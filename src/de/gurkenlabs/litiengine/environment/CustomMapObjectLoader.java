@@ -70,8 +70,7 @@ public final class CustomMapObjectLoader extends MapObjectLoader {
     }
 
     loadDefaultProperties(entity, mapObject);
-    if (entity instanceof ICollisionEntity)
-      loadCollisionProperties((ICollisionEntity) entity, mapObject);
+
     return Arrays.asList(entity);
   }
 }

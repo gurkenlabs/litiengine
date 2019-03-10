@@ -53,6 +53,10 @@ public class RangeAttribute<T extends Number> extends Attribute<T> {
   public void setToMaxValue() {
     this.setBaseValue(this.getMaxValue());
   }
+  
+  public void setMaxValue(final T maxValue) {
+    this.maxBaseValue = maxValue;
+  }
 
   protected List<AttributeModifier<T>> getMaxModifiers() {
     return this.maxModifiers;

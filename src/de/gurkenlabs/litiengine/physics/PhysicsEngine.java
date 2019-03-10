@@ -15,7 +15,6 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
-import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
@@ -52,7 +51,7 @@ public final class PhysicsEngine implements IUpdateable {
   public PhysicsEngine() {
     this.collisionEntities = new CopyOnWriteArrayList<>();
     this.staticCollisionBoxes = new CopyOnWriteArrayList<>();
-    
+
     // these collections are updated every tick so they don't use a CopyOnWriteArrayList due to performance
     this.entityCollisionBoxes = Collections.synchronizedList(new ArrayList<>());
     this.allCollisionBoxes = Collections.synchronizedList(new ArrayList<>());
@@ -78,12 +77,10 @@ public final class PhysicsEngine implements IUpdateable {
   public void add(final ICollisionEntity entity) {
 
     // special handling for making props be handled like static collision boxes.
-    if (entity instanceof Prop) {
-      Prop prop = (Prop) entity;
-      if (prop.isObstacle()) {
-        this.add(prop.getCollisionBox());
-        return;
-      }
+    if (entity.getCollisionType() == CollisionType.STATIC) {
+
+      this.add(entity.getCollisionBox());
+      return;
     }
 
     if (!this.collisionEntities.contains(entity)) {
@@ -111,12 +108,9 @@ public final class PhysicsEngine implements IUpdateable {
    *          The entity that is about to be removed.
    */
   public void remove(final ICollisionEntity entity) {
-    if (entity instanceof Prop) {
-      Prop prop = (Prop) entity;
-      if (prop.isObstacle()) {
-        this.remove(prop.getCollisionBox());
-        return;
-      }
+    if (entity.getCollisionType() == CollisionType.STATIC) {
+      this.remove(entity.getCollisionBox());
+      return;
     }
 
     this.collisionEntities.remove(entity);
@@ -186,7 +180,7 @@ public final class PhysicsEngine implements IUpdateable {
     switch (collisionType) {
     case ALL:
       return this.collides(point);
-    case ENTITY:
+    case DYNAMIC:
       return this.collidesWithAnyEntity(null, point);
     case STATIC:
       return this.collidesWithAnyStaticCollisionBox(point);
@@ -273,7 +267,7 @@ public final class PhysicsEngine implements IUpdateable {
     switch (collisionType) {
     case ALL:
       return this.collides(rect);
-    case ENTITY:
+    case DYNAMIC:
       return this.collidesWithAnyEntity(collisionEntity, rect) != null;
     case STATIC:
       return this.collidesWithAnyStaticCollisionBox(rect) != null;
@@ -379,7 +373,7 @@ public final class PhysicsEngine implements IUpdateable {
 
   private List<Rectangle2D> getAllCollisionBoxRectangles(CollisionType collisionType) {
     switch (collisionType) {
-    case ENTITY:
+    case DYNAMIC:
       return this.entityCollisionBoxRectangles;
     case STATIC:
       return this.staticCollisionBoxes;

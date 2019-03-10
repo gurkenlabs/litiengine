@@ -60,6 +60,7 @@ import de.gurkenlabs.litiengine.gui.ComponentMouseEvent;
 import de.gurkenlabs.litiengine.gui.ComponentMouseWheelEvent;
 import de.gurkenlabs.litiengine.gui.GuiComponent;
 import de.gurkenlabs.litiengine.input.Input;
+import de.gurkenlabs.litiengine.physics.CollisionType;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.litiengine.util.ColorHelper;
@@ -930,6 +931,9 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       mo.setValue(MapObjectProperty.LIGHT_COLOR, Color.WHITE);
       mo.setValue(MapObjectProperty.LIGHT_SHAPE, LightSource.ELLIPSE);
       mo.setValue(MapObjectProperty.LIGHT_ACTIVE, true);
+      break;
+    case COLLISIONBOX:
+      mo.setValue(MapObjectProperty.COLLISION_TYPE, CollisionType.STATIC);
       break;
     case SPAWNPOINT:
     default:

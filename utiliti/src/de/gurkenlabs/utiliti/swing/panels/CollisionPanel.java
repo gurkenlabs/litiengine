@@ -12,7 +12,9 @@ import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.litiengine.physics.CollisionType;
 import de.gurkenlabs.utiliti.Icons;
+import de.gurkenlabs.utiliti.swing.panels.PropertyPanel.LayoutItem;
 
 @SuppressWarnings("serial")
 public class CollisionPanel extends PropertyPanel {
@@ -21,6 +23,7 @@ public class CollisionPanel extends PropertyPanel {
   private final JSpinner spinnerHeight;
   private final JComboBox<Align> comboBoxAlign;
   private final JComboBox<Valign> comboBoxValign;
+  private final JComboBox<CollisionType> comboBoxColl;
 
   /**
    * Create the panel.
@@ -35,6 +38,8 @@ public class CollisionPanel extends PropertyPanel {
     this.comboBoxAlign.setModel(new DefaultComboBoxModel<>(Align.values()));
     this.comboBoxValign = new JComboBox<>();
     this.comboBoxValign.setModel(new DefaultComboBoxModel<>(Valign.values()));
+    this.comboBoxColl = new JComboBox<>();
+    this.comboBoxColl.setModel(new DefaultComboBoxModel<>(new CollisionType[] { CollisionType.DYNAMIC, CollisionType.STATIC }));
     
     this.setLayout(this.createLayout());
     this.setupChangedListeners();
@@ -47,6 +52,7 @@ public class CollisionPanel extends PropertyPanel {
     this.spinnerHeight.setValue(0.0);
     this.comboBoxAlign.setSelectedItem(Align.CENTER);
     this.comboBoxValign.setSelectedItem(Valign.DOWN);
+    this.comboBoxColl.setSelectedItem(CollisionType.STATIC);
   }
 
   @Override
@@ -56,6 +62,7 @@ public class CollisionPanel extends PropertyPanel {
     this.spinnerHeight.setValue(mapObject.getDoubleValue(MapObjectProperty.COLLISIONBOX_HEIGHT));
     this.comboBoxAlign.setSelectedItem(Align.get(mapObject.getStringValue(MapObjectProperty.COLLISION_ALIGN)));
     this.comboBoxValign.setSelectedItem(Valign.get(mapObject.getStringValue(MapObjectProperty.COLLISION_VALIGN)));
+    this.comboBoxColl.setSelectedItem(mapObject.getEnumValue(MapObjectProperty.COLLISION_TYPE, CollisionType.class, CollisionType.DYNAMIC));
   }
   
   private void setupChangedListeners() {
@@ -64,6 +71,7 @@ public class CollisionPanel extends PropertyPanel {
     this.setup(this.spinnerHeight, MapObjectProperty.COLLISIONBOX_HEIGHT);
     this.setup(this.comboBoxAlign, MapObjectProperty.COLLISION_ALIGN);
     this.setup(this.comboBoxValign, MapObjectProperty.COLLISION_VALIGN);
+    this.setup(this.comboBoxColl, MapObjectProperty.COLLISION_TYPE);
   }
   
   private LayoutManager createLayout() {
@@ -72,6 +80,7 @@ public class CollisionPanel extends PropertyPanel {
         new LayoutItem("panel_height", this.spinnerHeight),
         new LayoutItem("panel_align", this.comboBoxAlign),
         new LayoutItem("panel_valign", this.comboBoxValign),
+        new LayoutItem("panel_collisionType", this.comboBoxColl), 
     };
     
     return this.createLayout(layoutItems, this.chckbxHasCollision);

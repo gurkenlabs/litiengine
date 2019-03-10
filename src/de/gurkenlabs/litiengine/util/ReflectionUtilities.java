@@ -27,12 +27,23 @@ public final class ReflectionUtilities {
     return null;
   }
 
-  public static <T, C> void setValue(Class<C> cls, Object instance, final String fieldName, final T value) {
+  public static List<Field> getAllFields(List<Field> fields, Class<?> type) {
+    fields.addAll(Arrays.asList(type.getDeclaredFields()));
+
+    if (type.getSuperclass() != null) {
+      getAllFields(fields, type.getSuperclass());
+    }
+
+    return fields;
+  }
+
+  public static <T, C> boolean setValue(Class<C> cls, Object instance, final String fieldName, final T value) {
     try {
       final Method method = getSetter(cls, fieldName);
       if (method != null) {
         // set the new value with the setter
         method.invoke(instance, value);
+        return true;
       } else {
         // if no setter is present, try to set the field directly
         for (final Field field : cls.getDeclaredFields()) {
@@ -42,22 +53,27 @@ public final class ReflectionUtilities {
             }
 
             field.set(instance, value);
+            return true;
           }
         }
       }
     } catch (final SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
     }
+    
+    return false;
   }
 
-  public static <T> void setEnumPropertyValue(Class<T> cls, Object instance, final Field field, String propertyName, String value) {
+  public static <T> boolean setEnumPropertyValue(Class<T> cls, Object instance, final Field field, String propertyName, String value) {
     final Object[] enumArray = field.getType().getEnumConstants();
 
     for (final Object enumConst : enumArray) {
       if (enumConst != null && enumConst.toString().equalsIgnoreCase(value)) {
-        ReflectionUtilities.setValue(cls, instance, propertyName, field.getType().cast(enumConst));
+        return ReflectionUtilities.setValue(cls, instance, propertyName, field.getType().cast(enumConst));
       }
     }
+    
+    return false;
   }
 
   public static <T> Method getSetter(Class<T> cls, final String fieldName) {
@@ -120,39 +136,42 @@ public final class ReflectionUtilities {
     return false;
   }
 
-  public static <T> void setFieldValue(final Class<T> cls, final Object instance, final String fieldName, final String value) {
+  public static <T> boolean setFieldValue(final Class<T> cls, final Object instance, final String fieldName, final String value) {
     // if a setter is present, instance method will use it, otherwise it will
     // directly try to set the field.
     final Field field = getField(cls, fieldName);
     if (field == null) {
-      return;
+      return false;
     }
 
     try {
       if (field.getType().equals(boolean.class)) {
-        setValue(cls, instance, fieldName, Boolean.parseBoolean(value));
+        return setValue(cls, instance, fieldName, Boolean.parseBoolean(value));
       } else if (field.getType().equals(int.class)) {
-        setValue(cls, instance, fieldName, Integer.parseInt(value));
+        return setValue(cls, instance, fieldName, Integer.parseInt(value));
       } else if (field.getType().equals(float.class)) {
-        setValue(cls, instance, fieldName, Float.parseFloat(value));
+        return setValue(cls, instance, fieldName, Float.parseFloat(value));
       } else if (field.getType().equals(double.class)) {
-        setValue(cls, instance, fieldName, Double.parseDouble(value));
+        return setValue(cls, instance, fieldName, Double.parseDouble(value));
       } else if (field.getType().equals(short.class)) {
-        setValue(cls, instance, fieldName, Short.parseShort(value));
+        return setValue(cls, instance, fieldName, Short.parseShort(value));
       } else if (field.getType().equals(byte.class)) {
-        setValue(cls, instance, fieldName, Byte.parseByte(value));
+        return setValue(cls, instance, fieldName, Byte.parseByte(value));
       } else if (field.getType().equals(long.class)) {
-        setValue(cls, instance, fieldName, Long.parseLong(value));
+        return setValue(cls, instance, fieldName, Long.parseLong(value));
       } else if (field.getType().equals(String.class)) {
-        setValue(cls, instance, fieldName, value);
+        return setValue(cls, instance, fieldName, value);
       } else if (field.getType().equals(String[].class)) {
-        setValue(cls, instance, fieldName, value.split(","));
+        return setValue(cls, instance, fieldName, value.split(","));
       } else if (field.getType() instanceof Class && field.getType().isEnum()) {
-        setEnumPropertyValue(cls, instance, field, fieldName, value);
+        return setEnumPropertyValue(cls, instance, field, fieldName, value);
       }
+      // TODO: implement support for Attribute and RangeAttribute fields
     } catch (final NumberFormatException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
     }
+    
+    return false;
   }
 
   public static List<Method> getMethodsAnnotatedWith(final Class<?> type, final Class<? extends Annotation> annotation) {

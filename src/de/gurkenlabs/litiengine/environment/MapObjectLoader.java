@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.environment;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Valign;
@@ -12,6 +13,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
+import de.gurkenlabs.litiengine.physics.CollisionType;
 import de.gurkenlabs.litiengine.util.ReflectionUtilities;
 
 public abstract class MapObjectLoader implements IMapObjectLoader {
@@ -73,39 +75,20 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
   }
 
   private static void loadCustomMapObjectProperties(IEntity entity, IMapObject mapObject) {
-    for (final Field field : entity.getClass().getDeclaredFields()) {
+    for (final Field field : ReflectionUtilities.getAllFields(new ArrayList<Field>(), entity.getClass())) {
       TmxProperty property = field.getAnnotation(TmxProperty.class);
+      
       if (property == null) {
         continue;
       }
+
 
       String value = mapObject.getStringValue(property.name(), null);
       if (value == null) {
         continue;
       }
 
-      ReflectionUtilities.setFieldValue(entity.getClass(), entity, field.getName(), value);
+      ReflectionUtilities.setFieldValue(field.getDeclaringClass(), entity, field.getName(), value);
     }
-  }
-
-  public static void loadCollisionProperties(ICollisionEntity entity, IMapObject mapObject) {
-    entity.setCollision(mapObject.getBoolValue(MapObjectProperty.COLLISION, true));
-    entity.setCollisionBoxWidth(mapObject.getFloatValue(MapObjectProperty.COLLISIONBOX_WIDTH, mapObject.getWidth()));
-    entity.setCollisionBoxHeight(mapObject.getFloatValue(MapObjectProperty.COLLISIONBOX_HEIGHT, mapObject.getHeight()));
-    entity.setCollisionBoxAlign(mapObject.getEnumValue(MapObjectProperty.COLLISION_ALIGN, Align.class, Align.CENTER));
-    entity.setCollisionBoxValign(mapObject.getEnumValue(MapObjectProperty.COLLISION_VALIGN, Valign.class, Valign.DOWN));
-  }
-
-  public static void loadCombatProperties(ICombatEntity entity, IMapObject mapObject) {
-    entity.setIndestructible(mapObject.getBoolValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE));
-    entity.getHitPoints().setBaseValue(mapObject.getIntValue(MapObjectProperty.COMBAT_HITPOINTS));
-    entity.setTeam(mapObject.getIntValue(MapObjectProperty.COMBAT_TEAM));
-  }
-
-  public static void loadMovementProperties(IMobileEntity entity, IMapObject mapObject) {
-    entity.setVelocity(mapObject.getFloatValue(MapObjectProperty.MOVEMENT_VELOCITY, 100f));
-    entity.setAcceleration(mapObject.getIntValue(MapObjectProperty.MOVEMENT_ACCELERATION));
-    entity.setDeceleration(mapObject.getIntValue(MapObjectProperty.MOVEMENT_DECELERATION));
-    entity.setTurnOnMove(mapObject.getBoolValue(MapObjectProperty.MOVEMENT_TURNONMOVE));
   }
 }

@@ -18,16 +18,27 @@ import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 @MovementInfo
 public class Creature extends CombatEntity implements IMobileEntity {
   private static final int IDLE_DELAY = 100;
+  
+  @TmxProperty(name = MapObjectProperty.MOVEMENT_ACCELERATION)
   private int acceleration;
+  
+  @TmxProperty(name = MapObjectProperty.MOVEMENT_DECELERATION)
   private int deceleration;
-  private long lastMoved;
-  private Point2D moveDestination;
+  
+  @TmxProperty(name = MapObjectProperty.MOVEMENT_TURNONMOVE)
   private boolean turnOnMove;
+  
+  @TmxProperty(name = MapObjectProperty.MOVEMENT_VELOCITY)
   private Attribute<Float> velocity;
+  
+  @TmxProperty(name = MapObjectProperty.SPRITESHEETNAME)
   private String spritePrefix;
-
+  
   @TmxProperty(name = MapObjectProperty.SCALE_SPRITE)
   private boolean scaling;
+  
+  private long lastMoved;
+  private Point2D moveDestination;
 
   public Creature() {
     this(null);

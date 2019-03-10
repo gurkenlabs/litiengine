@@ -4,10 +4,12 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 import de.gurkenlabs.litiengine.Align;
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.annotation.CollisionInfo;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
+import de.gurkenlabs.litiengine.physics.CollisionType;
 
 @CollisionInfo(collision = true)
 public abstract class CollisionEntity extends Entity implements ICollisionEntity {
@@ -29,7 +31,10 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
 
   @TmxProperty(name = MapObjectProperty.COLLISION_VALIGN)
   private Valign valign = Valign.DOWN;
-  
+
+  @TmxProperty(name = MapObjectProperty.COLLISION_TYPE)
+  private CollisionType collisionType = CollisionType.DYNAMIC;
+
   private Rectangle2D collisionBox;
 
   protected CollisionEntity() {
@@ -104,6 +109,11 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
     return this.valign;
   }
 
+  @Override
+  public CollisionType getCollisionType() {
+    return this.collisionType;
+  }
+
   /**
    * Checks for collision.
    *
@@ -171,5 +181,17 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
   public void setWidth(final float width) {
     super.setWidth(width);
     this.collisionBox = this.getCollisionBox(this.getLocation());
+  }
+
+  @Override
+  public void setCollisionType(CollisionType type) {
+    if (this.getEnvironment() != null && this.getEnvironment().isLoaded()) {
+      // re-add the entity to the physics engine so it will be treated with the updated collision type
+      Game.physics().remove(this);
+      this.collisionType = type;
+      Game.physics().add(this);
+    } else {
+      this.collisionType = type;
+    }
   }
 }

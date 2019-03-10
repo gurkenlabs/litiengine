@@ -72,8 +72,6 @@ public class PropMapObjectLoader extends MapObjectLoader {
 
     final Prop prop = this.createNewProp(mapObject, mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME));
     loadDefaultProperties(prop, mapObject);
-    loadCollisionProperties(prop, mapObject);
-    loadCombatProperties(prop, mapObject);
     
     prop.setMaterial(Material.get(mapObject.getStringValue(MapObjectProperty.PROP_MATERIAL)));
 

@@ -178,7 +178,7 @@ public class AStarGrid implements IRenderable {
   }
 
   protected void assignPenalty(AStarNode node) {
-    if (!Game.physics().collides(node.getLocation(), CollisionType.ENTITY)) {
+    if (!Game.physics().collides(node.getLocation(), CollisionType.DYNAMIC)) {
       return;
     }
 

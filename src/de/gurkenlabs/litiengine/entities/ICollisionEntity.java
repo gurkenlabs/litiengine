@@ -5,6 +5,7 @@ import java.awt.geom.Rectangle2D;
 
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Valign;
+import de.gurkenlabs.litiengine.physics.CollisionType;
 
 public interface ICollisionEntity extends IEntity {
   public boolean canCollideWith(ICollisionEntity otherEntity);
@@ -35,6 +36,8 @@ public interface ICollisionEntity extends IEntity {
   public Valign getCollisionBoxValign();
 
   public Align getCollisionBoxAlign();
+  
+  public CollisionType getCollisionType();
 
   public float getCollisionBoxHeight();
 
@@ -62,4 +65,6 @@ public interface ICollisionEntity extends IEntity {
   public void setCollisionBoxAlign(final Align align);
 
   public void setCollisionBoxValign(final Valign valign);
+  
+  public void setCollisionType(CollisionType collisionType);
 }

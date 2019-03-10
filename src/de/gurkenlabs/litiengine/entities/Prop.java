@@ -14,9 +14,6 @@ public class Prop extends CombatEntity {
   @TmxProperty(name = MapObjectProperty.PROP_MATERIAL)
   private Material material;
 
-  @TmxProperty(name = MapObjectProperty.PROP_OBSTACLE)
-  private boolean isObstacle;
-
   @TmxProperty(name = MapObjectProperty.PROP_ADDSHADOW)
   private boolean addShadow;
 
@@ -87,15 +84,6 @@ public class Prop extends CombatEntity {
     return this.addShadow;
   }
 
-  /**
-   * Gets whether this instance should be treated like an obstacle (static collision box).
-   * 
-   * @return True if this instance is defined as obstacle; otherwise false.
-   */
-  public boolean isObstacle() {
-    return this.isObstacle;
-  }
-
   public boolean isScaling() {
     return this.scaling;
   }
@@ -119,10 +107,6 @@ public class Prop extends CombatEntity {
   public void setSpritesheetName(final String spriteName) {
     this.spritesheetName = spriteName;
     this.updateAnimationController();
-  }
-
-  public void setObstacle(boolean isObstacle) {
-    this.isObstacle = isObstacle;
   }
 
   public void setAddShadow(boolean addShadow) {
