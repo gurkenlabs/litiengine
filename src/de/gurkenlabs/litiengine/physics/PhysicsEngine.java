@@ -46,13 +46,13 @@ public final class PhysicsEngine implements IUpdateable {
   public PhysicsEngine() {
     this.collisionEntities = new ConcurrentHashMap<>();
     this.collisionEntities.put(Collision.DYNAMIC, new CopyOnWriteArrayList<>());
-    this.collisionEntities.put(Collision.STATIC,new CopyOnWriteArrayList<>());
-    this.collisionEntities.put(Collision.ALL, new CopyOnWriteArrayList<>());
+    this.collisionEntities.put(Collision.STATIC, new CopyOnWriteArrayList<>());
+    this.collisionEntities.put(Collision.ANY, new CopyOnWriteArrayList<>());
 
     this.collisionBoxes = new ConcurrentHashMap<>();
     this.collisionBoxes.put(Collision.DYNAMIC, new CopyOnWriteArrayList<>());
     this.collisionBoxes.put(Collision.STATIC, new CopyOnWriteArrayList<>());
-    this.collisionBoxes.put(Collision.ALL, new CopyOnWriteArrayList<>());
+    this.collisionBoxes.put(Collision.ANY, new CopyOnWriteArrayList<>());
   }
 
   /**
@@ -83,7 +83,7 @@ public final class PhysicsEngine implements IUpdateable {
       return;
     }
 
-    this.collisionEntities.get(Collision.ALL).add(entity);
+    this.collisionEntities.get(Collision.ANY).add(entity);
   }
 
   /**
@@ -107,7 +107,7 @@ public final class PhysicsEngine implements IUpdateable {
       return;
     }
 
-    this.collisionEntities.get(Collision.ALL).remove(entity);
+    this.collisionEntities.get(Collision.ANY).remove(entity);
   }
 
   /**
@@ -128,7 +128,7 @@ public final class PhysicsEngine implements IUpdateable {
   }
 
   public Collection<Rectangle2D> getCollisionBoxes() {
-    return this.getCollisionBoxes(Collision.ALL);
+    return this.getCollisionBoxes(Collision.ANY);
   }
 
   public Collection<Rectangle2D> getCollisionBoxes(Collision type) {
@@ -140,7 +140,7 @@ public final class PhysicsEngine implements IUpdateable {
   }
 
   public Collection<ICollisionEntity> getCollisionEntities() {
-    return this.getCollisionEntities(Collision.ALL);
+    return this.getCollisionEntities(Collision.ANY);
   }
 
   public Collection<ICollisionEntity> getCollisionEntities(Collision type) {
@@ -159,49 +159,24 @@ public final class PhysicsEngine implements IUpdateable {
     this.environmentBounds = environmentBounds;
   }
 
-  public Point2D collides(final Line2D rayCast) {
-    return this.collides(rayCast, Collision.ALL);
+  public boolean collides(Line2D line) {
+    return this.collides(line, Collision.ANY, null);
   }
 
-  public Point2D collides(Line2D rayCast, Collision collisionType) {
-    final Point2D rayCastSource = new Point2D.Double(rayCast.getX1(), rayCast.getY1());
-
-    final List<Rectangle2D> collBoxes = this.collisionBoxes.get(collisionType);
-    for (final Rectangle2D collisionBox : collBoxes) {
-      if (collisionBox.intersectsLine(rayCast)) {
-        double closestDist = -1;
-        Point2D closestPoint = null;
-        for (final Point2D intersection : GeometricUtilities.getIntersectionPoints(rayCast, collisionBox)) {
-          final double dist = intersection.distance(rayCastSource);
-          if (closestPoint == null || dist < closestDist) {
-            closestPoint = intersection;
-            closestDist = dist;
-          }
-        }
-
-        return closestPoint;
-      }
-    }
-
-    return null;
+  public boolean collides(Line2D line, Collision collision) {
+    return this.collides(line, collision, null);
   }
 
-  public boolean collides(final Point2D point) {
-    return this.collides(point, Collision.ALL, null);
+  public boolean collides(Line2D line, ICollisionEntity entity) {
+    return this.collides(line, Collision.ANY, entity);
+  }
+
+  public boolean collides(final Line2D line, Collision collision, ICollisionEntity entity) {
+    return this.collides(entity, collision, otherEntity -> GeometricUtilities.getIntersectionPoint(line, otherEntity.getCollisionBox()) != null);
   }
 
   public boolean collides(final Rectangle2D rect) {
-    if (this.environmentBounds != null && !this.environmentBounds.intersects(rect)) {
-      return true;
-    }
-
-    for (final Rectangle2D collisionBox : this.getCollisionBoxes()) {
-      if (GeometricUtilities.intersects(rect, collisionBox)) {
-        return true;
-      }
-    }
-
-    return false;
+    return this.collides(rect, Collision.ANY);
   }
 
   /**
@@ -209,18 +184,11 @@ public final class PhysicsEngine implements IUpdateable {
    * 
    * @param rect
    *          The rectangle to check the collision for.
-   * @param collisionType
-   *          use the following flags
-   *          <ul>
-   *          <li>COLLTYPE_ENTITY</li>
-   *          <li>COLLTYPE_STATIC</li>
-   *          <li>COLLTYPE_ALL</li>
-   *          </ul>
    * @return Returns true if the specified rectangle collides with any collision
    *         box of the specified type(s); otherwise false.
    */
   public boolean collides(Rectangle2D rect, ICollisionEntity collisionEntity) {
-    return this.collides(rect, Collision.ALL, collisionEntity);
+    return this.collides(rect, Collision.ANY, collisionEntity);
   }
 
   public boolean collides(Rectangle2D collisionBox, Collision type) {
@@ -228,18 +196,30 @@ public final class PhysicsEngine implements IUpdateable {
   }
 
   public boolean collides(Rectangle2D rectangle, Collision type, ICollisionEntity entity) {
+    if (this.environmentBounds != null && !this.environmentBounds.intersects(rectangle)) {
+      return true;
+    }
+
     return collides(entity, type, otherEntity -> GeometricUtilities.intersects(otherEntity.getCollisionBox(), rectangle));
+  }
+
+  public boolean collides(final Point2D location) {
+    return this.collides(location, Collision.ANY);
   }
 
   public boolean collides(Point2D location, Collision type) {
     return collides(location, type, null);
   }
 
-  public boolean collides(Point2D point, ICollisionEntity collisionEntity) {
-    return this.collides(point, Collision.ALL, collisionEntity);
+  public boolean collides(Point2D location, ICollisionEntity collisionEntity) {
+    return this.collides(location, Collision.ANY, collisionEntity);
   }
 
   public boolean collides(Point2D location, Collision type, ICollisionEntity entity) {
+    if (this.environmentBounds != null && !this.environmentBounds.contains(location)) {
+      return true;
+    }
+
     return collides(entity, type, otherEntity -> otherEntity.getCollisionBox().contains(location));
   }
 
@@ -256,11 +236,58 @@ public final class PhysicsEngine implements IUpdateable {
   }
 
   public boolean collides(ICollisionEntity collisionEntity) {
-    return this.collides(collisionEntity, Collision.ALL);
+    return this.collides(collisionEntity, Collision.ANY);
   }
 
   public boolean collides(ICollisionEntity collisionEntity, Collision collisionType) {
     return this.collides(collisionEntity.getCollisionBox(), collisionType, collisionEntity);
+  }
+
+  public Point2D raycast(Point2D pointA, Point2D pointB) {
+    return raycast(pointA, pointB, Collision.ANY);
+  }
+
+  public Point2D raycast(Point2D pointA, Point2D pointB, Collision collisionType) {
+    final Line2D line = new Line2D.Double(pointA.getX(), pointA.getY(), pointB.getX(), pointB.getY());
+    return raycast(line, collisionType, null);
+  }
+
+  public Point2D raycast(Line2D line) {
+    return raycast(line, Collision.ANY, null);
+  }
+
+  public Point2D raycast(Line2D line, Collision collisionType) {
+    return raycast(line, collisionType, null);
+  }
+
+  public Point2D raycast(Line2D line, ICollisionEntity entity) {
+    return raycast(line, Collision.ANY, entity);
+  }
+
+  public Point2D raycast(Line2D line, Collision collisionType, ICollisionEntity entity) {
+    final Point2D rayCastSource = new Point2D.Double(line.getX1(), line.getY1());
+
+    for (final ICollisionEntity collisionBox : this.collisionEntities.get(collisionType)) {
+      if (!canCollide(entity, collisionBox)) {
+        continue;
+      }
+
+      if (collisionBox.getCollisionBox().intersectsLine(line)) {
+        double closestDist = -1;
+        Point2D closestPoint = null;
+        for (final Point2D intersection : GeometricUtilities.getIntersectionPoints(line, collisionBox.getCollisionBox())) {
+          final double dist = intersection.distance(rayCastSource);
+          if (closestPoint == null || dist < closestDist) {
+            closestPoint = intersection;
+            closestDist = dist;
+          }
+        }
+
+        return closestPoint;
+      }
+    }
+
+    return null;
   }
 
   /**
@@ -331,11 +358,7 @@ public final class PhysicsEngine implements IUpdateable {
 
   @Override
   public void update() {
-    this.updateAllCollisionBoxes();
-  }
-
-  private void updateAllCollisionBoxes() {
-    // retrieve all collisionbox rectangles once per update
+    // retrieve all collision box rectangles once per update
     for (Collision type : Collision.values()) {
       if (type == Collision.NONE) {
         continue;
@@ -346,12 +369,28 @@ public final class PhysicsEngine implements IUpdateable {
     }
   }
 
+  private static boolean canCollide(ICollisionEntity entity, ICollisionEntity otherEntity) {
+    if (otherEntity == null || !otherEntity.hasCollision()) {
+      return false;
+    }
+
+    // the entity to check against is not provided
+    if (entity == null) {
+      return true;
+    }
+
+    // cannot collide with itself
+    if (otherEntity.equals(entity)) {
+      return false;
+    }
+
+    // an entity cannot collide with other entities that are excluded from collision by the canCollideWith method
+    return entity.canCollideWith(otherEntity);
+  }
+
   private Rectangle2D getIntersection(final ICollisionEntity entity, final Rectangle2D entityCollisionBox) {
     for (final ICollisionEntity collisionBox : this.getCollisionEntities()) {
-
-      // an entity cannot collide with itself or other entities that are
-      // excluded from collision by the canCollideWith method
-      if (collisionBox.equals(entity) || !entity.canCollideWith(collisionBox)) {
+      if (!canCollide(entity, collisionBox)) {
         continue;
       }
 
@@ -369,7 +408,7 @@ public final class PhysicsEngine implements IUpdateable {
 
   private boolean collides(final ICollisionEntity entity, Collision type, Predicate<ICollisionEntity> check) {
     for (final ICollisionEntity otherEntity : this.getCollisionEntities(type)) {
-      if (otherEntity == null || !otherEntity.hasCollision() || entity != null && otherEntity.equals(entity) || entity != null && !entity.canCollideWith(otherEntity)) {
+      if (!canCollide(entity, otherEntity)) {
         continue;
       }
 
@@ -471,18 +510,6 @@ public final class PhysicsEngine implements IUpdateable {
     // special case to prevent entities to glitch through collision boxes if
     // they have a large enough step size
     final Line2D line = new Line2D.Double(entity.getCollisionBox().getCenterX(), entity.getCollisionBox().getCenterY(), entity.getCollisionBox(newPosition).getCenterX(), entity.getCollisionBox(newPosition).getCenterY());
-    for (final ICollisionEntity collisionBox : this.getCollisionEntities()) {
-      if (collisionBox.equals(entity) || !entity.canCollideWith(collisionBox)) {
-        continue;
-      }
-
-      // there was a collision in between
-      final Point2D intersection = GeometricUtilities.getIntersectionPoint(line, collisionBox.getCollisionBox());
-      if (intersection != null) {
-        return true;
-      }
-    }
-
-    return false;
+    return this.collides(line, Collision.ANY, entity);
   }
 }

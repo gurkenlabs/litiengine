@@ -61,7 +61,7 @@ public class PhysicsTests {
     engine.update();
 
     assertTrue(engine.collides(5, 5));
-    assertTrue(engine.collides(5, 5, Collision.ALL));
+    assertTrue(engine.collides(5, 5, Collision.ANY));
     assertTrue(engine.collides(5, 5, Collision.DYNAMIC));
     assertFalse(engine.collides(5, 5, Collision.STATIC));
     assertFalse(engine.collides(5, 5, Collision.NONE));
@@ -103,7 +103,7 @@ public class PhysicsTests {
     assertTrue(engine.collides(new Rectangle2D.Double(9, 9, 5, 5)));
 
     assertTrue(engine.collides(new Rectangle2D.Double(9, 9, 5, 5), Collision.DYNAMIC));
-    assertTrue(engine.collides(new Rectangle2D.Double(9, 9, 5, 5), Collision.ALL));
+    assertTrue(engine.collides(new Rectangle2D.Double(9, 9, 5, 5), Collision.ANY));
     assertFalse(engine.collides(new Rectangle2D.Double(9, 9, 5, 5), Collision.STATIC));
     assertFalse(engine.collides(new Rectangle2D.Double(9, 9, 5, 5), Collision.NONE));
 

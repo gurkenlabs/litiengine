@@ -26,9 +26,9 @@ public interface EntityTransformListener extends EventListener {
    * @param entity
    *          The entity that changed its size.
    *          
-   * @see IEntity#setSize(float, float)
-   * @see IEntity#setHeight(float)
-   * @see IEntity#setWidth(float)
+   * @see IEntity#setSize(double, double)
+   * @see IEntity#setHeight(double)
+   * @see IEntity#setWidth(double)
    */
   public void sizeChanged(IEntity entity);
 }

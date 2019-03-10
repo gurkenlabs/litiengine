@@ -186,7 +186,7 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
 
   @Override
   public void setCollisionType(Collision type) {
-    if (type == Collision.ALL) {
+    if (type == Collision.ANY) {
       throw new IllegalArgumentException("CollistionType.ALL is not allowed to be assigned to an entity. It may only be used for filtering in the PhysicsEngine.");
     }
 
