@@ -81,7 +81,6 @@ public final class Game {
   private static boolean debug = true;
   private static boolean noGUIMode = false;
   private static final List<GameListener> gameListeners = new CopyOnWriteArrayList<>();
-  private static final List<GameTerminatedListener> gameTerminatedListeners = new CopyOnWriteArrayList<>();
 
   private static final RenderEngine graphicsEngine = new RenderEngine();
   private static final SoundEngine soundEngine = new SoundEngine();
@@ -120,20 +119,10 @@ public final class Game {
 
   public static void addGameListener(GameListener listener) {
     gameListeners.add(listener);
-    gameTerminatedListeners.add(listener);
   }
 
   public static void removeGameListener(GameListener listener) {
     gameListeners.remove(listener);
-    gameTerminatedListeners.remove(listener);
-  }
-
-  public static void addGameTerminatedListener(GameTerminatedListener listener) {
-    gameTerminatedListeners.add(listener);
-  }
-
-  public static void removeGameTerminatedListener(GameTerminatedListener listener) {
-    gameTerminatedListeners.remove(listener);
   }
 
   /**
@@ -595,7 +584,7 @@ public final class Game {
       renderLoop.terminate();
     }
 
-    for (final GameTerminatedListener listener : gameTerminatedListeners) {
+    for (final GameListener listener : gameListeners) {
       listener.terminated();
     }
   }

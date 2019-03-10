@@ -62,7 +62,7 @@ import javax.swing.SwingUtilities;
 
 import de.gurkenlabs.litiengine.DefaultUncaughtExceptionHandler;
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.GameAdapter;
+import de.gurkenlabs.litiengine.GameListener;
 import de.gurkenlabs.litiengine.configuration.Quality;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
@@ -288,7 +288,7 @@ public class Program {
     JFrame window = ((JFrame) Game.window().getHostControl());
     window.setResizable(true);
 
-    Game.addGameListener(new GameAdapter() {
+    Game.addGameListener(new GameListener() {
       @Override
       public boolean terminating() {
         boolean terminate = notifyPendingChanges();

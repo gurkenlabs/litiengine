@@ -7,7 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.GameAdapter;
+import de.gurkenlabs.litiengine.GameListener;
 
 /**
  * The static <code>Input</code> class is the LITIengine's access point to devices that capture physical player input.
@@ -90,7 +90,7 @@ public final class Input {
     }
   }
 
-  public static final class InputGameAdapter extends GameAdapter {
+  public static final class InputGameAdapter implements GameListener {
     @Override
     public void terminated() {
       if (gamePadManager != null) {
