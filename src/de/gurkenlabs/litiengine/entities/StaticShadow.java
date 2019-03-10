@@ -82,13 +82,13 @@ public class StaticShadow extends MapArea {
   }
 
   @Override
-  public void setWidth(final float width) {
+  public void setWidth(final double width) {
     super.setWidth(width);
     this.area = null;
   }
 
   @Override
-  public void setHeight(final float height) {
+  public void setHeight(final double height) {
     super.setHeight(height);
     this.area = null;
   }

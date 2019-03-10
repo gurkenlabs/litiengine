@@ -1,5 +1,8 @@
 package de.gurkenlabs.litiengine.entities;
 
+import java.awt.geom.Rectangle2D;
+
+import de.gurkenlabs.litiengine.annotation.CollisionInfo;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
@@ -7,6 +10,7 @@ import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.physics.CollisionType;
 
 @EntityInfo(renderType = RenderType.OVERLAY)
+@CollisionInfo(collision = true, collisionType = CollisionType.STATIC)
 public class CollisionBox extends CollisionEntity {
 
   @TmxProperty(name = MapObjectProperty.COLLISIONBOX_OBSTRUCTINGLIGHTS)
@@ -17,9 +21,25 @@ public class CollisionBox extends CollisionEntity {
   }
 
   public CollisionBox(final boolean obstructingLight) {
-    super();
     this.obstructingLight = obstructingLight;
-    this.setCollisionType(CollisionType.STATIC);
+  }
+
+  public CollisionBox(double width, double height) {
+    this(false);
+    this.setWidth(width);
+    this.setHeight(height);
+    this.setCollisionBoxWidth(this.getWidth());
+    this.setCollisionBoxHeight(this.getHeight());
+  }
+
+  public CollisionBox(double x, double y, double width, double height) {
+    this(width, height);
+    this.setX(x);
+    this.setY(y);
+  }
+
+  public CollisionBox(Rectangle2D box) {
+    this(box.getX(), box.getY(), box.getWidth(), box.getHeight());
   }
 
   public boolean isObstructingLight() {

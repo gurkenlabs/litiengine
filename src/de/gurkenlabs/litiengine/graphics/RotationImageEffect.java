@@ -29,7 +29,7 @@ public class RotationImageEffect extends ImageEffect {
     return img;
   }
 
-  public float getAngle() {
+  public double getAngle() {
     return this.angle;
   }
 }

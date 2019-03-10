@@ -39,9 +39,9 @@ public interface ICollisionEntity extends IEntity {
   
   public CollisionType getCollisionType();
 
-  public float getCollisionBoxHeight();
+  public double getCollisionBoxHeight();
 
-  public float getCollisionBoxWidth();
+  public double getCollisionBoxWidth();
 
   /**
    * Checks for collision.
@@ -58,9 +58,9 @@ public interface ICollisionEntity extends IEntity {
    */
   public void setCollision(boolean collision);
 
-  public void setCollisionBoxHeight(final float collisionBoxHeight);
+  public void setCollisionBoxHeight(final double collisionBoxHeight);
 
-  public void setCollisionBoxWidth(final float collisionBoxWidth);
+  public void setCollisionBoxWidth(final double collisionBoxWidth);
 
   public void setCollisionBoxAlign(final Align align);
 

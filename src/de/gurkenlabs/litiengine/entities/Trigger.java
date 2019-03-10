@@ -198,19 +198,19 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   }
 
   @Override
-  public void setHeight(final float height) {
+  public void setHeight(final double height) {
     this.setCollisionBoxHeight(height);
     super.setHeight(height);
   }
 
   @Override
-  public void setWidth(final float width) {
+  public void setWidth(final double width) {
     this.setCollisionBoxWidth(width);
     super.setWidth(width);
   }
 
   @Override
-  public void setSize(final float width, final float height) {
+  public void setSize(final double width, final double height) {
     this.setCollisionBoxWidth(width);
     this.setCollisionBoxHeight(height);
     super.setSize(width, height);

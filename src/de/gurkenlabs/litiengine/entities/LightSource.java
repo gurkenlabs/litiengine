@@ -154,14 +154,14 @@ public class LightSource extends Entity implements IRenderable {
   }
 
   @Override
-  public void setWidth(float width) {
+  public void setWidth(double width) {
     super.setWidth(width);
     this.updateShape();
     this.updateAmbientLayers();
   }
 
   @Override
-  public void setHeight(float height) {
+  public void setHeight(double height) {
     super.setHeight(height);
     this.updateShape();
     this.updateAmbientLayers();
@@ -174,7 +174,7 @@ public class LightSource extends Entity implements IRenderable {
   }
 
   @Override
-  public void setSize(final float width, final float height) {
+  public void setSize(final double width, final double height) {
     super.setSize(width, height);
     double shorterDimension = width;
     if (width > height) {

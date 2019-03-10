@@ -33,11 +33,12 @@ public final class PhysicsEngine implements IUpdateable {
 
   private final List<Rectangle2D> staticCollisionBoxes;
 
-  private final List<CollisionBox> entityCollisionBoxes;
+  private final List<CollisionBox> dynamicCollisionBoxes;
   private final List<CollisionBox> allCollisionBoxes;
   private final List<CollisionBox> staticBoxes;
+  
   private final List<Rectangle2D> allCollisionBoxRectangles;
-  private final List<Rectangle2D> entityCollisionBoxRectangles;
+  private final List<Rectangle2D> dynamicCollisionBoxRectangles;
 
   /**
    * Instantiates a new PhysicsEngine instance.
@@ -53,11 +54,11 @@ public final class PhysicsEngine implements IUpdateable {
     this.staticCollisionBoxes = new CopyOnWriteArrayList<>();
 
     // these collections are updated every tick so they don't use a CopyOnWriteArrayList due to performance
-    this.entityCollisionBoxes = Collections.synchronizedList(new ArrayList<>());
+    this.dynamicCollisionBoxes = Collections.synchronizedList(new ArrayList<>());
     this.allCollisionBoxes = Collections.synchronizedList(new ArrayList<>());
     this.staticBoxes = Collections.synchronizedList(new ArrayList<>());
     this.allCollisionBoxRectangles = Collections.synchronizedList(new ArrayList<>());
-    this.entityCollisionBoxRectangles = Collections.synchronizedList(new ArrayList<>());
+    this.dynamicCollisionBoxRectangles = Collections.synchronizedList(new ArrayList<>());
   }
 
   /**
@@ -89,18 +90,6 @@ public final class PhysicsEngine implements IUpdateable {
   }
 
   /**
-   * Adds the specified static collision box to the physics engine.
-   * 
-   * @param staticCollisionBox
-   *          The static collision box to be added.
-   */
-  public void add(final Rectangle2D staticCollisionBox) {
-    if (!this.staticCollisionBoxes.contains(staticCollisionBox)) {
-      this.staticCollisionBoxes.add(staticCollisionBox);
-    }
-  }
-
-  /**
    * Removes the specified entity from any collision processing. Typically this method is implicitly called when an entity is removed from the current
    * environment.
    * 
@@ -117,16 +106,6 @@ public final class PhysicsEngine implements IUpdateable {
   }
 
   /**
-   * Removes the specified static collision box.
-   * 
-   * @param staticCollisionBox
-   *          The static collision box that is about to be removed.
-   */
-  public void remove(final Rectangle2D staticCollisionBox) {
-    this.staticCollisionBoxes.remove(staticCollisionBox);
-  }
-
-  /**
    * Clears all previously registered participants in the collision process from this instance.
    * This includes all entities, static collision boxes and the map boundaries.
    */
@@ -136,7 +115,7 @@ public final class PhysicsEngine implements IUpdateable {
     this.allCollisionBoxes.clear();
     this.staticBoxes.clear();
     this.allCollisionBoxRectangles.clear();
-    this.entityCollisionBoxRectangles.clear();
+    this.dynamicCollisionBoxRectangles.clear();
     this.setBounds(null);
   }
 
@@ -374,7 +353,7 @@ public final class PhysicsEngine implements IUpdateable {
   private List<Rectangle2D> getAllCollisionBoxRectangles(CollisionType collisionType) {
     switch (collisionType) {
     case DYNAMIC:
-      return this.entityCollisionBoxRectangles;
+      return this.dynamicCollisionBoxRectangles;
     case STATIC:
       return this.staticCollisionBoxes;
     default:
@@ -384,18 +363,18 @@ public final class PhysicsEngine implements IUpdateable {
 
   private void updateAllCollisionBoxes() {
     this.allCollisionBoxes.clear();
-    this.entityCollisionBoxes.clear();
+    this.dynamicCollisionBoxes.clear();
     this.staticBoxes.clear();
 
-    this.entityCollisionBoxes.addAll(this.collisionEntities.stream().filter(ICollisionEntity::hasCollision).map(CollisionBox::new).collect(Collectors.toList()));
+    this.dynamicCollisionBoxes.addAll(this.collisionEntities.stream().filter(ICollisionEntity::hasCollision).map(CollisionBox::new).collect(Collectors.toList()));
     this.staticBoxes.addAll(this.staticCollisionBoxes.stream().map(CollisionBox::new).collect(Collectors.toList()));
 
-    this.allCollisionBoxes.addAll(entityCollisionBoxes);
+    this.allCollisionBoxes.addAll(dynamicCollisionBoxes);
     this.allCollisionBoxes.addAll(this.staticBoxes);
 
     this.allCollisionBoxRectangles.clear();
-    this.entityCollisionBoxRectangles.clear();
-    this.entityCollisionBoxRectangles.addAll(this.entityCollisionBoxes.stream().map(CollisionBox::getCollisionBox).collect(Collectors.toList()));
+    this.dynamicCollisionBoxRectangles.clear();
+    this.dynamicCollisionBoxRectangles.addAll(this.dynamicCollisionBoxes.stream().map(CollisionBox::getCollisionBox).collect(Collectors.toList()));
 
     this.allCollisionBoxRectangles.addAll(this.allCollisionBoxes.stream().map(CollisionBox::getCollisionBox).collect(Collectors.toList()));
   }
@@ -591,6 +570,29 @@ public final class PhysicsEngine implements IUpdateable {
 
     return false;
   }
+  
+  /**
+   * Adds the specified static collision box to the physics engine.
+   * 
+   * @param staticCollisionBox
+   *          The static collision box to be added.
+   */
+  private void add(final Rectangle2D staticCollisionBox) {
+    if (!this.staticCollisionBoxes.contains(staticCollisionBox)) {
+      this.staticCollisionBoxes.add(staticCollisionBox);
+    }
+  }
+
+  /**
+   * Removes the specified static collision box.
+   * 
+   * @param staticCollisionBox
+   *          The static collision box that is about to be removed.
+   */
+  private void remove(final Rectangle2D staticCollisionBox) {
+    this.staticCollisionBoxes.remove(staticCollisionBox);
+  }
+
 
   private class CollisionBox {
     private final Rectangle2D box;

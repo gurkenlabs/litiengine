@@ -13,6 +13,7 @@ import java.awt.geom.Rectangle2D;
 import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.litiengine.GameLoop;
+import de.gurkenlabs.litiengine.entities.CollisionBox;
 import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
 
@@ -83,7 +84,7 @@ public class PhysicsTests {
 
     PhysicsEngine engine = new PhysicsEngine();
     engine.add(ent);
-    engine.add(new Rectangle2D.Double(5, 5, 10, 10));
+    engine.add(new CollisionBox(5, 5, 10, 10));
     engine.update();
 
     assertNotNull(engine.collides(new Line2D.Double(0, 0, 5, 5)));

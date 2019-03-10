@@ -14,10 +14,10 @@ public class ParticleParameter implements Serializable {
   private static final long serialVersionUID = 4893417265998349179L;
 
   @XmlAttribute
-  private float maxValue;
+  private double maxValue;
 
   @XmlAttribute
-  private float minValue;
+  private double minValue;
 
   public ParticleParameter() {
   }
@@ -33,7 +33,7 @@ public class ParticleParameter implements Serializable {
    *
    * @return The value of this parameter.
    */
-  public float get() {
+  public double get() {
     if (maxValue != -1 && minValue < maxValue) {
       return this.getRandomNumber();
     } else {
@@ -42,12 +42,12 @@ public class ParticleParameter implements Serializable {
   }
 
   @XmlTransient
-  public float getMaxValue() {
+  public double getMaxValue() {
     return this.maxValue;
   }
 
   @XmlTransient
-  public float getMinValue() {
+  public double getMinValue() {
     return this.minValue;
   }
 
@@ -56,11 +56,11 @@ public class ParticleParameter implements Serializable {
     return (float) MathUtilities.randomInRange(this.getMinValue(), this.getMaxValue());
   }
 
-  public void setMaxValue(final float maxValue) {
+  public void setMaxValue(final double maxValue) {
     this.maxValue = maxValue;
   }
 
-  public void setMinValue(final float minValue) {
+  public void setMinValue(final double minValue) {
     this.minValue = minValue;
   }
 }

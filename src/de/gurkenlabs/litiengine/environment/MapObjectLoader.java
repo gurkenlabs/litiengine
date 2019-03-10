@@ -3,17 +3,11 @@ package de.gurkenlabs.litiengine.environment;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 
-import de.gurkenlabs.litiengine.Align;
-import de.gurkenlabs.litiengine.Valign;
-import de.gurkenlabs.litiengine.entities.ICollisionEntity;
-import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
-import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
-import de.gurkenlabs.litiengine.physics.CollisionType;
 import de.gurkenlabs.litiengine.util.ReflectionUtilities;
 
 public abstract class MapObjectLoader implements IMapObjectLoader {

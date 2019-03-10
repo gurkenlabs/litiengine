@@ -11,7 +11,7 @@ public class EntityRotationImageEffect extends RotationImageEffect {
   }
 
   @Override
-  public float getAngle() {
+  public double getAngle() {
     return 360 - this.entity.getAngle();
   }
 }

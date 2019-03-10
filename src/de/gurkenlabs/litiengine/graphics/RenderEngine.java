@@ -265,8 +265,8 @@ public final class RenderEngine {
         final double ratioY = entity.getHeight() / img.getHeight();
         ImageRenderer.renderScaled(g, img, Game.world().camera().getViewportLocation(entity.getLocation()), ratioX, ratioY);
       } else {
-        float deltaX = (entity.getWidth() - img.getWidth()) / 2.0f;
-        float deltaY = (entity.getHeight() - img.getHeight()) / 2.0f;
+        double deltaX = (entity.getWidth() - img.getWidth()) / 2.0;
+        double deltaY = (entity.getHeight() - img.getHeight()) / 2.0;
 
         ImageRenderer.renderTransformed(g, img, Game.world().camera().getViewportLocation(entity.getX() + deltaX, entity.getY() + deltaY), animationController.getAffineTransform());
       }
