@@ -25,7 +25,7 @@ public interface ResourcesContainerListener<T> extends ResourcesContainerCleared
    *          The added resource.
    * @see ResourcesContainer#add(String, Object)
    */
-  public void added(String resourceName, T resource);
+  public default void added(String resourceName, T resource) {}
 
   /**
    * This method gets called after the <code>ResourcesContainer.remove</code> method was executed.
@@ -36,5 +36,8 @@ public interface ResourcesContainerListener<T> extends ResourcesContainerCleared
    *          The removed resource.
    * @see ResourcesContainer#remove(String)
    */
-  public void removed(String resourceName, T resource);
+  public default void removed(String resourceName, T resource) {}
+
+  @Override
+  public default void cleared() {}
 }

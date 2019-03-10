@@ -30,7 +30,7 @@ public class GameTest {
     final Status initialized = new Status();
     final Status started = new Status();
 
-    Game.addGameListener(new GameAdapter() {
+    Game.addGameListener(new GameListener() {
       @Override
       public void initialized(String... args) {
         initialized.wasCalled = true;

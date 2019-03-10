@@ -18,7 +18,7 @@ public interface EntityTransformListener extends EventListener {
    * @see IEntity#setX(double)
    * @see IEntity#setY(double)
    */
-  public void locationChanged(IEntity entity);
+  public default void locationChanged(IEntity entity) {}
 
   /**
    * This method is called whenever the size of an <code>IEntity</code> was changed.
@@ -30,5 +30,5 @@ public interface EntityTransformListener extends EventListener {
    * @see IEntity#setHeight(float)
    * @see IEntity#setWidth(float)
    */
-  public void sizeChanged(IEntity entity);
+  public default void sizeChanged(IEntity entity) {}
 }

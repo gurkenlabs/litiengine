@@ -14,7 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.GameAdapter;
+import de.gurkenlabs.litiengine.GameListener;
 import de.gurkenlabs.litiengine.ILaunchable;
 import net.java.games.input.Controller;
 import net.java.games.input.Controller.Type;
@@ -61,7 +61,7 @@ public class GamepadManager implements ILaunchable, GamepadEvents {
       }
     });
 
-    Game.addGameListener(new GameAdapter() {
+    Game.addGameListener(new GameListener() {
       @Override
       public void terminated() {
         hotPlugThread.interrupt();
