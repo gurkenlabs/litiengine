@@ -16,6 +16,7 @@ import de.gurkenlabs.litiengine.GameLoop;
 import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
 
+@SuppressWarnings("deprecation")
 public class PhysicsTests {
 
   @Test

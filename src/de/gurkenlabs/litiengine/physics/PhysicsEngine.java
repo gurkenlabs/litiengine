@@ -28,37 +28,28 @@ import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
  * Also, there's an overload that takes a <code>Line2D</code> to perform a basic raycast check.
  */
 public final class PhysicsEngine implements IUpdateable {
-  private final List<ICollisionEntity> collisionEntities;
+  private final List<ICollisionEntity> collisionEntities = new CopyOnWriteArrayList<>();
 
   private Rectangle2D environmentBounds;
 
-  private final List<Rectangle2D> staticCollisionBoxes;
+  private final List<Rectangle2D> staticCollisionBoxes = new CopyOnWriteArrayList<>();
 
-  private final List<CollisionBox> entityCollisionBoxes;
-  private final List<CollisionBox> allCollisionBoxes;
-  private final List<CollisionBox> staticBoxes;
-  private final List<Rectangle2D> allCollisionBoxRectangles;
-  private final List<Rectangle2D> entityCollisionBoxRectangles;
+  // these collections are updated every tick so they don't use a CopyOnWriteArrayList due to performance
+  private final List<CollisionBox> entityCollisionBoxes = Collections.synchronizedList(new ArrayList<>());
+  private final List<CollisionBox> allCollisionBoxes = Collections.synchronizedList(new ArrayList<>());
+  private final List<CollisionBox> staticBoxes = Collections.synchronizedList(new ArrayList<>());
+  private final List<Rectangle2D> allCollisionBoxRectangles = Collections.synchronizedList(new ArrayList<>());
+  private final List<Rectangle2D> entityCollisionBoxRectangles = Collections.synchronizedList(new ArrayList<>());
 
   /**
    * Instantiates a new PhysicsEngine instance.
    * 
-   * <p>
-   * <b>You should never call this manually! Instead use the <code>Game.physics()</code> instance.</b>
-   * </p>
+   * @deprecated You should never call this manually! Instead use the <code>Game.physics()</code> instance.
    * 
    * @see Game#physics()
    */
+  @Deprecated
   public PhysicsEngine() {
-    this.collisionEntities = new CopyOnWriteArrayList<>();
-    this.staticCollisionBoxes = new CopyOnWriteArrayList<>();
-    
-    // these collections are updated every tick so they don't use a CopyOnWriteArrayList due to performance
-    this.entityCollisionBoxes = Collections.synchronizedList(new ArrayList<>());
-    this.allCollisionBoxes = Collections.synchronizedList(new ArrayList<>());
-    this.staticBoxes = Collections.synchronizedList(new ArrayList<>());
-    this.allCollisionBoxRectangles = Collections.synchronizedList(new ArrayList<>());
-    this.entityCollisionBoxRectangles = Collections.synchronizedList(new ArrayList<>());
   }
 
   /**

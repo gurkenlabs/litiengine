@@ -43,29 +43,22 @@ import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
 public final class RenderEngine {
   public static final float DEFAULT_RENDERSCALE = 3.0f;
 
-  private final EntityYComparator entityComparator;
-  private final List<Consumer<RenderEvent<IEntity>>> entityRenderedConsumer;
-  private final List<Predicate<IEntity>> entityRenderingConditions;
-  private final List<Consumer<RenderEvent<IEntity>>> entityRenderingConsumer;
+  private final EntityYComparator entityComparator = new EntityYComparator();
+  private final List<Consumer<RenderEvent<IEntity>>> entityRenderedConsumer = new CopyOnWriteArrayList<>();
+  private final List<Predicate<IEntity>> entityRenderingConditions = new CopyOnWriteArrayList<>();
+  private final List<Consumer<RenderEvent<IEntity>>> entityRenderingConsumer = new CopyOnWriteArrayList<>();
 
-  private float baseRenderScale;
+  private float baseRenderScale = DEFAULT_RENDERSCALE;
 
   /**
    * Instantiates a new RenderEngine instance.
    * 
-   * <p>
-   * <b>You should never call this manually! Instead use the <code>Game.graphics()</code> instance.</b>
-   * </p>
+   * @deprecated You should never call this manually! Instead use the <code>Game.graphics()</code> instance.
    * 
    * @see Game#graphics()
    */
+  @Deprecated
   public RenderEngine() {
-    this.entityRenderedConsumer = new CopyOnWriteArrayList<>();
-    this.entityRenderingConsumer = new CopyOnWriteArrayList<>();
-    this.entityRenderingConditions = new CopyOnWriteArrayList<>();
-    this.entityComparator = new EntityYComparator();
-
-    this.baseRenderScale = DEFAULT_RENDERSCALE;
   }
 
   /**

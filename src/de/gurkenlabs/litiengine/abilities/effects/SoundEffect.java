@@ -2,10 +2,10 @@ package de.gurkenlabs.litiengine.abilities.effects;
 
 import java.util.Random;
 
-import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.abilities.Ability;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.sound.Sound;
+import de.gurkenlabs.litiengine.sound.SoundEngine;
 
 public class SoundEffect extends Effect {
   private final Sound[] sounds;
@@ -22,7 +22,7 @@ public class SoundEffect extends Effect {
       return;
     }
 
-    Game.audio().playSound(this.getRandomSound(), entity);
+    SoundEngine.playSound(this.getRandomSound(), entity);
   }
 
   private Sound getRandomSound() {
