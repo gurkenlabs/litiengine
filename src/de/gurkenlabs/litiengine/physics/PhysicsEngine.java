@@ -243,39 +243,44 @@ public final class PhysicsEngine implements IUpdateable {
     return this.collides(collisionEntity.getCollisionBox(), collisionType, collisionEntity);
   }
 
-  public Point2D raycast(Point2D pointA, Point2D pointB) {
-    return raycast(pointA, pointB, Collision.ANY);
+  public RaycastHit raycast(Point2D point, double angle) {
+    double diameter = GeometricUtilities.getDiagonal(this.environmentBounds); 
+    return raycast(point, GeometricUtilities.project(point, angle, diameter));
+  }
+  
+  public RaycastHit raycast(Point2D start, Point2D target) {
+    return raycast(start, target, Collision.ANY);
   }
 
-  public Point2D raycast(Point2D pointA, Point2D pointB, Collision collisionType) {
-    final Line2D line = new Line2D.Double(pointA.getX(), pointA.getY(), pointB.getX(), pointB.getY());
+  public RaycastHit raycast(Point2D start, Point2D target, Collision collisionType) {
+    final Line2D line = new Line2D.Double(start.getX(), start.getY(), target.getX(), target.getY());
     return raycast(line, collisionType, null);
   }
 
-  public Point2D raycast(Line2D line) {
+  public RaycastHit raycast(Line2D line) {
     return raycast(line, Collision.ANY, null);
   }
 
-  public Point2D raycast(Line2D line, Collision collisionType) {
+  public RaycastHit raycast(Line2D line, Collision collisionType) {
     return raycast(line, collisionType, null);
   }
 
-  public Point2D raycast(Line2D line, ICollisionEntity entity) {
+  public RaycastHit raycast(Line2D line, ICollisionEntity entity) {
     return raycast(line, Collision.ANY, entity);
   }
 
-  public Point2D raycast(Line2D line, Collision collisionType, ICollisionEntity entity) {
+  public RaycastHit raycast(Line2D line, Collision collisionType, ICollisionEntity entity) {
     final Point2D rayCastSource = new Point2D.Double(line.getX1(), line.getY1());
 
-    for (final ICollisionEntity collisionBox : this.collisionEntities.get(collisionType)) {
-      if (!canCollide(entity, collisionBox)) {
+    for (final ICollisionEntity collisionEntity : this.collisionEntities.get(collisionType)) {
+      if (!canCollide(entity, collisionEntity)) {
         continue;
       }
 
-      if (collisionBox.getCollisionBox().intersectsLine(line)) {
+      if (collisionEntity.getCollisionBox().intersectsLine(line)) {
         double closestDist = -1;
         Point2D closestPoint = null;
-        for (final Point2D intersection : GeometricUtilities.getIntersectionPoints(line, collisionBox.getCollisionBox())) {
+        for (final Point2D intersection : GeometricUtilities.getIntersectionPoints(line, collisionEntity.getCollisionBox())) {
           final double dist = intersection.distance(rayCastSource);
           if (closestPoint == null || dist < closestDist) {
             closestPoint = intersection;
@@ -283,7 +288,7 @@ public final class PhysicsEngine implements IUpdateable {
           }
         }
 
-        return closestPoint;
+        return new RaycastHit(closestPoint, collisionEntity, closestDist);
       }
     }
 

@@ -298,6 +298,14 @@ public class GeometricUtilities {
     return lines;
   }
 
+  public static double getDiagonal(Rectangle2D rect) {
+    if (rect == null) {
+      return 0;
+    }
+
+    return Math.sqrt(Math.pow(rect.getWidth(), 2) + Math.pow(rect.getHeight(), 2));
+  }
+
   public static Point2D getMidPoint(final Point2D p1, final Point2D p2) {
     final Point2D mid = new Point2D.Double();
     final double x = (p1.getX() + p2.getX()) / 2;
