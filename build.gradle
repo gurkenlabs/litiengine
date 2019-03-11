@@ -6,7 +6,7 @@ buildscript {
  
  plugins {
   id 'com.stehno.natives' version '0.3.1'
-  id 'org.sonarqube' version '2.6.2'
+  id 'org.sonarqube' version '2.7'
 }
 
 natives {
@@ -49,11 +49,11 @@ dependencies {
   compile 'com.code-disaster.steamworks4j:steamworks4j:1.8.0'
   
   // JAXB modules for JDK 9 or higher
-  compile 'javax.xml.bind:jaxb-api:2.3.0'
-  compile 'com.sun.xml.bind:jaxb-core:2.3.0'
-  compile 'com.sun.xml.bind:jaxb-impl:2.3.0'
-  compile 'javax.activation:activation:1.1.1'
-  
+  compile 'javax.activation:javax.activation-api:1.2.0'
+  compile 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
+  compile 'com.sun.xml.bind:jaxb-core:2.3.0.1'
+  compile 'com.sun.xml.bind:jaxb-impl:2.3.2'
+
   testCompile 'org.junit.jupiter:junit-jupiter-api:5.4.+'
   testCompile 'org.junit.jupiter:junit-jupiter-params:5.4.+'
   testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.4.+'
