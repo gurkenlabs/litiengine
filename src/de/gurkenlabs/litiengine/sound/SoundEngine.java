@@ -70,6 +70,14 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
     return maxDist;
   }
 
+  public static void playMusic(String music) {
+    playMusic(Resources.sounds().get(music));
+  }
+
+  public static void playMusic(Sound music) {
+    playMusic(new LoopedTrack(music));
+  }
+
   /**
    * Sets the currently playing track to the specified track. This has no effect if the specified track is already playing.
    *
