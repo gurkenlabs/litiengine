@@ -13,7 +13,7 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -27,6 +27,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.entities.CollisionBox;
+import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.entities.Entity;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.LightSource;
@@ -71,6 +72,63 @@ public class MapObjectLoaderTests {
     this.testEnvironment = new Environment(map);
   }
   
+
+  @Test
+  public void testCreatureMapObjectLoader() {
+    CreatureMapObjectLoader loader = new CreatureMapObjectLoader();
+    MapObject mapObject = new MapObject();
+    mapObject.setType(MapObjectType.CREATURE.name());
+    mapObject.setId(111);
+    mapObject.setName("testCreature");
+    mapObject.setLocation(100, 100);
+    
+    // collision
+    mapObject.setValue(MapObjectProperty.COLLISION, true);
+    mapObject.setValue(MapObjectProperty.COLLISIONBOX_WIDTH, 100.0f);
+    mapObject.setValue(MapObjectProperty.COLLISIONBOX_HEIGHT, 100.0f);
+    mapObject.setValue(MapObjectProperty.COLLISION_ALIGN, Align.LEFT);
+    mapObject.setValue(MapObjectProperty.COLLISION_VALIGN, Valign.MIDDLE);
+    
+    // combat
+    mapObject.setValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE, true);
+    mapObject.setValue(MapObjectProperty.COMBAT_HITPOINTS, 100);
+    mapObject.setValue(MapObjectProperty.COMBAT_TEAM, 1);
+
+    // movement
+    mapObject.setValue(MapObjectProperty.MOVEMENT_VELOCITY, 200f);
+    mapObject.setValue(MapObjectProperty.MOVEMENT_ACCELERATION, 150);
+    mapObject.setValue(MapObjectProperty.MOVEMENT_DECELERATION, 160);
+    mapObject.setValue(MapObjectProperty.MOVEMENT_TURNONMOVE, true);
+    
+    Collection<IEntity> entities = loader.load(this.testEnvironment, mapObject);
+    Optional<IEntity> opt = entities.stream().findFirst();
+    assertTrue(opt.isPresent());
+    
+    IEntity entity = opt.get();
+    assertNotNull(entity);
+    assertEquals(111, entity.getMapId());
+    assertEquals("testCreature", entity.getName());
+    assertEquals(100, entity.getX(), 0.0001);
+    assertEquals(100, entity.getY(), 0.0001);
+    
+    Creature creature = (Creature) entity;
+    assertTrue(creature.hasCollision());
+    assertEquals(100.0, creature.getCollisionBoxWidth(), 0.0001);
+    assertEquals(100.0, creature.getCollisionBoxHeight(), 0.0001);
+    assertEquals(Align.LEFT, creature.getCollisionBoxAlign());
+    assertEquals(Valign.MIDDLE, creature.getCollisionBoxValign());
+    
+    assertTrue(creature.isIndestructible());
+    assertEquals(100, creature.getHitPoints().getMaxValue().intValue());
+    assertEquals(100, creature.getHitPoints().getCurrentValue().intValue());
+    assertEquals(1, creature.getTeam());
+
+    assertEquals(200f, creature.getVelocity().getCurrentValue().floatValue());
+    assertEquals(150f, creature.getAcceleration());
+    assertEquals(160f, creature.getDeceleration());
+    assertTrue(creature.turnOnMove());
+  }
+  
   @Test
   public void testPropMapObjectLoader() {
     PropMapObjectLoader loader = new PropMapObjectLoader();
@@ -80,21 +138,22 @@ public class MapObjectLoaderTests {
     mapObject.setName("testProp");
     mapObject.setLocation(100, 100);
     mapObject.setValue(MapObjectProperty.PROP_MATERIAL, Material.PLASTIC.getName());
-    mapObject.setValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE, true);
+    
     mapObject.setValue(MapObjectProperty.COLLISION, true);
-    mapObject.setValue(MapObjectProperty.COMBAT_HITPOINTS, 100);
-
     mapObject.setValue(MapObjectProperty.COLLISIONBOX_WIDTH, 100.0f);
     mapObject.setValue(MapObjectProperty.COLLISIONBOX_HEIGHT, 100.0f);
     mapObject.setValue(MapObjectProperty.COLLISION_ALIGN, Align.LEFT);
     mapObject.setValue(MapObjectProperty.COLLISION_VALIGN, Valign.MIDDLE);
+    
+    mapObject.setValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE, true);
+    mapObject.setValue(MapObjectProperty.COMBAT_HITPOINTS, 100);
     mapObject.setValue(MapObjectProperty.COMBAT_TEAM, 1);
 
     Collection<IEntity> entities = loader.load(this.testEnvironment, mapObject);
     Optional<IEntity> opt = entities.stream().findFirst();
     assertTrue(opt.isPresent());
 
-    IEntity entity = entities.stream().findFirst().get();
+    IEntity entity = opt.get();
     assertNotNull(entity);
     assertEquals(111, entity.getMapId());
     assertEquals("testProp", entity.getName());
@@ -103,15 +162,16 @@ public class MapObjectLoaderTests {
 
     Prop prop = (Prop) entity;
     assertEquals(Material.PLASTIC, prop.getMaterial());
-    assertTrue(prop.isIndestructible());
-    assertTrue(prop.hasCollision());
-    assertEquals(100, prop.getHitPoints().getMaxValue().intValue());
-    assertEquals(100, prop.getHitPoints().getCurrentValue().intValue());
 
+    assertTrue(prop.hasCollision());
     assertEquals(100.0, prop.getCollisionBoxWidth(), 0.0001);
     assertEquals(100.0, prop.getCollisionBoxHeight(), 0.0001);
     assertEquals(Align.LEFT, prop.getCollisionBoxAlign());
     assertEquals(Valign.MIDDLE, prop.getCollisionBoxValign());
+    
+    assertTrue(prop.isIndestructible());
+    assertEquals(100, prop.getHitPoints().getMaxValue().intValue());
+    assertEquals(100, prop.getHitPoints().getCurrentValue().intValue());
     assertEquals(1, prop.getTeam());
   }
 
@@ -130,7 +190,7 @@ public class MapObjectLoaderTests {
     Optional<IEntity> opt = entities.stream().findFirst();
     assertTrue(opt.isPresent());
 
-    IEntity entity = entities.stream().findFirst().get();
+    IEntity entity = opt.get();
 
     assertNotNull(entity);
     assertEquals(111, entity.getMapId());
@@ -165,7 +225,7 @@ public class MapObjectLoaderTests {
     Optional<IEntity> opt = entities.stream().findFirst();
     assertTrue(opt.isPresent());
 
-    IEntity entity = entities.stream().findFirst().get();
+    IEntity entity = opt.get();
 
     assertNotNull(entity);
     assertEquals(111, entity.getMapId());
@@ -196,7 +256,7 @@ public class MapObjectLoaderTests {
     Optional<IEntity> opt = entities.stream().findFirst();
     assertTrue(opt.isPresent());
 
-    IEntity entity = entities.stream().findFirst().get();
+    IEntity entity = opt.get();
 
     assertNotNull(entity);
     assertEquals(111, entity.getMapId());
@@ -223,7 +283,7 @@ public class MapObjectLoaderTests {
     Optional<IEntity> opt = entities.stream().findFirst();
     assertTrue(opt.isPresent());
 
-    IEntity entity = entities.stream().findFirst().get();
+    IEntity entity = opt.get();
 
     assertNotNull(entity);
     assertEquals(111, entity.getMapId());
@@ -253,15 +313,15 @@ public class MapObjectLoaderTests {
     when(mapObject.getWidth()).thenReturn(50f);
     when(mapObject.getHeight()).thenReturn(150f);
 
-    Map<String, ICustomProperty> customProps = new Hashtable<>(2);
+    Map<String, ICustomProperty> customProps = new HashMap<>(2);
     customProps.put("foo", new CustomProperty("foovalue"));
     customProps.put("bar", new CustomProperty("111"));
     when(mapObject.getProperties()).thenReturn(customProps);
     when(mapObject.getStringValue("foo")).thenReturn("foovalue");
-    when(mapObject.getStringValue("bar")).thenReturn("111");
-
     when(mapObject.getStringValue("foo", null)).thenReturn("foovalue");
+    when(mapObject.getStringValue("bar")).thenReturn("111");
     when(mapObject.getStringValue("bar", null)).thenReturn("111");
+
 
     IMap map = mock(IMap.class);
     when(map.getSizeInPixels()).thenReturn(new Dimension(100, 100));
@@ -278,6 +338,40 @@ public class MapObjectLoaderTests {
     CustomEntity customEntity = (CustomEntity) ent;
     assertEquals("foovalue", customEntity.getFoo());
     assertEquals(111, customEntity.getBar());
+  }
+  
+  @Test
+  public void customPropertiesShoudBePassedToTheEntity() {
+    Environment.registerCustomEntityType(CustomEntity.class);
+
+    IMapObject mapObject = mock(IMapObject.class);
+    when(mapObject.getType()).thenReturn("customEntity");
+    when(mapObject.getId()).thenReturn(111);
+    when(mapObject.getName()).thenReturn("somethin");
+    when(mapObject.getLocation()).thenReturn(new Point(100, 100));
+    when(mapObject.getWidth()).thenReturn(50f);
+    when(mapObject.getHeight()).thenReturn(150f);
+
+    Map<String, ICustomProperty> customProps = new HashMap<>(2);
+    customProps.put("wasdd", new CustomProperty("11111"));
+    customProps.put("zapp", new CustomProperty("33333"));
+    when(mapObject.getProperties()).thenReturn(customProps);
+
+    IMap map = mock(IMap.class);
+    when(map.getSizeInPixels()).thenReturn(new Dimension(100, 100));
+    when(map.getSizeInTiles()).thenReturn(new Dimension(10, 10));
+    Environment env = new Environment(map);
+
+    Collection<IEntity> loaded = env.load(mapObject);
+
+    assertEquals(1, loaded.size());
+
+    IEntity ent = loaded.iterator().next();
+    assertTrue(ent instanceof CustomEntity);
+
+    CustomEntity customEntity = (CustomEntity) ent;
+    assertEquals("11111", customEntity.getProperties().getStringValue("wasdd"));
+    assertEquals("33333", customEntity.getProperties().getStringValue("zapp"));
   }
 
   @EntityInfo(customMapObjectType = "customEntity")

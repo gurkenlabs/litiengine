@@ -6,7 +6,6 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collection;
 
-import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 
@@ -70,8 +69,7 @@ public final class CustomMapObjectLoader extends MapObjectLoader {
     }
 
     loadDefaultProperties(entity, mapObject);
-    if (entity instanceof ICollisionEntity)
-      loadCollisionProperties((ICollisionEntity) entity, mapObject);
+
     return Arrays.asList(entity);
   }
 }

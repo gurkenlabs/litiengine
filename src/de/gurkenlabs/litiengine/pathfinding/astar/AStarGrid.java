@@ -13,7 +13,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
-import de.gurkenlabs.litiengine.physics.CollisionType;
+import de.gurkenlabs.litiengine.physics.Collision;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 
 public class AStarGrid implements IRenderable {
@@ -173,12 +173,12 @@ public class AStarGrid implements IRenderable {
    */
   public void updateWalkable(final Rectangle2D rectangle) {
     for (final AStarNode node : this.getIntersectedNodes(rectangle)) {
-      node.setWalkable(!Game.physics().collides(node.getBounds(), CollisionType.STATIC));
+      node.setWalkable(!Game.physics().collides(node.getBounds(), Collision.STATIC));
     }
   }
 
   protected void assignPenalty(AStarNode node) {
-    if (!Game.physics().collides(node.getLocation(), CollisionType.ENTITY)) {
+    if (!Game.physics().collides(node.getLocation(), Collision.DYNAMIC)) {
       return;
     }
 
@@ -227,7 +227,7 @@ public class AStarGrid implements IRenderable {
     for (int x = 0; x < gridSizeX; x++) {
       for (int y = 0; y < gridSizeY; y++) {
         final Rectangle nodeBounds = new Rectangle(x * this.nodeSize, y * this.nodeSize, this.nodeSize, this.nodeSize);
-        final AStarNode node = new AStarNode(!Game.physics().collides(nodeBounds, CollisionType.STATIC), nodeBounds, x, y);
+        final AStarNode node = new AStarNode(!Game.physics().collides(nodeBounds, Collision.STATIC), nodeBounds, x, y);
         this.assignPenalty(node);
         this.getGrid()[x][y] = node;
       }

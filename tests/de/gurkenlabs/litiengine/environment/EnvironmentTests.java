@@ -42,6 +42,7 @@ import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.StaticShadowType;
 import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.Particle;
+import de.gurkenlabs.litiengine.physics.Collision;
 
 public class EnvironmentTests {
   private Environment testEnvironment;
@@ -188,6 +189,7 @@ public class EnvironmentTests {
     when(mobileEntity.getMapId()).thenReturn(456);
     when(mobileEntity.getName()).thenReturn("test");
     when(mobileEntity.getRenderType()).thenReturn(RenderType.NORMAL);
+    when(mobileEntity.getCollisionType()).thenReturn(Collision.DYNAMIC);
 
     this.testEnvironment.add(mobileEntity);
 
@@ -422,7 +424,8 @@ public class EnvironmentTests {
     when(entity.getMapId()).thenReturn(123);
     when(entity.getName()).thenReturn("test");
     when(entity.getRenderType()).thenReturn(renderType);
-
+    when(entity.getCollisionType()).thenReturn(Collision.DYNAMIC);
+    
     this.testEnvironment.add(entity);
 
     assertNotNull(this.testEnvironment.get(123));
@@ -441,10 +444,12 @@ public class EnvironmentTests {
     IMobileEntity entityWithTags = mock(IMobileEntity.class);
     when(entityWithTags.getMapId()).thenReturn(456);
     when(entityWithTags.getRenderType()).thenReturn(RenderType.NORMAL);
+    when(entityWithTags.getCollisionType()).thenReturn(Collision.DYNAMIC);
 
     IMobileEntity anotherEntityWithTags = mock(IMobileEntity.class);
     when(anotherEntityWithTags.getMapId()).thenReturn(123);
     when(anotherEntityWithTags.getRenderType()).thenReturn(RenderType.NORMAL);
+    when(anotherEntityWithTags.getCollisionType()).thenReturn(Collision.DYNAMIC);
 
     ArrayList<String> tags = new ArrayList<>();
     tags.add("tag1");
@@ -502,11 +507,13 @@ public class EnvironmentTests {
     ICombatEntity combatEntity = mock(ICombatEntity.class);
     when(combatEntity.getMapId()).thenReturn(123);
     when(combatEntity.getRenderType()).thenReturn(RenderType.NORMAL);
+    when(combatEntity.getCollisionType()).thenReturn(Collision.DYNAMIC);
     when(combatEntity.getHitBox()).thenReturn(new Ellipse2D.Double(0, 0, 10, 10));
 
     ICombatEntity combatEntity2 = mock(ICombatEntity.class);
     when(combatEntity2.getMapId()).thenReturn(456);
     when(combatEntity2.getRenderType()).thenReturn(RenderType.NORMAL);
+    when(combatEntity2.getCollisionType()).thenReturn(Collision.DYNAMIC);
     when(combatEntity2.getHitBox()).thenReturn(new Ellipse2D.Double(10, 10, 10, 10));
 
     this.testEnvironment.add(combatEntity);

@@ -4,10 +4,12 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 import de.gurkenlabs.litiengine.Align;
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.annotation.CollisionInfo;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
+import de.gurkenlabs.litiengine.physics.Collision;
 
 @CollisionInfo(collision = true)
 public abstract class CollisionEntity extends Entity implements ICollisionEntity {
@@ -16,20 +18,23 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
   private static final double WIDTH_FACTOR = 0.4;
 
   @TmxProperty(name = MapObjectProperty.COLLISION_ALIGN)
-  private Align align = Align.CENTER;
+  private Align align;
 
   @TmxProperty(name = MapObjectProperty.COLLISION)
   private boolean collision;
 
   @TmxProperty(name = MapObjectProperty.COLLISIONBOX_HEIGHT)
-  private float collisionBoxHeight;
+  private double collisionBoxHeight;
 
   @TmxProperty(name = MapObjectProperty.COLLISIONBOX_WIDTH)
-  private float collisionBoxWidth;
+  private double collisionBoxWidth;
 
   @TmxProperty(name = MapObjectProperty.COLLISION_VALIGN)
-  private Valign valign = Valign.DOWN;
-  
+  private Valign valign;
+
+  @TmxProperty(name = MapObjectProperty.COLLISION_TYPE)
+  private Collision collisionType;
+
   private Rectangle2D collisionBox;
 
   protected CollisionEntity() {
@@ -38,8 +43,9 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
     this.collisionBoxWidth = info.collisionBoxWidth();
     this.collisionBoxHeight = info.collisionBoxHeight();
     this.collision = info.collision();
-    this.setCollisionBoxValign(info.valign());
-    this.setCollisionBoxAlign(info.align());
+    this.valign = info.valign();
+    this.align = info.align();
+    this.collisionType = info.collisionType();
     this.collisionBox = this.getCollisionBox(this.getLocation());
   }
 
@@ -85,12 +91,12 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
   }
 
   @Override
-  public float getCollisionBoxHeight() {
+  public double getCollisionBoxHeight() {
     return this.collisionBoxHeight;
   }
 
   @Override
-  public float getCollisionBoxWidth() {
+  public double getCollisionBoxWidth() {
     return this.collisionBoxWidth;
   }
 
@@ -102,6 +108,11 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
   @Override
   public Valign getCollisionBoxValign() {
     return this.valign;
+  }
+
+  @Override
+  public Collision getCollisionType() {
+    return this.collisionType;
   }
 
   /**
@@ -132,7 +143,7 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
   }
 
   @Override
-  public void setCollisionBoxHeight(final float collisionBoxHeight) {
+  public void setCollisionBoxHeight(final double collisionBoxHeight) {
     this.collisionBoxHeight = collisionBoxHeight;
     this.collisionBox = this.getCollisionBox(this.getLocation());
   }
@@ -144,7 +155,7 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
   }
 
   @Override
-  public void setCollisionBoxWidth(final float collisionBoxWidth) {
+  public void setCollisionBoxWidth(final double collisionBoxWidth) {
     this.collisionBoxWidth = collisionBoxWidth;
     this.collisionBox = this.getCollisionBox(this.getLocation());
   }
@@ -156,20 +167,36 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
   }
 
   @Override
-  public void setSize(final float width, final float height) {
+  public void setSize(final double width, final double height) {
     super.setSize(width, height);
     this.collisionBox = this.getCollisionBox(this.getLocation());
   }
 
   @Override
-  public void setHeight(final float height) {
+  public void setHeight(final double height) {
     super.setHeight(height);
     this.collisionBox = this.getCollisionBox(this.getLocation());
   }
 
   @Override
-  public void setWidth(final float width) {
+  public void setWidth(final double width) {
     super.setWidth(width);
     this.collisionBox = this.getCollisionBox(this.getLocation());
+  }
+
+  @Override
+  public void setCollisionType(Collision type) {
+    if (type == Collision.ANY) {
+      throw new IllegalArgumentException("CollistionType.ALL is not allowed to be assigned to an entity. It may only be used for filtering in the PhysicsEngine.");
+    }
+
+    if (this.getEnvironment() != null && this.getEnvironment().isLoaded()) {
+      // re-add the entity to the physics engine so it will be treated with the updated collision type
+      Game.physics().remove(this);
+      this.collisionType = type;
+      Game.physics().add(this);
+    } else {
+      this.collisionType = type;
+    }
   }
 }

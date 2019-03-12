@@ -23,8 +23,8 @@ public final class MapObjectSerializer {
     obj.setId(entity.getMapId());
     obj.setX((float) entity.getX());
     obj.setY((float) entity.getY());
-    obj.setWidth(entity.getWidth());
-    obj.setHeight(entity.getHeight());
+    obj.setWidth((float)entity.getWidth());
+    obj.setHeight((float)entity.getHeight());
     obj.setName(entity.getName());
 
     serialize(entity.getClass(), entity, obj);

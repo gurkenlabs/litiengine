@@ -36,6 +36,9 @@ System.out.println("Game version is: " + Game.info().getVersion());
  * `Game.time()`
 
 ## Game Loops
+In the LITIengine, the game logic is decoupled from the framerate and run in a separate loop. The same applies to the player input. 
+For these purposes, the engine provides three different loops which have their designated purpose.
+
  * `Game.loop()`
  * `Game.renderLoop()`
  * `Game.inputLoop()`

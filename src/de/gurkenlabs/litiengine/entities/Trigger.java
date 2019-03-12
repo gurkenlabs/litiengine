@@ -11,7 +11,6 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.annotation.CollisionInfo;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
-import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.graphics.RenderType;
@@ -58,10 +57,10 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   }
 
   public Trigger(final TriggerActivation activation, final String name, final String message) {
-    this(activation, name, message, false, null);
+    this(activation, name, message, false);
   }
 
-  public Trigger(final TriggerActivation activation, final String message, final boolean isOneTime, ICustomPropertyProvider customProperties) {
+  public Trigger(final TriggerActivation activation, final String message, final boolean isOneTime) {
     super();
     this.activatingConditions = new CopyOnWriteArrayList<>();
     this.activatedListeners = new CopyOnWriteArrayList<>();
@@ -72,16 +71,15 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     this.message = message;
     this.isOneTimeTrigger = isOneTime;
     this.activationType = activation;
-    this.setProperties(customProperties);
   }
 
-  public Trigger(final TriggerActivation activation, final String name, final String message, final boolean isOneTime, ICustomPropertyProvider customProperties) {
-    this(activation, message, isOneTime, customProperties);
+  public Trigger(final TriggerActivation activation, final String name, final String message, final boolean isOneTime) {
+    this(activation, message, isOneTime);
     this.setName(name);
   }
 
-  public Trigger(final TriggerActivation activation, final String message, final boolean isOneTime, final int cooldown, ICustomPropertyProvider customProperties) {
-    this(activation, message, isOneTime, customProperties);
+  public Trigger(final TriggerActivation activation, final String message, final boolean isOneTime, final int cooldown) {
+    this(activation, message, isOneTime);
     this.setCooldown(cooldown);
   }
 
@@ -198,19 +196,19 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   }
 
   @Override
-  public void setHeight(final float height) {
+  public void setHeight(final double height) {
     this.setCollisionBoxHeight(height);
     super.setHeight(height);
   }
 
   @Override
-  public void setWidth(final float width) {
+  public void setWidth(final double width) {
     this.setCollisionBoxWidth(width);
     super.setWidth(width);
   }
 
   @Override
-  public void setSize(final float width, final float height) {
+  public void setSize(final double width, final double height) {
     this.setCollisionBoxWidth(width);
     this.setCollisionBoxHeight(height);
     super.setSize(width, height);

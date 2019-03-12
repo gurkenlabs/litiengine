@@ -25,7 +25,7 @@ public interface IEntity {
 
   public void removeListener(EntityListener listener);
 
-  public float getAngle();
+  public double getAngle();
   
   /**
    * Sets the angle (in degrees) in which the entity is directed.
@@ -33,7 +33,7 @@ public interface IEntity {
    * @param angle
    *          the new angle in degrees
    */
-  public void setAngle(float angle);
+  public void setAngle(double angle);
 
   public IEntityAnimationController getAnimationController();
 
@@ -91,7 +91,7 @@ public interface IEntity {
 
   public Point2D getCenter();
 
-  public float getHeight();
+  public double getHeight();
 
   public Point2D getLocation();
 
@@ -106,7 +106,7 @@ public interface IEntity {
 
   public RenderType getRenderType();
 
-  public float getWidth();
+  public double getWidth();
 
   public double getX();
 
@@ -114,7 +114,7 @@ public interface IEntity {
 
   public String sendMessage(Object sender, String message);
 
-  public void setHeight(float height);
+  public void setHeight(double height);
 
   public void setLocation(double x, double y);
 
@@ -147,9 +147,9 @@ public interface IEntity {
 
   public void setRenderType(RenderType renderType);
 
-  public void setSize(float width, float height);
+  public void setSize(double width, double height);
 
-  public void setWidth(float width);
+  public void setWidth(double width);
 
   public void setX(double x);
 

@@ -15,16 +15,16 @@ import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 public class MobileEntity extends CollisionEntity implements IMobileEntity {
   @TmxProperty(name = MapObjectProperty.MOVEMENT_ACCELERATION)
   private int acceleration;
-  
+
   @TmxProperty(name = MapObjectProperty.MOVEMENT_DECELERATION)
   private int deceleration;
-  
+
   @TmxProperty(name = MapObjectProperty.MOVEMENT_TURNONMOVE)
   private boolean turnOnMove;
-  
+
   @TmxProperty(name = MapObjectProperty.MOVEMENT_VELOCITY)
   private Attribute<Float> velocity;
-  
+
   private Point2D moveDestination;
 
   public MobileEntity() {
@@ -92,6 +92,11 @@ public class MobileEntity extends CollisionEntity implements IMobileEntity {
   @Override
   public void setTurnOnMove(final boolean turn) {
     this.turnOnMove = turn;
+  }
+
+  @Override
+  public void setVelocity(float velocity) {
+    this.getVelocity().setBaseValue(velocity);
   }
 
   @Override

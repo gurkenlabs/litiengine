@@ -17,7 +17,7 @@ import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.ParticleType;
-import de.gurkenlabs.litiengine.physics.CollisionType;
+import de.gurkenlabs.litiengine.physics.Collision;
 import de.gurkenlabs.litiengine.resources.Resource;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.MathUtilities;
@@ -119,7 +119,7 @@ public class EmitterData implements Serializable, Resource {
   private Valign originValign;
 
   @XmlElement
-  private CollisionType collisionType;
+  private Collision collisionType;
 
   @XmlElement
   private boolean fade;
@@ -138,7 +138,7 @@ public class EmitterData implements Serializable, Resource {
     this.deltaHeight = new ParticleParameter();
     this.colorDeviation = 0;
     this.alphaDeviation = 0;
-    this.collisionType = CollisionType.NONE;
+    this.collisionType = Collision.NONE;
     this.updateRate = Emitter.DEFAULT_UPDATERATE;
     this.originValign = Valign.TOP;
     this.originAlign = Align.LEFT;
@@ -301,7 +301,7 @@ public class EmitterData implements Serializable, Resource {
   }
 
   @XmlTransient
-  public CollisionType getCollisionType() {
+  public Collision getCollisionType() {
     return this.collisionType;
   }
 
@@ -449,7 +449,7 @@ public class EmitterData implements Serializable, Resource {
     this.particleWidth = particleWidth;
   }
 
-  public void setCollisionType(CollisionType physics) {
+  public void setCollisionType(Collision physics) {
     this.collisionType = physics;
   }
 

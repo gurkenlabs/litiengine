@@ -10,12 +10,12 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.ITimeToLive;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
-import de.gurkenlabs.litiengine.physics.CollisionType;
+import de.gurkenlabs.litiengine.physics.Collision;
 
 public abstract class Particle implements ITimeToLive {
   private long aliveTick;
   private long aliveTime;
-  private CollisionType collisionType;
+  private Collision collisionType;
   private Color color;
   private int colorAlpha = 255;
   private float deltaHeight;
@@ -76,7 +76,7 @@ public abstract class Particle implements ITimeToLive {
     this.timeToLive = ttl;
     this.color = color;
     this.colorAlpha = this.color.getAlpha();
-    this.collisionType = CollisionType.NONE;
+    this.collisionType = Collision.NONE;
     this.opacity = 1;
     this.fade = true;
   }
@@ -90,7 +90,7 @@ public abstract class Particle implements ITimeToLive {
     return new Rectangle2D.Double(origin.getX() + this.getX(), origin.getY() + this.getY(), this.getWidth(), this.getHeight());
   }
 
-  public CollisionType getCollisionType() {
+  public Collision getCollisionType() {
     return this.collisionType;
   }
 
@@ -179,7 +179,7 @@ public abstract class Particle implements ITimeToLive {
 
   public abstract void render(final Graphics2D g, final Point2D emitterOrigin);
 
-  public Particle setCollisionType(final CollisionType collisionType) {
+  public Particle setCollisionType(final Collision collisionType) {
     this.collisionType = collisionType;
     return this;
   }
@@ -356,7 +356,7 @@ public abstract class Particle implements ITimeToLive {
       double endY = emitterOrigin.getY() + targetY - this.getHeight() / 2.0;
 
       Line2D ray = new Line2D.Double(start.getX(), start.getY(), endX, endY);
-      if (this.getCollisionType() != CollisionType.NONE && Game.physics() != null && Game.physics().collides(ray, this.getCollisionType()) != null) {
+      if (this.getCollisionType() != Collision.NONE && Game.physics() != null && Game.physics().collides(ray, this.getCollisionType())) {
         if (this.isFadingOnCollision()) {
           this.opacity = 0;
         }
@@ -364,7 +364,7 @@ public abstract class Particle implements ITimeToLive {
         this.colliding = true;
         return true;
       }
-    } else if (this.getCollisionType() != CollisionType.NONE && Game.physics() != null && Game.physics().collides(this.getBoundingBox(emitterOrigin), this.getCollisionType())) {
+    } else if (this.getCollisionType() != Collision.NONE && Game.physics() != null && Game.physics().collides(this.getBoundingBox(emitterOrigin), this.getCollisionType())) {
       if (this.isFadingOnCollision()) {
         this.opacity = 0;
       }

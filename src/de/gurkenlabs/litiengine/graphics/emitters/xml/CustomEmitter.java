@@ -29,7 +29,7 @@ import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 @EmitterInfo(maxParticles = 0, spawnAmount = 0, activateOnInit = true)
 public class CustomEmitter extends Emitter {
   private static final Map<String, EmitterData> loadedCustomEmitters;
-  
+
   private static final Logger log = Logger.getLogger(CustomEmitter.class.getName());
 
   static {
@@ -125,16 +125,16 @@ public class CustomEmitter extends Emitter {
     float deltaWidth;
     float deltaHeight;
 
-    x = this.getEmitterData().getParticleX().get();
-    y = this.getEmitterData().getParticleY().get();
-    deltaX = this.getEmitterData().getDeltaX().get();
-    deltaY = this.getEmitterData().getDeltaY().get();
-    gravityX = this.getEmitterData().getGravityX().get();
-    gravityY = this.getEmitterData().getGravityY().get();
-    width = this.getEmitterData().getParticleWidth().get();
-    height = this.getEmitterData().getParticleHeight().get();
-    deltaWidth = this.getEmitterData().getDeltaWidth().get();
-    deltaHeight = this.getEmitterData().getDeltaHeight().get();
+    x = (float) this.getEmitterData().getParticleX().get();
+    y = (float) this.getEmitterData().getParticleY().get();
+    deltaX = (float) this.getEmitterData().getDeltaX().get();
+    deltaY = (float) this.getEmitterData().getDeltaY().get();
+    gravityX = (float) this.getEmitterData().getGravityX().get();
+    gravityY = (float) this.getEmitterData().getGravityY().get();
+    width = (float) this.getEmitterData().getParticleWidth().get();
+    height = (float) this.getEmitterData().getParticleHeight().get();
+    deltaWidth = (float) this.getEmitterData().getDeltaWidth().get();
+    deltaHeight = (float) this.getEmitterData().getDeltaHeight().get();
 
     Particle particle;
     switch (this.getEmitterData().getParticleType()) {
@@ -154,7 +154,8 @@ public class CustomEmitter extends Emitter {
       particle = new RightLineParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL()).setX(x).setY(y).setDeltaIncX(gravityX).setDeltaIncY(gravityY).setDeltaX(deltaX).setDeltaY(deltaY).setDeltaWidth(deltaWidth).setDeltaHeight(deltaHeight);
       break;
     case SHIMMER:
-      particle = new ShimmerParticle(new Rectangle2D.Float(x, y, this.getWidth(), this.getHeight()), width, height, this.getRandomParticleColor()).setX(x).setY(y).setDeltaIncX(gravityX).setDeltaIncY(gravityY).setDeltaX(deltaX).setDeltaY(deltaY).setDeltaWidth(deltaWidth).setDeltaHeight(deltaHeight);
+      particle = new ShimmerParticle(new Rectangle2D.Float(x, y, (float) this.getWidth(), (float) this.getHeight()), width, height, this.getRandomParticleColor()).setX(x).setY(y).setDeltaIncX(gravityX).setDeltaIncY(gravityY).setDeltaX(deltaX).setDeltaY(deltaY).setDeltaWidth(deltaWidth)
+          .setDeltaHeight(deltaHeight);
       break;
     case TEXT:
       particle = new TextParticle(this.getEmitterData().getParticleText(), this.getRandomParticleColor(), this.getRandomParticleTTL()).setX(x).setY(y).setDeltaIncX(gravityX).setDeltaIncY(gravityY).setDeltaX(deltaX).setDeltaY(deltaY).setDeltaWidth(deltaWidth).setDeltaHeight(deltaHeight);

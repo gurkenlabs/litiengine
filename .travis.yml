@@ -7,6 +7,9 @@ before_install:
 
 jdk: oraclejdk8
 
+git:
+  depth: false
+  
 addons:
   sonarcloud:
     organization: "gurkenlabs-github"

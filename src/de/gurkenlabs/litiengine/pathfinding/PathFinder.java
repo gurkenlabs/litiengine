@@ -6,6 +6,7 @@ import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import de.gurkenlabs.litiengine.Game;
@@ -15,6 +16,7 @@ import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 public abstract class PathFinder {
   private static final float PATH_MARGIN = 2.0f;
+
   /**
    * Gets the path.
    *
@@ -25,7 +27,7 @@ public abstract class PathFinder {
    * @return the path
    */
   public abstract Path findPath(IMobileEntity start, Point2D target);
-  
+
   protected Path findDirectPath(final Point2D start, final Point2D target) {
     final Path2D path2D = new GeneralPath(Path2D.WIND_NON_ZERO);
     path2D.moveTo(start.getX(), start.getY());
@@ -47,7 +49,7 @@ public abstract class PathFinder {
   }
 
   protected boolean intersectsWithAnyCollisionBox(final ICollisionEntity entity, final Point2D start, final Point2D target) {
-    final List<Rectangle2D> allCollisionBoxes = Game.physics().getAllCollisionBoxes();
+    final Collection<Rectangle2D> allCollisionBoxes = Game.physics().getCollisionBoxes();
 
     final Line2D line = new Line2D.Double(start, target);
     for (final Rectangle2D collisionBox : allCollisionBoxes) {

@@ -398,7 +398,8 @@ public final class Environment implements IRenderable {
   /**
    * Finds the entities in the environment with the specified map IDs.
    * 
-   * @param mapIds The map IDs to search for.
+   * @param mapIds
+   *          The map IDs to search for.
    * @return A {@code List} of entities found, in the order given by the parameters.
    */
   public List<IEntity> get(final int... mapIds) {
@@ -574,7 +575,6 @@ public final class Environment implements IRenderable {
   public LightSource getLightSource(String name) {
     return getByName(this.getLightSources(), name);
   }
-
 
   /**
    * Gets the next unique local map id. (All local map ids are negative).
@@ -1180,14 +1180,7 @@ public final class Environment implements IRenderable {
   }
 
   private static void loadPhysicsEntity(IEntity entity) {
-    if (entity instanceof CollisionBox) {
-      final CollisionBox coll = (CollisionBox) entity;
-      if (coll.isObstacle()) {
-        Game.physics().add(coll.getBoundingBox());
-      } else {
-        Game.physics().add(coll);
-      }
-    } else if (entity instanceof ICollisionEntity) {
+    if (entity instanceof ICollisionEntity) {
       final ICollisionEntity coll = (ICollisionEntity) entity;
       if (coll.hasCollision()) {
         Game.physics().add(coll);
@@ -1228,16 +1221,8 @@ public final class Environment implements IRenderable {
    */
   private void unload(final IEntity entity) {
     // 1. remove from physics engine
-    if (entity instanceof CollisionBox) {
-      final CollisionBox coll = (CollisionBox) entity;
-      if (coll.isObstacle()) {
-        Game.physics().remove(coll.getBoundingBox());
-      } else {
-        Game.physics().remove(coll);
-      }
-    } else if (entity instanceof ICollisionEntity) {
-      final ICollisionEntity coll = (ICollisionEntity) entity;
-      Game.physics().remove(coll);
+    if (entity instanceof ICollisionEntity) {
+      Game.physics().remove((ICollisionEntity) entity);
     }
 
     // 2. unregister from update

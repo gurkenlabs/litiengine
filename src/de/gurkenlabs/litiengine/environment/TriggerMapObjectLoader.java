@@ -28,7 +28,7 @@ public class TriggerMapObjectLoader extends MapObjectLoader {
     final boolean oneTime = mapObject.getBoolValue(MapObjectProperty.TRIGGER_ONETIME);
     final int coolDown = mapObject.getIntValue(MapObjectProperty.TRIGGER_COOLDOWN);
 
-    final Trigger trigger = this.createTrigger(mapObject, act, message, oneTime, coolDown, mapObject);
+    final Trigger trigger = this.createTrigger(mapObject, act, message, oneTime, coolDown);
     loadDefaultProperties(trigger, mapObject);
     this.loadTargets(mapObject, trigger);
     this.loadActivators(mapObject, trigger);
@@ -38,8 +38,8 @@ public class TriggerMapObjectLoader extends MapObjectLoader {
     return entities;
   }
 
-  protected Trigger createTrigger(IMapObject mapObject, TriggerActivation act, String message, boolean oneTime, int coolDown, IMapObject mapObject2) {
-    return new Trigger(act, message, oneTime, coolDown, mapObject);
+  protected Trigger createTrigger(IMapObject mapObject, TriggerActivation act, String message, boolean oneTime, int coolDown) {
+    return new Trigger(act, message, oneTime, coolDown);
   }
 
   protected void loadTargets(IMapObject mapObject, Trigger trigger) {

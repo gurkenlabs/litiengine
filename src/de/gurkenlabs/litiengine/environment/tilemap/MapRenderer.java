@@ -8,7 +8,7 @@ import java.awt.Point;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
-import de.gurkenlabs.litiengine.GameTime;
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.ImageRenderer;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
@@ -149,7 +149,7 @@ public class MapRenderer {
     // support for animated tiles
     final ITileAnimation animation = MapUtilities.getAnimation(map, index);
     if (animation != null && !animation.getFrames().isEmpty()) {
-      final long playedMs = GameTime.sinceGameStart();
+      final long playedMs = Game.time().sinceGameStart();
 
       final int totalDuration = animation.getTotalDuration();
       final long animationsPlayed = playedMs / totalDuration;

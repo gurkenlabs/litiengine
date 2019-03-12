@@ -45,11 +45,11 @@ public abstract class Entity implements IEntity {
 
   private Environment environment;
 
-  private float angle;
+  private double angle;
 
   private Rectangle2D boundingBox;
 
-  private float height;
+  private double height;
 
   private int mapId;
 
@@ -59,7 +59,7 @@ public abstract class Entity implements IEntity {
 
   private RenderType renderType;
 
-  private float width;
+  private double width;
 
   /**
    * Instantiates a new entity.
@@ -164,7 +164,7 @@ public abstract class Entity implements IEntity {
   }
 
   @Override
-  public float getAngle() {
+  public double getAngle() {
     return this.angle;
   }
 
@@ -209,7 +209,7 @@ public abstract class Entity implements IEntity {
   }
 
   @Override
-  public float getHeight() {
+  public double getHeight() {
     return this.height;
   }
 
@@ -234,7 +234,7 @@ public abstract class Entity implements IEntity {
   }
 
   @Override
-  public float getWidth() {
+  public double getWidth() {
     return this.width;
   }
 
@@ -274,7 +274,7 @@ public abstract class Entity implements IEntity {
   }
 
   @Override
-  public void setHeight(final float height) {
+  public void setHeight(final double height) {
     this.height = height;
     this.boundingBox = null;
     this.fireSizeChangedEvent();
@@ -318,7 +318,7 @@ public abstract class Entity implements IEntity {
   }
 
   @Override
-  public void setSize(final float width, final float height) {
+  public void setSize(final double width, final double height) {
     this.width = width;
     this.height = height;
     this.boundingBox = null;
@@ -326,7 +326,7 @@ public abstract class Entity implements IEntity {
   }
 
   @Override
-  public void setWidth(final float width) {
+  public void setWidth(final double width) {
     this.width = width;
     this.boundingBox = null;
     this.fireSizeChangedEvent();
@@ -375,7 +375,7 @@ public abstract class Entity implements IEntity {
   }
 
   @Override
-  public void setAngle(final float angle) {
+  public void setAngle(final double angle) {
     this.angle = angle;
   }
 

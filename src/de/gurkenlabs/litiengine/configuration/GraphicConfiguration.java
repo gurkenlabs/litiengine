@@ -34,8 +34,8 @@ public class GraphicConfiguration extends ConfigurationGroup {
     this.fullscreen = false;
     this.renderDynamicShadows = false;
     Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-    this.resolutionHeight = d.width;
-    this.resolutionWidth = d.height - 100;
+    this.resolutionWidth = d.width;
+    this.resolutionHeight = d.height - 100;
     this.setEnableResolutionScale(true);
     this.setReduceFramesWhenNotFocused(true);
     this.setAntiAliasing(false);

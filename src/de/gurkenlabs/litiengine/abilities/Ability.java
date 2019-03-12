@@ -209,7 +209,7 @@ public abstract class Ability implements IRenderable {
     return this.effects;
   }
 
-  protected Shape internalCalculateImpactArea(final float angle) {
+  protected Shape internalCalculateImpactArea(final double angle) {
     final int impact = this.getAttributes().getImpact().getCurrentValue();
     final int impactAngle = this.getAttributes().getImpactAngle().getCurrentValue();
     final double arcX = this.getOrigin().getX() - impact * 0.5;

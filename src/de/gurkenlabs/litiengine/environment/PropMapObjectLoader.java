@@ -9,8 +9,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.annotation.AnimationInfo;
-import de.gurkenlabs.litiengine.attributes.AttributeModifier;
-import de.gurkenlabs.litiengine.attributes.Modification;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.Material;
 import de.gurkenlabs.litiengine.entities.Prop;
@@ -74,16 +72,8 @@ public class PropMapObjectLoader extends MapObjectLoader {
 
     final Prop prop = this.createNewProp(mapObject, mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME));
     loadDefaultProperties(prop, mapObject);
-    loadCollisionProperties(prop, mapObject);
-
-    prop.setMaterial(Material.get(mapObject.getStringValue(MapObjectProperty.PROP_MATERIAL)));
     
-    prop.setIndestructible(mapObject.getBoolValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE));
-    AttributeModifier<Integer> mod = new AttributeModifier<>(Modification.SET, mapObject.getIntValue(MapObjectProperty.COMBAT_HITPOINTS));
-    prop.getHitPoints().modifyMaxBaseValue(mod);
-    prop.getHitPoints().modifyBaseValue(mod);
-
-    prop.setTeam(mapObject.getIntValue(MapObjectProperty.COMBAT_TEAM));
+    prop.setMaterial(Material.get(mapObject.getStringValue(MapObjectProperty.PROP_MATERIAL)));
 
     Collection<IEntity> entities = new ArrayList<>();
     entities.add(prop);

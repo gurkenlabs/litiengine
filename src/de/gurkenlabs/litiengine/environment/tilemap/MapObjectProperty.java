@@ -14,9 +14,9 @@ public final class MapObjectProperty {
 
   // collision entity
   public static final String COLLISION = "collision";
-
   public static final String COLLISION_ALIGN = "collisionAlign";
   public static final String COLLISION_VALIGN = "collisionValign";
+  public static final String COLLISION_TYPE = "collisionType";
 
   // collision box
   public static final String COLLISIONBOX_HEIGHT = "collisionboxHeightFactor";
@@ -26,21 +26,20 @@ public final class MapObjectProperty {
   // general entity stuff
   public static final String SPRITESHEETNAME = "spritesheetName";
   public static final String SCALE_SPRITE = "scaling";
-  
+
   // mobile entity
   public static final String MOVEMENT_ACCELERATION = "acceleration";
   public static final String MOVEMENT_DECELERATION = "deceleration";
   public static final String MOVEMENT_VELOCITY = "velocity";
   public static final String MOVEMENT_TURNONMOVE = "turnOnMove";
-  
+
   // combat entity
   public static final String COMBAT_HITPOINTS = "hitpoints";
   public static final String COMBAT_INDESTRUCTIBLE = "indestructible";
   public static final String COMBAT_TEAM = "team";
-  
+
   // props
   public static final String PROP_MATERIAL = "material";
-  public static final String PROP_OBSTACLE = "isObstacle";
   public static final String PROP_ADDSHADOW = "addShadow";
   public static final String PROP_ROTATION = "rotationSprite";
   public static final String PROP_FLIPHORIZONTALLY = "flipHorizontally";
@@ -53,7 +52,7 @@ public final class MapObjectProperty {
   public static final String LIGHT_ACTIVE = "lightActive";
   public static final String LIGHT_FOCUSOFFSETX = "lightFocusOffsetX";
   public static final String LIGHT_FOCUSOFFSETY = "lightFocusOffsetY";
-  
+
   // static shadow
   public static final String SHADOW_TYPE = "shadowType";
   public static final String SHADOW_OFFSET = "shadowOffset";
@@ -143,7 +142,7 @@ public final class MapObjectProperty {
       addAvailableProperties(MapObjectProperty.Emitter.class);
       addAvailableProperties(MapObjectProperty.Particle.class);
     }
-    
+
     return availableProperties;
   }
 

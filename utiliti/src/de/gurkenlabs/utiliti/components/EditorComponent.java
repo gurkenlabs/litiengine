@@ -1,5 +1,7 @@
 package de.gurkenlabs.utiliti.components;
 
+import java.awt.event.MouseEvent;
+
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.gui.GuiComponent;
 import de.gurkenlabs.utiliti.EditorScreen;
@@ -23,5 +25,10 @@ public abstract class EditorComponent extends GuiComponent {
 
   public void setComponentType(ComponentType componentType) {
     this.componentType = componentType;
+  }
+ 
+  @Override
+  protected boolean mouseEventShouldBeForwarded(final MouseEvent e) {
+    return this.isForwardMouseEvents() && this.isVisible() && this.isEnabled() && !this.isSuspended() && e != null;
   }
 }

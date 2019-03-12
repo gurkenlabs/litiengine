@@ -62,7 +62,8 @@ public interface IMobileEntity extends ICollisionEntity {
   public void setAcceleration(int acceleration);
 
   /**
-   * Sets the deceleration for this entity. deceleration is a value that defines how long it takes the entity to stop when slowing down from movements (in ms).
+   * Sets the deceleration for this entity. deceleration is a value that defines how long it takes the entity to stop when slowing down from movements
+   * (in ms).
    *
    * @param deceleration
    *          the new deceleration
@@ -78,7 +79,8 @@ public interface IMobileEntity extends ICollisionEntity {
   public void setMoveDestination(Point2D dest);
 
   /**
-   * Sets the turn on move parameter for this entity. It specifies if the entity will change its angle to the direction of the move destination when moved.
+   * Sets the turn on move parameter for this entity. It specifies if the entity will change its angle to the direction of the move destination when
+   * moved.
    *
    * @param turn
    *          the new turn on move parameter.
@@ -86,7 +88,18 @@ public interface IMobileEntity extends ICollisionEntity {
   public void setTurnOnMove(boolean turn);
 
   /**
-   * Gets the turn on move parameter for this entity. It specifies if the entity will change its angle to the direction of the move destination when moved.
+   * Sets the base value on the velocity attribute of this instance.
+   * 
+   * @param velocity
+   *          The velocity to be set.
+   * 
+   * @see #getVelocity()
+   */
+  public void setVelocity(float velocity);
+
+  /**
+   * Gets the turn on move parameter for this entity. It specifies if the entity will change its angle to the direction of the move destination when
+   * moved.
    *
    * @return true, if the entity will change its angle to the direction of the move destination when being moved
    */

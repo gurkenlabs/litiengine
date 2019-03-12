@@ -23,7 +23,6 @@ import de.gurkenlabs.utiliti.swing.LabelListCellRenderer;
 public class PropPanel extends PropertyPanel {
   private JComboBox<JLabel> comboBoxSpriteSheets;
   private JComboBox<Material> comboBoxMaterial;
-  private JCheckBox chckbxIsObstacle;
   private JCheckBox chckbxShadow;
   private JComboBox<Rotation> comboBoxRotation;
   private JCheckBox checkBoxHorizontalFlip;
@@ -44,11 +43,10 @@ public class PropPanel extends PropertyPanel {
 
     this.comboBoxMaterial = new JComboBox<>();
     this.comboBoxMaterial.setModel(new DefaultComboBoxModel<Material>(Material.getMaterials().toArray(new Material[Material.getMaterials().size()])));
-    
+
     this.comboBoxRotation = new JComboBox<>();
     this.comboBoxRotation.setModel(new DefaultComboBoxModel<>(Rotation.values()));
 
-    this.chckbxIsObstacle = new JCheckBox(Resources.strings().get("panel_isObstacle"));
     this.chckbxShadow = new JCheckBox("shadow");
     this.checkBoxHorizontalFlip = new JCheckBox("horizontal flip");
     this.checkBoxVerticalFlip = new JCheckBox("vertical flip");
@@ -84,7 +82,6 @@ public class PropPanel extends PropertyPanel {
 
   @Override
   protected void clearControls() {
-    this.chckbxIsObstacle.setSelected(false);
     this.chckbxShadow.setSelected(false);
     this.checkBoxScale.setSelected(false);
     this.comboBoxMaterial.setSelectedItem(Material.UNDEFINED);
@@ -102,7 +99,6 @@ public class PropPanel extends PropertyPanel {
     this.comboBoxRotation.setSelectedItem(mapObject.getEnumValue(MapObjectProperty.PROP_ROTATION, Rotation.class, Rotation.NONE));
 
     this.chckbxShadow.setSelected(mapObject.getBoolValue(MapObjectProperty.PROP_ADDSHADOW));
-    this.chckbxIsObstacle.setSelected(mapObject.getBoolValue(MapObjectProperty.PROP_OBSTACLE));
     this.checkBoxHorizontalFlip.setSelected(mapObject.getBoolValue(MapObjectProperty.PROP_FLIPHORIZONTALLY));
     this.checkBoxVerticalFlip.setSelected(mapObject.getBoolValue(MapObjectProperty.PROP_FLIPVERTICALLY));
     this.checkBoxScale.setSelected(mapObject.getBoolValue(MapObjectProperty.SCALE_SPRITE));
@@ -112,9 +108,8 @@ public class PropPanel extends PropertyPanel {
     this.setup(this.comboBoxMaterial, MapObjectProperty.PROP_MATERIAL);
     this.setup(this.comboBoxRotation, MapObjectProperty.PROP_ROTATION);
     this.setupL(this.comboBoxSpriteSheets, MapObjectProperty.SPRITESHEETNAME);
-    
+
     this.setup(this.chckbxShadow, MapObjectProperty.PROP_ADDSHADOW);
-    this.setup(this.chckbxIsObstacle, MapObjectProperty.PROP_OBSTACLE);
     this.setup(this.checkBoxHorizontalFlip, MapObjectProperty.PROP_FLIPHORIZONTALLY);
     this.setup(this.checkBoxVerticalFlip, MapObjectProperty.PROP_FLIPVERTICALLY);
     this.setup(this.checkBoxScale, MapObjectProperty.SCALE_SPRITE);
@@ -142,14 +137,15 @@ public class PropPanel extends PropertyPanel {
 
     this.propsLoaded = true;
   }
-  
+
   private LayoutManager createLayout() {
-    LayoutItem[] layoutItems = new LayoutItem [] {
-        new LayoutItem("panel_sprite", this.comboBoxSpriteSheets),
-        new LayoutItem("panel_material", this.comboBoxMaterial),
-        new LayoutItem("panel_rotation", this.comboBoxRotation),
-    };
-    
-    return this.createLayout(layoutItems, this.checkBoxScale, this.chckbxIsObstacle, this.chckbxShadow, this.checkBoxHorizontalFlip, this.checkBoxVerticalFlip);
+    LayoutItem[] layoutItems = new LayoutItem[] 
+        { 
+            new LayoutItem("panel_sprite", this.comboBoxSpriteSheets), 
+            new LayoutItem("panel_material", this.comboBoxMaterial), 
+            new LayoutItem("panel_rotation", this.comboBoxRotation), 
+        };
+
+    return this.createLayout(layoutItems, this.checkBoxScale, this.chckbxShadow, this.checkBoxHorizontalFlip, this.checkBoxVerticalFlip);
   }
 }

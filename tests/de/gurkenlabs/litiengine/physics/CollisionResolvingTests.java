@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Valign;
+import de.gurkenlabs.litiengine.entities.CollisionBox;
 import de.gurkenlabs.litiengine.entities.Creature;
 
 @SuppressWarnings("deprecation")
@@ -22,8 +23,8 @@ public class CollisionResolvingTests {
     engine.add(ent);
 
     // large rectangle at the bottom of the entity
-    Rectangle2D rect1 = new Rectangle2D.Double(0, 25, 100, 10);
-    engine.add(rect1);
+
+    engine.add(new CollisionBox(0, 25, 100, 10));
 
     // move 10 px to the right
     engine.update();
@@ -52,8 +53,7 @@ public class CollisionResolvingTests {
     engine.add(ent);
 
     // large rectangle at the bottom of the entity
-    Rectangle2D rect1 = new Rectangle2D.Double(0, 20, 100, 10);
-    engine.add(rect1);
+    engine.add(new CollisionBox(0, 20, 100, 10));
 
     // move 10 px to the right
     engine.update();
@@ -88,8 +88,7 @@ public class CollisionResolvingTests {
     engine.add(ent);
 
     // large rectangle at the right of the entity
-    Rectangle2D rect1 = new Rectangle2D.Double(20, 0, 10, 100);
-    engine.add(rect1);
+    engine.add(new CollisionBox(20, 0, 10, 100));
 
     // move 10 px down
     engine.update();
@@ -120,12 +119,10 @@ public class CollisionResolvingTests {
     engine.add(ent);
 
     // large rectangle at the bottom of the entity
-    Rectangle2D rect1 = new Rectangle2D.Double(0, 20, 50, 30);
-
+    engine.add(new CollisionBox(0, 20, 50, 30));
+    
     // another rectangle that creates an angle on the right side
-    Rectangle2D rect2 = new Rectangle2D.Double(50, 20, 10, 100);
-    engine.add(rect1);
-    engine.add(rect2);
+    engine.add(new CollisionBox(50, 20, 10, 100));
 
     // first relocate the entity
     ent.setLocation(45, 10);

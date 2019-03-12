@@ -22,6 +22,7 @@ import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
 import de.gurkenlabs.litiengine.graphics.RenderType;
+import de.gurkenlabs.litiengine.physics.Collision;
 
 public class EnvironmentEventTests {
   private Environment testEnvironment;
@@ -90,6 +91,7 @@ public class EnvironmentEventTests {
     ICombatEntity combatEntity = mock(ICombatEntity.class);
     when(combatEntity.getMapId()).thenReturn(123);
     when(combatEntity.getRenderType()).thenReturn(RenderType.NORMAL);
+    when(combatEntity.getCollisionType()).thenReturn(Collision.DYNAMIC);
 
     EnvironmentEntityListener listener = mock(EnvironmentEntityListener.class);
     this.testEnvironment.addEntityListener(listener);

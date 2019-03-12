@@ -71,7 +71,7 @@ public class SpeechBubble implements IUpdateable, IRenderable {
     }
     this.setFont(font);
 
-    this.textBoxWidth = entity.getWidth() * 4;
+    this.textBoxWidth = (float) (entity.getWidth() * 4);
     this.entity = entity;
 
     this.currentText = text;
