@@ -73,7 +73,6 @@ public class AssetPanelItem extends JPanel {
   private final JButton btnDelete;
   private final JButton btnAdd;
   private final JButton btnExport;
-  private final JButton btnRefresh;
 
   private final transient Object origin;
 
@@ -125,7 +124,6 @@ public class AssetPanelItem extends JPanel {
           btnDelete.setVisible(true);
           btnExport.setVisible(true);
         }
-        btnRefresh.setVisible(true);
       }
 
       @Override
@@ -140,7 +138,6 @@ public class AssetPanelItem extends JPanel {
         btnAdd.setVisible(false);
         btnDelete.setVisible(false);
         btnExport.setVisible(false);
-        btnRefresh.setVisible(false);
       }
     });
 
@@ -262,21 +259,10 @@ public class AssetPanelItem extends JPanel {
     btnExport.setIcon(Icons.EXPORT);
     btnExport.setVisible(false);
 
-    btnRefresh = new JButton("");
-    btnRefresh.setToolTipText("Refresh Asset");
-    btnRefresh.addActionListener(e -> this.refresh());
-    btnRefresh.setMaximumSize(new Dimension(16, 16));
-    btnRefresh.setMinimumSize(new Dimension(16, 16));
-    btnRefresh.setPreferredSize(new Dimension(16, 16));
-    btnRefresh.setOpaque(false);
-    btnRefresh.setIcon(Icons.REFRESH);
-    btnRefresh.setVisible(false);
-
     buttonPanel.add(btnEdit);
     buttonPanel.add(btnAdd);
     buttonPanel.add(btnDelete);
     buttonPanel.add(btnExport);
-    buttonPanel.add(btnRefresh);
   }
 
   public AssetPanelItem(Icon icon, String text, Object origin) {
@@ -408,10 +394,6 @@ public class AssetPanelItem extends JPanel {
     } else if (this.getOrigin() instanceof SoundResource) {
       this.exportSound();
     }
-  }
-
-  private void refresh() {
-
   }
 
   private void exportSpritesheet() {
