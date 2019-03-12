@@ -106,12 +106,12 @@ public abstract class SoundPlayback implements Runnable {
   protected void finish() {
     this.line.drain();
     synchronized (this) {
+      this.line.close();
       if (!this.task.isCancelled()) {
         SoundEvent event = new SoundEvent(this, null);
         for (SoundPlaybackListener listener : this.listeners) {
           listener.finished(event);
         }
-        this.line.close();
       }
     }
   }

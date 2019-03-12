@@ -5,16 +5,30 @@ import java.util.Objects;
 
 import javax.sound.sampled.AudioFormat;
 
+import de.gurkenlabs.litiengine.resources.Resources;
+
 public class IntroTrack implements Track {
   private Sound intro;
   private Sound loop;
 
+  public IntroTrack(String intro, String loop) {
+    this(Resources.sounds().get(intro), Resources.sounds().get(loop));
+  }
+
+  public IntroTrack(Sound intro, String loop) {
+    this(intro, Resources.sounds().get(loop));
+  }
+
+  public IntroTrack(String intro, Sound loop) {
+    this(Resources.sounds().get(intro), loop);
+  }
+
   public IntroTrack(Sound intro, Sound loop) {
-    if (!intro.getFormat().equals(loop.getFormat())) {
-      throw new IllegalArgumentException(intro.getFormat() + " does not match " + loop.getFormat());
-    }
     Objects.requireNonNull(intro);
     Objects.requireNonNull(loop);
+    if (!intro.getFormat().matches(loop.getFormat())) {
+      throw new IllegalArgumentException(intro.getFormat() + " does not match " + loop.getFormat());
+    }
     this.intro = intro;
     this.loop = loop;
   }
@@ -60,7 +74,7 @@ public class IntroTrack implements Track {
     if (this == anObject) {
       return true;
     }
-    if (anObject == null || !(anObject instanceof IntroTrack)) {
+    if (!(anObject instanceof IntroTrack)) {
       return false;
     }
     IntroTrack other = (IntroTrack) anObject;

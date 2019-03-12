@@ -125,8 +125,8 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
       stopMusic();
     }
     allMusic.add(playback);
-    music = playback;
     playback.start();
+    music = playback;
   }
 
   /**
@@ -359,7 +359,6 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
     for (MusicPlayback track : allMusic) {
       track.cancel();
     }
-    allMusic.clear();
   }
 
   /**
