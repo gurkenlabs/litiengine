@@ -13,7 +13,7 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -313,15 +313,15 @@ public class MapObjectLoaderTests {
     when(mapObject.getWidth()).thenReturn(50f);
     when(mapObject.getHeight()).thenReturn(150f);
 
-    Map<String, ICustomProperty> customProps = new Hashtable<>(2);
+    Map<String, ICustomProperty> customProps = new HashMap<>(2);
     customProps.put("foo", new CustomProperty("foovalue"));
     customProps.put("bar", new CustomProperty("111"));
     when(mapObject.getProperties()).thenReturn(customProps);
     when(mapObject.getStringValue("foo")).thenReturn("foovalue");
-    when(mapObject.getStringValue("bar")).thenReturn("111");
-
     when(mapObject.getStringValue("foo", null)).thenReturn("foovalue");
+    when(mapObject.getStringValue("bar")).thenReturn("111");
     when(mapObject.getStringValue("bar", null)).thenReturn("111");
+
 
     IMap map = mock(IMap.class);
     when(map.getSizeInPixels()).thenReturn(new Dimension(100, 100));
@@ -338,6 +338,40 @@ public class MapObjectLoaderTests {
     CustomEntity customEntity = (CustomEntity) ent;
     assertEquals("foovalue", customEntity.getFoo());
     assertEquals(111, customEntity.getBar());
+  }
+  
+  @Test
+  public void customPropertiesShoudBePassedToTheEntity() {
+    Environment.registerCustomEntityType(CustomEntity.class);
+
+    IMapObject mapObject = mock(IMapObject.class);
+    when(mapObject.getType()).thenReturn("customEntity");
+    when(mapObject.getId()).thenReturn(111);
+    when(mapObject.getName()).thenReturn("somethin");
+    when(mapObject.getLocation()).thenReturn(new Point(100, 100));
+    when(mapObject.getWidth()).thenReturn(50f);
+    when(mapObject.getHeight()).thenReturn(150f);
+
+    Map<String, ICustomProperty> customProps = new HashMap<>(2);
+    customProps.put("wasdd", new CustomProperty("11111"));
+    customProps.put("zapp", new CustomProperty("33333"));
+    when(mapObject.getProperties()).thenReturn(customProps);
+
+    IMap map = mock(IMap.class);
+    when(map.getSizeInPixels()).thenReturn(new Dimension(100, 100));
+    when(map.getSizeInTiles()).thenReturn(new Dimension(10, 10));
+    Environment env = new Environment(map);
+
+    Collection<IEntity> loaded = env.load(mapObject);
+
+    assertEquals(1, loaded.size());
+
+    IEntity ent = loaded.iterator().next();
+    assertTrue(ent instanceof CustomEntity);
+
+    CustomEntity customEntity = (CustomEntity) ent;
+    assertEquals("11111", customEntity.getProperties().getStringValue("wasdd"));
+    assertEquals("33333", customEntity.getProperties().getStringValue("zapp"));
   }
 
   @EntityInfo(customMapObjectType = "customEntity")

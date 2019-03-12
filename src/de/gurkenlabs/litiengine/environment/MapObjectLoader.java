@@ -66,16 +66,21 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
     }
 
     loadCustomMapObjectProperties(entity, mapObject);
+
+    mapObject.getProperties().forEach((name, property) -> {
+      if (MapObjectProperty.isCustom(name)) {
+       entity.getProperties().setValue(name, property);
+      }
+    });
   }
 
   private static void loadCustomMapObjectProperties(IEntity entity, IMapObject mapObject) {
     for (final Field field : ReflectionUtilities.getAllFields(new ArrayList<Field>(), entity.getClass())) {
       TmxProperty property = field.getAnnotation(TmxProperty.class);
-      
+
       if (property == null) {
         continue;
       }
-
 
       String value = mapObject.getStringValue(property.name(), null);
       if (value == null) {
