@@ -61,25 +61,35 @@ public final class MapUtilities {
   public static Point2D getCenterMapLocation(IMap map) {
     return new Point2D.Double(map.getSizeInPixels().width / 2.0, map.getSizeInPixels().height / 2.0);
   }
-
+  
   public static Rectangle2D getTileBoundingBox(final Point2D mapLocation) {
-    if (Game.world().environment() == null || Game.world().environment().getMap() == null) {
+    return getTileBoundingBox(getCurrentMap(), mapLocation);
+  }
+  public static Rectangle2D getTileBoundingBox(final IMap map, final Point2D mapLocation) {
+    if (map == null) {
       return new Rectangle2D.Double();
     }
-
-    IMap map = Game.world().environment().getMap();
+    
     return map.getOrientation().getEnclosingTileShape(mapLocation, map).getBounds2D();
   }
 
   public static Rectangle2D getTileBoundingBox(final int x, final int y) {
-    return getTileBoundingBox(new Point(x, y));
+    return getTileBoundingBox(getCurrentMap(), x, y);
+  }
+
+  public static Rectangle2D getTileBoundingBox(final IMap map, final int x, final int y) {
+    return getTileBoundingBox(map, new Point(x, y));
   }
 
   public static Rectangle2D getTileBoundingBox(final Point tile) {
-    if (Game.world().environment() == null || Game.world().environment().getMap() == null) {
+    return getTileBoundingBox(getCurrentMap(), tile);
+  }
+
+  public static Rectangle2D getTileBoundingBox(final IMap map, final Point tile) {
+    if (map == null) {
       return new Rectangle2D.Double();
     }
-    IMap map = Game.world().environment().getMap();
+
     return map.getOrientation().getShape(tile, map).getBounds2D();
   }
 
@@ -90,8 +100,8 @@ public final class MapUtilities {
     final int maxY = (int) MathUtilities.clamp(box.getMaxY(), 0, map.getSizeInPixels().height - 1);
     final Point minTilePoint = map.getOrientation().getTile(minX, minY, map);
     final Point maxTilePoint = map.getOrientation().getTile(maxX, maxY, map);
-    final Rectangle2D minTileBounds = getTileBoundingBox(new Point(MathUtilities.clamp(minTilePoint.x, 0, map.getWidth() - 1), MathUtilities.clamp(minTilePoint.y, 0, map.getHeight() - 1)));
-    final Rectangle2D maxTileBounds = getTileBoundingBox(new Point(MathUtilities.clamp(maxTilePoint.x, 0, map.getWidth() - 1), MathUtilities.clamp(maxTilePoint.y, 0, map.getHeight() - 1)));
+    final Rectangle2D minTileBounds = getTileBoundingBox(map, new Point(MathUtilities.clamp(minTilePoint.x, 0, map.getWidth() - 1), MathUtilities.clamp(minTilePoint.y, 0, map.getHeight() - 1)));
+    final Rectangle2D maxTileBounds = getTileBoundingBox(map, new Point(MathUtilities.clamp(maxTilePoint.x, 0, map.getWidth() - 1), MathUtilities.clamp(maxTilePoint.y, 0, map.getHeight() - 1)));
 
     return new Rectangle2D.Double(minTileBounds.getX(), minTileBounds.getY(), maxTileBounds.getMaxX() - minTileBounds.getX(), maxTileBounds.getMaxY() - minTileBounds.getY());
   }
@@ -294,5 +304,13 @@ public final class MapUtilities {
     }
 
     return null;
+  }
+
+  private static final IMap getCurrentMap() {
+    if (Game.world().environment() == null) {
+      return null;
+    }
+
+    return Game.world().environment().getMap();
   }
 }
