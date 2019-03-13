@@ -41,7 +41,7 @@ public abstract class Entity implements IEntity {
 
   private final EntityActionMap actions;
 
-  private ICustomPropertyProvider properties;
+  private final ICustomPropertyProvider properties;
 
   private Environment environment;
 
@@ -419,10 +419,6 @@ public abstract class Entity implements IEntity {
 
   protected EntityControllers getControllers() {
     return this.controllers;
-  }
-
-  protected final void setProperties(ICustomPropertyProvider attributes) {
-    this.properties = attributes;
   }
 
   private void fireSizeChangedEvent() {
