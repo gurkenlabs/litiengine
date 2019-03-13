@@ -62,11 +62,8 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   @XmlTransient
   private IMapOrientation mapOrientation;
 
-  @XmlTransient
-  private RenderOrder renderOrderEnum;
-
   @XmlAttribute
-  private String renderorder;
+  private RenderOrder renderorder;
 
   @XmlAttribute
   private int width;
@@ -86,17 +83,11 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   @XmlAttribute
   private Integer hexsidelength;
 
-  @XmlTransient
-  private StaggerAxis staggerAxisEnum;
-
-  @XmlTransient
-  private StaggerIndex staggerIndexEnum;
+  @XmlAttribute
+  private StaggerAxis staggeraxis;
 
   @XmlAttribute
-  private String staggeraxis;
-
-  @XmlAttribute
-  private String staggerindex;
+  private StaggerIndex staggerindex;
 
   @XmlAttribute
   private String backgroundcolor;
@@ -178,7 +169,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
   @Override
   public RenderOrder getRenderOrder() {
-    return this.renderOrderEnum;
+    return this.renderorder;
   }
 
   @Override
@@ -360,12 +351,12 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
   @Override
   public StaggerAxis getStaggerAxis() {
-    return this.staggerAxisEnum;
+    return this.staggeraxis;
   }
 
   @Override
   public StaggerIndex getStaggerIndex() {
-    return this.staggerIndexEnum;
+    return this.staggerindex;
   }
 
   public void setPath(final String path) {
@@ -447,8 +438,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
   @XmlTransient
   public void setRenderOrder(RenderOrder renderorder) {
-    Objects.requireNonNull(renderorder);
-    this.renderOrderEnum = renderorder;
+    this.renderorder = renderorder;
   }
 
   @XmlTransient
@@ -473,12 +463,12 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
   @XmlTransient
   public void setStaggerAxis(StaggerAxis staggerAxis) {
-    this.staggerAxisEnum = staggerAxis;
+    this.staggeraxis = staggerAxis;
   }
 
   @XmlTransient
   public void setStaggerIndex(StaggerIndex staggerIndex) {
-    this.staggerIndexEnum = staggerIndex;
+    this.staggerindex = staggerIndex;
   }
 
   @XmlTransient
@@ -567,22 +557,10 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   private void afterUnmarshal(Unmarshaller u, Object parent) {
     this.checkVersion();
 
-    if (this.staggeraxis != null) {
-      this.staggerAxisEnum = StaggerAxis.valueOf(this.staggeraxis.toUpperCase());
-    }
-    if (this.staggerindex != null) {
-      this.staggerIndexEnum = StaggerIndex.valueOf(this.staggerindex.toUpperCase());
-    }
-    if (this.renderorder != null) {
-      this.renderOrderEnum = RenderOrder.forName(this.renderorder);
-    }
     if (this.orientation != null) {
       this.mapOrientation = MapOrientations.forName(this.orientation);
     }
 
-    if (this.renderOrderEnum == null) {
-      this.renderOrderEnum = RenderOrder.RIGHT_DOWN;
-    }
     if (this.mapOrientation == null) {
       this.mapOrientation = MapOrientations.ORTHOGONAL;
     }
@@ -606,9 +584,6 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
   @SuppressWarnings("unused")
   private void beforeMarshal(Marshaller m) {
-    this.staggeraxis = this.staggerAxisEnum == null ? null : this.staggerAxisEnum.name().toLowerCase();
-    this.staggerindex = this.staggerIndexEnum == null ? null : this.staggerIndexEnum.name().toLowerCase();
-    this.renderorder = this.renderOrderEnum.savedName;
     this.orientation = this.mapOrientation.getName();
   }
 
