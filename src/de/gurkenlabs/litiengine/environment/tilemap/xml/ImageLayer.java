@@ -4,18 +4,19 @@ import java.awt.Color;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapImage;
-import de.gurkenlabs.litiengine.util.ColorHelper;
 
 public class ImageLayer extends Layer implements IImageLayer {
 
-  @XmlElement(name = "image")
+  @XmlElement
   private MapImage image;
 
-  @XmlAttribute(name = "trans")
-  private String transparentcolor;
+  @XmlAttribute
+  @XmlJavaTypeAdapter(ColorAdapter.class)
+  private Color trans;
 
   @Override
   public IMapImage getImage() {
@@ -24,11 +25,7 @@ public class ImageLayer extends Layer implements IImageLayer {
 
   @Override
   public Color getTransparentColor() {
-    if (this.transparentcolor != null && !this.transparentcolor.isEmpty()) {
-      return ColorHelper.decode(this.transparentcolor);
-    }
-
-    return null;
+    return this.trans;
   }
 
   @Override

@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IGroupLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
@@ -39,7 +40,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.RenderOrder;
 import de.gurkenlabs.litiengine.environment.tilemap.StaggerAxis;
 import de.gurkenlabs.litiengine.environment.tilemap.StaggerIndex;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
-import de.gurkenlabs.litiengine.util.ColorHelper;
 
 @XmlRootElement(name = "map")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -90,7 +90,8 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   private StaggerIndex staggerindex;
 
   @XmlAttribute
-  private String backgroundcolor;
+  @XmlJavaTypeAdapter(ColorAdapter.class)
+  private Color backgroundcolor;
 
   @XmlAttribute(name = "nextobjectid")
   private int nextObjectId;
@@ -124,8 +125,6 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   private transient List<IMapObjectLayer> mapObjectLayers = Collections.unmodifiableList(this.rawMapObjectLayers);
   private transient List<IImageLayer> imageLayers = Collections.unmodifiableList(this.rawImageLayers);
   private transient List<IGroupLayer> groupLayers = Collections.unmodifiableList(this.rawGroupLayers);
-
-  private transient Color decodedBackgroundColor;
 
   @XmlTransient
   private int chunkOffsetX;
@@ -528,16 +527,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
   @Override
   public Color getBackgroundColor() {
-    if (this.backgroundcolor == null || this.backgroundcolor.isEmpty()) {
-      return null;
-    }
-
-    if (this.decodedBackgroundColor != null) {
-      return this.decodedBackgroundColor;
-    }
-
-    this.decodedBackgroundColor = ColorHelper.decode(this.backgroundcolor, true);
-    return this.decodedBackgroundColor;
+    return this.backgroundcolor;
   }
 
   @Override
