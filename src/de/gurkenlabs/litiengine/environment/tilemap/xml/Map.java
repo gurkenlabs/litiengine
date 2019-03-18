@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -40,6 +41,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.RenderOrder;
 import de.gurkenlabs.litiengine.environment.tilemap.StaggerAxis;
 import de.gurkenlabs.litiengine.environment.tilemap.StaggerIndex;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
+import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 @XmlRootElement(name = "map")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -114,7 +116,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   private List<ILayer> layers;
 
   @XmlTransient
-  private String path;
+  private URL path;
 
   private transient List<ITileLayer> rawTileLayers = new ArrayList<>();
   private transient List<IMapObjectLayer> rawMapObjectLayers = new ArrayList<>();
@@ -162,7 +164,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
   @Override
   @XmlTransient
-  public String getPath() {
+  public URL getPath() {
     return this.path;
   }
 
@@ -358,17 +360,24 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     return this.staggerindex;
   }
 
-  public void setPath(final String path) {
+  public void setPath(final URL path) {
     this.path = path;
-    for (ILayer layer : this.layers) {
-      if (layer instanceof ImageLayer) {
-        ((ImageLayer) layer).setMapPath(path);
-      }
-    }
+  }
 
+  public void finish(URL location) throws TmxException {
+    if (this.name == null) {
+      this.name = FileUtilities.getFileName(location);
+    }
+    this.path = location;
+    // tilesets must be post-processed before layers; otherwise external tilesets may not be loaded
     for (ITileset tileset : this.tilesets) {
       if (tileset instanceof Tileset) {
-        ((Tileset) tileset).setMapPath(path);
+        ((Tileset) tileset).finish(location);
+      }
+    }
+    for (ILayer layer : this.layers) {
+      if (layer instanceof Layer) {
+        ((Layer) layer).finish(location);
       }
     }
   }

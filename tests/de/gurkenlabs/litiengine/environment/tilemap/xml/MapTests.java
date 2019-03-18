@@ -7,6 +7,8 @@ import static org.mockito.Mockito.mock;
 
 import java.awt.Color;
 import java.awt.geom.Rectangle2D;
+import java.io.File;
+import java.net.MalformedURLException;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,7 +27,7 @@ public class MapTests {
   }
 
   @Test
-  public void testBasicProperties() {
+  public void testBasicProperties() throws MalformedURLException {
     IMap map = Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
 
     assertEquals(1.0, map.getVersion());
@@ -41,8 +43,8 @@ public class MapTests {
     assertEquals(1, map.getNextObjectId());
 
     assertEquals("test-map", map.getName());
-    assertEquals("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx", map.getPath());
-    assertEquals(new Color(200, 0, 0), map.getBackgroundColor());
+    assertEquals((new File("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx")).toURI().toURL(), map.getPath());
+    assertEquals(new Color(0xaa3df675, true), map.getBackgroundColor());
     assertEquals(new Rectangle2D.Double(0, 0, 256, 256), map.getBounds());
     assertEquals(2, map.getTilesets().size());
     assertEquals(1, ((Map) map).getExternalTilesets().size());

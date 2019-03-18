@@ -1,6 +1,9 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.awt.Point;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
+import java.awt.image.BufferedImage;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -85,6 +88,33 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
   @Override
   public boolean isFlipped() {
     return this.flipped;
+  }
+
+  @Override
+  public BufferedImage getImage() {
+    BufferedImage base = this.getTilesetEntry().getImage();
+    if (!this.isFlipped()) {
+      return base;
+    }
+    // save some overhead by doing all the reflection at once
+    AffineTransform tx = new AffineTransform();
+    int w = base.getWidth();
+    int h = base.getHeight();
+    if (this.isFlippedDiagonally()) {
+      tx.setTransform(0.0, 1.0, 0.0, 1.0, 0.0, 0.0);
+      int temp = w;
+      w = h;
+      h = temp;
+    }
+    if (this.isFlippedHorizontally()) {
+      tx.scale(-1.0, 1.0);
+      tx.translate(w, 0.0);
+    }
+    if (this.isFlippedVertically()) {
+      tx.scale(1.0, -1.0);
+      tx.translate(0.0, h);
+    }
+    return (new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR)).filter(base, null);
   }
 
   @Override

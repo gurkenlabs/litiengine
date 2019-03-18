@@ -4,20 +4,13 @@ import java.awt.Font;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.FileSystemNotFoundException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,7 +19,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.sound.Sound;
 import de.gurkenlabs.litiengine.util.TimeUtilities;
-import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 /**
  * This class is the engines entry point for accessing any kind of resources. A resource is any non-executable data that is deployed with your game.
@@ -146,7 +138,7 @@ public final class Resources {
    * @param gameResourceFile
    *          The file name of the game resource file
    */
-  public static void load(final String gameResourceFile) {
+  public static void load(final URL gameResourceFile) {
     final long loadStart = System.nanoTime();
 
     final ResourceBundle file = ResourceBundle.load(gameResourceFile);
@@ -211,6 +203,10 @@ public final class Resources {
    * @see Resources
    */
   public static InputStream get(String file) {
+    return get(getLocation(file));
+  }
+
+  public static InputStream get(URL file) {
     InputStream stream = getResource(file);
     if (stream == null) {
       return null;
@@ -219,60 +215,26 @@ public final class Resources {
     return stream.markSupported() ? stream : new BufferedInputStream(stream);
   }
 
-  private static InputStream getResource(final String file) {
-    // get resource from web
-    if (file.startsWith("http://") || file.startsWith("https://")) {
-      return getWebResource(file);
+  public static URL getLocation(String name) {
+    URL fromClass = ClassLoader.getSystemResource(name);
+    if (fromClass != null) {
+      return fromClass;
     }
-
     try {
-      // get resource from class loader (required for jars)
-      InputStream resourceStream = ClassLoader.getSystemResourceAsStream(file);
-      if (resourceStream != null) {
-        return resourceStream;
-      }
-
-      resourceStream = FileUtilities.class.getResourceAsStream(file);
-      if (resourceStream != null) {
-        return resourceStream;
-      }
-
-      // get resource from the local file system
-      File f;
+      return new URL(name);
+    } catch (MalformedURLException e) {
       try {
-        URI uri = new URI(file);
-        f = Paths.get(uri).toFile();
-      } catch (URISyntaxException | IllegalArgumentException | FileSystemNotFoundException e) {
-        f = new File(file);
-      }
-
-      if (f.exists()) {
-        resourceStream = new FileInputStream(f.getAbsolutePath());
-        return resourceStream;
-      } else {
-        log.log(Level.INFO, "{0} could not be found.", file);
+        return (new File(name)).toURI().toURL();
+      } catch (MalformedURLException e1) {
         return null;
       }
-    } catch (final IOException e) {
-      log.log(Level.SEVERE, e.getMessage(), e);
-      return null;
     }
   }
 
-  private static InputStream getWebResource(String file) {
-
+  private static InputStream getResource(final URL file) {
     try {
-      URL url = new URL(file);
-      final long downloadStart = System.nanoTime();
-      try (InputStream in = url.openStream()) {
-        File tmpFile = File.createTempFile(UUID.randomUUID().toString(), null);
-        long downloaded = Files.copy(in, tmpFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-        final double downloadTime = TimeUtilities.nanoToMs(System.nanoTime() - downloadStart);
-        log.log(Level.INFO, "[Download: {0} bytes; {1} ms] from {2}", new Object[] { downloaded, downloadTime, url });
-        return new FileInputStream(tmpFile);
-      }
+      return file.openStream();
     } catch (IOException e) {
-      log.log(Level.SEVERE, e.getMessage(), e);
       return null;
     }
   }

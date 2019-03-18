@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileAnimation;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileAnimationFrame;
 
@@ -41,5 +42,17 @@ public class Animation implements ITileAnimation, Serializable {
     }
 
     return this.totalDuration;
+  }
+
+  @Override
+  public ITileAnimationFrame getCurrentFrame() {
+    long time = Game.time().sinceEnvironmentLoad() % this.getTotalDuration();
+    for (ITileAnimationFrame frame : this.getFrames()) {
+      time -= frame.getDuration();
+      if (time <= 0) {
+        return frame;
+      }
+    }
+    throw new AssertionError(); // we should never reach this line
   }
 }

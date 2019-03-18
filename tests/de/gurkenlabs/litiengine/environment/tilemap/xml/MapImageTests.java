@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.awt.Color;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import org.junit.jupiter.api.Test;
 
@@ -13,7 +15,7 @@ public class MapImageTests {
      * Tests the copy constructor and verifies that there are no side effects.
      */
     @Test
-    public void testCopyConstructor() {
+    public void testCopyConstructor() throws MalformedURLException {
         MapImage original = new MapImage();
         MapImage copy = new MapImage(original);
 
@@ -21,7 +23,7 @@ public class MapImageTests {
 
         // Change original, verify it does not affect the copy
         original.setSource("source1");
-        original.setAbsoluteSourcePath("abs1");
+        original.setAbsoluteSourcePath(new URL("http://example.com/abs1"));
         original.setTransparentColor(Color.GREEN);
         original.setHeight(10);
         original.setWidth(10);
@@ -30,13 +32,13 @@ public class MapImageTests {
 
         // Change the copy, verify it does not affect the original
         copy.setSource("source2");
-        copy.setAbsoluteSourcePath("abs2");
+        copy.setAbsoluteSourcePath(new URL("http://example.com/abs2"));
         copy.setTransparentColor(Color.RED);
         copy.setHeight(20);
         copy.setWidth(20);
 
         assertEquals("source1", original.getSource());
-        assertEquals("abs1", original.getAbsoluteSourcePath());
+        assertEquals(new URL("http://example.com/abs1"), original.getAbsoluteSourcePath());
         assertEquals(Color.GREEN, original.getTransparentColor());
         assertEquals(10, original.getWidth());
         assertEquals(10, original.getHeight());

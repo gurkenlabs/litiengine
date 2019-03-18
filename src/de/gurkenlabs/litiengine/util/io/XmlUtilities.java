@@ -5,7 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -23,8 +23,6 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.stream.StreamResult;
-
-import de.gurkenlabs.litiengine.resources.Resources;
 
 public final class XmlUtilities {
   private static final Logger log = Logger.getLogger(XmlUtilities.class.getName());
@@ -85,7 +83,7 @@ public final class XmlUtilities {
     return null;
   }
 
-  public static <T> T readFromFile(Class<T> cls, String path) throws JAXBException {
+  public static <T> T readFromFile(Class<T> cls, URL path) throws JAXBException {
     final JAXBContext jaxbContext = getContext(cls);
     if (jaxbContext == null) {
       return null;
@@ -93,19 +91,7 @@ public final class XmlUtilities {
 
     final Unmarshaller um = jaxbContext.createUnmarshaller();
 
-    InputStream stream = Resources.get(path);
-    if (stream == null) {
-      return null;
-    }
-    try {
-      return cls.cast(um.unmarshal(stream));
-    } finally {
-      try {
-        stream.close();
-      } catch (IOException e) {
-        log.log(Level.WARNING, "could not close the input stream.", e);
-      }
-    }
+    return cls.cast(um.unmarshal(path));
   }
 
   public static <T> File save(T object, String fileName) {

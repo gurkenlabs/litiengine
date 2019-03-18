@@ -180,10 +180,12 @@ public final class PhysicsEngine implements IUpdateable {
   }
 
   /**
-   * Checks whether the specified rectangle collides with anything.
+   * Checks whether the specified rectangle collides with the specified entity.
    * 
    * @param rect
    *          The rectangle to check the collision for.
+   * @param collisionEntity
+   *          The entity to check the collision for.
    * @return Returns true if the specified rectangle collides with any collision
    *         box of the specified type(s); otherwise false.
    */

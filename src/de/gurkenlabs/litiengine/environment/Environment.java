@@ -57,6 +57,7 @@ import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
 import de.gurkenlabs.litiengine.physics.GravityForce;
 import de.gurkenlabs.litiengine.physics.IMovementController;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.litiengine.util.TimeUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
@@ -714,7 +715,7 @@ public final class Environment implements IRenderable {
 
     if (this.getMap() != null) {
       if (this.getMap().getBackgroundColor() != null) {
-        Game.window().getRenderComponent().setBackground(this.getMap().getBackgroundColor());
+        Game.window().getRenderComponent().setBackground(ColorHelper.premultiply(this.getMap().getBackgroundColor()));
       }
     } else {
       Game.window().getRenderComponent().setBackground(Color.BLACK);

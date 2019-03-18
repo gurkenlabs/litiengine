@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.resources;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -25,8 +26,8 @@ import java.util.stream.Collectors;
 public abstract class ResourcesContainer<T> {
   private static final Logger log = Logger.getLogger(ResourcesContainer.class.getName());
 
-  private final Map<String, T> resources = new ConcurrentHashMap<>();
-  private final Map<String, String> aliases = new ConcurrentHashMap<>();
+  private final Map<URL, T> resources = new ConcurrentHashMap<>();
+  private final Map<String, URL> aliases = new ConcurrentHashMap<>();
   private final List<ResourcesContainerListener<? super T>> listeners = new CopyOnWriteArrayList<>();
   private final List<ResourcesContainerClearedListener> clearedListeners = new CopyOnWriteArrayList<>();
 
@@ -98,9 +99,11 @@ public abstract class ResourcesContainer<T> {
    * @see #tryGet(String)
    */
   public void add(String resourceName, T resource) {
-    String identifier = resourceName;
+    this.add(this.getIdentifier(resourceName), resource);
+  }
 
-    this.resources.put(identifier, resource);
+  public void add(URL resourceName, T resource) {
+    this.resources.put(resourceName, resource);
 
     for (ResourcesContainerListener<? super T> listener : this.listeners) {
       listener.added(resourceName, resource);
@@ -131,6 +134,10 @@ public abstract class ResourcesContainer<T> {
    * @see ResourcesContainer#contains(Object)
    */
   public boolean contains(String resourceName) {
+    return this.contains(this.getIdentifier(resourceName));
+  }
+
+  public boolean contains(URL resourceName) {
     return this.resources.containsKey(resourceName);
   }
 
@@ -183,6 +190,10 @@ public abstract class ResourcesContainer<T> {
    * @return The resource with the specified name or null if not found.
    */
   public T get(String resourceName) {
+    return this.get(this.getIdentifier(resourceName), false);
+  }
+
+  public T get(URL resourceName) {
     return this.get(resourceName, false);
   }
 
@@ -200,15 +211,18 @@ public abstract class ResourcesContainer<T> {
    * @return T The resource with the specified name.
    */
   public T get(String resourceName, Supplier<? extends T> loadCallback) {
-    String identifier = resourceName;
-    Optional<T> opt = this.tryGet(identifier);
+    return this.get(this.getIdentifier(resourceName), loadCallback);
+  }
+
+  public T get(URL resourceName, Supplier<? extends T> loadCallback) {
+    Optional<T> opt = this.tryGet(resourceName);
     if (opt.isPresent()) {
       return opt.get();
     }
 
     T resource = loadCallback.get();
     if (resource != null) {
-      this.add(identifier, resource);
+      this.add(resourceName, resource);
     }
 
     return resource;
@@ -227,24 +241,25 @@ public abstract class ResourcesContainer<T> {
    * @return The game resource or null if not found.
    */
   public T get(String resourceName, boolean forceLoad) {
+    return this.get(this.getIdentifier(resourceName), forceLoad);
+  }
+
+  public T get(URL resourceName, boolean forceLoad) {
     if (resourceName == null) {
       return null;
     }
 
-    // the case is ignored when retrieving resources
-    String identifier = this.getIdentifier(resourceName);
-
     if (forceLoad) {
-      T resource = this.loadResource(identifier);
+      T resource = this.loadResource(resourceName);
       if (resource == null) {
         return null;
       }
 
-      this.resources.put(identifier, resource);
+      this.resources.put(resourceName, resource);
 
       return resource;
     } else {
-      return this.resources.computeIfAbsent(identifier, this::loadResource);
+      return this.resources.computeIfAbsent(resourceName, this::loadResource);
     }
   }
 
@@ -265,6 +280,10 @@ public abstract class ResourcesContainer<T> {
    * @return The removed resource.
    */
   public T remove(String resourceName) {
+    return this.remove(this.getIdentifier(resourceName));
+  }
+
+  public T remove(URL resourceName) {
     T removedResource = this.resources.remove(resourceName);
 
     if (removedResource != null) {
@@ -294,6 +313,10 @@ public abstract class ResourcesContainer<T> {
    * @see #get(String)
    */
   public Optional<T> tryGet(String resourceName) {
+    return this.tryGet(this.getIdentifier(resourceName));
+  }
+
+  public Optional<T> tryGet(URL resourceName) {
     if (this.contains(resourceName)) {
       return Optional.of(this.get(resourceName));
     }
@@ -301,7 +324,7 @@ public abstract class ResourcesContainer<T> {
     return Optional.empty();
   }
 
-  protected abstract T load(String resourceName) throws Exception;
+  protected abstract T load(URL resourceName) throws Exception;
 
   /**
    * Gets an alias for the specified resourceName. Note that the process of providing an alias is up to the ResourceContainer implementation.
@@ -312,15 +335,15 @@ public abstract class ResourcesContainer<T> {
    *          The resource.
    * @return An alias for the specified resource.
    */
-  protected String getAlias(String resourceName, T resource) {
+  protected String getAlias(URL resourceName, T resource) {
     return null;
   }
 
-  protected Map<String, T> getResources() {
+  protected Map<URL, T> getResources() {
     return this.resources;
   }
 
-  private T loadResource(String identifier) {
+  private T loadResource(URL identifier) {
     T newResource;
     try {
       newResource = this.load(identifier);
@@ -341,12 +364,7 @@ public abstract class ResourcesContainer<T> {
     return newResource;
   }
 
-  private String getIdentifier(String resourceName) {
-    String res = resourceName;
-    if (this.resources.containsKey(res)) {
-      return res;
-    }
-
-    return this.aliases.getOrDefault(res, res);
+  private URL getIdentifier(String resourceName) {
+    return this.aliases.getOrDefault(resourceName, Resources.getLocation(resourceName));
   }
 }

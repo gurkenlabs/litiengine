@@ -1,5 +1,7 @@
 package de.gurkenlabs.litiengine.resources;
 
+import java.net.URL;
+
 import javax.xml.bind.JAXBException;
 
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
@@ -12,9 +14,11 @@ public class Tilesets extends ResourcesContainer<Tileset> {
   }
 
   @Override
-  protected Tileset load(String resourceName) throws TmxException {
+  protected Tileset load(URL resourceName) throws TmxException {
     try {
-      return XmlUtilities.readFromFile(Tileset.class, resourceName);
+      Tileset tileset = XmlUtilities.readFromFile(Tileset.class, resourceName);
+      tileset.finish(resourceName);
+      return tileset;
     } catch (JAXBException e) {
       throw new TmxException(e);
     }

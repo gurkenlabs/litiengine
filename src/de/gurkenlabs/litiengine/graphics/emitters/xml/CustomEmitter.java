@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.graphics.emitters.xml;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -23,7 +24,6 @@ import de.gurkenlabs.litiengine.graphics.emitters.particles.SpriteParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.TextParticle;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.MathUtilities;
-import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 
 @EmitterInfo(maxParticles = 0, spawnAmount = 0, activateOnInit = true)
@@ -83,7 +83,11 @@ public class CustomEmitter extends Emitter {
   }
 
   public static EmitterData load(String emitterXml) {
-    final String name = FileUtilities.getFileName(emitterXml);
+    return load(Resources.getLocation(emitterXml));
+  }
+
+  public static EmitterData load(URL emitterXml) {
+    final String name = emitterXml.getFile();
     if (loadedCustomEmitters.containsKey(name)) {
       return loadedCustomEmitters.get(name);
     }

@@ -3,13 +3,14 @@ package de.gurkenlabs.litiengine.environment.tilemap;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.io.File;
+import java.net.URL;
 
 /**
  * The Interface IMapImage.
  */
 public interface IMapImage extends ICustomPropertyProvider {
 
-  public String getAbsoluteSourcePath();
+  public URL getAbsoluteSourcePath();
 
   /**
    * Gets the dimension.
@@ -62,7 +63,7 @@ public interface IMapImage extends ICustomPropertyProvider {
 
   public void setSource(String source);
 
-  public void setAbsoluteSourcePath(String absolutePath);
+  public void setAbsoluteSourcePath(URL absolutePath);
 
   public void setWidth(int width);
 

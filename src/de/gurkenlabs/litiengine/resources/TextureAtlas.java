@@ -40,7 +40,7 @@ public class TextureAtlas {
 
   public static TextureAtlas read(String textureAtlasFile) {
     try {
-      TextureAtlas atlas = XmlUtilities.readFromFile(TextureAtlas.class, textureAtlasFile);
+      TextureAtlas atlas = XmlUtilities.readFromFile(TextureAtlas.class, Resources.getLocation(textureAtlasFile));
       if (atlas == null) {
         return null;
       }

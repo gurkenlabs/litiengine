@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.awt.Point;
 import java.awt.geom.Point2D;
+import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -97,9 +98,10 @@ public class TileLayer extends Layer implements ITileLayer {
     return this.data;
   }
 
-  public void setTilesetEntries(Map map) throws TmxException {
+  @Override
+  void finish(URL location) throws TmxException {
     for (Tile tile : getData()) {
-      for (ITileset tileset : map.getTilesets()) {
+      for (ITileset tileset : this.getMap().getTilesets()) {
         if (tileset.containsTile(tile.getGridId())) {
           tile.setTilesetEntry(tileset.getTile(tile.getGridId() - tileset.getFirstGridId()));
           break;

@@ -12,6 +12,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -38,6 +40,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.MapRenderer;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.MissingTmxResourceException;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.graphics.ImageFormat;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
@@ -441,8 +444,8 @@ public class EditorScreen extends Screen {
     XmlImportDialog.importXml("Emitter", file -> {
       EmitterData emitter;
       try {
-        emitter = XmlUtilities.readFromFile(EmitterData.class, file.toString());
-      } catch (JAXBException e) {
+        emitter = XmlUtilities.readFromFile(EmitterData.class, file.toURI().toURL());
+      } catch (JAXBException | MalformedURLException e) {
         log.log(Level.SEVERE, "could not load emitter data from " + file, e);
         return;
       }
@@ -465,8 +468,8 @@ public class EditorScreen extends Screen {
     XmlImportDialog.importXml("Blueprint", file -> {
       Blueprint blueprint;
       try {
-        blueprint = XmlUtilities.readFromFile(Blueprint.class, file.toString());
-      } catch (JAXBException e) {
+        blueprint = XmlUtilities.readFromFile(Blueprint.class, file.toURI().toURL());
+      } catch (JAXBException | MalformedURLException e) {
         log.log(Level.SEVERE, "could not load blueprint from " + file, e);
         return;
       }
@@ -495,16 +498,16 @@ public class EditorScreen extends Screen {
 
   public void importTilesets() {
     XmlImportDialog.importXml("Tilesets", file -> {
+      URL location;
       Tileset tileset;
       try {
-        tileset = XmlUtilities.readFromFile(Tileset.class, file.toString());
-      } catch (JAXBException e) {
+        location = file.toURI().toURL();
+        tileset = XmlUtilities.readFromFile(Tileset.class, location);
+        tileset.finish(location);
+      } catch (JAXBException | MalformedURLException | MissingTmxResourceException e) {
         log.log(Level.SEVERE, "could not load tileset from " + file, e);
         return;
       }
-
-      String path = FileUtilities.getParentDirPath(file.toURI());
-      tileset.setMapPath(path);
 
       if (this.gameFile.getTilesets().stream().anyMatch(x -> x.getName().equals(tileset.getName()))) {
         int result = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), Resources.strings().get("import_tileset_title", tileset.getName()), Resources.strings().get("import_tileset_title"), JOptionPane.YES_NO_OPTION);

@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.awt.Color;
+import java.net.URL;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -48,15 +49,12 @@ public class ImageLayer extends Layer implements IImageLayer {
     return super.getOffsetY();
   }
 
-  public void setMapPath(final String path) {
-    if (this.image == null) {
-      return;
-    }
-
-    this.image.setAbsolutePath(path);
-  }
-
   private boolean isInfiniteMap() {
     return this.getMap() != null && this.getMap().isInfinite() && this.getMap() instanceof Map;
+  }
+
+  @Override
+  void finish(URL location) throws MissingImageException {
+    this.image.finish(location);
   }
 }

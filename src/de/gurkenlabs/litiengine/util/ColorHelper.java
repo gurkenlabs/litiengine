@@ -130,6 +130,23 @@ public final class ColorHelper {
     return null;
   }
 
+  /**
+   * Premultiplies the alpha on the given color.
+   * @param color The color to premultiply
+   * @return The color given, with alpha replaced with a black background.
+   */
+  public static Color premultiply(Color color) {
+    if (color.getAlpha() == 255) {
+      return color;
+    }
+    return new Color(premultiply(color.getRed(), color.getAlpha()), premultiply(color.getGreen(), color.getAlpha()), premultiply(color.getBlue(), color.getAlpha()));
+  }
+
+  private static int premultiply(int value, int alpha) {
+    // account for gamma
+    return (int) Math.round(value * Math.pow(alpha / 255.0, 1/2.2));
+  }
+
   private static Color decodeHexStringWithAlpha(String hexString, boolean solid) {
     String alpha = hexString.substring(1, 3);
 
@@ -148,15 +165,12 @@ public final class ColorHelper {
     if (baseColor == null) {
       return null;
     }
+    baseColor = new Color(baseColor.getRGB() & 0xffffff | alphaValue << 24, true);
     // solid means that color alpha will basically create a darker version of the base color
     if (solid) {
-      float alphaRatio = alphaValue / (float) MAX_RGB_VALUE;
-      int red = ensureColorValueRange(alphaRatio * baseColor.getRed());
-      int green = ensureColorValueRange(alphaRatio * baseColor.getGreen());
-      int blue = ensureColorValueRange(alphaRatio * baseColor.getBlue());
-      return new Color(red, green, blue);
+      return premultiply(baseColor);
     } else {
-      return new Color(baseColor.getRed(), baseColor.getGreen(), baseColor.getBlue(), alphaValue);
+      return baseColor;
     }
   }
 }
