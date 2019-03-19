@@ -20,7 +20,7 @@ import java.awt.image.ImageFilter;
 import java.awt.image.ImageProducer;
 import java.awt.image.RGBImageFilter;
 import java.awt.image.WritableRaster;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import de.gurkenlabs.litiengine.entities.Rotation;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
@@ -84,6 +84,9 @@ public final class Imaging {
     final BufferedImage rotatedImage = op.filter(shadowImage, null);
 
     final BufferedImage shadow = getCompatibleImage(width, height + rotatedImage.getHeight() * 2);
+    if (shadow == null) {
+      return image;
+    }
     final Graphics2D g2D = shadow.createGraphics();
     g2D.drawImage(rotatedImage, xOffset, yOffset + rotatedImage.getHeight(), null);
     g2D.drawImage(image, 0, rotatedImage.getHeight(), null);
@@ -537,7 +540,7 @@ public final class Imaging {
     return bimage;
   }
 
-  private static BufferedImage flipSprites(final Spritesheet sprite, Function<BufferedImage, BufferedImage> flipFunction) {
+  private static BufferedImage flipSprites(final Spritesheet sprite, UnaryOperator<BufferedImage> flipFunction) {
     final BufferedImage flippedSprite = Imaging.getCompatibleImage(sprite.getSpriteWidth() * sprite.getColumns(), sprite.getSpriteHeight() * sprite.getRows());
     if (flippedSprite == null) {
       return null;
