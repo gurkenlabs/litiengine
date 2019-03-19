@@ -597,7 +597,7 @@ public class MapSelectionPanel extends JSplitPane {
       this.mapList.setSelectedIndex(0);
     }
 
-    if (EditorScreen.instance().getMapComponent().getMaps().isEmpty()) {
+    if (EditorScreen.instance().getMapComponent().getMaps().isEmpty() || mapList.getSelectedIndex() == -1) {
       layerModel.clear();
       return;
     }
