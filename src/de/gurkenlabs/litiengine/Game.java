@@ -65,7 +65,6 @@ import de.gurkenlabs.litiengine.util.io.XmlUtilities;
  * </p>
  * 
  * @see GameListener
- * @see GameTerminatedListener
  * @see EnvironmentLoadedListener
  */
 public final class Game {
