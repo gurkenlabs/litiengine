@@ -114,7 +114,7 @@ public class MapOrientations {
       return this.getTile(location.getX(), location.getY(), map);
     }
 
-    protected static void checkTileSize(IMap map) throws ArithmeticException {
+    protected static void checkTileSize(IMap map) {
       if (map.getTileWidth() == 0) {
         throw new ArithmeticException("tile width == 0");
       }
@@ -193,7 +193,7 @@ public class MapOrientations {
       return new Point((int) Math.floor(y + x), (int) Math.ceil(y - x) - 1);
     }
 
-    static void checkSizeParity(IMap map) throws IllegalArgumentException {
+    static void checkSizeParity(IMap map) {
       if (map.getWidth() % 2 != 0) {
         throw new IllegalArgumentException("tile width is not divisible by 2");
       }
@@ -304,7 +304,7 @@ public class MapOrientations {
       return p;
     }
 
-    protected void checkValidity(IMap map) throws IllegalArgumentException {
+    protected void checkValidity(IMap map) {
       Isometric.checkSizeParity(map);
       if (map.getStaggerAxis() == null) {
         throw new IllegalArgumentException("no stagger axis");
