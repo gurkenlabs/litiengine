@@ -41,9 +41,10 @@ public abstract class Entity implements IEntity {
 
   private final EntityActionMap actions;
 
-  private ICustomPropertyProvider properties;
+  private final ICustomPropertyProvider properties;
 
   private Environment environment;
+  private boolean loaded;
 
   private double angle;
 
@@ -401,6 +402,7 @@ public abstract class Entity implements IEntity {
   @Override
   public void loaded(Environment environment) {
     this.environment = environment;
+    this.loaded = true;
 
     for (EntityListener listener : this.listeners) {
       listener.loaded(this, this.getEnvironment());
@@ -409,6 +411,8 @@ public abstract class Entity implements IEntity {
 
   @Override
   public void removed(Environment environment) {
+    this.loaded = false;
+    
     for (EntityListener listener : this.listeners) {
       listener.removed(this, this.getEnvironment());
     }
@@ -417,12 +421,13 @@ public abstract class Entity implements IEntity {
     this.environment = null;
   }
 
-  protected EntityControllers getControllers() {
-    return this.controllers;
+  @Override
+  public boolean isLoaded() {
+    return this.loaded;
   }
 
-  protected final void setProperties(ICustomPropertyProvider attributes) {
-    this.properties = attributes;
+  protected EntityControllers getControllers() {
+    return this.controllers;
   }
 
   private void fireSizeChangedEvent() {

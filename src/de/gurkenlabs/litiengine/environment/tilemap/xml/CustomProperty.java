@@ -15,6 +15,17 @@ public class CustomProperty implements ICustomProperty {
     this.type = "string";
     this.value = "";
   }
+  
+  /**
+   * Copy Constructor for copying instances of CustomProperties.
+   *
+   * @param propertyToBeCopied
+   *          the Property we want to copy
+   */
+  public CustomProperty(CustomProperty propertyToBeCopied) {
+    this.type = propertyToBeCopied.getType();
+    this.value = propertyToBeCopied.getAsString();
+  }
 
   public CustomProperty(String value) {
     this.type = "string";
@@ -68,7 +79,7 @@ public class CustomProperty implements ICustomProperty {
 
   @Override
   public char getAsChar() {
-    return this.value.charAt(0); // Is this enough? Should it check if it's the right length and throw an exception if it's not?
+    return this.value.charAt(0); //TODO Is this enough? Should it check if it's the right length and throw an exception if it's not?
   }
 
   @Override
