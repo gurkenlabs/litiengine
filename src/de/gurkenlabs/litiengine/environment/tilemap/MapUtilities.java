@@ -100,8 +100,13 @@ public final class MapUtilities {
     final int maxY = (int) MathUtilities.clamp(box.getMaxY(), 0, map.getSizeInPixels().height - 1);
     final Point minTilePoint = map.getOrientation().getTile(minX, minY, map);
     final Point maxTilePoint = map.getOrientation().getTile(maxX, maxY, map);
-    final Rectangle2D minTileBounds = getTileBoundingBox(map, new Point(MathUtilities.clamp(minTilePoint.x, 0, map.getWidth() - 1), MathUtilities.clamp(minTilePoint.y, 0, map.getHeight() - 1)));
-    final Rectangle2D maxTileBounds = getTileBoundingBox(map, new Point(MathUtilities.clamp(maxTilePoint.x, 0, map.getWidth() - 1), MathUtilities.clamp(maxTilePoint.y, 0, map.getHeight() - 1)));
+    int minTileX = map.getOrientation().getName().equals(MapOrientations.ISOMETRIC.getName()) ? minTilePoint.x : MathUtilities.clamp(minTilePoint.x, 0, map.getWidth() - 1);
+    int minTileY = map.getOrientation().getName().equals(MapOrientations.ISOMETRIC.getName()) ? minTilePoint.y : MathUtilities.clamp(minTilePoint.y, 0, map.getHeight() - 1);
+    int maxTileX = map.getOrientation().getName().equals(MapOrientations.ISOMETRIC.getName()) ? maxTilePoint.x : MathUtilities.clamp(maxTilePoint.x, 0, map.getWidth() - 1);
+    int maxTileY = map.getOrientation().getName().equals(MapOrientations.ISOMETRIC.getName()) ? maxTilePoint.y : MathUtilities.clamp(maxTilePoint.y, 0, map.getWidth() - 1);
+    
+    final Rectangle2D minTileBounds = getTileBoundingBox(map, new Point(minTileX, minTileY));
+    final Rectangle2D maxTileBounds = getTileBoundingBox(map, new Point(maxTileX, maxTileY));
 
     return new Rectangle2D.Double(minTileBounds.getX(), minTileBounds.getY(), maxTileBounds.getMaxX() - minTileBounds.getX(), maxTileBounds.getMaxY() - minTileBounds.getY());
   }

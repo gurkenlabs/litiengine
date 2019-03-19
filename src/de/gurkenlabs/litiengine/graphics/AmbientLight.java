@@ -28,31 +28,24 @@ public class AmbientLight extends ColorLayer {
     super(env, ambientColor);
   }
 
+  /**
+   * @see <a href="https://docs.oracle.com/javase/tutorial/2d/advanced/compositing.html">Compositing Graphics</a>
+   */
   @Override
   protected void renderSection(Graphics2D g, Rectangle2D section) {
-
-    // create large rectangle and crop lights from it
-    final double width = section.getWidth();
-    final double height = section.getHeight();
-
-    final double mapWidth = this.getEnvironment().getMap().getSizeInPixels().width;
-    final double mapHeight = this.getEnvironment().getMap().getSizeInPixels().height;
-    double longerDimension = mapWidth < mapHeight ? mapHeight : mapWidth;
-
-    final Area darkArea = new Area(new Rectangle2D.Double(0, 0, width, height));
-
+    this.renderAmbient(g, section);
+    
+    // carve out the lights that will be added 
+    g.setComposite(AlphaComposite.getInstance(AlphaComposite.DST_OUT, 1));
     for (final LightSource light : this.getEnvironment().getLightSources()) {
       if (!light.getBoundingBox().intersects(section) || !light.isActive()) {
         continue;
       }
 
-      this.renderLightSource(g, light, longerDimension, section);
+      this.renderLightSource(g, light, section);
     }
-
-    g.setColor(this.getColor());
-    g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OUT, 1.0f));
-    g.fill(darkArea);
-
+    
+    // render the actual lights, depending on their intensity
     for (final LightSource light : this.getEnvironment().getLightSources()) {
       if (!light.getBoundingBox().intersects(section) || !light.isActive() || light.getIntensity() <= 0) {
         continue;
@@ -60,12 +53,27 @@ public class AmbientLight extends ColorLayer {
 
       final float intensity = MathUtilities.clamp((float) light.getIntensity() / 255, 0, 1);
       g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, intensity));
-      this.renderLightSource(g, light, longerDimension, section);
+      this.renderLightSource(g, light, section);
     }
   }
 
-  private void renderLightSource(final Graphics2D g, final LightSource light, final double longerDimension, Rectangle2D section) {
+  private void renderAmbient(Graphics2D g, Rectangle2D section) {
+    // create large rectangle and crop lights from it
+    final double width = section.getWidth();
+    final double height = section.getHeight();
 
+    // render the basic am
+    final Area ambientArea = new Area(new Rectangle2D.Double(0, 0, width, height));
+    g.setColor(this.getColor());
+    g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_IN, 1));
+    g.fill(ambientArea);
+  }
+
+  private void renderLightSource(final Graphics2D g, final LightSource light, Rectangle2D section) {
+    final double mapWidth = this.getEnvironment().getMap().getSizeInPixels().width;
+    final double mapHeight = this.getEnvironment().getMap().getSizeInPixels().height;
+    double longerDimension = mapWidth < mapHeight ? mapHeight : mapWidth;
+    
     final Point2D lightCenter = light.getCenter();
     final Point2D lightFocus = new Point2D.Double(lightCenter.getX() + light.getBoundingBox().getWidth() * light.getFocusOffsetX(), lightCenter.getY() + light.getBoundingBox().getHeight() * light.getFocusOffsetY());
     Shape fillShape;

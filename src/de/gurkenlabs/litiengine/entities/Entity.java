@@ -44,6 +44,7 @@ public abstract class Entity implements IEntity {
   private final ICustomPropertyProvider properties;
 
   private Environment environment;
+  private boolean loaded;
 
   private double angle;
 
@@ -401,6 +402,7 @@ public abstract class Entity implements IEntity {
   @Override
   public void loaded(Environment environment) {
     this.environment = environment;
+    this.loaded = true;
 
     for (EntityListener listener : this.listeners) {
       listener.loaded(this, this.getEnvironment());
@@ -409,12 +411,19 @@ public abstract class Entity implements IEntity {
 
   @Override
   public void removed(Environment environment) {
+    this.loaded = false;
+    
     for (EntityListener listener : this.listeners) {
       listener.removed(this, this.getEnvironment());
     }
 
     // set to null after informing the listeners so they can still access the environment instance
     this.environment = null;
+  }
+
+  @Override
+  public boolean isLoaded() {
+    return this.loaded;
   }
 
   protected EntityControllers getControllers() {
