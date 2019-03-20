@@ -75,7 +75,10 @@ import de.gurkenlabs.utiliti.components.EditorScreen;
 import de.gurkenlabs.utiliti.components.MapComponent;
 import de.gurkenlabs.utiliti.swing.AssetPanel;
 import de.gurkenlabs.utiliti.swing.AssetTree;
+import de.gurkenlabs.utiliti.swing.ConsoleLogHandler;
 import de.gurkenlabs.utiliti.swing.FileDrop;
+import de.gurkenlabs.utiliti.swing.Icons;
+import de.gurkenlabs.utiliti.swing.MapSelectionPanel;
 import de.gurkenlabs.utiliti.swing.dialogs.GridEditPanel;
 import de.gurkenlabs.utiliti.swing.dialogs.MapPropertyPanel;
 import de.gurkenlabs.utiliti.swing.panels.MapObjectPanel;
@@ -125,7 +128,7 @@ public class Program {
 
     Game.screens().display(EditorScreen.instance());
 
-    Game.window().getRenderComponent().setCursor(Icons.Cursor.DEFAULT, 0, 0);
+    Game.window().getRenderComponent().setCursor(Cursors.DEFAULT, 0, 0);
     Game.window().getRenderComponent().setCursorOffsetX(0);
     Game.window().getRenderComponent().setCursorOffsetY(0);
     setupInterface();
@@ -737,7 +740,7 @@ public class Program {
       EditorScreen.instance().getMapComponent().setEditMode(MapComponent.EDITMODE_EDIT);
       isChanging = false;
 
-      Game.window().getRenderComponent().setCursor(Icons.Cursor.DEFAULT, 0, 0);
+      Game.window().getRenderComponent().setCursor(Cursors.DEFAULT, 0, 0);
     });
 
     place.addActionListener(a -> {
@@ -758,7 +761,7 @@ public class Program {
       EditorScreen.instance().getMapComponent().setEditMode(MapComponent.EDITMODE_MOVE);
       isChanging = false;
 
-      Game.window().getRenderComponent().setCursor(Icons.Cursor.MOVE, 0, 0);
+      Game.window().getRenderComponent().setCursor(Cursors.MOVE, 0, 0);
     });
 
     EditorScreen.instance().getMapComponent().onEditModeChanged(i -> {
@@ -771,7 +774,7 @@ public class Program {
         mv.setSelected(false);
         place.setSelected(true);
         place.requestFocus();
-        Game.window().getRenderComponent().setCursor(Icons.Cursor.ADD, 0, 0);
+        Game.window().getRenderComponent().setCursor(Cursors.ADD, 0, 0);
       }
 
       if (i == MapComponent.EDITMODE_EDIT) {
@@ -779,7 +782,7 @@ public class Program {
         mv.setSelected(false);
         ed.setSelected(true);
         ed.requestFocus();
-        Game.window().getRenderComponent().setCursor(Icons.Cursor.DEFAULT, 0, 0);
+        Game.window().getRenderComponent().setCursor(Cursors.DEFAULT, 0, 0);
       }
 
       if (i == MapComponent.EDITMODE_MOVE) {
@@ -791,7 +794,7 @@ public class Program {
         place.setSelected(false);
         mv.setSelected(true);
         mv.requestFocus();
-        Game.window().getRenderComponent().setCursor(Icons.Cursor.MOVE, 0, 0);
+        Game.window().getRenderComponent().setCursor(Cursors.MOVE, 0, 0);
       }
     });
 

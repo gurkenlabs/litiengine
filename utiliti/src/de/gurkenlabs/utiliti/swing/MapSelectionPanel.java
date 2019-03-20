@@ -1,4 +1,4 @@
-package de.gurkenlabs.utiliti;
+package de.gurkenlabs.utiliti.swing;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -63,10 +63,9 @@ import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.litiengine.util.Imaging;
+import de.gurkenlabs.utiliti.Program;
+import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.components.EditorScreen;
-import de.gurkenlabs.utiliti.swing.IconTreeListItem;
-import de.gurkenlabs.utiliti.swing.IconTreeListRenderer;
-import de.gurkenlabs.utiliti.swing.JCheckBoxList;
 
 @SuppressWarnings("serial")
 public class MapSelectionPanel extends JSplitPane {

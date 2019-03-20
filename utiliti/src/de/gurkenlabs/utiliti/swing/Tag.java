@@ -14,7 +14,6 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import de.gurkenlabs.utiliti.Icons;
 import de.gurkenlabs.utiliti.Style;
 
 @SuppressWarnings("serial")

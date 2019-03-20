@@ -13,8 +13,8 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.LightSource;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
-import de.gurkenlabs.utiliti.Icons;
 import de.gurkenlabs.utiliti.swing.ColorControl;
+import de.gurkenlabs.utiliti.swing.Icons;
 
 @SuppressWarnings("serial")
 public class LightSourcePanel extends PropertyPanel {

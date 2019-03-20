@@ -26,7 +26,6 @@ import de.gurkenlabs.litiengine.graphics.animation.CreatureAnimationController;
 import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.Imaging;
-import de.gurkenlabs.utiliti.Icons;
 
 public class IconTreeListRenderer implements TreeCellRenderer {
 

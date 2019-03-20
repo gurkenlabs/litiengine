@@ -68,12 +68,12 @@ import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import de.gurkenlabs.litiengine.util.io.ImageSerializer;
-import de.gurkenlabs.utiliti.Icons;
+import de.gurkenlabs.utiliti.Cursors;
 import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.Style;
 import de.gurkenlabs.utiliti.UndoManager;
-import de.gurkenlabs.utiliti.swing.XmlExportDialog;
-import de.gurkenlabs.utiliti.swing.XmlImportDialog;
+import de.gurkenlabs.utiliti.swing.dialogs.XmlExportDialog;
+import de.gurkenlabs.utiliti.swing.dialogs.XmlImportDialog;
 
 public class MapComponent extends EditorComponent implements IUpdateable {
   public enum TransformType {
@@ -526,13 +526,13 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     case EDITMODE_CREATE:
       this.setFocus(null, true);
       EditorScreen.instance().getMapObjectPanel().bind(null);
-      Game.window().getRenderComponent().setCursor(Icons.Cursor.ADD, 0, 0);
+      Game.window().getRenderComponent().setCursor(Cursors.ADD, 0, 0);
       break;
     case EDITMODE_EDIT:
-      Game.window().getRenderComponent().setCursor(Icons.Cursor.DEFAULT, 0, 0);
+      Game.window().getRenderComponent().setCursor(Cursors.DEFAULT, 0, 0);
       break;
     case EDITMODE_MOVE:
-      Game.window().getRenderComponent().setCursor(Icons.Cursor.MOVE, 0, 0);
+      Game.window().getRenderComponent().setCursor(Cursors.MOVE, 0, 0);
       break;
     default:
       break;
@@ -1331,7 +1331,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   private void handleMouseMoved(ComponentMouseEvent e) {
     if (this.getFocus() == null) {
       if (this.currentEditMode != EDITMODE_CREATE) {
-        Game.window().getRenderComponent().setCursor(Icons.Cursor.DEFAULT, 0, 0);
+        Game.window().getRenderComponent().setCursor(Cursors.DEFAULT, 0, 0);
       }
       this.currentTransform = TransformType.NONE;
       return;
@@ -1347,13 +1347,13 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       if (hoverrect.contains(Input.mouse().getMapLocation())) {
         hovered = true;
         if (entry.getKey() == TransformType.DOWN || entry.getKey() == TransformType.UP) {
-          Game.window().getRenderComponent().setCursor(Icons.Cursor.TRANS_VERTICAL, 0, 0);
+          Game.window().getRenderComponent().setCursor(Cursors.TRANS_VERTICAL, 0, 0);
         } else if (entry.getKey() == TransformType.UPLEFT || entry.getKey() == TransformType.DOWNRIGHT) {
-          Game.window().getRenderComponent().setCursor(Icons.Cursor.TRANS_DIAGONAL_LEFT, 0, 0);
+          Game.window().getRenderComponent().setCursor(Cursors.TRANS_DIAGONAL_LEFT, 0, 0);
         } else if (entry.getKey() == TransformType.UPRIGHT || entry.getKey() == TransformType.DOWNLEFT) {
-          Game.window().getRenderComponent().setCursor(Icons.Cursor.TRANS_DIAGONAL_RIGHT, 0, 0);
+          Game.window().getRenderComponent().setCursor(Cursors.TRANS_DIAGONAL_RIGHT, 0, 0);
         } else {
-          Game.window().getRenderComponent().setCursor(Icons.Cursor.TRANS_HORIZONTAL, 0, 0);
+          Game.window().getRenderComponent().setCursor(Cursors.TRANS_HORIZONTAL, 0, 0);
         }
 
         this.currentTransform = entry.getKey();
@@ -1362,7 +1362,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     }
 
     if (!hovered) {
-      Game.window().getRenderComponent().setCursor(Icons.Cursor.DEFAULT, 0, 0);
+      Game.window().getRenderComponent().setCursor(Cursors.DEFAULT, 0, 0);
       this.currentTransform = TransformType.NONE;
     }
   }

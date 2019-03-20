@@ -1,4 +1,4 @@
-package de.gurkenlabs.utiliti.swing;
+package de.gurkenlabs.utiliti.swing.dialogs;
 
 import java.io.File;
 import java.io.IOException;

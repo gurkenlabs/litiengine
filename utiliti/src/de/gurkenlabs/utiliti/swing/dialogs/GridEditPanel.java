@@ -16,7 +16,7 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SpinnerNumberModel;
 
 import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.utiliti.Icons;
+import de.gurkenlabs.utiliti.swing.Icons;
 
 @SuppressWarnings("serial")
 public class GridEditPanel extends JPanel {

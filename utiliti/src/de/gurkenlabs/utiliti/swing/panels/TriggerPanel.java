@@ -12,7 +12,7 @@ import de.gurkenlabs.litiengine.entities.Trigger.TriggerActivation;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.utiliti.Icons;
+import de.gurkenlabs.utiliti.swing.Icons;
 import de.gurkenlabs.utiliti.swing.TextList;
 
 @SuppressWarnings("serial")

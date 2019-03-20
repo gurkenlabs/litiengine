@@ -15,8 +15,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.CustomEmitter;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.utiliti.Icons;
 import de.gurkenlabs.utiliti.components.EditorScreen;
+import de.gurkenlabs.utiliti.swing.Icons;
 
 @SuppressWarnings("serial")
 public class EmitterPanel extends PropertyPanel {
