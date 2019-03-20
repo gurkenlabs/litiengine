@@ -85,6 +85,6 @@ public class GridEditPanel extends JPanel {
     } catch (ParseException e) {
       log.log(Level.WARNING, "Your edits in the grid line thickness spinner could not be parsed as Float.");
     }
-    return (Float) this.strokeSpinner.getValue();
+    return ((Double) this.strokeSpinner.getValue()).floatValue();
   }
 }
