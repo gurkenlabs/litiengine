@@ -1,4 +1,4 @@
-package de.gurkenlabs.utiliti.components;
+package de.gurkenlabs.utiliti.swing;
 
 import java.awt.event.ActionListener;
 import java.util.ArrayList;

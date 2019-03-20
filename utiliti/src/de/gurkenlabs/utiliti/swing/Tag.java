@@ -20,7 +20,6 @@ import de.gurkenlabs.utiliti.Style;
 @SuppressWarnings("serial")
 public class Tag extends JPanel {
 
-
   private JPanel panel;
   private JLabel lblText;
   private JButton btnDelete;
@@ -73,7 +72,7 @@ public class Tag extends JPanel {
     this.btnDelete.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseEntered(final MouseEvent e) {
-          btnDelete.setIcon(Icons.DELETE_X7);
+        btnDelete.setIcon(Icons.DELETE_X7);
 
         panel.setBackground(Style.COLOR_DEFAULT_TAG_HOVER);
         deleteHovered = true;
@@ -92,12 +91,12 @@ public class Tag extends JPanel {
     this.btnDelete.addFocusListener(new FocusListener() {
       @Override
       public void focusLost(FocusEvent e) {
-          btnDelete.setIcon(Icons.DELETE_X7_DISABLED);
+        btnDelete.setIcon(Icons.DELETE_X7_DISABLED);
       }
 
       @Override
       public void focusGained(FocusEvent e) {
-          btnDelete.setIcon(Icons.DELETE_X7);
+        btnDelete.setIcon(Icons.DELETE_X7);
       }
     });
 
@@ -107,7 +106,7 @@ public class Tag extends JPanel {
     this.btnDelete.setFocusPainted(false);
     this.btnDelete.setBorder(null);
     this.btnDelete.setPreferredSize(new Dimension(7, 7));
-      this.btnDelete.setIcon(Icons.DELETE_X7_DISABLED);
+    this.btnDelete.setIcon(Icons.DELETE_X7_DISABLED);
     this.panel.add(this.btnDelete);
   }
 
