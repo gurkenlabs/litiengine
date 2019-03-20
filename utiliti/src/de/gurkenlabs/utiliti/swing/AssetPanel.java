@@ -1,6 +1,5 @@
 package de.gurkenlabs.utiliti.swing;
 
-import java.awt.Color;
 import java.awt.GridLayout;
 import java.util.Collections;
 import java.util.List;
@@ -21,10 +20,10 @@ import de.gurkenlabs.litiengine.resources.SoundResource;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.litiengine.util.Imaging;
 import de.gurkenlabs.utiliti.Icons;
+import de.gurkenlabs.utiliti.Style;
 
 @SuppressWarnings("serial")
 public class AssetPanel extends JPanel {
-  public static final Color BACKGROUND = new Color(24, 24, 24);
   private static final int COLUMNS = 10;
   private final GridLayout gridLayout;
 
@@ -35,7 +34,7 @@ public class AssetPanel extends JPanel {
     this.setLayout(this.gridLayout);
 
     this.setBorder(new EmptyBorder(5, 5, 5, 5));
-    this.setBackground(BACKGROUND);
+    this.setBackground(Style.COLOR_ASSETPANEL_BACKGROUND);
 
     // TODO: implement support for arrow keys to change focus
   }

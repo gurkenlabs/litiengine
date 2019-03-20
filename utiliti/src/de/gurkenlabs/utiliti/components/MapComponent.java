@@ -70,6 +70,7 @@ import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import de.gurkenlabs.litiengine.util.io.ImageSerializer;
 import de.gurkenlabs.utiliti.EditorScreen;
 import de.gurkenlabs.utiliti.Program;
+import de.gurkenlabs.utiliti.Style;
 import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.swing.XmlExportDialog;
 import de.gurkenlabs.utiliti.swing.XmlImportDialog;
@@ -88,24 +89,6 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   private static final String DEFAULT_MAPOBJECTLAYER_NAME = "default";
   private static final int TRANSFORM_RECT_SIZE = 6;
   private static final int BASE_SCROLL_SPEED = 50;
-
-  private static final Color DEFAULT_COLOR_BOUNDING_BOX_FILL = new Color(0, 0, 0, 35);
-
-  private static final Color COLOR_COLLISION_FILL = new Color(255, 0, 0, 15);
-  private static final Color COLOR_COLLISION_BORDER = Color.RED;
-  private static final Color COLOR_NOCOLLISION_BORDER = new Color(255, 0, 0, 150);
-  private static final Color COLOR_TRIGGER_BORDER = Color.YELLOW;
-  private static final Color COLOR_TRIGGER_FILL = new Color(255, 255, 0, 15);
-  private static final Color COLOR_SPAWNPOINT = Color.GREEN;
-  private static final Color COLOR_UNSUPPORTED = new Color(180, 180, 180, 200);
-  private static final Color COLOR_UNSUPPORTED_FILL = new Color(180, 180, 180, 15);
-  private static final Color COLOR_NEWOBJECT_FILL = new Color(0, 255, 0, 50);
-  private static final Color COLOR_NEWOBJECT_BORDER = Color.GREEN.darker();
-  private static final Color COLOR_TRANSFORM_RECT_FILL = new Color(255, 255, 255, 100);
-  private static final Color COLOR_SHADOW_FILL = new Color(85, 130, 200, 15);
-  private static final Color COLOR_SHADOW_BORDER = new Color(30, 85, 170);
-  private static final Color COLOR_MOUSE_SELECTION_AREA_FILL = new Color(0, 130, 152, 80);
-  private static final Color COLOR_MOUSE_SELECTION_AREA_BORDER = new Color(0, 130, 152, 150);
 
   private double currentTransformRectSize = TRANSFORM_RECT_SIZE;
   private final java.util.Map<TransformType, Rectangle2D> transformRects;
@@ -1628,7 +1611,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       if (layer.getColor() != null) {
         colorBoundingBoxFill = new Color(layer.getColor().getRed(), layer.getColor().getGreen(), layer.getColor().getBlue(), 15);
       } else {
-        colorBoundingBoxFill = DEFAULT_COLOR_BOUNDING_BOX_FILL;
+        colorBoundingBoxFill = Style.COLOR_DEFAULT_BOUNDING_BOX_FILL;
       }
 
       for (final IMapObject mapObject : layer.getMapObjects()) {
@@ -1648,7 +1631,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
         // render spawn points
         if (type == MapObjectType.SPAWNPOINT) {
-          g.setColor(COLOR_SPAWNPOINT);
+          g.setColor(Style.COLOR_SPAWNPOINT);
           RenderEngine.renderShape(g, new Rectangle2D.Double(mapObject.getBoundingBox().getCenterX() - 1, mapObject.getBoundingBox().getCenterY() - 1, 2, 2));
         }
 
@@ -1662,7 +1645,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   }
 
   private static void renderUnsupportedMapObject(Graphics2D g, IMapObject mapObject, BasicStroke shapeStroke) {
-    g.setColor(COLOR_UNSUPPORTED);
+    g.setColor(Style.COLOR_UNSUPPORTED);
     Point2D start = new Point2D.Double(mapObject.getLocation().getX(), mapObject.getLocation().getY());
     StringBuilder info = new StringBuilder("#");
     info.append(mapObject.getId());
@@ -1699,23 +1682,23 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         return;
       }
 
-      g.setColor(COLOR_UNSUPPORTED_FILL);
+      g.setColor(Style.COLOR_UNSUPPORTED_FILL);
       RenderEngine.renderShape(g, path);
-      g.setColor(COLOR_UNSUPPORTED);
+      g.setColor(Style.COLOR_UNSUPPORTED);
       RenderEngine.renderOutline(g, path, shapeStroke);
     } else if (mapObject.isEllipse()) {
       if (mapObject.getEllipse() == null) {
         return;
       }
-      g.setColor(COLOR_UNSUPPORTED_FILL);
+      g.setColor(Style.COLOR_UNSUPPORTED_FILL);
       RenderEngine.renderShape(g, mapObject.getEllipse());
 
-      g.setColor(COLOR_UNSUPPORTED);
+      g.setColor(Style.COLOR_UNSUPPORTED);
       RenderEngine.renderOutline(g, mapObject.getEllipse(), shapeStroke);
     } else {
-      g.setColor(COLOR_UNSUPPORTED_FILL);
+      g.setColor(Style.COLOR_UNSUPPORTED_FILL);
       RenderEngine.renderShape(g, mapObject.getBoundingBox());
-      g.setColor(COLOR_UNSUPPORTED);
+      g.setColor(Style.COLOR_UNSUPPORTED);
       RenderEngine.renderOutline(g, mapObject.getBoundingBox(), shapeStroke);
     }
   }
@@ -1773,9 +1756,9 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       return;
     }
 
-    g.setColor(COLOR_NEWOBJECT_FILL);
+    g.setColor(Style.COLOR_NEWOBJECT_FILL);
     RenderEngine.renderShape(g, newObjectArea);
-    g.setColor(COLOR_NEWOBJECT_BORDER);
+    g.setColor(Style.COLOR_NEWOBJECT_BORDER);
     RenderEngine.renderOutline(g, newObjectArea, shapeStroke);
     g.setFont(g.getFont().deriveFont(Font.BOLD));
     RenderEngine.renderText(g, newObjectArea.getWidth() + "", newObjectArea.getX() + newObjectArea.getWidth() / 2 - 3, newObjectArea.getY() - 5);
@@ -1791,9 +1774,9 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         return;
       }
 
-      g.setColor(COLOR_MOUSE_SELECTION_AREA_FILL);
+      g.setColor(Style.COLOR_MOUSE_SELECTION_AREA_FILL);
       RenderEngine.renderShape(g, rect);
-      g.setColor(COLOR_MOUSE_SELECTION_AREA_BORDER);
+      g.setColor(Style.COLOR_MOUSE_SELECTION_AREA_BORDER);
       RenderEngine.renderOutline(g, rect, shapeStroke);
     }
   }
@@ -1817,7 +1800,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       if (!Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
         Stroke transStroke = new BasicStroke(1 / Game.world().camera().getRenderScale());
         for (Rectangle2D trans : this.transformRects.values()) {
-          g.setColor(COLOR_TRANSFORM_RECT_FILL);
+          g.setColor(Style.COLOR_TRANSFORM_RECT_FILL);
           RenderEngine.renderShape(g, trans);
           g.setColor(Color.BLACK);
           RenderEngine.renderOutline(g, trans, transStroke);
@@ -1828,7 +1811,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       if (!Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
         Stroke transStroke = new BasicStroke(1 / Game.world().camera().getRenderScale());
         for (Rectangle2D trans : this.transformRects.values()) {
-          g.setColor(COLOR_TRANSFORM_RECT_FILL);
+          g.setColor(Style.COLOR_TRANSFORM_RECT_FILL);
           RenderEngine.renderShape(g, trans);
           g.setColor(Color.BLACK);
           RenderEngine.renderOutline(g, trans, transStroke);
@@ -1861,9 +1844,9 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     MapObjectType type = MapObjectType.get(mapObject.getType());
     Color fillColor = colorBoundingBoxFill;
     if (type == MapObjectType.TRIGGER) {
-      fillColor = COLOR_TRIGGER_FILL;
+      fillColor = Style.COLOR_TRIGGER_FILL;
     } else if (type == MapObjectType.STATICSHADOW) {
-      fillColor = COLOR_SHADOW_FILL;
+      fillColor = Style.COLOR_SHADOW_FILL;
     }
 
     // render bounding boxes
@@ -1877,7 +1860,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
     Color borderColor = colorBoundingBoxFill;
     if (type == MapObjectType.TRIGGER) {
-      borderColor = COLOR_TRIGGER_BORDER;
+      borderColor = Style.COLOR_TRIGGER_BORDER;
     } else if (type == MapObjectType.LIGHTSOURCE) {
       final String mapObjectColor = mapObject.getStringValue(MapObjectProperty.LIGHT_COLOR);
       if (mapObjectColor != null && !mapObjectColor.isEmpty()) {
@@ -1885,9 +1868,9 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         borderColor = new Color(lightColor.getRed(), lightColor.getGreen(), lightColor.getBlue(), 180);
       }
     } else if (type == MapObjectType.STATICSHADOW) {
-      borderColor = COLOR_SHADOW_BORDER;
+      borderColor = Style.COLOR_SHADOW_BORDER;
     } else if (type == MapObjectType.SPAWNPOINT) {
-      borderColor = COLOR_SPAWNPOINT;
+      borderColor = Style.COLOR_SPAWNPOINT;
     }
 
     g.setColor(borderColor);
@@ -1913,11 +1896,11 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
     if (collisionBoxWidth != -1 && collisionBoxHeight != -1) {
 
-      g.setColor(COLOR_COLLISION_FILL);
+      g.setColor(Style.COLOR_COLLISION_FILL);
       Rectangle2D collisionBox = CollisionEntity.getCollisionBox(mapObject.getLocation(), mapObject.getWidth(), mapObject.getHeight(), collisionBoxWidth, collisionBoxHeight, align, valign);
 
       RenderEngine.renderShape(g, collisionBox);
-      g.setColor(collision ? COLOR_COLLISION_BORDER : COLOR_NOCOLLISION_BORDER);
+      g.setColor(collision ? Style.COLOR_COLLISION_BORDER : Style.COLOR_NOCOLLISION_BORDER);
 
       Stroke collisionStroke = collision ? shapeStroke : new BasicStroke(1 / Game.world().camera().getRenderScale(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL, 0, new float[] { 1f }, 0);
       RenderEngine.renderOutline(g, collisionBox, collisionStroke);

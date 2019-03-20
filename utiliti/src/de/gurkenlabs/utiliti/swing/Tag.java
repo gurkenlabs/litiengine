@@ -15,12 +15,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import de.gurkenlabs.utiliti.Icons;
+import de.gurkenlabs.utiliti.Style;
 
 @SuppressWarnings("serial")
 public class Tag extends JPanel {
 
-  public static final Color DEFAULT_TAG_COLOR = new Color(99, 113, 118);
-  public static final Color DEFAULT_TAG_HOVER_COLOR = DEFAULT_TAG_COLOR.darker();
+
   private JPanel panel;
   private JLabel lblText;
   private JButton btnDelete;
@@ -36,7 +36,7 @@ public class Tag extends JPanel {
     setBorder(null);
 
     this.panel = new InternalTagPanel();
-    this.panel.setBackground(DEFAULT_TAG_COLOR);
+    this.panel.setBackground(Style.COLOR_DEFAULT_TAG);
     this.panel.setLayout(new FlowLayout(FlowLayout.LEADING, 2, 2));
     add(this.panel);
     FlowLayout flowLayout = (FlowLayout) getLayout();
@@ -52,13 +52,13 @@ public class Tag extends JPanel {
     this.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseEntered(final MouseEvent e) {
-        panel.setBackground(DEFAULT_TAG_HOVER_COLOR);
+        panel.setBackground(Style.COLOR_DEFAULT_TAG_HOVER);
       }
 
       @Override
       public void mouseExited(final MouseEvent e) {
         if (!deleteHovered) {
-          panel.setBackground(DEFAULT_TAG_COLOR);
+          panel.setBackground(Style.COLOR_DEFAULT_TAG);
         }
       }
     });
@@ -75,7 +75,7 @@ public class Tag extends JPanel {
       public void mouseEntered(final MouseEvent e) {
           btnDelete.setIcon(Icons.DELETE_X7);
 
-        panel.setBackground(DEFAULT_TAG_HOVER_COLOR);
+        panel.setBackground(Style.COLOR_DEFAULT_TAG_HOVER);
         deleteHovered = true;
       }
 

@@ -697,7 +697,7 @@ public class Program {
     consoleScrollPane.setViewportView(consoleTextArea);
 
     consoleTextArea.setEditable(false);
-    consoleTextArea.setBackground(AssetPanel.BACKGROUND);
+    consoleTextArea.setBackground(Style.COLOR_ASSETPANEL_BACKGROUND);
     consoleTextArea.setForeground(Color.WHITE);
     consoleTextArea.setAutoscrolls(true);
     root.addHandler(new ConsoleLogHandler(consoleTextArea));
@@ -780,7 +780,7 @@ public class Program {
         mv.setSelected(false);
         place.setSelected(true);
         place.requestFocus();
-        Game.window().getRenderComponent().setCursor(Program.CURSOR_ADD, 0, 0);
+        Game.window().getRenderComponent().setCursor(CURSOR_ADD, 0, 0);
       }
 
       if (i == MapComponent.EDITMODE_EDIT) {

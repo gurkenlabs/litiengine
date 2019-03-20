@@ -43,7 +43,7 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
     this.lastOpenedFiles = new String[10];
     this.compressFile = false;
     this.gridLineWidth = 1.0f;
-    this.gridColor = ColorHelper.encode(new Color(255, 255, 255, 65));
+    this.gridColor = ColorHelper.encode(Style.COLOR_DEFAULT_GRID);
   }
 
   public void addOpenedFile(String str) {

@@ -76,10 +76,6 @@ public class EditorScreen extends Screen {
   private static final String SPRITESHEET_FILE_NAME = "Spritesheet Image";
   private static final String TEXTUREATLAS_FILE_NAME = "Texture Atlas XML (generic)";
 
-  public static final Color COLLISION_COLOR = new Color(255, 0, 0, 125);
-  public static final Color BOUNDINGBOX_COLOR = new Color(0, 0, 255, 125);
-  public static final Color COMPONENTBACKGROUND_COLOR = new Color(100, 100, 100, 125);
-
   private static EditorScreen instance;
 
   private final List<EditorComponent> comps;
@@ -176,7 +172,7 @@ public class EditorScreen extends Screen {
       if (deltaTime > fadeOutTime) {
         double fade = deltaTime - fadeOutTime;
         int alpha = (int) (255 - (fade / (STATUS_DURATION - fadeOutTime)) * 255);
-        g.setColor(new Color(255, 255, 255, MathUtilities.clamp(alpha, 0, 255)));
+        g.setColor(new Color(Style.COLOR_STATUS.getRed(), Style.COLOR_STATUS.getGreen(), Style.COLOR_STATUS.getBlue(), MathUtilities.clamp(alpha, 0, 255)));
       }
 
       Font old = g.getFont();
@@ -324,7 +320,7 @@ public class EditorScreen extends Screen {
       log.log(Level.INFO, "{0} emitters loaded from {1}", new Object[] { this.getGameFile().getEmitters().size(), this.currentResourceFile });
       log.log(Level.INFO, "{0} blueprints loaded from {1}", new Object[] { this.getGameFile().getBluePrints().size(), this.currentResourceFile });
       log.log(Level.INFO, "{0} sounds loaded from {1}", new Object[] { this.getGameFile().getSounds().size(), this.currentResourceFile });
-      
+
       for (Map map : this.mapComponent.getMaps()) {
         this.loadSpriteSheets(map);
       }
