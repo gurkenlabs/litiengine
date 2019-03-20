@@ -4,7 +4,6 @@ import java.awt.event.MouseEvent;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.gui.GuiComponent;
-import de.gurkenlabs.utiliti.EditorScreen;
 
 public abstract class EditorComponent extends GuiComponent {
 

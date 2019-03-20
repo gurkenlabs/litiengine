@@ -1,4 +1,4 @@
-package de.gurkenlabs.utiliti;
+package de.gurkenlabs.utiliti.components;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -56,9 +56,12 @@ import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import de.gurkenlabs.litiengine.util.io.ImageSerializer;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
-import de.gurkenlabs.utiliti.components.EditorComponent;
+import de.gurkenlabs.utiliti.Icons;
+import de.gurkenlabs.utiliti.MapSelectionPanel;
+import de.gurkenlabs.utiliti.Program;
+import de.gurkenlabs.utiliti.Style;
+import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.components.EditorComponent.ComponentType;
-import de.gurkenlabs.utiliti.components.MapComponent;
 import de.gurkenlabs.utiliti.swing.EditorFileChooser;
 import de.gurkenlabs.utiliti.swing.XmlImportDialog;
 import de.gurkenlabs.utiliti.swing.dialogs.SpritesheetImportPanel;
@@ -274,7 +277,7 @@ public class EditorScreen extends Screen {
     }
 
     final long currentTime = System.nanoTime();
-    Game.window().getRenderComponent().setCursor(Program.CURSOR_LOAD, 0, 0);
+    Game.window().getRenderComponent().setCursor(Icons.Cursor.LOAD, 0, 0);
     Game.window().getRenderComponent().setCursorOffsetX(0);
     Game.window().getRenderComponent().setCursorOffsetY(0);
 
@@ -340,7 +343,7 @@ public class EditorScreen extends Screen {
       this.changeComponent(ComponentType.MAP);
       this.setCurrentStatus(Resources.strings().get("status_gamefile_loaded"));
     } finally {
-      Game.window().getRenderComponent().setCursor(Program.CURSOR, 0, 0);
+      Game.window().getRenderComponent().setCursor(Icons.Cursor.DEFAULT, 0, 0);
       log.log(Level.INFO, "Loading gamefile {0} took: {1} ms", new Object[] { gameFile, (System.nanoTime() - currentTime) / 1000000.0 });
       this.loading = false;
     }

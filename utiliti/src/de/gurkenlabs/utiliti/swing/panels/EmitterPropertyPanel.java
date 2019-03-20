@@ -42,8 +42,8 @@ import de.gurkenlabs.litiengine.physics.Collision;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
-import de.gurkenlabs.utiliti.EditorScreen;
 import de.gurkenlabs.utiliti.Icons;
+import de.gurkenlabs.utiliti.components.EditorScreen;
 
 @SuppressWarnings("serial")
 public class EmitterPropertyPanel extends PropertyPanel {

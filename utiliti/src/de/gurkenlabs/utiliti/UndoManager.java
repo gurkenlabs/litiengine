@@ -16,6 +16,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
+import de.gurkenlabs.utiliti.components.EditorScreen;
 import de.gurkenlabs.utiliti.components.MapComponent;
 
 public class UndoManager {
@@ -266,7 +267,7 @@ public class UndoManager {
     return false;
   }
 
-  static void save(IMap map) {
+  public static void save(IMap map) {
     if (instance.containsKey(map.getName())) {
       instance.get(map.getName()).saved = true;
     }

@@ -23,7 +23,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.URI;
 import java.nio.file.InvalidPathException;
@@ -72,6 +71,7 @@ import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.litiengine.util.UriUtilities;
+import de.gurkenlabs.utiliti.components.EditorScreen;
 import de.gurkenlabs.utiliti.components.MapComponent;
 import de.gurkenlabs.utiliti.swing.AssetPanel;
 import de.gurkenlabs.utiliti.swing.AssetTree;
@@ -82,15 +82,6 @@ import de.gurkenlabs.utiliti.swing.panels.MapObjectPanel;
 
 public class Program {
   public static final Font TEXT_FONT = new JLabel().getFont().deriveFont(10f);
-  public static final BufferedImage CURSOR = Resources.images().get("cursor.png");
-  public static final BufferedImage CURSOR_ADD = Resources.images().get("cursor-add.png");
-  public static final BufferedImage CURSOR_MOVE = Resources.images().get("cursor-move.png");
-  public static final BufferedImage CURSOR_SELECT = Resources.images().get("cursor-select.png");
-  public static final BufferedImage CURSOR_LOAD = Resources.images().get("cursor-load.png");
-  public static final BufferedImage CURSOR_TRANS_HORIZONTAL = Resources.images().get("cursor-trans-horizontal.png");
-  public static final BufferedImage CURSOR_TRANS_VERTICAL = Resources.images().get("cursor-trans-vertical.png");
-  public static final BufferedImage CURSOR_TRANS_DIAGONAL_LEFT = Resources.images().get("cursor-trans-315.png");
-  public static final BufferedImage CURSOR_TRANS_DIAGONAL_RIGHT = Resources.images().get("cursor-trans-45.png");
 
   private static final Logger log = Logger.getLogger(Program.class.getName());
 
@@ -134,7 +125,7 @@ public class Program {
 
     Game.screens().display(EditorScreen.instance());
 
-    Game.window().getRenderComponent().setCursor(CURSOR, 0, 0);
+    Game.window().getRenderComponent().setCursor(Icons.Cursor.DEFAULT, 0, 0);
     Game.window().getRenderComponent().setCursorOffsetX(0);
     Game.window().getRenderComponent().setCursorOffsetY(0);
     setupInterface();
@@ -746,7 +737,7 @@ public class Program {
       EditorScreen.instance().getMapComponent().setEditMode(MapComponent.EDITMODE_EDIT);
       isChanging = false;
 
-      Game.window().getRenderComponent().setCursor(CURSOR, 0, 0);
+      Game.window().getRenderComponent().setCursor(Icons.Cursor.DEFAULT, 0, 0);
     });
 
     place.addActionListener(a -> {
@@ -767,7 +758,7 @@ public class Program {
       EditorScreen.instance().getMapComponent().setEditMode(MapComponent.EDITMODE_MOVE);
       isChanging = false;
 
-      Game.window().getRenderComponent().setCursor(CURSOR_MOVE, 0, 0);
+      Game.window().getRenderComponent().setCursor(Icons.Cursor.MOVE, 0, 0);
     });
 
     EditorScreen.instance().getMapComponent().onEditModeChanged(i -> {
@@ -780,7 +771,7 @@ public class Program {
         mv.setSelected(false);
         place.setSelected(true);
         place.requestFocus();
-        Game.window().getRenderComponent().setCursor(CURSOR_ADD, 0, 0);
+        Game.window().getRenderComponent().setCursor(Icons.Cursor.ADD, 0, 0);
       }
 
       if (i == MapComponent.EDITMODE_EDIT) {
@@ -788,7 +779,7 @@ public class Program {
         mv.setSelected(false);
         ed.setSelected(true);
         ed.requestFocus();
-        Game.window().getRenderComponent().setCursor(CURSOR, 0, 0);
+        Game.window().getRenderComponent().setCursor(Icons.Cursor.DEFAULT, 0, 0);
       }
 
       if (i == MapComponent.EDITMODE_MOVE) {
@@ -800,7 +791,7 @@ public class Program {
         place.setSelected(false);
         mv.setSelected(true);
         mv.requestFocus();
-        Game.window().getRenderComponent().setCursor(CURSOR_MOVE, 0, 0);
+        Game.window().getRenderComponent().setCursor(Icons.Cursor.MOVE, 0, 0);
       }
     });
 

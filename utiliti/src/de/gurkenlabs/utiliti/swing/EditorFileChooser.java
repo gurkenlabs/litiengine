@@ -8,7 +8,7 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.utiliti.EditorScreen;
+import de.gurkenlabs.utiliti.components.EditorScreen;
 
 @SuppressWarnings("serial")
 public final class EditorFileChooser extends JFileChooser {
