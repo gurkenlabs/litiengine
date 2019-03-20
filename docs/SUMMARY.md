@@ -28,7 +28,7 @@
     * Text
 
 * [Manage Maps](manage-maps/README.md)
-    * Map creation with Tiled
+    * [Map creation with Tiled](manage-maps/create-maps-with-tiled.md)
     * Map Objects
     * Custom Properties
     * Import maps with utiLITI
