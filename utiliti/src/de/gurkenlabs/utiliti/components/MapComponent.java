@@ -142,10 +142,6 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   private float dragSizeWidth;
   private Rectangle2D newObjectArea;
   private Blueprint copiedBlueprint;
-  private int gridWidth;
-  private int gridHeight;
-  private Color gridColor;
-  private float gridStrokeFactor;
 
   private Color colorSelectionBorder;
   private float focusBorderBrightness = 0;
@@ -175,10 +171,6 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       this.currentTransformRectSize = TRANSFORM_RECT_SIZE / zoom;
       this.updateTransformControls();
     });
-    this.gridWidth = Program.getUserPreferences().getGridWidth();
-    this.gridHeight = Program.getUserPreferences().getGridHeight();
-    this.gridStrokeFactor = Program.getUserPreferences().getGridLineWidth();
-    this.gridColor = ColorHelper.decode(Program.getUserPreferences().getGridColor());
   }
 
   public void onEditModeChanged(Consumer<Integer> cons) {
@@ -233,7 +225,8 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     final List<Map> loadedMaps = new ArrayList<>();
     for (final String mapFile : files) {
       Map map = (Map) Resources.maps().get(mapFile);
-      if (map != null) { // if an error occurred or it's not in the expected format
+      if (map != null) { // if an error occurred or it's not in the expected
+                         // format
         loadedMaps.add(map);
         log.log(Level.INFO, "map found: {0}", new Object[] { map.getName() });
       }
@@ -258,22 +251,6 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
   public List<Map> getMaps() {
     return this.maps;
-  }
-
-  public int getGridWidth() {
-    return this.gridWidth;
-  }
-
-  public int getGridHeight() {
-    return this.gridHeight;
-  }
-
-  public Color getGridColor() {
-    return this.gridColor;
-  }
-
-  public float getGridStrokeFactor() {
-    return this.gridStrokeFactor;
   }
 
   public IMapObject getFocusedMapObject() {
@@ -677,23 +654,6 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     for (Consumer<List<IMapObject>> cons : this.selectionChangedConsumer) {
       cons.accept(this.getSelectedMapObjects());
     }
-  }
-
-  public void setGridSize(int gridWidth, int gridHeight) {
-    Program.getUserPreferences().setGridWidth(gridWidth);
-    Program.getUserPreferences().setGridHeight(gridHeight);
-    this.gridWidth = gridWidth;
-    this.gridHeight = gridHeight;
-  }
-
-  public void setGridStrokeFactor(float gridStrokeFactor) {
-    Program.getUserPreferences().setGridLineWidth(gridStrokeFactor);
-    this.gridStrokeFactor = gridStrokeFactor;
-  }
-
-  public void setGridColor(Color gridColor) {
-    Program.getUserPreferences().setGridColor(ColorHelper.encode(gridColor));
-    this.gridColor = gridColor;
   }
 
   public void updateTransformControls() {
@@ -1601,7 +1561,11 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
   private float snapX(double x) {
     if (Program.getUserPreferences().isSnapGrid()) {
-      double snapped = ((int) (x / this.getGridWidth()) * this.getGridWidth());
+      final IMap map = Game.world().environment().getMap();
+      if (map == null) {
+        return (float) x;
+      }
+      double snapped = ((int) (x / map.getTileSize().width) * map.getTileSize().width);
       return (int) Math.round(Math.min(Math.max(snapped, 0), Game.world().environment().getMap().getSizeInPixels().getWidth()));
     }
 
@@ -1614,7 +1578,12 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
   private float snapY(double y) {
     if (Program.getUserPreferences().isSnapGrid()) {
-      int snapped = (int) (y / this.getGridHeight()) * this.getGridHeight();
+      final IMap map = Game.world().environment().getMap();
+      if (map == null) {
+        return (float) y;
+      }
+
+      int snapped = (int) (y / map.getTileSize().height) * map.getTileSize().height;
       return (int) Math.round(Math.min(Math.max(snapped, 0), Game.world().environment().getMap().getSizeInPixels().getHeight()));
     }
 
@@ -1786,8 +1755,8 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         return;
       }
 
-      g.setColor(this.getGridColor());
-      final Stroke stroke = new BasicStroke(this.getGridStrokeFactor() / Game.world().camera().getRenderScale());
+      g.setColor(Program.getUserPreferences().getGridColor());
+      final Stroke stroke = new BasicStroke(Program.getUserPreferences().getGridLineWidth() / Game.world().camera().getRenderScale());
       for (int x = 0; x < map.getWidth(); x++) {
         for (int y = 0; y < map.getHeight(); y++) {
           Shape tile = map.getOrientation().getShape(x, y, map);

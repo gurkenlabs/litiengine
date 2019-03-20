@@ -478,12 +478,11 @@ public class Program {
 
     MenuItem setGrid = new MenuItem(Resources.strings().get("menu_gridSettings"));
     setGrid.addActionListener(a -> {
-      GridEditPanel panel = new GridEditPanel(EditorScreen.instance().getMapComponent().getGridWidth(), EditorScreen.instance().getMapComponent().getGridHeight(), EditorScreen.instance().getMapComponent().getGridStrokeFactor(), EditorScreen.instance().getMapComponent().getGridColor());
+      GridEditPanel panel = new GridEditPanel(getUserPreferences().getGridLineWidth(), getUserPreferences().getGridColor());
       int option = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), panel, Resources.strings().get("menu_gridSettings"), JOptionPane.PLAIN_MESSAGE);
       if (option == JOptionPane.OK_OPTION) {
-        EditorScreen.instance().getMapComponent().setGridSize(panel.getGridSize().width, panel.getGridSize().height);
-        EditorScreen.instance().getMapComponent().setGridColor(panel.getGridColor());
-        EditorScreen.instance().getMapComponent().setGridStrokeFactor(panel.getStrokeWidth());
+        getUserPreferences().setGridColor(ColorHelper.encode(panel.getGridColor()));
+        getUserPreferences().setGridLineWidth(panel.getStrokeWidth());
       }
     });
 
