@@ -1844,7 +1844,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     String id = Integer.toString(mapObject.getId());
 
     double x = loc.getX() * Game.world().camera().getRenderScale() - g.getFontMetrics().stringWidth(id) / 2.0;
-    double y = loc.getY() * Game.world().camera().getRenderScale() - (g.getFontMetrics().getHeight() * .75);
+    double y = loc.getY() * Game.world().camera().getRenderScale() - (g.getFontMetrics().getHeight() * .30);
 
     if (this.currentZoomIndex < DEFAULT_ZOOM_INDEX) {
       TextRenderer.render(g, id, x, y);

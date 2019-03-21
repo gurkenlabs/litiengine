@@ -485,7 +485,7 @@ public class Program {
 
     CheckboxMenuItem renderMapIds = new CheckboxMenuItem(Resources.strings().get("menu_renderMapIds"));
     renderMapIds.setState(userPreferences.isRenderMapIds());
-    renderCustomMapObjects.setShortcut(new MenuShortcut(KeyEvent.VK_I));
+    renderMapIds.setShortcut(new MenuShortcut(KeyEvent.VK_I));
     renderMapIds.addItemListener(e -> userPreferences.setRenderMapIds(renderMapIds.getState()));
 
     MenuItem setGrid = new MenuItem(Resources.strings().get("menu_gridSettings"));
