@@ -18,25 +18,25 @@ import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 @MovementInfo
 public class Creature extends CombatEntity implements IMobileEntity {
   private static final int IDLE_DELAY = 100;
-  
+
   @TmxProperty(name = MapObjectProperty.MOVEMENT_ACCELERATION)
   private int acceleration;
-  
+
   @TmxProperty(name = MapObjectProperty.MOVEMENT_DECELERATION)
   private int deceleration;
-  
+
   @TmxProperty(name = MapObjectProperty.MOVEMENT_TURNONMOVE)
   private boolean turnOnMove;
-  
+
   @TmxProperty(name = MapObjectProperty.MOVEMENT_VELOCITY)
   private Attribute<Float> velocity;
-  
+
   @TmxProperty(name = MapObjectProperty.SPRITESHEETNAME)
   private String spritePrefix;
-  
+
   @TmxProperty(name = MapObjectProperty.SCALE_SPRITE)
   private boolean scaling;
-  
+
   private long lastMoved;
   private Point2D moveDestination;
 
@@ -173,7 +173,6 @@ public class Creature extends CombatEntity implements IMobileEntity {
   public void setScaling(boolean scaling) {
     this.scaling = scaling;
   }
-  
 
   @Override
   public void setVelocity(float velocity) {
@@ -188,16 +187,14 @@ public class Creature extends CombatEntity implements IMobileEntity {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
+    sb.append("#" + this.getMapId() + ": ");
     if (this.getName() != null && !this.getName().isEmpty()) {
       sb.append(this.getName());
     } else {
       sb.append(Creature.class.getSimpleName());
     }
-    sb.append(" (");
-    sb.append(this.getSpritePrefix());
+    sb.append(" (" + this.getSpritePrefix() + ")");
 
-    sb.append(") #");
-    sb.append(this.getMapId());
     return sb.toString();
   }
 

@@ -383,14 +383,12 @@ public abstract class Entity implements IEntity {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
+    sb.append("#" + this.getMapId() + ": ");
     if (this.getName() != null && !this.getName().isEmpty()) {
       sb.append(this.getName());
     } else {
       sb.append(this.getClass().getSimpleName());
     }
-
-    sb.append(" #");
-    sb.append(this.getMapId());
     return sb.toString();
   }
 
@@ -412,7 +410,7 @@ public abstract class Entity implements IEntity {
   @Override
   public void removed(Environment environment) {
     this.loaded = false;
-    
+
     for (EntityListener listener : this.listeners) {
       listener.removed(this, this.getEnvironment());
     }

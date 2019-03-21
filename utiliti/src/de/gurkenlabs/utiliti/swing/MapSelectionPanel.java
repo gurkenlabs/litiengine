@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import javax.swing.Box;
 import javax.swing.DefaultListModel;
@@ -863,47 +864,47 @@ public class MapSelectionPanel extends JSplitPane {
     this.nodeEmitter.setUserObject(new IconTreeListItem((Game.world().environment() == null ? 0 : Game.world().environment().getEmitters().size()) + " " + Resources.strings().get("panel_mapselection_emitter"), Icons.EMITTER));
 
     if (Game.world().environment() != null) {
-      for (LightSource light : Game.world().environment().getLightSources()) {
+      for (LightSource light : Game.world().environment().getLightSources().stream().sorted((p1, p2) -> Integer.compare(p1.getMapId(), p2.getMapId())).collect(Collectors.toList())) {
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(new IconTreeListItem(light));
         this.nodeLights.add(node);
       }
 
-      for (Prop prop : Game.world().environment().getProps()) {
+      for (Prop prop : Game.world().environment().getProps().stream().sorted((p1, p2) -> Integer.compare(p1.getMapId(), p2.getMapId())).collect(Collectors.toList())) {
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(new IconTreeListItem(prop));
         this.nodeProps.add(node);
       }
 
-      for (Creature creature : Game.world().environment().getCreatures()) {
+      for (Creature creature : Game.world().environment().getCreatures().stream().sorted((p1, p2) -> Integer.compare(p1.getMapId(), p2.getMapId())).collect(Collectors.toList())) {
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(new IconTreeListItem(creature));
         this.nodeCreatures.add(node);
       }
 
-      for (Trigger trigger : Game.world().environment().getTriggers()) {
+      for (Trigger trigger : Game.world().environment().getTriggers().stream().sorted((p1, p2) -> Integer.compare(p1.getMapId(), p2.getMapId())).collect(Collectors.toList())) {
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(new IconTreeListItem(trigger));
         this.nodeTriggers.add(node);
       }
 
-      for (Spawnpoint spawn : Game.world().environment().getSpawnPoints()) {
+      for (Spawnpoint spawn : Game.world().environment().getSpawnPoints().stream().sorted((p1, p2) -> Integer.compare(p1.getMapId(), p2.getMapId())).collect(Collectors.toList())) {
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(new IconTreeListItem(spawn));
         this.nodeSpawnpoints.add(node);
       }
 
-      for (CollisionBox coll : Game.world().environment().getCollisionBoxes()) {
+      for (CollisionBox coll : Game.world().environment().getCollisionBoxes().stream().sorted((p1, p2) -> Integer.compare(p1.getMapId(), p2.getMapId())).collect(Collectors.toList())) {
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(new IconTreeListItem(coll));
         this.nodeCollisionBoxes.add(node);
       }
 
-      for (MapArea area : Game.world().environment().getAreas()) {
+      for (MapArea area : Game.world().environment().getAreas().stream().sorted((p1, p2) -> Integer.compare(p1.getMapId(), p2.getMapId())).collect(Collectors.toList())) {
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(new IconTreeListItem(area));
         this.nodeMapAreas.add(node);
       }
 
-      for (StaticShadow shadow : Game.world().environment().getStaticShadows()) {
+      for (StaticShadow shadow : Game.world().environment().getStaticShadows().stream().sorted((p1, p2) -> Integer.compare(p1.getMapId(), p2.getMapId())).collect(Collectors.toList())) {
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(new IconTreeListItem(shadow));
         this.nodeStaticShadows.add(node);
       }
 
-      for (Emitter emitter : Game.world().environment().getEmitters()) {
+      for (Emitter emitter : Game.world().environment().getEmitters().stream().sorted((p1, p2) -> Integer.compare(p1.getMapId(), p2.getMapId())).collect(Collectors.toList())) {
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(new IconTreeListItem(emitter));
         this.nodeEmitter.add(node);
       }
