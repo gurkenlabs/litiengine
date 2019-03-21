@@ -8,11 +8,16 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
+import de.gurkenlabs.litiengine.Game;
 
 /**
  * An abstract implementation for all classes that provide a certain type of resources.
@@ -25,11 +30,17 @@ import java.util.stream.Collectors;
  */
 public abstract class ResourcesContainer<T> {
   private static final Logger log = Logger.getLogger(ResourcesContainer.class.getName());
+  // use a work-stealing pool to maximize resource load speed while minimizing the number of resources in use
+  private static final ExecutorService ASYNC_POOL = Executors.newWorkStealingPool();
 
   private final Map<URL, T> resources = new ConcurrentHashMap<>();
   private final Map<String, URL> aliases = new ConcurrentHashMap<>();
   private final List<ResourcesContainerListener<? super T>> listeners = new CopyOnWriteArrayList<>();
   private final List<ResourcesContainerClearedListener> clearedListeners = new CopyOnWriteArrayList<>();
+
+  static {
+    Game.addGameTerminatedListener(ASYNC_POOL::shutdownNow);
+  }
 
   /**
    * Add a new container listener to this instance in order to observe resource life cycles.
@@ -261,6 +272,18 @@ public abstract class ResourcesContainer<T> {
     } else {
       return this.resources.computeIfAbsent(resourceName, this::loadResource);
     }
+  }
+
+  /**
+   * Eventually gets the resource with the specified location. The resource is loaded asynchronously and can be retrieved from the returned
+   * {@code Future} object returned by this method once loaded.
+   * 
+   * @param location
+   *          The location of the resource
+   * @return A {@code Future} object that can be used to retrieve the resource once it is finished loading
+   */
+  public Future<T> getAsync(URL location) {
+    return ASYNC_POOL.submit(() -> this.get(location));
   }
 
   /**
