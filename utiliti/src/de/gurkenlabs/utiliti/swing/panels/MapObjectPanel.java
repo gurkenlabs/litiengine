@@ -166,6 +166,9 @@ public class MapObjectPanel extends PropertyPanel {
   }
 
   private void switchPanel(MapObjectType type) {
+    if (type == null) {
+      return;
+    }
     PropertyPanel panel = this.panels.get(type);
     if (panel == null) {
       if (this.currentPanel != null) {

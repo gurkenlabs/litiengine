@@ -301,6 +301,24 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   }
 
   @Override
+  public Collection<IMapObject> getMapObjects(int... mapIDs) {
+    List<IMapObject> mapObjects = new ArrayList<>();
+    if (this.getMapObjectLayers() == null || this.getMapObjectLayers().isEmpty() || mapIDs.length == 0) {
+      return mapObjects;
+    }
+
+    for (IMapObjectLayer layer : this.getMapObjectLayers()) {
+      if (layer == null) {
+        continue;
+      }
+
+      mapObjects.addAll(layer.getMapObjects(mapIDs));
+    }
+
+    return mapObjects;
+  }
+
+  @Override
   public Collection<IMapObject> getMapObjects() {
     List<IMapObject> mapObjects = new ArrayList<>();
     if (this.getMapObjectLayers() == null) {

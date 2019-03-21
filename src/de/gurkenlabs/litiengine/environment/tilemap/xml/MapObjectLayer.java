@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -52,7 +53,7 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
   public MapObjectLayer(MapObjectLayer layerToBeCopied) {
     super(layerToBeCopied);
     for (IMapObject obj : layerToBeCopied.getMapObjects()) {
-      this.addMapObject(new MapObject((MapObject)obj));
+      this.addMapObject(new MapObject((MapObject) obj));
     }
     if (layerToBeCopied.getColor() != null) {
       this.setColor(layerToBeCopied.getColorHexString());
@@ -135,17 +136,21 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
   public Collection<IMapObject> getMapObjects(String... types) {
     List<IMapObject> objs = new ArrayList<>();
     for (IMapObject mapObject : this.getMapObjects()) {
-      if (mapObject == null) {
-        continue;
-      }
-
-      for (String type : types) {
-        if (mapObject.getType() != null && mapObject.getType().equals(type)) {
-          objs.add(mapObject);
-        }
+      if (mapObject != null && Arrays.stream(types).anyMatch(type -> type.equals(mapObject.getType()))) {
+        objs.add(mapObject);
       }
     }
+    return objs;
+  }
 
+  @Override
+  public Collection<IMapObject> getMapObjects(int... mapIDs) {
+    List<IMapObject> objs = new ArrayList<>();
+    for (IMapObject mapObject : this.getMapObjects()) {
+      if (mapObject != null && Arrays.stream(mapIDs).anyMatch(id -> id == mapObject.getId())) {
+        objs.add(mapObject);
+      }
+    }
     return objs;
   }
 

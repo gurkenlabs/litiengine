@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine.environment;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
@@ -69,7 +70,7 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
 
     mapObject.getProperties().forEach((name, property) -> {
       if (MapObjectProperty.isCustom(name)) {
-       entity.getProperties().setValue(name, property);
+        entity.getProperties().setValue(name, property);
       }
     });
   }
