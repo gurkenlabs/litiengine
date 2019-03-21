@@ -17,6 +17,7 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
   private boolean snapGrid;
   private boolean renderBoundingBoxes;
   private boolean renderCustomMapObjects;
+  private boolean renderMapIds;
   private boolean compressFile;
   private boolean syncMaps;
   private int frameState;
@@ -30,7 +31,7 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
 
   private float gridLineWidth;
   private String gridColor;
-  
+
   private String lastGameFile;
   private String[] lastOpenedFiles;
 
@@ -117,6 +118,14 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
 
   public void setRenderCustomMapObjects(boolean renderCustomMapObjects) {
     this.renderCustomMapObjects = renderCustomMapObjects;
+  }
+
+  public boolean isRenderMapIds() {
+    return this.renderMapIds;
+  }
+
+  public void setRenderMapIds(boolean renderIds) {
+    this.renderMapIds = renderIds;
   }
 
   public String getLastGameFile() {

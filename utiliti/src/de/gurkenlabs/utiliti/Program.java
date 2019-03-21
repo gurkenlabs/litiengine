@@ -13,6 +13,7 @@ import java.awt.Menu;
 import java.awt.MenuBar;
 import java.awt.MenuItem;
 import java.awt.MenuShortcut;
+import java.awt.Point;
 import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
@@ -58,6 +59,7 @@ import javax.swing.KeyStroke;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.border.EmptyBorder;
 
 import de.gurkenlabs.litiengine.DefaultUncaughtExceptionHandler;
 import de.gurkenlabs.litiengine.Game;
@@ -368,17 +370,28 @@ public class Program {
 
     statusBar = new JLabel("");
     statusBar.setPreferredSize(new Dimension(0, 16));
-    statusBar.setFont(new Font(ConsoleLogHandler.CONSOLE_FONT, Font.PLAIN, 10));
-    bottomPanel.add(statusBar, BorderLayout.SOUTH);
-    EditorScreen.instance().getMapComponent().onSelectionChanged(selection -> {
-      if (selection.isEmpty()) {
-        statusBar.setText("");
-      } else {
-        statusBar.setText(" " + selection.size() + " selected objects");
-      }
-    });
+    statusBar.setFont(new Font(ConsoleLogHandler.CONSOLE_FONT, Font.PLAIN, 11));
+    statusBar.setBorder(new EmptyBorder(0, 5, 0, 0));
 
+    bottomPanel.add(statusBar, BorderLayout.SOUTH);
     return bottomPanel;
+  }
+
+  public static void updateStatusBar() {
+    Point tile = Input.mouse().getTile();
+    String positionX = "x: " + (int) Input.mouse().getMapLocation().getX() + "[" + tile.x + "]";
+    String positionY = "y: " + (int) Input.mouse().getMapLocation().getY() + "[" + tile.y + "]";
+    String status = String.format("%-14s %-14s", positionX, positionY) + String.format(" %-10s", (int) (Game.world().camera().getRenderScale() * 100) + "%");
+
+    int size = EditorScreen.instance().getMapComponent().getSelectedMapObjects().size();
+    if (size <= 0) {
+      statusBar.setText("");
+    } else {
+
+      status += Resources.strings().get("status_selected_objects", size);
+    }
+
+    statusBar.setText(status);
   }
 
   private static void initScrollBars(JPanel renderPane) {
@@ -470,6 +483,11 @@ public class Program {
     renderCustomMapObjects.setShortcut(new MenuShortcut(KeyEvent.VK_K));
     renderCustomMapObjects.addItemListener(e -> userPreferences.setRenderCustomMapObjects(renderCustomMapObjects.getState()));
 
+    CheckboxMenuItem renderMapIds = new CheckboxMenuItem(Resources.strings().get("menu_renderMapIds"));
+    renderMapIds.setState(userPreferences.isRenderMapIds());
+    renderCustomMapObjects.setShortcut(new MenuShortcut(KeyEvent.VK_I));
+    renderMapIds.addItemListener(e -> userPreferences.setRenderMapIds(renderMapIds.getState()));
+
     MenuItem setGrid = new MenuItem(Resources.strings().get("menu_gridSettings"));
     setGrid.addActionListener(a -> {
       GridEditPanel panel = new GridEditPanel(getUserPreferences().getGridLineWidth(), getUserPreferences().getGridColor());
@@ -493,6 +511,7 @@ public class Program {
     mnView.add(renderGrid);
     mnView.add(renderCollision);
     mnView.add(renderCustomMapObjects);
+    mnView.add(renderMapIds);
     mnView.add(setGrid);
     mnView.addSeparator();
     mnView.add(zoomIn);

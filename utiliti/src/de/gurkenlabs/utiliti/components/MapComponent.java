@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.event.FocusAdapter;
@@ -86,6 +87,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   private static final Logger log = Logger.getLogger(MapComponent.class.getName());
 
   private static final float[] zooms = new float[] { 0.1f, 0.25f, 0.5f, 1, 1.5f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f, 16f, 32f, 50f, 80f, 100f };
+  private static final int DEFAULT_ZOOM_INDEX = 3;
   private static final String DEFAULT_MAPOBJECTLAYER_NAME = "default";
   private static final int TRANSFORM_RECT_SIZE = 6;
   private static final int BASE_SCROLL_SPEED = 50;
@@ -1820,11 +1822,37 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     }
 
     if (focusedMapObject != null) {
-      Point2D loc = Game.world().camera().getViewportLocation(new Point2D.Double(focusedMapObject.getX() + focusedMapObject.getWidth() / 2, focusedMapObject.getY()));
-      g.setColor(Color.WHITE);
-      String id = "#" + focusedMapObject.getId();
-      TextRenderer.render(g, id, loc.getX() * Game.world().camera().getRenderScale() - g.getFontMetrics().stringWidth(id) / 2.0, loc.getY() * Game.world().camera().getRenderScale() - (5 * this.currentTransformRectSize));
+      renderObjectId(g, focusedMapObject);
     }
+  }
+
+  private void renderObjectId(Graphics2D g, IMapObject mapObject) {
+    if (!Program.getUserPreferences().isRenderMapIds()) {
+      return;
+    }
+
+    Font previousFont = g.getFont();
+    Font idFont = previousFont.deriveFont(Math.max(10f, (float) (10 * Math.sqrt(Game.world().camera().getRenderScale()))));
+    if (this.currentZoomIndex > DEFAULT_ZOOM_INDEX) {
+      idFont = idFont.deriveFont(Font.BOLD);
+    }
+
+    Point2D loc = Game.world().camera().getViewportLocation(new Point2D.Double(mapObject.getX() + mapObject.getWidth() / 2, mapObject.getY()));
+    g.setColor(Style.COLOR_STATUS);
+
+    g.setFont(idFont);
+    String id = Integer.toString(mapObject.getId());
+
+    double x = loc.getX() * Game.world().camera().getRenderScale() - g.getFontMetrics().stringWidth(id) / 2.0;
+    double y = loc.getY() * Game.world().camera().getRenderScale() - (g.getFontMetrics().getHeight() * .75);
+
+    if (this.currentZoomIndex < DEFAULT_ZOOM_INDEX) {
+      TextRenderer.render(g, id, x, y);
+    } else {
+      TextRenderer.render(g, id, x, y, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+    }
+
+    g.setFont(previousFont);
   }
 
   private void renderSelection(Graphics2D g) {
@@ -1837,6 +1865,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
       g.setColor(colorSelectionBorder);
       RenderEngine.renderOutline(g, mapObject.getBoundingBox(), stroke);
+      renderObjectId(g, mapObject);
     }
   }
 
@@ -1916,9 +1945,9 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     }
 
     if (this.focusBorderBrightnessIncreasing && this.focusBorderBrightness < 0.9) {
-      this.focusBorderBrightness += 0.005;
+      this.focusBorderBrightness += 0.01;
     } else if (!focusBorderBrightnessIncreasing && this.focusBorderBrightness >= 0.4) {
-      this.focusBorderBrightness -= 0.005;
+      this.focusBorderBrightness -= 0.01;
     }
 
     this.colorSelectionBorder = Color.getHSBColor(0, 0, this.focusBorderBrightness);

@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
@@ -45,7 +44,6 @@ import de.gurkenlabs.litiengine.graphics.TextRenderer;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.CustomEmitter;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.litiengine.gui.screens.Screen;
-import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.resources.ResourceBundle;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.resources.SoundResource;
@@ -157,11 +155,11 @@ public class EditorScreen extends Screen {
 
     g.setFont(Program.TEXT_FONT);
     g.setColor(Color.WHITE);
-    Point tile = Input.mouse().getTile();
-
-    TextRenderer.render(g, "x: " + (int) Input.mouse().getMapLocation().getX() + " y: " + (int) Input.mouse().getMapLocation().getY() + " tile: [" + tile.x + ", " + tile.y + "]" + " zoom: " + (int) (Game.world().camera().getRenderScale() * 100) + " %", 10,
-        Game.window().getResolution().getHeight() - 40);
     TextRenderer.render(g, Game.metrics().getFramesPerSecond() + " FPS", 10, Game.window().getResolution().getHeight() - 20);
+
+    if (Game.loop().getTicks() % 4 == 0) {
+      Program.updateStatusBar();
+    }
 
     // render status
     if (this.currentStatus != null && !this.currentStatus.isEmpty()) {
