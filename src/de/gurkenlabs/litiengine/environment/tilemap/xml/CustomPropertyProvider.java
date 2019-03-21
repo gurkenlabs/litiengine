@@ -3,7 +3,7 @@ package de.gurkenlabs.litiengine.environment.tilemap.xml;
 import java.awt.Color;
 import java.util.Hashtable;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -30,11 +30,8 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
    * @param propertyProviderToBeCopied
    *          the PropertyProvider we want to copy
    */
-  public CustomPropertyProvider(CustomPropertyProvider propertyProviderToBeCopied) {
-    this.properties = new Hashtable<>();
-    for (Entry<String, ICustomProperty> entry : propertyProviderToBeCopied.getProperties().entrySet()) {
-      this.properties.put(entry.getKey(), new CustomProperty((CustomProperty) entry.getValue()));
-    }
+  public CustomPropertyProvider(ICustomPropertyProvider propertyProviderToBeCopied) {
+    this.properties = propertyProviderToBeCopied.getProperties().entrySet().stream().collect(Collectors.toMap(e -> e.getKey(), e -> new CustomProperty((e.getValue()))));
   }
 
   @Override

@@ -22,7 +22,7 @@ public class CustomProperty implements ICustomProperty {
    * @param propertyToBeCopied
    *          the Property we want to copy
    */
-  public CustomProperty(CustomProperty propertyToBeCopied) {
+  public CustomProperty(ICustomProperty propertyToBeCopied) {
     this.type = propertyToBeCopied.getType();
     this.value = propertyToBeCopied.getAsString();
   }
