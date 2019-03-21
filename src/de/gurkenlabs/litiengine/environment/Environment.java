@@ -1037,6 +1037,9 @@ public final class Environment implements IRenderable {
   }
 
   public Collection<IEntity> load(final IMapObject mapObject) {
+    if (mapObject == null) {
+      return null;
+    }
     IMapObjectLoader loader = null;
     if (mapObject.getType() == null || mapObject.getType().isEmpty()) {
       // this makes it possible to register custom MapObjectLoaders that can handle a MapObject without a type specified

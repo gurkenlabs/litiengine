@@ -6,7 +6,6 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collection;
 
-import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 
@@ -64,8 +63,8 @@ public final class CustomMapObjectLoader extends MapObjectLoader {
   public Collection<IEntity> load(Environment environment, IMapObject mapObject) throws MapObjectException {
     IEntity entity;
     try {
-      if (environment != null) {
-        mapObject.setId(Game.world().environment().getNextMapId());
+      if (mapObject != null && environment != null) {
+        mapObject.setId(environment.getNextMapId());
       }
       entity = invoke.invoke(environment, mapObject);
 
