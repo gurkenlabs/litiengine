@@ -154,10 +154,6 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
       this.objects = new ArrayList<>();
     }
 
-    for (MapObject obj : this.objects) {
-      obj.setLayer(this);
-    }
-
     super.afterUnmarshal(u, parent);
   }
 }

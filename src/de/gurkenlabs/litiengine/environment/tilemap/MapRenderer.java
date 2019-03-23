@@ -7,6 +7,7 @@ import java.awt.Point;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
+import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.graphics.ImageRenderer;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
@@ -14,11 +15,15 @@ import de.gurkenlabs.litiengine.resources.Resources;
 
 public class MapRenderer {
 
-  public static void render(final Graphics2D g, final IMap map, final Rectangle2D viewport, RenderType... renderTypes) {
-    renderLayers(g, map, map, viewport, renderTypes, 1f);
+  public static void render(Graphics2D g, IMap map, Rectangle2D viewport, RenderType... renderTypes) {
+    renderLayers(g, map, map, viewport, null, renderTypes, 1f);
   }
 
-  private static void renderLayers(final Graphics2D g, final IMap map, ILayerList layers, final Rectangle2D viewport, RenderType[] renderTypes, float opacity) {
+  public static void render(final Graphics2D g, final IMap map, final Rectangle2D viewport, Environment env, RenderType... renderTypes) {
+    renderLayers(g, map, map, viewport, env, renderTypes, 1f);
+  }
+
+  private static void renderLayers(final Graphics2D g, final IMap map, ILayerList layers, final Rectangle2D viewport, Environment env, RenderType[] renderTypes, float opacity) {
     for (final ILayer layer : layers.getRenderLayers()) {
       if (layer == null || !shouldBeRendered(layer, renderTypes)) {
         continue;
@@ -30,12 +35,16 @@ public class MapRenderer {
         renderTileLayer(g, (ITileLayer) layer, map, viewport, layerOpacity);
       }
 
+      if (env != null && layer instanceof IMapObjectLayer) {
+        env.renderLayer(g, (IMapObjectLayer) layer, viewport);
+      }
+
       if (layer instanceof IImageLayer) {
         renderImageLayer(g, (IImageLayer) layer, viewport, layerOpacity);
       }
 
       if (layer instanceof IGroupLayer) {
-        renderLayers(g, map, (IGroupLayer)layer, viewport, renderTypes, layerOpacity);
+        renderLayers(g, map, (IGroupLayer)layer, viewport, env, renderTypes, layerOpacity);
       }
     }
   }

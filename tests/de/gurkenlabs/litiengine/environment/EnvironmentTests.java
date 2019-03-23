@@ -430,13 +430,13 @@ public class EnvironmentTests {
 
     assertNotNull(this.testEnvironment.get(123));
     assertNotNull(this.testEnvironment.get("test"));
-    assertEquals(1, this.testEnvironment.getEntities(renderType).size());
+    assertEquals(1, this.testEnvironment.getMiscEntities(renderType).size());
 
     this.testEnvironment.remove(entity);
 
     assertNull(this.testEnvironment.get(123));
     assertNull(this.testEnvironment.get("test"));
-    assertEquals(0, this.testEnvironment.getEntities(renderType).size());
+    assertEquals(0, this.testEnvironment.getMiscEntities(renderType).size());
   }
 
   @Test
