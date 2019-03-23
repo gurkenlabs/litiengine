@@ -103,8 +103,7 @@ public interface IMapOrientation {
   public Shape getEnclosingTileShape(Point2D location, IMap map);
 
   /**
-   * Determines the coordinates of the tile containing the given point, as determined by {@link IMapOrientation#getShape(int, int, IMap)}. If the
-   * point is on the edge separating two tiles, any of those tiles may be used.
+   * Determines the coordinates of the tile containing the given point, as determined by {@link IMapOrientation#getShape(int, int, IMap)}.
    *
    * @param x
    *          The X coordinate to contain
@@ -119,8 +118,7 @@ public interface IMapOrientation {
   public Point getTile(double x, double y, IMap map);
 
   /**
-   * Determines the coordinates of the tile containing the given point, as determined by {@link IMapOrientation#getShape(int, int, IMap)}. If the
-   * point is on the edge separating two tiles, any of those tiles may be used.
+   * Determines the coordinates of the tile containing the given point, as determined by {@link IMapOrientation#getShape(int, int, IMap)}.
    *
    * @param location
    *          The point to contain
