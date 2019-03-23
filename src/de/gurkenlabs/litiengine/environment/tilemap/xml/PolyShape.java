@@ -1,7 +1,6 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.awt.geom.Point2D;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,19 +9,17 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IPolyShape;
 
-public abstract class Polyshape implements IPolyShape, Serializable {
-  private static final long serialVersionUID = -9046398175130339L;
-
+public abstract class PolyShape implements IPolyShape {
   @XmlAttribute
   @XmlJavaTypeAdapter(PolylineAdapter.class)
   private List<Point2D> points;
 
-  public Polyshape() {
+  public PolyShape() {
     super();
     this.points = new ArrayList<>();
   }
 
-  public Polyshape(IPolyShape polyLineToBeCopied) {
+  public PolyShape(IPolyShape polyLineToBeCopied) {
     this();
     if (polyLineToBeCopied == null) {
       return;
