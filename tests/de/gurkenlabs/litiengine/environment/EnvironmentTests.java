@@ -418,7 +418,7 @@ public class EnvironmentTests {
   }
 
   @ParameterizedTest
-  @EnumSource(value = RenderType.class)
+  @EnumSource(RenderType.class)
   public void testEntityByRenderType(RenderType renderType) {
     ICombatEntity entity = mock(ICombatEntity.class);
     when(entity.getMapId()).thenReturn(123);
