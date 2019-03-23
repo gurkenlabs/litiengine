@@ -33,14 +33,14 @@ public class LightSourceMapObjectLoader extends MapObjectLoader {
       return entities;
     }
 
-    String lightType;
+    LightSource.Type lightType;
     switch (lightShape) {
-    case LightSource.RECTANGLE:
-      lightType = LightSource.RECTANGLE;
+    case "rectangle":
+      lightType = LightSource.Type.RECTANGLE;
       break;
-    case LightSource.ELLIPSE:
+    case "ellipse":
     default:
-      lightType = LightSource.ELLIPSE;
+      lightType = LightSource.Type.ELLIPSE;
       break;
     }
 
@@ -53,7 +53,7 @@ public class LightSourceMapObjectLoader extends MapObjectLoader {
     return entities;
   }
 
-  protected LightSource createLightSource(IMapObject mapObject, int intensity, Color color, String lightType, boolean active) {
+  protected LightSource createLightSource(IMapObject mapObject, int intensity, Color color, LightSource.Type lightType, boolean active) {
     return new LightSource(intensity, color, lightType, active);
   }
 }

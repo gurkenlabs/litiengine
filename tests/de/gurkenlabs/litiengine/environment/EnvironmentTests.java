@@ -238,7 +238,7 @@ public class EnvironmentTests {
 
   @Test
   public void testLightSource() {
-    LightSource testLight = new LightSource(100, new Color(255, 255, 255, 100), LightSource.ELLIPSE, true);
+    LightSource testLight = new LightSource(100, new Color(255, 255, 255, 100), LightSource.Type.ELLIPSE, true);
     testLight.setMapId(999);
     testLight.setName("test");
 

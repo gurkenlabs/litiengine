@@ -37,7 +37,6 @@ import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.entities.CollisionEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
-import de.gurkenlabs.litiengine.entities.LightSource;
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
@@ -929,7 +928,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       break;
     case LIGHTSOURCE:
       mo.setValue(MapObjectProperty.LIGHT_COLOR, Color.WHITE);
-      mo.setValue(MapObjectProperty.LIGHT_SHAPE, LightSource.ELLIPSE);
+      mo.setValue(MapObjectProperty.LIGHT_SHAPE, "ellipse");
       mo.setValue(MapObjectProperty.LIGHT_ACTIVE, true);
       break;
     case COLLISIONBOX:

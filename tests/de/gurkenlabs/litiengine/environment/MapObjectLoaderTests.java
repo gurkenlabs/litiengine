@@ -277,7 +277,7 @@ public class MapObjectLoaderTests {
     when(mapObject.getIntValue(MapObjectProperty.LIGHT_INTENSITY, 100)).thenReturn(100);
     when(mapObject.getColorValue(MapObjectProperty.LIGHT_COLOR)).thenReturn(new Color(255, 255, 255, 100));
     when(mapObject.getBoolValue(MapObjectProperty.LIGHT_ACTIVE, true)).thenReturn(true);
-    when(mapObject.getStringValue(MapObjectProperty.LIGHT_SHAPE)).thenReturn(LightSource.ELLIPSE);
+    when(mapObject.getStringValue(MapObjectProperty.LIGHT_SHAPE)).thenReturn("ellipse");
 
     Collection<IEntity> entities = loader.load(this.testEnvironment, mapObject);
     Optional<IEntity> opt = entities.stream().findFirst();
@@ -298,7 +298,7 @@ public class MapObjectLoaderTests {
     assertEquals(Color.WHITE.getGreen(), light.getColor().getGreen());
     assertEquals(100, light.getColor().getAlpha());
     assertEquals(100, light.getIntensity());
-    assertEquals(LightSource.ELLIPSE, light.getLightShapeType());
+    assertEquals(LightSource.Type.ELLIPSE, light.getLightShapeType());
   }
 
   @Test
