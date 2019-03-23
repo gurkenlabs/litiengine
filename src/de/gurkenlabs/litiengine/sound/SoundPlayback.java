@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Future;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
@@ -18,7 +17,8 @@ public abstract class SoundPlayback implements Runnable {
   private FloatControl gainControl;
   private BooleanControl muteControl;
 
-  private Future<?> task = null;
+  private boolean started = false;
+  private volatile boolean cancelled = false;
 
   private final Collection<SoundPlaybackListener> listeners = ConcurrentHashMap.newKeySet();
 
@@ -74,10 +74,11 @@ public abstract class SoundPlayback implements Runnable {
    *           if the audio has already been started
    */
   public synchronized void start() {
-    if (this.task != null) {
+    if (this.started) {
       throw new IllegalStateException("already started");
     }
-    this.task = SoundEngine.EXECUTOR.submit(this);
+    SoundEngine.EXECUTOR.submit(this);
+    this.started = true;
   }
 
   /**
@@ -93,11 +94,11 @@ public abstract class SoundPlayback implements Runnable {
     // math hacks here: we're getting just over half the buffer size, but it needs to be an integral number of sample frames
     len = (this.line.getBufferSize() / len / 2 + 1) * len;
     for (int i = 0; i < data.length; i += this.line.write(data, i, Math.min(len, data.length - i))) {
-      if (this.task.isCancelled()) {
+      if (this.cancelled) {
         return true;
       }
     }
-    return this.task.isCancelled();
+    return this.cancelled;
   }
 
   /**
@@ -107,7 +108,7 @@ public abstract class SoundPlayback implements Runnable {
     this.line.drain();
     synchronized (this) {
       this.line.close();
-      if (!this.task.isCancelled()) {
+      if (!this.cancelled) {
         SoundEvent event = new SoundEvent(this, null);
         for (SoundPlaybackListener listener : this.listeners) {
           listener.finished(event);
@@ -190,19 +191,18 @@ public abstract class SoundPlayback implements Runnable {
   /**
    * Attempts to cancel the playback of this audio. If the playback was successfully cancelled, it will notify listeners.
    */
-  public void cancel() {
-    synchronized (this) {
-      if (this.task == null) {
-        throw new IllegalStateException("not started");
-      }
-      if (this.task.cancel(true)) {
-        this.line.stop();
-        this.line.flush();
-        this.line.close();
-        SoundEvent event = new SoundEvent(this, null);
-        for (SoundPlaybackListener listener : this.listeners) {
-          listener.cancelled(event);
-        }
+  public synchronized void cancel() {
+    if (!this.started) {
+      throw new IllegalStateException("not started");
+    }
+    if (!this.cancelled && this.line.isOpen()) {
+      this.line.stop();
+      this.cancelled = true;
+      this.line.flush();
+      this.line.close();
+      SoundEvent event = new SoundEvent(this, null);
+      for (SoundPlaybackListener listener : this.listeners) {
+        listener.cancelled(event);
       }
     }
   }
