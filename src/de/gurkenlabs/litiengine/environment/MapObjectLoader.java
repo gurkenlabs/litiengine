@@ -3,7 +3,6 @@ package de.gurkenlabs.litiengine.environment;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 
-import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
