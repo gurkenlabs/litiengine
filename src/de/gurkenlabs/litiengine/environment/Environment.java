@@ -18,6 +18,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.Direction;
@@ -64,6 +65,7 @@ import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 public final class Environment implements IRenderable {
   private static final Map<String, IMapObjectLoader> mapObjectLoaders = new ConcurrentHashMap<>();
   private static final String GRAVITY_IDENTIFIER = "GRAVITY";
+  private static final Logger log = Logger.getLogger(Environment.class.getName());
 
   private final Map<Integer, ICombatEntity> combatEntities = new ConcurrentHashMap<>();
   private final Map<Integer, IMobileEntity> mobileEntities = new ConcurrentHashMap<>();
@@ -166,10 +168,22 @@ public final class Environment implements IRenderable {
     if (entity == null) {
       return;
     }
-
+    int desiredID = entity.getMapId();
     // set local map id if none is set for the entity
-    if (entity.getMapId() == 0) {
+    if (desiredID == 0) {
       entity.setMapId(this.getLocalMapId());
+      log.info(() -> String.format("Entity [%s] was assigned a local mapID.", entity));
+    }
+    // set a new global map id on the entity and the underlying mapObject if the mapObject's id was already present.
+    else if (this.getAllMapIDs().contains(desiredID)) {
+      for (IMapObject obj : this.getMap().getMapObjects(desiredID)) {
+        if (obj.getBoundingBox().equals(entity.getBoundingBox())) {
+          int newID = this.getNextMapId();
+          obj.setId(newID);
+          entity.setMapId(newID);
+          log.warning(() -> String.format("Entity %s and the corresponding MapObject were assigned a new mapID because their ID #%d wasn\'t unique.", entity, desiredID));
+        }
+      }
     }
 
     if (entity instanceof Emitter) {
@@ -721,9 +735,7 @@ public final class Environment implements IRenderable {
       Game.window().getRenderComponent().setBackground(Color.BLACK);
     }
 
-    for (final IEntity entity : this.getEntities()) {
-      this.load(entity);
-    }
+    this.getEntities().stream().forEach(this::load);
 
     this.loaded = true;
     this.fireEvent(l -> l.loaded(this));
@@ -1026,6 +1038,9 @@ public final class Environment implements IRenderable {
   }
 
   public Collection<IEntity> load(final IMapObject mapObject) {
+    if (mapObject == null) {
+      return null;
+    }
     IMapObjectLoader loader = null;
     if (mapObject.getType() == null || mapObject.getType().isEmpty()) {
       // this makes it possible to register custom MapObjectLoaders that can handle a MapObject without a type specified
@@ -1112,6 +1127,10 @@ public final class Environment implements IRenderable {
   private void addStaticShadows() {
     final Color color = this.getMap().getColorValue(MapProperty.SHADOWCOLOR, StaticShadow.DEFAULT_COLOR);
     this.staticShadowLayer = new StaticShadowLayer(this, color);
+  }
+
+  public Collection<Integer> getAllMapIDs() {
+    return this.getEntities().stream().map(IEntity::getMapId).collect(Collectors.toList());
   }
 
   private static void dispose(final Collection<? extends IEntity> entities) {

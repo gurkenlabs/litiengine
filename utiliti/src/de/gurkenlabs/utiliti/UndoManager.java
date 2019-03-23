@@ -16,6 +16,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
+import de.gurkenlabs.utiliti.components.EditorScreen;
 import de.gurkenlabs.utiliti.components.MapComponent;
 
 public class UndoManager {
@@ -175,9 +176,13 @@ public class UndoManager {
   }
 
   public void mapObjectChanged(IMapObject mapObject) {
+    if (mapObject == null) {
+      return;
+    }
+
     this.mapObjectChanged(mapObject, mapObject.getId());
   }
-  
+
   /**
    * This method overload is only used for when the ID of a map object was
    * changed.
@@ -234,13 +239,14 @@ public class UndoManager {
   }
 
   /**
-   * This method is used to mark the current map as changed/unsaved which is mainly 
-   * useful when something other than a <code>MapObject</code> changed (e.g. a layer).
+   * This method is used to mark the current map as changed/unsaved which is
+   * mainly useful when something other than a <code>MapObject</code> changed
+   * (e.g. a layer).
    */
   public void recordChanges() {
     fireUndoStackChangedEvent(this);
   }
-  
+
   public static void onUndoStackChanged(Consumer<UndoManager> cons) {
     undoStackChangedConsumers.add(cons);
   }
@@ -261,7 +267,7 @@ public class UndoManager {
     return false;
   }
 
-  static void save(IMap map) {
+  public static void save(IMap map) {
     if (instance.containsKey(map.getName())) {
       instance.get(map.getName()).saved = true;
     }

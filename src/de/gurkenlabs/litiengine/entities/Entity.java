@@ -44,6 +44,7 @@ public abstract class Entity implements IEntity {
   private final ICustomPropertyProvider properties;
 
   private Environment environment;
+  private boolean loaded;
 
   private double angle;
 
@@ -382,14 +383,12 @@ public abstract class Entity implements IEntity {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
+    sb.append("#" + this.getMapId() + ": ");
     if (this.getName() != null && !this.getName().isEmpty()) {
       sb.append(this.getName());
     } else {
       sb.append(this.getClass().getSimpleName());
     }
-
-    sb.append(" #");
-    sb.append(this.getMapId());
     return sb.toString();
   }
 
@@ -401,6 +400,7 @@ public abstract class Entity implements IEntity {
   @Override
   public void loaded(Environment environment) {
     this.environment = environment;
+    this.loaded = true;
 
     for (EntityListener listener : this.listeners) {
       listener.loaded(this, this.getEnvironment());
@@ -409,12 +409,19 @@ public abstract class Entity implements IEntity {
 
   @Override
   public void removed(Environment environment) {
+    this.loaded = false;
+
     for (EntityListener listener : this.listeners) {
       listener.removed(this, this.getEnvironment());
     }
 
     // set to null after informing the listeners so they can still access the environment instance
     this.environment = null;
+  }
+
+  @Override
+  public boolean isLoaded() {
+    return this.loaded;
   }
 
   protected EntityControllers getControllers() {

@@ -20,10 +20,10 @@ import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
 public class GroupLayer extends Layer implements IGroupLayer {
 
   @XmlElements({
-    @XmlElement(name = "imagelayer", type = ImageLayer.class),
-    @XmlElement(name = "layer", type = TileLayer.class),
-    @XmlElement(name = "objectgroup", type = MapObjectLayer.class),
-    @XmlElement(name = "group", type = GroupLayer.class)
+      @XmlElement(name = "imagelayer", type = ImageLayer.class),
+      @XmlElement(name = "layer", type = TileLayer.class),
+      @XmlElement(name = "objectgroup", type = MapObjectLayer.class),
+      @XmlElement(name = "group", type = GroupLayer.class)
   })
   private List<ILayer> layers;
 
@@ -52,7 +52,7 @@ public class GroupLayer extends Layer implements IGroupLayer {
     this.layers.add(layer);
     this.layerAdded(layer);
     if (layer instanceof Layer) {
-      ((Layer)layer).setMap((Map)this.getMap());
+      ((Layer) layer).setMap((Map) this.getMap());
     }
   }
 
@@ -61,7 +61,7 @@ public class GroupLayer extends Layer implements IGroupLayer {
     this.layers.add(index, layer);
     this.layerAdded(layer);
     if (layer instanceof Layer) {
-      ((Layer)layer).setMap((Map)this.getMap());
+      ((Layer) layer).setMap((Map) this.getMap());
     }
   }
 
@@ -70,7 +70,7 @@ public class GroupLayer extends Layer implements IGroupLayer {
     this.layers.remove(layer);
     this.layerRemoved(layer);
     if (layer instanceof Layer) {
-      ((Layer)layer).setMap(null);
+      ((Layer) layer).setMap(null);
     }
   }
 
@@ -79,7 +79,7 @@ public class GroupLayer extends Layer implements IGroupLayer {
     ILayer removed = this.layers.remove(index);
     this.layerRemoved(removed);
     if (removed != null && removed instanceof Layer) {
-      ((Layer)removed).setMap(null);
+      ((Layer) removed).setMap(null);
     }
   }
 
@@ -100,16 +100,16 @@ public class GroupLayer extends Layer implements IGroupLayer {
 
   private void layerAdded(ILayer layer) {
     if (layer instanceof ITileLayer) {
-      this.rawTileLayers.add((ITileLayer)layer);
+      this.rawTileLayers.add((ITileLayer) layer);
     }
     if (layer instanceof IMapObjectLayer) {
-      this.rawMapObjectLayers.add((IMapObjectLayer)layer);
+      this.rawMapObjectLayers.add((IMapObjectLayer) layer);
     }
     if (layer instanceof IImageLayer) {
-      this.rawImageLayers.add((IImageLayer)layer);
+      this.rawImageLayers.add((IImageLayer) layer);
     }
     if (layer instanceof IGroupLayer) {
-      this.rawGroupLayers.add((IGroupLayer)layer);
+      this.rawGroupLayers.add((IGroupLayer) layer);
     }
   }
 
@@ -142,6 +142,24 @@ public class GroupLayer extends Layer implements IGroupLayer {
           mapObjects.add(mapObject);
         }
       }
+    }
+
+    return mapObjects;
+  }
+
+  @Override
+  public Collection<IMapObject> getMapObjects(int... mapIDs) {
+    List<IMapObject> mapObjects = new ArrayList<>();
+    if (this.getMapObjectLayers() == null || this.getMapObjectLayers().isEmpty()) {
+      return mapObjects;
+    }
+
+    for (IMapObjectLayer layer : this.getMapObjectLayers()) {
+      if (layer == null) {
+        continue;
+      }
+
+      mapObjects.addAll(layer.getMapObjects(mapIDs));
     }
 
     return mapObjects;

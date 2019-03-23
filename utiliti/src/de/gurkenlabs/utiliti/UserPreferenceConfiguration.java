@@ -17,11 +17,10 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
   private boolean snapGrid;
   private boolean renderBoundingBoxes;
   private boolean renderCustomMapObjects;
+  private boolean renderMapIds;
   private boolean compressFile;
   private boolean syncMaps;
   private int frameState;
-  private int gridWidth;
-  private int gridHeight;
   private int mainSplitter;
   private int selectionEditSplitter;
   private int mapPanelSplitter;
@@ -31,10 +30,10 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
   private int height;
 
   private float gridLineWidth;
+  private String gridColor;
 
   private String lastGameFile;
   private String[] lastOpenedFiles;
-  private String gridColor;
 
   public UserPreferenceConfiguration() {
     this.zoom = 1.0f;
@@ -44,10 +43,8 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
     this.renderBoundingBoxes = true;
     this.lastOpenedFiles = new String[10];
     this.compressFile = false;
-    this.gridWidth = 16;
-    this.gridHeight = 16;
     this.gridLineWidth = 1.0f;
-    this.gridColor = ColorHelper.encode(new Color(255, 255, 255, 65));
+    this.gridColor = ColorHelper.encode(Style.COLOR_DEFAULT_GRID);
   }
 
   public void addOpenedFile(String str) {
@@ -123,6 +120,14 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
     this.renderCustomMapObjects = renderCustomMapObjects;
   }
 
+  public boolean isRenderMapIds() {
+    return this.renderMapIds;
+  }
+
+  public void setRenderMapIds(boolean renderIds) {
+    this.renderMapIds = renderIds;
+  }
+
   public String getLastGameFile() {
     return this.lastGameFile;
   }
@@ -147,20 +152,12 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
     this.compressFile = compressFile;
   }
 
-  public int getGridWidth() {
-    return this.gridWidth;
-  }
-
-  public int getGridHeight() {
-    return this.gridHeight;
-  }
-
   public float getGridLineWidth() {
     return this.gridLineWidth;
   }
 
-  public String getGridColor() {
-    return this.gridColor;
+  public Color getGridColor() {
+    return ColorHelper.decode(this.gridColor);
   }
 
   public void setGridLineWidth(float gridLineWidth) {
@@ -169,14 +166,6 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
 
   public void setGridColor(String gridColor) {
     this.gridColor = gridColor;
-  }
-
-  public void setGridWidth(int gridwidth) {
-    this.gridWidth = gridwidth;
-  }
-
-  public void setGridHeight(int gridHeight) {
-    this.gridHeight = gridHeight;
   }
 
   public boolean isSyncMaps() {

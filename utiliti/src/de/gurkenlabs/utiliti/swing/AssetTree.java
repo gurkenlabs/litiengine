@@ -15,9 +15,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
 import de.gurkenlabs.litiengine.resources.ResourceBundle;
 import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.utiliti.EditorScreen;
-import de.gurkenlabs.utiliti.Icons;
 import de.gurkenlabs.utiliti.Program;
+import de.gurkenlabs.utiliti.components.EditorScreen;
 import de.gurkenlabs.utiliti.swing.panels.CreaturePanel;
 
 @SuppressWarnings("serial")

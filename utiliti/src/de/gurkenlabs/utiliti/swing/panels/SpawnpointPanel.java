@@ -9,7 +9,7 @@ import javax.swing.JTextField;
 import de.gurkenlabs.litiengine.Direction;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
-import de.gurkenlabs.utiliti.Icons;
+import de.gurkenlabs.utiliti.swing.Icons;
 
 @SuppressWarnings("serial")
 public class SpawnpointPanel extends PropertyPanel {

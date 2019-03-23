@@ -69,7 +69,7 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
 
     mapObject.getProperties().forEach((name, property) -> {
       if (MapObjectProperty.isCustom(name)) {
-       entity.getProperties().setValue(name, property);
+        entity.getProperties().setValue(name, property);
       }
     });
   }

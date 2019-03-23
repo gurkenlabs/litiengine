@@ -6,6 +6,7 @@ import java.util.List;
 
 import de.gurkenlabs.litiengine.entities.ai.IBehaviorController;
 import de.gurkenlabs.litiengine.environment.Environment;
+import de.gurkenlabs.litiengine.environment.GameWorld;
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
@@ -26,7 +27,7 @@ public interface IEntity {
   public void removeListener(EntityListener listener);
 
   public double getAngle();
-  
+
   /**
    * Sets the angle (in degrees) in which the entity is directed.
    *
@@ -57,7 +58,9 @@ public interface IEntity {
 
   /**
    * Performs an <code>EntityAction</code> that was previously registered for this entity.
-   * <p><i>Does nothing in case no action has been registered for the specified <code>actionName</code>.</i></p>
+   * <p>
+   * <i>Does nothing in case no action has been registered for the specified <code>actionName</code>.</i>
+   * </p>
    * 
    * @param actionName
    *          The name of the action to be performed.
@@ -183,4 +186,15 @@ public interface IEntity {
    * @see IEntity#addListener(EntityListener)
    */
   public void removed(Environment environment);
+
+  /**
+   * Indicates whether this entity is loaded on the currently active environment.
+   * 
+   * @return True if the entity is loaded on the game's currently active environment; otherwise false.
+   * 
+   * @see GameWorld#environment()
+   * @see IEntity#loaded(Environment)
+   * @see IEntity#removed(Environment)
+   */
+  public boolean isLoaded();
 }

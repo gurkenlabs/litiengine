@@ -15,31 +15,34 @@ import de.gurkenlabs.litiengine.resources.Resources;
 public class MapRenderer {
 
   public static void render(final Graphics2D g, final IMap map, final Rectangle2D viewport, RenderType... renderTypes) {
-    renderLayers(g, map, map, viewport, renderTypes);
+    renderLayers(g, map, map, viewport, renderTypes, 1f);
   }
 
-  private static void renderLayers(final Graphics2D g, final IMap map, ILayerList layers, final Rectangle2D viewport, RenderType[] renderTypes) {
+  private static void renderLayers(final Graphics2D g, final IMap map, ILayerList layers, final Rectangle2D viewport, RenderType[] renderTypes, float opacity) {
     for (final ILayer layer : layers.getRenderLayers()) {
       if (layer == null || !shouldBeRendered(layer, renderTypes)) {
         continue;
       }
 
+      float layerOpacity = layer.getOpacity() * opacity;
+
       if (layer instanceof ITileLayer) {
-        renderTileLayerImage(g, (ITileLayer) layer, map, viewport);
+        renderTileLayer(g, (ITileLayer) layer, map, viewport, layerOpacity);
       }
 
       if (layer instanceof IImageLayer) {
-        renderImageLayer(g, (IImageLayer) layer, viewport);
+        renderImageLayer(g, (IImageLayer) layer, viewport, layerOpacity);
       }
 
       if (layer instanceof IGroupLayer) {
-        renderLayers(g, map, (IGroupLayer)layer, viewport, renderTypes);
+        renderLayers(g, map, (IGroupLayer)layer, viewport, renderTypes, layerOpacity);
       }
     }
   }
 
-  private static void renderTileLayerImage(final Graphics2D g, final ITileLayer layer, final IMap map, final Rectangle2D viewport) {
+  private static void renderTileLayer(final Graphics2D g, final ITileLayer layer, final IMap map, final Rectangle2D viewport, float opacity) {
     // TODO: possibly implement the same render order that Tiled uses for staggered maps: undo the staggering, and then render it right-down
+    g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
     if (map.getRenderOrder().btt) {
       for (int y = map.getHeight() - 1; y >= 0; y--) {
         drawRow(g, layer, y, map, viewport);
@@ -98,18 +101,18 @@ public class MapRenderer {
     return layer.isVisible() && layer.getOpacity() > 0f;
   }
 
-  protected static void renderImageLayer(Graphics2D g, IImageLayer layer, Rectangle2D viewport) {
+  protected static void renderImageLayer(Graphics2D g, IImageLayer layer, Rectangle2D viewport, float opacity) {
     Spritesheet sprite = Resources.spritesheets().get(layer.getImage().getSource());
     if (sprite == null) {
       return;
     }
 
     final Composite oldComp = g.getComposite();
-    final AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, layer.getOpacity());
+    final AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity);
     g.setComposite(ac);
 
-    final double viewportOffsetX = -viewport.getX() + layer.getOffset().x;
-    final double viewportOffsetY = -viewport.getY() + layer.getOffset().y;
+    final double viewportOffsetX = layer.getOffset().x - viewport.getX();
+    final double viewportOffsetY = layer.getOffset().y - viewport.getY();
 
     ImageRenderer.render(g, sprite.getImage(), viewportOffsetX, viewportOffsetY);
     g.setComposite(oldComp);

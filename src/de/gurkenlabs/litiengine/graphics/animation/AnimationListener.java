@@ -12,7 +12,7 @@ public interface AnimationListener extends EventListener {
    * @param animation
    *          The animation that is now played.
    */
-  public void played(Animation animation);
+  public default void played(Animation animation) {}
 
   /**
    * Called when the specified animation has finished playing.
@@ -20,5 +20,5 @@ public interface AnimationListener extends EventListener {
    * @param animation
    *          The animation that has just finished playing.
    */
-  public void finished(Animation animation);
+  public default void finished(Animation animation) {}
 }

@@ -1,7 +1,6 @@
 package de.gurkenlabs.utiliti.swing.dialogs;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
@@ -43,6 +42,7 @@ import de.gurkenlabs.litiengine.util.Imaging;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.io.Codec;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
+import de.gurkenlabs.utiliti.Style;
 
 @SuppressWarnings("serial")
 public class SpritesheetImportPanel extends JPanel implements IUpdateable {
@@ -452,7 +452,7 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
 
       Graphics2D g = (Graphics2D) img.getGraphics();
       g.drawImage(scaled, 0, 0, null);
-      g.setColor(new Color(255, 0, 0, 180));
+      g.setColor(Style.COLOR_COLLISION_BORDER);
       for (int i = 1; i < cols; i++) {
         g.drawLine(i * scaledWidth, 0, i * scaledWidth, scaled.getHeight() - 1);
       }

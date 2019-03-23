@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.GameListener;
 
 /**
  * An abstract implementation for all classes that provide a certain type of resources.
@@ -39,7 +40,12 @@ public abstract class ResourcesContainer<T> {
   private final List<ResourcesContainerClearedListener> clearedListeners = new CopyOnWriteArrayList<>();
 
   static {
-    Game.addGameTerminatedListener(ASYNC_POOL::shutdownNow);
+    Game.addGameListener(new GameListener() {
+      @Override
+      public void terminated() {
+        ASYNC_POOL.shutdownNow();
+      }
+    });
   }
 
   /**

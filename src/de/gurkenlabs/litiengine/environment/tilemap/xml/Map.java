@@ -50,7 +50,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
   private static final Logger log = Logger.getLogger(Map.class.getName());
   private static final long serialVersionUID = 402776584608365440L;
-  private static final int[] MAX_SUPPORTED_VERSION = { 1, 2, 1 };
+  private static final int[] MAX_SUPPORTED_VERSION = { 1, 2, 2 };
 
   @XmlAttribute
   private double version;
@@ -287,6 +287,24 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
       }
 
       mapObjects.addAll(layer.getMapObjects(types));
+    }
+
+    return mapObjects;
+  }
+
+  @Override
+  public Collection<IMapObject> getMapObjects(int... mapIDs) {
+    List<IMapObject> mapObjects = new ArrayList<>();
+    if (this.getMapObjectLayers() == null || this.getMapObjectLayers().isEmpty() || mapIDs.length == 0) {
+      return mapObjects;
+    }
+
+    for (IMapObjectLayer layer : this.getMapObjectLayers()) {
+      if (layer == null) {
+        continue;
+      }
+
+      mapObjects.addAll(layer.getMapObjects(mapIDs));
     }
 
     return mapObjects;

@@ -21,8 +21,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.utiliti.EditorScreen;
 import de.gurkenlabs.utiliti.Program;
+import de.gurkenlabs.utiliti.components.EditorScreen;
 import de.gurkenlabs.utiliti.swing.TagPanel;
 
 @SuppressWarnings("serial")
@@ -166,6 +166,9 @@ public class MapObjectPanel extends PropertyPanel {
   }
 
   private void switchPanel(MapObjectType type) {
+    if (type == null) {
+      return;
+    }
     PropertyPanel panel = this.panels.get(type);
     if (panel == null) {
       if (this.currentPanel != null) {

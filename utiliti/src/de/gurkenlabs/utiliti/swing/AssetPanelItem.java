@@ -52,11 +52,12 @@ import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.litiengine.sound.SoundFormat;
 import de.gurkenlabs.litiengine.util.io.Codec;
 import de.gurkenlabs.litiengine.util.io.ImageSerializer;
-import de.gurkenlabs.utiliti.EditorScreen;
-import de.gurkenlabs.utiliti.Icons;
 import de.gurkenlabs.utiliti.Program;
+import de.gurkenlabs.utiliti.Style;
 import de.gurkenlabs.utiliti.UndoManager;
+import de.gurkenlabs.utiliti.components.EditorScreen;
 import de.gurkenlabs.utiliti.swing.dialogs.SpritesheetImportPanel;
+import de.gurkenlabs.utiliti.swing.dialogs.XmlExportDialog;
 import de.gurkenlabs.utiliti.swing.panels.CreaturePanel;
 import de.gurkenlabs.utiliti.swing.panels.PropPanel;
 
@@ -83,7 +84,7 @@ public class AssetPanelItem extends JPanel {
   public AssetPanelItem(Object origin) {
     setPreferredSize(new Dimension(100, 100));
     this.origin = origin;
-    this.setBackground(AssetPanel.BACKGROUND);
+    this.setBackground(Style.COLOR_ASSETPANEL_BACKGROUND);
     this.setBorder(normalBorder);
 
     this.getInputMap(JPanel.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deleteAsset");
@@ -129,7 +130,7 @@ public class AssetPanelItem extends JPanel {
       @Override
       public void focusLost(FocusEvent e) {
         UIDefaults defaults = UIManager.getDefaults();
-        setBackground(AssetPanel.BACKGROUND);
+        setBackground(Style.COLOR_ASSETPANEL_BACKGROUND);
         setForeground(defaults.getColor("Tree.foreground"));
         textField.setForeground(Color.WHITE);
         setBorder(normalBorder);

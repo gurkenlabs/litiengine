@@ -1,10 +1,9 @@
-package de.gurkenlabs.utiliti;
+package de.gurkenlabs.utiliti.components;
 
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
@@ -48,7 +47,6 @@ import de.gurkenlabs.litiengine.graphics.TextRenderer;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.CustomEmitter;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.litiengine.gui.screens.Screen;
-import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.resources.ResourceBundle;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.resources.SoundResource;
@@ -59,12 +57,15 @@ import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import de.gurkenlabs.litiengine.util.io.ImageSerializer;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
-import de.gurkenlabs.utiliti.components.EditorComponent;
+import de.gurkenlabs.utiliti.Cursors;
+import de.gurkenlabs.utiliti.Program;
+import de.gurkenlabs.utiliti.Style;
+import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.components.EditorComponent.ComponentType;
-import de.gurkenlabs.utiliti.components.MapComponent;
-import de.gurkenlabs.utiliti.swing.EditorFileChooser;
-import de.gurkenlabs.utiliti.swing.XmlImportDialog;
+import de.gurkenlabs.utiliti.swing.MapSelectionPanel;
+import de.gurkenlabs.utiliti.swing.dialogs.EditorFileChooser;
 import de.gurkenlabs.utiliti.swing.dialogs.SpritesheetImportPanel;
+import de.gurkenlabs.utiliti.swing.dialogs.XmlImportDialog;
 import de.gurkenlabs.utiliti.swing.panels.MapObjectPanel;
 
 public class EditorScreen extends Screen {
@@ -78,10 +79,6 @@ public class EditorScreen extends Screen {
   private static final String AUDIO_FILE_NAME = "Audio File";
   private static final String SPRITESHEET_FILE_NAME = "Spritesheet Image";
   private static final String TEXTUREATLAS_FILE_NAME = "Texture Atlas XML (generic)";
-
-  public static final Color COLLISION_COLOR = new Color(255, 0, 0, 125);
-  public static final Color BOUNDINGBOX_COLOR = new Color(0, 0, 255, 125);
-  public static final Color COMPONENTBACKGROUND_COLOR = new Color(100, 100, 100, 125);
 
   private static EditorScreen instance;
 
@@ -161,11 +158,11 @@ public class EditorScreen extends Screen {
 
     g.setFont(Program.TEXT_FONT);
     g.setColor(Color.WHITE);
-    Point tile = Input.mouse().getTile();
-
-    TextRenderer.render(g, "x: " + (int) Input.mouse().getMapLocation().getX() + " y: " + (int) Input.mouse().getMapLocation().getY() + " tile: [" + tile.x + ", " + tile.y + "]" + " zoom: " + (int) (Game.world().camera().getRenderScale() * 100) + " %", 10,
-        Game.window().getResolution().getHeight() - 40);
     TextRenderer.render(g, Game.metrics().getFramesPerSecond() + " FPS", 10, Game.window().getResolution().getHeight() - 20);
+
+    if (Game.loop().getTicks() % 4 == 0) {
+      Program.updateStatusBar();
+    }
 
     // render status
     if (this.currentStatus != null && !this.currentStatus.isEmpty()) {
@@ -179,7 +176,7 @@ public class EditorScreen extends Screen {
       if (deltaTime > fadeOutTime) {
         double fade = deltaTime - fadeOutTime;
         int alpha = (int) (255 - (fade / (STATUS_DURATION - fadeOutTime)) * 255);
-        g.setColor(new Color(255, 255, 255, MathUtilities.clamp(alpha, 0, 255)));
+        g.setColor(new Color(Style.COLOR_STATUS.getRed(), Style.COLOR_STATUS.getGreen(), Style.COLOR_STATUS.getBlue(), MathUtilities.clamp(alpha, 0, 255)));
       }
 
       Font old = g.getFont();
@@ -281,7 +278,7 @@ public class EditorScreen extends Screen {
     }
 
     final long currentTime = System.nanoTime();
-    Game.window().getRenderComponent().setCursor(Program.CURSOR_LOAD, 0, 0);
+    Game.window().getRenderComponent().setCursor(Cursors.LOAD, 0, 0);
     Game.window().getRenderComponent().setCursorOffsetX(0);
     Game.window().getRenderComponent().setCursorOffsetY(0);
 
@@ -327,7 +324,7 @@ public class EditorScreen extends Screen {
       log.log(Level.INFO, "{0} emitters loaded from {1}", new Object[] { this.getGameFile().getEmitters().size(), this.currentResourceFile });
       log.log(Level.INFO, "{0} blueprints loaded from {1}", new Object[] { this.getGameFile().getBluePrints().size(), this.currentResourceFile });
       log.log(Level.INFO, "{0} sounds loaded from {1}", new Object[] { this.getGameFile().getSounds().size(), this.currentResourceFile });
-      
+
       for (Map map : this.mapComponent.getMaps()) {
         this.loadSpriteSheets(map);
       }
@@ -347,7 +344,7 @@ public class EditorScreen extends Screen {
       this.changeComponent(ComponentType.MAP);
       this.setCurrentStatus(Resources.strings().get("status_gamefile_loaded"));
     } finally {
-      Game.window().getRenderComponent().setCursor(Program.CURSOR, 0, 0);
+      Game.window().getRenderComponent().setCursor(Cursors.DEFAULT, 0, 0);
       log.log(Level.INFO, "Loading gamefile {0} took: {1} ms", new Object[] { gameFile, (System.nanoTime() - currentTime) / 1000000.0 });
       this.loading = false;
     }
@@ -498,16 +495,16 @@ public class EditorScreen extends Screen {
 
   public void importTilesets() {
     XmlImportDialog.importXml("Tilesets", file -> {
-      URL location;
       Tileset tileset;
       try {
-        location = file.toURI().toURL();
-        tileset = XmlUtilities.readFromFile(Tileset.class, location);
-        tileset.finish(location);
+        URL path = file.toURI().toURL();
+        tileset = XmlUtilities.readFromFile(Tileset.class, file.toURI().toURL());
+        tileset.finish(path);
       } catch (JAXBException | MalformedURLException | MissingTmxResourceException e) {
         log.log(Level.SEVERE, "could not load tileset from " + file, e);
         return;
       }
+
 
       if (this.gameFile.getTilesets().stream().anyMatch(x -> x.getName().equals(tileset.getName()))) {
         int result = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), Resources.strings().get("import_tileset_title", tileset.getName()), Resources.strings().get("import_tileset_title"), JOptionPane.YES_NO_OPTION);

@@ -1,4 +1,4 @@
-package de.gurkenlabs.utiliti.swing;
+package de.gurkenlabs.utiliti.swing.dialogs;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,7 +13,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
-import de.gurkenlabs.utiliti.EditorScreen;
+import de.gurkenlabs.utiliti.components.EditorScreen;
 
 public final class XmlExportDialog {
   private static final Logger log = Logger.getLogger(XmlExportDialog.class.getName());

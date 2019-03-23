@@ -37,7 +37,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.UndoManager;
-import de.gurkenlabs.utiliti.components.TextList;
+import de.gurkenlabs.utiliti.swing.TextList;
 
 @SuppressWarnings("serial")
 public abstract class PropertyPanel extends JPanel {

@@ -26,7 +26,6 @@ import de.gurkenlabs.litiengine.graphics.animation.CreatureAnimationController;
 import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.Imaging;
-import de.gurkenlabs.utiliti.Icons;
 
 public class IconTreeListRenderer implements TreeCellRenderer {
 
@@ -115,6 +114,10 @@ public class IconTreeListRenderer implements TreeCellRenderer {
       return Imaging.scale(sprites.iterator().next().getSprite(0), 16, 16, true);
     });
 
+    if(propImag == null) {
+      return null;
+    }
+    
     return new ImageIcon(propImag);
   }
 }

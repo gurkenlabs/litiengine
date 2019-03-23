@@ -337,6 +337,10 @@ public class LightSource extends Entity implements IRenderable {
   }
 
   private void updateAmbientLayers() {
+    if (!this.isLoaded()) {
+      return;
+    }
+
     if (Game.world().environment() != null && Game.world().environment().getAmbientLight() != null) {
       Game.world().environment().getAmbientLight().updateSection(this.getBoundingBox());
     }

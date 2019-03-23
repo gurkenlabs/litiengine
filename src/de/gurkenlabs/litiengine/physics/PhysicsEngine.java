@@ -185,7 +185,7 @@ public final class PhysicsEngine implements IUpdateable {
    * @param rect
    *          The rectangle to check the collision for.
    * @param collisionEntity
-   *          The entity to check the collision for.
+   *          The entity on which this collision check is based on.
    * @return Returns true if the specified rectangle collides with any collision
    *         box of the specified type(s); otherwise false.
    */
@@ -246,10 +246,10 @@ public final class PhysicsEngine implements IUpdateable {
   }
 
   public RaycastHit raycast(Point2D point, double angle) {
-    double diameter = GeometricUtilities.getDiagonal(this.environmentBounds); 
+    double diameter = GeometricUtilities.getDiagonal(this.environmentBounds);
     return raycast(point, GeometricUtilities.project(point, angle, diameter));
   }
-  
+
   public RaycastHit raycast(Point2D start, Point2D target) {
     return raycast(start, target, Collision.ANY);
   }

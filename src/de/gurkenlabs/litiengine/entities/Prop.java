@@ -140,16 +140,14 @@ public class Prop extends CombatEntity {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
+    sb.append("#" + this.getMapId() + ": ");
     if (this.getName() != null && !this.getName().isEmpty()) {
       sb.append(this.getName());
     } else {
       sb.append(Prop.class.getSimpleName());
     }
-    sb.append(" (");
-    sb.append(this.getSpritesheetName());
+    sb.append(" (" + this.getSpritesheetName() + ")");
 
-    sb.append(") #");
-    sb.append(this.getMapId());
     return sb.toString();
   }
 

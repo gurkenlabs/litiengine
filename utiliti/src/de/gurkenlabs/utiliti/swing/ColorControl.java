@@ -1,4 +1,4 @@
-package de.gurkenlabs.utiliti.components;
+package de.gurkenlabs.utiliti.swing;
 
 import java.awt.Color;
 import java.awt.event.ActionListener;

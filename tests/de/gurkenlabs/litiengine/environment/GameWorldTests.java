@@ -34,7 +34,7 @@ public class GameWorldTests {
     Status map2Loaded = new Status();
     Status map2Initialized = new Status();
 
-    Game.world().addListener("test-map", new EnvironmentAdapter() {
+    Game.world().addListener("test-map", new EnvironmentListener() {
       @Override
       public void initialized(Environment environment) {
         mapInitialized.wasCalled = true;
@@ -56,7 +56,7 @@ public class GameWorldTests {
       }
     });
 
-    Game.world().addListener("test-mapobject", new EnvironmentAdapter() {
+    Game.world().addListener("test-mapobject", new EnvironmentListener() {
 
       @Override
       public void initialized(Environment environment) {
