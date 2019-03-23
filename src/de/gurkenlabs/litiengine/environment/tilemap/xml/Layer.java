@@ -220,8 +220,7 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
     this.parentMap = map;
   }
 
-  @SuppressWarnings("unused")
-  private void afterUnmarshal(Unmarshaller u, Object parent) {
+  protected void afterUnmarshal(Unmarshaller u, Object parent) {
     if (parent instanceof Map) {
       this.parentMap = (Map) parent;
     }

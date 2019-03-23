@@ -2,15 +2,11 @@ package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -24,8 +20,6 @@ import de.gurkenlabs.litiengine.util.ColorHelper;
  * The Class ShapeLayer.
  */
 public class MapObjectLayer extends Layer implements IMapObjectLayer {
-
-  private static final Logger log = Logger.getLogger(MapObjectLayer.class.getName());
 
   /** The objects. */
   @XmlElement(name = "object")
@@ -154,7 +148,8 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
     return objs;
   }
 
-  void afterUnmarshal(Unmarshaller u, Object parent) {
+  @Override
+  protected void afterUnmarshal(Unmarshaller u, Object parent) {
     if (this.objects == null) {
       this.objects = new ArrayList<>();
     }
@@ -163,13 +158,6 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
       obj.setLayer(this);
     }
 
-    Method m;
-    try {
-      m = getClass().getSuperclass().getDeclaredMethod("afterUnmarshal", Unmarshaller.class, Object.class);
-      m.setAccessible(true);
-      m.invoke(this, u, parent);
-    } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-      log.log(Level.SEVERE, e.getMessage(), e);
-    }
+    super.afterUnmarshal(u, parent);
   }
 }
