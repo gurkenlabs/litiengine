@@ -29,11 +29,14 @@ public class TilesetEntry extends CustomPropertyProvider implements ITilesetEntr
   @XmlAttribute
   private String terrain;
 
-  @XmlElement(required = false)
+  @XmlElement
   private Animation animation;
 
   @XmlElement
   private MapImage image;
+
+  @XmlAttribute
+  private String type;
 
   public TilesetEntry() {
   }
@@ -81,6 +84,11 @@ public class TilesetEntry extends CustomPropertyProvider implements ITilesetEntr
   @Override
   public ITileset getTileset() {
     return this.tileset;
+  }
+
+  @Override
+  public String getType() {
+    return this.type;
   }
 
   protected void setTerrains(ITerrain[] terrains) {

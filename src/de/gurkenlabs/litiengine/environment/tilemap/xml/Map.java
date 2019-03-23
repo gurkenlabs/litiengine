@@ -101,7 +101,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   @XmlAttribute(name = "nextlayerid")
   private int nextLayerId;
 
-  @XmlAttribute(required = false)
+  @XmlAttribute
   private String name;
 
   @XmlElement(name = "tileset", type = Tileset.class)

@@ -27,4 +27,6 @@ public interface ITilesetEntry extends ICustomPropertyProvider {
    * @return The tileset for this entry
    */
   public ITileset getTileset();
+
+  public String getType();
 }
