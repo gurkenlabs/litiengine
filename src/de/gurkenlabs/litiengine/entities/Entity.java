@@ -15,7 +15,6 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.annotation.Action;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.annotation.Tag;
-import de.gurkenlabs.litiengine.entities.ai.IBehaviorController;
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
@@ -172,11 +171,6 @@ public abstract class Entity implements IEntity {
   @Override
   public IEntityAnimationController getAnimationController() {
     return this.getController(IEntityAnimationController.class);
-  }
-
-  @Override
-  public IBehaviorController getBehaviorController() {
-    return this.getController(IBehaviorController.class);
   }
 
   @Override

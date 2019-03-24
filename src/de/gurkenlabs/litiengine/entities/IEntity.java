@@ -4,7 +4,6 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
 
-import de.gurkenlabs.litiengine.entities.ai.IBehaviorController;
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.GameWorld;
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
@@ -37,8 +36,6 @@ public interface IEntity {
   public void setAngle(double angle);
 
   public IEntityAnimationController getAnimationController();
-
-  public IBehaviorController getBehaviorController();
 
   public void addController(IEntityController controller);
 
