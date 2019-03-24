@@ -178,7 +178,6 @@ public final class Environment implements IRenderable {
       for (IMapObject obj : this.getMap().getMapObjects(desiredID)) {
         if (obj.getBoundingBox().equals(entity.getBoundingBox())) {
           int newID = this.getNextMapId();
-          obj.setId(newID);
           entity.setMapId(newID);
           log.warning(() -> String.format("Entity %s and the corresponding MapObject were assigned a new mapID because their ID #%d wasn\'t unique.", entity, desiredID));
         }

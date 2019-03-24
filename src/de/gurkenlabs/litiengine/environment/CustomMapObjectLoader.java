@@ -63,11 +63,7 @@ public final class CustomMapObjectLoader extends MapObjectLoader {
   public Collection<IEntity> load(Environment environment, IMapObject mapObject) throws MapObjectException {
     IEntity entity;
     try {
-      if (mapObject != null && environment != null) {
-        mapObject.setId(environment.getNextMapId());
-      }
       entity = invoke.invoke(environment, mapObject);
-
     } catch (ReflectiveOperationException e) {
       throw new MapObjectException(e);
     }
