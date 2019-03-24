@@ -19,6 +19,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -180,14 +181,13 @@ public final class Environment implements IRenderable {
     // set local map id if none is set for the entity
     if (desiredID == 0) {
       entity.setMapId(this.getLocalMapId());
-      log.info(() -> String.format("Entity [%s] was assigned a local mapID.", entity));
+      log.fine(() -> String.format("Entity [%s] was assigned a local mapID.", entity));
     }
     // set a new global map id on the entity and the underlying mapObject if the mapObject's id was already present.
     else if (this.getAllMapIDs().contains(desiredID)) {
       for (IMapObject obj : this.getMap().getMapObjects(desiredID)) {
         if (obj.getBoundingBox().equals(entity.getBoundingBox())) {
           int newID = this.getNextMapId();
-          obj.setId(newID);
           entity.setMapId(newID);
           log.warning(() -> String.format("Entity %s and the corresponding MapObject were assigned a new mapID because their ID #%d wasn\'t unique.", entity, desiredID));
         }
@@ -1063,6 +1063,7 @@ public final class Environment implements IRenderable {
       try {
         loadedEntities = loader.load(this, mapObject);
       } catch (MapObjectException e) {
+        log.log(Level.WARNING, "map object " + mapObject.getId() + " failed to load", e);
         return new ArrayList<>();
       }
       for (IEntity entity : loadedEntities) {
@@ -1109,7 +1110,9 @@ public final class Environment implements IRenderable {
     long renderStart = System.nanoTime();
 
     // 1. Render map layers
-    MapRenderer.render(g, this.getMap(), Game.world().camera().getViewport(), renderType);
+    if (this.getMap() != null) {
+      MapRenderer.render(g, this.getMap(), Game.world().camera().getViewport(), this, renderType);
+    }
 
     // 2. Render renderables
     for (final IRenderable rend : this.getRenderables(renderType)) {
@@ -1132,7 +1135,10 @@ public final class Environment implements IRenderable {
   }
 
   public void renderLayer(Graphics2D g, IMapObjectLayer layer, Rectangle2D viewport) {
-    Game.graphics().renderEntities(g, this.layerEntities.get(layer), layer.getRenderType() == RenderType.NORMAL);
+    List<IEntity> entities = this.layerEntities.get(layer);
+    if (entities != null) {
+      Game.graphics().renderEntities(g, entities, layer.getRenderType() == RenderType.NORMAL);
+    }
   }
 
   private void addAmbientLight() {

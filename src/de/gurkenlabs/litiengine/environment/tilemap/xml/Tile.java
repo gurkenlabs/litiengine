@@ -4,7 +4,7 @@ import java.awt.Point;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
-import java.io.Serializable;
+import java.util.Collections;
 import java.util.Objects;
 
 import javax.xml.bind.Marshaller;
@@ -17,14 +17,13 @@ import de.gurkenlabs.litiengine.environment.tilemap.ITile;
 import de.gurkenlabs.litiengine.environment.tilemap.ITilesetEntry;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Tile extends CustomPropertyProvider implements ITile, Serializable {
+public class Tile extends CustomPropertyProvider implements ITile {
   public static final int NONE = 0;
   public static final Tile EMPTY = new Tile(NONE);
   protected static final int FLIPPED_HORIZONTALLY_FLAG = 0x80000000;
   protected static final int FLIPPED_VERTICALLY_FLAG = 0x40000000;
   protected static final int FLIPPED_DIAGONALLY_FLAG = 0x20000000;
-
-  private static final long serialVersionUID = -7597673646108642906L;
+  private static final AffineTransform TX_DIAGONAL_FLIP = new AffineTransform(0.0, 1.0, 1.0, 0.0, 0.0, 0.0);
 
   @XmlAttribute
   private Integer gid;
@@ -58,7 +57,7 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
 
   @Override
   public java.util.Map<String, ICustomProperty> getProperties() {
-    return this.getTilesetEntry() == null ? super.getProperties() : this.getTilesetEntry().getProperties();
+    return this.getTilesetEntry() == null ? Collections.emptyMap() : this.getTilesetEntry().getProperties();
   }
 
   @Override
@@ -92,27 +91,26 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
 
   @Override
   public BufferedImage getImage() {
+    if (this.tilesetEntry == null) { // happens if the tile is empty
+      return null;
+    }
     BufferedImage base = this.getTilesetEntry().getImage();
     if (!this.isFlipped()) {
       return base;
     }
     // save some overhead by doing all the reflection at once
+    // affine transforms are confusing: this actually does represent the correct order
     AffineTransform tx = new AffineTransform();
-    int w = base.getWidth();
-    int h = base.getHeight();
-    if (this.isFlippedDiagonally()) {
-      tx.setTransform(0.0, 1.0, 0.0, 1.0, 0.0, 0.0);
-      int temp = w;
-      w = h;
-      h = temp;
-    }
     if (this.isFlippedHorizontally()) {
+      tx.translate(base.getWidth(), 0.0);
       tx.scale(-1.0, 1.0);
-      tx.translate(w, 0.0);
     }
     if (this.isFlippedVertically()) {
+      tx.translate(0.0, base.getHeight());
       tx.scale(1.0, -1.0);
-      tx.translate(0.0, h);
+    }
+    if (this.isFlippedDiagonally()) {
+      tx.concatenate(TX_DIAGONAL_FLIP);
     }
     return (new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR)).filter(base, null);
   }
@@ -176,7 +174,7 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
     return this.getGridId() + String.valueOf(this.getTilesetEntry());
   }
 
-  protected void setTilesetEntry(ITilesetEntry entry) {
+  void setTilesetEntry(ITilesetEntry entry) {
     this.tilesetEntry = entry;
   }
 

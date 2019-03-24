@@ -382,7 +382,9 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     this.path = path;
   }
 
+  @Override
   public void finish(URL location) throws TmxException {
+    super.finish(location);
     if (this.name == null) {
       this.name = FileUtilities.getFileName(location);
     }

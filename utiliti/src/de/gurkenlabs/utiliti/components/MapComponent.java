@@ -754,9 +754,8 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   }
 
   public void loadTileset(ITileset tileset, boolean embedded) {
-    Optional<Spritesheet> opt = Resources.spritesheets().tryGet(tileset.getImage().getSource());
-    if (opt.isPresent()) {
-      Spritesheet sprite = opt.get();
+    Spritesheet sprite = Resources.spritesheets().get(tileset.getImage().getSource());
+    if (sprite != null) {
       Resources.spritesheets().remove(sprite.getName());
       this.screen.getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(sprite.getName()));
     }

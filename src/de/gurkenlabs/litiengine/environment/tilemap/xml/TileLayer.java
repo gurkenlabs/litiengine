@@ -100,6 +100,7 @@ public class TileLayer extends Layer implements ITileLayer {
 
   @Override
   void finish(URL location) throws TmxException {
+    super.finish(location);
     for (Tile tile : getData()) {
       for (ITileset tileset : this.getMap().getTilesets()) {
         if (tileset.containsTile(tile.getGridId())) {

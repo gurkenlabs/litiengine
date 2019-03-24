@@ -401,12 +401,10 @@ public class AssetPanelItem extends JPanel {
     if (this.getOrigin() instanceof SpritesheetResource) {
       SpritesheetResource spriteSheetInfo = (SpritesheetResource) this.getOrigin();
 
-      Optional<Spritesheet> opt = Resources.spritesheets().tryGet(spriteSheetInfo.getName());
-      if (!opt.isPresent()) {
+      Spritesheet sprite = Resources.spritesheets().get(spriteSheetInfo.getName());
+      if (sprite == null) {
         return;
       }
-
-      Spritesheet sprite = opt.get();
 
       ImageFormat format = sprite.getImageFormat() != ImageFormat.UNDEFINED ? sprite.getImageFormat() : ImageFormat.PNG;
 

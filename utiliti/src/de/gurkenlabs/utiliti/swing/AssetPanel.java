@@ -3,7 +3,6 @@ package de.gurkenlabs.utiliti.swing;
 import java.awt.GridLayout;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -43,10 +42,10 @@ public class AssetPanel extends JPanel {
       Collections.sort(infos);
       for (SpritesheetResource info : infos) {
         Icon icon;
-        Optional<Spritesheet> opt = Resources.spritesheets().tryGet(info.getName());
+        Spritesheet opt = Resources.spritesheets().get(info.getName());
 
-        if (opt.isPresent() && opt.get().getSprite(0) != null) {
-          icon = new ImageIcon(Imaging.scale(opt.get().getSprite(0), 64, 64, true));
+        if (opt != null && opt.getSprite(0) != null) {
+          icon = new ImageIcon(Imaging.scale(opt.getSprite(0), 64, 64, true));
         } else {
           icon = null;
         }

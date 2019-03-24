@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.awt.Color;
+import java.net.URL;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -205,6 +206,20 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
     return property.getAsEnum(enumType);
   }
 
+  @Override
+  public URL getFileValue(String propertyName) {
+    return this.getFileValue(propertyName, null);
+  }
+
+  @Override
+  public URL getFileValue(String propertyName, URL defaultValue) {
+    ICustomProperty property = this.getProperty(propertyName);
+    if (property == null || property.getAsFile() == null) {
+      return defaultValue;
+    }
+    return property.getAsFile();
+  }
+
   private ICustomProperty createPropertyIfAbsent(String propertyName) {
     return this.getProperties().computeIfAbsent(propertyName, n -> new CustomProperty());
   }
@@ -300,6 +315,14 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
   private void afterUnmarshal(Unmarshaller u, Object parent) {
     if (this.properties == null) {
       this.properties = new Hashtable<>();
+    }
+  }
+
+  void finish(URL location) throws TmxException {
+    for (ICustomProperty property : this.properties.values()) {
+      if (property instanceof CustomProperty) {
+        ((CustomProperty) property).finish(location);
+      }
     }
   }
 }

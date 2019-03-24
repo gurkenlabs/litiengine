@@ -122,7 +122,9 @@ public class MapImage extends CustomPropertyProvider implements IMapImage {
     this.source = source;
   }
 
-  void finish(URL location) throws MissingImageException {
+  @Override
+  void finish(URL location) throws TmxException {
+    super.finish(location);
     try {
       this.absolutePath = new URL(location, this.source);
     } catch (MalformedURLException e) {

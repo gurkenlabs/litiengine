@@ -54,7 +54,8 @@ public class ImageLayer extends Layer implements IImageLayer {
   }
 
   @Override
-  void finish(URL location) throws MissingImageException {
+  void finish(URL location) throws TmxException {
+    super.finish(location);
     this.image.finish(location);
   }
 }

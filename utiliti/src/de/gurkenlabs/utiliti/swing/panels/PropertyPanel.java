@@ -10,7 +10,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 import javax.swing.GroupLayout;
@@ -105,9 +104,9 @@ public abstract class PropertyPanel extends JPanel {
     for (Map.Entry<String, String> entry : m.entrySet()) {
       JLabel label = new JLabel();
       label.setText(entry.getKey());
-      Optional<Spritesheet> opt = Resources.spritesheets().tryGet(entry.getValue());
-      if (opt.isPresent() && opt.get().getTotalNumberOfSprites() > 0) {
-        BufferedImage scaled = opt.get().getPreview(24);
+      Spritesheet opt = Resources.spritesheets().get(entry.getValue());
+      if (opt != null && opt.getTotalNumberOfSprites() > 0) {
+        BufferedImage scaled = opt.getPreview(24);
         if (scaled != null) {
           label.setIcon(new ImageIcon(scaled));
         }

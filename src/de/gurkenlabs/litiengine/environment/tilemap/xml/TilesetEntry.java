@@ -116,7 +116,9 @@ public class TilesetEntry extends CustomPropertyProvider implements ITilesetEntr
     return Arrays.toString(this.getTerrainIds());
   }
 
-  void finish(URL location) throws MissingImageException {
+  @Override
+  void finish(URL location) throws TmxException {
+    super.finish(location);
     if (this.image != null) {
       this.image.finish(location);
     }

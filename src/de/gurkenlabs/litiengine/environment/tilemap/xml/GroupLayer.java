@@ -239,6 +239,7 @@ public class GroupLayer extends Layer implements IGroupLayer {
 
   @Override
   void finish(URL location) throws TmxException {
+    super.finish(location);
     for (ILayer layer : this.layers) {
       if (layer instanceof Layer) {
         ((Layer) layer).finish(location);

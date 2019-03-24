@@ -2,7 +2,6 @@ package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.awt.Dimension;
 import java.awt.Point;
-import java.net.URL;
 
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -248,8 +247,5 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
     if (this.visible != null && this.visible.intValue() == 1) {
       this.visible = null;
     }
-  }
-
-  void finish(URL location) throws TmxException {
   }
 }

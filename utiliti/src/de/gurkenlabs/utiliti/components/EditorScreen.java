@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -39,8 +38,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.MapRenderer;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
-import de.gurkenlabs.litiengine.environment.tilemap.xml.MissingTmxResourceException;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxException;
 import de.gurkenlabs.litiengine.graphics.ImageFormat;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.TextRenderer;
@@ -500,7 +499,7 @@ public class EditorScreen extends Screen {
         URL path = file.toURI().toURL();
         tileset = XmlUtilities.readFromFile(Tileset.class, file.toURI().toURL());
         tileset.finish(path);
-      } catch (JAXBException | MalformedURLException | MissingTmxResourceException e) {
+      } catch (JAXBException | MalformedURLException | TmxException e) {
         log.log(Level.SEVERE, "could not load tileset from " + file, e);
         return;
       }
@@ -525,8 +524,8 @@ public class EditorScreen extends Screen {
 
   public void loadSpriteSheets(Collection<SpritesheetResource> infos, boolean forceAssetTreeUpdate) {
     infos.parallelStream().forEach(info -> {
-      Optional<Spritesheet> opt = Resources.spritesheets().tryGet(info.getName());
-      if (opt.isPresent()) {
+      Spritesheet opt = Resources.spritesheets().get(info.getName());
+      if (opt != null) {
         Resources.spritesheets().update(info);
       } else {
         Resources.spritesheets().load(info);
@@ -688,15 +687,15 @@ public class EditorScreen extends Screen {
         continue;
       }
 
-      Optional<Spritesheet> opt = Resources.spritesheets().tryGet(tileSet.getImage().getSource());
+      Spritesheet opt = Resources.spritesheets().get(tileSet.getImage().getSource());
       Spritesheet sprite = null;
-      if (!opt.isPresent()) {
+      if (opt == null) {
         sprite = Resources.spritesheets().load(tileSet);
         if (sprite == null) {
           continue;
         }
       } else {
-        sprite = opt.get();
+        sprite = opt;
       }
 
       infos.add(new SpritesheetResource(sprite));
@@ -704,9 +703,9 @@ public class EditorScreen extends Screen {
     }
 
     for (IImageLayer imageLayer : map.getImageLayers()) {
-      Optional<Spritesheet> opt = Resources.spritesheets().tryGet(imageLayer.getImage().getSource());
+      Spritesheet opt = Resources.spritesheets().get(imageLayer.getImage().getSource());
       Spritesheet sprite = null;
-      if (!opt.isPresent()) {
+      if (opt == null) {
         BufferedImage img = Resources.images().get(imageLayer.getImage().getAbsoluteSourcePath(), true);
         if (img == null) {
           continue;
@@ -717,7 +716,7 @@ public class EditorScreen extends Screen {
           continue;
         }
       } else {
-        sprite = opt.get();
+        sprite = opt;
       }
 
       SpritesheetResource info = new SpritesheetResource(sprite);

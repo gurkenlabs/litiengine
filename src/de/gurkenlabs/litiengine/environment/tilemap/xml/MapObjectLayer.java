@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -67,7 +68,7 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
   @Override
   public List<IMapObject> getMapObjects() {
     loadMapObjects();
-    return mapObjects;
+    return this.mapObjects;
   }
 
   @Override
@@ -155,5 +156,13 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
     }
 
     super.afterUnmarshal(u, parent);
+  }
+
+  @Override
+  void finish(URL location) throws TmxException {
+    super.finish(location);
+    for (MapObject object : this.objects) {
+      object.finish(location);
+    }
   }
 }
