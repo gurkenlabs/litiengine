@@ -6,6 +6,8 @@ import java.util.function.Supplier;
 import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 
+import de.gurkenlabs.litiengine.Game;
+
 public class SFXPlayback extends SoundPlayback {
   private Sound sound;
   private FloatControl panControl;
@@ -41,9 +43,9 @@ public class SFXPlayback extends SoundPlayback {
       if (this.panControl != null) {
         this.panControl.setValue(dist > 0 ? (float) (dx / dist) : 0f);
       }
-      this.distance.set((float) Math.max(1.0 - dist / SoundEngine.getMaxDistance(), 0.0));
+      this.distance.set(Game.config().sound().getSoundVolume() * (float) Math.max(1.0 - dist / SoundEngine.getMaxDistance(), 0.0));
     } else {
-      this.distance.set(1f);
+      this.distance.set(Game.config().sound().getSoundVolume());
     }
   }
 }
