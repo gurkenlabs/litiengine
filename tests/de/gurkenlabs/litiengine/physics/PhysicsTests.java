@@ -14,7 +14,6 @@ import de.gurkenlabs.litiengine.entities.CollisionBox;
 import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
 
-@SuppressWarnings("deprecation")
 public class PhysicsTests {
 
   @Test
