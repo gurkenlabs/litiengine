@@ -39,7 +39,9 @@ import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.input.Input.InputGameAdapter;
 import de.gurkenlabs.litiengine.physics.PhysicsEngine;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.sound.Sound;
 import de.gurkenlabs.litiengine.sound.SoundEngine;
+import de.gurkenlabs.litiengine.sound.SoundPlayback;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 
@@ -79,11 +81,8 @@ public final class Game {
   private static boolean noGUIMode = false;
   private static final List<GameListener> gameListeners = new CopyOnWriteArrayList<>();
 
-  @SuppressWarnings("deprecation")
   private static final RenderEngine graphicsEngine = new RenderEngine();
-  @SuppressWarnings("deprecation")
   private static final SoundEngine soundEngine = new SoundEngine();
-  @SuppressWarnings("deprecation")
   private static final PhysicsEngine physicsEngine = new PhysicsEngine();
 
   private static final GameConfiguration configuration;
@@ -253,6 +252,29 @@ public final class Game {
    */
   public static GameWindow window() {
     return gameWindow;
+  }
+  
+  /**
+   * Gets the engine's <code>SoundEngine</code> component that can be used to play sounds and music.<br>
+   * Sound can be loaded and accessed using the <code>Resources</code> API and are managed by the<br>
+   * <code>Resources.sounds()</code> resource container.
+   * 
+   * <p>
+   * <i>
+   * Upon playing a sound, the engine returns an <code>SoundPlayback</code> instance that can then be used to further control the audio line.
+   * </i>
+   * </p>
+   * 
+   * @return The engine's <code>SoundEngine</code> component.
+   * 
+   * @see Sound
+   * @see Resources#sounds()
+   * @see SoundPlayback
+   * @see SoundEngine#playSound(de.gurkenlabs.litiengine.sound.Sound)
+   * @see SoundEngine#playMusic(de.gurkenlabs.litiengine.sound.Sound)
+   */
+  public static SoundEngine audio() {
+    return soundEngine;
   }
 
   /**

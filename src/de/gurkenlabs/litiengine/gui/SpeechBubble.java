@@ -28,7 +28,6 @@ import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.ShapeRenderer;
 import de.gurkenlabs.litiengine.sound.Sound;
-import de.gurkenlabs.litiengine.sound.SoundEngine;
 import de.gurkenlabs.litiengine.util.Imaging;
 
 public class SpeechBubble implements IUpdateable, IRenderable {
@@ -200,7 +199,7 @@ public class SpeechBubble implements IUpdateable, IRenderable {
       this.displayedText += this.currentTextQueue.poll();
       this.lastCharPoll = Game.loop().getTicks();
       if (this.typeSound != null) {
-        SoundEngine.playSound(this.typeSound, this.getEntity());
+        Game.audio().playSound(this.typeSound, this.getEntity());
       }
     }
 

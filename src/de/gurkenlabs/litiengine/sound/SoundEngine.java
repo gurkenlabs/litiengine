@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -44,20 +43,26 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
       return new Thread(r, "Sound Playback Thread " + ++id);
     }
   });
-  private static Point2D listenerLocation;
-  private static Function<Point2D, Point2D> listenerLocationCallback = old -> Game.world().camera().getFocus();
-  private static float maxDist = DEFAULT_MAX_DISTANCE;
-  private static MusicPlayback music;
-  private static Collection<MusicPlayback> allMusic = ConcurrentHashMap.newKeySet();
-  private static Collection<SFXPlayback> sounds = ConcurrentHashMap.newKeySet();
+  private Point2D listenerLocation;
+  private Function<Point2D, Point2D> listenerLocationCallback = old -> Game.world().camera().getFocus();
+  private float maxDist = DEFAULT_MAX_DISTANCE;
+  private MusicPlayback music;
+  private final Collection<MusicPlayback> allMusic = ConcurrentHashMap.newKeySet();
+  private final Collection<SFXPlayback> sounds = ConcurrentHashMap.newKeySet();
 
   /**
    * Instantiates a new SoundEngine instance.
    * 
-   * @deprecated You should never call this manually! This is already called upon startup.
+   * <p>
+   * <b>You should never call this manually! Instead use the <code>Game.audio()</code> instance.</b>
+   * </p>
+   * 
+   * @see Game#audio()
    */
-  @Deprecated
   public SoundEngine() {
+    if(Game.audio() != null) {
+      throw new UnsupportedOperationException("Never initialize a SoundEngine manually. Use Game.audio() instead.");
+    }
   }
 
   /**
@@ -66,15 +71,15 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    * 
    * @return The maximum distance at which a sound can be heard.
    */
-  public static float getMaxDistance() {
+  public float getMaxDistance() {
     return maxDist;
   }
 
-  public static void playMusic(String music) {
+  public void playMusic(String music) {
     playMusic(Resources.sounds().get(music));
   }
 
-  public static void playMusic(Sound music) {
+  public void playMusic(Sound music) {
     playMusic(new LoopedTrack(music));
   }
 
@@ -84,7 +89,7 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    * @param track
    *          The track to play
    */
-  public static void playMusic(Track track) {
+  public void playMusic(Track track) {
     playMusic(track, false, true);
   }
 
@@ -96,7 +101,7 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    * @param restart
    *          Whether to restart if the specified track is already playing, determined by {@link Object#equals(Object)}
    */
-  public static void playMusic(Track track, boolean restart) {
+  public void playMusic(Track track, boolean restart) {
     playMusic(track, false, true);
   }
 
@@ -110,7 +115,7 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    * @param stop
    *          Whether to stop an existing track if present
    */
-  public static synchronized void playMusic(Track track, boolean restart, boolean stop) {
+  public synchronized void playMusic(Track track, boolean restart, boolean stop) {
     if (!restart && music != null && music.isPlaying() && music.getTrack().equals(track)) {
       return;
     }
@@ -135,7 +140,7 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    * @param time
    *          The time in frames to make the existing music fade out for if present
    */
-  public static void fadeMusic(int time) {
+  public void fadeMusic(int time) {
     fadeMusic(time, null);
   }
 
@@ -147,7 +152,7 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    * @param callback
    *          The callback for when the fade finishes
    */
-  public static synchronized void fadeMusic(final int time, final Runnable callback) {
+  public synchronized void fadeMusic(final int time, final Runnable callback) {
     music = null;
     final Map<MusicPlayback, VolumeControl> faders = new HashMap<>(allMusic.size());
     for (MusicPlayback track : allMusic) {
@@ -182,11 +187,11 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    *
    * @return The main music, which could be {@code null}.
    */
-  public static synchronized MusicPlayback getMusic() {
+  public synchronized MusicPlayback getMusic() {
     return music;
   }
 
-  public static synchronized Collection<MusicPlayback> getAllMusic() {
+  public synchronized Collection<MusicPlayback> getAllMusic() {
     return Collections.unmodifiableCollection(allMusic);
   }
 
@@ -202,11 +207,11 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    * @return An {@link SFXPlayback} instance that allows to further process
    *         and control the played sound.
    */
-  public static SFXPlayback playSound(final Sound sound, final IEntity entity) {
+  public SFXPlayback playSound(final Sound sound, final IEntity entity) {
     return playSound(sound, entity, false);
   }
 
-  public static SFXPlayback playSound(final String sound, final IEntity entity) {
+  public SFXPlayback playSound(final String sound, final IEntity entity) {
     return playSound(Resources.sounds().get(sound), entity, false);
   }
 
@@ -223,11 +228,11 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    * @return An {@link SFXPlayback} instance that allows to further process
    *         and control the played sound.
    */
-  public static SFXPlayback playSound(final Sound sound, final IEntity entity, boolean loop) {
+  public SFXPlayback playSound(final Sound sound, final IEntity entity, boolean loop) {
     return playSound(sound, entity::getLocation, loop);
   }
 
-  public static SFXPlayback playSound(final String sound, final IEntity entity, boolean loop) {
+  public SFXPlayback playSound(final String sound, final IEntity entity, boolean loop) {
     return playSound(Resources.sounds().get(sound), entity, loop);
   }
 
@@ -243,19 +248,19 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    * @return An {@link SFXPlayback} instance that allows to further process
    *         and control the played sound.
    */
-  public static SFXPlayback playSound(final Sound sound, final Point2D location) {
+  public SFXPlayback playSound(final Sound sound, final Point2D location) {
     return playSound(sound, location, false);
   }
 
-  public static SFXPlayback playSound(final String sound, final Point2D location) {
+  public SFXPlayback playSound(final String sound, final Point2D location) {
     return playSound(Resources.sounds().get(sound), location, false);
   }
 
-  public static SFXPlayback playSound(final Sound sound, double x, double y) {
+  public SFXPlayback playSound(final Sound sound, double x, double y) {
     return playSound(sound, new Point2D.Double(x, y), false);
   }
 
-  public static SFXPlayback playSound(final String sound, double x, double y) {
+  public SFXPlayback playSound(final String sound, double x, double y) {
     return playSound(Resources.sounds().get(sound), new Point2D.Double(x, y), false);
   }
 
@@ -272,19 +277,19 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    * @return An {@link SFXPlayback} instance that allows to further process
    *         and control the played sound.
    */
-  public static SFXPlayback playSound(final Sound sound, final Point2D location, boolean loop) {
+  public SFXPlayback playSound(final Sound sound, final Point2D location, boolean loop) {
     return playSound(sound, () -> location, loop);
   }
 
-  public static SFXPlayback playSound(final String sound, final Point2D location, boolean loop) {
+  public SFXPlayback playSound(final String sound, final Point2D location, boolean loop) {
     return playSound(Resources.sounds().get(sound), location, loop);
   }
 
-  public static SFXPlayback playSound(final Sound sound, final double x, final double y, boolean loop) {
+  public SFXPlayback playSound(final Sound sound, final double x, final double y, boolean loop) {
     return playSound(sound, new Point2D.Double(x, y), loop);
   }
 
-  public static SFXPlayback playSound(final String sound, final double x, final double y, boolean loop) {
+  public SFXPlayback playSound(final String sound, final double x, final double y, boolean loop) {
     return playSound(Resources.sounds().get(sound), new Point2D.Double(x, y), loop);
   }
 
@@ -298,11 +303,11 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    * @return An {@link SFXPlayback} instance that allows to further process
    *         and control the played sound.
    */
-  public static SFXPlayback playSound(final Sound sound) {
+  public SFXPlayback playSound(final Sound sound) {
     return playSound(sound, false);
   }
 
-  public static SFXPlayback playSound(final String sound) {
+  public SFXPlayback playSound(final String sound) {
     return playSound(Resources.sounds().get(sound), false);
   }
 
@@ -317,27 +322,12 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    * @return An {@link SFXPlayback} instance that allows to further process
    *         and control the played sound.
    */
-  public static SFXPlayback playSound(final Sound sound, boolean loop) {
+  public SFXPlayback playSound(final Sound sound, boolean loop) {
     return playSound(sound, () -> null, loop);
   }
 
-  public static SFXPlayback playSound(final String sound, boolean loop) {
+  public SFXPlayback playSound(final String sound, boolean loop) {
     return playSound(Resources.sounds().get(sound), loop);
-  }
-
-  private static SFXPlayback playSound(Sound sound, Supplier<Point2D> supplier, boolean loop) {
-    Objects.requireNonNull(sound);
-    SFXPlayback playback;
-    try {
-      playback = new SFXPlayback(sound, supplier, loop);
-    } catch (LineUnavailableException e) {
-      resourceFailure(e);
-      return null;
-    }
-    playback.updateLocation(listenerLocation);
-    playback.start();
-    sounds.add(playback);
-    return playback;
   }
 
   /**
@@ -348,14 +338,14 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    * @param radius
    *          The maximum distance at which sounds can still be heard.
    */
-  public static void setMaxDistance(final float radius) {
+  public void setMaxDistance(final float radius) {
     maxDist = radius;
   }
 
   /**
    * Stops the playback of the current background music.
    */
-  public static synchronized void stopMusic() {
+  public synchronized void stopMusic() {
     for (MusicPlayback track : allMusic) {
       track.cancel();
     }
@@ -371,7 +361,7 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    * @param callback
    *          The callback that determines the location of the sound listener.
    */
-  public static void setListenerLocationCallback(Function<Point2D, Point2D> callback) {
+  public void setListenerLocationCallback(Function<Point2D, Point2D> callback) {
     listenerLocationCallback = callback;
   }
 
@@ -428,6 +418,24 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
     }
   }
 
+  private SFXPlayback playSound(Sound sound, Supplier<Point2D> supplier, boolean loop) {
+    if(sound == null) {
+      return null;
+    }
+    
+    SFXPlayback playback;
+    try {
+      playback = new SFXPlayback(sound, supplier, loop);
+    } catch (LineUnavailableException e) {
+      resourceFailure(e);
+      return null;
+    }
+    playback.updateLocation(listenerLocation);
+    playback.start();
+    sounds.add(playback);
+    return playback;
+  }
+  
   private static void resourceFailure(Throwable e) {
     log.log(Level.WARNING, "could not open a line", e);
   }

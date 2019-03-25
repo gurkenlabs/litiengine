@@ -43,8 +43,11 @@ public final class PhysicsEngine implements IUpdateable {
    * 
    * @see Game#physics()
    */
-  @Deprecated
   public PhysicsEngine() {
+    if(Game.physics() != null) {
+      throw new UnsupportedOperationException("Never initialize a PhysicsEngine manually. Use Game.physics() instead.");
+    }
+    
     this.collisionEntities.put(Collision.DYNAMIC, new CopyOnWriteArrayList<>());
     this.collisionEntities.put(Collision.STATIC, new CopyOnWriteArrayList<>());
     this.collisionEntities.put(Collision.ANY, new CopyOnWriteArrayList<>());

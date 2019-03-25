@@ -23,7 +23,6 @@ import de.gurkenlabs.litiengine.graphics.TextRenderer;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.sound.Sound;
-import de.gurkenlabs.litiengine.sound.SoundEngine;
 
 /**
  * The abstract Class GuiComponent provides all properties and methods needed for screens, built-in, and custom GUI components such as buttons,
@@ -481,7 +480,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     final ComponentMouseEvent event = new ComponentMouseEvent(e, this);
     this.getHoverConsumer().forEach(consumer -> consumer.accept(event));
     if (this.getHoverSound() != null) {
-      SoundEngine.playSound(this.getHoverSound());
+      Game.audio().playSound(this.getHoverSound());
     }
 
     this.getMouseEnterConsumer().forEach(consumer -> consumer.accept(event));

@@ -53,12 +53,16 @@ public final class RenderEngine {
   /**
    * Instantiates a new RenderEngine instance.
    * 
-   * @deprecated You should never call this manually! Instead use the <code>Game.graphics()</code> instance.
+   * <p>
+   * <b>You should never call this manually! Instead use the <code>Game.graphics()</code> instance.</b>
+   * </p>
    * 
    * @see Game#graphics()
    */
-  @Deprecated
   public RenderEngine() {
+    if(Game.graphics() != null) {
+      throw new UnsupportedOperationException("Never initialize a RenderEngine manually. Use Game.graphics() instead.");
+    }
   }
 
   /**
