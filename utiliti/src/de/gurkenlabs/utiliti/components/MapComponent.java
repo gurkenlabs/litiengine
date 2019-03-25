@@ -1849,7 +1849,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     if (this.currentZoomIndex < DEFAULT_ZOOM_INDEX) {
       TextRenderer.render(g, id, x, y);
     } else {
-      TextRenderer.render(g, id, x, y, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+      TextRenderer.renderWithOutline(g, id, x, y, Style.COLOR_DARKBORDER, RenderingHints.VALUE_ANTIALIAS_ON);
     }
 
     g.setFont(previousFont);
