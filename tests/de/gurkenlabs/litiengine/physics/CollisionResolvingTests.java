@@ -11,6 +11,7 @@ import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.entities.CollisionBox;
 import de.gurkenlabs.litiengine.entities.Creature;
 
+@SuppressWarnings("deprecation")
 public class CollisionResolvingTests {
   final double EPSILON = 0.02;
 

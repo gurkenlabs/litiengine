@@ -1,366 +1,275 @@
 package de.gurkenlabs.litiengine.sound;
 
-import java.awt.geom.Point2D;
-import java.io.ByteArrayInputStream;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
+import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.DataLine;
+import javax.sound.sampled.BooleanControl;
 import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.entities.IEntity;
-import de.gurkenlabs.litiengine.util.MathUtilities;
-import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
+public abstract class SoundPlayback implements Runnable {
+  protected final SourceDataLine line;
+  private FloatControl gainControl;
+  private BooleanControl muteControl;
 
-/**
- * This class is responsible for the playback of all sounds in the engine. If
- * specified, it calculates the sound volume and pan depending to the assigned
- * entity or location.
- */
-final class SoundPlayback implements Runnable, ISoundPlayback {
-  private static final Logger log = Logger.getLogger(SoundPlayback.class.getName());
-  private static final ExecutorService executorService = Executors.newCachedThreadPool(new ThreadFactory() {
-    private int id = 0;
+  private boolean started = false;
+  private volatile boolean cancelled = false;
+
+  private final Collection<SoundPlaybackListener> listeners = ConcurrentHashMap.newKeySet();
+
+  private final Collection<VolumeControl> volumeControls = Collections.synchronizedSet(Collections.newSetFromMap(new WeakHashMap<>()));
+  private VolumeControl masterVolume;
+  private volatile float miscVolume = 1f;
+
+  /**
+   * An object for controlling the volume of an {@code AudioPlayback}. Each distinct instance represents an independent factor contributing to its
+   * volume.
+   *
+   * @see SoundPlayback#createVolumeControl()
+   */
+  public class VolumeControl {
+    private volatile float value = 1f;
+
+    private VolumeControl() {
+    }
+
+    public float get() {
+      return this.value;
+    }
+
+    public void set(float value) {
+      if (value < 0f) {
+        throw new IllegalArgumentException("negative volume");
+      }
+      this.value = value;
+      SoundPlayback.this.updateVolume();
+    }
 
     @Override
-    public Thread newThread(Runnable r) {
-      return new Thread(r, "Sound Playback Thread " + ++id);
-    }
-  });
-
-  private final List<SoundPlaybackListener> playbackListeners;
-
-  private final Point2D initialListenerLocation;
-  private SourceDataLine dataLine;
-
-  private IEntity entity;
-  private float gain;
-  private float actualGain;
-  private FloatControl gainControl;
-  private FloatControl panControl;
-
-  private Point2D location;
-
-  private final Sound sound;
-
-  private boolean playing;
-  private boolean loop;
-  private boolean cancelled;
-  private boolean paused;
-
-  private volatile Thread playingIn;
-
-  SoundPlayback(final Sound sound) {
-    this(sound, null);
-  }
-
-  SoundPlayback(final Sound sound, final Point2D listenerLocation) {
-    this.playbackListeners = new CopyOnWriteArrayList<>();
-    this.sound = sound;
-    this.initialListenerLocation = listenerLocation;
-    this.gain = 1;
-  }
-
-  SoundPlayback(final Sound sound, final Point2D listenerLocation, final IEntity sourceEntity) {
-    this(sound, listenerLocation);
-    this.entity = sourceEntity;
-  }
-
-  SoundPlayback(final Sound sound, final Point2D listenerLocation, final Point2D location) {
-    this(sound, listenerLocation);
-    this.location = location;
-  }
-
-  @Override
-  public void run() {
-    this.playingIn = Thread.currentThread();
-    this.playing = true;
-    this.loadDataLine();
-
-    if (this.dataLine == null) {
-      return;
-    }
-
-    this.startDataLine();
-
-    final byte[] buffer = new byte[64];
-    ByteArrayInputStream str = new ByteArrayInputStream(this.sound.getStreamData());
-    while (!this.cancelled) {
-      if (this.isPaused()) {
-        try {
-          synchronized (this) {
-            this.wait();
-          }
-        } catch (InterruptedException e) {
-          this.cancel();
-          Thread.currentThread().interrupt();
-          continue;
-        }
-      }
-
-      int readCount;
-      readCount = str.read(buffer, 0, buffer.length);
-
-      if (readCount < 0) {
-        synchronized (this) {
-          if (!this.loop || this.dataLine == null) {
-            break;
-          }
-  
-          this.restartDataLine();
-          str = new ByteArrayInputStream(this.sound.getStreamData());
-        }
-      } else if (this.dataLine != null) {
-        this.dataLine.write(buffer, 0, readCount);
-      }
-      Thread.interrupted(); // clears the interrupted flag for waiting; the interrupted flag is inconsistent when used with the sound system
-      // it can, however, establish a happens-before relationship
-      // see https://community.oracle.com/thread/2381571
-    }
-    
-    if (!this.cancelled) {
-      if (this.dataLine != null) {
-        this.dataLine.drain();
-        this.dataLine.close();
-      }
-      final SoundEvent event = new SoundEvent(this, this.sound);
-      for (SoundPlaybackListener listener : this.playbackListeners) {
-        listener.finished(event);
-      }
-    }
-
-    this.playing = false;
-  }
-
-  @Override
-  public void cancel() {
-    this.cancelled = true;
-    this.dispose();
-    this.playingIn.interrupt();
-
-    final SoundEvent event = new SoundEvent(this, this.sound);
-    for (SoundPlaybackListener listener : this.playbackListeners) {
-      listener.cancelled(event);
+    protected void finalize() {
+      // clean up the instance without affecting the volume
+      SoundPlayback.this.miscVolume *= this.value;
     }
   }
 
-  @Override
-  public void addSoundPlaybackListener(SoundPlaybackListener soundPlaybackListener) {
-    this.playbackListeners.add(soundPlaybackListener);
-  }
-
-  @Override
-  public void removeSoundPlaybackListener(SoundPlaybackListener soundPlaybackListener) {
-    this.playbackListeners.remove(soundPlaybackListener);
-  }
-
-  @Override
-  public float getGain() {
-    return this.gain;
-  }
-
-  @Override
-  public void pausePlayback() {
-    this.paused = true;
-    this.playingIn.interrupt();
-  }
-
-  @Override
-  public void resumePlayback() {
-    this.paused = false;
-    synchronized (this) {
-      this.notifyAll();
-    }
-  }
-
-  @Override
-  public boolean isPaused() {
-    return this.paused;
-  }
-
-  @Override
-  public boolean isPlaying() {
-    return this.playing;
-  }
-
-  @Override
-  public void setGain(float gain) {
-    this.gain = MathUtilities.clamp(gain, 0, 1);
-  }
-
-  protected static void terminate() {
-    executorService.shutdownNow();
-  }
-
-  private synchronized void dispose() {
-    if (this.dataLine != null) {
-      this.dataLine.stop();
-      this.dataLine.flush();
-      this.dataLine.close();
-    }
-    this.dataLine = null;
-    this.gainControl = null;
-    this.panControl = null;
-  }
-
-  Sound getSound() {
-    return this.sound;
+  SoundPlayback(AudioFormat format) throws LineUnavailableException {
+    // acquire resources in the constructor so that they can be used before the task is started
+    this.line = AudioSystem.getSourceDataLine(format);
+    this.line.open();
+    this.line.start();
+    this.gainControl = (FloatControl) this.line.getControl(FloatControl.Type.MASTER_GAIN);
+    this.muteControl = (BooleanControl) this.line.getControl(BooleanControl.Type.MUTE);
+    this.masterVolume = this.createVolumeControl();
   }
 
   /**
-   * Plays the sound without any volume or pan adjustments.
+   * Starts playing the audio.
+   *
+   * @throws IllegalStateException
+   *           if the audio has already been started
    */
-  void play() {
-    this.play(false);
-  }
-
-  void play(final boolean loop) {
-    this.play(loop, Game.config().sound().getSoundVolume());
-  }
-
-  void play(final boolean loop, final float volume) {
-    this.play(loop, null, volume);
-  }
-
-  void play(final float volume) {
-    this.play(false, null, volume);
-  }
-
-  void play(final Point2D location) {
-    this.play(false, location, Game.config().sound().getSoundVolume());
-  }
-
-  void play(final boolean loop, final Point2D location, final float gain) {
-    // clip must be disposed
-    if (this.dataLine != null) {
-      return;
+  public synchronized void start() {
+    if (this.started) {
+      throw new IllegalStateException("already started");
     }
-
-    this.actualGain = gain;
-    this.location = location;
-    this.loop = loop;
-    executorService.execute(this);
+    SoundEngine.EXECUTOR.submit(this);
+    this.started = true;
   }
 
-  void setMasterGain(final float g) {
-    // Make sure there is a gain control
-    if (this.gainControl == null) {
-      return;
-    }
-
-    // make sure the value is valid (between 0 and 1)
-    final float newGain = MathUtilities.clamp(g * this.gain, 0, 1);
-
-    final double minimumDB = this.gainControl.getMinimum();
-    final double maximumDB = 1;
-
-    // convert the supplied linear gain into a "decible change" value
-    // minimumDB is no volume
-    // maximumDB is maximum volume
-    // (Number of decibles is a logrithmic function of linear gain)
-    final double ampGainDB = 10.0f / 20.0f * maximumDB - minimumDB;
-    final double cste = Math.log(10.0) / 20;
-    final float valueDB = (float) (minimumDB + 1 / cste * Math.log(1 + (Math.exp(cste * ampGainDB) - 1) * newGain));
-    // Update the gain:
-    this.gainControl.setValue(valueDB);
-  }
-
-  void updateControls(final Point2D listenerLocation) {
-    if (listenerLocation == null) {
-      return;
-    }
-
-    final Point2D loc = this.entity != null ? this.entity.getCenter() : this.location;
-    if (loc == null) {
-      return;
-    }
-
-    this.setMasterGain(calculateGain(loc, listenerLocation));
-    this.setPan(calculatePan(loc, listenerLocation));
-  }
-
-  private static float calculateGain(final Point2D currentLocation, final Point2D listenerLocation) {
-    if (currentLocation == null || listenerLocation == null) {
-      return 0;
-    }
-    float gain;
-    final float distanceFromListener = (float) currentLocation.distance(listenerLocation);
-    if (distanceFromListener <= 0) {
-      gain = 1.0f;
-    } else if (distanceFromListener >= Game.audio().getMaxDistance()) {
-      gain = 0.0f;
-    } else {
-      gain = 1.0f - distanceFromListener / Game.audio().getMaxDistance();
-    }
-
-    gain = MathUtilities.clamp(gain, 0, 1);
-    gain *= Game.config().sound().getSoundVolume();
-    return gain;
-  }
-
-  private static float calculatePan(final Point2D currentLocation, final Point2D listenerLocation) {
-    final double angle = GeometricUtilities.calcRotationAngleInDegrees(listenerLocation, currentLocation);
-    return (float) -Math.sin(angle);
-  }
-
-  private void loadDataLine() {
-    final DataLine.Info dataInfo = new DataLine.Info(SourceDataLine.class, this.sound.getFormat());
-    try {
-      this.dataLine = (SourceDataLine) AudioSystem.getLine(dataInfo);
-      if (!dataLine.isOpen()) {
-        this.dataLine.open();
+  /**
+   * Plays a sound to this object's data line.
+   *
+   * @param sound
+   *          The sound to play
+   * @return Whether the sound was cancelled while playing
+   */
+  protected boolean play(Sound sound) {
+    byte[] data = sound.getStreamData();
+    int len = this.line.getFormat().getFrameSize();
+    // math hacks here: we're getting just over half the buffer size, but it needs to be an integral number of sample frames
+    len = (this.line.getBufferSize() / len / 2 + 1) * len;
+    for (int i = 0; i < data.length; i += this.line.write(data, i, Math.min(len, data.length - i))) {
+      if (this.cancelled) {
+        return true;
       }
-    } catch (final LineUnavailableException e) {
-      log.log(Level.SEVERE, e.getMessage(), e);
+    }
+    return this.cancelled;
+  }
+
+  /**
+   * Finishes the playback. If this playback was not cancelled in the process, it will notify listeners.
+   */
+  protected void finish() {
+    this.line.drain();
+    synchronized (this) {
+      this.line.close();
+      if (!this.cancelled) {
+        SoundEvent event = new SoundEvent(this, null);
+        for (SoundPlaybackListener listener : this.listeners) {
+          listener.finished(event);
+        }
+      }
     }
   }
 
-  private void startDataLine() {
-    this.initControls();
-    this.updateControls(this.initialListenerLocation);
-    this.dataLine.start();
+  /**
+   * Adds a <code>SoundPlaybackListener</code> to this instance.
+   *
+   * @param listener
+   *          The <code>SoundPlaybackListener</code> to be added.
+   */
+  public void addSoundPlaybackListener(SoundPlaybackListener listener) {
+    this.listeners.add(listener);
   }
 
-  private void restartDataLine() {
-    this.dataLine.drain();
-    this.loadDataLine();
-    this.initControls();
-    this.dataLine.start();
+  /**
+   * Removes a <code>SoundPlaybackListener</code> from this instance.
+   *
+   * @param listener
+   *          The <code>SoundPlaybackListener</code> to be removed.
+   */
+  public void removeSoundPlaybackListener(SoundPlaybackListener listener) {
+    this.listeners.remove(listener);
   }
 
-  private void initControls() {
-    if (this.dataLine == null) {
-      return;
+  /**
+   * Sets the paused state of this playback to the provided value.
+   * 
+   * @param paused
+   *          Whether to pause or resume this playback
+   */
+  public void setPaused(boolean paused) {
+    if (paused) {
+      this.pausePlayback();
+    } else {
+      this.resumePlayback();
     }
-
-    // Check if panning is supported:
-    // Create a new pan Control:
-    this.panControl = this.dataLine.isControlSupported(FloatControl.Type.PAN) ? (FloatControl) this.dataLine.getControl(FloatControl.Type.PAN) : null;
-
-    // Check if changing the volume is supported:
-    // Create a new gain control:
-    this.gainControl = this.dataLine.isControlSupported(FloatControl.Type.MASTER_GAIN) ? (FloatControl) this.dataLine.getControl(FloatControl.Type.MASTER_GAIN) : null;
-    // Store it's initial gain to use as "maximum volume" later:
-
-    this.setMasterGain(this.actualGain);
   }
 
-  private void setPan(final float p) {
-    // Make sure there is a pan control
-    if (this.panControl == null) {
-      return;
+  /**
+   * Pauses this playback. If this playback is already paused, this call has no effect.
+   */
+  public void pausePlayback() {
+    if (this.line.isOpen()) {
+      this.line.stop();
     }
-    final float pan = MathUtilities.clamp(p, -1, 1);
-    // Update the pan:
-    this.panControl.setValue(pan);
+  }
+
+  /**
+   * Resumes this playback. If this playback is already playing, this call has no effect.
+   */
+  public void resumePlayback() {
+    if (this.line.isOpen()) {
+      this.line.start();
+    }
+  }
+
+  /**
+   * Determines if this playback is paused.
+   * 
+   * @return Whether this playback is paused
+   */
+  public boolean isPaused() {
+    return !this.line.isActive();
+  }
+
+  /**
+   * Determines if this playback has sound to play. If it is paused but still in the middle of playback, it will return {@code true}, but it will
+   * return {@code false} if it has finished or it has been cancelled.
+   * 
+   * @return Whether this playback has sound to play
+   */
+  public boolean isPlaying() {
+    return this.line.isOpen();
+  }
+
+  /**
+   * Attempts to cancel the playback of this audio. If the playback was successfully cancelled, it will notify listeners.
+   */
+  public synchronized void cancel() {
+    if (!this.started) {
+      throw new IllegalStateException("not started");
+    }
+    if (!this.cancelled && this.line.isOpen()) {
+      this.line.stop();
+      this.cancelled = true;
+      this.line.flush();
+      this.line.close();
+      SoundEvent event = new SoundEvent(this, null);
+      for (SoundPlaybackListener listener : this.listeners) {
+        listener.cancelled(event);
+      }
+    }
+  }
+
+  /**
+   * Gets the current volume of this playback, considering all {@code VolumeControl} objects created for it.
+   * 
+   * @return The volume
+   */
+  public float getMasterVolume() {
+    if (this.muteControl.getValue()) {
+      return 0f;
+    }
+    return (float) Math.pow(10.0, this.gainControl.getValue() / 20.0);
+  }
+
+  /**
+   * Gets the current master volume of this playback. This will be approximately equal to the value set by a previous call to {@code setVolume},
+   * though rounding errors may occur.
+   * 
+   * @return The settable volume
+   */
+  public float getVolume() {
+    return this.masterVolume.get();
+  }
+
+  /**
+   * Sets the master volume of this playback.
+   * 
+   * @param volume
+   *          The new volume
+   */
+  public void setVolume(float volume) {
+    this.masterVolume.set(volume);
+  }
+
+  public VolumeControl getMasterVolumeControl() {
+    return this.masterVolume;
+  }
+
+  public VolumeControl createVolumeControl() {
+    VolumeControl control = new VolumeControl();
+    this.volumeControls.add(control);
+    return control;
+  }
+
+  void updateVolume() {
+    synchronized (this.volumeControls) {
+      float volume = this.miscVolume;
+      for (VolumeControl control : this.volumeControls) {
+        volume *= control.get();
+      }
+      float dbGain = (float) (20.0 * Math.log10(volume));
+      if (dbGain < this.gainControl.getMinimum()) {
+        this.muteControl.setValue(true);
+      } else {
+        this.gainControl.setValue(dbGain);
+        this.muteControl.setValue(false);
+      }
+    }
+  }
+
+  @Override
+  protected void finalize() {
+    // resources will not be released if the start method is never called
+    if (this.line != null && this.line.isOpen()) {
+      this.line.close();
+    }
   }
 }

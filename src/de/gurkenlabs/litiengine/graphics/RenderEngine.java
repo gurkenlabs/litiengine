@@ -43,12 +43,12 @@ import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
 public final class RenderEngine {
   public static final float DEFAULT_RENDERSCALE = 3.0f;
 
-  private final EntityYComparator entityComparator;
-  private final List<Consumer<RenderEvent<IEntity>>> entityRenderedConsumer;
-  private final List<Predicate<IEntity>> entityRenderingConditions;
-  private final List<Consumer<RenderEvent<IEntity>>> entityRenderingConsumer;
+  private final EntityYComparator entityComparator = new EntityYComparator();
+  private final List<Consumer<RenderEvent<IEntity>>> entityRenderedConsumer = new CopyOnWriteArrayList<>();
+  private final List<Predicate<IEntity>> entityRenderingConditions = new CopyOnWriteArrayList<>();
+  private final List<Consumer<RenderEvent<IEntity>>> entityRenderingConsumer = new CopyOnWriteArrayList<>();
 
-  private float baseRenderScale;
+  private float baseRenderScale = DEFAULT_RENDERSCALE;
 
   /**
    * Instantiates a new RenderEngine instance.
@@ -60,12 +60,9 @@ public final class RenderEngine {
    * @see Game#graphics()
    */
   public RenderEngine() {
-    this.entityRenderedConsumer = new CopyOnWriteArrayList<>();
-    this.entityRenderingConsumer = new CopyOnWriteArrayList<>();
-    this.entityRenderingConditions = new CopyOnWriteArrayList<>();
-    this.entityComparator = new EntityYComparator();
-
-    this.baseRenderScale = DEFAULT_RENDERSCALE;
+    if(Game.graphics() != null) {
+      throw new UnsupportedOperationException("Never initialize a RenderEngine manually. Use Game.graphics() instead.");
+    }
   }
 
   /**
