@@ -7,7 +7,7 @@ apply plugin: 'eclipse'
 apply plugin: 'application'
 
 archivesBaseName = "utiliti"
-version = "v0.4.15-alpha"
+version = "v0.4.16-alpha"
 mainClassName = "de.gurkenlabs.utiliti.Program"
 
 sourceSets {
@@ -48,10 +48,10 @@ launch4j {
   mainClassName = 'de.gurkenlabs.utiliti.Program'
   icon = 'pixel-icon-utiLITI.ico'
   outputDir = 'libs'
-  outfile = archivesBaseName + '-v0.4.15-alpha.exe'
+  outfile = archivesBaseName + '-v0.4.16-alpha.exe'
   companyName = 'gurkenlabs.de'
-  version = '0.4.15'
-  textVersion = '0.4.15'
+  version = '0.4.16'
+  textVersion = '0.4.16'
   copyright = '2017 gurkenlabs.de'
   jvmOptions = ['-Xms256m', '-Xmx1024m']
 }
