@@ -282,6 +282,19 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   }
 
   @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("#" + this.getId() + ": ");
+    sb.append(this.getName() == null ? "" : "\'" + this.getName() + "\' ");
+    sb.append("" + this.getType());
+    sb.append("; x: " + this.getX());
+    sb.append("; y: " + this.getY());
+    sb.append("; width: " + this.getWidth());
+    sb.append("; height: " + this.getHeight());
+    return sb.toString();
+  }
+
+  @Override
   public float getX() {
     if (this.isInfiniteMap()) {
       Map map = (Map) this.getLayer().getMap();

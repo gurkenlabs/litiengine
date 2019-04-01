@@ -820,14 +820,12 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
   public void reassignIds(IMap map, int startID) {
     int maxMapId = startID;
-    List<Integer> usedIds = new ArrayList<>();
     UndoManager.instance().beginOperation();
     for (IMapObject obj : map.getMapObjects()) {
       final int previousId = obj.getId();
       UndoManager.instance().mapObjectChanging(obj);
       obj.setId(maxMapId);
       UndoManager.instance().mapObjectChanged(obj, previousId);
-      usedIds.add(obj.getId());
       maxMapId++;
     }
     UndoManager.instance().endOperation();

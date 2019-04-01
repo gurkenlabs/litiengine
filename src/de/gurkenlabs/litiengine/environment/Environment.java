@@ -168,23 +168,15 @@ public final class Environment implements IRenderable {
       return;
     }
     int desiredID = entity.getMapId();
-    // set local map id if none is set for the entity
-    if (desiredID == 0) {
+    // assign local map id if the entity's mapID is invalid
+    if (desiredID == 0 || this.getAllMapIDs().contains(desiredID)) {
       entity.setMapId(this.getLocalMapId());
-      log.info(() -> String.format("Entity [%s] was assigned a local mapID.", entity));
-    }
-    // set a new global map id on the entity and the underlying mapObject if the mapObject's id was already present.
-    else if (this.getAllMapIDs().contains(desiredID)) {
-      for (IMapObject obj : this.getMap().getMapObjects(desiredID)) {
-        if (obj.getBoundingBox().equals(entity.getBoundingBox())) {
-          int newID = this.getNextMapId();
-          entity.setMapId(newID);
-          log.warning(() -> String.format("Entity %s and the corresponding MapObject were assigned a new mapID because their ID #%d wasn\'t unique.", entity, desiredID));
-        }
-      }
+      log.info(() -> String.format("Entity [%s] was assigned a local mapID because #%d was already taken or invalid.", entity, desiredID));
     }
 
-    if (entity instanceof Emitter) {
+    if (entity instanceof Emitter)
+
+    {
       Emitter emitter = (Emitter) entity;
       this.addEmitter(emitter);
     }
@@ -1037,7 +1029,7 @@ public final class Environment implements IRenderable {
 
   public Collection<IEntity> load(final IMapObject mapObject) {
     if (mapObject == null) {
-      return null;
+      return new ArrayList<>();
     }
     IMapObjectLoader loader = null;
     if (mapObject.getType() == null || mapObject.getType().isEmpty()) {

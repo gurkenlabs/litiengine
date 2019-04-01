@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objecttypes>
+ <objecttype name="COLLISIONBOX" color="#ff0000">
+  <property name="isObstacle" type="bool" default="false"/>
+  <property name="shadowType" type="string"/>
+ </objecttype>
+ <objecttype name="CREATURE" color="#a0a0a4">
+  <property name="collision" type="bool" default="false"/>
+  <property name="collisionboxHeight" type="int" default="0"/>
+  <property name="collisionboxWidth" type="int" default="0"/>
+  <property name="spawnDirection" type="string"/>
+  <property name="spawnType" type="string"/>
+  <property name="spritesheetName" type="string"/>
+ </objecttype>
+ <objecttype name="EMITTER" color="#1755ff">
+  <property name="emitterType" type="string"/>
+ </objecttype>
+ <objecttype name="LIGHTSOURCE" color="#ffffff">
+  <property name="lightBrightness" type="int" default="30"/>
+  <property name="lightColor" type="string" default="#ffffff"/>
+  <property name="lightShape" type="string"/>
+  <property name="lightStepFactor" type="float" default="0.15"/>
+ </objecttype>
+ <objecttype name="PROP" color="#ffc550">
+  <property name="addShadow" type="bool" default="false"/>
+  <property name="collision" type="bool" default="false"/>
+  <property name="collisionboxHeight" type="float"/>
+  <property name="collisionboxWidth" type="float"/>
+  <property name="health" type="int"/>
+  <property name="indestructible" type="bool" default="false"/>
+  <property name="material" type="string"/>
+  <property name="spritesheetName" type="string"/>
+ </objecttype>
+ <objecttype name="SPAWNPOINT" color="#ffff00"/>
+ <objecttype name="TRIGGER" color="#a0a0a4">
+  <property name="renderTrigger" type="bool" default="false"/>
+  <property name="triggerActivation" type="string"/>
+  <property name="triggerAlpha" type="int" default="0"/>
+  <property name="triggerColor" type="string"/>
+  <property name="triggerOneTime" type="bool" default="false"/>
+  <property name="triggermessage" type="string"/>
+ </objecttype>
+</objecttypes>

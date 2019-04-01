@@ -19,8 +19,8 @@ public final class MapObjectProperty {
   public static final String COLLISION_TYPE = "collisionType";
 
   // collision box
-  public static final String COLLISIONBOX_HEIGHT = "collisionboxHeightFactor";
-  public static final String COLLISIONBOX_WIDTH = "collisionboxWidthFactor";
+  public static final String COLLISIONBOX_HEIGHT = "collisionboxHeight";
+  public static final String COLLISIONBOX_WIDTH = "collisionboxWidth";
   public static final String COLLISIONBOX_OBSTRUCTINGLIGHTS = "isObstructingLight";
 
   // general entity stuff

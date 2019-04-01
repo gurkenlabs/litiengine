@@ -585,7 +585,7 @@ public class Program {
     reassignIDs.addActionListener(a -> {
       try {
         int minID = Integer.parseInt(JOptionPane.showInputDialog(Resources.strings().get("panel_reassignMapIds"), 1));
-        EditorScreen.instance().getMapComponent().reassignIds(Game.world().environment().getMap(), minID);
+        EditorScreen.instance().getMapComponent().reassignIds(EditorScreen.instance().getMapSelectionPanel().getCurrentMap(), minID);
       } catch (Exception e) {
         log.log(Level.SEVERE, "No parseable Integer found upon reading the min Map ID input. Try again.");
       }
@@ -662,11 +662,10 @@ public class Program {
 
     MenuItem payPalMenuItem = new MenuItem(Resources.strings().get("menu_help_paypal"));
     payPalMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().getFrom("links", "link_paypal"))));
-    
+
     MenuItem aboutMenuItem = new MenuItem(Resources.strings().get("menu_help_about"));
-    aboutMenuItem.addActionListener(event -> JOptionPane.showMessageDialog(((JFrame) Game.window().getHostControl()),
-        Resources.strings().get("menu_help_abouttext") + "\n" + Resources.strings().get("menu_help_releases") + Resources.strings().getFrom("links", "link_LITIengine_releases") + "\n\n" + Resources.strings().get("copyright_gurkenlabs", "2019") + "\n" + Resources.strings().get("copyright_LITIengine"),
-        Resources.strings().get("menu_help_about") + " " + Game.info().getVersion(), JOptionPane.INFORMATION_MESSAGE));
+    aboutMenuItem.addActionListener(event -> JOptionPane.showMessageDialog(((JFrame) Game.window().getHostControl()), Resources.strings().get("menu_help_abouttext") + "\n" + Resources.strings().get("menu_help_releases") + Resources.strings().getFrom("links", "link_LITIengine_releases") + "\n\n"
+        + Resources.strings().get("copyright_gurkenlabs", "2019") + "\n" + Resources.strings().get("copyright_LITIengine"), Resources.strings().get("menu_help_about") + " " + Game.info().getVersion(), JOptionPane.INFORMATION_MESSAGE));
 
     helpMenu.add(tutorialMenuItem);
     helpMenu.add(docsMenuItem);
