@@ -16,6 +16,7 @@ import de.gurkenlabs.litiengine.resources.Resources;
 
 public final class Style {
   public static final Color COLOR_DEFAULT_BOUNDING_BOX_FILL = new Color(0, 0, 0, 35);
+  public static final Color COLOR_DARKBORDER = new Color(30, 30, 30, 200);
   public static final Color COLOR_DEFAULT_GRID = new Color(255, 255, 255, 65);
   public static final Color COLOR_COLLISION_FILL = new Color(255, 0, 0, 15);
   public static final Color COLOR_COLLISION_BORDER = Color.RED;
@@ -32,7 +33,7 @@ public final class Style {
   public static final Color COLOR_SHADOW_BORDER = new Color(30, 85, 170);
   public static final Color COLOR_MOUSE_SELECTION_AREA_FILL = new Color(0, 130, 152, 80);
   public static final Color COLOR_MOUSE_SELECTION_AREA_BORDER = new Color(0, 130, 152, 150);
-  
+
   public static final Color COLOR_ASSETPANEL_BACKGROUND = new Color(24, 24, 24);
   public static final Color COLOR_DEFAULT_TAG = new Color(99, 113, 118);
   public static final Color COLOR_DEFAULT_TAG_HOVER = COLOR_DEFAULT_TAG.darker();

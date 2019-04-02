@@ -12,7 +12,7 @@ import de.gurkenlabs.litiengine.entities.CollisionBox;
 import de.gurkenlabs.litiengine.entities.Creature;
 
 public class CollisionResolvingTests {
-  final double EPSILON = 0.02;
+  final double EPSILON = 1e-6;
 
   @Test
   public void testBasicMovement() {

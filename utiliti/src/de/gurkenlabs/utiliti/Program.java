@@ -71,6 +71,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.graphics.ImageFormat;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.resources.Strings;
 import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.litiengine.util.UriUtilities;
 import de.gurkenlabs.utiliti.components.EditorScreen;
@@ -110,7 +111,8 @@ public class Program {
 
     Game.info().setName("utiLITI");
     Game.info().setSubTitle("LITIengine Creation Kit");
-    Game.info().setVersion("v0.4.15-alpha");
+    Game.info().setVersion("v0.4.16.1-alpha");
+    Resources.strings().setEncoding(Strings.ENCODING_UTF_8);
 
     initSystemTray();
 
@@ -583,7 +585,7 @@ public class Program {
     reassignIDs.addActionListener(a -> {
       try {
         int minID = Integer.parseInt(JOptionPane.showInputDialog(Resources.strings().get("panel_reassignMapIds"), 1));
-        EditorScreen.instance().getMapComponent().reassignIds(Game.world().environment().getMap(), minID);
+        EditorScreen.instance().getMapComponent().reassignIds(EditorScreen.instance().getMapSelectionPanel().getCurrentMap(), minID);
       } catch (Exception e) {
         log.log(Level.SEVERE, "No parseable Integer found upon reading the min Map ID input. Try again.");
       }
@@ -638,33 +640,32 @@ public class Program {
     Menu helpMenu = new Menu("Help");
 
     MenuItem tutorialMenuItem = new MenuItem(Resources.strings().get("menu_help_tutorial"));
-    tutorialMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().get("link_LITIengine_tutorials"))));
+    tutorialMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().getFrom("links", "link_LITIengine_tutorials"))));
 
     MenuItem docsMenuItem = new MenuItem(Resources.strings().get("menu_help_docs"));
-    docsMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().get("link_LITIengine_docs"))));
+    docsMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().getFrom("links", "link_LITIengine_docs"))));
 
     MenuItem forumMenuItem = new MenuItem(Resources.strings().get("menu_help_forum"));
-    forumMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().get("link_LITIengine_forum"))));
+    forumMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().getFrom("links", "link_LITIengine_forum"))));
 
     MenuItem javadocsMenuItem = new MenuItem(Resources.strings().get("menu_help_javadocs"));
-    javadocsMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().get("link_LITIengine_javadocs"))));
+    javadocsMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().getFrom("links", "link_LITIengine_javadocs"))));
 
     MenuItem bugMenuItem = new MenuItem(Resources.strings().get("menu_help_bug"));
-    bugMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().get("link_LITIengine_bug"))));
+    bugMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().getFrom("links", "link_LITIengine_bug"))));
 
     MenuItem releaseMenuItem = new MenuItem(Resources.strings().get("menu_help_releasenotes"));
-    releaseMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().get("link_LITIengine_releasenotes"))));
+    releaseMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().getFrom("links", "link_LITIengine_releasenotes"))));
 
     MenuItem patreonMenuItem = new MenuItem(Resources.strings().get("menu_help_patreon"));
-    patreonMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().get("link_patreon"))));
+    patreonMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().getFrom("links", "link_patreon"))));
 
     MenuItem payPalMenuItem = new MenuItem(Resources.strings().get("menu_help_paypal"));
-    payPalMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().get("link_paypal"))));
-    
+    payPalMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().getFrom("links", "link_paypal"))));
+
     MenuItem aboutMenuItem = new MenuItem(Resources.strings().get("menu_help_about"));
-    aboutMenuItem.addActionListener(event -> JOptionPane.showMessageDialog(((JFrame) Game.window().getHostControl()),
-        Resources.strings().get("menu_help_abouttext") + "\n" + Resources.strings().get("menu_help_releases") + Resources.strings().get("link_LITIengine_releases") + "\n\n" + Resources.strings().get("copyright_gurkenlabs") + "\n" + Resources.strings().get("copyright_LITIengine"),
-        Resources.strings().get("menu_help_about") + " " + Game.info().getVersion(), JOptionPane.INFORMATION_MESSAGE));
+    aboutMenuItem.addActionListener(event -> JOptionPane.showMessageDialog(((JFrame) Game.window().getHostControl()), Resources.strings().get("menu_help_abouttext") + "\n" + Resources.strings().get("menu_help_releases") + Resources.strings().getFrom("links", "link_LITIengine_releases") + "\n\n"
+        + Resources.strings().get("copyright_gurkenlabs", "2019") + "\n" + Resources.strings().get("copyright_LITIengine"), Resources.strings().get("menu_help_about") + " " + Game.info().getVersion(), JOptionPane.INFORMATION_MESSAGE));
 
     helpMenu.add(tutorialMenuItem);
     helpMenu.add(docsMenuItem);

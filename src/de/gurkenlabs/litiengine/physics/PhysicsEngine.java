@@ -31,8 +31,8 @@ import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 public final class PhysicsEngine implements IUpdateable {
   private Rectangle2D environmentBounds;
 
-  private final Map<Collision, List<ICollisionEntity>> collisionEntities;
-  private final Map<Collision, List<Rectangle2D>> collisionBoxes;
+  private final Map<Collision, List<ICollisionEntity>> collisionEntities = new ConcurrentHashMap<>();
+  private final Map<Collision, List<Rectangle2D>> collisionBoxes = new ConcurrentHashMap<>();
 
   /**
    * Instantiates a new PhysicsEngine instance.
@@ -44,12 +44,10 @@ public final class PhysicsEngine implements IUpdateable {
    * @see Game#physics()
    */
   public PhysicsEngine() {
-    this.collisionEntities = new ConcurrentHashMap<>();
     this.collisionEntities.put(Collision.DYNAMIC, new CopyOnWriteArrayList<>());
     this.collisionEntities.put(Collision.STATIC, new CopyOnWriteArrayList<>());
     this.collisionEntities.put(Collision.ANY, new CopyOnWriteArrayList<>());
 
-    this.collisionBoxes = new ConcurrentHashMap<>();
     this.collisionBoxes.put(Collision.DYNAMIC, new CopyOnWriteArrayList<>());
     this.collisionBoxes.put(Collision.STATIC, new CopyOnWriteArrayList<>());
     this.collisionBoxes.put(Collision.ANY, new CopyOnWriteArrayList<>());

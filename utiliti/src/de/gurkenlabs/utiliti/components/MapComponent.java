@@ -818,14 +818,12 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
   public void reassignIds(IMap map, int startID) {
     int maxMapId = startID;
-    List<Integer> usedIds = new ArrayList<>();
     UndoManager.instance().beginOperation();
     for (IMapObject obj : map.getMapObjects()) {
       final int previousId = obj.getId();
       UndoManager.instance().mapObjectChanging(obj);
       obj.setId(maxMapId);
       UndoManager.instance().mapObjectChanged(obj, previousId);
-      usedIds.add(obj.getId());
       maxMapId++;
     }
     UndoManager.instance().endOperation();
@@ -1847,7 +1845,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     if (this.currentZoomIndex < DEFAULT_ZOOM_INDEX) {
       TextRenderer.render(g, id, x, y);
     } else {
-      TextRenderer.render(g, id, x, y, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+      TextRenderer.renderWithOutline(g, id, x, y, Style.COLOR_DARKBORDER, RenderingHints.VALUE_ANTIALIAS_ON);
     }
 
     g.setFont(previousFont);

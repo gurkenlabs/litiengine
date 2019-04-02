@@ -10,7 +10,9 @@ sourceSets {
     java {
       srcDirs = ["tests"] 
     }
-  }
+    resources {
+      srcDirs = ["tests"]
+    }  }
 }
 
 repositories {
@@ -30,15 +32,15 @@ dependencies {
   compile 'com.code-disaster.steamworks4j:steamworks4j:1.8.0'
   
   // JAXB modules for JDK 9 or higher
-  compile 'javax.xml.bind:jaxb-api:2.3.0'
-  compile 'com.sun.xml.bind:jaxb-core:2.3.0'
-  compile 'com.sun.xml.bind:jaxb-impl:2.3.0'
-  compile 'javax.activation:activation:1.1.1'
+  compile 'javax.activation:javax.activation-api:1.2.0'
+  compile 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
+  compile 'com.sun.xml.bind:jaxb-core:2.3.0.1'
+  compile 'com.sun.xml.bind:jaxb-impl:2.3.2'
   
-  testCompile 'org.junit.jupiter:junit-jupiter-api:5.3.2'
-  testCompile 'org.junit.jupiter:junit-jupiter-params:5.3.2'
-  testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.3.2'
-  testCompile 'org.mockito:mockito-core:2.23.4'
+  testCompile 'org.junit.jupiter:junit-jupiter-api:5.4.1'
+  testCompile 'org.junit.jupiter:junit-jupiter-params:5.4.1'
+  testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.4.1'
+  testCompile 'org.mockito:mockito-core:2.25.1'
 }
 
 test {
@@ -53,7 +55,7 @@ jar {
 
   from('resources') { include '**/*' }
   
-  version = 'v0.4.15-alpha'
+  version = 'v0.4.16.1-alpha'
   exclude '**/*.dll'
   exclude '**/*.jnilib'
   exclude '**/*.dylib'
@@ -86,13 +88,13 @@ task createJavadocs(type: Javadoc) {
 task javadocJar(type: Jar) {
   classifier = 'javadoc'
   from javadoc
-  version = 'v0.4.15-alpha'
+  version = 'v0.4.16.1-alpha'
 }
 
 task sourcesJar(type: Jar) {
   classifier = 'sources'
   from sourceSets.main.allSource
-  version = 'v0.4.15-alpha'
+  version = 'v0.4.16.1-alpha'
 }
 
 artifacts {
@@ -106,7 +108,7 @@ tasks.withType(JavaCompile) {
 
 group = "de.gurkenlabs"
 archivesBaseName = "litiengine"
-version = "0.4.15"
+version = "0.4.16.1"
 
 uploadArchives {
   repositories {

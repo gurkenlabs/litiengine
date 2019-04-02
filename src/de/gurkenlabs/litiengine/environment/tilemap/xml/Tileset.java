@@ -368,7 +368,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   }
 
   public void updateTileTerrain() {
-    if (this.sourceTileset == null) {
+    if (this.sourceTileset == null && this.tiles != null) {
       for (TilesetEntry entry : this.tiles) {
         entry.setTerrains(this.getTerrain(entry.getId()));
       }
