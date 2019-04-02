@@ -199,7 +199,7 @@ public final class RenderEngine {
     // in order to render the entities in a 2.5D manner, we sort them by their
     // max Y Coordinate
 
-    final List<? extends IEntity> entitiesToRender = entities.stream().filter(x -> x instanceof IRenderable && Game.world().camera().getViewport().intersects(x.getBoundingBox())).collect(Collectors.toList());
+    final List<? extends IEntity> entitiesToRender = entities.stream().filter(x -> Game.world().camera().getViewport().intersects(x.getBoundingBox())).collect(Collectors.toList());
 
     if (sort) {
       // THIS COSTS THE MOST TIME OF THE RENDERING LOOP... MAYBE USE A
