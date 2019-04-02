@@ -1152,7 +1152,7 @@ public final class Environment implements IRenderable {
   }
 
   public Collection<Integer> getAllMapIDs() {
-    return this.getEntities().stream().map(IEntity::getMapId).collect(Collectors.toList());
+    return this.allEntities.keySet();
   }
 
   private static void dispose(final Collection<? extends IEntity> entities) {
