@@ -586,30 +586,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   }
 
   public void setSelection(IMapObject mapObject, boolean clearSelection) {
-    if (mapObject == null) {
-      this.getSelectedMapObjects().clear();
-      for (Consumer<List<IMapObject>> cons : this.selectionChangedConsumer) {
-        cons.accept(this.getSelectedMapObjects());
-      }
-      return;
-    }
-
-    final String map = Game.world().environment().getMap().getName();
-    if (!this.selectedObjects.containsKey(map)) {
-      this.selectedObjects.put(map, new CopyOnWriteArrayList<>());
-    }
-
-    if (clearSelection) {
-      this.getSelectedMapObjects().clear();
-    }
-
-    if (!this.getSelectedMapObjects().contains(mapObject)) {
-      this.getSelectedMapObjects().add((MapObject) mapObject);
-    }
-
-    for (Consumer<List<IMapObject>> cons : this.selectionChangedConsumer) {
-      cons.accept(this.getSelectedMapObjects());
-    }
+    this.setSelection(mapObject == null ? null : Collections.singletonList(mapObject), clearSelection);
   }
 
   public void setSelection(List<IMapObject> mapObjects, boolean clearSelection) {

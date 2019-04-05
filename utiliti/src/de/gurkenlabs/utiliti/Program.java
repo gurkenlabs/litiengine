@@ -342,14 +342,14 @@ public class Program {
   }
 
   private static Component initRightSplitPanel() {
-    final MapObjectPanel mapEditorPanel = new MapObjectPanel();
+    final MapObjectPanel mapObjectPanel = new MapObjectPanel();
     final MapSelectionPanel mapSelectionPanel = new MapSelectionPanel();
-    EditorScreen.instance().setMapEditorPanel(mapEditorPanel);
+    EditorScreen.instance().setMapEditorPanel(mapObjectPanel);
     EditorScreen.instance().setMapSelectionPanel(mapSelectionPanel);
 
     JSplitPane rightSplitPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
     rightSplitPanel.setMinimumSize(new Dimension(300, 0));
-    rightSplitPanel.setBottomComponent(mapEditorPanel);
+    rightSplitPanel.setBottomComponent(mapObjectPanel);
     rightSplitPanel.setTopComponent(mapSelectionPanel);
     rightSplitPanel.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> userPreferences.setSelectionEditSplitter(rightSplitPanel.getDividerLocation()));
     if (userPreferences.getSelectionEditSplitter() != 0) {
