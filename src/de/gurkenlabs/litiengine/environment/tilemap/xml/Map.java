@@ -45,7 +45,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
   private static final Logger log = Logger.getLogger(Map.class.getName());
   private static final long serialVersionUID = 402776584608365440L;
-  private static final int[] MAX_SUPPORTED_VERSION = { 1, 2, 2 };
+  private static final int[] MAX_SUPPORTED_VERSION = { 1, 2, 3 };
 
   @XmlAttribute
   private double version;
