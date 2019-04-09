@@ -5,42 +5,41 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 
 public class GameLoopTest {
+
   @Test
   public void testTimeCalculation100() {
     final int updateRate = 100;
 
-    try (final GameLoop loop = new GameLoop("Test Loop", updateRate)) {
-      assertEquals(1000, loop.convertToMs(100));
-      assertEquals(500, loop.convertToMs(50));
-      assertEquals(2000, loop.convertToMs(200));
-      assertEquals(4500, loop.convertToMs(450));
-      assertEquals(330, loop.convertToMs(33));
-    }
+    GameTime time = new GameTime();
+    assertEquals(1000, time.toMilliseconds(100, updateRate));
+    assertEquals(500, time.toMilliseconds(50, updateRate));
+    assertEquals(2000, time.toMilliseconds(200, updateRate));
+    assertEquals(4500, time.toMilliseconds(450, updateRate));
+    assertEquals(330, time.toMilliseconds(33, updateRate));
   }
 
   @Test
   public void testTimeCalculation50() {
     final int updateRate = 50;
 
-    try (final GameLoop loop = new GameLoop("Test Loop", updateRate)) {
-      assertEquals(2000, loop.convertToMs(100));
-      assertEquals(1000, loop.convertToMs(50));
-      assertEquals(4000, loop.convertToMs(200));
-      assertEquals(9000, loop.convertToMs(450));
-      assertEquals(660, loop.convertToMs(33));
-    }
+    GameTime time = new GameTime();
+    assertEquals(2000, time.toMilliseconds(100, updateRate));
+    assertEquals(1000, time.toMilliseconds(50, updateRate));
+    assertEquals(4000, time.toMilliseconds(200, updateRate));
+    assertEquals(9000, time.toMilliseconds(450, updateRate));
+    assertEquals(660, time.toMilliseconds(33, updateRate));
+
   }
 
   @Test
   public void testTimeCalculation33() {
     final int updateRate = 33;
 
-    try (final GameLoop loop = new GameLoop("Test Loop", updateRate)) {
-      assertEquals(3030, loop.convertToMs(100));
-      assertEquals(1515, loop.convertToMs(50));
-      assertEquals(6060, loop.convertToMs(200));
-      assertEquals(13636, loop.convertToMs(450));
-      assertEquals(1000, loop.convertToMs(33));
-    }
+    GameTime time = new GameTime();
+    assertEquals(3030, time.toMilliseconds(100, updateRate));
+    assertEquals(1515, time.toMilliseconds(50, updateRate));
+    assertEquals(6060, time.toMilliseconds(200, updateRate));
+    assertEquals(13636, time.toMilliseconds(450, updateRate));
+    assertEquals(1000, time.toMilliseconds(33, updateRate));
   }
 }

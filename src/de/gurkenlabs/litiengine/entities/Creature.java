@@ -138,7 +138,7 @@ public class Creature extends CombatEntity implements IMobileEntity {
   }
 
   public void setFacingDirection(final Direction facingDirection) {
-    this.setAngle(Direction.toAngle(facingDirection));
+    this.setAngle(facingDirection.toAngle());
   }
 
   @Override

@@ -24,7 +24,7 @@ public class TilesetEntry extends CustomPropertyProvider implements ITilesetEntr
   private String terrain;
 
   @XmlElement(required = false)
-  private Animation animation;
+  private TileAnimation animation;
 
   @Override
   public int getId() {

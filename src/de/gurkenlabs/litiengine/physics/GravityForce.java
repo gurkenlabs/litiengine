@@ -13,7 +13,7 @@ public class GravityForce extends Force {
   private final IEntity forceEntity;
 
   public GravityForce(final IEntity forceEntity, final float strength, final Direction direction) {
-    this(forceEntity, strength, Direction.toAngle(direction));
+    this(forceEntity, strength, direction.toAngle());
   }
 
   public GravityForce(final IEntity forceEntity, final float strength, final float angle) {

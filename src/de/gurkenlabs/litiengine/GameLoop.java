@@ -6,7 +6,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.gurkenlabs.litiengine.util.TimeUtilities;
 
-public class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseable {
+/**
+ * The main update loop that executes the game logic by calling the update functions on all registered components and entities.
+ *
+ * @see IUpdateable#update()
+ * @see Game#loop()
+ */
+public final class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseable {
   /**
    * The tick {@link #getDeltaTime()} at which we consider the game not to run fluently anymore.
    * <ul>
@@ -31,7 +37,7 @@ public class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseable {
 
   private int updateCount;
 
-  public GameLoop(String name, final int updateRate) {
+  protected GameLoop(String name, final int updateRate) {
     super(name);
     this.actions = new CopyOnWriteArrayList<>();
     this.updateRate = updateRate;
@@ -44,18 +50,8 @@ public class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseable {
   }
 
   @Override
-  public long convertToMs(final long ticks) {
-    return (long) (ticks / (this.updateRate / 1000.0));
-  }
-
-  @Override
-  public long convertToTicks(final int ms) {
-    return (long) (this.updateRate / 1000.0 * ms);
-  }
-
-  @Override
   public int execute(int delay, Runnable action) {
-    final long d = this.convertToTicks(delay);
+    final long d = Game.time().toTicks(delay);
 
     TimedAction a = new TimedAction(this.getTicks() + d, action);
     this.actions.add(a);
@@ -70,7 +66,7 @@ public class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseable {
 
   @Override
   public long getDeltaTime(final long ticks) {
-    return this.convertToMs(this.totalTicks - ticks);
+    return Game.time().toMilliseconds(this.totalTicks - ticks);
   }
 
   @Override

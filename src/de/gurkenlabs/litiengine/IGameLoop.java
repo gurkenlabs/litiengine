@@ -2,10 +2,6 @@ package de.gurkenlabs.litiengine;
 
 public interface IGameLoop extends ILoop {
 
-  public long convertToMs(final long ticks);
-
-  public long convertToTicks(final int ms);
-
   public int execute(int delay, Runnable action);
 
   public void updateExecutionTime(int index, long ticks);
