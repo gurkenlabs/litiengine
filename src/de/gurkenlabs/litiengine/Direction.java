@@ -8,19 +8,21 @@ import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
  * It can provide a simplified way to look at a rotation or angle which is particularly useful in tile based games.
  * </p>
  * <p>
- * Directions can be converted to or constructed from angles (specified in degree).<br>
+ * Directions can be converted to or constructed from angles (specified in degrees).<br>
  * The directions also specify a flag that can be used to exchange the information in an size-optimized manner (e.g. for network communication).
  * </p>
  * 
  * @see #toFlagValue()
  */
 public enum Direction {
-  DOWN((byte) 1), LEFT((byte) 2), RIGHT((byte) 4), UNDEFINED((byte) 8), UP((byte) 16);
+  DOWN((byte) 1, 360f), LEFT((byte) 2, 270f), RIGHT((byte) 4, 90f), UNDEFINED((byte) 8, 0f), UP((byte) 16, 180f);
 
   private final byte flagValue;
+  private final float angle;
 
-  private Direction(final byte flagValue) {
+  private Direction(final byte flagValue, float angle) {
     this.flagValue = flagValue;
+    this.angle = angle;
   }
 
   /**
@@ -114,19 +116,7 @@ public enum Direction {
    * @return The mean angle of this direction.
    */
   public float toAngle() {
-    switch (this) {
-
-    case RIGHT:
-      return 90;
-    case UP:
-      return 180;
-    case LEFT:
-      return 270;
-    case DOWN:
-      return 360;
-    default:
-      return 0;
-    }
+    return this.angle;
   }
 
   /**
