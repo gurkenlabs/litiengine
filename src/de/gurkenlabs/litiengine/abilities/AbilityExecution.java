@@ -25,7 +25,7 @@ public class AbilityExecution implements IUpdateable {
   public AbilityExecution(final Ability ability) {
     this.appliedEffects = new CopyOnWriteArrayList<>();
     this.ability = ability;
-    this.executionTicks = Game.loop().getTicks();
+    this.executionTicks = Game.time().now();
     this.impactArea = ability.calculateImpactArea();
     this.castLocation = ability.getExecutor().getCenter();
     Game.loop().attach(this);
@@ -68,7 +68,7 @@ public class AbilityExecution implements IUpdateable {
     for (final Effect effect : this.getAbility().getEffects()) {
       // if the ability was not executed yet or the delay of the effect is not
       // yet reached
-      if (this.getAppliedEffects().contains(effect) || Game.loop().getDeltaTime(this.getExecutionTicks()) < effect.getDelay()) {
+      if (this.getAppliedEffects().contains(effect) || Game.time().since(this.getExecutionTicks()) < effect.getDelay()) {
         continue;
       }
 

@@ -10,6 +10,31 @@ public final class GameTime implements EnvironmentLoadedListener {
   }
 
   /**
+   * Gets the current game time in ticks.
+   * 
+   * @return The current game time in ticks.
+   * 
+   * @see GameLoop#getTicks()
+   */
+  public long now() {
+    return Game.loop().getTicks();
+  }
+
+  /**
+   * Calculates the delta time between the current game time and the specified
+   * ticks in milliseconds.
+   *
+   * @param tick
+   *          The tick for which to calculate the delta time.
+   * @return The delta time in ms.
+   * 
+   * @see #now()
+   */
+  public long since(final long tick) {
+    return toMilliseconds(Game.loop().getTicks() - tick);
+  }
+
+  /**
    * Gets the time in milliseconds that has passed since the game has been started.<br>
    * This uses the configured update rate to calculate the passed time from the specified ticks.
    * 
@@ -25,7 +50,7 @@ public final class GameTime implements EnvironmentLoadedListener {
    * @return The time since the current environment was loaded.
    */
   public long sinceEnvironmentLoad() {
-    return this.toMilliseconds(Game.loop().getTicks() - this.environmentLoaded);
+    return this.since(this.environmentLoaded);
   }
 
   /**

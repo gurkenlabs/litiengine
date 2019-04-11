@@ -4,15 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import de.gurkenlabs.litiengine.util.TimeUtilities;
-
 /**
  * The main update loop that executes the game logic by calling the update functions on all registered components and entities.
  *
  * @see IUpdateable#update()
  * @see Game#loop()
  */
-public final class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseable {
+public final class GameLoop extends UpdateLoop implements IGameLoop {
   /**
    * The tick {@link #getDeltaTime()} at which we consider the game not to run fluently anymore.
    * <ul>
@@ -26,31 +24,21 @@ public final class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseab
   private static int executionIndex = -1;
 
   private final List<TimedAction> actions;
-  private final int updateRate;
-
-  private long deltaTime;
 
   private long lastUpsTime;
 
   private float timeScale;
-  private long totalTicks;
 
   private int updateCount;
 
   protected GameLoop(String name, final int updateRate) {
-    super(name);
+    super(name, updateRate);
     this.actions = new CopyOnWriteArrayList<>();
-    this.updateRate = updateRate;
     this.setTimeScale(1.0F);
   }
 
   @Override
-  public void close() {
-    this.terminate();
-  }
-
-  @Override
-  public int execute(int delay, Runnable action) {
+  public int perform(int delay, Runnable action) {
     final long d = Game.time().toTicks(delay);
 
     TimedAction a = new TimedAction(this.getTicks() + d, action);
@@ -60,69 +48,18 @@ public final class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseab
   }
 
   @Override
-  public long getDeltaTime() {
-    return this.deltaTime;
-  }
-
-  @Override
-  public long getDeltaTime(final long ticks) {
-    return Game.time().toMilliseconds(this.totalTicks - ticks);
-  }
-
-  @Override
-  public long getTicks() {
-    return this.totalTicks;
-  }
-
-  @Override
   public float getTimeScale() {
     return this.timeScale;
   }
 
   @Override
   public int getUpdateRate() {
-    return this.updateRate;
-  }
-
-  @Override
-  public void run() {
-    while (!interrupted()) {
-      final float scale = this.getTimeScale() > 0 ? this.getTimeScale() : 1;
-      final long tickWait = (long) (1.0 / (this.getUpdateRate() * scale) * 1000);
-      final long updateStart = System.nanoTime();
-
-      if (this.getTimeScale() > 0) {
-        ++this.totalTicks;
-        this.update();
-        this.executeTimedActions();
-      }
-
-      ++this.updateCount;
-
-      final long currentMillis = System.currentTimeMillis();
-      this.trackUpdateRate(currentMillis);
-
-      final long lastUpdateTime = currentMillis;
-      final long updateTime = (long) TimeUtilities.nanoToMs(System.nanoTime() - updateStart);
-      try {
-        sleep(Math.max(0, tickWait - updateTime));
-      } catch (final InterruptedException e) {
-        interrupt();
-        break;
-      }
-
-      this.deltaTime = System.currentTimeMillis() - lastUpdateTime + updateTime;
-    }
+    return this.getTickRate();
   }
 
   @Override
   public void setTimeScale(final float timeScale) {
     this.timeScale = timeScale;
-  }
-
-  @Override
-  public void terminate() {
-    this.interrupt();
   }
 
   @Override
@@ -134,10 +71,30 @@ public final class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseab
     }
   }
 
+  /**
+   * In addition to the normal base implementation, the <code>GameLoop</code> performs registered action at the required
+   * time and tracks some detailed metrics.
+   */
+  @Override
+  protected void process() {
+    if (this.getTimeScale() > 0) {
+      super.process();
+      this.executeTimedActions();
+    }
+
+    this.trackUpdateRate();
+  }
+
+  @Override
+  protected long getExpectedDelta() {
+    final float scale = this.getTimeScale() > 0 ? this.getTimeScale() : 1;
+    return (long) (1000 / (this.getUpdateRate() * scale));
+  }
+
   private void executeTimedActions() {
     final List<TimedAction> executed = new ArrayList<>();
     for (final TimedAction action : this.actions) {
-      if (action.getExecutionTick() <= this.totalTicks) {
+      if (action.getExecutionTick() <= this.getTicks()) {
 
         action.getAction().run();
         executed.add(action);
@@ -147,7 +104,10 @@ public final class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseab
     this.actions.removeAll(executed);
   }
 
-  private void trackUpdateRate(long currentMillis) {
+  private void trackUpdateRate() {
+    ++this.updateCount;
+
+    long currentMillis = System.currentTimeMillis();
     if (currentMillis - this.lastUpsTime >= 1000) {
       this.lastUpsTime = currentMillis;
       Game.metrics().setUpdatesPerSecond(this.updateCount);

@@ -1763,13 +1763,13 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     final Rectangle2D focus = this.getFocus();
     final IMapObject focusedMapObject = this.getFocusedMapObject();
     if (focus != null && focusedMapObject != null) {
-      Stroke stroke = new BasicStroke(1 / Game.world().camera().getRenderScale(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER, 4, new float[] { 1f, 1f }, Game.loop().getTicks() / 15);
+      Stroke stroke = new BasicStroke(1 / Game.world().camera().getRenderScale(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER, 4, new float[] { 1f, 1f }, Game.time().now() / 15);
 
       g.setColor(Color.BLACK);
 
       RenderEngine.renderOutline(g, focus, stroke);
 
-      Stroke whiteStroke = new BasicStroke(1 / Game.world().camera().getRenderScale(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER, 4, new float[] { 1f, 1f }, Game.loop().getTicks() / 15 - 1f);
+      Stroke whiteStroke = new BasicStroke(1 / Game.world().camera().getRenderScale(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER, 4, new float[] { 1f, 1f }, Game.time().now() / 15 - 1f);
       g.setColor(Color.WHITE);
       RenderEngine.renderOutline(g, focus, whiteStroke);
 

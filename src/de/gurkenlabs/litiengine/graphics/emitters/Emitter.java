@@ -111,7 +111,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     }
 
     this.activated = true;
-    this.activationTick = Game.loop().getTicks();
+    this.activationTick = Game.time().now();
     Game.loop().attach(this);
   }
 
@@ -395,9 +395,9 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
       p.update(this.getOrigin(), updateRatio);
     }
 
-    this.aliveTime = Game.loop().getDeltaTime(this.activationTick);
+    this.aliveTime = Game.time().since(this.activationTick);
 
-    if ((this.getSpawnRate() == 0 || Game.loop().getDeltaTime(this.lastSpawn) >= this.getSpawnRate())) {
+    if ((this.getSpawnRate() == 0 || Game.time().since(this.lastSpawn) >= this.getSpawnRate())) {
       this.spawnParticle();
     }
   }
