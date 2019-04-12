@@ -1,6 +1,5 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
-import java.io.Serializable;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -14,9 +13,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.ITileAnimationFrame;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "animation")
-public class TileAnimation implements ITileAnimation, Serializable {
-  private static final long serialVersionUID = -6359129685451548791L;
-
+public class TileAnimation implements ITileAnimation {
   @XmlElement(name = "frame", type = Frame.class)
   private List<ITileAnimationFrame> frames;
 
