@@ -203,6 +203,10 @@ public abstract class Ability implements IRenderable {
   public void setOrigin(final Point2D origin) {
     this.origin = origin;
   }
+  
+  protected void setCurrentExecution(AbilityExecution ae) {
+    this.currentExecution = ae;
+  }
 
   protected List<Effect> getEffects() {
     return this.effects;
