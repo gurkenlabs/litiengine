@@ -5,7 +5,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
-import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,11 +41,10 @@ import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 @XmlRootElement(name = "map")
 @XmlAccessorType(XmlAccessType.FIELD)
-public final class Map extends CustomPropertyProvider implements IMap, Serializable, Comparable<Map> {
+public final class Map extends CustomPropertyProvider implements IMap, Comparable<Map> {
   public static final String FILE_EXTENSION = "tmx";
 
   private static final Logger log = Logger.getLogger(Map.class.getName());
-  private static final long serialVersionUID = 402776584608365440L;
   private static final int[] MAX_SUPPORTED_VERSION = { 1, 2, 3 };
 
   @XmlAttribute
