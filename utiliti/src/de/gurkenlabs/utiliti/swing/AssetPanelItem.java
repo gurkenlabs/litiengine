@@ -29,6 +29,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
@@ -167,7 +168,7 @@ public class AssetPanelItem extends JPanel {
     this.iconLabel.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(MouseEvent e) {
-        if (e.getClickCount() == 2 && addEntity()) {
+        if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e) && addEntity()) {
           e.consume();
         }
       }

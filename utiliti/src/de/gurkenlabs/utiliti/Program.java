@@ -802,7 +802,6 @@ public class Program {
         ed.setSelected(false);
         mv.setSelected(false);
         place.setSelected(true);
-        place.requestFocus();
         Game.window().getRenderComponent().setCursor(Cursors.ADD, 0, 0);
       }
 
@@ -810,7 +809,6 @@ public class Program {
         place.setSelected(false);
         mv.setSelected(false);
         ed.setSelected(true);
-        ed.requestFocus();
         Game.window().getRenderComponent().setCursor(Cursors.DEFAULT, 0, 0);
       }
 
@@ -822,7 +820,6 @@ public class Program {
         ed.setSelected(false);
         place.setSelected(false);
         mv.setSelected(true);
-        mv.requestFocus();
         Game.window().getRenderComponent().setCursor(Cursors.MOVE, 0, 0);
       }
     });
