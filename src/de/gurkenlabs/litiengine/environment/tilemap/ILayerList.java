@@ -57,7 +57,7 @@ public interface ILayerList extends ICustomPropertyProvider {
    *          the map object being searched
    * @return the map object layer containing the map object
    */
-  default public IMapObjectLayer getMapObjectLayer(IMapObject mapObject) {
+  public default IMapObjectLayer getMapObjectLayer(IMapObject mapObject) {
     for (IMapObjectLayer layer : this.getMapObjectLayers()) {
       Optional<IMapObject> found = layer.getMapObjects().stream().filter(x -> x.getId() == mapObject.getId()).findFirst();
       if (found.isPresent()) {
@@ -81,7 +81,7 @@ public interface ILayerList extends ICustomPropertyProvider {
    *
    * @return a Collection of all IMapObjects in the layer list
    */
-  default public Collection<IMapObject> getMapObjects() {
+  public default Collection<IMapObject> getMapObjects() {
     List<IMapObject> mapObjects = new ArrayList<>();
     if (this.getMapObjectLayers() == null) {
       return mapObjects;
@@ -109,7 +109,7 @@ public interface ILayerList extends ICustomPropertyProvider {
    *          an array of types for which the layer list is searched
    * @return a Collection of IMapObjects matching the given MapObjectTypes
    */
-  default public Collection<IMapObject> getMapObjects(String... types) {
+  public default Collection<IMapObject> getMapObjects(String... types) {
     List<IMapObject> mapObjects = new ArrayList<>();
     if (this.getMapObjectLayers() == null || this.getMapObjectLayers().isEmpty() || types.length == 0) {
       return mapObjects;
@@ -137,7 +137,7 @@ public interface ILayerList extends ICustomPropertyProvider {
    *          an array of mapIDs for which the layer list is searched
    * @return a Collection of IMapObjects matching the given MapObject IDs
    */
-  default public Collection<IMapObject> getMapObjects(int... mapIDs) {
+  public default Collection<IMapObject> getMapObjects(int... mapIDs) {
     List<IMapObject> mapObjects = new ArrayList<>();
     if (this.getMapObjectLayers() == null || this.getMapObjectLayers().isEmpty() || mapIDs.length == 0) {
       return mapObjects;
@@ -161,7 +161,7 @@ public interface ILayerList extends ICustomPropertyProvider {
    *          the map id of the desired <code>IMapObject</code>
    * @return the <code>IMapObject</code> with the given ID
    */
-  default public IMapObject getMapObject(int mapId) {
+  public default IMapObject getMapObject(int mapId) {
     if (this.getMapObjectLayers() == null) {
       return null;
     }
@@ -187,7 +187,7 @@ public interface ILayerList extends ICustomPropertyProvider {
    * @param mapId
    *          the map id of the <code>IMapObject</code> we want to remove
    */
-  default public void removeMapObject(int mapId) {
+  public default void removeMapObject(int mapId) {
     for (IMapObjectLayer layer : this.getMapObjectLayers()) {
       IMapObject remove = null;
       for (IMapObject obj : layer.getMapObjects()) {

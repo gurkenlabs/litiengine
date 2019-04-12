@@ -13,7 +13,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.abilities.effects.Effect;
 import de.gurkenlabs.litiengine.abilities.effects.EffectArgument;
 import de.gurkenlabs.litiengine.annotation.AbilityInfo;
