@@ -159,13 +159,13 @@ public class EditorScreen extends Screen {
     g.setColor(Color.WHITE);
     TextRenderer.render(g, Game.metrics().getFramesPerSecond() + " FPS", 10, Game.window().getResolution().getHeight() - 20);
 
-    if (Game.loop().getTicks() % 4 == 0) {
+    if (Game.time().now() % 4 == 0) {
       Program.updateStatusBar();
     }
 
     // render status
     if (this.currentStatus != null && !this.currentStatus.isEmpty()) {
-      long deltaTime = Game.loop().getDeltaTime(this.statusTick);
+      long deltaTime = Game.time().since(this.statusTick);
       if (deltaTime > STATUS_DURATION) {
         this.currentStatus = null;
       }
@@ -634,7 +634,7 @@ public class EditorScreen extends Screen {
 
   public void setCurrentStatus(String currentStatus) {
     this.currentStatus = currentStatus;
-    this.statusTick = Game.loop().getTicks();
+    this.statusTick = Game.time().now();
   }
 
   public void updateGameFileMaps() {

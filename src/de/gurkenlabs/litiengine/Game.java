@@ -93,7 +93,7 @@ public final class Game {
 
   private static GameLoop gameLoop;
   private static RenderLoop renderLoop;
-  private static GameLoop inputLoop;
+  private static UpdateLoop inputLoop;
   private static ScreenManager screenManager;
   private static GameWindow gameWindow;
   private static GameWorld world;
@@ -351,7 +351,7 @@ public final class Game {
    * 
    * @return The game's input loop.
    */
-  public static IGameLoop inputLoop() {
+  public static ILoop inputLoop() {
     return inputLoop;
   }
 
@@ -465,7 +465,7 @@ public final class Game {
 
     // setup default exception handling for render and update loop
     renderLoop = new RenderLoop("Render Loop");
-    inputLoop = new GameLoop("Input Loop", loop().getUpdateRate());
+    inputLoop = new UpdateLoop("Input Loop", loop().getUpdateRate());
 
     setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(config().client().exitOnError()));
 

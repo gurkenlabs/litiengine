@@ -12,7 +12,7 @@ public class EffectApplication {
   private final Shape impactArea;
 
   protected EffectApplication(final List<ICombatEntity> affectedEntities, final Shape impactArea) {
-    this.applied = Game.loop().getTicks();
+    this.applied = Game.time().now();
     this.affectedEntities = affectedEntities;
     this.impactArea = impactArea;
   }

@@ -161,7 +161,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
       listener.onHit(event);
     }
 
-    this.lastHit = Game.loop().getTicks();
+    this.lastHit = Game.time().now();
 
     return this.isDead();
   }
@@ -251,6 +251,6 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
 
   @Override
   public boolean wasHit(int timeSpan) {
-    return Game.loop().getDeltaTime(this.lastHit) < timeSpan;
+    return Game.time().since(this.lastHit) < timeSpan;
   }
 }

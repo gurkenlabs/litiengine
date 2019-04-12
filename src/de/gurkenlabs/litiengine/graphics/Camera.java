@@ -180,7 +180,7 @@ public class Camera implements ICamera {
       this.zoomTick = 0;
       this.zoomStep = 0;
     } else {
-      this.zoomTick = Game.loop().getTicks();
+      this.zoomTick = Game.time().now();
       this.targetZoom = targetZoom;
       this.zoomDelay = delay;
 
@@ -193,7 +193,7 @@ public class Camera implements ICamera {
 
   @Override
   public void shake(final double intensity, final int delay, final int shakeDuration) {
-    this.shakeTick = Game.loop().getTicks();
+    this.shakeTick = Game.time().now();
     this.shakeDelay = delay;
     this.shakeIntensity = intensity;
     this.shakeDuration = shakeDuration;
@@ -206,7 +206,7 @@ public class Camera implements ICamera {
     }
 
     if (this.targetZoom > 0) {
-      if (Game.loop().getDeltaTime(this.zoomTick) >= this.zoomDelay) {
+      if (Game.time().since(this.zoomTick) >= this.zoomDelay) {
         for (final DoubleConsumer cons : this.zoomChangedConsumer) {
           cons.accept(this.zoom);
         }
@@ -246,10 +246,10 @@ public class Camera implements ICamera {
       return;
     }
 
-    if (Game.loop().getDeltaTime(this.lastShake) > this.shakeDelay) {
+    if (Game.time().since(this.lastShake) > this.shakeDelay) {
       this.shakeOffsetX = this.getShakeIntensity() * MathUtilities.randomSign();
       this.shakeOffsetY = this.getShakeIntensity() * MathUtilities.randomSign();
-      this.lastShake = Game.loop().getTicks();
+      this.lastShake = Game.time().now();
     }
   }
 
@@ -370,7 +370,7 @@ public class Camera implements ICamera {
   }
 
   private boolean isShakeEffectActive() {
-    return this.getShakeTick() != 0 && Game.loop().getDeltaTime(this.getShakeTick()) < this.getShakeDuration();
+    return this.getShakeTick() != 0 && Game.time().since(this.getShakeTick()) < this.getShakeDuration();
   }
 
   @Override

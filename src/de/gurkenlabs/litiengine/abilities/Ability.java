@@ -13,7 +13,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.abilities.effects.Effect;
 import de.gurkenlabs.litiengine.abilities.effects.EffectArgument;
 import de.gurkenlabs.litiengine.annotation.AbilityInfo;
@@ -74,7 +73,7 @@ public abstract class Ability implements IRenderable {
   }
 
   public boolean canCast() {
-    return !this.getExecutor().isDead() && (this.getCurrentExecution() == null || this.getCurrentExecution().getExecutionTicks() == 0 || Game.loop().getDeltaTime(this.getCurrentExecution().getExecutionTicks()) >= this.getAttributes().getCooldown().getCurrentValue());
+    return !this.getExecutor().isDead() && (this.getCurrentExecution() == null || this.getCurrentExecution().getExecutionTicks() == 0 || Game.time().since(this.getCurrentExecution().getExecutionTicks()) >= this.getAttributes().getCooldown().getCurrentValue());
   }
 
   /**
@@ -145,17 +144,17 @@ public abstract class Ability implements IRenderable {
     return this.executor.getLocation();
   }
 
-  public float getRemainingCooldownInSeconds(final IGameLoop loop) {
+  public float getRemainingCooldownInSeconds() {
     if (this.getCurrentExecution() == null || this.getExecutor() == null || this.getExecutor().isDead()) {
       return 0;
     }
 
     // calculate cooldown in seconds
-    return (float) (!this.canCast() ? (this.getAttributes().getCooldown().getCurrentValue() - loop.getDeltaTime(this.getCurrentExecution().getExecutionTicks())) * 0.001 : 0);
+    return (float) (!this.canCast() ? (this.getAttributes().getCooldown().getCurrentValue() - Game.time().since(this.getCurrentExecution().getExecutionTicks())) * 0.001 : 0);
   }
 
   public boolean isActive() {
-    return this.getCurrentExecution() != null && Game.loop().getDeltaTime(this.getCurrentExecution().getExecutionTicks()) < this.getAttributes().getDuration().getCurrentValue();
+    return this.getCurrentExecution() != null && Game.time().since(this.getCurrentExecution().getExecutionTicks()) < this.getAttributes().getDuration().getCurrentValue();
   }
 
   public boolean isMultiTarget() {
@@ -203,6 +202,10 @@ public abstract class Ability implements IRenderable {
    */
   public void setOrigin(final Point2D origin) {
     this.origin = origin;
+  }
+  
+  protected void setCurrentExecution(AbilityExecution ae) {
+    this.currentExecution = ae;
   }
 
   protected List<Effect> getEffects() {

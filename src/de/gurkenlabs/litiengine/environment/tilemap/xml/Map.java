@@ -8,11 +8,9 @@ import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,7 +29,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.IGroupLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ILayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
-import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapOrientation;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
@@ -50,7 +47,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
   private static final Logger log = Logger.getLogger(Map.class.getName());
   private static final long serialVersionUID = 402776584608365440L;
-  private static final int[] MAX_SUPPORTED_VERSION = { 1, 2, 2 };
+  private static final int[] MAX_SUPPORTED_VERSION = { 1, 2, 3 };
 
   @XmlAttribute
   private double version;
@@ -179,36 +176,6 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   }
 
   @Override
-  public IMapObjectLayer getMapObjectLayer(IMapObject mapObject) {
-    for (IMapObjectLayer layer : this.getMapObjectLayers()) {
-      Optional<IMapObject> found = layer.getMapObjects().stream().filter(x -> x.getId() == mapObject.getId()).findFirst();
-      if (found.isPresent()) {
-        return layer;
-      }
-    }
-
-    return null;
-  }
-
-  @Override
-  public void removeMapObject(int mapId) {
-    for (IMapObjectLayer layer : this.getMapObjectLayers()) {
-      IMapObject remove = null;
-      for (IMapObject obj : layer.getMapObjects()) {
-        if (obj.getId() == mapId) {
-          remove = obj;
-          break;
-        }
-      }
-
-      if (remove != null) {
-        layer.removeMapObject(remove);
-        break;
-      }
-    }
-  }
-
-  @Override
   public Dimension getSizeInPixels() {
     return this.getOrientation().getSize(this);
   }
@@ -275,85 +242,6 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   }
 
   @Override
-  public Collection<IMapObject> getMapObjects(String... types) {
-    List<IMapObject> mapObjects = new ArrayList<>();
-    if (this.getMapObjectLayers() == null || this.getMapObjectLayers().isEmpty() || types.length == 0) {
-      return mapObjects;
-    }
-
-    for (IMapObjectLayer layer : this.getMapObjectLayers()) {
-      if (layer == null) {
-        continue;
-      }
-
-      mapObjects.addAll(layer.getMapObjects(types));
-    }
-
-    return mapObjects;
-  }
-
-  @Override
-  public Collection<IMapObject> getMapObjects(int... mapIDs) {
-    List<IMapObject> mapObjects = new ArrayList<>();
-    if (this.getMapObjectLayers() == null || this.getMapObjectLayers().isEmpty() || mapIDs.length == 0) {
-      return mapObjects;
-    }
-
-    for (IMapObjectLayer layer : this.getMapObjectLayers()) {
-      if (layer == null) {
-        continue;
-      }
-
-      mapObjects.addAll(layer.getMapObjects(mapIDs));
-    }
-
-    return mapObjects;
-  }
-
-  @Override
-  public Collection<IMapObject> getMapObjects() {
-    List<IMapObject> mapObjects = new ArrayList<>();
-    if (this.getMapObjectLayers() == null) {
-      return mapObjects;
-    }
-
-    for (IMapObjectLayer layer : this.getMapObjectLayers()) {
-      if (layer == null) {
-        continue;
-      }
-
-      for (IMapObject mapObject : layer.getMapObjects()) {
-        if (mapObject != null) {
-          mapObjects.add(mapObject);
-        }
-      }
-    }
-
-    return mapObjects;
-  }
-
-  @Override
-  public IMapObject getMapObject(int mapId) {
-    if (this.getMapObjectLayers() == null) {
-      return null;
-    }
-
-    for (IMapObjectLayer layer : this.getMapObjectLayers()) {
-      if (layer == null) {
-        continue;
-      }
-
-      for (IMapObject mapObject : layer.getMapObjects()) {
-        if (mapObject != null && mapObject.getId() == mapId) {
-          return mapObject;
-        }
-      }
-    }
-
-    return null;
-  }
-
-  @Override
   public int getWidth() {
     return this.width;
   }
@@ -404,7 +292,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
   @Override
   public void addLayer(ILayer layer) {
-    this.layers.add(layer);
+    this.getRenderLayers().add(layer);
     this.layerAdded(layer);
     if (layer instanceof Layer) {
       ((Layer) layer).setMap(this);
@@ -413,7 +301,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
   @Override
   public void addLayer(int index, ILayer layer) {
-    this.layers.add(index, layer);
+    this.getRenderLayers().add(index, layer);
     this.layerAdded(layer);
     if (layer instanceof Layer) {
       ((Layer) layer).setMap(this);
@@ -433,7 +321,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   public void removeLayer(int index) {
     ILayer removed = this.layers.remove(index);
     this.layerRemoved(removed);
-    if (removed != null && removed instanceof Layer) {
+    if (removed instanceof Layer) {
       ((Layer) removed).setMap(null);
     }
   }
@@ -656,6 +544,9 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     int minChunkOffsetX = 0;
     int minChunkOffsetY = 0;
 
+    int w = 0;
+    int h = 0;
+
     for (ITileLayer tileLayer : this.tileLayers) {
       if (!(tileLayer instanceof TileLayer)) {
         continue;
@@ -682,15 +573,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
       if (layer.getRawTileData() != null) {
         layer.getRawTileData().setMinChunkOffsets(minChunkOffsetX, minChunkOffsetY);
       }
-    }
 
-    this.chunkOffsetX = minChunkOffsetX;
-    this.chunkOffsetY = minChunkOffsetY;
-
-    int w = 0;
-    int h = 0;
-
-    for (ITileLayer tileLayer : this.tileLayers) {
       if (tileLayer.getWidth() > w) {
         w = tileLayer.getWidth();
       }
@@ -700,7 +583,10 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
       }
     }
 
+    this.chunkOffsetX = minChunkOffsetX;
+    this.chunkOffsetY = minChunkOffsetY;
     this.width = w;
     this.height = h;
+
   }
 }

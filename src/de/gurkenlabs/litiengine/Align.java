@@ -2,6 +2,9 @@ package de.gurkenlabs.litiengine;
 
 import de.gurkenlabs.litiengine.util.MathUtilities;
 
+/**
+ * This enum defines a range of horizontal alignments.
+ */
 public enum Align {
   CENTER(0.5f), LEFT(0f), RIGHT(1f), CENTER_LEFT(0.25f), CENTER_RIGHT(0.75f);
 

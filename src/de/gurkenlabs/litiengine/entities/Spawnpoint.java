@@ -67,7 +67,7 @@ public class Spawnpoint extends Entity {
 
   public void spawn(IMobileEntity entity) {
     entity.setLocation(this.getLocation());
-    entity.setAngle(Direction.toAngle(this.getDirection()));
+    entity.setAngle(this.getDirection().toAngle());
 
     Environment env = this.getEnvironment();
     if (env == null) {

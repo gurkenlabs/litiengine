@@ -81,7 +81,7 @@ public class SpeechBubble implements IUpdateable, IRenderable {
       this.currentTextQueue.add(this.currentText.charAt(i));
     }
 
-    this.lastTextDispay = Game.loop().getTicks();
+    this.lastTextDispay = Game.time().now();
     this.createBubbleImage();
     Game.world().environment().add(this, RenderType.UI);
     Game.renderLoop().attach(this);
@@ -187,7 +187,7 @@ public class SpeechBubble implements IUpdateable, IRenderable {
     this.entityCenter = Game.world().camera().getViewportLocation(this.getEntity().getCenter());
 
     // old text was displayed long enough
-    if (this.lastTextDispay != 0 && Game.loop().getDeltaTime(this.lastTextDispay) > this.currentTextDisplayTime) {
+    if (this.lastTextDispay != 0 && Game.time().since(this.lastTextDispay) > this.currentTextDisplayTime) {
       this.currentText = null;
       this.displayedText = null;
       this.lastTextDispay = 0;
@@ -195,9 +195,9 @@ public class SpeechBubble implements IUpdateable, IRenderable {
     }
 
     // display new text
-    if (!this.currentTextQueue.isEmpty() && Game.loop().getDeltaTime(this.lastCharPoll) > LETTER_WRITE_DELAY) {
+    if (!this.currentTextQueue.isEmpty() && Game.time().since(this.lastCharPoll) > LETTER_WRITE_DELAY) {
       this.displayedText += this.currentTextQueue.poll();
-      this.lastCharPoll = Game.loop().getTicks();
+      this.lastCharPoll = Game.time().now();
       if (this.typeSound != null) {
         Game.audio().playSound(this.typeSound, this.getEntity());
       }

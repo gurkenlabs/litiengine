@@ -82,11 +82,7 @@ public class ClientConfiguration extends ConfigurationGroup {
    *          the new max fps
    */
   public void setMaxFps(final int maxFps) {
-    if (maxFps < 1) {
-      return;
-    }
-
-    this.maxFps = maxFps;
+    this.maxFps = Math.max(1, maxFps);
   }
 
   public void setShowGameMetrics(final boolean showGameMetrics) {

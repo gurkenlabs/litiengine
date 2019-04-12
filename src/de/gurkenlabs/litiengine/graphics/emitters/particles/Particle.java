@@ -301,10 +301,10 @@ public abstract class Particle implements ITimeToLive {
    */
   public void update(final Point2D emitterOrigin, final float updateRatio) {
     if (this.aliveTick == 0) {
-      this.aliveTick = Game.loop().getTicks();
+      this.aliveTick = Game.time().now();
     }
 
-    this.aliveTime = Game.loop().getDeltaTime(this.aliveTick);
+    this.aliveTime = Game.time().since(this.aliveTick);
     if (this.timeToLiveReached() || this.colliding) {
       return;
     }

@@ -206,7 +206,7 @@ public abstract class Effect implements IUpdateable {
   }
 
   protected boolean hasEnded(final EffectApplication appliance) {
-    final long effectDuration = Game.loop().getDeltaTime(appliance.getAppliedTicks());
+    final long effectDuration = Game.time().since(appliance.getAppliedTicks());
     return effectDuration > this.getDuration();
   }
 

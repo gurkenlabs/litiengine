@@ -81,14 +81,14 @@ public class RenderComponent extends Canvas {
   public void fadeIn(final int ms) {
     this.fadeOutStart = -1;
     this.fadeOutTime = -1;
-    this.fadeInStart = Game.loop().getTicks();
+    this.fadeInStart = Game.time().now();
     this.fadeInTime = ms;
   }
 
   public void fadeOut(final int ms) {
     this.fadeInStart = -1;
     this.fadeInTime = -1;
-    this.fadeOutStart = Game.loop().getTicks();
+    this.fadeOutStart = Game.time().now();
     this.fadeOutTime = ms;
   }
 
@@ -130,6 +130,11 @@ public class RenderComponent extends Canvas {
 
   public void render() {
     final long currentMillis = System.currentTimeMillis();
+    if (currentMillis - this.lastFpsTime >= 1000) {
+      this.lastFpsTime = currentMillis;
+      this.fpsChangedConsumer.forEach(consumer -> consumer.accept(this.frameCount));
+      this.frameCount = 0;
+    }
     this.handleFade();
     Graphics2D g = null;
     do {
@@ -202,12 +207,6 @@ public class RenderComponent extends Canvas {
 
     Toolkit.getDefaultToolkit().sync();
     this.frameCount++;
-
-    if (currentMillis - this.lastFpsTime >= 1000) {
-      this.lastFpsTime = currentMillis;
-      this.fpsChangedConsumer.forEach(consumer -> consumer.accept(this.frameCount));
-      this.frameCount = 0;
-    }
   }
 
   public void setCursor(final Image image) {
@@ -249,7 +248,7 @@ public class RenderComponent extends Canvas {
 
   private void handleFade() {
     if (this.fadeOutStart != -1) {
-      final long timePassed = Game.loop().getDeltaTime(this.fadeOutStart);
+      final long timePassed = Game.time().since(this.fadeOutStart);
       this.currentAlpha = MathUtilities.clamp(1 - timePassed / (float) this.fadeOutTime, 0, 1);
       if (this.currentAlpha == 0) {
         this.fadeOutStart = -1;
@@ -260,7 +259,7 @@ public class RenderComponent extends Canvas {
     }
 
     if (this.fadeInStart != -1) {
-      final long timePassed = Game.loop().getDeltaTime(this.fadeInStart);
+      final long timePassed = Game.time().since(this.fadeInStart);
       this.currentAlpha = MathUtilities.clamp(timePassed / (float) this.fadeInTime, 0, 1);
       if (this.currentAlpha == 1) {
         this.fadeInStart = -1;

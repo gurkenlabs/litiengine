@@ -591,4 +591,21 @@ public class GeometricUtilities {
   public static double getYDelta(final double angle, final double delta) {
     return Math.cos(Math.toRadians(angle)) * delta * 100 / 100.0;
   }
+
+  /**
+   * Normalizes the specified angle to the range between 0-360 degree.
+   * 
+   * @param angle
+   *          The angle that will be normalized.
+   * @return The normalized angle.
+   */
+  public static double normalizeAngle(final double angle) {
+    double normalized = angle % 360;
+
+    if (normalized < 0) {
+      normalized += 360;
+    }
+
+    return normalized;
+  }
 }

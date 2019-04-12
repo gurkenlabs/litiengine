@@ -257,7 +257,7 @@ public class Trigger extends CollisionEntity implements IUpdateable {
       return false;
     }
 
-    if (this.cooldown > 0 && Game.loop().getDeltaTime(this.lastActivation) < this.cooldown) {
+    if (this.cooldown > 0 && Game.time().since(this.lastActivation) < this.cooldown) {
       return false;
     }
 
@@ -292,7 +292,7 @@ public class Trigger extends CollisionEntity implements IUpdateable {
       Game.world().environment().remove(this);
     }
 
-    this.lastActivation = Game.loop().getTicks();
+    this.lastActivation = Game.time().now();
     return true;
   }
 

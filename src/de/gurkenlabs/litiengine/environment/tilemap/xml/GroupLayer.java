@@ -2,10 +2,8 @@ package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
@@ -13,7 +11,6 @@ import javax.xml.bind.annotation.XmlElements;
 import de.gurkenlabs.litiengine.environment.tilemap.IGroupLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ILayer;
-import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
 
@@ -78,7 +75,7 @@ public class GroupLayer extends Layer implements IGroupLayer {
   public void removeLayer(int index) {
     ILayer removed = this.layers.remove(index);
     this.layerRemoved(removed);
-    if (removed != null && removed instanceof Layer) {
+    if (removed instanceof Layer) {
       ((Layer) removed).setMap(null);
     }
   }
@@ -110,115 +107,6 @@ public class GroupLayer extends Layer implements IGroupLayer {
     }
     if (layer instanceof IGroupLayer) {
       this.rawGroupLayers.add((IGroupLayer) layer);
-    }
-  }
-
-  @Override
-  public IMapObjectLayer getMapObjectLayer(IMapObject mapObject) {
-    for (IMapObjectLayer layer : this.getMapObjectLayers()) {
-      Optional<IMapObject> found = layer.getMapObjects().stream().filter(x -> x.getId() == mapObject.getId()).findFirst();
-      if (found.isPresent()) {
-        return layer;
-      }
-    }
-
-    return null;
-  }
-
-  @Override
-  public Collection<IMapObject> getMapObjects() {
-    List<IMapObject> mapObjects = new ArrayList<>();
-    if (this.getMapObjectLayers() == null) {
-      return mapObjects;
-    }
-
-    for (IMapObjectLayer layer : this.getMapObjectLayers()) {
-      if (layer == null) {
-        continue;
-      }
-
-      for (IMapObject mapObject : layer.getMapObjects()) {
-        if (mapObject != null) {
-          mapObjects.add(mapObject);
-        }
-      }
-    }
-
-    return mapObjects;
-  }
-
-  @Override
-  public Collection<IMapObject> getMapObjects(int... mapIDs) {
-    List<IMapObject> mapObjects = new ArrayList<>();
-    if (this.getMapObjectLayers() == null || this.getMapObjectLayers().isEmpty()) {
-      return mapObjects;
-    }
-
-    for (IMapObjectLayer layer : this.getMapObjectLayers()) {
-      if (layer == null) {
-        continue;
-      }
-
-      mapObjects.addAll(layer.getMapObjects(mapIDs));
-    }
-
-    return mapObjects;
-  }
-
-  @Override
-  public Collection<IMapObject> getMapObjects(String... types) {
-    List<IMapObject> mapObjects = new ArrayList<>();
-    if (this.getMapObjectLayers() == null || this.getMapObjectLayers().isEmpty() || types.length == 0) {
-      return mapObjects;
-    }
-
-    for (IMapObjectLayer layer : this.getMapObjectLayers()) {
-      if (layer == null) {
-        continue;
-      }
-
-      mapObjects.addAll(layer.getMapObjects(types));
-    }
-
-    return mapObjects;
-  }
-
-  @Override
-  public IMapObject getMapObject(int mapId) {
-    if (this.getMapObjectLayers() == null) {
-      return null;
-    }
-
-    for (IMapObjectLayer layer : this.getMapObjectLayers()) {
-      if (layer == null) {
-        continue;
-      }
-
-      for (IMapObject mapObject : layer.getMapObjects()) {
-        if (mapObject != null && mapObject.getId() == mapId) {
-          return mapObject;
-        }
-      }
-    }
-
-    return null;
-  }
-
-  @Override
-  public void removeMapObject(int mapId) {
-    for (IMapObjectLayer layer : this.getMapObjectLayers()) {
-      IMapObject remove = null;
-      for (IMapObject obj : layer.getMapObjects()) {
-        if (obj.getId() == mapId) {
-          remove = obj;
-          break;
-        }
-      }
-
-      if (remove != null) {
-        layer.removeMapObject(remove);
-        break;
-      }
     }
   }
 

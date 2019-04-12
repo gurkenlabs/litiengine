@@ -19,12 +19,12 @@ public abstract class ImageEffect implements ITimeToLive, Comparable<ImageEffect
   protected ImageEffect(final int ttl, final String name) {
     this.ttl = ttl;
     this.name = name;
-    this.aliveTick = Game.loop().getTicks();
+    this.aliveTick = Game.time().now();
   }
 
   @Override
   public long getAliveTime() {
-    return Game.loop().getDeltaTime(this.aliveTick);
+    return Game.time().since(this.aliveTick);
   }
 
   public String getName() {

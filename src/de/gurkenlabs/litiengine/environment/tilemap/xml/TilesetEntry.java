@@ -30,7 +30,7 @@ public class TilesetEntry extends CustomPropertyProvider implements ITilesetEntr
   private String terrain;
 
   @XmlElement
-  private Animation animation;
+  private TileAnimation animation;
 
   @XmlElement
   private MapImage image;

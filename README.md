@@ -9,12 +9,12 @@
 
 LITIengine is the pure open-source java game engine for creating 2D PC games. Written in plain Java 8, it provides all the infrastructure to create a 2D tile based java game, be it a platformer or a top-down adventure.
 
-> ## Important Note
+> ## :construction: Important Note
 
 > Currently the LITIengine is being actively developed and therefore some parts of the framework are not final yet. Be aware that the engine API might change over the course of the next releases up until beta (v0.5.0-beta).
-Nonetheless, the LITIengine can of course already be used to make fully functioning **2D java games**, or at least we've done so quite successfully :smile:.
+Nonetheless, the LITIengine can of course already be used to make fully functioning **2D java games**.
 
-> We are aware that there is currently a **lack of documentation**, but for the mentioned reasons, we're planning to document the most important parts of the library and use-cases with the first beta release to ensure that features don't get deprecated before they're even used.
+> :warning: We are aware that there is currently a **lack of documentation**, but for the mentioned reasons, we're planning to document the most important parts of the library and use-cases with the first beta release to ensure that features don't get deprecated before they're even used.
 
 > We're looking forward for your feedback on the engine!
 
@@ -33,7 +33,7 @@ Visit the official [LITIengine forum](https://forum.litiengine.com/) for trouble
 The [LITIengine documentation pages](https://docs.litiengine.com/) containing in-depth guides for LITIengine are currently in deployment. We're looking forward to your contributions!
 
 ## Becoming a contributor
-* Agree to our [Code of Conduct](https://github.com/gurkenlabs/litiengine/blob/master/docs/CODE_OF_CONDUCT.md)
+* Agree to our [Code of Conduct](https://github.com/gurkenlabs/litiengine/blob/master/CODE_OF_CONDUCT.md)
 * View our [Contribution guidelines](https://github.com/gurkenlabs/litiengine/blob/master/CONTRIBUTING.md)
 
 ## Features
