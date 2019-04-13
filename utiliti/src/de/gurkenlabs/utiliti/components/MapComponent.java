@@ -179,7 +179,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       return;
     }
 
-    this.renderGrid(g);
+    renderGrid(g);
 
     final BasicStroke shapeStroke = new BasicStroke(1 / Game.world().camera().getRenderScale());
     if (Program.getUserPreferences().isRenderBoundingBoxes()) {
@@ -875,10 +875,10 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     double maxY = Math.max(start.getY(), endPoint.getY());
 
     if (snap) {
-      minX = this.snapX(minX);
-      maxX = this.snapX(maxX);
-      minY = this.snapY(minY);
-      maxY = this.snapY(maxY);
+      minX = snapX(minX);
+      maxX = snapX(maxX);
+      minY = snapY(minY);
+      maxY = snapY(maxY);
     }
 
     double width = Math.abs(minX - maxX);
@@ -951,8 +951,8 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     double deltaY = Input.mouse().getMapLocation().getY() - this.dragPoint.getY();
     double newWidth = this.dragSizeWidth;
     double newHeight = this.dragSizeHeight;
-    double newX = this.snapX(dragLocationMapObject.getX());
-    double newY = this.snapY(dragLocationMapObject.getY());
+    double newX = snapX(dragLocationMapObject.getX());
+    double newY = snapY(dragLocationMapObject.getY());
 
     switch (this.currentTransform) {
     case DOWN:
@@ -999,10 +999,10 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       return;
     }
 
-    transformObject.setWidth(this.snapX(newWidth));
-    transformObject.setHeight(this.snapY(newHeight));
-    transformObject.setX(this.snapX(newX));
-    transformObject.setY(this.snapY(newY));
+    transformObject.setWidth(snapX(newWidth));
+    transformObject.setHeight(snapY(newHeight));
+    transformObject.setX(snapX(newX));
+    transformObject.setY(snapY(newY));
 
     Game.world().environment().reloadFromMap(transformObject.getId());
     if (MapObjectType.get(transformObject.getType()) == MapObjectType.LIGHTSOURCE) {
@@ -1056,11 +1056,11 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     Point2D dragLocationMapObjectMinY = this.dragLocationMapObjects.get(minY);
 
     double deltaX = Input.mouse().getMapLocation().getX() - this.dragPoint.getX();
-    float newX = this.snapX(dragLocationMapObjectMinX.getX() + deltaX);
+    float newX = snapX(dragLocationMapObjectMinX.getX() + deltaX);
     float snappedDeltaX = newX - minX.getX();
 
     double deltaY = Input.mouse().getMapLocation().getY() - this.dragPoint.getY();
-    float newY = this.snapY(dragLocationMapObjectMinY.getY() + deltaY);
+    float newY = snapY(dragLocationMapObjectMinY.getY() + deltaY);
     float snappedDeltaY = newY - minY.getY();
 
     if (snappedDeltaX == 0 && snappedDeltaY == 0) {
@@ -1517,7 +1517,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     this.startPoint = null;
   }
 
-  private float snapX(double x) {
+  private static float snapX(double x) {
     if (Program.getUserPreferences().isSnapGrid()) {
       final IMap map = Game.world().environment().getMap();
       if (map == null) {
@@ -1534,7 +1534,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     return MathUtilities.round((float) x, 2);
   }
 
-  private float snapY(double y) {
+  private static float snapY(double y) {
     if (Program.getUserPreferences().isSnapGrid()) {
       final IMap map = Game.world().environment().getMap();
       if (map == null) {
@@ -1704,7 +1704,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     RenderEngine.renderText(g, "[" + tags + "]", mapObject.getX() + 1, y);
   }
 
-  private void renderGrid(Graphics2D g) {
+  private static void renderGrid(Graphics2D g) {
     // render the grid
     if (Program.getUserPreferences().isShowGrid() && Game.world().camera().getRenderScale() >= 1 && Game.world().environment() != null) {
 

@@ -45,7 +45,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Comparabl
   public static final String FILE_EXTENSION = "tmx";
 
   private static final Logger log = Logger.getLogger(Map.class.getName());
-  private static final int[] MAX_SUPPORTED_VERSION = { 1, 2, 3 };
+  private static final int[] MAX_SUPPORTED_VERSION = { 1, 2 };
 
   @XmlAttribute
   private double version;
