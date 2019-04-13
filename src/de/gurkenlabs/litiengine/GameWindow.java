@@ -1,4 +1,4 @@
-package de.gurkenlabs.litiengine.graphics;
+package de.gurkenlabs.litiengine;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 
 import javax.swing.JFrame;
 
-import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.graphics.RenderComponent;
 import de.gurkenlabs.litiengine.gui.screens.Resolution;
 
 public final class GameWindow {
@@ -56,7 +56,6 @@ public final class GameWindow {
 
       this.hostControl.setTitle(Game.info().getTitle());
       this.hostControl.setResizable(false);
-      this.hostControl.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       this.hostControl.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
       initializeWindowEventListeners(this.hostControl);
     }
@@ -216,7 +215,9 @@ public final class GameWindow {
     window.addWindowListener(new WindowAdapter() {
       @Override
       public void windowClosing(final WindowEvent event) {
-        System.exit(Game.EXIT_GAME_CLOSED);
+        if (Game.terminating()) {
+          System.exit(Game.EXIT_GAME_CLOSED);
+        }
       }
     });
   }

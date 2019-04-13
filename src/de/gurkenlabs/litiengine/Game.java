@@ -27,7 +27,6 @@ import de.gurkenlabs.litiengine.environment.GameWorld;
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
 import de.gurkenlabs.litiengine.graphics.Camera;
 import de.gurkenlabs.litiengine.graphics.DebugRenderer;
-import de.gurkenlabs.litiengine.graphics.GameWindow;
 import de.gurkenlabs.litiengine.graphics.ImageRenderer;
 import de.gurkenlabs.litiengine.graphics.RenderComponent;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
@@ -254,7 +253,7 @@ public final class Game {
   public static GameWindow window() {
     return gameWindow;
   }
-  
+
   /**
    * Gets the engine's <code>SoundEngine</code> component that can be used to play sounds and music.<br>
    * Sound can be loaded and accessed using the <code>Resources</code> API and are managed by the<br>
@@ -559,17 +558,21 @@ public final class Game {
     hasStarted = true;
   }
 
-  static synchronized void terminate() {
+  static synchronized boolean terminating() {
     for (final GameListener listener : gameListeners) {
       try {
         if (!listener.terminating()) {
-          return;
+          return false;
         }
-      } catch (Throwable t) {
-        log.log(Level.WARNING, "game listener threw an exception during shutdown", t);
+      } catch (Exception e) {
+        log.log(Level.WARNING, "game listener threw an exception while terminating", e);
       }
     }
 
+    return true;
+  }
+
+  static synchronized void terminate() {
     hasStarted = false;
     initialized = false;
 
