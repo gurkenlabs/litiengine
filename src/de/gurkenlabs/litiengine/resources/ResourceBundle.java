@@ -30,8 +30,8 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
-import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 

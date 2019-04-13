@@ -10,8 +10,8 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
-import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
 import de.gurkenlabs.litiengine.resources.ResourceBundle;
 import de.gurkenlabs.litiengine.resources.Resources;

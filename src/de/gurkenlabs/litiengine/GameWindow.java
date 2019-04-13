@@ -154,6 +154,10 @@ public final class GameWindow {
   public void setIconImage(Image image) {
     this.hostControl.setIconImage(image);
   }
+  
+  public void setIconImages(List<? extends Image> image) {
+    this.hostControl.setIconImages(image);
+  }
 
   public void setTitle(String name) {
     this.hostControl.setTitle(name);

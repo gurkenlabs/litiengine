@@ -4,6 +4,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -500,7 +501,7 @@ public final class Game {
       }
 
       window().getRenderComponent().onFpsChanged(fps -> metrics().setFramesPerSecond(fps));
-      window().setIconImage(Resources.images().get("litiengine-icon.png"));
+      window().setIconImages(Arrays.asList(Resources.images().get("liti-logo-x16.png"), Resources.images().get("liti-logo-x20.png"), Resources.images().get("liti-logo-x32.png"), Resources.images().get("liti-logo-x48.png")));
 
       // init mouse inputs
       window().getRenderComponent().addMouseListener(Input.mouse());

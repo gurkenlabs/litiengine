@@ -5,8 +5,8 @@ import java.net.URL;
 import javax.xml.bind.JAXBException;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
-import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxException;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 

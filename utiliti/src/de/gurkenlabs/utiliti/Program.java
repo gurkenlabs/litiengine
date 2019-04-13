@@ -3,16 +3,12 @@ package de.gurkenlabs.utiliti;
 import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Canvas;
-import java.awt.CheckboxMenuItem;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Event;
 import java.awt.Font;
-import java.awt.Menu;
-import java.awt.MenuBar;
 import java.awt.MenuItem;
-import java.awt.MenuShortcut;
 import java.awt.Point;
 import java.awt.PopupMenu;
 import java.awt.SystemTray;
@@ -37,11 +33,13 @@ import java.util.logging.Logger;
 import javax.swing.Box;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JColorChooser;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
+import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -96,7 +94,7 @@ public class Program {
   private static JScrollBar verticalScroll;
   private static TrayIcon trayIcon;
 
-  private static Menu recentFiles;
+  private static JMenu recentFiles;
   private static AssetPanel assetPanel;
   private static AssetTree assetTree;
   private static JPopupMenu canvasPopup;
@@ -136,6 +134,7 @@ public class Program {
     Game.window().getRenderComponent().setCursorOffsetX(0);
     Game.window().getRenderComponent().setCursorOffsetY(0);
     setupInterface();
+    Game.window().getHostControl().revalidate();
     Game.start();
     Input.mouse().setGrabMouse(false);
     Input.keyboard().consumeAlt(true);
@@ -158,10 +157,10 @@ public class Program {
     recentFiles.removeAll();
     for (String recent : userPreferences.getLastOpenedFiles()) {
       if (recent != null && !recent.isEmpty() && new File(recent).exists()) {
-        MenuItem fileButton = new MenuItem(recent);
+        JMenuItem fileButton = new JMenuItem(recent);
         fileButton.addActionListener(a -> {
-          log.log(Level.INFO, "load " + fileButton.getLabel());
-          EditorScreen.instance().load(new File(fileButton.getLabel()));
+          log.log(Level.INFO, "load " + fileButton.getText());
+          EditorScreen.instance().load(new File(fileButton.getText()));
         });
 
         recentFiles.add(fileButton);
@@ -279,7 +278,7 @@ public class Program {
     JToolBar toolbar = initToolBar();
     rootPanel.add(toolbar, BorderLayout.NORTH);
 
-    window.setMenuBar(initMenuBar());
+    window.setJMenuBar(initMenuBar());
   }
 
   private static JFrame initWindow() {
@@ -308,21 +307,21 @@ public class Program {
     return window;
   }
 
-  private static MenuBar initMenuBar() {
-    MenuBar menuBar = new MenuBar();
-    Menu mnFile = initFileMenu();
+  private static JMenuBar initMenuBar() {
+    JMenuBar menuBar = new JMenuBar();
+    JMenu mnFile = initFileMenu();
     menuBar.add(mnFile);
 
-    Menu mnView = initViewMenu();
+    JMenu mnView = initViewMenu();
     menuBar.add(mnView);
 
-    Menu mnProject = initProjectMenu();
+    JMenu mnProject = initProjectMenu();
     menuBar.add(mnProject);
 
-    Menu mnMap = initMapMenu();
+    JMenu mnMap = initMapMenu();
     menuBar.add(mnMap);
 
-    Menu mnHelp = initHelpMenu();
+    JMenu mnHelp = initHelpMenu();
     menuBar.add(mnHelp);
 
     return menuBar;
@@ -420,26 +419,27 @@ public class Program {
     });
   }
 
-  private static Menu initFileMenu() {
-    Menu mnFile = new Menu(Resources.strings().get("menu_file"));
-
-    MenuItem create = new MenuItem(Resources.strings().get("menu_createProject"));
-    create.setShortcut(new MenuShortcut(KeyEvent.VK_N));
+  private static JMenu initFileMenu() {
+    JMenu mnFile = new JMenu(Resources.strings().get("menu_file"));
+    mnFile.setMnemonic('F');
+    
+    JMenuItem create = new JMenuItem(Resources.strings().get("menu_createProject"));
+    create.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, Event.CTRL_MASK));
     create.addActionListener(a -> EditorScreen.instance().create());
 
-    MenuItem load = new MenuItem(Resources.strings().get("menu_loadProject"));
-    load.setShortcut(new MenuShortcut(KeyEvent.VK_O));
+    JMenuItem load = new JMenuItem(Resources.strings().get("menu_loadProject"));
+    load.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Event.CTRL_MASK));
     load.addActionListener(a -> EditorScreen.instance().load());
 
-    MenuItem save = new MenuItem(Resources.strings().get("menu_save"));
-    save.setShortcut(new MenuShortcut(KeyEvent.VK_S));
+    JMenuItem save = new JMenuItem(Resources.strings().get("menu_save"));
+    save.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Event.CTRL_MASK));
     save.addActionListener(a -> EditorScreen.instance().save(false));
 
-    MenuItem saveAs = new MenuItem(Resources.strings().get("menu_saveAs"));
+    JMenuItem saveAs = new JMenuItem(Resources.strings().get("menu_saveAs"));
     saveAs.addActionListener(a -> EditorScreen.instance().save(true));
 
-    MenuItem exit = new MenuItem(Resources.strings().get("menu_exit"));
-    exit.setShortcut(new MenuShortcut(KeyEvent.VK_Q));
+    JMenuItem exit = new JMenuItem(Resources.strings().get("menu_exit"));
+    exit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, Event.CTRL_MASK));
     exit.addActionListener(a -> System.exit(0));
 
     mnFile.add(load);
@@ -447,7 +447,7 @@ public class Program {
     mnFile.add(save);
     mnFile.add(saveAs);
     mnFile.addSeparator();
-    recentFiles = new Menu(Resources.strings().get("menu_recentFiles"));
+    recentFiles = new JMenu(Resources.strings().get("menu_recentFiles"));
     loadRecentFiles();
     mnFile.add(recentFiles);
     mnFile.addSeparator();
@@ -455,10 +455,11 @@ public class Program {
     return mnFile;
   }
 
-  private static Menu initViewMenu() {
-    Menu mnView = new Menu(Resources.strings().get("menu_view"));
-
-    CheckboxMenuItem snapToPixels = new CheckboxMenuItem(Resources.strings().get("menu_snapPixels"));
+  private static JMenu initViewMenu() {
+    JMenu mnView = new JMenu(Resources.strings().get("menu_view"));
+    mnView.setMnemonic('V');
+    
+    JCheckBoxMenuItem snapToPixels = new JCheckBoxMenuItem(Resources.strings().get("menu_snapPixels"));
     snapToPixels.setState(userPreferences.isSnapPixels());
     snapToPixels.addItemListener(e -> {
       userPreferences.setSnapPixels(snapToPixels.getState());
@@ -466,31 +467,31 @@ public class Program {
       EditorScreen.instance().getMapObjectPanel().bind(EditorScreen.instance().getMapComponent().getFocusedMapObject());
     });
 
-    CheckboxMenuItem snapToGrid = new CheckboxMenuItem(Resources.strings().get("menu_snapGrid"));
+    JCheckBoxMenuItem snapToGrid = new JCheckBoxMenuItem(Resources.strings().get("menu_snapGrid"));
     snapToGrid.setState(userPreferences.isSnapGrid());
     snapToGrid.addItemListener(e -> userPreferences.setSnapGrid(snapToGrid.getState()));
 
-    CheckboxMenuItem renderGrid = new CheckboxMenuItem(Resources.strings().get("menu_renderGrid"));
+    JCheckBoxMenuItem renderGrid = new JCheckBoxMenuItem(Resources.strings().get("menu_renderGrid"));
     renderGrid.setState(userPreferences.isShowGrid());
-    renderGrid.setShortcut(new MenuShortcut(KeyEvent.VK_G));
+    renderGrid.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, Event.CTRL_MASK));
     renderGrid.addItemListener(e -> userPreferences.setShowGrid(renderGrid.getState()));
 
-    CheckboxMenuItem renderCollision = new CheckboxMenuItem(Resources.strings().get("menu_renderCollisionBoxes"));
+    JCheckBoxMenuItem renderCollision = new JCheckBoxMenuItem(Resources.strings().get("menu_renderCollisionBoxes"));
     renderCollision.setState(userPreferences.isRenderBoundingBoxes());
-    renderCollision.setShortcut(new MenuShortcut(KeyEvent.VK_H));
+    renderCollision.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, Event.CTRL_MASK));
     renderCollision.addItemListener(e -> userPreferences.setRenderBoundingBoxes(renderCollision.getState()));
 
-    CheckboxMenuItem renderCustomMapObjects = new CheckboxMenuItem(Resources.strings().get("menu_renderCustomMapObjects"));
+    JCheckBoxMenuItem renderCustomMapObjects = new JCheckBoxMenuItem(Resources.strings().get("menu_renderCustomMapObjects"));
     renderCustomMapObjects.setState(userPreferences.isRenderCustomMapObjects());
-    renderCustomMapObjects.setShortcut(new MenuShortcut(KeyEvent.VK_K));
+    renderCustomMapObjects.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, Event.CTRL_MASK));
     renderCustomMapObjects.addItemListener(e -> userPreferences.setRenderCustomMapObjects(renderCustomMapObjects.getState()));
 
-    CheckboxMenuItem renderMapIds = new CheckboxMenuItem(Resources.strings().get("menu_renderMapIds"));
+    JCheckBoxMenuItem renderMapIds = new JCheckBoxMenuItem(Resources.strings().get("menu_renderMapIds"));
     renderMapIds.setState(userPreferences.isRenderMapIds());
-    renderMapIds.setShortcut(new MenuShortcut(KeyEvent.VK_I));
+    renderMapIds.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, Event.CTRL_MASK));
     renderMapIds.addItemListener(e -> userPreferences.setRenderMapIds(renderMapIds.getState()));
 
-    MenuItem setGrid = new MenuItem(Resources.strings().get("menu_gridSettings"));
+    JMenuItem setGrid = new JMenuItem(Resources.strings().get("menu_gridSettings"));
     setGrid.addActionListener(a -> {
       GridEditPanel panel = new GridEditPanel(getUserPreferences().getGridLineWidth(), getUserPreferences().getGridColor());
       int option = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), panel, Resources.strings().get("menu_gridSettings"), JOptionPane.PLAIN_MESSAGE);
@@ -500,12 +501,12 @@ public class Program {
       }
     });
 
-    MenuItem zoomIn = new MenuItem(Resources.strings().get("menu_zoomIn"));
-    zoomIn.setShortcut(new MenuShortcut(KeyEvent.VK_PLUS));
+    JMenuItem zoomIn = new JMenuItem(Resources.strings().get("menu_zoomIn"));
+    zoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, Event.CTRL_MASK));
     zoomIn.addActionListener(a -> EditorScreen.instance().getMapComponent().zoomIn());
 
-    MenuItem zoomOut = new MenuItem(Resources.strings().get("menu_zoomOut"));
-    zoomOut.setShortcut(new MenuShortcut(KeyEvent.VK_MINUS));
+    JMenuItem zoomOut = new JMenuItem(Resources.strings().get("menu_zoomOut"));
+    zoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, Event.CTRL_MASK));
     zoomOut.addActionListener(a -> EditorScreen.instance().getMapComponent().zoomOut());
 
     mnView.add(snapToPixels);
@@ -522,36 +523,37 @@ public class Program {
     return mnView;
   }
 
-  private static Menu initProjectMenu() {
-    Menu mnProject = new Menu(Resources.strings().get("menu_project"));
-
-    CheckboxMenuItem compress = new CheckboxMenuItem(Resources.strings().get("menu_compressProjectFile"));
+  private static JMenu initProjectMenu() {
+    JMenu mnProject = new JMenu(Resources.strings().get("menu_project"));
+    mnProject.setMnemonic('P');
+    
+    JCheckBoxMenuItem compress = new JCheckBoxMenuItem(Resources.strings().get("menu_compressProjectFile"));
     compress.setState(userPreferences.isCompressFile());
     compress.addItemListener(e -> userPreferences.setCompressFile(compress.getState()));
 
-    CheckboxMenuItem sync = new CheckboxMenuItem(Resources.strings().get("menu_syncMaps"));
+    JCheckBoxMenuItem sync = new JCheckBoxMenuItem(Resources.strings().get("menu_syncMaps"));
     sync.setState(userPreferences.isSyncMaps());
     sync.addItemListener(e -> userPreferences.setSyncMaps(sync.getState()));
 
-    MenuItem importSpriteFile = new MenuItem(Resources.strings().get("menu_assets_importSpriteFile"));
+    JMenuItem importSpriteFile = new JMenuItem(Resources.strings().get("menu_assets_importSpriteFile"));
     importSpriteFile.addActionListener(a -> EditorScreen.instance().importSpriteFile());
 
-    MenuItem importSprite = new MenuItem(Resources.strings().get("menu_assets_importSprite"));
+    JMenuItem importSprite = new JMenuItem(Resources.strings().get("menu_assets_importSprite"));
     importSprite.addActionListener(a -> EditorScreen.instance().importSpriteSheets());
 
-    MenuItem importTextureAtlas = new MenuItem(Resources.strings().get("menu_assets_importTextureAtlas"));
+    JMenuItem importTextureAtlas = new JMenuItem(Resources.strings().get("menu_assets_importTextureAtlas"));
     importTextureAtlas.addActionListener(a -> EditorScreen.instance().importTextureAtlas());
 
-    MenuItem importEmitters = new MenuItem(Resources.strings().get("menu_assets_importEmitters"));
+    JMenuItem importEmitters = new JMenuItem(Resources.strings().get("menu_assets_importEmitters"));
     importEmitters.addActionListener(a -> EditorScreen.instance().importEmitters());
 
-    MenuItem importBlueprints = new MenuItem(Resources.strings().get("menu_assets_importBlueprints"));
+    JMenuItem importBlueprints = new JMenuItem(Resources.strings().get("menu_assets_importBlueprints"));
     importBlueprints.addActionListener(a -> EditorScreen.instance().importBlueprints());
 
-    MenuItem importTilesets = new MenuItem(Resources.strings().get("menu_assets_importTilesets"));
+    JMenuItem importTilesets = new JMenuItem(Resources.strings().get("menu_assets_importTilesets"));
     importTilesets.addActionListener(a -> EditorScreen.instance().importTilesets());
 
-    MenuItem importSounds = new MenuItem(Resources.strings().get("menu_assets_importSounds"));
+    JMenuItem importSounds = new JMenuItem(Resources.strings().get("menu_assets_importSounds"));
     importSounds.addActionListener(a -> EditorScreen.instance().importSounds());
 
     mnProject.add(importSprite);
@@ -568,20 +570,21 @@ public class Program {
     return mnProject;
   }
 
-  private static Menu initMapMenu() {
-    Menu mnMap = new Menu(Resources.strings().get("menu_map"));
-
-    MenuItem imp = new MenuItem(Resources.strings().get("menu_import"));
+  private static JMenu initMapMenu() {
+    JMenu mnMap = new JMenu(Resources.strings().get("menu_map"));
+    mnMap.setMnemonic('M');
+    
+    JMenuItem imp = new JMenuItem(Resources.strings().get("menu_import"));
     imp.addActionListener(a -> EditorScreen.instance().getMapComponent().importMap());
 
-    MenuItem exp = new MenuItem(Resources.strings().get("menu_export"));
+    JMenuItem exp = new JMenuItem(Resources.strings().get("menu_export"));
     exp.addActionListener(a -> EditorScreen.instance().getMapComponent().exportMap());
 
-    MenuItem saveMapSnapshot = new MenuItem(Resources.strings().get("menu_exportMapSnapshot"));
-    saveMapSnapshot.setShortcut(new MenuShortcut(KeyEvent.VK_ENTER));
+    JMenuItem saveMapSnapshot = new JMenuItem(Resources.strings().get("menu_exportMapSnapshot"));
+    saveMapSnapshot.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, Event.CTRL_MASK));
     saveMapSnapshot.addActionListener(a -> EditorScreen.instance().saveMapSnapshot());
 
-    MenuItem reassignIDs = new MenuItem(Resources.strings().get("menu_reassignMapIds"));
+    JMenuItem reassignIDs = new JMenuItem(Resources.strings().get("menu_reassignMapIds"));
     reassignIDs.addActionListener(a -> {
       try {
         int minID = Integer.parseInt(JOptionPane.showInputDialog(Resources.strings().get("panel_reassignMapIds"), 1));
@@ -592,11 +595,11 @@ public class Program {
 
     });
 
-    MenuItem del2 = new MenuItem(Resources.strings().get("menu_removeMap"));
+    JMenuItem del2 = new JMenuItem(Resources.strings().get("menu_removeMap"));
     del2.addActionListener(a -> EditorScreen.instance().getMapComponent().deleteMap());
 
-    MenuItem mapProps = new MenuItem(Resources.strings().get("menu_properties"));
-    mapProps.setShortcut(new MenuShortcut(KeyEvent.VK_M));
+    JMenuItem mapProps = new JMenuItem(Resources.strings().get("menu_properties"));
+    mapProps.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, Event.CTRL_MASK));
     mapProps.addActionListener(a -> {
       if (EditorScreen.instance().getMapComponent().getMaps() == null || EditorScreen.instance().getMapComponent().getMaps().isEmpty()) {
         return;
@@ -636,34 +639,35 @@ public class Program {
     return mnMap;
   }
 
-  private static Menu initHelpMenu() {
-    Menu helpMenu = new Menu("Help");
-
-    MenuItem tutorialMenuItem = new MenuItem(Resources.strings().get("menu_help_tutorial"));
+  private static JMenu initHelpMenu() {
+    JMenu helpMenu = new JMenu("Help");
+    helpMenu.setMnemonic('H');
+    
+    JMenuItem tutorialMenuItem = new JMenuItem(Resources.strings().get("menu_help_tutorial"));
     tutorialMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().getFrom("links", "link_LITIengine_tutorials"))));
 
-    MenuItem docsMenuItem = new MenuItem(Resources.strings().get("menu_help_docs"));
+    JMenuItem docsMenuItem = new JMenuItem(Resources.strings().get("menu_help_docs"));
     docsMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().getFrom("links", "link_LITIengine_docs"))));
 
-    MenuItem forumMenuItem = new MenuItem(Resources.strings().get("menu_help_forum"));
+    JMenuItem forumMenuItem = new JMenuItem(Resources.strings().get("menu_help_forum"));
     forumMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().getFrom("links", "link_LITIengine_forum"))));
 
-    MenuItem javadocsMenuItem = new MenuItem(Resources.strings().get("menu_help_javadocs"));
+    JMenuItem javadocsMenuItem = new JMenuItem(Resources.strings().get("menu_help_javadocs"));
     javadocsMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().getFrom("links", "link_LITIengine_javadocs"))));
 
-    MenuItem bugMenuItem = new MenuItem(Resources.strings().get("menu_help_bug"));
+    JMenuItem bugMenuItem = new JMenuItem(Resources.strings().get("menu_help_bug"));
     bugMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().getFrom("links", "link_LITIengine_bug"))));
 
-    MenuItem releaseMenuItem = new MenuItem(Resources.strings().get("menu_help_releasenotes"));
+    JMenuItem releaseMenuItem = new JMenuItem(Resources.strings().get("menu_help_releasenotes"));
     releaseMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().getFrom("links", "link_LITIengine_releasenotes"))));
 
-    MenuItem patreonMenuItem = new MenuItem(Resources.strings().get("menu_help_patreon"));
+    JMenuItem patreonMenuItem = new JMenuItem(Resources.strings().get("menu_help_patreon"));
     patreonMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().getFrom("links", "link_patreon"))));
 
-    MenuItem payPalMenuItem = new MenuItem(Resources.strings().get("menu_help_paypal"));
+    JMenuItem payPalMenuItem = new JMenuItem(Resources.strings().get("menu_help_paypal"));
     payPalMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().getFrom("links", "link_paypal"))));
 
-    MenuItem aboutMenuItem = new MenuItem(Resources.strings().get("menu_help_about"));
+    JMenuItem aboutMenuItem = new JMenuItem(Resources.strings().get("menu_help_about"));
     aboutMenuItem.addActionListener(event -> JOptionPane.showMessageDialog(((JFrame) Game.window().getHostControl()), Resources.strings().get("menu_help_abouttext") + "\n" + Resources.strings().get("menu_help_releases") + Resources.strings().getFrom("links", "link_LITIengine_releases") + "\n\n"
         + Resources.strings().get("copyright_gurkenlabs", "2019") + "\n" + Resources.strings().get("copyright_LITIengine"), Resources.strings().get("menu_help_about") + " " + Game.info().getVersion(), JOptionPane.INFORMATION_MESSAGE));
 
@@ -1101,7 +1105,7 @@ public class Program {
       exitItem.addActionListener(a -> System.exit(0));
       menu.add(exitItem);
 
-      trayIcon = new TrayIcon(Resources.images().get("litiengine-icon.png"), Game.info().toString(), menu);
+      trayIcon = new TrayIcon(Resources.images().get("liti-icon-x16.png"), Game.info().toString(), menu);
       trayIcon.setImageAutoSize(true);
       try {
         tray.add(trayIcon);
