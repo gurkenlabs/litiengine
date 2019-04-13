@@ -412,6 +412,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
       this.tileheight = null;
       this.tilecount = null;
       this.columns = null;
+    } else {
       Iterator<TilesetEntry> iter = this.tiles.iterator();
       while (iter.hasNext()) {
         if (!iter.next().shouldBeSaved()) {
