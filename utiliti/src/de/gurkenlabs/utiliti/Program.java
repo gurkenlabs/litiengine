@@ -526,7 +526,7 @@ public class Program {
   private static JMenu initProjectMenu() {
     JMenu mnProject = new JMenu(Resources.strings().get("menu_project"));
     mnProject.setMnemonic('P');
-    
+
     JCheckBoxMenuItem compress = new JCheckBoxMenuItem(Resources.strings().get("menu_compressProjectFile"));
     compress.setState(userPreferences.isCompressFile());
     compress.addItemListener(e -> userPreferences.setCompressFile(compress.getState()));
@@ -573,7 +573,7 @@ public class Program {
   private static JMenu initMapMenu() {
     JMenu mnMap = new JMenu(Resources.strings().get("menu_map"));
     mnMap.setMnemonic('M');
-    
+
     JMenuItem imp = new JMenuItem(Resources.strings().get("menu_import"));
     imp.addActionListener(a -> EditorScreen.instance().getMapComponent().importMap());
 
@@ -642,7 +642,7 @@ public class Program {
   private static JMenu initHelpMenu() {
     JMenu helpMenu = new JMenu("Help");
     helpMenu.setMnemonic('H');
-    
+
     JMenuItem tutorialMenuItem = new JMenuItem(Resources.strings().get("menu_help_tutorial"));
     tutorialMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().getFrom("links", "link_LITIengine_tutorials"))));
 
@@ -743,25 +743,25 @@ public class Program {
     // create basic icon toolbar
     JToolBar basicMenu = new JToolBar();
 
-    JButton cr = initButton(Icons.CREATE, a -> EditorScreen.instance().create());
-    JButton op = initButton(Icons.LOAD, a -> EditorScreen.instance().load());
-    JButton sv = initButton(Icons.SAVE, a -> EditorScreen.instance().save(false));
-    JButton undo = initButton(Icons.UNDO, a -> UndoManager.instance().undo());
-    JButton redo = initButton(Icons.REDO, a -> UndoManager.instance().redo());
+    JButton cr = initButton(Icons.ToolBar.CREATE, a -> EditorScreen.instance().create());
+    JButton op = initButton(Icons.ToolBar.LOAD, a -> EditorScreen.instance().load());
+    JButton sv = initButton(Icons.ToolBar.SAVE, a -> EditorScreen.instance().save(false));
+    JButton undo = initButton(Icons.ToolBar.UNDO, a -> UndoManager.instance().undo());
+    JButton redo = initButton(Icons.ToolBar.REDO, a -> UndoManager.instance().redo());
     undo.setEnabled(false);
     redo.setEnabled(false);
 
     JToggleButton place = new JToggleButton();
-    place.setIcon(Icons.PLACEOBJECT);
+    place.setIcon(Icons.ToolBar.ADD);
     requestFocusOnMouseDown(place);
 
     JToggleButton ed = new JToggleButton();
-    ed.setIcon(Icons.EDIT);
+    ed.setIcon(Icons.ToolBar.EDIT);
     ed.setSelected(true);
     requestFocusOnMouseDown(ed);
 
     JToggleButton mv = new JToggleButton();
-    mv.setIcon(Icons.MOVE);
+    mv.setIcon(Icons.ToolBar.MOVE);
     mv.setEnabled(false);
     requestFocusOnMouseDown(mv);
 
@@ -835,7 +835,7 @@ public class Program {
 
     // copy
     JButton cop = new JButton();
-    cop.setIcon(Icons.COPY);
+    cop.setIcon(Icons.ToolBar.COPY);
     cop.setEnabled(false);
     ActionListener copyAction = a -> EditorScreen.instance().getMapComponent().copy();
     cop.addActionListener(copyAction);
@@ -845,7 +845,7 @@ public class Program {
 
     // paste
     JButton paste = new JButton();
-    paste.setIcon(Icons.PASTE);
+    paste.setIcon(Icons.ToolBar.PASTE);
 
     ActionListener pasteAction = a -> EditorScreen.instance().getMapComponent().paste();
     paste.addActionListener(pasteAction);
@@ -855,7 +855,7 @@ public class Program {
 
     // cut
     JButton cut = new JButton();
-    cut.setIcon(Icons.CUT);
+    cut.setIcon(Icons.ToolBar.CUT);
     cut.setEnabled(false);
     ActionListener cutAction = a -> EditorScreen.instance().getMapComponent().cut();
     cut.addActionListener(cutAction);
@@ -887,7 +887,7 @@ public class Program {
     });
 
     JButton colorButton = new JButton();
-    colorButton.setIcon(Icons.COLOR);
+    colorButton.setIcon(Icons.ToolBar.COLOR);
     colorButton.setEnabled(false);
 
     JSpinner spinnerAmbientAlpha = new JSpinner();
