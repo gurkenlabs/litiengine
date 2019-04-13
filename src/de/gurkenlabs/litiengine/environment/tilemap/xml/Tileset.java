@@ -191,7 +191,6 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   @Override
   public void finish(URL location) throws TmxException {
     if (this.source != null) {
-      super.finish(location);
       try {
         URL url = new URL(location, this.source);
         this.sourceTileset = Resources.tilesets().get(url);
@@ -202,6 +201,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
         throw new MissingExternalTilesetException(e);
       }
     } else {
+      super.finish(location);
       if (this.image != null) {
         this.image.finish(location);
       }
