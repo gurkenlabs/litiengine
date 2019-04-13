@@ -7,23 +7,48 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.util.io.Codec;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
-public final class Spritesheets extends ResourcesContainer<Spritesheet> {
+public final class Spritesheets {
   private final Map<String, int[]> customKeyFrameDurations = new ConcurrentHashMap<>();
+  private final Map<String, Spritesheet> spritesheets = new ConcurrentHashMap<>();
+  private final Collection<ResourcesContainerClearedListener> listeners = ConcurrentHashMap.newKeySet();
   private static final Logger log = Logger.getLogger(Spritesheet.class.getName());
   private static final String SPRITE_INFO_COMMENT_CHAR = "#";
 
   Spritesheets() {
+  }
+
+  public void add(String name, Spritesheet spritesheet) {
+    this.spritesheets.put(name, spritesheet);
+  }
+
+  public void addClearedListener(ResourcesContainerClearedListener listener) {
+    this.listeners.add(listener);
+  }
+
+  public void removeClearedListener(ResourcesContainerClearedListener listener) {
+    this.listeners.remove(listener);
+  }
+
+  public void clear() {
+    this.spritesheets.clear();
+  }
+
+  public boolean contains(String name) {
+    return this.spritesheets.containsKey(name);
   }
 
   /**
@@ -32,10 +57,9 @@ public final class Spritesheets extends ResourcesContainer<Spritesheet> {
    * 
    * @param path
    *          The path of the spritesheet.
-   * @return The {@link Spritesheet} assotiated with the path or null if not
+   * @return The {@link Spritesheet} associated with the path or null if not
    *         loaded yet
    */
-  @Override
   public Spritesheet get(final String path) {
     if (path == null || path.isEmpty()) {
       return null;
@@ -43,12 +67,23 @@ public final class Spritesheets extends ResourcesContainer<Spritesheet> {
 
     final String name = FileUtilities.getFileName(path);
 
-    return this.getResources().getOrDefault(name, null);
+    return this.spritesheets.get(name); // this already returns null if absent
   }
 
-  @Override
   public Spritesheet get(String resourceName, boolean forceLoad) {
     return this.get(resourceName);
+  }
+
+  public Collection<Spritesheet> get(Predicate<? super Spritesheet> pred) {
+    if (pred == null) {
+      return new ArrayList<>();
+    }
+
+    return this.spritesheets.values().stream().filter(pred).collect(Collectors.toList());
+  }
+
+  public Collection<Spritesheet> getAll() {
+    return this.spritesheets.values();
   }
 
   public int[] getCustomKeyFrameDurations(final String name) {
@@ -140,9 +175,8 @@ public final class Spritesheets extends ResourcesContainer<Spritesheet> {
     return new Spritesheet(Resources.images().get(path, true), path, spriteWidth, spriteHeight);
   }
 
-  @Override
   public Spritesheet remove(final String path) {
-    Spritesheet spriteToRemove = super.remove(path);
+    Spritesheet spriteToRemove = this.spritesheets.remove(path);
     customKeyFrameDurations.remove(path);
     return spriteToRemove;
   }
@@ -190,10 +224,5 @@ public final class Spritesheets extends ResourcesContainer<Spritesheet> {
     } catch (final NumberFormatException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
     }
-  }
-
-  @Override
-  protected Spritesheet load(String resourceName) {
-    return null;
   }
 }

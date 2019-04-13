@@ -4,6 +4,7 @@ import java.awt.Font;
 import java.awt.FontFormatException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -52,7 +53,7 @@ public final class Fonts extends ResourcesContainer<Font> {
    * @see Font#getFont(String)
    */
   @Override
-  protected Font load(String resourceName) {
+  protected Font load(URL resourceName) {
     try (final InputStream fontStream = Resources.get(resourceName)) {
       if (fontStream == null) {
         log.log(Level.SEVERE, "font {0} could not be loaded", resourceName);
@@ -62,8 +63,7 @@ public final class Fonts extends ResourcesContainer<Font> {
       return Font.createFont(Font.TRUETYPE_FONT, fontStream);
     } catch (final FontFormatException | IOException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
+      return null;
     }
-
-    return Font.getFont(resourceName);
   }
 }

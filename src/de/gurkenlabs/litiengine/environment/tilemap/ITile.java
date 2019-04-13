@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.environment.tilemap;
 
 import java.awt.Point;
+import java.awt.image.BufferedImage;
 
 /**
  * The Interface ITile.
@@ -13,6 +14,8 @@ public interface ITile extends ICustomPropertyProvider {
    * @return the grid id
    */
   public int getGridId();
+
+  public BufferedImage getImage();
 
   /**
    * Gets the tile coordinate.

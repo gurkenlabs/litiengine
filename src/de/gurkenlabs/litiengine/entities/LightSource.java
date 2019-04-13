@@ -24,9 +24,9 @@ import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 @EntityInfo(renderType = RenderType.GROUND)
 public class LightSource extends Entity implements IRenderable {
-  // TODO: Why are these string values and not an enum?
-  public static final String ELLIPSE = "ellipse";
-  public static final String RECTANGLE = "rectangle";
+  public enum Type {
+    ELLIPSE, RECTANGLE;
+  }
   public static final String TOGGLE_MESSAGE = "toggle";
   public static final int DEFAULT_INTENSITY = 100;
 
@@ -49,7 +49,7 @@ public class LightSource extends Entity implements IRenderable {
   private int intensity;
 
   @TmxProperty(name = MapObjectProperty.LIGHT_SHAPE)
-  private String lightShapeType;
+  private Type lightShapeType;
 
   @TmxProperty(name = MapObjectProperty.LIGHT_FOCUSOFFSETX)
   private double focusOffsetX;
@@ -61,7 +61,7 @@ public class LightSource extends Entity implements IRenderable {
   private Shape lightShape;
   private int radius;
 
-  public LightSource(final int intensity, final Color lightColor, final String shapeType, boolean activated) {
+  public LightSource(final int intensity, final Color lightColor, final Type shapeType, boolean activated) {
     super();
     this.color = lightColor;
     this.intensity = intensity;
@@ -98,7 +98,7 @@ public class LightSource extends Entity implements IRenderable {
     return this.lightShape;
   }
 
-  public String getLightShapeType() {
+  public Type getLightShapeType() {
     return this.lightShapeType;
   }
 
@@ -135,7 +135,7 @@ public class LightSource extends Entity implements IRenderable {
     this.updateAmbientLayers();
   }
 
-  public void setLightShapeType(final String shapeType) {
+  public void setLightShapeType(final Type shapeType) {
     this.lightShapeType = shapeType;
   }
 
@@ -352,10 +352,10 @@ public class LightSource extends Entity implements IRenderable {
 
   private void updateShape() {
     switch (this.getLightShapeType()) {
-    case LightSource.ELLIPSE:
+    case ELLIPSE:
       this.lightShape = new Ellipse2D.Double(this.getX(), this.getY(), this.getWidth(), this.getHeight());
       break;
-    case LightSource.RECTANGLE:
+    case RECTANGLE:
       this.lightShape = new Rectangle2D.Double(this.getX(), this.getY(), this.getWidth(), this.getHeight());
       break;
     default:

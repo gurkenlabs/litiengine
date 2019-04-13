@@ -6,6 +6,7 @@ import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 
 /**
  * A class containing various standard map orientations.
@@ -100,6 +101,16 @@ public class MapOrientations {
     }
 
     @Override
+    public Rectangle2D getBounds(int x, int y, IMap map) {
+      return this.getShape(x, y, map).getBounds2D();
+    }
+
+    @Override
+    public Rectangle2D getBounds(Point tile, IMap map) {
+      return this.getBounds(tile.x, tile.y, map);
+    }
+
+    @Override
     public Shape getEnclosingTileShape(double x, double y, IMap map) {
       return this.getShape(this.getTile(x, y, map), map);
     }
@@ -107,6 +118,16 @@ public class MapOrientations {
     @Override
     public Shape getEnclosingTileShape(Point2D location, IMap map) {
       return this.getEnclosingTileShape(location.getX(), location.getY(), map);
+    }
+
+    @Override
+    public Rectangle2D getEnclosingTileBounds(double x, double y, IMap map) {
+      return this.getEnclosingTileShape(x, y, map).getBounds2D();
+    }
+
+    @Override
+    public Rectangle2D getEnclosingTileBounds(Point2D location, IMap map) {
+      return this.getEnclosingTileBounds(location.getX(), location.getY(), map);
     }
 
     @Override

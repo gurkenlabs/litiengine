@@ -79,7 +79,7 @@ public class AmbientLight extends ColorLayer {
     Shape fillShape;
 
     Area lightArea = null;
-    if (light.getLightShapeType().equals(LightSource.RECTANGLE)) {
+    if (light.getLightShapeType() == LightSource.Type.RECTANGLE) {
       g.setColor(new Color(light.getColor().getRed(), light.getColor().getGreen(), light.getColor().getBlue(), light.getColor().getAlpha()));
       fillShape = new Rectangle2D.Double(light.getBoundingBox().getX() - section.getX(), light.getBoundingBox().getY() - section.getY(), light.getBoundingBox().getWidth(), light.getBoundingBox().getHeight());
       g.fill(fillShape);

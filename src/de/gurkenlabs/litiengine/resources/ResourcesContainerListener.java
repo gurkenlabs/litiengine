@@ -1,5 +1,7 @@
 package de.gurkenlabs.litiengine.resources;
 
+import java.net.URL;
+
 /**
  * This listener provides callbacks to observe <code>ResourcesContainer</code> instances.
  *
@@ -25,7 +27,8 @@ public interface ResourcesContainerListener<T> extends ResourcesContainerCleared
    *          The added resource.
    * @see ResourcesContainer#add(String, Object)
    */
-  public default void added(String resourceName, T resource) {}
+  public default void added(URL resourceName, T resource) {
+  }
 
   /**
    * This method gets called after the <code>ResourcesContainer.remove</code> method was executed.
@@ -36,8 +39,9 @@ public interface ResourcesContainerListener<T> extends ResourcesContainerCleared
    *          The removed resource.
    * @see ResourcesContainer#remove(String)
    */
-  public default void removed(String resourceName, T resource) {}
+  public default void removed(URL resourceName, T resource) {
+  }
 
-  @Override
-  public default void cleared() {}
+  public default void cleared() {
+  }
 }

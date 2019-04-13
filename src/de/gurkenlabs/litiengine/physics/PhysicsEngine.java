@@ -178,7 +178,7 @@ public final class PhysicsEngine implements IUpdateable {
   }
 
   /**
-   * Checks whether the specified rectangle collides with anything.
+   * Checks whether the specified rectangle collides with the specified entity.
    * 
    * @param rect
    *          The rectangle to check the collision for.

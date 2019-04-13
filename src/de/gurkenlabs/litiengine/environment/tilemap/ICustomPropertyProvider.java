@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.environment.tilemap;
 
 import java.awt.Color;
+import java.net.URL;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -33,7 +34,8 @@ public interface ICustomPropertyProvider {
    * @param propertyName
    *          the name of the custom property
    * @return the string value of the custom property
-   * @throws NoSuchElementException if the custom property does not exist
+   * @throws NoSuchElementException
+   *           if the custom property does not exist
    */
   public String getStringValue(String propertyName);
 
@@ -54,8 +56,10 @@ public interface ICustomPropertyProvider {
    * @param propertyName
    *          the name of the custom property
    * @return the int value of the custom property
-   * @throws NoSuchElementException if the custom property does not exist
-   * @throws NumberFormatException if the custom property is not an integer or is not in range for an {@code int}
+   * @throws NoSuchElementException
+   *           if the custom property does not exist
+   * @throws NumberFormatException
+   *           if the custom property is not an integer or is not in range for an {@code int}
    */
   public int getIntValue(String propertyName);
 
@@ -76,8 +80,10 @@ public interface ICustomPropertyProvider {
    * @param propertyName
    *          the name of the custom property
    * @return the long value of the custom property
-   * @throws NoSuchElementException if the custom property does not exist
-   * @throws NumberFormatException if the custom property is not an integer or is not in range for a {@code long}
+   * @throws NoSuchElementException
+   *           if the custom property does not exist
+   * @throws NumberFormatException
+   *           if the custom property is not an integer or is not in range for a {@code long}
    */
   public default long getLongValue(String propertyName) {
     ICustomProperty property = this.getProperty(propertyName);
@@ -104,8 +110,10 @@ public interface ICustomPropertyProvider {
    * @param propertyName
    *          the name of the custom property
    * @return the short value of the custom property
-   * @throws NoSuchElementException if the custom property does not exist
-   * @throws NumberFormatException if the custom property is not an integer or is out of range for a {@code short}
+   * @throws NoSuchElementException
+   *           if the custom property does not exist
+   * @throws NumberFormatException
+   *           if the custom property is not an integer or is out of range for a {@code short}
    */
   public short getShortValue(String propertyName);
 
@@ -126,8 +134,10 @@ public interface ICustomPropertyProvider {
    * @param propertyName
    *          the name of the custom property
    * @return the byte value of the custom property
-   * @throws NoSuchElementException if the custom property does not exist
-   * @throws NumberFormatException if the custom property is not an integer or is out of range for a {@code byte}
+   * @throws NoSuchElementException
+   *           if the custom property does not exist
+   * @throws NumberFormatException
+   *           if the custom property is not an integer or is out of range for a {@code byte}
    */
   public byte getByteValue(String propertyName);
 
@@ -148,8 +158,10 @@ public interface ICustomPropertyProvider {
    * @param propertyName
    *          the name of the custom property
    * @return the boolean value of the custom property
-   * @throws NoSuchElementException if the custom property does not exist
-   * @throws NumberFormatException if the custom property is not a {@code boolean} value
+   * @throws NoSuchElementException
+   *           if the custom property does not exist
+   * @throws NumberFormatException
+   *           if the custom property is not a {@code boolean} value
    */
   public boolean getBoolValue(String propertyName);
 
@@ -170,8 +182,10 @@ public interface ICustomPropertyProvider {
    * @param propertyName
    *          the name of the custom property
    * @return the float value of the custom property
-   * @throws NoSuchElementException if the custom property does not exist
-   * @throws NumberFormatException if the custom property is not a number
+   * @throws NoSuchElementException
+   *           if the custom property does not exist
+   * @throws NumberFormatException
+   *           if the custom property is not a number
    */
   public float getFloatValue(String propertyName);
 
@@ -192,8 +206,10 @@ public interface ICustomPropertyProvider {
    * @param propertyName
    *          the name of the custom property
    * @return the double value of the custom property
-   * @throws NoSuchElementException if the custom property does not exist
-   * @throws NumberFormatException if the custom property is not a number
+   * @throws NoSuchElementException
+   *           if the custom property does not exist
+   * @throws NumberFormatException
+   *           if the custom property is not a number
    */
   public double getDoubleValue(String propertyName);
 
@@ -214,7 +230,8 @@ public interface ICustomPropertyProvider {
    * @param propertyName
    *          the name of the custom property
    * @return the color value of the custom property
-   * @throws NoSuchElementException if the custom property does not exist
+   * @throws NoSuchElementException
+   *           if the custom property does not exist
    */
   public Color getColorValue(String propertyName);
 
@@ -239,7 +256,8 @@ public interface ICustomPropertyProvider {
    * @param <T>
    *          the enum type to use
    * @return the enum value of the custom property
-   * @throws NoSuchElementException if the custom property does not exist
+   * @throws NoSuchElementException
+   *           if the custom property does not exist
    */
   public <T extends Enum<T>> T getEnumValue(String propertyName, Class<T> enumType);
 
@@ -257,6 +275,27 @@ public interface ICustomPropertyProvider {
    * @return the enum value of the custom property, if present. Otherwise, the provided default value is returned.
    */
   public <T extends Enum<T>> T getEnumValue(String propertyName, Class<T> enumType, T defaultValue);
+
+  /**
+   * Gets the file value of the custom property with the provided name. If the property is not a file, {@code null} is returned instead.
+   *
+   * @param propertyName
+   *          the name of the custom property
+   * @return the file value of the custom property, if present.
+   */
+  public URL getFileValue(String propertyName);
+
+  /**
+   * Gets the file value of the custom property with the provided name. If the value is null or the property is not a file, the provided default value
+   * is used as a fallback.
+   *
+   * @param propertyName
+   *          the name of the custom property
+   * @param defaultValue
+   *          the fallback value in case the property value is null.
+   * @return the file value of the custom property, if present. Otherwise, the provided default value is returned.
+   */
+  public URL getFileValue(String propertyName, URL defaultValue);
 
   /**
    * Sets the value for the custom property with the given name to the given string.

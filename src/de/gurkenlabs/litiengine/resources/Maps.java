@@ -1,13 +1,11 @@
 package de.gurkenlabs.litiengine.resources;
 
+import java.net.URL;
+
 import javax.xml.bind.JAXBException;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
-import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
-import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
-import de.gurkenlabs.litiengine.environment.tilemap.xml.TileLayer;
-import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxException;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
@@ -23,11 +21,7 @@ public final class Maps extends ResourcesContainer<IMap> {
   }
 
   @Override
-  protected IMap load(String resourceName) throws TmxException {
-    if (!isSupported(resourceName)) {
-      return null;
-    }
-
+  protected IMap load(URL resourceName) throws TmxException {
     Map map;
     try {
       map = XmlUtilities.readFromFile(Map.class, resourceName);
@@ -37,32 +31,13 @@ public final class Maps extends ResourcesContainer<IMap> {
     if (map == null) {
       return null;
     }
-
-    String basePath = FileUtilities.getParentDirPath(resourceName);
-    for (ITileset tileset : map.getTilesets()) {
-      if (tileset instanceof Tileset) {
-        ((Tileset)tileset).loadFromSource(basePath);
-      }
-    }
-
-    for (ITileLayer layer : map.getTileLayers()) {
-      if (layer instanceof TileLayer) {
-        ((TileLayer)layer).setTilesetEntries(map);
-      }
-    }
-
-    // by default the map is named by the source file
-    String name = FileUtilities.getFileName(resourceName);
-
-    map.setName(name);
-    map.setPath(resourceName);
-
+    map.finish(resourceName);
     return map;
   }
 
   @Override
-  protected String getAlias(String resourceName, IMap resource) {
-    if (resource == null || resource.getName() == null || resource.getName().isEmpty() || resource.getName().equalsIgnoreCase(resourceName)) {
+  protected String getAlias(URL resourceName, IMap resource) {
+    if (resource == null || resource.getName() == null || resource.getName().isEmpty() || resource.getName().equalsIgnoreCase(resourceName.getFile())) {
       return null;
     }
 

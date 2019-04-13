@@ -239,7 +239,7 @@ public class EnvironmentTests {
 
   @Test
   public void testLightSource() {
-    LightSource testLight = new LightSource(100, new Color(255, 255, 255, 100), LightSource.ELLIPSE, true);
+    LightSource testLight = new LightSource(100, new Color(255, 255, 255, 100), LightSource.Type.ELLIPSE, true);
     testLight.setMapId(999);
     testLight.setName("test");
 
@@ -419,7 +419,7 @@ public class EnvironmentTests {
   }
 
   @ParameterizedTest
-  @EnumSource(value = RenderType.class)
+  @EnumSource(RenderType.class)
   public void testEntityByRenderType(RenderType renderType) {
     ICombatEntity entity = mock(ICombatEntity.class);
     when(entity.getMapId()).thenReturn(123);

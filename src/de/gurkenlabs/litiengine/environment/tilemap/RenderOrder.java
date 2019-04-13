@@ -1,37 +1,24 @@
 package de.gurkenlabs.litiengine.environment.tilemap;
 
-public enum RenderOrder {
-  RIGHT_DOWN("right-down", false, false),
-  RIGHT_UP("right-up", false, true),
-  LEFT_DOWN("left-down", true, false),
-  LEFT_UP("left-up", true, true);
+import javax.xml.bind.annotation.XmlEnum;
+import javax.xml.bind.annotation.XmlEnumValue;
 
-  public final String savedName;
+@XmlEnum
+public enum RenderOrder {
+  @XmlEnumValue("right-down")
+  RIGHT_DOWN(false, false),
+  @XmlEnumValue("right-up")
+  RIGHT_UP(false, true),
+  @XmlEnumValue("left-down")
+  LEFT_DOWN(true, false),
+  @XmlEnumValue("left-up")
+  LEFT_UP(true, true);
+
   public final boolean rtl;
   public final boolean btt;
 
-  public static RenderOrder forName(String name) {
-    if ("right-down".equals(name)) {
-      return RIGHT_DOWN;
-    } else if ("right-up".equals(name)) {
-      return RIGHT_UP;
-    } else if ("left-down".equals(name)) {
-      return LEFT_DOWN;
-    } else if ("left-up".equals(name)) {
-      return LEFT_UP;
-    } else {
-      return null;
-    }
-  }
-
-  private RenderOrder(String name, boolean rtl, boolean btt) {
-    this.savedName = name;
+  private RenderOrder(boolean rtl, boolean btt) {
     this.rtl = rtl;
     this.btt = btt;
-  }
-
-  @Override
-  public String toString() {
-    return this.savedName;
   }
 }

@@ -3,7 +3,6 @@ package de.gurkenlabs.utiliti.swing;
 import java.awt.Component;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
-import java.util.Optional;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -79,11 +78,8 @@ public class IconTreeListRenderer implements TreeCellRenderer {
     BufferedImage propImag = Resources.images().get(cacheKey, () -> {
       final String fallbackName = PropAnimationController.getSpriteName(prop, false);
 
-      Optional<Spritesheet> opt = Resources.spritesheets().tryGet(PropAnimationController.getSpriteName(prop, PropState.INTACT, true));
-      Spritesheet sprite = null;
-      if (opt.isPresent()) {
-        sprite = opt.get();
-      } else if (Resources.spritesheets().contains(fallbackName)) {
+      Spritesheet sprite = Resources.spritesheets().get(PropAnimationController.getSpriteName(prop, PropState.INTACT, true));
+      if (sprite == null && Resources.spritesheets().contains(fallbackName)) {
         sprite = Resources.spritesheets().get(fallbackName);
       }
 

@@ -60,9 +60,9 @@ public class ColorHelperTests {
     Color greenDecoded = ColorHelper.decode(green00, true);
     Color blueDecoded = ColorHelper.decode(blue200, true);
 
-    Color solidAlphaRed = new Color(200, 0, 0);
-    Color solidAlphaGreen = new Color(0, 200, 0);
-    Color solidAlphaBlue = new Color(0, 0, 200);
+    Color solidAlphaRed = new Color(228, 0, 0);
+    Color solidAlphaGreen = new Color(0, 228, 0);
+    Color solidAlphaBlue = new Color(0, 0, 228);
 
     assertEquals(solidAlphaRed, redDecoded);
     assertEquals(solidAlphaGreen, greenDecoded);

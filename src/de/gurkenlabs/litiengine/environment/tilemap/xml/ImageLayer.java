@@ -1,21 +1,23 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.awt.Color;
+import java.net.URL;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapImage;
-import de.gurkenlabs.litiengine.util.ColorHelper;
 
 public class ImageLayer extends Layer implements IImageLayer {
 
-  @XmlElement(name = "image")
+  @XmlElement
   private MapImage image;
 
-  @XmlAttribute(name = "trans")
-  private String transparentcolor;
+  @XmlAttribute
+  @XmlJavaTypeAdapter(ColorAdapter.class)
+  private Color trans;
 
   @Override
   public IMapImage getImage() {
@@ -24,11 +26,7 @@ public class ImageLayer extends Layer implements IImageLayer {
 
   @Override
   public Color getTransparentColor() {
-    if (this.transparentcolor != null && !this.transparentcolor.isEmpty()) {
-      return ColorHelper.decode(this.transparentcolor);
-    }
-
-    return null;
+    return this.trans;
   }
 
   @Override
@@ -51,15 +49,13 @@ public class ImageLayer extends Layer implements IImageLayer {
     return super.getOffsetY();
   }
 
-  public void setMapPath(final String path) {
-    if (this.image == null) {
-      return;
-    }
-
-    this.image.setAbsolutePath(path);
-  }
-
   private boolean isInfiniteMap() {
     return this.getMap() != null && this.getMap().isInfinite() && this.getMap() instanceof Map;
+  }
+
+  @Override
+  void finish(URL location) throws TmxException {
+    super.finish(location);
+    this.image.finish(location);
   }
 }

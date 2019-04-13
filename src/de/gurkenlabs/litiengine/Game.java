@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.lang.Thread.UncaughtExceptionHandler;
+import java.net.URL;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -621,7 +622,11 @@ public final class Game {
    * @see Game#info()
    * @see GameInfo
    */
-  public static void setInfo(final String gameInfoFile) {
+  public static void setInfo(String gameInfoFile) {
+    setInfo(Resources.getLocation(gameInfoFile));
+  }
+
+  public static void setInfo(final URL gameInfoFile) {
     GameInfo info;
     try {
       info = XmlUtilities.readFromFile(GameInfo.class, gameInfoFile);

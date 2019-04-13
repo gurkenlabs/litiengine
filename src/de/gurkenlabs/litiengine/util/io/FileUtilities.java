@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -111,6 +112,10 @@ public final class FileUtilities {
     } catch (final Exception e) {
       return "";
     }
+  }
+
+  public static String getFileName(URL path) {
+    return getFileName(path.getPath());
   }
 
   public static String getFileName(final String path) {

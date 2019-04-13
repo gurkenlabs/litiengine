@@ -1,39 +1,25 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileAnimation;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileAnimationFrame;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-public class TileAnimation implements ITileAnimation, Serializable {
-  private static final long serialVersionUID = -6359129685451548791L;
-
-  @XmlElement(name = "frame")
-  private List<Frame> frames;
-
-  private transient List<ITileAnimationFrame> tileAnimationFrames;
+public class TileAnimation implements ITileAnimation {
+  @XmlElement(name = "frame", type = Frame.class)
+  private List<ITileAnimationFrame> frames;
 
   private transient int totalDuration;
 
   @Override
   public List<ITileAnimationFrame> getFrames() {
-    if (this.tileAnimationFrames != null) {
-      return this.tileAnimationFrames;
-    }
-
-    if (this.frames == null) {
-      return new ArrayList<>();
-    }
-
-    this.tileAnimationFrames = new ArrayList<>(this.frames);
-    return this.tileAnimationFrames;
+    return this.frames;
   }
 
   @Override
@@ -53,5 +39,17 @@ public class TileAnimation implements ITileAnimation, Serializable {
     }
 
     return this.totalDuration;
+  }
+
+  @Override
+  public ITileAnimationFrame getCurrentFrame() {
+    long time = Game.time().sinceEnvironmentLoad() % this.getTotalDuration();
+    for (ITileAnimationFrame frame : this.getFrames()) {
+      time -= frame.getDuration();
+      if (time <= 0) {
+        return frame;
+      }
+    }
+    throw new AssertionError(); // we should never reach this line
   }
 }

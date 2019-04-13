@@ -69,7 +69,7 @@ public class ResourcesTests {
     Sound nonExisting = Resources.sounds().get("randomname.mp3");
 
     assertNotNull(sound);
-    assertEquals("tests/de/gurkenlabs/litiengine/resources/bip.ogg", sound.getName());
+    assertEquals("bip", sound.getName());
     assertNull(nonExisting);
   }
 

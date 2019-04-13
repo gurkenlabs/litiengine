@@ -25,23 +25,12 @@ public class LightSourceMapObjectLoader extends MapObjectLoader {
     final int intensity = mapObject.getIntValue(MapObjectProperty.LIGHT_INTENSITY, LightSource.DEFAULT_INTENSITY);
     final Color color = mapObject.getColorValue(MapObjectProperty.LIGHT_COLOR);
     final boolean active = mapObject.getBoolValue(MapObjectProperty.LIGHT_ACTIVE, true);
-    final String lightShape = mapObject.getStringValue(MapObjectProperty.LIGHT_SHAPE);
+    final LightSource.Type lightType = mapObject.getEnumValue(MapObjectProperty.LIGHT_SHAPE, LightSource.Type.class);
     final double focusOffsetX = mapObject.getDoubleValue(MapObjectProperty.LIGHT_FOCUSOFFSETX);
     final double focusOffsetY = mapObject.getDoubleValue(MapObjectProperty.LIGHT_FOCUSOFFSETY);
     Collection<IEntity> entities = new ArrayList<>();
-    if (color == null || lightShape == null) {
+    if (color == null) {
       return entities;
-    }
-
-    String lightType;
-    switch (lightShape) {
-    case LightSource.RECTANGLE:
-      lightType = LightSource.RECTANGLE;
-      break;
-    case LightSource.ELLIPSE:
-    default:
-      lightType = LightSource.ELLIPSE;
-      break;
     }
 
     final LightSource light = this.createLightSource(mapObject, intensity, color, lightType, active);
@@ -53,7 +42,7 @@ public class LightSourceMapObjectLoader extends MapObjectLoader {
     return entities;
   }
 
-  protected LightSource createLightSource(IMapObject mapObject, int intensity, Color color, String lightType, boolean active) {
+  protected LightSource createLightSource(IMapObject mapObject, int intensity, Color color, LightSource.Type lightType, boolean active) {
     return new LightSource(intensity, color, lightType, active);
   }
 }

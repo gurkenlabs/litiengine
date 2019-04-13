@@ -3,25 +3,27 @@ package de.gurkenlabs.litiengine.environment.tilemap;
 import java.awt.AlphaComposite;
 import java.awt.Composite;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Point;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
-import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.graphics.ImageRenderer;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.litiengine.util.Imaging;
 
 public class MapRenderer {
 
-  public static void render(final Graphics2D g, final IMap map, final Rectangle2D viewport, RenderType... renderTypes) {
-    renderLayers(g, map, map, viewport, renderTypes, 1f);
+  public static void render(Graphics2D g, IMap map, Rectangle2D viewport, RenderType... renderTypes) {
+    renderLayers(g, map, map, viewport, null, renderTypes, 1f);
   }
 
-  private static void renderLayers(final Graphics2D g, final IMap map, ILayerList layers, final Rectangle2D viewport, RenderType[] renderTypes, float opacity) {
+  public static void render(final Graphics2D g, final IMap map, final Rectangle2D viewport, Environment env, RenderType... renderTypes) {
+    renderLayers(g, map, map, viewport, env, renderTypes, 1f);
+  }
+
+  private static void renderLayers(final Graphics2D g, final IMap map, ILayerList layers, final Rectangle2D viewport, Environment env, RenderType[] renderTypes, float opacity) {
     for (final ILayer layer : layers.getRenderLayers()) {
       if (layer == null || !shouldBeRendered(layer, renderTypes)) {
         continue;
@@ -33,12 +35,16 @@ public class MapRenderer {
         renderTileLayer(g, (ITileLayer) layer, map, viewport, layerOpacity);
       }
 
+      if (env != null && layer instanceof IMapObjectLayer) {
+        env.renderLayer(g, (IMapObjectLayer) layer, viewport);
+      }
+
       if (layer instanceof IImageLayer) {
         renderImageLayer(g, (IImageLayer) layer, viewport, layerOpacity);
       }
 
       if (layer instanceof IGroupLayer) {
-        renderLayers(g, map, (IGroupLayer)layer, viewport, renderTypes, layerOpacity);
+        renderLayers(g, map, (IGroupLayer)layer, viewport, env, renderTypes, layerOpacity);
       }
     }
   }
@@ -71,11 +77,16 @@ public class MapRenderer {
 
   private static void drawTile(Graphics2D g, ITileLayer layer, int x, int y, IMap map, Rectangle2D viewport) {
     ITile tile = layer.getTile(x, y);
-    Image image = getTileImage(map, tile);
+    BufferedImage image = tile.getImage();
     if (image != null) {
       Point p = map.getOrientation().getLocation(x, y, map);
-      p.y -= image.getHeight(null);
-      if (viewport.intersects(p.x, p.y, image.getWidth(null), image.getHeight(null))) {
+      p.y -= image.getHeight();
+      ITileOffset offset = tile.getTilesetEntry().getTileset().getTileOffset();
+      if (offset != null) {
+        p.x += offset.getX();
+        p.y += offset.getY();
+      }
+      if (viewport.intersects(p.x, p.y, image.getWidth(), image.getHeight())) {
         ImageRenderer.render(g, image, p.x - viewport.getX(), p.y - viewport.getY());
       }
     }
@@ -114,75 +125,6 @@ public class MapRenderer {
 
     ImageRenderer.render(g, sprite.getImage(), viewportOffsetX, viewportOffsetY);
     g.setComposite(oldComp);
-  }
-
-  /**
-   * Gets the cache key.
-   *
-   * @param map
-   *          the map
-   * @return the cache key
-   */
-  protected static String getCacheKey(final IMap map) {
-    return "map_" + map.getName();
-  }
-
-  protected static Image getTileImage(final IMap map, final ITile tile) {
-    if (tile == null) {
-      return null;
-    }
-
-    final ITileset tileset = MapUtilities.findTileSet(map, tile);
-    if (tileset == null || tileset.getFirstGridId() > tile.getGridId()) {
-      return null;
-    }
-
-    Spritesheet sprite = tileset.getSpritesheet();
-    if (sprite == null) {
-      return null;
-    }
-
-    // get the grid id relative to the sprite sheet since we use a 0 based
-    // approach to calculate the position
-    int index = tile.getGridId() - tileset.getFirstGridId();
-
-    // support for animated tiles
-    final ITileAnimation animation = MapUtilities.getAnimation(map, index);
-    if (animation != null && !animation.getFrames().isEmpty()) {
-      final long playedMs = Game.time().sinceGameStart();
-
-      final int totalDuration = animation.getTotalDuration();
-      final long animationsPlayed = playedMs / totalDuration;
-
-      final long deltaTicks = playedMs - animationsPlayed * totalDuration;
-      int currentPlayTime = 0;
-      for (final ITileAnimationFrame frame : animation.getFrames()) {
-        currentPlayTime += frame.getDuration();
-        if (deltaTicks < currentPlayTime) {
-          // found the current animation frame
-          index = frame.getTileId();
-          break;
-        }
-      }
-    }
-
-    BufferedImage tileImage = sprite.getSprite(index, tileset.getMargin(), tileset.getSpacing());
-    if (tile.isFlipped()) {
-      if (tile.isFlippedDiagonally()) {
-        tileImage = Imaging.rotate(tileImage, -Math.PI / 2);
-        tileImage = Imaging.verticalFlip(tileImage);
-      }
-
-      if (tile.isFlippedHorizontally()) {
-        tileImage = Imaging.horizontalFlip(tileImage);
-      }
-
-      if (tile.isFlippedVertically()) {
-        tileImage = Imaging.verticalFlip(tileImage);
-      }
-    }
-
-    return tileImage;
   }
 
   private MapRenderer() {

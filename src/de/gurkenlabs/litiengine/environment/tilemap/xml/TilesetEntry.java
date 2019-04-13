@@ -1,7 +1,10 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
+import java.awt.image.BufferedImage;
+import java.net.URL;
 import java.util.Arrays;
 
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -9,11 +12,14 @@ import javax.xml.bind.annotation.XmlElement;
 
 import de.gurkenlabs.litiengine.environment.tilemap.ITerrain;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileAnimation;
+import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.ITilesetEntry;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 public class TilesetEntry extends CustomPropertyProvider implements ITilesetEntry {
+  private Tileset tileset;
 
   private transient ITerrain[] terrains;
 
@@ -23,8 +29,22 @@ public class TilesetEntry extends CustomPropertyProvider implements ITilesetEntr
   @XmlAttribute
   private String terrain;
 
-  @XmlElement(required = false)
+  @XmlElement
   private TileAnimation animation;
+
+  @XmlElement
+  private MapImage image;
+
+  @XmlAttribute
+  private String type;
+
+  public TilesetEntry() {
+  }
+
+  public TilesetEntry(Tileset tileset, int id) {
+    this.tileset = tileset;
+    this.id = id;
+  }
 
   @Override
   public int getId() {
@@ -43,6 +63,32 @@ public class TilesetEntry extends CustomPropertyProvider implements ITilesetEntr
   @Override
   public ITileAnimation getAnimation() {
     return this.animation;
+  }
+
+  @Override
+  public BufferedImage getImage() {
+    if (this.animation == null) {
+      return this.getBasicImage();
+    }
+    return this.tileset.getTile(this.animation.getCurrentFrame().getTileId()).getBasicImage();
+  }
+
+  @Override
+  public BufferedImage getBasicImage() {
+    if (this.image != null) {
+      return Resources.images().get(this.image.getAbsoluteSourcePath());
+    }
+    return this.tileset.getSpritesheet().getSprite(this.getId(), this.tileset.getMargin(), this.tileset.getSpacing());
+  }
+
+  @Override
+  public ITileset getTileset() {
+    return this.tileset;
+  }
+
+  @Override
+  public String getType() {
+    return this.type;
   }
 
   protected void setTerrains(ITerrain[] terrains) {
@@ -68,5 +114,22 @@ public class TilesetEntry extends CustomPropertyProvider implements ITilesetEntr
   @Override
   public String toString() {
     return Arrays.toString(this.getTerrainIds());
+  }
+
+  @Override
+  void finish(URL location) throws TmxException {
+    super.finish(location);
+    if (this.image != null) {
+      this.image.finish(location);
+    }
+  }
+
+  boolean shouldBeSaved() {
+    return this.terrain != null || this.image != null || this.animation != null;
+  }
+
+  @SuppressWarnings("unused")
+  private void afterUnmarshal(Unmarshaller u, Object parent) {
+    this.tileset = (Tileset) parent;
   }
 }

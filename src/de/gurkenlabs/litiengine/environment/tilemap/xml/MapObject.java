@@ -354,7 +354,13 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
     return this.ellipseElement != null;
   }
 
-  void afterUnmarshal(Unmarshaller u, Object parent) {
+  @SuppressWarnings("unused")
+  private void afterUnmarshal(Unmarshaller u, Object parent) {
+    // MapObjects don't necessarily have to be children of a layer. E.g. they can also be children of a Blueprint.
+    if (parent instanceof MapObjectLayer) {
+      this.setLayer((MapObjectLayer) parent);
+    }
+
     if (this.gid != null && this.gid == 0) {
       this.gid = null;
     }

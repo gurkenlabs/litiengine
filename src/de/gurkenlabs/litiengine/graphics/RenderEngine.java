@@ -20,8 +20,6 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.EntityYComparator;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.GameWorld;
-import de.gurkenlabs.litiengine.environment.tilemap.IMap;
-import de.gurkenlabs.litiengine.environment.tilemap.MapRenderer;
 import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
 
 /**
@@ -278,15 +276,6 @@ public final class RenderEngine {
         consumer.accept(renderEvent);
       }
     }
-  }
-
-  public static void render(final Graphics2D g, final IMap map, final RenderType... renderTypes) {
-    if (map == null) {
-      return;
-    }
-
-    // draw layers
-    MapRenderer.render(g, map, Game.world().camera().getViewport(), renderTypes);
   }
 
   /**

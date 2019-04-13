@@ -38,7 +38,6 @@ import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.entities.CollisionEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
-import de.gurkenlabs.litiengine.entities.LightSource;
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
@@ -732,9 +731,8 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   }
 
   public void loadTileset(ITileset tileset, boolean embedded) {
-    Optional<Spritesheet> opt = Resources.spritesheets().tryGet(tileset.getImage().getSource());
-    if (opt.isPresent()) {
-      Spritesheet sprite = opt.get();
+    Spritesheet sprite = Resources.spritesheets().get(tileset.getImage().getSource());
+    if (sprite != null) {
       Resources.spritesheets().remove(sprite.getName());
       this.screen.getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(sprite.getName()));
     }
@@ -849,7 +847,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       break;
     case LIGHTSOURCE:
       mo.setValue(MapObjectProperty.LIGHT_COLOR, Color.WHITE);
-      mo.setValue(MapObjectProperty.LIGHT_SHAPE, LightSource.ELLIPSE);
+      mo.setValue(MapObjectProperty.LIGHT_SHAPE, "ellipse");
       mo.setValue(MapObjectProperty.LIGHT_ACTIVE, true);
       break;
     case COLLISIONBOX:

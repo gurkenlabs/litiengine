@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.net.URL;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -78,20 +79,29 @@ public class ResourceBundle implements Serializable {
     this.sounds = new ArrayList<>();
   }
 
-  public static ResourceBundle load(final String file) {
+  public static ResourceBundle load(String file) {
+    return load(Resources.getLocation(file));
+  }
+
+  public static ResourceBundle load(final URL file) {
     try {
       ResourceBundle gameFile = getGameFileFromFile(file);
       if (gameFile == null) {
         return null;
       }
 
-      gameFile.getMaps().parallelStream().forEach(map -> {
+      for (Tileset tileset : gameFile.getTilesets()) {
+        tileset.finish(file);
+      }
+
+      for (Map map : gameFile.getMaps()) {
         for (final ITileset tileset : map.getTilesets()) {
           if (tileset instanceof Tileset) {
             ((Tileset)tileset).load(gameFile.getTilesets());
           }
         }
-      });
+        map.finish(file);
+      }
 
       return gameFile;
     } catch (final JAXBException | IOException e) {
@@ -183,7 +193,7 @@ public class ResourceBundle implements Serializable {
     return newFile.toString();
   }
 
-  private static ResourceBundle getGameFileFromFile(String file) throws JAXBException, IOException {
+  private static ResourceBundle getGameFileFromFile(URL file) throws JAXBException, IOException {
     final JAXBContext jaxbContext = XmlUtilities.getContext(ResourceBundle.class);
     final Unmarshaller um = jaxbContext.createUnmarshaller();
     try (InputStream inputStream = Resources.get(file)) {

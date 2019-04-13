@@ -3,6 +3,8 @@ package de.gurkenlabs.litiengine.environment.tilemap.xml;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -11,7 +13,6 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IMapImage;
-import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 /**
  * The Class MapImage.
@@ -37,7 +38,7 @@ public class MapImage extends CustomPropertyProvider implements IMapImage {
   private int height;
 
   @XmlTransient
-  private String absolutePath;
+  private URL absolutePath;
 
   public MapImage(){
     super();
@@ -69,7 +70,7 @@ public class MapImage extends CustomPropertyProvider implements IMapImage {
   }
 
   @Override
-  public String getAbsoluteSourcePath() {
+  public URL getAbsoluteSourcePath() {
     return this.absolutePath;
   }
 
@@ -111,10 +112,6 @@ public class MapImage extends CustomPropertyProvider implements IMapImage {
     return this.width;
   }
 
-  public void setAbsolutePath(final String mapPath) {
-    this.absolutePath = FileUtilities.combine(mapPath, this.getSource());
-  }
-
   @Override
   public void setTransparentColor(Color color) {
     this.transparentcolor = color;
@@ -126,7 +123,17 @@ public class MapImage extends CustomPropertyProvider implements IMapImage {
   }
 
   @Override
-  public void setAbsoluteSourcePath(String absolutePath) {
+  void finish(URL location) throws TmxException {
+    super.finish(location);
+    try {
+      this.absolutePath = new URL(location, this.source);
+    } catch (MalformedURLException e) {
+      throw new MissingImageException(e);
+    }
+  }
+
+  @Override
+  public void setAbsoluteSourcePath(URL absolutePath) {
     this.absolutePath = absolutePath;
   }
 
@@ -161,6 +168,6 @@ public class MapImage extends CustomPropertyProvider implements IMapImage {
 
   @Override
   public String toString() {
-    return this.getAbsoluteSourcePath();
+    return this.getAbsoluteSourcePath().toExternalForm();
   }
 }

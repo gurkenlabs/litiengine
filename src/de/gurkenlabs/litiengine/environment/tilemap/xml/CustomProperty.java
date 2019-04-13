@@ -1,6 +1,8 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.awt.Color;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Objects;
 
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
@@ -10,12 +12,13 @@ public class CustomProperty implements ICustomProperty {
 
   private String type;
   private String value;
+  private URL location;
 
   public CustomProperty() {
     this.type = "string";
     this.value = "";
   }
-  
+
   /**
    * Copy Constructor for copying instances of CustomProperties.
    *
@@ -25,6 +28,7 @@ public class CustomProperty implements ICustomProperty {
   public CustomProperty(ICustomProperty propertyToBeCopied) {
     this.type = propertyToBeCopied.getType();
     this.value = propertyToBeCopied.getAsString();
+    this.location = propertyToBeCopied.getAsFile();
   }
 
   public CustomProperty(String value) {
@@ -40,36 +44,43 @@ public class CustomProperty implements ICustomProperty {
   @Override
   public void setValue(String value) {
     this.value = Objects.requireNonNull(value);
+    this.location = null;
   }
 
   @Override
   public void setValue(char value) {
     this.value = Character.toString(value);
+    this.location = null;
   }
 
   @Override
   public void setValue(Enum<?> value) {
     this.value = value.name();
+    this.location = null;
   }
 
   @Override
   public void setValue(long value) {
     this.value = Long.toString(value);
+    this.location = null;
   }
 
   @Override
   public void setValue(double value) {
     this.value = Double.toString(value);
+    this.location = null;
   }
 
   @Override
   public void setValue(boolean value) {
     this.value = Boolean.toString(value);
+    this.location = null;
   }
 
   @Override
   public void setValue(Color value) {
-    this.value = ColorHelper.encode(value);
+    this.value = ColorHelper.encode(Objects.requireNonNull(value));
+    this.location = null;
   }
 
   @Override
@@ -79,7 +90,7 @@ public class CustomProperty implements ICustomProperty {
 
   @Override
   public char getAsChar() {
-    return this.value.charAt(0); //TODO Is this enough? Should it check if it's the right length and throw an exception if it's not?
+    return this.value.charAt(0); // TODO Is this enough? Should it check if it's the right length and throw an exception if it's not?
   }
 
   @Override
@@ -127,8 +138,20 @@ public class CustomProperty implements ICustomProperty {
     try {
       return Enum.valueOf(enumType, this.value);
     } catch (IllegalArgumentException e) {
-      return null;
+      // try to ignore case to retrieve the enum value as a fallback
+      for (T enumValue : enumType.getEnumConstants()) {
+        if (enumValue.name().compareToIgnoreCase(this.value) == 0) {
+          return enumValue;
+        }
+      }
     }
+
+    return null;
+  }
+
+  @Override
+  public URL getAsFile() {
+    return this.location;
   }
 
   @Override
@@ -161,5 +184,15 @@ public class CustomProperty implements ICustomProperty {
   @Override
   public String toString() {
     return this.getAsString() + " (" + this.getType() + ')';
+  }
+
+  void finish(URL location) throws TmxException {
+    if ("file".equals(this.type)) {
+      try {
+        this.location = new URL(location, this.value);
+      } catch (MalformedURLException e) {
+        throw new MissingTmxResourceException("invalid location for file property", e);
+      }
+    }
   }
 }

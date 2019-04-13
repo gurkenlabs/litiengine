@@ -1,8 +1,12 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.awt.Dimension;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Optional;
 
 import javax.xml.bind.Marshaller;
@@ -15,6 +19,7 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapImage;
 import de.gurkenlabs.litiengine.environment.tilemap.ITerrain;
 import de.gurkenlabs.litiengine.environment.tilemap.ITile;
@@ -70,7 +75,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   private List<Terrain> terrainTypes = null;
 
   @XmlElement(name = "tile")
-  private List<TilesetEntry> tiles = null;
+  private ArrayList<TilesetEntry> tiles = null;
 
   @XmlTransient
   protected Tileset sourceTileset;
@@ -79,6 +84,11 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
 
   public Tileset() {
     Resources.images().addClearedListener(() -> this.spriteSheet = null);
+  }
+
+  @Override
+  public java.util.Map<String, ICustomProperty> getProperties() {
+    return this.sourceTileset != null ? this.sourceTileset.getProperties() : super.getProperties();
   }
 
   @Override
@@ -178,22 +188,35 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     return this.sourceTileset != null ? this.sourceTileset.getTileWidth() : this.tilewidth;
   }
 
-  public void setMapPath(final String path) {
-    String completePath = path;
+  @Override
+  public void finish(URL location) throws TmxException {
     if (this.source != null) {
-      completePath = FileUtilities.combine(path, FileUtilities.getParentDirPath(this.source));
+      // don't reload the source if it's already been loaded in a resource bundle
+      if (this.sourceTileset == null) {
+        try {
+          URL url = new URL(location, this.source);
+          this.sourceTileset = Resources.tilesets().get(url);
+          if (this.sourceTileset == null) {
+            throw new MissingExternalTilesetException(url.toExternalForm());
+          }
+        } catch (MalformedURLException e) {
+          throw new MissingExternalTilesetException(e);
+        }
+      }
+    } else {
+      super.finish(location);
+      if (this.image != null) {
+        this.image.finish(location);
+      }
+      if (this.terrainTypes != null) {
+        for (Terrain terrain : this.terrainTypes) {
+          terrain.finish(location);
+        }
+      }
+      for (TilesetEntry entry : this.tiles) {
+        entry.finish(location);
+      }
     }
-
-    if (this.sourceTileset != null) {
-      this.sourceTileset.setMapPath(completePath);
-      return;
-    }
-
-    if (this.image == null) {
-      return;
-    }
-
-    this.image.setAbsolutePath(completePath);
   }
 
   @Override
@@ -287,21 +310,15 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
 
   @Override
   public ITilesetEntry getTile(int id) {
-    if (sourceTileset != null) {
-      return sourceTileset.getTile(id);
+    if (this.sourceTileset != null) {
+      return this.sourceTileset.getTile(id);
     }
 
-    if (tiles == null) {
+    if (id < 0 || id >= this.tilecount || this.tiles == null) {
       return null;
     }
 
-    for (TilesetEntry tile : tiles) {
-      if (tile.getId() == id) {
-        return tile;
-      }
-    }
-
-    return null;
+    return this.tiles.get(id);
   }
 
   @Override
@@ -312,12 +329,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
 
   @Override
   public boolean containsTile(int tileId) {
-    final int lastGridId = this.getFirstGridId() - 1 + this.getTileCount();
-    if (this.getFirstGridId() - 1 > tileId) {
-      return false;
-    }
-
-    return lastGridId >= tileId || this.sourceTileset != null && this.sourceTileset.containsTile(tileId);
+    return tileId >= this.firstgid && tileId < this.firstgid + this.getTileCount();
   }
 
   public void loadFromSource(String basePath) throws MissingExternalTilesetException {
@@ -359,7 +371,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   }
 
   public void updateTileTerrain() {
-    if (this.sourceTileset == null && this.tiles != null) {
+    if (this.sourceTileset == null) {
       for (TilesetEntry entry : this.tiles) {
         entry.setTerrains(this.getTerrain(entry.getId()));
       }
@@ -369,8 +381,31 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   @SuppressWarnings("unused")
   private void afterUnmarshal(Unmarshaller u, Object parent) {
     if (this.source == null) {
+      if (this.tiles == null) {
+        this.tiles = new ArrayList<>(this.tilecount);
+      } else {
+        this.tiles.ensureCapacity(this.tilecount);
+      }
       this.updateTileTerrain();
+      // add missing entries
+      ListIterator<TilesetEntry> iter = this.tiles.listIterator();
+      for (int i = 0; i < this.tilecount; i++) {
+        if (add(iter)) {
+          iter.add(new TilesetEntry(this, iter.nextIndex()));
+        }
+      }
     }
+  }
+
+  private static boolean add(ListIterator<TilesetEntry> iter) {
+    if (!iter.hasNext()) {
+      return true;
+    }
+    if (iter.next().getId() != iter.previousIndex()) {
+      iter.previous(); // move the cursor back
+      return true;
+    }
+    return false;
   }
 
   @SuppressWarnings("unused")
@@ -380,6 +415,13 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
       this.tileheight = null;
       this.tilecount = null;
       this.columns = null;
+    } else {
+      Iterator<TilesetEntry> iter = this.tiles.iterator();
+      while (iter.hasNext()) {
+        if (!iter.next().shouldBeSaved()) {
+          iter.remove();
+        }
+      }
     }
 
     if (this.margin != null && this.margin == 0) {

@@ -111,10 +111,10 @@ public class PropAnimationController<T extends Prop> extends EntityAnimationCont
       return null;
     }
 
-    Optional<Spritesheet> opt = Resources.spritesheets().tryGet(getSpriteName(prop, state, true));
+    Spritesheet opt = Resources.spritesheets().get(getSpriteName(prop, state, true));
 
-    if (opt.isPresent()) {
-      return opt.get();
+    if (opt != null) {
+      return opt;
     }
 
     return Resources.spritesheets().get(getSpriteName(prop, state, false));

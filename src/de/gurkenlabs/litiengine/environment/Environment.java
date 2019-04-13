@@ -10,14 +10,17 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -39,18 +42,19 @@ import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.Spawnpoint;
 import de.gurkenlabs.litiengine.entities.StaticShadow;
 import de.gurkenlabs.litiengine.entities.Trigger;
+import de.gurkenlabs.litiengine.environment.tilemap.ILayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.MapRenderer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.graphics.AmbientLight;
 import de.gurkenlabs.litiengine.graphics.DebugRenderer;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.graphics.RenderComponent;
-import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.StaticShadowLayer;
 import de.gurkenlabs.litiengine.graphics.StaticShadowType;
@@ -58,6 +62,7 @@ import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
 import de.gurkenlabs.litiengine.physics.GravityForce;
 import de.gurkenlabs.litiengine.physics.IMovementController;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.litiengine.util.TimeUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
@@ -69,8 +74,10 @@ public final class Environment implements IRenderable {
   private final Map<Integer, ICombatEntity> combatEntities = new ConcurrentHashMap<>();
   private final Map<Integer, IMobileEntity> mobileEntities = new ConcurrentHashMap<>();
   private final Map<Integer, GravityForce> gravityForces = new ConcurrentHashMap<>();
-  private final Map<RenderType, Map<Integer, IEntity>> entities = Collections.synchronizedMap(new EnumMap<>(RenderType.class));
+  private final Map<RenderType, Map<Integer, IEntity>> miscEntities = Collections.synchronizedMap(new EnumMap<>(RenderType.class));
+  private final Map<IMapObjectLayer, List<IEntity>> layerEntities = new ConcurrentHashMap<>();
   private final Map<String, Collection<IEntity>> entitiesByTag = new ConcurrentHashMap<>();
+  private final Map<Integer, IEntity> allEntities = new ConcurrentHashMap<>();
 
   private final Map<RenderType, Collection<EnvironmentRenderListener>> renderListeners = Collections.synchronizedMap(new EnumMap<>(RenderType.class));
   private final List<EnvironmentListener> listeners = new CopyOnWriteArrayList<>();
@@ -123,7 +130,7 @@ public final class Environment implements IRenderable {
 
   private Environment() {
     for (RenderType renderType : RenderType.values()) {
-      this.entities.put(renderType, new ConcurrentHashMap<>());
+      this.miscEntities.put(renderType, new ConcurrentHashMap<>());
       this.renderListeners.put(renderType, ConcurrentHashMap.newKeySet());
       this.renderables.put(renderType, ConcurrentHashMap.newKeySet());
     }
@@ -158,20 +165,25 @@ public final class Environment implements IRenderable {
   /**
    * Adds the specified entity to the environment container. This also loads the
    * entity (register entity and controllers for update) if the environment has
-   * already been loaded.
+   * already been loaded. The entity will not be bound to a layer.
    *
    * @param entity
    *          The entity to add to the environment.
    */
-  public void add(final IEntity entity) {
+  public void add(IEntity entity) {
     if (entity == null) {
       return;
     }
+    this.addEntity(entity);
+    this.miscEntities.get(entity.getRenderType()).put(entity.getMapId(), entity);
+  }
+
+  private void addEntity(final IEntity entity) {
     int desiredID = entity.getMapId();
     // assign local map id if the entity's mapID is invalid
     if (desiredID == 0 || this.getAllMapIDs().contains(desiredID)) {
       entity.setMapId(this.getLocalMapId());
-      log.info(() -> String.format("Entity [%s] was assigned a local mapID because #%d was already taken or invalid.", entity, desiredID));
+      log.fine(() -> String.format("Entity [%s] was assigned a local mapID because #%d was already taken or invalid.", entity, desiredID));
     }
 
     if (entity instanceof Emitter)
@@ -238,7 +250,7 @@ public final class Environment implements IRenderable {
       this.load(entity);
     }
 
-    this.entities.get(entity.getRenderType()).put(entity.getMapId(), entity);
+    this.allEntities.put(entity.getMapId(), entity);
 
     this.fireEntityEvent(l -> l.entityAdded(entity));
   }
@@ -307,9 +319,10 @@ public final class Environment implements IRenderable {
     this.getSpawnPoints().clear();
     this.getAreas().clear();
     this.getTriggers().clear();
+    this.allEntities.clear();
     this.getEntitiesByTag().clear();
 
-    for (Map<Integer, IEntity> type : this.entities.values()) {
+    for (Map<Integer, IEntity> type : this.miscEntities.values()) {
       type.clear();
     }
 
@@ -390,14 +403,7 @@ public final class Environment implements IRenderable {
   }
 
   public IEntity get(final int mapId) {
-    for (Map<Integer, IEntity> type : this.entities.values()) {
-      IEntity entity = type.get(mapId);
-      if (entity != null) {
-        return entity;
-      }
-    }
-
-    return null;
+    return this.allEntities.get(mapId);
   }
 
   /**
@@ -413,15 +419,13 @@ public final class Environment implements IRenderable {
       return foundEntities;
     }
 
-    for (Map<Integer, IEntity> type : this.entities.values()) {
-      for (int id : mapIds) {
-        IEntity entity = type.get(id);
-        if (entity != null) {
-          foundEntities.add(entity);
-        }
+    for (int id : mapIds) {
+      IEntity entity = this.allEntities.get(id);
+      if (entity != null) {
+        foundEntities.add(entity);
       }
-
     }
+
     return foundEntities;
   }
 
@@ -439,11 +443,9 @@ public final class Environment implements IRenderable {
       return null;
     }
 
-    for (Map<Integer, IEntity> type : this.entities.values()) {
-      for (final IEntity entity : type.values()) {
-        if (entity.getName() != null && entity.getName().equals(name)) {
-          return entity;
-        }
+    for (final IEntity entity : this.allEntities.values()) {
+      if (entity.getName() != null && entity.getName().equals(name)) {
+        return entity;
       }
     }
 
@@ -542,16 +544,98 @@ public final class Environment implements IRenderable {
   }
 
   public Collection<IEntity> getEntities() {
-    final ArrayList<IEntity> ent = new ArrayList<>();
-    for (Map<Integer, IEntity> type : this.entities.values()) {
-      ent.addAll(type.values());
-    }
-
-    return ent;
+    return Collections.unmodifiableCollection(this.allEntities.values());
   }
 
+  /**
+   * Gets the entities with the specified render type that are not bound to layers.
+   * <p>
+   * Entities are unbound from there originating <code>MapObjectLayer</code> if their <code>RenderType</code> differs
+   * from the layer's <code>RenderType</code>.
+   * </p>
+   *
+   * @param renderType
+   *          The render type
+   * @return The miscellaneous entities with the specified render type
+   * 
+   * @see IEntity#getRenderType()
+   * @see ILayer#getRenderType()
+   */
   public Collection<IEntity> getEntities(final RenderType renderType) {
-    return this.entities.get(renderType).values();
+    return this.miscEntities.get(renderType).values();
+  }
+
+  /**
+   * Gets the entities that are bound to the specified layer.
+   * <p>
+   * Entities are bound to a layer if their <code>RenderType</code> matches the layer's <code>RenderType</code>
+   * </p>
+   * 
+   * @param layer
+   *          The layer that the entities are bound to.
+   * @return The entities that are bound to the specified layer.
+   * 
+   * @see IEntity#getRenderType()
+   * @see ILayer#getRenderType()
+   */
+  public Collection<IEntity> getEntities(final IMapObjectLayer layer) {
+    if (layer == null || !this.layerEntities.containsKey(layer)) {
+      return Collections.emptySet();
+    }
+
+    return this.layerEntities.get(layer);
+  }
+
+  /**
+   * Gets the entities that are bound to layer with the specified name.
+   * <p>
+   * Entities are bound to a layer if their <code>RenderType</code> matches the layer's <code>RenderType</code>
+   * </p>
+   * 
+   * @param name
+   *          The name of the layer
+   * @return The entities that are bound to the specified layer.
+   * 
+   * @see IEntity#getRenderType()
+   * @see ILayer#getRenderType()
+   * @see ILayer#getName()
+   */
+  public Collection<IEntity> getEntitiesByLayer(final String name) {
+    if (name == null || name.isEmpty()) {
+      return Collections.emptySet();
+    }
+
+    for (Entry<IMapObjectLayer, List<IEntity>> entry : this.layerEntities.entrySet()) {
+      if (name.equals(entry.getKey().getName())) {
+        return entry.getValue();
+      }
+    }
+
+    return Collections.emptySet();
+  }
+
+  /**
+   * Gets the entities that are bound to layer with the specified layer ID.
+   * <p>
+   * Entities are bound to a layer if their <code>RenderType</code> matches the layer's <code>RenderType</code>
+   * </p>
+   * 
+   * @param layerId
+   *          The id of the layer
+   * @return The entities that are bound to the specified layer.
+   * 
+   * @see IEntity#getRenderType()
+   * @see ILayer#getRenderType()
+   * @see ILayer#getId()
+   */
+  public Collection<IEntity> getEntitiesByLayer(final int layerId) {
+    for (Entry<IMapObjectLayer, List<IEntity>> entry : this.layerEntities.entrySet()) {
+      if (layerId == entry.getKey().getId()) {
+        return entry.getValue();
+      }
+    }
+
+    return Collections.emptySet();
   }
 
   public Map<String, Collection<IEntity>> getEntitiesByTag() {
@@ -719,7 +803,7 @@ public final class Environment implements IRenderable {
 
     if (this.getMap() != null) {
       if (this.getMap().getBackgroundColor() != null) {
-        Game.window().getRenderComponent().setBackground(this.getMap().getBackgroundColor());
+        Game.window().getRenderComponent().setBackground(ColorHelper.premultiply(this.getMap().getBackgroundColor()));
       }
     } else {
       Game.window().getRenderComponent().setBackground(Color.BLACK);
@@ -816,8 +900,16 @@ public final class Environment implements IRenderable {
       return;
     }
 
-    if (this.entities.get(entity.getRenderType()) != null) {
-      this.entities.get(entity.getRenderType()).entrySet().removeIf(e -> e.getValue().getMapId() == entity.getMapId());
+    this.allEntities.remove(entity.getMapId());
+    Iterator<List<IEntity>> iter = this.layerEntities.values().iterator();
+    while (iter.hasNext()) {
+      List<IEntity> layer = iter.next();
+      if (layer.remove(entity) && layer.isEmpty()) {
+        iter.remove();
+      }
+    }
+    if (this.miscEntities.get(entity.getRenderType()) != null) {
+      this.miscEntities.get(entity.getRenderType()).values().remove(entity);
     }
 
     for (String tag : entity.getTags()) {
@@ -1046,11 +1138,19 @@ public final class Environment implements IRenderable {
       try {
         loadedEntities = loader.load(this, mapObject);
       } catch (MapObjectException e) {
+        log.log(Level.WARNING, "map object " + mapObject.getId() + " failed to load", e);
         return new ArrayList<>();
       }
       for (IEntity entity : loadedEntities) {
         if (entity != null) {
-          this.add(entity);
+
+          // only add the entity to be rendered with it's layer if its RenderType equals the layer's RenderType
+          if (mapObject.getLayer() != null && entity.getRenderType() == mapObject.getLayer().getRenderType()) {
+            this.addEntity(entity);
+            this.layerEntities.computeIfAbsent(mapObject.getLayer(), m -> new CopyOnWriteArrayList<>()).add(entity);
+          } else {
+            this.add(entity);
+          }
         }
       }
 
@@ -1087,7 +1187,9 @@ public final class Environment implements IRenderable {
     long renderStart = System.nanoTime();
 
     // 1. Render map layers
-    RenderEngine.render(g, this.getMap(), renderType);
+    if (this.getMap() != null) {
+      MapRenderer.render(g, this.getMap(), Game.world().camera().getViewport(), this, renderType);
+    }
 
     // 2. Render renderables
     for (final IRenderable rend : this.getRenderables(renderType)) {
@@ -1095,7 +1197,7 @@ public final class Environment implements IRenderable {
     }
 
     // 3. Render entities
-    Game.graphics().renderEntities(g, this.entities.get(renderType).values(), renderType == RenderType.NORMAL);
+    Game.graphics().renderEntities(g, this.miscEntities.get(renderType).values(), renderType == RenderType.NORMAL);
 
     // 4. fire event
     this.fireRenderEvent(g, renderType);
@@ -1105,7 +1207,14 @@ public final class Environment implements IRenderable {
       Game.metrics().trackRenderTime(renderType.toString().toLowerCase(), renderTime,
           new GameMetrics.RenderInfo("layers", this.getMap().getRenderLayers().stream().filter(m -> m.getRenderType() == renderType).count()),
           new GameMetrics.RenderInfo("renderables", this.getRenderables(renderType).size()),
-          new GameMetrics.RenderInfo("entities", this.entities.get(renderType).size()));
+          new GameMetrics.RenderInfo("entities", this.miscEntities.get(renderType).size()));
+    }
+  }
+
+  public void renderLayer(Graphics2D g, IMapObjectLayer layer, Rectangle2D viewport) {
+    List<IEntity> entities = this.layerEntities.get(layer);
+    if (entities != null) {
+      Game.graphics().renderEntities(g, entities, layer.getRenderType() == RenderType.NORMAL);
     }
   }
 
@@ -1120,7 +1229,7 @@ public final class Environment implements IRenderable {
   }
 
   public Collection<Integer> getAllMapIDs() {
-    return this.getEntities().stream().map(IEntity::getMapId).collect(Collectors.toList());
+    return this.allEntities.keySet();
   }
 
   private static void dispose(final Collection<? extends IEntity> entities) {

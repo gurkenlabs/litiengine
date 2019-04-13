@@ -4,10 +4,12 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Shape;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 
 public interface IMapOrientation {
   /**
    * Gets the name of this {@code IMapOrientation}.
+   * 
    * @return The name of this orientation
    */
   public String getName();
@@ -77,9 +79,35 @@ public interface IMapOrientation {
   public Shape getShape(Point tile, IMap map);
 
   /**
+   * Determines the bounding box for the tile at the given coordinates. A call to this method is equivalent to calling
+   * {@code orientation.getShape(x, y, map).getBounds2D()}.
+   *
+   * @param x
+   *          The X coordinate of the tile
+   * @param y
+   *          The Y coordinate of the tile
+   * @param map
+   *          The {@code IMap} that the tile is in
+   * @return The bounding box of the tile
+   */
+  public Rectangle2D getBounds(int x, int y, IMap map);
+
+  /**
+   * Determines the bounding box for the tile at the given coordinates. A call to this method is equivalent to calling
+   * {@code orientation.getShape(tile, map).getBounds2D()}.
+   *
+   * @param tile
+   *          The location of the tile
+   * @param map
+   *          The {@code IMap} that the tile is in
+   * @return The bounding box of the tile
+   */
+  public Rectangle2D getBounds(Point tile, IMap map);
+
+  /**
    * Returns the shape of the tile containing the given coordinates. A call to this method is equivalent to calling
    * {@code orientation.getShape(orientation.getTile(x, y, map), map)}.
-   * 
+   *
    * @param x
    *          The X coordinate to contain
    * @param y
@@ -93,7 +121,7 @@ public interface IMapOrientation {
   /**
    * Returns the shape of the tile containing the given coordinates. A call to this method is equivalent to calling
    * {@code orientation.getShape(orientation.getTile(location, map), map)}.
-   * 
+   *
    * @param location
    *          The point to contain
    * @param map
@@ -103,8 +131,33 @@ public interface IMapOrientation {
   public Shape getEnclosingTileShape(Point2D location, IMap map);
 
   /**
-   * Determines the coordinates of the tile containing the given point, as determined by {@link IMapOrientation#getShape(int, int, IMap)}. If the
-   * point is on the edge separating two tiles, any of those tiles may be used.
+   * Returns the bounding box of the tile containing the given coordinates. A call to this method is equivalent to calling
+   * {@code orientation.getShape(orientation.getTile(x, y, map), map).getBounds2D()}.
+   *
+   * @param x
+   *          The X coordinate to contain
+   * @param y
+   *          The Y coordinate to contain
+   * @param map
+   *          The {@code IMap} containing the tile
+   * @return The bounding box of the tile containing the given point
+   */
+  public Rectangle2D getEnclosingTileBounds(double x, double y, IMap map);
+
+  /**
+   * Returns the bounding box of the tile containing the given coordinates. A call to this method is equivalent to calling
+   * {@code orientation.getShape(orientation.getTile(location, map), map).getBounds2D()}.
+   *
+   * @param location
+   *          The point to contain
+   * @param map
+   *          The {@code IMap} containing the tile
+   * @return The bounding box of the tile containing the given point
+   */
+  public Rectangle2D getEnclosingTileBounds(Point2D location, IMap map);
+
+  /**
+   * Determines the coordinates of the tile containing the given point, as determined by {@link IMapOrientation#getShape(int, int, IMap)}.
    *
    * @param x
    *          The X coordinate to contain
@@ -119,8 +172,7 @@ public interface IMapOrientation {
   public Point getTile(double x, double y, IMap map);
 
   /**
-   * Determines the coordinates of the tile containing the given point, as determined by {@link IMapOrientation#getShape(int, int, IMap)}. If the
-   * point is on the edge separating two tiles, any of those tiles may be used.
+   * Determines the coordinates of the tile containing the given point, as determined by {@link IMapOrientation#getShape(int, int, IMap)}.
    *
    * @param location
    *          The point to contain

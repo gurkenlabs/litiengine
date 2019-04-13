@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -124,4 +125,13 @@ public class GroupLayer extends Layer implements IGroupLayer {
     return this.groupLayers;
   }
 
+  @Override
+  void finish(URL location) throws TmxException {
+    super.finish(location);
+    for (ILayer layer : this.layers) {
+      if (layer instanceof Layer) {
+        ((Layer) layer).finish(location);
+      }
+    }
+  }
 }

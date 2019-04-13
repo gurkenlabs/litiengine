@@ -2,7 +2,7 @@ package de.gurkenlabs.litiengine.resources;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.URL;
 
 import javax.imageio.ImageIO;
 
@@ -45,19 +45,8 @@ public final class Images extends ResourcesContainer<BufferedImage> {
    * @return the image
    */
   @Override
-  protected BufferedImage load(String resourceName) throws IOException {
-    if (resourceName == null || resourceName.isEmpty()) {
-      return null;
-    }
-
-    // try to get image from resource folder first and as a fallback get it from
-    // a normal folder
-    BufferedImage img = null;
-    try (final InputStream imageFile = Resources.get(resourceName)) {
-      if (imageFile != null) {
-        img = ImageIO.read(imageFile);
-      }
-    }
+  protected BufferedImage load(URL resourceName) throws IOException {
+    BufferedImage img = ImageIO.read(resourceName);
 
     if (img == null) {
       return null;

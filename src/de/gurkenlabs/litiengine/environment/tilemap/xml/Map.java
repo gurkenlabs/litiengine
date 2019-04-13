@@ -5,7 +5,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
-import java.io.Serializable;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IGroupLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
@@ -36,15 +37,14 @@ import de.gurkenlabs.litiengine.environment.tilemap.RenderOrder;
 import de.gurkenlabs.litiengine.environment.tilemap.StaggerAxis;
 import de.gurkenlabs.litiengine.environment.tilemap.StaggerIndex;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
-import de.gurkenlabs.litiengine.util.ColorHelper;
+import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 @XmlRootElement(name = "map")
 @XmlAccessorType(XmlAccessType.FIELD)
-public final class Map extends CustomPropertyProvider implements IMap, Serializable, Comparable<Map> {
+public final class Map extends CustomPropertyProvider implements IMap, Comparable<Map> {
   public static final String FILE_EXTENSION = "tmx";
 
   private static final Logger log = Logger.getLogger(Map.class.getName());
-  private static final long serialVersionUID = 402776584608365440L;
   private static final int[] MAX_SUPPORTED_VERSION = { 1, 2 };
 
   @XmlAttribute
@@ -59,11 +59,8 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   @XmlTransient
   private IMapOrientation mapOrientation;
 
-  @XmlTransient
-  private RenderOrder renderOrderEnum;
-
   @XmlAttribute
-  private String renderorder;
+  private RenderOrder renderorder;
 
   @XmlAttribute
   private int width;
@@ -83,20 +80,15 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   @XmlAttribute
   private Integer hexsidelength;
 
-  @XmlTransient
-  private StaggerAxis staggerAxisEnum;
-
-  @XmlTransient
-  private StaggerIndex staggerIndexEnum;
+  @XmlAttribute
+  private StaggerAxis staggeraxis;
 
   @XmlAttribute
-  private String staggeraxis;
+  private StaggerIndex staggerindex;
 
   @XmlAttribute
-  private String staggerindex;
-
-  @XmlAttribute
-  private String backgroundcolor;
+  @XmlJavaTypeAdapter(ColorAdapter.class)
+  private Color backgroundcolor;
 
   @XmlAttribute(name = "nextobjectid")
   private int nextObjectId;
@@ -104,7 +96,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   @XmlAttribute(name = "nextlayerid")
   private int nextLayerId;
 
-  @XmlAttribute(required = false)
+  @XmlAttribute
   private String name;
 
   @XmlElement(name = "tileset", type = Tileset.class)
@@ -119,7 +111,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   private List<ILayer> layers;
 
   @XmlTransient
-  private String path;
+  private URL path;
 
   private transient List<ITileLayer> rawTileLayers = new ArrayList<>();
   private transient List<IMapObjectLayer> rawMapObjectLayers = new ArrayList<>();
@@ -130,8 +122,6 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   private transient List<IMapObjectLayer> mapObjectLayers = Collections.unmodifiableList(this.rawMapObjectLayers);
   private transient List<IImageLayer> imageLayers = Collections.unmodifiableList(this.rawImageLayers);
   private transient List<IGroupLayer> groupLayers = Collections.unmodifiableList(this.rawGroupLayers);
-
-  private transient Color decodedBackgroundColor;
 
   @XmlTransient
   private int chunkOffsetX;
@@ -169,13 +159,13 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
   @Override
   @XmlTransient
-  public String getPath() {
+  public URL getPath() {
     return this.path;
   }
 
   @Override
   public RenderOrder getRenderOrder() {
-    return this.renderOrderEnum;
+    return this.renderorder;
   }
 
   @Override
@@ -266,25 +256,34 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
   @Override
   public StaggerAxis getStaggerAxis() {
-    return this.staggerAxisEnum;
+    return this.staggeraxis;
   }
 
   @Override
   public StaggerIndex getStaggerIndex() {
-    return this.staggerIndexEnum;
+    return this.staggerindex;
   }
 
-  public void setPath(final String path) {
+  public void setPath(final URL path) {
     this.path = path;
-    for (ILayer layer : this.getRenderLayers()) {
-      if (layer instanceof ImageLayer) {
-        ((ImageLayer) layer).setMapPath(path);
-      }
-    }
+  }
 
+  @Override
+  public void finish(URL location) throws TmxException {
+    super.finish(location);
+    if (this.name == null) {
+      this.name = FileUtilities.getFileName(location);
+    }
+    this.path = location;
+    // tilesets must be post-processed before layers; otherwise external tilesets may not be loaded
     for (ITileset tileset : this.tilesets) {
       if (tileset instanceof Tileset) {
-        ((Tileset) tileset).setMapPath(path);
+        ((Tileset) tileset).finish(location);
+      }
+    }
+    for (ILayer layer : this.layers) {
+      if (layer instanceof Layer) {
+        ((Layer) layer).finish(location);
       }
     }
   }
@@ -353,8 +352,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
   @XmlTransient
   public void setRenderOrder(RenderOrder renderorder) {
-    Objects.requireNonNull(renderorder);
-    this.renderOrderEnum = renderorder;
+    this.renderorder = renderorder;
   }
 
   @XmlTransient
@@ -379,12 +377,12 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
   @XmlTransient
   public void setStaggerAxis(StaggerAxis staggerAxis) {
-    this.staggerAxisEnum = staggerAxis;
+    this.staggeraxis = staggerAxis;
   }
 
   @XmlTransient
   public void setStaggerIndex(StaggerIndex staggerIndex) {
-    this.staggerIndexEnum = staggerIndex;
+    this.staggerindex = staggerIndex;
   }
 
   @XmlTransient
@@ -444,16 +442,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
   @Override
   public Color getBackgroundColor() {
-    if (this.backgroundcolor == null || this.backgroundcolor.isEmpty()) {
-      return null;
-    }
-
-    if (this.decodedBackgroundColor != null) {
-      return this.decodedBackgroundColor;
-    }
-
-    this.decodedBackgroundColor = ColorHelper.decode(this.backgroundcolor, true);
-    return this.decodedBackgroundColor;
+    return this.backgroundcolor;
   }
 
   @Override
@@ -473,22 +462,10 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   private void afterUnmarshal(Unmarshaller u, Object parent) {
     this.checkVersion();
 
-    if (this.staggeraxis != null) {
-      this.staggerAxisEnum = StaggerAxis.valueOf(this.staggeraxis.toUpperCase());
-    }
-    if (this.staggerindex != null) {
-      this.staggerIndexEnum = StaggerIndex.valueOf(this.staggerindex.toUpperCase());
-    }
-    if (this.renderorder != null) {
-      this.renderOrderEnum = RenderOrder.forName(this.renderorder);
-    }
     if (this.orientation != null) {
       this.mapOrientation = MapOrientations.forName(this.orientation);
     }
 
-    if (this.renderOrderEnum == null) {
-      this.renderOrderEnum = RenderOrder.RIGHT_DOWN;
-    }
     if (this.mapOrientation == null) {
       this.mapOrientation = MapOrientations.ORTHOGONAL;
     }
@@ -512,9 +489,6 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
   @SuppressWarnings("unused")
   private void beforeMarshal(Marshaller m) {
-    this.staggeraxis = this.staggerAxisEnum == null ? null : this.staggerAxisEnum.name().toLowerCase();
-    this.staggerindex = this.staggerIndexEnum == null ? null : this.staggerIndexEnum.name().toLowerCase();
-    this.renderorder = this.renderOrderEnum.savedName;
     this.orientation = this.mapOrientation.getName();
   }
 

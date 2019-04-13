@@ -11,13 +11,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -38,6 +39,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapRenderer;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxException;
 import de.gurkenlabs.litiengine.graphics.ImageFormat;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.TextRenderer;
@@ -438,8 +440,8 @@ public class EditorScreen extends Screen {
     XmlImportDialog.importXml("Emitter", file -> {
       EmitterData emitter;
       try {
-        emitter = XmlUtilities.readFromFile(EmitterData.class, file.toString());
-      } catch (JAXBException e) {
+        emitter = XmlUtilities.readFromFile(EmitterData.class, file.toURI().toURL());
+      } catch (JAXBException | MalformedURLException e) {
         log.log(Level.SEVERE, "could not load emitter data from " + file, e);
         return;
       }
@@ -462,8 +464,8 @@ public class EditorScreen extends Screen {
     XmlImportDialog.importXml("Blueprint", file -> {
       Blueprint blueprint;
       try {
-        blueprint = XmlUtilities.readFromFile(Blueprint.class, file.toString());
-      } catch (JAXBException e) {
+        blueprint = XmlUtilities.readFromFile(Blueprint.class, file.toURI().toURL());
+      } catch (JAXBException | MalformedURLException e) {
         log.log(Level.SEVERE, "could not load blueprint from " + file, e);
         return;
       }
@@ -494,14 +496,14 @@ public class EditorScreen extends Screen {
     XmlImportDialog.importXml("Tilesets", file -> {
       Tileset tileset;
       try {
-        tileset = XmlUtilities.readFromFile(Tileset.class, file.toString());
-      } catch (JAXBException e) {
+        URL path = file.toURI().toURL();
+        tileset = XmlUtilities.readFromFile(Tileset.class, file.toURI().toURL());
+        tileset.finish(path);
+      } catch (JAXBException | MalformedURLException | TmxException e) {
         log.log(Level.SEVERE, "could not load tileset from " + file, e);
         return;
       }
 
-      String path = FileUtilities.getParentDirPath(file.toURI());
-      tileset.setMapPath(path);
 
       if (this.gameFile.getTilesets().stream().anyMatch(x -> x.getName().equals(tileset.getName()))) {
         int result = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), Resources.strings().get("import_tileset_title", tileset.getName()), Resources.strings().get("import_tileset_title"), JOptionPane.YES_NO_OPTION);
@@ -522,8 +524,8 @@ public class EditorScreen extends Screen {
 
   public void loadSpriteSheets(Collection<SpritesheetResource> infos, boolean forceAssetTreeUpdate) {
     infos.parallelStream().forEach(info -> {
-      Optional<Spritesheet> opt = Resources.spritesheets().tryGet(info.getName());
-      if (opt.isPresent()) {
+      Spritesheet opt = Resources.spritesheets().get(info.getName());
+      if (opt != null) {
         Resources.spritesheets().update(info);
       } else {
         Resources.spritesheets().load(info);
@@ -587,8 +589,7 @@ public class EditorScreen extends Screen {
 
         int result = chooser.showSaveDialog((JFrame) Game.window().getHostControl());
         if (result == JFileChooser.APPROVE_OPTION) {
-          String newFile = this.saveGameFile(chooser.getSelectedFile().toString());
-          this.currentResourceFile = newFile;
+          this.saveGameFile(chooser.getSelectedFile().toString());
         }
       } catch (IOException e1) {
         log.log(Level.SEVERE, e1.getLocalizedMessage(), e1);
@@ -646,6 +647,7 @@ public class EditorScreen extends Screen {
 
   private String saveGameFile(String target) {
     String saveFile = this.getGameFile().save(target, Program.getUserPreferences().isCompressFile());
+    this.currentResourceFile = saveFile;
     Program.getUserPreferences().setLastGameFile(this.currentResourceFile);
     Program.getUserPreferences().addOpenedFile(this.currentResourceFile);
     Program.loadRecentFiles();
@@ -685,15 +687,15 @@ public class EditorScreen extends Screen {
         continue;
       }
 
-      Optional<Spritesheet> opt = Resources.spritesheets().tryGet(tileSet.getImage().getSource());
+      Spritesheet opt = Resources.spritesheets().get(tileSet.getImage().getSource());
       Spritesheet sprite = null;
-      if (!opt.isPresent()) {
+      if (opt == null) {
         sprite = Resources.spritesheets().load(tileSet);
         if (sprite == null) {
           continue;
         }
       } else {
-        sprite = opt.get();
+        sprite = opt;
       }
 
       infos.add(new SpritesheetResource(sprite));
@@ -701,9 +703,9 @@ public class EditorScreen extends Screen {
     }
 
     for (IImageLayer imageLayer : map.getImageLayers()) {
-      Optional<Spritesheet> opt = Resources.spritesheets().tryGet(imageLayer.getImage().getSource());
+      Spritesheet opt = Resources.spritesheets().get(imageLayer.getImage().getSource());
       Spritesheet sprite = null;
-      if (!opt.isPresent()) {
+      if (opt == null) {
         BufferedImage img = Resources.images().get(imageLayer.getImage().getAbsoluteSourcePath(), true);
         if (img == null) {
           continue;
@@ -714,7 +716,7 @@ public class EditorScreen extends Screen {
           continue;
         }
       } else {
-        sprite = opt.get();
+        sprite = opt;
       }
 
       SpritesheetResource info = new SpritesheetResource(sprite);

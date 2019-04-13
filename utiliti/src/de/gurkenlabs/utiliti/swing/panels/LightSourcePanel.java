@@ -31,7 +31,7 @@ public class LightSourcePanel extends PropertyPanel {
     this.colorControl = new ColorControl();
 
     this.comboBoxLightShape = new JComboBox<>();
-    this.comboBoxLightShape.setModel(new DefaultComboBoxModel<String>(new String[] { LightSource.ELLIPSE, LightSource.RECTANGLE }));
+    this.comboBoxLightShape.setModel(new DefaultComboBoxModel<String>(new String[] { "ellipse", "rectangle" }));
 
     this.spinnerIntensity = new JSpinner(new SpinnerNumberModel(0, 0, 255, 1));
 
@@ -49,7 +49,7 @@ public class LightSourcePanel extends PropertyPanel {
   protected void clearControls() {
     this.spinnerIntensity.setValue(LightSource.DEFAULT_INTENSITY);
     this.colorControl.clear();
-    this.comboBoxLightShape.setSelectedItem(LightSource.ELLIPSE);
+    this.comboBoxLightShape.setSelectedItem("ellipse");
     this.checkBoxIsActive.setSelected(true);
   }
 
