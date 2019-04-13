@@ -589,8 +589,7 @@ public class EditorScreen extends Screen {
 
         int result = chooser.showSaveDialog((JFrame) Game.window().getHostControl());
         if (result == JFileChooser.APPROVE_OPTION) {
-          String newFile = this.saveGameFile(chooser.getSelectedFile().toString());
-          this.currentResourceFile = newFile;
+          this.saveGameFile(chooser.getSelectedFile().toString());
         }
       } catch (IOException e1) {
         log.log(Level.SEVERE, e1.getLocalizedMessage(), e1);
@@ -648,6 +647,7 @@ public class EditorScreen extends Screen {
 
   private String saveGameFile(String target) {
     String saveFile = this.getGameFile().save(target, Program.getUserPreferences().isCompressFile());
+    this.currentResourceFile = saveFile;
     Program.getUserPreferences().setLastGameFile(this.currentResourceFile);
     Program.getUserPreferences().addOpenedFile(this.currentResourceFile);
     Program.loadRecentFiles();
