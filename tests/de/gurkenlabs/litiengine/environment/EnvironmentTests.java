@@ -26,6 +26,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.GameTest;
 import de.gurkenlabs.litiengine.entities.CollisionBox;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
@@ -67,7 +68,7 @@ public class EnvironmentTests {
 
   @AfterAll
   public static void terminateGame() {
-    Game.terminate();
+    GameTest.resetGame();
   }
 
   @BeforeEach

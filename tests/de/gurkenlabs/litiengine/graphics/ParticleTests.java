@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.GameTest;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.EllipseOutlineParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.LeftLineParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.LightParticle;
@@ -30,7 +31,7 @@ public class ParticleTests {
 
   @AfterAll
   public static void terminateGame() {
-    Game.terminate();
+    GameTest.resetGame();
   }
 
   @Test

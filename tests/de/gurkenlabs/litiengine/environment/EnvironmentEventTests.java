@@ -18,6 +18,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.EnumSource.Mode;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.GameTest;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
@@ -37,7 +38,7 @@ public class EnvironmentEventTests {
 
   @AfterAll
   public static void terminateGame() {
-    Game.terminate();
+    GameTest.resetGame();
   }
   
   @BeforeEach

@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.GameTest;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.resources.Resources;
 
@@ -22,7 +23,7 @@ public class GameWorldTests {
 
   @AfterAll
   public static void terminateGame() {
-    Game.terminate();
+    GameTest.resetGame();
   }
 
   @Test

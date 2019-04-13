@@ -10,6 +10,10 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 public class GameTest {
+  // test-only helper method to call the package-private Game.terminate
+  public static void resetGame() {
+    Game.terminate();
+  }
 
   @AfterEach
   public void cleanup() {
@@ -18,7 +22,7 @@ public class GameTest {
       configFile.delete();
     }
     
-    Game.terminate();
+    resetGame();
   }
 
   private class Status {

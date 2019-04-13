@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.GameTest;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.entities.CollisionBox;
@@ -58,7 +59,7 @@ public class MapObjectLoaderTests {
 
   @AfterAll
   public static void terminateGame() {
-    Game.terminate();
+    GameTest.resetGame();
   }
   
   @BeforeEach
