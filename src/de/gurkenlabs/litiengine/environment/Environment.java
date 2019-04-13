@@ -13,6 +13,7 @@ import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -41,6 +42,7 @@ import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.Spawnpoint;
 import de.gurkenlabs.litiengine.entities.StaticShadow;
 import de.gurkenlabs.litiengine.entities.Trigger;
+import de.gurkenlabs.litiengine.environment.tilemap.ILayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
@@ -547,12 +549,93 @@ public final class Environment implements IRenderable {
 
   /**
    * Gets the entities with the specified render type that are not bound to layers.
+   * <p>
+   * Entities are unbound from there originating <code>MapObjectLayer</code> if their <code>RenderType</code> differs
+   * from the layer's <code>RenderType</code>.
+   * </p>
    *
-   * @param renderType The render type
+   * @param renderType
+   *          The render type
    * @return The miscellaneous entities with the specified render type
+   * 
+   * @see IEntity#getRenderType()
+   * @see ILayer#getRenderType()
    */
-  public Collection<IEntity> getMiscEntities(final RenderType renderType) {
+  public Collection<IEntity> getEntities(final RenderType renderType) {
     return this.miscEntities.get(renderType).values();
+  }
+
+  /**
+   * Gets the entities that are bound to the specified layer.
+   * <p>
+   * Entities are bound to a layer if their <code>RenderType</code> matches the layer's <code>RenderType</code>
+   * </p>
+   * 
+   * @param layer
+   *          The layer that the entities are bound to.
+   * @return The entities that are bound to the specified layer.
+   * 
+   * @see IEntity#getRenderType()
+   * @see ILayer#getRenderType()
+   */
+  public Collection<IEntity> getEntities(final IMapObjectLayer layer) {
+    if (layer == null || !this.layerEntities.containsKey(layer)) {
+      return Collections.emptySet();
+    }
+
+    return this.layerEntities.get(layer);
+  }
+
+  /**
+   * Gets the entities that are bound to layer with the specified name.
+   * <p>
+   * Entities are bound to a layer if their <code>RenderType</code> matches the layer's <code>RenderType</code>
+   * </p>
+   * 
+   * @param name
+   *          The name of the layer
+   * @return The entities that are bound to the specified layer.
+   * 
+   * @see IEntity#getRenderType()
+   * @see ILayer#getRenderType()
+   * @see ILayer#getName()
+   */
+  public Collection<IEntity> getEntitiesByLayer(final String name) {
+    if (name == null || name.isEmpty()) {
+      return Collections.emptySet();
+    }
+
+    for (Entry<IMapObjectLayer, List<IEntity>> entry : this.layerEntities.entrySet()) {
+      if (name.equals(entry.getKey().getName())) {
+        return entry.getValue();
+      }
+    }
+
+    return Collections.emptySet();
+  }
+
+  /**
+   * Gets the entities that are bound to layer with the specified layer ID.
+   * <p>
+   * Entities are bound to a layer if their <code>RenderType</code> matches the layer's <code>RenderType</code>
+   * </p>
+   * 
+   * @param layerId
+   *          The id of the layer
+   * @return The entities that are bound to the specified layer.
+   * 
+   * @see IEntity#getRenderType()
+   * @see ILayer#getRenderType()
+   * @see ILayer#getId()
+   */
+  public Collection<IEntity> getEntitiesByLayer(final int layerId) {
+    for (Entry<IMapObjectLayer, List<IEntity>> entry : this.layerEntities.entrySet()) {
+      if (layerId == entry.getKey().getId()) {
+        return entry.getValue();
+      }
+    }
+
+    return Collections.emptySet();
   }
 
   public Map<String, Collection<IEntity>> getEntitiesByTag() {
@@ -1060,6 +1143,8 @@ public final class Environment implements IRenderable {
       }
       for (IEntity entity : loadedEntities) {
         if (entity != null) {
+
+          // only add the entity to be rendered with it's layer if its RenderType equals the layer's RenderType
           if (mapObject.getLayer() != null && entity.getRenderType() == mapObject.getLayer().getRenderType()) {
             this.addEntity(entity);
             this.layerEntities.computeIfAbsent(mapObject.getLayer(), m -> new CopyOnWriteArrayList<>()).add(entity);

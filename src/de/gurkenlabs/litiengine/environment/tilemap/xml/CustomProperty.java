@@ -18,7 +18,7 @@ public class CustomProperty implements ICustomProperty {
     this.type = "string";
     this.value = "";
   }
-  
+
   /**
    * Copy Constructor for copying instances of CustomProperties.
    *
@@ -138,8 +138,15 @@ public class CustomProperty implements ICustomProperty {
     try {
       return Enum.valueOf(enumType, this.value);
     } catch (IllegalArgumentException e) {
-      return null;
+      // try to ignore case to retrieve the enum value as a fallback
+      for (T enumValue : enumType.getEnumConstants()) {
+        if (enumValue.name().compareToIgnoreCase(this.value) == 0) {
+          return enumValue;
+        }
+      }
     }
+
+    return null;
   }
 
   @Override

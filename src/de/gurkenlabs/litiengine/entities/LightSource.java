@@ -24,7 +24,7 @@ import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 @EntityInfo(renderType = RenderType.GROUND)
 public class LightSource extends Entity implements IRenderable {
-  public static enum Type {
+  public enum Type {
     ELLIPSE, RECTANGLE;
   }
   public static final String TOGGLE_MESSAGE = "toggle";
