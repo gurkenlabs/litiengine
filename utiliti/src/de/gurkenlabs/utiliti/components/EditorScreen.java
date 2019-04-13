@@ -37,7 +37,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.MapRenderer;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
-import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxException;
 import de.gurkenlabs.litiengine.graphics.ImageFormat;
@@ -240,7 +240,7 @@ public class EditorScreen extends Screen {
       this.gameFile = new ResourceBundle();
 
       // add sprite sheets by tile sets of all maps in the project director
-      for (Map map : this.mapComponent.getMaps()) {
+      for (TmxMap map : this.mapComponent.getMaps()) {
         this.loadSpriteSheets(map);
       }
 
@@ -324,7 +324,7 @@ public class EditorScreen extends Screen {
       log.log(Level.INFO, "{0} blueprints loaded from {1}", new Object[] { this.getGameFile().getBluePrints().size(), this.currentResourceFile });
       log.log(Level.INFO, "{0} sounds loaded from {1}", new Object[] { this.getGameFile().getSounds().size(), this.currentResourceFile });
 
-      for (Map map : this.mapComponent.getMaps()) {
+      for (TmxMap map : this.mapComponent.getMaps()) {
         this.loadSpriteSheets(map);
       }
 
@@ -627,7 +627,7 @@ public class EditorScreen extends Screen {
     return currentStatus;
   }
 
-  public List<Map> getChangedMaps() {
+  public List<TmxMap> getChangedMaps() {
     return this.getMapComponent().getMaps().stream().filter(UndoManager::hasChanges).distinct().collect(Collectors.toList());
   }
 
@@ -638,7 +638,7 @@ public class EditorScreen extends Screen {
 
   public void updateGameFileMaps() {
     this.getGameFile().getMaps().clear();
-    for (Map map : this.mapComponent.getMaps()) {
+    for (TmxMap map : this.mapComponent.getMaps()) {
       this.getGameFile().getMaps().add(map);
     }
 
@@ -664,10 +664,10 @@ public class EditorScreen extends Screen {
   }
 
   private void saveMaps() {
-    for (Map map : this.getChangedMaps()) {
+    for (TmxMap map : this.getChangedMaps()) {
       UndoManager.save(map);
-      for (String file : FileUtilities.findFilesByExtension(new ArrayList<>(), Paths.get(FileUtilities.combine(this.getProjectPath(), "maps")), map.getName() + "." + Map.FILE_EXTENSION)) {
-        File newFile = XmlUtilities.save(map, file, Map.FILE_EXTENSION);
+      for (String file : FileUtilities.findFilesByExtension(new ArrayList<>(), Paths.get(FileUtilities.combine(this.getProjectPath(), "maps")), map.getName() + "." + TmxMap.FILE_EXTENSION)) {
+        File newFile = XmlUtilities.save(map, file, TmxMap.FILE_EXTENSION);
         log.log(Level.INFO, "synchronized map {0}", new Object[] { newFile });
       }
     }
@@ -679,7 +679,7 @@ public class EditorScreen extends Screen {
     }
   }
 
-  private void loadSpriteSheets(Map map) {
+  private void loadSpriteSheets(TmxMap map) {
     List<SpritesheetResource> infos = new ArrayList<>();
     int cnt = 0;
     for (ITileset tileSet : map.getTilesets()) {

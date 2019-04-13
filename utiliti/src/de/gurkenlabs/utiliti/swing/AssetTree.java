@@ -10,7 +10,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
-import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
 import de.gurkenlabs.litiengine.resources.ResourceBundle;
@@ -105,7 +105,7 @@ public class AssetTree extends JTree {
       ArrayList<Tileset> allTilesets = new ArrayList<>();
       allTilesets.addAll(gameFile.getTilesets().stream().filter(x -> x.getName() != null).collect(Collectors.toList()));
 
-      for (Map map : gameFile.getMaps()) {
+      for (TmxMap map : gameFile.getMaps()) {
         for (ITileset tileset : map.getTilesets()) {
           if (allTilesets.stream().anyMatch(x -> x.getName() != null && x.getName().equals(tileset.getName()))) {
             continue;

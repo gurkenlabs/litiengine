@@ -53,7 +53,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
-import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ColorHelper;
@@ -139,7 +139,7 @@ public class MapSelectionPanel extends JSplitPane {
       }
 
       if (this.mapList.getSelectedIndex() < EditorScreen.instance().getMapComponent().getMaps().size() && this.mapList.getSelectedIndex() >= 0) {
-        Map map = EditorScreen.instance().getMapComponent().getMaps().get(this.mapList.getSelectedIndex());
+        TmxMap map = EditorScreen.instance().getMapComponent().getMaps().get(this.mapList.getSelectedIndex());
         if (Game.world().environment() != null && Game.world().environment().getMap().equals(map)) {
           return;
         }
@@ -519,16 +519,16 @@ public class MapSelectionPanel extends JSplitPane {
     UndoManager.onUndoStackChanged(manager -> this.bind(EditorScreen.instance().getMapComponent().getMaps()));
   }
 
-  public synchronized void bind(List<Map> maps) {
+  public synchronized void bind(List<TmxMap> maps) {
     this.bind(maps, false);
   }
 
-  public synchronized void bind(List<Map> maps, boolean clear) {
+  public synchronized void bind(List<TmxMap> maps, boolean clear) {
     if (clear) {
       this.model.clear();
     }
 
-    for (Map map : maps) {
+    for (TmxMap map : maps) {
       String name = map.getName();
       if (UndoManager.hasChanges(map)) {
         name += " *";
@@ -597,7 +597,7 @@ public class MapSelectionPanel extends JSplitPane {
       return;
     }
 
-    Map map = EditorScreen.instance().getMapComponent().getMaps().get(mapList.getSelectedIndex());
+    TmxMap map = EditorScreen.instance().getMapComponent().getMaps().get(mapList.getSelectedIndex());
     int lastSelection = listObjectLayers.getSelectedIndex();
     this.saveLayerVisibility();
     this.layerModel.clear();
@@ -625,7 +625,7 @@ public class MapSelectionPanel extends JSplitPane {
       }
       newBox.setSelected(layer.isVisible());
       newBox.addItemListener(sel -> {
-        Map currentMap = EditorScreen.instance().getMapComponent().getMaps().get(mapList.getSelectedIndex());
+        TmxMap currentMap = EditorScreen.instance().getMapComponent().getMaps().get(mapList.getSelectedIndex());
         int boxIndex = this.layerModel.indexOf(newBox);
         currentMap.getMapObjectLayers().get(boxIndex).setVisible(newBox.isSelected());
         UndoManager.instance().recordChanges();

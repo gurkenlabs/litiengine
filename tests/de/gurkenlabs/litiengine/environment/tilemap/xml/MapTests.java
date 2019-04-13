@@ -47,7 +47,7 @@ public class MapTests {
     assertEquals(new Color(0xaa3df675, true), map.getBackgroundColor());
     assertEquals(new Rectangle2D.Double(0, 0, 256, 256), map.getBounds());
     assertEquals(2, map.getTilesets().size());
-    assertEquals(1, ((Map) map).getExternalTilesets().size());
+    assertEquals(1, ((TmxMap) map).getExternalTilesets().size());
     assertEquals("external-tileset", map.getTilesets().get(1).getName());
     assertEquals(1, map.getTileLayers().size());
     assertEquals(16, map.getTileLayers().get(0).getSizeInTiles().width);
@@ -70,7 +70,7 @@ public class MapTests {
 
   @Test
   public void testSettingProperties() {
-    Map map = (Map) Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
+    TmxMap map = (TmxMap) Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
     map.setOrientation(MapOrientations.ISOMETRIC_STAGGERED);
     map.setTiledVersion("0.0.0");
     map.setVersion(2.0);
@@ -145,7 +145,7 @@ public class MapTests {
 
   @Test
   public void testInfiniteMap() {
-    Map map = (Map) Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-infinite-map.tmx");
+    TmxMap map = (TmxMap) Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-infinite-map.tmx");
 
     assertTrue(map.isInfinite());
     assertEquals(64, map.getWidth());

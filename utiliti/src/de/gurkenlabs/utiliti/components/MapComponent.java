@@ -48,7 +48,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
-import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
@@ -97,7 +97,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   private final List<Consumer<Integer>> editModeChangedConsumer;
   private final List<Consumer<IMapObject>> focusChangedConsumer;
   private final List<Consumer<List<IMapObject>>> selectionChangedConsumer;
-  private final List<Consumer<Map>> mapLoadedConsumer;
+  private final List<Consumer<TmxMap>> mapLoadedConsumer;
 
   private final java.util.Map<String, Integer> selectedLayers;
   private final java.util.Map<String, Point2D> cameraFocus;
@@ -111,7 +111,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
   private int currentZoomIndex = 7;
 
-  private final List<Map> maps;
+  private final List<TmxMap> maps;
 
   private float scrollSpeed = BASE_SCROLL_SPEED;
 
@@ -169,7 +169,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     this.selectionChangedConsumer.add(cons);
   }
 
-  public void onMapLoaded(Consumer<Map> cons) {
+  public void onMapLoaded(Consumer<TmxMap> cons) {
     this.mapLoadedConsumer.add(cons);
   }
 
@@ -206,9 +206,9 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   public void loadMaps(String projectPath) {
     final List<String> files = FileUtilities.findFilesByExtension(new ArrayList<>(), Paths.get(projectPath), "tmx");
     log.log(Level.INFO, "{0} maps found in folder {1}", new Object[] { files.size(), projectPath });
-    final List<Map> loadedMaps = new ArrayList<>();
+    final List<TmxMap> loadedMaps = new ArrayList<>();
     for (final String mapFile : files) {
-      Map map = (Map) Resources.maps().get(mapFile);
+      TmxMap map = (TmxMap) Resources.maps().get(mapFile);
       if (map != null) { // if an error occurred or it's not in the expected
                          // format
         loadedMaps.add(map);
@@ -219,7 +219,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     this.loadMaps(loadedMaps);
   }
 
-  public void loadMaps(List<Map> maps) {
+  public void loadMaps(List<TmxMap> maps) {
     if (maps == null) {
       return;
     }
@@ -233,7 +233,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     EditorScreen.instance().getMapSelectionPanel().bind(this.getMaps(), true);
   }
 
-  public List<Map> getMaps() {
+  public List<TmxMap> getMaps() {
     return this.maps;
   }
 
@@ -285,7 +285,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     super.prepare();
   }
 
-  public void loadEnvironment(Map map) {
+  public void loadEnvironment(TmxMap map) {
     if (map == null) {
       return;
     }
@@ -328,7 +328,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
       EditorScreen.instance().getMapObjectPanel().bind(this.getFocusedMapObject());
 
-      for (Consumer<Map> cons : this.mapLoadedConsumer) {
+      for (Consumer<TmxMap> cons : this.mapLoadedConsumer) {
         cons.accept(map);
       }
 
@@ -342,7 +342,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       return;
     }
 
-    this.loadEnvironment((Map) Game.world().environment().getMap());
+    this.loadEnvironment((TmxMap) Game.world().environment().getMap());
   }
 
   public void add(IMapObject mapObject) {
@@ -668,7 +668,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
     XmlImportDialog.importXml("Tilemap", file -> {
       String mapPath = file.toURI().toString();
-      Map map = (Map) Resources.maps().get(mapPath);
+      TmxMap map = (TmxMap) Resources.maps().get(mapPath);
       if (map == null) {
         log.log(Level.WARNING, "could not load map from file {0}", new Object[] { mapPath });
         return;
@@ -683,7 +683,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         map.addLayer(layer);
       }
 
-      Optional<Map> current = this.maps.stream().filter(x -> x.getName().equals(map.getName())).findFirst();
+      Optional<TmxMap> current = this.maps.stream().filter(x -> x.getName().equals(map.getName())).findFirst();
       if (current.isPresent()) {
         int n = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), Resources.strings().get("input_replace_map", map.getName()), Resources.strings().get("input_replace_map_title"), JOptionPane.YES_NO_OPTION);
 
@@ -727,7 +727,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       EditorScreen.instance().getMapSelectionPanel().bind(this.getMaps(), true);
       this.loadEnvironment(map);
       log.log(Level.INFO, "imported map {0}", new Object[] { map.getName() });
-    }, Map.FILE_EXTENSION);
+    }, TmxMap.FILE_EXTENSION);
   }
 
   public void loadTileset(ITileset tileset, boolean embedded) {
@@ -753,7 +753,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       return;
     }
 
-    Map map = (Map) Game.world().environment().getMap();
+    TmxMap map = (TmxMap) Game.world().environment().getMap();
     if (map == null) {
       return;
     }
@@ -761,8 +761,8 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     this.exportMap(map);
   }
 
-  public void exportMap(Map map) {
-    XmlExportDialog.export(map, "Map", map.getName(), Map.FILE_EXTENSION, dir -> {
+  public void exportMap(TmxMap map) {
+    XmlExportDialog.export(map, "Map", map.getName(), TmxMap.FILE_EXTENSION, dir -> {
       for (ITileset tileSet : map.getTilesets()) {
         ImageFormat format = ImageFormat.get(FileUtilities.getExtension(tileSet.getImage().getSource()));
         ImageSerializer.saveImage(Paths.get(dir, tileSet.getImage().getSource()).toString(), Resources.spritesheets().get(tileSet.getImage().getSource()).getImage(), format);

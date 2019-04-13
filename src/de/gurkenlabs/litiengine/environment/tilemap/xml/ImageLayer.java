@@ -32,7 +32,7 @@ public class ImageLayer extends Layer implements IImageLayer {
   @Override
   public int getOffsetX() {
     if (this.isInfiniteMap()) {
-      Map map = (Map) this.getMap();
+      TmxMap map = (TmxMap) this.getMap();
       return super.getOffsetX() - map.getChunkOffsetX() * map.getTileWidth();
     }
 
@@ -42,7 +42,7 @@ public class ImageLayer extends Layer implements IImageLayer {
   @Override
   public int getOffsetY() {
     if (this.isInfiniteMap()) {
-      Map map = (Map) this.getMap();
+      TmxMap map = (TmxMap) this.getMap();
       return super.getOffsetX() - map.getChunkOffsetY() * map.getTileHeight();
     }
 
@@ -50,7 +50,7 @@ public class ImageLayer extends Layer implements IImageLayer {
   }
 
   private boolean isInfiniteMap() {
-    return this.getMap() != null && this.getMap().isInfinite() && this.getMap() instanceof Map;
+    return this.getMap() != null && this.getMap().isInfinite() && this.getMap() instanceof TmxMap;
   }
 
   @Override

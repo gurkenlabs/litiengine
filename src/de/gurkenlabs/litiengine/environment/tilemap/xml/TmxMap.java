@@ -41,10 +41,10 @@ import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 @XmlRootElement(name = "map")
 @XmlAccessorType(XmlAccessType.FIELD)
-public final class Map extends CustomPropertyProvider implements IMap, Comparable<Map> {
+public final class TmxMap extends CustomPropertyProvider implements IMap, Comparable<TmxMap> {
   public static final String FILE_EXTENSION = "tmx";
 
-  private static final Logger log = Logger.getLogger(Map.class.getName());
+  private static final Logger log = Logger.getLogger(TmxMap.class.getName());
   private static final int[] MAX_SUPPORTED_VERSION = { 1, 2 };
 
   @XmlAttribute
@@ -396,7 +396,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Comparabl
   }
 
   @Override
-  public int compareTo(Map o) {
+  public int compareTo(TmxMap o) {
     if (this.name == null) {
       return o.name == null ? 0 : -1;
     }
@@ -413,10 +413,10 @@ public final class Map extends CustomPropertyProvider implements IMap, Comparabl
     if (this == anObject) {
       return true;
     }
-    if (!(anObject instanceof Map)) {
+    if (!(anObject instanceof TmxMap)) {
       return false;
     }
-    return Objects.equals(this.name, ((Map) anObject).name);
+    return Objects.equals(this.name, ((TmxMap) anObject).name);
   }
 
   @Override
