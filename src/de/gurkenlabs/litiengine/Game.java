@@ -564,8 +564,12 @@ public final class Game {
    */
   public static synchronized void terminate() {
     for (final GameListener listener : gameListeners) {
-      if (!listener.terminating()) {
-        return;
+      try {
+        if (!listener.terminating()) {
+          return;
+        }
+      } catch (Throwable t) {
+        log.log(Level.WARNING, "game listener threw an exception during shutdown", t);
       }
     }
 
@@ -584,7 +588,11 @@ public final class Game {
     }
 
     for (final GameListener listener : gameListeners) {
-      listener.terminated();
+      try {
+        listener.terminated();
+      } catch (Throwable t) {
+        log.log(Level.WARNING, "game listener threw an exception during shutdown", t);
+      }
     }
   }
 
