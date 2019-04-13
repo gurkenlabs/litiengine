@@ -24,7 +24,7 @@ import de.gurkenlabs.litiengine.entities.Creature;
 public class AbilityTests {
   @Test
   public void testGetRemainingCooldownInSeconds() {
-    Game.init();
+    Game.init(Game.COMMADLINE_ARG_NOGUI);
     Creature creature = mock(Creature.class);
     TestAbility ability = new TestAbility(creature);
     float actual = ability.getRemainingCooldownInSeconds();
@@ -33,7 +33,7 @@ public class AbilityTests {
 
   @Test
   public void testGetRemainingCooldownInSecondsNoCast() {
-    Game.init();
+    Game.init(Game.COMMADLINE_ARG_NOGUI);
     Creature creature = mock(Creature.class);
     TestAbility ability = new TestAbility(creature);
     float actual = ability.getRemainingCooldownInSeconds();
@@ -42,7 +42,7 @@ public class AbilityTests {
 
   @Test
   public void testGetRemainingCooldownInSecondsCreatureIsDead() {
-    Game.init();
+    Game.init(Game.COMMADLINE_ARG_NOGUI);
     Creature creature = mock(Creature.class);
     when(creature.isDead()).thenReturn(true);
     TestAbility ability = new TestAbility(creature);
