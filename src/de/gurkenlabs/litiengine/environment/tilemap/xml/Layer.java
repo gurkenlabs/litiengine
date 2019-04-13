@@ -48,7 +48,7 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
   @XmlAttribute
   private Integer offsety;
 
-  private transient Map parentMap;
+  private transient TmxMap parentMap;
   private transient RenderType renderType;
   private transient boolean renderTypeLoaded;
 
@@ -215,13 +215,13 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
     this.visible = visible ? 1 : 0;
   }
 
-  protected void setMap(Map map) {
+  protected void setMap(TmxMap map) {
     this.parentMap = map;
   }
 
   protected void afterUnmarshal(Unmarshaller u, Object parent) {
-    if (parent instanceof Map) {
-      this.parentMap = (Map) parent;
+    if (parent instanceof TmxMap) {
+      this.parentMap = (TmxMap) parent;
     }
 
     if (this.offsetx != null && this.offsetx.intValue() == 0) {

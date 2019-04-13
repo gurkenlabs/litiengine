@@ -49,7 +49,7 @@ public class GroupLayer extends Layer implements IGroupLayer {
     this.layers.add(layer);
     this.layerAdded(layer);
     if (layer instanceof Layer) {
-      ((Layer) layer).setMap((Map) this.getMap());
+      ((Layer) layer).setMap((TmxMap) this.getMap());
     }
   }
 
@@ -58,7 +58,7 @@ public class GroupLayer extends Layer implements IGroupLayer {
     this.layers.add(index, layer);
     this.layerAdded(layer);
     if (layer instanceof Layer) {
-      ((Layer) layer).setMap((Map) this.getMap());
+      ((Layer) layer).setMap((TmxMap) this.getMap());
     }
   }
 

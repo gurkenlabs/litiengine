@@ -67,7 +67,7 @@ import de.gurkenlabs.litiengine.GameListener;
 import de.gurkenlabs.litiengine.configuration.Quality;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
-import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.litiengine.graphics.ImageFormat;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.resources.Resources;
@@ -621,7 +621,7 @@ public class Program {
 
         UndoManager.instance().recordChanges();
         EditorScreen.instance().getMapComponent().loadMaps(EditorScreen.instance().getGameFile().getMaps());
-        EditorScreen.instance().getMapComponent().loadEnvironment((Map) Game.world().environment().getMap());
+        EditorScreen.instance().getMapComponent().loadEnvironment((TmxMap) Game.world().environment().getMap());
       }
     });
 

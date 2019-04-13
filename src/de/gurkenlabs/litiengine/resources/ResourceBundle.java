@@ -30,7 +30,7 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
-import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
@@ -48,7 +48,7 @@ public class ResourceBundle implements Serializable {
 
   @XmlElementWrapper(name = "maps")
   @XmlElement(name = "map")
-  private List<Map> maps;
+  private List<TmxMap> maps;
 
   @XmlElementWrapper(name = "spriteSheets")
   @XmlElement(name = "sprite")
@@ -94,7 +94,7 @@ public class ResourceBundle implements Serializable {
         tileset.finish(file);
       }
 
-      for (Map map : gameFile.getMaps()) {
+      for (TmxMap map : gameFile.getMaps()) {
         for (final ITileset tileset : map.getTilesets()) {
           if (tileset instanceof Tileset) {
             ((Tileset)tileset).load(gameFile.getTilesets());
@@ -112,7 +112,7 @@ public class ResourceBundle implements Serializable {
   }
 
   @XmlTransient
-  public List<Map> getMaps() {
+  public List<TmxMap> getMaps() {
     return this.maps;
   }
 

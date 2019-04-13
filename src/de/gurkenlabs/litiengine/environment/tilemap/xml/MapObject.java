@@ -246,7 +246,7 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   @XmlTransient
   public void setX(float x) {
     if (this.isInfiniteMap()) {
-      Map map = (Map) this.getLayer().getMap();
+      TmxMap map = (TmxMap) this.getLayer().getMap();
       this.x = x + map.getChunkOffsetX() * map.getTileWidth();
       return;
     }
@@ -258,7 +258,7 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   @XmlTransient
   public void setY(float y) {
     if (this.isInfiniteMap()) {
-      Map map = (Map) this.getLayer().getMap();
+      TmxMap map = (TmxMap) this.getLayer().getMap();
       this.y = y + map.getChunkOffsetY() * map.getTileHeight();
       return;
     }
@@ -297,7 +297,7 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   @Override
   public float getX() {
     if (this.isInfiniteMap()) {
-      Map map = (Map) this.getLayer().getMap();
+      TmxMap map = (TmxMap) this.getLayer().getMap();
       return this.x - map.getChunkOffsetX() * map.getTileWidth();
     }
 
@@ -307,7 +307,7 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   @Override
   public float getY() {
     if (this.isInfiniteMap()) {
-      Map map = (Map) this.getLayer().getMap();
+      TmxMap map = (TmxMap) this.getLayer().getMap();
       return this.y - map.getChunkOffsetY() * map.getTileHeight();
     }
 
@@ -379,6 +379,6 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   }
 
   private boolean isInfiniteMap() {
-    return this.getLayer() != null && this.getLayer().getMap() != null && this.getLayer().getMap().isInfinite() && this.getLayer().getMap() instanceof Map;
+    return this.getLayer() != null && this.getLayer().getMap() != null && this.getLayer().getMap().isInfinite() && this.getLayer().getMap() instanceof TmxMap;
   }
 }
