@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.pathfinding.astar.AStarGrid;
 import de.gurkenlabs.litiengine.pathfinding.astar.AStarNode;
 
@@ -52,6 +53,7 @@ public class AStarTests {
 
   @Test
   public void testGridPopulation() {
+    Game.init(Game.COMMADLINE_ARG_NOGUI);
     AStarGrid grid = new AStarGrid(320, 240, 4);
 
     AStarNode node = grid.getNode(new Point2D.Double(10, 10));
@@ -70,6 +72,7 @@ public class AStarTests {
 
   @Test
   public void testGetNeighbors() {
+    Game.init(Game.COMMADLINE_ARG_NOGUI);
     AStarGrid grid = new AStarGrid(320, 240, 4);
 
     AStarNode node = grid.getNode(new Point2D.Double(10, 10));
