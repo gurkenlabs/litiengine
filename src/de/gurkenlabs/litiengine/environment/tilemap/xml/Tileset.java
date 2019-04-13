@@ -75,7 +75,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   private List<Terrain> terrainTypes = null;
 
   @XmlElement(name = "tile")
-  private List<TilesetEntry> tiles = null;
+  private ArrayList<TilesetEntry> tiles = null;
 
   @XmlTransient
   protected Tileset sourceTileset;
@@ -368,7 +368,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   }
 
   public void updateTileTerrain() {
-    if (this.sourceTileset == null && this.tiles != null) {
+    if (this.sourceTileset == null) {
       for (TilesetEntry entry : this.tiles) {
         entry.setTerrains(this.getTerrain(entry.getId()));
       }
@@ -378,6 +378,11 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   @SuppressWarnings("unused")
   private void afterUnmarshal(Unmarshaller u, Object parent) {
     if (this.source == null) {
+      if (this.tiles == null) {
+        this.tiles = new ArrayList<>(this.tilecount);
+      } else {
+        this.tiles.ensureCapacity(this.tilecount);
+      }
       this.updateTileTerrain();
       // add missing entries
       ListIterator<TilesetEntry> iter = this.tiles.listIterator();
