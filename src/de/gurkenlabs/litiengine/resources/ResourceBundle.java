@@ -90,13 +90,18 @@ public class ResourceBundle implements Serializable {
         return null;
       }
 
-      gameFile.getMaps().parallelStream().forEach(map -> {
+      for (Tileset tileset : gameFile.getTilesets()) {
+        tileset.finish(file);
+      }
+
+      for (Map map : gameFile.getMaps()) {
         for (final ITileset tileset : map.getTilesets()) {
           if (tileset instanceof Tileset) {
             ((Tileset)tileset).load(gameFile.getTilesets());
           }
         }
-      });
+        map.finish(file);
+      }
 
       return gameFile;
     } catch (final JAXBException | IOException e) {

@@ -191,14 +191,17 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   @Override
   public void finish(URL location) throws TmxException {
     if (this.source != null) {
-      try {
-        URL url = new URL(location, this.source);
-        this.sourceTileset = Resources.tilesets().get(url);
-        if (this.sourceTileset == null) {
-          throw new MissingExternalTilesetException(url.toExternalForm());
+      // don't reload the source if it's already been loaded in a resource bundle
+      if (this.sourceTileset == null) {
+        try {
+          URL url = new URL(location, this.source);
+          this.sourceTileset = Resources.tilesets().get(url);
+          if (this.sourceTileset == null) {
+            throw new MissingExternalTilesetException(url.toExternalForm());
+          }
+        } catch (MalformedURLException e) {
+          throw new MissingExternalTilesetException(e);
         }
-      } catch (MalformedURLException e) {
-        throw new MissingExternalTilesetException(e);
       }
     } else {
       super.finish(location);
