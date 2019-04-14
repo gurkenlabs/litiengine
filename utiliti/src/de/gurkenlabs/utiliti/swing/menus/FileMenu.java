@@ -46,8 +46,8 @@ public final class FileMenu extends JMenu {
     loadRecentFiles();
     EditorScreen.instance().onLoaded(this::loadRecentFiles);
 
-    this.add(load);
     this.add(create);
+    this.add(load);
     this.add(save);
     this.add(saveAs);
     this.addSeparator();

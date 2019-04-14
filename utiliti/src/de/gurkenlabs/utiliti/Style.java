@@ -30,7 +30,7 @@ public final class Style {
   public static final Color COLOR_DEFAULT_TAG_HOVER = COLOR_DEFAULT_TAG.darker();
   public static final Color COLOR_STATUS = Color.WHITE;
   
-  public static final Font FONT_DEFAULT = Resources.fonts().get("OpenSans.ttf", Font.PLAIN, 11);
+  public static final Font FONT_DEFAULT = Resources.fonts().get("OpenSans.ttf", Font.PLAIN, 12);
   public static final String FONTNAME_CONSOLE = "Consolas";
   
   private Style() {

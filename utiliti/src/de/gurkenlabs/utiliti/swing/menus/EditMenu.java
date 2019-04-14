@@ -18,6 +18,8 @@ public final class EditMenu extends JMenu {
     super(Resources.strings().get("menu_edit"));
     this.setMnemonic('E');
 
+    JMenu addMenu = new AddMenu();
+    
     JMenuItem undo = new JMenuItem(Resources.strings().get("menu_edit_undo"));
     undo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, Event.CTRL_MASK));
     undo.addActionListener(a -> UndoManager.instance().undo());
@@ -72,6 +74,8 @@ public final class EditMenu extends JMenu {
 
     EditorScreen.instance().getMapComponent().onEditModeChanged(mode -> paste.setEnabled(EditorScreen.instance().getMapComponent().getCopiedBlueprint() != null));
 
+    this.add(addMenu);
+    this.addSeparator();
     this.add(undo);
     this.add(redo);
     this.addSeparator();

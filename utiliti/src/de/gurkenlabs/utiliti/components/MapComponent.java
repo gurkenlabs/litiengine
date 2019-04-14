@@ -79,7 +79,7 @@ import de.gurkenlabs.utiliti.swing.dialogs.XmlImportDialog;
 
 public class MapComponent extends EditorComponent implements IUpdateable {
   public enum TransformType {
-    UP, DOWN, LEFT, RIGHT, UPLEFT, UPRIGHT, DOWNLEFT, DOWNRIGHT, NONE
+    UP, DOWN, LEFT, RIGHT, UPLEFT, UPRIGHT, DOWNLEFT, DOWNRIGHT, NONE, MOVE
   }
 
   public static final int EDITMODE_CREATE = 0;
@@ -159,6 +159,8 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       this.currentTransformRectSize = TRANSFORM_RECT_SIZE / zoom;
       this.updateTransformControls();
     });
+
+    UndoManager.onUndoStackChanged(e -> this.updateTransformControls());
   }
 
   public void onEditModeChanged(IntConsumer cons) {
@@ -1127,7 +1129,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
   private void setupKeyboardControls() {
     Input.keyboard().onKeyPressed(KeyEvent.VK_CONTROL, e -> {
-      if (this.currentEditMode == EDITMODE_EDIT) {
+      if (this.currentEditMode == EDITMODE_EDIT && this.getFocus() != null) {
         this.setEditMode(EDITMODE_MOVE);
       }
     });
@@ -1315,8 +1317,14 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     }
 
     if (!hovered) {
-      Game.window().getRenderComponent().setCursor(Cursors.DEFAULT, 0, 0);
-      this.currentTransform = TransformType.NONE;
+      final Rectangle2D focus = this.getFocus();
+      if (focus != null && focus.contains(Input.mouse().getMapLocation())) {
+        Game.window().getRenderComponent().setCursor(Cursors.MOVE, 0, 0);
+        this.currentTransform = TransformType.MOVE;
+      } else {
+        Game.window().getRenderComponent().setCursor(Cursors.DEFAULT, 0, 0);
+        this.currentTransform = TransformType.NONE;
+      }
     }
   }
 
@@ -1325,6 +1333,10 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       return;
     }
 
+    if(this.currentTransform == TransformType.MOVE) {
+      this.setEditMode(EDITMODE_MOVE);
+    }
+    
     switch (this.currentEditMode) {
     case EDITMODE_CREATE:
       if (SwingUtilities.isLeftMouseButton(e.getEvent())) {
@@ -1419,6 +1431,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         }
 
         UndoManager.instance().endOperation();
+        this.setEditMode(EDITMODE_EDIT);
       }
 
       break;

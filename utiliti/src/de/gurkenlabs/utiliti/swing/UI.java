@@ -34,7 +34,6 @@ import de.gurkenlabs.utiliti.Cursors;
 import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.Style;
 import de.gurkenlabs.utiliti.components.EditorScreen;
-import de.gurkenlabs.utiliti.swing.menus.AddMenu;
 import de.gurkenlabs.utiliti.swing.menus.CanvasPopupMenu;
 import de.gurkenlabs.utiliti.swing.menus.MainMenuBar;
 import de.gurkenlabs.utiliti.swing.panels.MapObjectPanel;
@@ -140,7 +139,6 @@ public final class UI {
     rootPanel.add(split, BorderLayout.CENTER);
     split.setDividerLocation(Program.preferences().getMainSplitterPosition() != 0 ? Program.preferences().getMainSplitterPosition() : (int) (window.getSize().width * 0.75));
 
-    rootPanel.add(new ToolBar(), BorderLayout.NORTH);
 
     window.setJMenuBar(new MainMenuBar());
   }
@@ -243,7 +241,6 @@ public final class UI {
   }
 
   private static void initPopupMenu(Canvas canvas) {
-    AddMenu.initPopup();
     canvasPopup = new CanvasPopupMenu();
 
     canvas.addMouseListener(new MouseAdapter() {

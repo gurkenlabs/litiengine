@@ -81,16 +81,18 @@ public final class ViewMenu extends JMenu {
       centerFocus.setEnabled(mo != null);
     });
 
-    this.add(snapToPixels);
-    this.add(snapToGrid);
+    this.add(setGrid);
+    this.addSeparator();
     this.add(renderGrid);
     this.add(renderCollision);
     this.add(renderCustomMapObjects);
     this.add(renderMapIds);
-    this.add(setGrid);
     this.addSeparator();
     this.add(zoomIn);
     this.add(zoomOut);
     this.add(centerFocus);
+    this.addSeparator();
+    this.add(snapToPixels);
+    this.add(snapToGrid);
   }
 }

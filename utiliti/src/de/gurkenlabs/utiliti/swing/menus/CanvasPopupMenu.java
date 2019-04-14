@@ -38,7 +38,7 @@ public final class CanvasPopupMenu extends JPopupMenu {
     blueprint.addActionListener(e -> EditorScreen.instance().getMapComponent().defineBlueprint());
     blueprint.setEnabled(false);
 
-    this.add(AddMenu.create());
+    this.add(new AddMenu());
     this.add(paste);
     this.addSeparator();
     this.add(copy);
