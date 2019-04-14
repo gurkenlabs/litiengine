@@ -305,6 +305,10 @@ public class EditorScreen extends Screen {
       // set up project settings
       this.currentResourceFile = gameFile.getPath();
       this.gameFile = ResourceBundle.load(gameFile.getPath());
+      if (this.gameFile == null) {
+        throw new IllegalArgumentException("The game file " + gameFile + " could not be loaded!");
+      }
+      
       this.gamefileLoaded();
 
       this.setProjectPath(gameFile.getPath());

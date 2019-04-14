@@ -1,6 +1,8 @@
 package de.gurkenlabs.utiliti.swing;
 
 import java.awt.Color;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.text.MessageFormat;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -29,7 +31,7 @@ public class ConsoleComponent extends JScrollPane {
     consoleTextArea.setAutoscrolls(true);
     root.addHandler(new LogHandler(consoleTextArea));
   }
-  
+
   private class LogHandler extends java.util.logging.Handler {
     private final JTextPane textPane;
 
@@ -49,14 +51,23 @@ public class ConsoleComponent extends JScrollPane {
       SimpleAttributeSet text = new SimpleAttributeSet();
       StyleConstants.setForeground(text, getColor(record.getLevel()));
       StyleConstants.setFontFamily(text, Style.FONTNAME_CONSOLE);
+
+      String message = "";
+      if (record.getParameters() != null) {
+        message = MessageFormat.format(record.getMessage(), record.getParameters());
+      } else {
+        message = record.getMessage();
+      }
+
+      if (record.getLevel() == Level.SEVERE && record.getThrown() != null) {
+        StringWriter writer = new StringWriter();
+        record.getThrown().printStackTrace(new PrintWriter(writer));
+        message = writer.toString();
+      }
+
       try {
         doc.insertString(doc.getLength(), String.format("%1$-10s", record.getLevel()), keyWord);
-        if (record.getParameters() != null) {
-          doc.insertString(doc.getLength(), MessageFormat.format(record.getMessage(), record.getParameters()), text);
-        } else {
-          doc.insertString(doc.getLength(), record.getMessage(), text);
-        }
-
+        doc.insertString(doc.getLength(), message, text);
         doc.insertString(doc.getLength(), "\n", text);
       } catch (BadLocationException e) {
       }
