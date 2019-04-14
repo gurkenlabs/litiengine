@@ -59,7 +59,7 @@ public final class FileMenu extends JMenu {
 
   public void loadRecentFiles() {
     recentFiles.removeAll();
-    for (String recent : Program.getUserPreferences().getLastOpenedFiles()) {
+    for (String recent : Program.preferences().getLastOpenedFiles()) {
       if (recent != null && !recent.isEmpty() && new File(recent).exists()) {
         JMenuItem fileButton = new JMenuItem(recent);
         fileButton.addActionListener(a -> {

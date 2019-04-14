@@ -112,9 +112,9 @@ public class MapSelectionPanel extends JSplitPane {
    */
   public MapSelectionPanel() {
     super(JSplitPane.HORIZONTAL_SPLIT);
-    this.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> Program.getUserPreferences().setMapPanelSplitter(this.getDividerLocation()));
-    if (Program.getUserPreferences().getMapPanelSplitter() != 0) {
-      this.setDividerLocation(Program.getUserPreferences().getMapPanelSplitter());
+    this.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> Program.preferences().setMapPanelSplitter(this.getDividerLocation()));
+    if (Program.preferences().getMapPanelSplitter() != 0) {
+      this.setDividerLocation(Program.preferences().getMapPanelSplitter());
     }
 
     this.setMaximumSize(new Dimension(0, 250));

@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -65,6 +66,7 @@ import de.gurkenlabs.utiliti.components.EditorComponent.ComponentType;
 import de.gurkenlabs.utiliti.swing.MapSelectionPanel;
 import de.gurkenlabs.utiliti.swing.StatusBar;
 import de.gurkenlabs.utiliti.swing.Tray;
+import de.gurkenlabs.utiliti.swing.UI;
 import de.gurkenlabs.utiliti.swing.dialogs.EditorFileChooser;
 import de.gurkenlabs.utiliti.swing.dialogs.SpritesheetImportPanel;
 import de.gurkenlabs.utiliti.swing.dialogs.XmlImportDialog;
@@ -160,10 +162,9 @@ public class EditorScreen extends Screen {
     super.render(g);
 
     // render mouse/zoom and fps
-
-    g.setFont(Program.TEXT_FONT);
+    g.setFont(Style.FONT_DEFAULT);
     g.setColor(Color.WHITE);
-    TextRenderer.render(g, Game.metrics().getFramesPerSecond() + " FPS", 10, Game.window().getResolution().getHeight() - 20);
+    TextRenderer.render(g, Game.metrics().getFramesPerSecond() + " FPS", 10, Game.window().getResolution().getHeight() - 20, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
     if (Game.time().now() % 4 == 0) {
       StatusBar.update();
@@ -186,7 +187,7 @@ public class EditorScreen extends Screen {
 
       Font old = g.getFont();
       g.setFont(g.getFont().deriveFont(20.0f));
-      TextRenderer.render(g, this.currentStatus, 10, Game.window().getResolution().getHeight() - 60);
+      TextRenderer.render(g, this.currentStatus, 10, Game.window().getResolution().getHeight() - 60, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
       g.setFont(old);
     }
   }
@@ -250,7 +251,7 @@ public class EditorScreen extends Screen {
         this.loadSpriteSheets(map);
       }
 
-      Program.updateAssets();
+      UI.updateAssets();
 
       // load custom emitter files
       loadCustomEmitters(this.getGameFile().getEmitters());
@@ -277,7 +278,7 @@ public class EditorScreen extends Screen {
   }
 
   public void load(File gameFile) {
-    boolean proceedLoading = Program.notifyPendingChanges();
+    boolean proceedLoading = UI.notifyPendingChanges();
     if (!proceedLoading) {
       return;
     }
@@ -334,7 +335,7 @@ public class EditorScreen extends Screen {
 
       // load custom emitter files
       loadCustomEmitters(this.getGameFile().getEmitters());
-      Program.updateAssets();
+      UI.updateAssets();
 
       // display first available map after loading all stuff
       // also switch to map component
@@ -547,7 +548,7 @@ public class EditorScreen extends Screen {
     this.getMapComponent().reloadEnvironment();
 
     if (forceAssetTreeUpdate) {
-      Program.updateAssets();
+      UI.updateAssets();
     }
   }
 
@@ -649,20 +650,20 @@ public class EditorScreen extends Screen {
       this.getGameFile().getMaps().add(map);
     }
 
-    Program.updateAssets();
+    UI.updateAssets();
   }
 
   private String saveGameFile(String target) {
-    String saveFile = this.getGameFile().save(target, Program.getUserPreferences().isCompressFile());
+    String saveFile = this.getGameFile().save(target, Program.preferences().isCompressFile());
     this.currentResourceFile = saveFile;
-    Program.getUserPreferences().setLastGameFile(this.currentResourceFile);
-    Program.getUserPreferences().addOpenedFile(this.currentResourceFile);
+    Program.preferences().setLastGameFile(this.currentResourceFile);
+    Program.preferences().addOpenedFile(this.currentResourceFile);
     this.gamefileLoaded();
     log.log(Level.INFO, "saved {0} maps, {1} spritesheets, {2} tilesets, {3} emitters, {4} blueprints, {5} sounds to {6}",
         new Object[] { this.getGameFile().getMaps().size(), this.getGameFile().getSpriteSheets().size(), this.getGameFile().getTilesets().size(), this.getGameFile().getEmitters().size(), this.getGameFile().getBluePrints().size(), this.getGameFile().getSounds().size(), this.currentResourceFile });
     this.setCurrentStatus(Resources.strings().get("status_gamefile_saved"));
 
-    if (Program.getUserPreferences().isSyncMaps()) {
+    if (Program.preferences().isSyncMaps()) {
       this.saveMaps();
     }
 
@@ -746,8 +747,8 @@ public class EditorScreen extends Screen {
   }
 
   private void gamefileLoaded() {
-    Program.getUserPreferences().setLastGameFile(this.currentResourceFile);
-    Program.getUserPreferences().addOpenedFile(this.currentResourceFile);
+    Program.preferences().setLastGameFile(this.currentResourceFile);
+    Program.preferences().addOpenedFile(this.currentResourceFile);
     for (Runnable callback : this.loadedCallbacks) {
       callback.run();
     }

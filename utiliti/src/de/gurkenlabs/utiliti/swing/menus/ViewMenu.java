@@ -23,44 +23,44 @@ public final class ViewMenu extends JMenu {
     this.setMnemonic('V');
     
     JCheckBoxMenuItem snapToPixels = new JCheckBoxMenuItem(Resources.strings().get("menu_snapPixels"));
-    snapToPixels.setState(Program.getUserPreferences().isSnapPixels());
+    snapToPixels.setState(Program.preferences().isSnapPixels());
     snapToPixels.addItemListener(e -> {
-      Program.getUserPreferences().setSnapPixels(snapToPixels.getState());
+      Program.preferences().setSnapPixels(snapToPixels.getState());
       EditorScreen.instance().getMapObjectPanel().updateSpinnerModels();
       EditorScreen.instance().getMapObjectPanel().bind(EditorScreen.instance().getMapComponent().getFocusedMapObject());
     });
 
     JCheckBoxMenuItem snapToGrid = new JCheckBoxMenuItem(Resources.strings().get("menu_snapGrid"));
-    snapToGrid.setState(Program.getUserPreferences().isSnapGrid());
-    snapToGrid.addItemListener(e -> Program.getUserPreferences().setSnapGrid(snapToGrid.getState()));
+    snapToGrid.setState(Program.preferences().isSnapGrid());
+    snapToGrid.addItemListener(e -> Program.preferences().setSnapGrid(snapToGrid.getState()));
 
     JCheckBoxMenuItem renderGrid = new JCheckBoxMenuItem(Resources.strings().get("menu_renderGrid"));
-    renderGrid.setState(Program.getUserPreferences().isShowGrid());
+    renderGrid.setState(Program.preferences().isShowGrid());
     renderGrid.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, Event.CTRL_MASK));
-    renderGrid.addItemListener(e -> Program.getUserPreferences().setShowGrid(renderGrid.getState()));
+    renderGrid.addItemListener(e -> Program.preferences().setShowGrid(renderGrid.getState()));
 
     JCheckBoxMenuItem renderCollision = new JCheckBoxMenuItem(Resources.strings().get("menu_renderCollisionBoxes"));
-    renderCollision.setState(Program.getUserPreferences().isRenderBoundingBoxes());
+    renderCollision.setState(Program.preferences().isRenderBoundingBoxes());
     renderCollision.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, Event.CTRL_MASK));
-    renderCollision.addItemListener(e -> Program.getUserPreferences().setRenderBoundingBoxes(renderCollision.getState()));
+    renderCollision.addItemListener(e -> Program.preferences().setRenderBoundingBoxes(renderCollision.getState()));
 
     JCheckBoxMenuItem renderCustomMapObjects = new JCheckBoxMenuItem(Resources.strings().get("menu_renderCustomMapObjects"));
-    renderCustomMapObjects.setState(Program.getUserPreferences().isRenderCustomMapObjects());
+    renderCustomMapObjects.setState(Program.preferences().isRenderCustomMapObjects());
     renderCustomMapObjects.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, Event.CTRL_MASK));
-    renderCustomMapObjects.addItemListener(e -> Program.getUserPreferences().setRenderCustomMapObjects(renderCustomMapObjects.getState()));
+    renderCustomMapObjects.addItemListener(e -> Program.preferences().setRenderCustomMapObjects(renderCustomMapObjects.getState()));
 
     JCheckBoxMenuItem renderMapIds = new JCheckBoxMenuItem(Resources.strings().get("menu_renderMapIds"));
-    renderMapIds.setState(Program.getUserPreferences().isRenderMapIds());
+    renderMapIds.setState(Program.preferences().isRenderMapIds());
     renderMapIds.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, Event.CTRL_MASK));
-    renderMapIds.addItemListener(e -> Program.getUserPreferences().setRenderMapIds(renderMapIds.getState()));
+    renderMapIds.addItemListener(e -> Program.preferences().setRenderMapIds(renderMapIds.getState()));
 
     JMenuItem setGrid = new JMenuItem(Resources.strings().get("menu_gridSettings"));
     setGrid.addActionListener(a -> {
-      GridEditPanel panel = new GridEditPanel(Program.getUserPreferences().getGridLineWidth(), Program.getUserPreferences().getGridColor());
+      GridEditPanel panel = new GridEditPanel(Program.preferences().getGridLineWidth(), Program.preferences().getGridColor());
       int option = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), panel, Resources.strings().get("menu_gridSettings"), JOptionPane.PLAIN_MESSAGE);
       if (option == JOptionPane.OK_OPTION) {
-        Program.getUserPreferences().setGridColor(ColorHelper.encode(panel.getGridColor()));
-        Program.getUserPreferences().setGridLineWidth(panel.getStrokeWidth());
+        Program.preferences().setGridColor(ColorHelper.encode(panel.getGridColor()));
+        Program.preferences().setGridLineWidth(panel.getStrokeWidth());
       }
     });
 

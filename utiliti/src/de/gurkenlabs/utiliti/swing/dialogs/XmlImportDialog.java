@@ -5,7 +5,7 @@ import java.util.function.Consumer;
 
 import javax.swing.JFileChooser;
 
-import de.gurkenlabs.utiliti.Program;
+import de.gurkenlabs.utiliti.swing.UI;
 
 public final class XmlImportDialog {
   private XmlImportDialog() {
@@ -33,7 +33,7 @@ public final class XmlImportDialog {
         consumer.accept(file);
       }
 
-      Program.updateAssets();
+      UI.updateAssets();
     }
   }
 }

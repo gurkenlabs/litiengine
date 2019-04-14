@@ -72,6 +72,7 @@ import de.gurkenlabs.utiliti.Cursors;
 import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.Style;
 import de.gurkenlabs.utiliti.UndoManager;
+import de.gurkenlabs.utiliti.swing.UI;
 import de.gurkenlabs.utiliti.swing.dialogs.XmlExportDialog;
 import de.gurkenlabs.utiliti.swing.dialogs.XmlImportDialog;
 
@@ -182,7 +183,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     renderGrid(g);
 
     final BasicStroke shapeStroke = new BasicStroke(1 / Game.world().camera().getRenderScale());
-    if (Program.getUserPreferences().isRenderBoundingBoxes()) {
+    if (Program.preferences().isRenderBoundingBoxes()) {
       renderMapObjectBounds(g);
     }
 
@@ -319,7 +320,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
       Game.world().loadEnvironment(this.environments.get(map.getName()));
 
-      Program.updateScrollBars();
+      UI.updateScrollBars();
 
       EditorScreen.instance().getMapSelectionPanel().setSelection(map.getName());
       if (this.selectedLayers.containsKey(map.getName())) {
@@ -504,7 +505,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     Blueprint blueprint = new Blueprint(name.toString(), this.getSelectedMapObjects().toArray(new MapObject[this.getSelectedMapObjects().size()]));
 
     EditorScreen.instance().getGameFile().getBluePrints().add(blueprint);
-    Program.updateAssets();
+    UI.updateAssets();
   }
 
   public void centerCameraOnFocus() {
@@ -1267,7 +1268,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         Game.world().camera().setFocus(newFocus);
       }
 
-      Program.getHorizontalScrollBar().setValue((int) Game.world().camera().getViewport().getCenterX());
+      UI.getHorizontalScrollBar().setValue((int) Game.world().camera().getViewport().getCenterX());
       return;
     }
 
@@ -1290,7 +1291,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       Game.world().camera().setFocus(newFocus);
     }
 
-    Program.getVerticalcrollBar().setValue((int) Game.world().camera().getViewport().getCenterY());
+    UI.getVerticalcrollBar().setValue((int) Game.world().camera().getViewport().getCenterY());
   }
 
   /***
@@ -1518,7 +1519,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   }
 
   private static float snapX(double x) {
-    if (Program.getUserPreferences().isSnapGrid()) {
+    if (Program.preferences().isSnapGrid()) {
       final IMap map = Game.world().environment().getMap();
       if (map == null) {
         return (float) x;
@@ -1527,7 +1528,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       return (int) Math.round(Math.min(Math.max(snapped, 0), Game.world().environment().getMap().getSizeInPixels().getWidth()));
     }
 
-    if (Program.getUserPreferences().isSnapPixels()) {
+    if (Program.preferences().isSnapPixels()) {
       return MathUtilities.clamp((int) Math.round(x), 0, (int) Game.world().environment().getMap().getSizeInPixels().getWidth());
     }
 
@@ -1535,7 +1536,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   }
 
   private static float snapY(double y) {
-    if (Program.getUserPreferences().isSnapGrid()) {
+    if (Program.preferences().isSnapGrid()) {
       final IMap map = Game.world().environment().getMap();
       if (map == null) {
         return (float) y;
@@ -1545,7 +1546,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       return (int) Math.round(Math.min(Math.max(snapped, 0), Game.world().environment().getMap().getSizeInPixels().getHeight()));
     }
 
-    if (Program.getUserPreferences().isSnapPixels()) {
+    if (Program.preferences().isSnapPixels()) {
       return MathUtilities.clamp((int) Math.round(y), 0, (int) Game.world().environment().getMap().getSizeInPixels().getHeight());
     }
 
@@ -1597,7 +1598,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         MapObjectType type = MapObjectType.get(mapObject.getType());
         final BasicStroke shapeStroke = new BasicStroke(1f / Game.world().camera().getRenderScale());
         if (type == null) {
-          if (Program.getUserPreferences().isRenderCustomMapObjects()) {
+          if (Program.preferences().isRenderCustomMapObjects()) {
             renderUnsupportedMapObject(g, mapObject, shapeStroke);
           }
 
@@ -1706,15 +1707,15 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
   private static void renderGrid(Graphics2D g) {
     // render the grid
-    if (Program.getUserPreferences().isShowGrid() && Game.world().camera().getRenderScale() >= 1 && Game.world().environment() != null) {
+    if (Program.preferences().isShowGrid() && Game.world().camera().getRenderScale() >= 1 && Game.world().environment() != null) {
 
       final IMap map = Game.world().environment().getMap();
       if (map == null) {
         return;
       }
 
-      g.setColor(Program.getUserPreferences().getGridColor());
-      final Stroke stroke = new BasicStroke(Program.getUserPreferences().getGridLineWidth() / Game.world().camera().getRenderScale());
+      g.setColor(Program.preferences().getGridColor());
+      final Stroke stroke = new BasicStroke(Program.preferences().getGridLineWidth() / Game.world().camera().getRenderScale());
       for (int x = 0; x < map.getWidth(); x++) {
         for (int y = 0; y < map.getHeight(); y++) {
           Shape tile = map.getOrientation().getShape(x, y, map);
@@ -1800,7 +1801,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   }
 
   private void renderObjectId(Graphics2D g, IMapObject mapObject) {
-    if (!Program.getUserPreferences().isRenderMapIds()) {
+    if (!Program.preferences().isRenderMapIds()) {
       return;
     }
 

@@ -53,7 +53,6 @@ import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.litiengine.sound.SoundFormat;
 import de.gurkenlabs.litiengine.util.io.Codec;
 import de.gurkenlabs.litiengine.util.io.ImageSerializer;
-import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.Style;
 import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.components.EditorScreen;
@@ -289,7 +288,7 @@ public class AssetPanelItem extends JPanel {
         Resources.spritesheets().remove(info.getName());
         EditorScreen.instance().getMapComponent().reloadEnvironment();
 
-        Program.updateAssets();
+        UI.updateAssets();
       }
     } else if (getOrigin() instanceof EmitterData) {
       EmitterData emitter = (EmitterData) getOrigin();
@@ -299,21 +298,21 @@ public class AssetPanelItem extends JPanel {
         EditorScreen.instance().getGameFile().getEmitters().remove(getOrigin());
         EditorScreen.instance().getMapComponent().reloadEnvironment();
 
-        Program.updateAssets();
+        UI.updateAssets();
       }
     } else if (getOrigin() instanceof Blueprint) {
       Blueprint blueprint = (Blueprint) getOrigin();
       int n = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), "Do you really want to delete the blueprint [" + blueprint.getName() + "]?", "Delete Blueprint?", JOptionPane.YES_NO_OPTION);
       if (n == JOptionPane.OK_OPTION) {
         EditorScreen.instance().getGameFile().getBluePrints().remove(getOrigin());
-        Program.updateAssets();
+        UI.updateAssets();
       }
     } else if (getOrigin() instanceof SoundResource) {
       SoundResource sound = (SoundResource) getOrigin();
       int n = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), "Do you really want to delete the sound [" + sound.getName() + "]?", "Delete Sound?", JOptionPane.YES_NO_OPTION);
       if (n == JOptionPane.OK_OPTION) {
         EditorScreen.instance().getGameFile().getSounds().remove(getOrigin());
-        Program.updateAssets();
+        UI.updateAssets();
       }
     }
   }

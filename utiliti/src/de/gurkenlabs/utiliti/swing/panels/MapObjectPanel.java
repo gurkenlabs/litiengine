@@ -132,7 +132,7 @@ public class MapObjectPanel extends PropertyPanel {
   }
 
   public void updateSpinnerModels() {
-    if (Program.getUserPreferences().isSnapPixels()) {
+    if (Program.preferences().isSnapPixels()) {
       this.updateSpinnerModels(MapObjectPanel::getIntegerModel);
     } else {
       this.updateSpinnerModels(MapObjectPanel::getFloatModel);

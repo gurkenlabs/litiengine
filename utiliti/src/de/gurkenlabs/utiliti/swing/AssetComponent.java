@@ -39,8 +39,8 @@ public class AssetComponent extends JSplitPane {
 
     JScrollPane scrollPane = new JScrollPane(assetPanel);
 
-    this.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> Program.getUserPreferences().setAssetsSplitter(this.getDividerLocation()));
-    this.setDividerLocation(Program.getUserPreferences().getMainSplitterPosition() != 0 ? Program.getUserPreferences().getAssetsSplitter() : 200);
+    this.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> Program.preferences().setAssetsSplitter(this.getDividerLocation()));
+    this.setDividerLocation(Program.preferences().getMainSplitterPosition() != 0 ? Program.preferences().getAssetsSplitter() : 200);
 
     this.setRightComponent(scrollPane);
   }

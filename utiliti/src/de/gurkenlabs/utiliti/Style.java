@@ -3,10 +3,12 @@ package de.gurkenlabs.utiliti;
 import java.awt.Color;
 import java.awt.Font;
 import java.util.Enumeration;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -46,6 +48,7 @@ public final class Style {
 
   public static void initSwingComponentStyle() {
     try {
+      JOptionPane.setDefaultLocale(Locale.getDefault());
       JPopupMenu.setDefaultLightWeightPopupEnabled(false);
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
       UIManager.getDefaults().put("SplitPane.border", BorderFactory.createEmptyBorder());

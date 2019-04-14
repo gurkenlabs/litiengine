@@ -16,12 +16,12 @@ public final class ProjectMenu extends JMenu {
     this.setMnemonic('P');
 
     JCheckBoxMenuItem compress = new JCheckBoxMenuItem(Resources.strings().get("menu_compressProjectFile"));
-    compress.setState(Program.getUserPreferences().isCompressFile());
-    compress.addItemListener(e -> Program.getUserPreferences().setCompressFile(compress.getState()));
+    compress.setState(Program.preferences().isCompressFile());
+    compress.addItemListener(e -> Program.preferences().setCompressFile(compress.getState()));
 
     JCheckBoxMenuItem sync = new JCheckBoxMenuItem(Resources.strings().get("menu_syncMaps"));
-    sync.setState(Program.getUserPreferences().isSyncMaps());
-    sync.addItemListener(e -> Program.getUserPreferences().setSyncMaps(sync.getState()));
+    sync.setState(Program.preferences().isSyncMaps());
+    sync.addItemListener(e -> Program.preferences().setSyncMaps(sync.getState()));
 
     JMenuItem importSpriteFile = new JMenuItem(Resources.strings().get("menu_assets_importSpriteFile"));
     importSpriteFile.addActionListener(a -> EditorScreen.instance().importSpriteFile());
