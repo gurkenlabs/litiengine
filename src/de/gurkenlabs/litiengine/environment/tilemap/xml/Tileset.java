@@ -405,6 +405,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
             iter.add(new TilesetEntry(this, iter.nextIndex()));
           }
         }
+        this.tilecount = this.tiles.size();
       }
     }
   }
