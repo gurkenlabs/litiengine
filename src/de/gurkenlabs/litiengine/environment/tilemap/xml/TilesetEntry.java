@@ -126,10 +126,6 @@ public class TilesetEntry extends CustomPropertyProvider implements ITilesetEntr
     }
   }
 
-  boolean shouldBeSaved() {
-    return this.terrain != null || this.image != null || this.animation != null;
-  }
-
   @SuppressWarnings("unused")
   private void afterUnmarshal(Unmarshaller u, Object parent) {
     this.tileset = (Tileset) parent;
