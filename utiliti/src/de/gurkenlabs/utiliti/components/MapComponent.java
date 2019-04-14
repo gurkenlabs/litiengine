@@ -1138,8 +1138,6 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       }
     });
 
-    Input.keyboard().onKeyPressed(KeyEvent.VK_SPACE, e -> this.centerCameraOnFocus());
-
     Input.keyboard().onKeyPressed(KeyEvent.VK_CONTROL, e -> {
       if (this.currentEditMode == EDITMODE_EDIT) {
         this.setEditMode(EDITMODE_MOVE);

@@ -27,7 +27,7 @@ public class GridEditPanel extends JPanel {
 
   public GridEditPanel(float strokeWidth, Color strokeColor) {
 
-    JLabel lblStroke = new JLabel(Resources.strings().get("menu_gridStroke"));
+    JLabel lblStroke = new JLabel(Resources.strings().get("menu_view_gridStroke"));
 
     this.strokeSpinner = new JSpinner();
     strokeSpinner.setModel(new SpinnerNumberModel(strokeWidth, 1f, 5f, 0.1f));
@@ -40,7 +40,7 @@ public class GridEditPanel extends JPanel {
       this.gridColor = newColor == null ? strokeColor : newColor;
     });
 
-    JLabel lblColor = new JLabel(Resources.strings().get("menu_gridColor"));
+    JLabel lblColor = new JLabel(Resources.strings().get("menu_view_gridColor"));
 
     GroupLayout groupLayout = new GroupLayout(this);
     groupLayout.setHorizontalGroup(
