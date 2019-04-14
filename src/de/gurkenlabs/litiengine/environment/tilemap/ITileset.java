@@ -59,8 +59,6 @@ public interface ITileset extends ICustomPropertyProvider, Resource {
 
   public ITerrain[] getTerrain(int tileId);
 
-  public ITileAnimation getAnimation(int tileId);
-
   public boolean containsTile(ITile tile);
 
   public boolean containsTile(ITilesetEntry entry);

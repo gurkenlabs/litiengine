@@ -6,21 +6,11 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 
 public final class MapUtilities {
-  private static final Map<String, ITileAnimation> animations;
-  private static final Map<String, Boolean> hasAnimation;
-
-  static {
-    animations = new ConcurrentHashMap<>();
-    hasAnimation = new ConcurrentHashMap<>();
-  }
-
   private MapUtilities() {
     throw new UnsupportedOperationException();
   }
@@ -158,50 +148,6 @@ public final class MapUtilities {
     }
 
     return tile;
-  }
-
-  public static boolean hasAnimation(final IMap map, final ITile tile) {
-
-    final ITileset tileset = MapUtilities.findTileSet(map, tile);
-    if (tileset == null || tileset.getFirstGridId() > tile.getGridId()) {
-      return false;
-    }
-
-    // get the grid id relative to the sprite sheet since we use a 0 based
-    // approach to calculate the position
-    int index = tile.getGridId() - tileset.getFirstGridId();
-
-    final ITileAnimation animation = MapUtilities.getAnimation(map, index);
-    return animation != null && !animation.getFrames().isEmpty();
-  }
-
-  public static ITileAnimation getAnimation(final IMap map, final int gId) {
-
-    String cacheKey = map.getName() + "[" + gId + "]";
-    if (hasAnimation.containsKey(cacheKey) && !hasAnimation.get(cacheKey)) {
-      return null;
-    }
-
-    if (animations.containsKey(cacheKey)) {
-      return animations.get(cacheKey);
-    }
-
-    for (final ITileset tileset : map.getTilesets()) {
-      if (tileset.containsTile(gId)) {
-        ITileAnimation anim = tileset.getAnimation(gId);
-        boolean animation = false;
-        if (anim != null) {
-          animations.put(cacheKey, anim);
-          animation = true;
-        }
-
-        hasAnimation.put(cacheKey, animation);
-
-        return anim;
-      }
-    }
-
-    return null;
   }
 
   /**

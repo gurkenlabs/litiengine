@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Optional;
 import java.util.logging.Logger;
 
 import javax.xml.bind.Marshaller;
@@ -24,7 +23,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapImage;
 import de.gurkenlabs.litiengine.environment.tilemap.ITerrain;
 import de.gurkenlabs.litiengine.environment.tilemap.ITile;
-import de.gurkenlabs.litiengine.environment.tilemap.ITileAnimation;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileOffset;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.ITilesetEntry;
@@ -218,8 +216,11 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
           terrain.finish(location);
         }
       }
-      for (TilesetEntry entry : this.tiles) {
-        entry.finish(location);
+      if (this.tiles != null) {
+        // unsaved tiles don't need any post-processing
+        for (TilesetEntry entry : this.tiles) {
+          entry.finish(location);
+        }
       }
     }
   }
@@ -249,16 +250,11 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     }
 
     ITerrain[] terrains = new ITerrain[4];
-    if (this.tiles == null) {
+    if (!this.containsTile(tileId)) {
       return terrains;
     }
 
-    Optional<TilesetEntry> optTile = this.tiles.stream().filter(x -> x.getId() == tileId).findFirst();
-    if (!optTile.isPresent()) {
-      return terrains;
-    }
-
-    TilesetEntry tile = optTile.get();
+    TilesetEntry tile = this.allTiles.get(tileId);
     int[] tileTerrains = tile.getTerrainIds();
     for (int i = 0; i < 4; i++) {
       if (tileTerrains[i] < 0 || tileTerrains[i] >= this.getTerrainTypes().size()) {
@@ -274,24 +270,6 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     }
 
     return terrains;
-  }
-
-  @Override
-  public ITileAnimation getAnimation(int tileId) {
-    if (this.sourceTileset != null) {
-      return this.sourceTileset.getAnimation(tileId);
-    }
-
-    if (this.tiles == null) {
-      return null;
-    }
-
-    Optional<TilesetEntry> optTile = this.tiles.stream().filter(x -> x.getId() == tileId).findFirst();
-    if (!optTile.isPresent()) {
-      return null;
-    }
-
-    return optTile.get().getAnimation();
   }
 
   @Override
@@ -319,11 +297,11 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
       return this.sourceTileset.getTile(id);
     }
 
-    if (id < 0 || id >= this.tilecount || this.tiles == null) {
+    if (id < 0 || id >= this.tilecount) {
       return null;
     }
 
-    return this.tiles.get(id);
+    return this.allTiles.get(id);
   }
 
   @Override
@@ -376,7 +354,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   }
 
   public void updateTileTerrain() {
-    if (this.sourceTileset == null) {
+    if (this.sourceTileset == null && this.tiles != null) {
       for (TilesetEntry entry : this.tiles) {
         entry.setTerrains(this.getTerrain(entry.getId()));
       }
@@ -463,6 +441,6 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
       return this.sourceTileset.containsTile(entry);
     }
 
-    return this.tiles != null && this.tiles.contains(entry);
+    return this.allTiles != null && this.allTiles.contains(entry);
   }
 }
