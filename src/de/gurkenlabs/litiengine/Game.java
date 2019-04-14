@@ -574,6 +574,9 @@ public final class Game {
   }
 
   static synchronized void terminate() {
+    if (!initialized) {
+      return;
+    }
     hasStarted = false;
     initialized = false;
 
