@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
@@ -35,6 +36,7 @@ import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 @XmlRootElement(name = "tileset")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Tileset extends CustomPropertyProvider implements ITileset {
+  private static final Logger log = Logger.getLogger(Tileset.class.getName());
   public static final String FILE_EXTENSION = "tsx";
 
   @XmlAttribute
@@ -392,6 +394,16 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
       for (int i = 0; i < this.tilecount; i++) {
         if (add(iter)) {
           iter.add(new TilesetEntry(this, iter.nextIndex()));
+        }
+      }
+      if (iter.hasNext()) {
+        log.warning("tileset " + this.name + " had a tilecount attribute of " + this.tilecount + " but had tile IDs going beyond that");
+        while (iter.hasNext()) {
+          int nextId = iter.next().getId();
+          iter.previous();
+          while (iter.nextIndex() < nextId) {
+            iter.add(new TilesetEntry(this, iter.nextIndex()));
+          }
         }
       }
     }

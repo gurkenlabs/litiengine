@@ -9,6 +9,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import de.gurkenlabs.litiengine.environment.tilemap.ITerrain;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileAnimation;
@@ -19,6 +20,7 @@ import de.gurkenlabs.litiengine.util.ArrayUtilities;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 public class TilesetEntry extends CustomPropertyProvider implements ITilesetEntry {
+  @XmlTransient
   private Tileset tileset;
 
   private transient ITerrain[] terrains;
