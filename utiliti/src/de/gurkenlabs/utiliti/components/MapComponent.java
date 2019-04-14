@@ -99,6 +99,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   private final List<Consumer<IMapObject>> focusChangedConsumer;
   private final List<Consumer<List<IMapObject>>> selectionChangedConsumer;
   private final List<Consumer<TmxMap>> mapLoadedConsumer;
+  private final List<Consumer<Blueprint>> copyTargetChangedConsumer;
 
   private final java.util.Map<String, Integer> selectedLayers;
   private final java.util.Map<String, Point2D> cameraFocus;
@@ -143,6 +144,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     this.focusChangedConsumer = new CopyOnWriteArrayList<>();
     this.selectionChangedConsumer = new CopyOnWriteArrayList<>();
     this.mapLoadedConsumer = new CopyOnWriteArrayList<>();
+    this.copyTargetChangedConsumer = new CopyOnWriteArrayList<>();
     this.focusedObjects = new ConcurrentHashMap<>();
     this.selectedObjects = new ConcurrentHashMap<>();
     this.environments = new ConcurrentHashMap<>();
@@ -172,6 +174,10 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
   public void onMapLoaded(Consumer<TmxMap> cons) {
     this.mapLoadedConsumer.add(cons);
+  }
+
+  public void onCopyTargetChanged(Consumer<Blueprint> cons) {
+    this.copyTargetChangedConsumer.add(cons);
   }
 
   @Override
@@ -402,7 +408,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   }
 
   public void copy() {
-    this.copiedBlueprint = new Blueprint("", this.getSelectedMapObjects().toArray(new MapObject[this.getSelectedMapObjects().size()]));
+    this.setCopyBlueprint(new Blueprint("", this.getSelectedMapObjects().toArray(new MapObject[this.getSelectedMapObjects().size()])));
   }
 
   public void paste() {
@@ -431,7 +437,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
       // clean up copied blueprints in case, we cut the objects and kept the IDs
       if (this.copiedBlueprint.keepIds()) {
-        this.copiedBlueprint = null;
+        this.setCopyBlueprint(null);
       }
     } finally {
       UndoManager.instance().endOperation();
@@ -439,7 +445,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   }
 
   public void cut() {
-    this.copiedBlueprint = new Blueprint("", true, this.getSelectedMapObjects().toArray(new MapObject[this.getSelectedMapObjects().size()]));
+    this.setCopyBlueprint(new Blueprint("", true, this.getSelectedMapObjects().toArray(new MapObject[this.getSelectedMapObjects().size()])));
 
     UndoManager.instance().beginOperation();
     try {
@@ -1104,6 +1110,13 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
   private void setCurrentZoom() {
     Game.world().camera().setZoom(zooms[this.currentZoomIndex], 0);
+  }
+
+  private void setCopyBlueprint(Blueprint copyTarget) {
+    this.copiedBlueprint = copyTarget;
+    for (Consumer<Blueprint> consumer : this.copyTargetChangedConsumer) {
+      consumer.accept(this.copiedBlueprint);
+    }
   }
 
   private void setupKeyboardControls() {

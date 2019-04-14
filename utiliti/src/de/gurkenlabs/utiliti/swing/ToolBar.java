@@ -170,6 +170,7 @@ public final class ToolBar extends JToolBar {
       paste.setEnabled(EditorScreen.instance().getMapComponent().getCopiedBlueprint() != null);
     });
 
+    EditorScreen.instance().getMapComponent().onCopyTargetChanged(target -> paste.setEnabled(target != null));
     EditorScreen.instance().getMapComponent().onEditModeChanged(mode -> paste.setEnabled(EditorScreen.instance().getMapComponent().getCopiedBlueprint() != null));
 
     UndoManager.onUndoStackChanged(manager -> {

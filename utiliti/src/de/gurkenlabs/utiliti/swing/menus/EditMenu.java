@@ -62,6 +62,9 @@ public final class EditMenu extends JMenu {
       redo.setEnabled(UndoManager.instance().canRedo());
     });
 
+    EditorScreen.instance().getMapComponent().onCopyTargetChanged(target -> paste.setEnabled(target != null));
+    EditorScreen.instance().getMapComponent().onEditModeChanged(mode -> paste.setEnabled(EditorScreen.instance().getMapComponent().getCopiedBlueprint() != null));
+    
     UndoManager.onUndoStackChanged(manager -> {
       undo.setEnabled(UndoManager.instance().canUndo());
       redo.setEnabled(UndoManager.instance().canRedo());
