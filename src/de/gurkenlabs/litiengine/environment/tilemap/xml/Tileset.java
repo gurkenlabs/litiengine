@@ -355,6 +355,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
 
   public void updateTileTerrain() {
     if (this.sourceTileset == null && this.tiles != null) {
+      // only go through saved tiles because unsaved tiles can't have terrains
       for (TilesetEntry entry : this.tiles) {
         entry.setTerrains(this.getTerrain(entry.getId()));
       }
@@ -368,7 +369,6 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
       if (this.tiles != null) {
         this.allTiles.addAll(this.tiles);
       }
-      this.updateTileTerrain();
       // add missing entries
       ListIterator<TilesetEntry> iter = this.allTiles.listIterator();
       for (int i = 0; i < this.tilecount; i++) {
@@ -387,6 +387,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
         }
         this.tilecount = this.allTiles.size();
       }
+      this.updateTileTerrain();
     }
   }
 
