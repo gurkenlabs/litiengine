@@ -467,6 +467,10 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   }
 
   public void delete() {
+    if (this.isSuspended() || !this.isVisible() || this.getFocusedMapObject() == null) {
+      return;
+    }
+
     UndoManager.instance().beginOperation();
     try {
       for (IMapObject deleteObject : this.getSelectedMapObjects()) {
@@ -547,6 +551,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     }
 
     this.currentEditMode = editMode;
+    System.out.println("editmode" + this.currentEditMode);
     for (Consumer<Integer> cons : this.editModeChangedConsumer) {
       cons.accept(this.currentEditMode);
     }
@@ -1120,33 +1125,9 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   }
 
   private void setupKeyboardControls() {
-    Input.keyboard().onKeyReleased(KeyEvent.VK_ADD, e -> {
-      if (this.isSuspended() || !this.isVisible()) {
-        return;
-      }
-      if (Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
-        this.zoomIn();
-      }
-    });
-
-    Input.keyboard().onKeyReleased(KeyEvent.VK_SUBTRACT, e -> {
-      if (this.isSuspended() || !this.isVisible()) {
-        return;
-      }
-      if (Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
-        this.zoomOut();
-      }
-    });
-
     Input.keyboard().onKeyPressed(KeyEvent.VK_CONTROL, e -> {
       if (this.currentEditMode == EDITMODE_EDIT) {
         this.setEditMode(EDITMODE_MOVE);
-      }
-    });
-
-    Input.keyboard().onKeyPressed(KeyEvent.VK_ESCAPE, e -> {
-      if (this.currentEditMode == EDITMODE_CREATE) {
-        this.setEditMode(EDITMODE_EDIT);
       }
     });
 
@@ -1156,25 +1137,9 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       }
     });
 
-    Input.keyboard().onKeyReleased(KeyEvent.VK_Z, e -> {
-      if (Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
-        UndoManager.instance().undo();
-      }
-    });
-
-    Input.keyboard().onKeyReleased(KeyEvent.VK_Y, e -> {
-      if (Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
-        UndoManager.instance().redo();
-      }
-    });
-
-    Input.keyboard().onKeyPressed(KeyEvent.VK_DELETE, e -> {
-      if (this.isSuspended() || !this.isVisible() || this.getFocusedMapObject() == null) {
-        return;
-      }
-
-      if (Game.window().getRenderComponent().hasFocus() && this.currentEditMode == EDITMODE_EDIT) {
-        this.delete();
+    Input.keyboard().onKeyPressed(KeyEvent.VK_ESCAPE, e -> {
+      if (this.currentEditMode == EDITMODE_CREATE) {
+        this.setEditMode(EDITMODE_EDIT);
       }
     });
 
@@ -1325,7 +1290,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     }
 
     boolean hovered = false;
-    if (Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
+    if (this.currentEditMode == EDITMODE_MOVE) {
       return;
     }
     for (Entry<TransformType, Rectangle2D> entry : this.transformRects.entrySet()) {
@@ -1397,17 +1362,13 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
       break;
     case EDITMODE_EDIT:
-      if (Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
-        this.handleSelectedEntitiesDrag();
-        return;
-      } else if (this.currentTransform != TransformType.NONE) {
+      if (this.currentTransform != TransformType.NONE) {
         if (!this.isTransforming) {
           this.isTransforming = true;
           UndoManager.instance().mapObjectChanging(this.getFocusedMapObject());
         }
 
         this.handleTransform();
-        return;
       }
       break;
     case EDITMODE_MOVE:
@@ -1784,18 +1745,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       RenderEngine.renderOutline(g, focus, whiteStroke);
 
       // render transform rects
-      if (!Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
-        Stroke transStroke = new BasicStroke(1 / Game.world().camera().getRenderScale());
-        for (Rectangle2D trans : this.transformRects.values()) {
-          g.setColor(Style.COLOR_TRANSFORM_RECT_FILL);
-          RenderEngine.renderShape(g, trans);
-          g.setColor(Color.BLACK);
-          RenderEngine.renderOutline(g, trans, transStroke);
-        }
-      }
-
-      // render transform rects
-      if (!Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
+      if (this.currentEditMode != EDITMODE_MOVE) {
         Stroke transStroke = new BasicStroke(1 / Game.world().camera().getRenderScale());
         for (Rectangle2D trans : this.transformRects.values()) {
           g.setColor(Style.COLOR_TRANSFORM_RECT_FILL);
