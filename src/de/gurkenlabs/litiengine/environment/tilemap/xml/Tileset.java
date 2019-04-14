@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Optional;
@@ -76,7 +77,9 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   private List<Terrain> terrainTypes = null;
 
   @XmlElement(name = "tile")
-  private ArrayList<TilesetEntry> tiles = null;
+  private List<TilesetEntry> tiles = null;
+
+  private List<TilesetEntry> allTiles;
 
   @XmlTransient
   protected Tileset sourceTileset;
@@ -382,21 +385,20 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   @SuppressWarnings("unused")
   private void afterUnmarshal(Unmarshaller u, Object parent) {
     if (this.source == null) {
-      if (this.tiles == null) {
-        this.tiles = new ArrayList<>(this.tilecount);
-      } else {
-        this.tiles.ensureCapacity(this.tilecount);
+      this.allTiles = new ArrayList<>(this.tilecount);
+      if (this.tiles != null) {
+        this.allTiles.addAll(this.tiles);
       }
       this.updateTileTerrain();
       // add missing entries
-      ListIterator<TilesetEntry> iter = this.tiles.listIterator();
+      ListIterator<TilesetEntry> iter = this.allTiles.listIterator();
       for (int i = 0; i < this.tilecount; i++) {
         if (add(iter)) {
           iter.add(new TilesetEntry(this, iter.nextIndex()));
         }
       }
       if (iter.hasNext()) {
-        log.warning("tileset " + this.name + " had a tilecount attribute of " + this.tilecount + " but had tile IDs going beyond that");
+        log.warning("tileset \"" + this.name + "\" had a tilecount attribute of " + this.tilecount + " but had tile IDs going beyond that");
         while (iter.hasNext()) {
           int nextId = iter.next().getId();
           iter.previous();
@@ -404,7 +406,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
             iter.add(new TilesetEntry(this, iter.nextIndex()));
           }
         }
-        this.tilecount = this.tiles.size();
+        this.tilecount = this.allTiles.size();
       }
     }
   }
@@ -427,6 +429,14 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
       this.tileheight = null;
       this.tilecount = null;
       this.columns = null;
+    } else {
+      this.tiles = new ArrayList<>(this.allTiles);
+      Iterator<TilesetEntry> iter = this.tiles.iterator();
+      while (iter.hasNext()) {
+        if (!iter.next().shouldBeSaved()) {
+          iter.remove();
+        }
+      }
     }
 
     if (this.margin != null && this.margin == 0) {
