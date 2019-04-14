@@ -26,6 +26,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
+import java.util.function.IntConsumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -95,7 +96,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   private double currentTransformRectSize = TRANSFORM_RECT_SIZE;
   private final java.util.Map<TransformType, Rectangle2D> transformRects;
 
-  private final List<Consumer<Integer>> editModeChangedConsumer;
+  private final List<IntConsumer> editModeChangedConsumer;
   private final List<Consumer<IMapObject>> focusChangedConsumer;
   private final List<Consumer<List<IMapObject>>> selectionChangedConsumer;
   private final List<Consumer<TmxMap>> mapLoadedConsumer;
@@ -160,7 +161,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     });
   }
 
-  public void onEditModeChanged(Consumer<Integer> cons) {
+  public void onEditModeChanged(IntConsumer cons) {
     this.editModeChangedConsumer.add(cons);
   }
 
@@ -551,8 +552,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     }
 
     this.currentEditMode = editMode;
-    System.out.println("editmode" + this.currentEditMode);
-    for (Consumer<Integer> cons : this.editModeChangedConsumer) {
+    for (IntConsumer cons : this.editModeChangedConsumer) {
       cons.accept(this.currentEditMode);
     }
   }
@@ -680,6 +680,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
     XmlImportDialog.importXml("Tilemap", file -> {
       String mapPath = file.toURI().toString();
+      Resources.maps().clear();
       TmxMap map = (TmxMap) Resources.maps().get(mapPath);
       if (map == null) {
         log.log(Level.WARNING, "could not load map from file {0}", new Object[] { mapPath });

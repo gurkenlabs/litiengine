@@ -65,7 +65,6 @@ public final class ToolBar extends JToolBar {
       EditorScreen.instance().getMapComponent().setEditMode(MapComponent.EDITMODE_EDIT);
       this.isChanging = false;
 
-      System.out.println("edit action");
       Game.window().getRenderComponent().setCursor(Cursors.DEFAULT, 0, 0);
     });
 
@@ -84,7 +83,6 @@ public final class ToolBar extends JToolBar {
       ed.setSelected(false);
       place.setSelected(false);
       this.isChanging = true;
-      System.out.println("move action");
       EditorScreen.instance().getMapComponent().setEditMode(MapComponent.EDITMODE_MOVE);
       this.isChanging = false;
 
@@ -97,8 +95,6 @@ public final class ToolBar extends JToolBar {
         return;
       }
       
-      System.out.println("changing" + i);
-
       if (i == MapComponent.EDITMODE_CREATE) {
         ed.setSelected(false);
         mv.setSelected(false);
