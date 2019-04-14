@@ -504,7 +504,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     Blueprint blueprint = new Blueprint(name.toString(), this.getSelectedMapObjects().toArray(new MapObject[this.getSelectedMapObjects().size()]));
 
     EditorScreen.instance().getGameFile().getBluePrints().add(blueprint);
-    Program.getAssetTree().forceUpdate();
+    Program.updateAssets();
   }
 
   public void centerCameraOnFocus() {

@@ -18,14 +18,14 @@ import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.utiliti.swing.panels.PropertyPanel;
 
 @SuppressWarnings("serial")
-public class ColorControl extends JPanel {
+public class ColorComponent extends JPanel {
   private static final String DEFAULT_COLOR = "#ffffffff";
   private final JButton btnSelectColor;
   private final JTextField textFieldColor;
 
   private final List<ActionListener> listeners;
 
-  public ColorControl() {
+  public ColorComponent() {
     this.listeners = new ArrayList<>();
     this.textFieldColor = new JTextField();
     this.textFieldColor.setText(DEFAULT_COLOR);

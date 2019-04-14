@@ -38,7 +38,10 @@ public final class Style {
   public static final Color COLOR_DEFAULT_TAG = new Color(99, 113, 118);
   public static final Color COLOR_DEFAULT_TAG_HOVER = COLOR_DEFAULT_TAG.darker();
   public static final Color COLOR_STATUS = Color.WHITE;
-
+  
+  public static final Font FONT_DEFAULT = Resources.fonts().get("OpenSans.ttf", Font.PLAIN, 11);
+  public static final String FONTNAME_CONSOLE = "Consolas";
+  
   private static final Logger log = Logger.getLogger(Style.class.getName());
 
   public static void initSwingComponentStyle() {
@@ -46,7 +49,7 @@ public final class Style {
       JPopupMenu.setDefaultLightWeightPopupEnabled(false);
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
       UIManager.getDefaults().put("SplitPane.border", BorderFactory.createEmptyBorder());
-      setDefaultSwingFont(new FontUIResource(Resources.fonts().get("OpenSans.ttf", Font.PLAIN, 11)));
+      setDefaultSwingFont(new FontUIResource(FONT_DEFAULT));
     } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
       log.log(Level.SEVERE, e.getLocalizedMessage(), e);
     }

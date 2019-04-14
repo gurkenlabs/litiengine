@@ -13,7 +13,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.LightSource;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
-import de.gurkenlabs.utiliti.swing.ColorControl;
+import de.gurkenlabs.utiliti.swing.ColorComponent;
 import de.gurkenlabs.utiliti.swing.Icons;
 
 @SuppressWarnings("serial")
@@ -23,12 +23,12 @@ public class LightSourcePanel extends PropertyPanel {
   private JCheckBox checkBoxIsActive;
   private JSlider sliderOffsetX;
   private JSlider sliderOffsetY;
-  private final ColorControl colorControl;
+  private final ColorComponent colorControl;
 
   public LightSourcePanel() {
     super("panel_lightSource", Icons.LIGHT);
 
-    this.colorControl = new ColorControl();
+    this.colorControl = new ColorComponent();
 
     this.comboBoxLightShape = new JComboBox<>();
     this.comboBoxLightShape.setModel(new DefaultComboBoxModel<String>(new String[] { "ellipse", "rectangle" }));

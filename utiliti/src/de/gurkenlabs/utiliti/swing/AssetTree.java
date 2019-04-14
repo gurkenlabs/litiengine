@@ -15,12 +15,12 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
 import de.gurkenlabs.litiengine.resources.ResourceBundle;
 import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.components.EditorScreen;
 import de.gurkenlabs.utiliti.swing.panels.CreaturePanel;
 
 @SuppressWarnings("serial")
 public class AssetTree extends JTree {
+  private final AssetPanel assetPanel;
   private final DefaultTreeModel entitiesTreeModel;
   private final DefaultMutableTreeNode nodeRoot;
   private final DefaultMutableTreeNode nodeSpritesheets;
@@ -32,9 +32,11 @@ public class AssetTree extends JTree {
   private final DefaultMutableTreeNode nodeBlueprints;
   private final DefaultMutableTreeNode nodeCreatures;
 
-  public AssetTree() {
+  public AssetTree(AssetPanel assetPanel) {
     this.setRootVisible(false);
-    
+
+    this.assetPanel = assetPanel;
+
     this.nodeRoot = new DefaultMutableTreeNode(new IconTreeListItem(Resources.strings().get("assettree_assets"), Icons.ASSET));
     this.nodeSpritesheets = new DefaultMutableTreeNode(new IconTreeListItem(Resources.strings().get("assettree_spritesheets"), Icons.SPRITESHEET));
     this.nodeSpriteProps = new DefaultMutableTreeNode(new IconTreeListItem(Resources.strings().get("assettree_spritesheets_props"), Icons.PROP));
@@ -44,7 +46,7 @@ public class AssetTree extends JTree {
     this.nodeEmitters = new DefaultMutableTreeNode(new IconTreeListItem(Resources.strings().get("assettree_emitters"), Icons.EMITTER));
     this.nodeBlueprints = new DefaultMutableTreeNode(new IconTreeListItem(Resources.strings().get("assettree_blueprints"), Icons.BLUEPRINT));
     this.nodeCreatures = new DefaultMutableTreeNode(new IconTreeListItem(Resources.strings().get("assettree_creatures"), Icons.CREATURE));
-    
+
     this.nodeSpritesheets.add(this.nodeSpriteProps);
     this.nodeSpritesheets.add(this.nodeCreatures);
     this.nodeSpritesheets.add(this.nodeSpriteMisc);
@@ -94,13 +96,13 @@ public class AssetTree extends JTree {
 
     final ResourceBundle gameFile = EditorScreen.instance().getGameFile();
     if (selectedPath.equals(spritePath)) {
-      Program.getAssetPanel().loadSprites(gameFile.getSpriteSheets().stream().collect(Collectors.toList()));
+      this.assetPanel.loadSprites(gameFile.getSpriteSheets().stream().collect(Collectors.toList()));
     } else if (this.getSelectionPath().equals(propPath)) {
-      Program.getAssetPanel().loadSprites(gameFile.getSpriteSheets().stream().filter(x -> x.getName() != null && x.getName().contains(PropAnimationController.PROP_IDENTIFIER)).collect(Collectors.toList()));
+      this.assetPanel.loadSprites(gameFile.getSpriteSheets().stream().filter(x -> x.getName() != null && x.getName().contains(PropAnimationController.PROP_IDENTIFIER)).collect(Collectors.toList()));
     } else if (this.getSelectionPath().equals(creaturePath)) {
-      Program.getAssetPanel().loadSprites(gameFile.getSpriteSheets().stream().filter(x -> x.getName() != null && CreaturePanel.getCreatureSpriteName(x.getName()) != null).collect(Collectors.toList()));
-    }else if (selectedPath.equals(miscPath)) {
-      Program.getAssetPanel().loadSprites(gameFile.getSpriteSheets().stream().filter(x -> x.getName() != null && !x.getName().contains(PropAnimationController.PROP_IDENTIFIER) && CreaturePanel.getCreatureSpriteName(x.getName()) == null).collect(Collectors.toList()));
+      this.assetPanel.loadSprites(gameFile.getSpriteSheets().stream().filter(x -> x.getName() != null && CreaturePanel.getCreatureSpriteName(x.getName()) != null).collect(Collectors.toList()));
+    } else if (selectedPath.equals(miscPath)) {
+      this.assetPanel.loadSprites(gameFile.getSpriteSheets().stream().filter(x -> x.getName() != null && !x.getName().contains(PropAnimationController.PROP_IDENTIFIER) && CreaturePanel.getCreatureSpriteName(x.getName()) == null).collect(Collectors.toList()));
     } else if (selectedPath.equals(tilesetPath)) {
       ArrayList<Tileset> allTilesets = new ArrayList<>();
       allTilesets.addAll(gameFile.getTilesets().stream().filter(x -> x.getName() != null).collect(Collectors.toList()));
@@ -115,13 +117,13 @@ public class AssetTree extends JTree {
         }
       }
 
-      Program.getAssetPanel().loadTilesets(allTilesets);
+      this.assetPanel.loadTilesets(allTilesets);
     } else if (selectedPath.equals(emitterPath)) {
-      Program.getAssetPanel().loadEmitters(gameFile.getEmitters());
+      this.assetPanel.loadEmitters(gameFile.getEmitters());
     } else if (selectedPath.equals(blueprintPath)) {
-      Program.getAssetPanel().loadBlueprints(gameFile.getBluePrints());
+      this.assetPanel.loadBlueprints(gameFile.getBluePrints());
     } else if (selectedPath.equals(soundPath)) {
-      Program.getAssetPanel().loadSounds(gameFile.getSounds());
+      this.assetPanel.loadSounds(gameFile.getSounds());
     }
   }
 }

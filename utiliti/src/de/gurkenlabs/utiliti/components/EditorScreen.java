@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -62,6 +63,8 @@ import de.gurkenlabs.utiliti.Style;
 import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.components.EditorComponent.ComponentType;
 import de.gurkenlabs.utiliti.swing.MapSelectionPanel;
+import de.gurkenlabs.utiliti.swing.StatusBar;
+import de.gurkenlabs.utiliti.swing.Tray;
 import de.gurkenlabs.utiliti.swing.dialogs.EditorFileChooser;
 import de.gurkenlabs.utiliti.swing.dialogs.SpritesheetImportPanel;
 import de.gurkenlabs.utiliti.swing.dialogs.XmlImportDialog;
@@ -83,6 +86,8 @@ public class EditorScreen extends Screen {
 
   private final List<EditorComponent> comps;
 
+  private final List<Runnable> loadedCallbacks;
+
   private double padding;
   private MapComponent mapComponent;
   private ResourceBundle gameFile = new ResourceBundle();
@@ -101,6 +106,7 @@ public class EditorScreen extends Screen {
   private EditorScreen() {
     super("Editor");
     this.comps = new ArrayList<>();
+    this.loadedCallbacks = new CopyOnWriteArrayList<>();
   }
 
   public static EditorScreen instance() {
@@ -143,10 +149,10 @@ public class EditorScreen extends Screen {
       Game.window().setTitle(Game.info().getName() + " " + Game.info().getVersion() + " - " + this.currentResourceFile);
 
       String mapName = Game.world().environment() != null && Game.world().environment().getMap() != null ? "\nMap: " + Game.world().environment().getMap().getName() : "";
-      Program.setTrayToolTip(Game.info().getName() + " " + Game.info().getVersion() + "\n" + this.currentResourceFile + mapName);
+      Tray.setToolTip(Game.info().getName() + " " + Game.info().getVersion() + "\n" + this.currentResourceFile + mapName);
     } else if (this.getProjectPath() != null) {
       Game.window().setTitle(Game.info().getTitle() + " - " + NEW_GAME_STRING);
-      Program.setTrayToolTip(Game.info().getTitle() + "\n" + NEW_GAME_STRING);
+      Tray.setToolTip(Game.info().getTitle() + "\n" + NEW_GAME_STRING);
     } else {
       Game.window().setTitle(Game.info().getTitle());
     }
@@ -160,7 +166,7 @@ public class EditorScreen extends Screen {
     TextRenderer.render(g, Game.metrics().getFramesPerSecond() + " FPS", 10, Game.window().getResolution().getHeight() - 20);
 
     if (Game.time().now() % 4 == 0) {
-      Program.updateStatusBar();
+      StatusBar.update();
     }
 
     // render status
@@ -244,7 +250,7 @@ public class EditorScreen extends Screen {
         this.loadSpriteSheets(map);
       }
 
-      Program.getAssetTree().forceUpdate();
+      Program.updateAssets();
 
       // load custom emitter files
       loadCustomEmitters(this.getGameFile().getEmitters());
@@ -298,10 +304,8 @@ public class EditorScreen extends Screen {
       // set up project settings
       this.currentResourceFile = gameFile.getPath();
       this.gameFile = ResourceBundle.load(gameFile.getPath());
+      this.gamefileLoaded();
 
-      Program.getUserPreferences().setLastGameFile(gameFile.getPath());
-      Program.getUserPreferences().addOpenedFile(this.currentResourceFile);
-      Program.loadRecentFiles();
       this.setProjectPath(gameFile.getPath());
 
       // load maps from game file
@@ -330,7 +334,7 @@ public class EditorScreen extends Screen {
 
       // load custom emitter files
       loadCustomEmitters(this.getGameFile().getEmitters());
-      Program.getAssetTree().forceUpdate();
+      Program.updateAssets();
 
       // display first available map after loading all stuff
       // also switch to map component
@@ -347,6 +351,10 @@ public class EditorScreen extends Screen {
       log.log(Level.INFO, "Loading gamefile {0} took: {1} ms", new Object[] { gameFile, (System.nanoTime() - currentTime) / 1000000.0 });
       this.loading = false;
     }
+  }
+
+  public void onLoaded(Runnable callback) {
+    this.loadedCallbacks.add(callback);
   }
 
   public void importSpriteFile() {
@@ -504,7 +512,6 @@ public class EditorScreen extends Screen {
         return;
       }
 
-
       if (this.gameFile.getTilesets().stream().anyMatch(x -> x.getName().equals(tileset.getName()))) {
         int result = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), Resources.strings().get("import_tileset_title", tileset.getName()), Resources.strings().get("import_tileset_title"), JOptionPane.YES_NO_OPTION);
         if (result == JOptionPane.NO_OPTION) {
@@ -540,7 +547,7 @@ public class EditorScreen extends Screen {
     this.getMapComponent().reloadEnvironment();
 
     if (forceAssetTreeUpdate) {
-      Program.getAssetTree().forceUpdate();
+      Program.updateAssets();
     }
   }
 
@@ -642,7 +649,7 @@ public class EditorScreen extends Screen {
       this.getGameFile().getMaps().add(map);
     }
 
-    Program.getAssetTree().forceUpdate();
+    Program.updateAssets();
   }
 
   private String saveGameFile(String target) {
@@ -650,7 +657,7 @@ public class EditorScreen extends Screen {
     this.currentResourceFile = saveFile;
     Program.getUserPreferences().setLastGameFile(this.currentResourceFile);
     Program.getUserPreferences().addOpenedFile(this.currentResourceFile);
-    Program.loadRecentFiles();
+    this.gamefileLoaded();
     log.log(Level.INFO, "saved {0} maps, {1} spritesheets, {2} tilesets, {3} emitters, {4} blueprints, {5} sounds to {6}",
         new Object[] { this.getGameFile().getMaps().size(), this.getGameFile().getSpriteSheets().size(), this.getGameFile().getTilesets().size(), this.getGameFile().getEmitters().size(), this.getGameFile().getBluePrints().size(), this.getGameFile().getSounds().size(), this.currentResourceFile });
     this.setCurrentStatus(Resources.strings().get("status_gamefile_saved"));
@@ -737,4 +744,13 @@ public class EditorScreen extends Screen {
       log.log(Level.INFO, "{0} tilesets loaded from {1}", new Object[] { cnt, map.getName() });
     }
   }
+
+  private void gamefileLoaded() {
+    Program.getUserPreferences().setLastGameFile(this.currentResourceFile);
+    Program.getUserPreferences().addOpenedFile(this.currentResourceFile);
+    for (Runnable callback : this.loadedCallbacks) {
+      callback.run();
+    }
+  }
+
 }
