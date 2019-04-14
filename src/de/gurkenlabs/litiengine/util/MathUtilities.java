@@ -28,14 +28,74 @@ public class MathUtilities {
   }
 
   public static double clamp(final double value, final double min, final double max) {
-    return Math.max(min, Math.min(max, value));
+    if (min > max) {
+      throw new IllegalArgumentException("min of " + min + " is greater than max of " + max);
+    }
+
+    if (value < min) {
+      return min;
+    }
+
+    if (value > max) {
+      return max;
+    }
+
+    return value;
   }
 
   public static float clamp(final float value, final float min, final float max) {
-    return Math.max(min, Math.min(max, value));
+    if (min > max) {
+      throw new IllegalArgumentException("min of " + min + " is greater than max of " + max);
+    }
+
+    if (value < min) {
+      return min;
+    }
+
+    if (value > max) {
+      return max;
+    }
+
+    return value;
+  }
+
+  public static byte clamp(final byte value, final byte min, final byte max) {
+    if (min > max) {
+      throw new IllegalArgumentException("min of " + min + " is greater than max of " + max);
+    }
+
+    if (value < min) {
+      return min;
+    }
+
+    if (value > max) {
+      return max;
+    }
+
+    return value;
+  }
+
+  public static short clamp(final short value, final short min, final short max) {
+    if (min > max) {
+      throw new IllegalArgumentException("min of " + min + " is greater than max of " + max);
+    }
+
+    if (value < min) {
+      return min;
+    }
+
+    if (value > max) {
+      return max;
+    }
+
+    return value;
   }
 
   public static int clamp(final int value, final int min, final int max) {
+    if (min > max) {
+      throw new IllegalArgumentException("min of " + min + " is greater than max of " + max);
+    }
+
     if (value < min) {
       return min;
     }
@@ -48,6 +108,10 @@ public class MathUtilities {
   }
 
   public static long clamp(final long value, final long min, final long max) {
+    if (min > max) {
+      throw new IllegalArgumentException("min of " + min + " is greater than max of " + max);
+    }
+
     if (value < min) {
       return min;
     }
