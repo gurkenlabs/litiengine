@@ -1,7 +1,5 @@
 package de.gurkenlabs.utiliti.swing;
 
-import java.awt.Image;
-
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 

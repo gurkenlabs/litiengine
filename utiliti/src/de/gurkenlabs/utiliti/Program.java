@@ -312,6 +312,9 @@ public class Program {
     JMenu mnFile = initFileMenu();
     menuBar.add(mnFile);
 
+    JMenu mnEdit = initEditMenu();
+    menuBar.add(mnEdit);
+
     JMenu mnView = initViewMenu();
     menuBar.add(mnView);
 
@@ -422,7 +425,7 @@ public class Program {
   private static JMenu initFileMenu() {
     JMenu mnFile = new JMenu(Resources.strings().get("menu_file"));
     mnFile.setMnemonic('F');
-    
+
     JMenuItem create = new JMenuItem(Resources.strings().get("menu_createProject"));
     create.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, Event.CTRL_MASK));
     create.addActionListener(a -> EditorScreen.instance().create());
@@ -455,10 +458,44 @@ public class Program {
     return mnFile;
   }
 
+  private static JMenu initEditMenu() {
+    JMenu mnEdit = new JMenu(Resources.strings().get("menu_edit"));
+    mnEdit.setMnemonic('E');
+
+    JMenuItem undo = new JMenuItem(Resources.strings().get("menu_undo"));
+    undo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, Event.CTRL_MASK));
+    undo.addActionListener(a -> UndoManager.instance().undo());
+
+    JMenuItem redo = new JMenuItem(Resources.strings().get("menu_redo"));
+    redo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, Event.CTRL_MASK));
+    redo.addActionListener(a -> UndoManager.instance().redo());
+
+    JMenuItem cut = new JMenuItem(Resources.strings().get("menu_cut"));
+    cut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Event.CTRL_MASK));
+    cut.addActionListener(a -> EditorScreen.instance().getMapComponent().cut());
+    
+    
+    JMenuItem copy = new JMenuItem(Resources.strings().get("menu_copy"));
+    copy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Event.CTRL_MASK));
+    copy.addActionListener(a -> EditorScreen.instance().getMapComponent().copy());
+
+    JMenuItem paste = new JMenuItem(Resources.strings().get("menu_paste"));
+    paste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Event.CTRL_MASK));
+    paste.addActionListener(a -> EditorScreen.instance().getMapComponent().paste());
+
+    mnEdit.add(undo);
+    mnEdit.add(redo);
+    mnEdit.addSeparator();
+    mnEdit.add(cut);
+    mnEdit.add(copy);
+    mnEdit.add(paste);
+    return mnEdit;
+  }
+
   private static JMenu initViewMenu() {
     JMenu mnView = new JMenu(Resources.strings().get("menu_view"));
     mnView.setMnemonic('V');
-    
+
     JCheckBoxMenuItem snapToPixels = new JCheckBoxMenuItem(Resources.strings().get("menu_snapPixels"));
     snapToPixels.setState(userPreferences.isSnapPixels());
     snapToPixels.addItemListener(e -> {
