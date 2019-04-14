@@ -79,6 +79,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   @XmlElement(name = "tile")
   private List<TilesetEntry> tiles = null;
 
+  @XmlTransient
   private List<TilesetEntry> allTiles;
 
   @XmlTransient
