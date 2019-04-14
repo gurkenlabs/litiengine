@@ -9,7 +9,12 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
+import java.util.Enumeration;
+import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -18,6 +23,9 @@ import javax.swing.JScrollBar;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.plaf.FontUIResource;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameListener;
@@ -32,6 +40,7 @@ import de.gurkenlabs.utiliti.swing.menus.MainMenuBar;
 import de.gurkenlabs.utiliti.swing.panels.MapObjectPanel;
 
 public final class UI {
+  private static final Logger log = Logger.getLogger(UI.class.getName());
   private static JScrollBar horizontalScroll;
   private static JScrollBar verticalScroll;
   private static JPopupMenu canvasPopup;
@@ -85,7 +94,7 @@ public final class UI {
 
     Game.screens().display(EditorScreen.instance());
 
-    Style.initSwingComponentStyle();
+    initSwingComponentStyle();
     Tray.init();
     Game.window().getRenderComponent().setCursor(Cursors.DEFAULT, 0, 0);
     Game.window().getRenderComponent().setCursorOffsetX(0);
@@ -245,5 +254,30 @@ public final class UI {
         }
       }
     });
+  }
+
+  public static void initSwingComponentStyle() {
+    try {
+      JOptionPane.setDefaultLocale(Locale.getDefault());
+      JPopupMenu.setDefaultLightWeightPopupEnabled(false);
+      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+      UIManager.getDefaults().put("SplitPane.border", BorderFactory.createEmptyBorder());
+      setDefaultSwingFont(new FontUIResource(Style.FONT_DEFAULT));
+    } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
+      log.log(Level.SEVERE, e.getLocalizedMessage(), e);
+    }
+  }
+
+  public static void setDefaultSwingFont(FontUIResource font) {
+    Enumeration<Object> keys = UIManager.getDefaults().keys();
+    while (keys.hasMoreElements()) {
+      Object key = keys.nextElement();
+
+      Object value = UIManager.get(key);
+
+      if (value instanceof javax.swing.plaf.FontUIResource) {
+        UIManager.put(key, font);
+      }
+    }
   }
 }

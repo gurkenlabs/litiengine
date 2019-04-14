@@ -2,17 +2,6 @@ package de.gurkenlabs.utiliti;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.util.Enumeration;
-import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.swing.BorderFactory;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.plaf.FontUIResource;
 
 import de.gurkenlabs.litiengine.resources.Resources;
 
@@ -44,33 +33,6 @@ public final class Style {
   public static final Font FONT_DEFAULT = Resources.fonts().get("OpenSans.ttf", Font.PLAIN, 11);
   public static final String FONTNAME_CONSOLE = "Consolas";
   
-  private static final Logger log = Logger.getLogger(Style.class.getName());
-
-  public static void initSwingComponentStyle() {
-    try {
-      JOptionPane.setDefaultLocale(Locale.getDefault());
-      JPopupMenu.setDefaultLightWeightPopupEnabled(false);
-      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-      UIManager.getDefaults().put("SplitPane.border", BorderFactory.createEmptyBorder());
-      setDefaultSwingFont(new FontUIResource(FONT_DEFAULT));
-    } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
-      log.log(Level.SEVERE, e.getLocalizedMessage(), e);
-    }
-  }
-
-  public static void setDefaultSwingFont(FontUIResource font) {
-    Enumeration<Object> keys = UIManager.getDefaults().keys();
-    while (keys.hasMoreElements()) {
-      Object key = keys.nextElement();
-      ;
-      Object value = UIManager.get(key);
-
-      if (value instanceof javax.swing.plaf.FontUIResource) {
-        UIManager.put(key, font);
-      }
-    }
-  }
-
   private Style() {
     throw new UnsupportedOperationException();
   }
