@@ -11,7 +11,6 @@ import javax.xml.bind.annotation.XmlElement;
 
 import de.gurkenlabs.litiengine.environment.tilemap.ITile;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
-import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 
 public class TileLayer extends Layer implements ITileLayer {
 
@@ -102,12 +101,7 @@ public class TileLayer extends Layer implements ITileLayer {
   void finish(URL location) throws TmxException {
     super.finish(location);
     for (Tile tile : getData()) {
-      for (ITileset tileset : this.getMap().getTilesets()) {
-        if (tileset.containsTile(tile.getGridId())) {
-          tile.setTilesetEntry(tileset.getTile(tile.getGridId() - tileset.getFirstGridId()));
-          break;
-        }
-      }
+      tile.setTilesetEntry(this.getMap().getTilesetEntry(tile.getGridId()));
     }
   }
 }

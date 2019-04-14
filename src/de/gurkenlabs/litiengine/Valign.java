@@ -1,9 +1,19 @@
 package de.gurkenlabs.litiengine;
 
+import javax.xml.bind.annotation.XmlEnum;
+import javax.xml.bind.annotation.XmlEnumValue;
+
 import de.gurkenlabs.litiengine.util.MathUtilities;
 
+@XmlEnum
 public enum Valign {
-  DOWN(1f), MIDDLE(0.5f), TOP(0f), MIDDLE_TOP(0.25f), MIDDLE_DOWN(0.75f);
+  @XmlEnumValue("bottom")
+  DOWN(1f),
+  @XmlEnumValue("center")
+  MIDDLE(0.5f),
+  @XmlEnumValue("top")
+  TOP(0f),
+  MIDDLE_TOP(0.25f), MIDDLE_DOWN(0.75f);
 
   public final float portion;
 

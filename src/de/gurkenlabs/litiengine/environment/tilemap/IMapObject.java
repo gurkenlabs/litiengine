@@ -21,6 +21,8 @@ public interface IMapObject extends ICustomPropertyProvider, Resource {
    */
   public int getGridId();
 
+  public ITilesetEntry getTile();
+
   /**
    * Gets the hit box.
    *
@@ -49,6 +51,8 @@ public interface IMapObject extends ICustomPropertyProvider, Resource {
   public IPolygon getPolygon();
   
   public Ellipse2D getEllipse();
+
+  public IMapObjectText getText();
 
   public IMapObjectLayer getLayer();
 

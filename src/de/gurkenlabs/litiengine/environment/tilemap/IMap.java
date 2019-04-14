@@ -18,6 +18,8 @@ public interface IMap extends ILayerList {
    */
   public List<ITileset> getTilesets();
 
+  public ITilesetEntry getTilesetEntry(int gid);
+
   /**
    * Gets the orientation.
    *

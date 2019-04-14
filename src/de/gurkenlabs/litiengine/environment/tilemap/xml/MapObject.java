@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine.environment.tilemap.xml;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.net.URL;
 import java.util.Arrays;
 
 import javax.xml.bind.Unmarshaller;
@@ -15,6 +16,8 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.IPolygon;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
+import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectText;
+import de.gurkenlabs.litiengine.environment.tilemap.ITilesetEntry;
 
 /**
  * The Class MapObject.
@@ -48,6 +51,9 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   @XmlAttribute
   private Integer gid;
 
+  @XmlTransient
+  private ITilesetEntry tile;
+
   @XmlElement
   private Polyline polyline;
 
@@ -59,6 +65,9 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
 
   @XmlElement
   private String ellipse;
+
+  @XmlElement
+  private Text text;
 
   private transient MapObjectLayer layer;
 
@@ -148,6 +157,11 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   }
 
   @Override
+  public ITilesetEntry getTile() {
+    return this.tile;
+  }
+
+  @Override
   public Rectangle2D getBoundingBox() {
     return new Rectangle2D.Double(this.getX(), this.getY(), this.width, this.height);
   }
@@ -194,6 +208,11 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
     }
 
     return new Ellipse2D.Double(this.getX(), this.getY(), this.getWidth(), this.getHeight());
+  }
+
+  @Override
+  public IMapObjectText getText() {
+    return this.text;
   }
 
   @Override
@@ -366,6 +385,14 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
 
     if (this.polyline != null && this.polyline.getPoints().isEmpty()) {
       this.polyline = null;
+    }
+  }
+
+  @Override
+  void finish(URL location) throws TmxException {
+    super.finish(location);
+    if (this.gid != null) {
+      this.tile = this.getLayer().getMap().getTilesetEntry(this.gid);
     }
   }
 

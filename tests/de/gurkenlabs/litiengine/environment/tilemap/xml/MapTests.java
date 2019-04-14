@@ -100,7 +100,7 @@ public class MapTests {
 
     IMapObjectLayer layer = map.getMapObjectLayers().get(0);
     assertEquals("test", layer.getName());
-    assertEquals(1, layer.getMapObjects().size());
+    assertEquals(4, layer.getMapObjects().size());
     assertEquals(16, layer.getSizeInTiles().width);
 
     IMapObject object = map.getMapObject(1);
@@ -108,7 +108,7 @@ public class MapTests {
     assertEquals(layer, map.getMapObjectLayer(object));
 
     assertEquals(1, map.getMapObjects("TEST_TYPE").size());
-    assertEquals(1, map.getMapObjects().size());
+    assertEquals(4, map.getMapObjects().size());
     assertEquals("TEST_TYPE", object.getType());
     assertEquals("bar", object.getStringValue("foo"));
     assertEquals(0.1f, object.getX());

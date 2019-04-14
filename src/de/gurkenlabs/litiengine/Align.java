@@ -1,12 +1,24 @@
 package de.gurkenlabs.litiengine;
 
+import javax.xml.bind.annotation.XmlEnum;
+import javax.xml.bind.annotation.XmlEnumValue;
+
 import de.gurkenlabs.litiengine.util.MathUtilities;
 
 /**
  * This enum defines a range of horizontal alignments.
  */
+@XmlEnum
 public enum Align {
-  CENTER(0.5f), LEFT(0f), RIGHT(1f), CENTER_LEFT(0.25f), CENTER_RIGHT(0.75f);
+  @XmlEnumValue("center")
+  CENTER(0.5f),
+  @XmlEnumValue("left")
+  LEFT(0f),
+  @XmlEnumValue("right")
+  RIGHT(1f),
+  @XmlEnumValue("justify")
+  JUSTIFY(Float.NaN), // for use in TMX maps
+  CENTER_LEFT(0.25f), CENTER_RIGHT(0.75f);
 
   public final float portion;
 

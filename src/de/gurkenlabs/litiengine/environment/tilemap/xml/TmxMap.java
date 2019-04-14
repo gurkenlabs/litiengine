@@ -32,6 +32,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapOrientation;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
+import de.gurkenlabs.litiengine.environment.tilemap.ITilesetEntry;
 import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
 import de.gurkenlabs.litiengine.environment.tilemap.RenderOrder;
 import de.gurkenlabs.litiengine.environment.tilemap.StaggerAxis;
@@ -197,6 +198,16 @@ public final class TmxMap extends CustomPropertyProvider implements IMap, Compar
   @Override
   public List<ITileset> getTilesets() {
     return this.tilesets;
+  }
+
+  @Override
+  public ITilesetEntry getTilesetEntry(int gid) {
+    for (ITileset tileset : this.getTilesets()) {
+      if (tileset.containsTile(gid)) {
+        return tileset.getTile(gid - tileset.getFirstGridId());
+      }
+    }
+    return null;
   }
 
   @Override
