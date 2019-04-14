@@ -36,7 +36,6 @@ public class MathUtilities {
   }
 
   public static byte clamp(final byte value, final byte min, final byte max) {
-
     if (value < min) {
       return min;
     }

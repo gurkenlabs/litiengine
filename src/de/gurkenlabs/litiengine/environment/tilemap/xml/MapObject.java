@@ -34,11 +34,11 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
 
   @XmlAttribute
   @XmlJavaTypeAdapter(value = DecimalFloatAdapter.class)
-  private Float x = 0f;
+  private Float x;
 
   @XmlAttribute
   @XmlJavaTypeAdapter(value = DecimalFloatAdapter.class)
-  private Float y = 0f;
+  private Float y;
 
   @XmlAttribute
   @XmlJavaTypeAdapter(value = DecimalFloatAdapter.class)
