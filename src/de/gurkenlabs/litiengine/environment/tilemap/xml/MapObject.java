@@ -31,43 +31,38 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
 
   @XmlAttribute
   @XmlJavaTypeAdapter(value = DecimalFloatAdapter.class)
-  private Float x;
+  private Float x = 0f;
 
   @XmlAttribute
   @XmlJavaTypeAdapter(value = DecimalFloatAdapter.class)
-  private Float y;
+  private Float y = 0f;
 
   @XmlAttribute
   @XmlJavaTypeAdapter(value = DecimalFloatAdapter.class)
-  private Float width;
+  private Float width = 0f;
 
   @XmlAttribute
   @XmlJavaTypeAdapter(value = DecimalFloatAdapter.class)
-  private Float height;
+  private Float height = 0f;
 
   @XmlAttribute
   private Integer gid;
 
-  @XmlElement(name = "polyline")
+  @XmlElement
   private Polyline polyline;
 
-  @XmlElement(name = "polygon")
+  @XmlElement
   private Polygon polygon;
 
-  @XmlElement(name = "point")
-  private String pointElement;
+  @XmlElement
+  private String point;
 
-  @XmlElement(name = "ellipse")
-  private String ellipseElement;
+  @XmlElement
+  private String ellipse;
 
   private transient MapObjectLayer layer;
 
   public MapObject() {
-    super();
-    this.setX(0f);
-    this.setY(0f);
-    this.setWidth(0f);
-    this.setHeight(0f);
   }
 
   /**
@@ -346,12 +341,12 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
 
   @Override
   public boolean isPoint() {
-    return this.pointElement != null;
+    return this.point != null;
   }
 
   @Override
   public boolean isEllipse() {
-    return this.ellipseElement != null;
+    return this.ellipse != null;
   }
 
   @SuppressWarnings("unused")
