@@ -47,7 +47,6 @@ The [LITIengine documentation pages](https://docs.litiengine.com/) containing in
   * ...
 * 2D Sound Engine (support for .wav, .mp3 and .ogg)
 * Support for Tile Maps in .tmx format (e.g. made with [Tiled Editor](http://www.mapeditor.org/))
-  * **Isometric maps are not currently supported, but are in development**
 * Message Based Networking Framework
 * Player Input via Gamepad/Keyboard/Mouse
 * Entity Framework
