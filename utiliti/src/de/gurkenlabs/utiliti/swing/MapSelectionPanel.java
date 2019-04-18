@@ -848,7 +848,10 @@ public class MapSelectionPanel extends JSplitPane {
       addEntitiesToTreeNode(Game.world().environment().getLightSources(), this.nodeLights, Resources.strings().get("panel_mapselection_lights"), Icons.LIGHT);
       addEntitiesToTreeNode(Game.world().environment().getStaticShadows(), this.nodeStaticShadows, Resources.strings().get("panel_mapselection_shadow"), Icons.SHADOWBOX);
       addEntitiesToTreeNode(Game.world().environment().getEmitters(), this.nodeEmitter, Resources.strings().get("panel_mapselection_emitter"), Icons.EMITTER);
+    } else {
+      this.nodeRoot.removeAllChildren();
     }
+    
     this.entitiesTreeModel.reload();
   }
 

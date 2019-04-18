@@ -226,6 +226,18 @@ public final class Resources {
     return stream.markSupported() ? stream : new BufferedInputStream(stream);
   }
 
+  /**
+   * Clears the all resource containers by removing previously loaded resources.
+   */
+  public static void clearAll() {
+    fonts().clear();
+    sounds().clear();
+    maps().clear();
+    tilesets().clear();
+    images().clear();
+    spritesheets().clear();
+  }
+
   public static URL getLocation(String name) {
     URL fromClass = ClassLoader.getSystemResource(name);
     if (fromClass != null) {

@@ -16,6 +16,7 @@ import java.net.URL;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -276,6 +277,25 @@ public class EditorScreen extends Screen {
     }
   }
 
+  public void close() {
+    boolean proceedClosing = UI.notifyPendingChanges();
+    if (!proceedClosing) {
+      return;
+    }
+
+    Game.world().unloadEnvironment();
+    UndoManager.clearAll();
+    this.currentResourceFile = null;
+    this.gameFile = null;
+    this.gamefileLoaded();
+    this.setProjectPath(null);
+    this.mapComponent.loadMaps(Arrays.asList());
+    Resources.clearAll();
+    UI.updateAssets();
+    this.changeComponent(ComponentType.MAP);
+    this.setCurrentStatus(Resources.strings().get("status_gamefile_closed"));
+  }
+
   public void load(File gameFile) {
     boolean proceedLoading = UI.notifyPendingChanges();
     if (!proceedLoading) {
@@ -307,7 +327,7 @@ public class EditorScreen extends Screen {
       if (this.gameFile == null) {
         throw new IllegalArgumentException("The game file " + gameFile + " could not be loaded!");
       }
-      
+
       this.gamefileLoaded();
 
       this.setProjectPath(gameFile.getPath());

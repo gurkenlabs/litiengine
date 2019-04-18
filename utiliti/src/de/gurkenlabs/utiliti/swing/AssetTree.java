@@ -95,6 +95,10 @@ public class AssetTree extends JTree {
     final TreePath soundPath = new TreePath(this.nodeSounds.getPath());
 
     final ResourceBundle gameFile = EditorScreen.instance().getGameFile();
+    if(gameFile == null) {
+      return;
+    }
+    
     if (selectedPath.equals(spritePath)) {
       this.assetPanel.loadSprites(gameFile.getSpriteSheets().stream().collect(Collectors.toList()));
     } else if (this.getSelectionPath().equals(propPath)) {

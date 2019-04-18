@@ -23,42 +23,48 @@ public final class FileMenu extends JMenu {
     super(Resources.strings().get("menu_file"));
     this.setMnemonic('F');
 
-    JMenuItem create = new JMenuItem(Resources.strings().get("menu_createProject"));
+    JMenuItem create = new JMenuItem(Resources.strings().get("menu_file_new"));
     create.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, Event.CTRL_MASK));
     create.addActionListener(a -> EditorScreen.instance().create());
 
-    JMenuItem load = new JMenuItem(Resources.strings().get("menu_loadProject"));
+    JMenuItem load = new JMenuItem(Resources.strings().get("menu_file_open"));
     load.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Event.CTRL_MASK));
     load.addActionListener(a -> EditorScreen.instance().load());
 
-    JMenuItem save = new JMenuItem(Resources.strings().get("menu_save"));
+    JMenuItem close = new JMenuItem(Resources.strings().get("menu_file_close"));
+    close.addActionListener(a -> EditorScreen.instance().close());
+    close.setEnabled(false);
+    EditorScreen.instance().onLoaded(() -> close.setEnabled(EditorScreen.instance().getCurrentResourceFile() != null));
+
+    this.recentFiles = new JMenu(Resources.strings().get("menu_file_recentFiles"));
+    loadRecentFiles();
+    EditorScreen.instance().onLoaded(this::loadRecentFiles);
+
+    JMenuItem save = new JMenuItem(Resources.strings().get("menu_file_save"));
     save.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Event.CTRL_MASK));
     save.addActionListener(a -> EditorScreen.instance().save(false));
 
-    JMenuItem saveAs = new JMenuItem(Resources.strings().get("menu_saveAs"));
+    JMenuItem saveAs = new JMenuItem(Resources.strings().get("menu_file_saveAs"));
     saveAs.addActionListener(a -> EditorScreen.instance().save(true));
 
     JMenuItem exit = new JMenuItem(Resources.strings().get("menu_exit"));
     exit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, Event.CTRL_MASK));
     exit.addActionListener(a -> System.exit(0));
 
-    this.recentFiles = new JMenu(Resources.strings().get("menu_recentFiles"));
-    loadRecentFiles();
-    EditorScreen.instance().onLoaded(this::loadRecentFiles);
-
     this.add(create);
     this.add(load);
+    this.add(close);
+    this.add(recentFiles);
+    this.addSeparator();
     this.add(save);
     this.add(saveAs);
-    this.addSeparator();
-
-    this.add(recentFiles);
     this.addSeparator();
     this.add(exit);
   }
 
   public void loadRecentFiles() {
     recentFiles.removeAll();
+    int added = 0;
     for (String recent : Program.preferences().getLastOpenedFiles()) {
       if (recent != null && !recent.isEmpty() && new File(recent).exists()) {
         JMenuItem fileButton = new JMenuItem(recent);
@@ -68,7 +74,25 @@ public final class FileMenu extends JMenu {
         });
 
         recentFiles.add(fileButton);
+        added++;
       }
     }
+
+    if (added == 0) {
+      recentFiles.setEnabled(false);
+      return;
+    }
+
+    JMenuItem clear = new JMenuItem(Resources.strings().get("menu_file_clear_recent"));
+    clear.addActionListener(a -> {
+      recentFiles.removeAll();
+      Program.preferences().clearOpenedFiles();
+      Program.preferences().setLastGameFile(null);
+      recentFiles.setEnabled(false);
+    });
+
+    recentFiles.addSeparator();
+    recentFiles.add(clear);
+    recentFiles.setEnabled(true);
   }
 }

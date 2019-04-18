@@ -85,8 +85,6 @@ public final class ViewMenu extends JMenu {
       centerFocus.setEnabled(mo != null);
     });
 
-    this.add(setGrid);
-    this.addSeparator();
     this.add(renderGrid);
     this.add(renderCollision);
     this.add(renderCustomMapObjects);
@@ -99,5 +97,7 @@ public final class ViewMenu extends JMenu {
     this.addSeparator();
     this.add(snapToPixels);
     this.add(snapToGrid);
+    this.addSeparator();
+    this.add(setGrid);
   }
 }

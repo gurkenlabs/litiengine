@@ -6,6 +6,7 @@ import java.awt.event.KeyEvent;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -16,6 +17,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ColorHelper;
+import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.components.EditorScreen;
 import de.gurkenlabs.utiliti.swing.dialogs.MapPropertyPanel;
@@ -28,17 +30,17 @@ public final class MapMenu extends JMenu {
     super(Resources.strings().get("menu_map"));
     this.setMnemonic('M');
 
-    JMenuItem imp = new JMenuItem(Resources.strings().get("menu_import"));
+    JMenuItem imp = new JMenuItem(Resources.strings().get("menu_map_import"));
     imp.addActionListener(a -> EditorScreen.instance().getMapComponent().importMap());
 
-    JMenuItem exp = new JMenuItem(Resources.strings().get("menu_export"));
+    JMenuItem exp = new JMenuItem(Resources.strings().get("menu_map_export"));
     exp.addActionListener(a -> EditorScreen.instance().getMapComponent().exportMap());
 
-    JMenuItem saveMapSnapshot = new JMenuItem(Resources.strings().get("menu_exportMapSnapshot"));
+    JMenuItem saveMapSnapshot = new JMenuItem(Resources.strings().get("menu_map_snapshot"));
     saveMapSnapshot.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_PRINTSCREEN, Event.SHIFT_MASK));
     saveMapSnapshot.addActionListener(a -> EditorScreen.instance().saveMapSnapshot());
 
-    JMenuItem reassignIDs = new JMenuItem(Resources.strings().get("menu_reassignMapIds"));
+    JMenuItem reassignIDs = new JMenuItem(Resources.strings().get("menu_map_reassignMapIds"));
     reassignIDs.addActionListener(a -> {
       try {
         int minID = Integer.parseInt(JOptionPane.showInputDialog(Resources.strings().get("panel_reassignMapIds"), 1));
@@ -49,11 +51,10 @@ public final class MapMenu extends JMenu {
 
     });
 
-    JMenuItem del2 = new JMenuItem(Resources.strings().get("menu_removeMap"));
+    JMenuItem del2 = new JMenuItem(Resources.strings().get("menu_map_delete"));
     del2.addActionListener(a -> EditorScreen.instance().getMapComponent().deleteMap());
 
-    JMenuItem mapProps = new JMenuItem(Resources.strings().get("menu_properties"));
-    mapProps.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, Event.CTRL_MASK));
+    JMenuItem mapProps = new JMenuItem(Resources.strings().get("menu_map_properties"));
     mapProps.addActionListener(a -> {
       if (EditorScreen.instance().getMapComponent().getMaps() == null || EditorScreen.instance().getMapComponent().getMaps().isEmpty()) {
         return;
@@ -62,7 +63,7 @@ public final class MapMenu extends JMenu {
       MapPropertyPanel panel = new MapPropertyPanel();
       panel.bind(Game.world().environment().getMap());
 
-      int option = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), panel, Resources.strings().get("menu_mapProperties"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+      int option = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), panel, Resources.strings().get("menu_map_properties"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
       if (option == JOptionPane.OK_OPTION) {
         panel.saveChanges();
 
@@ -81,13 +82,22 @@ public final class MapMenu extends JMenu {
         EditorScreen.instance().getMapComponent().loadEnvironment((TmxMap) Game.world().environment().getMap());
       }
     });
+    
+    JCheckBoxMenuItem sync = new JCheckBoxMenuItem(Resources.strings().get("menu_map_syncMaps"));
+    sync.setState(Program.preferences().isSyncMaps());
+    sync.addItemListener(e -> Program.preferences().setSyncMaps(sync.getState()));
 
     this.add(imp);
     this.add(exp);
-    this.add(saveMapSnapshot);
-    this.add(reassignIDs);
     this.add(del2);
     this.addSeparator();
+    this.add(saveMapSnapshot);
+    this.add(sync);
+    this.add(reassignIDs);
+    this.addSeparator();
     this.add(mapProps);
+    
+    this.setEnabled(false);
+    EditorScreen.instance().onLoaded(() -> this.setEnabled(EditorScreen.instance().getCurrentResourceFile() != null));
   }
 }

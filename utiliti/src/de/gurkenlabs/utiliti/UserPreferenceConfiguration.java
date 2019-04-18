@@ -140,6 +140,10 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
     return this.lastOpenedFiles;
   }
 
+  public void clearOpenedFiles() {
+    this.lastOpenedFiles = new String[10];
+  }
+
   public void setLastOpenedFiles(String[] lastOpenedFiles) {
     this.lastOpenedFiles = lastOpenedFiles;
   }

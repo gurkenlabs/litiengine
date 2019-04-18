@@ -128,7 +128,7 @@ public abstract class ResourcesContainer<T> {
   }
 
   /**
-   * Clears the resources container by removing all previously loaded resources.
+   * Clears the resource container by removing all previously loaded resources.
    */
   public void clear() {
     this.resources.clear();

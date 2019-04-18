@@ -65,6 +65,9 @@ public final class AddMenu extends JMenu {
     this.add(addLight);
     this.add(addShadow);
     this.add(addEmitter);
+    
+    this.setEnabled(false);
+    EditorScreen.instance().onLoaded(() -> this.setEnabled(EditorScreen.instance().getCurrentResourceFile() != null));
   }
 
   private static void setCreateMode(MapObjectType tpye) {
