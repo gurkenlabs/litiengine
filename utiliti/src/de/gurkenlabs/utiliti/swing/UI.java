@@ -34,6 +34,7 @@ import de.gurkenlabs.utiliti.Cursors;
 import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.Style;
 import de.gurkenlabs.utiliti.components.EditorScreen;
+import de.gurkenlabs.utiliti.components.MapComponent;
 import de.gurkenlabs.utiliti.swing.menus.CanvasPopupMenu;
 import de.gurkenlabs.utiliti.swing.menus.MainMenuBar;
 import de.gurkenlabs.utiliti.swing.panels.MapObjectPanel;
@@ -247,6 +248,7 @@ public final class UI {
       @Override
       public void mouseReleased(MouseEvent e) {
         if (SwingUtilities.isRightMouseButton(e)) {
+          EditorScreen.instance().getMapComponent().setEditMode(MapComponent.EDITMODE_EDIT);
           canvasPopup.show(canvas, e.getX(), e.getY());
         }
       }
