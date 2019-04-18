@@ -77,6 +77,9 @@ public class MapRenderer {
 
   private static void drawTile(Graphics2D g, ITileLayer layer, int x, int y, IMap map, Rectangle2D viewport) {
     ITile tile = layer.getTile(x, y);
+    if (tile == null) {
+      return;
+    }
     BufferedImage image = tile.getImage();
     if (image != null) {
       Point p = map.getOrientation().getLocation(x, y, map);
