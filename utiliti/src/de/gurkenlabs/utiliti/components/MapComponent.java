@@ -648,9 +648,10 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     }
 
     for (TransformType trans : TransformType.values()) {
-      if (trans == TransformType.NONE) {
+      if (trans == TransformType.NONE || trans == TransformType.MOVE) {
         continue;
       }
+      
       Rectangle2D transRect = new Rectangle2D.Double(this.getTransX(trans, focus), this.getTransY(trans, focus), this.currentTransformRectSize, this.currentTransformRectSize);
       this.transformRects.put(trans, transRect);
     }
@@ -958,7 +959,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
   private void handleTransform() {
     final IMapObject transformObject = this.getFocusedMapObject();
-    if (transformObject == null || this.currentEditMode != EDITMODE_EDIT || currentTransform == TransformType.NONE) {
+    if (transformObject == null || this.currentEditMode != EDITMODE_EDIT || currentTransform == TransformType.NONE || this.currentTransform == TransformType.MOVE) {
       return;
     }
 
@@ -1355,7 +1356,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     case EDITMODE_MOVE:
       break;
     case EDITMODE_EDIT:
-      if (this.isMoving || this.currentTransform != TransformType.NONE || SwingUtilities.isRightMouseButton(e.getEvent())) {
+      if (this.isMoving || (this.currentTransform != TransformType.NONE && this.currentTransform != TransformType.MOVE) || SwingUtilities.isRightMouseButton(e.getEvent())) {
         return;
       }
 
@@ -1384,7 +1385,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
       break;
     case EDITMODE_EDIT:
-      if (this.currentTransform != TransformType.NONE) {
+      if (this.currentTransform != TransformType.NONE && this.currentTransform != TransformType.MOVE) {
         if (!this.isTransforming) {
           this.isTransforming = true;
           UndoManager.instance().mapObjectChanging(this.getFocusedMapObject());
