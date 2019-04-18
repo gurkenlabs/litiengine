@@ -532,6 +532,15 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     }
   }
 
+  public void centerCameraOnMap() {
+    final Environment env = Game.world().environment();
+    if (env == null) {
+      return;
+    }
+
+    Game.world().camera().setFocus(env.getCenter());
+  }
+
   public void setEditMode(int editMode) {
     if (editMode == this.currentEditMode) {
       return;
@@ -1333,10 +1342,10 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       return;
     }
 
-    if(this.currentTransform == TransformType.MOVE) {
+    if (this.currentTransform == TransformType.MOVE) {
       this.setEditMode(EDITMODE_MOVE);
     }
-    
+
     switch (this.currentEditMode) {
     case EDITMODE_CREATE:
       if (SwingUtilities.isLeftMouseButton(e.getEvent())) {

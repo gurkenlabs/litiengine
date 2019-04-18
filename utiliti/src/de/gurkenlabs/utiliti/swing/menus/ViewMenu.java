@@ -76,6 +76,10 @@ public final class ViewMenu extends JMenu {
     centerFocus.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0));
     centerFocus.addActionListener(a -> EditorScreen.instance().getMapComponent().centerCameraOnFocus());
     centerFocus.setEnabled(false);
+    
+    JMenuItem centerMap = new JMenuItem(Resources.strings().get("menu_view_centermap"));
+    centerMap.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, Event.CTRL_MASK));
+    centerMap.addActionListener(a -> EditorScreen.instance().getMapComponent().centerCameraOnMap());
 
     EditorScreen.instance().getMapComponent().onFocusChanged(mo -> {
       centerFocus.setEnabled(mo != null);
@@ -91,6 +95,7 @@ public final class ViewMenu extends JMenu {
     this.add(zoomIn);
     this.add(zoomOut);
     this.add(centerFocus);
+    this.add(centerMap);
     this.addSeparator();
     this.add(snapToPixels);
     this.add(snapToGrid);
