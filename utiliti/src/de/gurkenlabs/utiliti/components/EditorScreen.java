@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
@@ -562,10 +561,10 @@ public class EditorScreen extends Screen {
       return;
     }
 
-    IMap currentMap = Game.world().environment().getMap();
+    final IMap currentMap = Game.world().environment().getMap();
     Dimension size = currentMap.getOrientation().getSize(currentMap);
     BufferedImage img = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
-    MapRenderer.render(img.createGraphics(), currentMap, new Rectangle());
+    MapRenderer.render(img.createGraphics(), currentMap, currentMap.getBounds());
 
     try {
       final String timeStamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());

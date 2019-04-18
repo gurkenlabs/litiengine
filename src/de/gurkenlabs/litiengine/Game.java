@@ -508,7 +508,14 @@ public final class Game {
       window().getRenderComponent().addMouseMotionListener(Input.mouse());
       window().getRenderComponent().addMouseWheelListener(Input.mouse());
 
-      Input.keyboard().onKeyTyped(KeyEvent.VK_PRINTSCREEN, key -> window().getRenderComponent().takeScreenshot());
+      Input.keyboard().onKeyTyped(KeyEvent.VK_PRINTSCREEN, key -> {
+        // don't take a screenshot if a modifier is active
+        if (key.getModifiers() != 0) {
+          return;
+        }
+
+        window().getRenderComponent().takeScreenshot();
+      });
     }
 
     Runtime.getRuntime().addShutdownHook(new Thread(Game::terminate, "Shutdown"));
