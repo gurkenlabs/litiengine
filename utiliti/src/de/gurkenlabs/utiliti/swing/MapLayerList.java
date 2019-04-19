@@ -80,6 +80,11 @@ public final class MapLayerList extends JScrollPane {
     }, false);
 
     this.buttonRemoveLayer = createButton(Icons.DELETE, (map, selectedLayer) -> {
+      // we need at least on mapobject layer to work with LITIengine entities.
+      if (map.getMapObjectLayers().size() <= 1) {
+        return;
+      }
+
       if (JOptionPane.showConfirmDialog(null, Resources.strings().get("panel_confirmDeleteLayer"), "", JOptionPane.YES_NO_OPTION) != 0) {
         return;
       }
@@ -125,7 +130,7 @@ public final class MapLayerList extends JScrollPane {
       }
 
       EditorScreen.instance().getMapComponent().updateTransformControls();
-    });
+    }, true);
 
     this.buttonLiftLayer = createButton(Icons.LIFT, (map, selectedLayer) -> {
       final int selLayerIndex = this.getCurrentLayerIndex();
@@ -264,27 +269,6 @@ public final class MapLayerList extends JScrollPane {
     }
 
     return Game.world().environment().getMap();
-  }
-
-  private static String getMapName(JCheckBox layer) {
-    return getLayerInfo(layer, 0);
-  }
-
-  private static String getLayerName(JCheckBox layer) {
-    return getLayerInfo(layer, 1);
-  }
-
-  private static String getLayerInfo(JCheckBox layer, int index) {
-    if (layer == null) {
-      return null;
-    }
-
-    String[] layerInfo = layer.getName().split("/");
-    if (layerInfo.length < 2) {
-      return null;
-    }
-
-    return layerInfo[index];
   }
 
   private JButton createButton(Icon icon, BiConsumer<IMap, IMapObjectLayer> consumer) {
