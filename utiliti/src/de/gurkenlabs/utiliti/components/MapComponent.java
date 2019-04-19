@@ -1824,7 +1824,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     }
 
     Font previousFont = g.getFont();
-    Font idFont = previousFont.deriveFont(Math.max(10f, (float) (10 * Math.sqrt(Game.world().camera().getRenderScale()))));
+    Font idFont = previousFont.deriveFont(Math.max(8f, (float) (10 * Math.sqrt(Game.world().camera().getRenderScale()))));
     if (this.currentZoomIndex > DEFAULT_ZOOM_INDEX) {
       idFont = idFont.deriveFont(Font.BOLD);
     }

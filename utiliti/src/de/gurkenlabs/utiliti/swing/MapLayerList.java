@@ -6,8 +6,11 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import javax.swing.Box;
 import javax.swing.DefaultListModel;
@@ -35,6 +38,7 @@ public final class MapLayerList extends JScrollPane {
   private static final Dimension BUTTON_SIZE = new Dimension(24, 24);
 
   private final java.util.Map<String, Integer> selectedLayers;
+  private final List<Consumer<IMap>> layerChangedListeners;
 
   private final JCheckBoxList list;
   private final DefaultListModel<JCheckBox> layerModel;
@@ -51,6 +55,7 @@ public final class MapLayerList extends JScrollPane {
 
   public MapLayerList() {
     this.selectedLayers = new ConcurrentHashMap<>();
+    this.layerChangedListeners = new CopyOnWriteArrayList<>();
 
     this.setViewportBorder(null);
     this.setMinimumSize(new Dimension(150, 0));
@@ -263,6 +268,10 @@ public final class MapLayerList extends JScrollPane {
     }
   }
 
+  public void onLayersChanged(Consumer<IMap> consumer) {
+    this.layerChangedListeners.add(consumer);
+  }
+
   private static IMap getCurrentMap() {
     if (Game.world().environment() == null) {
       return null;
@@ -296,6 +305,9 @@ public final class MapLayerList extends JScrollPane {
       consumer.accept(currentMap, layer);
       this.update();
       UndoManager.instance().recordChanges();
+      for (Consumer<IMap> c : this.layerChangedListeners) {
+        c.accept(getCurrentMap());
+      }
     });
     return button;
   }

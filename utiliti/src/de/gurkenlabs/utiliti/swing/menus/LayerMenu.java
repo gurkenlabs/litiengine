@@ -10,6 +10,7 @@ import javax.swing.JMenuItem;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.Environment;
+import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.resources.Resources;
@@ -21,8 +22,9 @@ public final class LayerMenu extends JMenu {
 
   public LayerMenu() {
     super(Resources.strings().get("menu_move_to_layer"));
-    Game.world().addLoadedListener(this::updateMenu);
+    Game.world().addLoadedListener(e -> this.updateMenu(e.getMap()));
 
+    EditorScreen.instance().getMapLayerList().onLayersChanged(this::updateMenu);
     EditorScreen.instance().getMapComponent().onSelectionChanged(mapObjects -> {
       this.updateMenuItemStates(mapObjects);
     });
@@ -38,16 +40,18 @@ public final class LayerMenu extends JMenu {
       }
     }
   }
-  
-  private void updateMenu(Environment e) {
+
+  private void updateMenu(IMap map) {
     this.removeAll();
-    if (e == null) {
+    if (map == null) {
       return;
     }
 
-    ArrayList<IMapObjectLayer> layers = new ArrayList<>(e.getMap().getMapObjectLayers());
-    
-    // the first layer is the one which is rendered first and thereby technically below all other layers. Reversing the
+    ArrayList<IMapObjectLayer> layers = new ArrayList<>(map.getMapObjectLayers());
+
+    // the first layer is the one which is rendered first and thereby
+    // technically below all other layers. Reversing the
+
     // list for the UI reflects this
     Collections.reverse(layers);
     for (IMapObjectLayer layer : layers) {
@@ -55,6 +59,8 @@ public final class LayerMenu extends JMenu {
       item.addActionListener(event -> moveMapObjects(item.getText()));
       this.add(item);
     }
+
+    this.updateMenuItemStates(EditorScreen.instance().getMapComponent().getSelectedMapObjects());
   }
 
   private void moveMapObjects(String layerName) {
@@ -75,7 +81,7 @@ public final class LayerMenu extends JMenu {
       env.reloadFromMap(mapObject.getId());
       UndoManager.instance().mapObjectChanged(mapObject);
     }
-    
+
     UndoManager.instance().endOperation();
 
     // rebind to refresh the layer property
