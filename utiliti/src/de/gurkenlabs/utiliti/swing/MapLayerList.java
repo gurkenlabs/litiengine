@@ -6,8 +6,6 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 
@@ -23,6 +21,7 @@ import javax.swing.JScrollPane;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
+import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer;
 import de.gurkenlabs.litiengine.resources.Resources;
@@ -36,7 +35,6 @@ public final class MapLayerList extends JScrollPane {
   private static final Dimension BUTTON_SIZE = new Dimension(24, 24);
 
   private final java.util.Map<String, Integer> selectedLayers;
-  private final Map<String, Map<String, Boolean>> layerVisibility;
 
   private final JCheckBoxList list;
   private final DefaultListModel<JCheckBox> layerModel;
@@ -53,7 +51,6 @@ public final class MapLayerList extends JScrollPane {
 
   public MapLayerList() {
     this.selectedLayers = new ConcurrentHashMap<>();
-    this.layerVisibility = new ConcurrentHashMap<>();
 
     this.setViewportBorder(null);
     this.setMinimumSize(new Dimension(150, 0));
@@ -165,11 +162,11 @@ public final class MapLayerList extends JScrollPane {
     // TODO: enabled states for all commands
 
     EditorScreen.instance().getMapComponent().onMapLoading(map -> {
-      if(map == null) {
+      if (map == null) {
         return;
       }
-      
-      this.selectedLayers.put(map.getName(), this.getCurrentLayerIndex());
+
+      this.selectedLayers.put(map.getName(), this.list.getSelectedIndex());
     });
 
     EditorScreen.instance().getMapComponent().onMapLoaded(map -> {
@@ -182,27 +179,34 @@ public final class MapLayerList extends JScrollPane {
   public IMapObjectLayer getCurrentLayer() {
     JCheckBox current = this.list.getSelectedValue();
     if (current == null) {
-      if(this.list.getModel().getSize() == 0) {
+      if (this.list.getModel().getSize() == 0) {
         return null;
       }
-      
+
+      IMapObject focus = EditorScreen.instance().getMapComponent().getFocusedMapObject();
+      if (focus != null) {
+        return focus.getLayer();
+      }
+
       current = this.list.getModel().getElementAt(0);
     }
 
     Object property = current.getClientProperty("layer");
-    if(!(property instanceof IMapObjectLayer)) {
+    if (!(property instanceof IMapObjectLayer)) {
       return null;
     }
-    
-    return (IMapObjectLayer)property;
+
+    return (IMapObjectLayer) property;
   }
 
   public void selectLayer(int index) {
     this.list.setSelectedIndex(index);
   }
+
   public void clear() {
-    
+    this.selectedLayers.clear();
   }
+
   public void update() {
     IMap map = getCurrentMap();
     if (map == null) {
@@ -210,8 +214,6 @@ public final class MapLayerList extends JScrollPane {
       return;
     }
 
-    int lastSelection = this.list.getSelectedIndex();
-    this.saveLayerVisibility();
     this.layerModel.clear();
 
     ArrayList<IMapObjectLayer> layers = new ArrayList<>(map.getMapObjectLayers());
@@ -251,34 +253,9 @@ public final class MapLayerList extends JScrollPane {
       layerModel.addElement(newBox);
     }
 
-    /*
-     * int start = 0; int end = mapList.getModel().getSize() - 1; if (end >= 0)
-     * { this.list.setSelectionInterval(start, end);
-     * this.selectLayer(lastSelection); }
-     */
-  }
-
-  private void saveLayerVisibility() {
-    if (this.list.getModel().getSize() == 0) {
-      return;
+    if (this.selectedLayers.containsKey(map.getName())) {
+      this.selectLayer(this.selectedLayers.get(map.getName()));
     }
-
-    for (int i = 0; i < this.list.getModel().getSize(); i++) {
-      JCheckBox layer = this.list.getModel().getElementAt(i);
-      if (layer == null) {
-        continue;
-      }
-
-      this.saveLayerVisibility(getMapName(layer), getLayerName(layer), layer.isSelected());
-    }
-  }
-
-  private void saveLayerVisibility(String mapName, String layerName, boolean selected) {
-    if (!this.layerVisibility.containsKey(mapName)) {
-      this.layerVisibility.put(mapName, new HashMap<>());
-    }
-
-    this.layerVisibility.get(mapName).put(layerName, selected);
   }
 
   private static IMap getCurrentMap() {
@@ -338,7 +315,7 @@ public final class MapLayerList extends JScrollPane {
     });
     return button;
   }
-  
+
   private int getCurrentLayerIndex() {
     // invert since we display the layers exactly the other way around to
     // reflect the order in which they get rendered
