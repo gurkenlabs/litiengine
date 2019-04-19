@@ -384,6 +384,15 @@ public class MapSelectionPanel extends JSplitPane {
     }
   }
 
+  public void updateComponents() {
+    if (mapList.getSelectedIndex() == -1 && this.model.size() > 0) {
+      this.mapList.setSelectedIndex(0);
+    }
+
+    this.updateMapObjectTree();
+    this.mapLayerList.update();
+  }
+
   private void collapseAll() {
     int row = tree.getRowCount() - 1;
     while (row >= 0) {
@@ -560,14 +569,5 @@ public class MapSelectionPanel extends JSplitPane {
     }
 
     return -1;
-  }
-
-  private void updateComponents() {
-    if (mapList.getSelectedIndex() == -1 && this.model.size() > 0) {
-      this.mapList.setSelectedIndex(0);
-    }
-
-    this.updateMapObjectTree();
-    this.mapLayerList.update();
   }
 }

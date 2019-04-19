@@ -853,6 +853,10 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       maxMapId++;
     }
     UndoManager.instance().endOperation();
+
+    Game.world().environment().clear();
+    Game.world().environment().load();
+    EditorScreen.instance().getMapSelectionPanel().updateComponents();
   }
 
   @Override
