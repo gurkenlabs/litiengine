@@ -310,8 +310,27 @@ public final class Environment implements IRenderable {
 
   public void clear() {
     Game.physics().clear();
+
+    this.combatEntities.clear();
+    this.mobileEntities.clear();
+    this.gravityForces.clear();
+    this.layerEntities.clear();
+    this.entitiesByTag.clear();
+    this.allEntities.clear();
+
+    for (RenderType renderType : RenderType.values()) {
+      this.miscEntities.get(renderType).clear();
+      this.renderListeners.get(renderType).clear();
+      this.renderables.get(renderType).clear();
+    }
+
     dispose(this.getEntities());
     dispose(this.getTriggers());
+    this.getEmitters().clear();
+    this.getCollisionBoxes().clear();
+    this.getProps().clear();
+    this.getCreatures().clear();
+    this.getStaticShadows().clear();
     this.getCombatEntities().clear();
     this.getMobileEntities().clear();
     this.getLightSources().clear();
@@ -319,8 +338,9 @@ public final class Environment implements IRenderable {
     this.getSpawnPoints().clear();
     this.getAreas().clear();
     this.getTriggers().clear();
-    this.allEntities.clear();
-    this.getEntitiesByTag().clear();
+
+    this.ambientLight = null;
+    this.staticShadowLayer = null;
 
     for (Map<Integer, IEntity> type : this.miscEntities.values()) {
       type.clear();
