@@ -346,7 +346,7 @@ public class MapSelectionPanel extends JSplitPane {
       return;
     }
 
-    if (mapObject == null) {
+    if (mapObject == null || mapObject.getType() == null) {
       tree.clearSelection();
       return;
     }
