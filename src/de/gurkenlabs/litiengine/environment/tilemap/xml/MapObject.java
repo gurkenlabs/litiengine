@@ -112,6 +112,11 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
       this.setId(mapObjectToBeCopied.getId());
     }
   }
+  
+  public MapObject(MapObject mapObjectToBeCopied, int id) {
+    this(mapObjectToBeCopied);
+    this.setId(id);
+  }
 
   public static Rectangle2D getBounds2D(IMapObject... objects) {
     return getBounds(objects);

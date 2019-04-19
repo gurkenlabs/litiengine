@@ -13,6 +13,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.util.ColorHelper;
@@ -47,8 +48,10 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
    */
   public MapObjectLayer(MapObjectLayer layerToBeCopied) {
     super(layerToBeCopied);
+    int mapId = Game.world().environment().getNextMapId();
     for (IMapObject obj : layerToBeCopied.getMapObjects()) {
-      this.addMapObject(new MapObject((MapObject) obj));
+      this.addMapObject(new MapObject((MapObject) obj, mapId));
+      mapId++;
     }
     if (layerToBeCopied.getColor() != null) {
       this.setColor(layerToBeCopied.getColorHexString());
@@ -100,7 +103,7 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
       if (obj.getLayer() != null) {
         obj.getLayer().removeMapObject(obj);
       }
-      
+
       this.objects.add(obj);
       obj.setLayer(this);
     }
