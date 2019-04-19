@@ -91,6 +91,10 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
     this.setY(mapObjectToBeCopied.getY());
     this.setWidth(mapObjectToBeCopied.getWidth());
     this.setHeight(mapObjectToBeCopied.getHeight());
+    this.setLayer(mapObjectToBeCopied.layer);
+    this.text = mapObjectToBeCopied.text;
+    this.ellipse = mapObjectToBeCopied.ellipse;
+    this.point = mapObjectToBeCopied.point;
   }
 
   /**
