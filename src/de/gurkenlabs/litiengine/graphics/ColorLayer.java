@@ -21,6 +21,7 @@ public abstract class ColorLayer implements IRenderable {
   protected ColorLayer(Environment env, final Color color) {
     this.environment = env;
     this.color = color;
+
     Dimension size = env.getMap().getSizeInPixels();
     this.layer = Imaging.getCompatibleImage(size.width, size.height);
     this.updateSection(this.environment.getMap().getBounds());
@@ -58,8 +59,7 @@ public abstract class ColorLayer implements IRenderable {
     Rectangle aligned = new Rectangle(minX, minY, maxX - minX, maxY - minY);
 
     final Graphics2D g = this.layer.createGraphics();
-    g.setColor(new Color(0, 0, 0, 0));
-    g.clearRect(aligned.x, aligned.y, aligned.width, aligned.height);
+    this.clearSection(g, aligned);
     g.setClip(aligned.x, aligned.y, aligned.width, aligned.height);
     g.translate(aligned.x, aligned.y);
     this.renderSection(g, aligned);
@@ -67,6 +67,8 @@ public abstract class ColorLayer implements IRenderable {
   }
 
   protected abstract void renderSection(Graphics2D g, Rectangle2D section);
+  
+  protected abstract void clearSection(Graphics2D g, Rectangle2D section);
 
   protected Environment getEnvironment() {
     return this.environment;

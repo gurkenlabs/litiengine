@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.graphics;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
@@ -34,5 +35,12 @@ public class StaticShadowLayer extends ColorLayer {
 
     ar.transform(AffineTransform.getTranslateInstance(-section.getX(), -section.getY()));
     g.fill(ar);
+  }
+  
+  @Override
+  protected void clearSection(Graphics2D g, Rectangle2D section) {
+    g.setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR));
+    g.fill(section);
+    g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
   }
 }
