@@ -1,5 +1,6 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.util.Map;
@@ -16,6 +17,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
@@ -42,7 +44,7 @@ public class MapObjectPanel extends PropertyPanel {
   private final JSpinner spinnerHeight;
   private final JLabel labelEntityID;
   private TagPanel tagPanel;
-  private JLabel lblTags;
+  private JLabel lblLayer;
 
   public MapObjectPanel() {
     this.panels = new ConcurrentHashMap<>();
@@ -66,11 +68,12 @@ public class MapObjectPanel extends PropertyPanel {
     JLabel lblWidth = new JLabel(Resources.strings().get("panel_width"));
     JLabel lblHeight = new JLabel(Resources.strings().get("panel_height"));
     JLabel lblName = new JLabel(Resources.strings().get("panel_name"));
+    JLabel lblTags = new JLabel(Resources.strings().get("panel_tags"));
+    JLabel lblType = new JLabel(Resources.strings().get("panel_type"));
 
     this.textFieldName = new JTextField();
     this.textFieldName.setColumns(10);
 
-    JLabel lblType = new JLabel(Resources.strings().get("panel_type"));
     this.comboBoxType = new JComboBox<>();
     this.comboBoxType.setModel(new DefaultComboBoxModel<MapObjectType>(MapObjectType.values()));
 
@@ -81,17 +84,21 @@ public class MapObjectPanel extends PropertyPanel {
 
     this.updateSpinnerModels();
 
-    JLabel lblNewLabel = new JLabel("ID");
-    lblNewLabel.setFont(lblNewLabel.getFont().deriveFont(Font.BOLD).deriveFont(12f));
+    JLabel lblEntityId = new JLabel("ID");
+    lblEntityId.setFont(lblEntityId.getFont().deriveFont(Font.BOLD).deriveFont(12f));
 
     this.labelEntityID = new JLabel("####");
     this.labelEntityID.setFont(labelEntityID.getFont().deriveFont(12f));
 
+    this.lblLayer = new JLabel("");
+    this.lblLayer.setHorizontalAlignment(SwingConstants.TRAILING);
+    this.lblLayer.setForeground(Color.GRAY);
+    this.lblLayer.setFont(this.lblLayer.getFont().deriveFont(10f));
+
     this.tagPanel = new TagPanel();
 
-    lblTags = new JLabel("tags");
-
     tabbedPanel = new JTabbedPane(JTabbedPane.TOP);
+    
     GroupLayout groupLayout = new GroupLayout(this);
     groupLayout.setHorizontalGroup(
       groupLayout.createParallelGroup(Alignment.TRAILING)
@@ -100,34 +107,36 @@ public class MapObjectPanel extends PropertyPanel {
           .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
             .addComponent(tabbedPanel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 440, Short.MAX_VALUE)
             .addGroup(groupLayout.createSequentialGroup()
-              .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-                .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-                  .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-                    .addComponent(lblX, GroupLayout.PREFERRED_SIZE, 56, GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblWidth, GroupLayout.PREFERRED_SIZE, 56, GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblName, GroupLayout.PREFERRED_SIZE, 56, GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblTags, GroupLayout.PREFERRED_SIZE, 56, GroupLayout.PREFERRED_SIZE))
-                  .addComponent(lblType, GroupLayout.PREFERRED_SIZE, 56, GroupLayout.PREFERRED_SIZE))
-                .addComponent(lblNewLabel, GroupLayout.PREFERRED_SIZE, 56, GroupLayout.PREFERRED_SIZE))
+              .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING, false)
+                .addComponent(lblType, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE)
+                .addComponent(lblX, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE)
+                .addComponent(lblWidth, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE)
+                .addComponent(lblName, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE)
+                .addComponent(lblTags, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE)
+                .addComponent(lblEntityId, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE))
               .addPreferredGap(ComponentPlacement.RELATED)
               .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-                .addComponent(labelEntityID)
-                .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-                  .addComponent(tagPanel, GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE)
-                  .addGroup(groupLayout.createSequentialGroup()
-                    .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-                      .addComponent(spinnerWidth, GroupLayout.DEFAULT_SIZE, 161, Short.MAX_VALUE)
-                      .addComponent(spinnerX, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 161, Short.MAX_VALUE))
-                    .addPreferredGap(ComponentPlacement.UNRELATED)
-                    .addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
-                      .addComponent(lblHeight, GroupLayout.PREFERRED_SIZE, 49, GroupLayout.PREFERRED_SIZE)
-                      .addComponent(lblYcoordinate, GroupLayout.PREFERRED_SIZE, 49, GroupLayout.PREFERRED_SIZE))
-                    .addGap(0)
-                    .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-                      .addComponent(spinnerY, GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE)
-                      .addComponent(spinnerHeight, GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE)))
-                  .addComponent(comboBoxType, 0, 378, Short.MAX_VALUE)
-                  .addComponent(textFieldName, GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE)))))
+                .addComponent(tagPanel, GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE)
+                .addComponent(comboBoxType, 0, 378, Short.MAX_VALUE)
+                .addComponent(textFieldName, GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE)
+                .addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
+                  .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+                    .addGroup(groupLayout.createSequentialGroup()
+                      .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+                        .addComponent(spinnerWidth, GroupLayout.DEFAULT_SIZE, 161, Short.MAX_VALUE)
+                        .addComponent(spinnerX, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 161, Short.MAX_VALUE))
+                      .addPreferredGap(ComponentPlacement.UNRELATED)
+                      .addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
+                        .addComponent(lblHeight, GroupLayout.PREFERRED_SIZE, 49, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblYcoordinate, GroupLayout.PREFERRED_SIZE, 49, GroupLayout.PREFERRED_SIZE))
+                      .addGap(0))
+                    .addGroup(groupLayout.createSequentialGroup()
+                      .addComponent(labelEntityID)
+                      .addGap(184)))
+                  .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+                    .addComponent(spinnerY, GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE)
+                    .addComponent(spinnerHeight, GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE)
+                    .addComponent(lblLayer, GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE))))))
           .addGap(5))
     );
     groupLayout.setVerticalGroup(
@@ -135,8 +144,9 @@ public class MapObjectPanel extends PropertyPanel {
         .addGroup(groupLayout.createSequentialGroup()
           .addGap(5)
           .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-            .addComponent(lblNewLabel, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE)
-            .addComponent(labelEntityID))
+            .addComponent(lblEntityId, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
+            .addComponent(labelEntityID)
+            .addComponent(lblLayer, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE))
           .addGap(5)
           .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
             .addComponent(lblX, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
@@ -157,13 +167,13 @@ public class MapObjectPanel extends PropertyPanel {
           .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
             .addComponent(tagPanel, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
             .addComponent(lblTags, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE))
-          .addGap(5)
+          .addPreferredGap(ComponentPlacement.RELATED)
           .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
             .addComponent(comboBoxType, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
             .addComponent(lblType, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE))
           .addPreferredGap(ComponentPlacement.RELATED)
           .addComponent(tabbedPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-          .addContainerGap())
+          .addGap(108))
     );
     setLayout(groupLayout);
 
@@ -278,6 +288,7 @@ public class MapObjectPanel extends PropertyPanel {
     }
     this.textFieldName.setText("");
     this.labelEntityID.setText("####");
+    this.lblLayer.setText("");
     this.comboBoxType.setEnabled(true);
     this.tagPanel.clear();
   }
@@ -292,10 +303,13 @@ public class MapObjectPanel extends PropertyPanel {
     MapObjectType type = MapObjectType.get(mapObject.getType());
     this.comboBoxType.setSelectedItem(type);
     this.textFieldName.setText(mapObject.getName());
-    this.labelEntityID.setText(Integer.toString(mapObject.getId()));
+
     this.comboBoxType.setEnabled(false);
 
     this.tagPanel.bind(mapObject.getStringValue(MapObjectProperty.TAGS));
+    
+    this.labelEntityID.setText(Integer.toString(mapObject.getId()));
+    this.lblLayer.setText("layer: " +mapObject.getLayer().getName());
   }
 
   private void setupChangedListeners() {

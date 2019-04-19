@@ -63,6 +63,7 @@ import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.Style;
 import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.components.EditorComponent.ComponentType;
+import de.gurkenlabs.utiliti.swing.MapLayerList;
 import de.gurkenlabs.utiliti.swing.MapSelectionPanel;
 import de.gurkenlabs.utiliti.swing.StatusBar;
 import de.gurkenlabs.utiliti.swing.Tray;
@@ -98,8 +99,8 @@ public class EditorScreen extends Screen {
   private String currentResourceFile;
 
   private MapObjectPanel mapEditorPanel;
-
   private MapSelectionPanel mapSelectionPanel;
+  private MapLayerList mapLayerList;
 
   private long statusTick;
   private String currentStatus;
@@ -285,6 +286,7 @@ public class EditorScreen extends Screen {
 
     Game.world().unloadEnvironment();
     UndoManager.clearAll();
+    getMapComponent().clearAll();
     this.currentResourceFile = null;
     this.gameFile = null;
     this.gamefileLoaded();
@@ -631,7 +633,11 @@ public class EditorScreen extends Screen {
   }
 
   public MapObjectPanel getMapObjectPanel() {
-    return mapEditorPanel;
+    return this.mapEditorPanel;
+  }
+
+  public MapLayerList getMapLayerList() {
+    return this.mapLayerList;
   }
 
   public MapComponent getMapComponent() {
@@ -642,16 +648,21 @@ public class EditorScreen extends Screen {
     return this.currentResourceFile;
   }
 
-  public void setMapEditorPanel(MapObjectPanel mapEditorPanel) {
-    this.mapEditorPanel = mapEditorPanel;
-  }
+
 
   public MapSelectionPanel getMapSelectionPanel() {
     return mapSelectionPanel;
   }
-
+  public void setMapObjectPanel(MapObjectPanel mapEditorPanel) {
+    this.mapEditorPanel = mapEditorPanel;
+  }
+  
   public void setMapSelectionPanel(MapSelectionPanel mapSelectionPanel) {
     this.mapSelectionPanel = mapSelectionPanel;
+  }
+  
+  public void setMapLayerList(MapLayerList mapLayerList) {
+    this.mapLayerList = mapLayerList;
   }
 
   public String getCurrentStatus() {

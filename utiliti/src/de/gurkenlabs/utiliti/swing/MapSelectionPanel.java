@@ -2,9 +2,7 @@ package de.gurkenlabs.utiliti.swing;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.FocusAdapter;
@@ -12,25 +10,17 @@ import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.image.BufferedImage;
 import java.util.Collection;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import javax.swing.Box;
 import javax.swing.DefaultListModel;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JColorChooser;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -49,15 +39,12 @@ import javax.swing.tree.TreePath;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.Entity;
 import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
-import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
-import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.litiengine.util.ColorHelper;
-import de.gurkenlabs.litiengine.util.Imaging;
 import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.components.EditorScreen;
@@ -65,16 +52,13 @@ import de.gurkenlabs.utiliti.components.EditorScreen;
 @SuppressWarnings("serial")
 public class MapSelectionPanel extends JSplitPane {
   private final JList<String> mapList;
-  private final java.util.Map<String, java.util.Map<String, Boolean>> layerVisibility;
-  private final JCheckBoxList listObjectLayers;
   private final DefaultListModel<String> model;
-  private final DefaultListModel<JCheckBox> layerModel;
   private final JScrollPane mapScrollPane;
-  private final JScrollPane layerScrollPane;
+  private final MapLayerList mapLayerList;
   private final JScrollPane entityScrollPane;
   private final JPopupMenu popupMenu;
-  private final JMenuItem mntmExportMap;
-  private final JMenuItem mntmDeleteMap;
+  private final JMenuItem exportMap;
+  private final JMenuItem deleteMap;
 
   private final JPanel entityPanel;
   private final JPanel panel;
@@ -96,16 +80,6 @@ public class MapSelectionPanel extends JSplitPane {
   private final DefaultMutableTreeNode[] entityNodes;
 
   private boolean isFocussing;
-  private Box layerButtonBox;
-  private JButton buttonAddLayer;
-  private JButton buttonRemoveLayer;
-  private JButton buttonSetColor;
-  private JButton buttonDuplicateLayer;
-  private JButton buttonHideOtherLayers;
-  private JButton buttonLiftLayer;
-  private JButton buttonLowerLayer;
-  private Component horizontalGlue4;
-  private JButton buttonRenameLayer;
 
   /**
    * Create the panel.
@@ -125,8 +99,7 @@ public class MapSelectionPanel extends JSplitPane {
     this.setLeftComponent(mapScrollPane);
 
     model = new DefaultListModel<>();
-    layerModel = new DefaultListModel<>();
-    this.layerVisibility = new ConcurrentHashMap<>();
+
     this.mapList = new JList<>();
     this.mapList.setModel(model);
     this.mapList.setVisibleRowCount(8);
@@ -153,30 +126,28 @@ public class MapSelectionPanel extends JSplitPane {
     popupMenu = new JPopupMenu();
     addPopup(this.mapList, popupMenu);
 
-    mntmExportMap = new JMenuItem(Resources.strings().get("hud_exportMap"));
-    mntmExportMap.setIcon(Icons.MAP_EXPORT);
-    mntmExportMap.addActionListener(a -> EditorScreen.instance().getMapComponent().exportMap());
+    exportMap = new JMenuItem(Resources.strings().get("hud_exportMap"));
+    exportMap.setIcon(Icons.MAP_EXPORT);
+    exportMap.addActionListener(a -> EditorScreen.instance().getMapComponent().exportMap());
 
-    popupMenu.add(mntmExportMap);
+    deleteMap = new JMenuItem(Resources.strings().get("hud_deleteMap"));
+    deleteMap.setIcon(Icons.MAP_DELETE);
+    deleteMap.addActionListener(a -> EditorScreen.instance().getMapComponent().deleteMap());
 
-    mntmDeleteMap = new JMenuItem(Resources.strings().get("hud_deleteMap"));
-    mntmDeleteMap.setIcon(Icons.MAP_DELETE);
-    mntmDeleteMap.addActionListener(a -> EditorScreen.instance().getMapComponent().deleteMap());
-    popupMenu.add(mntmDeleteMap);
+    popupMenu.add(exportMap);
+    popupMenu.add(deleteMap);
+
     mapScrollPane.setViewportBorder(null);
 
-    layerScrollPane = new JScrollPane();
-    layerScrollPane.setViewportBorder(null);
-    layerScrollPane.setMinimumSize(new Dimension(150, 0));
-    layerScrollPane.setMaximumSize(new Dimension(0, 250));
-
+    this.mapLayerList = new MapLayerList();
+    EditorScreen.instance().setMapLayerList(this.mapLayerList);
     JTabbedPane tabPane = new JTabbedPane();
 
     this.entityPanel = new JPanel();
     this.entityPanel.setLayout(new BorderLayout(0, 0));
 
     tabPane.addTab(Resources.strings().get("panel_entities"), entityPanel);
-    tabPane.add(Resources.strings().get("panel_mapObjectLayers"), layerScrollPane);
+    tabPane.add(Resources.strings().get("panel_mapObjectLayers"), this.mapLayerList);
 
     panel = new JPanel();
     entityPanel.add(panel, BorderLayout.NORTH);
@@ -244,6 +215,11 @@ public class MapSelectionPanel extends JSplitPane {
     this.tree.setMaximumSize(new Dimension(0, 250));
 
     this.tree.addTreeSelectionListener(e -> {
+      final Environment env = Game.world().environment();
+      if (env == null) {
+        return;
+      }
+
       this.isFocussing = true;
       try {
         if (e.getPath().getLastPathComponent() instanceof DefaultMutableTreeNode) {
@@ -251,7 +227,7 @@ public class MapSelectionPanel extends JSplitPane {
           if (node.getUserObject() instanceof IconTreeListItem) {
             IconTreeListItem item = (IconTreeListItem) node.getUserObject();
             if (item.getUserObject() instanceof IEntity) {
-              IMapObject obj = Game.world().environment().getMap().getMapObject(((IEntity) item.getUserObject()).getMapId());
+              IMapObject obj = env.getMap().getMapObject(((IEntity) item.getUserObject()).getMapId());
               if (obj != null) {
                 EditorScreen.instance().getMapComponent().setFocus(obj, true);
               }
@@ -297,214 +273,13 @@ public class MapSelectionPanel extends JSplitPane {
 
     this.setRightComponent(tabPane);
 
-    listObjectLayers = new JCheckBoxList();
-    listObjectLayers.setModel(layerModel);
-    listObjectLayers.setMaximumSize(new Dimension(0, 250));
-    layerScrollPane.setViewportView(listObjectLayers);
-
-    layerButtonBox = Box.createHorizontalBox();
-    layerScrollPane.setColumnHeaderView(layerButtonBox);
-
-    buttonAddLayer = new JButton("");
-    buttonAddLayer.setPreferredSize(new Dimension(24, 24));
-    buttonAddLayer.setMinimumSize(new Dimension(24, 24));
-    buttonAddLayer.setMaximumSize(new Dimension(24, 24));
-    buttonAddLayer.setIcon(Icons.ADD);
-
-    buttonAddLayer.addActionListener(a -> {
-      final IMap currentMap = this.getCurrentMap();
-      if (currentMap == null) {
-        return;
-      }
-
-      MapObjectLayer layer = new MapObjectLayer();
-      layer.setName("new layer");
-      int selIndex = this.getSelectedLayerIndex();
-      if (selIndex < 0 || selIndex >= this.layerModel.size()) {
-        currentMap.addLayer(layer);
-        this.updateMapLayerControl();
-        this.listObjectLayers.setSelectedIndex(selIndex);
-      } else {
-        currentMap.addLayer(this.getSelectedLayerIndex(), layer);
-        this.updateMapLayerControl();
-        this.listObjectLayers.setSelectedIndex(selIndex);
-      }
-      EditorScreen.instance().getMapComponent().updateTransformControls();
-      UndoManager.instance().recordChanges();
-    });
-    layerButtonBox.add(buttonAddLayer);
-
-    buttonRemoveLayer = new JButton("");
-    buttonRemoveLayer.setPreferredSize(new Dimension(24, 24));
-    buttonRemoveLayer.setMinimumSize(new Dimension(24, 24));
-    buttonRemoveLayer.setMaximumSize(new Dimension(24, 24));
-
-    buttonRemoveLayer.setIcon(Icons.DELETE);
-    buttonRemoveLayer.addActionListener(a -> {
-      final IMap currentMap = this.getCurrentMap();
-      if (currentMap == null) {
-        return;
-      }
-
-      if (this.getSelectedLayerIndex() < 0 || this.getSelectedLayerIndex() >= this.layerModel.size()) {
-        return;
-      }
-      if (JOptionPane.showConfirmDialog(null, Resources.strings().get("panel_confirmDeleteLayer"), "", JOptionPane.YES_NO_OPTION) != 0) {
-        return;
-      }
-
-      EditorScreen.instance().getMapComponent().delete(currentMap.getMapObjectLayers().get(this.getSelectedLayerIndex()));
-      currentMap.removeLayer(this.getSelectedLayerIndex());
-      layerModel.remove(this.getSelectedLayerIndex());
-      EditorScreen.instance().getMapComponent().updateTransformControls();
-      UndoManager.instance().recordChanges();
-    });
-    layerButtonBox.add(buttonRemoveLayer);
-
-    buttonSetColor = new JButton("");
-    buttonSetColor.setPreferredSize(new Dimension(24, 24));
-    buttonSetColor.setMinimumSize(new Dimension(24, 24));
-    buttonSetColor.setMaximumSize(new Dimension(24, 24));
-    buttonSetColor.setIcon(Icons.COLORX16);
-    buttonSetColor.addActionListener(a -> {
-      if (this.getSelectedLayerIndex() < 0 || this.getSelectedLayerIndex() >= this.layerModel.size()) {
-        return;
-      }
-      IMap currentMap = EditorScreen.instance().getMapComponent().getMaps().get(mapList.getSelectedIndex());
-      Color newColor = JColorChooser.showDialog(null, Resources.strings().get("panel_selectLayerColor"), currentMap.getMapObjectLayers().get(this.getSelectedLayerIndex()).getColor());
-      if (newColor == null) {
-        return;
-      }
-      currentMap.getMapObjectLayers().get(this.getSelectedLayerIndex()).setColor(ColorHelper.encode(newColor));
-      this.updateMapLayerControl();
-      UndoManager.instance().recordChanges();
-    });
-    layerButtonBox.add(buttonSetColor);
-
-    buttonDuplicateLayer = new JButton("");
-    buttonDuplicateLayer.setPreferredSize(new Dimension(24, 24));
-    buttonDuplicateLayer.setMinimumSize(new Dimension(24, 24));
-    buttonDuplicateLayer.setMaximumSize(new Dimension(24, 24));
-    buttonDuplicateLayer.setIcon(Icons.COPYX16);
-
-    buttonDuplicateLayer.addActionListener(a -> {
-      if (this.getSelectedLayerIndex() < 0 || this.getSelectedLayerIndex() >= this.layerModel.size()) {
-        return;
-      }
-      IMap currentMap = EditorScreen.instance().getMapComponent().getMaps().get(mapList.getSelectedIndex());
-      IMapObjectLayer copiedLayer = new MapObjectLayer((MapObjectLayer) currentMap.getMapObjectLayers().get(this.getSelectedLayerIndex()));
-      currentMap.addLayer(this.getSelectedLayerIndex(), copiedLayer);
-      this.updateMapLayerControl();
-      EditorScreen.instance().getMapComponent().add(copiedLayer);
-      UndoManager.instance().recordChanges();
-    });
-
-    buttonRenameLayer = new JButton("");
-    buttonRenameLayer.setPreferredSize(new Dimension(24, 24));
-    buttonRenameLayer.setMinimumSize(new Dimension(24, 24));
-    buttonRenameLayer.setMaximumSize(new Dimension(24, 24));
-    buttonRenameLayer.setIcon(Icons.RENAMEX16);
-
-    buttonRenameLayer.addActionListener(a -> {
-      if (this.getSelectedLayerIndex() < 0 || this.getSelectedLayerIndex() >= this.layerModel.size()) {
-        return;
-      }
-      IMap currentMap = EditorScreen.instance().getMapComponent().getMaps().get(mapList.getSelectedIndex());
-      IMapObjectLayer selectedLayer = currentMap.getMapObjectLayers().get(this.getSelectedLayerIndex());
-      String newLayerName = JOptionPane.showInputDialog(Resources.strings().get("panel_renameLayer"), selectedLayer.getName());
-      if (newLayerName == null) {
-        return;
-      }
-      selectedLayer.setName(newLayerName);
-      this.updateMapLayerControl();
-      UndoManager.instance().recordChanges();
-    });
-
-    layerButtonBox.add(buttonRenameLayer);
-
-    layerButtonBox.add(buttonDuplicateLayer);
-
-    buttonHideOtherLayers = new JButton("");
-    buttonHideOtherLayers.setPreferredSize(new Dimension(24, 24));
-    buttonHideOtherLayers.setMinimumSize(new Dimension(24, 24));
-    buttonHideOtherLayers.setMaximumSize(new Dimension(24, 24));
-    buttonHideOtherLayers.setIcon(Icons.HIDEOTHER);
-
-    buttonHideOtherLayers.addActionListener(a -> {
-      if (this.getSelectedLayerIndex() < 0 || this.getSelectedLayerIndex() >= this.layerModel.size()) {
-        return;
-      }
-      IMap currentMap = EditorScreen.instance().getMapComponent().getMaps().get(mapList.getSelectedIndex());
-
-      for (int i = 0; i < currentMap.getMapObjectLayers().size(); i++) {
-        if (i != this.getSelectedLayerIndex()) {
-          currentMap.getMapObjectLayers().get(i).setVisible(false);
-        } else if (!currentMap.getMapObjectLayers().get(i).isVisible()) {
-          currentMap.getMapObjectLayers().get(i).setVisible(true);
-        }
-      }
-      this.updateMapLayerControl();
-      EditorScreen.instance().getMapComponent().updateTransformControls();
-      UndoManager.instance().recordChanges();
-    });
-
-    layerButtonBox.add(buttonHideOtherLayers);
-
-    buttonLiftLayer = new JButton("");
-    buttonLiftLayer.setPreferredSize(new Dimension(24, 24));
-    buttonLiftLayer.setMinimumSize(new Dimension(24, 24));
-    buttonLiftLayer.setMaximumSize(new Dimension(24, 24));
-    buttonLiftLayer.setIcon(Icons.LIFT);
-
-    buttonLiftLayer.addActionListener(a -> {
-      int selLayerIndex = this.getSelectedLayerIndex();
-      if (selLayerIndex < 1 || selLayerIndex >= this.layerModel.getSize()) {
-        return;
-      }
-      IMap currentMap = EditorScreen.instance().getMapComponent().getMaps().get(mapList.getSelectedIndex());
-      IMapObjectLayer selectedLayer = currentMap.getMapObjectLayers().get(this.getSelectedLayerIndex());
-      currentMap.removeLayer(selLayerIndex);
-      currentMap.addLayer(selLayerIndex - 1, selectedLayer);
-      this.listObjectLayers.setSelectedIndex(selLayerIndex - 1);
-      this.updateMapLayerControl();
-      UndoManager.instance().recordChanges();
-    });
-
-    layerButtonBox.add(buttonLiftLayer);
-
-    buttonLowerLayer = new JButton("");
-    buttonLowerLayer.setPreferredSize(new Dimension(24, 24));
-    buttonLowerLayer.setMinimumSize(new Dimension(24, 24));
-    buttonLowerLayer.setMaximumSize(new Dimension(24, 24));
-    buttonLowerLayer.setIcon(Icons.LOWER);
-
-    buttonLowerLayer.addActionListener(a -> {
-      int selLayerIndex = this.getSelectedLayerIndex();
-      if (selLayerIndex < 0 || selLayerIndex >= this.layerModel.getSize() - 1) {
-        return;
-      }
-      IMap currentMap = EditorScreen.instance().getMapComponent().getMaps().get(mapList.getSelectedIndex());
-      IMapObjectLayer selectedLayer = currentMap.getMapObjectLayers().get(this.getSelectedLayerIndex());
-      currentMap.removeLayer(selLayerIndex);
-      currentMap.addLayer(selLayerIndex + 1, selectedLayer);
-      this.listObjectLayers.setSelectedIndex(selLayerIndex + 1);
-      this.updateMapLayerControl();
-      UndoManager.instance().recordChanges();
-    });
-
-    layerButtonBox.add(buttonLowerLayer);
-
-    horizontalGlue4 = Box.createHorizontalGlue();
-    layerButtonBox.add(horizontalGlue4);
-
     UndoManager.onMapObjectAdded(manager -> {
-      this.updateMapObjectTree();
-      this.updateMapLayerControl();
+      this.updateComponents();
+
     });
 
     UndoManager.onMapObjectRemoved(manager -> {
-      this.updateMapObjectTree();
-      this.updateMapLayerControl();
+      this.updateComponents();
     });
 
     UndoManager.onUndoStackChanged(manager -> this.bind(EditorScreen.instance().getMapComponent().getMaps()));
@@ -544,8 +319,7 @@ public class MapSelectionPanel extends JSplitPane {
     }
 
     mapList.revalidate();
-    this.updateMapLayerControl();
-    this.updateMapObjectTree();
+    this.updateComponents();
   }
 
   public void setSelection(String mapName) {
@@ -557,83 +331,7 @@ public class MapSelectionPanel extends JSplitPane {
       }
     }
 
-    this.updateMapLayerControl();
-    this.updateMapObjectTree();
-  }
-
-  public boolean isVisibleMapObjectLayer(String name) {
-
-    // Get all the selected items using the indices
-    for (int i = 0; i < this.listObjectLayers.getModel().getSize(); i++) {
-      if (i >= this.listObjectLayers.getModel().getSize()) {
-        return false;
-      }
-      Object sel = this.listObjectLayers.getModel().getElementAt(i);
-      JCheckBox check = (JCheckBox) sel;
-      String layerName = getLayerName(check);
-      if (layerName != null && layerName.equals(name) && check.isSelected()) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  private void updateMapLayerControl() {
-    if (mapList.getSelectedIndex() == -1 && this.model.size() > 0) {
-      this.mapList.setSelectedIndex(0);
-    }
-
-    if (EditorScreen.instance().getMapComponent().getMaps().isEmpty() || mapList.getSelectedIndex() == -1) {
-      layerModel.clear();
-      return;
-    }
-
-    TmxMap map = EditorScreen.instance().getMapComponent().getMaps().get(mapList.getSelectedIndex());
-    int lastSelection = listObjectLayers.getSelectedIndex();
-    this.saveLayerVisibility();
-    this.layerModel.clear();
-    for (IMapObjectLayer layer : map.getMapObjectLayers()) {
-      String layerName = layer.getName();
-      int layerSize = layer.getMapObjects().size();
-      JCheckBox newBox = new JCheckBox(layerName + " (" + layerSize + ")");
-      newBox.setName(map.getName() + "/" + layerName);
-      Color layerColor = layer.getColor();
-      if (layerColor != null) {
-        final String cacheKey = map.getName() + layer.getName() + "#" + Integer.toHexString(layerColor.getRGB());
-
-        BufferedImage newIconImage = Resources.images().get(cacheKey, () -> {
-          BufferedImage img = Imaging.getCompatibleImage(10, 10);
-          Graphics2D g = (Graphics2D) img.getGraphics();
-          g.setColor(layer.getColor());
-          g.fillRect(0, 0, 9, 9);
-          g.setColor(Color.BLACK);
-          g.drawRect(0, 0, 9, 9);
-          g.dispose();
-          return img;
-        });
-
-        newBox.setIcon(new ImageIcon(newIconImage));
-      }
-      newBox.setSelected(layer.isVisible());
-      newBox.addItemListener(sel -> {
-        TmxMap currentMap = EditorScreen.instance().getMapComponent().getMaps().get(mapList.getSelectedIndex());
-        int boxIndex = this.layerModel.indexOf(newBox);
-        currentMap.getMapObjectLayers().get(boxIndex).setVisible(newBox.isSelected());
-        UndoManager.instance().recordChanges();
-      });
-      layerModel.addElement(newBox);
-    }
-
-    int start = 0;
-    int end = mapList.getModel().getSize() - 1;
-    if (end >= 0) {
-      listObjectLayers.setSelectionInterval(start, end);
-      this.selectLayer(lastSelection);
-    }
-  }
-
-  public int getSelectedLayerIndex() {
-    return listObjectLayers.getSelectedIndex();
+    this.updateComponents();
   }
 
   public IMap getCurrentMap() {
@@ -641,10 +339,6 @@ public class MapSelectionPanel extends JSplitPane {
       return null;
     }
     return EditorScreen.instance().getMapComponent().getMaps().get(mapList.getSelectedIndex());
-  }
-
-  public void selectLayer(int index) {
-    this.listObjectLayers.setSelectedIndex(index);
   }
 
   public void focus(final IMapObject mapObject) {
@@ -688,19 +382,6 @@ public class MapSelectionPanel extends JSplitPane {
     default:
       return;
     }
-  }
-
-  private static String getLayerInfo(JCheckBox layer, int index) {
-    if (layer == null) {
-      return null;
-    }
-
-    String[] layerInfo = layer.getName().split("/");
-    if (layerInfo.length < 2) {
-      return null;
-    }
-
-    return layerInfo[index];
   }
 
   private void collapseAll() {
@@ -851,7 +532,7 @@ public class MapSelectionPanel extends JSplitPane {
     } else {
       this.nodeRoot.removeAllChildren();
     }
-    
+
     this.entitiesTreeModel.reload();
   }
 
@@ -881,34 +562,12 @@ public class MapSelectionPanel extends JSplitPane {
     return -1;
   }
 
-  private void saveLayerVisibility() {
-    if (this.listObjectLayers.getModel().getSize() == 0) {
-      return;
+  private void updateComponents() {
+    if (mapList.getSelectedIndex() == -1 && this.model.size() > 0) {
+      this.mapList.setSelectedIndex(0);
     }
 
-    for (int i = 0; i < this.listObjectLayers.getModel().getSize(); i++) {
-      JCheckBox layer = this.listObjectLayers.getModel().getElementAt(i);
-      if (layer == null) {
-        continue;
-      }
-
-      this.saveLayerVisibility(getMapName(layer), getLayerName(layer), layer.isSelected());
-    }
-  }
-
-  private void saveLayerVisibility(String mapName, String layerName, boolean selected) {
-    if (!this.layerVisibility.containsKey(mapName)) {
-      this.layerVisibility.put(mapName, new HashMap<>());
-    }
-
-    this.layerVisibility.get(mapName).put(layerName, selected);
-  }
-
-  private static String getMapName(JCheckBox layer) {
-    return getLayerInfo(layer, 0);
-  }
-
-  private static String getLayerName(JCheckBox layer) {
-    return getLayerInfo(layer, 1);
+    this.updateMapObjectTree();
+    this.mapLayerList.update();
   }
 }

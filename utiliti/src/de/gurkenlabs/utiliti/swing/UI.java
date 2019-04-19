@@ -186,7 +186,7 @@ public final class UI {
   private static Component initRightSplitPanel() {
     final MapObjectPanel mapObjectPanel = new MapObjectPanel();
     final MapSelectionPanel mapSelectionPanel = new MapSelectionPanel();
-    EditorScreen.instance().setMapEditorPanel(mapObjectPanel);
+    EditorScreen.instance().setMapObjectPanel(mapObjectPanel);
     EditorScreen.instance().setMapSelectionPanel(mapSelectionPanel);
 
     JSplitPane rightSplitPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
