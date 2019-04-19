@@ -182,7 +182,11 @@ public final class MapLayerList extends JScrollPane {
   public IMapObjectLayer getCurrentLayer() {
     JCheckBox current = this.list.getSelectedValue();
     if (current == null) {
-      return null;
+      if(this.list.getModel().getSize() == 0) {
+        return null;
+      }
+      
+      current = this.list.getModel().getElementAt(0);
     }
 
     Object property = current.getClientProperty("layer");
