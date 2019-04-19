@@ -12,7 +12,6 @@ import javax.swing.KeyStroke;
 
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.Program;
-import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.components.EditorScreen;
 
 @SuppressWarnings("serial")

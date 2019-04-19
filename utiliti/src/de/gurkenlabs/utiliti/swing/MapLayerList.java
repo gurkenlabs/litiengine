@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
@@ -37,7 +38,7 @@ import de.gurkenlabs.utiliti.components.EditorScreen;
 public final class MapLayerList extends JScrollPane {
   private static final Dimension BUTTON_SIZE = new Dimension(24, 24);
 
-  private final java.util.Map<String, Integer> selectedLayers;
+  private final Map<String, Integer> selectedLayers;
   private final List<Consumer<IMap>> layerChangedListeners;
 
   private final JCheckBoxList list;
@@ -77,7 +78,7 @@ public final class MapLayerList extends JScrollPane {
       if (selIndex < 0 || selIndex >= this.layerModel.size()) {
         map.addLayer(layer);
       } else {
-        map.addLayer(this.getCurrentLayerIndex(), layer);
+        map.addLayer(this.getAbsoluteIndex(map, this.getCurrentLayerIndex()), layer);
       }
 
       this.list.setSelectedIndex(selIndex);
@@ -102,7 +103,7 @@ public final class MapLayerList extends JScrollPane {
 
     this.buttonDuplicateLayer = createButton(Icons.COPYX16, (map, selectedLayer) -> {
       IMapObjectLayer copiedLayer = new MapObjectLayer((MapObjectLayer) selectedLayer);
-      map.addLayer(this.getCurrentLayerIndex(), copiedLayer);
+      map.addLayer(this.getAbsoluteIndex(map, this.getCurrentLayerIndex()), copiedLayer);
       this.update();
       EditorScreen.instance().getMapComponent().add(copiedLayer);
     });
@@ -139,24 +140,24 @@ public final class MapLayerList extends JScrollPane {
 
     this.buttonLiftLayer = createButton(Icons.LIFT, (map, selectedLayer) -> {
       final int selLayerIndex = this.getCurrentLayerIndex();
-      if (selLayerIndex < 1 || selLayerIndex >= this.layerModel.getSize()) {
+      if (selLayerIndex < 0 || selLayerIndex >= this.layerModel.getSize()) {
         return;
       }
 
       map.removeLayer(selectedLayer);
-      map.addLayer(selLayerIndex - 1, selectedLayer);
-      this.list.setSelectedIndex(selLayerIndex - 1);
+      map.addLayer(this.getAbsoluteIndex(map, selLayerIndex), selectedLayer);
+      this.list.setSelectedIndex(selLayerIndex + 1);
     });
 
     this.buttonLowerLayer = createButton(Icons.LOWER, (map, selectedLayer) -> {
       int selLayerIndex = this.getCurrentLayerIndex();
-      if (selLayerIndex < 0 || selLayerIndex >= this.layerModel.getSize() - 1) {
+      if (selLayerIndex <= 0 || selLayerIndex >= this.layerModel.getSize() - 1) {
         return;
       }
 
       map.removeLayer(selectedLayer);
-      map.addLayer(selLayerIndex + 1, selectedLayer);
-      this.list.setSelectedIndex(selLayerIndex + 1);
+      map.addLayer(this.getAbsoluteIndex(map, selLayerIndex-2), selectedLayer);
+      this.list.setSelectedIndex(selLayerIndex - 1);
     });
 
     this.layerButtonBox.add(this.buttonAddLayer);
@@ -317,5 +318,24 @@ public final class MapLayerList extends JScrollPane {
     // reflect the order in which they get rendered
     // -> first layer gets rendered first and thereby below all others
     return this.list.getModel().getSize() - 1 - this.list.getSelectedIndex();
+  }
+  
+  private int getAbsoluteIndex(IMap map, int index) {
+    if(map.getMapObjectLayers().size() <= 1) {
+      return 0;
+    }
+    
+    int mapObjectLayerIndex = 0;
+    for (int i = 0; i < map.getRenderLayers().size(); i++) {
+      if (mapObjectLayerIndex > index) {
+        return i;
+      }
+      
+      if (IMapObjectLayer.class.isAssignableFrom(map.getRenderLayers().get(i).getClass())) {
+        mapObjectLayerIndex++;
+      }
+    }
+
+    return map.getRenderLayers().size();
   }
 }
