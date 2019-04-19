@@ -86,6 +86,11 @@ public final class UI {
 
     return n != JOptionPane.CANCEL_OPTION && n != JOptionPane.CLOSED_OPTION;
   }
+  
+  public static boolean showRevertWarning() {
+    int n = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), Resources.strings().get("hud_revertChangesMessage"), Resources.strings().get("hud_revertChanges"), JOptionPane.YES_NO_OPTION);
+    return n != JOptionPane.CANCEL_OPTION && n != JOptionPane.CLOSED_OPTION;
+  }
 
   public static synchronized void init() {
     if (initialized) {

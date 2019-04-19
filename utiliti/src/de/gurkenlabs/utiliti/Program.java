@@ -32,7 +32,7 @@ public class Program {
 
     // the editor should never crash, even if an exception occurs
     Game.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(false));
-    
+
     // prepare UI and start the game
     UI.init();
     Game.start();
@@ -41,10 +41,11 @@ public class Program {
     Input.mouse().setGrabMouse(false);
     Input.keyboard().consumeAlt(true);
 
-    // load up previously opened project file or the one that is specified in the command line arguments
+    // load up previously opened project file or the one that is specified in
+    // the command line arguments
     handleArgs(args);
     if (!EditorScreen.instance().fileLoaded() && userPreferences.getLastGameFile() != null) {
-      EditorScreen.instance().load(new File(userPreferences.getLastGameFile()));
+      EditorScreen.instance().load(new File(userPreferences.getLastGameFile()), false);
     }
   }
 
@@ -73,6 +74,6 @@ public class Program {
     }
 
     File f = new File(args[0]);
-    EditorScreen.instance().load(f);
+    EditorScreen.instance().load(f, false);
   }
 }

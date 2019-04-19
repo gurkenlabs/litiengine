@@ -274,14 +274,16 @@ public class EditorScreen extends Screen {
 
   public void load() {
     if (EditorFileChooser.showFileDialog(ResourceBundle.FILE_EXTENSION, GAME_FILE_NAME, false, ResourceBundle.FILE_EXTENSION) == JFileChooser.APPROVE_OPTION) {
-      this.load(EditorFileChooser.instance().getSelectedFile());
+      this.load(EditorFileChooser.instance().getSelectedFile(), false);
     }
   }
 
-  public void close() {
-    boolean proceedClosing = UI.notifyPendingChanges();
-    if (!proceedClosing) {
-      return;
+  public void close(boolean force) {
+    if (!force) {
+      boolean proceedClosing = UI.notifyPendingChanges();
+      if (!proceedClosing) {
+        return;
+      }
     }
 
     Game.world().unloadEnvironment();
@@ -298,10 +300,12 @@ public class EditorScreen extends Screen {
     this.setCurrentStatus(Resources.strings().get("status_gamefile_closed"));
   }
 
-  public void load(File gameFile) {
-    boolean proceedLoading = UI.notifyPendingChanges();
-    if (!proceedLoading) {
-      return;
+  public void load(File gameFile, boolean force) {
+    if (!force) {
+      boolean proceedLoading = UI.notifyPendingChanges();
+      if (!proceedLoading) {
+        return;
+      }
     }
 
     final long currentTime = System.nanoTime();
@@ -632,6 +636,27 @@ public class EditorScreen extends Screen {
     }
   }
 
+  public void revert() {
+    if (this.currentResourceFile == null || this.currentResourceFile.isEmpty()) {
+      return;
+    }
+
+    boolean revert = UI.showRevertWarning();
+    if (!revert) {
+      return;
+    }
+
+    File currentFile = new File(this.currentResourceFile);
+    String currentMapSelection = null;
+    if (this.getMapSelectionPanel().getCurrentMap() != null) {
+      currentMapSelection = this.getMapSelectionPanel().getCurrentMap().getName();
+    }
+
+    this.close(true);
+    this.load(currentFile, true);
+    this.getMapSelectionPanel().setSelection(currentMapSelection);
+  }
+
   public MapObjectPanel getMapObjectPanel() {
     return this.mapEditorPanel;
   }
@@ -648,19 +673,18 @@ public class EditorScreen extends Screen {
     return this.currentResourceFile;
   }
 
-
-
   public MapSelectionPanel getMapSelectionPanel() {
     return mapSelectionPanel;
   }
+
   public void setMapObjectPanel(MapObjectPanel mapEditorPanel) {
     this.mapEditorPanel = mapEditorPanel;
   }
-  
+
   public void setMapSelectionPanel(MapSelectionPanel mapSelectionPanel) {
     this.mapSelectionPanel = mapSelectionPanel;
   }
-  
+
   public void setMapLayerList(MapLayerList mapLayerList) {
     this.mapLayerList = mapLayerList;
   }
@@ -787,5 +811,4 @@ public class EditorScreen extends Screen {
       callback.run();
     }
   }
-
 }
