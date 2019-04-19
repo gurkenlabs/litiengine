@@ -49,6 +49,15 @@ public final class EditMenu extends JMenu {
     delete.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
     delete.addActionListener(a -> EditorScreen.instance().getMapComponent().delete());
     delete.setEnabled(false);
+    
+    JMenuItem selectAll = new JMenuItem(Resources.strings().get("menu_edit_selectAll"));
+    selectAll.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, Event.CTRL_MASK));
+    selectAll.addActionListener(a -> EditorScreen.instance().getMapComponent().selectAll());
+    
+    JMenuItem deselect = new JMenuItem(Resources.strings().get("menu_edit_deselect"));
+    deselect.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, Event.CTRL_MASK));
+    deselect.addActionListener(a -> EditorScreen.instance().getMapComponent().deselect());
+    
 
     JMenuItem blueprint = new JMenuItem(Resources.strings().get("menu_edit_blueprint"), Icons.BLUEPRINT);
     blueprint.addActionListener(e -> EditorScreen.instance().getMapComponent().defineBlueprint());
@@ -83,6 +92,9 @@ public final class EditMenu extends JMenu {
     this.add(copy);
     this.add(paste);
     this.add(delete);
+    this.addSeparator();
+    this.add(selectAll);
+    this.add(deselect);
     this.addSeparator();
     this.add(blueprint);
   }

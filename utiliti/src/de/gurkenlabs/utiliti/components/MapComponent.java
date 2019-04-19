@@ -175,11 +175,11 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   public void onSelectionChanged(Consumer<List<IMapObject>> cons) {
     this.selectionChangedConsumer.add(cons);
   }
-  
+
   public void onMapLoading(Consumer<TmxMap> cons) {
     this.loadingConsumer.add(cons);
   }
-  
+
   public void onMapLoaded(Consumer<TmxMap> cons) {
     this.loadedConsumer.add(cons);
   }
@@ -313,9 +313,9 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         Point2D newPoint = new Point2D.Double(x, y);
         this.cameraFocus.put(mapName, newPoint);
       }
-      
+
       for (Consumer<TmxMap> cons : this.loadingConsumer) {
-        cons.accept(Game.world().environment() != null ? (TmxMap)Game.world().environment().getMap() : null);
+        cons.accept(Game.world().environment() != null ? (TmxMap) Game.world().environment().getMap() : null);
       }
 
       Point2D newFocus = null;
@@ -491,6 +491,25 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     } finally {
       UndoManager.instance().endOperation();
     }
+  }
+
+  public void selectAll() {
+    final List<IMapObjectLayer> layers = Game.world().environment().getMap().getMapObjectLayers();
+
+    ArrayList<IMapObject> selection = new ArrayList<>();
+    for (final IMapObjectLayer layer : layers) {
+      if (layer == null || !layer.isVisible()) {
+        continue;
+      }
+
+      selection.addAll(layer.getMapObjects());
+
+      this.setSelection(selection, true);
+    }
+  }
+
+  public void deselect() {
+    this.setSelection(Collections.emptyList(), true);
   }
 
   public void delete(final IMapObject mapObject) {
@@ -834,6 +853,23 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       maxMapId++;
     }
     UndoManager.instance().endOperation();
+  }
+
+  @Override
+  public void update() {
+    if (this.focusBorderBrightness <= 0.4) {
+      this.focusBorderBrightnessIncreasing = true;
+    } else if (this.focusBorderBrightness >= 0.9) {
+      this.focusBorderBrightnessIncreasing = false;
+    }
+
+    if (this.focusBorderBrightnessIncreasing && this.focusBorderBrightness < 0.9) {
+      this.focusBorderBrightness += 0.01;
+    } else if (!focusBorderBrightnessIncreasing && this.focusBorderBrightness >= 0.4) {
+      this.focusBorderBrightness -= 0.01;
+    }
+
+    this.colorSelectionBorder = Color.getHSBColor(0, 0, this.focusBorderBrightness);
   }
 
   private void updateScrollSpeed() {
@@ -1290,38 +1326,40 @@ public class MapComponent extends EditorComponent implements IUpdateable {
    *          The mouse event of the calling {@link GuiComponent}
    */
   private void handleMouseMoved(ComponentMouseEvent e) {
-    if (this.getFocus() == null) {
-      if (this.currentEditMode != EDITMODE_CREATE) {
-        Game.window().getRenderComponent().setCursor(Cursors.DEFAULT, 0, 0);
-      }
-      this.currentTransform = TransformType.NONE;
-      return;
-    }
-
     boolean hovered = false;
-    for (Entry<TransformType, Rectangle2D> entry : this.transformRects.entrySet()) {
-      Rectangle2D rect = entry.getValue();
-      Rectangle2D hoverrect = new Rectangle2D.Double(rect.getX() - rect.getWidth() * 3, rect.getY() - rect.getHeight() * 3, rect.getWidth() * 5, rect.getHeight() * 5);
-      if (hoverrect.contains(Input.mouse().getMapLocation())) {
-        hovered = true;
-        if (entry.getKey() == TransformType.DOWN || entry.getKey() == TransformType.UP) {
-          Game.window().getRenderComponent().setCursor(Cursors.TRANS_VERTICAL, 0, 0);
-        } else if (entry.getKey() == TransformType.UPLEFT || entry.getKey() == TransformType.DOWNRIGHT) {
-          Game.window().getRenderComponent().setCursor(Cursors.TRANS_DIAGONAL_LEFT, 0, 0);
-        } else if (entry.getKey() == TransformType.UPRIGHT || entry.getKey() == TransformType.DOWNLEFT) {
-          Game.window().getRenderComponent().setCursor(Cursors.TRANS_DIAGONAL_RIGHT, 0, 0);
-        } else {
-          Game.window().getRenderComponent().setCursor(Cursors.TRANS_HORIZONTAL, 0, 0);
-        }
+    if (this.getFocus() != null) {
+      for (Entry<TransformType, Rectangle2D> entry : this.transformRects.entrySet()) {
+        Rectangle2D rect = entry.getValue();
+        Rectangle2D hoverrect = new Rectangle2D.Double(rect.getX() - rect.getWidth() * 3, rect.getY() - rect.getHeight() * 3, rect.getWidth() * 5, rect.getHeight() * 5);
+        if (hoverrect.contains(Input.mouse().getMapLocation())) {
+          hovered = true;
+          if (entry.getKey() == TransformType.DOWN || entry.getKey() == TransformType.UP) {
+            Game.window().getRenderComponent().setCursor(Cursors.TRANS_VERTICAL, 0, 0);
+          } else if (entry.getKey() == TransformType.UPLEFT || entry.getKey() == TransformType.DOWNRIGHT) {
+            Game.window().getRenderComponent().setCursor(Cursors.TRANS_DIAGONAL_LEFT, 0, 0);
+          } else if (entry.getKey() == TransformType.UPRIGHT || entry.getKey() == TransformType.DOWNLEFT) {
+            Game.window().getRenderComponent().setCursor(Cursors.TRANS_DIAGONAL_RIGHT, 0, 0);
+          } else {
+            Game.window().getRenderComponent().setCursor(Cursors.TRANS_HORIZONTAL, 0, 0);
+          }
 
-        this.currentTransform = entry.getKey();
-        break;
+          this.currentTransform = entry.getKey();
+          break;
+        }
       }
     }
 
     if (!hovered) {
-      final Rectangle2D focus = this.getFocus();
-      if (focus != null && focus.contains(Input.mouse().getMapLocation())) {
+      boolean moveMode = false;
+
+      for (IMapObject selected : this.getSelectedMapObjects()) {
+        if (selected.getBoundingBox().contains(Input.mouse().getMapLocation())) {
+          moveMode = true;
+          break;
+        }
+      }
+
+      if (moveMode) {
         Game.window().getRenderComponent().setCursor(Cursors.MOVE, 0, 0);
         this.currentTransform = TransformType.MOVE;
       } else {
@@ -1342,11 +1380,10 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
     switch (this.currentEditMode) {
     case EDITMODE_CREATE:
+    case EDITMODE_MOVE:
       if (SwingUtilities.isLeftMouseButton(e.getEvent())) {
         this.startPoint = Input.mouse().getMapLocation();
       }
-      break;
-    case EDITMODE_MOVE:
       break;
     case EDITMODE_EDIT:
       if (this.isMoving || (this.currentTransform != TransformType.NONE && this.currentTransform != TransformType.MOVE) || SwingUtilities.isRightMouseButton(e.getEvent())) {
@@ -1397,7 +1434,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   }
 
   private void handleMouseReleased(ComponentMouseEvent e) {
-    if (!this.hasFocus() || mapIsNull()) {
+    if (!this.hasFocus() || mapIsNull() || !SwingUtilities.isLeftMouseButton(e.getEvent())) {
       return;
     }
 
@@ -1437,6 +1474,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         this.setEditMode(EDITMODE_EDIT);
       } else {
         this.setEditMode(EDITMODE_EDIT);
+        this.evaluateFocus();
       }
 
       break;
@@ -1451,62 +1489,66 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         return;
       }
 
-      Rectangle2D rect = this.getCurrentMouseSelectionArea(false);
-      boolean somethingIsFocused = false;
-      boolean currentObjectFocused = false;
-      for (IMapObjectLayer layer : Game.world().environment().getMap().getMapObjectLayers()) {
-        if (layer == null || !layer.isVisible()) {
-          continue;
-        }
-
-        for (IMapObject mapObject : layer.getMapObjects()) {
-          if (mapObject == null) {
-            continue;
-          }
-
-          MapObjectType type = MapObjectType.get(mapObject.getType());
-          if (type == null) {
-            continue;
-          }
-
-          if (!GeometricUtilities.intersects(rect, mapObject.getBoundingBox())) {
-            continue;
-          }
-
-          if (this.getFocusedMapObject() != null && mapObject.getId() == this.getFocusedMapObject().getId()) {
-            currentObjectFocused = true;
-            continue;
-          }
-
-          if (somethingIsFocused) {
-            if (rect.getWidth() == 0 && rect.getHeight() == 0) {
-              break;
-            }
-
-            this.setSelection(mapObject, false);
-            continue;
-          }
-          if (this.getSelectedMapObjects().contains((MapObject) mapObject)) {
-            this.getSelectedMapObjects().remove((MapObject) mapObject);
-          } else {
-            this.setFocus(mapObject, !Input.keyboard().isPressed(KeyEvent.VK_SHIFT));
-            EditorScreen.instance().getMapObjectPanel().bind(mapObject);
-          }
-          somethingIsFocused = true;
-        }
-      }
-
-      if (!somethingIsFocused && !currentObjectFocused) {
-        this.setFocus(null, true);
-        EditorScreen.instance().getMapObjectPanel().bind(null);
-      }
-
+      this.evaluateFocus();
       break;
     default:
       break;
     }
 
     this.startPoint = null;
+  }
+
+  private void evaluateFocus() {
+    Rectangle2D rect = this.getCurrentMouseSelectionArea(false);
+    if(rect == null) {
+      return;
+    }
+    
+    boolean somethingIsFocused = false;
+    boolean currentObjectFocused = false;
+    for (IMapObjectLayer layer : Game.world().environment().getMap().getMapObjectLayers()) {
+      if (layer == null || !layer.isVisible()) {
+        continue;
+      }
+
+      for (IMapObject mapObject : layer.getMapObjects()) {
+        if (mapObject == null) {
+          continue;
+        }
+
+        MapObjectType type = MapObjectType.get(mapObject.getType());
+        if (type == null || !GeometricUtilities.intersects(rect, mapObject.getBoundingBox())) {
+          continue;
+        }
+
+        if (this.getFocusedMapObject() != null && mapObject.getId() == this.getFocusedMapObject().getId()) {
+          currentObjectFocused = true;
+          continue;
+        }
+
+        if (somethingIsFocused) {
+          if (rect.getWidth() == 0 && rect.getHeight() == 0) {
+            break;
+          }
+
+          this.setSelection(mapObject, false);
+          continue;
+        }
+        if (this.getSelectedMapObjects().contains((MapObject) mapObject)) {
+          this.getSelectedMapObjects().remove((MapObject) mapObject);
+        } else {
+          this.setFocus(mapObject, !Input.keyboard().isPressed(KeyEvent.VK_SHIFT));
+          EditorScreen.instance().getMapObjectPanel().bind(mapObject);
+        }
+        somethingIsFocused = true;
+      }
+    }
+
+    if (!somethingIsFocused && !currentObjectFocused) {
+      this.setFocus(null, true);
+      this.setSelection(Collections.emptyList(), true);
+      EditorScreen.instance().getMapObjectPanel().bind(null);
+    }
   }
 
   private static float snapX(double x) {
@@ -1566,11 +1608,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     final List<IMapObjectLayer> layers = Game.world().environment().getMap().getMapObjectLayers();
     // render all entities
     for (final IMapObjectLayer layer : layers) {
-      if (layer == null) {
-        continue;
-      }
-
-      if (!layer.isVisible()) {
+      if (layer == null || !layer.isVisible()) {
         continue;
       }
 
@@ -1888,22 +1926,5 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       Stroke collisionStroke = collision ? shapeStroke : new BasicStroke(1 / Game.world().camera().getRenderScale(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL, 0, new float[] { 1f }, 0);
       RenderEngine.renderOutline(g, collisionBox, collisionStroke);
     }
-  }
-
-  @Override
-  public void update() {
-    if (this.focusBorderBrightness <= 0.4) {
-      this.focusBorderBrightnessIncreasing = true;
-    } else if (this.focusBorderBrightness >= 0.9) {
-      this.focusBorderBrightnessIncreasing = false;
-    }
-
-    if (this.focusBorderBrightnessIncreasing && this.focusBorderBrightness < 0.9) {
-      this.focusBorderBrightness += 0.01;
-    } else if (!focusBorderBrightnessIncreasing && this.focusBorderBrightness >= 0.4) {
-      this.focusBorderBrightness -= 0.01;
-    }
-
-    this.colorSelectionBorder = Color.getHSBColor(0, 0, this.focusBorderBrightness);
   }
 }
