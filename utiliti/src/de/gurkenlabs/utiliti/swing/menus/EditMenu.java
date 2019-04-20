@@ -19,7 +19,7 @@ public final class EditMenu extends JMenu {
     this.setMnemonic('E');
 
     JMenu addMenu = new AddMenu();
-    
+
     JMenuItem undo = new JMenuItem(Resources.strings().get("menu_edit_undo"));
     undo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, Event.CTRL_MASK));
     undo.addActionListener(a -> UndoManager.instance().undo());
@@ -49,15 +49,17 @@ public final class EditMenu extends JMenu {
     delete.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
     delete.addActionListener(a -> EditorScreen.instance().getMapComponent().delete());
     delete.setEnabled(false);
-    
+
     JMenuItem selectAll = new JMenuItem(Resources.strings().get("menu_edit_selectAll"));
     selectAll.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, Event.CTRL_MASK));
     selectAll.addActionListener(a -> EditorScreen.instance().getMapComponent().selectAll());
-    
+
     JMenuItem deselect = new JMenuItem(Resources.strings().get("menu_edit_deselect"));
     deselect.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, Event.CTRL_MASK));
     deselect.addActionListener(a -> EditorScreen.instance().getMapComponent().deselect());
-    
+
+    JMenu moveLayer = new LayerMenu();
+    moveLayer.setEnabled(false);
 
     JMenuItem blueprint = new JMenuItem(Resources.strings().get("menu_edit_blueprint"), Icons.BLUEPRINT);
     blueprint.addActionListener(e -> EditorScreen.instance().getMapComponent().defineBlueprint());
@@ -75,7 +77,7 @@ public final class EditMenu extends JMenu {
 
     EditorScreen.instance().getMapComponent().onCopyTargetChanged(target -> paste.setEnabled(target != null));
     EditorScreen.instance().getMapComponent().onEditModeChanged(mode -> paste.setEnabled(EditorScreen.instance().getMapComponent().getCopiedBlueprint() != null));
-    
+
     UndoManager.onUndoStackChanged(manager -> {
       undo.setEnabled(UndoManager.instance().canUndo());
       redo.setEnabled(UndoManager.instance().canRedo());
@@ -96,6 +98,7 @@ public final class EditMenu extends JMenu {
     this.add(selectAll);
     this.add(deselect);
     this.addSeparator();
+    this.add(moveLayer);
     this.add(blueprint);
   }
 }

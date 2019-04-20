@@ -50,7 +50,6 @@ public final class CanvasPopupMenu extends JPopupMenu {
     this.add(delete);
     this.addSeparator();
     this.add(moveLayer);
-    this.addSeparator();
     this.add(blueprint);
 
     EditorScreen.instance().getMapComponent().onFocusChanged(mo -> {
