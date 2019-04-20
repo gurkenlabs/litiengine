@@ -373,9 +373,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     this.setFocus(null, true);
     for (IMapObject mapObject : layer.getMapObjects()) {
       Game.world().environment().loadFromMap(mapObject.getId());
-      if (MapObjectType.get(mapObject.getType()) == MapObjectType.LIGHTSOURCE) {
-        Game.world().environment().getAmbientLight().updateSection(mapObject.getBoundingBox());
-      }
+
       this.setSelection(mapObject, false);
       this.setFocus(mapObject, false);
     }
@@ -389,7 +387,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     }
     for (IMapObject mapObject : layer.getMapObjects()) {
       if (MapObjectType.get(mapObject.getType()) == MapObjectType.LIGHTSOURCE) {
-        Game.world().environment().getAmbientLight().updateSection(mapObject.getBoundingBox());
+        Game.world().environment().updateLighting(mapObject.getBoundingBox());
       }
       Game.world().environment().remove(mapObject.getId());
       if (mapObject.equals(this.getFocusedMapObject())) {
@@ -406,9 +404,6 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
     layer.addMapObject(mapObject);
     Game.world().environment().loadFromMap(mapObject.getId());
-    if (MapObjectType.get(mapObject.getType()) == MapObjectType.LIGHTSOURCE) {
-      Game.world().environment().getAmbientLight().updateSection(mapObject.getBoundingBox());
-    }
 
     Game.window().getRenderComponent().requestFocus();
     this.setFocus(mapObject, false);
@@ -517,12 +512,8 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       return;
     }
 
-    MapObjectType type = MapObjectType.get(mapObject.getType());
     Game.world().environment().getMap().removeMapObject(mapObject.getId());
     Game.world().environment().remove(mapObject.getId());
-    if (type == MapObjectType.STATICSHADOW || type == MapObjectType.LIGHTSOURCE) {
-      Game.world().environment().getAmbientLight().updateSection(mapObject.getBoundingBox());
-    }
 
     if (mapObject.equals(this.getFocusedMapObject())) {
       this.setFocus(null, true);
@@ -1066,8 +1057,9 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     transformObject.setY(snapY(newY));
 
     Game.world().environment().reloadFromMap(transformObject.getId());
-    if (MapObjectType.get(transformObject.getType()) == MapObjectType.LIGHTSOURCE) {
-      Game.world().environment().getAmbientLight().updateSection(transformObject.getBoundingBox());
+    MapObjectType type = MapObjectType.get(transformObject.getType());
+    if (type == MapObjectType.LIGHTSOURCE || type == MapObjectType.STATICSHADOW) {
+      Game.world().environment().updateLighting(transformObject.getBoundingBox());
     }
 
     EditorScreen.instance().getMapObjectPanel().bind(transformObject);
@@ -1137,7 +1129,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       double y = Math.min(beforeBounds.getY(), afterBounds.getY());
       double width = Math.max(beforeBounds.getMaxX(), afterBounds.getMaxX()) - x;
       double height = Math.max(beforeBounds.getMaxY(), afterBounds.getMaxY()) - y;
-      Game.world().environment().getAmbientLight().updateSection(new Rectangle2D.Double(x, y, width, height));
+      Game.world().environment().updateLighting(new Rectangle2D.Double(x, y, width, height));
     }
   }
 

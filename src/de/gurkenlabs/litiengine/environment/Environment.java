@@ -280,12 +280,15 @@ public final class Environment implements IRenderable {
     this.emitters.remove(emitter);
   }
 
-  private void updateColorLayers(IEntity entity) {
-    this.updateColorLayers(entity.getBoundingBox());
+  private void updateLighting(IEntity entity) {
+    this.updateLighting(entity.getBoundingBox());
   }
 
-  private void updateColorLayers(Rectangle2D section) {
-
+  public void updateLighting() {
+    this.updateLighting(this.getMap().getBounds());
+  }
+  
+  public void updateLighting(Rectangle2D section) {
     if (this.staticShadowLayer != null) {
       this.staticShadowLayer.updateSection(section);
     }
@@ -835,7 +838,7 @@ public final class Environment implements IRenderable {
     }
 
     this.getEntities().stream().forEach(this::load);
-    this.updateColorLayers(this.getMap().getBounds());
+    this.updateLighting();
     this.loaded = true;
     this.fireEvent(l -> l.loaded(this));
   }
@@ -971,7 +974,7 @@ public final class Environment implements IRenderable {
 
     if (entity instanceof LightSource) {
       this.lightSources.remove(entity);
-      this.updateColorLayers(entity);
+      this.updateLighting(entity);
     }
 
     if (entity instanceof Trigger) {
@@ -984,7 +987,7 @@ public final class Environment implements IRenderable {
 
     if (entity instanceof StaticShadow) {
       this.staticShadows.remove(entity);
-      this.updateColorLayers(entity);
+      this.updateLighting(entity);
     }
 
     if (entity instanceof IMobileEntity) {
@@ -1300,7 +1303,7 @@ public final class Environment implements IRenderable {
     entity.attachControllers();
 
     if (this.loaded && (entity instanceof LightSource || entity instanceof StaticShadow)) {
-      this.updateColorLayers(entity);
+      this.updateLighting(entity);
     }
 
     entity.loaded(this);
@@ -1384,6 +1387,10 @@ public final class Environment implements IRenderable {
     if (entity instanceof Emitter) {
       Emitter em = (Emitter) entity;
       em.deactivate();
+    }
+    
+    if (this.loaded && (entity instanceof LightSource || entity instanceof StaticShadow)) {
+      this.updateLighting(entity);
     }
 
     entity.removed(this);
