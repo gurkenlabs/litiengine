@@ -25,7 +25,9 @@ public class CollisionBoxMapObjectLoader extends MapObjectLoader {
 
     final CollisionBox col = this.createCollisionBox(mapObject);
     loadDefaultProperties(col, mapObject);
-
+    col.setCollisionBoxWidth(col.getWidth());
+    col.setCollisionBoxHeight(col.getHeight());
+    
     Collection<IEntity> entities = new ArrayList<>();
     entities.add(col);
 
