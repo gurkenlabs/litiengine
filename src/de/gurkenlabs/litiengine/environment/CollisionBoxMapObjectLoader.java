@@ -23,26 +23,20 @@ public class CollisionBoxMapObjectLoader extends MapObjectLoader {
       throw new IllegalArgumentException("Cannot load a mapobject of the type " + mapObject.getType() + " with a loader of the type " + CollisionBoxMapObjectLoader.class);
     }
 
-    Collision collisionType = mapObject.getEnumValue(MapObjectProperty.COLLISION_TYPE, Collision.class, Collision.STATIC);
-    boolean isObstructingLight = mapObject.getBoolValue(MapObjectProperty.COLLISIONBOX_OBSTRUCTINGLIGHTS);
-
-    final CollisionBox col = this.createCollisionBox(mapObject, isObstructingLight);
+    final CollisionBox col = this.createCollisionBox(mapObject);
     loadDefaultProperties(col, mapObject);
-    col.setCollisionBoxWidth(col.getWidth());
-    col.setCollisionBoxHeight(col.getHeight());
-    col.setCollisionType(collisionType);
 
     Collection<IEntity> entities = new ArrayList<>();
     entities.add(col);
 
-    if (isObstructingLight) {
+    if (col.isObstructingLight()) {
       entities.add(new StaticShadow(col));
     }
 
     return entities;
   }
 
-  protected CollisionBox createCollisionBox(IMapObject mapObject, boolean isObstructingLight) {
-    return new CollisionBox(isObstructingLight);
+  protected CollisionBox createCollisionBox(IMapObject mapObject) {
+    return new CollisionBox();
   }
 }

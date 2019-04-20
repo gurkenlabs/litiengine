@@ -87,7 +87,7 @@ public class MapObjectPanel extends PropertyPanel {
 
     this.tagPanel = new TagPanel();
 
-    tabbedPanel = new JTabbedPane(JTabbedPane.TOP);
+    this.tabbedPanel = new JTabbedPane(JTabbedPane.TOP);
 
     panel_1 = new JPanel();
 
@@ -222,27 +222,27 @@ public class MapObjectPanel extends PropertyPanel {
       this.currentPanel.bind(null);
       this.tabbedPanel.remove(this.currentPanel);
     }
-    tabbedPanel.addTab(Resources.strings().get(panel.getIdentifier()), panel.getIcon(), panel);
+    tabbedPanel.addTab(Resources.strings().get(panel.getIdentifier()).toUpperCase(), panel.getIcon(), panel);
 
     if (currentType == MapObjectType.PROP || currentType == MapObjectType.CREATURE) {
-      tabbedPanel.addTab(Resources.strings().get(this.collisionPanel.getIdentifier()), this.collisionPanel.getIcon(), this.collisionPanel);
+      tabbedPanel.addTab(Resources.strings().get(this.collisionPanel.getIdentifier()).toUpperCase(), this.collisionPanel.getIcon(), this.collisionPanel);
     } else {
       this.tabbedPanel.remove(this.collisionPanel);
     }
 
     if (currentType == MapObjectType.PROP || currentType == MapObjectType.CREATURE) {
-      tabbedPanel.addTab(Resources.strings().get(this.combatPanel.getIdentifier()), this.combatPanel);
+      tabbedPanel.addTab(Resources.strings().get(this.combatPanel.getIdentifier()).toUpperCase(), this.combatPanel);
     } else {
       this.tabbedPanel.remove(this.combatPanel);
     }
 
     if (currentType == MapObjectType.CREATURE) {
-      tabbedPanel.addTab(Resources.strings().get(this.movementPanel.getIdentifier()), this.movementPanel.getIcon(), this.movementPanel);
+      tabbedPanel.addTab(Resources.strings().get(this.movementPanel.getIdentifier()).toUpperCase(), this.movementPanel.getIcon(), this.movementPanel);
     } else {
       this.tabbedPanel.remove(this.movementPanel);
     }
 
-    tabbedPanel.addTab(Resources.strings().get(this.customPanel.getIdentifier()), this.customPanel.getIcon(), this.customPanel);
+    tabbedPanel.addTab(Resources.strings().get(this.customPanel.getIdentifier()).toUpperCase(), this.customPanel.getIcon(), this.customPanel);
 
     this.currentPanel = panel;
     this.currentPanel.bind(this.getDataSource());

@@ -1,14 +1,11 @@
 package de.gurkenlabs.utiliti.swing;
 
 import java.awt.Dimension;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.Font;
 import java.util.List;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
@@ -17,7 +14,6 @@ import javax.swing.ListSelectionModel;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
-import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.components.EditorScreen;
@@ -27,10 +23,6 @@ public class MapSelectionPanel extends JSplitPane {
   private final JList<String> mapList;
   private final DefaultListModel<String> model;
   private final JScrollPane mapScrollPane;
-
-  private final JPopupMenu popupMenu;
-  private final JMenuItem exportMap;
-  private final JMenuItem deleteMap;
 
   public MapSelectionPanel() {
     super(JSplitPane.HORIZONTAL_SPLIT);
@@ -46,10 +38,10 @@ public class MapSelectionPanel extends JSplitPane {
     mapScrollPane.setMaximumSize(new Dimension(0, 250));
     this.setLeftComponent(mapScrollPane);
 
-    model = new DefaultListModel<>();
+    this.model = new DefaultListModel<>();
 
     this.mapList = new JList<>();
-    this.mapList.setModel(model);
+    this.mapList.setModel(this.model);
     this.mapList.setVisibleRowCount(8);
     this.mapList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     this.mapList.setMaximumSize(new Dimension(0, 250));
@@ -70,30 +62,13 @@ public class MapSelectionPanel extends JSplitPane {
     });
 
     mapScrollPane.setViewportView(this.mapList);
-
-    popupMenu = new JPopupMenu();
-    addPopup(this.mapList, popupMenu);
-
-    exportMap = new JMenuItem(Resources.strings().get("hud_exportMap"));
-    exportMap.setIcon(Icons.MAP_EXPORT);
-    exportMap.addActionListener(a -> EditorScreen.instance().getMapComponent().exportMap());
-
-    deleteMap = new JMenuItem(Resources.strings().get("hud_deleteMap"));
-    deleteMap.setIcon(Icons.MAP_DELETE);
-    deleteMap.addActionListener(a -> EditorScreen.instance().getMapComponent().deleteMap());
-
-    popupMenu.add(exportMap);
-    popupMenu.add(deleteMap);
-
     mapScrollPane.setViewportBorder(null);
 
     JTabbedPane tabPane = new JTabbedPane();
-    tabPane.addTab(Resources.strings().get("panel_entities"), UI.getEntityList());
-    tabPane.add(Resources.strings().get("panel_mapObjectLayers"), UI.getMapLayerList());
+    tabPane.setFont(tabPane.getFont().deriveFont(Font.BOLD));
+    tabPane.add(UI.getEntityList());
+    tabPane.add(UI.getMapLayerList());
     tabPane.setMaximumSize(new Dimension(0, 150));
-
-    tabPane.setIconAt(0, Icons.CUBE);
-    tabPane.setIconAt(1, Icons.LAYER);
 
     this.setRightComponent(tabPane);
 
@@ -172,30 +147,6 @@ public class MapSelectionPanel extends JSplitPane {
 
     UI.getEntityList().update();
     UI.getMapLayerList().update();
-  }
-
-  private static void addPopup(JList<String> mapList, final JPopupMenu popup) {
-    mapList.addMouseListener(new MouseAdapter() {
-      @Override
-      public void mousePressed(MouseEvent e) {
-        if (e.isPopupTrigger()) {
-          mapList.setSelectedIndex(mapList.locationToIndex(e.getPoint()));
-          showMenu(e);
-        }
-      }
-
-      @Override
-      public void mouseReleased(MouseEvent e) {
-        if (e.isPopupTrigger()) {
-          mapList.setSelectedIndex(mapList.locationToIndex(e.getPoint()));
-          showMenu(e);
-        }
-      }
-
-      private void showMenu(MouseEvent e) {
-        popup.show(e.getComponent(), e.getX(), e.getY());
-      }
-    });
   }
 
   private int getIndexToReplace(String mapName) {

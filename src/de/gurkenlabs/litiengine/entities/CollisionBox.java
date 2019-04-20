@@ -14,10 +14,9 @@ import de.gurkenlabs.litiengine.physics.Collision;
 public class CollisionBox extends CollisionEntity {
 
   @TmxProperty(name = MapObjectProperty.COLLISIONBOX_OBSTRUCTINGLIGHTS)
-  private final boolean obstructingLight;
+  private boolean obstructingLight;
 
   public CollisionBox() {
-    this(false);
   }
 
   public CollisionBox(final boolean obstructingLight) {
@@ -25,7 +24,6 @@ public class CollisionBox extends CollisionEntity {
   }
 
   public CollisionBox(double width, double height) {
-    this(false);
     this.setWidth(width);
     this.setHeight(height);
     this.setCollisionBoxWidth(this.getWidth());

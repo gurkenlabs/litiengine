@@ -6,11 +6,13 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.physics.Collision;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.swing.Icons;
+import de.gurkenlabs.utiliti.swing.UI;
 
 @SuppressWarnings("serial")
 public class CollisionBoxPanel extends PropertyPanel {
@@ -35,12 +37,17 @@ public class CollisionBoxPanel extends PropertyPanel {
     this.chckbxIsObstructingLights.setSelected(false);
   }
 
-  @Override
+
   protected void setControlValues(IMapObject mapObject) {
     this.comboBoxColl.setSelectedItem(mapObject.getEnumValue(MapObjectProperty.COLLISION_TYPE, Collision.class, Collision.STATIC));
     this.chckbxIsObstructingLights.setSelected(mapObject.getBoolValue(MapObjectProperty.COLLISIONBOX_OBSTRUCTINGLIGHTS));
   }
-
+  @Override
+  protected void updateEnvironment(final IMapObject before) {
+    super.updateEnvironment(before);
+    UI.getEntityList().update();
+  }
+  
   private void setupChangedListeners() {
     this.setup(this.comboBoxColl, MapObjectProperty.COLLISION_TYPE);
     this.setup(this.chckbxIsObstructingLights, MapObjectProperty.COLLISIONBOX_OBSTRUCTINGLIGHTS);

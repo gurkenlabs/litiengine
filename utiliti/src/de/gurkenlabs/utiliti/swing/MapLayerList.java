@@ -55,6 +55,7 @@ public final class MapLayerList extends JScrollPane {
   private final JButton buttonRenameLayer;
 
   public MapLayerList() {
+    this.setName(Resources.strings().get("panel_mapObjectLayers").toUpperCase());
     this.selectedLayers = new ConcurrentHashMap<>();
     this.layerChangedListeners = new CopyOnWriteArrayList<>();
 
