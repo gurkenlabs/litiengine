@@ -11,6 +11,8 @@ public final class MapObjectProperty {
   private static final Logger log = Logger.getLogger(MapObjectProperty.class.getName());
 
   public static final String TAGS = "tags";
+  public static final String RENDERTYPE = "renderType";
+  public static final String RENDERWITHLAYER = "renderWithLayer";
 
   // collision entity
   public static final String COLLISION = "collision";

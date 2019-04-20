@@ -1176,7 +1176,7 @@ public final class Environment implements IRenderable {
         if (entity != null) {
 
           // only add the entity to be rendered with it's layer if its RenderType equals the layer's RenderType
-          if (mapObject.getLayer() != null && entity.getRenderType() == mapObject.getLayer().getRenderType()) {
+          if (mapObject.getLayer() != null && entity.renderWithLayer()) {
             this.addEntity(entity);
             this.layerEntities.computeIfAbsent(mapObject.getLayer(), m -> new CopyOnWriteArrayList<>()).add(entity);
           } else {

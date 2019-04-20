@@ -8,6 +8,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
+import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.util.ReflectionUtilities;
 
 public abstract class MapObjectLoader implements IMapObjectLoader {
@@ -50,6 +51,7 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
     entity.setHeight(mapObject.getHeight());
     entity.setName(mapObject.getName());
     entity.setLocation(mapObject.getLocation());
+    entity.setRenderWithLayer(mapObject.getBoolValue(MapObjectProperty.RENDERWITHLAYER));
 
     String tagsString = mapObject.getStringValue(MapObjectProperty.TAGS);
     if (tagsString != null && tagsString.trim().length() > 0) {
@@ -63,6 +65,11 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
 
         entity.addTag(tag);
       }
+    }
+
+    RenderType renderType = mapObject.getEnumValue(MapObjectProperty.RENDERTYPE, RenderType.class);
+    if (renderType != null) {
+      entity.setRenderType(renderType);
     }
 
     loadCustomMapObjectProperties(entity, mapObject);
