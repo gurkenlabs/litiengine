@@ -119,24 +119,28 @@ public class MapObjectPanel extends PropertyPanel {
     panel_1.setLayout(new BoxLayout(panel_1, BoxLayout.X_AXIS));
 
     JLabel lblEntityId = new JLabel("ID");
-    panel_1.add(lblEntityId);
     lblEntityId.setFont(lblEntityId.getFont().deriveFont(Font.BOLD).deriveFont(12f));
-    panel_1.add(Box.createHorizontalStrut(47));
+
     this.labelEntityID = new JLabel("####");
-    panel_1.add(labelEntityID);
     this.labelEntityID.setFont(labelEntityID.getFont().deriveFont(12f));
-    panel_1.add(Box.createHorizontalStrut(20));
+
     this.lblLayer = new JLabel("");
-    panel_1.add(lblLayer);
+
+    this.lblRendering = new JLabel("");
+    this.lblRendering.setForeground(Color.GRAY);
+    this.lblRendering.setFont(lblRendering.getFont().deriveFont(10f));
+
     this.lblLayer.setHorizontalAlignment(SwingConstants.TRAILING);
     this.lblLayer.setForeground(Color.GRAY);
     this.lblLayer.setFont(this.lblLayer.getFont().deriveFont(10f));
-    panel_1.add(Box.createHorizontalStrut(15));
-    this.lblRendering = new JLabel("");
-    panel_1.add(lblRendering);
-    this.lblRendering.setForeground(Color.GRAY);
-    this.lblRendering.setFont(lblRendering.getFont().deriveFont(10f));
+
+    panel_1.add(lblEntityId);
+    panel_1.add(Box.createHorizontalStrut(47));
+    panel_1.add(labelEntityID);
     panel_1.add(Box.createGlue());
+    panel_1.add(lblRendering);
+    panel_1.add(Box.createHorizontalStrut(15));
+    panel_1.add(lblLayer);
     
     setLayout(groupLayout);
 
