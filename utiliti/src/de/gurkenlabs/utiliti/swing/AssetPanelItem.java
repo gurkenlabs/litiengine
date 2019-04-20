@@ -286,9 +286,9 @@ public class AssetPanelItem extends JPanel {
         EditorScreen.instance().getGameFile().getSpriteSheets().remove(getOrigin());
         Resources.images().clear();
         Resources.spritesheets().remove(info.getName());
-        EditorScreen.instance().getMapComponent().reloadEnvironment();
+        EditorScreen.instance().getMainComponent().reloadEnvironment();
 
-        UI.updateAssets();
+        UI.getAssetComponent().refresh();
       }
     } else if (getOrigin() instanceof EmitterData) {
       EmitterData emitter = (EmitterData) getOrigin();
@@ -296,23 +296,23 @@ public class AssetPanelItem extends JPanel {
 
       if (n == JOptionPane.OK_OPTION) {
         EditorScreen.instance().getGameFile().getEmitters().remove(getOrigin());
-        EditorScreen.instance().getMapComponent().reloadEnvironment();
+        EditorScreen.instance().getMainComponent().reloadEnvironment();
 
-        UI.updateAssets();
+        UI.getAssetComponent().refresh();
       }
     } else if (getOrigin() instanceof Blueprint) {
       Blueprint blueprint = (Blueprint) getOrigin();
       int n = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), "Do you really want to delete the blueprint [" + blueprint.getName() + "]?", "Delete Blueprint?", JOptionPane.YES_NO_OPTION);
       if (n == JOptionPane.OK_OPTION) {
         EditorScreen.instance().getGameFile().getBluePrints().remove(getOrigin());
-        UI.updateAssets();
+        UI.getAssetComponent().refresh();
       }
     } else if (getOrigin() instanceof SoundResource) {
       SoundResource sound = (SoundResource) getOrigin();
       int n = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), "Do you really want to delete the sound [" + sound.getName() + "]?", "Delete Sound?", JOptionPane.YES_NO_OPTION);
       if (n == JOptionPane.OK_OPTION) {
         EditorScreen.instance().getGameFile().getSounds().remove(getOrigin());
-        UI.updateAssets();
+        UI.getAssetComponent().refresh();
       }
     }
   }
@@ -350,14 +350,14 @@ public class AssetPanelItem extends JPanel {
       mo.setValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE, false);
       mo.setValue(MapObjectProperty.PROP_ADDSHADOW, true);
 
-      EditorScreen.instance().getMapComponent().add(mo);
+      EditorScreen.instance().getMainComponent().add(mo);
       return true;
     } else if (this.getOrigin() instanceof EmitterData) {
       MapObject newEmitter = (MapObject) EmitterMapObjectLoader.createMapObject((EmitterData) this.getOrigin());
       newEmitter.setX((int) (Game.world().camera().getFocus().getX() - newEmitter.getWidth()));
       newEmitter.setY((int) (Game.world().camera().getFocus().getY() - newEmitter.getHeight()));
       newEmitter.setId(Game.world().environment().getNextMapId());
-      EditorScreen.instance().getMapComponent().add(newEmitter);
+      EditorScreen.instance().getMainComponent().add(newEmitter);
     } else if (this.getOrigin() instanceof Blueprint) {
       Blueprint blueprint = (Blueprint) this.getOrigin();
 
@@ -365,7 +365,7 @@ public class AssetPanelItem extends JPanel {
       try {
         List<IMapObject> newObjects = blueprint.build((int) Game.world().camera().getFocus().getX() - blueprint.getWidth() / 2, (int) Game.world().camera().getFocus().getY() - blueprint.getHeight() / 2);
         for (IMapObject newMapObject : newObjects) {
-          EditorScreen.instance().getMapComponent().add(newMapObject);
+          EditorScreen.instance().getMainComponent().add(newMapObject);
         }
 
         // separately select the added objects because this cannot be done in
@@ -373,7 +373,7 @@ public class AssetPanelItem extends JPanel {
         // previous loop because it gets overwritten every time a map object
         // gets added
         for (IMapObject newMapObject : newObjects) {
-          EditorScreen.instance().getMapComponent().setSelection(newMapObject, false);
+          EditorScreen.instance().getMainComponent().setSelection(newMapObject, false);
         }
       } finally {
         UndoManager.instance().endOperation();

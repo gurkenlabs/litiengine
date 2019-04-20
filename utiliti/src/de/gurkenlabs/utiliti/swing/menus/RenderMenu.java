@@ -24,8 +24,8 @@ public final class RenderMenu extends JMenu {
 
     Game.world().addLoadedListener(e -> this.setEnabled(false));
 
-    UI.getMapLayerList().onLayersChanged(map -> this.updateMenu(EditorScreen.instance().getMapComponent().getSelectedMapObjects()));
-    EditorScreen.instance().getMapComponent().onSelectionChanged(this::updateMenu);
+    UI.getLayerComponent().onLayersChanged(map -> this.updateMenu(EditorScreen.instance().getMainComponent().getSelectedMapObjects()));
+    EditorScreen.instance().getMainComponent().onSelectionChanged(this::updateMenu);
   }
 
   private void updateMenu(List<IMapObject> selectedMapObjects) {
@@ -84,7 +84,7 @@ public final class RenderMenu extends JMenu {
     UndoManager.instance().endOperation();
 
     // rebind to refresh the ui
-    UI.getMapObjectPanel().bind(EditorScreen.instance().getMapComponent().getFocusedMapObject());
+    UI.getMapObjectPanel().bind(EditorScreen.instance().getMainComponent().getFocusedMapObject());
   }
 
   private void setRenderType(List<IMapObject> selectedMapObjects, RenderType renderType) {
@@ -108,6 +108,6 @@ public final class RenderMenu extends JMenu {
     UndoManager.instance().endOperation();
 
     // rebind to refresh the ui
-    UI.getMapObjectPanel().bind(EditorScreen.instance().getMapComponent().getFocusedMapObject());
+    UI.getMapObjectPanel().bind(EditorScreen.instance().getMainComponent().getFocusedMapObject());
   }
 }

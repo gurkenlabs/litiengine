@@ -11,6 +11,7 @@ import java.awt.Stroke;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
@@ -78,7 +79,7 @@ import de.gurkenlabs.utiliti.swing.UI;
 import de.gurkenlabs.utiliti.swing.dialogs.XmlExportDialog;
 import de.gurkenlabs.utiliti.swing.dialogs.XmlImportDialog;
 
-public class MapComponent extends EditorComponent implements IUpdateable {
+public class MainComponent extends GuiComponent implements IUpdateable {
   public enum TransformType {
     UP, DOWN, LEFT, RIGHT, UPLEFT, UPRIGHT, DOWNLEFT, DOWNRIGHT, NONE, MOVE
   }
@@ -86,7 +87,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   public static final int EDITMODE_CREATE = 0;
   public static final int EDITMODE_EDIT = 1;
   public static final int EDITMODE_MOVE = 2;
-  private static final Logger log = Logger.getLogger(MapComponent.class.getName());
+  private static final Logger log = Logger.getLogger(MainComponent.class.getName());
 
   private static final float[] zooms = new float[] { 0.1f, 0.25f, 0.5f, 1, 1.5f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f, 16f, 32f, 50f, 80f, 100f };
   private static final int DEFAULT_ZOOM_INDEX = 3;
@@ -140,8 +141,8 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   private boolean loading;
   private boolean initialized;
 
-  public MapComponent(final EditorScreen screen) {
-    super(ComponentType.MAP);
+  public MainComponent(final EditorScreen screen) {
+    super(0, EditorScreen.instance().getPadding(), Game.window().getResolution().getWidth(), Game.window().getResolution().getHeight() - Game.window().getResolution().getHeight() * 1 / 15);
     this.editModeChangedConsumer = new CopyOnWriteArrayList<>();
     this.focusChangedConsumer = new CopyOnWriteArrayList<>();
     this.selectionChangedConsumer = new CopyOnWriteArrayList<>();
@@ -245,7 +246,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     Collections.sort(maps);
 
     this.getMaps().addAll(maps);
-    UI.getMapSelectionPanel().bind(this.getMaps(), true);
+    UI.getMapComponent().bind(this.getMaps(), true);
   }
 
   public List<TmxMap> getMaps() {
@@ -338,7 +339,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       Game.world().loadEnvironment(this.environments.get(map.getName()));
 
       UI.updateScrollBars();
-      UI.getMapSelectionPanel().setSelection(map.getName());
+      UI.getMapComponent().setSelection(map.getName());
       UI.getMapObjectPanel().bind(this.getFocusedMapObject());
 
       for (Consumer<TmxMap> cons : this.loadedConsumer) {
@@ -359,7 +360,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   }
 
   public void add(IMapObject mapObject) {
-    this.add(mapObject, UI.getMapLayerList().getCurrentLayer());
+    this.add(mapObject, UI.getLayerComponent().getCurrentLayer());
     UndoManager.instance().mapObjectAdded(mapObject);
   }
 
@@ -468,7 +469,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
   public void clearAll() {
     this.focusedObjects.clear();
-    UI.getMapLayerList().clear();
+    UI.getLayerComponent().clear();
     this.selectedObjects.clear();
     this.cameraFocus.clear();
     this.environments.clear();
@@ -485,8 +486,9 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         if (deleteObject == null) {
           continue;
         }
-        UndoManager.instance().mapObjectDeleted(deleteObject);
+        
         this.delete(deleteObject);
+        UndoManager.instance().mapObjectDeleted(deleteObject);
       }
     } finally {
       UndoManager.instance().endOperation();
@@ -538,7 +540,6 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     Blueprint blueprint = new Blueprint(name.toString(), this.getSelectedMapObjects().toArray(new MapObject[this.getSelectedMapObjects().size()]));
 
     EditorScreen.instance().getGameFile().getBluePrints().add(blueprint);
-    UI.updateAssets();
   }
 
   public void centerCameraOnFocus() {
@@ -609,7 +610,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       }
 
       UI.getMapObjectPanel().bind(mapObject);
-      UI.getEntityList().focus(mapObject);
+      UI.getEntityComponent().focus(mapObject);
       if (mapObject == null) {
         this.focusedObjects.remove(Game.world().environment().getMap().getName());
       } else {
@@ -695,7 +696,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
     // TODO: remove all tile sets from the game file that are no longer needed
     // by any other map.
-    UI.getMapSelectionPanel().bind(this.getMaps());
+    UI.getMapComponent().bind(this.getMaps());
     if (!this.maps.isEmpty()) {
       this.loadEnvironment(this.maps.get(0));
     } else {
@@ -769,7 +770,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         this.environments.remove(map.getName());
       }
 
-      UI.getMapSelectionPanel().bind(this.getMaps(), true);
+      UI.getMapComponent().bind(this.getMaps(), true);
       this.loadEnvironment(map);
       log.log(Level.INFO, "imported map {0}", new Object[] { map.getName() });
     }, TmxMap.FILE_EXTENSION);
@@ -852,7 +853,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
     Game.world().environment().clear();
     Game.world().environment().load();
-    UI.getMapSelectionPanel().updateComponents();
+    UI.getMapComponent().refresh();
   }
 
   @Override
@@ -871,7 +872,12 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
     this.colorSelectionBorder = Color.getHSBColor(0, 0, this.focusBorderBrightness);
   }
-
+  
+  @Override
+  protected boolean mouseEventShouldBeForwarded(final MouseEvent e) {
+    return this.isForwardMouseEvents() && this.isVisible() && this.isEnabled() && !this.isSuspended() && e != null;
+  }
+  
   private void updateScrollSpeed() {
     this.scrollSpeed = BASE_SCROLL_SPEED / zooms[this.currentZoomIndex];
   }
@@ -1268,7 +1274,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   }
 
   private static void afterKeyPressed() {
-    EditorScreen.instance().getMapComponent().updateTransformControls();
+    EditorScreen.instance().getMainComponent().updateTransformControls();
   }
 
   private void setupMouseControls() {

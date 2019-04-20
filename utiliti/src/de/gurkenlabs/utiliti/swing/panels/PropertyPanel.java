@@ -36,6 +36,7 @@ import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.swing.TextList;
+import de.gurkenlabs.utiliti.swing.UI;
 
 @SuppressWarnings("serial")
 public abstract class PropertyPanel extends JPanel {
@@ -60,7 +61,6 @@ public abstract class PropertyPanel extends JPanel {
   public PropertyPanel(String identifier) {
     this();
     this.identifier = identifier;
-
   }
 
   public PropertyPanel() {
@@ -240,6 +240,7 @@ public abstract class PropertyPanel extends JPanel {
     if (getDataSource() instanceof IMapObject) {
       IMapObject obj = getDataSource();
       Game.world().environment().reloadFromMap(obj.getId());
+      UI.getEntityComponent().refresh();
     }
   }
 

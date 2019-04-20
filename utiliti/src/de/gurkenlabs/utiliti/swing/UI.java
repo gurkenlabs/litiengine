@@ -34,7 +34,8 @@ import de.gurkenlabs.utiliti.Cursors;
 import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.Style;
 import de.gurkenlabs.utiliti.components.EditorScreen;
-import de.gurkenlabs.utiliti.components.MapComponent;
+import de.gurkenlabs.utiliti.components.MainComponent;
+import de.gurkenlabs.utiliti.components.SubComponent;
 import de.gurkenlabs.utiliti.swing.menus.CanvasPopupMenu;
 import de.gurkenlabs.utiliti.swing.menus.MainMenuBar;
 import de.gurkenlabs.utiliti.swing.panels.MapObjectPanel;
@@ -47,9 +48,9 @@ public final class UI {
   private static AssetComponent assetComponent;
 
   private static MapObjectPanel mapObjectPanel;
-  private static MapSelectionPanel mapSelectionPanel;
-  private static MapLayerList mapLayerList;
-  private static EntityList entityList;
+  private static MapComponent mapSelectionPanel;
+  private static LayerComponent mapLayerList;
+  private static EntityComponent entityList;
   
   private static boolean initialized;
 
@@ -71,10 +72,6 @@ public final class UI {
     verticalScroll.setMaximum(Game.world().environment().getMap().getSizeInPixels().height);
     horizontalScroll.setValue((int) Game.world().camera().getViewport().getCenterX());
     verticalScroll.setValue((int) Game.world().camera().getViewport().getCenterY());
-  }
-
-  public static void updateAssets() {
-    assetComponent.update();
   }
 
   public static boolean notifyPendingChanges() {
@@ -119,15 +116,19 @@ public final class UI {
     return mapObjectPanel;
   }
 
-  public static MapLayerList getMapLayerList() {
+  public static LayerComponent getLayerComponent() {
     return mapLayerList;
   }
 
-  public static EntityList getEntityList() {
+  public static EntityComponent getEntityComponent() {
     return entityList;
   }
+  
+  public static SubComponent getAssetComponent() {
+    return assetComponent;
+  }
 
-  public static MapSelectionPanel getMapSelectionPanel() {
+  public static MapComponent getMapComponent() {
     return mapSelectionPanel;
   }
   
@@ -208,9 +209,9 @@ public final class UI {
   }
 
   private static Component initRightSplitPanel() {
-    mapLayerList = new MapLayerList();
-    entityList = new EntityList();
-    mapSelectionPanel = new MapSelectionPanel();
+    mapLayerList = new LayerComponent();
+    entityList = new EntityComponent();
+    mapSelectionPanel = new MapComponent();
     mapObjectPanel = new MapObjectPanel();
     
     JSplitPane rightSplitPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
@@ -248,7 +249,7 @@ public final class UI {
     renderPane.add(verticalScroll, BorderLayout.EAST);
 
     horizontalScroll.addAdjustmentListener(e -> {
-      if (EditorScreen.instance().getMapComponent().isLoading()) {
+      if (EditorScreen.instance().getMainComponent().isLoading()) {
         return;
       }
 
@@ -257,7 +258,7 @@ public final class UI {
     });
 
     verticalScroll.addAdjustmentListener(e -> {
-      if (EditorScreen.instance().getMapComponent().isLoading()) {
+      if (EditorScreen.instance().getMainComponent().isLoading()) {
         return;
       }
       Point2D newFocus = new Point2D.Double(Game.world().camera().getFocus().getX(), verticalScroll.getValue());
@@ -272,7 +273,7 @@ public final class UI {
       @Override
       public void mouseReleased(MouseEvent e) {
         if (SwingUtilities.isRightMouseButton(e)) {
-          EditorScreen.instance().getMapComponent().setEditMode(MapComponent.EDITMODE_EDIT);
+          EditorScreen.instance().getMainComponent().setEditMode(MainComponent.EDITMODE_EDIT);
           canvasPopup.show(canvas, e.getX(), e.getY());
         }
       }

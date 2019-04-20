@@ -32,10 +32,10 @@ public final class MapMenu extends JMenu {
     this.setMnemonic('M');
 
     JMenuItem imp = new JMenuItem(Resources.strings().get("menu_map_import"));
-    imp.addActionListener(a -> EditorScreen.instance().getMapComponent().importMap());
+    imp.addActionListener(a -> EditorScreen.instance().getMainComponent().importMap());
 
     JMenuItem exp = new JMenuItem(Resources.strings().get("menu_map_export"));
-    exp.addActionListener(a -> EditorScreen.instance().getMapComponent().exportMap());
+    exp.addActionListener(a -> EditorScreen.instance().getMainComponent().exportMap());
 
     JMenuItem saveMapSnapshot = new JMenuItem(Resources.strings().get("menu_map_snapshot"));
     saveMapSnapshot.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_PRINTSCREEN, Event.SHIFT_MASK));
@@ -45,7 +45,7 @@ public final class MapMenu extends JMenu {
     reassignIDs.addActionListener(a -> {
       try {
         int minID = Integer.parseInt(JOptionPane.showInputDialog(Resources.strings().get("panel_reassignMapIds"), 1));
-        EditorScreen.instance().getMapComponent().reassignIds(UI.getMapSelectionPanel().getCurrentMap(), minID);
+        EditorScreen.instance().getMainComponent().reassignIds(UI.getMapComponent().getCurrentMap(), minID);
       } catch (Exception e) {
         log.log(Level.SEVERE, "No parseable Integer found upon reading the min Map ID input. Try again.");
       }
@@ -53,11 +53,11 @@ public final class MapMenu extends JMenu {
     });
 
     JMenuItem del2 = new JMenuItem(Resources.strings().get("menu_map_delete"));
-    del2.addActionListener(a -> EditorScreen.instance().getMapComponent().deleteMap());
+    del2.addActionListener(a -> EditorScreen.instance().getMainComponent().deleteMap());
 
     JMenuItem mapProps = new JMenuItem(Resources.strings().get("menu_map_properties"));
     mapProps.addActionListener(a -> {
-      if (EditorScreen.instance().getMapComponent().getMaps() == null || EditorScreen.instance().getMapComponent().getMaps().isEmpty()) {
+      if (EditorScreen.instance().getMainComponent().getMaps() == null || EditorScreen.instance().getMainComponent().getMaps().isEmpty()) {
         return;
       }
 
@@ -79,8 +79,8 @@ public final class MapMenu extends JMenu {
         }
 
         UndoManager.instance().recordChanges();
-        EditorScreen.instance().getMapComponent().loadMaps(EditorScreen.instance().getGameFile().getMaps());
-        EditorScreen.instance().getMapComponent().loadEnvironment((TmxMap) Game.world().environment().getMap());
+        EditorScreen.instance().getMainComponent().loadMaps(EditorScreen.instance().getGameFile().getMaps());
+        EditorScreen.instance().getMainComponent().loadEnvironment((TmxMap) Game.world().environment().getMap());
       }
     });
     

@@ -33,9 +33,10 @@ import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.litiengine.util.Imaging;
 import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.components.EditorScreen;
+import de.gurkenlabs.utiliti.components.SubComponent;
 
 @SuppressWarnings("serial")
-public final class MapLayerList extends JScrollPane {
+public final class LayerComponent extends JScrollPane implements SubComponent {
   private static final Dimension BUTTON_SIZE = new Dimension(24, 24);
 
   private final Map<String, Integer> selectedLayers;
@@ -54,7 +55,7 @@ public final class MapLayerList extends JScrollPane {
   private final JButton buttonLowerLayer;
   private final JButton buttonRenameLayer;
 
-  public MapLayerList() {
+  public LayerComponent() {
     this.setName(Resources.strings().get("panel_mapObjectLayers").toUpperCase());
     this.selectedLayers = new ConcurrentHashMap<>();
     this.layerChangedListeners = new CopyOnWriteArrayList<>();
@@ -83,7 +84,7 @@ public final class MapLayerList extends JScrollPane {
       }
 
       this.list.setSelectedIndex(selIndex);
-      EditorScreen.instance().getMapComponent().updateTransformControls();
+      EditorScreen.instance().getMainComponent().updateTransformControls();
     }, false);
 
     this.buttonRemoveLayer = createButton(Icons.DELETE, (map, selectedLayer) -> {
@@ -96,17 +97,17 @@ public final class MapLayerList extends JScrollPane {
         return;
       }
 
-      EditorScreen.instance().getMapComponent().delete(selectedLayer);
+      EditorScreen.instance().getMainComponent().delete(selectedLayer);
       map.removeLayer(selectedLayer);
       layerModel.remove(this.getCurrentLayerIndex());
-      EditorScreen.instance().getMapComponent().updateTransformControls();
+      EditorScreen.instance().getMainComponent().updateTransformControls();
     });
 
     this.buttonDuplicateLayer = createButton(Icons.COPYX16, (map, selectedLayer) -> {
       IMapObjectLayer copiedLayer = new MapObjectLayer((MapObjectLayer) selectedLayer);
       map.addLayer(this.getAbsoluteIndex(map, this.getCurrentLayerIndex()), copiedLayer);
-      this.update();
-      EditorScreen.instance().getMapComponent().add(copiedLayer);
+      this.refresh();
+      EditorScreen.instance().getMainComponent().add(copiedLayer);
     });
 
     this.buttonSetColor = createButton(Icons.COLORX16, (map, selectedLayer) -> {
@@ -136,7 +137,7 @@ public final class MapLayerList extends JScrollPane {
         }
       }
 
-      EditorScreen.instance().getMapComponent().updateTransformControls();
+      EditorScreen.instance().getMainComponent().updateTransformControls();
     }, true);
 
     this.buttonLiftLayer = createButton(Icons.LIFT, (map, selectedLayer) -> {
@@ -173,7 +174,7 @@ public final class MapLayerList extends JScrollPane {
 
     // TODO: enabled states for all commands
 
-    EditorScreen.instance().getMapComponent().onMapLoading(map -> {
+    EditorScreen.instance().getMainComponent().onMapLoading(map -> {
       if (map == null) {
         return;
       }
@@ -181,7 +182,7 @@ public final class MapLayerList extends JScrollPane {
       this.selectedLayers.put(map.getName(), this.list.getSelectedIndex());
     });
 
-    EditorScreen.instance().getMapComponent().onMapLoaded(map -> {
+    EditorScreen.instance().getMainComponent().onMapLoaded(map -> {
       if (this.selectedLayers.containsKey(map.getName())) {
         this.selectLayer(this.selectedLayers.get(map.getName()));
       }
@@ -195,7 +196,7 @@ public final class MapLayerList extends JScrollPane {
         return null;
       }
 
-      IMapObject focus = EditorScreen.instance().getMapComponent().getFocusedMapObject();
+      IMapObject focus = EditorScreen.instance().getMainComponent().getFocusedMapObject();
       if (focus != null) {
         return focus.getLayer();
       }
@@ -219,7 +220,7 @@ public final class MapLayerList extends JScrollPane {
     this.selectedLayers.clear();
   }
 
-  public void update() {
+  public void refresh() {
     IMap map = getCurrentMap();
     if (map == null) {
       this.layerModel.clear();
@@ -305,7 +306,7 @@ public final class MapLayerList extends JScrollPane {
       }
 
       consumer.accept(currentMap, layer);
-      this.update();
+      this.refresh();
       UndoManager.instance().recordChanges();
       for (Consumer<IMap> c : this.layerChangedListeners) {
         c.accept(getCurrentMap());

@@ -33,7 +33,7 @@ public final class XmlImportDialog {
         consumer.accept(file);
       }
 
-      UI.updateAssets();
+      UI.getAssetComponent().refresh();
     }
   }
 }

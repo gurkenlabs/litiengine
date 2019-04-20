@@ -33,7 +33,7 @@ public final class StatusBar {
     String positionY = "y: " + (int) Input.mouse().getMapLocation().getY() + "[" + tile.y + "]";
     String status = String.format("%-14s %-14s", positionX, positionY) + String.format(" %-10s", (int) (Game.world().camera().getRenderScale() * 100) + "%");
 
-    int size = EditorScreen.instance().getMapComponent().getSelectedMapObjects().size();
+    int size = EditorScreen.instance().getMainComponent().getSelectedMapObjects().size();
     if (size <= 0) {
       statusLabel.setText("");
     } else {

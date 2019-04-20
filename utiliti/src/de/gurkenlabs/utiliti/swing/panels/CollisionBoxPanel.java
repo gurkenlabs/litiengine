@@ -42,12 +42,7 @@ public class CollisionBoxPanel extends PropertyPanel {
     this.comboBoxColl.setSelectedItem(mapObject.getEnumValue(MapObjectProperty.COLLISION_TYPE, Collision.class, Collision.STATIC));
     this.chckbxIsObstructingLights.setSelected(mapObject.getBoolValue(MapObjectProperty.COLLISIONBOX_OBSTRUCTINGLIGHTS));
   }
-  @Override
-  protected void updateEnvironment(final IMapObject before) {
-    super.updateEnvironment(before);
-    UI.getEntityList().update();
-  }
-  
+
   private void setupChangedListeners() {
     this.setup(this.comboBoxColl, MapObjectProperty.COLLISION_TYPE);
     this.setup(this.chckbxIsObstructingLights, MapObjectProperty.COLLISIONBOX_OBSTRUCTINGLIGHTS);

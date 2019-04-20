@@ -10,9 +10,10 @@ import javax.swing.JSplitPane;
 import de.gurkenlabs.litiengine.graphics.ImageFormat;
 import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.components.EditorScreen;
+import de.gurkenlabs.utiliti.components.SubComponent;
 
 @SuppressWarnings("serial")
-public class AssetComponent extends JSplitPane {
+public class AssetComponent extends JSplitPane implements SubComponent {
   private AssetPanel assetPanel;
   private AssetTree assetTree;
 
@@ -49,7 +50,7 @@ public class AssetComponent extends JSplitPane {
     return this.assetTree;
   }
   
-  public void update() {
+  public void refresh() {
     this.assetTree.forceUpdate();
   }
 }

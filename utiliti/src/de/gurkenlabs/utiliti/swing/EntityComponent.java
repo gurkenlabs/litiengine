@@ -36,9 +36,10 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.components.EditorScreen;
+import de.gurkenlabs.utiliti.components.SubComponent;
 
 @SuppressWarnings("serial")
-public final class EntityList extends JPanel {
+public final class EntityComponent extends JPanel implements SubComponent {
   private final JScrollPane entityScrollPane;
   private final JPanel searchPanel;
 
@@ -64,7 +65,7 @@ public final class EntityList extends JPanel {
 
   private boolean isFocussing;
 
-  public EntityList() {
+  public EntityComponent() {
     this.setName(Resources.strings().get("panel_entities").toUpperCase());
     this.setLayout(new BorderLayout(0, 0));
 
@@ -147,7 +148,7 @@ public final class EntityList extends JPanel {
             if (item.getUserObject() instanceof IEntity) {
               IMapObject obj = env.getMap().getMapObject(((IEntity) item.getUserObject()).getMapId());
               if (obj != null) {
-                EditorScreen.instance().getMapComponent().setFocus(obj, true);
+                EditorScreen.instance().getMainComponent().setFocus(obj, true);
               }
             }
           }
@@ -176,7 +177,7 @@ public final class EntityList extends JPanel {
       public void mouseClicked(MouseEvent e) {
         int selRow = tree.getRowForLocation(e.getX(), e.getY());
         if (selRow != -1 && e.getClickCount() == 2) {
-          EditorScreen.instance().getMapComponent().centerCameraOnFocus();
+          EditorScreen.instance().getMainComponent().centerCameraOnFocus();
         }
       }
     };
@@ -231,7 +232,7 @@ public final class EntityList extends JPanel {
     }
   }
   
-  public void update() {
+  public void refresh() {
     this.nodeRoot.setUserObject(new IconTreeListItem((Game.world().environment() == null ? 0 : Game.world().environment().getEntities().size()) + " " + Resources.strings().get("panel_mapselection_entities"), Icons.FOLDER));
     for (DefaultMutableTreeNode node : this.entityNodes) {
       node.removeAllChildren();
@@ -252,6 +253,7 @@ public final class EntityList extends JPanel {
     }
 
     this.entitiesTreeModel.reload();
+    this.focus(EditorScreen.instance().getMainComponent().getFocusedMapObject());
   }
 
   private void collapseAll() {

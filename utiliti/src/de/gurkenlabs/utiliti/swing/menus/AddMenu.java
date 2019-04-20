@@ -10,7 +10,7 @@ import javax.swing.KeyStroke;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.components.EditorScreen;
-import de.gurkenlabs.utiliti.components.MapComponent;
+import de.gurkenlabs.utiliti.components.MainComponent;
 import de.gurkenlabs.utiliti.swing.Icons;
 import de.gurkenlabs.utiliti.swing.UI;
 
@@ -72,7 +72,7 @@ public final class AddMenu extends JMenu {
   }
 
   private static void setCreateMode(MapObjectType tpye) {
-    EditorScreen.instance().getMapComponent().setEditMode(MapComponent.EDITMODE_CREATE);
+    EditorScreen.instance().getMainComponent().setEditMode(MainComponent.EDITMODE_CREATE);
     UI.getMapObjectPanel().setMapObjectType(tpye);
   }
 }

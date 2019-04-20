@@ -146,7 +146,7 @@ public class MapObjectPanel extends PropertyPanel {
     setLayout(groupLayout);
 
     this.setupChangedListeners();
-    UI.getMapLayerList().onLayersChanged(map -> this.bind(this.getDataSource()));
+    UI.getLayerComponent().onLayersChanged(map -> this.bind(this.getDataSource()));
   }
 
   public void updateSpinnerModels() {
@@ -222,27 +222,27 @@ public class MapObjectPanel extends PropertyPanel {
       this.currentPanel.bind(null);
       this.tabbedPanel.remove(this.currentPanel);
     }
-    tabbedPanel.addTab(Resources.strings().get(panel.getIdentifier()).toUpperCase(), panel.getIcon(), panel);
+    tabbedPanel.addTab(Resources.strings().get(panel.getIdentifier()), panel.getIcon(), panel);
 
     if (currentType == MapObjectType.PROP || currentType == MapObjectType.CREATURE) {
-      tabbedPanel.addTab(Resources.strings().get(this.collisionPanel.getIdentifier()).toUpperCase(), this.collisionPanel.getIcon(), this.collisionPanel);
+      tabbedPanel.addTab(Resources.strings().get(this.collisionPanel.getIdentifier()), this.collisionPanel.getIcon(), this.collisionPanel);
     } else {
       this.tabbedPanel.remove(this.collisionPanel);
     }
 
     if (currentType == MapObjectType.PROP || currentType == MapObjectType.CREATURE) {
-      tabbedPanel.addTab(Resources.strings().get(this.combatPanel.getIdentifier()).toUpperCase(), this.combatPanel);
+      tabbedPanel.addTab(Resources.strings().get(this.combatPanel.getIdentifier()), this.combatPanel);
     } else {
       this.tabbedPanel.remove(this.combatPanel);
     }
 
     if (currentType == MapObjectType.CREATURE) {
-      tabbedPanel.addTab(Resources.strings().get(this.movementPanel.getIdentifier()).toUpperCase(), this.movementPanel.getIcon(), this.movementPanel);
+      tabbedPanel.addTab(Resources.strings().get(this.movementPanel.getIdentifier()), this.movementPanel.getIcon(), this.movementPanel);
     } else {
       this.tabbedPanel.remove(this.movementPanel);
     }
 
-    tabbedPanel.addTab(Resources.strings().get(this.customPanel.getIdentifier()).toUpperCase(), this.customPanel.getIcon(), this.customPanel);
+    tabbedPanel.addTab(Resources.strings().get(this.customPanel.getIdentifier()), this.customPanel.getIcon(), this.customPanel);
 
     this.currentPanel = panel;
     this.currentPanel.bind(this.getDataSource());
@@ -320,22 +320,22 @@ public class MapObjectPanel extends PropertyPanel {
     this.spinnerX.addChangeListener(new MapObjectPropertyChangeListener(m -> {
 
       m.setX(getSpinnerValue(spinnerX));
-      EditorScreen.instance().getMapComponent().updateTransformControls();
+      EditorScreen.instance().getMainComponent().updateTransformControls();
     }));
 
     this.spinnerY.addChangeListener(new MapObjectPropertyChangeListener(m -> {
       m.setY(getSpinnerValue(spinnerY));
-      EditorScreen.instance().getMapComponent().updateTransformControls();
+      EditorScreen.instance().getMainComponent().updateTransformControls();
     }));
 
     this.spinnerWidth.addChangeListener(new MapObjectPropertyChangeListener(m -> {
       m.setWidth(getSpinnerValue(spinnerWidth));
-      EditorScreen.instance().getMapComponent().updateTransformControls();
+      EditorScreen.instance().getMainComponent().updateTransformControls();
     }));
 
     this.spinnerHeight.addChangeListener(new MapObjectPropertyChangeListener(m -> {
       m.setHeight(getSpinnerValue(spinnerHeight));
-      EditorScreen.instance().getMapComponent().updateTransformControls();
+      EditorScreen.instance().getMainComponent().updateTransformControls();
     }));
 
     this.tagPanel.addActionListener(new MapObjectPropertyActionListener(m -> m.setValue(MapObjectProperty.TAGS, this.tagPanel.getTagsString())));

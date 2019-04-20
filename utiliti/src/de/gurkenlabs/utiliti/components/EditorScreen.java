@@ -62,7 +62,6 @@ import de.gurkenlabs.utiliti.Cursors;
 import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.Style;
 import de.gurkenlabs.utiliti.UndoManager;
-import de.gurkenlabs.utiliti.components.EditorComponent.ComponentType;
 import de.gurkenlabs.utiliti.swing.StatusBar;
 import de.gurkenlabs.utiliti.swing.Tray;
 import de.gurkenlabs.utiliti.swing.UI;
@@ -84,14 +83,11 @@ public class EditorScreen extends Screen {
 
   private static EditorScreen instance;
 
-  private final List<EditorComponent> comps;
-
   private final List<Runnable> loadedCallbacks;
 
   private double padding;
-  private MapComponent mapComponent;
+  private MainComponent mainComponent;
   private ResourceBundle gameFile = new ResourceBundle();
-  private EditorComponent current;
   private String projectPath;
   private String currentResourceFile;
 
@@ -101,7 +97,6 @@ public class EditorScreen extends Screen {
 
   private EditorScreen() {
     super("Editor");
-    this.comps = new ArrayList<>();
     this.loadedCallbacks = new CopyOnWriteArrayList<>();
   }
 
@@ -123,8 +118,9 @@ public class EditorScreen extends Screen {
     padding = this.getWidth() / 50;
 
     // init components
-    this.mapComponent = new MapComponent(this);
-    this.comps.add(this.mapComponent);
+    this.mainComponent = new MainComponent(this);
+
+    this.getComponents().add(this.mainComponent);
     super.prepare();
   }
 
@@ -202,22 +198,6 @@ public class EditorScreen extends Screen {
     this.projectPath = projectPath;
   }
 
-  public void changeComponent(EditorComponent.ComponentType type) {
-    if (this.current != null) {
-      this.current.suspend();
-      this.getComponents().remove(this.current);
-    }
-
-    for (EditorComponent comp : this.comps) {
-      if (comp.getComponentType() == type) {
-        this.current = comp;
-        this.current.prepare();
-        this.getComponents().add(this.current);
-        break;
-      }
-    }
-  }
-
   public void create() {
     JFileChooser chooser;
     try {
@@ -236,16 +216,16 @@ public class EditorScreen extends Screen {
       this.setProjectPath(chooser.getSelectedFile().getCanonicalPath());
 
       // load all maps in the directory
-      this.mapComponent.loadMaps(this.getProjectPath());
+      this.mainComponent.loadMaps(this.getProjectPath());
       this.currentResourceFile = null;
       this.gameFile = new ResourceBundle();
 
       // add sprite sheets by tile sets of all maps in the project director
-      for (TmxMap map : this.mapComponent.getMaps()) {
+      for (TmxMap map : this.mainComponent.getMaps()) {
         this.loadSpriteSheets(map);
       }
 
-      UI.updateAssets();
+      UI.getAssetComponent().refresh();
 
       // load custom emitter files
       loadCustomEmitters(this.getGameFile().getEmitters());
@@ -254,9 +234,8 @@ public class EditorScreen extends Screen {
       this.updateGameFileMaps();
 
       // display first available map after loading all stuff
-      if (!this.mapComponent.getMaps().isEmpty()) {
-        this.mapComponent.loadEnvironment(this.mapComponent.getMaps().get(0));
-        this.changeComponent(ComponentType.MAP);
+      if (!this.mainComponent.getMaps().isEmpty()) {
+        this.mainComponent.loadEnvironment(this.mainComponent.getMaps().get(0));
       }
     } catch (IOException e) {
       log.log(Level.SEVERE, e.getLocalizedMessage(), e);
@@ -281,15 +260,14 @@ public class EditorScreen extends Screen {
 
     Game.world().unloadEnvironment();
     UndoManager.clearAll();
-    getMapComponent().clearAll();
+    getMainComponent().clearAll();
     this.currentResourceFile = null;
     this.gameFile = null;
     this.gamefileLoaded();
     this.setProjectPath(null);
-    this.mapComponent.loadMaps(Arrays.asList());
+    this.mainComponent.loadMaps(Arrays.asList());
     Resources.clearAll();
-    UI.updateAssets();
-    this.changeComponent(ComponentType.MAP);
+    UI.getAssetComponent().refresh();
     this.setCurrentStatus(Resources.strings().get("status_gamefile_closed"));
   }
 
@@ -332,7 +310,7 @@ public class EditorScreen extends Screen {
       this.setProjectPath(gameFile.getPath());
 
       // load maps from game file
-      this.mapComponent.loadMaps(this.getGameFile().getMaps());
+      this.mainComponent.loadMaps(this.getGameFile().getMaps());
 
       Resources.images().clear();
       Resources.spritesheets().clear();
@@ -351,23 +329,22 @@ public class EditorScreen extends Screen {
       log.log(Level.INFO, "{0} blueprints loaded from {1}", new Object[] { this.getGameFile().getBluePrints().size(), this.currentResourceFile });
       log.log(Level.INFO, "{0} sounds loaded from {1}", new Object[] { this.getGameFile().getSounds().size(), this.currentResourceFile });
 
-      for (TmxMap map : this.mapComponent.getMaps()) {
+      for (TmxMap map : this.mainComponent.getMaps()) {
         this.loadSpriteSheets(map);
       }
 
       // load custom emitter files
       loadCustomEmitters(this.getGameFile().getEmitters());
-      UI.updateAssets();
+      UI.getAssetComponent().refresh();
 
       // display first available map after loading all stuff
       // also switch to map component
-      if (!this.mapComponent.getMaps().isEmpty()) {
-        this.mapComponent.loadEnvironment(this.mapComponent.getMaps().get(0));
+      if (!this.mainComponent.getMaps().isEmpty()) {
+        this.mainComponent.loadEnvironment(this.mainComponent.getMaps().get(0));
       } else {
         Game.world().unloadEnvironment();
       }
 
-      this.changeComponent(ComponentType.MAP);
       this.setCurrentStatus(Resources.strings().get("status_gamefile_loaded"));
     } finally {
       Game.window().getRenderComponent().setCursor(Cursors.DEFAULT, 0, 0);
@@ -541,7 +518,7 @@ public class EditorScreen extends Screen {
           return;
         }
 
-        this.getMapComponent().loadTileset(tileset, false);
+        this.getMainComponent().loadTileset(tileset, false);
       }
 
       log.log(Level.INFO, "imported tileset {0} from {1}", new Object[] { tileset.getName(), file });
@@ -567,10 +544,10 @@ public class EditorScreen extends Screen {
     }
 
     Resources.images().clear();
-    this.getMapComponent().reloadEnvironment();
+    this.getMainComponent().reloadEnvironment();
 
     if (forceAssetTreeUpdate) {
-      UI.updateAssets();
+      UI.getAssetComponent().refresh();
     }
   }
 
@@ -641,30 +618,29 @@ public class EditorScreen extends Screen {
 
     File currentFile = new File(this.currentResourceFile);
     String currentMapSelection = null;
-    if (UI.getMapSelectionPanel().getCurrentMap() != null) {
-      currentMapSelection = UI.getMapSelectionPanel().getCurrentMap().getName();
+    if (UI.getMapComponent().getCurrentMap() != null) {
+      currentMapSelection = UI.getMapComponent().getCurrentMap().getName();
     }
 
     this.close(true);
     this.load(currentFile, true);
-    UI.getMapSelectionPanel().setSelection(currentMapSelection);
+    UI.getMapComponent().setSelection(currentMapSelection);
   }
 
-  public MapComponent getMapComponent() {
-    return this.mapComponent;
+  public MainComponent getMainComponent() {
+    return this.mainComponent;
   }
 
   public String getCurrentResourceFile() {
     return this.currentResourceFile;
   }
 
-
   public String getCurrentStatus() {
     return currentStatus;
   }
 
   public List<TmxMap> getChangedMaps() {
-    return this.getMapComponent().getMaps().stream().filter(UndoManager::hasChanges).distinct().collect(Collectors.toList());
+    return this.getMainComponent().getMaps().stream().filter(UndoManager::hasChanges).distinct().collect(Collectors.toList());
   }
 
   public void setCurrentStatus(String currentStatus) {
@@ -674,11 +650,11 @@ public class EditorScreen extends Screen {
 
   public void updateGameFileMaps() {
     this.getGameFile().getMaps().clear();
-    for (TmxMap map : this.mapComponent.getMaps()) {
+    for (TmxMap map : this.mainComponent.getMaps()) {
       this.getGameFile().getMaps().add(map);
     }
 
-    UI.updateAssets();
+    UI.getAssetComponent().refresh();
   }
 
   private String saveGameFile(String target) {
@@ -695,7 +671,7 @@ public class EditorScreen extends Screen {
       this.saveMaps();
     }
 
-    UI.getMapSelectionPanel().bind(this.getMapComponent().getMaps());
+    UI.getMapComponent().bind(this.getMainComponent().getMaps());
     return saveFile;
   }
 

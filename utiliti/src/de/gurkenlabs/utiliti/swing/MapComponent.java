@@ -1,7 +1,6 @@
 package de.gurkenlabs.utiliti.swing;
 
 import java.awt.Dimension;
-import java.awt.Font;
 import java.util.List;
 
 import javax.swing.DefaultListModel;
@@ -17,14 +16,15 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.components.EditorScreen;
+import de.gurkenlabs.utiliti.components.SubComponent;
 
 @SuppressWarnings("serial")
-public class MapSelectionPanel extends JSplitPane {
+public class MapComponent extends JSplitPane implements SubComponent {
   private final JList<String> mapList;
   private final DefaultListModel<String> model;
   private final JScrollPane mapScrollPane;
 
-  public MapSelectionPanel() {
+  public MapComponent() {
     super(JSplitPane.HORIZONTAL_SPLIT);
     this.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> Program.preferences().setMapPanelSplitter(this.getDividerLocation()));
     if (Program.preferences().getMapPanelSplitter() != 0) {
@@ -47,17 +47,17 @@ public class MapSelectionPanel extends JSplitPane {
     this.mapList.setMaximumSize(new Dimension(0, 250));
 
     this.mapList.getSelectionModel().addListSelectionListener(e -> {
-      if (EditorScreen.instance().isLoading() || EditorScreen.instance().getMapComponent().isLoading()) {
+      if (EditorScreen.instance().isLoading() || EditorScreen.instance().getMainComponent().isLoading()) {
         return;
       }
 
-      if (this.mapList.getSelectedIndex() < EditorScreen.instance().getMapComponent().getMaps().size() && this.mapList.getSelectedIndex() >= 0) {
-        TmxMap map = EditorScreen.instance().getMapComponent().getMaps().get(this.mapList.getSelectedIndex());
+      if (this.mapList.getSelectedIndex() < EditorScreen.instance().getMainComponent().getMaps().size() && this.mapList.getSelectedIndex() >= 0) {
+        TmxMap map = EditorScreen.instance().getMainComponent().getMaps().get(this.mapList.getSelectedIndex());
         if (Game.world().environment() != null && Game.world().environment().getMap().equals(map)) {
           return;
         }
 
-        EditorScreen.instance().getMapComponent().loadEnvironment(map);
+        EditorScreen.instance().getMainComponent().loadEnvironment(map);
       }
     });
 
@@ -65,23 +65,23 @@ public class MapSelectionPanel extends JSplitPane {
     mapScrollPane.setViewportBorder(null);
 
     JTabbedPane tabPane = new JTabbedPane();
-    tabPane.setFont(tabPane.getFont().deriveFont(Font.BOLD));
-    tabPane.add(UI.getEntityList());
-    tabPane.add(UI.getMapLayerList());
+
+    tabPane.add(UI.getEntityComponent());
+    tabPane.add(UI.getLayerComponent());
     tabPane.setMaximumSize(new Dimension(0, 150));
 
     this.setRightComponent(tabPane);
 
     UndoManager.onMapObjectAdded(manager -> {
-      this.updateComponents();
+      this.refresh();
 
     });
 
     UndoManager.onMapObjectRemoved(manager -> {
-      this.updateComponents();
+      this.refresh();
     });
 
-    UndoManager.onUndoStackChanged(manager -> this.bind(EditorScreen.instance().getMapComponent().getMaps()));
+    UndoManager.onUndoStackChanged(manager -> this.bind(EditorScreen.instance().getMainComponent().getMaps()));
   }
 
   public synchronized void bind(List<TmxMap> maps) {
@@ -118,7 +118,7 @@ public class MapSelectionPanel extends JSplitPane {
     }
 
     mapList.revalidate();
-    this.updateComponents();
+    this.refresh();
   }
 
   public void setSelection(String mapName) {
@@ -130,23 +130,23 @@ public class MapSelectionPanel extends JSplitPane {
       }
     }
 
-    this.updateComponents();
+    this.refresh();
   }
 
   public IMap getCurrentMap() {
     if (this.mapList.getSelectedIndex() == -1) {
       return null;
     }
-    return EditorScreen.instance().getMapComponent().getMaps().get(mapList.getSelectedIndex());
+    return EditorScreen.instance().getMainComponent().getMaps().get(mapList.getSelectedIndex());
   }
 
-  public void updateComponents() {
+  public void refresh() {
     if (mapList.getSelectedIndex() == -1 && this.model.size() > 0) {
       this.mapList.setSelectedIndex(0);
     }
 
-    UI.getEntityList().update();
-    UI.getMapLayerList().update();
+    UI.getEntityComponent().refresh();
+    UI.getLayerComponent().refresh();
   }
 
   private int getIndexToReplace(String mapName) {
