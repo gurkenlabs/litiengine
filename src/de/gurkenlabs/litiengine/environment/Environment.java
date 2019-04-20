@@ -280,7 +280,7 @@ public final class Environment implements IRenderable {
     this.emitters.remove(emitter);
   }
 
-  private void updateLighting(IEntity entity) {
+  public void updateLighting(IEntity entity) {
     if (entity instanceof StaticShadow) {
       StaticShadow shadow = (StaticShadow) entity;
       this.updateLighting(shadow.getArea() != null ? shadow.getArea().getBounds2D() : shadow.getBoundingBox());
