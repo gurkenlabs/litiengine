@@ -281,12 +281,17 @@ public final class Environment implements IRenderable {
   }
 
   private void updateColorLayers(IEntity entity) {
+    this.updateColorLayers(entity.getBoundingBox());
+  }
+
+  private void updateColorLayers(Rectangle2D section) {
+
     if (this.staticShadowLayer != null) {
-      this.staticShadowLayer.updateSection(entity.getBoundingBox());
+      this.staticShadowLayer.updateSection(section);
     }
 
     if (this.ambientLight != null) {
-      this.ambientLight.updateSection(entity.getBoundingBox());
+      this.ambientLight.updateSection(section);
     }
   }
 
@@ -830,7 +835,7 @@ public final class Environment implements IRenderable {
     }
 
     this.getEntities().stream().forEach(this::load);
-
+    this.updateColorLayers(this.getMap().getBounds());
     this.loaded = true;
     this.fireEvent(l -> l.loaded(this));
   }
@@ -1294,7 +1299,7 @@ public final class Environment implements IRenderable {
     // 4. attach all controllers
     entity.attachControllers();
 
-    if (entity instanceof LightSource || entity instanceof StaticShadow) {
+    if (this.loaded && (entity instanceof LightSource || entity instanceof StaticShadow)) {
       this.updateColorLayers(entity);
     }
 
