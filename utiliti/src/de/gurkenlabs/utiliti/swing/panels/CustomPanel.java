@@ -12,6 +12,7 @@ import javax.swing.JTable;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellEditor;
 
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
@@ -38,7 +39,6 @@ public class CustomPanel extends PropertyPanel {
       int[] rows = tableCustomProperties.getSelectedRows();
       for (int i = 0; i < rows.length; i++) {
         model.removeRow(rows[i] - i);
-
       }
     });
 
@@ -79,6 +79,11 @@ public class CustomPanel extends PropertyPanel {
 
   @Override
   protected void clearControls() {
+    TableCellEditor editor = tableCustomProperties.getCellEditor();
+    if (editor != null) {
+      editor.stopCellEditing();
+    }
+    
     this.model.setRowCount(0);
   }
 
@@ -96,24 +101,26 @@ public class CustomPanel extends PropertyPanel {
   }
 
   private void setupChangedListeners() {
-    this.model.addTableModelListener(e -> {
-      if (getDataSource() == null || isFocussing) {
-        return;
-      }
+    this.model.addTableModelListener(e -> this.updateCustomProperties());
+  }
 
-      UndoManager.instance().mapObjectChanging(getDataSource());
-      List<String> setProperties = new ArrayList<>();
-      for (int row = 0; row < model.getRowCount(); row++) {
-        String name = (String) model.getValueAt(row, 0);
-        String value = (String) model.getValueAt(row, 1);
-        if (name != null && value != null && !name.isEmpty() && !value.isEmpty()) {
-          setProperties.add(name);
-          getDataSource().setValue(name, value);
-        }
+  private void updateCustomProperties() {
+    if (getDataSource() == null || isFocussing) {
+      return;
+    }
+    
+    UndoManager.instance().mapObjectChanging(getDataSource());
+    List<String> setProperties = new ArrayList<>();
+    for (int row = 0; row < model.getRowCount(); row++) {
+      String name = (String) model.getValueAt(row, 0);
+      String value = (String) model.getValueAt(row, 1);
+      if (name != null && !name.isEmpty()) {
+        setProperties.add(name);
+        getDataSource().setValue(name, value);
       }
+    }
 
-      getDataSource().getProperties().keySet().removeIf(p -> MapObjectProperty.isCustom(p) && !setProperties.contains(p));
-      UndoManager.instance().mapObjectChanged(getDataSource());
-    });
+    getDataSource().getProperties().keySet().removeIf(p -> MapObjectProperty.isCustom(p) && !setProperties.contains(p));
+    UndoManager.instance().mapObjectChanged(getDataSource());
   }
 }
