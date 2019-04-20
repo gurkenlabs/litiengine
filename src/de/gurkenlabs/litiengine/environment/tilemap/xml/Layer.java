@@ -138,13 +138,7 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
       return this.renderType;
     }
 
-    final String renderTypeProp = this.getStringValue(LayerProperty.LAYER_RENDER_TYPE);
-    if (renderTypeProp != null && !renderTypeProp.isEmpty()) {
-      this.renderType = RenderType.valueOf(renderTypeProp);
-    } else {
-      this.renderType = RenderType.GROUND;
-    }
-
+    this.renderType = this.getEnumValue(LayerProperty.LAYER_RENDER_TYPE, RenderType.class, RenderType.GROUND);
     this.renderTypeLoaded = true;
     return this.renderType;
   }

@@ -187,7 +187,6 @@ public final class Environment implements IRenderable {
     }
 
     if (entity instanceof Emitter)
-
     {
       Emitter emitter = (Emitter) entity;
       this.addEmitter(emitter);
@@ -1057,9 +1056,7 @@ public final class Environment implements IRenderable {
     }
 
     this.render(g, RenderType.SURFACE);
-
     this.render(g, RenderType.NORMAL);
-
     this.render(g, RenderType.OVERLAY);
 
     long ambientStart = System.nanoTime();
@@ -1245,7 +1242,7 @@ public final class Environment implements IRenderable {
     }
   }
 
-  public void renderLayer(Graphics2D g, IMapObjectLayer layer, Rectangle2D viewport) {
+  public void renderLayer(Graphics2D g, IMapObjectLayer layer) {
     List<IEntity> entities = this.layerEntities.get(layer);
     if (entities != null) {
       Game.graphics().renderEntities(g, entities, layer.getRenderType() == RenderType.NORMAL);
