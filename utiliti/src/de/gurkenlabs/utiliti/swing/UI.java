@@ -33,22 +33,29 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.Cursors;
 import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.Style;
+import de.gurkenlabs.utiliti.components.Controller;
 import de.gurkenlabs.utiliti.components.EditorScreen;
 import de.gurkenlabs.utiliti.components.EntityController;
-import de.gurkenlabs.utiliti.components.MainComponent;
-import de.gurkenlabs.utiliti.components.Controller;
+import de.gurkenlabs.utiliti.components.LayerController;
+import de.gurkenlabs.utiliti.components.MapComponent;
+import de.gurkenlabs.utiliti.components.MapController;
+import de.gurkenlabs.utiliti.components.PropertyInspector;
+import de.gurkenlabs.utiliti.swing.controllers.AssetList;
+import de.gurkenlabs.utiliti.swing.controllers.EntityList;
+import de.gurkenlabs.utiliti.swing.controllers.LayerList;
+import de.gurkenlabs.utiliti.swing.controllers.MapList;
 import de.gurkenlabs.utiliti.swing.menus.CanvasPopupMenu;
 import de.gurkenlabs.utiliti.swing.menus.MainMenuBar;
-import de.gurkenlabs.utiliti.swing.panels.Inspector;
+import de.gurkenlabs.utiliti.swing.panels.MapObjectInspector;
 
 public final class UI {
   private static final Logger log = Logger.getLogger(UI.class.getName());
   private static JScrollBar horizontalScroll;
   private static JScrollBar verticalScroll;
   private static JPopupMenu canvasPopup;
-  private static AssetComponent assetComponent;
+  private static AssetList assetComponent;
 
-  private static Inspector mapObjectPanel;
+  private static MapObjectInspector mapObjectPanel;
   private static MapList mapSelectionPanel;
   private static LayerList mapLayerList;
   private static EntityList entityList;
@@ -113,11 +120,11 @@ public final class UI {
     initialized = true;
   }
   
-  public static Inspector getInspector() {
+  public static PropertyInspector getInspector() {
     return mapObjectPanel;
   }
 
-  public static LayerList getLayerController() {
+  public static LayerController getLayerController() {
     return mapLayerList;
   }
 
@@ -129,7 +136,7 @@ public final class UI {
     return assetComponent;
   }
 
-  public static MapList getMapController() {
+  public static MapController getMapController() {
     return mapSelectionPanel;
   }
   
@@ -229,7 +236,7 @@ public final class UI {
     topRightSplitPanel.setLeftComponent(mapSelectionPanel);
     topRightSplitPanel.setRightComponent(tabPane);
     
-    mapObjectPanel = new Inspector();
+    mapObjectPanel = new MapObjectInspector();
     
     JSplitPane rightSplitPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
     rightSplitPanel.setMinimumSize(new Dimension(300, 0));
@@ -247,7 +254,7 @@ public final class UI {
     JPanel bottomPanel = new JPanel(new BorderLayout());
     JTabbedPane bottomTab = new JTabbedPane();
 
-    assetComponent = new AssetComponent();
+    assetComponent = new AssetList();
     bottomTab.addTab(Resources.strings().get("assettree_assets"), assetComponent);
     bottomTab.addTab(Resources.strings().get("assettree_console"), new ConsoleComponent());
     bottomTab.setIconAt(0, Icons.ASSET);
@@ -266,7 +273,7 @@ public final class UI {
     renderPane.add(verticalScroll, BorderLayout.EAST);
 
     horizontalScroll.addAdjustmentListener(e -> {
-      if (EditorScreen.instance().getMainComponent().isLoading()) {
+      if (EditorScreen.instance().getMapComponent().isLoading()) {
         return;
       }
 
@@ -275,7 +282,7 @@ public final class UI {
     });
 
     verticalScroll.addAdjustmentListener(e -> {
-      if (EditorScreen.instance().getMainComponent().isLoading()) {
+      if (EditorScreen.instance().getMapComponent().isLoading()) {
         return;
       }
       Point2D newFocus = new Point2D.Double(Game.world().camera().getFocus().getX(), verticalScroll.getValue());
@@ -290,7 +297,7 @@ public final class UI {
       @Override
       public void mouseReleased(MouseEvent e) {
         if (SwingUtilities.isRightMouseButton(e)) {
-          EditorScreen.instance().getMainComponent().setEditMode(MainComponent.EDITMODE_EDIT);
+          EditorScreen.instance().getMapComponent().setEditMode(MapComponent.EDITMODE_EDIT);
           canvasPopup.show(canvas, e.getX(), e.getY());
         }
       }

@@ -1,4 +1,4 @@
-package de.gurkenlabs.utiliti.swing;
+package de.gurkenlabs.utiliti.swing.controllers;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -9,15 +9,18 @@ import javax.swing.JSplitPane;
 
 import de.gurkenlabs.litiengine.graphics.ImageFormat;
 import de.gurkenlabs.utiliti.Program;
-import de.gurkenlabs.utiliti.components.EditorScreen;
 import de.gurkenlabs.utiliti.components.Controller;
+import de.gurkenlabs.utiliti.components.EditorScreen;
+import de.gurkenlabs.utiliti.swing.AssetPanel;
+import de.gurkenlabs.utiliti.swing.AssetTree;
+import de.gurkenlabs.utiliti.swing.FileDrop;
 
 @SuppressWarnings("serial")
-public class AssetComponent extends JSplitPane implements Controller {
+public class AssetList extends JSplitPane implements Controller {
   private AssetPanel assetPanel;
   private AssetTree assetTree;
 
-  public AssetComponent() {
+  public AssetList() {
     super(JSplitPane.HORIZONTAL_SPLIT);
     this.assetPanel = new AssetPanel();
     this.assetTree = new AssetTree(this.assetPanel);

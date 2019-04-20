@@ -6,13 +6,11 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 
-import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.physics.Collision;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.swing.Icons;
-import de.gurkenlabs.utiliti.swing.UI;
 
 @SuppressWarnings("serial")
 public class CollisionBoxPanel extends PropertyPanel {

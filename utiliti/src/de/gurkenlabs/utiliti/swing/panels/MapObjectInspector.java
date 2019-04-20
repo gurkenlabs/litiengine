@@ -27,11 +27,12 @@ import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.components.EditorScreen;
+import de.gurkenlabs.utiliti.components.PropertyInspector;
 import de.gurkenlabs.utiliti.swing.TagPanel;
 import de.gurkenlabs.utiliti.swing.UI;
 
 @SuppressWarnings("serial")
-public class Inspector extends PropertyPanel {
+public class MapObjectInspector extends PropertyPanel implements PropertyInspector {
   private final Map<MapObjectType, PropertyPanel> panels;
   private MapObjectType type;
   private PropertyPanel currentPanel;
@@ -51,7 +52,7 @@ public class Inspector extends PropertyPanel {
   private JLabel lblRendering;
   private JPanel panel_1;
 
-  public Inspector() {
+  public MapObjectInspector() {
     this.panels = new ConcurrentHashMap<>();
     this.panels.put(MapObjectType.PROP, new PropPanel());
     this.panels.put(MapObjectType.COLLISIONBOX, new CollisionBoxPanel());
@@ -142,7 +143,7 @@ public class Inspector extends PropertyPanel {
     panel_1.add(lblRendering);
     panel_1.add(Box.createHorizontalStrut(15));
     panel_1.add(lblLayer);
-    
+
     setLayout(groupLayout);
 
     this.setupChangedListeners();
@@ -151,14 +152,19 @@ public class Inspector extends PropertyPanel {
 
   public void updateSpinnerModels() {
     if (Program.preferences().isSnapPixels()) {
-      this.updateSpinnerModels(Inspector::getIntegerModel);
+      this.updateSpinnerModels(MapObjectInspector::getIntegerModel);
     } else {
-      this.updateSpinnerModels(Inspector::getFloatModel);
+      this.updateSpinnerModels(MapObjectInspector::getFloatModel);
     }
   }
 
   public MapObjectType getObjectType() {
     return this.type;
+  }
+
+  @Override
+  public void refresh() {
+    this.updateSpinnerModels();
   }
 
   @Override
@@ -320,22 +326,22 @@ public class Inspector extends PropertyPanel {
     this.spinnerX.addChangeListener(new MapObjectPropertyChangeListener(m -> {
 
       m.setX(getSpinnerValue(spinnerX));
-      EditorScreen.instance().getMainComponent().updateTransformControls();
+      EditorScreen.instance().getMapComponent().updateTransformControls();
     }));
 
     this.spinnerY.addChangeListener(new MapObjectPropertyChangeListener(m -> {
       m.setY(getSpinnerValue(spinnerY));
-      EditorScreen.instance().getMainComponent().updateTransformControls();
+      EditorScreen.instance().getMapComponent().updateTransformControls();
     }));
 
     this.spinnerWidth.addChangeListener(new MapObjectPropertyChangeListener(m -> {
       m.setWidth(getSpinnerValue(spinnerWidth));
-      EditorScreen.instance().getMainComponent().updateTransformControls();
+      EditorScreen.instance().getMapComponent().updateTransformControls();
     }));
 
     this.spinnerHeight.addChangeListener(new MapObjectPropertyChangeListener(m -> {
       m.setHeight(getSpinnerValue(spinnerHeight));
-      EditorScreen.instance().getMainComponent().updateTransformControls();
+      EditorScreen.instance().getMapComponent().updateTransformControls();
     }));
 
     this.tagPanel.addActionListener(new MapObjectPropertyActionListener(m -> m.setValue(MapObjectProperty.TAGS, this.tagPanel.getTagsString())));

@@ -1,4 +1,4 @@
-package de.gurkenlabs.utiliti.swing;
+package de.gurkenlabs.utiliti.swing.controllers;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -33,10 +33,12 @@ import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.litiengine.util.Imaging;
 import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.components.EditorScreen;
-import de.gurkenlabs.utiliti.components.Controller;
+import de.gurkenlabs.utiliti.components.LayerController;
+import de.gurkenlabs.utiliti.swing.Icons;
+import de.gurkenlabs.utiliti.swing.JCheckBoxList;
 
 @SuppressWarnings("serial")
-public final class LayerList extends JScrollPane implements Controller {
+public final class LayerList extends JScrollPane implements LayerController {
   private static final Dimension BUTTON_SIZE = new Dimension(24, 24);
 
   private final Map<String, Integer> selectedLayers;
@@ -84,7 +86,7 @@ public final class LayerList extends JScrollPane implements Controller {
       }
 
       this.list.setSelectedIndex(selIndex);
-      EditorScreen.instance().getMainComponent().updateTransformControls();
+      EditorScreen.instance().getMapComponent().updateTransformControls();
     }, false);
 
     this.buttonRemoveLayer = createButton(Icons.DELETE, (map, selectedLayer) -> {
@@ -97,17 +99,17 @@ public final class LayerList extends JScrollPane implements Controller {
         return;
       }
 
-      EditorScreen.instance().getMainComponent().delete(selectedLayer);
+      EditorScreen.instance().getMapComponent().delete(selectedLayer);
       map.removeLayer(selectedLayer);
       layerModel.remove(this.getCurrentLayerIndex());
-      EditorScreen.instance().getMainComponent().updateTransformControls();
+      EditorScreen.instance().getMapComponent().updateTransformControls();
     });
 
     this.buttonDuplicateLayer = createButton(Icons.COPYX16, (map, selectedLayer) -> {
       IMapObjectLayer copiedLayer = new MapObjectLayer((MapObjectLayer) selectedLayer);
       map.addLayer(this.getAbsoluteIndex(map, this.getCurrentLayerIndex()), copiedLayer);
       this.refresh();
-      EditorScreen.instance().getMainComponent().add(copiedLayer);
+      EditorScreen.instance().getMapComponent().add(copiedLayer);
     });
 
     this.buttonSetColor = createButton(Icons.COLORX16, (map, selectedLayer) -> {
@@ -137,7 +139,7 @@ public final class LayerList extends JScrollPane implements Controller {
         }
       }
 
-      EditorScreen.instance().getMainComponent().updateTransformControls();
+      EditorScreen.instance().getMapComponent().updateTransformControls();
     }, true);
 
     this.buttonLiftLayer = createButton(Icons.LIFT, (map, selectedLayer) -> {
@@ -174,7 +176,7 @@ public final class LayerList extends JScrollPane implements Controller {
 
     // TODO: enabled states for all commands
 
-    EditorScreen.instance().getMainComponent().onMapLoading(map -> {
+    EditorScreen.instance().getMapComponent().onMapLoading(map -> {
       if (map == null) {
         return;
       }
@@ -182,7 +184,7 @@ public final class LayerList extends JScrollPane implements Controller {
       this.selectedLayers.put(map.getName(), this.list.getSelectedIndex());
     });
 
-    EditorScreen.instance().getMainComponent().onMapLoaded(map -> {
+    EditorScreen.instance().getMapComponent().onMapLoaded(map -> {
       if (this.selectedLayers.containsKey(map.getName())) {
         this.selectLayer(this.selectedLayers.get(map.getName()));
       }
@@ -196,7 +198,7 @@ public final class LayerList extends JScrollPane implements Controller {
         return null;
       }
 
-      IMapObject focus = EditorScreen.instance().getMainComponent().getFocusedMapObject();
+      IMapObject focus = EditorScreen.instance().getMapComponent().getFocusedMapObject();
       if (focus != null) {
         return focus.getLayer();
       }

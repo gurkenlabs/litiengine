@@ -1,4 +1,4 @@
-package de.gurkenlabs.utiliti.swing;
+package de.gurkenlabs.utiliti.swing.controllers;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -37,7 +37,9 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.components.EditorScreen;
 import de.gurkenlabs.utiliti.components.EntityController;
-import de.gurkenlabs.utiliti.components.Controller;
+import de.gurkenlabs.utiliti.swing.IconTreeListItem;
+import de.gurkenlabs.utiliti.swing.IconTreeListRenderer;
+import de.gurkenlabs.utiliti.swing.Icons;
 
 @SuppressWarnings("serial")
 public final class EntityList extends JPanel implements EntityController {
@@ -149,7 +151,7 @@ public final class EntityList extends JPanel implements EntityController {
             if (item.getUserObject() instanceof IEntity) {
               IMapObject obj = env.getMap().getMapObject(((IEntity) item.getUserObject()).getMapId());
               if (obj != null) {
-                EditorScreen.instance().getMainComponent().setFocus(obj, true);
+                EditorScreen.instance().getMapComponent().setFocus(obj, true);
               }
             }
           }
@@ -178,7 +180,7 @@ public final class EntityList extends JPanel implements EntityController {
       public void mouseClicked(MouseEvent e) {
         int selRow = tree.getRowForLocation(e.getX(), e.getY());
         if (selRow != -1 && e.getClickCount() == 2) {
-          EditorScreen.instance().getMainComponent().centerCameraOnFocus();
+          EditorScreen.instance().getMapComponent().centerCameraOnFocus();
         }
       }
     };
@@ -254,7 +256,7 @@ public final class EntityList extends JPanel implements EntityController {
     }
 
     this.entitiesTreeModel.reload();
-    this.select(EditorScreen.instance().getMainComponent().getFocusedMapObject());
+    this.select(EditorScreen.instance().getMapComponent().getFocusedMapObject());
   }
 
   private void collapseAll() {

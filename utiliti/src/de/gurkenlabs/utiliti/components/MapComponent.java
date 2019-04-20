@@ -79,7 +79,7 @@ import de.gurkenlabs.utiliti.swing.UI;
 import de.gurkenlabs.utiliti.swing.dialogs.XmlExportDialog;
 import de.gurkenlabs.utiliti.swing.dialogs.XmlImportDialog;
 
-public class MainComponent extends GuiComponent implements IUpdateable {
+public class MapComponent extends GuiComponent implements IUpdateable {
   public enum TransformType {
     UP, DOWN, LEFT, RIGHT, UPLEFT, UPRIGHT, DOWNLEFT, DOWNRIGHT, NONE, MOVE
   }
@@ -87,7 +87,7 @@ public class MainComponent extends GuiComponent implements IUpdateable {
   public static final int EDITMODE_CREATE = 0;
   public static final int EDITMODE_EDIT = 1;
   public static final int EDITMODE_MOVE = 2;
-  private static final Logger log = Logger.getLogger(MainComponent.class.getName());
+  private static final Logger log = Logger.getLogger(MapComponent.class.getName());
 
   private static final float[] zooms = new float[] { 0.1f, 0.25f, 0.5f, 1, 1.5f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f, 16f, 32f, 50f, 80f, 100f };
   private static final int DEFAULT_ZOOM_INDEX = 3;
@@ -141,7 +141,7 @@ public class MainComponent extends GuiComponent implements IUpdateable {
   private boolean loading;
   private boolean initialized;
 
-  public MainComponent(final EditorScreen screen) {
+  public MapComponent(final EditorScreen screen) {
     super(0, EditorScreen.instance().getPadding(), Game.window().getResolution().getWidth(), Game.window().getResolution().getHeight() - Game.window().getResolution().getHeight() * 1 / 15);
     this.editModeChangedConsumer = new CopyOnWriteArrayList<>();
     this.focusChangedConsumer = new CopyOnWriteArrayList<>();
@@ -1274,7 +1274,7 @@ public class MainComponent extends GuiComponent implements IUpdateable {
   }
 
   private static void afterKeyPressed() {
-    EditorScreen.instance().getMainComponent().updateTransformControls();
+    EditorScreen.instance().getMapComponent().updateTransformControls();
   }
 
   private void setupMouseControls() {

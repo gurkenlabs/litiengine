@@ -27,8 +27,8 @@ public final class ViewMenu extends JMenu {
     snapToPixels.setState(Program.preferences().isSnapPixels());
     snapToPixels.addItemListener(e -> {
       Program.preferences().setSnapPixels(snapToPixels.getState());
-      UI.getInspector().updateSpinnerModels();
-      UI.getInspector().bind(EditorScreen.instance().getMainComponent().getFocusedMapObject());
+      UI.getInspector().refresh();
+      UI.getInspector().bind(EditorScreen.instance().getMapComponent().getFocusedMapObject());
     });
 
     JCheckBoxMenuItem snapToGrid = new JCheckBoxMenuItem(Resources.strings().get("menu_view_snapGrid"));
@@ -71,22 +71,22 @@ public final class ViewMenu extends JMenu {
 
     JMenuItem zoomIn = new JMenuItem(Resources.strings().get("menu_view_zoomIn"));
     zoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, Event.CTRL_MASK));
-    zoomIn.addActionListener(a -> EditorScreen.instance().getMainComponent().zoomIn());
+    zoomIn.addActionListener(a -> EditorScreen.instance().getMapComponent().zoomIn());
 
     JMenuItem zoomOut = new JMenuItem(Resources.strings().get("menu_view_zoomOut"));
     zoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, Event.CTRL_MASK));
-    zoomOut.addActionListener(a -> EditorScreen.instance().getMainComponent().zoomOut());
+    zoomOut.addActionListener(a -> EditorScreen.instance().getMapComponent().zoomOut());
 
     JMenuItem centerFocus = new JMenuItem(Resources.strings().get("menu_view_center"));
     centerFocus.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0));
-    centerFocus.addActionListener(a -> EditorScreen.instance().getMainComponent().centerCameraOnFocus());
+    centerFocus.addActionListener(a -> EditorScreen.instance().getMapComponent().centerCameraOnFocus());
     centerFocus.setEnabled(false);
 
     JMenuItem centerMap = new JMenuItem(Resources.strings().get("menu_view_centermap"));
     centerMap.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, Event.CTRL_MASK));
-    centerMap.addActionListener(a -> EditorScreen.instance().getMainComponent().centerCameraOnMap());
+    centerMap.addActionListener(a -> EditorScreen.instance().getMapComponent().centerCameraOnMap());
 
-    EditorScreen.instance().getMainComponent().onFocusChanged(mo -> {
+    EditorScreen.instance().getMapComponent().onFocusChanged(mo -> {
       centerFocus.setEnabled(mo != null);
     });
 

@@ -286,7 +286,7 @@ public class AssetPanelItem extends JPanel {
         EditorScreen.instance().getGameFile().getSpriteSheets().remove(getOrigin());
         Resources.images().clear();
         Resources.spritesheets().remove(info.getName());
-        EditorScreen.instance().getMainComponent().reloadEnvironment();
+        EditorScreen.instance().getMapComponent().reloadEnvironment();
 
         UI.getAssetController().refresh();
       }
@@ -296,7 +296,7 @@ public class AssetPanelItem extends JPanel {
 
       if (n == JOptionPane.OK_OPTION) {
         EditorScreen.instance().getGameFile().getEmitters().remove(getOrigin());
-        EditorScreen.instance().getMainComponent().reloadEnvironment();
+        EditorScreen.instance().getMapComponent().reloadEnvironment();
 
         UI.getAssetController().refresh();
       }
@@ -350,14 +350,14 @@ public class AssetPanelItem extends JPanel {
       mo.setValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE, false);
       mo.setValue(MapObjectProperty.PROP_ADDSHADOW, true);
 
-      EditorScreen.instance().getMainComponent().add(mo);
+      EditorScreen.instance().getMapComponent().add(mo);
       return true;
     } else if (this.getOrigin() instanceof EmitterData) {
       MapObject newEmitter = (MapObject) EmitterMapObjectLoader.createMapObject((EmitterData) this.getOrigin());
       newEmitter.setX((int) (Game.world().camera().getFocus().getX() - newEmitter.getWidth()));
       newEmitter.setY((int) (Game.world().camera().getFocus().getY() - newEmitter.getHeight()));
       newEmitter.setId(Game.world().environment().getNextMapId());
-      EditorScreen.instance().getMainComponent().add(newEmitter);
+      EditorScreen.instance().getMapComponent().add(newEmitter);
     } else if (this.getOrigin() instanceof Blueprint) {
       Blueprint blueprint = (Blueprint) this.getOrigin();
 
@@ -365,7 +365,7 @@ public class AssetPanelItem extends JPanel {
       try {
         List<IMapObject> newObjects = blueprint.build((int) Game.world().camera().getFocus().getX() - blueprint.getWidth() / 2, (int) Game.world().camera().getFocus().getY() - blueprint.getHeight() / 2);
         for (IMapObject newMapObject : newObjects) {
-          EditorScreen.instance().getMainComponent().add(newMapObject);
+          EditorScreen.instance().getMapComponent().add(newMapObject);
         }
 
         // separately select the added objects because this cannot be done in
@@ -373,7 +373,7 @@ public class AssetPanelItem extends JPanel {
         // previous loop because it gets overwritten every time a map object
         // gets added
         for (IMapObject newMapObject : newObjects) {
-          EditorScreen.instance().getMainComponent().setSelection(newMapObject, false);
+          EditorScreen.instance().getMapComponent().setSelection(newMapObject, false);
         }
       } finally {
         UndoManager.instance().endOperation();

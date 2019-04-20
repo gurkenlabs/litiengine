@@ -1,4 +1,4 @@
-package de.gurkenlabs.utiliti.swing;
+package de.gurkenlabs.utiliti.swing.controllers;
 
 import java.awt.Dimension;
 import java.util.List;
@@ -13,10 +13,11 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.components.EditorScreen;
-import de.gurkenlabs.utiliti.components.Controller;
+import de.gurkenlabs.utiliti.components.MapController;
+import de.gurkenlabs.utiliti.swing.UI;
 
 @SuppressWarnings("serial")
-public class MapList extends JScrollPane implements Controller {
+public class MapList extends JScrollPane implements MapController {
   private final JList<String> list;
   private final DefaultListModel<String> model;
 
@@ -34,17 +35,17 @@ public class MapList extends JScrollPane implements Controller {
     this.list.setMaximumSize(new Dimension(0, 250));
 
     this.list.getSelectionModel().addListSelectionListener(e -> {
-      if (EditorScreen.instance().isLoading() || EditorScreen.instance().getMainComponent().isLoading()) {
+      if (EditorScreen.instance().isLoading() || EditorScreen.instance().getMapComponent().isLoading()) {
         return;
       }
 
-      if (this.list.getSelectedIndex() < EditorScreen.instance().getMainComponent().getMaps().size() && this.list.getSelectedIndex() >= 0) {
-        TmxMap map = EditorScreen.instance().getMainComponent().getMaps().get(this.list.getSelectedIndex());
+      if (this.list.getSelectedIndex() < EditorScreen.instance().getMapComponent().getMaps().size() && this.list.getSelectedIndex() >= 0) {
+        TmxMap map = EditorScreen.instance().getMapComponent().getMaps().get(this.list.getSelectedIndex());
         if (Game.world().environment() != null && Game.world().environment().getMap().equals(map)) {
           return;
         }
 
-        EditorScreen.instance().getMainComponent().loadEnvironment(map);
+        EditorScreen.instance().getMapComponent().loadEnvironment(map);
       }
     });
 
@@ -59,7 +60,7 @@ public class MapList extends JScrollPane implements Controller {
       this.refresh();
     });
 
-    UndoManager.onUndoStackChanged(manager -> this.bind(EditorScreen.instance().getMainComponent().getMaps()));
+    UndoManager.onUndoStackChanged(manager -> this.bind(EditorScreen.instance().getMapComponent().getMaps()));
   }
 
   public synchronized void bind(List<TmxMap> maps) {
@@ -115,7 +116,7 @@ public class MapList extends JScrollPane implements Controller {
     if (this.list.getSelectedIndex() == -1) {
       return null;
     }
-    return EditorScreen.instance().getMainComponent().getMaps().get(list.getSelectedIndex());
+    return EditorScreen.instance().getMapComponent().getMaps().get(list.getSelectedIndex());
   }
 
   public void refresh() {

@@ -86,7 +86,7 @@ public class EditorScreen extends Screen {
   private final List<Runnable> loadedCallbacks;
 
   private double padding;
-  private MainComponent mainComponent;
+  private MapComponent mapComponent;
   private ResourceBundle gameFile = new ResourceBundle();
   private String projectPath;
   private String currentResourceFile;
@@ -118,9 +118,9 @@ public class EditorScreen extends Screen {
     padding = this.getWidth() / 50;
 
     // init components
-    this.mainComponent = new MainComponent(this);
+    this.mapComponent = new MapComponent(this);
 
-    this.getComponents().add(this.mainComponent);
+    this.getComponents().add(this.mapComponent);
     super.prepare();
   }
 
@@ -216,12 +216,12 @@ public class EditorScreen extends Screen {
       this.setProjectPath(chooser.getSelectedFile().getCanonicalPath());
 
       // load all maps in the directory
-      this.mainComponent.loadMaps(this.getProjectPath());
+      this.mapComponent.loadMaps(this.getProjectPath());
       this.currentResourceFile = null;
       this.gameFile = new ResourceBundle();
 
       // add sprite sheets by tile sets of all maps in the project director
-      for (TmxMap map : this.mainComponent.getMaps()) {
+      for (TmxMap map : this.mapComponent.getMaps()) {
         this.loadSpriteSheets(map);
       }
 
@@ -234,8 +234,8 @@ public class EditorScreen extends Screen {
       this.updateGameFileMaps();
 
       // display first available map after loading all stuff
-      if (!this.mainComponent.getMaps().isEmpty()) {
-        this.mainComponent.loadEnvironment(this.mainComponent.getMaps().get(0));
+      if (!this.mapComponent.getMaps().isEmpty()) {
+        this.mapComponent.loadEnvironment(this.mapComponent.getMaps().get(0));
       }
     } catch (IOException e) {
       log.log(Level.SEVERE, e.getLocalizedMessage(), e);
@@ -260,12 +260,12 @@ public class EditorScreen extends Screen {
 
     Game.world().unloadEnvironment();
     UndoManager.clearAll();
-    getMainComponent().clearAll();
+    getMapComponent().clearAll();
     this.currentResourceFile = null;
     this.gameFile = null;
     this.gamefileLoaded();
     this.setProjectPath(null);
-    this.mainComponent.loadMaps(Arrays.asList());
+    this.mapComponent.loadMaps(Arrays.asList());
     Resources.clearAll();
     UI.getAssetController().refresh();
     this.setCurrentStatus(Resources.strings().get("status_gamefile_closed"));
@@ -310,7 +310,7 @@ public class EditorScreen extends Screen {
       this.setProjectPath(gameFile.getPath());
 
       // load maps from game file
-      this.mainComponent.loadMaps(this.getGameFile().getMaps());
+      this.mapComponent.loadMaps(this.getGameFile().getMaps());
 
       Resources.images().clear();
       Resources.spritesheets().clear();
@@ -329,7 +329,7 @@ public class EditorScreen extends Screen {
       log.log(Level.INFO, "{0} blueprints loaded from {1}", new Object[] { this.getGameFile().getBluePrints().size(), this.currentResourceFile });
       log.log(Level.INFO, "{0} sounds loaded from {1}", new Object[] { this.getGameFile().getSounds().size(), this.currentResourceFile });
 
-      for (TmxMap map : this.mainComponent.getMaps()) {
+      for (TmxMap map : this.mapComponent.getMaps()) {
         this.loadSpriteSheets(map);
       }
 
@@ -339,8 +339,8 @@ public class EditorScreen extends Screen {
 
       // display first available map after loading all stuff
       // also switch to map component
-      if (!this.mainComponent.getMaps().isEmpty()) {
-        this.mainComponent.loadEnvironment(this.mainComponent.getMaps().get(0));
+      if (!this.mapComponent.getMaps().isEmpty()) {
+        this.mapComponent.loadEnvironment(this.mapComponent.getMaps().get(0));
       } else {
         Game.world().unloadEnvironment();
       }
@@ -518,7 +518,7 @@ public class EditorScreen extends Screen {
           return;
         }
 
-        this.getMainComponent().loadTileset(tileset, false);
+        this.getMapComponent().loadTileset(tileset, false);
       }
 
       log.log(Level.INFO, "imported tileset {0} from {1}", new Object[] { tileset.getName(), file });
@@ -544,7 +544,7 @@ public class EditorScreen extends Screen {
     }
 
     Resources.images().clear();
-    this.getMainComponent().reloadEnvironment();
+    this.getMapComponent().reloadEnvironment();
 
     if (forceAssetTreeUpdate) {
       UI.getAssetController().refresh();
@@ -627,8 +627,8 @@ public class EditorScreen extends Screen {
     UI.getMapController().setSelection(currentMapSelection);
   }
 
-  public MainComponent getMainComponent() {
-    return this.mainComponent;
+  public MapComponent getMapComponent() {
+    return this.mapComponent;
   }
 
   public String getCurrentResourceFile() {
@@ -640,7 +640,7 @@ public class EditorScreen extends Screen {
   }
 
   public List<TmxMap> getChangedMaps() {
-    return this.getMainComponent().getMaps().stream().filter(UndoManager::hasChanges).distinct().collect(Collectors.toList());
+    return this.getMapComponent().getMaps().stream().filter(UndoManager::hasChanges).distinct().collect(Collectors.toList());
   }
 
   public void setCurrentStatus(String currentStatus) {
@@ -650,7 +650,7 @@ public class EditorScreen extends Screen {
 
   public void updateGameFileMaps() {
     this.getGameFile().getMaps().clear();
-    for (TmxMap map : this.mainComponent.getMaps()) {
+    for (TmxMap map : this.mapComponent.getMaps()) {
       this.getGameFile().getMaps().add(map);
     }
 
@@ -671,7 +671,7 @@ public class EditorScreen extends Screen {
       this.saveMaps();
     }
 
-    UI.getMapController().bind(this.getMainComponent().getMaps());
+    UI.getMapController().bind(this.getMapComponent().getMaps());
     return saveFile;
   }
 

@@ -26,7 +26,7 @@ public final class LayerMenu extends JMenu {
     Game.world().addLoadedListener(e -> this.updateMenu(e.getMap()));
 
     UI.getLayerController().onLayersChanged(this::updateMenu);
-    EditorScreen.instance().getMainComponent().onSelectionChanged(mapObjects -> {
+    EditorScreen.instance().getMapComponent().onSelectionChanged(mapObjects -> {
       this.updateMenuItemStates(mapObjects);
     });
   }
@@ -61,7 +61,7 @@ public final class LayerMenu extends JMenu {
       this.add(item);
     }
 
-    this.updateMenuItemStates(EditorScreen.instance().getMainComponent().getSelectedMapObjects());
+    this.updateMenuItemStates(EditorScreen.instance().getMapComponent().getSelectedMapObjects());
   }
 
   private void moveMapObjects(String layerName) {
@@ -76,7 +76,7 @@ public final class LayerMenu extends JMenu {
     }
 
     UndoManager.instance().beginOperation();
-    for (IMapObject mapObject : EditorScreen.instance().getMainComponent().getSelectedMapObjects()) {
+    for (IMapObject mapObject : EditorScreen.instance().getMapComponent().getSelectedMapObjects()) {
       UndoManager.instance().mapObjectChanging(mapObject);
       layer.addMapObject(mapObject);
       env.reloadFromMap(mapObject.getId());
@@ -86,8 +86,8 @@ public final class LayerMenu extends JMenu {
     UndoManager.instance().endOperation();
 
     // rebind to refresh the layer property
-    UI.getInspector().bind(EditorScreen.instance().getMainComponent().getFocusedMapObject());
+    UI.getInspector().bind(EditorScreen.instance().getMapComponent().getFocusedMapObject());
 
-    this.updateMenuItemStates(EditorScreen.instance().getMainComponent().getSelectedMapObjects());
+    this.updateMenuItemStates(EditorScreen.instance().getMapComponent().getSelectedMapObjects());
   }
 }
