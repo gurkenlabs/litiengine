@@ -58,8 +58,11 @@ public final class EditMenu extends JMenu {
     deselect.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, Event.CTRL_MASK));
     deselect.addActionListener(a -> EditorScreen.instance().getMapComponent().deselect());
 
-    JMenu moveLayer = new LayerMenu();
-    moveLayer.setEnabled(false);
+    JMenu layerMenu = new LayerMenu();
+    layerMenu.setEnabled(false);
+    
+    JMenu renderMenu = new RenderMenu();
+    renderMenu.setEnabled(false);
 
     JMenuItem blueprint = new JMenuItem(Resources.strings().get("menu_edit_blueprint"), Icons.BLUEPRINT);
     blueprint.addActionListener(e -> EditorScreen.instance().getMapComponent().defineBlueprint());
@@ -98,7 +101,8 @@ public final class EditMenu extends JMenu {
     this.add(selectAll);
     this.add(deselect);
     this.addSeparator();
-    this.add(moveLayer);
+    this.add(layerMenu);
+    this.add(renderMenu);
     this.add(blueprint);
   }
 }
