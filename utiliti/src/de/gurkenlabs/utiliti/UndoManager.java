@@ -300,7 +300,7 @@ public class UndoManager {
 
     if (EditorScreen.instance().getMapComponent().getFocusedMapObject() != null && EditorScreen.instance().getMapComponent().getFocusedMapObject().getId() == target.getId()) {
       EditorScreen.instance().getMapObjectPanel().bind(target);
-      EditorScreen.instance().getMapSelectionPanel().focus(target);
+      EditorScreen.instance().getEntityList().focus(target);
     }
   }
 

@@ -63,6 +63,7 @@ import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.Style;
 import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.components.EditorComponent.ComponentType;
+import de.gurkenlabs.utiliti.swing.EntityList;
 import de.gurkenlabs.utiliti.swing.MapLayerList;
 import de.gurkenlabs.utiliti.swing.MapSelectionPanel;
 import de.gurkenlabs.utiliti.swing.StatusBar;
@@ -101,6 +102,7 @@ public class EditorScreen extends Screen {
   private MapObjectPanel mapEditorPanel;
   private MapSelectionPanel mapSelectionPanel;
   private MapLayerList mapLayerList;
+  private EntityList entityList;
 
   private long statusTick;
   private String currentStatus;
@@ -665,6 +667,10 @@ public class EditorScreen extends Screen {
     return this.mapLayerList;
   }
 
+  public EntityList getEntityList() {
+    return this.entityList;
+  }
+
   public MapComponent getMapComponent() {
     return this.mapComponent;
   }
@@ -687,6 +693,10 @@ public class EditorScreen extends Screen {
 
   public void setMapLayerList(MapLayerList mapLayerList) {
     this.mapLayerList = mapLayerList;
+  }
+
+  public void setEntityList(EntityList entityList) {
+    this.entityList = entityList;
   }
 
   public String getCurrentStatus() {

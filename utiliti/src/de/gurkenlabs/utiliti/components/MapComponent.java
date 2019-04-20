@@ -611,7 +611,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       }
 
       EditorScreen.instance().getMapObjectPanel().bind(mapObject);
-      EditorScreen.instance().getMapSelectionPanel().focus(mapObject);
+      EditorScreen.instance().getEntityList().focus(mapObject);
       if (mapObject == null) {
         this.focusedObjects.remove(Game.world().environment().getMap().getName());
       } else {
