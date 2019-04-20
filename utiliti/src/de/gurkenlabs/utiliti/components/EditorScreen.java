@@ -63,16 +63,12 @@ import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.Style;
 import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.components.EditorComponent.ComponentType;
-import de.gurkenlabs.utiliti.swing.EntityList;
-import de.gurkenlabs.utiliti.swing.MapLayerList;
-import de.gurkenlabs.utiliti.swing.MapSelectionPanel;
 import de.gurkenlabs.utiliti.swing.StatusBar;
 import de.gurkenlabs.utiliti.swing.Tray;
 import de.gurkenlabs.utiliti.swing.UI;
 import de.gurkenlabs.utiliti.swing.dialogs.EditorFileChooser;
 import de.gurkenlabs.utiliti.swing.dialogs.SpritesheetImportPanel;
 import de.gurkenlabs.utiliti.swing.dialogs.XmlImportDialog;
-import de.gurkenlabs.utiliti.swing.panels.MapObjectPanel;
 
 public class EditorScreen extends Screen {
   private static final Logger log = Logger.getLogger(EditorScreen.class.getName());
@@ -98,11 +94,6 @@ public class EditorScreen extends Screen {
   private EditorComponent current;
   private String projectPath;
   private String currentResourceFile;
-
-  private MapObjectPanel mapEditorPanel;
-  private MapSelectionPanel mapSelectionPanel;
-  private MapLayerList mapLayerList;
-  private EntityList entityList;
 
   private long statusTick;
   private String currentStatus;
@@ -650,25 +641,13 @@ public class EditorScreen extends Screen {
 
     File currentFile = new File(this.currentResourceFile);
     String currentMapSelection = null;
-    if (this.getMapSelectionPanel().getCurrentMap() != null) {
-      currentMapSelection = this.getMapSelectionPanel().getCurrentMap().getName();
+    if (UI.getMapSelectionPanel().getCurrentMap() != null) {
+      currentMapSelection = UI.getMapSelectionPanel().getCurrentMap().getName();
     }
 
     this.close(true);
     this.load(currentFile, true);
-    this.getMapSelectionPanel().setSelection(currentMapSelection);
-  }
-
-  public MapObjectPanel getMapObjectPanel() {
-    return this.mapEditorPanel;
-  }
-
-  public MapLayerList getMapLayerList() {
-    return this.mapLayerList;
-  }
-
-  public EntityList getEntityList() {
-    return this.entityList;
+    UI.getMapSelectionPanel().setSelection(currentMapSelection);
   }
 
   public MapComponent getMapComponent() {
@@ -679,25 +658,6 @@ public class EditorScreen extends Screen {
     return this.currentResourceFile;
   }
 
-  public MapSelectionPanel getMapSelectionPanel() {
-    return mapSelectionPanel;
-  }
-
-  public void setMapObjectPanel(MapObjectPanel mapEditorPanel) {
-    this.mapEditorPanel = mapEditorPanel;
-  }
-
-  public void setMapSelectionPanel(MapSelectionPanel mapSelectionPanel) {
-    this.mapSelectionPanel = mapSelectionPanel;
-  }
-
-  public void setMapLayerList(MapLayerList mapLayerList) {
-    this.mapLayerList = mapLayerList;
-  }
-
-  public void setEntityList(EntityList entityList) {
-    this.entityList = entityList;
-  }
 
   public String getCurrentStatus() {
     return currentStatus;
@@ -735,7 +695,7 @@ public class EditorScreen extends Screen {
       this.saveMaps();
     }
 
-    this.getMapSelectionPanel().bind(this.getMapComponent().getMaps());
+    UI.getMapSelectionPanel().bind(this.getMapComponent().getMaps());
     return saveFile;
   }
 

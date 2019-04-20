@@ -14,6 +14,7 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.components.EditorScreen;
+import de.gurkenlabs.utiliti.swing.UI;
 import de.gurkenlabs.utiliti.swing.dialogs.GridEditPanel;
 
 @SuppressWarnings("serial")
@@ -26,8 +27,8 @@ public final class ViewMenu extends JMenu {
     snapToPixels.setState(Program.preferences().isSnapPixels());
     snapToPixels.addItemListener(e -> {
       Program.preferences().setSnapPixels(snapToPixels.getState());
-      EditorScreen.instance().getMapObjectPanel().updateSpinnerModels();
-      EditorScreen.instance().getMapObjectPanel().bind(EditorScreen.instance().getMapComponent().getFocusedMapObject());
+      UI.getMapObjectPanel().updateSpinnerModels();
+      UI.getMapObjectPanel().bind(EditorScreen.instance().getMapComponent().getFocusedMapObject());
     });
 
     JCheckBoxMenuItem snapToGrid = new JCheckBoxMenuItem(Resources.strings().get("menu_view_snapGrid"));

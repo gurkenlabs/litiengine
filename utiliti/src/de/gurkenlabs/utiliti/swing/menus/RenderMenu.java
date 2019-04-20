@@ -15,6 +15,7 @@ import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.components.EditorScreen;
+import de.gurkenlabs.utiliti.swing.UI;
 
 @SuppressWarnings("serial")
 public final class RenderMenu extends JMenu {
@@ -23,7 +24,7 @@ public final class RenderMenu extends JMenu {
 
     Game.world().addLoadedListener(e -> this.setEnabled(false));
 
-    EditorScreen.instance().getMapLayerList().onLayersChanged(map -> this.updateMenu(EditorScreen.instance().getMapComponent().getSelectedMapObjects()));
+    UI.getMapLayerList().onLayersChanged(map -> this.updateMenu(EditorScreen.instance().getMapComponent().getSelectedMapObjects()));
     EditorScreen.instance().getMapComponent().onSelectionChanged(this::updateMenu);
   }
 
@@ -83,7 +84,7 @@ public final class RenderMenu extends JMenu {
     UndoManager.instance().endOperation();
 
     // rebind to refresh the ui
-    EditorScreen.instance().getMapObjectPanel().bind(EditorScreen.instance().getMapComponent().getFocusedMapObject());
+    UI.getMapObjectPanel().bind(EditorScreen.instance().getMapComponent().getFocusedMapObject());
   }
 
   private void setRenderType(List<IMapObject> selectedMapObjects, RenderType renderType) {
@@ -107,6 +108,6 @@ public final class RenderMenu extends JMenu {
     UndoManager.instance().endOperation();
 
     // rebind to refresh the ui
-    EditorScreen.instance().getMapObjectPanel().bind(EditorScreen.instance().getMapComponent().getFocusedMapObject());
+    UI.getMapObjectPanel().bind(EditorScreen.instance().getMapComponent().getFocusedMapObject());
   }
 }

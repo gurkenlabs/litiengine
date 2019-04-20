@@ -28,6 +28,7 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.components.EditorScreen;
 import de.gurkenlabs.utiliti.swing.TagPanel;
+import de.gurkenlabs.utiliti.swing.UI;
 
 @SuppressWarnings("serial")
 public class MapObjectPanel extends PropertyPanel {
@@ -145,7 +146,7 @@ public class MapObjectPanel extends PropertyPanel {
     setLayout(groupLayout);
 
     this.setupChangedListeners();
-    EditorScreen.instance().getMapLayerList().onLayersChanged(map -> this.bind(this.getDataSource()));
+    UI.getMapLayerList().onLayersChanged(map -> this.bind(this.getDataSource()));
   }
 
   public void updateSpinnerModels() {

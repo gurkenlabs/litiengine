@@ -16,6 +16,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.components.EditorScreen;
+import de.gurkenlabs.utiliti.swing.UI;
 
 @SuppressWarnings("serial")
 public final class LayerMenu extends JMenu {
@@ -24,7 +25,7 @@ public final class LayerMenu extends JMenu {
     super(Resources.strings().get("menu_move_to_layer"));
     Game.world().addLoadedListener(e -> this.updateMenu(e.getMap()));
 
-    EditorScreen.instance().getMapLayerList().onLayersChanged(this::updateMenu);
+    UI.getMapLayerList().onLayersChanged(this::updateMenu);
     EditorScreen.instance().getMapComponent().onSelectionChanged(mapObjects -> {
       this.updateMenuItemStates(mapObjects);
     });
@@ -85,7 +86,7 @@ public final class LayerMenu extends JMenu {
     UndoManager.instance().endOperation();
 
     // rebind to refresh the layer property
-    EditorScreen.instance().getMapObjectPanel().bind(EditorScreen.instance().getMapComponent().getFocusedMapObject());
+    UI.getMapObjectPanel().bind(EditorScreen.instance().getMapComponent().getFocusedMapObject());
 
     this.updateMenuItemStates(EditorScreen.instance().getMapComponent().getSelectedMapObjects());
   }

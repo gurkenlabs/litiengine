@@ -12,6 +12,7 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.components.EditorScreen;
 import de.gurkenlabs.utiliti.components.MapComponent;
 import de.gurkenlabs.utiliti.swing.Icons;
+import de.gurkenlabs.utiliti.swing.UI;
 
 @SuppressWarnings("serial")
 public final class AddMenu extends JMenu {
@@ -72,6 +73,6 @@ public final class AddMenu extends JMenu {
 
   private static void setCreateMode(MapObjectType tpye) {
     EditorScreen.instance().getMapComponent().setEditMode(MapComponent.EDITMODE_CREATE);
-    EditorScreen.instance().getMapObjectPanel().setMapObjectType(tpye);
+    UI.getMapObjectPanel().setMapObjectType(tpye);
   }
 }

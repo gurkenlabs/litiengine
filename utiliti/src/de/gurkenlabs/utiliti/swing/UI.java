@@ -46,6 +46,11 @@ public final class UI {
   private static JPopupMenu canvasPopup;
   private static AssetComponent assetComponent;
 
+  private static MapObjectPanel mapObjectPanel;
+  private static MapSelectionPanel mapSelectionPanel;
+  private static MapLayerList mapLayerList;
+  private static EntityList entityList;
+  
   private static boolean initialized;
 
   private UI() {
@@ -109,7 +114,23 @@ public final class UI {
 
     initialized = true;
   }
+  
+  public static MapObjectPanel getMapObjectPanel() {
+    return mapObjectPanel;
+  }
 
+  public static MapLayerList getMapLayerList() {
+    return mapLayerList;
+  }
+
+  public static EntityList getEntityList() {
+    return entityList;
+  }
+
+  public static MapSelectionPanel getMapSelectionPanel() {
+    return mapSelectionPanel;
+  }
+  
   private static void setupInterface() {
     JFrame window = initWindow();
 
@@ -187,11 +208,10 @@ public final class UI {
   }
 
   private static Component initRightSplitPanel() {
-    final MapSelectionPanel mapSelectionPanel = new MapSelectionPanel();
-    EditorScreen.instance().setMapSelectionPanel(mapSelectionPanel);
-    
-    final MapObjectPanel mapObjectPanel = new MapObjectPanel();
-    EditorScreen.instance().setMapObjectPanel(mapObjectPanel);
+    mapLayerList = new MapLayerList();
+    entityList = new EntityList();
+    mapSelectionPanel = new MapSelectionPanel();
+    mapObjectPanel = new MapObjectPanel();
     
     JSplitPane rightSplitPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
     rightSplitPanel.setMinimumSize(new Dimension(300, 0));
@@ -259,7 +279,7 @@ public final class UI {
     });
   }
 
-  public static void initSwingComponentStyle() {
+  private static void initSwingComponentStyle() {
     try {
       JOptionPane.setDefaultLocale(Locale.getDefault());
       JPopupMenu.setDefaultLightWeightPopupEnabled(false);
@@ -271,7 +291,7 @@ public final class UI {
     }
   }
 
-  public static void setDefaultSwingFont(FontUIResource font) {
+  private static void setDefaultSwingFont(FontUIResource font) {
     Enumeration<Object> keys = UIManager.getDefaults().keys();
     while (keys.hasMoreElements()) {
       Object key = keys.nextElement();

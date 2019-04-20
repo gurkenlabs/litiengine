@@ -17,6 +17,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.utiliti.components.EditorScreen;
 import de.gurkenlabs.utiliti.components.MapComponent;
+import de.gurkenlabs.utiliti.swing.UI;
 
 public class UndoManager {
   private static final Logger log = Logger.getLogger(MapComponent.class.getName());
@@ -299,8 +300,8 @@ public class UndoManager {
     Game.world().environment().reloadFromMap(target.getId());
 
     if (EditorScreen.instance().getMapComponent().getFocusedMapObject() != null && EditorScreen.instance().getMapComponent().getFocusedMapObject().getId() == target.getId()) {
-      EditorScreen.instance().getMapObjectPanel().bind(target);
-      EditorScreen.instance().getEntityList().focus(target);
+      UI.getMapObjectPanel().bind(target);
+      UI.getEntityList().focus(target);
     }
   }
 

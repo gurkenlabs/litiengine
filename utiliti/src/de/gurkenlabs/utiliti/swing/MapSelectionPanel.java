@@ -27,9 +27,7 @@ public class MapSelectionPanel extends JSplitPane {
   private final JList<String> mapList;
   private final DefaultListModel<String> model;
   private final JScrollPane mapScrollPane;
-  private final MapLayerList mapLayerList;
-  private final EntityList entityList;
-  
+
   private final JPopupMenu popupMenu;
   private final JMenuItem exportMap;
   private final JMenuItem deleteMap;
@@ -89,15 +87,9 @@ public class MapSelectionPanel extends JSplitPane {
 
     mapScrollPane.setViewportBorder(null);
 
-    this.mapLayerList = new MapLayerList();
-    EditorScreen.instance().setMapLayerList(this.mapLayerList);
-
-    this.entityList = new EntityList();
-    EditorScreen.instance().setEntityList(this.entityList);
-    
     JTabbedPane tabPane = new JTabbedPane();
-    tabPane.addTab(Resources.strings().get("panel_entities"), this.entityList);
-    tabPane.add(Resources.strings().get("panel_mapObjectLayers"), this.mapLayerList);
+    tabPane.addTab(Resources.strings().get("panel_entities"), UI.getEntityList());
+    tabPane.add(Resources.strings().get("panel_mapObjectLayers"), UI.getMapLayerList());
     tabPane.setMaximumSize(new Dimension(0, 150));
 
     tabPane.setIconAt(0, Icons.CUBE);
@@ -173,17 +165,15 @@ public class MapSelectionPanel extends JSplitPane {
     return EditorScreen.instance().getMapComponent().getMaps().get(mapList.getSelectedIndex());
   }
 
- 
-
   public void updateComponents() {
     if (mapList.getSelectedIndex() == -1 && this.model.size() > 0) {
       this.mapList.setSelectedIndex(0);
     }
 
-    this.entityList.update();
-    this.mapLayerList.update();
+    UI.getEntityList().update();
+    UI.getMapLayerList().update();
   }
- 
+
   private static void addPopup(JList<String> mapList, final JPopupMenu popup) {
     mapList.addMouseListener(new MouseAdapter() {
       @Override
@@ -207,8 +197,6 @@ public class MapSelectionPanel extends JSplitPane {
       }
     });
   }
-
-  
 
   private int getIndexToReplace(String mapName) {
     for (int i = 0; i < this.model.getSize(); i++) {

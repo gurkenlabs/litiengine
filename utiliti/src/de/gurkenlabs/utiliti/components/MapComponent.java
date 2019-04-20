@@ -238,14 +238,14 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     if (maps == null) {
       return;
     }
-    EditorScreen.instance().getMapObjectPanel().bind(null);
+    UI.getMapObjectPanel().bind(null);
     this.setFocus(null, true);
     this.getMaps().clear();
 
     Collections.sort(maps);
 
     this.getMaps().addAll(maps);
-    EditorScreen.instance().getMapSelectionPanel().bind(this.getMaps(), true);
+    UI.getMapSelectionPanel().bind(this.getMaps(), true);
   }
 
   public List<TmxMap> getMaps() {
@@ -338,10 +338,8 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       Game.world().loadEnvironment(this.environments.get(map.getName()));
 
       UI.updateScrollBars();
-
-      EditorScreen.instance().getMapSelectionPanel().setSelection(map.getName());
-
-      EditorScreen.instance().getMapObjectPanel().bind(this.getFocusedMapObject());
+      UI.getMapSelectionPanel().setSelection(map.getName());
+      UI.getMapObjectPanel().bind(this.getFocusedMapObject());
 
       for (Consumer<TmxMap> cons : this.loadedConsumer) {
         cons.accept(map);
@@ -361,7 +359,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   }
 
   public void add(IMapObject mapObject) {
-    this.add(mapObject, EditorScreen.instance().getMapLayerList().getCurrentLayer());
+    this.add(mapObject, UI.getMapLayerList().getCurrentLayer());
     UndoManager.instance().mapObjectAdded(mapObject);
   }
 
@@ -470,7 +468,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
   public void clearAll() {
     this.focusedObjects.clear();
-    EditorScreen.instance().getMapLayerList().clear();
+    UI.getMapLayerList().clear();
     this.selectedObjects.clear();
     this.cameraFocus.clear();
     this.environments.clear();
@@ -571,7 +569,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     switch (editMode) {
     case EDITMODE_CREATE:
       this.setFocus(null, true);
-      EditorScreen.instance().getMapObjectPanel().bind(null);
+      UI.getMapObjectPanel().bind(null);
       Game.window().getRenderComponent().setCursor(Cursors.ADD, 0, 0);
       break;
     case EDITMODE_EDIT:
@@ -610,8 +608,8 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         return;
       }
 
-      EditorScreen.instance().getMapObjectPanel().bind(mapObject);
-      EditorScreen.instance().getEntityList().focus(mapObject);
+      UI.getMapObjectPanel().bind(mapObject);
+      UI.getEntityList().focus(mapObject);
       if (mapObject == null) {
         this.focusedObjects.remove(Game.world().environment().getMap().getName());
       } else {
@@ -697,7 +695,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
     // TODO: remove all tile sets from the game file that are no longer needed
     // by any other map.
-    EditorScreen.instance().getMapSelectionPanel().bind(this.getMaps());
+    UI.getMapSelectionPanel().bind(this.getMaps());
     if (!this.maps.isEmpty()) {
       this.loadEnvironment(this.maps.get(0));
     } else {
@@ -771,7 +769,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         this.environments.remove(map.getName());
       }
 
-      EditorScreen.instance().getMapSelectionPanel().bind(this.getMaps(), true);
+      UI.getMapSelectionPanel().bind(this.getMaps(), true);
       this.loadEnvironment(map);
       log.log(Level.INFO, "imported map {0}", new Object[] { map.getName() });
     }, TmxMap.FILE_EXTENSION);
@@ -854,7 +852,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
     Game.world().environment().clear();
     Game.world().environment().load();
-    EditorScreen.instance().getMapSelectionPanel().updateComponents();
+    UI.getMapSelectionPanel().updateComponents();
   }
 
   @Override
@@ -1073,7 +1071,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       Game.world().environment().updateLighting();
     }
 
-    EditorScreen.instance().getMapObjectPanel().bind(transformObject);
+    UI.getMapObjectPanel().bind(transformObject);
     this.updateTransformControls();
   }
 
@@ -1161,7 +1159,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       }
 
       if (selected.equals(this.getFocusedMapObject())) {
-        EditorScreen.instance().getMapObjectPanel().bind(selected);
+        UI.getMapObjectPanel().bind(selected);
         this.updateTransformControls();
       }
     }
@@ -1464,10 +1462,10 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         break;
       }
 
-      IMapObject mo = this.createNewMapObject(EditorScreen.instance().getMapObjectPanel().getObjectType());
+      IMapObject mo = this.createNewMapObject(UI.getMapObjectPanel().getObjectType());
       this.newObjectArea = null;
       this.setFocus(mo, !Input.keyboard().isPressed(KeyEvent.VK_SHIFT));
-      EditorScreen.instance().getMapObjectPanel().bind(mo);
+      UI.getMapObjectPanel().bind(mo);
       this.setEditMode(EDITMODE_EDIT);
       break;
     case EDITMODE_MOVE:
@@ -1547,7 +1545,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
           this.getSelectedMapObjects().remove((MapObject) mapObject);
         } else {
           this.setFocus(mapObject, !Input.keyboard().isPressed(KeyEvent.VK_SHIFT));
-          EditorScreen.instance().getMapObjectPanel().bind(mapObject);
+          UI.getMapObjectPanel().bind(mapObject);
         }
         somethingIsFocused = true;
       }
@@ -1556,7 +1554,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     if (!somethingIsFocused && !currentObjectFocused) {
       this.setFocus(null, true);
       this.setSelection(Collections.emptyList(), true);
-      EditorScreen.instance().getMapObjectPanel().bind(null);
+      UI.getMapObjectPanel().bind(null);
     }
   }
 
