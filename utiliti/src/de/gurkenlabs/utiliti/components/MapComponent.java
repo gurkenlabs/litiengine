@@ -389,6 +389,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       if (MapObjectType.get(mapObject.getType()) == MapObjectType.LIGHTSOURCE) {
         Game.world().environment().updateLighting(mapObject.getBoundingBox());
       }
+      
       Game.world().environment().remove(mapObject.getId());
       if (mapObject.equals(this.getFocusedMapObject())) {
         this.setFocus(null, true);
@@ -1058,8 +1059,12 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
     Game.world().environment().reloadFromMap(transformObject.getId());
     MapObjectType type = MapObjectType.get(transformObject.getType());
-    if (type == MapObjectType.LIGHTSOURCE || type == MapObjectType.STATICSHADOW) {
+    if (type == MapObjectType.LIGHTSOURCE) {
       Game.world().environment().updateLighting(transformObject.getBoundingBox());
+    }
+    
+    if(type == MapObjectType.STATICSHADOW) {
+      Game.world().environment().updateLighting();
     }
 
     EditorScreen.instance().getMapObjectPanel().bind(transformObject);

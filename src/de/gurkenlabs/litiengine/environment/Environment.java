@@ -281,13 +281,19 @@ public final class Environment implements IRenderable {
   }
 
   private void updateLighting(IEntity entity) {
+    if (entity instanceof StaticShadow) {
+      StaticShadow shadow = (StaticShadow) entity;
+      this.updateLighting(shadow.getArea() != null ? shadow.getArea().getBounds2D() : shadow.getBoundingBox());
+      return;
+    }
+
     this.updateLighting(entity.getBoundingBox());
   }
 
   public void updateLighting() {
     this.updateLighting(this.getMap().getBounds());
   }
-  
+
   public void updateLighting(Rectangle2D section) {
     if (this.staticShadowLayer != null) {
       this.staticShadowLayer.updateSection(section);
@@ -1054,13 +1060,6 @@ public final class Environment implements IRenderable {
 
     this.render(g, RenderType.NORMAL);
 
-    long shadowRenderStart = System.nanoTime();
-    if (this.getStaticShadows().stream().anyMatch(x -> x.getShadowType() != StaticShadowType.NONE)) {
-      this.getStaticShadowLayer().render(g);
-    }
-
-    final double shadowTime = TimeUtilities.nanoToMs(System.nanoTime() - shadowRenderStart);
-
     this.render(g, RenderType.OVERLAY);
 
     long ambientStart = System.nanoTime();
@@ -1070,6 +1069,13 @@ public final class Environment implements IRenderable {
 
     final double ambientTime = TimeUtilities.nanoToMs(System.nanoTime() - ambientStart);
 
+    long shadowRenderStart = System.nanoTime();
+    if (this.getStaticShadows().stream().anyMatch(x -> x.getShadowType() != StaticShadowType.NONE)) {
+      this.getStaticShadowLayer().render(g);
+    }
+
+    final double shadowTime = TimeUtilities.nanoToMs(System.nanoTime() - shadowRenderStart);
+    
     this.render(g, RenderType.UI);
 
     if (Game.config().debug().trackRenderTimes()) {
@@ -1388,7 +1394,7 @@ public final class Environment implements IRenderable {
       Emitter em = (Emitter) entity;
       em.deactivate();
     }
-    
+
     if (this.loaded && (entity instanceof LightSource || entity instanceof StaticShadow)) {
       this.updateLighting(entity);
     }
