@@ -39,9 +39,12 @@ public final class CanvasPopupMenu extends JPopupMenu {
     blueprint.addActionListener(e -> EditorScreen.instance().getMapComponent().defineBlueprint());
     blueprint.setEnabled(false);
 
-    JMenu moveLayer = new LayerMenu();
-    moveLayer.setEnabled(false);
+    JMenu layerMenu = new LayerMenu();
+    layerMenu.setEnabled(false);
 
+    JMenu renderMenu = new RenderMenu();
+    renderMenu.setEnabled(false);
+    
     this.add(new AddMenu());
     this.add(paste);
     this.addSeparator();
@@ -49,7 +52,8 @@ public final class CanvasPopupMenu extends JPopupMenu {
     this.add(cut);
     this.add(delete);
     this.addSeparator();
-    this.add(moveLayer);
+    this.add(layerMenu);
+    this.add(renderMenu);
     this.add(blueprint);
 
     EditorScreen.instance().getMapComponent().onFocusChanged(mo -> {

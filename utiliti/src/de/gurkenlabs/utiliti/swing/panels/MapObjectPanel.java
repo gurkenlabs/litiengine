@@ -7,9 +7,12 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
@@ -20,6 +23,7 @@ import javax.swing.SwingConstants;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
+import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.components.EditorScreen;
@@ -43,6 +47,8 @@ public class MapObjectPanel extends PropertyPanel {
   private final JLabel labelEntityID;
   private TagPanel tagPanel;
   private JLabel lblLayer;
+  private JLabel lblRendering;
+  private JPanel panel_1;
 
   public MapObjectPanel() {
     this.panels = new ConcurrentHashMap<>();
@@ -78,49 +84,64 @@ public class MapObjectPanel extends PropertyPanel {
 
     this.updateSpinnerModels();
 
-    JLabel lblEntityId = new JLabel("ID");
-    lblEntityId.setFont(lblEntityId.getFont().deriveFont(Font.BOLD).deriveFont(12f));
-
-    this.labelEntityID = new JLabel("####");
-    this.labelEntityID.setFont(labelEntityID.getFont().deriveFont(12f));
-
-    this.lblLayer = new JLabel("");
-    this.lblLayer.setHorizontalAlignment(SwingConstants.TRAILING);
-    this.lblLayer.setForeground(Color.GRAY);
-    this.lblLayer.setFont(this.lblLayer.getFont().deriveFont(10f));
-
     this.tagPanel = new TagPanel();
 
     tabbedPanel = new JTabbedPane(JTabbedPane.TOP);
 
+    panel_1 = new JPanel();
+
     GroupLayout groupLayout = new GroupLayout(this);
-    groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-        .addGroup(groupLayout.createSequentialGroup().addGap(5).addGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addComponent(tabbedPanel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 440, Short.MAX_VALUE).addGroup(groupLayout.createSequentialGroup()
-            .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING, false).addComponent(lblX, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE).addComponent(lblWidth, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE)
-                .addComponent(lblName, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE).addComponent(lblTags, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE).addComponent(lblEntityId, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE))
-            .addPreferredGap(ComponentPlacement.RELATED)
-            .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addComponent(tagPanel, GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE).addComponent(textFieldName, GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE).addGroup(groupLayout.createSequentialGroup()
-                .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-                    .addGroup(groupLayout.createSequentialGroup().addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(spinnerWidth, GroupLayout.DEFAULT_SIZE, 161, Short.MAX_VALUE).addComponent(spinnerX, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 161, Short.MAX_VALUE))
-                        .addPreferredGap(ComponentPlacement.UNRELATED)
-                        .addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false).addComponent(lblHeight, GroupLayout.PREFERRED_SIZE, 49, GroupLayout.PREFERRED_SIZE).addComponent(lblYcoordinate, GroupLayout.PREFERRED_SIZE, 49, GroupLayout.PREFERRED_SIZE)).addGap(0))
-                    .addGroup(groupLayout.createSequentialGroup().addComponent(labelEntityID).addGap(184)))
-                .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(spinnerY, GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE).addComponent(spinnerHeight, GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE).addComponent(lblLayer, GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE))))))
-            .addGap(5)));
+    groupLayout
+        .setHorizontalGroup(
+            groupLayout.createParallelGroup(Alignment.TRAILING)
+                .addGroup(groupLayout.createSequentialGroup().addGap(5)
+                    .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addComponent(tabbedPanel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 440, Short.MAX_VALUE).addGroup(groupLayout.createSequentialGroup()
+                        .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING, false).addComponent(lblX, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE).addComponent(lblWidth, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE)
+                            .addComponent(lblName, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE).addComponent(lblTags, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE))
+                        .addPreferredGap(ComponentPlacement.RELATED)
+                        .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addComponent(tagPanel, GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE).addComponent(textFieldName, GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE)
+                            .addGroup(groupLayout.createSequentialGroup().addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(spinnerWidth, GroupLayout.DEFAULT_SIZE, 161, Short.MAX_VALUE).addComponent(spinnerX, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 161, Short.MAX_VALUE))
+                                .addPreferredGap(ComponentPlacement.UNRELATED)
+                                .addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false).addComponent(lblHeight, GroupLayout.PREFERRED_SIZE, 49, GroupLayout.PREFERRED_SIZE).addComponent(lblYcoordinate, GroupLayout.PREFERRED_SIZE, 49, GroupLayout.PREFERRED_SIZE)).addGap(0)
+                                .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addComponent(spinnerY, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE).addComponent(spinnerHeight, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE))))))
+                    .addGap(5))
+                .addGroup(Alignment.LEADING, groupLayout.createSequentialGroup().addGap(5).addComponent(panel_1, GroupLayout.DEFAULT_SIZE, 430, Short.MAX_VALUE).addGap(5)));
     groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-        .addGroup(groupLayout.createSequentialGroup().addGap(5)
-            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(lblEntityId, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE).addComponent(labelEntityID).addComponent(lblLayer, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE)).addGap(5)
+        .addGroup(groupLayout.createSequentialGroup().addGap(5).addComponent(panel_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addGap(5)
             .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(lblX, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE).addComponent(spinnerX, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
                 .addComponent(lblYcoordinate, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE).addComponent(spinnerY, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE))
             .addGap(5)
             .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(spinnerWidth, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE).addComponent(lblHeight, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
                 .addComponent(spinnerHeight, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE).addComponent(lblWidth, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE))
             .addGap(5).addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(textFieldName, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE).addComponent(lblName, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)).addGap(5)
-            .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(tagPanel, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE).addComponent(lblTags, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)).addGap(37)
+            .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(tagPanel, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE).addComponent(lblTags, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)).addGap(5)
             .addComponent(tabbedPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addGap(108)));
+    panel_1.setLayout(new BoxLayout(panel_1, BoxLayout.X_AXIS));
+
+    JLabel lblEntityId = new JLabel("ID");
+    panel_1.add(lblEntityId);
+    lblEntityId.setFont(lblEntityId.getFont().deriveFont(Font.BOLD).deriveFont(12f));
+    panel_1.add(Box.createHorizontalStrut(47));
+    this.labelEntityID = new JLabel("####");
+    panel_1.add(labelEntityID);
+    this.labelEntityID.setFont(labelEntityID.getFont().deriveFont(12f));
+    panel_1.add(Box.createHorizontalStrut(20));
+    this.lblLayer = new JLabel("");
+    panel_1.add(lblLayer);
+    this.lblLayer.setHorizontalAlignment(SwingConstants.TRAILING);
+    this.lblLayer.setForeground(Color.GRAY);
+    this.lblLayer.setFont(this.lblLayer.getFont().deriveFont(10f));
+    panel_1.add(Box.createHorizontalStrut(15));
+    this.lblRendering = new JLabel("");
+    panel_1.add(lblRendering);
+    this.lblRendering.setForeground(Color.GRAY);
+    this.lblRendering.setFont(lblRendering.getFont().deriveFont(10f));
+    panel_1.add(Box.createGlue());
+    
     setLayout(groupLayout);
 
     this.setupChangedListeners();
+    EditorScreen.instance().getMapLayerList().onLayersChanged(map -> this.bind(this.getDataSource()));
   }
 
   public void updateSpinnerModels() {
@@ -241,6 +262,7 @@ public class MapObjectPanel extends PropertyPanel {
     this.textFieldName.setText("");
     this.labelEntityID.setText("####");
     this.lblLayer.setText("");
+    this.lblRendering.setText("");
     this.tagPanel.clear();
   }
 
@@ -257,7 +279,29 @@ public class MapObjectPanel extends PropertyPanel {
     this.tagPanel.bind(mapObject.getStringValue(MapObjectProperty.TAGS));
 
     this.labelEntityID.setText(Integer.toString(mapObject.getId()));
+
     this.lblLayer.setText("layer: " + mapObject.getLayer().getName());
+    String info = this.getRendering(mapObject);
+    if (info == null) {
+      this.lblRendering.setText("");
+    } else {
+      this.lblRendering.setText("render: " + this.getRendering(mapObject));
+    }
+  }
+
+  private String getRendering(IMapObject mapObject) {
+    switch (MapObjectType.get(mapObject.getType())) {
+    case PROP:
+    case EMITTER:
+    case CREATURE:
+      RenderType renderType = mapObject.getEnumValue(MapObjectProperty.RENDERTYPE, RenderType.class, RenderType.NORMAL);
+      if (mapObject.getLayer() != null && mapObject.getBoolValue(MapObjectProperty.RENDERWITHLAYER)) {
+        return "layer (" + mapObject.getLayer().getRenderType() + ")";
+      }
+      return renderType.toString();
+    default:
+      return null;
+    }
   }
 
   private void setupChangedListeners() {
