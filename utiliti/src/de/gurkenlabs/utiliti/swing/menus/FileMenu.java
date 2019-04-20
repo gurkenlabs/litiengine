@@ -32,7 +32,7 @@ public final class FileMenu extends JMenu {
     load.addActionListener(a -> EditorScreen.instance().load());
 
     JMenuItem close = new JMenuItem(Resources.strings().get("menu_file_close"));
-    close.addActionListener(a -> EditorScreen.instance().close());
+    close.addActionListener(a -> EditorScreen.instance().close(false));
     close.setEnabled(false);
     EditorScreen.instance().onLoaded(() -> close.setEnabled(EditorScreen.instance().getCurrentResourceFile() != null));
 
@@ -46,7 +46,10 @@ public final class FileMenu extends JMenu {
 
     JMenuItem saveAs = new JMenuItem(Resources.strings().get("menu_file_saveAs"));
     saveAs.addActionListener(a -> EditorScreen.instance().save(true));
-
+    
+    JMenuItem revert = new JMenuItem(Resources.strings().get("menu_file_revert"));
+    revert.addActionListener(a -> EditorScreen.instance().revert());
+    
     JMenuItem exit = new JMenuItem(Resources.strings().get("menu_exit"));
     exit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, Event.CTRL_MASK));
     exit.addActionListener(a -> System.exit(0));
@@ -58,6 +61,7 @@ public final class FileMenu extends JMenu {
     this.addSeparator();
     this.add(save);
     this.add(saveAs);
+    this.add(revert);
     this.addSeparator();
     this.add(exit);
   }
@@ -70,7 +74,7 @@ public final class FileMenu extends JMenu {
         JMenuItem fileButton = new JMenuItem(recent);
         fileButton.addActionListener(a -> {
           log.log(Level.INFO, "load " + fileButton.getText());
-          EditorScreen.instance().load(new File(fileButton.getText()));
+          EditorScreen.instance().load(new File(fileButton.getText()), false);
         });
 
         recentFiles.add(fileButton);

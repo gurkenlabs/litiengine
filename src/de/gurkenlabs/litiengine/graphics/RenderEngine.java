@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine.graphics;
 import java.awt.BasicStroke;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
@@ -58,7 +59,7 @@ public final class RenderEngine {
    * @see Game#graphics()
    */
   public RenderEngine() {
-    if(Game.graphics() != null) {
+    if (Game.graphics() != null) {
       throw new UnsupportedOperationException("Never initialize a RenderEngine manually. Use Game.graphics() instead.");
     }
   }
@@ -74,33 +75,50 @@ public final class RenderEngine {
    *          The x-coordinate of the text.
    * @param y
    *          The y-coordinate of the text
+   * @param antialias
+   *          Configure whether or not to render the text with antialiasing.
    */
-  public static void renderText(final Graphics2D g, final String text, final double x, final double y) {
+  public static void renderText(final Graphics2D g, final String text, final double x, final double y, boolean antialias) {
     if (text == null || text.isEmpty()) {
       return;
     }
-    
+
     final Point2D viewPortLocation = Game.world().camera().getViewportLocation(x, y);
     double viewPortX = (float) viewPortLocation.getX() * Game.world().camera().getRenderScale();
     double yiewPortY = (float) viewPortLocation.getY() * Game.world().camera().getRenderScale();
 
-    TextRenderer.render(g, text, viewPortX, yiewPortY);
+    TextRenderer.render(g, text, viewPortX, yiewPortY, antialias ? RenderingHints.VALUE_TEXT_ANTIALIAS_ON : RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+  }
+
+  public static void renderText(final Graphics2D g, final String text, final double x, final double y) {
+    renderText(g, text, x, y, false);
+  }
+
+  public static void renderText(final Graphics2D g, final String text, final Point2D location, boolean antialias) {
+    renderText(g, text, location.getX(), location.getY(), antialias);
   }
 
   public static void renderText(final Graphics2D g, final String text, final Point2D location) {
-    renderText(g, text, location.getX(), location.getY());
+    renderText(g, text, location, false);
   }
 
   public static void renderShape(final Graphics2D g, final Shape shape) {
+    renderShape(g, shape, false);
+  }
+
+  public static void renderShape(final Graphics2D g, final Shape shape, boolean antialiasing) {
     if (shape == null) {
       return;
     }
 
+    Object hint = g.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
+    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, antialiasing ? RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF);
     final AffineTransform t = new AffineTransform();
     t.scale(Game.world().camera().getRenderScale(), Game.world().camera().getRenderScale());
     t.translate(Game.world().camera().getPixelOffsetX(), Game.world().camera().getPixelOffsetY());
 
     ShapeRenderer.renderTransformed(g, shape, t);
+    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, hint);
   }
 
   public static void renderOutline(final Graphics2D g, final Shape shape) {
@@ -124,7 +142,7 @@ public final class RenderEngine {
   }
 
   public static void renderImage(Graphics2D g, final Image image, Point2D location) {
-    Point2D viewPortLocation = Game.world().camera().getViewportLocation(location); 
+    Point2D viewPortLocation = Game.world().camera().getViewportLocation(location);
     ImageRenderer.render(g, image, viewPortLocation.getX() * Game.world().camera().getRenderScale(), viewPortLocation.getY() * Game.world().camera().getRenderScale());
   }
 

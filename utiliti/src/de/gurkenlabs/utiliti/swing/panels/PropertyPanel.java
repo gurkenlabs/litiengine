@@ -31,7 +31,6 @@ import javax.swing.event.ChangeListener;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
-import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
@@ -241,9 +240,6 @@ public abstract class PropertyPanel extends JPanel {
     if (getDataSource() instanceof IMapObject) {
       IMapObject obj = getDataSource();
       Game.world().environment().reloadFromMap(obj.getId());
-      if (MapObjectType.get(obj.getType()) == MapObjectType.LIGHTSOURCE) {
-        Game.world().environment().getAmbientLight().updateSection(MapObject.getBounds(before, obj));
-      }
     }
   }
 

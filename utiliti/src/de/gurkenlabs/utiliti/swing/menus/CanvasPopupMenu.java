@@ -3,6 +3,7 @@ package de.gurkenlabs.utiliti.swing.menus;
 import java.awt.Event;
 import java.awt.event.KeyEvent;
 
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
@@ -38,6 +39,12 @@ public final class CanvasPopupMenu extends JPopupMenu {
     blueprint.addActionListener(e -> EditorScreen.instance().getMapComponent().defineBlueprint());
     blueprint.setEnabled(false);
 
+    JMenu layerMenu = new LayerMenu();
+    layerMenu.setEnabled(false);
+
+    JMenu renderMenu = new RenderMenu();
+    renderMenu.setEnabled(false);
+    
     this.add(new AddMenu());
     this.add(paste);
     this.addSeparator();
@@ -45,6 +52,8 @@ public final class CanvasPopupMenu extends JPopupMenu {
     this.add(cut);
     this.add(delete);
     this.addSeparator();
+    this.add(layerMenu);
+    this.add(renderMenu);
     this.add(blueprint);
 
     EditorScreen.instance().getMapComponent().onFocusChanged(mo -> {

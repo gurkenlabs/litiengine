@@ -91,6 +91,10 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
     this.setY(mapObjectToBeCopied.getY());
     this.setWidth(mapObjectToBeCopied.getWidth());
     this.setHeight(mapObjectToBeCopied.getHeight());
+    this.setLayer(mapObjectToBeCopied.layer);
+    this.text = mapObjectToBeCopied.text;
+    this.ellipse = mapObjectToBeCopied.ellipse;
+    this.point = mapObjectToBeCopied.point;
   }
 
   /**
@@ -107,6 +111,11 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
     if (keepID) {
       this.setId(mapObjectToBeCopied.getId());
     }
+  }
+  
+  public MapObject(MapObject mapObjectToBeCopied, int id) {
+    this(mapObjectToBeCopied);
+    this.setId(id);
   }
 
   public static Rectangle2D getBounds2D(IMapObject... objects) {

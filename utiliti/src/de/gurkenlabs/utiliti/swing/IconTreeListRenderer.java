@@ -1,6 +1,8 @@
 package de.gurkenlabs.utiliti.swing;
 
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
 
@@ -17,6 +19,7 @@ import javax.swing.tree.TreeCellRenderer;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.Creature;
+import de.gurkenlabs.litiengine.entities.LightSource;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.PropState;
 import de.gurkenlabs.litiengine.graphics.CreatureAnimationState;
@@ -55,6 +58,9 @@ public class IconTreeListRenderer implements TreeCellRenderer {
           label.setIcon(getIcon(prop));
         } else if (iconItem.getUserObject() instanceof Creature) {
           Creature creature = (Creature) iconItem.getUserObject();
+          label.setIcon(getIcon(creature));
+        } else if (iconItem.getUserObject() instanceof LightSource) {
+          LightSource creature = (LightSource) iconItem.getUserObject();
           label.setIcon(getIcon(creature));
         }
       }
@@ -110,10 +116,32 @@ public class IconTreeListRenderer implements TreeCellRenderer {
       return Imaging.scale(sprites.iterator().next().getSprite(0), 16, 16, true);
     });
 
-    if(propImag == null) {
+    if (propImag == null) {
       return null;
     }
-    
+
     return new ImageIcon(propImag);
+  }
+
+  private static Icon getIcon(LightSource lightSource) {
+    Color lightColor = lightSource.getColor();
+    if (lightColor != null) {
+      final String cacheKey = Game.world().environment().getMap().getName() + "-" + Integer.toHexString(lightSource.getColor().getRGB());
+
+      BufferedImage newIconImage = Resources.images().get(cacheKey, () -> {
+        BufferedImage img = Imaging.getCompatibleImage(10, 10);
+        Graphics2D g = (Graphics2D) img.getGraphics();
+        g.setColor(lightColor);
+        g.fillRect(0, 0, 9, 9);
+        g.setColor(Color.BLACK);
+        g.drawRect(0, 0, 9, 9);
+        g.dispose();
+        return img;
+      });
+
+      return new ImageIcon(newIconImage);
+    }
+
+    return null;
   }
 }

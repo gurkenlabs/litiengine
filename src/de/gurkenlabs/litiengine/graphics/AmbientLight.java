@@ -34,7 +34,7 @@ public class AmbientLight extends ColorLayer {
   @Override
   protected void renderSection(Graphics2D g, Rectangle2D section) {
     this.renderAmbient(g, section);
-    
+
     // carve out the lights that will be added 
     g.setComposite(AlphaComposite.getInstance(AlphaComposite.DST_OUT, 1));
     for (final LightSource light : this.getEnvironment().getLightSources()) {
@@ -44,7 +44,7 @@ public class AmbientLight extends ColorLayer {
 
       this.renderLightSource(g, light, section);
     }
-    
+
     // render the actual lights, depending on their intensity
     for (final LightSource light : this.getEnvironment().getLightSources()) {
       if (!light.getBoundingBox().intersects(section) || !light.isActive() || light.getIntensity() <= 0) {
@@ -55,6 +55,12 @@ public class AmbientLight extends ColorLayer {
       g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, intensity));
       this.renderLightSource(g, light, section);
     }
+  }
+
+  @Override
+  protected void clearSection(Graphics2D g, Rectangle2D section) {
+    g.setColor(new Color(0, 0, 0, 0));
+    g.clearRect((int) section.getX(), (int) section.getY(), (int) section.getWidth(), (int) section.getHeight());
   }
 
   private void renderAmbient(Graphics2D g, Rectangle2D section) {
@@ -73,7 +79,7 @@ public class AmbientLight extends ColorLayer {
     final double mapWidth = this.getEnvironment().getMap().getSizeInPixels().width;
     final double mapHeight = this.getEnvironment().getMap().getSizeInPixels().height;
     double longerDimension = mapWidth < mapHeight ? mapHeight : mapWidth;
-    
+
     final Point2D lightCenter = light.getCenter();
     final Point2D lightFocus = new Point2D.Double(lightCenter.getX() + light.getBoundingBox().getWidth() * light.getFocusOffsetX(), lightCenter.getY() + light.getBoundingBox().getHeight() * light.getFocusOffsetY());
     Shape fillShape;

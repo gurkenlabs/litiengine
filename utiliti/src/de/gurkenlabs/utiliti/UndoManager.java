@@ -14,7 +14,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
-import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.utiliti.components.EditorScreen;
 import de.gurkenlabs.utiliti.components.MapComponent;
@@ -298,9 +297,6 @@ public class UndoManager {
     }
 
     Game.world().environment().reloadFromMap(target.getId());
-    if (MapObjectType.get(target.getType()) == MapObjectType.LIGHTSOURCE) {
-      Game.world().environment().getAmbientLight().updateSection(MapObject.getBounds2D((MapObject) target, (MapObject) restore));
-    }
 
     if (EditorScreen.instance().getMapComponent().getFocusedMapObject() != null && EditorScreen.instance().getMapComponent().getFocusedMapObject().getId() == target.getId()) {
       EditorScreen.instance().getMapObjectPanel().bind(target);

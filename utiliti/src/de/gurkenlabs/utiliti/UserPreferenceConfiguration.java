@@ -18,6 +18,7 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
   private boolean renderBoundingBoxes;
   private boolean renderCustomMapObjects;
   private boolean renderMapIds;
+  private boolean renderNames;
   private boolean compressFile;
   private boolean syncMaps;
   private int frameState;
@@ -41,6 +42,7 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
     this.snapPixels = true;
     this.snapGrid = true;
     this.renderBoundingBoxes = true;
+    this.renderNames = true;
     this.lastOpenedFiles = new String[10];
     this.compressFile = false;
     this.gridLineWidth = 1.0f;
@@ -250,5 +252,13 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
 
   public void setSnapPixels(boolean snapPixels) {
     this.snapPixels = snapPixels;
+  }
+
+  public boolean isRenderNames() {
+    return renderNames;
+  }
+
+  public void setRenderNames(boolean renderNames) {
+    this.renderNames = renderNames;
   }
 }

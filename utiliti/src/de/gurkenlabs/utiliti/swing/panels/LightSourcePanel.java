@@ -72,34 +72,33 @@ public class LightSourcePanel extends PropertyPanel {
     this.colorControl.addActionListener(new MapObjectPropertyActionListener(m -> {
       if (getDataSource() != null) {
         getDataSource().setValue(MapObjectProperty.LIGHT_COLOR, this.colorControl.getHexColor());
-        //Game.world().environment().reloadFromMap(getDataSource().getId());
-        Game.world().environment().getAmbientLight().updateSection(getDataSource().getBoundingBox());
+        Game.world().environment().updateLighting(getDataSource().getBoundingBox());
       }
     }));
 
     this.spinnerIntensity.addChangeListener(new MapObjectPropertyChangeListener(m -> {
       m.setValue(MapObjectProperty.LIGHT_INTENSITY, spinnerIntensity.getValue().toString());
-      Game.world().environment().getAmbientLight().updateSection(getDataSource().getBoundingBox());
+      Game.world().environment().updateLighting(getDataSource().getBoundingBox());
     }));
 
     this.comboBoxLightShape.addActionListener(new MapObjectPropertyActionListener(m -> {
       m.setValue(MapObjectProperty.LIGHT_SHAPE, comboBoxLightShape.getSelectedItem().toString());
-      Game.world().environment().getAmbientLight().updateSection(getDataSource().getBoundingBox());
+      Game.world().environment().updateLighting(getDataSource().getBoundingBox());
     }));
 
     this.checkBoxIsActive.addActionListener(new MapObjectPropertyActionListener(m -> {
       m.setValue(MapObjectProperty.LIGHT_ACTIVE, checkBoxIsActive.isSelected());
-      Game.world().environment().getAmbientLight().updateSection(getDataSource().getBoundingBox());
+      Game.world().environment().updateLighting(getDataSource().getBoundingBox());
     }));
 
     this.sliderOffsetX.addChangeListener(new MapObjectPropertyChangeListener(m -> {
       m.setValue(MapObjectProperty.LIGHT_FOCUSOFFSETX, this.sliderOffsetX.getValue() / 100.0);
-      Game.world().environment().getAmbientLight().updateSection(getDataSource().getBoundingBox());
+      Game.world().environment().updateLighting(getDataSource().getBoundingBox());
     }));
 
     this.sliderOffsetY.addChangeListener(new MapObjectPropertyChangeListener(m -> {
       m.setValue(MapObjectProperty.LIGHT_FOCUSOFFSETY, this.sliderOffsetY.getValue() / 100.0);
-      Game.world().environment().getAmbientLight().updateSection(getDataSource().getBoundingBox());
+      Game.world().environment().updateLighting(getDataSource().getBoundingBox());
     }));
   }
 

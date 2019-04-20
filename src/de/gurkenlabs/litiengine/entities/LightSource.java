@@ -22,7 +22,7 @@ import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.ShapeRenderer;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
-@EntityInfo(renderType = RenderType.GROUND)
+@EntityInfo(renderType = RenderType.OVERLAY)
 public class LightSource extends Entity implements IRenderable {
   public enum Type {
     ELLIPSE, RECTANGLE;

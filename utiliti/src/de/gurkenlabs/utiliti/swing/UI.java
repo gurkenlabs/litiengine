@@ -87,6 +87,11 @@ public final class UI {
     return n != JOptionPane.CANCEL_OPTION && n != JOptionPane.CLOSED_OPTION;
   }
 
+  public static boolean showRevertWarning() {
+    int n = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), Resources.strings().get("hud_revertChangesMessage"), Resources.strings().get("hud_revertChanges"), JOptionPane.YES_NO_OPTION);
+    return n != JOptionPane.CANCEL_OPTION && n != JOptionPane.CLOSED_OPTION;
+  }
+
   public static synchronized void init() {
     if (initialized) {
       return;
@@ -115,8 +120,6 @@ public final class UI {
     // remove canvas because we want to add a wrapping panel
     window.remove(canvas);
 
-    initPopupMenu(canvas);
-
     JPanel renderPanel = new JPanel(new BorderLayout());
     renderPanel.add(canvas);
     renderPanel.setMinimumSize(new Dimension(300, 0));
@@ -140,7 +143,7 @@ public final class UI {
     rootPanel.add(split, BorderLayout.CENTER);
     split.setDividerLocation(Program.preferences().getMainSplitterPosition() != 0 ? Program.preferences().getMainSplitterPosition() : (int) (window.getSize().width * 0.75));
 
-
+    initPopupMenu(canvas);
     window.setJMenuBar(new MainMenuBar());
   }
 
@@ -184,11 +187,12 @@ public final class UI {
   }
 
   private static Component initRightSplitPanel() {
-    final MapObjectPanel mapObjectPanel = new MapObjectPanel();
     final MapSelectionPanel mapSelectionPanel = new MapSelectionPanel();
-    EditorScreen.instance().setMapEditorPanel(mapObjectPanel);
     EditorScreen.instance().setMapSelectionPanel(mapSelectionPanel);
-
+    
+    final MapObjectPanel mapObjectPanel = new MapObjectPanel();
+    EditorScreen.instance().setMapObjectPanel(mapObjectPanel);
+    
     JSplitPane rightSplitPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
     rightSplitPanel.setMinimumSize(new Dimension(300, 0));
     rightSplitPanel.setBottomComponent(mapObjectPanel);

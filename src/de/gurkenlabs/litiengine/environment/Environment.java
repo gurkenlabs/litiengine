@@ -187,7 +187,6 @@ public final class Environment implements IRenderable {
     }
 
     if (entity instanceof Emitter)
-
     {
       Emitter emitter = (Emitter) entity;
       this.addEmitter(emitter);
@@ -280,13 +279,27 @@ public final class Environment implements IRenderable {
     this.emitters.remove(emitter);
   }
 
-  private void updateColorLayers(IEntity entity) {
+  public void updateLighting(IEntity entity) {
+    if (entity instanceof StaticShadow) {
+      StaticShadow shadow = (StaticShadow) entity;
+      this.updateLighting(shadow.getArea() != null ? shadow.getArea().getBounds2D() : shadow.getBoundingBox());
+      return;
+    }
+
+    this.updateLighting(entity.getBoundingBox());
+  }
+
+  public void updateLighting() {
+    this.updateLighting(this.getMap().getBounds());
+  }
+
+  public void updateLighting(Rectangle2D section) {
     if (this.staticShadowLayer != null) {
-      this.staticShadowLayer.updateSection(entity.getBoundingBox());
+      this.staticShadowLayer.updateSection(section);
     }
 
     if (this.ambientLight != null) {
-      this.ambientLight.updateSection(entity.getBoundingBox());
+      this.ambientLight.updateSection(section);
     }
   }
 
@@ -310,8 +323,27 @@ public final class Environment implements IRenderable {
 
   public void clear() {
     Game.physics().clear();
+
+    this.combatEntities.clear();
+    this.mobileEntities.clear();
+    this.gravityForces.clear();
+    this.layerEntities.clear();
+    this.entitiesByTag.clear();
+    this.allEntities.clear();
+
+    for (RenderType renderType : RenderType.values()) {
+      this.miscEntities.get(renderType).clear();
+      this.renderListeners.get(renderType).clear();
+      this.renderables.get(renderType).clear();
+    }
+
     dispose(this.getEntities());
     dispose(this.getTriggers());
+    this.getEmitters().clear();
+    this.getCollisionBoxes().clear();
+    this.getProps().clear();
+    this.getCreatures().clear();
+    this.getStaticShadows().clear();
     this.getCombatEntities().clear();
     this.getMobileEntities().clear();
     this.getLightSources().clear();
@@ -319,8 +351,9 @@ public final class Environment implements IRenderable {
     this.getSpawnPoints().clear();
     this.getAreas().clear();
     this.getTriggers().clear();
-    this.allEntities.clear();
-    this.getEntitiesByTag().clear();
+
+    this.ambientLight = null;
+    this.staticShadowLayer = null;
 
     for (Map<Integer, IEntity> type : this.miscEntities.values()) {
       type.clear();
@@ -810,7 +843,7 @@ public final class Environment implements IRenderable {
     }
 
     this.getEntities().stream().forEach(this::load);
-
+    this.updateLighting();
     this.loaded = true;
     this.fireEvent(l -> l.loaded(this));
   }
@@ -946,7 +979,7 @@ public final class Environment implements IRenderable {
 
     if (entity instanceof LightSource) {
       this.lightSources.remove(entity);
-      this.updateColorLayers(entity);
+      this.updateLighting(entity);
     }
 
     if (entity instanceof Trigger) {
@@ -959,7 +992,7 @@ public final class Environment implements IRenderable {
 
     if (entity instanceof StaticShadow) {
       this.staticShadows.remove(entity);
-      this.updateColorLayers(entity);
+      this.updateLighting(entity);
     }
 
     if (entity instanceof IMobileEntity) {
@@ -1023,16 +1056,7 @@ public final class Environment implements IRenderable {
     }
 
     this.render(g, RenderType.SURFACE);
-
     this.render(g, RenderType.NORMAL);
-
-    long shadowRenderStart = System.nanoTime();
-    if (this.getStaticShadows().stream().anyMatch(x -> x.getShadowType() != StaticShadowType.NONE)) {
-      this.getStaticShadowLayer().render(g);
-    }
-
-    final double shadowTime = TimeUtilities.nanoToMs(System.nanoTime() - shadowRenderStart);
-
     this.render(g, RenderType.OVERLAY);
 
     long ambientStart = System.nanoTime();
@@ -1042,6 +1066,13 @@ public final class Environment implements IRenderable {
 
     final double ambientTime = TimeUtilities.nanoToMs(System.nanoTime() - ambientStart);
 
+    long shadowRenderStart = System.nanoTime();
+    if (this.getStaticShadows().stream().anyMatch(x -> x.getShadowType() != StaticShadowType.NONE)) {
+      this.getStaticShadowLayer().render(g);
+    }
+
+    final double shadowTime = TimeUtilities.nanoToMs(System.nanoTime() - shadowRenderStart);
+    
     this.render(g, RenderType.UI);
 
     if (Game.config().debug().trackRenderTimes()) {
@@ -1145,7 +1176,7 @@ public final class Environment implements IRenderable {
         if (entity != null) {
 
           // only add the entity to be rendered with it's layer if its RenderType equals the layer's RenderType
-          if (mapObject.getLayer() != null && entity.getRenderType() == mapObject.getLayer().getRenderType()) {
+          if (mapObject.getLayer() != null && entity.renderWithLayer()) {
             this.addEntity(entity);
             this.layerEntities.computeIfAbsent(mapObject.getLayer(), m -> new CopyOnWriteArrayList<>()).add(entity);
           } else {
@@ -1211,7 +1242,7 @@ public final class Environment implements IRenderable {
     }
   }
 
-  public void renderLayer(Graphics2D g, IMapObjectLayer layer, Rectangle2D viewport) {
+  public void renderLayer(Graphics2D g, IMapObjectLayer layer) {
     List<IEntity> entities = this.layerEntities.get(layer);
     if (entities != null) {
       Game.graphics().renderEntities(g, entities, layer.getRenderType() == RenderType.NORMAL);
@@ -1274,8 +1305,8 @@ public final class Environment implements IRenderable {
     // 4. attach all controllers
     entity.attachControllers();
 
-    if (entity instanceof LightSource || entity instanceof StaticShadow) {
-      this.updateColorLayers(entity);
+    if (this.loaded && (entity instanceof LightSource || entity instanceof StaticShadow)) {
+      this.updateLighting(entity);
     }
 
     entity.loaded(this);
@@ -1359,6 +1390,10 @@ public final class Environment implements IRenderable {
     if (entity instanceof Emitter) {
       Emitter em = (Emitter) entity;
       em.deactivate();
+    }
+
+    if (this.loaded && (entity instanceof LightSource || entity instanceof StaticShadow)) {
+      this.updateLighting(entity);
     }
 
     entity.removed(this);

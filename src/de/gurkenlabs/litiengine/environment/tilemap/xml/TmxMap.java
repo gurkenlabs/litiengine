@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -114,10 +115,10 @@ public final class TmxMap extends CustomPropertyProvider implements IMap, Compar
   @XmlTransient
   private URL path;
 
-  private transient List<ITileLayer> rawTileLayers = new ArrayList<>();
-  private transient List<IMapObjectLayer> rawMapObjectLayers = new ArrayList<>();
-  private transient List<IImageLayer> rawImageLayers = new ArrayList<>();
-  private transient List<IGroupLayer> rawGroupLayers = new ArrayList<>();
+  private transient List<ITileLayer> rawTileLayers = new CopyOnWriteArrayList<>();
+  private transient List<IMapObjectLayer> rawMapObjectLayers = new CopyOnWriteArrayList<>();
+  private transient List<IImageLayer> rawImageLayers = new CopyOnWriteArrayList<>();
+  private transient List<IGroupLayer> rawGroupLayers = new CopyOnWriteArrayList<>();
 
   private transient List<ITileLayer> tileLayers = Collections.unmodifiableList(this.rawTileLayers);
   private transient List<IMapObjectLayer> mapObjectLayers = Collections.unmodifiableList(this.rawMapObjectLayers);
@@ -311,7 +312,7 @@ public final class TmxMap extends CustomPropertyProvider implements IMap, Compar
   @Override
   public void addLayer(int index, ILayer layer) {
     this.getRenderLayers().add(index, layer);
-    this.layerAdded(layer);
+    this.addRawLayer(index, layer);
     if (layer instanceof Layer) {
       ((Layer) layer).setMap(this);
     }
@@ -320,7 +321,7 @@ public final class TmxMap extends CustomPropertyProvider implements IMap, Compar
   @Override
   public void removeLayer(ILayer layer) {
     this.layers.remove(layer);
-    this.layerRemoved(layer);
+    this.removeRawLayer(layer);
     if (layer instanceof Layer) {
       ((Layer) layer).setMap(null);
     }
@@ -329,13 +330,13 @@ public final class TmxMap extends CustomPropertyProvider implements IMap, Compar
   @Override
   public void removeLayer(int index) {
     ILayer removed = this.layers.remove(index);
-    this.layerRemoved(removed);
+    this.removeRawLayer(removed);
     if (removed instanceof Layer) {
       ((Layer) removed).setMap(null);
     }
   }
 
-  private void layerRemoved(ILayer layer) {
+  private void removeRawLayer(ILayer layer) {
     if (layer instanceof ITileLayer) {
       this.rawTileLayers.remove(layer);
     }
@@ -516,6 +517,37 @@ public final class TmxMap extends CustomPropertyProvider implements IMap, Compar
     if (layer instanceof IGroupLayer) {
       this.rawGroupLayers.add((IGroupLayer) layer);
     }
+  }
+
+  private void addRawLayer(int index, ILayer layer) {
+    if (layer instanceof ITileLayer) {
+      this.rawTileLayers.add(this.getRawIndex(index, ITileLayer.class), (ITileLayer) layer);
+    }
+    if (layer instanceof IMapObjectLayer) {
+      this.rawMapObjectLayers.add(this.getRawIndex(index, IMapObjectLayer.class), (IMapObjectLayer) layer);
+    }
+    if (layer instanceof IImageLayer) {
+      this.rawImageLayers.add(this.getRawIndex(index, IImageLayer.class), (IImageLayer) layer);
+    }
+    if (layer instanceof IGroupLayer) {
+      this.rawGroupLayers.add(this.getRawIndex(index, IGroupLayer.class), (IGroupLayer) layer);
+    }
+  }
+
+  private <T extends ILayer> int getRawIndex(int index, Class<T> layerType) {
+    int rawIndex = 0;
+    for (int i = 0; i < this.layers.size(); i++) {
+      if (i >= index) {
+        break;
+      }
+      
+      if (layerType.isAssignableFrom(this.layers.get(i).getClass())) {
+        rawIndex++;
+      }
+
+    }
+
+    return rawIndex;
   }
 
   private void checkVersion() {

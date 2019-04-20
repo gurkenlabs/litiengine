@@ -42,6 +42,7 @@ public abstract class Entity implements IEntity {
   private final EntityActionMap actions;
 
   private final ICustomPropertyProvider properties;
+  private boolean renderWithLayer;
 
   private Environment environment;
   private boolean loaded;
@@ -87,6 +88,11 @@ public abstract class Entity implements IEntity {
     }
 
     this.registerActions();
+  }
+
+  protected Entity(boolean renderWithLayer) {
+    this();
+    this.renderWithLayer = renderWithLayer;
   }
 
   protected Entity(int mapId) {
@@ -422,6 +428,16 @@ public abstract class Entity implements IEntity {
   @Override
   public boolean isLoaded() {
     return this.loaded;
+  }
+
+  @Override
+  public boolean renderWithLayer() {
+    return this.renderWithLayer;
+  }
+
+  @Override
+  public void setRenderWithLayer(boolean renderWithLayer) {
+    this.renderWithLayer = renderWithLayer;
   }
 
   protected EntityControllers getControllers() {

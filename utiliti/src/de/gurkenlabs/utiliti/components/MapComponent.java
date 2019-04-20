@@ -15,6 +15,7 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -99,10 +100,10 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   private final List<IntConsumer> editModeChangedConsumer;
   private final List<Consumer<IMapObject>> focusChangedConsumer;
   private final List<Consumer<List<IMapObject>>> selectionChangedConsumer;
-  private final List<Consumer<TmxMap>> mapLoadedConsumer;
+  private final List<Consumer<TmxMap>> loadingConsumer;
+  private final List<Consumer<TmxMap>> loadedConsumer;
   private final List<Consumer<Blueprint>> copyTargetChangedConsumer;
 
-  private final java.util.Map<String, Integer> selectedLayers;
   private final java.util.Map<String, Point2D> cameraFocus;
   private final java.util.Map<String, IMapObject> focusedObjects;
   private final java.util.Map<String, List<IMapObject>> selectedObjects;
@@ -144,13 +145,13 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     this.editModeChangedConsumer = new CopyOnWriteArrayList<>();
     this.focusChangedConsumer = new CopyOnWriteArrayList<>();
     this.selectionChangedConsumer = new CopyOnWriteArrayList<>();
-    this.mapLoadedConsumer = new CopyOnWriteArrayList<>();
+    this.loadingConsumer = new CopyOnWriteArrayList<>();
+    this.loadedConsumer = new CopyOnWriteArrayList<>();
     this.copyTargetChangedConsumer = new CopyOnWriteArrayList<>();
     this.focusedObjects = new ConcurrentHashMap<>();
     this.selectedObjects = new ConcurrentHashMap<>();
     this.environments = new ConcurrentHashMap<>();
     this.maps = new ArrayList<>();
-    this.selectedLayers = new ConcurrentHashMap<>();
     this.cameraFocus = new ConcurrentHashMap<>();
     this.transformRects = new ConcurrentHashMap<>();
     this.dragLocationMapObjects = new ConcurrentHashMap<>();
@@ -175,8 +176,12 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     this.selectionChangedConsumer.add(cons);
   }
 
+  public void onMapLoading(Consumer<TmxMap> cons) {
+    this.loadingConsumer.add(cons);
+  }
+
   public void onMapLoaded(Consumer<TmxMap> cons) {
-    this.mapLoadedConsumer.add(cons);
+    this.loadedConsumer.add(cons);
   }
 
   public void onCopyTargetChanged(Consumer<Blueprint> cons) {
@@ -307,7 +312,10 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         double y = Game.world().camera().getFocus().getY();
         Point2D newPoint = new Point2D.Double(x, y);
         this.cameraFocus.put(mapName, newPoint);
-        this.selectedLayers.put(mapName, EditorScreen.instance().getMapSelectionPanel().getSelectedLayerIndex());
+      }
+
+      for (Consumer<TmxMap> cons : this.loadingConsumer) {
+        cons.accept(Game.world().environment() != null ? (TmxMap) Game.world().environment().getMap() : null);
       }
 
       Point2D newFocus = null;
@@ -332,13 +340,10 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       UI.updateScrollBars();
 
       EditorScreen.instance().getMapSelectionPanel().setSelection(map.getName());
-      if (this.selectedLayers.containsKey(map.getName())) {
-        EditorScreen.instance().getMapSelectionPanel().selectLayer(this.selectedLayers.get(map.getName()));
-      }
 
       EditorScreen.instance().getMapObjectPanel().bind(this.getFocusedMapObject());
 
-      for (Consumer<TmxMap> cons : this.mapLoadedConsumer) {
+      for (Consumer<TmxMap> cons : this.loadedConsumer) {
         cons.accept(map);
       }
 
@@ -356,7 +361,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   }
 
   public void add(IMapObject mapObject) {
-    this.add(mapObject, getCurrentLayer());
+    this.add(mapObject, EditorScreen.instance().getMapLayerList().getCurrentLayer());
     UndoManager.instance().mapObjectAdded(mapObject);
   }
 
@@ -368,9 +373,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     this.setFocus(null, true);
     for (IMapObject mapObject : layer.getMapObjects()) {
       Game.world().environment().loadFromMap(mapObject.getId());
-      if (MapObjectType.get(mapObject.getType()) == MapObjectType.LIGHTSOURCE) {
-        Game.world().environment().getAmbientLight().updateSection(mapObject.getBoundingBox());
-      }
+
       this.setSelection(mapObject, false);
       this.setFocus(mapObject, false);
     }
@@ -382,15 +385,22 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     if (layer == null) {
       return;
     }
+
+    boolean shadow = layer.getMapObjects().stream().anyMatch(x -> MapObjectType.get(x.getType()) == MapObjectType.STATICSHADOW);
     for (IMapObject mapObject : layer.getMapObjects()) {
-      if (MapObjectType.get(mapObject.getType()) == MapObjectType.LIGHTSOURCE) {
-        Game.world().environment().getAmbientLight().updateSection(mapObject.getBoundingBox());
+      if (!shadow && MapObjectType.get(mapObject.getType()) == MapObjectType.LIGHTSOURCE) {
+        Game.world().environment().updateLighting(mapObject.getBoundingBox());
       }
+
       Game.world().environment().remove(mapObject.getId());
       if (mapObject.equals(this.getFocusedMapObject())) {
         this.setFocus(null, true);
       }
       this.getSelectedMapObjects().remove(mapObject);
+    }
+
+    if (shadow) {
+      Game.world().environment().updateLighting();
     }
   }
 
@@ -401,9 +411,6 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
     layer.addMapObject(mapObject);
     Game.world().environment().loadFromMap(mapObject.getId());
-    if (MapObjectType.get(mapObject.getType()) == MapObjectType.LIGHTSOURCE) {
-      Game.world().environment().getAmbientLight().updateSection(mapObject.getBoundingBox());
-    }
 
     Game.window().getRenderComponent().requestFocus();
     this.setFocus(mapObject, false);
@@ -463,7 +470,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
   public void clearAll() {
     this.focusedObjects.clear();
-    this.selectedLayers.clear();
+    EditorScreen.instance().getMapLayerList().clear();
     this.selectedObjects.clear();
     this.cameraFocus.clear();
     this.environments.clear();
@@ -488,17 +495,32 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     }
   }
 
+  public void selectAll() {
+    final List<IMapObjectLayer> layers = Game.world().environment().getMap().getMapObjectLayers();
+
+    ArrayList<IMapObject> selection = new ArrayList<>();
+    for (final IMapObjectLayer layer : layers) {
+      if (layer == null || !layer.isVisible()) {
+        continue;
+      }
+
+      selection.addAll(layer.getMapObjects());
+
+      this.setSelection(selection, true);
+    }
+  }
+
+  public void deselect() {
+    this.setSelection(Collections.emptyList(), true);
+  }
+
   public void delete(final IMapObject mapObject) {
     if (mapObject == null) {
       return;
     }
 
-    MapObjectType type = MapObjectType.get(mapObject.getType());
     Game.world().environment().getMap().removeMapObject(mapObject.getId());
     Game.world().environment().remove(mapObject.getId());
-    if (type == MapObjectType.STATICSHADOW || type == MapObjectType.LIGHTSOURCE) {
-      Game.world().environment().getAmbientLight().updateSection(mapObject.getBoundingBox());
-    }
 
     if (mapObject.equals(this.getFocusedMapObject())) {
       this.setFocus(null, true);
@@ -522,7 +544,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   }
 
   public void centerCameraOnFocus() {
-    if (this.getFocusedMapObject() != null) {
+    if (this.hasFocus() && this.getFocusedMapObject() != null) {
       final Rectangle2D focus = this.getFocus();
       if (focus == null) {
         return;
@@ -651,7 +673,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       if (trans == TransformType.NONE || trans == TransformType.MOVE) {
         continue;
       }
-      
+
       Rectangle2D transRect = new Rectangle2D.Double(this.getTransX(trans, focus), this.getTransY(trans, focus), this.currentTransformRectSize, this.currentTransformRectSize);
       this.transformRects.put(trans, transRect);
     }
@@ -829,6 +851,27 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       maxMapId++;
     }
     UndoManager.instance().endOperation();
+
+    Game.world().environment().clear();
+    Game.world().environment().load();
+    EditorScreen.instance().getMapSelectionPanel().updateComponents();
+  }
+
+  @Override
+  public void update() {
+    if (this.focusBorderBrightness <= 0.4) {
+      this.focusBorderBrightnessIncreasing = true;
+    } else if (this.focusBorderBrightness >= 0.9) {
+      this.focusBorderBrightnessIncreasing = false;
+    }
+
+    if (this.focusBorderBrightnessIncreasing && this.focusBorderBrightness < 0.9) {
+      this.focusBorderBrightness += 0.01;
+    } else if (!focusBorderBrightnessIncreasing && this.focusBorderBrightness >= 0.4) {
+      this.focusBorderBrightness -= 0.01;
+    }
+
+    this.colorSelectionBorder = Color.getHSBColor(0, 0, this.focusBorderBrightness);
   }
 
   private void updateScrollSpeed() {
@@ -837,15 +880,6 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
   private static boolean mapIsNull() {
     return Game.world().environment() == null || Game.world().environment().getMap() == null;
-  }
-
-  private static IMapObjectLayer getCurrentLayer() {
-    int layerIndex = EditorScreen.instance().getMapSelectionPanel().getSelectedLayerIndex();
-    if (layerIndex < 0 || layerIndex >= Game.world().environment().getMap().getMapObjectLayers().size()) {
-      layerIndex = 0;
-    }
-
-    return Game.world().environment().getMap().getMapObjectLayers().get(layerIndex);
   }
 
   private IMapObject createNewMapObject(MapObjectType type) {
@@ -1030,8 +1064,13 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     transformObject.setY(snapY(newY));
 
     Game.world().environment().reloadFromMap(transformObject.getId());
-    if (MapObjectType.get(transformObject.getType()) == MapObjectType.LIGHTSOURCE) {
-      Game.world().environment().getAmbientLight().updateSection(transformObject.getBoundingBox());
+    MapObjectType type = MapObjectType.get(transformObject.getType());
+    if (type == MapObjectType.LIGHTSOURCE) {
+      Game.world().environment().updateLighting(transformObject.getBoundingBox());
+    }
+
+    if (type == MapObjectType.STATICSHADOW) {
+      Game.world().environment().updateLighting();
     }
 
     EditorScreen.instance().getMapObjectPanel().bind(transformObject);
@@ -1095,13 +1134,15 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     final Rectangle2D beforeBounds = MapObject.getBounds2D(this.getSelectedMapObjects());
     this.handleEntityDrag(snappedDeltaX, snappedDeltaY);
 
-    if (this.getSelectedMapObjects().stream().anyMatch(x -> MapObjectType.get(x.getType()) == MapObjectType.STATICSHADOW || MapObjectType.get(x.getType()) == MapObjectType.LIGHTSOURCE)) {
+    if (this.getSelectedMapObjects().stream().anyMatch(x -> MapObjectType.get(x.getType()) == MapObjectType.STATICSHADOW)) {
+      Game.world().environment().updateLighting();
+    } else if (this.getSelectedMapObjects().stream().anyMatch(x -> MapObjectType.get(x.getType()) == MapObjectType.LIGHTSOURCE)) {
       final Rectangle2D afterBounds = MapObject.getBounds2D(this.getSelectedMapObjects());
       double x = Math.min(beforeBounds.getX(), afterBounds.getX());
       double y = Math.min(beforeBounds.getY(), afterBounds.getY());
       double width = Math.max(beforeBounds.getMaxX(), afterBounds.getMaxX()) - x;
       double height = Math.max(beforeBounds.getMaxY(), afterBounds.getMaxY()) - y;
-      Game.world().environment().getAmbientLight().updateSection(new Rectangle2D.Double(x, y, width, height));
+      Game.world().environment().updateLighting(new Rectangle2D.Double(x, y, width, height));
     }
   }
 
@@ -1294,41 +1335,40 @@ public class MapComponent extends EditorComponent implements IUpdateable {
    *          The mouse event of the calling {@link GuiComponent}
    */
   private void handleMouseMoved(ComponentMouseEvent e) {
-    if (this.getFocus() == null) {
-      if (this.currentEditMode != EDITMODE_CREATE) {
-        Game.window().getRenderComponent().setCursor(Cursors.DEFAULT, 0, 0);
-      }
-      this.currentTransform = TransformType.NONE;
-      return;
-    }
-
     boolean hovered = false;
-    if (this.currentEditMode == EDITMODE_MOVE) {
-      return;
-    }
-    for (Entry<TransformType, Rectangle2D> entry : this.transformRects.entrySet()) {
-      Rectangle2D rect = entry.getValue();
-      Rectangle2D hoverrect = new Rectangle2D.Double(rect.getX() - rect.getWidth() * 3, rect.getY() - rect.getHeight() * 3, rect.getWidth() * 5, rect.getHeight() * 5);
-      if (hoverrect.contains(Input.mouse().getMapLocation())) {
-        hovered = true;
-        if (entry.getKey() == TransformType.DOWN || entry.getKey() == TransformType.UP) {
-          Game.window().getRenderComponent().setCursor(Cursors.TRANS_VERTICAL, 0, 0);
-        } else if (entry.getKey() == TransformType.UPLEFT || entry.getKey() == TransformType.DOWNRIGHT) {
-          Game.window().getRenderComponent().setCursor(Cursors.TRANS_DIAGONAL_LEFT, 0, 0);
-        } else if (entry.getKey() == TransformType.UPRIGHT || entry.getKey() == TransformType.DOWNLEFT) {
-          Game.window().getRenderComponent().setCursor(Cursors.TRANS_DIAGONAL_RIGHT, 0, 0);
-        } else {
-          Game.window().getRenderComponent().setCursor(Cursors.TRANS_HORIZONTAL, 0, 0);
-        }
+    if (this.getFocus() != null) {
+      for (Entry<TransformType, Rectangle2D> entry : this.transformRects.entrySet()) {
+        Rectangle2D rect = entry.getValue();
+        Rectangle2D hoverrect = new Rectangle2D.Double(rect.getX() - rect.getWidth() * 3, rect.getY() - rect.getHeight() * 3, rect.getWidth() * 5, rect.getHeight() * 5);
+        if (hoverrect.contains(Input.mouse().getMapLocation())) {
+          hovered = true;
+          if (entry.getKey() == TransformType.DOWN || entry.getKey() == TransformType.UP) {
+            Game.window().getRenderComponent().setCursor(Cursors.TRANS_VERTICAL, 0, 0);
+          } else if (entry.getKey() == TransformType.UPLEFT || entry.getKey() == TransformType.DOWNRIGHT) {
+            Game.window().getRenderComponent().setCursor(Cursors.TRANS_DIAGONAL_LEFT, 0, 0);
+          } else if (entry.getKey() == TransformType.UPRIGHT || entry.getKey() == TransformType.DOWNLEFT) {
+            Game.window().getRenderComponent().setCursor(Cursors.TRANS_DIAGONAL_RIGHT, 0, 0);
+          } else {
+            Game.window().getRenderComponent().setCursor(Cursors.TRANS_HORIZONTAL, 0, 0);
+          }
 
-        this.currentTransform = entry.getKey();
-        break;
+          this.currentTransform = entry.getKey();
+          break;
+        }
       }
     }
 
     if (!hovered) {
-      final Rectangle2D focus = this.getFocus();
-      if (focus != null && focus.contains(Input.mouse().getMapLocation())) {
+      boolean moveMode = false;
+
+      for (IMapObject selected : this.getSelectedMapObjects()) {
+        if (selected.getBoundingBox().contains(Input.mouse().getMapLocation())) {
+          moveMode = true;
+          break;
+        }
+      }
+
+      if (moveMode) {
         Game.window().getRenderComponent().setCursor(Cursors.MOVE, 0, 0);
         this.currentTransform = TransformType.MOVE;
       } else {
@@ -1349,11 +1389,10 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
     switch (this.currentEditMode) {
     case EDITMODE_CREATE:
+    case EDITMODE_MOVE:
       if (SwingUtilities.isLeftMouseButton(e.getEvent())) {
         this.startPoint = Input.mouse().getMapLocation();
       }
-      break;
-    case EDITMODE_MOVE:
       break;
     case EDITMODE_EDIT:
       if (this.isMoving || (this.currentTransform != TransformType.NONE && this.currentTransform != TransformType.MOVE) || SwingUtilities.isRightMouseButton(e.getEvent())) {
@@ -1404,7 +1443,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   }
 
   private void handleMouseReleased(ComponentMouseEvent e) {
-    if (!this.hasFocus() || mapIsNull()) {
+    if (!this.hasFocus() || mapIsNull() || !SwingUtilities.isLeftMouseButton(e.getEvent())) {
       return;
     }
 
@@ -1442,6 +1481,9 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
         UndoManager.instance().endOperation();
         this.setEditMode(EDITMODE_EDIT);
+      } else {
+        this.setEditMode(EDITMODE_EDIT);
+        this.evaluateFocus();
       }
 
       break;
@@ -1456,62 +1498,66 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         return;
       }
 
-      Rectangle2D rect = this.getCurrentMouseSelectionArea(false);
-      boolean somethingIsFocused = false;
-      boolean currentObjectFocused = false;
-      for (IMapObjectLayer layer : Game.world().environment().getMap().getMapObjectLayers()) {
-        if (layer == null || !EditorScreen.instance().getMapSelectionPanel().isVisibleMapObjectLayer(layer.getName())) {
-          continue;
-        }
-
-        for (IMapObject mapObject : layer.getMapObjects()) {
-          if (mapObject == null) {
-            continue;
-          }
-
-          MapObjectType type = MapObjectType.get(mapObject.getType());
-          if (type == null) {
-            continue;
-          }
-
-          if (!GeometricUtilities.intersects(rect, mapObject.getBoundingBox())) {
-            continue;
-          }
-
-          if (this.getFocusedMapObject() != null && mapObject.getId() == this.getFocusedMapObject().getId()) {
-            currentObjectFocused = true;
-            continue;
-          }
-
-          if (somethingIsFocused) {
-            if (rect.getWidth() == 0 && rect.getHeight() == 0) {
-              break;
-            }
-
-            this.setSelection(mapObject, false);
-            continue;
-          }
-          if (this.getSelectedMapObjects().contains((MapObject) mapObject)) {
-            this.getSelectedMapObjects().remove((MapObject) mapObject);
-          } else {
-            this.setFocus(mapObject, !Input.keyboard().isPressed(KeyEvent.VK_SHIFT));
-            EditorScreen.instance().getMapObjectPanel().bind(mapObject);
-          }
-          somethingIsFocused = true;
-        }
-      }
-
-      if (!somethingIsFocused && !currentObjectFocused) {
-        this.setFocus(null, true);
-        EditorScreen.instance().getMapObjectPanel().bind(null);
-      }
-
+      this.evaluateFocus();
       break;
     default:
       break;
     }
 
     this.startPoint = null;
+  }
+
+  private void evaluateFocus() {
+    Rectangle2D rect = this.getCurrentMouseSelectionArea(false);
+    if (rect == null) {
+      return;
+    }
+
+    boolean somethingIsFocused = false;
+    boolean currentObjectFocused = false;
+    for (IMapObjectLayer layer : Game.world().environment().getMap().getMapObjectLayers()) {
+      if (layer == null || !layer.isVisible()) {
+        continue;
+      }
+
+      for (IMapObject mapObject : layer.getMapObjects()) {
+        if (mapObject == null) {
+          continue;
+        }
+
+        MapObjectType type = MapObjectType.get(mapObject.getType());
+        if (type == null || !GeometricUtilities.intersects(rect, mapObject.getBoundingBox())) {
+          continue;
+        }
+
+        if (this.getFocusedMapObject() != null && mapObject.getId() == this.getFocusedMapObject().getId()) {
+          currentObjectFocused = true;
+          continue;
+        }
+
+        if (somethingIsFocused) {
+          if (rect.getWidth() == 0 && rect.getHeight() == 0) {
+            break;
+          }
+
+          this.setSelection(mapObject, false);
+          continue;
+        }
+        if (this.getSelectedMapObjects().contains((MapObject) mapObject)) {
+          this.getSelectedMapObjects().remove((MapObject) mapObject);
+        } else {
+          this.setFocus(mapObject, !Input.keyboard().isPressed(KeyEvent.VK_SHIFT));
+          EditorScreen.instance().getMapObjectPanel().bind(mapObject);
+        }
+        somethingIsFocused = true;
+      }
+    }
+
+    if (!somethingIsFocused && !currentObjectFocused) {
+      this.setFocus(null, true);
+      this.setSelection(Collections.emptyList(), true);
+      EditorScreen.instance().getMapObjectPanel().bind(null);
+    }
   }
 
   private static float snapX(double x) {
@@ -1571,19 +1617,8 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     final List<IMapObjectLayer> layers = Game.world().environment().getMap().getMapObjectLayers();
     // render all entities
     for (final IMapObjectLayer layer : layers) {
-      if (layer == null) {
+      if (layer == null || !layer.isVisible()) {
         continue;
-      }
-
-      if (!EditorScreen.instance().getMapSelectionPanel().isVisibleMapObjectLayer(layer.getName())) {
-        continue;
-      }
-
-      Color colorBoundingBoxFill;
-      if (layer.getColor() != null) {
-        colorBoundingBoxFill = new Color(layer.getColor().getRed(), layer.getColor().getGreen(), layer.getColor().getBlue(), 15);
-      } else {
-        colorBoundingBoxFill = Style.COLOR_DEFAULT_BOUNDING_BOX_FILL;
       }
 
       for (final IMapObject mapObject : layer.getMapObjects()) {
@@ -1608,6 +1643,13 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         }
 
         if (type != MapObjectType.COLLISIONBOX) {
+          Color colorBoundingBoxFill;
+          if (layer.getColor() != null) {
+            colorBoundingBoxFill = new Color(layer.getColor().getRed(), layer.getColor().getGreen(), layer.getColor().getBlue(), 15);
+          } else {
+            colorBoundingBoxFill = Style.COLOR_DEFAULT_BOUNDING_BOX_FILL;
+          }
+
           renderBoundingBox(g, mapObject, colorBoundingBoxFill, shapeStroke);
         }
 
@@ -1675,30 +1717,26 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     }
   }
 
-  private static void renderName(Graphics2D g, Color nameColor, IMapObject mapObject) {
-    final int MAX_TAGS_RENDER_CHARS = 30;
-    g.setColor(nameColor.getAlpha() > 100 ? nameColor : Color.WHITE);
+  private static void renderName(Graphics2D g, IMapObject mapObject) {
+    g.setFont(Style.FONT_DEFAULT.deriveFont(10f));
+    FontMetrics fm = g.getFontMetrics();
 
     String objectName = mapObject.getName();
     if (objectName != null && !objectName.isEmpty()) {
-      RenderEngine.renderText(g, mapObject.getName(), mapObject.getX() + 1, mapObject.getBoundingBox().getMaxY() - 1);
+      final int PADDING = 2;
+      double stringWidth = fm.stringWidth(objectName) / Game.world().camera().getRenderScale();
+      double stringHeight = fm.getHeight() * .5 / Game.world().camera().getRenderScale();
+      double x = mapObject.getX() + ((mapObject.getWidth() - stringWidth) / 2.0) - PADDING;
+      double y = mapObject.getY() + mapObject.getHeight() + stringHeight;
+      double width = stringWidth + PADDING * 2;
+      double height = stringHeight + PADDING * 2;
+      RoundRectangle2D rect = new RoundRectangle2D.Double(x, y, width, height, 2, 2);
+      g.setColor(new Color(0, 0, 0, 200));
+      RenderEngine.renderShape(g, rect, true);
+
+      g.setColor(Color.WHITE);
+      RenderEngine.renderText(g, mapObject.getName(), x + PADDING, rect.getMaxY() - PADDING, true);
     }
-
-    // render tags
-    String tags = mapObject.getStringValue(MapObjectProperty.TAGS);
-    if (tags == null || tags.isEmpty()) {
-      return;
-    }
-
-    FontMetrics fm = g.getFontMetrics();
-
-    double y = objectName != null && !objectName.isEmpty() ? mapObject.getBoundingBox().getMaxY() - 2 - fm.getMaxDescent() : mapObject.getBoundingBox().getMaxY() - 1;
-    if (tags.length() > MAX_TAGS_RENDER_CHARS) {
-      tags = tags.substring(0, MAX_TAGS_RENDER_CHARS - 1);
-      tags += "...";
-    }
-
-    RenderEngine.renderText(g, "[" + tags + "]", mapObject.getX() + 1, y);
   }
 
   private static void renderGrid(Graphics2D g) {
@@ -1791,7 +1829,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     }
 
     Font previousFont = g.getFont();
-    Font idFont = previousFont.deriveFont(Math.max(10f, (float) (10 * Math.sqrt(Game.world().camera().getRenderScale()))));
+    Font idFont = previousFont.deriveFont(Math.max(8f, (float) (10 * Math.sqrt(Game.world().camera().getRenderScale()))));
     if (this.currentZoomIndex > DEFAULT_ZOOM_INDEX) {
       idFont = idFont.deriveFont(Font.BOLD);
     }
@@ -1853,19 +1891,23 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       final String mapObjectColor = mapObject.getStringValue(MapObjectProperty.LIGHT_COLOR);
       if (mapObjectColor != null && !mapObjectColor.isEmpty()) {
         Color lightColor = ColorHelper.decode(mapObjectColor);
-        borderColor = new Color(lightColor.getRed(), lightColor.getGreen(), lightColor.getBlue(), 180);
+        borderColor = new Color(lightColor.getRed(), lightColor.getGreen(), lightColor.getBlue(), 255);
       }
     } else if (type == MapObjectType.STATICSHADOW) {
       borderColor = Style.COLOR_SHADOW_BORDER;
     } else if (type == MapObjectType.SPAWNPOINT) {
       borderColor = Style.COLOR_SPAWNPOINT;
+    } else {
+      borderColor = new Color(colorBoundingBoxFill.getRed(), colorBoundingBoxFill.getGreen(), colorBoundingBoxFill.getBlue(), 150);
     }
 
     g.setColor(borderColor);
 
     RenderEngine.renderOutline(g, mapObject.getBoundingBox(), shapeStroke);
 
-    renderName(g, borderColor, mapObject);
+    if (Program.preferences().isRenderNames()) {
+      renderName(g, mapObject);
+    }
   }
 
   private static void renderCollisionBox(Graphics2D g, IMapObject mapObject, BasicStroke shapeStroke) {
@@ -1893,22 +1935,5 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       Stroke collisionStroke = collision ? shapeStroke : new BasicStroke(1 / Game.world().camera().getRenderScale(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL, 0, new float[] { 1f }, 0);
       RenderEngine.renderOutline(g, collisionBox, collisionStroke);
     }
-  }
-
-  @Override
-  public void update() {
-    if (this.focusBorderBrightness <= 0.4) {
-      this.focusBorderBrightnessIncreasing = true;
-    } else if (this.focusBorderBrightness >= 0.9) {
-      this.focusBorderBrightnessIncreasing = false;
-    }
-
-    if (this.focusBorderBrightnessIncreasing && this.focusBorderBrightness < 0.9) {
-      this.focusBorderBrightness += 0.01;
-    } else if (!focusBorderBrightnessIncreasing && this.focusBorderBrightness >= 0.4) {
-      this.focusBorderBrightness -= 0.01;
-    }
-
-    this.colorSelectionBorder = Color.getHSBColor(0, 0, this.focusBorderBrightness);
   }
 }
