@@ -27,8 +27,8 @@ public final class ViewMenu extends JMenu {
     snapToPixels.setState(Program.preferences().isSnapPixels());
     snapToPixels.addItemListener(e -> {
       Program.preferences().setSnapPixels(snapToPixels.getState());
-      UI.getMapObjectPanel().updateSpinnerModels();
-      UI.getMapObjectPanel().bind(EditorScreen.instance().getMainComponent().getFocusedMapObject());
+      UI.getInspector().updateSpinnerModels();
+      UI.getInspector().bind(EditorScreen.instance().getMainComponent().getFocusedMapObject());
     });
 
     JCheckBoxMenuItem snapToGrid = new JCheckBoxMenuItem(Resources.strings().get("menu_view_snapGrid"));

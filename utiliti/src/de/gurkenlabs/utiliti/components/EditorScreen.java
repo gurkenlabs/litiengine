@@ -225,7 +225,7 @@ public class EditorScreen extends Screen {
         this.loadSpriteSheets(map);
       }
 
-      UI.getAssetComponent().refresh();
+      UI.getAssetController().refresh();
 
       // load custom emitter files
       loadCustomEmitters(this.getGameFile().getEmitters());
@@ -267,7 +267,7 @@ public class EditorScreen extends Screen {
     this.setProjectPath(null);
     this.mainComponent.loadMaps(Arrays.asList());
     Resources.clearAll();
-    UI.getAssetComponent().refresh();
+    UI.getAssetController().refresh();
     this.setCurrentStatus(Resources.strings().get("status_gamefile_closed"));
   }
 
@@ -335,7 +335,7 @@ public class EditorScreen extends Screen {
 
       // load custom emitter files
       loadCustomEmitters(this.getGameFile().getEmitters());
-      UI.getAssetComponent().refresh();
+      UI.getAssetController().refresh();
 
       // display first available map after loading all stuff
       // also switch to map component
@@ -547,7 +547,7 @@ public class EditorScreen extends Screen {
     this.getMainComponent().reloadEnvironment();
 
     if (forceAssetTreeUpdate) {
-      UI.getAssetComponent().refresh();
+      UI.getAssetController().refresh();
     }
   }
 
@@ -618,13 +618,13 @@ public class EditorScreen extends Screen {
 
     File currentFile = new File(this.currentResourceFile);
     String currentMapSelection = null;
-    if (UI.getMapComponent().getCurrentMap() != null) {
-      currentMapSelection = UI.getMapComponent().getCurrentMap().getName();
+    if (UI.getMapController().getCurrentMap() != null) {
+      currentMapSelection = UI.getMapController().getCurrentMap().getName();
     }
 
     this.close(true);
     this.load(currentFile, true);
-    UI.getMapComponent().setSelection(currentMapSelection);
+    UI.getMapController().setSelection(currentMapSelection);
   }
 
   public MainComponent getMainComponent() {
@@ -654,7 +654,7 @@ public class EditorScreen extends Screen {
       this.getGameFile().getMaps().add(map);
     }
 
-    UI.getAssetComponent().refresh();
+    UI.getAssetController().refresh();
   }
 
   private String saveGameFile(String target) {
@@ -671,7 +671,7 @@ public class EditorScreen extends Screen {
       this.saveMaps();
     }
 
-    UI.getMapComponent().bind(this.getMainComponent().getMaps());
+    UI.getMapController().bind(this.getMainComponent().getMaps());
     return saveFile;
   }
 

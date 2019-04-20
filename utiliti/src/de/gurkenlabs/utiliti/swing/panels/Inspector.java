@@ -31,7 +31,7 @@ import de.gurkenlabs.utiliti.swing.TagPanel;
 import de.gurkenlabs.utiliti.swing.UI;
 
 @SuppressWarnings("serial")
-public class MapObjectPanel extends PropertyPanel {
+public class Inspector extends PropertyPanel {
   private final Map<MapObjectType, PropertyPanel> panels;
   private MapObjectType type;
   private PropertyPanel currentPanel;
@@ -51,7 +51,7 @@ public class MapObjectPanel extends PropertyPanel {
   private JLabel lblRendering;
   private JPanel panel_1;
 
-  public MapObjectPanel() {
+  public Inspector() {
     this.panels = new ConcurrentHashMap<>();
     this.panels.put(MapObjectType.PROP, new PropPanel());
     this.panels.put(MapObjectType.COLLISIONBOX, new CollisionBoxPanel());
@@ -146,14 +146,14 @@ public class MapObjectPanel extends PropertyPanel {
     setLayout(groupLayout);
 
     this.setupChangedListeners();
-    UI.getLayerComponent().onLayersChanged(map -> this.bind(this.getDataSource()));
+    UI.getLayerController().onLayersChanged(map -> this.bind(this.getDataSource()));
   }
 
   public void updateSpinnerModels() {
     if (Program.preferences().isSnapPixels()) {
-      this.updateSpinnerModels(MapObjectPanel::getIntegerModel);
+      this.updateSpinnerModels(Inspector::getIntegerModel);
     } else {
-      this.updateSpinnerModels(MapObjectPanel::getFloatModel);
+      this.updateSpinnerModels(Inspector::getFloatModel);
     }
   }
 

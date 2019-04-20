@@ -45,7 +45,7 @@ public final class MapMenu extends JMenu {
     reassignIDs.addActionListener(a -> {
       try {
         int minID = Integer.parseInt(JOptionPane.showInputDialog(Resources.strings().get("panel_reassignMapIds"), 1));
-        EditorScreen.instance().getMainComponent().reassignIds(UI.getMapComponent().getCurrentMap(), minID);
+        EditorScreen.instance().getMainComponent().reassignIds(UI.getMapController().getCurrentMap(), minID);
       } catch (Exception e) {
         log.log(Level.SEVERE, "No parseable Integer found upon reading the min Map ID input. Try again.");
       }

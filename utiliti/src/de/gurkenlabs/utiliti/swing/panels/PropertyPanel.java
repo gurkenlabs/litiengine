@@ -240,7 +240,7 @@ public abstract class PropertyPanel extends JPanel {
     if (getDataSource() instanceof IMapObject) {
       IMapObject obj = getDataSource();
       Game.world().environment().reloadFromMap(obj.getId());
-      UI.getEntityComponent().refresh();
+      UI.getEntityController().refresh();
     }
   }
 

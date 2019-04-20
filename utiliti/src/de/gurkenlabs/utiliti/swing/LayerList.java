@@ -33,10 +33,10 @@ import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.litiengine.util.Imaging;
 import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.components.EditorScreen;
-import de.gurkenlabs.utiliti.components.SubComponent;
+import de.gurkenlabs.utiliti.components.Controller;
 
 @SuppressWarnings("serial")
-public final class LayerComponent extends JScrollPane implements SubComponent {
+public final class LayerList extends JScrollPane implements Controller {
   private static final Dimension BUTTON_SIZE = new Dimension(24, 24);
 
   private final Map<String, Integer> selectedLayers;
@@ -55,7 +55,7 @@ public final class LayerComponent extends JScrollPane implements SubComponent {
   private final JButton buttonLowerLayer;
   private final JButton buttonRenameLayer;
 
-  public LayerComponent() {
+  public LayerList() {
     this.setName(Resources.strings().get("panel_mapObjectLayers").toUpperCase());
     this.selectedLayers = new ConcurrentHashMap<>();
     this.layerChangedListeners = new CopyOnWriteArrayList<>();

@@ -239,14 +239,14 @@ public class MainComponent extends GuiComponent implements IUpdateable {
     if (maps == null) {
       return;
     }
-    UI.getMapObjectPanel().bind(null);
+    UI.getInspector().bind(null);
     this.setFocus(null, true);
     this.getMaps().clear();
 
     Collections.sort(maps);
 
     this.getMaps().addAll(maps);
-    UI.getMapComponent().bind(this.getMaps(), true);
+    UI.getMapController().bind(this.getMaps(), true);
   }
 
   public List<TmxMap> getMaps() {
@@ -339,8 +339,8 @@ public class MainComponent extends GuiComponent implements IUpdateable {
       Game.world().loadEnvironment(this.environments.get(map.getName()));
 
       UI.updateScrollBars();
-      UI.getMapComponent().setSelection(map.getName());
-      UI.getMapObjectPanel().bind(this.getFocusedMapObject());
+      UI.getMapController().setSelection(map.getName());
+      UI.getInspector().bind(this.getFocusedMapObject());
 
       for (Consumer<TmxMap> cons : this.loadedConsumer) {
         cons.accept(map);
@@ -360,7 +360,7 @@ public class MainComponent extends GuiComponent implements IUpdateable {
   }
 
   public void add(IMapObject mapObject) {
-    this.add(mapObject, UI.getLayerComponent().getCurrentLayer());
+    this.add(mapObject, UI.getLayerController().getCurrentLayer());
     UndoManager.instance().mapObjectAdded(mapObject);
   }
 
@@ -469,7 +469,7 @@ public class MainComponent extends GuiComponent implements IUpdateable {
 
   public void clearAll() {
     this.focusedObjects.clear();
-    UI.getLayerComponent().clear();
+    UI.getLayerController().clear();
     this.selectedObjects.clear();
     this.cameraFocus.clear();
     this.environments.clear();
@@ -570,7 +570,7 @@ public class MainComponent extends GuiComponent implements IUpdateable {
     switch (editMode) {
     case EDITMODE_CREATE:
       this.setFocus(null, true);
-      UI.getMapObjectPanel().bind(null);
+      UI.getInspector().bind(null);
       Game.window().getRenderComponent().setCursor(Cursors.ADD, 0, 0);
       break;
     case EDITMODE_EDIT:
@@ -609,8 +609,8 @@ public class MainComponent extends GuiComponent implements IUpdateable {
         return;
       }
 
-      UI.getMapObjectPanel().bind(mapObject);
-      UI.getEntityComponent().focus(mapObject);
+      UI.getInspector().bind(mapObject);
+      UI.getEntityController().select(mapObject);
       if (mapObject == null) {
         this.focusedObjects.remove(Game.world().environment().getMap().getName());
       } else {
@@ -696,7 +696,7 @@ public class MainComponent extends GuiComponent implements IUpdateable {
 
     // TODO: remove all tile sets from the game file that are no longer needed
     // by any other map.
-    UI.getMapComponent().bind(this.getMaps());
+    UI.getMapController().bind(this.getMaps());
     if (!this.maps.isEmpty()) {
       this.loadEnvironment(this.maps.get(0));
     } else {
@@ -770,7 +770,7 @@ public class MainComponent extends GuiComponent implements IUpdateable {
         this.environments.remove(map.getName());
       }
 
-      UI.getMapComponent().bind(this.getMaps(), true);
+      UI.getMapController().bind(this.getMaps(), true);
       this.loadEnvironment(map);
       log.log(Level.INFO, "imported map {0}", new Object[] { map.getName() });
     }, TmxMap.FILE_EXTENSION);
@@ -853,7 +853,7 @@ public class MainComponent extends GuiComponent implements IUpdateable {
 
     Game.world().environment().clear();
     Game.world().environment().load();
-    UI.getMapComponent().refresh();
+    UI.getMapController().refresh();
   }
 
   @Override
@@ -1077,7 +1077,7 @@ public class MainComponent extends GuiComponent implements IUpdateable {
       Game.world().environment().updateLighting();
     }
 
-    UI.getMapObjectPanel().bind(transformObject);
+    UI.getInspector().bind(transformObject);
     this.updateTransformControls();
   }
 
@@ -1165,7 +1165,7 @@ public class MainComponent extends GuiComponent implements IUpdateable {
       }
 
       if (selected.equals(this.getFocusedMapObject())) {
-        UI.getMapObjectPanel().bind(selected);
+        UI.getInspector().bind(selected);
         this.updateTransformControls();
       }
     }
@@ -1468,10 +1468,10 @@ public class MainComponent extends GuiComponent implements IUpdateable {
         break;
       }
 
-      IMapObject mo = this.createNewMapObject(UI.getMapObjectPanel().getObjectType());
+      IMapObject mo = this.createNewMapObject(UI.getInspector().getObjectType());
       this.newObjectArea = null;
       this.setFocus(mo, !Input.keyboard().isPressed(KeyEvent.VK_SHIFT));
-      UI.getMapObjectPanel().bind(mo);
+      UI.getInspector().bind(mo);
       this.setEditMode(EDITMODE_EDIT);
       break;
     case EDITMODE_MOVE:
@@ -1551,7 +1551,7 @@ public class MainComponent extends GuiComponent implements IUpdateable {
           this.getSelectedMapObjects().remove((MapObject) mapObject);
         } else {
           this.setFocus(mapObject, !Input.keyboard().isPressed(KeyEvent.VK_SHIFT));
-          UI.getMapObjectPanel().bind(mapObject);
+          UI.getInspector().bind(mapObject);
         }
         somethingIsFocused = true;
       }
@@ -1560,7 +1560,7 @@ public class MainComponent extends GuiComponent implements IUpdateable {
     if (!somethingIsFocused && !currentObjectFocused) {
       this.setFocus(null, true);
       this.setSelection(Collections.emptyList(), true);
-      UI.getMapObjectPanel().bind(null);
+      UI.getInspector().bind(null);
     }
   }
 

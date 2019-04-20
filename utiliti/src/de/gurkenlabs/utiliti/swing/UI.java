@@ -34,11 +34,12 @@ import de.gurkenlabs.utiliti.Cursors;
 import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.Style;
 import de.gurkenlabs.utiliti.components.EditorScreen;
+import de.gurkenlabs.utiliti.components.EntityController;
 import de.gurkenlabs.utiliti.components.MainComponent;
-import de.gurkenlabs.utiliti.components.SubComponent;
+import de.gurkenlabs.utiliti.components.Controller;
 import de.gurkenlabs.utiliti.swing.menus.CanvasPopupMenu;
 import de.gurkenlabs.utiliti.swing.menus.MainMenuBar;
-import de.gurkenlabs.utiliti.swing.panels.MapObjectPanel;
+import de.gurkenlabs.utiliti.swing.panels.Inspector;
 
 public final class UI {
   private static final Logger log = Logger.getLogger(UI.class.getName());
@@ -47,10 +48,10 @@ public final class UI {
   private static JPopupMenu canvasPopup;
   private static AssetComponent assetComponent;
 
-  private static MapObjectPanel mapObjectPanel;
-  private static MapComponent mapSelectionPanel;
-  private static LayerComponent mapLayerList;
-  private static EntityComponent entityList;
+  private static Inspector mapObjectPanel;
+  private static MapList mapSelectionPanel;
+  private static LayerList mapLayerList;
+  private static EntityList entityList;
   
   private static boolean initialized;
 
@@ -112,23 +113,23 @@ public final class UI {
     initialized = true;
   }
   
-  public static MapObjectPanel getMapObjectPanel() {
+  public static Inspector getInspector() {
     return mapObjectPanel;
   }
 
-  public static LayerComponent getLayerComponent() {
+  public static LayerList getLayerController() {
     return mapLayerList;
   }
 
-  public static EntityComponent getEntityComponent() {
+  public static EntityController getEntityController() {
     return entityList;
   }
   
-  public static SubComponent getAssetComponent() {
+  public static Controller getAssetController() {
     return assetComponent;
   }
 
-  public static MapComponent getMapComponent() {
+  public static MapList getMapController() {
     return mapSelectionPanel;
   }
   
@@ -209,15 +210,31 @@ public final class UI {
   }
 
   private static Component initRightSplitPanel() {
-    mapLayerList = new LayerComponent();
-    entityList = new EntityComponent();
-    mapSelectionPanel = new MapComponent();
-    mapObjectPanel = new MapObjectPanel();
+    mapSelectionPanel = new MapList();
+    
+    mapLayerList = new LayerList();
+    entityList = new EntityList();
+    JTabbedPane tabPane = new JTabbedPane();
+    tabPane.add(entityList);
+    tabPane.add(mapLayerList);
+    tabPane.setMaximumSize(new Dimension(0, 150));
+
+    JSplitPane topRightSplitPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT); 
+    topRightSplitPanel.setContinuousLayout(true);
+    topRightSplitPanel.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> Program.preferences().setMapPanelSplitter(topRightSplitPanel.getDividerLocation()));
+    if (Program.preferences().getMapPanelSplitter() != 0) {
+      topRightSplitPanel.setDividerLocation(Program.preferences().getMapPanelSplitter());
+    }
+    
+    topRightSplitPanel.setLeftComponent(mapSelectionPanel);
+    topRightSplitPanel.setRightComponent(tabPane);
+    
+    mapObjectPanel = new Inspector();
     
     JSplitPane rightSplitPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
     rightSplitPanel.setMinimumSize(new Dimension(300, 0));
     rightSplitPanel.setBottomComponent(mapObjectPanel);
-    rightSplitPanel.setTopComponent(mapSelectionPanel);
+    rightSplitPanel.setTopComponent(topRightSplitPanel);
     rightSplitPanel.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> Program.preferences().setSelectionEditSplitter(rightSplitPanel.getDividerLocation()));
     if (Program.preferences().getSelectionEditSplitter() != 0) {
       rightSplitPanel.setDividerLocation(Program.preferences().getSelectionEditSplitter());

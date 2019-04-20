@@ -73,6 +73,6 @@ public final class AddMenu extends JMenu {
 
   private static void setCreateMode(MapObjectType tpye) {
     EditorScreen.instance().getMainComponent().setEditMode(MainComponent.EDITMODE_CREATE);
-    UI.getMapObjectPanel().setMapObjectType(tpye);
+    UI.getInspector().setMapObjectType(tpye);
   }
 }

@@ -6,53 +6,40 @@ import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
 import javax.swing.ListSelectionModel;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
-import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.components.EditorScreen;
-import de.gurkenlabs.utiliti.components.SubComponent;
+import de.gurkenlabs.utiliti.components.Controller;
 
 @SuppressWarnings("serial")
-public class MapComponent extends JSplitPane implements SubComponent {
-  private final JList<String> mapList;
+public class MapList extends JScrollPane implements Controller {
+  private final JList<String> list;
   private final DefaultListModel<String> model;
-  private final JScrollPane mapScrollPane;
 
-  public MapComponent() {
-    super(JSplitPane.HORIZONTAL_SPLIT);
-    this.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> Program.preferences().setMapPanelSplitter(this.getDividerLocation()));
-    if (Program.preferences().getMapPanelSplitter() != 0) {
-      this.setDividerLocation(Program.preferences().getMapPanelSplitter());
-    }
-
+  public MapList() {
+    super();
+    this.setMinimumSize(new Dimension(80, 0));
     this.setMaximumSize(new Dimension(0, 250));
-    setContinuousLayout(true);
-    mapScrollPane = new JScrollPane();
-    mapScrollPane.setMinimumSize(new Dimension(80, 0));
-    mapScrollPane.setMaximumSize(new Dimension(0, 250));
-    this.setLeftComponent(mapScrollPane);
 
     this.model = new DefaultListModel<>();
 
-    this.mapList = new JList<>();
-    this.mapList.setModel(this.model);
-    this.mapList.setVisibleRowCount(8);
-    this.mapList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    this.mapList.setMaximumSize(new Dimension(0, 250));
+    this.list = new JList<>();
+    this.list.setModel(this.model);
+    this.list.setVisibleRowCount(8);
+    this.list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    this.list.setMaximumSize(new Dimension(0, 250));
 
-    this.mapList.getSelectionModel().addListSelectionListener(e -> {
+    this.list.getSelectionModel().addListSelectionListener(e -> {
       if (EditorScreen.instance().isLoading() || EditorScreen.instance().getMainComponent().isLoading()) {
         return;
       }
 
-      if (this.mapList.getSelectedIndex() < EditorScreen.instance().getMainComponent().getMaps().size() && this.mapList.getSelectedIndex() >= 0) {
-        TmxMap map = EditorScreen.instance().getMainComponent().getMaps().get(this.mapList.getSelectedIndex());
+      if (this.list.getSelectedIndex() < EditorScreen.instance().getMainComponent().getMaps().size() && this.list.getSelectedIndex() >= 0) {
+        TmxMap map = EditorScreen.instance().getMainComponent().getMaps().get(this.list.getSelectedIndex());
         if (Game.world().environment() != null && Game.world().environment().getMap().equals(map)) {
           return;
         }
@@ -61,20 +48,11 @@ public class MapComponent extends JSplitPane implements SubComponent {
       }
     });
 
-    mapScrollPane.setViewportView(this.mapList);
-    mapScrollPane.setViewportBorder(null);
-
-    JTabbedPane tabPane = new JTabbedPane();
-
-    tabPane.add(UI.getEntityComponent());
-    tabPane.add(UI.getLayerComponent());
-    tabPane.setMaximumSize(new Dimension(0, 150));
-
-    this.setRightComponent(tabPane);
+    this.setViewportView(this.list);
+    this.setViewportBorder(null);
 
     UndoManager.onMapObjectAdded(manager -> {
       this.refresh();
-
     });
 
     UndoManager.onMapObjectRemoved(manager -> {
@@ -117,16 +95,16 @@ public class MapComponent extends JSplitPane implements SubComponent {
       }
     }
 
-    mapList.revalidate();
+    list.revalidate();
     this.refresh();
   }
 
   public void setSelection(String mapName) {
     if (mapName == null || mapName.isEmpty()) {
-      mapList.clearSelection();
+      list.clearSelection();
     } else {
       if (model.contains(mapName)) {
-        mapList.setSelectedValue(mapName, true);
+        list.setSelectedValue(mapName, true);
       }
     }
 
@@ -134,19 +112,19 @@ public class MapComponent extends JSplitPane implements SubComponent {
   }
 
   public IMap getCurrentMap() {
-    if (this.mapList.getSelectedIndex() == -1) {
+    if (this.list.getSelectedIndex() == -1) {
       return null;
     }
-    return EditorScreen.instance().getMainComponent().getMaps().get(mapList.getSelectedIndex());
+    return EditorScreen.instance().getMainComponent().getMaps().get(list.getSelectedIndex());
   }
 
   public void refresh() {
-    if (mapList.getSelectedIndex() == -1 && this.model.size() > 0) {
-      this.mapList.setSelectedIndex(0);
+    if (list.getSelectedIndex() == -1 && this.model.size() > 0) {
+      this.list.setSelectedIndex(0);
     }
 
-    UI.getEntityComponent().refresh();
-    UI.getLayerComponent().refresh();
+    UI.getEntityController().refresh();
+    UI.getLayerController().refresh();
   }
 
   private int getIndexToReplace(String mapName) {

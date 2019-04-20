@@ -36,10 +36,11 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.components.EditorScreen;
-import de.gurkenlabs.utiliti.components.SubComponent;
+import de.gurkenlabs.utiliti.components.EntityController;
+import de.gurkenlabs.utiliti.components.Controller;
 
 @SuppressWarnings("serial")
-public final class EntityComponent extends JPanel implements SubComponent {
+public final class EntityList extends JPanel implements EntityController {
   private final JScrollPane entityScrollPane;
   private final JPanel searchPanel;
 
@@ -65,7 +66,7 @@ public final class EntityComponent extends JPanel implements SubComponent {
 
   private boolean isFocussing;
 
-  public EntityComponent() {
+  public EntityList() {
     this.setName(Resources.strings().get("panel_entities").toUpperCase());
     this.setLayout(new BorderLayout(0, 0));
 
@@ -189,7 +190,7 @@ public final class EntityComponent extends JPanel implements SubComponent {
     this.add(this.searchPanel, BorderLayout.NORTH);
   }
 
-  public void focus(final IMapObject mapObject) {
+  public void select(final IMapObject mapObject) {
     if (this.isFocussing) {
       return;
     }
@@ -253,7 +254,7 @@ public final class EntityComponent extends JPanel implements SubComponent {
     }
 
     this.entitiesTreeModel.reload();
-    this.focus(EditorScreen.instance().getMainComponent().getFocusedMapObject());
+    this.select(EditorScreen.instance().getMainComponent().getFocusedMapObject());
   }
 
   private void collapseAll() {

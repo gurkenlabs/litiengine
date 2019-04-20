@@ -25,7 +25,7 @@ public final class LayerMenu extends JMenu {
     super(Resources.strings().get("menu_move_to_layer"));
     Game.world().addLoadedListener(e -> this.updateMenu(e.getMap()));
 
-    UI.getLayerComponent().onLayersChanged(this::updateMenu);
+    UI.getLayerController().onLayersChanged(this::updateMenu);
     EditorScreen.instance().getMainComponent().onSelectionChanged(mapObjects -> {
       this.updateMenuItemStates(mapObjects);
     });
@@ -86,7 +86,7 @@ public final class LayerMenu extends JMenu {
     UndoManager.instance().endOperation();
 
     // rebind to refresh the layer property
-    UI.getMapObjectPanel().bind(EditorScreen.instance().getMainComponent().getFocusedMapObject());
+    UI.getInspector().bind(EditorScreen.instance().getMainComponent().getFocusedMapObject());
 
     this.updateMenuItemStates(EditorScreen.instance().getMainComponent().getSelectedMapObjects());
   }

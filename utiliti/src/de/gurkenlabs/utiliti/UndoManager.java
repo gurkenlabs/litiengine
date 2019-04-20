@@ -300,8 +300,8 @@ public class UndoManager {
     Game.world().environment().reloadFromMap(target.getId());
 
     if (EditorScreen.instance().getMainComponent().getFocusedMapObject() != null && EditorScreen.instance().getMainComponent().getFocusedMapObject().getId() == target.getId()) {
-      UI.getMapObjectPanel().bind(target);
-      UI.getEntityComponent().focus(target);
+      UI.getInspector().bind(target);
+      UI.getEntityController().select(target);
     }
   }
 
