@@ -18,7 +18,7 @@ Nonetheless, the LITIengine can of course already be used to make fully function
 ## Installation
 The library is distributed over the [Maven Central Repository](https://search.maven.org/artifact/de.gurkenlabs/litiengine/) and you can grab the necessary .jar-file(s) from there by using your favorite build automation tool or manually download the library.
 
-### Gradle (Groovy)
+### Gradle
 ```groovy
 compile 'de.gurkenlabs:litiengine:0.4.16.1'
 ```
