@@ -23,7 +23,7 @@ The library is distributed over the [Maven Central Repository](https://search.ma
 compile 'de.gurkenlabs:litiengine:0.4.16.1'
 ```
 
-### Apache Maven
+### Maven
 ```xml
 <dependency>
   <groupId>de.gurkenlabs</groupId>
