@@ -15,26 +15,36 @@ LITIengine is the pure open-source java game engine for creating 2D PC games. Wr
 Nonetheless, the LITIengine can of course already be used to make fully functioning **2D java games**.
 
 > :warning: We are aware that there is currently a **lack of documentation**, but for the mentioned reasons, we're planning to document the most important parts of the library and use-cases with the first beta release to ensure that features don't get deprecated before they're even used.
+## Installation
+The library is distributed over the [Maven Central Repository](https://search.maven.org/artifact/de.gurkenlabs/litiengine/) and you can grab the necessary .jar-file(s) from there by using your favorite build automation tool or manually download the library.
 
-> We're looking forward for your feedback on the engine!
+### Gradle (Groovy)
+```groovy
+compile 'de.gurkenlabs:litiengine:0.4.16.1'
+```
+
+### Apache Maven
+```xml
+<dependency>
+  <groupId>de.gurkenlabs</groupId>
+  <artifactId>litiengine</artifactId>
+  <version>0.4.16.1</version>
+</dependency>
+```
+[More Installation Instructions](https://docs.litiengine.com/basics/getting-started/get-litiengine)
+## Getting Started
+
+
+2. [Setup the Game Project](https://litiengine.com/getting-started-setup-the-game-project/)
+3. [Learning the Basics](https://litiengine.com/getting-started-learning-the-basics)
+4. [Configuring the Game](https://litiengine.com/getting-started-configuring-the-game/)
+5. [Loading a .tmx Map](https://youtu.be/RR3QxOhV8hM)
+
+## Documentation
+The [LITIengine documentation pages](https://docs.litiengine.com/) containing in-depth guides for LITIengine are currently in deployment. We're looking forward to your contributions!
 
 ## Questions?
 Visit the official [LITIengine forum](https://forum.litiengine.com/) for troubleshooting or to learn about the LITIengine community. If you encounter bugs or want to request fancy new features, you can also open an issue in our [Issue Tracker](https://github.com/gurkenlabs/litiengine/issues).
-
-## Getting Started
-
-1. [Setup the Game Project](https://litiengine.com/getting-started-setup-the-game-project/)
-2. [Learning the Basics](https://litiengine.com/getting-started-learning-the-basics)
-3. [Configuring the Game](https://litiengine.com/getting-started-configuring-the-game/)
-4. [Loading a .tmx Map](https://youtu.be/RR3QxOhV8hM)
-5. Working with Entities
-
-## Further Documentation
-The [LITIengine documentation pages](https://docs.litiengine.com/) containing in-depth guides for LITIengine are currently in deployment. We're looking forward to your contributions!
-
-## Becoming a contributor
-* Agree to our [Code of Conduct](https://github.com/gurkenlabs/litiengine/blob/master/CODE_OF_CONDUCT.md)
-* View our [Contribution guidelines](https://github.com/gurkenlabs/litiengine/blob/master/CONTRIBUTING.md)
 
 ## Features
 
@@ -79,6 +89,9 @@ The [LITIengine documentation pages](https://docs.litiengine.com/) containing in
 ### [LITI - Stoneage Brawl](https://gurkenlabs.de/liti/)
 ![LITI - Stoneage Brawl](https://gurkenlabs.de/wp-content/uploads/2017/01/liti-stoneage-brawl-banner.png "LITI - Stoneage Brawl")
 
+## Contributing
+* Agree to our [Code of Conduct](https://github.com/gurkenlabs/litiengine/blob/master/CODE_OF_CONDUCT.md)
+* View our [Contribution guidelines](https://github.com/gurkenlabs/litiengine/blob/master/CONTRIBUTING.md)
 
 ## Contacts 
 * Website [litiengine.com](https://litiengine.com)
