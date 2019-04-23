@@ -15,9 +15,7 @@ import java.awt.image.BufferedImage;
 import java.text.AttributedCharacterIterator;
 import java.text.AttributedString;
 import java.util.Map;
-import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
@@ -42,13 +40,12 @@ public class SpeechBubble implements IUpdateable, IRenderable {
   private static final double TRIANGLE_SIZE = 6;
 
   private final int currentTextDisplayTime;
-  private final Queue<Character> currentTextQueue;
   private final SpeechBubbleAppearance appearance;
 
   private BufferedImage bubble;
   private String currentText;
 
-  private String displayedText;
+  private int textIndex;
   private final IEntity entity;
 
   private long lastCharPoll;
@@ -75,11 +72,6 @@ public class SpeechBubble implements IUpdateable, IRenderable {
 
     this.currentText = text;
     this.currentTextDisplayTime = DISPLAYTIME_MIN + text.length() * DISPLAYTIME_PER_LETTER;
-    this.currentTextQueue = new ConcurrentLinkedQueue<>();
-    this.displayedText = "";
-    for (int i = 0; i < this.currentText.length(); i++) {
-      this.currentTextQueue.add(this.currentText.charAt(i));
-    }
 
     this.lastTextDisplay = Game.time().now();
     this.createBubbleImage();
@@ -129,7 +121,7 @@ public class SpeechBubble implements IUpdateable, IRenderable {
 
   @Override
   public void render(final Graphics2D g) {
-    if (this.displayedText == null || this.displayedText.isEmpty() || !Game.graphics().canRender(this.entity)) {
+    if (this.currentText == null || this.textIndex <= 0 || !Game.graphics().canRender(this.entity)) {
       return;
     }
 
@@ -140,20 +132,15 @@ public class SpeechBubble implements IUpdateable, IRenderable {
     final float startY = (float) (entityCenter.getY() - deltaY);
     ImageRenderer.render(g, this.bubble, new Point2D.Double(startX, startY));
 
-    g.setColor(this.getAppearance().getForeColor());
-    final FontRenderContext frc = g.getFontRenderContext();
-
-    final String text = this.displayedText;
-    final AttributedString styledText = new AttributedString(text);
+    final AttributedString styledText = new AttributedString(this.currentText);
     styledText.addAttribute(TextAttribute.FONT, this.getFont());
-    final AttributedCharacterIterator iterator = styledText.getIterator();
-    final LineBreakMeasurer measurer = new LineBreakMeasurer(iterator, frc);
-    measurer.setPosition(0);
+    styledText.addAttribute(TextAttribute.FOREGROUND, this.getAppearance().getForeColor());
+    final LineBreakMeasurer measurer = new LineBreakMeasurer(styledText.getIterator(), g.getFontRenderContext());
 
     float y = startY + this.getAppearance().getPadding();
     float x = startX + this.getAppearance().getPadding();
-    while (measurer.getPosition() < text.length()) {
-      final TextLayout layout = measurer.nextLayout(this.textBoxWidth);
+    while (measurer.getPosition() < this.textIndex) {
+      final TextLayout layout = measurer.nextLayout(this.textBoxWidth, this.textIndex, false);
 
       y += layout.getAscent();
       final float dx = layout.isLeftToRight() ? 0 : this.textBoxWidth - layout.getAdvance();
@@ -189,14 +176,13 @@ public class SpeechBubble implements IUpdateable, IRenderable {
     // old text was displayed long enough
     if (this.lastTextDisplay != 0 && Game.time().since(this.lastTextDisplay) > this.currentTextDisplayTime) {
       this.currentText = null;
-      this.displayedText = null;
       this.lastTextDisplay = 0;
       return;
     }
 
     // display new text
-    if (!this.currentTextQueue.isEmpty() && Game.time().since(this.lastCharPoll) > LETTER_WRITE_DELAY) {
-      this.displayedText += this.currentTextQueue.poll();
+    if (this.textIndex < this.currentText.length() && Game.time().since(this.lastCharPoll) > LETTER_WRITE_DELAY) {
+      this.textIndex++;
       this.lastCharPoll = Game.time().now();
       if (this.typeSound != null) {
         Game.audio().playSound(this.typeSound, this.getEntity());
