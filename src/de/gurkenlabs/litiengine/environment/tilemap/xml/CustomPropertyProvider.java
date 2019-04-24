@@ -226,6 +226,13 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
   }
 
   @Override
+  public void setValue(String propertyName, URL value) {
+    ICustomProperty property = createPropertyIfAbsent(propertyName);
+    property.setType("file");
+    property.setValue(value);
+  }
+
+  @Override
   public void setValue(String propertyName, String value) {
     if (value != null) {
       ICustomProperty property = createPropertyIfAbsent(propertyName);
@@ -320,10 +327,6 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
   }
 
   void finish(URL location) throws TmxException {
-    for (ICustomProperty property : this.properties.values()) {
-      if (property instanceof CustomProperty) {
-        ((CustomProperty) property).finish(location);
-      }
-    }
+    // blank base case
   }
 }

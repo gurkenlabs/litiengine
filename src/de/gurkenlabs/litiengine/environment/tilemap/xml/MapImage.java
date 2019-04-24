@@ -2,7 +2,6 @@ package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -91,11 +90,6 @@ public class MapImage extends CustomPropertyProvider implements IMapImage {
   @Override
   public String getSource() {
     return this.source;
-  }
-
-  @Override
-  public File getSourceFile() {
-    return new File(this.getSource());
   }
 
   @Override

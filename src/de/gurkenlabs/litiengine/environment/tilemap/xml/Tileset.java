@@ -1,7 +1,6 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.awt.Dimension;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -18,6 +17,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapImage;
@@ -29,6 +29,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.ITilesetEntry;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
+import de.gurkenlabs.litiengine.util.io.URLAdapter;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 
 @XmlRootElement(name = "tileset")
@@ -68,7 +69,8 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   private Integer spacing;
 
   @XmlAttribute
-  private String source;
+  @XmlJavaTypeAdapter(URLAdapter.class)
+  private URL source;
 
   @XmlElementWrapper(name = "terraintypes")
   @XmlElement(name = "terrain")
@@ -196,14 +198,9 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     if (this.source != null) {
       // don't reload the source if it's already been loaded in a resource bundle
       if (this.sourceTileset == null) {
-        try {
-          URL url = new URL(location, this.source);
-          this.sourceTileset = Resources.tilesets().get(url);
-          if (this.sourceTileset == null) {
-            throw new MissingExternalTilesetException(url.toExternalForm());
-          }
-        } catch (MalformedURLException e) {
-          throw new MissingExternalTilesetException(e);
+        this.sourceTileset = Resources.tilesets().get(this.source);
+        if (this.sourceTileset == null) {
+          throw new MissingExternalTilesetException(this.source.toExternalForm());
         }
       }
     } else {
@@ -315,24 +312,12 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     return tileId >= this.firstgid && tileId < this.firstgid + this.getTileCount();
   }
 
-  public void loadFromSource(String basePath) throws MissingExternalTilesetException {
-    if (this.source == null || this.source.isEmpty()) {
-      return;
-    }
-
-    String location = FileUtilities.combine(basePath, this.source);
-    this.sourceTileset = Resources.tilesets().get(location);
-    if (this.sourceTileset == null) {
-      throw new MissingExternalTilesetException(location);
-    }
-  }
-
   public void saveSource(String basePath) {
     if (this.sourceTileset == null) {
       return;
     }
 
-    XmlUtilities.save(this.sourceTileset, FileUtilities.combine(basePath, this.source), FILE_EXTENSION);
+    XmlUtilities.save(this.sourceTileset, this.source.getPath(), FILE_EXTENSION);
   }
 
   public boolean isExternal() {
@@ -340,7 +325,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   }
 
   public void load(List<Tileset> rawTilesets) {
-    if (this.source == null || this.source.isEmpty()) {
+    if (this.source == null) {
       return;
     }
 

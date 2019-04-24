@@ -8,6 +8,8 @@ import java.net.URL;
  */
 public interface ICustomProperty {
 
+  public void setValue(URL value);
+
   public void setValue(String value);
 
   public void setValue(char value);

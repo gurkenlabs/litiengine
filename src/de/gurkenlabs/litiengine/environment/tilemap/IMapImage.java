@@ -2,7 +2,6 @@ package de.gurkenlabs.litiengine.environment.tilemap;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.io.File;
 import java.net.URL;
 
 /**
@@ -10,7 +9,7 @@ import java.net.URL;
  */
 public interface IMapImage extends ICustomPropertyProvider {
 
-  public URL getAbsoluteSourcePath();
+  public URL getAbsoluteSourcePath(); // XXX merge with getSource
 
   /**
    * Gets the dimension.
@@ -24,14 +23,7 @@ public interface IMapImage extends ICustomPropertyProvider {
    *
    * @return the source
    */
-  public String getSource();
-
-  /**
-   * Gets the source file.
-   *
-   * @return the source file
-   */
-  public File getSourceFile();
+  public String getSource(); // TODO change this to a URL
 
   /**
    * Gets the transparent color.
@@ -61,9 +53,9 @@ public interface IMapImage extends ICustomPropertyProvider {
 
   public void setTransparentColor(Color color);
 
-  public void setSource(String source);
+  public void setSource(String source); // TODO change this to a URL
 
-  public void setAbsoluteSourcePath(URL absolutePath);
+  public void setAbsoluteSourcePath(URL absolutePath); // XXX merge with setSource
 
   public void setWidth(int width);
 

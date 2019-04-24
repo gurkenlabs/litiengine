@@ -298,6 +298,16 @@ public interface ICustomPropertyProvider {
   public URL getFileValue(String propertyName, URL defaultValue);
 
   /**
+   * Sets the value for the custom property with the given name to the given file.
+   *
+   * @param propertyName
+   *          the name of the custom property
+   * @param value
+   *          the new value
+   */
+  public void setValue(String propertyName, URL value);
+
+  /**
    * Sets the value for the custom property with the given name to the given string.
    *
    * @param propertyName

@@ -1,7 +1,9 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -12,10 +14,12 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlValue;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
+import de.gurkenlabs.litiengine.util.io.URLAdapter;
 
 public class CustomPropertyAdapter extends XmlAdapter<CustomPropertyAdapter.PropertyList, Map<String, ICustomProperty>> {
   private static class PropertyType {
@@ -51,6 +55,8 @@ public class CustomPropertyAdapter extends XmlAdapter<CustomPropertyAdapter.Prop
     String value;
     @XmlValue
     String contents;
+    @XmlTransient
+    URL location;
 
     Property() {
     }
@@ -61,16 +67,22 @@ public class CustomPropertyAdapter extends XmlAdapter<CustomPropertyAdapter.Prop
     }
 
     @SuppressWarnings("unused")
-    private void afterUnmarshal(Unmarshaller u, Object parent) {
+    private void afterUnmarshal(Unmarshaller u, Object parent) throws MalformedURLException {
       if (this.type == null) {
         this.type = PropertyType.STRING;
+      }
+      if (this.type.equals(PropertyType.FILE)) {
+        this.location = u.getAdapter(URLAdapter.class).unmarshal(this.value);
       }
     }
 
     @SuppressWarnings("unused")
-    private void beforeMarshal(Marshaller m) {
+    private void beforeMarshal(Marshaller m) throws URISyntaxException {
       if (this.type.equals(PropertyType.STRING)) {
         this.type = null;
+      }
+      if (this.location != null) {
+        this.value = m.getAdapter(URLAdapter.class).marshal(this.location);
       }
     }
 
@@ -109,7 +121,11 @@ public class CustomPropertyAdapter extends XmlAdapter<CustomPropertyAdapter.Prop
   public Map<String, ICustomProperty> unmarshal(PropertyList v) {
     Map<String, ICustomProperty> map = new Hashtable<>(v.properties.size()); // use hashtable to reject null keys/values
     for (Property property : v.properties) {
-      map.put(property.name, new CustomProperty(property.type, property.value != null ? property.value : property.contents));
+      CustomProperty prop = new CustomProperty(property.type, property.value != null ? property.value : property.contents);
+      if (property.location != null) {
+        prop.setValue(property.location);
+      }
+      map.put(property.name, prop);
     }
     return map;
   }
@@ -133,10 +149,11 @@ public class CustomPropertyAdapter extends XmlAdapter<CustomPropertyAdapter.Prop
       } else {
         saved.value = value;
       }
+      saved.location = property.getAsFile();
       list.add(saved);
     }
 
-    Collections.sort(list);
+    list.sort(null);
     return new PropertyList(list);
   }
 }

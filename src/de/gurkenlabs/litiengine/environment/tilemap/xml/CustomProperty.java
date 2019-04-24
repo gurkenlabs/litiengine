@@ -1,7 +1,6 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.awt.Color;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Objects;
 
@@ -39,6 +38,18 @@ public class CustomProperty implements ICustomProperty {
   public CustomProperty(String type, String value) {
     this.type = Objects.requireNonNull(type);
     this.value = Objects.requireNonNull(value);
+  }
+
+  public CustomProperty(URL location) {
+    this.type = "file";
+    this.value = location.toExternalForm();
+    this.location = location;
+  }
+
+  @Override
+  public void setValue(URL location) {
+    this.value = location.toExternalForm();
+    this.location = location;
   }
 
   @Override
@@ -184,15 +195,5 @@ public class CustomProperty implements ICustomProperty {
   @Override
   public String toString() {
     return this.getAsString() + " (" + this.getType() + ')';
-  }
-
-  void finish(URL location) throws TmxException {
-    if ("file".equals(this.type)) {
-      try {
-        this.location = new URL(location, this.value);
-      } catch (MalformedURLException e) {
-        throw new MissingTmxResourceException("invalid location for file property", e);
-      }
-    }
   }
 }
