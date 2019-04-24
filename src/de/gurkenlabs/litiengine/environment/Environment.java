@@ -290,7 +290,9 @@ public final class Environment implements IRenderable {
   }
 
   public void updateLighting() {
-    this.updateLighting(this.getMap().getBounds());
+    if (this.getMap() != null) {
+      this.updateLighting(this.getMap().getBounds());
+    }
   }
 
   public void updateLighting(Rectangle2D section) {
