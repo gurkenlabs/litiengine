@@ -20,7 +20,7 @@ The library is distributed over the [Maven Central Repository](https://search.ma
 
 ### Gradle
 ```groovy
-compile 'de.gurkenlabs:litiengine:0.4.16.1'
+compile 'de.gurkenlabs:litiengine:0.4.17'
 ```
 
 ### Maven
@@ -28,7 +28,7 @@ compile 'de.gurkenlabs:litiengine:0.4.16.1'
 <dependency>
   <groupId>de.gurkenlabs</groupId>
   <artifactId>litiengine</artifactId>
-  <version>0.4.16.1</version>
+  <version>0.4.17</version>
 </dependency>
 ```
 [More Installation Instructions](https://docs.litiengine.com/basics/getting-started/get-litiengine)
