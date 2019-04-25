@@ -37,7 +37,7 @@ public final class RenderMenu extends JMenu {
     // which are always rendered at a particular
     // section of the rendering pipeline (regardless of any explicitly set
     // render types).
-    if (!selectedMapObjects.stream().allMatch(x -> {
+    if (selectedMapObjects.isEmpty() || !selectedMapObjects.stream().allMatch(x -> {
       MapObjectType type = MapObjectType.get(x.getType());
       return type == MapObjectType.PROP || type == MapObjectType.CREATURE || type == MapObjectType.EMITTER;
     })) {
