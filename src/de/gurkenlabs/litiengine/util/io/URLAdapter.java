@@ -40,6 +40,10 @@ public class URLAdapter extends XmlAdapter<String, URL> {
 
   @Override
   public URL unmarshal(String v) throws MalformedURLException {
+    if (v == null) {
+      return null;
+    }
+
     if (this.base != null) {
       return new URL(base, v);
     }
@@ -48,6 +52,10 @@ public class URLAdapter extends XmlAdapter<String, URL> {
 
   @Override
   public String marshal(URL v) throws URISyntaxException {
+    if (v == null) {
+      return null;
+    }
+
     if (this.base != null) {
       return v.toURI().relativize(this.base.toURI()).toASCIIString();
     }
