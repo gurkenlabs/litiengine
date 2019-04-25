@@ -99,6 +99,6 @@ public final class MapMenu extends JMenu {
     this.add(mapProps);
     
     this.setEnabled(false);
-    EditorScreen.instance().onLoaded(() -> this.setEnabled(EditorScreen.instance().getCurrentResourceFile() != null));
+    EditorScreen.instance().onLoaded(() -> this.setEnabled(EditorScreen.instance().getProjectPath() != null));
   }
 }

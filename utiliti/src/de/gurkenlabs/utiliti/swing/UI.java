@@ -84,7 +84,7 @@ public final class UI {
 
   public static boolean notifyPendingChanges() {
     String resourceFile = EditorScreen.instance().getCurrentResourceFile() != null ? EditorScreen.instance().getCurrentResourceFile() : "";
-    if (EditorScreen.instance().getChangedMaps().isEmpty()) {
+    if (EditorScreen.instance().getChangedMaps().isEmpty() && !EditorScreen.instance().isUnsavedProject()) {
       return true;
     }
 

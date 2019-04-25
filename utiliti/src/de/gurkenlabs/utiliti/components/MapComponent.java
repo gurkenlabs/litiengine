@@ -459,8 +459,10 @@ public class MapComponent extends GuiComponent implements IUpdateable {
     UndoManager.instance().beginOperation();
     try {
       for (IMapObject mapObject : this.getSelectedMapObjects()) {
-        this.delete(mapObject);
+        // call the undomanager first because otherwise the information about
+        // the object's layer will be lost
         UndoManager.instance().mapObjectDeleted(mapObject);
+        this.delete(mapObject);
       }
     } finally {
       UndoManager.instance().endOperation();
@@ -486,9 +488,11 @@ public class MapComponent extends GuiComponent implements IUpdateable {
         if (deleteObject == null) {
           continue;
         }
-        
-        this.delete(deleteObject);
+
+        // call the undomanager first because otherwise the information about
+        // the object's layer will be lost
         UndoManager.instance().mapObjectDeleted(deleteObject);
+        this.delete(deleteObject);
       }
     } finally {
       UndoManager.instance().endOperation();
@@ -872,12 +876,12 @@ public class MapComponent extends GuiComponent implements IUpdateable {
 
     this.colorSelectionBorder = Color.getHSBColor(0, 0, this.focusBorderBrightness);
   }
-  
+
   @Override
   protected boolean mouseEventShouldBeForwarded(final MouseEvent e) {
     return this.isForwardMouseEvents() && this.isVisible() && this.isEnabled() && !this.isSuspended() && e != null;
   }
-  
+
   private void updateScrollSpeed() {
     this.scrollSpeed = BASE_SCROLL_SPEED / zooms[this.currentZoomIndex];
   }

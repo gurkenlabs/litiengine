@@ -237,6 +237,8 @@ public class EditorScreen extends Screen {
       if (!this.mapComponent.getMaps().isEmpty()) {
         this.mapComponent.loadEnvironment(this.mapComponent.getMaps().get(0));
       }
+
+      this.gamefileLoaded();
     } catch (IOException e) {
       log.log(Level.SEVERE, e.getLocalizedMessage(), e);
     }
@@ -263,11 +265,11 @@ public class EditorScreen extends Screen {
     getMapComponent().clearAll();
     this.currentResourceFile = null;
     this.gameFile = null;
-    this.gamefileLoaded();
     this.setProjectPath(null);
     this.mapComponent.loadMaps(Arrays.asList());
     Resources.clearAll();
     UI.getAssetController().refresh();
+    this.gamefileLoaded();
     this.setCurrentStatus(Resources.strings().get("status_gamefile_closed"));
   }
 
@@ -304,8 +306,6 @@ public class EditorScreen extends Screen {
       if (this.gameFile == null) {
         throw new IllegalArgumentException("The game file " + gameFile + " could not be loaded!");
       }
-
-      this.gamefileLoaded();
 
       this.setProjectPath(gameFile.getPath());
 
@@ -345,6 +345,7 @@ public class EditorScreen extends Screen {
         Game.world().unloadEnvironment();
       }
 
+      this.gamefileLoaded();
       this.setCurrentStatus(Resources.strings().get("status_gamefile_loaded"));
     } finally {
       Game.window().getRenderComponent().setCursor(Cursors.DEFAULT, 0, 0);
@@ -655,6 +656,10 @@ public class EditorScreen extends Screen {
     }
 
     UI.getAssetController().refresh();
+  }
+
+  public boolean isUnsavedProject() {
+    return this.getCurrentResourceFile() == null && this.getProjectPath() != null;
   }
 
   private String saveGameFile(String target) {
