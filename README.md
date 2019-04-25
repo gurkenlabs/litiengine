@@ -35,10 +35,10 @@ compile 'de.gurkenlabs:litiengine:0.4.16.1'
 ## Getting Started
 
 
-2. [Setup the Game Project](https://litiengine.com/getting-started-setup-the-game-project/)
-3. [Learning the Basics](https://litiengine.com/getting-started-learning-the-basics)
-4. [Configuring the Game](https://litiengine.com/getting-started-configuring-the-game/)
-5. [Loading a .tmx Map](https://youtu.be/RR3QxOhV8hM)
+1. [Setup the Game Project](https://litiengine.com/getting-started-setup-the-game-project/)
+2. [Learning the Basics](https://litiengine.com/getting-started-learning-the-basics)
+3. [Configuring the Game](https://litiengine.com/getting-started-configuring-the-game/)
+4. [Loading a .tmx Map](https://youtu.be/RR3QxOhV8hM)
 
 ## Documentation
 The [LITIengine documentation pages](https://docs.litiengine.com/) containing in-depth guides for LITIengine are currently in deployment. We're looking forward to your contributions!
