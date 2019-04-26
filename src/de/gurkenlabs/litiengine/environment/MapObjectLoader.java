@@ -51,7 +51,9 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
     entity.setHeight(mapObject.getHeight());
     entity.setName(mapObject.getName());
     entity.setLocation(mapObject.getLocation());
-    entity.setRenderWithLayer(mapObject.getBoolValue(MapObjectProperty.RENDERWITHLAYER));
+    if (mapObject.hasCustomProperty(MapObjectProperty.RENDERWITHLAYER)) {
+      entity.setRenderWithLayer(mapObject.getBoolValue(MapObjectProperty.RENDERWITHLAYER));
+    }
 
     String tagsString = mapObject.getStringValue(MapObjectProperty.TAGS);
     if (tagsString != null && tagsString.trim().length() > 0) {

@@ -23,4 +23,6 @@ public @interface EntityInfo {
   float width() default 32;
 
   String customMapObjectType() default "";
+
+  boolean renderWithLayer() default false;
 }

@@ -29,19 +29,19 @@ import de.gurkenlabs.litiengine.util.ReflectionUtilities;
 public abstract class Entity implements IEntity {
   private static final Logger log = Logger.getLogger(Entity.class.getName());
   public static final String ANY_MESSAGE = "";
-  private final List<EntityTransformListener> transformListeners;
-  private final List<EntityListener> listeners;
+  private final List<EntityTransformListener> transformListeners = new CopyOnWriteArrayList<>();
+  private final List<EntityListener> listeners = new CopyOnWriteArrayList<>();
 
-  private final Map<String, List<MessageListener>> messageListeners;
+  private final Map<String, List<MessageListener>> messageListeners = new ConcurrentHashMap<>();
 
   @TmxProperty(name = MapObjectProperty.TAGS)
-  private final List<String> tags;
+  private final List<String> tags = new CopyOnWriteArrayList<>();
 
-  private final EntityControllers controllers;
+  private final EntityControllers controllers = new EntityControllers();
 
-  private final EntityActionMap actions;
+  private final EntityActionMap actions = new EntityActionMap();
 
-  private final ICustomPropertyProvider properties;
+  private final ICustomPropertyProvider properties = new CustomPropertyProvider();
   private boolean renderWithLayer;
 
   private Environment environment;
@@ -67,20 +67,12 @@ public abstract class Entity implements IEntity {
    * Instantiates a new entity.
    */
   protected Entity() {
-    this.transformListeners = new CopyOnWriteArrayList<>();
-    this.listeners = new CopyOnWriteArrayList<>();
-    this.messageListeners = new ConcurrentHashMap<>();
-    this.tags = new CopyOnWriteArrayList<>();
-    this.properties = new CustomPropertyProvider();
-
-    this.controllers = new EntityControllers();
-    this.actions = new EntityActionMap();
-
     this.mapLocation = new Point2D.Double(0, 0);
     final EntityInfo info = this.getClass().getAnnotation(EntityInfo.class);
     this.width = info.width();
     this.height = info.height();
     this.renderType = info.renderType();
+    this.renderWithLayer = info.renderWithLayer();
 
     final Tag[] tagAnnotations = this.getClass().getAnnotationsByType(Tag.class);
     for (Tag t : tagAnnotations) {
