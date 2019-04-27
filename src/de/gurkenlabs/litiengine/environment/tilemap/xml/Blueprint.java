@@ -9,6 +9,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 
@@ -18,7 +19,7 @@ public class Blueprint extends MapObject {
    * Templates in this format typically come from the Tiled editor and only support a single MapObject.
    */
   public static final String TEMPLATE_FILE_EXTENSION = "tx";
-  
+
   /**
    * Blueprint in this format support multiple map objects as children (extended template XML).
    */
@@ -80,8 +81,13 @@ public class Blueprint extends MapObject {
   public List<IMapObject> build(float x, float y) {
     List<IMapObject> builtObjects = new ArrayList<>();
 
+    int baseId = Game.world().environment().getNextMapId();
     for (MapObject item : this.getItems()) {
       MapObject newObject = new MapObject(item, this.keepIds());
+      if (!this.keepIds()) {
+        newObject.setId(baseId);
+        baseId++;
+      }
       newObject.setX(newObject.getX() + x);
       newObject.setY(newObject.getY() + y);
       builtObjects.add(newObject);
