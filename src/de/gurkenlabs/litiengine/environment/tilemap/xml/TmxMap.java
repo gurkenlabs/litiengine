@@ -483,11 +483,11 @@ public final class TmxMap extends CustomPropertyProvider implements IMap, Compar
     }
 
     if (this.tilesets == null) {
-      this.tilesets = new ArrayList<>();
+      this.tilesets = new CopyOnWriteArrayList<>();
     }
 
     if (this.layers == null) {
-      this.layers = new ArrayList<>();
+      this.layers = new CopyOnWriteArrayList<>();
     }
 
     for (ILayer layer : this.layers) {
@@ -540,7 +540,7 @@ public final class TmxMap extends CustomPropertyProvider implements IMap, Compar
       if (i >= index) {
         break;
       }
-      
+
       if (layerType.isAssignableFrom(this.layers.get(i).getClass())) {
         rawIndex++;
       }
