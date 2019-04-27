@@ -103,6 +103,10 @@ public class GeometricUtilities {
     return Math.sqrt(dx * dx + dy * dy);
   }
 
+  public static Rectangle2D extrude(Rectangle2D rect, double ext) {
+    return new Rectangle2D.Double(rect.getX() - ext, rect.getY() - ext, rect.getWidth() + ext * 2, rect.getHeight() + ext * 2);
+  }
+
   public static boolean equals(final Point2D point1, final Point2D point2, final double epsilon) {
     return point1.distance(point2) < epsilon;
   }
