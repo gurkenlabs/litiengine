@@ -12,7 +12,7 @@ public enum ImageFormat {
   }
 
   public static boolean isSupported(File file) {
-    return isSupported(file);
+    return isSupported(file.toString());
   }
 
   public static boolean isSupported(String fileName) {
