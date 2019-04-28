@@ -60,8 +60,6 @@ public class Creature extends CombatEntity implements IMobileEntity {
     } else {
       this.setSpritePrefix(ArrayUtilities.getRandom(EntityAnimationController.getDefaultSpritePrefixes(this.getClass())));
     }
-
-    this.updateAnimationController();
   }
 
   @Override
