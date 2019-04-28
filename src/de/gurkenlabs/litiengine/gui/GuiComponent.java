@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -11,6 +13,8 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.RectangularShape;
+import java.awt.geom.RoundRectangle2D;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
@@ -695,6 +699,9 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
       currentAppearance = this.getAppearanceDisabled();
     }
 
+    Shape clip = g.getClip();
+    g.clip(this.getShape());
+
     if (!currentAppearance.isTransparentBackground()) {
       g.setPaint(currentAppearance.getBackgroundPaint(this.getWidth(), this.getHeight()));
       g.fill(this.getBoundingBox());
@@ -705,6 +712,14 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
 
     this.renderText(g);
 
+    g.setClip(clip);
+    if (currentAppearance.getBorderColor() != null && currentAppearance.getBorderStyle() != null) {
+      Stroke s = g.getStroke();
+      g.setStroke(currentAppearance.getBorderStyle());
+      g.setColor(currentAppearance.getBorderColor());
+      g.draw(this.getShape());
+      g.setStroke(s);
+    }
     for (final GuiComponent component : this.getComponents()) {
       if (!component.isVisible() || component.isSuspended()) {
         continue;
@@ -717,6 +732,21 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
       g.setColor(Color.RED);
       ShapeRenderer.renderOutline(g, this.getBoundingBox());
     }
+  }
+
+  public RectangularShape getShape() {
+    float radius = this.getCurrentAppearance().getBorderRadius();
+    if (radius == 0f) {
+      return this.getBoundingBox();
+    }
+    return new RoundRectangle2D.Double(this.getX(), this.getY(), this.getWidth(), this.getHeight(), this.getCurrentAppearance().getBorderRadius(), this.getCurrentAppearance().getBorderRadius());
+  }
+
+  protected Appearance getCurrentAppearance() {
+    if (!this.isEnabled()) {
+      return this.getAppearanceDisabled();
+    }
+    return this.isHovered() ? this.getAppearanceHovered() : this.getAppearance();
   }
 
   /**

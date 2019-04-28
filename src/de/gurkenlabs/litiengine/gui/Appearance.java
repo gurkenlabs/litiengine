@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.GradientPaint;
 import java.awt.Paint;
 import java.awt.RenderingHints;
+import java.awt.Stroke;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -15,6 +16,9 @@ public class Appearance {
   private Color foreColor;
   private Color backgroundColor1;
   private Color backgroundColor2;
+  private Color borderColor;
+  private Stroke borderStyle;
+  private float borderRadius;
   private boolean horizontalBackgroundGradient;
   private boolean transparentBackground;
 
@@ -39,16 +43,28 @@ public class Appearance {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof Appearance) {
-      return this.hashCode() == obj.hashCode();
+    if (this == obj) {
+      return true;
     }
-
-    return super.equals(obj);
+    if (!(obj instanceof Appearance)) {
+      return false;
+    }
+    Appearance other = (Appearance)obj;
+    return this.textAntialiasing.equals(other.textAntialiasing)
+        && this.transparentBackground == other.transparentBackground
+        && this.horizontalBackgroundGradient == other.horizontalBackgroundGradient
+        && Float.floatToIntBits(this.borderRadius) == Float.floatToIntBits(other.borderRadius)
+        && Objects.equals(this.borderColor, other.borderColor)
+        && Objects.equals(this.borderStyle, other.borderStyle)
+        && Objects.equals(this.backgroundColor1, other.backgroundColor1)
+        && Objects.equals(this.backgroundColor2, other.backgroundColor2)
+        && Objects.equals(this.foreColor, other.foreColor);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(this.getForeColor(), this.getBackgroundColor1(), this.getBackgroundColor2(), this.isHorizontalBackgroundGradient(), this.isTransparentBackground());
+    return Objects.hash(this.textAntialiasing, this.transparentBackground, this.horizontalBackgroundGradient, this.borderRadius,
+        this.borderColor, this.borderStyle, this.backgroundColor1, this.backgroundColor2, this.foreColor);
   }
 
   public Color getForeColor() {
@@ -80,6 +96,18 @@ public class Appearance {
     }
   }
 
+  public Color getBorderColor() {
+    return this.borderColor;
+  }
+
+  public Stroke getBorderStyle() {
+    return this.borderStyle;
+  }
+
+  public float getBorderRadius() {
+    return this.borderRadius;
+  }
+
   public Object getTextAntialiasing() {
     return this.textAntialiasing;
   }
@@ -105,6 +133,18 @@ public class Appearance {
   public void setBackgroundColor2(Color backColor2) {
     this.backgroundColor2 = backColor2;
     this.fireOnChangeEvent();
+  }
+
+  public void setBorderColor(Color color) {
+    this.borderColor = color;
+  }
+
+  public void setBorderStyle(Stroke style) {
+    this.borderStyle = style;
+  }
+
+  public void setBorderRadius(float radius) {
+    this.borderRadius = radius;
   }
 
   public void setHorizontalBackgroundGradient(boolean horizontal) {
