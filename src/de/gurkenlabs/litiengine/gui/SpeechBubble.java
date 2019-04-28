@@ -40,7 +40,7 @@ public class SpeechBubble implements IUpdateable, IRenderable {
   private static final double TRIANGLE_SIZE = 6;
 
   private final List<SpeechBubbleListener> listeners = new CopyOnWriteArrayList<>();
-  private final int currentTextDisplayTime;
+  private int currentTextDisplayTime;
   private final SpeechBubbleAppearance appearance;
 
   private Font font;
@@ -164,6 +164,14 @@ public class SpeechBubble implements IUpdateable, IRenderable {
     this.font = font;
   }
 
+  public int getTextDisplayTime() {
+    return this.currentTextDisplayTime;
+  }
+
+  public void setTextDisplayTime(int duration) {
+    this.currentTextDisplayTime = duration;
+  }
+
   @Override
   public void update() {
     if (this.currentText == null) {
@@ -174,10 +182,10 @@ public class SpeechBubble implements IUpdateable, IRenderable {
         activeSpeechBubbles.remove(this.getEntity());
       }
 
-      for(SpeechBubbleListener listener : this.listeners) {
+      for (SpeechBubbleListener listener : this.listeners) {
         listener.hidden();
       }
-      
+
       return;
     }
 
