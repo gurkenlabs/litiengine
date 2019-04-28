@@ -14,8 +14,10 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.text.AttributedCharacterIterator;
 import java.text.AttributedString;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
@@ -35,13 +37,13 @@ public class SpeechBubble implements IUpdateable, IRenderable {
   private static final int DISPLAYTIME_MIN = 2000;
   private static final int DISPLAYTIME_PER_LETTER = 120;
   private static final int LETTER_WRITE_DELAY = 30;
-  private Font font;
-
   private static final double TRIANGLE_SIZE = 6;
 
+  private final List<SpeechBubbleListener> listeners = new CopyOnWriteArrayList<>();
   private final int currentTextDisplayTime;
   private final SpeechBubbleAppearance appearance;
 
+  private Font font;
   private BufferedImage bubble;
   private String currentText;
 
@@ -107,6 +109,10 @@ public class SpeechBubble implements IUpdateable, IRenderable {
     return activeSpeechBubbles.containsKey(entity);
   }
 
+  public void addListener(SpeechBubbleListener listener) {
+    this.listeners.add(listener);
+  }
+
   public IEntity getEntity() {
     return this.entity;
   }
@@ -168,6 +174,10 @@ public class SpeechBubble implements IUpdateable, IRenderable {
         activeSpeechBubbles.remove(this.getEntity());
       }
 
+      for(SpeechBubbleListener listener : this.listeners) {
+        listener.hidden();
+      }
+      
       return;
     }
 
