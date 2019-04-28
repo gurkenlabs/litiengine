@@ -20,11 +20,13 @@ public interface IEntityAnimationController extends IAnimationController, IEntit
    */
   public void addAnimationRule(Predicate<IEntity> rule, Function<IEntity, String> animationName);
 
+  public void addAnimationRule(Predicate<IEntity> rule, Function<IEntity, String> animationName, int priority);
+
   public boolean isAutoScaling();
 
   public void setAutoScaling(boolean scaling);
-  
+
   public void scaleSprite(float scaleX, float scaleY);
-  
+
   public void scaleSprite(float scale);
 }
