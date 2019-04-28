@@ -198,7 +198,7 @@ public class Creature extends CombatEntity implements IMobileEntity {
     return sb.toString();
   }
 
-  private void updateAnimationController() {
+  protected void updateAnimationController() {
     CreatureAnimationController<Creature> controller = new CreatureAnimationController<>(this, true);
     this.getControllers().addController(controller);
     if (Game.world().environment() != null && Game.world().environment().isLoaded()) {
