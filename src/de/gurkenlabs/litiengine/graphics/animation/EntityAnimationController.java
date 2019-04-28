@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine.graphics.animation;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
@@ -57,6 +58,8 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
   @Override
   public void addAnimationRule(Predicate<IEntity> rule, Function<IEntity, String> animationName) {
     this.animationRules.add(new AnimationRule(rule, animationName));
+
+    Collections.sort(this.animationRules);
   }
 
   @Override
@@ -99,8 +102,8 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
   protected void setSpritePrefix(String prefix) {
     this.spritePrefix = prefix;
   }
-  
-  protected List<AnimationRule> getAnimationRules(){
+
+  protected List<AnimationRule> getAnimationRules() {
     return this.animationRules;
   }
 
@@ -140,22 +143,53 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
   public void scaleSprite(float scale) {
     this.scaleSprite(scale, scale);
   }
-  
-  public class AnimationRule{
+
+  public class AnimationRule implements Comparable<AnimationRule> {
     private final Predicate<IEntity> condition;
     private final Function<IEntity, String> animationName;
-    
-    public AnimationRule(Predicate<IEntity> condition, Function<IEntity, String> animationName){
+    private int priority;
+
+    public AnimationRule(Predicate<IEntity> condition, Function<IEntity, String> animationName) {
       this.condition = condition;
       this.animationName = animationName;
     }
-    
-    Predicate<IEntity> getCondition(){
+
+    public AnimationRule(Predicate<IEntity> condition, Function<IEntity, String> animationName, int priority) {
+      this(condition, animationName);
+      this.priority = priority;
+    }
+
+    Predicate<IEntity> getCondition() {
       return this.condition;
     }
-    
-    Function<IEntity, String> getAnimationName(){
+
+    Function<IEntity, String> getAnimationName() {
       return this.animationName;
+    }
+
+    public int getPriority() {
+      return priority;
+    }
+
+    public void setPriority(int priority) {
+      this.priority = priority;
+    }
+
+    @Override
+    public int compareTo(EntityAnimationController<T>.AnimationRule o) {
+      if (o == null) {
+        return 1;
+      }
+
+      if (this.getPriority() == o.getPriority()) {
+        return 0;
+      }
+
+      if (this.getPriority() < o.getPriority()) {
+        return 1;
+      }
+
+      return -1;
     }
   }
 }
