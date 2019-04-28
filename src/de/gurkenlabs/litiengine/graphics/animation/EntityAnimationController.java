@@ -137,11 +137,11 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
     this.scaleSprite(scale, scale);
   }
   
-  protected class AnimationRule{
+  public class AnimationRule{
     private final Predicate<IEntity> condition;
     private final Function<IEntity, String> animationName;
     
-    AnimationRule(Predicate<IEntity> condition, Function<IEntity, String> animationName){
+    public AnimationRule(Predicate<IEntity> condition, Function<IEntity, String> animationName){
       this.condition = condition;
       this.animationName = animationName;
     }
