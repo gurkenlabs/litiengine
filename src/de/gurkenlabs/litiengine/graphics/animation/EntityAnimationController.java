@@ -99,6 +99,10 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
   protected void setSpritePrefix(String prefix) {
     this.spritePrefix = prefix;
   }
+  
+  protected List<AnimationRule> getAnimationRules(){
+    return this.animationRules;
+  }
 
   @Override
   public boolean isAutoScaling() {
