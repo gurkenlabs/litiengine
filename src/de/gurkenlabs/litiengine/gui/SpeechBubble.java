@@ -65,7 +65,7 @@ public class SpeechBubble implements IUpdateable, IRenderable {
 
     final SpeechBubble active = activeSpeechBubbles.get(entity);
     if (active != null) {
-      active.cancel();
+      active.hide();
     }
     this.setFont(font);
 
@@ -175,17 +175,7 @@ public class SpeechBubble implements IUpdateable, IRenderable {
   @Override
   public void update() {
     if (this.currentText == null) {
-      Game.world().environment().removeRenderable(this);
-      Game.renderLoop().detach(this);
-
-      if (activeSpeechBubbles.containsKey(this.getEntity()) && activeSpeechBubbles.get(this.getEntity()).equals(this)) {
-        activeSpeechBubbles.remove(this.getEntity());
-      }
-
-      for (SpeechBubbleListener listener : this.listeners) {
-        listener.hidden();
-      }
-
+      this.hide();
       return;
     }
 
@@ -210,11 +200,15 @@ public class SpeechBubble implements IUpdateable, IRenderable {
     // continue displaying currently displayed text
   }
 
-  private void cancel() {
+  public void hide() {
     Game.world().environment().removeRenderable(this);
     Game.renderLoop().detach(this);
     if (activeSpeechBubbles.get(this.getEntity()) != null && activeSpeechBubbles.remove(this.getEntity()).equals(this)) {
       activeSpeechBubbles.remove(this.getEntity());
+    }
+    
+    for (SpeechBubbleListener listener : this.listeners) {
+      listener.hidden();
     }
   }
 
