@@ -230,7 +230,7 @@ public final class TextRenderer {
     Shape textShape = at.createTransformedShape(glyphVector.getOutline());
 
     // activate anti aliasing for text rendering (if you want it to look nice)
-    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, antiAliasing);
+    g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, antiAliasing);
     g.setRenderingHint(RenderingHints.KEY_RENDERING,
         RenderingHints.VALUE_RENDER_QUALITY);
 
