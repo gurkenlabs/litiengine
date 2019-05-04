@@ -138,7 +138,7 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
       return this.renderType;
     }
 
-    this.renderType = this.getEnumValue(LayerProperty.LAYER_RENDER_TYPE, RenderType.class, this instanceof TileLayer ? RenderType.GROUND : RenderType.NORMAL);
+    this.renderType = this.getEnumValue(LayerProperty.LAYER_RENDER_TYPE, RenderType.class, RenderType.GROUND);
     this.renderTypeLoaded = true;
     return this.renderType;
   }
