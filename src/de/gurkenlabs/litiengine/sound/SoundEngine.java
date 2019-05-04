@@ -99,11 +99,11 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    *
    * @param track
    *          The track to play
-   * @param restart
-   *          Whether to restart if the specified track is already playing, determined by {@link Object#equals(Object)}
+   * @param stop
+   *          Whether to stop an existing track if present
    */
-  public void playMusic(Track track, boolean restart) {
-    playMusic(track, null, false, true);
+  public void playMusic(Track track, boolean stop) {
+    playMusic(track, null, false, stop);
   }
 
   /**
