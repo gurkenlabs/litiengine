@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.logging.Level;
@@ -60,7 +61,7 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    * @see Game#audio()
    */
   public SoundEngine() {
-    if(Game.audio() != null) {
+    if (Game.audio() != null) {
       throw new UnsupportedOperationException("Never initialize a SoundEngine manually. Use Game.audio() instead.");
     }
   }
@@ -90,7 +91,7 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    *          The track to play
    */
   public void playMusic(Track track) {
-    playMusic(track, false, true);
+    playMusic(track, null, false, true);
   }
 
   /**
@@ -102,7 +103,7 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    *          Whether to restart if the specified track is already playing, determined by {@link Object#equals(Object)}
    */
   public void playMusic(Track track, boolean restart) {
-    playMusic(track, false, true);
+    playMusic(track, null, false, true);
   }
 
   /**
@@ -115,16 +116,35 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    * @param stop
    *          Whether to stop an existing track if present
    */
-  public synchronized void playMusic(Track track, boolean restart, boolean stop) {
+  public MusicPlayback playMusic(Track track, boolean restart, boolean stop) {
+    return playMusic(track, null, restart, stop);
+  }
+
+  /**
+   * Plays the specified track, optionally configuring it before starting.
+   *
+   * @param track
+   *          The track to play
+   * @param config
+   *          A call to configure the playback prior to starting, which can be {@code null}
+   * @param restart
+   *          Whether to restart if the specified track is already playing, determined by {@link Object#equals(Object)}
+   * @param stop
+   *          Whether to stop an existing track if present
+   */
+  public synchronized MusicPlayback playMusic(Track track, Consumer<? super MusicPlayback> config, boolean restart, boolean stop) {
     if (!restart && music != null && music.isPlaying() && music.getTrack().equals(track)) {
-      return;
+      return music;
     }
     MusicPlayback playback;
     try {
       playback = new MusicPlayback(track);
     } catch (LineUnavailableException e) {
       resourceFailure(e);
-      return;
+      return null;
+    }
+    if (config != null) {
+      config.accept(playback);
     }
     if (stop) {
       stopMusic();
@@ -132,6 +152,7 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
     allMusic.add(playback);
     playback.start();
     music = playback;
+    return playback;
   }
 
   /**
@@ -352,6 +373,31 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
   }
 
   /**
+   * <p>
+   * Creates an {@code SFXPlayback} object that can be configured prior to starting. Also allows for a custom source supplier.
+   * <p>
+   * Unlike the {@code playSound} methods, the {@code SFXPlayback} objects returned by this method must be started using the
+   * {@link SoundPlayback#start()} method. However, necessary resources are acquired <em>immediately</em> upon calling this method, and will remain in
+   * use until the playback is either cancelled or finalized.
+   * 
+   * @param sound
+   *          The sound to play
+   * @param supplier
+   *          A function to get the sound's current source location (the sound is statically positioned if the location is {@code null})
+   * @param loop
+   *          Whether to loop the sound
+   * @return An {@code SFXPlayback} object that can be configured prior to starting, but will need to be manually started.
+   */
+  public SFXPlayback createSound(Sound sound, Supplier<Point2D> supplier, boolean loop) {
+    try {
+      return new SFXPlayback(sound, supplier, loop);
+    } catch (LineUnavailableException e) {
+      resourceFailure(e);
+      return null;
+    }
+  }
+
+  /**
    * This method allows to set the callback that is used by the SoundEngine to
    * determine where the listener location is.
    * 
@@ -363,6 +409,10 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    */
   public void setListenerLocationCallback(Function<Point2D, Point2D> callback) {
     listenerLocationCallback = callback;
+  }
+
+  public Point2D getListenerLocation() {
+    return (Point2D) this.listenerLocation.clone();
   }
 
   @Override
@@ -414,28 +464,31 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
     }
 
     if (music != null) {
-      music.setMusicVolume(Game.config().sound().getMusicVolume());
+      if (music.isPlaying()) {
+        music.setMusicVolume(Game.config().sound().getMusicVolume());
+      } else {
+        music = null;
+      }
     }
   }
 
   private SFXPlayback playSound(Sound sound, Supplier<Point2D> supplier, boolean loop) {
-    if(sound == null) {
+    if (sound == null) {
       return null;
     }
-    
-    SFXPlayback playback;
-    try {
-      playback = new SFXPlayback(sound, supplier, loop);
-    } catch (LineUnavailableException e) {
-      resourceFailure(e);
+
+    SFXPlayback playback = createSound(sound, supplier, loop);
+    if (playback == null) {
       return null;
     }
-    playback.updateLocation(listenerLocation);
     playback.start();
-    sounds.add(playback);
     return playback;
   }
-  
+
+  void addSound(SFXPlayback playback) {
+    this.sounds.add(playback);
+  }
+
   private static void resourceFailure(Throwable e) {
     log.log(Level.WARNING, "could not open a line", e);
   }

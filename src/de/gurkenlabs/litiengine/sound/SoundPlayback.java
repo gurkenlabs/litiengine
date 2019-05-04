@@ -77,8 +77,12 @@ public abstract class SoundPlayback implements Runnable {
     if (this.started) {
       throw new IllegalStateException("already started");
     }
-    SoundEngine.EXECUTOR.submit(this);
+    this.play();
     this.started = true;
+  }
+
+  protected void play() {
+    SoundEngine.EXECUTOR.submit(this);
   }
 
   /**

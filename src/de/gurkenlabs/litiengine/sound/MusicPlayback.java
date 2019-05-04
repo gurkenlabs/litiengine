@@ -16,6 +16,11 @@ public class MusicPlayback extends SoundPlayback {
   }
 
   @Override
+  protected void play() {
+    super.play();
+  }
+
+  @Override
   public void run() {
     for (Sound sound : this.track) {
       if (this.play(sound)) {

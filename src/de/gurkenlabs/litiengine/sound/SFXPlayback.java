@@ -23,6 +23,13 @@ public class SFXPlayback extends SoundPlayback {
     this.source = source;
     this.distance = this.createVolumeControl();
   }
+  
+  @Override
+  protected void play() {
+    this.updateLocation(Game.audio().getListenerLocation());
+    super.play();
+    Game.audio().addSound(this);
+  }
 
   @Override
   public void run() {
