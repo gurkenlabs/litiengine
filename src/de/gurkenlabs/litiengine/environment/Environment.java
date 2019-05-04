@@ -834,9 +834,6 @@ public final class Environment implements IRenderable {
 
     if (this.getMap() != null) {
       Game.physics().setBounds(new Rectangle2D.Double(0, 0, this.getMap().getSizeInPixels().getWidth(), this.getMap().getSizeInPixels().getHeight()));
-    }
-
-    if (this.getMap() != null) {
       if (this.getMap().getBackgroundColor() != null) {
         Game.window().getRenderComponent().setBackground(ColorHelper.premultiply(this.getMap().getBackgroundColor()));
       }
