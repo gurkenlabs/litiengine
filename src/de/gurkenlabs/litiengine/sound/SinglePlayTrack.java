@@ -5,6 +5,8 @@ import java.util.NoSuchElementException;
 
 import javax.sound.sampled.AudioFormat;
 
+import de.gurkenlabs.litiengine.resources.Resources;
+
 /**
  * A {@code Track} that plays a sound once and then stops.
  */
@@ -27,6 +29,10 @@ public class SinglePlayTrack implements Track {
       this.hasNext = false;
       return SinglePlayTrack.this.sound;
     }
+  }
+
+  public SinglePlayTrack(String sound) {
+    this(Resources.sounds().get(sound));
   }
 
   public SinglePlayTrack(Sound sound) {

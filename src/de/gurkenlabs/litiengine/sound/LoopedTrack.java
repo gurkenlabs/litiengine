@@ -5,8 +5,14 @@ import java.util.Objects;
 
 import javax.sound.sampled.AudioFormat;
 
+import de.gurkenlabs.litiengine.resources.Resources;
+
 public class LoopedTrack implements Track, Iterator<Sound> {
   private Sound track;
+
+  public LoopedTrack(String track) {
+    this(Resources.sounds().get(track));
+  }
 
   public LoopedTrack(Sound track) {
     Objects.requireNonNull(track);
