@@ -76,12 +76,12 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
     return maxDist;
   }
 
-  public void playMusic(String music) {
-    playMusic(Resources.sounds().get(music));
+  public MusicPlayback playMusic(String music) {
+    return playMusic(Resources.sounds().get(music));
   }
 
-  public void playMusic(Sound music) {
-    playMusic(new LoopedTrack(music));
+  public MusicPlayback playMusic(Sound music) {
+    return playMusic(new LoopedTrack(music));
   }
 
   /**
@@ -89,9 +89,10 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    *
    * @param track
    *          The track to play
+   * @return The playback of the music
    */
-  public void playMusic(Track track) {
-    playMusic(track, null, false, true);
+  public MusicPlayback playMusic(Track track) {
+    return playMusic(track, null, false, true);
   }
 
   /**
@@ -101,9 +102,10 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    *          The track to play
    * @param restart
    *          Whether to restart if the specified track is already playing, determined by {@link Object#equals(Object)}
+   * @return The playback of the music
    */
-  public void playMusic(Track track, boolean restart) {
-    playMusic(track, null, restart, true);
+  public MusicPlayback playMusic(Track track, boolean restart) {
+    return playMusic(track, null, restart, true);
   }
 
   /**
@@ -115,6 +117,7 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    *          Whether to restart if the specified track is already playing, determined by {@link Object#equals(Object)}
    * @param stop
    *          Whether to stop an existing track if present
+   * @return The playback of the music
    */
   public MusicPlayback playMusic(Track track, boolean restart, boolean stop) {
     return playMusic(track, null, restart, stop);
@@ -131,6 +134,7 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    *          Whether to restart if the specified track is already playing, determined by {@link Object#equals(Object)}
    * @param stop
    *          Whether to stop an existing track if present
+   * @return The playback of the music
    */
   public synchronized MusicPlayback playMusic(Track track, Consumer<? super MusicPlayback> config, boolean restart, boolean stop) {
     if (!restart && music != null && music.isPlaying() && music.getTrack().equals(track)) {
