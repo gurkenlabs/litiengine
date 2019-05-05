@@ -12,7 +12,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 
 public class SpawnpointMapObjectLoader extends MapObjectLoader {
 
-  protected SpawnpointMapObjectLoader() {
+  public SpawnpointMapObjectLoader() {
     super(MapObjectType.SPAWNPOINT);
   }
 

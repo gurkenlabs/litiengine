@@ -25,7 +25,7 @@ public class CreatureMapObjectLoader extends MapObjectLoader {
     customCreatureType = new CopyOnWriteArrayList<>();
   }
 
-  protected CreatureMapObjectLoader() {
+  public CreatureMapObjectLoader() {
     super(MapObjectType.CREATURE);
   }
 

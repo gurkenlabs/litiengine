@@ -11,7 +11,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 
 public class CollisionBoxMapObjectLoader extends MapObjectLoader {
 
-  protected CollisionBoxMapObjectLoader() {
+  public CollisionBoxMapObjectLoader() {
     super(MapObjectType.COLLISIONBOX);
   }
 

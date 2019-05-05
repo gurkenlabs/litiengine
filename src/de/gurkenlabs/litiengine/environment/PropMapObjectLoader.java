@@ -26,7 +26,7 @@ public class PropMapObjectLoader extends MapObjectLoader {
     customPropType = new CopyOnWriteArrayList<>();
   }
 
-  protected PropMapObjectLoader() {
+  public PropMapObjectLoader() {
     super(MapObjectType.PROP);
   }
 

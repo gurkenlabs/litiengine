@@ -12,7 +12,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 
 public class LightSourceMapObjectLoader extends MapObjectLoader {
 
-  protected LightSourceMapObjectLoader() {
+  public LightSourceMapObjectLoader() {
     super(MapObjectType.LIGHTSOURCE);
   }
 

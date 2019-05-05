@@ -17,7 +17,7 @@ public final class CustomMapObjectLoader extends MapObjectLoader {
     IEntity invoke(Environment environment, IMapObject mapObject) throws InvocationTargetException, IllegalAccessException, InstantiationException;
   }
 
-  protected CustomMapObjectLoader(String mapObjectType, Class<? extends IEntity> entityType) {
+  public CustomMapObjectLoader(String mapObjectType, Class<? extends IEntity> entityType) {
     super(mapObjectType);
     if (entityType.isInterface() || Modifier.isAbstract(entityType.getModifiers())) {
       throw new IllegalArgumentException("cannot create loader for interface or abstract class");

@@ -881,8 +881,6 @@ public final class Environment implements IRenderable {
    * without
    * having to provide an <code>EntityInfo</code> annotation containing this information.
    * 
-   * @param <T>
-   *          The type of the custom entity.
    * @param mapObjectType
    *          The custom mapobjectType that is used by <code>IMapObjects</code> to determine the target entity implementation.
    * @param entityType
@@ -891,7 +889,7 @@ public final class Environment implements IRenderable {
    * @see IMapObject#getType()
    * @see EntityInfo#customMapObjectType()
    */
-  public static <T extends IEntity> void registerCustomEntityType(String mapObjectType, Class<T> entityType) {
+  public static void registerCustomEntityType(String mapObjectType, Class<? extends IEntity> entityType) {
     CustomMapObjectLoader mapObjectLoader = new CustomMapObjectLoader(mapObjectType, entityType);
     registerMapObjectLoader(mapObjectLoader);
   }
@@ -903,8 +901,6 @@ public final class Environment implements IRenderable {
    * This implementation uses the provided <code>EntityInfo.customMapObjectType()</code> to determine for which type the specified class should be
    * used.
    * 
-   * @param <T>
-   *          The type of the custom entity.
    * @param entityType
    *          The class type of the custom entity implementation.
    * 
@@ -912,7 +908,7 @@ public final class Environment implements IRenderable {
    * @see IMapObject#getType()
    * @see EntityInfo#customMapObjectType()
    */
-  public static <T extends IEntity> void registerCustomEntityType(Class<T> entityType) {
+  public static void registerCustomEntityType(Class<? extends IEntity> entityType) {
     EntityInfo info = entityType.getAnnotation(EntityInfo.class);
     if (info == null || info.customMapObjectType().isEmpty()) {
       throw new IllegalArgumentException(

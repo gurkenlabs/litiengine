@@ -285,7 +285,7 @@ public class Trigger extends CollisionEntity implements IUpdateable {
       listener.activated(te);
     }
 
-    if (this.isOneTimeTrigger && this.isActivated) {
+    if (this.isOneTimeTrigger) {
       Game.world().environment().remove(this);
     }
 

@@ -12,7 +12,7 @@ import de.gurkenlabs.litiengine.graphics.StaticShadowType;
 
 public class StaticShadowMapObjectLoader extends MapObjectLoader {
 
-  protected StaticShadowMapObjectLoader() {
+  public StaticShadowMapObjectLoader() {
     super(MapObjectType.STATICSHADOW);
   }
 
