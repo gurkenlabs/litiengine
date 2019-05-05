@@ -2,7 +2,9 @@ package de.gurkenlabs.litiengine.entities;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,16 +28,16 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   public static final String INTERACT_MESSAGE = "interact";
   private static final Logger log = Logger.getLogger(Trigger.class.getName());
 
-  private List<IEntity> activated;
-  private final Collection<TriggerActivatedListener> activatedListeners;
-  private final Collection<TriggerDeactivatedListener> deactivatedListeners;
-  private final Collection<TriggerActivatingCondition> activatingConditions;
+  private final Collection<IEntity> activated = ConcurrentHashMap.newKeySet();
+  private final Collection<TriggerActivatedListener> activatedListeners = ConcurrentHashMap.newKeySet();
+  private final Collection<TriggerDeactivatedListener> deactivatedListeners = ConcurrentHashMap.newKeySet();
+  private final Collection<TriggerActivatingCondition> activatingConditions = ConcurrentHashMap.newKeySet();
 
   @TmxProperty(name = MapObjectProperty.TRIGGER_ACTIVATORS)
-  private final List<Integer> activators;
+  private final List<Integer> activators = new CopyOnWriteArrayList<>();
 
   @TmxProperty(name = MapObjectProperty.TRIGGER_TARGETS)
-  private final List<Integer> targets;
+  private final List<Integer> targets = new CopyOnWriteArrayList<>();
 
   @TmxProperty(name = MapObjectProperty.TRIGGER_ACTIVATION)
   private final TriggerActivation activationType;
@@ -61,13 +63,6 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   }
 
   public Trigger(final TriggerActivation activation, final String message, final boolean isOneTime) {
-    super();
-    this.activatingConditions = new CopyOnWriteArrayList<>();
-    this.activatedListeners = new CopyOnWriteArrayList<>();
-    this.deactivatedListeners = new CopyOnWriteArrayList<>();
-    this.activators = new CopyOnWriteArrayList<>();
-    this.targets = new CopyOnWriteArrayList<>();
-    this.activated = new CopyOnWriteArrayList<>();
     this.message = message;
     this.isOneTimeTrigger = isOneTime;
     this.activationType = activation;
@@ -234,7 +229,9 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     }
 
     // send deactivation event
-    for (final IEntity ent : this.activated) {
+    Iterator<IEntity> iter = this.activated.iterator();
+    while (iter.hasNext()) {
+      IEntity ent = iter.next();
       if (!collEntities.contains(ent)) {
         List<Integer> triggerTargets = this.getTargets();
         if (triggerTargets.isEmpty()) {
@@ -246,10 +243,10 @@ public class Trigger extends CollisionEntity implements IUpdateable {
         for (final TriggerDeactivatedListener listener : this.deactivatedListeners) {
           listener.deactivated(event);
         }
+
+        iter.remove();
       }
     }
-
-    this.activated = collEntities;
   }
 
   private boolean activate(final IEntity activator, final int tar) {
