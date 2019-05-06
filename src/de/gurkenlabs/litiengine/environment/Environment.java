@@ -80,8 +80,8 @@ public final class Environment implements IRenderable {
   private final Map<Integer, IEntity> allEntities = new ConcurrentHashMap<>();
 
   private final Map<RenderType, Collection<EnvironmentRenderListener>> renderListeners = Collections.synchronizedMap(new EnumMap<>(RenderType.class));
-  private final List<EnvironmentListener> listeners = new CopyOnWriteArrayList<>();
-  private final List<EnvironmentEntityListener> entityListeners = new CopyOnWriteArrayList<>();
+  private final Collection<EnvironmentListener> listeners = ConcurrentHashMap.newKeySet();
+  private final Collection<EnvironmentEntityListener> entityListeners = ConcurrentHashMap.newKeySet();
 
   private final Map<RenderType, Collection<IRenderable>> renderables = Collections.synchronizedMap(new EnumMap<>(RenderType.class));
   private final Collection<CollisionBox> colliders = ConcurrentHashMap.newKeySet();
