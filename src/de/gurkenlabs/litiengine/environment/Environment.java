@@ -176,6 +176,7 @@ public final class Environment implements IRenderable {
     }
     this.addEntity(entity);
     this.miscEntities.get(entity.getRenderType()).put(entity.getMapId(), entity);
+    this.fireEntityEvent(l -> l.entityAdded(entity));
   }
 
   private void addEntity(final IEntity entity) {
@@ -250,8 +251,6 @@ public final class Environment implements IRenderable {
     }
 
     this.allEntities.put(entity.getMapId(), entity);
-
-    this.fireEntityEvent(l -> l.entityAdded(entity));
   }
 
   private void addEmitter(Emitter emitter) {
@@ -1174,6 +1173,7 @@ public final class Environment implements IRenderable {
           if (mapObject.getLayer() != null && entity.renderWithLayer()) {
             this.addEntity(entity);
             this.layerEntities.computeIfAbsent(mapObject.getLayer(), m -> new CopyOnWriteArrayList<>()).add(entity);
+            this.fireEntityEvent(l -> l.entityAdded(entity));
           } else {
             this.add(entity);
           }
