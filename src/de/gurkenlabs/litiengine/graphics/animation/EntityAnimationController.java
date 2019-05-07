@@ -46,7 +46,7 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
     this(entity, new Animation(sprite, loop, Resources.spritesheets().getCustomKeyFrameDurations(sprite)));
   }
 
-  public static <T> String[] getDefaultSpritePrefixes(Class<T> cls) {
+  public static String[] getDefaultSpritePrefixes(Class<?> cls) {
     AnimationInfo animationInfo = cls.getAnnotation(AnimationInfo.class);
     if (animationInfo != null && animationInfo.spritePrefix().length > 0) {
       return animationInfo.spritePrefix();
@@ -56,14 +56,14 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
   }
 
   @Override
-  public void addAnimationRule(Predicate<IEntity> rule, Function<IEntity, String> animationName, int priority) {
+  public void addAnimationRule(Predicate<? super T> rule, Function<? super T, ? extends String> animationName, int priority) {
     this.animationRules.add(new AnimationRule(rule, animationName, priority));
 
     Collections.sort(this.animationRules);
   }
   
   @Override
-  public void addAnimationRule(Predicate<IEntity> rule, Function<IEntity, String> animationName) {
+  public void addAnimationRule(Predicate<IEntity> rule, Function<? super T, ? extends String> animationName) {
     this.animationRules.add(new AnimationRule(rule, animationName));
 
     Collections.sort(this.animationRules);
@@ -151,26 +151,26 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
     this.scaleSprite(scale, scale);
   }
 
-  public class AnimationRule implements Comparable<AnimationRule> {
-    private final Predicate<IEntity> condition;
-    private final Function<IEntity, String> animationName;
+  public static class AnimationRule<T extends IEntity> implements Comparable<AnimationRule> {
+    private final Predicate<? super T> condition;
+    private final Function<? super T, ? extends String> animationName;
     private int priority;
 
-    public AnimationRule(Predicate<IEntity> condition, Function<IEntity, String> animationName) {
+    public AnimationRule(Predicate<? super T> condition, Function<? super T, ? extends String> animationName) {
       this.condition = condition;
       this.animationName = animationName;
     }
 
-    public AnimationRule(Predicate<IEntity> condition, Function<IEntity, String> animationName, int priority) {
+    public AnimationRule(Predicate<? super T> condition, Function<? super T, ? extends String> animationName, int priority) {
       this(condition, animationName);
       this.priority = priority;
     }
 
-    Predicate<IEntity> getCondition() {
+    Predicate<? super T> getCondition() {
       return this.condition;
     }
 
-    Function<IEntity, String> getAnimationName() {
+    Function<? super T, ? extends String> getAnimationName() {
       return this.animationName;
     }
 
@@ -183,7 +183,7 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
     }
 
     @Override
-    public int compareTo(EntityAnimationController<T>.AnimationRule o) {
+    public int compareTo(AnimationRule o) {
       if (o == null) {
         return 1;
       }
