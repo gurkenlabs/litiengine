@@ -56,14 +56,14 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
   }
 
   @Override
-  public void addAnimationRule(Predicate<? super T> rule, Function<? super T, ? extends String> animationName, int priority) {
+  public void addAnimationRule(Predicate<IEntity> rule, Function<IEntity, String> animationName, int priority) {
     this.animationRules.add(new AnimationRule(rule, animationName, priority));
 
     Collections.sort(this.animationRules);
   }
   
   @Override
-  public void addAnimationRule(Predicate<IEntity> rule, Function<? super T, ? extends String> animationName) {
+  public void addAnimationRule(Predicate<IEntity> rule, Function<IEntity, String> animationName) {
     this.animationRules.add(new AnimationRule(rule, animationName));
 
     Collections.sort(this.animationRules);
