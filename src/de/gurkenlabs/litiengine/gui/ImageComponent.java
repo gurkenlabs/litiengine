@@ -95,32 +95,44 @@ public class ImageComponent extends GuiComponent {
   }
 
   public Image getImage() {
-    if (this.image == null) {
-      return null;
-    }
-
-    int imageWidth = this.image.getWidth(null);
-    int imageHeight = this.image.getHeight(null);
-
-    if (this.getImageScaleMode() == ImageScaleMode.STRETCH) {
-      imageWidth = (int) this.getWidth();
-      imageHeight = (int) this.getHeight();
-    }
-
-    final String cacheKey = this.image.hashCode() + "_" + imageWidth + "+" + imageHeight;
-    Optional<BufferedImage> opt = Resources.images().tryGet(cacheKey);
-    if (opt.isPresent()) {
-      return opt.get();
-    }
-
     BufferedImage bufferedImage = Imaging.toBufferedImage(this.image);
-    if (bufferedImage == null) {
-      return this.image;
+    if (bufferedImage != null) {
+      int imageWidth = this.image.getWidth(null);
+      int imageHeight = this.image.getHeight(null);
+      if (this.getImageScaleMode() != null) {
+        boolean keepRatio;
+        
+        switch (this.getImageScaleMode()) {
+          case STRETCH:
+            imageWidth = (int) this.getWidth();
+            imageHeight = (int) this.getHeight();
+            keepRatio = false;
+            break;
+          case FIT:
+            imageWidth = (int) this.getWidth();
+            imageHeight = (int) this.getHeight();
+            keepRatio = true;
+            break;
+          default:
+            keepRatio = false;
+            break;
+        }
+        
+        bufferedImage = Imaging.scale(bufferedImage, imageWidth, imageHeight, keepRatio);
+        imageWidth = bufferedImage.getWidth();
+        imageHeight = bufferedImage.getHeight();
+      }
+      
+      final String cacheKey = this.image.hashCode() + "_" + imageWidth + "+" + imageHeight;
+      Optional<BufferedImage> opt = Resources.images().tryGet(cacheKey);
+      if (opt.isPresent()) {
+        return opt.get();
+      }
+      
+      Resources.images().add(cacheKey, bufferedImage);
     }
-
-    BufferedImage img = Imaging.scale(bufferedImage, imageWidth, imageHeight);
-    Resources.images().add(cacheKey, img);
-    return img;
+    
+    return bufferedImage;
   }
 
   public Align getImageAlign() {
