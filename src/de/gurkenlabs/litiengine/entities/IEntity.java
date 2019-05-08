@@ -38,7 +38,7 @@ public interface IEntity {
    */
   public void setAngle(double angle);
 
-  public IEntityAnimationController getAnimationController();
+  public IEntityAnimationController<?> getAnimationController();
 
   public IBehaviorController getBehaviorController();
 

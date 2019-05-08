@@ -266,7 +266,7 @@ public final class RenderEngine {
       consumer.accept(renderEvent);
     }
 
-    final IEntityAnimationController animationController = entity.getAnimationController();
+    final IEntityAnimationController<?> animationController = entity.getAnimationController();
     if (animationController != null) {
       final BufferedImage img = animationController.getCurrentSprite();
       if (img == null) {

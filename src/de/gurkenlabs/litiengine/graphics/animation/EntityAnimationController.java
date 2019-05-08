@@ -3,7 +3,6 @@ package de.gurkenlabs.litiengine.graphics.animation;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
@@ -16,8 +15,8 @@ import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 
-public class EntityAnimationController<T extends IEntity> extends AnimationController implements IEntityAnimationController {
-  private final List<AnimationRule> animationRules = new CopyOnWriteArrayList<>();
+public class EntityAnimationController<T extends IEntity> extends AnimationController implements IEntityAnimationController<T> {
+  private final List<AnimationRule<T>> animationRules = new CopyOnWriteArrayList<>();
   private final T entity;
   private String spritePrefix;
   private boolean autoScaling;
@@ -56,17 +55,25 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
   }
 
   @Override
-  public void addAnimationRule(Predicate<IEntity> rule, Function<IEntity, String> animationName, int priority) {
-    this.animationRules.add(new AnimationRule(rule, animationName, priority));
+  public synchronized void addAnimationRule(Predicate<? super T> rule, Function<? super T, ? extends String> animationName, int priority) {
+    // binary search the list for the appropriate index
+    int min = 0;
+    int max = this.animationRules.size();
+    while (min < max - 1) {
+      int midpoint = (min + max) / 2;
+      if (priority > this.animationRules.get(midpoint).getPriority()) {
+        min = midpoint + 1;
+      } else {
+        max = midpoint;
+      }
+    }
 
-    Collections.sort(this.animationRules);
+    this.animationRules.add(min, new AnimationRule<>(rule, animationName, priority));
   }
   
   @Override
-  public void addAnimationRule(Predicate<IEntity> rule, Function<IEntity, String> animationName) {
-    this.animationRules.add(new AnimationRule(rule, animationName));
-
-    Collections.sort(this.animationRules);
+  public void addAnimationRule(Predicate<? super T> rule, Function<? super T, ? extends String> animationName) {
+    this.addAnimationRule(rule, animationName, 0);
   }
 
   @Override
@@ -90,7 +97,7 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
       return;
     }
 
-    for (AnimationRule animationRule : this.animationRules) {
+    for (AnimationRule<T> animationRule : this.animationRules) {
       if (animationRule.getCondition().test(this.getEntity())) {
         final String animationName = animationRule.getAnimationName().apply(this.getEntity());
         if (this.getCurrentAnimation() == null || animationName != null && !animationName.isEmpty() && !this.getCurrentAnimation().getName().equalsIgnoreCase(animationName)) {
@@ -108,10 +115,6 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
 
   protected void setSpritePrefix(String prefix) {
     this.spritePrefix = prefix;
-  }
-
-  protected List<AnimationRule> getAnimationRules() {
-    return this.animationRules;
   }
 
   @Override
@@ -151,18 +154,14 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
     this.scaleSprite(scale, scale);
   }
 
-  public static class AnimationRule<T extends IEntity> implements Comparable<AnimationRule> {
+  protected static class AnimationRule<T extends IEntity> {
     private final Predicate<? super T> condition;
     private final Function<? super T, ? extends String> animationName;
     private int priority;
 
-    public AnimationRule(Predicate<? super T> condition, Function<? super T, ? extends String> animationName) {
+    public AnimationRule(Predicate<? super T> condition, Function<? super T, ? extends String> animationName, int priority) {
       this.condition = condition;
       this.animationName = animationName;
-    }
-
-    public AnimationRule(Predicate<? super T> condition, Function<? super T, ? extends String> animationName, int priority) {
-      this(condition, animationName);
       this.priority = priority;
     }
 
@@ -180,23 +179,6 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
 
     public void setPriority(int priority) {
       this.priority = priority;
-    }
-
-    @Override
-    public int compareTo(AnimationRule o) {
-      if (o == null) {
-        return 1;
-      }
-
-      if (this.getPriority() == o.getPriority()) {
-        return 0;
-      }
-
-      if (this.getPriority() < o.getPriority()) {
-        return 1;
-      }
-
-      return -1;
     }
   }
 }
