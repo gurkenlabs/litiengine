@@ -57,7 +57,7 @@ public class URLAdapter extends XmlAdapter<String, URL> {
     }
 
     if (this.base != null) {
-      return v.toURI().relativize(this.base.toURI()).toASCIIString();
+      return this.base.toURI().relativize(v.toURI()).toASCIIString();
     }
     return v.toExternalForm();
   }
