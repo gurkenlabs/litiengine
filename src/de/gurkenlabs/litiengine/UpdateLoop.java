@@ -1,8 +1,9 @@
 package de.gurkenlabs.litiengine;
 
-import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -10,7 +11,8 @@ import de.gurkenlabs.litiengine.util.TimeUtilities;
 
 public class UpdateLoop extends Thread implements AutoCloseable, ILoop {
   private static final Logger log = Logger.getLogger(UpdateLoop.class.getName());
-  private final Set<IUpdateable> updatables;
+  private final Set<IUpdateable> updatables = ConcurrentHashMap.newKeySet();
+  private final Lock lock = new ReentrantLock();
 
   private int tickRate;
 
@@ -22,7 +24,6 @@ public class UpdateLoop extends Thread implements AutoCloseable, ILoop {
 
   protected UpdateLoop(String name, int tickRate) {
     super(name);
-    this.updatables = Collections.newSetFromMap(new ConcurrentHashMap<IUpdateable, Boolean>());
     this.tickRate = tickRate;
   }
 
@@ -43,7 +44,13 @@ public class UpdateLoop extends Thread implements AutoCloseable, ILoop {
 
       final long start = System.nanoTime();
 
-      this.process();
+      Lock lock = this.getLock();
+      lock.lock();
+      try {
+        this.process();
+      } finally {
+        lock.unlock();
+      }
 
       // delay tick to meet the expected rate
       this.processTime = TimeUtilities.nanoToMs(System.nanoTime() - start);
@@ -164,5 +171,10 @@ public class UpdateLoop extends Thread implements AutoCloseable, ILoop {
 
   protected void setTickRate(int tickRate) {
     this.tickRate = tickRate;
+  }
+
+  @Override
+  public Lock getLock() {
+    return this.lock;
   }
 }

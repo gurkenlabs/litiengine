@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.locks.Lock;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
@@ -209,33 +210,39 @@ public final class GameWorld implements IUpdateable {
    * @see GameWorld#environment()
    */
   public void loadEnvironment(final Environment env) {
-    unloadEnvironment();
-    this.environment = env;
-    if (env != null) {
-      this.addEnvironment(env);
-
-      if (env.getGravity() == 0 && this.gravity() != 0) {
-        env.setGravity(this.gravity());
-      }
-
-      env.load();
-      for (final EnvironmentLoadedListener listener : this.loadedListeners) {
-        listener.loaded(env);
-      }
-
-      // call map specific listeners
-      String mapName = getMapName(env);
-      if (mapName != null && this.environmentLoadedListeners.containsKey(mapName)) {
-        
-        // for the default camera we center the camera on the environment
-        if (this.camera().getClass().equals(Camera.class)) {
-          camera().setFocus(env.getCenter());
+    Lock lock = Game.renderLoop().getLock();
+    lock.lock();
+    try {
+      unloadEnvironment();
+      this.environment = env;
+      if (env != null) {
+        this.addEnvironment(env);
+  
+        if (env.getGravity() == 0 && this.gravity() != 0) {
+          env.setGravity(this.gravity());
         }
-        
-        for (EnvironmentLoadedListener listener : this.environmentLoadedListeners.get(mapName)) {
+  
+        env.load();
+        for (final EnvironmentLoadedListener listener : this.loadedListeners) {
           listener.loaded(env);
         }
+  
+        // call map specific listeners
+        String mapName = getMapName(env);
+        if (mapName != null && this.environmentLoadedListeners.containsKey(mapName)) {
+          
+          // for the default camera we center the camera on the environment
+          if (this.camera().getClass().equals(Camera.class)) {
+            camera().setFocus(env.getCenter());
+          }
+          
+          for (EnvironmentLoadedListener listener : this.environmentLoadedListeners.get(mapName)) {
+            listener.loaded(env);
+          }
+        }
       }
+    } finally {
+      lock.unlock();
     }
   }
 

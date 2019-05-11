@@ -1,5 +1,7 @@
 package de.gurkenlabs.litiengine;
 
+import java.util.concurrent.locks.Lock;
+
 public interface ILoop extends ILaunchable {
   /**
    * Attaches the update method of the specified IUpdatable instance to be called
@@ -56,4 +58,10 @@ public interface ILoop extends ILaunchable {
    * @see #getDeltaTime()
    */
   public double getProcessTime();
+
+  /**
+   * Returns a lock that can be used for actions that must be performed either within or independently of the loop.
+   * @return A {@code Lock} for this loop.
+   */
+  public Lock getLock();
 }

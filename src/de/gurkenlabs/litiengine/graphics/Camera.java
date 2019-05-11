@@ -6,6 +6,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
 
@@ -34,7 +35,7 @@ public class Camera implements ICamera {
   private double shakeOffsetY;
 
   private long shakeTick;
-  private Rectangle2D viewPort;
+  private Rectangle2D viewport;
 
   private float zoom;
   private float targetZoom;
@@ -56,7 +57,7 @@ public class Camera implements ICamera {
    */
   public Camera() {
     this.focus = new Point2D.Double();
-    this.viewPort = new Rectangle2D.Double();
+    this.viewport = new Rectangle2D.Double();
     this.zoom = 1;
   }
 
@@ -74,17 +75,17 @@ public class Camera implements ICamera {
 
   @Override
   public double getPixelOffsetX() {
-    return this.getViewPortCenterX() - (this.getFocus() != null ? this.getFocus().getX() : 0);
+    return -this.viewport.getX();
   }
 
   @Override
   public double getPixelOffsetY() {
-    return this.getViewPortCenterY() - (this.getFocus() != null ? this.getFocus().getY() : 0);
+    return -this.viewport.getY();
   }
 
   @Override
   public Rectangle2D getViewport() {
-    return this.viewPort;
+    return (Rectangle2D) this.viewport.clone();
   }
 
   @Override
@@ -154,7 +155,7 @@ public class Camera implements ICamera {
     // location with an AffineTransform...
     final double fraction = this.focus.getY() - Math.floor(this.focus.getY());
     if (MathUtilities.isInt(fraction * 4)) {
-      this.focus.setLocation(this.focus.getX(), this.focus.getY() + 0.01);
+      this.focus.setLocation(this.focus.getX(), this.focus.getY() + Math.ulp((float) this.focus.getY()));
     }
 
     for (Consumer<Point2D> consumer : this.focusChangedConsumer) {
@@ -247,19 +248,19 @@ public class Camera implements ICamera {
     }
 
     if (Game.time().since(this.lastShake) > this.shakeDelay) {
-      this.shakeOffsetX = this.getShakeIntensity() * MathUtilities.randomSign();
-      this.shakeOffsetY = this.getShakeIntensity() * MathUtilities.randomSign();
+      this.shakeOffsetX = this.getShakeIntensity() * ThreadLocalRandom.current().nextGaussian();
+      this.shakeOffsetY = this.getShakeIntensity() * ThreadLocalRandom.current().nextGaussian();
       this.lastShake = Game.time().now();
     }
   }
 
   @Override
   public void updateFocus() {
-    this.setFocus(this.applyShakeEffect(this.getFocus()));
+    Point2D shook = this.applyShakeEffect(this.getFocus());
 
-    final double viewPortX = this.getFocus().getX() - this.getViewPortCenterX();
-    final double viewPortY = this.getFocus().getY() - this.getViewPortCenterY();
-    this.viewPort = new Rectangle2D.Double(viewPortX, viewPortY, this.getViewportWidth(), this.getViewportHeight());
+    final double viewPortX = shook.getX() - this.getViewPortCenterX();
+    final double viewPortY = shook.getY() - this.getViewPortCenterY();
+    this.viewport.setFrame(viewPortX, viewPortY, this.getViewportWidth(), this.getViewportHeight());
   }
 
   @Override
