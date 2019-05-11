@@ -35,40 +35,16 @@ public class TileLayer extends Layer implements ITileLayer {
       return null;
     }
 
-    if (x < 0 || y < 0 || x > this.tiles.length - 1 || y > this.tiles[0].length - 1) {
+    if (x < 0 || y < 0 || y >= this.tiles.length || x >= this.tiles[y].length) {
       return null;
     }
 
-    return this.tiles[x][y];
+    return this.tiles[y][x];
   }
 
   @Override
   public List<ITile> getTiles() {
-    if (this.tileList != null) {
-      return this.tileList;
-    }
-
-    try {
-      this.tileList = new CopyOnWriteArrayList<>(this.getData());
-      if (this.data == null) {
-        return this.tileList;
-      }
-
-      this.tiles = new Tile[this.getWidth()][this.getHeight()];
-      for (int i = 0; i < this.getData().size(); i++) {
-        final int x = i % this.getWidth();
-        final int y = i / this.getWidth();
-  
-        final Tile tile = this.getData().get(i);
-        tile.setTileCoordinate(new Point(x, y));
-        this.tileList.add(tile);
-        this.tiles[x][y] = tile;
-      }
-
-      return this.tileList;
-    } catch (InvalidTileLayerException e) {
-      throw new TmxError(e);
-    }
+    return this.tileList;
   }
 
   @Override
@@ -100,6 +76,17 @@ public class TileLayer extends Layer implements ITileLayer {
   @Override
   void finish(URL location) throws TmxException {
     super.finish(location);
+    this.tileList = new CopyOnWriteArrayList<>(this.getData());
+    this.tiles = new Tile[this.getHeight()][this.getWidth()];
+    for (int i = 0; i < this.getData().size(); i++) {
+      final int x = i % this.getWidth();
+      final int y = i / this.getWidth();
+
+      final Tile tile = this.getData().get(i);
+      tile.setTileCoordinate(new Point(x, y));
+      this.tileList.add(tile);
+      this.tiles[y][x] = tile;
+    }
     for (Tile tile : getData()) {
       tile.setTilesetEntry(this.getMap().getTilesetEntry(tile.getGridId()));
     }
