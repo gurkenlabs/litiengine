@@ -181,9 +181,9 @@ public class RenderComponent extends Canvas {
           consumer.accept(g);
         }
 
-        if (this.currentAlpha != -1) {
+        if (this.currentAlpha != Float.NaN) {
           final int visibleAlpha = MathUtilities.clamp(Math.round(255 * (1 - this.currentAlpha)), 0, 255);
-          g.setColor(new Color(this.getBackground().getRed(), this.getBackground().getGreen(), this.getBackground().getBlue(), visibleAlpha));
+          g.setColor(new Color(this.getBackground().getRGB() & 0xffffff | visibleAlpha << 24, true));
           g.fill(bounds);
         }
 
@@ -250,7 +250,7 @@ public class RenderComponent extends Canvas {
     if (this.fadeOutStart != -1) {
       final long timePassed = Game.time().since(this.fadeOutStart);
       this.currentAlpha = MathUtilities.clamp(1 - timePassed / (float) this.fadeOutTime, 0, 1);
-      if (this.currentAlpha == 0) {
+      if (this.currentAlpha == 0f) {
         this.fadeOutStart = -1;
         this.fadeOutTime = -1;
       }
@@ -261,10 +261,10 @@ public class RenderComponent extends Canvas {
     if (this.fadeInStart != -1) {
       final long timePassed = Game.time().since(this.fadeInStart);
       this.currentAlpha = MathUtilities.clamp(timePassed / (float) this.fadeInTime, 0, 1);
-      if (this.currentAlpha == 1) {
+      if (this.currentAlpha == 1f) {
         this.fadeInStart = -1;
         this.fadeInTime = -1;
-        this.currentAlpha = -1;
+        this.currentAlpha = Float.NaN;
       }
     }
   }

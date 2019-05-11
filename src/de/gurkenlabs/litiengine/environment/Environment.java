@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine.environment;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Shape;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -54,7 +55,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.graphics.AmbientLight;
 import de.gurkenlabs.litiengine.graphics.DebugRenderer;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
-import de.gurkenlabs.litiengine.graphics.RenderComponent;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.StaticShadowLayer;
 import de.gurkenlabs.litiengine.graphics.StaticShadowType;
@@ -62,7 +62,6 @@ import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
 import de.gurkenlabs.litiengine.physics.GravityForce;
 import de.gurkenlabs.litiengine.physics.IMovementController;
 import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.litiengine.util.TimeUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
@@ -833,11 +832,6 @@ public final class Environment implements IRenderable {
 
     if (this.getMap() != null) {
       Game.physics().setBounds(new Rectangle2D.Double(0, 0, this.getMap().getSizeInPixels().getWidth(), this.getMap().getSizeInPixels().getHeight()));
-      if (this.getMap().getBackgroundColor() != null) {
-        Game.window().getRenderComponent().setBackground(ColorHelper.premultiply(this.getMap().getBackgroundColor()));
-      }
-    } else {
-      Game.window().getRenderComponent().setBackground(Color.BLACK);
     }
 
     this.getEntities().stream().forEach(this::load);
@@ -1038,9 +1032,14 @@ public final class Environment implements IRenderable {
 
   @Override
   public void render(final Graphics2D g) {
-    g.scale(Game.world().camera().getRenderScale(), Game.world().camera().getRenderScale());
-
     long renderStart = System.nanoTime();
+
+    AffineTransform otx = g.getTransform();
+    g.scale(Game.world().camera().getRenderScale(), Game.world().camera().getRenderScale());
+    if (this.getMap() != null && this.getMap().getBackgroundColor() != null) {
+      g.setColor(this.getMap().getBackgroundColor());
+      g.fill(new Rectangle2D.Double(0.0, 0.0, Game.world().camera().getViewport().getWidth(), Game.world().camera().getViewport().getHeight()));
+    }
 
     this.render(g, RenderType.BACKGROUND);
 
@@ -1078,7 +1077,7 @@ public final class Environment implements IRenderable {
       Game.metrics().trackRenderTime("world", totalRenderTime);
     }
 
-    g.scale(1.0 / Game.world().camera().getRenderScale(), 1.0 / Game.world().camera().getRenderScale());
+    g.setTransform(otx);
   }
 
   public int getGravity() {
@@ -1134,10 +1133,6 @@ public final class Environment implements IRenderable {
     // unregister all updatable entities from the current environment
     for (final IEntity entity : this.getEntities()) {
       this.unload(entity);
-    }
-
-    if (Game.screens() != null && Game.window().getRenderComponent() != null && Game.hasStarted()) {
-      Game.window().getRenderComponent().setBackground(RenderComponent.DEFAULT_BACKGROUND_COLOR);
     }
 
     this.loaded = false;
