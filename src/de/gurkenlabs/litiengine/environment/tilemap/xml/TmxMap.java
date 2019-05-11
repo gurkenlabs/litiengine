@@ -38,7 +38,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
 import de.gurkenlabs.litiengine.environment.tilemap.RenderOrder;
 import de.gurkenlabs.litiengine.environment.tilemap.StaggerAxis;
 import de.gurkenlabs.litiengine.environment.tilemap.StaggerIndex;
-import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 @XmlRootElement(name = "map")
@@ -47,7 +46,8 @@ public final class TmxMap extends CustomPropertyProvider implements IMap, Compar
   public static final String FILE_EXTENSION = "tmx";
 
   private static final Logger log = Logger.getLogger(TmxMap.class.getName());
-  private static final int[] MAX_SUPPORTED_VERSION = { 1, 2 };
+  private static final int MAX_MAJOR = 1;
+  private static final int MAX_MINOR = 2;
 
   @XmlAttribute
   private double version;
@@ -471,7 +471,7 @@ public final class TmxMap extends CustomPropertyProvider implements IMap, Compar
   }
 
   @SuppressWarnings("unused")
-  private void afterUnmarshal(Unmarshaller u, Object parent) {
+  private void afterUnmarshal(Unmarshaller u, Object parent) throws TmxException {
     this.checkVersion();
 
     if (this.orientation != null) {
@@ -550,30 +550,29 @@ public final class TmxMap extends CustomPropertyProvider implements IMap, Compar
     return rawIndex;
   }
 
-  private void checkVersion() {
+  private void checkVersion() throws UnsupportedMapVersionException {
     if (this.tiledversion == null || this.tiledversion.isEmpty()) {
       log.log(Level.WARNING, "Tiled version not defined for map {0}. Could not evaluate whether the map format is supported by the engine.", new Object[] { this.getName() });
       return;
     }
 
-    String supportedVersionString = ArrayUtilities.join(MAX_SUPPORTED_VERSION, ".");
-    String[] ver = this.tiledversion.split("\\.");
-    int[] vNumbers = new int[ver.length];
+    String[] ver = this.tiledversion.split("\\.", 3);
+    int major, minor;
     try {
-      for (int i = 0; i < ver.length; i++) {
-        vNumbers[i] = Integer.parseInt(ver[i]);
-      }
+      major = Integer.parseInt(ver[0]);
+      minor = Integer.parseInt(ver[1]);
+      // we don't need to care about the patch version
     } catch (NumberFormatException e) {
-      log.log(Level.WARNING, "Unsupported Tiled version: {0} (Max. supported version is {1})", new Object[] { this.tiledversion, supportedVersionString });
+      throw new UnsupportedMapVersionException(this.tiledversion);
     }
 
-    for (int i = 0; i < Math.min(vNumbers.length, MAX_SUPPORTED_VERSION.length); i++) {
-      if (vNumbers[i] > MAX_SUPPORTED_VERSION[i]) {
-        log.log(Level.WARNING, "Unsupported Tiled version: {0} (Max. supported version is {1})", new Object[] { this.tiledversion, supportedVersionString });
-        break;
-      } else if (vNumbers[i] < MAX_SUPPORTED_VERSION[i]) {
-        break;
-      }
+    if (major > MAX_MAJOR) {
+      // incompatible API changes
+      throw new UnsupportedMapVersionException(this.tiledversion);
+    }
+
+    if (minor > MAX_MINOR) {
+      log.warning("Tiled version " + this.tiledversion + " is greater than what is supported. Some features may not work.");
     }
   }
 
