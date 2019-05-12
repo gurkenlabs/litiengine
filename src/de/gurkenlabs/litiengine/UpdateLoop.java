@@ -44,12 +44,12 @@ public class UpdateLoop extends Thread implements AutoCloseable, ILoop {
 
       final long start = System.nanoTime();
 
-      Lock lock = this.getLock();
-      lock.lock();
+      Lock theLock = this.getLock();
+      theLock.lock();
       try {
         this.process();
       } finally {
-        lock.unlock();
+        theLock.unlock();
       }
 
       // delay tick to meet the expected rate
