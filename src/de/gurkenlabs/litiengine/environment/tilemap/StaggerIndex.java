@@ -9,8 +9,4 @@ public enum StaggerIndex {
   ODD,
   @XmlEnumValue("even")
   EVEN;
-
-  public String value() {
-    return this.name().toLowerCase();
-  }
 }

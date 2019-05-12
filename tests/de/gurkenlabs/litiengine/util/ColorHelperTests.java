@@ -95,6 +95,7 @@ public class ColorHelperTests {
     assertEquals("#00ff00", greenEncoded);
     assertEquals("#0000ff", blueEncoded);
     assertEquals("#00000000", invisibleBlack);
+    assertNull(ColorHelper.encode(null));
   }
 
   @Test

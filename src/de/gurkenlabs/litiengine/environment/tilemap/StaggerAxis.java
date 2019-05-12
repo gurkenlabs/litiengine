@@ -9,8 +9,4 @@ public enum StaggerAxis {
   X,
   @XmlEnumValue("y")
   Y;
-
-  public String value() {
-    return this.name().toLowerCase();
-  }
 }
