@@ -9,6 +9,7 @@ import java.awt.Color;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URL;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,6 +20,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
 import de.gurkenlabs.litiengine.environment.tilemap.RenderOrder;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.util.io.URLAdapter;
 
 public class MapTests {
   @BeforeEach
@@ -154,5 +156,23 @@ public class MapTests {
     assertEquals(2, map.getTileLayers().size());
 
     assertEquals(1, map.getTileLayers().get(0).getTile(15, 24).getGridId());
+  }
+
+  @Test
+  public void testURLAdapter() {
+    // this test is only for the marshalling
+    // the unmarshalling is covered by other map tests
+
+    URL map = MapTests.class.getResource("test-map.tmx");
+    URL tileset = MapTests.class.getResource("res/external-tileset.tsx");
+    URL image1 = MapTests.class.getResource("tile.png");
+    URL image2 = MapTests.class.getResource("tiles-test.png");
+
+    URLAdapter ma = new URLAdapter(map);
+    URLAdapter ta = new URLAdapter(tileset);
+    assertEquals("#", ma.marshal(map));
+    assertEquals("tile.png", ma.marshal(image1));
+    assertEquals("res/external-tileset.tsx", ma.marshal(tileset));
+    assertEquals("../tiles-test.png", ta.marshal(image2));
   }
 }

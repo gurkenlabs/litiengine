@@ -1,8 +1,8 @@
 package de.gurkenlabs.litiengine.util.io;
 
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Objects;
 
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
@@ -50,16 +50,39 @@ public class URLAdapter extends XmlAdapter<String, URL> {
     return new URL(v);
   }
 
+  // TODO make a unit test for this
   @Override
-  public String marshal(URL v) throws URISyntaxException {
+  public String marshal(URL v) {
     if (v == null) {
       return null;
     }
 
-    if (this.base != null) {
-      return this.base.toURI().relativize(v.toURI()).toASCIIString();
+    if (this.base == null || !this.base.getProtocol().equals(v.getProtocol()) || !Objects.equals(this.base.getAuthority(), v.getAuthority())) {
+      return v.toExternalForm();
     }
-    return v.toExternalForm();
+    if (this.base.equals(v)) {
+      return "#";
+    }
+    if (this.base.getFile().equals(v.getFile())) {
+      return '#' + v.getRef();
+    }
+
+    String[] path1 = v.getFile().split("/");
+    String[] path2 = this.base.getFile().split("/");
+    int firstDiff = 0;
+    while (firstDiff < path1.length && firstDiff < path2.length && path1[firstDiff].equals(path2[firstDiff]))
+      firstDiff++;
+    if (firstDiff == 0) {
+      return v.getFile();
+    }
+    StringBuilder builder = new StringBuilder();
+    for (int i = path2.length - 1; i > firstDiff; i--)
+      builder.append("/..");
+    for (int i = firstDiff; i < path1.length; i++) {
+      builder.append('/');
+      builder.append(path1[i]);
+    }
+    return builder.substring(1);
   }
 
   /**

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" tiledversion="1.1.5" orientation="orthogonal" renderorder="right-down" width="20" height="25" tilewidth="16" tileheight="16" infinite="1" nextobjectid="1">
- <tileset firstgid="1" source="external-tileset.tsx"/>
+ <tileset firstgid="1" source="res/external-tileset.tsx"/>
  <layer name="Tile Layer 1" width="20" height="25">
   <data encoding="csv">
    <chunk x="-32" y="-32" width="16" height="16">
