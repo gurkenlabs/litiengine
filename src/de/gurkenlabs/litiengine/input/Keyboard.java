@@ -5,22 +5,23 @@ import java.awt.KeyboardFocusManager;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.AbstractMap;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.Game;
 
 public class Keyboard implements KeyEventDispatcher, IKeyboard {
-  private final List<KeyListener> keyListeners = new CopyOnWriteArrayList<>();
-  private final List<Map.Entry<Integer, Consumer<KeyEvent>>> keySpecificPressedConsumer = new CopyOnWriteArrayList<>();
-  private final List<Map.Entry<Integer, Consumer<KeyEvent>>> keySpecificReleasedConsumer = new CopyOnWriteArrayList<>();
-  private final List<Map.Entry<Integer, Consumer<KeyEvent>>> keySpecificTypedConsumer = new CopyOnWriteArrayList<>();
-  private final List<Consumer<KeyEvent>> keyPressedConsumer = new CopyOnWriteArrayList<>();
-  private final List<Consumer<KeyEvent>> keyReleasedConsumer = new CopyOnWriteArrayList<>();
-  private final List<Consumer<KeyEvent>> keyTypedConsumer = new CopyOnWriteArrayList<>();
+  private final Collection<KeyListener> keyListeners = ConcurrentHashMap.newKeySet();
+  private final Map<Integer, Collection<Consumer<KeyEvent>>> keySpecificPressedConsumer = new ConcurrentHashMap<>();
+  private final Map<Integer, Collection<Consumer<KeyEvent>>> keySpecificReleasedConsumer = new ConcurrentHashMap<>();
+  private final Map<Integer, Collection<Consumer<KeyEvent>>> keySpecificTypedConsumer = new ConcurrentHashMap<>();
+  private final Collection<Consumer<KeyEvent>> keyPressedConsumer = ConcurrentHashMap.newKeySet();
+  private final Collection<Consumer<KeyEvent>> keyReleasedConsumer = ConcurrentHashMap.newKeySet();
+  private final Collection<Consumer<KeyEvent>> keyTypedConsumer = ConcurrentHashMap.newKeySet();
 
   private final List<KeyEvent> pressedKeys = new CopyOnWriteArrayList<>();
   private final List<KeyEvent> releasedKeys = new CopyOnWriteArrayList<>();
@@ -89,17 +90,17 @@ public class Keyboard implements KeyEventDispatcher, IKeyboard {
 
   @Override
   public void onKeyPressed(final int keyCode, final Consumer<KeyEvent> consumer) {
-    this.keySpecificPressedConsumer.add(new AbstractMap.SimpleEntry<>(keyCode, consumer));
+    this.keySpecificPressedConsumer.computeIfAbsent(keyCode, ConcurrentHashMap::newKeySet).add(consumer);
   }
 
   @Override
   public void onKeyReleased(final int keyCode, final Consumer<KeyEvent> consumer) {
-    this.keySpecificReleasedConsumer.add(new AbstractMap.SimpleEntry<>(keyCode, consumer));
+    this.keySpecificReleasedConsumer.computeIfAbsent(keyCode, ConcurrentHashMap::newKeySet).add(consumer);
   }
 
   @Override
   public void onKeyTyped(final int keyCode, final Consumer<KeyEvent> consumer) {
-    this.keySpecificTypedConsumer.add(new AbstractMap.SimpleEntry<>(keyCode, consumer));
+    this.keySpecificTypedConsumer.computeIfAbsent(keyCode, ConcurrentHashMap::newKeySet).add(consumer);
   }
 
   @Override
@@ -186,11 +187,7 @@ public class Keyboard implements KeyEventDispatcher, IKeyboard {
   private void executePressedKeys() {
     // called at the rate of the updaterate
     this.pressedKeys.forEach(key -> {
-      this.keySpecificPressedConsumer.forEach(consumer -> {
-        if (consumer.getKey().intValue() == key.getKeyCode()) {
-          consumer.getValue().accept(key);
-        }
-      });
+      this.keySpecificPressedConsumer.get(key.getKeyCode()).forEach(consumer -> consumer.accept(key));
 
       this.keyPressedConsumer.forEach(consumer -> consumer.accept(key));
       this.keyListeners.forEach(listener -> listener.keyPressed(key));
@@ -202,11 +199,7 @@ public class Keyboard implements KeyEventDispatcher, IKeyboard {
    */
   private void executeReleasedKeys() {
     this.releasedKeys.forEach(key -> {
-      this.keySpecificReleasedConsumer.forEach(consumer -> {
-        if (consumer.getKey().intValue() == key.getKeyCode()) {
-          consumer.getValue().accept(key);
-        }
-      });
+      this.keySpecificReleasedConsumer.get(key.getKeyCode()).forEach(consumer -> consumer.accept(key));
 
       this.keyReleasedConsumer.forEach(consumer -> consumer.accept(key));
       this.keyListeners.forEach(listener -> listener.keyReleased(key));
@@ -220,11 +213,7 @@ public class Keyboard implements KeyEventDispatcher, IKeyboard {
    */
   private void executeTypedKeys() {
     this.typedKeys.forEach(key -> {
-      this.keySpecificTypedConsumer.forEach(consumer -> {
-        if (consumer.getKey().intValue() == key.getKeyCode()) {
-          consumer.getValue().accept(key);
-        }
-      });
+      this.keySpecificTypedConsumer.get(key.getKeyCode()).forEach(consumer -> consumer.accept(key));
 
       this.keyTypedConsumer.forEach(consumer -> consumer.accept(key));
       this.keyListeners.forEach(listener -> listener.keyTyped(key));
