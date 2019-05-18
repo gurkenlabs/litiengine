@@ -6,6 +6,7 @@ import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -187,7 +188,7 @@ public class Keyboard implements KeyEventDispatcher, IKeyboard {
   private void executePressedKeys() {
     // called at the rate of the updaterate
     this.pressedKeys.forEach(key -> {
-      this.keySpecificPressedConsumer.get(key.getKeyCode()).forEach(consumer -> consumer.accept(key));
+      this.keySpecificPressedConsumer.getOrDefault(key.getKeyCode(), Collections.emptySet()).forEach(consumer -> consumer.accept(key));
 
       this.keyPressedConsumer.forEach(consumer -> consumer.accept(key));
       this.keyListeners.forEach(listener -> listener.keyPressed(key));
@@ -199,7 +200,7 @@ public class Keyboard implements KeyEventDispatcher, IKeyboard {
    */
   private void executeReleasedKeys() {
     this.releasedKeys.forEach(key -> {
-      this.keySpecificReleasedConsumer.get(key.getKeyCode()).forEach(consumer -> consumer.accept(key));
+      this.keySpecificReleasedConsumer.getOrDefault(key.getKeyCode(), Collections.emptySet()).forEach(consumer -> consumer.accept(key));
 
       this.keyReleasedConsumer.forEach(consumer -> consumer.accept(key));
       this.keyListeners.forEach(listener -> listener.keyReleased(key));
@@ -213,7 +214,7 @@ public class Keyboard implements KeyEventDispatcher, IKeyboard {
    */
   private void executeTypedKeys() {
     this.typedKeys.forEach(key -> {
-      this.keySpecificTypedConsumer.get(key.getKeyCode()).forEach(consumer -> consumer.accept(key));
+      this.keySpecificTypedConsumer.getOrDefault(key.getKeyCode(), Collections.emptySet()).forEach(consumer -> consumer.accept(key));
 
       this.keyTypedConsumer.forEach(consumer -> consumer.accept(key));
       this.keyListeners.forEach(listener -> listener.keyTyped(key));
