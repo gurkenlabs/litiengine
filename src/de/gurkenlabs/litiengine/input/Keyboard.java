@@ -187,10 +187,12 @@ public class Keyboard implements KeyEventDispatcher, IKeyboard {
   private void executePressedKeys() {
     // called at the rate of the updaterate
     this.pressedKeys.forEach(key -> {
-      this.keySpecificPressedConsumer.get(key.getKeyCode()).forEach(consumer -> consumer.accept(key));
+      if (this.keySpecificPressedConsumer.get(key.getKeyCode()) != null) {
+        this.keySpecificPressedConsumer.get(key.getKeyCode()).forEach(consumer -> consumer.accept(key));
 
-      this.keyPressedConsumer.forEach(consumer -> consumer.accept(key));
-      this.keyListeners.forEach(listener -> listener.keyPressed(key));
+        this.keyPressedConsumer.forEach(consumer -> consumer.accept(key));
+        this.keyListeners.forEach(listener -> listener.keyPressed(key));
+      }
     });
   }
 
@@ -199,10 +201,12 @@ public class Keyboard implements KeyEventDispatcher, IKeyboard {
    */
   private void executeReleasedKeys() {
     this.releasedKeys.forEach(key -> {
-      this.keySpecificReleasedConsumer.get(key.getKeyCode()).forEach(consumer -> consumer.accept(key));
+      if (this.keySpecificReleasedConsumer.get(key.getKeyCode()) != null) {
+        this.keySpecificReleasedConsumer.get(key.getKeyCode()).forEach(consumer -> consumer.accept(key));
 
-      this.keyReleasedConsumer.forEach(consumer -> consumer.accept(key));
-      this.keyListeners.forEach(listener -> listener.keyReleased(key));
+        this.keyReleasedConsumer.forEach(consumer -> consumer.accept(key));
+        this.keyListeners.forEach(listener -> listener.keyReleased(key));
+      }
     });
 
     this.releasedKeys.clear();
@@ -213,10 +217,12 @@ public class Keyboard implements KeyEventDispatcher, IKeyboard {
    */
   private void executeTypedKeys() {
     this.typedKeys.forEach(key -> {
-      this.keySpecificTypedConsumer.get(key.getKeyCode()).forEach(consumer -> consumer.accept(key));
+      if (this.keySpecificTypedConsumer.get(key.getKeyCode()) != null) {
+        this.keySpecificTypedConsumer.get(key.getKeyCode()).forEach(consumer -> consumer.accept(key));
 
-      this.keyTypedConsumer.forEach(consumer -> consumer.accept(key));
-      this.keyListeners.forEach(listener -> listener.keyTyped(key));
+        this.keyTypedConsumer.forEach(consumer -> consumer.accept(key));
+        this.keyListeners.forEach(listener -> listener.keyTyped(key));
+      }
     });
 
     this.typedKeys.clear();
