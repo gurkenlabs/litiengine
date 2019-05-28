@@ -293,6 +293,18 @@ public abstract class ResourcesContainer<T> {
   }
 
   /**
+   * Eventually gets the resource with the specified location. The resource is loaded asynchronously and can be retrieved from the returned
+   * {@code Future} object returned by this method once loaded.
+   * 
+   * @param name
+   *          The name or location of the resource
+   * @return A {@code Future} object that can be used to retrieve the resource once it is finished loading
+   */
+  public Future<T> getAsync(String name) {
+    return this.getAsync(this.getIdentifier(name));
+  }
+
+  /**
    * Gets all loaded resources from this container.
    * 
    * @return All loaded resources.
