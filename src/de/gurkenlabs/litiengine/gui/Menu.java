@@ -2,7 +2,7 @@ package de.gurkenlabs.litiengine.gui;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Consumer;
+import java.util.function.IntConsumer;
 
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 
@@ -14,7 +14,7 @@ public class Menu extends ImageComponentList {
   private int currentSelection;
   /** The menu buttons. */
   private final String[] items;
-  private final List<Consumer<Integer>> selectionChangeConsumers;
+  private final List<IntConsumer> selectionChangeConsumers;
 
   public Menu(final double x, final double y, final double width, final double height, final String... items) {
     this(x, y, width, height, null, items);
@@ -30,7 +30,7 @@ public class Menu extends ImageComponentList {
     return this.currentSelection;
   }
 
-  public void onChange(final Consumer<Integer> cons) {
+  public void onChange(final IntConsumer cons) {
     this.selectionChangeConsumers.add(cons);
   }
 
