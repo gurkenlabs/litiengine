@@ -155,7 +155,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   @Override
   @XmlTransient
   public Spritesheet getSpritesheet() {
-    if (this.spriteSheet == null) {
+    if (this.spriteSheet == null && this.getImage() != null) {
       this.spriteSheet = Resources.spritesheets().get(this.getImage().getSource());
       if (this.spriteSheet == null) {
         this.spriteSheet = Resources.spritesheets().load(this);
