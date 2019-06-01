@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.sound;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.WeakHashMap;
@@ -24,7 +25,7 @@ public abstract class SoundPlayback implements Runnable {
 
   private final Collection<VolumeControl> volumeControls = Collections.synchronizedSet(Collections.newSetFromMap(new WeakHashMap<>()));
   private VolumeControl masterVolume;
-  private volatile float miscVolume = 1f;
+  private volatile AtomicInteger miscVolume = new AtomicInteger(0x3f800000); // floatToIntBits(1f)
 
   /**
    * An object for controlling the volume of an {@code AudioPlayback}. Each distinct instance represents an independent factor contributing to its
@@ -46,6 +47,9 @@ public abstract class SoundPlayback implements Runnable {
       if (value < 0f) {
         throw new IllegalArgumentException("negative volume");
       }
+      if (value < 0f) {
+        throw new IllegalArgumentException("negative volume");
+      }
       this.value = value;
       SoundPlayback.this.updateVolume();
     }
@@ -53,7 +57,7 @@ public abstract class SoundPlayback implements Runnable {
     @Override
     protected void finalize() {
       // clean up the instance without affecting the volume
-      SoundPlayback.this.miscVolume *= this.value;
+      SoundPlayback.this.miscVolume.accumulateAndGet(Float.floatToRawIntBits(this.value), (a, b) -> Float.floatToRawIntBits(Float.intBitsToFloat(a) * Float.intBitsToFloat(b)));
     }
   }
 
@@ -255,7 +259,7 @@ public abstract class SoundPlayback implements Runnable {
 
   void updateVolume() {
     synchronized (this.volumeControls) {
-      float volume = this.miscVolume;
+      float volume = Float.intBitsToFloat(this.miscVolume.get());
       for (VolumeControl control : this.volumeControls) {
         volume *= control.get();
       }
