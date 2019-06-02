@@ -22,6 +22,8 @@ import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
@@ -56,6 +58,8 @@ public final class LayerList extends JScrollPane implements LayerController {
   private final JButton buttonLiftLayer;
   private final JButton buttonLowerLayer;
   private final JButton buttonRenameLayer;
+
+  private boolean refreshing;
 
   public LayerList() {
     this.setName(Resources.strings().get("panel_mapObjectLayers").toUpperCase());
@@ -160,7 +164,7 @@ public final class LayerList extends JScrollPane implements LayerController {
       }
 
       map.removeLayer(selectedLayer);
-      map.addLayer(this.getAbsoluteIndex(map, selLayerIndex-2), selectedLayer);
+      map.addLayer(this.getAbsoluteIndex(map, selLayerIndex - 2), selectedLayer);
       this.list.setSelectedIndex(selLayerIndex - 1);
     });
 
@@ -175,13 +179,13 @@ public final class LayerList extends JScrollPane implements LayerController {
     this.layerButtonBox.add(Box.createHorizontalGlue());
 
     // TODO: enabled states for all commands
-
-    EditorScreen.instance().getMapComponent().onMapLoading(map -> {
-      if (map == null) {
+    this.list.addListSelectionListener(e -> {
+      IMap map = Game.world().environment().getMap();
+      if (map == null || EditorScreen.instance().getMapComponent().isLoading() || this.refreshing) {
         return;
       }
 
-      this.selectedLayers.put(map.getName(), this.list.getSelectedIndex());
+      selectedLayers.put(map.getName(), list.getSelectedIndex());
     });
 
     EditorScreen.instance().getMapComponent().onMapLoaded(map -> {
@@ -223,53 +227,58 @@ public final class LayerList extends JScrollPane implements LayerController {
   }
 
   public void refresh() {
-    IMap map = getCurrentMap();
-    if (map == null) {
-      this.layerModel.clear();
-      return;
-    }
-
-    this.layerModel.clear();
-
-    ArrayList<IMapObjectLayer> layers = new ArrayList<>(map.getMapObjectLayers());
-
-    // the first layer is the one which is rendered first and thereby
-    // technically below all other layers. Reversing the
-    // list for the UI reflects this
-    Collections.reverse(layers);
-    for (IMapObjectLayer layer : layers) {
-      String layerName = layer.getName();
-      int layerSize = layer.getMapObjects().size();
-      JCheckBox newBox = new JCheckBox(layerName + " (" + layerSize + ")");
-      newBox.setName(map.getName() + "/" + layerName);
-      Color layerColor = layer.getColor();
-      if (layerColor != null) {
-        final String cacheKey = map.getName() + layer.getName() + "#" + Integer.toHexString(layerColor.getRGB());
-
-        BufferedImage newIconImage = Resources.images().get(cacheKey, () -> {
-          BufferedImage img = Imaging.getCompatibleImage(10, 10);
-          Graphics2D g = (Graphics2D) img.getGraphics();
-          g.setColor(layer.getColor());
-          g.fillRect(0, 0, 9, 9);
-          g.setColor(Color.BLACK);
-          g.drawRect(0, 0, 9, 9);
-          g.dispose();
-          return img;
-        });
-
-        newBox.setIcon(new ImageIcon(newIconImage));
+    this.refreshing = true;
+    try {
+      IMap map = getCurrentMap();
+      if (map == null) {
+        this.layerModel.clear();
+        return;
       }
-      newBox.setSelected(layer.isVisible());
-      newBox.putClientProperty("layer", layer);
-      newBox.addItemListener(sel -> {
-        layer.setVisible(newBox.isSelected());
-        UndoManager.instance().recordChanges();
-      });
-      layerModel.addElement(newBox);
-    }
 
-    if (this.selectedLayers.containsKey(map.getName())) {
-      this.selectLayer(this.selectedLayers.get(map.getName()));
+      this.layerModel.clear();
+
+      ArrayList<IMapObjectLayer> layers = new ArrayList<>(map.getMapObjectLayers());
+
+      // the first layer is the one which is rendered first and thereby
+      // technically below all other layers. Reversing the
+      // list for the UI reflects this
+      Collections.reverse(layers);
+      for (IMapObjectLayer layer : layers) {
+        String layerName = layer.getName();
+        int layerSize = layer.getMapObjects().size();
+        JCheckBox newBox = new JCheckBox(layerName + " (" + layerSize + ")");
+        newBox.setName(map.getName() + "/" + layerName);
+        Color layerColor = layer.getColor();
+        if (layerColor != null) {
+          final String cacheKey = map.getName() + layer.getName() + "#" + Integer.toHexString(layerColor.getRGB());
+
+          BufferedImage newIconImage = Resources.images().get(cacheKey, () -> {
+            BufferedImage img = Imaging.getCompatibleImage(10, 10);
+            Graphics2D g = (Graphics2D) img.getGraphics();
+            g.setColor(layer.getColor());
+            g.fillRect(0, 0, 9, 9);
+            g.setColor(Color.BLACK);
+            g.drawRect(0, 0, 9, 9);
+            g.dispose();
+            return img;
+          });
+
+          newBox.setIcon(new ImageIcon(newIconImage));
+        }
+        newBox.setSelected(layer.isVisible());
+        newBox.putClientProperty("layer", layer);
+        newBox.addItemListener(sel -> {
+          layer.setVisible(newBox.isSelected());
+          UndoManager.instance().recordChanges();
+        });
+        layerModel.addElement(newBox);
+      }
+
+      if (this.selectedLayers.containsKey(map.getName())) {
+        this.selectLayer(this.selectedLayers.get(map.getName()));
+      }
+    } finally {
+      this.refreshing = false;
     }
   }
 
@@ -323,18 +332,18 @@ public final class LayerList extends JScrollPane implements LayerController {
     // -> first layer gets rendered first and thereby below all others
     return this.list.getModel().getSize() - 1 - this.list.getSelectedIndex();
   }
-  
+
   private int getAbsoluteIndex(IMap map, int index) {
-    if(map.getMapObjectLayers().size() <= 1) {
+    if (map.getMapObjectLayers().size() <= 1) {
       return 0;
     }
-    
+
     int mapObjectLayerIndex = 0;
     for (int i = 0; i < map.getRenderLayers().size(); i++) {
       if (mapObjectLayerIndex > index) {
         return i;
       }
-      
+
       if (IMapObjectLayer.class.isAssignableFrom(map.getRenderLayers().get(i).getClass())) {
         mapObjectLayerIndex++;
       }
