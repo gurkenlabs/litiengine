@@ -1183,7 +1183,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
       this.setTextX(defaultTextX);
     }
 
-    Object antialiasing = this.getAppearance().getTextAntialiasing();
+    boolean antialiasing = this.getAppearance().getTextAntialiasing();
     if (this.isHovered()) {
       antialiasing = this.getAppearanceHovered().getTextAntialiasing();
     }

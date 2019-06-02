@@ -21,12 +21,11 @@ public class Appearance {
   private float borderRadius;
   private boolean horizontalBackgroundGradient;
   private boolean transparentBackground;
-
-  private Object textAntialiasing;
+  private boolean textAntialiasing;
 
   public Appearance() {
     this.changedConsumer = new CopyOnWriteArrayList<>();
-    this.textAntialiasing = RenderingHints.VALUE_TEXT_ANTIALIAS_OFF;
+    this.textAntialiasing = false;
   }
 
   public Appearance(Color foreColor) {
@@ -49,8 +48,8 @@ public class Appearance {
     if (!(obj instanceof Appearance)) {
       return false;
     }
-    Appearance other = (Appearance)obj;
-    return this.textAntialiasing.equals(other.textAntialiasing)
+    Appearance other = (Appearance) obj;
+    return this.textAntialiasing == other.textAntialiasing
         && this.transparentBackground == other.transparentBackground
         && this.horizontalBackgroundGradient == other.horizontalBackgroundGradient
         && Float.floatToIntBits(this.borderRadius) == Float.floatToIntBits(other.borderRadius)
@@ -108,7 +107,7 @@ public class Appearance {
     return this.borderRadius;
   }
 
-  public Object getTextAntialiasing() {
+  public boolean getTextAntialiasing() {
     return this.textAntialiasing;
   }
 
@@ -163,7 +162,7 @@ public class Appearance {
    * @param antialiasing
    *          Either {@link RenderingHints#VALUE_TEXT_ANTIALIAS_ON} or {@link RenderingHints#VALUE_TEXT_ANTIALIAS_OFF}
    */
-  public void setTextAntialiasing(Object antialiasing) {
+  public void setTextAntialiasing(boolean antialiasing) {
     this.textAntialiasing = antialiasing;
   }
 

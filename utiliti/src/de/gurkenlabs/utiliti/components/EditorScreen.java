@@ -154,7 +154,7 @@ public class EditorScreen extends Screen {
     // render mouse/zoom and fps
     g.setFont(Style.FONT_DEFAULT);
     g.setColor(Color.WHITE);
-    TextRenderer.render(g, Game.metrics().getFramesPerSecond() + " FPS", 10, Game.window().getResolution().getHeight() - 20, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+    TextRenderer.render(g, Game.metrics().getFramesPerSecond() + " FPS", 10, Game.window().getResolution().getHeight() - 20, true);
 
     if (Game.time().now() % 4 == 0) {
       StatusBar.update();
@@ -177,7 +177,7 @@ public class EditorScreen extends Screen {
 
       Font old = g.getFont();
       g.setFont(g.getFont().deriveFont(20.0f));
-      TextRenderer.render(g, this.currentStatus, 10, Game.window().getResolution().getHeight() - 60, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+      TextRenderer.render(g, this.currentStatus, 10, Game.window().getResolution().getHeight() - 60, true);
       g.setFont(old);
     }
   }

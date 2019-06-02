@@ -87,7 +87,7 @@ public final class RenderEngine {
     double viewPortX = (float) viewPortLocation.getX() * Game.world().camera().getRenderScale();
     double yiewPortY = (float) viewPortLocation.getY() * Game.world().camera().getRenderScale();
 
-    TextRenderer.render(g, text, viewPortX, yiewPortY, antialias ? RenderingHints.VALUE_TEXT_ANTIALIAS_ON : RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+    TextRenderer.render(g, text, viewPortX, yiewPortY, antialias);
   }
 
   public static void renderText(final Graphics2D g, final String text, final double x, final double y) {

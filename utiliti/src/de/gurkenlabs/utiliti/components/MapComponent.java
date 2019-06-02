@@ -1854,7 +1854,7 @@ public class MapComponent extends GuiComponent implements IUpdateable {
     if (this.currentZoomIndex < DEFAULT_ZOOM_INDEX) {
       TextRenderer.render(g, id, x, y);
     } else {
-      TextRenderer.renderWithOutline(g, id, x, y, Style.COLOR_DARKBORDER, RenderingHints.VALUE_ANTIALIAS_ON);
+      TextRenderer.renderWithOutline(g, id, x, y, Style.COLOR_DARKBORDER, true);
     }
 
     g.setFont(previousFont);
