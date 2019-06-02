@@ -495,6 +495,7 @@ public class MapComponent extends GuiComponent implements IUpdateable {
       }
     } finally {
       UndoManager.instance().endOperation();
+      UI.getEntityController().refresh();
     }
   }
 
@@ -1853,7 +1854,7 @@ public class MapComponent extends GuiComponent implements IUpdateable {
     if (this.currentZoomIndex < DEFAULT_ZOOM_INDEX) {
       TextRenderer.render(g, id, x, y);
     } else {
-      TextRenderer.renderWithOutline(g, id, x, y, Style.COLOR_DARKBORDER, true);
+      TextRenderer.renderWithOutline(g, id, x, y, Style.COLOR_DARKBORDER, 5, true);
     }
 
     g.setFont(previousFont);
