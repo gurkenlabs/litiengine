@@ -14,7 +14,6 @@ LITIengine is the pure open-source java game engine for creating 2D PC games. Wr
 > Currently the LITIengine is being actively developed and therefore some parts of the framework are not final yet. Be aware that the engine API might change over the course of the next releases up until beta (v0.5.0-beta).
 Nonetheless, the LITIengine can of course already be used to make fully functioning **2D java games**.
 
-> :warning: We are aware that there is currently a **lack of documentation**, but for the mentioned reasons, we're planning to document the most important parts of the library and use-cases with the first beta release to ensure that features don't get deprecated before they're even used.
 ## Installation
 The library is distributed over the [Maven Central Repository](https://search.maven.org/artifact/de.gurkenlabs/litiengine/) and you can grab the necessary .jar-file(s) from there by using your favorite build automation tool or manually download the library.
 
@@ -42,6 +41,8 @@ compile 'de.gurkenlabs:litiengine:0.4.17'
 
 ## Documentation
 The [LITIengine documentation pages](https://docs.litiengine.com/) containing in-depth guides for LITIengine are currently in deployment. We're looking forward to your contributions!
+
+> :warning: We are aware that there is currently a **lack of documentation**, but we're planning to document the most important parts of the library and use-cases with the first beta release to ensure that features don't get deprecated before they're even used.
 
 ## Questions?
 Visit the official [LITIengine forum](https://forum.litiengine.com/) for troubleshooting or to learn about the LITIengine community. If you encounter bugs or want to request fancy new features, you can also open an issue in our [Issue Tracker](https://github.com/gurkenlabs/litiengine/issues).
