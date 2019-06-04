@@ -42,6 +42,13 @@ public interface ICollisionEntity extends IEntity {
   public double getCollisionBoxHeight();
 
   public double getCollisionBoxWidth();
+  
+  /**
+   * Gets the first collided entity.
+   * 
+   * @return the first collided entity; null otherwise
+   */
+  public ICollisionEntity getCollidedEntity();
 
   /**
    * Checks for collision.
@@ -67,4 +74,12 @@ public interface ICollisionEntity extends IEntity {
   public void setCollisionBoxValign(final Valign valign);
   
   public void setCollisionType(Collision collisionType);
+  
+  /**
+   * Sets the first collided entity
+   * 
+   * @param entity
+   *          the first collided entity
+   */
+  public void setCollidedEntity(ICollisionEntity entity);
 }

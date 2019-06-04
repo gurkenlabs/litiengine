@@ -36,6 +36,8 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
   private Collision collisionType;
 
   private Rectangle2D collisionBox;
+  
+  private ICollisionEntity collidedEntity;
 
   protected CollisionEntity() {
     super();
@@ -113,6 +115,14 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
   @Override
   public Collision getCollisionType() {
     return this.collisionType;
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ICollisionEntity getCollidedEntity() {
+    return this.collidedEntity;
   }
 
   /**
@@ -198,5 +208,13 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
     } else {
       this.collisionType = type;
     }
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setCollidedEntity(ICollisionEntity entity) {
+    this.collidedEntity = entity;
   }
 }
