@@ -2,6 +2,8 @@ package de.gurkenlabs.litiengine.entities;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.List;
 
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Game;
@@ -37,7 +39,7 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
 
   private Rectangle2D collisionBox;
   
-  private ICollisionEntity collidedEntity;
+  private List<ICollisionEntity> collidedEntities;
 
   protected CollisionEntity() {
     super();
@@ -49,6 +51,7 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
     this.align = info.align();
     this.collisionType = info.collisionType();
     this.collisionBox = this.getCollisionBox(this.getLocation());
+    this.collidedEntities = new ArrayList<ICollisionEntity> ();
   }
 
   public static Rectangle2D getCollisionBox(final Point2D location, final double entityWidth, final double entityHeight, final double collisionBoxWidth, final double collisionBoxHeight, final Align align, final Valign valign) {
@@ -121,8 +124,8 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
    * {@inheritDoc}
    */
   @Override
-  public ICollisionEntity getLastCollidedEntity() {
-    return this.collidedEntity;
+  public List<ICollisionEntity> getLastCollidedEntities() {
+    return this.collidedEntities;
   }
 
   /**
@@ -214,7 +217,7 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
    * {@inheritDoc}
    */
   @Override
-  public void setLastCollidedEntity(ICollisionEntity entity) {
-    this.collidedEntity = entity;
+  public void addCollidedEntities(ICollisionEntity entity) {
+    this.collidedEntities.add(entity);
   }
 }

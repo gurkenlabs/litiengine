@@ -415,21 +415,23 @@ public final class PhysicsEngine implements IUpdateable {
   }
 
   private boolean collides(final ICollisionEntity entity, Collision type, Predicate<ICollisionEntity> check) {
-    for (final ICollisionEntity otherEntity : this.getCollisionEntities(type)) {
-      if (!canCollide(entity, otherEntity)) {
-        continue;
-      }
+    boolean result = false;
 
-      if (check.test(otherEntity)) {
-        if (entity != null) {
-          entity.setLastCollidedEntity(otherEntity);
-          otherEntity.setLastCollidedEntity(entity);
+    if (entity != null) {
+      entity.getLastCollidedEntities().clear();
+      for (final ICollisionEntity otherEntity : this.getCollisionEntities(type)) {
+
+        if (canCollide(entity, otherEntity)  &&  check.test(otherEntity)) {
+          otherEntity.getLastCollidedEntities().clear();
+          otherEntity.addCollidedEntities(entity);
+          entity.addCollidedEntities(otherEntity);
+
+          result = true;
         }
-        return true;
       }
     }
 
-    return false;
+    return result;
   }
 
   /**

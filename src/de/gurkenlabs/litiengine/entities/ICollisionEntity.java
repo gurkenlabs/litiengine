@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.entities;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.List;
 
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Valign;
@@ -44,11 +45,11 @@ public interface ICollisionEntity extends IEntity {
   public double getCollisionBoxWidth();
   
   /**
-   * Gets the last collided entity.
+   * Gets a list of all last collided entities.
    * 
-   * @return the last collided entity; null otherwise
+   * @return a list of all last collided entities; null otherwise
    */
-  public ICollisionEntity getLastCollidedEntity();
+  public List<ICollisionEntity> getLastCollidedEntities();
 
   /**
    * Checks for collision.
@@ -76,10 +77,10 @@ public interface ICollisionEntity extends IEntity {
   public void setCollisionType(Collision collisionType);
   
   /**
-   * Sets the last collided entity
+   * Adds a collided entity at the end of a list of collided entities.
    * 
    * @param entity
-   *          the last collided entity
+   *          a collided entity
    */
-  public void setLastCollidedEntity(ICollisionEntity entity);
+  public void addCollidedEntities(ICollisionEntity entity);
 }
