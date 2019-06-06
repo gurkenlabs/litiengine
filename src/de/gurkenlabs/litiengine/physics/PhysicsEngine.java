@@ -422,8 +422,8 @@ public final class PhysicsEngine implements IUpdateable {
 
       if (check.test(otherEntity)) {
         if (entity != null) {
-          entity.setCollidedEntity(otherEntity);
-          otherEntity.setCollidedEntity(entity);
+          entity.setLastCollidedEntity(otherEntity);
+          otherEntity.setLastCollidedEntity(entity);
         }
         return true;
       }

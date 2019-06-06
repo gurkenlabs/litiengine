@@ -121,7 +121,7 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
    * {@inheritDoc}
    */
   @Override
-  public ICollisionEntity getCollidedEntity() {
+  public ICollisionEntity getLastCollidedEntity() {
     return this.collidedEntity;
   }
 
@@ -214,7 +214,7 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
    * {@inheritDoc}
    */
   @Override
-  public void setCollidedEntity(ICollisionEntity entity) {
+  public void setLastCollidedEntity(ICollisionEntity entity) {
     this.collidedEntity = entity;
   }
 }
