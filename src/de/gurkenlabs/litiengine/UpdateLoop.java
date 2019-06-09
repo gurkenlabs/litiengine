@@ -54,7 +54,12 @@ public class UpdateLoop extends Thread implements AutoCloseable, ILoop {
 
       // delay tick to meet the expected rate
       this.processTime = TimeUtilities.nanoToMs(System.nanoTime() - start);
-      double delay = this.delay();
+      double delay;
+      try {
+        delay = this.delay();
+      } catch (InterruptedException e) {
+        break;
+      }
       this.deltaTime = (long) (delay + this.processTime);
     }
   }
@@ -145,7 +150,7 @@ public class UpdateLoop extends Thread implements AutoCloseable, ILoop {
    * 
    * @return The delay for which this tick was paused after the actual processing.
    */
-  protected double delay() {
+  protected double delay() throws InterruptedException {
     double delay = Math.max(0, this.getExpectedDelta() - this.getProcessTime());
     long sleepDelay = Math.round(delay);
 
@@ -159,11 +164,7 @@ public class UpdateLoop extends Thread implements AutoCloseable, ILoop {
     }
 
     if (delay > 0) {
-      try {
-        sleep(sleepDelay);
-      } catch (final InterruptedException e) {
-        this.interrupt();
-      }
+      sleep(sleepDelay);
     }
 
     return delay;
