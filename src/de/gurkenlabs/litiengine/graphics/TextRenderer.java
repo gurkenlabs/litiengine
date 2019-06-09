@@ -217,6 +217,8 @@ public final class TextRenderer {
    *          the min y coordinate
    * @param outlineColor
    *          the outline color
+   * @param stroke
+   *          the width of the outline
    * @param antiAliasing
    *          the Anti-Aliasing object (e.g. RenderingHints.VALUE_TEXT_ANTIALIAS_OFF)
    * @see RenderingHints
