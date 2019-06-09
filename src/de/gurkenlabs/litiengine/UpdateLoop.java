@@ -149,6 +149,7 @@ public class UpdateLoop extends Thread implements AutoCloseable, ILoop {
    * It then delays the execution of this loop by pausing the thread for the necessary delay.
    * 
    * @return The delay for which this tick was paused after the actual processing.
+   * @throws InterruptedException If the thread was interrupted while sleeping
    */
   protected double delay() throws InterruptedException {
     double delay = Math.max(0, this.getExpectedDelta() - this.getProcessTime());
