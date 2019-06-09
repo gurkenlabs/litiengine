@@ -10,7 +10,6 @@ import java.awt.image.BufferedImage;
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.graphics.ImageRenderer;
 import de.gurkenlabs.litiengine.graphics.RenderType;
-import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
 
 public class MapRenderer {
@@ -114,19 +113,18 @@ public class MapRenderer {
   }
 
   protected static void renderImageLayer(Graphics2D g, IImageLayer layer, Rectangle2D viewport, float opacity) {
-    Spritesheet sprite = Resources.spritesheets().get(layer.getImage().getSource());
+    BufferedImage sprite = Resources.images().get(layer.getImage().getAbsoluteSourcePath());
     if (sprite == null) {
       return;
     }
 
     final Composite oldComp = g.getComposite();
-    final AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity);
-    g.setComposite(ac);
+    g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
 
     final double viewportOffsetX = layer.getOffset().x - viewport.getX();
     final double viewportOffsetY = layer.getOffset().y - viewport.getY();
 
-    ImageRenderer.render(g, sprite.getImage(), viewportOffsetX, viewportOffsetY);
+    ImageRenderer.render(g, sprite, viewportOffsetX, viewportOffsetY);
     g.setComposite(oldComp);
   }
 
