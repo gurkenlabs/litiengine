@@ -14,6 +14,7 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.components.EditorScreen;
+import de.gurkenlabs.utiliti.handlers.Zoom;
 import de.gurkenlabs.utiliti.swing.UI;
 import de.gurkenlabs.utiliti.swing.dialogs.GridEditPanel;
 
@@ -71,11 +72,11 @@ public final class ViewMenu extends JMenu {
 
     JMenuItem zoomIn = new JMenuItem(Resources.strings().get("menu_view_zoomIn"));
     zoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, Event.CTRL_MASK));
-    zoomIn.addActionListener(a -> EditorScreen.instance().getMapComponent().zoomIn());
+    zoomIn.addActionListener(a -> Zoom.in());
 
     JMenuItem zoomOut = new JMenuItem(Resources.strings().get("menu_view_zoomOut"));
     zoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, Event.CTRL_MASK));
-    zoomOut.addActionListener(a -> EditorScreen.instance().getMapComponent().zoomOut());
+    zoomOut.addActionListener(a -> Zoom.out());
 
     JMenuItem centerFocus = new JMenuItem(Resources.strings().get("menu_view_center"));
     centerFocus.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0));

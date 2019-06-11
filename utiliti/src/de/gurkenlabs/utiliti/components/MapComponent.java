@@ -75,6 +75,7 @@ import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.Style;
 import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.handlers.Snap;
+import de.gurkenlabs.utiliti.handlers.Zoom;
 import de.gurkenlabs.utiliti.handlers.Transform.ResizeAnchor;
 import de.gurkenlabs.utiliti.handlers.Transform.TransformType;
 import de.gurkenlabs.utiliti.swing.UI;
@@ -93,8 +94,6 @@ public class MapComponent extends GuiComponent implements IUpdateable {
   public static final int EDITMODE_MOVE = 2;
   private static final Logger log = Logger.getLogger(MapComponent.class.getName());
 
-  private static final float[] zooms = new float[] { 0.1f, 0.25f, 0.5f, 1, 1.5f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f, 16f, 32f, 50f, 80f, 100f };
-  private static final int DEFAULT_ZOOM_INDEX = 3;
   private static final String DEFAULT_MAPOBJECTLAYER_NAME = "default";
   private static final int TRANSFORM_RECT_SIZE = 6;
   private static final int BASE_SCROLL_SPEED = 50;
@@ -119,11 +118,9 @@ public class MapComponent extends GuiComponent implements IUpdateable {
   private TransformType currentTransform;
   private ResizeAnchor currentAnchor;
 
-  private int currentZoomIndex = 7;
-
   private final List<TmxMap> maps;
 
-  private float scrollSpeed = BASE_SCROLL_SPEED;
+  private double scrollSpeed = BASE_SCROLL_SPEED;
 
   private Point2D startPoint;
   private Point2D dragPoint;
@@ -162,10 +159,6 @@ public class MapComponent extends GuiComponent implements IUpdateable {
     this.transformRects = new ConcurrentHashMap<>();
     this.dragLocationMapObjects = new ConcurrentHashMap<>();
     this.screen = screen;
-    Game.world().camera().onZoomChanged(zoom -> {
-      this.currentTransformRectSize = TRANSFORM_RECT_SIZE / zoom;
-      this.updateTransformControls();
-    });
 
     UndoManager.onUndoStackChanged(e -> this.updateTransformControls());
   }
@@ -287,7 +280,13 @@ public class MapComponent extends GuiComponent implements IUpdateable {
 
   @Override
   public void prepare() {
-    Game.world().camera().setZoom(zooms[this.currentZoomIndex], 0);
+    Game.world().camera().onZoomChanged(zoom -> {
+      this.currentTransformRectSize = TRANSFORM_RECT_SIZE / zoom;
+      this.updateTransformControls();
+      this.scrollSpeed = BASE_SCROLL_SPEED / zoom;
+    });
+
+    Zoom.apply();
     if (!this.initialized) {
       Game.window().getRenderComponent().addFocusListener(new FocusAdapter() {
         @Override
@@ -827,24 +826,6 @@ public class MapComponent extends GuiComponent implements IUpdateable {
     });
   }
 
-  public void zoomIn() {
-    if (this.currentZoomIndex < zooms.length - 1) {
-      this.currentZoomIndex++;
-    }
-
-    this.setCurrentZoom();
-    this.updateScrollSpeed();
-  }
-
-  public void zoomOut() {
-    if (this.currentZoomIndex > 0) {
-      this.currentZoomIndex--;
-    }
-
-    this.setCurrentZoom();
-    this.updateScrollSpeed();
-  }
-
   public void reassignIds(IMap map, int startID) {
     int maxMapId = startID;
     UndoManager.instance().beginOperation();
@@ -882,10 +863,6 @@ public class MapComponent extends GuiComponent implements IUpdateable {
   @Override
   protected boolean mouseEventShouldBeForwarded(final MouseEvent e) {
     return this.isForwardMouseEvents() && this.isVisible() && this.isEnabled() && !this.isSuspended() && e != null;
-  }
-
-  private void updateScrollSpeed() {
-    this.scrollSpeed = BASE_SCROLL_SPEED / zooms[this.currentZoomIndex];
   }
 
   private static boolean mapIsNull() {
@@ -1209,10 +1186,6 @@ public class MapComponent extends GuiComponent implements IUpdateable {
     }
   }
 
-  private void setCurrentZoom() {
-    Game.world().camera().setZoom(zooms[this.currentZoomIndex], 0);
-  }
-
   private void setCopyBlueprint(Blueprint copyTarget) {
     this.copiedBlueprint = copyTarget;
     for (Consumer<Blueprint> consumer : this.copyTargetChangedConsumer) {
@@ -1346,9 +1319,9 @@ public class MapComponent extends GuiComponent implements IUpdateable {
 
     if (Input.keyboard().isPressed(KeyEvent.VK_ALT)) {
       if (e.getEvent().getWheelRotation() < 0) {
-        this.zoomIn();
+        Zoom.in();
       } else {
-        this.zoomOut();
+        Zoom.out();
       }
 
       return;
@@ -1812,7 +1785,7 @@ public class MapComponent extends GuiComponent implements IUpdateable {
 
       RenderEngine.renderOutline(g, focus, stroke);
 
-      Stroke whiteStroke = new BasicStroke(1 / Game.world().camera().getRenderScale(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER, 4, new float[] { 1f, 1f }, Game.time().now() / 15 - 1f);
+      Stroke whiteStroke = new BasicStroke(1 / Game.world().camera().getRenderScale(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER, 4, new float[] { 1f, 1f }, Game.time().now() / 15.0f - 1f);
       g.setColor(Color.WHITE);
       RenderEngine.renderOutline(g, focus, whiteStroke);
 
@@ -1840,7 +1813,7 @@ public class MapComponent extends GuiComponent implements IUpdateable {
 
     Font previousFont = g.getFont();
     Font idFont = previousFont.deriveFont(Math.max(8f, (float) (10 * Math.sqrt(Game.world().camera().getRenderScale()))));
-    if (this.currentZoomIndex > DEFAULT_ZOOM_INDEX) {
+    if (Zoom.get() > 1) {
       idFont = idFont.deriveFont(Font.BOLD);
     }
 
@@ -1853,7 +1826,7 @@ public class MapComponent extends GuiComponent implements IUpdateable {
     double x = loc.getX() * Game.world().camera().getRenderScale() - g.getFontMetrics().stringWidth(id) / 2.0;
     double y = loc.getY() * Game.world().camera().getRenderScale() - (g.getFontMetrics().getHeight() * .30);
 
-    if (this.currentZoomIndex < DEFAULT_ZOOM_INDEX) {
+    if (Zoom.get() < 1) {
       TextRenderer.render(g, id, x, y);
     } else {
       TextRenderer.renderWithOutline(g, id, x, y, Style.COLOR_DARKBORDER, 5, true);
