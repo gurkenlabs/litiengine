@@ -233,7 +233,7 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   @Override
   @XmlTransient
   public void setHeight(float height) {
-    this.height = height;
+    this.height = Math.max(height, 0);
   }
 
   @Override
@@ -262,7 +262,7 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   @Override
   @XmlTransient
   public void setWidth(float width) {
-    this.width = width;
+    this.width = Math.max(width, 0);
   }
 
   @Override
