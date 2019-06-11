@@ -8,6 +8,10 @@ public class Zoom {
   private static int currentZoomIndex = DEFAULT_ZOOM_INDEX;
 
   public static void apply() {
+    if (Game.world() == null || Game.world().camera() == null) {
+      return;
+    }
+
     Game.world().camera().setZoom(get(), 0);
   }
 
@@ -26,8 +30,20 @@ public class Zoom {
 
     apply();
   }
-
+  
   public static float get() {
     return zooms[currentZoomIndex];
+  }
+
+  public static float getMax() {
+    return zooms[zooms.length - 1];
+  }
+  
+  public static float getMin() {
+    return zooms[0];
+  }
+  
+  public static float getDefault() {
+    return zooms[DEFAULT_ZOOM_INDEX];
   }
 }

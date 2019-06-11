@@ -34,6 +34,7 @@ import de.gurkenlabs.litiengine.util.Imaging;
 import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.components.EditorScreen;
 import de.gurkenlabs.utiliti.components.LayerController;
+import de.gurkenlabs.utiliti.handlers.Transform;
 import de.gurkenlabs.utiliti.swing.Icons;
 import de.gurkenlabs.utiliti.swing.JCheckBoxList;
 
@@ -88,7 +89,7 @@ public final class LayerList extends JScrollPane implements LayerController {
       }
 
       this.list.setSelectedIndex(selIndex);
-      EditorScreen.instance().getMapComponent().updateTransformControls();
+      Transform.updateAnchors();
     }, false);
 
     this.buttonRemoveLayer = createButton(Icons.DELETE, (map, selectedLayer) -> {
@@ -104,7 +105,7 @@ public final class LayerList extends JScrollPane implements LayerController {
       EditorScreen.instance().getMapComponent().delete(selectedLayer);
       map.removeLayer(selectedLayer);
       layerModel.remove(this.getCurrentLayerIndex());
-      EditorScreen.instance().getMapComponent().updateTransformControls();
+      Transform.updateAnchors();
     });
 
     this.buttonDuplicateLayer = createButton(Icons.COPYX16, (map, selectedLayer) -> {
@@ -141,7 +142,7 @@ public final class LayerList extends JScrollPane implements LayerController {
         }
       }
 
-      EditorScreen.instance().getMapComponent().updateTransformControls();
+      Transform.updateAnchors();
     }, true);
 
     this.buttonLiftLayer = createButton(Icons.LIFT, (map, selectedLayer) -> {

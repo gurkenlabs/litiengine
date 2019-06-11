@@ -26,8 +26,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.Program;
-import de.gurkenlabs.utiliti.components.EditorScreen;
 import de.gurkenlabs.utiliti.components.PropertyInspector;
+import de.gurkenlabs.utiliti.handlers.Transform;
 import de.gurkenlabs.utiliti.swing.TagPanel;
 import de.gurkenlabs.utiliti.swing.UI;
 
@@ -326,22 +326,22 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.spinnerX.addChangeListener(new MapObjectPropertyChangeListener(m -> {
 
       m.setX(getSpinnerValue(spinnerX));
-      EditorScreen.instance().getMapComponent().updateTransformControls();
+      Transform.updateAnchors();
     }));
 
     this.spinnerY.addChangeListener(new MapObjectPropertyChangeListener(m -> {
       m.setY(getSpinnerValue(spinnerY));
-      EditorScreen.instance().getMapComponent().updateTransformControls();
+      Transform.updateAnchors();
     }));
 
     this.spinnerWidth.addChangeListener(new MapObjectPropertyChangeListener(m -> {
       m.setWidth(getSpinnerValue(spinnerWidth));
-      EditorScreen.instance().getMapComponent().updateTransformControls();
+      Transform.updateAnchors();
     }));
 
     this.spinnerHeight.addChangeListener(new MapObjectPropertyChangeListener(m -> {
       m.setHeight(getSpinnerValue(spinnerHeight));
-      EditorScreen.instance().getMapComponent().updateTransformControls();
+      Transform.updateAnchors();
     }));
 
     this.tagPanel.addActionListener(new MapObjectPropertyActionListener(m -> m.setValue(MapObjectProperty.TAGS, this.tagPanel.getTagsString())));
