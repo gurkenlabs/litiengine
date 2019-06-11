@@ -59,7 +59,7 @@ public final class UI {
   private static MapList mapSelectionPanel;
   private static LayerList mapLayerList;
   private static EntityList entityList;
-  
+
   private static boolean initialized;
 
   private UI() {
@@ -99,7 +99,7 @@ public final class UI {
 
   public static boolean showRevertWarning() {
     int n = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), Resources.strings().get("hud_revertChangesMessage"), Resources.strings().get("hud_revertChanges"), JOptionPane.YES_NO_OPTION);
-    return n != JOptionPane.CANCEL_OPTION && n != JOptionPane.CLOSED_OPTION;
+    return n == JOptionPane.YES_OPTION;
   }
 
   public static synchronized void init() {
@@ -119,7 +119,7 @@ public final class UI {
 
     initialized = true;
   }
-  
+
   public static PropertyInspector getInspector() {
     return mapObjectPanel;
   }
@@ -131,7 +131,7 @@ public final class UI {
   public static EntityController getEntityController() {
     return entityList;
   }
-  
+
   public static Controller getAssetController() {
     return assetComponent;
   }
@@ -139,7 +139,7 @@ public final class UI {
   public static MapController getMapController() {
     return mapSelectionPanel;
   }
-  
+
   private static void setupInterface() {
     JFrame window = initWindow();
 
@@ -218,7 +218,7 @@ public final class UI {
 
   private static Component initRightSplitPanel() {
     mapSelectionPanel = new MapList();
-    
+
     mapLayerList = new LayerList();
     entityList = new EntityList();
     JTabbedPane tabPane = new JTabbedPane();
@@ -226,18 +226,18 @@ public final class UI {
     tabPane.add(mapLayerList);
     tabPane.setMaximumSize(new Dimension(0, 150));
 
-    JSplitPane topRightSplitPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT); 
+    JSplitPane topRightSplitPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
     topRightSplitPanel.setContinuousLayout(true);
     topRightSplitPanel.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> Program.preferences().setMapPanelSplitter(topRightSplitPanel.getDividerLocation()));
     if (Program.preferences().getMapPanelSplitter() != 0) {
       topRightSplitPanel.setDividerLocation(Program.preferences().getMapPanelSplitter());
     }
-    
+
     topRightSplitPanel.setLeftComponent(mapSelectionPanel);
     topRightSplitPanel.setRightComponent(tabPane);
-    
+
     mapObjectPanel = new MapObjectInspector();
-    
+
     JSplitPane rightSplitPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
     rightSplitPanel.setMinimumSize(new Dimension(300, 0));
     rightSplitPanel.setBottomComponent(mapObjectPanel);

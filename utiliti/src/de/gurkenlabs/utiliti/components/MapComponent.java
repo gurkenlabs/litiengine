@@ -74,17 +74,22 @@ import de.gurkenlabs.utiliti.Cursors;
 import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.Style;
 import de.gurkenlabs.utiliti.UndoManager;
+import de.gurkenlabs.utiliti.handlers.Snap;
+import de.gurkenlabs.utiliti.handlers.Transform.ResizeAnchor;
+import de.gurkenlabs.utiliti.handlers.Transform.TransformType;
 import de.gurkenlabs.utiliti.swing.UI;
 import de.gurkenlabs.utiliti.swing.dialogs.XmlExportDialog;
 import de.gurkenlabs.utiliti.swing.dialogs.XmlImportDialog;
 
 public class MapComponent extends GuiComponent implements IUpdateable {
-  public enum TransformType {
-    UP, DOWN, LEFT, RIGHT, UPLEFT, UPRIGHT, DOWNLEFT, DOWNRIGHT, NONE, MOVE
-  }
 
   public static final int EDITMODE_CREATE = 0;
   public static final int EDITMODE_EDIT = 1;
+
+  /**
+   * @deprecated Will be replaced by {@link TransformType#MOVE}
+   */
+  @Deprecated()
   public static final int EDITMODE_MOVE = 2;
   private static final Logger log = Logger.getLogger(MapComponent.class.getName());
 
@@ -95,7 +100,7 @@ public class MapComponent extends GuiComponent implements IUpdateable {
   private static final int BASE_SCROLL_SPEED = 50;
 
   private double currentTransformRectSize = TRANSFORM_RECT_SIZE;
-  private final java.util.Map<TransformType, Rectangle2D> transformRects;
+  private final java.util.Map<ResizeAnchor, Rectangle2D> transformRects;
 
   private final List<IntConsumer> editModeChangedConsumer;
   private final List<Consumer<IMapObject>> focusChangedConsumer;
@@ -112,6 +117,7 @@ public class MapComponent extends GuiComponent implements IUpdateable {
 
   private int currentEditMode = EDITMODE_EDIT;
   private TransformType currentTransform;
+  private ResizeAnchor currentAnchor;
 
   private int currentZoomIndex = 7;
 
@@ -379,6 +385,19 @@ public class MapComponent extends GuiComponent implements IUpdateable {
     this.setEditMode(EDITMODE_MOVE);
   }
 
+  public void add(IMapObject mapObject, IMapObjectLayer layer) {
+    if (layer == null || mapObject == null) {
+      return;
+    }
+
+    layer.addMapObject(mapObject);
+    Game.world().environment().loadFromMap(mapObject.getId());
+
+    Game.window().getRenderComponent().requestFocus();
+    this.setFocus(mapObject, false);
+    this.setEditMode(EDITMODE_EDIT);
+  }
+
   public void delete(IMapObjectLayer layer) {
     if (layer == null) {
       return;
@@ -400,19 +419,6 @@ public class MapComponent extends GuiComponent implements IUpdateable {
     if (shadow) {
       Game.world().environment().updateLighting();
     }
-  }
-
-  public void add(IMapObject mapObject, IMapObjectLayer layer) {
-    if (layer == null || mapObject == null) {
-      return;
-    }
-
-    layer.addMapObject(mapObject);
-    Game.world().environment().loadFromMap(mapObject.getId());
-
-    Game.window().getRenderComponent().requestFocus();
-    this.setFocus(mapObject, false);
-    this.setEditMode(EDITMODE_EDIT);
   }
 
   public void copy() {
@@ -672,11 +678,7 @@ public class MapComponent extends GuiComponent implements IUpdateable {
       return;
     }
 
-    for (TransformType trans : TransformType.values()) {
-      if (trans == TransformType.NONE || trans == TransformType.MOVE) {
-        continue;
-      }
-
+    for (ResizeAnchor trans : ResizeAnchor.values()) {
       Rectangle2D transRect = new Rectangle2D.Double(this.getTransX(trans, focus), this.getTransY(trans, focus), this.currentTransformRectSize, this.currentTransformRectSize);
       this.transformRects.put(trans, transRect);
     }
@@ -942,10 +944,18 @@ public class MapComponent extends GuiComponent implements IUpdateable {
     double maxY = Math.max(start.getY(), endPoint.getY());
 
     if (snap) {
-      minX = snapX(minX);
-      maxX = snapX(maxX);
-      minY = snapY(minY);
-      maxY = snapY(maxY);
+      minX = Snap.x(minX);
+      maxX = Snap.x(maxX);
+      minY = Snap.y(minY);
+      maxY = Snap.y(maxY);
+    }
+
+    final IMap map = Game.world().environment().getMap();
+    if (map != null && Program.preferences().clampToMap()) {
+      minX = MathUtilities.clamp(minX, 0, map.getSizeInPixels().width);
+      maxX = MathUtilities.clamp(maxX, 0, map.getSizeInPixels().width);
+      minY = MathUtilities.clamp(minY, 0, map.getSizeInPixels().height);
+      maxY = MathUtilities.clamp(maxY, 0, map.getSizeInPixels().height);
     }
 
     double width = Math.abs(minX - maxX);
@@ -963,7 +973,7 @@ public class MapComponent extends GuiComponent implements IUpdateable {
     return focusedObject.getBoundingBox();
   }
 
-  private double getTransX(TransformType type, Rectangle2D focus) {
+  private double getTransX(ResizeAnchor type, Rectangle2D focus) {
     switch (type) {
     case DOWN:
     case UP:
@@ -981,7 +991,7 @@ public class MapComponent extends GuiComponent implements IUpdateable {
     }
   }
 
-  private double getTransY(TransformType type, Rectangle2D focus) {
+  private double getTransY(ResizeAnchor type, Rectangle2D focus) {
     switch (type) {
     case DOWN:
     case DOWNLEFT:
@@ -1001,7 +1011,7 @@ public class MapComponent extends GuiComponent implements IUpdateable {
 
   private void handleTransform() {
     final IMapObject transformObject = this.getFocusedMapObject();
-    if (transformObject == null || this.currentEditMode != EDITMODE_EDIT || currentTransform == TransformType.NONE || this.currentTransform == TransformType.MOVE) {
+    if (transformObject == null || this.currentEditMode != EDITMODE_EDIT || currentTransform != TransformType.RESIZE || this.currentAnchor == null) {
       return;
     }
 
@@ -1018,10 +1028,10 @@ public class MapComponent extends GuiComponent implements IUpdateable {
     double deltaY = Input.mouse().getMapLocation().getY() - this.dragPoint.getY();
     double newWidth = this.dragSizeWidth;
     double newHeight = this.dragSizeHeight;
-    double newX = snapX(dragLocationMapObject.getX());
-    double newY = snapY(dragLocationMapObject.getY());
+    double newX = dragLocationMapObject.getX();
+    double newY = dragLocationMapObject.getY();
 
-    switch (this.currentTransform) {
+    switch (this.currentAnchor) {
     case DOWN:
       newHeight += deltaY;
       break;
@@ -1066,10 +1076,25 @@ public class MapComponent extends GuiComponent implements IUpdateable {
       return;
     }
 
-    transformObject.setWidth(snapX(newWidth));
-    transformObject.setHeight(snapY(newHeight));
-    transformObject.setX(snapX(newX));
-    transformObject.setY(snapY(newY));
+    newX = Snap.x(newX);
+    newY = Snap.y(newY);
+    newWidth = Snap.x(newWidth);
+    newHeight = Snap.y(newHeight);
+
+    final IMap map = Game.world().environment().getMap();
+    if (map != null && Program.preferences().clampToMap()) {
+      newX = MathUtilities.clamp(newX, 0, map.getSizeInPixels().width);
+      newY = MathUtilities.clamp(newX, 0, map.getSizeInPixels().height);
+
+      newWidth = MathUtilities.clamp(newWidth, 0, map.getSizeInPixels().width - newX);
+      newHeight = MathUtilities.clamp(newHeight, 0, map.getSizeInPixels().height - newY);
+    }
+
+    transformObject.setWidth((float) newWidth);
+    transformObject.setHeight((float) newHeight);
+
+    transformObject.setX((float) newX);
+    transformObject.setY((float) newY);
 
     Game.world().environment().reloadFromMap(transformObject.getId());
     MapObjectType type = MapObjectType.get(transformObject.getType());
@@ -1128,11 +1153,11 @@ public class MapComponent extends GuiComponent implements IUpdateable {
     Point2D dragLocationMapObjectMinY = this.dragLocationMapObjects.get(minY);
 
     double deltaX = Input.mouse().getMapLocation().getX() - this.dragPoint.getX();
-    float newX = snapX(dragLocationMapObjectMinX.getX() + deltaX);
+    float newX = Snap.x(dragLocationMapObjectMinX.getX() + deltaX);
     float snappedDeltaX = newX - minX.getX();
 
     double deltaY = Input.mouse().getMapLocation().getY() - this.dragPoint.getY();
-    float newY = snapY(dragLocationMapObjectMinY.getY() + deltaY);
+    float newY = Snap.y(dragLocationMapObjectMinY.getY() + deltaY);
     float snappedDeltaY = newY - minY.getY();
 
     if (snappedDeltaX == 0 && snappedDeltaY == 0) {
@@ -1155,10 +1180,19 @@ public class MapComponent extends GuiComponent implements IUpdateable {
   }
 
   private void handleEntityDrag(float snappedDeltaX, float snappedDeltaY) {
+    final IMap map = Game.world().environment().getMap();
+
     for (IMapObject selected : this.getSelectedMapObjects()) {
 
-      selected.setX(selected.getX() + snappedDeltaX);
-      selected.setY(selected.getY() + snappedDeltaY);
+      float newX = selected.getX() + snappedDeltaX;
+      float newY = selected.getY() + snappedDeltaY;
+      if (Program.preferences().clampToMap()) {
+        newX = MathUtilities.clamp(newX, 0, map.getSizeInPixels().width - selected.getWidth());
+        newY = MathUtilities.clamp(newY, 0, map.getSizeInPixels().height - selected.getHeight());
+      }
+
+      selected.setX(newX);
+      selected.setY(newY);
 
       IEntity entity = Game.world().environment().get(selected.getId());
       if (entity != null) {
@@ -1345,22 +1379,25 @@ public class MapComponent extends GuiComponent implements IUpdateable {
   private void handleMouseMoved(ComponentMouseEvent e) {
     boolean hovered = false;
     if (this.getFocus() != null) {
-      for (Entry<TransformType, Rectangle2D> entry : this.transformRects.entrySet()) {
+      this.currentAnchor = null;
+
+      for (Entry<ResizeAnchor, Rectangle2D> entry : this.transformRects.entrySet()) {
         Rectangle2D rect = entry.getValue();
-        Rectangle2D hoverrect = new Rectangle2D.Double(rect.getX() - rect.getWidth() * 3, rect.getY() - rect.getHeight() * 3, rect.getWidth() * 5, rect.getHeight() * 5);
+        Rectangle2D hoverrect = new Rectangle2D.Double(rect.getX() - rect.getWidth() * 2.5, rect.getY() - rect.getHeight() * 2.5, rect.getWidth() * 5, rect.getHeight() * 5);
         if (hoverrect.contains(Input.mouse().getMapLocation())) {
           hovered = true;
-          if (entry.getKey() == TransformType.DOWN || entry.getKey() == TransformType.UP) {
+          if (entry.getKey() == ResizeAnchor.DOWN || entry.getKey() == ResizeAnchor.UP) {
             Game.window().getRenderComponent().setCursor(Cursors.TRANS_VERTICAL, 0, 0);
-          } else if (entry.getKey() == TransformType.UPLEFT || entry.getKey() == TransformType.DOWNRIGHT) {
+          } else if (entry.getKey() == ResizeAnchor.UPLEFT || entry.getKey() == ResizeAnchor.DOWNRIGHT) {
             Game.window().getRenderComponent().setCursor(Cursors.TRANS_DIAGONAL_LEFT, 0, 0);
-          } else if (entry.getKey() == TransformType.UPRIGHT || entry.getKey() == TransformType.DOWNLEFT) {
+          } else if (entry.getKey() == ResizeAnchor.UPRIGHT || entry.getKey() == ResizeAnchor.DOWNLEFT) {
             Game.window().getRenderComponent().setCursor(Cursors.TRANS_DIAGONAL_RIGHT, 0, 0);
           } else {
             Game.window().getRenderComponent().setCursor(Cursors.TRANS_HORIZONTAL, 0, 0);
           }
 
-          this.currentTransform = entry.getKey();
+          this.currentAnchor = entry.getKey();
+          this.currentTransform = TransformType.RESIZE;
           break;
         }
       }
@@ -1403,7 +1440,7 @@ public class MapComponent extends GuiComponent implements IUpdateable {
       }
       break;
     case EDITMODE_EDIT:
-      if (this.isMoving || (this.currentTransform != TransformType.NONE && this.currentTransform != TransformType.MOVE) || SwingUtilities.isRightMouseButton(e.getEvent())) {
+      if (this.isMoving || this.currentTransform == TransformType.RESIZE || SwingUtilities.isRightMouseButton(e.getEvent())) {
         return;
       }
 
@@ -1432,7 +1469,7 @@ public class MapComponent extends GuiComponent implements IUpdateable {
 
       break;
     case EDITMODE_EDIT:
-      if (this.currentTransform != TransformType.NONE && this.currentTransform != TransformType.MOVE) {
+      if (this.currentTransform == TransformType.RESIZE) {
         if (!this.isTransforming) {
           this.isTransforming = true;
           UndoManager.instance().mapObjectChanging(this.getFocusedMapObject());
@@ -1566,41 +1603,6 @@ public class MapComponent extends GuiComponent implements IUpdateable {
       this.setSelection(Collections.emptyList(), true);
       UI.getInspector().bind(null);
     }
-  }
-
-  private static float snapX(double x) {
-    if (Program.preferences().isSnapGrid()) {
-      final IMap map = Game.world().environment().getMap();
-      if (map == null) {
-        return (float) x;
-      }
-      double snapped = ((int) (x / map.getTileSize().width) * map.getTileSize().width);
-      return (int) Math.round(Math.min(Math.max(snapped, 0), Game.world().environment().getMap().getSizeInPixels().getWidth()));
-    }
-
-    if (Program.preferences().isSnapPixels()) {
-      return MathUtilities.clamp((int) Math.round(x), 0, (int) Game.world().environment().getMap().getSizeInPixels().getWidth());
-    }
-
-    return MathUtilities.round((float) x, 2);
-  }
-
-  private static float snapY(double y) {
-    if (Program.preferences().isSnapGrid()) {
-      final IMap map = Game.world().environment().getMap();
-      if (map == null) {
-        return (float) y;
-      }
-
-      int snapped = (int) (y / map.getTileSize().height) * map.getTileSize().height;
-      return (int) Math.round(Math.min(Math.max(snapped, 0), Game.world().environment().getMap().getSizeInPixels().getHeight()));
-    }
-
-    if (Program.preferences().isSnapPixels()) {
-      return MathUtilities.clamp((int) Math.round(y), 0, (int) Game.world().environment().getMap().getSizeInPixels().getHeight());
-    }
-
-    return MathUtilities.round((float) y, 2);
   }
 
   private boolean hasFocus() {

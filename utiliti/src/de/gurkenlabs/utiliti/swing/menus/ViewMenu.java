@@ -24,16 +24,16 @@ public final class ViewMenu extends JMenu {
     this.setMnemonic('V');
 
     JCheckBoxMenuItem snapToPixels = new JCheckBoxMenuItem(Resources.strings().get("menu_view_snapPixels"));
-    snapToPixels.setState(Program.preferences().isSnapPixels());
+    snapToPixels.setState(Program.preferences().snapToPixels());
     snapToPixels.addItemListener(e -> {
-      Program.preferences().setSnapPixels(snapToPixels.getState());
+      Program.preferences().setSnapToPixels(snapToPixels.getState());
       UI.getInspector().refresh();
       UI.getInspector().bind(EditorScreen.instance().getMapComponent().getFocusedMapObject());
     });
 
     JCheckBoxMenuItem snapToGrid = new JCheckBoxMenuItem(Resources.strings().get("menu_view_snapGrid"));
-    snapToGrid.setState(Program.preferences().isSnapGrid());
-    snapToGrid.addItemListener(e -> Program.preferences().setSnapGrid(snapToGrid.getState()));
+    snapToGrid.setState(Program.preferences().snapToGrid());
+    snapToGrid.addItemListener(e -> Program.preferences().setSnapToGrid(snapToGrid.getState()));
 
     JCheckBoxMenuItem renderGrid = new JCheckBoxMenuItem(Resources.strings().get("menu_view_renderGrid"));
     renderGrid.setState(Program.preferences().isShowGrid());

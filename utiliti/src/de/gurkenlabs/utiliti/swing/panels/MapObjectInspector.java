@@ -151,7 +151,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
   }
 
   public void updateSpinnerModels() {
-    if (Program.preferences().isSnapPixels()) {
+    if (Program.preferences().snapToPixels()) {
       this.updateSpinnerModels(MapObjectInspector::getIntegerModel);
     } else {
       this.updateSpinnerModels(MapObjectInspector::getFloatModel);
