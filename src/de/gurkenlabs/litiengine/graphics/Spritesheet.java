@@ -167,7 +167,7 @@ public final class Spritesheet {
   }
 
   public void setSpriteHeight(final int spriteHeight) {
-    this.checkHeight(spriteWidth);
+    this.checkHeight(spriteHeight);
 
     this.spriteHeight = spriteHeight;
     this.updateRowsAndCols();
