@@ -11,9 +11,8 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.TextRenderer;
-import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.Style;
-import de.gurkenlabs.utiliti.components.EditorScreen;
+import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.handlers.Zoom;
 
 public class SelectionRenderer implements IEditorRenderer {
@@ -30,10 +29,10 @@ public class SelectionRenderer implements IEditorRenderer {
   public void render(Graphics2D g) {
     this.updateSelectionColor();
 
-    for (IMapObject mapObject : EditorScreen.instance().getMapComponent().getSelectedMapObjects()) {
+    for (IMapObject mapObject : Editor.instance().getMapComponent().getSelectedMapObjects()) {
       renderObjectId(g, mapObject);
 
-      if (mapObject.equals(EditorScreen.instance().getMapComponent().getFocusedMapObject())) {
+      if (mapObject.equals(Editor.instance().getMapComponent().getFocusedMapObject())) {
         continue;
       }
 
@@ -61,7 +60,7 @@ public class SelectionRenderer implements IEditorRenderer {
   }
 
   private void renderObjectId(Graphics2D g, IMapObject mapObject) {
-    if (!Program.preferences().isRenderMapIds()) {
+    if (!Editor.preferences().renderMapIds()) {
       return;
     }
 

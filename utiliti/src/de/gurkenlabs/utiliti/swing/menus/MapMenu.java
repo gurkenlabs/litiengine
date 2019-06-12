@@ -17,9 +17,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ColorHelper;
-import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.UndoManager;
-import de.gurkenlabs.utiliti.components.EditorScreen;
+import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.swing.UI;
 import de.gurkenlabs.utiliti.swing.dialogs.MapPropertyPanel;
 
@@ -32,14 +31,14 @@ public final class MapMenu extends JMenu {
     this.setMnemonic('M');
 
     JMenuItem imp = new JMenuItem(Resources.strings().get("menu_map_import"));
-    imp.addActionListener(a -> EditorScreen.instance().getMapComponent().importMap());
+    imp.addActionListener(a -> Editor.instance().getMapComponent().importMap());
 
     JMenuItem exp = new JMenuItem(Resources.strings().get("menu_map_export"));
-    exp.addActionListener(a -> EditorScreen.instance().getMapComponent().exportMap());
+    exp.addActionListener(a -> Editor.instance().getMapComponent().exportMap());
 
     JMenuItem saveMapSnapshot = new JMenuItem(Resources.strings().get("menu_map_snapshot"));
     saveMapSnapshot.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_PRINTSCREEN, Event.SHIFT_MASK));
-    saveMapSnapshot.addActionListener(a -> EditorScreen.instance().saveMapSnapshot());
+    saveMapSnapshot.addActionListener(a -> Editor.instance().saveMapSnapshot());
 
     JMenuItem reassignIDs = new JMenuItem(Resources.strings().get("menu_map_reassignMapIds"));
     reassignIDs.addActionListener(a -> {
@@ -50,7 +49,7 @@ public final class MapMenu extends JMenu {
         }
 
         int minID = Integer.parseInt(min);
-        EditorScreen.instance().getMapComponent().reassignIds(UI.getMapController().getCurrentMap(), minID);
+        Editor.instance().getMapComponent().reassignIds(UI.getMapController().getCurrentMap(), minID);
       } catch (Exception e) {
         log.log(Level.SEVERE, "No parseable Integer found upon reading the min Map ID input. Try again.");
       }
@@ -58,11 +57,11 @@ public final class MapMenu extends JMenu {
     });
 
     JMenuItem del2 = new JMenuItem(Resources.strings().get("menu_map_delete"));
-    del2.addActionListener(a -> EditorScreen.instance().getMapComponent().deleteMap());
+    del2.addActionListener(a -> Editor.instance().getMapComponent().deleteMap());
 
     JMenuItem mapProps = new JMenuItem(Resources.strings().get("menu_map_properties"));
     mapProps.addActionListener(a -> {
-      if (EditorScreen.instance().getMapComponent().getMaps() == null || EditorScreen.instance().getMapComponent().getMaps().isEmpty()) {
+      if (Editor.instance().getMapComponent().getMaps() == null || Editor.instance().getMapComponent().getMaps().isEmpty()) {
         return;
       }
 
@@ -84,14 +83,14 @@ public final class MapMenu extends JMenu {
         }
 
         UndoManager.instance().recordChanges();
-        EditorScreen.instance().getMapComponent().loadMaps(EditorScreen.instance().getGameFile().getMaps());
-        EditorScreen.instance().getMapComponent().loadEnvironment((TmxMap) Game.world().environment().getMap());
+        Editor.instance().getMapComponent().loadMaps(Editor.instance().getGameFile().getMaps());
+        Editor.instance().getMapComponent().loadEnvironment((TmxMap) Game.world().environment().getMap());
       }
     });
 
     JCheckBoxMenuItem sync = new JCheckBoxMenuItem(Resources.strings().get("menu_map_syncMaps"));
-    sync.setState(Program.preferences().isSyncMaps());
-    sync.addItemListener(e -> Program.preferences().setSyncMaps(sync.getState()));
+    sync.setState(Editor.preferences().syncMaps());
+    sync.addItemListener(e -> Editor.preferences().setSyncMaps(sync.getState()));
 
     this.add(imp);
     this.add(exp);
@@ -104,6 +103,6 @@ public final class MapMenu extends JMenu {
     this.add(mapProps);
 
     this.setEnabled(false);
-    EditorScreen.instance().onLoaded(() -> this.setEnabled(EditorScreen.instance().getProjectPath() != null));
+    Editor.instance().onLoaded(() -> this.setEnabled(Editor.instance().getProjectPath() != null));
   }
 }

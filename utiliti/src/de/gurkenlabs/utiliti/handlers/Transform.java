@@ -11,7 +11,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import de.gurkenlabs.utiliti.Cursors;
-import de.gurkenlabs.utiliti.components.EditorScreen;
+import de.gurkenlabs.utiliti.components.Editor;
 
 public class Transform {
 
@@ -74,7 +74,7 @@ public class Transform {
 
     // if no anchor is hovered, check if we can apply a move transform
     if (anchor == null) {
-      for (IMapObject selected : EditorScreen.instance().getMapComponent().getSelectedMapObjects()) {
+      for (IMapObject selected : Editor.instance().getMapComponent().getSelectedMapObjects()) {
         if (selected.getBoundingBox().contains(Input.mouse().getMapLocation())) {
           Game.window().getRenderComponent().setCursor(Cursors.MOVE, 0, 0);
           type = TransformType.MOVE;
@@ -90,7 +90,7 @@ public class Transform {
 
   public static void updateAnchors() {
     transformRectSize = Zoom.get() < Zoom.getDefault() ? TRANSFORM_RECT_SIZE : TRANSFORM_RECT_SIZE / (Math.sqrt(Zoom.get() * 1.25));
-    final Rectangle2D focus = EditorScreen.instance().getMapComponent().getFocusBounds();
+    final Rectangle2D focus = Editor.instance().getMapComponent().getFocusBounds();
     if (focus == null) {
       resizeAnchors.clear();
       return;

@@ -3,7 +3,7 @@ package de.gurkenlabs.utiliti.handlers;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.util.MathUtilities;
-import de.gurkenlabs.utiliti.Program;
+import de.gurkenlabs.utiliti.components.Editor;
 
 public class Snap {
   private static final int DEFAULT_PRECISION = 2;
@@ -12,7 +12,7 @@ public class Snap {
     final IMap map = Game.world() != null && Game.world().environment() != null ? Game.world().environment().getMap() : null;
     int gridSize = map != null ? map.getTileSize().width : 1;
 
-    return x(x, gridSize, Program.preferences().snapToGrid(), Program.preferences().snapToPixels());
+    return x(x, gridSize, Editor.preferences().snapToGrid(), Editor.preferences().snapToPixels());
   }
 
   protected static float x(double x, int gridSize, boolean snapToGrid, boolean snapToPixel) {
@@ -23,7 +23,7 @@ public class Snap {
     final IMap map = Game.world() != null && Game.world().environment() != null ? Game.world().environment().getMap() : null;
     int gridSize = map != null ? map.getTileSize().height : 1;
 
-    return y(y, gridSize, Program.preferences().snapToGrid(), Program.preferences().snapToPixels());
+    return y(y, gridSize, Editor.preferences().snapToGrid(), Editor.preferences().snapToPixels());
   }
 
   protected static float y(double y, int gridSize, boolean snapToGrid, boolean snapToPixel) {

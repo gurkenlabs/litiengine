@@ -25,7 +25,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.utiliti.Program;
+import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.components.PropertyInspector;
 import de.gurkenlabs.utiliti.handlers.Transform;
 import de.gurkenlabs.utiliti.swing.TagPanel;
@@ -151,7 +151,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
   }
 
   public void updateSpinnerModels() {
-    if (Program.preferences().snapToPixels()) {
+    if (Editor.preferences().snapToPixels()) {
       this.updateSpinnerModels(MapObjectInspector::getIntegerModel);
     } else {
       this.updateSpinnerModels(MapObjectInspector::getFloatModel);

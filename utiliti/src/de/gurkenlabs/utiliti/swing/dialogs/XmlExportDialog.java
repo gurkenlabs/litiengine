@@ -13,7 +13,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
-import de.gurkenlabs.utiliti.components.EditorScreen;
+import de.gurkenlabs.utiliti.components.Editor;
 
 public final class XmlExportDialog {
   private static final Logger log = Logger.getLogger(XmlExportDialog.class.getName());
@@ -33,7 +33,7 @@ public final class XmlExportDialog {
   public static <T> void export(T object, String name, String filename, String extension, Consumer<String> consumer) {
     JFileChooser chooser;
     try {
-      String source = EditorScreen.instance().getProjectPath();
+      String source = Editor.instance().getProjectPath();
       chooser = new JFileChooser(source != null ? source : new File(".").getCanonicalPath());
       chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
       chooser.setDialogType(JFileChooser.SAVE_DIALOG);

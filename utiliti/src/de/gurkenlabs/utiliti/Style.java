@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.utiliti.components.Editor;
 
 public final class Style {
   public static final Color COLOR_DEFAULT_BOUNDING_BOX_FILL = new Color(0, 0, 0, 35);
@@ -41,7 +42,7 @@ public final class Style {
 
   public static Font getDefaultFont() {
     if (scaledDefaultFont == null) {
-      scaledDefaultFont = FONT_DEFAULT.deriveFont(FONT_DEFAULT_SIZE * Program.preferences().getUiScale());
+      scaledDefaultFont = FONT_DEFAULT.deriveFont(FONT_DEFAULT_SIZE * Editor.preferences().getUiScale());
     }
 
     return scaledDefaultFont;

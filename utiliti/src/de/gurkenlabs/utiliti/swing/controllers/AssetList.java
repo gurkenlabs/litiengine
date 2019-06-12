@@ -8,9 +8,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 
 import de.gurkenlabs.litiengine.graphics.ImageFormat;
-import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.components.Controller;
-import de.gurkenlabs.utiliti.components.EditorScreen;
+import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.swing.AssetPanel;
 import de.gurkenlabs.utiliti.swing.AssetTree;
 import de.gurkenlabs.utiliti.swing.FileDrop;
@@ -37,22 +36,22 @@ public class AssetList extends JSplitPane implements Controller {
       }
 
       if (!droppedImages.isEmpty()) {
-        EditorScreen.instance().importSpriteSheets(droppedImages.toArray(new File[droppedImages.size()]));
+        Editor.instance().importSpriteSheets(droppedImages.toArray(new File[droppedImages.size()]));
       }
     });
 
     JScrollPane scrollPane = new JScrollPane(assetPanel);
 
-    this.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> Program.preferences().setAssetsSplitter(this.getDividerLocation()));
-    this.setDividerLocation(Program.preferences().getMainSplitterPosition() != 0 ? Program.preferences().getAssetsSplitter() : 200);
+    this.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> Editor.preferences().setAssetsSplitter(this.getDividerLocation()));
+    this.setDividerLocation(Editor.preferences().getMainSplitterPosition() != 0 ? Editor.preferences().getAssetsSplitter() : 200);
 
     this.setRightComponent(scrollPane);
   }
-  
+
   public AssetTree getAssetTree() {
     return this.assetTree;
   }
-  
+
   public void refresh() {
     this.assetTree.forceUpdate();
   }

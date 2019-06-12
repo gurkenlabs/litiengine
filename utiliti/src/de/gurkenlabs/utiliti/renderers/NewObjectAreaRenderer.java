@@ -7,7 +7,7 @@ import java.awt.geom.Rectangle2D;
 
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.utiliti.Style;
-import de.gurkenlabs.utiliti.components.EditorScreen;
+import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.components.MapComponent;
 
 public class NewObjectAreaRenderer extends MouseSelectAreaRenderer {
@@ -23,8 +23,8 @@ public class NewObjectAreaRenderer extends MouseSelectAreaRenderer {
 
   @Override
   public void render(Graphics2D g) {
-    final Rectangle2D rect = EditorScreen.instance().getMapComponent().getMouseSelectArea(true);
-    if (rect == null || EditorScreen.instance().getMapComponent().getEditMode() != MapComponent.EDITMODE_CREATE) {
+    final Rectangle2D rect = Editor.instance().getMapComponent().getMouseSelectArea(true);
+    if (rect == null || Editor.instance().getMapComponent().getEditMode() != MapComponent.EDITMODE_CREATE) {
       return;
     }
 

@@ -23,8 +23,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.util.ColorHelper;
-import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.Style;
+import de.gurkenlabs.utiliti.components.Editor;
 
 public class MapObjectsRenderer implements IEditorRenderer {
   @Override
@@ -34,7 +34,7 @@ public class MapObjectsRenderer implements IEditorRenderer {
 
   @Override
   public void render(Graphics2D g) {
-    if (!Program.preferences().isRenderBoundingBoxes()) {
+    if (!Editor.preferences().renderBoundingBoxes()) {
       return;
     }
 
@@ -57,7 +57,7 @@ public class MapObjectsRenderer implements IEditorRenderer {
         MapObjectType type = MapObjectType.get(mapObject.getType());
         final BasicStroke shapeStroke = new BasicStroke(1f / Game.world().camera().getRenderScale());
         if (type == null) {
-          if (Program.preferences().isRenderCustomMapObjects()) {
+          if (Editor.preferences().renderCustomMapObjects()) {
             renderUnsupportedMapObject(g, mapObject, shapeStroke);
           }
 
@@ -184,7 +184,7 @@ public class MapObjectsRenderer implements IEditorRenderer {
 
     RenderEngine.renderOutline(g, mapObject.getBoundingBox(), shapeStroke);
 
-    if (Program.preferences().isRenderNames()) {
+    if (Editor.preferences().renderNames()) {
       renderName(g, mapObject);
     }
   }

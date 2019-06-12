@@ -32,7 +32,7 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.litiengine.util.Imaging;
 import de.gurkenlabs.utiliti.UndoManager;
-import de.gurkenlabs.utiliti.components.EditorScreen;
+import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.components.LayerController;
 import de.gurkenlabs.utiliti.handlers.Transform;
 import de.gurkenlabs.utiliti.swing.Icons;
@@ -102,7 +102,7 @@ public final class LayerList extends JScrollPane implements LayerController {
         return;
       }
 
-      EditorScreen.instance().getMapComponent().delete(selectedLayer);
+      Editor.instance().getMapComponent().delete(selectedLayer);
       map.removeLayer(selectedLayer);
       layerModel.remove(this.getCurrentLayerIndex());
       Transform.updateAnchors();
@@ -112,7 +112,7 @@ public final class LayerList extends JScrollPane implements LayerController {
       IMapObjectLayer copiedLayer = new MapObjectLayer((MapObjectLayer) selectedLayer);
       map.addLayer(this.getAbsoluteIndex(map, this.getCurrentLayerIndex()), copiedLayer);
       this.refresh();
-      EditorScreen.instance().getMapComponent().add(copiedLayer);
+      Editor.instance().getMapComponent().add(copiedLayer);
     });
 
     this.buttonSetColor = createButton(Icons.COLORX16, (map, selectedLayer) -> {
@@ -180,14 +180,14 @@ public final class LayerList extends JScrollPane implements LayerController {
     // TODO: enabled states for all commands
     this.list.addListSelectionListener(e -> {
       IMap map = Game.world().environment().getMap();
-      if (map == null || EditorScreen.instance().getMapComponent().isLoading() || this.refreshing) {
+      if (map == null || Editor.instance().getMapComponent().isLoading() || this.refreshing) {
         return;
       }
 
       selectedLayers.put(map.getName(), list.getSelectedIndex());
     });
 
-    EditorScreen.instance().getMapComponent().onMapLoaded(map -> {
+    Editor.instance().getMapComponent().onMapLoaded(map -> {
       if (this.selectedLayers.containsKey(map.getName())) {
         this.selectLayer(this.selectedLayers.get(map.getName()));
       }
@@ -201,7 +201,7 @@ public final class LayerList extends JScrollPane implements LayerController {
         return null;
       }
 
-      IMapObject focus = EditorScreen.instance().getMapComponent().getFocusedMapObject();
+      IMapObject focus = Editor.instance().getMapComponent().getFocusedMapObject();
       if (focus != null) {
         return focus.getLayer();
       }

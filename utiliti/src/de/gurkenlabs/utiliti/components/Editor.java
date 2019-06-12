@@ -57,9 +57,9 @@ import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import de.gurkenlabs.litiengine.util.io.ImageSerializer;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 import de.gurkenlabs.utiliti.Cursors;
-import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.Style;
 import de.gurkenlabs.utiliti.UndoManager;
+import de.gurkenlabs.utiliti.UserPreferences;
 import de.gurkenlabs.utiliti.swing.StatusBar;
 import de.gurkenlabs.utiliti.swing.Tray;
 import de.gurkenlabs.utiliti.swing.UI;
@@ -68,8 +68,8 @@ import de.gurkenlabs.utiliti.swing.dialogs.EditorFileChooser;
 import de.gurkenlabs.utiliti.swing.dialogs.SpritesheetImportPanel;
 import de.gurkenlabs.utiliti.swing.dialogs.XmlImportDialog;
 
-public class EditorScreen extends Screen {
-  private static final Logger log = Logger.getLogger(EditorScreen.class.getName());
+public class Editor extends Screen {
+  private static final Logger log = Logger.getLogger(Editor.class.getName());
   private static final int STATUS_DURATION = 5000;
   private static final String DEFAULT_GAME_NAME = "game";
   private static final String NEW_GAME_STRING = "NEW GAME *";
@@ -80,7 +80,8 @@ public class EditorScreen extends Screen {
   private static final String SPRITESHEET_FILE_NAME = "Spritesheet Image";
   private static final String TEXTUREATLAS_FILE_NAME = "Texture Atlas XML (generic)";
 
-  private static EditorScreen instance;
+  private static Editor instance;
+  private static UserPreferences preferences;
 
   private final List<Runnable> loadedCallbacks;
 
@@ -94,22 +95,29 @@ public class EditorScreen extends Screen {
   private String currentStatus;
   private boolean loading;
 
-  private EditorScreen() {
+  private Editor() {
     super("Editor");
     this.loadedCallbacks = new CopyOnWriteArrayList<>();
   }
 
-  public static EditorScreen instance() {
-    if (instance != null) {
-      return instance;
+  public static Editor instance() {
+    if (instance == null) {
+      instance = new Editor();
     }
 
-    instance = new EditorScreen();
     return instance;
   }
 
   public boolean fileLoaded() {
     return this.currentResourceFile != null;
+  }
+
+  public static UserPreferences preferences() {
+    if (preferences == null) {
+      preferences = new UserPreferences();
+    }
+
+    return preferences;
   }
 
   @Override
@@ -668,16 +676,16 @@ public class EditorScreen extends Screen {
   }
 
   private String saveGameFile(String target) {
-    String saveFile = this.getGameFile().save(target, Program.preferences().isCompressFile());
+    String saveFile = this.getGameFile().save(target, preferences().compressFile());
     this.currentResourceFile = saveFile;
-    Program.preferences().setLastGameFile(this.currentResourceFile);
-    Program.preferences().addOpenedFile(this.currentResourceFile);
+    preferences().setLastGameFile(this.currentResourceFile);
+    preferences().addOpenedFile(this.currentResourceFile);
     this.gamefileLoaded();
     log.log(Level.INFO, "saved {0} maps, {1} spritesheets, {2} tilesets, {3} emitters, {4} blueprints, {5} sounds to {6}",
         new Object[] { this.getGameFile().getMaps().size(), this.getGameFile().getSpriteSheets().size(), this.getGameFile().getTilesets().size(), this.getGameFile().getEmitters().size(), this.getGameFile().getBluePrints().size(), this.getGameFile().getSounds().size(), this.currentResourceFile });
     this.setCurrentStatus(Resources.strings().get("status_gamefile_saved"));
 
-    if (Program.preferences().isSyncMaps()) {
+    if (preferences().syncMaps()) {
       this.saveMaps();
     }
 
@@ -761,8 +769,8 @@ public class EditorScreen extends Screen {
   }
 
   private void gamefileLoaded() {
-    Program.preferences().setLastGameFile(this.currentResourceFile);
-    Program.preferences().addOpenedFile(this.currentResourceFile);
+    preferences().setLastGameFile(this.currentResourceFile);
+    preferences().addOpenedFile(this.currentResourceFile);
     for (Runnable callback : this.loadedCallbacks) {
       callback.run();
     }

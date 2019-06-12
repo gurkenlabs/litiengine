@@ -54,7 +54,6 @@ import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import de.gurkenlabs.litiengine.util.io.ImageSerializer;
 import de.gurkenlabs.utiliti.Cursors;
-import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.handlers.Snap;
 import de.gurkenlabs.utiliti.handlers.Transform;
@@ -116,7 +115,7 @@ public class MapComponent extends GuiComponent {
   private boolean initialized;
 
   public MapComponent() {
-    super(0, EditorScreen.instance().getPadding(), Game.window().getResolution().getWidth(), Game.window().getResolution().getHeight() - Game.window().getResolution().getHeight() * 1 / 15);
+    super(0, Editor.instance().getPadding(), Game.window().getResolution().getWidth(), Game.window().getResolution().getHeight() - Game.window().getResolution().getHeight() * 1 / 15);
     this.editModeChangedConsumer = new CopyOnWriteArrayList<>();
     this.focusChangedConsumer = new CopyOnWriteArrayList<>();
     this.selectionChangedConsumer = new CopyOnWriteArrayList<>();
@@ -504,7 +503,7 @@ public class MapComponent extends GuiComponent {
 
     Blueprint blueprint = new Blueprint(name.toString(), this.getSelectedMapObjects().toArray(new MapObject[this.getSelectedMapObjects().size()]));
 
-    EditorScreen.instance().getGameFile().getBluePrints().add(blueprint);
+    Editor.instance().getGameFile().getBluePrints().add(blueprint);
   }
 
   public void centerCameraOnFocus() {
@@ -654,7 +653,7 @@ public class MapComponent extends GuiComponent {
       this.loadEnvironment(null);
     }
 
-    EditorScreen.instance().updateGameFileMaps();
+    Editor.instance().updateGameFileMaps();
   }
 
   public void importMap() {
@@ -697,20 +696,20 @@ public class MapComponent extends GuiComponent {
         }
 
         Spritesheet sprite = Resources.spritesheets().load(img, imageLayer.getImage().getSource(), img.getWidth(), img.getHeight());
-        EditorScreen.instance().getGameFile().getSpriteSheets().add(new SpritesheetResource(sprite));
+        Editor.instance().getGameFile().getSpriteSheets().add(new SpritesheetResource(sprite));
       }
 
       // remove old spritesheets
       for (ITileset tileSet : map.getTilesets()) {
-        EditorScreen.instance().loadTileset(tileSet, true);
+        Editor.instance().loadTileset(tileSet, true);
       }
 
       // remove old tilesets
       for (ITileset tileset : map.getExternalTilesets()) {
-        EditorScreen.instance().loadTileset(tileset, false);
+        Editor.instance().loadTileset(tileset, false);
       }
 
-      EditorScreen.instance().updateGameFileMaps();
+      Editor.instance().updateGameFileMaps();
       Resources.images().clear();
       if (this.environments.containsKey(map.getName())) {
         this.environments.remove(map.getName());
@@ -832,7 +831,7 @@ public class MapComponent extends GuiComponent {
     }
 
     final IMap map = Game.world().environment().getMap();
-    if (map != null && Program.preferences().clampToMap()) {
+    if (map != null && Editor.preferences().clampToMap()) {
       minX = MathUtilities.clamp(minX, 0, map.getSizeInPixels().width);
       maxX = MathUtilities.clamp(maxX, 0, map.getSizeInPixels().width);
       minY = MathUtilities.clamp(minY, 0, map.getSizeInPixels().height);
@@ -918,7 +917,7 @@ public class MapComponent extends GuiComponent {
     newHeight = Snap.y(newHeight);
 
     final IMap map = Game.world().environment().getMap();
-    if (map != null && Program.preferences().clampToMap()) {
+    if (map != null && Editor.preferences().clampToMap()) {
       newX = MathUtilities.clamp(newX, 0, map.getSizeInPixels().width);
       newY = MathUtilities.clamp(newX, 0, map.getSizeInPixels().height);
 
@@ -1021,7 +1020,7 @@ public class MapComponent extends GuiComponent {
     for (IMapObject selected : this.getSelectedMapObjects()) {
       float newX = selected.getX() + snappedDeltaX;
       float newY = selected.getY() + snappedDeltaY;
-      if (Program.preferences().clampToMap()) {
+      if (Editor.preferences().clampToMap()) {
         newX = MathUtilities.clamp(newX, 0, map.getSizeInPixels().width - selected.getWidth());
         newY = MathUtilities.clamp(newY, 0, map.getSizeInPixels().height - selected.getHeight());
       }

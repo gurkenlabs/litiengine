@@ -10,7 +10,7 @@ import de.gurkenlabs.litiengine.configuration.ConfigurationGroupInfo;
 import de.gurkenlabs.litiengine.util.ColorHelper;
 
 @ConfigurationGroupInfo(prefix = "user_")
-public class UserPreferenceConfiguration extends ConfigurationGroup {
+public class UserPreferences extends ConfigurationGroup {
   private float zoom;
   private boolean showGrid;
   private boolean clampToMap;
@@ -38,7 +38,7 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
   private String[] lastOpenedFiles;
   private float uiScale;
 
-  public UserPreferenceConfiguration() {
+  public UserPreferences() {
     this.zoom = 1.0f;
     this.showGrid = true;
     this.clampToMap = true;
@@ -94,7 +94,7 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
     this.zoom = zoom;
   }
 
-  public boolean isShowGrid() {
+  public boolean showGrid() {
     return this.showGrid;
   }
 
@@ -126,7 +126,7 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
     this.snapToGrid = snapGrid;
   }
 
-  public boolean isRenderBoundingBoxes() {
+  public boolean renderBoundingBoxes() {
     return this.renderBoundingBoxes;
   }
 
@@ -134,7 +134,7 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
     this.renderBoundingBoxes = renderBoundingBoxes;
   }
 
-  public boolean isRenderCustomMapObjects() {
+  public boolean renderCustomMapObjects() {
     return this.renderCustomMapObjects;
   }
 
@@ -142,7 +142,7 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
     this.renderCustomMapObjects = renderCustomMapObjects;
   }
 
-  public boolean isRenderMapIds() {
+  public boolean renderMapIds() {
     return this.renderMapIds;
   }
 
@@ -170,7 +170,7 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
     this.lastOpenedFiles = lastOpenedFiles;
   }
 
-  public boolean isCompressFile() {
+  public boolean compressFile() {
     return compressFile;
   }
 
@@ -194,7 +194,7 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
     this.gridColor = gridColor;
   }
 
-  public boolean isSyncMaps() {
+  public boolean syncMaps() {
     return syncMaps;
   }
 
@@ -266,7 +266,7 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
     this.frameState = frameState;
   }
 
-  public boolean isRenderNames() {
+  public boolean renderNames() {
     return renderNames;
   }
 

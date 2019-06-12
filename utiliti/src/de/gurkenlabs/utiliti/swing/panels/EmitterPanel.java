@@ -15,7 +15,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.CustomEmitter;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.utiliti.components.EditorScreen;
+import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.swing.Icons;
 
 @SuppressWarnings("serial")
@@ -54,8 +54,8 @@ public class EmitterPanel extends PropertyPanel {
       final EmitterData data = new EmitterData(emitter.getEmitterData());
       data.setName(name.toString());
 
-      EditorScreen.instance().getGameFile().getEmitters().removeIf(x -> x.getName().equals(data.getName()));
-      EditorScreen.instance().getGameFile().getEmitters().add(data);
+      Editor.instance().getGameFile().getEmitters().removeIf(x -> x.getName().equals(data.getName()));
+      Editor.instance().getGameFile().getEmitters().add(data);
     });
 
     btnSave.setIcon(Icons.EMITTER);

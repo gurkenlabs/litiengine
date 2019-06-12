@@ -10,7 +10,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.utiliti.Style;
-import de.gurkenlabs.utiliti.components.EditorScreen;
+import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.components.MapComponent;
 import de.gurkenlabs.utiliti.handlers.Transform;
 
@@ -24,8 +24,8 @@ public class FocusRenderer implements IEditorRenderer {
   @Override
   public void render(Graphics2D g) {
     // render the focus and the transform rects
-    final Rectangle2D focus = EditorScreen.instance().getMapComponent().getFocusBounds();
-    final IMapObject focusedMapObject = EditorScreen.instance().getMapComponent().getFocusedMapObject();
+    final Rectangle2D focus = Editor.instance().getMapComponent().getFocusBounds();
+    final IMapObject focusedMapObject = Editor.instance().getMapComponent().getFocusedMapObject();
     if (focus != null && focusedMapObject != null) {
       Stroke stroke = new BasicStroke(1 / Game.world().camera().getRenderScale(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER, 4, new float[] { 1f, 1f }, Game.time().now() / 15);
 
@@ -38,7 +38,7 @@ public class FocusRenderer implements IEditorRenderer {
       RenderEngine.renderOutline(g, focus, whiteStroke);
 
       // render transform rects
-      if (EditorScreen.instance().getMapComponent().getEditMode() != MapComponent.EDITMODE_MOVE) {
+      if (Editor.instance().getMapComponent().getEditMode() != MapComponent.EDITMODE_MOVE) {
         Stroke transStroke = new BasicStroke(1 / Game.world().camera().getRenderScale());
         for (Rectangle2D trans : Transform.getAnchors()) {
           g.setColor(Style.COLOR_TRANSFORM_RECT_FILL);

@@ -11,7 +11,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.Style;
-import de.gurkenlabs.utiliti.components.EditorScreen;
+import de.gurkenlabs.utiliti.components.Editor;
 
 public final class StatusBar {
   private static JLabel statusLabel;
@@ -33,7 +33,7 @@ public final class StatusBar {
     String positionY = "y: " + (int) Input.mouse().getMapLocation().getY() + "[" + tile.y + "]";
     String status = String.format("%-14s %-14s", positionX, positionY) + String.format(" %-10s", (int) (Game.world().camera().getRenderScale() * 100) + "%");
 
-    int size = EditorScreen.instance().getMapComponent().getSelectedMapObjects().size();
+    int size = Editor.instance().getMapComponent().getSelectedMapObjects().size();
     if (size <= 0) {
       statusLabel.setText("");
     } else {

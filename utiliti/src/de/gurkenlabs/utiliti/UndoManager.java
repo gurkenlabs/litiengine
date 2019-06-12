@@ -15,7 +15,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
-import de.gurkenlabs.utiliti.components.EditorScreen;
+import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.swing.UI;
 
 public class UndoManager {
@@ -87,13 +87,13 @@ public class UndoManager {
         state = this.undoStack[this.currentIndex];
         switch (state.operationType) {
         case ADD:
-          EditorScreen.instance().getMapComponent().delete(state.target);
+          Editor.instance().getMapComponent().delete(state.target);
           break;
         case CHANGE:
           restoreState(state.target, state.oldMapObject);
           break;
         case DELETE:
-          EditorScreen.instance().getMapComponent().add(state.target, state.layer);
+          Editor.instance().getMapComponent().add(state.target, state.layer);
           break;
         }
 
@@ -129,13 +129,13 @@ public class UndoManager {
 
         switch (state.operationType) {
         case ADD:
-          EditorScreen.instance().getMapComponent().add(state.target, state.layer);
+          Editor.instance().getMapComponent().add(state.target, state.layer);
           break;
         case CHANGE:
           restoreState(state.target, state.newMapObject);
           break;
         case DELETE:
-          EditorScreen.instance().getMapComponent().delete(state.target);
+          Editor.instance().getMapComponent().delete(state.target);
           break;
         }
       } while (currentOperation != 0 && this.currentIndex < MAX_STACK_SIZE && this.undoStack[this.currentIndex + 1] != null && this.undoStack[this.currentIndex + 1].getOperation() == currentOperation);
@@ -298,7 +298,7 @@ public class UndoManager {
 
     Game.world().environment().reloadFromMap(target.getId());
 
-    if (EditorScreen.instance().getMapComponent().getFocusedMapObject() != null && EditorScreen.instance().getMapComponent().getFocusedMapObject().getId() == target.getId()) {
+    if (Editor.instance().getMapComponent().getFocusedMapObject() != null && Editor.instance().getMapComponent().getFocusedMapObject().getId() == target.getId()) {
       UI.getInspector().bind(target);
       UI.getEntityController().select(target);
     }
