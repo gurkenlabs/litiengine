@@ -565,30 +565,6 @@ public class Editor extends Screen {
     }
   }
 
-  public void saveMapSnapshot() {
-
-    if (Game.world().environment() == null || Game.world().environment().getMap() == null) {
-      return;
-    }
-
-    final IMap currentMap = Game.world().environment().getMap();
-    Dimension size = currentMap.getOrientation().getSize(currentMap);
-    BufferedImage img = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
-    MapRenderer.render(img.createGraphics(), currentMap, currentMap.getBounds());
-
-    try {
-      final String timeStamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
-      final File folder = new File("./screenshots/");
-      if (!folder.exists()) {
-        folder.mkdirs();
-      }
-
-      ImageSerializer.saveImage(new File("./screenshots/" + timeStamp + ImageFormat.PNG.toExtension()).toString(), img);
-    } catch (Exception e) {
-      log.log(Level.SEVERE, e.getLocalizedMessage(), e);
-    }
-  }
-
   public void save(boolean selectFile) {
     this.updateGameFileMaps();
 

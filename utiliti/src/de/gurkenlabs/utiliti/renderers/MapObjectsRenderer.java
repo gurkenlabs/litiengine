@@ -25,8 +25,11 @@ import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.utiliti.Style;
 import de.gurkenlabs.utiliti.components.Editor;
+import de.gurkenlabs.utiliti.components.MapComponent;
 
 public class MapObjectsRenderer implements IEditorRenderer {
+  private static final int MAX_NAME_DISPLAY_LENGTH = 50;
+
   @Override
   public String getName() {
     return "MAPOBJECTS";
@@ -38,7 +41,7 @@ public class MapObjectsRenderer implements IEditorRenderer {
       return;
     }
 
-    if (Game.world().environment() == null || Game.world().environment().getMap() == null) {
+    if (MapComponent.mapIsNull()) {
       return;
     }
 
@@ -222,6 +225,7 @@ public class MapObjectsRenderer implements IEditorRenderer {
 
     String objectName = mapObject.getName();
     if (objectName != null && !objectName.isEmpty()) {
+      objectName = truncateName(objectName);
       final int PADDING = 2;
       double stringWidth = fm.stringWidth(objectName) / Game.world().camera().getRenderScale();
       double stringHeight = fm.getHeight() * .5 / Game.world().camera().getRenderScale();
@@ -234,7 +238,20 @@ public class MapObjectsRenderer implements IEditorRenderer {
       RenderEngine.renderShape(g, rect, true);
 
       g.setColor(Color.WHITE);
-      RenderEngine.renderText(g, mapObject.getName(), x + PADDING, rect.getMaxY() - PADDING, true);
+      RenderEngine.renderText(g, objectName, x + PADDING, rect.getMaxY() - PADDING, true);
     }
+  }
+
+  private static String truncateName(String value) {
+
+    if (value == null || value.isEmpty() || value.length() < 4) {
+      return value;
+    }
+
+    if (value.length() < MAX_NAME_DISPLAY_LENGTH) {
+      return value;
+    }
+
+    return value.substring(0, MAX_NAME_DISPLAY_LENGTH - 1) + "...";
   }
 }

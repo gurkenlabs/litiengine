@@ -38,7 +38,7 @@ public final class MapMenu extends JMenu {
 
     JMenuItem saveMapSnapshot = new JMenuItem(Resources.strings().get("menu_map_snapshot"));
     saveMapSnapshot.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_PRINTSCREEN, Event.SHIFT_MASK));
-    saveMapSnapshot.addActionListener(a -> Editor.instance().saveMapSnapshot());
+    saveMapSnapshot.addActionListener(a -> Editor.instance().getMapComponent().saveMapSnapshot());
 
     JMenuItem reassignIDs = new JMenuItem(Resources.strings().get("menu_map_reassignMapIds"));
     reassignIDs.addActionListener(a -> {

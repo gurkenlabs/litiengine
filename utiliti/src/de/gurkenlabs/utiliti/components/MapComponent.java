@@ -1,6 +1,7 @@
 package de.gurkenlabs.utiliti.components;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -9,9 +10,12 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -35,6 +39,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
+import de.gurkenlabs.litiengine.environment.tilemap.MapRenderer;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer;
@@ -132,6 +137,10 @@ public class MapComponent extends GuiComponent {
     UndoManager.onUndoStackChanged(e -> Transform.updateAnchors());
   }
 
+  public static boolean mapIsNull() {
+    return Game.world().environment() == null || Game.world().environment().getMap() == null;
+  }
+  
   public void onEditModeChanged(IntConsumer cons) {
     this.editModeChangedConsumer.add(cons);
   }
@@ -311,7 +320,7 @@ public class MapComponent extends GuiComponent {
   }
 
   public void reloadEnvironment() {
-    if (Game.world().environment() == null || Game.world().environment().getMap() == null) {
+    if (mapIsNull()) {
       return;
     }
 
@@ -569,7 +578,7 @@ public class MapComponent extends GuiComponent {
         return;
       }
 
-      if (Game.world().environment() == null || Game.world().environment().getMap() == null) {
+      if (mapIsNull()) {
         return;
       }
 
@@ -634,7 +643,7 @@ public class MapComponent extends GuiComponent {
       return;
     }
 
-    if (Game.world().environment() == null || Game.world().environment().getMap() == null) {
+    if (mapIsNull()) {
       return;
     }
 
@@ -767,10 +776,62 @@ public class MapComponent extends GuiComponent {
     return this.isForwardMouseEvents() && this.isVisible() && this.isEnabled() && !this.isSuspended() && e != null;
   }
 
-  private static boolean mapIsNull() {
-    return Game.world().environment() == null || Game.world().environment().getMap() == null;
+  public void saveMapSnapshot() {
+    if (mapIsNull()) {
+      return;
+    }
+
+    final IMap currentMap = Game.world().environment().getMap();
+    Dimension size = currentMap.getOrientation().getSize(currentMap);
+    BufferedImage img = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
+    MapRenderer.render(img.createGraphics(), currentMap, currentMap.getBounds());
+
+    try {
+      final String timeStamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
+      final File folder = new File("./screenshots/");
+      if (!folder.exists()) {
+        folder.mkdirs();
+      }
+
+      ImageSerializer.saveImage(new File("./screenshots/" + timeStamp + ImageFormat.PNG.toExtension()).toString(), img);
+    } catch (Exception e) {
+      log.log(Level.SEVERE, e.getLocalizedMessage(), e);
+    }
   }
 
+  public Rectangle2D getMouseSelectArea(boolean snap) {
+    final Point2D start = this.startPoint;
+    if (start == null) {
+      return null;
+    }
+
+    final Point2D endPoint = Input.mouse().getMapLocation();
+    double minX = Math.min(start.getX(), endPoint.getX());
+    double maxX = Math.max(start.getX(), endPoint.getX());
+    double minY = Math.min(start.getY(), endPoint.getY());
+    double maxY = Math.max(start.getY(), endPoint.getY());
+
+    if (snap) {
+      minX = Snap.x(minX);
+      maxX = Snap.x(maxX);
+      minY = Snap.y(minY);
+      maxY = Snap.y(maxY);
+    }
+
+    final IMap map = Game.world().environment().getMap();
+    if (map != null && Editor.preferences().clampToMap()) {
+      minX = MathUtilities.clamp(minX, 0, map.getSizeInPixels().width);
+      maxX = MathUtilities.clamp(maxX, 0, map.getSizeInPixels().width);
+      minY = MathUtilities.clamp(minY, 0, map.getSizeInPixels().height);
+      maxY = MathUtilities.clamp(maxY, 0, map.getSizeInPixels().height);
+    }
+
+    double width = Math.abs(minX - maxX);
+    double height = Math.abs(minY - maxY);
+
+    return new Rectangle2D.Double(minX, minY, width, height);
+  }
+  
   private IMapObject createNewMapObject(MapObjectType type) {
     final Rectangle2D newObjectArea = this.getMouseSelectArea(true);
     IMapObject mo = new MapObject();
@@ -810,40 +871,7 @@ public class MapComponent extends GuiComponent {
     this.add(mo);
     return mo;
   }
-
-  public Rectangle2D getMouseSelectArea(boolean snap) {
-    final Point2D start = this.startPoint;
-    if (start == null) {
-      return null;
-    }
-
-    final Point2D endPoint = Input.mouse().getMapLocation();
-    double minX = Math.min(start.getX(), endPoint.getX());
-    double maxX = Math.max(start.getX(), endPoint.getX());
-    double minY = Math.min(start.getY(), endPoint.getY());
-    double maxY = Math.max(start.getY(), endPoint.getY());
-
-    if (snap) {
-      minX = Snap.x(minX);
-      maxX = Snap.x(maxX);
-      minY = Snap.y(minY);
-      maxY = Snap.y(maxY);
-    }
-
-    final IMap map = Game.world().environment().getMap();
-    if (map != null && Editor.preferences().clampToMap()) {
-      minX = MathUtilities.clamp(minX, 0, map.getSizeInPixels().width);
-      maxX = MathUtilities.clamp(maxX, 0, map.getSizeInPixels().width);
-      minY = MathUtilities.clamp(minY, 0, map.getSizeInPixels().height);
-      maxY = MathUtilities.clamp(maxY, 0, map.getSizeInPixels().height);
-    }
-
-    double width = Math.abs(minX - maxX);
-    double height = Math.abs(minY - maxY);
-
-    return new Rectangle2D.Double(minX, minY, width, height);
-  }
-
+  
   private void handleResizeTransform() {
     final IMapObject transformObject = this.getFocusedMapObject();
     if (transformObject == null || this.editMode != EDITMODE_EDIT || Transform.type() != TransformType.RESIZE || Transform.anchor() == null) {
