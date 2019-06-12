@@ -310,7 +310,7 @@ public final class UI {
       JPopupMenu.setDefaultLightWeightPopupEnabled(false);
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
       UIManager.getDefaults().put("SplitPane.border", BorderFactory.createEmptyBorder());
-      setDefaultSwingFont(new FontUIResource(Style.FONT_DEFAULT));
+      setDefaultSwingFont(new FontUIResource(Style.getDefaultFont()));
     } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
       log.log(Level.SEVERE, e.getLocalizedMessage(), e);
     }

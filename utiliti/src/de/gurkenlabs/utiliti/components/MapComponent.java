@@ -11,7 +11,6 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -63,6 +62,7 @@ import de.gurkenlabs.utiliti.handlers.Transform.TransformType;
 import de.gurkenlabs.utiliti.handlers.Zoom;
 import de.gurkenlabs.utiliti.renderers.Renderers;
 import de.gurkenlabs.utiliti.swing.UI;
+import de.gurkenlabs.utiliti.swing.dialogs.ConfirmDialog;
 import de.gurkenlabs.utiliti.swing.dialogs.XmlExportDialog;
 import de.gurkenlabs.utiliti.swing.dialogs.XmlImportDialog;
 
@@ -112,12 +112,10 @@ public class MapComponent extends GuiComponent {
   private float dragSizeWidth;
   private Blueprint copiedBlueprint;
 
-  private final EditorScreen screen;
-
   private boolean loading;
   private boolean initialized;
 
-  public MapComponent(final EditorScreen screen) {
+  public MapComponent() {
     super(0, EditorScreen.instance().getPadding(), Game.window().getResolution().getWidth(), Game.window().getResolution().getHeight() - Game.window().getResolution().getHeight() * 1 / 15);
     this.editModeChangedConsumer = new CopyOnWriteArrayList<>();
     this.focusChangedConsumer = new CopyOnWriteArrayList<>();
@@ -131,7 +129,6 @@ public class MapComponent extends GuiComponent {
     this.maps = new ArrayList<>();
     this.cameraFocus = new ConcurrentHashMap<>();
     this.dragLocationMapObjects = new ConcurrentHashMap<>();
-    this.screen = screen;
 
     UndoManager.onUndoStackChanged(e -> Transform.updateAnchors());
   }
@@ -642,8 +639,7 @@ public class MapComponent extends GuiComponent {
       return;
     }
 
-    int n = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), Resources.strings().get("hud_deleteMapMessage") + "\n" + Game.world().environment().getMap().getName(), Resources.strings().get("hud_deleteMap"), JOptionPane.YES_NO_OPTION);
-    if (n != JOptionPane.YES_OPTION) {
+    if (!ConfirmDialog.show(Resources.strings().get("hud_deleteMap"), Resources.strings().get("hud_deleteMapMessage") + "\n" + Game.world().environment().getMap().getName())) {
       return;
     }
 
@@ -685,15 +681,10 @@ public class MapComponent extends GuiComponent {
       }
 
       Optional<TmxMap> current = this.maps.stream().filter(x -> x.getName().equals(map.getName())).findFirst();
-      if (current.isPresent()) {
-        int n = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), Resources.strings().get("input_replace_map", map.getName()), Resources.strings().get("input_replace_map_title"), JOptionPane.YES_NO_OPTION);
-
-        if (n == JOptionPane.YES_OPTION) {
-          this.getMaps().remove(current.get());
-
-        } else {
-          return;
-        }
+      if (current.isPresent() && ConfirmDialog.show(Resources.strings().get("input_replace_map_title"), Resources.strings().get("input_replace_map", map.getName()))) {
+        this.getMaps().remove(current.get());
+      } else {
+        return;
       }
 
       this.getMaps().add(map);
@@ -706,17 +697,17 @@ public class MapComponent extends GuiComponent {
         }
 
         Spritesheet sprite = Resources.spritesheets().load(img, imageLayer.getImage().getSource(), img.getWidth(), img.getHeight());
-        this.screen.getGameFile().getSpriteSheets().add(new SpritesheetResource(sprite));
+        EditorScreen.instance().getGameFile().getSpriteSheets().add(new SpritesheetResource(sprite));
       }
 
       // remove old spritesheets
       for (ITileset tileSet : map.getTilesets()) {
-        this.loadTileset(tileSet, true);
+        EditorScreen.instance().loadTileset(tileSet, true);
       }
 
       // remove old tilesets
       for (ITileset tileset : map.getExternalTilesets()) {
-        this.loadTileset(tileset, false);
+        EditorScreen.instance().loadTileset(tileset, false);
       }
 
       EditorScreen.instance().updateGameFileMaps();
@@ -729,24 +720,7 @@ public class MapComponent extends GuiComponent {
       this.loadEnvironment(map);
       log.log(Level.INFO, "imported map {0}", new Object[] { map.getName() });
     }, TmxMap.FILE_EXTENSION);
-  }
 
-  public void loadTileset(ITileset tileset, boolean embedded) {
-    Spritesheet sprite = Resources.spritesheets().get(tileset.getImage().getSource());
-    if (sprite != null) {
-      Resources.spritesheets().remove(sprite.getName());
-      this.screen.getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(sprite.getName()));
-    }
-
-    Spritesheet newSprite = Resources.spritesheets().load(tileset);
-    SpritesheetResource info = new SpritesheetResource(newSprite);
-    EditorScreen.instance().getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(info.getName()));
-    EditorScreen.instance().getGameFile().getSpriteSheets().add(info);
-    EditorScreen.instance().loadSpriteSheets(Arrays.asList(info), true);
-    if (!embedded) {
-      this.screen.getGameFile().getTilesets().removeIf(x -> x.getName().equals(tileset.getName()));
-      this.screen.getGameFile().getTilesets().add((Tileset) tileset);
-    }
   }
 
   public void exportMap() {
@@ -1045,7 +1019,6 @@ public class MapComponent extends GuiComponent {
     final IMap map = Game.world().environment().getMap();
 
     for (IMapObject selected : this.getSelectedMapObjects()) {
-
       float newX = selected.getX() + snappedDeltaX;
       float newY = selected.getY() + snappedDeltaY;
       if (Program.preferences().clampToMap()) {
@@ -1068,7 +1041,7 @@ public class MapComponent extends GuiComponent {
         UI.getInspector().bind(selected);
       }
     }
-    
+
     Transform.updateAnchors();
   }
 

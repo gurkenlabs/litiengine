@@ -44,7 +44,12 @@ public final class MapMenu extends JMenu {
     JMenuItem reassignIDs = new JMenuItem(Resources.strings().get("menu_map_reassignMapIds"));
     reassignIDs.addActionListener(a -> {
       try {
-        int minID = Integer.parseInt(JOptionPane.showInputDialog(Resources.strings().get("panel_reassignMapIds"), 1));
+        String min = JOptionPane.showInputDialog(Resources.strings().get("panel_reassignMapIds"), 1);
+        if (min == null || min.isEmpty()) {
+          return;
+        }
+
+        int minID = Integer.parseInt(min);
         EditorScreen.instance().getMapComponent().reassignIds(UI.getMapController().getCurrentMap(), minID);
       } catch (Exception e) {
         log.log(Level.SEVERE, "No parseable Integer found upon reading the min Map ID input. Try again.");
@@ -83,7 +88,7 @@ public final class MapMenu extends JMenu {
         EditorScreen.instance().getMapComponent().loadEnvironment((TmxMap) Game.world().environment().getMap());
       }
     });
-    
+
     JCheckBoxMenuItem sync = new JCheckBoxMenuItem(Resources.strings().get("menu_map_syncMaps"));
     sync.setState(Program.preferences().isSyncMaps());
     sync.addItemListener(e -> Program.preferences().setSyncMaps(sync.getState()));
@@ -97,7 +102,7 @@ public final class MapMenu extends JMenu {
     this.add(reassignIDs);
     this.addSeparator();
     this.add(mapProps);
-    
+
     this.setEnabled(false);
     EditorScreen.instance().onLoaded(() -> this.setEnabled(EditorScreen.instance().getProjectPath() != null));
   }

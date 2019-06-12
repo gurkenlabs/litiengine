@@ -16,11 +16,10 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.utiliti.components.EditorScreen;
-import de.gurkenlabs.utiliti.components.MapComponent;
 import de.gurkenlabs.utiliti.swing.UI;
 
 public class UndoManager {
-  private static final Logger log = Logger.getLogger(MapComponent.class.getName());
+  private static final Logger log = Logger.getLogger(UndoManager.class.getName());
   private static final int MAX_STACK_SIZE = 10000;
   private static int nextOperation = 1;
   private UndoState[] undoStack;

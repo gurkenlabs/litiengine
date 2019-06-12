@@ -36,10 +36,12 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
 
   private String lastGameFile;
   private String[] lastOpenedFiles;
+  private float uiScale;
 
   public UserPreferenceConfiguration() {
     this.zoom = 1.0f;
     this.showGrid = true;
+    this.clampToMap = true;
     this.snapToPixels = true;
     this.snapToGrid = true;
     this.renderBoundingBoxes = true;
@@ -48,6 +50,7 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
     this.compressFile = false;
     this.gridLineWidth = 1.0f;
     this.gridColor = ColorHelper.encode(Style.COLOR_DEFAULT_GRID);
+    this.setUiScale(1.0f);
   }
 
   public void addOpenedFile(String str) {
@@ -118,7 +121,7 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
   public void setSnapToPixels(boolean snapPixels) {
     this.snapToPixels = snapPixels;
   }
-  
+
   public void setSnapToGrid(boolean snapGrid) {
     this.snapToGrid = snapGrid;
   }
@@ -269,5 +272,13 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
 
   public void setRenderNames(boolean renderNames) {
     this.renderNames = renderNames;
+  }
+
+  public float getUiScale() {
+    return uiScale;
+  }
+
+  public void setUiScale(float uiScale) {
+    this.uiScale = uiScale;
   }
 }

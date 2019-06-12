@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -64,6 +63,7 @@ import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.swing.StatusBar;
 import de.gurkenlabs.utiliti.swing.Tray;
 import de.gurkenlabs.utiliti.swing.UI;
+import de.gurkenlabs.utiliti.swing.dialogs.ConfirmDialog;
 import de.gurkenlabs.utiliti.swing.dialogs.EditorFileChooser;
 import de.gurkenlabs.utiliti.swing.dialogs.SpritesheetImportPanel;
 import de.gurkenlabs.utiliti.swing.dialogs.XmlImportDialog;
@@ -115,10 +115,7 @@ public class EditorScreen extends Screen {
   @Override
   public void prepare() {
     padding = this.getWidth() / 50;
-
-    // init components
-    this.mapComponent = new MapComponent(this);
-
+    this.mapComponent = new MapComponent();
     this.getComponents().add(this.mapComponent);
     super.prepare();
   }
@@ -151,7 +148,7 @@ public class EditorScreen extends Screen {
     super.render(g);
 
     // render mouse/zoom and fps
-    g.setFont(Style.FONT_DEFAULT);
+    g.setFont(Style.getDefaultFont());
     g.setColor(Color.WHITE);
     TextRenderer.render(g, Game.metrics().getFramesPerSecond() + " FPS", 10, Game.window().getResolution().getHeight() - 20, true);
 
@@ -203,7 +200,7 @@ public class EditorScreen extends Screen {
       chooser = new JFileChooser(new File(".").getCanonicalPath());
       chooser.setDialogTitle(Resources.strings().get("input_select_project_folder"));
       chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-      if (chooser.showOpenDialog((JFrame) Game.window().getHostControl()) != JFileChooser.APPROVE_OPTION) {
+      if (chooser.showOpenDialog(Game.window().getHostControl()) != JFileChooser.APPROVE_OPTION) {
         return;
       }
 
@@ -455,8 +452,7 @@ public class EditorScreen extends Screen {
       }
 
       if (this.gameFile.getEmitters().stream().anyMatch(x -> x.getName().equals(emitter.getName()))) {
-        int result = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), Resources.strings().get("import_emitter_question", emitter.getName()), Resources.strings().get("import_emitter_title"), JOptionPane.YES_NO_OPTION);
-        if (result == JOptionPane.NO_OPTION) {
+        if (!ConfirmDialog.show(Resources.strings().get("import_emitter_title"), Resources.strings().get("import_emitter_question", emitter.getName()))) {
           return;
         }
 
@@ -485,13 +481,8 @@ public class EditorScreen extends Screen {
         blueprint.setName(FileUtilities.getFileName(file.getPath()));
       }
 
-      if (this.gameFile.getBluePrints().stream().anyMatch(x -> x.getName().equals(blueprint.getName()))) {
-        int result = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), Resources.strings().get("import_blueprint_question", blueprint.getName()), Resources.strings().get("import_blueprint_title"), JOptionPane.YES_NO_OPTION);
-        if (result == JOptionPane.NO_OPTION) {
-          return;
-        }
-
-        this.gameFile.getBluePrints().removeIf(x -> x.getName().equals(blueprint.getName()));
+      if (this.gameFile.getBluePrints().stream().anyMatch(x -> x.getName().equals(blueprint.getName())) && !ConfirmDialog.show(Resources.strings().get("import_blueprint_title"), Resources.strings().get("import_blueprint_question", blueprint.getName()))) {
+        return;
       }
 
       this.gameFile.getBluePrints().add(blueprint);
@@ -512,14 +503,11 @@ public class EditorScreen extends Screen {
         return;
       }
 
-      if (this.gameFile.getTilesets().stream().anyMatch(x -> x.getName().equals(tileset.getName()))) {
-        int result = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), Resources.strings().get("import_tileset_title", tileset.getName()), Resources.strings().get("import_tileset_title"), JOptionPane.YES_NO_OPTION);
-        if (result == JOptionPane.NO_OPTION) {
-          return;
-        }
-
-        this.getMapComponent().loadTileset(tileset, false);
+      if (this.gameFile.getTilesets().stream().anyMatch(x -> x.getName().equals(tileset.getName())) && !ConfirmDialog.show(Resources.strings().get("import_tileset_title"), Resources.strings().get("import_tileset_title", tileset.getName()))) {
+        return;
       }
+
+      loadTileset(tileset, false);
 
       log.log(Level.INFO, "imported tileset {0} from {1}", new Object[] { tileset.getName(), file });
     }, Tileset.FILE_EXTENSION);
@@ -548,6 +536,24 @@ public class EditorScreen extends Screen {
 
     if (forceAssetTreeUpdate) {
       UI.getAssetController().refresh();
+    }
+  }
+
+  public void loadTileset(ITileset tileset, boolean embedded) {
+    Spritesheet sprite = Resources.spritesheets().get(tileset.getImage().getSource());
+    if (sprite != null) {
+      Resources.spritesheets().remove(sprite.getName());
+      getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(sprite.getName()));
+    }
+
+    Spritesheet newSprite = Resources.spritesheets().load(tileset);
+    SpritesheetResource info = new SpritesheetResource(newSprite);
+    getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(info.getName()));
+    getGameFile().getSpriteSheets().add(info);
+    loadSpriteSheets(Arrays.asList(info), true);
+    if (!embedded) {
+      getGameFile().getTilesets().removeIf(x -> x.getName().equals(tileset.getName()));
+      getGameFile().getTilesets().add((Tileset) tileset);
     }
   }
 
@@ -594,7 +600,7 @@ public class EditorScreen extends Screen {
         chooser.addChoosableFileFilter(filter);
         chooser.setSelectedFile(new File(DEFAULT_GAME_NAME + "." + ResourceBundle.FILE_EXTENSION));
 
-        int result = chooser.showSaveDialog((JFrame) Game.window().getHostControl());
+        int result = chooser.showSaveDialog(Game.window().getHostControl());
         if (result == JFileChooser.APPROVE_OPTION) {
           this.saveGameFile(chooser.getSelectedFile().toString());
         }

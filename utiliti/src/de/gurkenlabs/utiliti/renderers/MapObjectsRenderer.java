@@ -217,7 +217,7 @@ public class MapObjectsRenderer implements IEditorRenderer {
   }
 
   private static void renderName(Graphics2D g, IMapObject mapObject) {
-    g.setFont(Style.FONT_DEFAULT.deriveFont(10f));
+    g.setFont(Style.getDefaultFont().deriveFont(Style.getDefaultFont().getSize() * 0.75f));
     FontMetrics fm = g.getFontMetrics();
 
     String objectName = mapObject.getName();
