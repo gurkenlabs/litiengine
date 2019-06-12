@@ -243,7 +243,7 @@ public class MapComponent extends GuiComponent {
       this.scrollSpeed = BASE_SCROLL_SPEED / zoom;
     });
 
-    Zoom.apply();
+    Zoom.applyPreference();
     if (!this.initialized) {
       Game.window().getRenderComponent().addFocusListener(new FocusAdapter() {
         @Override
