@@ -1,7 +1,6 @@
 package de.gurkenlabs.utiliti.components;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -13,11 +12,9 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
@@ -33,9 +30,7 @@ import javax.xml.bind.JAXBException;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
-import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
-import de.gurkenlabs.litiengine.environment.tilemap.MapRenderer;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxException;
@@ -54,7 +49,6 @@ import de.gurkenlabs.litiengine.resources.TextureAtlas;
 import de.gurkenlabs.litiengine.sound.SoundFormat;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
-import de.gurkenlabs.litiengine.util.io.ImageSerializer;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 import de.gurkenlabs.utiliti.Cursors;
 import de.gurkenlabs.utiliti.Style;
@@ -98,6 +92,7 @@ public class Editor extends Screen {
   private Editor() {
     super("Editor");
     this.loadedCallbacks = new CopyOnWriteArrayList<>();
+    this.mapComponent = new MapComponent();
   }
 
   public static Editor instance() {
@@ -122,8 +117,6 @@ public class Editor extends Screen {
 
   @Override
   public void prepare() {
-    padding = this.getWidth() / 50;
-    this.mapComponent = new MapComponent();
     this.getComponents().add(this.mapComponent);
     super.prepare();
   }
@@ -192,10 +185,6 @@ public class Editor extends Screen {
 
   public String getProjectPath() {
     return projectPath;
-  }
-
-  public double getPadding() {
-    return this.padding;
   }
 
   public void setProjectPath(String projectPath) {

@@ -30,7 +30,6 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
@@ -97,7 +96,6 @@ public class MapComponent extends GuiComponent {
   private final Map<String, IMapObject> focusedObjects;
   private final Map<String, List<IMapObject>> selectedObjects;
   private final Map<String, Environment> environments;
-  private final Map<IMapObject, Point2D> dragLocationMapObjects;
 
   private int editMode = EDITMODE_EDIT;
 
@@ -106,21 +104,51 @@ public class MapComponent extends GuiComponent {
   private double scrollSpeed = BASE_SCROLL_SPEED;
 
   private Point2D startPoint;
-  private Point2D dragPoint;
-
-  private boolean isMoving;
-  private boolean isMovingWithKeyboard;
-  private boolean isTransforming;
-  private boolean isFocussing;
-  private float dragSizeHeight;
-  private float dragSizeWidth;
   private Blueprint copiedBlueprint;
 
+  /**
+   * This flag is used to control the undo behavior of a <b>move
+   * transformation</b>. It ensures that the UndoManager tracks the "changing"
+   * event in the beginning of the operation (when the key event is recorded for
+   * the first time) and also triggers the "changed" event upon key release.
+   */
+  private boolean isMoving;
+
+  /**
+   * This flag is used to control the undo behavior of a <b>resize
+   * transformation</b>. It ensures that the UndoManager tracks the "changing"
+   * event in the beginning of the operation (when the key event is recorded for
+   * the first time) and also triggers the "changed" event upon key release.
+   */
+  private boolean isResizing;
+
+  /**
+   * This flag is used to bundle a move operation over several key events until
+   * the arrow keys are released. This allows for the UndoManager to revert the
+   * keyboard move operation once instead of having to revert for each
+   * individual key stroke.
+   */
+  private boolean isMovingWithKeyboard;
+
+  /**
+   * This flag prevents circular focusing approaches while this instance is
+   * already performing a focus process.
+   */
+  private boolean isFocussing;
+
+  /**
+   * This flag prevents certain UI operations from executing while the editor is
+   * loading an environment.
+   */
   private boolean loading;
+
+  /**
+   * Ensures that various initialization processes are only carried out once.
+   */
   private boolean initialized;
 
   public MapComponent() {
-    super(0, Editor.instance().getPadding(), Game.window().getResolution().getWidth(), Game.window().getResolution().getHeight() - Game.window().getResolution().getHeight() * 1 / 15);
+    super(0, 0);
     this.editModeChangedConsumer = new CopyOnWriteArrayList<>();
     this.focusChangedConsumer = new CopyOnWriteArrayList<>();
     this.selectionChangedConsumer = new CopyOnWriteArrayList<>();
@@ -132,7 +160,6 @@ public class MapComponent extends GuiComponent {
     this.environments = new ConcurrentHashMap<>();
     this.maps = new ArrayList<>();
     this.cameraFocus = new ConcurrentHashMap<>();
-    this.dragLocationMapObjects = new ConcurrentHashMap<>();
 
     UndoManager.onUndoStackChanged(e -> Transform.updateAnchors());
   }
@@ -140,7 +167,7 @@ public class MapComponent extends GuiComponent {
   public static boolean mapIsNull() {
     return Game.world().environment() == null || Game.world().environment().getMap() == null;
   }
-  
+
   public void onEditModeChanged(IntConsumer cons) {
     this.editModeChangedConsumer.add(cons);
   }
@@ -253,6 +280,7 @@ public class MapComponent extends GuiComponent {
     });
 
     Zoom.applyPreference();
+
     if (!this.initialized) {
       Game.window().getRenderComponent().addFocusListener(new FocusAdapter() {
         @Override
@@ -582,7 +610,7 @@ public class MapComponent extends GuiComponent {
         return;
       }
 
-      if (this.isMoving || this.isTransforming) {
+      if (this.isMoving || this.isResizing) {
         return;
       }
 
@@ -831,7 +859,7 @@ public class MapComponent extends GuiComponent {
 
     return new Rectangle2D.Double(minX, minY, width, height);
   }
-  
+
   private IMapObject createNewMapObject(MapObjectType type) {
     final Rectangle2D newObjectArea = this.getMouseSelectArea(true);
     IMapObject mo = new MapObject();
@@ -870,206 +898,6 @@ public class MapComponent extends GuiComponent {
 
     this.add(mo);
     return mo;
-  }
-  
-  private void handleResizeTransform() {
-    final IMapObject transformObject = this.getFocusedMapObject();
-    if (transformObject == null || this.editMode != EDITMODE_EDIT || Transform.type() != TransformType.RESIZE || Transform.anchor() == null) {
-      return;
-    }
-
-    if (this.dragPoint == null) {
-      this.dragPoint = Input.mouse().getMapLocation();
-      this.dragLocationMapObjects.put(this.getFocusedMapObject(), new Point2D.Double(transformObject.getX(), transformObject.getY()));
-      this.dragSizeHeight = transformObject.getHeight();
-      this.dragSizeWidth = transformObject.getWidth();
-      return;
-    }
-
-    Point2D dragLocationMapObject = this.dragLocationMapObjects.get(this.getFocusedMapObject());
-    double deltaX = Input.mouse().getMapLocation().getX() - this.dragPoint.getX();
-    double deltaY = Input.mouse().getMapLocation().getY() - this.dragPoint.getY();
-    double newWidth = this.dragSizeWidth;
-    double newHeight = this.dragSizeHeight;
-    double newX = dragLocationMapObject.getX();
-    double newY = dragLocationMapObject.getY();
-
-    switch (Transform.anchor()) {
-    case DOWN:
-      newHeight += deltaY;
-      break;
-    case DOWNRIGHT:
-      newHeight += deltaY;
-      newWidth += deltaX;
-      break;
-    case DOWNLEFT:
-      newHeight += deltaY;
-      newWidth -= deltaX;
-      newX += deltaX;
-      newX = MathUtilities.clamp(newX, 0, dragLocationMapObject.getX() + this.dragSizeWidth);
-      break;
-    case LEFT:
-      newWidth -= deltaX;
-      newX += deltaX;
-      newX = MathUtilities.clamp(newX, 0, dragLocationMapObject.getX() + this.dragSizeWidth);
-      break;
-    case RIGHT:
-      newWidth += deltaX;
-      break;
-    case UP:
-      newHeight -= deltaY;
-      newY += deltaY;
-      newY = MathUtilities.clamp(newY, 0, dragLocationMapObject.getY() + this.dragSizeHeight);
-      break;
-    case UPLEFT:
-      newHeight -= deltaY;
-      newY += deltaY;
-      newY = MathUtilities.clamp(newY, 0, dragLocationMapObject.getY() + this.dragSizeHeight);
-      newWidth -= deltaX;
-      newX += deltaX;
-      newX = MathUtilities.clamp(newX, 0, dragLocationMapObject.getX() + this.dragSizeWidth);
-      break;
-    case UPRIGHT:
-      newHeight -= deltaY;
-      newY += deltaY;
-      newY = MathUtilities.clamp(newY, 0, dragLocationMapObject.getY() + this.dragSizeHeight);
-      newWidth += deltaX;
-      break;
-    default:
-      return;
-    }
-
-    newX = Snap.x(newX);
-    newY = Snap.y(newY);
-    newWidth = Snap.x(newWidth);
-    newHeight = Snap.y(newHeight);
-
-    final IMap map = Game.world().environment().getMap();
-    if (map != null && Editor.preferences().clampToMap()) {
-      newX = MathUtilities.clamp(newX, 0, map.getSizeInPixels().width);
-      newY = MathUtilities.clamp(newX, 0, map.getSizeInPixels().height);
-
-      newWidth = MathUtilities.clamp(newWidth, 0, map.getSizeInPixels().width - newX);
-      newHeight = MathUtilities.clamp(newHeight, 0, map.getSizeInPixels().height - newY);
-    }
-
-    transformObject.setWidth((float) newWidth);
-    transformObject.setHeight((float) newHeight);
-
-    transformObject.setX((float) newX);
-    transformObject.setY((float) newY);
-
-    Game.world().environment().reloadFromMap(transformObject.getId());
-    MapObjectType type = MapObjectType.get(transformObject.getType());
-    if (type == MapObjectType.LIGHTSOURCE) {
-      Game.world().environment().updateLighting(transformObject.getBoundingBox());
-    }
-
-    if (type == MapObjectType.STATICSHADOW) {
-      Game.world().environment().updateLighting();
-    }
-
-    UI.getInspector().bind(transformObject);
-    Transform.updateAnchors();
-  }
-
-  private void handleMoveTransform() {
-    if (!this.isMoving) {
-      this.isMoving = true;
-
-      UndoManager.instance().beginOperation();
-      for (IMapObject selected : this.getSelectedMapObjects()) {
-        UndoManager.instance().mapObjectChanging(selected);
-      }
-    }
-
-    IMapObject minX = null;
-    IMapObject minY = null;
-    for (IMapObject selected : this.getSelectedMapObjects()) {
-      if (minX == null || selected.getX() < minX.getX()) {
-        minX = selected;
-      }
-
-      if (minY == null || selected.getY() < minY.getY()) {
-        minY = selected;
-      }
-    }
-
-    if (minX == null || minY == null || (!Input.keyboard().isPressed(KeyEvent.VK_CONTROL) && this.editMode != EDITMODE_MOVE)) {
-      return;
-    }
-
-    if (this.dragPoint == null) {
-      this.dragPoint = Input.mouse().getMapLocation();
-      return;
-    }
-
-    if (!this.dragLocationMapObjects.containsKey(minX)) {
-      this.dragLocationMapObjects.put(minX, new Point2D.Double(minX.getX(), minX.getY()));
-    }
-
-    if (!this.dragLocationMapObjects.containsKey(minY)) {
-      this.dragLocationMapObjects.put(minY, new Point2D.Double(minY.getX(), minY.getY()));
-    }
-
-    Point2D dragLocationMapObjectMinX = this.dragLocationMapObjects.get(minX);
-    Point2D dragLocationMapObjectMinY = this.dragLocationMapObjects.get(minY);
-
-    double deltaX = Input.mouse().getMapLocation().getX() - this.dragPoint.getX();
-    float newX = Snap.x(dragLocationMapObjectMinX.getX() + deltaX);
-    float snappedDeltaX = newX - minX.getX();
-
-    double deltaY = Input.mouse().getMapLocation().getY() - this.dragPoint.getY();
-    float newY = Snap.y(dragLocationMapObjectMinY.getY() + deltaY);
-    float snappedDeltaY = newY - minY.getY();
-
-    if (snappedDeltaX == 0 && snappedDeltaY == 0) {
-      return;
-    }
-
-    final Rectangle2D beforeBounds = MapObject.getBounds2D(this.getSelectedMapObjects());
-    this.handleEntityDrag(snappedDeltaX, snappedDeltaY);
-
-    if (this.getSelectedMapObjects().stream().anyMatch(x -> MapObjectType.get(x.getType()) == MapObjectType.STATICSHADOW)) {
-      Game.world().environment().updateLighting();
-    } else if (this.getSelectedMapObjects().stream().anyMatch(x -> MapObjectType.get(x.getType()) == MapObjectType.LIGHTSOURCE)) {
-      final Rectangle2D afterBounds = MapObject.getBounds2D(this.getSelectedMapObjects());
-      double x = Math.min(beforeBounds.getX(), afterBounds.getX());
-      double y = Math.min(beforeBounds.getY(), afterBounds.getY());
-      double width = Math.max(beforeBounds.getMaxX(), afterBounds.getMaxX()) - x;
-      double height = Math.max(beforeBounds.getMaxY(), afterBounds.getMaxY()) - y;
-      Game.world().environment().updateLighting(new Rectangle2D.Double(x, y, width, height));
-    }
-  }
-
-  private void handleEntityDrag(float snappedDeltaX, float snappedDeltaY) {
-    final IMap map = Game.world().environment().getMap();
-
-    for (IMapObject selected : this.getSelectedMapObjects()) {
-      float newX = selected.getX() + snappedDeltaX;
-      float newY = selected.getY() + snappedDeltaY;
-      if (Editor.preferences().clampToMap()) {
-        newX = MathUtilities.clamp(newX, 0, map.getSizeInPixels().width - selected.getWidth());
-        newY = MathUtilities.clamp(newY, 0, map.getSizeInPixels().height - selected.getHeight());
-      }
-
-      selected.setX(newX);
-      selected.setY(newY);
-
-      IEntity entity = Game.world().environment().get(selected.getId());
-      if (entity != null) {
-        entity.setX(selected.getLocation().getX());
-        entity.setY(selected.getLocation().getY());
-      } else {
-        Game.world().environment().reloadFromMap(selected.getId());
-      }
-
-      if (selected.equals(this.getFocusedMapObject())) {
-        UI.getInspector().bind(selected);
-      }
-    }
-
-    Transform.updateAnchors();
   }
 
   private void setCopyBlueprint(Blueprint copyTarget) {
@@ -1124,7 +952,7 @@ public class MapComponent extends GuiComponent {
       }
 
       this.beforeArrowKeyPressed();
-      this.handleEntityDrag(1, 0);
+      Transform.moveEntities(this.getSelectedMapObjects(), 1, 0);
     });
 
     Input.keyboard().onKeyPressed(KeyEvent.VK_LEFT, e -> {
@@ -1133,7 +961,7 @@ public class MapComponent extends GuiComponent {
       }
 
       this.beforeArrowKeyPressed();
-      this.handleEntityDrag(-1, 0);
+      Transform.moveEntities(this.getSelectedMapObjects(), -1, 0);
     });
 
     Input.keyboard().onKeyPressed(KeyEvent.VK_UP, e -> {
@@ -1142,7 +970,7 @@ public class MapComponent extends GuiComponent {
       }
 
       this.beforeArrowKeyPressed();
-      this.handleEntityDrag(0, -1);
+      Transform.moveEntities(this.getSelectedMapObjects(), 0, -1);
     });
 
     Input.keyboard().onKeyPressed(KeyEvent.VK_DOWN, e -> {
@@ -1151,7 +979,7 @@ public class MapComponent extends GuiComponent {
       }
 
       this.beforeArrowKeyPressed();
-      this.handleEntityDrag(0, 1);
+      Transform.moveEntities(this.getSelectedMapObjects(), 0, 1);
     });
   }
 
@@ -1181,7 +1009,7 @@ public class MapComponent extends GuiComponent {
 
     final Point2D currentFocus = Game.world().camera().getFocus();
     // horizontal scrolling
-    if (Input.keyboard().isPressed(KeyEvent.VK_CONTROL) && this.dragPoint == null) {
+    if (Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
       if (e.getEvent().getWheelRotation() < 0) {
 
         Point2D newFocus = new Point2D.Double(currentFocus.getX() - this.scrollSpeed, currentFocus.getY());
@@ -1268,16 +1096,26 @@ public class MapComponent extends GuiComponent {
     switch (this.editMode) {
     case EDITMODE_EDIT:
       if (Transform.type() == TransformType.RESIZE) {
-        if (!this.isTransforming) {
-          this.isTransforming = true;
+        if (!this.isResizing) {
+          this.isResizing = true;
           UndoManager.instance().mapObjectChanging(this.getFocusedMapObject());
         }
 
-        this.handleResizeTransform();
+        Transform.resize();
       }
+
       break;
     case EDITMODE_MOVE:
-      this.handleMoveTransform();
+      if (!this.isMoving) {
+        this.isMoving = true;
+
+        UndoManager.instance().beginOperation();
+        for (IMapObject selected : this.getSelectedMapObjects()) {
+          UndoManager.instance().mapObjectChanging(selected);
+        }
+      }
+
+      Transform.move();
 
       break;
     default:
@@ -1290,10 +1128,7 @@ public class MapComponent extends GuiComponent {
       return;
     }
 
-    this.dragPoint = null;
-    this.dragLocationMapObjects.clear();
-    this.dragSizeHeight = 0;
-    this.dragSizeWidth = 0;
+    Transform.resetDragging();
 
     switch (this.editMode) {
     case EDITMODE_CREATE:
@@ -1326,9 +1161,9 @@ public class MapComponent extends GuiComponent {
 
       break;
     case EDITMODE_EDIT:
-      if (this.isMoving || this.isTransforming) {
+      if (this.isMoving || this.isResizing) {
         this.isMoving = false;
-        this.isTransforming = false;
+        this.isResizing = false;
         UndoManager.instance().mapObjectChanged(this.getFocusedMapObject());
       }
 
