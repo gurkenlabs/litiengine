@@ -43,13 +43,19 @@ public class Transform {
     return resizeAnchors.values();
   }
 
+  /***
+   * Updates the currently applicable transform by evaluating the focused resize
+   * anchor from the current mouse location or whether the mouse is currently
+   * hovered over any selected map object to allow a move transformation.
+   * <p>
+   * This method also ensures that an adequate mouse cursor is set.
+   * </p>
+   */
   public static void updateTransform() {
     anchor = null;
-    boolean anchorHovered = false;
     for (Entry<ResizeAnchor, Rectangle2D> entry : resizeAnchors.entrySet()) {
       Rectangle2D hoverrect = GeometricUtilities.extrude(entry.getValue(), 2.5);
       if (hoverrect.contains(Input.mouse().getMapLocation())) {
-        anchorHovered = true;
         if (entry.getKey() == ResizeAnchor.DOWN || entry.getKey() == ResizeAnchor.UP) {
           Game.window().getRenderComponent().setCursor(Cursors.TRANS_VERTICAL, 0, 0);
         } else if (entry.getKey() == ResizeAnchor.UPLEFT || entry.getKey() == ResizeAnchor.DOWNRIGHT) {
@@ -66,7 +72,8 @@ public class Transform {
       }
     }
 
-    if (!anchorHovered) {
+    // if no anchor is hovered, check if we can apply a move transform
+    if (anchor == null) {
       for (IMapObject selected : EditorScreen.instance().getMapComponent().getSelectedMapObjects()) {
         if (selected.getBoundingBox().contains(Input.mouse().getMapLocation())) {
           Game.window().getRenderComponent().setCursor(Cursors.MOVE, 0, 0);
@@ -75,6 +82,7 @@ public class Transform {
         }
       }
 
+      // if no transform can be applied, reset the transform type
       Game.window().getRenderComponent().setCursor(Cursors.DEFAULT, 0, 0);
       type = TransformType.NONE;
     }

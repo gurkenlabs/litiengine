@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -88,11 +89,11 @@ public class MapComponent extends GuiComponent {
   private final List<Consumer<TmxMap>> loadedConsumer;
   private final List<Consumer<Blueprint>> copyTargetChangedConsumer;
 
-  private final java.util.Map<String, Point2D> cameraFocus;
-  private final java.util.Map<String, IMapObject> focusedObjects;
-  private final java.util.Map<String, List<IMapObject>> selectedObjects;
-  private final java.util.Map<String, Environment> environments;
-  private final java.util.Map<IMapObject, Point2D> dragLocationMapObjects;
+  private final Map<String, Point2D> cameraFocus;
+  private final Map<String, IMapObject> focusedObjects;
+  private final Map<String, List<IMapObject>> selectedObjects;
+  private final Map<String, Environment> environments;
+  private final Map<IMapObject, Point2D> dragLocationMapObjects;
 
   private int editMode = EDITMODE_EDIT;
 
@@ -758,10 +759,6 @@ public class MapComponent extends GuiComponent {
       return;
     }
 
-    this.exportMap(map);
-  }
-
-  public void exportMap(TmxMap map) {
     XmlExportDialog.export(map, "Map", map.getName(), TmxMap.FILE_EXTENSION, dir -> {
       for (ITileset tileSet : map.getTilesets()) {
         ImageFormat format = ImageFormat.get(FileUtilities.getExtension(tileSet.getImage().getSource()));
@@ -1069,9 +1066,10 @@ public class MapComponent extends GuiComponent {
 
       if (selected.equals(this.getFocusedMapObject())) {
         UI.getInspector().bind(selected);
-        Transform.updateAnchors();
       }
     }
+    
+    Transform.updateAnchors();
   }
 
   private void setCopyBlueprint(Blueprint copyTarget) {
@@ -1125,9 +1123,8 @@ public class MapComponent extends GuiComponent {
         return;
       }
 
-      this.beforeKeyPressed();
+      this.beforeArrowKeyPressed();
       this.handleEntityDrag(1, 0);
-      afterKeyPressed();
     });
 
     Input.keyboard().onKeyPressed(KeyEvent.VK_LEFT, e -> {
@@ -1135,9 +1132,8 @@ public class MapComponent extends GuiComponent {
         return;
       }
 
-      this.beforeKeyPressed();
+      this.beforeArrowKeyPressed();
       this.handleEntityDrag(-1, 0);
-      afterKeyPressed();
     });
 
     Input.keyboard().onKeyPressed(KeyEvent.VK_UP, e -> {
@@ -1145,9 +1141,8 @@ public class MapComponent extends GuiComponent {
         return;
       }
 
-      this.beforeKeyPressed();
+      this.beforeArrowKeyPressed();
       this.handleEntityDrag(0, -1);
-      afterKeyPressed();
     });
 
     Input.keyboard().onKeyPressed(KeyEvent.VK_DOWN, e -> {
@@ -1155,13 +1150,12 @@ public class MapComponent extends GuiComponent {
         return;
       }
 
-      this.beforeKeyPressed();
+      this.beforeArrowKeyPressed();
       this.handleEntityDrag(0, 1);
-      afterKeyPressed();
     });
   }
 
-  private void beforeKeyPressed() {
+  private void beforeArrowKeyPressed() {
     if (!this.isMovingWithKeyboard) {
       UndoManager.instance().beginOperation();
       for (IMapObject selected : this.getSelectedMapObjects()) {
@@ -1170,10 +1164,6 @@ public class MapComponent extends GuiComponent {
 
       this.isMovingWithKeyboard = true;
     }
-  }
-
-  private static void afterKeyPressed() {
-    Transform.updateAnchors();
   }
 
   private void setupMouseControls() {
