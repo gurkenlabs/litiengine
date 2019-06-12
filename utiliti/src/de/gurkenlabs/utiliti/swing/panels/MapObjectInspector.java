@@ -121,20 +121,20 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     panel_1.setLayout(new BoxLayout(panel_1, BoxLayout.X_AXIS));
 
     JLabel lblEntityId = new JLabel("ID");
-    lblEntityId.setFont(lblEntityId.getFont().deriveFont(Font.BOLD).deriveFont(12f));
+    lblEntityId.setFont(lblEntityId.getFont().deriveFont(Font.BOLD));
 
     this.labelEntityID = new JLabel("####");
-    this.labelEntityID.setFont(labelEntityID.getFont().deriveFont(12f));
+    this.labelEntityID.setFont(labelEntityID.getFont());
 
     this.lblLayer = new JLabel("");
 
     this.lblRendering = new JLabel("");
     this.lblRendering.setForeground(Color.GRAY);
-    this.lblRendering.setFont(lblRendering.getFont().deriveFont(10f));
+    this.lblRendering.setFont(lblRendering.getFont().deriveFont(lblRendering.getFont().getStyle() * 0.75f));
 
     this.lblLayer.setHorizontalAlignment(SwingConstants.TRAILING);
     this.lblLayer.setForeground(Color.GRAY);
-    this.lblLayer.setFont(this.lblLayer.getFont().deriveFont(10f));
+    this.lblLayer.setFont(this.lblLayer.getFont().deriveFont(lblLayer.getFont().getStyle() * 0.75f));
 
     panel_1.add(lblEntityId);
     panel_1.add(Box.createHorizontalStrut(47));
