@@ -124,7 +124,6 @@ public class Editor extends Screen {
   @Override
   public void render(final Graphics2D g) {
 
-    Game.world().camera().updateFocus();
     if (Game.world().environment() != null) {
       Game.world().environment().render(g);
     }
