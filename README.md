@@ -95,7 +95,7 @@ Visit the official [LITIengine forum](https://forum.litiengine.com/) for trouble
 * View our [Contribution guidelines](https://github.com/gurkenlabs/litiengine/blob/master/CONTRIBUTING.md)
 
 ## Cite the LITIengine
-If you want to cite parts of the LITIengie in your academic work, you can use the fllowing Digital Object Identifier:
+If you want to cite parts of the LITIengie in your academic work, you can use the following Digital Object Identifier:
 
 [![DOI](https://zenodo.org/badge/87944612.svg)](https://zenodo.org/badge/latestdoi/87944612)
 
