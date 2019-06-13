@@ -15,6 +15,22 @@ public final class MapUtilities {
     throw new UnsupportedOperationException();
   }
 
+  public static Rectangle2D getBounds(IMapObject... objects) {
+    double x = Double.MAX_VALUE;
+    double y = Double.MAX_VALUE;
+    double maxX = Double.MIN_VALUE;
+    double maxY = Double.MIN_VALUE;
+    for (IMapObject object : objects) {
+      final Rectangle2D bounds = object.getBoundingBox();
+      x = Math.min(bounds.getX(), x);
+      y = Math.min(bounds.getY(), y);
+      maxX = Math.max(bounds.getX(), maxX);
+      maxY = Math.max(bounds.getY(), maxY);
+    }
+
+    return new Rectangle2D.Double(x, y, maxX - x, maxY - y);
+  }
+
   public static int getMaxMapId(final IMap map) {
     int maxId = 0;
     if (map == null || map.getMapObjectLayers() == null) {
@@ -38,18 +54,6 @@ public final class MapUtilities {
     }
 
     return maxId;
-  }
-
-  public static Point2D getCenterMapLocation() {
-    if (Game.world().environment() == null || Game.world().environment().getMap() == null) {
-      return new Point2D.Double();
-    }
-
-    return getCenterMapLocation(Game.world().environment().getMap());
-  }
-
-  public static Point2D getCenterMapLocation(IMap map) {
-    return new Point2D.Double(map.getSizeInPixels().width / 2.0, map.getSizeInPixels().height / 2.0);
   }
 
   public static Rectangle2D getTileBoundingBox(final IMap map, final Rectangle2D box) {

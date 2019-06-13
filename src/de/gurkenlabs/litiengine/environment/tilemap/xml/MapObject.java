@@ -118,42 +118,24 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
     this.setId(id);
   }
 
-  public static Rectangle2D getBounds2D(IMapObject... objects) {
-    return getBounds(objects);
-  }
-
-  public static Rectangle2D getBounds2D(Iterable<IMapObject> objects) {
-    return getBounds(objects);
-  }
-
   public static Rectangle2D getBounds(IMapObject... objects) {
     return getBounds(Arrays.asList(objects));
   }
 
   public static Rectangle2D getBounds(Iterable<IMapObject> objects) {
-    float minX = -1;
-    float minY = -1;
-    float maxX = -1;
-    float maxY = -1;
-    for (IMapObject item : objects) {
-      if (minX == -1 || item.getX() < minX) {
-        minX = item.getX();
-      }
-
-      if (minY == -1 || item.getY() < minY) {
-        minY = item.getY();
-      }
-
-      if (maxX == -1 || item.getBoundingBox().getMaxX() > maxX) {
-        maxX = (int) item.getBoundingBox().getMaxX();
-      }
-
-      if (maxY == -1 || item.getBoundingBox().getMaxY() > maxY) {
-        maxY = (int) item.getBoundingBox().getMaxY();
-      }
+    double x = Double.MAX_VALUE;
+    double y = Double.MAX_VALUE;
+    double maxX = Double.MIN_VALUE;
+    double maxY = Double.MIN_VALUE;
+    for (IMapObject object : objects) {
+      final Rectangle2D bounds = object.getBoundingBox();
+      x = Math.min(bounds.getX(), x);
+      y = Math.min(bounds.getY(), y);
+      maxX = Math.max(bounds.getMaxX(), maxX);
+      maxY = Math.max(bounds.getMaxY(), maxY);
     }
 
-    return new Rectangle2D.Float(minX, minY, maxX - minX, maxY - minY);
+    return new Rectangle2D.Double(x, y, maxX - x, maxY - y);
   }
 
   @Override

@@ -1,8 +1,11 @@
 package de.gurkenlabs.utiliti.handlers;
 
+import java.awt.Dimension;
 import java.awt.event.KeyEvent;
+import java.awt.geom.Dimension2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +37,6 @@ public class Transform {
   }
 
   private static final Map<ResizeAnchor, Rectangle2D> resizeAnchors = new ConcurrentHashMap<>();
-  private static final Map<IMapObject, Point2D> dragLocationMapObjects = new ConcurrentHashMap<>();
 
   private static final int TRANSFORM_RECT_SIZE = 6;
 
@@ -43,9 +45,10 @@ public class Transform {
   private static TransformType type;
   private static ResizeAnchor anchor;
 
+  private static DragData drag;
+
   private static float dragSizeHeight;
   private static float dragSizeWidth;
-  private static Point2D dragPoint;
 
   public static TransformType type() {
     return type;
@@ -65,62 +68,70 @@ public class Transform {
       return;
     }
 
-    if (dragPoint == null) {
-      dragPoint = Input.mouse().getMapLocation();
-      dragLocationMapObjects.put(transformObject, new Point2D.Double(transformObject.getX(), transformObject.getY()));
+    if (drag == null) {
+      drag = new DragData(transformObject);
       dragSizeHeight = transformObject.getHeight();
       dragSizeWidth = transformObject.getWidth();
       return;
     }
 
-    Point2D dragLocationMapObject = dragLocationMapObjects.get(transformObject);
-    double deltaX = Input.mouse().getMapLocation().getX() - dragPoint.getX();
-    double deltaY = Input.mouse().getMapLocation().getY() - dragPoint.getY();
+    // get the distance that the mouse moved since the start of the dragging
+    // operation
+    final Point2D newMouseLocation = Input.mouse().getMapLocation();
+    final double mouseDeltaX = newMouseLocation.getX() - drag.mouseLocation.getX();
+    final double mouseDeltaY = newMouseLocation.getY() - drag.mouseLocation.getY();
+
     double newWidth = dragSizeWidth;
     double newHeight = dragSizeHeight;
-    double newX = dragLocationMapObject.getX();
-    double newY = dragLocationMapObject.getY();
+    double newX = drag.minX;
+    double newY = drag.minY;
 
     switch (Transform.anchor()) {
     case DOWN:
-      newHeight += deltaY;
+      newHeight += mouseDeltaY;
       break;
     case DOWNRIGHT:
-      newHeight += deltaY;
-      newWidth += deltaX;
+      newHeight += mouseDeltaY;
+      newWidth += mouseDeltaX;
       break;
     case DOWNLEFT:
-      newHeight += deltaY;
-      newWidth -= deltaX;
-      newX += deltaX;
-      newX = MathUtilities.clamp(newX, 0, dragLocationMapObject.getX() + dragSizeWidth);
+      newHeight += mouseDeltaY;
+      newWidth -= mouseDeltaX;
+      newX += mouseDeltaX;
+      // newX = MathUtilities.clamp(newX, 0, dragLocationMapObject.getX() +
+      // dragSizeWidth);
       break;
     case LEFT:
-      newWidth -= deltaX;
-      newX += deltaX;
-      newX = MathUtilities.clamp(newX, 0, dragLocationMapObject.getX() + dragSizeWidth);
+      newWidth -= mouseDeltaX;
+      newX += mouseDeltaX;
+      // newX = MathUtilities.clamp(newX, 0, dragLocationMapObject.getX() +
+      // dragSizeWidth);
       break;
     case RIGHT:
-      newWidth += deltaX;
+      newWidth += mouseDeltaX;
       break;
     case UP:
-      newHeight -= deltaY;
-      newY += deltaY;
-      newY = MathUtilities.clamp(newY, 0, dragLocationMapObject.getY() + dragSizeHeight);
+      newHeight -= mouseDeltaY;
+      newY += mouseDeltaY;
+      // newY = MathUtilities.clamp(newY, 0, dragLocationMapObject.getY() +
+      // dragSizeHeight);
       break;
     case UPLEFT:
-      newHeight -= deltaY;
-      newY += deltaY;
-      newY = MathUtilities.clamp(newY, 0, dragLocationMapObject.getY() + dragSizeHeight);
-      newWidth -= deltaX;
-      newX += deltaX;
-      newX = MathUtilities.clamp(newX, 0, dragLocationMapObject.getX() + dragSizeWidth);
+      newHeight -= mouseDeltaY;
+      newY += mouseDeltaY;
+      // newY = MathUtilities.clamp(newY, 0, dragLocationMapObject.getY() +
+      // dragSizeHeight);
+      newWidth -= mouseDeltaX;
+      newX += mouseDeltaX;
+      // newX = MathUtilities.clamp(newX, 0, dragLocationMapObject.getX() +
+      // dragSizeWidth);
       break;
     case UPRIGHT:
-      newHeight -= deltaY;
-      newY += deltaY;
-      newY = MathUtilities.clamp(newY, 0, dragLocationMapObject.getY() + dragSizeHeight);
-      newWidth += deltaX;
+      newHeight -= mouseDeltaY;
+      newY += mouseDeltaY;
+      // newY = MathUtilities.clamp(newY, 0, dragLocationMapObject.getY() +
+      // dragSizeHeight);
+      newWidth += mouseDeltaX;
       break;
     default:
       return;
@@ -160,59 +171,66 @@ public class Transform {
     updateAnchors();
   }
 
+  /**
+   * Moves the currently selected map objects by the distance the mouse passed
+   * since starting to drag.
+   * 
+   * <p>
+   * Map objects are moved relative to the corners of the most left and most top
+   * objects, i.e. the snapping will only be applied to the objects on the
+   * border and all the other objects keep their relative distances. <br>
+   * In a way this means that we're not moving the objects individually but
+   * instead move them as a group that doesn't change its internal positioning.
+   * </p>
+   */
   public static void move() {
     final List<IMapObject> selectedMapObjects = Editor.instance().getMapComponent().getSelectedMapObjects();
-    IMapObject minX = null;
-    IMapObject minY = null;
-    for (IMapObject selected : selectedMapObjects) {
-      if (minX == null || selected.getX() < minX.getX()) {
-        minX = selected;
-      }
-
-      if (minY == null || selected.getY() < minY.getY()) {
-        minY = selected;
-      }
-    }
-
-    if (minX == null || minY == null || (!Input.keyboard().isPressed(KeyEvent.VK_CONTROL) && Editor.instance().getMapComponent().getEditMode() != MapComponent.EDITMODE_MOVE)) {
+    if (selectedMapObjects.isEmpty() || (!Input.keyboard().isPressed(KeyEvent.VK_CONTROL) && Editor.instance().getMapComponent().getEditMode() != MapComponent.EDITMODE_MOVE)) {
       return;
     }
 
-    if (dragPoint == null) {
-      dragPoint = Input.mouse().getMapLocation();
+    // track the initial mouse location to use it for calculating the delta
+    // values
+    if (drag == null) {
+      drag = new DragData(selectedMapObjects);
       return;
     }
 
-    if (!dragLocationMapObjects.containsKey(minX)) {
-      dragLocationMapObjects.put(minX, new Point2D.Double(minX.getX(), minX.getY()));
+    // get the distance that the mouse moved since the start of the dragging
+    // operation
+    // note that the always needs to be relative to the original positions
+    // because otherwise, too small mouse movements will be
+    // ignored due to snapping (particularly with grid snapping)
+    final Point2D newMouseLocation = Input.mouse().getMapLocation();
+    final double mouseDeltaX = newMouseLocation.getX() - drag.mouseLocation.getX();
+    final double mouseDeltaY = newMouseLocation.getY() - drag.mouseLocation.getY();
+
+    // snap the new location to the grid or the pixels, depending on the user
+    // preference
+    float newX = Snap.x(drag.minX + mouseDeltaX);
+    float newY = Snap.y(drag.minY + mouseDeltaY);
+
+    // clamp the new location to the map
+    if (Editor.preferences().clampToMap()) {
+      final IMap map = Game.world().environment().getMap();
+      newX = MathUtilities.clamp(newX, 0, map.getSizeInPixels().width - drag.width);
+      newY = MathUtilities.clamp(newY, 0, map.getSizeInPixels().height - drag.height);
     }
 
-    if (!dragLocationMapObjects.containsKey(minY)) {
-      dragLocationMapObjects.put(minY, new Point2D.Double(minY.getX(), minY.getY()));
-    }
-
-    Point2D dragLocationMapObjectMinX = dragLocationMapObjects.get(minX);
-    Point2D dragLocationMapObjectMinY = dragLocationMapObjects.get(minY);
-
-    double deltaX = Input.mouse().getMapLocation().getX() - dragPoint.getX();
-    float newX = Snap.x(dragLocationMapObjectMinX.getX() + deltaX);
-    float snappedDeltaX = newX - minX.getX();
-
-    double deltaY = Input.mouse().getMapLocation().getY() - dragPoint.getY();
-    float newY = Snap.y(dragLocationMapObjectMinY.getY() + deltaY);
-    float snappedDeltaY = newY - minY.getY();
-
-    if (snappedDeltaX == 0 && snappedDeltaY == 0) {
+    // calculate the actual delta that all the map objects need to be moved by
+    float deltaX = newX - drag.minX;
+    float deltaY = newY - drag.minY;
+    if (deltaX == 0 && deltaY == 0) {
       return;
     }
 
-    final Rectangle2D beforeBounds = MapObject.getBounds2D(selectedMapObjects);
-    moveEntities(selectedMapObjects, snappedDeltaX, snappedDeltaY);
+    final Rectangle2D beforeBounds = MapObject.getBounds(selectedMapObjects);
+    moveEntities(selectedMapObjects, deltaX, deltaY);
 
     if (selectedMapObjects.stream().anyMatch(x -> MapObjectType.get(x.getType()) == MapObjectType.STATICSHADOW)) {
       Game.world().environment().updateLighting();
     } else if (selectedMapObjects.stream().anyMatch(x -> MapObjectType.get(x.getType()) == MapObjectType.LIGHTSOURCE)) {
-      final Rectangle2D afterBounds = MapObject.getBounds2D(selectedMapObjects);
+      final Rectangle2D afterBounds = MapObject.getBounds(selectedMapObjects);
       double x = Math.min(beforeBounds.getX(), afterBounds.getX());
       double y = Math.min(beforeBounds.getY(), afterBounds.getY());
       double width = Math.max(beforeBounds.getMaxX(), afterBounds.getMaxX()) - x;
@@ -222,18 +240,13 @@ public class Transform {
   }
 
   public static void moveEntities(List<IMapObject> selectedMapObjects, float deltaX, float deltaY) {
-    final IMap map = Game.world().environment().getMap();
 
     for (IMapObject selected : selectedMapObjects) {
-      float newX = selected.getX() + deltaX;
-      float newY = selected.getY() + deltaY;
-      if (Editor.preferences().clampToMap()) {
-        newX = MathUtilities.clamp(newX, 0, map.getSizeInPixels().width - selected.getWidth());
-        newY = MathUtilities.clamp(newY, 0, map.getSizeInPixels().height - selected.getHeight());
-      }
+      double newX = drag.originalLocations.get(selected).getX() + deltaX;
+      double newY = drag.originalLocations.get(selected).getY() + deltaY;
 
-      selected.setX(newX);
-      selected.setY(newY);
+      selected.setX((float) newX);
+      selected.setY((float) newY);
 
       IEntity entity = Game.world().environment().get(selected.getId());
       if (entity != null) {
@@ -305,7 +318,7 @@ public class Transform {
     }
 
     for (ResizeAnchor trans : ResizeAnchor.values()) {
-      Rectangle2D transRect = new Rectangle2D.Double(getTransX(trans, focus), getTransY(trans, focus), transformRectSize, transformRectSize);
+      Rectangle2D transRect = new Rectangle2D.Double(getAnchorX(trans, focus), getAnchorY(trans, focus), transformRectSize, transformRectSize);
       resizeAnchors.put(trans, transRect);
     }
   }
@@ -313,11 +326,10 @@ public class Transform {
   public static void resetDragging() {
     dragSizeHeight = 0;
     dragSizeWidth = 0;
-    dragPoint = null;
-    dragLocationMapObjects.clear();
+    drag = null;
   }
 
-  private static double getTransX(ResizeAnchor type, Rectangle2D focus) {
+  private static double getAnchorX(ResizeAnchor type, Rectangle2D focus) {
     switch (type) {
     case DOWN:
     case UP:
@@ -335,7 +347,7 @@ public class Transform {
     }
   }
 
-  private static double getTransY(ResizeAnchor type, Rectangle2D focus) {
+  private static double getAnchorY(ResizeAnchor type, Rectangle2D focus) {
     switch (type) {
     case DOWN:
     case DOWNLEFT:
@@ -350,6 +362,34 @@ public class Transform {
       return focus.getCenterY() - transformRectSize / 2;
     default:
       return 0;
+    }
+  }
+
+  private static class DragData {
+    private final Map<IMapObject, Point2D> originalLocations;
+    private final Point2D mouseLocation;
+    private final float minX;
+    private final float minY;
+    private final float width;
+    private final float height;
+
+    public DragData(IMapObject... selectedMapObjects) {
+      this(Arrays.asList(selectedMapObjects));
+    }
+
+    public DragData(List<IMapObject> selectedMapObjects) {
+      this.originalLocations = new ConcurrentHashMap<>();
+
+      this.mouseLocation = Input.mouse().getMapLocation();
+      Rectangle2D bounds = MapObject.getBounds(selectedMapObjects);
+      this.minX = (float) bounds.getX();
+      this.minY = (float) bounds.getY();
+      this.width = (float) bounds.getWidth();
+      this.height = (float) bounds.getHeight();
+
+      for (IMapObject obj : selectedMapObjects) {
+        this.originalLocations.put(obj, obj.getLocation());
+      }
     }
   }
 }
