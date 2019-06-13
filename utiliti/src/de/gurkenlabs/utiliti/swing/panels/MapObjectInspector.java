@@ -158,6 +158,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     }
   }
 
+  @Override
   public MapObjectType getObjectType() {
     return this.type;
   }
@@ -256,6 +257,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.tabbedPanel.repaint();
   }
 
+  @Override
   public void setMapObjectType(MapObjectType type) {
     this.type = type;
     switchPanel();
@@ -292,15 +294,15 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.labelEntityID.setText(Integer.toString(mapObject.getId()));
 
     this.lblLayer.setText("layer: " + mapObject.getLayer().getName());
-    String info = this.getRendering(mapObject);
+    String info = getRendering(mapObject);
     if (info == null) {
       this.lblRendering.setText("");
     } else {
-      this.lblRendering.setText("render: " + this.getRendering(mapObject));
+      this.lblRendering.setText("render: " + getRendering(mapObject));
     }
   }
 
-  private String getRendering(IMapObject mapObject) {
+  private static String getRendering(IMapObject mapObject) {
     switch (MapObjectType.get(mapObject.getType())) {
     case PROP:
     case EMITTER:

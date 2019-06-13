@@ -62,10 +62,12 @@ public class MapList extends JScrollPane implements MapController {
     UndoManager.onUndoStackChanged(manager -> this.bind(Editor.instance().getMapComponent().getMaps()));
   }
 
+  @Override
   public synchronized void bind(List<TmxMap> maps) {
     this.bind(maps, false);
   }
 
+  @Override
   public synchronized void bind(List<TmxMap> maps, boolean clear) {
     if (clear) {
       this.model.clear();
@@ -100,6 +102,7 @@ public class MapList extends JScrollPane implements MapController {
     this.refresh();
   }
 
+  @Override
   public void setSelection(String mapName) {
     if (mapName == null || mapName.isEmpty()) {
       list.clearSelection();
@@ -112,6 +115,7 @@ public class MapList extends JScrollPane implements MapController {
     this.refresh();
   }
 
+  @Override
   public IMap getCurrentMap() {
     if (this.list.getSelectedIndex() == -1) {
       return null;
@@ -119,6 +123,7 @@ public class MapList extends JScrollPane implements MapController {
     return Editor.instance().getMapComponent().getMaps().get(list.getSelectedIndex());
   }
 
+  @Override
   public void refresh() {
     if (list.getSelectedIndex() == -1 && this.model.size() > 0) {
       this.list.setSelectedIndex(0);

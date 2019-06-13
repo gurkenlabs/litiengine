@@ -79,7 +79,6 @@ public class Editor extends Screen {
 
   private final List<Runnable> loadedCallbacks;
 
-  private double padding;
   private MapComponent mapComponent;
   private ResourceBundle gameFile = new ResourceBundle();
   private String projectPath;

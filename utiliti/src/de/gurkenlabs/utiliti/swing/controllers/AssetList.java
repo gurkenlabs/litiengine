@@ -52,6 +52,7 @@ public class AssetList extends JSplitPane implements Controller {
     return this.assetTree;
   }
 
+  @Override
   public void refresh() {
     this.assetTree.forceUpdate();
   }

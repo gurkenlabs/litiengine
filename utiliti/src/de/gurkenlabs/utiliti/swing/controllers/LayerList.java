@@ -85,7 +85,7 @@ public final class LayerList extends JScrollPane implements LayerController {
       if (selIndex < 0 || selIndex >= this.layerModel.size()) {
         map.addLayer(layer);
       } else {
-        map.addLayer(this.getAbsoluteIndex(map, this.getCurrentLayerIndex()), layer);
+        map.addLayer(getAbsoluteIndex(map, this.getCurrentLayerIndex()), layer);
       }
 
       this.list.setSelectedIndex(selIndex);
@@ -110,7 +110,7 @@ public final class LayerList extends JScrollPane implements LayerController {
 
     this.buttonDuplicateLayer = createButton(Icons.COPYX16, (map, selectedLayer) -> {
       IMapObjectLayer copiedLayer = new MapObjectLayer((MapObjectLayer) selectedLayer);
-      map.addLayer(this.getAbsoluteIndex(map, this.getCurrentLayerIndex()), copiedLayer);
+      map.addLayer(getAbsoluteIndex(map, this.getCurrentLayerIndex()), copiedLayer);
       this.refresh();
       Editor.instance().getMapComponent().add(copiedLayer);
     });
@@ -152,7 +152,7 @@ public final class LayerList extends JScrollPane implements LayerController {
       }
 
       map.removeLayer(selectedLayer);
-      map.addLayer(this.getAbsoluteIndex(map, selLayerIndex), selectedLayer);
+      map.addLayer(getAbsoluteIndex(map, selLayerIndex), selectedLayer);
       this.list.setSelectedIndex(selLayerIndex + 1);
     });
 
@@ -163,7 +163,7 @@ public final class LayerList extends JScrollPane implements LayerController {
       }
 
       map.removeLayer(selectedLayer);
-      map.addLayer(this.getAbsoluteIndex(map, selLayerIndex - 2), selectedLayer);
+      map.addLayer(getAbsoluteIndex(map, selLayerIndex - 2), selectedLayer);
       this.list.setSelectedIndex(selLayerIndex - 1);
     });
 
@@ -194,6 +194,7 @@ public final class LayerList extends JScrollPane implements LayerController {
     });
   }
 
+  @Override
   public IMapObjectLayer getCurrentLayer() {
     JCheckBox current = this.list.getSelectedValue();
     if (current == null) {
@@ -221,10 +222,12 @@ public final class LayerList extends JScrollPane implements LayerController {
     this.list.setSelectedIndex(index);
   }
 
+  @Override
   public void clear() {
     this.selectedLayers.clear();
   }
 
+  @Override
   public void refresh() {
     this.refreshing = true;
     try {
@@ -281,6 +284,7 @@ public final class LayerList extends JScrollPane implements LayerController {
     }
   }
 
+  @Override
   public void onLayersChanged(Consumer<IMap> consumer) {
     this.layerChangedListeners.add(consumer);
   }
@@ -332,7 +336,7 @@ public final class LayerList extends JScrollPane implements LayerController {
     return this.list.getModel().getSize() - 1 - this.list.getSelectedIndex();
   }
 
-  private int getAbsoluteIndex(IMap map, int index) {
+  private static int getAbsoluteIndex(IMap map, int index) {
     if (map.getMapObjectLayers().size() <= 1) {
       return 0;
     }

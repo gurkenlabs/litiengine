@@ -71,7 +71,7 @@ public final class RenderMenu extends JMenu {
     this.setEnabled(true);
   }
 
-  private void setRenderWithLayer(List<IMapObject> selectedMapObjects) {
+  private static void setRenderWithLayer(List<IMapObject> selectedMapObjects) {
     UndoManager.instance().beginOperation();
     for (IMapObject object : selectedMapObjects) {
       UndoManager.instance().mapObjectChanging(object);
@@ -87,7 +87,7 @@ public final class RenderMenu extends JMenu {
     UI.getInspector().bind(Editor.instance().getMapComponent().getFocusedMapObject());
   }
 
-  private void setRenderType(List<IMapObject> selectedMapObjects, RenderType renderType) {
+  private static void setRenderType(List<IMapObject> selectedMapObjects, RenderType renderType) {
     UndoManager.instance().beginOperation();
     for (IMapObject object : selectedMapObjects) {
       UndoManager.instance().mapObjectChanging(object);

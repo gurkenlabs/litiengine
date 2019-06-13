@@ -192,6 +192,7 @@ public final class EntityList extends JPanel implements EntityController {
     this.add(this.searchPanel, BorderLayout.NORTH);
   }
 
+  @Override
   public void select(final IMapObject mapObject) {
     if (this.isFocussing) {
       return;
@@ -235,6 +236,7 @@ public final class EntityList extends JPanel implements EntityController {
     }
   }
   
+  @Override
   public void refresh() {
     this.nodeRoot.setUserObject(new IconTreeListItem((Game.world().environment() == null ? 0 : Game.world().environment().getEntities().size()) + " " + Resources.strings().get("panel_mapselection_entities"), Icons.FOLDER));
     for (DefaultMutableTreeNode node : this.entityNodes) {

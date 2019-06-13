@@ -59,7 +59,7 @@ public class SelectionRenderer implements IEditorRenderer {
     this.colorSelectionBorder = Color.getHSBColor(0, 0, this.selectionBorderBrightness);
   }
 
-  private void renderObjectId(Graphics2D g, IMapObject mapObject) {
+  private static void renderObjectId(Graphics2D g, IMapObject mapObject) {
     if (!Editor.preferences().renderMapIds()) {
       return;
     }
