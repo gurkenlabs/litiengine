@@ -158,7 +158,7 @@ public class MapComponent extends GuiComponent {
     this.focusedObjects = new ConcurrentHashMap<>();
     this.selectedObjects = new ConcurrentHashMap<>();
     this.environments = new ConcurrentHashMap<>();
-    this.maps = new ArrayList<>();
+    this.maps = new CopyOnWriteArrayList<>();
     this.cameraFocus = new ConcurrentHashMap<>();
 
     UndoManager.onUndoStackChanged(e -> Transform.updateAnchors());

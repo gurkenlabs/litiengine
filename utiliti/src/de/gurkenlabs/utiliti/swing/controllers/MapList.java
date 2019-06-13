@@ -29,7 +29,6 @@ public class MapList extends JScrollPane implements MapController {
     this.model = new DefaultListModel<>();
 
     this.list = new JList<>();
-    this.list.setModel(this.model);
     this.list.setVisibleRowCount(8);
     this.list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     this.list.setMaximumSize(new Dimension(0, 250));
@@ -96,7 +95,8 @@ public class MapList extends JScrollPane implements MapController {
       }
     }
 
-    list.revalidate();
+    this.list.setModel(this.model);
+    this.list.revalidate();
     this.refresh();
   }
 
