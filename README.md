@@ -94,6 +94,11 @@ Visit the official [LITIengine forum](https://forum.litiengine.com/) for trouble
 * Agree to our [Code of Conduct](https://github.com/gurkenlabs/litiengine/blob/master/CODE_OF_CONDUCT.md)
 * View our [Contribution guidelines](https://github.com/gurkenlabs/litiengine/blob/master/CONTRIBUTING.md)
 
+## Cite the LITIengine
+If you want to cite parts of the LITIengie in your academic work, you can use the fllowing Digital Object Identifier:
+
+[![DOI](https://zenodo.org/badge/87944612.svg)](https://zenodo.org/badge/latestdoi/87944612)
+
 ## Contacts 
 * Website [litiengine.com](https://litiengine.com)
 * Twitter [@gurkenlabs](https://twitter.com/gurkenlabs)
