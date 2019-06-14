@@ -43,7 +43,6 @@ public final class Sounds extends ResourcesContainer<Sound> {
     Sound sound;
     try {
       sound = new Sound(input, resource.getName());
-      this.add(resource.getName(), sound);
       return sound;
     } catch (IOException | UnsupportedAudioFileException e) {
       log.log(Level.SEVERE, "The audio file {0} could not be loaded.", new Object[] { resource.getName() });

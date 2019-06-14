@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -28,11 +29,11 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
+import de.gurkenlabs.litiengine.util.io.URLAdapter;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 
 @XmlRootElement(name = "litidata")
@@ -90,17 +91,22 @@ public class ResourceBundle implements Serializable {
         return null;
       }
 
+      for (SpritesheetResource res : gameFile.getSpriteSheets()) {
+        Resources.images().add(new URL(file, '#' + res.getName()), Resources.spritesheets().load(res).getImage());
+      }
+
+      for (SoundResource res : gameFile.getSounds()) {
+        Resources.sounds().add(new URL(file, '#' + res.getName()), Resources.sounds().load(res));
+      }
+
       for (Tileset tileset : gameFile.getTilesets()) {
         tileset.finish(file);
+        Resources.tilesets().add(new URL(file, '#' + tileset.getName()), tileset);
       }
 
       for (TmxMap map : gameFile.getMaps()) {
-        for (final ITileset tileset : map.getTilesets()) {
-          if (tileset instanceof Tileset) {
-            ((Tileset)tileset).load(gameFile.getTilesets());
-          }
-        }
         map.finish(file);
+        Resources.maps().add(new URL(file, '#' + map.getName()), map);
       }
 
       return gameFile;
@@ -196,6 +202,17 @@ public class ResourceBundle implements Serializable {
   private static ResourceBundle getGameFileFromFile(URL file) throws JAXBException, IOException {
     final JAXBContext jaxbContext = XmlUtilities.getContext(ResourceBundle.class);
     final Unmarshaller um = jaxbContext.createUnmarshaller();
+    um.setAdapter(URLAdapter.class, new URLAdapter(file) {
+      // TODO: come the beta release, this can be removed
+      @Override
+      public URL unmarshal(String v) throws MalformedURLException {
+        if (v.indexOf('/') == -1 && v.indexOf('\\') == -1 && v.indexOf('.') == -1 && !v.startsWith("#")) {
+          log.warning("Could not safely determine whether the reference \"" + v + "\" was referring to another resource in the bundle or a separate file.\nPrepend \"./\" or \"#\" to clear this ambiguity.");
+          v = '#' + v;
+        }
+        return super.unmarshal(v);
+      }
+    });
     try (InputStream inputStream = Resources.get(file)) {
 
       // try to get compressed game file
