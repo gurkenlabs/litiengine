@@ -63,7 +63,11 @@ public class Zoom {
   }
 
   public static float get() {
-    return zooms[currentZoomIndex];
+    return get(currentZoomIndex);
+  }
+
+  public static float get(int zoomIndex) {
+    return zooms[zoomIndex];
   }
 
   public static void set(float zoom) {
@@ -71,14 +75,14 @@ public class Zoom {
   }
 
   public static float getMax() {
-    return zooms[zooms.length - 1];
+    return get(zooms.length - 1);
   }
 
   public static float getMin() {
-    return zooms[0];
+    return get(0);
   }
 
   public static float getDefault() {
-    return zooms[DEFAULT_ZOOM_INDEX];
+    return get(DEFAULT_ZOOM_INDEX);
   }
 }

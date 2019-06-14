@@ -25,16 +25,16 @@ public class ZoomTests {
 
   @Test
   public void testZoomMatchToPresets() {
-    float matched1 = Zoom.match(1.11111f);
-    float matched2 = Zoom.match(101f);
-    float matched3 = Zoom.match(1000000f);
-    float matched4 = Zoom.match(0.00001f);
-    float matched5 = Zoom.match(3.1f);
+    int matched1 = Zoom.match(1.11111f);
+    int matched2 = Zoom.match(101f);
+    int matched3 = Zoom.match(1000000f);
+    int matched4 = Zoom.match(0.00001f);
+    int matched5 = Zoom.match(3.1f);
 
-    assertEquals(1.0f, matched1);
-    assertEquals(100f, matched2);
-    assertEquals(100f, matched3);
-    assertEquals(0.1f, matched4);
-    assertEquals(3f, matched5);
+    assertEquals(1.0f, Zoom.get(matched1));
+    assertEquals(100f, Zoom.get(matched2));
+    assertEquals(100f, Zoom.get(matched3));
+    assertEquals(0.1f, Zoom.get(matched4));
+    assertEquals(3f, Zoom.get(matched5));
   }
 }
