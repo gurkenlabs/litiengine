@@ -1,5 +1,7 @@
 package de.gurkenlabs.utiliti.handlers;
 
+import java.util.Arrays;
+
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.utiliti.components.Editor;
 
@@ -33,21 +35,15 @@ public class Zoom {
    * @return The index of the matched zoom provided by this class.
    */
   public static int match(float preference) {
-    int match = Integer.MAX_VALUE;
-    double diff = 0;
-    for (int i = 0; i < zooms.length; i++) {
-      double newDiff = Math.abs(preference - zooms[i]);
-      if ((diff == 0 && match == Integer.MAX_VALUE) || newDiff < diff) {
-        if (newDiff == 0) {
-          return i;
-        }
-
-        diff = newDiff;
-        match = i;
-      }
+    int index = Arrays.binarySearch(zooms, preference);
+    if (index >= 0) {
+      return index;
     }
-
-    return match;
+    index = -(index + 1);
+    if (index == zooms.length || index > 0 && zooms[index] + zooms[index - 1] > 2 * preference) {
+      index--;
+    }
+    return index;
   }
 
   public static void in() {
