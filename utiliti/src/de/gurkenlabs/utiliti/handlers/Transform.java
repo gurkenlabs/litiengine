@@ -1,8 +1,6 @@
 package de.gurkenlabs.utiliti.handlers;
 
-import java.awt.Dimension;
 import java.awt.event.KeyEvent;
-import java.awt.geom.Dimension2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Arrays;
@@ -29,7 +27,40 @@ import de.gurkenlabs.utiliti.swing.UI;
 public class Transform {
 
   public enum ResizeAnchor {
-    UP, DOWN, LEFT, RIGHT, UPLEFT, UPRIGHT, DOWNLEFT, DOWNRIGHT
+    UP(0, -1, 0, 1), DOWN(0, 1, 0, 0), LEFT(-1, 0, 1, 0), RIGHT(1, 0, 0, 0), UPLEFT(-1, -1, 1, 1), UPRIGHT(1, -1, 0, 1), DOWNLEFT(-1, 1, 1, 0), DOWNRIGHT(1, 1, 0, 0);
+
+    private final int w;
+    private final int h;
+    private final int x;
+    private final int y;
+
+    private ResizeAnchor(int widthFactor, int heightFactor, int xFactor, int yFactor) {
+      this.w = widthFactor;
+      this.h = heightFactor;
+      this.x = xFactor;
+      this.y = yFactor;
+    }
+
+    protected Rectangle2D getNewBounds(double deltaX, double deltaY, double originalX, double originalY, double originalWidth, double originalHeight) {
+
+      double newWidth = originalWidth;
+      double newHeight = originalHeight;
+
+      double newX = originalX;
+      double newY = originalY;
+
+      newWidth += deltaX * w;
+      newHeight += deltaY * h;
+      newX += deltaX * x;
+      newY += deltaY * y;
+
+      // TODO: Only apply where necessary
+      // newX = MathUtilities.clamp(newX, 0, originalX + originalWidth);
+      // newY = MathUtilities.clamp(newY, 0, originalY + originalHeight);
+
+
+      return new Rectangle2D.Double(newX, newY, newWidth, newHeight);
+    }
   }
 
   public enum TransformType {
@@ -46,9 +77,6 @@ public class Transform {
   private static ResizeAnchor anchor;
 
   private static DragData drag;
-
-  private static float dragSizeHeight;
-  private static float dragSizeWidth;
 
   public static TransformType type() {
     return type;
@@ -70,8 +98,6 @@ public class Transform {
 
     if (drag == null) {
       drag = new DragData(transformObject);
-      dragSizeHeight = transformObject.getHeight();
-      dragSizeWidth = transformObject.getWidth();
       return;
     }
 
@@ -81,31 +107,32 @@ public class Transform {
     final double mouseDeltaX = newMouseLocation.getX() - drag.mouseLocation.getX();
     final double mouseDeltaY = newMouseLocation.getY() - drag.mouseLocation.getY();
 
-    double newWidth = dragSizeWidth;
-    double newHeight = dragSizeHeight;
+    double newWidth = drag.originalBounds.get(transformObject).getWidth();
+    double newHeight = drag.originalBounds.get(transformObject).getHeight();
     double newX = drag.minX;
     double newY = drag.minY;
 
     switch (Transform.anchor()) {
     case DOWN:
       newHeight += mouseDeltaY;
+      newHeight = Math.min(0, newHeight);
       break;
     case DOWNRIGHT:
       newHeight += mouseDeltaY;
+      newHeight = Math.min(0, newHeight);
       newWidth += mouseDeltaX;
       break;
     case DOWNLEFT:
       newHeight += mouseDeltaY;
+      newHeight = Math.min(0, newHeight);
       newWidth -= mouseDeltaX;
       newX += mouseDeltaX;
-      // newX = MathUtilities.clamp(newX, 0, dragLocationMapObject.getX() +
-      // dragSizeWidth);
+      newX = Math.max(newX, drag.minX + drag.originalBounds.get(transformObject).getWidth());
       break;
     case LEFT:
       newWidth -= mouseDeltaX;
       newX += mouseDeltaX;
-      // newX = MathUtilities.clamp(newX, 0, dragLocationMapObject.getX() +
-      // dragSizeWidth);
+      newX = Math.max(newX, drag.minX + drag.originalBounds.get(transformObject).getWidth());
       break;
     case RIGHT:
       newWidth += mouseDeltaX;
@@ -113,24 +140,20 @@ public class Transform {
     case UP:
       newHeight -= mouseDeltaY;
       newY += mouseDeltaY;
-      // newY = MathUtilities.clamp(newY, 0, dragLocationMapObject.getY() +
-      // dragSizeHeight);
+      newY = Math.min(newY, drag.minY + drag.originalBounds.get(transformObject).getHeight());
       break;
     case UPLEFT:
       newHeight -= mouseDeltaY;
       newY += mouseDeltaY;
-      // newY = MathUtilities.clamp(newY, 0, dragLocationMapObject.getY() +
-      // dragSizeHeight);
+      newY = MathUtilities.clamp(newY, 0, drag.minY + drag.originalBounds.get(transformObject).getHeight());
       newWidth -= mouseDeltaX;
       newX += mouseDeltaX;
-      // newX = MathUtilities.clamp(newX, 0, dragLocationMapObject.getX() +
-      // dragSizeWidth);
+      newX = MathUtilities.clamp(newX, 0, drag.minX + drag.originalBounds.get(transformObject).getWidth());
       break;
     case UPRIGHT:
       newHeight -= mouseDeltaY;
       newY += mouseDeltaY;
-      // newY = MathUtilities.clamp(newY, 0, dragLocationMapObject.getY() +
-      // dragSizeHeight);
+      newY = MathUtilities.clamp(newY, 0, drag.minY + drag.originalBounds.get(transformObject).getHeight());
       newWidth += mouseDeltaX;
       break;
     default:
@@ -145,7 +168,7 @@ public class Transform {
     final IMap map = Game.world().environment().getMap();
     if (map != null && Editor.preferences().clampToMap()) {
       newX = MathUtilities.clamp(newX, 0, map.getSizeInPixels().width);
-      newY = MathUtilities.clamp(newX, 0, map.getSizeInPixels().height);
+      newY = MathUtilities.clamp(newY, 0, map.getSizeInPixels().height);
 
       newWidth = MathUtilities.clamp(newWidth, 0, map.getSizeInPixels().width - newX);
       newHeight = MathUtilities.clamp(newHeight, 0, map.getSizeInPixels().height - newY);
@@ -225,6 +248,7 @@ public class Transform {
     }
 
     final Rectangle2D beforeBounds = MapObject.getBounds(selectedMapObjects);
+
     moveEntities(selectedMapObjects, deltaX, deltaY);
 
     if (selectedMapObjects.stream().anyMatch(x -> MapObjectType.get(x.getType()) == MapObjectType.STATICSHADOW)) {
@@ -242,8 +266,8 @@ public class Transform {
   public static void moveEntities(List<IMapObject> selectedMapObjects, float deltaX, float deltaY) {
 
     for (IMapObject selected : selectedMapObjects) {
-      double newX = drag.originalLocations.get(selected).getX() + deltaX;
-      double newY = drag.originalLocations.get(selected).getY() + deltaY;
+      double newX = drag.originalBounds.get(selected).getX() + deltaX;
+      double newY = drag.originalBounds.get(selected).getY() + deltaY;
 
       selected.setX((float) newX);
       selected.setY((float) newY);
@@ -324,8 +348,6 @@ public class Transform {
   }
 
   public static void resetDragging() {
-    dragSizeHeight = 0;
-    dragSizeWidth = 0;
     drag = null;
   }
 
@@ -365,8 +387,8 @@ public class Transform {
     }
   }
 
-  private static class DragData {
-    private final Map<IMapObject, Point2D> originalLocations;
+  protected static class DragData {
+    private final Map<IMapObject, Rectangle2D> originalBounds;
     private final Point2D mouseLocation;
     private final float minX;
     private final float minY;
@@ -378,7 +400,7 @@ public class Transform {
     }
 
     public DragData(List<IMapObject> selectedMapObjects) {
-      this.originalLocations = new ConcurrentHashMap<>();
+      this.originalBounds = new ConcurrentHashMap<>();
 
       this.mouseLocation = Input.mouse().getMapLocation();
       Rectangle2D bounds = MapObject.getBounds(selectedMapObjects);
@@ -388,7 +410,7 @@ public class Transform {
       this.height = (float) bounds.getHeight();
 
       for (IMapObject obj : selectedMapObjects) {
-        this.originalLocations.put(obj, obj.getLocation());
+        this.originalBounds.put(obj, obj.getBoundingBox());
       }
     }
   }
