@@ -42,7 +42,7 @@ import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 @XmlRootElement(name = "map")
 @XmlAccessorType(XmlAccessType.FIELD)
-public final class TmxMap extends CustomPropertyProvider implements IMap, Comparable<TmxMap> {
+public final class TmxMap extends CustomPropertyProvider implements IMap {
   public static final String FILE_EXTENSION = "tmx";
 
   private static final Logger log = Logger.getLogger(TmxMap.class.getName());
@@ -405,19 +405,6 @@ public final class TmxMap extends CustomPropertyProvider implements IMap, Compar
   @XmlTransient
   public void setWidth(int width) {
     this.width = width;
-  }
-
-  @Override
-  public int compareTo(TmxMap o) {
-    if (this.name == null) {
-      return o.name == null ? 0 : -1;
-    }
-
-    if (o.name == null) {
-      return 1;
-    }
-
-    return this.name.compareTo(o.name);
   }
 
   @Override

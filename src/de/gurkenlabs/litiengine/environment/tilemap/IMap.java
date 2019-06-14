@@ -6,10 +6,12 @@ import java.awt.geom.Rectangle2D;
 import java.net.URL;
 import java.util.List;
 
+import de.gurkenlabs.litiengine.resources.Resource;
+
 /**
  * The Interface IMap.
  */
-public interface IMap extends ILayerList {
+public interface IMap extends ILayerList, Resource {
 
   /**
    * Gets the tilesets.
@@ -106,16 +108,6 @@ public interface IMap extends ILayerList {
   public double getVersion();
 
   public String getTiledVersion();
-
-  /**
-   * Sets the name.
-   *
-   * @param name
-   *          the new name
-   */
-  public void setName(String name);
-
-  public String getName();
 
   public int getNextObjectId();
   

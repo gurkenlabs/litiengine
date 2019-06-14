@@ -14,6 +14,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
+import de.gurkenlabs.litiengine.resources.Resource;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.resources.SoundResource;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
@@ -39,7 +40,7 @@ public class AssetPanel extends JPanel {
 
   public void loadSprites(List<SpritesheetResource> infos) {
     this.load(infos, () -> {
-      Collections.sort(infos);
+      Collections.sort(infos, Resource.BY_NAME);
       for (SpritesheetResource info : infos) {
         Icon icon;
         Spritesheet opt = Resources.spritesheets().get(info.getName());
@@ -59,7 +60,7 @@ public class AssetPanel extends JPanel {
 
   public void loadTilesets(List<Tileset> tilesets) {
     this.load(tilesets, () -> {
-      Collections.sort(tilesets);
+      Collections.sort(tilesets, Resource.BY_NAME);
       for (Tileset tileset : tilesets) {
         AssetPanelItem panelItem = new AssetPanelItem(Icons.DOC_TILESET, tileset.getName(), tileset);
         this.add(panelItem);
@@ -70,7 +71,7 @@ public class AssetPanel extends JPanel {
 
   public void loadEmitters(List<EmitterData> emitters) {
     this.load(emitters, () -> {
-      Collections.sort(emitters);
+      Collections.sort(emitters, Resource.BY_NAME);
       for (EmitterData emitter : emitters) {
         AssetPanelItem panelItem = new AssetPanelItem(Icons.DOC_EMITTER, emitter.getName(), emitter);
         this.add(panelItem);
@@ -81,7 +82,7 @@ public class AssetPanel extends JPanel {
 
   public void loadBlueprints(List<Blueprint> blueprints) {
     this.load(blueprints, () -> {
-      Collections.sort(blueprints);
+      Collections.sort(blueprints, Resource.BY_NAME);
       for (MapObject blueprint : blueprints) {
         AssetPanelItem panelItem = new AssetPanelItem(Icons.DOC_BLUEPRINT, blueprint.getName(), blueprint);
         this.add(panelItem);
@@ -92,7 +93,7 @@ public class AssetPanel extends JPanel {
 
   public void loadSounds(List<SoundResource> sounds) {
     this.load(sounds, () -> {
-      Collections.sort(sounds);
+      Collections.sort(sounds, Resource.BY_NAME);
       for (SoundResource sound : sounds) {
         AssetPanelItem panelItem = new AssetPanelItem(Icons.DOC_SOUND, sound.getName(), sound);
         this.add(panelItem);

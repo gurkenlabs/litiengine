@@ -156,12 +156,12 @@ public class ResourceBundle implements Serializable {
       }
     }
 
-    Collections.sort(this.getMaps());
-    Collections.sort(this.getSpriteSheets());
-    Collections.sort(this.getTilesets());
-    Collections.sort(this.getEmitters());
-    Collections.sort(this.getBluePrints());
-    Collections.sort(this.getSounds());
+    Collections.sort(this.getMaps(), Resource.BY_NAME);
+    Collections.sort(this.getSpriteSheets(), Resource.BY_NAME);
+    Collections.sort(this.getTilesets(), Resource.BY_NAME);
+    Collections.sort(this.getEmitters(), Resource.BY_NAME);
+    Collections.sort(this.getBluePrints(), Resource.BY_NAME);
+    Collections.sort(this.getSounds(), Resource.BY_NAME);
 
     try (FileOutputStream fileOut = new FileOutputStream(newFile, false)) {
       final JAXBContext jaxbContext = XmlUtilities.getContext(ResourceBundle.class);
