@@ -276,6 +276,9 @@ public abstract class ResourcesContainer<T> {
 
       return resource;
     } else {
+      if (resourceName.getRef() != null && !this.contains(resourceName)) {
+        ResourceBundle.load(resourceName);
+      }
       return this.resources.computeIfAbsent(resourceName, this::loadResource);
     }
   }
