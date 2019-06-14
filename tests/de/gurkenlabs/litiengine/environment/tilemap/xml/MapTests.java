@@ -7,7 +7,6 @@ import static org.mockito.Mockito.mock;
 
 import java.awt.Color;
 import java.awt.geom.Rectangle2D;
-import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -45,7 +44,6 @@ public class MapTests {
     assertEquals(1, map.getNextObjectId());
 
     assertEquals("test-map", map.getName());
-    assertEquals((new File("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx")).toURI().toURL(), map.getPath());
     assertEquals(new Color(0xaa3df675, true), map.getBackgroundColor());
     assertEquals(new Rectangle2D.Double(0, 0, 256, 256), map.getBounds());
     assertEquals(2, map.getTilesets().size());

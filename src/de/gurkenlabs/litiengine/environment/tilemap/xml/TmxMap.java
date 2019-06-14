@@ -112,9 +112,6 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
   })
   private List<ILayer> layers;
 
-  @XmlTransient
-  private URL path;
-
   private transient List<ITileLayer> rawTileLayers = new CopyOnWriteArrayList<>();
   private transient List<IMapObjectLayer> rawMapObjectLayers = new CopyOnWriteArrayList<>();
   private transient List<IImageLayer> rawImageLayers = new CopyOnWriteArrayList<>();
@@ -157,12 +154,6 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
       this.mapOrientation = MapOrientations.forName(this.orientation);
     }
     return this.mapOrientation;
-  }
-
-  @Override
-  @XmlTransient
-  public URL getPath() {
-    return this.path;
   }
 
   @Override
@@ -276,17 +267,12 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
     return this.staggerindex;
   }
 
-  public void setPath(final URL path) {
-    this.path = path;
-  }
-
   @Override
   public void finish(URL location) throws TmxException {
     super.finish(location);
     if (this.name == null) {
       this.name = FileUtilities.getFileName(location);
     }
-    this.path = location;
     // tilesets must be post-processed before layers; otherwise external tilesets may not be loaded
     for (ITileset tileset : this.tilesets) {
       if (tileset instanceof Tileset) {

@@ -3,7 +3,6 @@ package de.gurkenlabs.litiengine.environment.tilemap;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.geom.Rectangle2D;
-import java.net.URL;
 import java.util.List;
 
 import de.gurkenlabs.litiengine.resources.Resource;
@@ -28,8 +27,6 @@ public interface IMap extends ILayerList, Resource {
    * @return the orientation
    */
   public IMapOrientation getOrientation();
-
-  public URL getPath();
 
   /**
    * Gets the renderorder.
