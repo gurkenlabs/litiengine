@@ -174,6 +174,7 @@ public class ResourceBundle implements Serializable {
       final Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
       // output pretty printed
       jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, false);
+      jaxbMarshaller.setAdapter(new URLAdapter(newFile.toURI().toURL()));
 
       if (compress) {
         final GZIPOutputStream stream = new GZIPOutputStream(fileOut);
