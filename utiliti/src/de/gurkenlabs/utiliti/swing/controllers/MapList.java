@@ -1,12 +1,13 @@
 package de.gurkenlabs.utiliti.swing.controllers;
 
 import java.awt.Dimension;
+import java.util.Enumeration;
 import java.util.List;
 
-import javax.swing.DefaultListModel;
-import javax.swing.JList;
 import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
+import javax.swing.JTree;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
@@ -14,33 +15,41 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.components.EditorScreen;
 import de.gurkenlabs.utiliti.components.MapController;
+import de.gurkenlabs.utiliti.swing.CustomMutableTreeNode;
+import de.gurkenlabs.utiliti.swing.LeafOnlyTreeSelectionModel;
 import de.gurkenlabs.utiliti.swing.UI;
 
 @SuppressWarnings("serial")
 public class MapList extends JScrollPane implements MapController {
-  private final JList<String> list;
-  private final DefaultListModel<String> model;
+  private final JTree tree;
+  private final CustomMutableTreeNode root;
+  private final DefaultTreeModel model;
 
   public MapList() {
     super();
     this.setMinimumSize(new Dimension(80, 0));
     this.setMaximumSize(new Dimension(0, 250));
 
-    this.model = new DefaultListModel<>();
+    this.root = new CustomMutableTreeNode("! root should be invisible !", -1);
 
-    this.list = new JList<>();
-    this.list.setModel(this.model);
-    this.list.setVisibleRowCount(8);
-    this.list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    this.list.setMaximumSize(new Dimension(0, 250));
+    this.model = new DefaultTreeModel(this.root);
 
-    this.list.getSelectionModel().addListSelectionListener(e -> {
+    this.tree = new JTree();
+    this.tree.setRootVisible(false);
+    this.tree.setShowsRootHandles(true);
+    this.tree.setVisibleRowCount(8);
+    this.tree.setModel(this.model);
+    this.tree.setSelectionModel(new LeafOnlyTreeSelectionModel());
+    this.tree.setMaximumSize(new Dimension(0, 250));
+
+    this.tree.getSelectionModel().addTreeSelectionListener(e -> {
       if (EditorScreen.instance().isLoading() || EditorScreen.instance().getMapComponent().isLoading()) {
         return;
       }
 
-      if (this.list.getSelectedIndex() < EditorScreen.instance().getMapComponent().getMaps().size() && this.list.getSelectedIndex() >= 0) {
-        TmxMap map = EditorScreen.instance().getMapComponent().getMaps().get(this.list.getSelectedIndex());
+      CustomMutableTreeNode selectedNode = (CustomMutableTreeNode) this.tree.getLastSelectedPathComponent();
+      if (selectedNode != null && this.root.getLeafCount() == EditorScreen.instance().getMapComponent().getMaps().size() && selectedNode.getIndex() >= 0) {
+        TmxMap map = EditorScreen.instance().getMapComponent().getMaps().get(selectedNode.getIndex());
         if (Game.world().environment() != null && Game.world().environment().getMap().equals(map)) {
           return;
         }
@@ -49,7 +58,7 @@ public class MapList extends JScrollPane implements MapController {
       }
     });
 
-    this.setViewportView(this.list);
+    this.setViewportView(this.tree);
     this.setViewportBorder(null);
 
     UndoManager.onMapObjectAdded(manager -> {
@@ -69,43 +78,68 @@ public class MapList extends JScrollPane implements MapController {
 
   public synchronized void bind(List<TmxMap> maps, boolean clear) {
     if (clear) {
-      this.model.clear();
+      this.root.removeAllChildren();
+      this.model.reload();
     }
 
-    for (TmxMap map : maps) {
+    TmxMap map;
+    for (int i=0; i<maps.size(); i++) {
+      map = maps.get(i);
       String name = map.getName();
       if (UndoManager.hasChanges(map)) {
         name += " *";
       }
 
       // update existing strings
-      int indexToReplace = getIndexToReplace(map.getName());
-      if (indexToReplace != -1) {
-        this.model.set(indexToReplace, name);
+      CustomMutableTreeNode node = this.findLeaf(map.getName());
+      if (node != null) {
+        node.setName(name);
       } else {
-        // add new maps
-        this.model.addElement(name);
+        /**
+         * Keeping this code in case its needed in the future.
+         * It allows grouping maps designed as floors of the same level
+         */
+        // if name matches: <map_name>-<number>
+        /*if (name.matches(".*-\\d")) {
+          String nameParent = name.split("-", 2)[0];
+          CustomMutableTreeNode nodeParent = this.findNode(nameParent);
+          // if node group doesn't exist
+          if (nodeParent == null || (! this.root.isNodeChild(nodeParent))) {
+            // create and add node group
+            nodeParent = new CustomMutableTreeNode(nameParent, -1);
+            this.root.add(nodeParent);
+          }
+          // add new map its node group
+          nodeParent.add(new CustomMutableTreeNode(name, i));
+        }
+        else {*/
+          // add new map to root
+          this.root.add(new CustomMutableTreeNode(name, i));
+        /*}*/
       }
     }
 
     // remove maps that are no longer present
-    for (int i = 0; i < this.model.getSize(); i++) {
-      final String current = this.model.get(i);
-      if (current == null || maps.stream().noneMatch(x -> current.startsWith(x.getName()))) {
-        this.model.remove(i);
+    @SuppressWarnings("unchecked")
+    Enumeration<CustomMutableTreeNode> e = this.root.depthFirstEnumeration();
+    while (e.hasMoreElements()) {
+      CustomMutableTreeNode node = e.nextElement();
+      if (node.isLeaf() && (node.toString() == null || maps.stream().noneMatch(x -> node.toString().startsWith(x.getName())))) {
+        this.root.remove(node);
       }
     }
 
-    list.revalidate();
+    this.tree.revalidate();
     this.refresh();
   }
 
   public void setSelection(String mapName) {
     if (mapName == null || mapName.isEmpty()) {
-      list.clearSelection();
+      this.tree.clearSelection();
     } else {
-      if (model.contains(mapName)) {
-        list.setSelectedValue(mapName, true);
+      CustomMutableTreeNode node = this.findLeaf(mapName);
+      if (node != null) {
+        this.tree.setSelectionPath(new TreePath(node.getPath()));
       }
     }
 
@@ -113,29 +147,40 @@ public class MapList extends JScrollPane implements MapController {
   }
 
   public IMap getCurrentMap() {
-    if (this.list.getSelectedIndex() == -1) {
+    CustomMutableTreeNode selectedNode = (CustomMutableTreeNode) this.tree.getLastSelectedPathComponent();
+    if (selectedNode != null && ! selectedNode.isLeaf()) {
       return null;
     }
-    return EditorScreen.instance().getMapComponent().getMaps().get(list.getSelectedIndex());
+    return EditorScreen.instance().getMapComponent().getMaps().get(selectedNode.getIndex());
   }
 
   public void refresh() {
-    if (list.getSelectedIndex() == -1 && this.model.size() > 0) {
-      this.list.setSelectedIndex(0);
+    CustomMutableTreeNode selectedNode = (CustomMutableTreeNode) this.tree.getLastSelectedPathComponent();
+    if (selectedNode != null && selectedNode.isLeaf() && this.root.getLeafCount() > 0) {
+      this.tree.setSelectionPath(new TreePath(selectedNode.getPath()));
     }
 
     UI.getEntityController().refresh();
     UI.getLayerController().refresh();
   }
-
-  private int getIndexToReplace(String mapName) {
-    for (int i = 0; i < this.model.getSize(); i++) {
-      final String currentName = this.model.get(i);
-      if (currentName != null && (currentName.equals(mapName) || currentName.equals(mapName + " *"))) {
-        return i;
+  
+  public CustomMutableTreeNode findNode(String name) {
+    @SuppressWarnings("unchecked")
+    Enumeration<CustomMutableTreeNode> e = this.root.depthFirstEnumeration();
+    while (e.hasMoreElements()) {
+      CustomMutableTreeNode node = e.nextElement();
+      if (node.toString() != null && (node.toString().equals(name) || node.toString().equals(name + " *"))) {
+        return node;
       }
     }
+    return null;
+  }
 
-    return -1;
+  public CustomMutableTreeNode findLeaf(String mapName) {
+    CustomMutableTreeNode nodeResult = this.findNode(mapName);
+    if (nodeResult != null && nodeResult.isLeaf()) {
+      return nodeResult;
+    }
+    return null;
   }
 }
