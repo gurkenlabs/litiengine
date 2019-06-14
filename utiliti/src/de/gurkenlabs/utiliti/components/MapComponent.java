@@ -51,6 +51,7 @@ import de.gurkenlabs.litiengine.gui.ComponentMouseWheelEvent;
 import de.gurkenlabs.litiengine.gui.GuiComponent;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.physics.Collision;
+import de.gurkenlabs.litiengine.resources.Resource;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.litiengine.util.MathUtilities;
@@ -226,7 +227,7 @@ public class MapComponent extends GuiComponent {
     this.setFocus(null, true);
     this.getMaps().clear();
 
-    Collections.sort(maps);
+    Collections.sort(maps, Resource.BY_NAME);
 
     this.getMaps().addAll(maps);
     UI.getMapController().bind(this.getMaps(), true);
@@ -724,7 +725,7 @@ public class MapComponent extends GuiComponent {
       }
 
       this.getMaps().add(map);
-      Collections.sort(this.getMaps());
+      Collections.sort(this.getMaps(), Resource.BY_NAME);
 
       for (IImageLayer imageLayer : map.getImageLayers()) {
         BufferedImage img = Resources.images().get(imageLayer.getImage().getAbsoluteSourcePath(), true);
