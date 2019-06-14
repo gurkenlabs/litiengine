@@ -33,6 +33,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
+import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import de.gurkenlabs.litiengine.util.io.URLAdapter;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 
@@ -147,6 +148,17 @@ public class ResourceBundle implements Serializable {
     return this.sounds;
   }
 
+  public List<Resource> getAll() {
+    List<Resource> resources = new ArrayList<>();
+    resources.addAll(this.getMaps());
+    resources.addAll(this.getSpriteSheets());
+    resources.addAll(this.getTilesets());
+    resources.addAll(this.getEmitters());
+    resources.addAll(this.getBluePrints());
+    resources.addAll(this.getSounds());
+    return Collections.unmodifiableList(resources);
+  }
+
   public String save(final String fileName, final boolean compress) {
     String fileNameWithExtension = fileName;
     if (!fileNameWithExtension.endsWith("." + FILE_EXTENSION)) {
@@ -174,7 +186,20 @@ public class ResourceBundle implements Serializable {
       final Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
       // output pretty printed
       jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, false);
-      jaxbMarshaller.setAdapter(new URLAdapter(newFile.toURI().toURL()));
+      final List<Resource> resources = this.getAll();
+      jaxbMarshaller.setAdapter(URLAdapter.class, new URLAdapter(newFile.toURI().toURL()) {
+        // TODO: come the beta release, this can be removed
+        @Override
+        public String marshal(URL v) {
+          String file = FileUtilities.getFileName(v);
+          for (Resource r : resources) {
+            if (file.equals(r.getName())) {
+              return '#' + file;
+            }
+          }
+          return super.marshal(v);
+        }
+      });
 
       if (compress) {
         final GZIPOutputStream stream = new GZIPOutputStream(fileOut);
