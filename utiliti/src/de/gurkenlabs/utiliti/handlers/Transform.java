@@ -54,12 +54,16 @@ public class Transform {
       newX += deltaX * x;
       newY += deltaY * y;
 
-      // TODO: Only apply where necessary
-      // newX = MathUtilities.clamp(newX, 0, originalX + originalWidth);
-      // newY = MathUtilities.clamp(newY, 0, originalY + originalHeight);
+      // prevent overshooting
+      if (y == 1) {
+        newY = Math.min(originalY + originalHeight, newY);
+      }
 
+      if (x == 1) {
+        newX = Math.min(originalX + originalWidth, newX);
+      }
 
-      return new Rectangle2D.Double(newX, newY, newWidth, newHeight);
+      return new Rectangle2D.Double(newX, newY, Math.max(newWidth, 0), Math.max(newHeight, 0));
     }
   }
 
@@ -107,58 +111,12 @@ public class Transform {
     final double mouseDeltaX = newMouseLocation.getX() - drag.mouseLocation.getX();
     final double mouseDeltaY = newMouseLocation.getY() - drag.mouseLocation.getY();
 
-    double newWidth = drag.originalBounds.get(transformObject).getWidth();
-    double newHeight = drag.originalBounds.get(transformObject).getHeight();
-    double newX = drag.minX;
-    double newY = drag.minY;
+    final Rectangle2D newBound = Transform.anchor().getNewBounds(mouseDeltaX, mouseDeltaY, drag.minX, drag.minY, drag.originalBounds.get(transformObject).getWidth(), drag.originalBounds.get(transformObject).getHeight());
 
-    switch (Transform.anchor()) {
-    case DOWN:
-      newHeight += mouseDeltaY;
-      newHeight = Math.min(0, newHeight);
-      break;
-    case DOWNRIGHT:
-      newHeight += mouseDeltaY;
-      newHeight = Math.min(0, newHeight);
-      newWidth += mouseDeltaX;
-      break;
-    case DOWNLEFT:
-      newHeight += mouseDeltaY;
-      newHeight = Math.min(0, newHeight);
-      newWidth -= mouseDeltaX;
-      newX += mouseDeltaX;
-      newX = Math.max(newX, drag.minX + drag.originalBounds.get(transformObject).getWidth());
-      break;
-    case LEFT:
-      newWidth -= mouseDeltaX;
-      newX += mouseDeltaX;
-      newX = Math.max(newX, drag.minX + drag.originalBounds.get(transformObject).getWidth());
-      break;
-    case RIGHT:
-      newWidth += mouseDeltaX;
-      break;
-    case UP:
-      newHeight -= mouseDeltaY;
-      newY += mouseDeltaY;
-      newY = Math.min(newY, drag.minY + drag.originalBounds.get(transformObject).getHeight());
-      break;
-    case UPLEFT:
-      newHeight -= mouseDeltaY;
-      newY += mouseDeltaY;
-      newY = MathUtilities.clamp(newY, 0, drag.minY + drag.originalBounds.get(transformObject).getHeight());
-      newWidth -= mouseDeltaX;
-      newX += mouseDeltaX;
-      newX = MathUtilities.clamp(newX, 0, drag.minX + drag.originalBounds.get(transformObject).getWidth());
-      break;
-    case UPRIGHT:
-      newHeight -= mouseDeltaY;
-      newY += mouseDeltaY;
-      newY = MathUtilities.clamp(newY, 0, drag.minY + drag.originalBounds.get(transformObject).getHeight());
-      newWidth += mouseDeltaX;
-      break;
-    default:
-      return;
-    }
+    double newX = newBound.getX();
+    double newY = newBound.getY();
+    double newWidth = newBound.getWidth();
+    double newHeight = newBound.getHeight();
 
     newX = Snap.x(newX);
     newY = Snap.y(newY);
