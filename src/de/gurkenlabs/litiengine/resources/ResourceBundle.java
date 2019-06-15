@@ -232,7 +232,7 @@ public class ResourceBundle implements Serializable {
       // TODO: come the beta release, this can be removed
       @Override
       public URL unmarshal(String v) throws MalformedURLException {
-        if (v.indexOf('/') == -1 && v.indexOf('\\') == -1 && v.indexOf('.') == -1 && !v.startsWith("#")) {
+        if (v.indexOf('/') == -1 && v.indexOf('\\') == -1 && !v.startsWith("#")) {
           log.warning("Could not safely determine whether the reference \"" + v + "\" was referring to another resource in the bundle or a separate file.\nPrepend \"./\" or \"#\" to clear this ambiguity.");
           v = '#' + v;
         }
