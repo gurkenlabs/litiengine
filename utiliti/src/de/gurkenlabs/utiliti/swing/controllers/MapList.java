@@ -84,72 +84,12 @@ public class MapList extends JScrollPane implements MapController {
       this.model.reload();
     }
 
-    TmxMap map;
-    for (int i=0; i<maps.size(); i++) {
-      map = maps.get(i);
-      String name = map.getName();
-      if (UndoManager.hasChanges(map)) {
-        name += " *";
-      }
-
-      // update existing strings
-      CustomMutableTreeNode node = this.findLeaf(map.getName());
-      if (node != null) {
-        node.setName(name);
-      } else {
-        // TODO
-        //if (autoGroupMapsIsOn()) {
-          String nameParent = name;
-          while (nameParent.matches(".*\\d")) {
-            nameParent = nameParent.substring(0, (nameParent.length()-1));
-          }
-          if (nameParent.matches(".*[^a-zA-Z0-9]")) {
-            nameParent = nameParent.substring(0, nameParent.length()-1);
-          }
-
-          // if map would be part of a group
-          if (! nameParent.equals(name)) {
-            CustomMutableTreeNode nodeParent = this.findNode(nameParent);
-            // if node group doesn't exist
-            if (nodeParent == null || (! this.root.isNodeChild(nodeParent))) {
-              // create and add node group
-              nodeParent = new CustomMutableTreeNode(nameParent, -1);
-              this.root.add(nodeParent);
-            }
-            // add new map its node group
-            nodeParent.add(new CustomMutableTreeNode(name, i));
-          }
-          else {
-            // add new map to root
-            this.root.add(new CustomMutableTreeNode(name, i));
-          }
-        //}
-        
-        
-        /**
-         * XXX
-         * Keeping this code in case its needed in the future.
-         * It allows grouping maps designed as floors of the same level
-         */
-        // if name matches: <map_name>-<number>
-        /*if (name.matches(".*-\\d")) {
-          String nameParent = name.split("-", 2)[0];
-          CustomMutableTreeNode nodeParent = this.findNode(nameParent);
-          // if node group doesn't exist
-          if (nodeParent == null || (! this.root.isNodeChild(nodeParent))) {
-            // create and add node group
-            nodeParent = new CustomMutableTreeNode(nameParent, -1);
-            this.root.add(nodeParent);
-          }
-          // add new map its node group
-          nodeParent.add(new CustomMutableTreeNode(name, i));
-        }
-        else {
-          // add new map to root
-          this.root.add(new CustomMutableTreeNode(name, i));
-        }*/
-      }
-    }
+    /**
+     * TODO
+     * Best way would be to group maps as they would already be grouped in their folders.
+     * If they aren't grouped in any folders, auto-group maps.
+     */
+    this.autoGroupMaps(maps);
 
     // remove maps that are no longer present
     @SuppressWarnings("unchecked")
@@ -217,5 +157,46 @@ public class MapList extends JScrollPane implements MapController {
       return nodeResult;
     }
     return null;
+  }
+  
+  private void autoGroupMaps(List<TmxMap> maps) {
+    TmxMap map;
+    for (int i=0; i<maps.size(); i++) {
+      map = maps.get(i);
+      String name = map.getName();
+      if (UndoManager.hasChanges(map)) {
+        name += " *";
+      }
+
+      CustomMutableTreeNode node = this.findLeaf(map.getName());
+      if (node != null) {
+        node.setName(name);
+      } else {
+        String nameParent = name;
+        while (nameParent.matches(".*\\d")) {
+          nameParent = nameParent.substring(0, (nameParent.length()-1));
+        }
+        if (nameParent.matches(".*[^a-zA-Z0-9]")) {
+          nameParent = nameParent.substring(0, nameParent.length()-1);
+        }
+
+        // if map would be part of a group
+        if (! nameParent.equals(name)) {
+          CustomMutableTreeNode nodeParent = this.findNode(nameParent);
+          // if node group doesn't exist
+          if (nodeParent == null || (! this.root.isNodeChild(nodeParent))) {
+            // create and add node group
+            nodeParent = new CustomMutableTreeNode(nameParent, -1);
+            this.root.add(nodeParent);
+          }
+          // add new map its node group
+          nodeParent.add(new CustomMutableTreeNode(name, i));
+        }
+        else {
+          // add new map to root
+          this.root.add(new CustomMutableTreeNode(name, i));
+        }
+      }
+    }
   }
 }
