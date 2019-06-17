@@ -13,7 +13,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.utiliti.UndoManager;
-import de.gurkenlabs.utiliti.components.EditorScreen;
+import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.components.MapController;
 import de.gurkenlabs.utiliti.swing.CustomMutableTreeNode;
 import de.gurkenlabs.utiliti.swing.LeafOnlyTreeSelectionModel;
@@ -43,18 +43,18 @@ public class MapList extends JScrollPane implements MapController {
     this.tree.setMaximumSize(new Dimension(0, 250));
 
     this.tree.getSelectionModel().addTreeSelectionListener(e -> {
-      if (EditorScreen.instance().isLoading() || EditorScreen.instance().getMapComponent().isLoading()) {
+      if (Editor.instance().isLoading() || Editor.instance().getMapComponent().isLoading()) {
         return;
       }
 
       CustomMutableTreeNode selectedNode = (CustomMutableTreeNode) this.tree.getLastSelectedPathComponent();
-      if (selectedNode != null && this.root.getLeafCount() == EditorScreen.instance().getMapComponent().getMaps().size() && selectedNode.getIndex() >= 0) {
-        TmxMap map = EditorScreen.instance().getMapComponent().getMaps().get(selectedNode.getIndex());
+      if (selectedNode != null && this.root.getLeafCount() == Editor.instance().getMapComponent().getMaps().size() && selectedNode.getIndex() >= 0) {
+        TmxMap map = Editor.instance().getMapComponent().getMaps().get(selectedNode.getIndex());
         if (Game.world().environment() != null && Game.world().environment().getMap().equals(map)) {
           return;
         }
 
-        EditorScreen.instance().getMapComponent().loadEnvironment(map);
+        Editor.instance().getMapComponent().loadEnvironment(map);
       }
     });
 
@@ -69,13 +69,15 @@ public class MapList extends JScrollPane implements MapController {
       this.refresh();
     });
 
-    UndoManager.onUndoStackChanged(manager -> this.bind(EditorScreen.instance().getMapComponent().getMaps()));
+    UndoManager.onUndoStackChanged(manager -> this.bind(Editor.instance().getMapComponent().getMaps()));
   }
 
+  @Override
   public synchronized void bind(List<TmxMap> maps) {
     this.bind(maps, false);
   }
 
+  @Override
   public synchronized void bind(List<TmxMap> maps, boolean clear) {
     if (clear) {
       this.root.removeAllChildren();
@@ -133,6 +135,7 @@ public class MapList extends JScrollPane implements MapController {
     this.refresh();
   }
 
+  @Override
   public void setSelection(String mapName) {
     if (mapName == null || mapName.isEmpty()) {
       this.tree.clearSelection();
@@ -146,14 +149,16 @@ public class MapList extends JScrollPane implements MapController {
     this.refresh();
   }
 
+  @Override
   public IMap getCurrentMap() {
     CustomMutableTreeNode selectedNode = (CustomMutableTreeNode) this.tree.getLastSelectedPathComponent();
     if (selectedNode != null && ! selectedNode.isLeaf()) {
       return null;
     }
-    return EditorScreen.instance().getMapComponent().getMaps().get(selectedNode.getIndex());
+    return Editor.instance().getMapComponent().getMaps().get(selectedNode.getIndex());
   }
 
+  @Override
   public void refresh() {
     CustomMutableTreeNode selectedNode = (CustomMutableTreeNode) this.tree.getLastSelectedPathComponent();
     if (selectedNode != null && selectedNode.isLeaf() && this.root.getLeafCount() > 0) {

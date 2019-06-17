@@ -12,8 +12,8 @@ import javax.swing.KeyStroke;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ColorHelper;
-import de.gurkenlabs.utiliti.Program;
-import de.gurkenlabs.utiliti.components.EditorScreen;
+import de.gurkenlabs.utiliti.components.Editor;
+import de.gurkenlabs.utiliti.handlers.Zoom;
 import de.gurkenlabs.utiliti.swing.UI;
 import de.gurkenlabs.utiliti.swing.dialogs.GridEditPanel;
 
@@ -23,70 +23,74 @@ public final class ViewMenu extends JMenu {
     super(Resources.strings().get("menu_view"));
     this.setMnemonic('V');
 
+    JCheckBoxMenuItem clampToMap = new JCheckBoxMenuItem(Resources.strings().get("menu_view_clampMap"));
+    clampToMap.setState(Editor.preferences().clampToMap());
+    clampToMap.addItemListener(e -> Editor.preferences().setClampToMap(clampToMap.getState()));
+
     JCheckBoxMenuItem snapToPixels = new JCheckBoxMenuItem(Resources.strings().get("menu_view_snapPixels"));
-    snapToPixels.setState(Program.preferences().isSnapPixels());
+    snapToPixels.setState(Editor.preferences().snapToPixels());
     snapToPixels.addItemListener(e -> {
-      Program.preferences().setSnapPixels(snapToPixels.getState());
+      Editor.preferences().setSnapToPixels(snapToPixels.getState());
       UI.getInspector().refresh();
-      UI.getInspector().bind(EditorScreen.instance().getMapComponent().getFocusedMapObject());
+      UI.getInspector().bind(Editor.instance().getMapComponent().getFocusedMapObject());
     });
 
     JCheckBoxMenuItem snapToGrid = new JCheckBoxMenuItem(Resources.strings().get("menu_view_snapGrid"));
-    snapToGrid.setState(Program.preferences().isSnapGrid());
-    snapToGrid.addItemListener(e -> Program.preferences().setSnapGrid(snapToGrid.getState()));
+    snapToGrid.setState(Editor.preferences().snapToGrid());
+    snapToGrid.addItemListener(e -> Editor.preferences().setSnapToGrid(snapToGrid.getState()));
 
     JCheckBoxMenuItem renderGrid = new JCheckBoxMenuItem(Resources.strings().get("menu_view_renderGrid"));
-    renderGrid.setState(Program.preferences().isShowGrid());
+    renderGrid.setState(Editor.preferences().showGrid());
     renderGrid.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, Event.CTRL_MASK));
-    renderGrid.addItemListener(e -> Program.preferences().setShowGrid(renderGrid.getState()));
+    renderGrid.addItemListener(e -> Editor.preferences().setShowGrid(renderGrid.getState()));
 
     JCheckBoxMenuItem renderCollision = new JCheckBoxMenuItem(Resources.strings().get("menu_view_renderCollisionBoxes"));
-    renderCollision.setState(Program.preferences().isRenderBoundingBoxes());
+    renderCollision.setState(Editor.preferences().renderBoundingBoxes());
     renderCollision.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, Event.CTRL_MASK));
-    renderCollision.addItemListener(e -> Program.preferences().setRenderBoundingBoxes(renderCollision.getState()));
+    renderCollision.addItemListener(e -> Editor.preferences().setRenderBoundingBoxes(renderCollision.getState()));
 
     JCheckBoxMenuItem renderCustomMapObjects = new JCheckBoxMenuItem(Resources.strings().get("menu_view_renderCustomMapObjects"));
-    renderCustomMapObjects.setState(Program.preferences().isRenderCustomMapObjects());
+    renderCustomMapObjects.setState(Editor.preferences().renderCustomMapObjects());
     renderCustomMapObjects.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, Event.CTRL_MASK));
-    renderCustomMapObjects.addItemListener(e -> Program.preferences().setRenderCustomMapObjects(renderCustomMapObjects.getState()));
+    renderCustomMapObjects.addItemListener(e -> Editor.preferences().setRenderCustomMapObjects(renderCustomMapObjects.getState()));
 
     JCheckBoxMenuItem renderNames = new JCheckBoxMenuItem(Resources.strings().get("menu_view_renderNames"));
-    renderNames.setState(Program.preferences().isRenderNames());
-    renderNames.addItemListener(e -> Program.preferences().setRenderNames(renderNames.getState()));
+    renderNames.setState(Editor.preferences().renderNames());
+    renderNames.addItemListener(e -> Editor.preferences().setRenderNames(renderNames.getState()));
 
     JCheckBoxMenuItem renderMapIds = new JCheckBoxMenuItem(Resources.strings().get("menu_view_renderMapIds"));
-    renderMapIds.setState(Program.preferences().isRenderMapIds());
+    renderMapIds.setState(Editor.preferences().renderMapIds());
     renderMapIds.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, Event.CTRL_MASK));
-    renderMapIds.addItemListener(e -> Program.preferences().setRenderMapIds(renderMapIds.getState()));
+    renderMapIds.addItemListener(e -> Editor.preferences().setRenderMapIds(renderMapIds.getState()));
 
     JMenuItem setGrid = new JMenuItem(Resources.strings().get("menu_view_gridSettings"));
     setGrid.addActionListener(a -> {
-      GridEditPanel panel = new GridEditPanel(Program.preferences().getGridLineWidth(), Program.preferences().getGridColor());
+      GridEditPanel panel = new GridEditPanel(Editor.preferences().getGridLineWidth(), Editor.preferences().getGridColor());
       int option = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), panel, Resources.strings().get("menu_view_gridSettings"), JOptionPane.PLAIN_MESSAGE);
       if (option == JOptionPane.OK_OPTION) {
-        Program.preferences().setGridColor(ColorHelper.encode(panel.getGridColor()));
-        Program.preferences().setGridLineWidth(panel.getStrokeWidth());
+        Editor.preferences().setGridColor(ColorHelper.encode(panel.getGridColor()));
+        Editor.preferences().setGridLineWidth(panel.getStrokeWidth());
       }
     });
 
     JMenuItem zoomIn = new JMenuItem(Resources.strings().get("menu_view_zoomIn"));
     zoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, Event.CTRL_MASK));
-    zoomIn.addActionListener(a -> EditorScreen.instance().getMapComponent().zoomIn());
+    zoomIn.addActionListener(a -> Zoom.in());
 
     JMenuItem zoomOut = new JMenuItem(Resources.strings().get("menu_view_zoomOut"));
     zoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, Event.CTRL_MASK));
-    zoomOut.addActionListener(a -> EditorScreen.instance().getMapComponent().zoomOut());
+    zoomOut.addActionListener(a -> Zoom.out());
 
     JMenuItem centerFocus = new JMenuItem(Resources.strings().get("menu_view_center"));
     centerFocus.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0));
-    centerFocus.addActionListener(a -> EditorScreen.instance().getMapComponent().centerCameraOnFocus());
+    centerFocus.addActionListener(a -> Editor.instance().getMapComponent().centerCameraOnFocus());
     centerFocus.setEnabled(false);
 
     JMenuItem centerMap = new JMenuItem(Resources.strings().get("menu_view_centermap"));
     centerMap.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, Event.CTRL_MASK));
-    centerMap.addActionListener(a -> EditorScreen.instance().getMapComponent().centerCameraOnMap());
+    centerMap.addActionListener(a -> Editor.instance().getMapComponent().centerCameraOnMap());
 
-    EditorScreen.instance().getMapComponent().onFocusChanged(mo -> {
+    Editor.instance().getMapComponent().onFocusChanged(mo -> {
       centerFocus.setEnabled(mo != null);
     });
 
@@ -101,6 +105,7 @@ public final class ViewMenu extends JMenu {
     this.add(centerFocus);
     this.add(centerMap);
     this.addSeparator();
+    this.add(clampToMap);
     this.add(snapToPixels);
     this.add(snapToGrid);
     this.addSeparator();

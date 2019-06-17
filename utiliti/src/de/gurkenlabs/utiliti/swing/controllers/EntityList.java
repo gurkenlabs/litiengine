@@ -35,7 +35,7 @@ import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.utiliti.components.EditorScreen;
+import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.components.EntityController;
 import de.gurkenlabs.utiliti.swing.IconTreeListItem;
 import de.gurkenlabs.utiliti.swing.IconTreeListRenderer;
@@ -151,7 +151,7 @@ public final class EntityList extends JPanel implements EntityController {
             if (item.getUserObject() instanceof IEntity) {
               IMapObject obj = env.getMap().getMapObject(((IEntity) item.getUserObject()).getMapId());
               if (obj != null) {
-                EditorScreen.instance().getMapComponent().setFocus(obj, true);
+                Editor.instance().getMapComponent().setFocus(obj, true);
               }
             }
           }
@@ -180,7 +180,7 @@ public final class EntityList extends JPanel implements EntityController {
       public void mouseClicked(MouseEvent e) {
         int selRow = tree.getRowForLocation(e.getX(), e.getY());
         if (selRow != -1 && e.getClickCount() == 2) {
-          EditorScreen.instance().getMapComponent().centerCameraOnFocus();
+          Editor.instance().getMapComponent().centerCameraOnFocus();
         }
       }
     };
@@ -192,6 +192,7 @@ public final class EntityList extends JPanel implements EntityController {
     this.add(this.searchPanel, BorderLayout.NORTH);
   }
 
+  @Override
   public void select(final IMapObject mapObject) {
     if (this.isFocussing) {
       return;
@@ -235,6 +236,7 @@ public final class EntityList extends JPanel implements EntityController {
     }
   }
   
+  @Override
   public void refresh() {
     this.nodeRoot.setUserObject(new IconTreeListItem((Game.world().environment() == null ? 0 : Game.world().environment().getEntities().size()) + " " + Resources.strings().get("panel_mapselection_entities"), Icons.FOLDER));
     for (DefaultMutableTreeNode node : this.entityNodes) {
@@ -256,7 +258,7 @@ public final class EntityList extends JPanel implements EntityController {
     }
 
     this.entitiesTreeModel.reload();
-    this.select(EditorScreen.instance().getMapComponent().getFocusedMapObject());
+    this.select(Editor.instance().getMapComponent().getFocusedMapObject());
   }
 
   private void collapseAll() {

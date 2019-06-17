@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.utiliti.components.Editor;
 
 public final class Style {
   public static final Color COLOR_DEFAULT_BOUNDING_BOX_FILL = new Color(0, 0, 0, 35);
@@ -29,11 +30,21 @@ public final class Style {
   public static final Color COLOR_DEFAULT_TAG = new Color(99, 113, 118);
   public static final Color COLOR_DEFAULT_TAG_HOVER = COLOR_DEFAULT_TAG.darker();
   public static final Color COLOR_STATUS = Color.WHITE;
-  
-  public static final Font FONT_DEFAULT = Resources.fonts().get("OpenSans.ttf", Font.PLAIN, 12);
+
+  public static final float FONT_DEFAULT_SIZE = 12;
   public static final String FONTNAME_CONSOLE = "Consolas";
-  
+  private static final Font FONT_DEFAULT = Resources.fonts().get("OpenSans.ttf", Font.PLAIN, FONT_DEFAULT_SIZE);
+  private static Font scaledDefaultFont;
+
   private Style() {
     throw new UnsupportedOperationException();
+  }
+
+  public static Font getDefaultFont() {
+    if (scaledDefaultFont == null) {
+      scaledDefaultFont = FONT_DEFAULT.deriveFont(FONT_DEFAULT_SIZE * Editor.preferences().getUiScale());
+    }
+
+    return scaledDefaultFont;
   }
 }

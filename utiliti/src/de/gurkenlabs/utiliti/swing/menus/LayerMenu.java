@@ -15,7 +15,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.UndoManager;
-import de.gurkenlabs.utiliti.components.EditorScreen;
+import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.swing.UI;
 
 @SuppressWarnings("serial")
@@ -26,7 +26,7 @@ public final class LayerMenu extends JMenu {
     Game.world().addLoadedListener(e -> this.updateMenu(e.getMap()));
 
     UI.getLayerController().onLayersChanged(this::updateMenu);
-    EditorScreen.instance().getMapComponent().onSelectionChanged(mapObjects -> {
+    Editor.instance().getMapComponent().onSelectionChanged(mapObjects -> {
       this.updateMenuItemStates(mapObjects);
     });
   }
@@ -61,7 +61,7 @@ public final class LayerMenu extends JMenu {
       this.add(item);
     }
 
-    this.updateMenuItemStates(EditorScreen.instance().getMapComponent().getSelectedMapObjects());
+    this.updateMenuItemStates(Editor.instance().getMapComponent().getSelectedMapObjects());
   }
 
   private void moveMapObjects(String layerName) {
@@ -76,7 +76,7 @@ public final class LayerMenu extends JMenu {
     }
 
     UndoManager.instance().beginOperation();
-    for (IMapObject mapObject : EditorScreen.instance().getMapComponent().getSelectedMapObjects()) {
+    for (IMapObject mapObject : Editor.instance().getMapComponent().getSelectedMapObjects()) {
       UndoManager.instance().mapObjectChanging(mapObject);
       layer.addMapObject(mapObject);
       env.reloadFromMap(mapObject.getId());
@@ -86,8 +86,8 @@ public final class LayerMenu extends JMenu {
     UndoManager.instance().endOperation();
 
     // rebind to refresh the layer property
-    UI.getInspector().bind(EditorScreen.instance().getMapComponent().getFocusedMapObject());
+    UI.getInspector().bind(Editor.instance().getMapComponent().getFocusedMapObject());
 
-    this.updateMenuItemStates(EditorScreen.instance().getMapComponent().getSelectedMapObjects());
+    this.updateMenuItemStates(Editor.instance().getMapComponent().getSelectedMapObjects());
   }
 }

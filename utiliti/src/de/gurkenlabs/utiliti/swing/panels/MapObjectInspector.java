@@ -25,9 +25,9 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.utiliti.Program;
-import de.gurkenlabs.utiliti.components.EditorScreen;
+import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.components.PropertyInspector;
+import de.gurkenlabs.utiliti.handlers.Transform;
 import de.gurkenlabs.utiliti.swing.TagPanel;
 import de.gurkenlabs.utiliti.swing.UI;
 
@@ -121,20 +121,20 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     panel_1.setLayout(new BoxLayout(panel_1, BoxLayout.X_AXIS));
 
     JLabel lblEntityId = new JLabel("ID");
-    lblEntityId.setFont(lblEntityId.getFont().deriveFont(Font.BOLD).deriveFont(12f));
+    lblEntityId.setFont(lblEntityId.getFont().deriveFont(Font.BOLD));
 
     this.labelEntityID = new JLabel("####");
-    this.labelEntityID.setFont(labelEntityID.getFont().deriveFont(12f));
+    this.labelEntityID.setFont(labelEntityID.getFont());
 
     this.lblLayer = new JLabel("");
 
     this.lblRendering = new JLabel("");
     this.lblRendering.setForeground(Color.GRAY);
-    this.lblRendering.setFont(lblRendering.getFont().deriveFont(10f));
+    this.lblRendering.setFont(lblRendering.getFont().deriveFont(lblRendering.getFont().getSize() * 0.75f));
 
     this.lblLayer.setHorizontalAlignment(SwingConstants.TRAILING);
     this.lblLayer.setForeground(Color.GRAY);
-    this.lblLayer.setFont(this.lblLayer.getFont().deriveFont(10f));
+    this.lblLayer.setFont(this.lblLayer.getFont().deriveFont(lblLayer.getFont().getSize() * 0.75f));
 
     panel_1.add(lblEntityId);
     panel_1.add(Box.createHorizontalStrut(47));
@@ -151,13 +151,14 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
   }
 
   public void updateSpinnerModels() {
-    if (Program.preferences().isSnapPixels()) {
+    if (Editor.preferences().snapToPixels()) {
       this.updateSpinnerModels(MapObjectInspector::getIntegerModel);
     } else {
       this.updateSpinnerModels(MapObjectInspector::getFloatModel);
     }
   }
 
+  @Override
   public MapObjectType getObjectType() {
     return this.type;
   }
@@ -256,6 +257,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.tabbedPanel.repaint();
   }
 
+  @Override
   public void setMapObjectType(MapObjectType type) {
     this.type = type;
     switchPanel();
@@ -292,15 +294,15 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.labelEntityID.setText(Integer.toString(mapObject.getId()));
 
     this.lblLayer.setText("layer: " + mapObject.getLayer().getName());
-    String info = this.getRendering(mapObject);
+    String info = getRendering(mapObject);
     if (info == null) {
       this.lblRendering.setText("");
     } else {
-      this.lblRendering.setText("render: " + this.getRendering(mapObject));
+      this.lblRendering.setText("render: " + getRendering(mapObject));
     }
   }
 
-  private String getRendering(IMapObject mapObject) {
+  private static String getRendering(IMapObject mapObject) {
     switch (MapObjectType.get(mapObject.getType())) {
     case PROP:
     case EMITTER:
@@ -326,22 +328,22 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.spinnerX.addChangeListener(new MapObjectPropertyChangeListener(m -> {
 
       m.setX(getSpinnerValue(spinnerX));
-      EditorScreen.instance().getMapComponent().updateTransformControls();
+      Transform.updateAnchors();
     }));
 
     this.spinnerY.addChangeListener(new MapObjectPropertyChangeListener(m -> {
       m.setY(getSpinnerValue(spinnerY));
-      EditorScreen.instance().getMapComponent().updateTransformControls();
+      Transform.updateAnchors();
     }));
 
     this.spinnerWidth.addChangeListener(new MapObjectPropertyChangeListener(m -> {
       m.setWidth(getSpinnerValue(spinnerWidth));
-      EditorScreen.instance().getMapComponent().updateTransformControls();
+      Transform.updateAnchors();
     }));
 
     this.spinnerHeight.addChangeListener(new MapObjectPropertyChangeListener(m -> {
       m.setHeight(getSpinnerValue(spinnerHeight));
-      EditorScreen.instance().getMapComponent().updateTransformControls();
+      Transform.updateAnchors();
     }));
 
     this.tagPanel.addActionListener(new MapObjectPropertyActionListener(m -> m.setValue(MapObjectProperty.TAGS, this.tagPanel.getTagsString())));

@@ -8,14 +8,14 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.utiliti.components.EditorScreen;
+import de.gurkenlabs.utiliti.components.Editor;
 
 @SuppressWarnings("serial")
 public final class EditorFileChooser extends JFileChooser {
   private static EditorFileChooser instance;
 
   private EditorFileChooser() {
-    String source = EditorScreen.instance().getProjectPath();
+    String source = Editor.instance().getProjectPath();
     this.setCurrentDirectory(source != null ? new File(source) : new File("."));
     this.setDialogType(JFileChooser.OPEN_DIALOG);
   }

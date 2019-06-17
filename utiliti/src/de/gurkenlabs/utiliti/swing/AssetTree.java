@@ -15,7 +15,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
 import de.gurkenlabs.litiengine.resources.ResourceBundle;
 import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.utiliti.components.EditorScreen;
+import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.swing.panels.CreaturePanel;
 
 @SuppressWarnings("serial")
@@ -94,7 +94,7 @@ public class AssetTree extends JTree {
     final TreePath blueprintPath = new TreePath(this.nodeBlueprints.getPath());
     final TreePath soundPath = new TreePath(this.nodeSounds.getPath());
 
-    final ResourceBundle gameFile = EditorScreen.instance().getGameFile();
+    final ResourceBundle gameFile = Editor.instance().getGameFile();
     if(gameFile == null) {
       return;
     }

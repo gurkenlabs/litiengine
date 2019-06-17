@@ -42,7 +42,7 @@ import de.gurkenlabs.litiengine.physics.Collision;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
-import de.gurkenlabs.utiliti.components.EditorScreen;
+import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.swing.Icons;
 
 @SuppressWarnings("serial")
@@ -167,7 +167,7 @@ public class EmitterPropertyPanel extends PropertyPanel {
     this.comboBoxSpriteType.addItem(Resources.strings().get("panel_animation"));
     this.comboBoxSpriteType.addItem(Resources.strings().get("panel_spritesheet"));
     this.comboBoxSpriteType.setSelectedIndex(0);
-    for (SpritesheetResource s : EditorScreen.instance().getGameFile().getSpriteSheets()) {
+    for (SpritesheetResource s : Editor.instance().getGameFile().getSpriteSheets()) {
       this.comboBoxSprite.addItem(s.getName());
     }
     

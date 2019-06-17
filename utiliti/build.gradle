@@ -14,11 +14,30 @@ sourceSets {
   main.java.srcDir "src"
   main.resources.srcDir "resources"
   main.resources.srcDir "localization"
+  
+  test {
+    java {
+      srcDirs = ["tests"]
+    }
+    
+    resources {
+      srcDirs = ["tests"]
+    }
+  }
 }
 
 dependencies {
   compile project(':')
+  
+  testCompile 'org.junit.jupiter:junit-jupiter-api:5.4.+'
+  testCompile 'org.junit.jupiter:junit-jupiter-params:5.4.+'
+  testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.4.+'
+  testCompile 'org.mockito:mockito-core:2.25.+'
 } 
+
+test {
+  useJUnitPlatform()
+}
 
 jar {
   from {
@@ -74,25 +93,17 @@ task distZipWindows(type: Zip) {
 
   archiveName archivesBaseName + '-' + version + '-win.zip'
   destinationDir(file('build/libs/'))
+  
+  dependsOn createAllExecutables
 }
 
-task distZipMac(type: Zip) {
+task distZipLinuxMac(type: Zip) {
   group 'build'
   from 'build/libs/'
   include '*.jar'
   include 'config.properties'
 
-  archiveName archivesBaseName + '-' + version + '-osx.zip'
-  destinationDir(file('build/libs/'))
-}
-
-task distZipLinux(type: Zip) {
-  group 'build'
-  from 'build/libs/'
-  include '*.jar'
-  include 'config.properties'
-
-  archiveName archivesBaseName + '-' + version + '-linux.zip'
+  archiveName archivesBaseName + '-' + version + '-linux-mac.zip'
   destinationDir(file('build/libs/'))
 }
 

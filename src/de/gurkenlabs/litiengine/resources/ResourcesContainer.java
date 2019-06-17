@@ -13,8 +13,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.Game;
@@ -30,7 +28,6 @@ import de.gurkenlabs.litiengine.GameListener;
  * @see ResourcesContainerListener
  */
 public abstract class ResourcesContainer<T> {
-  private static final Logger log = Logger.getLogger(ResourcesContainer.class.getName());
   // use a work-stealing pool to maximize resource load speed while minimizing the number of resources in use
   private static final ExecutorService ASYNC_POOL = Executors.newWorkStealingPool();
 
@@ -389,8 +386,7 @@ public abstract class ResourcesContainer<T> {
     try {
       newResource = this.load(identifier);
     } catch (Exception e) {
-      log.log(Level.SEVERE, "Could not load the game resource.", e);
-      return null;
+      throw new ResourceLoadException(e);
     }
 
     for (ResourcesContainerListener<? super T> listener : this.listeners) {

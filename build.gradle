@@ -113,12 +113,19 @@ task distZip(type: Zip) {
   archiveName archivesBaseName + '-' + version + '.zip'
   exclude archiveName
   destinationDir(file('build/libs/'))
+  
+  dependsOn ":utiliti:build"
+  dependsOn ":utiliti:distZipLinuxMac"
 }
 
 task fullbuild{
   group 'build'
   description 'executes the build including coverage reports and javadoc'
+  
+
   dependsOn createJavadocs
+  dependsOn jacocoTestReport
+  dependsOn distZip
 }
 
 task copyLicense(type: Copy) { 
@@ -126,8 +133,6 @@ task copyLicense(type: Copy) {
   into new File(buildDir, 'libs')
 }
 
-fullbuild.dependsOn jacocoTestReport
-fullbuild.dependsOn distZip
 compileJava.dependsOn includeNatives
 includeNatives.dependsOn copyLicense
 

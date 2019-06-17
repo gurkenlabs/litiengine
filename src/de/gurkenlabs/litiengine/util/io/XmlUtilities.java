@@ -96,7 +96,7 @@ public final class XmlUtilities {
     return cls.cast(um.unmarshal(path));
   }
 
-  public static <T> File save(T object, String fileName) {
+  public static File save(Object object, String fileName) {
     if (fileName == null || fileName.isEmpty()) {
       return null;
     }
@@ -132,7 +132,7 @@ public final class XmlUtilities {
     return newFile;
   }
 
-  public static <T> File save(T object, String fileName, String extension) {
+  public static File save(Object object, String fileName, String extension) {
     String fileNameWithExtension = fileName;
     if (!fileNameWithExtension.endsWith("." + extension)) {
       fileNameWithExtension += "." + extension;

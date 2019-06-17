@@ -36,6 +36,7 @@ public class CollisionBoxPanel extends PropertyPanel {
   }
 
 
+  @Override
   protected void setControlValues(IMapObject mapObject) {
     this.comboBoxColl.setSelectedItem(mapObject.getEnumValue(MapObjectProperty.COLLISION_TYPE, Collision.class, Collision.STATIC));
     this.chckbxIsObstructingLights.setSelected(mapObject.getBoolValue(MapObjectProperty.COLLISIONBOX_OBSTRUCTINGLIGHTS));

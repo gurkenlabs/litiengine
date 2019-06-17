@@ -31,10 +31,9 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameListener;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.Cursors;
-import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.Style;
 import de.gurkenlabs.utiliti.components.Controller;
-import de.gurkenlabs.utiliti.components.EditorScreen;
+import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.components.EntityController;
 import de.gurkenlabs.utiliti.components.LayerController;
 import de.gurkenlabs.utiliti.components.MapComponent;
@@ -59,7 +58,7 @@ public final class UI {
   private static MapList mapSelectionPanel;
   private static LayerList mapLayerList;
   private static EntityList entityList;
-  
+
   private static boolean initialized;
 
   private UI() {
@@ -83,15 +82,15 @@ public final class UI {
   }
 
   public static boolean notifyPendingChanges() {
-    String resourceFile = EditorScreen.instance().getCurrentResourceFile() != null ? EditorScreen.instance().getCurrentResourceFile() : "";
-    if (EditorScreen.instance().getChangedMaps().isEmpty() && !EditorScreen.instance().isUnsavedProject()) {
+    String resourceFile = Editor.instance().getCurrentResourceFile() != null ? Editor.instance().getCurrentResourceFile() : "";
+    if (Editor.instance().getChangedMaps().isEmpty() && !Editor.instance().isUnsavedProject()) {
       return true;
     }
 
     int n = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), Resources.strings().get("hud_saveProjectMessage") + "\n" + resourceFile, Resources.strings().get("hud_saveProject"), JOptionPane.YES_NO_CANCEL_OPTION);
 
     if (n == JOptionPane.YES_OPTION) {
-      EditorScreen.instance().save(false);
+      Editor.instance().save(false);
     }
 
     return n != JOptionPane.CANCEL_OPTION && n != JOptionPane.CLOSED_OPTION;
@@ -99,7 +98,7 @@ public final class UI {
 
   public static boolean showRevertWarning() {
     int n = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), Resources.strings().get("hud_revertChangesMessage"), Resources.strings().get("hud_revertChanges"), JOptionPane.YES_NO_OPTION);
-    return n != JOptionPane.CANCEL_OPTION && n != JOptionPane.CLOSED_OPTION;
+    return n == JOptionPane.YES_OPTION;
   }
 
   public static synchronized void init() {
@@ -107,7 +106,7 @@ public final class UI {
       return;
     }
 
-    Game.screens().display(EditorScreen.instance());
+    Game.screens().display(Editor.instance());
 
     initSwingComponentStyle();
     Tray.init();
@@ -119,7 +118,7 @@ public final class UI {
 
     initialized = true;
   }
-  
+
   public static PropertyInspector getInspector() {
     return mapObjectPanel;
   }
@@ -131,7 +130,7 @@ public final class UI {
   public static EntityController getEntityController() {
     return entityList;
   }
-  
+
   public static Controller getAssetController() {
     return assetComponent;
   }
@@ -139,7 +138,7 @@ public final class UI {
   public static MapController getMapController() {
     return mapSelectionPanel;
   }
-  
+
   private static void setupInterface() {
     JFrame window = initWindow();
 
@@ -160,18 +159,18 @@ public final class UI {
     split.addComponentListener(new ComponentAdapter() {
       @Override
       public void componentResized(ComponentEvent e) {
-        Program.preferences().setWidth(window.getWidth());
-        Program.preferences().setHeight(window.getHeight());
+        Editor.preferences().setWidth(window.getWidth());
+        Editor.preferences().setHeight(window.getHeight());
       }
     });
 
-    split.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> Program.preferences().setMainSplitter(split.getDividerLocation()));
+    split.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> Editor.preferences().setMainSplitter(split.getDividerLocation()));
 
     JPanel rootPanel = new JPanel(new BorderLayout());
     window.setContentPane(rootPanel);
 
     rootPanel.add(split, BorderLayout.CENTER);
-    split.setDividerLocation(Program.preferences().getMainSplitterPosition() != 0 ? Program.preferences().getMainSplitterPosition() : (int) (window.getSize().width * 0.75));
+    split.setDividerLocation(Editor.preferences().getMainSplitterPosition() != 0 ? Editor.preferences().getMainSplitterPosition() : (int) (window.getSize().width * 0.75));
 
     initPopupMenu(canvas);
     window.setJMenuBar(new MainMenuBar());
@@ -186,7 +185,7 @@ public final class UI {
       public boolean terminating() {
         boolean terminate = notifyPendingChanges();
         if (terminate) {
-          Program.preferences().setFrameState(window.getExtendedState());
+          Editor.preferences().setFrameState(window.getExtendedState());
         }
 
         return terminate;
@@ -194,10 +193,10 @@ public final class UI {
     });
 
     window.setLocationRelativeTo(null);
-    if (Program.preferences().getFrameState() != JFrame.ICONIFIED && Program.preferences().getFrameState() != JFrame.NORMAL) {
-      window.setExtendedState(Program.preferences().getFrameState());
-    } else if (Program.preferences().getWidth() != 0 && Program.preferences().getHeight() != 0) {
-      window.setSize(Program.preferences().getWidth(), Program.preferences().getHeight());
+    if (Editor.preferences().getFrameState() != JFrame.ICONIFIED && Editor.preferences().getFrameState() != JFrame.NORMAL) {
+      window.setExtendedState(Editor.preferences().getFrameState());
+    } else if (Editor.preferences().getWidth() != 0 && Editor.preferences().getHeight() != 0) {
+      window.setSize(Editor.preferences().getWidth(), Editor.preferences().getHeight());
     }
 
     return window;
@@ -205,20 +204,20 @@ public final class UI {
 
   private static Component initRenderSplitPanel(JPanel renderPanel, JFrame window) {
     JSplitPane renderSplitPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, renderPanel, initBottomPanel());
-    if (Program.preferences().getBottomSplitter() != 0) {
-      renderSplitPanel.setDividerLocation(Program.preferences().getBottomSplitter());
+    if (Editor.preferences().getBottomSplitter() != 0) {
+      renderSplitPanel.setDividerLocation(Editor.preferences().getBottomSplitter());
     } else {
       renderSplitPanel.setDividerLocation((int) (window.getSize().height * 0.75));
     }
 
-    renderSplitPanel.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> Program.preferences().setBottomSplitter(renderSplitPanel.getDividerLocation()));
+    renderSplitPanel.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> Editor.preferences().setBottomSplitter(renderSplitPanel.getDividerLocation()));
     renderSplitPanel.setContinuousLayout(true);
     return renderSplitPanel;
   }
 
   private static Component initRightSplitPanel() {
     mapSelectionPanel = new MapList();
-    
+
     mapLayerList = new LayerList();
     entityList = new EntityList();
     JTabbedPane tabPane = new JTabbedPane();
@@ -226,25 +225,25 @@ public final class UI {
     tabPane.add(mapLayerList);
     tabPane.setMaximumSize(new Dimension(0, 150));
 
-    JSplitPane topRightSplitPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT); 
+    JSplitPane topRightSplitPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
     topRightSplitPanel.setContinuousLayout(true);
-    topRightSplitPanel.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> Program.preferences().setMapPanelSplitter(topRightSplitPanel.getDividerLocation()));
-    if (Program.preferences().getMapPanelSplitter() != 0) {
-      topRightSplitPanel.setDividerLocation(Program.preferences().getMapPanelSplitter());
+    topRightSplitPanel.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> Editor.preferences().setMapPanelSplitter(topRightSplitPanel.getDividerLocation()));
+    if (Editor.preferences().getMapPanelSplitter() != 0) {
+      topRightSplitPanel.setDividerLocation(Editor.preferences().getMapPanelSplitter());
     }
-    
+
     topRightSplitPanel.setLeftComponent(mapSelectionPanel);
     topRightSplitPanel.setRightComponent(tabPane);
-    
+
     mapObjectPanel = new MapObjectInspector();
-    
+
     JSplitPane rightSplitPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
     rightSplitPanel.setMinimumSize(new Dimension(300, 0));
     rightSplitPanel.setBottomComponent(mapObjectPanel);
     rightSplitPanel.setTopComponent(topRightSplitPanel);
-    rightSplitPanel.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> Program.preferences().setSelectionEditSplitter(rightSplitPanel.getDividerLocation()));
-    if (Program.preferences().getSelectionEditSplitter() != 0) {
-      rightSplitPanel.setDividerLocation(Program.preferences().getSelectionEditSplitter());
+    rightSplitPanel.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> Editor.preferences().setSelectionEditSplitter(rightSplitPanel.getDividerLocation()));
+    if (Editor.preferences().getSelectionEditSplitter() != 0) {
+      rightSplitPanel.setDividerLocation(Editor.preferences().getSelectionEditSplitter());
     }
 
     return rightSplitPanel;
@@ -273,7 +272,7 @@ public final class UI {
     renderPane.add(verticalScroll, BorderLayout.EAST);
 
     horizontalScroll.addAdjustmentListener(e -> {
-      if (EditorScreen.instance().getMapComponent().isLoading()) {
+      if (Editor.instance().getMapComponent().isLoading()) {
         return;
       }
 
@@ -282,7 +281,7 @@ public final class UI {
     });
 
     verticalScroll.addAdjustmentListener(e -> {
-      if (EditorScreen.instance().getMapComponent().isLoading()) {
+      if (Editor.instance().getMapComponent().isLoading()) {
         return;
       }
       Point2D newFocus = new Point2D.Double(Game.world().camera().getFocus().getX(), verticalScroll.getValue());
@@ -297,7 +296,7 @@ public final class UI {
       @Override
       public void mouseReleased(MouseEvent e) {
         if (SwingUtilities.isRightMouseButton(e)) {
-          EditorScreen.instance().getMapComponent().setEditMode(MapComponent.EDITMODE_EDIT);
+          Editor.instance().getMapComponent().setEditMode(MapComponent.EDITMODE_EDIT);
           canvasPopup.show(canvas, e.getX(), e.getY());
         }
       }
@@ -310,7 +309,7 @@ public final class UI {
       JPopupMenu.setDefaultLightWeightPopupEnabled(false);
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
       UIManager.getDefaults().put("SplitPane.border", BorderFactory.createEmptyBorder());
-      setDefaultSwingFont(new FontUIResource(Style.FONT_DEFAULT));
+      setDefaultSwingFont(new FontUIResource(Style.getDefaultFont()));
     } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
       log.log(Level.SEVERE, e.getLocalizedMessage(), e);
     }
