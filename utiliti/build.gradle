@@ -93,25 +93,17 @@ task distZipWindows(type: Zip) {
 
   archiveName archivesBaseName + '-' + version + '-win.zip'
   destinationDir(file('build/libs/'))
+  
+  dependsOn createAllExecutables
 }
 
-task distZipMac(type: Zip) {
+task distZipLinuxMac(type: Zip) {
   group 'build'
   from 'build/libs/'
   include '*.jar'
   include 'config.properties'
 
-  archiveName archivesBaseName + '-' + version + '-osx.zip'
-  destinationDir(file('build/libs/'))
-}
-
-task distZipLinux(type: Zip) {
-  group 'build'
-  from 'build/libs/'
-  include '*.jar'
-  include 'config.properties'
-
-  archiveName archivesBaseName + '-' + version + '-linux.zip'
+  archiveName archivesBaseName + '-' + version + '-linux-mac.zip'
   destinationDir(file('build/libs/'))
 }
 
