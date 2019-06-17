@@ -116,7 +116,6 @@ task distZip(type: Zip) {
   
   dependsOn ":utiliti:build"
   dependsOn ":utiliti:distZipLinuxMac"
-  dependsOn ":utiliti:distZipWindows"
 }
 
 task fullbuild{
