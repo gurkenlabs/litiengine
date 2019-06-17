@@ -55,7 +55,7 @@ import de.gurkenlabs.litiengine.util.io.Codec;
 import de.gurkenlabs.litiengine.util.io.ImageSerializer;
 import de.gurkenlabs.utiliti.Style;
 import de.gurkenlabs.utiliti.UndoManager;
-import de.gurkenlabs.utiliti.components.EditorScreen;
+import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.swing.dialogs.SpritesheetImportPanel;
 import de.gurkenlabs.utiliti.swing.dialogs.XmlExportDialog;
 import de.gurkenlabs.utiliti.swing.panels.CreaturePanel;
@@ -217,21 +217,21 @@ public class AssetPanelItem extends JPanel {
       final Collection<SpritesheetResource> sprites = spritePanel.getSpriteSheets();
       for (SpritesheetResource spriteFile : sprites) {
         int index = -1;
-        Optional<SpritesheetResource> old = EditorScreen.instance().getGameFile().getSpriteSheets().stream().filter((x -> x.getName().equals(spriteFile.getName()))).findFirst();
+        Optional<SpritesheetResource> old = Editor.instance().getGameFile().getSpriteSheets().stream().filter((x -> x.getName().equals(spriteFile.getName()))).findFirst();
         if (old.isPresent()) {
-          index = EditorScreen.instance().getGameFile().getSpriteSheets().indexOf(old.get());
-          EditorScreen.instance().getGameFile().getSpriteSheets().remove(index);
+          index = Editor.instance().getGameFile().getSpriteSheets().indexOf(old.get());
+          Editor.instance().getGameFile().getSpriteSheets().remove(index);
         }
 
-        EditorScreen.instance().getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(spriteFile.getName()));
+        Editor.instance().getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(spriteFile.getName()));
         if (index != -1) {
-          EditorScreen.instance().getGameFile().getSpriteSheets().add(index, spriteFile);
+          Editor.instance().getGameFile().getSpriteSheets().add(index, spriteFile);
         } else {
-          EditorScreen.instance().getGameFile().getSpriteSheets().add(spriteFile);
+          Editor.instance().getGameFile().getSpriteSheets().add(spriteFile);
         }
       }
 
-      EditorScreen.instance().loadSpriteSheets(EditorScreen.instance().getGameFile().getSpriteSheets(), true);
+      Editor.instance().loadSpriteSheets(Editor.instance().getGameFile().getSpriteSheets(), true);
     });
     btnEdit.setMaximumSize(new Dimension(16, 16));
     btnEdit.setMinimumSize(new Dimension(16, 16));
@@ -283,10 +283,10 @@ public class AssetPanelItem extends JPanel {
       int n = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), "Do you really want to delete the spritesheet [" + info.getName() + "]?\n Entities that use the sprite won't be rendered anymore!", "Delete Spritesheet?", JOptionPane.YES_NO_OPTION);
 
       if (n == JOptionPane.OK_OPTION) {
-        EditorScreen.instance().getGameFile().getSpriteSheets().remove(getOrigin());
+        Editor.instance().getGameFile().getSpriteSheets().remove(getOrigin());
         Resources.images().clear();
         Resources.spritesheets().remove(info.getName());
-        EditorScreen.instance().getMapComponent().reloadEnvironment();
+        Editor.instance().getMapComponent().reloadEnvironment();
 
         UI.getAssetController().refresh();
       }
@@ -295,8 +295,8 @@ public class AssetPanelItem extends JPanel {
       int n = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), "Do you really want to delete the emitter [" + emitter.getName() + "]", "Delete Emitter?", JOptionPane.YES_NO_OPTION);
 
       if (n == JOptionPane.OK_OPTION) {
-        EditorScreen.instance().getGameFile().getEmitters().remove(getOrigin());
-        EditorScreen.instance().getMapComponent().reloadEnvironment();
+        Editor.instance().getGameFile().getEmitters().remove(getOrigin());
+        Editor.instance().getMapComponent().reloadEnvironment();
 
         UI.getAssetController().refresh();
       }
@@ -304,14 +304,14 @@ public class AssetPanelItem extends JPanel {
       Blueprint blueprint = (Blueprint) getOrigin();
       int n = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), "Do you really want to delete the blueprint [" + blueprint.getName() + "]?", "Delete Blueprint?", JOptionPane.YES_NO_OPTION);
       if (n == JOptionPane.OK_OPTION) {
-        EditorScreen.instance().getGameFile().getBluePrints().remove(getOrigin());
+        Editor.instance().getGameFile().getBluePrints().remove(getOrigin());
         UI.getAssetController().refresh();
       }
     } else if (getOrigin() instanceof SoundResource) {
       SoundResource sound = (SoundResource) getOrigin();
       int n = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), "Do you really want to delete the sound [" + sound.getName() + "]?", "Delete Sound?", JOptionPane.YES_NO_OPTION);
       if (n == JOptionPane.OK_OPTION) {
-        EditorScreen.instance().getGameFile().getSounds().remove(getOrigin());
+        Editor.instance().getGameFile().getSounds().remove(getOrigin());
         UI.getAssetController().refresh();
       }
     }
@@ -350,14 +350,14 @@ public class AssetPanelItem extends JPanel {
       mo.setValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE, false);
       mo.setValue(MapObjectProperty.PROP_ADDSHADOW, true);
 
-      EditorScreen.instance().getMapComponent().add(mo);
+      Editor.instance().getMapComponent().add(mo);
       return true;
     } else if (this.getOrigin() instanceof EmitterData) {
       MapObject newEmitter = (MapObject) EmitterMapObjectLoader.createMapObject((EmitterData) this.getOrigin());
       newEmitter.setX((int) (Game.world().camera().getFocus().getX() - newEmitter.getWidth()));
       newEmitter.setY((int) (Game.world().camera().getFocus().getY() - newEmitter.getHeight()));
       newEmitter.setId(Game.world().environment().getNextMapId());
-      EditorScreen.instance().getMapComponent().add(newEmitter);
+      Editor.instance().getMapComponent().add(newEmitter);
     } else if (this.getOrigin() instanceof Blueprint) {
       Blueprint blueprint = (Blueprint) this.getOrigin();
 
@@ -365,7 +365,7 @@ public class AssetPanelItem extends JPanel {
       try {
         List<IMapObject> newObjects = blueprint.build((int) Game.world().camera().getFocus().getX() - blueprint.getWidth() / 2, (int) Game.world().camera().getFocus().getY() - blueprint.getHeight() / 2);
         for (IMapObject newMapObject : newObjects) {
-          EditorScreen.instance().getMapComponent().add(newMapObject);
+          Editor.instance().getMapComponent().add(newMapObject);
         }
 
         // separately select the added objects because this cannot be done in
@@ -373,7 +373,7 @@ public class AssetPanelItem extends JPanel {
         // previous loop because it gets overwritten every time a map object
         // gets added
         for (IMapObject newMapObject : newObjects) {
-          EditorScreen.instance().getMapComponent().setSelection(newMapObject, false);
+          Editor.instance().getMapComponent().setSelection(newMapObject, false);
         }
       } finally {
         UndoManager.instance().endOperation();
@@ -413,7 +413,7 @@ public class AssetPanelItem extends JPanel {
 
       try {
         JFileChooser chooser;
-        String source = EditorScreen.instance().getProjectPath();
+        String source = Editor.instance().getProjectPath();
         chooser = new JFileChooser(source != null ? source : new File(".").getCanonicalPath());
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         chooser.setDialogType(JFileChooser.SAVE_DIALOG);
@@ -479,7 +479,7 @@ public class AssetPanelItem extends JPanel {
     FileFilter filter = new FileNameExtensionFilter(format.toString() + " - Sound", format.toString());
     try {
       JFileChooser chooser;
-      String source = EditorScreen.instance().getProjectPath();
+      String source = Editor.instance().getProjectPath();
       chooser = new JFileChooser(source != null ? source : new File(".").getCanonicalPath());
       chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
       chooser.setDialogType(JFileChooser.SAVE_DIALOG);

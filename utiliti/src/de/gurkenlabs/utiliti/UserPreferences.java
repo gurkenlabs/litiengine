@@ -10,11 +10,12 @@ import de.gurkenlabs.litiengine.configuration.ConfigurationGroupInfo;
 import de.gurkenlabs.litiengine.util.ColorHelper;
 
 @ConfigurationGroupInfo(prefix = "user_")
-public class UserPreferenceConfiguration extends ConfigurationGroup {
+public class UserPreferences extends ConfigurationGroup {
   private float zoom;
   private boolean showGrid;
-  private boolean snapPixels;
-  private boolean snapGrid;
+  private boolean clampToMap;
+  private boolean snapToPixels;
+  private boolean snapToGrid;
   private boolean renderBoundingBoxes;
   private boolean renderCustomMapObjects;
   private boolean renderMapIds;
@@ -35,18 +36,21 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
 
   private String lastGameFile;
   private String[] lastOpenedFiles;
+  private float uiScale;
 
-  public UserPreferenceConfiguration() {
+  public UserPreferences() {
     this.zoom = 1.0f;
     this.showGrid = true;
-    this.snapPixels = true;
-    this.snapGrid = true;
+    this.clampToMap = true;
+    this.snapToPixels = true;
+    this.snapToGrid = true;
     this.renderBoundingBoxes = true;
     this.renderNames = true;
     this.lastOpenedFiles = new String[10];
     this.compressFile = false;
     this.gridLineWidth = 1.0f;
     this.gridColor = ColorHelper.encode(Style.COLOR_DEFAULT_GRID);
+    this.setUiScale(1.0f);
   }
 
   public void addOpenedFile(String str) {
@@ -90,7 +94,7 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
     this.zoom = zoom;
   }
 
-  public boolean isShowGrid() {
+  public boolean showGrid() {
     return this.showGrid;
   }
 
@@ -98,15 +102,31 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
     this.showGrid = showGrid;
   }
 
-  public boolean isSnapGrid() {
-    return this.snapGrid;
+  public boolean clampToMap() {
+    return this.clampToMap;
   }
 
-  public void setSnapGrid(boolean snapGrid) {
-    this.snapGrid = snapGrid;
+  public boolean snapToPixels() {
+    return this.snapToPixels;
   }
 
-  public boolean isRenderBoundingBoxes() {
+  public boolean snapToGrid() {
+    return this.snapToGrid;
+  }
+
+  public void setClampToMap(boolean snapMap) {
+    this.clampToMap = snapMap;
+  }
+
+  public void setSnapToPixels(boolean snapPixels) {
+    this.snapToPixels = snapPixels;
+  }
+
+  public void setSnapToGrid(boolean snapGrid) {
+    this.snapToGrid = snapGrid;
+  }
+
+  public boolean renderBoundingBoxes() {
     return this.renderBoundingBoxes;
   }
 
@@ -114,7 +134,7 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
     this.renderBoundingBoxes = renderBoundingBoxes;
   }
 
-  public boolean isRenderCustomMapObjects() {
+  public boolean renderCustomMapObjects() {
     return this.renderCustomMapObjects;
   }
 
@@ -122,7 +142,7 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
     this.renderCustomMapObjects = renderCustomMapObjects;
   }
 
-  public boolean isRenderMapIds() {
+  public boolean renderMapIds() {
     return this.renderMapIds;
   }
 
@@ -150,7 +170,7 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
     this.lastOpenedFiles = lastOpenedFiles;
   }
 
-  public boolean isCompressFile() {
+  public boolean compressFile() {
     return compressFile;
   }
 
@@ -174,7 +194,7 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
     this.gridColor = gridColor;
   }
 
-  public boolean isSyncMaps() {
+  public boolean syncMaps() {
     return syncMaps;
   }
 
@@ -246,19 +266,19 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
     this.frameState = frameState;
   }
 
-  public boolean isSnapPixels() {
-    return snapPixels;
-  }
-
-  public void setSnapPixels(boolean snapPixels) {
-    this.snapPixels = snapPixels;
-  }
-
-  public boolean isRenderNames() {
+  public boolean renderNames() {
     return renderNames;
   }
 
   public void setRenderNames(boolean renderNames) {
     this.renderNames = renderNames;
+  }
+
+  public float getUiScale() {
+    return uiScale;
+  }
+
+  public void setUiScale(float uiScale) {
+    this.uiScale = uiScale;
   }
 }

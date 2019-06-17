@@ -10,12 +10,10 @@ import de.gurkenlabs.litiengine.configuration.Quality;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.resources.Strings;
-import de.gurkenlabs.utiliti.components.EditorScreen;
+import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.swing.UI;
 
 public class Program {
-  private static UserPreferenceConfiguration userPreferences;
-
   public static void main(String[] args) {
     // setup basic settings
     Game.info().setName("utiLITI");
@@ -24,11 +22,10 @@ public class Program {
     Resources.strings().setEncoding(Strings.ENCODING_UTF_8);
 
     // hook up configuration and initialize the game
-    userPreferences = new UserPreferenceConfiguration();
-    Game.config().getConfigurationGroups().add(userPreferences);
+    Game.config().getConfigurationGroups().add(Editor.preferences());
     Game.init(args);
     forceBasicEditorConfiguration();
-    Game.world().camera().onZoomChanged(zoom -> userPreferences.setZoom((float) zoom));
+    Game.world().camera().onZoomChanged(zoom -> Editor.preferences().setZoom((float) zoom));
 
     // the editor should never crash, even if an exception occurs
     Game.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(false));
@@ -44,8 +41,8 @@ public class Program {
     // load up previously opened project file or the one that is specified in
     // the command line arguments
     handleArgs(args);
-    if (!EditorScreen.instance().fileLoaded() && userPreferences.getLastGameFile() != null) {
-      EditorScreen.instance().load(new File(userPreferences.getLastGameFile()), false);
+    if (!Editor.instance().fileLoaded() && Editor.preferences().getLastGameFile() != null) {
+      Editor.instance().load(new File(Editor.preferences().getLastGameFile()), false);
     }
   }
 
@@ -55,10 +52,6 @@ public class Program {
     Game.config().debug().setDebugEnabled(true);
     Game.config().graphics().setGraphicQuality(Quality.VERYHIGH);
     Game.config().graphics().setReduceFramesWhenNotFocused(false);
-  }
-
-  public static UserPreferenceConfiguration preferences() {
-    return userPreferences;
   }
 
   private static void handleArgs(String[] args) {
@@ -74,6 +67,6 @@ public class Program {
     }
 
     File f = new File(args[0]);
-    EditorScreen.instance().load(f, false);
+    Editor.instance().load(f, false);
   }
 }

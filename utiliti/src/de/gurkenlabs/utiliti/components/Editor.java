@@ -1,7 +1,6 @@
 package de.gurkenlabs.utiliti.components;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -13,11 +12,9 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
@@ -26,7 +23,6 @@ import java.util.stream.Collectors;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -34,9 +30,7 @@ import javax.xml.bind.JAXBException;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
-import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
-import de.gurkenlabs.litiengine.environment.tilemap.MapRenderer;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxException;
@@ -55,21 +49,21 @@ import de.gurkenlabs.litiengine.resources.TextureAtlas;
 import de.gurkenlabs.litiengine.sound.SoundFormat;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
-import de.gurkenlabs.litiengine.util.io.ImageSerializer;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 import de.gurkenlabs.utiliti.Cursors;
-import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.Style;
 import de.gurkenlabs.utiliti.UndoManager;
+import de.gurkenlabs.utiliti.UserPreferences;
 import de.gurkenlabs.utiliti.swing.StatusBar;
 import de.gurkenlabs.utiliti.swing.Tray;
 import de.gurkenlabs.utiliti.swing.UI;
+import de.gurkenlabs.utiliti.swing.dialogs.ConfirmDialog;
 import de.gurkenlabs.utiliti.swing.dialogs.EditorFileChooser;
 import de.gurkenlabs.utiliti.swing.dialogs.SpritesheetImportPanel;
 import de.gurkenlabs.utiliti.swing.dialogs.XmlImportDialog;
 
-public class EditorScreen extends Screen {
-  private static final Logger log = Logger.getLogger(EditorScreen.class.getName());
+public class Editor extends Screen {
+  private static final Logger log = Logger.getLogger(Editor.class.getName());
   private static final int STATUS_DURATION = 5000;
   private static final String DEFAULT_GAME_NAME = "game";
   private static final String NEW_GAME_STRING = "NEW GAME *";
@@ -80,11 +74,11 @@ public class EditorScreen extends Screen {
   private static final String SPRITESHEET_FILE_NAME = "Spritesheet Image";
   private static final String TEXTUREATLAS_FILE_NAME = "Texture Atlas XML (generic)";
 
-  private static EditorScreen instance;
+  private static Editor instance;
+  private static UserPreferences preferences;
 
   private final List<Runnable> loadedCallbacks;
 
-  private double padding;
   private MapComponent mapComponent;
   private ResourceBundle gameFile = new ResourceBundle();
   private String projectPath;
@@ -94,17 +88,17 @@ public class EditorScreen extends Screen {
   private String currentStatus;
   private boolean loading;
 
-  private EditorScreen() {
+  private Editor() {
     super("Editor");
     this.loadedCallbacks = new CopyOnWriteArrayList<>();
+    this.mapComponent = new MapComponent();
   }
 
-  public static EditorScreen instance() {
-    if (instance != null) {
-      return instance;
+  public static Editor instance() {
+    if (instance == null) {
+      instance = new Editor();
     }
 
-    instance = new EditorScreen();
     return instance;
   }
 
@@ -112,13 +106,16 @@ public class EditorScreen extends Screen {
     return this.currentResourceFile != null;
   }
 
+  public static UserPreferences preferences() {
+    if (preferences == null) {
+      preferences = new UserPreferences();
+    }
+
+    return preferences;
+  }
+
   @Override
   public void prepare() {
-    padding = this.getWidth() / 50;
-
-    // init components
-    this.mapComponent = new MapComponent(this);
-
     this.getComponents().add(this.mapComponent);
     super.prepare();
   }
@@ -126,7 +123,6 @@ public class EditorScreen extends Screen {
   @Override
   public void render(final Graphics2D g) {
 
-    Game.world().camera().updateFocus();
     if (Game.world().environment() != null) {
       Game.world().environment().render(g);
     }
@@ -151,7 +147,7 @@ public class EditorScreen extends Screen {
     super.render(g);
 
     // render mouse/zoom and fps
-    g.setFont(Style.FONT_DEFAULT);
+    g.setFont(Style.getDefaultFont());
     g.setColor(Color.WHITE);
     TextRenderer.render(g, Game.metrics().getFramesPerSecond() + " FPS", 10, Game.window().getResolution().getHeight() - 20, true);
 
@@ -189,10 +185,6 @@ public class EditorScreen extends Screen {
     return projectPath;
   }
 
-  public double getPadding() {
-    return this.padding;
-  }
-
   public void setProjectPath(String projectPath) {
     this.projectPath = projectPath;
   }
@@ -203,7 +195,7 @@ public class EditorScreen extends Screen {
       chooser = new JFileChooser(new File(".").getCanonicalPath());
       chooser.setDialogTitle(Resources.strings().get("input_select_project_folder"));
       chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-      if (chooser.showOpenDialog((JFrame) Game.window().getHostControl()) != JFileChooser.APPROVE_OPTION) {
+      if (chooser.showOpenDialog(Game.window().getHostControl()) != JFileChooser.APPROVE_OPTION) {
         return;
       }
 
@@ -455,8 +447,7 @@ public class EditorScreen extends Screen {
       }
 
       if (this.gameFile.getEmitters().stream().anyMatch(x -> x.getName().equals(emitter.getName()))) {
-        int result = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), Resources.strings().get("import_emitter_question", emitter.getName()), Resources.strings().get("import_emitter_title"), JOptionPane.YES_NO_OPTION);
-        if (result == JOptionPane.NO_OPTION) {
+        if (!ConfirmDialog.show(Resources.strings().get("import_emitter_title"), Resources.strings().get("import_emitter_question", emitter.getName()))) {
           return;
         }
 
@@ -485,13 +476,8 @@ public class EditorScreen extends Screen {
         blueprint.setName(FileUtilities.getFileName(file.getPath()));
       }
 
-      if (this.gameFile.getBluePrints().stream().anyMatch(x -> x.getName().equals(blueprint.getName()))) {
-        int result = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), Resources.strings().get("import_blueprint_question", blueprint.getName()), Resources.strings().get("import_blueprint_title"), JOptionPane.YES_NO_OPTION);
-        if (result == JOptionPane.NO_OPTION) {
-          return;
-        }
-
-        this.gameFile.getBluePrints().removeIf(x -> x.getName().equals(blueprint.getName()));
+      if (this.gameFile.getBluePrints().stream().anyMatch(x -> x.getName().equals(blueprint.getName())) && !ConfirmDialog.show(Resources.strings().get("import_blueprint_title"), Resources.strings().get("import_blueprint_question", blueprint.getName()))) {
+        return;
       }
 
       this.gameFile.getBluePrints().add(blueprint);
@@ -512,14 +498,11 @@ public class EditorScreen extends Screen {
         return;
       }
 
-      if (this.gameFile.getTilesets().stream().anyMatch(x -> x.getName().equals(tileset.getName()))) {
-        int result = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), Resources.strings().get("import_tileset_title", tileset.getName()), Resources.strings().get("import_tileset_title"), JOptionPane.YES_NO_OPTION);
-        if (result == JOptionPane.NO_OPTION) {
-          return;
-        }
-
-        this.getMapComponent().loadTileset(tileset, false);
+      if (this.gameFile.getTilesets().stream().anyMatch(x -> x.getName().equals(tileset.getName())) && !ConfirmDialog.show(Resources.strings().get("import_tileset_title"), Resources.strings().get("import_tileset_title", tileset.getName()))) {
+        return;
       }
+
+      loadTileset(tileset, false);
 
       log.log(Level.INFO, "imported tileset {0} from {1}", new Object[] { tileset.getName(), file });
     }, Tileset.FILE_EXTENSION);
@@ -551,27 +534,21 @@ public class EditorScreen extends Screen {
     }
   }
 
-  public void saveMapSnapshot() {
-
-    if (Game.world().environment() == null || Game.world().environment().getMap() == null) {
-      return;
+  public void loadTileset(ITileset tileset, boolean embedded) {
+    Spritesheet sprite = Resources.spritesheets().get(tileset.getImage().getSource());
+    if (sprite != null) {
+      Resources.spritesheets().remove(sprite.getName());
+      getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(sprite.getName()));
     }
 
-    final IMap currentMap = Game.world().environment().getMap();
-    Dimension size = currentMap.getOrientation().getSize(currentMap);
-    BufferedImage img = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
-    MapRenderer.render(img.createGraphics(), currentMap, currentMap.getBounds());
-
-    try {
-      final String timeStamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
-      final File folder = new File("./screenshots/");
-      if (!folder.exists()) {
-        folder.mkdirs();
-      }
-
-      ImageSerializer.saveImage(new File("./screenshots/" + timeStamp + ImageFormat.PNG.toExtension()).toString(), img);
-    } catch (Exception e) {
-      log.log(Level.SEVERE, e.getLocalizedMessage(), e);
+    Spritesheet newSprite = Resources.spritesheets().load(tileset);
+    SpritesheetResource info = new SpritesheetResource(newSprite);
+    getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(info.getName()));
+    getGameFile().getSpriteSheets().add(info);
+    loadSpriteSheets(Arrays.asList(info), true);
+    if (!embedded) {
+      getGameFile().getTilesets().removeIf(x -> x.getName().equals(tileset.getName()));
+      getGameFile().getTilesets().add((Tileset) tileset);
     }
   }
 
@@ -594,7 +571,7 @@ public class EditorScreen extends Screen {
         chooser.addChoosableFileFilter(filter);
         chooser.setSelectedFile(new File(DEFAULT_GAME_NAME + "." + ResourceBundle.FILE_EXTENSION));
 
-        int result = chooser.showSaveDialog((JFrame) Game.window().getHostControl());
+        int result = chooser.showSaveDialog(Game.window().getHostControl());
         if (result == JFileChooser.APPROVE_OPTION) {
           this.saveGameFile(chooser.getSelectedFile().toString());
         }
@@ -662,16 +639,16 @@ public class EditorScreen extends Screen {
   }
 
   private String saveGameFile(String target) {
-    String saveFile = this.getGameFile().save(target, Program.preferences().isCompressFile());
+    String saveFile = this.getGameFile().save(target, preferences().compressFile());
     this.currentResourceFile = saveFile;
-    Program.preferences().setLastGameFile(this.currentResourceFile);
-    Program.preferences().addOpenedFile(this.currentResourceFile);
+    preferences().setLastGameFile(this.currentResourceFile);
+    preferences().addOpenedFile(this.currentResourceFile);
     this.gamefileLoaded();
     log.log(Level.INFO, "saved {0} maps, {1} spritesheets, {2} tilesets, {3} emitters, {4} blueprints, {5} sounds to {6}",
         new Object[] { this.getGameFile().getMaps().size(), this.getGameFile().getSpriteSheets().size(), this.getGameFile().getTilesets().size(), this.getGameFile().getEmitters().size(), this.getGameFile().getBluePrints().size(), this.getGameFile().getSounds().size(), this.currentResourceFile });
     this.setCurrentStatus(Resources.strings().get("status_gamefile_saved"));
 
-    if (Program.preferences().isSyncMaps()) {
+    if (preferences().syncMaps()) {
       this.saveMaps();
     }
 
@@ -755,8 +732,8 @@ public class EditorScreen extends Screen {
   }
 
   private void gamefileLoaded() {
-    Program.preferences().setLastGameFile(this.currentResourceFile);
-    Program.preferences().addOpenedFile(this.currentResourceFile);
+    preferences().setLastGameFile(this.currentResourceFile);
+    preferences().addOpenedFile(this.currentResourceFile);
     for (Runnable callback : this.loadedCallbacks) {
       callback.run();
     }
