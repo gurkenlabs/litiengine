@@ -97,7 +97,37 @@ public class MapList extends JScrollPane implements MapController {
       if (node != null) {
         node.setName(name);
       } else {
+        // TODO
+        //if (autoGroupMapsIsOn()) {
+          String nameParent = name;
+          while (nameParent.matches(".*\\d")) {
+            nameParent = nameParent.substring(0, (nameParent.length()-1));
+          }
+          if (nameParent.matches(".*[^a-zA-Z0-9]")) {
+            nameParent = nameParent.substring(0, nameParent.length()-1);
+          }
+
+          // if map would be part of a group
+          if (! nameParent.equals(name)) {
+            CustomMutableTreeNode nodeParent = this.findNode(nameParent);
+            // if node group doesn't exist
+            if (nodeParent == null || (! this.root.isNodeChild(nodeParent))) {
+              // create and add node group
+              nodeParent = new CustomMutableTreeNode(nameParent, -1);
+              this.root.add(nodeParent);
+            }
+            // add new map its node group
+            nodeParent.add(new CustomMutableTreeNode(name, i));
+          }
+          else {
+            // add new map to root
+            this.root.add(new CustomMutableTreeNode(name, i));
+          }
+        //}
+        
+        
         /**
+         * XXX
          * Keeping this code in case its needed in the future.
          * It allows grouping maps designed as floors of the same level
          */
@@ -114,10 +144,10 @@ public class MapList extends JScrollPane implements MapController {
           // add new map its node group
           nodeParent.add(new CustomMutableTreeNode(name, i));
         }
-        else {*/
+        else {
           // add new map to root
           this.root.add(new CustomMutableTreeNode(name, i));
-        /*}*/
+        }*/
       }
     }
 
