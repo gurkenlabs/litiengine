@@ -96,10 +96,10 @@ public class MapList extends JScrollPane implements MapController {
     this.groupMapsByFolders(maps);
 
     // remove maps that are no longer present
-    @SuppressWarnings("unchecked")
-    Enumeration<CustomMutableTreeNode> e = this.root.depthFirstEnumeration();
+    @SuppressWarnings("rawtypes")
+    Enumeration e = this.root.depthFirstEnumeration();
     while (e.hasMoreElements()) {
-      CustomMutableTreeNode node = e.nextElement();
+      CustomMutableTreeNode node = (CustomMutableTreeNode) e.nextElement();
       if (node.isLeaf() && (node.toString() == null || maps.stream().noneMatch(x -> node.toString().startsWith(x.getName())))) {
         this.root.remove(node);
       }
@@ -144,10 +144,10 @@ public class MapList extends JScrollPane implements MapController {
   }
   
   public CustomMutableTreeNode findNode(String name) {
-    @SuppressWarnings("unchecked")
-    Enumeration<CustomMutableTreeNode> e = this.root.depthFirstEnumeration();
+    @SuppressWarnings("rawtypes")
+    Enumeration e = this.root.depthFirstEnumeration();
     while (e.hasMoreElements()) {
-      CustomMutableTreeNode node = e.nextElement();
+      CustomMutableTreeNode node = (CustomMutableTreeNode) e.nextElement();
       if (node.toString() != null && (node.toString().equals(name) || node.toString().equals(name + " *"))) {
         return node;
       }
