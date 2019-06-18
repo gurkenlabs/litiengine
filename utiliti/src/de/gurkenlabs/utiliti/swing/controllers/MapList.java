@@ -6,6 +6,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
@@ -20,11 +22,14 @@ import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.components.MapController;
 import de.gurkenlabs.utiliti.swing.CustomMutableTreeNode;
+import de.gurkenlabs.utiliti.swing.FileDrop;
 import de.gurkenlabs.utiliti.swing.LeafOnlyTreeSelectionModel;
 import de.gurkenlabs.utiliti.swing.UI;
 
 @SuppressWarnings("serial")
 public class MapList extends JScrollPane implements MapController {
+  private static final Logger LOG = Logger.getLogger(FileDrop.class.getName());
+
   private final JTree tree;
   private final CustomMutableTreeNode root;
   private final DefaultTreeModel model;
@@ -232,10 +237,7 @@ public class MapList extends JScrollPane implements MapController {
           }
         }
         else {
-          /**
-           *  TODO
-           *  log a warning: "Could not find maps directory to properly build tree view of maps."
-           */
+          LOG.log(Level.WARNING, "Could not find maps directory to properly build tree view of maps");
         }
         
         if (! hasSubFolders) {
