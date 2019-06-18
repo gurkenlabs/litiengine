@@ -3,7 +3,6 @@
 [![Build Status](https://travis-ci.com/gurkenlabs/litiengine.svg?branch=master)](https://travis-ci.com/gurkenlabs/litiengine)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=de.gurkenlabs%3Alitiengine&metric=coverage)](https://sonarcloud.io/dashboard?id=de.gurkenlabs%3Alitiengine)
 [![Maven Central](https://img.shields.io/maven-central/v/de.gurkenlabs/litiengine.svg)](https://maven-badges.herokuapp.com/maven-central/de.gurkenlabs/litiengine)
-[![Javadocs](http://www.javadoc.io/badge/de.gurkenlabs/litiengine.svg)](http://www.javadoc.io/doc/de.gurkenlabs/litiengine)
 
 ![LITIengine Logo](https://github.com/gurkenlabs/litiengine/blob/master/resources/LITIEngine_Logo_big.png "LITIengine Logo")
 
@@ -54,6 +53,9 @@ The [LITIengine documentation pages](https://docs.litiengine.com/) containing in
 
 > :warning: We are aware that there is currently a **lack of documentation**, but we're planning to document the most important parts of the library and use-cases with the first beta release to ensure that features don't get deprecated before they're even used.
 
+If you are searching for a particular method or class within the API or just want to further explore the engine's possiblities, the Javadocs are a good place to start. 
+
+[![Javadocs](http://www.javadoc.io/badge/de.gurkenlabs/litiengine.svg)](http://www.javadoc.io/doc/de.gurkenlabs/litiengine) 
 ## Questions?
 Visit the official [LITIengine forum](https://forum.litiengine.com/) for troubleshooting or to learn about the LITIengine community. If you encounter bugs or want to request fancy new features, you can also open an issue in our [Issue Tracker](https://github.com/gurkenlabs/litiengine/issues).
 
