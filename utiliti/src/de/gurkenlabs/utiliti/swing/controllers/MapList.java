@@ -1,6 +1,7 @@
 package de.gurkenlabs.utiliti.swing.controllers;
 
 import java.awt.Dimension;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -87,16 +88,7 @@ public class MapList extends JScrollPane implements MapController {
       this.model.reload();
     }
 
-    /**
-     * MAP LIST ORGANIZATION
-     * 
-     * Group maps as they are already grouped in their folders.
-     * If they aren't grouped in any folders, group maps by their names.
-     */
-    if (! this.groupMapsByFolders(maps)) {
-      this.root.removeAllChildren();
-      this.groupMapsDefault(maps);
-    }
+    this.groupMapsByFolders(maps);
 
     // remove maps that are no longer present
     @SuppressWarnings("unchecked")
@@ -168,11 +160,21 @@ public class MapList extends JScrollPane implements MapController {
   
   /**
    * Creates a tree view of maps, as they are already grouped in their folders.
+   * 
+   * <p>The maps folder can only be found from gamefile's path.
+   * Three possible cases where maps folder could be found from gamefile's path:
+   * <blockquote><pre>
+   *  - the gamefile is already in the maps folder (same path)
+   *  - the gamefile is one folder ahead of maps folder (adds "maps" at the end of path)
+   *  - the gamefile is two folders ahead of maps folder (adds "resources/maps" at the end of path)
+   * </pre></blockquote>
+   * 
+   * <p>If maps folder isn't found, calls {@link #groupMapsDefault(List) groupMapsDefault}.
+   * 
    * @param maps
-   * @return true if at least one map is in a folder; false otherwise
    */
-  private boolean groupMapsByFolders(List<TmxMap> maps) {
-    boolean result = false;
+  private void groupMapsByFolders(List<TmxMap> maps) {
+    boolean hasSubFolders = false;
     TmxMap map;
     for (int i=0; i<maps.size(); i++) {
       map = maps.get(i);
@@ -185,37 +187,63 @@ public class MapList extends JScrollPane implements MapController {
       if (node != null) {
         node.setName(name);
       } else {
-        // FIXME - path specified is too precise. Won't work for everyone because not everyone will automatically put the gamefile in the same directory...
-        for (String filePath : FileUtilities.findFilesByExtension(new ArrayList<>(), Paths.get(FileUtilities.combine(Editor.instance().getProjectPath(), "")), map.getName() + "." + TmxMap.FILE_EXTENSION)) {
-          filePath = filePath.replaceAll("\\\\", "/");
-          String tmp = filePath.split(FileUtilities.combine(Editor.instance().getProjectPath(), ""), 2)[1];
-          String folders[] = tmp.split("/");
-          
-          // if map is in at least one folder
-          if (folders.length > 1) {
-            result = true;
-            CustomMutableTreeNode nodeParent = this.root;
-            // for each folder...
-            for (String folderName : folders) {
-              CustomMutableTreeNode nodeChild = this.findNode(folderName);
-              // ...if its node doesn't exist, create it and add it to its parent node
-              if (nodeChild == null || (! this.root.isNodeChild(nodeChild))) {
-                nodeChild = new CustomMutableTreeNode(folderName, -1);
-                nodeParent.add(nodeChild);
+        String mapsLocation = null;
+        // if gamefile is already in maps folder
+        if (FileUtilities.combine(Editor.instance().getProjectPath(), "").endsWith("maps/")) {
+          mapsLocation = "";
+        }
+        else if (Files.isDirectory(Paths.get(FileUtilities.combine(Editor.instance().getProjectPath(), "maps")))) {
+          mapsLocation = "maps";
+        }
+        else if (Files.isDirectory(Paths.get(FileUtilities.combine(Editor.instance().getProjectPath(), "resources/maps")))) {
+          mapsLocation = "resources/maps";
+        }
+
+        // if folder "maps" is located
+        if (mapsLocation != null) {
+          mapsLocation = mapsLocation.concat("/");
+
+          for (String filePath : FileUtilities.findFilesByExtension(new ArrayList<>(), Paths.get(FileUtilities.combine(Editor.instance().getProjectPath(), mapsLocation)), map.getName() + "." + TmxMap.FILE_EXTENSION)) {
+            filePath = filePath.replaceAll("\\\\", "/");
+            String tmp = filePath.split(FileUtilities.combine(Editor.instance().getProjectPath(), mapsLocation), 2)[1];
+            String folders[] = tmp.split("/");
+  
+            // if map is in at least one folder
+            if (folders.length > 1) {
+              hasSubFolders = true;
+              CustomMutableTreeNode nodeParent = this.root;
+              // for each folder...
+              for (String folderName : folders) {
+                CustomMutableTreeNode nodeChild = this.findNode(folderName);
+                // ...if its node doesn't exist, create it and add it to its parent node
+                if (nodeChild == null || (! this.root.isNodeChild(nodeChild))) {
+                  nodeChild = new CustomMutableTreeNode(folderName, -1);
+                  nodeParent.add(nodeChild);
+                }
+                nodeParent = nodeChild;
               }
-              nodeParent = nodeChild;
+              // here, nodeParent is the .tmx map file
+              nodeParent.setIndex(i);
             }
-            // here, nodeParent is the .tmx map file
-            nodeParent.setIndex(i);
+            else {
+              // add new map to root
+              this.root.add(new CustomMutableTreeNode(name, i));
+            }
           }
-          else {
-            // add new map to root
-            this.root.add(new CustomMutableTreeNode(name, i));
-          }
+        }
+        else {
+          /**
+           *  TODO
+           *  log a warning: "Could not find maps directory to properly build tree view of maps."
+           */
+        }
+        
+        if (! hasSubFolders) {
+          this.root.removeAllChildren();
+          this.groupMapsDefault(maps);
         }
       }
     }
-    return result;
   }
   
   /**
