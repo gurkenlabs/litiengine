@@ -7,7 +7,18 @@
 
 ![LITIengine Logo](https://github.com/gurkenlabs/litiengine/blob/master/resources/LITIEngine_Logo_big.png "LITIengine Logo")
 
-LITIengine is the pure open-source java game engine for creating 2D PC games. Written in plain Java 8, it provides all the infrastructure to create a 2D tile based java game, be it a platformer or a top-down adventure.
+LITIengine is a free and open source Java 2D Game Engine. It provides all the infrastructure to create tile based 2D games with plain java, be it a platformer or a top-down adventure. 
+
+## Main Features
+
+* Basic Game Infrastructure (GameLoop, Configuration, Resource Management, Logging, ...)
+* 2D Render Engine (GUI Components, Spritesheet Animations, Ambient Lighting, Particle System, ...)
+* 2D Sound Engine (support for .wav, .mp3 and .ogg)
+* 2D Physics Engine
+* Support for Tile Maps in .tmx format (e.g. made with [Tiled Editor](http://www.mapeditor.org/))
+* Player Input via Gamepad/Keyboard/Mouse
+* Entity Framework
+* Message Based Networking Framework
 
 > ## :construction: Important Note
 
@@ -33,7 +44,6 @@ compile 'de.gurkenlabs:litiengine:0.4.17'
 [More Installation Instructions](https://docs.litiengine.com/basics/getting-started/get-litiengine)
 ## Getting Started
 
-
 1. [Setup the Game Project](https://litiengine.com/getting-started-setup-the-game-project/)
 2. [Learning the Basics](https://litiengine.com/getting-started-learning-the-basics)
 3. [Configuring the Game](https://litiengine.com/getting-started-configuring-the-game/)
@@ -46,30 +56,6 @@ The [LITIengine documentation pages](https://docs.litiengine.com/) containing in
 
 ## Questions?
 Visit the official [LITIengine forum](https://forum.litiengine.com/) for troubleshooting or to learn about the LITIengine community. If you encounter bugs or want to request fancy new features, you can also open an issue in our [Issue Tracker](https://github.com/gurkenlabs/litiengine/issues).
-
-## Features
-
-* Basic Game Infrastructure (GameLoop, Configuration, Resource Management, Logging, ...)
-* 2D Physics Engine
-* 2D Render Engine (plain Java)
-  * GUI Components
-  * Static and Dynamic Shadows
-  * Dynamic Lighting
-  * ...
-* 2D Sound Engine (support for .wav, .mp3 and .ogg)
-* Support for Tile Maps in .tmx format (e.g. made with [Tiled Editor](http://www.mapeditor.org/))
-* Message Based Networking Framework
-* Player Input via Gamepad/Keyboard/Mouse
-* Entity Framework
-* Ability Framework
-* Particle System
-
-## Libraries Used
-
-* [JInput](https://github.com/jinput/jinput) for Gamepad support
-* [MP3 SPI](http://www.javazoom.net/mp3spi/mp3spi.html) for .mp3 support
-* [Ogg Vorbis SPI](http://www.javazoom.net/vorbisspi/vorbisspi.html) for .ogg support
-* [Steamworks4j](https://github.com/code-disaster/steamworks4j) for supporting the steamworks SDK
 
 ## Games made with LITIengine
 ### [GoIn - Behave or GET LOST!](https://gurkenlabs.de/ldjam-42-goin-behave-or-get-lost/)
@@ -89,6 +75,13 @@ Visit the official [LITIengine forum](https://forum.litiengine.com/) for trouble
 
 ### [LITI - Stoneage Brawl](https://gurkenlabs.de/liti/)
 ![LITI - Stoneage Brawl](https://gurkenlabs.de/wp-content/uploads/2017/01/liti-stoneage-brawl-banner.png "LITI - Stoneage Brawl")
+
+## Libraries Used
+
+* [JInput](https://github.com/jinput/jinput) for Gamepad support
+* [MP3 SPI](http://www.javazoom.net/mp3spi/mp3spi.html) for .mp3 support
+* [Ogg Vorbis SPI](http://www.javazoom.net/vorbisspi/vorbisspi.html) for .ogg support
+* [Steamworks4j](https://github.com/code-disaster/steamworks4j) for supporting the steamworks SDK
 
 ## Contributing
 * Agree to our [Code of Conduct](https://github.com/gurkenlabs/litiengine/blob/master/CODE_OF_CONDUCT.md)
