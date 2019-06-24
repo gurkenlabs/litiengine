@@ -90,7 +90,7 @@ public class MapList extends JScrollPane implements MapController {
   public synchronized void bind(List<TmxMap> maps, boolean clear) {
     if (clear) {
       this.root.removeAllChildren();
-      this.model.reload();
+      this.model.reload(this.root);
     }
 
     this.groupMapsByFolders(maps);
@@ -101,10 +101,20 @@ public class MapList extends JScrollPane implements MapController {
     while (e.hasMoreElements()) {
       CustomMutableTreeNode node = (CustomMutableTreeNode) e.nextElement();
       if (node.isLeaf() && (node.toString() == null || maps.stream().noneMatch(x -> node.toString().startsWith(x.getName())))) {
-        this.root.remove(node);
+        node.removeFromParent();
+        // decrement index's higher than node's index
+        @SuppressWarnings("rawtypes")
+        Enumeration ee = this.root.depthFirstEnumeration();
+        while (ee.hasMoreElements()) {
+          CustomMutableTreeNode otherNode = (CustomMutableTreeNode) ee.nextElement();
+          if (otherNode.isLeaf() && otherNode.getIndex() > node.getIndex()) {
+            otherNode.setIndex(otherNode.getIndex() - 1);
+          }
+        }
       }
     }
 
+    this.model.reload(this.root);
     this.tree.revalidate();
     this.refresh();
   }
@@ -212,7 +222,7 @@ public class MapList extends JScrollPane implements MapController {
             filePath = filePath.replaceAll("\\\\", "/");
             String tmp = filePath.split(FileUtilities.combine(Editor.instance().getProjectPath(), mapsLocation), 2)[1];
             String folders[] = tmp.split("/");
-  
+
             // if map is in at least one folder
             if (folders.length > 1) {
               hasSubFolders = true;
@@ -239,12 +249,12 @@ public class MapList extends JScrollPane implements MapController {
         else {
           LOG.log(Level.WARNING, "Could not find maps directory to properly build tree view of maps");
         }
-        
-        if (! hasSubFolders) {
-          this.root.removeAllChildren();
-          this.groupMapsDefault(maps);
-        }
       }
+    }
+    
+    if (! hasSubFolders) {
+      this.root.removeAllChildren();
+      this.groupMapsDefault(maps);
     }
   }
   
