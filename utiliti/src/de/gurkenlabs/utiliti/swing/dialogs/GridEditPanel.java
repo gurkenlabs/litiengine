@@ -26,7 +26,7 @@ public class GridEditPanel extends JPanel {
   private Color gridColor;
   private JSpinner snapDivisionSpinner;
 
-  public GridEditPanel(float strokeWidth, Color strokeColor, double snapDivision) {
+  public GridEditPanel(float strokeWidth, Color strokeColor, int snapDivision) {
 
     this.strokeSpinner = new JSpinner();
     this.strokeSpinner.setModel(new SpinnerNumberModel(strokeWidth, 1f, 5f, 0.1f));
@@ -100,7 +100,7 @@ public class GridEditPanel extends JPanel {
     return ((Double) this.strokeSpinner.getValue()).floatValue();
   }
   
-  public double getSnapDivision() {
-    return Double.parseDouble(this.snapDivisionSpinner.getValue().toString());
+  public int getSnapDivision() {
+    return Integer.parseInt(this.snapDivisionSpinner.getValue().toString());
   }
 }

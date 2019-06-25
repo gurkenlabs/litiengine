@@ -33,7 +33,7 @@ public class UserPreferences extends ConfigurationGroup {
 
   private float gridLineWidth;
   private String gridColor;
-  private double snapDivision;
+  private int snapDivision;
 
   private String lastGameFile;
   private String[] lastOpenedFiles;
@@ -51,7 +51,7 @@ public class UserPreferences extends ConfigurationGroup {
     this.compressFile = false;
     this.gridLineWidth = 1.0f;
     this.gridColor = ColorHelper.encode(Style.COLOR_DEFAULT_GRID);
-    this.snapDivision = 1.0;
+    this.snapDivision = 1;
     this.setUiScale(1.0f);
   }
 
@@ -188,7 +188,7 @@ public class UserPreferences extends ConfigurationGroup {
     return ColorHelper.decode(this.gridColor);
   }
   
-  public double getSnapDivision() {
+  public int getSnapDivision() {
     return this.snapDivision;
   }
 
@@ -200,7 +200,7 @@ public class UserPreferences extends ConfigurationGroup {
     this.gridColor = gridColor;
   }
   
-  public void setSnapDivision(double snapDivision) {
+  public void setSnapDivision(int snapDivision) {
     this.snapDivision = snapDivision;
   }
 
