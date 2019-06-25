@@ -246,13 +246,11 @@ public class MapList extends JScrollPane implements MapController {
             }
           }
         }
-        else {
-          LOG.log(Level.WARNING, "Could not find maps directory to properly build tree view of maps");
-        }
       }
     }
     
     if (! hasSubFolders) {
+      LOG.log(Level.WARNING, "Could not find maps directory to properly build tree view of maps");
       this.root.removeAllChildren();
       this.groupMapsDefault(maps);
     }
