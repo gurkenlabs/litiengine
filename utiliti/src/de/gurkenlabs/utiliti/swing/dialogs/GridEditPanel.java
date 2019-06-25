@@ -101,6 +101,6 @@ public class GridEditPanel extends JPanel {
   }
   
   public int getSnapDivision() {
-    return Integer.parseInt(this.snapDivisionSpinner.getValue().toString());
+    return (int) Math.round(Double.parseDouble(this.snapDivisionSpinner.getValue().toString()));
   }
 }

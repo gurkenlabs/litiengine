@@ -48,7 +48,7 @@ public class Snap {
   }
 
   private static double snapToGrid(double value, int gridSize) {
-    double gridSizeDivided = gridSize / Editor.preferences().getSnapDivision();
+    double gridSizeDivided = gridSize / (double) Editor.preferences().getSnapDivision();
     double snapped = Math.round(value / gridSizeDivided) * gridSizeDivided;
     return snapped;
   }
