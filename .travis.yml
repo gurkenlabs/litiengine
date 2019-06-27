@@ -5,7 +5,7 @@ before_install:
   - "sh -e /etc/init.d/xvfb start"
   - chmod +x gradlew
 
-jdk: oraclejdk11
+jdk: openjdk11
 
 git:
   depth: false
@@ -16,7 +16,7 @@ addons:
 
 script: 
 - ./gradlew fullbuild
-- jdk_switcher use oraclejdk8
+- jdk_switcher use openjdk8
 - ./gradlew fullbuild
 - if [ $TRAVIS_PULL_REQUEST = 'false' ]; then 
     sonar-scanner; 
