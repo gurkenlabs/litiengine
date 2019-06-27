@@ -201,9 +201,6 @@ public class Transform {
     // calculate the actual delta that all the map objects need to be moved by
     float deltaX = newX - drag.minX;
     float deltaY = newY - drag.minY;
-    if (deltaX == 0 && deltaY == 0) {
-      return;
-    }
 
     final Rectangle2D beforeBounds = MapObject.getBounds(selectedMapObjects);
 

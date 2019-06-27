@@ -65,11 +65,12 @@ public final class ViewMenu extends JMenu {
 
     JMenuItem setGrid = new JMenuItem(Resources.strings().get("menu_view_gridSettings"));
     setGrid.addActionListener(a -> {
-      GridEditPanel panel = new GridEditPanel(Editor.preferences().getGridLineWidth(), Editor.preferences().getGridColor());
+      GridEditPanel panel = new GridEditPanel(Editor.preferences().getGridLineWidth(), Editor.preferences().getGridColor(), Editor.preferences().getSnapDivision());
       int option = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), panel, Resources.strings().get("menu_view_gridSettings"), JOptionPane.PLAIN_MESSAGE);
       if (option == JOptionPane.OK_OPTION) {
         Editor.preferences().setGridColor(ColorHelper.encode(panel.getGridColor()));
         Editor.preferences().setGridLineWidth(panel.getStrokeWidth());
+        Editor.preferences().setSnapDivision(panel.getSnapDivision());
       }
     });
 

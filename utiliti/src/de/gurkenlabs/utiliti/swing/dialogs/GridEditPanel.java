@@ -24,13 +24,12 @@ public class GridEditPanel extends JPanel {
   private JSpinner strokeSpinner;
   private JButton buttonSetColor;
   private Color gridColor;
+  private JSpinner snapDivisionSpinner;
 
-  public GridEditPanel(float strokeWidth, Color strokeColor) {
-
-    JLabel lblStroke = new JLabel(Resources.strings().get("menu_view_gridStroke"));
+  public GridEditPanel(float strokeWidth, Color strokeColor, int snapDivision) {
 
     this.strokeSpinner = new JSpinner();
-    strokeSpinner.setModel(new SpinnerNumberModel(strokeWidth, 1f, 5f, 0.1f));
+    this.strokeSpinner.setModel(new SpinnerNumberModel(strokeWidth, 1f, 5f, 0.1f));
 
     this.gridColor = strokeColor;
     this.buttonSetColor = new JButton("");
@@ -39,8 +38,13 @@ public class GridEditPanel extends JPanel {
       Color newColor = JColorChooser.showDialog(null, Resources.strings().get("panel_selectLayerColor"), strokeColor);
       this.gridColor = newColor == null ? strokeColor : newColor;
     });
+    
+    this.snapDivisionSpinner = new JSpinner();
+    this.snapDivisionSpinner.setModel(new SpinnerNumberModel(snapDivision, 1.0, 10.0, 1.0));
 
+    JLabel lblStroke = new JLabel(Resources.strings().get("menu_view_gridStroke"));
     JLabel lblColor = new JLabel(Resources.strings().get("menu_view_gridColor"));
+    JLabel lblSnapDivision = new JLabel(Resources.strings().get("menu_view_snapDivision"));
 
     GroupLayout groupLayout = new GroupLayout(this);
     groupLayout.setHorizontalGroup(
@@ -51,11 +55,15 @@ public class GridEditPanel extends JPanel {
             .addGroup(groupLayout.createSequentialGroup()
               .addComponent(lblStroke)
               .addGap(18)
-              .addComponent(strokeSpinner, GroupLayout.DEFAULT_SIZE, 34, Short.MAX_VALUE))
+              .addComponent(this.strokeSpinner, GroupLayout.DEFAULT_SIZE, 34, Short.MAX_VALUE))
             .addGroup(groupLayout.createSequentialGroup()
               .addComponent(lblColor)
               .addGap(58)
-              .addComponent(buttonSetColor, GroupLayout.DEFAULT_SIZE, 34, Short.MAX_VALUE)))
+              .addComponent(this.buttonSetColor, GroupLayout.DEFAULT_SIZE, 34, Short.MAX_VALUE))
+            .addGroup(groupLayout.createSequentialGroup()
+              .addComponent(lblSnapDivision)
+              .addGap(18)
+              .addComponent(this.snapDivisionSpinner, GroupLayout.DEFAULT_SIZE, 34, Short.MAX_VALUE)))
           .addContainerGap())
     );
     groupLayout.setVerticalGroup(
@@ -64,11 +72,15 @@ public class GridEditPanel extends JPanel {
           .addContainerGap()
           .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
             .addComponent(lblStroke)
-            .addComponent(strokeSpinner, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+            .addComponent(this.strokeSpinner, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
           .addPreferredGap(ComponentPlacement.RELATED)
           .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
             .addComponent(lblColor)
-            .addComponent(buttonSetColor, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE))
+            .addComponent(this.buttonSetColor, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE))
+          .addPreferredGap(ComponentPlacement.UNRELATED)
+          .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+              .addComponent(lblSnapDivision)
+              .addComponent(this.snapDivisionSpinner, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE))
           .addGap(171))
     );
 
@@ -86,5 +98,9 @@ public class GridEditPanel extends JPanel {
       log.log(Level.WARNING, "Your edits in the grid line thickness spinner could not be parsed as Float.");
     }
     return ((Double) this.strokeSpinner.getValue()).floatValue();
+  }
+  
+  public int getSnapDivision() {
+    return (int) Math.round(Double.parseDouble(this.snapDivisionSpinner.getValue().toString()));
   }
 }
