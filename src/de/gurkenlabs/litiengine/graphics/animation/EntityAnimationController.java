@@ -55,7 +55,7 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
   }
 
   @Override
-  public synchronized void addAnimationRule(Predicate<? super T> rule, Function<? super T, ? extends String> animationName, int priority) {
+  public synchronized void addAnimationRule(Predicate<? super T> rule, Function<? super T, String> animationName, int priority) {
     // binary search the list for the appropriate index
     int min = 0;
     int max = this.animationRules.size();
@@ -72,7 +72,7 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
   }
   
   @Override
-  public void addAnimationRule(Predicate<? super T> rule, Function<? super T, ? extends String> animationName) {
+  public void addAnimationRule(Predicate<? super T> rule, Function<? super T, String> animationName) {
     this.addAnimationRule(rule, animationName, 0);
   }
 
@@ -156,10 +156,10 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
 
   protected static class AnimationRule<T extends IEntity> {
     private final Predicate<? super T> condition;
-    private final Function<? super T, ? extends String> animationName;
+    private final Function<? super T, String> animationName;
     private int priority;
 
-    public AnimationRule(Predicate<? super T> condition, Function<? super T, ? extends String> animationName, int priority) {
+    public AnimationRule(Predicate<? super T> condition, Function<? super T, String> animationName, int priority) {
       this.condition = condition;
       this.animationName = animationName;
       this.priority = priority;
@@ -169,7 +169,7 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
       return this.condition;
     }
 
-    Function<? super T, ? extends String> getAnimationName() {
+    Function<? super T, String> getAnimationName() {
       return this.animationName;
     }
 

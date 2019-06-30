@@ -17,9 +17,9 @@ public interface IEntityAnimationController<T> extends IAnimationController, IEn
    *          The callback that evaluates the actual animation name that will be
    *          applied
    */
-  public void addAnimationRule(Predicate<? super T> rule, Function<? super T, ? extends String> animationName);
+  public void addAnimationRule(Predicate<? super T> rule, Function<? super T, String> animationName);
 
-  public void addAnimationRule(Predicate<? super T> rule, Function<? super T, ? extends String> animationName, int priority);
+  public void addAnimationRule(Predicate<? super T> rule, Function<? super T, String> animationName, int priority);
 
   public boolean isAutoScaling();
 
