@@ -92,6 +92,10 @@ public class ClientConfiguration extends ConfigurationGroup {
   /**
    * Sets the updaterate. On a very good machine the max update rate is sth.
    * around 500 but such a high value will never be beneficial for the player.
+   * 
+   * <p>
+   * This defaults to a value of 60.
+   * </p>
    *
    * @param updaterate
    *          the new updaterate
