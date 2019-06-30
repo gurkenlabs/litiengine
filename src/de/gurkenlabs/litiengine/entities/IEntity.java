@@ -38,9 +38,13 @@ public interface IEntity {
    */
   public void setAngle(double angle);
 
-  public IEntityAnimationController<?> getAnimationController();
+  public IEntityAnimationController<?> animations();
 
-  public IBehaviorController getBehaviorController();
+  public boolean isVisible();
+
+  public void setVisible(boolean visible);
+
+  public IBehaviorController behavior();
 
   public void addController(IEntityController controller);
 
@@ -110,12 +114,16 @@ public interface IEntity {
   public String getName();
 
   public RenderType getRenderType();
-  
+
   /**
    * Determines whether this entity is being rendered with the layer it's originating from.
    * This ignores the specified <code>RenderType</code> and makes the entity dependent upon the visibility of it's layer.
-   * <p>This can only be used, of course, if the entity is related to a <code>MapObject</code>.
-   * <br>This defaults to <code>false</code> if not explicitly set on the <code>MapObject</code>.</p>
+   * <p>
+   * This can only be used, of course, if the entity is related to a <code>MapObject</code>.
+   * <br>
+   * This defaults to <code>false</code> if not explicitly set on the <code>MapObject</code>.
+   * </p>
+   * 
    * @return True if the entity should be rendered with the layer of the corresponding map object; otherwise false.
    * 
    * @see ILayer#isVisible()
@@ -165,7 +173,7 @@ public interface IEntity {
   public void setName(String name);
 
   public void setRenderType(RenderType renderType);
-  
+
   public void setRenderWithLayer(boolean renderWithLayer);
 
   public void setSize(double width, double height);

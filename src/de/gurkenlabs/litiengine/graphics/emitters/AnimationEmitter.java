@@ -23,7 +23,7 @@ public class AnimationEmitter extends SpritesheetEmitter {
     this.setWidth(spriteSheet.getSpriteWidth());
     this.setHeight(spriteSheet.getSpriteHeight());
     EntityAnimationController<AnimationEmitter> animationController = new EntityAnimationController<>(this, spriteSheet, false);
-    this.setTimeToLive(animationController.getDefaultAnimation().getTotalDuration());
+    this.setTimeToLive(animationController.getDefault().getTotalDuration());
     this.getControllers().addController(animationController);
   }
 

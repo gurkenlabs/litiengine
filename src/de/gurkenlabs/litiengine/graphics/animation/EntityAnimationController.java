@@ -55,7 +55,7 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
   }
 
   @Override
-  public synchronized void addAnimationRule(Predicate<? super T> rule, Function<? super T, String> animationName, int priority) {
+  public synchronized void addRule(Predicate<? super T> rule, Function<? super T, String> animationName, int priority) {
     // binary search the list for the appropriate index
     int min = 0;
     int max = this.animationRules.size();
@@ -72,8 +72,8 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
   }
   
   @Override
-  public void addAnimationRule(Predicate<? super T> rule, Function<? super T, String> animationName) {
-    this.addAnimationRule(rule, animationName, 0);
+  public void addRule(Predicate<? super T> rule, Function<? super T, String> animationName) {
+    this.addRule(rule, animationName, 0);
   }
 
   @Override
@@ -89,7 +89,7 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
       return;
     }
 
-    if (this.getCurrentAnimation() != null && !this.getCurrentAnimation().isLoop() && this.getCurrentAnimation().isPlaying()) {
+    if (this.getCurrent() != null && !this.getCurrent().isLoop() && this.getCurrent().isPlaying()) {
       return;
     }
 
@@ -100,8 +100,8 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
     for (AnimationRule<T> animationRule : this.animationRules) {
       if (animationRule.getCondition().test(this.getEntity())) {
         final String animationName = animationRule.getAnimationName().apply(this.getEntity());
-        if (this.getCurrentAnimation() == null || animationName != null && !animationName.isEmpty() && !this.getCurrentAnimation().getName().equalsIgnoreCase(animationName)) {
-          this.playAnimation(animationName);
+        if (this.getCurrent() == null || animationName != null && !animationName.isEmpty() && !this.getCurrent().getName().equalsIgnoreCase(animationName)) {
+          this.play(animationName);
         }
 
         break;

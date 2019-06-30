@@ -168,12 +168,12 @@ public abstract class Entity implements IEntity {
   }
 
   @Override
-  public IEntityAnimationController<?> getAnimationController() {
+  public IEntityAnimationController<?> animations() {
     return this.getController(IEntityAnimationController.class);
   }
 
   @Override
-  public IBehaviorController getBehaviorController() {
+  public IBehaviorController behavior() {
     return this.getController(IBehaviorController.class);
   }
 
@@ -245,6 +245,20 @@ public abstract class Entity implements IEntity {
   @Override
   public double getY() {
     return this.getLocation().getY();
+  }
+
+  @Override
+  public boolean isVisible() {
+    return this.animations() != null && this.animations().isEnabled();
+  }
+
+  @Override
+  public void setVisible(boolean visible) {
+    if (this.animations() == null) {
+      return;
+    }
+
+    this.animations().setEnabled(visible);
   }
 
   @Override

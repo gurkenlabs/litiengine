@@ -154,13 +154,13 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
   private void initializeFlippedAnimations() {
     String leftIdle = this.getSpriteName(CreatureAnimationState.IDLE, Direction.LEFT);
     String leftWalk = this.getSpriteName(CreatureAnimationState.WALK, Direction.LEFT);
-    Optional<Animation> leftIdleAnimation = this.getAnimations().stream().filter(x -> x.getName().equals(leftIdle)).findFirst();
-    Optional<Animation> leftWalkAnimation = this.getAnimations().stream().filter(x -> x.getName().equals(leftWalk)).findFirst();
+    Optional<Animation> leftIdleAnimation = this.getAll().stream().filter(x -> x.getName().equals(leftIdle)).findFirst();
+    Optional<Animation> leftWalkAnimation = this.getAll().stream().filter(x -> x.getName().equals(leftWalk)).findFirst();
 
     String rightIdle = this.getSpriteName(CreatureAnimationState.IDLE, Direction.RIGHT);
     String rightWalk = this.getSpriteName(CreatureAnimationState.WALK, Direction.RIGHT);
-    Optional<Animation> rightIdleAnimation = this.getAnimations().stream().filter(x -> x.getName().equals(rightIdle)).findFirst();
-    Optional<Animation> rightWalkAnimation = this.getAnimations().stream().filter(x -> x.getName().equals(rightWalk)).findFirst();
+    Optional<Animation> rightIdleAnimation = this.getAll().stream().filter(x -> x.getName().equals(rightIdle)).findFirst();
+    Optional<Animation> rightWalkAnimation = this.getAll().stream().filter(x -> x.getName().equals(rightWalk)).findFirst();
 
     if (!leftIdleAnimation.isPresent() && rightIdleAnimation.isPresent()) {
       this.add(flipAnimation(rightIdleAnimation.get().getSpritesheet(), leftIdle));
@@ -215,7 +215,7 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
       }
     }
 
-    return this.getDefaultAnimation() != null ? this.getDefaultAnimation().getName() : null;
+    return this.getDefault() != null ? this.getDefault().getName() : null;
   }
 
   public static String getSpriteName(Creature creature, CreatureAnimationState state) {
@@ -241,7 +241,7 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
       this.initializeFlippedAnimations();
     }
 
-    this.addAnimationRule(e -> true, e -> this.getCurrentAnimationName());
+    this.addRule(e -> true, e -> this.getCurrentAnimationName());
 
     AnimationInfo info = this.getEntity().getClass().getAnnotation(AnimationInfo.class);
     if (info != null) {

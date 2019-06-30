@@ -92,12 +92,12 @@ public class Camera implements ICamera {
   public Point2D getViewportDimensionCenter(final IEntity entity) {
     final Point2D viewPortLocation = this.getViewportLocation(entity);
 
-    final IAnimationController animationController = entity.getAnimationController();
-    if (animationController == null || animationController.getCurrentAnimation() == null) {
+    final IAnimationController animationController = entity.animations();
+    if (animationController == null || animationController.getCurrent() == null) {
       return new Point2D.Double(viewPortLocation.getX() + entity.getWidth() * 0.5, viewPortLocation.getY() + entity.getHeight() * 0.5);
     }
 
-    final Spritesheet spriteSheet = animationController.getCurrentAnimation().getSpritesheet();
+    final Spritesheet spriteSheet = animationController.getCurrent().getSpritesheet();
     if (spriteSheet == null) {
       return viewPortLocation;
     }

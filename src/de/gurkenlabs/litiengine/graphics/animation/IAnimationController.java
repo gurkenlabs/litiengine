@@ -17,11 +17,13 @@ public interface IAnimationController extends IUpdateable {
 
   public void add(ImageEffect effect);
 
-  public Collection<Animation> getAnimations();
+  public Collection<Animation> getAll();
 
-  public Animation getAnimation(String animationName);
+  public Animation get(String animationName);
 
-  public Animation getCurrentAnimation();
+  public Animation getCurrent();
+  
+  public Animation getDefault();
 
   public BufferedImage getCurrentSprite();
 
@@ -29,21 +31,23 @@ public interface IAnimationController extends IUpdateable {
 
   public AffineTransform getAffineTransform();
 
-  public Animation getDefaultAnimation();
-
   public List<ImageEffect> getImageEffects();
 
   public boolean hasAnimation(String animationName);
 
   public boolean isPlaying(String animationName);
 
-  public void playAnimation(final String animationName);
+  public void play(final String animationName);
 
-  public void setDefaultAnimation(Animation defaultAnimation);
+  public void setDefault(Animation defaultAnimation);
 
   public void setAffineTransform(AffineTransform affineTransform);
 
   public void remove(Animation animation);
 
   public void remove(ImageEffect effect);
+  
+  public boolean isEnabled();
+
+  public void setEnabled(boolean enabled);
 }

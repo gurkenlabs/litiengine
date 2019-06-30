@@ -320,7 +320,7 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
     this.isUpdating = true;
     try {
       this.labelImage.setIcon(file.getIcon());
-      this.controller.getAnimations().clear();
+      this.controller.getAll().clear();
 
       int factor = PREVIEW_SIZE / Math.max(file.getSpriteWidth(), file.getSpriteHeight());
 
@@ -329,8 +329,8 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
       Spritesheet sprite = new Spritesheet(img, file.getName() + "-preview", file.getSpriteWidth() * factor, file.getSpriteHeight() * factor);
       Animation newAnim = new Animation(sprite, true, file.keyFrames);
 
-      this.controller.setDefaultAnimation(newAnim);
-      this.controller.playAnimation(newAnim.getName());
+      this.controller.setDefault(newAnim);
+      this.controller.play(newAnim.getName());
     } catch (IllegalArgumentException e) {
       log.log(Level.WARNING, "The sprite file '" + file.name + "' cannot be scaled correctly for the preview window. Please check if the image file's dimensions are divisible by the desired sprite dimensions without remainder.", e);
     } finally {

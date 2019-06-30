@@ -26,16 +26,18 @@ public class AnimationController implements IAnimationController {
   private Animation currentAnimation;
   private Animation defaultAnimation;
   private AffineTransform affineTransform;
+  private boolean enabled;
 
   public AnimationController() {
     this.animations = new ConcurrentHashMap<>();
     this.imageEffects = new CopyOnWriteArrayList<>();
     this.listeners = new CopyOnWriteArrayList<>();
+    this.enabled = true;
   }
 
   public AnimationController(final Animation defaultAnimation) {
     this();
-    this.setDefaultAnimation(defaultAnimation);
+    this.setDefault(defaultAnimation);
   }
 
   public AnimationController(final Spritesheet sprite) {
@@ -79,14 +81,14 @@ public class AnimationController implements IAnimationController {
 
   public void attach() {
     Game.loop().attach(this);
-    for (final Animation animation : this.getAnimations()) {
+    for (final Animation animation : this.getAll()) {
       Game.loop().attach(animation);
     }
   }
 
   public void detach() {
     Game.loop().detach(this);
-    for (final Animation animation : this.getAnimations()) {
+    for (final Animation animation : this.getAll()) {
       Game.loop().detach(animation);
     }
   }
@@ -107,12 +109,12 @@ public class AnimationController implements IAnimationController {
   }
 
   @Override
-  public Collection<Animation> getAnimations() {
+  public Collection<Animation> getAll() {
     return this.animations.values();
   }
 
   @Override
-  public Animation getAnimation(String animationName) {
+  public Animation get(String animationName) {
     if (animationName == null || animationName.isEmpty()) {
       return null;
     }
@@ -121,13 +123,17 @@ public class AnimationController implements IAnimationController {
   }
 
   @Override
-  public Animation getCurrentAnimation() {
+  public Animation getCurrent() {
     return this.currentAnimation;
   }
 
   @Override
   public BufferedImage getCurrentSprite() {
-    final Animation current = this.getCurrentAnimation();
+    if (!this.isEnabled()) {
+      return null;
+    }
+
+    final Animation current = this.getCurrent();
     if (current == null || current.getSpritesheet() == null || current.getCurrentKeyFrame() == null) {
       return null;
     }
@@ -162,16 +168,16 @@ public class AnimationController implements IAnimationController {
   }
 
   @Override
-  public Animation getDefaultAnimation() {
+  public Animation getDefault() {
     if (this.defaultAnimation != null) {
       return this.defaultAnimation;
     }
 
-    if (this.getAnimations().isEmpty()) {
+    if (this.getAll().isEmpty()) {
       return null;
     }
 
-    return this.getAnimations().stream().findFirst().orElse(null);
+    return this.getAll().stream().findFirst().orElse(null);
   }
 
   @Override
@@ -191,31 +197,31 @@ public class AnimationController implements IAnimationController {
 
   @Override
   public boolean isPlaying(String animationName) {
-    return this.getCurrentAnimation() != null && this.getCurrentAnimation().getName() != null && this.getCurrentAnimation().getName().equalsIgnoreCase(animationName);
+    return this.getCurrent() != null && this.getCurrent().getName() != null && this.getCurrent().getName().equalsIgnoreCase(animationName);
   }
 
   @Override
-  public void playAnimation(final String animationName) {
+  public void play(final String animationName) {
     // if we have no animation with the name or it is already playing, do nothing
     if (this.isPlaying(animationName) || !this.hasAnimation(animationName)) {
       return;
     }
 
-    final Animation anim = this.getAnimation(animationName);
+    final Animation anim = this.get(animationName);
     if (anim == null) {
       return;
     }
 
     // ensure that only one animation is playing at a time
-    if (this.getCurrentAnimation() != null) {
-      this.getCurrentAnimation().terminate();
+    if (this.getCurrent() != null) {
+      this.getCurrent().terminate();
     }
 
     this.currentAnimation = anim;
     this.currentAnimation.start();
 
     for (AnimationListener listener : this.listeners) {
-      listener.played(this.getCurrentAnimation());
+      listener.played(this.getCurrent());
     }
   }
 
@@ -230,8 +236,8 @@ public class AnimationController implements IAnimationController {
       this.currentAnimation = null;
     }
 
-    if (this.getDefaultAnimation() != null && this.getDefaultAnimation().equals(animation)) {
-      this.setDefaultAnimation(this.getAnimations().stream().findFirst().orElse(null));
+    if (this.getDefault() != null && this.getDefault().equals(animation)) {
+      this.setDefault(this.getAll().stream().findFirst().orElse(null));
     }
   }
 
@@ -245,7 +251,7 @@ public class AnimationController implements IAnimationController {
   }
 
   @Override
-  public void setDefaultAnimation(Animation defaultAnimation) {
+  public void setDefault(Animation defaultAnimation) {
     if (this.defaultAnimation != null) {
       this.animations.remove(this.defaultAnimation.getName());
       if (this.currentAnimation != null && this.currentAnimation.equals(this.defaultAnimation)) {
@@ -261,20 +267,20 @@ public class AnimationController implements IAnimationController {
 
   @Override
   public void update() {
-    if (this.getCurrentAnimation() != null && this.getCurrentAnimation().isPaused()) {
+    if (this.getCurrent() != null && this.getCurrent().isPaused()) {
       return;
     }
 
-    final boolean playbackFinished = this.getCurrentAnimation() != null && !this.getCurrentAnimation().isPlaying();
+    final boolean playbackFinished = this.getCurrent() != null && !this.getCurrent().isPlaying();
     if (playbackFinished) {
       for (AnimationListener listener : this.listeners) {
-        listener.finished(this.getCurrentAnimation());
+        listener.finished(this.getCurrent());
       }
     }
 
-    if (this.getCurrentAnimation() == null || playbackFinished) {
-      if (this.getDefaultAnimation() != null) {
-        this.playAnimation(this.getDefaultAnimation().getName());
+    if (this.getCurrent() == null || playbackFinished) {
+      if (this.getDefault() != null) {
+        this.play(this.getDefault().getName());
       } else {
         this.currentAnimation = null;
       }
@@ -282,13 +288,13 @@ public class AnimationController implements IAnimationController {
   }
 
   protected String buildCurrentCacheKey() {
-    if (this.getCurrentAnimation() == null || this.getCurrentAnimation().getCurrentKeyFrame() == null || this.getCurrentAnimation().getSpritesheet() == null) {
+    if (this.getCurrent() == null || this.getCurrent().getCurrentKeyFrame() == null || this.getCurrent().getSpritesheet() == null) {
       return null;
     }
     final StringBuilder cacheKey = new StringBuilder();
-    cacheKey.append(this.getCurrentAnimation().getSpritesheet().hashCode());
+    cacheKey.append(this.getCurrent().getSpritesheet().hashCode());
     cacheKey.append('_');
-    cacheKey.append(this.getCurrentAnimation().getCurrentKeyFrame().getSpriteIndex());
+    cacheKey.append(this.getCurrent().getCurrentKeyFrame().getSpriteIndex());
     cacheKey.append('_');
 
     this.getImageEffects().forEach(x -> cacheKey.append(x.getName().hashCode()));
@@ -314,5 +320,15 @@ public class AnimationController implements IAnimationController {
   @Override
   public void setAffineTransform(AffineTransform affineTransform) {
     this.affineTransform = affineTransform;
+  }
+
+  @Override
+  public boolean isEnabled() {
+    return enabled;
+  }
+
+  @Override
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
   }
 }

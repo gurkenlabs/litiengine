@@ -16,7 +16,7 @@ public class PropAnimationController<T extends Prop> extends EntityAnimationCont
   public PropAnimationController(final T prop) {
     super(prop);
 
-    this.setDefaultAnimation(createAnimation(this.getEntity(), PropState.INTACT));
+    this.setDefault(createAnimation(this.getEntity(), PropState.INTACT));
     this.add(createAnimation(this.getEntity(), PropState.DAMAGED));
     this.add(createAnimation(this.getEntity(), PropState.DESTROYED));
   }
@@ -26,7 +26,7 @@ public class PropAnimationController<T extends Prop> extends EntityAnimationCont
     // get shadow from the cache or draw it dynamically and add it to the
     // cache
     // get complete image from the cache
-    final Animation animation = this.getCurrentAnimation();
+    final Animation animation = this.getCurrent();
     if (animation == null || animation.getSpritesheet() == null) {
       return null;
     }
@@ -74,7 +74,7 @@ public class PropAnimationController<T extends Prop> extends EntityAnimationCont
   @Override
   public void update() {
     super.update();
-    this.playAnimation(this.getEntity().getState().spriteString());
+    this.play(this.getEntity().getState().spriteString());
   }
 
   @Override
