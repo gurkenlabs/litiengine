@@ -6,16 +6,11 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.MouseInfo;
 import java.awt.Point;
-import java.awt.PointerInfo;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -24,6 +19,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
+import java.util.function.IntConsumer;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.gui.screens.Screen;
@@ -39,17 +35,12 @@ public class RenderComponent extends Canvas {
   public static final Font DEFAULT_FONT = new Font(Font.MONOSPACED, Font.PLAIN, 12);
   private static final int DEBUG_MOUSE_SIZE = 5;
 
-  private final transient List<Consumer<Integer>> fpsChangedConsumer;
+  private final transient List<IntConsumer> fpsChangedConsumer;
   private final transient List<Consumer<Graphics2D>> renderedConsumer;
 
   private transient BufferStrategy currentBufferStrategy;
 
   private float currentAlpha;
-
-  private transient Image cursorImage;
-  private transient AffineTransform cursorTransform;
-  private int cursorOffsetX;
-  private int cursorOffsetY;
 
   private long fadeInStart;
   private int fadeInTime;
@@ -92,29 +83,13 @@ public class RenderComponent extends Canvas {
     this.fadeOutTime = ms;
   }
 
-  public Image getCursorImage() {
-    return this.cursorImage;
-  }
-
-  public AffineTransform getCursorTransform() {
-    return this.cursorTransform;
-  }
-
-  public int getCursorOffsetX() {
-    return this.cursorOffsetX;
-  }
-
-  public int getCursorOffsetY() {
-    return this.cursorOffsetY;
-  }
-
   public void init() {
     this.createBufferStrategy(2);
     this.currentBufferStrategy = this.getBufferStrategy();
     this.currentAlpha = 1.1f;
   }
 
-  public void onFpsChanged(final Consumer<Integer> fpsConsumer) {
+  public void onFpsChanged(final IntConsumer fpsConsumer) {
     if (this.fpsChangedConsumer.contains(fpsConsumer)) {
       return;
     }
@@ -162,13 +137,7 @@ public class RenderComponent extends Canvas {
           }
         }
 
-        final Point locationOnScreen = this.getLocationOnScreen();
-        final Rectangle rect = new Rectangle(locationOnScreen.x, locationOnScreen.y, this.getWidth(), this.getHeight());
-        final PointerInfo pointerInfo = MouseInfo.getPointerInfo();
-        if (this.cursorImage != null && (Input.mouse().isGrabMouse() || pointerInfo != null && rect.contains(pointerInfo.getLocation()))) {
-          final Point2D locationWithOffset = new Point2D.Double(Input.mouse().getLocation().getX() - this.getCursorOffsetX(), Input.mouse().getLocation().getY() - this.getCursorOffsetY());
-          ImageRenderer.renderTransformed(g, this.cursorImage, locationWithOffset, this.getCursorTransform());
-        }
+        Game.window().cursor().render(g);
 
         if (Game.config().debug().isRenderDebugMouse()) {
           g.setColor(Color.RED);
@@ -207,39 +176,6 @@ public class RenderComponent extends Canvas {
 
     Toolkit.getDefaultToolkit().sync();
     this.frameCount++;
-  }
-
-  public void setCursor(final Image image) {
-    this.cursorImage = image;
-    if (this.cursorImage != null) {
-      this.setCursorOffsetX(-(this.cursorImage.getWidth(null) / 2));
-      this.setCursorOffsetY(-(this.cursorImage.getHeight(null) / 2));
-    } else {
-      this.setCursorOffsetX(0);
-      this.setCursorOffsetY(0);
-    }
-  }
-
-  public void setCursor(final Image image, final int offsetX, final int offsetY) {
-    this.setCursor(image);
-    this.setCursorOffset(offsetX, offsetY);
-  }
-
-  public void setCursorOffset(final int x, final int y) {
-    this.setCursorOffsetX(x);
-    this.setCursorOffsetY(y);
-  }
-
-  public void setCursorOffsetX(final int cursorOffsetX) {
-    this.cursorOffsetX = cursorOffsetX;
-  }
-
-  public void setCursorOffsetY(final int cursorOffsetY) {
-    this.cursorOffsetY = cursorOffsetY;
-  }
-
-  public void setCursorTransform(AffineTransform transform) {
-    this.cursorTransform = transform;
   }
 
   public void takeScreenshot() {

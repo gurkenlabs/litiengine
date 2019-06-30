@@ -273,9 +273,9 @@ public class Editor extends Screen {
     }
 
     final long currentTime = System.nanoTime();
-    Game.window().getRenderComponent().setCursor(Cursors.LOAD, 0, 0);
-    Game.window().getRenderComponent().setCursorOffsetX(0);
-    Game.window().getRenderComponent().setCursorOffsetY(0);
+    Game.window().cursor().set(Cursors.LOAD, 0, 0);
+    Game.window().cursor().setOffsetX(0);
+    Game.window().cursor().setOffsetY(0);
 
     this.loading = true;
     try {
@@ -339,7 +339,7 @@ public class Editor extends Screen {
       this.gamefileLoaded();
       this.setCurrentStatus(Resources.strings().get("status_gamefile_loaded"));
     } finally {
-      Game.window().getRenderComponent().setCursor(Cursors.DEFAULT, 0, 0);
+      Game.window().cursor().set(Cursors.DEFAULT, 0, 0);
       log.log(Level.INFO, "Loading gamefile {0} took: {1} ms", new Object[] { gameFile, (System.nanoTime() - currentTime) / 1000000.0 });
       this.loading = false;
     }

@@ -1,10 +1,10 @@
 package de.gurkenlabs.litiengine.sound;
 
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;

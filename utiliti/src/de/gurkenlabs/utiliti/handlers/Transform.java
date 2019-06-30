@@ -257,13 +257,13 @@ public class Transform {
       Rectangle2D hoverrect = GeometricUtilities.extrude(entry.getValue(), 2.5);
       if (hoverrect.contains(Input.mouse().getMapLocation())) {
         if (entry.getKey() == ResizeAnchor.DOWN || entry.getKey() == ResizeAnchor.UP) {
-          Game.window().getRenderComponent().setCursor(Cursors.TRANS_VERTICAL, 0, 0);
+          Game.window().cursor().set(Cursors.TRANS_VERTICAL, 0, 0);
         } else if (entry.getKey() == ResizeAnchor.UPLEFT || entry.getKey() == ResizeAnchor.DOWNRIGHT) {
-          Game.window().getRenderComponent().setCursor(Cursors.TRANS_DIAGONAL_LEFT, 0, 0);
+          Game.window().cursor().set(Cursors.TRANS_DIAGONAL_LEFT, 0, 0);
         } else if (entry.getKey() == ResizeAnchor.UPRIGHT || entry.getKey() == ResizeAnchor.DOWNLEFT) {
-          Game.window().getRenderComponent().setCursor(Cursors.TRANS_DIAGONAL_RIGHT, 0, 0);
+          Game.window().cursor().set(Cursors.TRANS_DIAGONAL_RIGHT, 0, 0);
         } else {
-          Game.window().getRenderComponent().setCursor(Cursors.TRANS_HORIZONTAL, 0, 0);
+          Game.window().cursor().set(Cursors.TRANS_HORIZONTAL, 0, 0);
         }
 
         anchor = entry.getKey();
@@ -276,14 +276,14 @@ public class Transform {
     if (anchor == null) {
       for (IMapObject selected : Editor.instance().getMapComponent().getSelectedMapObjects()) {
         if (selected.getBoundingBox().contains(Input.mouse().getMapLocation())) {
-          Game.window().getRenderComponent().setCursor(Cursors.MOVE, 0, 0);
+          Game.window().cursor().set(Cursors.MOVE, 0, 0);
           type = TransformType.MOVE;
           return;
         }
       }
 
       // if no transform can be applied, reset the transform type
-      Game.window().getRenderComponent().setCursor(Cursors.DEFAULT, 0, 0);
+      Game.window().cursor().set(Cursors.DEFAULT, 0, 0);
       type = TransformType.NONE;
     }
   }

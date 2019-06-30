@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 
 import javax.swing.JFrame;
 
+import de.gurkenlabs.litiengine.graphics.MouseCursor;
 import de.gurkenlabs.litiengine.graphics.RenderComponent;
 import de.gurkenlabs.litiengine.gui.screens.Resolution;
 
@@ -36,6 +37,7 @@ public final class GameWindow {
 
   private final JFrame hostControl;
   private final RenderComponent renderCanvas;
+  private final MouseCursor cursor;
 
   private float resolutionScale = 1;
 
@@ -48,6 +50,7 @@ public final class GameWindow {
     this.resolutionChangedConsumer = new CopyOnWriteArrayList<>();
 
     this.renderCanvas = new RenderComponent(Game.config().graphics().getResolution());
+    this.cursor = new MouseCursor();
     if (!Game.isInNoGUIMode()) {
       this.hostControl.setBackground(Color.BLACK);
       this.hostControl.add(this.renderCanvas);
@@ -138,6 +141,19 @@ public final class GameWindow {
     return this.renderCanvas;
   }
 
+  /**
+   * Gets the visual representation of the mouse cursor on the <code>GameWindow</code>.
+   * 
+   * <p>
+   * This can be used to provide a custom cursor image, define its visibility or specify a rendering offset from the actual position.
+   * </p>
+   * 
+   * @return The mouse cursor of the game.
+   */
+  public MouseCursor cursor() {
+    return this.cursor;
+  }
+
   public Dimension getResolution() {
     return this.resolution;
   }
@@ -154,7 +170,7 @@ public final class GameWindow {
   public void setIconImage(Image image) {
     this.hostControl.setIconImage(image);
   }
-  
+
   public void setIconImages(List<? extends Image> image) {
     this.hostControl.setIconImages(image);
   }

@@ -110,9 +110,9 @@ public final class UI {
 
     initSwingComponentStyle();
     Tray.init();
-    Game.window().getRenderComponent().setCursor(Cursors.DEFAULT, 0, 0);
-    Game.window().getRenderComponent().setCursorOffsetX(0);
-    Game.window().getRenderComponent().setCursorOffsetY(0);
+    Game.window().cursor().set(Cursors.DEFAULT, 0, 0);
+    Game.window().cursor().setOffsetX(0);
+    Game.window().cursor().setOffsetY(0);
     setupInterface();
     Game.window().getHostControl().revalidate();
 

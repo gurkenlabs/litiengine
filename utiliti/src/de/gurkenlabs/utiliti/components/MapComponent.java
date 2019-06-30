@@ -576,13 +576,13 @@ public class MapComponent extends GuiComponent {
     case EDITMODE_CREATE:
       this.setFocus(null, true);
       UI.getInspector().bind(null);
-      Game.window().getRenderComponent().setCursor(Cursors.ADD, 0, 0);
+      Game.window().cursor().set(Cursors.ADD, 0, 0);
       break;
     case EDITMODE_EDIT:
-      Game.window().getRenderComponent().setCursor(Cursors.DEFAULT, 0, 0);
+      Game.window().cursor().set(Cursors.DEFAULT, 0, 0);
       break;
     case EDITMODE_MOVE:
-      Game.window().getRenderComponent().setCursor(Cursors.MOVE, 0, 0);
+      Game.window().cursor().set(Cursors.MOVE, 0, 0);
       break;
     default:
       break;
