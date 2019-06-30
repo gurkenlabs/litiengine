@@ -22,6 +22,10 @@ public final class MouseCursor implements IRenderable {
   private int offsetY;
 
   private boolean visible;
+  
+  public MouseCursor() {
+    this.visible = true;
+  }
 
   @Override
   public void render(Graphics2D g) {
