@@ -165,8 +165,54 @@ public class CollisionResolvingTests {
     assertEquals(59.0, ent.getX(), EPSILON);
   }
 
+  // TODO
   @Test
-  public void testCollisiionWithMapBounds() {
+  public void testMultipleIntersection() {
+    Creature ent = getNewCreature();
+
+    PhysicsEngine engine = new PhysicsEngine();
+    engine.add(ent);
+
+    // thin rectangle at the bottom of the entity
+    engine.add(new CollisionBox(0, 25, 50, 10));
+
+    // small square to top the right corner of the thin rectangle
+    engine.add(new CollisionBox(50, 20, 5, 5));
+
+    // large rectangle at the right of the square
+    engine.add(new CollisionBox(55, 0, 50, 100));
+
+    // first relocate the entity
+    ent.setLocation(45, 10);
+
+    // move 10 px down
+    engine.move(ent, 0, 10);
+
+    // the movement should have been denied
+    assertEquals(45.0, ent.getX(), EPSILON);
+    assertEquals(10.0, ent.getY(), EPSILON);
+
+    // move along the square to the left
+    engine.move(ent, -90, 10);
+
+    assertEquals(35.0, ent.getX(), EPSILON);
+    assertEquals(10.0, ent.getY(), EPSILON);
+
+    // move along the square downwards
+    engine.move(ent, 0, 10);
+
+    assertEquals(35.0, ent.getX(), EPSILON);
+    assertEquals(15.0, ent.getY(), EPSILON);
+
+    // move along the thin rectangle to the right
+    engine.move(ent, 90, 15);
+
+    assertEquals(40.0, ent.getX(), EPSILON);
+    assertEquals(15.0, ent.getY(), EPSILON);
+  }
+
+  @Test
+  public void testCollisionWithMapBounds() {
     Creature ent = getNewCreature();
     ent.setWidth(30);
     ent.setHeight(30);

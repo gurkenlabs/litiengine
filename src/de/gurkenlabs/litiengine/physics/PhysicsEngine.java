@@ -393,25 +393,33 @@ public final class PhysicsEngine implements IUpdateable {
     return entity.canCollideWith(otherEntity);
   }
 
-  // TODO: I think the issue with this method is that it only reflects the intersection with the first collision box it 
-  // finds which results in the physics only accounting for one collision box at a time when resolving collision.
-  // We need to aggregate the delta X and delta Y for all collision boxes that the entity is colliding with.
+  /**
+   * Returns a Rectangle2D representing the union of intersections between the targeted position and all collision boxes 
+   * that the entity would be colliding with at that targeted position.
+   * 
+   * @param entity
+   * @param entityCollisionBox
+   * @return Rectangle2D
+   */
   private Rectangle2D getIntersection(final ICollisionEntity entity, final Rectangle2D entityCollisionBox) {
+    Rectangle2D result = null;
     for (final ICollisionEntity collisionBox : this.getCollisionEntities()) {
       if (!canCollide(entity, collisionBox)) {
         continue;
       }
 
-      if (collisionBox.getCollisionBox().contains(entityCollisionBox)) {
-        return collisionBox.getCollisionBox();
-      }
-
       if (GeometricUtilities.intersects(collisionBox.getCollisionBox(), entityCollisionBox)) {
-        return collisionBox.getCollisionBox().createIntersection(entityCollisionBox);
+        Rectangle2D tmpIntersection = collisionBox.getCollisionBox().createIntersection(entityCollisionBox);
+        if (result != null) {
+          result = tmpIntersection.createUnion(result);
+        }
+        else {
+          result = tmpIntersection;
+        }
       }
     }
 
-    return null;
+    return result;
   }
 
   private boolean collides(final ICollisionEntity entity, Collision type, Predicate<ICollisionEntity> check) {
