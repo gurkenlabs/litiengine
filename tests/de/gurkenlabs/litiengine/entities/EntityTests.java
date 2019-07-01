@@ -59,13 +59,17 @@ public class EntityTests {
 
   @Test
   public void testCustomAction() {
-    Entity entity = new TestEntity();
+    TestEntity entity = new TestEntity();
     entity.register("customAction", () -> {
+      entity.customActionPerformed = true;
       return;
     });
 
     assertTrue(entity.actions().exists("customAction"));
-
+   
+    entity.perform("customAction");
+    assertTrue(entity.customActionPerformed);
+    
     entity.actions().unregister("customAction");
 
     assertFalse(entity.actions().exists("customAction"));
@@ -74,7 +78,8 @@ public class EntityTests {
   private class TestEntity extends Entity {
     private boolean didSomething;
     private boolean didNamedAction;
-
+    private boolean customActionPerformed;
+    
     @Action(description = "does something")
     public void doSomething() {
       didSomething = true;
