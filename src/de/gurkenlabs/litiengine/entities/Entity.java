@@ -4,6 +4,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -268,9 +269,16 @@ public abstract class Entity implements IEntity {
 
   @Override
   public void perform(String actionName) {
-    if (this.actions.exists(actionName)) {
-      this.actions.get(actionName).perform();
+    if (actionName == null || actionName.isEmpty()) {
+      return;
     }
+
+    if (!this.actions.exists(actionName)) {
+      log.log(Level.INFO, "Entity \"{0}\" could not perform the action \"{1}\". \nMaybe you need to register the action or provide an appropriate Action annotation on the method you want to call.", new Object[] { this, actionName });
+      return;
+    }
+
+    this.actions.get(actionName).perform();
   }
 
   @Override
@@ -489,7 +497,8 @@ public abstract class Entity implements IEntity {
 
     // iterate over all methods that have the EntityActionInfo annotation and register them
     for (Method method : methods) {
-      if (method.isAccessible()) {
+      if (!Modifier.isPublic(method.getModifiers()) || method.getParameterCount() > 0) {
+        log.log(Level.INFO, "\"{0}\" is not a valid entity action. Either make it public and parameterless or remove the Action annotation.", new Object[] { method });
         continue;
       }
 
