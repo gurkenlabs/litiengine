@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.entities;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -15,14 +16,30 @@ public class EntityTests {
     TestEntity entity = new TestEntity();
     
     assertTrue(entity.actions().exists("doSomething"));
+    assertFalse(entity.actions().exists("imNotAnAction"));
+    
+    assertEquals(2, entity.actions().getActions().size());
     
     EntityAction action = entity.actions().get("doSomething");
+    
+    assertEquals("doSomething", action.getName());
+    assertEquals("does something", action.getDescription());
     
     assertNotNull(action);
     
     action.perform();
     
     assertTrue(entity.didSomething);
+    
+    entity.actions().unregister(action);
+    
+    assertEquals(1, entity.actions().getActions().size());
+    assertFalse(entity.actions().exists("doSomething"));
+    
+    entity.actions().register(action);
+    
+    assertEquals(2, entity.actions().getActions().size());
+    assertTrue(entity.actions().exists("doSomething"));
   }
 
   @Test
@@ -66,6 +83,9 @@ public class EntityTests {
     @Action(name = "myName")
     public void namedAction() {
       didNamedAction = true;
+    }
+    
+    public void imNotAnAction() {
     }
   }
 }
