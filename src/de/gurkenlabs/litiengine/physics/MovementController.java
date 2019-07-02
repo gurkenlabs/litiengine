@@ -262,6 +262,10 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
       }
     });
 
+    if (this.activeForces.isEmpty()) {
+      return;
+    }
+
     // disable turn-on-move for force handling
     boolean turn = this.getEntity().turnOnMove();
     this.getEntity().setTurnOnMove(false);

@@ -5,8 +5,14 @@ public enum CreatureAnimationState {
   WALK,
   DEAD;
 
+  private final String spriteString;
+
+  private CreatureAnimationState() {
+    this.spriteString = this.name().toLowerCase();
+  }
+
   public String spriteString() {
-    return this.name().toLowerCase();
+    return this.spriteString;
   }
 
   public CreatureAnimationState getOpposite() {
