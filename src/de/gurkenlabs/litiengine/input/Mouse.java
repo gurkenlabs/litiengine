@@ -18,13 +18,14 @@ import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 
 /**
  * This implementation provides information about the mouse input in the LITIengine.
  */
-public class Mouse implements IMouse {
+public class Mouse implements IMouse, IUpdateable {
   private static final Logger log = Logger.getLogger(Mouse.class.getName());
 
   private final List<Consumer<MouseEvent>> mouseClickedConsumer = new CopyOnWriteArrayList<>();
@@ -49,6 +50,9 @@ public class Mouse implements IMouse {
   private Point2D lastLocation;
   private Point2D location;
 
+  private MouseEvent updateLocation;
+  private boolean updatingLocation;
+
   /**
    * Instantiates a new mouse.
    * 
@@ -68,6 +72,21 @@ public class Mouse implements IMouse {
     this.lastLocation = this.location;
     this.sensitivity = Game.config().input().getMouseSensitivity();
     this.grabMouse = true;
+    
+    Game.inputLoop().attach(this);
+  }
+
+  @Override
+  public void update() {
+    if (this.updateLocation != null) {
+      this.updatingLocation = true;
+      try {
+        this.setLocation(this.updateLocation);
+        this.updateLocation = null;
+      } finally {
+        this.updatingLocation = false;
+      }
+    }
   }
 
   @Override
@@ -107,7 +126,7 @@ public class Mouse implements IMouse {
 
   @Override
   public void mouseClicked(final MouseEvent e) {
-    this.setLocation(e);
+    this.updateLocation(e);
     final MouseEvent wrappedEvent = this.createEvent(e);
     this.mouseListeners.forEach(listener -> listener.mouseClicked(wrappedEvent));
 
@@ -118,7 +137,7 @@ public class Mouse implements IMouse {
 
   @Override
   public void mouseDragged(final MouseEvent e) {
-    this.setLocation(e);
+    this.updateLocation(e);
     final MouseEvent wrappedEvent = this.createEvent(e);
     this.mouseMotionListeners.forEach(listener -> listener.mouseDragged(wrappedEvent));
 
@@ -133,7 +152,7 @@ public class Mouse implements IMouse {
       this.lastLocation = e.getPoint();
       this.location = e.getPoint();
     } else {
-      this.setLocation(e);
+      this.updateLocation(e);
     }
 
     final MouseEvent wrappedEvent = this.createEvent(e);
@@ -142,14 +161,14 @@ public class Mouse implements IMouse {
 
   @Override
   public void mouseExited(final MouseEvent e) {
-    this.setLocation(e);
+    this.updateLocation(e);
     final MouseEvent wrappedEvent = this.createEvent(e);
     this.mouseListeners.forEach(listener -> listener.mouseExited(wrappedEvent));
   }
 
   @Override
   public void mouseMoved(final MouseEvent e) {
-    this.setLocation(e);
+    this.updateLocation(e);
     final MouseEvent wrappedEvent = this.createEvent(e);
     this.mouseMotionListeners.forEach(listener -> listener.mouseMoved(wrappedEvent));
 
@@ -160,7 +179,7 @@ public class Mouse implements IMouse {
 
   @Override
   public void mousePressed(final MouseEvent e) {
-    this.setLocation(e);
+    this.updateLocation(e);
     this.setPressed(true);
     final MouseEvent wrappedEvent = this.createEvent(e);
     this.mouseListeners.forEach(listener -> listener.mousePressed(wrappedEvent));
@@ -180,7 +199,7 @@ public class Mouse implements IMouse {
 
   @Override
   public void mouseReleased(final MouseEvent e) {
-    this.setLocation(e);
+    this.updateLocation(e);
     this.setPressed(false);
     final MouseEvent wrappedEvent = this.createEvent(e);
     this.mouseListeners.forEach(listener -> listener.mouseReleased(wrappedEvent));
@@ -325,7 +344,7 @@ public class Mouse implements IMouse {
       // get diff relative from last mouse location
       diffX = e.getX() - this.lastLocation.getX();
       diffY = e.getY() - this.lastLocation.getY();
-      this.lastLocation = new Point(e.getPoint().x - Game.window().cursor().getOffsetX(), e.getPoint().y - Game.window().cursor().getOffsetY());
+      this.lastLocation = new Point(e.getX() - Game.window().cursor().getOffsetX(), e.getY() - Game.window().cursor().getOffsetY());
     } else {
       // get diff relative from grabbed position
       final double screenCenterX = Game.window().getResolution().getWidth() * 0.5;
@@ -359,5 +378,13 @@ public class Mouse implements IMouse {
    */
   private void setPressed(final boolean pressed) {
     this.pressed = pressed;
+  }
+
+  private void updateLocation(MouseEvent mouseEvent) {
+    if (this.updatingLocation) {
+      return;
+    }
+
+    this.updateLocation = mouseEvent;
   }
 }
