@@ -5,7 +5,6 @@ import java.awt.Image;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 
-import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.input.Mouse;
 
@@ -29,7 +28,7 @@ public final class MouseCursor implements IRenderable {
 
   @Override
   public void render(Graphics2D g) {
-    if (this.isVisible() && (Input.mouse().isGrabMouse() || Game.window().isFocusOwner())) {
+    if (this.isVisible()) {
       final Point2D locationWithOffset = new Point2D.Double(Input.mouse().getLocation().getX() - this.getOffsetX(), Input.mouse().getLocation().getY() - this.getOffsetY());
       ImageRenderer.renderTransformed(g, this.getImage(), locationWithOffset, this.getTransform());
     }
