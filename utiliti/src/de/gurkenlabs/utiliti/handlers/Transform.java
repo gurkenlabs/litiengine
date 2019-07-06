@@ -138,7 +138,8 @@ public class Transform {
     transformObject.setX((float) newX);
     transformObject.setY((float) newY);
 
-    Game.world().environment().reloadFromMap(transformObject.getId());
+    updateEntityTransform(transformObject);
+
     MapObjectType mapObjectType = MapObjectType.get(transformObject.getType());
     if (mapObjectType == MapObjectType.LIGHTSOURCE) {
       Game.world().environment().updateLighting(transformObject.getBoundingBox());
@@ -227,13 +228,7 @@ public class Transform {
       selected.setX((float) newX);
       selected.setY((float) newY);
 
-      IEntity entity = Game.world().environment().get(selected.getId());
-      if (entity != null) {
-        entity.setX(selected.getLocation().getX());
-        entity.setY(selected.getLocation().getY());
-      } else {
-        Game.world().environment().reloadFromMap(selected.getId());
-      }
+      updateEntityTransform(selected);
 
       if (selected.equals(Editor.instance().getMapComponent().getFocusedMapObject())) {
         UI.getInspector().bind(selected);
@@ -339,6 +334,22 @@ public class Transform {
       return focus.getCenterY() - transformRectSize / 2;
     default:
       return 0;
+    }
+  }
+
+  private static void updateEntityTransform(IMapObject mapObject) {
+    if (mapObject == null) {
+      return;
+    }
+
+    IEntity entity = Game.world().environment().get(mapObject.getId());
+    if (entity != null) {
+      entity.setX(mapObject.getX());
+      entity.setY(mapObject.getY());
+      entity.setWidth(mapObject.getWidth());
+      entity.setHeight(mapObject.getHeight());
+    } else {
+      Game.world().environment().reloadFromMap(mapObject.getId());
     }
   }
 
