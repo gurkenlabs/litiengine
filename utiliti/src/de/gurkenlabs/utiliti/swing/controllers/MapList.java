@@ -20,6 +20,7 @@ import de.gurkenlabs.utiliti.swing.UI;
 public class MapList extends JScrollPane implements MapController {
   private final JList<String> list;
   private final DefaultListModel<String> model;
+  private int index = -1;
 
   public MapList() {
     super();
@@ -39,6 +40,7 @@ public class MapList extends JScrollPane implements MapController {
       }
 
       if (this.list.getSelectedIndex() < Editor.instance().getMapComponent().getMaps().size() && this.list.getSelectedIndex() >= 0) {
+        this.index = this.list.getSelectedIndex();
         TmxMap map = Editor.instance().getMapComponent().getMaps().get(this.list.getSelectedIndex());
         if (Game.world().environment() != null && Game.world().environment().getMap().equals(map)) {
           return;
@@ -71,6 +73,7 @@ public class MapList extends JScrollPane implements MapController {
   public synchronized void bind(List<TmxMap> maps, boolean clear) {
     if (clear) {
       this.model.clear();
+      this.index = -1;
     }
 
     for (TmxMap map : maps) {
@@ -125,8 +128,10 @@ public class MapList extends JScrollPane implements MapController {
 
   @Override
   public void refresh() {
-    if (list.getSelectedIndex() == -1 && this.model.size() > 0) {
+    if (this.index == -1 && this.model.size() > 0) {
       this.list.setSelectedIndex(0);
+    } else {
+      this.list.setSelectedIndex(this.index);
     }
 
     UI.getEntityController().refresh();
