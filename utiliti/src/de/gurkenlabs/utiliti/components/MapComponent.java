@@ -717,10 +717,12 @@ public class MapComponent extends GuiComponent {
       }
 
       Optional<TmxMap> current = this.maps.stream().filter(x -> x.getName().equals(map.getName())).findFirst();
-      if (current.isPresent() && ConfirmDialog.show(Resources.strings().get("input_replace_map_title"), Resources.strings().get("input_replace_map", map.getName()))) {
-        this.getMaps().remove(current.get());
-      } else {
-        return;
+      if (current.isPresent()) {
+        if (ConfirmDialog.show(Resources.strings().get("input_replace_map_title"), Resources.strings().get("input_replace_map", map.getName()))) {
+          this.getMaps().remove(current.get());
+        } else {
+          return;
+        }
       }
 
       this.getMaps().add(map);
@@ -963,7 +965,7 @@ public class MapComponent extends GuiComponent {
 
       this.isMovingWithKeyboard = true;
     }
-    
+
     Transform.startDragging(this.getSelectedMapObjects());
   }
 
