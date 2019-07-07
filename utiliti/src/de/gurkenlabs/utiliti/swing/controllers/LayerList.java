@@ -179,6 +179,10 @@ public final class LayerList extends JScrollPane implements LayerController {
 
     // TODO: enabled states for all commands
     this.list.addListSelectionListener(e -> {
+      if (Game.world().environment() == null) {
+        return;
+      }
+      
       IMap map = Game.world().environment().getMap();
       if (map == null || Editor.instance().getMapComponent().isLoading() || this.refreshing) {
         return;
