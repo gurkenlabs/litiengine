@@ -936,51 +936,22 @@ public class MapComponent extends GuiComponent {
         return;
       }
 
-      if (this.isMovingWithKeyboard) {
-        for (IMapObject selected : this.getSelectedMapObjects()) {
-          UndoManager.instance().mapObjectChanged(selected);
-        }
-
-        UndoManager.instance().endOperation();
-        this.isMovingWithKeyboard = false;
-      }
+      this.afterArrowKeysReleased();
     });
 
-    Input.keyboard().onKeyPressed(KeyEvent.VK_RIGHT, e -> {
-      if (!Game.window().getRenderComponent().hasFocus()) {
-        return;
-      }
+    Input.keyboard().onKeyPressed(KeyEvent.VK_RIGHT, e -> this.handleKeyboardTransform(1, 0));
+    Input.keyboard().onKeyPressed(KeyEvent.VK_LEFT, e -> this.handleKeyboardTransform(-1, 0));
+    Input.keyboard().onKeyPressed(KeyEvent.VK_UP, e -> this.handleKeyboardTransform(0, -1));
+    Input.keyboard().onKeyPressed(KeyEvent.VK_DOWN, e -> this.handleKeyboardTransform(0, 1));
+  }
 
-      this.beforeArrowKeyPressed();
-      Transform.moveEntities(this.getSelectedMapObjects(), 1, 0);
-    });
+  private void handleKeyboardTransform(int x, int y) {
+    if (!Game.window().getRenderComponent().hasFocus()) {
+      return;
+    }
 
-    Input.keyboard().onKeyPressed(KeyEvent.VK_LEFT, e -> {
-      if (!Game.window().getRenderComponent().hasFocus()) {
-        return;
-      }
-
-      this.beforeArrowKeyPressed();
-      Transform.moveEntities(this.getSelectedMapObjects(), -1, 0);
-    });
-
-    Input.keyboard().onKeyPressed(KeyEvent.VK_UP, e -> {
-      if (!Game.window().getRenderComponent().hasFocus()) {
-        return;
-      }
-
-      this.beforeArrowKeyPressed();
-      Transform.moveEntities(this.getSelectedMapObjects(), 0, -1);
-    });
-
-    Input.keyboard().onKeyPressed(KeyEvent.VK_DOWN, e -> {
-      if (!Game.window().getRenderComponent().hasFocus()) {
-        return;
-      }
-
-      this.beforeArrowKeyPressed();
-      Transform.moveEntities(this.getSelectedMapObjects(), 0, 1);
-    });
+    this.beforeArrowKeyPressed();
+    Transform.moveEntities(this.getSelectedMapObjects(), x, y);
   }
 
   private void beforeArrowKeyPressed() {
@@ -991,6 +962,20 @@ public class MapComponent extends GuiComponent {
       }
 
       this.isMovingWithKeyboard = true;
+    }
+    
+    Transform.startDragging(this.getSelectedMapObjects());
+  }
+
+  private void afterArrowKeysReleased() {
+    if (this.isMovingWithKeyboard) {
+      for (IMapObject selected : this.getSelectedMapObjects()) {
+        UndoManager.instance().mapObjectChanged(selected);
+      }
+
+      UndoManager.instance().endOperation();
+      this.isMovingWithKeyboard = false;
+      Transform.resetDragging();
     }
   }
 

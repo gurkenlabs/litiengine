@@ -174,7 +174,7 @@ public class Transform {
     // track the initial mouse location to use it for calculating the delta
     // values
     if (drag == null) {
-      drag = new DragData(selectedMapObjects);
+      startDragging(selectedMapObjects);
       return;
     }
 
@@ -299,6 +299,10 @@ public class Transform {
 
   public static void resetDragging() {
     drag = null;
+  }
+
+  public static void startDragging(List<IMapObject> selectedMapObjects) {
+    drag = new DragData(selectedMapObjects);
   }
 
   private static double getAnchorX(ResizeAnchor type, Rectangle2D focus) {
