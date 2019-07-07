@@ -5,8 +5,12 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.utiliti.components.Editor;
 
-public class Snap {
+public final class Snap {
+
   private static final int DEFAULT_PRECISION = 2;
+
+  private Snap() {
+  }
 
   public static float x(double x) {
     final IMap map = Game.world() != null && Game.world().environment() != null ? Game.world().environment().getMap() : null;
@@ -49,7 +53,6 @@ public class Snap {
 
   private static double snapToGrid(double value, int gridSize) {
     double gridSizeDivided = gridSize / (double) Editor.preferences().getSnapDivision();
-    double snapped = Math.round(value / gridSizeDivided) * gridSizeDivided;
-    return snapped;
+    return Math.round(value / gridSizeDivided) * gridSizeDivided;
   }
 }

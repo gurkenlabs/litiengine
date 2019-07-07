@@ -24,7 +24,7 @@ import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.components.MapComponent;
 import de.gurkenlabs.utiliti.swing.UI;
 
-public class Transform {
+public final class Transform {
 
   public enum ResizeAnchor {
     UP(0, -1, 0, 1), DOWN(0, 1, 0, 0), LEFT(-1, 0, 1, 0), RIGHT(1, 0, 0, 0), UPLEFT(-1, -1, 1, 1), UPRIGHT(1, -1, 0, 1), DOWNLEFT(-1, 1, 1, 0), DOWNRIGHT(1, 1, 0, 0);
@@ -81,6 +81,9 @@ public class Transform {
   private static ResizeAnchor anchor;
 
   private static DragData drag;
+  
+  private Transform() {
+  }
 
   public static TransformType type() {
     return type;
