@@ -137,7 +137,7 @@ public class TextFieldComponent extends ImageComponent {
       this.setText(this.getText().substring(0, this.getText().length() - 1));
     }
 
-    if (this.getFormat() != null && (this.getFormat() == INTEGER_FORMAT || this.getFormat() == DOUBLE_FORMAT) && (this.getText() == null || this.getText().isEmpty())) {
+    if (this.isKnownNumericFormat() && (this.getText() == null || this.getText().isEmpty())) {
       this.setText("0");
     }
   }
@@ -161,10 +161,14 @@ public class TextFieldComponent extends ImageComponent {
       }
     }
 
-    if (this.getFormat() != null && (this.getFormat() == INTEGER_FORMAT || this.getFormat() == DOUBLE_FORMAT) && this.getText().equals("0")) {
+    if (this.isKnownNumericFormat() && this.getText().equals("0")) {
       this.setText("");
     }
 
     this.setText(this.getText() + text);
+  }
+  
+  private boolean isKnownNumericFormat() {
+    return this.getFormat() != null && (this.getFormat().equals(INTEGER_FORMAT) || this.getFormat().equals(DOUBLE_FORMAT));
   }
 }

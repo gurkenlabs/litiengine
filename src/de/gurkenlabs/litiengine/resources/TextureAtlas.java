@@ -214,7 +214,7 @@ public class TextureAtlas {
         return false;
       }
 
-      return v.equalsIgnoreCase("y") || v.equalsIgnoreCase("yes") || v == "1" || v.equalsIgnoreCase("true");
+      return v.equalsIgnoreCase("y") || v.equalsIgnoreCase("yes") || v.equals("1") || v.equalsIgnoreCase("true");
     }
 
     @Override

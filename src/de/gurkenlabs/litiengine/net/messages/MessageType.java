@@ -27,7 +27,7 @@ public class MessageType {
       throw new IllegalArgumentException(String.format("Cannot create a new message type with packetId '%d' because another message type has an equal id assigned.", messageId));
     }
 
-    if (messageTypes.stream().anyMatch(type -> type.getName() == name)) {
+    if (messageTypes.stream().anyMatch(type -> type.getName().equals(name))) {
       throw new IllegalArgumentException(String.format("Cannot create a new message type with name '%s' because another message type has an equal name.", name));
     }
 
