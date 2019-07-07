@@ -271,6 +271,16 @@ public class Editor extends Screen {
         return;
       }
     }
+    
+    if (!FileUtilities.getExtension(gameFile).equals(ResourceBundle.FILE_EXTENSION)) {
+      log.log(Level.SEVERE, "unsupported file format {0}", FileUtilities.getExtension(gameFile));
+      return;
+    }
+
+    if (!gameFile.exists()) {
+      log.log(Level.SEVERE, "gameFile {0} does not exist", gameFile);
+      return;
+    }
 
     final long currentTime = System.nanoTime();
     Game.window().cursor().set(Cursors.LOAD, 0, 0);
@@ -279,16 +289,6 @@ public class Editor extends Screen {
 
     this.loading = true;
     try {
-      if (!FileUtilities.getExtension(gameFile).equals(ResourceBundle.FILE_EXTENSION)) {
-        log.log(Level.SEVERE, "unsupported file format {0}", FileUtilities.getExtension(gameFile));
-        return;
-      }
-
-      if (!gameFile.exists()) {
-        log.log(Level.SEVERE, "gameFile {0} does not exist", gameFile);
-        return;
-      }
-
       UndoManager.clearAll();
 
       // set up project settings
