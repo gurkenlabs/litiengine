@@ -53,13 +53,8 @@ public class MapList extends JScrollPane implements MapController {
     this.setViewportView(this.list);
     this.setViewportBorder(null);
 
-    UndoManager.onMapObjectAdded(manager -> {
-      this.refresh();
-    });
-
-    UndoManager.onMapObjectRemoved(manager -> {
-      this.refresh();
-    });
+    UndoManager.onMapObjectAdded(manager -> this.refresh());
+    UndoManager.onMapObjectRemoved(manager -> this.refresh());
 
     UndoManager.onUndoStackChanged(manager -> this.bind(Editor.instance().getMapComponent().getMaps()));
   }

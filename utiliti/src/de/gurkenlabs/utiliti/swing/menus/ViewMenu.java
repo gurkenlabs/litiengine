@@ -91,9 +91,7 @@ public final class ViewMenu extends JMenu {
     centerMap.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, Event.CTRL_MASK));
     centerMap.addActionListener(a -> Editor.instance().getMapComponent().centerCameraOnMap());
 
-    Editor.instance().getMapComponent().onFocusChanged(mo -> {
-      centerFocus.setEnabled(mo != null);
-    });
+    Editor.instance().getMapComponent().onFocusChanged(mo -> centerFocus.setEnabled(mo != null));
 
     this.add(renderGrid);
     this.add(renderCollision);

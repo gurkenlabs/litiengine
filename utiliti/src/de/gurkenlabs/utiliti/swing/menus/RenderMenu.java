@@ -53,9 +53,7 @@ public final class RenderMenu extends JMenu {
     Collections.reverse(types);
 
     JMenuItem layerItem = new JMenuItem("Render with layer");
-    boolean canRenderWithLayer = selectedMapObjects.stream().anyMatch(x -> {
-      return x.getLayer() != null;
-    });
+    boolean canRenderWithLayer = selectedMapObjects.stream().anyMatch(x -> x.getLayer() != null);
 
     layerItem.addActionListener(event -> setRenderWithLayer(selectedMapObjects));
     layerItem.setEnabled(canRenderWithLayer);
