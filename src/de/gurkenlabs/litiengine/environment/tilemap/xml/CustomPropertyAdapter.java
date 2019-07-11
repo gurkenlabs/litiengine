@@ -4,6 +4,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -119,7 +120,7 @@ public class CustomPropertyAdapter extends XmlAdapter<CustomPropertyAdapter.Prop
 
   @Override
   public Map<String, ICustomProperty> unmarshal(PropertyList v) {
-    Map<String, ICustomProperty> map = new Hashtable<>(v.properties.size()); // use hashtable to reject null keys/values
+    Map<String, ICustomProperty> map = new HashMap<>(v.properties.size()); // use hashtable to reject null keys/values
     for (Property property : v.properties) {
       CustomProperty prop = new CustomProperty(property.type, property.value != null ? property.value : property.contents);
       if (property.location != null) {

@@ -43,7 +43,7 @@ public final class LayerList extends JScrollPane implements LayerController {
   private static final Dimension BUTTON_SIZE = new Dimension(24, 24);
 
   private final Map<String, Integer> selectedLayers;
-  private final List<Consumer<IMap>> layerChangedListeners;
+  private final transient List<Consumer<IMap>> layerChangedListeners;
 
   private final JCheckBoxList list;
   private final DefaultListModel<JCheckBox> layerModel;

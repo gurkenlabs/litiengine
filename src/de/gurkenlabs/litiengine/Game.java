@@ -601,8 +601,8 @@ public final class Game {
     for (final GameListener listener : gameListeners) {
       try {
         listener.terminated();
-      } catch (Throwable t) {
-        log.log(Level.WARNING, "game listener threw an exception during shutdown", t);
+      } catch (Exception e) {
+        log.log(Level.WARNING, "game listener threw an exception during shutdown", e);
       }
     }
   }

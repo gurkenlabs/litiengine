@@ -70,6 +70,7 @@ public class ConsoleComponent extends JScrollPane {
         doc.insertString(doc.getLength(), message, text);
         doc.insertString(doc.getLength(), "\n", text);
       } catch (BadLocationException e) {
+        // if an exception occurs while logging, just ignore it
       }
 
       textPane.setCaretPosition(doc.getLength());
@@ -90,8 +91,9 @@ public class ConsoleComponent extends JScrollPane {
         return Color.RED;
       } else if (level == Level.WARNING) {
         return Color.ORANGE;
-      } else
-        return Color.WHITE;
+      }
+
+      return Color.WHITE;
     }
   }
 }

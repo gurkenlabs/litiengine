@@ -16,6 +16,9 @@ public class Renderers {
     editorRenderers.add(new NewObjectAreaRenderer());
     editorRenderers.add(new MouseSelectAreaRenderer());
   }
+  
+  private Renderers() {
+  }
 
   public static void render(Graphics2D g) {
     for (IEditorRenderer renderer : editorRenderers) {

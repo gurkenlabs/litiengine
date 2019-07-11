@@ -23,7 +23,7 @@ public class ColorComponent extends JPanel {
   private final JButton btnSelectColor;
   private final JTextField textFieldColor;
 
-  private final List<ActionListener> listeners;
+  private final transient List<ActionListener> listeners;
 
   public ColorComponent() {
     this.listeners = new ArrayList<>();
