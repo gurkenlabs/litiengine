@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.Marshaller;
@@ -362,7 +363,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
         }
       }
       if (iter.hasNext()) {
-        log.warning("tileset \"" + this.name + "\" had a tilecount attribute of " + this.tilecount + " but had tile IDs going beyond that");
+        log.log(Level.WARNING, "tileset \"{0}\" had a tilecount attribute of {1} but had tile IDs going beyond that", new Object[] { this.name, this.tilecount });
         while (iter.hasNext()) {
           int nextId = iter.next().getId();
           iter.previous();

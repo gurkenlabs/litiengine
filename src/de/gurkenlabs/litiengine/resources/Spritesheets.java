@@ -25,7 +25,7 @@ public final class Spritesheets {
   private final Map<String, int[]> customKeyFrameDurations = new ConcurrentHashMap<>();
   private final Map<String, Spritesheet> spritesheets = new ConcurrentHashMap<>();
   private final Collection<ResourcesContainerClearedListener> listeners = ConcurrentHashMap.newKeySet();
-  private static final Logger log = Logger.getLogger(Spritesheet.class.getName());
+  private static final Logger log = Logger.getLogger(Spritesheets.class.getName());
   private static final String SPRITE_INFO_COMMENT_CHAR = "#";
 
   Spritesheets() {

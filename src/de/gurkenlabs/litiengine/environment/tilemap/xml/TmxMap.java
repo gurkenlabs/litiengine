@@ -557,7 +557,9 @@ public final class TmxMap extends CustomPropertyProvider implements IMap, Compar
     }
 
     String[] ver = this.tiledversion.split("\\.", 3);
-    int major, minor;
+    
+    int major;
+    int minor;
     try {
       major = Integer.parseInt(ver[0]);
       minor = Integer.parseInt(ver[1]);
@@ -572,7 +574,7 @@ public final class TmxMap extends CustomPropertyProvider implements IMap, Compar
     }
 
     if (minor > MAX_MINOR) {
-      log.warning("Tiled version " + this.tiledversion + " is greater than what is supported. Some features may not work.");
+      log.log(Level.WARNING, "Tiled version {0} is greater than what is supported. Some features may not work.", new Object[] { this.tiledversion });
     }
   }
 

@@ -23,7 +23,7 @@ public final class Strings {
   public static final String ENCODING_ISO_8859_1 = "ISO-8859-1";
   public static final String ENCODING_UTF_8 = "UTF-8";
 
-  private static final Logger log = Logger.getLogger(ResourcesContainer.class.getName());
+  private static final Logger log = Logger.getLogger(Strings.class.getName());
 
   private String encoding = ENCODING_ISO_8859_1;
 
