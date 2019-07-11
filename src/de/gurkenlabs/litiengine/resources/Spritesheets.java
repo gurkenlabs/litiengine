@@ -70,10 +70,6 @@ public final class Spritesheets {
     return this.spritesheets.get(name); // this already returns null if absent
   }
 
-  public Spritesheet get(String resourceName, boolean forceLoad) {
-    return this.get(resourceName);
-  }
-
   public Collection<Spritesheet> get(Predicate<? super Spritesheet> pred) {
     if (pred == null) {
       return new ArrayList<>();
