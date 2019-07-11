@@ -3,7 +3,7 @@ package de.gurkenlabs.litiengine.util;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -11,7 +11,7 @@ import de.gurkenlabs.litiengine.ILaunchable;
 
 public class CommandManager implements ILaunchable {
   private static final Logger log = Logger.getLogger(CommandManager.class.getName());
-  private final Map<String, Function<String[], Boolean>> commandConsumers;
+  private final Map<String, Predicate<String[]>> commandConsumers;
   private final ConsoleCommandListener commandListener;
 
   public CommandManager() {
@@ -19,7 +19,7 @@ public class CommandManager implements ILaunchable {
     this.commandListener = new ConsoleCommandListener();
   }
 
-  public void bind(final String command, final Function<String[], Boolean> commandConsumer) {
+  public void bind(final String command, final Predicate<String[]> commandConsumer) {
     if (this.commandConsumers.containsKey(command)) {
       throw new IllegalArgumentException("Cannot bind command " + command + " because it is already bound.");
     }
@@ -43,7 +43,7 @@ public class CommandManager implements ILaunchable {
       return false;
     }
 
-    return this.commandConsumers.get(keyword).apply(arr);
+    return this.commandConsumers.get(keyword).test(arr);
   }
 
   @Override

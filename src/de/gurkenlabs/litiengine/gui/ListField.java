@@ -6,7 +6,7 @@ import java.awt.event.KeyEvent;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Consumer;
+import java.util.function.IntConsumer;
 
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.graphics.ShapeRenderer;
@@ -20,7 +20,7 @@ public class ListField extends GuiComponent {
   private boolean arrowKeyNavigation;
   private Spritesheet buttonSprite;
   private Spritesheet entrySprite;
-  private final List<Consumer<Integer>> changeConsumer;
+  private final List<IntConsumer> changeConsumer;
 
   private final Object[] contents;
 
@@ -51,7 +51,7 @@ public class ListField extends GuiComponent {
     return this.buttonSprite;
   }
 
-  public List<Consumer<Integer>> getChangeConsumer() {
+  public List<IntConsumer> getChangeConsumer() {
     return this.changeConsumer;
   }
 
@@ -120,7 +120,7 @@ public class ListField extends GuiComponent {
     return this.arrowKeyNavigation;
   }
 
-  public void onChange(final Consumer<Integer> c) {
+  public void onChange(final IntConsumer c) {
     this.getChangeConsumer().add(c);
   }
 

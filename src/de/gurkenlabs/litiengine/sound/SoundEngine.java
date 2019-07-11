@@ -11,8 +11,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,7 +45,7 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
     }
   });
   private Point2D listenerLocation;
-  private Function<Point2D, Point2D> listenerLocationCallback = old -> Game.world().camera().getFocus();
+  private UnaryOperator<Point2D> listenerLocationCallback = old -> Game.world().camera().getFocus();
   private float maxDist = DEFAULT_MAX_DISTANCE;
   private MusicPlayback music;
   private final Collection<MusicPlayback> allMusic = ConcurrentHashMap.newKeySet();
@@ -411,7 +411,7 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    * @param callback
    *          The callback that determines the location of the sound listener.
    */
-  public void setListenerLocationCallback(Function<Point2D, Point2D> callback) {
+  public void setListenerLocationCallback(UnaryOperator<Point2D> callback) {
     listenerLocationCallback = callback;
   }
 

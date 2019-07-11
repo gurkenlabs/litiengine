@@ -4,7 +4,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.function.LongConsumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,7 +25,7 @@ public class PingLoop extends ClientMessageHandler<PingResponseMessage> implemen
   private final int clientId;
   private PingThread pingThread;
 
-  private final List<Consumer<Long>> pingRecordConsumer;
+  private final List<LongConsumer> pingRecordConsumer;
 
   private final int port;
 
@@ -42,7 +42,7 @@ public class PingLoop extends ClientMessageHandler<PingResponseMessage> implemen
     provider.register(MessageType.PING, this);
   }
 
-  public void onPingRecorded(final Consumer<Long> consumer) {
+  public void onPingRecorded(final LongConsumer consumer) {
     if (this.pingRecordConsumer.contains(consumer)) {
       return;
     }
@@ -93,7 +93,7 @@ public class PingLoop extends ClientMessageHandler<PingResponseMessage> implemen
       final long after = System.currentTimeMillis();
       final long ping = after - this.lastPing;
 
-      for (final Consumer<Long> consumer : PingLoop.this.pingRecordConsumer) {
+      for (final LongConsumer consumer : PingLoop.this.pingRecordConsumer) {
         consumer.accept(ping);
       }
     }
