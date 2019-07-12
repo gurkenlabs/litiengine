@@ -20,7 +20,6 @@ import de.gurkenlabs.litiengine.GameListener;
 public final class Input {
   private static final Logger log = Logger.getLogger(Input.class.getName());
 
-
   private static GamepadManager gamePadManager;
   private static List<Gamepad> gamePads;
   private static IKeyboard keyboard;
@@ -87,8 +86,19 @@ public final class Input {
 
     @Override
     public void initialized(String... args) {
+      init();
+    }
+
+    @Override
+    public void started() {
+      if (gamePadManager != null) {
+        gamePadManager.start();
+      }
+    }
+
+    private static void init() {
       try {
-        Input.keyboard = new Keyboard();
+        keyboard = new Keyboard();
         mouse = new Mouse();
         if (Game.config().input().isGamepadSupport()) {
           gamePads = new CopyOnWriteArrayList<>();
@@ -96,13 +106,6 @@ public final class Input {
         }
       } catch (AWTException e) {
         log.log(Level.SEVERE, e.getMessage(), e);
-      }
-    }
-
-    @Override
-    public void started() {
-      if (gamePadManager != null) {
-        gamePadManager.start();
       }
     }
   }

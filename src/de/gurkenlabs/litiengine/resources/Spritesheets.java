@@ -23,7 +23,7 @@ import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 public final class Spritesheets {
   private final Map<String, int[]> customKeyFrameDurations = new ConcurrentHashMap<>();
-  private final Map<String, Spritesheet> spritesheets = new ConcurrentHashMap<>();
+  private final Map<String, Spritesheet> loadedSpritesheets = new ConcurrentHashMap<>();
   private final Collection<ResourcesContainerClearedListener> listeners = ConcurrentHashMap.newKeySet();
   private static final Logger log = Logger.getLogger(Spritesheets.class.getName());
   private static final String SPRITE_INFO_COMMENT_CHAR = "#";
@@ -32,7 +32,7 @@ public final class Spritesheets {
   }
 
   public void add(String name, Spritesheet spritesheet) {
-    this.spritesheets.put(name, spritesheet);
+    this.loadedSpritesheets.put(name, spritesheet);
   }
 
   public void addClearedListener(ResourcesContainerClearedListener listener) {
@@ -44,11 +44,11 @@ public final class Spritesheets {
   }
 
   public void clear() {
-    this.spritesheets.clear();
+    this.loadedSpritesheets.clear();
   }
 
   public boolean contains(String name) {
-    return this.spritesheets.containsKey(name);
+    return this.loadedSpritesheets.containsKey(name);
   }
 
   /**
@@ -67,7 +67,7 @@ public final class Spritesheets {
 
     final String name = FileUtilities.getFileName(path);
 
-    return this.spritesheets.get(name); // this already returns null if absent
+    return this.loadedSpritesheets.get(name); // this already returns null if absent
   }
 
   public Collection<Spritesheet> get(Predicate<? super Spritesheet> pred) {
@@ -75,11 +75,11 @@ public final class Spritesheets {
       return new ArrayList<>();
     }
 
-    return this.spritesheets.values().stream().filter(pred).collect(Collectors.toList());
+    return this.loadedSpritesheets.values().stream().filter(pred).collect(Collectors.toList());
   }
 
   public Collection<Spritesheet> getAll() {
-    return this.spritesheets.values();
+    return this.loadedSpritesheets.values();
   }
 
   public int[] getCustomKeyFrameDurations(final String name) {
@@ -172,7 +172,7 @@ public final class Spritesheets {
   }
 
   public Spritesheet remove(final String path) {
-    Spritesheet spriteToRemove = this.spritesheets.remove(path);
+    Spritesheet spriteToRemove = this.loadedSpritesheets.remove(path);
     customKeyFrameDurations.remove(path);
     return spriteToRemove;
   }

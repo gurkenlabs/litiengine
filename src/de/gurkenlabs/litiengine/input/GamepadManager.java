@@ -182,7 +182,7 @@ public class GamepadManager implements ILaunchable, GamepadEvents {
    * restart the application it would work... so we just reset the environment via
    * reflection and it'll do it ;).
    */
-  private static void hackTheShitOutOfJInputBecauseItSucksHard() {
+  private static void hackTheShitOutOfJInput() {
     try {
       final Field env = ControllerEnvironment.class.getDeclaredField("defaultEnvironment");
       env.setAccessible(true);
@@ -249,7 +249,7 @@ public class GamepadManager implements ILaunchable, GamepadEvents {
   private void updateGamepads() {
     this.handleHotPluggedControllers = true;
     try {
-      hackTheShitOutOfJInputBecauseItSucksHard();
+      hackTheShitOutOfJInput();
       // update plugged in gamepads
       for (int i = 0; i < ControllerEnvironment.getDefaultEnvironment().getControllers().length; i++) {
         final Controller controller = ControllerEnvironment.getDefaultEnvironment().getControllers()[i];

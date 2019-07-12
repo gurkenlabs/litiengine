@@ -60,7 +60,7 @@ public final class ReflectionUtilities {
     } catch (final SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
     }
-    
+
     return false;
   }
 
@@ -72,7 +72,7 @@ public final class ReflectionUtilities {
         return ReflectionUtilities.setValue(cls, instance, propertyName, field.getType().cast(enumConst));
       }
     }
-    
+
     return false;
   }
 
@@ -170,7 +170,7 @@ public final class ReflectionUtilities {
     } catch (final NumberFormatException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
     }
-    
+
     return false;
   }
 
