@@ -77,19 +77,6 @@ public final class Input {
     return null;
   }
 
-  private static final void init() {
-    try {
-      Input.keyboard = new Keyboard();
-      mouse = new Mouse();
-      if (Game.config().input().isGamepadSupport()) {
-        gamePads = new CopyOnWriteArrayList<>();
-        gamePadManager = new GamepadManager();
-      }
-    } catch (AWTException e) {
-      log.log(Level.SEVERE, e.getMessage(), e);
-    }
-  }
-
   public static final class InputGameAdapter implements GameListener {
     @Override
     public void terminated() {
@@ -100,7 +87,16 @@ public final class Input {
 
     @Override
     public void initialized(String... args) {
-      Input.init();
+      try {
+        Input.keyboard = new Keyboard();
+        mouse = new Mouse();
+        if (Game.config().input().isGamepadSupport()) {
+          gamePads = new CopyOnWriteArrayList<>();
+          gamePadManager = new GamepadManager();
+        }
+      } catch (AWTException e) {
+        log.log(Level.SEVERE, e.getMessage(), e);
+      }
     }
 
     @Override

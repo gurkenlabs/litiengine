@@ -50,7 +50,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
   private TagPanel tagPanel;
   private JLabel lblLayer;
   private JLabel lblRendering;
-  private JPanel panel_1;
+  private JPanel infoPanel;
 
   public MapObjectInspector() {
     this.panels = new ConcurrentHashMap<>();
@@ -90,7 +90,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
     this.tabbedPanel = new JTabbedPane(JTabbedPane.TOP);
 
-    panel_1 = new JPanel();
+    this.infoPanel = new JPanel();
 
     GroupLayout groupLayout = new GroupLayout(this);
     groupLayout
@@ -107,9 +107,9 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
                                 .addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false).addComponent(lblHeight, GroupLayout.PREFERRED_SIZE, 49, GroupLayout.PREFERRED_SIZE).addComponent(lblYcoordinate, GroupLayout.PREFERRED_SIZE, 49, GroupLayout.PREFERRED_SIZE)).addGap(0)
                                 .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addComponent(spinnerY, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE).addComponent(spinnerHeight, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE))))))
                     .addGap(5))
-                .addGroup(Alignment.LEADING, groupLayout.createSequentialGroup().addGap(5).addComponent(panel_1, GroupLayout.DEFAULT_SIZE, 430, Short.MAX_VALUE).addGap(5)));
+                .addGroup(Alignment.LEADING, groupLayout.createSequentialGroup().addGap(5).addComponent(infoPanel, GroupLayout.DEFAULT_SIZE, 430, Short.MAX_VALUE).addGap(5)));
     groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-        .addGroup(groupLayout.createSequentialGroup().addGap(5).addComponent(panel_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addGap(5)
+        .addGroup(groupLayout.createSequentialGroup().addGap(5).addComponent(infoPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addGap(5)
             .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(lblX, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE).addComponent(spinnerX, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
                 .addComponent(lblYcoordinate, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE).addComponent(spinnerY, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE))
             .addGap(5)
@@ -118,7 +118,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
             .addGap(5).addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(textFieldName, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE).addComponent(lblName, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)).addGap(5)
             .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(tagPanel, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE).addComponent(lblTags, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)).addGap(5)
             .addComponent(tabbedPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addGap(108)));
-    panel_1.setLayout(new BoxLayout(panel_1, BoxLayout.X_AXIS));
+    this.infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.X_AXIS));
 
     JLabel lblEntityId = new JLabel("ID");
     lblEntityId.setFont(lblEntityId.getFont().deriveFont(Font.BOLD));
@@ -136,13 +136,13 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.lblLayer.setForeground(Color.GRAY);
     this.lblLayer.setFont(this.lblLayer.getFont().deriveFont(lblLayer.getFont().getSize() * 0.75f));
 
-    panel_1.add(lblEntityId);
-    panel_1.add(Box.createHorizontalStrut(47));
-    panel_1.add(labelEntityID);
-    panel_1.add(Box.createGlue());
-    panel_1.add(lblRendering);
-    panel_1.add(Box.createHorizontalStrut(15));
-    panel_1.add(lblLayer);
+    this.infoPanel.add(lblEntityId);
+    this.infoPanel.add(Box.createHorizontalStrut(47));
+    this.infoPanel.add(labelEntityID);
+    this.infoPanel.add(Box.createGlue());
+    this.infoPanel.add(lblRendering);
+    this.infoPanel.add(Box.createHorizontalStrut(15));
+    this.infoPanel.add(lblLayer);
 
     setLayout(groupLayout);
 

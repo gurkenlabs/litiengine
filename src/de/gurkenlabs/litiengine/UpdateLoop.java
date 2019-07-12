@@ -82,7 +82,6 @@ public class UpdateLoop extends Thread implements AutoCloseable, ILoop {
 
     if (!this.updatables.add(updatable)) {
       log.log(Level.FINE, "Updatable {0} already registered for update!", new Object[] { updatable });
-      return;
     }
   }
 

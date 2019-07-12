@@ -43,7 +43,7 @@ public class LoopedTrack implements Track, Iterator<Sound> {
 
   @Override
   public boolean equals(Object anObject) {
-    return this == anObject || anObject != null && anObject instanceof LoopedTrack && ((LoopedTrack) anObject).track.equals(this.track);
+    return this == anObject || anObject instanceof LoopedTrack && ((LoopedTrack) anObject).track.equals(this.track);
   }
 
   @Override

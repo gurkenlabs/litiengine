@@ -369,7 +369,9 @@ public class MapOrientations {
       Point loc = this.getLocation(x, y, map);
       Dimension tileSize = map.getTileSize();
       int hexSide = map.getHexSideLength();
-      int[] xp, yp;
+      
+      int[] xp;
+      int[] yp;
       if (map.getStaggerAxis() == StaggerAxis.X) {
         int off = (tileSize.width - hexSide) / 2;
         xp = new int[] { 0, off, tileSize.width - off, tileSize.width, tileSize.width - off, off };
