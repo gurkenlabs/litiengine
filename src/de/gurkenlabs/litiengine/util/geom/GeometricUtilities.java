@@ -14,6 +14,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class GeometricUtilities {
   private static final double RAYCAST_EPSILON = 0.01;
@@ -430,8 +431,8 @@ public class GeometricUtilities {
   }
 
   public static Point2D getRandomLocation(final double x, final double y, final double width, final double height) {
-    final double xOffset = Math.random() * width;
-    final double yOffset = Math.random() * height;
+    final double xOffset = ThreadLocalRandom.current().nextDouble(width);
+    final double yOffset = ThreadLocalRandom.current().nextDouble(height);
 
     return new Point2D.Double(x + xOffset, y + yOffset);
   }

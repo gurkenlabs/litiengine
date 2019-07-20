@@ -30,22 +30,28 @@ public class MathUtilities {
   /**
    * Modifies the value (if necessary) such that it lies within the boundaries of the specified minimum and maximum.
    * 
-   * @param value The value to be clamped.
-   * @param min The minimum value to be accepted.
-   * @param max The maximum value to be accepted.
+   * @param value
+   *          The value to be clamped.
+   * @param min
+   *          The minimum value to be accepted.
+   * @param max
+   *          The maximum value to be accepted.
    * 
    * @return A value clamped to the specified boundaries.
    */
   public static double clamp(final double value, final double min, final double max) {
     return Math.max(min, Math.min(max, value));
   }
-  
+
   /**
    * Modifies the value (if necessary) such that it lies within the boundaries of the specified minimum and maximum.
    * 
-   * @param value The value to be clamped.
-   * @param min The minimum value to be accepted.
-   * @param max The maximum value to be accepted.
+   * @param value
+   *          The value to be clamped.
+   * @param min
+   *          The minimum value to be accepted.
+   * @param max
+   *          The maximum value to be accepted.
    * 
    * @return A value clamped to the specified boundaries.
    */
@@ -56,9 +62,12 @@ public class MathUtilities {
   /**
    * Modifies the value (if necessary) such that it lies within the boundaries of the specified minimum and maximum.
    * 
-   * @param value The value to be clamped.
-   * @param min The minimum value to be accepted.
-   * @param max The maximum value to be accepted.
+   * @param value
+   *          The value to be clamped.
+   * @param min
+   *          The minimum value to be accepted.
+   * @param max
+   *          The maximum value to be accepted.
    * 
    * @return A value clamped to the specified boundaries.
    */
@@ -73,13 +82,16 @@ public class MathUtilities {
 
     return value;
   }
-  
+
   /**
    * Modifies the value (if necessary) such that it lies within the boundaries of the specified minimum and maximum.
    * 
-   * @param value The value to be clamped.
-   * @param min The minimum value to be accepted.
-   * @param max The maximum value to be accepted.
+   * @param value
+   *          The value to be clamped.
+   * @param min
+   *          The minimum value to be accepted.
+   * @param max
+   *          The maximum value to be accepted.
    * 
    * @return A value clamped to the specified boundaries.
    */
@@ -95,13 +107,16 @@ public class MathUtilities {
 
     return value;
   }
-  
+
   /**
    * Modifies the value (if necessary) such that it lies within the boundaries of the specified minimum and maximum.
    * 
-   * @param value The value to be clamped.
-   * @param min The minimum value to be accepted.
-   * @param max The maximum value to be accepted.
+   * @param value
+   *          The value to be clamped.
+   * @param min
+   *          The minimum value to be accepted.
+   * @param max
+   *          The maximum value to be accepted.
    * 
    * @return A value clamped to the specified boundaries.
    */
@@ -120,9 +135,12 @@ public class MathUtilities {
   /**
    * Modifies the value (if necessary) such that it lies within the boundaries of the specified minimum and maximum.
    * 
-   * @param value The value to be clamped.
-   * @param min The minimum value to be accepted.
-   * @param max The maximum value to be accepted.
+   * @param value
+   *          The value to be clamped.
+   * @param min
+   *          The minimum value to be accepted.
+   * @param max
+   *          The maximum value to be accepted.
    * 
    * @return A value clamped to the specified boundaries.
    */

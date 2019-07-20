@@ -183,7 +183,7 @@ public final class ArrayUtilities {
   public static <T> T getRandom(T[] arr) {
     return getRandom(arr, ThreadLocalRandom.current());
   }
-
+  
   public static <T> T getRandom(T[] arr, Random rand) {
     if (arr.length == 0) {
       return null;

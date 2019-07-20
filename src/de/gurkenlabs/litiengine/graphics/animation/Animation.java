@@ -2,7 +2,6 @@ package de.gurkenlabs.litiengine.graphics.animation;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -11,6 +10,7 @@ import de.gurkenlabs.litiengine.ILaunchable;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.util.CollectionUtilities;
 
 public class Animation implements IUpdateable, ILaunchable {
   public static final int DEFAULT_FRAME_DURATION = 120;
@@ -43,7 +43,7 @@ public class Animation implements IUpdateable, ILaunchable {
     this(name, spritesheet, loop, keyFrameDurations);
 
     if (randomizeStart && !this.keyframes.isEmpty()) {
-      this.firstFrame = this.getKeyframes().get(new Random().nextInt(this.getKeyframes().size()));
+      this.firstFrame = CollectionUtilities.random(this.getKeyframes());
     }
   }
 

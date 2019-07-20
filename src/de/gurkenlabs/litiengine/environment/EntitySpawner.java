@@ -1,7 +1,6 @@
 package de.gurkenlabs.litiengine.environment;
 
 import java.util.List;
-import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -9,6 +8,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.Spawnpoint;
+import de.gurkenlabs.litiengine.util.CollectionUtilities;
 
 public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner<T> {
   private static final Logger log = Logger.getLogger(EntitySpawner.class.getName());
@@ -126,13 +126,11 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
       }
       break;
     case ONERANDOMSPAWNPOINT:
-      final int rnd = new Random().nextInt(this.getSpawnPoints().size());
-      this.spawn(this.getSpawnPoints().get(rnd), this.getSpawnAmount());
+      this.spawn(CollectionUtilities.random(this.getSpawnPoints()), this.getSpawnAmount());
       break;
     case RANDOMSPAWNPOINTS:
       for (int i = 0; i < this.getSpawnAmount(); i++) {
-        final int rnd2 = new Random().nextInt(this.getSpawnPoints().size());
-        this.spawn(this.getSpawnPoints().get(rnd2), 1);
+        this.spawn(CollectionUtilities.random(this.getSpawnPoints()), 1);
       }
 
       break;

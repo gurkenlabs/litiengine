@@ -2,7 +2,7 @@ package de.gurkenlabs.litiengine.graphics.emitters;
 
 import java.awt.Image;
 import java.awt.geom.Point2D;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.Particle;
@@ -23,9 +23,9 @@ public abstract class SpritesheetEmitter extends Emitter {
   }
 
   protected Image getRandomSprite() {
-    return this.getSpritesheet().getSprite(new Random().nextInt(this.getSpritesheet().getTotalNumberOfSprites()));
+    return this.getSpritesheet().getSprite(ThreadLocalRandom.current().nextInt(this.getSpritesheet().getTotalNumberOfSprites()));
   }
-  
+
   @Override
   protected Particle createNewParticle() {
     return new SpriteParticle(this.getRandomSprite(), this.getRandomParticleTTL());

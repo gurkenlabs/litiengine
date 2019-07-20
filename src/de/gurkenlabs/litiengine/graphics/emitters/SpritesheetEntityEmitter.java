@@ -1,7 +1,7 @@
 package de.gurkenlabs.litiengine.graphics.emitters;
 
 import java.awt.Image;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
@@ -23,7 +23,7 @@ public class SpritesheetEntityEmitter extends EntityEmitter {
   }
 
   protected Image getRandomSprite() {
-    return this.getSpritesheet().getSprite(new Random().nextInt(this.getSpritesheet().getTotalNumberOfSprites()));
+    return this.getSpritesheet().getSprite(ThreadLocalRandom.current().nextInt(this.getSpritesheet().getTotalNumberOfSprites()));
   }
 
   @Override

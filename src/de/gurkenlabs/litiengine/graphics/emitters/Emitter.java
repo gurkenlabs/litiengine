@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -37,8 +37,6 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   public static final int DEFAULT_UPDATERATE = 30;
   public static final int DEFAULT_SPAWNAMOUNT = 1;
   public static final int DEFAULT_MAXPARTICLES = 100;
-
-  private static final Random RANDOM = new Random();
 
   private final List<Consumer<Emitter>> finishedConsumer;
   private final CopyOnWriteArrayList<Particle> particles;
@@ -431,7 +429,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
       return DEFAULT_PARTICLE_COLOR;
     }
 
-    return this.colors.get(RANDOM.nextInt(this.colors.size()));
+    return this.colors.get(ThreadLocalRandom.current().nextInt(this.colors.size()));
   }
 
   protected int getRandomParticleTTL() {
@@ -444,15 +442,15 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
       return this.getParticleMaxTTL();
     }
 
-    return RANDOM.nextInt(this.getParticleMaxTTL() - this.getParticleMinTTL()) + this.getParticleMinTTL();
+    return ThreadLocalRandom.current().nextInt(this.getParticleMaxTTL() - this.getParticleMinTTL()) + this.getParticleMinTTL();
   }
 
   protected int getRandomParticleX() {
-    return RANDOM.nextInt((int) this.getWidth());
+    return ThreadLocalRandom.current().nextInt((int) this.getWidth());
   }
 
   protected int getRandomParticleY() {
-    return RANDOM.nextInt((int) this.getHeight());
+    return ThreadLocalRandom.current().nextInt((int) this.getHeight());
   }
 
   /**
