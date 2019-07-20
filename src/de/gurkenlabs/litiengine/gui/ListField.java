@@ -305,6 +305,10 @@ public class ListField extends GuiComponent {
     for (int column = 0; column < this.nbOfColumns; column++) {
       this.listEntries.add(new CopyOnWriteArrayList<ImageComponent>());
       for (int row = 0; row < this.getNumberOfShownElements(); row++) {
+        if (this.getContent()[column].length <= row) {
+          continue;
+        }
+
         ImageComponent entryComponent;
         if (this.getContent()[column][row] == null) {
           entryComponent = new ImageComponent(this.getX() + (columnWidth * column), this.getY() + ((this.getHeight() / this.getNumberOfShownElements()) * row), (this.getWidth() / this.nbOfColumns), this.getHeight() / this.getNumberOfShownElements(), this.entrySprite, "", null);
