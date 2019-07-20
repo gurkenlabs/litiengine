@@ -72,13 +72,13 @@ public class Mouse implements IMouse, IUpdateable {
     this.lastLocation = this.location;
     this.sensitivity = Game.config().input().getMouseSensitivity();
     this.grabMouse = true;
-    
+
     Game.inputLoop().attach(this);
   }
 
   @Override
   public void update() {
-    if (this.updateLocation != null) {
+    if (this.updateLocation != null && !this.updatingLocation) {
       this.updatingLocation = true;
       try {
         this.setLocation(this.updateLocation);
