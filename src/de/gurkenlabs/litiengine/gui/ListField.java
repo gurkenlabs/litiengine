@@ -45,25 +45,31 @@ public class ListField extends GuiComponent {
    * The <b>content</b> of this list field can only be accessed through the first column (column 0).
    * <br>
    * Examples:
-   * <code><blockquote>
-   * content[0][0] -> ok<br>
-   * content[0][1] -> ok<br>
-   * content[0][8] -> ok<br>
-   * content[1][5] -> NOK<br>
-   * content[2][0] -> NOK<br>
-   * </blockquote></code>
-   * The argument <b>shownElements</b> represents the number of rows/elements to 
-   * display before the user needs to scroll for more possible rows/elements.
-   * <br>
+   * <blockquote>
+   * content[0][0] - ok<br>
+   * content[0][1] - ok<br>
+   * content[0][8] - ok<br>
+   * content[1][5] - NOK<br>
+   * content[2][0] - NOK<br>
+   * </blockquote>
    * 
    * @param x
+   * the x
    * @param y
+   * the y
    * @param width
+   * the width
    * @param height
+   * the height
    * @param content
+   * the 1D content
    * @param shownElements
+   * the number of rows/elements to 
+   * display before the user needs to scroll for more possible rows/elements
    * @param entrySprite
+   * the entrySprite
    * @param buttonSprite
+   * the buttonSprite
    */
   public ListField(final double x, final double y, final double width, final double height, final Object[] content, final int shownElements, final Spritesheet entrySprite, final Spritesheet buttonSprite) {
     this(x, y, width, height, new Object[][] {content}, shownElements, entrySprite, buttonSprite);
@@ -75,23 +81,29 @@ public class ListField extends GuiComponent {
    * The given <b>content</b> should be arranged as columns of elements.
    * <br>
    * Examples:
-   * <code><blockquote>
-   * content[0][0] -> column 0, row 0<br>
-   * content[0][1] -> column 0, row 1<br>
-   * content[2][8] -> column 2, row 8<br>
-   * </blockquote></code>
-   * The argument <b>shownElements</b> represents the number of rows/elements to 
-   * display before the user needs to scroll for more possible rows/elements.
-   * <br>
+   * <blockquote>
+   * content[0][0] - column 0, row 0<br>
+   * content[0][1] - column 0, row 1<br>
+   * content[2][8] - column 2, row 8<br>
+   * </blockquote>
    * 
    * @param x
+   * the x
    * @param y
+   * the y
    * @param width
+   * the width
    * @param height
+   * the height
    * @param content
+   * the 2D content
    * @param shownElements
+   * the number of rows/elements to 
+   * display before the user needs to scroll for more possible rows/elements
    * @param entrySprite
+   * the entrySprite
    * @param buttonSprite
+   * the buttonSprite
    */
   public ListField(final double x, final double y, final double width, final double height, final Object[][] content, final int shownElements, final Spritesheet entrySprite, final Spritesheet buttonSprite) {
     super(x, y, width, height);
@@ -126,6 +138,7 @@ public class ListField extends GuiComponent {
    * Returns all list items of a specified column.
    *
    * @param column
+   * the column
    * @return a list of items
    */
   public List<ImageComponent> getListEntry(final int column) {
@@ -143,6 +156,7 @@ public class ListField extends GuiComponent {
    * Returns the number of rows of the tallest column.
    * 
    * @return
+   * int representing the length of the tallest column
    */
   public int getMaxRows() {
     int result = 0;
