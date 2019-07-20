@@ -34,6 +34,7 @@ public class ListField extends GuiComponent {
   private int selectionColumn;
   private int selectionRow;
 
+  private boolean selectEntireRow = false;
 
   private final int shownElements;
   private VerticalSlider slider;
@@ -222,7 +223,12 @@ public class ListField extends GuiComponent {
     super.render(g);
     if (this.selectedComponent != null) {
       Rectangle2D border;
+      if (this.selectEntireRow) {
+        border = new Rectangle2D.Double(this.getX() - 1, this.selectedComponent.getY() - 1, this.getWidth() + 2, this.selectedComponent.getHeight() + 2);
+      }
+      else {
         border = new Rectangle2D.Double(this.selectedComponent.getX() - 1, this.selectedComponent.getY() - 1, this.selectedComponent.getWidth() + 2, this.selectedComponent.getHeight() + 2);
+      }
       g.setColor(Color.WHITE);
       ShapeRenderer.renderOutline(g, border, 2);
     }
@@ -267,7 +273,10 @@ public class ListField extends GuiComponent {
     }
     this.getChangeConsumer().forEach(consumer -> consumer.accept(this.selectionRow));
     this.refresh();
+  }
 
+  public void setSelectEntireRow(boolean selectEntireRow) {
+    this.selectEntireRow = selectEntireRow;
   }
 
   private void initContentList() {
