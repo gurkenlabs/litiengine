@@ -240,6 +240,15 @@ public class ListField extends GuiComponent {
     this.entrySprite = entrySprite;
   }
 
+  public void setForwardMouseEvents(final int column, final boolean forwardMouseEvents) {
+    if (column < 0 && column >= this.nbOfColumns) {
+      return;
+    }
+    for (ImageComponent comp : this.getListEntry(column)) {
+      comp.setForwardMouseEvents(forwardMouseEvents);
+    }
+  }
+
   public void setLowerBound(final int lowerBound) {
     this.lowerBound = lowerBound;
   }
