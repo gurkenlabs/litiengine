@@ -137,6 +137,11 @@ public final class GameWindow {
     return this.hostControl.getHeight();
   }
 
+  /**
+   * Gets the AWT canvas that is used to render the game's content on.
+   * 
+   * @return The AWT render component onto which the game contents are rendered.
+   */
   public RenderComponent getRenderComponent() {
     return this.renderCanvas;
   }
