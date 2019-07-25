@@ -176,6 +176,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
     if (property == null) {
       return defaultValue;
     }
+    
     return property.getAsDouble();
   }
 
@@ -190,7 +191,13 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
     if (property == null) {
       return defaultValue;
     }
-    return property.getAsColor();
+
+    Color value = property.getAsColor();
+    if (value == null) {
+      return defaultValue;
+    }
+
+    return value;
   }
 
   @Override
@@ -204,7 +211,13 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
     if (property == null) {
       return defaultValue;
     }
-    return property.getAsEnum(enumType);
+
+    T value = property.getAsEnum(enumType);
+    if (value == null) {
+      return defaultValue;
+    }
+
+    return value;
   }
 
   @Override
@@ -215,10 +228,16 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
   @Override
   public URL getFileValue(String propertyName, URL defaultValue) {
     ICustomProperty property = this.getProperty(propertyName);
-    if (property == null || property.getAsFile() == null) {
+    if (property == null) {
       return defaultValue;
     }
-    return property.getAsFile();
+
+    URL value = property.getAsFile();
+    if (value == null) {
+      return defaultValue;
+    }
+
+    return value;
   }
 
   private ICustomProperty createPropertyIfAbsent(String propertyName) {

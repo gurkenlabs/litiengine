@@ -66,7 +66,7 @@ public class CustomProperty implements ICustomProperty {
 
   @Override
   public void setValue(Enum<?> value) {
-    this.value = value != null ? value.name() : null;
+    this.value = value.name();
     this.location = null;
   }
 
@@ -147,9 +147,6 @@ public class CustomProperty implements ICustomProperty {
   @Override
   public <T extends Enum<T>> T getAsEnum(Class<T> enumType) {
     try {
-      if (this.value == null) {
-        return null;
-      }
       return Enum.valueOf(enumType, this.value);
     } catch (IllegalArgumentException e) {
       // try to ignore case to retrieve the enum value as a fallback
