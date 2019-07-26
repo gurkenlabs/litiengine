@@ -37,7 +37,9 @@ public class ListField extends GuiComponent {
   private boolean selectEntireRow = false;
 
   private final int shownElements;
+
   private VerticalSlider slider;
+  private boolean sliderInside = false;
 
   /**
    * Creates a vertical list field.
@@ -183,9 +185,12 @@ public class ListField extends GuiComponent {
   /**
    * Returns the selected column.
    *
-   * @return number of the column
+   * @return number of the column; -1 if isEntireRowSelected() is true
    */
   public int getSelectionColumn() {
+    if (this.isEntireRowSelected()) {
+      return -1;
+    }
     return this.selectionColumn;
   }
 
@@ -237,11 +242,21 @@ public class ListField extends GuiComponent {
     super.render(g);
     if (this.selectedComponent != null) {
       Rectangle2D border;
-      if (this.selectEntireRow) {
-        border = new Rectangle2D.Double(this.getX() - 1, this.selectedComponent.getY() - 1, this.getWidth() + 2, this.selectedComponent.getHeight() + 2);
+      if (this.isEntireRowSelected()) {
+        if (this.isSliderInside()) {
+          border = new Rectangle2D.Double(this.getX() - 1, this.selectedComponent.getY() - 1, this.getWidth() + 2 - this.slider.getWidth(), this.selectedComponent.getHeight() + 2);
+        }
+        else {
+          border = new Rectangle2D.Double(this.getX() - 1, this.selectedComponent.getY() - 1, this.getWidth() + 2, this.selectedComponent.getHeight() + 2);
+        }
       }
       else {
-        border = new Rectangle2D.Double(this.selectedComponent.getX() - 1, this.selectedComponent.getY() - 1, this.selectedComponent.getWidth() + 2, this.selectedComponent.getHeight() + 2);
+        if (this.isSliderInside()) {
+          border = new Rectangle2D.Double(this.selectedComponent.getX() - 1, this.selectedComponent.getY() - 1, this.selectedComponent.getWidth() + 2 - this.slider.getWidth(), this.selectedComponent.getHeight() + 2);
+        }
+        else {
+          border = new Rectangle2D.Double(this.selectedComponent.getX() - 1, this.selectedComponent.getY() - 1, this.selectedComponent.getWidth() + 2, this.selectedComponent.getHeight() + 2);
+        }
       }
       g.setColor(Color.WHITE);
       ShapeRenderer.renderOutline(g, border, 2);
@@ -289,14 +304,46 @@ public class ListField extends GuiComponent {
     this.refresh();
   }
 
+  /**
+   * If set to true, selecting a element will show a selection of 
+   * the entire row on which that element is on. Without taking 
+   * account of its column.
+   * <br><br>
+   * Set to <b>false</b> as default.
+   * 
+   * @param selectEntireRow
+   * a boolean
+   */
   public void setSelectEntireRow(boolean selectEntireRow) {
     this.selectEntireRow = selectEntireRow;
+  }
+
+  /**
+   * If set to true, the slider will show inside the ListField.
+   * <br>
+   * This can be used, for example, if the ListField's width matches the screen's width.
+   * <br><br>
+   * Set to <b>false</b> as default.
+   * 
+   * @param sliderInside
+   * a boolean
+   */
+  public void setSliderInside(boolean sliderInside) {
+    this.sliderInside = sliderInside;
+    this.listEntries.clear();
+    this.getComponents().clear();
+    this.initContentList();
   }
 
   private void initContentList() {
     final int maxNbOfRows = this.getMaxRows() - this.getNumberOfShownElements();
     if (maxNbOfRows > 0) {
-      this.slider = new VerticalSlider(this.getX() + this.getWidth(), this.getY(), this.getHeight() / this.getNumberOfShownElements(), this.getHeight(), 0, maxNbOfRows, 1);
+      if (this.isSliderInside()) {
+        this.slider = new VerticalSlider(this.getX() + this.getWidth() - (this.getHeight() / this.getNumberOfShownElements()), this.getY(), this.getHeight() / this.getNumberOfShownElements(), this.getHeight(), 0, this.getMaxRows() - this.getNumberOfShownElements(), 1);
+      }
+      else {
+        this.slider = new VerticalSlider(this.getX() + this.getWidth(), this.getY(), this.getHeight() / this.getNumberOfShownElements(), this.getHeight(), 0, this.getMaxRows() - this.getNumberOfShownElements(), 1);
+      }
       this.getSlider().setCurrentValue(this.getLowerBound());
       this.getComponents().add(this.getSlider());
     }
@@ -315,6 +362,10 @@ public class ListField extends GuiComponent {
         }
         else {
           entryComponent = new ImageComponent(this.getX() + (columnWidth * column), this.getY() + ((this.getHeight() / this.getNumberOfShownElements()) * row), (this.getWidth() / this.nbOfColumns), this.getHeight() / this.getNumberOfShownElements(), this.entrySprite, this.getContent()[column][row].toString(), null);
+        }
+        if (this.isSliderInside()) {
+          entryComponent.setX(this.getX() + ((columnWidth - (this.getSlider().getWidth() / this.nbOfColumns))  * column));
+          entryComponent.setWidth(entryComponent.getWidth() - (this.getSlider().getWidth() / this.nbOfColumns));
         }
         entryComponent.setTextAlign(Align.LEFT);
         this.getListEntry(column).add(entryComponent);
@@ -342,6 +393,26 @@ public class ListField extends GuiComponent {
         this.refresh();
       });
     }
+  }
+
+  /**
+   * See {@link #setSelectEntireRow(boolean)}
+   * 
+   * @return
+   * true if selection is set to select the entire row; false otherwise
+   */
+  public boolean isEntireRowSelected() {
+    return this.selectEntireRow;
+  }
+
+  /**
+   * See {@link #setSliderInside(boolean)}
+   * 
+   * @return
+   * true if slider is set to be inside the ListField; false otherwise
+   */
+  public boolean isSliderInside() {
+    return this.sliderInside;
   }
 
   private void prepareInput() {
