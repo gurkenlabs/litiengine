@@ -555,7 +555,7 @@ public class ListField extends GuiComponent {
   }
 
   /**
-   * See {@link #setSliderInside(boolean)}
+   * Verify if sliders are set to be inside the ListField.
    * 
    * @return
    * true if slider is set to be inside the ListField; false otherwise
