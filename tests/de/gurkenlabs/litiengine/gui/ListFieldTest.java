@@ -26,7 +26,7 @@ public class ListFieldTest {
     Game.init(Game.COMMADLINE_ARG_NOGUI);
     
     ListField listField_1D = new ListField(0, 0, 100, 50, this.content_1D, 4, null, null);
-    ListField listField_2D = new ListField(0, 0, 100, 50, this.content_2D, 7, null, null);
+    ListField listField_2D = new ListField(0, 0, 100, 50, this.content_2D, 7, 3, null, null);
 
     assertNotNull(listField_1D);
     assertNotNull(listField_2D);
@@ -37,7 +37,7 @@ public class ListFieldTest {
     for (int i = 0; i < listField_1D.getListEntry(0).size(); i++) {
       assertEquals(this.content_1D[i], listField_1D.getListEntry(0).get(i).getText());
     }
-    for (int i = 0; i < listField_2D.getContent().length; i++) {
+    for (int i = 0; i < listField_2D.getNumberOfShownColumns(); i++) {
       for (int j = 0; j < listField_2D.getListEntry(i).size(); j++) {
         assertEquals(this.content_2D[i][j], listField_2D.getListEntry(i).get(j).getText());
       }
