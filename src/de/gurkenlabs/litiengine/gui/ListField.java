@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Rectangle2D;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.IntConsumer;
@@ -157,7 +158,7 @@ public class ListField extends GuiComponent {
    * @see #ListField(double, double, double, double, Object[][], int, int, boolean, Spritesheet, Spritesheet)
    */
   public ListField(final double x, final double y, final double width, final double height, final Object[][] content, final int shownRows, final int shownColumns, final Spritesheet entrySprite, final Spritesheet buttonSprite) {
-    this(x, y, width, height, new Object[][] {content}, shownRows, shownColumns, false, entrySprite, buttonSprite);
+    this(x, y, width, height, content, shownRows, shownColumns, false, entrySprite, buttonSprite);
   }
 
   /**
@@ -199,6 +200,7 @@ public class ListField extends GuiComponent {
   public ListField(final double x, final double y, final double width, final double height, final Object[][] content, final int shownRows, final int shownColumns, final boolean sliderInside, final Spritesheet entrySprite, final Spritesheet buttonSprite) {
     super(x, y, width, height);
     this.changeConsumer = new CopyOnWriteArrayList<>();
+    System.out.println(Arrays.deepToString(content));
     this.content = content;
     this.nbOfColumns = this.content.length;
     this.listEntries = new CopyOnWriteArrayList<>();
