@@ -469,10 +469,12 @@ public class ListField extends GuiComponent {
         else {
           entryComponent = new ImageComponent(this.getX() + (columnWidth * column), this.getY() + (rowHeight * row), columnWidth, rowHeight, this.entrySprite, this.getContent()[column][row].toString(), null);
         }
-        if (this.isSliderInside()) {
+        if (this.isSliderInside() && this.getVerticalSlider() != null) {
           entryComponent.setX(this.getX() + ((columnWidth - (this.getVerticalSlider().getWidth() / this.getNumberOfShownColumns()))  * column));
-          entryComponent.setY(this.getY() + ((rowHeight - (this.getHorizontalSlider().getHeight() / this.getNumberOfShownRows())) * row));
           entryComponent.setWidth(entryComponent.getWidth() - (this.getVerticalSlider().getWidth() / this.getNumberOfShownColumns()));
+        }
+        if (this.isSliderInside() && this.getHorizontalSlider() != null) {
+          entryComponent.setY(this.getY() + ((rowHeight - (this.getHorizontalSlider().getHeight() / this.getNumberOfShownRows())) * row));
           entryComponent.setHeight(entryComponent.getHeight() - (this.getHorizontalSlider().getHeight() / this.getNumberOfShownRows()));
         }
         entryComponent.setTextAlign(Align.LEFT);
@@ -516,19 +518,31 @@ public class ListField extends GuiComponent {
   
   private void initSliders() {
     final int maxNbOfRows = this.getMaxRows() - this.getNumberOfShownRows();
-    if (maxNbOfRows > 0) {
+    if (this.getNumberOfShownColumns() < this.getContent().length) {
       if (this.isSliderInside()) {
-        this.verticalSlider = new VerticalSlider(this.getX() + this.getWidth() - this.sliderSize, this.getY(), this.sliderSize, this.getHeight() - this.sliderSize, 0, this.getMaxRows() - this.getNumberOfShownRows(), 1);
         this.horizontalSlider = new HorizontalSlider(this.getX(), this.getY() + this.getHeight() - this.sliderSize, this.getWidth() - this.sliderSize, this.sliderSize, 0, this.nbOfColumns - this.getNumberOfShownColumns(), 1);
       }
       else {
-        this.verticalSlider = new VerticalSlider(this.getX() + this.getWidth(), this.getY(), this.sliderSize, this.getHeight(), 0, this.getMaxRows() - this.getNumberOfShownRows(), 1);
         this.horizontalSlider = new HorizontalSlider(this.getX(), this.getY() + this.getHeight(), this.getWidth(), this.sliderSize, 0, this.nbOfColumns - this.getNumberOfShownColumns(), 1);
       }
-      this.getVerticalSlider().setCurrentValue(this.getVerticalLowerBound());
       this.getHorizontalSlider().setCurrentValue(this.getHorizontalLowerBound());
-      this.getComponents().add(this.getVerticalSlider());
       this.getComponents().add(this.getHorizontalSlider());
+    }
+
+    if (maxNbOfRows > 0) {
+      if (this.isSliderInside()) {
+        if (this.getHorizontalSlider() != null) {
+          this.verticalSlider = new VerticalSlider(this.getX() + this.getWidth() - this.sliderSize, this.getY(), this.sliderSize, this.getHeight() - this.sliderSize, 0, this.getMaxRows() - this.getNumberOfShownRows(), 1);
+        }
+        else {
+          this.verticalSlider = new VerticalSlider(this.getX() + this.getWidth() - this.sliderSize, this.getY(), this.sliderSize, this.getHeight(), 0, this.getMaxRows() - this.getNumberOfShownRows(), 1);
+        }
+      }
+      else {
+        this.verticalSlider = new VerticalSlider(this.getX() + this.getWidth(), this.getY(), this.sliderSize, this.getHeight(), 0, this.getMaxRows() - this.getNumberOfShownRows(), 1);
+      }
+      this.getVerticalSlider().setCurrentValue(this.getVerticalLowerBound());
+      this.getComponents().add(this.getVerticalSlider());
     }
   }
 
