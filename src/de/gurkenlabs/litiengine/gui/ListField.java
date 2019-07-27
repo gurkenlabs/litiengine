@@ -200,7 +200,6 @@ public class ListField extends GuiComponent {
   public ListField(final double x, final double y, final double width, final double height, final Object[][] content, final int shownRows, final int shownColumns, final boolean sliderInside, final Spritesheet entrySprite, final Spritesheet buttonSprite) {
     super(x, y, width, height);
     this.changeConsumer = new CopyOnWriteArrayList<>();
-    System.out.println(Arrays.deepToString(content));
     this.content = content;
     this.nbOfColumns = this.content.length;
     this.listEntries = new CopyOnWriteArrayList<>();
