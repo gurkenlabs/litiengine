@@ -27,18 +27,23 @@ public class ListField extends GuiComponent {
 
   private final CopyOnWriteArrayList<CopyOnWriteArrayList<ImageComponent>> listEntries;
 
-  private int lowerBound = 0;
+  private int verticalLowerBound = 0;
+  private int horizontalLowerBound = 0;
 
   private ImageComponent selectedComponent;
 
   private int selectionColumn;
   private int selectionRow;
 
+  private boolean selectEntireColumn = false;
   private boolean selectEntireRow = false;
 
-  private final int shownElements;
+  private final int shownRows;
+  private final int shownColumns;
 
-  private VerticalSlider slider;
+  private VerticalSlider verticalSlider;
+  private HorizontalSlider horizontalSlider;
+  private final double sliderSize = 100.0;
   private boolean sliderInside = false;
 
   /**
@@ -73,8 +78,12 @@ public class ListField extends GuiComponent {
    * @param buttonSprite
    * the buttonSprite
    */
-  public ListField(final double x, final double y, final double width, final double height, final Object[] content, final int shownElements, final Spritesheet entrySprite, final Spritesheet buttonSprite) {
-    this(x, y, width, height, new Object[][] {content}, shownElements, entrySprite, buttonSprite);
+  public ListField(final double x, final double y, final double width, final double height, final Object[] content, final int shownRows, final Spritesheet entrySprite, final Spritesheet buttonSprite) {
+    this(x, y, width, height, new Object[][] {content}, shownRows, 1, false, entrySprite, buttonSprite);
+  }
+
+  public ListField(final double x, final double y, final double width, final double height, final Object[] content, final int shownRows, final boolean sliderInside, final Spritesheet entrySprite, final Spritesheet buttonSprite) {
+    this(x, y, width, height, new Object[][] {content}, shownRows, 1, sliderInside, entrySprite, buttonSprite);
   }
 
   /**
@@ -107,7 +116,11 @@ public class ListField extends GuiComponent {
    * @param buttonSprite
    * the buttonSprite
    */
-  public ListField(final double x, final double y, final double width, final double height, final Object[][] content, final int shownElements, final Spritesheet entrySprite, final Spritesheet buttonSprite) {
+  public ListField(final double x, final double y, final double width, final double height, final Object[][] content, final int shownRows, final int shownColumns, final Spritesheet entrySprite, final Spritesheet buttonSprite) {
+    this(x, y, width, height, new Object[][] {content}, shownRows, shownColumns, false, entrySprite, buttonSprite);
+  }
+
+  public ListField(final double x, final double y, final double width, final double height, final Object[][] content, final int shownRows, final int shownColumns, final boolean sliderInside, final Spritesheet entrySprite, final Spritesheet buttonSprite) {
     super(x, y, width, height);
     this.changeConsumer = new CopyOnWriteArrayList<>();
     this.content = content;
@@ -115,7 +128,10 @@ public class ListField extends GuiComponent {
     this.listEntries = new CopyOnWriteArrayList<>();
     this.buttonSprite = buttonSprite;
     this.entrySprite = entrySprite;
-    this.shownElements = shownElements;
+    this.sliderInside = sliderInside;
+    this.shownRows = shownRows;
+    this.shownColumns = shownColumns;
+    this.initSliders();
     this.initContentList();
     this.prepareInput();
   }
@@ -136,6 +152,14 @@ public class ListField extends GuiComponent {
     return this.entrySprite;
   }
 
+  public int getHorizontalLowerBound() {
+    return this.horizontalLowerBound;
+  }
+
+  public HorizontalSlider getHorizontalSlider() {
+    return this.horizontalSlider;
+  }
+
   /**
    * Returns all list items of a specified column.
    *
@@ -148,10 +172,6 @@ public class ListField extends GuiComponent {
       return null;
     }
     return this.listEntries.get(column);
-  }
-
-  public int getLowerBound() {
-    return this.lowerBound;
   }
 
   /**
@@ -170,8 +190,12 @@ public class ListField extends GuiComponent {
     return result;
   }
 
-  public int getNumberOfShownElements() {
-    return this.shownElements;
+  public int getNumberOfShownRows() {
+    return this.shownRows;
+  }
+
+  public int getNumberOfShownColumns() {
+    return this.shownColumns;
   }
 
   public ImageComponent getSelectedComponent() {
@@ -203,8 +227,12 @@ public class ListField extends GuiComponent {
     return this.selectionRow;
   }
 
-  public VerticalSlider getSlider() {
-    return this.slider;
+  public int getVerticalLowerBound() {
+    return this.verticalLowerBound;
+  }
+
+  public VerticalSlider getVerticalSlider() {
+    return this.verticalSlider;
   }
 
   public boolean isArrowKeyNavigation() {
@@ -216,24 +244,30 @@ public class ListField extends GuiComponent {
   }
 
   public void refresh() {
-    for (int column = 0; column < this.nbOfColumns; column++) {
-      for (int row = 0; row < this.getNumberOfShownElements(); row++) {
+    for (int column = 0; column < this.getNumberOfShownColumns(); column++) {
+      for (int row = 0; row < this.getNumberOfShownRows(); row++) {
         if (this.getContent()[column].length <= row) {
           continue;
         }
 
         if (this.getListEntry(column).get(row) != null) {
-          this.getListEntry(column).get(row).setText(this.getContent()[column][row+ this.getLowerBound()].toString());
+          this.getListEntry(column).get(row).setText(this.getContent()[column + this.getHorizontalLowerBound()][row + this.getVerticalLowerBound()].toString());
         }
       }
     }
-    if (this.selectionColumn >= 0 && this.selectionColumn < this.nbOfColumns && this.selectionRow >= this.getLowerBound() && this.selectionRow < this.getLowerBound() + this.getNumberOfShownElements()) {
-      this.selectedComponent = this.getListEntry(this.selectionColumn).get(this.selectionRow - this.getLowerBound());
-      if (this.selectedComponent != null) {
-        this.selectedComponent.setSelected(true);
-      }
-    } else {
+
+    if (!this.isEntireRowSelected() && this.selectionColumn >= this.getHorizontalLowerBound() && this.selectionColumn < this.getHorizontalLowerBound() + this.getNumberOfShownColumns() && this.selectionRow >= this.getVerticalLowerBound() && this.selectionRow < this.getVerticalLowerBound() + this.getNumberOfShownRows()) {
+      this.selectedComponent = this.getListEntry(this.selectionColumn - this.getHorizontalLowerBound()).get(this.selectionRow - this.getVerticalLowerBound());
+    }
+    else if (this.isEntireRowSelected() && this.selectionColumn >= 0 && this.selectionColumn < this.nbOfColumns && this.selectionRow >= this.getVerticalLowerBound() && this.selectionRow < this.getVerticalLowerBound() + this.getNumberOfShownRows()) {
+      this.selectedComponent = this.getListEntry(0).get(this.selectionRow - this.getVerticalLowerBound());
+    }
+    else {
       this.selectedComponent = null;
+    }
+
+    if (this.selectedComponent != null) {
+      this.selectedComponent.setSelected(true);
     }
   }
 
@@ -242,22 +276,22 @@ public class ListField extends GuiComponent {
     super.render(g);
     if (this.selectedComponent != null) {
       Rectangle2D border;
+      double borderWidth = this.selectedComponent.getWidth() + 2;
+      double borderHeight = this.selectedComponent.getHeight() + 2;
+
       if (this.isEntireRowSelected()) {
-        if (this.isSliderInside()) {
-          border = new Rectangle2D.Double(this.getX() - 1, this.selectedComponent.getY() - 1, this.getWidth() + 2 - this.slider.getWidth(), this.selectedComponent.getHeight() + 2);
-        }
-        else {
-          border = new Rectangle2D.Double(this.getX() - 1, this.selectedComponent.getY() - 1, this.getWidth() + 2, this.selectedComponent.getHeight() + 2);
-        }
+        borderWidth = this.getWidth() + 2;
       }
-      else {
-        if (this.isSliderInside()) {
-          border = new Rectangle2D.Double(this.selectedComponent.getX() - 1, this.selectedComponent.getY() - 1, this.selectedComponent.getWidth() + 2 - this.slider.getWidth(), this.selectedComponent.getHeight() + 2);
-        }
-        else {
-          border = new Rectangle2D.Double(this.selectedComponent.getX() - 1, this.selectedComponent.getY() - 1, this.selectedComponent.getWidth() + 2, this.selectedComponent.getHeight() + 2);
-        }
+      if (this.getVerticalSlider() != null && this.getVerticalSlider().isVisible() && this.isSliderInside()) {
+        borderWidth = borderWidth - this.getVerticalSlider().getWidth();
       }
+
+      if (this.isEntireColumnSelected()) {
+        borderHeight = this.getHeight() + 2;
+      }
+
+      border = new Rectangle2D.Double(this.getX() - 1, this.selectedComponent.getY() - 1, borderWidth, borderHeight);
+
       g.setColor(Color.WHITE);
       ShapeRenderer.renderOutline(g, border, 2);
     }
@@ -284,8 +318,8 @@ public class ListField extends GuiComponent {
     }
   }
 
-  public void setLowerBound(final int lowerBound) {
-    this.lowerBound = lowerBound;
+  public void setHorizontalLowerBound(final int lowerBound) {
+    this.horizontalLowerBound = lowerBound;
   }
 
   public void setSelection(final int column, final int row) {
@@ -295,11 +329,17 @@ public class ListField extends GuiComponent {
     this.selectionColumn = column;
     this.selectionRow = row;
 
-    if (this.selectionRow >= this.getLowerBound() + this.getNumberOfShownElements()) {
-      this.setLowerBound(this.getLowerBound() + 1);
-    } else if (this.selectionRow < this.getLowerBound() && this.getLowerBound() > 0) {
-      this.setLowerBound(this.getLowerBound() - 1);
+    if (this.selectionRow >= this.getVerticalLowerBound() + this.getNumberOfShownRows()) {
+      this.setVerticalLowerBound(this.getVerticalLowerBound() + 1);
+    } else if (this.selectionRow < this.getVerticalLowerBound() && this.getVerticalLowerBound() > 0) {
+      this.setVerticalLowerBound(this.getVerticalLowerBound() - 1);
     }
+    if (this.selectionColumn >= this.getHorizontalLowerBound() + this.getNumberOfShownColumns()) {
+      this.setHorizontalLowerBound(this.getHorizontalLowerBound() + 1);
+    } else if (this.selectionColumn < this.getHorizontalLowerBound() && this.getHorizontalLowerBound() > 0) {
+      this.setHorizontalLowerBound(this.getHorizontalLowerBound() - 1);
+    }
+
     this.getChangeConsumer().forEach(consumer -> consumer.accept(this.selectionRow));
     this.refresh();
   }
@@ -314,8 +354,8 @@ public class ListField extends GuiComponent {
    * @param selectEntireRow
    * a boolean
    */
-  public void setSelectEntireRow(boolean selectEntireRow) {
-    this.selectEntireRow = selectEntireRow;
+  public void setSelectEntireColumn(boolean selectEntireColumn) {
+    this.selectEntireColumn = selectEntireColumn;
   }
 
   /**
@@ -328,44 +368,36 @@ public class ListField extends GuiComponent {
    * @param sliderInside
    * a boolean
    */
-  public void setSliderInside(boolean sliderInside) {
-    this.sliderInside = sliderInside;
-    this.listEntries.clear();
-    this.getComponents().clear();
-    this.initContentList();
+  public void setSelectEntireRow(boolean selectEntireRow) {
+    this.selectEntireRow = selectEntireRow;
+  }
+
+  public void setVerticalLowerBound(final int lowerBound) {
+    this.verticalLowerBound = lowerBound;
   }
 
   private void initContentList() {
-    final int maxNbOfRows = this.getMaxRows() - this.getNumberOfShownElements();
-    if (maxNbOfRows > 0) {
-      if (this.isSliderInside()) {
-        this.slider = new VerticalSlider(this.getX() + this.getWidth() - (this.getHeight() / this.getNumberOfShownElements()), this.getY(), this.getHeight() / this.getNumberOfShownElements(), this.getHeight(), 0, this.getMaxRows() - this.getNumberOfShownElements(), 1);
-      }
-      else {
-        this.slider = new VerticalSlider(this.getX() + this.getWidth(), this.getY(), this.getHeight() / this.getNumberOfShownElements(), this.getHeight(), 0, this.getMaxRows() - this.getNumberOfShownElements(), 1);
-      }
-      this.getSlider().setCurrentValue(this.getLowerBound());
-      this.getComponents().add(this.getSlider());
-    }
-
-    final double columnWidth = this.getWidth() / this.nbOfColumns;
-    for (int column = 0; column < this.nbOfColumns; column++) {
+    final double columnWidth = this.getWidth() / this.getNumberOfShownColumns();
+    final double rowHeight = this.getHeight() / this.getNumberOfShownRows();
+    for (int column = 0; column < this.getNumberOfShownColumns(); column++) {
       this.listEntries.add(new CopyOnWriteArrayList<ImageComponent>());
-      for (int row = 0; row < this.getNumberOfShownElements(); row++) {
+      for (int row = 0; row < this.getNumberOfShownRows(); row++) {
         if (this.getContent()[column].length <= row) {
           continue;
         }
 
         ImageComponent entryComponent;
         if (this.getContent()[column][row] == null) {
-          entryComponent = new ImageComponent(this.getX() + (columnWidth * column), this.getY() + ((this.getHeight() / this.getNumberOfShownElements()) * row), (this.getWidth() / this.nbOfColumns), this.getHeight() / this.getNumberOfShownElements(), this.entrySprite, "", null);
+          entryComponent = new ImageComponent(this.getX() + (columnWidth * column), this.getY() + (rowHeight * row), columnWidth, rowHeight, this.entrySprite, "", null);
         }
         else {
-          entryComponent = new ImageComponent(this.getX() + (columnWidth * column), this.getY() + ((this.getHeight() / this.getNumberOfShownElements()) * row), (this.getWidth() / this.nbOfColumns), this.getHeight() / this.getNumberOfShownElements(), this.entrySprite, this.getContent()[column][row].toString(), null);
+          entryComponent = new ImageComponent(this.getX() + (columnWidth * column), this.getY() + (rowHeight * row), columnWidth, rowHeight, this.entrySprite, this.getContent()[column][row].toString(), null);
         }
         if (this.isSliderInside()) {
-          entryComponent.setX(this.getX() + ((columnWidth - (this.getSlider().getWidth() / this.nbOfColumns))  * column));
-          entryComponent.setWidth(entryComponent.getWidth() - (this.getSlider().getWidth() / this.nbOfColumns));
+          entryComponent.setX(this.getX() + ((columnWidth - (this.getVerticalSlider().getWidth() / this.getNumberOfShownColumns()))  * column));
+          entryComponent.setY(this.getY() + ((rowHeight - (this.getHorizontalSlider().getHeight() / this.getNumberOfShownRows())) * row));
+          entryComponent.setWidth(entryComponent.getWidth() - (this.getVerticalSlider().getWidth() / this.getNumberOfShownColumns()));
+          entryComponent.setHeight(entryComponent.getHeight() - (this.getHorizontalSlider().getHeight() / this.getNumberOfShownRows()));
         }
         entryComponent.setTextAlign(Align.LEFT);
         this.getListEntry(column).add(entryComponent);
@@ -374,25 +406,58 @@ public class ListField extends GuiComponent {
       final int col = column;
       for (final ImageComponent comp : this.getListEntry(col)) {
         comp.onClicked(e -> {
-          this.setSelection(col, this.getLowerBound() + this.getListEntry(col).indexOf(comp) % this.getNumberOfShownElements());
+          this.setSelection(this.getHorizontalLowerBound() + col % this.getNumberOfShownColumns(), this.getVerticalLowerBound() + this.getListEntry(col).indexOf(comp) % this.getNumberOfShownRows());
           this.refresh();
         });
       }
     }
 
     this.onChange(s -> {
-      if (this.getSlider() != null) {
-        this.getSlider().setCurrentValue(this.getLowerBound());
-        this.getSlider().getSliderComponent().setLocation(this.getSlider().getRelativeSliderPosition());
+      if (this.getVerticalSlider() != null) {
+        this.getVerticalSlider().setCurrentValue(this.getVerticalLowerBound());
+        this.getVerticalSlider().getSliderComponent().setLocation(this.getVerticalSlider().getRelativeSliderPosition());
+      }
+      if (this.getHorizontalSlider() != null) {
+        this.getHorizontalSlider().setCurrentValue(this.getHorizontalLowerBound());
+        this.getHorizontalSlider().getSliderComponent().setLocation(this.getHorizontalSlider().getRelativeSliderPosition());
       }
     });
-    if (this.getSlider() != null) {
-      this.getSlider().onChange(sliderValue -> {
-        this.setLowerBound(sliderValue.intValue());
-        this.getSlider().getSliderComponent().setLocation(this.getSlider().getRelativeSliderPosition());
+    if (this.getVerticalSlider() != null) {
+      this.getVerticalSlider().onChange(sliderValue -> {
+        this.setVerticalLowerBound(sliderValue.intValue());
+        this.getVerticalSlider().getSliderComponent().setLocation(this.getVerticalSlider().getRelativeSliderPosition());
         this.refresh();
       });
     }
+    if (this.getHorizontalSlider() != null) {
+      this.getHorizontalSlider().onChange(sliderValue -> {
+        this.setHorizontalLowerBound(sliderValue.intValue());
+        this.getHorizontalSlider().getSliderComponent().setLocation(this.getHorizontalSlider().getRelativeSliderPosition());
+        this.refresh();
+      });
+    }
+  }
+  
+  private void initSliders() {
+    final int maxNbOfRows = this.getMaxRows() - this.getNumberOfShownRows();
+    if (maxNbOfRows > 0) {
+      if (this.isSliderInside()) {
+        this.verticalSlider = new VerticalSlider(this.getX() + this.getWidth() - this.sliderSize, this.getY(), this.sliderSize, this.getHeight() - this.sliderSize, 0, this.getMaxRows() - this.getNumberOfShownRows(), 1);
+        this.horizontalSlider = new HorizontalSlider(this.getX(), this.getY() + this.getHeight() - this.sliderSize, this.getWidth() - this.sliderSize, this.sliderSize, 0, this.nbOfColumns - this.getNumberOfShownColumns(), 1);
+      }
+      else {
+        this.verticalSlider = new VerticalSlider(this.getX() + this.getWidth(), this.getY(), this.sliderSize, this.getHeight(), 0, this.getMaxRows() - this.getNumberOfShownRows(), 1);
+        this.horizontalSlider = new HorizontalSlider(this.getX(), this.getY() + this.getHeight(), this.getWidth(), this.sliderSize, 0, this.nbOfColumns - this.getNumberOfShownColumns(), 1);
+      }
+      this.getVerticalSlider().setCurrentValue(this.getVerticalLowerBound());
+      this.getHorizontalSlider().setCurrentValue(this.getHorizontalLowerBound());
+      this.getComponents().add(this.getVerticalSlider());
+      this.getComponents().add(this.getHorizontalSlider());
+    }
+  }
+
+  public boolean isEntireColumnSelected() {
+    return this.selectEntireColumn;
   }
 
   /**
@@ -420,28 +485,28 @@ public class ListField extends GuiComponent {
       if (this.isSuspended() || !this.isVisible() || !this.isArrowKeyNavigation()) {
         return;
       }
-      this.setSelection(this.selectionColumn, this.selectionRow - 1);
+      this.setSelection(this.getHorizontalLowerBound(), this.selectionRow - 1);
     });
 
     Input.keyboard().onKeyTyped(KeyEvent.VK_DOWN, e -> {
       if (this.isSuspended() || !this.isVisible() || !this.isArrowKeyNavigation()) {
         return;
       }
-      this.setSelection(this.selectionColumn, this.selectionRow + 1);
+      this.setSelection(this.getHorizontalLowerBound(), this.selectionRow + 1);
     });
 
     Input.keyboard().onKeyTyped(KeyEvent.VK_LEFT, e -> {
       if (this.isSuspended() || !this.isVisible() || !this.isArrowKeyNavigation()) {
         return;
       }
-      this.setSelection(this.selectionColumn - 1, this.selectionRow);
+      this.setSelection(this.getHorizontalLowerBound() - 1, this.selectionRow);
     });
 
     Input.keyboard().onKeyTyped(KeyEvent.VK_RIGHT, e -> {
       if (this.isSuspended() || !this.isVisible() || !this.isArrowKeyNavigation()) {
         return;
       }
-      this.setSelection(this.selectionColumn + 1, this.selectionRow);
+      this.setSelection(this.getHorizontalLowerBound() + 1, this.selectionRow);
     });
 
     this.onMouseWheelScrolled(e -> {
@@ -450,9 +515,9 @@ public class ListField extends GuiComponent {
       }
       if (this.isHovered()) {
         if (e.getEvent().getWheelRotation() < 0) {
-          this.setSelection(this.selectionColumn, this.selectionRow - 1);
+          this.setSelection(this.getHorizontalLowerBound(), this.selectionRow - 1);
         } else {
-          this.setSelection(this.selectionColumn, this.selectionRow + 1);
+          this.setSelection(this.getHorizontalLowerBound(), this.selectionRow + 1);
         }
         return;
       }
