@@ -93,6 +93,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   }
 
   public Tileset(Tileset source) {
+    this.source = Resources.getLocation(source.getName() + "." + FILE_EXTENSION);
     this.sourceTileset = source;
     this.firstgid = 1;
   }

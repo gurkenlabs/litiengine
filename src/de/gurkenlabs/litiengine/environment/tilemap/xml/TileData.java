@@ -1,12 +1,17 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.zip.DeflaterOutputStream;
 import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 import java.util.zip.InflaterInputStream;
 
 import javax.xml.bind.DatatypeConverter;
@@ -17,12 +22,34 @@ import javax.xml.bind.annotation.XmlMixed;
 import javax.xml.bind.annotation.XmlTransient;
 
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
+import de.gurkenlabs.litiengine.util.io.Codec;
 
 public class TileData {
-  protected static final String ENCODING_BASE64 = "base64";
-  protected static final String ENCODING_CSV = "csv";
-  protected static final String COMPRESSION_GZIP = "gzip";
-  protected static final String COMPRESSION_ZLIB = "zlib";
+  public static class Encoding {
+    public static final String BASE64 = "base64";
+    public static final String CSV = "csv";
+
+    private Encoding() {
+    }
+
+    public static boolean isValid(String encoding) {
+      return encoding != null && !encoding.isEmpty() && (encoding.equals(BASE64) || encoding.equals(CSV));
+    }
+  }
+
+  public static class Compression {
+    public static final String GZIP = "gzip";
+    public static final String ZLIB = "zlib";
+    public static final String NONE = null;
+
+    private Compression() {
+    }
+
+    public static boolean isValid(String compression) {
+      // null equals no compression which is an accepted value
+      return compression == null || !compression.isEmpty() && (compression.equals(GZIP) || compression.equals(ZLIB));
+    }
+  }
 
   @XmlAttribute
   private String encoding;
@@ -65,23 +92,35 @@ public class TileData {
     // keep for serialization
   }
 
-  public TileData(List<Tile> tiles) {
+  public TileData(List<Tile> tiles, int width, int height, String encoding, String compression) throws TmxException {
+    if (!Encoding.isValid(encoding)) {
+      throw new TmxException("Invalid tile data encoding '" + encoding + "'. Supported encodings are " + Encoding.CSV + " and " + Encoding.BASE64 + ".");
+    }
+
+    if (!Compression.isValid(compression)) {
+      throw new TmxException("Invalid tile data compression '" + compression + "'. Supported compressions are " + Compression.GZIP + " and " + Compression.ZLIB + ".");
+    }
+
     this.tiles = tiles;
+    this.encoding = encoding;
+    this.compression = compression;
+    this.width = width;
+    this.height = height;
   }
 
   @XmlTransient
   public String getEncoding() {
-    return encoding;
+    return this.encoding;
   }
 
   @XmlTransient
   public String getCompression() {
-    return compression;
+    return this.compression;
   }
 
   @XmlTransient
   public String getValue() {
-    return value;
+    return this.value;
   }
 
   public void setEncoding(String encoding) {
@@ -94,6 +133,11 @@ public class TileData {
 
   public void setValue(String value) {
     this.value = value;
+    if (this.rawValue == null) {
+      this.rawValue = new CopyOnWriteArrayList<>();
+    }
+
+    this.rawValue.add(0, value);
   }
 
   public List<Tile> getTiles() throws InvalidTileLayerException {
@@ -112,6 +156,78 @@ public class TileData {
     }
 
     return this.tiles;
+  }
+
+  public static String encode(TileData data) throws IOException {
+    if (data.getEncoding() == null) {
+      return null;
+    }
+
+    if (data.getEncoding().equals(Encoding.CSV)) {
+      return encodeCsv(data);
+    } else if (data.getEncoding().equals(Encoding.BASE64)) {
+      return encodeBase64(data);
+    }
+
+    return null;
+  }
+
+  private static String encodeCsv(TileData data) throws InvalidTileLayerException {
+    StringBuilder sb = new StringBuilder();
+    if (!data.getTiles().isEmpty()) {
+      sb.append('\n');
+    }
+
+    for (int i = 0; i < data.getTiles().size(); i++) {
+      sb.append(data.getTiles().get(i).getGridId());
+
+      if (i < data.getTiles().size() - 1) {
+        sb.append(',');
+      }
+
+      if (i != 0 && (i + 1) % data.getWidth() == 0) {
+        sb.append('\n');
+      }
+    }
+
+    return sb.toString();
+  }
+
+  private static String encodeBase64(TileData data) throws IOException {
+    try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+      OutputStream out = baos;
+
+      if (data.getCompression() != null && Compression.isValid(data.getCompression())) {
+        if (data.getCompression().equals(Compression.GZIP)) {
+          out = new GZIPOutputStream(baos);
+        } else if (data.getCompression().equals(Compression.ZLIB)) {
+          out = new DeflaterOutputStream(baos);
+        }
+      }
+
+      for (Tile tile : data.getTiles()) {
+        int gid = 0;
+
+        if (tile != null) {
+          gid = tile.getGridId();
+        }
+
+        out.write(gid);
+        out.write(gid >> Byte.SIZE);
+        out.write(gid >> Byte.SIZE * 2);
+        out.write(gid >> Byte.SIZE * 3);
+      }
+
+      if (data.getCompression() != null && data.getCompression().equals(Compression.GZIP)) {
+        ((GZIPOutputStream) out).finish();
+      }
+      
+      if (data.getCompression() != null && data.getCompression().equals(Compression.ZLIB)) {
+        ((DeflaterOutputStream) out).finish();
+      }
+
+      return Codec.encode(baos.toByteArray());
+    }
   }
 
   protected void setMinChunkOffsets(int x, int y) {
@@ -162,9 +278,9 @@ public class TileData {
 
       if (compression == null || compression.isEmpty()) {
         is = bais;
-      } else if (compression.equals(COMPRESSION_GZIP)) {
+      } else if (compression.equals(Compression.GZIP)) {
         is = new GZIPInputStream(bais, dec.length);
-      } else if (compression.equals(COMPRESSION_ZLIB)) {
+      } else if (compression.equals(Compression.ZLIB)) {
         is = new InflaterInputStream(bais);
       } else {
         throw new IllegalArgumentException("Unsupported tile layer compression method " + compression);
@@ -316,12 +432,12 @@ public class TileData {
     // first fill a two-dimensional array with all the information of the chunks
     Tile[][] tileArr = new Tile[this.getHeight()][this.getWidth()];
 
-    if (this.getEncoding().equals(ENCODING_BASE64)) {
+    if (this.getEncoding().equals(Encoding.BASE64)) {
       for (TileChunk chunk : this.chunks) {
         List<Tile> chunkTiles = parseBase64Data(chunk.getValue(), this.compression);
         this.addTiles(tileArr, chunk, chunkTiles);
       }
-    } else if (this.getEncoding().equals(ENCODING_CSV)) {
+    } else if (this.getEncoding().equals(Encoding.CSV)) {
       for (TileChunk chunk : this.chunks) {
         List<Tile> chunkTiles = parseCsvData(chunk.getValue());
         this.addTiles(tileArr, chunk, chunkTiles);
@@ -358,9 +474,9 @@ public class TileData {
 
   private List<Tile> parseData() throws InvalidTileLayerException {
     List<Tile> tiles;
-    if (this.getEncoding().equals(ENCODING_BASE64)) {
+    if (this.getEncoding().equals(Encoding.BASE64)) {
       tiles = parseBase64Data(this.value, this.compression);
-    } else if (this.getEncoding().equals(ENCODING_CSV)) {
+    } else if (this.getEncoding().equals(Encoding.CSV)) {
       tiles = parseCsvData(this.value);
     } else {
       throw new IllegalArgumentException("Unsupported tile layer encoding " + this.getEncoding());
