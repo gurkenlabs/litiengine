@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -102,24 +102,74 @@ public class TileDataTests {
     assertFalse(tiles.get(127).isFlippedDiagonally());
     assertEquals(18, tiles.get(127).getGridId());
   }
-  
+
   @Test
-  public void testEncodeTileData() throws TmxException{
-    String csv = String.join("\n"
-        , "1,1,1,0,0,0,1,1,1,"
-        , "1,1,1,0,2,0,1,1,1,"
-        , "1,1,1,0,1,0,1,1,1");
-    
+  public void testEncodeBase64() throws IOException {
+    String uncompressed = "AQAAAAEAAAABAAAAAAAAAAAAAAAAAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAAAAAAIAAAAAAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAAAAAAEAAAAAAAAAAQAAAAEAAAABAAAA";
+
     Tile[] tiles = new Tile[] {
         new Tile(1), new Tile(1), new Tile(1), new Tile(0), new Tile(0), new Tile(0), new Tile(1), new Tile(1), new Tile(1),
         new Tile(1), new Tile(1), new Tile(1), new Tile(0), new Tile(2), new Tile(0), new Tile(1), new Tile(1), new Tile(1),
         new Tile(1), new Tile(1), new Tile(1), new Tile(0), new Tile(1), new Tile(0), new Tile(1), new Tile(1), new Tile(1),
     };
-     
-    TileData data = new TileData(Arrays.asList(tiles), 9, 3, TileData.Encoding.CSV, TileData.Compression.NONE);
-    
+    TileData data = new TileData(Arrays.asList(tiles), 9, 3, TileData.Encoding.BASE64, TileData.Compression.NONE);
+
     String encoded = TileData.encode(data);
-    
+
+    assertEquals(uncompressed, encoded);
+  }
+
+  @Test
+  public void testEncodeBase64Gzip() throws IOException {
+    String compressed = "H4sIAAAAAAAAAGNkYGBghGJkwIgDgwATEWoYsagBAFsJTlBsAAAA";
+
+    Tile[] tiles = new Tile[] {
+        new Tile(1), new Tile(1), new Tile(1), new Tile(0), new Tile(0), new Tile(0), new Tile(1), new Tile(1), new Tile(1),
+        new Tile(1), new Tile(1), new Tile(1), new Tile(0), new Tile(2), new Tile(0), new Tile(1), new Tile(1), new Tile(1),
+        new Tile(1), new Tile(1), new Tile(1), new Tile(0), new Tile(1), new Tile(0), new Tile(1), new Tile(1), new Tile(1),
+    };
+    TileData data = new TileData(Arrays.asList(tiles), 9, 3, TileData.Encoding.BASE64, TileData.Compression.GZIP);
+
+    String encoded = TileData.encode(data);
+
+    assertEquals(compressed, encoded);
+  }
+
+  @Test
+  public void testEncodeBase64Zlib() throws IOException {
+    String compressed = "eJxjZGBgYIRiZMCIA4MAExFqGLGoAQAE4AAW";
+
+    Tile[] tiles = new Tile[] {
+        new Tile(1), new Tile(1), new Tile(1), new Tile(0), new Tile(0), new Tile(0), new Tile(1), new Tile(1), new Tile(1),
+        new Tile(1), new Tile(1), new Tile(1), new Tile(0), new Tile(2), new Tile(0), new Tile(1), new Tile(1), new Tile(1),
+        new Tile(1), new Tile(1), new Tile(1), new Tile(0), new Tile(1), new Tile(0), new Tile(1), new Tile(1), new Tile(1),
+    };
+    TileData data = new TileData(Arrays.asList(tiles), 9, 3, TileData.Encoding.BASE64, TileData.Compression.ZLIB);
+
+    String encoded = TileData.encode(data);
+
+    assertEquals(compressed, encoded);
+  }
+
+  @Test
+  public void testEncodeCsv() throws IOException {
+    String csv = String.join("\n", 
+        "",
+        "1,1,1,0,0,0,1,1,1,", 
+        "1,1,1,0,2,0,1,1,1,", 
+        "1,1,1,0,1,0,1,1,1", 
+        "");
+
+    Tile[] tiles = new Tile[] {
+        new Tile(1), new Tile(1), new Tile(1), new Tile(0), new Tile(0), new Tile(0), new Tile(1), new Tile(1), new Tile(1),
+        new Tile(1), new Tile(1), new Tile(1), new Tile(0), new Tile(2), new Tile(0), new Tile(1), new Tile(1), new Tile(1),
+        new Tile(1), new Tile(1), new Tile(1), new Tile(0), new Tile(1), new Tile(0), new Tile(1), new Tile(1), new Tile(1),
+    };
+
+    TileData data = new TileData(Arrays.asList(tiles), 9, 3, TileData.Encoding.CSV, TileData.Compression.NONE);
+
+    String encoded = TileData.encode(data);
+
     assertEquals(csv, encoded);
   }
 }

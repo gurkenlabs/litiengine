@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.resources;
 
 import java.net.URL;
+
 import javax.xml.bind.JAXBException;
 
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
