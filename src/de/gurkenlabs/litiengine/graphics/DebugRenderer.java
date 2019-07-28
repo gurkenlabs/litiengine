@@ -110,10 +110,10 @@ public class DebugRenderer {
   private static void drawMapId(final Graphics2D g, final IEntity entity) {
     g.setColor(Color.RED);
     g.setFont(g.getFont().deriveFont(Font.PLAIN, 4f));
-    final int x = (int) Game.world().camera().getViewportDimensionCenter(entity).getX() + 10;
-    final int y = (int) Game.world().camera().getViewportDimensionCenter(entity).getY();
+    final double x = Game.world().camera().getViewportDimensionCenter(entity).getX() + 10;
+    final double y = Game.world().camera().getViewportDimensionCenter(entity).getY();
     TextRenderer.render(g, Integer.toString(entity.getMapId()), x, y);
-    final String locationString = "[x:" + new DecimalFormat("##.##").format(entity.getX()) + ";y:" + new DecimalFormat("##.##").format(entity.getY()) + "]";
+    final String locationString = new DecimalFormat("##.##").format(entity.getX()) + ";" + new DecimalFormat("##.##").format(entity.getY());
     TextRenderer.render(g, locationString, x, y + 5.0);
   }
 
