@@ -15,6 +15,10 @@ public class DecimalFloatAdapter extends XmlAdapter<String, Float> {
 
   @Override
   public String marshal(Float v) throws Exception {
+    if (v == null) {
+      return null;
+    }
+
     if (v.floatValue() % 1 == 0) {
       return Integer.toString(v.intValue());
     }
