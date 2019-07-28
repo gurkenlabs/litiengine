@@ -17,7 +17,7 @@ public class TileDataTests {
     TileData data = new TileData();
     data.setValue(uncompressedBase64);
     data.setEncoding(TileData.ENCODING_BASE64);
-    List<Tile> tiles = data.parseTiles();
+    List<Tile> tiles = data.getTiles();
     assertEquals(500, tiles.size());
     assertEquals(1, tiles.get(0).getGridId());
     assertEquals(17, tiles.get(19).getGridId());
@@ -36,7 +36,7 @@ public class TileDataTests {
     data.setValue(gzipBase64);
     data.setEncoding(TileData.ENCODING_BASE64);
     data.setCompression(TileData.COMPRESSION_GZIP);
-    List<Tile> tiles = data.parseTiles();
+    List<Tile> tiles = data.getTiles();
     assertEquals(500, tiles.size());
     assertEquals(1, tiles.get(0).getGridId());
     assertEquals(17, tiles.get(19).getGridId());
@@ -51,7 +51,7 @@ public class TileDataTests {
     data.setValue(zlibBase64);
     data.setEncoding(TileData.ENCODING_BASE64);
     data.setCompression(TileData.COMPRESSION_ZLIB);
-    List<Tile> tiles = data.parseTiles();
+    List<Tile> tiles = data.getTiles();
     assertEquals(500, tiles.size());
     assertEquals(1, tiles.get(0).getGridId());
     assertEquals(17, tiles.get(19).getGridId());
@@ -90,7 +90,7 @@ public class TileDataTests {
     TileData data = new TileData();
     data.setValue(csv);
     data.setEncoding(TileData.ENCODING_CSV);
-    List<Tile> tiles = data.parseTiles();
+    List<Tile> tiles = data.getTiles();
     assertEquals(500, tiles.size());
     assertEquals(1, tiles.get(0).getGridId());
     assertEquals(17, tiles.get(19).getGridId());

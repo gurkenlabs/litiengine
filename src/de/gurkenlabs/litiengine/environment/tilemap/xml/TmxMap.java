@@ -206,6 +206,10 @@ public final class TmxMap extends CustomPropertyProvider implements IMap, Compar
 
   @Override
   public List<ITileset> getTilesets() {
+    if (this.tilesets == null) {
+      this.tilesets = new CopyOnWriteArrayList<>();
+    }
+
     return this.tilesets;
   }
 

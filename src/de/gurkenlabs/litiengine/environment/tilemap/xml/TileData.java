@@ -41,7 +41,7 @@ public class TileData {
   private List<TileChunk> chunks;
 
   @XmlTransient
-  private List<Tile> parsedTiles;
+  private List<Tile> tiles;
 
   @XmlTransient
   private int width;
@@ -60,6 +60,14 @@ public class TileData {
 
   @XmlTransient
   private int minChunkOffsetYMap;
+
+  public TileData() {
+    // keep for serialization
+  }
+
+  public TileData(List<Tile> tiles) {
+    this.tiles = tiles;
+  }
 
   @XmlTransient
   public String getEncoding() {
@@ -88,6 +96,24 @@ public class TileData {
     this.value = value;
   }
 
+  public List<Tile> getTiles() throws InvalidTileLayerException {
+    if (this.tiles != null) {
+      return this.tiles;
+    }
+
+    if (this.getEncoding() == null || this.getEncoding().isEmpty()) {
+      return new ArrayList<>();
+    }
+
+    if (this.isInfinite()) {
+      this.tiles = this.parseChunkData();
+    } else {
+      this.tiles = this.parseData();
+    }
+
+    return this.tiles;
+  }
+
   protected void setMinChunkOffsets(int x, int y) {
     this.minChunkOffsetXMap = x;
     this.minChunkOffsetYMap = y;
@@ -109,7 +135,7 @@ public class TileData {
     if (this.isInfinite() && this.minChunkOffsetYMap != 0) {
       return this.height + (this.offsetY - this.minChunkOffsetYMap);
     }
-    
+
     return this.height;
   }
 
@@ -119,24 +145,6 @@ public class TileData {
 
   protected int getOffsetY() {
     return this.offsetY;
-  }
-
-  protected List<Tile> parseTiles() throws InvalidTileLayerException {
-    if (this.parsedTiles != null) {
-      return this.parsedTiles;
-    }
-
-    if (this.getEncoding() == null || this.getEncoding().isEmpty()) {
-      return new ArrayList<>();
-    }
-
-    if (this.isInfinite()) {
-      this.parsedTiles = this.parseChunkData();
-    } else {
-      this.parsedTiles = this.parseData();
-    }
-
-    return this.parsedTiles;
   }
 
   protected static List<Tile> parseBase64Data(String value, String compression) throws InvalidTileLayerException {

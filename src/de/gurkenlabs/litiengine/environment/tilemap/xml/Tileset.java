@@ -92,6 +92,11 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     Resources.images().addClearedListener(() -> this.spriteSheet = null);
   }
 
+  public Tileset(Tileset source) {
+    this.sourceTileset = source;
+    this.firstgid = 1;
+  }
+
   @Override
   public java.util.Map<String, ICustomProperty> getProperties() {
     return this.sourceTileset != null ? this.sourceTileset.getProperties() : super.getProperties();

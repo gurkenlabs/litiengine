@@ -203,6 +203,11 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
     this.opacity = opacity;
   }
 
+  @XmlTransient
+  public void setRenderType(RenderType renderType) {
+    this.renderType = renderType;
+  }
+
   @Override
   @XmlTransient
   public void setVisible(boolean visible) {

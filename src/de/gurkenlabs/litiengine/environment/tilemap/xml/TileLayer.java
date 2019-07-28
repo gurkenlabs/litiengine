@@ -21,6 +21,14 @@ public class TileLayer extends Layer implements ITileLayer {
 
   private transient Tile[][] tiles;
 
+  public TileLayer() {
+    // keep for serialization
+  }
+
+  public TileLayer(TileData data) {
+    this.data = data;
+  }
+
   @Override
   public ITile getTileByLocation(final Point2D location) {
     final Optional<ITile> tile = this.getTiles().stream().filter(x -> x.getTileCoordinate().equals(location)).findFirst();
@@ -66,7 +74,7 @@ public class TileLayer extends Layer implements ITileLayer {
   }
 
   protected List<Tile> getData() throws InvalidTileLayerException {
-    return this.data.parseTiles();
+    return this.data.getTiles();
   }
 
   protected TileData getRawTileData() {
