@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -16,7 +18,7 @@ public class TileDataTests {
 
     TileData data = new TileData();
     data.setValue(uncompressedBase64);
-    data.setEncoding(TileData.ENCODING_BASE64);
+    data.setEncoding(TileData.Encoding.BASE64);
     List<Tile> tiles = data.getTiles();
     assertEquals(500, tiles.size());
     assertEquals(1, tiles.get(0).getGridId());
@@ -34,8 +36,8 @@ public class TileDataTests {
 
     TileData data = new TileData();
     data.setValue(gzipBase64);
-    data.setEncoding(TileData.ENCODING_BASE64);
-    data.setCompression(TileData.COMPRESSION_GZIP);
+    data.setEncoding(TileData.Encoding.BASE64);
+    data.setCompression(TileData.Compression.GZIP);
     List<Tile> tiles = data.getTiles();
     assertEquals(500, tiles.size());
     assertEquals(1, tiles.get(0).getGridId());
@@ -49,8 +51,8 @@ public class TileDataTests {
 
     TileData data = new TileData();
     data.setValue(zlibBase64);
-    data.setEncoding(TileData.ENCODING_BASE64);
-    data.setCompression(TileData.COMPRESSION_ZLIB);
+    data.setEncoding(TileData.Encoding.BASE64);
+    data.setCompression(TileData.Compression.ZLIB);
     List<Tile> tiles = data.getTiles();
     assertEquals(500, tiles.size());
     assertEquals(1, tiles.get(0).getGridId());
@@ -89,7 +91,7 @@ public class TileDataTests {
 
     TileData data = new TileData();
     data.setValue(csv);
-    data.setEncoding(TileData.ENCODING_CSV);
+    data.setEncoding(TileData.Encoding.CSV);
     List<Tile> tiles = data.getTiles();
     assertEquals(500, tiles.size());
     assertEquals(1, tiles.get(0).getGridId());
@@ -99,5 +101,25 @@ public class TileDataTests {
     assertTrue(tiles.get(127).isFlippedVertically());
     assertFalse(tiles.get(127).isFlippedDiagonally());
     assertEquals(18, tiles.get(127).getGridId());
+  }
+  
+  @Test
+  public void testEncodeTileData() throws TmxException{
+    String csv = String.join("\n"
+        , "1,1,1,0,0,0,1,1,1,"
+        , "1,1,1,0,2,0,1,1,1,"
+        , "1,1,1,0,1,0,1,1,1");
+    
+    Tile[] tiles = new Tile[] {
+        new Tile(1), new Tile(1), new Tile(1), new Tile(0), new Tile(0), new Tile(0), new Tile(1), new Tile(1), new Tile(1),
+        new Tile(1), new Tile(1), new Tile(1), new Tile(0), new Tile(2), new Tile(0), new Tile(1), new Tile(1), new Tile(1),
+        new Tile(1), new Tile(1), new Tile(1), new Tile(0), new Tile(1), new Tile(0), new Tile(1), new Tile(1), new Tile(1),
+    };
+     
+    TileData data = new TileData(Arrays.asList(tiles), 9, 3, TileData.Encoding.CSV, TileData.Compression.NONE);
+    
+    String encoded = TileData.encode(data);
+    
+    assertEquals(csv, encoded);
   }
 }
