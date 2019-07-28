@@ -125,6 +125,14 @@ public final class TmxMap extends CustomPropertyProvider implements IMap, Compar
   private transient List<IImageLayer> imageLayers = Collections.unmodifiableList(this.rawImageLayers);
   private transient List<IGroupLayer> groupLayers = Collections.unmodifiableList(this.rawGroupLayers);
 
+  public TmxMap() {
+    // keep for serialization
+  }
+
+  public TmxMap(IMapOrientation orientation) {
+    this.mapOrientation = orientation;
+  }
+
   @XmlTransient
   private int chunkOffsetX;
 
@@ -438,6 +446,10 @@ public final class TmxMap extends CustomPropertyProvider implements IMap, Compar
 
   @Override
   public List<ILayer> getRenderLayers() {
+    if (this.layers == null) {
+      this.layers = new CopyOnWriteArrayList<>();
+    }
+
     return this.layers;
   }
 
@@ -557,7 +569,7 @@ public final class TmxMap extends CustomPropertyProvider implements IMap, Compar
     }
 
     String[] ver = this.tiledversion.split("\\.", 3);
-    
+
     int major;
     int minor;
     try {

@@ -48,6 +48,7 @@ public final class Resources {
   private static Strings strings = new Strings();
   private static Images images = new Images();
   private static Spritesheets spritesheets = new Spritesheets();
+  private static Blueprints blueprints = new Blueprints();
 
   private Resources() {
     throw new UnsupportedOperationException();
@@ -132,6 +133,17 @@ public final class Resources {
   }
 
   /**
+   * Gets the container that manages <code>Blueprint</code> resources.
+   * 
+   * @return The Blueprint resource container.
+   * 
+   * @see Blueprint
+   */
+  public static Blueprints blueprints() {
+    return blueprints;
+  }
+
+  /**
    * Load <code>Spritesheets</code>, <code>Tilesets</code> and <code>Maps</code> from a game resource file created with the utiLITI editor.
    * After loading, these resources can be accessed via this API (e.g. <code>Resources.maps().get("mapname")</code>.
    * 
@@ -160,6 +172,10 @@ public final class Resources {
     file.getMaps().parallelStream().forEach(m -> Resources.maps().add(m.getName(), m));
 
     log.log(Level.INFO, "{0} maps loaded from {1}", new Object[] { file.getMaps().size(), gameResourceFile });
+
+    file.getBluePrints().parallelStream().forEach(m -> Resources.blueprints().add(m.getName(), m));
+
+    log.log(Level.INFO, "{0} blueprints loaded from {1}", new Object[] { file.getBluePrints().size(), gameResourceFile });
 
     int tileCnt = 0;
     for (final Tileset tileset : file.getTilesets()) {
