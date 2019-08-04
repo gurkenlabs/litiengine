@@ -73,11 +73,35 @@ public final class MapUtilities {
     return new Rectangle2D.Double(minTileBounds.getX(), minTileBounds.getY(), maxTileBounds.getMaxX() - minTileBounds.getX(), maxTileBounds.getMaxY() - minTileBounds.getY());
   }
 
+  /**
+   * Get the corresponding tile for a given pixel map location. This is an overload taking the Map from the current environment to calculate a tile
+   * location.
+   * 
+   * @param mapLocation
+   *          the pixel map location.
+   * @return The x / y tile coordinate for the given mapLocation.
+   * @see MapUtilities.getTile(IMap map, final Point2D mapLocation)
+   */
   public static Point getTile(final Point2D mapLocation) {
     if (Game.world().environment() == null) {
       return new Point(-1, -1);
     }
-    IMap map = Game.world().environment().getMap();
+    return getTile(Game.world().environment().getMap(), mapLocation);
+  }
+
+  /**
+   * Get the corresponding tile for a given pixel map location.
+   * 
+   * @param map
+   *          The map on which to calculate the tile location.
+   * @param mapLocation
+   *          the pixel map location.
+   * @return The x / y tile coordinate for the given mapLocation .
+   */
+  public static Point getTile(IMap map, final Point2D mapLocation) {
+    if (map == null) {
+      return new Point(-1, -1);
+    }
     return map.getOrientation().getTile(mapLocation, map);
   }
 
