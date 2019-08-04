@@ -74,6 +74,10 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   public MapObject() {
   }
 
+  public MapObject(String type) {
+    this.type = type;
+  }
+
   /**
    * Copy Constructor for copying instances of MapObjects.
    * This variant of the constructor will assign an entirely new ID to the newly created MapObject.
@@ -112,7 +116,7 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
       this.setId(mapObjectToBeCopied.getId());
     }
   }
-  
+
   public MapObject(MapObject mapObjectToBeCopied, int id) {
     this(mapObjectToBeCopied);
     this.setId(id);

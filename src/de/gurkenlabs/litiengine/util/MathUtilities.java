@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.util;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class MathUtilities {
@@ -239,6 +240,10 @@ public class MathUtilities {
   }
 
   public static double randomInRange(final double min, final double max) {
+    return randomInRange(min, max, ThreadLocalRandom.current());
+  }
+
+  public static double randomInRange(final double min, final double max, Random random) {
     if (min == max) {
       return min;
     }
@@ -247,10 +252,14 @@ public class MathUtilities {
       throw new IllegalArgumentException("min value is > than max value");
     }
 
-    return min + ThreadLocalRandom.current().nextDouble() * (max - min);
+    return min + random.nextDouble() * (max - min);
   }
 
   public static int randomInRange(final int min, final int max) {
+    return randomInRange(min, max, ThreadLocalRandom.current());
+  }
+
+  public static int randomInRange(final int min, final int max, Random random) {
     if (min == max) {
       return min;
     }
@@ -259,7 +268,7 @@ public class MathUtilities {
       throw new IllegalArgumentException("min value is > than max value");
     }
 
-    return ThreadLocalRandom.current().nextInt(max - min) + min;
+    return random.nextInt(max - min) + min;
   }
 
   public static int randomSign() {
