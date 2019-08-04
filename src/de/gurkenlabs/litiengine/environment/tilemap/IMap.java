@@ -43,8 +43,18 @@ public interface IMap extends ILayerList {
    */
   public Dimension getSizeInPixels();
 
+  /**
+   * Gets the map width in tiles.
+   *
+   * @return the width in tiles
+   */
   public int getWidth();
 
+  /**
+   * Gets the map height in tiles.
+   *
+   * @return the height in tiles
+   */
   public int getHeight();
 
   /**
@@ -118,9 +128,9 @@ public interface IMap extends ILayerList {
   public String getName();
 
   public int getNextObjectId();
-  
+
   public int getNextLayerId();
-  
+
   public Color getBackgroundColor();
 
   public boolean isInfinite();

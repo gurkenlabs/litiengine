@@ -6,6 +6,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Dimension2D;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.Ellipse2D.Double;
 import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
@@ -612,5 +613,14 @@ public class GeometricUtilities {
     }
 
     return normalized;
+  }
+
+  public static Point2D getRandomPointInCircle(Ellipse2D.Double circle) {
+    double radius = circle.getWidth();
+    double t = 2 * Math.PI * Math.random();
+    double u = Math.random() + Math.random();
+    double r = u > 1 ? 2 - u : u;
+
+    return new Point2D.Double(radius * r * Math.cos(t), radius * r * Math.sin(t));
   }
 }
