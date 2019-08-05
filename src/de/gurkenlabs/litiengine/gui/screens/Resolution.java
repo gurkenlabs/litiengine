@@ -217,7 +217,7 @@ public class Resolution {
     /**
      * Gets the name of this aspect ratio
      * 
-     * @return
+     * @return The name of this aspect ratio.
      */
     public String getName() {
       return this.name;

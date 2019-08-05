@@ -80,7 +80,7 @@ public final class MapUtilities {
    * @param mapLocation
    *          the pixel map location.
    * @return The x / y tile coordinate for the given mapLocation.
-   * @see MapUtilities.getTile(IMap map, final Point2D mapLocation)
+   * @see MapUtilities#getTile(IMap, Point2D)
    */
   public static Point getTile(final Point2D mapLocation) {
     if (Game.world().environment() == null) {
