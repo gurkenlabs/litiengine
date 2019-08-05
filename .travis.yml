@@ -17,8 +17,6 @@ services:
 
 script: 
 - ./gradlew fullbuild
-- jdk_switcher use openjdk8
-- ./gradlew fullbuild
 - if [ $TRAVIS_PULL_REQUEST = 'false' ]; then 
     sonar-scanner; 
   fi
