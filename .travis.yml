@@ -1,8 +1,6 @@
 language: java
 install: true
 before_install:
-  - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
   - chmod +x gradlew
 
 jdk: openjdk11
@@ -13,6 +11,9 @@ git:
 addons:
   sonarcloud:
     organization: "gurkenlabs-github"
+
+services:
+  - xvfb
 
 script: 
 - ./gradlew fullbuild
