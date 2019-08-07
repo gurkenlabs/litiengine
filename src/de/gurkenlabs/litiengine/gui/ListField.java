@@ -211,6 +211,17 @@ public class ListField extends GuiComponent {
     this.prepareInput();
   }
 
+  /**
+   * Resets the ListField's selection to {@code null}.
+   * <br>
+   * The ListField will then show no selection.
+   */
+  public void deselect() {
+    this.selectionColumn = -1;
+    this.selectionRow = -1;
+    this.selectedComponent = null;
+  }
+
   public Spritesheet getButtonSprite() {
     return this.buttonSprite;
   }
@@ -278,6 +289,9 @@ public class ListField extends GuiComponent {
   }
 
   public Object getSelectedObject() {
+    if (this.getSelectedComponent() == null) {
+      return null;
+    }
     return this.getContent()[this.selectionColumn][this.selectionRow];
   }
 
