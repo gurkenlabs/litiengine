@@ -32,8 +32,8 @@ public class ListField extends GuiComponent {
 
   private ImageComponent selectedComponent;
 
-  private int selectionColumn;
-  private int selectionRow;
+  private int selectionColumn = -1;
+  private int selectionRow = -1;
 
   private boolean selectEntireColumn = false;
   private boolean selectEntireRow = false;
@@ -576,6 +576,30 @@ public class ListField extends GuiComponent {
     return this.sliderInside;
   }
 
+  /**
+   * Slides the ListField up by one row.
+   */
+  public void slideUp() {
+    if (this.getVerticalLowerBound() <= 0) {
+      return;
+    }
+
+    this.setVerticalLowerBound(this.getVerticalLowerBound() - 1);
+    this.refresh();
+  }
+
+  /**
+   * Slides the ListField down by one row.
+   */
+  public void slideDown() {
+    if (this.getVerticalLowerBound() >= this.getMaxRows() - this.getNumberOfShownRows()) {
+      return;
+    }
+
+    this.setVerticalLowerBound(this.getVerticalLowerBound() + 1);
+    this.refresh();
+  }
+
   private void prepareInput() {
     Input.keyboard().onKeyTyped(KeyEvent.VK_UP, e -> {
       if (this.isSuspended() || !this.isVisible() || !this.isArrowKeyNavigation()) {
@@ -611,9 +635,9 @@ public class ListField extends GuiComponent {
       }
       if (this.isHovered()) {
         if (e.getEvent().getWheelRotation() < 0) {
-          this.setSelection(this.getHorizontalLowerBound(), this.selectionRow - 1);
+          this.slideUp();
         } else {
-          this.setSelection(this.getHorizontalLowerBound(), this.selectionRow + 1);
+          this.slideDown();
         }
         return;
       }

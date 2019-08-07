@@ -113,7 +113,7 @@ public class DropdownListField extends GuiComponent {
     this.getContentList().suspend();
 
     if (!this.getListEntries().isEmpty()) {
-      this.chosenElementComponent.setText(this.getListEntries().get(this.getSelectedIndex()).getText());
+      this.chosenElementComponent.setText(this.getListEntries().get(0).getText());
     }
 
     this.dropDownButton.onClicked(e -> this.toggleDropDown());
