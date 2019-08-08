@@ -185,14 +185,15 @@ public final class GameWindow {
   }
 
   private void setResolution(Dimension dim) {
-    Dimension insetAwareDimension = new Dimension(dim.width + this.hostControl.getInsets().left + this.hostControl.getInsets().right, dim.height + this.hostControl.getInsets().top + this.hostControl.getInsets().bottom);
+    Dimension dimension = new Dimension(dim.width, dim.height);
 
     if (Game.config().graphics().enableResolutionScaling()) {
       this.resolutionScale = (float) (dim.getWidth() / Resolution.Ratio16x9.RES_1920x1080.getWidth());
       Game.graphics().setBaseRenderScale(Game.graphics().getBaseRenderScale() * this.resolutionScale);
     }
 
-    this.hostControl.setSize(insetAwareDimension);
+    this.hostControl.getContentPane().setPreferredSize(dimension);
+    this.hostControl.pack();
   }
 
   private void initializeEventListeners() {
