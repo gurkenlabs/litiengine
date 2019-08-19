@@ -63,7 +63,7 @@ public class DropdownListField extends GuiComponent {
   }
 
   public List<ImageComponent> getListEntries() {
-    return this.getContentList().getListEntries();
+    return this.getContentList().getListEntry(0);
   }
 
   public int getNumberOfShownElements() {
@@ -71,7 +71,7 @@ public class DropdownListField extends GuiComponent {
   }
 
   public int getSelectedIndex() {
-    return this.getContentList().getSelection();
+    return this.getContentList().getSelectionRow();
   }
 
   public Object getSelectedObject() {
@@ -79,7 +79,7 @@ public class DropdownListField extends GuiComponent {
       return null;
     }
 
-    return this.getContentArray()[this.getContentList().getSelection()];
+    return this.getContentArray()[this.getContentList().getSelectionRow()];
   }
 
   public boolean isArrowKeyNavigation() {
@@ -113,7 +113,7 @@ public class DropdownListField extends GuiComponent {
     this.getContentList().suspend();
 
     if (!this.getListEntries().isEmpty()) {
-      this.chosenElementComponent.setText(this.getListEntries().get(this.getSelectedIndex()).getText());
+      this.chosenElementComponent.setText(this.getListEntries().get(0).getText());
     }
 
     this.dropDownButton.onClicked(e -> this.toggleDropDown());
@@ -146,7 +146,7 @@ public class DropdownListField extends GuiComponent {
       return;
     }
 
-    this.getContentList().setSelection(selectionIndex);
+    this.getContentList().setSelection(0, selectionIndex);
   }
 
   public void setSelection(final Object selectedObject) {
@@ -182,14 +182,14 @@ public class DropdownListField extends GuiComponent {
       if (this.isSuspended() || !this.isVisible() || !this.isArrowKeyNavigation() || !this.getChosenElementComponent().isHovered()) {
         return;
       }
-      this.getContentList().setSelection(this.getSelectedIndex() - 1);
+      this.getContentList().setSelection(0, this.getSelectedIndex() - 1);
     });
 
     Input.keyboard().onKeyTyped(KeyEvent.VK_DOWN, e -> {
       if (this.isSuspended() || !this.isVisible() || !this.isArrowKeyNavigation() || !this.getChosenElementComponent().isHovered()) {
         return;
       }
-      this.getContentList().setSelection(this.getSelectedIndex() + 1);
+      this.getContentList().setSelection(0, this.getSelectedIndex() + 1);
     });
 
     this.onMouseWheelScrolled(e -> {
@@ -197,9 +197,9 @@ public class DropdownListField extends GuiComponent {
         return;
       }
       if (e.getEvent().getWheelRotation() < 0) {
-        this.getContentList().setSelection(this.getSelectedIndex() - 1);
+        this.getContentList().setSelection(0, this.getSelectedIndex() - 1);
       } else {
-        this.getContentList().setSelection(this.getSelectedIndex() + 1);
+        this.getContentList().setSelection(0, this.getSelectedIndex() + 1);
       }
       return;
     });
