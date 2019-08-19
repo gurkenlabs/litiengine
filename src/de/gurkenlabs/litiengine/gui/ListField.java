@@ -382,7 +382,7 @@ public class ListField extends GuiComponent {
         borderHeight = this.getHeight() + 2;
       }
 
-      border = new Rectangle2D.Double(this.getX() - 1, this.selectedComponent.getY() - 1, borderWidth, borderHeight);
+      border = new Rectangle2D.Double(this.selectedComponent.getX() - 1, this.selectedComponent.getY() - 1, borderWidth, borderHeight);
 
       g.setColor(Color.WHITE);
       ShapeRenderer.renderOutline(g, border, 2);
