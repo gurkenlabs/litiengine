@@ -339,8 +339,11 @@ public class ListField extends GuiComponent {
           continue;
         }
 
-        if (this.getListEntry(column).get(row) != null) {
+        if (row + this.getVerticalLowerBound() < this.getContent()[column + this.getHorizontalLowerBound()].length && this.getContent()[column + this.getHorizontalLowerBound()][row + this.getVerticalLowerBound()] != null) {
           this.getListEntry(column).get(row).setText(this.getContent()[column + this.getHorizontalLowerBound()][row + this.getVerticalLowerBound()].toString());
+        }
+        else {
+          this.getListEntry(column).get(row).setText("");
         }
       }
     }
