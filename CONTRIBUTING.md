@@ -2,7 +2,7 @@
 You are awesome! Thank you for considering contributing to LITIengine.
 Before you start, we would like to share a few guidelines for contributions to LITIengine with you.
 
-In order to contribute to our project, we expect you to have fully read and agreed to our [Code of Conduct](https://github.com/gurkenlabs/litiengine/blob/master/docs/CODE_OF_CONDUCT.md). 
+In order to contribute to our project, we expect you to have fully read and agreed to our [Code of Conduct](https://github.com/gurkenlabs/litiengine/blob/master/CODE_OF_CONDUCT.md). 
 
 ## How can I help?
 You can not only support the development of LITIengine by contributing code!
