@@ -59,25 +59,6 @@ If you are searching for a particular method or class within the API or just wan
 ## Questions?
 Visit the official [LITIengine forum](https://forum.litiengine.com/) for troubleshooting or to learn about the LITIengine community. If you encounter bugs or want to request fancy new features, you can also open an issue in our [Issue Tracker](https://github.com/gurkenlabs/litiengine/issues).
 
-## Games made with LITIengine
-### [GoIn - Behave or GET LOST!](https://gurkenlabs.de/ldjam-42-goin-behave-or-get-lost/)
-![GoIn - Behave or GET LOST!](https://gurkenlabs.de/wp-content/uploads/2018/11/banner1.png "GoIn")
-
-### [DR.LEPUS](https://drlepus.com)
-![DR.LEPUS - The Last Rabbit on Earth](https://gurkenlabs.de/wp-content/uploads/2017/04/page-title.png "DR.LEPUS")
-
-### [Naughty Elves](https://naughtyelves.gurkenlabs.de/)
-![Naughty Elves](https://gurkenlabs.de/wp-content/uploads/2018/02/banner.png "Naughty Elves")
-
-### [Naughty Gnomes](https://gurkenlabs.de/naughty-gnomes/) ([Ludum Dare 38](https://ldjam.com/events/ludum-dare/38/naughty-gnomes))
-![Naughty Gnomes](https://gurkenlabs.de/wp-content/uploads/2017/04/banner.png "Naughty Gnomes")
-
-### [DR.LEPUS - The Last Rabbit on Earth](https://gurkenlabs.de/ldjam35-dr-lepus/) ([Ludum Dare 35](http://ludumdare.com/compo/ludum-dare-35/?action=preview&uid=67508))
-![DR.LEPUS - The Last Rabbit on Earth](https://gurkenlabs.de/wp-content/uploads/2016/09/page-title.png "DR.LEPUS - The Last Rabbit on Earth")
-
-### [LITI - Stoneage Brawl](https://gurkenlabs.de/liti/)
-![LITI - Stoneage Brawl](https://gurkenlabs.de/wp-content/uploads/2017/01/liti-stoneage-brawl-banner.png "LITI - Stoneage Brawl")
-
 ## Libraries Used
 
 * [JInput](https://github.com/jinput/jinput) for Gamepad support
