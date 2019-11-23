@@ -118,7 +118,6 @@ public final class XmlUtilities {
 
       // first: marshal to byte array
       jaxbMarshaller.marshal(object, out);
-      out.flush();
 
       // second: postprocess xml and then write it to the file
       XmlUtilities.saveWithCustomIndentation(new ByteArrayInputStream(out.toByteArray()), fileOut, 1);
