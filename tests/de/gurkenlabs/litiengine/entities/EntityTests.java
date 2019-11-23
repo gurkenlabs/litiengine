@@ -104,6 +104,7 @@ public class EntityTests {
       didNamedAction = true;
     }
 
+    @SuppressWarnings("unused")
     public void imNotAnAction() {
     }
     
