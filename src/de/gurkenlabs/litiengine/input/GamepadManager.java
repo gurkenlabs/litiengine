@@ -85,6 +85,8 @@ public class GamepadManager implements ILaunchable, GamepadEvents {
         }
       }
     });
+    
+    updateGamepads();
   }
 
   public void onGamepadAdded(final Consumer<Gamepad> cons) {
