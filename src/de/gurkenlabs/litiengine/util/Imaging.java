@@ -20,6 +20,9 @@ import java.awt.image.ImageFilter;
 import java.awt.image.ImageProducer;
 import java.awt.image.RGBImageFilter;
 import java.awt.image.WritableRaster;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
 import java.util.function.UnaryOperator;
 
 import de.gurkenlabs.litiengine.entities.Rotation;
@@ -390,6 +393,27 @@ public final class Imaging {
     g.drawImage(img, 0, 0 + h, w, -h, null);
     g.dispose();
     return dimg;
+  }
+
+  /**
+   * Replace colors in an image according to a Map containing  source colors and target colors, then return the result.
+   * @param bufferedImage the original image
+   * @param colorMappings a Map with source colors as keys and target colors as values
+   * @return a new version of the original image, where the source colors are replaced with the target colors.
+   */
+  public static BufferedImage replaceColors(final BufferedImage bufferedImage, Map<Color, Color> colorMappings) {
+    BufferedImage recoloredImage = copy(bufferedImage);
+    for (Color originalColor : colorMappings.keySet()) {
+      for (int y = 0; y < recoloredImage.getHeight(); y++) {
+        for (int x = 0; x < recoloredImage.getWidth(); x++) {
+          if (recoloredImage.getRGB(x, y) == originalColor.getRGB()) {
+            int new_clr = colorMappings.get(originalColor).getRGB();
+            recoloredImage.setRGB(x, y, new_clr);
+          }
+        }
+      }
+    }
+    return recoloredImage;
   }
 
   public static BufferedImage rotate(final BufferedImage bufferedImage, final Rotation rotation) {
