@@ -269,19 +269,17 @@ public final class RenderEngine {
     final IEntityAnimationController<?> animationController = entity.animations();
     if (animationController != null) {
       final BufferedImage img = animationController.getCurrentSprite();
-      if (img == null) {
-        return;
-      }
+      if (img != null) {
+        if (animationController.isAutoScaling()) {
+          final double ratioX = entity.getWidth() / img.getWidth();
+          final double ratioY = entity.getHeight() / img.getHeight();
+          ImageRenderer.renderScaled(g, img, Game.world().camera().getViewportLocation(entity.getLocation()), ratioX, ratioY);
+        } else {
+          double deltaX = (entity.getWidth() - img.getWidth()) / 2.0;
+          double deltaY = (entity.getHeight() - img.getHeight()) / 2.0;
 
-      if (animationController.isAutoScaling()) {
-        final double ratioX = entity.getWidth() / img.getWidth();
-        final double ratioY = entity.getHeight() / img.getHeight();
-        ImageRenderer.renderScaled(g, img, Game.world().camera().getViewportLocation(entity.getLocation()), ratioX, ratioY);
-      } else {
-        double deltaX = (entity.getWidth() - img.getWidth()) / 2.0;
-        double deltaY = (entity.getHeight() - img.getHeight()) / 2.0;
-
-        ImageRenderer.renderTransformed(g, img, Game.world().camera().getViewportLocation(entity.getX() + deltaX, entity.getY() + deltaY), animationController.getAffineTransform());
+          ImageRenderer.renderTransformed(g, img, Game.world().camera().getViewportLocation(entity.getX() + deltaX, entity.getY() + deltaY), animationController.getAffineTransform());
+        }
       }
     }
 
