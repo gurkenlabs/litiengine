@@ -7,8 +7,6 @@ import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.gurkenlabs.litiengine.graphics.Spritesheet;
-
 public class NumberAdjuster extends TextFieldComponent {
   public static final FontIcon ARROW_DOWN = new FontIcon(ICON_FONT, "\uE84A");
   public static final FontIcon ARROW_UP = new FontIcon(ICON_FONT, "\uE84B");
@@ -17,27 +15,20 @@ public class NumberAdjuster extends TextFieldComponent {
   private BigDecimal lowerBound;
   private BigDecimal upperBound;
   private BigDecimal currentValue;
-  private Spritesheet buttonSprite;
   private final List<Consumer<BigDecimal>> valueChangeConsumers;
 
-  public NumberAdjuster(final double x, final double y, final double width, final double height, final Spritesheet textBackground, final Spritesheet buttonBackground, final double lowerBound, final double upperBound, final double startValue, final double stepSize) {
-    super(x, y, width, height, textBackground, Double.toString(startValue));
-    this.buttonSprite = buttonBackground;
+  public NumberAdjuster(final double x, final double y, final double width, final double height,  final double lowerBound, final double upperBound, final double startValue, final double stepSize) {
+    super(x, y, width, height, Double.toString(startValue));
     this.valueChangeConsumers = new CopyOnWriteArrayList<>();
     this.lowerBound = BigDecimal.valueOf(lowerBound);
     this.upperBound = BigDecimal.valueOf(upperBound);
     this.setCurrentValue(BigDecimal.valueOf(startValue));
     this.step = BigDecimal.valueOf(stepSize);
     this.setFormat(DOUBLE_FORMAT);
-
   }
 
   public void decrement() {
     this.setCurrentValue(this.getCurrentValue().subtract(this.getStepSize()));
-  }
-
-  public Spritesheet getButtonSprite() {
-    return this.buttonSprite;
   }
 
   public BigDecimal getCurrentValue() {
@@ -66,8 +57,8 @@ public class NumberAdjuster extends TextFieldComponent {
 
   @Override
   public void prepare() {
-    ImageComponent buttonUp = new ImageComponent(this.getX() + this.getWidth(), this.getY(), this.getHeight() / 2, this.getHeight() / 2, this.getButtonSprite(), ARROW_UP.getText(), null);
-    ImageComponent buttonDown = new ImageComponent(this.getX() + this.getWidth(), this.getY() + this.getHeight() / 2, this.getHeight() / 2, this.getHeight() / 2, this.getButtonSprite(), ARROW_DOWN.getText(), null);
+    ImageComponent buttonUp = new ImageComponent(this.getX() + this.getWidth(), this.getY(), this.getHeight() / 2, this.getHeight() / 2,  ARROW_UP.getText());
+    ImageComponent buttonDown = new ImageComponent(this.getX() + this.getWidth(), this.getY() + this.getHeight() / 2, this.getHeight() / 2, this.getHeight() / 2, ARROW_DOWN.getText());
     buttonUp.setFont(ARROW_UP.getFont());
     buttonDown.setFont(ARROW_UP.getFont());
 
@@ -83,10 +74,6 @@ public class NumberAdjuster extends TextFieldComponent {
         log.log(Level.SEVERE, ex.getMessage(), ex);
       }
     });
-  }
-
-  public void setButtonSprite(final Spritesheet buttonSprite) {
-    this.buttonSprite = buttonSprite;
   }
 
   public void setCurrentValue(final BigDecimal newValue) {

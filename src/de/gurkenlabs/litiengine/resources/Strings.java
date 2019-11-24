@@ -105,6 +105,9 @@ public final class Strings {
       final List<String> strings = new ArrayList<>();
       String str = "";
       while ((str = reader.readLine()) != null) {
+        if (str.startsWith("//")) {
+          continue;
+        }
         strings.add(str);
       }
 

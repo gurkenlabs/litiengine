@@ -30,8 +30,8 @@ public class TextFieldComponent extends ImageComponent {
   private long lastToggled;
   private int maxLength = 0;
 
-  public TextFieldComponent(final double x, final double y, final double width, final double height, final Spritesheet spritesheet, final String text) {
-    super(x, y, width, height, spritesheet, text, null);
+  public TextFieldComponent(final double x, final double y, final double width, final double height, final String text) {
+    super(x, y, width, height, text);
     this.changeConfirmedConsumers = new CopyOnWriteArrayList<>();
     this.setText(text);
     this.flickerDelay = 100;
@@ -167,7 +167,7 @@ public class TextFieldComponent extends ImageComponent {
 
     this.setText(this.getText() + text);
   }
-  
+
   private boolean isKnownNumericFormat() {
     return this.getFormat() != null && (this.getFormat().equals(INTEGER_FORMAT) || this.getFormat().equals(DOUBLE_FORMAT));
   }
