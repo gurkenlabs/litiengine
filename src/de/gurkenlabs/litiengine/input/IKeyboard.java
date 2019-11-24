@@ -27,6 +27,18 @@ public interface IKeyboard extends IUpdateable {
   public void onKeyTyped(Consumer<KeyEvent> consumer);
 
   /**
+   * Removes all registered event consumers from the Keyboard instance. This <b>does not affect</b> registered <code>KeyListener</code> instances.
+   * 
+   * @see #onKeyPressed(Consumer)
+   * @see #onKeyPressed(int, Consumer)
+   * @see #onKeyReleased(Consumer)
+   * @see #onKeyReleased(int, Consumer)
+   * @see #onKeyTyped(Consumer)
+   * @see #onKeyTyped(int, Consumer)
+   */
+  public void clearEventConsumers();
+
+  /**
    * Register for key events.
    *
    * @param observer

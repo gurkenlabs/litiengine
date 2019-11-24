@@ -254,6 +254,16 @@ public class Mouse implements IMouse, IUpdateable {
   }
 
   @Override
+  public void clearEventConsumers() {
+    this.mouseClickedConsumer.clear();
+    this.mouseDraggedConsumer.clear();
+    this.mouseMovedConsumer.clear();
+    this.mousePressedConsumer.clear();
+    this.mouseReleasedConsumer.clear();
+    this.wheelMovedConsumer.clear();
+  }
+
+  @Override
   public void addMouseListener(final MouseListener listener) {
     if (this.mouseListeners.contains(listener)) {
       return;

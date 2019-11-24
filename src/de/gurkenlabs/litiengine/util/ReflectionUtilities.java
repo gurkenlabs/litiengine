@@ -27,6 +27,20 @@ public final class ReflectionUtilities {
     return null;
   }
 
+  @SuppressWarnings("unchecked")
+  public static <V> V getStaticValue(Class<?> cls, String fieldName) {
+    Field keyField = ReflectionUtilities.getField(cls, fieldName);
+    if (keyField == null) {
+      return null;
+    }
+
+    try {
+      return (V) keyField.get(null);
+    } catch (Exception e) {
+      return null;
+    }
+  }
+
   public static List<Field> getAllFields(List<Field> fields, Class<?> type) {
     fields.addAll(Arrays.asList(type.getDeclaredFields()));
 

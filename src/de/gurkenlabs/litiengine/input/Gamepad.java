@@ -117,6 +117,18 @@ public class Gamepad implements GamepadEvents, IUpdateable {
     this.releasedConsumer.add(consumer);
   }
 
+  @Override
+  public void clearEventConsumers() {
+    this.releasedConsumer.clear();
+    this.componentReleasedConsumer.clear();
+    
+    this.pressedConsumer.clear();
+    this.componentPressedConsumer.clear();
+    
+    this.pollConsumer.clear();
+    this.componentPollConsumer.clear();
+  }
+
   public void setAxisDeadzone(float gamepadAxisDeadzone) {
     this.axisDeadzone = gamepadAxisDeadzone;
   }
