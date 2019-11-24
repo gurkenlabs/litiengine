@@ -33,6 +33,8 @@ public class GamepadManager implements ILaunchable, GamepadEvents {
   private final List<BiConsumer<String, Float>> pressedConsumer;
   private final List<BiConsumer<String, Float>> releasedConsumer;
 
+  private final List<Gamepad> gamePads;
+
   private final Thread hotPlugThread;
 
   private int defaultgamePadIndex = -1;
@@ -47,6 +49,7 @@ public class GamepadManager implements ILaunchable, GamepadEvents {
     this.pollConsumer = new CopyOnWriteArrayList<>();
     this.pressedConsumer = new CopyOnWriteArrayList<>();
     this.releasedConsumer = new CopyOnWriteArrayList<>();
+    this.gamePads = new CopyOnWriteArrayList<>();
 
     this.hotPlugThread = new Thread(() -> {
       while (!Thread.interrupted()) {
@@ -78,15 +81,50 @@ public class GamepadManager implements ILaunchable, GamepadEvents {
     this.onGamepadRemoved(pad -> {
       if (this.defaultgamePadIndex == pad.getIndex()) {
         this.defaultgamePadIndex = -1;
-        final Gamepad newGamePad = Input.getGamepad();
+        final Gamepad newGamePad = current();
         if (newGamePad != null) {
           this.defaultgamePadIndex = newGamePad.getIndex();
           this.hookupToGamepad(newGamePad);
         }
       }
     });
-    
+
     updateGamepads();
+  }
+
+  public List<Gamepad> getAll() {
+    return this.gamePads;
+  }
+
+  /**
+   * Gets the first game pad that is currently available.
+   *
+   * @return The first available {@link Gamepad} instance
+   */
+  public Gamepad current() {
+    if (this.gamePads.isEmpty()) {
+      return null;
+    }
+
+    return this.gamePads.get(0);
+  }
+
+  /**
+   * Gets the game pad with the specified index if it is still plugged in. After
+   * re-plugging a controller while the game is running, its index might change.
+   *
+   * @param index
+   *          The index of the {@link Gamepad}.
+   * @return The {@link Gamepad} with the specified index.
+   */
+  public Gamepad get(final int index) {
+    for (final Gamepad gamepad : this.gamePads) {
+      if (gamepad.getIndex() == index) {
+        return gamepad;
+      }
+    }
+
+    return null;
   }
 
   public void onGamepadAdded(final Consumer<Gamepad> cons) {
@@ -139,12 +177,12 @@ public class GamepadManager implements ILaunchable, GamepadEvents {
     this.releasedConsumer.add(consumer);
   }
 
-  public void remove(final Gamepad gamepad) {
+  protected void remove(final Gamepad gamepad) {
     if (gamepad == null) {
       return;
     }
 
-    Input.gamepads().remove(gamepad);
+    this.getAll().remove(gamepad);
     for (final Consumer<Gamepad> cons : this.gamepadRemovedConsumer) {
       cons.accept(gamepad);
     }
@@ -260,7 +298,7 @@ public class GamepadManager implements ILaunchable, GamepadEvents {
           continue;
         }
 
-        final Gamepad existing = Input.getGamepad(i);
+        final Gamepad existing = this.get(i);
         if (existing != null && existing.getName().equals(controller.getName())) {
           // already added
           continue;
@@ -268,7 +306,7 @@ public class GamepadManager implements ILaunchable, GamepadEvents {
 
         // add new gamepads
         final Gamepad newGamepad = new Gamepad(i, controller);
-        Input.gamepads().add(newGamepad);
+        this.getAll().add(newGamepad);
         for (final Consumer<Gamepad> cons : this.gamepadAddedConsumer) {
           cons.accept(newGamepad);
         }

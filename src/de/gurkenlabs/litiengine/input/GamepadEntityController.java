@@ -16,21 +16,21 @@ public class GamepadEntityController<T extends IMobileEntity> extends MovementCo
 
   public GamepadEntityController(final T entity, boolean rotateWithRightStick) {
     super(entity);
-    if (Input.getGamepad() != null) {
-      this.gamePadIndex = Input.getGamepad().getIndex();
+    if (Input.gamepads().current() != null) {
+      this.gamePadIndex = Input.gamepads().current().getIndex();
     }
 
     this.rotateWithRightStick = rotateWithRightStick;
-    Input.gamepadManager().onGamepadAdded(pad -> {
+    Input.gamepads().onGamepadAdded(pad -> {
       if (this.gamePadIndex == -1) {
         this.gamePadIndex = pad.getIndex();
       }
     });
 
-    Input.gamepadManager().onGamepadRemoved(pad -> {
+    Input.gamepads().onGamepadRemoved(pad -> {
       if (this.gamePadIndex == pad.getIndex()) {
         this.gamePadIndex = -1;
-        final Gamepad newGamePad = Input.getGamepad();
+        final Gamepad newGamePad = Input.gamepads().current();
         if (newGamePad != null) {
           this.gamePadIndex = newGamePad.getIndex();
         }
@@ -70,12 +70,12 @@ public class GamepadEntityController<T extends IMobileEntity> extends MovementCo
   }
 
   private void retrieveGamepadValues() {
-    if (this.gamePadIndex == -1 || this.gamePadIndex != -1 && Input.getGamepad(this.gamePadIndex) == null) {
+    if (this.gamePadIndex == -1 || this.gamePadIndex != -1 && Input.gamepads().get(this.gamePadIndex) == null) {
       return;
     }
 
-    final float x = Input.getGamepad(this.gamePadIndex).getPollData(Identifier.Axis.X);
-    final float y = Input.getGamepad(this.gamePadIndex).getPollData(Identifier.Axis.Y);
+    final float x = Input.gamepads().get(this.gamePadIndex).getPollData(Identifier.Axis.X);
+    final float y = Input.gamepads().get(this.gamePadIndex).getPollData(Identifier.Axis.Y);
 
     if (Math.abs(x) > this.gamepadDeadzone) {
       this.setDx(x);
@@ -86,8 +86,8 @@ public class GamepadEntityController<T extends IMobileEntity> extends MovementCo
     }
 
     if (this.isRotateWithRightStick()) {
-      final float rightX = Input.getGamepad(this.gamePadIndex).getPollData(Identifier.Axis.RX);
-      final float rightY = Input.getGamepad(this.gamePadIndex).getPollData(Identifier.Axis.RY);
+      final float rightX = Input.gamepads().get(this.gamePadIndex).getPollData(Identifier.Axis.RX);
+      final float rightY = Input.gamepads().get(this.gamePadIndex).getPollData(Identifier.Axis.RY);
       float targetX = 0;
       float targetY = 0;
       if (Math.abs(rightX) > this.gamepadRightStick) {

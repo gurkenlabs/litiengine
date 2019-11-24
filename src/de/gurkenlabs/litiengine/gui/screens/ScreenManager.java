@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.gui.screens;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -92,6 +93,10 @@ public final class ScreenManager {
   public Screen get(String screenName) {
     Optional<Screen> opt = this.screens.stream().filter(element -> element.getName().equalsIgnoreCase(screenName)).findFirst();
     return opt.orElse(null);
+  }
+  
+  public Collection<Screen> getAll(){
+    return this.screens;
   }
 
   public Screen current() {

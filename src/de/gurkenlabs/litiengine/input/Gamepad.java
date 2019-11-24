@@ -190,7 +190,7 @@ public class Gamepad implements GamepadEvents, IUpdateable {
     Game.inputLoop().detach(this);
     this.componentPollConsumer.clear();
     this.componentPressedConsumer.clear();
-    Input.gamepadManager().remove(this);
+    Input.gamepads().remove(this);
   }
 
   private void handlePollEvents(Event event) {

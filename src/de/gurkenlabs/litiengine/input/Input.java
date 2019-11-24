@@ -15,13 +15,12 @@ import de.gurkenlabs.litiengine.GameListener;
  * 
  * @see #mouse()
  * @see #keyboard()
- * @see #gamepadManager()
+ * @see #gamepads()
  */
 public final class Input {
   private static final Logger log = Logger.getLogger(Input.class.getName());
 
   private static GamepadManager gamePadManager;
-  private static List<Gamepad> gamePads;
   private static IKeyboard keyboard;
   private static IMouse mouse;
 
@@ -29,7 +28,11 @@ public final class Input {
     throw new UnsupportedOperationException();
   }
 
-  public static GamepadManager gamepadManager() {
+  public static GamepadManager gamepads() {
+    if (!Game.config().input().isGamepadSupport()) {
+      log.log(Level.SEVERE, "Cannot access gamepads because gamepad support is disabled in the configuration.");
+    }
+    
     return gamePadManager;
   }
 
@@ -39,41 +42,6 @@ public final class Input {
 
   public static IMouse mouse() {
     return mouse;
-  }
-
-  public static List<Gamepad> gamepads() {
-    return gamePads;
-  }
-
-  /**
-   * Gets the first game pad that is currently available.
-   *
-   * @return The first available {@link Gamepad} instance
-   */
-  public static Gamepad getGamepad() {
-    if (gamePads.isEmpty()) {
-      return null;
-    }
-
-    return gamePads.get(0);
-  }
-
-  /**
-   * Gets the game pad with the specified index if it is still plugged in. After
-   * re-plugging a controller while the game is running, its index might change.
-   *
-   * @param index
-   *          The index of the {@link Gamepad}.
-   * @return The {@link Gamepad} with the specified index.
-   */
-  public static Gamepad getGamepad(final int index) {
-    for (final Gamepad gamepad : gamePads) {
-      if (gamepad.getIndex() == index) {
-        return gamepad;
-      }
-    }
-
-    return null;
   }
 
   public static final class InputGameAdapter implements GameListener {
@@ -101,7 +69,6 @@ public final class Input {
         keyboard = new Keyboard();
         mouse = new Mouse();
         if (Game.config().input().isGamepadSupport()) {
-          gamePads = new CopyOnWriteArrayList<>();
           gamePadManager = new GamepadManager();
         }
       } catch (AWTException e) {
