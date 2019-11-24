@@ -329,4 +329,9 @@ public class GamepadManager implements ILaunchable, GamepadEvents {
       this.handleHotPluggedControllers = false;
     }
   }
+
+  @Override
+  public boolean isPressed(String gamepadComponent) {
+    return this.current() != null && this.current().isPressed(gamepadComponent);
+  }
 }

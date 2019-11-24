@@ -21,4 +21,17 @@ public interface GamepadEvents {
    * Removes all registered event consumers from the Gamepad instance.
    */
   public void clearEventConsumers();
+
+  /**
+   * Determines whether the specified Gamepad component is currently pressed.
+   * This is useful for button type components.
+   * 
+   * @param gamepadComponent
+   *          The component to check against.
+   * @return True if the component is pressed, otherwise false.
+   * 
+   * @see Gamepad.Buttons
+   * @see Gamepad.Xbox
+   */
+  public boolean isPressed(String gamepadComponent);
 }

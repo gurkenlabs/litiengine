@@ -121,12 +121,17 @@ public class Gamepad implements GamepadEvents, IUpdateable {
   public void clearEventConsumers() {
     this.releasedConsumer.clear();
     this.componentReleasedConsumer.clear();
-    
+
     this.pressedConsumer.clear();
     this.componentPressedConsumer.clear();
-    
+
     this.pollConsumer.clear();
     this.componentPollConsumer.clear();
+  }
+
+  @Override
+  public boolean isPressed(String gamepadComponent) {
+    return this.pressedComponents.stream().anyMatch(x -> x.equals(gamepadComponent));
   }
 
   public void setAxisDeadzone(float gamepadAxisDeadzone) {
@@ -157,6 +162,11 @@ public class Gamepad implements GamepadEvents, IUpdateable {
         this.handleRelease(comp);
       }
     }
+  }
+
+  @Override
+  public String toString() {
+    return this.controller.toString();
   }
 
   private void handlePressed(Component comp) {
