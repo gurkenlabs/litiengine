@@ -46,6 +46,18 @@ public interface IMouse extends MouseListener, MouseMotionListener, MouseWheelLi
   public void onReleased(Consumer<MouseEvent> consumer);
 
   public void onWheelMoved(Consumer<MouseWheelEvent> consumer);
+  
+  /**
+   * Removes all registered event consumers from the Mouse instance. This <b>does not affect</b> registered <code>MouseListener</code>, <code>MouseMotionListener</code> or <code>MouseWheelListener</code> instances.
+   * 
+   * @see #onClicked(Consumer)
+   * @see #onDragged(int, Consumer)
+   * @see #onMoved(Consumer)
+   * @see #onPressed(int, Consumer)
+   * @see #onReleased(Consumer)
+   * @see #onWheelMoved(int, Consumer)
+   */
+  public void clearEventConsumers();
 
   /**
    * Register mouse listener.

@@ -177,6 +177,18 @@ public class GamepadManager implements ILaunchable, GamepadEvents {
     this.releasedConsumer.add(consumer);
   }
 
+  @Override
+  public void clearEventConsumers() {
+    this.releasedConsumer.clear();
+    this.componentReleasedConsumer.clear();
+
+    this.pressedConsumer.clear();
+    this.componentPressedConsumer.clear();
+
+    this.pollConsumer.clear();
+    this.componentPollConsumer.clear();
+  }
+
   protected void remove(final Gamepad gamepad) {
     if (gamepad == null) {
       return;

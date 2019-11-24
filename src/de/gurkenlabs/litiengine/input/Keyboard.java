@@ -120,6 +120,18 @@ public class Keyboard implements KeyEventDispatcher, IKeyboard {
   }
 
   @Override
+  public void clearEventConsumers() {
+    this.keyPressedConsumer.clear();
+    this.keySpecificPressedConsumer.clear();
+    
+    this.keyReleasedConsumer.clear();
+    this.keySpecificReleasedConsumer.clear();
+    
+    this.keyTypedConsumer.clear();
+    this.keySpecificTypedConsumer.clear();
+  }
+
+  @Override
   public void addKeyListener(final KeyListener listener) {
     if (this.keyListeners.contains(listener)) {
       return;
