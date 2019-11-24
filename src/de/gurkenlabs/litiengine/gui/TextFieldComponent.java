@@ -14,7 +14,6 @@ import java.util.regex.Pattern;
 
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.input.Input;
 
 public class TextFieldComponent extends ImageComponent {

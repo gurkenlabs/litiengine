@@ -41,6 +41,10 @@ public class ImageComponent extends GuiComponent {
 
   public ImageComponent(final double x, final double y, final double width, final double height, final String text) {
     super(x, y, width, height);
+    Font defFont = new JLabel().getFont().deriveFont((float) (this.getHeight() * 3 / 6f));
+    if (this.getFont() == null) {
+      this.setFont(defFont);
+    }
     this.setText(text);
   }
 
@@ -50,15 +54,8 @@ public class ImageComponent extends GuiComponent {
   }
 
   public ImageComponent(final double x, final double y, final double width, final double height, final Spritesheet spritesheet, final String text, final Image image) {
-    super(x, y, width, height);
+    this(x, y, width, height,text);
     this.spritesheet = spritesheet;
-
-    Font defFont = new JLabel().getFont().deriveFont((float) (this.getHeight() * 3 / 6f));
-    if (this.getFont() == null) {
-      this.setFont(defFont);
-    }
-
-    this.setText(text);
     this.setImageAlign(Align.LEFT);
     this.setImageValign(Valign.TOP);
     if (image != null) {
@@ -101,37 +98,37 @@ public class ImageComponent extends GuiComponent {
       int imageHeight = this.image.getHeight(null);
       if (this.getImageScaleMode() != null) {
         boolean keepRatio;
-        
+
         switch (this.getImageScaleMode()) {
-          case STRETCH:
-            imageWidth = (int) this.getWidth();
-            imageHeight = (int) this.getHeight();
-            keepRatio = false;
-            break;
-          case FIT:
-            imageWidth = (int) this.getWidth();
-            imageHeight = (int) this.getHeight();
-            keepRatio = true;
-            break;
-          default:
-            keepRatio = false;
-            break;
+        case STRETCH:
+          imageWidth = (int) this.getWidth();
+          imageHeight = (int) this.getHeight();
+          keepRatio = false;
+          break;
+        case FIT:
+          imageWidth = (int) this.getWidth();
+          imageHeight = (int) this.getHeight();
+          keepRatio = true;
+          break;
+        default:
+          keepRatio = false;
+          break;
         }
-        
+
         bufferedImage = Imaging.scale(bufferedImage, imageWidth, imageHeight, keepRatio);
         imageWidth = bufferedImage.getWidth();
         imageHeight = bufferedImage.getHeight();
       }
-      
+
       final String cacheKey = this.image.hashCode() + "_" + imageWidth + "+" + imageHeight;
       Optional<BufferedImage> opt = Resources.images().tryGet(cacheKey);
       if (opt.isPresent()) {
         return opt.get();
       }
-      
+
       Resources.images().add(cacheKey, bufferedImage);
     }
-    
+
     return bufferedImage;
   }
 
