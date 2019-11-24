@@ -58,13 +58,12 @@ public class Gamepad implements GamepadEvents, IUpdateable {
     return this.controller.getName();
   }
 
-  public float getPollData(final Identifier identifier) {
-    final Component comp = this.controller.getComponent(identifier);
-    if (comp == null) {
-      return 0;
+  public float getPollData(final String component) {
+    if (components.containsKey(component)) {
+      return getPollData(components.get(component));
     }
 
-    return comp.getPollData();
+    return 0;
   }
 
   public float getAxisDeadzone() {
@@ -166,7 +165,16 @@ public class Gamepad implements GamepadEvents, IUpdateable {
 
   @Override
   public String toString() {
-    return "Gamepad "+ this.getIndex() + " - " +this.controller.toString();
+    return "Gamepad " + this.getIndex() + " - " + this.controller.toString();
+  }
+
+  protected float getPollData(final Identifier identifier) {
+    final Component comp = this.controller.getComponent(identifier);
+    if (comp == null) {
+      return 0;
+    }
+
+    return comp.getPollData();
   }
 
   private void handlePressed(Component comp) {
