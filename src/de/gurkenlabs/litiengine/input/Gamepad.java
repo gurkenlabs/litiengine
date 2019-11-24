@@ -166,7 +166,7 @@ public class Gamepad implements GamepadEvents, IUpdateable {
 
   @Override
   public String toString() {
-    return this.controller.toString();
+    return "Gamepad "+ this.getIndex() + " - " +this.controller.toString();
   }
 
   private void handlePressed(Component comp) {
