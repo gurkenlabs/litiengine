@@ -20,8 +20,6 @@ import java.awt.image.ImageFilter;
 import java.awt.image.ImageProducer;
 import java.awt.image.RGBImageFilter;
 import java.awt.image.WritableRaster;
-import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 

@@ -1,8 +1,6 @@
 package de.gurkenlabs.litiengine.input;
 
 import java.awt.AWTException;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
