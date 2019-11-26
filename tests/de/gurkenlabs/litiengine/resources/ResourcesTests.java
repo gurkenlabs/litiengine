@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import org.junit.jupiter.api.Test;
 
@@ -71,6 +72,18 @@ public class ResourcesTests {
     assertNotNull(sound);
     assertEquals("bip", sound.getName());
     assertNull(nonExisting);
+  }
+  
+  @Test
+  public void testReadStringResources() {
+    String fileContent = Resources.read("tests/de/gurkenlabs/litiengine/resources/stringfile-utf8.txt");
+    assertEquals("my utf8 èncöded strîng!!1$", fileContent);
+  }
+  
+  @Test
+  public void testReadStringCharsetResources() {
+    String fileContent = Resources.read("tests/de/gurkenlabs/litiengine/resources/stringfile-iso8859-1.txt", StandardCharsets.ISO_8859_1);
+    assertEquals("my iso8859 èncöded strîng!!1$", fileContent);
   }
 
   @Test

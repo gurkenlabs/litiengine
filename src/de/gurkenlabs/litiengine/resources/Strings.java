@@ -20,6 +20,8 @@ import de.gurkenlabs.litiengine.Game;
 
 public final class Strings {
   public static final String DEFAULT_BUNDLE = "strings";
+  
+  // TODO: use java.nio.charset.StandardCharsets
   public static final String ENCODING_ISO_8859_1 = "ISO-8859-1";
   public static final String ENCODING_UTF_8 = "UTF-8";
 

@@ -8,9 +8,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -234,6 +237,14 @@ public final class Resources {
     return get(getLocation(file));
   }
 
+  /**
+   * Gets the specified file as InputStream from either a resource folder or the file system.
+   * 
+   * @param file
+   *          The path to the file.
+   * @return The contents of the specified file as {@code InputStream}.
+   * @see Resources
+   */
   public static InputStream get(URL file) {
     InputStream stream = getResource(file);
     if (stream == null) {
@@ -241,6 +252,62 @@ public final class Resources {
     }
 
     return stream.markSupported() ? stream : new BufferedInputStream(stream);
+  }
+
+  /**
+   * Reads the specified file as String from either a resource folder or the file system.<br>
+   * Since no {@code Charset} is specified with this overload, the implementation uses UTF-8 by default.
+   * 
+   * @param file
+   *          The path to the file.
+   * @return The contents of the specified file as {@code String}
+   */
+  public static String read(String file) {
+    return read(file, StandardCharsets.UTF_8);
+  }
+
+  /**
+   * Reads the specified file as String from either a resource folder or the file system.<br>
+   * 
+   * @param file
+   *          The path to the file.
+   * @param charset
+   *          The charset that is used to read the String from the file.
+   * @return The contents of the specified file as {@code String}
+   */
+  public static String read(String file, Charset charset) {
+    return read(getLocation(file), charset);
+  }
+
+  /**
+   * Reads the specified file as String from either a resource folder or the file system.<br>
+   * Since no {@code Charset} is specified with this overload, the implementation uses UTF-8 by default.
+   * 
+   * @param file
+   *          The path to the file.
+   * @return The contents of the specified file as {@code String}
+   */
+  public static String read(URL file) {
+    return read(file, StandardCharsets.UTF_8);
+  }
+
+  /**
+   * Reads the specified file as String from either a resource folder or the file system.<br>
+   * 
+   * @param file
+   *          The path to the file.
+   * @param charset
+   *          The charset that is used to read the String from the file.
+   * @return The contents of the specified file as {@code String}
+   */
+  public static String read(URL file, Charset charset) {
+    try (Scanner scanner = new Scanner(file.openStream(), charset.toString())) {
+      scanner.useDelimiter("\\A");
+      return scanner.hasNext() ? scanner.next() : null;
+    } catch (IOException e) {
+      log.log(Level.SEVERE, e.getMessage());
+      return null;
+    }
   }
 
   /**
