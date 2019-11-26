@@ -79,7 +79,7 @@ public final class MapUtilities {
    * 
    * @param mapLocation
    *          the pixel map location.
-   * @return The x / y tile coordinate for the given mapLocation.
+   * @return The x / y tile coordinate for the given location.
    * @see MapUtilities#getTile(IMap, Point2D)
    */
   public static Point getTile(final Point2D mapLocation) {
@@ -96,7 +96,7 @@ public final class MapUtilities {
    *          The map on which to calculate the tile location.
    * @param mapLocation
    *          the pixel map location.
-   * @return The x / y tile coordinate for the given mapLocation .
+   * @return The x / y tile coordinate for the given mapLocation.
    */
   public static Point getTile(IMap map, final Point2D mapLocation) {
     if (map == null) {
