@@ -25,13 +25,15 @@ import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 public abstract class Ability implements IRenderable {
   private final List<Consumer<AbilityExecution>> abilityCastConsumer;
   private final AbilityAttributes attributes;
-  private final CastType castType;
-  private final String description;
+
   private final List<Effect> effects;
   private final Creature executor;
-  private final boolean multiTarget;
-  private final String name;
-  private final AbilityOrigin originType;
+
+  private String name;
+  private String description;
+  private boolean multiTarget;
+  private CastType castType;
+  private AbilityOrigin originType;
 
   private AbilityExecution currentExecution;
   private Point2D origin;
@@ -125,6 +127,10 @@ public abstract class Ability implements IRenderable {
     return this.name;
   }
 
+  public AbilityOrigin getOriginType() {
+    return this.originType;
+  }
+
   public Point2D getOrigin() {
     switch (this.originType) {
     case COLLISIONBOX_CENTER:
@@ -203,7 +209,31 @@ public abstract class Ability implements IRenderable {
   public void setOrigin(final Point2D origin) {
     this.origin = origin;
   }
-  
+
+  public void setOriginType(AbilityOrigin originType) {
+    this.originType = originType;
+  }
+
+  public List<Consumer<AbilityExecution>> getAbilityCastConsumer() {
+    return this.abilityCastConsumer;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public void setMultiTarget(boolean multiTarget) {
+    this.multiTarget = multiTarget;
+  }
+
+  public void setCastType(CastType castType) {
+    this.castType = castType;
+  }
+
   protected void setCurrentExecution(AbilityExecution ae) {
     this.currentExecution = ae;
   }
