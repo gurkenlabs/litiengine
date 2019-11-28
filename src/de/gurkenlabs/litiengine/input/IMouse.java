@@ -42,6 +42,8 @@ public interface IMouse extends MouseListener, MouseMotionListener, MouseWheelLi
   public void onMoved(Consumer<MouseEvent> consumer);
 
   public void onPressed(Consumer<MouseEvent> consumer);
+  
+  public void onPressing(Runnable consumer);
 
   public void onReleased(Consumer<MouseEvent> consumer);
 

@@ -34,6 +34,7 @@ public class Mouse implements IMouse, IUpdateable {
   private final List<MouseMotionListener> mouseMotionListeners = new CopyOnWriteArrayList<>();
   private final List<Consumer<MouseEvent>> mouseMovedConsumer = new CopyOnWriteArrayList<>();
   private final List<Consumer<MouseEvent>> mousePressedConsumer = new CopyOnWriteArrayList<>();
+  private final List<Runnable> mousePressingConsumer = new CopyOnWriteArrayList<>();
   private final List<Consumer<MouseEvent>> mouseReleasedConsumer = new CopyOnWriteArrayList<>();
   private final List<MouseWheelListener> mouseWheelListeners = new CopyOnWriteArrayList<>();
   private final List<Consumer<MouseWheelEvent>> wheelMovedConsumer = new CopyOnWriteArrayList<>();
@@ -78,6 +79,11 @@ public class Mouse implements IMouse, IUpdateable {
 
   @Override
   public void update() {
+    if (this.isPressed()) {
+      for (final Runnable cons : this.mousePressingConsumer) {
+        cons.run();
+      }
+    }
     if (this.updateLocation != null && !this.updatingLocation) {
       this.updatingLocation = true;
       try {
@@ -244,6 +250,11 @@ public class Mouse implements IMouse, IUpdateable {
   }
 
   @Override
+  public void onPressing(Runnable consumer) {
+    this.mousePressingConsumer.add(consumer);
+  }
+
+  @Override
   public void onReleased(final Consumer<MouseEvent> consumer) {
     this.mouseReleasedConsumer.add(consumer);
   }
@@ -259,6 +270,7 @@ public class Mouse implements IMouse, IUpdateable {
     this.mouseDraggedConsumer.clear();
     this.mouseMovedConsumer.clear();
     this.mousePressedConsumer.clear();
+    this.mousePressingConsumer.clear();
     this.mouseReleasedConsumer.clear();
     this.wheelMovedConsumer.clear();
   }
