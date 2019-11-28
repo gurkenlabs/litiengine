@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.ILoop;
 import de.gurkenlabs.litiengine.graphics.ImageEffect;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
@@ -19,14 +20,14 @@ import de.gurkenlabs.litiengine.util.Imaging;
 
 public class AnimationController implements IAnimationController {
   private static final int MAX_IMAGE_EFFECTS = 20;
+  private AffineTransform affineTransform;
   private final Map<String, Animation> animations;
+  private Animation currentAnimation;
+
+  private Animation defaultAnimation;
+  private boolean enabled;
   private final List<ImageEffect> imageEffects;
   private final List<AnimationListener> listeners;
-
-  private Animation currentAnimation;
-  private Animation defaultAnimation;
-  private AffineTransform affineTransform;
-  private boolean enabled;
 
   public AnimationController() {
     this.animations = new ConcurrentHashMap<>();
@@ -40,14 +41,6 @@ public class AnimationController implements IAnimationController {
     this.setDefault(defaultAnimation);
   }
 
-  public AnimationController(final Spritesheet sprite) {
-    this(sprite, true);
-  }
-
-  public AnimationController(final Spritesheet sprite, boolean loop) {
-    this(new Animation(sprite, loop, Resources.spritesheets().getCustomKeyFrameDurations(sprite)));
-  }
-
   public AnimationController(final Animation defaultAnimation, final Animation... animations) {
     this(defaultAnimation);
 
@@ -58,6 +51,14 @@ public class AnimationController implements IAnimationController {
         }
       }
     }
+  }
+
+  public AnimationController(final Spritesheet sprite) {
+    this(sprite, true);
+  }
+
+  public AnimationController(final Spritesheet sprite, final boolean loop) {
+    this(new Animation(sprite, loop, Resources.spritesheets().getCustomKeyFrameDurations(sprite)));
   }
 
   @Override
@@ -79,6 +80,15 @@ public class AnimationController implements IAnimationController {
     Collections.sort(this.getImageEffects());
   }
 
+  @Override
+  public void addListener(final AnimationListener listener) {
+    this.listeners.add(listener);
+  }
+
+  /**
+   * Attach the <code>AnimationController</code>, as well as all its <code>Animation</code>s to the Game loop.
+   * @see ILoop
+   */
   public void attach() {
     Game.loop().attach(this);
     for (final Animation animation : this.getAll()) {
@@ -86,6 +96,15 @@ public class AnimationController implements IAnimationController {
     }
   }
 
+  @Override
+  public void clear() {
+    this.animations.clear();
+  }
+
+  /**
+   * Detach the <code>AnimationController</code>, as well as all its <code>Animation</code>s from the Game loop.
+   * @see ILoop
+   */
   public void detach() {
     Game.loop().detach(this);
     for (final Animation animation : this.getAll()) {
@@ -94,13 +113,12 @@ public class AnimationController implements IAnimationController {
   }
 
   @Override
-  public void addListener(AnimationListener listener) {
-    this.listeners.add(listener);
-  }
+  public Animation get(final String animationName) {
+    if (animationName == null || animationName.isEmpty()) {
+      return null;
+    }
 
-  @Override
-  public void removeListener(AnimationListener listener) {
-    this.listeners.remove(listener);
+    return this.animations.getOrDefault(animationName, null);
   }
 
   @Override
@@ -111,15 +129,6 @@ public class AnimationController implements IAnimationController {
   @Override
   public Collection<Animation> getAll() {
     return this.animations.values();
-  }
-
-  @Override
-  public Animation get(String animationName) {
-    if (animationName == null || animationName.isEmpty()) {
-      return null;
-    }
-
-    return this.animations.getOrDefault(animationName, null);
   }
 
   @Override
@@ -138,8 +147,8 @@ public class AnimationController implements IAnimationController {
       return null;
     }
 
-    final String cacheKey = buildCurrentCacheKey();
-    Optional<BufferedImage> opt = Resources.images().tryGet(cacheKey);
+    final String cacheKey = this.buildCurrentCacheKey();
+    final Optional<BufferedImage> opt = Resources.images().tryGet(cacheKey);
     if (opt.isPresent()) {
       return opt.get();
     }
@@ -158,8 +167,8 @@ public class AnimationController implements IAnimationController {
       return null;
     }
 
-    final String cacheKey = buildCurrentCacheKey() + "_" + width + "_" + height;
-    Optional<BufferedImage> opt = Resources.images().tryGet(cacheKey);
+    final String cacheKey = this.buildCurrentCacheKey() + "_" + width + "_" + height;
+    final Optional<BufferedImage> opt = Resources.images().tryGet(cacheKey);
     if (opt.isPresent()) {
       return opt.get();
     }
@@ -187,7 +196,7 @@ public class AnimationController implements IAnimationController {
   }
 
   @Override
-  public boolean hasAnimation(String animationName) {
+  public boolean hasAnimation(final String animationName) {
     if (animationName == null || animationName.isEmpty()) {
       return false;
     }
@@ -196,7 +205,12 @@ public class AnimationController implements IAnimationController {
   }
 
   @Override
-  public boolean isPlaying(String animationName) {
+  public boolean isEnabled() {
+    return this.enabled;
+  }
+
+  @Override
+  public boolean isPlaying(final String animationName) {
     return this.getCurrent() != null && this.getCurrent().getName() != null && this.getCurrent().getName().equalsIgnoreCase(animationName);
   }
 
@@ -220,13 +234,13 @@ public class AnimationController implements IAnimationController {
     this.currentAnimation = anim;
     this.currentAnimation.start();
 
-    for (AnimationListener listener : this.listeners) {
+    for (final AnimationListener listener : this.listeners) {
       listener.played(this.getCurrent());
     }
   }
 
   @Override
-  public void remove(Animation animation) {
+  public void remove(final Animation animation) {
     if (animation == null) {
       return;
     }
@@ -242,7 +256,7 @@ public class AnimationController implements IAnimationController {
   }
 
   @Override
-  public void remove(ImageEffect effect) {
+  public void remove(final ImageEffect effect) {
     if (effect == null) {
       return;
     }
@@ -251,7 +265,17 @@ public class AnimationController implements IAnimationController {
   }
 
   @Override
-  public void setDefault(Animation defaultAnimation) {
+  public void removeListener(final AnimationListener listener) {
+    this.listeners.remove(listener);
+  }
+
+  @Override
+  public void setAffineTransform(final AffineTransform affineTransform) {
+    this.affineTransform = affineTransform;
+  }
+
+  @Override
+  public void setDefault(final Animation defaultAnimation) {
     if (this.defaultAnimation != null) {
       this.animations.remove(this.defaultAnimation.getName());
       if (this.currentAnimation != null && this.currentAnimation.equals(this.defaultAnimation)) {
@@ -266,6 +290,11 @@ public class AnimationController implements IAnimationController {
   }
 
   @Override
+  public void setEnabled(final boolean enabled) {
+    this.enabled = enabled;
+  }
+
+  @Override
   public void update() {
     if (this.getCurrent() != null && this.getCurrent().isPaused()) {
       return;
@@ -273,7 +302,7 @@ public class AnimationController implements IAnimationController {
 
     final boolean playbackFinished = this.getCurrent() != null && !this.getCurrent().isPlaying();
     if (playbackFinished) {
-      for (AnimationListener listener : this.listeners) {
+      for (final AnimationListener listener : this.listeners) {
         listener.finished(this.getCurrent());
       }
     }
@@ -287,6 +316,11 @@ public class AnimationController implements IAnimationController {
     }
   }
 
+  /**
+   * Build a unique cache key for the current frame.
+   * The spritesheet's <code>hashCode</code>, the current keyframe's sprite index, as well as all applied <code>ImageEffect</code>s' names, are considered when determining the current cache key.
+   * @return the unique cache key for the current key frame
+   */
   protected String buildCurrentCacheKey() {
     if (this.getCurrent() == null || this.getCurrent().getCurrentKeyFrame() == null || this.getCurrent().getSpritesheet() == null) {
       return null;
@@ -315,20 +349,5 @@ public class AnimationController implements IAnimationController {
 
     this.imageEffects.removeAll(effectsToRemove);
     this.imageEffects.removeAll(Collections.singleton(null));
-  }
-
-  @Override
-  public void setAffineTransform(AffineTransform affineTransform) {
-    this.affineTransform = affineTransform;
-  }
-
-  @Override
-  public boolean isEnabled() {
-    return enabled;
-  }
-
-  @Override
-  public void setEnabled(boolean enabled) {
-    this.enabled = enabled;
   }
 }

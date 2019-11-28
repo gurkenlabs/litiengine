@@ -16,6 +16,11 @@ public interface IAnimationController extends IUpdateable {
   public void add(Animation animation);
 
   public void add(ImageEffect effect);
+  
+  /**
+   * Remove all <code>Animation</code>s from the <code>AnimationController</code>.
+   */
+  public void clear();
 
   public Collection<Animation> getAll();
 
