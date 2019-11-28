@@ -27,6 +27,19 @@ public final class Spritesheet {
   private int spriteHeight;
   private int spriteWidth;
 
+  /**
+   * Instantiates a new spritesheet. Depending on the given <code>spriteWidth</code> and <code>spriteHeight</code>, the sub-images will be cropped
+   * from the spritesheet image when accessing individual sprites.
+   *
+   * @param image
+   *          the spritesheet image
+   * @param path
+   *          the path (or name) of the spritesheet image
+   * @param spriteWidth
+   *          the width in pixels of each sprite in the spritesheet.
+   * @param spriteHeight
+   *          the height in pixels of each sprite in the spritesheet.
+   */
   public Spritesheet(final BufferedImage image, final String path, final int spriteWidth, final int spriteHeight) {
     checkImage(image, path);
     this.image = image;
@@ -40,9 +53,9 @@ public final class Spritesheet {
 
     this.updateRowsAndCols();
     this.sprites = new BufferedImage[this.getTotalNumberOfSprites()];
-    
+
     Resources.spritesheets().add(this.name, this);
-    
+
     Resources.images().addClearedListener(() -> {
       this.emptySprites.clear();
       this.sprites = new BufferedImage[this.getTotalNumberOfSprites()];
