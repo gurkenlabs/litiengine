@@ -8,7 +8,7 @@ import java.awt.Toolkit;
 @ConfigurationGroupInfo(prefix = "gfx_")
 public class GraphicConfiguration extends ConfigurationGroup {
 
-  private boolean fullscreen;
+  private DisplayMode displayMode;
 
   private Quality graphicQuality;
 
@@ -31,7 +31,7 @@ public class GraphicConfiguration extends ConfigurationGroup {
    */
   public GraphicConfiguration() {
     this.graphicQuality = Quality.LOW;
-    this.fullscreen = false;
+    this.displayMode = DisplayMode.WINDOWED;
     this.renderDynamicShadows = false;
     Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
     this.resolutionWidth = d.width;
@@ -57,7 +57,7 @@ public class GraphicConfiguration extends ConfigurationGroup {
    * @return the resolution
    */
   public Dimension getResolution() {
-    if (this.isFullscreen()) {
+    if (this.getDisplayMode() == DisplayMode.FULLSCREEN) {
       final GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
       final int width = gd.getDisplayMode().getWidth();
       final int height = gd.getDisplayMode().getHeight();
@@ -75,15 +75,6 @@ public class GraphicConfiguration extends ConfigurationGroup {
     return this.resolutionWidth;
   }
 
-  /**
-   * Checks if is fullscreen.
-   *
-   * @return true, if is fullscreen
-   */
-  public boolean isFullscreen() {
-    return this.fullscreen;
-  }
-
   public boolean renderDynamicShadows() {
     return this.renderDynamicShadows;
   }
@@ -96,18 +87,12 @@ public class GraphicConfiguration extends ConfigurationGroup {
     return this.colorInterpolation;
   }
 
-  /**
-   * Sets the fullscreen.
-   *
-   * @param fullscreen
-   *          the new fullscreen
-   */
-  public void setFullscreen(final boolean fullscreen) {
-    if (fullscreen == this.fullscreen) {
-      return;
-    }
+  public DisplayMode getDisplayMode() {
+    return displayMode;
+  }
 
-    this.fullscreen = fullscreen;
+  public void setDisplayMode(DisplayMode displayMode) {
+    this.displayMode = displayMode;
   }
 
   /**
