@@ -41,7 +41,6 @@ public class GameWindowTests {
 
     assertFalse(frame.isResizable());
     assertTrue(frame.isUndecorated());
-    assertEquals(JFrame.MAXIMIZED_BOTH, frame.getExtendedState());
     
     frame.dispose();
   }
