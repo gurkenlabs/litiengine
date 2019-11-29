@@ -366,7 +366,7 @@ public class Mouse implements IMouse, IUpdateable {
       // get diff relative from last mouse location
       diffX = e.getX() - this.lastLocation.getX();
       diffY = e.getY() - this.lastLocation.getY();
-      this.lastLocation = new Point(e.getX() - Game.window().cursor().getOffsetX(), e.getY() - Game.window().cursor().getOffsetY());
+      this.lastLocation = new Point(e.getX(), e.getY());
     } else {
       // get diff relative from grabbed position
       final double screenCenterX = Game.window().getResolution().getWidth() * 0.5;
