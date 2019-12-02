@@ -57,6 +57,8 @@ public abstract class Particle implements ITimeToLive {
 
   private boolean continuousCollision;
 
+  private boolean stopOnCollision;
+
   /**
    * Constructs a new particle.
    * 
@@ -79,6 +81,8 @@ public abstract class Particle implements ITimeToLive {
     this.collisionType = Collision.NONE;
     this.opacity = 1;
     this.fade = true;
+    this.setStopOnCollision(true);
+    this.setContinuousCollision(false);
   }
 
   @Override
@@ -177,6 +181,10 @@ public abstract class Particle implements ITimeToLive {
     return this.continuousCollision;
   }
 
+  public boolean isStoppingOnCollision() {
+    return this.stopOnCollision;
+  }
+
   public abstract void render(final Graphics2D g, final Point2D emitterOrigin);
 
   public Particle setCollisionType(final Collision collisionType) {
@@ -194,6 +202,10 @@ public abstract class Particle implements ITimeToLive {
   public Particle setContinuousCollision(boolean ccd) {
     this.continuousCollision = ccd;
     return this;
+  }
+
+  public void setStopOnCollision(boolean stopOnCollision) {
+    this.stopOnCollision = stopOnCollision;
   }
 
   public Particle setColor(final Color color) {
@@ -316,9 +328,21 @@ public abstract class Particle implements ITimeToLive {
     final int alpha = (int) (this.getOpacity() * this.getColorAlpha());
     this.color = new Color(this.color.getRed(), this.color.getGreen(), this.color.getBlue(), alpha >= 0 ? alpha : 0);
 
+    if (this.getDeltaWidth() != 0) {
+      this.width += this.getDeltaWidth() * updateRatio;
+    }
+
+    if (this.getDeltaHeight() != 0) {
+      this.height += this.getDeltaHeight() * updateRatio;
+    }
+
     // test for ray cast collision
     final float targetX = this.x + this.getDx() * updateRatio;
     final float targetY = this.y + this.getDy() * updateRatio;
+
+    if (targetX == this.x && targetY == this.y) {
+      return;
+    }
 
     if (this.checkForCollision(emitterOrigin, targetX, targetY)) {
       return;
@@ -339,17 +363,13 @@ public abstract class Particle implements ITimeToLive {
     if (this.getGravityY() != 0) {
       this.deltaY += this.getGravityY() * updateRatio;
     }
-
-    if (this.getDeltaWidth() != 0) {
-      this.width += this.getDeltaWidth() * updateRatio;
-    }
-
-    if (this.getDeltaHeight() != 0) {
-      this.height += this.getDeltaHeight() * updateRatio;
-    }
   }
 
   private boolean checkForCollision(final Point2D emitterOrigin, float targetX, float targetY) {
+    if (this.isStoppingOnCollision() && this.colliding) {
+      return true;
+    }
+
     if (this.isContinuousCollisionEnabled()) {
       Point2D start = this.getAbsoluteLocation(emitterOrigin);
       double endX = emitterOrigin.getX() + targetX - this.getWidth() / 2.0;
