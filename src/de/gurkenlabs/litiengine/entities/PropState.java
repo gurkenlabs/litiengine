@@ -5,7 +5,13 @@ public enum PropState {
   DAMAGED,
   DESTROYED;
 
+  private final String str;
+
+  private PropState() {
+    this.str = this.name().toLowerCase();
+  }
+
   public String spriteString() {
-    return this.name().toLowerCase();
+    return this.str;
   }
 }
