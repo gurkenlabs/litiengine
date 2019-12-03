@@ -153,7 +153,7 @@ public final class FileUtilities {
     if (uri == null || uri.isEmpty()) {
       return uri;
     }
-    
+
     try {
       return getParentDirPath(new URI(uri));
     } catch (URISyntaxException e) {
@@ -181,7 +181,8 @@ public final class FileUtilities {
   public static String combine(String basePath, final String... paths) {
     basePath = basePath.replace(FILE_SEPARATOR_WIN, FILE_SEPARATOR);
     try {
-      URI uri = new URI(basePath);
+
+      URI uri = new URI(basePath.replaceAll(" ","%20"));
 
       for (String path : paths) {
         if (path == null) {
@@ -190,7 +191,7 @@ public final class FileUtilities {
 
         path = path.replace(FILE_SEPARATOR_WIN, FILE_SEPARATOR);
 
-        uri = uri.resolve(path);
+        uri = uri.resolve(path.replaceAll(" ","%20"));
       }
 
       return uri.toString();
