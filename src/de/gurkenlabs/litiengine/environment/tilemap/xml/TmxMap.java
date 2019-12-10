@@ -92,11 +92,11 @@ public final class TmxMap extends CustomPropertyProvider implements IMap, Compar
   @XmlJavaTypeAdapter(ColorAdapter.class)
   private Color backgroundcolor;
 
-  @XmlAttribute(name = "nextobjectid")
-  private int nextObjectId;
-
   @XmlAttribute(name = "nextlayerid")
-  private int nextLayerId;
+  private Integer nextLayerId;
+  
+  @XmlAttribute(name = "nextobjectid")
+  private Integer nextObjectId;
 
   @XmlAttribute
   private String name;

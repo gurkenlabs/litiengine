@@ -25,6 +25,9 @@ import de.gurkenlabs.litiengine.environment.tilemap.ITilesetEntry;
 public class MapObject extends CustomPropertyProvider implements IMapObject {
   @XmlAttribute
   private int id;
+  
+  @XmlAttribute
+  private Integer gid;
 
   @XmlAttribute
   private String name;
@@ -47,9 +50,6 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   @XmlAttribute
   @XmlJavaTypeAdapter(value = DecimalFloatAdapter.class)
   private Float height = 0f;
-
-  @XmlAttribute
-  private Integer gid;
 
   @XmlTransient
   private ITilesetEntry tile;
