@@ -394,9 +394,12 @@ public final class Imaging {
   }
 
   /**
-   * Replace colors in an image according to a Map containing  source colors and target colors, then return the result.
-   * @param bufferedImage the original image
-   * @param colorMappings a Map with source colors as keys and target colors as values
+   * Replace colors in an image according to a Map containing source colors and target colors, then return the result.
+   * 
+   * @param bufferedImage
+   *          the original image
+   * @param colorMappings
+   *          a Map with source colors as keys and target colors as values
    * @return a new version of the original image, where the source colors are replaced with the target colors.
    */
   public static BufferedImage replaceColors(final BufferedImage bufferedImage, Map<Color, Color> colorMappings) {
@@ -453,7 +456,9 @@ public final class Imaging {
   }
 
   public static BufferedImage scale(final BufferedImage image, final double factor, boolean keepRatio) {
-
+    if (image == null) {
+      return null;
+    }
     final double width = image.getWidth();
     final double height = image.getHeight();
 
