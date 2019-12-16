@@ -5,6 +5,8 @@ import java.awt.Image;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 
+import de.gurkenlabs.litiengine.Align;
+import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.input.Mouse;
 
@@ -21,7 +23,7 @@ public final class MouseCursor implements IRenderable {
   private int offsetY;
 
   private boolean visible;
-  
+
   public MouseCursor() {
     this.visible = true;
   }
@@ -29,7 +31,7 @@ public final class MouseCursor implements IRenderable {
   @Override
   public void render(Graphics2D g) {
     if (this.isVisible()) {
-      final Point2D locationWithOffset = new Point2D.Double(Input.mouse().getLocation().getX() - this.getOffsetX(), Input.mouse().getLocation().getY() - this.getOffsetY());
+      final Point2D locationWithOffset = new Point2D.Double(Input.mouse().getLocation().getX() + this.getOffsetX(), Input.mouse().getLocation().getY() + this.getOffsetY());
       ImageRenderer.renderTransformed(g, this.getImage(), locationWithOffset, this.getTransform());
     }
   }
@@ -61,19 +63,16 @@ public final class MouseCursor implements IRenderable {
   }
 
   public void set(final Image img) {
-    this.image = img;
-    if (this.image != null) {
-      this.setOffsetX(-(this.image.getWidth(null) / 2));
-      this.setOffsetY(-(this.image.getHeight(null) / 2));
-    } else {
-      this.setOffsetX(0);
-      this.setOffsetY(0);
-    }
+    this.set(img, Align.LEFT, Valign.TOP);
   }
 
   public void set(final Image img, final int offsetX, final int offsetY) {
-    this.set(img);
+    this.image = img;
     this.setOffset(offsetX, offsetY);
+  }
+
+  public void set(final Image img, Align hAlign, Valign vAlign) {
+    this.set(img, -(int) (hAlign.portion * img.getWidth(null)), -(int) (vAlign.portion * img.getHeight(null)));
   }
 
   public void setOffset(final int x, final int y) {
