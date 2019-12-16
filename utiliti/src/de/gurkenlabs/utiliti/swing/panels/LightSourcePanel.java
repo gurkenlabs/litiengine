@@ -33,14 +33,13 @@ public class LightSourcePanel extends PropertyPanel {
     this.comboBoxLightShape = new JComboBox<>();
     this.comboBoxLightShape.setModel(new DefaultComboBoxModel<String>(new String[] { "ellipse", "rectangle" }));
 
-    this.spinnerIntensity = new JSpinner(new SpinnerNumberModel(0, 0, 255, 1));
-
+    this.spinnerIntensity = new JSpinner(new SpinnerNumberModel(0, 0, 255, 5));
     this.checkBoxIsActive = new JCheckBox("is active");
     this.checkBoxIsActive.setSelected(true);
 
     this.sliderOffsetX = new JSlider(-100, 100, 0);
     this.sliderOffsetY = new JSlider(-100, 100, 0);
-    
+
     setLayout(this.createLayout());
     this.setupChangedListeners();
   }
@@ -72,6 +71,7 @@ public class LightSourcePanel extends PropertyPanel {
     this.colorControl.addActionListener(new MapObjectPropertyActionListener(m -> {
       if (getDataSource() != null) {
         getDataSource().setValue(MapObjectProperty.LIGHT_COLOR, this.colorControl.getHexColor());
+        getDataSource().setValue(MapObjectProperty.LIGHT_INTENSITY, (int) this.spinnerIntensity.getValue());
         Game.world().environment().updateLighting(getDataSource().getBoundingBox());
       }
     }));
@@ -80,7 +80,6 @@ public class LightSourcePanel extends PropertyPanel {
       m.setValue(MapObjectProperty.LIGHT_INTENSITY, spinnerIntensity.getValue().toString());
       Game.world().environment().updateLighting(getDataSource().getBoundingBox());
     }));
-
     this.comboBoxLightShape.addActionListener(new MapObjectPropertyActionListener(m -> {
       m.setValue(MapObjectProperty.LIGHT_SHAPE, comboBoxLightShape.getSelectedItem().toString());
       Game.world().environment().updateLighting(getDataSource().getBoundingBox());
@@ -103,14 +102,9 @@ public class LightSourcePanel extends PropertyPanel {
   }
 
   private LayoutManager createLayout() {
-   
-    LayoutItem[] layoutItems = new LayoutItem[] { 
-        new LayoutItem("panel_shape", this.comboBoxLightShape), 
-        new LayoutItem("panel_color", this.colorControl), 
-        new LayoutItem("panel_intensity", this.spinnerIntensity), 
-        new LayoutItem("panel_offsetX", this.sliderOffsetX),
-        new LayoutItem("panel_offsetY", this.sliderOffsetY),
-    };
+
+    LayoutItem[] layoutItems = new LayoutItem[] { new LayoutItem("panel_shape", this.comboBoxLightShape), new LayoutItem("panel_color", this.colorControl, CONTROL_MIN_WIDTH, this.colorControl.getPreferredSize().height), new LayoutItem("panel_intensity", this.spinnerIntensity),
+        new LayoutItem("panel_offsetX", this.sliderOffsetX), new LayoutItem("panel_offsetY", this.sliderOffsetY), };
 
     return this.createLayout(layoutItems, this.checkBoxIsActive);
   }
