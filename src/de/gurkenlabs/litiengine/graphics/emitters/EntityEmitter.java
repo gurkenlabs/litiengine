@@ -20,7 +20,7 @@ public abstract class EntityEmitter extends Emitter {
    *          the entity
    */
   public EntityEmitter(final IEntity entity) {
-    super(entity.getCenter().getX() - entity.getWidth() / 2, entity.getCenter().getY() - entity.getHeight() / 2);
+    super(entity.getX(), entity.getY());
     this.entity = entity;
     this.setSize(this.getEntity().getWidth(), this.getEntity().getHeight());
   }

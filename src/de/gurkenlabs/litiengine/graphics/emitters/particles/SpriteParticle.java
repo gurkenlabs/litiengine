@@ -16,6 +16,8 @@ public class SpriteParticle extends Particle {
   public SpriteParticle(final Image sprite, final int ttl) {
     super(0, 0, Color.WHITE, ttl);
     this.image = sprite;
+    this.setWidth(this.image.getWidth(null));
+    this.setHeight(this.image.getHeight(null));
   }
 
   public float getAngle() {
