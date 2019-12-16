@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" tiledversion="1.1.5" orientation="orthogonal" renderorder="right-down" width="20" height="25" tilewidth="16" tileheight="16" infinite="1" nextobjectid="1">
+<map version="1.0" tiledversion="1.1.5" orientation="orthogonal" renderorder="right-down" width="64" height="64" tilewidth="16" tileheight="16" infinite="1" nextobjectid="1" name="test-infinite-map">
  <tileset firstgid="1" source="res/external-tileset.tsx"/>
- <layer name="Tile Layer 1" width="20" height="25">
+ <layer id="1" name="Tile Layer 1" width="20" height="25">
   <data encoding="csv">
    <chunk x="-32" y="-32" width="16" height="16">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -41,7 +41,7 @@
 </chunk>
   </data>
  </layer>
- <layer name="Tile Layer 2" width="20" height="25" visible="0">
+ <layer id="2" name="Tile Layer 2" width="20" height="25" visible="0">
   <data encoding="csv">
    <chunk x="16" y="-48" width="16" height="16">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,

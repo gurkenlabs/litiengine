@@ -27,7 +27,7 @@ public class MapTests {
   public void clearResources() {
     Resources.maps().clear();
   }
-
+  
   @Test
   public void testBasicProperties() throws MalformedURLException {
     IMap map = Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");

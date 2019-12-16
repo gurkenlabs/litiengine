@@ -1,7 +1,9 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.awt.Dimension;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -28,6 +30,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.ITileOffset;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.ITilesetEntry;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.pathfinding.Path;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import de.gurkenlabs.litiengine.util.io.URLAdapter;
@@ -70,8 +73,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   private Integer spacing;
 
   @XmlAttribute
-  @XmlJavaTypeAdapter(URLAdapter.class)
-  private URL source;
+  private String source;
 
   @XmlElementWrapper(name = "terraintypes")
   @XmlElement(name = "terrain")
@@ -93,7 +95,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   }
 
   public Tileset(Tileset source) {
-    this.source = Resources.getLocation(source.getName() + "." + FILE_EXTENSION);
+    this.source = source.getName() + "." + FILE_EXTENSION;
     this.sourceTileset = source;
     this.firstgid = 1;
   }
@@ -205,9 +207,14 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     if (this.source != null) {
       // don't reload the source if it's already been loaded in a resource bundle
       if (this.sourceTileset == null) {
-        this.sourceTileset = Resources.tilesets().get(this.source);
-        if (this.sourceTileset == null) {
-          throw new MissingExternalTilesetException(this.source.toExternalForm());
+        try {
+          URL url = new URL(location, this.source);
+          this.sourceTileset = Resources.tilesets().get(url);
+          if (this.sourceTileset == null) {
+            throw new MissingExternalTilesetException(this.source);
+          }
+        } catch (MalformedURLException e) {
+          throw new MissingExternalTilesetException(e);
         }
       }
     } else {
@@ -301,7 +308,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
       return this.sourceTileset.getTile(id);
     }
 
-    if (id < 0 || id >= this.tilecount) {
+    if (id < 0 || id >= this.getTileCount()) {
       return null;
     }
 
@@ -324,7 +331,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
       return;
     }
 
-    XmlUtilities.save(this.sourceTileset, this.source.getPath(), FILE_EXTENSION);
+    XmlUtilities.save(this.sourceTileset, FileUtilities.combine(basePath, this.source), FILE_EXTENSION);
   }
 
   public boolean isExternal() {
@@ -357,19 +364,19 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   @SuppressWarnings("unused")
   private void afterUnmarshal(Unmarshaller u, Object parent) {
     if (this.source == null) {
-      this.allTiles = new ArrayList<>(this.tilecount);
+      this.allTiles = new ArrayList<>(this.getTileCount());
       if (this.tiles != null) {
         this.allTiles.addAll(this.tiles);
       }
       // add missing entries
       ListIterator<TilesetEntry> iter = this.allTiles.listIterator();
-      for (int i = 0; i < this.tilecount; i++) {
+      for (int i = 0; i < this.getTileCount(); i++) {
         if (add(iter)) {
           iter.add(new TilesetEntry(this, iter.nextIndex()));
         }
       }
       if (iter.hasNext()) {
-        log.log(Level.WARNING, "tileset \"{0}\" had a tilecount attribute of {1} but had tile IDs going beyond that", new Object[] { this.name, this.tilecount });
+        log.log(Level.WARNING, "tileset \"{0}\" had a tilecount attribute of {1} but had tile IDs going beyond that", new Object[] { this.name, this.getTileCount() });
         while (iter.hasNext()) {
           int nextId = iter.next().getId();
           iter.previous();

@@ -90,8 +90,6 @@ public final class XmlUtilities {
     }
 
     final Unmarshaller um = jaxbContext.createUnmarshaller();
-    // configure for relative paths
-    um.setAdapter(new URLAdapter(path));
 
     return cls.cast(um.unmarshal(path));
   }
@@ -111,8 +109,6 @@ public final class XmlUtilities {
 
       Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
       jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, false);
-      // configure for relative paths
-      jaxbMarshaller.setAdapter(new URLAdapter(newFile.toURI().toURL()));
 
       final ByteArrayOutputStream out = new ByteArrayOutputStream();
 

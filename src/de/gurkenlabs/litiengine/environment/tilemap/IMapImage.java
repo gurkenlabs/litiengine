@@ -23,7 +23,7 @@ public interface IMapImage extends ICustomPropertyProvider {
    *
    * @return the source
    */
-  public String getSource(); // TODO change this to a URL
+  public String getSource();
 
   /**
    * Gets the transparent color.
