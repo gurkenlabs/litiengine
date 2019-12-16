@@ -182,7 +182,7 @@ public final class FileUtilities {
     basePath = basePath.replace(FILE_SEPARATOR_WIN, FILE_SEPARATOR);
     try {
 
-      URI uri = new URI(basePath.replaceAll(" ","%20"));
+      URI uri = new URI(basePath.replaceAll(" ", "%20"));
 
       for (String path : paths) {
         if (path == null) {
@@ -191,10 +191,10 @@ public final class FileUtilities {
 
         path = path.replace(FILE_SEPARATOR_WIN, FILE_SEPARATOR);
 
-        uri = uri.resolve(path.replaceAll(" ","%20"));
+        uri = uri.resolve(path.replaceAll(" ", "%20"));
       }
 
-      return uri.toString();
+      return uri.toString().replaceAll("%20", " ");
     } catch (URISyntaxException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
       return basePath;
