@@ -31,16 +31,16 @@ public class MouseCursorTests {
     cursor.set(new BufferedImage(30, 30, BufferedImage.TYPE_INT_ARGB));
 
     // by default center the image on the cursor position
-    assertEquals(-15, cursor.getOffsetX());
-    assertEquals(-15, cursor.getOffsetY());
+    assertEquals(0, cursor.getOffsetX());
+    assertEquals(0, cursor.getOffsetY());
 
     // as soon as an image is set, the cursor should be visible by default
     assertTrue(cursor.isVisible());
 
-    cursor.setOffset(0, 0);
+    cursor.setOffset(15, 15);
 
-    assertEquals(0, cursor.getOffsetX());
-    assertEquals(0, cursor.getOffsetY());
+    assertEquals(15, cursor.getOffsetX());
+    assertEquals(15, cursor.getOffsetY());
 
     cursor.setVisible(false);
     assertFalse(cursor.isVisible());
