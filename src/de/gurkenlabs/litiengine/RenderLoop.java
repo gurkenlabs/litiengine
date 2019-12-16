@@ -1,6 +1,11 @@
 package de.gurkenlabs.litiengine;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 public class RenderLoop extends UpdateLoop {
+  
+  public static final Lock RenderLock = new ReentrantLock();
 
   public RenderLoop(String name) {
     super(name, Game.config().client().getMaxFps());
@@ -32,5 +37,10 @@ public class RenderLoop extends UpdateLoop {
     if (Game.config().debug().trackRenderTimes()) {
       Game.metrics().trackRenderTime("total", this.getProcessTime());
     }
+  }
+  
+  @Override
+  public Lock getLock() {
+    return RenderLock;
   }
 }

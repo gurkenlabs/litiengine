@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.locks.Lock;
 
 /**
  * The main update loop that executes the game logic by calling the update functions on all registered components and entities.
@@ -69,6 +70,13 @@ public final class GameLoop extends UpdateLoop implements IGameLoop {
         action.setExecutionTicks(ticks);
       }
     }
+  }
+
+  @Override
+  public Lock getLock() {
+    // make sure so synchronize the game logic with the render loop such that the update of gamelogic (e.g. positions) 
+    // doesn't happen while a frame is being rendered
+    return RenderLoop.RenderLock;
   }
 
   /**
