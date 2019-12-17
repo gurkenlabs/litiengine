@@ -2,6 +2,7 @@ language: java
 install: true
 before_install:
   - chmod +x gradlew
+  - sudo apt-get -y install at-spi2-core
 
 jdk: openjdk11
 
