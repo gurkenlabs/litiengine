@@ -20,7 +20,7 @@ public class TmxCompatibilityTests {
     String original = Resources.read(source);
     String output = Resources.read(target);
 
-    assertEquals(original, output);
+    assertEquals(original, output.replaceAll("\\r\\n?", "\n"));
   }
   
   @Test
@@ -34,6 +34,6 @@ public class TmxCompatibilityTests {
     String original = Resources.read(source);
     String output = Resources.read(target);
 
-    assertEquals(original, output);
+    assertEquals(original, output.replaceAll("\\r\\n?", "\n"));
   }
 }
