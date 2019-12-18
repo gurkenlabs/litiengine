@@ -1,6 +1,5 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
-import java.awt.BasicStroke;
 import java.awt.Component;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
@@ -36,18 +35,16 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.UndoManager;
+import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.swing.TextList;
 import de.gurkenlabs.utiliti.swing.UI;
 
 @SuppressWarnings("serial")
 public abstract class PropertyPanel extends JPanel {
   public static final int LABEL_WIDTH = 80;
-  public static final int LABEL_MAX_HEIGHT = 100;
-  public static final int LABEL_HEIGHT = 25;
   public static final int CONTROL_MIN_WIDTH = 120;
   public static final int CONTROL_WIDTH = 200;
-  public static final int CONTROL_HEIGHT = 25;
-  public static final int CONTROL_MAX_HEIGHT = 100;
+  public static final int CONTROL_HEIGHT = (int) (25 * Editor.preferences().getUiScale());
   public static final int CONTROL_MARGIN = 5;
   public static final int LABEL_GAP = 0;
 
@@ -270,7 +267,7 @@ public abstract class PropertyPanel extends JPanel {
     SequentialGroup current = seq.addGap(CONTROL_MARGIN);
 
     for (LayoutItem item : layoutItems) {
-      current = current.addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(item.getComponent(), item.getMinHeight(), GroupLayout.PREFERRED_SIZE, CONTROL_MAX_HEIGHT).addComponent(item.getLabel(), item.getMinHeight(), GroupLayout.PREFERRED_SIZE, LABEL_MAX_HEIGHT))
+      current = current.addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(item.getComponent(), item.getMinHeight(), item.getMinHeight(), item.getMinHeight()).addComponent(item.getLabel(), GroupLayout.PREFERRED_SIZE, item.getMinHeight(), item.getMinHeight()))
           .addGap(CONTROL_MARGIN);
     }
 
@@ -297,20 +294,17 @@ public abstract class PropertyPanel extends JPanel {
     private final JLabel label;
 
     private int minHeight;
-    private int minWidth;
 
     public LayoutItem(String resource, Component component) {
       this.caption = Resources.strings().get(resource);
       this.component = component;
       this.label = new JLabel(this.caption);
       this.label.setVerticalAlignment(JLabel.TOP);
-      this.setMinWidth(GroupLayout.PREFERRED_SIZE);
-      this.setMinHeight(GroupLayout.PREFERRED_SIZE);
+      this.setMinHeight(CONTROL_HEIGHT);
     }
 
-    public LayoutItem(String resource, Component component, int minWidth, int minHeight) {
+    public LayoutItem(String resource, Component component, int minHeight) {
       this(resource, component);
-      this.setMinWidth(minWidth);
       this.setMinHeight(minHeight);
     }
 
@@ -332,14 +326,6 @@ public abstract class PropertyPanel extends JPanel {
 
     private void setMinHeight(int minHeight) {
       this.minHeight = minHeight;
-    }
-
-    private int getMinWidth() {
-      return minWidth;
-    }
-
-    private void setMinWidth(int minWidth) {
-      this.minWidth = minWidth;
     }
   }
 }
