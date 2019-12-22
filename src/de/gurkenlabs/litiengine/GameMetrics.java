@@ -36,7 +36,6 @@ public final class GameMetrics implements IRenderable {
   private long upStreamInBytes;
 
   private int framesPerSecond;
-  private int updatesPerSecond;
   private int maxFramesPerSecond;
 
   private float usedMemory;
@@ -66,10 +65,6 @@ public final class GameMetrics implements IRenderable {
 
   public long getPing() {
     return this.ping;
-  }
-
-  public long getUpdatesPerSecond() {
-    return this.updatesPerSecond;
   }
 
   public float getUpStreamInBytes() {
@@ -107,7 +102,6 @@ public final class GameMetrics implements IRenderable {
     // render client metrics
     this.drawTitle(g, "[client]");
     this.drawMetric(g, "fps       : " + this.getFramesPerSecond());
-    this.drawMetric(g, "ups       : " + this.getUpdatesPerSecond());
     this.drawMetric(g, "max fps   : " + this.maxFramesPerSecond);
 
     // render jvm metrics if debug is enabled
@@ -149,10 +143,6 @@ public final class GameMetrics implements IRenderable {
 
   public void setPing(final long ping) {
     this.ping = ping;
-  }
-
-  public void setUpdatesPerSecond(final int updatesPerSecond) {
-    this.updatesPerSecond = updatesPerSecond;
   }
 
   /**

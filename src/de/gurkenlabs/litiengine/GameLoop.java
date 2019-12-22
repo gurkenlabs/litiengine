@@ -26,11 +26,8 @@ public final class GameLoop extends UpdateLoop implements IGameLoop {
 
   private final List<TimedAction> actions;
 
-  private long lastUpsTime;
-
   private float timeScale;
 
-  private int updateCount;
 
   protected GameLoop(String name, final int updateRate) {
     super(name, updateRate);
@@ -72,25 +69,23 @@ public final class GameLoop extends UpdateLoop implements IGameLoop {
     }
   }
 
-  @Override
-  public Lock getLock() {
-    // make sure so synchronize the game logic with the render loop such that the update of gamelogic (e.g. positions) 
-    // doesn't happen while a frame is being rendered
-    return RenderLoop.RenderLock;
-  }
-
   /**
    * In addition to the normal base implementation, the <code>GameLoop</code> performs registered action at the required
    * time and tracks some detailed metrics.
    */
   @Override
   protected void process() {
+    Game.world().camera().updateFocus();
     if (this.getTimeScale() > 0) {
       super.process();
       this.executeTimedActions();
     }
+    
+    if(!Game.isInNoGUIMode()) {
+      Game.window().getRenderComponent().render();
+    }
 
-    this.trackUpdateRate();
+    this.trackRenderMetric();
   }
 
   @Override
@@ -111,15 +106,11 @@ public final class GameLoop extends UpdateLoop implements IGameLoop {
 
     this.actions.removeAll(executed);
   }
-
-  private void trackUpdateRate() {
-    ++this.updateCount;
-
-    long currentMillis = System.currentTimeMillis();
-    if (currentMillis - this.lastUpsTime >= 1000) {
-      this.lastUpsTime = currentMillis;
-      Game.metrics().setUpdatesPerSecond(this.updateCount);
-      this.updateCount = 0;
+  
+  private void trackRenderMetric() {
+    Game.metrics().setEstimatedMaxFramesPerSecond((int) (1000.0 / this.getProcessTime()));
+    if (Game.config().debug().trackRenderTimes()) {
+      Game.metrics().trackRenderTime("total", this.getProcessTime());
     }
   }
 

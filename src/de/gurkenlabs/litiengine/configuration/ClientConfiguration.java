@@ -16,8 +16,6 @@ public class ClientConfiguration extends ConfigurationGroup {
 
   private boolean showGameMetrics;
 
-  private int updaterate;
-
   private boolean exitOnError;
 
   /**
@@ -25,7 +23,6 @@ public class ClientConfiguration extends ConfigurationGroup {
    */
   public ClientConfiguration() {
     super();
-    this.setUpdaterate(60);
     this.setMaxFps(60);
     this.setShowGameMetrics(false);
     this.setExitOnError(false);
@@ -58,15 +55,6 @@ public class ClientConfiguration extends ConfigurationGroup {
     return this.maxFps;
   }
 
-  /**
-   * Gets the updaterate.
-   *
-   * @return the updaterate
-   */
-  public int getUpdaterate() {
-    return this.updaterate;
-  }
-
   public void setCountry(final String country) {
     this.country = country;
   }
@@ -87,25 +75,6 @@ public class ClientConfiguration extends ConfigurationGroup {
 
   public void setShowGameMetrics(final boolean showGameMetrics) {
     this.showGameMetrics = showGameMetrics;
-  }
-
-  /**
-   * Sets the updaterate. On a very good machine the max update rate is sth.
-   * around 500 but such a high value will never be beneficial for the player.
-   * 
-   * <p>
-   * This defaults to a value of 60.
-   * </p>
-   *
-   * @param updaterate
-   *          the new updaterate
-   */
-  public void setUpdaterate(final int updaterate) {
-    if (updaterate < 1 || updaterate > 500) {
-      return;
-    }
-
-    this.updaterate = updaterate;
   }
 
   public void setExitOnError(boolean exit) {

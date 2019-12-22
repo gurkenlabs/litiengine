@@ -64,4 +64,10 @@ public interface ILoop extends ILaunchable {
    * @return A {@code Lock} for this loop.
    */
   public Lock getLock();
+  
+  /**
+   * Sets the tickrate at which the loop performs its updates.
+   * @param tickRate The tickrate of the loop.
+   */
+  public void setTickRate(int tickRate);
 }

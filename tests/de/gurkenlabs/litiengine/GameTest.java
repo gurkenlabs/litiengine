@@ -57,7 +57,6 @@ public class GameTest {
 
     assertTrue(initialized.wasCalled);
     assertFalse(started.wasCalled);
-    assertNotNull(Game.renderLoop());
     assertNotNull(Game.loop());
     assertNotNull(Game.world().camera());
     assertNotNull(Game.screens());

@@ -110,6 +110,10 @@ public class UpdateLoop extends Thread implements AutoCloseable, ILoop {
     return this.processTime;
   }
 
+  public void setTickRate(int tickRate) {
+    this.tickRate = tickRate;
+  }
+  
   protected Set<IUpdateable> getUpdatables() {
     return this.updatables;
   }
@@ -168,10 +172,6 @@ public class UpdateLoop extends Thread implements AutoCloseable, ILoop {
     }
 
     return delay;
-  }
-
-  protected void setTickRate(int tickRate) {
-    this.tickRate = tickRate;
   }
 
   @Override

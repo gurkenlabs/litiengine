@@ -22,7 +22,6 @@ import de.gurkenlabs.litiengine.graphics.RenderComponent;
  * @see RenderComponent
  * @see GameScreen
  * @see Screen#render(java.awt.Graphics2D)
- * @see Game#renderLoop()
  */
 public final class ScreenManager {
   private static final int SCREENCHANGETIMEOUT = 200;

@@ -92,7 +92,6 @@ public final class Game {
   private static GameInfo gameInfo = new GameInfo();
 
   private static GameLoop gameLoop;
-  private static RenderLoop renderLoop;
   private static UpdateLoop inputLoop;
   private static ScreenManager screenManager;
   private static GameWindow gameWindow;
@@ -150,7 +149,6 @@ public final class Game {
    *          If set to true, the GUI will be hidden.
    * @see GameWindow
    * @see Game#init(String...)
-   * @see RenderLoop
    * @see Camera
    */
   public static void hideGUI(boolean noGui) {
@@ -319,10 +317,13 @@ public final class Game {
   }
 
   /**
-   * Gets the game's main loop that is used to execute and manage all game logic apart from rendering and input processing.<br>
+   * Gets the game's main loop that is used to execute and manage all game logic apart from input processing.<br>
    * You can attach any <code>Updatable</code> instance to this loop if you want to execute custom game logic that is executed at the configured
-   * updaterate.
+   * max fps.
    * 
+   * The game's loop also executes the rendering process on the GameFrame's <code>RenderComponent</code>.<br>
+   * This internally renders the currently active screen which passes the <code>Graphics2D</code> object to all <code>GuiComponents</code> and the
+   * Environment for rendering.
    * <p>
    * <i>The LITIengine has separate loops for game logic, rendering and input processing. <br>
    * This prevents them from interfering with each other and also properly separates tasks by their category.</i>
@@ -331,12 +332,11 @@ public final class Game {
    * 
    * @return The game's main loop.
    *
-   * @see ClientConfiguration#getUpdaterate()
+   * @see ClientConfiguration#getMaxFps()
    * @see IUpdateable
    * @see ILoop#attach(IUpdateable)
    * @see ILoop#detach(IUpdateable)
    * @see Game#inputLoop()
-   * @see Game#renderLoop()
    */
   public static IGameLoop loop() {
     return gameLoop;
@@ -353,29 +353,6 @@ public final class Game {
    */
   public static ILoop inputLoop() {
     return inputLoop;
-  }
-
-  /**
-   * Gets the game's loop that executes the rendering process on the GameFrame's <code>RenderComponent</code>.<br>
-   * This internally renders the currently active screen which passes the <code>Graphics2D</code> object to all <code>GuiComponents</code> and the
-   * Environment for rendering. This loop will try to execute at the configured frames-per-second and limit the frames to this value.
-   * 
-   * <p>
-   * <i>It's also possible to register <code>Updatable</code> instances to this loop which is useful if you want to execute something that is directly
-   * related to
-   * the rendering process and needs to be executed right before the game's rendering starts.</i>
-   * </p>
-   * 
-   * @return The game's render loop.
-   * 
-   * @see ClientConfiguration#getMaxFps()
-   * @see RenderComponent#render()
-   * @see Screen#render(java.awt.Graphics2D)
-   * @see GuiComponent#render(java.awt.Graphics2D)
-   * @see Environment#render(java.awt.Graphics2D)
-   */
-  public static RenderLoop renderLoop() {
-    return renderLoop;
   }
 
   /**
@@ -457,14 +434,13 @@ public final class Game {
     config().load();
     Locale.setDefault(new Locale(config().client().getCountry(), config().client().getLanguage()));
 
-    gameLoop = new GameLoop("Main Update Loop", config().client().getUpdaterate());
+    gameLoop = new GameLoop("Main Update Loop", config().client().getMaxFps());
     loop().attach(physics());
     loop().attach(world());
 
     final ScreenManager scrMgr = new ScreenManager();
 
     // setup default exception handling for render and update loop
-    renderLoop = new RenderLoop("Render Loop");
     inputLoop = new UpdateLoop("Input Loop", loop().getUpdateRate());
 
     setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(config().client().exitOnError()));
@@ -525,7 +501,6 @@ public final class Game {
 
   public static void setUncaughtExceptionHandler(UncaughtExceptionHandler uncaughtExceptionHandler) {
     gameLoop.setUncaughtExceptionHandler(uncaughtExceptionHandler);
-    renderLoop.setUncaughtExceptionHandler(uncaughtExceptionHandler);
     Thread.setDefaultUncaughtExceptionHandler(uncaughtExceptionHandler);
   }
 
@@ -552,10 +527,6 @@ public final class Game {
 
     gameLoop.start();
     inputLoop.start();
-
-    if (!isInNoGUIMode()) {
-      renderLoop.start();
-    }
 
     soundEngine.start();
 
@@ -594,9 +565,6 @@ public final class Game {
     soundEngine.terminate();
 
     world().clear();
-    if (!isInNoGUIMode()) {
-      renderLoop.terminate();
-    }
 
     for (final GameListener listener : gameListeners) {
       try {

@@ -15,7 +15,7 @@ public interface IUpdateable {
    * This method is called by the game loop on all objects that are attached to the loop.
    * It's called on every tick of the loop and the frequency can be configured using the <code>ClientConfiguration</code>.
    *
-   * @see ClientConfiguration#setUpdaterate(int)
+   * @see ClientConfiguration#setMaxFps(int)
    */
   public void update();
 

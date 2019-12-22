@@ -210,7 +210,7 @@ public final class GameWorld implements IUpdateable {
    * @see GameWorld#environment()
    */
   public void loadEnvironment(final Environment env) {
-    Lock lock = Game.renderLoop().getLock();
+    Lock lock = Game.loop().getLock();
     lock.lock();
     try {
       unloadEnvironment();
@@ -380,13 +380,13 @@ public final class GameWorld implements IUpdateable {
    */
   public void setCamera(final ICamera cam) {
     if (this.camera() != null) {
-      Game.renderLoop().detach(camera);
+      Game.loop().detach(camera);
     }
 
     camera = cam;
 
     if (cam != null && !Game.isInNoGUIMode()) {
-      Game.renderLoop().attach(cam);
+      Game.loop().attach(cam);
       cam.updateFocus();
     }
   }

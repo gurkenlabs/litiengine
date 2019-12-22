@@ -263,7 +263,7 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
     });
     panel.setLayout(glPanel);
 
-    Game.renderLoop().attach(this);
+    Game.loop().attach(this);
   }
 
   @Override
