@@ -6,10 +6,12 @@ import java.awt.geom.Rectangle2D;
 import java.net.URL;
 import java.util.List;
 
+import de.gurkenlabs.litiengine.util.AlphanumComparator;
+
 /**
  * The Interface IMap.
  */
-public interface IMap extends ILayerList {
+public interface IMap extends ILayerList, Comparable<IMap> {
 
   /**
    * Gets the tilesets.
@@ -134,4 +136,9 @@ public interface IMap extends ILayerList {
   public Color getBackgroundColor();
 
   public boolean isInfinite();
+
+  @Override
+  public default int compareTo(IMap map) {
+    return AlphanumComparator.compareTo(this.getName(), map.getName());
+  }
 }

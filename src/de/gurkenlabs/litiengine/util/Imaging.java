@@ -408,8 +408,8 @@ public final class Imaging {
       for (int y = 0; y < recoloredImage.getHeight(); y++) {
         for (int x = 0; x < recoloredImage.getWidth(); x++) {
           if (recoloredImage.getRGB(x, y) == originalColor.getRGB()) {
-            int new_clr = colorMappings.get(originalColor).getRGB();
-            recoloredImage.setRGB(x, y, new_clr);
+            int newColor = colorMappings.get(originalColor).getRGB();
+            recoloredImage.setRGB(x, y, newColor);
           }
         }
       }

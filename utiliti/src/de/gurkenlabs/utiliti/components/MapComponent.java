@@ -125,8 +125,8 @@ public class MapComponent extends GuiComponent {
   /**
    * This flag is used to bundle a move operation over several key events until
    * the arrow keys are released. This allows for the UndoManager to revert the
-   * keyboard move operation once instead of having to revert for each
-   * individual key stroke.
+   * keyboard move operation once instead of having to revert for each individual
+   * key stroke.
    */
   private boolean isMovingWithKeyboard;
 
@@ -225,9 +225,7 @@ public class MapComponent extends GuiComponent {
     UI.getInspector().bind(null);
     this.setFocus(null, true);
     this.getMaps().clear();
-
     Collections.sort(maps);
-
     this.getMaps().addAll(maps);
     UI.getMapController().bind(this.getMaps(), true);
   }
@@ -1040,7 +1038,7 @@ public class MapComponent extends GuiComponent {
    * </ol>
    * 
    * @param e
-   *          The mouse event of the calling {@link GuiComponent}
+   *            The mouse event of the calling {@link GuiComponent}
    */
   private void handleMouseMoved(ComponentMouseEvent e) {
     Transform.updateTransform();

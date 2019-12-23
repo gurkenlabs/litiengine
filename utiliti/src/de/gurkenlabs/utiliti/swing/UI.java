@@ -193,7 +193,7 @@ public final class UI {
     });
 
     window.setLocationRelativeTo(null);
-    if (Editor.preferences().getFrameState() != JFrame.ICONIFIED && Editor.preferences().getFrameState() != JFrame.NORMAL) {
+    if (Editor.preferences().getFrameState() != java.awt.Frame.ICONIFIED && Editor.preferences().getFrameState() != java.awt.Frame.NORMAL) {
       window.setExtendedState(Editor.preferences().getFrameState());
     } else if (Editor.preferences().getWidth() != 0 && Editor.preferences().getHeight() != 0) {
       window.setSize(Editor.preferences().getWidth(), Editor.preferences().getHeight());
@@ -266,9 +266,9 @@ public final class UI {
   }
 
   private static void initScrollBars(JPanel renderPane) {
-    horizontalScroll = new JScrollBar(JScrollBar.HORIZONTAL);
+    horizontalScroll = new JScrollBar(java.awt.Adjustable.HORIZONTAL);
     renderPane.add(horizontalScroll, BorderLayout.SOUTH);
-    verticalScroll = new JScrollBar(JScrollBar.VERTICAL);
+    verticalScroll = new JScrollBar(java.awt.Adjustable.VERTICAL);
     renderPane.add(verticalScroll, BorderLayout.EAST);
 
     horizontalScroll.addAdjustmentListener(e -> {
@@ -305,7 +305,7 @@ public final class UI {
 
   private static void initSwingComponentStyle() {
     try {
-      JOptionPane.setDefaultLocale(Locale.getDefault());
+      javax.swing.JComponent.setDefaultLocale(Locale.getDefault());
       JPopupMenu.setDefaultLightWeightPopupEnabled(false);
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
       UIManager.getDefaults().put("SplitPane.border", BorderFactory.createEmptyBorder());

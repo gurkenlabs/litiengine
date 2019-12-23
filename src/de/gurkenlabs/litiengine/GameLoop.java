@@ -3,7 +3,6 @@ package de.gurkenlabs.litiengine;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.locks.Lock;
 
 /**
  * The main update loop that executes the game logic by calling the update functions on all registered components and entities.

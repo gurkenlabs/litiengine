@@ -37,9 +37,7 @@ public class ColorComponent extends JPanel {
     this.textFieldColor = new JTextField();
     this.textFieldColor.setEditable(true);
     this.textFieldColor.setColumns(9);
-    this.textFieldColor.addActionListener(a -> {
-      this.setHexColor(this.textFieldColor.getText());
-    });
+    this.textFieldColor.addActionListener(a -> this.setHexColor(this.textFieldColor.getText()));
 
     this.btnSelectColor = new JButton();
     this.btnSelectColor.setIcon(Icons.COLORX16);
@@ -89,9 +87,13 @@ public class ColorComponent extends JPanel {
   }
 
   public void setHexColor(String color) {
+    Color c = ColorHelper.decode(color);
+    if (c == null) {
+      return;
+    }
     this.textFieldColor.setText(color);
     SwingHelpers.updateColorTextField(this.textFieldColor);
-    this.spinnerAlpha.setValue(ColorHelper.decode(color).getAlpha());
+    this.spinnerAlpha.setValue(c.getAlpha());
     for (ActionListener listener : this.listeners) {
       listener.actionPerformed(null);
     }

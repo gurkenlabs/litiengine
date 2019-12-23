@@ -107,7 +107,7 @@ public class MapOrientations {
 
     @Override
     public Rectangle2D getBounds(Point tile, IMap map) {
-      return this.getBounds(tile.x, tile.y, map);
+      return tile == null ? null : this.getBounds(tile.x, tile.y, map);
     }
 
     @Override
@@ -369,7 +369,7 @@ public class MapOrientations {
       Point loc = this.getLocation(x, y, map);
       Dimension tileSize = map.getTileSize();
       int hexSide = map.getHexSideLength();
-      
+
       int[] xp;
       int[] yp;
       if (map.getStaggerAxis() == StaggerAxis.X) {
