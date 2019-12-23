@@ -2,11 +2,14 @@ package de.gurkenlabs.utiliti.swing.controllers;
 
 import java.awt.Dimension;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
@@ -14,13 +17,13 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.components.MapController;
+import de.gurkenlabs.utiliti.swing.MapListCellRenderer;
 import de.gurkenlabs.utiliti.swing.UI;
 
 @SuppressWarnings("serial")
 public class MapList extends JScrollPane implements MapController {
-  private final JList<String> list;
-  private final DefaultListModel<String> model;
-  private int index = -1;
+  private final JList<IMap> list;
+  private final DefaultListModel<IMap> model;
 
   public MapList() {
     super();
@@ -32,22 +35,20 @@ public class MapList extends JScrollPane implements MapController {
     this.list = new JList<>();
     this.list.setVisibleRowCount(8);
     this.list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    this.list.setCellRenderer(new MapListCellRenderer());
     this.list.setMaximumSize(new Dimension(0, 250));
-
+    this.list.setSelectedIndex(0);
     this.list.getSelectionModel().addListSelectionListener(e -> {
       if (Editor.instance().isLoading() || Editor.instance().getMapComponent().isLoading()) {
         return;
       }
-
-      if (this.list.getSelectedIndex() < Editor.instance().getMapComponent().getMaps().size() && this.list.getSelectedIndex() >= 0) {
-        this.index = this.list.getSelectedIndex();
-        TmxMap map = Editor.instance().getMapComponent().getMaps().get(this.list.getSelectedIndex());
-        if (Game.world().environment() != null && Game.world().environment().getMap().equals(map)) {
-          return;
-        }
-
-        Editor.instance().getMapComponent().loadEnvironment(map);
+      Optional<TmxMap> map = Editor.instance().getMapComponent().getMaps().stream().filter(m -> m == this.list.getSelectedValue()).findFirst();
+      if ((map.isPresent() && Game.world().environment() != null && Game.world().environment().getMap() == map.get()) || !map.isPresent()) {
+        return;
       }
+      Editor.instance().getMapComponent().loadEnvironment(map.get());
+    });
+
     });
 
     this.setViewportView(this.list);
@@ -56,91 +57,66 @@ public class MapList extends JScrollPane implements MapController {
     UndoManager.onMapObjectAdded(manager -> this.refresh());
     UndoManager.onMapObjectRemoved(manager -> this.refresh());
 
-    UndoManager.onUndoStackChanged(manager -> this.bind(Editor.instance().getMapComponent().getMaps()));
+    UndoManager.onUndoStackChanged(manager -> this.bind(Editor.instance().getMapComponent().getMaps(), false));
   }
 
   @Override
   public synchronized void bind(List<TmxMap> maps) {
-    this.bind(maps, false);
+    this.bind(maps, true);
   }
 
   @Override
   public synchronized void bind(List<TmxMap> maps, boolean clear) {
     if (clear) {
       this.model.clear();
-      this.index = -1;
+      this.list.setSelectedIndex(0);
     }
-
+    int selectedIndex = this.list.getSelectedIndex();
     for (TmxMap map : maps) {
-      String name = map.getName();
-      if (UndoManager.hasChanges(map)) {
-        name += " *";
-      }
-
-      // update existing strings
-      int indexToReplace = getIndexToReplace(map.getName());
-      if (indexToReplace != -1) {
-        this.model.set(indexToReplace, name);
-      } else {
-        // add new maps
-        this.model.addElement(name);
+      if (!this.model.contains(map)) {
+        this.model.addElement(map);
       }
     }
 
     // remove maps that are no longer present
     for (int i = 0; i < this.model.getSize(); i++) {
-      final String current = this.model.get(i);
-      if (current == null || maps.stream().noneMatch(x -> current.startsWith(x.getName()))) {
+      final IMap current = this.model.get(i);
+      if (this.model.get(i) == null || maps.stream().noneMatch(x -> x == current)) {
         this.model.remove(i);
       }
     }
 
     this.list.setModel(this.model);
-    this.list.revalidate();
+    this.list.setSelectedIndex(selectedIndex);
+
     this.refresh();
   }
 
   @Override
-  public void setSelection(String mapName) {
-    if (mapName == null || mapName.isEmpty()) {
-      list.clearSelection();
+  public void setSelection(TmxMap map) {
+    if (map == null) {
+      this.list.clearSelection();
     } else {
-      if (model.contains(mapName)) {
-        list.setSelectedValue(mapName, true);
+      if (this.model.contains(map)) {
+        this.list.setSelectedValue(map, true);
       }
     }
-
     this.refresh();
   }
 
   @Override
-  public IMap getCurrentMap() {
+  public TmxMap getCurrentMap() {
     if (this.list.getSelectedIndex() == -1) {
       return null;
     }
-    return Editor.instance().getMapComponent().getMaps().get(list.getSelectedIndex());
+    Optional<TmxMap> map = Editor.instance().getMapComponent().getMaps().stream().filter(m -> m.getName().equals(this.list.getSelectedValue())).findFirst();
+    return map.isPresent() ? map.get() : null;
   }
 
   @Override
   public void refresh() {
-    if (this.index == -1 && this.model.size() > 0) {
-      this.list.setSelectedIndex(0);
-    } else {
-      this.list.setSelectedIndex(this.index);
-    }
-
+    this.list.revalidate();
     UI.getEntityController().refresh();
     UI.getLayerController().refresh();
-  }
-
-  private int getIndexToReplace(String mapName) {
-    for (int i = 0; i < this.model.getSize(); i++) {
-      final String currentName = this.model.get(i);
-      if (currentName != null && (currentName.equals(mapName) || currentName.equals(mapName + " *"))) {
-        return i;
-      }
-    }
-
-    return -1;
   }
 }

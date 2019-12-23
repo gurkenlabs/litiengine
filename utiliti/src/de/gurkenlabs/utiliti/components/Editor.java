@@ -257,7 +257,7 @@ public class Editor extends Screen {
     this.currentResourceFile = null;
     this.gameFile = null;
     this.setProjectPath(null);
-    this.mapComponent.loadMaps(Arrays.asList());
+    this.mapComponent.loadMaps(Arrays.asList(), true);
     Resources.clearAll();
     UI.getAssetController().refresh();
     this.gamefileLoaded();
@@ -271,7 +271,7 @@ public class Editor extends Screen {
         return;
       }
     }
-    
+
     if (!FileUtilities.getExtension(gameFile).equals(ResourceBundle.FILE_EXTENSION)) {
       log.log(Level.SEVERE, "unsupported file format {0}", FileUtilities.getExtension(gameFile));
       return;
@@ -301,7 +301,7 @@ public class Editor extends Screen {
       this.setProjectPath(gameFile.getPath());
 
       // load maps from game file
-      this.mapComponent.loadMaps(this.getGameFile().getMaps());
+      this.mapComponent.loadMaps(this.getGameFile().getMaps(), false);
 
       Resources.images().clear();
       Resources.spritesheets().clear();
@@ -594,9 +594,9 @@ public class Editor extends Screen {
     }
 
     File currentFile = new File(this.currentResourceFile);
-    String currentMapSelection = null;
+    TmxMap currentMapSelection = null;
     if (UI.getMapController().getCurrentMap() != null) {
-      currentMapSelection = UI.getMapController().getCurrentMap().getName();
+      currentMapSelection = UI.getMapController().getCurrentMap();
     }
 
     this.close(true);
@@ -651,8 +651,6 @@ public class Editor extends Screen {
     if (preferences().syncMaps()) {
       this.saveMaps();
     }
-
-    UI.getMapController().bind(this.getMapComponent().getMaps());
     return saveFile;
   }
 

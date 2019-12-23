@@ -32,7 +32,6 @@ import javax.swing.SwingUtilities;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
-import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
@@ -160,6 +159,8 @@ public class MapComponent extends GuiComponent {
     this.environments = new ConcurrentHashMap<>();
     this.maps = new CopyOnWriteArrayList<>();
     this.cameraFocus = new ConcurrentHashMap<>();
+    this.onMouseEnter(e -> Game.window().cursor().setVisible(true));
+    this.onMouseLeave(e -> Game.window().cursor().setVisible(false));
 
     UndoManager.onUndoStackChanged(e -> Transform.updateAnchors());
   }
@@ -215,10 +216,10 @@ public class MapComponent extends GuiComponent {
       }
     }
 
-    this.loadMaps(loadedMaps);
+    this.loadMaps(loadedMaps, true);
   }
 
-  public void loadMaps(List<TmxMap> maps) {
+  public void loadMaps(List<TmxMap> maps, boolean clearSelection) {
     if (maps == null) {
       return;
     }
@@ -227,7 +228,7 @@ public class MapComponent extends GuiComponent {
     this.getMaps().clear();
     Collections.sort(maps);
     this.getMaps().addAll(maps);
-    UI.getMapController().bind(this.getMaps(), true);
+    UI.getMapController().bind(this.getMaps(), clearSelection);
   }
 
   public List<TmxMap> getMaps() {
@@ -310,7 +311,7 @@ public class MapComponent extends GuiComponent {
       }
 
       for (Consumer<TmxMap> cons : this.loadingConsumer) {
-        cons.accept(Game.world().environment() != null ? (TmxMap) Game.world().environment().getMap() : null);
+        cons.accept(Game.world().environment() != null ? ((TmxMap) Game.world().environment().getMap()) : null);
       }
 
       Point2D newFocus = null;
@@ -333,7 +334,7 @@ public class MapComponent extends GuiComponent {
       Game.world().loadEnvironment(this.environments.get(map.getName()));
 
       UI.updateScrollBars();
-      UI.getMapController().setSelection(map.getName());
+      UI.getMapController().setSelection(map);
       UI.getInspector().bind(this.getFocusedMapObject());
 
       for (Consumer<TmxMap> cons : this.loadedConsumer) {
@@ -782,7 +783,7 @@ public class MapComponent extends GuiComponent {
     });
   }
 
-  public void reassignIds(IMap map, int startID) {
+  public void reassignIds(TmxMap map, int startID) {
     int maxMapId = startID;
     UndoManager.instance().beginOperation();
     for (IMapObject obj : map.getMapObjects()) {
@@ -809,7 +810,7 @@ public class MapComponent extends GuiComponent {
       return;
     }
 
-    final IMap currentMap = Game.world().environment().getMap();
+    final TmxMap currentMap = (TmxMap) Game.world().environment().getMap();
     Dimension size = currentMap.getOrientation().getSize(currentMap);
     BufferedImage img = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
     MapRenderer.render(img.createGraphics(), currentMap, currentMap.getBounds());
@@ -846,7 +847,7 @@ public class MapComponent extends GuiComponent {
       maxY = Snap.y(maxY);
     }
 
-    final IMap map = Game.world().environment().getMap();
+    final TmxMap map = (TmxMap) Game.world().environment().getMap();
     if (map != null && Editor.preferences().clampToMap()) {
       minX = MathUtilities.clamp(minX, 0, map.getSizeInPixels().width);
       maxX = MathUtilities.clamp(maxX, 0, map.getSizeInPixels().width);

@@ -14,7 +14,6 @@ import javax.swing.KeyStroke;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
-import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.utiliti.UndoManager;
@@ -81,10 +80,7 @@ public final class MapMenu extends JMenu {
         } catch (final NumberFormatException nfe) {
           log.log(Level.SEVERE, nfe.getLocalizedMessage(), nfe);
         }
-
         UndoManager.instance().recordChanges();
-        Editor.instance().getMapComponent().loadMaps(Editor.instance().getGameFile().getMaps());
-        Editor.instance().getMapComponent().loadEnvironment((TmxMap) Game.world().environment().getMap());
       }
     });
 
