@@ -8,9 +8,6 @@ import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
-
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
@@ -47,8 +44,6 @@ public class MapList extends JScrollPane implements MapController {
         return;
       }
       Editor.instance().getMapComponent().loadEnvironment(map.get());
-    });
-
     });
 
     this.setViewportView(this.list);
