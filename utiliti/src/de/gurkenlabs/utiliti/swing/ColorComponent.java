@@ -34,7 +34,7 @@ public class ColorComponent extends JPanel {
     this.setSize(200, 60);
     this.setPreferredSize(new Dimension(200, 60));
     this.listeners = new ArrayList<>();
-    this.textFieldColor = new JTextField();
+    this.textFieldColor = ControlBehavior.apply(new JTextField());
     this.textFieldColor.setEditable(true);
     this.textFieldColor.setColumns(9);
     this.textFieldColor.addActionListener(a -> this.setHexColor(this.textFieldColor.getText()));
@@ -56,6 +56,8 @@ public class ColorComponent extends JPanel {
       final Color newColor = new Color(oldColor.getRed(), oldColor.getGreen(), oldColor.getBlue(), (int) this.spinnerAlpha.getValue());
       this.setColor(newColor);
     });
+    
+    ControlBehavior.apply(this.spinnerAlpha);
 
     GroupLayout groupLayout = new GroupLayout(this);
     groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup().addComponent(btnSelectColor, 25, 25, 25).addPreferredGap(ComponentPlacement.RELATED).addComponent(textFieldColor, GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE))

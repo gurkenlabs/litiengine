@@ -28,6 +28,7 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.utiliti.Style;
 import de.gurkenlabs.utiliti.swing.ColorComponent;
+import de.gurkenlabs.utiliti.swing.ControlBehavior;
 import de.gurkenlabs.utiliti.swing.panels.AmbientLightPreviewPanel;
 
 @SuppressWarnings("serial")
@@ -89,6 +90,7 @@ public class MapPropertyPanel extends JPanel {
     final JLabel lblMapTitle = new JLabel(Resources.strings().get("panel_title"));
 
     this.textFieldTitle = new JTextField();
+    ControlBehavior.apply(this.textFieldTitle);
     this.textFieldTitle.setColumns(10);
 
     final JLabel lblGeneral = new JLabel(Resources.strings().get("panel_general"));
@@ -100,6 +102,7 @@ public class MapPropertyPanel extends JPanel {
     final JLabel lblDesc = new JLabel(Resources.strings().get("panel_description"));
 
     this.textFieldName = new JTextField();
+    ControlBehavior.apply(this.textFieldName);
     this.textFieldName.setColumns(10);
 
     final JLabel lblStaticShadows = new JLabel(Resources.strings().get("panel_staticshadows"));
@@ -108,6 +111,7 @@ public class MapPropertyPanel extends JPanel {
     final JLabel lblGravity = new JLabel(Resources.strings().get("panel_gravity"));
 
     this.spinnerGravity = new JSpinner();
+    ControlBehavior.apply(this.spinnerGravity);
 
     final JLabel lblCustomProperties = new JLabel(Resources.strings().get("panel_customProperties"));
     lblCustomProperties.setFont(Style.getDefaultFont());

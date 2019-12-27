@@ -25,6 +25,7 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -36,6 +37,7 @@ import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.components.Editor;
+import de.gurkenlabs.utiliti.swing.ControlBehavior;
 import de.gurkenlabs.utiliti.swing.TextList;
 import de.gurkenlabs.utiliti.swing.UI;
 
@@ -301,6 +303,7 @@ public abstract class PropertyPanel extends JPanel {
       this.label = new JLabel(this.caption);
       this.label.setVerticalAlignment(JLabel.TOP);
       this.setMinHeight(CONTROL_HEIGHT);
+      ControlBehavior.apply(this.getComponent());
     }
 
     public LayoutItem(String resource, Component component, int minHeight) {

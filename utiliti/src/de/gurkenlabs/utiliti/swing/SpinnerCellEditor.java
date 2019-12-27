@@ -23,7 +23,7 @@ public class SpinnerCellEditor extends DefaultCellEditor {
 
   // Initializes the spinner.
   public SpinnerCellEditor() {
-    super(new JTextField());
+    super(ControlBehavior.apply(new JTextField()));
     spinner = new JSpinner();
     editor = ((JSpinner.DefaultEditor) spinner.getEditor());
     textField = editor.getTextField();

@@ -28,6 +28,7 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.components.PropertyInspector;
 import de.gurkenlabs.utiliti.handlers.Transform;
+import de.gurkenlabs.utiliti.swing.ControlBehavior;
 import de.gurkenlabs.utiliti.swing.TagPanel;
 import de.gurkenlabs.utiliti.swing.UI;
 
@@ -78,12 +79,14 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
     this.textFieldName = new JTextField();
     this.textFieldName.setColumns(10);
+    
+    ControlBehavior.apply(this.textFieldName);
 
     this.spinnerX = new JSpinner();
     this.spinnerY = new JSpinner();
     this.spinnerWidth = new JSpinner();
     this.spinnerHeight = new JSpinner();
-
+    
     this.updateSpinnerModels();
 
     this.tagPanel = new TagPanel();
@@ -370,5 +373,10 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.spinnerY.setModel(supp.get());
     this.spinnerWidth.setModel(supp.get());
     this.spinnerHeight.setModel(supp.get());
+    
+    ControlBehavior.apply(this.spinnerX);
+    ControlBehavior.apply(this.spinnerY);
+    ControlBehavior.apply(this.spinnerWidth);
+    ControlBehavior.apply(this.spinnerHeight);
   }
 }

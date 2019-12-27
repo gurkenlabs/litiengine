@@ -16,6 +16,7 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SpinnerNumberModel;
 
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.utiliti.swing.ControlBehavior;
 import de.gurkenlabs.utiliti.swing.Icons;
 
 @SuppressWarnings("serial")
@@ -29,6 +30,7 @@ public class GridEditPanel extends JPanel {
   public GridEditPanel(float strokeWidth, Color strokeColor, int snapDivision) {
 
     this.strokeSpinner = new JSpinner();
+    ControlBehavior.apply(this.strokeSpinner);
     this.strokeSpinner.setModel(new SpinnerNumberModel(strokeWidth, 1f, 5f, 0.1f));
 
     this.gridColor = strokeColor;
@@ -40,6 +42,7 @@ public class GridEditPanel extends JPanel {
     });
     
     this.snapDivisionSpinner = new JSpinner();
+    ControlBehavior.apply(this.snapDivisionSpinner);
     this.snapDivisionSpinner.setModel(new SpinnerNumberModel(snapDivision, 1.0, 10.0, 1.0));
 
     JLabel lblStroke = new JLabel(Resources.strings().get("menu_view_gridStroke"));

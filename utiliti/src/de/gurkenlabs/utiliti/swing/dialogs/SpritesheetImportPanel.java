@@ -43,6 +43,7 @@ import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.io.Codec;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import de.gurkenlabs.utiliti.Style;
+import de.gurkenlabs.utiliti.swing.ControlBehavior;
 
 @SuppressWarnings("serial")
 public class SpritesheetImportPanel extends JPanel implements IUpdateable {
@@ -185,6 +186,7 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
     JLabel lblName = new JLabel("name:");
 
     textField = new JTextField();
+    ControlBehavior.apply(textField);
     textField.setColumns(10);
     textField.addActionListener(e -> fileList.getSelectedValue().setName(textField.getText()));
 
