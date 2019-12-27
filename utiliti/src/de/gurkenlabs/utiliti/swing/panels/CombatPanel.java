@@ -6,6 +6,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
+import de.gurkenlabs.litiengine.entities.CombatEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 
@@ -39,7 +40,7 @@ public class CombatPanel extends PropertyPanel {
   @Override
   protected void setControlValues(IMapObject mapObject) {
     this.chckbxIndestructible.setSelected(mapObject.getBoolValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE));
-    this.spinnerHitpoints.setValue(mapObject.getIntValue(MapObjectProperty.COMBAT_HITPOINTS));
+    this.spinnerHitpoints.setValue(mapObject.getIntValue(MapObjectProperty.COMBAT_HITPOINTS, CombatEntity.DEFAULT_HITPOINTS));
     this.spinnerTeam.setValue(mapObject.getIntValue(MapObjectProperty.COMBAT_TEAM));
   }
 

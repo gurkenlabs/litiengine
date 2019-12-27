@@ -22,6 +22,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 @CombatInfo
 @CollisionInfo(collision = true)
 public class CombatEntity extends CollisionEntity implements ICombatEntity {
+  public static final int DEFAULT_HITPOINTS = 100;
+
   private final List<Effect> appliedEffects;
   private final List<CombatEntityListener> listeners;
   private final List<CombatEntityDeathListener> deathListeners;
@@ -179,7 +181,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
    */
   @Override
   public boolean isDead() {
-    return this.getHitPoints().getCurrentValue() <= 0;
+    return !this.isIndestructible() && this.getHitPoints().getCurrentValue() <= 0;
   }
 
   /**
