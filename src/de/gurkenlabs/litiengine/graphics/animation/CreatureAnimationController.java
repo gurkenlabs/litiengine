@@ -214,6 +214,13 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
         return name;
       }
     }
+    
+    for(Direction d : Direction.values()) {
+      final String name = this.getSpriteName(state.getOpposite(), d);
+      if (this.hasAnimation(name)) {
+        return name;
+      }
+    }
 
     return this.getDefault() != null ? this.getDefault().getName() : null;
   }
