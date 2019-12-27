@@ -1,6 +1,5 @@
 package de.gurkenlabs.utiliti.swing;
 
-import java.awt.GridLayout;
 import java.util.Collections;
 import java.util.List;
 
@@ -22,23 +21,21 @@ import de.gurkenlabs.utiliti.Style;
 
 @SuppressWarnings("serial")
 public class AssetPanel extends JPanel {
-  private static final int COLUMNS = 10;
-  private final GridLayout gridLayout;
+  private final WrapLayout layout;
 
   public AssetPanel() {
-    this.gridLayout = new GridLayout(3, COLUMNS);
-    this.gridLayout.setVgap(5);
-    this.gridLayout.setHgap(5);
-    this.setLayout(this.gridLayout);
+    this.layout = new WrapLayout();
+    this.layout.setVgap(5);
+    this.layout.setHgap(5);
+    this.layout.setAlignment(WrapLayout.LEFT);
+    this.setLayout(this.layout);
 
     this.setBorder(new EmptyBorder(5, 5, 5, 5));
     this.setBackground(Style.COLOR_ASSETPANEL_BACKGROUND);
-
-    // TODO: implement support for arrow keys to change focus
   }
 
   public void loadSprites(List<SpritesheetResource> infos) {
-    this.load(infos, () -> {
+    this.load(() -> {
       Collections.sort(infos);
       for (SpritesheetResource info : infos) {
         Icon icon;
@@ -58,7 +55,7 @@ public class AssetPanel extends JPanel {
   }
 
   public void loadTilesets(List<Tileset> tilesets) {
-    this.load(tilesets, () -> {
+    this.load(() -> {
       Collections.sort(tilesets);
       for (Tileset tileset : tilesets) {
         AssetPanelItem panelItem = new AssetPanelItem(Icons.DOC_TILESET, tileset.getName(), tileset);
@@ -69,7 +66,7 @@ public class AssetPanel extends JPanel {
   }
 
   public void loadEmitters(List<EmitterData> emitters) {
-    this.load(emitters, () -> {
+    this.load(() -> {
       Collections.sort(emitters);
       for (EmitterData emitter : emitters) {
         AssetPanelItem panelItem = new AssetPanelItem(Icons.DOC_EMITTER, emitter.getName(), emitter);
@@ -80,7 +77,7 @@ public class AssetPanel extends JPanel {
   }
 
   public void loadBlueprints(List<Blueprint> blueprints) {
-    this.load(blueprints, () -> {
+    this.load(() -> {
       Collections.sort(blueprints);
       for (MapObject blueprint : blueprints) {
         AssetPanelItem panelItem = new AssetPanelItem(Icons.DOC_BLUEPRINT, blueprint.getName(), blueprint);
@@ -91,7 +88,7 @@ public class AssetPanel extends JPanel {
   }
 
   public void loadSounds(List<SoundResource> sounds) {
-    this.load(sounds, () -> {
+    this.load(() -> {
       Collections.sort(sounds);
       for (SoundResource sound : sounds) {
         AssetPanelItem panelItem = new AssetPanelItem(Icons.DOC_SOUND, sound.getName(), sound);
@@ -101,20 +98,9 @@ public class AssetPanel extends JPanel {
     });
   }
 
-  public <T> void load(List<T> list, Runnable runnable) {
+  public <T> void load(Runnable runnable) {
     this.removeAll();
-    this.gridLayout.setRows(Math.max(list.size() / COLUMNS, 2));
-
     runnable.run();
-
-    if (list.size() < COLUMNS * 2) {
-      for (int i = 0; i < COLUMNS * 2 - list.size(); i++) {
-        JPanel placeholder = new JPanel();
-        placeholder.setOpaque(false);
-        this.add(placeholder);
-      }
-    }
-
     this.getRootPane().repaint();
   }
 }

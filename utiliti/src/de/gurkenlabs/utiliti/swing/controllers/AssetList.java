@@ -40,7 +40,7 @@ public class AssetList extends JSplitPane implements Controller {
       }
     });
 
-    JScrollPane scrollPane = new JScrollPane(assetPanel);
+    JScrollPane scrollPane = new JScrollPane(assetPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
     this.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> Editor.preferences().setAssetsSplitter(this.getDividerLocation()));
     this.setDividerLocation(Editor.preferences().getMainSplitterPosition() != 0 ? Editor.preferences().getAssetsSplitter() : 200);
