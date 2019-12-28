@@ -403,13 +403,13 @@ public final class PhysicsEngine implements IUpdateable {
    */
   private Rectangle2D getIntersection(final ICollisionEntity entity, final Rectangle2D entityCollisionBox) {
     Rectangle2D result = null;
-    for (final ICollisionEntity collisionBox : this.getCollisionEntities()) {
-      if (!canCollide(entity, collisionBox)) {
+    for (final ICollisionEntity otherEntity : this.getCollisionEntities()) {
+      if (!canCollide(entity, otherEntity)) {
         continue;
       }
 
-      if (GeometricUtilities.intersects(collisionBox.getCollisionBox(), entityCollisionBox)) {
-        Rectangle2D tmpIntersection = collisionBox.getCollisionBox().createIntersection(entityCollisionBox);
+      if (GeometricUtilities.intersects(otherEntity.getCollisionBox(), entityCollisionBox)) {
+        Rectangle2D tmpIntersection = otherEntity.getCollisionBox().createIntersection(entityCollisionBox);
         if (result != null) {
           result = tmpIntersection.createUnion(result);
         }

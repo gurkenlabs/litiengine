@@ -3,9 +3,13 @@ package de.gurkenlabs.litiengine;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.awt.Dimension;
+
 import javax.swing.JFrame;
+
 import org.junit.jupiter.api.Test;
+
 import de.gurkenlabs.litiengine.configuration.DisplayMode;
 
 public class GameWindowTests {
