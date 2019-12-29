@@ -4,6 +4,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
@@ -183,7 +184,7 @@ public final class ArrayUtilities {
   public static <T> T getRandom(T[] arr) {
     return getRandom(arr, ThreadLocalRandom.current());
   }
-  
+
   public static <T> T getRandom(T[] arr, Random rand) {
     if (arr.length == 0) {
       return null;
@@ -259,6 +260,47 @@ public final class ArrayUtilities {
     return result.toArray((T[]) Array.newInstance(input.getClass().getComponentType(), result.size()));
   }
 
+  /**
+   * Adds the specified item to the input array and returns a new array instance with the length of the input array +1.
+   * 
+   * @param <T>
+   *          The element type of the array.
+   * @param input
+   *          The original array.
+   * @param addItem
+   *          The item to add.
+   * @return A new array with the item to add appended at the end.
+   */
+  @SuppressWarnings("unchecked")
+  public static <T> T[] append(T[] input, T addItem) {
+    List<T> result = new ArrayList<>(Arrays.asList(input));
+    result.add(addItem);
+
+    return result.toArray((T[]) Array.newInstance(input.getClass().getComponentType(), result.size()));
+  }
+
+  /**
+   * Combines the two specified arrays by only keeping distinct values.
+   * 
+   * @param <T>
+   *          The element type of the array.
+   * @param first
+   *          The first array.
+   * @param second
+   *          The second array.
+   * @return A new array with every distinct value of the specified arrays.
+   */
+  @SuppressWarnings("unchecked")
+  public static <T> T[] distinct(T[] first, T[] second) {
+    List<T> firstList = Arrays.asList(first);
+    List<T> secondList = Arrays.asList(second);
+
+    HashSet<T> hash = new HashSet<>(firstList);
+    hash.addAll(secondList);
+
+    return hash.toArray((T[]) Array.newInstance(first.getClass().getComponentType(), hash.size()));
+  }
+
   public static int[] toIntegerArray(List<Integer> intList) {
     Integer[] objArray = intList.toArray(new Integer[0]);
     int[] intArray = new int[objArray.length];
@@ -267,5 +309,4 @@ public final class ArrayUtilities {
     }
     return intArray;
   }
-
 }

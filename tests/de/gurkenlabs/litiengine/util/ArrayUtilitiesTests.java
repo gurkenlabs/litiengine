@@ -60,23 +60,40 @@ public class ArrayUtilitiesTests {
   @Test
   public void testTwoDimensionalArrayToList() {
     Integer[][] arr = new Integer[][] {
-      { 0, 0, 0, },  
-      { 1, 1, 1, },
-      { 2, 2, 2, },
+        { 0, 0, 0, },
+        { 1, 1, 1, },
+        { 2, 2, 2, },
     };
 
     List<Integer> list = ArrayUtilities.toList(arr);
-    
+
     assertEquals(0, list.get(0).intValue());
     assertEquals(0, list.get(1).intValue());
     assertEquals(0, list.get(2).intValue());
-    
+
     assertEquals(1, list.get(3).intValue());
     assertEquals(1, list.get(4).intValue());
     assertEquals(1, list.get(5).intValue());
-    
+
     assertEquals(2, list.get(6).intValue());
     assertEquals(2, list.get(7).intValue());
     assertEquals(2, list.get(8).intValue());
+  }
+
+  @Test
+  public void testAppend() {
+    Integer[] test = new Integer[] { 1, 2, 3, 4, 5 };
+    Integer[] result = ArrayUtilities.append(test, 6);
+
+    assertArrayEquals(new Integer[] { 1, 2, 3, 4, 5, 6 }, result);
+  }
+  
+  @Test
+  public void testDistinct() {
+    Integer[] first = new Integer[] { 1, 2, 3, 4, 5 };
+    Integer[] second = new Integer[] { 1, 2, 3, 4, 5, 6 };
+    Integer[] result = ArrayUtilities.distinct(first, second);
+
+    assertArrayEquals(new Integer[] { 1, 2, 3, 4, 5, 6 }, result);
   }
 }
