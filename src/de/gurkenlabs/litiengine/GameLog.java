@@ -26,6 +26,7 @@ public final class GameLog {
   }
   
   void init() {
+    LogManager.getLogManager().reset();
     if (new File(LOGGING_CONFIG_FILE).exists()) {
       System.setProperty("java.util.logging.config.file", LOGGING_CONFIG_FILE);
 
