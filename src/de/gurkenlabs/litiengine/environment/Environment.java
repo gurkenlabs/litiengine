@@ -135,6 +135,67 @@ public final class Environment implements IRenderable {
     }
   }
 
+  /**
+   * Registers a custom loader instance that is responsible for loading and initializing entities of the defined
+   * MapObjectType.
+   * <br>
+   * <br>
+   * There can only be one loader for a particular type. Calling this method again for the same type will overwrite the previously registered loader.
+   * 
+   * @param mapObjectLoader
+   *          The MapObjectLoader instance to be registered.
+   * 
+   * @see IMapObjectLoader#getMapObjectType()
+   */
+  public static void registerMapObjectLoader(IMapObjectLoader mapObjectLoader) {
+    mapObjectLoaders.put(mapObjectLoader.getMapObjectType(), mapObjectLoader);
+  }
+
+  /**
+   * Registers a custom <code>IEntity</code> implementation to support being loaded from an <code>IMap</code> instance.
+   * Note that the specified class needs to be accessible in a static manner. Inner classes that aren't declared statically are not supported.
+   * 
+   * This is an overload of the {@link #registerCustomEntityType(Class)} method that allows to explicitly specify the <code>MapObjectType</code>
+   * without
+   * having to provide an <code>EntityInfo</code> annotation containing this information.
+   * 
+   * @param mapObjectType
+   *          The custom mapobjectType that is used by <code>IMapObjects</code> to determine the target entity implementation.
+   * @param entityType
+   *          The class type of the custom entity implementation.
+   * 
+   * @see IMapObject#getType()
+   * @see EntityInfo#customMapObjectType()
+   */
+  public static void registerCustomEntityType(String mapObjectType, Class<? extends IEntity> entityType) {
+    CustomMapObjectLoader mapObjectLoader = new CustomMapObjectLoader(mapObjectType, entityType);
+    registerMapObjectLoader(mapObjectLoader);
+  }
+
+  /**
+   * Registers a custom <code>IEntity</code> implementation to support being loaded from an <code>IMap</code> instance.
+   * Note that the specified class needs to be accessible in a static manner. Inner classes that aren't declared statically are not supported.
+   * 
+   * This implementation uses the provided <code>EntityInfo.customMapObjectType()</code> to determine for which type the specified class should be
+   * used.
+   * 
+   * @param entityType
+   *          The class type of the custom entity implementation.
+   * 
+   * @see Environment#registerCustomEntityType(String, Class)
+   * @see IMapObject#getType()
+   * @see EntityInfo#customMapObjectType()
+   */
+  public static void registerCustomEntityType(Class<? extends IEntity> entityType) {
+    EntityInfo info = entityType.getAnnotation(EntityInfo.class);
+    if (info == null || info.customMapObjectType().isEmpty()) {
+      throw new IllegalArgumentException(
+          "Cannot register a custom entity type without the related EntityInfo.customMapObjectType being specified.\nAdd an EntityInfo annotation to the " + entityType + " class and provide the required information or use the registerCustomEntityType overload and provide the type explicitly.");
+    }
+
+    registerCustomEntityType(info.customMapObjectType(), entityType);
+  }
+
   public void addRenderListener(RenderType renderType, EnvironmentRenderListener listener) {
     this.renderListeners.get(renderType).add(listener);
   }
@@ -176,105 +237,6 @@ public final class Environment implements IRenderable {
     this.addEntity(entity);
     this.miscEntities.get(entity.getRenderType()).put(entity.getMapId(), entity);
     this.fireEntityEvent(l -> l.entityAdded(entity));
-  }
-
-  private void addEntity(final IEntity entity) {
-    int desiredID = entity.getMapId();
-    // assign local map id if the entity's mapID is invalid
-    if (desiredID == 0 || this.getAllMapIDs().contains(desiredID)) {
-      entity.setMapId(this.getLocalMapId());
-      log.fine(() -> String.format("Entity [%s] was assigned a local mapID because #%d was already taken or invalid.", entity, desiredID));
-    }
-
-    if (entity instanceof Emitter)
-    {
-      Emitter emitter = (Emitter) entity;
-      this.addEmitter(emitter);
-    }
-
-    if (entity instanceof ICombatEntity) {
-      this.combatEntities.put(entity.getMapId(), (ICombatEntity) entity);
-    }
-
-    if (entity instanceof IMobileEntity) {
-      this.mobileEntities.put(entity.getMapId(), (IMobileEntity) entity);
-    }
-
-    if (entity instanceof Prop) {
-      this.props.add((Prop) entity);
-    }
-
-    if (entity instanceof Creature) {
-      this.creatures.add((Creature) entity);
-    }
-
-    if (entity instanceof CollisionBox) {
-      this.colliders.add((CollisionBox) entity);
-    }
-
-    if (entity instanceof LightSource) {
-      this.lightSources.add((LightSource) entity);
-    }
-
-    if (entity instanceof Trigger) {
-      this.triggers.add((Trigger) entity);
-    }
-
-    if (entity instanceof Spawnpoint) {
-      this.spawnPoints.add((Spawnpoint) entity);
-    }
-
-    if (entity instanceof StaticShadow) {
-      this.staticShadows.add((StaticShadow) entity);
-    } else if (entity instanceof MapArea) {
-      this.mapAreas.add((MapArea) entity);
-    }
-
-    for (String rawTag : entity.getTags()) {
-      if (rawTag == null) {
-        continue;
-      }
-
-      final String tag = rawTag.trim().toLowerCase();
-      if (tag.isEmpty()) {
-        continue;
-      }
-
-      this.getEntitiesByTag().computeIfAbsent(tag, t -> new CopyOnWriteArrayList<>()).add(entity);
-    }
-
-    // if the environment has already been loaded,
-    // we need to load the new entity manually
-    if (this.loaded) {
-      this.load(entity);
-    }
-
-    this.allEntities.put(entity.getMapId(), entity);
-  }
-
-  private void addEmitter(Emitter emitter) {
-    this.manageEmitterRenderables(emitter, (rends, instance) -> rends.add(instance));
-    this.emitters.add(emitter);
-  }
-
-  private void removeEmitter(Emitter emitter) {
-    this.manageEmitterRenderables(emitter, (rends, instance) -> rends.remove(instance));
-    this.emitters.remove(emitter);
-  }
-
-  private void manageEmitterRenderables(Emitter emitter, BiConsumer<Collection<IRenderable>, IRenderable> cons) {
-    for (RenderType renderType : RenderType.values()) {
-      if (renderType == RenderType.NONE) {
-        continue;
-      }
-
-      IRenderable renderable = emitter.getRenderable(renderType);
-      if (renderable != null) {
-        cons.accept(this.getRenderables(renderType), renderable);
-      }
-    }
-
-    this.emitters.remove(emitter);
   }
 
   public void updateLighting(IEntity entity) {
@@ -522,6 +484,10 @@ public final class Environment implements IRenderable {
 
   public AmbientLight getAmbientLight() {
     return this.ambientLight;
+  }
+
+  public Collection<Integer> getAllMapIDs() {
+    return this.allEntities.keySet();
   }
 
   public Collection<MapArea> getAreas() {
@@ -851,64 +817,27 @@ public final class Environment implements IRenderable {
   }
 
   /**
-   * Registers a custom loader instance that is responsible for loading and initializing entities of the defined
-   * MapObjectType.
-   * <br>
-   * <br>
-   * There can only be one loader for a particular type. Calling this method again for the same type will overwrite the previously registered loader.
+   * Attempts to interact with triggers on this environment.
    * 
-   * @param mapObjectLoader
-   *          The MapObjectLoader instance to be registered.
-   * 
-   * @see IMapObjectLoader#getMapObjectType()
+   * @param source
+   *          The entity that attempts to interacts with triggers.
+   * @return The trigger that the source entity was able to interact with or null.
    */
-  public static void registerMapObjectLoader(IMapObjectLoader mapObjectLoader) {
-    mapObjectLoaders.put(mapObjectLoader.getMapObjectType(), mapObjectLoader);
+  public Trigger interact(ICollisionEntity source) {
+    return this.interact(source, null);
   }
 
-  /**
-   * Registers a custom <code>IEntity</code> implementation to support being loaded from an <code>IMap</code> instance.
-   * Note that the specified class needs to be accessible in a static manner. Inner classes that aren't declared statically are not supported.
-   * 
-   * This is an overload of the {@link #registerCustomEntityType(Class)} method that allows to explicitly specify the <code>MapObjectType</code>
-   * without
-   * having to provide an <code>EntityInfo</code> annotation containing this information.
-   * 
-   * @param mapObjectType
-   *          The custom mapobjectType that is used by <code>IMapObjects</code> to determine the target entity implementation.
-   * @param entityType
-   *          The class type of the custom entity implementation.
-   * 
-   * @see IMapObject#getType()
-   * @see EntityInfo#customMapObjectType()
-   */
-  public static void registerCustomEntityType(String mapObjectType, Class<? extends IEntity> entityType) {
-    CustomMapObjectLoader mapObjectLoader = new CustomMapObjectLoader(mapObjectType, entityType);
-    registerMapObjectLoader(mapObjectLoader);
-  }
-
-  /**
-   * Registers a custom <code>IEntity</code> implementation to support being loaded from an <code>IMap</code> instance.
-   * Note that the specified class needs to be accessible in a static manner. Inner classes that aren't declared statically are not supported.
-   * 
-   * This implementation uses the provided <code>EntityInfo.customMapObjectType()</code> to determine for which type the specified class should be
-   * used.
-   * 
-   * @param entityType
-   *          The class type of the custom entity implementation.
-   * 
-   * @see Environment#registerCustomEntityType(String, Class)
-   * @see IMapObject#getType()
-   * @see EntityInfo#customMapObjectType()
-   */
-  public static void registerCustomEntityType(Class<? extends IEntity> entityType) {
-    EntityInfo info = entityType.getAnnotation(EntityInfo.class);
-    if (info == null || info.customMapObjectType().isEmpty()) {
-      throw new IllegalArgumentException(
-          "Cannot register a custom entity type without the related EntityInfo.customMapObjectType being specified.\nAdd an EntityInfo annotation to the " + entityType + " class and provide the required information or use the registerCustomEntityType overload and provide the type explicitly.");
+  public Trigger interact(ICollisionEntity source, Predicate<Trigger> condition) {
+    for (final Trigger trigger : Game.world().environment().getTriggers()) {
+      if (trigger.canTrigger(source) && triggerConditionsAreMet(trigger, condition)) {
+        boolean result = trigger.interact(source);
+        if (result) {
+          return trigger;
+        }
+      }
     }
 
-    registerCustomEntityType(info.customMapObjectType(), entityType);
+    return null;
   }
 
   public void reloadFromMap(final int mapId) {
@@ -1065,7 +994,7 @@ public final class Environment implements IRenderable {
     }
 
     final double shadowTime = TimeUtilities.nanoToMs(System.nanoTime() - shadowRenderStart);
-    
+
     this.render(g, RenderType.UI);
 
     if (Game.config().debug().trackRenderTimes()) {
@@ -1104,24 +1033,6 @@ public final class Environment implements IRenderable {
       for (IMobileEntity entity : this.getMobileEntities()) {
         this.removeGravity(entity);
       }
-    }
-  }
-
-  private void fireEvent(Consumer<EnvironmentListener> cons) {
-    for (EnvironmentListener listener : this.listeners) {
-      cons.accept(listener);
-    }
-  }
-
-  private void fireRenderEvent(Graphics2D g, RenderType type) {
-    for (EnvironmentRenderListener listener : this.renderListeners.get(type)) {
-      listener.rendered(g, type);
-    }
-  }
-
-  private void fireEntityEvent(Consumer<EnvironmentEntityListener> cons) {
-    for (EnvironmentEntityListener listener : this.entityListeners) {
-      cons.accept(listener);
     }
   }
 
@@ -1181,6 +1092,21 @@ public final class Environment implements IRenderable {
     return new ArrayList<>();
   }
 
+  public void renderLayer(Graphics2D g, IMapObjectLayer layer) {
+    List<IEntity> entities = this.layerEntities.get(layer);
+    if (entities != null) {
+      Game.graphics().renderEntities(g, entities, layer.getRenderType() == RenderType.NORMAL);
+    }
+  }
+
+  private static boolean triggerConditionsAreMet(Trigger trigger, Predicate<Trigger> condition) {
+    if (condition == null) {
+      return true;
+    }
+
+    return condition.test(trigger);
+  }
+
   private static <T extends IEntity> T getById(Collection<T> entities, int mapId) {
     for (final T m : entities) {
       if (m.getMapId() == mapId) {
@@ -1202,6 +1128,36 @@ public final class Environment implements IRenderable {
       }
     }
     return null;
+  }
+
+  private static void loadPhysicsEntity(IEntity entity) {
+    if (entity instanceof ICollisionEntity) {
+      final ICollisionEntity coll = (ICollisionEntity) entity;
+      if (coll.hasCollision()) {
+        Game.physics().add(coll);
+      }
+    }
+  }
+
+  private static void loadUpdatableOrEmitterEntity(IEntity entity) {
+    if (entity instanceof Emitter) {
+      final Emitter emitter = (Emitter) entity;
+      if (emitter.isActivateOnInit()) {
+        emitter.activate();
+      }
+    } else if (entity instanceof IUpdateable) {
+      Game.loop().attach((IUpdateable) entity);
+    }
+  }
+
+  private static void dispose(final Collection<? extends IEntity> entities) {
+    for (final IEntity entity : entities) {
+      if (entity instanceof IUpdateable) {
+        Game.loop().detach((IUpdateable) entity);
+      }
+
+      entity.detachControllers();
+    }
   }
 
   private void render(Graphics2D g, RenderType renderType) {
@@ -1232,13 +1188,6 @@ public final class Environment implements IRenderable {
     }
   }
 
-  public void renderLayer(Graphics2D g, IMapObjectLayer layer) {
-    List<IEntity> entities = this.layerEntities.get(layer);
-    if (entities != null) {
-      Game.graphics().renderEntities(g, entities, layer.getRenderType() == RenderType.NORMAL);
-    }
-  }
-
   private void addAmbientLight() {
     final Color ambientColor = this.getMap().getColorValue(MapProperty.AMBIENTCOLOR, AmbientLight.DEFAULT_COLOR);
     this.ambientLight = new AmbientLight(this, ambientColor);
@@ -1247,20 +1196,6 @@ public final class Environment implements IRenderable {
   private void addStaticShadows() {
     final Color color = this.getMap().getColorValue(MapProperty.SHADOWCOLOR, StaticShadow.DEFAULT_COLOR);
     this.staticShadowLayer = new StaticShadowLayer(this, color);
-  }
-
-  public Collection<Integer> getAllMapIDs() {
-    return this.allEntities.keySet();
-  }
-
-  private static void dispose(final Collection<? extends IEntity> entities) {
-    for (final IEntity entity : entities) {
-      if (entity instanceof IUpdateable) {
-        Game.loop().detach((IUpdateable) entity);
-      }
-
-      entity.detachControllers();
-    }
   }
 
   /**
@@ -1319,26 +1254,6 @@ public final class Environment implements IRenderable {
     }
   }
 
-  private static void loadPhysicsEntity(IEntity entity) {
-    if (entity instanceof ICollisionEntity) {
-      final ICollisionEntity coll = (ICollisionEntity) entity;
-      if (coll.hasCollision()) {
-        Game.physics().add(coll);
-      }
-    }
-  }
-
-  private static void loadUpdatableOrEmitterEntity(IEntity entity) {
-    if (entity instanceof Emitter) {
-      final Emitter emitter = (Emitter) entity;
-      if (emitter.isActivateOnInit()) {
-        emitter.activate();
-      }
-    } else if (entity instanceof IUpdateable) {
-      Game.loop().attach((IUpdateable) entity);
-    }
-  }
-
   private void loadMapObjects() {
     for (final IMapObjectLayer layer : this.getMap().getMapObjectLayers()) {
       for (final IMapObject mapObject : layer.getMapObjects()) {
@@ -1387,5 +1302,121 @@ public final class Environment implements IRenderable {
     }
 
     entity.removed(this);
+  }
+
+  private void addEntity(final IEntity entity) {
+    int desiredID = entity.getMapId();
+    // assign local map id if the entity's mapID is invalid
+    if (desiredID == 0 || this.getAllMapIDs().contains(desiredID)) {
+      entity.setMapId(this.getLocalMapId());
+      log.fine(() -> String.format("Entity [%s] was assigned a local mapID because #%d was already taken or invalid.", entity, desiredID));
+    }
+
+    if (entity instanceof Emitter) {
+      Emitter emitter = (Emitter) entity;
+      this.addEmitter(emitter);
+    }
+
+    if (entity instanceof ICombatEntity) {
+      this.combatEntities.put(entity.getMapId(), (ICombatEntity) entity);
+    }
+
+    if (entity instanceof IMobileEntity) {
+      this.mobileEntities.put(entity.getMapId(), (IMobileEntity) entity);
+    }
+
+    if (entity instanceof Prop) {
+      this.props.add((Prop) entity);
+    }
+
+    if (entity instanceof Creature) {
+      this.creatures.add((Creature) entity);
+    }
+
+    if (entity instanceof CollisionBox) {
+      this.colliders.add((CollisionBox) entity);
+    }
+
+    if (entity instanceof LightSource) {
+      this.lightSources.add((LightSource) entity);
+    }
+
+    if (entity instanceof Trigger) {
+      this.triggers.add((Trigger) entity);
+    }
+
+    if (entity instanceof Spawnpoint) {
+      this.spawnPoints.add((Spawnpoint) entity);
+    }
+
+    if (entity instanceof StaticShadow) {
+      this.staticShadows.add((StaticShadow) entity);
+    } else if (entity instanceof MapArea) {
+      this.mapAreas.add((MapArea) entity);
+    }
+
+    for (String rawTag : entity.getTags()) {
+      if (rawTag == null) {
+        continue;
+      }
+
+      final String tag = rawTag.trim().toLowerCase();
+      if (tag.isEmpty()) {
+        continue;
+      }
+
+      this.getEntitiesByTag().computeIfAbsent(tag, t -> new CopyOnWriteArrayList<>()).add(entity);
+    }
+
+    // if the environment has already been loaded,
+    // we need to load the new entity manually
+    if (this.loaded) {
+      this.load(entity);
+    }
+
+    this.allEntities.put(entity.getMapId(), entity);
+  }
+
+  private void addEmitter(Emitter emitter) {
+    this.manageEmitterRenderables(emitter, (rends, instance) -> rends.add(instance));
+    this.emitters.add(emitter);
+  }
+
+  private void removeEmitter(Emitter emitter) {
+    this.manageEmitterRenderables(emitter, (rends, instance) -> rends.remove(instance));
+    this.emitters.remove(emitter);
+  }
+
+  private void manageEmitterRenderables(Emitter emitter, BiConsumer<Collection<IRenderable>, IRenderable> cons) {
+    for (RenderType renderType : RenderType.values()) {
+      if (renderType == RenderType.NONE) {
+        continue;
+      }
+
+      IRenderable renderable = emitter.getRenderable(renderType);
+      if (renderable != null) {
+        cons.accept(this.getRenderables(renderType), renderable);
+      }
+    }
+
+    this.emitters.remove(emitter);
+  }
+
+  private void fireEvent(Consumer<EnvironmentListener> cons) {
+    for (EnvironmentListener listener : this.listeners) {
+      cons.accept(listener);
+    }
+  }
+
+  private void fireRenderEvent(Graphics2D g, RenderType type) {
+    for (EnvironmentRenderListener listener : this.renderListeners.get(type)) {
+      listener.rendered(g, type);
+    }
+  }
+
+  private void fireEntityEvent(Consumer<EnvironmentEntityListener> cons) {
+    for (EnvironmentEntityListener listener : this.entityListeners) {
+      cons.accept(listener);
+    }
   }
 }

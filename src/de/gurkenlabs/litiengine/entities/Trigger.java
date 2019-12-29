@@ -25,7 +25,6 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     COLLISION, INTERACT
   }
 
-  public static final String INTERACT_MESSAGE = "interact";
   private static final Logger log = Logger.getLogger(Trigger.class.getName());
 
   private final Collection<IEntity> activated = ConcurrentHashMap.newKeySet();
@@ -161,29 +160,17 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     return this.isActivated;
   }
 
-  @Override
-  public String sendMessage(final Object sender, final String message) {
-    if (this.activationType == TriggerActivation.COLLISION && sender != null && sender instanceof IEntity || message == null || message.isEmpty()) {
-      return Boolean.toString(false);
+  public boolean interact(final IEntity sender) {
+    if (this.activationType == TriggerActivation.COLLISION || sender == null) {
+      return false;
     }
 
-    if (!message.equals(INTERACT_MESSAGE)) {
-      return Boolean.toString(false);
+    if (this.activators.isEmpty() || this.activators.contains(sender.getMapId())) {
+      return this.activate(sender, sender.getMapId());
+    } else {
+      log.log(Level.FINE, "[{1}] tried to activate trigger [{0}] but was not allowed so because it was not on the list of activators", new Object[] { this.getName(), sender.getMapId() });
+      return false;
     }
-
-    if (sender instanceof IEntity) {
-      final IEntity ent = (IEntity) sender;
-
-      if (this.activators.isEmpty() || this.activators.contains(ent.getMapId())) {
-        this.activate(ent, ent.getMapId());
-        return Boolean.toString(true);
-      } else {
-        log.log(Level.INFO, "[{1}] tried to activate trigger [{0}] but was not allowed so because it was not on the list of activators", new Object[] { this.getName(), ent.getMapId() });
-        return Boolean.toString(false);
-      }
-    }
-
-    return super.sendMessage(sender, message);
   }
 
   public void setMessage(final String message) {

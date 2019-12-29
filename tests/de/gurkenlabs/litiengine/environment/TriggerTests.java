@@ -27,6 +27,7 @@ import de.gurkenlabs.litiengine.graphics.RenderType;
 
 public class TriggerTests {
   private Environment testEnvironment;
+
   @BeforeAll
   public static void initGame() {
 
@@ -39,7 +40,7 @@ public class TriggerTests {
   public static void terminateGame() {
     GameTest.resetGame();
   }
-  
+
   @BeforeEach
   public void initEnvironment() {
     IMap map = mock(IMap.class);
@@ -47,10 +48,10 @@ public class TriggerTests {
     when(map.getSizeInTiles()).thenReturn(new Dimension(10, 10));
     when(map.getOrientation()).thenReturn(MapOrientations.ORTHOGONAL);
     when(map.getRenderLayers()).thenReturn(new ArrayList<>());
-    
+
     this.testEnvironment = new Environment(map);
   }
-  
+
   @Test
   public void testInteractTrigger() {
     Trigger trigger = new Trigger(TriggerActivation.INTERACT, "testrigger", "testmessage");
@@ -68,7 +69,7 @@ public class TriggerTests {
 
     assertFalse(trigger.isActivated());
 
-    trigger.sendMessage(entity, Trigger.INTERACT_MESSAGE);
+    trigger.interact(entity);
 
     assertTrue(trigger.isActivated());
     verify(target, times(1)).sendMessage(trigger, trigger.getMessage());
