@@ -16,9 +16,6 @@ import de.gurkenlabs.litiengine.attributes.RangeAttribute;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 
-/**
- * The Class AttackableEntity.
- */
 @CombatInfo
 @CollisionInfo(collision = true)
 public class CombatEntity extends CollisionEntity implements ICombatEntity {

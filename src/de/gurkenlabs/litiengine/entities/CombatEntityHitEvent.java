@@ -8,7 +8,7 @@ public class CombatEntityHitEvent extends CombatEntityEvent {
   private final float damage;
 
   public CombatEntityHitEvent(final ICombatEntity entity, final float damage, final Ability ability) {
-    super(entity, entity);
+    super(entity);
     this.damage = damage;
     this.ability = ability;
   }

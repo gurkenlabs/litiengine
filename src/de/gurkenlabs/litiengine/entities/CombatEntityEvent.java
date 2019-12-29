@@ -7,8 +7,8 @@ public class CombatEntityEvent extends EventObject {
 
   private final transient ICombatEntity entity;
 
-  public CombatEntityEvent(Object source, ICombatEntity combatEntity) {
-    super(source);
+  public CombatEntityEvent(ICombatEntity combatEntity) {
+    super(combatEntity);
     this.entity = combatEntity;
   }
 
