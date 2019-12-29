@@ -113,7 +113,7 @@ public class UpdateLoop extends Thread implements AutoCloseable, ILoop {
   public void setTickRate(int tickRate) {
     this.tickRate = tickRate;
   }
-  
+
   protected Set<IUpdateable> getUpdatables() {
     return this.updatables;
   }
@@ -142,6 +142,10 @@ public class UpdateLoop extends Thread implements AutoCloseable, ILoop {
           updatable.update();
         }
       } catch (final Exception e) {
+        if (Game.config().client().exitOnError()) {
+          throw e;
+        }
+
         log.log(Level.SEVERE, e.getMessage(), e);
       }
     }
@@ -152,7 +156,8 @@ public class UpdateLoop extends Thread implements AutoCloseable, ILoop {
    * It then delays the execution of this loop by pausing the thread for the necessary delay.
    * 
    * @return The delay for which this tick was paused after the actual processing.
-   * @throws InterruptedException If the thread was interrupted while sleeping
+   * @throws InterruptedException
+   *           If the thread was interrupted while sleeping
    */
   protected double delay() throws InterruptedException {
     double delay = Math.max(0, this.getExpectedDelta() - this.getProcessTime());

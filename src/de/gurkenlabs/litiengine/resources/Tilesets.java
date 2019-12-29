@@ -1,5 +1,7 @@
 package de.gurkenlabs.litiengine.resources;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import javax.xml.bind.JAXBException;
@@ -14,7 +16,7 @@ public class Tilesets extends ResourcesContainer<Tileset> {
   }
 
   @Override
-  protected Tileset load(URL resourceName) throws TmxException {
+  protected Tileset load(URL resourceName) throws IOException, URISyntaxException {
     try {
       Tileset tileset = XmlUtilities.readFromFile(Tileset.class, resourceName);
       tileset.finish(resourceName);

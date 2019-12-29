@@ -10,6 +10,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -441,7 +442,7 @@ public class Editor extends Screen {
       EmitterData emitter;
       try {
         emitter = XmlUtilities.readFromFile(EmitterData.class, file.toURI().toURL());
-      } catch (JAXBException | MalformedURLException e) {
+      } catch (IOException | JAXBException | URISyntaxException e) {
         log.log(Level.SEVERE, "could not load emitter data from " + file, e);
         return;
       }
@@ -464,7 +465,7 @@ public class Editor extends Screen {
       Blueprint blueprint;
       try {
         blueprint = XmlUtilities.readFromFile(Blueprint.class, file.toURI().toURL());
-      } catch (JAXBException | MalformedURLException e) {
+      } catch (IOException | JAXBException | URISyntaxException e) {
         log.log(Level.SEVERE, "could not load blueprint from " + file, e);
         return;
       }
@@ -491,9 +492,9 @@ public class Editor extends Screen {
       Tileset tileset;
       try {
         URL path = file.toURI().toURL();
-        tileset = XmlUtilities.readFromFile(Tileset.class, file.toURI().toURL());
+        tileset = XmlUtilities.readFromFile(Tileset.class, path);
         tileset.finish(path);
-      } catch (JAXBException | MalformedURLException | TmxException e) {
+      } catch (IOException | JAXBException | URISyntaxException e) {
         log.log(Level.SEVERE, "could not load tileset from " + file, e);
         return;
       }

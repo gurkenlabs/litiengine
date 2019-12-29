@@ -3,9 +3,12 @@ package de.gurkenlabs.litiengine.util.io;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -83,7 +86,12 @@ public final class XmlUtilities {
     return null;
   }
 
-  public static <T> T readFromFile(Class<T> cls, URL path) throws JAXBException {
+  public static <T> T readFromFile(Class<T> cls, URL path) throws FileNotFoundException, JAXBException, URISyntaxException {
+    File file = Paths.get(path.toURI()).toFile();
+    if (!file.exists() || !file.isFile()) {
+      throw new FileNotFoundException();
+    }
+
     final JAXBContext jaxbContext = getContext(cls);
     if (jaxbContext == null) {
       return null;

@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -97,14 +98,14 @@ public class ResourceBundle implements Serializable {
       for (TmxMap map : gameFile.getMaps()) {
         for (final ITileset tileset : map.getTilesets()) {
           if (tileset instanceof Tileset) {
-            ((Tileset)tileset).load(gameFile.getTilesets());
+            ((Tileset) tileset).load(gameFile.getTilesets());
           }
         }
         map.finish(file);
       }
 
       return gameFile;
-    } catch (final JAXBException | IOException e) {
+    } catch (final JAXBException | IOException | URISyntaxException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
     }
 
@@ -135,7 +136,7 @@ public class ResourceBundle implements Serializable {
   public List<Blueprint> getBluePrints() {
     return this.blueprints;
   }
-  
+
   @XmlTransient
   public List<SoundResource> getSounds() {
     return this.sounds;
@@ -193,7 +194,7 @@ public class ResourceBundle implements Serializable {
     return newFile.toString();
   }
 
-  private static ResourceBundle getGameFileFromFile(URL file) throws JAXBException, IOException {
+  private static ResourceBundle getGameFileFromFile(URL file) throws JAXBException, IOException, URISyntaxException {
     final JAXBContext jaxbContext = XmlUtilities.getContext(ResourceBundle.class);
     final Unmarshaller um = jaxbContext.createUnmarshaller();
     try (InputStream inputStream = Resources.get(file)) {

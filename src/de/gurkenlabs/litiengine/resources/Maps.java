@@ -1,5 +1,7 @@
 package de.gurkenlabs.litiengine.resources;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import javax.xml.bind.JAXBException;
@@ -21,13 +23,14 @@ public final class Maps extends ResourcesContainer<IMap> {
   }
 
   @Override
-  protected IMap load(URL resourceName) throws TmxException {
+  protected IMap load(URL resourceName) throws IOException, URISyntaxException {
     TmxMap map;
     try {
       map = XmlUtilities.readFromFile(TmxMap.class, resourceName);
     } catch (JAXBException e) {
-      throw new TmxException("could not parse xml data", e);
+      throw new TmxException(e.getMessage(), e);
     }
+    
     if (map == null) {
       return null;
     }

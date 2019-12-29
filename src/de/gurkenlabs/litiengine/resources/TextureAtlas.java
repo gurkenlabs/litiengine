@@ -1,5 +1,7 @@
 package de.gurkenlabs.litiengine.resources;
 
+import java.io.FileNotFoundException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -48,12 +50,12 @@ public class TextureAtlas {
       String directory = FileUtilities.getParentDirPath(textureAtlasFile);
       atlas.absoluteImagePath = FileUtilities.combine(directory, atlas.rawImagePath);
       return atlas;
-    } catch (JAXBException e) {
+    } catch (FileNotFoundException | JAXBException | URISyntaxException e) {
       log.log(Level.SEVERE, "TextureAtlas " + textureAtlasFile + " could not be read.", e);
       return null;
     }
   }
-  
+
   @XmlTransient
   public String getAbsoluteImagePath() {
     return this.absoluteImagePath;
