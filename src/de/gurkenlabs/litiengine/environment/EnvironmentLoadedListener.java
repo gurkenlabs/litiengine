@@ -10,7 +10,7 @@ import java.util.EventListener;
 public interface EnvironmentLoadedListener extends EventListener {
 
   /**
-   * This method was called after the environment was loaded.
+   * This method is called after the environment was loaded.
    * 
    * @param environment
    *          The environment that was loaded.
