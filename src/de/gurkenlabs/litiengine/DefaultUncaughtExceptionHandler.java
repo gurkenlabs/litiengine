@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.lang.Thread.UncaughtExceptionHandler;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,6 +40,7 @@ public class DefaultUncaughtExceptionHandler implements UncaughtExceptionHandler
       return;
 
     try (PrintStream stream = new PrintStream("crash.txt")) {
+      stream.print(new Date() + " ");
       stream.println(t.getName() + " threw an exception:");
       e.printStackTrace(stream);
     } catch (FileNotFoundException e2) {

@@ -1,7 +1,6 @@
 package de.gurkenlabs.litiengine;
 
 import java.awt.event.KeyEvent;
-import java.io.File;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.net.URL;
 import java.util.Arrays;
@@ -9,9 +8,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
-import java.util.logging.LogManager;
 import java.util.logging.Logger;
-
 import javax.xml.bind.JAXBException;
 
 import de.gurkenlabs.litiengine.configuration.ClientConfiguration;
@@ -74,11 +71,6 @@ public final class Game {
   public static final String COMMADLINE_ARG_RELEASE = "-release";
   public static final String COMMADLINE_ARG_NOGUI = "-nogui";
 
-  private static final Logger log = Logger.getLogger(Game.class.getName());
-  private static final String LOGGING_CONFIG_FILE = "logging.properties";
-
-  private static boolean debug = true;
-  private static boolean noGUIMode = false;
   private static final List<GameListener> gameListeners = new CopyOnWriteArrayList<>();
 
   private static final RenderEngine graphicsEngine = new RenderEngine();
@@ -87,7 +79,8 @@ public final class Game {
 
   private static final GameConfiguration configuration;
   private static final GameMetrics metrics = new GameMetrics();
-  private static final GameTime gameTime;
+  private static final GameLog log = new GameLog();
+  private static final GameTime gameTime = new GameTime();
   private static GameInfo gameInfo = new GameInfo();
 
   private static GameLoop gameLoop;
@@ -96,11 +89,12 @@ public final class Game {
   private static GameWindow gameWindow;
   private static GameWorld world;
 
+  private static boolean debug = true;
+  private static boolean noGUIMode = false;
   private static boolean hasStarted;
   private static boolean initialized;
 
   static {
-    gameTime = new GameTime();
 
     // init configuration before init method in order to use configured values
     // to initialize components
@@ -354,6 +348,10 @@ public final class Game {
     return inputLoop;
   }
 
+  public static Logger log() {
+    return log.log();
+  }
+
   /**
    * Gets the game's <code>ScreenManager</code> that is responsible for organizing all <code>Screens</code> of your game and providing the currently
    * active <code>Screen</code> that is used to render the current <code>Environment</code>.<br>
@@ -424,10 +422,11 @@ public final class Game {
    */
   public static synchronized void init(String... args) {
     if (initialized) {
-      log.log(Level.INFO, "The game has already been initialized.");
+      log().log(Level.INFO, "The game has already been initialized.");
       return;
     }
 
+    log.init();
     handleCommandLineArguments(args);
 
     config().load();
@@ -450,17 +449,6 @@ public final class Game {
     // initialize  the game window
     window().init();
     world.setCamera(new Camera());
-
-    // init logging
-    if (new File(LOGGING_CONFIG_FILE).exists()) {
-      System.setProperty("java.util.logging.config.file", LOGGING_CONFIG_FILE);
-
-      try {
-        LogManager.getLogManager().readConfiguration();
-      } catch (final Exception e) {
-        log.log(Level.SEVERE, e.getMessage(), e);
-      }
-    }
 
     for (GameListener listener : gameListeners) {
       listener.initialized(args);
@@ -543,7 +531,7 @@ public final class Game {
           return false;
         }
       } catch (Exception e) {
-        log.log(Level.WARNING, "game listener threw an exception while terminating", e);
+        log().log(Level.WARNING, "game listener threw an exception while terminating", e);
       }
     }
 
@@ -569,7 +557,7 @@ public final class Game {
       try {
         listener.terminated();
       } catch (Exception e) {
-        log.log(Level.WARNING, "game listener threw an exception during shutdown", e);
+        log().log(Level.WARNING, "game listener threw an exception during shutdown", e);
       }
     }
   }
@@ -612,7 +600,7 @@ public final class Game {
     try {
       info = XmlUtilities.readFromFile(GameInfo.class, gameInfoFile);
     } catch (JAXBException e) {
-      log.log(Level.WARNING, "Could not read game info from {0}", new Object[] { gameInfoFile });
+      log().log(Level.WARNING, "Could not read game info from {0}", new Object[] { gameInfoFile });
       setInfo((GameInfo) null);
       return;
     }
