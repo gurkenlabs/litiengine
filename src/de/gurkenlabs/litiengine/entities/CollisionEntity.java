@@ -2,6 +2,8 @@ package de.gurkenlabs.litiengine.entities;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Game;
@@ -10,12 +12,15 @@ import de.gurkenlabs.litiengine.annotation.CollisionInfo;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.physics.Collision;
+import de.gurkenlabs.litiengine.physics.CollisionEvent;
 
 @CollisionInfo(collision = true)
 public abstract class CollisionEntity extends Entity implements ICollisionEntity {
   private static final double HEIGHT_FACTOR = 0.4;
 
   private static final double WIDTH_FACTOR = 0.4;
+
+  private final List<CollisionListener> collisionListener = new CopyOnWriteArrayList<>();
 
   @TmxProperty(name = MapObjectProperty.COLLISION_ALIGN)
   private Align align;
@@ -197,6 +202,23 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
       Game.physics().add(this);
     } else {
       this.collisionType = type;
+    }
+  }
+
+  @Override
+  public void addCollisionListener(CollisionListener listener) {
+    this.collisionListener.add(listener);
+  }
+
+  @Override
+  public void removeCollisionListener(CollisionListener listener) {
+    this.collisionListener.remove(listener);
+  }
+
+  @Override
+  public void fireCollisionEvent(CollisionEvent event) {
+    for (CollisionListener listener : this.collisionListener) {
+      listener.collisionResolved(event);
     }
   }
 }

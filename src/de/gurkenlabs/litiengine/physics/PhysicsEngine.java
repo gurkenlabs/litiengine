@@ -17,6 +17,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
+import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
@@ -394,27 +395,26 @@ public final class PhysicsEngine implements IUpdateable {
   }
 
   /**
-   * Returns a Rectangle2D representing the union of intersections between the targeted position and all collision boxes 
+   * Returns a Rectangle2D representing the union of intersections between the targeted position and all collision boxes
    * that the entity would be colliding with at that targeted position.
    * 
    * @param entity
    * @param entityCollisionBox
    * @return Rectangle2D
    */
-  private Rectangle2D getIntersection(final ICollisionEntity entity, final Rectangle2D entityCollisionBox) {
-    Rectangle2D result = null;
+  private Intersection getIntersection(final ICollisionEntity entity, final Rectangle2D entityCollisionBox) {
+    Intersection result = null;
     for (final ICollisionEntity otherEntity : this.getCollisionEntities()) {
       if (!canCollide(entity, otherEntity)) {
         continue;
       }
 
       if (GeometricUtilities.intersects(otherEntity.getCollisionBox(), entityCollisionBox)) {
-        Rectangle2D tmpIntersection = otherEntity.getCollisionBox().createIntersection(entityCollisionBox);
+        Rectangle2D intersection = otherEntity.getCollisionBox().createIntersection(entityCollisionBox);
         if (result != null) {
-          result = tmpIntersection.createUnion(result);
-        }
-        else {
-          result = tmpIntersection;
+          result = new Intersection(intersection.createUnion(result), ArrayUtilities.append(result.involvedEntities, otherEntity));
+        } else {
+          result = new Intersection(intersection, otherEntity);
         }
       }
     }
@@ -465,7 +465,7 @@ public final class PhysicsEngine implements IUpdateable {
     Point2D resolvedPosition = new Point2D.Double(targetPosition.getX(), entity.getY());
 
     final Rectangle2D targetCollisionBoxX = entity.getCollisionBox(resolvedPosition);
-    final Rectangle2D intersectionX = this.getIntersection(entity, targetCollisionBoxX);
+    final Intersection intersectionX = this.getIntersection(entity, targetCollisionBoxX);
     if (intersectionX != null) {
       if (entity.getCollisionBox().getX() < targetCollisionBoxX.getX()) {
         // entity was moved left -> right, so push out to the left
@@ -480,7 +480,7 @@ public final class PhysicsEngine implements IUpdateable {
     resolvedPosition.setLocation(resolvedPosition.getX(), targetPosition.getY());
 
     final Rectangle2D targetCollisionBoxY = entity.getCollisionBox(resolvedPosition);
-    final Rectangle2D intersectionY = this.getIntersection(entity, targetCollisionBoxY);
+    final Intersection intersectionY = this.getIntersection(entity, targetCollisionBoxY);
     if (intersectionY != null) {
       if (entity.getCollisionBox().getY() < targetCollisionBoxY.getY()) {
         // entity was moved top -> bottom so push out towards the top
@@ -489,6 +489,8 @@ public final class PhysicsEngine implements IUpdateable {
         resolvedPosition.setLocation(resolvedPosition.getX(), Math.min(entity.getY(), resolvedPosition.getY() + intersectionY.getHeight()));
       }
     }
+
+    fireCollisionEvents(entity, intersectionX, intersectionY);
 
     return resolvedPosition;
   }
@@ -527,5 +529,46 @@ public final class PhysicsEngine implements IUpdateable {
     // they have a large enough step size
     final Line2D line = new Line2D.Double(entity.getCollisionBox().getCenterX(), entity.getCollisionBox().getCenterY(), entity.getCollisionBox(newPosition).getCenterX(), entity.getCollisionBox(newPosition).getCenterY());
     return this.collides(line, Collision.ANY, entity);
+  }
+
+  private static void fireCollisionEvents(ICollisionEntity collider, Intersection... intersections) {
+    // aggregate the involved entities of all intersections
+    ICollisionEntity[] involvedEntities = null;
+    for (Intersection inter : intersections) {
+      if (inter == null) {
+        continue;
+      }
+
+      if (involvedEntities == null) {
+        involvedEntities = inter.involvedEntities;
+        continue;
+      }
+
+      involvedEntities = ArrayUtilities.distinct(involvedEntities, inter.involvedEntities);
+    }
+
+    // 1. fire collision event on the collider with all the involved entities
+    CollisionEvent event = new CollisionEvent(collider, involvedEntities);
+    collider.fireCollisionEvent(event);
+
+    // 2. fire collision event on the involved entities with the collider entity
+    CollisionEvent colliderEvent = new CollisionEvent(collider);
+    for (ICollisionEntity involved : involvedEntities) {
+      involved.fireCollisionEvent(colliderEvent);
+    }
+  }
+
+  /**
+   * A helper class that contains the intersection of a collision event and the involved entities.
+   * This is basically just a {@link Rectangle2D} with some additional information.
+   */
+  @SuppressWarnings("serial")
+  private class Intersection extends Rectangle2D.Double {
+    private final transient ICollisionEntity[] involvedEntities;
+
+    public Intersection(Rectangle2D rect, ICollisionEntity... entities) {
+      super(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
+      this.involvedEntities = entities;
+    }
   }
 }
