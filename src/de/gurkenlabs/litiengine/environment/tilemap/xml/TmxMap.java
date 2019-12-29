@@ -560,7 +560,7 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
 
   private void checkVersion() throws UnsupportedMapVersionException {
     if (this.tiledversion == null || this.tiledversion.isEmpty()) {
-      log.log(Level.WARNING, "Tiled version not defined for map {0}. Could not evaluate whether the map format is supported by the engine.", new Object[] { this.getName() });
+      log.log(Level.WARNING, "Tiled version not defined for map \"{0}\". Could not evaluate whether the map format is supported by the engine.", new Object[] { this.getName() });
       return;
     }
 
@@ -582,7 +582,7 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
     }
 
     if (minor > MAX_MINOR) {
-      log.log(Level.WARNING, "Tiled version {0} is greater than what is supported. Some features may not work.", new Object[] { this.tiledversion });
+      log.log(Level.WARNING, "Tiled version {0} of map \"{1}\" is greater than the supported version {2}.{3}.x. Some features may not work.", new Object[] { this.tiledversion, this.getName(), MAX_MAJOR, MAX_MINOR });
     }
   }
 
