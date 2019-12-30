@@ -136,14 +136,14 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   }
 
   @Override
-  public boolean hit(int damage) {
+  public EntityHitEvent hit(int damage) {
     return this.hit(damage, null);
   }
 
   @Override
-  public boolean hit(final int damage, final Ability ability) {
+  public EntityHitEvent hit(final int damage, final Ability ability) {
     if (this.isDead()) {
-      return false;
+      return null;
     }
 
     if (!this.isIndestructible()) {
@@ -155,14 +155,14 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
       this.setCollision(false);
     }
 
-    final CombatEntityHitEvent event = new CombatEntityHitEvent(this, damage, ability);
+    final EntityHitEvent event = new EntityHitEvent(this, ability, damage, this.isDead());
     for (final CombatEntityHitListener listener : this.hitListeners) {
       listener.onHit(event);
     }
 
     this.lastHit = Game.time().now();
 
-    return this.isDead();
+    return event;
   }
 
   private void fireDeathEvent() {
