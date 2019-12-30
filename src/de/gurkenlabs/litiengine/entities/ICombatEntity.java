@@ -32,9 +32,9 @@ public interface ICombatEntity extends ICollisionEntity {
 
   public int getTeam();
 
-  public EntityHitEvent hit(int damage);
+  public void hit(int damage);
 
-  public EntityHitEvent hit(int damage, Ability ability);
+  public void hit(int damage, Ability ability);
 
   public boolean isDead();
 

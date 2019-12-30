@@ -32,7 +32,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
 
   @TmxProperty(name = MapObjectProperty.COMBAT_TEAM)
   private int team;
-  
+
   @TmxProperty(name = MapObjectProperty.COMBAT_HITPOINTS)
   private int initialHitpoints;
 
@@ -136,14 +136,14 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   }
 
   @Override
-  public EntityHitEvent hit(int damage) {
-    return this.hit(damage, null);
+  public void hit(int damage) {
+    this.hit(damage, null);
   }
 
   @Override
-  public EntityHitEvent hit(final int damage, final Ability ability) {
+  public void hit(final int damage, final Ability ability) {
     if (this.isDead()) {
-      return null;
+      return;
     }
 
     if (!this.isIndestructible()) {
@@ -161,8 +161,6 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
     }
 
     this.lastHit = Game.time().now();
-
-    return event;
   }
 
   private void fireDeathEvent() {
