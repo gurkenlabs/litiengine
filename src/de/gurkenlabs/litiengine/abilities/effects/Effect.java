@@ -8,7 +8,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.Game;
@@ -25,14 +24,14 @@ import de.gurkenlabs.litiengine.entities.ICombatEntity;
  */
 public abstract class Effect implements IUpdateable {
   public static final int NO_DURATION = -1;
-  
+
   private final Ability ability;
   private final List<EffectApplication> appliances;
   private final List<Consumer<EffectArgument>> appliedConsumer;
   private final List<Consumer<EffectArgument>> ceasedConsumer;
   private final EffectTarget[] effectTargets;
   private final List<Effect> followUpEffects;
-  
+
   private int delay;
   private int duration;
   private EntityComparator targetPriorityComparator;
@@ -155,9 +154,9 @@ public abstract class Effect implements IUpdateable {
   }
 
   /**
-   * 1. Cease the effect after its duration. 
-   * 2. apply all follow up effects 
-   * 3. remove appliance 
+   * 1. Cease the effect after its duration.
+   * 2. apply all follow up effects
+   * 3. remove appliance
    * 4. unregister from loop if all appliances are done
    */
   @Override
@@ -220,15 +219,19 @@ public abstract class Effect implements IUpdateable {
         return affectedEntities;
       case ENEMY:
         affectedEntities.addAll(this.getEntitiesInImpactArea(impactArea));
-        affectedEntities = affectedEntities.stream().filter(this.canAttackEntity()).collect(Collectors.toList());
+        affectedEntities = affectedEntities.stream().filter(this::canAttackEntity).collect(Collectors.toList());
         break;
       case FRIENDLY:
         affectedEntities.addAll(this.getEntitiesInImpactArea(impactArea));
-        affectedEntities = affectedEntities.stream().filter(this.isAliveFriendlyEntity()).collect(Collectors.toList());
+        affectedEntities = affectedEntities.stream().filter(this::isAliveFriendlyEntity).collect(Collectors.toList());
         break;
       case FRIENDLYDEAD:
         affectedEntities.addAll(this.getEntitiesInImpactArea(impactArea));
-        affectedEntities = affectedEntities.stream().filter(this.isDeadFriendlyEntity()).collect(Collectors.toList());
+        affectedEntities = affectedEntities.stream().filter(this::isDeadFriendlyEntity).collect(Collectors.toList());
+        break;
+      case CUSTOM:
+        affectedEntities.addAll(this.getEntitiesInImpactArea(impactArea));
+        affectedEntities = affectedEntities.stream().filter(this::customTarget).collect(Collectors.toList());
         break;
       default:
         break;
@@ -237,7 +240,7 @@ public abstract class Effect implements IUpdateable {
 
     affectedEntities.removeAll(Collections.singleton(null));
     affectedEntities.sort(this.targetPriorityComparator);
-    
+
     if (!this.getAbility().isMultiTarget() && !affectedEntities.isEmpty()) {
       final ICombatEntity target;
       if (this.getAbility().getExecutor().getTarget() != null) {
@@ -253,15 +256,29 @@ public abstract class Effect implements IUpdateable {
     return affectedEntities;
   }
 
-  private Predicate<? super ICombatEntity> canAttackEntity() {
-    return entity -> !entity.equals(this.getAbility().getExecutor()) && !entity.isFriendly(this.getAbility().getExecutor()) && !entity.isDead();
+  /**
+   * Overwrite this method to implement a custom target predicate that determines whether an entity can be affected by this effect.
+   * The targets of this effect need to include the <code>CUSTOM</code> value in order for this function to be evaluated.
+   * 
+   * @param entity
+   *          The entity to check against the custom target predicate.
+   * @return True if the entity can be affected by this effect; otherwise false.
+   * 
+   * @see EffectTarget#CUSTOM
+   */
+  protected boolean customTarget(ICombatEntity entity) {
+    return entity != null;
   }
 
-  private Predicate<? super ICombatEntity> isAliveFriendlyEntity() {
-    return entity -> !entity.equals(this.getAbility().getExecutor()) && entity.isFriendly(this.getAbility().getExecutor()) && !entity.isDead();
+  private boolean canAttackEntity(ICombatEntity entity) {
+    return !entity.equals(this.getAbility().getExecutor()) && !entity.isFriendly(this.getAbility().getExecutor()) && !entity.isDead();
   }
 
-  private Predicate<? super ICombatEntity> isDeadFriendlyEntity() {
-    return entity -> !entity.equals(this.getAbility().getExecutor()) && entity.isFriendly(this.getAbility().getExecutor()) && entity.isDead();
+  private boolean isAliveFriendlyEntity(ICombatEntity entity) {
+    return !entity.equals(this.getAbility().getExecutor()) && entity.isFriendly(this.getAbility().getExecutor()) && !entity.isDead();
+  }
+
+  private boolean isDeadFriendlyEntity(ICombatEntity entity) {
+    return !entity.equals(this.getAbility().getExecutor()) && entity.isFriendly(this.getAbility().getExecutor()) && entity.isDead();
   }
 }
