@@ -13,10 +13,10 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.environment.IPolygon;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectText;
+import de.gurkenlabs.litiengine.environment.tilemap.IPolyShape;
 import de.gurkenlabs.litiengine.environment.tilemap.ITilesetEntry;
 
 /**
@@ -25,7 +25,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.ITilesetEntry;
 public class MapObject extends CustomPropertyProvider implements IMapObject {
   @XmlAttribute
   private int id;
-  
+
   @XmlAttribute
   private Integer gid;
 
@@ -54,11 +54,11 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   @XmlTransient
   private ITilesetEntry tile;
 
-  @XmlElement
-  private Polyline polyline;
+  @XmlElement(name = "polyline")
+  private PolyShape polyline;
 
-  @XmlElement
-  private Polygon polygon;
+  @XmlElement(name = "polygon")
+  private PolyShape polygon;
 
   @XmlElement
   private String point;
@@ -89,7 +89,7 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
     super(mapObjectToBeCopied);
     this.setName(mapObjectToBeCopied.getName());
     this.setId(Game.world().environment().getNextMapId());
-    this.polyline = (mapObjectToBeCopied.getPolyline() != null && !mapObjectToBeCopied.getPolyline().getPoints().isEmpty()) ? new Polyline(mapObjectToBeCopied.getPolyline()) : null;
+    this.polyline = (mapObjectToBeCopied.getPolyline() != null && !mapObjectToBeCopied.getPolyline().getPoints().isEmpty()) ? new PolyShape(mapObjectToBeCopied.getPolyline()) : null;
     this.setType(mapObjectToBeCopied.getType());
     this.setX(mapObjectToBeCopied.getX());
     this.setY(mapObjectToBeCopied.getY());
@@ -187,12 +187,12 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   }
 
   @Override
-  public Polyline getPolyline() {
+  public IPolyShape getPolyline() {
     return this.polyline;
   }
 
   @Override
-  public IPolygon getPolygon() {
+  public IPolyShape getPolygon() {
     return this.polygon;
   }
 
@@ -324,7 +324,7 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   }
 
   @XmlTransient
-  public void setPolyline(Polyline polyline) {
+  public void setPolyline(PolyShape polyline) {
     this.polyline = polyline;
   }
 

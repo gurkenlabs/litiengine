@@ -4,7 +4,6 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
-import de.gurkenlabs.litiengine.environment.IPolygon;
 import de.gurkenlabs.litiengine.resources.Resource;
 
 /**
@@ -46,9 +45,9 @@ public interface IMapObject extends ICustomPropertyProvider, Resource {
 
   public String getType();
 
-  public IPolyline getPolyline();
+  public IPolyShape getPolyline();
   
-  public IPolygon getPolygon();
+  public IPolyShape getPolygon();
   
   public Ellipse2D getEllipse();
 

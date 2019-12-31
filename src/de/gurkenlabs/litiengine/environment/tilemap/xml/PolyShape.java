@@ -9,7 +9,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IPolyShape;
 
-public abstract class PolyShape implements IPolyShape {
+public class PolyShape implements IPolyShape {
   @XmlAttribute
   @XmlJavaTypeAdapter(PolylineAdapter.class)
   private List<Point2D> points;
