@@ -9,7 +9,7 @@ import de.gurkenlabs.litiengine.GameListener;
 
 /**
  * The static <code>Input</code> class is the LITIengine's access point to devices that capture physical player input.
- * It manages input from different devices, i.e. keyboard, mouse or game pad, and provides a unified API to access this information.
+ * It manages input from different devices, i.e. keyboard, mouse or gamepad, and provides a unified API to access this information.
  * 
  * @see #mouse()
  * @see #keyboard()

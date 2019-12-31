@@ -7,7 +7,7 @@ import java.util.List;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 
-import de.gurkenlabs.litiengine.graphics.ImageFormat;
+import de.gurkenlabs.litiengine.resources.ImageFormat;
 import de.gurkenlabs.utiliti.components.Controller;
 import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.swing.AssetPanel;

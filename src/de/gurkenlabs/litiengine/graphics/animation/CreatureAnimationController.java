@@ -26,7 +26,7 @@ import de.gurkenlabs.litiengine.util.Imaging;
  * Where {DIRECTION} refers to a value of the {@link Direction} enum and
  * {@link #getSpritePrefix()} refers to the current sprite prefix of the entity.
  * {EXTENSION} refers to a value of the
- * {@link de.gurkenlabs.litiengine.graphics.ImageFormat} enum.
+ * {@link de.gurkenlabs.litiengine.resources.ImageFormat} enum.
  * 
  * @see de.gurkenlabs.litiengine.entities.Creature
  * @see de.gurkenlabs.litiengine.Direction
@@ -50,7 +50,15 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
     super(entity, defaultAnimation, animations);
     this.init(useFlippedSpritesAsFallback);
   }
+  
+  public static String getSpriteName(Creature creature, CreatureAnimationState state) {
+    return creature.getSpritePrefix() + "-" + state.spriteString();
+  }
 
+  public static String getSpriteName(Creature creature, CreatureAnimationState state, Direction direction) {
+    return getSpriteName(creature, state) + "-" + direction.name().toLowerCase();
+  }
+  
   @Override
   public boolean isAutoScaling() {
     return this.getEntity().isScaling();
@@ -61,7 +69,7 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
     Spritesheet leftIdleSpritesheet = Resources.spritesheets().load(leftIdleSprite, newSpriteName, spriteToFlip.getSpriteWidth(), spriteToFlip.getSpriteHeight());
     return new Animation(leftIdleSpritesheet, true);
   }
-
+  
   @Override
   protected String getSpritePrefix() {
     return this.getEntity().getSpritePrefix();
@@ -223,14 +231,6 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
     }
 
     return this.getDefault() != null ? this.getDefault().getName() : null;
-  }
-
-  public static String getSpriteName(Creature creature, CreatureAnimationState state) {
-    return creature.getSpritePrefix() + "-" + state.spriteString();
-  }
-
-  public static String getSpriteName(Creature creature, CreatureAnimationState state, Direction direction) {
-    return getSpriteName(creature, state) + "-" + direction.name().toLowerCase();
   }
 
   private String getSpriteName(CreatureAnimationState state) {

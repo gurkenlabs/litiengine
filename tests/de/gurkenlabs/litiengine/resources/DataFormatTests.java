@@ -7,9 +7,6 @@ import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 
-import de.gurkenlabs.litiengine.graphics.ImageFormat;
-import de.gurkenlabs.litiengine.sound.SoundFormat;
-
 public class DataFormatTests {
 
   @Test

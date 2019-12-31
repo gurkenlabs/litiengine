@@ -9,7 +9,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import de.gurkenlabs.litiengine.sound.Sound;
-import de.gurkenlabs.litiengine.sound.SoundFormat;
 import de.gurkenlabs.litiengine.util.io.Codec;
 
 @XmlRootElement(name = "sound")
@@ -18,7 +17,7 @@ public class SoundResource extends NamedResource {
   private String data;
 
   @XmlElement(name = "format")
-  private SoundFormat format = SoundFormat.UNDEFINED;
+  private SoundFormat format = SoundFormat.UNSUPPORTED;
 
   public SoundResource() {
     // keep for xml serialization

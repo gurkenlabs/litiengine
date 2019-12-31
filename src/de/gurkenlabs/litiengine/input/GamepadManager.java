@@ -97,7 +97,7 @@ public class GamepadManager implements ILaunchable, GamepadEvents {
   }
 
   /**
-   * Gets the first game pad that is currently available.
+   * Gets the first gamepad that is currently available.
    *
    * @return The first available {@link Gamepad} instance
    */
@@ -110,7 +110,7 @@ public class GamepadManager implements ILaunchable, GamepadEvents {
   }
 
   /**
-   * Gets the game pad with the specified index if it is still plugged in. After
+   * Gets the gamepad with the specified index if it is still plugged in. After
    * re-plugging a controller while the game is running, its index might change.
    *
    * @param index

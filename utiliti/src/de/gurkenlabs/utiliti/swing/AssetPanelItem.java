@@ -44,13 +44,13 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
-import de.gurkenlabs.litiengine.graphics.ImageFormat;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
+import de.gurkenlabs.litiengine.resources.ImageFormat;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.resources.SoundFormat;
 import de.gurkenlabs.litiengine.resources.SoundResource;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
-import de.gurkenlabs.litiengine.sound.SoundFormat;
 import de.gurkenlabs.litiengine.util.io.Codec;
 import de.gurkenlabs.litiengine.util.io.ImageSerializer;
 import de.gurkenlabs.utiliti.Style;
@@ -406,9 +406,9 @@ public class AssetPanelItem extends JPanel {
         return;
       }
 
-      ImageFormat format = sprite.getImageFormat() != ImageFormat.UNDEFINED ? sprite.getImageFormat() : ImageFormat.PNG;
+      ImageFormat format = sprite.getImageFormat() != ImageFormat.UNSUPPORTED ? sprite.getImageFormat() : ImageFormat.PNG;
 
-      Object[] options = { ".xml", format.toExtension() };
+      Object[] options = { ".xml", format.toFileExtension() };
       int answer = JOptionPane.showOptionDialog(Game.window().getRenderComponent(), "Select an export format:", "Export Spritesheet", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
 
       try {
@@ -424,7 +424,7 @@ public class AssetPanelItem extends JPanel {
           FileFilter filter = new FileNameExtensionFilter(format.toString() + " - Image", format.toString());
           chooser.setFileFilter(filter);
           chooser.addChoosableFileFilter(filter);
-          chooser.setSelectedFile(new File(spriteSheetInfo.getName() + format.toExtension()));
+          chooser.setSelectedFile(new File(spriteSheetInfo.getName() + format.toFileExtension()));
 
           int result = chooser.showSaveDialog(Game.window().getRenderComponent());
           if (result == JFileChooser.APPROVE_OPTION) {
@@ -472,7 +472,7 @@ public class AssetPanelItem extends JPanel {
 
     SoundResource sound = (SoundResource) this.getOrigin();
     SoundFormat format = sound.getFormat();
-    if (format == SoundFormat.UNDEFINED) {
+    if (format == SoundFormat.UNSUPPORTED) {
       return;
     }
 
@@ -486,7 +486,7 @@ public class AssetPanelItem extends JPanel {
       chooser.setDialogTitle("Export Sound");
       chooser.setFileFilter(filter);
       chooser.addChoosableFileFilter(filter);
-      chooser.setSelectedFile(new File(sound.getName() + format.toExtension()));
+      chooser.setSelectedFile(new File(sound.getName() + format.toFileExtension()));
 
       int result = chooser.showSaveDialog(Game.window().getRenderComponent());
       if (result == JFileChooser.APPROVE_OPTION) {

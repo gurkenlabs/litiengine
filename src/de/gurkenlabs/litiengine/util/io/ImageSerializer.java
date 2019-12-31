@@ -13,7 +13,7 @@ import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.FileImageOutputStream;
 
-import de.gurkenlabs.litiengine.graphics.ImageFormat;
+import de.gurkenlabs.litiengine.resources.ImageFormat;
 import de.gurkenlabs.litiengine.util.Imaging;
 
 public final class ImageSerializer {

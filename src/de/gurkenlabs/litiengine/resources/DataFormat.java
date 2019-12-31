@@ -4,11 +4,14 @@ import java.util.ArrayList;
 
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
-public final class DataFormat {
+/**
+ * Some common implementations that are used by different kinds of file classes (e.g. <code>SoundFormat</code>, <code>ImageFormat</code>.
+ */
+final class DataFormat {
   private DataFormat() {
   }
 
-  public static <T extends Enum<T>> T get(String format, T[] values, T defaultValue) {
+  protected static <T extends Enum<T>> T get(String format, T[] values, T defaultValue) {
     if (format == null || format.isEmpty()) {
       return defaultValue;
     }
@@ -27,7 +30,7 @@ public final class DataFormat {
     return defaultValue;
   }
 
-  public static <T extends Enum<T>> boolean isSupported(String fileName, T[] values, T defaultValue) {
+  protected static <T extends Enum<T>> boolean isSupported(String fileName, T[] values, T defaultValue) {
     String extension = FileUtilities.getExtension(fileName);
     if (extension == null || extension.isEmpty()) {
       return false;
@@ -42,7 +45,7 @@ public final class DataFormat {
     return false;
   }
 
-  public static <T extends Enum<T>> String[] getAllExtensions(T[] values, T defaultValue) {
+  protected static <T extends Enum<T>> String[] getAllExtensions(T[] values, T defaultValue) {
     ArrayList<String> arrList = new ArrayList<>();
     for (T format : values) {
       if (format != defaultValue) {
@@ -52,5 +55,4 @@ public final class DataFormat {
 
     return arrList.toArray(new String[arrList.size()]);
   }
-
 }

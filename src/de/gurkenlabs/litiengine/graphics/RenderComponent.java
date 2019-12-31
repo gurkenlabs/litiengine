@@ -24,6 +24,7 @@ import java.util.function.IntConsumer;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.gui.screens.Screen;
 import de.gurkenlabs.litiengine.input.Input;
+import de.gurkenlabs.litiengine.resources.ImageFormat;
 import de.gurkenlabs.litiengine.util.Imaging;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.TimeUtilities;
@@ -213,7 +214,7 @@ public class RenderComponent extends Canvas {
         folder.mkdirs();
       }
 
-      ImageSerializer.saveImage(new File("./screenshots/" + timeStamp + ImageFormat.PNG.toExtension()).toString(), img);
+      ImageSerializer.saveImage(new File("./screenshots/" + timeStamp + ImageFormat.PNG.toFileExtension()).toString(), img);
     } finally {
       this.takeScreenShot = false;
     }

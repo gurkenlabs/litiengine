@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 
-import de.gurkenlabs.litiengine.graphics.ImageFormat;
+import de.gurkenlabs.litiengine.resources.ImageFormat;
 
 public final class Codec {
   private static final Logger log = Logger.getLogger(Codec.class.getName());
@@ -130,7 +130,7 @@ public final class Codec {
     final ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
     try {
-      ImageIO.write(image, imageFormat != ImageFormat.UNDEFINED ? imageFormat.toString() : ImageFormat.PNG.toString(), bos);
+      ImageIO.write(image, imageFormat != ImageFormat.UNSUPPORTED ? imageFormat.toString() : ImageFormat.PNG.toString(), bos);
       final byte[] imageBytes = bos.toByteArray();
 
       imageString = encode(imageBytes);
