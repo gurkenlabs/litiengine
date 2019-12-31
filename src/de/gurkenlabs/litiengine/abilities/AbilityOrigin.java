@@ -5,5 +5,5 @@ package de.gurkenlabs.litiengine.abilities;
  * location of the effect shape.
  */
 public enum AbilityOrigin {
-  COLLISIONBOX_CENTER, CUSTOM, DIMENSION_CENTER, LOCATION
+  COLLISIONBOX_CENTER, OFFSET, DIMENSION_CENTER, LOCATION
 }

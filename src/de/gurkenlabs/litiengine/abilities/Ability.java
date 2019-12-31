@@ -132,12 +132,12 @@ public abstract class Ability implements IRenderable {
   }
 
   public Point2D getOrigin() {
-    switch (this.originType) {
+    switch (this.getOriginType()) {
     case COLLISIONBOX_CENTER:
       return new Point2D.Double(this.executor.getCollisionBox().getCenterX(), this.executor.getCollisionBox().getCenterY());
     case DIMENSION_CENTER:
       return this.executor.getCenter();
-    case CUSTOM:
+    case OFFSET:
       if (this.origin != null) {
         return new Point2D.Double(this.executor.getX() + this.origin.getX(), this.executor.getY() + this.origin.getY());
       }

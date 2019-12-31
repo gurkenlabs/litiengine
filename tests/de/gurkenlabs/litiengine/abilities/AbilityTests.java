@@ -297,7 +297,7 @@ public class AbilityTests {
     }
   }
 
-  @AbilityInfo(origin = AbilityOrigin.CUSTOM)
+  @AbilityInfo(origin = AbilityOrigin.OFFSET)
   private class TestOriginCustom extends Ability {
     protected TestOriginCustom(Creature executor) {
       super(executor);
