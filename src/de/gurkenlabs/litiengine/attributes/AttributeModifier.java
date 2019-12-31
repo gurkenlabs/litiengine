@@ -26,6 +26,7 @@ public class AttributeModifier<T extends Number> implements Comparable<Attribute
   public AttributeModifier(final Modification mod, final double modifyValue) {
     this.modification = mod;
     this.modifyValue = modifyValue;
+    this.active = true;
   }
 
   @Override
