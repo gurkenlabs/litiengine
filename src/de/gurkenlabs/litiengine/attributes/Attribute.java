@@ -5,14 +5,25 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * The class Attribute represents a numerical representation of a character property that can be adjusted using {@link AttributeModifier}s.
+ * An attribute is a numerical representation of a property that can be adjusted using {@link AttributeModifier}s.
+ * <p>
+ * It typically doesn't adjust the raw base value (unless explicitly requested) and instead adjusts the value by registered
+ * modifications. This is e.g. useful when a property might only be changed for a certain period of time or we need to know the original
+ * value of a property.
+ * </p>
+ * 
+ * <p>
+ * <i>
+ * An example use-case are player stats that might be affected throughout the game (e.g. via certain skills, upgrades or level-ups).
+ * </i>
+ * </p>
  *
  * @param <T>
- *          The type of the actual attribute.
+ *          The type of the attribute value.
  */
 public class Attribute<T extends Number> {
   private final List<AttributeModifier<T>> modifiers;
-  
+
   private T baseValue;
 
   /**
@@ -26,6 +37,12 @@ public class Attribute<T extends Number> {
     this.baseValue = initialValue;
   }
 
+  /**
+   * Adds the specified modifier to this attribute.
+   * 
+   * @param modifier
+   *          The modifier to be added to this instance.
+   */
   public void addModifier(final AttributeModifier<T> modifier) {
     if (this.getModifiers().contains(modifier)) {
       return;
@@ -35,27 +52,74 @@ public class Attribute<T extends Number> {
     Collections.sort(this.getModifiers());
   }
 
-  public T getCurrentValue() {
-    return this.applyModifiers(this.getBaseValue());
-  }
-
-  public List<AttributeModifier<T>> getModifiers() {
-    return this.modifiers;
-  }
-
-  public boolean isModifierApplied(final AttributeModifier<T> modifier) {
-    return this.getModifiers().contains(modifier);
-  }
-
-  public void modifyBaseValue(final AttributeModifier<T> modifier) {
-    this.baseValue = modifier.modify(this.getBaseValue());
-  }
-
+  /**
+   * Removes the specified modifier from this attribute.
+   * 
+   * @param modifier
+   *          The modifier to be removed from this instance.
+   */
   public void removeModifier(final AttributeModifier<T> modifier) {
     this.getModifiers().remove(modifier);
     Collections.sort(this.getModifiers());
   }
-  
+
+  /**
+   * Gets the current value of this attribute, respecting all the registered <code>AttributeModifier</code>s.
+   * 
+   * @return The current value of this attribute.
+   */
+  public T get() {
+    return this.applyModifiers(this.getBase());
+  }
+
+  /**
+   * Gets the raw base value of this attribute without applying any modifications.
+   * 
+   * @return The raw base value of this attribute.
+   */
+  public T getBase() {
+    return this.baseValue;
+  }
+
+  /**
+   * Gets all modifiers added to this instance.
+   * 
+   * @return All modifiers added to this instance.
+   */
+  public List<AttributeModifier<T>> getModifiers() {
+    return this.modifiers;
+  }
+
+  /**
+   * Determines whether the specified modifier instance is added to this attribute instance.
+   * 
+   * @param modifier
+   *          The modifier to check for.
+   * @return True if the modifier was added to this attribute instance; otherwise false.
+   */
+  public boolean isModifierApplied(final AttributeModifier<T> modifier) {
+    return this.getModifiers().contains(modifier);
+  }
+
+  /**
+   * Adjusts the base value of this attribute once with the specified modifier.
+   * 
+   * @param modifier
+   *          The modifier used to adjust this attribute's base value.
+   * 
+   * @see #getBase()
+   * @see #setBaseValue(Number)
+   */
+  public void modifyBaseValue(final AttributeModifier<T> modifier) {
+    this.baseValue = modifier.modify(this.getBase());
+  }
+
+  /**
+   * Sets the base value of this attribute.
+   * 
+   * @param baseValue
+   *          The base value to be set.
+   */
   public void setBaseValue(final T baseValue) {
     this.baseValue = baseValue;
   }
@@ -67,9 +131,5 @@ public class Attribute<T extends Number> {
     }
 
     return currentValue;
-  }
-
-  protected T getBaseValue() {
-    return this.baseValue;
   }
 }

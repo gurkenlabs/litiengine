@@ -26,27 +26,27 @@ public class AbilityAttributes {
     this.impactAngle = new Attribute<>(info.impactAngle());
   }
 
-  public Attribute<Integer> getCooldown() {
+  public Attribute<Integer> cooldown() {
     return this.cooldown;
   }
 
-  public Attribute<Integer> getDuration() {
+  public Attribute<Integer> duration() {
     return this.duration;
   }
 
-  public Attribute<Integer> getImpact() {
+  public Attribute<Integer> impact() {
     return this.impact;
   }
 
-  public Attribute<Integer> getImpactAngle() {
+  public Attribute<Integer> impactAngle() {
     return this.impactAngle;
   }
 
-  public Attribute<Integer> getRange() {
+  public Attribute<Integer> range() {
     return this.range;
   }
 
-  public Attribute<Integer> getValue() {
+  public Attribute<Integer> value() {
     return this.value;
   }
 }

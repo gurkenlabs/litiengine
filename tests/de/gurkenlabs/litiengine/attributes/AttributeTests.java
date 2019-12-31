@@ -27,13 +27,13 @@ public class AttributeTests {
     testAttributeFloat.modifyBaseValue(new AttributeModifier<Float>(Modification.ADD, 101.1f));
     testAttributeDouble.modifyBaseValue(new AttributeModifier<Double>(Modification.ADD, 101.1));
 
-    assertEquals((byte) 110, testAttributeByte.getCurrentValue().byteValue());
-    assertEquals((short) 110, testAttributeByte.getCurrentValue().byteValue());
-    assertEquals(110, testAttributeInt.getCurrentValue().intValue());
-    assertEquals(1010L, testAttributeLong.getCurrentValue().longValue());
+    assertEquals((byte) 110, testAttributeByte.get().byteValue());
+    assertEquals((short) 110, testAttributeByte.get().byteValue());
+    assertEquals(110, testAttributeInt.get().intValue());
+    assertEquals(1010L, testAttributeLong.get().longValue());
 
-    assertEquals(111.1f, testAttributeFloat.getCurrentValue().floatValue(), 0.0001f);
-    assertEquals(111.1, testAttributeDouble.getCurrentValue().doubleValue(), 0.0000001);
+    assertEquals(111.1f, testAttributeFloat.get().floatValue(), 0.0001f);
+    assertEquals(111.1, testAttributeDouble.get().doubleValue(), 0.0000001);
   }
 
   @Test
@@ -54,19 +54,19 @@ public class AttributeTests {
     testAttributeFloat.modifyBaseValue(new AttributeModifier<Float>(Modification.ADDPERCENT, 11));
     testAttributeDouble.modifyBaseValue(new AttributeModifier<Double>(Modification.ADDPERCENT, 11));
 
-    assertEquals((byte) 11, testAttributeByte.getCurrentValue().byteValue());
-    assertEquals((short) 11, testAttributeByte.getCurrentValue().byteValue());
-    assertEquals(11, testAttributeInt.getCurrentValue().intValue());
-    assertEquals(11L, testAttributeLong.getCurrentValue().longValue());
+    assertEquals((byte) 11, testAttributeByte.get().byteValue());
+    assertEquals((short) 11, testAttributeByte.get().byteValue());
+    assertEquals(11, testAttributeInt.get().intValue());
+    assertEquals(11L, testAttributeLong.get().longValue());
 
-    assertEquals(11.1f, testAttributeFloat.getCurrentValue().floatValue(), 0.0001f);
-    assertEquals(11.1, testAttributeDouble.getCurrentValue().doubleValue(), 0.0000001);
+    assertEquals(11.1f, testAttributeFloat.get().floatValue(), 0.0001f);
+    assertEquals(11.1, testAttributeDouble.get().doubleValue(), 0.0000001);
   }
 
   @Test
   public void testAttributeInitialization() {
     final Attribute<Integer> testAttribute = new Attribute<>(10);
-    assertEquals(10, testAttribute.getCurrentValue().intValue());
+    assertEquals(10, testAttribute.get().intValue());
   }
 
   @Test
@@ -87,13 +87,13 @@ public class AttributeTests {
     testAttributeFloat.modifyBaseValue(new AttributeModifier<Float>(Modification.DIVIDE, 3));
     testAttributeDouble.modifyBaseValue(new AttributeModifier<Double>(Modification.DIVIDE, 3));
 
-    assertEquals((byte) 5, testAttributeByte.getCurrentValue().byteValue());
-    assertEquals((short) 5, testAttributeByte.getCurrentValue().byteValue());
-    assertEquals(5, testAttributeInt.getCurrentValue().intValue());
-    assertEquals(5L, testAttributeLong.getCurrentValue().longValue());
+    assertEquals((byte) 5, testAttributeByte.get().byteValue());
+    assertEquals((short) 5, testAttributeByte.get().byteValue());
+    assertEquals(5, testAttributeInt.get().intValue());
+    assertEquals(5L, testAttributeLong.get().longValue());
 
-    assertEquals(3.333333333333f, testAttributeFloat.getCurrentValue().floatValue(), 0.0001f);
-    assertEquals(3.333333333333, testAttributeDouble.getCurrentValue().doubleValue(), 0.0000001);
+    assertEquals(3.333333333333f, testAttributeFloat.get().floatValue(), 0.0001f);
+    assertEquals(3.333333333333, testAttributeDouble.get().doubleValue(), 0.0000001);
   }
 
   @Test
@@ -114,13 +114,13 @@ public class AttributeTests {
     testAttributeFloat.modifyBaseValue(new AttributeModifier<Float>(Modification.MULTIPLY, 2.1));
     testAttributeDouble.modifyBaseValue(new AttributeModifier<Double>(Modification.MULTIPLY, 2.1));
 
-    assertEquals((byte) 20, testAttributeByte.getCurrentValue().byteValue());
-    assertEquals((short) 20, testAttributeByte.getCurrentValue().byteValue());
-    assertEquals(20, testAttributeInt.getCurrentValue().intValue());
-    assertEquals(20L, testAttributeLong.getCurrentValue().longValue());
+    assertEquals((byte) 20, testAttributeByte.get().byteValue());
+    assertEquals((short) 20, testAttributeByte.get().byteValue());
+    assertEquals(20, testAttributeInt.get().intValue());
+    assertEquals(20L, testAttributeLong.get().longValue());
 
-    assertEquals(21f, testAttributeFloat.getCurrentValue().floatValue(), 0.0001f);
-    assertEquals(21, testAttributeDouble.getCurrentValue().doubleValue(), 0.0000001);
+    assertEquals(21f, testAttributeFloat.get().floatValue(), 0.0001f);
+    assertEquals(21, testAttributeDouble.get().doubleValue(), 0.0000001);
   }
 
   @Test
@@ -141,13 +141,13 @@ public class AttributeTests {
     testAttributeFloat.modifyBaseValue(new AttributeModifier<Float>(Modification.SET, 21));
     testAttributeDouble.modifyBaseValue(new AttributeModifier<Double>(Modification.SET, 21));
 
-    assertEquals((byte) 20, testAttributeByte.getCurrentValue().byteValue());
-    assertEquals((short) 20, testAttributeByte.getCurrentValue().byteValue());
-    assertEquals(20, testAttributeInt.getCurrentValue().intValue());
-    assertEquals(20L, testAttributeLong.getCurrentValue().longValue());
+    assertEquals((byte) 20, testAttributeByte.get().byteValue());
+    assertEquals((short) 20, testAttributeByte.get().byteValue());
+    assertEquals(20, testAttributeInt.get().intValue());
+    assertEquals(20L, testAttributeLong.get().longValue());
 
-    assertEquals(21f, testAttributeFloat.getCurrentValue().floatValue(), 0.0001f);
-    assertEquals(21, testAttributeDouble.getCurrentValue().doubleValue(), 0.0000001);
+    assertEquals(21f, testAttributeFloat.get().floatValue(), 0.0001f);
+    assertEquals(21, testAttributeDouble.get().doubleValue(), 0.0000001);
   }
 
   @Test
@@ -168,13 +168,13 @@ public class AttributeTests {
     testAttributeFloat.modifyBaseValue(new AttributeModifier<Float>(Modification.SUBSTRACT, 0.9f));
     testAttributeDouble.modifyBaseValue(new AttributeModifier<Double>(Modification.SUBSTRACT, 0.9));
 
-    assertEquals((byte) 9, testAttributeByte.getCurrentValue().byteValue());
-    assertEquals((short) 9, testAttributeByte.getCurrentValue().byteValue());
-    assertEquals(9, testAttributeInt.getCurrentValue().intValue());
-    assertEquals(9L, testAttributeLong.getCurrentValue().longValue());
+    assertEquals((byte) 9, testAttributeByte.get().byteValue());
+    assertEquals((short) 9, testAttributeByte.get().byteValue());
+    assertEquals(9, testAttributeInt.get().intValue());
+    assertEquals(9L, testAttributeLong.get().longValue());
 
-    assertEquals(9.1f, testAttributeFloat.getCurrentValue().floatValue(), 0.0001f);
-    assertEquals(9.1, testAttributeDouble.getCurrentValue().doubleValue(), 0.0000001);
+    assertEquals(9.1f, testAttributeFloat.get().floatValue(), 0.0001f);
+    assertEquals(9.1, testAttributeDouble.get().doubleValue(), 0.0000001);
   }
 
   @Test
@@ -195,13 +195,13 @@ public class AttributeTests {
     testAttributeFloat.modifyBaseValue(new AttributeModifier<Float>(Modification.SUBSTRACTPERCENT, 9));
     testAttributeDouble.modifyBaseValue(new AttributeModifier<Double>(Modification.SUBSTRACTPERCENT, 9));
 
-    assertEquals((byte) 9, testAttributeByte.getCurrentValue().byteValue());
-    assertEquals((short) 9, testAttributeByte.getCurrentValue().byteValue());
-    assertEquals(9, testAttributeInt.getCurrentValue().intValue());
-    assertEquals(9L, testAttributeLong.getCurrentValue().longValue());
+    assertEquals((byte) 9, testAttributeByte.get().byteValue());
+    assertEquals((short) 9, testAttributeByte.get().byteValue());
+    assertEquals(9, testAttributeInt.get().intValue());
+    assertEquals(9L, testAttributeLong.get().longValue());
 
-    assertEquals(9.1f, testAttributeFloat.getCurrentValue().floatValue(), 0.0001f);
-    assertEquals(9.1, testAttributeDouble.getCurrentValue().doubleValue(), 0.0000001);
+    assertEquals(9.1f, testAttributeFloat.get().floatValue(), 0.0001f);
+    assertEquals(9.1, testAttributeDouble.get().doubleValue(), 0.0000001);
   }
 
   @Test
@@ -222,13 +222,13 @@ public class AttributeTests {
     testAttributeFloat.modifyMaxBaseValue(new AttributeModifier<Float>(Modification.SUBSTRACTPERCENT, 9));
     testAttributeDouble.modifyMaxBaseValue(new AttributeModifier<Double>(Modification.SUBSTRACTPERCENT, 9));
     
-    assertEquals((byte) 9, testAttributeByte.getMaxValue().byteValue());
-    assertEquals((short) 9, testAttributeByte.getMaxValue().byteValue());
-    assertEquals(9, testAttributeInt.getMaxValue().intValue());
-    assertEquals(9L, testAttributeLong.getMaxValue().longValue());
+    assertEquals((byte) 9, testAttributeByte.getMax().byteValue());
+    assertEquals((short) 9, testAttributeByte.getMax().byteValue());
+    assertEquals(9, testAttributeInt.getMax().intValue());
+    assertEquals(9L, testAttributeLong.getMax().longValue());
 
-    assertEquals(9.1f, testAttributeFloat.getMaxValue().floatValue(), 0.0001f);
-    assertEquals(9.1, testAttributeDouble.getMaxValue().doubleValue(), 0.0000001);
+    assertEquals(9.1f, testAttributeFloat.getMax().floatValue(), 0.0001f);
+    assertEquals(9.1, testAttributeDouble.getMax().doubleValue(), 0.0000001);
     
     testAttributeByte.addMaxModifier(new AttributeModifier<Byte>(Modification.ADDPERCENT, 50));
     testAttributeShort.addMaxModifier(new AttributeModifier<Short>(Modification.ADDPERCENT, 50));
@@ -238,12 +238,12 @@ public class AttributeTests {
     testAttributeFloat.addMaxModifier(new AttributeModifier<Float>(Modification.ADDPERCENT, 50));
     testAttributeDouble.addMaxModifier(new AttributeModifier<Double>(Modification.ADDPERCENT, 50));
     
-    assertEquals((byte) 13, testAttributeByte.getMaxValue().byteValue());
-    assertEquals((short) 13, testAttributeByte.getMaxValue().byteValue());
-    assertEquals(13, testAttributeInt.getMaxValue().intValue());
-    assertEquals(13L, testAttributeLong.getMaxValue().longValue());
+    assertEquals((byte) 13, testAttributeByte.getMax().byteValue());
+    assertEquals((short) 13, testAttributeByte.getMax().byteValue());
+    assertEquals(13, testAttributeInt.getMax().intValue());
+    assertEquals(13L, testAttributeLong.getMax().longValue());
 
-    assertEquals(13.65f, testAttributeFloat.getMaxValue().floatValue(), 0.0001f);
-    assertEquals(13.65, testAttributeDouble.getMaxValue().doubleValue(), 0.0000001);
+    assertEquals(13.65f, testAttributeFloat.getMax().floatValue(), 0.0001f);
+    assertEquals(13.65, testAttributeDouble.getMax().doubleValue(), 0.0000001);
   }
 }

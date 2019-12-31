@@ -1,5 +1,10 @@
 package de.gurkenlabs.litiengine.attributes;
 
+/**
+ * The different modification types that can be applied to an <code>Attribute</code>.
+ * 
+ * @see AttributeModifier#getModification()
+ */
 public enum Modification {
   ADD(1),
   ADDPERCENT(5),

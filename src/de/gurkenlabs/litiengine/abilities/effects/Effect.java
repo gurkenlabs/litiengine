@@ -53,7 +53,7 @@ public abstract class Effect implements IUpdateable {
     this.ability = ability;
     this.targetPriorityComparator = new EntityDistanceComparator(this.getAbility().getExecutor());
 
-    this.duration = ability.getAttributes().getDuration().getCurrentValue();
+    this.duration = ability.getAttributes().duration().get();
     if (targets == null || targets.length == 0) {
       this.effectTargets = new EffectTarget[] { EffectTarget.NONE };
     } else {

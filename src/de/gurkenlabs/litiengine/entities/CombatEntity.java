@@ -176,7 +176,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
    */
   @Override
   public boolean isDead() {
-    return !this.isIndestructible() && this.getHitPoints().getCurrentValue() <= 0;
+    return !this.isIndestructible() && this.getHitPoints().get() <= 0;
   }
 
   /**
@@ -215,7 +215,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
       return;
     }
 
-    this.getHitPoints().modifyBaseValue(new AttributeModifier<>(Modification.SET, this.getHitPoints().getMaxValue()));
+    this.getHitPoints().modifyBaseValue(new AttributeModifier<>(Modification.SET, this.getHitPoints().getMax()));
 
     for (final CombatEntityListener listener : this.listeners) {
       listener.onResurrection(this);

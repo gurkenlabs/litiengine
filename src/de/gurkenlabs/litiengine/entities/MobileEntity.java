@@ -107,6 +107,6 @@ public class MobileEntity extends CollisionEntity implements IMobileEntity {
   protected static float getTickVelocity(IMobileEntity entity) {
     // pixels per ms multiplied by the passed ms
     // ensure that entities don't travel too far in case of lag
-    return Math.min(Game.loop().getDeltaTime(), GameLoop.TICK_DELTATIME_LAG) * 0.001F * entity.getVelocity().getCurrentValue() * Game.loop().getTimeScale();
+    return Math.min(Game.loop().getDeltaTime(), GameLoop.TICK_DELTATIME_LAG) * 0.001F * entity.getVelocity().get() * Game.loop().getTimeScale();
   }
 }

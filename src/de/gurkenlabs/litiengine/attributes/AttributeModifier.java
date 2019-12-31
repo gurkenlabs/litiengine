@@ -1,15 +1,19 @@
 package de.gurkenlabs.litiengine.attributes;
 
 /**
- * An attribute modifier allows to modify a specific CombatAttribute by the
- * specified Modification and the specified modifyValue.
+ * An attribute modifier allows to modify attributes by the
+ * specified Modification and modify value.
  *
  * @param <T>
  *          the generic type
+ *
+ * @see Attribute#addModifier(AttributeModifier)
+ * @see Attribute#modifyBaseValue(AttributeModifier)
  */
 public class AttributeModifier<T extends Number> implements Comparable<AttributeModifier<T>> {
   private final Modification modification;
   private double modifyValue;
+  private boolean active;
 
   /**
    * Instantiates a new attribute modifier.
@@ -33,7 +37,7 @@ public class AttributeModifier<T extends Number> implements Comparable<Attribute
   public boolean equals(Object obj) {
     if (obj instanceof AttributeModifier<?>) {
       AttributeModifier<?> attr = (AttributeModifier<?>) obj;
-      return this.getModification() == attr.getModification() && this.getModifyValue() == attr.getModifyValue();
+      return this.isActive() == attr.isActive() && this.getModification() == attr.getModification() && this.getModifyValue() == attr.getModifyValue();
     }
 
     return super.equals(obj);
@@ -44,15 +48,33 @@ public class AttributeModifier<T extends Number> implements Comparable<Attribute
     return super.hashCode();
   }
 
+  /**
+   * Gets the modification type applied by this modifier.
+   * 
+   * @return The modification type applied by this modifier.
+   */
   public Modification getModification() {
     return this.modification;
   }
 
+  /**
+   * Gets the value that is used to modify an attribute.
+   * 
+   * @return The value that is used to modify an attribute.
+   */
   public double getModifyValue() {
     return this.modifyValue;
   }
 
+  public boolean isActive() {
+    return active;
+  }
+
   public T modify(final T modvalue) {
+    if (!this.isActive()) {
+      return modvalue;
+    }
+
     switch (this.getModification()) {
     case ADD:
       return this.ensureType(Double.valueOf(modvalue.doubleValue() + this.getModifyValue()), modvalue);
@@ -76,6 +98,10 @@ public class AttributeModifier<T extends Number> implements Comparable<Attribute
 
   public void setModifyValue(double value) {
     this.modifyValue = value;
+  }
+
+  public void setActive(boolean active) {
+    this.active = active;
   }
 
   @SuppressWarnings("unchecked")

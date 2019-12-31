@@ -120,11 +120,11 @@ public class MapObjectLoaderTests {
     assertEquals(Valign.MIDDLE, creature.getCollisionBoxValign());
     
     assertTrue(creature.isIndestructible());
-    assertEquals(100, creature.getHitPoints().getMaxValue().intValue());
-    assertEquals(100, creature.getHitPoints().getCurrentValue().intValue());
+    assertEquals(100, creature.getHitPoints().getMax().intValue());
+    assertEquals(100, creature.getHitPoints().get().intValue());
     assertEquals(1, creature.getTeam());
 
-    assertEquals(200f, creature.getVelocity().getCurrentValue().floatValue());
+    assertEquals(200f, creature.getVelocity().get().floatValue());
     assertEquals(150f, creature.getAcceleration());
     assertEquals(160f, creature.getDeceleration());
     assertTrue(creature.turnOnMove());
@@ -171,8 +171,8 @@ public class MapObjectLoaderTests {
     assertEquals(Valign.MIDDLE, prop.getCollisionBoxValign());
     
     assertTrue(prop.isIndestructible());
-    assertEquals(100, prop.getHitPoints().getMaxValue().intValue());
-    assertEquals(100, prop.getHitPoints().getCurrentValue().intValue());
+    assertEquals(100, prop.getHitPoints().getMax().intValue());
+    assertEquals(100, prop.getHitPoints().get().intValue());
     assertEquals(1, prop.getTeam());
   }
 

@@ -67,7 +67,7 @@ public abstract class Ability implements IRenderable {
   }
 
   public Ellipse2D calculatePotentialImpactArea() {
-    final int range = this.getAttributes().getImpact().getCurrentValue();
+    final int range = this.getAttributes().impact().get();
     final double arcX = this.getExecutor().getCollisionBox().getCenterX() - range * 0.5;
     final double arcY = this.getExecutor().getCollisionBox().getCenterY() - range * 0.5;
 
@@ -75,7 +75,7 @@ public abstract class Ability implements IRenderable {
   }
 
   public boolean canCast() {
-    return !this.getExecutor().isDead() && (this.getCurrentExecution() == null || this.getCurrentExecution().getExecutionTicks() == 0 || Game.time().since(this.getCurrentExecution().getExecutionTicks()) >= this.getAttributes().getCooldown().getCurrentValue());
+    return !this.getExecutor().isDead() && (this.getCurrentExecution() == null || this.getCurrentExecution().getExecutionTicks() == 0 || Game.time().since(this.getCurrentExecution().getExecutionTicks()) >= this.getAttributes().cooldown().get());
   }
 
   /**
@@ -108,7 +108,7 @@ public abstract class Ability implements IRenderable {
   }
 
   public float getCooldownInSeconds() {
-    return (float) (this.getAttributes().getCooldown().getCurrentValue() * 0.001);
+    return (float) (this.getAttributes().cooldown().get() * 0.001);
   }
 
   public AbilityExecution getCurrentExecution() {
@@ -156,11 +156,11 @@ public abstract class Ability implements IRenderable {
     }
 
     // calculate cooldown in seconds
-    return (float) (!this.canCast() ? (this.getAttributes().getCooldown().getCurrentValue() - Game.time().since(this.getCurrentExecution().getExecutionTicks())) * 0.001 : 0);
+    return (float) (!this.canCast() ? (this.getAttributes().cooldown().get() - Game.time().since(this.getCurrentExecution().getExecutionTicks())) * 0.001 : 0);
   }
 
   public boolean isActive() {
-    return this.getCurrentExecution() != null && Game.time().since(this.getCurrentExecution().getExecutionTicks()) < this.getAttributes().getDuration().getCurrentValue();
+    return this.getCurrentExecution() != null && Game.time().since(this.getCurrentExecution().getExecutionTicks()) < this.getAttributes().duration().get();
   }
 
   public boolean isMultiTarget() {
@@ -243,13 +243,13 @@ public abstract class Ability implements IRenderable {
   }
 
   protected Shape internalCalculateImpactArea(final double angle) {
-    final int impact = this.getAttributes().getImpact().getCurrentValue();
-    final int impactAngle = this.getAttributes().getImpactAngle().getCurrentValue();
+    final int impact = this.getAttributes().impact().get();
+    final int impactAngle = this.getAttributes().impactAngle().get();
     final double arcX = this.getOrigin().getX() - impact * 0.5;
     final double arcY = this.getOrigin().getY() - impact * 0.5;
 
     // project
-    final Point2D appliedRange = GeometricUtilities.project(new Point2D.Double(arcX, arcY), angle, this.getAttributes().getRange().getCurrentValue() * 0.5);
+    final Point2D appliedRange = GeometricUtilities.project(new Point2D.Double(arcX, arcY), angle, this.getAttributes().range().get() * 0.5);
     final double start = angle - 90;
     if (impactAngle % 360 == 0) {
       return new Ellipse2D.Double(appliedRange.getX(), appliedRange.getY(), impact, impact);

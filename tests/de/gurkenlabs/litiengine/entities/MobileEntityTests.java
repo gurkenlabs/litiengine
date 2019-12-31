@@ -12,7 +12,7 @@ public class MobileEntityTests {
   public void testInitializationByAnnotation() {
     IMobileEntity entity = new TestMobileEntity();
 
-    assertEquals(111, entity.getVelocity().getCurrentValue().intValue());
+    assertEquals(111, entity.getVelocity().get().intValue());
     assertEquals(222, entity.getAcceleration());
     assertEquals(333, entity.getDeceleration());
     assertFalse(entity.turnOnMove());

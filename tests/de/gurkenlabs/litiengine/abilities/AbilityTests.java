@@ -60,12 +60,12 @@ public class AbilityTests {
     assertEquals(CastType.ONCONFIRM, ability.getCastType());
     assertEquals(true, ability.isMultiTarget());
 
-    assertEquals(333, ability.getAttributes().getCooldown().getCurrentValue().intValue());
-    assertEquals(222, ability.getAttributes().getDuration().getCurrentValue().intValue());
-    assertEquals(111, ability.getAttributes().getImpact().getCurrentValue().intValue());
-    assertEquals(99, ability.getAttributes().getImpactAngle().getCurrentValue().intValue());
-    assertEquals(444, ability.getAttributes().getRange().getCurrentValue().intValue());
-    assertEquals(999, ability.getAttributes().getValue().getCurrentValue().intValue());
+    assertEquals(333, ability.getAttributes().cooldown().get().intValue());
+    assertEquals(222, ability.getAttributes().duration().get().intValue());
+    assertEquals(111, ability.getAttributes().impact().get().intValue());
+    assertEquals(99, ability.getAttributes().impactAngle().get().intValue());
+    assertEquals(444, ability.getAttributes().range().get().intValue());
+    assertEquals(999, ability.getAttributes().value().get().intValue());
   }
 
   @Test
@@ -74,7 +74,7 @@ public class AbilityTests {
     TestAbility ability = new TestAbility(new Creature());
 
     Effect effect = new TestEffect(ability, EffectTarget.ENEMY);
-    assertEquals(ability.getAttributes().getDuration().getCurrentValue().intValue(), effect.getDuration());
+    assertEquals(ability.getAttributes().duration().get().intValue(), effect.getDuration());
     assertEquals(ability, effect.getAbility());
     assertEquals(0, effect.getFollowUpEffects().size());
     assertFalse(effect.isActive(entity));
