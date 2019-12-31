@@ -64,20 +64,6 @@ public final class GameWindow {
     }
   }
 
-  public void init() {
-    if (Game.isInNoGUIMode()) {
-      this.resolution = new Dimension(0, 0);
-      this.hostControl.setVisible(false);
-      return;
-    }
-
-    prepareHostControl(this.hostControl, Game.config().graphics().getDisplayMode(), Game.config().graphics().getResolution());
-
-    this.getRenderComponent().init();
-    this.resolution = this.getRenderComponent().getSize();
-    this.hostControl.requestFocus();
-  }
-
   public boolean isFocusOwner() {
     if (this.getRenderComponent() instanceof Component && this.getRenderComponent().isFocusOwner()) {
       return true;
@@ -169,7 +155,7 @@ public final class GameWindow {
     this.hostControl.setTitle(name);
   }
 
-  protected static void prepareHostControl(JFrame host, DisplayMode displaymode, Dimension resolution) {
+  static void prepareHostControl(JFrame host, DisplayMode displaymode, Dimension resolution) {
     switch (displaymode) {
     case BORDERLESS:
       host.setResizable(false);
@@ -197,6 +183,20 @@ public final class GameWindow {
     }
 
     setResolution(host, resolution);
+  }
+  
+  void init() {
+    if (Game.isInNoGUIMode()) {
+      this.resolution = new Dimension(0, 0);
+      this.hostControl.setVisible(false);
+      return;
+    }
+
+    prepareHostControl(this.hostControl, Game.config().graphics().getDisplayMode(), Game.config().graphics().getResolution());
+
+    this.getRenderComponent().init();
+    this.resolution = this.getRenderComponent().getSize();
+    this.hostControl.requestFocus();
   }
 
   private static float setResolution(Container host, Dimension dim) {

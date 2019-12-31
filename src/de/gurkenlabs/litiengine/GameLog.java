@@ -13,7 +13,7 @@ import java.util.logging.SimpleFormatter;
  *
  * @see Game#log()
  */
-public final class GameLog {
+final class GameLog {
   private static final String LOGGING_CONFIG_FILE = "logging.properties";
   private static final Logger log = Logger.getLogger(Game.class.getName());
 
