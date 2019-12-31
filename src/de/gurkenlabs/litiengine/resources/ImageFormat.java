@@ -13,7 +13,7 @@ public enum ImageFormat {
   /**
    * Gets the <code>SoundFormat</code> of the specified format string.
    * 
-   * @param format
+   * @param imageFormat
    *          The format string from which to extract the format.
    * @return The format of the specified string or <code>UNDEFINED</code> if not supported.
    */
