@@ -1,6 +1,6 @@
 package de.gurkenlabs.litiengine.util.geom;
 
-public class Trigonometry {
+public final class Trigonometry {
   private static final int ATAN2_BITS = 7;
   private static final int ATAN2_BITS2 = ATAN2_BITS << 1;
   private static final int ATAN2_MASK = ~(-1 << ATAN2_BITS2);

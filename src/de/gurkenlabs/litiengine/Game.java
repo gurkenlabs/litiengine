@@ -23,7 +23,6 @@ import de.gurkenlabs.litiengine.configuration.SoundConfiguration;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.environment.Environment;
-import de.gurkenlabs.litiengine.environment.EnvironmentLoadedListener;
 import de.gurkenlabs.litiengine.environment.GameWorld;
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
 import de.gurkenlabs.litiengine.graphics.Camera;
@@ -65,7 +64,6 @@ import de.gurkenlabs.litiengine.util.io.XmlUtilities;
  * </p>
  * 
  * @see GameListener
- * @see EnvironmentLoadedListener
  */
 public final class Game {
   public static final int EXIT_GAME_CLOSED = 0;
@@ -98,7 +96,6 @@ public final class Game {
   private static boolean initialized;
 
   static {
-
     // init configuration before init method in order to use configured values
     // to initialize components
     configuration = new GameConfiguration();
@@ -112,10 +109,22 @@ public final class Game {
     throw new UnsupportedOperationException();
   }
 
+  /**
+   * Adds the specified game listener to receive events about the basic game life-cycle.
+   * 
+   * @param listener
+   *          The listener to add.
+   */
   public static void addGameListener(GameListener listener) {
     gameListeners.add(listener);
   }
 
+  /**
+   * Removes the specified game listener.
+   * 
+   * @param listener
+   *          The listener to remove.
+   */
   public static void removeGameListener(GameListener listener) {
     gameListeners.remove(listener);
   }
@@ -146,6 +155,7 @@ public final class Game {
    * @see GameWindow
    * @see Game#init(String...)
    * @see Camera
+   * @see #isInNoGUIMode()
    */
   public static void hideGUI(boolean noGui) {
     noGUIMode = noGui;
@@ -164,8 +174,24 @@ public final class Game {
     return debug;
   }
 
+  /**
+   * Indicates whether the game should display the <code>GameWindow</code> or not.
+   * 
+   * @return True if the game should display visual components; otherwise false.
+   */
   public static boolean isInNoGUIMode() {
     return noGUIMode;
+  }
+
+  /**
+   * Indicates whether the game has already been started.
+   * 
+   * @return True if the game has been started; otherwise false.
+   * 
+   * @see Game#start()
+   */
+  public static boolean hasStarted() {
+    return hasStarted;
   }
 
   /**
@@ -351,6 +377,12 @@ public final class Game {
     return inputLoop;
   }
 
+  /**
+   * Gets the game's default logger instance that can be used to quickly log messages without the need to initialize
+   * custom logger instances.
+   * 
+   * @return The game's default logger instance.
+   */
   public static Logger log() {
     return log.log();
   }
@@ -395,13 +427,10 @@ public final class Game {
    * @see Camera
    * @see GameWorld#environment()
    * @see GameWorld#camera()
+   * @see GameWorld#reset(String)
    */
   public static GameWorld world() {
     return world;
-  }
-
-  public static boolean hasStarted() {
-    return hasStarted;
   }
 
   /***
@@ -417,7 +446,7 @@ public final class Game {
    * <li>initialize the <code>ScreenManger</code></li>
    * <li>initialize the <code>Input</code></li>
    * <li>initialize the <code>GameLoop</code> and <code>RenderLoop</code></li>
-   * <li>set a default camera</li>
+   * <li>set a default <code>Camera</code></li>
    * </ul>
    * 
    * @param args
@@ -489,8 +518,15 @@ public final class Game {
     initialized = true;
   }
 
+  /**
+   * Sets an <code>UncaughtExceptionHandler</code> used to handle all unexpected exceptions happening in the game.
+   * 
+   * @param uncaughtExceptionHandler
+   *          The handler to be used for uncaught exceptions.
+   */
   public static void setUncaughtExceptionHandler(UncaughtExceptionHandler uncaughtExceptionHandler) {
     gameLoop.setUncaughtExceptionHandler(uncaughtExceptionHandler);
+    inputLoop.setUncaughtExceptionHandler(uncaughtExceptionHandler);
     Thread.setDefaultUncaughtExceptionHandler(uncaughtExceptionHandler);
   }
 
@@ -509,6 +545,7 @@ public final class Game {
    * @see SoundEngine
    * @see Input
    * @see GameListener#started()
+   * @see #hasStarted()
    */
   public static synchronized void start() {
     if (!initialized) {
@@ -525,44 +562,6 @@ public final class Game {
     }
 
     hasStarted = true;
-  }
-
-  static synchronized boolean terminating() {
-    for (final GameListener listener : gameListeners) {
-      try {
-        if (!listener.terminating()) {
-          return false;
-        }
-      } catch (Exception e) {
-        log().log(Level.WARNING, "game listener threw an exception while terminating", e);
-      }
-    }
-
-    return true;
-  }
-
-  static synchronized void terminate() {
-    if (!initialized) {
-      return;
-    }
-    hasStarted = false;
-    initialized = false;
-
-    config().save();
-    gameLoop.terminate();
-    inputLoop.terminate();
-
-    soundEngine.terminate();
-
-    world().clear();
-
-    for (final GameListener listener : gameListeners) {
-      try {
-        listener.terminated();
-      } catch (Exception e) {
-        log().log(Level.WARNING, "game listener threw an exception during shutdown", e);
-      }
-    }
   }
 
   /**
@@ -609,6 +608,45 @@ public final class Game {
     }
 
     setInfo(info);
+  }
+
+  static synchronized boolean terminating() {
+    for (final GameListener listener : gameListeners) {
+      try {
+        if (!listener.terminating()) {
+          return false;
+        }
+      } catch (Exception e) {
+        log().log(Level.WARNING, "game listener threw an exception while terminating", e);
+      }
+    }
+
+    return true;
+  }
+
+  static synchronized void terminate() {
+    if (!initialized) {
+      return;
+    }
+
+    hasStarted = false;
+    initialized = false;
+
+    config().save();
+    gameLoop.terminate();
+    inputLoop.terminate();
+
+    soundEngine.terminate();
+
+    world().clear();
+
+    for (final GameListener listener : gameListeners) {
+      try {
+        listener.terminated();
+      } catch (Exception e) {
+        log().log(Level.WARNING, "game listener threw an exception during shutdown", e);
+      }
+    }
   }
 
   private static void handleCommandLineArguments(String[] args) {

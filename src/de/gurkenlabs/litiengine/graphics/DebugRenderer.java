@@ -99,14 +99,6 @@ public class DebugRenderer {
     }
   }
 
-  /**
-   * Draw name.
-   *
-   * @param g
-   *          the g
-   * @param entity
-   *          the entity
-   */
   private static void drawMapId(final Graphics2D g, final IEntity entity) {
     g.setColor(Color.RED);
     g.setFont(g.getFont().deriveFont(Font.PLAIN, 4f));

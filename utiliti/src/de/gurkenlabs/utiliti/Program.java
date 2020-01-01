@@ -22,7 +22,7 @@ public class Program {
     Resources.strings().setEncoding(Strings.ENCODING_UTF_8);
 
     // hook up configuration and initialize the game
-    Game.config().getConfigurationGroups().add(Editor.preferences());
+    Game.config().add(Editor.preferences());
     Game.init(args);
     forceBasicEditorConfiguration();
     Game.world().camera().onZoomChanged(zoom -> Editor.preferences().setZoom((float) zoom));

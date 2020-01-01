@@ -37,6 +37,15 @@ public class Configuration {
     }
   }
 
+  /**
+   * Gets the strongly typed configuration group if it was previously added to the configuration.
+   * 
+   * @param <T>
+   *          The type of the config group.
+   * @param groupClass
+   *          The class that provides the generic type for this method.
+   * @return The configuration group of the specified type or null if none can be found.
+   */
   public <T extends ConfigurationGroup> T getConfigurationGroup(final Class<T> groupClass) {
     for (final ConfigurationGroup group : this.getConfigurationGroups()) {
       if (group.getClass().equals(groupClass)) {
@@ -62,27 +71,81 @@ public class Configuration {
 
     return null;
   }
-  
-  public <T extends ConfigurationGroup> T getConfigurationGroup(String prefix, Class<T> groupClass) {
-    return groupClass.cast(getConfigurationGroup(prefix));
-  }
 
+  /**
+   * Gets all <code>ConfigurationGroups</code> from the configuration.
+   * 
+   * @return All config groups.
+   */
   public List<ConfigurationGroup> getConfigurationGroups() {
     return this.configurationGroups;
   }
 
+  /**
+   * Adds the specified configuration group to the configuration.
+   * 
+   * @param group
+   *          The group to add.
+   */
   public void add(ConfigurationGroup group) {
     this.getConfigurationGroups().add(group);
   }
 
+  /**
+   * Gets the name of the file to which this configuration is saved.
+   * 
+   * @return The name of the configuration file.
+   * 
+   * @see #save()
+   */
   public String getFileName() {
     return this.fileName;
   }
 
+  /**
+   * Tries to load the configuration from file in the application folder. If none
+   * exists, it tires to load the file from any resource folder. If none exists,
+   * it creates a new configuration file in the application folder.
+   */
   public void load() {
-    this.loadFromFile();
+    final File settingsFile = new File(this.getFileName());
+    try (InputStream settingsStream = Resources.get(this.getFileName())) {
+      if (!settingsFile.exists() && settingsStream == null || !settingsFile.isFile()) {
+        try (OutputStream out = new FileOutputStream(settingsFile)) {
+          this.createDefaultSettingsFile(out);
+        }
+
+        log.log(Level.INFO, "Default configuration " + this.getFileName() + " created");
+        return;
+      }
+    } catch (final IOException e) {
+      log.log(Level.SEVERE, e.getMessage(), e);
+    }
+
+    if (settingsFile.exists()) {
+      try (InputStream settingsStream = new FileInputStream(settingsFile)) {
+
+        final Properties properties = new Properties();
+        BufferedInputStream stream;
+
+        stream = new BufferedInputStream(settingsStream);
+        properties.load(stream);
+        stream.close();
+
+        this.initializeSettingsByProperties(properties);
+        log.log(Level.INFO, "Configuration " + this.getFileName() + " loaded");
+      } catch (final IOException e) {
+        log.log(Level.SEVERE, e.getMessage(), e);
+      }
+    }
   }
 
+  /**
+   * Saves this configuration to a file with the specified name of this instance (config.properties is the engines default config file).
+   * 
+   * @see #getFileName()
+   * @see Configuration#DEFAULT_CONFIGURATION_FILE_NAME
+   */
   public void save() {
     final File settingsFile = new File(this.getFileName());
     try (OutputStream out = new FileOutputStream(settingsFile, false)) {
@@ -122,44 +185,6 @@ public class Configuration {
         if (key.startsWith(group.getPrefix())) {
           group.initializeByProperty(key, properties.getProperty(key));
         }
-      }
-    }
-  }
-
-  /**
-   * Tries to load configuration from file in the application folder. If none
-   * exists, it tires to load the file from any resource folder. If none exists,
-   * it creates a new configuration file in the application folder.
-   */
-  private void loadFromFile() {
-    final File settingsFile = new File(this.getFileName());
-    try (InputStream settingsStream = Resources.get(this.getFileName())) {
-      if (!settingsFile.exists() && settingsStream == null || !settingsFile.isFile()) {
-        try (OutputStream out = new FileOutputStream(settingsFile)) {
-          this.createDefaultSettingsFile(out);
-        }
-
-        log.log(Level.INFO, "Default configuration " + this.getFileName() + " created");
-        return;
-      }
-    } catch (final IOException e) {
-      log.log(Level.SEVERE, e.getMessage(), e);
-    }
-
-    if (settingsFile.exists()) {
-      try (InputStream settingsStream = new FileInputStream(settingsFile)) {
-
-        final Properties properties = new Properties();
-        BufferedInputStream stream;
-
-        stream = new BufferedInputStream(settingsStream);
-        properties.load(stream);
-        stream.close();
-
-        this.initializeSettingsByProperties(properties);
-        log.log(Level.INFO, "Configuration " + this.getFileName() + " loaded");
-      } catch (final IOException e) {
-        log.log(Level.SEVERE, e.getMessage(), e);
       }
     }
   }
