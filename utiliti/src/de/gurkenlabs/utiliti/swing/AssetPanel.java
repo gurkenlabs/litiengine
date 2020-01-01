@@ -98,7 +98,7 @@ public class AssetPanel extends JPanel {
     });
   }
 
-  public <T> void load(Runnable runnable) {
+  public void load(Runnable runnable) {
     this.removeAll();
     runnable.run();
     this.getRootPane().repaint();
