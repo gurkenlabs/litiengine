@@ -647,18 +647,19 @@ public class Editor extends Screen {
         new Object[] { this.getGameFile().getMaps().size(), this.getGameFile().getSpriteSheets().size(), this.getGameFile().getTilesets().size(), this.getGameFile().getEmitters().size(), this.getGameFile().getBluePrints().size(), this.getGameFile().getSounds().size(), this.currentResourceFile });
     this.setCurrentStatus(Resources.strings().get("status_gamefile_saved"));
 
-    if (preferences().syncMaps()) {
-      this.saveMaps();
-    }
+    this.saveMaps();
     return saveFile;
   }
 
   private void saveMaps() {
     for (TmxMap map : this.getChangedMaps()) {
       UndoManager.save(map);
-      for (String file : FileUtilities.findFilesByExtension(new ArrayList<>(), Paths.get(FileUtilities.combine(this.getProjectPath(), "maps")), map.getName() + "." + TmxMap.FILE_EXTENSION)) {
-        File newFile = XmlUtilities.save(map, file, TmxMap.FILE_EXTENSION);
-        log.log(Level.INFO, "synchronized map {0}", new Object[] { newFile });
+      
+      if (preferences().syncMaps()) {
+        for (String file : FileUtilities.findFilesByExtension(new ArrayList<>(), Paths.get(FileUtilities.combine(this.getProjectPath(), "maps")), map.getName() + "." + TmxMap.FILE_EXTENSION)) {
+          File newFile = XmlUtilities.save(map, file, TmxMap.FILE_EXTENSION);
+          log.log(Level.INFO, "synchronized map {0}", new Object[] { newFile });
+        }
       }
     }
   }

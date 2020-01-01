@@ -53,8 +53,9 @@ public class UndoManager {
       return instance.get(Game.world().environment().getMap().getName());
     }
 
-    UndoManager newUndoManager = new UndoManager(Game.world().environment().getMap().getName());
-    instance.put(Game.world().environment().getMap().getName(), newUndoManager);
+    final String mapName = Game.world().environment().getMap().getName();
+    UndoManager newUndoManager = new UndoManager(mapName);
+    instance.put(mapName, newUndoManager);
     return newUndoManager;
   }
 
@@ -269,6 +270,7 @@ public class UndoManager {
   public static void save(IMap map) {
     if (instance.containsKey(map.getName())) {
       instance.get(map.getName()).saved = true;
+      UI.getMapController().refresh();
     }
   }
 
