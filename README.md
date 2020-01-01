@@ -29,7 +29,7 @@ The library is distributed over the [Maven Central Repository](https://search.ma
 
 ### Gradle
 ```groovy
-compile 'de.gurkenlabs:litiengine:0.4.17'
+compile 'de.gurkenlabs:litiengine:0.4.18'
 ```
 
 ### Maven
@@ -37,7 +37,7 @@ compile 'de.gurkenlabs:litiengine:0.4.17'
 <dependency>
   <groupId>de.gurkenlabs</groupId>
   <artifactId>litiengine</artifactId>
-  <version>0.4.17</version>
+  <version>0.4.18</version>
 </dependency>
 ```
 [More Installation Instructions](https://docs.litiengine.com/basics/getting-started/get-litiengine)
