@@ -1,6 +1,6 @@
 package de.gurkenlabs.utiliti.swing.menus;
 
-import java.awt.Event;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
 import javax.swing.JMenu;
@@ -23,16 +23,16 @@ public final class CanvasPopupMenu extends JPopupMenu {
     JMenuItem copy = new JMenuItem(Resources.strings().get("menu_edit_copy"), Icons.COPYX16);
     copy.addActionListener(e -> Editor.instance().getMapComponent().copy());
     copy.setEnabled(false);
-    copy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Event.CTRL_MASK));
+    copy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK));
 
     JMenuItem cut = new JMenuItem(Resources.strings().get("menu_edit_cut"), Icons.CUTX16);
     cut.addActionListener(e -> Editor.instance().getMapComponent().cut());
     cut.setEnabled(false);
-    cut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Event.CTRL_MASK));
+    cut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK));
 
     JMenuItem paste = new JMenuItem(Resources.strings().get("menu_edit_paste"), Icons.PASTEX16);
     paste.addActionListener(e -> Editor.instance().getMapComponent().paste());
-    paste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Event.CTRL_MASK));
+    paste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK));
     paste.setEnabled(false);
 
     JMenuItem blueprint = new JMenuItem(Resources.strings().get("menu_edit_blueprint"), Icons.BLUEPRINT);

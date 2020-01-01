@@ -1,6 +1,6 @@
 package de.gurkenlabs.utiliti.swing.menus;
 
-import java.awt.Event;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
 import javax.swing.JMenu;
@@ -21,27 +21,27 @@ public final class EditMenu extends JMenu {
     JMenu addMenu = new AddMenu();
 
     JMenuItem undo = new JMenuItem(Resources.strings().get("menu_edit_undo"));
-    undo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, Event.CTRL_MASK));
+    undo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK));
     undo.addActionListener(a -> UndoManager.instance().undo());
     undo.setEnabled(false);
 
     JMenuItem redo = new JMenuItem(Resources.strings().get("menu_edit_redo"));
-    redo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, Event.CTRL_MASK));
+    redo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_DOWN_MASK));
     redo.addActionListener(a -> UndoManager.instance().redo());
     redo.setEnabled(false);
 
     JMenuItem cut = new JMenuItem(Resources.strings().get("menu_edit_cut"));
-    cut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Event.CTRL_MASK));
+    cut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK));
     cut.addActionListener(a -> Editor.instance().getMapComponent().cut());
     cut.setEnabled(false);
 
     JMenuItem copy = new JMenuItem(Resources.strings().get("menu_edit_copy"));
-    copy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Event.CTRL_MASK));
+    copy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK));
     copy.addActionListener(a -> Editor.instance().getMapComponent().copy());
     copy.setEnabled(false);
 
     JMenuItem paste = new JMenuItem(Resources.strings().get("menu_edit_paste"));
-    paste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Event.CTRL_MASK));
+    paste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK));
     paste.addActionListener(a -> Editor.instance().getMapComponent().paste());
     paste.setEnabled(false);
 
@@ -51,16 +51,16 @@ public final class EditMenu extends JMenu {
     delete.setEnabled(false);
 
     JMenuItem selectAll = new JMenuItem(Resources.strings().get("menu_edit_selectAll"));
-    selectAll.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, Event.CTRL_MASK));
+    selectAll.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK));
     selectAll.addActionListener(a -> Editor.instance().getMapComponent().selectAll());
 
     JMenuItem deselect = new JMenuItem(Resources.strings().get("menu_edit_deselect"));
-    deselect.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, Event.CTRL_MASK));
+    deselect.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK));
     deselect.addActionListener(a -> Editor.instance().getMapComponent().deselect());
 
     JMenu layerMenu = new LayerMenu();
     layerMenu.setEnabled(false);
-    
+
     JMenu renderMenu = new RenderMenu();
     renderMenu.setEnabled(false);
 

@@ -1,7 +1,7 @@
 package de.gurkenlabs.utiliti.swing.menus;
 
 import java.awt.Color;
-import java.awt.Event;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,7 +36,7 @@ public final class MapMenu extends JMenu {
     exp.addActionListener(a -> Editor.instance().getMapComponent().exportMap());
 
     JMenuItem saveMapSnapshot = new JMenuItem(Resources.strings().get("menu_map_snapshot"));
-    saveMapSnapshot.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_PRINTSCREEN, Event.SHIFT_MASK));
+    saveMapSnapshot.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_PRINTSCREEN, InputEvent.SHIFT_DOWN_MASK));
     saveMapSnapshot.addActionListener(a -> Editor.instance().getMapComponent().saveMapSnapshot());
 
     JMenuItem reassignIDs = new JMenuItem(Resources.strings().get("menu_map_reassignMapIds"));

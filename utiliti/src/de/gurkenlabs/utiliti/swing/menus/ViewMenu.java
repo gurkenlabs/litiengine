@@ -1,6 +1,6 @@
 package de.gurkenlabs.utiliti.swing.menus;
 
-import java.awt.Event;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
 import javax.swing.JCheckBoxMenuItem;
@@ -41,17 +41,17 @@ public final class ViewMenu extends JMenu {
 
     JCheckBoxMenuItem renderGrid = new JCheckBoxMenuItem(Resources.strings().get("menu_view_renderGrid"));
     renderGrid.setState(Editor.preferences().showGrid());
-    renderGrid.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, Event.CTRL_MASK));
+    renderGrid.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, InputEvent.CTRL_DOWN_MASK));
     renderGrid.addItemListener(e -> Editor.preferences().setShowGrid(renderGrid.getState()));
 
     JCheckBoxMenuItem renderCollision = new JCheckBoxMenuItem(Resources.strings().get("menu_view_renderCollisionBoxes"));
     renderCollision.setState(Editor.preferences().renderBoundingBoxes());
-    renderCollision.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, Event.CTRL_MASK));
+    renderCollision.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.CTRL_DOWN_MASK));
     renderCollision.addItemListener(e -> Editor.preferences().setRenderBoundingBoxes(renderCollision.getState()));
 
     JCheckBoxMenuItem renderCustomMapObjects = new JCheckBoxMenuItem(Resources.strings().get("menu_view_renderCustomMapObjects"));
     renderCustomMapObjects.setState(Editor.preferences().renderCustomMapObjects());
-    renderCustomMapObjects.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, Event.CTRL_MASK));
+    renderCustomMapObjects.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, InputEvent.CTRL_DOWN_MASK));
     renderCustomMapObjects.addItemListener(e -> Editor.preferences().setRenderCustomMapObjects(renderCustomMapObjects.getState()));
 
     JCheckBoxMenuItem renderNames = new JCheckBoxMenuItem(Resources.strings().get("menu_view_renderNames"));
@@ -60,7 +60,7 @@ public final class ViewMenu extends JMenu {
 
     JCheckBoxMenuItem renderMapIds = new JCheckBoxMenuItem(Resources.strings().get("menu_view_renderMapIds"));
     renderMapIds.setState(Editor.preferences().renderMapIds());
-    renderMapIds.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, Event.CTRL_MASK));
+    renderMapIds.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, InputEvent.CTRL_DOWN_MASK));
     renderMapIds.addItemListener(e -> Editor.preferences().setRenderMapIds(renderMapIds.getState()));
 
     JMenuItem setGrid = new JMenuItem(Resources.strings().get("menu_view_gridSettings"));
@@ -75,11 +75,11 @@ public final class ViewMenu extends JMenu {
     });
 
     JMenuItem zoomIn = new JMenuItem(Resources.strings().get("menu_view_zoomIn"));
-    zoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, Event.CTRL_MASK));
+    zoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, InputEvent.CTRL_DOWN_MASK));
     zoomIn.addActionListener(a -> Zoom.in());
 
     JMenuItem zoomOut = new JMenuItem(Resources.strings().get("menu_view_zoomOut"));
-    zoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, Event.CTRL_MASK));
+    zoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, InputEvent.CTRL_DOWN_MASK));
     zoomOut.addActionListener(a -> Zoom.out());
 
     JMenuItem centerFocus = new JMenuItem(Resources.strings().get("menu_view_center"));
@@ -88,7 +88,7 @@ public final class ViewMenu extends JMenu {
     centerFocus.setEnabled(false);
 
     JMenuItem centerMap = new JMenuItem(Resources.strings().get("menu_view_centermap"));
-    centerMap.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, Event.CTRL_MASK));
+    centerMap.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_DOWN_MASK));
     centerMap.addActionListener(a -> Editor.instance().getMapComponent().centerCameraOnMap());
 
     Editor.instance().getMapComponent().onFocusChanged(mo -> centerFocus.setEnabled(mo != null));
