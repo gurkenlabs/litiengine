@@ -43,7 +43,7 @@ public final class HelpMenu extends JMenu {
 
     JMenuItem aboutMenuItem = new JMenuItem(Resources.strings().get("menu_help_about"));
     aboutMenuItem.addActionListener(event -> JOptionPane.showMessageDialog(((JFrame) Game.window().getHostControl()), Resources.strings().get("menu_help_abouttext") + "\n" + Resources.strings().get("menu_help_releases") + Resources.strings().getFrom("links", "link_LITIengine_releases") + "\n\n"
-        + Resources.strings().get("copyright_gurkenlabs", "2019") + "\n" + Resources.strings().get("copyright_LITIengine"), Resources.strings().get("menu_help_about") + " " + Game.info().getVersion(), JOptionPane.INFORMATION_MESSAGE));
+        + Resources.strings().get("copyright_gurkenlabs", "2020") + "\n" + Resources.strings().get("copyright_LITIengine"), Resources.strings().get("menu_help_about") + " " + Game.info().getVersion(), JOptionPane.INFORMATION_MESSAGE));
 
     this.add(tutorialMenuItem);
     this.add(docsMenuItem);
