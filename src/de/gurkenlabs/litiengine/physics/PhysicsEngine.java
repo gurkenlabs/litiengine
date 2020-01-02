@@ -457,8 +457,10 @@ public final class PhysicsEngine implements IUpdateable {
    * moving entity and they also move towards the currently moving entity.
    *
    * @param entity
+   *          The entity to resolve the collision for.
    * @param targetPosition
-   * @return
+   *          The target position to which the entity should be moved to.
+   * @return The position to which the entity should be moved after resolving the collision.
    */
   private Point2D resolveCollision(final ICollisionEntity entity, final Point2D targetPosition) {
     // first resolve x-axis movement

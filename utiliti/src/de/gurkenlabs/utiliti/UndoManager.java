@@ -183,13 +183,6 @@ public class UndoManager {
     this.mapObjectChanged(mapObject, mapObject.getId());
   }
 
-  /**
-   * This method overload is only used for when the ID of a map object was
-   * changed.
-   * 
-   * @param mapObject
-   * @param mapId
-   */
   public void mapObjectChanged(IMapObject mapObject, int previousMapId) {
     if (executing || mapObject == null) {
       return;
