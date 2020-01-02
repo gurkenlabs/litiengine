@@ -3,7 +3,7 @@ package de.gurkenlabs.litiengine;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 /**
- * This class defines the four dimensional directions in 2D space.
+ * This enum defines the four dimensional directions in 2D space.
  * <p>
  * It can provide a simplified way to look at a rotation or angle which is particularly useful in tile based games.
  * </p>

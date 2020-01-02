@@ -6,9 +6,6 @@ import java.util.List;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resource;
 
-/**
- * The Interface ITileset.
- */
 public interface ITileset extends ICustomPropertyProvider, Resource {
 
   /**

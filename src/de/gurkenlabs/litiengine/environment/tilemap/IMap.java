@@ -8,9 +8,6 @@ import java.util.List;
 
 import de.gurkenlabs.litiengine.util.AlphanumComparator;
 
-/**
- * The Interface IMap.
- */
 public interface IMap extends ILayerList, Comparable<IMap> {
 
   /**

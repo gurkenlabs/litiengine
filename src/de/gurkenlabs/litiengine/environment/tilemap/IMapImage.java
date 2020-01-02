@@ -4,9 +4,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.net.URL;
 
-/**
- * The Interface IMapImage.
- */
 public interface IMapImage extends ICustomPropertyProvider {
 
   public URL getAbsoluteSourcePath(); // XXX merge with getSource

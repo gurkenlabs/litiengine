@@ -9,7 +9,8 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 /**
- * Contains the basic logger provided by the <code>Game</code> class.
+ * The <code>GameLog</code> class provides a general purpose logger for games.
+ * It prevents the necessity to create custom logger instances and provides a simplified way to quickly log events.
  *
  * @see Game#log()
  */
@@ -20,11 +21,10 @@ final class GameLog {
   GameLog() {
   }
 
-
   Logger log() {
     return log;
   }
-  
+
   void init() {
     LogManager.getLogManager().reset();
     if (new File(LOGGING_CONFIG_FILE).exists()) {

@@ -5,6 +5,9 @@ import javax.xml.bind.annotation.XmlEnumValue;
 
 import de.gurkenlabs.litiengine.util.MathUtilities;
 
+/**
+ * The enum <code>Valign</code> defines a range of vertical alignments.
+ */
 @XmlEnum
 public enum Valign {
   @XmlEnumValue("bottom")
@@ -13,7 +16,8 @@ public enum Valign {
   MIDDLE(0.5f),
   @XmlEnumValue("top")
   TOP(0f),
-  MIDDLE_TOP(0.25f), MIDDLE_DOWN(0.75f);
+  MIDDLE_TOP(0.25f), 
+  MIDDLE_DOWN(0.75f);
 
   public final float portion;
 

@@ -4,11 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import de.gurkenlabs.litiengine.graphics.RenderComponent;
+
 /**
- * The main update loop that executes the game logic by calling the update functions on all registered components and entities.
+ * The main update loop that executes the game logic by calling the update functions on all registered <code>IUpdatable</code> instances.
+ * Subsequently, it performs the rendering of the current frame and tracks some performance metrics on the process.
  *
  * @see IUpdateable#update()
  * @see Game#loop()
+ * @see RenderComponent#render()
  */
 public final class GameLoop extends UpdateLoop implements IGameLoop {
   /**
@@ -78,8 +82,8 @@ public final class GameLoop extends UpdateLoop implements IGameLoop {
       super.process();
       this.executeTimedActions();
     }
-    
-    if(!Game.isInNoGUIMode()) {
+
+    if (!Game.isInNoGUIMode()) {
       Game.window().getRenderComponent().render();
     }
 
@@ -104,7 +108,7 @@ public final class GameLoop extends UpdateLoop implements IGameLoop {
 
     this.actions.removeAll(executed);
   }
-  
+
   private void trackRenderMetric() {
     Game.metrics().setEstimatedMaxFramesPerSecond((int) (1000.0 / this.getProcessTime()));
     if (Game.config().debug().trackRenderTimes()) {

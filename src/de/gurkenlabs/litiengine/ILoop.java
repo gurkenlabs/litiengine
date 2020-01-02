@@ -2,6 +2,16 @@ package de.gurkenlabs.litiengine;
 
 import java.util.concurrent.locks.Lock;
 
+/**
+ * The <code>ILoop</code> interface provide method for game loops that are publicly exposed.
+ * 
+ * <p>
+ * A loop is an implementation that performs actions (e.g. physics, rendering, input processing, ...) and updates other <code>IUpdatable</code>
+ * instances while the game is running.
+ * </p>
+ * 
+ * @see IUpdateable
+ */
 public interface ILoop extends ILaunchable {
   /**
    * Attaches the update method of the specified IUpdatable instance to be called
@@ -29,7 +39,7 @@ public interface ILoop extends ILaunchable {
    * @see #start()
    */
   public long getTicks();
-  
+
   /**
    * Gets the rate at which this loop performs its updates.
    * 
@@ -61,13 +71,16 @@ public interface ILoop extends ILaunchable {
 
   /**
    * Returns a lock that can be used for actions that must be performed either within or independently of the loop.
+   * 
    * @return A {@code Lock} for this loop.
    */
   public Lock getLock();
-  
+
   /**
    * Sets the tickrate at which the loop performs its updates.
-   * @param tickRate The tickrate of the loop.
+   * 
+   * @param tickRate
+   *          The tickrate of the loop.
    */
   public void setTickRate(int tickRate);
 }

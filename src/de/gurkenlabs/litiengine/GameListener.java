@@ -3,7 +3,7 @@ package de.gurkenlabs.litiengine;
 import java.util.EventListener;
 
 /**
- * This listener provides callbacks for when the <code>Game</code> gets started or terminated.
+ * This listener interface to for receiving events about the general life-cycle of the <code>Game</code> (e.g. started/terminated).
  */
 public interface GameListener extends EventListener {
 

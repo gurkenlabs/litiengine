@@ -3,11 +3,16 @@ package de.gurkenlabs.litiengine;
 import de.gurkenlabs.litiengine.configuration.ClientConfiguration;
 
 /**
- * The Interface IUpdateable provides the functionality to automatically update an instance that implements it
- * from the game loop. The instance needs to be registered on the loop.
+ * The <code>IUpdateable</code> interface provides the functionality to automatically update the instance
+ * from a loop that the it is attached to.
+ * 
+ * <p>
+ * This should be used for code that needs to be executed on every tick/frame.
+ * </p>
  * 
  * @see ILoop#attach(IUpdateable)
  * @see ILoop#detach(IUpdateable)
+ * @see Game#loop()
  */
 public interface IUpdateable {
 

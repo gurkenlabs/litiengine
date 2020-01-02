@@ -3,9 +3,6 @@ package de.gurkenlabs.litiengine.environment.tilemap;
 import java.awt.geom.Point2D;
 import java.util.List;
 
-/**
- * The Interface ITileLayer.
- */
 public interface ITileLayer extends ILayer {
 
   /**

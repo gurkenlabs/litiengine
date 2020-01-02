@@ -2,9 +2,6 @@ package de.gurkenlabs.litiengine.environment.tilemap;
 
 import java.awt.Color;
 
-/**
- * The Interface IImageLayer.
- */
 public interface IImageLayer extends ICustomPropertyProvider, ILayer {
 
   /**

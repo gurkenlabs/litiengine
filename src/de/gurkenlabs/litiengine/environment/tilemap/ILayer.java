@@ -5,9 +5,6 @@ import java.awt.Point;
 
 import de.gurkenlabs.litiengine.graphics.RenderType;
 
-/**
- * The Interface ILayer.
- */
 public interface ILayer extends ICustomPropertyProvider {
 
   public int getId();

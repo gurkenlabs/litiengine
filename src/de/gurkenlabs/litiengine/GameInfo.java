@@ -12,7 +12,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.CustomPropertyProvider;
 
 /**
- * This class contains basic information about a LITIengine game.
+ * The <code>GameInfo</code> class contains basic information about a LITIengine game.
  * The information can be accessed via <code>Game.getInfo()</code> and the infrastructure also internally uses this information
  * e.g. to setup the main window of the Game by providing an appropriate title.
  * <p>

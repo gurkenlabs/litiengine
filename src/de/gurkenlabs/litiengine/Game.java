@@ -256,6 +256,18 @@ public final class Game {
     return metrics;
   }
 
+  /**
+   * Gets time information about the running game/environment.
+   * 
+   * <p>
+   * This allow to measure the time between actions, track how long something took, evaluate cooldowns or just get information about the played game
+   * time.
+   * </p>
+   * 
+   * @return The game's temporal information.
+   * 
+   * @see GameTime#now()
+   */
   public static GameTime time() {
     return gameTime;
   }
@@ -487,9 +499,7 @@ public final class Game {
     }
 
     if (!isInNoGUIMode()) {
-      if (config().client().showGameMetrics()) {
-        window().getRenderComponent().onRendered(g -> metrics().render(g));
-      }
+      window().getRenderComponent().onRendered(g -> metrics().render(g));
 
       if (config().debug().isDebugEnabled()) {
         graphics().onEntityRendered(e -> DebugRenderer.renderEntityDebugInfo(e.getGraphics(), e.getRenderedObject()));

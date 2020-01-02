@@ -12,6 +12,17 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import de.gurkenlabs.litiengine.configuration.ClientConfiguration;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 
+/**
+ * The class <code>GameMetrics</code> provides meta information about the game's metrics. This allows the developer to
+ * get a feeling about the performance of different aspects (e.g. memory consumption, potential fps, network traffic, ...) and to identify potential issues.
+ * 
+ * <p>
+ * This information can be rendered as debug information if configured to get live data during a gameplay session.
+ * </p>
+ *
+ * @see ClientConfiguration#showGameMetrics()
+ * @see #render(Graphics2D)
+ */
 public final class GameMetrics implements IRenderable {
   private static final Font TITLE_FONT = new Font(Font.MONOSPACED, Font.BOLD, 12);
   private static final Font METRIC_FONT = new Font(Font.MONOSPACED, Font.PLAIN, 12);
@@ -94,6 +105,10 @@ public final class GameMetrics implements IRenderable {
   @Override
   public void render(final Graphics2D g) {
     this.updateMetrics();
+
+    if (!Game.config().client().showGameMetrics()) {
+      return;
+    }
 
     this.currentOffsetY = 0;
 
