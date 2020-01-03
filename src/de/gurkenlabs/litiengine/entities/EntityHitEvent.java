@@ -15,7 +15,7 @@ public class EntityHitEvent extends EventObject {
 
   public EntityHitEvent(final ICombatEntity hitEntity, final Ability ability, final int damage, final boolean kill) {
     super(hitEntity);
-    this.executor = ability.getExecutor();
+    this.executor = ability != null ? ability.getExecutor() : null;
     this.hitEntity = hitEntity;
     this.ability = ability;
     this.damage = damage;
