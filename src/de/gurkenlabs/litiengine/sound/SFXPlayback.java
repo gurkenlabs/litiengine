@@ -8,6 +8,9 @@ import javax.sound.sampled.LineUnavailableException;
 
 import de.gurkenlabs.litiengine.Game;
 
+/**
+ * A <code>SoundPlayback</code> implementation for the playback of sound effects.
+ */
 public class SFXPlayback extends SoundPlayback {
   private Sound sound;
   private FloatControl panControl;
@@ -23,7 +26,7 @@ public class SFXPlayback extends SoundPlayback {
     this.source = source;
     this.distance = this.createVolumeControl();
   }
-  
+
   @Override
   protected void play() {
     this.updateLocation(Game.audio().getListenerLocation());

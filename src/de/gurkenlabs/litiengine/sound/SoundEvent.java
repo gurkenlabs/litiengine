@@ -5,15 +5,15 @@ import java.util.EventObject;
 /**
  * This implementation is used for all events that need to pass a <code>Sound</code> object to their listeners.
  * 
- * @see Sound
- * @see EventObject
+ * @see SoundPlayback#cancel()
+ * @see SoundPlayback#finish()
  */
 public class SoundEvent extends EventObject {
   private static final long serialVersionUID = -2070316328855430839L;
 
   private final transient Sound sound;
 
-  public SoundEvent(Object source, Sound sound) {
+  SoundEvent(Object source, Sound sound) {
     super(source);
     this.sound = sound;
   }

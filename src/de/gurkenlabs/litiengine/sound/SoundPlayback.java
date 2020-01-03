@@ -13,6 +13,11 @@ import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
+/**
+ * The <code>SoundPlayback</code> class is a wrapper <code>SourceDataLine</code> on which a <code>Sound</code> playback can be carried out.
+ * 
+ * @see #play(Sound)
+ */
 public abstract class SoundPlayback implements Runnable {
   protected final SourceDataLine line;
   private FloatControl gainControl;
@@ -25,41 +30,7 @@ public abstract class SoundPlayback implements Runnable {
 
   private final Collection<VolumeControl> volumeControls = Collections.synchronizedSet(Collections.newSetFromMap(new WeakHashMap<>()));
   private VolumeControl masterVolume;
-  private volatile AtomicInteger miscVolume = new AtomicInteger(0x3f800000); // floatToIntBits(1f)
-
-  /**
-   * An object for controlling the volume of an {@code AudioPlayback}. Each distinct instance represents an independent factor contributing to its
-   * volume.
-   *
-   * @see SoundPlayback#createVolumeControl()
-   */
-  public class VolumeControl {
-    private volatile float value = 1f;
-
-    private VolumeControl() {
-    }
-
-    public float get() {
-      return this.value;
-    }
-
-    public void set(float value) {
-      if (value < 0f) {
-        throw new IllegalArgumentException("negative volume");
-      }
-      if (value < 0f) {
-        throw new IllegalArgumentException("negative volume");
-      }
-      this.value = value;
-      SoundPlayback.this.updateVolume();
-    }
-
-    @Override
-    protected void finalize() {
-      // clean up the instance without affecting the volume
-      SoundPlayback.this.miscVolume.accumulateAndGet(Float.floatToRawIntBits(this.value), (a, b) -> Float.floatToRawIntBits(Float.intBitsToFloat(a) * Float.intBitsToFloat(b)));
-    }
-  }
+  private AtomicInteger miscVolume = new AtomicInteger(0x3f800000); // floatToIntBits(1f)
 
   SoundPlayback(AudioFormat format) throws LineUnavailableException {
     // acquire resources in the constructor so that they can be used before the task is started
@@ -83,46 +54,6 @@ public abstract class SoundPlayback implements Runnable {
     }
     this.play();
     this.started = true;
-  }
-
-  protected void play() {
-    SoundEngine.EXECUTOR.submit(this);
-  }
-
-  /**
-   * Plays a sound to this object's data line.
-   *
-   * @param sound
-   *          The sound to play
-   * @return Whether the sound was cancelled while playing
-   */
-  protected boolean play(Sound sound) {
-    byte[] data = sound.getStreamData();
-    int len = this.line.getFormat().getFrameSize();
-    // math hacks here: we're getting just over half the buffer size, but it needs to be an integral number of sample frames
-    len = (this.line.getBufferSize() / len / 2 + 1) * len;
-    for (int i = 0; i < data.length; i += this.line.write(data, i, Math.min(len, data.length - i))) {
-      if (this.cancelled) {
-        return true;
-      }
-    }
-    return this.cancelled;
-  }
-
-  /**
-   * Finishes the playback. If this playback was not cancelled in the process, it will notify listeners.
-   */
-  protected void finish() {
-    this.line.drain();
-    synchronized (this) {
-      this.line.close();
-      if (!this.cancelled) {
-        SoundEvent event = new SoundEvent(this, null);
-        for (SoundPlaybackListener listener : this.listeners) {
-          listener.finished(event);
-        }
-      }
-    }
   }
 
   /**
@@ -218,7 +149,7 @@ public abstract class SoundPlayback implements Runnable {
   /**
    * Gets the current volume of this playback, considering all {@code VolumeControl} objects created for it.
    * 
-   * @return The volume
+   * @return The current volume.
    */
   public float getMasterVolume() {
     if (this.muteControl.getValue()) {
@@ -231,7 +162,7 @@ public abstract class SoundPlayback implements Runnable {
    * Gets the current master volume of this playback. This will be approximately equal to the value set by a previous call to {@code setVolume},
    * though rounding errors may occur.
    * 
-   * @return The settable volume
+   * @return The settable volume.
    */
   public float getVolume() {
     return this.masterVolume.get();
@@ -241,20 +172,56 @@ public abstract class SoundPlayback implements Runnable {
    * Sets the master volume of this playback.
    * 
    * @param volume
-   *          The new volume
+   *          The new volume.
    */
   public void setVolume(float volume) {
     this.masterVolume.set(volume);
   }
 
-  public VolumeControl getMasterVolumeControl() {
-    return this.masterVolume;
-  }
-
-  public VolumeControl createVolumeControl() {
+  VolumeControl createVolumeControl() {
     VolumeControl control = new VolumeControl();
     this.volumeControls.add(control);
     return control;
+  }
+
+  void play() {
+    SoundEngine.EXECUTOR.submit(this);
+  }
+
+  /**
+   * Plays a sound to this object's data line.
+   *
+   * @param sound
+   *          The sound to play
+   * @return Whether the sound was cancelled while playing
+   */
+  boolean play(Sound sound) {
+    byte[] data = sound.getStreamData();
+    int len = this.line.getFormat().getFrameSize();
+    // math hacks here: we're getting just over half the buffer size, but it needs to be an integral number of sample frames
+    len = (this.line.getBufferSize() / len / 2 + 1) * len;
+    for (int i = 0; i < data.length; i += this.line.write(data, i, Math.min(len, data.length - i))) {
+      if (this.cancelled) {
+        return true;
+      }
+    }
+    return this.cancelled;
+  }
+
+  /**
+   * Finishes the playback. If this playback was not cancelled in the process, it will notify listeners.
+   */
+  void finish() {
+    this.line.drain();
+    synchronized (this) {
+      this.line.close();
+      if (!this.cancelled) {
+        SoundEvent event = new SoundEvent(this, null);
+        for (SoundPlaybackListener listener : this.listeners) {
+          listener.finished(event);
+        }
+      }
+    }
   }
 
   void updateVolume() {
@@ -278,6 +245,40 @@ public abstract class SoundPlayback implements Runnable {
     // resources will not be released if the start method is never called
     if (this.line != null && this.line.isOpen()) {
       this.line.close();
+    }
+  }
+
+  /**
+   * An object for controlling the volume of a {@code SoundPlayback}. Each distinct instance represents an independent factor contributing to its
+   * volume.
+   *
+   * @see SoundPlayback#createVolumeControl()
+   */
+  class VolumeControl {
+    private volatile float value = 1f;
+
+    private VolumeControl() {
+    }
+
+    public float get() {
+      return this.value;
+    }
+
+    public void set(float value) {
+      if (value < 0f) {
+        throw new IllegalArgumentException("negative volume");
+      }
+      if (value < 0f) {
+        throw new IllegalArgumentException("negative volume");
+      }
+      this.value = value;
+      SoundPlayback.this.updateVolume();
+    }
+
+    @Override
+    protected void finalize() {
+      // clean up the instance without affecting the volume
+      SoundPlayback.this.miscVolume.accumulateAndGet(Float.floatToRawIntBits(this.value), (a, b) -> Float.floatToRawIntBits(Float.intBitsToFloat(a) * Float.intBitsToFloat(b)));
     }
   }
 }

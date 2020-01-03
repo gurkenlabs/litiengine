@@ -47,7 +47,7 @@ public final class Sound {
     this.name = name;
 
     this.data = StreamUtilities.getBytes(is);
-   
+
     AudioInputStream in = AudioSystem.getAudioInputStream(is);
     if (in != null) {
       final AudioFormat baseFormat = in.getFormat();
@@ -60,24 +60,43 @@ public final class Sound {
     }
   }
 
+  /**
+   * Gets the audio format of this sound instance.
+   * 
+   * @return The audio format of this instance.
+   */
   public AudioFormat getFormat() {
     return this.format;
   }
 
+  /**
+   * Gets the name of this instance that is used to uniquely identify the resource of this sound.
+   * 
+   * @return The name of this sound.
+   */
   public String getName() {
     return this.name;
   }
 
-  public byte[] getStreamData() {
+  /**
+   * Gets the raw data of this sound as byte array.
+   * 
+   * <p>
+   * This is used during resource serialization.
+   * </p>
+   * 
+   * @return The raw data of this sound as byte array.
+   */
+  public byte[] getRawData() {
+    return this.data;
+  }
+
+  byte[] getStreamData() {
     if (this.streamData == null) {
       return new byte[0];
     }
 
     return this.streamData.clone();
-  }
-
-  public byte[] getRawData() {
-    return this.data;
   }
 
   private static AudioFormat getOutFormat(final AudioFormat inFormat) {

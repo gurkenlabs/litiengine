@@ -4,6 +4,9 @@ import javax.sound.sampled.LineUnavailableException;
 
 import de.gurkenlabs.litiengine.Game;
 
+/**
+ * A <code>SoundPlayback</code> implementation for the playback music.
+ */
 public class MusicPlayback extends SoundPlayback {
   private Track track;
   private VolumeControl musicVolume;
