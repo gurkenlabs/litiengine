@@ -84,8 +84,6 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    * Sets the currently playing track to a <code>LoopedTrack</code> with the sound defined by the specified music name. This has no effect if the
    * specified track is already playing.
    *
-   * @param track
-   *          The track to play
    * @param musicName
    *          The name of the <code>Sound</code> to be played.
    * @return The playback of the music
