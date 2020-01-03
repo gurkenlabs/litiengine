@@ -60,7 +60,7 @@ public class Animation implements IUpdateable, ILaunchable {
 
     this.initKeyFrames(keyFrameDurations);
     if (this.getKeyframes().isEmpty()) {
-      log.log(Level.WARNING, "No keyframes defined for animation " + this.getName() + " (spitesheet: {0})", spritesheet.getName());
+      log.log(Level.WARNING, "No keyframes defined for animation {0} (spitesheet: {1})", new Object[] { this.getName(), spritesheet.getName() });
     }
   }
 
@@ -199,7 +199,7 @@ public class Animation implements IUpdateable, ILaunchable {
     if (this.getSpritesheet() == null) {
       return;
     }
-    
+
     this.keyframes.clear();
     int[] keyFrameDurations = keyFrames;
     if (keyFrameDurations.length == 0) {
