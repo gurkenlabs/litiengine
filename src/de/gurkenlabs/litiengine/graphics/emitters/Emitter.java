@@ -382,7 +382,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
       return;
     }
 
-    final float updateRatio = (float) this.getParticleUpdateRate() / Game.loop().getUpdateRate();
+    final float updateRatio = (float) this.getParticleUpdateRate() / Game.loop().getTickRate();
     for (final Particle p : this.getParticles().stream().collect(Collectors.toList())) {
       if (this.particleCanBeRemoved(p)) {
         // remove dead particles

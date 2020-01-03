@@ -359,10 +359,9 @@ public final class Game {
    * This internally renders the currently active screen which passes the <code>Graphics2D</code> object to all <code>GuiComponents</code> and the
    * Environment for rendering.
    * <p>
-   * <i>The LITIengine has separate loops for game logic, rendering and input processing. <br>
-   * This prevents them from interfering with each other and also properly separates tasks by their category.</i>
+   * <i>The LITIengine has two separate loops for game logic/rendering and input processing. <br>
+   * This prevents them from interfering with each other and to be able to process player input independent of the game's framerate.</i>
    * </p>
-   * 
    * 
    * @return The game's main loop.
    *
@@ -483,7 +482,7 @@ public final class Game {
     final ScreenManager scrMgr = new ScreenManager();
 
     // setup default exception handling for render and update loop
-    inputLoop = new UpdateLoop("Input Loop", loop().getUpdateRate());
+    inputLoop = new UpdateLoop("Input Loop", loop().getTickRate());
 
     setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(config().client().exitOnError()));
 

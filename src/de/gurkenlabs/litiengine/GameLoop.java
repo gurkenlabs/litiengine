@@ -53,17 +53,12 @@ public final class GameLoop extends UpdateLoop implements IGameLoop {
   }
 
   @Override
-  public int getUpdateRate() {
-    return this.getTickRate();
-  }
-
-  @Override
   public void setTimeScale(final float timeScale) {
     this.timeScale = timeScale;
   }
 
   @Override
-  public void updateExecutionTime(int index, long ticks) {
+  public void alterExecutionTime(int index, long ticks) {
     for (TimedAction action : this.actions) {
       if (action.getIndex() == index) {
         action.setExecutionTicks(ticks);
@@ -93,7 +88,7 @@ public final class GameLoop extends UpdateLoop implements IGameLoop {
   @Override
   protected long getExpectedDelta() {
     final float scale = this.getTimeScale() > 0 ? this.getTimeScale() : 1;
-    return (long) (1000 / (this.getUpdateRate() * scale));
+    return (long) (1000 / (this.getTickRate() * scale));
   }
 
   private void executeTimedActions() {

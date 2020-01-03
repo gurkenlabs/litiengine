@@ -76,7 +76,7 @@ public final class GameTime implements EnvironmentLoadedListener {
    * @return The milliseconds that correspond to the specified ticks.
    */
   public long toMilliseconds(final long ticks) {
-    return this.toMilliseconds(ticks, Game.loop().getUpdateRate());
+    return this.toMilliseconds(ticks, Game.loop().getTickRate());
   }
 
   /**
@@ -100,7 +100,7 @@ public final class GameTime implements EnvironmentLoadedListener {
    * @return The ticks that correspond to the specified milliseconds.
    */
   public long toTicks(final int milliseconds) {
-    return this.toTicks(milliseconds, Game.loop().getUpdateRate());
+    return this.toTicks(milliseconds, Game.loop().getTickRate());
   }
 
   /**
