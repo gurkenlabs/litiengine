@@ -26,12 +26,16 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.sound.SoundPlayback.VolumeControl;
 
 /**
- * This class provides all methods to playback sounds and music in your
+ * This <code>SoundEngine</code> class provides all methods to play back sounds and music in your
  * game. It allows to define the 2D coordinates of the sound or even pass in the
  * source entity of the sound which will adjust the position according to the
- * position of the entity. The LILIengine sound engine supports .wav, .mp3 and
+ * position of the entity.
+ * 
+ * <p>
+ * The LILIengine sound engine supports .wav, .mp3 and
  * .ogg by default. If you need other file extensions, you have to write an own
  * SPI implementation and inject it in your project.
+ * </p>
  */
 public final class SoundEngine implements IUpdateable, ILaunchable {
   private static final Logger log = Logger.getLogger(SoundEngine.class.getName());
@@ -76,10 +80,28 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
     return maxDist;
   }
 
-  public MusicPlayback playMusic(String music) {
-    return playMusic(Resources.sounds().get(music));
+  /**
+   * Sets the currently playing track to a <code>LoopedTrack</code> with the sound defined by the specified music name. This has no effect if the
+   * specified track is already playing.
+   *
+   * @param track
+   *          The track to play
+   * @param musicName
+   *          The name of the <code>Sound</code> to be played.
+   * @return The playback of the music
+   */
+  public MusicPlayback playMusic(String musicName) {
+    return playMusic(Resources.sounds().get(musicName));
   }
 
+  /**
+   * Sets the currently playing track to a <code>LoopedTrack</code> with the specified music <code>Sound</code>. This has no effect if the specified
+   * track is already playing.
+   *
+   * @param music
+   *          The <code>Sound</code> to be played.
+   * @return The playback of the music
+   */
   public MusicPlayback playMusic(Sound music) {
     return playMusic(new LoopedTrack(music));
   }
@@ -216,6 +238,11 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
     return music;
   }
 
+  /**
+   * Gets a list of all music playbacks.
+   * 
+   * @return A list of all music playbacks.
+   */
   public synchronized Collection<MusicPlayback> getAllMusic() {
     return Collections.unmodifiableCollection(allMusic);
   }
@@ -236,8 +263,20 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
     return playSound(sound, entity, false);
   }
 
-  public SFXPlayback playSound(final String sound, final IEntity entity) {
-    return playSound(Resources.sounds().get(sound), entity, false);
+  /**
+   * Plays a <code>Sound</code> with the specified name and updates its volume and pan by the current
+   * entity location in relation to the listener location.
+   * 
+   * @param entity
+   *          The entity at which location the sound should be played.
+   * @param soundName
+   *          The name of the sound to play.
+   * 
+   * @return An {@link SFXPlayback} instance that allows to further process
+   *         and control the played sound.
+   */
+  public SFXPlayback playSound(final String soundName, final IEntity entity) {
+    return playSound(Resources.sounds().get(soundName), entity, false);
   }
 
   /**
@@ -257,8 +296,21 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
     return playSound(sound, entity::getLocation, loop);
   }
 
-  public SFXPlayback playSound(final String sound, final IEntity entity, boolean loop) {
-    return playSound(Resources.sounds().get(sound), entity, loop);
+  /**
+   * Plays a <code>Sound</code> with the specified name and updates its volume and pan by the current
+   * entity location in relation to the listener location.
+   * 
+   * @param entity
+   *          The entity at which location the sound should be played.
+   * @param soundName
+   *          The name of the sound to play.
+   * @param loop
+   *          Determines whether this playback should be looped or not.
+   * @return An {@link SFXPlayback} instance that allows to further process
+   *         and control the played sound.
+   */
+  public SFXPlayback playSound(final String soundName, final IEntity entity, boolean loop) {
+    return playSound(Resources.sounds().get(soundName), entity, loop);
   }
 
   /**
@@ -277,16 +329,56 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
     return playSound(sound, location, false);
   }
 
-  public SFXPlayback playSound(final String sound, final Point2D location) {
-    return playSound(Resources.sounds().get(sound), location, false);
+  /**
+   * Plays a <code>Sound</code> with the specified name at the specified location and updates the volume
+   * and pan in relation to the listener location.
+   * 
+   * @param location
+   *          The location at which to play the sound.
+   * @param soundName
+   *          The name of the sound to play.
+   * 
+   * @return An {@link SFXPlayback} instance that allows to further process
+   *         and control the played sound.
+   */
+  public SFXPlayback playSound(final String soundName, final Point2D location) {
+    return playSound(Resources.sounds().get(soundName), location, false);
   }
 
+  /**
+   * Plays the specified sound at the specified location and updates the volume
+   * and pan in relation to the listener location.
+   * 
+   * @param x
+   *          The x-coordinate of the location at which to play the sound.
+   * @param y
+   *          The y-coordinate of the location at which to play the sound.
+   * @param sound
+   *          The sound to play.
+   * 
+   * @return An {@link SFXPlayback} instance that allows to further process
+   *         and control the played sound.
+   */
   public SFXPlayback playSound(final Sound sound, double x, double y) {
     return playSound(sound, new Point2D.Double(x, y), false);
   }
 
-  public SFXPlayback playSound(final String sound, double x, double y) {
-    return playSound(Resources.sounds().get(sound), new Point2D.Double(x, y), false);
+  /**
+   * Plays a <code>Sound</code> with the specified name at the specified location and updates the volume
+   * and pan in relation to the listener location.
+   * 
+   * @param x
+   *          The x-coordinate of the location at which to play the sound.
+   * @param y
+   *          The y-coordinate of the location at which to play the sound.
+   * @param soundName
+   *          The name of the sound to play.
+   * 
+   * @return An {@link SFXPlayback} instance that allows to further process
+   *         and control the played sound.
+   */
+  public SFXPlayback playSound(final String soundName, double x, double y) {
+    return playSound(Resources.sounds().get(soundName), new Point2D.Double(x, y), false);
   }
 
   /**
@@ -306,16 +398,61 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
     return playSound(sound, () -> location, loop);
   }
 
-  public SFXPlayback playSound(final String sound, final Point2D location, boolean loop) {
-    return playSound(Resources.sounds().get(sound), location, loop);
+  /**
+   * Plays a <code>Sound</code> with the specified name at the specified location and updates the volume
+   * and pan in relation to the listener location.
+   * 
+   * @param location
+   *          The location at which to play the sound.
+   * @param soundName
+   *          The name of the sound to play.
+   * @param loop
+   *          Determines whether this playback should be looped or not.
+   * @return An {@link SFXPlayback} instance that allows to further process
+   *         and control the played sound.
+   */
+  public SFXPlayback playSound(final String soundName, final Point2D location, boolean loop) {
+    return playSound(Resources.sounds().get(soundName), location, loop);
   }
 
+  /**
+   * Plays the specified sound at the specified location and updates the volume
+   * and pan in relation to the listener location.
+   * 
+   * @param x
+   *          The x-coordinate of the location at which to play the sound.
+   * @param y
+   *          The y-coordinate of the location at which to play the sound.
+   * @param sound
+   *          The sound to play.
+   * @param loop
+   *          Determines whether this playback should be looped or not.
+   * 
+   * @return An {@link SFXPlayback} instance that allows to further process
+   *         and control the played sound.
+   */
   public SFXPlayback playSound(final Sound sound, final double x, final double y, boolean loop) {
     return playSound(sound, new Point2D.Double(x, y), loop);
   }
 
-  public SFXPlayback playSound(final String sound, final double x, final double y, boolean loop) {
-    return playSound(Resources.sounds().get(sound), new Point2D.Double(x, y), loop);
+  /**
+   * Plays a <code>Sound</code> with the specified name at the specified location and updates the volume
+   * and pan in relation to the listener location.
+   * 
+   * @param x
+   *          The x-coordinate of the location at which to play the sound.
+   * @param y
+   *          The y-coordinate of the location at which to play the sound.
+   * @param soundName
+   *          The name of the sound to play.
+   * @param loop
+   *          Determines whether this playback should be looped or not.
+   * 
+   * @return An {@link SFXPlayback} instance that allows to further process
+   *         and control the played sound.
+   */
+  public SFXPlayback playSound(final String soundName, final double x, final double y, boolean loop) {
+    return playSound(Resources.sounds().get(soundName), new Point2D.Double(x, y), loop);
   }
 
   /**
@@ -332,8 +469,18 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
     return playSound(sound, false);
   }
 
-  public SFXPlayback playSound(final String sound) {
-    return playSound(Resources.sounds().get(sound), false);
+  /**
+   * Plays a <code>Sound</code> with the specified name with the volume configured in the SOUND config
+   * with a center pan.
+   * 
+   * @param soundName
+   *          The name of the sound to play.
+   * 
+   * @return An {@link SFXPlayback} instance that allows to further process
+   *         and control the played sound.
+   */
+  public SFXPlayback playSound(final String soundName) {
+    return playSound(Resources.sounds().get(soundName), false);
   }
 
   /**
@@ -351,8 +498,19 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
     return playSound(sound, () -> null, loop);
   }
 
-  public SFXPlayback playSound(final String sound, boolean loop) {
-    return playSound(Resources.sounds().get(sound), loop);
+  /**
+   * Plays a <code>Sound</code> with the specified name with the volume configured in the SOUND config
+   * with a center pan.
+   * 
+   * @param soundName
+   *          The name of the sound to play.
+   * @param loop
+   *          Determines whether this playback should be looped or not.
+   * @return An {@link SFXPlayback} instance that allows to further process
+   *         and control the played sound.
+   */
+  public SFXPlayback playSound(final String soundName, boolean loop) {
+    return playSound(Resources.sounds().get(soundName), loop);
   }
 
   /**
@@ -415,10 +573,6 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
     listenerLocationCallback = callback;
   }
 
-  public Point2D getListenerLocation() {
-    return (Point2D) this.listenerLocation.clone();
-  }
-
   @Override
   public void start() {
     Game.inputLoop().attach(this);
@@ -476,6 +630,14 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
     }
   }
 
+  Point2D getListenerLocation() {
+    return (Point2D) this.listenerLocation.clone();
+  }
+
+  void addSound(SFXPlayback playback) {
+    this.sounds.add(playback);
+  }
+
   private SFXPlayback playSound(Sound sound, Supplier<Point2D> supplier, boolean loop) {
     if (sound == null) {
       return null;
@@ -487,10 +649,6 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
     }
     playback.start();
     return playback;
-  }
-
-  void addSound(SFXPlayback playback) {
-    this.sounds.add(playback);
   }
 
   private static void resourceFailure(Throwable e) {
