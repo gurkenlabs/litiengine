@@ -14,7 +14,7 @@ public interface ITimeToLive {
   /**
    * Gets the total time to live of this instance.
    * 
-   * @return
+   * @return The total time to live.
    */
   int getTimeToLive();
 

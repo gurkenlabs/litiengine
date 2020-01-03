@@ -29,8 +29,6 @@ import de.gurkenlabs.litiengine.resources.Resources;
  * <i>This is typically used to provide some per-level logic or to trigger
  * general loading behavior.</i>
  * 
- * @return The game's world which manages all <code>Environments</code>.
- * 
  * @see Environment
  * @see Camera
  * @see GameWorld#environment()
@@ -149,6 +147,8 @@ public final class GameWorld implements IUpdateable {
   /**
    * Removes the specified environment loaded listener for the specified map name.
    * 
+   * @param mapName
+   *          The name of the map for which to remove the listener.
    * @param listener
    *          The listener to remove.
    */
@@ -170,7 +170,9 @@ public final class GameWorld implements IUpdateable {
 
   /**
    * Removes the specified environment unloaded listener for the specified map name.
-   * 
+   *
+   * @param mapName
+   *          The name of the map for which to remove the listener.
    * @param listener
    *          The listener to remove.
    */
@@ -181,6 +183,8 @@ public final class GameWorld implements IUpdateable {
   /**
    * Adds the specified environment listener to receive events about the basic life-cycle of environments with the specified map name.
    * 
+   * @param mapName
+   *          The name of the map for which to add the listener.
    * @param listener
    *          The listener to add.
    */
@@ -191,6 +195,8 @@ public final class GameWorld implements IUpdateable {
   /**
    * Removes the specified environment listener.
    * 
+   * @param mapName
+   *          The name of the map for which to remove the listener.
    * @param listener
    *          The listener to remove.
    */

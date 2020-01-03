@@ -23,7 +23,7 @@ public interface IGameLoop extends ILoop {
    * 
    * @param index
    *          The index of the <code>TimedAction</code>.
-   * @param ticks
+   * @param tick
    *          The tick at which to perform the action instead.
    */
   public void alterExecutionTime(int index, long tick);
