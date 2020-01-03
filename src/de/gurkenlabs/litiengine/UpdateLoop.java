@@ -9,6 +9,13 @@ import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.util.TimeUtilities;
 
+/**
+ * The <code>UpdateLoop</code> is a basic loop implementation that performs operations at the specified <code>tickRate</code> 
+ * by continuously processing the registered logic and delaying the loop until the requested rate is met.
+ *
+ * @see #process()
+ * @see #delay()
+ */
 public class UpdateLoop extends Thread implements AutoCloseable, ILoop {
   private static final Logger log = Logger.getLogger(UpdateLoop.class.getName());
   private final Set<IUpdateable> updatables = ConcurrentHashMap.newKeySet();

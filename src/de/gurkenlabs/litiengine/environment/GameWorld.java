@@ -16,9 +16,33 @@ import de.gurkenlabs.litiengine.graphics.Camera;
 import de.gurkenlabs.litiengine.graphics.ICamera;
 import de.gurkenlabs.litiengine.resources.Resources;
 
+/**
+ * The <code>GameWorld</code> class is a global environment manager that contains all <code>Environments</code>
+ * and provides the currently active <code>Environment</code> and <code>Camera</code>.<br>
+ * <p>
+ * The <code>GameWorld</code> returns the same instance for a particular map/mapName until the
+ * <code>GameWorld.reset(String)</code> method is called.
+ * </p>
+ * 
+ * Moreover, it provides the possibility to attach game logic via <code>EnvironmentListeners</code> to different events of the
+ * <code>Envrionment's</code> life cycle (e.g. loaded, initialized, ...).<br>
+ * <i>This is typically used to provide some per-level logic or to trigger
+ * general loading behavior.</i>
+ * 
+ * @return The game's world which manages all <code>Environments</code>.
+ * 
+ * @see Environment
+ * @see Camera
+ * @see GameWorld#environment()
+ * @see GameWorld#camera()
+ * @see GameWorld#reset(String)
+ *
+ */
 public final class GameWorld implements IUpdateable {
+  private final List<EnvironmentListener> listeners = new CopyOnWriteArrayList<>();
   private final List<EnvironmentLoadedListener> loadedListeners = new CopyOnWriteArrayList<>();
   private final List<EnvironmentUnloadedListener> unloadedListeners = new CopyOnWriteArrayList<>();
+
   private final Map<String, Collection<EnvironmentListener>> environmentListeners = new ConcurrentHashMap<>();
   private final Map<String, Collection<EnvironmentLoadedListener>> environmentLoadedListeners = new ConcurrentHashMap<>();
   private final Map<String, Collection<EnvironmentUnloadedListener>> environmentUnloadedListeners = new ConcurrentHashMap<>();
@@ -30,6 +54,9 @@ public final class GameWorld implements IUpdateable {
   private ICamera camera;
   private int gravity;
 
+  /**
+   * Don't call this manually!
+   */
   @Override
   public void update() {
     if (this.environment() == null) {
@@ -44,50 +71,153 @@ public final class GameWorld implements IUpdateable {
     }
   }
 
+  /**
+   * Adds the specified environment listener to receive events about the basic life-cycle of environments. This is a global event that gets called for
+   * any map.
+   * 
+   * @param listener
+   *          The listener to add.
+   */
+  public void addListener(EnvironmentListener listener) {
+    this.listeners.add(listener);
+  }
+
+  /**
+   * Removes the specified environment listener.
+   * 
+   * @param listener
+   *          The listener to remove.
+   */
+  public void removeListener(EnvironmentListener listener) {
+    this.listeners.remove(listener);
+  }
+
+  /**
+   * Adds the specified environment loaded listener to receive events for when an environment gets loaded. This is a global event that gets called for
+   * any map.
+   * 
+   * @param listener
+   *          The listener to add.
+   */
   public void addLoadedListener(EnvironmentLoadedListener listener) {
     this.loadedListeners.add(listener);
   }
 
+  /**
+   * Removes the specified environment loaded listener.
+   * 
+   * @param listener
+   *          The listener to remove.
+   */
   public void removeLoadedListener(EnvironmentLoadedListener listener) {
     this.loadedListeners.remove(listener);
   }
 
+  /**
+   * Adds the specified environment unloaded listener to receive events for when an environment gets unloaded. This is a global event that gets called
+   * for any map.
+   * 
+   * @param listener
+   *          The listener to add.
+   */
   public void addUnloadedListener(EnvironmentUnloadedListener listener) {
     this.unloadedListeners.add(listener);
   }
 
+  /**
+   * Removes the specified environment unloaded listener.
+   * 
+   * @param listener
+   *          The listener to remove.
+   */
   public void removeUnloadedListener(EnvironmentUnloadedListener listener) {
     this.unloadedListeners.remove(listener);
   }
 
+  /**
+   * Adds the specified environment loaded listener to receive events for when an environment with the specified map name gets loaded.
+   * 
+   * @param mapName
+   *          The name of the map for which to add the listener.
+   * @param listener
+   *          The listener to add.
+   */
   public void addLoadedListener(String mapName, EnvironmentLoadedListener listener) {
     add(this.environmentLoadedListeners, mapName, listener);
   }
 
+  /**
+   * Removes the specified environment loaded listener for the specified map name.
+   * 
+   * @param listener
+   *          The listener to remove.
+   */
   public void removeLoadedListener(String mapName, EnvironmentLoadedListener listener) {
     remove(this.environmentLoadedListeners, mapName, listener);
   }
 
+  /**
+   * Adds the specified environment unloaded listener to receive events for when an environment with the specified map name gets unloaded.
+   * 
+   * @param mapName
+   *          The name of the map for which to add the listener.
+   * @param listener
+   *          The listener to add.
+   */
   public void addUnloadedListener(String mapName, EnvironmentUnloadedListener listener) {
     add(this.environmentUnloadedListeners, mapName, listener);
   }
 
+  /**
+   * Removes the specified environment unloaded listener for the specified map name.
+   * 
+   * @param listener
+   *          The listener to remove.
+   */
   public void removeUnloadedListener(String mapName, EnvironmentUnloadedListener listener) {
     add(this.environmentUnloadedListeners, mapName, listener);
   }
 
+  /**
+   * Adds the specified environment listener to receive events about the basic life-cycle of environments with the specified map name.
+   * 
+   * @param listener
+   *          The listener to add.
+   */
   public void addListener(String mapName, EnvironmentListener listener) {
     add(this.environmentListeners, mapName, listener);
   }
 
+  /**
+   * Removes the specified environment listener.
+   * 
+   * @param listener
+   *          The listener to remove.
+   */
   public void removeListener(String mapName, EnvironmentListener listener) {
     remove(this.environmentListeners, mapName, listener);
   }
 
+  /**
+   * Attaches the specified updatable instance that only gets updated when an environment with the specified map name is currently loaded.
+   * 
+   * @param mapName
+   *          The name of the map for which to attach the updatable instance.
+   * @param updateable
+   *          The updatable instance to attach.
+   */
   public void attach(String mapName, IUpdateable updateable) {
     add(this.updatables, mapName, updateable);
   }
 
+  /**
+   * Detaches the specified updatable instance from the updating of environments with the specified map name.
+   * 
+   * @param mapName
+   *          The name of the map for which to detach the updatable instance.
+   * @param updateable
+   *          The updatable instance to detach.
+   */
   public void detach(String mapName, IUpdateable updateable) {
     remove(this.updatables, mapName, updateable);
   }
@@ -114,6 +244,11 @@ public final class GameWorld implements IUpdateable {
     return this.environment;
   }
 
+  /**
+   * Gets the game worlds gravity that is applied to any environment. This can e.g. be useful for platformers.
+   * 
+   * @return The gravity of the game world that gets applied to any environment.
+   */
   public int gravity() {
     return this.gravity;
   }
@@ -131,6 +266,7 @@ public final class GameWorld implements IUpdateable {
     this.environmentLoadedListeners.clear();
     this.environmentUnloadedListeners.clear();
 
+    this.listeners.clear();
     this.loadedListeners.clear();
     this.unloadedListeners.clear();
   }
@@ -217,25 +353,25 @@ public final class GameWorld implements IUpdateable {
       this.environment = env;
       if (env != null) {
         this.addEnvironment(env);
-  
+
         if (env.getGravity() == 0 && this.gravity() != 0) {
           env.setGravity(this.gravity());
         }
-  
+
         env.load();
         for (final EnvironmentLoadedListener listener : this.loadedListeners) {
           listener.loaded(env);
         }
-  
+
         // call map specific listeners
         String mapName = getMapName(env);
         if (mapName != null && this.environmentLoadedListeners.containsKey(mapName)) {
-          
+
           // for the default camera we center the camera on the environment
           if (this.camera().getClass().equals(Camera.class)) {
             camera().setFocus(env.getCenter());
           }
-          
+
           for (EnvironmentLoadedListener listener : this.environmentLoadedListeners.get(mapName)) {
             listener.loaded(env);
           }
@@ -366,6 +502,10 @@ public final class GameWorld implements IUpdateable {
             env.removeListener(listener);
           }
         }
+
+        for (EnvironmentListener listener : this.listeners) {
+          env.removeListener(listener);
+        }
       }
     }
 
@@ -455,6 +595,10 @@ public final class GameWorld implements IUpdateable {
       for (EnvironmentListener listener : this.environmentListeners.get(mapName)) {
         env.addListener(listener);
       }
+    }
+
+    for (EnvironmentListener listener : this.listeners) {
+      env.addListener(listener);
     }
   }
 }
