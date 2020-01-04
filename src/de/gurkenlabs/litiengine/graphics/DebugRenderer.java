@@ -23,7 +23,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.physics.Collision;
 
-public class DebugRenderer {
+public final class DebugRenderer {
   private static List<Consumer<MapDebugArgs>> mapDebugConsumer;
 
   private static List<EntityRenderedListener> entityDebugListeners;
@@ -34,6 +34,7 @@ public class DebugRenderer {
   }
 
   private DebugRenderer() {
+    throw new UnsupportedOperationException();
   }
 
   public static void addEntityDebugListener(EntityRenderedListener listener) {
@@ -59,22 +60,23 @@ public class DebugRenderer {
 
     if (Game.config().debug().renderHitBoxes() && entity instanceof ICombatEntity) {
       g.setColor(Color.RED);
-      RenderEngine.renderOutline(g, ((ICombatEntity) entity).getHitBox());
+      Game.graphics().renderOutline(g, ((ICombatEntity) entity).getHitBox());
     }
 
     if (Game.config().debug().renderBoundingBoxes()) {
       g.setColor(Color.RED);
-      RenderEngine.renderOutline(g, entity.getBoundingBox());
+      Game.graphics().renderOutline(g, entity.getBoundingBox());
     }
 
     if (Game.config().debug().renderCollisionBoxes() && entity instanceof ICollisionEntity) {
       final ICollisionEntity collisionEntity = (ICollisionEntity) entity;
       g.setColor(collisionEntity.hasCollision() ? Color.RED : Color.ORANGE);
-      RenderEngine.renderOutline(g, collisionEntity.getCollisionBox());
+      Game.graphics().renderOutline(g, collisionEntity.getCollisionBox());
     }
 
+    final EntityRenderEvent event = new EntityRenderEvent(g, entity);
     for (EntityRenderedListener listener : entityDebugListeners) {
-      listener.rendered(g, entity);
+      listener.rendered(event);
     }
   }
 
@@ -84,7 +86,7 @@ public class DebugRenderer {
       final BasicStroke shapeStroke = new BasicStroke(1 / Game.world().camera().getRenderScale());
       for (final Rectangle2D shape : Game.physics().getCollisionBoxes(Collision.STATIC)) {
         g.setColor(Color.RED);
-        RenderEngine.renderOutline(g, shape, shapeStroke);
+        Game.graphics().renderOutline(g, shape, shapeStroke);
       }
     }
 
@@ -114,7 +116,7 @@ public class DebugRenderer {
 
     // draw rect
     g.setColor(Color.CYAN);
-    RenderEngine.renderOutline(g, playerTile);
+    Game.graphics().renderOutline(g, playerTile);
 
     // draw coords
     final Point tileLocation = map.getOrientation().getTile(location, map);

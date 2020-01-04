@@ -7,7 +7,6 @@ import java.awt.Stroke;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
-import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.utiliti.components.Editor;
 
 public class GridRenderer implements IEditorRenderer {
@@ -32,7 +31,7 @@ public class GridRenderer implements IEditorRenderer {
         for (int y = 0; y < map.getHeight(); y++) {
           Shape tile = map.getOrientation().getShape(x, y, map);
           if (Game.world().camera().getViewport().intersects(tile.getBounds2D())) {
-            RenderEngine.renderOutline(g, tile, stroke);
+            Game.graphics().renderOutline(g, tile, stroke);
           }
         }
       }

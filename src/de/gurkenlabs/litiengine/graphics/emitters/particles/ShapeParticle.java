@@ -5,7 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.geom.Point2D;
 
-import de.gurkenlabs.litiengine.graphics.RenderEngine;
+import de.gurkenlabs.litiengine.Game;
 
 public abstract class ShapeParticle extends Particle {
 
@@ -19,6 +19,6 @@ public abstract class ShapeParticle extends Particle {
   public void render(final Graphics2D g, final Point2D emitterOrigin) {
     g.setColor(this.getColor());
 
-    RenderEngine.renderShape(g, this.getShape(emitterOrigin));
+    Game.graphics().renderShape(g, this.getShape(emitterOrigin));
   }
 }

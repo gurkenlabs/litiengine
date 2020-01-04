@@ -501,7 +501,7 @@ public final class Game {
       window().getRenderComponent().onRendered(g -> metrics().render(g));
 
       if (config().debug().isDebugEnabled()) {
-        graphics().onEntityRendered(e -> DebugRenderer.renderEntityDebugInfo(e.getGraphics(), e.getEntity()));
+        graphics().addEntityRenderedListener(e -> DebugRenderer.renderEntityDebugInfo(e.getGraphics(), e.getEntity()));
       }
 
       window().getRenderComponent().onFpsChanged(fps -> metrics().setFramesPerSecond(fps));

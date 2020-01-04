@@ -5,7 +5,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 
-import de.gurkenlabs.litiengine.graphics.RenderEngine;
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.utiliti.Style;
 import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.components.MapComponent;
@@ -36,7 +36,7 @@ public class NewObjectAreaRenderer extends MouseSelectAreaRenderer {
 
     String width = rect.getWidth() + "";
     String height = rect.getHeight() + "";
-    RenderEngine.renderText(g, width, rect.getX() + rect.getWidth() / 2.0 - fm.stringWidth(width) / 2.0, rect.getY() - 5);
-    RenderEngine.renderText(g, height, rect.getX() - (fm.stringWidth(height) + 3), rect.getY() + rect.getHeight() / 2);
+    Game.graphics().renderText(g, width, rect.getX() + rect.getWidth() / 2.0 - fm.stringWidth(width) / 2.0, rect.getY() - 5);
+    Game.graphics().renderText(g, height, rect.getX() - (fm.stringWidth(height) + 3), rect.getY() + rect.getHeight() / 2);
   }
 }

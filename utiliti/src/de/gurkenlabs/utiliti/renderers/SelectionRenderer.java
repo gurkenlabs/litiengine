@@ -9,7 +9,6 @@ import java.awt.geom.Point2D;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
-import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.TextRenderer;
 import de.gurkenlabs.utiliti.Style;
 import de.gurkenlabs.utiliti.components.Editor;
@@ -39,7 +38,7 @@ public class SelectionRenderer implements IEditorRenderer {
       Stroke stroke = new BasicStroke(1 / Game.world().camera().getRenderScale());
 
       g.setColor(colorSelectionBorder);
-      RenderEngine.renderOutline(g, mapObject.getBoundingBox(), stroke);
+      Game.graphics().renderOutline(g, mapObject.getBoundingBox(), stroke);
     }
   }
 

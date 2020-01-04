@@ -21,7 +21,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
-import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.utiliti.Style;
 import de.gurkenlabs.utiliti.components.Editor;
@@ -70,7 +69,7 @@ public class MapObjectsRenderer implements IEditorRenderer {
         // render spawn points
         if (type == MapObjectType.SPAWNPOINT) {
           g.setColor(Style.COLOR_SPAWNPOINT);
-          RenderEngine.renderShape(g, new Rectangle2D.Double(mapObject.getBoundingBox().getCenterX() - 1, mapObject.getBoundingBox().getCenterY() - 1, 2, 2));
+          Game.graphics().renderShape(g, new Rectangle2D.Double(mapObject.getBoundingBox().getCenterX() - 1, mapObject.getBoundingBox().getCenterY() - 1, 2, 2));
         }
 
         if (type != MapObjectType.COLLISIONBOX) {
@@ -100,8 +99,8 @@ public class MapObjectsRenderer implements IEditorRenderer {
       info.append(")");
     }
 
-    RenderEngine.renderText(g, info.toString(), start.getX(), start.getY() - 5);
-    RenderEngine.renderShape(g, new Ellipse2D.Double(start.getX() - 1, start.getY() - 1, 3, 3));
+    Game.graphics().renderText(g, info.toString(), start.getX(), start.getY() - 5);
+    Game.graphics().renderShape(g, new Ellipse2D.Double(start.getX() - 1, start.getY() - 1, 3, 3));
 
     if (mapObject.isPolyline()) {
 
@@ -115,7 +114,7 @@ public class MapObjectsRenderer implements IEditorRenderer {
         return;
       }
 
-      RenderEngine.renderOutline(g, path, shapeStroke);
+      Game.graphics().renderOutline(g, path, shapeStroke);
     } else if (mapObject.isPolygon()) {
       if (mapObject.getPolygon() == null || mapObject.getPolygon().getPoints().isEmpty()) {
         return;
@@ -128,23 +127,23 @@ public class MapObjectsRenderer implements IEditorRenderer {
       }
 
       g.setColor(Style.COLOR_UNSUPPORTED_FILL);
-      RenderEngine.renderShape(g, path);
+      Game.graphics().renderShape(g, path);
       g.setColor(Style.COLOR_UNSUPPORTED);
-      RenderEngine.renderOutline(g, path, shapeStroke);
+      Game.graphics().renderOutline(g, path, shapeStroke);
     } else if (mapObject.isEllipse()) {
       if (mapObject.getEllipse() == null) {
         return;
       }
       g.setColor(Style.COLOR_UNSUPPORTED_FILL);
-      RenderEngine.renderShape(g, mapObject.getEllipse());
+      Game.graphics().renderShape(g, mapObject.getEllipse());
 
       g.setColor(Style.COLOR_UNSUPPORTED);
-      RenderEngine.renderOutline(g, mapObject.getEllipse(), shapeStroke);
+      Game.graphics().renderOutline(g, mapObject.getEllipse(), shapeStroke);
     } else {
       g.setColor(Style.COLOR_UNSUPPORTED_FILL);
-      RenderEngine.renderShape(g, mapObject.getBoundingBox());
+      Game.graphics().renderShape(g, mapObject.getBoundingBox());
       g.setColor(Style.COLOR_UNSUPPORTED);
-      RenderEngine.renderOutline(g, mapObject.getBoundingBox(), shapeStroke);
+      Game.graphics().renderOutline(g, mapObject.getBoundingBox(), shapeStroke);
     }
   }
 
@@ -163,7 +162,7 @@ public class MapObjectsRenderer implements IEditorRenderer {
     // don't fill rect for lightsource because it is important to judge
     // the color
     if (type != MapObjectType.LIGHTSOURCE) {
-      RenderEngine.renderShape(g, mapObject.getBoundingBox());
+      Game.graphics().renderShape(g, mapObject.getBoundingBox());
     }
 
     Color borderColor = colorBoundingBoxFill;
@@ -185,7 +184,7 @@ public class MapObjectsRenderer implements IEditorRenderer {
 
     g.setColor(borderColor);
 
-    RenderEngine.renderOutline(g, mapObject.getBoundingBox(), shapeStroke);
+    Game.graphics().renderOutline(g, mapObject.getBoundingBox(), shapeStroke);
 
     if (Editor.preferences().renderNames()) {
       renderName(g, mapObject);
@@ -211,11 +210,11 @@ public class MapObjectsRenderer implements IEditorRenderer {
       g.setColor(Style.COLOR_COLLISION_FILL);
       Rectangle2D collisionBox = CollisionEntity.getCollisionBox(mapObject.getLocation(), mapObject.getWidth(), mapObject.getHeight(), collisionBoxWidth, collisionBoxHeight, align, valign);
 
-      RenderEngine.renderShape(g, collisionBox);
+      Game.graphics().renderShape(g, collisionBox);
       g.setColor(collision ? Style.COLOR_COLLISION_BORDER : Style.COLOR_NOCOLLISION_BORDER);
 
       Stroke collisionStroke = collision ? shapeStroke : new BasicStroke(1 / Game.world().camera().getRenderScale(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL, 0, new float[] { 1f }, 0);
-      RenderEngine.renderOutline(g, collisionBox, collisionStroke);
+      Game.graphics().renderOutline(g, collisionBox, collisionStroke);
     }
   }
 
@@ -235,10 +234,10 @@ public class MapObjectsRenderer implements IEditorRenderer {
       double height = stringHeight + PADDING * 2;
       RoundRectangle2D rect = new RoundRectangle2D.Double(x, y, width, height, 2, 2);
       g.setColor(new Color(0, 0, 0, 200));
-      RenderEngine.renderShape(g, rect, true);
+      Game.graphics().renderShape(g, rect, true);
 
       g.setColor(Color.WHITE);
-      RenderEngine.renderText(g, objectName, x + PADDING, rect.getMaxY() - PADDING, true);
+      Game.graphics().renderText(g, objectName, x + PADDING, rect.getMaxY() - PADDING, true);
     }
   }
 

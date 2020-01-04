@@ -13,7 +13,6 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
-import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 public class EntityNavigator implements IUpdateable, IRenderable {
@@ -101,7 +100,7 @@ public class EntityNavigator implements IUpdateable, IRenderable {
     }
 
     g.setColor(Color.MAGENTA);
-    RenderEngine.renderOutline(g, this.getPath().getPath());
+    Game.graphics().renderOutline(g, this.getPath().getPath());
   }
 
   public void rotateTowards(final Point2D target) {

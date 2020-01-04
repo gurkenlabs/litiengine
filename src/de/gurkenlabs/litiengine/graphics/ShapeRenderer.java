@@ -11,6 +11,7 @@ public final class ShapeRenderer {
   public static final Stroke DEFAULT_STROKE = new BasicStroke(1);
 
   private ShapeRenderer() {
+    throw new UnsupportedOperationException();
   }
 
   public static void render(final Graphics2D g, final Shape shape) {

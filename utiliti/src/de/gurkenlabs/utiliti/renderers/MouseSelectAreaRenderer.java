@@ -6,7 +6,6 @@ import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.utiliti.Style;
 import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.components.MapComponent;
@@ -43,8 +42,8 @@ public class MouseSelectAreaRenderer implements IEditorRenderer {
   protected void renderSelectArea(Graphics2D g, Rectangle2D rect) {
     // draw mouse selection area
     g.setColor(this.fillColor);
-    RenderEngine.renderShape(g, rect);
+    Game.graphics().renderShape(g, rect);
     g.setColor(this.borderColor);
-    RenderEngine.renderOutline(g, rect, this.shapeStroke);
+    Game.graphics().renderOutline(g, rect, this.shapeStroke);
   }
 }

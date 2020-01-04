@@ -8,7 +8,6 @@ import java.awt.geom.Rectangle2D;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
-import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.utiliti.Style;
 import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.components.MapComponent;
@@ -31,20 +30,20 @@ public class FocusRenderer implements IEditorRenderer {
 
       g.setColor(Color.BLACK);
 
-      RenderEngine.renderOutline(g, focus, stroke);
+      Game.graphics().renderOutline(g, focus, stroke);
 
       Stroke whiteStroke = new BasicStroke(1 / Game.world().camera().getRenderScale(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER, 4, new float[] { 1f, 1f }, Game.time().now() / 15.0f - 1f);
       g.setColor(Color.WHITE);
-      RenderEngine.renderOutline(g, focus, whiteStroke);
+      Game.graphics().renderOutline(g, focus, whiteStroke);
 
       // render transform rects
       if (Editor.instance().getMapComponent().getEditMode() != MapComponent.EDITMODE_MOVE) {
         Stroke transStroke = new BasicStroke(1 / Game.world().camera().getRenderScale());
         for (Rectangle2D trans : Transform.getAnchors()) {
           g.setColor(Style.COLOR_TRANSFORM_RECT_FILL);
-          RenderEngine.renderShape(g, trans);
+          Game.graphics().renderShape(g, trans);
           g.setColor(Color.BLACK);
-          RenderEngine.renderOutline(g, trans, transStroke);
+          Game.graphics().renderOutline(g, trans, transStroke);
         }
       }
     }

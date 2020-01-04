@@ -13,8 +13,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.Game;
@@ -43,9 +41,8 @@ public final class RenderEngine {
   public static final float DEFAULT_RENDERSCALE = 3.0f;
 
   private final EntityYComparator entityComparator = new EntityYComparator();
-  private final List<Consumer<EntityRenderEvent>> entityRenderedConsumer = new CopyOnWriteArrayList<>();
-  private final List<Predicate<IEntity>> entityRenderingConditions = new CopyOnWriteArrayList<>();
-  private final List<Consumer<EntityRenderEvent>> entityRenderingConsumer = new CopyOnWriteArrayList<>();
+  private final List<EntityRenderedListener> entityRenderedListener = new CopyOnWriteArrayList<>();
+  private final List<EntityRenderListener> entityRenderListener = new CopyOnWriteArrayList<>();
 
   private float baseRenderScale = DEFAULT_RENDERSCALE;
 
@@ -64,6 +61,43 @@ public final class RenderEngine {
     }
   }
 
+  public void addEntityRenderedListener(final EntityRenderedListener listener) {
+    this.entityRenderedListener.add(listener);
+  }
+
+  public void removeEntityRenderedListener(final EntityRenderedListener listener) {
+    this.entityRenderedListener.remove(listener);
+  }
+
+  public void addEntityRenderListener(final EntityRenderListener listener) {
+    this.entityRenderListener.add(listener);
+  }
+
+  public void removeEntityRenderListener(final EntityRenderListener listener) {
+    this.entityRenderListener.remove(listener);
+  }
+  
+  /**
+   * Gets the base render scale of the game.
+   * 
+   * @return The base render scale.
+   */
+  public float getBaseRenderScale() {
+    return this.baseRenderScale;
+  }
+
+  /**
+   * Sets the global base scale that is used to calculate the actual render scale of the game.
+   * 
+   * @param scale
+   *          The base render scale for the game.
+   * 
+   * @see ICamera#getRenderScale()
+   */
+  public void setBaseRenderScale(float scale) {
+    this.baseRenderScale = scale;
+  }
+
   /**
    * Draws the given string to the specified map location.
    *
@@ -78,7 +112,7 @@ public final class RenderEngine {
    * @param antialias
    *          Configure whether or not to render the text with antialiasing.
    */
-  public static void renderText(final Graphics2D g, final String text, final double x, final double y, boolean antialias) {
+  public void renderText(final Graphics2D g, final String text, final double x, final double y, boolean antialias) {
     if (text == null || text.isEmpty()) {
       return;
     }
@@ -102,7 +136,7 @@ public final class RenderEngine {
    * @param y
    *          The y-coordinate of the text
    */
-  public static void renderText(final Graphics2D g, final String text, final double x, final double y) {
+  public void renderText(final Graphics2D g, final String text, final double x, final double y) {
     renderText(g, text, x, y, false);
   }
 
@@ -118,7 +152,7 @@ public final class RenderEngine {
    * @param antialias
    *          Configure whether or not to render the text with antialiasing.
    */
-  public static void renderText(final Graphics2D g, final String text, final Point2D location, boolean antialias) {
+  public void renderText(final Graphics2D g, final String text, final Point2D location, boolean antialias) {
     renderText(g, text, location.getX(), location.getY(), antialias);
   }
 
@@ -132,15 +166,15 @@ public final class RenderEngine {
    * @param location
    *          The location on the map.
    */
-  public static void renderText(final Graphics2D g, final String text, final Point2D location) {
+  public void renderText(final Graphics2D g, final String text, final Point2D location) {
     renderText(g, text, location, false);
   }
 
-  public static void renderShape(final Graphics2D g, final Shape shape) {
+  public void renderShape(final Graphics2D g, final Shape shape) {
     renderShape(g, shape, false);
   }
 
-  public static void renderShape(final Graphics2D g, final Shape shape, boolean antialiasing) {
+  public void renderShape(final Graphics2D g, final Shape shape, boolean antialiasing) {
     if (shape == null) {
       return;
     }
@@ -155,11 +189,11 @@ public final class RenderEngine {
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, hint);
   }
 
-  public static void renderOutline(final Graphics2D g, final Shape shape) {
+  public void renderOutline(final Graphics2D g, final Shape shape) {
     renderOutline(g, shape, new BasicStroke(1 / Game.world().camera().getRenderScale()));
   }
 
-  public static void renderOutline(final Graphics2D g, final Shape shape, final Stroke stroke) {
+  public void renderOutline(final Graphics2D g, final Shape shape, final Stroke stroke) {
     if (shape == null) {
       return;
     }
@@ -171,20 +205,20 @@ public final class RenderEngine {
     ShapeRenderer.renderOutlineTransformed(g, shape, t, stroke);
   }
 
-  public static void renderImage(Graphics2D g, final Image image, double x, double y) {
+  public void renderImage(Graphics2D g, final Image image, double x, double y) {
     renderImage(g, image, new Point2D.Double(x, y));
   }
 
-  public static void renderImage(Graphics2D g, final Image image, Point2D location) {
+  public void renderImage(Graphics2D g, final Image image, Point2D location) {
     Point2D viewPortLocation = Game.world().camera().getViewportLocation(location);
     ImageRenderer.render(g, image, viewPortLocation.getX() * Game.world().camera().getRenderScale(), viewPortLocation.getY() * Game.world().camera().getRenderScale());
   }
-  
-  public static void render(final Graphics2D g, final Collection<? extends IRenderable> renderables) {
-    renderables.forEach(r -> render(g, r));
+
+  public void render(final Graphics2D g, final Collection<? extends IRenderable> renderables) {
+    renderables.forEach(r -> r.render(g));
   }
 
-  public static void render(final Graphics2D g, final Collection<? extends IRenderable> renderables, final Shape clip) {
+  public void render(final Graphics2D g, final Collection<? extends IRenderable> renderables, final Shape clip) {
     // set render shape according to the vision
     final Shape oldClip = g.getClip();
 
@@ -193,51 +227,6 @@ public final class RenderEngine {
     renderables.forEach(r -> r.render(g));
 
     g.setClip(oldClip);
-  }
-
-  public static void render(final Graphics2D g, final IRenderable renderable) {
-    if (renderable == null) {
-      return;
-    }
-
-    renderable.render(g);
-  }
-
-  public boolean canRender(final IEntity entity) {
-    for (final Predicate<IEntity> consumer : this.entityRenderingConditions) {
-      if (!consumer.test(entity)) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  public void entityRenderingCondition(final Predicate<IEntity> predicate) {
-    if (!this.entityRenderingConditions.contains(predicate)) {
-      this.entityRenderingConditions.add(predicate);
-    }
-  }
-
-  /**
-   * Gets the base render scale of the game.
-   * 
-   * @return The base render scale.
-   */
-  public float getBaseRenderScale() {
-    return this.baseRenderScale;
-  }
-
-  public void onEntityRendered(final Consumer<EntityRenderEvent> entity) {
-    if (!this.entityRenderedConsumer.contains(entity)) {
-      this.entityRenderedConsumer.add(entity);
-    }
-  }
-
-  public void onEntityRendering(final Consumer<EntityRenderEvent> entity) {
-    if (!this.entityRenderingConsumer.contains(entity)) {
-      this.entityRenderingConsumer.add(entity);
-    }
   }
 
   public void renderEntities(final Graphics2D g, final Collection<? extends IEntity> entities) {
@@ -296,8 +285,8 @@ public final class RenderEngine {
       return;
     }
     final EntityRenderEvent renderEvent = new EntityRenderEvent(g, entity);
-    for (final Consumer<EntityRenderEvent> consumer : this.entityRenderingConsumer) {
-      consumer.accept(renderEvent);
+    for (final EntityRenderListener listener : this.entityRenderListener) {
+      listener.rendering(renderEvent);
     }
 
     final IEntityAnimationController<?> animationController = entity.animations();
@@ -321,22 +310,22 @@ public final class RenderEngine {
       ((IRenderable) entity).render(g);
     }
 
-    if (!this.entityRenderedConsumer.isEmpty()) {
-      for (final Consumer<EntityRenderEvent> consumer : this.entityRenderedConsumer) {
-        consumer.accept(renderEvent);
-      }
+    for (final EntityRenderListener listener : this.entityRenderListener) {
+      listener.rendered(renderEvent);
+    }
+
+    for (final EntityRenderedListener listener : this.entityRenderedListener) {
+      listener.rendered(renderEvent);
     }
   }
+  
+  public boolean canRender(final IEntity entity) {
+    for (final EntityRenderListener listener : this.entityRenderListener) {
+      if (!listener.canRender(entity)) {
+        return false;
+      }
+    }
 
-  /**
-   * Sets the global base scale that is used to calculate the actual render scale of the game.
-   * 
-   * @param scale
-   *          The base render scale for the game.
-   * 
-   * @see ICamera#getRenderScale()
-   */
-  public void setBaseRenderScale(float scale) {
-    this.baseRenderScale = scale;
+    return true;
   }
 }
