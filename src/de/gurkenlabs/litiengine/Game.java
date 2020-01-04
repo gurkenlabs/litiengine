@@ -479,14 +479,12 @@ public final class Game {
     loop().attach(physics());
     loop().attach(world());
 
-    final ScreenManager scrMgr = new ScreenManager();
-
     // setup default exception handling for render and update loop
     inputLoop = new UpdateLoop("Input Loop", loop().getTickRate());
 
     setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(config().client().exitOnError()));
 
-    screenManager = scrMgr;
+    screenManager = new ScreenManager();
     gameWindow = new GameWindow();
 
     // initialize  the game window

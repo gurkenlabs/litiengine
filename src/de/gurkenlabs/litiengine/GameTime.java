@@ -21,7 +21,7 @@ import de.gurkenlabs.litiengine.environment.EnvironmentLoadedListener;
 public final class GameTime implements EnvironmentLoadedListener {
   private long environmentLoaded;
 
-  protected GameTime() {
+  GameTime() {
   }
 
   /**

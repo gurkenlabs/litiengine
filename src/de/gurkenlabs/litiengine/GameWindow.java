@@ -55,7 +55,7 @@ public final class GameWindow {
   private Dimension resolution;
   private Point screenLocation;
 
-  public GameWindow() {
+  GameWindow() {
     this.hostControl = new JFrame();
 
     this.resolutionChangedConsumer = new CopyOnWriteArrayList<>();

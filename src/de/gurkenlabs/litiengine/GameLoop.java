@@ -31,7 +31,7 @@ public final class GameLoop extends UpdateLoop implements IGameLoop {
 
   private float timeScale;
 
-  protected GameLoop(String name, final int updateRate) {
+  GameLoop(String name, final int updateRate) {
     super(name, updateRate);
     this.actions = new CopyOnWriteArrayList<>();
     this.setTimeScale(1.0F);
