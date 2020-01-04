@@ -7,6 +7,7 @@ import java.awt.Graphics2D;
  * 
  * @see Graphics2D
  */
+@FunctionalInterface
 public interface IRenderable {
   /**
    * Renders the visual contents of this instance onto the provided graphics context.

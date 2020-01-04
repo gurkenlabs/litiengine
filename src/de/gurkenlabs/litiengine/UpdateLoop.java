@@ -145,7 +145,7 @@ public class UpdateLoop extends Thread implements AutoCloseable, ILoop {
   protected void update() {
     for (IUpdateable updatable : this.getUpdatables()) {
       try {
-        if (updatable != null && updatable.isActive()) {
+        if (updatable != null) {
           updatable.update();
         }
       } catch (final Exception e) {
