@@ -8,13 +8,25 @@ import static org.mockito.Mockito.when;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.CollisionBox;
 import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
 
 public class PhysicsTests {
+  @BeforeEach
+  public void init() {
+    Game.init(Game.COMMADLINE_ARG_NOGUI);
+  }
+  
+  @AfterEach
+  public void clear() {
+    Game.physics().clear();
+  }
 
   @Test
   public void testBasicCollisionDetection() {
@@ -25,14 +37,13 @@ public class PhysicsTests {
     ent.setCollisionBoxHeight(16);
     ent.setLocation(10, 10);
 
-    PhysicsEngine engine = new PhysicsEngine();
-    engine.add(ent);
-    engine.update();
+    Game.physics().add(ent);
+    Game.physics().update();
 
-    assertFalse(engine.collides(9, 9));
-    assertFalse(engine.collides(27, 27));
-    assertTrue(engine.collides(10.00001, 10.00001));
-    assertTrue(engine.collides(25.99999, 25.99999));
+    assertFalse(Game.physics().collides(9, 9));
+    assertFalse(Game.physics().collides(27, 27));
+    assertTrue(Game.physics().collides(10.00001, 10.00001));
+    assertTrue(Game.physics().collides(25.99999, 25.99999));
 
     Rectangle2D rect1 = new Rectangle2D.Double(0, 0, 10, 10);
     Rectangle2D rect2 = new Rectangle2D.Double(10, 10, 0, 0);
@@ -40,11 +51,11 @@ public class PhysicsTests {
     Rectangle2D rect4 = new Rectangle2D.Double(8, 8, 3, 3);
     Rectangle2D rect5 = new Rectangle2D.Double(25.99999, 10, 10, 20);
 
-    assertFalse(engine.collides(rect1));
-    assertFalse(engine.collides(rect2));
-    assertTrue(engine.collides(rect3));
-    assertTrue(engine.collides(rect4));
-    assertTrue(engine.collides(rect5));
+    assertFalse(Game.physics().collides(rect1));
+    assertFalse(Game.physics().collides(rect2));
+    assertTrue(Game.physics().collides(rect3));
+    assertTrue(Game.physics().collides(rect4));
+    assertTrue(Game.physics().collides(rect5));
   }
 
   @Test
@@ -54,20 +65,19 @@ public class PhysicsTests {
     when(ent.hasCollision()).thenReturn(true);
     when(ent.getCollisionType()).thenReturn(Collision.DYNAMIC);
 
-    PhysicsEngine engine = new PhysicsEngine();
-    engine.add(ent);
-    engine.update();
+    Game.physics().add(ent);
+    Game.physics().update();
 
-    assertTrue(engine.collides(5, 5));
-    assertTrue(engine.collides(5, 5, Collision.ANY));
-    assertTrue(engine.collides(5, 5, Collision.DYNAMIC));
-    assertFalse(engine.collides(5, 5, Collision.STATIC));
-    assertFalse(engine.collides(5, 5, Collision.NONE));
+    assertTrue(Game.physics().collides(5, 5));
+    assertTrue(Game.physics().collides(5, 5, Collision.ANY));
+    assertTrue(Game.physics().collides(5, 5, Collision.DYNAMIC));
+    assertFalse(Game.physics().collides(5, 5, Collision.STATIC));
+    assertFalse(Game.physics().collides(5, 5, Collision.NONE));
 
-    engine.remove(ent);
-    engine.update();
+    Game.physics().remove(ent);
+    Game.physics().update();
 
-    assertFalse(engine.collides(5, 5));
+    assertFalse(Game.physics().collides(5, 5));
   }
 
   @Test
@@ -77,14 +87,13 @@ public class PhysicsTests {
     when(ent.hasCollision()).thenReturn(true);
     when(ent.getCollisionType()).thenReturn(Collision.DYNAMIC);
 
-    PhysicsEngine engine = new PhysicsEngine();
-    engine.add(ent);
-    engine.add(new CollisionBox(5, 5, 10, 10));
-    engine.update();
+    Game.physics().add(ent);
+    Game.physics().add(new CollisionBox(5, 5, 10, 10));
+    Game.physics().update();
 
-    assertTrue(engine.collides(new Line2D.Double(0, 0, 5, 5)));
-    assertTrue(engine.collides(new Line2D.Double(10, 10, 5, 5)));
-    assertFalse(engine.collides(new Line2D.Double(15.1, 15.0, 15, 15)));
+    assertTrue(Game.physics().collides(new Line2D.Double(0, 0, 5, 5)));
+    assertTrue(Game.physics().collides(new Line2D.Double(10, 10, 5, 5)));
+    assertFalse(Game.physics().collides(new Line2D.Double(15.1, 15.0, 15, 15)));
   }
 
   @Test
@@ -94,17 +103,16 @@ public class PhysicsTests {
     when(ent.hasCollision()).thenReturn(true);
     when(ent.getCollisionType()).thenReturn(Collision.DYNAMIC);
 
-    PhysicsEngine engine = new PhysicsEngine();
-    engine.add(ent);
-    engine.update();
+    Game.physics().add(ent);
+    Game.physics().update();
 
-    assertTrue(engine.collides(new Rectangle2D.Double(9, 9, 5, 5)));
+    assertTrue(Game.physics().collides(new Rectangle2D.Double(9, 9, 5, 5)));
 
-    assertTrue(engine.collides(new Rectangle2D.Double(9, 9, 5, 5), Collision.DYNAMIC));
-    assertTrue(engine.collides(new Rectangle2D.Double(9, 9, 5, 5), Collision.ANY));
-    assertFalse(engine.collides(new Rectangle2D.Double(9, 9, 5, 5), Collision.STATIC));
-    assertFalse(engine.collides(new Rectangle2D.Double(9, 9, 5, 5), Collision.NONE));
+    assertTrue(Game.physics().collides(new Rectangle2D.Double(9, 9, 5, 5), Collision.DYNAMIC));
+    assertTrue(Game.physics().collides(new Rectangle2D.Double(9, 9, 5, 5), Collision.ANY));
+    assertFalse(Game.physics().collides(new Rectangle2D.Double(9, 9, 5, 5), Collision.STATIC));
+    assertFalse(Game.physics().collides(new Rectangle2D.Double(9, 9, 5, 5), Collision.NONE));
 
-    assertFalse(engine.collides(new Rectangle2D.Double(10.1, 10.1, 5, 5)));
+    assertFalse(Game.physics().collides(new Rectangle2D.Double(10.1, 10.1, 5, 5)));
   }
 }

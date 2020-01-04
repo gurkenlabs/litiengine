@@ -78,7 +78,7 @@ public final class Game {
   private static final SoundEngine soundEngine = new SoundEngine();
   private static final PhysicsEngine physicsEngine = new PhysicsEngine();
 
-  private static final GameConfiguration configuration;
+  private static final GameConfiguration configuration = new GameConfiguration();
   private static final GameMetrics metrics = new GameMetrics();
   private static final GameLog log = new GameLog();
   private static final GameTime gameTime = new GameTime();
@@ -88,7 +88,8 @@ public final class Game {
   private static UpdateLoop inputLoop;
   private static ScreenManager screenManager;
   private static GameWindow gameWindow;
-  private static GameWorld world;
+  
+  private static GameWorld world = new GameWorld();
 
   private static boolean debug = true;
   private static boolean noGUIMode = false;
@@ -96,12 +97,7 @@ public final class Game {
   private static boolean initialized;
 
   static {
-    // init configuration before init method in order to use configured values
-    // to initialize components
-    configuration = new GameConfiguration();
-    world = new GameWorld();
     world.addLoadedListener(gameTime);
-
     addGameListener(new InputGameAdapter());
   }
 
@@ -654,6 +650,11 @@ public final class Game {
         log().log(Level.WARNING, "game listener threw an exception during shutdown", e);
       }
     }
+
+    gameLoop = null;
+    inputLoop = null;
+    screenManager = null;
+    gameWindow = null;
   }
 
   private static void handleCommandLineArguments(String[] args) {

@@ -13,6 +13,7 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.litiengine.Game;
@@ -22,9 +23,13 @@ import de.gurkenlabs.litiengine.annotation.AbilityInfo;
 import de.gurkenlabs.litiengine.entities.Creature;
 
 public class AbilityTests {
+  @BeforeEach
+  public void init() {
+    Game.init(Game.COMMADLINE_ARG_NOGUI);
+  }
+
   @Test
   public void testGetRemainingCooldownInSeconds() {
-    Game.init(Game.COMMADLINE_ARG_NOGUI);
     Creature creature = mock(Creature.class);
     TestAbility ability = new TestAbility(creature);
     float actual = ability.getRemainingCooldownInSeconds();
@@ -33,7 +38,6 @@ public class AbilityTests {
 
   @Test
   public void testGetRemainingCooldownInSecondsNoCast() {
-    Game.init(Game.COMMADLINE_ARG_NOGUI);
     Creature creature = mock(Creature.class);
     TestAbility ability = new TestAbility(creature);
     float actual = ability.getRemainingCooldownInSeconds();
@@ -42,7 +46,6 @@ public class AbilityTests {
 
   @Test
   public void testGetRemainingCooldownInSecondsCreatureIsDead() {
-    Game.init(Game.COMMADLINE_ARG_NOGUI);
     Creature creature = mock(Creature.class);
     when(creature.isDead()).thenReturn(true);
     TestAbility ability = new TestAbility(creature);
@@ -88,6 +91,7 @@ public class AbilityTests {
       super(executor);
     }
   }
+
   /*
    * Impact Angle = 360
    * Range 100
@@ -116,6 +120,7 @@ public class AbilityTests {
       super(executor);
     }
   }
+
   /*
    * Impact Angle = 180
    * Range = 150
