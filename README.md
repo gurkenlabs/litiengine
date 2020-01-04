@@ -1,4 +1,4 @@
-![LITIENGINE Logo](https://github.com/gurkenlabs/litiengine/blob/master/resources/litiengine-logo.png "LITIENGINE Logo")
+![LITIENGINE Logo](https://github.com/gurkenlabs/litiengine/blob/master/resources/litiengine-logo-nopad.png "LITIENGINE Logo")
 
 **LITIENGINE** is a free and open source Java 2D Game Engine. It provides all the infrastructure to create tile based 2D games with plain java, be it a platformer or a top-down adventure. 
 
