@@ -26,7 +26,7 @@ import de.gurkenlabs.litiengine.physics.Collision;
 public class DebugRenderer {
   private static List<Consumer<MapDebugArgs>> mapDebugConsumer;
 
-  private static List<EntityDebugRenderedListener> entityDebugListeners;
+  private static List<EntityRenderedListener> entityDebugListeners;
 
   static {
     mapDebugConsumer = new CopyOnWriteArrayList<>();
@@ -36,11 +36,11 @@ public class DebugRenderer {
   private DebugRenderer() {
   }
 
-  public static void addEntityDebugListener(EntityDebugRenderedListener listener) {
+  public static void addEntityDebugListener(EntityRenderedListener listener) {
     entityDebugListeners.add(listener);
   }
 
-  public static void removeEntityDebugListener(EntityDebugRenderedListener listener) {
+  public static void removeEntityDebugListener(EntityRenderedListener listener) {
     entityDebugListeners.remove(listener);
   }
 
@@ -73,8 +73,8 @@ public class DebugRenderer {
       RenderEngine.renderOutline(g, collisionEntity.getCollisionBox());
     }
 
-    for (EntityDebugRenderedListener listener : entityDebugListeners) {
-      listener.entityRendered(g, entity);
+    for (EntityRenderedListener listener : entityDebugListeners) {
+      listener.rendered(g, entity);
     }
   }
 

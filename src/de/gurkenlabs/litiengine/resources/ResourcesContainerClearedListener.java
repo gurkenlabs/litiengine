@@ -1,12 +1,14 @@
 package de.gurkenlabs.litiengine.resources;
 
+import java.util.EventListener;
+
 /**
  * This listener provides a callback for when a <code>ResourcesContainer</code> was cleared.
  *
  * @see ResourcesContainer
  * 
  */
-public interface ResourcesContainerClearedListener {
+public interface ResourcesContainerClearedListener extends EventListener {
   /**
    * This method gets called after the <code>ResourcesContainer.clear</code> method was executed.
    * 

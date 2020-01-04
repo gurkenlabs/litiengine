@@ -43,9 +43,9 @@ public final class RenderEngine {
   public static final float DEFAULT_RENDERSCALE = 3.0f;
 
   private final EntityYComparator entityComparator = new EntityYComparator();
-  private final List<Consumer<RenderEvent<IEntity>>> entityRenderedConsumer = new CopyOnWriteArrayList<>();
+  private final List<Consumer<EntityRenderEvent>> entityRenderedConsumer = new CopyOnWriteArrayList<>();
   private final List<Predicate<IEntity>> entityRenderingConditions = new CopyOnWriteArrayList<>();
-  private final List<Consumer<RenderEvent<IEntity>>> entityRenderingConsumer = new CopyOnWriteArrayList<>();
+  private final List<Consumer<EntityRenderEvent>> entityRenderingConsumer = new CopyOnWriteArrayList<>();
 
   private float baseRenderScale = DEFAULT_RENDERSCALE;
 
@@ -90,14 +90,48 @@ public final class RenderEngine {
     TextRenderer.render(g, text, viewPortX, yiewPortY, antialias);
   }
 
+  /**
+   * Draws the given string to the specified map location.
+   *
+   * @param g
+   *          The graphics object to draw on.
+   * @param text
+   *          The text to be drawn
+   * @param x
+   *          The x-coordinate of the text.
+   * @param y
+   *          The y-coordinate of the text
+   */
   public static void renderText(final Graphics2D g, final String text, final double x, final double y) {
     renderText(g, text, x, y, false);
   }
 
+  /**
+   * Draws the given string to the specified map location.
+   *
+   * @param g
+   *          The graphics object to draw on.
+   * @param text
+   *          The text to be drawn.
+   * @param location
+   *          The location on the map.
+   * @param antialias
+   *          Configure whether or not to render the text with antialiasing.
+   */
   public static void renderText(final Graphics2D g, final String text, final Point2D location, boolean antialias) {
     renderText(g, text, location.getX(), location.getY(), antialias);
   }
 
+  /**
+   * Draws the given string to the specified map location.
+   *
+   * @param g
+   *          The graphics object to draw on.
+   * @param text
+   *          The text to be drawn.
+   * @param location
+   *          The location on the map.
+   */
   public static void renderText(final Graphics2D g, final String text, final Point2D location) {
     renderText(g, text, location, false);
   }
@@ -145,6 +179,29 @@ public final class RenderEngine {
     Point2D viewPortLocation = Game.world().camera().getViewportLocation(location);
     ImageRenderer.render(g, image, viewPortLocation.getX() * Game.world().camera().getRenderScale(), viewPortLocation.getY() * Game.world().camera().getRenderScale());
   }
+  
+  public static void render(final Graphics2D g, final Collection<? extends IRenderable> renderables) {
+    renderables.forEach(r -> render(g, r));
+  }
+
+  public static void render(final Graphics2D g, final Collection<? extends IRenderable> renderables, final Shape clip) {
+    // set render shape according to the vision
+    final Shape oldClip = g.getClip();
+
+    g.setClip(clip);
+
+    renderables.forEach(r -> r.render(g));
+
+    g.setClip(oldClip);
+  }
+
+  public static void render(final Graphics2D g, final IRenderable renderable) {
+    if (renderable == null) {
+      return;
+    }
+
+    renderable.render(g);
+  }
 
   public boolean canRender(final IEntity entity) {
     for (final Predicate<IEntity> consumer : this.entityRenderingConditions) {
@@ -171,39 +228,16 @@ public final class RenderEngine {
     return this.baseRenderScale;
   }
 
-  public void onEntityRendered(final Consumer<RenderEvent<IEntity>> entity) {
+  public void onEntityRendered(final Consumer<EntityRenderEvent> entity) {
     if (!this.entityRenderedConsumer.contains(entity)) {
       this.entityRenderedConsumer.add(entity);
     }
   }
 
-  public void onEntityRendering(final Consumer<RenderEvent<IEntity>> entity) {
+  public void onEntityRendering(final Consumer<EntityRenderEvent> entity) {
     if (!this.entityRenderingConsumer.contains(entity)) {
       this.entityRenderingConsumer.add(entity);
     }
-  }
-
-  public static void render(final Graphics2D g, final Collection<? extends IRenderable> renderables) {
-    renderables.forEach(r -> render(g, r));
-  }
-
-  public static void render(final Graphics2D g, final Collection<? extends IRenderable> renderables, final Shape clip) {
-    // set render shape according to the vision
-    final Shape oldClip = g.getClip();
-
-    g.setClip(clip);
-
-    renderables.forEach(r -> r.render(g));
-
-    g.setClip(oldClip);
-  }
-
-  public static void render(final Graphics2D g, final IRenderable renderable) {
-    if (renderable == null) {
-      return;
-    }
-
-    renderable.render(g);
   }
 
   public void renderEntities(final Graphics2D g, final Collection<? extends IEntity> entities) {
@@ -261,8 +295,8 @@ public final class RenderEngine {
     if (entity.getRenderType() == RenderType.NONE || !this.canRender(entity)) {
       return;
     }
-    final RenderEvent<IEntity> renderEvent = new RenderEvent<>(g, entity);
-    for (final Consumer<RenderEvent<IEntity>> consumer : this.entityRenderingConsumer) {
+    final EntityRenderEvent renderEvent = new EntityRenderEvent(g, entity);
+    for (final Consumer<EntityRenderEvent> consumer : this.entityRenderingConsumer) {
       consumer.accept(renderEvent);
     }
 
@@ -288,7 +322,7 @@ public final class RenderEngine {
     }
 
     if (!this.entityRenderedConsumer.isEmpty()) {
-      for (final Consumer<RenderEvent<IEntity>> consumer : this.entityRenderedConsumer) {
+      for (final Consumer<EntityRenderEvent> consumer : this.entityRenderedConsumer) {
         consumer.accept(renderEvent);
       }
     }

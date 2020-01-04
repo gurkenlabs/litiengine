@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.gui;
 
-public interface SpeechBubbleListener {
-  public default void hidden() {
-  }
+import java.util.EventListener;
+
+public interface SpeechBubbleListener extends EventListener {
+  public void hidden();
 }

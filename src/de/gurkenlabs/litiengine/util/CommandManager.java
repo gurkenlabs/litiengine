@@ -12,11 +12,11 @@ import de.gurkenlabs.litiengine.ILaunchable;
 public class CommandManager implements ILaunchable {
   private static final Logger log = Logger.getLogger(CommandManager.class.getName());
   private final Map<String, Predicate<String[]>> commandConsumers;
-  private final ConsoleCommandListener commandListener;
+  private final ConsoleCommandProcessor commandListener;
 
   public CommandManager() {
     this.commandConsumers = new ConcurrentHashMap<>();
-    this.commandListener = new ConsoleCommandListener();
+    this.commandListener = new ConsoleCommandProcessor();
   }
 
   public void bind(final String command, final Predicate<String[]> commandConsumer) {
@@ -56,8 +56,8 @@ public class CommandManager implements ILaunchable {
     this.commandListener.terminate();
   }
 
-  private class ConsoleCommandListener extends Thread implements ILaunchable {
-    ConsoleCommandListener() {
+  private class ConsoleCommandProcessor extends Thread implements ILaunchable {
+    ConsoleCommandProcessor() {
       this.setDaemon(true);
     }
 
