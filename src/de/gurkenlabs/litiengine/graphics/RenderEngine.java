@@ -212,7 +212,7 @@ public final class RenderEngine {
    *          The graphics object to render on.
    * @param shape
    *          The shape to be rendered.
-   * @param antialias
+   * @param antialiasing
    *          Configure whether or not to render the shape with antialiasing.
    */
   public void renderShape(final Graphics2D g, final Shape shape, boolean antialiasing) {
@@ -249,7 +249,7 @@ public final class RenderEngine {
    *          The graphics object to render on.
    * @param shape
    *          The shape to be rendered.
-   * @param antialias
+   * @param antialiasing
    *          Configure whether or not to render the shape with antialiasing.
    */
   public void renderOutline(final Graphics2D g, final Shape shape, boolean antialiasing) {
@@ -281,7 +281,7 @@ public final class RenderEngine {
    *          The shape to be rendered.
    * @param stroke
    *          The stroke that is used to render the shape.
-   * @param antialias
+   * @param antialiasing
    *          Configure whether or not to render the shape with antialiasing.
    * 
    * @see Stroke

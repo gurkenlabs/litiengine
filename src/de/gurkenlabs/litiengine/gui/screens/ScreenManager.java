@@ -111,6 +111,7 @@ public final class ScreenManager {
    * Displays the specified screen by setting
    * 
    * @param screen
+   *          The screen to be displayed.
    */
   public void display(final Screen screen) {
     if (Game.hasStarted() && Game.time().since(this.lastScreenChange) < this.getChangeCooldown()) {
