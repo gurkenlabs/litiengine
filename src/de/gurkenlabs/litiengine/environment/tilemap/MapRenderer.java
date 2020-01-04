@@ -36,7 +36,7 @@ public class MapRenderer {
       }
 
       if (env != null && layer instanceof IMapObjectLayer) {
-        env.renderLayer(g, (IMapObjectLayer) layer);
+        env.renderEntitiesOnLayer(g, (IMapObjectLayer) layer);
       }
 
       if (layer instanceof IImageLayer) {

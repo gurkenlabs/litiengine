@@ -11,7 +11,6 @@ import java.awt.geom.Rectangle2D;
 import java.text.DecimalFormat;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
@@ -24,12 +23,11 @@ import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.physics.Collision;
 
 public final class DebugRenderer {
-  private static List<Consumer<MapDebugArgs>> mapDebugConsumer;
-
+  private static List<MapRenderedListener> mapDebugListener;
   private static List<EntityRenderedListener> entityDebugListeners;
 
   static {
-    mapDebugConsumer = new CopyOnWriteArrayList<>();
+    mapDebugListener = new CopyOnWriteArrayList<>();
     entityDebugListeners = new CopyOnWriteArrayList<>();
   }
 
@@ -45,8 +43,12 @@ public final class DebugRenderer {
     entityDebugListeners.remove(listener);
   }
 
-  public static void onMapDebugRendered(Consumer<MapDebugArgs> cons) {
-    mapDebugConsumer.add(cons);
+  public static void addMapRenderedListener(MapRenderedListener listener) {
+    mapDebugListener.add(listener);
+  }
+  
+  public static void removeMapRenderedListener(MapRenderedListener listener) {
+    mapDebugListener.remove(listener);
   }
 
   public static void renderEntityDebugInfo(final Graphics2D g, final IEntity entity) {
@@ -95,9 +97,9 @@ public final class DebugRenderer {
       drawTileBoundingBox(g, map, Input.mouse().getMapLocation());
     }
 
-    final MapDebugArgs args = new MapDebugArgs(map, g);
-    for (Consumer<MapDebugArgs> cons : mapDebugConsumer) {
-      cons.accept(args);
+    final MapRenderedEvent event = new MapRenderedEvent(g, map);
+    for (MapRenderedListener cons : mapDebugListener) {
+      cons.rendered(event);
     }
   }
 

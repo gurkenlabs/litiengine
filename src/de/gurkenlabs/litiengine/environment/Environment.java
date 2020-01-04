@@ -1092,7 +1092,7 @@ public final class Environment implements IRenderable {
     return new ArrayList<>();
   }
 
-  public void renderLayer(Graphics2D g, IMapObjectLayer layer) {
+  public void renderEntitiesOnLayer(Graphics2D g, IMapObjectLayer layer) {
     List<IEntity> entities = this.layerEntities.get(layer);
     if (entities != null) {
       Game.graphics().renderEntities(g, entities, layer.getRenderType() == RenderType.NORMAL);

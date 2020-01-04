@@ -2,7 +2,18 @@ package de.gurkenlabs.litiengine.graphics;
 
 import de.gurkenlabs.litiengine.entities.IEntity;
 
+/**
+ * This listener interface is used for receiving events during an entity's rendering process from the game's <code>RenderEngine</code>.
+ * 
+ * @see RenderEngine#renderEntity(java.awt.Graphics2D, IEntity)
+ */
 public interface EntityRenderListener extends EntityRenderedListener {
+  /**
+   * This method gets called after all rendering checks have successfully passed and right before the entity is about to be rendered.
+   * 
+   * @param event
+   *          The event that contains the render data.
+   */
   public default void rendering(EntityRenderEvent event) {
   }
 
