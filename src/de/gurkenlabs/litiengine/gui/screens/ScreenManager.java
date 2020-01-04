@@ -38,6 +38,13 @@ public final class ScreenManager {
   private int changeCooldown = DEFAULT_CHANGE_COOLDOWN;
   private long lastScreenChange = 0;
 
+  /**
+   * <p>
+   * <b>You should never call this manually! Instead use the <code>Game.screens()</code> instance.</b>
+   * </p>
+   * 
+   * @see Game#screens()
+   */
   public ScreenManager() {
     if (Game.screens() != null) {
       throw new UnsupportedOperationException("Never initialize a ScreenManager manually. Use Game.screens() instead.");

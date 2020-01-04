@@ -13,9 +13,9 @@ import java.util.stream.Collectors;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.abilities.Ability;
-import de.gurkenlabs.litiengine.entities.EntityComparator;
 import de.gurkenlabs.litiengine.entities.EntityDistanceComparator;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
+import de.gurkenlabs.litiengine.entities.RelativeEntityComparator;
 
 /**
  * The Class Effect seeks for affected entities in the game's current
@@ -34,7 +34,7 @@ public abstract class Effect implements IUpdateable {
 
   private int delay;
   private int duration;
-  private EntityComparator targetPriorityComparator;
+  private RelativeEntityComparator targetPriorityComparator;
 
   /**
    * Instantiates a new effect.
@@ -113,7 +113,7 @@ public abstract class Effect implements IUpdateable {
     return this.followUpEffects;
   }
 
-  public EntityComparator getTargetPriorityComparator() {
+  public RelativeEntityComparator getTargetPriorityComparator() {
     return this.targetPriorityComparator;
   }
 
@@ -149,7 +149,7 @@ public abstract class Effect implements IUpdateable {
     this.duration = duration;
   }
 
-  public void setTargetPriorityComparator(final EntityComparator targetPriorityComparator) {
+  public void setTargetPriorityComparator(final RelativeEntityComparator targetPriorityComparator) {
     this.targetPriorityComparator = targetPriorityComparator;
   }
 

@@ -1,6 +1,6 @@
 package de.gurkenlabs.litiengine.entities;
 
-public class EntityDistanceComparator extends EntityComparator {
+public class EntityDistanceComparator extends RelativeEntityComparator {
 
   public EntityDistanceComparator(final IEntity relativeEntity) {
     super(relativeEntity);

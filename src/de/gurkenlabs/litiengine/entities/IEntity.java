@@ -10,6 +10,7 @@ import de.gurkenlabs.litiengine.environment.GameWorld;
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
 import de.gurkenlabs.litiengine.environment.tilemap.ILayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
+import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
 
@@ -38,6 +39,13 @@ public interface IEntity {
    */
   public void setAngle(double angle);
 
+  /**
+   * Gets the entities animation controller.
+   * 
+   * @return The entities animation controller or null if none was registered.
+   * 
+   * @see RenderEngine#renderEntity(java.awt.Graphics2D, IEntity)
+   */
   public IEntityAnimationController<?> animations();
 
   public boolean isVisible();

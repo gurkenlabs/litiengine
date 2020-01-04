@@ -52,6 +52,13 @@ public final class GameWorld implements IUpdateable {
   private ICamera camera;
   private int gravity;
 
+  /**
+   * <p>
+   * <b>You should never call this manually! Instead use the <code>Game.world()</code> instance.</b>
+   * </p>
+   * 
+   * @see Game#world()
+   */
   public GameWorld() {
     if (Game.world() != null) {
       throw new UnsupportedOperationException("Never initialize a GameWorld manually. Use Game.world() instead.");

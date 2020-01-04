@@ -36,8 +36,6 @@ public final class PhysicsEngine implements IUpdateable {
   private final Map<Collision, List<Rectangle2D>> collisionBoxes = new ConcurrentHashMap<>();
 
   /**
-   * Instantiates a new PhysicsEngine instance.
-   * 
    * <p>
    * <b>You should never call this manually! Instead use the <code>Game.physics()</code> instance.</b>
    * </p>

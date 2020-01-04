@@ -56,8 +56,6 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
   private final Collection<SFXPlayback> sounds = ConcurrentHashMap.newKeySet();
 
   /**
-   * Instantiates a new SoundEngine instance.
-   * 
    * <p>
    * <b>You should never call this manually! Instead use the <code>Game.audio()</code> instance.</b>
    * </p>

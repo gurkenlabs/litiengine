@@ -2,14 +2,14 @@ package de.gurkenlabs.litiengine.entities;
 
 import java.util.Comparator;
 
-public abstract class EntityComparator implements Comparator<IEntity> {
+public abstract class RelativeEntityComparator implements Comparator<IEntity> {
   private IEntity relativeEntity;
 
-  protected EntityComparator() {
+  protected RelativeEntityComparator() {
 
   }
 
-  protected EntityComparator(final IEntity relativeEntity) {
+  protected RelativeEntityComparator(final IEntity relativeEntity) {
     this.relativeEntity = relativeEntity;
   }
 
