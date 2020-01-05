@@ -18,10 +18,6 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
   /**
    * Instantiates a new entity spawner.
    *
-   * @param environment
-   *          the environment
-   * @param loop
-   *          the loop
    * @param spawnpoints
    *          the spawnpoints
    * @param interval
