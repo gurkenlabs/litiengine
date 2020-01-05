@@ -326,6 +326,10 @@ public final class Environment implements IRenderable {
     this.fireEvent(l -> l.cleared(this));
   }
 
+  public boolean contains(IEntity entity) {
+    return allEntities.containsKey(entity.getMapId());
+  }
+
   public Collection<ICombatEntity> findCombatEntities(final Shape shape) {
     return this.findCombatEntities(shape, entity -> true);
   }
