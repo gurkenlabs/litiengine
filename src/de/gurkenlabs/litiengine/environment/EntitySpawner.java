@@ -128,11 +128,14 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
   }
 
   private void spawn(final Spawnpoint spawnpoint, final int amount) {
+    if (spawnpoint.getEnvironment() == null || !spawnpoint.getEnvironment().isLoaded()) {
+      return;
+    }
     for (int i = 0; i < amount; i++) {
       final T newEntity = this.createNew();
       newEntity.setLocation(spawnpoint.getLocation());
-      newEntity.setMapId(Game.world().environment().getNextMapId());
-      Game.world().environment().add(newEntity);
+      newEntity.setMapId(spawnpoint.getEnvironment().getNextMapId());
+      spawnpoint.getEnvironment().add(newEntity);
     }
   }
 }
