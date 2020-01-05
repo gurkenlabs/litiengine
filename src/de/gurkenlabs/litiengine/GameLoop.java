@@ -44,7 +44,7 @@ public final class GameLoop extends UpdateLoop implements IGameLoop {
     TimedAction a = new TimedAction(this.getTicks() + d, action);
     this.actions.add(a);
 
-    return a.getIndex();
+    return a.getId();
   }
 
   @Override
@@ -60,10 +60,15 @@ public final class GameLoop extends UpdateLoop implements IGameLoop {
   @Override
   public void alterExecutionTime(int index, long ticks) {
     for (TimedAction action : this.actions) {
-      if (action.getIndex() == index) {
+      if (action.getId() == index) {
         action.setExecutionTicks(ticks);
       }
     }
+  }
+
+  @Override
+  public void removeAction(int id) {
+    this.actions.removeIf(x -> x.getId() == id);
   }
 
   /**
@@ -114,12 +119,12 @@ public final class GameLoop extends UpdateLoop implements IGameLoop {
   private class TimedAction {
     private final Runnable action;
     private long execution;
-    private final int index;
+    private final int id;
 
     private TimedAction(final long execution, final Runnable action) {
       this.execution = execution;
       this.action = action;
-      this.index = ++executionIndex;
+      this.id = ++executionIndex;
     }
 
     public Runnable getAction() {
@@ -134,8 +139,8 @@ public final class GameLoop extends UpdateLoop implements IGameLoop {
       this.execution = ticks;
     }
 
-    public int getIndex() {
-      return index;
+    public int getId() {
+      return id;
     }
   }
 }
