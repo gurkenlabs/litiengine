@@ -494,9 +494,7 @@ public final class Game {
     if (!isInNoGUIMode()) {
       window().getRenderComponent().onRendered(g -> metrics().render(g));
 
-      if (config().debug().isDebugEnabled()) {
-        graphics().addEntityRenderedListener(e -> DebugRenderer.renderEntityDebugInfo(e.getGraphics(), e.getEntity()));
-      }
+      graphics().addEntityRenderedListener(e -> DebugRenderer.renderEntityDebugInfo(e.getGraphics(), e.getEntity()));
 
       window().getRenderComponent().onFpsChanged(fps -> metrics().setFramesPerSecond(fps));
       window().setIconImages(Arrays.asList(Resources.images().get("liti-logo-x16.png"), Resources.images().get("liti-logo-x20.png"), Resources.images().get("liti-logo-x32.png"), Resources.images().get("liti-logo-x48.png")));

@@ -16,12 +16,17 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.ITile;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.physics.Collision;
 
+/**
+ * The <code>DebugRenderer</code> class implements default debug rendering and exposes extension points to reder your own
+ * debug information via callbacks.
+ */
 public final class DebugRenderer {
   private static List<MapRenderedListener> mapDebugListener;
   private static List<EntityRenderedListener> entityDebugListeners;
@@ -35,18 +40,45 @@ public final class DebugRenderer {
     throw new UnsupportedOperationException();
   }
 
+  /**
+   * Add the specified entity rendered listener to attach custom debug rendering after the default debug information for an entity has been rendered.
+   * 
+   * @param listener
+   *          The listener to add.
+   */
   public static void addEntityDebugListener(EntityRenderedListener listener) {
     entityDebugListeners.add(listener);
   }
 
+  /**
+   * Removes the specified entity rendered listener.
+   * 
+   * @param listener
+   *          The listener to remove.
+   */
   public static void removeEntityDebugListener(EntityRenderedListener listener) {
     entityDebugListeners.remove(listener);
   }
 
+  /**
+   * Add the specified map rendered listener to attach custom debug rendering after layers of the type <code>GROUND</code> have beend rendered.
+   * 
+   * @param listener
+   *          The listener to add.
+   * 
+   * @see RenderType#GROUND
+   * @see Environment#render(Graphics2D)
+   */
   public static void addMapRenderedListener(MapRenderedListener listener) {
     mapDebugListener.add(listener);
   }
-  
+
+  /**
+   * Removes the specified map rendered listener.
+   * 
+   * @param listener
+   *          The listener to remove.
+   */
   public static void removeMapRenderedListener(MapRenderedListener listener) {
     mapDebugListener.remove(listener);
   }
@@ -83,6 +115,10 @@ public final class DebugRenderer {
   }
 
   public static void renderMapDebugInfo(final Graphics2D g, final IMap map) {
+    if (!Game.config().debug().isDebugEnabled()) {
+      return;
+    }
+    
     // draw collision boxes from shape layer
     if (Game.config().debug().renderCollisionBoxes()) {
       final BasicStroke shapeStroke = new BasicStroke(1 / Game.world().camera().getRenderScale());

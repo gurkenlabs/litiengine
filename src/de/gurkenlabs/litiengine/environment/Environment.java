@@ -973,9 +973,7 @@ public final class Environment implements IRenderable {
     this.render(g, RenderType.BACKGROUND);
 
     this.render(g, RenderType.GROUND);
-    if (Game.config().debug().isDebug()) {
-      DebugRenderer.renderMapDebugInfo(g, this.getMap());
-    }
+    DebugRenderer.renderMapDebugInfo(g, this.getMap());
 
     this.render(g, RenderType.SURFACE);
     this.render(g, RenderType.NORMAL);

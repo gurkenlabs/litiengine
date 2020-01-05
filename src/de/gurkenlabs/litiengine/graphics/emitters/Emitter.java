@@ -22,7 +22,6 @@ import de.gurkenlabs.litiengine.annotation.CollisionInfo;
 import de.gurkenlabs.litiengine.annotation.EmitterInfo;
 import de.gurkenlabs.litiengine.configuration.Quality;
 import de.gurkenlabs.litiengine.entities.Entity;
-import de.gurkenlabs.litiengine.graphics.DebugRenderer;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.Particle;
@@ -283,10 +282,6 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   @Override
   public void render(final Graphics2D g) {
     this.renderParticles(g, RenderType.NONE);
-
-    if (Game.config().debug().renderHitBoxes()) {
-      DebugRenderer.renderEntityDebugInfo(g, this);
-    }
   }
 
   public void setColors(final Color... colors) {
