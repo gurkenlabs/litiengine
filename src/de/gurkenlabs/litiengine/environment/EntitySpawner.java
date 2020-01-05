@@ -1,19 +1,14 @@
 package de.gurkenlabs.litiengine.environment;
 
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.Spawnpoint;
 import de.gurkenlabs.litiengine.util.CollectionUtilities;
 
 public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner<T> {
-  private static final Logger log = Logger.getLogger(EntitySpawner.class.getName());
   private int amount;
-  private Environment environment;
   private int interval;
   private long lastSpawnWave;
   private int spawnDelay;
@@ -34,24 +29,12 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
    * @param amount
    *          the amount
    */
-  public EntitySpawner(final Environment environment, final IGameLoop loop, final List<Spawnpoint> spawnpoints, final int interval, final int amount) {
-    this.environment = environment;
-    Game.world().addUnloadedListener(e -> {
-      if (e == this.environment) {
-        loop.detach(this);
-      }
-    });
-    Game.world().addLoadedListener(e -> {
-      if (e == this.environment) {
-        loop.attach(this);
-      }
-    });
+  public EntitySpawner(final List<Spawnpoint> spawnpoints, final int interval, final int amount) {
     this.interval = interval;
     this.spawnDelay = 1000;
     this.amount = amount;
     this.spawnpoints = spawnpoints;
     this.spawnMode = SpawnMode.ALLSPAWNPOINTS;
-    loop.attach(this);
   }
 
   @Override
@@ -101,7 +84,7 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
 
   @Override
   public void update() {
-    if (Game.time().since(this.lastSpawnWave) < this.getSpawnInterval()) {
+    if (this.lastSpawnWave != 0 && Game.time().since(this.lastSpawnWave) < this.getSpawnInterval()) {
       return;
     }
 
@@ -121,8 +104,11 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
 
     switch (this.getSpawnMode()) {
     case ALLSPAWNPOINTS:
-      for (final Spawnpoint spawn : this.getSpawnPoints()) {
-        this.spawn(spawn, this.getSpawnAmount());
+      for (int i = 0; i < this.getSpawnPoints().size(); i++) {
+        final int index = i;
+        Game.loop().perform(this.getSpawnDelay() + this.getSpawnDelay() * i, () -> {
+          this.spawn(this.getSpawnPoints().get(index), this.getSpawnAmount());
+        });
       }
       break;
     case ONERANDOMSPAWNPOINT:
@@ -130,7 +116,9 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
       break;
     case RANDOMSPAWNPOINTS:
       for (int i = 0; i < this.getSpawnAmount(); i++) {
-        this.spawn(CollectionUtilities.random(this.getSpawnPoints()), 1);
+        Game.loop().perform(this.getSpawnDelay() + this.getSpawnDelay() * i, () -> {
+          this.spawn(CollectionUtilities.random(this.getSpawnPoints()), 1);
+        });
       }
 
       break;
@@ -140,45 +128,11 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
   }
 
   private void spawn(final Spawnpoint spawnpoint, final int amount) {
-    new SpawnThread(spawnpoint, amount).start();
-  }
-
-  private class SpawnThread extends Thread {
-
-    /** The amount of entities to spawn. */
-    private final int remaining;
-
-    /** The <code>Spawnpoint</code> where entities will be spawned. */
-    private final Spawnpoint point;
-
-    /**
-     * Instantiates a new spawn thread.
-     *
-     * @param point
-     *          the <code>Spawnpoint</code> where entities will be spawned.
-     * @param amount
-     *          the amount of entities to spawn.
-     */
-    public SpawnThread(final Spawnpoint point, final int amount) {
-      this.point = point;
-      this.remaining = amount;
-    }
-
-    @Override
-    public void run() {
-      for (int i = 0; i < this.remaining; i++) {
-        final T newEntity = EntitySpawner.this.createNew();
-        newEntity.setLocation(this.point.getLocation());
-        newEntity.setMapId(EntitySpawner.this.environment.getNextMapId());
-        EntitySpawner.this.environment.add(newEntity);
-
-        try {
-          Thread.sleep(EntitySpawner.this.getSpawnDelay());
-        } catch (final InterruptedException e) {
-          log.log(Level.SEVERE, e.getMessage(), e);
-          this.interrupt();
-        }
-      }
+    for (int i = 0; i < amount; i++) {
+      final T newEntity = this.createNew();
+      newEntity.setLocation(spawnpoint.getLocation());
+      newEntity.setMapId(Game.world().environment().getNextMapId());
+      Game.world().environment().add(newEntity);
     }
   }
 }
