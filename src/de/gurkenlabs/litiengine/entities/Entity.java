@@ -27,26 +27,25 @@ import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
 import de.gurkenlabs.litiengine.util.ReflectionUtilities;
 
 @EntityInfo
-public abstract class Entity implements IEntity {
+public abstract class Entity implements IEntity, EntityRenderListener {
   private static final Logger log = Logger.getLogger(Entity.class.getName());
   public static final String ANY_MESSAGE = "";
   private final List<EntityTransformListener> transformListeners = new CopyOnWriteArrayList<>();
   private final List<EntityListener> listeners = new CopyOnWriteArrayList<>();
+  private final List<EntityRenderListener> renderListeners = new CopyOnWriteArrayList<>();
+  private final List<EntityRenderedListener> renderedListeners = new CopyOnWriteArrayList<>();
+  private final Map<String, List<EntityMessageListener>> messageListeners = new ConcurrentHashMap<>();
 
-  private final Map<String, List<MessageListener>> messageListeners = new ConcurrentHashMap<>();
+  private final EntityControllers controllers = new EntityControllers();
+  private final EntityActionMap actions = new EntityActionMap();
+  private final ICustomPropertyProvider properties = new CustomPropertyProvider();
+
+  private boolean renderWithLayer;
+  private Environment environment;
+  private boolean loaded;
 
   @TmxProperty(name = MapObjectProperty.TAGS)
   private final List<String> tags = new CopyOnWriteArrayList<>();
-
-  private final EntityControllers controllers = new EntityControllers();
-
-  private final EntityActionMap actions = new EntityActionMap();
-
-  private final ICustomPropertyProvider properties = new CustomPropertyProvider();
-  private boolean renderWithLayer;
-
-  private Environment environment;
-  private boolean loaded;
 
   private double angle;
 
@@ -109,16 +108,6 @@ public abstract class Entity implements IEntity {
   }
 
   @Override
-  public void attachControllers() {
-    this.controllers.attachAll();
-  }
-
-  @Override
-  public void detachControllers() {
-    this.controllers.detachAll();
-  }
-
-  @Override
   public void removeTransformListener(EntityTransformListener listener) {
     this.transformListeners.remove(listener);
   }
@@ -134,12 +123,32 @@ public abstract class Entity implements IEntity {
   }
 
   @Override
-  public void addMessageListener(MessageListener listener) {
+  public void addEntityRenderedListener(final EntityRenderedListener listener) {
+    this.renderedListeners.add(listener);
+  }
+
+  @Override
+  public void removeEntityRenderedListener(final EntityRenderedListener listener) {
+    this.renderedListeners.remove(listener);
+  }
+
+  @Override
+  public void addEntityRenderListener(final EntityRenderListener listener) {
+    this.renderListeners.add(listener);
+  }
+
+  @Override
+  public void removeEntityRenderListener(final EntityRenderListener listener) {
+    this.renderListeners.remove(listener);
+  }
+
+  @Override
+  public void addMessageListener(EntityMessageListener listener) {
     this.addMessageListener(ANY_MESSAGE, listener);
   }
 
   @Override
-  public void addMessageListener(String message, MessageListener listener) {
+  public void addMessageListener(String message, EntityMessageListener listener) {
     if (!this.messageListeners.containsKey(message)) {
       this.messageListeners.put(message, new CopyOnWriteArrayList<>());
     }
@@ -148,14 +157,24 @@ public abstract class Entity implements IEntity {
   }
 
   @Override
-  public void removeMessageListener(MessageListener listener) {
-    for (List<MessageListener> listenerType : this.messageListeners.values()) {
+  public void removeMessageListener(EntityMessageListener listener) {
+    for (List<EntityMessageListener> listenerType : this.messageListeners.values()) {
       if (listenerType == null || listenerType.isEmpty()) {
         continue;
       }
 
       listenerType.remove(listener);
     }
+  }
+
+  @Override
+  public void attachControllers() {
+    this.controllers.attachAll();
+  }
+
+  @Override
+  public void detachControllers() {
+    this.controllers.detachAll();
   }
 
   @Override
@@ -288,7 +307,7 @@ public abstract class Entity implements IEntity {
 
   @Override
   public String sendMessage(final Object sender, final String message) {
-    MessageEvent event = this.fireMessageReceived(sender, ANY_MESSAGE, message, null);
+    EntityMessageEvent event = this.fireMessageReceived(sender, ANY_MESSAGE, message, null);
     this.fireMessageReceived(sender, message, message, event);
 
     return null;
@@ -420,6 +439,7 @@ public abstract class Entity implements IEntity {
   @Override
   public void loaded(Environment environment) {
     this.environment = environment;
+
     this.loaded = true;
 
     for (EntityListener listener : this.listeners) {
@@ -453,7 +473,48 @@ public abstract class Entity implements IEntity {
   public void setRenderWithLayer(boolean renderWithLayer) {
     this.renderWithLayer = renderWithLayer;
   }
+  
+  @Override
+  public void rendering(EntityRenderEvent event) {
+    if (event.getEntity() == null || !event.getEntity().equals(Entity.this)) {
+      return;
+    }
 
+    for (EntityRenderListener listener : Entity.this.renderListeners) {
+      listener.rendering(event);
+    }
+  }
+
+  @Override
+  public void rendered(EntityRenderEvent event) {
+    if (event.getEntity() == null || !event.getEntity().equals(Entity.this)) {
+      return;
+    }
+
+    for (EntityRenderListener listener : Entity.this.renderListeners) {
+      listener.rendered(event);
+    }
+
+    for (EntityRenderedListener listener : Entity.this.renderedListeners) {
+      listener.rendered(event);
+    }
+  }
+
+  @Override
+  public boolean canRender(IEntity entity) {
+    if (entity == null || !entity.equals(Entity.this)) {
+      return true;
+    }
+
+    for (EntityRenderListener listener : Entity.this.renderListeners) {
+      if (!listener.canRender(entity)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+  
   protected EntityControllers getControllers() {
     return this.controllers;
   }
@@ -470,16 +531,16 @@ public abstract class Entity implements IEntity {
     }
   }
 
-  private MessageEvent fireMessageReceived(Object sender, String listenerMessage, String message, MessageEvent event) {
+  private EntityMessageEvent fireMessageReceived(Object sender, String listenerMessage, String message, EntityMessageEvent event) {
     if (message == null) {
       return event;
     }
 
     if (this.messageListeners.containsKey(listenerMessage) && this.messageListeners.get(listenerMessage) != null) {
-      MessageEvent receivedEvent = event;
-      for (MessageListener listener : this.messageListeners.get(listenerMessage)) {
+      EntityMessageEvent receivedEvent = event;
+      for (EntityMessageListener listener : this.messageListeners.get(listenerMessage)) {
         if (receivedEvent == null) {
-          receivedEvent = new MessageEvent(sender, this, message);
+          receivedEvent = new EntityMessageEvent(sender, this, message);
         }
 
         listener.messageReceived(receivedEvent);

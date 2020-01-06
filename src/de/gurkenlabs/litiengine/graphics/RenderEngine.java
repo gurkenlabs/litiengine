@@ -16,6 +16,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.entities.EntityRenderEvent;
+import de.gurkenlabs.litiengine.entities.EntityRenderListener;
+import de.gurkenlabs.litiengine.entities.EntityRenderedListener;
 import de.gurkenlabs.litiengine.entities.EntityYComparator;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.GameWorld;
@@ -63,8 +66,14 @@ public final class RenderEngine {
   /**
    * Adds the specified entity rendered listener to receive events when entities were rendered.
    * 
+   * <p>
+   * This is the global equivalent to <code>IEntity.addEntityRenderedListener</code>
+   * </p>
+   * 
    * @param listener
    *          The listener to add.
+   * 
+   * @see IEntity#addEntityRenderedListener(EntityRenderedListener)
    */
   public void addEntityRenderedListener(final EntityRenderedListener listener) {
     this.entityRenderedListener.add(listener);
@@ -83,8 +92,13 @@ public final class RenderEngine {
   /**
    * Adds the specified entity render listener to receive events and callbacks about the rendering process of entities.
    * 
+   * <p>
+   * This is the global equivalent to <code>IEntity.addEntityRenderListener</code>
+   * </p>
+   * 
    * @param listener
    *          The listener to add.
+   * @see IEntity#addEntityRenderListener(EntityRenderListener)
    */
   public void addEntityRenderListener(final EntityRenderListener listener) {
     this.entityRenderListener.add(listener);
@@ -420,6 +434,11 @@ public final class RenderEngine {
     }
 
     final EntityRenderEvent renderEvent = new EntityRenderEvent(g, entity);
+
+    if (entity instanceof EntityRenderListener) {
+      ((EntityRenderListener) entity).rendering(renderEvent);
+    }
+
     for (final EntityRenderListener listener : this.entityRenderListener) {
       listener.rendering(renderEvent);
     }
@@ -445,6 +464,10 @@ public final class RenderEngine {
       ((IRenderable) entity).render(g);
     }
 
+    if (entity instanceof EntityRenderListener) {
+      ((EntityRenderListener) entity).rendered(renderEvent);
+    }
+
     for (final EntityRenderListener listener : this.entityRenderListener) {
       listener.rendered(renderEvent);
     }
@@ -468,11 +491,16 @@ public final class RenderEngine {
    * @return True if the entity can be rendered; otherwise false.
    * 
    * @see IEntity#getRenderType()
+   * @see IEntity#canRender()
    * @see RenderType#NONE
    * @see EntityRenderListener#canRender(IEntity)
    */
   public boolean canRender(final IEntity entity) {
     if (entity.getRenderType() == RenderType.NONE) {
+      return false;
+    }
+
+    if (entity instanceof EntityRenderListener && !((EntityRenderListener) entity).canRender(entity)) {
       return false;
     }
 

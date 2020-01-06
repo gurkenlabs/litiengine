@@ -7,12 +7,12 @@ import java.util.EventObject;
  * 
  * @see IEntity#sendMessage(Object, String)
  */
-public class MessageEvent extends EventObject {
+public class EntityMessageEvent extends EventObject {
   private static final long serialVersionUID = 5131621546037429725L;
   private final transient IEntity entity;
   private final String message;
 
-  public MessageEvent(Object sender, IEntity entity, String message) {
+  public EntityMessageEvent(Object sender, IEntity entity, String message) {
     super(sender);
     this.entity = entity;
     this.message = message;

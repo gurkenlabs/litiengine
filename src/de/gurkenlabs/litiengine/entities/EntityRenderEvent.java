@@ -1,9 +1,9 @@
-package de.gurkenlabs.litiengine.graphics;
+package de.gurkenlabs.litiengine.entities;
 
 import java.awt.Graphics2D;
 import java.util.EventObject;
 
-import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.graphics.RenderEngine;
 
 /**
  * This <code>EventObject</code> contains data about the rendering process of an entity.

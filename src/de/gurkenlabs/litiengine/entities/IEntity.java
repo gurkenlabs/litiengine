@@ -14,12 +14,12 @@ import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
 
-public interface IEntity {
-  public void addMessageListener(MessageListener listener);
+public interface IEntity{
+  public void addMessageListener(EntityMessageListener listener);
 
-  public void addMessageListener(String message, MessageListener listener);
+  public void addMessageListener(String message, EntityMessageListener listener);
 
-  public void removeMessageListener(MessageListener listener);
+  public void removeMessageListener(EntityMessageListener listener);
 
   public void addTransformListener(EntityTransformListener listener);
 
@@ -28,6 +28,38 @@ public interface IEntity {
   public void addListener(EntityListener listener);
 
   public void removeListener(EntityListener listener);
+
+  /**
+   * Adds the specified entity rendered listener to receive events when entities were rendered.
+   * 
+   * @param listener
+   *          The listener to add.
+   */
+  public void addEntityRenderedListener(final EntityRenderedListener listener);
+
+  /**
+   * Removes the specified entity rendered listener.
+   * 
+   * @param listener
+   *          The listener to remove.
+   */
+  public void removeEntityRenderedListener(final EntityRenderedListener listener);
+
+  /**
+   * Adds the specified entity render listener to receive events and callbacks about the rendering process of entities.
+   * 
+   * @param listener
+   *          The listener to add.
+   */
+  public void addEntityRenderListener(final EntityRenderListener listener);
+
+  /**
+   * Removes the specified entity render listener.
+   * 
+   * @param listener
+   *          The listener to remove.
+   */
+  public void removeEntityRenderListener(final EntityRenderListener listener);
 
   public double getAngle();
 

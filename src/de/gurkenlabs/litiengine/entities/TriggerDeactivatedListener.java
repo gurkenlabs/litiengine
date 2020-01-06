@@ -5,6 +5,7 @@ import java.util.EventListener;
 /**
  * This listener provides a callback for when a <code>Trigger</code> was deactivated.
  */
+@FunctionalInterface
 public interface TriggerDeactivatedListener extends EventListener {
 
   /**
