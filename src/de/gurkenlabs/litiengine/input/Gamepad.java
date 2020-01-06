@@ -4,8 +4,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
@@ -21,13 +19,13 @@ public class Gamepad implements GamepadEvents, IUpdateable {
 
   private final int index;
 
-  private final Map<String, Collection<Consumer<Float>>> componentPollConsumer;
-  private final Map<String, Collection<Consumer<Float>>> componentPressedConsumer;
-  private final Map<String, Collection<Consumer<Float>>> componentReleasedConsumer;
+  private final Map<String, Collection<GamepadPollListener>> componentPollListeners;
+  private final Map<String, Collection<GamepadPressedListener>> componentPressedListeners;
+  private final Map<String, Collection<GamepadReleasedListener>> componentReleasedListeners;
 
-  private final Collection<BiConsumer<String, Float>> pollConsumer;
-  private final Collection<BiConsumer<String, Float>> pressedConsumer;
-  private final Collection<BiConsumer<String, Float>> releasedConsumer;
+  private final Collection<GamepadPollListener> pollListeners;
+  private final Collection<GamepadPressedListener> pressedListeners;
+  private final Collection<GamepadReleasedListener> releasedListeners;
 
   private final Collection<String> pressedComponents;
 
@@ -35,12 +33,12 @@ public class Gamepad implements GamepadEvents, IUpdateable {
   private float triggerDeadzone = Game.config().input().getGamepadTriggerDeadzone();
 
   protected Gamepad(final int index, final Controller controller) {
-    this.componentPollConsumer = new ConcurrentHashMap<>();
-    this.componentPressedConsumer = new ConcurrentHashMap<>();
-    this.componentReleasedConsumer = new ConcurrentHashMap<>();
-    this.pollConsumer = ConcurrentHashMap.newKeySet();
-    this.pressedConsumer = ConcurrentHashMap.newKeySet();
-    this.releasedConsumer = ConcurrentHashMap.newKeySet();
+    this.componentPollListeners = new ConcurrentHashMap<>();
+    this.componentPressedListeners = new ConcurrentHashMap<>();
+    this.componentReleasedListeners = new ConcurrentHashMap<>();
+    this.pollListeners = ConcurrentHashMap.newKeySet();
+    this.pressedListeners = ConcurrentHashMap.newKeySet();
+    this.releasedListeners = ConcurrentHashMap.newKeySet();
 
     this.pressedComponents = ConcurrentHashMap.newKeySet();
 
@@ -74,57 +72,57 @@ public class Gamepad implements GamepadEvents, IUpdateable {
   }
 
   @Override
-  public void onPoll(final String identifier, final Consumer<Float> consumer) {
-    GamepadManager.addComponentConsumer(this.componentPollConsumer, identifier, consumer);
+  public void onPoll(final String identifier, final GamepadPollListener listener) {
+    GamepadManager.addComponentListener(this.componentPollListeners, identifier, listener);
   }
 
   @Override
-  public void onPoll(BiConsumer<String, Float> consumer) {
-    if (this.pollConsumer.contains(consumer)) {
+  public void onPoll(GamepadPollListener consumer) {
+    if (this.pollListeners.contains(consumer)) {
       return;
     }
 
-    this.pollConsumer.add(consumer);
+    this.pollListeners.add(consumer);
   }
 
   @Override
-  public void onPressed(final String identifier, final Consumer<Float> consumer) {
-    GamepadManager.addComponentConsumer(this.componentPressedConsumer, identifier, consumer);
+  public void onPressed(final String identifier, final GamepadPressedListener listener) {
+    GamepadManager.addComponentListener(this.componentPressedListeners, identifier, listener);
   }
 
   @Override
-  public void onPressed(BiConsumer<String, Float> consumer) {
-    if (this.pressedConsumer.contains(consumer)) {
+  public void onPressed(GamepadPressedListener listener) {
+    if (this.pressedListeners.contains(listener)) {
       return;
     }
 
-    this.pressedConsumer.add(consumer);
+    this.pressedListeners.add(listener);
   }
 
   @Override
-  public void onReleased(String identifier, Consumer<Float> consumer) {
-    GamepadManager.addComponentConsumer(this.componentReleasedConsumer, identifier, consumer);
+  public void onReleased(String identifier, GamepadReleasedListener listener) {
+    GamepadManager.addComponentListener(this.componentReleasedListeners, identifier, listener);
   }
 
   @Override
-  public void onReleased(BiConsumer<String, Float> consumer) {
-    if (this.releasedConsumer.contains(consumer)) {
+  public void onReleased(GamepadReleasedListener listener) {
+    if (this.releasedListeners.contains(listener)) {
       return;
     }
 
-    this.releasedConsumer.add(consumer);
+    this.releasedListeners.add(listener);
   }
 
   @Override
   public void clearEventConsumers() {
-    this.releasedConsumer.clear();
-    this.componentReleasedConsumer.clear();
+    this.releasedListeners.clear();
+    this.componentReleasedListeners.clear();
 
-    this.pressedConsumer.clear();
-    this.componentPressedConsumer.clear();
+    this.pressedListeners.clear();
+    this.componentPressedListeners.clear();
 
-    this.pollConsumer.clear();
-    this.componentPollConsumer.clear();
+    this.pollListeners.clear();
+    this.componentPollListeners.clear();
   }
 
   @Override
@@ -178,13 +176,16 @@ public class Gamepad implements GamepadEvents, IUpdateable {
 
   private void handlePressed(Component comp) {
     final String name = comp.getIdentifier().getName();
-    for (final BiConsumer<String, Float> cons : this.pressedConsumer) {
-      cons.accept(name, comp.getPollData());
+
+    final GamepadEvent event = new GamepadEvent(this, comp);
+
+    for (final GamepadPressedListener listener : this.pressedListeners) {
+      listener.pressed(event);
     }
 
-    if (this.componentPressedConsumer.containsKey(name)) {
-      for (Consumer<Float> cons : this.componentPressedConsumer.get(name)) {
-        cons.accept(comp.getPollData());
+    if (this.componentPressedListeners.containsKey(name)) {
+      for (GamepadPressedListener listener : this.componentPressedListeners.get(name)) {
+        listener.pressed(event);
       }
     }
 
@@ -217,21 +218,22 @@ public class Gamepad implements GamepadEvents, IUpdateable {
 
   private void dispose() {
     Game.inputLoop().detach(this);
-    this.componentPollConsumer.clear();
-    this.componentPressedConsumer.clear();
+    this.componentPollListeners.clear();
+    this.componentPressedListeners.clear();
     Input.gamepads().remove(this);
   }
 
   private void handlePollEvents(Event event) {
+    final GamepadEvent gamepadEvent = new GamepadEvent(this, event.getComponent());
 
-    for (final BiConsumer<String, Float> cons : this.pollConsumer) {
-      cons.accept(event.getComponent().getIdentifier().getName(), event.getValue());
+    for (final GamepadPollListener listener : this.pollListeners) {
+      listener.polled(gamepadEvent);
     }
 
-    final Collection<Consumer<Float>> consumers = this.componentPollConsumer.get(event.getComponent().getIdentifier().getName());
-    if (consumers != null) {
-      for (final Consumer<Float> cons : consumers) {
-        cons.accept(event.getValue());
+    final Collection<GamepadPollListener> listeners = this.componentPollListeners.get(event.getComponent().getIdentifier().getName());
+    if (listeners != null) {
+      for (final GamepadPollListener listener : listeners) {
+        listener.polled(gamepadEvent);
       }
     }
   }
@@ -244,14 +246,16 @@ public class Gamepad implements GamepadEvents, IUpdateable {
 
     this.pressedComponents.remove(name);
 
-    for (final BiConsumer<String, Float> cons : this.releasedConsumer) {
-      cons.accept(name, comp.getPollData());
+    final GamepadEvent event = new GamepadEvent(this, comp);
+
+    for (final GamepadReleasedListener listener : this.releasedListeners) {
+      listener.released(event);
     }
 
-    final Collection<Consumer<Float>> consumers = this.componentReleasedConsumer.get(comp.getIdentifier().getName());
-    if (consumers != null) {
-      for (final Consumer<Float> cons : consumers) {
-        cons.accept(comp.getPollData());
+    final Collection<GamepadReleasedListener> listeners = this.componentReleasedListeners.get(comp.getIdentifier().getName());
+    if (listeners != null) {
+      for (final GamepadReleasedListener listener : listeners) {
+        listener.released(event);
       }
     }
   }

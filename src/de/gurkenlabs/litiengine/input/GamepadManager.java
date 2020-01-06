@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,12 +26,12 @@ public class GamepadManager implements ILaunchable, GamepadEvents {
   private final Collection<Consumer<Gamepad>> gamepadAddedConsumer;
   private final Collection<Consumer<Gamepad>> gamepadRemovedConsumer;
 
-  private final Map<String, Collection<Consumer<Float>>> componentPollConsumer;
-  private final Map<String, Collection<Consumer<Float>>> componentPressedConsumer;
-  private final Map<String, Collection<Consumer<Float>>> componentReleasedConsumer;
-  private final Collection<BiConsumer<String, Float>> pollConsumer;
-  private final Collection<BiConsumer<String, Float>> pressedConsumer;
-  private final Collection<BiConsumer<String, Float>> releasedConsumer;
+  private final Map<String, Collection<GamepadPollListener>> componentPollListeners;
+  private final Map<String, Collection<GamepadPressedListener>> componentPressedListeners;
+  private final Map<String, Collection<GamepadReleasedListener>> componentReleasedListeners;
+  private final Collection<GamepadPollListener> pollListeners;
+  private final Collection<GamepadPressedListener> pressedListeners;
+  private final Collection<GamepadReleasedListener> releasedListeners;
 
   private final List<Gamepad> gamePads;
 
@@ -44,12 +43,12 @@ public class GamepadManager implements ILaunchable, GamepadEvents {
   public GamepadManager() {
     this.gamepadRemovedConsumer = ConcurrentHashMap.newKeySet();
     this.gamepadAddedConsumer = ConcurrentHashMap.newKeySet();
-    this.componentPollConsumer = new ConcurrentHashMap<>();
-    this.componentPressedConsumer = new ConcurrentHashMap<>();
-    this.componentReleasedConsumer = new ConcurrentHashMap<>();
-    this.pollConsumer = ConcurrentHashMap.newKeySet();
-    this.pressedConsumer = ConcurrentHashMap.newKeySet();
-    this.releasedConsumer = ConcurrentHashMap.newKeySet();
+    this.componentPollListeners = new ConcurrentHashMap<>();
+    this.componentPressedListeners = new ConcurrentHashMap<>();
+    this.componentReleasedListeners = new ConcurrentHashMap<>();
+    this.pollListeners = ConcurrentHashMap.newKeySet();
+    this.pressedListeners = ConcurrentHashMap.newKeySet();
+    this.releasedListeners = ConcurrentHashMap.newKeySet();
 
     this.gamePads = new CopyOnWriteArrayList<>();
 
@@ -138,57 +137,57 @@ public class GamepadManager implements ILaunchable, GamepadEvents {
   }
 
   @Override
-  public void onPoll(final String identifier, final Consumer<Float> consumer) {
-    addComponentConsumer(this.componentPollConsumer, identifier, consumer);
+  public void onPoll(final String identifier, final GamepadPollListener consumer) {
+    addComponentListener(this.componentPollListeners, identifier, consumer);
   }
 
   @Override
-  public void onPoll(BiConsumer<String, Float> consumer) {
-    if (this.pollConsumer.contains(consumer)) {
+  public void onPoll(GamepadPollListener consumer) {
+    if (this.pollListeners.contains(consumer)) {
       return;
     }
 
-    this.pollConsumer.add(consumer);
+    this.pollListeners.add(consumer);
   }
 
   @Override
-  public void onPressed(final String identifier, final Consumer<Float> consumer) {
-    addComponentConsumer(this.componentPressedConsumer, identifier, consumer);
+  public void onPressed(final String identifier, final GamepadPressedListener listener) {
+    addComponentListener(this.componentPressedListeners, identifier, listener);
   }
 
   @Override
-  public void onPressed(BiConsumer<String, Float> consumer) {
-    if (this.pressedConsumer.contains(consumer)) {
+  public void onPressed(GamepadPressedListener listener) {
+    if (this.pressedListeners.contains(listener)) {
       return;
     }
 
-    this.pressedConsumer.add(consumer);
+    this.pressedListeners.add(listener);
   }
 
   @Override
-  public void onReleased(String identifier, Consumer<Float> consumer) {
-    addComponentConsumer(this.componentReleasedConsumer, identifier, consumer);
+  public void onReleased(String identifier, GamepadReleasedListener listener) {
+    addComponentListener(this.componentReleasedListeners, identifier, listener);
   }
 
   @Override
-  public void onReleased(BiConsumer<String, Float> consumer) {
-    if (this.releasedConsumer.contains(consumer)) {
+  public void onReleased(GamepadReleasedListener listener) {
+    if (this.releasedListeners.contains(listener)) {
       return;
     }
 
-    this.releasedConsumer.add(consumer);
+    this.releasedListeners.add(listener);
   }
 
   @Override
   public void clearEventConsumers() {
-    this.releasedConsumer.clear();
-    this.componentReleasedConsumer.clear();
+    this.releasedListeners.clear();
+    this.componentReleasedListeners.clear();
 
-    this.pressedConsumer.clear();
-    this.componentPressedConsumer.clear();
+    this.pressedListeners.clear();
+    this.componentPressedListeners.clear();
 
-    this.pollConsumer.clear();
-    this.componentPollConsumer.clear();
+    this.pollListeners.clear();
+    this.componentPollListeners.clear();
   }
 
   protected void remove(final Gamepad gamepad) {
@@ -222,7 +221,7 @@ public class GamepadManager implements ILaunchable, GamepadEvents {
     this.hotPlugThread.interrupt();
   }
 
-  protected static void addComponentConsumer(Map<String, Collection<Consumer<Float>>> consumerList, String identifier, Consumer<Float> consumer) {
+  static <T> void addComponentListener(Map<String, Collection<T>> consumerList, String identifier, T consumer) {
     if (!consumerList.containsKey(identifier)) {
       consumerList.put(identifier, new ArrayList<>());
     }
@@ -269,34 +268,34 @@ public class GamepadManager implements ILaunchable, GamepadEvents {
   }
 
   private void hookupToGamepad(final Gamepad pad) {
-    for (final Map.Entry<String, Collection<Consumer<Float>>> entry : this.componentPollConsumer.entrySet()) {
-      for (final Consumer<Float> cons : entry.getValue()) {
-        pad.onPoll(entry.getKey(), cons);
+    for (final Map.Entry<String, Collection<GamepadPollListener>> entry : this.componentPollListeners.entrySet()) {
+      for (final GamepadPollListener listener : entry.getValue()) {
+        pad.onPoll(entry.getKey(), listener);
       }
     }
 
-    for (final Map.Entry<String, Collection<Consumer<Float>>> entry : this.componentPressedConsumer.entrySet()) {
-      for (final Consumer<Float> cons : entry.getValue()) {
-        pad.onPressed(entry.getKey(), cons);
+    for (final Map.Entry<String, Collection<GamepadPressedListener>> entry : this.componentPressedListeners.entrySet()) {
+      for (final GamepadPressedListener listener : entry.getValue()) {
+        pad.onPressed(entry.getKey(), listener);
       }
     }
 
-    for (final Map.Entry<String, Collection<Consumer<Float>>> entry : this.componentReleasedConsumer.entrySet()) {
-      for (final Consumer<Float> cons : entry.getValue()) {
-        pad.onReleased(entry.getKey(), cons);
+    for (final Map.Entry<String, Collection<GamepadReleasedListener>> entry : this.componentReleasedListeners.entrySet()) {
+      for (final GamepadReleasedListener listener : entry.getValue()) {
+        pad.onReleased(entry.getKey(), listener);
       }
     }
 
-    for (final BiConsumer<String, Float> consumer : this.pollConsumer) {
-      pad.onPoll(consumer);
+    for (final GamepadPollListener listener : this.pollListeners) {
+      pad.onPoll(listener);
     }
 
-    for (final BiConsumer<String, Float> consumer : this.pressedConsumer) {
-      pad.onPressed(consumer);
+    for (final GamepadPressedListener listener : this.pressedListeners) {
+      pad.onPressed(listener);
     }
 
-    for (final BiConsumer<String, Float> consumer : this.releasedConsumer) {
-      pad.onReleased(consumer);
+    for (final GamepadReleasedListener listener : this.releasedListeners) {
+      pad.onReleased(listener);
     }
   }
 

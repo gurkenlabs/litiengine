@@ -1,21 +1,20 @@
 package de.gurkenlabs.litiengine.input;
 
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
+import java.util.EventListener;
 
 public interface GamepadEvents {
 
-  public void onPoll(String identifier, Consumer<Float> consumer);
+  public void onPoll(String identifier, GamepadPollListener consumer);
 
-  public void onPoll(BiConsumer<String, Float> consumer);
+  public void onPoll(GamepadPollListener consumer);
 
-  public void onPressed(String identifier, Consumer<Float> consumer);
+  public void onPressed(String identifier, GamepadPressedListener consumer);
 
-  public void onPressed(BiConsumer<String, Float> consumer);
+  public void onPressed(GamepadPressedListener consumer);
 
-  public void onReleased(String identifier, Consumer<Float> consumer);
+  public void onReleased(String identifier, GamepadReleasedListener consumer);
 
-  public void onReleased(BiConsumer<String, Float> consumer);
+  public void onReleased(GamepadReleasedListener consumer);
 
   /**
    * Removes all registered event consumers from the Gamepad instance.
@@ -34,4 +33,19 @@ public interface GamepadEvents {
    * @see Gamepad.Xbox
    */
   public boolean isPressed(String gamepadComponent);
+
+  @FunctionalInterface
+  public interface GamepadPollListener extends EventListener {
+    void polled(GamepadEvent event);
+  }
+  
+  @FunctionalInterface
+  public interface GamepadPressedListener extends EventListener {
+    void pressed(GamepadEvent event);
+  }
+  
+  @FunctionalInterface
+  public interface GamepadReleasedListener extends EventListener {
+    void released(GamepadEvent event);
+  }
 }
