@@ -7,6 +7,7 @@ import java.util.EventListener;
  * 
  * @see ICombatEntity#die()
  */
+@FunctionalInterface
 public interface CombatEntityDeathListener extends EventListener {
   
   /**

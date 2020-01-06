@@ -8,6 +8,7 @@ import java.util.EventListener;
  * @see ICombatEntity#hit(int)
  * @see ICombatEntity#hit(int, de.gurkenlabs.litiengine.abilities.Ability)
  */
+@FunctionalInterface
 public interface CombatEntityHitListener extends EventListener {
 
   /**
