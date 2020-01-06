@@ -24,7 +24,7 @@ import de.gurkenlabs.litiengine.util.MathUtilities;
 /**
  * This implementation provides information about the mouse input in the LITIengine.
  */
-public class Mouse implements MouseListener, MouseMotionListener, MouseWheelListener, IMouse, IUpdateable {
+public final class Mouse implements MouseListener, MouseMotionListener, MouseWheelListener, IMouse, IUpdateable {
   private static final Logger log = Logger.getLogger(Mouse.class.getName());
 
   private final Collection<MouseClickedListener> mouseClickedListeners = ConcurrentHashMap.newKeySet();
@@ -59,7 +59,7 @@ public class Mouse implements MouseListener, MouseMotionListener, MouseWheelList
    * @throws AWTException
    *           In case the {@link Robot} class could not be initialized.
    */
-  protected Mouse() throws AWTException {
+  Mouse() throws AWTException {
     try {
       this.robot = new Robot();
       this.robot.setAutoDelay(0);

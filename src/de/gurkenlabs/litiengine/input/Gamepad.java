@@ -12,7 +12,7 @@ import net.java.games.input.Component.Identifier;
 import net.java.games.input.Controller;
 import net.java.games.input.Event;
 
-public class Gamepad implements GamepadEvents, IUpdateable {
+public final class Gamepad implements GamepadEvents, IUpdateable {
   private static final Map<String, Identifier> components = new HashMap<>();
 
   private final Controller controller;
@@ -32,7 +32,7 @@ public class Gamepad implements GamepadEvents, IUpdateable {
   private float axisDeadzone = Game.config().input().getGamepadAxisDeadzone();
   private float triggerDeadzone = Game.config().input().getGamepadTriggerDeadzone();
 
-  protected Gamepad(final int index, final Controller controller) {
+  Gamepad(final int index, final Controller controller) {
     this.componentPollListeners = new ConcurrentHashMap<>();
     this.componentPressedListeners = new ConcurrentHashMap<>();
     this.componentReleasedListeners = new ConcurrentHashMap<>();

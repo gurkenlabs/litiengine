@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
 
-public class Keyboard implements KeyEventDispatcher, IKeyboard, IUpdateable {
+public final class Keyboard implements KeyEventDispatcher, IKeyboard, IUpdateable {
   private final Collection<KeyListener> keyListeners = ConcurrentHashMap.newKeySet();
   private final Map<Integer, Collection<KeyPressedListener>> keySpecificPressedListener = new ConcurrentHashMap<>();
   private final Map<Integer, Collection<KeyReleasedListener>> keySpecificReleasedListener = new ConcurrentHashMap<>();
@@ -27,7 +27,7 @@ public class Keyboard implements KeyEventDispatcher, IKeyboard, IUpdateable {
 
   private boolean consumeAlt;
 
-  protected Keyboard() {
+  Keyboard() {
     KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
 
     Game.inputLoop().attach(this);

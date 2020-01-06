@@ -20,7 +20,7 @@ import net.java.games.input.Controller;
 import net.java.games.input.Controller.Type;
 import net.java.games.input.ControllerEnvironment;
 
-public class GamepadManager implements ILaunchable, GamepadEvents {
+public final class GamepadManager implements ILaunchable, GamepadEvents {
   private static final Logger log = Logger.getLogger(GamepadManager.class.getName());
 
   private final Collection<Consumer<Gamepad>> gamepadAddedConsumer;
@@ -40,7 +40,7 @@ public class GamepadManager implements ILaunchable, GamepadEvents {
   private int defaultgamePadIndex = -1;
   private boolean handleHotPluggedControllers;
 
-  public GamepadManager() {
+  GamepadManager() {
     this.gamepadRemovedConsumer = ConcurrentHashMap.newKeySet();
     this.gamepadAddedConsumer = ConcurrentHashMap.newKeySet();
     this.componentPollListeners = new ConcurrentHashMap<>();
