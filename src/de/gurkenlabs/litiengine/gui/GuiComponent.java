@@ -677,7 +677,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     this.suspended = false;
     this.visible = true;
     Input.mouse().addMouseListener(this);
-    Input.mouse().addMouseWheelListener(this);
+    Input.mouse().onWheelMoved(this);
     Input.mouse().addMouseMotionListener(this);
     for (final GuiComponent component : this.getComponents()) {
       component.prepare();

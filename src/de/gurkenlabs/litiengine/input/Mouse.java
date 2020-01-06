@@ -11,7 +11,6 @@ import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,16 +27,16 @@ import de.gurkenlabs.litiengine.util.MathUtilities;
 public class Mouse implements IMouse, IUpdateable {
   private static final Logger log = Logger.getLogger(Mouse.class.getName());
 
-  private final List<Consumer<MouseEvent>> mouseClickedConsumer = new CopyOnWriteArrayList<>();
-  private final List<Consumer<MouseEvent>> mouseDraggedConsumer = new CopyOnWriteArrayList<>();
+  private final List<MouseClickedListener> mouseClickedListeners = new CopyOnWriteArrayList<>();
+  private final List<MouseDraggedListener> mouseDraggedListeners = new CopyOnWriteArrayList<>();
+  private final List<MouseMovedListener> mouseMovedListeners = new CopyOnWriteArrayList<>();
+  private final List<MousePressedListener> mousePressedListeners = new CopyOnWriteArrayList<>();
+  private final List<MousePressingListener> mousePressingListeners = new CopyOnWriteArrayList<>();
+  private final List<MouseReleasedListener> mouseReleasedListeners = new CopyOnWriteArrayList<>();
+  
   private final List<MouseListener> mouseListeners = new CopyOnWriteArrayList<>();
   private final List<MouseMotionListener> mouseMotionListeners = new CopyOnWriteArrayList<>();
-  private final List<Consumer<MouseEvent>> mouseMovedConsumer = new CopyOnWriteArrayList<>();
-  private final List<Consumer<MouseEvent>> mousePressedConsumer = new CopyOnWriteArrayList<>();
-  private final List<Runnable> mousePressingConsumer = new CopyOnWriteArrayList<>();
-  private final List<Consumer<MouseEvent>> mouseReleasedConsumer = new CopyOnWriteArrayList<>();
   private final List<MouseWheelListener> mouseWheelListeners = new CopyOnWriteArrayList<>();
-  private final List<Consumer<MouseWheelEvent>> wheelMovedConsumer = new CopyOnWriteArrayList<>();
 
   private final Robot robot;
 
@@ -80,8 +79,8 @@ public class Mouse implements IMouse, IUpdateable {
   @Override
   public void update() {
     if (this.isPressed()) {
-      for (final Runnable cons : this.mousePressingConsumer) {
-        cons.run();
+      for (final MousePressingListener listener : this.mousePressingListeners) {
+        listener.mousePressing();
       }
     }
     if (this.updateLocation != null && !this.updatingLocation) {
@@ -136,8 +135,8 @@ public class Mouse implements IMouse, IUpdateable {
     final MouseEvent wrappedEvent = this.createEvent(e);
     this.mouseListeners.forEach(listener -> listener.mouseClicked(wrappedEvent));
 
-    for (final Consumer<MouseEvent> cons : this.mouseClickedConsumer) {
-      cons.accept(wrappedEvent);
+    for (final MouseClickedListener listener : this.mouseClickedListeners) {
+      listener.mouseClicked(wrappedEvent);
     }
   }
 
@@ -147,8 +146,8 @@ public class Mouse implements IMouse, IUpdateable {
     final MouseEvent wrappedEvent = this.createEvent(e);
     this.mouseMotionListeners.forEach(listener -> listener.mouseDragged(wrappedEvent));
 
-    for (final Consumer<MouseEvent> cons : this.mouseDraggedConsumer) {
-      cons.accept(wrappedEvent);
+    for (final MouseDraggedListener listener : this.mouseDraggedListeners) {
+      listener.mouseDragged(wrappedEvent);
     }
   }
 
@@ -178,8 +177,8 @@ public class Mouse implements IMouse, IUpdateable {
     final MouseEvent wrappedEvent = this.createEvent(e);
     this.mouseMotionListeners.forEach(listener -> listener.mouseMoved(wrappedEvent));
 
-    for (final Consumer<MouseEvent> cons : this.mouseMovedConsumer) {
-      cons.accept(wrappedEvent);
+    for (final MouseMovedListener listener : this.mouseMovedListeners) {
+      listener.mouseMoved(wrappedEvent);
     }
   }
 
@@ -198,8 +197,8 @@ public class Mouse implements IMouse, IUpdateable {
       this.isRightMouseButtonDown = true;
     }
 
-    for (final Consumer<MouseEvent> cons : this.mousePressedConsumer) {
-      cons.accept(wrappedEvent);
+    for (final MousePressedListener listener : this.mousePressedListeners) {
+      listener.mousePressed(wrappedEvent);
     }
   }
 
@@ -218,61 +217,85 @@ public class Mouse implements IMouse, IUpdateable {
       this.isRightMouseButtonDown = false;
     }
 
-    for (final Consumer<MouseEvent> cons : this.mouseReleasedConsumer) {
-      cons.accept(wrappedEvent);
+    for (final MouseReleasedListener listener : this.mouseReleasedListeners) {
+      listener.mouseReleased(wrappedEvent);
     }
   }
 
   @Override
   public void mouseWheelMoved(final MouseWheelEvent e) {
     this.mouseWheelListeners.forEach(listener -> listener.mouseWheelMoved(e));
-    this.wheelMovedConsumer.forEach(cons -> cons.accept(e));
   }
 
   @Override
-  public void onClicked(final Consumer<MouseEvent> consumer) {
-    this.mouseClickedConsumer.add(consumer);
+  public void onClicked(final MouseClickedListener listener) {
+    this.mouseClickedListeners.add(listener);
+  }
+  
+  @Override
+  public void removeMouseClickedListener(MouseClickedListener listener) {
+    this.mouseClickedListeners.remove(listener);
   }
 
   @Override
-  public void onDragged(final Consumer<MouseEvent> consumer) {
-    this.mouseDraggedConsumer.add(consumer);
+  public void onDragged(final MouseDraggedListener listener) {
+    this.mouseDraggedListeners.add(listener);
+  }
+  
+  @Override
+  public void removeMouseDraggedListener(MouseDraggedListener listener) {
+    this.mouseDraggedListeners.remove(listener);
   }
 
   @Override
-  public void onMoved(final Consumer<MouseEvent> consumer) {
-    this.mouseMovedConsumer.add(consumer);
+  public void onMoved(final MouseMovedListener listener) {
+    this.mouseMovedListeners.add(listener);
   }
 
   @Override
-  public void onPressed(final Consumer<MouseEvent> consumer) {
-    this.mousePressedConsumer.add(consumer);
+  public void removeMouseMovedListener(MouseMovedListener listener) {
+    this.mouseMovedListeners.remove(listener);
   }
 
   @Override
-  public void onPressing(Runnable consumer) {
-    this.mousePressingConsumer.add(consumer);
+  public void onPressed(final MousePressedListener listener) {
+    this.mousePressedListeners.add(listener);
+  }
+  
+
+  @Override
+  public void removeMousePressedListener(MousePressedListener listener) {
+    this.mousePressedListeners.remove(listener);
   }
 
   @Override
-  public void onReleased(final Consumer<MouseEvent> consumer) {
-    this.mouseReleasedConsumer.add(consumer);
+  public void onPressing(MousePressingListener listener) {
+    this.mousePressingListeners.add(listener);
+  }
+  
+  @Override
+  public void removeMousePressingListener(MousePressingListener listener) {
+    this.mousePressingListeners.remove(listener);
   }
 
   @Override
-  public void onWheelMoved(final Consumer<MouseWheelEvent> consumer) {
-    this.wheelMovedConsumer.add(consumer);
+  public void onReleased(final MouseReleasedListener listener) {
+    this.mouseReleasedListeners.add(listener);
+  }
+  
+  @Override
+  public void removeMouseReleasedListener(MouseReleasedListener listener) {
+    this.mouseReleasedListeners.remove(listener);
   }
 
   @Override
-  public void clearEventConsumers() {
-    this.mouseClickedConsumer.clear();
-    this.mouseDraggedConsumer.clear();
-    this.mouseMovedConsumer.clear();
-    this.mousePressedConsumer.clear();
-    this.mousePressingConsumer.clear();
-    this.mouseReleasedConsumer.clear();
-    this.wheelMovedConsumer.clear();
+  public void onWheelMoved(final MouseWheelListener listener) {
+    this.mouseWheelListeners.add(listener);
+  }
+
+  @Override
+  public void removeMouseWheelListener(final MouseWheelListener listener) {
+    this.mouseWheelListeners.remove(listener);
   }
 
   @Override
@@ -283,6 +306,11 @@ public class Mouse implements IMouse, IUpdateable {
 
     this.mouseListeners.add(listener);
   }
+  
+  @Override
+  public void removeMouseListener(final MouseListener listener) {
+    this.mouseListeners.remove(listener);
+  }
 
   @Override
   public void addMouseMotionListener(final MouseMotionListener listener) {
@@ -292,14 +320,20 @@ public class Mouse implements IMouse, IUpdateable {
 
     this.mouseMotionListeners.add(listener);
   }
+  
+  @Override
+  public void removeMouseMotionListener(final MouseMotionListener listener) {
+    this.mouseMotionListeners.remove(listener);
+  }
 
   @Override
-  public void addMouseWheelListener(final MouseWheelListener listener) {
-    if (this.mouseWheelListeners.contains(listener)) {
-      return;
-    }
-
-    this.mouseWheelListeners.add(listener);
+  public void clearExplicitListeners() {
+    this.mouseClickedListeners.clear();
+    this.mouseDraggedListeners.clear();
+    this.mouseMovedListeners.clear();
+    this.mousePressedListeners.clear();
+    this.mousePressingListeners.clear();
+    this.mouseReleasedListeners.clear();
   }
 
   @Override
@@ -318,29 +352,14 @@ public class Mouse implements IMouse, IUpdateable {
 
     final MouseEvent mouseEvent = new MouseEvent(Game.window().getRenderComponent(), MouseEvent.MOUSE_MOVED, 0, 0, (int) this.getLocation().getX(), (int) this.getLocation().getY(), 0, false, MouseEvent.NOBUTTON);
     final MouseEvent wrappedEvent = this.createEvent(mouseEvent);
-    for (final Consumer<MouseEvent> cons : this.mouseMovedConsumer) {
-      cons.accept(wrappedEvent);
+    for (final MouseMovedListener listener : this.mouseMovedListeners) {
+      listener.mouseMoved(wrappedEvent);
     }
   }
 
   @Override
   public void setLocation(double x, double y) {
     this.setLocation(new Point2D.Double(x, y));
-  }
-
-  @Override
-  public void removeMouseListener(final MouseListener listener) {
-    this.mouseListeners.remove(listener);
-  }
-
-  @Override
-  public void removeMouseMotionListener(final MouseMotionListener listener) {
-    this.mouseMotionListeners.remove(listener);
-  }
-
-  @Override
-  public void removeMouseWheelListener(final MouseWheelListener listener) {
-    this.mouseWheelListeners.remove(listener);
   }
 
   private MouseEvent createEvent(final MouseEvent original) {
