@@ -5,7 +5,7 @@ import java.awt.event.KeyListener;
 import java.util.EventListener;
 
 /**
- * The <code>IKeyboard</code> interface is the engines API for receiving keyboard input events.
+ * The <code>IKeyboard</code> interface is the engine's API for receiving keyboard input events.
  */
 public interface IKeyboard {
 

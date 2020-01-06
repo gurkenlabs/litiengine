@@ -11,7 +11,7 @@ import java.util.EventListener;
 import de.gurkenlabs.litiengine.graphics.RenderComponent;
 
 /**
- * The <code>IMouse</code> interface is the engines API for receiving mouse input events.
+ * The <code>IMouse</code> interface is the engine's API for receiving mouse input events.
  */
 public interface IMouse extends MouseListener, MouseMotionListener, MouseWheelListener {
   public void onClicked(MouseClickedListener listener);

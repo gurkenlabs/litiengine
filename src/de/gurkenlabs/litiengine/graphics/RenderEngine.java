@@ -491,7 +491,6 @@ public final class RenderEngine {
    * @return True if the entity can be rendered; otherwise false.
    * 
    * @see IEntity#getRenderType()
-   * @see IEntity#canRender()
    * @see RenderType#NONE
    * @see EntityRenderListener#canRender(IEntity)
    */
