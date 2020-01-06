@@ -499,11 +499,6 @@ public final class Game {
       window().getRenderComponent().onFpsChanged(fps -> metrics().setFramesPerSecond(fps));
       window().setIconImages(Arrays.asList(Resources.images().get("liti-logo-x16.png"), Resources.images().get("liti-logo-x20.png"), Resources.images().get("liti-logo-x32.png"), Resources.images().get("liti-logo-x48.png")));
 
-      // init mouse inputs
-      window().getRenderComponent().addMouseListener(Input.mouse());
-      window().getRenderComponent().addMouseMotionListener(Input.mouse());
-      window().getRenderComponent().addMouseWheelListener(Input.mouse());
-
       Input.keyboard().onKeyTyped(KeyEvent.VK_PRINTSCREEN, key -> {
         // don't take a screenshot if a modifier is active
         if (key.getModifiers() != 0) {

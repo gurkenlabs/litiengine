@@ -24,7 +24,7 @@ import de.gurkenlabs.litiengine.util.MathUtilities;
 /**
  * This implementation provides information about the mouse input in the LITIengine.
  */
-public class Mouse implements IMouse, IUpdateable {
+public class Mouse implements MouseListener, MouseMotionListener, MouseWheelListener, IMouse, IUpdateable {
   private static final Logger log = Logger.getLogger(Mouse.class.getName());
 
   private final Collection<MouseClickedListener> mouseClickedListeners = ConcurrentHashMap.newKeySet();
@@ -33,7 +33,7 @@ public class Mouse implements IMouse, IUpdateable {
   private final Collection<MousePressedListener> mousePressedListeners = ConcurrentHashMap.newKeySet();
   private final Collection<MousePressingListener> mousePressingListeners = ConcurrentHashMap.newKeySet();
   private final Collection<MouseReleasedListener> mouseReleasedListeners = ConcurrentHashMap.newKeySet();
-  
+
   private final Collection<MouseListener> mouseListeners = ConcurrentHashMap.newKeySet();
   private final Collection<MouseMotionListener> mouseMotionListeners = ConcurrentHashMap.newKeySet();
   private final Collection<MouseWheelListener> mouseWheelListeners = ConcurrentHashMap.newKeySet();
@@ -115,7 +115,7 @@ public class Mouse implements IMouse, IUpdateable {
   }
 
   @Override
-  public boolean isLeftMouseButtonDown() {
+  public boolean isLeftButtonPressed() {
     return this.isLeftMouseButtonDown;
   }
 
@@ -125,7 +125,7 @@ public class Mouse implements IMouse, IUpdateable {
   }
 
   @Override
-  public boolean isRightMouseButtonDown() {
+  public boolean isRightButtonPressed() {
     return this.isRightMouseButtonDown;
   }
 
@@ -231,7 +231,7 @@ public class Mouse implements IMouse, IUpdateable {
   public void onClicked(final MouseClickedListener listener) {
     this.mouseClickedListeners.add(listener);
   }
-  
+
   @Override
   public void removeMouseClickedListener(MouseClickedListener listener) {
     this.mouseClickedListeners.remove(listener);
@@ -241,7 +241,7 @@ public class Mouse implements IMouse, IUpdateable {
   public void onDragged(final MouseDraggedListener listener) {
     this.mouseDraggedListeners.add(listener);
   }
-  
+
   @Override
   public void removeMouseDraggedListener(MouseDraggedListener listener) {
     this.mouseDraggedListeners.remove(listener);
@@ -261,7 +261,6 @@ public class Mouse implements IMouse, IUpdateable {
   public void onPressed(final MousePressedListener listener) {
     this.mousePressedListeners.add(listener);
   }
-  
 
   @Override
   public void removeMousePressedListener(MousePressedListener listener) {
@@ -272,7 +271,7 @@ public class Mouse implements IMouse, IUpdateable {
   public void onPressing(MousePressingListener listener) {
     this.mousePressingListeners.add(listener);
   }
-  
+
   @Override
   public void removeMousePressingListener(MousePressingListener listener) {
     this.mousePressingListeners.remove(listener);
@@ -282,7 +281,7 @@ public class Mouse implements IMouse, IUpdateable {
   public void onReleased(final MouseReleasedListener listener) {
     this.mouseReleasedListeners.add(listener);
   }
-  
+
   @Override
   public void removeMouseReleasedListener(MouseReleasedListener listener) {
     this.mouseReleasedListeners.remove(listener);
@@ -306,7 +305,7 @@ public class Mouse implements IMouse, IUpdateable {
 
     this.mouseListeners.add(listener);
   }
-  
+
   @Override
   public void removeMouseListener(final MouseListener listener) {
     this.mouseListeners.remove(listener);
@@ -320,7 +319,7 @@ public class Mouse implements IMouse, IUpdateable {
 
     this.mouseMotionListeners.add(listener);
   }
-  
+
   @Override
   public void removeMouseMotionListener(final MouseMotionListener listener) {
     this.mouseMotionListeners.remove(listener);

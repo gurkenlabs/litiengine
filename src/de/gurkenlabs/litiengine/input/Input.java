@@ -30,7 +30,7 @@ public final class Input {
     if (!Game.config().input().isGamepadSupport()) {
       log.log(Level.SEVERE, "Cannot access gamepads because gamepad support is disabled in the configuration.");
     }
-    
+
     return gamePadManager;
   }
 
@@ -65,7 +65,15 @@ public final class Input {
     private static void init() {
       try {
         keyboard = new Keyboard();
-        mouse = new Mouse();
+        Mouse m = new Mouse();
+        
+        if (!Game.isInNoGUIMode()) {
+          Game.window().getRenderComponent().addMouseListener(m);
+          Game.window().getRenderComponent().addMouseMotionListener(m);
+          Game.window().getRenderComponent().addMouseWheelListener(m);
+        }
+        
+        mouse = m;
         if (Game.config().input().isGamepadSupport()) {
           gamePadManager = new GamepadManager();
         }
