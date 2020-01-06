@@ -36,6 +36,8 @@ public class GamepadEvent extends EventObject {
    * If this axis is a button, the value returned will be either 0.0f or 1.0f.
    * If this axis is normalized, the value returned will be between -1.0f and
    * 1.0f.
+   * 
+   * @return The last poll value of the component of this event.
    */
   public float getValue() {
     return this.value;
@@ -52,6 +54,8 @@ public class GamepadEvent extends EventObject {
 
   /**
    * Gets the gamepad that caused the event.
+   * 
+   * @return The gamepad of this event.
    */
   public Gamepad getGamepad() {
     return this.gamepad;
@@ -61,6 +65,8 @@ public class GamepadEvent extends EventObject {
    * Returns <code>true</code> if data returned from <code>poll</code>
    * is relative to the last call, or <code>false</code> if data
    * is absolute.
+   * 
+   * @return True if the data is relative; otherwise false.
    */
   public boolean isRelative() {
     return this.relative;
@@ -68,6 +74,8 @@ public class GamepadEvent extends EventObject {
 
   /**
    * Returns whether or not the axis is analog, or false if it is digital.
+   * 
+   * @return True if the component is analog; otherwise false.
    */
   public boolean isAnalog() {
     return this.analog;

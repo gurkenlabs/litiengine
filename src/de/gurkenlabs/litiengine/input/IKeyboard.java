@@ -38,7 +38,7 @@ public interface IKeyboard {
   public boolean isPressed(int keyCode);
 
   /**
-   * Adds the specified key pressed listener to receive events when the key with the defined <code>keyCode</code> was pressed.
+   * Adds the specified key pressed listener to receive events when the key with the defined <code>keyCode</code> has been pressed.
    * 
    * @param keyCode
    *          The keyCode to capture the key pressed event for.
@@ -61,7 +61,7 @@ public interface IKeyboard {
   public void removeKeyPressedListener(int keyCode, KeyPressedListener listener);
 
   /**
-   * Adds the specified key released listener to receive events when the key with the defined <code>keyCode</code> was released.
+   * Adds the specified key released listener to receive events when the key with the defined <code>keyCode</code> has been released.
    * 
    * @param keyCode
    *          The keyCode to capture the key released event for.
@@ -84,7 +84,7 @@ public interface IKeyboard {
   public void removeKeyReleasedListener(int keyCode, KeyReleasedListener listener);
 
   /**
-   * Adds the specified key typed listener to receive events when the key with the defined <code>keyCode</code> was typed.
+   * Adds the specified key typed listener to receive events when the key with the defined <code>keyCode</code> has been typed.
    * 
    * @param keyCode
    *          The keyCode to capture the key typed event for.
@@ -107,7 +107,7 @@ public interface IKeyboard {
   public void removeKeyTypedListener(int keyCode, KeyTypedListener listener);
 
   /**
-   * Adds the specified key pressed listener to receive events when any key was pressed.
+   * Adds the specified key pressed listener to receive events when any key has been pressed.
    * 
    * @param listener
    *          The listener to add.
@@ -126,7 +126,7 @@ public interface IKeyboard {
   public void removeKeyPressedListener(KeyPressedListener listener);
 
   /**
-   * Adds the specified key released listener to receive events when any key was released.
+   * Adds the specified key released listener to receive events when any key has been released.
    * 
    * @param listener
    *          The listener to add.
@@ -145,7 +145,7 @@ public interface IKeyboard {
   public void removeKeyReleasedListener(KeyReleasedListener listener);
 
   /**
-   * Adds the specified key typed listener to receive events when any key was typed.
+   * Adds the specified key typed listener to receive events when any key has been typed.
    * 
    * @param listener
    *          The listener to add.
