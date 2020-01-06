@@ -9,8 +9,8 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Collection;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,16 +27,16 @@ import de.gurkenlabs.litiengine.util.MathUtilities;
 public class Mouse implements IMouse, IUpdateable {
   private static final Logger log = Logger.getLogger(Mouse.class.getName());
 
-  private final List<MouseClickedListener> mouseClickedListeners = new CopyOnWriteArrayList<>();
-  private final List<MouseDraggedListener> mouseDraggedListeners = new CopyOnWriteArrayList<>();
-  private final List<MouseMovedListener> mouseMovedListeners = new CopyOnWriteArrayList<>();
-  private final List<MousePressedListener> mousePressedListeners = new CopyOnWriteArrayList<>();
-  private final List<MousePressingListener> mousePressingListeners = new CopyOnWriteArrayList<>();
-  private final List<MouseReleasedListener> mouseReleasedListeners = new CopyOnWriteArrayList<>();
+  private final Collection<MouseClickedListener> mouseClickedListeners = ConcurrentHashMap.newKeySet();
+  private final Collection<MouseDraggedListener> mouseDraggedListeners = ConcurrentHashMap.newKeySet();
+  private final Collection<MouseMovedListener> mouseMovedListeners = ConcurrentHashMap.newKeySet();
+  private final Collection<MousePressedListener> mousePressedListeners = ConcurrentHashMap.newKeySet();
+  private final Collection<MousePressingListener> mousePressingListeners = ConcurrentHashMap.newKeySet();
+  private final Collection<MouseReleasedListener> mouseReleasedListeners = ConcurrentHashMap.newKeySet();
   
-  private final List<MouseListener> mouseListeners = new CopyOnWriteArrayList<>();
-  private final List<MouseMotionListener> mouseMotionListeners = new CopyOnWriteArrayList<>();
-  private final List<MouseWheelListener> mouseWheelListeners = new CopyOnWriteArrayList<>();
+  private final Collection<MouseListener> mouseListeners = ConcurrentHashMap.newKeySet();
+  private final Collection<MouseMotionListener> mouseMotionListeners = ConcurrentHashMap.newKeySet();
+  private final Collection<MouseWheelListener> mouseWheelListeners = ConcurrentHashMap.newKeySet();
 
   private final Robot robot;
 
