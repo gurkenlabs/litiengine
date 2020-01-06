@@ -2,31 +2,28 @@ package de.gurkenlabs.litiengine.input;
 
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
-import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.IUpdateable;
 
-public class Keyboard implements KeyEventDispatcher, IKeyboard {
+public class Keyboard implements KeyEventDispatcher, IKeyboard, IUpdateable {
   private final Collection<KeyListener> keyListeners = ConcurrentHashMap.newKeySet();
-  private final Map<Integer, Collection<Consumer<KeyEvent>>> keySpecificPressedConsumer = new ConcurrentHashMap<>();
-  private final Map<Integer, Collection<Consumer<KeyEvent>>> keySpecificReleasedConsumer = new ConcurrentHashMap<>();
-  private final Map<Integer, Collection<Consumer<KeyEvent>>> keySpecificTypedConsumer = new ConcurrentHashMap<>();
-  private final Collection<Consumer<KeyEvent>> keyPressedConsumer = ConcurrentHashMap.newKeySet();
-  private final Collection<Consumer<KeyEvent>> keyReleasedConsumer = ConcurrentHashMap.newKeySet();
-  private final Collection<Consumer<KeyEvent>> keyTypedConsumer = ConcurrentHashMap.newKeySet();
+  private final Map<Integer, Collection<KeyPressedListener>> keySpecificPressedListener = new ConcurrentHashMap<>();
+  private final Map<Integer, Collection<KeyReleasedListener>> keySpecificReleasedListener = new ConcurrentHashMap<>();
+  private final Map<Integer, Collection<KeyTypedListener>> keySpecificTypedListener = new ConcurrentHashMap<>();
+  private final Collection<KeyPressedListener> keyPressedListener = ConcurrentHashMap.newKeySet();
+  private final Collection<KeyReleasedListener> keyReleasedListener = ConcurrentHashMap.newKeySet();
+  private final Collection<KeyTypedListener> keyTypedListener = ConcurrentHashMap.newKeySet();
 
-  private final List<KeyEvent> pressedKeys = new CopyOnWriteArrayList<>();
-  private final List<KeyEvent> releasedKeys = new CopyOnWriteArrayList<>();
-  private final List<KeyEvent> typedKeys = new CopyOnWriteArrayList<>();
+  private final Collection<KeyEvent> pressedKeys = ConcurrentHashMap.newKeySet();
+  private final Collection<KeyEvent> releasedKeys = ConcurrentHashMap.newKeySet();
+  private final Collection<KeyEvent> typedKeys = ConcurrentHashMap.newKeySet();
 
   private boolean consumeAlt;
 
@@ -90,45 +87,87 @@ public class Keyboard implements KeyEventDispatcher, IKeyboard {
   }
 
   @Override
-  public void onKeyPressed(final int keyCode, final Consumer<KeyEvent> consumer) {
-    this.keySpecificPressedConsumer.computeIfAbsent(keyCode, ConcurrentHashMap::newKeySet).add(consumer);
+  public void onKeyPressed(final int keyCode, final KeyPressedListener listener) {
+    this.keySpecificPressedListener.computeIfAbsent(keyCode, ConcurrentHashMap::newKeySet).add(listener);
   }
 
   @Override
-  public void onKeyReleased(final int keyCode, final Consumer<KeyEvent> consumer) {
-    this.keySpecificReleasedConsumer.computeIfAbsent(keyCode, ConcurrentHashMap::newKeySet).add(consumer);
+  public void removeKeyPressedListener(int keyCode, KeyPressedListener listener) {
+    if (!this.keySpecificPressedListener.containsKey(keyCode)) {
+      return;
+    }
+
+    this.keySpecificPressedListener.get(keyCode).remove(listener);
   }
 
   @Override
-  public void onKeyTyped(final int keyCode, final Consumer<KeyEvent> consumer) {
-    this.keySpecificTypedConsumer.computeIfAbsent(keyCode, ConcurrentHashMap::newKeySet).add(consumer);
+  public void onKeyReleased(final int keyCode, final KeyReleasedListener listener) {
+    this.keySpecificReleasedListener.computeIfAbsent(keyCode, ConcurrentHashMap::newKeySet).add(listener);
   }
 
   @Override
-  public void onKeyPressed(Consumer<KeyEvent> consumer) {
-    this.keyPressedConsumer.add(consumer);
+  public void removeKeyReleasedListener(int keyCode, KeyReleasedListener listener) {
+    if (!this.keySpecificReleasedListener.containsKey(keyCode)) {
+      return;
+    }
+
+    this.keySpecificReleasedListener.get(keyCode).remove(listener);
   }
 
   @Override
-  public void onKeyReleased(Consumer<KeyEvent> consumer) {
-    this.keyReleasedConsumer.add(consumer);
+  public void onKeyTyped(final int keyCode, final KeyTypedListener listener) {
+    this.keySpecificTypedListener.computeIfAbsent(keyCode, ConcurrentHashMap::newKeySet).add(listener);
   }
 
   @Override
-  public void onKeyTyped(Consumer<KeyEvent> consumer) {
-    this.keyTypedConsumer.add(consumer);
+  public void removeKeyTypedListener(int keyCode, KeyTypedListener listener) {
+    if (!this.keySpecificTypedListener.containsKey(keyCode)) {
+      return;
+    }
+
+    this.keySpecificTypedListener.get(keyCode).remove(listener);
   }
 
   @Override
-  public void clearEventConsumers() {
-    this.keyPressedConsumer.clear();
-    this.keySpecificPressedConsumer.clear();
-    
-    this.keyReleasedConsumer.clear();
-    this.keySpecificReleasedConsumer.clear();
-    
-    this.keyTypedConsumer.clear();
-    this.keySpecificTypedConsumer.clear();
+  public void onKeyPressed(KeyPressedListener listener) {
+    this.keyPressedListener.add(listener);
+  }
+
+  @Override
+  public void removeKeyPressedListener(KeyPressedListener listener) {
+    this.keyPressedListener.remove(listener);
+  }
+
+  @Override
+  public void onKeyReleased(KeyReleasedListener listener) {
+    this.keyReleasedListener.add(listener);
+  }
+
+  @Override
+  public void removeKeyReleasedListener(KeyReleasedListener listener) {
+    this.keyReleasedListener.remove(listener);
+  }
+
+  @Override
+  public void onKeyTyped(KeyTypedListener listener) {
+    this.keyTypedListener.add(listener);
+  }
+
+  @Override
+  public void removeKeyTypedListener(KeyTypedListener listener) {
+    this.keyTypedListener.remove(listener);
+  }
+
+  @Override
+  public void clearExplicitListeners() {
+    this.keyPressedListener.clear();
+    this.keySpecificPressedListener.clear();
+
+    this.keyReleasedListener.clear();
+    this.keySpecificReleasedListener.clear();
+
+    this.keyTypedListener.clear();
+    this.keySpecificTypedListener.clear();
   }
 
   @Override
@@ -200,9 +239,9 @@ public class Keyboard implements KeyEventDispatcher, IKeyboard {
   private void executePressedKeys() {
     // called at the rate of the updaterate
     this.pressedKeys.forEach(key -> {
-      this.keySpecificPressedConsumer.getOrDefault(key.getKeyCode(), Collections.emptySet()).forEach(consumer -> consumer.accept(key));
+      this.keySpecificPressedListener.getOrDefault(key.getKeyCode(), Collections.emptySet()).forEach(listener -> listener.keyPressed(key));
 
-      this.keyPressedConsumer.forEach(consumer -> consumer.accept(key));
+      this.keyPressedListener.forEach(listener -> listener.keyPressed(key));
       this.keyListeners.forEach(listener -> listener.keyPressed(key));
     });
   }
@@ -212,9 +251,9 @@ public class Keyboard implements KeyEventDispatcher, IKeyboard {
    */
   private void executeReleasedKeys() {
     this.releasedKeys.forEach(key -> {
-      this.keySpecificReleasedConsumer.getOrDefault(key.getKeyCode(), Collections.emptySet()).forEach(consumer -> consumer.accept(key));
+      this.keySpecificReleasedListener.getOrDefault(key.getKeyCode(), Collections.emptySet()).forEach(listener -> listener.keyReleased(key));
 
-      this.keyReleasedConsumer.forEach(consumer -> consumer.accept(key));
+      this.keyReleasedListener.forEach(listener -> listener.keyReleased(key));
       this.keyListeners.forEach(listener -> listener.keyReleased(key));
     });
 
@@ -226,9 +265,9 @@ public class Keyboard implements KeyEventDispatcher, IKeyboard {
    */
   private void executeTypedKeys() {
     this.typedKeys.forEach(key -> {
-      this.keySpecificTypedConsumer.getOrDefault(key.getKeyCode(), Collections.emptySet()).forEach(consumer -> consumer.accept(key));
+      this.keySpecificTypedListener.getOrDefault(key.getKeyCode(), Collections.emptySet()).forEach(listener -> listener.keyTyped(key));
 
-      this.keyTypedConsumer.forEach(consumer -> consumer.accept(key));
+      this.keyTypedListener.forEach(listener -> listener.keyTyped(key));
       this.keyListeners.forEach(listener -> listener.keyTyped(key));
     });
 
@@ -251,8 +290,8 @@ public class Keyboard implements KeyEventDispatcher, IKeyboard {
   }
 
   private static String getNormalText(KeyEvent e) {
-    if (e.getExtendedKeyCode() == KeyEvent.getExtendedKeyCodeForChar('ÃŸ')) {
-      return "ÃŸ";
+    if (e.getExtendedKeyCode() == KeyEvent.getExtendedKeyCodeForChar('ß')) {
+      return "ß";
     }
 
     switch (e.getKeyCode()) {
@@ -305,16 +344,16 @@ public class Keyboard implements KeyEventDispatcher, IKeyboard {
   }
 
   private static String getAltText(KeyEvent e) {
-    if (e.getExtendedKeyCode() == KeyEvent.getExtendedKeyCodeForChar('ÃŸ')) {
+    if (e.getExtendedKeyCode() == KeyEvent.getExtendedKeyCodeForChar('ß')) {
       return "\\";
     }
     switch (e.getKeyCode()) {
     case KeyEvent.VK_0:
       return "}";
     case KeyEvent.VK_2:
-      return "Â²";
+      return "²";
     case KeyEvent.VK_3:
-      return "Â³";
+      return "³";
     case KeyEvent.VK_7:
       return "{";
     case KeyEvent.VK_8:
@@ -322,11 +361,11 @@ public class Keyboard implements KeyEventDispatcher, IKeyboard {
     case KeyEvent.VK_9:
       return "]";
     case KeyEvent.VK_E:
-      return "â‚¬";
+      return "€";
     case KeyEvent.VK_Q:
       return "@";
     case KeyEvent.VK_M:
-      return "Âµ";
+      return "µ";
     case KeyEvent.VK_PLUS:
       return "~";
     default:
@@ -335,7 +374,7 @@ public class Keyboard implements KeyEventDispatcher, IKeyboard {
   }
 
   private static String getShiftText(KeyEvent e) {
-    if (e.getExtendedKeyCode() == KeyEvent.getExtendedKeyCodeForChar('ÃŸ')) {
+    if (e.getExtendedKeyCode() == KeyEvent.getExtendedKeyCodeForChar('ß')) {
       return "?";
     }
 
@@ -347,7 +386,7 @@ public class Keyboard implements KeyEventDispatcher, IKeyboard {
     case KeyEvent.VK_2:
       return "\"";
     case KeyEvent.VK_3:
-      return "Â§";
+      return "§";
     case KeyEvent.VK_4:
       return "$";
     case KeyEvent.VK_5:
