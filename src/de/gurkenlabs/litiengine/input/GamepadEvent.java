@@ -31,14 +31,28 @@ public class GamepadEvent extends EventObject {
     this.analog = false;
   }
 
+  /**
+   * Gets the data from the last time the component has been polled.
+   * If this axis is a button, the value returned will be either 0.0f or 1.0f.
+   * If this axis is normalized, the value returned will be between -1.0f and
+   * 1.0f.
+   */
   public float getValue() {
     return this.value;
   }
 
+  /**
+   * Gets the identifier of the component that caused this event.
+   * 
+   * @return The human-readable name of the component.
+   */
   public String getComponent() {
     return this.component;
   }
 
+  /**
+   * Gets the gamepad that caused the event.
+   */
   public Gamepad getGamepad() {
     return this.gamepad;
   }

@@ -142,12 +142,8 @@ public class GamepadManager implements ILaunchable, GamepadEvents {
   }
 
   @Override
-  public void onPoll(GamepadPollListener consumer) {
-    if (this.pollListeners.contains(consumer)) {
-      return;
-    }
-
-    this.pollListeners.add(consumer);
+  public void removePollListener(String identifier, GamepadPollListener listener) {
+    removeComponentListener(this.componentPollListeners, identifier, listener);
   }
 
   @Override
@@ -156,12 +152,8 @@ public class GamepadManager implements ILaunchable, GamepadEvents {
   }
 
   @Override
-  public void onPressed(GamepadPressedListener listener) {
-    if (this.pressedListeners.contains(listener)) {
-      return;
-    }
-
-    this.pressedListeners.add(listener);
+  public void removePressedListener(String identifier, GamepadPressedListener listener) {
+    removeComponentListener(this.componentPressedListeners, identifier, listener);
   }
 
   @Override
@@ -170,35 +162,49 @@ public class GamepadManager implements ILaunchable, GamepadEvents {
   }
 
   @Override
-  public void onReleased(GamepadReleasedListener listener) {
-    if (this.releasedListeners.contains(listener)) {
-      return;
-    }
+  public void removeReleasedListener(String identifier, GamepadReleasedListener listener) {
+    removeComponentListener(this.componentReleasedListeners, identifier, listener);
+  }
 
+  @Override
+  public void onPoll(GamepadPollListener listener) {
+    this.pollListeners.add(listener);
+  }
+
+  @Override
+  public void removePollListener(GamepadPollListener listener) {
+    this.pollListeners.remove(listener);
+  }
+
+  @Override
+  public void onPressed(GamepadPressedListener listener) {
+    this.pressedListeners.add(listener);
+  }
+
+  @Override
+  public void removePressedListener(GamepadPressedListener listener) {
+    this.pressedListeners.remove(listener);
+  }
+
+  @Override
+  public void onReleased(GamepadReleasedListener listener) {
     this.releasedListeners.add(listener);
   }
 
   @Override
-  public void clearEventConsumers() {
-    this.releasedListeners.clear();
-    this.componentReleasedListeners.clear();
-
-    this.pressedListeners.clear();
-    this.componentPressedListeners.clear();
-
-    this.pollListeners.clear();
-    this.componentPollListeners.clear();
+  public void removeReleasedListener(GamepadReleasedListener listener) {
+    this.releasedListeners.remove(listener);
   }
 
-  protected void remove(final Gamepad gamepad) {
-    if (gamepad == null) {
-      return;
-    }
+  @Override
+  public void clearEventListeners() {
+    this.componentPollListeners.clear();
+    this.componentPressedListeners.clear();
+    this.componentReleasedListeners.clear();
 
-    this.getAll().remove(gamepad);
-    for (final Consumer<Gamepad> cons : this.gamepadRemovedConsumer) {
-      cons.accept(gamepad);
-    }
+    this.pollListeners.clear();
+    this.pressedListeners.clear();
+    this.releasedListeners.clear();
   }
 
   @Override
@@ -221,12 +227,36 @@ public class GamepadManager implements ILaunchable, GamepadEvents {
     this.hotPlugThread.interrupt();
   }
 
+  @Override
+  public boolean isPressed(String gamepadComponent) {
+    return this.current() != null && this.current().isPressed(gamepadComponent);
+  }
+
   static <T> void addComponentListener(Map<String, Collection<T>> consumerList, String identifier, T consumer) {
     if (!consumerList.containsKey(identifier)) {
       consumerList.put(identifier, new ArrayList<>());
     }
 
     consumerList.get(identifier).add(consumer);
+  }
+
+  static <T> void removeComponentListener(Map<String, Collection<T>> consumerList, String identifier, T consumer) {
+    if (!consumerList.containsKey(identifier)) {
+      return;
+    }
+
+    consumerList.get(identifier).remove(consumer);
+  }
+
+  void remove(final Gamepad gamepad) {
+    if (gamepad == null) {
+      return;
+    }
+
+    this.getAll().remove(gamepad);
+    for (final Consumer<Gamepad> cons : this.gamepadRemovedConsumer) {
+      cons.accept(gamepad);
+    }
   }
 
   /**
@@ -329,10 +359,5 @@ public class GamepadManager implements ILaunchable, GamepadEvents {
     } finally {
       this.handleHotPluggedControllers = false;
     }
-  }
-
-  @Override
-  public boolean isPressed(String gamepadComponent) {
-    return this.current() != null && this.current().isPressed(gamepadComponent);
   }
 }

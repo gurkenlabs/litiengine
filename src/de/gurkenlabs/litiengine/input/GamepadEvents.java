@@ -4,22 +4,34 @@ import java.util.EventListener;
 
 public interface GamepadEvents {
 
-  public void onPoll(String identifier, GamepadPollListener consumer);
+  public void onPoll(String identifier, GamepadPollListener listener);
 
-  public void onPoll(GamepadPollListener consumer);
+  public void removePollListener(String identifier, GamepadPollListener listener);
 
-  public void onPressed(String identifier, GamepadPressedListener consumer);
+  public void onPressed(String identifier, GamepadPressedListener listener);
 
-  public void onPressed(GamepadPressedListener consumer);
+  public void removePressedListener(String identifier, GamepadPressedListener listener);
 
-  public void onReleased(String identifier, GamepadReleasedListener consumer);
+  public void onReleased(String identifier, GamepadReleasedListener listener);
 
-  public void onReleased(GamepadReleasedListener consumer);
+  public void removeReleasedListener(String identifier, GamepadReleasedListener listener);
+
+  public void onPoll(GamepadPollListener listener);
+
+  public void removePollListener(GamepadPollListener listener);
+
+  public void onPressed(GamepadPressedListener listener);
+
+  public void removePressedListener(GamepadPressedListener listener);
+
+  public void onReleased(GamepadReleasedListener listener);
+
+  public void removeReleasedListener(GamepadReleasedListener listener);
 
   /**
-   * Removes all registered event consumers from the Gamepad instance.
+   * Removes all registered event listeners from the Gamepad instance.
    */
-  public void clearEventConsumers();
+  public void clearEventListeners();
 
   /**
    * Determines whether the specified Gamepad component is currently pressed.
@@ -38,12 +50,12 @@ public interface GamepadEvents {
   public interface GamepadPollListener extends EventListener {
     void polled(GamepadEvent event);
   }
-  
+
   @FunctionalInterface
   public interface GamepadPressedListener extends EventListener {
     void pressed(GamepadEvent event);
   }
-  
+
   @FunctionalInterface
   public interface GamepadReleasedListener extends EventListener {
     void released(GamepadEvent event);

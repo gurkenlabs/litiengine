@@ -77,12 +77,8 @@ public class Gamepad implements GamepadEvents, IUpdateable {
   }
 
   @Override
-  public void onPoll(GamepadPollListener consumer) {
-    if (this.pollListeners.contains(consumer)) {
-      return;
-    }
-
-    this.pollListeners.add(consumer);
+  public void removePollListener(String identifier, GamepadPollListener listener) {
+    GamepadManager.removeComponentListener(this.componentPollListeners, identifier, listener);
   }
 
   @Override
@@ -91,12 +87,8 @@ public class Gamepad implements GamepadEvents, IUpdateable {
   }
 
   @Override
-  public void onPressed(GamepadPressedListener listener) {
-    if (this.pressedListeners.contains(listener)) {
-      return;
-    }
-
-    this.pressedListeners.add(listener);
+  public void removePressedListener(String identifier, GamepadPressedListener listener) {
+    GamepadManager.removeComponentListener(this.componentPressedListeners, identifier, listener);
   }
 
   @Override
@@ -105,16 +97,42 @@ public class Gamepad implements GamepadEvents, IUpdateable {
   }
 
   @Override
-  public void onReleased(GamepadReleasedListener listener) {
-    if (this.releasedListeners.contains(listener)) {
-      return;
-    }
+  public void removeReleasedListener(String identifier, GamepadReleasedListener listener) {
+    GamepadManager.removeComponentListener(this.componentReleasedListeners, identifier, listener);
+  }
 
+  @Override
+  public void onPoll(GamepadPollListener listener) {
+    this.pollListeners.add(listener);
+  }
+
+  @Override
+  public void removePollListener(GamepadPollListener listener) {
+    this.pollListeners.remove(listener);
+  }
+
+  @Override
+  public void onPressed(GamepadPressedListener listener) {
+    this.pressedListeners.add(listener);
+  }
+
+  @Override
+  public void removePressedListener(GamepadPressedListener listener) {
+    this.pressedListeners.remove(listener);
+  }
+
+  @Override
+  public void onReleased(GamepadReleasedListener listener) {
     this.releasedListeners.add(listener);
   }
 
   @Override
-  public void clearEventConsumers() {
+  public void removeReleasedListener(GamepadReleasedListener listener) {
+    this.releasedListeners.remove(listener);
+  }
+
+  @Override
+  public void clearEventListeners() {
     this.releasedListeners.clear();
     this.componentReleasedListeners.clear();
 
