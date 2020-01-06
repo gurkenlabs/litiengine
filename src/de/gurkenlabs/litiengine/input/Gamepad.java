@@ -1,10 +1,9 @@
 package de.gurkenlabs.litiengine.input;
 
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -22,15 +21,15 @@ public class Gamepad implements GamepadEvents, IUpdateable {
 
   private final int index;
 
-  private final Map<String, List<Consumer<Float>>> componentPollConsumer;
-  private final Map<String, List<Consumer<Float>>> componentPressedConsumer;
-  private final Map<String, List<Consumer<Float>>> componentReleasedConsumer;
+  private final Map<String, Collection<Consumer<Float>>> componentPollConsumer;
+  private final Map<String, Collection<Consumer<Float>>> componentPressedConsumer;
+  private final Map<String, Collection<Consumer<Float>>> componentReleasedConsumer;
 
-  private final List<BiConsumer<String, Float>> pollConsumer;
-  private final List<BiConsumer<String, Float>> pressedConsumer;
-  private final List<BiConsumer<String, Float>> releasedConsumer;
+  private final Collection<BiConsumer<String, Float>> pollConsumer;
+  private final Collection<BiConsumer<String, Float>> pressedConsumer;
+  private final Collection<BiConsumer<String, Float>> releasedConsumer;
 
-  private final List<String> pressedComponents;
+  private final Collection<String> pressedComponents;
 
   private float axisDeadzone = Game.config().input().getGamepadAxisDeadzone();
   private float triggerDeadzone = Game.config().input().getGamepadTriggerDeadzone();
@@ -39,11 +38,11 @@ public class Gamepad implements GamepadEvents, IUpdateable {
     this.componentPollConsumer = new ConcurrentHashMap<>();
     this.componentPressedConsumer = new ConcurrentHashMap<>();
     this.componentReleasedConsumer = new ConcurrentHashMap<>();
-    this.pollConsumer = new CopyOnWriteArrayList<>();
-    this.pressedConsumer = new CopyOnWriteArrayList<>();
-    this.releasedConsumer = new CopyOnWriteArrayList<>();
+    this.pollConsumer = ConcurrentHashMap.newKeySet();
+    this.pressedConsumer = ConcurrentHashMap.newKeySet();
+    this.releasedConsumer = ConcurrentHashMap.newKeySet();
 
-    this.pressedComponents = new CopyOnWriteArrayList<>();
+    this.pressedComponents = ConcurrentHashMap.newKeySet();
 
     this.index = index;
     this.controller = controller;
@@ -229,7 +228,7 @@ public class Gamepad implements GamepadEvents, IUpdateable {
       cons.accept(event.getComponent().getIdentifier().getName(), event.getValue());
     }
 
-    final List<Consumer<Float>> consumers = this.componentPollConsumer.get(event.getComponent().getIdentifier().getName());
+    final Collection<Consumer<Float>> consumers = this.componentPollConsumer.get(event.getComponent().getIdentifier().getName());
     if (consumers != null) {
       for (final Consumer<Float> cons : consumers) {
         cons.accept(event.getValue());
@@ -249,7 +248,7 @@ public class Gamepad implements GamepadEvents, IUpdateable {
       cons.accept(name, comp.getPollData());
     }
 
-    final List<Consumer<Float>> consumers = this.componentReleasedConsumer.get(comp.getIdentifier().getName());
+    final Collection<Consumer<Float>> consumers = this.componentReleasedConsumer.get(comp.getIdentifier().getName());
     if (consumers != null) {
       for (final Consumer<Float> cons : consumers) {
         cons.accept(comp.getPollData());

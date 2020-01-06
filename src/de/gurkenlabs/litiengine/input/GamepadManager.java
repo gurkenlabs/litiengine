@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine.input;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -23,15 +24,15 @@ import net.java.games.input.ControllerEnvironment;
 public class GamepadManager implements ILaunchable, GamepadEvents {
   private static final Logger log = Logger.getLogger(GamepadManager.class.getName());
 
-  private final List<Consumer<Gamepad>> gamepadAddedConsumer;
-  private final List<Consumer<Gamepad>> gamepadRemovedConsumer;
+  private final Collection<Consumer<Gamepad>> gamepadAddedConsumer;
+  private final Collection<Consumer<Gamepad>> gamepadRemovedConsumer;
 
-  private final Map<String, List<Consumer<Float>>> componentPollConsumer;
-  private final Map<String, List<Consumer<Float>>> componentPressedConsumer;
-  private final Map<String, List<Consumer<Float>>> componentReleasedConsumer;
-  private final List<BiConsumer<String, Float>> pollConsumer;
-  private final List<BiConsumer<String, Float>> pressedConsumer;
-  private final List<BiConsumer<String, Float>> releasedConsumer;
+  private final Map<String, Collection<Consumer<Float>>> componentPollConsumer;
+  private final Map<String, Collection<Consumer<Float>>> componentPressedConsumer;
+  private final Map<String, Collection<Consumer<Float>>> componentReleasedConsumer;
+  private final Collection<BiConsumer<String, Float>> pollConsumer;
+  private final Collection<BiConsumer<String, Float>> pressedConsumer;
+  private final Collection<BiConsumer<String, Float>> releasedConsumer;
 
   private final List<Gamepad> gamePads;
 
@@ -41,14 +42,15 @@ public class GamepadManager implements ILaunchable, GamepadEvents {
   private boolean handleHotPluggedControllers;
 
   public GamepadManager() {
-    this.gamepadRemovedConsumer = new CopyOnWriteArrayList<>();
-    this.gamepadAddedConsumer = new CopyOnWriteArrayList<>();
+    this.gamepadRemovedConsumer = ConcurrentHashMap.newKeySet();
+    this.gamepadAddedConsumer = ConcurrentHashMap.newKeySet();
     this.componentPollConsumer = new ConcurrentHashMap<>();
     this.componentPressedConsumer = new ConcurrentHashMap<>();
     this.componentReleasedConsumer = new ConcurrentHashMap<>();
-    this.pollConsumer = new CopyOnWriteArrayList<>();
-    this.pressedConsumer = new CopyOnWriteArrayList<>();
-    this.releasedConsumer = new CopyOnWriteArrayList<>();
+    this.pollConsumer = ConcurrentHashMap.newKeySet();
+    this.pressedConsumer = ConcurrentHashMap.newKeySet();
+    this.releasedConsumer = ConcurrentHashMap.newKeySet();
+
     this.gamePads = new CopyOnWriteArrayList<>();
 
     this.hotPlugThread = new Thread(() -> {
@@ -220,7 +222,7 @@ public class GamepadManager implements ILaunchable, GamepadEvents {
     this.hotPlugThread.interrupt();
   }
 
-  protected static void addComponentConsumer(Map<String, List<Consumer<Float>>> consumerList, String identifier, Consumer<Float> consumer) {
+  protected static void addComponentConsumer(Map<String, Collection<Consumer<Float>>> consumerList, String identifier, Consumer<Float> consumer) {
     if (!consumerList.containsKey(identifier)) {
       consumerList.put(identifier, new ArrayList<>());
     }
@@ -267,19 +269,19 @@ public class GamepadManager implements ILaunchable, GamepadEvents {
   }
 
   private void hookupToGamepad(final Gamepad pad) {
-    for (final Map.Entry<String, List<Consumer<Float>>> entry : this.componentPollConsumer.entrySet()) {
+    for (final Map.Entry<String, Collection<Consumer<Float>>> entry : this.componentPollConsumer.entrySet()) {
       for (final Consumer<Float> cons : entry.getValue()) {
         pad.onPoll(entry.getKey(), cons);
       }
     }
 
-    for (final Map.Entry<String, List<Consumer<Float>>> entry : this.componentPressedConsumer.entrySet()) {
+    for (final Map.Entry<String, Collection<Consumer<Float>>> entry : this.componentPressedConsumer.entrySet()) {
       for (final Consumer<Float> cons : entry.getValue()) {
         pad.onPressed(entry.getKey(), cons);
       }
     }
 
-    for (final Map.Entry<String, List<Consumer<Float>>> entry : this.componentReleasedConsumer.entrySet()) {
+    for (final Map.Entry<String, Collection<Consumer<Float>>> entry : this.componentReleasedConsumer.entrySet()) {
       for (final Consumer<Float> cons : entry.getValue()) {
         pad.onReleased(entry.getKey(), cons);
       }
