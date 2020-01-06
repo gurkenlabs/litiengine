@@ -146,8 +146,8 @@ public class TextFieldComponent extends ImageComponent {
       return;
     }
 
-    final String text = Input.keyboard().getText(event);
-    if (text == null || text.isEmpty()) {
+    final char text = event.getKeyChar();
+    if (text == KeyEvent.CHAR_UNDEFINED) {
       return;
     }
 

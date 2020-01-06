@@ -8,7 +8,6 @@ public interface IKeyboard {
 
   public void consumeAlt(boolean consume);
 
-  public String getText(KeyEvent e);
   public boolean isPressed(int keyCode);
 
   public void onKeyPressed(int keyCode, KeyPressedListener consumer);
