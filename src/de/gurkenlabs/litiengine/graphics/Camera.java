@@ -3,12 +3,10 @@ package de.gurkenlabs.litiengine.graphics;
 import java.awt.Dimension;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.List;
+import java.util.Collection;
 import java.util.Objects;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Consumer;
-import java.util.function.DoubleConsumer;
 
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Game;
@@ -18,8 +16,8 @@ import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 
 public class Camera implements ICamera {
-  private final List<DoubleConsumer> zoomChangedConsumer = new CopyOnWriteArrayList<>();
-  private final List<Consumer<Point2D>> focusChangedConsumer = new CopyOnWriteArrayList<>();
+  private final Collection<ZoomChangedListener> zoomListeners = ConcurrentHashMap.newKeySet();
+  private final Collection<FocusChangedListener> focusChangedListeners = ConcurrentHashMap.newKeySet();
   /**
    * Provides the center location for the viewport.
    */
@@ -131,13 +129,23 @@ public class Camera implements ICamera {
   }
 
   @Override
-  public void onZoomChanged(final DoubleConsumer zoomCons) {
-    this.zoomChangedConsumer.add(zoomCons);
+  public void onZoom(final ZoomChangedListener listener) {
+    this.zoomListeners.add(listener);
   }
 
   @Override
-  public void onFocusChanged(Consumer<Point2D> focusCons) {
-    this.focusChangedConsumer.add(focusCons);
+  public void removeZoomListener(ZoomChangedListener listener) {
+    this.zoomListeners.remove(listener);
+  }
+
+  @Override
+  public void onFocus(final FocusChangedListener listener) {
+    this.focusChangedListeners.add(listener);
+  }
+
+  @Override
+  public void removeFocusListener(FocusChangedListener listener) {
+    this.focusChangedListeners.remove(listener);
   }
 
   @Override
@@ -158,8 +166,9 @@ public class Camera implements ICamera {
       this.focus.setLocation(this.focus.getX(), this.focus.getY() + Math.ulp((float) this.focus.getY()));
     }
 
-    for (Consumer<Point2D> consumer : this.focusChangedConsumer) {
-      consumer.accept(this.focus);
+    final FocusChangedEvent event = new FocusChangedEvent(this, this.focus);
+    for (FocusChangedListener listener : this.focusChangedListeners) {
+      listener.focusChanged(event);
     }
   }
 
@@ -171,8 +180,9 @@ public class Camera implements ICamera {
   @Override
   public void setZoom(final float targetZoom, final int delay) {
     if (delay == 0) {
-      for (final DoubleConsumer cons : this.zoomChangedConsumer) {
-        cons.accept(targetZoom);
+      final ZoomChangedEvent event = new ZoomChangedEvent(this, targetZoom);
+      for (final ZoomChangedListener listener : this.zoomListeners) {
+        listener.zoomChanged(event);
       }
 
       this.zoom = targetZoom;
@@ -208,21 +218,18 @@ public class Camera implements ICamera {
 
     if (this.targetZoom > 0) {
       if (Game.time().since(this.zoomTick) >= this.zoomDelay) {
-        for (final DoubleConsumer cons : this.zoomChangedConsumer) {
-          cons.accept(this.zoom);
-        }
-
         this.zoom = this.targetZoom;
         this.targetZoom = 0;
         this.zoomDelay = 0;
         this.zoomTick = 0;
         this.zoomStep = 0;
       } else {
-
         this.zoom += this.zoomStep;
-        for (final DoubleConsumer cons : this.zoomChangedConsumer) {
-          cons.accept(this.zoom);
-        }
+      }
+
+      final ZoomChangedEvent event = new ZoomChangedEvent(this, this.getZoom());
+      for (final ZoomChangedListener listener : this.zoomListeners) {
+        listener.zoomChanged(event);
       }
     }
 
@@ -230,10 +237,6 @@ public class Camera implements ICamera {
       if (--this.panTime <= 0) {
         this.setFocus(this.targetFocus);
         this.targetFocus = null;
-
-        for (Consumer<Point2D> cons : this.focusChangedConsumer) {
-          cons.accept(focus);
-        }
       } else {
         double diff = this.panTime / (this.panTime + 1.0);
         this.focus = new Point2D.Double(this.focus.getX() * diff + this.targetFocus.getX() * (1.0 - diff),
@@ -272,7 +275,7 @@ public class Camera implements ICamera {
   public void setClampToMap(final boolean clampToMap) {
     this.clampToMap = clampToMap;
   }
-  
+
   @Override
   public void setClampAlign(Align align, Valign valign) {
     Objects.requireNonNull(align);

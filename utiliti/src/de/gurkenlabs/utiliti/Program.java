@@ -25,7 +25,7 @@ public class Program {
     Game.config().add(Editor.preferences());
     Game.init(args);
     forceBasicEditorConfiguration();
-    Game.world().camera().onZoomChanged(zoom -> Editor.preferences().setZoom((float) zoom));
+    Game.world().camera().onZoom(event -> Editor.preferences().setZoom((float) event.getZoom()));
 
     // the editor should never crash, even if an exception occurs
     Game.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(false));
