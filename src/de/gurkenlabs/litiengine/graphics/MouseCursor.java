@@ -1,14 +1,21 @@
 package de.gurkenlabs.litiengine.graphics;
 
+import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 
 import de.gurkenlabs.litiengine.Align;
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.input.Mouse;
+import de.gurkenlabs.litiengine.util.Imaging;
 
 /**
  * The visual representation of the <code>Mouse</code> in the LITIengine.<br>
@@ -17,12 +24,31 @@ import de.gurkenlabs.litiengine.input.Mouse;
  * @see Mouse
  */
 public final class MouseCursor implements IRenderable {
+
+  private static final Cursor DEFAULT_CURSOR = new Cursor(Cursor.DEFAULT_CURSOR);
+  private static final Cursor BLANK_CURSOR;
+  private static final Image DEBUG_CURSOR_IMAGE;
+
   private Image image;
   private AffineTransform transform;
   private int offsetX;
   private int offsetY;
 
   private boolean visible;
+  static {
+    final BufferedImage cursorImg = Imaging.getCompatibleImage(16, 16);
+    BLANK_CURSOR = Toolkit.getDefaultToolkit().createCustomCursor(cursorImg, new Point(0, 0), "blank cursor");
+
+    final BufferedImage debugCursorImg = Imaging.getCompatibleImage(16, 16);
+    Graphics2D g = debugCursorImg.createGraphics();
+    g.setColor(Color.RED);
+    g.drawLine(0, 0, 16, 16);
+    g.drawLine(0, 0, 16, 0);
+    g.drawLine(0, 0, 0, 16);
+    g.dispose();
+
+    DEBUG_CURSOR_IMAGE = debugCursorImg;
+  }
 
   public MouseCursor() {
     this.visible = true;
@@ -33,6 +59,10 @@ public final class MouseCursor implements IRenderable {
     if (this.isVisible()) {
       final Point2D locationWithOffset = new Point2D.Double(Input.mouse().getLocation().getX() + this.getOffsetX(), Input.mouse().getLocation().getY() + this.getOffsetY());
       ImageRenderer.renderTransformed(g, this.getImage(), locationWithOffset, this.getTransform());
+    }
+
+    if (Game.config().debug().isRenderDebugMouse()) {
+      ImageRenderer.render(g, DEBUG_CURSOR_IMAGE, Input.mouse().getLocation());
     }
   }
 
@@ -69,6 +99,15 @@ public final class MouseCursor implements IRenderable {
   public void set(final Image img, final int offsetX, final int offsetY) {
     this.image = img;
     this.setOffset(offsetX, offsetY);
+
+    if (this.getImage() != null) {
+      hideDefaultCursor();
+      return;
+    }
+
+    if (!Input.mouse().isGrabMouse()) {
+      showDefaultCursor();
+    }
   }
 
   public void set(final Image img, Align hAlign, Valign vAlign) {
@@ -94,5 +133,13 @@ public final class MouseCursor implements IRenderable {
 
   public void setVisible(boolean visible) {
     this.visible = visible;
+  }
+
+  public void showDefaultCursor() {
+    Game.window().getRenderComponent().setCursor(DEFAULT_CURSOR);
+  }
+
+  public void hideDefaultCursor() {
+    Game.window().getRenderComponent().setCursor(BLANK_CURSOR);
   }
 }

@@ -9,6 +9,10 @@ import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
 import java.util.EventListener;
 
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.GameWindow;
+import de.gurkenlabs.litiengine.graphics.MouseCursor;
+
 /**
  * The <code>IMouse</code> interface is the engine's API for receiving mouse input events.
  */
@@ -254,8 +258,16 @@ public interface IMouse {
   /**
    * If set to true, the mouse will be locked to the render component of the game.
    * 
+   * <p>
+   * If this is set to true, the default cursor cannot be used anymore and instead a virtual cursor should be set.
+   * </p>
+   * 
    * @param grab
    *          True if the mouse should be grabbed to the game's window, otherwise false.
+   *          
+   * @see MouseCursor#set(java.awt.Image)
+   * @see GameWindow#cursor()
+   * @see Game#window()
    */
   public void setGrabMouse(boolean grab);
 

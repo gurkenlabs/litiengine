@@ -71,7 +71,7 @@ public final class Mouse implements MouseListener, MouseMotionListener, MouseWhe
     this.location = new Point2D.Double(Game.world().camera().getViewport().getCenterX(), Game.world().camera().getViewport().getCenterY());
     this.lastLocation = this.location;
     this.sensitivity = Game.config().input().getMouseSensitivity();
-    this.grabMouse = true;
+    this.grabMouse = false;
 
     Game.inputLoop().attach(this);
   }
@@ -338,6 +338,12 @@ public final class Mouse implements MouseListener, MouseMotionListener, MouseWhe
   @Override
   public void setGrabMouse(final boolean grab) {
     this.grabMouse = grab;
+
+    if (this.isGrabMouse()) {
+      Game.window().cursor().hideDefaultCursor();
+    } else if (!Game.window().cursor().isVisible()) {
+      Game.window().cursor().showDefaultCursor();
+    }
   }
 
   @Override

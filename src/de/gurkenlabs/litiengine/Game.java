@@ -88,7 +88,7 @@ public final class Game {
   private static UpdateLoop inputLoop;
   private static ScreenManager screenManager;
   private static GameWindow gameWindow;
-  
+
   private static GameWorld world = new GameWorld();
 
   private static boolean debug = true;
@@ -270,7 +270,7 @@ public final class Game {
 
   /**
    * Gets the game's window in which the <code>RenderComponent</code> lives.<br>
-   * This class e.g. provides the possibility to set a title, provide an icon or get information about the resolution.
+   * This class e.g. provides the possibility to set a title, provide an icon, get information about the resolution or set a cursor.
    * 
    * @return The window that hosts the game's <code>RenderComponent</code>.
    * 
@@ -278,6 +278,7 @@ public final class Game {
    * @see GameWindow#getResolution()
    * @see GameWindow#setTitle(String)
    * @see GameWindow#setIconImage(java.awt.Image)
+   * @see GameWindow#cursor()
    */
   public static GameWindow window() {
     return gameWindow;

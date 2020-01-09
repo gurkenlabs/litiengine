@@ -2,15 +2,12 @@ package de.gurkenlabs.litiengine.graphics;
 
 import java.awt.Canvas;
 import java.awt.Color;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
-import java.awt.geom.Line2D;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -23,9 +20,7 @@ import java.util.function.IntConsumer;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.gui.screens.Screen;
-import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.resources.ImageFormat;
-import de.gurkenlabs.litiengine.util.Imaging;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.TimeUtilities;
 import de.gurkenlabs.litiengine.util.io.ImageSerializer;
@@ -34,7 +29,6 @@ import de.gurkenlabs.litiengine.util.io.ImageSerializer;
 public class RenderComponent extends Canvas {
   public static final Color DEFAULT_BACKGROUND_COLOR = Color.BLACK;
   public static final Font DEFAULT_FONT = new Font(Font.MONOSPACED, Font.PLAIN, 12);
-  private static final int DEBUG_MOUSE_SIZE = 5;
 
   private final transient List<IntConsumer> fpsChangedConsumer;
   private final transient List<Consumer<Graphics2D>> renderedConsumer;
@@ -60,10 +54,6 @@ public class RenderComponent extends Canvas {
     this.setBackground(DEFAULT_BACKGROUND_COLOR);
     this.setFont(DEFAULT_FONT);
 
-    // hide default cursor
-    final BufferedImage cursorImg = Imaging.getCompatibleImage(16, 16);
-    final Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursorImg, new Point(0, 0), "blank cursor");
-    this.setCursor(blankCursor);
     this.setSize(size);
 
     // canvas will scale when the size of this jframe gets changed
@@ -139,13 +129,6 @@ public class RenderComponent extends Canvas {
         }
 
         Game.window().cursor().render(g);
-
-        if (Game.config().debug().isRenderDebugMouse()) {
-          g.setColor(Color.RED);
-
-          g.draw(new Line2D.Double(Input.mouse().getLocation().getX(), Input.mouse().getLocation().getY() - DEBUG_MOUSE_SIZE, Input.mouse().getLocation().getX(), Input.mouse().getLocation().getY() + DEBUG_MOUSE_SIZE));
-          g.draw(new Line2D.Double(Input.mouse().getLocation().getX() - DEBUG_MOUSE_SIZE, Input.mouse().getLocation().getY(), Input.mouse().getLocation().getX() + DEBUG_MOUSE_SIZE, Input.mouse().getLocation().getY()));
-        }
 
         for (final Consumer<Graphics2D> consumer : this.renderedConsumer) {
           consumer.accept(g);
