@@ -136,10 +136,14 @@ public final class MouseCursor implements IRenderable {
   }
 
   public void showDefaultCursor() {
-    Game.window().getRenderComponent().setCursor(DEFAULT_CURSOR);
+    if (Game.window() != null && Game.window().getRenderComponent() != null) {
+      Game.window().getRenderComponent().setCursor(DEFAULT_CURSOR);
+    }
   }
 
   public void hideDefaultCursor() {
-    Game.window().getRenderComponent().setCursor(BLANK_CURSOR);
+    if (Game.window() != null && Game.window().getRenderComponent() != null) {
+      Game.window().getRenderComponent().setCursor(BLANK_CURSOR);
+    }
   }
 }
