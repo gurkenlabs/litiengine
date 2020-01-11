@@ -5,12 +5,13 @@ import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.EventListener;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.Align;
@@ -37,7 +38,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   public static final int DEFAULT_SPAWNAMOUNT = 1;
   public static final int DEFAULT_MAXPARTICLES = 100;
 
-  private final List<Consumer<Emitter>> finishedConsumer;
+  private final Collection<EmitterFinishedListener> finishedListeners;
   private final CopyOnWriteArrayList<Particle> particles;
   private final List<Color> colors;
 
@@ -65,7 +66,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
 
   public Emitter() {
     this.colors = new ArrayList<>();
-    this.finishedConsumer = new CopyOnWriteArrayList<>();
+    this.finishedListeners = ConcurrentHashMap.newKeySet();
     this.particles = new CopyOnWriteArrayList<>();
     this.renderables = new ConcurrentHashMap<>();
 
@@ -275,8 +276,12 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     return this.stopped;
   }
 
-  public void onFinished(Consumer<Emitter> cons) {
-    this.finishedConsumer.add(cons);
+  public void onFinished(EmitterFinishedListener listener) {
+    this.finishedListeners.add(listener);
+  }
+
+  public void removeFinishedListener(EmitterFinishedListener listener) {
+    this.finishedListeners.remove(listener);
   }
 
   @Override
@@ -369,8 +374,8 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
 
     // clear particles if the effect time to life is reached
     if (this.isFinished()) {
-      for (Consumer<Emitter> cons : this.finishedConsumer) {
-        cons.accept(this);
+      for (EmitterFinishedListener listener : this.finishedListeners) {
+        listener.finished(this);
       }
 
       this.delete();
@@ -501,5 +506,10 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
         particle.render(g, origin);
       }
     }
+  }
+
+  @FunctionalInterface
+  public interface EmitterFinishedListener extends EventListener {
+    void finished(Emitter emitter);
   }
 }
