@@ -1,6 +1,9 @@
 package de.gurkenlabs.litiengine.entities;
 
 import java.awt.geom.Point2D;
+import java.util.Collection;
+import java.util.EventListener;
+import java.util.concurrent.ConcurrentHashMap;
 
 import de.gurkenlabs.litiengine.Direction;
 import de.gurkenlabs.litiengine.Game;
@@ -9,6 +12,16 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 
 public class Spawnpoint extends Entity {
+  private final Collection<EntitySpawnedListener> spawnedListeners = ConcurrentHashMap.newKeySet();
+
+  public void onSpawned(EntitySpawnedListener listener) {
+    this.spawnedListeners.add(listener);
+  }
+
+  public void removeSpawnedListener(EntitySpawnedListener listener) {
+    this.spawnedListeners.remove(listener);
+  }
+
   @TmxProperty(name = MapObjectProperty.SPAWN_DIRECTION)
   private Direction direction;
 
@@ -65,7 +78,7 @@ public class Spawnpoint extends Entity {
     this.spawnType = spawnType;
   }
 
-  public void spawn(IMobileEntity entity) {
+  public void spawn(IEntity entity) {
     entity.setLocation(this.getLocation());
     entity.setAngle(this.getDirection().toAngle());
 
@@ -76,6 +89,16 @@ public class Spawnpoint extends Entity {
 
     if (env != null && env.get(entity.getMapId()) == null) {
       env.add(entity);
+
+      final EntitySpawnedEvent event = new EntitySpawnedEvent(this, entity);
+      for (EntitySpawnedListener listener : this.spawnedListeners) {
+        listener.spawned(event);
+      }
     }
+  }
+
+  @FunctionalInterface
+  public interface EntitySpawnedListener extends EventListener {
+    void spawned(EntitySpawnedEvent event);
   }
 }
