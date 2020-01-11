@@ -1,8 +1,6 @@
 package de.gurkenlabs.litiengine.physics;
 
-import java.awt.geom.Point2D;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import de.gurkenlabs.litiengine.entities.IEntityController;
@@ -67,12 +65,4 @@ public interface IMovementController extends IEntityController {
    *          the conditions that need to apply before moving. If they don't apply, the entity won't be moved.
    */
   public void onMovementCheck(Predicate<IMobileEntity> predicate);
-
-  /**
-   * Calls given logic after the entity has been moved.
-   *
-   * @param cons
-   *          the logic that will be called after the entity has been moved.
-   */
-  public void onMoved(Consumer<Point2D> cons);
 }

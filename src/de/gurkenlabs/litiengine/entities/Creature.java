@@ -1,6 +1,8 @@
 package de.gurkenlabs.litiengine.entities;
 
 import java.awt.geom.Point2D;
+import java.util.Collection;
+import java.util.concurrent.ConcurrentHashMap;
 
 import de.gurkenlabs.litiengine.Direction;
 import de.gurkenlabs.litiengine.Game;
@@ -15,9 +17,13 @@ import de.gurkenlabs.litiengine.physics.MovementController;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
+/**
+ * TODO: Add idle event
+ */
 @MovementInfo
 public class Creature extends CombatEntity implements IMobileEntity {
   private static final int IDLE_DELAY = 100;
+  private final Collection<EntityMovedListener> movedListeners = ConcurrentHashMap.newKeySet();
 
   @TmxProperty(name = MapObjectProperty.MOVEMENT_ACCELERATION)
   private int acceleration;
@@ -38,7 +44,6 @@ public class Creature extends CombatEntity implements IMobileEntity {
   private boolean scaling;
 
   private long lastMoved;
-  private Point2D moveDestination;
 
   public Creature() {
     this(null);
@@ -63,6 +68,23 @@ public class Creature extends CombatEntity implements IMobileEntity {
   }
 
   @Override
+  public void onMoved(EntityMovedListener listener) {
+    this.movedListeners.add(listener);
+  }
+
+  @Override
+  public void removeMovedListener(EntityMovedListener listener) {
+    this.movedListeners.remove(listener);
+  }
+
+  @Override
+  public void fireMovedEvent(EntityMovedEvent event) {
+    for (EntityMovedListener listener : this.movedListeners) {
+      listener.moved(event);
+    }
+  }
+
+  @Override
   public int getAcceleration() {
     return this.acceleration;
   }
@@ -74,11 +96,6 @@ public class Creature extends CombatEntity implements IMobileEntity {
 
   public Direction getFacingDirection() {
     return Direction.fromAngle(this.getAngle());
-  }
-
-  @Override
-  public Point2D getMoveDestination() {
-    return this.moveDestination;
   }
 
   @Override
@@ -150,12 +167,6 @@ public class Creature extends CombatEntity implements IMobileEntity {
     if (Game.hasStarted()) {
       this.lastMoved = Game.time().now();
     }
-  }
-
-  @Override
-  public void setMoveDestination(final Point2D dest) {
-    this.moveDestination = dest;
-    this.setAngle((float) GeometricUtilities.calcRotationAngleInDegrees(this.getLocation(), this.getMoveDestination()));
   }
 
   @Override

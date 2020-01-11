@@ -1,14 +1,30 @@
 package de.gurkenlabs.litiengine.entities;
 
-import java.awt.geom.Point2D;
+import java.util.EventListener;
 
 import de.gurkenlabs.litiengine.attributes.Attribute;
 import de.gurkenlabs.litiengine.physics.IMovementController;
 
-/**
- * The Interface IMobileEntity.
- */
 public interface IMobileEntity extends ICollisionEntity {
+
+  /**
+   * Adds the specified entity moved listener to receive events when this entity was moved.
+   * 
+   * @param listener
+   *          The listener to add.
+   */
+  public void onMoved(EntityMovedListener listener);
+
+  /**
+   * Removes the specified entity moved listener.
+   * 
+   * @param listener
+   *          The listener to remove.
+   */
+  public void removeMovedListener(EntityMovedListener listener);
+
+  void fireMovedEvent(EntityMovedEvent event);
+
   /**
    * Gets a value that defines how long it takes the entity to reach the full
    * velocity (in ms).
@@ -23,13 +39,6 @@ public interface IMobileEntity extends ICollisionEntity {
    * @return the deceleration value
    */
   public int getDeceleration();
-
-  /**
-   * Gets the move destination.
-   *
-   * @return the move destination
-   */
-  public Point2D getMoveDestination();
 
   /**
    * Gets the entity's velocity in PIXELS per Second.
@@ -71,14 +80,6 @@ public interface IMobileEntity extends ICollisionEntity {
   public void setDeceleration(int deceleration);
 
   /**
-   * Sets the point where the entity will be moved to.
-   *
-   * @param dest
-   *          the destination point of the movement.
-   */
-  public void setMoveDestination(Point2D dest);
-
-  /**
    * Sets the turn on move parameter for this entity. It specifies if the entity will change its angle to the direction of the move destination when
    * moved.
    *
@@ -104,4 +105,21 @@ public interface IMobileEntity extends ICollisionEntity {
    * @return true, if the entity will change its angle to the direction of the move destination when being moved
    */
   public boolean turnOnMove();
+
+  /**
+   * This listener interface receives events when an entity was moved.
+   * 
+   * @see IMovementController
+   * @see IMobileEntity#onMoved(EntityMovedListener)
+   */
+  @FunctionalInterface
+  public interface EntityMovedListener extends EventListener {
+    /**
+     * Invoked after an entity was moved.
+     * 
+     * @param event
+     *          The entity moved event.
+     */
+    void moved(EntityMovedEvent event);
+  }
 }

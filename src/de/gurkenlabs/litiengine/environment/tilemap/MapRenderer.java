@@ -24,18 +24,42 @@ public class MapRenderer {
     throw new UnsupportedOperationException();
   }
 
+  /**
+   * Adds the specified layer rendered listener to receive events when a layer has been rendered.
+   * 
+   * @param listener
+   *          The listener to add.
+   */
   public static void onLayerRendered(LayerRenderedListener listener) {
     layerRenderedListeners.add(listener);
   }
 
+  /**
+   * Removes the specified layer rendered listener..
+   * 
+   * @param listener
+   *          The listener to remove.
+   */
   public static void removeLayerRenderedListener(LayerRenderedListener listener) {
     layerRenderedListeners.remove(listener);
   }
 
+  /**
+   * Adds the specified layer render condition to control whether layers should be rendered.
+   * 
+   * @param condition
+   *          The condition to add.
+   */
   public static void addLayerRenderCondition(LayerRenderCondition condition) {
     layerRenderConditions.add(condition);
   }
 
+  /**
+   * Removes the specified layer render condition.
+   * 
+   * @param condition
+   *          The condition to remove.
+   */
   public static void removeLayerRenderCondition(LayerRenderCondition condition) {
     layerRenderConditions.remove(condition);
   }

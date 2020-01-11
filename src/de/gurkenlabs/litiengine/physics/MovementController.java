@@ -3,10 +3,10 @@ package de.gurkenlabs.litiengine.physics;
 import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.entities.EntityMovedEvent;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
@@ -15,7 +15,6 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
   private final List<Force> activeForces;
   private final T mobileEntity;
   private final List<Predicate<IMobileEntity>> movementPredicates;
-  private final List<Consumer<Point2D>> movedConsumer;
 
   private float dx;
   private float dy;
@@ -27,7 +26,6 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
   public MovementController(final T mobileEntity) {
     this.activeForces = new CopyOnWriteArrayList<>();
     this.movementPredicates = new CopyOnWriteArrayList<>();
-    this.movedConsumer = new CopyOnWriteArrayList<>();
     this.mobileEntity = mobileEntity;
   }
 
@@ -91,11 +89,6 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
   public void update() {
     this.handleForces();
     this.handleMovement();
-  }
-
-  @Override
-  public void onMoved(Consumer<Point2D> cons) {
-    this.movedConsumer.add(cons);
   }
 
   public void handleMovement() {
@@ -238,10 +231,7 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
     final Point2D oldLocation = this.getEntity().getLocation();
     Game.physics().move(this.getEntity(), newLocation);
 
-    final Point2D delta = new Point2D.Double(this.getEntity().getX() - oldLocation.getX(), this.getEntity().getY() - oldLocation.getY());
-    for (Consumer<Point2D> cons : this.movedConsumer) {
-      cons.accept(delta);
-    }
+    this.getEntity().fireMovedEvent(new EntityMovedEvent(this.getEntity(), this.getEntity().getX() - oldLocation.getX(), this.getEntity().getY() - oldLocation.getY()));
   }
 
   protected boolean isMovementAllowed() {

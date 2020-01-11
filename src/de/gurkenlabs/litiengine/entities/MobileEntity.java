@@ -1,6 +1,8 @@
 package de.gurkenlabs.litiengine.entities;
 
 import java.awt.geom.Point2D;
+import java.util.Collection;
+import java.util.concurrent.ConcurrentHashMap;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameLoop;
@@ -9,10 +11,13 @@ import de.gurkenlabs.litiengine.attributes.Attribute;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.physics.IMovementController;
+import de.gurkenlabs.litiengine.physics.MovementController;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 @MovementInfo
 public class MobileEntity extends CollisionEntity implements IMobileEntity {
+  private final Collection<EntityMovedListener> movedListeners = ConcurrentHashMap.newKeySet();
+
   @TmxProperty(name = MapObjectProperty.MOVEMENT_ACCELERATION)
   private int acceleration;
 
@@ -25,14 +30,30 @@ public class MobileEntity extends CollisionEntity implements IMobileEntity {
   @TmxProperty(name = MapObjectProperty.MOVEMENT_VELOCITY)
   private Attribute<Float> velocity;
 
-  private Point2D moveDestination;
-
   public MobileEntity() {
     final MovementInfo info = this.getClass().getAnnotation(MovementInfo.class);
     this.velocity = new Attribute<>(info.velocity());
     this.acceleration = info.acceleration();
     this.deceleration = info.deceleration();
     this.setTurnOnMove(info.turnOnMove());
+    this.addController(new MovementController<>(this));
+  }
+
+  @Override
+  public void onMoved(EntityMovedListener listener) {
+    this.movedListeners.add(listener);
+  }
+
+  @Override
+  public void removeMovedListener(EntityMovedListener listener) {
+    this.movedListeners.remove(listener);
+  }
+
+  @Override
+  public void fireMovedEvent(EntityMovedEvent event) {
+    for (EntityMovedListener listener : this.movedListeners) {
+      listener.moved(event);
+    }
   }
 
   @Override
@@ -43,11 +64,6 @@ public class MobileEntity extends CollisionEntity implements IMobileEntity {
   @Override
   public int getDeceleration() {
     return this.deceleration;
-  }
-
-  @Override
-  public Point2D getMoveDestination() {
-    return this.moveDestination;
   }
 
   @Override
@@ -82,11 +98,6 @@ public class MobileEntity extends CollisionEntity implements IMobileEntity {
     }
 
     super.setLocation(position);
-  }
-
-  @Override
-  public void setMoveDestination(final Point2D dest) {
-    this.moveDestination = dest;
   }
 
   @Override
