@@ -1,11 +1,15 @@
 package de.gurkenlabs.litiengine.util;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EventListener;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,9 +22,20 @@ public final class ReflectionUtilities {
   }
 
   public static <T> Field getField(Class<T> cls, final String fieldName) {
+    return getField(cls, fieldName, false);
+  }
+
+  public static <T> Field getField(Class<T> cls, final String fieldName, boolean recursive) {
     for (final Field field : cls.getDeclaredFields()) {
       if (field.getName().equalsIgnoreCase(fieldName)) {
         return field;
+      }
+    }
+
+    while (cls.getSuperclass() != null) {
+      Field f = getField(cls.getSuperclass(), fieldName, recursive);
+      if (f != null) {
+        return f;
       }
     }
 
@@ -72,7 +87,7 @@ public final class ReflectionUtilities {
         }
       }
     } catch (final SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-      log.log(Level.SEVERE, e.getMessage(), e);
+      log.log(Level.SEVERE, e.getMessage() + " (" + fieldName + " - " + value + ")", e);
     }
 
     return false;
@@ -91,19 +106,35 @@ public final class ReflectionUtilities {
   }
 
   public static <T> Method getSetter(Class<T> cls, final String fieldName) {
-    for (final Method method : cls.getMethods()) {
-      // method must start with "set" and have only one parameter, matching the
-      // specified fieldType
-      if (method.getName().equalsIgnoreCase("set" + fieldName) && method.getParameters().length == 1) {
-        if (!method.isAccessible()) {
-          method.setAccessible(true);
-        }
-
+    for (final Method method : getSetters(cls)) {
+      if (method.getName().equalsIgnoreCase("set" + fieldName)) {
         return method;
       }
     }
 
     return null;
+  }
+
+  public static <T> Collection<Method> getSetters(Class<T> cls) {
+    Collection<Method> methods = new ArrayList<>();
+
+    for (final Method method : cls.getMethods()) {
+      // method must start with "set" and have only one parameter, matching the
+      // specified fieldType
+      if (method.getName().toLowerCase().startsWith("set") && method.getParameters().length == 1) {
+        if (!method.isAccessible()) {
+          try {
+            method.setAccessible(true);
+          } catch (SecurityException e) {
+            continue;
+          }
+        }
+
+        methods.add(method);
+      }
+    }
+
+    return Collections.unmodifiableCollection(methods);
   }
 
   public static <T, C> boolean isWrapperType(Class<T> primitive, Class<C> potentialWrapper) {
@@ -203,5 +234,32 @@ public final class ReflectionUtilities {
       clazz = clazz.getSuperclass();
     }
     return methods;
+  }
+
+  public static Collection<Method> getEvents(final Class<?> type) {
+
+    final List<Method> events = new ArrayList<>();
+    Class<?> clazz = type;
+    while (clazz != Object.class) { // need to iterated thought hierarchy in order to retrieve methods from above the current instance
+      // iterate though the list of methods declared in the class represented by class variable, and add those annotated with the specified annotation
+      final List<Method> allMethods = new ArrayList<>(Arrays.asList(clazz.getDeclaredMethods()));
+      for (final Method method : allMethods) {
+        if (method.getParameterCount() == 1) {
+          for (Class<?> paramtype : method.getParameterTypes()) {
+            if (EventListener.class.isAssignableFrom(paramtype)) {
+              events.add(method);
+            }
+          }
+        }
+      }
+      // move to the upper class in the hierarchy in search for more methods
+      clazz = clazz.getSuperclass();
+    }
+    return events;
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T> T getDefaultValue(Class<T> clazz) {
+    return (T) Array.get(Array.newInstance(clazz, 1), 0);
   }
 }
