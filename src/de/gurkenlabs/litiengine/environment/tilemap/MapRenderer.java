@@ -6,6 +6,9 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.Collection;
+import java.util.EventListener;
+import java.util.concurrent.ConcurrentHashMap;
 
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.graphics.ImageRenderer;
@@ -14,6 +17,28 @@ import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
 
 public class MapRenderer {
+  private static Collection<LayerRenderedListener> layerRenderedListeners = ConcurrentHashMap.newKeySet();
+  private static Collection<LayerRenderCondition> layerRenderConditions = ConcurrentHashMap.newKeySet();
+
+  private MapRenderer() {
+    throw new UnsupportedOperationException();
+  }
+
+  public static void onLayerRendered(LayerRenderedListener listener) {
+    layerRenderedListeners.add(listener);
+  }
+
+  public static void removeLayerRenderedListener(LayerRenderedListener listener) {
+    layerRenderedListeners.remove(listener);
+  }
+
+  public static void addLayerRenderCondition(LayerRenderCondition condition) {
+    layerRenderConditions.add(condition);
+  }
+
+  public static void removeLayerRenderCondition(LayerRenderCondition condition) {
+    layerRenderConditions.remove(condition);
+  }
 
   public static void render(Graphics2D g, IMap map, Rectangle2D viewport, RenderType... renderTypes) {
     renderLayers(g, map, map, viewport, null, renderTypes, 1f);
@@ -25,7 +50,7 @@ public class MapRenderer {
 
   private static void renderLayers(final Graphics2D g, final IMap map, ILayerList layers, final Rectangle2D viewport, Environment env, RenderType[] renderTypes, float opacity) {
     for (final ILayer layer : layers.getRenderLayers()) {
-      if (layer == null || !shouldBeRendered(layer, renderTypes)) {
+      if (layer == null || !shouldBeRendered(g, map, layer, renderTypes)) {
         continue;
       }
 
@@ -40,11 +65,11 @@ public class MapRenderer {
       }
 
       if (layer instanceof IImageLayer) {
-        renderImageLayer(g, (IImageLayer) layer, viewport, layerOpacity);
+        renderImageLayer(g, (IImageLayer) layer, map, viewport, layerOpacity);
       }
 
       if (layer instanceof IGroupLayer) {
-        renderLayers(g, map, (IGroupLayer)layer, viewport, env, renderTypes, layerOpacity);
+        renderLayers(g, map, (IGroupLayer) layer, viewport, env, renderTypes, layerOpacity);
       }
     }
   }
@@ -60,6 +85,11 @@ public class MapRenderer {
       for (int y = 0; y < map.getHeight(); y++) {
         drawRow(g, layer, y, map, viewport);
       }
+    }
+
+    final LayerRenderEvent event = new LayerRenderEvent(g, map, layer);
+    for (LayerRenderedListener listener : layerRenderedListeners) {
+      listener.rendered(event);
     }
   }
 
@@ -95,7 +125,14 @@ public class MapRenderer {
     }
   }
 
-  protected static boolean shouldBeRendered(ILayer layer, RenderType[] renderTypes) {
+  protected static boolean shouldBeRendered(final Graphics2D g, final IMap map, ILayer layer, RenderType[] renderTypes) {
+    final LayerRenderEvent event = new LayerRenderEvent(g, map, layer);
+    for (LayerRenderCondition condition : layerRenderConditions) {
+      if (!condition.canRender(event)) {
+        return false;
+      }
+    }
+
     if (renderTypes == null || renderTypes.length == 0 || layer instanceof IGroupLayer) {
       return isVisible(layer);
     }
@@ -113,7 +150,7 @@ public class MapRenderer {
     return layer.isVisible() && layer.getOpacity() > 0f;
   }
 
-  protected static void renderImageLayer(Graphics2D g, IImageLayer layer, Rectangle2D viewport, float opacity) {
+  protected static void renderImageLayer(Graphics2D g, IImageLayer layer, final IMap map, Rectangle2D viewport, float opacity) {
     Spritesheet sprite = Resources.spritesheets().get(layer.getImage().getSource());
     if (sprite == null) {
       return;
@@ -128,9 +165,42 @@ public class MapRenderer {
 
     ImageRenderer.render(g, sprite.getImage(), viewportOffsetX, viewportOffsetY);
     g.setComposite(oldComp);
+
+    final LayerRenderEvent event = new LayerRenderEvent(g, map, layer);
+    for (LayerRenderedListener listener : layerRenderedListeners) {
+      listener.rendered(event);
+    }
   }
 
-  private MapRenderer() {
-    throw new UnsupportedOperationException();
+  /**
+   * This listener interface receives events when a layer was rendered.
+   * 
+   * @see MapRenderer#onLayerRendered(LayerRenderedListener)
+   */
+  @FunctionalInterface
+  public interface LayerRenderedListener extends EventListener {
+    /**
+     * Invoked when a layer has been rendered.
+     * 
+     * @param event
+     *          The layer render event.
+     */
+    void rendered(LayerRenderEvent event);
+  }
+
+  /**
+   * This listener interface provides a condition callback to contol whether a layer should be rendered.
+   * 
+   * @see MapRenderer#addLayerRenderCondition(LayerRenderCondition)
+   */
+  @FunctionalInterface
+  public interface LayerRenderCondition extends EventListener {
+    /**
+     * Invoked before the rendering of a layer to determine if it should be rendered.
+     * 
+     * @param event
+     *          The layer render event.
+     */
+    boolean canRender(LayerRenderEvent event);
   }
 }
