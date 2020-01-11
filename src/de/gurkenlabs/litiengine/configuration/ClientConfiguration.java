@@ -56,11 +56,11 @@ public class ClientConfiguration extends ConfigurationGroup {
   }
 
   public void setCountry(final String country) {
-    this.country = country;
+    this.set("country", country);
   }
 
   public void setLanguage(final String language) {
-    this.language = language;
+    this.set("language", language);
   }
 
   /**
@@ -70,15 +70,15 @@ public class ClientConfiguration extends ConfigurationGroup {
    *          the new max fps
    */
   public void setMaxFps(final int maxFps) {
-    this.maxFps = Math.max(1, maxFps);
+    this.set("maxFps", Math.max(1, maxFps));
   }
 
   public void setShowGameMetrics(final boolean showGameMetrics) {
-    this.showGameMetrics = showGameMetrics;
+    this.set("showGameMetrics", showGameMetrics);
   }
 
   public void setExitOnError(boolean exit) {
-    this.exitOnError = exit;
+    this.set("exitOnError", exit);
   }
 
   public boolean showGameMetrics() {

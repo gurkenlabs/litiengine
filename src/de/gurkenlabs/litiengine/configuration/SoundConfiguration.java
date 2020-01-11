@@ -33,7 +33,7 @@ public class SoundConfiguration extends ConfigurationGroup {
   }
 
   public void setMusicVolume(final float musicVolume) {
-    this.musicVolume = musicVolume;
+    this.set("musicVolume", musicVolume);
   }
 
   /**
@@ -43,6 +43,6 @@ public class SoundConfiguration extends ConfigurationGroup {
    *          the new sound volume
    */
   public void setSoundVolume(final float soundVolume) {
-    this.soundVolume = soundVolume;
+    this.set("soundVolume", soundVolume);
   }
 }

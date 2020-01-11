@@ -92,7 +92,7 @@ public class GraphicConfiguration extends ConfigurationGroup {
   }
 
   public void setDisplayMode(DisplayMode displayMode) {
-    this.displayMode = displayMode;
+    this.set("displayMode", displayMode);
   }
 
   /**
@@ -102,19 +102,19 @@ public class GraphicConfiguration extends ConfigurationGroup {
    *          the new graphic quality
    */
   public void setGraphicQuality(final Quality graphicQuality) {
-    this.graphicQuality = graphicQuality;
+    this.set("graphicQuality", graphicQuality);
   }
 
   public void setRenderDynamicShadows(final boolean renderDynamicShadows) {
-    this.renderDynamicShadows = renderDynamicShadows;
+    this.set("renderDynamicShadows", renderDynamicShadows);
   }
 
   public void setResolutionHeight(final int resolutionHeight) {
-    this.resolutionHeight = resolutionHeight;
+    this.set("resolutionHeight", resolutionHeight);
   }
 
   public void setResolutionWidth(final int resolutionWidth) {
-    this.resolutionWidth = resolutionWidth;
+    this.set("resolutionWidth", resolutionWidth);
   }
 
   public boolean enableResolutionScaling() {
@@ -122,7 +122,7 @@ public class GraphicConfiguration extends ConfigurationGroup {
   }
 
   public void setEnableResolutionScale(boolean enableResolutionScale) {
-    this.enableResolutionScale = enableResolutionScale;
+    this.set("enableResolutionScale", enableResolutionScale);
   }
 
   public boolean reduceFramesWhenNotFocused() {
@@ -130,14 +130,14 @@ public class GraphicConfiguration extends ConfigurationGroup {
   }
 
   public void setReduceFramesWhenNotFocused(boolean reduceFramesWhenNotFocused) {
-    this.reduceFramesWhenNotFocused = reduceFramesWhenNotFocused;
+    this.set("reduceFramesWhenNotFocused", reduceFramesWhenNotFocused);
   }
 
   public void setAntiAliasing(boolean antiAliasing) {
-    this.antiAliasing = antiAliasing;
+    this.set("antiAliasing", antiAliasing);
   }
 
   public void setColorInterpolation(boolean colorInterpolation) {
-    this.colorInterpolation = colorInterpolation;
+    this.set("colorInterpolation", colorInterpolation);
   }
 }

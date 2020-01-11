@@ -37,22 +37,22 @@ public class InputConfiguration extends ConfigurationGroup {
   }
 
   public void setMouseSensitivity(final float mouseSensitivity) {
-    this.mouseSensitivity = mouseSensitivity;
+    this.set("mouseSensitivity", mouseSensitivity);
   }
 
   public void setGamepadSupport(boolean gamepadSupport) {
-    this.gamepadSupport = gamepadSupport;
+    this.set("gamepadSupport", gamepadSupport);
   }
 
   public void setGamepadAxisDeadzone(float gamepadAxisDeadzone) {
-    this.gamepadAxisDeadzone = gamepadAxisDeadzone;
+    this.set("gamepadAxisDeadzone", gamepadAxisDeadzone);
   }
 
   public void setGamepadTriggerDeadzone(float gamepadTriggerDeadzone) {
-    this.gamepadTriggerDeadzone = gamepadTriggerDeadzone;
+    this.set("gamepadTriggerDeadzone", gamepadTriggerDeadzone);
   }
 
   public void setGamepadStickDeadzone(float gamepadStickDeadzone) {
-    this.gamepadStickDeadzone = gamepadStickDeadzone;
+    this.set("gamepadStickDeadzone", gamepadStickDeadzone);
   }
 }

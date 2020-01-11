@@ -1,7 +1,11 @@
 package de.gurkenlabs.litiengine.configuration;
 
+import java.beans.PropertyChangeEvent;
 import java.lang.reflect.Field;
+import java.util.Collection;
+import java.util.EventListener;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -11,10 +15,13 @@ import de.gurkenlabs.litiengine.util.ReflectionUtilities;
  * This class contains some basic functionality for all setting groups. It gets
  * the SettingsGroupInfo annotation and reads out the prefix that is used when
  * reading/ writing the settings into a property file.
+ * 
  */
 @ConfigurationGroupInfo
 public abstract class ConfigurationGroup {
   private static final Logger log = Logger.getLogger(ConfigurationGroup.class.getName());
+
+  private final Collection<ConfigurationChangedListener> listeners = ConcurrentHashMap.newKeySet();
 
   private final String prefix;
   private boolean debug;
@@ -29,12 +36,44 @@ public abstract class ConfigurationGroup {
   }
 
   /**
+   * Adds the specified configuration changed listener to receive events about any configuration property that changed.
+   * 
+   * <p>
+   * The event is supported for any property that uses the {@link #set(String, Object)} method to set the field value.
+   * </p>
+   * 
+   * <p>
+   * The event will provide you with the fieldName of the called setter (e.g. "debug" for the "setDebug" call).
+   * </p>
+   * 
+   * @param listener
+   *          The listener to add.
+   * 
+   * @see ConfigurationGroup#set(String, Object)
+   */
+  public void onChanged(ConfigurationChangedListener listener) {
+    this.listeners.add(listener);
+  }
+
+  public void removeChangedListener(ConfigurationChangedListener listener) {
+    this.listeners.remove(listener);
+  }
+
+  /**
    * Gets the prefix.
    *
    * @return the prefix
    */
   public String getPrefix() {
     return this.prefix != null ? this.prefix : "";
+  }
+
+  public boolean isDebug() {
+    return debug;
+  }
+
+  public void setDebug(boolean debug) {
+    this.set("debug", debug);
   }
 
   /**
@@ -66,7 +105,7 @@ public abstract class ConfigurationGroup {
         if (!field.isAccessible()) {
           field.setAccessible(true);
         }
-        
+
         final String propertyKey = this.getPrefix() + field.getName();
         if (field.getType().equals(boolean.class)) {
           properties.setProperty(propertyKey, Boolean.toString(field.getBoolean(this)));
@@ -97,11 +136,52 @@ public abstract class ConfigurationGroup {
     }
   }
 
-  public boolean isDebug() {
-    return debug;
+  /**
+   * Use this method to set configuration properties if you want to support <code>configurationChanged</code> for your property.
+   * 
+   * @param <T>
+   *          The type of the value to set.
+   * @param fieldName
+   *          The name of the field to set.
+   * @param value
+   *          The value to set.
+   */
+  protected <T> void set(String fieldName, T value) {
+    Field field = ReflectionUtilities.getField(this.getClass(), fieldName, true);
+    if (field != null) {
+      try {
+        if (!field.isAccessible()) {
+          field.setAccessible(true);
+        }
+
+        final Object currentValue = field.get(this);
+
+        final PropertyChangeEvent event = new PropertyChangeEvent(this, fieldName, currentValue, value);
+        field.set(this, value);
+
+        for (ConfigurationChangedListener listener : this.listeners) {
+          listener.configurationChanged(event);
+        }
+      } catch (IllegalArgumentException | IllegalAccessException e) {
+        log.log(Level.SEVERE, e.getMessage(), e);
+      }
+    }
   }
 
-  public void setDebug(boolean debug) {
-    this.debug = debug;
+  /**
+   * This listener interface receives events when any property of the configuration changed.
+   * 
+   * @see ConfigurationGroup#onChanged(ConfigurationChangedListener)
+   */
+  @FunctionalInterface
+  public interface ConfigurationChangedListener extends EventListener {
+    /**
+     * Invoked when a a property of the configuration has been changed using the {@link ConfigurationGroup#set(String, Object)} method to support this
+     * event.
+     * 
+     * @param event
+     *          The property changed event.
+     */
+    void configurationChanged(PropertyChangeEvent event);
   }
 }

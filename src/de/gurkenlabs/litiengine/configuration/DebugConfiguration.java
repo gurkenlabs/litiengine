@@ -96,42 +96,42 @@ public class DebugConfiguration extends ConfigurationGroup {
   }
   
   public void setDebugEnabled(final boolean debugEnabled) {
-    this.debugEnabled = debugEnabled;
+    this.set("debugEnabled", debugEnabled);
   }
 
   public void setRenderBoundingBoxes(final boolean renderBoundingBoxes) {
-    this.renderBoundingBoxes = renderBoundingBoxes;
+    this.set("renderBoundingBoxes", renderBoundingBoxes);
   }
 
   public void setRenderCollisionBoxes(final boolean renderCollisionBoxes) {
-    this.renderCollisionBoxes = renderCollisionBoxes;
+    this.set("renderCollisionBoxes", renderCollisionBoxes);
   }
 
   public void setRenderDebugMouse(final boolean renderDebugMouse) {
-    this.renderDebugMouse = renderDebugMouse;
+    this.set("renderDebugMouse", renderDebugMouse);
   }
 
   public void setRenderEntityNames(final boolean renderEntityNames) {
-    this.renderEntityNames = renderEntityNames;
+    this.set("renderEntityNames", renderEntityNames);
   }
 
   public void setRenderHitBoxes(final boolean renderHitBoxes) {
-    this.renderHitBoxes = renderHitBoxes;
+    this.set("renderHitBoxes", renderHitBoxes);
   }
 
   public void setShowMouseTargetMetric(final boolean showMouseTargetMetric) {
-    this.showMouseTargetMetric = showMouseTargetMetric;
+    this.set("showMouseTargetMetric", showMouseTargetMetric);
   }
 
   public void setShowTilesMetric(final boolean showTilesMetric) {
-    this.showTilesMetric = showTilesMetric;
+    this.set("showTilesMetric", showTilesMetric);
   }
 
   public void setRenderGuiComponentBoundingBoxes(boolean renderGuiComponentBoundingBoxes) {
-    this.renderGuiComponentBoundingBoxes = renderGuiComponentBoundingBoxes;
+    this.set("renderGuiComponentBoundingBoxes", renderGuiComponentBoundingBoxes);
   }
 
   public void setTrackRenderTimes(boolean trackRenderTimes) {
-    this.trackRenderTimes = trackRenderTimes;
+    this.set("trackRenderTimes", trackRenderTimes);
   }
 }
