@@ -5,6 +5,7 @@ import java.awt.geom.Rectangle2D;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -30,11 +31,11 @@ import de.gurkenlabs.litiengine.util.ReflectionUtilities;
 public abstract class Entity implements IEntity, EntityRenderListener {
   private static final Logger log = Logger.getLogger(Entity.class.getName());
   public static final String ANY_MESSAGE = "";
-  private final List<EntityTransformListener> transformListeners = new CopyOnWriteArrayList<>();
-  private final List<EntityListener> listeners = new CopyOnWriteArrayList<>();
-  private final List<EntityRenderListener> renderListeners = new CopyOnWriteArrayList<>();
-  private final List<EntityRenderedListener> renderedListeners = new CopyOnWriteArrayList<>();
-  private final Map<String, List<EntityMessageListener>> messageListeners = new ConcurrentHashMap<>();
+  private final Collection<EntityTransformListener> transformListeners = ConcurrentHashMap.newKeySet();
+  private final Collection<EntityListener> listeners = ConcurrentHashMap.newKeySet();
+  private final Collection<EntityRenderListener> renderListeners = ConcurrentHashMap.newKeySet();
+  private final Collection<EntityRenderedListener> renderedListeners = ConcurrentHashMap.newKeySet();
+  private final Map<String, Collection<EntityMessageListener>> messageListeners = new ConcurrentHashMap<>();
 
   private final EntityControllers controllers = new EntityControllers();
   private final EntityActionMap actions = new EntityActionMap();
@@ -150,7 +151,7 @@ public abstract class Entity implements IEntity, EntityRenderListener {
   @Override
   public void addMessageListener(String message, EntityMessageListener listener) {
     if (!this.messageListeners.containsKey(message)) {
-      this.messageListeners.put(message, new CopyOnWriteArrayList<>());
+      this.messageListeners.put(message, ConcurrentHashMap.newKeySet());
     }
 
     this.messageListeners.get(message).add(listener);
@@ -158,7 +159,7 @@ public abstract class Entity implements IEntity, EntityRenderListener {
 
   @Override
   public void removeMessageListener(EntityMessageListener listener) {
-    for (List<EntityMessageListener> listenerType : this.messageListeners.values()) {
+    for (Collection<EntityMessageListener> listenerType : this.messageListeners.values()) {
       if (listenerType == null || listenerType.isEmpty()) {
         continue;
       }
@@ -473,7 +474,7 @@ public abstract class Entity implements IEntity, EntityRenderListener {
   public void setRenderWithLayer(boolean renderWithLayer) {
     this.renderWithLayer = renderWithLayer;
   }
-  
+
   @Override
   public void rendering(EntityRenderEvent event) {
     if (event.getEntity() == null || !event.getEntity().equals(Entity.this)) {
@@ -514,7 +515,7 @@ public abstract class Entity implements IEntity, EntityRenderListener {
 
     return true;
   }
-  
+
   protected EntityControllers getControllers() {
     return this.controllers;
   }

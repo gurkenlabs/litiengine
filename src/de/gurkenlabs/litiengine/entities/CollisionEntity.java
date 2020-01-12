@@ -2,8 +2,8 @@ package de.gurkenlabs.litiengine.entities;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Collection;
+import java.util.concurrent.ConcurrentHashMap;
 
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Game;
@@ -20,7 +20,7 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
 
   private static final double WIDTH_FACTOR = 0.4;
 
-  private final List<CollisionListener> collisionListener = new CopyOnWriteArrayList<>();
+  private final Collection<CollisionListener> collisionListener = ConcurrentHashMap.newKeySet();
 
   @TmxProperty(name = MapObjectProperty.COLLISION_ALIGN)
   private Align align;

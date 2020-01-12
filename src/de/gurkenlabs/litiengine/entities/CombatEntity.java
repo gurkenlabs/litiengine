@@ -2,7 +2,9 @@ package de.gurkenlabs.litiengine.entities;
 
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
+import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.gurkenlabs.litiengine.Game;
@@ -22,9 +24,9 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   public static final int DEFAULT_HITPOINTS = 100;
 
   private final List<Effect> appliedEffects;
-  private final List<CombatEntityListener> listeners;
-  private final List<CombatEntityDeathListener> deathListeners;
-  private final List<CombatEntityHitListener> hitListeners;
+  private final Collection<CombatEntityListener> listeners;
+  private final Collection<CombatEntityDeathListener> deathListeners;
+  private final Collection<CombatEntityHitListener> hitListeners;
   private final RangeAttribute<Integer> hitPoints;
 
   @TmxProperty(name = MapObjectProperty.COMBAT_INDESTRUCTIBLE)
@@ -41,9 +43,9 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
 
   public CombatEntity() {
     super();
-    this.listeners = new CopyOnWriteArrayList<>();
-    this.deathListeners = new CopyOnWriteArrayList<>();
-    this.hitListeners = new CopyOnWriteArrayList<>();
+    this.listeners = ConcurrentHashMap.newKeySet();
+    this.deathListeners = ConcurrentHashMap.newKeySet();
+    this.hitListeners = ConcurrentHashMap.newKeySet();
     this.appliedEffects = new CopyOnWriteArrayList<>();
 
     final CombatInfo info = this.getClass().getAnnotation(CombatInfo.class);
@@ -232,7 +234,6 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   @Override
   public void setTarget(final ICombatEntity target) {
     this.target = target;
-
   }
 
   /**
