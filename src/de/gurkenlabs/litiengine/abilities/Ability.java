@@ -8,13 +8,16 @@ import java.awt.Stroke;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
+import java.util.Collection;
+import java.util.EventListener;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.abilities.effects.Effect;
-import de.gurkenlabs.litiengine.abilities.effects.EffectArgument;
+import de.gurkenlabs.litiengine.abilities.effects.Effect.EffectAppliedListener;
+import de.gurkenlabs.litiengine.abilities.effects.Effect.EffectCeasedListener;
 import de.gurkenlabs.litiengine.annotation.AbilityInfo;
 import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
@@ -22,7 +25,7 @@ import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 @AbilityInfo
 public abstract class Ability implements IRenderable {
-  private final List<Consumer<AbilityExecution>> abilityCastConsumer;
+  private final Collection<AbilityCastListener> abilityCastListeners;
   private final AbilityAttributes attributes;
 
   private final List<Effect> effects;
@@ -44,7 +47,7 @@ public abstract class Ability implements IRenderable {
    *          the executing entity
    */
   protected Ability(final Creature executor) {
-    this.abilityCastConsumer = new CopyOnWriteArrayList<>();
+    this.abilityCastListeners = ConcurrentHashMap.newKeySet();
     this.effects = new CopyOnWriteArrayList<>();
 
     final AbilityInfo info = this.getClass().getAnnotation(AbilityInfo.class);
@@ -55,6 +58,28 @@ public abstract class Ability implements IRenderable {
     this.description = info.description();
     this.castType = info.castType();
     this.originType = info.origin();
+  }
+
+  public void onCast(final AbilityCastListener listener) {
+    this.abilityCastListeners.add(listener);
+  }
+
+  public void removeAbilityCastListener(AbilityCastListener listener) {
+    this.abilityCastListeners.remove(listener);
+  }
+
+  public void onEffectApplied(final EffectAppliedListener listener) {
+    for (final Effect effect : this.getEffects()) {
+      // registers to all effects and their follow up effects recursively
+      this.onEffectApplied(effect, listener);
+    }
+  }
+
+  public void onEffectCeased(final EffectCeasedListener listener) {
+    for (final Effect effect : this.getEffects()) {
+      // registers to all effects and their follow up effects recursively
+      this.onEffectCeased(effect, listener);
+    }
   }
 
   public void addEffect(final Effect effect) {
@@ -91,8 +116,8 @@ public abstract class Ability implements IRenderable {
     }
     this.currentExecution = new AbilityExecution(this);
 
-    for (final Consumer<AbilityExecution> castConsumer : this.abilityCastConsumer) {
-      castConsumer.accept(this.currentExecution);
+    for (final AbilityCastListener listener : this.abilityCastListeners) {
+      listener.abilityCast(this.currentExecution);
     }
 
     return this.getCurrentExecution();
@@ -166,26 +191,6 @@ public abstract class Ability implements IRenderable {
     return this.multiTarget;
   }
 
-  public void onCast(final Consumer<AbilityExecution> castConsumer) {
-    if (!this.abilityCastConsumer.contains(castConsumer)) {
-      this.abilityCastConsumer.add(castConsumer);
-    }
-  }
-
-  public void onEffectApplied(final Consumer<EffectArgument> consumer) {
-    for (final Effect effect : this.getEffects()) {
-      // registers to all effects and their follow up effects recursively
-      this.onEffectApplied(effect, consumer);
-    }
-  }
-
-  public void onEffectCeased(final Consumer<EffectArgument> consumer) {
-    for (final Effect effect : this.getEffects()) {
-      // registers to all effects and their follow up effects recursively
-      this.onEffectCeased(effect, consumer);
-    }
-  }
-
   @Override
   public void render(final Graphics2D g) {
     g.setColor(new Color(255, 255, 0, 100));
@@ -211,10 +216,6 @@ public abstract class Ability implements IRenderable {
 
   public void setOriginType(AbilityOrigin originType) {
     this.originType = originType;
-  }
-
-  public List<Consumer<AbilityExecution>> getAbilityCastConsumer() {
-    return this.abilityCastConsumer;
   }
 
   public void setName(String name) {
@@ -257,19 +258,24 @@ public abstract class Ability implements IRenderable {
     return new Arc2D.Double(appliedRange.getX(), appliedRange.getY(), impact, impact, start, impactAngle, Arc2D.PIE);
   }
 
-  private void onEffectApplied(final Effect effect, final Consumer<EffectArgument> consumer) {
-    effect.onEffectApplied(consumer);
+  private void onEffectApplied(final Effect effect, final EffectAppliedListener listener) {
+    effect.onEffectApplied(listener);
 
     for (final Effect followUp : effect.getFollowUpEffects()) {
-      this.onEffectApplied(followUp, consumer);
+      this.onEffectApplied(followUp, listener);
     }
   }
 
-  private void onEffectCeased(final Effect effect, final Consumer<EffectArgument> consumer) {
-    effect.onEffectCeased(consumer);
+  private void onEffectCeased(final Effect effect, final EffectCeasedListener listener) {
+    effect.onEffectCeased(listener);
 
     for (final Effect followUp : effect.getFollowUpEffects()) {
-      this.onEffectCeased(followUp, consumer);
+      this.onEffectCeased(followUp, listener);
     }
+  }
+
+  @FunctionalInterface
+  public interface AbilityCastListener extends EventListener {
+    void abilityCast(AbilityExecution execution);
   }
 }

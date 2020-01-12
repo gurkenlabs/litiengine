@@ -4,10 +4,11 @@ import java.awt.Shape;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EventListener;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.Game;
@@ -23,12 +24,10 @@ import de.gurkenlabs.litiengine.entities.RelativeEntityComparator;
  * implementation of apply/cease.
  */
 public abstract class Effect implements IUpdateable {
-  public static final int NO_DURATION = -1;
-
   private final Ability ability;
   private final List<EffectApplication> appliances;
-  private final List<Consumer<EffectArgument>> appliedConsumer;
-  private final List<Consumer<EffectArgument>> ceasedConsumer;
+  private final Collection<EffectAppliedListener> appliedListeners;
+  private final Collection<EffectCeasedListener> ceasedListeners;
   private final EffectTarget[] effectTargets;
   private final List<Effect> followUpEffects;
 
@@ -45,8 +44,8 @@ public abstract class Effect implements IUpdateable {
    *          the targets
    */
   protected Effect(final Ability ability, final EffectTarget... targets) {
-    this.appliedConsumer = new CopyOnWriteArrayList<>();
-    this.ceasedConsumer = new CopyOnWriteArrayList<>();
+    this.appliedListeners = ConcurrentHashMap.newKeySet();
+    this.ceasedListeners = ConcurrentHashMap.newKeySet();
     this.appliances = new ArrayList<>();
     this.followUpEffects = new CopyOnWriteArrayList<>();
 
@@ -59,6 +58,22 @@ public abstract class Effect implements IUpdateable {
     } else {
       this.effectTargets = targets;
     }
+  }
+
+  public void onEffectApplied(final EffectAppliedListener listener) {
+    this.appliedListeners.add(listener);
+  }
+
+  public void removeEffectAppliedListener(final EffectAppliedListener listener) {
+    this.appliedListeners.remove(listener);
+  }
+
+  public void onEffectCeased(final EffectCeasedListener listener) {
+    this.ceasedListeners.add(listener);
+  }
+
+  public void removeEffectCeasedListener(final EffectCeasedListener listener) {
+    this.ceasedListeners.remove(listener);
   }
 
   /**
@@ -83,9 +98,9 @@ public abstract class Effect implements IUpdateable {
 
   public void cease(final ICombatEntity entity) {
     entity.getAppliedEffects().remove(this);
-    final EffectArgument arg = new EffectArgument(this, entity);
-    for (final Consumer<EffectArgument> consumer : this.ceasedConsumer) {
-      consumer.accept(arg);
+    final EffectEvent event = new EffectEvent(this, entity);
+    for (final EffectCeasedListener listener : this.ceasedListeners) {
+      listener.ceased(event);
     }
   }
 
@@ -129,18 +144,6 @@ public abstract class Effect implements IUpdateable {
     return false;
   }
 
-  public void onEffectApplied(final Consumer<EffectArgument> consumer) {
-    if (!this.appliedConsumer.contains(consumer)) {
-      this.appliedConsumer.add(consumer);
-    }
-  }
-
-  public void onEffectCeased(final Consumer<EffectArgument> consumer) {
-    if (!this.ceasedConsumer.contains(consumer)) {
-      this.ceasedConsumer.add(consumer);
-    }
-  }
-
   public void setDelay(final int delay) {
     this.delay = delay;
   }
@@ -180,9 +183,9 @@ public abstract class Effect implements IUpdateable {
 
   protected void apply(final ICombatEntity entity) {
     entity.getAppliedEffects().add(this);
-    final EffectArgument arg = new EffectArgument(this, entity);
-    for (final Consumer<EffectArgument> consumer : this.appliedConsumer) {
-      consumer.accept(arg);
+    final EffectEvent event = new EffectEvent(this, entity);
+    for (final EffectAppliedListener listener : this.appliedListeners) {
+      listener.applied(event);
     }
   }
 
@@ -280,5 +283,15 @@ public abstract class Effect implements IUpdateable {
 
   private boolean isDeadFriendlyEntity(ICombatEntity entity) {
     return !entity.equals(this.getAbility().getExecutor()) && entity.isFriendly(this.getAbility().getExecutor()) && entity.isDead();
+  }
+
+  @FunctionalInterface
+  public interface EffectAppliedListener extends EventListener {
+    void applied(EffectEvent event);
+  }
+
+  @FunctionalInterface
+  public interface EffectCeasedListener extends EventListener {
+    void ceased(EffectEvent event);
   }
 }
