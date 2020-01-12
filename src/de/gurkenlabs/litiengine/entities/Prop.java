@@ -139,16 +139,17 @@ public class Prop extends CombatEntity {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("#" + this.getMapId() + ": ");
+    // don't use a StringBuilder due to bad runtime performance
+    String str = "#" + this.getMapId() + ": ";
     if (this.getName() != null && !this.getName().isEmpty()) {
-      sb.append(this.getName());
+      str += this.getName();
     } else {
-      sb.append(Prop.class.getSimpleName());
+      str += Prop.class.getSimpleName();
     }
-    sb.append(" (" + this.getSpritesheetName() + ")");
 
-    return sb.toString();
+    str += " (" + this.getSpritesheetName() + ")";
+
+    return str;
   }
 
   private void updateAnimationController() {

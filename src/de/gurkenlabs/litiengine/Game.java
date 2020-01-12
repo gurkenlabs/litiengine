@@ -1,9 +1,7 @@
 package de.gurkenlabs.litiengine;
 
 import java.awt.event.KeyEvent;
-import java.io.FileNotFoundException;
 import java.lang.Thread.UncaughtExceptionHandler;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
@@ -11,8 +9,6 @@ import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.xml.bind.JAXBException;
 
 import de.gurkenlabs.litiengine.configuration.ClientConfiguration;
 import de.gurkenlabs.litiengine.configuration.DebugConfiguration;
@@ -598,7 +594,7 @@ public final class Game {
     GameInfo info;
     try {
       info = XmlUtilities.readFromFile(GameInfo.class, gameInfoFile);
-    } catch (FileNotFoundException | JAXBException | URISyntaxException e) {
+    } catch (Exception e) {
       log().log(Level.WARNING, "Could not read game info from {0}", new Object[] { gameInfoFile });
       setInfo((GameInfo) null);
       return;
