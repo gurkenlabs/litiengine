@@ -18,6 +18,9 @@ import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
+/**
+ * TODO: Triggers should be able to call entity actions (similar to the current message approach)
+ */
 @CollisionInfo(collision = false)
 @EntityInfo(renderType = RenderType.OVERLAY)
 public class Trigger extends CollisionEntity implements IUpdateable {
@@ -27,10 +30,11 @@ public class Trigger extends CollisionEntity implements IUpdateable {
 
   private static final Logger log = Logger.getLogger(Trigger.class.getName());
 
-  private final Collection<IEntity> activated = ConcurrentHashMap.newKeySet();
   private final Collection<TriggerActivatedListener> activatedListeners = ConcurrentHashMap.newKeySet();
   private final Collection<TriggerDeactivatedListener> deactivatedListeners = ConcurrentHashMap.newKeySet();
   private final Collection<TriggerActivatingCondition> activatingConditions = ConcurrentHashMap.newKeySet();
+
+  private final Collection<IEntity> collisionActivated = ConcurrentHashMap.newKeySet();
 
   @TmxProperty(name = MapObjectProperty.TRIGGER_ACTIVATORS)
   private final List<Integer> activators = new CopyOnWriteArrayList<>();
@@ -117,8 +121,16 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     this.activators.add(mapId);
   }
 
+  public void addActivator(final IEntity activator) {
+    this.activators.add(activator.getMapId());
+  }
+
   public void addTarget(final int mapId) {
     this.targets.add(mapId);
+  }
+
+  public void addTarget(final IEntity target) {
+    this.targets.add(target.getMapId());
   }
 
   public TriggerActivation getActivationType() {
@@ -168,7 +180,7 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     if (this.activators.isEmpty() || this.activators.contains(sender.getMapId())) {
       return this.activate(sender, sender.getMapId());
     } else {
-      log.log(Level.FINE, "[{1}] tried to activate trigger [{0}] but was not allowed so because it was not on the list of activators", new Object[] { this.getName(), sender.getMapId() });
+      log.log(Level.FINE, "[{1}] tried to activate trigger [{0}] but was not allowed so because it was not on the list of activators", new Object[] { this, sender.getMapId() });
       return false;
     }
   }
@@ -202,13 +214,13 @@ public class Trigger extends CollisionEntity implements IUpdateable {
 
   @Override
   public void update() {
-    if (Game.world().environment() == null || this.activationType != TriggerActivation.COLLISION) {
+    if (Game.world().environment() == null || !this.isLoaded() || this.activationType != TriggerActivation.COLLISION) {
       return;
     }
 
     final List<IEntity> collEntities = this.getEntitiesInCollisionBox();
     for (final IEntity ent : collEntities) {
-      if (this.activated.contains(ent)) {
+      if (this.collisionActivated.contains(ent)) {
         continue;
       }
 
@@ -216,7 +228,7 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     }
 
     // send deactivation event
-    Iterator<IEntity> iter = this.activated.iterator();
+    Iterator<IEntity> iter = this.collisionActivated.iterator();
     while (iter.hasNext()) {
       IEntity ent = iter.next();
       if (!collEntities.contains(ent)) {
@@ -237,11 +249,11 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   }
 
   private boolean activate(final IEntity activator, final int tar) {
-    if (this.isOneTimeTrigger && this.isActivated || this.getActivationType() == TriggerActivation.COLLISION && activator != null && this.activated.contains(activator)) {
+    if (!this.isLoaded() || this.isOneTimeTrigger && this.isActivated || this.getActivationType() == TriggerActivation.COLLISION && activator != null && this.collisionActivated.contains(activator)) {
       return false;
     }
 
-    if (this.cooldown > 0 && Game.time().since(this.lastActivation) < this.cooldown) {
+    if (this.getCooldown() > 0 && Game.time().since(this.lastActivation) < this.getCooldown()) {
       return false;
     }
 
@@ -254,17 +266,19 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     }
 
     this.isActivated = true;
+    if (activator != null) {
+      this.collisionActivated.add(activator);
+    }
 
     // if we actually have a trigger target, we send the message to the target
     for (final int target : triggerTargets) {
-      final IEntity entity = Game.world().environment().get(target);
+      final IEntity entity = this.getEnvironment().get(target);
       if (entity == null) {
-        log.log(Level.WARNING, "trigger [{0}] was activated, but the trigger target [{1}] could not be found on the environment", new Object[] { this.getName(), target });
+        log.log(Level.WARNING, "trigger [{0}] was activated, but the trigger target [{1}] could not be found on the environment", new Object[] { this, target });
         continue;
       }
 
       entity.sendMessage(this, this.message);
-      this.activated.add(activator);
     }
 
     // also send the trigger event to all registered consumers
@@ -273,7 +287,7 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     }
 
     if (this.isOneTimeTrigger) {
-      Game.world().environment().remove(this);
+      this.getEnvironment().remove(this);
     }
 
     this.lastActivation = Game.time().now();
@@ -286,6 +300,7 @@ public class Trigger extends CollisionEntity implements IUpdateable {
       String result = condition.canActivate(te);
       if (result != null && !result.isEmpty()) {
         te.getEntity().sendMessage(this, result);
+        log.log(Level.FINE, "trigger [{0}] was not activated. Reason: [{1}])", new Object[] { this, result });
         return false;
       }
     }
