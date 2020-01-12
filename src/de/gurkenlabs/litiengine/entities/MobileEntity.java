@@ -12,7 +12,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.physics.IMovementController;
 import de.gurkenlabs.litiengine.physics.MovementController;
-import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 @MovementInfo
 public class MobileEntity extends CollisionEntity implements IMobileEntity {
@@ -93,7 +92,7 @@ public class MobileEntity extends CollisionEntity implements IMobileEntity {
 
   @Override
   public void setLocation(final Point2D position) {
-    if (position == null || GeometricUtilities.equals(position, this.getLocation(), 0.001)) {
+    if (position == null) {
       return;
     }
 

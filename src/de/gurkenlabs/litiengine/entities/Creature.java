@@ -15,7 +15,6 @@ import de.gurkenlabs.litiengine.graphics.animation.EntityAnimationController;
 import de.gurkenlabs.litiengine.physics.IMovementController;
 import de.gurkenlabs.litiengine.physics.MovementController;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
-import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 /**
  * TODO: Add idle event
@@ -158,7 +157,7 @@ public class Creature extends CombatEntity implements IMobileEntity {
 
   @Override
   public void setLocation(final Point2D position) {
-    if (this.isDead() || position == null || GeometricUtilities.equals(position, this.getLocation(), 0.001)) {
+    if (this.isDead() || position == null) {
       return;
     }
 
