@@ -4,18 +4,52 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.GameTest;
+import de.gurkenlabs.litiengine.environment.Environment;
+import de.gurkenlabs.litiengine.environment.tilemap.IMap;
+import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
 import de.gurkenlabs.litiengine.pathfinding.astar.AStarGrid;
 import de.gurkenlabs.litiengine.pathfinding.astar.AStarNode;
 
 public class AStarTests {
+  @BeforeAll
+  public static void initGame() {
+
+    // necessary because the environment need access to the game loop and other
+    // stuff
+    Game.init(Game.COMMADLINE_ARG_NOGUI);
+  }
+
+  @AfterAll
+  public static void terminateGame() {
+    GameTest.resetGame();
+  }
+
+  @BeforeEach
+  public void initEnvironment() {
+    IMap map = mock(IMap.class);
+    when(map.getSizeInPixels()).thenReturn(new Dimension(100, 100));
+    when(map.getSizeInTiles()).thenReturn(new Dimension(10, 10));
+    when(map.getOrientation()).thenReturn(MapOrientations.ORTHOGONAL);
+    when(map.getRenderLayers()).thenReturn(new ArrayList<>());
+
+    Game.world().loadEnvironment(new Environment(map));
+  }
 
   @Test
   public void testCostCalculationNode() {
