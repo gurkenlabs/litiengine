@@ -66,6 +66,8 @@ jar {
      exclude 'META-INF/services/**'
   }
   
+  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+  
   exclude '**/*.dll'
   exclude '**/*.jnilib'
   exclude '**/*.dylib'
