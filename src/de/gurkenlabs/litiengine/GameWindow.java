@@ -23,6 +23,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JFrame;
+import javax.swing.WindowConstants;
 
 import de.gurkenlabs.litiengine.configuration.DisplayMode;
 import de.gurkenlabs.litiengine.graphics.MouseCursor;
@@ -69,7 +70,7 @@ public final class GameWindow {
       this.initializeEventListeners();
 
       this.hostControl.setTitle(Game.info().getTitle());
-      this.hostControl.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+      this.hostControl.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
       initializeWindowEventListeners(this.hostControl);
     }
   }
@@ -188,6 +189,7 @@ public final class GameWindow {
       resolution = new Dimension(host.getSize().width, host.getSize().height);
       break;
     case WINDOWED:
+    default:
       host.setVisible(true);
       break;
     }

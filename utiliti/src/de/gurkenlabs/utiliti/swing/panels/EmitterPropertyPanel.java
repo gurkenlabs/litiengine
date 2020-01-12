@@ -176,7 +176,7 @@ public class EmitterPropertyPanel extends PropertyPanel {
     this.txt.setText("IFFF");
     this.txt.setColumns(10);
 
-    this.tabbedPanel = new JTabbedPane(JTabbedPane.TOP);
+    this.tabbedPanel = new JTabbedPane(SwingConstants.TOP);
     this.tabbedPanel.setBorder(null);
 
     this.colorPanel = new JPanel();

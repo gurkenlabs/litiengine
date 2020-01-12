@@ -22,9 +22,9 @@ import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.sax.SAXSource;
-import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 
 public final class XmlUtilities {
@@ -55,7 +55,7 @@ public final class XmlUtilities {
    */
   public static void saveWithCustomIndentation(ByteArrayInputStream input, FileOutputStream fos, int indentation) {
     try {
-      Transformer transformer = SAXTransformerFactory.newInstance().newTransformer();
+      Transformer transformer = TransformerFactory.newInstance().newTransformer();
       transformer.setOutputProperty(OutputKeys.DOCTYPE_PUBLIC, "yes");
       transformer.setOutputProperty(OutputKeys.INDENT, "yes");
       transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", String.valueOf(indentation));

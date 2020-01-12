@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.ScrollPaneConstants;
 
 import de.gurkenlabs.litiengine.resources.ImageFormat;
 import de.gurkenlabs.utiliti.components.Controller;
@@ -40,7 +41,7 @@ public class AssetList extends JSplitPane implements Controller {
       }
     });
 
-    JScrollPane scrollPane = new JScrollPane(assetPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    JScrollPane scrollPane = new JScrollPane(assetPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
     this.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> Editor.preferences().setAssetsSplitter(this.getDividerLocation()));
     this.setDividerLocation(Editor.preferences().getMainSplitterPosition() != 0 ? Editor.preferences().getAssetsSplitter() : 200);

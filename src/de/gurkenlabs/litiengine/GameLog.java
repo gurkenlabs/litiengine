@@ -16,7 +16,7 @@ import java.util.logging.SimpleFormatter;
  */
 final class GameLog {
   private static final String LOGGING_CONFIG_FILE = "logging.properties";
-  private static final Logger log = Logger.getLogger(Game.class.getName());
+  private static final Logger log = Logger.getLogger(GameLog.class.getName());
 
   GameLog() {
   }

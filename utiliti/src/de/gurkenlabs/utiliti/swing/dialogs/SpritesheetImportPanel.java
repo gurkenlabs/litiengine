@@ -200,7 +200,7 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
     JLabel lblKeyframes = new JLabel("keyframes:");
 
     labelImage = new JLabel("");
-    labelImage.setHorizontalAlignment(JLabel.CENTER);
+    labelImage.setHorizontalAlignment(SwingConstants.CENTER);
     labelImage.setMaximumSize(new Dimension(0, 128));
     labelImage.setMinimumSize(new Dimension(0, 128));
     labelImage.setPreferredSize(new Dimension(0, 128));

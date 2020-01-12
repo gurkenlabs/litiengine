@@ -91,7 +91,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
     this.tagPanel = new TagPanel();
 
-    this.tabbedPanel = new JTabbedPane(JTabbedPane.TOP);
+    this.tabbedPanel = new JTabbedPane(SwingConstants.TOP);
 
     this.infoPanel = new JPanel();
 

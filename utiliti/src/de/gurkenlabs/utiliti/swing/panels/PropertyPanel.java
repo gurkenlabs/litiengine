@@ -25,6 +25,7 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -298,7 +299,7 @@ public abstract class PropertyPanel extends JPanel {
       this.caption = Resources.strings().get(resource);
       this.component = component;
       this.label = new JLabel(this.caption);
-      this.label.setVerticalAlignment(JLabel.TOP);
+      this.label.setVerticalAlignment(SwingConstants.TOP);
       this.setMinHeight(CONTROL_HEIGHT);
       ControlBehavior.apply(this.getComponent());
     }

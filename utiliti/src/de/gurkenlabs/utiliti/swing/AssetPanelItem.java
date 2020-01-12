@@ -23,12 +23,14 @@ import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
@@ -87,7 +89,7 @@ public class AssetPanelItem extends JPanel {
     this.setBackground(Style.COLOR_ASSETPANEL_BACKGROUND);
     this.setBorder(normalBorder);
 
-    this.getInputMap(JPanel.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deleteAsset");
+    this.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deleteAsset");
     this.getActionMap().put("deleteAsset", new AbstractAction() {
       @Override
       public void actionPerformed(ActionEvent ae) {
@@ -176,7 +178,7 @@ public class AssetPanelItem extends JPanel {
     this.textField = new JTextField();
     add(this.textField, BorderLayout.SOUTH);
     this.textField.setColumns(10);
-    this.textField.setHorizontalAlignment(JTextField.CENTER);
+    this.textField.setHorizontalAlignment(SwingConstants.CENTER);
     this.textField.setForeground(Color.WHITE);
     this.textField.setBackground(null);
     this.textField.setBorder(null);
@@ -268,7 +270,7 @@ public class AssetPanelItem extends JPanel {
 
   public AssetPanelItem(Icon icon, String text, Object origin) {
     this(origin);
-    this.iconLabel.setHorizontalAlignment(JLabel.CENTER);
+    this.iconLabel.setHorizontalAlignment(SwingConstants.CENTER);
     this.iconLabel.setIcon(icon);
     this.textField.setText(text);
   }
