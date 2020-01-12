@@ -23,7 +23,7 @@ public class Blueprints extends ResourcesContainer<Blueprint> {
   protected Blueprint load(URL resourceName) throws Exception {
     Blueprint blueprint;
     try {
-      blueprint = XmlUtilities.readFromFile(Blueprint.class, resourceName);
+      blueprint = XmlUtilities.read(Blueprint.class, resourceName);
     } catch (JAXBException e) {
       throw new TmxException("could not parse xml data", e);
     }

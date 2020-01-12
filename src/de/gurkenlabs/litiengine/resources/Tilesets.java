@@ -18,7 +18,7 @@ public class Tilesets extends ResourcesContainer<Tileset> {
   @Override
   protected Tileset load(URL resourceName) throws IOException, URISyntaxException {
     try {
-      Tileset tileset = XmlUtilities.readFromFile(Tileset.class, resourceName);
+      Tileset tileset = XmlUtilities.read(Tileset.class, resourceName);
       tileset.finish(resourceName);
       return tileset;
     } catch (JAXBException e) {

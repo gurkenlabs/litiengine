@@ -2,8 +2,6 @@ package de.gurkenlabs.litiengine.graphics.emitters.xml;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.io.FileNotFoundException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -96,8 +94,8 @@ public class CustomEmitter extends Emitter {
 
     EmitterData loaded;
     try {
-      loaded = XmlUtilities.readFromFile(EmitterData.class, emitterXml);
-    } catch (FileNotFoundException | JAXBException | URISyntaxException e) {
+      loaded = XmlUtilities.read(EmitterData.class, emitterXml);
+    } catch (JAXBException e) {
       log.log(Level.SEVERE, "failed to load emmiter data for " + emitterXml, e);
       return null;
     }

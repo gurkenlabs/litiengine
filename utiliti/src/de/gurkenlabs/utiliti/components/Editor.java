@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -439,8 +438,8 @@ public class Editor extends Screen {
     XmlImportDialog.importXml("Emitter", file -> {
       EmitterData emitter;
       try {
-        emitter = XmlUtilities.readFromFile(EmitterData.class, file.toURI().toURL());
-      } catch (IOException | JAXBException | URISyntaxException e) {
+        emitter = XmlUtilities.read(EmitterData.class, file.toURI().toURL());
+      } catch (IOException | JAXBException e) {
         log.log(Level.SEVERE, "could not load emitter data from " + file, e);
         return;
       }
@@ -462,8 +461,8 @@ public class Editor extends Screen {
     XmlImportDialog.importXml("Blueprint", file -> {
       Blueprint blueprint;
       try {
-        blueprint = XmlUtilities.readFromFile(Blueprint.class, file.toURI().toURL());
-      } catch (IOException | JAXBException | URISyntaxException e) {
+        blueprint = XmlUtilities.read(Blueprint.class, file.toURI().toURL());
+      } catch (IOException | JAXBException e) {
         log.log(Level.SEVERE, "could not load blueprint from " + file, e);
         return;
       }
@@ -490,9 +489,9 @@ public class Editor extends Screen {
       Tileset tileset;
       try {
         URL path = file.toURI().toURL();
-        tileset = XmlUtilities.readFromFile(Tileset.class, path);
+        tileset = XmlUtilities.read(Tileset.class, path);
         tileset.finish(path);
-      } catch (IOException | JAXBException | URISyntaxException e) {
+      } catch (IOException | JAXBException e) {
         log.log(Level.SEVERE, "could not load tileset from " + file, e);
         return;
       }

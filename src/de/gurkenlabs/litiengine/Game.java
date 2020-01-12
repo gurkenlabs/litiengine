@@ -593,7 +593,7 @@ public final class Game {
   public static void setInfo(final URL gameInfoFile) {
     GameInfo info;
     try {
-      info = XmlUtilities.readFromFile(GameInfo.class, gameInfoFile);
+      info = XmlUtilities.read(GameInfo.class, gameInfoFile);
     } catch (Exception e) {
       log().log(Level.WARNING, "Could not read game info from {0}", new Object[] { gameInfoFile });
       setInfo((GameInfo) null);

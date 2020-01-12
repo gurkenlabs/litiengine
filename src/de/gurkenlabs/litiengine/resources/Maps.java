@@ -26,7 +26,7 @@ public final class Maps extends ResourcesContainer<IMap> {
   protected IMap load(URL resourceName) throws IOException, URISyntaxException {
     TmxMap map;
     try {
-      map = XmlUtilities.readFromFile(TmxMap.class, resourceName);
+      map = XmlUtilities.read(TmxMap.class, resourceName);
     } catch (JAXBException e) {
       throw new TmxException(e.getMessage(), e);
     }

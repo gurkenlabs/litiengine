@@ -1,7 +1,5 @@
 package de.gurkenlabs.litiengine.resources;
 
-import java.io.FileNotFoundException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -42,7 +40,7 @@ public class TextureAtlas {
 
   public static TextureAtlas read(String textureAtlasFile) {
     try {
-      TextureAtlas atlas = XmlUtilities.readFromFile(TextureAtlas.class, Resources.getLocation(textureAtlasFile));
+      TextureAtlas atlas = XmlUtilities.read(TextureAtlas.class, Resources.getLocation(textureAtlasFile));
       if (atlas == null) {
         return null;
       }
@@ -50,7 +48,7 @@ public class TextureAtlas {
       String directory = FileUtilities.getParentDirPath(textureAtlasFile);
       atlas.absoluteImagePath = FileUtilities.combine(directory, atlas.rawImagePath);
       return atlas;
-    } catch (FileNotFoundException | JAXBException | URISyntaxException e) {
+    } catch (JAXBException e) {
       log.log(Level.SEVERE, "TextureAtlas " + textureAtlasFile + " could not be read.", e);
       return null;
     }

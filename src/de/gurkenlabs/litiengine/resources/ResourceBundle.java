@@ -7,7 +7,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -86,7 +85,7 @@ public class ResourceBundle implements Serializable {
 
   public static ResourceBundle load(final URL file) {
     try {
-      ResourceBundle gameFile = getGameFileFromFile(file);
+      ResourceBundle gameFile = getResourceBundle(file);
       if (gameFile == null) {
         return null;
       }
@@ -105,8 +104,8 @@ public class ResourceBundle implements Serializable {
       }
 
       return gameFile;
-    } catch (final JAXBException | IOException | URISyntaxException e) {
-      log.log(Level.SEVERE, e.getMessage(), e);
+    } catch (final JAXBException | IOException e) {
+      log.log(Level.SEVERE, file + " - " + e.getMessage(), e);
     }
 
     return null;
@@ -194,7 +193,7 @@ public class ResourceBundle implements Serializable {
     return newFile.toString();
   }
 
-  private static ResourceBundle getGameFileFromFile(URL file) throws JAXBException, IOException, URISyntaxException {
+  private static ResourceBundle getResourceBundle(URL file) throws JAXBException, IOException {
     final JAXBContext jaxbContext = XmlUtilities.getContext(ResourceBundle.class);
     final Unmarshaller um = jaxbContext.createUnmarshaller();
     try (InputStream inputStream = Resources.get(file)) {
@@ -205,7 +204,7 @@ public class ResourceBundle implements Serializable {
     } catch (final ZipException e) {
 
       // if it fails to load the compressed file, get it from plain XML
-      return XmlUtilities.readFromFile(ResourceBundle.class, file);
+      return XmlUtilities.read(ResourceBundle.class, file);
     }
   }
 
