@@ -31,7 +31,6 @@ import javax.swing.event.ChangeListener;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
-import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.UndoManager;
@@ -237,7 +236,7 @@ public abstract class PropertyPanel extends JPanel {
     }
   }
 
-  protected void updateEnvironment(final IMapObject before) {
+  protected void updateEnvironment() {
     if (getDataSource() instanceof IMapObject) {
       IMapObject obj = getDataSource();
       Game.world().environment().reloadFromMap(obj.getId());
@@ -282,11 +281,10 @@ public abstract class PropertyPanel extends JPanel {
   }
 
   private void applyChanges(Consumer<IMapObject> updateAction) {
-    final IMapObject before = new MapObject((MapObject) getDataSource());
     UndoManager.instance().mapObjectChanging(getDataSource());
     updateAction.accept(getDataSource());
     UndoManager.instance().mapObjectChanged(getDataSource());
-    updateEnvironment(before);
+    updateEnvironment();
   }
 
   protected class LayoutItem {

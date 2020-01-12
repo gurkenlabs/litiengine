@@ -276,7 +276,12 @@ public final class Resources {
    * @return The contents of the specified file as {@code String}
    */
   public static String read(String file, Charset charset) {
-    return read(getLocation(file), charset);
+    final URL location = getLocation(file);
+    if (location == null) {
+      return null;
+    }
+
+    return read(location, charset);
   }
 
   /**

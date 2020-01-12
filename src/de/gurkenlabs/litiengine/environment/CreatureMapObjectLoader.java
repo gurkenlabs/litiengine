@@ -72,7 +72,7 @@ public class CreatureMapObjectLoader extends MapObjectLoader {
     Collection<IEntity> entities = new ArrayList<>();
     final String spriteSheet = mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME);
 
-    Creature creature = this.createNewCreature(mapObject, spriteSheet, mapObject.getStringValue(MapObjectProperty.SPAWN_TYPE));
+    Creature creature = this.createNewCreature(mapObject, spriteSheet);
     loadDefaultProperties(creature, mapObject);
 
     if (mapObject.hasCustomProperty(MapObjectProperty.MOVEMENT_VELOCITY)) {
@@ -85,7 +85,7 @@ public class CreatureMapObjectLoader extends MapObjectLoader {
     return entities;
   }
 
-  protected Creature createNewCreature(IMapObject mapObject, String spriteSheet, String spawnType) {
+  protected Creature createNewCreature(IMapObject mapObject, String spriteSheet) {
     // for each known custom creature type, check if it was registered for the specified spriteSheetName
     // if so: create an instance of the custom class instead of the default Creature class
     for (Class<? extends Creature> customCreature : customCreatureType) {

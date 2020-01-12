@@ -229,7 +229,8 @@ public final class GamepadManager implements ILaunchable, GamepadEvents {
 
   @Override
   public boolean isPressed(String gamepadComponent) {
-    return this.current() != null && this.current().isPressed(gamepadComponent);
+    final Gamepad current = this.current();
+    return current != null && current.isPressed(gamepadComponent);
   }
 
   static <T> void addComponentListener(Map<String, Collection<T>> consumerList, String identifier, T consumer) {
