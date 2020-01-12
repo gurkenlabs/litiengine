@@ -41,8 +41,10 @@ public class Program {
     // load up previously opened project file or the one that is specified in
     // the command line arguments
     handleArgs(args);
-    if (!Editor.instance().fileLoaded() && Editor.preferences().getLastGameFile() != null) {
-      Editor.instance().load(new File(Editor.preferences().getLastGameFile()), false);
+    
+    String gameFile = Editor.preferences().getLastGameFile().trim();
+    if (!Editor.instance().fileLoaded() && gameFile != null && !gameFile.isEmpty()) {
+      Editor.instance().load(new File(gameFile), false);
     }
   }
 
@@ -55,18 +57,23 @@ public class Program {
   }
 
   private static void handleArgs(String[] args) {
-    if (args.length == 0 || args[0] == null || args[0].isEmpty()) {
+    if (args.length == 0) {
+      return;
+    }
+
+    String gameFile = args[0].trim();
+    if (gameFile == null || gameFile.isEmpty()) {
       return;
     }
 
     // handle file loading
     try {
-      Paths.get(args[0]);
+      Paths.get(gameFile);
     } catch (InvalidPathException e) {
       return;
     }
 
-    File f = new File(args[0]);
+    File f = new File(gameFile);
     Editor.instance().load(f, false);
   }
 }

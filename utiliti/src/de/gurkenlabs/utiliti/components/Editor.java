@@ -270,14 +270,14 @@ public class Editor extends Screen {
         return;
       }
     }
-
-    if (!FileUtilities.getExtension(gameFile).equals(ResourceBundle.FILE_EXTENSION)) {
-      log.log(Level.SEVERE, "unsupported file format {0}", FileUtilities.getExtension(gameFile));
+    
+    if (!gameFile.exists()) {
+      log.log(Level.SEVERE, "gameFile {0} does not exist", gameFile);
       return;
     }
 
-    if (!gameFile.exists()) {
-      log.log(Level.SEVERE, "gameFile {0} does not exist", gameFile);
+    if (!FileUtilities.getExtension(gameFile).equals(ResourceBundle.FILE_EXTENSION)) {
+      log.log(Level.SEVERE, "[{0}] unsupported file format [{1}]", new Object[] { gameFile, FileUtilities.getExtension(gameFile) });
       return;
     }
 
@@ -654,7 +654,7 @@ public class Editor extends Screen {
   private void saveMaps() {
     for (TmxMap map : this.getChangedMaps()) {
       UndoManager.save(map);
-      
+
       if (preferences().syncMaps()) {
         for (String file : FileUtilities.findFilesByExtension(new ArrayList<>(), Paths.get(FileUtilities.combine(this.getProjectPath(), "maps")), map.getName() + "." + TmxMap.FILE_EXTENSION)) {
           File newFile = XmlUtilities.save(map, file, TmxMap.FILE_EXTENSION);
