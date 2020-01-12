@@ -31,14 +31,15 @@ public final class ReflectionUtilities {
         return field;
       }
     }
-
-    while (cls.getSuperclass() != null && !cls.getSuperclass().equals(Object.class)) {
+    
+    if (cls.getSuperclass() != null && !cls.getSuperclass().equals(Object.class)) {
       Field f = getField(cls.getSuperclass(), fieldName, recursive);
       if (f != null) {
         return f;
       }
     }
-
+    
+    log.log(Level.WARNING, "Could not find field [{0}] on class [{1}] or its parents.", new Object[] {fieldName, cls});
     return null;
   }
 
