@@ -60,12 +60,6 @@ public final class MapObjectProperty {
   public static final String SHADOW_OFFSET = "shadowOffset";
 
   // spawnpoint
-  /**
-   * @deprecated This is an old attempt of deciding what should be spawned at spawnpoint.
-   *             A spawnpoint however is designed as non-restrictive and just provides a
-   *             location for any entity to spawn on.
-   */
-  @Deprecated()
   public static final String SPAWN_TYPE = "spawnType";
   public static final String SPAWN_DIRECTION = "spawnDirection";
 
