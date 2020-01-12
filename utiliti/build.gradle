@@ -15,15 +15,8 @@ sourceSets {
   main.resources.srcDir "resources"
   main.resources.srcDir "localization"
   
-  test {
-    java {
-      srcDirs = ["tests"]
-    }
-    
-    resources {
-      srcDirs = ["tests"]
-    }
-  }
+  test.java.srcDir "tests"
+  test.resources.srcDir "tests"
 }
 
 dependencies {
@@ -51,7 +44,6 @@ jar {
      exclude 'META-INF/services/**'
   }
   
-  from('resources') { include '**/*' }
   exclude '**/*.dll'
   exclude '**/*.jnilib'
   exclude '**/*.dylib'

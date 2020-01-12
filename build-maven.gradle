@@ -4,15 +4,10 @@ apply plugin: 'signing'
 
 sourceSets {
   main.java.srcDir "src"
-  main.java.srcDir "resources"
+  main.resources.srcDir "resources"
   
-  test {
-    java {
-      srcDirs = ["tests"] 
-    }
-    resources {
-      srcDirs = ["tests"]
-    }  }
+  test.java.srcDir "tests"
+  test.resources.srcDir "tests"
 }
 
 repositories {
@@ -53,8 +48,6 @@ jar {
      exclude 'META-INF/services/**'
   }
 
-  from('resources') { include '**/*' }
-  
   version = 'v0.4.18-alpha'
   exclude '**/*.dll'
   exclude '**/*.jnilib'
