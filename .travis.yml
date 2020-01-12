@@ -17,7 +17,7 @@ services:
   - xvfb
 
 script: 
-- ./gradlew fullbuild
+- ./gradlew fullbuild --warning-mode all
 - if [ $TRAVIS_PULL_REQUEST = 'false' ]; then 
     sonar-scanner; 
   fi
