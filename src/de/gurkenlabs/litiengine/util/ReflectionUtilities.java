@@ -32,7 +32,7 @@ public final class ReflectionUtilities {
       }
     }
 
-    while (cls.getSuperclass() != null) {
+    while (cls.getSuperclass() != null && !cls.getSuperclass().equals(Object.class)) {
       Field f = getField(cls.getSuperclass(), fieldName, recursive);
       if (f != null) {
         return f;
