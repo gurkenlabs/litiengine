@@ -14,7 +14,8 @@ import de.gurkenlabs.litiengine.graphics.IRenderable;
 
 /**
  * The class <code>GameMetrics</code> provides meta information about the game's metrics. This allows the developer to
- * get a feeling about the performance of different aspects (e.g. memory consumption, potential fps, network traffic, ...) and to identify potential issues.
+ * get a feeling about the performance of different aspects (e.g. memory consumption, potential fps, network traffic, ...) and to identify potential
+ * issues.
  * 
  * <p>
  * This information can be rendered as debug information if configured to get live data during a gameplay session.
@@ -118,6 +119,7 @@ public final class GameMetrics implements IRenderable {
     this.drawTitle(g, "[client]");
     this.drawMetric(g, "fps       : " + this.getFramesPerSecond());
     this.drawMetric(g, "max fps   : " + this.maxFramesPerSecond);
+    this.drawMetric(g, "updatables: " + Game.loop().getUpdatableCount());
 
     // render jvm metrics if debug is enabled
     if (Game.config().debug().isDebugEnabled()) {
@@ -138,7 +140,7 @@ public final class GameMetrics implements IRenderable {
 
     // render rendering metrics
     if (!this.renderMetrics.isEmpty()) {
-      this.drawTitle(g, "[rendering]");
+      this.drawTitle(g, "[update]");
 
       for (RenderMetrics metric : this.renderMetrics) {
         this.drawMetric(g, metric.toString());
@@ -148,11 +150,11 @@ public final class GameMetrics implements IRenderable {
     }
   }
 
-  public void setFramesPerSecond(final int currentFramesPerSecond) {
+  void setFramesPerSecond(final int currentFramesPerSecond) {
     this.framesPerSecond = currentFramesPerSecond;
   }
 
-  public void setEstimatedMaxFramesPerSecond(final int maxFrames) {
+  void setEstimatedMaxFramesPerSecond(final int maxFrames) {
     this.maxFramesPerSecond = maxFrames;
   }
 

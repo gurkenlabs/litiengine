@@ -32,6 +32,13 @@ public interface ILoop extends ILaunchable {
   public void detach(final IUpdateable updatable);
 
   /**
+   * Gets the amount of attached <code>IUpdatable</code> instances of this loop.
+   * 
+   * @return The amount instances attached to this loop.
+   */
+  public int getUpdatableCount();
+
+  /**
    * Gets the total amount of ticks performed by this loop since it was started.
    * 
    * @return The total amount of elapsed ticks.

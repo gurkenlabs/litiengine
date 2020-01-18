@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 import de.gurkenlabs.litiengine.util.TimeUtilities;
 
 /**
- * The <code>UpdateLoop</code> is a basic loop implementation that performs operations at the specified <code>tickRate</code> 
+ * The <code>UpdateLoop</code> is a basic loop implementation that performs operations at the specified <code>tickRate</code>
  * by continuously processing the registered logic and delaying the loop until the requested rate is met.
  *
  * @see #process()
@@ -95,6 +95,11 @@ public class UpdateLoop extends Thread implements AutoCloseable, ILoop {
   @Override
   public void detach(final IUpdateable updatable) {
     this.updatables.remove(updatable);
+  }
+
+  @Override
+  public int getUpdatableCount() {
+    return this.updatables.size();
   }
 
   @Override
