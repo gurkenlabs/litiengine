@@ -66,16 +66,17 @@ public class PropMapObjectLoader extends MapObjectLoader {
 
   @Override
   public Collection<IEntity> load(Environment environment, IMapObject mapObject) {
-    if (MapObjectType.get(mapObject.getType()) != MapObjectType.PROP) {
-      throw new IllegalArgumentException("Cannot load a mapobject of the type " + mapObject.getType() + " with a loader of the type " + PropMapObjectLoader.class);
+    Collection<IEntity> entities = new ArrayList<>();
+    if (!this.isMatchingType(mapObject)) {
+      return entities;
     }
+
 
     final Prop prop = this.createNewProp(mapObject, mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME));
     loadDefaultProperties(prop, mapObject);
     
     prop.setMaterial(Material.get(mapObject.getStringValue(MapObjectProperty.PROP_MATERIAL)));
 
-    Collection<IEntity> entities = new ArrayList<>();
     entities.add(prop);
     return entities;
   }

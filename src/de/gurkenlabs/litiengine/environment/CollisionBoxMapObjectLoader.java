@@ -17,16 +17,16 @@ public class CollisionBoxMapObjectLoader extends MapObjectLoader {
 
   @Override
   public Collection<IEntity> load(Environment environment, IMapObject mapObject) {
-    if (MapObjectType.get(mapObject.getType()) != MapObjectType.COLLISIONBOX) {
-      throw new IllegalArgumentException("Cannot load a mapobject of the type " + mapObject.getType() + " with a loader of the type " + CollisionBoxMapObjectLoader.class);
+    Collection<IEntity> entities = new ArrayList<>();
+    if (!this.isMatchingType(mapObject)) {
+      return entities;
     }
 
     final CollisionBox col = this.createCollisionBox(mapObject);
     loadDefaultProperties(col, mapObject);
     col.setCollisionBoxWidth(col.getWidth());
     col.setCollisionBoxHeight(col.getHeight());
-    
-    Collection<IEntity> entities = new ArrayList<>();
+
     entities.add(col);
 
     if (col.isObstructingLight()) {

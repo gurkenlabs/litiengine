@@ -4,6 +4,8 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Game;
@@ -16,6 +18,8 @@ import de.gurkenlabs.litiengine.physics.CollisionEvent;
 
 @CollisionInfo(collision = true)
 public abstract class CollisionEntity extends Entity implements ICollisionEntity {
+  private static final Logger log = Logger.getLogger(CollisionEntity.class.getName());
+  
   private static final double HEIGHT_FACTOR = 0.4;
 
   private static final double WIDTH_FACTOR = 0.4;
@@ -192,7 +196,8 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
   @Override
   public void setCollisionType(Collision type) {
     if (type == Collision.ANY) {
-      throw new IllegalArgumentException("CollistionType.ALL is not allowed to be assigned to an entity. It may only be used for filtering in the PhysicsEngine.");
+      log.log(Level.WARNING, "CollistionType.ALL is not allowed to be assigned to an entity. It may only be used for filtering in the PhysicsEngine.");
+      return;
     }
 
     if (this.getEnvironment() != null && this.getEnvironment().isLoaded()) {

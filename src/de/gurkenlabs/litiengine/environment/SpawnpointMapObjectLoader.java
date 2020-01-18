@@ -18,9 +18,11 @@ public class SpawnpointMapObjectLoader extends MapObjectLoader {
 
   @Override
   public Collection<IEntity> load(Environment environment, IMapObject mapObject) {
-    if (MapObjectType.get(mapObject.getType()) != MapObjectType.SPAWNPOINT) {
-      throw new IllegalArgumentException("Cannot load a mapobject of the type " + mapObject.getType() + " with a loader of the type " + SpawnpointMapObjectLoader.class);
+    Collection<IEntity> entities = new ArrayList<>();
+    if (!this.isMatchingType(mapObject)) {
+      return entities;
     }
+
 
     final Direction direction = mapObject.getStringValue(MapObjectProperty.SPAWN_DIRECTION) != null ? Direction.valueOf(mapObject.getStringValue(MapObjectProperty.SPAWN_DIRECTION)) : Direction.DOWN;
     final String spawnType = mapObject.getStringValue(MapObjectProperty.SPAWN_TYPE);
@@ -28,7 +30,6 @@ public class SpawnpointMapObjectLoader extends MapObjectLoader {
     final Spawnpoint spawn = this.createSpawnpoint(mapObject, direction, spawnType);
     loadDefaultProperties(spawn, mapObject);
 
-    Collection<IEntity> entities = new ArrayList<>();
     entities.add(spawn);
     return entities;
   }

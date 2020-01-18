@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine.environment;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.LightSource;
@@ -11,6 +12,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 
 public class LightSourceMapObjectLoader extends MapObjectLoader {
+  private static final Logger log = Logger.getLogger(LightSourceMapObjectLoader.class.getName());
 
   public LightSourceMapObjectLoader() {
     super(MapObjectType.LIGHTSOURCE);
@@ -18,9 +20,11 @@ public class LightSourceMapObjectLoader extends MapObjectLoader {
 
   @Override
   public Collection<IEntity> load(Environment environment, IMapObject mapObject) {
-    if (MapObjectType.get(mapObject.getType()) != MapObjectType.LIGHTSOURCE) {
-      throw new IllegalArgumentException("Cannot load a mapobject of the type " + mapObject.getType() + " with a loader of the type " + LightSourceMapObjectLoader.class);
+    Collection<IEntity> entities = new ArrayList<>();
+    if (!this.isMatchingType(mapObject)) {
+      return entities;
     }
+
 
     final int intensity = mapObject.getIntValue(MapObjectProperty.LIGHT_INTENSITY, LightSource.DEFAULT_INTENSITY);
     final Color color = mapObject.getColorValue(MapObjectProperty.LIGHT_COLOR);
@@ -28,7 +32,6 @@ public class LightSourceMapObjectLoader extends MapObjectLoader {
     final LightSource.Type lightType = mapObject.getEnumValue(MapObjectProperty.LIGHT_SHAPE, LightSource.Type.class);
     final double focusOffsetX = mapObject.getDoubleValue(MapObjectProperty.LIGHT_FOCUSOFFSETX);
     final double focusOffsetY = mapObject.getDoubleValue(MapObjectProperty.LIGHT_FOCUSOFFSETY);
-    Collection<IEntity> entities = new ArrayList<>();
     if (color == null) {
       return entities;
     }

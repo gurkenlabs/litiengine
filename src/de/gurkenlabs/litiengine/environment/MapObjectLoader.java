@@ -2,6 +2,8 @@ package de.gurkenlabs.litiengine.environment;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
@@ -12,6 +14,7 @@ import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.util.ReflectionUtilities;
 
 public abstract class MapObjectLoader implements IMapObjectLoader {
+  private static final Logger log = Logger.getLogger(MapObjectLoader.class.getName());
   private final String mapObjectType;
 
   protected MapObjectLoader(String mapObjectType) {
@@ -81,6 +84,15 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
         entity.getProperties().setValue(name, property);
       }
     });
+  }
+  
+  protected boolean isMatchingType(IMapObject mapObject) {
+    if (!mapObject.getType().equalsIgnoreCase(this.getMapObjectType())) {
+      log.log(Level.SEVERE, "Cannot load a mapobject of the type [{0}] with a loader of type [{1}].", new Object[] { mapObject.getType(), this.getClass() });
+      return false;
+    }
+    
+    return true;
   }
 
   private static void loadCustomMapObjectProperties(IEntity entity, IMapObject mapObject) {

@@ -65,11 +65,12 @@ public class CreatureMapObjectLoader extends MapObjectLoader {
 
   @Override
   public Collection<IEntity> load(Environment environment, IMapObject mapObject) {
-    if (MapObjectType.get(mapObject.getType()) != MapObjectType.CREATURE) {
-      throw new IllegalArgumentException("Cannot load a mapobject of the type " + mapObject.getType() + " with a loader of the type " + CreatureMapObjectLoader.class);
+    Collection<IEntity> entities = new ArrayList<>();
+    if (!this.isMatchingType(mapObject)) {
+      return entities;
     }
 
-    Collection<IEntity> entities = new ArrayList<>();
+
     final String spriteSheet = mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME);
 
     Creature creature = this.createNewCreature(mapObject, spriteSheet);
@@ -78,7 +79,7 @@ public class CreatureMapObjectLoader extends MapObjectLoader {
     if (mapObject.hasCustomProperty(MapObjectProperty.MOVEMENT_VELOCITY)) {
       creature.setVelocity(mapObject.getFloatValue(MapObjectProperty.MOVEMENT_VELOCITY));
     }
-    
+
     creature.setFacingDirection(mapObject.getEnumValue(MapObjectProperty.SPAWN_DIRECTION, Direction.class, Direction.RIGHT));
 
     entities.add(creature);
