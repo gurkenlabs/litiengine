@@ -163,7 +163,7 @@ public class Camera implements ICamera {
     // location with an AffineTransform...
     final double fraction = this.focus.getY() - Math.floor(this.focus.getY());
     if (MathUtilities.isInt(fraction * 4)) {
-      this.focus.setLocation(this.focus.getX(), this.focus.getY() + Math.ulp((float) this.focus.getY()));
+      this.focus.setLocation(this.focus.getX(), this.focus.getY() + 0.01);
     }
 
     final FocusChangedEvent event = new FocusChangedEvent(this, this.focus);
