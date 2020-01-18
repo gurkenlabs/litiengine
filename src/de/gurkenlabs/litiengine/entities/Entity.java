@@ -124,7 +124,7 @@ public abstract class Entity implements IEntity, EntityRenderListener {
   }
 
   @Override
-  public void addEntityRenderedListener(final EntityRenderedListener listener) {
+  public void onRendered(final EntityRenderedListener listener) {
     this.renderedListeners.add(listener);
   }
 
@@ -144,12 +144,12 @@ public abstract class Entity implements IEntity, EntityRenderListener {
   }
 
   @Override
-  public void addMessageListener(EntityMessageListener listener) {
-    this.addMessageListener(ANY_MESSAGE, listener);
+  public void onMessage(EntityMessageListener listener) {
+    this.onMessage(ANY_MESSAGE, listener);
   }
 
   @Override
-  public void addMessageListener(String message, EntityMessageListener listener) {
+  public void onMessage(String message, EntityMessageListener listener) {
     if (!this.messageListeners.containsKey(message)) {
       this.messageListeners.put(message, ConcurrentHashMap.newKeySet());
     }

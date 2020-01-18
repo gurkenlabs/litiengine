@@ -73,7 +73,7 @@ public final class RenderEngine {
    * @param listener
    *          The listener to add.
    * 
-   * @see IEntity#addEntityRenderedListener(EntityRenderedListener)
+   * @see IEntity#onRendered(EntityRenderedListener)
    */
   public void addEntityRenderedListener(final EntityRenderedListener listener) {
     this.entityRenderedListener.add(listener);

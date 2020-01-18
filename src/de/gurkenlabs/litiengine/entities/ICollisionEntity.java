@@ -69,7 +69,7 @@ public interface ICollisionEntity extends IEntity {
   
   public void setCollisionType(Collision collisionType);
   
-  public void addCollisionListener(CollisionListener listener);
+  public void onCollision(CollisionListener listener);
 
   public void removeCollisionListener(CollisionListener listener);
 

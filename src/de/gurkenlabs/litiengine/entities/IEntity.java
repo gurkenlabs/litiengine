@@ -15,9 +15,9 @@ import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
 
 public interface IEntity{
-  public void addMessageListener(EntityMessageListener listener);
+  public void onMessage(EntityMessageListener listener);
 
-  public void addMessageListener(String message, EntityMessageListener listener);
+  public void onMessage(String message, EntityMessageListener listener);
 
   public void removeMessageListener(EntityMessageListener listener);
 
@@ -35,7 +35,7 @@ public interface IEntity{
    * @param listener
    *          The listener to add.
    */
-  public void addEntityRenderedListener(final EntityRenderedListener listener);
+  public void onRendered(final EntityRenderedListener listener);
 
   /**
    * Removes the specified entity rendered listener.

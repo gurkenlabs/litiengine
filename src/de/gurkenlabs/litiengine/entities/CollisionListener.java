@@ -8,6 +8,7 @@ import de.gurkenlabs.litiengine.physics.PhysicsEngine;
 /**
  * This listener provides callbacks for collision events on <code>ICollisionEntity</code>.
  */
+@FunctionalInterface
 public interface CollisionListener extends EventListener {
 
   /**

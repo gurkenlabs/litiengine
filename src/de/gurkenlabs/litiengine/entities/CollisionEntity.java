@@ -211,7 +211,7 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
   }
 
   @Override
-  public void addCollisionListener(CollisionListener listener) {
+  public void onCollision(CollisionListener listener) {
     this.collisionListener.add(listener);
   }
 
