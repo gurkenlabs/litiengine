@@ -15,8 +15,7 @@ public class LoopedTrack implements Track, Iterator<Sound> {
   }
 
   public LoopedTrack(Sound track) {
-    Objects.requireNonNull(track);
-    this.track = track;
+    this.track = Objects.requireNonNull(track);
   }
 
   @Override

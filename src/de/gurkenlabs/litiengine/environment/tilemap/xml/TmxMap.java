@@ -370,8 +370,7 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
 
   @XmlTransient
   public void setOrientation(IMapOrientation orientation) {
-    Objects.requireNonNull(orientation);
-    this.mapOrientation = orientation;
+    this.mapOrientation = Objects.requireNonNull(orientation);
   }
 
   @XmlTransient

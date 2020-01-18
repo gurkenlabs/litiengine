@@ -278,10 +278,8 @@ public class Camera implements ICamera {
 
   @Override
   public void setClampAlign(Align align, Valign valign) {
-    Objects.requireNonNull(align);
-    Objects.requireNonNull(valign);
-    this.align = align;
-    this.valign = valign;
+    this.align = Objects.requireNonNull(align);
+    this.valign = Objects.requireNonNull(valign);
   }
 
   @Override
