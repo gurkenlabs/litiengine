@@ -6,45 +6,37 @@ import java.awt.Point;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import de.gurkenlabs.litiengine.environment.tilemap.ILayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.LayerProperty;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 
-/**
- * The Class Layer.
- */
 public abstract class Layer extends CustomPropertyProvider implements ILayer {
 
   @XmlAttribute
   private int id;
 
-  /** The name. */
   @XmlAttribute
   private String name;
 
-  /** The width. */
   @XmlAttribute
   private Integer width;
 
-  /** The height. */
   @XmlAttribute
   private Integer height;
 
-  /** The opacity. */
   @XmlAttribute
   private Float opacity;
 
-  /** The visible. */
   @XmlAttribute
-  private Integer visible;
+  @XmlJavaTypeAdapter(BooleanIntegerAdapter.class)
+  private Boolean visible;
 
-  /** The x. */
   @XmlAttribute
   private Integer offsetx;
 
-  /** The y. */
   @XmlAttribute
   private Integer offsety;
 
@@ -177,7 +169,7 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
       return true;
     }
 
-    return this.visible > 0;
+    return this.visible;
   }
 
   @Override
@@ -211,7 +203,7 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
   @Override
   @XmlTransient
   public void setVisible(boolean visible) {
-    this.visible = visible ? 1 : 0;
+    this.visible = visible;
   }
 
   protected void setMap(TmxMap map) {
@@ -241,10 +233,6 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
 
     if (this.opacity != null && this.opacity.floatValue() == 1.0f) {
       this.opacity = null;
-    }
-
-    if (this.visible != null && this.visible.intValue() == 1) {
-      this.visible = null;
     }
   }
 }

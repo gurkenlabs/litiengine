@@ -18,12 +18,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.util.ColorHelper;
 
-/**
- * The Class ShapeLayer.
- */
 public class MapObjectLayer extends Layer implements IMapObjectLayer {
 
-  /** The objects. */
   @XmlElement(name = "object")
   private ArrayList<MapObject> objects = new ArrayList<>();
 
