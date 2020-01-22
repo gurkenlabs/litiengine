@@ -656,7 +656,7 @@ public class MapComponent extends GuiComponent {
 
     for (IMapObject mapObject : mapObjects) {
       if (!this.getSelectedMapObjects().contains(mapObject)) {
-        this.getSelectedMapObjects().add((MapObject) mapObject);
+        this.getSelectedMapObjects().add(mapObject);
       }
     }
 
@@ -1202,8 +1202,8 @@ public class MapComponent extends GuiComponent {
           this.setSelection(mapObject, false);
           continue;
         }
-        if (this.getSelectedMapObjects().contains((MapObject) mapObject)) {
-          this.getSelectedMapObjects().remove((MapObject) mapObject);
+        if (this.getSelectedMapObjects().contains(mapObject)) {
+          this.getSelectedMapObjects().remove(mapObject);
         } else {
           this.setFocus(mapObject, !Input.keyboard().isPressed(KeyEvent.VK_SHIFT));
           UI.getInspector().bind(mapObject);
