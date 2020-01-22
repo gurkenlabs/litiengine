@@ -420,7 +420,7 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
 
   @Override
   public String toString() {
-    return (this.getName().isEmpty() || this.getName() == null) ? super.toString() : this.getName();
+    return (this.getName() == null || this.getName().isEmpty()) ? super.toString() : this.getName();
   }
 
   @Override
