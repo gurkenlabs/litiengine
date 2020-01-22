@@ -31,15 +31,15 @@ public final class ReflectionUtilities {
         return field;
       }
     }
-    
+
     if (cls.getSuperclass() != null && !cls.getSuperclass().equals(Object.class)) {
       Field f = getField(cls.getSuperclass(), fieldName, recursive);
       if (f != null) {
         return f;
       }
     }
-    
-    log.log(Level.WARNING, "Could not find field [{0}] on class [{1}] or its parents.", new Object[] {fieldName, cls});
+
+    log.log(Level.WARNING, "Could not find field [{0}] on class [{1}] or its parents.", new Object[] { fieldName, cls });
     return null;
   }
 
@@ -237,7 +237,22 @@ public final class ReflectionUtilities {
     return methods;
   }
 
+  /**
+   * Gets the events for the specified type.
+   * <p>
+   * This will search for all methods that have a parameter of type <code>EventListener</code> and match the LITIengine's naming conventions
+   * for event subscription (i.e. the method name starts with one of the prefixes "add" or "on".
+   * </p>
+   * 
+   * @param type
+   *          The type to inspect the events on.
+   * @return All methods on the specified type that are considered to be events.
+   * 
+   * @see EventListener
+   */
   public static Collection<Method> getEvents(final Class<?> type) {
+    final String eventAddPrefix = "add";
+    final String eventOnPrefix = "on";
 
     final List<Method> events = new ArrayList<>();
     Class<?> clazz = type;
@@ -245,14 +260,13 @@ public final class ReflectionUtilities {
       // iterate though the list of methods declared in the class represented by class variable, and add those annotated with the specified annotation
       final List<Method> allMethods = new ArrayList<>(Arrays.asList(clazz.getDeclaredMethods()));
       for (final Method method : allMethods) {
-        if (method.getParameterCount() == 1) {
-          for (Class<?> paramtype : method.getParameterTypes()) {
-            if (EventListener.class.isAssignableFrom(paramtype)) {
-              events.add(method);
-            }
+        for (Class<?> paramtype : method.getParameterTypes()) {
+          if (EventListener.class.isAssignableFrom(paramtype) && (method.getName().startsWith(eventAddPrefix) || method.getName().startsWith(eventOnPrefix))) {
+            events.add(method);
           }
         }
       }
+
       // move to the upper class in the hierarchy in search for more methods
       clazz = clazz.getSuperclass();
     }
