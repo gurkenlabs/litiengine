@@ -1,4 +1,4 @@
-package de.gurkenlabs.litiengine.annotation;
+package de.gurkenlabs.litiengine.entities;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;

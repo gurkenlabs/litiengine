@@ -1,6 +1,5 @@
 package de.gurkenlabs.litiengine.abilities;
 
-import de.gurkenlabs.litiengine.annotation.AbilityInfo;
 import de.gurkenlabs.litiengine.attributes.Attribute;
 
 public class AbilityAttributes {

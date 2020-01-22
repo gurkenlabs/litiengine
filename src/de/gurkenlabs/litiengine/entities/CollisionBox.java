@@ -2,8 +2,6 @@ package de.gurkenlabs.litiengine.entities;
 
 import java.awt.geom.Rectangle2D;
 
-import de.gurkenlabs.litiengine.annotation.CollisionInfo;
-import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.graphics.RenderType;

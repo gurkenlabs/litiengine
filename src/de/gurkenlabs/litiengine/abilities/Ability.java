@@ -18,7 +18,6 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.abilities.effects.Effect;
 import de.gurkenlabs.litiengine.abilities.effects.Effect.EffectAppliedListener;
 import de.gurkenlabs.litiengine.abilities.effects.Effect.EffectCeasedListener;
-import de.gurkenlabs.litiengine.annotation.AbilityInfo;
 import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;

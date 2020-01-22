@@ -19,7 +19,6 @@ import org.junit.jupiter.api.Test;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.abilities.effects.Effect;
 import de.gurkenlabs.litiengine.abilities.effects.EffectTarget;
-import de.gurkenlabs.litiengine.annotation.AbilityInfo;
 import de.gurkenlabs.litiengine.entities.Creature;
 
 public class AbilityTests {

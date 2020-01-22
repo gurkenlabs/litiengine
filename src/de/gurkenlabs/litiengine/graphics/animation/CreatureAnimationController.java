@@ -4,7 +4,7 @@ import java.awt.image.BufferedImage;
 import java.util.Optional;
 
 import de.gurkenlabs.litiengine.Direction;
-import de.gurkenlabs.litiengine.annotation.AnimationInfo;
+import de.gurkenlabs.litiengine.entities.AnimationInfo;
 import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.graphics.CreatureAnimationState;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;

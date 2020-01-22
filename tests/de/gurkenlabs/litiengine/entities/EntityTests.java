@@ -8,9 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
-import de.gurkenlabs.litiengine.annotation.Action;
-import de.gurkenlabs.litiengine.annotation.Tag;
-
 public class EntityTests {
 
   @Test

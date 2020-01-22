@@ -3,7 +3,6 @@ package de.gurkenlabs.litiengine.entities;
 import java.awt.geom.Point2D;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.annotation.AnimationInfo;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;

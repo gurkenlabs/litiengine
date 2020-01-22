@@ -1,13 +1,10 @@
-package de.gurkenlabs.litiengine.annotation;
+package de.gurkenlabs.litiengine.abilities;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-
-import de.gurkenlabs.litiengine.abilities.AbilityOrigin;
-import de.gurkenlabs.litiengine.abilities.CastType;
 
 /**
  * This attribute provides initial values for entity attributes.

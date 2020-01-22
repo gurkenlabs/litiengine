@@ -10,9 +10,9 @@ import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Valign;
-import de.gurkenlabs.litiengine.annotation.EmitterInfo;
-import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.configuration.Quality;
+import de.gurkenlabs.litiengine.entities.EmitterInfo;
+import de.gurkenlabs.litiengine.entities.EntityInfo;
 import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.Particle;
 

@@ -5,8 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import org.junit.jupiter.api.Test;
 
-import de.gurkenlabs.litiengine.annotation.MovementInfo;
-
 public class MobileEntityTests {
   @Test
   public void testInitializationByAnnotation() {

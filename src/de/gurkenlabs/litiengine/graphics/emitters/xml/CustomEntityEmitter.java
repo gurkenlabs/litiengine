@@ -2,8 +2,8 @@ package de.gurkenlabs.litiengine.graphics.emitters.xml;
 
 import java.awt.geom.Point2D;
 
-import de.gurkenlabs.litiengine.annotation.EmitterInfo;
-import de.gurkenlabs.litiengine.annotation.EntityInfo;
+import de.gurkenlabs.litiengine.entities.EmitterInfo;
+import de.gurkenlabs.litiengine.entities.EntityInfo;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 
