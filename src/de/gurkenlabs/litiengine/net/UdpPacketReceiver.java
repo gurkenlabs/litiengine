@@ -9,16 +9,11 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * The Class UdpPacketReceiver.
- */
 public class UdpPacketReceiver extends Thread implements IPacketReceiver {
   private static final Logger log = Logger.getLogger(UdpPacketReceiver.class.getName());
 
-  /** The incoming packet observers. */
   private final ArrayList<IIncomingPacketObserver> incomingPacketObservers;
 
-  /** The socket. */
   private DatagramSocket socket;
 
   /**

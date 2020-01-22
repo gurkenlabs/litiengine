@@ -4,28 +4,19 @@ import java.io.Serializable;
 import java.net.InetAddress;
 import java.util.Date;
 
-/**
- * The Class ClientConnection.
- */
 public class ClientConnection implements Serializable {
-  /** The id sequence. */
   private static int idSequence = 0;
 
   private static final long serialVersionUID = 6311152055968351408L;
 
-  /** The id. */
   private final int id;
 
-  /** The ip address. */
   private final InetAddress ipAddress;
 
-  /** The last sign of life. */
   private Date lastSignOfLife;
 
-  /** The port. */
   private final int port;
 
-  /** The account. */
   private final String userName;
 
   public ClientConnection(final ClientConnection connection) {

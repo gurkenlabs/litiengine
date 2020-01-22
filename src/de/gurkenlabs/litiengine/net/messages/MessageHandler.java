@@ -1,12 +1,9 @@
-package de.gurkenlabs.litiengine.net.messages.handlers;
+package de.gurkenlabs.litiengine.net.messages;
 
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import de.gurkenlabs.litiengine.net.messages.IMessageHandler;
-import de.gurkenlabs.litiengine.net.messages.MessagePacket;
 
 /**
  * The Class MessageHandler is an abstract implementation for all existing

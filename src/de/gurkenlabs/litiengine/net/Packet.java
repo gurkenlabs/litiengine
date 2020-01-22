@@ -1,18 +1,12 @@
 package de.gurkenlabs.litiengine.net;
 
-/**
- * The Class Packet.
- */
 public abstract class Packet {
 
-  /** The Type byte count. */
   protected static final int TYPEBYTECOUNT = 1;
 
-  /** The data. */
-  private byte[] data;
-
-  /** The packet id. */
   private final byte packetId;
+  
+  private byte[] data;
 
   /**
    * Instantiates a new packet.

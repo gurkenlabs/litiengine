@@ -9,13 +9,9 @@ import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * The Class UdpPacketSender.
- */
 public class UdpPacketSender implements IPacketSender {
   private static final Logger log = Logger.getLogger(UdpPacketSender.class.getName());
 
-  /** The socket. */
   private DatagramSocket socket;
 
   /**

@@ -1,4 +1,4 @@
-package de.gurkenlabs.litiengine.net.client;
+package de.gurkenlabs.litiengine.net;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -9,17 +9,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.ILaunchable;
-import de.gurkenlabs.litiengine.net.IPacketSender;
 import de.gurkenlabs.litiengine.net.messages.ClientMessage;
+import de.gurkenlabs.litiengine.net.messages.ClientMessageHandler;
 import de.gurkenlabs.litiengine.net.messages.IMessageHandlerProvider;
 import de.gurkenlabs.litiengine.net.messages.MessagePacket;
 import de.gurkenlabs.litiengine.net.messages.MessageType;
 import de.gurkenlabs.litiengine.net.messages.PingResponseMessage;
-import de.gurkenlabs.litiengine.net.messages.handlers.ClientMessageHandler;
 
-/**
- * The Class PingThread.
- */
 public class PingLoop extends ClientMessageHandler<PingResponseMessage> implements ILaunchable {
   private static final Logger log = Logger.getLogger(PingLoop.class.getName());
   private final int clientId;
@@ -77,10 +73,8 @@ public class PingLoop extends ClientMessageHandler<PingResponseMessage> implemen
   }
 
   private class PingThread extends Thread implements ILaunchable {
-    /** The Constant TimeBetweenPings. */
     private static final int TIME_BETWEEN_PINGS = 1000;
 
-    /** The is terminated. */
     private boolean isTerminated;
 
     private long lastPing;

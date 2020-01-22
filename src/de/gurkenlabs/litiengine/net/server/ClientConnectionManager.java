@@ -5,14 +5,8 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-/**
- * The Class ClientConnectionManager.
- */
 public class ClientConnectionManager extends CopyOnWriteArrayList<ClientConnection> implements IClientConnectionManager {
 
-  /**
-   *
-   */
   private static final long serialVersionUID = 3719486731770172645L;
 
   /**

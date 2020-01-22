@@ -3,7 +3,7 @@ package de.gurkenlabs.litiengine.net.server;
 import java.net.InetAddress;
 
 import de.gurkenlabs.litiengine.net.messages.ClientMessage;
-import de.gurkenlabs.litiengine.net.messages.handlers.MessageHandler;
+import de.gurkenlabs.litiengine.net.messages.MessageHandler;
 
 public class ClientConnectionPingMessageHandler extends MessageHandler<ClientMessage> {
 

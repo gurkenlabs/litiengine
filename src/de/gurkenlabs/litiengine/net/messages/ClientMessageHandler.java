@@ -1,10 +1,9 @@
-package de.gurkenlabs.litiengine.net.messages.handlers;
+package de.gurkenlabs.litiengine.net.messages;
 
 import java.io.Serializable;
 import java.net.InetAddress;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.net.messages.MessagePacket;
 
 public abstract class ClientMessageHandler<T extends Serializable> extends MessageHandler<T> {
 

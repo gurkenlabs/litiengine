@@ -2,9 +2,6 @@ package de.gurkenlabs.litiengine.net;
 
 import java.net.InetAddress;
 
-/**
- * The Interface IPacketSender.
- */
 public interface IPacketSender {
 
   /**

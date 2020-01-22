@@ -1,24 +1,13 @@
-package de.gurkenlabs.litiengine.net.messages.handlers;
+package de.gurkenlabs.litiengine.net.messages;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import de.gurkenlabs.litiengine.net.messages.IMessageHandler;
-import de.gurkenlabs.litiengine.net.messages.IMessageHandlerProvider;
-import de.gurkenlabs.litiengine.net.messages.MessageType;
-
-/**
- * The Class MessageHandlerProvider.
- */
 public abstract class MessageHandlerProvider implements IMessageHandlerProvider {
 
-  /** The message handlers. */
   private final HashMap<MessageType, List<IMessageHandler>> messageHandlers;
 
-  /**
-   * Instantiates a new message handler provider base.
-   */
   public MessageHandlerProvider() {
     this.messageHandlers = new HashMap<>();
     this.initializeHandlers();
@@ -55,8 +44,5 @@ public abstract class MessageHandlerProvider implements IMessageHandlerProvider 
     return this.messageHandlers;
   }
 
-  /**
-   * Initialize handlers.
-   */
   protected abstract void initializeHandlers();
 }

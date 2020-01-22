@@ -21,18 +21,14 @@ public class UdpServer implements IServer {
 
   private static final Logger log = Logger.getLogger(UdpServer.class.getName());
 
-  /** The client connection manager. */
   private final IClientConnectionManager clientConnectionManager;
 
   private final CommandManager commandManager;
 
-  /** The message handler provider. */
   private final IMessageHandlerProvider messageHandlerProvider;
 
-  /** The receiver. */
   private final IPacketReceiver receiver;
 
-  /** The sender. */
   private final IPacketSender sender;
 
   public UdpServer(final int listenPort, final IMessageHandlerProvider provider) {
