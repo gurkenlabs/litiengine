@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 
@@ -123,6 +124,16 @@ public class GroupLayer extends Layer implements IGroupLayer {
   @Override
   public List<IGroupLayer> getGroupLayers() {
     return this.groupLayers;
+  }
+
+  @Override
+  protected void afterUnmarshal(Unmarshaller u, Object parent) {
+    super.afterUnmarshal(u, parent);
+    if (getMap() != null) {
+      for (ILayer layer : layers) {
+        ((Layer) layer).setMap((TmxMap) getMap());
+      }
+    }
   }
 
   @Override
