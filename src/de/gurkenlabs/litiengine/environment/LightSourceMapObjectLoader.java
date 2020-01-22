@@ -3,7 +3,6 @@ package de.gurkenlabs.litiengine.environment;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.LightSource;
@@ -12,7 +11,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 
 public class LightSourceMapObjectLoader extends MapObjectLoader {
-  private static final Logger log = Logger.getLogger(LightSourceMapObjectLoader.class.getName());
 
   public LightSourceMapObjectLoader() {
     super(MapObjectType.LIGHTSOURCE);
