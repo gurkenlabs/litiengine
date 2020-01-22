@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.resources;
 
+import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
@@ -7,6 +8,8 @@ import java.net.URL;
 import javax.imageio.ImageIO;
 
 import de.gurkenlabs.litiengine.entities.Rotation;
+import de.gurkenlabs.litiengine.environment.tilemap.MapRenderer;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.litiengine.util.Imaging;
 
 public final class Images extends ResourcesContainer<BufferedImage> {
@@ -46,10 +49,22 @@ public final class Images extends ResourcesContainer<BufferedImage> {
    */
   @Override
   protected BufferedImage load(URL resourceName) throws IOException {
-    BufferedImage img = ImageIO.read(resourceName);
+    BufferedImage img;
+    if (resourceName.getPath().toLowerCase().endsWith(".tmx")) {
+      TmxMap submap = (TmxMap) Resources.maps().get(resourceName);
+      if (submap == null) {
+        return null;
+      }
 
-    if (img == null) {
-      return null;
+      Dimension size = submap.getOrientation().getSize(submap);
+      img = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
+      MapRenderer.render(img.createGraphics(), submap, submap.getBounds());
+    } else {
+      img = ImageIO.read(resourceName);
+
+      if (img == null) {
+        return null;
+      }
     }
 
     final BufferedImage compatibleImg = Imaging.getCompatibleImage(img.getWidth(), img.getHeight());
