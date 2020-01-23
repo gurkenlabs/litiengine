@@ -6,6 +6,7 @@ import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -159,6 +160,17 @@ public final class Environment implements IRenderable {
    * without
    * having to provide an <code>EntityInfo</code> annotation containing this information.
    * 
+   * <p>
+   * Custom entity types need to provide at least one constructor that matches the following criteria:
+   * <ul>
+   * <li>has 2 parameters: <code>Environment, IMapObject</code></li>
+   * <li>has 2 parameters: <code>IMapObject, Environment</code></li>
+   * <li>has 1 parameter: <code>IMapObject</code></li>
+   * <li>has 1 parameter: <code>Environment</code></li>
+   * <li>is empty constructor</li>
+   * </ul>
+   * </p>
+   * 
    * @param mapObjectType
    *          The custom mapobjectType that is used by <code>IMapObjects</code> to determine the target entity implementation.
    * @param entityType
@@ -168,7 +180,18 @@ public final class Environment implements IRenderable {
    * @see EntityInfo#customMapObjectType()
    */
   public static void registerCustomEntityType(String mapObjectType, Class<? extends IEntity> entityType) {
-    CustomMapObjectLoader mapObjectLoader = new CustomMapObjectLoader(mapObjectType, entityType);
+    if (entityType.isInterface() || Modifier.isAbstract(entityType.getModifiers())) {
+      log.log(Level.WARNING, "Cannot register the custom entity type [{0}]: Type must not be an interface or abstract class.", entityType.getName());
+      return;
+    }
+
+    CustomMapObjectLoader.ConstructorInvocation invocation = CustomMapObjectLoader.findConstructor(entityType);
+    if (invocation == null) {
+      log.log(Level.WARNING, "Cannot register the custom entity type [{0}]: No matching constructor found.", entityType.getName());
+      return;
+    }
+
+    CustomMapObjectLoader mapObjectLoader = new CustomMapObjectLoader(mapObjectType, invocation);
     registerMapObjectLoader(mapObjectLoader);
   }
 
@@ -189,8 +212,9 @@ public final class Environment implements IRenderable {
   public static void registerCustomEntityType(Class<? extends IEntity> entityType) {
     EntityInfo info = entityType.getAnnotation(EntityInfo.class);
     if (info == null || info.customMapObjectType().isEmpty()) {
-      throw new IllegalArgumentException(
-          "Cannot register a custom entity type without the related EntityInfo.customMapObjectType being specified.\nAdd an EntityInfo annotation to the " + entityType + " class and provide the required information or use the registerCustomEntityType overload and provide the type explicitly.");
+      log.log(Level.WARNING, "Cannot register the custom entity type [{0}]: EntityInfo.customMapObjectType must be specified.\nAdd an EntityInfo annotation to the class and provide the required information or use the registerCustomEntityType overload and provide the type explicitly.",
+          entityType.getName());
+      return;
     }
 
     registerCustomEntityType(info.customMapObjectType(), entityType);
@@ -1068,12 +1092,7 @@ public final class Environment implements IRenderable {
 
     if (loader != null) {
       Collection<IEntity> loadedEntities;
-      try {
-        loadedEntities = loader.load(this, mapObject);
-      } catch (MapObjectException e) {
-        log.log(Level.WARNING, "map object " + mapObject.getId() + " failed to load", e);
-        return new ArrayList<>();
-      }
+      loadedEntities = loader.load(this, mapObject);
       for (IEntity entity : loadedEntities) {
         if (entity != null) {
 

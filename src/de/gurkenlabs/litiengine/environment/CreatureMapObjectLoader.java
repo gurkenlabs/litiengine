@@ -70,7 +70,6 @@ public class CreatureMapObjectLoader extends MapObjectLoader {
       return entities;
     }
 
-
     final String spriteSheet = mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME);
 
     Creature creature = this.createNewCreature(mapObject, spriteSheet);
