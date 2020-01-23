@@ -273,7 +273,7 @@ public final class Game {
    * @see RenderComponent
    * @see GameWindow#getResolution()
    * @see GameWindow#setTitle(String)
-   * @see GameWindow#setIconImage(java.awt.Image)
+   * @see GameWindow#setIcon(java.awt.Image)
    * @see GameWindow#cursor()
    */
   public static GameWindow window() {
@@ -494,7 +494,7 @@ public final class Game {
       graphics().addEntityRenderedListener(e -> DebugRenderer.renderEntityDebugInfo(e.getGraphics(), e.getEntity()));
 
       window().getRenderComponent().onFpsChanged(fps -> metrics().setFramesPerSecond(fps));
-      window().setIconImages(Arrays.asList(Resources.images().get("liti-logo-x16.png"), Resources.images().get("liti-logo-x20.png"), Resources.images().get("liti-logo-x32.png"), Resources.images().get("liti-logo-x48.png")));
+      window().setIcons(Arrays.asList(Resources.images().get("liti-logo-x16.png"), Resources.images().get("liti-logo-x20.png"), Resources.images().get("liti-logo-x32.png"), Resources.images().get("liti-logo-x48.png")));
 
       Input.keyboard().onKeyTyped(KeyEvent.VK_PRINTSCREEN, key -> {
         // don't take a screenshot if a modifier is active

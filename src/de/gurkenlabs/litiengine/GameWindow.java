@@ -38,7 +38,7 @@ import de.gurkenlabs.litiengine.gui.screens.Resolution;
  * @see #getResolution()
  * @see #setTitle(String)
  * @see #cursor()
- * @see #setIconImage(java.awt.Image)
+ * @see #setIcon(java.awt.Image)
  */
 public final class GameWindow {
   private static final Logger log = Logger.getLogger(GameWindow.class.getName());
@@ -154,11 +154,11 @@ public final class GameWindow {
     return this.screenLocation;
   }
 
-  public void setIconImage(Image image) {
+  public void setIcon(Image image) {
     this.hostControl.setIconImage(image);
   }
 
-  public void setIconImages(List<? extends Image> image) {
+  public void setIcons(List<? extends Image> image) {
     this.hostControl.setIconImages(image);
   }
 
