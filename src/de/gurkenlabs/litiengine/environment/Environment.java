@@ -162,6 +162,8 @@ public final class Environment implements IRenderable {
    * 
    * <p>
    * Custom entity types need to provide at least one constructor that matches the following criteria:
+   * </p>
+   * 
    * <ul>
    * <li>has 2 parameters: <code>Environment, IMapObject</code></li>
    * <li>has 2 parameters: <code>IMapObject, Environment</code></li>
@@ -169,7 +171,7 @@ public final class Environment implements IRenderable {
    * <li>has 1 parameter: <code>Environment</code></li>
    * <li>is empty constructor</li>
    * </ul>
-   * </p>
+   * 
    * 
    * @param mapObjectType
    *          The custom mapobjectType that is used by <code>IMapObjects</code> to determine the target entity implementation.
