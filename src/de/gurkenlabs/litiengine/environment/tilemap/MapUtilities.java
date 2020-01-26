@@ -252,4 +252,44 @@ public final class MapUtilities {
 
     return null;
   }
+
+  public static Rectangle2D getTileBoundingBox(final Point2D mapLocation) {
+    return getTileBoundingBox(getCurrentMap(), mapLocation);
+  }
+
+  public static Rectangle2D getTileBoundingBox(final IMap map, final Point2D mapLocation) {
+    if (map == null) {
+      return new Rectangle2D.Double();
+    }
+
+    return map.getOrientation().getEnclosingTileBounds(mapLocation, map);
+  }
+
+  public static Rectangle2D getTileBoundingBox(final int x, final int y) {
+    return getTileBoundingBox(getCurrentMap(), x, y);
+  }
+
+  public static Rectangle2D getTileBoundingBox(final IMap map, final int x, final int y) {
+    return getTileBoundingBox(map, new Point(x, y));
+  }
+
+  public static Rectangle2D getTileBoundingBox(final Point tile) {
+    return getTileBoundingBox(getCurrentMap(), tile);
+  }
+
+  public static Rectangle2D getTileBoundingBox(final IMap map, final Point tile) {
+    if (map == null) {
+      return new Rectangle2D.Double();
+    }
+
+    return map.getOrientation().getBounds(tile, map);
+  }
+
+  private static final IMap getCurrentMap() {
+    if (Game.world().environment() == null) {
+      return null;
+    }
+
+    return Game.world().environment().getMap();
+  }
 }
