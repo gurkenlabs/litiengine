@@ -14,6 +14,7 @@ public class ReflectionUtilitiesTests {
   }
 
   private class TestImpl {
+    @SuppressWarnings("unused")
     private int integerField;
   }
   
