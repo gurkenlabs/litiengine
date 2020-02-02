@@ -486,7 +486,7 @@ public final class GameWorld implements IUpdateable {
       return null;
     }
 
-    return this.getEnvironment(Resources.maps().get(mapName));
+    return this.reset(Resources.maps().get(mapName));
   }
 
   /**
