@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import de.gurkenlabs.litiengine.Direction;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.Environment;
+import de.gurkenlabs.litiengine.environment.GameWorld;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 
@@ -78,23 +79,46 @@ public class Spawnpoint extends Entity {
     this.spawnType = spawnType;
   }
 
-  public void spawn(IEntity entity) {
-    entity.setLocation(this.getLocation());
-    entity.setAngle(this.getDirection().toAngle());
-
+  /**
+   * Spawns the specified entity to the <code>Environment</code> of the <code>Spawnpoint</code> or the currently active <code>Environment</code>.
+   * 
+   * <p>
+   * Spawning will set the location of the entity to the location defined by the spawnpoint and optionally also set the angle of the entity,
+   * if a spawn direction is defined.
+   * </p>
+   * 
+   * @param entity
+   *          The entity to spawn at the specified location.
+   * @return True if the entity was spawned; otherwise false, which is typically the case if no environment is loaded.
+   * 
+   * @see GameWorld#environment()
+   */
+  public boolean spawn(IEntity entity) {
     Environment env = this.getEnvironment();
     if (env == null) {
       env = Game.world().environment();
     }
 
-    if (env != null && env.get(entity.getMapId()) == null) {
-      env.add(entity);
-
-      final EntitySpawnedEvent event = new EntitySpawnedEvent(this, entity);
-      for (EntitySpawnedListener listener : this.spawnedListeners) {
-        listener.spawned(event);
-      }
+    if (env == null) {
+      return false;
     }
+
+    entity.setLocation(this.getLocation());
+
+    if (this.getDirection() != null && this.getDirection() != Direction.UNDEFINED) {
+      entity.setAngle(this.getDirection().toAngle());
+    }
+
+    if (env.get(entity.getMapId()) == null) {
+      env.add(entity);
+    }
+
+    final EntitySpawnedEvent event = new EntitySpawnedEvent(this, entity);
+    for (EntitySpawnedListener listener : this.spawnedListeners) {
+      listener.spawned(event);
+    }
+
+    return true;
   }
 
   @FunctionalInterface
