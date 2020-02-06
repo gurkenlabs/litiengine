@@ -107,9 +107,9 @@ public class EnvironmentEventTests {
   @ParameterizedTest
   @EnumSource(value = RenderType.class, mode = Mode.EXCLUDE, names = "NONE")
   public void testRenderListener(RenderType renderType) {
-    EnvironmentRenderListener listener = mock(EnvironmentRenderListener.class);
+    EnvironmentRenderedListener listener = mock(EnvironmentRenderedListener.class);
     Graphics2D g = mock(Graphics2D.class);
-    this.testEnvironment.addRenderListener(renderType, listener);
+    this.testEnvironment.onRendered(renderType, listener);
     this.testEnvironment.render(g);
     verify(listener, times(1)).rendered(g, renderType);
   }

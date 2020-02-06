@@ -54,8 +54,10 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapRenderer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.graphics.AmbientLight;
+import de.gurkenlabs.litiengine.graphics.ColorLayer;
 import de.gurkenlabs.litiengine.graphics.DebugRenderer;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
+import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.StaticShadowLayer;
 import de.gurkenlabs.litiengine.graphics.StaticShadowType;
@@ -79,7 +81,7 @@ public final class Environment implements IRenderable {
   private final Map<String, Collection<IEntity>> entitiesByTag = new ConcurrentHashMap<>();
   private final Map<Integer, IEntity> allEntities = new ConcurrentHashMap<>();
 
-  private final Map<RenderType, Collection<EnvironmentRenderListener>> renderListeners = Collections.synchronizedMap(new EnumMap<>(RenderType.class));
+  private final Map<RenderType, Collection<EnvironmentRenderedListener>> renderListeners = Collections.synchronizedMap(new EnumMap<>(RenderType.class));
   private final Collection<EnvironmentListener> listeners = ConcurrentHashMap.newKeySet();
   private final Collection<EnvironmentEntityListener> entityListeners = ConcurrentHashMap.newKeySet();
 
@@ -222,12 +224,12 @@ public final class Environment implements IRenderable {
     registerCustomEntityType(info.customMapObjectType(), entityType);
   }
 
-  public void addRenderListener(RenderType renderType, EnvironmentRenderListener listener) {
+  public void onRendered(RenderType renderType, EnvironmentRenderedListener listener) {
     this.renderListeners.get(renderType).add(listener);
   }
 
-  public void removeRenderListener(EnvironmentRenderListener listener) {
-    for (Collection<EnvironmentRenderListener> rends : this.renderListeners.values()) {
+  public void removeRenderListener(EnvironmentRenderedListener listener) {
+    for (Collection<EnvironmentRenderedListener> rends : this.renderListeners.values()) {
       rends.remove(listener);
     }
   }
@@ -250,11 +252,15 @@ public final class Environment implements IRenderable {
 
   /**
    * Adds the specified entity to the environment container. This also loads the
-   * entity (register entity and controllers for update) if the environment has
+   * entity (registers entity and controllers for update) if the environment has
    * already been loaded. The entity will not be bound to a layer.
    *
    * @param entity
    *          The entity to add to the environment.
+   * 
+   * @see #isLoaded()
+   * @see IEntity#loaded(Environment)
+   * @see EnvironmentEntityListener#entityAdded(IEntity)
    */
   public void add(IEntity entity) {
     if (entity == null) {
@@ -265,22 +271,29 @@ public final class Environment implements IRenderable {
     this.fireEntityEvent(l -> l.entityAdded(entity));
   }
 
-  public void updateLighting(IEntity entity) {
-    if (entity instanceof StaticShadow) {
-      StaticShadow shadow = (StaticShadow) entity;
-      this.updateLighting(shadow.getArea() != null ? shadow.getArea().getBounds2D() : shadow.getBoundingBox());
-      return;
-    }
-
-    this.updateLighting(entity.getBoundingBox());
-  }
-
+  /**
+   * Forces an update on the lighting layers for the entire map.
+   * 
+   * @see #getStaticShadowLayer()
+   * @see #getAmbientLight()
+   * @see ColorLayer#updateSection(Rectangle2D)
+   */
   public void updateLighting() {
     if (this.getMap() != null) {
       this.updateLighting(this.getMap().getBounds());
     }
   }
 
+  /**
+   * Forces an update on the lighting layers for the specified section on the map.
+   * 
+   * @param The
+   *          section for which to update the lighting layers.
+   * 
+   * @see #getStaticShadowLayer()
+   * @see #getAmbientLight()
+   * @see ColorLayer#updateSection(Rectangle2D)
+   */
   public void updateLighting(Rectangle2D section) {
     if (this.staticShadowLayer != null) {
       this.staticShadowLayer.updateSection(section);
@@ -291,6 +304,26 @@ public final class Environment implements IRenderable {
     }
   }
 
+  /**
+   * Adds the specified instance to be rendered with the defined <code>RenderType</code> whenever the environment's render pipeline is executed.
+   * 
+   * <p>
+   * This method can be used for any custom rendering that is not related to an entity, a GUI component or the map.
+   * </p>
+   * 
+   * <p>
+   * Note that you don't need to explicitly add an <code>Entity</code> if it implements <code>IRenderable</code>. The render engine will inherently
+   * call an entity's render method.
+   * </p>
+   * 
+   * @param renderable
+   *          The instance that should be rendered.
+   * @param renderType
+   *          The render type that determines how the instance is processed by the environment's render pipeline.
+   * 
+   * @see #render(Graphics2D)
+   * @see RenderEngine#renderEntity(Graphics2D, IEntity)
+   */
   public void add(IRenderable renderable, RenderType renderType) {
     this.getRenderables(renderType).add(renderable);
   }
@@ -352,8 +385,28 @@ public final class Environment implements IRenderable {
     this.fireEvent(l -> l.cleared(this));
   }
 
+  /**
+   * Determines whether the environment contains the specified entity.
+   * 
+   * @param entity
+   *          The entity to check for.
+   * 
+   * @return True if the environment contains the specified entity; otherwise false.
+   */
   public boolean contains(IEntity entity) {
-    return allEntities.containsKey(entity.getMapId());
+    return this.contains(entity.getMapId());
+  }
+
+  /**
+   * Determines whether the environment contains any entity with the specified map ID.
+   * 
+   * @param mapId
+   *          The map ID of the entity to check for.
+   * 
+   * @return True if the environment contains an entity with the specified map ID; otherwise false.
+   */
+  public boolean contains(int mapId) {
+    return this.allEntities.containsKey(mapId);
   }
 
   public Collection<ICombatEntity> findCombatEntities(final Shape shape) {
@@ -572,6 +625,11 @@ public final class Environment implements IRenderable {
     return getByName(this.getCombatEntities(), name);
   }
 
+  /**
+   * Gets a read only collection of all entities on the environment.
+   * 
+   * @return All entities on the environment.
+   */
   public Collection<IEntity> getEntities() {
     return Collections.unmodifiableCollection(this.allEntities.values());
   }
@@ -1425,6 +1483,16 @@ public final class Environment implements IRenderable {
     this.emitters.remove(emitter);
   }
 
+  private void updateLighting(IEntity entity) {
+    if (entity instanceof StaticShadow) {
+      StaticShadow shadow = (StaticShadow) entity;
+      this.updateLighting(shadow.getArea() != null ? shadow.getArea().getBounds2D() : shadow.getBoundingBox());
+      return;
+    }
+
+    this.updateLighting(entity.getBoundingBox());
+  }
+
   private void fireEvent(Consumer<EnvironmentListener> cons) {
     for (EnvironmentListener listener : this.listeners) {
       cons.accept(listener);
@@ -1432,7 +1500,7 @@ public final class Environment implements IRenderable {
   }
 
   private void fireRenderEvent(Graphics2D g, RenderType type) {
-    for (EnvironmentRenderListener listener : this.renderListeners.get(type)) {
+    for (EnvironmentRenderedListener listener : this.renderListeners.get(type)) {
       listener.rendered(g, type);
     }
   }

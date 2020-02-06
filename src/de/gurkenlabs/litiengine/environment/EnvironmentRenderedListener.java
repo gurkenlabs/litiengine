@@ -10,7 +10,8 @@ import de.gurkenlabs.litiengine.graphics.RenderType;
  * 
  * @see Environment#render(Graphics2D)
  */
-public interface EnvironmentRenderListener extends EventListener {
+@FunctionalInterface
+public interface EnvironmentRenderedListener extends EventListener {
   /**
    * This method is called after the <code>Environment</code> rendered everything of the specified <code>RenderType</code>.
    * 
