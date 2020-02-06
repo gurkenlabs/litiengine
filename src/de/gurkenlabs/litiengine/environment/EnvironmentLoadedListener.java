@@ -7,6 +7,7 @@ import java.util.EventListener;
  * 
  * @see Environment#load()
  */
+@FunctionalInterface
 public interface EnvironmentLoadedListener extends EventListener {
 
   /**
