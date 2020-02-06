@@ -10,6 +10,8 @@ import java.util.Collection;
 import java.util.EventListener;
 import java.util.concurrent.ConcurrentHashMap;
 
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.graphics.ImageRenderer;
 import de.gurkenlabs.litiengine.graphics.RenderType;
@@ -85,7 +87,10 @@ public class MapRenderer {
       }
 
       if (env != null && layer instanceof IMapObjectLayer) {
-        env.renderEntitiesOnLayer(g, (IMapObjectLayer) layer);
+        Collection<IEntity> entities = env.getEntities((IMapObjectLayer)layer);
+        if (entities != null) {
+          Game.graphics().renderEntities(g, entities, layer.getRenderType() == RenderType.NORMAL);
+        }
       }
 
       if (layer instanceof IImageLayer) {

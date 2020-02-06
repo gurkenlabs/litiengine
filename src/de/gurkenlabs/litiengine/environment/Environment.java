@@ -86,15 +86,15 @@ public final class Environment implements IRenderable {
   private final Collection<EnvironmentEntityListener> entityListeners = ConcurrentHashMap.newKeySet();
 
   private final Map<RenderType, Collection<IRenderable>> renderables = Collections.synchronizedMap(new EnumMap<>(RenderType.class));
-  private final Collection<CollisionBox> colliders = ConcurrentHashMap.newKeySet();
-  private final Collection<LightSource> lightSources = ConcurrentHashMap.newKeySet();
-  private final Collection<StaticShadow> staticShadows = ConcurrentHashMap.newKeySet();
-  private final Collection<Trigger> triggers = ConcurrentHashMap.newKeySet();
-  private final Collection<Prop> props = ConcurrentHashMap.newKeySet();
   private final Collection<Emitter> emitters = ConcurrentHashMap.newKeySet();
+  private final Collection<CollisionBox> colliders = ConcurrentHashMap.newKeySet();
+  private final Collection<Prop> props = ConcurrentHashMap.newKeySet();
   private final Collection<Creature> creatures = ConcurrentHashMap.newKeySet();
+  private final Collection<StaticShadow> staticShadows = ConcurrentHashMap.newKeySet();
+  private final Collection<LightSource> lightSources = ConcurrentHashMap.newKeySet();
   private final Collection<Spawnpoint> spawnPoints = ConcurrentHashMap.newKeySet();
   private final Collection<MapArea> mapAreas = ConcurrentHashMap.newKeySet();
+  private final Collection<Trigger> triggers = ConcurrentHashMap.newKeySet();
 
   private AmbientLight ambientLight;
   private StaticShadowLayer staticShadowLayer;
@@ -272,6 +272,44 @@ public final class Environment implements IRenderable {
   }
 
   /**
+   * Adds all the specified entities to the environment container.
+   * 
+   * @param <T>
+   *          The type of the entity.
+   * @param entities
+   *          The entities to be added to the environment.
+   * 
+   * @see #add(IEntity)
+   * @see #addAll(IEntity...)
+   * @see #remove(IEntity)
+   * @see #removeAll(Iterable)
+   */
+  public <T extends IEntity> void addAll(Iterable<T> entities) {
+    if (entities == null) {
+      return;
+    }
+
+    for (T ent : entities) {
+      this.add(ent);
+    }
+  }
+
+  /**
+   * Adds all the specified entities to the environment container.
+   * 
+   * @param entities
+   *          The entities to be added to the environment.
+   * 
+   * @see #add(IEntity)
+   * @see #addAll(Iterable)
+   * @see #remove(IEntity)
+   * @see #removeAll(Iterable)
+   */
+  public void addAll(IEntity... entities) {
+    this.addAll(Arrays.asList(entities));
+  }
+
+  /**
    * Forces an update on the lighting layers for the entire map.
    * 
    * @see #getStaticShadowLayer()
@@ -325,7 +363,7 @@ public final class Environment implements IRenderable {
    * @see RenderEngine#renderEntity(Graphics2D, IEntity)
    */
   public void add(IRenderable renderable, RenderType renderType) {
-    this.getRenderables(renderType).add(renderable);
+    this.renderables.get(renderType).add(renderable);
   }
 
   public Collection<IEntity> build(Blueprint blueprint, double x, double y) {
@@ -358,20 +396,19 @@ public final class Environment implements IRenderable {
       this.renderables.get(renderType).clear();
     }
 
-    dispose(this.getEntities());
-    dispose(this.getTriggers());
-    this.getEmitters().clear();
-    this.getCollisionBoxes().clear();
-    this.getProps().clear();
-    this.getCreatures().clear();
-    this.getStaticShadows().clear();
-    this.getCombatEntities().clear();
-    this.getMobileEntities().clear();
-    this.getLightSources().clear();
-    this.getCollisionBoxes().clear();
-    this.getSpawnPoints().clear();
-    this.getAreas().clear();
-    this.getTriggers().clear();
+    dispose(this.allEntities.values());
+    dispose(this.triggers);
+    this.emitters.clear();
+    this.colliders.clear();
+    this.props.clear();
+    this.creatures.clear();
+    this.staticShadows.clear();
+    this.combatEntities.clear();
+    this.mobileEntities.clear();
+    this.lightSources.clear();
+    this.spawnPoints.clear();
+    this.mapAreas.clear();
+    this.triggers.clear();
 
     this.ambientLight = null;
     this.staticShadowLayer = null;
@@ -414,8 +451,7 @@ public final class Environment implements IRenderable {
   }
 
   /**
-   * Searches for all combat entities whose hitBox intersect the specified
-   * shape.
+   * Attempts to find all combat entities whose hitBox intersects with the specified shape.
    * 
    * @param shape
    *          The shape to check intersection for.
@@ -461,7 +497,7 @@ public final class Environment implements IRenderable {
     }
     if (shape instanceof Rectangle2D) {
       final Rectangle2D rect = (Rectangle2D) shape;
-      for (final IEntity entity : this.getEntities()) {
+      for (final IEntity entity : this.allEntities.values()) {
         if (entity.getBoundingBox().intersects(rect)) {
           foundEntities.add(entity);
         }
@@ -469,9 +505,8 @@ public final class Environment implements IRenderable {
       return foundEntities;
     }
     // for other shapes, we check if the shape's bounds intersect the hitbox
-    // and
-    // if so, we then check if the actual shape intersects the hitbox
-    for (final IEntity entity : this.getEntities()) {
+    // and then we then check if the actual shape intersects the hitbox
+    for (final IEntity entity : this.allEntities.values()) {
       if (entity.getBoundingBox().intersects(shape.getBounds()) && GeometricUtilities.shapeIntersects(entity.getBoundingBox(), shape)) {
         foundEntities.add(entity);
       }
@@ -485,7 +520,7 @@ public final class Environment implements IRenderable {
   }
 
   /**
-   * Finds the entities in the environment with the specified map IDs.
+   * Gets all entities with the specified map IDs from the environment .
    * 
    * @param mapIds
    *          The map IDs to search for.
@@ -569,66 +604,220 @@ public final class Environment implements IRenderable {
     return this.ambientLight;
   }
 
+  /**
+   * Gets an immutable collection with all assigned map IDs on the environment.
+   * 
+   * @return An immutable collection with all map IDs.
+   */
   public Collection<Integer> getAllMapIDs() {
-    return this.allEntities.keySet();
-  }
-
-  public Collection<MapArea> getAreas() {
-    return this.mapAreas;
-  }
-
-  public MapArea getArea(final int mapId) {
-    return getById(this.getAreas(), mapId);
-  }
-
-  public MapArea getArea(final String name) {
-    return getByName(this.getAreas(), name);
-  }
-
-  public Point2D getCenter() {
-    return new Point2D.Double(this.getMap().getSizeInPixels().getWidth() / 2.0, this.getMap().getSizeInPixels().getHeight() / 2.0);
-  }
-
-  public Collection<Emitter> getEmitters() {
-    return this.emitters;
-  }
-
-  public Emitter getEmitter(int mapId) {
-    return getById(this.getEmitters(), mapId);
-  }
-
-  public Emitter getEmitter(String name) {
-    return getByName(this.getEmitters(), name);
-  }
-
-  public Collection<CollisionBox> getCollisionBoxes() {
-    return this.colliders;
-  }
-
-  public CollisionBox getCollisionBox(int mapId) {
-    return getById(this.getCollisionBoxes(), mapId);
-  }
-
-  public CollisionBox getCollisionBox(String name) {
-    return getByName(this.getCollisionBoxes(), name);
-  }
-
-  public Collection<ICombatEntity> getCombatEntities() {
-    return this.combatEntities.values();
-  }
-
-  public ICombatEntity getCombatEntity(final int mapId) {
-    return getById(this.getCombatEntities(), mapId);
-  }
-
-  public ICombatEntity getCombatEntity(String name) {
-    return getByName(this.getCombatEntities(), name);
+    return Collections.unmodifiableCollection(this.allEntities.keySet());
   }
 
   /**
-   * Gets a read only collection of all entities on the environment.
+   * Gets an immutable collection containing all {@link MapArea} entities on the environment.
    * 
-   * @return All entities on the environment.
+   * <p>
+   * To add or remove entities, use the corresponding methods on the environment.
+   * </p>
+   * 
+   * @return An immutable collection with all {@link MapArea} entities.
+   * 
+   * @see #add(IEntity)
+   * @see #addAll(Iterable)
+   * @see #remove(IEntity)
+   * @see #removeAll(Iterable)
+   */
+  public Collection<MapArea> getAreas() {
+    return Collections.unmodifiableCollection(this.mapAreas);
+  }
+
+  /**
+   * Gets the {@link MapArea} with the specified map ID from the environment.
+   * 
+   * @param mapId
+   *          The map ID of the entity.
+   * 
+   * @return The {@link MapArea} with the specified map ID or null if no entity is found.
+   * 
+   * @see #getArea(String)
+   * @see #getAreas()
+   */
+  public MapArea getArea(final int mapId) {
+    return getById(this.mapAreas, mapId);
+  }
+
+  /**
+   * Gets the {@link MapArea} with the specified name from the environment.
+   * 
+   * @param name
+   *          The name of the entity.
+   * 
+   * @return The {@link MapArea} with the specified name or null if no entity is found.
+   * 
+   * @see #getArea(int)
+   * @see #getAreas()
+   */
+  public MapArea getArea(final String name) {
+    return getByName(this.mapAreas, name);
+  }
+
+  /**
+   * Gets an immutable collection containing all {@link Emitter} entities on the environment.
+   * 
+   * <p>
+   * To add or remove entities, use the corresponding methods on the environment.
+   * </p>
+   * 
+   * @return An immutable collection with all {@link Emitter} entities.
+   * 
+   * @see #add(IEntity)
+   * @see #addAll(Iterable)
+   * @see #remove(IEntity)
+   * @see #removeAll(Iterable)
+   */
+  public Collection<Emitter> getEmitters() {
+    return Collections.unmodifiableCollection(this.emitters);
+  }
+
+  /**
+   * Gets the {@link Emitter} with the specified map ID from the environment.
+   * 
+   * @param mapId
+   *          The map ID of the entity.
+   * 
+   * @return The {@link Emitter} with the specified map ID or null if no entity is found.
+   * 
+   * @see #getEmitter(String)
+   * @see #getEmitters()
+   */
+  public Emitter getEmitter(int mapId) {
+    return getById(this.emitters, mapId);
+  }
+
+  /**
+   * Gets the {@link Emitter} with the specified name from the environment.
+   * 
+   * @param name
+   *          The name of the entity.
+   * 
+   * @return The {@link Emitter} with the specified name or null if no entity is found.
+   * 
+   * @see #getEmitter(int)
+   * @see #getEmitters()
+   */
+  public Emitter getEmitter(String name) {
+    return getByName(this.emitters, name);
+  }
+
+  /**
+   * Gets an immutable collection containing all {@link CollisionBox} entities on the environment.
+   * 
+   * <p>
+   * To add or remove entities, use the corresponding methods on the environment.
+   * </p>
+   * 
+   * @return An immutable collection with all {@link CollisionBox} entities.
+   * 
+   * @see #add(IEntity)
+   * @see #addAll(Iterable)
+   * @see #remove(IEntity)
+   * @see #removeAll(Iterable)
+   */
+  public Collection<CollisionBox> getCollisionBoxes() {
+    return Collections.unmodifiableCollection(this.colliders);
+  }
+
+  /**
+   * Gets the {@link CollisionBox} with the specified map ID from the environment.
+   * 
+   * @param mapId
+   *          The map ID of the entity.
+   * 
+   * @return The {@link CollisionBox} with the specified map ID or null if no entity is found.
+   * 
+   * @see #getCollisionBox(String)
+   * @see #getCollisionBoxes()
+   */
+  public CollisionBox getCollisionBox(int mapId) {
+    return getById(this.colliders, mapId);
+  }
+
+  /**
+   * Gets the {@link CollisionBox} with the specified name from the environment.
+   * 
+   * @param name
+   *          The name of the entity.
+   * 
+   * @return The {@link CollisionBox} with the specified name or null if no entity is found.
+   * 
+   * @see #getCollisionBox(int)
+   * @see #getCollisionBoxes()
+   */
+  public CollisionBox getCollisionBox(String name) {
+    return getByName(this.colliders, name);
+  }
+
+  /**
+   * Gets an immutable collection containing all {@link ICombatEntity} entities on the environment.
+   * 
+   * <p>
+   * To add or remove entities, use the corresponding methods on the environment.
+   * </p>
+   * 
+   * @return An immutable collection with all {@link ICombatEntity} entities.
+   * 
+   * @see #add(IEntity)
+   * @see #addAll(Iterable)
+   * @see #remove(IEntity)
+   * @see #removeAll(Iterable)
+   */
+  public Collection<ICombatEntity> getCombatEntities() {
+    return Collections.unmodifiableCollection(this.combatEntities.values());
+  }
+
+  /**
+   * Gets the {@link ICombatEntity} with the specified map ID from the environment.
+   * 
+   * @param mapId
+   *          The map ID of the entity.
+   * 
+   * @return The {@link ICombatEntity} with the specified map ID or null if no entity is found.
+   * 
+   * @see #getCombatEntity(String)
+   * @see #getCombatEntities()
+   */
+  public ICombatEntity getCombatEntity(final int mapId) {
+    return getById(this.combatEntities.values(), mapId);
+  }
+
+  /**
+   * Gets the {@link ICombatEntity} with the specified name from the environment.
+   * 
+   * @param name
+   *          The name of the entity.
+   * 
+   * @return The {@link ICombatEntity} with the specified name or null if no entity is found.
+   * 
+   * @see #getCombatEntity(int)
+   * @see #getCombatEntities()
+   */
+  public ICombatEntity getCombatEntity(String name) {
+    return getByName(this.combatEntities.values(), name);
+  }
+
+  /**
+   * Gets an immutable collection containing all entities on the environment.
+   * 
+   * <p>
+   * To add or remove entities, use the corresponding methods on the environment.
+   * </p>
+   * 
+   * @return An immutable collection with all entities.
+   * 
+   * @see #add(IEntity)
+   * @see #addAll(Iterable)
+   * @see #remove(IEntity)
+   * @see #removeAll(Iterable)
    */
   public Collection<IEntity> getEntities() {
     return Collections.unmodifiableCollection(this.allEntities.values());
@@ -649,7 +838,7 @@ public final class Environment implements IRenderable {
    * @see ILayer#getRenderType()
    */
   public Collection<IEntity> getEntities(final RenderType renderType) {
-    return this.miscEntities.get(renderType).values();
+    return Collections.unmodifiableCollection(this.miscEntities.get(renderType).values());
   }
 
   /**
@@ -670,7 +859,7 @@ public final class Environment implements IRenderable {
       return Collections.emptySet();
     }
 
-    return this.layerEntities.get(layer);
+    return Collections.unmodifiableCollection(this.layerEntities.get(layer));
   }
 
   /**
@@ -694,7 +883,7 @@ public final class Environment implements IRenderable {
 
     for (Entry<IMapObjectLayer, List<IEntity>> entry : this.layerEntities.entrySet()) {
       if (name.equals(entry.getKey().getName())) {
-        return entry.getValue();
+        return Collections.unmodifiableCollection(entry.getValue());
       }
     }
 
@@ -718,7 +907,7 @@ public final class Environment implements IRenderable {
   public Collection<IEntity> getEntitiesByLayer(final int layerId) {
     for (Entry<IMapObjectLayer, List<IEntity>> entry : this.layerEntities.entrySet()) {
       if (layerId == entry.getKey().getId()) {
-        return entry.getValue();
+        return Collections.unmodifiableCollection(entry.getValue());
       }
     }
 
@@ -731,7 +920,7 @@ public final class Environment implements IRenderable {
 
   public <T> Collection<T> getByType(Class<? extends T> cls) {
     Collection<T> foundEntities = new ArrayList<>();
-    for (IEntity ent : this.getEntities()) {
+    for (IEntity ent : this.allEntities.values()) {
       if (cls.isInstance(ent)) {
         foundEntities.add(cls.cast(ent));
       }
@@ -740,16 +929,52 @@ public final class Environment implements IRenderable {
     return foundEntities;
   }
 
+  /**
+   * Gets an immutable collection containing all {@link LightSource} entities on the environment.
+   * 
+   * <p>
+   * To add or remove entities, use the corresponding methods on the environment.
+   * </p>
+   * 
+   * @return An immutable collection with all {@link LightSource} entities.
+   * 
+   * @see #add(IEntity)
+   * @see #addAll(Iterable)
+   * @see #remove(IEntity)
+   * @see #removeAll(Iterable)
+   */
   public Collection<LightSource> getLightSources() {
-    return this.lightSources;
+    return Collections.unmodifiableCollection(this.lightSources);
   }
 
+  /**
+   * Gets the {@link LightSource} with the specified map ID from the environment.
+   * 
+   * @param mapId
+   *          The map ID of the entity.
+   * 
+   * @return The {@link LightSource} with the specified map ID or null if no entity is found.
+   * 
+   * @see #getLightSource(String)
+   * @see #getLightSources()
+   */
   public LightSource getLightSource(final int mapId) {
-    return getById(this.getLightSources(), mapId);
+    return getById(this.lightSources, mapId);
   }
 
+  /**
+   * Gets the {@link LightSource} with the specified name from the environment.
+   * 
+   * @param name
+   *          The name of the entity.
+   * 
+   * @return The {@link LightSource} with the specified name or null if no entity is found.
+   * 
+   * @see #getLightSource(int)
+   * @see #getLightSources()
+   */
   public LightSource getLightSource(String name) {
-    return getByName(this.getLightSources(), name);
+    return getByName(this.lightSources, name);
   }
 
   /**
@@ -765,16 +990,52 @@ public final class Environment implements IRenderable {
     return this.map;
   }
 
+  /**
+   * Gets an immutable collection containing all {@link IMobileEntity} instances on the environment.
+   * 
+   * <p>
+   * To add or remove entities, use the corresponding methods on the environment.
+   * </p>
+   * 
+   * @return An immutable collection with all {@link IMobileEntity} instances.
+   * 
+   * @see #add(IEntity)
+   * @see #addAll(Iterable)
+   * @see #remove(IEntity)
+   * @see #removeAll(Iterable)
+   */
   public Collection<IMobileEntity> getMobileEntities() {
-    return this.mobileEntities.values();
+    return Collections.unmodifiableCollection(this.mobileEntities.values());
   }
 
+  /**
+   * Gets the {@link IMobileEntity} with the specified map ID from the environment.
+   * 
+   * @param mapId
+   *          The map ID of the entity.
+   * 
+   * @return The {@link IMobileEntity} with the specified map ID or null if no entity is found.
+   * 
+   * @see #getMobileEntity(String)
+   * @see #getMobileEntities()
+   */
   public IMobileEntity getMobileEntity(final int mapId) {
-    return getById(this.getMobileEntities(), mapId);
+    return getById(this.mobileEntities.values(), mapId);
   }
 
+  /**
+   * Gets the {@link IMobileEntity} with the specified name from the environment.
+   * 
+   * @param name
+   *          The name of the entity.
+   * 
+   * @return The {@link IMobileEntity} with the specified name or null if no entity is found.
+   * 
+   * @see #getMobileEntity(int)
+   * @see #getMobileEntities()
+   */
   public IMobileEntity getMobileEntity(String name) {
-    return getByName(this.getMobileEntities(), name);
+    return getByName(this.mobileEntities.values(), name);
   }
 
   /**
@@ -787,76 +1048,280 @@ public final class Environment implements IRenderable {
     return ++maxMapID;
   }
 
+  /**
+   * Gets an immutable collection containing all {@link IRenderable} instances for the specified render type on the environment.
+   * 
+   * <p>
+   * To add or remove instances, use the corresponding methods on the environment.
+   * </p>
+   * 
+   * @param renderType
+   *          The render type of the renderable instances.
+   * 
+   * @return An immutable collection with all {@link IRenderable} instances.
+   * 
+   * @see #add(IRenderable, RenderType)
+   * @see #removeRenderable(IRenderable)
+   */
   public Collection<IRenderable> getRenderables(RenderType renderType) {
-    return this.renderables.get(renderType);
+    return Collections.unmodifiableCollection(this.renderables.get(renderType));
   }
 
+  /**
+   * Gets an immutable collection containing all {@link Prop} entities on the environment.
+   * 
+   * <p>
+   * To add or remove entities, use the corresponding methods on the environment.
+   * </p>
+   * 
+   * @return An immutable collection with all {@link Prop} entities.
+   * 
+   * @see #add(IEntity)
+   * @see #addAll(Iterable)
+   * @see #remove(IEntity)
+   * @see #removeAll(Iterable)
+   */
   public Collection<Prop> getProps() {
-    return this.props;
+    return Collections.unmodifiableCollection(this.props);
   }
 
+  /**
+   * Gets the {@link Prop} with the specified map ID from the environment.
+   * 
+   * @param mapId
+   *          The map ID of the entity.
+   * 
+   * @return The {@link Prop} with the specified map ID or null if no entity is found.
+   * 
+   * @see #getProp(String)
+   * @see #getProps()
+   */
   public Prop getProp(int mapId) {
-    return getById(this.getProps(), mapId);
+    return getById(this.props, mapId);
   }
 
+  /**
+   * Gets the {@link Prop} with the specified name from the environment.
+   * 
+   * @param name
+   *          The name of the entity.
+   * 
+   * @return The {@link Prop} with the specified name or null if no entity is found.
+   * 
+   * @see #getProp(int)
+   * @see #getProps()
+   */
   public Prop getProp(String name) {
-    return getByName(this.getProps(), name);
+    return getByName(this.props, name);
   }
 
-  public Creature getCreature(int mapId) {
-    return getById(this.getCreatures(), mapId);
-  }
-
-  public Creature getCreature(String name) {
-    return getByName(this.getCreatures(), name);
-  }
-
+  /**
+   * Gets an immutable collection containing all {@link Creature} entities on the environment.
+   * 
+   * <p>
+   * To add or remove entities, use the corresponding methods on the environment.
+   * </p>
+   * 
+   * @return An immutable collection with all {@link Creature} entities.
+   * 
+   * @see #add(IEntity)
+   * @see #addAll(Iterable)
+   * @see #remove(IEntity)
+   * @see #removeAll(Iterable)
+   */
   public Collection<Creature> getCreatures() {
-    return this.creatures;
+    return Collections.unmodifiableCollection(this.creatures);
   }
 
-  public Spawnpoint getSpawnpoint(final int mapId) {
-    return getById(this.getSpawnPoints(), mapId);
+  /**
+   * Gets the {@link Creature} with the specified map ID from the environment.
+   * 
+   * @param mapId
+   *          The map ID of the entity.
+   * 
+   * @return The {@link Creature} with the specified map ID or null if no entity is found.
+   * 
+   * @see #getCreature(String)
+   * @see #getCreatures()
+   */
+  public Creature getCreature(int mapId) {
+    return getById(this.creatures, mapId);
   }
 
-  public Spawnpoint getSpawnpoint(final String name) {
-    return getByName(this.getSpawnPoints(), name);
+  /**
+   * Gets the {@link Creature} with the specified name from the environment.
+   * 
+   * @param name
+   *          The name of the entity.
+   * 
+   * @return The {@link Creature} with the specified name or null if no entity is found.
+   * 
+   * @see #getCreature(int)
+   * @see #getCreatures()
+   */
+  public Creature getCreature(String name) {
+    return getByName(this.creatures, name);
   }
 
+  /**
+   * Gets an immutable collection containing all {@link Spawnpoint} entities on the environment.
+   * 
+   * <p>
+   * To add or remove entities, use the corresponding methods on the environment.
+   * </p>
+   * 
+   * @return An immutable collection with all {@link Spawnpoint} entities.
+   * 
+   * @see #add(IEntity)
+   * @see #addAll(Iterable)
+   * @see #remove(IEntity)
+   * @see #removeAll(Iterable)
+   */
   public Collection<Spawnpoint> getSpawnPoints() {
-    return this.spawnPoints;
+    return Collections.unmodifiableCollection(this.spawnPoints);
   }
 
+  /**
+   * Gets the {@link Spawnpoint} with the specified map ID from the environment.
+   * 
+   * @param mapId
+   *          The map ID of the entity.
+   * 
+   * @return The {@link Spawnpoint} with the specified map ID or null if no entity is found.
+   * 
+   * @see #getSpawnpoint(String)
+   * @see #getSpawnPoints()
+   */
+  public Spawnpoint getSpawnpoint(final int mapId) {
+    return getById(this.spawnPoints, mapId);
+  }
+
+  /**
+   * Gets the {@link Spawnpoint} with the specified name from the environment.
+   * 
+   * @param name
+   *          The name of the entity.
+   * 
+   * @return The {@link Spawnpoint} with the specified name or null if no entity is found.
+   * 
+   * @see #getSpawnpoint(int)
+   * @see #getSpawnPoints()
+   */
+  public Spawnpoint getSpawnpoint(final String name) {
+    return getByName(this.spawnPoints, name);
+  }
+
+  /**
+   * Gets an immutable collection containing all {@link StaticShadow} entities on the environment.
+   * 
+   * <p>
+   * To add or remove entities, use the corresponding methods on the environment.
+   * </p>
+   * 
+   * @return An immutable collection with all {@link StaticShadow} entities.
+   * 
+   * @see #add(IEntity)
+   * @see #addAll(Iterable)
+   * @see #remove(IEntity)
+   * @see #removeAll(Iterable)
+   */
   public Collection<StaticShadow> getStaticShadows() {
-    return this.staticShadows;
+    return Collections.unmodifiableCollection(this.staticShadows);
   }
 
+  /**
+   * Gets the {@link StaticShadow} with the specified map ID from the environment.
+   * 
+   * @param mapId
+   *          The map ID of the entity.
+   * 
+   * @return The {@link StaticShadow} with the specified map ID or null if no entity is found.
+   * 
+   * @see #getStaticShadow(String)
+   * @see #getStaticShadows()
+   */
   public StaticShadow getStaticShadow(int mapId) {
-    return getById(this.getStaticShadows(), mapId);
+    return getById(this.staticShadows, mapId);
   }
 
+  /**
+   * Gets the {@link StaticShadow} with the specified name from the environment.
+   * 
+   * @param name
+   *          The name of the entity.
+   * 
+   * @return The {@link StaticShadow} with the specified name or null if no entity is found.
+   * 
+   * @see #getStaticShadow(int)
+   * @see #getStaticShadows()
+   */
   public StaticShadow getStaticShadow(String name) {
-    return getByName(this.getStaticShadows(), name);
+    return getByName(this.staticShadows, name);
   }
 
   public StaticShadowLayer getStaticShadowLayer() {
     return this.staticShadowLayer;
   }
 
-  public Trigger getTrigger(final int mapId) {
-    return getById(this.getTriggers(), mapId);
-  }
-
-  public Trigger getTrigger(final String name) {
-    return getByName(this.getTriggers(), name);
-  }
-
+  /**
+   * Gets an immutable collection containing all {@link Trigger} entities on the environment.
+   * 
+   * <p>
+   * To add or remove entities, use the corresponding methods on the environment.
+   * </p>
+   * 
+   * @return An immutable collection with all {@link Trigger} entities.
+   * 
+   * @see #add(IEntity)
+   * @see #addAll(Iterable)
+   * @see #remove(IEntity)
+   * @see #removeAll(Iterable)
+   */
   public Collection<Trigger> getTriggers() {
-    return this.triggers;
+    return Collections.unmodifiableCollection(this.triggers);
   }
 
+  /**
+   * Gets the {@link Trigger} with the specified map ID from the environment.
+   * 
+   * @param mapId
+   *          The map ID of the entity.
+   * 
+   * @return The {@link Trigger} with the specified map ID or null if no entity is found.
+   * 
+   * @see #getTrigger(String)
+   * @see #getTriggers()
+   */
+  public Trigger getTrigger(final int mapId) {
+    return getById(this.triggers, mapId);
+  }
+
+  /**
+   * Gets the {@link Trigger} with the specified name from the environment.
+   * 
+   * @param name
+   *          The name of the entity.
+   * 
+   * @return The {@link Trigger} with the specified name or null if no entity is found.
+   * 
+   * @see #getTrigger(int)
+   * @see #getTriggers()
+   */
+  public Trigger getTrigger(final String name) {
+    return getByName(this.triggers, name);
+  }
+
+  /**
+   * Gets all tags that are assigned to entities on this environment.
+   * 
+   * @return All assigned tags of this environment.
+   */
   public Collection<String> getUsedTags() {
-    return new ArrayList<>(this.getEntitiesByTag().keySet());
+    return Collections.unmodifiableCollection(this.getEntitiesByTag().keySet());
+  }
+
+  public Point2D getCenter() {
+    return new Point2D.Double(this.getMap().getSizeInPixels().getWidth() / 2.0, this.getMap().getSizeInPixels().getHeight() / 2.0);
   }
 
   public final void init() {
@@ -888,7 +1353,7 @@ public final class Environment implements IRenderable {
       Game.physics().setBounds(new Rectangle2D.Double(0, 0, this.getMap().getSizeInPixels().getWidth(), this.getMap().getSizeInPixels().getHeight()));
     }
 
-    this.getEntities().stream().forEach(this::load);
+    this.allEntities.values().stream().forEach(this::load);
     this.updateLighting();
     this.loaded = true;
     this.fireEvent(l -> l.loaded(this));
@@ -904,6 +1369,43 @@ public final class Environment implements IRenderable {
     }
   }
 
+  public Collection<IEntity> load(final IMapObject mapObject) {
+    if (mapObject == null) {
+      return Collections.emptySet();
+    }
+    IMapObjectLoader loader = null;
+    if (mapObject.getType() == null || mapObject.getType().isEmpty()) {
+      // this makes it possible to register custom MapObjectLoaders that can handle a MapObject without a type specified
+      // by default, the engine doesn't provide such a loader (because it's not clear what Entity the MapObject should be mapped to)
+      // it might be useful for some games to do some custom handling e.g. for polygon, ellipse, polyline or point MapObjects.
+      loader = mapObjectLoaders.getOrDefault(MapObjectType.UNDEFINED_MAPOBJECTTYPE, null);
+    } else {
+      loader = mapObjectLoaders.get(mapObject.getType());
+    }
+
+    if (loader != null) {
+      Collection<IEntity> loadedEntities;
+      loadedEntities = loader.load(this, mapObject);
+      for (IEntity entity : loadedEntities) {
+        if (entity != null) {
+
+          // only add the entity to be rendered with it's layer if its RenderType equals the layer's RenderType
+          if (mapObject.getLayer() != null && entity.renderWithLayer()) {
+            this.addEntity(entity);
+            this.layerEntities.computeIfAbsent(mapObject.getLayer(), m -> new CopyOnWriteArrayList<>()).add(entity);
+            this.fireEntityEvent(l -> l.entityAdded(entity));
+          } else {
+            this.add(entity);
+          }
+        }
+      }
+
+      return loadedEntities;
+    }
+
+    return Collections.emptySet();
+  }
+
   /**
    * Attempts to interact with triggers on this environment.
    * 
@@ -916,7 +1418,7 @@ public final class Environment implements IRenderable {
   }
 
   public Trigger interact(ICollisionEntity source, Predicate<Trigger> condition) {
-    for (final Trigger trigger : Game.world().environment().getTriggers()) {
+    for (final Trigger trigger : this.triggers) {
       if (trigger.canTrigger(source) && triggerConditionsAreMet(trigger, condition)) {
         boolean result = trigger.interact(source);
         if (result) {
@@ -1031,7 +1533,7 @@ public final class Environment implements IRenderable {
     this.remove(ent);
   }
 
-  public <T extends IEntity> void remove(Collection<T> entities) {
+  public <T extends IEntity> void removeAll(Iterable<T> entities) {
     if (entities == null) {
       return;
     }
@@ -1039,6 +1541,10 @@ public final class Environment implements IRenderable {
     for (T ent : entities) {
       this.remove(ent);
     }
+  }
+
+  public void removeAll(IEntity... entities) {
+    this.removeAll(Arrays.asList(entities));
   }
 
   public void removeRenderable(final IRenderable renderable) {
@@ -1105,18 +1611,18 @@ public final class Environment implements IRenderable {
     if (this.getGravity() != 0) {
 
       // if there are gravity forces for all mobile entities, just update the existing forces
-      if (this.gravityForces.size() == this.getMobileEntities().size()) {
+      if (this.gravityForces.size() == this.mobileEntities.size()) {
         for (GravityForce force : this.gravityForces.values()) {
           force.setStrength(this.gravity);
         }
       } else {
         // otherwise create a new force for every mobile entity in the environment
-        for (IMobileEntity entity : this.getMobileEntities()) {
+        for (IMobileEntity entity : this.mobileEntities.values()) {
           this.addGravityForce(entity);
         }
       }
     } else {
-      for (IMobileEntity entity : this.getMobileEntities()) {
+      for (IMobileEntity entity : this.mobileEntities.values()) {
         this.removeGravity(entity);
       }
     }
@@ -1128,56 +1634,12 @@ public final class Environment implements IRenderable {
     }
 
     // unregister all updatable entities from the current environment
-    for (final IEntity entity : this.getEntities()) {
+    for (final IEntity entity : this.allEntities.values()) {
       this.unload(entity);
     }
 
     this.loaded = false;
     this.fireEvent(l -> l.unloaded(this));
-  }
-
-  public Collection<IEntity> load(final IMapObject mapObject) {
-    if (mapObject == null) {
-      return new ArrayList<>();
-    }
-    IMapObjectLoader loader = null;
-    if (mapObject.getType() == null || mapObject.getType().isEmpty()) {
-      // this makes it possible to register custom MapObjectLoaders that can handle a MapObject without a type specified
-      // by default, the engine doesn't provide such a loader (because it's not clear what Entity the MapObject should be mapped to)
-      // it might be useful for some games to do some custom handling e.g. for polygon, ellipse, polyline or point MapObjects.
-      loader = mapObjectLoaders.getOrDefault(MapObjectType.UNDEFINED_MAPOBJECTTYPE, null);
-    } else {
-      loader = mapObjectLoaders.get(mapObject.getType());
-    }
-
-    if (loader != null) {
-      Collection<IEntity> loadedEntities;
-      loadedEntities = loader.load(this, mapObject);
-      for (IEntity entity : loadedEntities) {
-        if (entity != null) {
-
-          // only add the entity to be rendered with it's layer if its RenderType equals the layer's RenderType
-          if (mapObject.getLayer() != null && entity.renderWithLayer()) {
-            this.addEntity(entity);
-            this.layerEntities.computeIfAbsent(mapObject.getLayer(), m -> new CopyOnWriteArrayList<>()).add(entity);
-            this.fireEntityEvent(l -> l.entityAdded(entity));
-          } else {
-            this.add(entity);
-          }
-        }
-      }
-
-      return loadedEntities;
-    }
-
-    return new ArrayList<>();
-  }
-
-  public void renderEntitiesOnLayer(Graphics2D g, IMapObjectLayer layer) {
-    List<IEntity> entities = this.layerEntities.get(layer);
-    if (entities != null) {
-      Game.graphics().renderEntities(g, entities, layer.getRenderType() == RenderType.NORMAL);
-    }
   }
 
   private static boolean triggerConditionsAreMet(Trigger trigger, Predicate<Trigger> condition) {
@@ -1388,7 +1850,7 @@ public final class Environment implements IRenderable {
   private void addEntity(final IEntity entity) {
     int desiredID = entity.getMapId();
     // assign local map id if the entity's mapID is invalid
-    if (desiredID == 0 || this.getAllMapIDs().contains(desiredID)) {
+    if (desiredID == 0 || this.allEntities.keySet().contains(desiredID)) {
       entity.setMapId(this.getLocalMapId());
       log.fine(() -> String.format("Entity [%s] was assigned a local mapID because #%d was already taken or invalid.", entity, desiredID));
     }
@@ -1476,7 +1938,7 @@ public final class Environment implements IRenderable {
 
       IRenderable renderable = emitter.getRenderable(renderType);
       if (renderable != null) {
-        cons.accept(this.getRenderables(renderType), renderable);
+        cons.accept(this.renderables.get(renderType), renderable);
       }
     }
 

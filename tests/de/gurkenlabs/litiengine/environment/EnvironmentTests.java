@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -150,36 +151,36 @@ public class EnvironmentTests {
     assertTrue(entities.contains(combatEntity));
     assertTrue(entities.contains(combatEntity2));
   }
-  
+
   @Test
   public void testGetByTag() {
     ICombatEntity combatEntity = mock(ICombatEntity.class);
     when(combatEntity.getMapId()).thenReturn(1);
     when(combatEntity.getRenderType()).thenReturn(RenderType.NORMAL);
     when(combatEntity.getTags()).thenReturn(Arrays.asList("test"));
-    
+
     ICombatEntity combatEntity2 = mock(ICombatEntity.class);
     when(combatEntity2.getMapId()).thenReturn(2);
     when(combatEntity2.getRenderType()).thenReturn(RenderType.NORMAL);
     when(combatEntity2.getTags()).thenReturn(Arrays.asList("test"));
-    
+
     ICombatEntity combatEntity3 = mock(ICombatEntity.class);
     when(combatEntity3.getMapId()).thenReturn(3);
     when(combatEntity3.getRenderType()).thenReturn(RenderType.NORMAL);
     when(combatEntity3.getTags()).thenReturn(Arrays.asList("test2"));
-    
+
     this.testEnvironment.add(combatEntity);
     this.testEnvironment.add(combatEntity2);
     this.testEnvironment.add(combatEntity3);
-    
+
     Collection<ICombatEntity> result = this.testEnvironment.getByTag(ICombatEntity.class, "test");
-    
+
     assertEquals(2, result.size());
     assertTrue(result.contains(combatEntity));
     assertTrue(result.contains(combatEntity2));
-    
+
     Collection<IEntity> result2 = this.testEnvironment.getByTag("test2");
-    
+
     assertEquals(1, result2.size());
     assertTrue(result2.contains(combatEntity3));
   }
@@ -409,7 +410,7 @@ public class EnvironmentTests {
   public void testGetNonExistingEntities() {
     this.testEnvironment.add(null);
     this.testEnvironment.remove((IEntity) null);
-    this.testEnvironment.remove((Collection<IEntity>) null);
+    this.testEnvironment.removeAll((Collection<IEntity>) null);
     this.testEnvironment.clear();
 
     assertNull(this.testEnvironment.get(123456789));
@@ -426,7 +427,7 @@ public class EnvironmentTests {
     when(entity.getName()).thenReturn("test");
     when(entity.getRenderType()).thenReturn(renderType);
     when(entity.getCollisionType()).thenReturn(Collision.DYNAMIC);
-    
+
     this.testEnvironment.add(entity);
 
     assertNotNull(this.testEnvironment.get(123));
@@ -571,5 +572,24 @@ public class EnvironmentTests {
     this.testEnvironment.unload();
 
     assertFalse(this.testEnvironment.isLoaded());
+  }
+
+  @Test
+  public void testCollectionGettersNeedToBeUnmodifiable() {
+    // entities need to be added/removed with the provided methods of the environment. Adding them to an internal collection can have unforeseen consequences
+    assertThrows(UnsupportedOperationException.class, () -> this.testEnvironment.getAreas().add(null));
+    assertThrows(UnsupportedOperationException.class, () -> this.testEnvironment.getEmitters().add(null));
+    assertThrows(UnsupportedOperationException.class, () -> this.testEnvironment.getCollisionBoxes().add(null));
+    assertThrows(UnsupportedOperationException.class, () -> this.testEnvironment.getCombatEntities().add(null));
+    assertThrows(UnsupportedOperationException.class, () -> this.testEnvironment.getEntities().add(null));
+    assertThrows(UnsupportedOperationException.class, () -> this.testEnvironment.getLightSources().add(null));
+    assertThrows(UnsupportedOperationException.class, () -> this.testEnvironment.getMobileEntities().add(null));
+    assertThrows(UnsupportedOperationException.class, () -> this.testEnvironment.getProps().add(null));
+    assertThrows(UnsupportedOperationException.class, () -> this.testEnvironment.getCreatures().add(null));
+    assertThrows(UnsupportedOperationException.class, () -> this.testEnvironment.getSpawnPoints().add(null));
+    assertThrows(UnsupportedOperationException.class, () -> this.testEnvironment.getStaticShadows().add(null));
+    assertThrows(UnsupportedOperationException.class, () -> this.testEnvironment.getTriggers().add(null));
+
+    assertThrows(UnsupportedOperationException.class, () -> this.testEnvironment.getUsedTags().add(null));
   }
 }
