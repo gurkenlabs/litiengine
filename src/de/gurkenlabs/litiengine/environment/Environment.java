@@ -287,8 +287,8 @@ public final class Environment implements IRenderable {
   /**
    * Forces an update on the lighting layers for the specified section on the map.
    * 
-   * @param The
-   *          section for which to update the lighting layers.
+   * @param section
+   *          The section for which to update the lighting layers.
    * 
    * @see #getStaticShadowLayer()
    * @see #getAmbientLight()

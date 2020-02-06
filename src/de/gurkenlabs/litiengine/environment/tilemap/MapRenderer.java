@@ -224,6 +224,8 @@ public class MapRenderer {
      * 
      * @param event
      *          The layer render event.
+     * 
+     * @return Return true if the layer should be rendered; otherwise false.
      */
     boolean canRender(LayerRenderEvent event);
   }
