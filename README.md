@@ -34,7 +34,7 @@ repositories {
 }
 
 dependencies {
-  compile 'de.gurkenlabs:litiengine:0.4.18'
+  compile 'de.gurkenlabs:litiengine:0.4.19'
 }
 ```
 
@@ -43,7 +43,7 @@ dependencies {
 <dependency>
   <groupId>de.gurkenlabs</groupId>
   <artifactId>litiengine</artifactId>
-  <version>0.4.18</version>
+  <version>0.4.19</version>
 </dependency>
 ```
 [More Installation Instructions](https://docs.litiengine.com/basics/getting-started/get-litiengine)
