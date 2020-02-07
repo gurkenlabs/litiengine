@@ -105,7 +105,7 @@ public class MapList extends JScrollPane implements MapController {
     if (this.list.getSelectedIndex() == -1) {
       return null;
     }
-    Optional<TmxMap> map = Editor.instance().getMapComponent().getMaps().stream().filter(m -> m.getName().equals(this.list.getSelectedValue())).findFirst();
+    Optional<TmxMap> map = Editor.instance().getMapComponent().getMaps().stream().filter(m -> m.equals(this.list.getSelectedValue())).findFirst();
     return map.isPresent() ? map.get() : null;
   }
 
