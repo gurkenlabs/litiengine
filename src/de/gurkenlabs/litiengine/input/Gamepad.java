@@ -12,20 +12,12 @@ import net.java.games.input.Component.Identifier;
 import net.java.games.input.Controller;
 import net.java.games.input.Event;
 
-public final class Gamepad implements GamepadEvents, IUpdateable {
+public final class Gamepad extends GamepadEvents implements IUpdateable {
   private static final Map<String, Identifier> components = new HashMap<>();
 
   private final Controller controller;
 
   private final int index;
-
-  private final Map<String, Collection<GamepadPollListener>> componentPollListeners;
-  private final Map<String, Collection<GamepadPressedListener>> componentPressedListeners;
-  private final Map<String, Collection<GamepadReleasedListener>> componentReleasedListeners;
-
-  private final Collection<GamepadPollListener> pollListeners;
-  private final Collection<GamepadPressedListener> pressedListeners;
-  private final Collection<GamepadReleasedListener> releasedListeners;
 
   private final Collection<String> pressedComponents;
 
@@ -33,13 +25,6 @@ public final class Gamepad implements GamepadEvents, IUpdateable {
   private float triggerDeadzone = Game.config().input().getGamepadTriggerDeadzone();
 
   Gamepad(final int index, final Controller controller) {
-    this.componentPollListeners = new ConcurrentHashMap<>();
-    this.componentPressedListeners = new ConcurrentHashMap<>();
-    this.componentReleasedListeners = new ConcurrentHashMap<>();
-    this.pollListeners = ConcurrentHashMap.newKeySet();
-    this.pressedListeners = ConcurrentHashMap.newKeySet();
-    this.releasedListeners = ConcurrentHashMap.newKeySet();
-
     this.pressedComponents = ConcurrentHashMap.newKeySet();
 
     this.index = index;
@@ -69,78 +54,6 @@ public final class Gamepad implements GamepadEvents, IUpdateable {
 
   public float getTriggerDeadzone() {
     return this.triggerDeadzone;
-  }
-
-  @Override
-  public void onPoll(final String identifier, final GamepadPollListener listener) {
-    GamepadManager.addComponentListener(this.componentPollListeners, identifier, listener);
-  }
-
-  @Override
-  public void removePollListener(String identifier, GamepadPollListener listener) {
-    GamepadManager.removeComponentListener(this.componentPollListeners, identifier, listener);
-  }
-
-  @Override
-  public void onPressed(final String identifier, final GamepadPressedListener listener) {
-    GamepadManager.addComponentListener(this.componentPressedListeners, identifier, listener);
-  }
-
-  @Override
-  public void removePressedListener(String identifier, GamepadPressedListener listener) {
-    GamepadManager.removeComponentListener(this.componentPressedListeners, identifier, listener);
-  }
-
-  @Override
-  public void onReleased(String identifier, GamepadReleasedListener listener) {
-    GamepadManager.addComponentListener(this.componentReleasedListeners, identifier, listener);
-  }
-
-  @Override
-  public void removeReleasedListener(String identifier, GamepadReleasedListener listener) {
-    GamepadManager.removeComponentListener(this.componentReleasedListeners, identifier, listener);
-  }
-
-  @Override
-  public void onPoll(GamepadPollListener listener) {
-    this.pollListeners.add(listener);
-  }
-
-  @Override
-  public void removePollListener(GamepadPollListener listener) {
-    this.pollListeners.remove(listener);
-  }
-
-  @Override
-  public void onPressed(GamepadPressedListener listener) {
-    this.pressedListeners.add(listener);
-  }
-
-  @Override
-  public void removePressedListener(GamepadPressedListener listener) {
-    this.pressedListeners.remove(listener);
-  }
-
-  @Override
-  public void onReleased(GamepadReleasedListener listener) {
-    this.releasedListeners.add(listener);
-  }
-
-  @Override
-  public void removeReleasedListener(GamepadReleasedListener listener) {
-    this.releasedListeners.remove(listener);
-  }
-
-  @Override
-  public void clearEventListeners() {
-    this.releasedListeners.clear();
-    this.componentReleasedListeners.clear();
-
-    this.pressedListeners.clear();
-    this.componentPressedListeners.clear();
-
-    this.pollListeners.clear();
-    this.componentPollListeners.clear();
   }
 
   @Override

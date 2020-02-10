@@ -2,7 +2,6 @@ package de.gurkenlabs.litiengine.input;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -20,18 +19,11 @@ import net.java.games.input.Controller;
 import net.java.games.input.Controller.Type;
 import net.java.games.input.ControllerEnvironment;
 
-public final class GamepadManager implements ILaunchable, GamepadEvents {
+public final class GamepadManager extends GamepadEvents implements ILaunchable {
   private static final Logger log = Logger.getLogger(GamepadManager.class.getName());
 
   private final Collection<Consumer<Gamepad>> gamepadAddedConsumer;
   private final Collection<Consumer<Gamepad>> gamepadRemovedConsumer;
-
-  private final Map<String, Collection<GamepadPollListener>> componentPollListeners;
-  private final Map<String, Collection<GamepadPressedListener>> componentPressedListeners;
-  private final Map<String, Collection<GamepadReleasedListener>> componentReleasedListeners;
-  private final Collection<GamepadPollListener> pollListeners;
-  private final Collection<GamepadPressedListener> pressedListeners;
-  private final Collection<GamepadReleasedListener> releasedListeners;
 
   private final List<Gamepad> gamePads;
 
@@ -43,12 +35,6 @@ public final class GamepadManager implements ILaunchable, GamepadEvents {
   GamepadManager() {
     this.gamepadRemovedConsumer = ConcurrentHashMap.newKeySet();
     this.gamepadAddedConsumer = ConcurrentHashMap.newKeySet();
-    this.componentPollListeners = new ConcurrentHashMap<>();
-    this.componentPressedListeners = new ConcurrentHashMap<>();
-    this.componentReleasedListeners = new ConcurrentHashMap<>();
-    this.pollListeners = ConcurrentHashMap.newKeySet();
-    this.pressedListeners = ConcurrentHashMap.newKeySet();
-    this.releasedListeners = ConcurrentHashMap.newKeySet();
 
     this.gamePads = new CopyOnWriteArrayList<>();
 
@@ -136,55 +122,6 @@ public final class GamepadManager implements ILaunchable, GamepadEvents {
     this.gamepadRemovedConsumer.add(cons);
   }
 
-  @Override
-  public void onPoll(final String identifier, final GamepadPollListener consumer) {
-    addComponentListener(this.componentPollListeners, identifier, consumer);
-  }
-
-  @Override
-  public void removePollListener(String identifier, GamepadPollListener listener) {
-    removeComponentListener(this.componentPollListeners, identifier, listener);
-  }
-
-  @Override
-  public void onPressed(final String identifier, final GamepadPressedListener listener) {
-    addComponentListener(this.componentPressedListeners, identifier, listener);
-  }
-
-  @Override
-  public void removePressedListener(String identifier, GamepadPressedListener listener) {
-    removeComponentListener(this.componentPressedListeners, identifier, listener);
-  }
-
-  @Override
-  public void onReleased(String identifier, GamepadReleasedListener listener) {
-    addComponentListener(this.componentReleasedListeners, identifier, listener);
-  }
-
-  @Override
-  public void removeReleasedListener(String identifier, GamepadReleasedListener listener) {
-    removeComponentListener(this.componentReleasedListeners, identifier, listener);
-  }
-
-  @Override
-  public void onPoll(GamepadPollListener listener) {
-    this.pollListeners.add(listener);
-  }
-
-  @Override
-  public void removePollListener(GamepadPollListener listener) {
-    this.pollListeners.remove(listener);
-  }
-
-  @Override
-  public void onPressed(GamepadPressedListener listener) {
-    this.pressedListeners.add(listener);
-  }
-
-  @Override
-  public void removePressedListener(GamepadPressedListener listener) {
-    this.pressedListeners.remove(listener);
-  }
 
   @Override
   public void onReleased(GamepadReleasedListener listener) {
@@ -231,22 +168,6 @@ public final class GamepadManager implements ILaunchable, GamepadEvents {
   public boolean isPressed(String gamepadComponent) {
     final Gamepad current = this.current();
     return current != null && current.isPressed(gamepadComponent);
-  }
-
-  static <T> void addComponentListener(Map<String, Collection<T>> consumerList, String identifier, T consumer) {
-    if (!consumerList.containsKey(identifier)) {
-      consumerList.put(identifier, new ArrayList<>());
-    }
-
-    consumerList.get(identifier).add(consumer);
-  }
-
-  static <T> void removeComponentListener(Map<String, Collection<T>> consumerList, String identifier, T consumer) {
-    if (!consumerList.containsKey(identifier)) {
-      return;
-    }
-
-    consumerList.get(identifier).remove(consumer);
   }
 
   void remove(final Gamepad gamepad) {
