@@ -170,14 +170,6 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
     return this.getActiveForces().stream().filter(x -> x.getIdentifier() != null && x.getIdentifier().equals(identifier)).findFirst().orElse(null);
   }
 
-  protected void setVelocityX(double velocityX) {
-    this.velocityX = velocityX;
-  }
-
-  protected void setVelocityY(double velocityY) {
-    this.velocityY = velocityY;
-  }
-
   public void decelerateVelocityX(double dec) {
     if (this.getVelocityX() > 0) {
       if (dec > this.getVelocityX()) {
@@ -216,6 +208,14 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
     if (Math.abs(this.getVelocityY()) < this.getStopThreshold()) {
       this.setVelocityY(0);
     }
+  }
+
+  protected void setVelocityX(double velocityX) {
+    this.velocityX = velocityX;
+  }
+
+  protected void setVelocityY(double velocityY) {
+    this.velocityY = velocityY;
   }
 
   public double getVelocityY() {

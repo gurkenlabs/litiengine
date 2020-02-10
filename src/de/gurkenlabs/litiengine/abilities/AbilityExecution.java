@@ -22,7 +22,7 @@ public class AbilityExecution implements IUpdateable {
    * @param ability
    *          the ability
    */
-  public AbilityExecution(final Ability ability) {
+  AbilityExecution(final Ability ability) {
     this.appliedEffects = new CopyOnWriteArrayList<>();
     this.ability = ability;
     this.executionTicks = Game.time().now();

@@ -40,8 +40,22 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     final Font icon = Resources.fonts().get("fontello.ttf");
     ICON_FONT = icon != null ? icon.deriveFont(16f) : null;
   }
-  private final Appearance appearance;
+  
   private final List<Consumer<ComponentMouseEvent>> clickConsumer;
+  private final List<Consumer<ComponentMouseEvent>> mouseDraggedConsumer;
+  private final List<Consumer<ComponentMouseEvent>> mouseEnterConsumer;
+  private final List<Consumer<ComponentMouseEvent>> mouseLeaveConsumer;
+  private final List<Consumer<ComponentMouseEvent>> mouseMovedConsumer;
+  private final List<Consumer<ComponentMouseEvent>> mousePressedConsumer;
+  private final List<Consumer<ComponentMouseEvent>> mouseReleasedConsumer;
+  private final List<Consumer<ComponentMouseWheelEvent>> mouseWheelConsumer;
+  private final List<Consumer<ComponentMouseEvent>> hoverConsumer;
+  private final List<Consumer<String>> textChangedConsumer;
+  
+  private final int componentId;
+  private final Appearance appearance;
+  private final Appearance hoveredAppearance;
+
   private final List<GuiComponent> components;
   private final Appearance disabledAppearance;
 
@@ -50,28 +64,20 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   private Font font;
   private boolean forwardMouseEvents = true;
   private double height;
-  private final List<Consumer<ComponentMouseEvent>> hoverConsumer;
-  private final Appearance hoveredAppearance;
+
   private Sound hoverSound;
-  private final int componentId;
+
   private boolean isHovered;
 
   private boolean isPressed;
   private boolean isSelected;
-  private final List<Consumer<ComponentMouseEvent>> mouseDraggedConsumer;
-  private final List<Consumer<ComponentMouseEvent>> mouseEnterConsumer;
-  private final List<Consumer<ComponentMouseEvent>> mouseLeaveConsumer;
-  private final List<Consumer<ComponentMouseEvent>> mouseMovedConsumer;
-  private final List<Consumer<ComponentMouseEvent>> mousePressedConsumer;
-  private final List<Consumer<ComponentMouseEvent>> mouseReleasedConsumer;
-  private final List<Consumer<ComponentMouseWheelEvent>> mouseWheelConsumer;
   private String name;
   private boolean suspended;
   private Object tag;
   private String text;
   private Align textAlignment = Align.CENTER;
   private int textAngle = 0;
-  private final List<Consumer<String>> textChangedConsumer;
+
   private Color textShadowColor;
   private double textX;
   private double textY;
@@ -742,13 +748,6 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     return new RoundRectangle2D.Double(this.getX(), this.getY(), this.getWidth(), this.getHeight(), this.getCurrentAppearance().getBorderRadius(), this.getCurrentAppearance().getBorderRadius());
   }
 
-  protected Appearance getCurrentAppearance() {
-    if (!this.isEnabled()) {
-      return this.getAppearanceDisabled();
-    }
-    return this.isHovered() ? this.getAppearanceHovered() : this.getAppearance();
-  }
-
   /**
    * Sets the width and height of this GuiComponent.
    *
@@ -1047,6 +1046,13 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
    */
   public void toggleSelection() {
     this.setSelected(!this.isSelected);
+  }
+
+  protected Appearance getCurrentAppearance() {
+    if (!this.isEnabled()) {
+      return this.getAppearanceDisabled();
+    }
+    return this.isHovered() ? this.getAppearanceHovered() : this.getAppearance();
   }
 
   /**

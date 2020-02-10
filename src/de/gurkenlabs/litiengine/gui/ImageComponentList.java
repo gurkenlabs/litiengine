@@ -97,10 +97,6 @@ public class ImageComponentList extends GuiComponent {
     super.prepare();
   }
 
-  protected ImageComponent createNewEntry(final double x, final double y, final double width, final double height, final Spritesheet spritesheet, final String text, final Image image) {
-    return new ImageComponent(x, y, width, height, spritesheet, text, image);
-  }
-
   public void setXOffset(final double xOffset) {
     this.xOffset = xOffset;
     this.suspend();
@@ -111,5 +107,9 @@ public class ImageComponentList extends GuiComponent {
     this.yOffset = yOffset;
     this.suspend();
     this.prepare();
+  }
+  
+  protected ImageComponent createNewEntry(final double x, final double y, final double width, final double height, final Spritesheet spritesheet, final String text, final Image image) {
+    return new ImageComponent(x, y, width, height, spritesheet, text, image);
   }
 }

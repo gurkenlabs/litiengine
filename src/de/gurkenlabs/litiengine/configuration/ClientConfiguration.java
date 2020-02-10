@@ -21,7 +21,7 @@ public class ClientConfiguration extends ConfigurationGroup {
   /**
    * Instantiates a new client configuration.
    */
-  public ClientConfiguration() {
+  ClientConfiguration() {
     super();
     this.setMaxFps(60);
     this.setShowGameMetrics(false);

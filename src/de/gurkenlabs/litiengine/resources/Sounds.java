@@ -19,6 +19,21 @@ public final class Sounds extends ResourcesContainer<Sound> {
   Sounds() {
   }
 
+  public Sound load(final SoundResource resource) {
+    byte[] data = Codec.decode(resource.getData());
+    ByteArrayInputStream input = new ByteArrayInputStream(data);
+    Sound sound;
+    try {
+      sound = new Sound(input, resource.getName());
+      this.add(resource.getName(), sound);
+      return sound;
+    } catch (IOException | UnsupportedAudioFileException e) {
+      log.log(Level.SEVERE, "The audio file {0} could not be loaded.", new Object[] { resource.getName() });
+    }
+
+    return null;
+  }
+
   /**
    * Loads the sound from the specified path and returns it.
    * 
@@ -35,20 +50,5 @@ public final class Sounds extends ResourcesContainer<Sound> {
       }
       return new Sound(is, FileUtilities.getFileName(resourceName));
     }
-  }
-
-  public Sound load(final SoundResource resource) {
-    byte[] data = Codec.decode(resource.getData());
-    ByteArrayInputStream input = new ByteArrayInputStream(data);
-    Sound sound;
-    try {
-      sound = new Sound(input, resource.getName());
-      this.add(resource.getName(), sound);
-      return sound;
-    } catch (IOException | UnsupportedAudioFileException e) {
-      log.log(Level.SEVERE, "The audio file {0} could not be loaded.", new Object[] { resource.getName() });
-    }
-
-    return null;
   }
 }

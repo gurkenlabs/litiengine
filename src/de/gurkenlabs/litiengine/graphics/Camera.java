@@ -18,10 +18,8 @@ import de.gurkenlabs.litiengine.util.MathUtilities;
 public class Camera implements ICamera {
   private final Collection<ZoomChangedListener> zoomListeners = ConcurrentHashMap.newKeySet();
   private final Collection<FocusChangedListener> focusChangedListeners = ConcurrentHashMap.newKeySet();
-  /**
-   * Provides the center location for the viewport.
-   */
-  protected Point2D focus;
+
+  private Point2D focus;
   private long lastShake;
 
   private int shakeDelay;
@@ -292,6 +290,17 @@ public class Camera implements ICamera {
     return this.valign;
   }
 
+  @Override
+  public void pan(Point2D focus, int duration) {
+    this.targetFocus = this.clampToMap(focus);
+    this.panTime = duration;
+  }
+
+  @Override
+  public void pan(double x, double y, int duration) {
+    this.pan(new Point2D.Double(x, y), duration);
+  }
+
   // TODO: write a unit test for this
   protected Point2D clampToMap(Point2D focus) {
 
@@ -312,7 +321,19 @@ public class Camera implements ICamera {
 
     return new Point2D.Double(x, y);
   }
+  
+  protected int panTime() {
+    return this.panTime;
+  }
 
+  protected double getViewportWidth() {
+    return Game.window().getResolution().getWidth() / this.getRenderScale();
+  }
+
+  protected double getViewportHeight() {
+    return Game.window().getResolution().getHeight() / this.getRenderScale();
+  }
+  
   /**
    * Apply shake effect.
    *
@@ -355,14 +376,6 @@ public class Camera implements ICamera {
     return this.shakeTick;
   }
 
-  protected double getViewportWidth() {
-    return Game.window().getResolution().getWidth() / this.getRenderScale();
-  }
-
-  protected double getViewportHeight() {
-    return Game.window().getResolution().getHeight() / this.getRenderScale();
-  }
-
   private double getViewPortCenterX() {
     return this.getViewportWidth() * 0.5;
   }
@@ -373,20 +386,5 @@ public class Camera implements ICamera {
 
   private boolean isShakeEffectActive() {
     return this.getShakeTick() != 0 && Game.time().since(this.getShakeTick()) < this.getShakeDuration();
-  }
-
-  @Override
-  public void pan(Point2D focus, int duration) {
-    this.targetFocus = this.clampToMap(focus);
-    this.panTime = duration;
-  }
-
-  @Override
-  public void pan(double x, double y, int duration) {
-    this.pan(new Point2D.Double(x, y), duration);
-  }
-
-  protected int panTime() {
-    return this.panTime;
   }
 }

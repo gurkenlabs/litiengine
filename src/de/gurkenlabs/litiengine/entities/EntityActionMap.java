@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.entities;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -46,7 +47,7 @@ public final class EntityActionMap {
   }
 
   public Collection<EntityAction> getActions() {
-    return this.actions.values();
+    return Collections.unmodifiableCollection(this.actions.values());
   }
 
   public EntityAction get(String actionName) {

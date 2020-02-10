@@ -8,7 +8,7 @@ import java.util.Enumeration;
 import java.util.Properties;
 import java.util.TreeSet;
 
-public class CleanProperties extends Properties {
+class CleanProperties extends Properties {
   private static final long serialVersionUID = 7567765340218227372L;
 
   @Override

@@ -21,11 +21,12 @@ public class ListField extends GuiComponent {
   private Spritesheet buttonSprite;
   private Spritesheet entrySprite;
   private final List<IntConsumer> changeConsumer;
-
-  private final Object[][] content;
-  private int nbOfColumns;
-
   private final CopyOnWriteArrayList<CopyOnWriteArrayList<ImageComponent>> listEntries;
+  private final Object[][] content;
+  private final int shownRows;
+  private final int shownColumns;
+
+  private int nbOfColumns;
 
   private int verticalLowerBound = 0;
   private int horizontalLowerBound = 0;
@@ -38,8 +39,6 @@ public class ListField extends GuiComponent {
   private boolean selectEntireColumn = false;
   private boolean selectEntireRow = false;
 
-  private final int shownRows;
-  private final int shownColumns;
 
   private VerticalSlider verticalSlider;
   private HorizontalSlider horizontalSlider;
@@ -47,7 +46,8 @@ public class ListField extends GuiComponent {
 
   /**
    * Creates a vertical list field.
-   * <br><br>
+   * <br>
+   * <br>
    * The <b>content</b> of this list field can only be accessed through the first column (column 0).
    * <br>
    * Examples:
@@ -60,31 +60,32 @@ public class ListField extends GuiComponent {
    * </blockquote>
    * 
    * @param x
-   * The x-coordinate of the ListField.
+   *          The x-coordinate of the ListField.
    * @param y
-   * The y-coordinate of the ListField.
+   *          The y-coordinate of the ListField.
    * @param width
-   * The width of the ListField.
+   *          The width of the ListField.
    * @param height
-   * The height of the ListField.
+   *          The height of the ListField.
    * @param content
-   * The 1 dimension array to show in the ListField.
+   *          The 1 dimension array to show in the ListField.
    * @param shownRows
-   * The number of rows/elements to 
-   * display before the user needs to scroll for more possible rows/elements.
+   *          The number of rows/elements to
+   *          display before the user needs to scroll for more possible rows/elements.
    * @param entrySprite
-   * The entrySprite.
+   *          The entrySprite.
    * @param buttonSprite
-   * The buttonSprite.
+   *          The buttonSprite.
    * @see #ListField(double, double, double, double, Object[], int, boolean, Spritesheet, Spritesheet)
    */
   public ListField(final double x, final double y, final double width, final double height, final Object[] content, final int shownRows, final Spritesheet entrySprite, final Spritesheet buttonSprite) {
-    this(x, y, width, height, new Object[][] {content}, shownRows, 1, false, entrySprite, buttonSprite);
+    this(x, y, width, height, new Object[][] { content }, shownRows, 1, false, entrySprite, buttonSprite);
   }
 
   /**
    * Creates a vertical list field.
-   * <br><br>
+   * <br>
+   * <br>
    * The <b>content</b> of this list field can only be accessed through the first column (column 0).
    * <br>
    * Examples:
@@ -97,33 +98,34 @@ public class ListField extends GuiComponent {
    * </blockquote>
    * 
    * @param x
-   * The x-coordinate of the ListField.
+   *          The x-coordinate of the ListField.
    * @param y
-   * The y-coordinate of the ListField.
+   *          The y-coordinate of the ListField.
    * @param width
-   * The width of the ListField.
+   *          The width of the ListField.
    * @param height
-   * The height of the ListField.
+   *          The height of the ListField.
    * @param content
-   * The 1 dimension array to show in the ListField.
+   *          The 1 dimension array to show in the ListField.
    * @param shownRows
-   * The number of rows/elements to 
-   * display before the user needs to scroll for more possible rows/elements.
+   *          The number of rows/elements to
+   *          display before the user needs to scroll for more possible rows/elements.
    * @param sliderInside
-   * If set to true, sliders will show inside the ListField. 
-   * This can be used, for example, if the ListField's width matches the screen's width.
+   *          If set to true, sliders will show inside the ListField.
+   *          This can be used, for example, if the ListField's width matches the screen's width.
    * @param entrySprite
-   * The entrySprite.
+   *          The entrySprite.
    * @param buttonSprite
-   * The buttonSprite.
+   *          The buttonSprite.
    */
   public ListField(final double x, final double y, final double width, final double height, final Object[] content, final int shownRows, final boolean sliderInside, final Spritesheet entrySprite, final Spritesheet buttonSprite) {
-    this(x, y, width, height, new Object[][] {content}, shownRows, 1, sliderInside, entrySprite, buttonSprite);
+    this(x, y, width, height, new Object[][] { content }, shownRows, 1, sliderInside, entrySprite, buttonSprite);
   }
 
   /**
    * Creates a 2D vertical list field.
-   * <br><br>
+   * <br>
+   * <br>
    * The given <b>content</b> should be arranged as columns of elements.
    * <br>
    * Examples:
@@ -134,25 +136,25 @@ public class ListField extends GuiComponent {
    * </blockquote>
    * 
    * @param x
-   * The x-coordinate of the ListField.
+   *          The x-coordinate of the ListField.
    * @param y
-   * The y-coordinate of the ListField.
+   *          The y-coordinate of the ListField.
    * @param width
-   * The width of the ListField.
+   *          The width of the ListField.
    * @param height
-   * The height of the ListField.
+   *          The height of the ListField.
    * @param content
-   * The 2 dimension array to show in the ListField.
+   *          The 2 dimension array to show in the ListField.
    * @param shownRows
-   * The number of rows to 
-   * display before the user needs to scroll for more possible rows.
+   *          The number of rows to
+   *          display before the user needs to scroll for more possible rows.
    * @param shownColumns
-   * The number of columns to 
-   * display before the user needs to scroll for more possible columns.
+   *          The number of columns to
+   *          display before the user needs to scroll for more possible columns.
    * @param entrySprite
-   * The entrySprite.
+   *          The entrySprite.
    * @param buttonSprite
-   * The buttonSprite.
+   *          The buttonSprite.
    * @see #ListField(double, double, double, double, Object[][], int, int, boolean, Spritesheet, Spritesheet)
    */
   public ListField(final double x, final double y, final double width, final double height, final Object[][] content, final int shownRows, final int shownColumns, final Spritesheet entrySprite, final Spritesheet buttonSprite) {
@@ -161,7 +163,8 @@ public class ListField extends GuiComponent {
 
   /**
    * Creates a 2D vertical list field.
-   * <br><br>
+   * <br>
+   * <br>
    * The given <b>content</b> should be arranged as columns of elements.
    * <br>
    * Examples:
@@ -172,28 +175,28 @@ public class ListField extends GuiComponent {
    * </blockquote>
    * 
    * @param x
-   * The x-coordinate of the ListField.
+   *          The x-coordinate of the ListField.
    * @param y
-   * The y-coordinate of the ListField.
+   *          The y-coordinate of the ListField.
    * @param width
-   * The width of the ListField.
+   *          The width of the ListField.
    * @param height
-   * The height of the ListField.
+   *          The height of the ListField.
    * @param content
-   * The 2 dimension array to show in the ListField.
+   *          The 2 dimension array to show in the ListField.
    * @param shownRows
-   * The number of rows to 
-   * display before the user needs to scroll for more possible rows.
+   *          The number of rows to
+   *          display before the user needs to scroll for more possible rows.
    * @param shownColumns
-   * The number of columns to 
-   * display before the user needs to scroll for more possible columns.
+   *          The number of columns to
+   *          display before the user needs to scroll for more possible columns.
    * @param sliderInside
-   * If set to true, sliders will show inside the ListField. 
-   * This can be used, for example, if the ListField's width matches the screen's width.
+   *          If set to true, sliders will show inside the ListField.
+   *          This can be used, for example, if the ListField's width matches the screen's width.
    * @param entrySprite
-   * The entrySprite.
+   *          The entrySprite.
    * @param buttonSprite
-   * The buttonSprite.
+   *          The buttonSprite.
    */
   public ListField(final double x, final double y, final double width, final double height, final Object[][] content, final int shownRows, final int shownColumns, final boolean sliderInside, final Spritesheet entrySprite, final Spritesheet buttonSprite) {
     super(x, y, width, height);
@@ -250,7 +253,7 @@ public class ListField extends GuiComponent {
    * Returns all list items of a specified column.
    *
    * @param column
-   * the column
+   *          the column
    * @return a list of items
    */
   public List<ImageComponent> getListEntry(final int column) {
@@ -264,7 +267,7 @@ public class ListField extends GuiComponent {
    * Returns the number of rows of the tallest column.
    * 
    * @return
-   * int representing the length of the tallest column
+   *         int representing the length of the tallest column
    */
   public int getMaxRows() {
     int result = 0;
@@ -341,20 +344,18 @@ public class ListField extends GuiComponent {
 
         if (row + this.getVerticalLowerBound() < this.getContent()[column + this.getHorizontalLowerBound()].length && this.getContent()[column + this.getHorizontalLowerBound()][row + this.getVerticalLowerBound()] != null) {
           this.getListEntry(column).get(row).setText(this.getContent()[column + this.getHorizontalLowerBound()][row + this.getVerticalLowerBound()].toString());
-        }
-        else {
+        } else {
           this.getListEntry(column).get(row).setText("");
         }
       }
     }
 
-    if (!this.isEntireRowSelected() && this.selectionColumn >= this.getHorizontalLowerBound() && this.selectionColumn < this.getHorizontalLowerBound() + this.getNumberOfShownColumns() && this.selectionRow >= this.getVerticalLowerBound() && this.selectionRow < this.getVerticalLowerBound() + this.getNumberOfShownRows()) {
+    if (!this.isEntireRowSelected() && this.selectionColumn >= this.getHorizontalLowerBound() && this.selectionColumn < this.getHorizontalLowerBound() + this.getNumberOfShownColumns() && this.selectionRow >= this.getVerticalLowerBound()
+        && this.selectionRow < this.getVerticalLowerBound() + this.getNumberOfShownRows()) {
       this.selectedComponent = this.getListEntry(this.selectionColumn - this.getHorizontalLowerBound()).get(this.selectionRow - this.getVerticalLowerBound());
-    }
-    else if (this.isEntireRowSelected() && this.selectionColumn >= 0 && this.selectionColumn < this.nbOfColumns && this.selectionRow >= this.getVerticalLowerBound() && this.selectionRow < this.getVerticalLowerBound() + this.getNumberOfShownRows()) {
+    } else if (this.isEntireRowSelected() && this.selectionColumn >= 0 && this.selectionColumn < this.nbOfColumns && this.selectionRow >= this.getVerticalLowerBound() && this.selectionRow < this.getVerticalLowerBound() + this.getNumberOfShownRows()) {
       this.selectedComponent = this.getListEntry(0).get(this.selectionRow - this.getVerticalLowerBound());
-    }
-    else {
+    } else {
       this.selectedComponent = null;
     }
 
@@ -437,28 +438,30 @@ public class ListField extends GuiComponent {
   }
 
   /**
-   * If set to true, selecting a element will show a selection of 
-   * the entire column on which that element is on. Without taking 
+   * If set to true, selecting a element will show a selection of
+   * the entire column on which that element is on. Without taking
    * account of its row.
-   * <br><br>
+   * <br>
+   * <br>
    * Set to <b>false</b> as default.
    * 
    * @param selectEntireColumn
-   * a boolean
+   *          a boolean
    */
   public void setSelectEntireColumn(boolean selectEntireColumn) {
     this.selectEntireColumn = selectEntireColumn;
   }
 
   /**
-   * If set to true, selecting a element will show a selection of 
-   * the entire row on which that element is on. Without taking 
+   * If set to true, selecting a element will show a selection of
+   * the entire row on which that element is on. Without taking
    * account of its column.
-   * <br><br>
+   * <br>
+   * <br>
    * Set to <b>false</b> as default.
    * 
    * @param selectEntireRow
-   * a boolean
+   *          a boolean
    */
   public void setSelectEntireRow(boolean selectEntireRow) {
     this.selectEntireRow = selectEntireRow;
@@ -468,106 +471,11 @@ public class ListField extends GuiComponent {
     this.verticalLowerBound = lowerBound;
   }
 
-  private void initContentList() {
-    final double columnWidth = this.getWidth() / this.getNumberOfShownColumns();
-    final double rowHeight = this.getHeight() / this.getNumberOfShownRows();
-    for (int column = 0; column < this.getNumberOfShownColumns(); column++) {
-      this.listEntries.add(new CopyOnWriteArrayList<ImageComponent>());
-      for (int row = 0; row < this.getNumberOfShownRows(); row++) {
-        if (this.getContent()[column].length <= row) {
-          continue;
-        }
-
-        ImageComponent entryComponent;
-        if (this.getContent()[column][row] == null) {
-          entryComponent = new ImageComponent(this.getX() + (columnWidth * column), this.getY() + (rowHeight * row), columnWidth, rowHeight, this.entrySprite, "", null);
-        }
-        else {
-          entryComponent = new ImageComponent(this.getX() + (columnWidth * column), this.getY() + (rowHeight * row), columnWidth, rowHeight, this.entrySprite, this.getContent()[column][row].toString(), null);
-        }
-        if (this.isSliderInside() && this.getVerticalSlider() != null) {
-          entryComponent.setX(this.getX() + ((columnWidth - (this.getVerticalSlider().getWidth() / this.getNumberOfShownColumns()))  * column));
-          entryComponent.setWidth(entryComponent.getWidth() - (this.getVerticalSlider().getWidth() / this.getNumberOfShownColumns()));
-        }
-        if (this.isSliderInside() && this.getHorizontalSlider() != null) {
-          entryComponent.setY(this.getY() + ((rowHeight - (this.getHorizontalSlider().getHeight() / this.getNumberOfShownRows())) * row));
-          entryComponent.setHeight(entryComponent.getHeight() - (this.getHorizontalSlider().getHeight() / this.getNumberOfShownRows()));
-        }
-        entryComponent.setTextAlign(Align.LEFT);
-        this.getListEntry(column).add(entryComponent);
-      }
-      this.getComponents().addAll(this.getListEntry(column));
-      final int col = column;
-      for (final ImageComponent comp : this.getListEntry(col)) {
-        comp.onClicked(e -> {
-          this.setSelection(this.getHorizontalLowerBound() + col % this.getNumberOfShownColumns(), this.getVerticalLowerBound() + this.getListEntry(col).indexOf(comp) % this.getNumberOfShownRows());
-          this.refresh();
-        });
-      }
-    }
-
-    this.onChange(s -> {
-      if (this.getVerticalSlider() != null) {
-        this.getVerticalSlider().setCurrentValue(this.getVerticalLowerBound());
-        this.getVerticalSlider().getSliderComponent().setLocation(this.getVerticalSlider().getRelativeSliderPosition());
-      }
-      if (this.getHorizontalSlider() != null) {
-        this.getHorizontalSlider().setCurrentValue(this.getHorizontalLowerBound());
-        this.getHorizontalSlider().getSliderComponent().setLocation(this.getHorizontalSlider().getRelativeSliderPosition());
-      }
-    });
-    if (this.getVerticalSlider() != null) {
-      this.getVerticalSlider().onChange(sliderValue -> {
-        this.setVerticalLowerBound(sliderValue.intValue());
-        this.getVerticalSlider().getSliderComponent().setLocation(this.getVerticalSlider().getRelativeSliderPosition());
-        this.refresh();
-      });
-    }
-    if (this.getHorizontalSlider() != null) {
-      this.getHorizontalSlider().onChange(sliderValue -> {
-        this.setHorizontalLowerBound(sliderValue.intValue());
-        this.getHorizontalSlider().getSliderComponent().setLocation(this.getHorizontalSlider().getRelativeSliderPosition());
-        this.refresh();
-      });
-    }
-  }
-  
-  private void initSliders() {
-    final double sliderSize = this.getHeight() / 5;
-    final int maxNbOfRows = this.getMaxRows() - this.getNumberOfShownRows();
-    if (this.getNumberOfShownColumns() < this.getContent().length) {
-      if (this.isSliderInside()) {
-        this.horizontalSlider = new HorizontalSlider(this.getX(), this.getY() + this.getHeight() - sliderSize, this.getWidth() - sliderSize, sliderSize, 0, this.nbOfColumns - this.getNumberOfShownColumns(), 1);
-      }
-      else {
-        this.horizontalSlider = new HorizontalSlider(this.getX(), this.getY() + this.getHeight(), this.getWidth(), sliderSize, 0, this.nbOfColumns - this.getNumberOfShownColumns(), 1);
-      }
-      this.getHorizontalSlider().setCurrentValue(this.getHorizontalLowerBound());
-      this.getComponents().add(this.getHorizontalSlider());
-    }
-
-    if (maxNbOfRows > 0) {
-      if (this.isSliderInside()) {
-        if (this.getHorizontalSlider() != null) {
-          this.verticalSlider = new VerticalSlider(this.getX() + this.getWidth() - sliderSize, this.getY(), sliderSize, this.getHeight() - sliderSize, 0, this.getMaxRows() - this.getNumberOfShownRows(), 1);
-        }
-        else {
-          this.verticalSlider = new VerticalSlider(this.getX() + this.getWidth() - sliderSize, this.getY(), sliderSize, this.getHeight(), 0, this.getMaxRows() - this.getNumberOfShownRows(), 1);
-        }
-      }
-      else {
-        this.verticalSlider = new VerticalSlider(this.getX() + this.getWidth(), this.getY(), sliderSize, this.getHeight(), 0, this.getMaxRows() - this.getNumberOfShownRows(), 1);
-      }
-      this.getVerticalSlider().setCurrentValue(this.getVerticalLowerBound());
-      this.getComponents().add(this.getVerticalSlider());
-    }
-  }
-
   /**
    * See {@link #setSelectEntireColumn(boolean)}
    * 
    * @return
-   * true if selection is set to select the entire column; false otherwise
+   *         true if selection is set to select the entire column; false otherwise
    */
   public boolean isEntireColumnSelected() {
     return this.selectEntireColumn;
@@ -577,7 +485,7 @@ public class ListField extends GuiComponent {
    * See {@link #setSelectEntireRow(boolean)}
    * 
    * @return
-   * true if selection is set to select the entire row; false otherwise
+   *         true if selection is set to select the entire row; false otherwise
    */
   public boolean isEntireRowSelected() {
     return this.selectEntireRow;
@@ -587,7 +495,7 @@ public class ListField extends GuiComponent {
    * Verify if sliders are set to be inside the ListField.
    * 
    * @return
-   * true if slider is set to be inside the ListField; false otherwise
+   *         true if slider is set to be inside the ListField; false otherwise
    */
   public boolean isSliderInside() {
     return this.sliderInside;
@@ -659,5 +567,96 @@ public class ListField extends GuiComponent {
         return;
       }
     });
+  }
+
+  private void initContentList() {
+    final double columnWidth = this.getWidth() / this.getNumberOfShownColumns();
+    final double rowHeight = this.getHeight() / this.getNumberOfShownRows();
+    for (int column = 0; column < this.getNumberOfShownColumns(); column++) {
+      this.listEntries.add(new CopyOnWriteArrayList<ImageComponent>());
+      for (int row = 0; row < this.getNumberOfShownRows(); row++) {
+        if (this.getContent()[column].length <= row) {
+          continue;
+        }
+
+        ImageComponent entryComponent;
+        if (this.getContent()[column][row] == null) {
+          entryComponent = new ImageComponent(this.getX() + (columnWidth * column), this.getY() + (rowHeight * row), columnWidth, rowHeight, this.entrySprite, "", null);
+        } else {
+          entryComponent = new ImageComponent(this.getX() + (columnWidth * column), this.getY() + (rowHeight * row), columnWidth, rowHeight, this.entrySprite, this.getContent()[column][row].toString(), null);
+        }
+        if (this.isSliderInside() && this.getVerticalSlider() != null) {
+          entryComponent.setX(this.getX() + ((columnWidth - (this.getVerticalSlider().getWidth() / this.getNumberOfShownColumns())) * column));
+          entryComponent.setWidth(entryComponent.getWidth() - (this.getVerticalSlider().getWidth() / this.getNumberOfShownColumns()));
+        }
+        if (this.isSliderInside() && this.getHorizontalSlider() != null) {
+          entryComponent.setY(this.getY() + ((rowHeight - (this.getHorizontalSlider().getHeight() / this.getNumberOfShownRows())) * row));
+          entryComponent.setHeight(entryComponent.getHeight() - (this.getHorizontalSlider().getHeight() / this.getNumberOfShownRows()));
+        }
+        entryComponent.setTextAlign(Align.LEFT);
+        this.getListEntry(column).add(entryComponent);
+      }
+      this.getComponents().addAll(this.getListEntry(column));
+      final int col = column;
+      for (final ImageComponent comp : this.getListEntry(col)) {
+        comp.onClicked(e -> {
+          this.setSelection(this.getHorizontalLowerBound() + col % this.getNumberOfShownColumns(), this.getVerticalLowerBound() + this.getListEntry(col).indexOf(comp) % this.getNumberOfShownRows());
+          this.refresh();
+        });
+      }
+    }
+
+    this.onChange(s -> {
+      if (this.getVerticalSlider() != null) {
+        this.getVerticalSlider().setCurrentValue(this.getVerticalLowerBound());
+        this.getVerticalSlider().getSliderComponent().setLocation(this.getVerticalSlider().getRelativeSliderPosition());
+      }
+      if (this.getHorizontalSlider() != null) {
+        this.getHorizontalSlider().setCurrentValue(this.getHorizontalLowerBound());
+        this.getHorizontalSlider().getSliderComponent().setLocation(this.getHorizontalSlider().getRelativeSliderPosition());
+      }
+    });
+    if (this.getVerticalSlider() != null) {
+      this.getVerticalSlider().onChange(sliderValue -> {
+        this.setVerticalLowerBound(sliderValue.intValue());
+        this.getVerticalSlider().getSliderComponent().setLocation(this.getVerticalSlider().getRelativeSliderPosition());
+        this.refresh();
+      });
+    }
+    if (this.getHorizontalSlider() != null) {
+      this.getHorizontalSlider().onChange(sliderValue -> {
+        this.setHorizontalLowerBound(sliderValue.intValue());
+        this.getHorizontalSlider().getSliderComponent().setLocation(this.getHorizontalSlider().getRelativeSliderPosition());
+        this.refresh();
+      });
+    }
+  }
+
+  private void initSliders() {
+    final double sliderSize = this.getHeight() / 5;
+    final int maxNbOfRows = this.getMaxRows() - this.getNumberOfShownRows();
+    if (this.getNumberOfShownColumns() < this.getContent().length) {
+      if (this.isSliderInside()) {
+        this.horizontalSlider = new HorizontalSlider(this.getX(), this.getY() + this.getHeight() - sliderSize, this.getWidth() - sliderSize, sliderSize, 0, this.nbOfColumns - this.getNumberOfShownColumns(), 1);
+      } else {
+        this.horizontalSlider = new HorizontalSlider(this.getX(), this.getY() + this.getHeight(), this.getWidth(), sliderSize, 0, this.nbOfColumns - this.getNumberOfShownColumns(), 1);
+      }
+      this.getHorizontalSlider().setCurrentValue(this.getHorizontalLowerBound());
+      this.getComponents().add(this.getHorizontalSlider());
+    }
+
+    if (maxNbOfRows > 0) {
+      if (this.isSliderInside()) {
+        if (this.getHorizontalSlider() != null) {
+          this.verticalSlider = new VerticalSlider(this.getX() + this.getWidth() - sliderSize, this.getY(), sliderSize, this.getHeight() - sliderSize, 0, this.getMaxRows() - this.getNumberOfShownRows(), 1);
+        } else {
+          this.verticalSlider = new VerticalSlider(this.getX() + this.getWidth() - sliderSize, this.getY(), sliderSize, this.getHeight(), 0, this.getMaxRows() - this.getNumberOfShownRows(), 1);
+        }
+      } else {
+        this.verticalSlider = new VerticalSlider(this.getX() + this.getWidth(), this.getY(), sliderSize, this.getHeight(), 0, this.getMaxRows() - this.getNumberOfShownRows(), 1);
+      }
+      this.getVerticalSlider().setCurrentValue(this.getVerticalLowerBound());
+      this.getComponents().add(this.getVerticalSlider());
+    }
   }
 }

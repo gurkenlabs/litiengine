@@ -144,10 +144,6 @@ public class ImageComponent extends GuiComponent {
     return this.imageValign;
   }
 
-  protected Spritesheet getSpritesheet() {
-    return this.spritesheet;
-  }
-
   @Override
   public void render(final Graphics2D g) {
     if (this.isSuspended() || !this.isVisible()) {
@@ -184,6 +180,10 @@ public class ImageComponent extends GuiComponent {
 
   public void setImageValign(Valign imageValign) {
     this.imageValign = imageValign;
+  }
+  
+  protected Spritesheet getSpritesheet() {
+    return this.spritesheet;
   }
 
   private Point2D getImageLocation(final Image img) {

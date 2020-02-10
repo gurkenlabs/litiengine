@@ -9,7 +9,7 @@ public class EffectEvent extends EventObject {
   private final transient ICombatEntity combatEntity;
   private final transient Effect effect;
 
-  public EffectEvent(final Effect effect, final ICombatEntity combatEntity) {
+  EffectEvent(final Effect effect, final ICombatEntity combatEntity) {
     super(effect);
     this.effect = effect;
     this.combatEntity = combatEntity;

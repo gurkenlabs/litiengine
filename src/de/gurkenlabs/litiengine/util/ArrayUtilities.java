@@ -151,27 +151,6 @@ public final class ArrayUtilities {
     return joinArray(arr, separator);
   }
 
-  // general method for joining an array
-  // encapsulated for type safety
-  private static String joinArray(Object arr, String separator) {
-    if (arr == null) {
-      return null;
-    }
-
-    int len = Array.getLength(arr);
-    if (len == 0) {
-      return null;
-    }
-
-    StringBuilder sb = new StringBuilder(String.valueOf(Array.get(arr, 0)));
-    for (int i = 1; i < len; i++) {
-      sb.append(separator);
-      sb.append(Array.get(arr, i));
-    }
-
-    return sb.toString();
-  }
-
   public static <T> List<T> toList(T[][] arr) {
     List<T> list = new ArrayList<>();
     for (T[] rows : arr) {
@@ -308,5 +287,26 @@ public final class ArrayUtilities {
       intArray[i] = objArray[i];
     }
     return intArray;
+  }
+
+  // general method for joining an array
+  // encapsulated for type safety
+  private static String joinArray(Object arr, String separator) {
+    if (arr == null) {
+      return null;
+    }
+
+    int len = Array.getLength(arr);
+    if (len == 0) {
+      return null;
+    }
+
+    StringBuilder sb = new StringBuilder(String.valueOf(Array.get(arr, 0)));
+    for (int i = 1; i < len; i++) {
+      sb.append(separator);
+      sb.append(Array.get(arr, i));
+    }
+
+    return sb.toString();
   }
 }

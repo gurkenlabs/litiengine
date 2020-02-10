@@ -233,7 +233,7 @@ public abstract class Ability implements IRenderable {
     this.castType = castType;
   }
 
-  protected void setCurrentExecution(AbilityExecution ae) {
+  void setCurrentExecution(AbilityExecution ae) {
     this.currentExecution = ae;
   }
 

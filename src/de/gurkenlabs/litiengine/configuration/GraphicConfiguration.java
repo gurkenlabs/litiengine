@@ -29,7 +29,7 @@ public class GraphicConfiguration extends ConfigurationGroup {
   /**
    * Instantiates a new graphic configuration.
    */
-  public GraphicConfiguration() {
+  GraphicConfiguration() {
     this.graphicQuality = Quality.LOW;
     this.displayMode = DisplayMode.WINDOWED;
     this.renderDynamicShadows = false;

@@ -6,7 +6,7 @@ public class EntityAction {
 
   private String description;
 
-  public EntityAction(String name, Runnable action) {
+  EntityAction(String name, Runnable action) {
     this.name = name;
     this.action = action;
   }

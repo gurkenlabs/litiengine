@@ -14,7 +14,7 @@ public class SoundConfiguration extends ConfigurationGroup {
   /**
    * Instantiates a new sound configuration.
    */
-  public SoundConfiguration() {
+  SoundConfiguration() {
     this.soundVolume = 0.5F;
     this.setMusicVolume(0.5f);
   }

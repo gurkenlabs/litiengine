@@ -8,7 +8,7 @@ public class InputConfiguration extends ConfigurationGroup {
   private float gamepadTriggerDeadzone;
   private float gamepadStickDeadzone;
 
-  public InputConfiguration() {
+  InputConfiguration() {
     this.setMouseSensitivity(1.0F);
     this.setGamepadSupport(false);
     this.setGamepadAxisDeadzone(0.3f);

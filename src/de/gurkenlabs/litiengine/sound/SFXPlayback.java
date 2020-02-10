@@ -28,13 +28,6 @@ public class SFXPlayback extends SoundPlayback {
   }
 
   @Override
-  protected void play() {
-    this.updateLocation(Game.audio().getListenerLocation());
-    super.play();
-    Game.audio().addSound(this);
-  }
-
-  @Override
   public void run() {
     do {
       if (this.play(this.sound)) {
@@ -57,5 +50,12 @@ public class SFXPlayback extends SoundPlayback {
     } else {
       this.distance.set(Game.config().sound().getSoundVolume());
     }
+  }
+
+  @Override
+  protected void play() {
+    this.updateLocation(Game.audio().getListenerLocation());
+    super.play();
+    Game.audio().addSound(this);
   }
 }

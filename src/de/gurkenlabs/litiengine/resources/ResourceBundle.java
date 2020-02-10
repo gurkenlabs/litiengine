@@ -193,21 +193,6 @@ public class ResourceBundle implements Serializable {
     return newFile.toString();
   }
 
-  private static ResourceBundle getResourceBundle(URL file) throws JAXBException, IOException {
-    final JAXBContext jaxbContext = XmlUtilities.getContext(ResourceBundle.class);
-    final Unmarshaller um = jaxbContext.createUnmarshaller();
-    try (InputStream inputStream = Resources.get(file)) {
-
-      // try to get compressed game file
-      final GZIPInputStream zipStream = new GZIPInputStream(inputStream);
-      return (ResourceBundle) um.unmarshal(zipStream);
-    } catch (final ZipException e) {
-
-      // if it fails to load the compressed file, get it from plain XML
-      return XmlUtilities.read(ResourceBundle.class, file);
-    }
-  }
-
   void beforeMarshal(Marshaller m) {
     List<SpritesheetResource> distinctList = new ArrayList<>();
     for (SpritesheetResource sprite : this.getSpriteSheets()) {
@@ -233,6 +218,21 @@ public class ResourceBundle implements Serializable {
 
     if (this.version == 0) {
       this.version = CURRENT_VERSION;
+    }
+  }
+
+  private static ResourceBundle getResourceBundle(URL file) throws JAXBException, IOException {
+    final JAXBContext jaxbContext = XmlUtilities.getContext(ResourceBundle.class);
+    final Unmarshaller um = jaxbContext.createUnmarshaller();
+    try (InputStream inputStream = Resources.get(file)) {
+
+      // try to get compressed game file
+      final GZIPInputStream zipStream = new GZIPInputStream(inputStream);
+      return (ResourceBundle) um.unmarshal(zipStream);
+    } catch (final ZipException e) {
+
+      // if it fails to load the compressed file, get it from plain XML
+      return XmlUtilities.read(ResourceBundle.class, file);
     }
   }
 }

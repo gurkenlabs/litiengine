@@ -15,14 +15,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 public class Spawnpoint extends Entity {
   private final Collection<EntitySpawnedListener> spawnedListeners = ConcurrentHashMap.newKeySet();
 
-  public void onSpawned(EntitySpawnedListener listener) {
-    this.spawnedListeners.add(listener);
-  }
-
-  public void removeSpawnedListener(EntitySpawnedListener listener) {
-    this.spawnedListeners.remove(listener);
-  }
-
   @TmxProperty(name = MapObjectProperty.SPAWN_DIRECTION)
   private Direction direction;
 
@@ -61,6 +53,14 @@ public class Spawnpoint extends Entity {
   public Spawnpoint(Direction direction, String spawnType) {
     this(direction);
     this.setSpawnType(spawnType);
+  }
+  
+  public void onSpawned(EntitySpawnedListener listener) {
+    this.spawnedListeners.add(listener);
+  }
+
+  public void removeSpawnedListener(EntitySpawnedListener listener) {
+    this.spawnedListeners.remove(listener);
   }
 
   public Direction getDirection() {

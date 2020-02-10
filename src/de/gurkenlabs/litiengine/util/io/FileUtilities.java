@@ -88,16 +88,6 @@ public final class FileUtilities {
     return fileNames;
   }
 
-  private static boolean isBlackListedDirectory(Path path) {
-    for (final String black : DIR_BLACKLIST) {
-      if (path.toAbsolutePath().toString().contains(black)) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
   public static String getExtension(final File file) {
     return getExtension(file.getAbsolutePath());
   }
@@ -199,5 +189,15 @@ public final class FileUtilities {
       log.log(Level.SEVERE, e.getMessage(), e);
       return basePath;
     }
+  }
+
+  private static boolean isBlackListedDirectory(Path path) {
+    for (final String black : DIR_BLACKLIST) {
+      if (path.toAbsolutePath().toString().contains(black)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }

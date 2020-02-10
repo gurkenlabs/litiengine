@@ -121,18 +121,11 @@ public final class ColorHelper {
     return Math.min(Math.max(value, 0), MAX_RGB_VALUE);
   }
 
-  private static Color decodeWellformedHexString(String hexString) {
-    try {
-      return Color.decode(hexString);
-    } catch (NumberFormatException e) {
-      log.log(Level.SEVERE, e.getMessage(), e);
-    }
-    return null;
-  }
-
   /**
    * Premultiplies the alpha on the given color.
-   * @param color The color to premultiply
+   * 
+   * @param color
+   *          The color to premultiply
    * @return The color given, with alpha replaced with a black background.
    */
   public static Color premultiply(Color color) {
@@ -142,9 +135,18 @@ public final class ColorHelper {
     return new Color(premultiply(color.getRed(), color.getAlpha()), premultiply(color.getGreen(), color.getAlpha()), premultiply(color.getBlue(), color.getAlpha()));
   }
 
+  private static Color decodeWellformedHexString(String hexString) {
+    try {
+      return Color.decode(hexString);
+    } catch (NumberFormatException e) {
+      log.log(Level.SEVERE, e.getMessage(), e);
+    }
+    return null;
+  }
+
   private static int premultiply(int value, int alpha) {
     // account for gamma
-    return (int) Math.round(value * Math.pow(alpha / 255.0, 1/2.2));
+    return (int) Math.round(value * Math.pow(alpha / 255.0, 1 / 2.2));
   }
 
   private static Color decodeHexStringWithAlpha(String hexString, boolean solid) {

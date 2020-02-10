@@ -192,6 +192,15 @@ public final class Gamepad implements GamepadEvents, IUpdateable {
     return comp.getPollData();
   }
 
+  protected static final Identifier get(final String name) {
+    return components.get(name);
+  }
+
+  private static final String addComponent(final Identifier identifier) {
+    components.put(identifier.getName(), identifier);
+    return identifier.getName();
+  }
+
   private void handlePressed(Component comp) {
     final String name = comp.getIdentifier().getName();
 
@@ -223,15 +232,6 @@ public final class Gamepad implements GamepadEvents, IUpdateable {
     }
 
     return 0;
-  }
-
-  private static final String addComponent(final Identifier identifier) {
-    components.put(identifier.getName(), identifier);
-    return identifier.getName();
-  }
-
-  protected static final Identifier get(final String name) {
-    return components.get(name);
   }
 
   private void dispose() {

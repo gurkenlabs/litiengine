@@ -29,7 +29,7 @@ public abstract class ConfigurationGroup {
   /**
    * Instantiates a new configuration group.
    */
-  public ConfigurationGroup() {
+  protected ConfigurationGroup() {
     final ConfigurationGroupInfo info = this.getClass().getAnnotation(ConfigurationGroupInfo.class);
     this.prefix = info.prefix();
     this.debug = info.debug();

@@ -16,7 +16,7 @@ public class AbilityAttributes {
    * @param info
    *          the info
    */
-  public AbilityAttributes(final AbilityInfo info) {
+  AbilityAttributes(final AbilityInfo info) {
     this.cooldown = new Attribute<>(info.cooldown());
     this.range = new Attribute<>(info.range());
     this.impact = new Attribute<>(info.impact());

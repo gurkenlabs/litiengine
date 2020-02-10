@@ -24,6 +24,10 @@ public class DebugConfiguration extends ConfigurationGroup {
 
   private boolean trackRenderTimes = false;
 
+  DebugConfiguration() {
+    super();
+  }
+  
   /**
    * Checks if is debug enabled.
    *

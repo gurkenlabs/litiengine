@@ -38,8 +38,8 @@ import de.gurkenlabs.litiengine.sound.SoundPlayback.VolumeControl;
  * </p>
  */
 public final class SoundEngine implements IUpdateable, ILaunchable {
-  private static final Logger log = Logger.getLogger(SoundEngine.class.getName());
   public static final int DEFAULT_MAX_DISTANCE = 150;
+
   static final ExecutorService EXECUTOR = Executors.newCachedThreadPool(new ThreadFactory() {
     private int id = 0;
 
@@ -48,6 +48,8 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
       return new Thread(r, "Sound Playback Thread " + ++id);
     }
   });
+
+  private static final Logger log = Logger.getLogger(SoundEngine.class.getName());
   private Point2D listenerLocation;
   private UnaryOperator<Point2D> listenerLocationCallback = old -> Game.world().camera().getFocus();
   private float maxDist = DEFAULT_MAX_DISTANCE;

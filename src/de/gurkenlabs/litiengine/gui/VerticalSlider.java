@@ -23,25 +23,6 @@ public class VerticalSlider extends Slider {
   }
 
   @Override
-  protected void initializeComponents() {
-    super.initializeComponents();
-    this.setButton1(new ImageComponent(this.getX(), this.getY(), this.getWidth(), this.getWidth(), ARROW_UP.getText()));
-    this.getButton1().setFont(ARROW_UP.getFont());
-    this.getButton1().setSpriteSheet(this.getButtonSpritesheet());
-    this.setButton2(new ImageComponent(this.getX(), this.getY() + this.getHeight() - this.getWidth(), this.getWidth(), this.getWidth(), ARROW_DOWN.getText()));
-    this.getButton2().setFont(ARROW_DOWN.getFont());
-    this.getButton2().setSpriteSheet(this.getButtonSpritesheet());
-
-
-    final double sliderHeight = (this.getHeight() - this.getWidth() * 2) * 1 / 6.0;
-    this.minSliderY = this.getY() + this.getWidth();
-    this.maxSliderY = this.getY() + this.getHeight() - (this.getWidth() + sliderHeight);
-    this.setSliderComponent(new ImageComponent(this.getRelativeSliderPosition().getX(), this.getRelativeSliderPosition().getY(), this.getWidth(), sliderHeight, this.getSliderSpritesheet(), "", null));
-    this.getSliderComponent().setSpriteSheet(this.getSliderSpritesheet());
-
-  }
-
-  @Override
   public void render(final Graphics2D g) {
     final Stroke oldStroke = g.getStroke();
     g.setStroke(new BasicStroke((float) (this.getWidth() / 8)));
@@ -59,5 +40,22 @@ public class VerticalSlider extends Slider {
       final double percentage = relativeMouseX / (this.maxSliderY - this.minSliderY);
       this.setCurrentValue((float) (this.getMinValue() + percentage * (this.getMaxValue() - this.getMinValue())));
     }
+  }
+
+  @Override
+  protected void initializeComponents() {
+    super.initializeComponents();
+    this.setButton1(new ImageComponent(this.getX(), this.getY(), this.getWidth(), this.getWidth(), ARROW_UP.getText()));
+    this.getButton1().setFont(ARROW_UP.getFont());
+    this.getButton1().setSpriteSheet(this.getButtonSpritesheet());
+    this.setButton2(new ImageComponent(this.getX(), this.getY() + this.getHeight() - this.getWidth(), this.getWidth(), this.getWidth(), ARROW_DOWN.getText()));
+    this.getButton2().setFont(ARROW_DOWN.getFont());
+    this.getButton2().setSpriteSheet(this.getButtonSpritesheet());
+
+    final double sliderHeight = (this.getHeight() - this.getWidth() * 2) * 1 / 6.0;
+    this.minSliderY = this.getY() + this.getWidth();
+    this.maxSliderY = this.getY() + this.getHeight() - (this.getWidth() + sliderHeight);
+    this.setSliderComponent(new ImageComponent(this.getRelativeSliderPosition().getX(), this.getRelativeSliderPosition().getY(), this.getWidth(), sliderHeight, this.getSliderSpritesheet(), "", null));
+    this.getSliderComponent().setSpriteSheet(this.getSliderSpritesheet());
   }
 }

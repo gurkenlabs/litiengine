@@ -147,14 +147,6 @@ public class AStarGrid implements IRenderable {
     }
   }
 
-  private int clampX(int x) {
-    return MathUtilities.clamp(x, 0, this.getGrid().length - 1);
-  }
-
-  private int clampY(int y) {
-    return MathUtilities.clamp(y, 0, this.getGrid()[0].length - 1);
-  }
-
   public void setAllowDiagonalMovement(final boolean allowDiagonalMovement) {
     this.allowDiagonalMovement = allowDiagonalMovement;
   }
@@ -212,6 +204,14 @@ public class AStarGrid implements IRenderable {
     if (node != null && this.isDiagonalCornerMovementAllowed() || node != null && diagonalNeighbor1 != null && diagonalNeighbor1.isWalkable() && diagonalNeighbor2 != null && diagonalNeighbor2.isWalkable()) {
       neighbors.add(node);
     }
+  }
+
+  private int clampX(int x) {
+    return MathUtilities.clamp(x, 0, this.getGrid().length - 1);
+  }
+
+  private int clampY(int y) {
+    return MathUtilities.clamp(y, 0, this.getGrid()[0].length - 1);
   }
 
   private AStarNode getNode(final int x, final int y) {
