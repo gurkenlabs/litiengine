@@ -40,14 +40,6 @@ public interface IMapImage extends ICustomPropertyProvider {
    */
   public boolean equals(Object anObject);
 
-  /**
-   * Computes a hash code for this map image. The hash code for
-   * a map image is equal to the hash code of its absolute source
-   * path xor the hash code of its transparent color.
-   * @return The hash code for this map image
-   */
-  public int hashCode();
-
   public void setTransparentColor(Color color);
 
   public void setSource(String source); // TODO change this to a URL

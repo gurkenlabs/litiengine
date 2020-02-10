@@ -13,33 +13,26 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IMapImage;
 
-/**
- * The Class MapImage.
- */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class MapImage extends CustomPropertyProvider implements IMapImage {
 
-  /** The source. */
   @XmlAttribute
   private String source;
 
-  /** The transparentcolor. */
   @XmlAttribute(name = "trans")
   @XmlJavaTypeAdapter(ColorAdapter.class)
   private Color transparentcolor;
 
-  /** The width. */
   @XmlAttribute
   private int width;
 
-  /** The height. */
   @XmlAttribute
   private int height;
 
   @XmlTransient
   private URL absolutePath;
 
-  public MapImage(){
+  public MapImage() {
     super();
   }
 
@@ -52,16 +45,16 @@ public class MapImage extends CustomPropertyProvider implements IMapImage {
   public MapImage(MapImage original) {
     super(original);
 
-    if(original == null){
+    if (original == null) {
       return;
     }
 
     this.source = original.source;
-    if (original.transparentcolor != null){
+    if (original.transparentcolor != null) {
       this.transparentcolor = new Color(original.transparentcolor.getRed(),
-              original.transparentcolor.getGreen(),
-              original.transparentcolor.getBlue(),
-              original.transparentcolor.getAlpha());
+          original.transparentcolor.getGreen(),
+          original.transparentcolor.getBlue(),
+          original.transparentcolor.getAlpha());
     }
     this.width = original.width;
     this.height = original.height;
@@ -146,15 +139,22 @@ public class MapImage extends CustomPropertyProvider implements IMapImage {
     if (!(anObject instanceof IMapImage)) {
       return false;
     }
-    
+
     if (this == anObject) {
       return true;
     }
-    
+
     IMapImage other = (IMapImage) anObject;
     return this.getTransparentColor().equals(other.getTransparentColor()) && this.getAbsoluteSourcePath().equals(other.getAbsoluteSourcePath());
   }
 
+  /**
+   * Computes a hash code for this map image. The hash code for
+   * a map image is equal to the hash code of its absolute source
+   * path xor the hash code of its transparent color.
+   * 
+   * @return The hash code for this map image
+   */
   @Override
   public int hashCode() {
     return this.getAbsoluteSourcePath().hashCode() ^ this.getTransparentColor().hashCode();

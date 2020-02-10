@@ -4,9 +4,6 @@ import java.awt.Color;
 import java.util.Collection;
 import java.util.List;
 
-/**
- * The Interface IMapObjectLayer.
- */
 public interface IMapObjectLayer extends ILayer {
 
   /**
