@@ -102,9 +102,7 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
     case ALLSPAWNPOINTS:
       for (int i = 0; i < this.getSpawnPoints().size(); i++) {
         final int index = i;
-        Game.loop().perform(this.getSpawnDelay() + this.getSpawnDelay() * i, () -> {
-          this.spawn(this.getSpawnPoints().get(index), this.getSpawnAmount());
-        });
+        Game.loop().perform(this.getSpawnDelay() + this.getSpawnDelay() * i, () -> this.spawn(this.getSpawnPoints().get(index), this.getSpawnAmount()));
       }
       break;
     case ONERANDOMSPAWNPOINT:
@@ -112,9 +110,7 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
       break;
     case RANDOMSPAWNPOINTS:
       for (int i = 0; i < this.getSpawnAmount(); i++) {
-        Game.loop().perform(this.getSpawnDelay() + this.getSpawnDelay() * i, () -> {
-          this.spawn(CollectionUtilities.random(this.getSpawnPoints()), 1);
-        });
+        Game.loop().perform(this.getSpawnDelay() + this.getSpawnDelay() * i, () -> this.spawn(CollectionUtilities.random(this.getSpawnPoints()), 1));
       }
 
       break;

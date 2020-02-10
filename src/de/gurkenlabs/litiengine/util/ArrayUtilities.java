@@ -283,9 +283,7 @@ public final class ArrayUtilities {
   public static int[] toIntegerArray(List<Integer> intList) {
     Integer[] objArray = intList.toArray(new Integer[0]);
     int[] intArray = new int[objArray.length];
-    for (int i = 0; i < intArray.length; i++) {
-      intArray[i] = objArray[i];
-    }
+    System.arraycopy(objArray, 0, intArray, 0, objArray.length);
     return intArray;
   }
 
