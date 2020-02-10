@@ -5,6 +5,7 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -134,10 +135,10 @@ public final class PhysicsEngine implements IUpdateable {
 
   public Collection<Rectangle2D> getCollisionBoxes(Collision type) {
     if (type == Collision.NONE) {
-      return new CopyOnWriteArrayList<>();
+      return Collections.emptySet();
     }
 
-    return this.collisionBoxes.get(type);
+    return Collections.unmodifiableCollection(this.collisionBoxes.get(type));
   }
 
   public Collection<ICollisionEntity> getCollisionEntities() {
@@ -146,10 +147,10 @@ public final class PhysicsEngine implements IUpdateable {
 
   public Collection<ICollisionEntity> getCollisionEntities(Collision type) {
     if (type == Collision.NONE) {
-      return new CopyOnWriteArrayList<>();
+      return Collections.emptySet();
     }
 
-    return this.collisionEntities.get(type);
+    return Collections.unmodifiableCollection(this.collisionEntities.get(type));
   }
 
   public Rectangle2D getBounds() {
