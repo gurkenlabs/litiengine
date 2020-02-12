@@ -34,6 +34,7 @@ import de.gurkenlabs.litiengine.configuration.Quality;
 import de.gurkenlabs.litiengine.entities.CollisionBox;
 import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.entities.EntityInfo;
+import de.gurkenlabs.litiengine.entities.EntityListener;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
@@ -727,9 +728,22 @@ public final class Environment implements IRenderable {
    * Gets the ambient light instance of this environment.
    * 
    * @return The ambient light instance of this environment.
+   * 
+   * @see #getStaticShadowLayer()
    */
   public AmbientLight getAmbientLight() {
     return this.ambientLight;
+  }
+
+  /**
+   * Gets the static shadow lighting layer of this environment.
+   * 
+   * @return The static shadow lighting layer of this environment.
+   * 
+   * @see #getAmbientLight()
+   */
+  public StaticShadowLayer getStaticShadowLayer() {
+    return this.staticShadowLayer;
   }
 
   /**
@@ -1407,10 +1421,6 @@ public final class Environment implements IRenderable {
     return getByName(this.staticShadows, name);
   }
 
-  public StaticShadowLayer getStaticShadowLayer() {
-    return this.staticShadowLayer;
-  }
-
   /**
    * Gets an immutable collection containing all {@link Trigger} entities on this environment.
    * 
@@ -1553,6 +1563,16 @@ public final class Environment implements IRenderable {
     return false;
   }
 
+  /**
+   * Reloads the map object with the specified map ID from the map by first removing any previously loaded entity
+   * and then loading it freshly from its map definition.
+   * 
+   * @param mapId
+   *          The map ID of the map object.
+   *
+   * @see #remove(int)
+   * @see Environment#loadFromMap(int)
+   */
   public void reloadFromMap(final int mapId) {
     this.remove(mapId);
     this.loadFromMap(mapId);
@@ -1606,9 +1626,21 @@ public final class Environment implements IRenderable {
     return this.interact(source, null);
   }
 
+  /**
+   * Attempts to interact with triggers on this environment.
+   * 
+   * @param source
+   *          The entity that attempts to interacts with triggers.
+   * @param condition
+   *          The condition that determines whether a trigger can be interacted with.
+   * 
+   * @return The trigger that the entity was able to interact with or null.
+   * 
+   * @see Trigger#canTrigger(ICollisionEntity)
+   */
   public Trigger interact(ICollisionEntity source, Predicate<Trigger> condition) {
     for (final Trigger trigger : this.triggers) {
-      if (trigger.canTrigger(source) && triggerConditionsAreMet(trigger, condition)) {
+      if (trigger.canTrigger(source) && (condition == null || condition.test(trigger))) {
         boolean result = trigger.interact(source);
         if (result) {
           return trigger;
@@ -1619,6 +1651,20 @@ public final class Environment implements IRenderable {
     return null;
   }
 
+  /**
+   * Removes the specified entity from this environment and unloads is.
+   * 
+   * @param entity
+   *          The entity to be removed.
+   * 
+   * @see #remove(int)
+   * @see #remove(String)
+   * @see #removeAll(Iterable)
+   * @see #unload(IEntity)
+   * @see EnvironmentEntityListener#entityRemoved(IEntity)
+   * @see IEntity#removed(Environment)
+   * @see EntityListener#removed(IEntity, Environment)
+   */
   public void remove(final IEntity entity) {
     if (entity == null) {
       return;
@@ -1700,10 +1746,18 @@ public final class Environment implements IRenderable {
   }
 
   /**
-   * Removes the entity with the specified map ID from this environment.
+   * Removes the entity with the specified map ID from this environment and unloads is.
    * 
    * @param mapId
    *          The map ID of the entity to be removed.
+   * 
+   * @see #remove(int)
+   * @see #remove(String)
+   * @see #removeAll(Iterable)
+   * @see #unload(IEntity)
+   * @see EnvironmentEntityListener#entityRemoved(IEntity)
+   * @see IEntity#removed(Environment)
+   * @see EntityListener#removed(IEntity, Environment)
    */
   public void remove(final int mapId) {
     final IEntity ent = this.get(mapId);
@@ -1715,10 +1769,18 @@ public final class Environment implements IRenderable {
   }
 
   /**
-   * Removes the entity with the specified name from this environment.
+   * Removes the entity with the specified name from this environment and unloads is.
    * 
    * @param name
    *          The name of the entity to be removed.
+   * 
+   * @see #remove(int)
+   * @see #remove(String)
+   * @see #removeAll(Iterable)
+   * @see #unload(IEntity)
+   * @see EnvironmentEntityListener#entityRemoved(IEntity)
+   * @see IEntity#removed(Environment)
+   * @see EntityListener#removed(IEntity, Environment)
    */
   public void remove(String name) {
     final IEntity ent = this.get(name);
@@ -1737,6 +1799,9 @@ public final class Environment implements IRenderable {
    * 
    * @param entities
    *          The entities to be removed.
+   *
+   * @see #remove(int)
+   * @see #remove(String)
    */
   public <T extends IEntity> void removeAll(Iterable<T> entities) {
     if (entities == null) {
@@ -1753,6 +1818,9 @@ public final class Environment implements IRenderable {
    * 
    * @param entities
    *          The entities to be removed.
+   * 
+   * @see #remove(int)
+   * @see #remove(String)
    */
   public void removeAll(IEntity... entities) {
     this.removeAll(Arrays.asList(entities));
@@ -1812,23 +1880,41 @@ public final class Environment implements IRenderable {
     g.setTransform(otx);
   }
 
+  /**
+   * Gets the gravity defined for this environment.
+   * 
+   * @return The gravity of this environment.
+   * 
+   * @see GameWorld#gravity()
+   * @see GameWorld#setGravity(int)
+   * @see #setGravity(int)
+   */
   public int getGravity() {
     return this.gravity;
   }
 
+  /**
+   * Sets the gravity for this particular environment.
+   * 
+   * <p>
+   * This typically only needs to be called explicitly, when the gravity is different than for other environments.
+   * </p>
+   * 
+   * @param gravity
+   *          The new gravity for this environment. If 0, no gravity will be applied.
+   *
+   * @see GameWorld#gravity()
+   * @see GameWorld#setGravity(int)
+   * @see #getGravity()
+   */
   public void setGravity(int gravity) {
     this.gravity = gravity;
 
     if (this.getGravity() != 0) {
-
-      // if there are gravity forces for all mobile entities, just update the existing forces
-      if (this.gravityForces.size() == this.mobileEntities.size()) {
-        for (GravityForce force : this.gravityForces.values()) {
-          force.setStrength(this.gravity);
-        }
-      } else {
-        // otherwise create a new force for every mobile entity in the environment
-        for (IMobileEntity entity : this.mobileEntities.values()) {
+      for (IMobileEntity entity : this.mobileEntities.values()) {
+        if (this.gravityForces.containsKey(entity.getMapId())) {
+          this.gravityForces.get(entity.getMapId()).setStrength(this.gravity);
+        } else {
           this.addGravityForce(entity);
         }
       }
@@ -1839,6 +1925,12 @@ public final class Environment implements IRenderable {
     }
   }
 
+  /**
+   * Unloads all entities of this environment.
+   * 
+   * @see #unload(IEntity)
+   * @see EnvironmentListener#unloaded(Environment)
+   */
   public void unload() {
     if (!this.loaded) {
       return;
@@ -1851,14 +1943,6 @@ public final class Environment implements IRenderable {
 
     this.loaded = false;
     this.fireEvent(l -> l.unloaded(this));
-  }
-
-  private static boolean triggerConditionsAreMet(Trigger trigger, Predicate<Trigger> condition) {
-    if (condition == null) {
-      return true;
-    }
-
-    return condition.test(trigger);
   }
 
   private static <T extends IEntity> T getById(Collection<T> entities, int mapId) {
@@ -1999,7 +2083,6 @@ public final class Environment implements IRenderable {
       entity.getMovementController().apply(force);
       this.gravityForces.put(entity.getMapId(), force);
     }
-
   }
 
   private void removeGravity(IMobileEntity entity) {
