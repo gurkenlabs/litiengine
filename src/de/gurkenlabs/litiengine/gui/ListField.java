@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.gui;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
@@ -39,7 +40,6 @@ public class ListField extends GuiComponent {
   private boolean selectEntireColumn = false;
   private boolean selectEntireRow = false;
 
-
   private VerticalSlider verticalSlider;
   private HorizontalSlider horizontalSlider;
   private boolean sliderInside = false;
@@ -72,54 +72,10 @@ public class ListField extends GuiComponent {
    * @param shownRows
    *          The number of rows/elements to
    *          display before the user needs to scroll for more possible rows/elements.
-   * @param entrySprite
-   *          The entrySprite.
-   * @param buttonSprite
-   *          The buttonSprite.
    * @see #ListField(double, double, double, double, Object[], int, boolean, Spritesheet, Spritesheet)
    */
-  public ListField(final double x, final double y, final double width, final double height, final Object[] content, final int shownRows, final Spritesheet entrySprite, final Spritesheet buttonSprite) {
-    this(x, y, width, height, new Object[][] { content }, shownRows, 1, false, entrySprite, buttonSprite);
-  }
-
-  /**
-   * Creates a vertical list field.
-   * <br>
-   * <br>
-   * The <b>content</b> of this list field can only be accessed through the first column (column 0).
-   * <br>
-   * Examples:
-   * <blockquote>
-   * content[0][0] - ok<br>
-   * content[0][1] - ok<br>
-   * content[0][8] - ok<br>
-   * content[1][5] - NOK<br>
-   * content[2][0] - NOK<br>
-   * </blockquote>
-   * 
-   * @param x
-   *          The x-coordinate of the ListField.
-   * @param y
-   *          The y-coordinate of the ListField.
-   * @param width
-   *          The width of the ListField.
-   * @param height
-   *          The height of the ListField.
-   * @param content
-   *          The 1 dimension array to show in the ListField.
-   * @param shownRows
-   *          The number of rows/elements to
-   *          display before the user needs to scroll for more possible rows/elements.
-   * @param sliderInside
-   *          If set to true, sliders will show inside the ListField.
-   *          This can be used, for example, if the ListField's width matches the screen's width.
-   * @param entrySprite
-   *          The entrySprite.
-   * @param buttonSprite
-   *          The buttonSprite.
-   */
-  public ListField(final double x, final double y, final double width, final double height, final Object[] content, final int shownRows, final boolean sliderInside, final Spritesheet entrySprite, final Spritesheet buttonSprite) {
-    this(x, y, width, height, new Object[][] { content }, shownRows, 1, sliderInside, entrySprite, buttonSprite);
+  public ListField(final double x, final double y, final double width, final double height, final Object[] content, final int shownRows) {
+    this(x, y, width, height, new Object[][] { content }, shownRows, 1);
   }
 
   /**
@@ -151,62 +107,13 @@ public class ListField extends GuiComponent {
    * @param shownColumns
    *          The number of columns to
    *          display before the user needs to scroll for more possible columns.
-   * @param entrySprite
-   *          The entrySprite.
-   * @param buttonSprite
-   *          The buttonSprite.
-   * @see #ListField(double, double, double, double, Object[][], int, int, boolean, Spritesheet, Spritesheet)
    */
-  public ListField(final double x, final double y, final double width, final double height, final Object[][] content, final int shownRows, final int shownColumns, final Spritesheet entrySprite, final Spritesheet buttonSprite) {
-    this(x, y, width, height, content, shownRows, shownColumns, false, entrySprite, buttonSprite);
-  }
-
-  /**
-   * Creates a 2D vertical list field.
-   * <br>
-   * <br>
-   * The given <b>content</b> should be arranged as columns of elements.
-   * <br>
-   * Examples:
-   * <blockquote>
-   * content[0][0] - column 0, row 0<br>
-   * content[0][1] - column 0, row 1<br>
-   * content[2][8] - column 2, row 8<br>
-   * </blockquote>
-   * 
-   * @param x
-   *          The x-coordinate of the ListField.
-   * @param y
-   *          The y-coordinate of the ListField.
-   * @param width
-   *          The width of the ListField.
-   * @param height
-   *          The height of the ListField.
-   * @param content
-   *          The 2 dimension array to show in the ListField.
-   * @param shownRows
-   *          The number of rows to
-   *          display before the user needs to scroll for more possible rows.
-   * @param shownColumns
-   *          The number of columns to
-   *          display before the user needs to scroll for more possible columns.
-   * @param sliderInside
-   *          If set to true, sliders will show inside the ListField.
-   *          This can be used, for example, if the ListField's width matches the screen's width.
-   * @param entrySprite
-   *          The entrySprite.
-   * @param buttonSprite
-   *          The buttonSprite.
-   */
-  public ListField(final double x, final double y, final double width, final double height, final Object[][] content, final int shownRows, final int shownColumns, final boolean sliderInside, final Spritesheet entrySprite, final Spritesheet buttonSprite) {
+  public ListField(final double x, final double y, final double width, final double height, final Object[][] content, final int shownRows, final int shownColumns) {
     super(x, y, width, height);
     this.changeConsumer = new CopyOnWriteArrayList<>();
     this.content = content;
     this.nbOfColumns = this.content.length;
     this.listEntries = new CopyOnWriteArrayList<>();
-    this.buttonSprite = buttonSprite;
-    this.entrySprite = entrySprite;
-    this.sliderInside = sliderInside;
     this.shownRows = shownRows;
     this.shownColumns = shownColumns;
     this.initSliders();
@@ -261,6 +168,22 @@ public class ListField extends GuiComponent {
       return null;
     }
     return this.listEntries.get(column);
+  }
+
+  /**
+   * Returns item at a specified column and row.
+   *
+   * @param column
+   *          the column
+   * @param row
+   *          the row
+   * @return ImageComponent at [column,row]
+   */
+  public ImageComponent getListEntry(final int column, final int row) {
+    if (column < 0 || row < 0 || column >= this.listEntries.size() || row >= this.listEntries.get(column).size()) {
+      return null;
+    }
+    return this.listEntries.get(column).get(row);
   }
 
   /**
@@ -343,9 +266,13 @@ public class ListField extends GuiComponent {
         }
 
         if (row + this.getVerticalLowerBound() < this.getContent()[column + this.getHorizontalLowerBound()].length && this.getContent()[column + this.getHorizontalLowerBound()][row + this.getVerticalLowerBound()] != null) {
-          this.getListEntry(column).get(row).setText(this.getContent()[column + this.getHorizontalLowerBound()][row + this.getVerticalLowerBound()].toString());
+          if (this.getContent()[column + this.getHorizontalLowerBound()][row + this.getVerticalLowerBound()] instanceof Image) {
+            this.getListEntry(column, row).setImage((Image) this.getContent()[column + this.getHorizontalLowerBound()][row + this.getVerticalLowerBound()]);
+          } else {
+            this.getListEntry(column, row).setText(this.getContent()[column + this.getHorizontalLowerBound()][row + this.getVerticalLowerBound()].toString());
+          }
         } else {
-          this.getListEntry(column).get(row).setText("");
+          this.getListEntry(column, row).setText("");
         }
       }
     }
@@ -396,10 +323,12 @@ public class ListField extends GuiComponent {
 
   public void setButtonSprite(final Spritesheet buttonSprite) {
     this.buttonSprite = buttonSprite;
+    this.initContentList();
   }
 
   public void setEntrySprite(final Spritesheet entrySprite) {
     this.entrySprite = entrySprite;
+    this.initContentList();
   }
 
   public void setForwardMouseEvents(final int column, final boolean forwardMouseEvents) {
@@ -450,6 +379,20 @@ public class ListField extends GuiComponent {
    */
   public void setSelectEntireColumn(boolean selectEntireColumn) {
     this.selectEntireColumn = selectEntireColumn;
+  }
+
+  /**
+   * If set to true, the sliders of this ListField will be displayed within its boundaries.
+   * This is necessary, for example, when a ListField covers an entire screen.
+   * <br>
+   * Set to <b>false</b> as default.
+   * 
+   * @param sliderInside
+   *          a boolean
+   */
+  public void setSliderInside(boolean sliderInside) {
+    this.sliderInside = sliderInside;
+    this.initSliders();
   }
 
   /**
@@ -582,6 +525,8 @@ public class ListField extends GuiComponent {
         ImageComponent entryComponent;
         if (this.getContent()[column][row] == null) {
           entryComponent = new ImageComponent(this.getX() + (columnWidth * column), this.getY() + (rowHeight * row), columnWidth, rowHeight, this.entrySprite, "", null);
+        } else if (this.getContent()[column][row] instanceof Image) {
+          entryComponent = new ImageComponent(this.getX() + (columnWidth * column), this.getY() + (rowHeight * row), columnWidth, rowHeight, this.entrySprite, "", (Image) this.getContent()[column][row]);
         } else {
           entryComponent = new ImageComponent(this.getX() + (columnWidth * column), this.getY() + (rowHeight * row), columnWidth, rowHeight, this.entrySprite, this.getContent()[column][row].toString(), null);
         }

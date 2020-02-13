@@ -12,21 +12,21 @@ import de.gurkenlabs.litiengine.Game;
 public class ListFieldTest {
 
   private final String[] content_1D = new String[] {
-    "A", "B", "C", "D", "E", "F", "G"
+      "A", "B", "C", "D", "E", "F", "G"
   };
   private final String[][] content_2D = new String[][] {
-    {"A", "B", "C", "D", "E", "F", "G"},
-    {"H", "I", "J", "K", "L", "M", "N", "O"},
-    {"P", "Q", "R", "S", "T", "U", "V"},
-    {"W", "X", "Y", "Z"}
+      { "A", "B", "C", "D", "E", "F", "G" },
+      { "H", "I", "J", "K", "L", "M", "N", "O" },
+      { "P", "Q", "R", "S", "T", "U", "V" },
+      { "W", "X", "Y", "Z" }
   };
 
   @Test
   public void testInitialization() {
     Game.init(Game.COMMADLINE_ARG_NOGUI);
-    
-    ListField listField_1D = new ListField(0, 0, 100, 50, this.content_1D, 4, null, null);
-    ListField listField_2D = new ListField(0, 0, 100, 50, this.content_2D, 7, 3, null, null);
+
+    ListField listField_1D = new ListField(0, 0, 100, 50, this.content_1D, 4);
+    ListField listField_2D = new ListField(0, 0, 100, 50, this.content_2D, 7, 3);
 
     assertNotNull(listField_1D);
     assertNotNull(listField_2D);
