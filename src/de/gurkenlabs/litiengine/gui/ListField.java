@@ -72,7 +72,7 @@ public class ListField extends GuiComponent {
    * @param shownRows
    *          The number of rows/elements to
    *          display before the user needs to scroll for more possible rows/elements.
-   * @see #ListField(double, double, double, double, Object[], int, boolean, Spritesheet, Spritesheet)
+   * @see #ListField(double, double, double, double, Object[], int)
    */
   public ListField(final double x, final double y, final double width, final double height, final Object[] content, final int shownRows) {
     this(x, y, width, height, new Object[][] { content }, shownRows, 1);
