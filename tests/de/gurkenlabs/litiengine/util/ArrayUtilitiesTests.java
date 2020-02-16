@@ -2,7 +2,6 @@ package de.gurkenlabs.litiengine.util;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.List;
 import java.util.logging.Logger;
@@ -54,7 +53,7 @@ public class ArrayUtilitiesTests {
     String testEmpty = ArrayUtilities.join(new int[] {});
 
     assertEquals("100,200,300,1,2,3", testStringWithInts);
-    assertNull(testEmpty);
+    assertEquals("", testEmpty);
   }
 
   @Test
@@ -87,7 +86,7 @@ public class ArrayUtilitiesTests {
 
     assertArrayEquals(new Integer[] { 1, 2, 3, 4, 5, 6 }, result);
   }
-  
+
   @Test
   public void testDistinct() {
     Integer[] first = new Integer[] { 1, 2, 3, 4, 5 };
