@@ -296,7 +296,7 @@ public final class ArrayUtilities {
 
     int len = Array.getLength(arr);
     if (len == 0) {
-      return null;
+      return "";
     }
 
     StringBuilder sb = new StringBuilder(String.valueOf(Array.get(arr, 0)));
