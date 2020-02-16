@@ -4,11 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -377,6 +373,53 @@ public class Editor extends Screen {
   public void importSounds() {
     if (EditorFileChooser.showFileDialog(AUDIO_FILE_NAME, Resources.strings().get("import_something", AUDIO_FILE_NAME), true, SoundFormat.getAllExtensions()) == JFileChooser.APPROVE_OPTION) {
       this.importSounds(EditorFileChooser.instance().getSelectedFiles());
+    }
+  }
+
+  public void exportSpriteSheets() {
+    JFileChooser chooser;
+    try {
+      final String source = this.getProjectPath();
+      chooser = new JFileChooser(source != null ? source : new File(".").getCanonicalPath());
+      chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+      chooser.setDialogType(JFileChooser.SAVE_DIALOG);
+      FileFilter filter = new FileNameExtensionFilter(SPRITE_FILE_NAME, "info");
+      chooser.setFileFilter(filter);
+      chooser.addChoosableFileFilter(filter);
+      chooser.setSelectedFile(new File("sprites.info"));
+
+      int result = chooser.showSaveDialog(Game.window().getHostControl());
+      if (result == JFileChooser.APPROVE_OPTION) {
+        // get all spritesheets
+        Collection<Spritesheet> allSpriteSheets = Resources.spritesheets().getAll();
+        if(allSpriteSheets.size() == 0) {
+          return;
+        }
+        BufferedWriter writer = new BufferedWriter(new FileWriter(chooser.getSelectedFile()));
+        // print the spritesheet information to the info file
+        for (Spritesheet sprite : allSpriteSheets) {
+          // check for keyframes
+          int[] keyFrames = Resources.spritesheets().getCustomKeyFrameDurations(sprite);
+          String fileExtension = sprite.getImageFormat().toFileExtension();
+          writer.write(String.format("{0}.{1},{2},{3}", sprite.getName(), fileExtension, sprite.getSpriteWidth(), sprite.getSpriteHeight()));
+          // print keyframes (if they exist)
+          if(keyFrames.length > 0) {
+            writer.write(";");
+            int i = 0;
+            for (int keyFrame : keyFrames) {
+              writer.write(keyFrame);
+              i++;
+              if(i != keyFrames.length - 1) {
+                writer.write(",");
+              }
+            }
+          }
+          writer.write("\n");
+        }
+        writer.close();
+      }
+    } catch (IOException e1) {
+      log.log(Level.SEVERE, e1.getLocalizedMessage(), e1);
     }
   }
 
