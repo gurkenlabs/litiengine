@@ -38,18 +38,12 @@ public abstract class Entity implements IEntity, EntityRenderListener {
   private final EntityActionMap actions = new EntityActionMap();
   private final ICustomPropertyProvider properties = new CustomPropertyProvider();
 
-  private boolean renderWithLayer;
   private Environment environment;
   private boolean loaded;
-
-  @TmxProperty(name = MapObjectProperty.TAGS)
-  private final List<String> tags = new CopyOnWriteArrayList<>();
 
   private double angle;
 
   private Rectangle2D boundingBox;
-
-  private double height;
 
   private int mapId;
 
@@ -57,13 +51,19 @@ public abstract class Entity implements IEntity, EntityRenderListener {
 
   private String name;
 
+  private double width;
+  
+  private double height;
+  
+  @TmxProperty(name = MapObjectProperty.TAGS)
+  private final List<String> tags = new CopyOnWriteArrayList<>();
+  
+  @TmxProperty(name = MapObjectProperty.RENDERWITHLAYER)
+  private boolean renderWithLayer;
+  
+  @TmxProperty(name = MapObjectProperty.RENDERTYPE)
   private RenderType renderType;
 
-  private double width;
-
-  /**
-   * Instantiates a new entity.
-   */
   protected Entity() {
     this.mapLocation = new Point2D.Double(0, 0);
     final EntityInfo info = this.getClass().getAnnotation(EntityInfo.class);
