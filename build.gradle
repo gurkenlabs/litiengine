@@ -38,7 +38,7 @@ dependencies {
   compile 'com.googlecode.soundlibs:jorbis:0.0.17.4'
   compile 'com.googlecode.soundlibs:tritonus-share:0.3.7.4'
   compile 'com.googlecode.soundlibs:vorbisspi:1.0.3.3'
-  compile ('com.googlecode.soundlibs:mp3spi:1.9.5.4'){
+  compile ('com.googlecode.soundlibs:mp3spi:1.9.5.4') {
     exclude group:'junit'
   }
 
@@ -61,13 +61,14 @@ test {
 }
 
 jar {
-  from  {configurations.compile.collect { zipTree it }
-  } {
-     exclude 'META-INF/services/**'
-  }
+  from {
+    configurations.compile.collect { zipTree it } 
+  } 
   
   duplicatesStrategy = DuplicatesStrategy.EXCLUDE
   
+  exclude 'META-INF/services/**'
+  exclude 'module-info.*'
   exclude '**/*.dll'
   exclude '**/*.jnilib'
   exclude '**/*.dylib'
