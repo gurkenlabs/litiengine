@@ -44,10 +44,10 @@ public final class Spritesheet {
   public Spritesheet(final BufferedImage image, final String path, final int spriteWidth, final int spriteHeight) {
     checkImage(image, path);
     this.image = image;
+    this.name = FileUtilities.getFileName(path);
     this.checkHeight(spriteHeight);
     this.checkWidth(spriteWidth);
 
-    this.name = FileUtilities.getFileName(path);
     this.spriteWidth = spriteWidth;
     this.spriteHeight = spriteHeight;
     this.imageFormat = ImageFormat.get(FileUtilities.getExtension(path));
@@ -195,20 +195,20 @@ public final class Spritesheet {
   }
 
   private void checkWidth(int value) {
-    checkDimension(value, this.getImage().getWidth(), "width");
+    checkDimension(value, this.getImage().getWidth(), this.getName(), "width");
   }
 
   private void checkHeight(int value) {
-    checkDimension(value, this.getImage().getHeight(), "height");
+    checkDimension(value, this.getImage().getHeight(), this.getName(), "height");
   }
 
-  private static void checkDimension(int value, int imageValue, String dimension) {
+  private static void checkDimension(int value, int imageValue, String image_name, String dimension) {
     if (value <= 0) {
-      throw new IllegalArgumentException("Invalid sprite dimensions! Sprite " + dimension + " must to be greater than 0.");
+      throw new IllegalArgumentException("Invalid sprite dimensions (" + image_name + ")! Sprite " + dimension + " must to be greater than 0.");
     }
 
     if (value > imageValue) {
-      throw new IllegalArgumentException("Invalid sprite dimensions! Sprite " + dimension + "(" + value + ") cannot be greater than the image " + dimension + "(" + imageValue + ").");
+      throw new IllegalArgumentException("Invalid sprite dimensions (" + image_name + ")! Sprite " + dimension + "(" + value + ") cannot be greater than the image " + dimension + "(" + imageValue + ").");
     }
   }
 

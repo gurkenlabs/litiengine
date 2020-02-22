@@ -23,6 +23,9 @@ public class SpritesheetResource extends NamedResource implements Serializable {
   @XmlAttribute(name = "height")
   private int height;
 
+  @XmlAttribute(name = "imageformat")
+  private ImageFormat imageformat;
+
   @XmlElement(required = false)
   private String image;
 
@@ -36,12 +39,14 @@ public class SpritesheetResource extends NamedResource implements Serializable {
   public SpritesheetResource(final Spritesheet sprite) {
     this(sprite.getSpriteWidth(), sprite.getSpriteHeight(), sprite.getName());
     this.setImage(Codec.encode(sprite.getImage(), sprite.getImageFormat()));
+    this.setImageFormat(sprite.getImageFormat());
     this.setKeyframes(Resources.spritesheets().getCustomKeyFrameDurations(sprite));
   }
 
   public SpritesheetResource(final BufferedImage image, String name, final int width, final int height) {
     this(width, height, name);
     this.setImage(Codec.encode(image));
+    this.setImageFormat(ImageFormat.PNG);
   }
 
   private SpritesheetResource(int width, int height, String name) {
@@ -60,10 +65,14 @@ public class SpritesheetResource extends NamedResource implements Serializable {
     return this.image;
   }
 
-
   @XmlTransient
   public int getWidth() {
     return this.width;
+  }
+
+  @XmlTransient
+  public ImageFormat getImageFormat() {
+    return this.imageformat;
   }
 
   @XmlTransient
@@ -85,6 +94,10 @@ public class SpritesheetResource extends NamedResource implements Serializable {
 
   public void setWidth(final int w) {
     this.width = w;
+  }
+
+  public void setImageFormat(final ImageFormat f) {
+    this.imageformat = f;
   }
 
   public void setKeyframes(int[] keyframes) {
