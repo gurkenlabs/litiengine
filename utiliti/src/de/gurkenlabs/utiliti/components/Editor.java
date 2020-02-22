@@ -7,10 +7,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,6 +38,7 @@ import de.gurkenlabs.litiengine.resources.SoundFormat;
 import de.gurkenlabs.litiengine.resources.SoundResource;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.litiengine.resources.TextureAtlas;
+import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
@@ -391,28 +389,23 @@ public class Editor extends Screen {
       int result = chooser.showSaveDialog(Game.window().getHostControl());
       if (result == JFileChooser.APPROVE_OPTION) {
         // get all spritesheets
-        Collection<Spritesheet> allSpriteSheets = Resources.spritesheets().getAll();
+        List allSpriteSheets = new ArrayList(Resources.spritesheets().getAll());
+        Collections.sort(allSpriteSheets);
         if(allSpriteSheets.size() == 0) {
           return;
         }
         BufferedWriter writer = new BufferedWriter(new FileWriter(chooser.getSelectedFile()));
         // print the spritesheet information to the info file
-        for (Spritesheet sprite : allSpriteSheets) {
+        for (Object spriteObject : allSpriteSheets) {
+          Spritesheet sprite = (Spritesheet) spriteObject;
           // check for keyframes
           int[] keyFrames = Resources.spritesheets().getCustomKeyFrameDurations(sprite);
           String fileExtension = sprite.getImageFormat().toFileExtension();
-          writer.write(String.format("{0}.{1},{2},{3}", sprite.getName(), fileExtension, sprite.getSpriteWidth(), sprite.getSpriteHeight()));
+          writer.write(String.format("%s%s,%d,%d", sprite.getName(), fileExtension, sprite.getSpriteWidth(), sprite.getSpriteHeight()));
           // print keyframes (if they exist)
           if(keyFrames.length > 0) {
             writer.write(";");
-            int i = 0;
-            for (int keyFrame : keyFrames) {
-              writer.write(keyFrame);
-              i++;
-              if(i != keyFrames.length - 1) {
-                writer.write(",");
-              }
-            }
+            writer.write(ArrayUtilities.join(keyFrames));
           }
           writer.write("\n");
         }

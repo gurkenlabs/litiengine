@@ -59,6 +59,7 @@ public final class ResourcesMenu extends JMenu {
       importBlueprints.setEnabled(Editor.instance().getCurrentResourceFile() != null);
       importTilesets.setEnabled(Editor.instance().getCurrentResourceFile() != null);
       importSounds.setEnabled(Editor.instance().getCurrentResourceFile() != null);
+      exportSpriteSheets.setEnabled(Editor.instance().getCurrentResourceFile() != null);
     });
 
     this.add(importSprite);
