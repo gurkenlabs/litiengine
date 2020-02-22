@@ -9,11 +9,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.resources.ImageFormat;
+import de.gurkenlabs.litiengine.resources.Resource;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.util.AlphanumComparator;
 import de.gurkenlabs.litiengine.util.Imaging;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
-public final class Spritesheet {
+public final class Spritesheet implements Comparable<Spritesheet> {
   private static final Logger log = Logger.getLogger(Spritesheet.class.getName());
 
   private final List<Integer> emptySprites = new CopyOnWriteArrayList<>();
@@ -61,6 +63,11 @@ public final class Spritesheet {
       this.emptySprites.clear();
       this.sprites = new BufferedImage[this.getTotalNumberOfSprites()];
     });
+  }
+
+  @Override
+  public int compareTo(Spritesheet obj) {
+    return AlphanumComparator.compareTo(this.getName(), obj.getName());
   }
 
   /**
