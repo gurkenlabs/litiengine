@@ -1,6 +1,7 @@
 package de.gurkenlabs.utiliti;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
 
@@ -9,7 +10,6 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.configuration.Quality;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.litiengine.resources.Strings;
 import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.swing.UI;
 
@@ -19,7 +19,7 @@ public class Program {
     Game.info().setName("utiLITI");
     Game.info().setSubTitle("LITIengine Creation Kit");
     Game.info().setVersion("v0.4.19-alpha");
-    Resources.strings().setEncoding(Strings.ENCODING_UTF_8);
+    Resources.strings().setEncoding(StandardCharsets.UTF_8);
 
     // hook up configuration and initialize the game
     Game.config().add(Editor.preferences());

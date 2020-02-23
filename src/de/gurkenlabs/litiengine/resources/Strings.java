@@ -6,7 +6,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,24 +22,17 @@ import de.gurkenlabs.litiengine.Game;
 public final class Strings {
   public static final String DEFAULT_BUNDLE = "strings";
   
-  // TODO: use java.nio.charset.StandardCharsets
-  public static final String ENCODING_ISO_8859_1 = "ISO-8859-1";
-  public static final String ENCODING_UTF_8 = "UTF-8";
-
   private static final Logger log = Logger.getLogger(Strings.class.getName());
 
-  private String encoding = ENCODING_ISO_8859_1;
+  // default encoding for properties is ISO_8859_1 see: https://docs.oracle.com/javase/7/docs/api/java/util/Properties.html
+  private Charset charset = StandardCharsets.ISO_8859_1;
 
   Strings() {
     Locale.setDefault(new Locale("en", "US"));
   }
 
-  public void setEncoding(String newEncoding) {
-    if (newEncoding == null || newEncoding.isEmpty()) {
-      throw new IllegalArgumentException("The encoding must not be null or empty.");
-    }
-
-    encoding = newEncoding;
+  public void setEncoding(Charset charset) {
+    this.charset = charset;
   }
 
   public String get(final String key) {
@@ -67,15 +61,15 @@ public final class Strings {
 
       String value = defaultBundle.getString(key);
 
-      String decodedValue = encoding.equals(ENCODING_ISO_8859_1) ? value : new String(value.getBytes(ENCODING_ISO_8859_1), encoding);
+      String decodedValue = this.charset.equals(StandardCharsets.ISO_8859_1) ? value : new String(value.getBytes(StandardCharsets.ISO_8859_1), this.charset);
       if (args.length > 0) {
         return MessageFormat.format(decodedValue, args);
       }
 
       return decodedValue;
-    } catch (final MissingResourceException | UnsupportedEncodingException me) {
+    } catch (final MissingResourceException e) {
       final StringWriter sw = new StringWriter();
-      me.printStackTrace(new PrintWriter(sw));
+      e.printStackTrace(new PrintWriter(sw));
       final String stacktrace = sw.toString();
       log.severe(stacktrace);
     }
