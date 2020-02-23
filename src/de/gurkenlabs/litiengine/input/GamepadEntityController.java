@@ -21,13 +21,13 @@ public class GamepadEntityController<T extends IMobileEntity> extends MovementCo
     }
 
     this.rotateWithRightStick = rotateWithRightStick;
-    Input.gamepads().onGamepadAdded(pad -> {
+    Input.gamepads().onAdded(pad -> {
       if (this.gamePadIndex == -1) {
         this.gamePadIndex = pad.getIndex();
       }
     });
 
-    Input.gamepads().onGamepadRemoved(pad -> {
+    Input.gamepads().onRemoved(pad -> {
       if (this.gamePadIndex == pad.getIndex()) {
         this.gamePadIndex = -1;
         final Gamepad newGamePad = Input.gamepads().current();

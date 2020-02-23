@@ -3,12 +3,12 @@ package de.gurkenlabs.litiengine.input;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.Collection;
+import java.util.EventListener;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,8 +22,8 @@ import net.java.games.input.ControllerEnvironment;
 public final class GamepadManager extends GamepadEvents implements ILaunchable {
   private static final Logger log = Logger.getLogger(GamepadManager.class.getName());
 
-  private final Collection<Consumer<Gamepad>> gamepadAddedConsumer;
-  private final Collection<Consumer<Gamepad>> gamepadRemovedConsumer;
+  private final Collection<GamepadAddedListener> gamepadAddedConsumer;
+  private final Collection<GamepadRemovedListener> gamepadRemovedConsumer;
 
   private final List<Gamepad> gamePads;
 
@@ -58,14 +58,14 @@ public final class GamepadManager extends GamepadEvents implements ILaunchable {
       }
     });
 
-    this.onGamepadAdded(pad -> {
+    this.onAdded(pad -> {
       if (this.defaultgamePadIndex == -1) {
         this.defaultgamePadIndex = pad.getIndex();
         this.hookupToGamepad(pad);
       }
     });
 
-    this.onGamepadRemoved(pad -> {
+    this.onRemoved(pad -> {
       if (this.defaultgamePadIndex == pad.getIndex()) {
         this.defaultgamePadIndex = -1;
         final Gamepad newGamePad = current();
@@ -80,9 +80,52 @@ public final class GamepadManager extends GamepadEvents implements ILaunchable {
   }
 
   /**
+   * Adds the specified gamepad added listener to receive events when gamepads are added.
+   * 
+   * @param listener
+   *          The listener to add.
+   */
+  public void onAdded(final GamepadAddedListener listener) {
+    this.gamepadAddedConsumer.add(listener);
+  }
+
+  /**
+   * Unregister the specified added listener from this instance.
+   *
+   * @param listener
+   *          The listener to remove.
+   */
+  public void removeAddedListener(GamepadAddedListener listener) {
+    this.gamepadAddedConsumer.remove(listener);
+  }
+
+  /**
+   * Adds the specified gamepad removed listener to receive events when gamepads are removed.
+   * 
+   * @param listener
+   *          The listener to add.
+   */
+  public void onRemoved(final GamepadRemovedListener listener) {
+    this.gamepadRemovedConsumer.add(listener);
+  }
+
+  /**
+   * Unregister the specified removed listener from this instance.
+   *
+   * @param listener
+   *          The listener to remove.
+   */
+  public void removeRemovedListener(GamepadRemovedListener listener) {
+    this.gamepadRemovedConsumer.remove(listener);
+  }
+
+  /**
    * Gets all gamepads that are currently available.
    * 
    * @return All available gamepads.
+   * 
+   * @see #get(int)
+   * @see #current()
    */
   public List<Gamepad> getAll() {
     return this.gamePads;
@@ -92,6 +135,9 @@ public final class GamepadManager extends GamepadEvents implements ILaunchable {
    * Gets the first gamepad that is currently available.
    *
    * @return The first available {@link Gamepad} instance
+   * 
+   * @see #get(int)
+   * @see #getAll()
    */
   public Gamepad current() {
     if (this.gamePads.isEmpty()) {
@@ -108,6 +154,9 @@ public final class GamepadManager extends GamepadEvents implements ILaunchable {
    * @param index
    *          The index of the {@link Gamepad}.
    * @return The {@link Gamepad} with the specified index.
+   * 
+   * @see #getAll()
+   * @see #current()
    */
   public Gamepad get(final int index) {
     for (final Gamepad gamepad : this.gamePads) {
@@ -119,19 +168,23 @@ public final class GamepadManager extends GamepadEvents implements ILaunchable {
     return null;
   }
 
-  public void onGamepadAdded(final Consumer<Gamepad> cons) {
-    this.gamepadAddedConsumer.add(cons);
+  @Override
+  public boolean isPressed(String gamepadComponent) {
+    final Gamepad current = this.current();
+    return current != null && current.isPressed(gamepadComponent);
   }
 
-  public void onGamepadRemoved(final Consumer<Gamepad> cons) {
-    this.gamepadRemovedConsumer.add(cons);
-  }
-
+  /**
+   * DON'T CALL THIS EXPLICITLY! THE LITIENGINE WILL MANAGE THE LIFECYCLE OF THIS INSTANCE.
+   */
   @Override
   public void start() {
     this.hotPlugThread.start();
   }
 
+  /**
+   * DON'T CALL THIS EXPLICITLY! THE LITIENGINE WILL MANAGE THE LIFECYCLE OF THIS INSTANCE.
+   */
   @Override
   public void terminate() {
     int totalWait = 0;
@@ -147,20 +200,17 @@ public final class GamepadManager extends GamepadEvents implements ILaunchable {
     this.hotPlugThread.interrupt();
   }
 
-  @Override
-  public boolean isPressed(String gamepadComponent) {
-    final Gamepad current = this.current();
-    return current != null && current.isPressed(gamepadComponent);
-  }
-
+  /**
+   * DON'T CALL THIS EXPLICITLY! THE LITIENGINE WILL MANAGE THE LIFECYCLE OF GAMEPADS.
+   */
   void remove(final Gamepad gamepad) {
     if (gamepad == null) {
       return;
     }
 
     this.getAll().remove(gamepad);
-    for (final Consumer<Gamepad> cons : this.gamepadRemovedConsumer) {
-      cons.accept(gamepad);
+    for (final GamepadRemovedListener listener : this.gamepadRemovedConsumer) {
+      listener.removed(gamepad);
     }
   }
 
@@ -255,8 +305,8 @@ public final class GamepadManager extends GamepadEvents implements ILaunchable {
         // add new gamepads
         final Gamepad newGamepad = new Gamepad(i, controller);
         this.getAll().add(newGamepad);
-        for (final Consumer<Gamepad> cons : this.gamepadAddedConsumer) {
-          cons.accept(newGamepad);
+        for (final GamepadAddedListener listener : this.gamepadAddedConsumer) {
+          listener.added(newGamepad);
         }
       }
     } catch (IllegalStateException e) {
@@ -264,5 +314,37 @@ public final class GamepadManager extends GamepadEvents implements ILaunchable {
     } finally {
       this.handleHotPluggedControllers = false;
     }
+  }
+
+  /**
+   * This listener interface receives events when gamepads gets added.
+   * 
+   * @see GamepadManager#onAdded(GamepadAddedListener)
+   */
+  @FunctionalInterface
+  public interface GamepadAddedListener extends EventListener {
+    /**
+     * Invoked when a gamepad was added.
+     * 
+     * @param gamepad
+     *          The added gamepad.
+     */
+    void added(Gamepad gamepad);
+  }
+
+  /**
+   * This listener interface receives events when gamepads gets removed.
+   * 
+   * @see GamepadManager#onAdded(GamepadAddedListener)
+   */
+  @FunctionalInterface
+  public interface GamepadRemovedListener extends EventListener {
+    /**
+     * Invoked when a gamepad was removed.
+     * 
+     * @param gamepad
+     *          The removed gamepad.
+     */
+    void removed(Gamepad gamepad);
   }
 }
