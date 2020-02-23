@@ -184,7 +184,6 @@ public abstract class GamepadEvents {
    */
   public abstract boolean isPressed(String gamepadComponent);
 
-  
   private static <T> void addComponentListener(Map<String, Collection<T>> consumerList, String identifier, T consumer) {
     if (!consumerList.containsKey(identifier)) {
       consumerList.put(identifier, new ArrayList<>());

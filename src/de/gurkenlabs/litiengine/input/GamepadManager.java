@@ -79,6 +79,11 @@ public final class GamepadManager extends GamepadEvents implements ILaunchable {
     updateGamepads();
   }
 
+  /**
+   * Gets all gamepads that are currently available.
+   * 
+   * @return All available gamepads.
+   */
   public List<Gamepad> getAll() {
     return this.gamePads;
   }
@@ -120,28 +125,6 @@ public final class GamepadManager extends GamepadEvents implements ILaunchable {
 
   public void onGamepadRemoved(final Consumer<Gamepad> cons) {
     this.gamepadRemovedConsumer.add(cons);
-  }
-
-
-  @Override
-  public void onReleased(GamepadReleasedListener listener) {
-    this.releasedListeners.add(listener);
-  }
-
-  @Override
-  public void removeReleasedListener(GamepadReleasedListener listener) {
-    this.releasedListeners.remove(listener);
-  }
-
-  @Override
-  public void clearEventListeners() {
-    this.componentPollListeners.clear();
-    this.componentPressedListeners.clear();
-    this.componentReleasedListeners.clear();
-
-    this.pollListeners.clear();
-    this.pressedListeners.clear();
-    this.releasedListeners.clear();
   }
 
   @Override
