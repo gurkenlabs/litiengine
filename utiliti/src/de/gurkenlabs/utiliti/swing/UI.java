@@ -254,14 +254,12 @@ public final class UI {
     JTabbedPane bottomTab = new JTabbedPane();
 
     assetComponent = new AssetList();
-    bottomTab.addTab(Resources.strings().get("assettree_assets"), assetComponent);
-    bottomTab.addTab(Resources.strings().get("assettree_console"), new ConsoleComponent());
-    bottomTab.setIconAt(0, Icons.ASSET);
-    bottomTab.setIconAt(1, Icons.CONSOLE);
+    bottomTab.addTab(Resources.strings().get("assettree_assets"), Icons.ASSET, assetComponent);
+    bottomTab.addTab(Resources.strings().get("assettree_console"), Icons.CONSOLE, new ConsoleComponent());
 
+    bottomPanel.add(StatusBar.create(), BorderLayout.NORTH);
     bottomPanel.add(bottomTab, BorderLayout.CENTER);
 
-    bottomPanel.add(StatusBar.create(), BorderLayout.SOUTH);
     return bottomPanel;
   }
 

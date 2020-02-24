@@ -2,7 +2,6 @@ package de.gurkenlabs.utiliti.swing;
 
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Point;
 
 import javax.swing.JLabel;
 import javax.swing.border.EmptyBorder;
@@ -22,16 +21,16 @@ public final class StatusBar {
   public static JLabel create() {
     statusLabel = new JLabel("");
     statusLabel.setPreferredSize(new Dimension(0, 16));
-    statusLabel.setFont(new Font(Style.FONTNAME_CONSOLE, Font.PLAIN, 11));
-    statusLabel.setBorder(new EmptyBorder(0, 5, 0, 0));
+    statusLabel.setFont(new Font(Style.FONTNAME_CONSOLE, Font.PLAIN, 14));
+    statusLabel.setBorder(new EmptyBorder(5, 15, 0, 0));
     return statusLabel;
   }
 
   public static void update() {
-    Point tile = Input.mouse().getTile();
-    String positionX = "x: " + (int) Input.mouse().getMapLocation().getX() + "[" + tile.x + "]";
-    String positionY = "y: " + (int) Input.mouse().getMapLocation().getY() + "[" + tile.y + "]";
-    String status = String.format("%-14s %-14s", positionX, positionY) + String.format(" %-10s", (int) (Game.world().camera().getRenderScale() * 100) + "%");
+    String position = String.format("x/y: %d,%d", (int) Input.mouse().getMapLocation().getX(), (int) Input.mouse().getMapLocation().getY());
+    String tile = String.format("Tile: %d,%d", Input.mouse().getTile().x, Input.mouse().getTile().y);
+    String zoom = String.format(" %6d%%", (int) (Game.world().camera().getRenderScale() * 100));
+    String status = String.format("%-14s %-14s %s", position, tile, zoom);
 
     int size = Editor.instance().getMapComponent().getSelectedMapObjects().size();
     if (size <= 0) {

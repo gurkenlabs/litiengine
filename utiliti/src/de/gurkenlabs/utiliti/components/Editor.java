@@ -138,7 +138,7 @@ public class Editor extends Screen {
 
     super.render(g);
 
-    // render mouse/zoom and fps
+    // render fps
     g.setFont(Style.getDefaultFont());
     g.setColor(Color.WHITE);
     TextRenderer.render(g, Game.metrics().getFramesPerSecond() + " FPS", 10, Game.window().getResolution().getHeight() - 20, true);
