@@ -4,17 +4,10 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -45,6 +38,7 @@ import de.gurkenlabs.litiengine.resources.SoundFormat;
 import de.gurkenlabs.litiengine.resources.SoundResource;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.litiengine.resources.TextureAtlas;
+import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
@@ -377,6 +371,48 @@ public class Editor extends Screen {
   public void importSounds() {
     if (EditorFileChooser.showFileDialog(AUDIO_FILE_NAME, Resources.strings().get("import_something", AUDIO_FILE_NAME), true, SoundFormat.getAllExtensions()) == JFileChooser.APPROVE_OPTION) {
       this.importSounds(EditorFileChooser.instance().getSelectedFiles());
+    }
+  }
+
+  public void exportSpriteSheets() {
+    JFileChooser chooser;
+    try {
+      final String source = this.getProjectPath();
+      chooser = new JFileChooser(source != null ? source : new File(".").getCanonicalPath());
+      chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+      chooser.setDialogType(JFileChooser.SAVE_DIALOG);
+      FileFilter filter = new FileNameExtensionFilter(SPRITE_FILE_NAME, "info");
+      chooser.setFileFilter(filter);
+      chooser.addChoosableFileFilter(filter);
+      chooser.setSelectedFile(new File("sprites.info"));
+
+      int result = chooser.showSaveDialog(Game.window().getHostControl());
+      if (result == JFileChooser.APPROVE_OPTION) {
+        // get all spritesheets
+        List allSpriteSheets = new ArrayList(Resources.spritesheets().getAll());
+        Collections.sort(allSpriteSheets);
+        if(allSpriteSheets.size() == 0) {
+          return;
+        }
+        BufferedWriter writer = new BufferedWriter(new FileWriter(chooser.getSelectedFile()));
+        // print the spritesheet information to the info file
+        for (Object spriteObject : allSpriteSheets) {
+          Spritesheet sprite = (Spritesheet) spriteObject;
+          // check for keyframes
+          int[] keyFrames = Resources.spritesheets().getCustomKeyFrameDurations(sprite);
+          String fileExtension = sprite.getImageFormat().toFileExtension();
+          writer.write(String.format("%s%s,%d,%d", sprite.getName(), fileExtension, sprite.getSpriteWidth(), sprite.getSpriteHeight()));
+          // print keyframes (if they exist)
+          if(keyFrames.length > 0) {
+            writer.write(";");
+            writer.write(ArrayUtilities.join(keyFrames));
+          }
+          writer.write("\n");
+        }
+        writer.close();
+      }
+    } catch (IOException e1) {
+      log.log(Level.SEVERE, e1.getLocalizedMessage(), e1);
     }
   }
 
