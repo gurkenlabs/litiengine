@@ -107,23 +107,8 @@ public class Camera implements ICamera {
   }
 
   @Override
-  public Point2D getViewportLocation(final IEntity entity) {
-    return this.getViewportLocation(entity.getLocation());
-  }
-
-  @Override
-  public Point2D getViewportLocation(final Point2D mapLocation) {
-    return this.getViewportLocation(mapLocation.getX(), mapLocation.getY());
-  }
-
-  @Override
   public float getZoom() {
     return this.zoom;
-  }
-
-  @Override
-  public float getRenderScale() {
-    return Game.graphics().getBaseRenderScale() * this.getZoom();
   }
 
   @Override

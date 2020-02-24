@@ -5,6 +5,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.EventListener;
 
 import de.gurkenlabs.litiengine.Align;
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.entities.IEntity;
@@ -12,6 +13,13 @@ import de.gurkenlabs.litiengine.entities.IEntity;
 /**
  * The Interface ICamera defines methods that allow to determine where entities
  * or tiles are rendered on the current screen.
+ * 
+ * Camera control is based on a Focus system. Generally, the camera will always
+ * try to keep the focus point in the center of the viewport.
+ * 
+ * There are two coordinate systems referenced in ICamera methods: map coordinates,
+ * and screen coordinates. The camera is responsible for converting between the
+ * two coordinate systems.
  */
 public interface ICamera extends IUpdateable {
   /**
@@ -49,79 +57,112 @@ public interface ICamera extends IUpdateable {
   /**
    * Gets the map location that is focused by this camera.
    *
-   * @return the focus map location
+   * @return the focus's location in map coordinates
    */
   public Point2D getFocus();
 
   /**
-   * Gets the map location.
+   * Converts a point in screen coordinates into a map location.
    *
    * @param point
-   *          the point
+   *          the point in screen coordinates
    * @return the map location
    */
   public Point2D getMapLocation(Point2D point);
 
   /**
-   * Gets the pixel offset x.
+   * Gets the x coordinate of the viewport's origin.
    *
-   * @return the pixel offset x
+   * @return the offset, in screen coordinates
    */
   public double getPixelOffsetX();
 
   /**
-   * Gets the pixel offset y.
+   * Gets the y coordinate of the viewport's origin.
    *
-   * @return the pixel offset y
+   * @return the offset, in screen coordinates
    */
   public double getPixelOffsetY();
 
   /**
-   * Gets the camera region.
+   * Gets the camera's viewport region, in screen coordinates.
    *
-   * @return the camera region
+   * @return the viewport region, in screen coordinates
    */
   public Rectangle2D getViewport();
 
+  /**
+   * Gets the center of the entity, in screen coordinates.
+   * 
+   * @return the center, in screen coordinates
+   */
   public Point2D getViewportDimensionCenter(IEntity entity);
 
   /**
-   * Gets the render location.
+   * Converts a location in map coordinates into screen coordinates.
    *
-   * @param x
-   *          the x
-   * @param y
-   *          the y
-   * @return the render location
+   * @return the screen location
    */
   public Point2D getViewportLocation(double x, double y);
 
   /**
-   * This method calculates to location for the specified entity in relation to
-   * the focus map location of the camera.
+   * Converts the entity's location into screen coordinates.
    *
    * @param entity
    *          the entity
-   * @return the render location
+   * @return the screen location
    */
-  public Point2D getViewportLocation(IEntity entity);
+  default public Point2D getViewportLocation(IEntity entity) {
+    Point2D entityLocation = entity.getLocation();
+    return getViewportLocation(entityLocation.getX(), entityLocation.getY());
+  }
 
   /**
-   * This method calculates to location for the specified point in relation to
-   * the focus map location of the camera.
+   * Converts a location in map coordinates into screen coordinates.
    *
    * @param point
    *          the point
-   * @return the render location
+   * @return the screen location
    */
-  public Point2D getViewportLocation(Point2D point);
+  default public Point2D getViewportLocation(Point2D point) {
+    return getViewportLocation(point.getX(), point.getY());
+  }
 
-  public float getRenderScale();
+  /**
+   * Combines this camera's zoom with the game's render scale.
+   * 
+   * @see RenderEngine#setBaseRenderScale(float)
+   * @return the scale factor
+   */
+  default public float getRenderScale() {
+    return Game.graphics().getBaseRenderScale() * this.getZoom();
+  }
 
+  /**
+   * The zoom factor of this camera.
+   * 
+   * @return the scale factor
+   */
   public float getZoom();
 
-  public void setFocus(Point2D focus);
+  /**
+   * Focuses the camera on a given point.
+   * 
+   * @param focus
+   *          the point, in map coordinates
+   */
+  default public void setFocus(Point2D focus) {
+    setFocus(focus.getX(), focus.getY());
+  }
 
+  /**
+   * Focuses the camera on a given point.
+   * 
+   * @param x
+   *          the x coordinate of the point, in map coordinates
+   * @param y
+   *          the y coordinate of the point, in map coordinates
+   */
   public void setFocus(double x, double y);
 
   /**
@@ -154,10 +195,29 @@ public interface ICamera extends IUpdateable {
    */
   public void pan(double x, double y, int duration);
 
-  public void setZoom(float zoom, int delay);
+  /**
+   * Changes the camera's zoom over the specified duration (in frames) to the
+   * target zoom.
+   * 
+   * @param zoom
+   *          the new zoom scale
+   * @param duration
+   *          the number of frames between this call and when the zoom
+   *          completes
+   */
+  public void setZoom(float zoom, int duration);
 
+  /**
+   * Returns whether this camera will clamp the viewport to the bounds of the
+   * map.
+   */
   public boolean isClampToMap();
 
+  /**
+   * Set the camera to clamp the viewport to the bounds of the map.
+   * 
+   * @param clampToMap
+   */
   public void setClampToMap(final boolean clampToMap);
 
   public void setClampAlign(Align align, Valign valign);
@@ -166,8 +226,19 @@ public interface ICamera extends IUpdateable {
 
   public Valign getClampValign();
 
+  /**
+   * Shake the camera for the specified duration (in frames). The way the camera
+   * shakes is implementation defined.
+   * 
+   * @param intensity
+   * @param delay
+   * @param duration
+   */
   public void shake(double intensity, final int delay, int duration);
 
+  /**
+   * Currently an update function for the shake effect.
+   */
   public void updateFocus();
 
   /**
@@ -185,7 +256,7 @@ public interface ICamera extends IUpdateable {
      */
     void zoomChanged(ZoomChangedEvent event);
   }
-  
+
   /**
    * This listener interface receives focus events for a camera.
    * 
