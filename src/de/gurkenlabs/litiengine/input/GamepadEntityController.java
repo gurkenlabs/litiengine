@@ -6,7 +6,6 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.physics.MovementController;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
-import net.java.games.input.Component.Identifier;
 
 public class GamepadEntityController<T extends IMobileEntity> extends MovementController<T> {
   private int gamePadIndex = -1;
@@ -74,8 +73,8 @@ public class GamepadEntityController<T extends IMobileEntity> extends MovementCo
       return;
     }
 
-    final float x = Input.gamepads().get(this.gamePadIndex).getPollData(Identifier.Axis.X);
-    final float y = Input.gamepads().get(this.gamePadIndex).getPollData(Identifier.Axis.Y);
+    final float x = Input.gamepads().get(this.gamePadIndex).getPollData(Gamepad.Axis.X);
+    final float y = Input.gamepads().get(this.gamePadIndex).getPollData(Gamepad.Axis.Y);
 
     if (Math.abs(x) > this.gamepadDeadzone) {
       this.setDx(x);
@@ -86,8 +85,8 @@ public class GamepadEntityController<T extends IMobileEntity> extends MovementCo
     }
 
     if (this.isRotateWithRightStick()) {
-      final float rightX = Input.gamepads().get(this.gamePadIndex).getPollData(Identifier.Axis.RX);
-      final float rightY = Input.gamepads().get(this.gamePadIndex).getPollData(Identifier.Axis.RY);
+      final float rightX = Input.gamepads().get(this.gamePadIndex).getPollData(Gamepad.Axis.RX);
+      final float rightY = Input.gamepads().get(this.gamePadIndex).getPollData(Gamepad.Axis.RY);
       float targetX = 0;
       float targetY = 0;
       if (Math.abs(rightX) > this.gamepadRightStick) {
