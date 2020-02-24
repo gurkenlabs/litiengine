@@ -70,7 +70,6 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
     for (TextureAtlas.Sprite sprite : atlas.getSprites()) {
       fileListModel.addElement(new SpriteFileWrapper(sprite));
     }
-
     this.initModel();
   }
 

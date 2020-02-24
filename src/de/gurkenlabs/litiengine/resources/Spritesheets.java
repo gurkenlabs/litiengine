@@ -112,7 +112,8 @@ public final class Spritesheets {
       log.log(Level.SEVERE, "Sprite {0} could not be loaded because no image is defined.", new Object[] { info.getName() });
       return null;
     } else {
-      sprite = load(Codec.decodeImage(info.getImage()), info.getName() + info.getImageFormat().toFileExtension(), info.getWidth(), info.getHeight());
+      String fileExtension = info.getImageFormat() == null ? "" : info.getImageFormat().toFileExtension();
+      sprite = load(Codec.decodeImage(info.getImage()), info.getName() + fileExtension, info.getWidth(), info.getHeight());
     }
 
     if (info.getKeyframes() != null && info.getKeyframes().length > 0) {
