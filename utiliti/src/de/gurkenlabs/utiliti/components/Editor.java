@@ -263,7 +263,7 @@ public class Editor extends Screen {
         return;
       }
     }
-    
+
     if (!gameFile.exists()) {
       log.log(Level.SEVERE, "gameFile {0} does not exist", gameFile);
       return;
@@ -375,9 +375,13 @@ public class Editor extends Screen {
   }
 
   public void exportSpriteSheets() {
-    JFileChooser chooser;
+    if (Resources.spritesheets().getAll().isEmpty()) {
+      return;
+    }
+    final String source = this.getProjectPath();
+    JFileChooser chooser = null;
+    int result = -1;
     try {
-      final String source = this.getProjectPath();
       chooser = new JFileChooser(source != null ? source : new File(".").getCanonicalPath());
       chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
       chooser.setDialogType(JFileChooser.SAVE_DIALOG);
@@ -386,33 +390,35 @@ public class Editor extends Screen {
       chooser.addChoosableFileFilter(filter);
       chooser.setSelectedFile(new File("sprites.info"));
 
-      int result = chooser.showSaveDialog(Game.window().getHostControl());
-      if (result == JFileChooser.APPROVE_OPTION) {
-        // get all spritesheets
-        List allSpriteSheets = new ArrayList(Resources.spritesheets().getAll());
-        Collections.sort(allSpriteSheets);
-        if(allSpriteSheets.size() == 0) {
-          return;
+      result = chooser.showSaveDialog(Game.window().getHostControl());
+
+    } catch (IOException ioe) {
+      log.log(Level.SEVERE, ioe.getLocalizedMessage(), ioe);
+    }
+    if (chooser == null || result != JFileChooser.APPROVE_OPTION) {
+      return;
+    }
+    // get all spritesheets
+    List<Spritesheet> allSpriteSheets = new ArrayList<>(Resources.spritesheets().getAll());
+    Collections.sort(allSpriteSheets);
+    try (BufferedWriter writer = new BufferedWriter(new FileWriter(chooser.getSelectedFile()));) {
+      // print the spritesheet information to the info file
+      for (Object spriteObject : allSpriteSheets) {
+        Spritesheet sprite = (Spritesheet) spriteObject;
+        // check for keyframes
+        int[] keyFrames = Resources.spritesheets().getCustomKeyFrameDurations(sprite);
+        String fileExtension = sprite.getImageFormat() == ImageFormat.UNSUPPORTED ? "" : sprite.getImageFormat().toFileExtension();
+        writer.write(String.format("%s%s,%d,%d", sprite.getName(), fileExtension, sprite.getSpriteWidth(), sprite.getSpriteHeight()));
+        // print keyframes (if they exist)
+        if (keyFrames.length > 0) {
+          writer.write(";");
+          writer.write(ArrayUtilities.join(keyFrames));
         }
-        BufferedWriter writer = new BufferedWriter(new FileWriter(chooser.getSelectedFile()));
-        // print the spritesheet information to the info file
-        for (Object spriteObject : allSpriteSheets) {
-          Spritesheet sprite = (Spritesheet) spriteObject;
-          // check for keyframes
-          int[] keyFrames = Resources.spritesheets().getCustomKeyFrameDurations(sprite);
-          String fileExtension = sprite.getImageFormat().toFileExtension();
-          writer.write(String.format("%s%s,%d,%d", sprite.getName(), fileExtension, sprite.getSpriteWidth(), sprite.getSpriteHeight()));
-          // print keyframes (if they exist)
-          if(keyFrames.length > 0) {
-            writer.write(";");
-            writer.write(ArrayUtilities.join(keyFrames));
-          }
-          writer.write("\n");
-        }
-        writer.close();
+        writer.write("\n");
       }
-    } catch (IOException e1) {
-      log.log(Level.SEVERE, e1.getLocalizedMessage(), e1);
+      log.log(Level.INFO, "Exported Spritesheet metadata to {0}", new Object[] { chooser.getSelectedFile().getCanonicalPath() });
+    } catch (IOException e2) {
+      log.log(Level.SEVERE, e2.getLocalizedMessage(), e2);
     }
   }
 
