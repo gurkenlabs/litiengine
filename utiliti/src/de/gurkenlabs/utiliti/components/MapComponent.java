@@ -798,6 +798,7 @@ public class MapComponent extends GuiComponent {
     Game.world().environment().clear();
     Game.world().environment().load();
     UI.getMapController().refresh();
+    log.log(Level.INFO, "Reassigned IDs for Map {0}.", new Object[] { map.getName() });
   }
 
   @Override
@@ -821,8 +822,9 @@ public class MapComponent extends GuiComponent {
       if (!folder.exists()) {
         folder.mkdirs();
       }
-
-      ImageSerializer.saveImage(new File("./screenshots/" + timeStamp + ImageFormat.PNG.toFileExtension()).toString(), img);
+      File snapshot = new File("./screenshots/" + timeStamp + ImageFormat.PNG.toFileExtension());
+      ImageSerializer.saveImage(snapshot.toString(), img);
+      log.log(Level.INFO, "Saved map snapshot to {0}", new Object[] { snapshot.getCanonicalPath() });
     } catch (Exception e) {
       log.log(Level.SEVERE, e.getLocalizedMessage(), e);
     }

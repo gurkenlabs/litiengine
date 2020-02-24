@@ -11,7 +11,7 @@ public enum ImageFormat {
   UNSUPPORTED, PNG, GIF, BMP, JPG;
 
   /**
-   * Gets the <code>SoundFormat</code> of the specified format string.
+   * Gets the <code>ImageFormat</code> of the specified format string.
    * 
    * @param imageFormat
    *          The format string from which to extract the format.

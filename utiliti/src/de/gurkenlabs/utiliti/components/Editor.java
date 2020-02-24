@@ -392,8 +392,8 @@ public class Editor extends Screen {
 
       result = chooser.showSaveDialog(Game.window().getHostControl());
 
-    } catch (IOException ioe) {
-      log.log(Level.SEVERE, ioe.getLocalizedMessage(), ioe);
+    } catch (IOException e1) {
+      log.log(Level.SEVERE, e1.getLocalizedMessage(), e1);
     }
     if (chooser == null || result != JFileChooser.APPROVE_OPTION) {
       return;
@@ -642,6 +642,7 @@ public class Editor extends Screen {
     this.close(true);
     this.load(currentFile, true);
     UI.getMapController().setSelection(currentMapSelection);
+    log.log(Level.INFO, "Reverted all pending changes.");
   }
 
   public MapComponent getMapComponent() {

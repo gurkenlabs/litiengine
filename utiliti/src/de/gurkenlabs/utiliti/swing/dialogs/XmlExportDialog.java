@@ -48,7 +48,7 @@ public final class XmlExportDialog {
         File newFile = XmlUtilities.save(object, chooser.getSelectedFile().toString(), extension);
         String dir = FileUtilities.getParentDirPath(newFile.getAbsolutePath());
         consumer.accept(dir);
-        log.log(Level.INFO, "exported {0} {1} to {2}", new Object[] { name, filename, newFile });
+        log.log(Level.INFO, "Exported {0} {1} to {2}", new Object[] { name, filename, newFile });
       }
     } catch (IOException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
