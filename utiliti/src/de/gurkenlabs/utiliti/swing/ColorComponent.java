@@ -53,10 +53,14 @@ public class ColorComponent extends JPanel {
     this.spinnerAlpha.setModel(new SpinnerNumberModel(0, 0, 255, 5));
     this.spinnerAlpha.addChangeListener(a -> {
       final Color oldColor = ColorHelper.decode(this.textFieldColor.getText());
+      if (oldColor == null) {
+        return;
+      }
+
       final Color newColor = new Color(oldColor.getRed(), oldColor.getGreen(), oldColor.getBlue(), (int) this.spinnerAlpha.getValue());
       this.setColor(newColor);
     });
-    
+
     ControlBehavior.apply(this.spinnerAlpha);
 
     GroupLayout groupLayout = new GroupLayout(this);
