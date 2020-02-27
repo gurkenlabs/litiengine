@@ -112,7 +112,7 @@ public interface ICamera extends IUpdateable {
    *          the entity
    * @return the screen location
    */
-  default public Point2D getViewportLocation(IEntity entity) {
+  public default Point2D getViewportLocation(IEntity entity) {
     Point2D entityLocation = entity.getLocation();
     return getViewportLocation(entityLocation.getX(), entityLocation.getY());
   }
@@ -124,7 +124,7 @@ public interface ICamera extends IUpdateable {
    *          the point
    * @return the screen location
    */
-  default public Point2D getViewportLocation(Point2D point) {
+  public default Point2D getViewportLocation(Point2D point) {
     return getViewportLocation(point.getX(), point.getY());
   }
 
@@ -134,7 +134,7 @@ public interface ICamera extends IUpdateable {
    * @see RenderEngine#setBaseRenderScale(float)
    * @return the scale factor
    */
-  default public float getRenderScale() {
+  public default float getRenderScale() {
     return Game.graphics().getBaseRenderScale() * this.getZoom();
   }
 
@@ -151,7 +151,7 @@ public interface ICamera extends IUpdateable {
    * @param focus
    *          the point, in map coordinates
    */
-  default public void setFocus(Point2D focus) {
+  public default void setFocus(Point2D focus) {
     setFocus(focus.getX(), focus.getY());
   }
 
