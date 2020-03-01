@@ -36,13 +36,13 @@ public final class Random extends java.util.Random {
   }
 
   /**
-   * Chooses a random element from the specified array.
+   * Chooses a pseudo-random element from the specified array.
    * 
    * @param <T>
    *          The type of the elements in the array.
    * @param array
    *          The array to choose from.
-   * @return A random element from the array or null if the array is empty.
+   * @return A pseudo-random element from the array or null if the array is empty.
    */
   public <T> T chose(T[] array) {
     if (array == null || array.length == 0) {
@@ -53,13 +53,13 @@ public final class Random extends java.util.Random {
   }
 
   /**
-   * Chooses a random element from the specified collection.
+   * Chooses a pseudo-random element from the specified collection.
    * 
    * @param <T>
    *          The type of the elements in the collection.
    * @param coll
    *          The collection to choose from.
-   * @return A random element from the array or null if the collection is empty.
+   * @return A pseudo-random element from the array or null if the collection is empty.
    */
   public <T> T chose(Collection<T> coll) {
     if (coll == null) {
@@ -124,7 +124,9 @@ public final class Random extends java.util.Random {
    * @param value
    *          The value to shuffle.
    * 
-   * @return Either the specified value; or its negative equivalent (* -1).
+   * @return Either the specified value; or its negative equivalent (multiplied by -1).
+   * 
+   * @see #nextSign()
    */
   public int shuffleSign(int value) {
     return value * this.nextSign();
@@ -136,7 +138,9 @@ public final class Random extends java.util.Random {
    * @param value
    *          The value to shuffle.
    * 
-   * @return Either the specified value; or its negative equivalent (* -1).
+   * @return Either the specified value; or its negative equivalent (multiplied by -1).
+   * 
+   * @see #nextSign()
    */
   public float shuffleSign(float value) {
     return value * this.nextSign();
@@ -148,7 +152,9 @@ public final class Random extends java.util.Random {
    * @param value
    *          The value to shuffle.
    * 
-   * @return Either the specified value; or its negative equivalent (* -1).
+   * @return Either the specified value; or its negative equivalent (multiplied by -1).
+   * 
+   * @see #nextSign()
    */
   public long shuffleSign(long value) {
     return value * this.nextSign();
@@ -160,7 +166,9 @@ public final class Random extends java.util.Random {
    * @param value
    *          The value to shuffle.
    * 
-   * @return Either the specified value; or its negative equivalent (* -1).
+   * @return Either the specified value; or its negative equivalent (multiplied by -1).
+   * 
+   * @see #nextSign()
    */
   public double shuffleSign(double value) {
     return value * this.nextSign();
@@ -312,7 +320,7 @@ public final class Random extends java.util.Random {
   }
 
   /**
-   * Samples a pseudo-random value between 0.0 and 1.0 and checks whether it matches the specified probability.
+   * Probes a pseudo-random value between 0.0 and 1.0 and checks whether it matches the specified probability.
    * 
    * <p>
    * Example: if the specified probability is 0.5, the sampled value needs to be less than or equal to the specified value
@@ -323,7 +331,7 @@ public final class Random extends java.util.Random {
    *          The probability to check.
    * @return True if the sampled value matches the probability; otherwise false.
    */
-  public boolean sample(final double probability) {
+  public boolean probe(final double probability) {
     double rnd = this.nextDouble();
     return rnd <= probability;
   }
