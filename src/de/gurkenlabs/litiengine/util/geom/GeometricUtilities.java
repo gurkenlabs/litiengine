@@ -14,7 +14,6 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class GeometricUtilities {
   private static final double RAYCAST_EPSILON = 0.01;
@@ -430,18 +429,6 @@ public class GeometricUtilities {
     return line;
   }
 
-  public static Point2D getRandomLocation(final double x, final double y, final double width, final double height) {
-    final double xOffset = ThreadLocalRandom.current().nextDouble(width);
-    final double yOffset = ThreadLocalRandom.current().nextDouble(height);
-
-    return new Point2D.Double(x + xOffset, y + yOffset);
-  }
-
-  public static Point2D getRandomLocation(final Rectangle2D rect) {
-    return getRandomLocation(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
-
-  }
-
   public static boolean intersects(final Rectangle2D a, final Rectangle2D b) {
     return Math.abs(a.getCenterX() - b.getCenterX()) < a.getWidth() * 0.5 + b.getWidth() * 0.5 && Math.abs(a.getCenterY() - b.getCenterY()) < a.getHeight() * 0.5 + b.getHeight() * 0.5;
   }
@@ -612,14 +599,5 @@ public class GeometricUtilities {
     }
 
     return normalized;
-  }
-
-  public static Point2D getRandomPointInCircle(Ellipse2D.Double circle) {
-    double radius = circle.getWidth();
-    double t = 2 * Math.PI * Math.random();
-    double u = Math.random() + Math.random();
-    double r = u > 1 ? 2 - u : u;
-
-    return new Point2D.Double(radius * r * Math.cos(t), radius * r * Math.sin(t));
   }
 }

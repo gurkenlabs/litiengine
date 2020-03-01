@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
+import de.gurkenlabs.litiengine.Game;
+
 public class MathUtilitiesTests {
 
   @Test
@@ -81,8 +83,8 @@ public class MathUtilitiesTests {
   @Test
   public void testRandomInRange() {
     for (int i = 0; i < 100; i++) {
-      double rnd = MathUtilities.randomInRange(0.0, 10);
-      int rndInt = MathUtilities.randomInRange(0, 10);
+      double rnd = Game.random().nextDouble(0.0, 10);
+      int rndInt = Game.random().nextInt(0, 10);
 
       assertTrue(rnd >= 0 && rnd < 10);
       assertTrue(rndInt >= 0 && rndInt < 10);
@@ -92,7 +94,7 @@ public class MathUtilitiesTests {
   @Test
   public void testRandomSign() {
     for (int i = 0; i < 100; i++) {
-      int rnd = MathUtilities.randomSign();
+      int rnd = Game.random().nextSign();
       assertTrue(rnd == 1 || rnd == -1);
     }
   }

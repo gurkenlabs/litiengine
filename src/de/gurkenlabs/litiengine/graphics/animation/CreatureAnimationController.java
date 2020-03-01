@@ -4,12 +4,12 @@ import java.awt.image.BufferedImage;
 import java.util.Optional;
 
 import de.gurkenlabs.litiengine.Direction;
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.AnimationInfo;
 import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.graphics.CreatureAnimationState;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.Imaging;
 
 /**
@@ -110,7 +110,7 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
         return this.randomDeathSprite;
       }
 
-      String randomDeathAnim = ArrayUtilities.getRandom(this.customDeathAnimations);
+      String randomDeathAnim = Game.random().chose(this.customDeathAnimations);
       if (randomDeathAnim != null && !randomDeathAnim.isEmpty()) {
         String randomDeathAnmimation = this.getSpritePrefix() + "-" + randomDeathAnim;
         if (this.hasAnimation(randomDeathAnmimation)) {

@@ -1,12 +1,11 @@
 package de.gurkenlabs.litiengine.graphics.emitters.xml;
 
 import java.io.Serializable;
+import java.util.concurrent.ThreadLocalRandom;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
-
-import de.gurkenlabs.litiengine.util.MathUtilities;
 
 @XmlRootElement(name = "param")
 public class ParticleParameter implements Serializable {
@@ -53,7 +52,7 @@ public class ParticleParameter implements Serializable {
 
   @XmlTransient
   public float getRandomNumber() {
-    return (float) MathUtilities.randomInRange(this.getMinValue(), this.getMaxValue());
+    return (float) ThreadLocalRandom.current().nextDouble(this.getMinValue(), this.getMaxValue());
   }
 
   public void setMaxValue(final double maxValue) {

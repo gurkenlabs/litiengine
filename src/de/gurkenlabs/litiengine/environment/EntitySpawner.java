@@ -5,7 +5,6 @@ import java.util.List;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.Spawnpoint;
-import de.gurkenlabs.litiengine.util.CollectionUtilities;
 
 public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner<T> {
   private int amount;
@@ -106,11 +105,11 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
       }
       break;
     case ONERANDOMSPAWNPOINT:
-      this.spawn(CollectionUtilities.random(this.getSpawnPoints()), this.getSpawnAmount());
+      this.spawn(Game.random().chose(this.getSpawnPoints()), this.getSpawnAmount());
       break;
     case RANDOMSPAWNPOINTS:
       for (int i = 0; i < this.getSpawnAmount(); i++) {
-        Game.loop().perform(this.getSpawnDelay() + this.getSpawnDelay() * i, () -> this.spawn(CollectionUtilities.random(this.getSpawnPoints()), 1));
+        Game.loop().perform(this.getSpawnDelay() + this.getSpawnDelay() * i, () -> this.spawn(Game.random().chose(this.getSpawnPoints()), 1));
       }
 
       break;

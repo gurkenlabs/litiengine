@@ -2,8 +2,6 @@ package de.gurkenlabs.litiengine.util;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class MathUtilities {
   private MathUtilities() {
@@ -200,79 +198,12 @@ public class MathUtilities {
     return max;
   }
 
-  /**
-   * The index probabilities must sum up to 1;
-   *
-   * @param indexProbabilities
-   *          The index with the probabilities for the related index.
-   * @return A random index within the range of the specified array.
-   */
-  public static int getRandomIndex(final double[] indexProbabilities) {
-    final double rnd = ThreadLocalRandom.current().nextDouble();
-    double probSum = 0;
-    for (int i = 0; i < indexProbabilities.length; i++) {
-      final double newProbSum = probSum + indexProbabilities[i];
-      if (rnd >= probSum && rnd < newProbSum) {
-        return i;
-      }
-
-      probSum = newProbSum;
-    }
-
-    return 0;
-  }
-
   public static boolean isInt(final double value) {
     return value == Math.floor(value) && !Double.isInfinite(value);
   }
 
   public static boolean isOddNumber(int num) {
     return (num & 1) != 0;
-  }
-
-  public static boolean probabilityIsTrue(final double probability) {
-    double rnd = ThreadLocalRandom.current().nextDouble();
-    return rnd < probability;
-  }
-
-  public static boolean randomBoolean() {
-    return ThreadLocalRandom.current().nextDouble() < 0.5;
-  }
-
-  public static double randomInRange(final double min, final double max) {
-    return randomInRange(min, max, ThreadLocalRandom.current());
-  }
-
-  public static double randomInRange(final double min, final double max, Random random) {
-    if (min == max) {
-      return min;
-    }
-
-    if (min > max) {
-      throw new IllegalArgumentException("min value is > than max value");
-    }
-
-    return min + random.nextDouble() * (max - min);
-  }
-
-  public static int randomInRange(final int min, final int max) {
-    return randomInRange(min, max, ThreadLocalRandom.current());
-  }
-
-  public static int randomInRange(final int min, final int max, Random random) {
-    if (min == max) {
-      return min;
-    }
-
-    if (min > max) {
-      throw new IllegalArgumentException("min value is > than max value");
-    }
-
-    return random.nextInt(max - min) + min;
-  }
-
-  public static int randomSign() {
-    return randomBoolean() ? 1 : -1;
   }
 
   public static int getFullPercent(double value, double fraction) {

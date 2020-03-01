@@ -10,7 +10,6 @@ import de.gurkenlabs.litiengine.ILaunchable;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.litiengine.util.CollectionUtilities;
 
 public class Animation implements IUpdateable, ILaunchable {
   public static final int DEFAULT_FRAME_DURATION = 120;
@@ -43,7 +42,7 @@ public class Animation implements IUpdateable, ILaunchable {
     this(name, spritesheet, loop, keyFrameDurations);
 
     if (randomizeStart && !this.keyframes.isEmpty()) {
-      this.firstFrame = CollectionUtilities.random(this.getKeyframes());
+      this.firstFrame = Game.random().chose(this.getKeyframes());
     }
   }
 

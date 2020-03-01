@@ -78,6 +78,7 @@ public final class Game {
   private static final GameMetrics metrics = new GameMetrics();
   private static final GameLog log = new GameLog();
   private static final GameTime gameTime = new GameTime();
+  private static final Random random = new Random();
   private static GameInfo gameInfo = new GameInfo();
 
   private static GameLoop gameLoop;
@@ -389,6 +390,16 @@ public final class Game {
    */
   public static Logger log() {
     return log.log();
+  }
+
+  /**
+   * Gets the game's pseudo-random generator that enhances the default Java <code>Random</code> implementation
+   * with helpful additions.
+   * 
+   * @return The game's pseudo random generator.
+   */
+  public static Random random() {
+    return random;
   }
 
   /**

@@ -6,10 +6,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import de.gurkenlabs.litiengine.Game;
 
 public final class ArrayUtilities {
   private static final Logger log = Logger.getLogger(ArrayUtilities.class.getName());
@@ -160,30 +160,6 @@ public final class ArrayUtilities {
     return list;
   }
 
-  public static <T> T getRandom(T[] arr) {
-    return getRandom(arr, ThreadLocalRandom.current());
-  }
-
-  public static <T> T getRandom(T[] arr, Random rand) {
-    if (arr.length == 0) {
-      return null;
-    }
-    return arr[rand.nextInt(arr.length)];
-  }
-
-  public static void shuffle(Object[] arr) {
-    shuffle(arr, ThreadLocalRandom.current());
-  }
-
-  public static void shuffle(Object[] arr, Random rand) {
-    for (int i = arr.length - 1; i > 0; i--) {
-      int swap = rand.nextInt(i + 1);
-      Object temp = arr[i];
-      arr[i] = arr[swap];
-      arr[swap] = temp;
-    }
-  }
-
   public static boolean contains(Object[] arr, Object value) {
     if (value == null) {
       return false;
@@ -279,7 +255,15 @@ public final class ArrayUtilities {
 
     return hash.toArray((T[]) Array.newInstance(first.getClass().getComponentType(), hash.size()));
   }
-
+  
+  public static void shuffle(Object[] arr) {
+    for (int i = arr.length - 1; i > 0; i--) {
+      int swap = Game.random().nextInt(i + 1);
+      Object temp = arr[i];
+      arr[i] = arr[swap];
+      arr[swap] = temp;
+    }
+  }
   public static int[] toIntegerArray(List<Integer> intList) {
     Integer[] objArray = intList.toArray(new Integer[0]);
     int[] intArray = new int[objArray.length];

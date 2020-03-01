@@ -13,7 +13,6 @@ import de.gurkenlabs.litiengine.entities.AnimationInfo;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.litiengine.util.ArrayUtilities;
 
 public class EntityAnimationController<T extends IEntity> extends AnimationController implements IEntityAnimationController<T> {
   private final List<AnimationRule<T>> animationRules = new CopyOnWriteArrayList<>();
@@ -26,7 +25,7 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
     this.entity = entity;
 
     if (entity != null) {
-      this.spritePrefix = ArrayUtilities.getRandom(getDefaultSpritePrefixes(entity.getClass()));
+      this.spritePrefix = Game.random().chose(getDefaultSpritePrefixes(entity.getClass()));
     }
   }
 
@@ -34,7 +33,7 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
     super(defaultAnimation, animations);
     this.entity = entity;
 
-    this.spritePrefix = ArrayUtilities.getRandom(getDefaultSpritePrefixes(entity.getClass()));
+    this.spritePrefix = Game.random().chose(getDefaultSpritePrefixes(entity.getClass()));
   }
 
   public EntityAnimationController(final T entity, final Spritesheet sprite) {

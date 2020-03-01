@@ -13,7 +13,6 @@ import de.gurkenlabs.litiengine.graphics.animation.CreatureAnimationController;
 import de.gurkenlabs.litiengine.graphics.animation.EntityAnimationController;
 import de.gurkenlabs.litiengine.physics.IMovementController;
 import de.gurkenlabs.litiengine.physics.MovementController;
-import de.gurkenlabs.litiengine.util.ArrayUtilities;
 
 /**
  * TODO: Add idle event
@@ -61,7 +60,7 @@ public class Creature extends CombatEntity implements IMobileEntity {
     if (spritePrefix != null) {
       this.setSpritePrefix(spritePrefix);
     } else {
-      this.setSpritePrefix(ArrayUtilities.getRandom(EntityAnimationController.getDefaultSpritePrefixes(this.getClass())));
+      this.setSpritePrefix(Game.random().chose(EntityAnimationController.getDefaultSpritePrefixes(this.getClass())));
     }
   }
 
