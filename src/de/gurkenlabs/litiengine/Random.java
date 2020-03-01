@@ -483,6 +483,35 @@ public final class Random extends java.util.Random {
   }
 
   /**
+   * Gets a pseudo-random char value.
+   * 
+   * @return A pseudo-random character.
+   */
+  public char nextAscii() {
+    return (char) (32 + this.nextDouble() * (126 - 32 + 1));
+  }
+
+  /**
+   * Gets a pseudo-random String of the specified length.
+   * 
+   * <p>
+   * Characters will be chosen from the set of characters whose ASCII value is between 32 and 126 (inclusive)
+   * </p>
+   * 
+   * @param length
+   *          The length of the String.
+   * @return A pseudo-random ASCII String.
+   */
+  public String nextAscii(int length) {
+    StringBuilder sb = new StringBuilder(length);
+    for (int i = 0; i < length; i++) {
+      sb.append(this.nextAscii());
+    }
+
+    return sb.toString();
+  }
+
+  /**
    * Gets a pseudo-random alphanumeric String of the specified length.
    * 
    * @param length

@@ -1,11 +1,7 @@
 package de.gurkenlabs.litiengine.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.junit.jupiter.api.Test;
-
-import de.gurkenlabs.litiengine.Game;
 
 public class MathUtilitiesTests {
 
@@ -78,24 +74,5 @@ public class MathUtilitiesTests {
 
     assertEquals(1.5f, avg, 0.0001);
     assertEquals(5.5f, avg2, 0.0001);
-  }
-
-  @Test
-  public void testRandomInRange() {
-    for (int i = 0; i < 100; i++) {
-      double rnd = Game.random().nextDouble(0.0, 10);
-      int rndInt = Game.random().nextInt(0, 10);
-
-      assertTrue(rnd >= 0 && rnd < 10);
-      assertTrue(rndInt >= 0 && rndInt < 10);
-    }
-  }
-
-  @Test
-  public void testRandomSign() {
-    for (int i = 0; i < 100; i++) {
-      int rnd = Game.random().nextSign();
-      assertTrue(rnd == 1 || rnd == -1);
-    }
   }
 }
