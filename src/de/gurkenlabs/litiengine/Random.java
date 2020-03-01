@@ -193,7 +193,7 @@ public final class Random extends java.util.Random {
    * Returns a pseudo-random {@code long} value between the specified
    * origin (inclusive) and the specified bound (exclusive).
    *
-   * @param origin
+   * @param min
    *          the least value returned
    * @param bound
    *          the upper bound (exclusive)
@@ -233,7 +233,7 @@ public final class Random extends java.util.Random {
    * Returns a pseudo-random {@code double} value between the specified
    * origin (inclusive) and the specified bound (exclusive).
    *
-   * @param origin
+   * @param min
    *          the least value returned
    * @param bound
    *          the upper bound (exclusive)
@@ -273,7 +273,7 @@ public final class Random extends java.util.Random {
    * Returns a pseudo-random {@code float} value between the specified
    * origin (inclusive) and the specified bound (exclusive).
    *
-   * @param origin
+   * @param min
    *          the least value returned
    * @param bound
    *          the upper bound (exclusive)
@@ -298,7 +298,7 @@ public final class Random extends java.util.Random {
    * Returns a pseudo-random {@code int} value between the specified
    * origin (inclusive) and the specified bound (exclusive).
    *
-   * @param origin
+   * @param min
    *          the least value returned
    * @param bound
    *          the upper bound (exclusive)

@@ -94,6 +94,8 @@ public interface ICamera extends IUpdateable {
   /**
    * Gets the center of the entity, in screen coordinates.
    * 
+   * @param entity
+   *          The entity to retrieve the dimension center for.
    * @return the center, in screen coordinates
    */
   public Point2D getViewportDimensionCenter(IEntity entity);
@@ -101,6 +103,10 @@ public interface ICamera extends IUpdateable {
   /**
    * Converts a location in map coordinates into screen coordinates.
    *
+   * @param x
+   *          The x-coordinate of the viewport location.
+   * @param y
+   *          The y-coordinate of the viewport location.
    * @return the screen location
    */
   public Point2D getViewportLocation(double x, double y);
@@ -210,6 +216,8 @@ public interface ICamera extends IUpdateable {
   /**
    * Returns whether this camera will clamp the viewport to the bounds of the
    * map.
+   * 
+   * @return True if the camera viewport is currently clamped to the map boundaries; otherwise false.
    */
   public boolean isClampToMap();
 
@@ -217,6 +225,7 @@ public interface ICamera extends IUpdateable {
    * Set the camera to clamp the viewport to the bounds of the map.
    * 
    * @param clampToMap
+   *          A flag indicating whether the camera viewport should be clamped to the map boundaries.
    */
   public void setClampToMap(final boolean clampToMap);
 
@@ -231,8 +240,11 @@ public interface ICamera extends IUpdateable {
    * shakes is implementation defined.
    * 
    * @param intensity
+   *          The intensity of the screen shake effect.
    * @param delay
+   *          The delay before the effect starts.
    * @param duration
+   *          The duration of the effect.
    */
   public void shake(double intensity, final int delay, int duration);
 
