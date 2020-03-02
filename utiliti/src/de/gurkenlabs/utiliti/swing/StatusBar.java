@@ -11,6 +11,7 @@ import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.Style;
 import de.gurkenlabs.utiliti.components.Editor;
+import de.gurkenlabs.utiliti.swing.panels.PropertyPanel;
 
 public final class StatusBar {
   private static JLabel statusLabel;
@@ -20,9 +21,9 @@ public final class StatusBar {
 
   public static JLabel create() {
     statusLabel = new JLabel("");
-    statusLabel.setPreferredSize(new Dimension(0, 16));
-    statusLabel.setFont(new Font(Style.FONTNAME_CONSOLE, Font.PLAIN, 14));
-    statusLabel.setBorder(new EmptyBorder(5, 15, 0, 0));
+    statusLabel.setPreferredSize(new Dimension(0, (int) (16 * Editor.preferences().getUiScale())));
+    statusLabel.setFont(new Font(Style.FONTNAME_CONSOLE, Font.PLAIN, (int) (14 * Editor.preferences().getUiScale())));
+    statusLabel.setBorder(new EmptyBorder(PropertyPanel.LABEL_GAP, PropertyPanel.LABEL_GAP, PropertyPanel.LABEL_GAP, PropertyPanel.LABEL_GAP));
     return statusLabel;
   }
 
@@ -36,8 +37,7 @@ public final class StatusBar {
     if (size <= 0) {
       statusLabel.setText("");
     } else {
-
-      status += Resources.strings().get("status_selected_objects", size);
+      status += " " + Resources.strings().get("status_selected_objects", size);
     }
 
     statusLabel.setText(status);

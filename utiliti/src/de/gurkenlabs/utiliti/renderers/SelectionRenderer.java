@@ -64,7 +64,7 @@ public class SelectionRenderer implements IEditorRenderer {
     }
 
     Font previousFont = g.getFont();
-    Font idFont = previousFont.deriveFont(Math.max(8f, (float) (10 * Math.sqrt(Game.world().camera().getRenderScale()))));
+    Font idFont = previousFont.deriveFont(Math.max(8f, (float) (10 * Math.sqrt(Game.world().camera().getRenderScale()))) * Editor.preferences().getUiScale());
     if (Zoom.get() > 1) {
       idFont = idFont.deriveFont(Font.BOLD);
     }

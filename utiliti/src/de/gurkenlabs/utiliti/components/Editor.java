@@ -163,7 +163,7 @@ public class Editor extends Screen {
       }
 
       Font old = g.getFont();
-      g.setFont(g.getFont().deriveFont(20.0f));
+      g.setFont(g.getFont().deriveFont(20.0f * Editor.preferences().getUiScale()));
       TextRenderer.render(g, this.currentStatus, 10, Game.window().getResolution().getHeight() - 60, true);
       g.setFont(old);
     }

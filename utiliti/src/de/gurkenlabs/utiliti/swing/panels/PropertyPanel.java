@@ -42,11 +42,11 @@ import de.gurkenlabs.utiliti.swing.UI;
 
 @SuppressWarnings("serial")
 public abstract class PropertyPanel extends JPanel {
-  public static final int LABEL_WIDTH = 80;
-  public static final int CONTROL_MIN_WIDTH = 120;
-  public static final int CONTROL_WIDTH = 200;
+  public static final int LABEL_WIDTH = (int) (80 * Editor.preferences().getUiScale());
+  public static final int CONTROL_MIN_WIDTH = (int) (120 * Editor.preferences().getUiScale());
+  public static final int CONTROL_WIDTH = (int) (200 * Editor.preferences().getUiScale());
   public static final int CONTROL_HEIGHT = (int) (25 * Editor.preferences().getUiScale());
-  public static final int CONTROL_MARGIN = 5;
+  public static final int CONTROL_MARGIN = (int) (5 * Editor.preferences().getUiScale());
   public static final int LABEL_GAP = 0;
 
   protected boolean isFocussing;

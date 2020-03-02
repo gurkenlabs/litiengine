@@ -135,6 +135,7 @@ public final class EntityList extends JPanel implements EntityController {
 
     this.tree.setCellRenderer(new IconTreeListRenderer());
     this.tree.setMaximumSize(new Dimension(0, 250));
+    this.tree.setRowHeight((int) (this.tree.getRowHeight() * Editor.preferences().getUiScale()));
 
     this.tree.addTreeSelectionListener(e -> {
       final Environment env = Game.world().environment();

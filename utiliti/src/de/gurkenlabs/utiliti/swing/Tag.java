@@ -44,7 +44,7 @@ public class Tag extends JPanel {
 
     this.lblText = new JLabel("New label");
     this.lblText.setForeground(Color.WHITE);
-    this.lblText.setFont(this.lblText.getFont().deriveFont(this.lblText.getFont().getSize() * 0.75f));
+    this.lblText.setFont(this.lblText.getFont().deriveFont(Style.getDefaultFont().getSize() * 0.75f));
     this.panel.add(this.lblText);
 
     this.addMouseListener(new MouseAdapter() {

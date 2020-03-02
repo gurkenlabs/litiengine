@@ -19,6 +19,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.UndoManager;
+import de.gurkenlabs.utiliti.components.Editor;
 
 @SuppressWarnings("serial")
 public class CustomPanel extends PropertyPanel {
@@ -69,7 +70,8 @@ public class CustomPanel extends PropertyPanel {
         return columnEditables[column];
       }
     });
-    tableCustomProperties.getColumnModel().getColumn(0).setResizable(false);
+    this.tableCustomProperties.getColumnModel().getColumn(0).setResizable(false);
+    this.tableCustomProperties.setRowHeight((int) (this.tableCustomProperties.getRowHeight() * Editor.preferences().getUiScale()));
 
     this.model = (DefaultTableModel) this.tableCustomProperties.getModel();
     setLayout(groupLayout);
@@ -80,10 +82,10 @@ public class CustomPanel extends PropertyPanel {
   @Override
   protected void clearControls() {
     TableCellEditor editor = tableCustomProperties.getCellEditor();
-    if (editor != null) {
+    if (editor != null && this.tableCustomProperties.getRowCount() != 0) {
       editor.stopCellEditing();
     }
-    
+
     this.model.setRowCount(0);
   }
 
@@ -108,7 +110,7 @@ public class CustomPanel extends PropertyPanel {
     if (getDataSource() == null || isFocussing) {
       return;
     }
-    
+
     UndoManager.instance().mapObjectChanging(getDataSource());
     List<String> setProperties = new ArrayList<>();
     for (int row = 0; row < model.getRowCount(); row++) {

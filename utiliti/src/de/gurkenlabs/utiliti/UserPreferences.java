@@ -8,9 +8,13 @@ import java.util.List;
 import de.gurkenlabs.litiengine.configuration.ConfigurationGroup;
 import de.gurkenlabs.litiengine.configuration.ConfigurationGroupInfo;
 import de.gurkenlabs.litiengine.util.ColorHelper;
+import de.gurkenlabs.litiengine.util.MathUtilities;
 
 @ConfigurationGroupInfo(prefix = "user_")
 public class UserPreferences extends ConfigurationGroup {
+  public static final float UI_SCALE_MAX = 2.0f;
+  public static final float UI_SCALE_MIN = 0.5f;
+
   private float zoom;
   private boolean showGrid;
   private boolean clampToMap;
@@ -187,7 +191,7 @@ public class UserPreferences extends ConfigurationGroup {
   public Color getGridColor() {
     return ColorHelper.decode(this.gridColor);
   }
-  
+
   public int getSnapDivision() {
     return this.snapDivision;
   }
@@ -199,7 +203,7 @@ public class UserPreferences extends ConfigurationGroup {
   public void setGridColor(String gridColor) {
     this.gridColor = gridColor;
   }
-  
+
   public void setSnapDivision(int snapDivision) {
     this.snapDivision = snapDivision;
   }
@@ -289,6 +293,6 @@ public class UserPreferences extends ConfigurationGroup {
   }
 
   public void setUiScale(float uiScale) {
-    this.uiScale = uiScale;
+    this.uiScale = MathUtilities.clamp(uiScale, UI_SCALE_MIN, UI_SCALE_MAX);
   }
 }
