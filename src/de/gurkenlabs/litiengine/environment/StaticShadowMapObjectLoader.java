@@ -12,7 +12,7 @@ import de.gurkenlabs.litiengine.graphics.StaticShadowType;
 
 public class StaticShadowMapObjectLoader extends MapObjectLoader {
 
-  public StaticShadowMapObjectLoader() {
+  protected StaticShadowMapObjectLoader() {
     super(MapObjectType.STATICSHADOW);
   }
 
@@ -22,7 +22,6 @@ public class StaticShadowMapObjectLoader extends MapObjectLoader {
     if (!this.isMatchingType(mapObject)) {
       return entities;
     }
-
 
     StaticShadowType type = mapObject.getEnumValue(MapObjectProperty.SHADOW_TYPE, StaticShadowType.class, StaticShadowType.DOWN);
     int offset = mapObject.getIntValue(MapObjectProperty.SHADOW_OFFSET, StaticShadow.DEFAULT_OFFSET);

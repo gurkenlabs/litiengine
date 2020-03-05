@@ -25,7 +25,7 @@ public class CreatureMapObjectLoader extends MapObjectLoader {
     customCreatureType = new CopyOnWriteArrayList<>();
   }
 
-  public CreatureMapObjectLoader() {
+  protected CreatureMapObjectLoader() {
     super(MapObjectType.CREATURE);
   }
 
@@ -109,7 +109,7 @@ public class CreatureMapObjectLoader extends MapObjectLoader {
     } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
       try {
         Creature creature = customCreature.getConstructor().newInstance();
-        creature.setSpritePrefix(spriteSheet);
+        creature.setSpritesheetName(spriteSheet);
         return creature;
       } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException ex) {
         log.log(Level.WARNING, "Could not automatically create creature of type {0} because a matching constructor is missing.", new Object[] { customCreature });

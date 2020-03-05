@@ -18,7 +18,13 @@ public class Material extends CustomPropertyProvider {
   public static final Material WOOD = new Material("WOOD");
 
   private final String name;
-  
+
+  /**
+   * Instantiates a new instance of the <code>Material</code> class.
+   *
+   * @param name
+   *          The name of the material.
+   */
   public Material(String name) {
     this.name = name;
     materials.put(name.toLowerCase(), this);

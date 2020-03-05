@@ -31,26 +31,50 @@ public class Blueprint extends MapObject {
   @XmlTransient
   private boolean keepIds;
 
+  /**
+   * Instantiates a new instance of the <code>Blueprint</code> map object.
+   */
   public Blueprint() {
     super();
   }
 
-  public Blueprint(String name, MapObject... items) {
-    this(name, false, items);
+  /**
+   * Instantiates a new instance of the <code>Blueprint</code> map object.
+   *
+   * @param name
+   *          The name of the blueprint.
+   * 
+   * @param mapObjects
+   *          The map objects to build the blueprint from.
+   */
+  public Blueprint(String name, MapObject... mapObjects) {
+    this(name, false, mapObjects);
   }
 
-  public Blueprint(String name, boolean keepIds, MapObject... items) {
+  /**
+   * Instantiates a new instance of the <code>Blueprint</code> map object.
+   *
+   * @param name
+   *          The name of the blueprint.
+   * 
+   * @param keepIds
+   *          A flag indicating whether the IDs of the specified map objects should be kept.
+   * 
+   * @param mapObjects
+   *          The map objects to build the blueprint from.
+   */
+  public Blueprint(String name, boolean keepIds, MapObject... mapObjects) {
     this.keepIds = keepIds;
     this.setType(MapObjectType.AREA.toString());
     if (name != null && !name.isEmpty()) {
       this.setName(name);
     }
 
-    final Rectangle2D bounds = MapObject.getBounds(items);
+    final Rectangle2D bounds = MapObject.getBounds(mapObjects);
     this.setWidth((float) bounds.getWidth());
     this.setHeight((float) bounds.getHeight());
 
-    for (MapObject item : items) {
+    for (MapObject item : mapObjects) {
       MapObject newItem = new MapObject(item, this.keepIds());
       newItem.setX((float) (item.getX() - bounds.getX()));
       newItem.setY((float) (item.getY() - bounds.getY()));

@@ -26,6 +26,7 @@ public class LightSource extends Entity implements IRenderable {
   public enum Type {
     ELLIPSE, RECTANGLE;
   }
+
   public static final String TOGGLE_MESSAGE = "toggle";
   public static final int DEFAULT_INTENSITY = 100;
 
@@ -60,6 +61,20 @@ public class LightSource extends Entity implements IRenderable {
   private Shape lightShape;
   private int radius;
 
+  /**
+   * Instantiates a new <code>LightSource</code> entity.
+   *
+   * @param intensity
+   *          The intensity of this instance.
+   * 
+   * @param lightColor
+   *          The color of this instance.
+   * 
+   * @param shapeType
+   *          The shape type of this instance.
+   * @param activated
+   *          A flag indicating whether this light is activated by default.
+   */
   public LightSource(final int intensity, final Color lightColor, final Type shapeType, boolean activated) {
     super();
     this.color = lightColor;

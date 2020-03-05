@@ -2,6 +2,12 @@ package de.gurkenlabs.litiengine.entities;
 
 public class EntityDistanceComparator extends RelativeEntityComparator {
 
+  /**
+   * Instantiates a new instance of the <code>EntityDistanceComparator</code> class.
+   *
+   * @param relativeEntity
+   *          The entity that is used as reference for distance comparison.
+   */
   public EntityDistanceComparator(final IEntity relativeEntity) {
     super(relativeEntity);
   }

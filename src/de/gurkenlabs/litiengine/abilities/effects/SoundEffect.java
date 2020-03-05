@@ -8,6 +8,14 @@ import de.gurkenlabs.litiengine.sound.Sound;
 public class SoundEffect extends Effect {
   private final Sound[] sounds;
 
+  /**
+   * Instantiates a new instance of the <code>SoundEffect</code> class.
+   *
+   * @param ability
+   *          The ability that performs the effect.
+   * @param sounds
+   *          The sounds to chose from when applying the effect.
+   */
   public SoundEffect(final Ability ability, final Sound... sounds) {
     super(ability, EffectTarget.EXECUTINGENTITY);
     this.sounds = sounds;

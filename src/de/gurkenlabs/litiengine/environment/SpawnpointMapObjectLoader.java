@@ -12,7 +12,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 
 public class SpawnpointMapObjectLoader extends MapObjectLoader {
 
-  public SpawnpointMapObjectLoader() {
+  protected SpawnpointMapObjectLoader() {
     super(MapObjectType.SPAWNPOINT);
   }
 
@@ -22,7 +22,6 @@ public class SpawnpointMapObjectLoader extends MapObjectLoader {
     if (!this.isMatchingType(mapObject)) {
       return entities;
     }
-
 
     final Direction direction = mapObject.getStringValue(MapObjectProperty.SPAWN_DIRECTION) != null ? Direction.valueOf(mapObject.getStringValue(MapObjectProperty.SPAWN_DIRECTION)) : Direction.DOWN;
     final String spawnType = mapObject.getStringValue(MapObjectProperty.SPAWN_TYPE);

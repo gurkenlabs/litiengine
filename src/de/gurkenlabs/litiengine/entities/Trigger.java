@@ -55,25 +55,77 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   private long lastActivation;
   private boolean isActivated;
 
+  /**
+   * Instantiates a new <code>Trigger</code> entity.
+   *
+   * @param activation
+   *          The activation method for this trigger.
+   * @param message
+   *          The message that gets sent by this trigger upon activation.
+   */
   public Trigger(final TriggerActivation activation, final String message) {
     this(activation, null, message);
   }
 
+  /**
+   * Instantiates a new <code>Trigger</code> entity.
+   *
+   * @param activation
+   *          The activation method for this trigger.
+   * @param name
+   *          The name of this trigger.
+   * @param message
+   *          The message that gets sent by this trigger upon activation.
+   */
   public Trigger(final TriggerActivation activation, final String name, final String message) {
     this(activation, name, message, false);
   }
 
+  /**
+   * Instantiates a new <code>Trigger</code> entity.
+   *
+   * @param activation
+   *          The activation method for this trigger.
+   * @param message
+   *          The message that gets sent by this trigger upon activation.
+   * @param isOneTime
+   *          A flag, indicating whether this instance can only be triggered once.
+   */
   public Trigger(final TriggerActivation activation, final String message, final boolean isOneTime) {
     this.message = message;
     this.isOneTimeTrigger = isOneTime;
     this.activationType = activation;
   }
 
+  /**
+   * Instantiates a new <code>Trigger</code> entity.
+   *
+   * @param activation
+   *          The activation method for this trigger.
+   * @param name
+   *          The name of this trigger.
+   * @param message
+   *          The message that gets sent by this trigger upon activation.
+   * @param isOneTime
+   *          A flag, indicating whether this instance can only be triggered once.
+   */
   public Trigger(final TriggerActivation activation, final String name, final String message, final boolean isOneTime) {
     this(activation, message, isOneTime);
     this.setName(name);
   }
 
+  /**
+   * Instantiates a new instance of the <code>Trigger</code> class.
+   *
+   * @param activation
+   *          The activation method for this trigger.
+   * @param message
+   *          The message that gets sent by this trigger upon activation.
+   * @param isOneTime
+   *          A flag, indicating whether this instance can only be triggered once.
+   * @param cooldown
+   *          The cooldown that needs to be respected between two activation events.
+   */
   public Trigger(final TriggerActivation activation, final String message, final boolean isOneTime, final int cooldown) {
     this(activation, message, isOneTime);
     this.setCooldown(cooldown);

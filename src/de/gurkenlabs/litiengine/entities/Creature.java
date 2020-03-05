@@ -35,7 +35,7 @@ public class Creature extends CombatEntity implements IMobileEntity {
   private Attribute<Float> velocity;
 
   @TmxProperty(name = MapObjectProperty.SPRITESHEETNAME)
-  private String spritePrefix;
+  private String spritesheetName;
 
   @TmxProperty(name = MapObjectProperty.SCALE_SPRITE)
   private boolean scaling;
@@ -46,7 +46,15 @@ public class Creature extends CombatEntity implements IMobileEntity {
     this(null);
   }
 
-  public Creature(String spritePrefix) {
+  /**
+   * Instantiates a new <code>Creature</code> entity.
+   *
+   * @param spritesheetName
+   *          The spritesheet name that identifies the sprites bound to this instance.
+   * 
+   * @see CreatureAnimationController#getSpriteName(Creature, de.gurkenlabs.litiengine.graphics.CreatureAnimationState)
+   */
+  public Creature(String spritesheetName) {
     super();
     final MovementInfo movementInfo = this.getClass().getAnnotation(MovementInfo.class);
     if (movementInfo != null) {
@@ -57,10 +65,10 @@ public class Creature extends CombatEntity implements IMobileEntity {
       this.addController(new MovementController<>(this));
     }
 
-    if (spritePrefix != null) {
-      this.setSpritePrefix(spritePrefix);
+    if (spritesheetName != null) {
+      this.setSpritesheetName(spritesheetName);
     } else {
-      this.setSpritePrefix(Game.random().chose(EntityAnimationController.getDefaultSpritePrefixes(this.getClass())));
+      this.setSpritesheetName(Game.random().chose(EntityAnimationController.getDefaultSpritePrefixes(this.getClass())));
     }
   }
 
@@ -101,7 +109,7 @@ public class Creature extends CombatEntity implements IMobileEntity {
   }
 
   /**
-   * Gets the current sprite prefix of this instance. Overwriting this allows
+   * Gets the current spritesheet name of this instance. Overwriting this allows
    * for a more sophisticated logic that determines the sprite to be used; e.g.
    * This method could append certain properties of the creature (state, weapon,
    * ...) to the default string. <br>
@@ -110,10 +118,10 @@ public class Creature extends CombatEntity implements IMobileEntity {
    * {@link CreatureAnimationController} to determine the animation that it
    * should play.
    * 
-   * @return The current sprite prefix of this instance.
+   * @return The current spritesheet name of this instance.
    */
-  public String getSpritePrefix() {
-    return this.spritePrefix;
+  public String getSpritesheetName() {
+    return this.spritesheetName;
   }
 
   @Override
@@ -171,8 +179,8 @@ public class Creature extends CombatEntity implements IMobileEntity {
     this.turnOnMove = turn;
   }
 
-  public void setSpritePrefix(String spritePrefix) {
-    this.spritePrefix = spritePrefix;
+  public void setSpritesheetName(String spritesheetName) {
+    this.spritesheetName = spritesheetName;
     this.updateAnimationController();
   }
 
@@ -199,7 +207,7 @@ public class Creature extends CombatEntity implements IMobileEntity {
     } else {
       sb.append(Creature.class.getSimpleName());
     }
-    sb.append(" (" + this.getSpritePrefix() + ")");
+    sb.append(" (" + this.getSpritesheetName() + ")");
 
     return sb.toString();
   }

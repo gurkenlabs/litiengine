@@ -118,6 +118,12 @@ public final class Environment implements IRenderable {
     registerMapObjectLoader(new CreatureMapObjectLoader());
   }
 
+  /**
+   * Instantiates a new <code>Environment</code> for the specified map.
+   *
+   * @param map
+   *          The map that defines this environment.
+   */
   public Environment(final IMap map) {
     this();
     this.map = map;
@@ -127,6 +133,12 @@ public final class Environment implements IRenderable {
     }
   }
 
+  /**
+   * Instantiates a new <code>Environment</code> for the specified map.
+   *
+   * @param mapPath
+   *          The path to the map resource that defines this environment.
+   */
   public Environment(final String mapPath) {
     this(Resources.maps().get(mapPath));
   }

@@ -30,6 +30,12 @@ public class DefaultUncaughtExceptionHandler implements UncaughtExceptionHandler
     this(true);
   }
 
+  /**
+   * Instantiates a new instance of the <code>DefaultUncaughtExceptionHandler</code> class.
+   *
+   * @param exitOnException
+   *          A flag indicating whether the game should exit when an unexpected error occurs.
+   */
   public DefaultUncaughtExceptionHandler(boolean exitOnException) {
     this.exitOnException = exitOnException;
   }

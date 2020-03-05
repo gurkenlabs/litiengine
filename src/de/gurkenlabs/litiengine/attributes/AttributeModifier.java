@@ -16,12 +16,12 @@ public class AttributeModifier<T extends Number> implements Comparable<Attribute
   private boolean active;
 
   /**
-   * Instantiates a new attribute modifier.
+   * Instantiates a new instance of the <code>AttributeModifier</code> class.
    *
    * @param mod
-   *          the mod
+   *          The modification type.
    * @param modifyValue
-   *          the modify value
+   *          The modification value to be applied by this instance.
    */
   public AttributeModifier(final Modification mod, final double modifyValue) {
     this.modification = mod;

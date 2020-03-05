@@ -51,6 +51,9 @@ public class GameInfo extends CustomPropertyProvider {
   @XmlElement(name = "developer")
   private String[] developers;
 
+  /**
+   * Instantiates a new instance of the <code>GameInfo</code> class.
+   */
   public GameInfo() {
     this.company = "gurkenlabs";
     this.name = "LITIengine Game";

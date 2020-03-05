@@ -11,7 +11,7 @@ public class TriggerEvent extends EventObject {
   private final transient List<Integer> targets;
   private final transient Trigger trigger;
 
-  public TriggerEvent(final Trigger trigger, final IEntity entity, final List<Integer> targets) {
+  TriggerEvent(final Trigger trigger, final IEntity entity, final List<Integer> targets) {
     super(trigger);
     this.trigger = trigger;
     this.message = trigger.getMessage();

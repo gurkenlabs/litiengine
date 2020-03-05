@@ -25,26 +25,88 @@ public class StaticShadow extends MapArea {
   private final CollisionBox origin;
   private Area area;
 
+  /**
+   * Instantiates a new <code>StaticShadow</code> entity.
+   *
+   * @param shadowType
+   *          The type of the static shadow.
+   * @param offset
+   *          The offset for the shadow.
+   */
   public StaticShadow(StaticShadowType shadowType, int offset) {
     this.shadowType = shadowType;
     this.shadowOffset = offset;
     this.origin = null;
   }
 
+  /**
+   * Instantiates a new <code>StaticShadow</code> entity.
+   *
+   * @param shadowType
+   *          The type of the static shadow.
+   */
   public StaticShadow(StaticShadowType shadowType) {
     this.shadowType = shadowType;
     this.shadowOffset = DEFAULT_OFFSET;
     this.origin = null;
   }
 
+  /**
+   * Instantiates a new <code>StaticShadow</code> entity.
+   *
+   * @param x
+   *          The x-coordinate of this instance.
+   * @param y
+   *          The y-coordinate of this instance.
+   * @param width
+   *          The width of this instance.
+   * @param height
+   *          The height of this instance.
+   * @param shadowType
+   *          The type of the static shadow.
+   */
   public StaticShadow(double x, double y, float width, float height, StaticShadowType shadowType) {
     this(0, null, x, y, width, height, shadowType);
   }
 
+  /**
+   * Instantiates a new <code>StaticShadow</code> entity.
+   *
+   * @param id
+   *          The id of this entity.
+   * @param x
+   *          The x-coordinate of this instance.
+   * @param y
+   *          The y-coordinate of this instance.
+   * @param width
+   *          The width of this instance.
+   * @param height
+   *          The height of this instance.
+   * @param shadowType
+   *          The type of the static shadow.
+   */
   public StaticShadow(int id, double x, double y, float width, float height, StaticShadowType shadowType) {
     this(id, null, x, y, width, height, shadowType);
   }
 
+  /**
+   * Instantiates a new <code>StaticShadow</code> entity.
+   *
+   * @param id
+   *          The id of this entity.
+   * @param name
+   *          The name of this entity.
+   * @param x
+   *          The x-coordinate of this instance.
+   * @param y
+   *          The y-coordinate of this instance.
+   * @param width
+   *          The width of this instance.
+   * @param height
+   *          The height of this instance.
+   * @param shadowType
+   *          The type of the static shadow.
+   */
   public StaticShadow(int id, String name, double x, double y, float width, float height, StaticShadowType shadowType) {
     super(id, name, x, y, width, height);
     this.setShadowType(shadowType);
@@ -52,10 +114,16 @@ public class StaticShadow extends MapArea {
     this.shadowOffset = DEFAULT_OFFSET;
   }
 
-  public StaticShadow(CollisionBox box) {
-    super(0, null, box.getX(), box.getY(), box.getWidth(), box.getHeight());
+  /**
+   * Instantiates a new <code>StaticShadow</code> entity.
+   *
+   * @param collisionBox
+   *          The collision box from which this shadow instance originates from.
+   */
+  public StaticShadow(CollisionBox collisionBox) {
+    super(0, null, collisionBox.getX(), collisionBox.getY(), collisionBox.getWidth(), collisionBox.getHeight());
     this.setShadowType(StaticShadowType.NONE);
-    this.origin = box;
+    this.origin = collisionBox;
     this.shadowOffset = DEFAULT_OFFSET;
   }
 

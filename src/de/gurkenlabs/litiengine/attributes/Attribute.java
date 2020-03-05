@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+// TODO: Auto-generated Javadoc
 /**
  * An attribute is a numerical representation of a property that can be adjusted using {@link AttributeModifier}s.
  * <p>
@@ -22,15 +23,18 @@ import java.util.List;
  *          The type of the attribute value.
  */
 public class Attribute<T extends Number> {
+
+  /** The modifiers. */
   private final List<AttributeModifier<T>> modifiers;
 
+  /** The base value. */
   private T baseValue;
 
   /**
-   * Instantiates a new attribute.
+   * Instantiates a new instance of the <code>Attribute</code> class.
    *
    * @param initialValue
-   *          the initial value
+   *          The initial value
    */
   public Attribute(final T initialValue) {
     this.modifiers = new ArrayList<>();
@@ -124,6 +128,13 @@ public class Attribute<T extends Number> {
     this.baseValue = baseValue;
   }
 
+  /**
+   * Apply modifiers.
+   *
+   * @param baseValue
+   *          the base value
+   * @return the t
+   */
   protected T applyModifiers(final T baseValue) {
     T currentValue = baseValue;
     for (final AttributeModifier<T> modifier : this.getModifiers()) {

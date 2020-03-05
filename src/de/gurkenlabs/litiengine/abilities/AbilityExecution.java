@@ -16,12 +16,6 @@ public class AbilityExecution implements IUpdateable {
   private final long executionTicks;
   private final Shape impactArea;
 
-  /**
-   * Instantiates a new ability execution.
-   *
-   * @param ability
-   *          the ability
-   */
   AbilityExecution(final Ability ability) {
     this.appliedEffects = new CopyOnWriteArrayList<>();
     this.ability = ability;

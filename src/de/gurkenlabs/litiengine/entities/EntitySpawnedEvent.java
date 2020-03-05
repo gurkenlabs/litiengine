@@ -8,7 +8,7 @@ public class EntitySpawnedEvent extends EventObject {
   private final transient Spawnpoint spawnpoint;
   private final transient IEntity spawnedEntity;
 
-  public EntitySpawnedEvent(Spawnpoint source, IEntity entity) {
+  EntitySpawnedEvent(Spawnpoint source, IEntity entity) {
     super(source);
     this.spawnpoint = source;
     this.spawnedEntity = entity;

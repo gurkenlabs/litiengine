@@ -13,7 +13,7 @@ import de.gurkenlabs.litiengine.util.ArrayUtilities;
 
 public class TriggerMapObjectLoader extends MapObjectLoader {
 
-  public TriggerMapObjectLoader() {
+  protected TriggerMapObjectLoader() {
     super(MapObjectType.TRIGGER);
   }
 

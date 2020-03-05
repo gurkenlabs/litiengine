@@ -11,6 +11,16 @@ public class RangeAttribute<T extends Number> extends Attribute<T> {
 
   private T maxBaseValue;
 
+  /**
+   * Instantiates a new instance of the <code>RangeAttribute</code> class.
+   *
+   * @param maxValue
+   *          The max value of this attribute.
+   * @param minValue
+   *          The min value of this attribute
+   * @param baseValue
+   *          The base (initial) value of this attribute
+   */
   public RangeAttribute(final T maxValue, final T minValue, final T baseValue) {
     super(baseValue);
 
@@ -47,7 +57,7 @@ public class RangeAttribute<T extends Number> extends Attribute<T> {
   public T getMin() {
     return this.applyMinModifiers(this.minBaseValue);
   }
-  
+
   public T getMax() {
     return this.applyMaxModifiers(this.maxBaseValue);
   }
@@ -68,7 +78,7 @@ public class RangeAttribute<T extends Number> extends Attribute<T> {
   public void setToMin() {
     this.setBaseValue(this.getMin());
   }
-  
+
   public void setToMax() {
     this.setBaseValue(this.getMax());
   }

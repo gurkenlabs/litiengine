@@ -6,6 +6,9 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.Spawnpoint;
 
+/**
+ * TODO: Implement spawn event/listener
+ */
 public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner<T> {
   private int amount;
   private int interval;
@@ -15,14 +18,16 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
   private List<Spawnpoint> spawnpoints;
 
   /**
-   * Instantiates a new entity spawner.
+   * Instantiates a new instance of the <code>EntitySpawner</code> class.
    *
    * @param spawnpoints
-   *          the spawnpoints
+   *          The spawnpoints from which this instance will choose from when spawning entities.
+   * 
    * @param interval
-   *          the interval
+   *          The interval in which entities will be spawned.
+   * 
    * @param amount
-   *          the amount
+   *          The amount of entities to spawn on every spawn event.
    */
   public EntitySpawner(final List<Spawnpoint> spawnpoints, final int interval, final int amount) {
     this.interval = interval;

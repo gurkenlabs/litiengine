@@ -22,7 +22,7 @@ import de.gurkenlabs.litiengine.util.ArrayUtilities;
 
 public class EmitterMapObjectLoader extends MapObjectLoader {
 
-  public EmitterMapObjectLoader() {
+  protected EmitterMapObjectLoader() {
     super(MapObjectType.EMITTER);
   }
 

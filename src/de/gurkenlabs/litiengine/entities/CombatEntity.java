@@ -39,6 +39,9 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   private ICombatEntity target;
   private long lastHit;
 
+  /**
+   * Instantiates a new <code>CombatEntity</code>.
+   */
   public CombatEntity() {
     super();
     this.listeners = ConcurrentHashMap.newKeySet();

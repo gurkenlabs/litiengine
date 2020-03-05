@@ -6,7 +6,6 @@ public abstract class RelativeEntityComparator implements Comparator<IEntity> {
   private IEntity relativeEntity;
 
   protected RelativeEntityComparator() {
-
   }
 
   protected RelativeEntityComparator(final IEntity relativeEntity) {

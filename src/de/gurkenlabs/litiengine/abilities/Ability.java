@@ -40,10 +40,10 @@ public abstract class Ability implements IRenderable {
   private Point2D origin;
 
   /**
-   * Instantiates a new ability.
+   * Instantiates a new instance of the <code>Ability</code> class.
    *
    * @param executor
-   *          the executing entity
+   *          The executing entity
    */
   protected Ability(final Creature executor) {
     this.abilityCastListeners = ConcurrentHashMap.newKeySet();

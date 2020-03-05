@@ -31,27 +31,73 @@ public class Prop extends CombatEntity {
   @TmxProperty(name = MapObjectProperty.SPRITESHEETNAME)
   private String spritesheetName;
 
+  /**
+   * Instantiates a new <code>Prop</code> entity.
+   *
+   * @param spritesheetName
+   *          The spritesheet name of this prop.
+   */
   public Prop(final String spritesheetName) {
     this(0, 0, spritesheetName);
   }
 
+  /**
+   * Instantiates a new <code>Prop</code> entity.
+   *
+   * @param x
+   *          The x-coordinate of this prop.
+   * @param y
+   *          The y-coordinate of this prop.
+   * @param spritesheetName
+   *          The spritesheet name of this prop.
+   */
   public Prop(double x, double y, final String spritesheetName) {
     this(x, y, spritesheetName, Material.UNDEFINED);
   }
 
-  public Prop(double x, double y, final String spritesheetName, final Material mat) {
-    this(new Point2D.Double(x, y), spritesheetName, mat);
+  /**
+   * Instantiates a new <code>Prop</code> entity.
+   *
+   * @param x
+   *          The x-coordinate of this prop.
+   * @param y
+   *          The y-coordinate of this prop.
+   * @param spritesheetName
+   *          The spritesheet name of this prop.
+   * @param material
+   *          The material of this prop.
+   */
+  public Prop(double x, double y, final String spritesheetName, final Material material) {
+    this(new Point2D.Double(x, y), spritesheetName, material);
   }
 
+  /**
+   * Instantiates a new <code>Prop</code> entity.
+   *
+   * @param location
+   *          The location of this prop.
+   * @param spritesheetName
+   *          The spritesheet name of this prop.
+   */
   public Prop(final Point2D location, final String spritesheetName) {
     this(location, spritesheetName, Material.UNDEFINED);
   }
 
-  public Prop(final Point2D location, final String spritesheetName, final Material mat) {
+  /**
+   * Instantiates a new <code>Prop</code> entity.
+   *
+   * @param location
+   *          The location of this prop.
+   * @param spritesheetName
+   *          The spritesheet name of this prop.
+   * @param material
+   *          The material of this prop.
+   */
+  public Prop(final Point2D location, final String spritesheetName, final Material material) {
     super();
     this.rotation = Rotation.NONE;
     this.spritesheetName = spritesheetName;
-    this.material = mat;
+    this.material = material;
     this.setLocation(location);
     this.updateAnimationController();
   }

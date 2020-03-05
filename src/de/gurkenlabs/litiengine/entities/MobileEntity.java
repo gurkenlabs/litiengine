@@ -28,6 +28,9 @@ public class MobileEntity extends CollisionEntity implements IMobileEntity {
   @TmxProperty(name = MapObjectProperty.MOVEMENT_VELOCITY)
   private Attribute<Float> velocity;
 
+  /**
+   * Instantiates a new <code>MobileEntity</code>.
+   */
   public MobileEntity() {
     final MovementInfo info = this.getClass().getAnnotation(MovementInfo.class);
     this.velocity = new Attribute<>(info.velocity());

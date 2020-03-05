@@ -23,10 +23,25 @@ public class Configuration {
   private final List<ConfigurationGroup> configurationGroups;
   private final String fileName;
 
+  /**
+   * Instantiates a new instance of the <code>Configuration</code> class.
+   *
+   * @param configurationGroups
+   *          The configuration groups managed by this instance.
+   */
   public Configuration(final ConfigurationGroup... configurationGroups) {
     this(DEFAULT_CONFIGURATION_FILE_NAME, configurationGroups);
   }
 
+  /**
+   * Instantiates a new instance of the <code>Configuration</code> class.
+   *
+   * @param fileName
+   *          The name of the file from which to load the settings.
+   * 
+   * @param configurationGroups
+   *          The configuration groups managed by this instance.
+   */
   public Configuration(final String fileName, final ConfigurationGroup... configurationGroups) {
     this.fileName = fileName;
     this.configurationGroups = new ArrayList<>();

@@ -104,11 +104,11 @@ public class IconTreeListRenderer implements TreeCellRenderer {
   }
 
   private static Icon getIcon(Creature creature) {
-    String cacheKey = Game.world().environment().getMap().getName() + "-" + creature.getSpritePrefix() + "-" + creature.getMapId() + "-tree";
+    String cacheKey = Game.world().environment().getMap().getName() + "-" + creature.getSpritesheetName() + "-" + creature.getMapId() + "-tree";
 
     BufferedImage propImag = Resources.images().get(cacheKey, () -> {
       Collection<Spritesheet> sprites = Resources.spritesheets().get(s -> s.getName().equals(CreatureAnimationController.getSpriteName(creature, CreatureAnimationState.IDLE)) || s.getName().equals(CreatureAnimationController.getSpriteName(creature, CreatureAnimationState.WALK))
-          || s.getName().equals(CreatureAnimationController.getSpriteName(creature, CreatureAnimationState.DEAD)) || s.getName().startsWith(creature.getSpritePrefix() + "-"));
+          || s.getName().equals(CreatureAnimationController.getSpriteName(creature, CreatureAnimationState.DEAD)) || s.getName().startsWith(creature.getSpritesheetName() + "-"));
       if (sprites.isEmpty()) {
         return null;
       }

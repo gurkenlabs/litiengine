@@ -10,12 +10,6 @@ public class AbilityAttributes {
   private final Attribute<Integer> range;
   private final Attribute<Integer> value;
 
-  /**
-   * Instantiates a new ability attributes.
-   *
-   * @param info
-   *          the info
-   */
   AbilityAttributes(final AbilityInfo info) {
     this.cooldown = new Attribute<>(info.cooldown());
     this.range = new Attribute<>(info.range());

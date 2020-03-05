@@ -12,7 +12,7 @@ public class EntityMessageEvent extends EventObject {
   private final transient IEntity entity;
   private final String message;
 
-  public EntityMessageEvent(Object sender, IEntity entity, String message) {
+  EntityMessageEvent(Object sender, IEntity entity, String message) {
     super(sender);
     this.entity = entity;
     this.message = message;

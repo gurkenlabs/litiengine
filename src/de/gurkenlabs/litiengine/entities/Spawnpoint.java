@@ -21,35 +21,100 @@ public class Spawnpoint extends Entity {
   @TmxProperty(name = MapObjectProperty.SPAWN_TYPE)
   private String spawnType;
 
+  /**
+   * Instantiates a new <code>Spawnpoint</code> entity.
+   */
   public Spawnpoint() {
   }
 
+  /**
+   * Instantiates a new <code>Spawnpoint</code> entity.
+   *
+   * @param x
+   *          The x-coordinate of this instance.
+   * @param y
+   *          The y-coordinate of this instance.
+   */
   public Spawnpoint(double x, double y) {
     this(0, x, y);
   }
 
+  /**
+   * Instantiates a new <code>Spawnpoint</code> entity.
+   *
+   * @param mapId
+   *          The map id of this instance.
+   * @param x
+   *          The x-coordinate of this instance.
+   * @param y
+   *          The y-coordinate of this instance.
+   */
   public Spawnpoint(int mapId, double x, double y) {
     this(mapId, new Point2D.Double(x, y));
   }
 
-  public Spawnpoint(int mapId, Point2D point) {
+  /**
+   * Instantiates a new <code>Spawnpoint</code> entity.
+   *
+   * @param mapId
+   *          The map id of this instance.
+   * @param location
+   *          The location of this instance.
+   */
+  public Spawnpoint(int mapId, Point2D location) {
     super(mapId);
-    this.setLocation(point);
+    this.setLocation(location);
   }
 
+  /**
+   * Instantiates a new <code>Spawnpoint</code> entity.
+   *
+   * @param mapId
+   *          The map id of this instance.
+   * @param x
+   *          The x-coordinate of this instance.
+   * @param y
+   *          The y-coordinate of this instance.
+   * @param direction
+   *          The direction in which entities will be spawned by this instance.
+   */
   public Spawnpoint(int mapId, double x, double y, Direction direction) {
     this(mapId, new Point2D.Double(x, y), direction);
   }
 
-  public Spawnpoint(int mapId, Point2D point, Direction direction) {
-    this(mapId, point);
+  /**
+   * Instantiates a new <code>Spawnpoint</code> entity.
+   *
+   * @param mapId
+   *          The map id of this instance.
+   * @param location
+   *          The location of this instance.
+   * @param direction
+   *          The direction in which entities will be spawned by this instance.
+   */
+  public Spawnpoint(int mapId, Point2D location, Direction direction) {
+    this(mapId, location);
     this.setDirection(direction);
   }
 
+  /**
+   * Instantiates a new <code>Spawnpoint</code> entity.
+   *
+   * @param direction
+   *          The direction in which entities will be spawned by this instance.
+   */
   public Spawnpoint(Direction direction) {
     this.setDirection(direction);
   }
 
+  /**
+   * Instantiates a new <code>Spawnpoint</code> entity.
+   *
+   * @param direction
+   *          The direction in which entities will be spawned by this instance.
+   * @param spawnType
+   *          The type that defines additional information about the entities spawned by this instance.
+   */
   public Spawnpoint(Direction direction, String spawnType) {
     this(direction);
     this.setSpawnType(spawnType);

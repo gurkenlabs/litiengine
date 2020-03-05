@@ -1,19 +1,12 @@
 package de.gurkenlabs.litiengine.configuration;
 
-/**
- * The Class SoundSettings.
- */
 @ConfigurationGroupInfo(prefix = "sfx_")
 public class SoundConfiguration extends ConfigurationGroup {
 
   private float musicVolume;
 
-  /** The sound volume. */
   private float soundVolume;
 
-  /**
-   * Instantiates a new sound configuration.
-   */
   SoundConfiguration() {
     this.soundVolume = 0.5F;
     this.setMusicVolume(0.5f);

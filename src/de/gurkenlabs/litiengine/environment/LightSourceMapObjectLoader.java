@@ -12,7 +12,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 
 public class LightSourceMapObjectLoader extends MapObjectLoader {
 
-  public LightSourceMapObjectLoader() {
+  protected LightSourceMapObjectLoader() {
     super(MapObjectType.LIGHTSOURCE);
   }
 
@@ -22,7 +22,6 @@ public class LightSourceMapObjectLoader extends MapObjectLoader {
     if (!this.isMatchingType(mapObject)) {
       return entities;
     }
-
 
     final int intensity = mapObject.getIntValue(MapObjectProperty.LIGHT_INTENSITY, LightSource.DEFAULT_INTENSITY);
     final Color color = mapObject.getColorValue(MapObjectProperty.LIGHT_COLOR);

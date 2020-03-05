@@ -18,18 +18,6 @@ public abstract class AttributeEffect<T extends Number> extends Effect {
   /** The modifier. */
   private final AttributeModifier<T> modifier;
 
-  /**
-   * Instantiates a new attribute effect.
-   *
-   * @param ability
-   *          the ability
-   * @param modification
-   *          the modification
-   * @param delta
-   *          the delta
-   * @param targtes
-   *          the targtes
-   */
   protected AttributeEffect(final Ability ability, final Modification modification, final double delta, final EffectTarget... targtes) {
     super(ability, targtes);
     this.modifier = new AttributeModifier<>(modification, delta);

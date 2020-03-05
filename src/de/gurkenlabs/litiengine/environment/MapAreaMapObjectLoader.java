@@ -10,7 +10,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 
 public class MapAreaMapObjectLoader extends MapObjectLoader {
 
-  public MapAreaMapObjectLoader() {
+  protected MapAreaMapObjectLoader() {
     super(MapObjectType.AREA);
   }
 

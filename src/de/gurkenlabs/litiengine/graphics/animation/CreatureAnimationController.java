@@ -52,7 +52,7 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
   }
   
   public static String getSpriteName(Creature creature, CreatureAnimationState state) {
-    return creature.getSpritePrefix() + "-" + state.spriteString();
+    return creature.getSpritesheetName() + "-" + state.spriteString();
   }
 
   public static String getSpriteName(Creature creature, CreatureAnimationState state, Direction direction) {
@@ -72,7 +72,7 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
   
   @Override
   protected String getSpritePrefix() {
-    return this.getEntity().getSpritePrefix();
+    return this.getEntity().getSpritesheetName();
   }
 
   /**

@@ -35,14 +35,6 @@ public abstract class Effect implements IUpdateable {
   private int duration;
   private RelativeEntityComparator targetPriorityComparator;
 
-  /**
-   * Instantiates a new effect.
-   *
-   * @param ability
-   *          the ability
-   * @param targets
-   *          the targets
-   */
   protected Effect(final Ability ability, final EffectTarget... targets) {
     this.appliedListeners = ConcurrentHashMap.newKeySet();
     this.ceasedListeners = ConcurrentHashMap.newKeySet();
