@@ -16,9 +16,9 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.awt.geom.Point2D;
+import java.util.EventListener;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,7 +45,7 @@ public final class GameWindow {
   private static final int ICONIFIED_MAX_FPS = 1;
   private static final int NONE_FOCUS_MAX_FPS = 10;
 
-  private final List<Consumer<Dimension>> resolutionChangedConsumer;
+  private final List<ResolutionChangedListener> resolutionChangedListeners;
 
   private final JFrame hostControl;
   private final RenderComponent renderCanvas;
@@ -59,7 +59,7 @@ public final class GameWindow {
   GameWindow() {
     this.hostControl = new JFrame();
 
-    this.resolutionChangedConsumer = new CopyOnWriteArrayList<>();
+    this.resolutionChangedListeners = new CopyOnWriteArrayList<>();
 
     this.renderCanvas = new RenderComponent(Game.config().graphics().getResolution());
     this.cursor = new MouseCursor();
@@ -83,12 +83,24 @@ public final class GameWindow {
     return this.hostControl.isFocusOwner();
   }
 
-  public void onResolutionChanged(final Consumer<Dimension> resolutionConsumer) {
-    if (this.resolutionChangedConsumer.contains(resolutionConsumer)) {
-      return;
-    }
+  /**
+   * Adds the specified resolution changed listener to receive events when the dimensions of this game window are changed.
+   * 
+   * @param listener
+   *          The listener to add.
+   */
+  public void onResolutionChanged(final ResolutionChangedListener listener) {
+    this.resolutionChangedListeners.add(listener);
+  }
 
-    this.resolutionChangedConsumer.add(resolutionConsumer);
+  /**
+   * Removes the specified resolution changed listener.
+   * 
+   * @param listener
+   *          The listener to remove.
+   */
+  public void removeResolutionChangedListener(final ResolutionChangedListener listener) {
+    this.resolutionChangedListeners.remove(listener);
   }
 
   public void setResolution(Resolution res) {
@@ -229,7 +241,7 @@ public final class GameWindow {
       @Override
       public void componentResized(final ComponentEvent evt) {
         resolution = getRenderComponent().getSize();
-        resolutionChangedConsumer.forEach(consumer -> consumer.accept(GameWindow.this.getSize()));
+        resolutionChangedListeners.forEach(listener -> listener.resolutionChanged(GameWindow.this.getSize()));
       }
     });
 
@@ -275,4 +287,22 @@ public final class GameWindow {
       }
     });
   }
+
+  /**
+   * This listener interface receives resolution changed events of the game window.
+   * 
+   * @see GameWindow#onResolutionChanged(ResolutionChangedListener)
+   * @see GameWindow#setResolution(Resolution)
+   */
+  @FunctionalInterface
+  public interface ResolutionChangedListener extends EventListener {
+    /**
+     * Invoked when the resolution of the <code>GameWindow</code> changed.
+     * 
+     * @param resolution
+     *          The new resolution.
+     */
+    void resolutionChanged(Dimension resolution);
+  }
+
 }
