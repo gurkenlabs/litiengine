@@ -146,6 +146,16 @@ public final class Codec {
     return Base64.getEncoder().encodeToString(data);
   }
 
+  /**
+   * Decodes the specified <code>Base64</code> string to a byte array.
+   * 
+   * @param base64
+   *          The Base64 string containing the encoded binary data.
+   * 
+   * @return The decoded byte array.
+   * 
+   * @see Base64
+   */
   public static byte[] decode(String base64) {
     return Base64.getDecoder().decode(base64);
   }

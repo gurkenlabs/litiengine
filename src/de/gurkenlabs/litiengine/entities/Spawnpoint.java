@@ -54,11 +54,23 @@ public class Spawnpoint extends Entity {
     this(direction);
     this.setSpawnType(spawnType);
   }
-  
+
+  /**
+   * Adds the specified entity spawned listener to receive events when entities are spawned by this instance.
+   * 
+   * @param listener
+   *          The listener to add.
+   */
   public void onSpawned(EntitySpawnedListener listener) {
     this.spawnedListeners.add(listener);
   }
 
+  /**
+   * Removes the specified entity spawned listener.
+   * 
+   * @param listener
+   *          The listener to remove.
+   */
   public void removeSpawnedListener(EntitySpawnedListener listener) {
     this.spawnedListeners.remove(listener);
   }

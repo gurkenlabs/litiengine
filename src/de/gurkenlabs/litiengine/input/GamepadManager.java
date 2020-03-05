@@ -19,6 +19,17 @@ import net.java.games.input.Controller;
 import net.java.games.input.Controller.Type;
 import net.java.games.input.ControllerEnvironment;
 
+/**
+ * The <code>GamepadManager</code> provides access to all gamepad input devices.
+ * 
+ * <p>
+ * Gamepads don't need to be added explicitly, the manager supports hot-plugging at runtime and will auto-detect any
+ * added/removed gamepads.
+ * </p>
+ * 
+ * @see #current()
+ * @see #get(int)
+ */
 public final class GamepadManager extends GamepadEvents implements ILaunchable {
   private static final Logger log = Logger.getLogger(GamepadManager.class.getName());
 

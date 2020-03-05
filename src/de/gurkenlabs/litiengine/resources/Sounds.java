@@ -19,6 +19,16 @@ public final class Sounds extends ResourcesContainer<Sound> {
   Sounds() {
   }
 
+  /**
+   * Loads a sound from the specified XML resource.
+   * 
+   * @param resource
+   *          The XML resource that contains the sound as Base64 string.
+   * 
+   * @return The <code>Sound</code> instance loaded from the specified resource.
+   * 
+   * @see Codec#decode(String)
+   */
   public Sound load(final SoundResource resource) {
     byte[] data = Codec.decode(resource.getData());
     ByteArrayInputStream input = new ByteArrayInputStream(data);

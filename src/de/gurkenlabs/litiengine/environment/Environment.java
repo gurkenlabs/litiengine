@@ -225,10 +225,24 @@ public final class Environment implements IRenderable {
     registerCustomEntityType(info.customMapObjectType(), entityType);
   }
 
+  /**
+   * Adds the specified environment rendered listener to receive events when this instance renders the specified renderType.
+   * 
+   * @param renderType
+   *          The type that defines to which render process this listener should be attached.
+   * @param listener
+   *          The listener to add.
+   */
   public void onRendered(RenderType renderType, EnvironmentRenderedListener listener) {
     this.renderListeners.get(renderType).add(listener);
   }
 
+  /**
+   * Removes the specified environment rendered listener.
+   * 
+   * @param listener
+   *          The listener to remove.
+   */
   public void removeRenderListener(EnvironmentRenderedListener listener) {
     for (Collection<EnvironmentRenderedListener> rends : this.renderListeners.values()) {
       rends.remove(listener);
@@ -1578,6 +1592,15 @@ public final class Environment implements IRenderable {
     this.loadFromMap(mapId);
   }
 
+  /**
+   * Loads all entities for the specified map object.
+   * 
+   * @param mapObject
+   *          The mapObject to load the entities from.
+   * @return A collection of all loaded entities.
+   * 
+   * @see MapObjectLoader#load(Environment, IMapObject)
+   */
   public Collection<IEntity> load(final IMapObject mapObject) {
     if (mapObject == null) {
       return Collections.emptySet();

@@ -255,7 +255,13 @@ public final class ArrayUtilities {
 
     return hash.toArray((T[]) Array.newInstance(first.getClass().getComponentType(), hash.size()));
   }
-  
+
+  /**
+   * Shuffles the elements in the specified array randomly.
+   * 
+   * @param arr
+   *          The array to shuffle.
+   */
   public static void shuffle(Object[] arr) {
     for (int i = arr.length - 1; i > 0; i--) {
       int swap = Game.random().nextInt(i + 1);
@@ -264,6 +270,7 @@ public final class ArrayUtilities {
       arr[swap] = temp;
     }
   }
+
   public static int[] toIntegerArray(List<Integer> intList) {
     Integer[] objArray = intList.toArray(new Integer[0]);
     int[] intArray = new int[objArray.length];
