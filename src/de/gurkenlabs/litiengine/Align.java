@@ -18,10 +18,10 @@ public enum Align {
   RIGHT(1f),
   @XmlEnumValue("justify")
   JUSTIFY(Float.NaN), // for use in TMX maps
-  CENTER_LEFT(0.25f), 
+  CENTER_LEFT(0.25f),
   CENTER_RIGHT(0.75f);
 
-  public final float portion;
+  private final float portion;
 
   private Align(float portion) {
     this.portion = portion;
@@ -39,12 +39,37 @@ public enum Align {
     }
   }
 
+  /**
+   * Gets the proportional value of this instance.
+   * 
+   * @param width
+   *          The width to calculate the relative value from.
+   * @return The proportional value for the specified height.
+   */
   public float getValue(float width) {
     return width * this.portion;
   }
 
+  /**
+   * Gets the proportional value of this instance.
+   * 
+   * @param width
+   *          The width to calculate the relative value from.
+   * @return The proportional value for the specified height.
+   */
   public double getValue(double width) {
     return width * this.portion;
+  }
+
+  /**
+   * Gets the proportional value of this instance.
+   * 
+   * @param width
+   *          The width to calculate the relative value from.
+   * @return The proportional value for the specified height.
+   */
+  public int getValue(int width) {
+    return (int) (width * this.portion);
   }
 
   public double getLocation(final double width, final double objectWidth) {

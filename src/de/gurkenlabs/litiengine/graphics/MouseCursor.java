@@ -111,7 +111,7 @@ public final class MouseCursor implements IRenderable {
   }
 
   public void set(final Image img, Align hAlign, Valign vAlign) {
-    this.set(img, -(int) (hAlign.portion * img.getWidth(null)), -(int) (vAlign.portion * img.getHeight(null)));
+    this.set(img, -hAlign.getValue(img.getWidth(null)), -vAlign.getValue(img.getHeight(null)));
   }
 
   public void setOffset(final int x, final int y) {

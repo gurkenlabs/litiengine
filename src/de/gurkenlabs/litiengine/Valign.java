@@ -16,10 +16,10 @@ public enum Valign {
   MIDDLE(0.5f),
   @XmlEnumValue("top")
   TOP(0f),
-  MIDDLE_TOP(0.25f), 
+  MIDDLE_TOP(0.25f),
   MIDDLE_DOWN(0.75f);
 
-  public final float portion;
+  private final float portion;
 
   private Valign(float portion) {
     this.portion = portion;
@@ -37,12 +37,37 @@ public enum Valign {
     }
   }
 
+  /**
+   * Gets the proportional value of this instance.
+   * 
+   * @param height
+   *          The height to calculate the relative value from.
+   * @return The proportional value for the specified height.
+   */
   public float getValue(float height) {
     return height * this.portion;
   }
 
+  /**
+   * Gets the proportional value of this instance.
+   * 
+   * @param height
+   *          The height to calculate the relative value from.
+   * @return The proportional value for the specified height.
+   */
   public double getValue(double height) {
     return height * this.portion;
+  }
+
+  /**
+   * Gets the proportional value of this instance.
+   * 
+   * @param height
+   *          The height to calculate the relative value from.
+   * @return The proportional value for the specified height.
+   */
+  public int getValue(int height) {
+    return (int) (height * this.portion);
   }
 
   public double getLocation(final double height, final double objectHeight) {
