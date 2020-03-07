@@ -18,11 +18,11 @@ public class StaticShadowLayer extends ColorLayer {
    * @param environment
    *          The environment to which this instance is assigned.
    * 
-   * @param ambientColor
+   * @param color
    *          The color of this instance.
    */
-  public StaticShadowLayer(Environment env, Color color) {
-    super(env, color);
+  public StaticShadowLayer(Environment environment, Color color) {
+    super(environment, color);
   }
 
   @Override
