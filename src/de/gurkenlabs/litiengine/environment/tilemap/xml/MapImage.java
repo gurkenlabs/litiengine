@@ -32,12 +32,15 @@ public class MapImage extends CustomPropertyProvider implements IMapImage {
   @XmlTransient
   private URL absolutePath;
 
+  /**
+   * Instantiates a new <code>MapImage</code> instance.
+   */
   public MapImage() {
     super();
   }
 
   /**
-   * Copy Constructor for copying instances of MapImage.
+   * Instantiates a new <code>MapImage</code> instance by copying the specified original.
    *
    * @param original
    *          the original we want to copy

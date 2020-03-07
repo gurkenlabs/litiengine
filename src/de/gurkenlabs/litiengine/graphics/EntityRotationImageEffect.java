@@ -5,6 +5,12 @@ import de.gurkenlabs.litiengine.entities.IEntity;
 public class EntityRotationImageEffect extends RotationImageEffect {
   private final IEntity entity;
 
+  /**
+   * Instantiates a new instance of the <code>EntityRotationImageEffect</code>.
+   *
+   * @param entity
+   *          The entity to which this affect will be applied.
+   */
   public EntityRotationImageEffect(final IEntity entity) {
     super(-1, 0);
     this.entity = entity;

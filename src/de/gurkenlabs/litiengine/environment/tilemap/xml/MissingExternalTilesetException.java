@@ -4,18 +4,18 @@ public class MissingExternalTilesetException extends MissingTmxResourceException
 
   private static final long serialVersionUID = 3758242882248677213L;
 
-  public MissingExternalTilesetException() {
+  MissingExternalTilesetException() {
   }
 
-  public MissingExternalTilesetException(String message) {
+  MissingExternalTilesetException(String message) {
     super(message);
   }
-  
-  public MissingExternalTilesetException(String message, Throwable cause) {
+
+  MissingExternalTilesetException(String message, Throwable cause) {
     super(message, cause);
   }
-  
-  public MissingExternalTilesetException(Throwable cause) {
+
+  MissingExternalTilesetException(Throwable cause) {
     super(cause);
   }
 }

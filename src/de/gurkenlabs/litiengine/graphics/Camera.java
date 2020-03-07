@@ -49,7 +49,7 @@ public class Camera implements ICamera {
   private Valign valign = Valign.TOP;
 
   /**
-   * Instantiates a new camera.
+   * Instantiates a new <code>Camera</code> instance.
    */
   public Camera() {
     this.focus = new Point2D.Double();
@@ -306,7 +306,7 @@ public class Camera implements ICamera {
 
     return new Point2D.Double(x, y);
   }
-  
+
   protected int panTime() {
     return this.panTime;
   }
@@ -318,7 +318,7 @@ public class Camera implements ICamera {
   protected double getViewportHeight() {
     return Game.window().getResolution().getHeight() / this.getRenderScale();
   }
-  
+
   /**
    * Apply shake effect.
    *

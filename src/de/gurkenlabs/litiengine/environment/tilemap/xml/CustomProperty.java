@@ -13,37 +13,64 @@ public class CustomProperty implements ICustomProperty {
   private String value;
   private URL location;
 
+  /**
+   * Instantiates a new <code>CustomProperty</code> instance.
+   * 
+   * <p>
+   * The default type for a custom property is <code>string</code> if not explicitly specified.
+   * </p>
+   */
   public CustomProperty() {
     this.type = "string";
     this.value = "";
   }
 
   /**
-   * Copy Constructor for copying instances of CustomProperties.
+   * Instantiates a new <code>CustomProperty</code> instance.
    *
-   * @param propertyToBeCopied
-   *          the Property we want to copy
+   * @param value
+   *          The value of this custom property.
    */
-  public CustomProperty(ICustomProperty propertyToBeCopied) {
-    this.type = propertyToBeCopied.getType();
-    this.value = propertyToBeCopied.getAsString();
-    this.location = propertyToBeCopied.getAsFile();
-  }
-
   public CustomProperty(String value) {
     this.type = "string";
     this.value = Objects.requireNonNull(value);
   }
 
+  /**
+   * Instantiates a new <code>CustomProperty</code> instance.
+   * 
+   * @param type
+   *          The type of this custom property.
+   * @param value
+   *          The value of this custom property.
+   */
   public CustomProperty(String type, String value) {
     this.type = Objects.requireNonNull(type);
     this.value = Objects.requireNonNull(value);
   }
 
+  /**
+   * Instantiates a new <code>CustomProperty</code> instance.
+   * 
+   * @param location
+   *          The location of the file represented by this custom property.
+   */
   public CustomProperty(URL location) {
     this.type = "file";
     this.value = location.toExternalForm();
     this.location = location;
+  }
+
+  /**
+   * Instantiates a new <code>CustomProperty</code> instance by copying from the specified instance.
+   *
+   * @param propertyToBeCopied
+   *          The property to be copied.
+   */
+  public CustomProperty(ICustomProperty propertyToBeCopied) {
+    this.type = propertyToBeCopied.getType();
+    this.value = propertyToBeCopied.getAsString();
+    this.location = propertyToBeCopied.getAsFile();
   }
 
   @Override

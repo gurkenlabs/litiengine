@@ -6,7 +6,7 @@ public class FocusChangedEvent extends CameraEvent {
   private static final long serialVersionUID = -7066039797167626439L;
   private final transient Point2D focus;
 
-  public FocusChangedEvent(ICamera source, Point2D focus) {
+  FocusChangedEvent(ICamera source, Point2D focus) {
     super(source);
     this.focus = focus;
   }

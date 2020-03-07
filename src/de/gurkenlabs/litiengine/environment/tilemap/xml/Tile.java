@@ -37,9 +37,22 @@ public class Tile extends CustomPropertyProvider implements ITile {
   private transient boolean flippedVertically;
   private transient boolean flipped;
 
+  /**
+   * Instantiates a new <code>Tile</code> instance.
+   */
   public Tile() {
   }
 
+  /**
+   * Instantiates a new <code>Tile</code> instance.
+   *
+   * @param gidBitmask
+   *          The grid ID bitmask used to identify flags of this instance.
+   * 
+   * @see Tile#FLIPPED_HORIZONTALLY_FLAG
+   * @see Tile#FLIPPED_DIAGONALLY_FLAG
+   * @see Tile#FLIPPED_VERTICALLY_FLAG
+   */
   public Tile(int gidBitmask) {
     // Clear the flags
     this.flippedDiagonally = (gidBitmask & FLIPPED_DIAGONALLY_FLAG) != 0;

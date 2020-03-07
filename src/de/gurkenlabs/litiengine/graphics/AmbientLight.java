@@ -24,8 +24,16 @@ import de.gurkenlabs.litiengine.util.geom.Vector2D;
 public class AmbientLight extends ColorLayer {
   public static final Color DEFAULT_COLOR = new Color(0, 0, 0, 0);
 
-  public AmbientLight(final Environment env, final Color ambientColor) {
-    super(env, ambientColor);
+  /**
+   * Instantiates a new <code>AmbientLight</code> instance.
+   *
+   * @param environment
+   *          The environment to which this instance is assigned.
+   * @param ambientColor
+   *          The color of this instance.
+   */
+  public AmbientLight(final Environment environment, final Color ambientColor) {
+    super(environment, ambientColor);
   }
 
   /**

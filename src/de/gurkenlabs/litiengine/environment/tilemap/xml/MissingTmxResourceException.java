@@ -7,18 +7,18 @@ public class MissingTmxResourceException extends TmxException {
 
   private static final long serialVersionUID = 2649018991304386841L;
 
-  public MissingTmxResourceException() {
+  protected MissingTmxResourceException() {
   }
 
-  public MissingTmxResourceException(String message) {
+  protected MissingTmxResourceException(String message) {
     super(message);
   }
 
-  public MissingTmxResourceException(String message, Throwable cause) {
+  protected MissingTmxResourceException(String message, Throwable cause) {
     super(message, cause);
   }
 
-  public MissingTmxResourceException(Throwable cause) {
+  protected MissingTmxResourceException(Throwable cause) {
     super(cause);
   }
 }

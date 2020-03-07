@@ -9,6 +9,14 @@ import de.gurkenlabs.litiengine.util.Imaging;
 public class RotationImageEffect extends ImageEffect {
   private final float angle;
 
+  /**
+   * Instantiates a new instance of the <code>RotationImageEffect</code>.
+   *
+   * @param ttl
+   *          The time to live of this effect.
+   * @param angle
+   *          The angle by which this effect rotates the base image.
+   */
   public RotationImageEffect(final int ttl, final float angle) {
     super(ttl, "RotationImageEffect");
     this.angle = angle;

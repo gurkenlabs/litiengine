@@ -13,14 +13,32 @@ public class FreeFlightCamera extends Camera implements IUpdateable {
   private double velocity;
   private double scrollPadding;
 
+  /**
+   * Instantiates a new instance of the <code>FreeFlightCamera</code>.
+   */
   public FreeFlightCamera() {
     this(0, 0);
   }
 
+  /**
+   * Instantiates a new instance of the <code>FreeFlightCamera</code> with the specified initial focus.
+   *
+   * @param x
+   *          The x-coordinate of the initial focus of this instance.
+   * @param y
+   *          The y-coordinate of the initial focus of this instance.
+   */
   public FreeFlightCamera(double x, double y) {
     this(new Point2D.Double(x, y));
   }
 
+  /**
+   * Instantiates a new instance of the <code>FreeFlightCamera</code> with the specified initial focus.
+   *
+   *
+   * @param focus
+   *          The initial focus of this instance.
+   */
   public FreeFlightCamera(final Point2D focus) {
     this.setFocus(focus);
     this.velocity = DEFAULT_SCROLL_PIXELS_PER_SECOND;

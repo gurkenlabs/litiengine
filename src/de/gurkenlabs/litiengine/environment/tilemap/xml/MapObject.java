@@ -68,54 +68,75 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
 
   private transient MapObjectLayer layer;
 
+  /**
+   * Instantiates a new <code>MapObject</code> instance.
+   */
   public MapObject() {
   }
 
+  /**
+   * Instantiates a new <code>MapObject</code> instance.
+   *
+   * @param type
+   *          The type of this map object.
+   */
   public MapObject(String type) {
     this.type = type;
   }
 
   /**
-   * Copy Constructor for copying instances of MapObjects.
+   * Instantiates a new <code>MapObject</code> instance by copying the specified original instance.
+   * <p>
    * This variant of the constructor will assign an entirely new ID to the newly created MapObject.
+   * </p>
    *
-   * @param mapObjectToBeCopied
+   * @param original
    *          the MapObject we want to copy
    */
-  public MapObject(MapObject mapObjectToBeCopied) {
-    super(mapObjectToBeCopied);
-    this.setName(mapObjectToBeCopied.getName());
+  public MapObject(MapObject original) {
+    super(original);
+    this.setName(original.getName());
     this.setId(Game.world().environment().getNextMapId());
-    this.polyline = (mapObjectToBeCopied.getPolyline() != null && !mapObjectToBeCopied.getPolyline().getPoints().isEmpty()) ? new PolyShape(mapObjectToBeCopied.getPolyline()) : null;
-    this.setType(mapObjectToBeCopied.getType());
-    this.setX(mapObjectToBeCopied.getX());
-    this.setY(mapObjectToBeCopied.getY());
-    this.setWidth(mapObjectToBeCopied.getWidth());
-    this.setHeight(mapObjectToBeCopied.getHeight());
-    this.setLayer(mapObjectToBeCopied.layer);
-    this.text = mapObjectToBeCopied.text;
-    this.ellipse = mapObjectToBeCopied.ellipse;
-    this.point = mapObjectToBeCopied.point;
+    this.polyline = (original.getPolyline() != null && !original.getPolyline().getPoints().isEmpty()) ? new PolyShape(original.getPolyline()) : null;
+    this.setType(original.getType());
+    this.setX(original.getX());
+    this.setY(original.getY());
+    this.setWidth(original.getWidth());
+    this.setHeight(original.getHeight());
+    this.setLayer(original.layer);
+    this.text = original.text;
+    this.ellipse = original.ellipse;
+    this.point = original.point;
   }
 
   /**
-   * Copy Constructor for copying instances of MapObjects.
+   * Instantiates a new <code>MapObject</code> instance by copying the specified original instance.
+   * <p>
    * This variant of the constructor lets you decide if the copy instance will get the same ID as the old MapObject or get a new ID.
+   * </p>
    * 
-   * @param mapObjectToBeCopied
+   * @param original
    *          the MapObject we want to copy
    * @param keepID
    *          decide if the new instance will adopt the old MapObject's ID or get a new, unique one.
    */
-  public MapObject(MapObject mapObjectToBeCopied, boolean keepID) {
-    this(mapObjectToBeCopied);
+  public MapObject(MapObject original, boolean keepID) {
+    this(original);
     if (keepID) {
-      this.setId(mapObjectToBeCopied.getId());
+      this.setId(original.getId());
     }
   }
 
-  public MapObject(MapObject mapObjectToBeCopied, int id) {
-    this(mapObjectToBeCopied);
+  /**
+   * Instantiates a new <code>MapObject</code> instance by copying the specified original instance.
+   *
+   * @param original
+   *          the MapObject we want to copy
+   * @param id
+   *          The id of this instance.
+   */
+  public MapObject(MapObject original, int id) {
+    this(original);
     this.setId(id);
   }
 

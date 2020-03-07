@@ -30,8 +30,8 @@ public final class Spritesheet implements Comparable<Spritesheet> {
   private int spriteWidth;
 
   /**
-   * Instantiates a new spritesheet. Depending on the given <code>spriteWidth</code> and <code>spriteHeight</code>, the sub-images will be cropped
-   * from the spritesheet image when accessing individual sprites.
+   * Instantiates a new <code>Spritesheet</code> instance. Depending on the given <code>spriteWidth</code> and <code>spriteHeight</code>, the
+   * sub-images will be cropped from the spritesheet image when accessing individual sprites.
    *
    * @param image
    *          the spritesheet image

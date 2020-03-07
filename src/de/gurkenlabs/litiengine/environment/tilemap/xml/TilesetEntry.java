@@ -40,9 +40,20 @@ public class TilesetEntry extends CustomPropertyProvider implements ITilesetEntr
   @XmlAttribute
   private String type;
 
+  /**
+   * Instantiates a new <code>TilesetEntry</code>.
+   */
   public TilesetEntry() {
   }
 
+  /**
+   * Instantiates a new <code>TilesetEntry</code> from the specified tileset.
+   *
+   * @param tileset
+   *          The tileset that contains this entry.
+   * @param id
+   *          The identifier of this instance.
+   */
   public TilesetEntry(Tileset tileset, int id) {
     this.tileset = tileset;
     this.id = id;
@@ -112,7 +123,7 @@ public class TilesetEntry extends CustomPropertyProvider implements ITilesetEntr
 
     return terrainIds;
   }
-  
+
   @Override
   public String toString() {
     return Arrays.toString(this.getTerrainIds());

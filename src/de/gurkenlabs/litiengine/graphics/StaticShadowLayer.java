@@ -11,6 +11,16 @@ import de.gurkenlabs.litiengine.entities.StaticShadow;
 import de.gurkenlabs.litiengine.environment.Environment;
 
 public class StaticShadowLayer extends ColorLayer {
+
+  /**
+   * Instantiates a new <code>StaticShadowLayer</code> instance.
+   *
+   * @param environment
+   *          The environment to which this instance is assigned.
+   * 
+   * @param ambientColor
+   *          The color of this instance.
+   */
   public StaticShadowLayer(Environment env, Color color) {
     super(env, color);
   }
@@ -36,7 +46,7 @@ public class StaticShadowLayer extends ColorLayer {
     ar.transform(AffineTransform.getTranslateInstance(-section.getX(), -section.getY()));
     g.fill(ar);
   }
-  
+
   @Override
   protected void clearSection(Graphics2D g, Rectangle2D section) {
     g.setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR));

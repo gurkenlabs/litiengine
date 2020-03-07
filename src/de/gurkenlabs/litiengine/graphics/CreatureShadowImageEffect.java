@@ -15,10 +15,24 @@ public class CreatureShadowImageEffect extends ImageEffect {
   private final Creature creature;
   private final Color shadowColor;
 
+  /**
+   * Instantiates a new instance of the <code>CreatureShadowImageEffect</code>.
+   *
+   * @param creature
+   *          The creature to which this affect will be applied to.
+   */
   public CreatureShadowImageEffect(final Creature creature) {
     this(creature, DEFAULT_SHADOW_COLOR);
   }
 
+  /**
+   * Instantiates a new instance of the <code>CreatureShadowImageEffect</code>.
+   *
+   * @param creature
+   *          The creature to which this affect will be applied to.
+   * @param shadowColor
+   *          The color of the shadow.
+   */
   public CreatureShadowImageEffect(final Creature creature, final Color shadowColor) {
     super(0, "shadow");
     this.creature = creature;

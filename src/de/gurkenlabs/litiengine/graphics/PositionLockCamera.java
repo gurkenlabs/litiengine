@@ -10,6 +10,12 @@ import de.gurkenlabs.litiengine.entities.IEntity;
 public class PositionLockCamera extends Camera {
   private final IEntity entity;
 
+  /**
+   * Instantiates a new instance of the <code>PositionLockCamera</code>.
+   *
+   * @param entity
+   *          The entity to which the focus will be locked.
+   */
   public PositionLockCamera(final IEntity entity) {
     super();
     this.entity = entity;

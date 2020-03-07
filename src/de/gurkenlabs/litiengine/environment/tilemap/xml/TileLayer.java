@@ -21,10 +21,19 @@ public class TileLayer extends Layer implements ITileLayer {
 
   private transient Tile[][] tiles;
 
+  /**
+   * Instantiates a new <code>TileLayer</code> instance.
+   */
   public TileLayer() {
     // keep for serialization
   }
 
+  /**
+   * Instantiates a new <code>TileLayer</code> instance with the specified data.
+   *
+   * @param data
+   *          The tile data of this instance.
+   */
   public TileLayer(TileData data) {
     this.data = data;
   }

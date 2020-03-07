@@ -88,11 +88,14 @@ public class TileData {
   @XmlTransient
   private int minChunkOffsetYMap;
 
+  /**
+   * Instantiates a new <code>TileData</code> instance.
+   */
   public TileData() {
     // keep for serialization
   }
 
-  public TileData(List<Tile> tiles, int width, int height, String encoding, String compression) throws TmxException {
+  TileData(List<Tile> tiles, int width, int height, String encoding, String compression) throws TmxException {
     if (!Encoding.isValid(encoding)) {
       throw new TmxException("Invalid tile data encoding '" + encoding + "'. Supported encodings are " + Encoding.CSV + " and " + Encoding.BASE64 + ".");
     }
@@ -221,7 +224,7 @@ public class TileData {
       if (data.getCompression() != null && data.getCompression().equals(Compression.GZIP)) {
         ((GZIPOutputStream) out).finish();
       }
-      
+
       if (data.getCompression() != null && data.getCompression().equals(Compression.ZLIB)) {
         ((DeflaterOutputStream) out).finish();
       }

@@ -10,7 +10,7 @@ public class MapRenderedEvent extends EventObject {
   private final transient IMap map;
   private final transient Graphics2D graphics;
 
-  public MapRenderedEvent(final Graphics2D graphics, final IMap map) {
+  MapRenderedEvent(final Graphics2D graphics, final IMap map) {
     super(map);
     this.graphics = graphics;
     this.map = map;

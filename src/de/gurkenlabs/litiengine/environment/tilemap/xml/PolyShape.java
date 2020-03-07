@@ -14,17 +14,26 @@ public class PolyShape implements IPolyShape {
   @XmlJavaTypeAdapter(PolylineAdapter.class)
   private List<Point2D> points;
 
+  /**
+   * Instantiates a new <code>PolyShape</code> instance.
+   */
   public PolyShape() {
     super();
     this.points = new ArrayList<>();
   }
 
-  public PolyShape(IPolyShape polyLineToBeCopied) {
+  /**
+   * Instantiates a new <code>PolyShape</code> instance by copying from the specified original.
+   *
+   * @param original
+   *          The poly line to be copied.
+   */
+  public PolyShape(IPolyShape original) {
     this();
-    if (polyLineToBeCopied == null) {
+    if (original == null) {
       return;
     }
-    for (Point2D point : polyLineToBeCopied.getPoints()) {
+    for (Point2D point : original.getPoints()) {
       this.points.add(new Point2D.Float((float) point.getX(), (float) point.getY()));
     }
   }

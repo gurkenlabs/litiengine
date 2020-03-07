@@ -6,7 +6,7 @@ public abstract class CameraEvent extends EventObject {
   private static final long serialVersionUID = 6376977651819216179L;
   private final transient ICamera camera;
 
-  public CameraEvent(ICamera source) {
+  CameraEvent(ICamera source) {
     super(source);
     this.camera = source;
   }
