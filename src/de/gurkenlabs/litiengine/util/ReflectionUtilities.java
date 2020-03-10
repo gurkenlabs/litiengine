@@ -5,6 +5,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -187,6 +188,11 @@ public final class ReflectionUtilities {
     // directly try to set the field.
     final Field field = getField(cls, fieldName);
     if (field == null) {
+      return false;
+    }
+
+    // final fields cannot be set
+    if (Modifier.isFinal(field.getModifiers())) {
       return false;
     }
 

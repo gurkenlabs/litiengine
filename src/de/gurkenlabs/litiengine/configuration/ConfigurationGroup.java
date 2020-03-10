@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.configuration;
 
 import java.beans.PropertyChangeEvent;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.EventListener;
 import java.util.Properties;
@@ -102,6 +103,11 @@ public abstract class ConfigurationGroup {
   protected void storeProperties(final Properties properties) {
     try {
       for (final Field field : this.getClass().getDeclaredFields()) {
+        if (Modifier.isFinal(field.getModifiers()) || Modifier.isStatic(field.getModifiers())) {
+          // final or static fields are not part of the configurable properties.
+          continue;
+        }
+
         if (!field.isAccessible()) {
           field.setAccessible(true);
         }
