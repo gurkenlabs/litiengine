@@ -98,7 +98,14 @@ public class Resolution {
    * Contains predefined <code>Resolutions</code> with an aspect ratio of 4:3.
    */
   public static class Ratio4x3 extends Ratio {
+    public static final Resolution RES_640x480 = new Resolution(640, 480, new Ratio4x3());
+    public static final Resolution RES_720x576 = new Resolution(720, 576, new Ratio4x3());
+    public static final Resolution RES_800x600 = new Resolution(800, 600, new Ratio4x3());
     public static final Resolution RES_1024x768 = new Resolution(1024, 768, new Ratio4x3());
+    public static final Resolution RES_1152x864 = new Resolution(1152, 864, new Ratio4x3());
+    public static final Resolution RES_1280x960 = new Resolution(1280, 960, new Ratio4x3());
+    public static final Resolution RES_1600x1200 = new Resolution(1600, 1200, new Ratio4x3());
+    public static final Resolution RES_1920x1440 = new Resolution(1920, 1440, new Ratio4x3());
 
     private Ratio4x3() {
       super(4, 3);
@@ -164,6 +171,7 @@ public class Resolution {
    * Contains predefined <code>Resolutions</code> with an aspect ratio of 16:10.
    */
   public static class Ratio16x10 extends Ratio {
+    public static final Resolution RES_720x480 = new Resolution(720, 480, new Ratio16x10());
     public static final Resolution RES_1280x800 = new Resolution(1280, 800, new Ratio16x10());
     public static final Resolution RES_1440x900 = new Resolution(1440, 900, new Ratio16x10());
     public static final Resolution RES_1680x1050 = new Resolution(1680, 1050, new Ratio16x10());
