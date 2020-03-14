@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
 import de.gurkenlabs.litiengine.resources.ImageFormat;
+import de.gurkenlabs.litiengine.util.Imaging;
 
 public final class Codec {
   private static final Logger log = Logger.getLogger(Codec.class.getName());
@@ -34,7 +35,7 @@ public final class Codec {
     return angle % 360;
   }
 
-  public static float decodeAngleFromShort(final short encodedAngle) {
+  public static float decodeAngle(final short encodedAngle) {
     return decodeSmallFloatingPointNumber(encodedAngle, 2);
   }
 
@@ -70,7 +71,7 @@ public final class Codec {
     return (byte) encodedAngle;
   }
 
-  public static short encodeAngleToShort(final float angle) {
+  public static short encodeAnglePrecise(final float angle) {
     float encodedAngle = angle;
     if (encodedAngle < 0) {
       encodedAngle += 360;
@@ -114,7 +115,8 @@ public final class Codec {
     } catch (final Exception e) {
       log.log(Level.SEVERE, e.getMessage(), e);
     }
-    return image;
+
+    return Imaging.toCompatibleImage(image);
   }
 
   public static String encode(final BufferedImage image) {

@@ -52,9 +52,6 @@ public final class Images extends ResourcesContainer<BufferedImage> {
       return null;
     }
 
-    final BufferedImage compatibleImg = Imaging.getCompatibleImage(img.getWidth(), img.getHeight());
-    compatibleImg.createGraphics().drawImage(img, 0, 0, null);
-
-    return compatibleImg;
+    return Imaging.toCompatibleImage(img);
   }
 }

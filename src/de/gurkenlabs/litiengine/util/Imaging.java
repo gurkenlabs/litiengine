@@ -180,6 +180,22 @@ public final class Imaging {
     return true;
   }
 
+  public static boolean areEqual(final BufferedImage image1, final BufferedImage image2) {
+    if (image1.getWidth() != image2.getWidth() || image1.getHeight() != image2.getHeight()) {
+      return false;
+    }
+
+    for (int x = 1; x < image2.getWidth(); x++) {
+      for (int y = 1; y < image2.getHeight(); y++) {
+        if (image1.getRGB(x, y) != image2.getRGB(x, y)) {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
+
   /**
    * Crops a sub image from the specified image.
    *
@@ -565,6 +581,17 @@ public final class Imaging {
     bGr.dispose();
 
     return bimage;
+  }
+
+  public static BufferedImage toCompatibleImage(final BufferedImage image) {
+    if (image == null || image.getWidth() == 0 || image.getHeight() == 0) {
+      return image;
+    }
+
+    final BufferedImage compatibleImg = getCompatibleImage(image.getWidth(), image.getHeight());
+    compatibleImg.createGraphics().drawImage(image, 0, 0, null);
+
+    return compatibleImg;
   }
 
   private static BufferedImage flipSprites(final Spritesheet sprite, UnaryOperator<BufferedImage> flipFunction) {
