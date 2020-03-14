@@ -1,7 +1,6 @@
-package de.gurkenlabs.litiengine.entities.ai;
+package de.gurkenlabs.litiengine.entities.behavior;
 
 import de.gurkenlabs.litiengine.entities.IEntity;
-import de.gurkenlabs.litiengine.states.StateMachine;
 
 public class StateController<T extends IEntity> extends StateMachine implements IBehaviorController {
   private final T entity;

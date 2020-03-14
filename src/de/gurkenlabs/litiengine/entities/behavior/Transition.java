@@ -1,4 +1,4 @@
-package de.gurkenlabs.litiengine.states;
+package de.gurkenlabs.litiengine.entities.behavior;
 
 public abstract class Transition implements Comparable<Transition> {
   private final int priority;

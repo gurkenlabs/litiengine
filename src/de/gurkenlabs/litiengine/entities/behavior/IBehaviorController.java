@@ -1,4 +1,4 @@
-package de.gurkenlabs.litiengine.entities.ai;
+package de.gurkenlabs.litiengine.entities.behavior;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.IEntityController;

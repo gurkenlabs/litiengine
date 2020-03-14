@@ -20,11 +20,11 @@ import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameTest;
+import de.gurkenlabs.litiengine.entities.behavior.AStarGrid;
+import de.gurkenlabs.litiengine.entities.behavior.AStarNode;
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
-import de.gurkenlabs.litiengine.pathfinding.astar.AStarGrid;
-import de.gurkenlabs.litiengine.pathfinding.astar.AStarNode;
 
 public class AStarTests {
   @BeforeAll

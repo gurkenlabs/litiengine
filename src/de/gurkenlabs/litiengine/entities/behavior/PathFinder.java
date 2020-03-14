@@ -1,4 +1,4 @@
-package de.gurkenlabs.litiengine.pathfinding;
+package de.gurkenlabs.litiengine.entities.behavior;
 
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;

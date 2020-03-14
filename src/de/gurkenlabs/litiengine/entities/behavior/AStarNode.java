@@ -1,4 +1,4 @@
-package de.gurkenlabs.litiengine.pathfinding.astar;
+package de.gurkenlabs.litiengine.entities.behavior;
 
 import java.awt.Point;
 import java.awt.Rectangle;
