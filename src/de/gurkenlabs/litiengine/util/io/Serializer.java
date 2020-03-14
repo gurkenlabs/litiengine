@@ -9,7 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * The Class Serializer.
+ * This class provides serialization an deserialization mechanisms from Object to byte array and vice versa.
  */
 public final class Serializer {
   private static final Logger log = Logger.getLogger(Serializer.class.getName());
@@ -19,11 +19,12 @@ public final class Serializer {
   }
 
   /**
-   * Deserialize.
+   * Deserializes an object from the specified byte array.
    *
    * @param bytes
-   *          the bytes
-   * @return the object
+   *          The byte array
+   * 
+   * @return The deserialized object.
    */
   public static Object deserialize(final byte[] bytes) {
     final ByteArrayInputStream b = new ByteArrayInputStream(bytes);
@@ -39,18 +40,18 @@ public final class Serializer {
   }
 
   /**
-   * Serialize.
+   * Serializes the specified object to a byte array.
    *
-   * @param obj
-   *          the obj
-   * @return the byte[]
+   * @param object
+   *          The object to be serialized.
+   * @return A serialized byte array representing the specified object.
    */
-  public static byte[] serialize(final Object obj) {
+  public static byte[] serialize(final Object object) {
     final ByteArrayOutputStream b = new ByteArrayOutputStream();
     ObjectOutputStream o;
     try {
       o = new ObjectOutputStream(b);
-      o.writeObject(obj);
+      o.writeObject(object);
 
     } catch (final IOException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
