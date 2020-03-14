@@ -11,33 +11,102 @@ import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
 
+/**
+ * The <code>Animation</code> class keeps track of the current keyframe which is used to animate a visual element.
+ * It iterates over all defined keyframes with respect to their duration and provides information
+ * for the related <code>AnimationController</code> which keyframe should currently be rendered.
+ * 
+ * @see IAnimationController#getCurrent()
+ */
 public class Animation implements IUpdateable, ILaunchable {
+  /**
+   * The default frame duration in milliseconds.
+   */
   public static final int DEFAULT_FRAME_DURATION = 120;
   private static final Logger log = Logger.getLogger(Animation.class.getName());
-  private KeyFrame currentFrame;
-  private long elapsedTicks;
-  private KeyFrame firstFrame;
-  private int frameDuration = DEFAULT_FRAME_DURATION;
 
   private final List<KeyFrame> keyframes;
   private final boolean loop;
   private final String name;
-  private boolean paused;
-  private boolean playing;
   private Spritesheet spritesheet;
 
+  private KeyFrame currentFrame;
+  private long lastFrameUpdate;
+  private KeyFrame firstFrame;
+  private int frameDuration = DEFAULT_FRAME_DURATION;
+
+  private boolean paused;
+  private boolean playing;
+
+  /**
+   * Initializes a new instance of the <code>Animation</code> class.
+   * 
+   * @param spriteSheetName
+   *          The name of the spritesheet used by this animation.
+   * @param loop
+   *          A flag indicating whether the animation should be looped or played only once.
+   * 
+   * @param randomizeStart
+   *          A flag indicating whether this animation should choose a random keyframe to start.
+   * 
+   * @param keyFrameDurations
+   *          The duration of each keyframe.
+   */
   public Animation(final String spriteSheetName, final boolean loop, final boolean randomizeStart, final int... keyFrameDurations) {
     this(Resources.spritesheets().get(spriteSheetName), loop, randomizeStart, keyFrameDurations);
   }
 
+  /**
+   * Initializes a new instance of the <code>Animation</code> class.
+   * 
+   * @param spritesheet
+   *          The spritesheet used by this animation.
+   * @param loop
+   *          A flag indicating whether the animation should be looped or played only once.
+   * 
+   * @param randomizeStart
+   *          A flag indicating whether this animation should choose a random keyframe to start.
+   * 
+   * @param keyFrameDurations
+   *          The duration of each keyframe.
+   */
   public Animation(final Spritesheet spritesheet, final boolean loop, final boolean randomizeStart, final int... keyFrameDurations) {
     this(spritesheet.getName(), spritesheet, loop, randomizeStart, keyFrameDurations);
   }
 
+  /**
+   * Initializes a new instance of the <code>Animation</code> class.
+   * 
+   * @param spritesheet
+   *          The spritesheet used by this animation.
+   * @param loop
+   *          A flag indicating whether the animation should be looped or played only once.
+   * 
+   * @param keyFrameDurations
+   *          The duration of each keyframe.
+   */
   public Animation(final Spritesheet spritesheet, final boolean loop, final int... keyFrameDurations) {
     this(spritesheet.getName(), spritesheet, loop, keyFrameDurations);
   }
 
+  /**
+   * Initializes a new instance of the <code>Animation</code> class.
+   * 
+   * @param name
+   *          The name of this animation.
+   * 
+   * @param spritesheet
+   *          The spritesheet used by this animation.
+   * 
+   * @param loop
+   *          A flag indicating whether the animation should be looped or played only once.
+   * 
+   * @param randomizeStart
+   *          A flag indicating whether this animation should choose a random keyframe to start.
+   * 
+   * @param keyFrameDurations
+   *          The duration of each keyframe.
+   */
   public Animation(final String name, final Spritesheet spritesheet, final boolean loop, final boolean randomizeStart, final int... keyFrameDurations) {
     this(name, spritesheet, loop, keyFrameDurations);
 
@@ -46,6 +115,21 @@ public class Animation implements IUpdateable, ILaunchable {
     }
   }
 
+  /**
+   * Initializes a new instance of the <code>Animation</code> class.
+   * 
+   * @param name
+   *          The name of this animation.
+   * 
+   * @param spritesheet
+   *          The spritesheet used by this animation.
+   * 
+   * @param loop
+   *          A flag indicating whether the animation should be looped or played only once.
+   * 
+   * @param keyFrameDurations
+   *          The duration of each keyframe.
+   */
   public Animation(final String name, final Spritesheet spritesheet, final boolean loop, final int... keyFrameDurations) {
     this.name = name;
     this.spritesheet = spritesheet;
@@ -63,14 +147,6 @@ public class Animation implements IUpdateable, ILaunchable {
     }
   }
 
-  public KeyFrame getCurrentKeyFrame() {
-    return this.currentFrame;
-  }
-
-  public List<KeyFrame> getKeyframes() {
-    return this.keyframes;
-  }
-
   /**
    * Gets to aggregated duration of all {@link KeyFrame}s in this animation.
    * 
@@ -85,6 +161,11 @@ public class Animation implements IUpdateable, ILaunchable {
     return duration;
   }
 
+  /**
+   * Gets the name of this animation.
+   * 
+   * @return The name of this animation.
+   */
   public String getName() {
     return this.name;
   }
@@ -101,20 +182,51 @@ public class Animation implements IUpdateable, ILaunchable {
     return this.spritesheet;
   }
 
-  public boolean isLoop() {
+  /**
+   * Gets a value indicating whether this animation intended to loop.
+   * 
+   * @return True if this animation will loop; otherwise false.
+   */
+  public boolean isLooping() {
     return this.loop;
   }
 
+  /**
+   * Gets a value indicating whether this animation is currently paused.
+   * 
+   * @return True if this animation is currently pause; otherwise false.
+   */
   public boolean isPaused() {
     return this.paused;
   }
 
+  /**
+   * Gets a value indicating whether this animation is currently playing.
+   * 
+   * @return True if this animation is currently playing; otherwise false.
+   */
   public boolean isPlaying() {
     return !this.paused && !this.keyframes.isEmpty() && this.playing;
   }
 
+  /**
+   * Pauses the playback of this animation.
+   * 
+   * @see #isPaused()
+   * @see #unpause()
+   */
   public void pause() {
     this.paused = true;
+  }
+
+  /**
+   * Un-pauses the playback of this animation.
+   * 
+   * @see #isPaused()
+   * @see #pause()
+   */
+  public void unpause() {
+    this.paused = false;
   }
 
   /**
@@ -124,7 +236,7 @@ public class Animation implements IUpdateable, ILaunchable {
    * @param frameDuration
    *          The frameduration for all keyframes.
    */
-  public void setFrameDuration(final int frameDuration) {
+  public void setDurationForAllKeyFrames(final int frameDuration) {
     this.frameDuration = frameDuration;
 
     for (final KeyFrame keyFrame : this.getKeyframes()) {
@@ -132,7 +244,18 @@ public class Animation implements IUpdateable, ILaunchable {
     }
   }
 
-  public void setkeyFrameDurations(final int... keyFrameDurations) {
+  /**
+   * Sets the specified durations for the keyframes at the index of the defined arguments.
+   * 
+   * <p>
+   * e.g.: If this animation defines 5 keyframes, the caller of this method can provide 5 individual durations for each
+   * keyframe.
+   * </p>
+   * 
+   * @param keyFrameDurations
+   *          The durations to be set on the keyframes of this animation.
+   */
+  public void setKeyFrameDurations(final int... keyFrameDurations) {
     if (keyFrameDurations.length == 0) {
       return;
     }
@@ -144,7 +267,6 @@ public class Animation implements IUpdateable, ILaunchable {
 
   @Override
   public void start() {
-    this.elapsedTicks = 0;
     this.playing = true;
     if (this.getKeyframes().isEmpty()) {
       return;
@@ -155,13 +277,15 @@ public class Animation implements IUpdateable, ILaunchable {
     Game.loop().attach(this);
   }
 
+  /**
+   * Restarts this animation at its first frame.
+   */
   public void restart() {
     this.currentFrame = this.firstFrame;
   }
 
   @Override
   public void terminate() {
-    this.elapsedTicks = 0;
     this.playing = false;
     if (this.getKeyframes().isEmpty()) {
       return;
@@ -170,21 +294,15 @@ public class Animation implements IUpdateable, ILaunchable {
     this.currentFrame = this.getKeyframes().get(0);
   }
 
-  public void unpause() {
-    this.paused = false;
-  }
-
   @Override
   public void update() {
-    // do nothing if the animation is not playing of the current keyframe is not
-    // finished
-    if (!this.isPlaying() || Game.time().toMilliseconds(++this.elapsedTicks) < this.currentFrame.getDuration()) {
+    // do nothing if the animation is not playing or the current keyframe is not finished
+    if (!this.isPlaying() || Game.time().since(this.lastFrameUpdate) < this.getCurrentKeyFrame().getDuration()) {
       return;
     }
 
-    // if we are not looping and the last keyframe is finished, we terminate the
-    // animation
-    if (!this.isLoop() && this.isLastKeyFrame()) {
+    // if we are not looping and the last keyframe is finished, we terminate the animation
+    if (!this.isLooping() && this.isLastKeyFrame()) {
       this.terminate();
       return;
     }
@@ -192,25 +310,46 @@ public class Animation implements IUpdateable, ILaunchable {
     // make sure, we stay inside the keyframe list
     final int newFrameIndex = (this.getKeyframes().indexOf(this.currentFrame) + 1) % this.getKeyframes().size();
     this.currentFrame = this.getKeyframes().get(newFrameIndex);
-    this.elapsedTicks = 0;
+    this.lastFrameUpdate = Game.loop().getTicks();
   }
 
-  private void initKeyFrames(final int... keyFrames) {
+  KeyFrame getCurrentKeyFrame() {
+    return this.currentFrame;
+  }
+
+  List<KeyFrame> getKeyframes() {
+    return this.keyframes;
+  }
+
+  /**
+   * Initializes the animation key frames by the specified durations.
+   * 
+   * <p>
+   * The amount of keyframes is defined by the available sprites of the assigned <code>Spritesheet</code>. For each
+   * sprite, a new keyframe will be initialized.
+   * </p>
+   * 
+   * <p>
+   * If no custom durations are specified, the {@link #DEFAULT_FRAME_DURATION} will be used for each frame.
+   * </p>
+   * 
+   * @param durations
+   *          The custom durations for each keyframe.
+   */
+  private void initKeyFrames(final int... durations) {
     if (this.getSpritesheet() == null) {
       return;
     }
 
     this.keyframes.clear();
-    int[] keyFrameDurations = keyFrames;
+    int[] keyFrameDurations = durations;
     if (keyFrameDurations.length == 0) {
-      // fallback to use custom keyframe durations if no specific durations are
-      // defined
+      // fallback to use custom keyframe durations if no specific durations are defined
       keyFrameDurations = Resources.spritesheets().getCustomKeyFrameDurations(name);
     }
 
     // if no keyframes are specified, the animation takes in the whole
-    // spritesheet as animation and uses the DEFAULT_FRAME_DURATION for each
-    // keyframe
+    // spritesheet as animation and uses the DEFAULT_FRAME_DURATION for each keyframe
     if (keyFrameDurations.length == 0) {
       for (int i = 0; i < this.getSpritesheet().getTotalNumberOfSprites(); i++) {
         this.keyframes.add(i, new KeyFrame(this.frameDuration, i));

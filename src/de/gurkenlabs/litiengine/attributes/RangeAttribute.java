@@ -12,7 +12,7 @@ public class RangeAttribute<T extends Number> extends Attribute<T> {
   private T maxBaseValue;
 
   /**
-   * Instantiates a new instance of the <code>RangeAttribute</code> class.
+   * Initializes a new instance of the <code>RangeAttribute</code> class.
    *
    * @param maxValue
    *          The max value of this attribute.

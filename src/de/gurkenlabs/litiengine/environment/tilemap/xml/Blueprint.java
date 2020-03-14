@@ -32,14 +32,14 @@ public class Blueprint extends MapObject {
   private boolean keepIds;
 
   /**
-   * Instantiates a new instance of the <code>Blueprint</code> map object.
+   * Initializes a new instance of the <code>Blueprint</code> map object.
    */
   public Blueprint() {
     super();
   }
 
   /**
-   * Instantiates a new instance of the <code>Blueprint</code> map object.
+   * Initializes a new instance of the <code>Blueprint</code> map object.
    *
    * @param name
    *          The name of the blueprint.
@@ -52,7 +52,7 @@ public class Blueprint extends MapObject {
   }
 
   /**
-   * Instantiates a new instance of the <code>Blueprint</code> map object.
+   * Initializes a new instance of the <code>Blueprint</code> map object.
    *
    * @param name
    *          The name of the blueprint.

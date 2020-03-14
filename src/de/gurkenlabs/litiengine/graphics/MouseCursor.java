@@ -51,7 +51,7 @@ public final class MouseCursor implements IRenderable {
   }
 
   /**
-   * Instantiates a new instance of the <code>MouseCursor</code> class.
+   * Initializes a new instance of the <code>MouseCursor</code> class.
    */
   public MouseCursor() {
     this.visible = true;

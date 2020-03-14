@@ -18,7 +18,7 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
   private List<Spawnpoint> spawnpoints;
 
   /**
-   * Instantiates a new instance of the <code>EntitySpawner</code> class.
+   * Initializes a new instance of the <code>EntitySpawner</code> class.
    *
    * @param spawnpoints
    *          The spawnpoints from which this instance will choose from when spawning entities.

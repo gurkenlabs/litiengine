@@ -1,10 +1,13 @@
 package de.gurkenlabs.litiengine.graphics.animation;
 
-public class KeyFrame {
+/**
+ * The <code>Keyframe</code> class defines the relation between a particular sprite index and its animation duration.
+ */
+class KeyFrame {
   private int duration;
   private int sprite;
 
-  public KeyFrame(final int duration, final int sprite) {
+  KeyFrame(final int duration, final int sprite) {
     this.duration = duration;
     this.sprite = sprite;
   }

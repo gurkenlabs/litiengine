@@ -24,7 +24,7 @@ public class Configuration {
   private final String fileName;
 
   /**
-   * Instantiates a new instance of the <code>Configuration</code> class.
+   * Initializes a new instance of the <code>Configuration</code> class.
    *
    * @param configurationGroups
    *          The configuration groups managed by this instance.
@@ -34,7 +34,7 @@ public class Configuration {
   }
 
   /**
-   * Instantiates a new instance of the <code>Configuration</code> class.
+   * Initializes a new instance of the <code>Configuration</code> class.
    *
    * @param fileName
    *          The name of the file from which to load the settings.

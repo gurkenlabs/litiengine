@@ -88,7 +88,7 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
       return;
     }
 
-    if (this.getCurrent() != null && !this.getCurrent().isLoop() && this.getCurrent().isPlaying()) {
+    if (this.getCurrent() != null && !this.getCurrent().isLooping() && this.getCurrent().isPlaying()) {
       return;
     }
 

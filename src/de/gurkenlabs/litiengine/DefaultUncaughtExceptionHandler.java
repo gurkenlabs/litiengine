@@ -31,7 +31,7 @@ public class DefaultUncaughtExceptionHandler implements UncaughtExceptionHandler
   }
 
   /**
-   * Instantiates a new instance of the <code>DefaultUncaughtExceptionHandler</code> class.
+   * Initializes a new instance of the <code>DefaultUncaughtExceptionHandler</code> class.
    *
    * @param exitOnException
    *          A flag indicating whether the game should exit when an unexpected error occurs.

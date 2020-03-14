@@ -16,7 +16,7 @@ public class CreatureShadowImageEffect extends ImageEffect {
   private final Color shadowColor;
 
   /**
-   * Instantiates a new instance of the <code>CreatureShadowImageEffect</code>.
+   * Initializes a new instance of the <code>CreatureShadowImageEffect</code>.
    *
    * @param creature
    *          The creature to which this affect will be applied to.
@@ -26,7 +26,7 @@ public class CreatureShadowImageEffect extends ImageEffect {
   }
 
   /**
-   * Instantiates a new instance of the <code>CreatureShadowImageEffect</code>.
+   * Initializes a new instance of the <code>CreatureShadowImageEffect</code>.
    *
    * @param creature
    *          The creature to which this affect will be applied to.

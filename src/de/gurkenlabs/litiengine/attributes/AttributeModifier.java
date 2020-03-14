@@ -16,7 +16,7 @@ public class AttributeModifier<T extends Number> implements Comparable<Attribute
   private boolean active;
 
   /**
-   * Instantiates a new instance of the <code>AttributeModifier</code> class.
+   * Initializes a new instance of the <code>AttributeModifier</code> class.
    *
    * @param mod
    *          The modification type.

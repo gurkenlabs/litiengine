@@ -31,7 +31,7 @@ public class Attribute<T extends Number> {
   private T baseValue;
 
   /**
-   * Instantiates a new instance of the <code>Attribute</code> class.
+   * Initializes a new instance of the <code>Attribute</code> class.
    *
    * @param initialValue
    *          The initial value

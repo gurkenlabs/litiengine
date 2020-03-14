@@ -9,7 +9,7 @@ public class SoundEffect extends Effect {
   private final Sound[] sounds;
 
   /**
-   * Instantiates a new instance of the <code>SoundEffect</code> class.
+   * Initializes a new instance of the <code>SoundEffect</code> class.
    *
    * @param ability
    *          The ability that performs the effect.

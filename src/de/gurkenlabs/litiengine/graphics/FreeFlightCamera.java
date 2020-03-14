@@ -14,14 +14,14 @@ public class FreeFlightCamera extends Camera implements IUpdateable {
   private double scrollPadding;
 
   /**
-   * Instantiates a new instance of the <code>FreeFlightCamera</code>.
+   * Initializes a new instance of the <code>FreeFlightCamera</code>.
    */
   public FreeFlightCamera() {
     this(0, 0);
   }
 
   /**
-   * Instantiates a new instance of the <code>FreeFlightCamera</code> with the specified initial focus.
+   * Initializes a new instance of the <code>FreeFlightCamera</code> with the specified initial focus.
    *
    * @param x
    *          The x-coordinate of the initial focus of this instance.
@@ -33,7 +33,7 @@ public class FreeFlightCamera extends Camera implements IUpdateable {
   }
 
   /**
-   * Instantiates a new instance of the <code>FreeFlightCamera</code> with the specified initial focus.
+   * Initializes a new instance of the <code>FreeFlightCamera</code> with the specified initial focus.
    *
    *
    * @param focus

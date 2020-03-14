@@ -20,7 +20,7 @@ public class Material extends CustomPropertyProvider {
   private final String name;
 
   /**
-   * Instantiates a new instance of the <code>Material</code> class.
+   * Initializes a new instance of the <code>Material</code> class.
    *
    * @param name
    *          The name of the material.

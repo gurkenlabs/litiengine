@@ -28,7 +28,7 @@ public abstract class ConfigurationGroup {
   private boolean debug;
 
   /**
-   * Instantiates a new instance of the <code>ConfigurationGroup</code> class.
+   * Initializes a new instance of the <code>ConfigurationGroup</code> class.
    */
   protected ConfigurationGroup() {
     final ConfigurationGroupInfo info = this.getClass().getAnnotation(ConfigurationGroupInfo.class);

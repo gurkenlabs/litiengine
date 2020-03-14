@@ -52,7 +52,7 @@ public class GameInfo extends CustomPropertyProvider {
   private String[] developers;
 
   /**
-   * Instantiates a new instance of the <code>GameInfo</code> class.
+   * Initializes a new instance of the <code>GameInfo</code> class.
    */
   public GameInfo() {
     this.company = "gurkenlabs";

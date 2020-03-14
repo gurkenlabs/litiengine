@@ -10,7 +10,7 @@ public class OverlayPixelsImageEffect extends ImageEffect {
   private final Color color;
 
   /**
-   * Instantiates a new instance of the <code>OverlayPixelsImageEffect</code>.
+   * Initializes a new instance of the <code>OverlayPixelsImageEffect</code>.
    *
    * @param ttl
    *          The time to live of this effect.

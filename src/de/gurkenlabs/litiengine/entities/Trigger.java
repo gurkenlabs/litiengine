@@ -115,7 +115,7 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   }
 
   /**
-   * Instantiates a new instance of the <code>Trigger</code> class.
+   * Initializes a new instance of the <code>Trigger</code> class.
    *
    * @param activation
    *          The activation method for this trigger.
