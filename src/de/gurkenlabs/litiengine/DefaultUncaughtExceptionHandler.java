@@ -26,10 +26,6 @@ public class DefaultUncaughtExceptionHandler implements UncaughtExceptionHandler
 
   private boolean exitOnException;
 
-  public DefaultUncaughtExceptionHandler() {
-    this(true);
-  }
-
   /**
    * Initializes a new instance of the <code>DefaultUncaughtExceptionHandler</code> class.
    *

@@ -16,10 +16,10 @@ import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
  * A random number generator instance that provides enhanced functionalities for the java default <code>Random</code> implementation.
  */
 @SuppressWarnings("serial")
-public final class Random extends java.util.Random {
-  private static final String InvalidBoundsError = "min value is > than max value";
+public final class GameRandom extends java.util.Random {
+  private static final String INVALID_BOUNDS_ERROR = "min value is > than max value";
 
-  Random() {
+  GameRandom() {
   }
 
   /**
@@ -208,7 +208,7 @@ public final class Random extends java.util.Random {
     }
 
     if (min > bound) {
-      throw new IllegalArgumentException(InvalidBoundsError);
+      throw new IllegalArgumentException(INVALID_BOUNDS_ERROR);
     }
 
     return min + this.nextLong() * (bound - min);
@@ -248,7 +248,7 @@ public final class Random extends java.util.Random {
     }
 
     if (min > bound) {
-      throw new IllegalArgumentException(InvalidBoundsError);
+      throw new IllegalArgumentException(INVALID_BOUNDS_ERROR);
     }
 
     return min + this.nextDouble() * (bound - min);
@@ -288,7 +288,7 @@ public final class Random extends java.util.Random {
     }
 
     if (min > bound) {
-      throw new IllegalArgumentException(InvalidBoundsError);
+      throw new IllegalArgumentException(INVALID_BOUNDS_ERROR);
     }
 
     return min + this.nextFloat() * (bound - min);
@@ -313,7 +313,7 @@ public final class Random extends java.util.Random {
     }
 
     if (min > bound) {
-      throw new IllegalArgumentException(InvalidBoundsError);
+      throw new IllegalArgumentException(INVALID_BOUNDS_ERROR);
     }
 
     return this.nextInt(bound - min) + min;

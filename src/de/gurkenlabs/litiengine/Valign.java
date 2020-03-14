@@ -25,13 +25,20 @@ public enum Valign {
     this.portion = portion;
   }
 
-  public static Valign get(final String valign) {
-    if (valign == null || valign.isEmpty()) {
+  /**
+   * Gets the vertical align enumeration value for the specified string.
+   * 
+   * @param valignString
+   *          The string representing the enum value.
+   * @return The enum value represented by the specified string or {@link Valign#DOWN} if the specified string is invalid.
+   */
+  public static Valign get(final String valignString) {
+    if (valignString == null || valignString.isEmpty()) {
       return Valign.DOWN;
     }
 
     try {
-      return Valign.valueOf(valign.toUpperCase());
+      return Valign.valueOf(valignString.toUpperCase());
     } catch (final IllegalArgumentException iae) {
       return Valign.DOWN;
     }
@@ -70,6 +77,17 @@ public enum Valign {
     return (int) (height * this.portion);
   }
 
+  /**
+   * Gets the location for the specified object height to be vertically aligned within the bounds of the specified height.
+   * 
+   * @param height
+   *          The height, limiting the vertical alignment.
+   * 
+   * @param objectHeight
+   *          The height of the object for which to calculate the vertically aligned location.
+   * 
+   * @return The y-coordinate for the location of the object with the specified height.
+   */
   public double getLocation(final double height, final double objectHeight) {
     double value = this.getValue(height);
     double location = value - objectHeight / 2.0;

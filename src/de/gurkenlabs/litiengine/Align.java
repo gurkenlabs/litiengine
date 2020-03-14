@@ -27,13 +27,20 @@ public enum Align {
     this.portion = portion;
   }
 
-  public static Align get(final String align) {
-    if (align == null || align.isEmpty()) {
+  /**
+   * Gets the align enumeration value for the specified string.
+   * 
+   * @param alignString
+   *          The string representing the enum value.
+   * @return The enum value represented by the specified string or {@link Align#CENTER} if the specified string is invalid.
+   */
+  public static Align get(final String alignString) {
+    if (alignString == null || alignString.isEmpty()) {
       return Align.CENTER;
     }
 
     try {
-      return Align.valueOf(align.toUpperCase());
+      return Align.valueOf(alignString.toUpperCase());
     } catch (final IllegalArgumentException iae) {
       return Align.CENTER;
     }
@@ -72,6 +79,17 @@ public enum Align {
     return (int) (width * this.portion);
   }
 
+  /**
+   * Gets the location for the specified object height to be horizontally aligned within the bounds of the specified width.
+   * 
+   * @param width
+   *          The width, limiting the horizontal alignment.
+   * 
+   * @param objectWidth
+   *          The width of the object for which to calculate the horizontally aligned location.
+   * 
+   * @return The x-coordinate for the location of the object with the specified width.
+   */
   public double getLocation(final double width, final double objectWidth) {
     double value = this.getValue(width);
     double location = value - objectWidth / 2.0;

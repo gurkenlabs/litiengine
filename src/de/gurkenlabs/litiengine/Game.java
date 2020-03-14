@@ -78,7 +78,7 @@ public final class Game {
   private static final GameMetrics metrics = new GameMetrics();
   private static final GameLog log = new GameLog();
   private static final GameTime gameTime = new GameTime();
-  private static final Random random = new Random();
+  private static final GameRandom random = new GameRandom();
   private static GameInfo gameInfo = new GameInfo();
 
   private static GameLoop gameLoop;
@@ -398,7 +398,7 @@ public final class Game {
    * 
    * @return The game's pseudo random generator.
    */
-  public static Random random() {
+  public static GameRandom random() {
     return random;
   }
 

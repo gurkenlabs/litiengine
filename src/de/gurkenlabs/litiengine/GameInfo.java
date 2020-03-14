@@ -112,7 +112,7 @@ public class GameInfo extends CustomPropertyProvider {
     try {
       return new URL(this.getWebsite());
     } catch (MalformedURLException e) {
-      log.log(Level.WARNING, this.getWebsite() + ": " + e.getMessage(), e);
+      log.log(Level.WARNING, e, () -> this.getWebsite() + ": " + e.getMessage());
       return null;
     }
   }
