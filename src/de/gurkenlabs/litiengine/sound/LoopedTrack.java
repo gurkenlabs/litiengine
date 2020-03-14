@@ -10,12 +10,24 @@ import de.gurkenlabs.litiengine.resources.Resources;
 public class LoopedTrack implements Track, Iterator<Sound> {
   private Sound track;
 
-  public LoopedTrack(String track) {
-    this(Resources.sounds().get(track));
+  /**
+   * Initializes a new <code>LoopedTrack</code> for the specified sound.
+   * 
+   * @param soundName
+   *          The name of the sound to be played by this track.
+   */
+  public LoopedTrack(String soundName) {
+    this(Resources.sounds().get(soundName));
   }
 
-  public LoopedTrack(Sound track) {
-    this.track = Objects.requireNonNull(track);
+  /**
+   * Initializes a new <code>LoopedTrack</code> for the specified sound.
+   * 
+   * @param sound
+   *          The sound to be played by this track.
+   */
+  public LoopedTrack(Sound sound) {
+    this.track = Objects.requireNonNull(sound);
   }
 
   @Override

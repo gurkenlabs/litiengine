@@ -31,10 +31,22 @@ public class SinglePlayTrack implements Track {
     }
   }
 
-  public SinglePlayTrack(String sound) {
-    this(Resources.sounds().get(sound));
+  /**
+   * Initializes a new <code>SinglePlayTrack</code> for the specified sound.
+   * 
+   * @param soundName
+   *          The name of the sound to be played by this track.
+   */
+  public SinglePlayTrack(String soundName) {
+    this(Resources.sounds().get(soundName));
   }
 
+  /**
+   * Initializes a new <code>SinglePlayTrack</code> for the specified sound.
+   * 
+   * @param sound
+   *          The sound to be played by this track.
+   */
   public SinglePlayTrack(Sound sound) {
     this.sound = sound;
   }

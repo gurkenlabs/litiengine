@@ -260,10 +260,21 @@ public abstract class SoundPlayback implements Runnable {
     private VolumeControl() {
     }
 
+    /**
+     * Gets the value of this volume control.
+     * 
+     * @return The value of this control.
+     */
     public float get() {
       return this.value;
     }
 
+    /**
+     * Sets the value of this volume control.
+     * 
+     * @param value
+     *          The value to be set.
+     */
     public void set(float value) {
       if (value < 0f) {
         throw new IllegalArgumentException("negative volume");
