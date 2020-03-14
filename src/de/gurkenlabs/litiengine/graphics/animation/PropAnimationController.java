@@ -22,7 +22,7 @@ public class PropAnimationController<T extends Prop> extends EntityAnimationCont
   }
 
   @Override
-  public BufferedImage getCurrentSprite() {
+  public BufferedImage getCurrentImage() {
     // get shadow from the cache or draw it dynamically and add it to the
     // cache
     // get complete image from the cache
@@ -42,7 +42,7 @@ public class PropAnimationController<T extends Prop> extends EntityAnimationCont
       return opt.get();
     }
 
-    BufferedImage currentImage = super.getCurrentSprite();
+    BufferedImage currentImage = super.getCurrentImage();
     if (currentImage == null) {
       return null;
     }

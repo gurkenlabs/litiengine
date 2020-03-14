@@ -137,7 +137,7 @@ public class AnimationController implements IAnimationController {
   }
 
   @Override
-  public BufferedImage getCurrentSprite() {
+  public BufferedImage getCurrentImage() {
     if (!this.isEnabled()) {
       return null;
     }
@@ -162,8 +162,8 @@ public class AnimationController implements IAnimationController {
   }
 
   @Override
-  public BufferedImage getCurrentSprite(final int width, final int height) {
-    if (this.getCurrentSprite() == null) {
+  public BufferedImage getCurrentImage(final int width, final int height) {
+    if (this.getCurrentImage() == null) {
       return null;
     }
 
@@ -173,7 +173,7 @@ public class AnimationController implements IAnimationController {
       return opt.get();
     }
 
-    return Imaging.scale(this.getCurrentSprite(), width, height);
+    return Imaging.scale(this.getCurrentImage(), width, height);
   }
 
   @Override

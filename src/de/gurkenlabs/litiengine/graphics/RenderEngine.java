@@ -417,7 +417,7 @@ public final class RenderEngine {
    *          The entity to be rendered.
    * 
    * @see IEntity#animations()
-   * @see IAnimationController#getCurrentSprite()
+   * @see IAnimationController#getCurrentImage()
    * @see IRenderable#render(Graphics2D)
    * 
    * @see #canRender(IEntity)
@@ -445,7 +445,7 @@ public final class RenderEngine {
 
     final IEntityAnimationController<?> animationController = entity.animations();
     if (animationController != null) {
-      final BufferedImage img = animationController.getCurrentSprite();
+      final BufferedImage img = animationController.getCurrentImage();
       if (img != null) {
         if (animationController.isAutoScaling()) {
           final double ratioX = entity.getWidth() / img.getWidth();

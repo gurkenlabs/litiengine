@@ -273,7 +273,7 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
       return;
     }
 
-    BufferedImage img = this.controller.getCurrentSprite();
+    BufferedImage img = this.controller.getCurrentImage();
     if (img != null) {
       this.labelAnimationPreview.setIcon(new ImageIcon(img));
     } else {

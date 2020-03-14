@@ -132,7 +132,7 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
     double deltaX = (point.getX() - (point.getX() * scaleX));
     double deltaY = (point.getY() - (point.getY() * scaleY));
 
-    BufferedImage img = this.getCurrentSprite();
+    BufferedImage img = this.getCurrentImage();
     if (img != null) {
       double imgDeltaX = (img.getWidth() - (img.getWidth() * scaleX)) / 2.0;
       double imgDeltaY = (img.getHeight() - (img.getHeight() * scaleY)) / 2.0;
