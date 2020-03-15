@@ -51,6 +51,7 @@ public class UserPreferences extends ConfigurationGroup {
     this.snapToGrid = true;
     this.renderBoundingBoxes = true;
     this.renderNames = true;
+    this.lastGameFile = "";
     this.lastOpenedFiles = new String[10];
     this.compressFile = false;
     this.gridLineWidth = 1.0f;
