@@ -165,12 +165,12 @@ public final class ArrayUtilities {
    *          The delimiter by which to split the elements.
    * @return An double array with all separated elements of the specified string.
    */
-  public static double[] splitDouble(String commaSeperatedString, String delimiter) {
-    if (commaSeperatedString == null || commaSeperatedString.isEmpty()) {
+  public static double[] splitDouble(String delimiterSeparatedString, String delimiter) {
+    if (delimiterSeparatedString == null || delimiterSeparatedString.isEmpty()) {
       return new double[0];
     }
 
-    final String[] split = commaSeperatedString.split(delimiter);
+    final String[] split = delimiterSeparatedString.split(delimiter);
     double[] doubles = new double[split.length];
     if (doubles.length == 0) {
       return doubles;
@@ -366,27 +366,27 @@ public final class ArrayUtilities {
   /**
    * Joins the specified list with the {@link #DEFAULT_STRING_DELIMITER}.
    * 
-   * @param arr
-   *          The array that provides the elements to be joined.
+   * @param collection
+   *          The list that provides the elements to be joined.
    * 
    * @return A string with all joined elements, separated by the delimiter.
    */
-  public static String join(List<?> list) {
-    return joinArray(list.toArray(), DEFAULT_STRING_DELIMITER);
+  public static String join(Collection<?> collection) {
+    return joinArray(collection.toArray(), DEFAULT_STRING_DELIMITER);
   }
 
   /**
    * Joins the specified collection with the defined delimiter.
    * 
-   * @param arr
-   *          The array that provides the elements to be joined.
+   * @param collection
+   *          The list that provides the elements to be joined.
    * @param delimiter
    *          The delimiter used to separate the elements with.
    * 
    * @return A string with all joined elements, separated by the delimiter.
    */
-  public static String join(Collection<?> list, String delimiter) {
-    return joinArray(list.toArray(), delimiter);
+  public static String join(Collection<?> collection, String delimiter) {
+    return joinArray(collection.toArray(), delimiter);
   }
 
   /**
@@ -452,18 +452,18 @@ public final class ArrayUtilities {
    * 
    * @param arr
    *          The array that is tested for the existence of the argument.
-   * @param value
+   * @param argument
    *          The argument to check for in the array.
    * @param ignoreCase
    *          A flag indicating whether the case should be ignored when checking for equality.
    * @return True if the specified argument is in the array; otherwise false.
    */
-  public static boolean contains(String[] args, String argument, boolean ignoreCase) {
-    if (args == null) {
+  public static boolean contains(String[] arr, String argument, boolean ignoreCase) {
+    if (arr == null) {
       return false;
     }
 
-    for (String arg : args) {
+    for (String arg : arr) {
       if (arg != null && !arg.isEmpty() && (ignoreCase && arg.equalsIgnoreCase(argument) || !ignoreCase && arg.equals(argument))) {
         return true;
       }
