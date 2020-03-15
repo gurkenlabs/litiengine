@@ -20,6 +20,14 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
   private String spritePrefix;
   private boolean autoScaling;
 
+  /**
+   * Initializes a new instance of the <code>EntityAnimationController</code> class.
+   * 
+   * @param entity
+   *          The entity related to this animation controller.
+   * 
+   * @see #getEntity()
+   */
   public EntityAnimationController(final T entity) {
     super();
     this.entity = entity;
@@ -29,6 +37,22 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
     }
   }
 
+  /**
+   * Initializes a new instance of the <code>EntityAnimationController</code> class.
+   * 
+   * @param entity
+   *          The entity related to this animation controller.
+   * 
+   * @param defaultAnimation
+   *          The default animation for this controller.
+   * 
+   * @param animations
+   *          Additional animations that are managed by this controller instance.
+   * 
+   * @see #getEntity()
+   * @see #getDefault()
+   * @see #getAll()
+   */
   public EntityAnimationController(final T entity, final Animation defaultAnimation, final Animation... animations) {
     super(defaultAnimation, animations);
     this.entity = entity;
@@ -36,10 +60,30 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
     this.spritePrefix = Game.random().chose(getDefaultSpritePrefixes(entity.getClass()));
   }
 
+  /**
+   * Initializes a new instance of the <code>EntityAnimationController</code> class.
+   * 
+   * @param entity
+   *          The entity related to this animation controller.
+   * 
+   * @param sprite
+   *          The sprite sheet used by the default animation of this controller.
+   */
   public EntityAnimationController(final T entity, final Spritesheet sprite) {
     this(entity, sprite, true);
   }
 
+  /**
+   * Initializes a new instance of the <code>EntityAnimationController</code> class.
+   * 
+   * @param entity
+   *          The entity related to this animation controller.
+   * 
+   * @param sprite
+   *          The sprite sheet used by the default animation of this controller.
+   * @param loop
+   *          A flag indicating whether the default animation should be looped or only played once.
+   */
   public EntityAnimationController(final T entity, final Spritesheet sprite, boolean loop) {
     this(entity, new Animation(sprite, loop, Resources.spritesheets().getCustomKeyFrameDurations(sprite)));
   }
@@ -69,7 +113,7 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
 
     this.animationRules.add(min, new AnimationRule<>(rule, animationName, priority));
   }
-  
+
   @Override
   public void addRule(Predicate<? super T> rule, Function<? super T, String> animationName) {
     this.addRule(rule, animationName, 0);

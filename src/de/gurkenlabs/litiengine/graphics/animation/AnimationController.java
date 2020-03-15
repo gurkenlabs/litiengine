@@ -29,6 +29,9 @@ public class AnimationController implements IAnimationController {
   private final List<ImageEffect> imageEffects;
   private final List<AnimationListener> listeners;
 
+  /**
+   * Initializes a new instance of the <code>AnimationController</code> class.
+   */
   public AnimationController() {
     this.animations = new ConcurrentHashMap<>();
     this.imageEffects = new CopyOnWriteArrayList<>();
@@ -36,11 +39,30 @@ public class AnimationController implements IAnimationController {
     this.enabled = true;
   }
 
+  /**
+   * Initializes a new instance of the <code>AnimationController</code> class with the specified default animation.
+   * 
+   * @param defaultAnimation
+   *          The default animation for this controller.
+   * 
+   * @see #getDefault()
+   */
   public AnimationController(final Animation defaultAnimation) {
     this();
     this.setDefault(defaultAnimation);
   }
 
+  /**
+   * Initializes a new instance of the <code>AnimationController</code> class with the specified default animation.
+   * 
+   * @param defaultAnimation
+   *          The default animation for this controller.
+   * @param animations
+   *          Additional animations that are managed by this controller instance.
+   * 
+   * @see #getDefault()
+   * @see #getAll()
+   */
   public AnimationController(final Animation defaultAnimation, final Animation... animations) {
     this(defaultAnimation);
 
@@ -53,10 +75,25 @@ public class AnimationController implements IAnimationController {
     }
   }
 
+  /**
+   * Initializes a new instance of the <code>AnimationController</code> class with the specified default animation.
+   * 
+   * @param sprite
+   *          The sprite sheet used by the default animation of this controller.
+   */
   public AnimationController(final Spritesheet sprite) {
     this(sprite, true);
   }
 
+  /**
+   * Initializes a new instance of the <code>AnimationController</code> class with the specified default animation.
+   * 
+   * @param sprite
+   *          The sprite sheet used by the default animation of this controller.
+   * 
+   * @param loop
+   *          A flag indicating whether the default animation should be looped or only played once.
+   */
   public AnimationController(final Spritesheet sprite, final boolean loop) {
     this(new Animation(sprite, loop, Resources.spritesheets().getCustomKeyFrameDurations(sprite)));
   }
@@ -87,6 +124,7 @@ public class AnimationController implements IAnimationController {
 
   /**
    * Attach the <code>AnimationController</code>, as well as all its <code>Animation</code>s to the Game loop.
+   * 
    * @see ILoop
    */
   public void attach() {
@@ -103,6 +141,7 @@ public class AnimationController implements IAnimationController {
 
   /**
    * Detach the <code>AnimationController</code>, as well as all its <code>Animation</code>s from the Game loop.
+   * 
    * @see ILoop
    */
   public void detach() {
@@ -318,7 +357,9 @@ public class AnimationController implements IAnimationController {
 
   /**
    * Build a unique cache key for the current frame.
-   * The spritesheet's <code>hashCode</code>, the current keyframe's sprite index, as well as all applied <code>ImageEffect</code>s' names, are considered when determining the current cache key.
+   * The spritesheet's <code>hashCode</code>, the current keyframe's sprite index, as well as all applied <code>ImageEffect</code>s' names, are
+   * considered when determining the current cache key.
+   * 
    * @return the unique cache key for the current key frame
    */
   protected String buildCurrentCacheKey() {
