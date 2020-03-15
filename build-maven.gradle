@@ -15,27 +15,27 @@ repositories {
 }
 
 dependencies {
-  compile 'net.java.jinput:jinput:2.0.9'
-  compile 'net.java.jinput:jinput:2.0.9:natives-all'
-  compile 'com.googlecode.soundlibs:jorbis:0.0.17.4'
-  compile 'com.googlecode.soundlibs:tritonus-share:0.3.7.4'
-  compile 'com.googlecode.soundlibs:vorbisspi:1.0.3.3'
-  compile ('com.googlecode.soundlibs:mp3spi:1.9.5.4'){
+  implementation 'net.java.jinput:jinput:2.0.9'
+  implementation 'net.java.jinput:jinput:2.0.9:natives-all'
+  implementation 'com.googlecode.soundlibs:jorbis:0.0.17.4'
+  implementation 'com.googlecode.soundlibs:tritonus-share:0.3.7.4'
+  implementation 'com.googlecode.soundlibs:vorbisspi:1.0.3.3'
+  implementation ('com.googlecode.soundlibs:mp3spi:1.9.5.4'){
     exclude group:'junit'
   }
 
-  compile 'com.code-disaster.steamworks4j:steamworks4j:1.8.0'
+  implementation 'com.code-disaster.steamworks4j:steamworks4j:1.8.0'
   
   // JAXB modules for JDK 9 or higher
-  compile 'javax.activation:javax.activation-api:1.2.0'
-  compile 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
-  compile 'com.sun.xml.bind:jaxb-core:2.3.0.1'
-  compile 'com.sun.xml.bind:jaxb-impl:2.3.2'
+  implementation 'javax.activation:javax.activation-api:1.2.0'
+  implementation 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
+  implementation 'com.sun.xml.bind:jaxb-core:2.3.0.1'
+  implementation 'com.sun.xml.bind:jaxb-impl:2.3.2'
   
-  testCompile 'org.junit.jupiter:junit-jupiter-api:5.4.1'
-  testCompile 'org.junit.jupiter:junit-jupiter-params:5.4.1'
-  testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.4.1'
-  testCompile 'org.mockito:mockito-core:2.25.1'
+  testImplementation 'org.junit.jupiter:junit-jupiter-api:5.4.1'
+  testImplementation 'org.junit.jupiter:junit-jupiter-params:5.4.1'
+  testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.4.1'
+  testImplementation 'org.mockito:mockito-core:2.25.1'
 }
 
 test {
@@ -44,7 +44,7 @@ test {
 
 jar {
   from {
-    configurations.compile.collect { zipTree it } 
+    configurations.compileClasspath.collect { zipTree it } 
   } 
   
   duplicatesStrategy = DuplicatesStrategy.EXCLUDE
@@ -83,13 +83,13 @@ task createJavadocs(type: Javadoc) {
 task javadocJar(type: Jar) {
   classifier = 'javadoc'
   from javadoc
-  version = 'v0.4.19-alpha'
+  archiveVersion = 'v0.4.19-alpha'
 }
 
 task sourcesJar(type: Jar) {
   classifier = 'sources'
   from sourceSets.main.allSource
-  version = 'v0.4.19-alpha'
+  archiveVersion = 'v0.4.19-alpha'
 }
 
 artifacts {

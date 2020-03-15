@@ -62,7 +62,7 @@ test {
 
 jar {
   from {
-    configurations.runtimeClasspath.collect { zipTree it } 
+    configurations.compileClasspath.collect { zipTree it } 
   } 
   
   duplicatesStrategy = DuplicatesStrategy.EXCLUDE
