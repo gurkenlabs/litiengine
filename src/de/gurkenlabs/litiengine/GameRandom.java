@@ -18,6 +18,7 @@ import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 @SuppressWarnings("serial")
 public final class GameRandom extends java.util.Random {
   private static final String INVALID_BOUNDS_ERROR = "min value is > than max value";
+  private static final String ARRAY_MUST_NOT_BE_EMPTY = "array to chose an element from must not be null or empty.";
 
   GameRandom() {
   }
@@ -47,6 +48,60 @@ public final class GameRandom extends java.util.Random {
   public <T> T chose(T[] array) {
     if (array == null || array.length == 0) {
       return null;
+    }
+
+    return array[this.nextInt(array.length)];
+  }
+
+  /**
+   * Chooses a pseudo-random element from the specified array.
+   * 
+   * @param array
+   *          The array to choose from.
+   * @return A pseudo-random element from the array or 0 if the array is empty.
+   * 
+   * @throws IllegalArgumentException
+   *           When the specified array is null or empty.
+   */
+  public int chose(int[] array) {
+    if (array == null || array.length == 0) {
+      throw new IllegalArgumentException(ARRAY_MUST_NOT_BE_EMPTY);
+    }
+
+    return array[this.nextInt(array.length)];
+  }
+
+  /**
+   * Chooses a pseudo-random element from the specified array.
+   * 
+   * @param array
+   *          The array to choose from.
+   * @return A pseudo-random element from the array or 0 if the array is empty.
+   * 
+   * @throws IllegalArgumentException
+   *           When the specified array is null or empty.
+   */
+  public long chose(long[] array) {
+    if (array == null || array.length == 0) {
+      throw new IllegalArgumentException(ARRAY_MUST_NOT_BE_EMPTY);
+    }
+
+    return array[this.nextInt(array.length)];
+  }
+
+  /**
+   * Chooses a pseudo-random element from the specified array.
+   * 
+   * @param array
+   *          The array to choose from.
+   * @return A pseudo-random element from the array or 0 if the array is empty.
+   * 
+   * @throws IllegalArgumentException
+   *           When the specified array is null or empty.
+   */
+  public double chose(double[] array) {
+    if (array == null || array.length == 0) {
+      throw new IllegalArgumentException(ARRAY_MUST_NOT_BE_EMPTY);
     }
 
     return array[this.nextInt(array.length)];
@@ -88,6 +143,51 @@ public final class GameRandom extends java.util.Random {
     for (int i = 0; i < array.length; i++) {
       int randomPosition = this.nextInt(array.length);
       T temp = array[i];
+      array[i] = array[randomPosition];
+      array[randomPosition] = temp;
+    }
+  }
+
+  /**
+   * Shuffles the elements in the specified array.
+   * 
+   * @param array
+   *          The array to be shuffled.
+   */
+  public void shuffle(int[] array) {
+    for (int i = 0; i < array.length; i++) {
+      int randomPosition = this.nextInt(array.length);
+      int temp = array[i];
+      array[i] = array[randomPosition];
+      array[randomPosition] = temp;
+    }
+  }
+
+  /**
+   * Shuffles the elements in the specified array.
+   * 
+   * @param array
+   *          The array to be shuffled.
+   */
+  public void shuffle(long[] array) {
+    for (int i = 0; i < array.length; i++) {
+      int randomPosition = this.nextInt(array.length);
+      long temp = array[i];
+      array[i] = array[randomPosition];
+      array[randomPosition] = temp;
+    }
+  }
+
+  /**
+   * Shuffles the elements in the specified array.
+   * 
+   * @param array
+   *          The array to be shuffled.
+   */
+  public void shuffle(double[] array) {
+    for (int i = 0; i < array.length; i++) {
+      int randomPosition = this.nextInt(array.length);
+      double temp = array[i];
       array[i] = array[randomPosition];
       array[randomPosition] = temp;
     }
