@@ -343,7 +343,7 @@ public class EmitterData implements Serializable, Resource {
 
   @XmlTransient
   public double[] getColorProbabilities() {
-    return ArrayUtilities.getDoubleArray(this.colorProbabilities);
+    return ArrayUtilities.splitDouble(this.colorProbabilities);
   }
 
   public void setColorProbabilities(double[] colorProbabilities) {

@@ -78,11 +78,11 @@ public class RandomTests {
 
     Integer[] testWrapper = new Integer[] { 1, 2, 3 };
 
-    int chosenInt = Game.random().chose(testInt);
-    long chosenLong = Game.random().chose(testLong);
-    double chosenDouble = Game.random().chose(testDouble);
+    int chosenInt = Game.random().choose(testInt);
+    long chosenLong = Game.random().choose(testLong);
+    double chosenDouble = Game.random().choose(testDouble);
 
-    Integer chosenWrapper = Game.random().chose(testWrapper);
+    Integer chosenWrapper = Game.random().choose(testWrapper);
 
     assertTrue(Arrays.stream(testInt).anyMatch(x -> x == chosenInt));
     assertTrue(Arrays.stream(testLong).anyMatch(x -> x == chosenLong));
@@ -95,7 +95,7 @@ public class RandomTests {
 
     List<Integer> list = Arrays.asList(1, 2, 3, 4, 5, 6);
 
-    Integer chosenInt = Game.random().chose(list);
+    Integer chosenInt = Game.random().choose(list);
     assertTrue(list.contains(chosenInt));
   }
 

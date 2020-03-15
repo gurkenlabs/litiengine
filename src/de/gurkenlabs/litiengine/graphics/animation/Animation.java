@@ -111,7 +111,7 @@ public class Animation implements IUpdateable, ILaunchable {
     this(name, spritesheet, loop, keyFrameDurations);
 
     if (randomizeStart && !this.keyframes.isEmpty()) {
-      this.firstFrame = Game.random().chose(this.getKeyframes());
+      this.firstFrame = Game.random().choose(this.getKeyframes());
     }
   }
 

@@ -110,7 +110,7 @@ public class TextList extends JPanel {
 
   public void setJoinedString(String rows) {
     this.model.setRowCount(0);
-    for (int target : ArrayUtilities.getIntegerArray(rows)) {
+    for (int target : ArrayUtilities.splitInt(rows)) {
       this.model.addRow(new Object[] { target });
     }
   }

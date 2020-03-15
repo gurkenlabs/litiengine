@@ -21,7 +21,7 @@ public class ArrayUtilitiesTests {
     byte[] arr1 = new byte[] { 1, 2, 3, 4, 5 };
     byte[] arr2 = new byte[] { 6, 7, 8, 9 };
 
-    byte[] arr3 = ArrayUtilities.arrayConcat(arr1, arr2);
+    byte[] arr3 = ArrayUtilities.concat(arr1, arr2);
 
     assertArrayEquals(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 }, arr3);
   }
@@ -33,10 +33,10 @@ public class ArrayUtilitiesTests {
     String testNull = null;
     String testEmpty = "";
 
-    int[] intsFromString = ArrayUtilities.getIntegerArray(testStringWithInts);
-    int[] stringWithoutInts = ArrayUtilities.getIntegerArray(testStringWithoutInts);
-    int[] nullString = ArrayUtilities.getIntegerArray(testNull);
-    int[] emptyString = ArrayUtilities.getIntegerArray(testEmpty);
+    int[] intsFromString = ArrayUtilities.splitInt(testStringWithInts);
+    int[] stringWithoutInts = ArrayUtilities.splitInt(testStringWithoutInts);
+    int[] nullString = ArrayUtilities.splitInt(testNull);
+    int[] emptyString = ArrayUtilities.splitInt(testEmpty);
 
     assertArrayEquals(new int[] { 100, 200, 300, 1, 2, 3 }, intsFromString);
     assertArrayEquals(new int[] { 0, 0, 0 }, stringWithoutInts);

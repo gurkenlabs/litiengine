@@ -3,36 +3,128 @@ package de.gurkenlabs.litiengine.util;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.gurkenlabs.litiengine.Game;
-
 public final class ArrayUtilities {
+  public static final String DEFAULT_STRING_DELIMITER = ",";
   private static final Logger log = Logger.getLogger(ArrayUtilities.class.getName());
 
   private ArrayUtilities() {
     throw new UnsupportedOperationException();
   }
 
-  public static byte[] arrayConcat(final byte[] firstArray, final byte[] secondArray) {
-    final int aLen = firstArray.length;
-    final int bLen = secondArray.length;
-    final byte[] combinedArray = new byte[aLen + bLen];
-    System.arraycopy(firstArray, 0, combinedArray, 0, aLen);
-    System.arraycopy(secondArray, 0, combinedArray, aLen, bLen);
-    return combinedArray;
+  /**
+   * Concatenates the two specified byte arrays to a new array.
+   * 
+   * @param first
+   *          The first array.
+   * @param second
+   *          The second array.
+   * 
+   * @return A new array with both specified arrays in sequence.
+   */
+  public static byte[] concat(byte[] first, byte[] second) {
+    byte[] result = Arrays.copyOf(first, first.length + second.length);
+    System.arraycopy(second, 0, result, first.length, second.length);
+    return result;
   }
 
-  public static int[] getIntegerArray(String commaSeperatedString) {
-    if (commaSeperatedString == null || commaSeperatedString.isEmpty()) {
+  /**
+   * Concatenates the two specified int arrays to a new array.
+   * 
+   * @param first
+   *          The first array.
+   * @param second
+   *          The second array.
+   * 
+   * @return A new array with both specified arrays in sequence.
+   */
+  public static int[] concat(int[] first, int[] second) {
+    int[] result = Arrays.copyOf(first, first.length + second.length);
+    System.arraycopy(second, 0, result, first.length, second.length);
+    return result;
+  }
+
+  /**
+   * Concatenates the two specified long arrays to a new array.
+   * 
+   * @param first
+   *          The first array.
+   * @param second
+   *          The second array.
+   * 
+   * @return A new array with both specified arrays in sequence.
+   */
+  public static long[] concat(long[] first, long[] second) {
+    long[] result = Arrays.copyOf(first, first.length + second.length);
+    System.arraycopy(second, 0, result, first.length, second.length);
+    return result;
+  }
+
+  /**
+   * Concatenates the two specified double arrays to a new array.
+   * 
+   * @param first
+   *          The first array.
+   * @param second
+   *          The second array.
+   * 
+   * @return A new array with both specified arrays in sequence.
+   */
+  public static double[] concat(double[] first, double[] second) {
+    double[] result = Arrays.copyOf(first, first.length + second.length);
+    System.arraycopy(second, 0, result, first.length, second.length);
+    return result;
+  }
+
+  /**
+   * Concatenates the two specified double arrays to a new array.
+   * 
+   * @param <T>
+   *          The type of the array elements.
+   * @param first
+   *          The first array.
+   * @param second
+   *          The second array.
+   * @return A new array with both specified arrays in sequence.
+   */
+  public static <T> T[] concat(T[] first, T[] second) {
+    T[] result = Arrays.copyOf(first, first.length + second.length);
+    System.arraycopy(second, 0, result, first.length, second.length);
+    return result;
+  }
+
+  /**
+   * Splits the specified string by the {@link #DEFAULT_STRING_DELIMITER} into an int array.
+   * 
+   * @param delimiterSeparatedString
+   *          The string to split.
+   * @return An int array with all separated elements of the specified string.
+   */
+  public static int[] splitInt(String delimiterSeparatedString) {
+    return splitInt(delimiterSeparatedString, DEFAULT_STRING_DELIMITER);
+  }
+
+  /**
+   * Splits the specified string by the defined delimiter into an int array.
+   * 
+   * @param delimiterSeparatedString
+   *          The string to split.
+   * @param delimiter
+   *          The delimiter by which to split the elements.
+   * @return An int array with all separated elements of the specified string.
+   */
+  public static int[] splitInt(String delimiterSeparatedString, String delimiter) {
+    if (delimiterSeparatedString == null || delimiterSeparatedString.isEmpty()) {
       return new int[0];
     }
 
-    final String[] split = commaSeperatedString.split(",");
+    final String[] split = delimiterSeparatedString.split(delimiter);
     int[] integers = new int[split.length];
     if (integers.length == 0) {
       return integers;
@@ -53,12 +145,32 @@ public final class ArrayUtilities {
     return integers;
   }
 
-  public static double[] getDoubleArray(String commaSeperatedString) {
+  /**
+   * Splits the specified string by the {@link #DEFAULT_STRING_DELIMITER} into a double array.
+   * 
+   * @param delimiterSeparatedString
+   *          The string to split.
+   * @return An double array with all separated elements of the specified string.
+   */
+  public static double[] splitDouble(String delimiterSeparatedString) {
+    return splitDouble(delimiterSeparatedString, DEFAULT_STRING_DELIMITER);
+  }
+
+  /**
+   * Splits the specified string by the defined delimiter into a double array.
+   * 
+   * @param delimiterSeparatedString
+   *          The string to split.
+   * @param delimiter
+   *          The delimiter by which to split the elements.
+   * @return An double array with all separated elements of the specified string.
+   */
+  public static double[] splitDouble(String commaSeperatedString, String delimiter) {
     if (commaSeperatedString == null || commaSeperatedString.isEmpty()) {
       return new double[0];
     }
 
-    final String[] split = commaSeperatedString.split(",");
+    final String[] split = commaSeperatedString.split(delimiter);
     double[] doubles = new double[split.length];
     if (doubles.length == 0) {
       return doubles;
@@ -79,76 +191,228 @@ public final class ArrayUtilities {
     return doubles;
   }
 
+  /**
+   * Joins the specified array with the {@link #DEFAULT_STRING_DELIMITER}.
+   * 
+   * @param arr
+   *          The array that provides the elements to be joined.
+   * 
+   * @return A string with all joined elements, separated by the delimiter.
+   */
   public static String join(boolean[] arr) {
-    return joinArray(arr, ",");
+    return joinArray(arr, DEFAULT_STRING_DELIMITER);
   }
 
-  public static String join(boolean[] arr, String separator) {
-    return joinArray(arr, separator);
+  /**
+   * Joins the specified array with the defined delimiter.
+   * 
+   * @param arr
+   *          The array that provides the elements to be joined.
+   * @param delimiter
+   *          The delimiter used to separate the elements with.
+   * 
+   * @return A string with all joined elements, separated by the delimiter.
+   */
+  public static String join(boolean[] arr, String delimiter) {
+    return joinArray(arr, delimiter);
   }
 
+  /**
+   * Joins the specified array with the {@link #DEFAULT_STRING_DELIMITER}.
+   * 
+   * @param arr
+   *          The array that provides the elements to be joined.
+   * 
+   * @return A string with all joined elements, separated by the delimiter.
+   */
   public static String join(int[] arr) {
-    return joinArray(arr, ",");
+    return joinArray(arr, DEFAULT_STRING_DELIMITER);
   }
 
-  public static String join(int[] arr, String separator) {
-    return joinArray(arr, separator);
+  /**
+   * Joins the specified array with the defined delimiter.
+   * 
+   * @param arr
+   *          The array that provides the elements to be joined.
+   * @param delimiter
+   *          The delimiter used to separate the elements with.
+   * 
+   * @return A string with all joined elements, separated by the delimiter.
+   */
+  public static String join(int[] arr, String delimiter) {
+    return joinArray(arr, delimiter);
   }
 
+  /**
+   * Joins the specified array with the {@link #DEFAULT_STRING_DELIMITER}.
+   * 
+   * @param arr
+   *          The array that provides the elements to be joined.
+   * 
+   * @return A string with all joined elements, separated by the delimiter.
+   */
   public static String join(double[] arr) {
-    return joinArray(arr, ",");
+    return joinArray(arr, DEFAULT_STRING_DELIMITER);
   }
 
-  public static String join(double[] arr, String separator) {
-    return joinArray(arr, separator);
+  /**
+   * Joins the specified array with the defined delimiter.
+   * 
+   * @param arr
+   *          The array that provides the elements to be joined.
+   * @param delimiter
+   *          The delimiter used to separate the elements with.
+   * 
+   * @return A string with all joined elements, separated by the delimiter.
+   */
+  public static String join(double[] arr, String delimiter) {
+    return joinArray(arr, delimiter);
   }
 
+  /**
+   * Joins the specified array with the {@link #DEFAULT_STRING_DELIMITER}.
+   * 
+   * @param arr
+   *          The array that provides the elements to be joined.
+   * 
+   * @return A string with all joined elements, separated by the delimiter.
+   */
   public static String join(float[] arr) {
-    return joinArray(arr, ",");
+    return joinArray(arr, DEFAULT_STRING_DELIMITER);
   }
 
-  public static String join(float[] arr, String separator) {
-    return joinArray(arr, separator);
+  /**
+   * Joins the specified array with the defined delimiter.
+   * 
+   * @param arr
+   *          The array that provides the elements to be joined.
+   * @param delimiter
+   *          The delimiter used to separate the elements with.
+   * 
+   * @return A string with all joined elements, separated by the delimiter.
+   */
+  public static String join(float[] arr, String delimiter) {
+    return joinArray(arr, delimiter);
   }
 
+  /**
+   * Joins the specified array with the {@link #DEFAULT_STRING_DELIMITER}.
+   * 
+   * @param arr
+   *          The array that provides the elements to be joined.
+   * 
+   * @return A string with all joined elements, separated by the delimiter.
+   */
   public static String join(short[] arr) {
-    return joinArray(arr, ",");
+    return joinArray(arr, DEFAULT_STRING_DELIMITER);
   }
 
-  public static String join(short[] arr, String separator) {
-    return joinArray(arr, separator);
+  public static String join(short[] arr, String delimiter) {
+    return joinArray(arr, delimiter);
   }
 
+  /**
+   * Joins the specified array with the {@link #DEFAULT_STRING_DELIMITER}.
+   * 
+   * @param arr
+   *          The array that provides the elements to be joined.
+   * 
+   * @return A string with all joined elements, separated by the delimiter.
+   */
   public static String join(long[] arr) {
-    return join(arr, ",");
+    return join(arr, DEFAULT_STRING_DELIMITER);
   }
 
-  public static String join(long[] arr, String separator) {
-    return joinArray(arr, separator);
+  /**
+   * Joins the specified array with the defined delimiter.
+   * 
+   * @param arr
+   *          The array that provides the elements to be joined.
+   * @param delimiter
+   *          The delimiter used to separate the elements with.
+   * 
+   * @return A string with all joined elements, separated by the delimiter.
+   */
+  public static String join(long[] arr, String delimiter) {
+    return joinArray(arr, delimiter);
   }
 
+  /**
+   * Joins the specified array with the {@link #DEFAULT_STRING_DELIMITER}.
+   * 
+   * @param arr
+   *          The array that provides the elements to be joined.
+   * 
+   * @return A string with all joined elements, separated by the delimiter.
+   */
   public static String join(byte[] arr) {
-    return join(arr, ",");
+    return join(arr, DEFAULT_STRING_DELIMITER);
   }
 
-  public static String join(byte[] arr, String separator) {
-    return joinArray(arr, separator);
+  /**
+   * Joins the specified array with the defined delimiter.
+   * 
+   * @param arr
+   *          The array that provides the elements to be joined.
+   * @param delimiter
+   *          The delimiter used to separate the elements with.
+   * 
+   * @return A string with all joined elements, separated by the delimiter.
+   */
+  public static String join(byte[] arr, String delimiter) {
+    return joinArray(arr, delimiter);
   }
 
+  /**
+   * Joins the specified list with the {@link #DEFAULT_STRING_DELIMITER}.
+   * 
+   * @param arr
+   *          The array that provides the elements to be joined.
+   * 
+   * @return A string with all joined elements, separated by the delimiter.
+   */
   public static String join(List<?> list) {
-    return joinArray(list.toArray(), ",");
+    return joinArray(list.toArray(), DEFAULT_STRING_DELIMITER);
   }
 
-  public static String join(List<?> list, String separator) {
-    return joinArray(list.toArray(), separator);
+  /**
+   * Joins the specified collection with the defined delimiter.
+   * 
+   * @param arr
+   *          The array that provides the elements to be joined.
+   * @param delimiter
+   *          The delimiter used to separate the elements with.
+   * 
+   * @return A string with all joined elements, separated by the delimiter.
+   */
+  public static String join(Collection<?> list, String delimiter) {
+    return joinArray(list.toArray(), delimiter);
   }
 
+  /**
+   * Joins the specified array with the {@link #DEFAULT_STRING_DELIMITER}.
+   * 
+   * @param arr
+   *          The array that provides the elements to be joined.
+   * 
+   * @return A string with all joined elements, separated by the delimiter.
+   */
   public static String join(Object[] arr) {
-    return joinArray(arr, ",");
+    return joinArray(arr, DEFAULT_STRING_DELIMITER);
   }
 
-  public static String join(Object[] arr, String separator) {
-    return joinArray(arr, separator);
+  /**
+   * Joins the specified array with the defined delimiter.
+   * 
+   * @param arr
+   *          The array that provides the elements to be joined.
+   * @param delimiter
+   *          The delimiter used to separate the elements with.
+   * 
+   * @return A string with all joined elements, separated by the delimiter.
+   */
+  public static String join(Object[] arr, String delimiter) {
+    return joinArray(arr, delimiter);
   }
 
   public static <T> List<T> toList(T[][] arr) {
@@ -160,12 +424,21 @@ public final class ArrayUtilities {
     return list;
   }
 
+  /**
+   * Return true if the array contains the specified value.
+   * 
+   * @param arr
+   *          The array that is tested for the existence of the element.
+   * @param value
+   *          The element to check for in the array.
+   * @return True if the specified element is in the array; otherwise false.
+   */
   public static boolean contains(Object[] arr, Object value) {
-    if (value == null) {
-      return false;
-    }
-
     for (Object v : arr) {
+      if (value == null && v == null) {
+        return true;
+      }
+
       if (v != null && v.equals(value)) {
         return true;
       }
@@ -174,14 +447,24 @@ public final class ArrayUtilities {
     return false;
   }
 
-  public static boolean containsArgument(String[] args, String argument) {
-    if (args == null || args.length == 0) {
+  /**
+   * Return true if the array contains the specified string argument.
+   * 
+   * @param arr
+   *          The array that is tested for the existence of the argument.
+   * @param value
+   *          The argument to check for in the array.
+   * @param ignoreCase
+   *          A flag indicating whether the case should be ignored when checking for equality.
+   * @return True if the specified argument is in the array; otherwise false.
+   */
+  public static boolean contains(String[] args, String argument, boolean ignoreCase) {
+    if (args == null) {
       return false;
     }
 
-    for (int i = 0; i < args.length; i++) {
-      final String a = args[i];
-      if (a != null && !a.isEmpty() && a.equalsIgnoreCase(argument)) {
+    for (String arg : args) {
+      if (arg != null && !arg.isEmpty() && (ignoreCase && arg.equalsIgnoreCase(argument) || !ignoreCase && arg.equals(argument))) {
         return true;
       }
     }
@@ -254,21 +537,6 @@ public final class ArrayUtilities {
     hash.addAll(secondList);
 
     return hash.toArray((T[]) Array.newInstance(first.getClass().getComponentType(), hash.size()));
-  }
-
-  /**
-   * Shuffles the elements in the specified array randomly.
-   * 
-   * @param arr
-   *          The array to shuffle.
-   */
-  public static void shuffle(Object[] arr) {
-    for (int i = arr.length - 1; i > 0; i--) {
-      int swap = Game.random().nextInt(i + 1);
-      Object temp = arr[i];
-      arr[i] = arr[swap];
-      arr[swap] = temp;
-    }
   }
 
   public static int[] toIntegerArray(List<Integer> intList) {

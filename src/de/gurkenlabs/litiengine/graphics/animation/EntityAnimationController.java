@@ -33,7 +33,7 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
     this.entity = entity;
 
     if (entity != null) {
-      this.spritePrefix = Game.random().chose(getDefaultSpritePrefixes(entity.getClass()));
+      this.spritePrefix = Game.random().choose(getDefaultSpritePrefixes(entity.getClass()));
     }
   }
 
@@ -57,7 +57,7 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
     super(defaultAnimation, animations);
     this.entity = entity;
 
-    this.spritePrefix = Game.random().chose(getDefaultSpritePrefixes(entity.getClass()));
+    this.spritePrefix = Game.random().choose(getDefaultSpritePrefixes(entity.getClass()));
   }
 
   /**

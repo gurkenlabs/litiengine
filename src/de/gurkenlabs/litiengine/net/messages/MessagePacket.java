@@ -92,7 +92,7 @@ public class MessagePacket<T> extends Packet {
     final byte[] header = new byte[] { this.getPacketId() };
     final byte[] serializedObject = Serializer.serialize(this.object);
     final byte[] objectSize = ByteBuffer.allocate(CONTENTLENGTHBYTECOUNT).putInt(serializedObject.length).array();
-    byte[] data = ArrayUtilities.arrayConcat(header, ArrayUtilities.arrayConcat(objectSize, serializedObject));
+    byte[] data = ArrayUtilities.concat(header, ArrayUtilities.concat(objectSize, serializedObject));
     data = CompressionUtilities.compress(data);
     this.setData(data);
     return data;

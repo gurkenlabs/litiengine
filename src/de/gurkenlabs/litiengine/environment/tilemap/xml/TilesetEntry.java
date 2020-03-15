@@ -114,7 +114,7 @@ public class TilesetEntry extends CustomPropertyProvider implements ITilesetEntr
       return terrainIds;
     }
 
-    int[] ids = ArrayUtilities.getIntegerArray(this.terrain);
+    int[] ids = ArrayUtilities.splitInt(this.terrain);
     if (ids.length != 4) {
       return terrainIds;
     } else {

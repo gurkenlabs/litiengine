@@ -45,7 +45,7 @@ public class TriggerMapObjectLoader extends MapObjectLoader {
   protected void loadTargets(IMapObject mapObject, Trigger trigger) {
     final String targets = mapObject.getStringValue(MapObjectProperty.TRIGGER_TARGETS);
 
-    for (final int target : ArrayUtilities.getIntegerArray(targets)) {
+    for (final int target : ArrayUtilities.splitInt(targets)) {
       if (target != 0) {
         trigger.addTarget(target);
       }
@@ -55,7 +55,7 @@ public class TriggerMapObjectLoader extends MapObjectLoader {
   protected void loadActivators(IMapObject mapObject, Trigger trigger) {
     final String activators = mapObject.getStringValue(MapObjectProperty.TRIGGER_ACTIVATORS);
 
-    for (final int activator : ArrayUtilities.getIntegerArray(activators)) {
+    for (final int activator : ArrayUtilities.splitInt(activators)) {
       if (activator != 0) {
         trigger.addActivator(activator);
       }

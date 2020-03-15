@@ -178,7 +178,7 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
         return this.randomDeathSprite;
       }
 
-      String randomDeathAnim = Game.random().chose(this.customDeathAnimations);
+      String randomDeathAnim = Game.random().choose(this.customDeathAnimations);
       if (randomDeathAnim != null && !randomDeathAnim.isEmpty()) {
         String randomDeathAnmimation = this.getSpritePrefix() + "-" + randomDeathAnim;
         if (this.hasAnimation(randomDeathAnmimation)) {

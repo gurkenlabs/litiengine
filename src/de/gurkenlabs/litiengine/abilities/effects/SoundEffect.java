@@ -36,6 +36,6 @@ public class SoundEffect extends Effect {
       return null;
     }
 
-    return Game.random().chose(this.sounds);
+    return Game.random().choose(this.sounds);
   }
 }

@@ -81,7 +81,7 @@ public class SpritesheetResource extends NamedResource implements Serializable {
       return new int[0];
     }
 
-    return ArrayUtilities.getIntegerArray(this.keyframes);
+    return ArrayUtilities.splitInt(this.keyframes);
   }
 
   public void setHeight(final int h) {

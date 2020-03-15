@@ -663,11 +663,11 @@ public final class Game {
       return;
     }
 
-    if (ArrayUtilities.containsArgument(args, COMMADLINE_ARG_RELEASE)) {
+    if (ArrayUtilities.contains(args, COMMADLINE_ARG_RELEASE, true)) {
       allowDebug(false);
     }
 
-    if (ArrayUtilities.containsArgument(args, COMMADLINE_ARG_NOGUI)) {
+    if (ArrayUtilities.contains(args, COMMADLINE_ARG_NOGUI, true)) {
       hideGUI(true);
     }
   }
