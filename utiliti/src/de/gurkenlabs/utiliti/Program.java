@@ -42,9 +42,9 @@ public class Program {
     // the command line arguments
     handleArgs(args);
     
-    String gameFile = Editor.preferences().getLastGameFile().trim();
+    String gameFile = Editor.preferences().getLastGameFile();
     if (!Editor.instance().fileLoaded() && gameFile != null && !gameFile.isEmpty()) {
-      Editor.instance().load(new File(gameFile), false);
+      Editor.instance().load(new File(gameFile.trim()), false);
     }
   }
 
