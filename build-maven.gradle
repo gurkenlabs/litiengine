@@ -1,5 +1,5 @@
-apply plugin: 'java'
-apply plugin: 'maven'
+apply plugin: 'java-library'
+apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
 sourceSets {
@@ -11,7 +11,7 @@ sourceSets {
 }
 
 repositories {
-   mavenCentral()
+  mavenCentral()
 }
 
 dependencies {
@@ -20,7 +20,7 @@ dependencies {
   implementation 'com.googlecode.soundlibs:jorbis:0.0.17.4'
   implementation 'com.googlecode.soundlibs:tritonus-share:0.3.7.4'
   implementation 'com.googlecode.soundlibs:vorbisspi:1.0.3.3'
-  implementation ('com.googlecode.soundlibs:mp3spi:1.9.5.4'){
+  implementation ('com.googlecode.soundlibs:mp3spi:1.9.5.4') {
     exclude group:'junit'
   }
 
@@ -60,10 +60,15 @@ jar {
 
 javadoc {
   options.encoding = 'UTF-8'
+  
+  if(JavaVersion.current().isJava9Compatible()) {
+    options.addBooleanOption('html5', true)
+  }
 }
 
-signing {
-  sign configurations.archives
+java {
+  withJavadocJar()
+  withSourcesJar()
 }
 
 task copyNativeLibs(type: Copy) {
@@ -80,22 +85,6 @@ task createJavadocs(type: Javadoc) {
   dependsOn build
 }
 
-task javadocJar(type: Jar) {
-  classifier = 'javadoc'
-  from javadoc
-  archiveVersion = 'v0.4.19-alpha'
-}
-
-task sourcesJar(type: Jar) {
-  classifier = 'sources'
-  from sourceSets.main.allSource
-  archiveVersion = 'v0.4.19-alpha'
-}
-
-artifacts {
-  archives javadocJar, sourcesJar
-}
-
 tasks.withType(JavaCompile) {
   options.encoding = 'UTF-8'
   dependsOn copyNativeLibs
@@ -105,52 +94,59 @@ group = "de.gurkenlabs"
 archivesBaseName = "litiengine"
 version = "0.4.19"
 
-uploadArchives {
-  repositories {
-    mavenDeployer {
-      beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-      repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-        authentication(userName: ossrhUsername, password: ossrhPassword)
-      }
-
-      snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-        authentication(userName: ossrhUsername, password: ossrhPassword)
-      }
-
-      pom.project {
-        name 'litiengine'
-        packaging 'jar'
-        // optionally artifactId can be defined here 
-        description 'LITIengine is the pure 2D free java game engine. Written in plain Java 8 it provides all the infrastructure to create a 2D tile based java game, be it a platformer or a top-down adventure.'
-        url 'http://litiengine.com'
+publishing {
+  publications {
+    mavenJava(MavenPublication) {
+      artifactId = 'litiengine'
+      from components.java
+      pom {
+        name = 'litiengine'
+        packaging = 'jar'
+        description = 'LITIengine is the pure 2D free java game engine. Written in plain Java 8 it provides all the infrastructure to create a 2D tile based java game, be it a platformer or a top-down adventure.'
+        url = 'http://litiengine.com'
 
         scm {
-          connection 'scm:git:git://github.com/gurkenlabs/litiengine.git'
-          developerConnection 'scm:git:git@github.com:gurkenlabs/litiengine.git'
-          url 'https://github.com/gurkenlabs/litiengine/'
+          connection = 'scm:git:git://github.com/gurkenlabs/litiengine.git'
+          developerConnection = 'scm:git:git@github.com:gurkenlabs/litiengine.git'
+          url = 'https://github.com/gurkenlabs/litiengine/'
         }
 
         licenses {
           license {
-            name 'MIT License'
-            url 'https://github.com/gurkenlabs/litiengine/blob/master/LICENSE'
+            name = 'MIT License'
+            url = 'https://github.com/gurkenlabs/litiengine/blob/master/LICENSE'
           }
         }
 
         developers {
           developer {
-            id 'steffen'
-            name 'Steffen Wilke'
-            email 'steffen@gurkenlabs.de'
+            id = 'steffen'
+            name = 'Steffen Wilke'
+            email = 'steffen@gurkenlabs.de'
           }
           developer {
-            id 'matthias'
-            name 'Matthias Wilke'
-            email 'matthias@gurkenlabs.de'
+            id = 'matthias'
+            name = 'Matthias Wilke'
+            email = 'matthias@gurkenlabs.de'
           }
         }
       }
     }
   }
+  
+  repositories {
+    maven {
+      def releasesRepoUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+      def snapshotRepoUrl = 'https://oss.sonatype.org/content/repositories/snapshots/'
+      url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+      credentials {
+        username = ossrhUsername
+        password = ossrhPassword
+      }
+    }
+  }
+}
+
+signing {
+  sign publishing.publications.mavenJava
 }
