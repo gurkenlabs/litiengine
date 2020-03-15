@@ -20,12 +20,12 @@ sourceSets {
 }
 
 dependencies {
-  compile project(':')
+  implementation project(':')
   
-  testCompile 'org.junit.jupiter:junit-jupiter-api:5.4.+'
-  testCompile 'org.junit.jupiter:junit-jupiter-params:5.4.+'
-  testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.4.+'
-  testCompile 'org.mockito:mockito-core:2.25.+'
+  testImplementation 'org.junit.jupiter:junit-jupiter-api:5.4.+'
+  testImplementation 'org.junit.jupiter:junit-jupiter-params:5.4.+'
+  testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.4.+'
+  testImplementation 'org.mockito:mockito-core:2.25.+'
 } 
 
 test {
@@ -34,10 +34,10 @@ test {
 
 jar {
   from {
-    configurations.runtime.collect {
+    configurations.runtimeClasspath.collect {
       it.isDirectory() ? it : zipTree(it)
     }
-    configurations.compile.collect {
+    configurations.compileClasspath.collect {
       it.isDirectory() ? it : zipTree(it)
     }
   }  {
@@ -85,8 +85,8 @@ task distZipWindows(type: Zip) {
   include '*.exe'
   include 'config.properties'
 
-  archiveName archivesBaseName + '-' + version + '-win.zip'
-  destinationDir(file('build/libs/'))
+  archiveClassifier = 'win'
+  destinationDirectory = file('build/libs/')
   
   dependsOn createAllExecutables
 }
@@ -97,8 +97,8 @@ task distZipLinuxMac(type: Zip) {
   include '*.jar'
   include 'config.properties'
 
-  archiveName archivesBaseName + '-' + version + '-linux-mac.zip'
-  destinationDir(file('build/libs/'))
+  archiveClassifier = 'linux-mac'
+  destinationDirectory = file('build/libs/')
 }
 
 build.dependsOn copyDistFiles
