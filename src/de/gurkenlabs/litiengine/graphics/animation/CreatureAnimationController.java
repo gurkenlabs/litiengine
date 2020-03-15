@@ -36,21 +36,64 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
   private String[] customDeathAnimations;
   private String randomDeathSprite;
 
-  // TODO: overhaul and streamline the constructor overloads
+  /**
+   * Initializes a new instance of the <code>CreatureAnimationController</code> class.
+   * 
+   * @param entity
+   *          The entity related to this controller.
+   * 
+   * @param useFlippedSpritesAsFallback
+   *          A flag indicating whether this controller should flip the provided spritesheet
+   *          horizontally to provide a fallback animation for left or right directions.
+   * 
+   * @see #getEntity()
+   */
   public CreatureAnimationController(T entity, boolean useFlippedSpritesAsFallback) {
     super(entity);
     this.init(useFlippedSpritesAsFallback);
   }
 
+  /**
+   * Initializes a new instance of the <code>CreatureAnimationController</code> class.
+   * 
+   * @param entity
+   *          The entity related to this controller.
+   * 
+   * @param defaultAnimation
+   *          The default animation for this controller.
+   * 
+   * @see #getEntity()
+   * @see #getDefault()
+   */
   public CreatureAnimationController(T entity, Animation defaultAnimation) {
     this(entity, true, defaultAnimation);
   }
 
+  /**
+   * Initializes a new instance of the <code>CreatureAnimationController</code> class.
+   * 
+   * @param entity
+   *          The entity related to this controller.
+   * 
+   * @param useFlippedSpritesAsFallback
+   *          A flag indicating whether this controller should flip the provided spritesheet
+   *          horizontally to provide a fallback animation for left or right directions.
+   * 
+   * @param defaultAnimation
+   *          The default animation for this controller.
+   * 
+   * @param animations
+   *          Additional animations that are managed by this controller instance.
+   * 
+   * @see #getEntity()
+   * @see #getDefault()
+   * @see #getAll()
+   */
   public CreatureAnimationController(T entity, boolean useFlippedSpritesAsFallback, Animation defaultAnimation, final Animation... animations) {
     super(entity, defaultAnimation, animations);
     this.init(useFlippedSpritesAsFallback);
   }
-  
+
   public static String getSpriteName(Creature creature, CreatureAnimationState state) {
     return creature.getSpritesheetName() + "-" + state.spriteString();
   }
@@ -58,7 +101,7 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
   public static String getSpriteName(Creature creature, CreatureAnimationState state, Direction direction) {
     return getSpriteName(creature, state) + "-" + direction.name().toLowerCase();
   }
-  
+
   @Override
   public boolean isAutoScaling() {
     return this.getEntity().isScaling();
@@ -69,7 +112,7 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
     Spritesheet leftIdleSpritesheet = Resources.spritesheets().load(leftIdleSprite, newSpriteName, spriteToFlip.getSpriteWidth(), spriteToFlip.getSpriteHeight());
     return new Animation(leftIdleSpritesheet, true);
   }
-  
+
   @Override
   protected String getSpritePrefix() {
     return this.getEntity().getSpritesheetName();
@@ -222,8 +265,8 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
         return name;
       }
     }
-    
-    for(Direction d : Direction.values()) {
+
+    for (Direction d : Direction.values()) {
       final String name = this.getSpriteName(state.getOpposite(), d);
       if (this.hasAnimation(name)) {
         return name;
