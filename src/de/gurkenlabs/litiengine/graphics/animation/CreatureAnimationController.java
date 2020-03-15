@@ -28,6 +28,8 @@ import de.gurkenlabs.litiengine.util.Imaging;
  * {EXTENSION} refers to a value of the
  * {@link de.gurkenlabs.litiengine.resources.ImageFormat} enum.
  * 
+ * @param <T>
+ *          The type of the creature for which animations are managed by this controller.
  * @see de.gurkenlabs.litiengine.entities.Creature
  * @see de.gurkenlabs.litiengine.Direction
  * @see de.gurkenlabs.litiengine.entities.IEntity#getName()
@@ -39,8 +41,8 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
   /**
    * Initializes a new instance of the <code>CreatureAnimationController</code> class.
    * 
-   * @param entity
-   *          The entity related to this controller.
+   * @param creature
+   *          The creature related to this controller.
    * 
    * @param useFlippedSpritesAsFallback
    *          A flag indicating whether this controller should flip the provided spritesheet
@@ -48,16 +50,16 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
    * 
    * @see #getEntity()
    */
-  public CreatureAnimationController(T entity, boolean useFlippedSpritesAsFallback) {
-    super(entity);
+  public CreatureAnimationController(T creature, boolean useFlippedSpritesAsFallback) {
+    super(creature);
     this.init(useFlippedSpritesAsFallback);
   }
 
   /**
    * Initializes a new instance of the <code>CreatureAnimationController</code> class.
    * 
-   * @param entity
-   *          The entity related to this controller.
+   * @param creature
+   *          The creature related to this controller.
    * 
    * @param defaultAnimation
    *          The default animation for this controller.
@@ -65,15 +67,15 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
    * @see #getEntity()
    * @see #getDefault()
    */
-  public CreatureAnimationController(T entity, Animation defaultAnimation) {
-    this(entity, true, defaultAnimation);
+  public CreatureAnimationController(T creature, Animation defaultAnimation) {
+    this(creature, true, defaultAnimation);
   }
 
   /**
    * Initializes a new instance of the <code>CreatureAnimationController</code> class.
    * 
-   * @param entity
-   *          The entity related to this controller.
+   * @param creature
+   *          The creature related to this controller.
    * 
    * @param useFlippedSpritesAsFallback
    *          A flag indicating whether this controller should flip the provided spritesheet
@@ -89,15 +91,44 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
    * @see #getDefault()
    * @see #getAll()
    */
-  public CreatureAnimationController(T entity, boolean useFlippedSpritesAsFallback, Animation defaultAnimation, final Animation... animations) {
-    super(entity, defaultAnimation, animations);
+  public CreatureAnimationController(T creature, boolean useFlippedSpritesAsFallback, Animation defaultAnimation, final Animation... animations) {
+    super(creature, defaultAnimation, animations);
     this.init(useFlippedSpritesAsFallback);
   }
 
+  /**
+   * Gets the sprite name for the specified creature and animation state.
+   * 
+   * @param creature
+   *          The creature to retrieve the sprite name for.
+   * 
+   * @param state
+   *          The current animation state.
+   * 
+   * @return A string representing the sprite name for the specified creature in the defined animation state.
+   * 
+   * @see Creature#getSpritesheetName()
+   */
   public static String getSpriteName(Creature creature, CreatureAnimationState state) {
     return creature.getSpritesheetName() + "-" + state.spriteString();
   }
 
+  /**
+   * Gets the sprite name for the specified creature, animation state.and direction.
+   * 
+   * @param creature
+   *          The creature to retrieve the sprite name for.
+   * 
+   * @param state
+   *          The current animation state.
+   * 
+   * @param direction
+   *          The direction in which the creature is facing.
+   * 
+   * @return A string representing the sprite name for the specified creature, animation state and facing direction.
+   * 
+   * @see Creature#getSpritesheetName()
+   */
   public static String getSpriteName(Creature creature, CreatureAnimationState state, Direction direction) {
     return getSpriteName(creature, state) + "-" + direction.name().toLowerCase();
   }
@@ -105,12 +136,6 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
   @Override
   public boolean isAutoScaling() {
     return this.getEntity().isScaling();
-  }
-
-  public Animation flipAnimation(Spritesheet spriteToFlip, String newSpriteName) {
-    final BufferedImage leftIdleSprite = Imaging.flipSpritesHorizontally(spriteToFlip);
-    Spritesheet leftIdleSpritesheet = Resources.spritesheets().load(leftIdleSprite, newSpriteName, spriteToFlip.getSpriteWidth(), spriteToFlip.getSpriteHeight());
-    return new Animation(leftIdleSpritesheet, true);
   }
 
   @Override
@@ -299,5 +324,11 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
     } else {
       this.customDeathAnimations = new String[0];
     }
+  }
+
+  private Animation flipAnimation(Spritesheet spriteToFlip, String newSpriteName) {
+    final BufferedImage leftIdleSprite = Imaging.flipSpritesHorizontally(spriteToFlip);
+    Spritesheet leftIdleSpritesheet = Resources.spritesheets().load(leftIdleSprite, newSpriteName, spriteToFlip.getSpriteWidth(), spriteToFlip.getSpriteHeight());
+    return new Animation(leftIdleSpritesheet, true);
   }
 }

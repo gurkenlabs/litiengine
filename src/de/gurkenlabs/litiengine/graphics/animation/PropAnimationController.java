@@ -13,6 +13,12 @@ import de.gurkenlabs.litiengine.util.Imaging;
 public class PropAnimationController<T extends Prop> extends EntityAnimationController<T> {
   public static final String PROP_IDENTIFIER = "prop-";
 
+  /**
+   * Initializes a new instance of the <code>PropAnimationController</code> class.
+   * 
+   * @param prop
+   *          The prop related to this controller.
+   */
   public PropAnimationController(final T prop) {
     super(prop);
 
@@ -21,11 +27,54 @@ public class PropAnimationController<T extends Prop> extends EntityAnimationCont
     this.add(createAnimation(this.getEntity(), PropState.DESTROYED));
   }
 
+  /**
+   * Gets the sprite name for the specified prop and state.
+   * 
+   * @param prop
+   *          The prop to retrieve the sprite name for.
+   * 
+   * @param appendState
+   *          A flag indicating whether the state should be appended to the name.
+   * 
+   * @return A string representing the sprite name for the specified prop in its state.
+   * 
+   * @see Prop#getSpritesheetName()
+   * @see Prop#getState()
+   */
+  public static String getSpriteName(final Prop prop, boolean appendState) {
+    return getSpriteName(prop, prop.getState(), appendState);
+  }
+
+  /**
+   * Gets the sprite name for the specified prop and state.
+   * 
+   * @param prop
+   *          The prop to retrieve the sprite name for.
+   * 
+   * @param state
+   *          The state of the prop.
+   * 
+   * @param appendState
+   *          A flag indicating whether the state should be appended to the name.
+   * 
+   * @return A string representing the sprite name for the specified prop in its state.
+   * 
+   * @see Prop#getSpritesheetName()
+   * @see Prop#getState()
+   */
+  public static String getSpriteName(final Prop prop, PropState state, boolean appendState) {
+    StringBuilder sb = new StringBuilder(PROP_IDENTIFIER);
+    sb.append(prop.getSpritesheetName());
+    if (appendState) {
+      sb.append("-");
+      sb.append(state.spriteString());
+    }
+
+    return sb.toString();
+  }
+
   @Override
   public BufferedImage getCurrentImage() {
-    // get shadow from the cache or draw it dynamically and add it to the
-    // cache
-    // get complete image from the cache
     final Animation animation = this.getCurrent();
     if (animation == null || animation.getSpritesheet() == null) {
       return null;
@@ -80,21 +129,6 @@ public class PropAnimationController<T extends Prop> extends EntityAnimationCont
   @Override
   public boolean isAutoScaling() {
     return this.getEntity().isScaling();
-  }
-
-  public static String getSpriteName(final Prop prop, boolean appendState) {
-    return getSpriteName(prop, prop.getState(), appendState);
-  }
-
-  public static String getSpriteName(final Prop prop, PropState state, boolean appendState) {
-    StringBuilder sb = new StringBuilder(PROP_IDENTIFIER);
-    sb.append(prop.getSpritesheetName());
-    if (appendState) {
-      sb.append("-");
-      sb.append(state.spriteString());
-    }
-
-    return sb.toString();
   }
 
   private static Animation createAnimation(final Prop prop, final PropState state) {
