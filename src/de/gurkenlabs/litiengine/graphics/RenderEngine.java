@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.graphics;
 
 import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
@@ -8,6 +9,7 @@ import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
 import java.util.Collections;
@@ -455,7 +457,13 @@ public final class RenderEngine {
           double deltaX = (entity.getWidth() - img.getWidth()) / 2.0;
           double deltaY = (entity.getHeight() - img.getHeight()) / 2.0;
 
-          ImageRenderer.renderTransformed(g, img, Game.world().camera().getViewportLocation(entity.getX() + deltaX, entity.getY() + deltaY), animationController.getAffineTransform());
+          Point2D renderLocation = Game.world().camera().getViewportLocation(entity.getX() + deltaX, entity.getY() + deltaY);
+          ImageRenderer.renderTransformed(g, img, renderLocation.getX(), renderLocation.getY(), animationController.getAffineTransform());
+
+          if (Game.config().debug().renderBoundingBoxes()) {
+            g.setColor(new Color(255, 0, 0, 50));
+            ShapeRenderer.renderOutlineTransformed(g, new Rectangle2D.Double(renderLocation.getX(), renderLocation.getY(), img.getWidth(), img.getWidth()), animationController.getAffineTransform(), 0.25f);
+          }
         }
       }
     }

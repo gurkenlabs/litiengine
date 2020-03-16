@@ -54,7 +54,16 @@ public final class ShapeRenderer {
     renderOutlineTransformed(g, shape, transform, DEFAULT_STROKE);
   }
 
+  public static void renderOutlineTransformed(final Graphics2D g, final Shape shape, AffineTransform transform, final float stroke) {
+    renderOutlineTransformed(g, shape, transform, new BasicStroke(stroke));
+  }
+
   public static void renderOutlineTransformed(final Graphics2D g, final Shape shape, AffineTransform transform, final Stroke stroke) {
+    if (transform == null) {
+      renderOutline(g, shape, stroke);
+      return;
+    }
+    
     final AffineTransform oldTransForm = g.getTransform();
     g.setTransform(transform);
     renderOutline(g, shape, stroke);
