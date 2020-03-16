@@ -15,6 +15,9 @@ public class CreatureShadowImageEffect extends ImageEffect {
   private final Creature creature;
   private final Color shadowColor;
 
+  private float offsetX = 0;
+  private float offsetY = 0;
+
   /**
    * Initializes a new instance of the <code>CreatureShadowImageEffect</code>.
    *
@@ -43,6 +46,24 @@ public class CreatureShadowImageEffect extends ImageEffect {
     return this.creature;
   }
 
+  public float getOffsetX() {
+    return this.offsetX;
+  }
+
+  public CreatureShadowImageEffect setOffsetX(float offsetX) {
+    this.offsetX = offsetX;
+    return this;
+  }
+
+  public float getOffsetY() {
+    return this.offsetY;
+  }
+
+  public CreatureShadowImageEffect setOffsetY(float offsetY) {
+    this.offsetY = offsetY;
+    return this;
+  }
+
   @Override
   public BufferedImage apply(BufferedImage image) {
     if (this.getCreature().isDead()) {
@@ -51,12 +72,12 @@ public class CreatureShadowImageEffect extends ImageEffect {
 
     final BufferedImage buffer = Imaging.getCompatibleImage(image.getWidth() * 2 + 2, image.getHeight() * 2);
     final Graphics2D graphics = buffer.createGraphics();
-    float offsetX = image.getWidth() / 2.0f;
-    float offsetY = image.getHeight() / 2.0f;
+    float x = image.getWidth() / 2.0f;
+    float y = image.getHeight() / 2.0f;
 
-    this.drawShadow(graphics, image.getWidth(), image.getHeight(), offsetX, offsetY);
+    this.drawShadow(graphics, image.getWidth(), image.getHeight(), x + this.offsetX, y + this.offsetY);
 
-    ImageRenderer.render(graphics, image, offsetX, offsetY);
+    ImageRenderer.render(graphics, image, x, y);
     graphics.dispose();
     return buffer;
   }
