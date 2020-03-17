@@ -17,5 +17,5 @@ public interface CombatEntityHitListener extends EventListener {
    * @param event
    *          The event data that contains information about the entity, for how much it was hit and the ability that caused the hit.
    */
-  public void onHit(EntityHitEvent event);
+  public void hit(EntityHitEvent event);
 }

@@ -12,11 +12,11 @@ public interface ICombatEntity extends ICollisionEntity {
 
   public void removeCombatEntityListener(CombatEntityListener listener);
 
-  public void addHitListener(CombatEntityHitListener listener);
+  public void onHit(CombatEntityHitListener listener);
 
   public void removeHitListener(CombatEntityHitListener listener);
 
-  public void addDeathListener(CombatEntityDeathListener listener);
+  public void onDeath(CombatEntityDeathListener listener);
 
   public void removeDeathListener(CombatEntityDeathListener listener);
 

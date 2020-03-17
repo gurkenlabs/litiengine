@@ -16,5 +16,5 @@ public interface CombatEntityDeathListener extends EventListener {
    * @param entity
    *          The combat entity that died.
    */
-  public void onDeath(ICombatEntity entity);
+  public void death(ICombatEntity entity);
 }

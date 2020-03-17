@@ -9,6 +9,12 @@ import de.gurkenlabs.litiengine.physics.Collision;
 import de.gurkenlabs.litiengine.physics.CollisionEvent;
 
 public interface ICollisionEntity extends IEntity {
+  public void onCollision(CollisionListener listener);
+
+  public void removeCollisionListener(CollisionListener listener);
+
+  public void fireCollisionEvent(CollisionEvent event);
+
   public boolean canCollideWith(ICollisionEntity otherEntity);
 
   /**
@@ -37,7 +43,7 @@ public interface ICollisionEntity extends IEntity {
   public Valign getCollisionBoxValign();
 
   public Align getCollisionBoxAlign();
-  
+
   public Collision getCollisionType();
 
   public double getCollisionBoxHeight();
@@ -66,12 +72,6 @@ public interface ICollisionEntity extends IEntity {
   public void setCollisionBoxAlign(final Align align);
 
   public void setCollisionBoxValign(final Valign valign);
-  
+
   public void setCollisionType(Collision collisionType);
-  
-  public void onCollision(CollisionListener listener);
-
-  public void removeCollisionListener(CollisionListener listener);
-
-  public void fireCollisionEvent(CollisionEvent event);
 }

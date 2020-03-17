@@ -72,7 +72,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   }
 
   @Override
-  public void addHitListener(CombatEntityHitListener listener) {
+  public void onHit(CombatEntityHitListener listener) {
     this.hitListeners.add(listener);
   }
 
@@ -82,7 +82,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   }
 
   @Override
-  public void addDeathListener(CombatEntityDeathListener listener) {
+  public void onDeath(CombatEntityDeathListener listener) {
     this.deathListeners.add(listener);
   }
 
@@ -160,7 +160,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
 
     final EntityHitEvent event = new EntityHitEvent(this, ability, damage, this.isDead());
     for (final CombatEntityHitListener listener : this.hitListeners) {
-      listener.onHit(event);
+      listener.hit(event);
     }
 
     this.lastHit = Game.time().now();
@@ -168,7 +168,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
 
   private void fireDeathEvent() {
     for (final CombatEntityDeathListener listener : this.deathListeners) {
-      listener.onDeath(this);
+      listener.death(this);
     }
   }
 
@@ -221,7 +221,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
     this.getHitPoints().modifyBaseValue(new AttributeModifier<>(Modification.SET, this.getHitPoints().getMax()));
 
     for (final CombatEntityListener listener : this.listeners) {
-      listener.onResurrection(this);
+      listener.resurrect(this);
     }
 
     this.setCollision(true);
