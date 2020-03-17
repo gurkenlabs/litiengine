@@ -129,9 +129,6 @@ public class AnimationController implements IAnimationController {
    */
   public void attach() {
     Game.loop().attach(this);
-    for (final Animation animation : this.getAll()) {
-      Game.loop().attach(animation);
-    }
   }
 
   @Override
@@ -146,9 +143,6 @@ public class AnimationController implements IAnimationController {
    */
   public void detach() {
     Game.loop().detach(this);
-    for (final Animation animation : this.getAll()) {
-      Game.loop().detach(animation);
-    }
   }
 
   @Override
@@ -335,6 +329,10 @@ public class AnimationController implements IAnimationController {
 
   @Override
   public void update() {
+    for (final Animation animation : this.getAll()) {
+      animation.update();
+    }
+    
     if (this.getCurrent() != null && this.getCurrent().isPaused()) {
       return;
     }
