@@ -11,6 +11,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.graphics.animation.CreatureAnimationController;
 import de.gurkenlabs.litiengine.graphics.animation.EntityAnimationController;
+import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
 import de.gurkenlabs.litiengine.physics.IMovementController;
 import de.gurkenlabs.litiengine.physics.MovementController;
 
@@ -62,7 +63,7 @@ public class Creature extends CombatEntity implements IMobileEntity {
       this.acceleration = movementInfo.acceleration();
       this.deceleration = movementInfo.deceleration();
       this.setTurnOnMove(movementInfo.turnOnMove());
-      this.addController(new MovementController<>(this));
+      this.addController(this.createMovementController());
     }
 
     if (spritesheetName != null) {
@@ -213,10 +214,18 @@ public class Creature extends CombatEntity implements IMobileEntity {
   }
 
   protected void updateAnimationController() {
-    CreatureAnimationController<Creature> controller = new CreatureAnimationController<>(this, true);
+    IEntityAnimationController<?> controller = this.createAnimationController();
     this.getControllers().addController(controller);
     if (Game.world().environment() != null && Game.world().environment().isLoaded()) {
       Game.loop().attach(controller);
     }
+  }
+
+  protected IEntityAnimationController<?> createAnimationController() {
+    return new CreatureAnimationController<>(this, true);
+  }
+
+  protected IMovementController createMovementController() {
+    return new MovementController<>(this);
   }
 }
