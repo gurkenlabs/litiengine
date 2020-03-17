@@ -273,8 +273,6 @@ public class Animation implements IUpdateable, ILaunchable {
     }
 
     this.currentFrame = this.firstFrame;
-
-    Game.loop().attach(this);
   }
 
   /**
