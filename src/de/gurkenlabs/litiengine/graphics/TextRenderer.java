@@ -13,6 +13,7 @@ import java.awt.font.TextAttribute;
 import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.text.AttributedCharacterIterator;
 import java.text.AttributedString;
 
@@ -266,6 +267,50 @@ public final class TextRenderer {
 
   public static void renderWithOutline(final Graphics2D g, final String text, Point2D location, final Color outlineColor, final boolean antiAliasing) {
     renderWithOutline(g, text, location.getX(), location.getY(), outlineColor, antiAliasing);
+  }
+  
+  /**
+   * Retrieve the bounds of some text if it was to be drawn on the specified Graphics2D
+   * 
+   * @param g
+   *          The Graphics2D object to be drawn on
+   * @param text
+   *          The string to calculate the bounds of
+   *          
+   * @return The bounds of the specified String in the specified Graphics context.
+   * 
+   * @see java.awt.FontMetrics#getStringBounds(String str, Graphics context)
+   */
+  public static Rectangle2D getBounds(final Graphics2D g, final String text) {
+    return g.getFontMetrics().getStringBounds(text, g);
+  }
+  
+  /**
+   * Retrieve the width of some text if it was to be drawn on the specified Graphics2D
+   * 
+   * @param g
+   *          The Graphics2D object to be drawn on
+   * @param text
+   *          The string to retrieve the width of
+   * @return
+   *          The width of the specified text
+   */
+  public static double getWidth(final Graphics2D g, final String text) {
+    return getBounds(g, text).getWidth();
+  }
+  
+  /**
+   * Retrieve the height of some text if it was to be drawn on the specified Graphics2D
+   * 
+   * @param g
+   *          The Graphics2D object to be drawn on
+   * @param text
+   *          The string to retrieve the height of
+   * @return
+   *          The height of the specified text
+   */
+  public static double getHeight(final Graphics2D g, final String text) {
+    return getBounds(g, text).getHeight();
   }
   
   private static void enableAntiAliasing(final Graphics2D g) {
