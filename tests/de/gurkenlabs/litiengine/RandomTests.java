@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D;
 import java.util.Arrays;
 import java.util.List;
 
@@ -122,6 +124,20 @@ public class RandomTests {
   }
 
   @Test
+  public void testRandomLocationInCircle() {
+    Game.random().setSeed(12345);
+    Ellipse2D circle = new Ellipse2D.Double(0, 0, 100, 100);
+    for (int i = 0; i < 100; i++) {
+      Point2D rnd = Game.random().getLocation(circle);
+      assertTrue(rnd.getX() >= 0, rnd.getX() + "should be >= 0");
+      assertTrue(rnd.getY() >= 0, rnd.getY() + "should be >= 0");
+      
+      assertTrue(rnd.getX() <= 100, rnd.getX() + "should be <= 0");
+      assertTrue(rnd.getY() <= 100, rnd.getY() + "should be <= 0");
+    }
+  }
+
+  @Test
   public void testGetIndex() {
     double[] probabilities = new double[] { .5, .25, .125, .125 };
 
@@ -129,7 +145,7 @@ public class RandomTests {
     Game.random().setSeed(1222225);
 
     int index = Game.random().getIndex(probabilities);
-    
+
     assertEquals(1, index);
   }
 }

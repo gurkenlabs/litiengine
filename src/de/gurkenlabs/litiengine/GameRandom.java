@@ -522,19 +522,21 @@ public final class GameRandom extends java.util.Random {
   }
 
   /**
-   * Gets a pseudo-random location on the specified circle.
+   * Gets a pseudo-random location in the specified circle.
    * 
    * @param circle
    *          The circle that defines the boundaries.
    * @return A pseudo-random location on the specified circle.
    */
   public Point2D getLocation(final Ellipse2D circle) {
-    double radius = circle.getWidth();
-    double t = 2 * Math.PI * this.nextDouble();
-    double u = this.nextDouble() + this.nextDouble();
-    double r = u > 1 ? 2 - u : u;
+    double radius = circle.getWidth() / 2.0;
 
-    return new Point2D.Double(radius * r * Math.cos(t), radius * r * Math.sin(t));
+    double a = Math.random() * 2 * Math.PI;
+    double r = radius * Math.sqrt(Math.random());
+    double x = r * Math.cos(a) + radius;
+    double y = r * Math.sin(a) + radius;
+
+    return new Point2D.Double(circle.getX() + x, circle.getY() +y);
   }
 
   /**
