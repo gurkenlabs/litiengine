@@ -21,6 +21,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.graphics.emitters.xml.CustomEmitter;
+import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.litiengine.sound.Sound;
 import de.gurkenlabs.litiengine.util.TimeUtilities;
 
@@ -220,6 +222,11 @@ public final class Resources {
     }
 
     log.log(Level.INFO, "{0} sprites loaded to memory", new Object[] { spriteload });
+
+    for (final EmitterData emitter : file.getEmitters()) {
+      CustomEmitter.load(emitter);
+    }
+
     final double loadTime = TimeUtilities.nanoToMs(System.nanoTime() - loadStart);
 
     log.log(Level.INFO, "loading game resources from {0} took {1} ms", new Object[] { gameResourceFile, loadTime });

@@ -112,6 +112,14 @@ public class CustomEmitter extends Emitter {
     return emitterData;
   }
 
+  public static CustomEmitter get(String name) {
+    if (loadedCustomEmitters.containsKey(name)) {
+      return new CustomEmitter(loadedCustomEmitters.get(name));
+    }
+
+    return null;
+  }
+
   public EmitterData getEmitterData() {
     return this.emitterData;
   }

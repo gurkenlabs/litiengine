@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine.environment;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.function.IntFunction;
 
 import de.gurkenlabs.litiengine.Game;
@@ -19,7 +20,7 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
   private int spawnDelay;
   private SpawnMode spawnMode;
   private List<Spawnpoint> spawnpoints;
-  private IntFunction<List<Spawnpoint>> customSpawnpoints;
+  private Function<IEntitySpawner<T>, List<Spawnpoint>> customSpawnpoints;
 
   /**
    * Initializes a new instance of the <code>EntitySpawner</code> class.
@@ -41,7 +42,7 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
     this.spawnMode = SpawnMode.ALLSPAWNPOINTS;
   }
 
-  public EntitySpawner(final int interval, final int amount, IntFunction<List<Spawnpoint>> spawnpointCallback) {
+  public EntitySpawner(final int interval, final int amount, Function<IEntitySpawner<T>, List<Spawnpoint>> spawnpointCallback) {
     this(new ArrayList<Spawnpoint>(), interval, amount);
     Objects.nonNull(spawnpointCallback);
 
@@ -130,7 +131,7 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
       }
       break;
     case CUSTOMSPAWNPOINTS:
-      List<Spawnpoint> spawnPoints = this.customSpawnpoints.apply(this.getSpawnAmount());
+      List<Spawnpoint> spawnPoints = this.customSpawnpoints.apply(this);
 
       int index = 0;
       for (Spawnpoint spawn : spawnPoints) {
