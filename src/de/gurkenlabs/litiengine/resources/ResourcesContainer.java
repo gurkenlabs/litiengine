@@ -319,19 +319,20 @@ public abstract class ResourcesContainer<T> {
    * @return The removed resource.
    */
   public T remove(String resourceName) {
-    return this.remove(this.getIdentifier(resourceName));
-  }
-
-  public T remove(URL resourceName) {
-    T removedResource = this.resources.remove(resourceName.toString());
+    T removedResource = this.resources.remove(resourceName);
 
     if (removedResource != null) {
       for (ResourcesContainerListener<? super T> listener : this.listeners) {
-        listener.removed(resourceName.toString(), removedResource);
+        listener.removed(resourceName, removedResource);
       }
     }
 
     return removedResource;
+
+  }
+
+  public T remove(URL resourceName) {
+    return this.remove(resourceName.toString());
   }
 
   /**
