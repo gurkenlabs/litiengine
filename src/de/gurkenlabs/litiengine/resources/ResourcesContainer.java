@@ -385,7 +385,6 @@ public abstract class ResourcesContainer<T> {
   private T loadResource(String identifier) {
     T newResource;
     try {
-      System.out.println(identifier);
       newResource = this.load(Resources.getLocation(identifier));
     } catch (Exception e) {
       throw new ResourceLoadException(e);
