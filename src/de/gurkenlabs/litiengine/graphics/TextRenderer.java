@@ -17,7 +17,9 @@ import java.awt.geom.Rectangle2D;
 import java.text.AttributedCharacterIterator;
 import java.text.AttributedString;
 
+import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.gui.GuiProperties;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 
@@ -48,6 +50,30 @@ public final class TextRenderer {
   }
 
   /**
+   * Draws text with the specified alignment.
+   * 
+   * @param g
+   *          the Graphics2D object to draw on
+   * @param text
+   *          the String to be distributed over all generated lines
+   * @param alignment
+   *          The horizontal alignment.
+   * @param verticalAlignment
+   *          The vertical alignment.
+   */
+  public static void render(final Graphics2D g, final String text, Align alignment, Valign verticalAlignment) {
+    final Rectangle2D bounds = g.getClipBounds();
+    if (bounds == null) {
+      return;
+    }
+
+    double locationX = alignment.getLocation(bounds.getWidth(), getWidth(g, text));
+    double locationY = verticalAlignment.getLocation(bounds.getHeight(), g.getFontMetrics().getHeight());
+
+    render(g, text, locationX, locationY);
+  }
+
+  /**
    * Draw text at the given coordinates. This variant of drawText() uses a provided AntiAliasing parameter.
    * 
    * @param g
@@ -68,11 +94,11 @@ public final class TextRenderer {
     }
 
     RenderingHints originalHints = g.getRenderingHints();
-    
+
     if (antiAliasing) {
       enableAntiAliasing(g);
     }
-    
+
     g.drawString(text, (float) x, (float) y);
     g.setRenderingHints(originalHints);
   }
@@ -83,11 +109,11 @@ public final class TextRenderer {
 
   public static void renderRotated(final Graphics2D g, final String text, final double x, final double y, final double angle, boolean antiAliasing) {
     RenderingHints originalHints = g.getRenderingHints();
-    
+
     if (antiAliasing) {
       enableAntiAliasing(g);
     }
-    
+
     renderRotated(g, text, x, y, angle);
     g.setRenderingHints(originalHints);
   }
@@ -153,7 +179,7 @@ public final class TextRenderer {
       return;
     }
     RenderingHints originalHints = g.getRenderingHints();
-    
+
     if (antiAliasing) {
       enableAntiAliasing(g);
     }
@@ -180,7 +206,7 @@ public final class TextRenderer {
   }
 
   /**
-   * Draw text at the given coordinates with an outline in the provided color. This variant of drawTextWithShadow() doesn't use Anti-Aliasing. 
+   * Draw text at the given coordinates with an outline in the provided color. This variant of drawTextWithShadow() doesn't use Anti-Aliasing.
    * For other Anti-Aliasing options, please specify the boolean value that controls it.
    * 
    * @param g
@@ -203,7 +229,7 @@ public final class TextRenderer {
   }
 
   public static void renderWithOutline(final Graphics2D g, final String text, final double x, final double y, final Color outlineColor, final boolean antiAliasing) {
-    float stroke = (float)MathUtilities.clamp((g.getFont().getSize2D() * 1 / 5f) * Math.log(Game.world().camera().getRenderScale()), 1, 100);
+    float stroke = (float) MathUtilities.clamp((g.getFont().getSize2D() * 1 / 5f) * Math.log(Game.world().camera().getRenderScale()), 1, 100);
     renderWithOutline(g, text, x, y, outlineColor, stroke, antiAliasing);
   }
 
@@ -268,7 +294,7 @@ public final class TextRenderer {
   public static void renderWithOutline(final Graphics2D g, final String text, Point2D location, final Color outlineColor, final boolean antiAliasing) {
     renderWithOutline(g, text, location.getX(), location.getY(), outlineColor, antiAliasing);
   }
-  
+
   /**
    * Retrieve the bounds of some text if it was to be drawn on the specified Graphics2D
    * 
@@ -276,7 +302,7 @@ public final class TextRenderer {
    *          The Graphics2D object to be drawn on
    * @param text
    *          The string to calculate the bounds of
-   *          
+   * 
    * @return The bounds of the specified String in the specified Graphics context.
    * 
    * @see java.awt.FontMetrics#getStringBounds(String str, Graphics context)
@@ -284,7 +310,7 @@ public final class TextRenderer {
   public static Rectangle2D getBounds(final Graphics2D g, final String text) {
     return g.getFontMetrics().getStringBounds(text, g);
   }
-  
+
   /**
    * Retrieve the width of some text if it was to be drawn on the specified Graphics2D
    * 
@@ -293,12 +319,12 @@ public final class TextRenderer {
    * @param text
    *          The string to retrieve the width of
    * @return
-   *          The width of the specified text
+   *         The width of the specified text
    */
   public static double getWidth(final Graphics2D g, final String text) {
     return getBounds(g, text).getWidth();
   }
-  
+
   /**
    * Retrieve the height of some text if it was to be drawn on the specified Graphics2D
    * 
@@ -307,12 +333,12 @@ public final class TextRenderer {
    * @param text
    *          The string to retrieve the height of
    * @return
-   *          The height of the specified text
+   *         The height of the specified text
    */
   public static double getHeight(final Graphics2D g, final String text) {
     return getBounds(g, text).getHeight();
   }
-  
+
   private static void enableAntiAliasing(final Graphics2D g) {
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
