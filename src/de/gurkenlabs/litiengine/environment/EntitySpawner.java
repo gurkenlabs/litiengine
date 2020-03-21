@@ -131,9 +131,11 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
       break;
     case CUSTOMSPAWNPOINTS:
       List<Spawnpoint> spawnPoints = this.customSpawnpoints.apply(this.getSpawnAmount());
-      for (int i = 0; i < spawnPoints.size(); i++) {
-        final int index = i;
-        Game.loop().perform(this.getSpawnDelay() + this.getSpawnDelay() * i, () -> this.spawn(spawnPoints.get(index), 1));
+
+      int index = 0;
+      for (Spawnpoint spawn : spawnPoints) {
+        Game.loop().perform(this.getSpawnDelay() + this.getSpawnDelay() * index, () -> this.spawn(spawn, 1));
+        index++;
       }
       break;
     default:
@@ -147,9 +149,7 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
     }
     for (int i = 0; i < amount; i++) {
       final T newEntity = this.createNew();
-      newEntity.setLocation(spawnpoint.getLocation());
-      newEntity.setMapId(spawnpoint.getEnvironment().getNextMapId());
-      spawnpoint.getEnvironment().add(newEntity);
+      spawnpoint.spawn(newEntity);
     }
   }
 }
