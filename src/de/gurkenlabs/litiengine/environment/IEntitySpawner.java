@@ -31,7 +31,9 @@ public interface IEntitySpawner<T extends IEntity> extends IUpdateable {
     /**
      * Spawns the amount of mobs, distributed to random spawnpoints.
      */
-    RANDOMSPAWNPOINTS
+    RANDOMSPAWNPOINTS,
+    
+    CUSTOMSPAWNPOINTS,
   }
 
   /**

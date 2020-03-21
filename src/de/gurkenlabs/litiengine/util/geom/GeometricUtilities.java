@@ -12,6 +12,7 @@ import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -311,12 +312,32 @@ public class GeometricUtilities {
   }
 
   public static Point2D getMidPoint(final Point2D p1, final Point2D p2) {
-    final Point2D mid = new Point2D.Double();
-    final double x = (p1.getX() + p2.getX()) / 2;
-    final double y = (p1.getY() + p2.getY()) / 2;
-    mid.setLocation(x, y);
-    return mid;
+    return getAveragePosition(p1, p2);
+  }
 
+  public static Ellipse2D getCircle(Point2D center, double radius) {
+    return new Ellipse2D.Double(center.getX() - radius, center.getY() - radius, radius * 2, radius * 2);
+  }
+
+  public static Point2D getAveragePosition(Collection<Point2D> points) {
+    return getAveragePosition(points.toArray(new Point2D[points.size()]));
+  }
+
+  public static Point2D getAveragePosition(Point2D... points) {
+    if (points.length == 0) {
+      return null;
+    }
+
+    final Point2D mid = new Point2D.Double();
+    double xSum = 0;
+    double ySum = 0;
+    for (Point2D point : points) {
+      xSum += point.getX();
+      ySum += point.getY();
+    }
+
+    mid.setLocation(xSum / points.length, ySum / points.length);
+    return mid;
   }
 
   /**

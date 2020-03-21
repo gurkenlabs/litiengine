@@ -419,6 +419,11 @@ public final class GameRandom extends java.util.Random {
     return this.nextInt(bound - min) + min;
   }
 
+  public <T extends Enum<?>> T next(Class<T> clazz) {
+    int x = this.nextInt(clazz.getEnumConstants().length);
+    return clazz.getEnumConstants()[x];
+  }
+
   /**
    * Probes a pseudo-random value between 0.0 and 1.0 and checks whether it matches the specified probability.
    * 

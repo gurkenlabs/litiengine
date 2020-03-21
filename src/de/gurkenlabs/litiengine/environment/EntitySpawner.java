@@ -1,6 +1,9 @@
 package de.gurkenlabs.litiengine.environment;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.IntFunction;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.IEntity;
@@ -16,6 +19,7 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
   private int spawnDelay;
   private SpawnMode spawnMode;
   private List<Spawnpoint> spawnpoints;
+  private IntFunction<List<Spawnpoint>> customSpawnpoints;
 
   /**
    * Initializes a new instance of the <code>EntitySpawner</code> class.
@@ -35,6 +39,14 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
     this.amount = amount;
     this.spawnpoints = spawnpoints;
     this.spawnMode = SpawnMode.ALLSPAWNPOINTS;
+  }
+
+  public EntitySpawner(final int interval, final int amount, IntFunction<List<Spawnpoint>> spawnpointCallback) {
+    this(new ArrayList<Spawnpoint>(), interval, amount);
+    Objects.nonNull(spawnpointCallback);
+
+    this.customSpawnpoints = spawnpointCallback;
+    this.spawnMode = SpawnMode.CUSTOMSPAWNPOINTS;
   }
 
   @Override
@@ -98,7 +110,7 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
    * @see SpawnMode
    */
   protected void spawnNewEntities() {
-    if (this.getSpawnPoints().isEmpty()) {
+    if (this.getSpawnPoints().isEmpty() && this.getSpawnMode() != SpawnMode.CUSTOMSPAWNPOINTS) {
       return;
     }
 
@@ -116,7 +128,13 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
       for (int i = 0; i < this.getSpawnAmount(); i++) {
         Game.loop().perform(this.getSpawnDelay() + this.getSpawnDelay() * i, () -> this.spawn(Game.random().choose(this.getSpawnPoints()), 1));
       }
-
+      break;
+    case CUSTOMSPAWNPOINTS:
+      List<Spawnpoint> spawnPoints = this.customSpawnpoints.apply(this.getSpawnAmount());
+      for (int i = 0; i < spawnPoints.size(); i++) {
+        final int index = i;
+        Game.loop().perform(this.getSpawnDelay() + this.getSpawnDelay() * i, () -> this.spawn(spawnPoints.get(index), 1));
+      }
       break;
     default:
       break;

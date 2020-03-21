@@ -39,6 +39,18 @@ public class Spawnpoint extends Entity {
     this(0, x, y);
   }
 
+  public Spawnpoint(Point2D location) {
+    this(0, location);
+  }
+
+  public Spawnpoint(double x, double y, Direction direction) {
+    this(0, x, y, direction);
+  }
+
+  public Spawnpoint(Point2D location, Direction direction) {
+    this(0, location, direction);
+  }
+
   /**
    * Instantiates a new <code>Spawnpoint</code> entity.
    *
