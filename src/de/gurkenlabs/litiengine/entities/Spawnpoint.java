@@ -21,10 +21,20 @@ public class Spawnpoint extends Entity {
   @TmxProperty(name = MapObjectProperty.SPAWN_TYPE)
   private String spawnType;
 
+  @TmxProperty(name = MapObjectProperty.SPAWN_PIVOT)
+  private EntityPivotType spawnPivotType;
+
+  @TmxProperty(name = MapObjectProperty.SPAWN_PIVOT_OFFSETX)
+  private double spawnOffsetX;
+
+  @TmxProperty(name = MapObjectProperty.SPAWN_PIVOT_OFFSETY)
+  private double spawnOffsetY;
+
   /**
    * Instantiates a new <code>Spawnpoint</code> entity.
    */
   public Spawnpoint() {
+    this.setSize(1, 1);
   }
 
   /**
@@ -75,6 +85,7 @@ public class Spawnpoint extends Entity {
    */
   public Spawnpoint(int mapId, Point2D location) {
     super(mapId);
+    this.setSize(1, 1);
     this.setLocation(location);
   }
 
@@ -168,6 +179,30 @@ public class Spawnpoint extends Entity {
     this.spawnType = spawnType;
   }
 
+  public EntityPivotType getSpawnPivotType() {
+    return this.spawnPivotType;
+  }
+
+  public void setSpawnPivotType(EntityPivotType spawnPivotType) {
+    this.spawnPivotType = spawnPivotType;
+  }
+
+  public double getSpawnOffsetX() {
+    return this.spawnOffsetX;
+  }
+
+  public void setSpawnOffsetX(double spawnOffsetX) {
+    this.spawnOffsetX = spawnOffsetX;
+  }
+
+  public double getSpawnOffsetY() {
+    return this.spawnOffsetY;
+  }
+
+  public void setSpawnOffsetY(double spawnOffsetY) {
+    this.spawnOffsetY = spawnOffsetY;
+  }
+
   /**
    * Spawns the specified entity to the <code>Environment</code> of the <code>Spawnpoint</code> or the currently active <code>Environment</code>.
    * 
@@ -192,7 +227,7 @@ public class Spawnpoint extends Entity {
       return false;
     }
 
-    entity.setLocation(this.getLocation());
+    entity.setLocation(this.getEntityLocationByPivot(entity));
 
     if (this.getDirection() != null && this.getDirection() != Direction.UNDEFINED) {
       entity.setAngle(this.getDirection().toAngle());
@@ -208,6 +243,17 @@ public class Spawnpoint extends Entity {
     }
 
     return true;
+  }
+
+  private Point2D getEntityLocationByPivot(IEntity entity) {
+    if (this.getSpawnPivotType() == null || this.getSpawnPivotType() == EntityPivotType.LOCATION) {
+      return this.getLocation();
+    }
+    
+    EntityPivot pivot = new EntityPivot(entity, this.getSpawnPivotType(), this.getSpawnOffsetX(), this.getSpawnOffsetY());
+
+    Point2D pivotPoint = pivot.getPoint();
+    return new Point2D.Double(this.getX() - (pivotPoint.getX() - entity.getX()), this.getY() - (pivotPoint.getY() - entity.getY()));
   }
 
   @FunctionalInterface

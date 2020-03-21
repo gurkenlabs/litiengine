@@ -62,6 +62,9 @@ public final class MapObjectProperty {
   // spawnpoint
   public static final String SPAWN_TYPE = "spawnType";
   public static final String SPAWN_DIRECTION = "spawnDirection";
+  public static final String SPAWN_PIVOT = "spawnPivot";
+  public static final String SPAWN_PIVOT_OFFSETX = "spawnPivotOffsetX";
+  public static final String SPAWN_PIVOT_OFFSETY = "spawnPivotOffsetY";
 
   // trigger
   public static final String TRIGGER_ACTIVATION = "triggerActivation";

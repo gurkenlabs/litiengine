@@ -6,6 +6,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import de.gurkenlabs.litiengine.entities.EntityPivotType;
+
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
@@ -27,7 +29,11 @@ public @interface AbilityInfo {
 
   String name() default "";
 
-  AbilityOrigin origin() default AbilityOrigin.COLLISIONBOX_CENTER;
+  EntityPivotType origin() default EntityPivotType.COLLISIONBOX_CENTER;
+
+  double pivotOffsetX() default 0;
+
+  double pivotOffsetY() default 0;
 
   int range() default 0;
 

@@ -19,6 +19,7 @@ import de.gurkenlabs.litiengine.abilities.effects.Effect;
 import de.gurkenlabs.litiengine.abilities.effects.Effect.EffectAppliedListener;
 import de.gurkenlabs.litiengine.abilities.effects.Effect.EffectCeasedListener;
 import de.gurkenlabs.litiengine.entities.Creature;
+import de.gurkenlabs.litiengine.entities.EntityPivot;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
@@ -29,15 +30,14 @@ public abstract class Ability implements IRenderable {
 
   private final List<Effect> effects;
   private final Creature executor;
+  private final EntityPivot entityPivot;
 
   private String name;
   private String description;
   private boolean multiTarget;
   private CastType castType;
-  private AbilityOrigin originType;
 
   private AbilityExecution currentExecution;
-  private Point2D origin;
 
   /**
    * Initializes a new instance of the <code>Ability</code> class.
@@ -56,7 +56,7 @@ public abstract class Ability implements IRenderable {
     this.multiTarget = info.multiTarget();
     this.description = info.description();
     this.castType = info.castType();
-    this.originType = info.origin();
+    this.entityPivot = new EntityPivot(executor, info.origin(), info.pivotOffsetX(), info.pivotOffsetY());
   }
 
   public void onCast(final AbilityCastListener listener) {
@@ -150,27 +150,8 @@ public abstract class Ability implements IRenderable {
     return this.name;
   }
 
-  public AbilityOrigin getOriginType() {
-    return this.originType;
-  }
-
-  public Point2D getOrigin() {
-    switch (this.getOriginType()) {
-    case COLLISIONBOX_CENTER:
-      return new Point2D.Double(this.executor.getCollisionBox().getCenterX(), this.executor.getCollisionBox().getCenterY());
-    case DIMENSION_CENTER:
-      return this.executor.getCenter();
-    case OFFSET:
-      if (this.origin != null) {
-        return new Point2D.Double(this.executor.getX() + this.origin.getX(), this.executor.getY() + this.origin.getY());
-      }
-      break;
-    case LOCATION:
-    default:
-      break;
-    }
-
-    return this.executor.getLocation();
+  public EntityPivot getPivot() {
+    return this.entityPivot;
   }
 
   public float getRemainingCooldownInSeconds() {
@@ -201,22 +182,6 @@ public abstract class Ability implements IRenderable {
     g.setStroke(oldStroke);
   }
 
-  /**
-   * Sets a custom offset from the executors map location as origin of this
-   * ability.
-   * 
-   * @param origin
-   *          The origin that defines the execution offset for this
-   *          {@link Ability}.
-   */
-  public void setOrigin(final Point2D origin) {
-    this.origin = origin;
-  }
-
-  public void setOriginType(AbilityOrigin originType) {
-    this.originType = originType;
-  }
-
   public void setName(String name) {
     this.name = name;
   }
@@ -244,8 +209,8 @@ public abstract class Ability implements IRenderable {
   protected Shape internalCalculateImpactArea(final double angle) {
     final int impact = this.getAttributes().impact().get();
     final int impactAngle = this.getAttributes().impactAngle().get();
-    final double arcX = this.getOrigin().getX() - impact * 0.5;
-    final double arcY = this.getOrigin().getY() - impact * 0.5;
+    final double arcX = this.getPivot().getPoint().getX() - impact * 0.5;
+    final double arcY = this.getPivot().getPoint().getY() - impact * 0.5;
 
     // project
     final Point2D appliedRange = GeometricUtilities.project(new Point2D.Double(arcX, arcY), angle, this.getAttributes().range().get() * 0.5);

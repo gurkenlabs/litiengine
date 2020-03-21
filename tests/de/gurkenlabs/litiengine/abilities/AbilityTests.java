@@ -20,6 +20,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.abilities.effects.Effect;
 import de.gurkenlabs.litiengine.abilities.effects.EffectTarget;
 import de.gurkenlabs.litiengine.entities.Creature;
+import de.gurkenlabs.litiengine.entities.EntityPivotType;
 
 public class AbilityTests {
   @BeforeEach
@@ -83,7 +84,7 @@ public class AbilityTests {
     assertArrayEquals(new EffectTarget[] { EffectTarget.ENEMY }, effect.getEffectTargets());
   }
 
-  @AbilityInfo(impact = 150, impactAngle = 360, origin = AbilityOrigin.DIMENSION_CENTER, range = 100)
+  @AbilityInfo(impact = 150, impactAngle = 360, origin = EntityPivotType.DIMENSION_CENTER, range = 100)
   private class TestAbility360 extends Ability {
 
     protected TestAbility360(Creature executor) {
@@ -112,7 +113,7 @@ public class AbilityTests {
 
   }
 
-  @AbilityInfo(impact = 111, impactAngle = 180, origin = AbilityOrigin.DIMENSION_CENTER, range = 150)
+  @AbilityInfo(impact = 111, impactAngle = 180, origin = EntityPivotType.DIMENSION_CENTER, range = 150)
   private class TestAbility180 extends Ability {
 
     protected TestAbility180(Creature executor) {
@@ -191,14 +192,16 @@ public class AbilityTests {
     when(entity.getLocation()).thenReturn(point1);
 
     TestOriginLocation abilityLocation = new TestOriginLocation(entity);
-    assertEquals(point1, abilityLocation.getOrigin());
+    assertEquals(point1, abilityLocation.getPivot().getPoint());
 
     /*
      * If AbilityOrigin = LOCATION; mapLocation = Point2D.Double(1,1)
      * --> return Point2D.Double(1,1)
      */
     when(entity.getLocation()).thenReturn(point2);
-    assertEquals(point2, abilityLocation.getOrigin());
+    when(entity.getX()).thenReturn((double) 1);
+    when(entity.getY()).thenReturn((double) 1);
+    assertEquals(point2, abilityLocation.getPivot().getPoint());
   }
 
   /*
@@ -206,7 +209,6 @@ public class AbilityTests {
    */
   @Test
   public void testGetOriginCustom() {
-    Point2D point1 = new Point2D.Double(0, 0);
     Point2D point2 = new Point2D.Double(1, 1);
     Point2D point3 = new Point2D.Double(2, 2);
 
@@ -215,19 +217,19 @@ public class AbilityTests {
      * --> return Point2D.Double(0,0)
      */
     Creature entity = mock(Creature.class);
-    when(entity.getLocation()).thenReturn(point1);
+    when(entity.getLocation()).thenReturn(point2);
     when(entity.getX()).thenReturn((double) 1);
     when(entity.getY()).thenReturn((double) 1);
 
     TestOriginCustom abilityCustom = new TestOriginCustom(entity);
-    assertEquals(point1, abilityCustom.getOrigin());
+    assertEquals(point2, abilityCustom.getPivot().getPoint());
 
     /*
      * If AbilityOrigin = CUSTOM; origin = Point2D.Double(1,1); mapLocation = Point2D.Double(1,1)
      * --> return Point2D.Double(2,2).
      */
-    abilityCustom.setOrigin(point2);
-    assertEquals(point3, abilityCustom.getOrigin());
+    abilityCustom.getPivot().setOffset(point2);
+    assertEquals(point3, abilityCustom.getPivot().getPoint());
   }
 
   /*
@@ -246,7 +248,7 @@ public class AbilityTests {
     when(entity.getCenter()).thenReturn(point1);
 
     TestOriginDimension abilityDimension = new TestOriginDimension(entity);
-    assertEquals(point1, abilityDimension.getOrigin());
+    assertEquals(point1, abilityDimension.getPivot().getPoint());
   }
 
   /*
@@ -268,11 +270,11 @@ public class AbilityTests {
     when(entity.getCollisionBox()).thenReturn(shape1);
 
     TestOriginCollisionBox abilityCollision = new TestOriginCollisionBox(entity);
-    assertEquals(point1, abilityCollision.getOrigin());
+    assertEquals(point1, abilityCollision.getPivot().getPoint());
 
   }
 
-  @AbilityInfo(castType = CastType.ONCONFIRM, name = "I do somethin", description = "does somethin", cooldown = 333, duration = 222, impact = 111, impactAngle = 99, multiTarget = true, origin = AbilityOrigin.COLLISIONBOX_CENTER, range = 444, value = 999)
+  @AbilityInfo(castType = CastType.ONCONFIRM, name = "I do somethin", description = "does somethin", cooldown = 333, duration = 222, impact = 111, impactAngle = 99, multiTarget = true, origin = EntityPivotType.COLLISIONBOX_CENTER, range = 444, value = 999)
   private class TestAbility extends Ability {
 
     protected TestAbility(Creature executor) {
@@ -294,28 +296,28 @@ public class AbilityTests {
     }
   }
 
-  @AbilityInfo(origin = AbilityOrigin.LOCATION)
+  @AbilityInfo(origin = EntityPivotType.LOCATION)
   private class TestOriginLocation extends Ability {
     protected TestOriginLocation(Creature executor) {
       super(executor);
     }
   }
 
-  @AbilityInfo(origin = AbilityOrigin.OFFSET)
+  @AbilityInfo(origin = EntityPivotType.OFFSET)
   private class TestOriginCustom extends Ability {
     protected TestOriginCustom(Creature executor) {
       super(executor);
     }
   }
 
-  @AbilityInfo(origin = AbilityOrigin.COLLISIONBOX_CENTER)
+  @AbilityInfo(origin = EntityPivotType.COLLISIONBOX_CENTER)
   private class TestOriginCollisionBox extends Ability {
     protected TestOriginCollisionBox(Creature executor) {
       super(executor);
     }
   }
 
-  @AbilityInfo(origin = AbilityOrigin.DIMENSION_CENTER)
+  @AbilityInfo(origin = EntityPivotType.DIMENSION_CENTER)
   private class TestOriginDimension extends Ability {
     protected TestOriginDimension(Creature executor) {
       super(executor);
