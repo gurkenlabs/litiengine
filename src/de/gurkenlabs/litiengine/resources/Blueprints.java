@@ -32,8 +32,8 @@ public class Blueprints extends ResourcesContainer<Blueprint> {
   }
   
   @Override
-  protected String getAlias(URL resourceName, Blueprint resource) {
-    if (resource == null || resource.getName() == null || resource.getName().isEmpty() || resource.getName().equalsIgnoreCase(resourceName.getFile())) {
+  protected String getAlias(String resourceName, Blueprint resource) {
+    if (resource == null || resource.getName() == null || resource.getName().isEmpty() || resource.getName().equalsIgnoreCase(resourceName)) {
       return null;
     }
 

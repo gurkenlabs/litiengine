@@ -39,8 +39,8 @@ public final class Maps extends ResourcesContainer<IMap> {
   }
 
   @Override
-  protected String getAlias(URL resourceName, IMap resource) {
-    if (resource == null || resource.getName() == null || resource.getName().isEmpty() || resource.getName().equalsIgnoreCase(resourceName.getFile())) {
+  protected String getAlias(String resourceName, IMap resource) {
+    if (resource == null || resource.getName() == null || resource.getName().isEmpty() || resource.getName().equalsIgnoreCase(resourceName)) {
       return null;
     }
 

@@ -31,8 +31,8 @@ public abstract class ResourcesContainer<T> {
   // use a work-stealing pool to maximize resource load speed while minimizing the number of resources in use
   private static final ExecutorService ASYNC_POOL = Executors.newWorkStealingPool();
 
-  private final Map<URL, T> resources = new ConcurrentHashMap<>();
-  private final Map<String, URL> aliases = new ConcurrentHashMap<>();
+  private final Map<String, T> resources = new ConcurrentHashMap<>();
+  private final Map<String, String> aliases = new ConcurrentHashMap<>();
   private final List<ResourcesContainerListener<? super T>> listeners = new CopyOnWriteArrayList<>();
   private final List<ResourcesContainerClearedListener> clearedListeners = new CopyOnWriteArrayList<>();
 
@@ -113,15 +113,15 @@ public abstract class ResourcesContainer<T> {
    * @see #tryGet(String)
    */
   public void add(String resourceName, T resource) {
-    this.add(this.getIdentifier(resourceName), resource);
-  }
-
-  public void add(URL resourceName, T resource) {
     this.resources.put(resourceName, resource);
 
     for (ResourcesContainerListener<? super T> listener : this.listeners) {
       listener.added(resourceName, resource);
     }
+  }
+
+  public void add(URL resourceName, T resource) {
+    this.add(resourceName.toString(), resource);
   }
 
   /**
@@ -148,11 +148,11 @@ public abstract class ResourcesContainer<T> {
    * @see ResourcesContainer#contains(Object)
    */
   public boolean contains(String resourceName) {
-    return this.contains(this.getIdentifier(resourceName));
+    return this.resources.containsKey(this.getIdentifier(resourceName));
   }
 
   public boolean contains(URL resourceName) {
-    return this.resources.containsKey(resourceName);
+    return this.contains(resourceName.toString());
   }
 
   /**
@@ -225,10 +225,6 @@ public abstract class ResourcesContainer<T> {
    * @return T The resource with the specified name.
    */
   public T get(String resourceName, Supplier<? extends T> loadCallback) {
-    return this.get(this.getIdentifier(resourceName), loadCallback);
-  }
-
-  public T get(URL resourceName, Supplier<? extends T> loadCallback) {
     Optional<T> opt = this.tryGet(resourceName);
     if (opt.isPresent()) {
       return opt.get();
@@ -240,6 +236,11 @@ public abstract class ResourcesContainer<T> {
     }
 
     return resource;
+
+  }
+
+  public T get(URL resourceName, Supplier<? extends T> loadCallback) {
+    return this.get(resourceName.toString(), loadCallback);
   }
 
   /**
@@ -255,10 +256,6 @@ public abstract class ResourcesContainer<T> {
    * @return The game resource or null if not found.
    */
   public T get(String resourceName, boolean forceLoad) {
-    return this.get(this.getIdentifier(resourceName), forceLoad);
-  }
-
-  public T get(URL resourceName, boolean forceLoad) {
     if (resourceName == null) {
       return null;
     }
@@ -275,6 +272,10 @@ public abstract class ResourcesContainer<T> {
     } else {
       return this.resources.computeIfAbsent(resourceName, this::loadResource);
     }
+  }
+
+  public T get(URL resourceName, boolean forceLoad) {
+    return this.get(resourceName.toString(), forceLoad);
   }
 
   /**
@@ -322,11 +323,11 @@ public abstract class ResourcesContainer<T> {
   }
 
   public T remove(URL resourceName) {
-    T removedResource = this.resources.remove(resourceName);
+    T removedResource = this.resources.remove(resourceName.toString());
 
     if (removedResource != null) {
       for (ResourcesContainerListener<? super T> listener : this.listeners) {
-        listener.removed(resourceName, removedResource);
+        listener.removed(resourceName.toString(), removedResource);
       }
     }
 
@@ -351,15 +352,15 @@ public abstract class ResourcesContainer<T> {
    * @see #get(String)
    */
   public Optional<T> tryGet(String resourceName) {
-    return this.tryGet(this.getIdentifier(resourceName));
-  }
-
-  public Optional<T> tryGet(URL resourceName) {
     if (this.contains(resourceName)) {
       return Optional.of(this.get(resourceName));
     }
 
     return Optional.empty();
+  }
+
+  public Optional<T> tryGet(URL resourceName) {
+    return this.tryGet(resourceName);
   }
 
   protected abstract T load(URL resourceName) throws Exception;
@@ -373,18 +374,19 @@ public abstract class ResourcesContainer<T> {
    *          The resource.
    * @return An alias for the specified resource.
    */
-  protected String getAlias(URL resourceName, T resource) {
+  protected String getAlias(String resourceName, T resource) {
     return null;
   }
 
-  protected Map<URL, T> getResources() {
+  protected Map<String, T> getResources() {
     return this.resources;
   }
 
-  private T loadResource(URL identifier) {
+  private T loadResource(String identifier) {
     T newResource;
     try {
-      newResource = this.load(identifier);
+      System.out.println(identifier);
+      newResource = this.load(Resources.getLocation(identifier));
     } catch (Exception e) {
       throw new ResourceLoadException(e);
     }
@@ -401,7 +403,7 @@ public abstract class ResourcesContainer<T> {
     return newResource;
   }
 
-  private URL getIdentifier(String resourceName) {
-    return this.aliases.getOrDefault(resourceName, Resources.getLocation(resourceName));
+  private String getIdentifier(String resourceName) {
+    return this.aliases.getOrDefault(resourceName, resourceName);
   }
 }
