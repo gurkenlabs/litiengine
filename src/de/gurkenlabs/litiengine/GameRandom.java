@@ -10,6 +10,7 @@ import java.util.List;
 
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
+import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 /**
@@ -19,6 +20,7 @@ import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 public final class GameRandom extends java.util.Random {
   private static final String INVALID_BOUNDS_ERROR = "min value is > than max value";
   private static final String ARRAY_MUST_NOT_BE_EMPTY = "array to chose an element from must not be null or empty.";
+  private static final String INVALID_AMOUNT_FOR_SAMPLING_WITHOUT_REPLACEMENT = "amount must be <= the specified array length for sampling without replacement.";
 
   GameRandom() {
   }
@@ -34,6 +36,32 @@ public final class GameRandom extends java.util.Random {
    */
   public void setSeed(String seed) {
     this.setSeed(seed.hashCode());
+  }
+
+  public <T> T[] sample(final T[] array, int amount, boolean replacement) {
+    if (!replacement && array.length < amount) {
+      throw new IllegalArgumentException(INVALID_AMOUNT_FOR_SAMPLING_WITHOUT_REPLACEMENT);
+    }
+
+    //declare array, cast to (T[]) that was determined using reflection, use java.lang.reflect to create a new instance of an Array(of arrayType variable, and the same length as the original
+    @SuppressWarnings("unchecked")
+    T[] sampled = (T[]) java.lang.reflect.Array.newInstance(array.getClass().getComponentType(), amount);
+
+    if (!replacement) {
+      T[] copiedArray = ArrayUtilities.arrayCopy(array);
+      this.shuffle(copiedArray);
+
+      //Use System and arraycopy to copy the array
+      System.arraycopy(copiedArray, 0, sampled, 0, amount);
+
+      return sampled;
+    }
+
+    for (int i = 0; i < amount; i++) {
+      sampled[i] = this.choose(array);
+    }
+
+    return sampled;
   }
 
   /**
@@ -536,7 +564,7 @@ public final class GameRandom extends java.util.Random {
     double x = r * Math.cos(a) + radius;
     double y = r * Math.sin(a) + radius;
 
-    return new Point2D.Double(circle.getX() + x, circle.getY() +y);
+    return new Point2D.Double(circle.getX() + x, circle.getY() + y);
   }
 
   /**

@@ -539,6 +539,10 @@ public final class ArrayUtilities {
     return hash.toArray((T[]) Array.newInstance(first.getClass().getComponentType(), hash.size()));
   }
 
+  public static <T> T[] arrayCopy(T[] original) {
+    return original.clone();
+  }
+
   public static int[] toIntegerArray(List<Integer> intList) {
     Integer[] objArray = intList.toArray(new Integer[0]);
     int[] intArray = new int[objArray.length];
