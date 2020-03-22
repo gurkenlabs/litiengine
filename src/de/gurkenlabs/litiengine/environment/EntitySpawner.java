@@ -11,6 +11,7 @@ import de.gurkenlabs.litiengine.entities.Spawnpoint;
 
 /**
  * TODO: Implement spawn event/listener
+ * TODO: Implement additional constructors to enhance the API
  */
 public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner<T> {
   private int amount;
@@ -20,6 +21,24 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
   private SpawnMode spawnMode;
   private List<Spawnpoint> spawnpoints;
   private Function<IEntitySpawner<T>, List<Spawnpoint>> customSpawnpoints;
+
+  public EntitySpawner(final int interval, final int amount) {
+    this.spawnDelay = 1000;
+    this.interval = interval;
+    this.amount = amount;
+    this.spawnMode = SpawnMode.CUSTOMSPAWNPOINTS;
+  }
+
+  public EntitySpawner(final List<Spawnpoint> spawnpoints, final int interval, final int amount) {
+    this(spawnpoints, interval, amount, SpawnMode.ALLSPAWNPOINTS);
+  }
+
+  public EntitySpawner(final List<Spawnpoint> spawnpoints, final int amount, SpawnMode spawnMode) {
+    this.spawnDelay = 1000;
+    this.amount = amount;
+    this.spawnpoints = spawnpoints;
+    this.spawnMode = spawnMode;
+  }
 
   /**
    * Initializes a new instance of the <code>EntitySpawner</code> class.
@@ -33,12 +52,20 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
    * @param amount
    *          The amount of entities to spawn on every spawn event.
    */
-  public EntitySpawner(final List<Spawnpoint> spawnpoints, final int interval, final int amount) {
+  public EntitySpawner(final List<Spawnpoint> spawnpoints, final int interval, final int amount, SpawnMode spawnMode) {
     this.interval = interval;
     this.spawnDelay = 1000;
     this.amount = amount;
     this.spawnpoints = spawnpoints;
-    this.spawnMode = SpawnMode.ALLSPAWNPOINTS;
+    this.spawnMode = spawnMode;
+  }
+
+  public EntitySpawner(final int amount, Function<IEntitySpawner<T>, List<Spawnpoint>> spawnpointCallback) {
+    Objects.nonNull(spawnpointCallback);
+
+    this.amount = amount;
+    this.customSpawnpoints = spawnpointCallback;
+    this.spawnMode = SpawnMode.CUSTOMSPAWNPOINTS;
   }
 
   public EntitySpawner(final int interval, final int amount, Function<IEntitySpawner<T>, List<Spawnpoint>> spawnpointCallback) {
@@ -96,12 +123,20 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
 
   @Override
   public void update() {
-    if (this.lastSpawnWave != 0 && Game.time().since(this.lastSpawnWave) < this.getSpawnInterval()) {
+    if (!this.shouldSpawn()) {
       return;
     }
 
     this.spawnNewEntities();
     this.lastSpawnWave = Game.time().now();
+  }
+
+  protected boolean shouldSpawn() {
+    return this.lastSpawnWave == 0 || Game.time().since(this.lastSpawnWave) >= this.getSpawnInterval();
+  }
+
+  protected List<Spawnpoint> getCustomSpawnpoints() {
+    return new ArrayList<>();
   }
 
   /**
@@ -110,7 +145,7 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
    * @see SpawnMode
    */
   protected void spawnNewEntities() {
-    if (this.getSpawnPoints().isEmpty() && this.getSpawnMode() != SpawnMode.CUSTOMSPAWNPOINTS) {
+    if (this.getSpawnMode() != SpawnMode.CUSTOMSPAWNPOINTS && this.getSpawnPoints().isEmpty()) {
       return;
     }
 
@@ -130,7 +165,7 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
       }
       break;
     case CUSTOMSPAWNPOINTS:
-      List<Spawnpoint> spawnPoints = this.customSpawnpoints.apply(this);
+      List<Spawnpoint> spawnPoints = this.customSpawnpoints != null ? this.customSpawnpoints.apply(this) : this.getCustomSpawnpoints();
 
       int index = 0;
       for (Spawnpoint spawn : spawnPoints) {
