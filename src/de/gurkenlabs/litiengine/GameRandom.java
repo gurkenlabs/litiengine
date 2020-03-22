@@ -4,9 +4,11 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
@@ -62,6 +64,27 @@ public final class GameRandom extends java.util.Random {
     }
 
     return sampled;
+  }
+
+  public <T> Collection<T> sample(final Collection<T> collection, int amount, boolean replacement) {
+    if (!replacement && collection.size() < amount) {
+      throw new IllegalArgumentException(INVALID_AMOUNT_FOR_SAMPLING_WITHOUT_REPLACEMENT);
+    }
+
+    if (!replacement) {
+      List<T> copied = new ArrayList<>(collection);
+      this.shuffle(copied);
+
+      return copied.stream().limit(amount).collect(Collectors.toList());
+    }
+
+    List<T> copied = new ArrayList<>(amount);
+
+    for (int i = 0; i < amount; i++) {
+      copied.add(this.choose(collection));
+    }
+
+    return copied;
   }
 
   /**
