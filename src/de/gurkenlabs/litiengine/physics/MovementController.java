@@ -271,8 +271,8 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
         final Point2D collisionBoxCenter = this.getEntity().getCollisionBoxCenter();
         final double angle = GeometricUtilities.calcRotationAngleInDegrees(collisionBoxCenter, force.getLocation());
         final double strength = Game.loop().getDeltaTime() * 0.001f * force.getStrength() * Game.loop().getTimeScale();
-        deltaX += GeometricUtilities.getXDelta(angle, strength);
-        deltaY += GeometricUtilities.getYDelta(angle, strength);
+        deltaX += GeometricUtilities.getDeltaX(angle, strength);
+        deltaY += GeometricUtilities.getDeltaY(angle, strength);
       }
 
       final Point2D target = new Point2D.Double(this.getEntity().getX() + deltaX, this.getEntity().getY() + deltaY);

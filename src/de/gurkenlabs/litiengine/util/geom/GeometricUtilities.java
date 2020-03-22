@@ -187,6 +187,14 @@ public class GeometricUtilities {
     return Trigonometry.sinDeg((float) actualAngle);
   }
 
+  public static double getDeltaX(final double angle, final double delta) {
+    return Math.sin(Math.toRadians(angle)) * delta * 100 / 100.0;
+  }
+
+  public static double getDeltaY(final double angle, final double delta) {
+    return Math.cos(Math.toRadians(angle)) * delta * 100 / 100.0;
+  }
+
   /**
    * Gets the intersection point.
    *
@@ -470,8 +478,8 @@ public class GeometricUtilities {
     double y = start.getY();
 
     // calculate delta
-    final double xDelta = getXDelta(angle, delta);
-    final double yDelta = getYDelta(angle, delta);
+    final double xDelta = getDeltaX(angle, delta);
+    final double yDelta = getDeltaY(angle, delta);
     x += xDelta;
     y += yDelta;
 
@@ -595,14 +603,6 @@ public class GeometricUtilities {
     final AffineTransform t = new AffineTransform();
     t.translate(newLocation.getX() - shape.getBounds2D().getX(), newLocation.getY() - shape.getBounds2D().getY());
     return t.createTransformedShape(shape);
-  }
-
-  public static double getXDelta(final double angle, final double delta) {
-    return Math.sin(Math.toRadians(angle)) * delta * 100 / 100.0;
-  }
-
-  public static double getYDelta(final double angle, final double delta) {
-    return Math.cos(Math.toRadians(angle)) * delta * 100 / 100.0;
   }
 
   /**
