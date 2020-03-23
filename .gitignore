@@ -8,3 +8,5 @@ game.log*
 /.idea
 /out/production/classes/de/gurkenlabs/litiengine
 /out/test/classes/de/gurkenlabs/litiengine
+litiengine.iml
+utiliti/utiliti.iml
