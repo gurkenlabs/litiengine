@@ -119,8 +119,15 @@ public class RenderComponent extends Canvas {
 
         final Screen currentScreen = Game.screens().current();
         if (currentScreen != null) {
+
           long renderStart = System.nanoTime();
-          currentScreen.render(g);
+
+          //set up local instance of Graphics2D for the screen
+          Graphics2D screenG = currentScreen.MakeGraphics(g);
+          //render screen using new Graphics2D instance
+          currentScreen.render(screenG);
+          //free up memory from the now used Graphics2D instance
+          screenG.dispose();
 
           if (Game.config().debug().trackRenderTimes()) {
             final double totalRenderTime = TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
