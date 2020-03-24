@@ -1209,4 +1209,24 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
       TextRenderer.renderRotated(g, this.getTextToRender(g), this.getX() + this.getTextX(), this.getY() + this.getTextY(), this.getTextAngle(), antialiasing);
     }
   }
+
+  /**
+   * Generate and transform a new Graphics2D from parameter g
+   * @param g The instance to generate from (Typically a parent {@link GuiComponent} or the {@link de.gurkenlabs.litiengine.graphics.RenderComponent}.
+   * @return a new instance of Graphics2D with all the GuiComponent translation settings set.
+   */
+  public Graphics2D MakeGraphics(Graphics2D g) {
+    /*
+    * Note from KvaGram: This function is essential for the changes made to how Screens work.
+    * As I advocate to use this for all GuiComponents, not just Screen, where it is needed, I leave it here.
+    * Note: Recommended usage is for a parent component to call MakeGraphics for it's child components.
+    *  - Remember to dispose the new Graphics2D after use.
+    * */
+    Graphics2D newG = (Graphics2D) g.create();
+    newG.translate(x, y);
+    newG.setClip(0, 0, (int) width, (int) height);
+    //set rotation ?
+
+    return newG;
+  }
 }
