@@ -25,17 +25,6 @@ public abstract class Screen extends GuiComponent {
     this.setLayer(layer);
   }
 
-
-  @Override
-  public void setX(final double x) {
-    // do nothing because screens always start at 0/0
-  }
-
-  @Override
-  public void setY(final double y) {
-    // do nothing because screens always start at 0/0
-  }
-
   public int getLayer() {
     return layer;
   }
