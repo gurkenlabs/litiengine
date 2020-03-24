@@ -493,7 +493,10 @@ public final class Game {
 
     // initialize  the game window
     window().init();
-    world.setCamera(new Camera());
+
+    // NOTE: suggestion from KvaGram - maybe the different cameras have different start settings that could be set here.
+    for(int i = 0; i < GameWorld.NUMBER_OF_CAMERAS; i ++)
+      world.setCamera(new Camera(), i);
 
     for (GameListener listener : gameListeners) {
       listener.initialized(args);
