@@ -10,10 +10,21 @@ import de.gurkenlabs.litiengine.gui.GuiComponent;
  * 
  */
 public abstract class Screen extends GuiComponent {
+  // The screen's layer determines the render order.
+  // The higher the value, the later the screen will be rendered.
+  // This is useful if you wish to make some sort of overlay, such as a UI.
+  private int layer;
+
   protected Screen(final String screenName) {
-    super(0, 0);
-    this.setName(screenName);
+    this(screenName, 0);
   }
+
+  protected Screen(final String screenName, int layer) {
+    super(0,0);
+    this.setName(screenName);
+    this.setLayer(layer);
+  }
+
 
   @Override
   public void setX(final double x) {
@@ -23,5 +34,13 @@ public abstract class Screen extends GuiComponent {
   @Override
   public void setY(final double y) {
     // do nothing because screens always start at 0/0
+  }
+
+  public int getLayer() {
+    return layer;
+  }
+
+  public void setLayer(int layer) {
+    this.layer = layer;
   }
 }
