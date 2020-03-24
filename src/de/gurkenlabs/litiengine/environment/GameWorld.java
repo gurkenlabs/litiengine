@@ -37,6 +37,62 @@ import de.gurkenlabs.litiengine.resources.Resources;
  *
  */
 public final class GameWorld implements IUpdateable {
+
+
+
+  //<editor-fold desc="extra camera vars and consts">
+
+  // Note that this code is placed on top for convenience of development.
+  // The code should be moved to more fitting place once the extra camera feature development had ended.
+
+  // The number of cameras to be loaded into the Game World.
+  // This constant value is temporary, final implementation should
+  // load this from a configuration object / file or set using game settings.
+  // The number of cameras should remain constant for the Game World at all times.
+  public static final int NUMBER_OF_CAMERAS = 3;
+
+  // The index for the active camera.
+  // This is set during render-time when the game world is rendered.
+  private int activeCameraIndex;
+
+  public int getActiveCameraIndex() {
+    return activeCameraIndex;
+  }
+  public void setActiveCameraIndex(int activeCameraIndex) {
+    this.activeCameraIndex = activeCameraIndex;
+    if (activeCameraIndex < 0 || activeCameraIndex >= NUMBER_OF_CAMERAS)
+      this.activeCameraIndex = 0;
+  }
+
+  public ICamera getCamera(int index){
+    return cameras[index];
+  }
+
+  /**
+   * Gets the camera currently / last used for rendering.
+   * Use this in render code to get the camera.
+   * @return
+   */
+  public ICamera getActiveCamera(){
+    return getCamera(activeCameraIndex);
+  }
+
+  public void setCamera(final ICamera cam, int index) {
+    if (cameras[index] != null) {
+      Game.loop().detach(cameras[index]);
+    }
+    cameras[index] = cam;
+
+    if (cam != null && !Game.isInNoGUIMode()) {
+      Game.loop().attach(cam);
+      cam.updateFocus();
+    }
+  }
+
+
+  //</editor-fold>
+
+
   private final List<EnvironmentListener> listeners = new CopyOnWriteArrayList<>();
   private final List<EnvironmentLoadedListener> loadedListeners = new CopyOnWriteArrayList<>();
   private final List<EnvironmentUnloadedListener> unloadedListeners = new CopyOnWriteArrayList<>();
@@ -49,7 +105,7 @@ public final class GameWorld implements IUpdateable {
   private final Map<String, Environment> environments = new ConcurrentHashMap<>();
 
   private Environment environment;
-  private ICamera camera;
+  private ICamera[] cameras;
   private int gravity;
 
   /**
@@ -243,13 +299,18 @@ public final class GameWorld implements IUpdateable {
 
   /**
    * Gets the game's current <code>Camera</code>.
-   * 
+   *
+   * @deprecated There may now be more than one camera in the world. <br/>
+   *             use {@link #getActiveCamera()} or {@link #getCamera(int)} instead. <br/>
+   *             Currently redirects to {@link #getActiveCamera()}
+   *
+   *
    * @return The currently active camera.
    * 
    * @see ICamera
    */
   public ICamera camera() {
-    return this.camera;
+    return getActiveCamera();
   }
 
   /**
@@ -533,21 +594,16 @@ public final class GameWorld implements IUpdateable {
 
   /**
    * Sets the active camera of the game.
-   * 
+   *
+   * @deprecated  There now may be more than one camera in the world, so you need to specify.<br>
+   *              Please use {@link #setCamera(ICamera, int)} instead. <br/>
+   *              Currently redirects to {@link #setCamera(ICamera, int)} with 0 as camera index
+   *
    * @param cam
    *          The new camera to be set.
    */
   public void setCamera(final ICamera cam) {
-    if (this.camera() != null) {
-      Game.loop().detach(camera);
-    }
-
-    camera = cam;
-
-    if (cam != null && !Game.isInNoGUIMode()) {
-      Game.loop().attach(cam);
-      cam.updateFocus();
-    }
+    setCamera(cam, 0);
   }
 
   /**
