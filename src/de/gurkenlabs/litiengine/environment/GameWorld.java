@@ -119,6 +119,7 @@ public final class GameWorld implements IUpdateable {
     if (Game.world() != null) {
       throw new UnsupportedOperationException("Never initialize a GameWorld manually. Use Game.world() instead.");
     }
+    cameras = new ICamera[NUMBER_OF_CAMERAS];
   }
 
   /**
