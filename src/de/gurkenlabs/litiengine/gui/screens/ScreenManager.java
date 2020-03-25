@@ -231,7 +231,7 @@ public final class ScreenManager {
 
   /**
    * Displays the specified screen by setting
-   * @Deprecated  please use {@link #displayScreen(Screen)} or {@link #replaceScreen(Screen, Screen)} instead
+   * @deprecated  please use {@link #displayScreen(Screen)} or {@link #replaceScreen(Screen, Screen)} instead
    *              If any screen is active, redirects to {@link #replaceScreen(Screen, Screen)} with {@link #activeScreens}.get(0) as oldScreen
    *              else redirects to {@link #displayScreen(Screen)}
    * @param screen
@@ -273,7 +273,7 @@ public final class ScreenManager {
   /**
    * Displays the <code>Screen</code> with the specified name.
    *
-   * @Deprecated please use {@link #displayScreen(String)} or {@link #replaceScreen(String, String)} instead
+   * @deprecated please use {@link #displayScreen(String)} or {@link #replaceScreen(String, String)} instead
    *
    * @param screenName
    *          The name of the screen to be displayed.
@@ -334,7 +334,7 @@ public final class ScreenManager {
   /**
    * Gets the currently active screen that is being rendered by the <code>RenderComponent</code>.
    *
-   * @Deprecated  There may now be more than one 'current' screen.<br/>
+   * @deprecated   There may now be more than one 'current' screen.
    *              currentScreen has been replaced with {@link #activeScreens}.
    *              Please use {@link #getActiveScreens()} instead.
    *              Currently redirects to {@link #getActiveScreens()}.get(0)
@@ -353,7 +353,7 @@ public final class ScreenManager {
    * 
    * @return The current change timeout for screens.
    *
-   * @Deprecated The cooldown is currently lingering junk code (this may or may not change)
+   * @deprecated The cooldown is currently lingering junk code (this may or may not change)
    *
    * @see #DEFAULT_CHANGE_COOLDOWN
    * @see Game#hasStarted()
@@ -365,7 +365,7 @@ public final class ScreenManager {
   /**
    * Sets the cooldown for changing screens.
    *
-   * @Deprecated The cooldown is currently lingering junk code (this may or may not change)
+   * @deprecated The cooldown is currently lingering junk code (this may or may not change)
    * 
    * @param changeCooldown
    *          The cooldown for changing screens.

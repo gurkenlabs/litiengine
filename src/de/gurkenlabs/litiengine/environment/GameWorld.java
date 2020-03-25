@@ -301,8 +301,8 @@ public final class GameWorld implements IUpdateable {
   /**
    * Gets the game's current <code>Camera</code>.
    *
-   * @Deprecated There may now be more than one camera in the world. <br/>
-   *             use {@link #getActiveCamera()} or {@link #getCamera(int)} instead. <br/>
+   * @deprecated There may now be more than one camera in the world.
+   *             use {@link #getActiveCamera()} or {@link #getCamera(int)} instead.
    *             Currently redirects to {@link #getActiveCamera()}
    *
    *
@@ -596,8 +596,8 @@ public final class GameWorld implements IUpdateable {
   /**
    * Sets the active camera of the game.
    *
-   * @Deprecated  There now may be more than one camera in the world, so you need to specify.<br>
-   *              Please use {@link #setCamera(ICamera, int)} instead. <br/>
+   * @deprecated  There now may be more than one camera in the world, so you need to specify.<br>
+   *              Please use {@link #setCamera(ICamera, int)} instead.
    *              Currently redirects to {@link #setCamera(ICamera, int)} with 0 as camera index
    *
    * @param cam
