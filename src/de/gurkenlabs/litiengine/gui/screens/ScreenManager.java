@@ -33,7 +33,7 @@ public final class ScreenManager {
   private final List<Screen> screens;
 
   // private Screen currentScreen; //OBSOLETE!
-  private ArrayList<Screen> activeScreens;
+  private CopyOnWriteArrayList<Screen> activeScreens;
 
   @Deprecated
   private int changeCooldown = DEFAULT_CHANGE_COOLDOWN;
@@ -342,7 +342,7 @@ public final class ScreenManager {
    * @deprecated   There may now be more than one 'current' screen.
    *              currentScreen has been replaced with {@link #activeScreens}.
    *              Please use {@link #getActiveScreens()} instead.
-   *              Currently redirects to {@link #getActiveScreens()}.get(0)
+   *              Currently redirects to {@link #getActiveScreens()}[0]
    *
    * @return The currently active screen.
    * 
@@ -351,7 +351,7 @@ public final class ScreenManager {
    */
   @Deprecated
   public Screen current() {
-    return this.getActiveScreens().get(0);
+    return this.getActiveScreens()[0];
   }
 
   /**
@@ -382,7 +382,7 @@ public final class ScreenManager {
     this.changeCooldown = changeCooldown;
   }
 
-  public ArrayList<Screen> getActiveScreens() {
-    return activeScreens;
+  public Screen[] getActiveScreens() {
+    return (Screen[]) activeScreens.toArray();
   }
 }
