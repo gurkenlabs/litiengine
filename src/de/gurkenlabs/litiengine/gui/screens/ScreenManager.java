@@ -347,14 +347,17 @@ public final class ScreenManager {
    *              Please use {@link #getActiveScreens()} instead.
    *              Currently redirects to {@link #getActiveScreens()}[0]
    *
-   * @return The currently active screen.
+   * @return The currently active screen, or null for legacy reasons if there is no active screen.
    * 
    * @see GameWindow#getRenderComponent()
    * @see RenderComponent#render()
    */
   @Deprecated
   public Screen current() {
-    return this.getActiveScreens()[0];
+    if(this.getActiveScreens().length > 0) {
+      return this.getActiveScreens()[0];
+    }
+    return null;
   }
 
   /**
