@@ -1,6 +1,9 @@
 package de.gurkenlabs.litiengine.gui.screens;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,7 +36,7 @@ public final class ScreenManager {
   private final List<Screen> screens;
 
   // private Screen currentScreen; //OBSOLETE!
-  private CopyOnWriteArrayList<Screen> activeScreens;
+  private CopyOnWriteArrayList<Screen> activeScreens = new CopyOnWriteArrayList<Screen>();
 
   @Deprecated
   private int changeCooldown = DEFAULT_CHANGE_COOLDOWN;
@@ -344,14 +347,17 @@ public final class ScreenManager {
    *              Please use {@link #getActiveScreens()} instead.
    *              Currently redirects to {@link #getActiveScreens()}[0]
    *
-   * @return The currently active screen.
+   * @return The currently active screen, or null for legacy reasons if there is no active screen.
    * 
    * @see GameWindow#getRenderComponent()
    * @see RenderComponent#render()
    */
   @Deprecated
   public Screen current() {
-    return this.getActiveScreens()[0];
+    if(this.getActiveScreens().length > 0) {
+      return this.getActiveScreens()[0];
+    }
+    return null;
   }
 
   /**
