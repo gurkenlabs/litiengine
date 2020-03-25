@@ -36,7 +36,7 @@ public final class ScreenManager {
   private final List<Screen> screens;
 
   // private Screen currentScreen; //OBSOLETE!
-  private CopyOnWriteArrayList<Screen> activeScreens;
+  private CopyOnWriteArrayList<Screen> activeScreens = new CopyOnWriteArrayList<Screen>();
 
   @Deprecated
   private int changeCooldown = DEFAULT_CHANGE_COOLDOWN;
