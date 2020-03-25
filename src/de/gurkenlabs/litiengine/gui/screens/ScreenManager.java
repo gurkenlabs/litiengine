@@ -25,6 +25,7 @@ import de.gurkenlabs.litiengine.graphics.RenderComponent;
  */
 public final class ScreenManager {
   private static final Logger log = Logger.getLogger(ScreenManager.class.getName());
+  @Deprecated
   private static final int DEFAULT_CHANGE_COOLDOWN = 200;
 
   private final List<ScreenChangedListener> screenChangedListeners;
@@ -34,7 +35,9 @@ public final class ScreenManager {
   // private Screen currentScreen; //OBSOLETE!
   private ArrayList<Screen> activeScreens;
 
+  @Deprecated
   private int changeCooldown = DEFAULT_CHANGE_COOLDOWN;
+  @Deprecated
   private long lastScreenChange = 0;
 
   /**
@@ -237,6 +240,7 @@ public final class ScreenManager {
    * @param screen
    *          The screen to be displayed.
    */
+  @Deprecated
   public void display(final Screen screen) {
     if(activeScreens.size() < 1)
       displayScreen(screen);
@@ -278,6 +282,7 @@ public final class ScreenManager {
    * @param screenName
    *          The name of the screen to be displayed.
    */
+  @Deprecated
   public void display(final String screenName) {
     if (this.current() != null && this.current().getName().equalsIgnoreCase(screenName)) {
       log.log(Level.INFO, "Skipping displaying of screen {0} because it is already the current screen.", screenName);
@@ -344,6 +349,7 @@ public final class ScreenManager {
    * @see GameWindow#getRenderComponent()
    * @see RenderComponent#render()
    */
+  @Deprecated
   public Screen current() {
     return this.getActiveScreens().get(0);
   }
@@ -358,6 +364,7 @@ public final class ScreenManager {
    * @see #DEFAULT_CHANGE_COOLDOWN
    * @see Game#hasStarted()
    */
+  @Deprecated
   public int getChangeCooldown() {
     return this.changeCooldown;
   }
@@ -370,6 +377,7 @@ public final class ScreenManager {
    * @param changeCooldown
    *          The cooldown for changing screens.
    */
+  @Deprecated
   public void setChangeCooldown(int changeCooldown) {
     this.changeCooldown = changeCooldown;
   }

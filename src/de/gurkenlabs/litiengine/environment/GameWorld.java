@@ -310,6 +310,7 @@ public final class GameWorld implements IUpdateable {
    * 
    * @see ICamera
    */
+  @Deprecated
   public ICamera camera() {
     return getActiveCamera();
   }
@@ -603,6 +604,7 @@ public final class GameWorld implements IUpdateable {
    * @param cam
    *          The new camera to be set.
    */
+  @Deprecated
   public void setCamera(final ICamera cam) {
     setCamera(cam, 0);
   }
