@@ -40,7 +40,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     final Font icon = Resources.fonts().get("fontello.ttf");
     ICON_FONT = icon != null ? icon.deriveFont(16f) : null;
   }
-  
+
   private final List<Consumer<ComponentMouseEvent>> clickConsumer;
   private final List<Consumer<ComponentMouseEvent>> mouseDraggedConsumer;
   private final List<Consumer<ComponentMouseEvent>> mouseEnterConsumer;
@@ -51,7 +51,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   private final List<Consumer<ComponentMouseWheelEvent>> mouseWheelConsumer;
   private final List<Consumer<ComponentMouseEvent>> hoverConsumer;
   private final List<Consumer<String>> textChangedConsumer;
-  
+
   private final int componentId;
   private final Appearance appearance;
   private final Appearance hoveredAppearance;
@@ -1046,6 +1046,18 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
    */
   public void toggleSelection() {
     this.setSelected(!this.isSelected);
+  }
+
+  /**
+   * Toggle this GuiComponent's suspension state.
+   * If it's suspended, prepare it. If it's prepared, suspend it.
+   */
+  public void toggleSuspension() {
+    if (!this.isSuspended()) {
+      this.suspend();
+    } else {
+      this.prepare();
+    }
   }
 
   protected Appearance getCurrentAppearance() {
