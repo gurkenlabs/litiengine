@@ -283,7 +283,7 @@ final class VideoManagerImpl implements VideoPlayer{
     }
   }
   
-  JComponent getPanel() {
+  public JComponent getPanel() {
     return panel;
   }
   
