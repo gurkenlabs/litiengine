@@ -2,6 +2,7 @@ package de.gurkenlabs.utiliti.swing;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -15,7 +16,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,7 +31,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -70,7 +73,7 @@ public class AssetPanelItem extends JPanel {
   private static final Border focusBorder = BorderFactory.createDashedBorder(UIManager.getDefaults().getColor("Tree.selectionBorderColor"));
 
   private final JLabel iconLabel;
-  private final JTextField textField;
+  private final JTextArea textField;
   private final JPanel buttonPanel;
   private final JButton btnEdit;
   private final JButton btnDelete;
@@ -84,7 +87,7 @@ public class AssetPanelItem extends JPanel {
   }
 
   public AssetPanelItem(Object origin) {
-    setPreferredSize(new Dimension(100, 100));
+    setPreferredSize(new Dimension(100, 120));
     this.origin = origin;
     this.setBackground(Style.COLOR_ASSETPANEL_BACKGROUND);
     this.setBorder(normalBorder);
@@ -175,16 +178,18 @@ public class AssetPanelItem extends JPanel {
       }
     });
 
-    this.textField = new JTextField();
+    this.textField = new JTextArea();
+    textField.setWrapStyleWord(true);
+    textField.setRows(2);
+    textField.setLineWrap(true);
     add(this.textField, BorderLayout.SOUTH);
     this.textField.setColumns(10);
-    this.textField.setHorizontalAlignment(SwingConstants.CENTER);
     this.textField.setForeground(Color.WHITE);
     this.textField.setBackground(null);
     this.textField.setBorder(null);
     this.textField.setEditable(false);
 
-    this.setMinimumSize(new Dimension(100, 64));
+    this.setMinimumSize(new Dimension(100, 100));
 
     GridLayout buttonGridLayout = new GridLayout(0, 5, 0, 0);
     buttonPanel = new JPanel(buttonGridLayout);
@@ -273,10 +278,40 @@ public class AssetPanelItem extends JPanel {
     this.iconLabel.setHorizontalAlignment(SwingConstants.CENTER);
     this.iconLabel.setIcon(icon);
     this.textField.setText(text);
+    this.setToolTipText("Name: " + text + "\nDetails: " + origin);
+
+    StringBuilder sb = new StringBuilder();
+    sb.append("<html><b>Name:</b> ");
+    sb.append(text);
+    for (Map.Entry<String, String> entry : getDetails(origin).entrySet()) {
+      sb.append("<br>");
+      sb.append(entry.getKey() + ": ");
+      sb.append(entry.getValue());
+    }
+
+    sb.append("</html>");
+
+    String tooltip = sb.toString();
+    for (Component component : this.getComponents()) {
+      if (component instanceof JComponent) {
+        ((JComponent) component).setToolTipText(tooltip);
+      }
+    }
   }
 
   public Object getOrigin() {
     return this.origin;
+  }
+
+  private static Map<String, String> getDetails(Object origin) {
+    Map<String, String> details = new ConcurrentHashMap<>();
+
+    if (origin instanceof SpritesheetResource) {
+      SpritesheetResource sprite = (SpritesheetResource) origin;
+      details.put("Size", sprite.getWidth() + "x" + sprite.getHeight() + "px");
+    }
+
+    return details;
   }
 
   private void deleteAsset() {

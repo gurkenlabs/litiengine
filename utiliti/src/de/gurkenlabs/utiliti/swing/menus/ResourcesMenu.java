@@ -1,12 +1,15 @@
 package de.gurkenlabs.utiliti.swing.menus;
 
-import javax.swing.*;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
 
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.components.Editor;
-
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 
 @SuppressWarnings("serial")
 public final class ResourcesMenu extends JMenu {
