@@ -289,6 +289,12 @@ public final class VideoManager extends GuiComponent implements VideoPlayer {
   @Override
   public void render(Graphics2D g) {
     impl.getPanel().update(g);
+
+  @Override
+  public Container getPanel() {
+    return impl.getPanel();
+  }
+
   }
   
 }
