@@ -3,6 +3,8 @@ package de.gurkenlabs.litiengine.video;
 import static java.time.Duration.ZERO;
 import static javafx.scene.media.MediaPlayer.Status.*;
 
+import javax.swing.JComponent;
+
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -279,6 +281,10 @@ final class VideoManagerImpl implements VideoPlayer{
     if(playerValid()) {
       mediaPlayer.stop();
     }
+  }
+  
+  JComponent getPanel() {
+    return panel;
   }
   
   private java.time.Duration convertDuration(javafx.util.Duration duration) {

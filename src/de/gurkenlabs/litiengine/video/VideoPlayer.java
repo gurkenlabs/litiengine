@@ -2,6 +2,8 @@ package de.gurkenlabs.litiengine.video;
 
 import java.time.Duration;
 
+import javax.swing.JComponent;
+
 interface VideoPlayer {
   void dispose();
   
@@ -36,6 +38,7 @@ interface VideoPlayer {
   void setStopTime(Duration value);
   void setVolume(double value);
   void stop();
+  JComponent getPanel();
   
   public static enum Status {
     DISPOSED,

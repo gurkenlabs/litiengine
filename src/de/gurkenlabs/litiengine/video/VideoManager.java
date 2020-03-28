@@ -1,8 +1,11 @@
 package de.gurkenlabs.litiengine.video;
 
+import java.awt.Graphics2D;
 import java.time.Duration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import de.gurkenlabs.litiengine.gui.GuiComponent;
 
 /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
  * 
@@ -14,7 +17,7 @@ import java.util.logging.Logger;
  *
  *!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
-public final class VideoManager implements VideoPlayer {
+public final class VideoManager extends GuiComponent implements VideoPlayer {
 
   private static final Logger log = Logger.getLogger(VideoManager.class.getName());
   
@@ -27,7 +30,9 @@ public final class VideoManager implements VideoPlayer {
   /**
    * Creates a new VideoManager
    */
-  VideoManager() {};
+  VideoManager() {
+    super(0,0);
+  };
   
   /**
    * Creates a new VideoManager which load the
@@ -36,6 +41,7 @@ public final class VideoManager implements VideoPlayer {
    * @param video the video to load
    */
   VideoManager(VideoResource video) {
+    super(0,0);
     setVideo(video);
   }
   
@@ -47,6 +53,7 @@ public final class VideoManager implements VideoPlayer {
    * @param play whether to immediately begin playing the video
    */
   VideoManager(VideoResource video, boolean play) {
+    super(0,0);
     if(play) {
       playVideo(video);
     }
@@ -257,6 +264,11 @@ public final class VideoManager implements VideoPlayer {
   @Override
   public void stop() {
     impl.stop();
+  }
+  
+  @Override
+  public void render(Graphics2D g) {
+    impl.getPanel().update(g);
   }
   
 }
