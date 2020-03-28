@@ -11,26 +11,54 @@ import de.gurkenlabs.litiengine.gui.GuiComponent;
  * 
  * Do not import anything from javafx into this class!
  * 
- * Not all JREs contain javafx. Some JREs may throw
- * java.lang.Error upon loading of this class if
- * a javafx import exists but the library is missing!
+ * Not all JREs contain javafx. Java will throw a
+ * java.lang.Error if we accidentally try to load a 
+ * javafx class if the library doesn't exist!
  *
  *!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
 public final class VideoManager extends GuiComponent implements VideoPlayer {
 
   private static final Logger log = Logger.getLogger(VideoManager.class.getName());
+  private static boolean checked = false;
   
   private VideoPlayer impl;
   
   {
+    if(!checked) {
+      try {
+        ClassLoader classLoader = VideoManager.class.getClassLoader();
+        Class.forName("javafx.scene.media.MediaPlayer", false, classLoader);
+      } catch (ClassNotFoundException e) {
+          NoClassDefFoundError err = new NoClassDefFoundError("JavaFX is not installed!");
+          err.initCause(e);
+          log.log(Level.SEVERE, err, () -> err.getMessage());
+          throw err;
+      } catch (LinkageError e) {
+          log.log(Level.SEVERE, e, () -> e.getMessage());
+          throw e;
+      } catch (SecurityException e) {
+        log.log(Level.SEVERE, e, () -> e.getMessage());
+        throw e;
+      }
+    }
+    checked = true;
     initialize();
   }
   
   /**
    * Creates a new VideoManager
+   * 
+   * @throws NoClassDefFoundError if JavaFX is not installed (you can catch this
+   * if you want to handle JavaFX not being installed)
+   * 
+   * @throws SecurityException if a security manager exists and it denies access to
+   * the classloader which loaded this class
+   * 
+   * @throws LinkageError if the linkage otherwise fails (It is highly discouraged to 
+   * catch this)
    */
-  VideoManager() {
+  VideoManager() throws NoClassDefFoundError {
     super(0,0);
   };
   
@@ -39,8 +67,17 @@ public final class VideoManager extends GuiComponent implements VideoPlayer {
    * specified video without playing it.
    * 
    * @param video the video to load
+   * 
+   * @throws NoClassDefFoundError if JavaFX is not installed (you can catch this
+   * if you want to handle JavaFX not being installed)
+   * 
+   * @throws SecurityException if a security manager exists and it denies access to
+   * the classloader which loaded this class
+   * 
+   * @throws LinkageError if the linkage otherwise fails (It is highly discouraged to 
+   * catch this)
    */
-  VideoManager(VideoResource video) {
+  VideoManager(VideoResource video) throws NoClassDefFoundError {
     super(0,0);
     setVideo(video);
   }
@@ -51,8 +88,17 @@ public final class VideoManager extends GuiComponent implements VideoPlayer {
    * 
    * @param video the video to load
    * @param play whether to immediately begin playing the video
+   * 
+   * @throws NoClassDefFoundError if JavaFX is not installed (you can catch this
+   * if you want to handle JavaFX not being installed)
+   * 
+   * @throws SecurityException if a security manager exists and it denies access to
+   * the classloader which loaded this class
+   * 
+   * @throws LinkageError if the linkage otherwise fails (It is highly discouraged to 
+   * catch this)
    */
-  VideoManager(VideoResource video, boolean play) {
+  VideoManager(VideoResource video, boolean play) throws NoClassDefFoundError {
     super(0,0);
     if(play) {
       playVideo(video);
@@ -66,36 +112,11 @@ public final class VideoManager extends GuiComponent implements VideoPlayer {
    * Initializes the media player
    * 
    * @throws IllegalStateException if the media player has already been initialized
-   * 
-   * @throws NoClassDefFoundError if JavaFX is not installed (you can catch this
-   * if you want to handle JavaFX not being installed)
-   * 
-   * @throws SecurityException if a security manager exists and it denies access to
-   * the classloader which loaded this class
-   * 
-   * @throws LinkageError if the linkage otherwise fails (It is highly discouraged to 
-   * catch this)
    */
-  public void initialize() throws NoClassDefFoundError {
+  private void initialize() {
     
     if(impl != null) {
       throw new IllegalStateException("Video player already initialized!");
-    }
-    
-    try {
-        ClassLoader classLoader = VideoManager.class.getClassLoader();
-        Class.forName("javafx.scene.media.MediaPlayer", false, classLoader);
-    } catch (ClassNotFoundException e) {
-        NoClassDefFoundError err = new NoClassDefFoundError("JavaFX is not installed!");
-        err.initCause(e);
-        log.log(Level.SEVERE, err, () -> err.getMessage());
-        throw err;
-    } catch (LinkageError e) {
-        log.log(Level.SEVERE, e, () -> e.getMessage());
-        throw e;
-    } catch (SecurityException e) {
-      log.log(Level.SEVERE, e, () -> e.getMessage());
-      throw e;
     }
     
     impl = new VideoManagerImpl();
@@ -111,7 +132,6 @@ public final class VideoManager extends GuiComponent implements VideoPlayer {
   public boolean isReady() {
     return impl.isReady();
   }
-  
 
   @Override
   public boolean isErrored() {
