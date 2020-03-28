@@ -17,11 +17,43 @@ import java.util.logging.Logger;
 public final class VideoManager implements VideoPlayer {
 
   private static final Logger log = Logger.getLogger(VideoManager.class.getName());
-  private static VideoPlayer impl;
   
-  private VideoManager() {
-    throw new UnsupportedOperationException();
-  };
+  private VideoPlayer impl;
+  
+  {
+    initialize();
+  }
+  
+  /**
+   * Creates a new VideoManager
+   */
+  VideoManager() {};
+  
+  /**
+   * Creates a new VideoManager which load the
+   * specified video without playing it.
+   * 
+   * @param video the video to load
+   */
+  VideoManager(VideoResource video) {
+    setVideo(video);
+  }
+  
+  /**
+   * Creates a new VideoManager which will load the
+   * specified video.
+   * 
+   * @param video the video to load
+   * @param play whether to immediately begin playing the video
+   */
+  VideoManager(VideoResource video, boolean play) {
+    if(play) {
+      playVideo(video);
+    }
+    else {
+      setVideo(video);
+    }
+  }
   
   /**
    * Initializes the media player
@@ -37,16 +69,15 @@ public final class VideoManager implements VideoPlayer {
    * @throws LinkageError if the linkage otherwise fails (It is highly discouraged to 
    * catch this)
    */
-  public void initialize(String[] args) throws NoClassDefFoundError {
+  public void initialize() throws NoClassDefFoundError {
     
     if(impl != null) {
       throw new IllegalStateException("Video player already initialized!");
     }
     
     try {
-        ClassLoader classLoader = this.getClass().getClassLoader();
+        ClassLoader classLoader = VideoManager.class.getClassLoader();
         Class.forName("javafx.scene.media.MediaPlayer", false, classLoader);
-        classLoader.setPackageAssertionStatus("de.gurkenlabs.litiengine.video", true);
     } catch (ClassNotFoundException e) {
         NoClassDefFoundError err = new NoClassDefFoundError("JavaFX is not installed!");
         err.initCause(e);
@@ -142,7 +173,7 @@ public final class VideoManager implements VideoPlayer {
 
   @Override
   public Object getMedia() {
-    //TODO return Video resource
+    //TODO return VideoResource
   }
 
   @Override

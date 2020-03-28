@@ -12,18 +12,11 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 
 final class VideoManagerImpl implements VideoPlayer{
-
-  private static VideoManagerImpl INSTANCE;
   
   private JFXPanel panel = new JFXPanel();
   private Media media;
   private MediaPlayer mediaPlayer;
   private MediaView mediaView;
-  
-  {
-    assert INSTANCE == null;
-    INSTANCE = this;
-  }
   
   void setMedia(Media media) {
     if(mediaPlayer != null) {
