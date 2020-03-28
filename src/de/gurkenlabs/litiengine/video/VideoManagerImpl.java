@@ -3,8 +3,11 @@ package de.gurkenlabs.litiengine.video;
 import static java.time.Duration.ZERO;
 import static javafx.scene.media.MediaPlayer.Status.*;
 
+import java.net.URL;
+
 import javax.swing.JComponent;
 
+import de.gurkenlabs.litiengine.resources.VideoResource;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -19,8 +22,35 @@ final class VideoManagerImpl implements VideoPlayer{
   private Media media;
   private MediaPlayer mediaPlayer;
   private MediaView mediaView;
+
+  @Override
+  public void setVideo(VideoResource video) {
+    setMedia(new Media(video.getURI()));
+  }
+
+  @Override
+  public void play(VideoResource video) {
+    play(new Media(video.getURI()));
+  }
+
+  @Override
+  public void setVideo(URL url) {
+    setMedia(new Media(url.toString()));
+  }
+
+  @Override
+  public void play(URL url) {
+    play(new Media(url.toString()));
+  }
   
-  void setMedia(Media media) {
+  public void play() {
+    if(panel != null && playerValid() && media != null && mediaView != null) {
+      panel.setVisible(true);
+      mediaPlayer.play();
+    }
+  }
+  
+  private void setMedia(Media media) {
     if(mediaPlayer != null) {
       mediaPlayer.dispose();
     }
@@ -31,6 +61,11 @@ final class VideoManagerImpl implements VideoPlayer{
     Group root = new Group(mediaView);
     Scene scene = new Scene(root, media.getWidth(), media.getHeight());
     panel.setScene(scene);
+  }
+  
+  private void play(Media media) {
+    setMedia(media);
+    play();
   }
   
   @Override
@@ -109,18 +144,6 @@ final class VideoManagerImpl implements VideoPlayer{
       return Status.UNKNOWN;
     }
   }
-  
-  void play(Media media) {
-    setMedia(media);
-    play();
-  }
-  
-  public void play() {
-    if(panel != null && playerValid() && media != null && mediaView != null) {
-      panel.setVisible(true);
-      mediaPlayer.play();
-    }
-  }
 
   @Override
   public void dispose() {
@@ -173,11 +196,6 @@ final class VideoManagerImpl implements VideoPlayer{
       return convertDuration(mediaPlayer.getCurrentTime());
     }
     return ZERO;
-  }
-
-  @Override
-  public Media getMedia() {
-    return media;
   }
 
   @Override

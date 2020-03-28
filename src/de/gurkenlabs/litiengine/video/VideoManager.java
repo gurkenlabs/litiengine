@@ -1,11 +1,17 @@
 package de.gurkenlabs.litiengine.video;
 
+import java.awt.Container;
 import java.awt.Graphics2D;
+import java.io.IOException;
+import java.net.URL;
 import java.time.Duration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.net.ssl.SSLHandshakeException;
+
 import de.gurkenlabs.litiengine.gui.GuiComponent;
+import de.gurkenlabs.litiengine.resources.VideoResource;
 
 /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
  * 
@@ -21,6 +27,8 @@ public final class VideoManager extends GuiComponent implements VideoPlayer {
 
   private static final Logger log = Logger.getLogger(VideoManager.class.getName());
   private static boolean checked = false;
+  
+  public static boolean allowNetworkConnections = false;
   
   private VideoPlayer impl;
   
@@ -58,7 +66,7 @@ public final class VideoManager extends GuiComponent implements VideoPlayer {
    * @throws LinkageError if the linkage otherwise fails (It is highly discouraged to 
    * catch this)
    */
-  VideoManager() throws NoClassDefFoundError {
+  public VideoManager() throws NoClassDefFoundError {
     super(0,0);
   };
   
@@ -77,7 +85,7 @@ public final class VideoManager extends GuiComponent implements VideoPlayer {
    * @throws LinkageError if the linkage otherwise fails (It is highly discouraged to 
    * catch this)
    */
-  VideoManager(VideoResource video) throws NoClassDefFoundError {
+  public VideoManager(VideoResource video) throws NoClassDefFoundError {
     super(0,0);
     setVideo(video);
   }
@@ -98,13 +106,35 @@ public final class VideoManager extends GuiComponent implements VideoPlayer {
    * @throws LinkageError if the linkage otherwise fails (It is highly discouraged to 
    * catch this)
    */
-  VideoManager(VideoResource video, boolean play) throws NoClassDefFoundError {
+  public VideoManager(VideoResource video, boolean play) throws NoClassDefFoundError {
     super(0,0);
     if(play) {
-      playVideo(video);
+      play(video);
     }
     else {
       setVideo(video);
+    }
+  }
+  
+  public VideoManager(URL url) throws NoClassDefFoundError, IOException {
+    this(url, false);
+  }
+  
+  public VideoManager(URL url, boolean play) throws NoClassDefFoundError, IOException {
+    super(0,0);
+    if(url.getProtocol().startsWith("http")) {
+      if(!allowNetworkConnections) {
+        throw new IOException("Network access disallowed");
+      }
+      if(url.getProtocol().equals("http")) {
+        throw new SSLHandshakeException("Insecure protocol: http. Use https");
+      }
+    }
+    if(play) {
+      play(url);
+    }
+    else {
+      setVideo(url);
     }
   }
   
@@ -199,11 +229,6 @@ public final class VideoManager extends GuiComponent implements VideoPlayer {
   }
 
   @Override
-  public Object getMedia() {
-    //TODO return VideoResource
-  }
-
-  @Override
   public double getRate() {
     return impl.getRate();
   }
@@ -234,11 +259,11 @@ public final class VideoManager extends GuiComponent implements VideoPlayer {
   }
 
   public void setVideo(VideoResource video) {
-    //TODO
+    impl.setVideo(video);
   }
   
   public void play(VideoResource video) {
-    //TODO
+    impl.play(video);
   }
   
   @Override
@@ -288,13 +313,22 @@ public final class VideoManager extends GuiComponent implements VideoPlayer {
   
   @Override
   public void render(Graphics2D g) {
-    impl.getPanel().update(g);
+    getPanel().update(g);
+  }
 
   @Override
   public Container getPanel() {
     return impl.getPanel();
   }
 
+  @Override
+  public void setVideo(URL url) {
+    impl.setVideo(url);
+  }
+
+  @Override
+  public void play(URL url) {
+    impl.play(url);
   }
   
 }

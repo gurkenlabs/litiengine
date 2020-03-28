@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.video;
 
 import java.awt.Container;
+import java.net.URL;
 import java.time.Duration;
 
 import de.gurkenlabs.litiengine.resources.VideoResource;
@@ -33,13 +34,16 @@ interface VideoPlayer {
   int getCurrentCount();
   double getCurrentRate();
   Duration getCurrentTime();
-  Object getMedia();
   double getRate();
   Duration getStartTime();
   Duration getStopTime();
   Duration getTotalDuration();
   double getVolume();
   void pause();
+  void setVideo(VideoResource video);
+  void setVideo(URL url);
+  void play(VideoResource video);
+  void play(URL url);
   void play();
   void seek(Duration seekTime);
   void setBalance(double value);

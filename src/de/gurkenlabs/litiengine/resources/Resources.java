@@ -41,6 +41,7 @@ import de.gurkenlabs.litiengine.util.TimeUtilities;
  * <li>(localizable) strings</li>
  * <li>spritesheets</li>
  * <li>sounds</li>
+ * <li>videos</li>
  * </ul>
  * 
  * @see ResourcesContainer
@@ -55,6 +56,7 @@ public final class Resources {
   private static Images images = new Images();
   private static Spritesheets spritesheets = new Spritesheets();
   private static Blueprints blueprints = new Blueprints();
+  private static Videos videos = new Videos();
 
   private Resources() {
     throw new UnsupportedOperationException();
@@ -147,6 +149,17 @@ public final class Resources {
    */
   public static Blueprints blueprints() {
     return blueprints;
+  }
+  
+  /**
+   * Gets the container that manages <code>VideoManager</code> resources.
+   * 
+   * @return The VideoManager resource container.
+   * 
+   * @see VideoManager
+   */
+  public static Videos videos() {
+    return videos;
   }
 
   /**
@@ -332,6 +345,7 @@ public final class Resources {
     tilesets().clear();
     images().clear();
     spritesheets().clear();
+    videos().clear();
   }
 
   public static URL getLocation(String name) {
