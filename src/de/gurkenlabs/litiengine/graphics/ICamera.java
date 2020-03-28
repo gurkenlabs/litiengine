@@ -6,6 +6,7 @@ import java.util.EventListener;
 
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.GameWindow;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.entities.IEntity;
@@ -141,7 +142,7 @@ public interface ICamera extends IUpdateable {
    * @return the scale factor
    */
   public default float getRenderScale() {
-    return Game.graphics().getBaseRenderScale() * this.getZoom();
+    return Game.graphics().getBaseRenderScale() * Game.window().getResolutionScale() * this.getZoom();
   }
 
   /**
