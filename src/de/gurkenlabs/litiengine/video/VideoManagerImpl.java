@@ -19,10 +19,9 @@ import javafx.scene.media.MediaView;
 
 final class VideoManagerImpl implements VideoPlayer{
   
-  private JFXPanel panel = new JFXPanel();
-  private Media media;
-  private MediaPlayer mediaPlayer;
-  private MediaView mediaView;
+  private volatile JFXPanel panel = new JFXPanel();
+  private volatile MediaPlayer mediaPlayer;
+  private volatile MediaView mediaView;
 
   @Override
   public void setVideo(VideoResource video) {
@@ -45,20 +44,19 @@ final class VideoManagerImpl implements VideoPlayer{
   }
   
   public void play() {
-    if(panel != null && playerValid() && media != null && mediaView != null) {
+    if(playerValid()) {
       panel.setVisible(true);
       mediaPlayer.play();
     }
   }
   
-  private void setMedia(Media media) {
+  private synchronized void setMedia(Media media) {
     Platform.runLater(() -> {
       if(mediaPlayer != null) {
         mediaPlayer.dispose();
       }
       
       this.mediaPlayer = new MediaPlayer(media);
-      this.media = media;
       this.mediaView = new MediaView(mediaPlayer);
       Group root = new Group(mediaView);
       Scene scene = new Scene(root, media.getWidth(), media.getHeight());
@@ -66,9 +64,11 @@ final class VideoManagerImpl implements VideoPlayer{
     });
   }
   
-  private void play(Media media) {
+  private synchronized void play(Media media) {
     setMedia(media);
-    play();
+    Platform.runLater(() -> {
+      play();
+    });
   }
   
   @Override
