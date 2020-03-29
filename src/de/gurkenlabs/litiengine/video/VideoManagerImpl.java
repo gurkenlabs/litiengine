@@ -61,6 +61,7 @@ final class VideoManagerImpl implements VideoPlayer{
       Scene scene = new Scene(root, media.getWidth(), media.getHeight());
       mediaView.autosize();
       panel.setScene(scene);
+      mediaView.getMediaPlayer().setOnReady(() -> panel.setSize(media.getWidth(), media.getHeight()));
     });
   }
   
