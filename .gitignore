@@ -5,6 +5,7 @@
 .DS_Store
 crash.txt
 game.log*
+hs_err_pid*.log
 /.idea
 /out/production/classes/de/gurkenlabs/litiengine
 /out/test/classes/de/gurkenlabs/litiengine
