@@ -20,7 +20,6 @@ import javafx.scene.media.MediaView;
 final class VideoManagerImpl implements VideoPlayer{
   
   private volatile JFXPanel panel = new JFXPanel();
-  private volatile MediaPlayer mediaPlayer;
   private volatile MediaView mediaView;
 
   @Override
@@ -46,20 +45,21 @@ final class VideoManagerImpl implements VideoPlayer{
   public void play() {
     if(playerValid()) {
       panel.setVisible(true);
-      mediaPlayer.play();
+      getPlayer().play();
     }
   }
   
   private synchronized void setMedia(Media media) {
     Platform.runLater(() -> {
-      if(mediaPlayer != null) {
-        mediaPlayer.dispose();
+      final MediaPlayer player = getPlayer();
+      if(player != null) {
+        player.dispose();
       }
       
-      this.mediaPlayer = new MediaPlayer(media);
-      this.mediaView = new MediaView(mediaPlayer);
+      this.mediaView = new MediaView(new MediaPlayer(media));
       Group root = new Group(mediaView);
       Scene scene = new Scene(root, media.getWidth(), media.getHeight());
+      mediaView.autosize();
       panel.setScene(scene);
     });
   }
@@ -74,7 +74,7 @@ final class VideoManagerImpl implements VideoPlayer{
   @Override
   public boolean isStatusUnknown() {
     if(playerValid()) {
-      return mediaPlayer.getStatus() == UNKNOWN;
+      return getPlayer().getStatus() == UNKNOWN;
     }
     return true;
   }
@@ -82,7 +82,7 @@ final class VideoManagerImpl implements VideoPlayer{
   @Override
   public boolean isReady() {
     if(playerValid()) {
-      return mediaPlayer.getStatus() == READY;
+      return getPlayer().getStatus() == READY;
     }
     return false;
   }
@@ -90,7 +90,7 @@ final class VideoManagerImpl implements VideoPlayer{
   @Override
   public boolean isPlaying() {
     if(playerValid()) {
-      return mediaPlayer.getStatus() == PLAYING;
+      return getPlayer().getStatus() == PLAYING;
     }
     return false;
   }
@@ -98,7 +98,7 @@ final class VideoManagerImpl implements VideoPlayer{
   @Override
   public boolean isErrored() {
     if(playerValid()) {
-      return mediaPlayer.getStatus() == HALTED;
+      return getPlayer().getStatus() == HALTED;
     }
     return false;
   }
@@ -106,7 +106,7 @@ final class VideoManagerImpl implements VideoPlayer{
   @Override
   public boolean isPaused() {
     if(playerValid()) {
-      return mediaPlayer.getStatus() == PAUSED;
+      return getPlayer().getStatus() == PAUSED;
     }
     return false;
   }
@@ -114,7 +114,7 @@ final class VideoManagerImpl implements VideoPlayer{
   @Override
   public boolean isBuffering() {
     if(playerValid()) {
-      return mediaPlayer.getStatus() == STALLED;
+      return getPlayer().getStatus() == STALLED;
     }
     return false;
   }
@@ -122,13 +122,13 @@ final class VideoManagerImpl implements VideoPlayer{
   @Override
   public boolean isStopped() {
     if(playerValid()) {
-      return mediaPlayer.getStatus() == STOPPED;
+      return getPlayer().getStatus() == STOPPED;
     }
     return false;
   }
   
   public VideoPlayer.Status getStatus() {
-    switch (mediaPlayer.getStatus()) {
+    switch (getPlayer().getStatus()) {
     case DISPOSED:
       return Status.DISPOSED;
     case HALTED:
@@ -150,13 +150,13 @@ final class VideoManagerImpl implements VideoPlayer{
 
   @Override
   public void dispose() {
-    mediaPlayer.dispose();
+    getPlayer().dispose();
   }
 
   @Override
   public MediaException getError() {
     if(playerValid()) {
-      return mediaPlayer.getError();
+      return getPlayer().getError();
     }
     return null;
   }
@@ -164,7 +164,7 @@ final class VideoManagerImpl implements VideoPlayer{
   @Override
   public double getBalance() {
     if(playerValid()) {
-      return mediaPlayer.getBalance();
+      return getPlayer().getBalance();
     }
     return 0;
   }
@@ -172,7 +172,7 @@ final class VideoManagerImpl implements VideoPlayer{
   @Override
   public java.time.Duration getBufferProgressTime() {
     if(playerValid()) {
-      return convertDuration(mediaPlayer.getBufferProgressTime());
+      return convertDuration(getPlayer().getBufferProgressTime());
     }
     return ZERO;
   }
@@ -180,7 +180,7 @@ final class VideoManagerImpl implements VideoPlayer{
   @Override
   public int getCurrentCount() {
     if(playerValid()) {
-      return mediaPlayer.getCurrentCount();
+      return getPlayer().getCurrentCount();
     }
     return 0;
   }
@@ -188,7 +188,7 @@ final class VideoManagerImpl implements VideoPlayer{
   @Override
   public double getCurrentRate() {
     if(playerValid()) {
-      return mediaPlayer.getCurrentRate();
+      return getPlayer().getCurrentRate();
     }
     return 0;
   }
@@ -196,7 +196,7 @@ final class VideoManagerImpl implements VideoPlayer{
   @Override
   public java.time.Duration getCurrentTime() {
     if(playerValid()) {
-      return convertDuration(mediaPlayer.getCurrentTime());
+      return convertDuration(getPlayer().getCurrentTime());
     }
     return ZERO;
   }
@@ -204,7 +204,7 @@ final class VideoManagerImpl implements VideoPlayer{
   @Override
   public double getRate() {
     if(playerValid()) {
-      return mediaPlayer.getRate();
+      return getPlayer().getRate();
     }
     return 0;
   }
@@ -212,7 +212,7 @@ final class VideoManagerImpl implements VideoPlayer{
   @Override
   public java.time.Duration getStartTime() {
     if(playerValid()) {
-      return convertDuration(mediaPlayer.getStartTime());
+      return convertDuration(getPlayer().getStartTime());
     }
     return ZERO;
   }
@@ -220,7 +220,7 @@ final class VideoManagerImpl implements VideoPlayer{
   @Override
   public java.time.Duration getStopTime() {
     if(playerValid()) {
-      return convertDuration(mediaPlayer.getStopTime());
+      return convertDuration(getPlayer().getStopTime());
     }
     return ZERO;
   }
@@ -228,7 +228,7 @@ final class VideoManagerImpl implements VideoPlayer{
   @Override
   public java.time.Duration getTotalDuration() {
     if(playerValid()) {
-      return convertDuration(mediaPlayer.getTotalDuration());
+      return convertDuration(getPlayer().getTotalDuration());
     }
     return ZERO;
   }
@@ -236,7 +236,7 @@ final class VideoManagerImpl implements VideoPlayer{
   @Override
   public double getVolume() {
     if(playerValid()) {
-      return mediaPlayer.getVolume();
+      return getPlayer().getVolume();
     }
     return 0;
   }
@@ -244,63 +244,63 @@ final class VideoManagerImpl implements VideoPlayer{
   @Override
   public void pause() {
     if(playerValid()) {
-      mediaPlayer.pause();
+      getPlayer().pause();
     }
   }
 
   @Override
   public void seek(java.time.Duration seekTime) {
     if(playerValid()) {
-      mediaPlayer.seek(convertDuration(seekTime));
+      getPlayer().seek(convertDuration(seekTime));
     }
   }
 
   @Override
   public void setBalance(double value) {
     if(playerValid()) {
-      mediaPlayer.setBalance(value);
+      getPlayer().setBalance(value);
     }
   }
 
   @Override
   public void setCycleCount(int value) {
     if(playerValid()) {
-      mediaPlayer.setCycleCount(value);
+      getPlayer().setCycleCount(value);
     }
   }
 
   @Override
   public void setRate(double value) {
     if(playerValid()) {
-      mediaPlayer.setRate(value);
+      getPlayer().setRate(value);
     }
   }
 
   @Override
   public void setStartTime(java.time.Duration value) {
     if(playerValid()) {
-      mediaPlayer.setStartTime(convertDuration(value));
+      getPlayer().setStartTime(convertDuration(value));
     }
   }
 
   @Override
   public void setStopTime(java.time.Duration value) {
     if(playerValid()) {
-      mediaPlayer.setStopTime(convertDuration(value));
+      getPlayer().setStopTime(convertDuration(value));
     }
   }
 
   @Override
   public void setVolume(double value) {
     if(playerValid()) {
-      mediaPlayer.setVolume(value);
+      getPlayer().setVolume(value);
     }
   }
 
   @Override
   public void stop() {
     if(playerValid()) {
-      mediaPlayer.stop();
+      getPlayer().stop();
     }
   }
   
@@ -316,8 +316,15 @@ final class VideoManagerImpl implements VideoPlayer{
     return javafx.util.Duration.seconds((double)duration.getSeconds());
   }
   
+  private MediaPlayer getPlayer() {
+    if(mediaView != null) {
+      return mediaView.getMediaPlayer();
+    }
+    return null;
+  }
+  
   private boolean playerValid() {
-    return mediaPlayer != null;
+    return getPlayer() != null;
   }
   
 }
