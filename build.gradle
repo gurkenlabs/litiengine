@@ -31,7 +31,7 @@ apply plugin: 'java'
 apply plugin: 'jacoco'
 
 archivesBaseName = "litiengine"
-version = "v0.4.19-alpha"
+version = "v0.4.20-alpha"
 sourceCompatibility = "8"
 targetCompatibility = "8"
 

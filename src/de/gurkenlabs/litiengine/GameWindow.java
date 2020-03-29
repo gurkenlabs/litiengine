@@ -226,13 +226,16 @@ public final class GameWindow {
   private static float setResolution(Container host, Dimension dim) {
     Dimension insetAwareDimension = new Dimension(dim.width + host.getInsets().left + host.getInsets().right, dim.height + host.getInsets().top + host.getInsets().bottom);
 
+    host.setSize(insetAwareDimension);
+    return getUpdatedResolutionScale(dim);
+  }
+
+  private static float getUpdatedResolutionScale(Dimension dim) {
     float resolutionScale = 1;
     if (Game.config().graphics().enableResolutionScaling()) {
       resolutionScale = (float) (dim.getWidth() / Resolution.Ratio16x9.RES_1920x1080.getWidth());
-      Game.graphics().setBaseRenderScale(Game.graphics().getBaseRenderScale() * resolutionScale);
     }
 
-    host.setSize(insetAwareDimension);
     return resolutionScale;
   }
 
@@ -241,6 +244,7 @@ public final class GameWindow {
       @Override
       public void componentResized(final ComponentEvent evt) {
         resolution = getRenderComponent().getSize();
+        GameWindow.this.resolutionScale = getUpdatedResolutionScale(GameWindow.this.getSize());
         resolutionChangedListeners.forEach(listener -> listener.resolutionChanged(GameWindow.this.getSize()));
       }
     });
