@@ -15,6 +15,9 @@ public final class ShapeRenderer {
   }
 
   public static void render(final Graphics2D g, final Shape shape) {
+    if (shape == null) {
+      return;
+    }
     g.fill(shape);
   }
 
@@ -37,6 +40,9 @@ public final class ShapeRenderer {
   }
 
   public static void renderOutline(final Graphics2D g, final Shape shape, final Stroke stroke) {
+    if (shape == null) {
+      return;
+    }
     final Stroke oldStroke = g.getStroke();
     g.setStroke(stroke);
     g.draw(shape);
@@ -63,7 +69,7 @@ public final class ShapeRenderer {
       renderOutline(g, shape, stroke);
       return;
     }
-    
+
     final AffineTransform oldTransForm = g.getTransform();
     g.setTransform(transform);
     renderOutline(g, shape, stroke);
