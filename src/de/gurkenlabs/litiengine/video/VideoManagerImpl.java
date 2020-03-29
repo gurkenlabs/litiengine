@@ -8,6 +8,7 @@ import java.net.URL;
 import javax.swing.JComponent;
 
 import de.gurkenlabs.litiengine.resources.VideoResource;
+import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -51,16 +52,18 @@ final class VideoManagerImpl implements VideoPlayer{
   }
   
   private void setMedia(Media media) {
-    if(mediaPlayer != null) {
-      mediaPlayer.dispose();
-    }
-    
-    this.mediaPlayer = new MediaPlayer(media);
-    this.media = media;
-    this.mediaView = new MediaView(mediaPlayer);
-    Group root = new Group(mediaView);
-    Scene scene = new Scene(root, media.getWidth(), media.getHeight());
-    panel.setScene(scene);
+    Platform.runLater(() -> {
+      if(mediaPlayer != null) {
+        mediaPlayer.dispose();
+      }
+      
+      this.mediaPlayer = new MediaPlayer(media);
+      this.media = media;
+      this.mediaView = new MediaView(mediaPlayer);
+      Group root = new Group(mediaView);
+      Scene scene = new Scene(root, media.getWidth(), media.getHeight());
+      panel.setScene(scene);
+    });
   }
   
   private void play(Media media) {
