@@ -548,6 +548,8 @@ public final class Imaging {
   }
 
   public static BufferedImage setOpacity(final Image img, final float opacity) {
+    if (img == null)
+      return null;
     final BufferedImage bimage = getCompatibleImage(img.getWidth(null), img.getHeight(null));
     if (bimage == null) {
       return null;
