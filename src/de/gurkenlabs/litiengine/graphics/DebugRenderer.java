@@ -123,7 +123,7 @@ public final class DebugRenderer {
     
     // draw collision boxes from shape layer
     if (Game.config().debug().renderCollisionBoxes()) {
-      final BasicStroke shapeStroke = new BasicStroke(1 / Game.world().camera().getRenderScale());
+      final BasicStroke shapeStroke = new BasicStroke(1 / Game.world().activeCamera().getRenderScale());
       for (final Rectangle2D shape : Game.physics().getCollisionBoxes(Collision.STATIC)) {
         g.setColor(Color.RED);
         Game.graphics().renderOutline(g, shape, shapeStroke);
@@ -144,8 +144,8 @@ public final class DebugRenderer {
   private static void drawMapId(final Graphics2D g, final IEntity entity) {
     g.setColor(Color.RED);
     g.setFont(g.getFont().deriveFont(Font.PLAIN, 4f));
-    final double x = Game.world().camera().getViewportDimensionCenter(entity).getX() + 10;
-    final double y = Game.world().camera().getViewportDimensionCenter(entity).getY();
+    final double x = Game.world().activeCamera().getViewportDimensionCenter(entity).getX() + 10;
+    final double y = Game.world().activeCamera().getViewportDimensionCenter(entity).getY();
     TextRenderer.render(g, Integer.toString(entity.getMapId()), x, y);
     final String locationString = new DecimalFormat("##.##").format(entity.getX()) + ";" + new DecimalFormat("##.##").format(entity.getY());
     TextRenderer.render(g, locationString, x, y + 5.0);
@@ -163,7 +163,7 @@ public final class DebugRenderer {
     final String locationText = tileLocation.x + ", " + tileLocation.y;
     g.setFont(g.getFont().deriveFont(3f));
     final FontMetrics fm = g.getFontMetrics();
-    final Point2D relative = Game.world().camera().getViewportLocation(playerTile.getX(), playerTile.getY());
+    final Point2D relative = Game.world().activeCamera().getViewportLocation(playerTile.getX(), playerTile.getY());
     TextRenderer.render(g, locationText, (float) (relative.getX() + playerTile.getWidth() + 3), (float) (relative.getY() + fm.getHeight()));
 
     final List<ITile> tiles = MapUtilities.getTilesByPixelLocation(map, location);

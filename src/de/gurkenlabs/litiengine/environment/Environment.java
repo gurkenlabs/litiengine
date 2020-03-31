@@ -1872,10 +1872,10 @@ public final class Environment implements IRenderable {
     long renderStart = System.nanoTime();
 
     AffineTransform otx = g.getTransform();
-    g.scale(Game.world().camera().getRenderScale(), Game.world().camera().getRenderScale());
+    g.scale(Game.world().activeCamera().getRenderScale(), Game.world().activeCamera().getRenderScale());
     if (this.getMap() != null && this.getMap().getBackgroundColor() != null) {
       g.setColor(this.getMap().getBackgroundColor());
-      g.fill(new Rectangle2D.Double(0.0, 0.0, Game.world().camera().getViewport().getWidth(), Game.world().camera().getViewport().getHeight()));
+      g.fill(new Rectangle2D.Double(0.0, 0.0, Game.world().activeCamera().getViewport().getWidth(), Game.world().activeCamera().getViewport().getHeight()));
     }
 
     this.render(g, RenderType.BACKGROUND);
@@ -2038,7 +2038,7 @@ public final class Environment implements IRenderable {
 
     // 1. Render map layers
     if (this.getMap() != null) {
-      MapRenderer.render(g, this.getMap(), Game.world().camera().getViewport(), this, renderType);
+      MapRenderer.render(g, this.getMap(), Game.world().activeCamera().getViewport(), this, renderType);
     }
 
     // 2. Render renderables

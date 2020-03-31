@@ -242,7 +242,7 @@ public class LightSource extends Entity implements IRenderable {
     final float ry = (float) bounds.getHeight() / 2f;
 
     // get relative center of entity
-    final Point2D relativeCenter = Game.world().camera().getViewportLocation(new Point((int) (bounds.getX() + r), (int) (bounds.getY() + ry)));
+    final Point2D relativeCenter = Game.world().activeCamera().getViewportLocation(new Point((int) (bounds.getX() + r), (int) (bounds.getY() + ry)));
     final double cx = relativeCenter.getX();
     final double cy = relativeCenter.getY();
 
@@ -281,7 +281,7 @@ public class LightSource extends Entity implements IRenderable {
     shadowPolygon.addPoint((int) pointD.getX(), (int) pointD.getY());
     shadowPolygon.addPoint((int) pointC.getX(), (int) pointC.getY());
 
-    final Point2D shadowRenderLocation = Game.world().camera().getViewportLocation(new Point2D.Double(shadowEllipse.getX(), shadowEllipse.getY()));
+    final Point2D shadowRenderLocation = Game.world().activeCamera().getViewportLocation(new Point2D.Double(shadowEllipse.getX(), shadowEllipse.getY()));
     final Ellipse2D relativeEllipse = new Ellipse2D.Double(shadowRenderLocation.getX(), shadowRenderLocation.getY(), shadowEllipse.getWidth(), shadowEllipse.getHeight());
 
     final Area ellipseArea = new Area(relativeEllipse);
@@ -315,8 +315,6 @@ public class LightSource extends Entity implements IRenderable {
    *
    * @param g
    *          the graphics to use for rendering
-   * @param center
-   *          the center
    */
   private void renderShadows(final Graphics2D g) {
     if (!Game.world().environment().getCombatEntities().stream().anyMatch(isInRange(this.getCenter(), SHADOW_GRADIENT_SIZE))) {
@@ -324,7 +322,7 @@ public class LightSource extends Entity implements IRenderable {
     }
 
     // we'll use a radial gradient
-    final Paint gradientPaint = new RadialGradientPaint(Game.world().camera().getViewportDimensionCenter(this), SHADOW_GRADIENT_SIZE, SHADOW_GRADIENT_FRACTIONS, SHADOW_GRADIENT_COLORS);
+    final Paint gradientPaint = new RadialGradientPaint(Game.world().activeCamera().getViewportDimensionCenter(this), SHADOW_GRADIENT_SIZE, SHADOW_GRADIENT_FRACTIONS, SHADOW_GRADIENT_COLORS);
 
     // old Paint object for resetting it later
     final Paint oldPaint = g.getPaint();
@@ -336,7 +334,7 @@ public class LightSource extends Entity implements IRenderable {
         continue;
       }
 
-      final Shape obstructedVision = getObstructedVisionArea(mob, Game.world().camera().getViewportDimensionCenter(this));
+      final Shape obstructedVision = getObstructedVisionArea(mob, Game.world().activeCamera().getViewportDimensionCenter(this));
       // fill the polygon with the gradient paint
 
       ShapeRenderer.render(g, obstructedVision);

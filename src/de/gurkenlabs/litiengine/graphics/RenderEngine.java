@@ -37,7 +37,7 @@ import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
  * </p>
  * 
  * @see GameWorld#environment()
- * @see GameWorld#getActiveCamera() ()
+ * @see GameWorld#activeCamera() ()
  * @see IEntity#getLocation()
  * @see ShapeRenderer
  * @see TextRenderer
@@ -156,9 +156,9 @@ public final class RenderEngine {
       return;
     }
 
-    final Point2D viewPortLocation = Game.world().getActiveCamera().getViewportLocation(x, y);
-    double viewPortX = (float) viewPortLocation.getX() * Game.world().getActiveCamera().getRenderScale();
-    double yiewPortY = (float) viewPortLocation.getY() * Game.world().getActiveCamera().getRenderScale();
+    final Point2D viewPortLocation = Game.world().activeCamera().getViewportLocation(x, y);
+    double viewPortX = (float) viewPortLocation.getX() * Game.world().activeCamera().getRenderScale();
+    double yiewPortY = (float) viewPortLocation.getY() * Game.world().activeCamera().getRenderScale();
 
     TextRenderer.render(g, text, viewPortX, yiewPortY, antialias);
   }
@@ -239,8 +239,8 @@ public final class RenderEngine {
     Object hint = g.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, antialiasing ? RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF);
     final AffineTransform t = new AffineTransform();
-    t.scale(Game.world().getActiveCamera().getRenderScale(), Game.world().getActiveCamera().getRenderScale());
-    t.translate(Game.world().getActiveCamera().getPixelOffsetX(), Game.world().getActiveCamera().getPixelOffsetY());
+    t.scale(Game.world().activeCamera().getRenderScale(), Game.world().activeCamera().getRenderScale());
+    t.translate(Game.world().activeCamera().getPixelOffsetX(), Game.world().activeCamera().getPixelOffsetY());
 
     ShapeRenderer.renderTransformed(g, shape, t);
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, hint);
@@ -255,7 +255,7 @@ public final class RenderEngine {
    *          The shape to be rendered.
    */
   public void renderOutline(final Graphics2D g, final Shape shape) {
-    renderOutline(g, shape, new BasicStroke(1 / Game.world().getActiveCamera().getRenderScale()));
+    renderOutline(g, shape, new BasicStroke(1 / Game.world().activeCamera().getRenderScale()));
   }
 
   /**
@@ -269,7 +269,7 @@ public final class RenderEngine {
    *          Configure whether or not to render the shape with antialiasing.
    */
   public void renderOutline(final Graphics2D g, final Shape shape, boolean antialiasing) {
-    renderOutline(g, shape, new BasicStroke(1 / Game.world().getActiveCamera().getRenderScale()), antialiasing);
+    renderOutline(g, shape, new BasicStroke(1 / Game.world().activeCamera().getRenderScale()), antialiasing);
   }
 
   /**
@@ -310,8 +310,8 @@ public final class RenderEngine {
     Object hint = g.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, antialiasing ? RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF);
     final AffineTransform t = new AffineTransform();
-    t.scale(Game.world().getActiveCamera().getRenderScale(), Game.world().getActiveCamera().getRenderScale());
-    t.translate(Game.world().getActiveCamera().getPixelOffsetX(), Game.world().getActiveCamera().getPixelOffsetY());
+    t.scale(Game.world().activeCamera().getRenderScale(), Game.world().activeCamera().getRenderScale());
+    t.translate(Game.world().activeCamera().getPixelOffsetX(), Game.world().activeCamera().getPixelOffsetY());
 
     ShapeRenderer.renderOutlineTransformed(g, shape, t, stroke);
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, hint);
@@ -344,8 +344,8 @@ public final class RenderEngine {
    *          The location of the image.
    */
   public void renderImage(Graphics2D g, final Image image, Point2D location) {
-    Point2D viewPortLocation = Game.world().getActiveCamera().getViewportLocation(location);
-    ImageRenderer.render(g, image, viewPortLocation.getX() * Game.world().getActiveCamera().getRenderScale(), viewPortLocation.getY() * Game.world().getActiveCamera().getRenderScale());
+    Point2D viewPortLocation = Game.world().activeCamera().getViewportLocation(location);
+    ImageRenderer.render(g, image, viewPortLocation.getX() * Game.world().activeCamera().getRenderScale(), viewPortLocation.getY() * Game.world().activeCamera().getRenderScale());
   }
 
   /**
@@ -379,7 +379,7 @@ public final class RenderEngine {
     // in order to render the entities in a 2.5D manner, we sort them by their
     // max Y Coordinate
 
-    final List<? extends IEntity> entitiesToRender = entities.stream().filter(x -> Game.world().getActiveCamera().getViewport().intersects(x.getBoundingBox())).collect(Collectors.toList());
+    final List<? extends IEntity> entitiesToRender = entities.stream().filter(x -> Game.world().activeCamera().getViewport().intersects(x.getBoundingBox())).collect(Collectors.toList());
 
     if (sort) {
       // THIS COSTS THE MOST TIME OF THE RENDERING LOOP... MAYBE USE A
@@ -452,12 +452,12 @@ public final class RenderEngine {
         if (animationController.isAutoScaling()) {
           final double ratioX = entity.getWidth() / img.getWidth();
           final double ratioY = entity.getHeight() / img.getHeight();
-          ImageRenderer.renderScaled(g, img, Game.world().getActiveCamera().getViewportLocation(entity.getLocation()), ratioX, ratioY);
+          ImageRenderer.renderScaled(g, img, Game.world().activeCamera().getViewportLocation(entity.getLocation()), ratioX, ratioY);
         } else {
           double deltaX = (entity.getWidth() - img.getWidth()) / 2.0;
           double deltaY = (entity.getHeight() - img.getHeight()) / 2.0;
 
-          Point2D renderLocation = Game.world().getActiveCamera().getViewportLocation(entity.getX() + deltaX, entity.getY() + deltaY);
+          Point2D renderLocation = Game.world().activeCamera().getViewportLocation(entity.getX() + deltaX, entity.getY() + deltaY);
           ImageRenderer.renderTransformed(g, img, renderLocation.getX(), renderLocation.getY(), animationController.getAffineTransform());
 
           if (Game.config().debug().renderBoundingBoxes()) {

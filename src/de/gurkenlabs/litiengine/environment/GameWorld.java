@@ -33,7 +33,7 @@ import de.gurkenlabs.litiengine.resources.Resources;
  * @see Camera
  * @see GameWorld#environment()
  * @see GameWorld#mainCamera()
- * @see GameWorld#getActiveCamera()
+ * @see GameWorld#activeCamera()
  * @see GameWorld#getCamera(int)
  * @see GameWorld#reset(String)
  *
@@ -75,7 +75,7 @@ public final class GameWorld implements IUpdateable {
    * Use this in render code to get the camera.
    * @return
    */
-  public ICamera getActiveCamera(){
+  public ICamera activeCamera(){
     return getCamera(activeCameraIndex);
   }
 
@@ -310,14 +310,14 @@ public final class GameWorld implements IUpdateable {
 
   /**
    * Gets the game's main camera. To get secondary cameras, use {@link #getCamera(int)}
-   * To get the camera currently used for rendering, use {@link #getActiveCamera()}
+   * To get the camera currently used for rendering, use {@link #activeCamera()}
    *
    * @return The currently active camera.
    * 
    * @see ICamera
    */
   public ICamera mainCamera() {
-    return getActiveCamera();
+    return activeCamera();
   }
 
   /**

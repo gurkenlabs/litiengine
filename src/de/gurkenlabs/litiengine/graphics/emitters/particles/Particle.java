@@ -144,7 +144,7 @@ public abstract class Particle implements ITimeToLive {
   public Point2D getRenderLocation(Point2D effectLocation) {
     // if we have a camera, we need to render the particle relative to the
     // viewport
-    Point2D newEffectLocation = Game.screens() != null ? Game.world().camera().getViewportLocation(effectLocation) : effectLocation;
+    Point2D newEffectLocation = Game.screens() != null ? Game.world().activeCamera().getViewportLocation(effectLocation) : effectLocation;
     return this.getAbsoluteLocation(newEffectLocation);
   }
 
