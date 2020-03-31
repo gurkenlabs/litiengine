@@ -119,7 +119,9 @@ public class RenderComponent extends Canvas {
 
         //final Screen currentScreen = Game.screens().current();
         long renderStart = System.nanoTime();
-        for (Screen currentScreen : Game.screens().getActiveScreens()) {
+
+        final Screen currentScreen = Game.screens().current();
+        if (currentScreen != null) {
           //set up local instance of Graphics2D for the screen
           Graphics2D screenG = currentScreen.MakeGraphics(g);
           //render screen using new Graphics2D instance
@@ -127,11 +129,12 @@ public class RenderComponent extends Canvas {
           //free up memory from the now used Graphics2D instance
           screenG.dispose();
 
+          if (Game.config().debug().trackRenderTimes()) {
+            final double totalRenderTime = TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
+            Game.metrics().trackRenderTime("screen", totalRenderTime);
+          }
         }
-        if (Game.config().debug().trackRenderTimes()) {
-          final double totalRenderTime = TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
-          Game.metrics().trackRenderTime("screen", totalRenderTime);
-        }
+
 
         Game.window().cursor().render(g);
 
@@ -145,17 +148,11 @@ public class RenderComponent extends Canvas {
           g.fill(bounds);
         }
 
-        if (this.takeScreenShot) {
-            final BufferedImage img = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
-            final Graphics2D imgGraphics = img.createGraphics();
-          for (Screen currentScreen : Game.screens().getActiveScreens()) {
-            //set up local instance of Graphics2D for the screen
-            Graphics2D screenG = currentScreen.MakeGraphics(imgGraphics);
-            //render screen using new Graphics2D instance
-            currentScreen.render(screenG);
-            //free up memory from the now used Graphics2D instance
-            screenG.dispose();
-          }
+        if (this.takeScreenShot && currentScreen != null) {
+          final BufferedImage img = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
+          final Graphics2D imgGraphics = img.createGraphics();
+          currentScreen.render(imgGraphics);
+
           imgGraphics.dispose();
           this.saveScreenShot(img);
         }
