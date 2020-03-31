@@ -4,6 +4,7 @@ import java.awt.Graphics2D;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.GameWorld;
+import de.gurkenlabs.litiengine.gui.GameRenderComponent;
 
 /**
  * A default screen implementation that renders the game's current environment.
@@ -13,34 +14,16 @@ import de.gurkenlabs.litiengine.environment.GameWorld;
 public class GameScreen extends Screen {
   // The camera this game screen uses to render the world
   private int cameraIndex;
+  GameRenderComponent gameRender;
 
   public GameScreen() {
     this("GAME");
   }
 
   protected GameScreen(String name) {
-    this(name, 0, 0);
-  }
-  protected GameScreen(String name, int layer, int cameraIndex) {
-    super(name, layer);
-    this.setCameraIndex(cameraIndex);
-  }
+    super(name);
 
-  @Override
-  public void render(final Graphics2D g) {
-    Game.world().setActiveCameraIndex(cameraIndex);
-    if (Game.world().environment() != null) {
-      Game.world().environment().render(g);
-    }
-
-    super.render(g);
-  }
-
-  public int getCameraIndex() {
-    return cameraIndex;
-  }
-
-  public void setCameraIndex(int cameraIndex) {
-    this.cameraIndex = cameraIndex;
+    gameRender = new GameRenderComponent(0, 0, Game.window().getWidth(), Game.window().getHeight());
+    getComponents().add(gameRender);
   }
 }
