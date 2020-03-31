@@ -27,7 +27,7 @@ final class VideoManagerImpl implements VideoPlayer{
   private volatile MediaView mediaView;
 
   @Override
-  public void setVideo(VideoResource video) {
+  public synchronized void setVideo(VideoResource video) {
     if(video.getURI().startsWith("http")) {
       try {
         setVideo(new URL(video.getURI()));
@@ -39,13 +39,14 @@ final class VideoManagerImpl implements VideoPlayer{
   }
 
   @Override
-  public void play(VideoResource video) {
+  public synchronized void play(VideoResource video) {
     setVideo(video);
+    while(isStatusUnknown());
     play();
   }
 
   @Override
-  public void setVideo(URL url) throws IOException {
+  public synchronized void setVideo(URL url) throws IOException {
     if(url.getProtocol().startsWith("http")) {
       if(!VideoManager.allowNetworkConnections) {
         throw new IOException("Network access disallowed");
@@ -58,17 +59,18 @@ final class VideoManagerImpl implements VideoPlayer{
   }
 
   @Override
-  public void play(URL url) throws IOException {
+  public synchronized void play(URL url) throws IOException {
     setVideo(url);
-    Platform.runLater(() -> {
-      play();
-    });
+    while(isStatusUnknown());
+    play();
   }
   
-  public void play() {
+  public synchronized void play() {
     if(playerValid()) {
       panel.setVisible(true);
-      getPlayer().play();
+      Platform.runLater(() -> {
+        getPlayer().play();
+      });
     }
   }
   
