@@ -10,11 +10,13 @@ public final class VideoRenderer {
     throw new UnsupportedOperationException();
   }
   
-  public static void render(final Graphics2D g, final VideoManager video, final double x, final double y) {
-    if(video == null) {
+  public static void render(final Graphics2D g, final VideoManager video) {
+    if(video == null || video.isStatusUnknown()) {
       return;
     }
-    //TODO implement me!
+    g.translate(video.getX(), video.getY());
+    video.getPanel().paint(g);
+    g.translate(-video.getX(), -video.getY());
   }
   
 }
