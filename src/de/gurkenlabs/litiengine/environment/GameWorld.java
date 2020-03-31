@@ -32,7 +32,9 @@ import de.gurkenlabs.litiengine.resources.Resources;
  * @see Environment
  * @see Camera
  * @see GameWorld#environment()
- * @see GameWorld#camera()
+ * @see GameWorld#mainCamera()
+ * @see GameWorld#getActiveCamera()
+ * @see GameWorld#getCamera(int)
  * @see GameWorld#reset(String)
  *
  */
@@ -299,19 +301,14 @@ public final class GameWorld implements IUpdateable {
   }
 
   /**
-   * Gets the game's current <code>Camera</code>.
-   *
-   * @deprecated There may now be more than one camera in the world.
-   *             use {@link #getActiveCamera()} or {@link #getCamera(int)} instead.
-   *             Currently redirects to {@link #getActiveCamera()}
-   *
+   * Gets the game's main camera. To get secondary cameras, use {@link #getCamera(int)}
+   * To get the camera currently used for rendering, use {@link #getActiveCamera()}
    *
    * @return The currently active camera.
    * 
    * @see ICamera
    */
-  @Deprecated
-  public ICamera camera() {
+  public ICamera mainCamera() {
     return getActiveCamera();
   }
 
@@ -336,13 +333,14 @@ public final class GameWorld implements IUpdateable {
   }
 
   /**
-   * Clears the currently active camera and environment, removes all previously loaded environments
+   * Clears all the cameras and environment, removes all previously loaded environments
    * and clears all listener lists.
    */
   public void clear() {
     this.unloadEnvironment();
     this.environments.clear();
-    this.setCamera(null);
+    for(int i= 0; i < NUMBER_OF_CAMERAS; i++)
+      this.cameras[i] = null;
 
     this.environmentListeners.clear();
     this.environmentLoadedListeners.clear();
@@ -450,8 +448,8 @@ public final class GameWorld implements IUpdateable {
         if (mapName != null && this.environmentLoadedListeners.containsKey(mapName)) {
 
           // for the default camera we center the camera on the environment
-          if (this.camera().getClass().equals(Camera.class)) {
-            camera().setFocus(env.getCenter());
+          if (this.mainCamera().getClass().equals(Camera.class)) {
+            mainCamera().setFocus(env.getCenter());
           }
 
           for (EnvironmentLoadedListener listener : this.environmentLoadedListeners.get(mapName)) {
@@ -595,17 +593,13 @@ public final class GameWorld implements IUpdateable {
   }
 
   /**
-   * Sets the active camera of the game.
-   *
-   * @deprecated  There now may be more than one camera in the world, so you need to specify.<br>
-   *              Please use {@link #setCamera(ICamera, int)} instead.
-   *              Currently redirects to {@link #setCamera(ICamera, int)} with 0 as camera index
+   * Sets the main camera of the game.
+   * to set secondary cameras, use {@link #setCamera(ICamera, int)}
    *
    * @param cam
    *          The new camera to be set.
    */
-  @Deprecated
-  public void setCamera(final ICamera cam) {
+  public void setMainCamera(final ICamera cam) {
     setCamera(cam, 0);
   }
 
