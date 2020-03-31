@@ -91,6 +91,14 @@ public final class GameWorld implements IUpdateable {
     }
   }
 
+  /**
+   * Get a list of all cameras in the game world
+   * @return an array of ICamera
+   */
+  public ICamera[] getCameras() {
+    return cameras;
+  }
+
 
   //</editor-fold>
 

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import de.gurkenlabs.litiengine.graphics.ICamera;
 import de.gurkenlabs.litiengine.graphics.RenderComponent;
 
 /**
@@ -77,7 +78,10 @@ public final class GameLoop extends UpdateLoop implements IGameLoop {
    */
   @Override
   protected void process() {
-    Game.world().camera().updateFocus();
+    for (ICamera cam : Game.world().getCameras()) {
+      if(cam != null)
+        cam.updateFocus();
+    }
     if (this.getTimeScale() > 0) {
       super.process();
       this.executeTimedActions();
