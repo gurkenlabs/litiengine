@@ -264,13 +264,6 @@ final class VideoManagerImpl implements VideoPlayer{
   }
 
   @Override
-  public void setCycleCount(int value) {
-    if(playerValid()) {
-      getPlayer().setCycleCount(value);
-    }
-  }
-
-  @Override
   public void setRate(double value) {
     if(playerValid()) {
       getPlayer().setRate(value);

@@ -47,7 +47,6 @@ interface VideoPlayer {
   void play();
   void seek(Duration seekTime);
   void setBalance(double value);
-  void setCycleCount(int value);
   void setRate(double value);
   void setStartTime(Duration value);
   void setStopTime(Duration value);

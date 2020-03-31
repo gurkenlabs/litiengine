@@ -282,11 +282,6 @@ public final class VideoManager extends GuiComponent implements VideoPlayer {
   }
 
   @Override
-  public void setCycleCount(int value) {
-    impl.setCycleCount(value);
-  }
-
-  @Override
   public void setRate(double value) {
     impl.setRate(value);
   }
