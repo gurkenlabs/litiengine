@@ -36,6 +36,10 @@ import de.gurkenlabs.litiengine.sound.SoundPlayback.VolumeControl;
  * .ogg by default. If you need other file extensions, you have to write an own
  * SPI implementation and inject it in your project.
  * </p>
+ *
+ * NOTE:
+ * How sound works in a multi-camera environment is left undecided. For now this has defaulted to use MainCamera.
+ * The consequence of this is that sounds generated near a secondary camera may not be heard, be faint, or come from the wrong direction.
  */
 public final class SoundEngine implements IUpdateable, ILaunchable {
   public static final int DEFAULT_MAX_DISTANCE = 150;
@@ -51,7 +55,7 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
 
   private static final Logger log = Logger.getLogger(SoundEngine.class.getName());
   private Point2D listenerLocation;
-  private UnaryOperator<Point2D> listenerLocationCallback = old -> Game.world().camera().getFocus();
+  private UnaryOperator<Point2D> listenerLocationCallback = old -> Game.world().mainCamera().getFocus();
   private float maxDist = DEFAULT_MAX_DISTANCE;
   private MusicPlayback music;
   private final Collection<MusicPlayback> allMusic = ConcurrentHashMap.newKeySet();
@@ -574,7 +578,7 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
   @Override
   public void start() {
     Game.inputLoop().attach(this);
-    listenerLocation = Game.world().camera().getFocus();
+    listenerLocation = Game.world().mainCamera().getFocus();
   }
 
   @Override
