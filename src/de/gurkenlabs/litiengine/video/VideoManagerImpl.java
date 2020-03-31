@@ -3,11 +3,15 @@ package de.gurkenlabs.litiengine.video;
 import static java.time.Duration.ZERO;
 import static javafx.scene.media.MediaPlayer.Status.*;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URL;
 
+import javax.net.ssl.SSLHandshakeException;
 import javax.swing.JComponent;
 
 import de.gurkenlabs.litiengine.resources.VideoResource;
+
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Group;
@@ -24,22 +28,41 @@ final class VideoManagerImpl implements VideoPlayer{
 
   @Override
   public void setVideo(VideoResource video) {
+    if(video.getURI().startsWith("http")) {
+      try {
+        setVideo(new URL(video.getURI()));
+      } catch (IOException e) {
+        throw new UncheckedIOException(e);
+      }
+    }
     setMedia(new Media(video.getURI()));
   }
 
   @Override
   public void play(VideoResource video) {
-    play(new Media(video.getURI()));
+    setVideo(video);
+    play();
   }
 
   @Override
-  public void setVideo(URL url) {
+  public void setVideo(URL url) throws IOException {
+    if(url.getProtocol().startsWith("http")) {
+      if(!VideoManager.allowNetworkConnections) {
+        throw new IOException("Network access disallowed");
+      }
+      if(url.getProtocol().equals("http")) {
+        throw new SSLHandshakeException("Insecure protocol: http. Use https");
+      }
+    }
     setMedia(new Media(url.toString()));
   }
 
   @Override
-  public void play(URL url) {
-    play(new Media(url.toString()));
+  public void play(URL url) throws IOException {
+    setVideo(url);
+    Platform.runLater(() -> {
+      play();
+    });
   }
   
   public void play() {
@@ -62,13 +85,6 @@ final class VideoManagerImpl implements VideoPlayer{
       mediaView.autosize();
       panel.setScene(scene);
       mediaView.getMediaPlayer().setOnReady(() -> panel.setSize(media.getWidth(), media.getHeight()));
-    });
-  }
-  
-  private synchronized void play(Media media) {
-    setMedia(media);
-    Platform.runLater(() -> {
-      play();
     });
   }
   
