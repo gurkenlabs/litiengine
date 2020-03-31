@@ -54,9 +54,12 @@ interface VideoPlayer {
   void stop();
   Container getPanel();
   
+  /**
+   * @see javafx.scene.media.MediaPlayer.Status
+   */
   public static enum Status {
     DISPOSED,
-    ERRORED,
+    ERRORED, //HALTED
     PAUSED,
     PLAYING,
     READY,

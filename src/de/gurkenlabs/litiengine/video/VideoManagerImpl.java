@@ -298,6 +298,7 @@ final class VideoManagerImpl implements VideoPlayer{
     }
   }
   
+  @Override
   public JComponent getPanel() {
     return panel;
   }
