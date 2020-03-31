@@ -14,6 +14,7 @@ import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 import de.gurkenlabs.litiengine.util.MathUtilities;
+import sun.security.util.ArrayUtil;
 
 public class Camera implements ICamera {
   private final Collection<ZoomChangedListener> zoomListeners = ConcurrentHashMap.newKeySet();
@@ -195,7 +196,14 @@ public class Camera implements ICamera {
 
   @Override
   public void update() {
-    if (Game.world().camera() != null && !Game.world().camera().equals(this)) {
+    boolean isRunning = false;
+    for (ICamera c : Game.world().getCameras()) {
+      if (c == this) {
+        isRunning = true;
+        break;
+      }
+    }
+    if (!isRunning){
       return;
     }
 
