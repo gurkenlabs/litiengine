@@ -95,7 +95,7 @@ public class TileData {
     // keep for serialization
   }
 
-  TileData(List<Tile> tiles, int width, int height, String encoding, String compression) throws TmxException {
+  public TileData(List<Tile> tiles, int width, int height, String encoding, String compression) throws TmxException {
     if (!Encoding.isValid(encoding)) {
       throw new TmxException("Invalid tile data encoding '" + encoding + "'. Supported encodings are " + Encoding.CSV + " and " + Encoding.BASE64 + ".");
     }
