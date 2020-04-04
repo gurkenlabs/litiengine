@@ -18,7 +18,7 @@ import de.gurkenlabs.litiengine.physics.CollisionEvent;
 @CollisionInfo(collision = true)
 public abstract class CollisionEntity extends Entity implements ICollisionEntity {
   private static final Logger log = Logger.getLogger(CollisionEntity.class.getName());
-  
+
   private static final double HEIGHT_FACTOR = 0.4;
 
   private static final double WIDTH_FACTOR = 0.4;
@@ -130,7 +130,7 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
    */
   @Override
   public boolean hasCollision() {
-    return this.collision;
+    return this.collision && this.getCollisionBoxWidth() > 0 && this.getCollisionBoxHeight() > 0;
   }
 
   /**
