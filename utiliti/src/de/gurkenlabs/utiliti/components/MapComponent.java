@@ -80,8 +80,6 @@ public class MapComponent extends GuiComponent {
   public static final int EDITMODE_MOVE = 2;
   private static final Logger log = Logger.getLogger(MapComponent.class.getName());
 
-  private static final String DEFAULT_MAPOBJECTLAYER_NAME = "default";
-
   private static final int BASE_SCROLL_SPEED = 50;
 
   private final List<IntConsumer> editModeChangedConsumer;
@@ -711,7 +709,7 @@ public class MapComponent extends GuiComponent {
         // make sure there's a map object layer on the map because we need one
         // to add any kind of entities
         MapObjectLayer layer = new MapObjectLayer();
-        layer.setName(DEFAULT_MAPOBJECTLAYER_NAME);
+        layer.setName(MapObjectLayer.DEFAULT_MAPOBJECTLAYER_NAME);
         map.addLayer(layer);
       }
 
