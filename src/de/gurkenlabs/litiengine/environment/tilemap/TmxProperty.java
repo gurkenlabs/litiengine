@@ -1,7 +1,6 @@
 package de.gurkenlabs.litiengine.environment.tilemap;
 
-import static java.lang.annotation.ElementType.FIELD;
-
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
@@ -9,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  * This annotation identifies which name is used by the map-object property related to the annotated member.
  */
-@Target(FIELD)
+@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface TmxProperty {
   /**
