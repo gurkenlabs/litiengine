@@ -4,10 +4,13 @@ import java.awt.geom.Point2D;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.TmxType;
 import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
 
 @AnimationInfo(spritePrefix = PropAnimationController.PROP_IDENTIFIER)
+@TmxType(MapObjectType.PROP)
 public class Prop extends CombatEntity {
 
   @TmxProperty(name = MapObjectProperty.PROP_MATERIAL)

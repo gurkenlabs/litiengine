@@ -10,8 +10,11 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.GameWorld;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.TmxType;
 
+@TmxType(MapObjectType.SPAWNPOINT)
 public class Spawnpoint extends Entity {
   private final Collection<EntitySpawnedListener> spawnedListeners = ConcurrentHashMap.newKeySet();
 

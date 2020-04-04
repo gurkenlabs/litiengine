@@ -15,13 +15,16 @@ import java.util.function.Predicate;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.TmxType;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.ShapeRenderer;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 @EntityInfo(renderType = RenderType.OVERLAY)
+@TmxType(MapObjectType.LIGHTSOURCE)
 public class LightSource extends Entity implements IRenderable {
   public enum Type {
     ELLIPSE, RECTANGLE;

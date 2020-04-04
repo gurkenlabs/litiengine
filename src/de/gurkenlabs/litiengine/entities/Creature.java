@@ -8,7 +8,9 @@ import de.gurkenlabs.litiengine.Direction;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.attributes.Attribute;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.TmxType;
 import de.gurkenlabs.litiengine.graphics.animation.CreatureAnimationController;
 import de.gurkenlabs.litiengine.graphics.animation.EntityAnimationController;
 import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
@@ -19,6 +21,7 @@ import de.gurkenlabs.litiengine.physics.MovementController;
  * TODO: Add idle event
  */
 @MovementInfo
+@TmxType(MapObjectType.CREATURE)
 public class Creature extends CombatEntity implements IMobileEntity {
   private static final int IDLE_DELAY = 100;
   private final Collection<EntityMovedListener> movedListeners = ConcurrentHashMap.newKeySet();
