@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.environment.tilemap;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -106,7 +107,7 @@ public interface ILayerList extends ICustomPropertyProvider {
       }
     }
 
-    return mapObjects;
+    return Collections.unmodifiableCollection(mapObjects);
   }
 
   /**
