@@ -114,7 +114,7 @@ public final class GameRandom extends java.util.Random {
    * @throws IllegalArgumentException
    *           When the specified array is null or empty.
    */
-  public int choose(int[] array) {
+  public int choose(int... array) {
     if (array == null || array.length == 0) {
       throw new IllegalArgumentException(ARRAY_MUST_NOT_BE_EMPTY);
     }
@@ -132,7 +132,7 @@ public final class GameRandom extends java.util.Random {
    * @throws IllegalArgumentException
    *           When the specified array is null or empty.
    */
-  public long choose(long[] array) {
+  public long choose(long... array) {
     if (array == null || array.length == 0) {
       throw new IllegalArgumentException(ARRAY_MUST_NOT_BE_EMPTY);
     }
@@ -150,7 +150,7 @@ public final class GameRandom extends java.util.Random {
    * @throws IllegalArgumentException
    *           When the specified array is null or empty.
    */
-  public double choose(double[] array) {
+  public double choose(double... array) {
     if (array == null || array.length == 0) {
       throw new IllegalArgumentException(ARRAY_MUST_NOT_BE_EMPTY);
     }
