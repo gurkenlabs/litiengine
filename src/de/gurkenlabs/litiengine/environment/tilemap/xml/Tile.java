@@ -137,6 +137,10 @@ public class Tile extends CustomPropertyProvider implements ITile {
     return this.gid;
   }
 
+  void setGridId(int gid) {
+    this.gid = gid;
+  }
+
   @Override
   public Point getTileCoordinate() {
     return this.tileCoordinate;

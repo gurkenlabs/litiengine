@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -25,6 +27,8 @@ import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.io.Codec;
 
 public class TileData {
+  private static final Logger log = Logger.getLogger(TileData.class.getName());
+
   public static class Encoding {
     public static final String BASE64 = "base64";
     public static final String CSV = "csv";
@@ -143,7 +147,7 @@ public class TileData {
     this.rawValue.add(0, value);
   }
 
-  public List<Tile> getTiles() throws InvalidTileLayerException {
+  public List<Tile> getTiles() {
     if (this.tiles != null) {
       return this.tiles;
     }
@@ -152,10 +156,15 @@ public class TileData {
       return new ArrayList<>();
     }
 
-    if (this.isInfinite()) {
-      this.tiles = this.parseChunkData();
-    } else {
-      this.tiles = this.parseData();
+    try {
+      if (this.isInfinite()) {
+        this.tiles = this.parseChunkData();
+      } else {
+        this.tiles = this.parseData();
+      }
+    } catch (InvalidTileLayerException e) {
+      log.log(Level.SEVERE, e.getMessage(), e);
+      return new ArrayList<>();
     }
 
     return this.tiles;
@@ -175,7 +184,7 @@ public class TileData {
     return null;
   }
 
-  private static String encodeCsv(TileData data) throws InvalidTileLayerException {
+  private static String encodeCsv(TileData data) {
     StringBuilder sb = new StringBuilder();
     if (!data.getTiles().isEmpty()) {
       sb.append('\n');
