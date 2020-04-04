@@ -52,7 +52,7 @@ public final class Maps extends ResourcesContainer<IMap> {
    * <pre>
    * IMap map;
    * try (MapGenerator generator = Resources.maps().generate("name", 50, 50, 16, 16, Resources.tilesets().get("tileset.tsx"))) {
-   *   ITileLayer tileLayer = generator.addTileLayer(RenderType.GROUND, (x, y) -> {
+   *   ITileLayer tileLayer = generator.addTileLayer(RenderType.GROUND, (x, y) -&gt; {
    *     if (x == y) {
    *       // draw a diagonal in another tile color
    *       return 2;
@@ -158,7 +158,7 @@ public final class Maps extends ResourcesContainer<IMap> {
      * <b>Example for a tileCallback:</b>
      * 
      * <pre>
-     * (x, y) -> {
+     * (x, y) -&gt; {
      *   if (x == y) {
      *     // draw a diagonal in another tile color
      *     return 2;
@@ -275,7 +275,6 @@ public final class Maps extends ResourcesContainer<IMap> {
      * </p>
      * 
      * @see TmxMap#finish(URL)
-     * @see Maps#add(URL, IMap)
      */
     @Override
     public void close() {
