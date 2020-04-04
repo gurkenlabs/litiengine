@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.TmxType;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.DecimalFloatAdapter;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
@@ -23,9 +24,14 @@ public final class MapObjectSerializer {
     obj.setId(entity.getMapId());
     obj.setX((float) entity.getX());
     obj.setY((float) entity.getY());
-    obj.setWidth((float)entity.getWidth());
-    obj.setHeight((float)entity.getHeight());
+    obj.setWidth((float) entity.getWidth());
+    obj.setHeight((float) entity.getHeight());
     obj.setName(entity.getName());
+
+    TmxType type = entity.getClass().getAnnotation(TmxType.class);
+    if (type != null) {
+      obj.setType(type.value().toString());
+    }
 
     serialize(entity.getClass(), entity, obj);
     return obj;
