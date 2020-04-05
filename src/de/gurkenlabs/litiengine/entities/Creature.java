@@ -184,6 +184,10 @@ public class Creature extends CombatEntity implements IMobileEntity {
   }
 
   public void setSpritesheetName(String spritesheetName) {
+    if (this.spritesheetName != null && this.spritesheetName.equals(spritesheetName)) {
+      return;
+    }
+
     this.spritesheetName = spritesheetName;
     this.updateAnimationController();
   }
