@@ -68,10 +68,6 @@ public class GeometricUtilitiesTests {
     Rectangle2D rectangle9 = new Rectangle2D.Double(-5, -5, 10, 10);
     Point2D mid9 = GeometricUtilities.getMidPoint(rectangle9);
     
-    for(int i = 0; i < 10; i++) {
-      System.err.println(mid3);
-    }
-    
     assertEquals(new Point2D.Double(0, 0.5), mid);
     assertEquals(new Point2D.Double(0, 0.5), mid2);
     assertEquals(new Point2D.Double(0.5, 0.5), mid3);
