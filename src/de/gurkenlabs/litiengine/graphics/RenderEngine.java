@@ -454,11 +454,19 @@ public final class RenderEngine {
           final double ratioY = entity.getHeight() / img.getHeight();
           ImageRenderer.renderScaled(g, img, Game.world().camera().getViewportLocation(entity.getLocation()), ratioX, ratioY);
         } else {
+          // center the image relative to the entity dimensions -> the pivot point for rendering is the center of the entity
           double deltaX = (entity.getWidth() - img.getWidth()) / 2.0;
           double deltaY = (entity.getHeight() - img.getHeight()) / 2.0;
 
+          final AffineTransform transform = animationController.getAffineTransform();
+          if (transform != null) {
+            // center the scaled image relative to the desired render location if the transform provides a scaling element
+            deltaX += (img.getWidth() - (img.getWidth() * transform.getScaleX())) / 2.0;
+            deltaY += (img.getHeight() - (img.getHeight() * transform.getScaleY())) / 2.0;
+          }
+
           Point2D renderLocation = Game.world().camera().getViewportLocation(entity.getX() + deltaX, entity.getY() + deltaY);
-          ImageRenderer.renderTransformed(g, img, renderLocation.getX(), renderLocation.getY(), animationController.getAffineTransform());
+          ImageRenderer.renderTransformed(g, img, renderLocation.getX(), renderLocation.getY(), transform);
 
           if (Game.config().debug().renderBoundingBoxes()) {
             g.setColor(new Color(255, 0, 0, 50));
