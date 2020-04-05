@@ -9,6 +9,20 @@ public interface IMapImage extends ICustomPropertyProvider {
   public URL getAbsoluteSourcePath(); // XXX merge with getSource
 
   /**
+   * Gets the width.
+   *
+   * @return the width
+   */
+  public int getWidth();
+
+  /**
+   * Gets the height.
+   *
+   * @return the height
+   */
+  public int getHeight();
+
+  /**
    * Gets the dimension.
    *
    * @return the dimension
@@ -33,10 +47,12 @@ public interface IMapImage extends ICustomPropertyProvider {
    * Tests for equality between two map images. Two map images
    * are <i>equal</i> if they have the same absolute source path
    * and the same transparent color.
-   * @param anObject The map image to test for equality with
+   * 
+   * @param anObject
+   *          The map image to test for equality with
    * @return Whether this map image is equal to the provided map
-   *  image, or {@code false} if {@code anObject} is not a map
-   *  image
+   *         image, or {@code false} if {@code anObject} is not a map
+   *         image
    */
   public boolean equals(Object anObject);
 

@@ -98,6 +98,7 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
     this.setName(original.getName());
     this.setId(Game.world().environment().getNextMapId());
     this.polyline = (original.getPolyline() != null && !original.getPolyline().getPoints().isEmpty()) ? new PolyShape(original.getPolyline()) : null;
+    this.polygon = (original.getPolygon() != null && !original.getPolygon().getPoints().isEmpty()) ? new PolyShape(original.getPolygon()) : null;
     this.setType(original.getType());
     this.setX(original.getX());
     this.setY(original.getY());
@@ -341,9 +342,16 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
     return this.y;
   }
 
+  @Override
   @XmlTransient
-  public void setPolyline(PolyShape polyline) {
-    this.polyline = polyline;
+  public void setPolyline(IPolyShape polyline) {
+    this.polyline = (PolyShape) polyline;
+  }
+
+  @Override
+  @XmlTransient
+  public void setPolygon(IPolyShape polygon) {
+    this.polygon = (PolyShape) polygon;
   }
 
   @Override

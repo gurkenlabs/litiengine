@@ -74,11 +74,12 @@ public class MapImage extends CustomPropertyProvider implements IMapImage {
     return new Dimension(this.getWidth(), this.getHeight());
   }
 
-  /**
-   * Gets the height.
-   *
-   * @return the height
-   */
+  @Override
+  public int getWidth() {
+    return this.width;
+  }
+
+  @Override
   public int getHeight() {
     return this.height;
   }
@@ -91,15 +92,6 @@ public class MapImage extends CustomPropertyProvider implements IMapImage {
   @Override
   public Color getTransparentColor() {
     return this.transparentcolor;
-  }
-
-  /**
-   * Gets the width.
-   *
-   * @return the width
-   */
-  public int getWidth() {
-    return this.width;
   }
 
   @Override

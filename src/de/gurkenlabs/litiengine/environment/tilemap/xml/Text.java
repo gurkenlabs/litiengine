@@ -88,22 +88,27 @@ public class Text implements IMapObjectText {
     return this.color != null ? this.color : Color.BLACK;
   }
 
+  @Override
   public boolean isBold() {
     return this.bold != null && this.bold != 0;
   }
 
+  @Override
   public boolean isItalic() {
     return this.italic != null && this.italic != 0;
   }
 
+  @Override
   public boolean isUnderlined() {
     return this.underline != null && this.underline != 0;
   }
 
+  @Override
   public boolean isStrikeout() {
     return this.strikeout != null && this.strikeout != 0;
   }
 
+  @Override
   public boolean useKerning() {
     return this.kerning == null || this.kerning != 0;
   }
