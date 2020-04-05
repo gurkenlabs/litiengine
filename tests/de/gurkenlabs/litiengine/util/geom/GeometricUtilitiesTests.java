@@ -3,10 +3,12 @@ package de.gurkenlabs.litiengine.util.geom;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.awt.geom.Arc2D;
 import java.awt.geom.Dimension2D;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-
 import org.junit.jupiter.api.Test;
 
 public class GeometricUtilitiesTests {
@@ -53,8 +55,32 @@ public class GeometricUtilitiesTests {
   @Test
   public void testGetMidPoint() {
     Point2D mid = GeometricUtilities.getMidPoint(new Point2D.Double(0, 0), new Point2D.Double(0, 1));
-
+    Point2D mid2 = GeometricUtilities.getMidPoint(new Line2D.Double(new Point2D.Double(0,0), new Point2D.Double(0,1)));
+    Point2D mid3 = GeometricUtilities.getMidPoint(0, 0, 1, 1);
+    Point2D mid4 = GeometricUtilities.getMidPoint(GeometricUtilities.getCircle(new Point2D.Double(0.5d, 0.5d), 0.5d));
+    Point2D mid5 = GeometricUtilities.getMidPoint(new Ellipse2D.Double(0, 0, 1, 1));
+    Point2D mid6 = GeometricUtilities.getMidPoint(new Rectangle2D.Double(0, 0, 1, 1));
+    Point2D mid7 = GeometricUtilities.getMidPoint(new Arc2D.Double(0, 0, 1, 1, 1, 1, Arc2D.OPEN));
+    
+    Rectangle2D rectangle8 = new Rectangle2D.Double(5, 5, 10, 10);
+    Point2D mid8 = GeometricUtilities.getMidPoint(rectangle8);
+    
+    Rectangle2D rectangle9 = new Rectangle2D.Double(-5, -5, 10, 10);
+    Point2D mid9 = GeometricUtilities.getMidPoint(rectangle9);
+    
+    for(int i = 0; i < 10; i++) {
+      System.err.println(mid3);
+    }
+    
     assertEquals(new Point2D.Double(0, 0.5), mid);
+    assertEquals(new Point2D.Double(0, 0.5), mid2);
+    assertEquals(new Point2D.Double(0.5, 0.5), mid3);
+    assertEquals(new Point2D.Double(0.5, 0.5), mid4);
+    assertEquals(new Point2D.Double(0.5, 0.5), mid5);
+    assertEquals(new Point2D.Double(0.5, 0.5), mid6);
+    assertEquals(new Point2D.Double(0.5, 0.5), mid7);
+    assertEquals(new Point2D.Double(10, 10), mid8);
+    assertEquals(new Point2D.Double(0, 0), mid9);
   }
 
   @Test
