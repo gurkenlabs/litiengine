@@ -11,6 +11,7 @@ import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.RectangularShape;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -329,6 +330,27 @@ public class GeometricUtilities {
   
   public static Point2D getMidPoint(final double x1, final double y1, final double x2, final double y2) {
     return new Point2D.Double((x1 + x2) / 2, (y1 + y2) / 2);
+  }
+  
+  /**
+   * Returns the center of a shape whose geometry is defined by a rectangular frame. 
+   * 
+   * Works for any subclass of RectuangularShape, including:<br>
+   * 
+   * <br>
+   * Arc2D<br>
+   * Ellipse2D<br>
+   * Rectangle2D<br>
+   * RoundRectangle2D<br>
+   * <br>
+   * 
+   * @param shape the shape to retrieve the center of
+   * @return a Point2D representing the center of the shape
+   * 
+   * @see java.awt.geom.RectangularShape
+   */
+  public static Point2D getMidPoint(RectangularShape shape) {
+    return new Point2D.Double(shape.getCenterX(), shape.getCenterY());
   }
 
   public static Ellipse2D getCircle(Point2D center, double radius) {
