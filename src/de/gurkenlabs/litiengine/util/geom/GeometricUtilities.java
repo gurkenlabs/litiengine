@@ -324,7 +324,8 @@ public class GeometricUtilities {
   }
 
   public static Point2D getMidPoint(final Point2D p1, final Point2D p2) {
-    return getAveragePosition(p1, p2);
+    return new Point2D.Double((p1.getX() + p2.getX()) / 2, (p1.getY() + p2.getY()) / 2);
+  }
   
   public static Point2D getMidPoint(final double x1, final double y1, final double x2, final double y2) {
     return new Point2D.Double((x1 + x2) / 2, (y1 + y2) / 2);
