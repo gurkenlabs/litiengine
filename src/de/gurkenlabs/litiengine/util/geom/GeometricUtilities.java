@@ -325,7 +325,7 @@ public class GeometricUtilities {
   }
 
   public static Point2D getCenter(final Point2D p1, final Point2D p2) {
-    return new Point2D.Double((p1.getX() + p2.getX()) / 2, (p1.getY() + p2.getY()) / 2);
+    return getCenter(p1.getX(), p2.getX(), p1.getY(),  p2.getY());
   }
   
   public static Point2D getCenter(final double x1, final double y1, final double x2, final double y2) {
