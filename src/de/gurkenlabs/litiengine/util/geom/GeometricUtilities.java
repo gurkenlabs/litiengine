@@ -320,15 +320,15 @@ public class GeometricUtilities {
     return Math.sqrt(Math.pow(rect.getWidth(), 2) + Math.pow(rect.getHeight(), 2));
   }
   
-  public static Point2D getMidPoint(Line2D line) {
-    return getMidPoint(line.getP1(), line.getP2());
+  public static Point2D getCenter(Line2D line) {
+    return getCenter(line.getP1(), line.getP2());
   }
 
-  public static Point2D getMidPoint(final Point2D p1, final Point2D p2) {
+  public static Point2D getCenter(final Point2D p1, final Point2D p2) {
     return new Point2D.Double((p1.getX() + p2.getX()) / 2, (p1.getY() + p2.getY()) / 2);
   }
   
-  public static Point2D getMidPoint(final double x1, final double y1, final double x2, final double y2) {
+  public static Point2D getCenter(final double x1, final double y1, final double x2, final double y2) {
     return new Point2D.Double((x1 + x2) / 2, (y1 + y2) / 2);
   }
   
@@ -349,7 +349,7 @@ public class GeometricUtilities {
    * 
    * @see java.awt.geom.RectangularShape
    */
-  public static Point2D getMidPoint(RectangularShape shape) {
+  public static Point2D getCenter(RectangularShape shape) {
     return new Point2D.Double(shape.getCenterX(), shape.getCenterY());
   }
 
