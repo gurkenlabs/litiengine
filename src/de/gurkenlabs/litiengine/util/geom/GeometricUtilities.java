@@ -320,7 +320,7 @@ public class GeometricUtilities {
     return Math.sqrt(Math.pow(rect.getWidth(), 2) + Math.pow(rect.getHeight(), 2));
   }
   
-  public static Point2D getCenter(Line2D line) {
+  public static Point2D getCenter(final Line2D line) {
     return getCenter(line.getP1(), line.getP2());
   }
 
@@ -349,7 +349,7 @@ public class GeometricUtilities {
    * 
    * @see java.awt.geom.RectangularShape
    */
-  public static Point2D getCenter(RectangularShape shape) {
+  public static Point2D getCenter(final RectangularShape shape) {
     return new Point2D.Double(shape.getCenterX(), shape.getCenterY());
   }
 
