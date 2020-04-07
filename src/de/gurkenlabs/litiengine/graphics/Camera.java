@@ -163,16 +163,17 @@ public class Camera implements ICamera {
   @Override
   public void setZoom(final float targetZoom, final int delay) {
     if (delay == 0) {
-      final ZoomChangedEvent event = new ZoomChangedEvent(this, targetZoom);
-      for (final ZoomChangedListener listener : this.zoomListeners) {
-        listener.zoomChanged(event);
-      }
 
       this.zoom = targetZoom;
       this.targetZoom = 0;
       this.zoomDelay = 0;
       this.zoomTick = 0;
       this.zoomStep = 0;
+      
+      final ZoomChangedEvent event = new ZoomChangedEvent(this, targetZoom);
+      for (final ZoomChangedListener listener : this.zoomListeners) {
+        listener.zoomChanged(event);
+      }
     } else {
       this.zoomTick = Game.time().now();
       this.targetZoom = targetZoom;
