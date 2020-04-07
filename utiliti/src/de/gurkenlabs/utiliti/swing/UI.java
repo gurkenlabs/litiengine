@@ -49,6 +49,9 @@ import de.gurkenlabs.utiliti.swing.panels.MapObjectInspector;
 
 public final class UI {
   private static final Logger log = Logger.getLogger(UI.class.getName());
+  private static final int SCROLL_MAX = 100;
+
+  private static JPanel renderPanel;
   private static JScrollBar horizontalScroll;
   private static JScrollBar verticalScroll;
   private static JPopupMenu canvasPopup;
@@ -61,24 +64,9 @@ public final class UI {
 
   private static boolean initialized;
 
+  private static float currentScrollSize;
+
   private UI() {
-  }
-
-  public static JScrollBar getHorizontalScrollBar() {
-    return horizontalScroll;
-  }
-
-  public static JScrollBar getVerticalcrollBar() {
-    return verticalScroll;
-  }
-
-  public static void updateScrollBars() {
-    horizontalScroll.setMinimum(0);
-    horizontalScroll.setMaximum(Game.world().environment().getMap().getSizeInPixels().width);
-    verticalScroll.setMinimum(0);
-    verticalScroll.setMaximum(Game.world().environment().getMap().getSizeInPixels().height);
-    horizontalScroll.setValue((int) Game.world().camera().getViewport().getCenterX());
-    verticalScroll.setValue((int) Game.world().camera().getViewport().getCenterY());
   }
 
   public static boolean notifyPendingChanges() {
@@ -139,6 +127,67 @@ public final class UI {
     return mapSelectionPanel;
   }
 
+  public static void updateScrollBars() {
+    double relativeX = Game.world().camera().getFocus().getX() / Game.world().environment().getMap().getSizeInPixels().width;
+    double relativeY = Game.world().camera().getFocus().getY() / Game.world().environment().getMap().getSizeInPixels().height;
+
+    // decouple the scrollbar from the environment
+    currentScrollSize = Math.round(SCROLL_MAX * Math.sqrt(Game.world().camera().getRenderScale()));
+
+    horizontalScroll.setMinimum(0);
+    horizontalScroll.setMaximum((int) currentScrollSize);
+    verticalScroll.setMinimum(0);
+    verticalScroll.setMaximum((int) currentScrollSize);
+
+    int valueX = (int) (relativeX * currentScrollSize);
+    int valueY = (int) (relativeY * currentScrollSize);
+
+    horizontalScroll.setValue(valueX);
+    verticalScroll.setValue(valueY);
+    renderPanel.grabFocus();
+  }
+
+  private static double getScrollValue(JScrollBar scrollbar, double actualSize) {
+    double currentValue = scrollbar.getValue() / currentScrollSize;
+    return currentValue * actualSize;
+  }
+
+  private static void initScrollBars(JPanel renderPane) {
+    horizontalScroll = new JScrollBar(java.awt.Adjustable.HORIZONTAL);
+    renderPane.add(horizontalScroll, BorderLayout.SOUTH);
+    verticalScroll = new JScrollBar(java.awt.Adjustable.VERTICAL);
+    renderPane.add(verticalScroll, BorderLayout.EAST);
+
+    horizontalScroll.setDoubleBuffered(true);
+    verticalScroll.setDoubleBuffered(true);
+
+    horizontalScroll.addAdjustmentListener(e -> {
+      if (Editor.instance().getMapComponent().isLoading()) {
+        return;
+      }
+
+      final double x = getScrollValue(horizontalScroll, Game.world().environment().getMap().getSizeInPixels().width);
+
+      Point2D newFocus = new Point2D.Double(x, Game.world().camera().getFocus().getY());
+      Game.world().camera().setFocus(newFocus);
+    });
+
+    verticalScroll.addAdjustmentListener(e -> {
+      if (Editor.instance().getMapComponent().isLoading()) {
+        return;
+      }
+
+      final double y = getScrollValue(verticalScroll, Game.world().environment().getMap().getSizeInPixels().height);
+
+      Point2D newFocus = new Point2D.Double(Game.world().camera().getFocus().getX(), y);
+      Game.world().camera().setFocus(newFocus);
+    });
+
+    Game.world().camera().onZoom(e -> {
+      updateScrollBars();
+    });
+  }
+
   private static void setupInterface() {
     JFrame window = initWindow();
 
@@ -149,7 +198,7 @@ public final class UI {
     // remove canvas because we want to add a wrapping panel
     window.remove(canvas);
 
-    JPanel renderPanel = new JPanel(new BorderLayout());
+    renderPanel = new JPanel(new BorderLayout());
     renderPanel.add(canvas);
     renderPanel.setMinimumSize(new Dimension(300, 0));
     initScrollBars(renderPanel);
@@ -261,30 +310,6 @@ public final class UI {
     bottomPanel.add(bottomTab, BorderLayout.CENTER);
 
     return bottomPanel;
-  }
-
-  private static void initScrollBars(JPanel renderPane) {
-    horizontalScroll = new JScrollBar(java.awt.Adjustable.HORIZONTAL);
-    renderPane.add(horizontalScroll, BorderLayout.SOUTH);
-    verticalScroll = new JScrollBar(java.awt.Adjustable.VERTICAL);
-    renderPane.add(verticalScroll, BorderLayout.EAST);
-
-    horizontalScroll.addAdjustmentListener(e -> {
-      if (Editor.instance().getMapComponent().isLoading()) {
-        return;
-      }
-
-      Point2D newFocus = new Point2D.Double(horizontalScroll.getValue(), Game.world().camera().getFocus().getY());
-      Game.world().camera().setFocus(newFocus);
-    });
-
-    verticalScroll.addAdjustmentListener(e -> {
-      if (Editor.instance().getMapComponent().isLoading()) {
-        return;
-      }
-      Point2D newFocus = new Point2D.Double(Game.world().camera().getFocus().getX(), verticalScroll.getValue());
-      Game.world().camera().setFocus(newFocus);
-    });
   }
 
   private static void initPopupMenu(Canvas canvas) {

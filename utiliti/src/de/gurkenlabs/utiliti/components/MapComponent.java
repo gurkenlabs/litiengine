@@ -1005,7 +1005,7 @@ public class MapComponent extends GuiComponent {
         Game.world().camera().setFocus(newFocus);
       }
 
-      UI.getHorizontalScrollBar().setValue((int) Game.world().camera().getViewport().getCenterX());
+      UI.updateScrollBars();
       return;
     }
 
@@ -1028,7 +1028,7 @@ public class MapComponent extends GuiComponent {
       Game.world().camera().setFocus(newFocus);
     }
 
-    UI.getVerticalcrollBar().setValue((int) Game.world().camera().getViewport().getCenterY());
+    UI.updateScrollBars();
   }
 
   /***
