@@ -127,7 +127,11 @@ public final class UI {
     return mapSelectionPanel;
   }
 
-  public static void updateScrollBars() {
+  private static void updateScrollBars() {
+    if (Game.world().environment() == null) {
+      return;
+    }
+
     double relativeX = Game.world().camera().getFocus().getX() / Game.world().environment().getMap().getSizeInPixels().width;
     double relativeY = Game.world().camera().getFocus().getY() / Game.world().environment().getMap().getSizeInPixels().height;
 
@@ -144,7 +148,6 @@ public final class UI {
 
     horizontalScroll.setValue(valueX);
     verticalScroll.setValue(valueY);
-    renderPanel.grabFocus();
   }
 
   private static double getScrollValue(JScrollBar scrollbar, double actualSize) {
@@ -184,6 +187,10 @@ public final class UI {
     });
 
     Game.world().camera().onZoom(e -> {
+      updateScrollBars();
+    });
+
+    Game.world().camera().onFocus(e -> {
       updateScrollBars();
     });
   }

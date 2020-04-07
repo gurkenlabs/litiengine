@@ -331,7 +331,6 @@ public class MapComponent extends GuiComponent {
 
       Game.world().loadEnvironment(this.environments.get(map.getName()));
 
-      UI.updateScrollBars();
       UI.getMapController().setSelection(map);
       UI.getInspector().bind(this.getFocusedMapObject());
 
@@ -1005,7 +1004,6 @@ public class MapComponent extends GuiComponent {
         Game.world().camera().setFocus(newFocus);
       }
 
-      UI.updateScrollBars();
       return;
     }
 
@@ -1027,8 +1025,6 @@ public class MapComponent extends GuiComponent {
       Point2D newFocus = new Point2D.Double(currentFocus.getX(), currentFocus.getY() + this.scrollSpeed);
       Game.world().camera().setFocus(newFocus);
     }
-
-    UI.updateScrollBars();
   }
 
   /***
