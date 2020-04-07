@@ -54,6 +54,7 @@ public class Program {
     Game.config().debug().setDebugEnabled(true);
     Game.config().graphics().setGraphicQuality(Quality.VERYHIGH);
     Game.config().graphics().setReduceFramesWhenNotFocused(false);
+    Game.config().graphics().setEnableResolutionScale(false);
   }
 
   private static void handleArgs(String[] args) {
