@@ -33,14 +33,29 @@ public class CustomPanel extends PropertyPanel {
     this.scrollPane = new JScrollPane();
 
     JButton buttonAdd = new JButton("+");
-    buttonAdd.addActionListener(a -> model.addRow(new Object[] { "", "" }));
+    buttonAdd.addActionListener(a -> {
+      TableCellEditor editor = tableCustomProperties.getCellEditor();
+      if (editor != null) {
+        editor.stopCellEditing();
+      }
+      model.addRow(new Object[] { "", "" });
+      model.fireTableDataChanged();
+    });
 
     JButton buttonRemove = new JButton("-");
     buttonRemove.addActionListener(a -> {
+      TableCellEditor editor = tableCustomProperties.getCellEditor();
+      if (editor != null) {
+        editor.stopCellEditing();
+      }
+      
       int[] rows = tableCustomProperties.getSelectedRows();
       for (int i = 0; i < rows.length; i++) {
         model.removeRow(rows[i] - i);
       }
+      
+      model.fireTableDataChanged();
+      tableCustomProperties.revalidate();
     });
 
     GroupLayout groupLayout = new GroupLayout(this);
