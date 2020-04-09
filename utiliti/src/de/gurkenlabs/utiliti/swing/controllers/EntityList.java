@@ -79,7 +79,6 @@ public final class EntityList extends JPanel implements EntityController {
 
     this.searchPanel = new JPanel();
     this.searchPanel.setBorder(new LineBorder(UIManager.getColor("Button.shadow")));
-    this.searchPanel.setBackground(Color.WHITE);
     this.searchPanel.setLayout(new BorderLayout(0, 0));
 
     this.btnCollape = new JButton("");
@@ -91,7 +90,6 @@ public final class EntityList extends JPanel implements EntityController {
     this.textField = new JTextField(Resources.strings().get("panel_entities_search_default"));
     this.textField.setBorder(new EmptyBorder(0, 5, 0, 0));
     this.textField.setOpaque(false);
-    this.textField.setForeground(Color.GRAY);
     this.textField.setColumns(10);
     this.textField.addActionListener(e -> search());
     this.textField.addFocusListener(new FocusAdapter() {
@@ -99,7 +97,6 @@ public final class EntityList extends JPanel implements EntityController {
       public void focusGained(final FocusEvent e) {
         if (textField.getText() != null && textField.getText().equals(Resources.strings().get("panel_entities_search_default"))) {
           textField.setText(null);
-          textField.setForeground(Color.BLACK);
         }
 
         textField.selectAll();
@@ -110,7 +107,6 @@ public final class EntityList extends JPanel implements EntityController {
       public void focusLost(FocusEvent e) {
         if (textField.getText() == null || textField.getText().isEmpty()) {
           textField.setText(Resources.strings().get("panel_entities_search_default"));
-          textField.setForeground(Color.DARK_GRAY);
         }
         super.focusLost(e);
       }

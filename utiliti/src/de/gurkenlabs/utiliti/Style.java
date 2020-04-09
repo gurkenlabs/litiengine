@@ -26,14 +26,13 @@ public final class Style {
   public static final Color COLOR_MOUSE_SELECTION_AREA_FILL = new Color(0, 130, 152, 80);
   public static final Color COLOR_MOUSE_SELECTION_AREA_BORDER = new Color(0, 130, 152, 150);
 
-  public static final Color COLOR_ASSETPANEL_BACKGROUND = new Color(24, 24, 24);
   public static final Color COLOR_DEFAULT_TAG = new Color(99, 113, 118);
   public static final Color COLOR_DEFAULT_TAG_HOVER = COLOR_DEFAULT_TAG.darker();
   public static final Color COLOR_STATUS = Color.WHITE;
 
-  public static final float FONT_DEFAULT_SIZE = 12;
+  public static final float FONT_DEFAULT_SIZE = 13;
   public static final String FONTNAME_CONSOLE = "Consolas";
-  private static final Font FONT_DEFAULT = Resources.fonts().get("OpenSans.ttf", Font.PLAIN, FONT_DEFAULT_SIZE);
+  private static final Font FONT_DEFAULT = Resources.fonts().get("Roboto-Regular.ttf", Font.PLAIN, FONT_DEFAULT_SIZE);
   private static Font scaledDefaultFont;
 
   private Style() {

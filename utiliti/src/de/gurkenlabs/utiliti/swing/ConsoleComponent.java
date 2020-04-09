@@ -26,8 +26,6 @@ public class ConsoleComponent extends JScrollPane {
     this.setViewportView(consoleTextArea);
 
     consoleTextArea.setEditable(false);
-    consoleTextArea.setBackground(Style.COLOR_ASSETPANEL_BACKGROUND);
-    consoleTextArea.setForeground(Color.WHITE);
     consoleTextArea.setAutoscrolls(true);
     root.addHandler(new LogHandler(consoleTextArea));
   }

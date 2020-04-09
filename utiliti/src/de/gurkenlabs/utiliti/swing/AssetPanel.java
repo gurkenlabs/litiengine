@@ -31,9 +31,7 @@ public class AssetPanel extends JPanel {
     this.setLayout(this.layout);
 
     this.setBorder(new EmptyBorder(5, 5, 5, 5));
-    this.setBackground(Style.COLOR_ASSETPANEL_BACKGROUND);
   }
-
   public void loadSprites(List<SpritesheetResource> infos) {
     this.load(() -> {
       Collections.sort(infos);

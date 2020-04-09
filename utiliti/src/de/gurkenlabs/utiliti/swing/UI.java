@@ -2,8 +2,10 @@ package de.gurkenlabs.utiliti.swing;
 
 import java.awt.BorderLayout;
 import java.awt.Canvas;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
@@ -11,7 +13,6 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.util.Enumeration;
 import java.util.Locale;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -24,8 +25,11 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.FontUIResource;
+
+import com.github.weisj.darklaf.LafManager;
+import com.github.weisj.darklaf.theme.DarculaTheme;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameListener;
@@ -96,7 +100,12 @@ public final class UI {
 
     Game.screens().display(Editor.instance());
 
-    initSwingComponentStyle();
+    javax.swing.JComponent.setDefaultLocale(Locale.getDefault());
+    JPopupMenu.setDefaultLightWeightPopupEnabled(false);
+    UIManager.getDefaults().put("SplitPane.border", BorderFactory.createEmptyBorder());
+    setDefaultSwingFont(Style.getDefaultFont());
+    setDefaultForegroundColor(Color.WHITE);
+
     Tray.init();
     Game.window().cursor().set(Cursors.DEFAULT, 0, 0);
     Game.window().cursor().setOffsetX(0);
@@ -294,7 +303,7 @@ public final class UI {
     mapObjectPanel = new MapObjectInspector();
 
     JSplitPane rightSplitPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-    rightSplitPanel.setMinimumSize(new Dimension(300, 0));
+    rightSplitPanel.setMinimumSize(new Dimension(320, 0));
     rightSplitPanel.setBottomComponent(mapObjectPanel);
     rightSplitPanel.setTopComponent(topRightSplitPanel);
     rightSplitPanel.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> Editor.preferences().setSelectionEditSplitter(rightSplitPanel.getDividerLocation()));
@@ -333,28 +342,70 @@ public final class UI {
     });
   }
 
-  private static void initSwingComponentStyle() {
-    try {
-      javax.swing.JComponent.setDefaultLocale(Locale.getDefault());
-      JPopupMenu.setDefaultLightWeightPopupEnabled(false);
-      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-      UIManager.getDefaults().put("SplitPane.border", BorderFactory.createEmptyBorder());
-      setDefaultSwingFont(new FontUIResource(Style.getDefaultFont()));
-    } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
-      log.log(Level.SEVERE, e.getLocalizedMessage(), e);
-    }
+  public static void initLookAndFeel() {
+    LafManager.setDecorationsEnabled(true);
+    LafManager.install(new DarculaTheme()); // Specify the used theme.
   }
 
-  private static void setDefaultSwingFont(FontUIResource font) {
+  private static void setDefaultSwingFont(Font font) {
     Enumeration<Object> keys = UIManager.getDefaults().keys();
     while (keys.hasMoreElements()) {
       Object key = keys.nextElement();
 
       Object value = UIManager.get(key);
-
       if (value instanceof javax.swing.plaf.FontUIResource) {
-        UIManager.put(key, font);
+        UIManager.put(key, new FontUIResource(font));
       }
+    }
+  }
+
+  private static void setDefaultForegroundColor(Color color) {
+    Enumeration<Object> keys = UIManager.getDefaults().keys();
+    while (keys.hasMoreElements()) {
+      Object key = keys.nextElement();
+
+      if (key instanceof String) {
+
+        Object value = UIManager.get(key);
+        if (value instanceof javax.swing.plaf.ColorUIResource) {
+          String keyString = (String) key;
+          
+          ColorUIResource colorResource = (ColorUIResource)value;
+          
+          // ICON COLORS
+          if(colorResource.equals(new Color(175,177,179))){
+            UIManager.put(key, new ColorUIResource(224,224,224));
+          }
+          
+          // FONT COLORS 
+          if(colorResource.equals(new Color(187,187,187))){
+            UIManager.put(key, new ColorUIResource(224,224,224));
+          }
+          
+          UIManager.put("JButton.square", false);
+          
+          System.out.println(key);
+          
+          if (!keyString.toLowerCase().contains("background") 
+              && !keyString.toLowerCase().contains("disabled") 
+              && !keyString.toLowerCase().contains("bordercolor")
+              && !keyString.toLowerCase().contains("fillcolor")
+              && !keyString.toLowerCase().contains("linecolor")
+              && !keyString.toLowerCase().contains("highlight")
+              && !keyString.toLowerCase().contains("knob")
+              && !keyString.toLowerCase().contains("caretforeground")
+              && !keyString.toLowerCase().contains("shadow")
+              && !keyString.toLowerCase().contains("contrast")
+              && !keyString.toLowerCase().contains("focus")
+              && !keyString.toLowerCase().contains("inactive")) {
+
+
+          }
+        }
+
+
+      }
+
     }
   }
 }

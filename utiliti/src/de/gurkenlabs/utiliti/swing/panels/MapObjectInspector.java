@@ -133,11 +133,11 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.lblLayer = new JLabel("");
 
     this.lblRendering = new JLabel("");
-    this.lblRendering.setForeground(Color.GRAY);
+    this.lblRendering.setForeground(Color.LIGHT_GRAY);
     this.lblRendering.setFont(lblRendering.getFont().deriveFont(Style.getDefaultFont().getSize() * 0.75f));
 
     this.lblLayer.setHorizontalAlignment(SwingConstants.TRAILING);
-    this.lblLayer.setForeground(Color.GRAY);
+    this.lblLayer.setForeground(Color.LIGHT_GRAY);
     this.lblLayer.setFont(this.lblLayer.getFont().deriveFont(Style.getDefaultFont().getSize() * 0.75f));
 
     this.infoPanel.add(lblEntityId);
