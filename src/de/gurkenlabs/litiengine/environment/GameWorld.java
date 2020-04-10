@@ -110,7 +110,7 @@ public final class GameWorld implements IUpdateable {
    * @param listener
    *          The listener to add.
    */
-  public void addLoadedListener(EnvironmentLoadedListener listener) {
+  public void onLoaded(EnvironmentLoadedListener listener) {
     this.loadedListeners.add(listener);
   }
 
@@ -131,7 +131,7 @@ public final class GameWorld implements IUpdateable {
    * @param listener
    *          The listener to add.
    */
-  public void addUnloadedListener(EnvironmentUnloadedListener listener) {
+  public void onUnloaded(EnvironmentUnloadedListener listener) {
     this.unloadedListeners.add(listener);
   }
 
@@ -153,7 +153,7 @@ public final class GameWorld implements IUpdateable {
    * @param listener
    *          The listener to add.
    */
-  public void addLoadedListener(String mapName, EnvironmentLoadedListener listener) {
+  public void onLoaded(String mapName, EnvironmentLoadedListener listener) {
     add(this.environmentLoadedListeners, mapName, listener);
   }
 
@@ -177,7 +177,7 @@ public final class GameWorld implements IUpdateable {
    * @param listener
    *          The listener to add.
    */
-  public void addUnloadedListener(String mapName, EnvironmentUnloadedListener listener) {
+  public void onUnloaded(String mapName, EnvironmentUnloadedListener listener) {
     add(this.environmentUnloadedListeners, mapName, listener);
   }
 
