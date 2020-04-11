@@ -2111,11 +2111,11 @@ public final class Environment implements IRenderable {
   }
 
   private void addGravityForce(IMobileEntity entity) {
-    IMovementController mvmtControl = entity.getMovementController();
+    IMovementController mvmtControl = entity.movement();
     if (mvmtControl != null) {
       GravityForce force = new GravityForce(entity, this.getGravity(), Direction.DOWN);
       force.setIdentifier(GRAVITY_IDENTIFIER);
-      entity.getMovementController().apply(force);
+      entity.movement().apply(force);
       this.gravityForces.put(entity.getMapId(), force);
     }
   }
