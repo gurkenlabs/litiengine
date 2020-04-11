@@ -54,6 +54,8 @@ import de.gurkenlabs.utiliti.swing.panels.MapObjectInspector;
 public final class UI {
   private static final Logger log = Logger.getLogger(UI.class.getName());
   private static final int SCROLL_MAX = 100;
+  private static final Color DARK_ICON_COLOR = new Color(175, 177, 179);
+  private static final Color DARK_FONT_COLOR = new Color(187, 187, 187);
 
   private static JPanel renderPanel;
   private static JScrollBar horizontalScroll;
@@ -104,7 +106,8 @@ public final class UI {
     JPopupMenu.setDefaultLightWeightPopupEnabled(false);
     UIManager.getDefaults().put("SplitPane.border", BorderFactory.createEmptyBorder());
     setDefaultSwingFont(Style.getDefaultFont());
-    setDefaultForegroundColor(Color.WHITE);
+
+    setDefaultForegroundColor();
 
     Tray.init();
     Game.window().cursor().set(Cursors.DEFAULT, 0, 0);
@@ -112,6 +115,7 @@ public final class UI {
     Game.window().cursor().setOffsetY(0);
     setupInterface();
     Game.window().getHostControl().revalidate();
+    Game.window().getRenderComponent().setBackground(new Color(30, 31, 32));
 
     initialized = true;
   }
@@ -200,6 +204,10 @@ public final class UI {
     });
 
     Game.world().camera().onFocus(e -> {
+      updateScrollBars();
+    });
+
+    Game.world().onLoaded(e -> {
       updateScrollBars();
     });
   }
@@ -359,7 +367,7 @@ public final class UI {
     }
   }
 
-  private static void setDefaultForegroundColor(Color color) {
+  private static void setDefaultForegroundColor() {
     Enumeration<Object> keys = UIManager.getDefaults().keys();
     while (keys.hasMoreElements()) {
       Object key = keys.nextElement();
@@ -368,44 +376,19 @@ public final class UI {
 
         Object value = UIManager.get(key);
         if (value instanceof javax.swing.plaf.ColorUIResource) {
-          String keyString = (String) key;
-          
-          ColorUIResource colorResource = (ColorUIResource)value;
-          
+          ColorUIResource colorResource = (ColorUIResource) value;
+
           // ICON COLORS
-          if(colorResource.equals(new Color(175,177,179))){
-            UIManager.put(key, new ColorUIResource(224,224,224));
+          if (colorResource.equals(DARK_ICON_COLOR)) {
+            UIManager.put(key, new ColorUIResource(Style.COLOR_DARKTHEME_FOREGROUND));
           }
-          
-          // FONT COLORS 
-          if(colorResource.equals(new Color(187,187,187))){
-            UIManager.put(key, new ColorUIResource(224,224,224));
-          }
-          
-          UIManager.put("JButton.square", false);
-          
-          System.out.println(key);
-          
-          if (!keyString.toLowerCase().contains("background") 
-              && !keyString.toLowerCase().contains("disabled") 
-              && !keyString.toLowerCase().contains("bordercolor")
-              && !keyString.toLowerCase().contains("fillcolor")
-              && !keyString.toLowerCase().contains("linecolor")
-              && !keyString.toLowerCase().contains("highlight")
-              && !keyString.toLowerCase().contains("knob")
-              && !keyString.toLowerCase().contains("caretforeground")
-              && !keyString.toLowerCase().contains("shadow")
-              && !keyString.toLowerCase().contains("contrast")
-              && !keyString.toLowerCase().contains("focus")
-              && !keyString.toLowerCase().contains("inactive")) {
 
-
+          // FONT COLORS
+          if (colorResource.equals(DARK_FONT_COLOR)) {
+            UIManager.put(key, new ColorUIResource(Style.COLOR_DARKTHEME_FOREGROUND));
           }
         }
-
-
       }
-
     }
   }
 }
