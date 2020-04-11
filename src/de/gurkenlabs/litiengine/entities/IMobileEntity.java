@@ -59,7 +59,7 @@ public interface IMobileEntity extends ICollisionEntity {
    *
    * @return the movement controller
    */
-  public IMovementController getMovementController();
+  public IMovementController movement();
 
   /**
    * Sets the acceleration for this entity. Acceleration is a value that defines how long it takes the entity to reach the full

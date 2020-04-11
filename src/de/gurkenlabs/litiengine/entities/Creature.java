@@ -108,7 +108,7 @@ public class Creature extends CombatEntity implements IMobileEntity {
   }
 
   @Override
-  public IMovementController getMovementController() {
+  public IMovementController movement() {
     return this.getController(IMovementController.class);
   }
 
