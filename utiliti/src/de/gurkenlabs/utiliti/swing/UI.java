@@ -224,7 +224,7 @@ public final class UI {
 
     renderPanel = new JPanel(new BorderLayout());
     renderPanel.add(canvas);
-    renderPanel.setMinimumSize(new Dimension(300, 0));
+    renderPanel.setMinimumSize(new Dimension(300, 100));
     initScrollBars(renderPanel);
 
     JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, initRenderSplitPanel(renderPanel, window), initRightSplitPanel());
