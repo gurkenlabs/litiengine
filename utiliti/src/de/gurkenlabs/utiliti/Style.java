@@ -13,7 +13,7 @@ public final class Style {
   public static final Color COLOR_COLLISION_FILL = new Color(255, 0, 0, 15);
   public static final Color COLOR_COLLISION_BORDER = Color.RED;
   public static final Color COLOR_NOCOLLISION_BORDER = new Color(255, 0, 0, 150);
-  public static final Color COLOR_TRIGGER_BORDER = Color.YELLOW;
+  public static final Color COLOR_TRIGGER_BORDER = new Color(255, 190, 86);
   public static final Color COLOR_TRIGGER_FILL = new Color(255, 255, 0, 15);
   public static final Color COLOR_SPAWNPOINT = Color.GREEN;
   public static final Color COLOR_UNSUPPORTED = new Color(180, 180, 180, 200);
@@ -28,7 +28,7 @@ public final class Style {
   public static final Color COLOR_DEFAULT_TAG = new Color(99, 113, 118);
   public static final Color COLOR_DEFAULT_TAG_HOVER = COLOR_DEFAULT_TAG.darker();
   public static final Color COLOR_STATUS = Color.WHITE;
-  
+
   public static final Color COLOR_DARKTHEME_FOREGROUND = new Color(224, 224, 224);
 
   public static final float FONT_DEFAULT_SIZE = 13;
