@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import de.gurkenlabs.litiengine.Direction;
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.GameLoop;
 import de.gurkenlabs.litiengine.attributes.Attribute;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
@@ -130,7 +131,9 @@ public class Creature extends CombatEntity implements IMobileEntity {
 
   @Override
   public float getTickVelocity() {
-    return MobileEntity.getTickVelocity(this);
+    // pixels per ms multiplied by the passed ms
+    // ensure that entities don't travel too far in case of lag
+    return Math.min(Game.loop().getDeltaTime(), GameLoop.TICK_DELTATIME_LAG) * 0.001F * this.getVelocity().get() * Game.loop().getTimeScale();
   }
 
   @Override
@@ -221,14 +224,14 @@ public class Creature extends CombatEntity implements IMobileEntity {
   }
 
   protected void updateAnimationController() {
-    IEntityAnimationController<?> controller = this.createAnimationController();
+    IEntityAnimationController<Creature> controller = this.createAnimationController();
     this.getControllers().addController(controller);
     if (Game.world().environment() != null && Game.world().environment().isLoaded()) {
       Game.loop().attach(controller);
     }
   }
 
-  protected IEntityAnimationController<?> createAnimationController() {
+  protected IEntityAnimationController<Creature> createAnimationController() {
     return new CreatureAnimationController<>(this, true);
   }
 

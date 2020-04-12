@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import org.junit.jupiter.api.Test;
 
-public class MobileEntityTests {
+public class CreatureTests {
   @Test
   public void testInitializationByAnnotation() {
     IMobileEntity entity = new TestMobileEntity();
@@ -17,7 +17,7 @@ public class MobileEntityTests {
   }
 
   @MovementInfo(velocity = 111, acceleration = 222, deceleration = 333, turnOnMove = false)
-  private class TestMobileEntity extends MobileEntity {
+  private class TestMobileEntity extends Creature {
 
   }
 }
