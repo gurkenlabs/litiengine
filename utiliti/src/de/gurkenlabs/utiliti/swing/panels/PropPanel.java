@@ -47,10 +47,10 @@ public class PropPanel extends PropertyPanel {
     this.comboBoxRotation = new JComboBox<>();
     this.comboBoxRotation.setModel(new DefaultComboBoxModel<>(Rotation.values()));
 
-    this.chckbxShadow = new JCheckBox("shadow");
-    this.checkBoxHorizontalFlip = new JCheckBox("horizontal flip");
-    this.checkBoxVerticalFlip = new JCheckBox("vertical flip");
-    this.checkBoxScale = new JCheckBox("stretch sprite");
+    this.chckbxShadow = new JCheckBox(Resources.strings().get("panel_prop_shadow"));
+    this.checkBoxHorizontalFlip = new JCheckBox(Resources.strings().get("panel_flip_horizontal"));
+    this.checkBoxVerticalFlip = new JCheckBox(Resources.strings().get("panel_flip_vertical"));
+    this.checkBoxScale = new JCheckBox(Resources.strings().get("panel_stretch_spripte"));
 
     setLayout(this.createLayout());
     this.setupChangedListeners();

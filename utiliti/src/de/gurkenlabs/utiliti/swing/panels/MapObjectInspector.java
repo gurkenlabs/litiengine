@@ -297,12 +297,12 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
     this.labelEntityID.setText(Integer.toString(mapObject.getId()));
 
-    this.lblLayer.setText("layer: " + mapObject.getLayer().getName());
+    this.lblLayer.setText("Layer: " + mapObject.getLayer().getName());
     String info = getRendering(mapObject);
     if (info == null) {
       this.lblRendering.setText("");
     } else {
-      this.lblRendering.setText("render: " + getRendering(mapObject));
+      this.lblRendering.setText("Render: " + getRendering(mapObject));
     }
   }
 

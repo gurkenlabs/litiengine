@@ -35,7 +35,7 @@ public class CreaturePanel extends PropertyPanel {
 
     this.comboBoxDirection = new JComboBox<>();
     this.comboBoxDirection.setModel(new DefaultComboBoxModel<>(Direction.values()));
-    this.checkBoxScale = new JCheckBox("stretch sprite");
+    this.checkBoxScale = new JCheckBox(Resources.strings().get("panel_stretch_spripte"));
     
     setLayout(this.createLayout());
     this.setupChangedListeners();

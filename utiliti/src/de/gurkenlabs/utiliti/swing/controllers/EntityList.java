@@ -69,7 +69,7 @@ public final class EntityList extends JPanel implements EntityController {
   private boolean isFocussing;
 
   public EntityList() {
-    this.setName(Resources.strings().get("panel_entities").toUpperCase());
+    this.setName(Resources.strings().get("panel_entities"));
     this.setLayout(new BorderLayout(0, 0));
 
     this.entityScrollPane = new JScrollPane();

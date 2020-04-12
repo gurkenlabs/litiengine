@@ -61,7 +61,7 @@ public final class LayerList extends JScrollPane implements LayerController {
   private boolean refreshing;
 
   public LayerList() {
-    this.setName(Resources.strings().get("panel_mapObjectLayers").toUpperCase());
+    this.setName(Resources.strings().get("panel_mapObjectLayers"));
     this.selectedLayers = new ConcurrentHashMap<>();
     this.layerChangedListeners = new CopyOnWriteArrayList<>();
 

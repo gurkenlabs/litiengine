@@ -9,6 +9,7 @@ import javax.swing.SpinnerNumberModel;
 import de.gurkenlabs.litiengine.entities.CombatEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.litiengine.resources.Resources;
 
 @SuppressWarnings("serial")
 public class CombatPanel extends PropertyPanel {
@@ -24,7 +25,7 @@ public class CombatPanel extends PropertyPanel {
 
     this.spinnerHitpoints = new JSpinner(new SpinnerNumberModel(100, 0, 100, 1));
     this.spinnerTeam = new JSpinner(new SpinnerNumberModel(1, 0, Integer.MAX_VALUE, 1));
-    this.chckbxIndestructible = new JCheckBox("indestructible");
+    this.chckbxIndestructible = new JCheckBox(Resources.strings().get("panel_indestructible"));
 
     setLayout(this.createLayout());
     this.setupChangedListeners();
