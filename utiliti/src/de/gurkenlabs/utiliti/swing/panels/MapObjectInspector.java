@@ -94,7 +94,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
     this.tabbedPanel = new JTabbedPane(SwingConstants.TOP);
     this.tabbedPanel.setFont(Style.getHeaderFont());
-    
+
     this.infoPanel = new JPanel();
 
     GroupLayout groupLayout = new GroupLayout(this);
@@ -179,9 +179,9 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
     if (mapObject != null) {
       MapObjectType t = MapObjectType.get(mapObject.getType());
-      this.setMapObjectType(t != null ? t : MapObjectType.AREA);
+      this.setMapObjectType(t != null ? t : null);
     } else {
-      this.setMapObjectType(MapObjectType.AREA);
+      this.setMapObjectType(null);
     }
 
     if (this.currentPanel != null) {
@@ -205,60 +205,71 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
   private void switchPanel() {
     final MapObjectType currentType = this.getObjectType();
     if (currentType == null) {
+      this.clearPanels();
       return;
     }
 
     PropertyPanel panel = this.panels.get(type);
-    if (panel == null) {
-      if (this.currentPanel != null) {
-        this.tabbedPanel.remove(this.currentPanel);
-        this.currentPanel.bind(null);
-        this.currentPanel = null;
-        this.tabbedPanel.revalidate();
-        this.tabbedPanel.repaint();
-      }
-      this.tabbedPanel.remove(this.collisionPanel);
-      this.tabbedPanel.remove(this.combatPanel);
-      this.tabbedPanel.remove(this.movementPanel);
-      this.tabbedPanel.remove(this.customPanel);
-
-      return;
-    }
-
-    if (panel == this.currentPanel) {
-      return;
-    }
-
     if (this.currentPanel != null) {
+      // panel is already selected
+      if (panel == this.currentPanel) {
+        return;
+      }
+
+      // clear current panel
       this.currentPanel.bind(null);
       this.tabbedPanel.remove(this.currentPanel);
     }
-    tabbedPanel.addTab(Resources.strings().get(panel.getIdentifier()), panel.getIcon(), panel);
 
+    if (panel != null) {
+      // add explicit map object panel
+      tabbedPanel.addTab(Resources.strings().get(panel.getIdentifier()), panel.getIcon(), panel);
+    }
+
+    // add/remove collision panel
     if (currentType == MapObjectType.PROP || currentType == MapObjectType.CREATURE) {
       tabbedPanel.addTab(Resources.strings().get(this.collisionPanel.getIdentifier()), this.collisionPanel.getIcon(), this.collisionPanel);
     } else {
       this.tabbedPanel.remove(this.collisionPanel);
     }
 
+    // add/remove combat panel
     if (currentType == MapObjectType.PROP || currentType == MapObjectType.CREATURE) {
       tabbedPanel.addTab(Resources.strings().get(this.combatPanel.getIdentifier()), this.combatPanel);
     } else {
       this.tabbedPanel.remove(this.combatPanel);
     }
 
+    // add/remove movement panel
     if (currentType == MapObjectType.CREATURE) {
       tabbedPanel.addTab(Resources.strings().get(this.movementPanel.getIdentifier()), this.movementPanel.getIcon(), this.movementPanel);
     } else {
       this.tabbedPanel.remove(this.movementPanel);
     }
 
+    // always add custom panel
     tabbedPanel.addTab(Resources.strings().get(this.customPanel.getIdentifier()), this.customPanel.getIcon(), this.customPanel);
 
-    this.currentPanel = panel;
+    this.currentPanel = panel != null ? panel : this.customPanel;
     this.currentPanel.bind(this.getDataSource());
     this.tabbedPanel.revalidate();
     this.tabbedPanel.repaint();
+  }
+
+  private void clearPanels() {
+    if (this.currentPanel != null) {
+      this.tabbedPanel.remove(this.currentPanel);
+      this.currentPanel.bind(null);
+      this.currentPanel = null;
+    }
+
+    this.tabbedPanel.revalidate();
+    this.tabbedPanel.repaint();
+
+    this.tabbedPanel.remove(this.collisionPanel);
+    this.tabbedPanel.remove(this.combatPanel);
+    this.tabbedPanel.remove(this.movementPanel);
+    this.tabbedPanel.remove(this.customPanel);
   }
 
   @Override
@@ -274,7 +285,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.spinnerY.setValue(0);
     this.spinnerWidth.setValue(0);
     this.spinnerHeight.setValue(0);
-    this.type = MapObjectType.AREA;
+    this.type = null;
 
     this.textFieldName.setText("");
     this.labelEntityID.setText("####");
