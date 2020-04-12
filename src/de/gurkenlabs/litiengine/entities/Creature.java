@@ -224,14 +224,14 @@ public class Creature extends CombatEntity implements IMobileEntity {
   }
 
   protected void updateAnimationController() {
-    IEntityAnimationController<Creature> controller = this.createAnimationController();
+    IEntityAnimationController<?> controller = this.createAnimationController();
     this.getControllers().addController(controller);
     if (Game.world().environment() != null && Game.world().environment().isLoaded()) {
       Game.loop().attach(controller);
     }
   }
 
-  protected IEntityAnimationController<Creature> createAnimationController() {
+  protected IEntityAnimationController<?> createAnimationController() {
     return new CreatureAnimationController<>(this, true);
   }
 
