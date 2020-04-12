@@ -294,6 +294,7 @@ public final class UI {
     mapLayerList = new LayerList();
     entityList = new EntityList();
     JTabbedPane tabPane = new JTabbedPane();
+    tabPane.setFont(Style.getHeaderFont());
     tabPane.add(entityList);
     tabPane.add(mapLayerList);
     tabPane.setMaximumSize(new Dimension(0, 150));
@@ -325,6 +326,7 @@ public final class UI {
   private static JPanel initBottomPanel() {
     JPanel bottomPanel = new JPanel(new BorderLayout());
     JTabbedPane bottomTab = new JTabbedPane();
+    bottomTab.setFont(Style.getHeaderFont());
 
     assetComponent = new AssetList();
     bottomTab.addTab(Resources.strings().get("assettree_assets"), Icons.ASSET, assetComponent);

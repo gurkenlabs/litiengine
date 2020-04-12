@@ -80,20 +80,21 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
     this.textFieldName = new JTextField();
     this.textFieldName.setColumns(10);
-    
+
     ControlBehavior.apply(this.textFieldName);
 
     this.spinnerX = new JSpinner();
     this.spinnerY = new JSpinner();
     this.spinnerWidth = new JSpinner();
     this.spinnerHeight = new JSpinner();
-    
+
     this.updateSpinnerModels();
 
     this.tagPanel = new TagPanel();
 
     this.tabbedPanel = new JTabbedPane(SwingConstants.TOP);
-
+    this.tabbedPanel.setFont(Style.getHeaderFont());
+    
     this.infoPanel = new JPanel();
 
     GroupLayout groupLayout = new GroupLayout(this);
@@ -107,8 +108,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
                         .addPreferredGap(ComponentPlacement.RELATED)
                         .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addComponent(tagPanel, GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE).addComponent(textFieldName, GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE)
                             .addGroup(groupLayout.createSequentialGroup().addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(spinnerWidth, GroupLayout.DEFAULT_SIZE, 161, Short.MAX_VALUE).addComponent(spinnerX, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 161, Short.MAX_VALUE))
-                                .addPreferredGap(ComponentPlacement.UNRELATED)
-                                .addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false).addComponent(lblHeight, LABEL_WIDTH, LABEL_WIDTH, Short.MAX_VALUE).addComponent(lblYcoordinate, LABEL_WIDTH, LABEL_WIDTH, Short.MAX_VALUE)).addGap(0)
+                                .addPreferredGap(ComponentPlacement.UNRELATED).addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false).addComponent(lblHeight, LABEL_WIDTH, LABEL_WIDTH, Short.MAX_VALUE).addComponent(lblYcoordinate, LABEL_WIDTH, LABEL_WIDTH, Short.MAX_VALUE)).addGap(0)
                                 .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addComponent(spinnerY, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE).addComponent(spinnerHeight, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE))))))
                     .addGap(CONTROL_MARGIN))
                 .addGroup(Alignment.LEADING, groupLayout.createSequentialGroup().addGap(CONTROL_MARGIN).addComponent(infoPanel, GroupLayout.DEFAULT_SIZE, 430, Short.MAX_VALUE).addGap(CONTROL_MARGIN)));
@@ -119,8 +119,8 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
             .addGap(CONTROL_MARGIN)
             .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(spinnerWidth, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE).addComponent(lblHeight, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE)
                 .addComponent(spinnerHeight, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE).addComponent(lblWidth, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE))
-            .addGap(CONTROL_MARGIN).addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(textFieldName, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE).addComponent(lblName, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE)).addGap(5)
-            .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(tagPanel, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE).addComponent(lblTags, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE)).addGap(5)
+            .addGap(CONTROL_MARGIN).addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(textFieldName, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE).addComponent(lblName, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE))
+            .addGap(5).addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(tagPanel, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE).addComponent(lblTags, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE)).addGap(5)
             .addComponent(tabbedPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addGap(108)));
     this.infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.X_AXIS));
 
@@ -374,7 +374,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.spinnerY.setModel(supp.get());
     this.spinnerWidth.setModel(supp.get());
     this.spinnerHeight.setModel(supp.get());
-    
+
     ControlBehavior.apply(this.spinnerX);
     ControlBehavior.apply(this.spinnerY);
     ControlBehavior.apply(this.spinnerWidth);

@@ -32,9 +32,12 @@ public final class Style {
   public static final Color COLOR_DARKTHEME_FOREGROUND = new Color(224, 224, 224);
 
   public static final float FONT_DEFAULT_SIZE = 13;
+  public static final float FONT_HEADER_SIZE = 14;
   public static final String FONTNAME_CONSOLE = "Consolas";
   private static final Font FONT_DEFAULT = Resources.fonts().get("Roboto-Regular.ttf", Font.PLAIN, FONT_DEFAULT_SIZE);
+  private static final Font FONT_HEADER = Resources.fonts().get("Roboto-Regular.ttf", Font.PLAIN, FONT_HEADER_SIZE);
   private static Font scaledDefaultFont;
+  private static Font scaledHeaderFont;
 
   private Style() {
     throw new UnsupportedOperationException();
@@ -46,5 +49,13 @@ public final class Style {
     }
 
     return scaledDefaultFont;
+  }
+  
+  public static Font getHeaderFont() {
+    if (scaledHeaderFont == null) {
+      scaledHeaderFont = FONT_HEADER.deriveFont(FONT_HEADER_SIZE * Editor.preferences().getUiScale());
+    }
+
+    return scaledHeaderFont;
   }
 }

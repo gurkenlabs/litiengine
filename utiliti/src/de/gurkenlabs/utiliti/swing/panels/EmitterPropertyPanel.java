@@ -42,6 +42,7 @@ import de.gurkenlabs.litiengine.physics.Collision;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
+import de.gurkenlabs.utiliti.Style;
 import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.swing.Icons;
 
@@ -177,6 +178,7 @@ public class EmitterPropertyPanel extends PropertyPanel {
     this.txt.setColumns(10);
 
     this.tabbedPanel = new JTabbedPane(SwingConstants.TOP);
+    this.tabbedPanel.setFont(Style.getHeaderFont());
     this.tabbedPanel.setBorder(null);
 
     this.colorPanel = new JPanel();
