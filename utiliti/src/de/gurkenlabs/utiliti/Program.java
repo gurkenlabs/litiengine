@@ -15,9 +15,6 @@ import de.gurkenlabs.utiliti.swing.UI;
 
 public class Program {
   public static void main(String[] args) {
-    
-    UI.initLookAndFeel();
-    
     // setup basic settings
     Game.info().setName("utiLITI");
     Game.info().setSubTitle("LITIengine Creation Kit");
@@ -26,8 +23,9 @@ public class Program {
 
     // hook up configuration and initialize the game
     Game.config().add(Editor.preferences());
-    Game.init(args);
 
+    UI.initLookAndFeel();
+    Game.init(args);
     forceBasicEditorConfiguration();
     Game.world().camera().onZoom(event -> Editor.preferences().setZoom((float) event.getZoom()));
 

@@ -9,6 +9,7 @@ import de.gurkenlabs.litiengine.configuration.ConfigurationGroup;
 import de.gurkenlabs.litiengine.configuration.ConfigurationGroupInfo;
 import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.litiengine.util.MathUtilities;
+import de.gurkenlabs.utiliti.Style.Theme;
 
 @ConfigurationGroupInfo(prefix = "user_")
 public class UserPreferences extends ConfigurationGroup {
@@ -43,6 +44,8 @@ public class UserPreferences extends ConfigurationGroup {
   private String[] lastOpenedFiles;
   private float uiScale;
 
+  private Theme theme;
+
   public UserPreferences() {
     this.zoom = 1.0f;
     this.showGrid = true;
@@ -58,6 +61,7 @@ public class UserPreferences extends ConfigurationGroup {
     this.gridColor = ColorHelper.encode(Style.COLOR_DEFAULT_GRID);
     this.snapDivision = 1;
     this.setUiScale(1.0f);
+    this.setTheme(Theme.DARK);
   }
 
   public void addOpenedFile(String str) {
@@ -295,5 +299,13 @@ public class UserPreferences extends ConfigurationGroup {
 
   public void setUiScale(float uiScale) {
     this.uiScale = MathUtilities.clamp(uiScale, UI_SCALE_MIN, UI_SCALE_MAX);
+  }
+
+  public Theme getTheme() {
+    return theme;
+  }
+
+  public void setTheme(Theme theme) {
+    this.theme = theme;
   }
 }
