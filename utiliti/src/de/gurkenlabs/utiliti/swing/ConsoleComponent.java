@@ -19,15 +19,16 @@ import de.gurkenlabs.utiliti.Style;
 
 @SuppressWarnings("serial")
 public class ConsoleComponent extends JScrollPane {
+  private final  JTextPane consoleTextArea;
   public ConsoleComponent() {
     Logger root = Logger.getLogger("");
-    JTextPane consoleTextArea = new JTextPane();
+    this.consoleTextArea = new JTextPane();
     this.setViewportBorder(null);
-    this.setViewportView(consoleTextArea);
+    this.setViewportView(this.consoleTextArea);
 
-    consoleTextArea.setEditable(false);
-    consoleTextArea.setAutoscrolls(true);
-    root.addHandler(new LogHandler(consoleTextArea));
+    this.consoleTextArea.setEditable(false);
+    this.consoleTextArea.setAutoscrolls(true);
+    root.addHandler(new LogHandler(this.consoleTextArea));
   }
 
   private class LogHandler extends java.util.logging.Handler {
@@ -91,7 +92,7 @@ public class ConsoleComponent extends JScrollPane {
         return Color.ORANGE;
       }
 
-      return Color.WHITE;
+      return ConsoleComponent.this.consoleTextArea.getForeground();
     }
   }
 }
