@@ -186,7 +186,7 @@ public final class GameRandom extends java.util.Random {
    * @return A pseudo-random element from the array or null if the collection is empty.
    */
   public <T> T choose(Collection<T> coll) {
-    if (coll == null) {
+    if (coll == null || coll.isEmpty()) {
       return null;
     }
 
