@@ -74,6 +74,8 @@ public final class Environment implements IRenderable {
   private static final String GRAVITY_IDENTIFIER = "GRAVITY";
   private static final Logger log = Logger.getLogger(Environment.class.getName());
 
+  private static int localIdSequence = 0;
+
   private final Map<Integer, ICombatEntity> combatEntities = new ConcurrentHashMap<>();
   private final Map<Integer, IMobileEntity> mobileEntities = new ConcurrentHashMap<>();
   private final Map<Integer, GravityForce> gravityForces = new ConcurrentHashMap<>();
@@ -102,7 +104,6 @@ public final class Environment implements IRenderable {
   private boolean loaded;
   private boolean initialized;
   private IMap map;
-  private int localIdSequence = 0;
 
   private int gravity;
 
@@ -1192,7 +1193,7 @@ public final class Environment implements IRenderable {
    * 
    * @return The next unique local map id.
    */
-  public synchronized int getLocalMapId() {
+  public static synchronized int getLocalMapId() {
     return --localIdSequence;
   }
 
