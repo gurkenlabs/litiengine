@@ -1013,6 +1013,33 @@ public final class Environment implements IRenderable {
   }
 
   /**
+   * Gets all entities of the specified type on this environment.
+   * 
+   * @param <T>
+   *          The type of the entity.
+   * @param cls
+   *          The class instance defining the type of the entity.
+   * @param pred
+   *          A predicate that decides whether the defined entity should be included in the result.
+   * 
+   * @return All entities of the specified type.
+   */
+  public <T> Collection<T> getEntities(Class<? extends T> cls, Predicate<T> pred) {
+    Collection<T> foundEntities = new ArrayList<>();
+    for (IEntity ent : this.allEntities.values()) {
+      if (cls.isInstance(ent)) {
+        T entity = cls.cast(ent);
+
+        if (pred.test(entity)) {
+          foundEntities.add(entity);
+        }
+      }
+    }
+
+    return foundEntities;
+  }
+
+  /**
    * Gets the entities with the specified render type that are not bound to layers.
    * <p>
    * Entities are unbound from there originating <code>MapObjectLayer</code> if their <code>RenderType</code> differs
