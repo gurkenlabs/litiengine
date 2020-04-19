@@ -13,7 +13,11 @@ public class SpritesheetEntityEmitter extends EntityEmitter {
   private final Spritesheet spriteSheet;
 
   public SpritesheetEntityEmitter(final Spritesheet spriteSheet, final IEntity entity) {
-    super(entity);
+    this(spriteSheet, entity, false);
+  }
+
+  public SpritesheetEntityEmitter(final Spritesheet spriteSheet, final IEntity entity, final boolean dynamicLocation) {
+    super(entity, dynamicLocation);
     this.spriteSheet = spriteSheet;
   }
 
