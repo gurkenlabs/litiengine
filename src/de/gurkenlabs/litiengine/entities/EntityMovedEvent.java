@@ -4,7 +4,7 @@ import java.util.EventObject;
 
 public class EntityMovedEvent extends EventObject {
   private static final long serialVersionUID = 2931711179495514204L;
-  private final transient IEntity entity;
+  private final transient IMobileEntity entity;
   private final double deltaX;
   private final double deltaY;
 
@@ -15,7 +15,7 @@ public class EntityMovedEvent extends EventObject {
     this.deltaY = deltaY;
   }
 
-  public IEntity getEntity() {
+  public IMobileEntity getEntity() {
     return this.entity;
   }
 
