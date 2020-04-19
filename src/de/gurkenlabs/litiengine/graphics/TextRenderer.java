@@ -50,6 +50,10 @@ public final class TextRenderer {
     render(g, text, location.getX(), location.getY());
   }
 
+  public static void render(final Graphics2D g, final String text, Align alignment, Valign verticalAlignment) {
+    render(g, text, alignment, verticalAlignment, 0, 0);
+  }
+
   /**
    * Draws text with the specified alignment.
    * 
@@ -62,9 +66,13 @@ public final class TextRenderer {
    * @param verticalAlignment
    *          The vertical alignment.
    */
-  public static void render(final Graphics2D g, final String text, Align alignment, Valign verticalAlignment) {
+  public static void render(final Graphics2D g, final String text, Align alignment, Valign verticalAlignment, double offesetX, double offsetY) {
     final Rectangle2D bounds = g.getClipBounds();
-    render(g, text, bounds, alignment, verticalAlignment, false);
+    render(g, text, bounds, alignment, verticalAlignment, offesetX, offsetY, false);
+  }
+
+  public static void render(final Graphics2D g, final String text, Rectangle2D bounds, Align alignment, Valign verticalAlignment, boolean scaleFont) {
+    render(g, text, bounds, alignment, verticalAlignment, 0, 0, scaleFont);
   }
 
   /**
@@ -83,7 +91,7 @@ public final class TextRenderer {
    * @param scaleFont
    *          if true, scale the font so that the text will fit inside the given rectangle. If not, use the Graphics context's previous font size.
    */
-  public static void render(final Graphics2D g, final String text, Rectangle2D bounds, Align alignment, Valign verticalAlignment, boolean scaleFont) {
+  public static void render(final Graphics2D g, final String text, Rectangle2D bounds, Align alignment, Valign verticalAlignment, double offsetX, double offsetY, boolean scaleFont) {
     if (bounds == null) {
       return;
     }
@@ -95,8 +103,8 @@ public final class TextRenderer {
         g.setFont(g.getFont().deriveFont(currentFontSize));
       }
     }
-    double locationX = bounds.getX() + alignment.getLocation(bounds.getWidth(), g.getFontMetrics().stringWidth(text));
-    double locationY = bounds.getY() + verticalAlignment.getLocation(bounds.getHeight(), getHeight(g, text)) + g.getFontMetrics().getAscent();
+    double locationX = bounds.getX() + alignment.getLocation(bounds.getWidth(), g.getFontMetrics().stringWidth(text)) + offsetX;
+    double locationY = bounds.getY() + verticalAlignment.getLocation(bounds.getHeight(), getHeight(g, text)) + g.getFontMetrics().getAscent() + offsetY;
     render(g, text, locationX, locationY);
     g.setFont(g.getFont().deriveFont(previousFontSize));
   }
