@@ -11,6 +11,7 @@ import java.util.function.Predicate;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
+import de.gurkenlabs.litiengine.entities.EntityMovedEvent;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
@@ -174,6 +175,9 @@ public class EntityNavigator implements IUpdateable, IRenderable {
 
     final double angle = GeometricUtilities.calcRotationAngleInDegrees(this.entity.getCollisionBox().getCenterX(), this.entity.getCollisionBox().getCenterY(), coordinates[0], coordinates[1]);
     final float pixelsPerTick = this.entity.getTickVelocity();
+    final Point2D oldLocation = this.getEntity().getLocation();
     Game.physics().move(this.entity, (float) angle, (float) (distance < pixelsPerTick ? distance : pixelsPerTick));
+
+    this.getEntity().fireMovedEvent(new EntityMovedEvent(this.getEntity(), this.getEntity().getX() - oldLocation.getX(), this.getEntity().getY() - oldLocation.getY()));
   }
 }
