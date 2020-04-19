@@ -15,7 +15,6 @@ public abstract class SpritesheetEmitter extends Emitter {
     super(origin);
     this.spriteSheet = spriteSheet;
     this.setSize(this.getSpritesheet().getSpriteWidth(), this.getSpritesheet().getSpriteHeight());
-
   }
 
   public Spritesheet getSpritesheet() {

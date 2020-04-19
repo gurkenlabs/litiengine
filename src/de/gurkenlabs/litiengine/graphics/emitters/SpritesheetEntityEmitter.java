@@ -15,7 +15,6 @@ public class SpritesheetEntityEmitter extends EntityEmitter {
   public SpritesheetEntityEmitter(final Spritesheet spriteSheet, final IEntity entity) {
     super(entity);
     this.spriteSheet = spriteSheet;
-    this.setSize(this.getSpritesheet().getSpriteWidth(), this.getSpritesheet().getSpriteHeight());
   }
 
   public Spritesheet getSpritesheet() {

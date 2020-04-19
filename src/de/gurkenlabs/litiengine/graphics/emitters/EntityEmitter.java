@@ -34,8 +34,7 @@ public abstract class EntityEmitter extends Emitter {
     if (this.getEntity() == null) {
       return null;
     }
-
-    return super.getLocation();
+    return this.getEntity().getLocation();
   }
 
 }
