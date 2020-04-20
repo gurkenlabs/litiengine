@@ -89,10 +89,12 @@ public class LightSource extends Entity implements IRenderable {
 
   public void activate() {
     this.activated = true;
+    this.updateAmbientLayers();
   }
 
   public void deactivate() {
     this.activated = false;
+    this.updateAmbientLayers();
   }
 
   public Color getColor() {
