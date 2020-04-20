@@ -7,6 +7,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxType;
+import de.gurkenlabs.litiengine.graphics.animation.CreatureAnimationController;
+import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
 import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
 
 @AnimationInfo(spritePrefix = PropAnimationController.PROP_IDENTIFIER)
@@ -200,8 +202,12 @@ public class Prop extends CombatEntity {
     return str;
   }
 
+  protected IEntityAnimationController<?> createAnimationController() {
+    return new PropAnimationController<>(this);
+  }
+
   private void updateAnimationController() {
-    PropAnimationController<Prop> controller = new PropAnimationController<>(this);
+    IEntityAnimationController<?> controller = this.createAnimationController();
     this.getControllers().addController(controller);
     if (Game.world().environment() != null && Game.world().environment().isLoaded()) {
       Game.loop().attach(controller);
