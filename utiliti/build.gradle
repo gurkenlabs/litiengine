@@ -21,7 +21,7 @@ sourceSets {
 
 dependencies {
   implementation project(':')
-  implementation 'com.github.weisj:darklaf-core:[1.4.3.1,)'
+  implementation 'com.github.weisj:darklaf-core:2.0.2'
   
   testImplementation 'org.junit.jupiter:junit-jupiter-api:5.4.+'
   testImplementation 'org.junit.jupiter:junit-jupiter-params:5.4.+'

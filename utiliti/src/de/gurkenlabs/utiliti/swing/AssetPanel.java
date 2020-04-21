@@ -17,7 +17,6 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.resources.SoundResource;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.litiengine.util.Imaging;
-import de.gurkenlabs.utiliti.Style;
 
 @SuppressWarnings("serial")
 public class AssetPanel extends JPanel {

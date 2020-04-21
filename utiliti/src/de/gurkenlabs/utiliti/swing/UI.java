@@ -11,11 +11,8 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
-import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.List;
 import java.util.Locale;
-import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
@@ -27,7 +24,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.FontUIResource;
 
 import com.github.weisj.darklaf.LafManager;
@@ -56,7 +52,6 @@ import de.gurkenlabs.utiliti.swing.menus.MainMenuBar;
 import de.gurkenlabs.utiliti.swing.panels.MapObjectInspector;
 
 public final class UI {
-  private static final Logger log = Logger.getLogger(UI.class.getName());
   private static final int SCROLL_MAX = 100;
   private static JPanel renderPanel;
   private static JScrollBar horizontalScroll;
@@ -72,6 +67,8 @@ public final class UI {
   private static boolean initialized;
 
   private static float currentScrollSize;
+
+  private static volatile boolean loadingTheme;
 
   private UI() {
   }
@@ -116,7 +113,7 @@ public final class UI {
     Game.window().getHostControl().revalidate();
     Game.window().getRenderComponent().setBackground(new Color(30, 31, 32));
 
-    loadTheme(Editor.preferences().getTheme());
+    setTheme(Editor.preferences().getTheme());
 
     initialized = true;
   }
@@ -355,23 +352,29 @@ public final class UI {
 
   public static void initLookAndFeel() {
     LafManager.setDecorationsEnabled(true);
-    LafManager.install(new DarculaTheme());
+    setTheme(Editor.preferences().getTheme());
   }
 
-  public static synchronized void loadTheme(Theme theme) {
-    SwingUtilities.invokeLater(() -> {
-      setDefaultForegroundColor(theme);
-      switch (theme) {
-      case DARK:
-        LafManager.install(new DarculaTheme());
-        break;
-      case LIGHT:
-        LafManager.install(new IntelliJTheme());
-        break;
-      default:
-        break;
-      }
-    });
+  public static synchronized void setTheme(Theme theme) {
+    if (loadingTheme) {
+      return;
+    }
+
+    loadingTheme = true;
+
+    switch (theme) {
+    case DARK:
+      LafManager.install(new DarculaTheme());
+      break;
+    case LIGHT:
+      LafManager.install(new IntelliJTheme());
+      break;
+    default:
+      break;
+    }
+
+    Editor.preferences().setTheme(theme);
+    loadingTheme = false;
   }
 
   private static void setDefaultSwingFont(Font font) {
@@ -382,38 +385,6 @@ public final class UI {
       Object value = UIManager.get(key);
       if (value instanceof javax.swing.plaf.FontUIResource) {
         UIManager.put(key, new FontUIResource(font));
-      }
-    }
-  }
-
-  private static void setDefaultForegroundColor(Theme theme) {
-    final List<String> foregroundKeys = Arrays.asList("FileView.foreground", "Icons.arrowRightSelected.color", "Icons.arrowRight.color", "ComboBox.selectionForeground", "Icons.speaker2.color", "Tree.selectionForeground", "Icons.verticalGlue.color", "Slider.foreground",
-        "Windows.OptionPane.questionDialog.titlePane.foreground", "Icons.copy.color", "textForeground", "Icons.moveToLeftBottom.color", "Tree.textForeground", "ColorChooser.foreground", "List.selectionForeground", "TextField.selectionForeground", "Table.selectionForegroundInactive",
-        "ToolBar.dockingForeground", "Icons.speaker0.crossColor", "CheckBox.foreground", "Icons.minus.color", "Icons.frame.color", "Table.foreground", "Viewport.foreground", "FormattedTextField.caretForeground", "Icons.speaker4.color", "MenuBar.foreground", "OptionPane.foreground",
-        "Icons.speaker3.color", "Icons.speaker0.color", "ComboBox.foreground", "ToolTip.foreground", "Icons.eye.color", "Icons.speaker3.volumeColor", "textForegroundDefault", "Icons.speaker1.color", "OptionPane.warningDialog.titlePane.foreground", "TaskPane.titleForeground", "Icons.moreTabs.color",
-        "Icons.minusSelected.color", "Icons.moveToTopLeft.color", "Icons.moveToBottomLeft.color", "global.caretForeground", "Icons.moveToBottomRight.color", "TextField.foreground", "Icons.separatorH.color", "Icons.newFolder.color", "ToolBar.foreground", "PasswordField.caretForeground",
-        "PasswordField.foreground", "TabFrameTab.foreground", "Icons.arrowDownSort.color", "Icons.plusSelected.color", "Icons.add.color", "Icons.cut.color", "TextPane.caretForeground", "global.selectionForeground", "Button.foreground", "Icons.save.color", "Icons.listFiles.color", "Label.foreground",
-        "EditorPane.caretForeground", "TabbedPane.foreground", "PopupMenu.foreground", "CheckBoxMenuItem.foreground", "activeCaptionText", "TextArea.selectionForeground", "menuIconSelected", "Icons.arrowUp.color", "Icons.arrowsUpDownSort.color", "Icons.delete.color", "Icons.separatorV.color",
-        "RadioButtonMenuItem.foreground", "CheckBoxMenuItem.selectionForeground", "Icons.verticalGrip.color", "Icons.arrowSplitCenterV.color", "Icons.moveToRightBottom.color", "PasswordField.selectionForeground", "TaskPane.titleOver", "Tree.foreground", "Icons.arrowUpSelected.color",
-        "List.selectionForegroundInactive", "TitledBorder.titleColor", "Icons.pipette.color", "global.textForeground", "TextField.caretForeground", "Button.selectedButtonForeground", "ScrollBar.foreground", "TextArea.foreground", "textSelectionForeground", "Menu.selectionForeground",
-        "FormattedTextField.selectionForeground", "Icons.moveToTopRight.color", "NumberingPane.currentLineForeground", "Panel.foreground", "global.foreground", "Icons.close.color", "OptionPane.errorDialog.titlePane.foreground", "RadioButtonMenuItem.selectionForeground", "Icons.moreTabs.arrowColor",
-        "RadioButton.foreground", "Icons.paste.color", "Icons.homeFolder.color", "ScrollPane.foreground", "ToggleButton.foreground", "MenuItem.foreground", "TaskPane.specialTitleBackground", "Icons.arrowLeft.color", "TextArea.caretForeground", "List.foreground", "Icons.searchWithHistory.color",
-        "Table.selectionForeground", "Icons.plus.color", "Icons.moveToLeftTop.color", "Icons.arrowSplitCenterH.color", "global.selectionForegroundInactive", "Icons.arrowUpSort.color", "DesktopIcon.foreground", "ProgressBar.selectionBackground", "Icons.arrowDownSelected.color",
-        "Icons.speaker4.volumeColor", "Icons.searchWithHistory.arrowColor", "caret", "Menu.foreground", "EditorPane.foreground", "Table.focusCellForeground", "Spinner.foreground", "textSelectionForegroundInactive", "TextPane.selectionForeground",
-        "Windows.OptionPane.warningDialog.titlePane.foreground", "InternalFrameTitlePane.selectedTextForeground", "Label.cellForegroundNoFocus", "MenuItem.selectionForeground", "OptionPane.messageForeground", "Icons.speaker2.volumeColor", "Icons.clear.color", "TaskPane.specialTitleOver",
-        "FormattedTextField.foreground", "TaskPane.foreground", "Icons.desktop.color", "EditorPane.selectionForeground", "menuIconEnabled", "Icons.arrowDivider.color", "Icons.search.color", "Icons.moveToRightTop.color", "TaskPane.specialTitleForeground", "Icons.collapse.color",
-        "Icons.horizontalGlue.color", "ProgressBar.foreground", "ToolBar.floatingForeground", "TableHeader.foreground", "Icons.horizontalGrip.color", "Tree.selectionForegroundInactive", "Icons.arrowDown.color", "Icons.arrowLeftSelected.color", "OptionPane.questionDialog.titlePane.foreground",
-        "Windows.OptionPane.errorDialog.titlePane.foreground", "Icons.groupBy.color", "Icons.speaker1.volumeColor", "TextPane.foreground");
-
-    ColorUIResource color = new ColorUIResource(theme == Theme.DARK ? Style.COLOR_DARKTHEME_FOREGROUND : Style.COLOR_LIGHTTHEME_FOREGROUND);
-
-    Enumeration<Object> keys = UIManager.getDefaults().keys();
-    while (keys.hasMoreElements()) {
-      Object key = keys.nextElement();
-
-      Object value = UIManager.get(key);
-      if (value instanceof javax.swing.plaf.ColorUIResource && foregroundKeys.contains(key)) {
-        UIManager.put(key, new ColorUIResource(color));
       }
     }
   }

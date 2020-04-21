@@ -58,7 +58,6 @@ import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import de.gurkenlabs.litiengine.util.io.ImageSerializer;
 import de.gurkenlabs.utiliti.Cursors;
 import de.gurkenlabs.utiliti.UndoManager;
-import de.gurkenlabs.utiliti.Style.Theme;
 import de.gurkenlabs.utiliti.handlers.Snap;
 import de.gurkenlabs.utiliti.handlers.Transform;
 import de.gurkenlabs.utiliti.handlers.Transform.TransformType;
@@ -944,14 +943,6 @@ public class MapComponent extends GuiComponent {
     Input.keyboard().onKeyPressed(KeyEvent.VK_LEFT, e -> this.handleKeyboardTransform(-1, 0));
     Input.keyboard().onKeyPressed(KeyEvent.VK_UP, e -> this.handleKeyboardTransform(0, -1));
     Input.keyboard().onKeyPressed(KeyEvent.VK_DOWN, e -> this.handleKeyboardTransform(0, 1));
-
-    Input.keyboard().onKeyPressed(KeyEvent.VK_F6, e -> {
-        UI.loadTheme(Theme.DARK);
-    });
-
-    Input.keyboard().onKeyPressed(KeyEvent.VK_F5, e -> {
-        UI.loadTheme(Theme.LIGHT);
-    });
   }
 
   private void handleKeyboardTransform(int x, int y) {

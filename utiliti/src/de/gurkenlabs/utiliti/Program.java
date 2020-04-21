@@ -5,6 +5,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
 
+import javax.swing.SwingUtilities;
+
 import de.gurkenlabs.litiengine.DefaultUncaughtExceptionHandler;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.configuration.Quality;
@@ -24,30 +26,33 @@ public class Program {
     // hook up configuration and initialize the game
     Game.config().add(Editor.preferences());
 
-    UI.initLookAndFeel();
-    Game.init(args);
-    forceBasicEditorConfiguration();
-    Game.world().camera().onZoom(event -> Editor.preferences().setZoom((float) event.getZoom()));
+    Game.config().load();
+    SwingUtilities.invokeLater(() -> {
+      UI.initLookAndFeel();
+      Game.init(args);
+      forceBasicEditorConfiguration();
+      Game.world().camera().onZoom(event -> Editor.preferences().setZoom((float) event.getZoom()));
 
-    // the editor should never crash, even if an exception occurs
-    Game.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(false));
+      // the editor should never crash, even if an exception occurs
+      Game.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(false));
 
-    // prepare UI and start the game
-    UI.init();
-    Game.start();
+      // prepare UI and start the game
+      UI.init();
+      Game.start();
 
-    // configure input settings
-    Input.mouse().setGrabMouse(false);
-    Input.keyboard().consumeAlt(true);
+      // configure input settings
+      Input.mouse().setGrabMouse(false);
+      Input.keyboard().consumeAlt(true);
 
-    // load up previously opened project file or the one that is specified in
-    // the command line arguments
-    handleArgs(args);
-    
-    String gameFile = Editor.preferences().getLastGameFile();
-    if (!Editor.instance().fileLoaded() && gameFile != null && !gameFile.isEmpty()) {
-      Editor.instance().load(new File(gameFile.trim()), false);
-    }
+      // load up previously opened project file or the one that is specified in
+      // the command line arguments
+      handleArgs(args);
+
+      String gameFile = Editor.preferences().getLastGameFile();
+      if (!Editor.instance().fileLoaded() && gameFile != null && !gameFile.isEmpty()) {
+        Editor.instance().load(new File(gameFile.trim()), false);
+      }
+    });
   }
 
   private static void forceBasicEditorConfiguration() {
