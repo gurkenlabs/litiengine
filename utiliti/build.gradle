@@ -14,20 +14,24 @@ sourceSets {
   main.java.srcDir "src"
   main.resources.srcDir "resources"
   main.resources.srcDir "localization"
-  
+
   test.java.srcDir "tests"
   test.resources.srcDir "tests"
+}
+
+repositories {
+  mavenCentral()
 }
 
 dependencies {
   implementation project(':')
   implementation 'com.github.weisj:darklaf-core:2.0.2'
-  
+
   testImplementation 'org.junit.jupiter:junit-jupiter-api:5.4.+'
   testImplementation 'org.junit.jupiter:junit-jupiter-params:5.4.+'
   testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.4.+'
   testImplementation 'org.mockito:mockito-core:2.25.+'
-} 
+}
 
 test {
   useJUnitPlatform()
@@ -42,17 +46,17 @@ jar {
       it.isDirectory() ? it : zipTree(it)
     }
   }  {
-     exclude 'META-INF/services/**'
+    exclude 'META-INF/services/**'
   }
-  
+
   duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-  
+
   exclude '**/*.dll'
   exclude '**/*.jnilib'
   exclude '**/*.dylib'
   exclude '**/*.so'
   exclude 'junit**/**'
-  
+
   manifest {
     attributes 'Main-Class': 'de.gurkenlabs.utiliti.Program'
   }
@@ -70,13 +74,13 @@ launch4j {
   jvmOptions = ['-Xms256m', '-Xmx1024m']
 }
 
-task copyDistFiles(type: Copy) { 
+task copyDistFiles(type: Copy) {
   def buildFolder = new File(buildDir, 'libs')
   from('/dist/'){
     include 'pixel-icon-utiliti.ico'
     include 'config.properties'
   }
-  
+
   into buildFolder
 }
 
@@ -88,7 +92,7 @@ task distZipWindows(type: Zip) {
 
   archiveClassifier = 'win'
   destinationDirectory = file('build/libs/')
-  
+
   dependsOn createAllExecutables
 }
 
