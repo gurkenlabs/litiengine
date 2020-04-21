@@ -132,7 +132,7 @@ public final class TextRenderer {
     RenderingHints originalHints = g.getRenderingHints();
 
     if (antiAliasing) {
-      enableAntiAliasing(g);
+      enableTextAntiAliasing(g);
     }
 
     g.drawString(text, (float) x, (float) y);
@@ -147,7 +147,7 @@ public final class TextRenderer {
     RenderingHints originalHints = g.getRenderingHints();
 
     if (antiAliasing) {
-      enableAntiAliasing(g);
+      enableTextAntiAliasing(g);
     }
 
     renderRotated(g, text, x, y, angle);
@@ -217,7 +217,7 @@ public final class TextRenderer {
     RenderingHints originalHints = g.getRenderingHints();
 
     if (antiAliasing) {
-      enableAntiAliasing(g);
+      enableTextAntiAliasing(g);
     }
 
     final FontRenderContext frc = g.getFontRenderContext();
@@ -311,7 +311,7 @@ public final class TextRenderer {
     // activate anti aliasing for text rendering (if you want it to look nice)
 
     if (antiAliasing) {
-      enableAntiAliasing(g);
+      enableTextAntiAliasing(g);
     }
 
     g.setColor(outlineColor);
@@ -375,7 +375,7 @@ public final class TextRenderer {
     return getBounds(g, text).getHeight();
   }
 
-  private static void enableAntiAliasing(final Graphics2D g) {
+  public static void enableTextAntiAliasing(final Graphics2D g) {
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
