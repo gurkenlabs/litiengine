@@ -15,6 +15,8 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
+import com.github.weisj.darklaf.components.text.NumberedTextComponent;
+
 import de.gurkenlabs.utiliti.Style;
 
 @SuppressWarnings("serial")
@@ -24,7 +26,7 @@ public class ConsoleComponent extends JScrollPane {
     Logger root = Logger.getLogger("");
     this.consoleTextArea = new JTextPane();
     this.setViewportBorder(null);
-    this.setViewportView(this.consoleTextArea);
+    this.setViewportView(new NumberedTextComponent(this.consoleTextArea));
 
     this.consoleTextArea.setEditable(false);
     this.consoleTextArea.setAutoscrolls(true);
