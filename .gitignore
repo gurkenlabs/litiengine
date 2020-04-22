@@ -1,4 +1,4 @@
-/.gradle/
+**/.gradle/
 /build/
 /bin/
 /config.properties
