@@ -25,7 +25,8 @@ repositories {
 
 dependencies {
   implementation project(':')
-  implementation 'com.github.weisj:darklaf-core:2.0.2'
+  implementation 'com.github.weisj:darklaf-core:2.0.3'
+  implementation 'com.github.weisj:darklaf-theme:2.0.3'
 
   testImplementation 'org.junit.jupiter:junit-jupiter-api:5.4.+'
   testImplementation 'org.junit.jupiter:junit-jupiter-params:5.4.+'
