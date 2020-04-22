@@ -1,7 +1,6 @@
 package de.gurkenlabs.utiliti.swing;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -58,7 +57,6 @@ import de.gurkenlabs.litiengine.resources.SoundResource;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.litiengine.util.io.Codec;
 import de.gurkenlabs.litiengine.util.io.ImageSerializer;
-import de.gurkenlabs.utiliti.Style;
 import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.swing.dialogs.SpritesheetImportPanel;
@@ -89,7 +87,6 @@ public class AssetPanelItem extends JPanel {
   public AssetPanelItem(Object origin) {
     setPreferredSize(new Dimension(100, 120));
     this.origin = origin;
-    this.setBackground(Style.COLOR_ASSETPANEL_BACKGROUND);
     this.setBorder(normalBorder);
 
     this.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deleteAsset");
@@ -104,9 +101,6 @@ public class AssetPanelItem extends JPanel {
       @Override
       public void focusGained(FocusEvent e) {
         UIDefaults defaults = UIManager.getDefaults();
-        setBackground(defaults.getColor("Tree.selectionBackground"));
-        setForeground(defaults.getColor("Tree.selectionForeground"));
-        textField.setForeground(defaults.getColor("Tree.selectionForeground"));
         setBorder(focusBorder);
 
         if (getOrigin() instanceof SpritesheetResource || getOrigin() instanceof EmitterData) {
@@ -135,9 +129,6 @@ public class AssetPanelItem extends JPanel {
       @Override
       public void focusLost(FocusEvent e) {
         UIDefaults defaults = UIManager.getDefaults();
-        setBackground(Style.COLOR_ASSETPANEL_BACKGROUND);
-        setForeground(defaults.getColor("Tree.foreground"));
-        textField.setForeground(Color.WHITE);
         setBorder(normalBorder);
 
         btnEdit.setVisible(false);
@@ -184,8 +175,6 @@ public class AssetPanelItem extends JPanel {
     textField.setLineWrap(true);
     add(this.textField, BorderLayout.SOUTH);
     this.textField.setColumns(10);
-    this.textField.setForeground(Color.WHITE);
-    this.textField.setBackground(null);
     this.textField.setBorder(null);
     this.textField.setEditable(false);
 

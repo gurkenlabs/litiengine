@@ -80,19 +80,20 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
     this.textFieldName = new JTextField();
     this.textFieldName.setColumns(10);
-    
+
     ControlBehavior.apply(this.textFieldName);
 
     this.spinnerX = new JSpinner();
     this.spinnerY = new JSpinner();
     this.spinnerWidth = new JSpinner();
     this.spinnerHeight = new JSpinner();
-    
+
     this.updateSpinnerModels();
 
     this.tagPanel = new TagPanel();
 
     this.tabbedPanel = new JTabbedPane(SwingConstants.TOP);
+    this.tabbedPanel.setFont(Style.getHeaderFont());
 
     this.infoPanel = new JPanel();
 
@@ -107,8 +108,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
                         .addPreferredGap(ComponentPlacement.RELATED)
                         .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addComponent(tagPanel, GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE).addComponent(textFieldName, GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE)
                             .addGroup(groupLayout.createSequentialGroup().addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(spinnerWidth, GroupLayout.DEFAULT_SIZE, 161, Short.MAX_VALUE).addComponent(spinnerX, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 161, Short.MAX_VALUE))
-                                .addPreferredGap(ComponentPlacement.UNRELATED)
-                                .addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false).addComponent(lblHeight, LABEL_WIDTH, LABEL_WIDTH, Short.MAX_VALUE).addComponent(lblYcoordinate, LABEL_WIDTH, LABEL_WIDTH, Short.MAX_VALUE)).addGap(0)
+                                .addPreferredGap(ComponentPlacement.UNRELATED).addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false).addComponent(lblHeight, LABEL_WIDTH, LABEL_WIDTH, Short.MAX_VALUE).addComponent(lblYcoordinate, LABEL_WIDTH, LABEL_WIDTH, Short.MAX_VALUE)).addGap(0)
                                 .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addComponent(spinnerY, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE).addComponent(spinnerHeight, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE))))))
                     .addGap(CONTROL_MARGIN))
                 .addGroup(Alignment.LEADING, groupLayout.createSequentialGroup().addGap(CONTROL_MARGIN).addComponent(infoPanel, GroupLayout.DEFAULT_SIZE, 430, Short.MAX_VALUE).addGap(CONTROL_MARGIN)));
@@ -119,8 +119,8 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
             .addGap(CONTROL_MARGIN)
             .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(spinnerWidth, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE).addComponent(lblHeight, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE)
                 .addComponent(spinnerHeight, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE).addComponent(lblWidth, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE))
-            .addGap(CONTROL_MARGIN).addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(textFieldName, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE).addComponent(lblName, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE)).addGap(5)
-            .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(tagPanel, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE).addComponent(lblTags, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE)).addGap(5)
+            .addGap(CONTROL_MARGIN).addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(textFieldName, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE).addComponent(lblName, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE))
+            .addGap(5).addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(tagPanel, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE).addComponent(lblTags, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE)).addGap(5)
             .addComponent(tabbedPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addGap(108)));
     this.infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.X_AXIS));
 
@@ -133,11 +133,11 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.lblLayer = new JLabel("");
 
     this.lblRendering = new JLabel("");
-    this.lblRendering.setForeground(Color.GRAY);
+    this.lblRendering.setForeground(Color.LIGHT_GRAY);
     this.lblRendering.setFont(lblRendering.getFont().deriveFont(Style.getDefaultFont().getSize() * 0.75f));
 
     this.lblLayer.setHorizontalAlignment(SwingConstants.TRAILING);
-    this.lblLayer.setForeground(Color.GRAY);
+    this.lblLayer.setForeground(Color.LIGHT_GRAY);
     this.lblLayer.setFont(this.lblLayer.getFont().deriveFont(Style.getDefaultFont().getSize() * 0.75f));
 
     this.infoPanel.add(lblEntityId);
@@ -179,9 +179,9 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
     if (mapObject != null) {
       MapObjectType t = MapObjectType.get(mapObject.getType());
-      this.setMapObjectType(t != null ? t : MapObjectType.AREA);
+      this.setMapObjectType(t != null ? t : null);
     } else {
-      this.setMapObjectType(MapObjectType.AREA);
+      this.setMapObjectType(null);
     }
 
     if (this.currentPanel != null) {
@@ -205,60 +205,71 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
   private void switchPanel() {
     final MapObjectType currentType = this.getObjectType();
     if (currentType == null) {
+      this.clearPanels();
       return;
     }
 
     PropertyPanel panel = this.panels.get(type);
-    if (panel == null) {
-      if (this.currentPanel != null) {
-        this.tabbedPanel.remove(this.currentPanel);
-        this.currentPanel.bind(null);
-        this.currentPanel = null;
-        this.tabbedPanel.revalidate();
-        this.tabbedPanel.repaint();
-      }
-      this.tabbedPanel.remove(this.collisionPanel);
-      this.tabbedPanel.remove(this.combatPanel);
-      this.tabbedPanel.remove(this.movementPanel);
-      this.tabbedPanel.remove(this.customPanel);
-
-      return;
-    }
-
-    if (panel == this.currentPanel) {
-      return;
-    }
-
     if (this.currentPanel != null) {
+      // panel is already selected
+      if (panel == this.currentPanel) {
+        return;
+      }
+
+      // clear current panel
       this.currentPanel.bind(null);
       this.tabbedPanel.remove(this.currentPanel);
     }
-    tabbedPanel.addTab(Resources.strings().get(panel.getIdentifier()), panel.getIcon(), panel);
 
+    if (panel != null) {
+      // add explicit map object panel
+      tabbedPanel.addTab(Resources.strings().get(panel.getIdentifier()), panel.getIcon(), panel);
+    }
+
+    // add/remove collision panel
     if (currentType == MapObjectType.PROP || currentType == MapObjectType.CREATURE) {
       tabbedPanel.addTab(Resources.strings().get(this.collisionPanel.getIdentifier()), this.collisionPanel.getIcon(), this.collisionPanel);
     } else {
       this.tabbedPanel.remove(this.collisionPanel);
     }
 
+    // add/remove combat panel
     if (currentType == MapObjectType.PROP || currentType == MapObjectType.CREATURE) {
       tabbedPanel.addTab(Resources.strings().get(this.combatPanel.getIdentifier()), this.combatPanel);
     } else {
       this.tabbedPanel.remove(this.combatPanel);
     }
 
+    // add/remove movement panel
     if (currentType == MapObjectType.CREATURE) {
       tabbedPanel.addTab(Resources.strings().get(this.movementPanel.getIdentifier()), this.movementPanel.getIcon(), this.movementPanel);
     } else {
       this.tabbedPanel.remove(this.movementPanel);
     }
 
+    // always add custom panel
     tabbedPanel.addTab(Resources.strings().get(this.customPanel.getIdentifier()), this.customPanel.getIcon(), this.customPanel);
 
-    this.currentPanel = panel;
+    this.currentPanel = panel != null ? panel : this.customPanel;
     this.currentPanel.bind(this.getDataSource());
     this.tabbedPanel.revalidate();
     this.tabbedPanel.repaint();
+  }
+
+  private void clearPanels() {
+    if (this.currentPanel != null) {
+      this.tabbedPanel.remove(this.currentPanel);
+      this.currentPanel.bind(null);
+      this.currentPanel = null;
+    }
+
+    this.tabbedPanel.revalidate();
+    this.tabbedPanel.repaint();
+
+    this.tabbedPanel.remove(this.collisionPanel);
+    this.tabbedPanel.remove(this.combatPanel);
+    this.tabbedPanel.remove(this.movementPanel);
+    this.tabbedPanel.remove(this.customPanel);
   }
 
   @Override
@@ -274,7 +285,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.spinnerY.setValue(0);
     this.spinnerWidth.setValue(0);
     this.spinnerHeight.setValue(0);
-    this.type = MapObjectType.AREA;
+    this.type = null;
 
     this.textFieldName.setText("");
     this.labelEntityID.setText("####");
@@ -297,12 +308,12 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
     this.labelEntityID.setText(Integer.toString(mapObject.getId()));
 
-    this.lblLayer.setText("layer: " + mapObject.getLayer().getName());
+    this.lblLayer.setText("Layer: " + mapObject.getLayer().getName());
     String info = getRendering(mapObject);
     if (info == null) {
       this.lblRendering.setText("");
     } else {
-      this.lblRendering.setText("render: " + getRendering(mapObject));
+      this.lblRendering.setText("Render: " + getRendering(mapObject));
     }
   }
 
@@ -374,7 +385,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.spinnerY.setModel(supp.get());
     this.spinnerWidth.setModel(supp.get());
     this.spinnerHeight.setModel(supp.get());
-    
+
     ControlBehavior.apply(this.spinnerX);
     ControlBehavior.apply(this.spinnerY);
     ControlBehavior.apply(this.spinnerWidth);

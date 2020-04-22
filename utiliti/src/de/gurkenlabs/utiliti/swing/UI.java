@@ -2,8 +2,10 @@ package de.gurkenlabs.utiliti.swing;
 
 import java.awt.BorderLayout;
 import java.awt.Canvas;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
@@ -11,8 +13,6 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.util.Enumeration;
 import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
@@ -24,14 +24,18 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.FontUIResource;
+
+import com.github.weisj.darklaf.LafManager;
+import com.github.weisj.darklaf.theme.DarculaTheme;
+import com.github.weisj.darklaf.theme.IntelliJTheme;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameListener;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.Cursors;
 import de.gurkenlabs.utiliti.Style;
+import de.gurkenlabs.utiliti.Style.Theme;
 import de.gurkenlabs.utiliti.components.Controller;
 import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.components.EntityController;
@@ -48,9 +52,7 @@ import de.gurkenlabs.utiliti.swing.menus.MainMenuBar;
 import de.gurkenlabs.utiliti.swing.panels.MapObjectInspector;
 
 public final class UI {
-  private static final Logger log = Logger.getLogger(UI.class.getName());
   private static final int SCROLL_MAX = 100;
-
   private static JPanel renderPanel;
   private static JScrollBar horizontalScroll;
   private static JScrollBar verticalScroll;
@@ -65,6 +67,8 @@ public final class UI {
   private static boolean initialized;
 
   private static float currentScrollSize;
+
+  private static volatile boolean loadingTheme;
 
   private UI() {
   }
@@ -96,13 +100,20 @@ public final class UI {
 
     Game.screens().display(Editor.instance());
 
-    initSwingComponentStyle();
+    javax.swing.JComponent.setDefaultLocale(Locale.getDefault());
+    JPopupMenu.setDefaultLightWeightPopupEnabled(false);
+    UIManager.getDefaults().put("SplitPane.border", BorderFactory.createEmptyBorder());
+    setDefaultSwingFont(Style.getDefaultFont());
+
     Tray.init();
     Game.window().cursor().set(Cursors.DEFAULT, 0, 0);
     Game.window().cursor().setOffsetX(0);
     Game.window().cursor().setOffsetY(0);
     setupInterface();
     Game.window().getHostControl().revalidate();
+    Game.window().getRenderComponent().setBackground(new Color(30, 31, 32));
+
+    setTheme(Editor.preferences().getTheme());
 
     initialized = true;
   }
@@ -193,6 +204,10 @@ public final class UI {
     Game.world().camera().onFocus(e -> {
       updateScrollBars();
     });
+
+    Game.world().onLoaded(e -> {
+      updateScrollBars();
+    });
   }
 
   private static void setupInterface() {
@@ -207,7 +222,7 @@ public final class UI {
 
     renderPanel = new JPanel(new BorderLayout());
     renderPanel.add(canvas);
-    renderPanel.setMinimumSize(new Dimension(300, 0));
+    renderPanel.setMinimumSize(new Dimension(300, 100));
     initScrollBars(renderPanel);
 
     JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, initRenderSplitPanel(renderPanel, window), initRightSplitPanel());
@@ -277,6 +292,7 @@ public final class UI {
     mapLayerList = new LayerList();
     entityList = new EntityList();
     JTabbedPane tabPane = new JTabbedPane();
+    tabPane.setFont(Style.getHeaderFont());
     tabPane.add(entityList);
     tabPane.add(mapLayerList);
     tabPane.setMaximumSize(new Dimension(0, 150));
@@ -294,7 +310,7 @@ public final class UI {
     mapObjectPanel = new MapObjectInspector();
 
     JSplitPane rightSplitPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-    rightSplitPanel.setMinimumSize(new Dimension(300, 0));
+    rightSplitPanel.setMinimumSize(new Dimension(320, 0));
     rightSplitPanel.setBottomComponent(mapObjectPanel);
     rightSplitPanel.setTopComponent(topRightSplitPanel);
     rightSplitPanel.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> Editor.preferences().setSelectionEditSplitter(rightSplitPanel.getDividerLocation()));
@@ -308,6 +324,7 @@ public final class UI {
   private static JPanel initBottomPanel() {
     JPanel bottomPanel = new JPanel(new BorderLayout());
     JTabbedPane bottomTab = new JTabbedPane();
+    bottomTab.setFont(Style.getHeaderFont());
 
     assetComponent = new AssetList();
     bottomTab.addTab(Resources.strings().get("assettree_assets"), Icons.ASSET, assetComponent);
@@ -333,27 +350,41 @@ public final class UI {
     });
   }
 
-  private static void initSwingComponentStyle() {
-    try {
-      javax.swing.JComponent.setDefaultLocale(Locale.getDefault());
-      JPopupMenu.setDefaultLightWeightPopupEnabled(false);
-      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-      UIManager.getDefaults().put("SplitPane.border", BorderFactory.createEmptyBorder());
-      setDefaultSwingFont(new FontUIResource(Style.getDefaultFont()));
-    } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
-      log.log(Level.SEVERE, e.getLocalizedMessage(), e);
-    }
+  public static void initLookAndFeel() {
+    LafManager.setDecorationsEnabled(true);
+    setTheme(Editor.preferences().getTheme());
   }
 
-  private static void setDefaultSwingFont(FontUIResource font) {
+  public static synchronized void setTheme(Theme theme) {
+    if (loadingTheme) {
+      return;
+    }
+
+    loadingTheme = true;
+
+    switch (theme) {
+    case DARK:
+      LafManager.install(new DarculaTheme());
+      break;
+    case LIGHT:
+      LafManager.install(new IntelliJTheme());
+      break;
+    default:
+      break;
+    }
+
+    Editor.preferences().setTheme(theme);
+    loadingTheme = false;
+  }
+
+  private static void setDefaultSwingFont(Font font) {
     Enumeration<Object> keys = UIManager.getDefaults().keys();
     while (keys.hasMoreElements()) {
       Object key = keys.nextElement();
 
       Object value = UIManager.get(key);
-
       if (value instanceof javax.swing.plaf.FontUIResource) {
-        UIManager.put(key, font);
+        UIManager.put(key, new FontUIResource(font));
       }
     }
   }

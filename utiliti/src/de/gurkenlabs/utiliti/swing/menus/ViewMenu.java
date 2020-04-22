@@ -1,8 +1,10 @@
 package de.gurkenlabs.utiliti.swing.menus;
 
+import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -12,6 +14,7 @@ import javax.swing.KeyStroke;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ColorHelper;
+import de.gurkenlabs.utiliti.Style.Theme;
 import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.handlers.Zoom;
 import de.gurkenlabs.utiliti.swing.UI;
@@ -22,6 +25,31 @@ public final class ViewMenu extends JMenu {
   public ViewMenu() {
     super(Resources.strings().get("menu_view"));
     this.setMnemonic('V');
+
+    JCheckBoxMenuItem lightTheme = new JCheckBoxMenuItem(Resources.strings().get("menu_view_theme_light"));
+    lightTheme.setState(Editor.preferences().getTheme() == Theme.LIGHT);
+
+    JCheckBoxMenuItem darkTheme = new JCheckBoxMenuItem(Resources.strings().get("menu_view_theme_dark"));
+    darkTheme.setState(Editor.preferences().getTheme() == Theme.DARK);
+
+    JMenu themeMenu = new JMenu(Resources.strings().get("menu_view_theme"));
+    ButtonGroup themegroup = new ButtonGroup();
+    themegroup.add(lightTheme);
+    themegroup.add(darkTheme);
+    themeMenu.add(lightTheme);
+    themeMenu.add(darkTheme);
+
+    ActionListener themeActionListener = event -> {
+      JCheckBoxMenuItem box = (JCheckBoxMenuItem) event.getSource();
+      if (box == lightTheme) {
+        UI.setTheme(Theme.LIGHT);
+      } else if (box == darkTheme) {
+        UI.setTheme(Theme.DARK);
+      }
+    };
+
+    lightTheme.addActionListener(themeActionListener);
+    darkTheme.addActionListener(themeActionListener);
 
     JCheckBoxMenuItem clampToMap = new JCheckBoxMenuItem(Resources.strings().get("menu_view_clampMap"));
     clampToMap.setState(Editor.preferences().clampToMap());
@@ -93,6 +121,8 @@ public final class ViewMenu extends JMenu {
 
     Editor.instance().getMapComponent().onFocusChanged(mo -> centerFocus.setEnabled(mo != null));
 
+    this.add(themeMenu);
+    this.addSeparator();
     this.add(renderGrid);
     this.add(renderCollision);
     this.add(renderCustomMapObjects);

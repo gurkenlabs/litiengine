@@ -5,14 +5,32 @@ import java.util.Arrays;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.utiliti.components.Editor;
 
-public final class Zoom {
-  private static final float[] zooms = new float[] { 0.1f, 0.25f, 0.5f, 1, 1.5f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f, 16f, 32f, 50f, 80f, 100f };
+public final class Zoom implements Comparable<Zoom> {
+  private static final Zoom[] zooms = new Zoom[] { new Zoom(0.1f), new Zoom(0.25f), new Zoom(0.5f), new Zoom(1), new Zoom(1.5f), new Zoom(2f), new Zoom(3f), new Zoom(4f), new Zoom(5f), new Zoom(6f), new Zoom(7f), new Zoom(8f), new Zoom(9f), new Zoom(10f), new Zoom(16f), new Zoom(32f), new Zoom(50f),
+      new Zoom(80f), new Zoom(100f) };
   private static final int DEFAULT_ZOOM_INDEX = 3;
   private static int currentZoomIndex = DEFAULT_ZOOM_INDEX;
 
-  private Zoom() {
+  private final float value;
+
+  private Zoom(float value) {
+    this.value = value;
   }
-  
+
+  public float getValue() {
+    return value;
+  }
+
+  @Override
+  public int compareTo(Zoom o) {
+    return Float.compare(this.getValue(), o.getValue());
+  }
+
+  @Override
+  public String toString() {
+    return String.format("%6d%%", (int) (this.getValue() * 100));
+  }
+
   public static void apply() {
     if (Game.world() == null || Game.world().camera() == null) {
       return;
@@ -23,7 +41,10 @@ public final class Zoom {
 
   public static void applyPreference() {
     set(Editor.preferences().getZoom());
-    apply();
+  }
+
+  public static Zoom[] getAll() {
+    return zooms;
   }
 
   /**
@@ -38,12 +59,12 @@ public final class Zoom {
    * @return The index of the matched zoom provided by this class.
    */
   public static int match(float preference) {
-    int index = Arrays.binarySearch(zooms, preference);
+    int index = Arrays.binarySearch(zooms, new Zoom(preference));
     if (index >= 0) {
       return index;
     }
     index = -(index + 1);
-    if (index == zooms.length || index > 0 && zooms[index] + zooms[index - 1] > 2 * preference) {
+    if (index == zooms.length || index > 0 && zooms[index].getValue() + zooms[index - 1].getValue() > 2 * preference) {
       index--;
     }
     return index;
@@ -69,12 +90,17 @@ public final class Zoom {
     return get(currentZoomIndex);
   }
 
+  public static Zoom getZoom() {
+    return zooms[currentZoomIndex];
+  }
+
   public static float get(int zoomIndex) {
-    return zooms[zoomIndex];
+    return zooms[zoomIndex].getValue();
   }
 
   public static void set(float zoom) {
     currentZoomIndex = match(zoom);
+    apply();
   }
 
   public static float getMax() {

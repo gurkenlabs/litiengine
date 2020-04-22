@@ -1202,7 +1202,6 @@ public class MapComponent extends GuiComponent {
           this.getSelectedMapObjects().remove(mapObject);
         } else {
           this.setFocus(mapObject, !Input.keyboard().isPressed(KeyEvent.VK_SHIFT));
-          UI.getInspector().bind(mapObject);
         }
         somethingIsFocused = true;
       }
@@ -1211,7 +1210,6 @@ public class MapComponent extends GuiComponent {
     if (!somethingIsFocused && !currentObjectFocused) {
       this.setFocus(null, true);
       this.setSelection(Collections.emptyList(), true);
-      UI.getInspector().bind(null);
     }
   }
 

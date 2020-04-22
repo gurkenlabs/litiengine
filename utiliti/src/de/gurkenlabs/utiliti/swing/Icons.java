@@ -35,7 +35,6 @@ public final class Icons {
   public static final Icon LIGHT = new ImageIcon(Resources.images().get("bulb.png"));
   public static final Icon LOWER = new ImageIcon(Resources.images().get("button-lower.png"));
   public static final Icon MAP_DELETE = new ImageIcon(Resources.images().get("button-deletex16.png"));
-  public static final Icon MAP_EXPORT = new ImageIcon(Resources.images().get("button-map-exportx16.png"));
   public static final Icon MAPAREA = new ImageIcon(Resources.images().get("maparea.png"));
   public static final Icon MISC = new ImageIcon(Resources.images().get("misc.png"));
   public static final Icon PAUSE = new ImageIcon(Resources.images().get("button-pause.png"));
@@ -43,7 +42,6 @@ public final class Icons {
   public static final Icon PENCIL = new ImageIcon(Resources.images().get("pencil.png"));
   public static final Icon PLAY = new ImageIcon(Resources.images().get("button-play.png"));
   public static final Icon PROP = new ImageIcon(Resources.images().get("entity.png"));
-  public static final Icon REFRESH = new ImageIcon(Resources.images().get("refresh.png"));
   public static final Icon RENAMEX16 = new ImageIcon(Resources.images().get("button-renamex16.png"));
   public static final Icon SEARCH = new ImageIcon(Resources.images().get("search.png"));
   public static final Icon SHADOWBOX = new ImageIcon(Resources.images().get("shadowbox.png"));
