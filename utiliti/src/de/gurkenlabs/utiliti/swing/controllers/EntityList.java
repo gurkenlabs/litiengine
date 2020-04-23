@@ -20,9 +20,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTree;
-import javax.swing.UIManager;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
@@ -77,7 +74,6 @@ public final class EntityList extends JPanel implements EntityController {
     this.entityScrollPane.setMaximumSize(new Dimension(0, 250));
 
     this.searchPanel = new JPanel();
-    this.searchPanel.setBorder(new LineBorder(UIManager.getColor("Button.shadow")));
     this.searchPanel.setLayout(new BorderLayout(0, 0));
 
     this.btnCollape = new JButton("");
@@ -87,7 +83,6 @@ public final class EntityList extends JPanel implements EntityController {
     this.btnCollape.setIcon(Icons.COLLAPSE);
 
     this.textField = new JTextField(Resources.strings().get("panel_entities_search_default"));
-    this.textField.setBorder(new EmptyBorder(0, 5, 0, 0));
     this.textField.setOpaque(false);
     this.textField.setColumns(10);
     this.textField.addActionListener(e -> search());

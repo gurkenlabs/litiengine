@@ -2,7 +2,6 @@ package de.gurkenlabs.utiliti.swing;
 
 import java.awt.BorderLayout;
 import java.awt.Canvas;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -14,7 +13,6 @@ import java.awt.geom.Point2D;
 import java.util.Enumeration;
 import java.util.Locale;
 
-import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -27,8 +25,8 @@ import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
 
 import com.github.weisj.darklaf.LafManager;
-import com.github.weisj.darklaf.theme.DarculaTheme;
 import com.github.weisj.darklaf.theme.IntelliJTheme;
+import com.github.weisj.darklaf.theme.OneDarkTheme;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameListener;
@@ -102,7 +100,6 @@ public final class UI {
 
     javax.swing.JComponent.setDefaultLocale(Locale.getDefault());
     JPopupMenu.setDefaultLightWeightPopupEnabled(false);
-    UIManager.getDefaults().put("SplitPane.border", BorderFactory.createEmptyBorder());
     setDefaultSwingFont(Style.getDefaultFont());
 
     Tray.init();
@@ -111,7 +108,6 @@ public final class UI {
     Game.window().cursor().setOffsetY(0);
     setupInterface();
     Game.window().getHostControl().revalidate();
-    Game.window().getRenderComponent().setBackground(new Color(30, 31, 32));
 
     setTheme(Editor.preferences().getTheme());
 
@@ -364,13 +360,17 @@ public final class UI {
 
     switch (theme) {
     case DARK:
-      LafManager.install(new DarculaTheme());
+      LafManager.install(new OneDarkTheme());
       break;
     case LIGHT:
       LafManager.install(new IntelliJTheme());
       break;
     default:
       break;
+    }
+
+    if (Game.window() != null && Game.window().getRenderComponent() != null) {
+      Game.window().getRenderComponent().setBackground(UIManager.getColor("Panel.background"));
     }
 
     Editor.preferences().setTheme(theme);

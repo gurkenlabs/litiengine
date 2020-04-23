@@ -26,30 +26,24 @@ public final class ViewMenu extends JMenu {
     super(Resources.strings().get("menu_view"));
     this.setMnemonic('V');
 
-    JCheckBoxMenuItem lightTheme = new JCheckBoxMenuItem(Resources.strings().get("menu_view_theme_light"));
-    lightTheme.setState(Editor.preferences().getTheme() == Theme.LIGHT);
-
-    JCheckBoxMenuItem darkTheme = new JCheckBoxMenuItem(Resources.strings().get("menu_view_theme_dark"));
-    darkTheme.setState(Editor.preferences().getTheme() == Theme.DARK);
-
     JMenu themeMenu = new JMenu(Resources.strings().get("menu_view_theme"));
     ButtonGroup themegroup = new ButtonGroup();
-    themegroup.add(lightTheme);
-    themegroup.add(darkTheme);
-    themeMenu.add(lightTheme);
-    themeMenu.add(darkTheme);
+    for (Theme theme : Theme.values()) {
+      JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(Resources.strings().get("menu_view_theme_" + theme.name().toLowerCase()));
+      menuItem.setState(Editor.preferences().getTheme() == theme);
 
-    ActionListener themeActionListener = event -> {
-      JCheckBoxMenuItem box = (JCheckBoxMenuItem) event.getSource();
-      if (box == lightTheme) {
-        UI.setTheme(Theme.LIGHT);
-      } else if (box == darkTheme) {
-        UI.setTheme(Theme.DARK);
-      }
-    };
 
-    lightTheme.addActionListener(themeActionListener);
-    darkTheme.addActionListener(themeActionListener);
+      ActionListener themeActionListener = event -> {
+        JCheckBoxMenuItem box = (JCheckBoxMenuItem) event.getSource();
+        if (box == menuItem) {
+          UI.setTheme(theme);
+        }
+      };
+      menuItem.addActionListener(themeActionListener);
+      
+      themegroup.add(menuItem);
+      themeMenu.add(menuItem);
+    }
 
     JCheckBoxMenuItem clampToMap = new JCheckBoxMenuItem(Resources.strings().get("menu_view_clampMap"));
     clampToMap.setState(Editor.preferences().clampToMap());
