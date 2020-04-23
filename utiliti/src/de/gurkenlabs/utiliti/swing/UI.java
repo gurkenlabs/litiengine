@@ -11,8 +11,11 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -50,6 +53,7 @@ import de.gurkenlabs.utiliti.swing.menus.MainMenuBar;
 import de.gurkenlabs.utiliti.swing.panels.MapObjectInspector;
 
 public final class UI {
+  private static final List<JComponent> orphanComponents = new CopyOnWriteArrayList<>();
   private static final int SCROLL_MAX = 100;
   private static JPanel renderPanel;
   private static JScrollBar horizontalScroll;
@@ -69,6 +73,21 @@ public final class UI {
   private static volatile boolean loadingTheme;
 
   private UI() {
+  }
+
+  /**
+   * Adds an orphan component to the UI to ensure updating when switching themes
+   * even though the elements might not be part of the currently active UI.
+   * 
+   * @param component
+   *          The orphan component to add.
+   */
+  public static void addOrphanComponent(JComponent component) {
+    orphanComponents.add(component);
+  }
+
+  public static void removeOrphanComponent(JComponent component) {
+    orphanComponents.remove(component);
   }
 
   public static boolean notifyPendingChanges() {
@@ -108,6 +127,12 @@ public final class UI {
     Game.window().cursor().setOffsetY(0);
     setupInterface();
     Game.window().getHostControl().revalidate();
+
+    UIManager.addPropertyChangeListener(e -> {
+      for (JComponent component : orphanComponents) {
+        SwingUtilities.updateComponentTreeUI(component);
+      }
+    });
 
     setTheme(Editor.preferences().getTheme());
 
@@ -334,6 +359,7 @@ public final class UI {
 
   private static void initPopupMenu(Canvas canvas) {
     canvasPopup = new CanvasPopupMenu();
+    addOrphanComponent(canvasPopup);
 
     canvas.addMouseListener(new MouseAdapter() {
       @Override

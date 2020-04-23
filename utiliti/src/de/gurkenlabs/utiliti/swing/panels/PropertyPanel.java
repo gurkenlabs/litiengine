@@ -66,6 +66,7 @@ public abstract class PropertyPanel extends JPanel {
 
   public PropertyPanel() {
     setBorder(null);
+    UI.addOrphanComponent(this);
   }
 
   protected IMapObject getDataSource() {
