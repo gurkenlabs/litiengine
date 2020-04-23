@@ -8,7 +8,6 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.SimpleAttributeSet;
@@ -20,17 +19,12 @@ import com.github.weisj.darklaf.components.text.NumberedTextComponent;
 import de.gurkenlabs.utiliti.Style;
 
 @SuppressWarnings("serial")
-public class ConsoleComponent extends JScrollPane {
-  private final  JTextPane consoleTextArea;
-  public ConsoleComponent() {
-    Logger root = Logger.getLogger("");
-    this.consoleTextArea = new JTextPane();
-    this.setViewportBorder(null);
-    this.setViewportView(new NumberedTextComponent(this.consoleTextArea));
+public class ConsoleComponent extends NumberedTextComponent {
 
-    this.consoleTextArea.setEditable(false);
-    this.consoleTextArea.setAutoscrolls(true);
-    root.addHandler(new LogHandler(this.consoleTextArea));
+  public ConsoleComponent() {
+    super(new JTextPane());
+    this.textComponent.setEditable(false);
+    Logger.getLogger("").addHandler(new LogHandler((JTextPane) this.textComponent));
   }
 
   private class LogHandler extends java.util.logging.Handler {
@@ -94,7 +88,7 @@ public class ConsoleComponent extends JScrollPane {
         return Color.ORANGE;
       }
 
-      return ConsoleComponent.this.consoleTextArea.getForeground();
+      return ConsoleComponent.this.getForeground();
     }
   }
 }
