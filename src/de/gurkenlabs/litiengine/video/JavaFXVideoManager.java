@@ -60,6 +60,7 @@ public final class JavaFXVideoManager extends VideoManager{
 
   @Override
   public synchronized void setVideo(URL url) throws IOException {
+    this.panel = new JFXPanel();
     if(url.getProtocol().startsWith("http")) {
       if(!allowNetworkConnections) {
         throw new IOException("Network access disallowed");
