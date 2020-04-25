@@ -94,7 +94,7 @@ public final class Game {
   private static boolean initialized;
 
   static {
-    world.addLoadedListener(gameTime);
+    world.onLoaded(gameTime);
     addGameListener(new InputGameAdapter());
   }
 

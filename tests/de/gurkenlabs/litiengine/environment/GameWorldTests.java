@@ -94,7 +94,7 @@ public class GameWorldTests {
   public void testMapSpecificLoadedListeners() {
     Status mapLoaded = new Status();
 
-    Game.world().addLoadedListener("test-map", e -> mapLoaded.wasCalled = true);
+    Game.world().onLoaded("test-map", e -> mapLoaded.wasCalled = true);
 
     IMap map = Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
 
@@ -107,7 +107,7 @@ public class GameWorldTests {
   public void testMapSpecificUnloadedListeners() {
     Status mapUnloaded = new Status();
 
-    Game.world().addUnloadedListener("test-map", e -> mapUnloaded.wasCalled = true);
+    Game.world().onUnloaded("test-map", e -> mapUnloaded.wasCalled = true);
 
     IMap map = Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
 

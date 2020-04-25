@@ -6,9 +6,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import de.gurkenlabs.litiengine.Direction;
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.GameLoop;
 import de.gurkenlabs.litiengine.attributes.Attribute;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.TmxType;
 import de.gurkenlabs.litiengine.graphics.animation.CreatureAnimationController;
 import de.gurkenlabs.litiengine.graphics.animation.EntityAnimationController;
 import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
@@ -19,6 +22,7 @@ import de.gurkenlabs.litiengine.physics.MovementController;
  * TODO: Add idle event
  */
 @MovementInfo
+@TmxType(MapObjectType.CREATURE)
 public class Creature extends CombatEntity implements IMobileEntity {
   private static final int IDLE_DELAY = 100;
   private final Collection<EntityMovedListener> movedListeners = ConcurrentHashMap.newKeySet();
@@ -105,7 +109,7 @@ public class Creature extends CombatEntity implements IMobileEntity {
   }
 
   @Override
-  public IMovementController getMovementController() {
+  public IMovementController movement() {
     return this.getController(IMovementController.class);
   }
 
@@ -127,7 +131,9 @@ public class Creature extends CombatEntity implements IMobileEntity {
 
   @Override
   public float getTickVelocity() {
-    return MobileEntity.getTickVelocity(this);
+    // pixels per ms multiplied by the passed ms
+    // ensure that entities don't travel too far in case of lag
+    return Math.min(Game.loop().getDeltaTime(), GameLoop.TICK_DELTATIME_LAG) * 0.001F * this.getVelocity().get() * Game.loop().getTimeScale();
   }
 
   @Override
@@ -181,6 +187,10 @@ public class Creature extends CombatEntity implements IMobileEntity {
   }
 
   public void setSpritesheetName(String spritesheetName) {
+    if (this.spritesheetName != null && this.spritesheetName.equals(spritesheetName)) {
+      return;
+    }
+
     this.spritesheetName = spritesheetName;
     this.updateAnimationController();
   }

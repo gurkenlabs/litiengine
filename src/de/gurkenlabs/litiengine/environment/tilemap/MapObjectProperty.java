@@ -60,7 +60,7 @@ public final class MapObjectProperty {
   public static final String SHADOW_OFFSET = "shadowOffset";
 
   // spawnpoint
-  public static final String SPAWN_TYPE = "spawnType";
+  public static final String SPAWN_INFO = "spawnInfo";
   public static final String SPAWN_DIRECTION = "spawnDirection";
   public static final String SPAWN_PIVOT = "spawnPivot";
   public static final String SPAWN_PIVOT_OFFSETX = "spawnPivotOffsetX";

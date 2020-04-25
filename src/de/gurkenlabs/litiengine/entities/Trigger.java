@@ -12,7 +12,9 @@ import java.util.logging.Logger;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.TmxType;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
@@ -21,6 +23,7 @@ import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
  */
 @CollisionInfo(collision = false)
 @EntityInfo(renderType = RenderType.OVERLAY)
+@TmxType(MapObjectType.TRIGGER)
 public class Trigger extends CollisionEntity implements IUpdateable {
   public enum TriggerActivation {
     COLLISION, INTERACT

@@ -20,6 +20,7 @@ import javax.swing.SpinnerNumberModel;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.utiliti.SwingHelpers;
+import de.gurkenlabs.utiliti.swing.panels.PropertyPanel;
 
 @SuppressWarnings("serial")
 public class ColorComponent extends JPanel {
@@ -31,8 +32,9 @@ public class ColorComponent extends JPanel {
   private static final String DEFAULT_COLOR = "#FFFFFFFF";
 
   public ColorComponent() {
-    this.setSize(200, 60);
-    this.setPreferredSize(new Dimension(200, 60));
+    int height = (PropertyPanel.CONTROL_HEIGHT + PropertyPanel.CONTROL_MARGIN) * 2;
+    this.setSize(200, height);
+    this.setPreferredSize(new Dimension(200, height));
     this.listeners = new ArrayList<>();
     this.textFieldColor = ControlBehavior.apply(new JTextField());
     this.textFieldColor.setEditable(true);
@@ -64,11 +66,12 @@ public class ColorComponent extends JPanel {
     ControlBehavior.apply(this.spinnerAlpha);
 
     GroupLayout groupLayout = new GroupLayout(this);
-    groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup().addComponent(btnSelectColor, 25, 25, 25).addPreferredGap(ComponentPlacement.RELATED).addComponent(textFieldColor, GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE))
+    groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+        .addGroup(groupLayout.createSequentialGroup().addComponent(btnSelectColor, PropertyPanel.CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE).addPreferredGap(ComponentPlacement.RELATED).addComponent(textFieldColor, GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE))
         .addGroup(groupLayout.createSequentialGroup().addComponent(lblAlpha).addPreferredGap(ComponentPlacement.RELATED).addComponent(spinnerAlpha, GroupLayout.DEFAULT_SIZE, 95, Short.MAX_VALUE)));
-    groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-        .addGroup(groupLayout.createSequentialGroup().addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(btnSelectColor, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE).addComponent(textFieldColor, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE))
-            .addPreferredGap(ComponentPlacement.RELATED).addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(lblAlpha).addComponent(spinnerAlpha, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)).addContainerGap(15, Short.MAX_VALUE)));
+    groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup()
+        .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(btnSelectColor, PropertyPanel.CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE).addComponent(textFieldColor, GroupLayout.PREFERRED_SIZE, PropertyPanel.CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE))
+        .addGap(PropertyPanel.CONTROL_MARGIN).addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(lblAlpha).addComponent(spinnerAlpha, PropertyPanel.CONTROL_HEIGHT, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))));
     setLayout(groupLayout);
   }
 

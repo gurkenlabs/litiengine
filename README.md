@@ -72,6 +72,9 @@ Visit the official [LITIengine forum](https://forum.litiengine.com/) for trouble
 * [Ogg Vorbis SPI](http://www.javazoom.net/vorbisspi/vorbisspi.html) for .ogg support
 * [Steamworks4j](https://github.com/code-disaster/steamworks4j) for supporting the steamworks SDK
 
+### utiLITI 
+* [Darklaf](https://github.com/weisJ/darklaf) for theming support
+
 ## Contributing
 * Agree to our [Code of Conduct](https://github.com/gurkenlabs/litiengine/blob/master/CODE_OF_CONDUCT.md)
 * View our [Contribution guidelines](https://github.com/gurkenlabs/litiengine/blob/master/CONTRIBUTING.md)

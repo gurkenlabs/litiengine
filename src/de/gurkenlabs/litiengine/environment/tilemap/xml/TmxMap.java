@@ -46,8 +46,8 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
   public static final String FILE_EXTENSION = "tmx";
 
   private static final Logger log = Logger.getLogger(TmxMap.class.getName());
-  private static final int MAX_MAJOR = 1;
-  private static final int MAX_MINOR = 2;
+  public static final int MAX_MAJOR = 1;
+  public static final int MAX_MINOR = 2;
 
   @XmlAttribute
   private double version;
@@ -131,6 +131,8 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
 
   public TmxMap(IMapOrientation orientation) {
     this.mapOrientation = orientation;
+    this.renderorder = RenderOrder.RIGHT_DOWN;
+    this.setTiledVersion(MAX_MAJOR + "." + MAX_MINOR + ".0");
   }
 
   @XmlTransient

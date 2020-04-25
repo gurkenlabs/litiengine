@@ -114,7 +114,7 @@ public final class GameRandom extends java.util.Random {
    * @throws IllegalArgumentException
    *           When the specified array is null or empty.
    */
-  public int choose(int[] array) {
+  public int choose(int... array) {
     if (array == null || array.length == 0) {
       throw new IllegalArgumentException(ARRAY_MUST_NOT_BE_EMPTY);
     }
@@ -132,7 +132,7 @@ public final class GameRandom extends java.util.Random {
    * @throws IllegalArgumentException
    *           When the specified array is null or empty.
    */
-  public long choose(long[] array) {
+  public long choose(long... array) {
     if (array == null || array.length == 0) {
       throw new IllegalArgumentException(ARRAY_MUST_NOT_BE_EMPTY);
     }
@@ -150,7 +150,25 @@ public final class GameRandom extends java.util.Random {
    * @throws IllegalArgumentException
    *           When the specified array is null or empty.
    */
-  public double choose(double[] array) {
+  public double choose(double... array) {
+    if (array == null || array.length == 0) {
+      throw new IllegalArgumentException(ARRAY_MUST_NOT_BE_EMPTY);
+    }
+
+    return array[this.nextInt(array.length)];
+  }
+  
+  /**
+   * Chooses a pseudo-random element from the specified array.
+   * 
+   * @param array
+   *          The array to choose from.
+   * @return A pseudo-random element from the array or 0 if the array is empty.
+   * 
+   * @throws IllegalArgumentException
+   *           When the specified array is null or empty.
+   */
+  public String choose(String... array) {
     if (array == null || array.length == 0) {
       throw new IllegalArgumentException(ARRAY_MUST_NOT_BE_EMPTY);
     }
@@ -168,7 +186,7 @@ public final class GameRandom extends java.util.Random {
    * @return A pseudo-random element from the array or null if the collection is empty.
    */
   public <T> T choose(Collection<T> coll) {
-    if (coll == null) {
+    if (coll == null || coll.isEmpty()) {
       return null;
     }
 

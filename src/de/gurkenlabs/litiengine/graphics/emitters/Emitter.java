@@ -23,6 +23,8 @@ import de.gurkenlabs.litiengine.configuration.Quality;
 import de.gurkenlabs.litiengine.entities.CollisionInfo;
 import de.gurkenlabs.litiengine.entities.EmitterInfo;
 import de.gurkenlabs.litiengine.entities.Entity;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
+import de.gurkenlabs.litiengine.environment.tilemap.TmxType;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.Particle;
@@ -32,6 +34,7 @@ import de.gurkenlabs.litiengine.graphics.emitters.particles.Particle;
  */
 @CollisionInfo(collision = false)
 @EmitterInfo
+@TmxType(MapObjectType.EMITTER)
 public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive, IRenderable {
   public static final Color DEFAULT_PARTICLE_COLOR = new Color(255, 255, 255, 150);
   public static final int DEFAULT_UPDATERATE = 30;

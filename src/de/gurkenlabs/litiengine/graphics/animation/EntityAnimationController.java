@@ -1,8 +1,6 @@
 package de.gurkenlabs.litiengine.graphics.animation;
 
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
-import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
@@ -172,21 +170,7 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
 
   @Override
   public void scaleSprite(float scaleX, float scaleY) {
-    final Point2D point = Game.world().camera().getViewportLocation(this.getEntity());
-    double deltaX = (point.getX() - (point.getX() * scaleX));
-    double deltaY = (point.getY() - (point.getY() * scaleY));
-
-    BufferedImage img = this.getCurrentImage();
-    if (img != null) {
-      double imgDeltaX = (img.getWidth() - (img.getWidth() * scaleX)) / 2.0;
-      double imgDeltaY = (img.getHeight() - (img.getHeight() * scaleY)) / 2.0;
-
-      deltaX += imgDeltaX;
-      deltaY += imgDeltaY;
-    }
-
     AffineTransform trans = new AffineTransform();
-    trans.translate(deltaX, deltaY);
     trans.scale(scaleX, scaleY);
 
     this.setAffineTransform(trans);

@@ -23,7 +23,7 @@ public final class LayerMenu extends JMenu {
 
   public LayerMenu() {
     super(Resources.strings().get("menu_move_to_layer"));
-    Game.world().addLoadedListener(e -> this.updateMenu(e.getMap()));
+    Game.world().onLoaded(e -> this.updateMenu(e.getMap()));
 
     UI.getLayerController().onLayersChanged(this::updateMenu);
     Editor.instance().getMapComponent().onSelectionChanged(this::updateMenuItemStates);

@@ -137,7 +137,7 @@ public class PropAnimationController<T extends Prop> extends EntityAnimationCont
       return null;
     }
 
-    return new Animation(state.name(), spritesheet, true, true, Resources.spritesheets().getCustomKeyFrameDurations(spritesheet.getName()));
+    return new Animation(state.spriteString(), spritesheet, true, true, Resources.spritesheets().getCustomKeyFrameDurations(spritesheet.getName()));
   }
 
   private static Spritesheet findSpriteSheet(final Prop prop, final PropState state) {

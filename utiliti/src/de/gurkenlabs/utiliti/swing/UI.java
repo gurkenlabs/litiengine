@@ -4,17 +4,18 @@ import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-import javax.swing.BorderFactory;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -24,14 +25,18 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.FontUIResource;
+
+import com.github.weisj.darklaf.LafManager;
+import com.github.weisj.darklaf.theme.IntelliJTheme;
+import com.github.weisj.darklaf.theme.OneDarkTheme;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameListener;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.Cursors;
 import de.gurkenlabs.utiliti.Style;
+import de.gurkenlabs.utiliti.Style.Theme;
 import de.gurkenlabs.utiliti.components.Controller;
 import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.components.EntityController;
@@ -48,7 +53,9 @@ import de.gurkenlabs.utiliti.swing.menus.MainMenuBar;
 import de.gurkenlabs.utiliti.swing.panels.MapObjectInspector;
 
 public final class UI {
-  private static final Logger log = Logger.getLogger(UI.class.getName());
+  private static final List<JComponent> orphanComponents = new CopyOnWriteArrayList<>();
+  private static final int SCROLL_MAX = 100;
+  private static JPanel renderPanel;
   private static JScrollBar horizontalScroll;
   private static JScrollBar verticalScroll;
   private static JPopupMenu canvasPopup;
@@ -61,24 +68,26 @@ public final class UI {
 
   private static boolean initialized;
 
+  private static float currentScrollSize;
+
+  private static volatile boolean loadingTheme;
+
   private UI() {
   }
 
-  public static JScrollBar getHorizontalScrollBar() {
-    return horizontalScroll;
+  /**
+   * Adds an orphan component to the UI to ensure updating when switching themes
+   * even though the elements might not be part of the currently active UI.
+   * 
+   * @param component
+   *          The orphan component to add.
+   */
+  public static void addOrphanComponent(JComponent component) {
+    orphanComponents.add(component);
   }
 
-  public static JScrollBar getVerticalcrollBar() {
-    return verticalScroll;
-  }
-
-  public static void updateScrollBars() {
-    horizontalScroll.setMinimum(0);
-    horizontalScroll.setMaximum(Game.world().environment().getMap().getSizeInPixels().width);
-    verticalScroll.setMinimum(0);
-    verticalScroll.setMaximum(Game.world().environment().getMap().getSizeInPixels().height);
-    horizontalScroll.setValue((int) Game.world().camera().getViewport().getCenterX());
-    verticalScroll.setValue((int) Game.world().camera().getViewport().getCenterY());
+  public static void removeOrphanComponent(JComponent component) {
+    orphanComponents.remove(component);
   }
 
   public static boolean notifyPendingChanges() {
@@ -108,13 +117,24 @@ public final class UI {
 
     Game.screens().display(Editor.instance());
 
-    initSwingComponentStyle();
+    javax.swing.JComponent.setDefaultLocale(Locale.getDefault());
+    JPopupMenu.setDefaultLightWeightPopupEnabled(false);
+    setDefaultSwingFont(Style.getDefaultFont());
+
     Tray.init();
     Game.window().cursor().set(Cursors.DEFAULT, 0, 0);
     Game.window().cursor().setOffsetX(0);
     Game.window().cursor().setOffsetY(0);
     setupInterface();
     Game.window().getHostControl().revalidate();
+
+    UIManager.addPropertyChangeListener(e -> {
+      for (JComponent component : orphanComponents) {
+        SwingUtilities.updateComponentTreeUI(component);
+      }
+    });
+
+    setTheme(Editor.preferences().getTheme());
 
     initialized = true;
   }
@@ -139,6 +159,78 @@ public final class UI {
     return mapSelectionPanel;
   }
 
+  private static void updateScrollBars() {
+    if (Game.world().environment() == null) {
+      return;
+    }
+
+    double relativeX = Game.world().camera().getFocus().getX() / Game.world().environment().getMap().getSizeInPixels().width;
+    double relativeY = Game.world().camera().getFocus().getY() / Game.world().environment().getMap().getSizeInPixels().height;
+
+    // decouple the scrollbar from the environment
+    currentScrollSize = Math.round(SCROLL_MAX * Math.sqrt(Game.world().camera().getRenderScale()));
+
+    horizontalScroll.setMinimum(0);
+    horizontalScroll.setMaximum((int) currentScrollSize);
+    verticalScroll.setMinimum(0);
+    verticalScroll.setMaximum((int) currentScrollSize);
+
+    int valueX = (int) (relativeX * currentScrollSize);
+    int valueY = (int) (relativeY * currentScrollSize);
+
+    horizontalScroll.setValue(valueX);
+    verticalScroll.setValue(valueY);
+  }
+
+  private static double getScrollValue(JScrollBar scrollbar, double actualSize) {
+    double currentValue = scrollbar.getValue() / currentScrollSize;
+    return currentValue * actualSize;
+  }
+
+  private static void initScrollBars(JPanel renderPane) {
+    horizontalScroll = new JScrollBar(java.awt.Adjustable.HORIZONTAL);
+    renderPane.add(horizontalScroll, BorderLayout.SOUTH);
+    verticalScroll = new JScrollBar(java.awt.Adjustable.VERTICAL);
+    renderPane.add(verticalScroll, BorderLayout.EAST);
+
+    horizontalScroll.setDoubleBuffered(true);
+    verticalScroll.setDoubleBuffered(true);
+
+    horizontalScroll.addAdjustmentListener(e -> {
+      if (Editor.instance().getMapComponent().isLoading()) {
+        return;
+      }
+
+      final double x = getScrollValue(horizontalScroll, Game.world().environment().getMap().getSizeInPixels().width);
+
+      Point2D newFocus = new Point2D.Double(x, Game.world().camera().getFocus().getY());
+      Game.world().camera().setFocus(newFocus);
+    });
+
+    verticalScroll.addAdjustmentListener(e -> {
+      if (Editor.instance().getMapComponent().isLoading()) {
+        return;
+      }
+
+      final double y = getScrollValue(verticalScroll, Game.world().environment().getMap().getSizeInPixels().height);
+
+      Point2D newFocus = new Point2D.Double(Game.world().camera().getFocus().getX(), y);
+      Game.world().camera().setFocus(newFocus);
+    });
+
+    Game.world().camera().onZoom(e -> {
+      updateScrollBars();
+    });
+
+    Game.world().camera().onFocus(e -> {
+      updateScrollBars();
+    });
+
+    Game.world().onLoaded(e -> {
+      updateScrollBars();
+    });
+  }
+
   private static void setupInterface() {
     JFrame window = initWindow();
 
@@ -149,9 +241,9 @@ public final class UI {
     // remove canvas because we want to add a wrapping panel
     window.remove(canvas);
 
-    JPanel renderPanel = new JPanel(new BorderLayout());
+    renderPanel = new JPanel(new BorderLayout());
     renderPanel.add(canvas);
-    renderPanel.setMinimumSize(new Dimension(300, 0));
+    renderPanel.setMinimumSize(new Dimension(300, 100));
     initScrollBars(renderPanel);
 
     JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, initRenderSplitPanel(renderPanel, window), initRightSplitPanel());
@@ -221,6 +313,7 @@ public final class UI {
     mapLayerList = new LayerList();
     entityList = new EntityList();
     JTabbedPane tabPane = new JTabbedPane();
+    tabPane.setFont(Style.getHeaderFont());
     tabPane.add(entityList);
     tabPane.add(mapLayerList);
     tabPane.setMaximumSize(new Dimension(0, 150));
@@ -238,7 +331,7 @@ public final class UI {
     mapObjectPanel = new MapObjectInspector();
 
     JSplitPane rightSplitPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-    rightSplitPanel.setMinimumSize(new Dimension(300, 0));
+    rightSplitPanel.setMinimumSize(new Dimension(320, 0));
     rightSplitPanel.setBottomComponent(mapObjectPanel);
     rightSplitPanel.setTopComponent(topRightSplitPanel);
     rightSplitPanel.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> Editor.preferences().setSelectionEditSplitter(rightSplitPanel.getDividerLocation()));
@@ -252,6 +345,7 @@ public final class UI {
   private static JPanel initBottomPanel() {
     JPanel bottomPanel = new JPanel(new BorderLayout());
     JTabbedPane bottomTab = new JTabbedPane();
+    bottomTab.setFont(Style.getHeaderFont());
 
     assetComponent = new AssetList();
     bottomTab.addTab(Resources.strings().get("assettree_assets"), Icons.ASSET, assetComponent);
@@ -263,32 +357,9 @@ public final class UI {
     return bottomPanel;
   }
 
-  private static void initScrollBars(JPanel renderPane) {
-    horizontalScroll = new JScrollBar(java.awt.Adjustable.HORIZONTAL);
-    renderPane.add(horizontalScroll, BorderLayout.SOUTH);
-    verticalScroll = new JScrollBar(java.awt.Adjustable.VERTICAL);
-    renderPane.add(verticalScroll, BorderLayout.EAST);
-
-    horizontalScroll.addAdjustmentListener(e -> {
-      if (Editor.instance().getMapComponent().isLoading()) {
-        return;
-      }
-
-      Point2D newFocus = new Point2D.Double(horizontalScroll.getValue(), Game.world().camera().getFocus().getY());
-      Game.world().camera().setFocus(newFocus);
-    });
-
-    verticalScroll.addAdjustmentListener(e -> {
-      if (Editor.instance().getMapComponent().isLoading()) {
-        return;
-      }
-      Point2D newFocus = new Point2D.Double(Game.world().camera().getFocus().getX(), verticalScroll.getValue());
-      Game.world().camera().setFocus(newFocus);
-    });
-  }
-
   private static void initPopupMenu(Canvas canvas) {
     canvasPopup = new CanvasPopupMenu();
+    addOrphanComponent(canvasPopup);
 
     canvas.addMouseListener(new MouseAdapter() {
       @Override
@@ -301,27 +372,45 @@ public final class UI {
     });
   }
 
-  private static void initSwingComponentStyle() {
-    try {
-      javax.swing.JComponent.setDefaultLocale(Locale.getDefault());
-      JPopupMenu.setDefaultLightWeightPopupEnabled(false);
-      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-      UIManager.getDefaults().put("SplitPane.border", BorderFactory.createEmptyBorder());
-      setDefaultSwingFont(new FontUIResource(Style.getDefaultFont()));
-    } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
-      log.log(Level.SEVERE, e.getLocalizedMessage(), e);
-    }
+  public static void initLookAndFeel() {
+    LafManager.setDecorationsEnabled(true);
+    setTheme(Editor.preferences().getTheme());
   }
 
-  private static void setDefaultSwingFont(FontUIResource font) {
+  public static synchronized void setTheme(Theme theme) {
+    if (loadingTheme) {
+      return;
+    }
+
+    loadingTheme = true;
+
+    switch (theme) {
+    case DARK:
+      LafManager.install(new OneDarkTheme());
+      break;
+    case LIGHT:
+      LafManager.install(new IntelliJTheme());
+      break;
+    default:
+      break;
+    }
+
+    if (Game.window() != null && Game.window().getRenderComponent() != null) {
+      Game.window().getRenderComponent().setBackground(UIManager.getColor("Panel.background"));
+    }
+
+    Editor.preferences().setTheme(theme);
+    loadingTheme = false;
+  }
+
+  private static void setDefaultSwingFont(Font font) {
     Enumeration<Object> keys = UIManager.getDefaults().keys();
     while (keys.hasMoreElements()) {
       Object key = keys.nextElement();
 
       Object value = UIManager.get(key);
-
       if (value instanceof javax.swing.plaf.FontUIResource) {
-        UIManager.put(key, font);
+        UIManager.put(key, new FontUIResource(font));
       }
     }
   }

@@ -11,6 +11,7 @@ import javax.xml.bind.annotation.XmlElement;
 
 import de.gurkenlabs.litiengine.environment.tilemap.ITile;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
+import de.gurkenlabs.litiengine.environment.tilemap.ITilesetEntry;
 
 public class TileLayer extends Layer implements ITileLayer {
 
@@ -60,6 +61,32 @@ public class TileLayer extends Layer implements ITileLayer {
   }
 
   @Override
+  public void setTile(int x, int y, ITile tile) {
+    this.setTile(x, y, tile.getGridId());
+  }
+
+  @Override
+  public void setTile(int x, int y, int gid) {
+    if (this.getRawTileData() == null) {
+      return;
+    }
+
+    Tile tile = this.getRawTileData().getTiles().get(x + y * this.getWidth());
+    if (tile == null) {
+      return;
+    }
+
+    tile.setGridId(gid);
+
+    if (this.getMap() != null) {
+      ITilesetEntry entry = this.getMap().getTilesetEntry(gid);
+      if (entry != null) {
+        tile.setTilesetEntry(entry);
+      }
+    }
+  }
+
+  @Override
   public List<ITile> getTiles() {
     return this.tileList;
   }
@@ -82,7 +109,7 @@ public class TileLayer extends Layer implements ITileLayer {
     return super.getHeight();
   }
 
-  protected List<Tile> getData() throws InvalidTileLayerException {
+  protected List<Tile> getData() {
     return this.data.getTiles();
   }
 

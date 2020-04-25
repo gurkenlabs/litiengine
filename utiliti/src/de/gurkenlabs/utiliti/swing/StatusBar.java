@@ -1,45 +1,67 @@
 package de.gurkenlabs.utiliti.swing;
 
-import java.awt.Dimension;
+import java.awt.Container;
+import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.event.ItemEvent;
 
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.border.EmptyBorder;
+import javax.swing.JPanel;
 
-import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.Style;
 import de.gurkenlabs.utiliti.components.Editor;
-import de.gurkenlabs.utiliti.swing.panels.PropertyPanel;
+import de.gurkenlabs.utiliti.handlers.Zoom;
 
 public final class StatusBar {
+  private static JPanel panel;
   private static JLabel statusLabel;
+  private static JComboBox<Zoom> zoomComboBox;
+
+  private static boolean settingZoom;
 
   private StatusBar() {
   }
 
-  public static JLabel create() {
+  public static Container create() {
+    panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
     statusLabel = new JLabel("");
-    statusLabel.setPreferredSize(new Dimension(0, (int) (16 * Editor.preferences().getUiScale())));
-    statusLabel.setFont(new Font(Style.FONTNAME_CONSOLE, Font.PLAIN, (int) (14 * Editor.preferences().getUiScale())));
-    statusLabel.setBorder(new EmptyBorder(PropertyPanel.LABEL_GAP, PropertyPanel.LABEL_GAP, PropertyPanel.LABEL_GAP, PropertyPanel.LABEL_GAP));
-    return statusLabel;
+    statusLabel.setFont(new Font(Style.FONTNAME_CONSOLE, Font.PLAIN, (int) (12 * Editor.preferences().getUiScale())));
+
+    zoomComboBox = new JComboBox<>(Zoom.getAll());
+    zoomComboBox.addItemListener(e -> {
+      if (settingZoom || e.getStateChange() != ItemEvent.SELECTED) {
+        return;
+      }
+
+      Zoom.set(((Zoom) zoomComboBox.getSelectedItem()).getValue());
+    });
+
+    panel.add(zoomComboBox);
+    panel.add(statusLabel);
+    return panel;
+
   }
 
   public static void update() {
     String position = String.format("x/y: %d,%d", (int) Input.mouse().getMapLocation().getX(), (int) Input.mouse().getMapLocation().getY());
     String tile = String.format("Tile: %d,%d", Input.mouse().getTile().x, Input.mouse().getTile().y);
-    String zoom = String.format(" %6d%%", (int) (Game.world().camera().getRenderScale() * 100));
-    String status = String.format("%-14s %-14s %s", position, tile, zoom);
+    String status = String.format("%-14s %-10s", position, tile);
 
     int size = Editor.instance().getMapComponent().getSelectedMapObjects().size();
     if (size <= 0) {
       statusLabel.setText("");
     } else {
-      status += " " + Resources.strings().get("status_selected_objects", size);
+      status += "  " + Resources.strings().get("status_selected_objects", size);
     }
 
     statusLabel.setText(status);
+
+    settingZoom = true;
+    zoomComboBox.setSelectedItem(Zoom.getZoom());
+    settingZoom = false;
   }
 }

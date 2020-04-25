@@ -10,16 +10,19 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.GameWorld;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.TmxType;
 
+@TmxType(MapObjectType.SPAWNPOINT)
 public class Spawnpoint extends Entity {
   private final Collection<EntitySpawnedListener> spawnedListeners = ConcurrentHashMap.newKeySet();
 
   @TmxProperty(name = MapObjectProperty.SPAWN_DIRECTION)
   private Direction direction;
 
-  @TmxProperty(name = MapObjectProperty.SPAWN_TYPE)
-  private String spawnType;
+  @TmxProperty(name = MapObjectProperty.SPAWN_INFO)
+  private String spawnInfo;
 
   @TmxProperty(name = MapObjectProperty.SPAWN_PIVOT)
   private EntityPivotType spawnPivotType;
@@ -140,7 +143,7 @@ public class Spawnpoint extends Entity {
    */
   public Spawnpoint(Direction direction, String spawnType) {
     this(direction);
-    this.setSpawnType(spawnType);
+    this.setSpawnInfo(spawnType);
   }
 
   /**
@@ -171,12 +174,12 @@ public class Spawnpoint extends Entity {
     this.direction = direction;
   }
 
-  public String getSpawnType() {
-    return spawnType;
+  public String getSpawnInfo() {
+    return spawnInfo;
   }
 
-  public void setSpawnType(String spawnType) {
-    this.spawnType = spawnType;
+  public void setSpawnInfo(String spawnInfo) {
+    this.spawnInfo = spawnInfo;
   }
 
   public EntityPivotType getSpawnPivotType() {

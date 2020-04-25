@@ -33,24 +33,55 @@ public class CustomPanel extends PropertyPanel {
     this.scrollPane = new JScrollPane();
 
     JButton buttonAdd = new JButton("+");
-    buttonAdd.addActionListener(a -> model.addRow(new Object[] { "", "" }));
+    buttonAdd.addActionListener(a -> {
+      TableCellEditor editor = tableCustomProperties.getCellEditor();
+      if (editor != null) {
+        editor.stopCellEditing();
+      }
+      model.addRow(new Object[] { "", "" });
+      model.fireTableDataChanged();
+    });
 
     JButton buttonRemove = new JButton("-");
     buttonRemove.addActionListener(a -> {
+      TableCellEditor editor = tableCustomProperties.getCellEditor();
+      if (editor != null) {
+        editor.stopCellEditing();
+      }
+      
       int[] rows = tableCustomProperties.getSelectedRows();
       for (int i = 0; i < rows.length; i++) {
         model.removeRow(rows[i] - i);
       }
+      
+      model.fireTableDataChanged();
+      tableCustomProperties.revalidate();
     });
 
     GroupLayout groupLayout = new GroupLayout(this);
-    groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
+    groupLayout.setHorizontalGroup(
+      groupLayout.createParallelGroup(Alignment.TRAILING)
         .addGroup(groupLayout.createSequentialGroup()
-            .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup().addContainerGap().addComponent(buttonAdd).addPreferredGap(ComponentPlacement.RELATED).addComponent(buttonRemove, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE))
-                .addGroup(groupLayout.createSequentialGroup().addGap(CONTROL_MARGIN).addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 149, Short.MAX_VALUE)))
-            .addGap(CONTROL_MARGIN)));
-    groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup().addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 123, GroupLayout.PREFERRED_SIZE).addPreferredGap(ComponentPlacement.RELATED)
-        .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(buttonRemove).addComponent(buttonAdd)).addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
+          .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+            .addGroup(groupLayout.createSequentialGroup()
+              .addComponent(buttonAdd)
+              .addPreferredGap(ComponentPlacement.RELATED)
+              .addComponent(buttonRemove, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE))
+            .addGroup(groupLayout.createSequentialGroup()
+              .addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 440, Short.MAX_VALUE)))
+          .addGap(PropertyPanel.LABEL_GAP))
+    );
+    groupLayout.setVerticalGroup(
+      groupLayout.createParallelGroup(Alignment.LEADING)
+        .addGroup(groupLayout.createSequentialGroup()
+          .addContainerGap()
+          .addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 112, GroupLayout.PREFERRED_SIZE)
+          .addPreferredGap(ComponentPlacement.RELATED)
+          .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+            .addComponent(buttonAdd)
+            .addComponent(buttonRemove))
+          .addContainerGap(148, Short.MAX_VALUE))
+    );
 
     this.tableCustomProperties = new JTable();
     this.tableCustomProperties.getTableHeader().setReorderingAllowed(false);

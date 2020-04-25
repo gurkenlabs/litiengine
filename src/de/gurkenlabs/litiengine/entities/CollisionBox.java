@@ -3,12 +3,15 @@ package de.gurkenlabs.litiengine.entities;
 import java.awt.geom.Rectangle2D;
 
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.TmxType;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.physics.Collision;
 
 @EntityInfo(renderType = RenderType.OVERLAY)
 @CollisionInfo(collision = true, collisionType = Collision.STATIC)
+@TmxType(MapObjectType.COLLISIONBOX)
 public class CollisionBox extends CollisionEntity {
 
   @TmxProperty(name = MapObjectProperty.COLLISIONBOX_OBSTRUCTINGLIGHTS)

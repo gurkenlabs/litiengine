@@ -15,7 +15,6 @@ import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.geom.Rectangle2D.Double;
 import java.text.AttributedCharacterIterator;
 import java.text.AttributedString;
 
@@ -51,6 +50,10 @@ public final class TextRenderer {
     render(g, text, location.getX(), location.getY());
   }
 
+  public static void render(final Graphics2D g, final String text, Align alignment, Valign verticalAlignment) {
+    render(g, text, alignment, verticalAlignment, 0, 0);
+  }
+
   /**
    * Draws text with the specified alignment.
    * 
@@ -63,9 +66,13 @@ public final class TextRenderer {
    * @param verticalAlignment
    *          The vertical alignment.
    */
-  public static void render(final Graphics2D g, final String text, Align alignment, Valign verticalAlignment) {
+  public static void render(final Graphics2D g, final String text, Align alignment, Valign verticalAlignment, double offesetX, double offsetY) {
     final Rectangle2D bounds = g.getClipBounds();
-    render(g, text, bounds, alignment, verticalAlignment, false);
+    render(g, text, bounds, alignment, verticalAlignment, offesetX, offsetY, false);
+  }
+
+  public static void render(final Graphics2D g, final String text, Rectangle2D bounds, Align alignment, Valign verticalAlignment, boolean scaleFont) {
+    render(g, text, bounds, alignment, verticalAlignment, 0, 0, scaleFont);
   }
 
   /**
@@ -84,7 +91,7 @@ public final class TextRenderer {
    * @param scaleFont
    *          if true, scale the font so that the text will fit inside the given rectangle. If not, use the Graphics context's previous font size.
    */
-  public static void render(final Graphics2D g, final String text, Rectangle2D bounds, Align alignment, Valign verticalAlignment, boolean scaleFont) {
+  public static void render(final Graphics2D g, final String text, Rectangle2D bounds, Align alignment, Valign verticalAlignment, double offsetX, double offsetY, boolean scaleFont) {
     if (bounds == null) {
       return;
     }
@@ -96,8 +103,8 @@ public final class TextRenderer {
         g.setFont(g.getFont().deriveFont(currentFontSize));
       }
     }
-    double locationX = bounds.getX() + alignment.getLocation(bounds.getWidth(), g.getFontMetrics().stringWidth(text));
-    double locationY = bounds.getY() + verticalAlignment.getLocation(bounds.getHeight(), getHeight(g, text)) + g.getFontMetrics().getAscent();
+    double locationX = bounds.getX() + alignment.getLocation(bounds.getWidth(), g.getFontMetrics().stringWidth(text)) + offsetX;
+    double locationY = bounds.getY() + verticalAlignment.getLocation(bounds.getHeight(), getHeight(g, text)) + g.getFontMetrics().getAscent() + offsetY;
     render(g, text, locationX, locationY);
     g.setFont(g.getFont().deriveFont(previousFontSize));
   }
@@ -125,7 +132,7 @@ public final class TextRenderer {
     RenderingHints originalHints = g.getRenderingHints();
 
     if (antiAliasing) {
-      enableAntiAliasing(g);
+      enableTextAntiAliasing(g);
     }
 
     g.drawString(text, (float) x, (float) y);
@@ -140,7 +147,7 @@ public final class TextRenderer {
     RenderingHints originalHints = g.getRenderingHints();
 
     if (antiAliasing) {
-      enableAntiAliasing(g);
+      enableTextAntiAliasing(g);
     }
 
     renderRotated(g, text, x, y, angle);
@@ -210,7 +217,7 @@ public final class TextRenderer {
     RenderingHints originalHints = g.getRenderingHints();
 
     if (antiAliasing) {
-      enableAntiAliasing(g);
+      enableTextAntiAliasing(g);
     }
 
     final FontRenderContext frc = g.getFontRenderContext();
@@ -304,7 +311,7 @@ public final class TextRenderer {
     // activate anti aliasing for text rendering (if you want it to look nice)
 
     if (antiAliasing) {
-      enableAntiAliasing(g);
+      enableTextAntiAliasing(g);
     }
 
     g.setColor(outlineColor);
@@ -368,7 +375,7 @@ public final class TextRenderer {
     return getBounds(g, text).getHeight();
   }
 
-  private static void enableAntiAliasing(final Graphics2D g) {
+  public static void enableTextAntiAliasing(final Graphics2D g) {
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);

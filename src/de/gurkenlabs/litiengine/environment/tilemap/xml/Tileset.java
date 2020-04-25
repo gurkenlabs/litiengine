@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -97,7 +98,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   }
 
   @Override
-  public java.util.Map<String, ICustomProperty> getProperties() {
+  public Map<String, ICustomProperty> getProperties() {
     return this.sourceTileset != null ? this.sourceTileset.getProperties() : super.getProperties();
   }
 
@@ -199,40 +200,6 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   }
 
   @Override
-  public void finish(URL location) throws TmxException {
-    if (this.source != null) {
-      // don't reload the source if it's already been loaded in a resource bundle
-      if (this.sourceTileset == null) {
-        try {
-          URL url = new URL(location, this.source);
-          this.sourceTileset = Resources.tilesets().get(url);
-          if (this.sourceTileset == null) {
-            throw new MissingExternalTilesetException(this.source);
-          }
-        } catch (MalformedURLException e) {
-          throw new MissingExternalTilesetException(e);
-        }
-      }
-    } else {
-      super.finish(location);
-      if (this.image != null) {
-        this.image.finish(location);
-      }
-      if (this.terrainTypes != null) {
-        for (Terrain terrain : this.terrainTypes) {
-          terrain.finish(location);
-        }
-      }
-      if (this.tiles != null) {
-        // unsaved tiles don't need any post-processing
-        for (TilesetEntry entry : this.tiles) {
-          entry.finish(location);
-        }
-      }
-    }
-  }
-
-  @Override
   public List<ITerrain> getTerrainTypes() {
     if (this.sourceTileset != null) {
       return this.sourceTileset.getTerrainTypes();
@@ -322,6 +289,54 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     return tileId >= this.firstgid && tileId < this.firstgid + this.getTileCount();
   }
 
+  @Override
+  public boolean containsTile(ITilesetEntry entry) {
+    if (entry == null) {
+      return false;
+    }
+
+    if (this.sourceTileset != null) {
+      return this.sourceTileset.containsTile(entry);
+    }
+
+    return this.allTiles != null && this.allTiles.contains(entry);
+  }
+
+  @Override
+  public void finish(URL location) throws TmxException {
+    super.finish(location);
+    if (this.source != null) {
+      // don't reload the source if it's already been loaded in a resource bundle
+      if (this.sourceTileset == null) {
+        try {
+          URL url = new URL(location, this.source);
+          this.sourceTileset = Resources.tilesets().get(url);
+          if (this.sourceTileset == null) {
+            throw new MissingExternalTilesetException(this.source);
+          }
+        } catch (MalformedURLException e) {
+          throw new MissingExternalTilesetException(e);
+        }
+      }
+    } else {
+      super.finish(location);
+      if (this.image != null) {
+        this.image.finish(location);
+      }
+      if (this.terrainTypes != null) {
+        for (Terrain terrain : this.terrainTypes) {
+          terrain.finish(location);
+        }
+      }
+      if (this.tiles != null) {
+        // unsaved tiles don't need any post-processing
+        for (TilesetEntry entry : this.tiles) {
+          entry.finish(location);
+        }
+      }
+    }
+  }
+
   public void saveSource(String basePath) {
     if (this.sourceTileset == null) {
       return;
@@ -344,15 +359,6 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
       if (set.getName() != null && set.getName().equals(fileName)) {
         this.sourceTileset = set;
         break;
-      }
-    }
-  }
-
-  public void updateTileTerrain() {
-    if (this.sourceTileset == null && this.tiles != null) {
-      // only go through saved tiles because unsaved tiles can't have terrains
-      for (TilesetEntry entry : this.tiles) {
-        entry.setTerrains(this.getTerrain(entry.getId()));
       }
     }
   }
@@ -427,16 +433,12 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     }
   }
 
-  @Override
-  public boolean containsTile(ITilesetEntry entry) {
-    if (entry == null) {
-      return false;
+  private void updateTileTerrain() {
+    if (this.sourceTileset == null && this.tiles != null) {
+      // only go through saved tiles because unsaved tiles can't have terrains
+      for (TilesetEntry entry : this.tiles) {
+        entry.setTerrains(this.getTerrain(entry.getId()));
+      }
     }
-
-    if (this.sourceTileset != null) {
-      return this.sourceTileset.containsTile(entry);
-    }
-
-    return this.allTiles != null && this.allTiles.contains(entry);
   }
 }

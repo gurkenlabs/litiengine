@@ -18,9 +18,9 @@ public @interface CollisionInfo {
 
   boolean collision();
 
-  float collisionBoxHeight() default -1;
+  float collisionBoxHeight() default 0;
 
-  float collisionBoxWidth() default -1;
+  float collisionBoxWidth() default 0;
 
   Valign valign() default Valign.DOWN;
   

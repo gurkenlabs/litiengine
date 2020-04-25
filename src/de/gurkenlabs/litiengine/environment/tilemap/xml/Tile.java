@@ -142,14 +142,9 @@ public class Tile extends CustomPropertyProvider implements ITile {
     return this.tileCoordinate;
   }
 
-  /**
-   * Sets the tile coordinate.
-   *
-   * @param tileCoordinate
-   *          the new tile coordinate
-   */
-  public void setTileCoordinate(final Point tileCoordinate) {
-    this.tileCoordinate = tileCoordinate;
+  @Override
+  public ITilesetEntry getTilesetEntry() {
+    return this.tilesetEntry;
   }
 
   @Override
@@ -191,9 +186,18 @@ public class Tile extends CustomPropertyProvider implements ITile {
     this.tilesetEntry = entry;
   }
 
-  @Override
-  public ITilesetEntry getTilesetEntry() {
-    return this.tilesetEntry;
+  void setGridId(int gid) {
+    this.gid = gid;
+  }
+
+  /**
+   * Sets the tile coordinate.
+   *
+   * @param tileCoordinate
+   *          the new tile coordinate
+   */
+  void setTileCoordinate(final Point tileCoordinate) {
+    this.tileCoordinate = tileCoordinate;
   }
 
   @SuppressWarnings("unused")

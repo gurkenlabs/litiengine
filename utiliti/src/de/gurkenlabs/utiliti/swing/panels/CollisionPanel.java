@@ -13,6 +13,7 @@ import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.physics.Collision;
+import de.gurkenlabs.litiengine.resources.Resources;
 
 @SuppressWarnings("serial")
 public class CollisionPanel extends PropertyPanel {
@@ -29,7 +30,7 @@ public class CollisionPanel extends PropertyPanel {
   public CollisionPanel() {
     super("panel_collisionEntity");
 
-    this.chckbxHasCollision = new JCheckBox("collision");
+    this.chckbxHasCollision = new JCheckBox(Resources.strings().get("panel_collision"));
     this.spinnerWidth = new JSpinner(new SpinnerNumberModel(0.0, 0.0, 100.0, 0.1));
     this.spinnerHeight = new JSpinner(new SpinnerNumberModel(0.0, 0.0, 100.0, 0.1));
     this.comboBoxAlign = new JComboBox<>();

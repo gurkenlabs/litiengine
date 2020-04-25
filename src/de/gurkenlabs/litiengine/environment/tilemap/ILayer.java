@@ -8,6 +8,7 @@ import de.gurkenlabs.litiengine.graphics.RenderType;
 public interface ILayer extends ICustomPropertyProvider {
 
   public int getId();
+
   /**
    * Gets the name.
    *
@@ -49,7 +50,7 @@ public interface ILayer extends ICustomPropertyProvider {
    * @return the size in tiles
    */
   public Dimension getSizeInTiles();
-  
+
   public IMap getMap();
 
   /**
@@ -72,4 +73,8 @@ public interface ILayer extends ICustomPropertyProvider {
   public void setWidth(int newWidth);
 
   public void setHeight(int newWidth);
+
+  public void setOpacity(float opacity);
+
+  public void setRenderType(RenderType renderType);
 }

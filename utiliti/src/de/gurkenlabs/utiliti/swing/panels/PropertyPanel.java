@@ -42,10 +42,10 @@ import de.gurkenlabs.utiliti.swing.UI;
 
 @SuppressWarnings("serial")
 public abstract class PropertyPanel extends JPanel {
-  public static final int LABEL_WIDTH = (int) (80 * Editor.preferences().getUiScale());
-  public static final int CONTROL_MIN_WIDTH = (int) (120 * Editor.preferences().getUiScale());
-  public static final int CONTROL_WIDTH = (int) (200 * Editor.preferences().getUiScale());
-  public static final int CONTROL_HEIGHT = (int) (25 * Editor.preferences().getUiScale());
+  public static final int LABEL_WIDTH = (int) (40 * Editor.preferences().getUiScale());
+  public static final int CONTROL_MIN_WIDTH = (int) (100 * Editor.preferences().getUiScale());
+  public static final int CONTROL_WIDTH = (int) (150 * Editor.preferences().getUiScale());
+  public static final int CONTROL_HEIGHT = (int) (30 * Editor.preferences().getUiScale());
   public static final int CONTROL_MARGIN = (int) (5 * Editor.preferences().getUiScale());
   public static final int LABEL_GAP = 0;
 
@@ -66,6 +66,7 @@ public abstract class PropertyPanel extends JPanel {
 
   public PropertyPanel() {
     setBorder(null);
+    UI.addOrphanComponent(this);
   }
 
   protected IMapObject getDataSource() {
@@ -261,7 +262,7 @@ public abstract class PropertyPanel extends JPanel {
 
     // initialize the horizontal layout group with the parallel groups for
     // labels and components and some additional gaps
-    groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup().addContainerGap().addGroup(parallel)));
+    groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup().addGroup(parallel)));
 
     // now prepare the vertical groups
     SequentialGroup seq = groupLayout.createSequentialGroup();
@@ -299,7 +300,7 @@ public abstract class PropertyPanel extends JPanel {
       this.caption = Resources.strings().get(resource);
       this.component = component;
       this.label = new JLabel(this.caption);
-      this.label.setVerticalAlignment(SwingConstants.TOP);
+      this.label.setVerticalAlignment(SwingConstants.CENTER);
       this.setMinHeight(CONTROL_HEIGHT);
       ControlBehavior.apply(this.getComponent());
     }

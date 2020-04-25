@@ -77,12 +77,12 @@ public final class GameLoop extends UpdateLoop implements IGameLoop {
    */
   @Override
   protected void process() {
-    Game.world().camera().updateFocus();
     if (this.getTimeScale() > 0) {
       super.process();
       this.executeTimedActions();
     }
 
+    Game.world().camera().updateFocus();
     if (!Game.isInNoGUIMode()) {
       Game.window().getRenderComponent().render();
     }

@@ -80,8 +80,6 @@ public class MapComponent extends GuiComponent {
   public static final int EDITMODE_MOVE = 2;
   private static final Logger log = Logger.getLogger(MapComponent.class.getName());
 
-  private static final String DEFAULT_MAPOBJECTLAYER_NAME = "default";
-
   private static final int BASE_SCROLL_SPEED = 50;
 
   private final List<IntConsumer> editModeChangedConsumer;
@@ -333,7 +331,6 @@ public class MapComponent extends GuiComponent {
 
       Game.world().loadEnvironment(this.environments.get(map.getName()));
 
-      UI.updateScrollBars();
       UI.getMapController().setSelection(map);
       UI.getInspector().bind(this.getFocusedMapObject());
 
@@ -711,7 +708,7 @@ public class MapComponent extends GuiComponent {
         // make sure there's a map object layer on the map because we need one
         // to add any kind of entities
         MapObjectLayer layer = new MapObjectLayer();
-        layer.setName(DEFAULT_MAPOBJECTLAYER_NAME);
+        layer.setName(MapObjectLayer.DEFAULT_MAPOBJECTLAYER_NAME);
         map.addLayer(layer);
       }
 
@@ -1007,7 +1004,6 @@ public class MapComponent extends GuiComponent {
         Game.world().camera().setFocus(newFocus);
       }
 
-      UI.getHorizontalScrollBar().setValue((int) Game.world().camera().getViewport().getCenterX());
       return;
     }
 
@@ -1029,8 +1025,6 @@ public class MapComponent extends GuiComponent {
       Point2D newFocus = new Point2D.Double(currentFocus.getX(), currentFocus.getY() + this.scrollSpeed);
       Game.world().camera().setFocus(newFocus);
     }
-
-    UI.getVerticalcrollBar().setValue((int) Game.world().camera().getViewport().getCenterY());
   }
 
   /***
@@ -1208,7 +1202,6 @@ public class MapComponent extends GuiComponent {
           this.getSelectedMapObjects().remove(mapObject);
         } else {
           this.setFocus(mapObject, !Input.keyboard().isPressed(KeyEvent.VK_SHIFT));
-          UI.getInspector().bind(mapObject);
         }
         somethingIsFocused = true;
       }
@@ -1217,7 +1210,6 @@ public class MapComponent extends GuiComponent {
     if (!somethingIsFocused && !currentObjectFocused) {
       this.setFocus(null, true);
       this.setSelection(Collections.emptyList(), true);
-      UI.getInspector().bind(null);
     }
   }
 

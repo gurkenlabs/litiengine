@@ -46,9 +46,9 @@ public interface IMapObject extends ICustomPropertyProvider, Resource {
   public String getType();
 
   public IPolyShape getPolyline();
-  
+
   public IPolyShape getPolygon();
-  
+
   public Ellipse2D getEllipse();
 
   public IMapObjectText getText();
@@ -80,12 +80,16 @@ public interface IMapObject extends ICustomPropertyProvider, Resource {
   public float getWidth();
 
   public float getHeight();
-  
+
   public boolean isPolyline();
-  
+
   public boolean isPolygon();
 
   public boolean isPoint();
 
   public boolean isEllipse();
+
+  public void setPolyline(IPolyShape polyline);
+
+  public void setPolygon(IPolyShape polygon);
 }

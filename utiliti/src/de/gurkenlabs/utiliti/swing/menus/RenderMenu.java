@@ -22,7 +22,7 @@ public final class RenderMenu extends JMenu {
   public RenderMenu() {
     super(Resources.strings().get("menu_rendertype"));
 
-    Game.world().addLoadedListener(e -> this.setEnabled(false));
+    Game.world().onLoaded(e -> this.setEnabled(false));
 
     UI.getLayerController().onLayersChanged(map -> this.updateMenu(Editor.instance().getMapComponent().getSelectedMapObjects()));
     Editor.instance().getMapComponent().onSelectionChanged(this::updateMenu);
