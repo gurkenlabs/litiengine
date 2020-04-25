@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine.resources;
 import java.net.URL;
 
 import de.gurkenlabs.litiengine.video.VideoManager;
+import de.gurkenlabs.litiengine.video.VideoManagerFactory;
 
 public class Videos extends ResourcesContainer<VideoManager>{
 
@@ -13,14 +14,17 @@ public class Videos extends ResourcesContainer<VideoManager>{
   }
   
   public VideoManager load(VideoResource video, boolean play) throws NoClassDefFoundError {
-    VideoManager videoManager = new VideoManager(video, play);
+    VideoManager videoManager = VideoManagerFactory.create(video);
+    if(play) {
+      videoManager.play();
+    }
     this.add(video.getName(), videoManager);
     return videoManager;
   }
   
   @Override
   protected VideoManager load(URL resourceName) throws Exception, NoClassDefFoundError {
-    return new VideoManager(resourceName);
+    return VideoManagerFactory.create(new VideoResource(resourceName.toURI(), resourceName.toString()));
   }
 
 }

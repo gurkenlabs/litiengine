@@ -3,45 +3,34 @@ package de.gurkenlabs.litiengine.video;
 import java.awt.Container;
 import java.awt.Graphics2D;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.net.URL;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.gui.GuiComponent;
 import de.gurkenlabs.litiengine.resources.VideoResource;
 
-
-/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+/**
  * 
- * Do not import anything from javafx into this class!
+ * UNIMPLEMENTED
  * 
- * Not all JREs contain javafx. Java will throw a
- * java.lang.Error if we accidentally try to load a 
- * javafx class if the library doesn't exist!
+ * THIS CLASS IS SUBJECT TO CHANGE DRAMATICALLY
  *
- *!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+ */
 
-public final class VideoManager extends GuiComponent implements VideoPlayer {
+public abstract class VideoManager extends GuiComponent implements VideoPlayer {
 
   private static final Logger log = Logger.getLogger(VideoManager.class.getName());
-  private static boolean checked = false;
+  protected static ArrayList<String> loadedNatives = new ArrayList<String>();
   
-  public static boolean allowNetworkConnections = false;
-  
-  private VideoPlayer impl;
+  protected VideoPlayer impl;
   
   {
-    if(!checked) {
+    if(!nativesLoaded()) {
       try {
-        ClassLoader classLoader = VideoManager.class.getClassLoader();
-        Class.forName("javafx.scene.media.MediaPlayer", false, classLoader);
-      } catch (ClassNotFoundException e) {
-          NoClassDefFoundError err = new NoClassDefFoundError("JavaFX is not installed!");
-          err.initCause(e);
-          log.log(Level.SEVERE, err, () -> err.getMessage());
-          throw err;
+        loadNatives();
       } catch (LinkageError e) {
           log.log(Level.SEVERE, e, () -> e.getMessage());
           throw e;
@@ -50,156 +39,52 @@ public final class VideoManager extends GuiComponent implements VideoPlayer {
         throw e;
       }
     }
-    checked = true;
+
     initialize();
   }
   
   /**
-   * Creates a new VideoManager
+   * Creates a new VideoManager which can play the
+   * specified video.
    * 
-   * @throws NoClassDefFoundError if JavaFX is not installed (you can catch this
-   * if you want to handle JavaFX not being installed)
-   * 
-   * @throws SecurityException if a security manager exists and it denies access to
-   * the classloader which loaded this class
-   * 
-   * @throws LinkageError if the linkage otherwise fails (It is highly discouraged to 
-   * catch this)
-   */
-  public VideoManager() {
-    super(0,0);
-  };
-  
-  /**
-   * Creates a new VideoManager which load the
-   * specified video without playing it.
+   * Subclasses MUST overwrite this constructor
    * 
    * @param video the video to load
    * 
-   * @throws NoClassDefFoundError if JavaFX is not installed (you can catch this if you 
-   * want to handle JavaFX not being installed)
-   * 
-   * @throws UncheckedIOException if the VideoResource's URI protocol is web based and the 
-   * connection is refused
-   * 
-   * @throws javafx.scene.media.MediaException see {@link javafx.scene.media.Media#Media(String)}
-   * 
-   * @throws SecurityException if a security manager exists and it denies access to
-   * the classloader which loaded this class
-   * 
-   * @throws LinkageError if JavaFX exists but otherwise fails to load (It is highly 
-   * discouraged to catch this)
-   * 
-   * @see javafx.scene.media.Media#Media(String)
+   * @throws LinkageError if the native binaries were unable to load
    */
-  public VideoManager(VideoResource video) {
+  protected VideoManager(VideoResource video) {
     super(0,0);
     setVideo(video);
   }
   
   /**
-   * Creates a new VideoManager which will load the
-   * specified video, and play it if specified.
-   * 
-   * @param video the video to load
-   * @param play whether to immediately begin playing the video
-   * 
-   * @throws NoClassDefFoundError if JavaFX is not installed (you can catch this if you 
-   * want to handle JavaFX not being installed)
-   * 
-   * @throws UncheckedIOException if the VideoResource's URL protocol is web based and the 
-   * connection is refused
-   * 
-   * @throws javafx.scene.media.MediaException see {@link javafx.scene.media.Media#Media(String)}
-   * 
-   * @throws SecurityException if a security manager exists and it denies access to
-   * the classloader which loaded this class
-   * 
-   * @throws LinkageError if JavaFX exists but otherwise fails to load (It is highly 
-   * discouraged to catch this)
-   * 
-   * @see javafx.scene.media.Media#Media(String)
-   */
-  public VideoManager(VideoResource video, boolean play) {
-    super(0,0);
-    if(play) {
-      play(video);
-    }
-    else {
-      setVideo(video);
-    }
-  }
-  
-  /**
-   * Creates a new VideoManager which will load the
-   * specified video, and play it if specified.
-   * 
-   * @param url the URL of the video
-   * 
-   * @throws NoClassDefFoundError if JavaFX is not installed (you can catch this if you 
-   * want to handle JavaFX not being installed)
-   * 
-   * @throws IOException if the URL protocol is web based and the connection is refused
-   * 
-   * @throws javafx.scene.media.MediaException see {@link javafx.scene.media.Media#Media(String)}
-   * 
-   * @throws SecurityException if a security manager exists and it denies access to
-   * the classloader which loaded this class
-   * 
-   * @throws LinkageError if JavaFX exists but otherwise fails to load (It is highly 
-   * discouraged to catch this)
-   * 
-   * @see javafx.scene.media.Media#Media(String)
-   */
-  public VideoManager(URL url) throws NoClassDefFoundError, IOException {
-    this(url, false);
-  }
-  
-  /**
-   * Creates a new video manager which will load the specified video, and play it if
-   * desired
-   * 
-   * @param url the URL of the video
-   * @param play whether to immediately begin playing the video
-   * 
-   * @throws NoClassDefFoundError if JavaFX is not installed (you can catch this if you 
-   * want to handle JavaFX not being installed)
-   * 
-   * @throws IOException if the URL protocol is web based and the connection is refused
-   * 
-   * @throws javafx.scene.media.MediaException see {@link javafx.scene.media.Media#Media(String)}
-   * 
-   * @throws SecurityException if a security manager exists and it denies access to
-   * the classloader which loaded this class
-   * 
-   * @throws LinkageError if JavaFX exists but otherwise fails to load (It is highly 
-   * discouraged to catch this)
-   * 
-   * @see javafx.scene.media.Media#Media(String)
-   */
-  public VideoManager(URL url, boolean play) throws NoClassDefFoundError, IOException {
-    super(0,0);
-    if(play) {
-      play(url);
-    }
-    else {
-      setVideo(url);
-    }
-  }
-  
-  /**
    * Initializes the media player
+   * 
+   * should set {@link #impl} to an instance of VideoPlayer
    * 
    * @throws IllegalStateException if the media player has already been initialized
    */
-  private void initialize() {
-    
-    if(impl != null) {
-      throw new IllegalStateException("Video player already initialized!");
-    }
-    
-    impl = new VideoManagerImpl();
-    
+  protected abstract void initialize();
+  
+  /**
+   * Load the native library required to play videos with this video manager
+   * 
+   * Should add a string representation of the library to {@link #loadedNatives}
+   * if it successfully loads
+   * 
+   * @throws LinkageError if the library is unable to load
+   * @throws IllegalStateException if the library is already loaded
+   */
+  protected abstract void loadNatives();
+  
+  /**
+   * @return true if the native library required to play the video has been loaded
+   */
+  protected abstract boolean nativesLoaded();
+  
+  public static boolean nativeLoaded(String libName) {
+    return loadedNatives.contains(libName);
   }
   
   /**
@@ -207,8 +92,6 @@ public final class VideoManager extends GuiComponent implements VideoPlayer {
    * 
    * This is generally the State of the player immediately after 
    * creation. 
-   *
-   * @see javafx.scene.media.MediaPlayer.Status#UNKNOWN
    */
   @Override
   public boolean isStatusUnknown() {
@@ -217,8 +100,6 @@ public final class VideoManager extends GuiComponent implements VideoPlayer {
 
   /**
    * @return true if the video is ready to play.
-   * 
-   * @see javafx.scene.media.MediaPlayer.Status#READY
    */
   @Override
   public boolean isReady() {
@@ -230,8 +111,6 @@ public final class VideoManager extends GuiComponent implements VideoPlayer {
    * 
    * This means that playback can never continue again with this VideoManager
    * and a new VideoManager should be created.
-   * 
-   * @see javafx.scene.media.MediaPlayer.Status#HALTED
    */
   @Override
   public boolean isErrored() {
@@ -251,8 +130,6 @@ public final class VideoManager extends GuiComponent implements VideoPlayer {
   /**
    * @return true if the video has stopped playing because the
    * buffer has slowed or stopped.
-   * 
-   * @see javafx.scene.media.MediaPlayer.Status#STALLED
    */
   @Override
   public boolean isBuffering() {
@@ -261,8 +138,6 @@ public final class VideoManager extends GuiComponent implements VideoPlayer {
 
   /**
    * @return true if playback has been stopped under normal conditions
-   * 
-   * @see javafx.scene.media.MediaPlayer.Status#STOPPED
    */
   @Override
   public boolean isStopped() {
@@ -271,8 +146,6 @@ public final class VideoManager extends GuiComponent implements VideoPlayer {
 
   /**
    * @return the status of the video player
-   * 
-   * @see javafx.scene.media.MediaPlayer.Status
    */
   @Override
   public Status getStatus() {
@@ -300,19 +173,11 @@ public final class VideoManager extends GuiComponent implements VideoPlayer {
     return impl.getBalance();
   }
 
-  /**
-   * @see javafx.scene.media.MediaPlayer#bufferProgressTimeProperty()
-   */
   @Override
   public Duration getBufferProgressTime() {
     return impl.getBufferProgressTime();
   }
 
-  /**
-   * @return the number of completed playback cycles. Begins at 0.
-   * 
-   * @see javafx.scene.media.MediaPlayer#currentCountProperty()
-   */
   @Override
   public int getCurrentCount() {
     return impl.getCurrentCount();
@@ -359,11 +224,6 @@ public final class VideoManager extends GuiComponent implements VideoPlayer {
     return impl.getStopTime();
   }
 
-  /**
-   * @return the total amount of time the player is allowed to play until finished.
-   * 
-   * @see javafx.scene.media.MediaPlayer#totalDuration
-   */
   @Override
   public Duration getTotalDuration() {
     return impl.getTotalDuration();

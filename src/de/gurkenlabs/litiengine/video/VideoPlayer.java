@@ -7,15 +7,13 @@ import java.time.Duration;
 
 import de.gurkenlabs.litiengine.resources.VideoResource;
 
-/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+/**
  * 
- * Do not import anything from javafx into this interface!
+ * UNIMPLEMENTED
  * 
- * Not all JREs contain javafx. Java will throw a
- * java.lang.Error if we accidentally try to load a 
- * javafx class if the library doesn't exist!
+ * THIS INTERFACE IS SUBJECT TO CHANGE DRAMATICALLY
  *
- *!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+ */
 
 interface VideoPlayer {
   void dispose();
@@ -55,9 +53,6 @@ interface VideoPlayer {
   void stop();
   Container getPanel();
   
-  /**
-   * @see javafx.scene.media.MediaPlayer.Status
-   */
   public static enum Status {
     DISPOSED,
     ERRORED, //HALTED
