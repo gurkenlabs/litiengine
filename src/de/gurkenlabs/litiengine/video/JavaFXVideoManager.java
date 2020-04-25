@@ -6,6 +6,7 @@ import static javafx.scene.media.MediaPlayer.Status.*;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URL;
+import java.util.logging.Level;
 
 import javax.net.ssl.SSLHandshakeException;
 import javax.swing.JComponent;
@@ -21,11 +22,22 @@ import javafx.scene.media.MediaException;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 
-final class VideoManagerImpl implements VideoPlayer{
-  
+public final class JavaFXVideoManager extends VideoManager{
+
   private volatile JFXPanel panel = new JFXPanel();
   private volatile MediaView mediaView;
 
+  public static boolean allowNetworkConnections = false;
+  public static final String NAME = "javaFX";
+  
+  public static void register() {
+    VideoManagerFactory.registerPlayerType(NAME, JavaFXVideoManager.class);
+  }
+  
+  protected JavaFXVideoManager(VideoResource video) {
+    super(video);
+  }
+  
   @Override
   public synchronized void setVideo(VideoResource video) {
     if(video.getURI().startsWith("http")) {
@@ -48,7 +60,7 @@ final class VideoManagerImpl implements VideoPlayer{
   @Override
   public synchronized void setVideo(URL url) throws IOException {
     if(url.getProtocol().startsWith("http")) {
-      if(!VideoManager.allowNetworkConnections) {
+      if(!allowNetworkConnections) {
         throw new IOException("Network access disallowed");
       }
       if(url.getProtocol().equals("http")) {
@@ -338,6 +350,36 @@ final class VideoManagerImpl implements VideoPlayer{
   
   private boolean playerValid() {
     return getPlayer() != null;
+  }
+
+  @Override
+  protected void initialize() {
+    //no special initialization code needed for javafx
+  }
+
+  @Override
+  protected void loadNatives() {
+    try {
+      ClassLoader classLoader = VideoManager.class.getClassLoader();
+      Class.forName("javafx.scene.media.MediaPlayer", false, classLoader);
+    } catch (ClassNotFoundException e) {
+        NoClassDefFoundError err = new NoClassDefFoundError("JavaFX is not installed!");
+        err.initCause(e);
+        log.log(Level.SEVERE, err, () -> err.getMessage());
+        throw err;
+    } catch (LinkageError e) {
+        log.log(Level.SEVERE, e, () -> e.getMessage());
+        throw e;
+    } catch (SecurityException e) {
+      log.log(Level.SEVERE, e, () -> e.getMessage());
+      throw e;
+    }
+    loadedNatives.add(NAME);
+  }
+
+  @Override
+  protected boolean nativesLoaded() {
+    return loadedNatives.contains(NAME);
   }
   
 }
