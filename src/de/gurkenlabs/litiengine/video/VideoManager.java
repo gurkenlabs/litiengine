@@ -22,10 +22,10 @@ import de.gurkenlabs.litiengine.resources.VideoResource;
 
 public abstract class VideoManager extends GuiComponent implements VideoPlayer {
 
-  private static final Logger log = Logger.getLogger(VideoManager.class.getName());
+  protected static final Logger log = Logger.getLogger(VideoManager.class.getName());
   protected static ArrayList<String> loadedNatives = new ArrayList<String>();
   
-  protected VideoPlayer impl;
+  private VideoPlayer impl;
   
   {
     if(!nativesLoaded()) {
