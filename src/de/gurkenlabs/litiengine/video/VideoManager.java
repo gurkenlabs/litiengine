@@ -47,8 +47,6 @@ public abstract class VideoManager extends GuiComponent implements VideoPlayer {
   /**
    * Initializes the media player
    * 
-   * should set {@link #impl} to an instance of VideoPlayer
-   * 
    * @throws IllegalStateException if the media player has already been initialized
    */
   protected abstract void initialize();
