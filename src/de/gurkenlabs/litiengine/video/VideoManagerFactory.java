@@ -40,7 +40,7 @@ public final class VideoManagerFactory {
   
   public static VideoManager create(VideoResource videoResource) {
     try {
-      Constructor<? extends VideoManager> c = PLAYERS.get(videoResource.getPlayerType()).getConstructor(VideoResource.class);
+      Constructor<? extends VideoManager> c = PLAYERS.get(videoResource.getPlayerType()).getDeclaredConstructor(VideoResource.class);
       c.setAccessible(true);
       return c.newInstance(videoResource);
     } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
