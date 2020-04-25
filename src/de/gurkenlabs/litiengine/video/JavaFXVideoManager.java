@@ -24,7 +24,7 @@ import javafx.scene.media.MediaView;
 
 public final class JavaFXVideoManager extends VideoManager{
 
-  private volatile JFXPanel panel = new JFXPanel();
+  private volatile JFXPanel panel;
   private volatile MediaView mediaView;
 
   public static boolean allowNetworkConnections = false;
@@ -40,6 +40,7 @@ public final class JavaFXVideoManager extends VideoManager{
   
   @Override
   public synchronized void setVideo(VideoResource video) {
+    this.panel = new JFXPanel();
     if(video.getURI().startsWith("http")) {
       try {
         setVideo(new URL(video.getURI()));
@@ -52,8 +53,8 @@ public final class JavaFXVideoManager extends VideoManager{
 
   @Override
   public synchronized void play(VideoResource video) {
-    setVideo(video);
     while(isStatusUnknown());
+    setVideo(video);
     play();
   }
 
@@ -72,8 +73,8 @@ public final class JavaFXVideoManager extends VideoManager{
 
   @Override
   public synchronized void play(URL url) throws IOException {
-    setVideo(url);
     while(isStatusUnknown());
+    setVideo(url);
     play();
   }
   
