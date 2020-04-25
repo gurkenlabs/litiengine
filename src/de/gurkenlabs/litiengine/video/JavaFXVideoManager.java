@@ -159,6 +159,9 @@ public final class JavaFXVideoManager extends VideoManager{
   }
   
   public VideoPlayer.Status getStatus() {
+    if(getPlayer() == null) {
+      return Status.UNKNOWN;
+    }
     switch (getPlayer().getStatus()) {
     case DISPOSED:
       return Status.DISPOSED;
