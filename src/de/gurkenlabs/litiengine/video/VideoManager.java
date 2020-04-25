@@ -44,76 +44,18 @@ public abstract class VideoManager extends GuiComponent implements VideoPlayer {
   }
   
   /**
-   * Creates a new VideoManager
+   * Creates a new VideoManager which can play the
+   * specified video.
    * 
-   * @throws LinkageError if the native binaries were unable to load
-   */
-  public VideoManager() {
-    super(0,0);
-  };
-  
-  /**
-   * Creates a new VideoManager which load the
-   * specified video without playing it.
+   * Subclasses MUST overwrite this constructor
    * 
    * @param video the video to load
    * 
    * @throws LinkageError if the native binaries were unable to load
    */
-  public VideoManager(VideoResource video) {
+  protected VideoManager(VideoResource video) {
     super(0,0);
     setVideo(video);
-  }
-  
-  /**
-   * Creates a new VideoManager which will load the
-   * specified video, and play it if specified.
-   * 
-   * @param video the video to load
-   * @param play whether to immediately begin playing the video
-   * 
-   * @throws LinkageError if the native binaries were unable to load
-   */
-  public VideoManager(VideoResource video, boolean play) {
-    super(0,0);
-    if(play) {
-      play(video);
-    }
-    else {
-      setVideo(video);
-    }
-  }
-  
-  /**
-   * Creates a new VideoManager which will load the
-   * specified video, and play it if specified.
-   * 
-   * @param url the URL of the video
-   * 
-   * @throws LinkageError if the native binaries were unable to load
-   * 
-   */
-  public VideoManager(URL url) throws NoClassDefFoundError, IOException {
-    this(url, false);
-  }
-  
-  /**
-   * Creates a new video manager which will load the specified video, and play it if
-   * desired
-   * 
-   * @param url the URL of the video
-   * @param play whether to immediately begin playing the video
-   * 
-   * @throws LinkageError if the native binaries were unable to load
-   */
-  public VideoManager(URL url, boolean play) throws NoClassDefFoundError, IOException {
-    super(0,0);
-    if(play) {
-      play(url);
-    }
-    else {
-      setVideo(url);
-    }
   }
   
   /**
