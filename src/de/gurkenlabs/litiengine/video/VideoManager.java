@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.io.IOException;
 import java.net.URL;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -19,21 +20,17 @@ import de.gurkenlabs.litiengine.resources.VideoResource;
  *
  */
 
-public final class VideoManager extends GuiComponent implements VideoPlayer {
+public abstract class VideoManager extends GuiComponent implements VideoPlayer {
 
   private static final Logger log = Logger.getLogger(VideoManager.class.getName());
-  private static boolean checked = false;
-  
-  public static boolean allowNetworkConnections = false;
+  protected static ArrayList<String> loadedNatives = new ArrayList<String>();
   
   protected VideoPlayer impl;
   
   {
-    if(!checked) {
+    if(!nativesLoaded()) {
       try {
-        
-        //TODO Load natives
-        
+        loadNatives();
       } catch (LinkageError e) {
           log.log(Level.SEVERE, e, () -> e.getMessage());
           throw e;
@@ -42,15 +39,12 @@ public final class VideoManager extends GuiComponent implements VideoPlayer {
         throw e;
       }
     }
-    checked = true;
+
     initialize();
   }
   
   /**
    * Creates a new VideoManager
-   * 
-   * @throws SecurityException if a security manager exists and it denies access to
-   * the classloader which loaded this class
    * 
    * @throws LinkageError if the native binaries were unable to load
    */
@@ -63,9 +57,6 @@ public final class VideoManager extends GuiComponent implements VideoPlayer {
    * specified video without playing it.
    * 
    * @param video the video to load
-   * 
-   * @throws SecurityException if a security manager exists and it denies access to
-   * the classloader which loaded this class
    * 
    * @throws LinkageError if the native binaries were unable to load
    */
@@ -80,9 +71,6 @@ public final class VideoManager extends GuiComponent implements VideoPlayer {
    * 
    * @param video the video to load
    * @param play whether to immediately begin playing the video
-   * 
-   * @throws SecurityException if a security manager exists and it denies access to
-   * the classloader which loaded this class
    * 
    * @throws LinkageError if the native binaries were unable to load
    */
@@ -102,9 +90,6 @@ public final class VideoManager extends GuiComponent implements VideoPlayer {
    * 
    * @param url the URL of the video
    * 
-   * @throws SecurityException if a security manager exists and it denies access to
-   * the classloader which loaded this class
-   * 
    * @throws LinkageError if the native binaries were unable to load
    * 
    */
@@ -118,9 +103,6 @@ public final class VideoManager extends GuiComponent implements VideoPlayer {
    * 
    * @param url the URL of the video
    * @param play whether to immediately begin playing the video
-   * 
-   * @throws SecurityException if a security manager exists and it denies access to
-   * the classloader which loaded this class
    * 
    * @throws LinkageError if the native binaries were unable to load
    */
@@ -137,16 +119,30 @@ public final class VideoManager extends GuiComponent implements VideoPlayer {
   /**
    * Initializes the media player
    * 
+   * should set {@link #impl} to an instance of VideoPlayer
+   * 
    * @throws IllegalStateException if the media player has already been initialized
    */
-  protected void initialize() {
-    
-    if(impl != null) {
-      throw new IllegalStateException("Video player already initialized!");
-    }
-    
-    //impl = new VideoManagerImpl();
-    
+  protected abstract void initialize();
+  
+  /**
+   * Load the native library required to play videos with this video manager
+   * 
+   * Should add a string representation of the library to {@link #loadedNatives}
+   * if it successfully loads
+   * 
+   * @throws LinkageError if the library is unable to load
+   * @throws IllegalStateException if the library is already loaded
+   */
+  protected abstract void loadNatives();
+  
+  /**
+   * @return true if the native library required to play the video has been loaded
+   */
+  protected abstract boolean nativesLoaded();
+  
+  public static boolean nativeLoaded(String libName) {
+    return loadedNatives.contains(libName);
   }
   
   /**
