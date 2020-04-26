@@ -163,7 +163,7 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
     MusicPlayback playback;
     try {
       playback = new MusicPlayback(track);
-    } catch (LineUnavailableException e) {
+    } catch (LineUnavailableException | IllegalArgumentException e) {
       resourceFailure(e);
       return null;
     }
@@ -551,7 +551,7 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
   public SFXPlayback createSound(Sound sound, Supplier<Point2D> supplier, boolean loop) {
     try {
       return new SFXPlayback(sound, supplier, loop);
-    } catch (LineUnavailableException e) {
+    } catch (LineUnavailableException | IllegalArgumentException e) {
       resourceFailure(e);
       return null;
     }
