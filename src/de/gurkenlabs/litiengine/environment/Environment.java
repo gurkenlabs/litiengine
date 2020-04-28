@@ -2208,7 +2208,7 @@ public final class Environment implements IRenderable {
     int desiredID = entity.getMapId();
     // assign local map id if the entity's mapID is invalid
     if (desiredID == 0 || this.allEntities.keySet().contains(desiredID)) {
-      entity.setMapId(this.getLocalMapId());
+      entity.setMapId(getLocalMapId());
       log.fine(() -> String.format("Entity [%s] was assigned a local mapID because #%d was already taken or invalid.", entity, desiredID));
     }
 
