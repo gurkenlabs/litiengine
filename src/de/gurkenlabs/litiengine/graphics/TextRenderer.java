@@ -320,6 +320,29 @@ public final class TextRenderer {
    * @see RenderingHints
    */
   public static void renderWithOutline(final Graphics2D g, final String text, final double x, final double y, final Color outlineColor, final float stroke, final boolean antiAliasing) {
+    renderWithOutline(g, text, x, y, 0.0, 0.0, outlineColor, stroke, Align.LEFT, Valign.TOP, antiAliasing);
+  }
+  
+  /**
+   * Draw text at the given coordinates with an outline in the provided color and a provided Anti-Aliasing parameter.
+   * 
+   * @param g
+   *          the Graphics2D object to draw on
+   * @param text
+   *          the String to be distributed over all generated lines
+   * @param x
+   *          the min x coordinate
+   * @param y
+   *          the min y coordinate
+   * @param outlineColor
+   *          the outline color
+   * @param stroke
+   *          the width of the outline
+   * @param antiAliasing
+   *          the Anti-Aliasing object (e.g. RenderingHints.VALUE_TEXT_ANTIALIAS_OFF)
+   * @see RenderingHints
+   */
+  public static void renderWithOutline(final Graphics2D g, final String text, final double x, final double y, double width, double height, final Color outlineColor, final float stroke, Align align, Valign valign, final boolean antiAliasing) {
     if (text == null || text.isEmpty()) {
       return;
     }
@@ -334,9 +357,10 @@ public final class TextRenderer {
 
     // create a glyph vector from your text
     GlyphVector glyphVector = g.getFont().createGlyphVector(g.getFontRenderContext(), text);
+    Rectangle2D bounds = getBounds(g, text);
     // get the shape object
     AffineTransform at = new AffineTransform();
-    at.translate(x, y);
+    at.translate(x + align.getLocation(width, bounds.getWidth()), y + valign.getLocation(height, bounds.getHeight()));
     Shape textShape = at.createTransformedShape(glyphVector.getOutline());
 
     // activate anti aliasing for text rendering (if you want it to look nice)
