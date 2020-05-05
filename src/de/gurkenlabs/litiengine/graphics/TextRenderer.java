@@ -17,6 +17,8 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.text.AttributedCharacterIterator;
 import java.text.AttributedString;
+import java.util.ArrayList;
+import java.util.List;
 
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Game;
@@ -211,6 +213,27 @@ public final class TextRenderer {
    * @see RenderingHints
    */
   public static void renderWithLinebreaks(final Graphics2D g, final String text, final double x, final double y, final double lineWidth, final boolean antiAliasing) {
+    renderWithLinebreaks(g, text, Align.LEFT, Valign.TOP, x, y, lineWidth, 0.0, antiAliasing);
+  }
+
+  /**
+   * Draw text at the given coordinates with a maximum line width for automatic line breaks and a provided Anti-Aliasing parameter.
+   * 
+   * @param g
+   *          the Graphics2D object to draw on
+   * @param text
+   *          the String to be distributed over all generated lines
+   * @param x
+   *          the min x coordinate
+   * @param y
+   *          the min y coordinate
+   * @param width
+   *          the line width
+   * @param antiAliasing
+   *          Configure whether or not to render the text with antialiasing.
+   * @see RenderingHints
+   */
+  public static void renderWithLinebreaks(final Graphics2D g, final String text, Align align, Valign valign, final double x, final double y, final double width, final double height, final boolean antiAliasing) {
     if (text == null || text.isEmpty()) {
       return;
     }
@@ -221,18 +244,30 @@ public final class TextRenderer {
     }
 
     final FontRenderContext frc = g.getFontRenderContext();
-    final AttributedString styledText = new AttributedString(text);
-    styledText.addAttribute(TextAttribute.FONT, g.getFont());
-    final AttributedCharacterIterator iterator = styledText.getIterator();
-    final LineBreakMeasurer measurer = new LineBreakMeasurer(iterator, frc);
-    measurer.setPosition(0);
-    float textY = (float) y;
-    while (measurer.getPosition() < text.length()) {
-      final TextLayout nextLayout = measurer.nextLayout((float) lineWidth);
-      textY += nextLayout.getAscent();
-      final float dx = (float) (nextLayout.isLeftToRight() ? 0 : lineWidth - nextLayout.getAdvance());
-      nextLayout.draw(g, (float) (x + dx), textY);
-      textY += nextLayout.getDescent() + nextLayout.getLeading();
+    List<TextLayout> lines = new ArrayList<>();
+    float textHeight = 0f;
+    for (String s : text.split(System.lineSeparator())) {
+      final AttributedString styledText = new AttributedString(s);
+      styledText.addAttribute(TextAttribute.FONT, g.getFont());
+      final AttributedCharacterIterator iterator = styledText.getIterator();
+      final LineBreakMeasurer measurer = new LineBreakMeasurer(iterator, frc);
+      while (true) {
+        TextLayout nextLayout = measurer.nextLayout((float) width);
+        if (align == Align.JUSTIFY && measurer.getPosition() < text.length())
+          nextLayout = nextLayout.getJustifiedLayout((float) width);
+        lines.add(nextLayout);
+        textHeight += nextLayout.getAscent() + nextLayout.getDescent();
+        if (measurer.getPosition() >= text.length()) {
+          break;
+        }
+        textHeight += nextLayout.getLeading();
+      }
+    }
+    float textY = (float) (y + valign.getLocation(height, textHeight));
+    for (TextLayout layout : lines) {
+      textY += layout.getAscent();
+      layout.draw(g, (float)(x + (align == Align.JUSTIFY ? 0.0 : align.getLocation(width, layout.getAdvance()))), textY);
+      textY += layout.getDescent() + layout.getLeading();
     }
     g.setRenderingHints(originalHints);
   }
