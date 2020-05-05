@@ -52,10 +52,6 @@ public final class TextRenderer {
     render(g, text, location.getX(), location.getY());
   }
 
-  public static void render(final Graphics2D g, final String text, Align alignment, Valign verticalAlignment) {
-    render(g, text, alignment, verticalAlignment, 0, 0);
-  }
-
   /**
    * Draws text with the specified alignment.
    * 
