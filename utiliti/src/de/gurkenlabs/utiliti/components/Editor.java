@@ -303,7 +303,7 @@ public class Editor extends Screen {
       this.setProjectPath(gameFile.getPath());
 
       // load maps from game file
-      this.mapComponent.loadMaps(this.getGameFile().getMaps(), false);
+      this.mapComponent.loadMaps(this.getGameFile().getMaps(), true);
 
       Resources.images().clear();
       Resources.spritesheets().clear();
