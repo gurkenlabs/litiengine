@@ -1,4 +1,4 @@
-# LITIengine Code of Conduct
+# LITIENGINE Code of Conduct
 
 ## Our Pledge
 
@@ -42,7 +42,7 @@ Examples of unacceptable behavior by participants include:
 
 ## Weapons Policy
 
-No weapons will be allowed at LITIengine events, community spaces, or in other spaces covered by the scope of this Code of Conduct. 
+No weapons will be allowed at LITIENGINE events, community spaces, or in other spaces covered by the scope of this Code of Conduct. 
 Weapons include but are not limited to guns, explosives (including fireworks), and large knives such as those used for hunting or display, as well as any other item used for the purpose of causing injury or harm to others. 
 Anyone seen in possession of one of these items will be asked to leave immediately, and will only be allowed to return without the weapon. 
 Community members are further expected to comply with all state and local laws on this matter.
@@ -108,7 +108,7 @@ http://safetyfirstpdx.org/training/code_of_conduct/TemplateReportingForm.pdf
 ## About this Code of Conduct
 The rules and expectations stated in this code of conduct have last been changed on 11-17-2018.
 Only the project maintainers hold the authority to modify this Code of Conduct.
-Modifications to this code of conduct immediately have to be communicated with the LITIengine community. 
+Modifications to this code of conduct immediately have to be communicated with the LITIENGINE community. 
 
 ## Attribution
 
