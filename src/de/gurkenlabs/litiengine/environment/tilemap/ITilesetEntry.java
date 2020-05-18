@@ -29,4 +29,6 @@ public interface ITilesetEntry extends ICustomPropertyProvider {
   public ITileset getTileset();
 
   public String getType();
+
+  public IMapObjectLayer getCollisionInfo();
 }

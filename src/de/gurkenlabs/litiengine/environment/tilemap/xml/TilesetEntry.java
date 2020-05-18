@@ -11,6 +11,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ITerrain;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileAnimation;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
@@ -39,6 +40,9 @@ public class TilesetEntry extends CustomPropertyProvider implements ITilesetEntr
 
   @XmlAttribute
   private String type;
+
+  @XmlElement(name="objectgroup")
+  private MapObjectLayer collisionData;
 
   /**
    * Instantiates a new <code>TilesetEntry</code>.
@@ -102,6 +106,11 @@ public class TilesetEntry extends CustomPropertyProvider implements ITilesetEntr
   @Override
   public String getType() {
     return this.type;
+  }
+
+  @Override
+  public IMapObjectLayer getCollisionInfo() {
+    return this.collisionData;
   }
 
   protected void setTerrains(ITerrain[] terrains) {
