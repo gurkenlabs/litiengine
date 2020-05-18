@@ -20,6 +20,7 @@ import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.swing.UI;
 import de.gurkenlabs.utiliti.swing.dialogs.MapPropertyPanel;
 
+@SuppressWarnings("serial")
 public class MapPopupMenu extends JPopupMenu {
   private static final Logger log = Logger.getLogger(MapPopupMenu.class.getName());
 

@@ -57,8 +57,8 @@ public class MapPropertyPanel extends JPanel {
   private final JTextField textFieldTitle;
 
   public MapPropertyPanel() {
-    this.setSize(new Dimension(330, 620));
-    this.setPreferredSize(new Dimension(330, 620));
+    this.setSize(new Dimension(330, 650));
+    this.setPreferredSize(new Dimension(330, 650));
     this.setBorder(new EmptyBorder(5, 5, 5, 5));
 
     this.scrollPane = new JScrollPane();
@@ -138,13 +138,13 @@ public class MapPropertyPanel extends JPanel {
         .addGap(233)));
     groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
         .addGroup(groupLayout.createSequentialGroup().addContainerGap().addComponent(lblGeneral).addPreferredGap(ComponentPlacement.UNRELATED)
-            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(lblMapName, GroupLayout.DEFAULT_SIZE, 17, Short.MAX_VALUE).addComponent(textFieldName, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE)).addGap(7)
+            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(lblMapName, GroupLayout.DEFAULT_SIZE, 17, Short.MAX_VALUE).addComponent(textFieldName, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)).addGap(7)
             .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addGroup(groupLayout.createSequentialGroup().addComponent(textFieldTitle, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addPreferredGap(ComponentPlacement.RELATED))
                 .addGroup(Alignment.LEADING, groupLayout.createSequentialGroup().addComponent(lblMapTitle, GroupLayout.PREFERRED_SIZE, 18, GroupLayout.PREFERRED_SIZE).addGap(8)))
             .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(scrollPaneDesc, GroupLayout.PREFERRED_SIZE, 47, GroupLayout.PREFERRED_SIZE).addComponent(lblDesc, GroupLayout.PREFERRED_SIZE, 16, GroupLayout.PREFERRED_SIZE)).addPreferredGap(ComponentPlacement.RELATED)
-            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(spinnerGravity, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addComponent(lblGravity, GroupLayout.PREFERRED_SIZE, 17, GroupLayout.PREFERRED_SIZE)).addGap(31)
-            .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(ambientColorComponent, GroupLayout.PREFERRED_SIZE, 57, GroupLayout.PREFERRED_SIZE).addComponent(lblAmbientLight)).addPreferredGap(ComponentPlacement.RELATED)
-            .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(lblStaticShadows).addComponent(shadowColorComponent, GroupLayout.PREFERRED_SIZE, 61, GroupLayout.PREFERRED_SIZE)).addPreferredGap(ComponentPlacement.RELATED)
+            .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(spinnerGravity, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addComponent(lblGravity, GroupLayout.PREFERRED_SIZE, 17, GroupLayout.PREFERRED_SIZE)).addGap(15)
+            .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(ambientColorComponent, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addComponent(lblAmbientLight)).addPreferredGap(ComponentPlacement.RELATED)
+            .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(lblStaticShadows).addComponent(shadowColorComponent, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)).addPreferredGap(ComponentPlacement.RELATED)
             .addComponent(ambientlightPreview, GroupLayout.PREFERRED_SIZE, 116, GroupLayout.PREFERRED_SIZE).addPreferredGap(ComponentPlacement.RELATED).addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(lblCustomProperties).addComponent(buttonRemove).addComponent(buttonAdd))
             .addPreferredGap(ComponentPlacement.RELATED).addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 123, GroupLayout.PREFERRED_SIZE).addGap(47)));
 
