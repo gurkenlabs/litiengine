@@ -15,7 +15,7 @@ public final class Icons {
   public static final Icon CONSOLE = new ImageIcon(Resources.images().get("console.png"));
   public static final Icon COPYX16 = new ImageIcon(Resources.images().get("button-copyx16.png"));
   public static final Icon CREATURE = new ImageIcon(Resources.images().get("creature.png"));
-  public static final Icon CUBE = new ImageIcon(Resources.images().get("object_cube-10x10.png"));
+  public static final Icon CUBE = new ImageIcon(Resources.images().get("object_cubex10.png"));
   public static final Icon CUTX16 = new ImageIcon(Resources.images().get("button-cutx16.png"));
   public static final Icon DEFAULT_NODE = new ImageIcon(Resources.images().get("bullet.png"));
   public static final Icon DELETE = new ImageIcon(Resources.images().get("button-deletex12.png"));
