@@ -398,8 +398,8 @@ public final class UI {
     if (Game.window() != null && Game.window().getRenderComponent() != null) {
       Game.window().getRenderComponent().setBackground(UIManager.getColor("Panel.background"));
     }
-
     Editor.preferences().setTheme(theme);
+    Icons.initialize(theme);
     loadingTheme = false;
   }
 

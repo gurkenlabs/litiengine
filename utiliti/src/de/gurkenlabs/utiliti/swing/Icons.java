@@ -3,75 +3,117 @@ package de.gurkenlabs.utiliti.swing;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
+import de.gurkenlabs.litiengine.resources.ResourceLoadException;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.utiliti.Style.Theme;
+import de.gurkenlabs.utiliti.components.Editor;
 
 public final class Icons {
-  public static final Icon ADD = new ImageIcon(Resources.images().get("addx12.png"));
-  public static final Icon ASSET = new ImageIcon(Resources.images().get("asset.png"));
-  public static final Icon BLUEPRINT = new ImageIcon(Resources.images().get("blueprint.png"));
-  public static final Icon COLLAPSE = new ImageIcon(Resources.images().get("collapse.png"));
-  public static final Icon COLLISIONBOX = new ImageIcon(Resources.images().get("collisionbox.png"));
-  public static final Icon COLORX16 = new ImageIcon(Resources.images().get("button-colorx16.png"));
-  public static final Icon CONSOLE = new ImageIcon(Resources.images().get("console.png"));
-  public static final Icon COPYX16 = new ImageIcon(Resources.images().get("button-copyx16.png"));
-  public static final Icon CREATURE = new ImageIcon(Resources.images().get("creature.png"));
-  public static final Icon CUBE = new ImageIcon(Resources.images().get("object_cubex10.png"));
-  public static final Icon CUTX16 = new ImageIcon(Resources.images().get("button-cutx16.png"));
-  public static final Icon DEFAULT_NODE = new ImageIcon(Resources.images().get("bullet.png"));
-  public static final Icon DELETE = new ImageIcon(Resources.images().get("button-deletex12.png"));
-  public static final Icon DELETEX16 = new ImageIcon(Resources.images().get("button-deletex16.png"));
-  public static final Icon DELETE_X7 = new ImageIcon(Resources.images().get("button-deletex7.png"));
-  public static final Icon DELETE_X7_DISABLED = new ImageIcon(Resources.images().get("button-delete-disabledx7.png"));
-  public static final Icon DOC_BLUEPRINT = new ImageIcon(Resources.images().get("document-blueprint.png"));
-  public static final Icon DOC_EMITTER = new ImageIcon(Resources.images().get("document-emitter.png"));
-  public static final Icon DOC_SOUND = new ImageIcon(Resources.images().get("document-sound.png"));
-  public static final Icon DOC_TILESET = new ImageIcon(Resources.images().get("document-tsx.png"));
-  public static final Icon EMITTER = new ImageIcon(Resources.images().get("emitter.png"));
-  public static final Icon EXPORT = new ImageIcon(Resources.images().get("export.png"));
-  public static final Icon FOLDER = new ImageIcon(Resources.images().get("object_cubex10.png"));
-  public static final Icon HIDEOTHER = new ImageIcon(Resources.images().get("button-hideother.png"));
-  public static final Icon LAYER = new ImageIcon(Resources.images().get("layer.png"));
-  public static final Icon LIFT = new ImageIcon(Resources.images().get("button-lift.png"));
-  public static final Icon LIGHT = new ImageIcon(Resources.images().get("bulb.png"));
-  public static final Icon LOWER = new ImageIcon(Resources.images().get("button-lower.png"));
-  public static final Icon MAP_DELETE = new ImageIcon(Resources.images().get("button-deletex16.png"));
-  public static final Icon MAPAREA = new ImageIcon(Resources.images().get("maparea.png"));
-  public static final Icon MISC = new ImageIcon(Resources.images().get("misc.png"));
-  public static final Icon PAUSE = new ImageIcon(Resources.images().get("button-pause.png"));
-  public static final Icon PASTEX16 = new ImageIcon(Resources.images().get("button-pastex16.png"));
-  public static final Icon PENCIL = new ImageIcon(Resources.images().get("pencil.png"));
-  public static final Icon PLAY = new ImageIcon(Resources.images().get("button-play.png"));
-  public static final Icon PROP = new ImageIcon(Resources.images().get("entity.png"));
-  public static final Icon RENAMEX16 = new ImageIcon(Resources.images().get("button-renamex16.png"));
-  public static final Icon SEARCH = new ImageIcon(Resources.images().get("search.png"));
-  public static final Icon SHADOWBOX = new ImageIcon(Resources.images().get("shadowbox.png"));
-  public static final Icon SPAWNPOINT = new ImageIcon(Resources.images().get("spawnpoint.png"));
-  public static final Icon SPRITESHEET = new ImageIcon(Resources.images().get("spritesheet.png"));
-  public static final Icon SOUND = new ImageIcon(Resources.images().get("sound.png"));
-  public static final Icon TILESET = new ImageIcon(Resources.images().get("tileset.png"));
-  public static final Icon TRIGGER = new ImageIcon(Resources.images().get("trigger.png"));
+  public static Icon ADD;
+  public static Icon ASSET;
+  public static Icon BLUEPRINT;
+  public static Icon COLLAPSE;
+  public static Icon COLLISIONBOX;
+  public static Icon COLOR;
+  public static Icon CONSOLE;
+  public static Icon COPY;
+  public static Icon CREATURE;
+  public static Icon CUBE;
+  public static Icon CUT;
+  public static Icon DEFAULT_NODE;
+  public static Icon DELETE;
+  public static Icon DELETE_X16;
+  public static Icon DELETE_X7;
+  public static Icon DELETE_X7_DISABLED;
+  public static Icon DOC_BLUEPRINT;
+  public static Icon DOC_EMITTER;
+  public static Icon DOC_SOUND;
+  public static Icon DOC_TILESET;
+  public static Icon EMITTER;
+  public static Icon EXPORT;
+  public static Icon FOLDER;
+  public static Icon HIDEOTHER;
+  public static Icon LAYER;
+  public static Icon LIFT;
+  public static Icon LIGHT;
+  public static Icon LOWER;
+  public static Icon MAP_DELETE;
+  public static Icon MAPAREA;
+  public static Icon MISC;
+  public static Icon PAUSE;
+  public static Icon PASTE;
+  public static Icon PENCIL;
+  public static Icon PLAY;
+  public static Icon PROP;
+  public static Icon RENAME;
+  public static Icon SEARCH;
+  public static Icon SHADOWBOX;
+  public static Icon SPAWNPOINT;
+  public static Icon SPRITESHEET;
+  public static Icon SOUND;
+  public static Icon TILESET;
+  public static Icon TRIGGER;
 
-  public static class ToolBar {
-    public static final int SIZE_ICON = 24;
-    public static final Icon COLOR = get("button-color.png");
-    public static final Icon COPY = get("button-copy.png");
-    public static final Icon CREATE = get("button-create.png");
-    public static final Icon CUT = get("button-cut.png");
-    public static final Icon EDIT = get("button-edit.png");
-    public static final Icon LOAD = get("button-load.png");
-    public static final Icon MOVE = get("button-move.png");
-    public static final Icon PASTE = get("button-paste.png");
-    public static final Icon ADD = get("button-placeobject.png");
-    public static final Icon REDO = get("button-redo.png");
-    public static final Icon SAVE = get("button-save.png");
-    public static final Icon UNDO = get("button-undo.png");
+  public static void initialize(Theme theme) {
+    ADD = get("add");
+    ASSET = get("asset");
+    BLUEPRINT = get("blueprint");
+    COLLAPSE = get("collapse");
+    COLLISIONBOX = get("collisionbox");
+    COLOR = get("color");
+    CONSOLE = get("console");
+    COPY = get("copy");
+    CREATURE = get("creature");
+    CUBE = get("cube");
+    CUT = get("cut");
+    DEFAULT_NODE = get("bullet");
+    DELETE = get("delete_x12");
+    DELETE_X16 = get("delete_x16");
+    DELETE_X7 = get("delete_x7");
+    DELETE_X7_DISABLED = get("delete_x7_disabled");
+    DOC_BLUEPRINT = get("document_blueprint");
+    DOC_EMITTER = get("document_emitter");
+    DOC_SOUND = get("document_sound");
+    DOC_TILESET = get("document_tsx");
+    EMITTER = get("emitter");
+    EXPORT = get("export");
+    FOLDER = get("cube");
+    HIDEOTHER = get("hideother");
+    LAYER = get("layer");
+    LIFT = get("lift");
+    LIGHT = get("bulb");
+    LOWER = get("lower");
+    MAP_DELETE = get("delete_x16");
+    MAPAREA = get("maparea");
+    MISC = get("misc");
+    PAUSE = get("pause");
+    PASTE = get("paste");
+    PENCIL = get("pencil");
+    PLAY = get("play");
+    PROP = get("entity");
+    RENAME = get("rename");
+    SEARCH = get("search");
+    SHADOWBOX = get("shadowbox");
+    SPAWNPOINT = get("spawnpoint");
+    SPRITESHEET = get("spritesheet");
+    SOUND = get("sound");
+    TILESET = get("tileset");
+    TRIGGER = get("trigger");
+  }
 
-    private ToolBar() {
+  private static ImageIcon get(String identifier) {
+    ImageIcon ic;
+
+    try {
+      ic = new ImageIcon(Resources.images().get(String.format("%s_%s.png", identifier, Editor.preferences().getTheme().name().toLowerCase())));
+    } catch (ResourceLoadException rle1) {
+      try {
+        ic = new ImageIcon(Resources.images().get(String.format("%s.png", identifier)));
+      } catch (ResourceLoadException rle2) {
+        return null;
+      }
     }
-
-    private static Icon get(String name) {
-      return new ImageIcon(Resources.images().get(name));
-    }
+    return ic;
   }
 
   private Icons() {

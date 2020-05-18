@@ -156,7 +156,7 @@ public class EmitterPropertyPanel extends PropertyPanel {
 
     this.initRadioButtons();
 
-    this.btnSelectColor.setIcon(Icons.ToolBar.COLOR);
+    this.btnSelectColor.setIcon(Icons.COLOR);
     this.btnSelectColor.setMinimumSize(new Dimension(30, 10));
     this.btnSelectColor.setMaximumSize(new Dimension(30, 10));
 

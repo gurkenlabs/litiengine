@@ -15,22 +15,22 @@ import de.gurkenlabs.utiliti.swing.Icons;
 @SuppressWarnings("serial")
 public final class CanvasPopupMenu extends JPopupMenu {
   public CanvasPopupMenu() {
-    JMenuItem delete = new JMenuItem(Resources.strings().get("menu_edit_delete"), Icons.DELETEX16);
+    JMenuItem delete = new JMenuItem(Resources.strings().get("menu_edit_delete"), Icons.DELETE);
     delete.addActionListener(e -> Editor.instance().getMapComponent().delete());
     delete.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
     delete.setEnabled(false);
 
-    JMenuItem copy = new JMenuItem(Resources.strings().get("menu_edit_copy"), Icons.COPYX16);
+    JMenuItem copy = new JMenuItem(Resources.strings().get("menu_edit_copy"), Icons.COPY);
     copy.addActionListener(e -> Editor.instance().getMapComponent().copy());
     copy.setEnabled(false);
     copy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK));
 
-    JMenuItem cut = new JMenuItem(Resources.strings().get("menu_edit_cut"), Icons.CUTX16);
+    JMenuItem cut = new JMenuItem(Resources.strings().get("menu_edit_cut"), Icons.CUT);
     cut.addActionListener(e -> Editor.instance().getMapComponent().cut());
     cut.setEnabled(false);
     cut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK));
 
-    JMenuItem paste = new JMenuItem(Resources.strings().get("menu_edit_paste"), Icons.PASTEX16);
+    JMenuItem paste = new JMenuItem(Resources.strings().get("menu_edit_paste"), Icons.PASTE);
     paste.addActionListener(e -> Editor.instance().getMapComponent().paste());
     paste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK));
     paste.setEnabled(false);

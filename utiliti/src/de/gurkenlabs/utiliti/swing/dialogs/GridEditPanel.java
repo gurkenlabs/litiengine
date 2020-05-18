@@ -35,7 +35,7 @@ public class GridEditPanel extends JPanel {
 
     this.gridColor = strokeColor;
     this.buttonSetColor = new JButton("");
-    this.buttonSetColor.setIcon(Icons.COLORX16);
+    this.buttonSetColor.setIcon(Icons.COLOR);
     this.buttonSetColor.addActionListener(a -> {
       Color newColor = JColorChooser.showDialog(null, Resources.strings().get("panel_selectLayerColor"), strokeColor);
       this.gridColor = newColor == null ? strokeColor : newColor;

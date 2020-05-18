@@ -108,14 +108,14 @@ public final class LayerList extends JScrollPane implements LayerController {
       Transform.updateAnchors();
     });
 
-    this.buttonDuplicateLayer = createButton(Icons.COPYX16, (map, selectedLayer) -> {
+    this.buttonDuplicateLayer = createButton(Icons.COPY, (map, selectedLayer) -> {
       IMapObjectLayer copiedLayer = new MapObjectLayer((MapObjectLayer) selectedLayer);
       map.addLayer(getAbsoluteIndex(map, this.getCurrentLayerIndex()), copiedLayer);
       this.refresh();
       Editor.instance().getMapComponent().add(copiedLayer);
     });
 
-    this.buttonSetColor = createButton(Icons.COLORX16, (map, selectedLayer) -> {
+    this.buttonSetColor = createButton(Icons.COLOR, (map, selectedLayer) -> {
       Color newColor = JColorChooser.showDialog(null, Resources.strings().get("panel_selectLayerColor"), selectedLayer.getColor());
       if (newColor == null) {
         return;
@@ -124,7 +124,7 @@ public final class LayerList extends JScrollPane implements LayerController {
       selectedLayer.setColor(ColorHelper.encode(newColor));
     });
 
-    this.buttonRenameLayer = createButton(Icons.RENAMEX16, (map, selectedLayer) -> {
+    this.buttonRenameLayer = createButton(Icons.RENAME, (map, selectedLayer) -> {
       String newLayerName = JOptionPane.showInputDialog(Resources.strings().get("panel_renameLayer"), selectedLayer.getName());
       if (newLayerName == null) {
         return;
