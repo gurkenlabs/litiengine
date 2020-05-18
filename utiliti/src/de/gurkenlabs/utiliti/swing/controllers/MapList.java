@@ -1,6 +1,8 @@
 package de.gurkenlabs.utiliti.swing.controllers;
 
 import java.awt.Dimension;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
 import java.util.Optional;
 
@@ -8,6 +10,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
@@ -17,11 +20,14 @@ import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.components.MapController;
 import de.gurkenlabs.utiliti.swing.MapListCellRenderer;
 import de.gurkenlabs.utiliti.swing.UI;
+import de.gurkenlabs.utiliti.swing.menus.MapPopupMenu;
 
 @SuppressWarnings("serial")
 public class MapList extends JScrollPane implements MapController {
-  private final JList<IMap> list;
   private final DefaultListModel<IMap> model;
+
+  private static MapPopupMenu mapPopupMenu;
+  private static JList<IMap> list;
 
   public MapList() {
     super();
@@ -30,30 +36,46 @@ public class MapList extends JScrollPane implements MapController {
 
     this.model = new DefaultListModel<>();
 
-    this.list = new JList<>();
-    this.list.setVisibleRowCount(8);
-    this.list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    this.list.setCellRenderer(new MapListCellRenderer());
-    this.list.setMaximumSize(new Dimension(0, 250));
-    this.list.setSelectedIndex(0);
-    this.list.getSelectionModel().addListSelectionListener(e -> {
+    list = new JList<>();
+    list.setVisibleRowCount(8);
+    list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    list.setCellRenderer(new MapListCellRenderer());
+    list.setMaximumSize(new Dimension(0, 250));
+    list.setSelectedIndex(0);
+    list.getSelectionModel().addListSelectionListener(e -> {
       if (Editor.instance().isLoading() || Editor.instance().getMapComponent().isLoading()) {
         return;
       }
-      Optional<TmxMap> map = Editor.instance().getMapComponent().getMaps().stream().filter(m -> m == this.list.getSelectedValue()).findFirst();
+      Optional<TmxMap> map = Editor.instance().getMapComponent().getMaps().stream().filter(m -> m == list.getSelectedValue()).findFirst();
       if ((map.isPresent() && Game.world().environment() != null && Game.world().environment().getMap() == map.get()) || !map.isPresent()) {
         return;
       }
       Editor.instance().getMapComponent().loadEnvironment(map.get());
     });
 
-    this.setViewportView(this.list);
+    this.setViewportView(list);
     this.setViewportBorder(null);
+    initPopupMenu();
 
     UndoManager.onMapObjectAdded(manager -> this.refresh());
     UndoManager.onMapObjectRemoved(manager -> this.refresh());
 
     UndoManager.onUndoStackChanged(manager -> this.bind(Editor.instance().getMapComponent().getMaps(), false));
+  }
+
+  private static void initPopupMenu() {
+    mapPopupMenu = new MapPopupMenu();
+    UI.addOrphanComponent(mapPopupMenu);
+
+    list.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseReleased(MouseEvent e) {
+        if (SwingUtilities.isRightMouseButton(e)) {
+          list.setSelectedIndex(list.locationToIndex(e.getPoint()));
+          mapPopupMenu.show(list, e.getX(), e.getY());
+        }
+      }
+    });
   }
 
   @Override
@@ -65,9 +87,9 @@ public class MapList extends JScrollPane implements MapController {
   public synchronized void bind(List<TmxMap> maps, boolean clear) {
     if (clear) {
       this.model.clear();
-      this.list.setSelectedIndex(0);
+      list.setSelectedIndex(0);
     }
-    int selectedIndex = this.list.getSelectedIndex();
+    int selectedIndex = list.getSelectedIndex();
     for (TmxMap map : maps) {
       if (!this.model.contains(map)) {
         this.model.addElement(map);
@@ -82,8 +104,8 @@ public class MapList extends JScrollPane implements MapController {
       }
     }
 
-    this.list.setModel(this.model);
-    this.list.setSelectedIndex(selectedIndex);
+    list.setModel(this.model);
+    list.setSelectedIndex(selectedIndex);
 
     this.refresh();
   }
@@ -91,10 +113,10 @@ public class MapList extends JScrollPane implements MapController {
   @Override
   public void setSelection(TmxMap map) {
     if (map == null) {
-      this.list.clearSelection();
+      list.clearSelection();
     } else {
       if (this.model.contains(map)) {
-        this.list.setSelectedValue(map, true);
+        list.setSelectedValue(map, true);
       }
     }
     this.refresh();
@@ -102,18 +124,18 @@ public class MapList extends JScrollPane implements MapController {
 
   @Override
   public TmxMap getCurrentMap() {
-    if (this.list.getSelectedIndex() == -1) {
+    if (list.getSelectedIndex() == -1) {
       return null;
     }
-    Optional<TmxMap> map = Editor.instance().getMapComponent().getMaps().stream().filter(m -> m.equals(this.list.getSelectedValue())).findFirst();
+    Optional<TmxMap> map = Editor.instance().getMapComponent().getMaps().stream().filter(m -> m.equals(list.getSelectedValue())).findFirst();
     return map.isPresent() ? map.get() : null;
   }
 
   @Override
   public void refresh() {
-    this.list.revalidate();
-    this.list.repaint();
-    
+    list.revalidate();
+    list.repaint();
+
     UI.getEntityController().refresh();
     UI.getLayerController().refresh();
   }

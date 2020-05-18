@@ -28,7 +28,7 @@ public final class Icons {
   public static final Icon DOC_TILESET = new ImageIcon(Resources.images().get("document-tsx.png"));
   public static final Icon EMITTER = new ImageIcon(Resources.images().get("emitter.png"));
   public static final Icon EXPORT = new ImageIcon(Resources.images().get("export.png"));
-  public static final Icon FOLDER = new ImageIcon(Resources.images().get("object_cube-10x10.png"));
+  public static final Icon FOLDER = new ImageIcon(Resources.images().get("object_cubex10.png"));
   public static final Icon HIDEOTHER = new ImageIcon(Resources.images().get("button-hideother.png"));
   public static final Icon LAYER = new ImageIcon(Resources.images().get("layer.png"));
   public static final Icon LIFT = new ImageIcon(Resources.images().get("button-lift.png"));
