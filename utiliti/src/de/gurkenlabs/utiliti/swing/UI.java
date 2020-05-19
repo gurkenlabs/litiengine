@@ -399,7 +399,7 @@ public final class UI {
       Game.window().getRenderComponent().setBackground(UIManager.getColor("Panel.background"));
     }
     Editor.preferences().setTheme(theme);
-    Icons.initialize(theme);
+    Icons.initialize();
     loadingTheme = false;
   }
 

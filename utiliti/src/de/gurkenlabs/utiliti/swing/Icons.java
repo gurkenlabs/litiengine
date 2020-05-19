@@ -54,7 +54,7 @@ public final class Icons {
   public static Icon TILESET;
   public static Icon TRIGGER;
 
-  public static void initialize(Theme theme) {
+  public static void initialize() {
     ADD = get("add");
     ASSET = get("asset");
     BLUEPRINT = get("blueprint");
