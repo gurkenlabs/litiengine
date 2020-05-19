@@ -101,17 +101,16 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     groupLayout
         .setHorizontalGroup(
             groupLayout.createParallelGroup(Alignment.TRAILING)
-                .addGroup(groupLayout.createSequentialGroup().addGap(CONTROL_MARGIN)
-                    .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addComponent(tabbedPanel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 440, Short.MAX_VALUE).addGroup(groupLayout.createSequentialGroup()
-                        .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING, false).addComponent(lblX, Alignment.LEADING, LABEL_WIDTH, LABEL_WIDTH, Short.MAX_VALUE).addComponent(lblWidth, Alignment.LEADING, LABEL_WIDTH, LABEL_WIDTH, Short.MAX_VALUE)
-                            .addComponent(lblName, Alignment.LEADING, LABEL_WIDTH, LABEL_WIDTH, Short.MAX_VALUE).addComponent(lblTags, Alignment.LEADING, LABEL_WIDTH, LABEL_WIDTH, Short.MAX_VALUE))
-                        .addPreferredGap(ComponentPlacement.RELATED)
-                        .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addComponent(tagPanel, GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE).addComponent(textFieldName, GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE)
-                            .addGroup(groupLayout.createSequentialGroup().addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(spinnerWidth, GroupLayout.DEFAULT_SIZE, 161, Short.MAX_VALUE).addComponent(spinnerX, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 161, Short.MAX_VALUE))
-                                .addPreferredGap(ComponentPlacement.UNRELATED).addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false).addComponent(lblHeight, LABEL_WIDTH, LABEL_WIDTH, Short.MAX_VALUE).addComponent(lblYcoordinate, LABEL_WIDTH, LABEL_WIDTH, Short.MAX_VALUE)).addGap(0)
-                                .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addComponent(spinnerY, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE).addComponent(spinnerHeight, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE))))))
+                .addGroup(groupLayout.createSequentialGroup().addGap(CONTROL_MARGIN).addGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addComponent(tabbedPanel, Alignment.LEADING, PANEL_WIDTH, PANEL_WIDTH, PANEL_WIDTH).addGroup(groupLayout.createSequentialGroup()
+                    .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING, false).addComponent(lblX, Alignment.LEADING, LABEL_WIDTH, LABEL_WIDTH, Short.MAX_VALUE).addComponent(lblWidth, Alignment.LEADING, LABEL_WIDTH, LABEL_WIDTH, PANEL_WIDTH)
+                        .addComponent(lblName, Alignment.LEADING, LABEL_WIDTH, LABEL_WIDTH, Short.MAX_VALUE).addComponent(lblTags, Alignment.LEADING, LABEL_WIDTH, LABEL_WIDTH, Short.MAX_VALUE))
+                    .addPreferredGap(ComponentPlacement.RELATED)
+                    .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addComponent(tagPanel, CONTROL_MIN_WIDTH, CONTROL_WIDTH, PANEL_WIDTH).addComponent(textFieldName, CONTROL_MIN_WIDTH, CONTROL_WIDTH, PANEL_WIDTH).addGap(0)
+                        .addGroup(groupLayout.createSequentialGroup().addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(spinnerWidth, CONTROL_MIN_WIDTH, CONTROL_WIDTH, CONTROL_WIDTH).addComponent(spinnerX, Alignment.TRAILING, CONTROL_MIN_WIDTH, CONTROL_WIDTH, CONTROL_WIDTH))
+                            .addPreferredGap(ComponentPlacement.UNRELATED).addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false).addComponent(lblHeight, LABEL_WIDTH, LABEL_WIDTH, LABEL_WIDTH).addComponent(lblYcoordinate, LABEL_WIDTH, LABEL_WIDTH, LABEL_WIDTH)).addGap(0)
+                            .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addComponent(spinnerY, Alignment.LEADING, CONTROL_MIN_WIDTH, CONTROL_WIDTH, CONTROL_WIDTH).addComponent(spinnerHeight, Alignment.LEADING, CONTROL_MIN_WIDTH, CONTROL_WIDTH, CONTROL_WIDTH))))))
                     .addGap(CONTROL_MARGIN))
-                .addGroup(Alignment.LEADING, groupLayout.createSequentialGroup().addGap(CONTROL_MARGIN).addComponent(infoPanel, GroupLayout.DEFAULT_SIZE, 430, Short.MAX_VALUE).addGap(CONTROL_MARGIN)));
+                .addGroup(Alignment.LEADING, groupLayout.createSequentialGroup().addGap(CONTROL_MARGIN).addComponent(infoPanel, GroupLayout.DEFAULT_SIZE, PANEL_WIDTH, Short.MAX_VALUE).addGap(CONTROL_MARGIN)));
     groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
         .addGroup(groupLayout.createSequentialGroup().addGap(CONTROL_MARGIN).addComponent(infoPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addGap(CONTROL_MARGIN)
             .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(lblX, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE).addComponent(spinnerX, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE)
@@ -121,7 +120,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
                 .addComponent(spinnerHeight, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE).addComponent(lblWidth, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE))
             .addGap(CONTROL_MARGIN).addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(textFieldName, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE).addComponent(lblName, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE))
             .addGap(5).addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(tagPanel, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE).addComponent(lblTags, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE)).addGap(5)
-            .addComponent(tabbedPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addGap(108)));
+            .addComponent(tabbedPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addGap(CONTROL_MARGIN)));
     this.infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.X_AXIS));
 
     JLabel lblEntityId = new JLabel("ID");

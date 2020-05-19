@@ -47,6 +47,7 @@ public abstract class PropertyPanel extends JPanel {
   public static final int CONTROL_WIDTH = (int) (150 * Editor.preferences().getUiScale());
   public static final int CONTROL_HEIGHT = (int) (30 * Editor.preferences().getUiScale());
   public static final int CONTROL_MARGIN = (int) (5 * Editor.preferences().getUiScale());
+  public static final int PANEL_WIDTH = 2 * (CONTROL_WIDTH + LABEL_WIDTH + CONTROL_MARGIN);
   public static final int LABEL_GAP = 0;
 
   protected boolean isFocussing;
