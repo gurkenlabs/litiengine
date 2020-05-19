@@ -1,63 +1,19 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Font;
-import java.awt.Graphics2D;
-
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextPane;
-import javax.swing.border.LineBorder;
-import javax.swing.text.BadLocationException;
-
-import com.github.weisj.darklaf.components.ClosableTabbedPane;
-import com.github.weisj.darklaf.components.tabframe.JTabFrame;
-import com.github.weisj.darklaf.components.tabframe.TabbedPopup;
-import com.github.weisj.darklaf.components.text.NonWrappingTextPane;
-import com.github.weisj.darklaf.components.text.NumberedTextComponent;
-import com.github.weisj.darklaf.components.text.NumberingPane;
-import com.github.weisj.darklaf.util.Alignment;
-import com.github.weisj.darklaf.util.DarkUIUtil;
-import com.github.weisj.darklaf.util.StringUtil;
-
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.environment.tilemap.IMap;
-import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
-import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
-import de.gurkenlabs.litiengine.graphics.emitters.xml.CustomEmitter;
-import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.litiengine.util.Imaging;
-import de.gurkenlabs.utiliti.UndoManager;
-import de.gurkenlabs.utiliti.swing.Icons;
-import de.gurkenlabs.utiliti.swing.JCheckBoxList;
-import de.gurkenlabs.utiliti.swing.PropertyListCellRenderer;
-
-import javax.swing.GroupLayout;
-import javax.swing.JRadioButton;
-import java.awt.GridBagLayout;
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.awt.GridBagConstraints;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
-
-import java.awt.FlowLayout;
-import javax.swing.JToolBar;
-import javax.swing.SwingConstants;
-import javax.swing.JSplitPane;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JList;
-import javax.swing.AbstractListModel;
+import javax.swing.JPanel;
+import javax.swing.JSplitPane;
 import javax.swing.ListSelectionModel;
+
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
+import de.gurkenlabs.litiengine.graphics.emitters.xml.CustomEmitter;
+import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.utiliti.swing.Icons;
+import de.gurkenlabs.utiliti.swing.JCheckBoxList;
 
 public class UpdatedEmitterPanel extends PropertyPanel {
   private transient CustomEmitter emitter;
@@ -79,7 +35,6 @@ public class UpdatedEmitterPanel extends PropertyPanel {
     this.initEmitterPropertyList();
     list.setSelectedIndex(0);
     list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    list.setCellRenderer(new PropertyListCellRenderer());
 
     splitPane.setLeftComponent(list);
     this.controlPanel = new JPanel();
