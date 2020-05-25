@@ -9,7 +9,6 @@ import javax.xml.bind.annotation.XmlTransient;
 
 @XmlRootElement(name = "param")
 public class ParticleParameter implements Serializable {
-  public static final int MAX_VALUE_UNDEFINED = -1;
   private static final long serialVersionUID = 4893417265998349179L;
 
   @XmlAttribute
@@ -22,8 +21,8 @@ public class ParticleParameter implements Serializable {
   }
 
   public ParticleParameter(final float minValue, final float maxValue) {
-    this.minValue = minValue;
-    this.maxValue = maxValue;
+    this.setMinValue(minValue);
+    this.setMaxValue(maxValue);
   }
 
   /**
@@ -33,7 +32,7 @@ public class ParticleParameter implements Serializable {
    * @return The value of this parameter.
    */
   public double get() {
-    if (maxValue != -1 && minValue < maxValue) {
+    if (minValue < maxValue) {
       return this.getRandomNumber();
     } else {
       return this.getMinValue();

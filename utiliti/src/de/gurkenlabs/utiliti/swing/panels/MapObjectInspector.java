@@ -216,7 +216,6 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
       }
 
       // clear current panel
-      this.currentPanel.bind(null);
       this.tabbedPanel.remove(this.currentPanel);
     }
 
@@ -250,7 +249,6 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     tabbedPanel.addTab(Resources.strings().get(this.customPanel.getIdentifier()), this.customPanel.getIcon(), this.customPanel);
 
     this.currentPanel = panel != null ? panel : this.customPanel;
-    this.currentPanel.bind(this.getDataSource());
     this.tabbedPanel.revalidate();
     this.tabbedPanel.repaint();
   }

@@ -15,17 +15,88 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Valign;
-import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
+import de.gurkenlabs.litiengine.configuration.Quality;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.ParticleType;
 import de.gurkenlabs.litiengine.physics.Collision;
 import de.gurkenlabs.litiengine.resources.Resource;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
+import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 
 @XmlRootElement(name = "emitter")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class EmitterData implements Serializable, Resource {
   private static final long serialVersionUID = 50238884097993529L;
+
+  public static final ParticleColor DEFAULT_COLOR = new ParticleColor(ColorHelper.decode("#CC00a5bc"));
+  public static final List<ParticleColor> DEFAULT_COLORS = new ArrayList<>();
+
+  public static final String DEFAULT_COLOR_PROBABILITIES = "";
+  public static final String DEFAULT_SPRITESHEET = "";
+  public static final String DEFAULT_NAME = "Custom Emitter";
+  public static final String DEFAULT_TEXT = "LITI";
+
+  public static final boolean DEFAULT_ANIMATE_SPRITE = true;
+  public static final boolean DEFAULT_FADE = true;
+
+  public static final Collision DEFAULT_COLLISION = Collision.NONE;
+  public static final ParticleType DEFAULT_PARTICLE_TYPE = ParticleType.RECTANGLE;
+  public static final Quality DEFAULT_REQUIRED_QUALITY = Quality.VERYLOW;
+  public static final Align DEFAULT_ORIGIN_ALIGN = Align.CENTER;
+  public static final Valign DEFAULT_ORIGIN_VALIGN = Valign.MIDDLE;
+
+  public static final float DEFAULT_WIDTH = 16f;
+  public static final float DEFAULT_HEIGHT = 16f;
+  public static final float DEFAULT_COLOR_DEVIATION = 0f;
+  public static final float DEFAULT_ALPHA_DEVIATION = 0f;
+
+  public static final int DEFAULT_UPDATERATE = 40;
+  public static final int DEFAULT_SPAWNAMOUNT = 20;
+  public static final int DEFAULT_SPAWNRATE = 100;
+  public static final int DEFAULT_MAXPARTICLES = 400;
+  public static final int DEFAULT_TTL = 0;
+  public static final int DEFAULT_MAX_PARTICLE_TTL = 1500;
+  public static final int DEFAULT_MIN_PARTICLE_TTL = 400;
+
+  public static final float DEFAULT_MIN_OFFSET_X = -4f;
+  public static final float DEFAULT_MAX_OFFSET_X = 4f;
+  public static final float DEFAULT_MIN_OFFSET_Y = -4f;
+  public static final float DEFAULT_MAX_OFFSET_Y = 4f;
+
+  public static final float DEFAULT_MIN_DELTA_WIDTH = -.1f;
+  public static final float DEFAULT_MAX_DELTA_WIDTH = .1f;
+  public static final float DEFAULT_MIN_DELTA_HEIGHT = -.1f;
+  public static final float DEFAULT_MAX_DELTA_HEIGHT = .1f;
+
+  public static final float DEFAULT_MIN_GRAVITY_X = -.01f;
+  public static final float DEFAULT_MAX_GRAVITY_X = .01f;
+  public static final float DEFAULT_MIN_GRAVITY_Y = -.01f;
+  public static final float DEFAULT_MAX_GRAVITY_Y = .01f;
+
+  public static final float DEFAULT_MIN_DELTA_X = -.1f;
+  public static final float DEFAULT_MAX_DELTA_X = .1f;
+  public static final float DEFAULT_MIN_DELTA_Y = -.1f;
+  public static final float DEFAULT_MAX_DELTA_Y = .1f;
+
+  public static final float DEFAULT_MIN_WIDTH = 2f;
+  public static final float DEFAULT_MAX_WIDTH = 6f;
+  public static final float DEFAULT_MIN_HEIGHT = 2f;
+  public static final float DEFAULT_MAX_HEIGHT = 6f;
+
+  @XmlElement
+  private float alphaDeviation;
+
+  @XmlElement
+  private boolean animateSprite;
+
+  @XmlElement
+  private Collision collisionType;
+
+  @XmlElement
+  private float colorDeviation;
+
+  @XmlElement
+  private String colorProbabilities;
 
   @XmlElementWrapper(name = "colors")
   @XmlElement(name = "color")
@@ -47,6 +118,9 @@ public class EmitterData implements Serializable, Resource {
   private int emitterTTL;
 
   @XmlElement
+  private boolean fade;
+
+  @XmlElement
   private ParticleParameter gravityX;
 
   @XmlElement
@@ -60,6 +134,12 @@ public class EmitterData implements Serializable, Resource {
 
   @XmlAttribute
   private String name;
+
+  @XmlElement
+  private Align originAlign;
+
+  @XmlElement
+  private Valign originValign;
 
   @XmlElement
   private ParticleParameter particleHeight;
@@ -85,6 +165,9 @@ public class EmitterData implements Serializable, Resource {
   @XmlAttribute
   private int spawnRate;
 
+  @XmlElement
+  private String spritesheet;
+
   @XmlAttribute
   private int updateRate;
 
@@ -92,102 +175,64 @@ public class EmitterData implements Serializable, Resource {
   private float width;
 
   @XmlElement
-  private float colorDeviation;
+  private ParticleParameter offsetX;
 
   @XmlElement
-  private float alphaDeviation;
-
-  @XmlElement
-  private ParticleParameter x;
-
-  @XmlElement
-  private ParticleParameter y;
-
-  @XmlElement
-  private boolean animateSprite;
-
-  @XmlElement
-  private String spritesheet;
-
-  @XmlElement
-  private String colorProbabilities;
-
-  @XmlElement
-  private Align originAlign;
-
-  @XmlElement
-  private Valign originValign;
-
-  @XmlElement
-  private Collision collisionType;
-
-  @XmlElement
-  private boolean fade;
+  private ParticleParameter offsetY;
 
   public EmitterData() {
-    this.colors = new ArrayList<>();
-    this.x = new ParticleParameter();
-    this.y = new ParticleParameter();
-    this.deltaX = new ParticleParameter();
-    this.deltaY = new ParticleParameter();
-    this.gravityX = new ParticleParameter();
-    this.gravityY = new ParticleParameter();
-    this.particleWidth = new ParticleParameter();
-    this.particleHeight = new ParticleParameter();
-    this.deltaWidth = new ParticleParameter();
-    this.deltaHeight = new ParticleParameter();
-    this.colorDeviation = 0;
-    this.alphaDeviation = 0;
-    this.collisionType = Collision.NONE;
-    this.updateRate = Emitter.DEFAULT_UPDATERATE;
-    this.originValign = Valign.TOP;
-    this.originAlign = Align.LEFT;
-    this.fade = true;
-  }
-
-  public EmitterData(EmitterData data) {
-    this.colors = data.colors;
-    this.colorProbabilities = data.colorProbabilities;
-    this.x = data.x;
-    this.y = data.y;
-    this.deltaHeight = data.deltaHeight;
-    this.deltaWidth = data.deltaWidth;
-    this.deltaX = data.deltaX;
-    this.deltaY = data.deltaY;
-    this.emitterTTL = data.emitterTTL;
-    this.gravityX = data.gravityX;
-    this.gravityY = data.gravityY;
-    this.width = data.width;
-    this.height = data.height;
-    this.particleWidth = data.particleWidth;
-    this.particleHeight = data.particleHeight;
-    this.colorDeviation = data.colorDeviation;
-    this.alphaDeviation = data.alphaDeviation;
-    this.updateRate = data.updateRate;
-    this.collisionType = data.collisionType;
-    this.maxParticles = data.maxParticles;
-    this.name = data.name;
-    this.particleMinTTL = data.particleMinTTL;
-    this.particleMaxTTL = data.particleMaxTTL;
-    this.particleText = data.particleText;
-    this.particleType = data.particleType;
-    this.spawnAmount = data.spawnAmount;
-    this.spawnRate = data.spawnRate;
-    this.animateSprite = data.animateSprite;
-    this.spritesheet = data.spritesheet;
-    this.originValign = data.getOriginValign();
-    this.originAlign = data.getOriginAlign();
-    this.fade = data.fade;
-  }
-
-  @XmlTransient
-  public float getColorDeviation() {
-    return colorDeviation;
+    this.offsetX = new ParticleParameter(DEFAULT_MIN_OFFSET_X, DEFAULT_MAX_OFFSET_X);
+    this.offsetY = new ParticleParameter(DEFAULT_MIN_OFFSET_Y, DEFAULT_MAX_OFFSET_Y);
+    this.deltaWidth = new ParticleParameter(DEFAULT_MIN_DELTA_WIDTH, DEFAULT_MAX_DELTA_WIDTH);
+    this.deltaHeight = new ParticleParameter(DEFAULT_MIN_DELTA_HEIGHT, DEFAULT_MAX_DELTA_HEIGHT);
+    this.deltaX = new ParticleParameter(DEFAULT_MIN_DELTA_X, DEFAULT_MAX_DELTA_X);
+    this.deltaY = new ParticleParameter(DEFAULT_MIN_DELTA_Y, DEFAULT_MAX_DELTA_Y);
+    this.gravityX = new ParticleParameter(DEFAULT_MIN_GRAVITY_X, DEFAULT_MAX_GRAVITY_X);
+    this.gravityY = new ParticleParameter(DEFAULT_MIN_GRAVITY_Y, DEFAULT_MAX_GRAVITY_Y);
+    this.particleWidth = new ParticleParameter(DEFAULT_MIN_WIDTH, DEFAULT_MAX_WIDTH);
+    this.particleHeight = new ParticleParameter(DEFAULT_MIN_HEIGHT, DEFAULT_MAX_HEIGHT);
+    this.colors = DEFAULT_COLORS;
+    this.colorProbabilities = DEFAULT_COLOR_PROBABILITIES;
+    this.emitterTTL = DEFAULT_TTL;
+    this.width = DEFAULT_WIDTH;
+    this.height = DEFAULT_HEIGHT;
+    this.colorDeviation = DEFAULT_COLOR_DEVIATION;
+    this.alphaDeviation = DEFAULT_ALPHA_DEVIATION;
+    this.updateRate = DEFAULT_UPDATERATE;
+    this.collisionType = DEFAULT_COLLISION;
+    this.maxParticles = DEFAULT_MAXPARTICLES;
+    this.name = DEFAULT_NAME;
+    this.particleMinTTL = DEFAULT_MIN_PARTICLE_TTL;
+    this.particleMaxTTL = DEFAULT_MAX_PARTICLE_TTL;
+    this.particleText = DEFAULT_TEXT;
+    this.particleType = DEFAULT_PARTICLE_TYPE;
+    this.spawnAmount = DEFAULT_SPAWNAMOUNT;
+    this.spawnRate = DEFAULT_SPAWNRATE;
+    this.animateSprite = DEFAULT_ANIMATE_SPRITE;
+    this.spritesheet = DEFAULT_SPRITESHEET;
+    this.originValign = DEFAULT_ORIGIN_VALIGN;
+    this.originAlign = DEFAULT_ORIGIN_ALIGN;
+    this.fade = DEFAULT_FADE;
   }
 
   @XmlTransient
   public float getAlphaDeviation() {
-    return alphaDeviation;
+    return this.alphaDeviation;
+  }
+
+  @XmlTransient
+  public Collision getCollisionType() {
+    return this.collisionType;
+  }
+
+  @XmlTransient
+  public float getColorDeviation() {
+    return this.colorDeviation;
+  }
+
+  @XmlTransient
+  public double[] getColorProbabilities() {
+    return ArrayUtilities.splitDouble(this.colorProbabilities);
   }
 
   @XmlTransient
@@ -286,13 +331,13 @@ public class EmitterData implements Serializable, Resource {
   }
 
   @XmlTransient
-  public ParticleParameter getParticleX() {
-    return this.x;
+  public ParticleParameter getParticleOffsetX() {
+    return this.offsetX;
   }
 
   @XmlTransient
-  public ParticleParameter getParticleY() {
-    return this.y;
+  public ParticleParameter getParticleOffsetY() {
+    return this.offsetY;
   }
 
   @XmlTransient
@@ -301,34 +346,13 @@ public class EmitterData implements Serializable, Resource {
   }
 
   @XmlTransient
-  public Collision getCollisionType() {
-    return this.collisionType;
-  }
-
-  @XmlTransient
   public int getSpawnRate() {
     return this.spawnRate;
   }
 
-  public boolean isAnimateSprite() {
-    return animateSprite;
-  }
-
-  public boolean isFading() {
-    return this.fade;
-  }
-
-  public void setAnimateSprite(boolean animateSprite) {
-    this.animateSprite = animateSprite;
-  }
-
   @XmlTransient
   public String getSpritesheet() {
-    return spritesheet;
-  }
-
-  public void setSpritesheet(String spritesheet) {
-    this.spritesheet = spritesheet;
+    return this.spritesheet;
   }
 
   @XmlTransient
@@ -341,35 +365,46 @@ public class EmitterData implements Serializable, Resource {
     return this.width;
   }
 
-  @XmlTransient
-  public double[] getColorProbabilities() {
-    return ArrayUtilities.splitDouble(this.colorProbabilities);
+  public boolean isAnimateSprite() {
+    return this.animateSprite;
   }
 
-  public void setColorProbabilities(double[] colorProbabilities) {
+  public boolean isFading() {
+    return this.fade;
+  }
+
+  public void setAlphaDeviation(final float alphaDeviation) {
+    this.alphaDeviation = MathUtilities.clamp(alphaDeviation, 0, 1);
+  }
+
+  public void setAnimateSprite(final boolean animateSprite) {
+    this.animateSprite = animateSprite;
+  }
+
+  public void setCollisionType(final Collision physics) {
+    this.collisionType = physics;
+  }
+
+  public void setColor(final Color color) {
+    final List<ParticleColor> tmpList = new ArrayList<>();
+    tmpList.add(new ParticleColor(color));
+    this.colors = tmpList;
+  }
+
+  public void setColorDeviation(final float colorDeviation) {
+    this.colorDeviation = MathUtilities.clamp(colorDeviation, 0, 1);
+  }
+
+  public void setColorProbabilities(final double[] colorProbabilities) {
     this.colorProbabilities = ArrayUtilities.join(colorProbabilities);
   }
 
-  public void setColorProbabilities(String colorProbabilities) {
+  public void setColorProbabilities(final String colorProbabilities) {
     this.colorProbabilities = colorProbabilities;
   }
 
   public void setColors(final List<ParticleColor> colors) {
     this.colors = colors;
-  }
-
-  public void setColor(Color color) {
-    List<ParticleColor> tmpList = new ArrayList<>();
-    tmpList.add(new ParticleColor(color));
-    this.colors = tmpList;
-  }
-
-  public void setAlphaDeviation(float alphaDeviation) {
-    this.alphaDeviation = MathUtilities.clamp(alphaDeviation, 0, 1);
-  }
-
-  public void setColorDeviation(float colorDeviation) {
-    this.colorDeviation = MathUtilities.clamp(colorDeviation, 0, 1);
   }
 
   public void setDeltaHeight(final ParticleParameter deltaHeight) {
@@ -417,11 +452,11 @@ public class EmitterData implements Serializable, Resource {
     this.name = name;
   }
 
-  public void setOriginAlign(Align align) {
+  public void setOriginAlign(final Align align) {
     this.originAlign = align;
   }
 
-  public void setOriginValign(Valign valign) {
+  public void setOriginValign(final Valign valign) {
     this.originValign = valign;
   }
 
@@ -449,8 +484,12 @@ public class EmitterData implements Serializable, Resource {
     this.particleWidth = particleWidth;
   }
 
-  public void setCollisionType(Collision physics) {
-    this.collisionType = physics;
+  public void setParticleX(final ParticleParameter x) {
+    this.offsetX = x;
+  }
+
+  public void setParticleY(final ParticleParameter y) {
+    this.offsetY = y;
   }
 
   public void setSpawnAmount(final int spawnAmount) {
@@ -459,6 +498,10 @@ public class EmitterData implements Serializable, Resource {
 
   public void setSpawnRate(final int spawnRate) {
     this.spawnRate = spawnRate;
+  }
+
+  public void setSpritesheet(final String spritesheet) {
+    this.spritesheet = spritesheet;
   }
 
   public void setUpdateRate(final int updateRate) {
@@ -471,13 +514,5 @@ public class EmitterData implements Serializable, Resource {
 
   public void setWidth(final float width) {
     this.width = width;
-  }
-
-  public void setParticleX(final ParticleParameter x) {
-    this.x = x;
-  }
-
-  public void setParticleY(final ParticleParameter y) {
-    this.y = y;
   }
 }

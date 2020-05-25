@@ -51,11 +51,11 @@ public class EmitterPanel extends PropertyPanel {
         return;
       }
 
-      final EmitterData data = new EmitterData(emitter.getEmitterData());
-      data.setName(name.toString());
-
-      Editor.instance().getGameFile().getEmitters().removeIf(x -> x.getName().equals(data.getName()));
-      Editor.instance().getGameFile().getEmitters().add(data);
+//      final EmitterData data = new EmitterData(emitter.getEmitterData());
+//      data.setName(name.toString());
+//
+//      Editor.instance().getGameFile().getEmitters().removeIf(x -> x.getName().equals(data.getName()));
+//      Editor.instance().getGameFile().getEmitters().add(data);
     });
 
     btnSave.setIcon(Icons.EMITTER);

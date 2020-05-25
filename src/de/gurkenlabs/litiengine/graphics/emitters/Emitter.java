@@ -28,6 +28,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.TmxType;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.Particle;
+import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 
 /**
  * An abstract implementation for emitters that provide a particle effect.
@@ -36,10 +37,6 @@ import de.gurkenlabs.litiengine.graphics.emitters.particles.Particle;
 @EmitterInfo
 @TmxType(MapObjectType.EMITTER)
 public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive, IRenderable {
-  public static final Color DEFAULT_PARTICLE_COLOR = new Color(255, 255, 255, 150);
-  public static final int DEFAULT_UPDATERATE = 30;
-  public static final int DEFAULT_SPAWNAMOUNT = 1;
-  public static final int DEFAULT_MAXPARTICLES = 100;
 
   private final Collection<EmitterFinishedListener> finishedListeners;
   private final CopyOnWriteArrayList<Particle> particles;
@@ -429,7 +426,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
 
   protected Color getRandomParticleColor() {
     if (this.colors.isEmpty()) {
-      return DEFAULT_PARTICLE_COLOR;
+      return EmitterData.DEFAULT_COLOR.toColor();
     }
 
     return this.colors.get(ThreadLocalRandom.current().nextInt(this.colors.size()));

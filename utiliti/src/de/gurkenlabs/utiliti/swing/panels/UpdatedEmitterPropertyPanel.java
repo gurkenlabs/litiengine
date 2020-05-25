@@ -8,15 +8,22 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.border.EmptyBorder;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.entities.EmitterInfo;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
+import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.utiliti.swing.Icons;
 import de.gurkenlabs.utiliti.swing.panels.UpdatedEmitterPanel.EmitterPropertyGroup;
 
 @SuppressWarnings("serial")
 public abstract class UpdatedEmitterPropertyPanel extends PropertyPanel {
+
   protected transient Emitter emitter;
+  private static final double PARTICLESPINNER_MAX_VALUE = 100.0;
+  private static final double PARTICLEDELTA_MAX_VALUE = 1.0;
+  private static final double PARTICLEDELTA_DEFAULT_VALUE = 0.1;
+
   private UpdatedEmitterPropertyPanel() {
     super();
   }
@@ -31,7 +38,7 @@ public abstract class UpdatedEmitterPropertyPanel extends PropertyPanel {
       return new ParticleColorPanel();
     case EMISSION:
       return new EmissionPanel();
-    case OFFSET:
+    case ORIGIN:
       return new ParticleOffsetPanel();
     case SIZE:
       return new ParticleSizePanel();
@@ -48,6 +55,30 @@ public abstract class UpdatedEmitterPropertyPanel extends PropertyPanel {
 
   protected abstract void setupChangedListeners();
 
+  private static SpinnerNumberModel getParticleMinModel() {
+    return new SpinnerNumberModel(-PARTICLEDELTA_DEFAULT_VALUE, -PARTICLESPINNER_MAX_VALUE, PARTICLESPINNER_MAX_VALUE, 0.1);
+  }
+
+  private static SpinnerNumberModel getParticleMaxModel() {
+    return new SpinnerNumberModel(PARTICLEDELTA_DEFAULT_VALUE, -PARTICLESPINNER_MAX_VALUE, PARTICLESPINNER_MAX_VALUE, 0.1);
+  }
+
+  private static SpinnerNumberModel getLocationModel() {
+    return new SpinnerNumberModel(0.0, -PARTICLESPINNER_MAX_VALUE, PARTICLESPINNER_MAX_VALUE, 0.1);
+  }
+
+  private static SpinnerNumberModel getDeltaModel() {
+    return new SpinnerNumberModel(0.0, -PARTICLEDELTA_MAX_VALUE, PARTICLEDELTA_MAX_VALUE, 0.01);
+  }
+
+  private static SpinnerNumberModel getParticleDimensionModel() {
+    return new SpinnerNumberModel(1.0, 0.0, PARTICLESPINNER_MAX_VALUE, 1.0);
+  }
+
+  private static SpinnerNumberModel getPercentModel() {
+    return new SpinnerNumberModel(0.0, 0.0, 1.0, 0.01);
+  }
+
   private static class EmissionPanel extends UpdatedEmitterPropertyPanel {
     private JSpinner spawnRateSpinner;
     private JSpinner spawnAmountSpinner;
@@ -58,11 +89,11 @@ public abstract class UpdatedEmitterPropertyPanel extends PropertyPanel {
 
     private EmissionPanel() {
       super();
-      this.spawnRateSpinner = new JSpinner(new SpinnerNumberModel(100, 0, 100, 1));
-      this.spawnAmountSpinner = new JSpinner(new SpinnerNumberModel(100, 0, 100, 1));
-      this.updateDelaySpinner = new JSpinner(new SpinnerNumberModel(100, 0, 100, 1));
-      this.ttlSpinner = new JSpinner(new SpinnerNumberModel(100, 0, 100, 1));
-      this.maxParticlesSpinner = new JSpinner(new SpinnerNumberModel(100, 0, 100, 1));
+      this.spawnRateSpinner = new JSpinner(new SpinnerNumberModel(EmitterData.DEFAULT_SPAWNRATE, 10, Integer.MAX_VALUE, 10));
+      this.spawnAmountSpinner = new JSpinner(new SpinnerNumberModel(EmitterData.DEFAULT_SPAWNAMOUNT, 1, 500, 1));
+      this.updateDelaySpinner = new JSpinner(new SpinnerNumberModel(EmitterData.DEFAULT_UPDATERATE, 0, Integer.MAX_VALUE, 10));
+      this.ttlSpinner = new JSpinner(new SpinnerNumberModel(EmitterData.DEFAULT_TTL, 0, Integer.MAX_VALUE, 100));
+      this.maxParticlesSpinner = new JSpinner(new SpinnerNumberModel(EmitterData.DEFAULT_MAXPARTICLES, 1, Integer.MAX_VALUE, 1));
 
       this.btnPause = new JToggleButton();
       this.btnPause.setSelected(true);
@@ -93,10 +124,10 @@ public abstract class UpdatedEmitterPropertyPanel extends PropertyPanel {
     protected void setControlValues(IMapObject mapObject) {
       this.emitter = Game.world().environment().getEmitter(mapObject.getId());
       this.spawnRateSpinner.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.SPAWNRATE));
-      this.spawnAmountSpinner.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.SPAWNAMOUNT, Emitter.DEFAULT_SPAWNAMOUNT));
-      this.updateDelaySpinner.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.UPDATERATE, Emitter.DEFAULT_UPDATERATE));
+      this.spawnAmountSpinner.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.SPAWNAMOUNT));
+      this.updateDelaySpinner.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.UPDATERATE));
       this.ttlSpinner.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.TIMETOLIVE));
-      this.maxParticlesSpinner.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.MAXPARTICLES, Emitter.DEFAULT_MAXPARTICLES));
+      this.maxParticlesSpinner.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.MAXPARTICLES));
     }
 
     @Override

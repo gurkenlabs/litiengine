@@ -35,7 +35,6 @@ import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.environment.EmitterMapObjectLoader;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
-import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.ParticleType;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.ParticleColor;
 import de.gurkenlabs.litiengine.physics.Collision;
@@ -108,10 +107,10 @@ public class EmitterPropertyPanel extends PropertyPanel {
   private final ButtonGroup buttonGroupStartX = new ButtonGroup();
   private final ButtonGroup buttonGroupStartY = new ButtonGroup();
   private final JSpinner spinnerSpawnRate = new JSpinner();
-  private final JSpinner spinnerSpawnAmount = new JSpinner(new SpinnerNumberModel(Emitter.DEFAULT_SPAWNAMOUNT, 1, 100, 1));
+  private final JSpinner spinnerSpawnAmount = new JSpinner(new SpinnerNumberModel(0, 1, 100, 1));
   private final JSpinner spinnerUpdateRate = new JSpinner();
   private final JSpinner spinnerTTL = new JSpinner();
-  private final JSpinner spinnerMaxParticles = new JSpinner(new SpinnerNumberModel(Emitter.DEFAULT_MAXPARTICLES, 1, 10000, 1));
+  private final JSpinner spinnerMaxParticles = new JSpinner(new SpinnerNumberModel(0, 1, 10000, 1));
   private final JSpinner spinnerColorDeviation = new JSpinner(getPercentModel());
   private final JSpinner spinnerAlphaDeviation = new JSpinner(getPercentModel());
   private final JSpinner spinnerMinDeltaX = new JSpinner(getParticleMinModel());
@@ -1036,10 +1035,10 @@ public class EmitterPropertyPanel extends PropertyPanel {
     this.comboBoxValign.setSelectedIndex(0);
     
     this.spinnerSpawnRate.setValue(0);
-    this.spinnerSpawnAmount.setValue(Emitter.DEFAULT_SPAWNAMOUNT);
-    this.spinnerUpdateRate.setValue(0);
-    this.spinnerTTL.setValue(0);
-    this.spinnerMaxParticles.setValue(Emitter.DEFAULT_MAXPARTICLES);
+//    this.spinnerSpawnAmount.setValue(Emitter.DEFAULT_SPAWNAMOUNT);
+//    this.spinnerUpdateRate.setValue(0);
+//    this.spinnerTTL.setValue(0);
+//    this.spinnerMaxParticles.setValue(Emitter.DEFAULT_MAXPARTICLES);
 
     this.spinnerMinDeltaX.setValue(-PARTICLEDELTA_DEFAULT_VALUE);
     this.spinnerMaxDeltaX.setValue(PARTICLEDELTA_DEFAULT_VALUE);
@@ -1106,10 +1105,10 @@ public class EmitterPropertyPanel extends PropertyPanel {
     this.comboBoxSpriteType.setSelectedIndex(0);
 
     this.spinnerSpawnRate.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.SPAWNRATE));
-    this.spinnerSpawnAmount.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.SPAWNAMOUNT, Emitter.DEFAULT_SPAWNAMOUNT));
-    this.spinnerUpdateRate.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.UPDATERATE));
-    this.spinnerTTL.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.TIMETOLIVE));
-    this.spinnerMaxParticles.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.MAXPARTICLES, Emitter.DEFAULT_MAXPARTICLES));
+//    this.spinnerSpawnAmount.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.SPAWNAMOUNT, Emitter.DEFAULT_SPAWNAMOUNT));
+//    this.spinnerUpdateRate.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.UPDATERATE));
+//    this.spinnerTTL.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.TIMETOLIVE));
+//    this.spinnerMaxParticles.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.MAXPARTICLES, Emitter.DEFAULT_MAXPARTICLES));
 
     this.spinnerColorDeviation.setValue(mapObject.getDoubleValue(MapObjectProperty.Emitter.COLORDEVIATION));
     this.spinnerAlphaDeviation.setValue(mapObject.getDoubleValue(MapObjectProperty.Emitter.ALPHADEVIATION));
