@@ -51,7 +51,7 @@ public abstract class PropertyPanel extends JPanel {
   public static final int LABEL_GAP = 0;
 
   protected boolean isFocussing;
-  private transient IMapObject dataSource;
+  protected transient IMapObject dataSource;
   private String identifier;
   private transient Icon icon;
 
@@ -153,7 +153,7 @@ public abstract class PropertyPanel extends JPanel {
   }
 
   protected void setup(JSpinner spinner, String property) {
-    spinner.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setValue(property, spinner.getValue().toString())));
+    spinner.addChangeListener(new SpinnerListener(property, spinner));
   }
 
   protected void setup(JTextField textField, String property) {
