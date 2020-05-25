@@ -6,7 +6,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JTabbedPane;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
-import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.swing.Icons;
 
@@ -14,7 +13,7 @@ import de.gurkenlabs.utiliti.swing.Icons;
 public class UpdatedEmitterPanel extends PropertyPanel {
 
   public enum EmitterPropertyGroup {
-    EMISSION, STYLE, COLOR, SIZE, ORIGIN, VELOCITY, ACCELERATION, COLLISION
+    EMISSION, STYLE, SIZE, ORIGIN, VELOCITY, ACCELERATION, COLLISION
   }
 
   JTabbedPane propertyGrouptabs;

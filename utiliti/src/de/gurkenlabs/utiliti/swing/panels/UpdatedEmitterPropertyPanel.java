@@ -2,6 +2,9 @@ package de.gurkenlabs.utiliti.swing.panels;
 
 import java.awt.LayoutManager;
 
+import javax.swing.ButtonGroup;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
 import javax.swing.JSpinner;
 import javax.swing.JToggleButton;
 import javax.swing.SpinnerNumberModel;
@@ -12,6 +15,7 @@ import de.gurkenlabs.litiengine.entities.EmitterInfo;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
+import de.gurkenlabs.litiengine.graphics.emitters.particles.ParticleType;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.utiliti.swing.Icons;
 import de.gurkenlabs.utiliti.swing.panels.UpdatedEmitterPanel.EmitterPropertyGroup;
@@ -26,6 +30,7 @@ public abstract class UpdatedEmitterPropertyPanel extends PropertyPanel {
 
   private UpdatedEmitterPropertyPanel() {
     super();
+    this.setBorder(new EmptyBorder(0, 4, 0, 0));
   }
 
   public static UpdatedEmitterPropertyPanel getEmitterPropertyPanel(EmitterPropertyGroup category) {
@@ -34,8 +39,6 @@ public abstract class UpdatedEmitterPropertyPanel extends PropertyPanel {
       return new ParticleAccelerationPanel();
     case COLLISION:
       return new ParticleCollisionPanel();
-    case COLOR:
-      return new ParticleColorPanel();
     case EMISSION:
       return new EmissionPanel();
     case ORIGIN:
@@ -100,7 +103,6 @@ public abstract class UpdatedEmitterPropertyPanel extends PropertyPanel {
       this.btnPause.setIcon(Icons.PAUSE);
 
       setLayout(this.createLayout());
-      this.setBorder(new EmptyBorder(0, 4, 0, 0));
       this.setupChangedListeners();
     }
 
@@ -152,65 +154,44 @@ public abstract class UpdatedEmitterPropertyPanel extends PropertyPanel {
   }
 
   private static class ParticleStylePanel extends UpdatedEmitterPropertyPanel {
+    private JComboBox<ParticleType> comboBoxParticleType;
+    private ButtonGroup colors;
+
     private ParticleStylePanel() {
       super();
+      this.comboBoxParticleType = new JComboBox<>(new DefaultComboBoxModel<ParticleType>(ParticleType.values()));
+      this.colors = new ButtonGroup();
+      
+      setLayout(this.createLayout());
+      this.setupChangedListeners();
     }
 
     @Override
     protected void clearControls() {
-      // TODO Auto-generated method stub
+      this.comboBoxParticleType.setSelectedItem(ParticleType.RECTANGLE);
 
     }
 
     @Override
     protected void setControlValues(IMapObject mapObject) {
       this.emitter = Game.world().environment().getEmitter(mapObject.getId());
+      this.comboBoxParticleType.setSelectedItem(mapObject.getEnumValue(MapObjectProperty.Emitter.PARTICLETYPE, ParticleType.class));
 
     }
 
     @Override
     protected LayoutManager createLayout() {
-      // TODO Auto-generated method stub
-      return null;
+      LayoutItem[] layoutItems = new LayoutItem[] { new LayoutItem("emitter_particletype", comboBoxParticleType) };
+      return this.createLayout(layoutItems);
     }
 
     @Override
     protected void setupChangedListeners() {
-      // TODO Auto-generated method stub
-
+      this.setup(this.comboBoxParticleType, MapObjectProperty.Emitter.PARTICLETYPE);
     }
   }
 
-  private static class ParticleColorPanel extends UpdatedEmitterPropertyPanel {
-    private ParticleColorPanel() {
-      super();
-    }
-
-    @Override
-    protected void clearControls() {
-      // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    protected void setControlValues(IMapObject mapObject) {
-      this.emitter = Game.world().environment().getEmitter(mapObject.getId());
-
-    }
-
-    @Override
-    protected LayoutManager createLayout() {
-      // TODO Auto-generated method stub
-      return null;
-    }
-
-    @Override
-    protected void setupChangedListeners() {
-      // TODO Auto-generated method stub
-
-    }
-  }
-
+  
   private static class ParticleSizePanel extends UpdatedEmitterPropertyPanel {
     private ParticleSizePanel() {
       super();

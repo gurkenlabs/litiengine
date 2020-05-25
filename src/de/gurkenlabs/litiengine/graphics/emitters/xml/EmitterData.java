@@ -29,7 +29,6 @@ public class EmitterData implements Serializable, Resource {
   private static final long serialVersionUID = 50238884097993529L;
 
   public static final ParticleColor DEFAULT_COLOR = new ParticleColor(ColorHelper.decode("#CC00a5bc"));
-  public static final List<ParticleColor> DEFAULT_COLORS = new ArrayList<>();
 
   public static final String DEFAULT_COLOR_PROBABILITIES = "";
   public static final String DEFAULT_SPRITESHEET = "";
@@ -191,7 +190,8 @@ public class EmitterData implements Serializable, Resource {
     this.gravityY = new ParticleParameter(DEFAULT_MIN_GRAVITY_Y, DEFAULT_MAX_GRAVITY_Y);
     this.particleWidth = new ParticleParameter(DEFAULT_MIN_WIDTH, DEFAULT_MAX_WIDTH);
     this.particleHeight = new ParticleParameter(DEFAULT_MIN_HEIGHT, DEFAULT_MAX_HEIGHT);
-    this.colors = DEFAULT_COLORS;
+    this.colors = new ArrayList<>();
+    this.colors.add(DEFAULT_COLOR);
     this.colorProbabilities = DEFAULT_COLOR_PROBABILITIES;
     this.emitterTTL = DEFAULT_TTL;
     this.width = DEFAULT_WIDTH;
