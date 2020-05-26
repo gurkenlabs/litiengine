@@ -1,14 +1,10 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
-import java.awt.Color;
 import java.awt.LayoutManager;
 
-import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.DefaultListModel;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JList;
+import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JToggleButton;
 import javax.swing.SpinnerNumberModel;
@@ -17,15 +13,13 @@ import javax.swing.border.EmptyBorder;
 import com.github.weisj.darklaf.ui.togglebutton.DarkToggleButtonUI;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.entities.EmitterInfo;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.ParticleType;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
-import de.gurkenlabs.utiliti.swing.ColorListCellRenderer;
+import de.gurkenlabs.utiliti.swing.ColorList;
 import de.gurkenlabs.utiliti.swing.Icons;
-import de.gurkenlabs.utiliti.swing.JCheckBoxList;
 import de.gurkenlabs.utiliti.swing.panels.UpdatedEmitterPanel.EmitterPropertyGroup;
 
 @SuppressWarnings("serial")
@@ -100,62 +94,62 @@ public abstract class UpdatedEmitterPropertyPanel extends PropertyPanel {
 
     private EmissionPanel() {
       super();
-      this.spawnRateSpinner = new JSpinner(new SpinnerNumberModel(EmitterData.DEFAULT_SPAWNRATE, 10, Integer.MAX_VALUE, 10));
-      this.spawnAmountSpinner = new JSpinner(new SpinnerNumberModel(EmitterData.DEFAULT_SPAWNAMOUNT, 1, 500, 1));
-      this.updateDelaySpinner = new JSpinner(new SpinnerNumberModel(EmitterData.DEFAULT_UPDATERATE, 0, Integer.MAX_VALUE, 10));
-      this.ttlSpinner = new JSpinner(new SpinnerNumberModel(EmitterData.DEFAULT_TTL, 0, Integer.MAX_VALUE, 100));
-      this.maxParticlesSpinner = new JSpinner(new SpinnerNumberModel(EmitterData.DEFAULT_MAXPARTICLES, 1, Integer.MAX_VALUE, 1));
+      spawnRateSpinner = new JSpinner(new SpinnerNumberModel(EmitterData.DEFAULT_SPAWNRATE, 10, Integer.MAX_VALUE, 10));
+      spawnAmountSpinner = new JSpinner(new SpinnerNumberModel(EmitterData.DEFAULT_SPAWNAMOUNT, 1, 500, 1));
+      updateDelaySpinner = new JSpinner(new SpinnerNumberModel(EmitterData.DEFAULT_UPDATERATE, 0, Integer.MAX_VALUE, 10));
+      ttlSpinner = new JSpinner(new SpinnerNumberModel(EmitterData.DEFAULT_TTL, 0, Integer.MAX_VALUE, 100));
+      maxParticlesSpinner = new JSpinner(new SpinnerNumberModel(EmitterData.DEFAULT_MAXPARTICLES, 1, Integer.MAX_VALUE, 1));
 
-      this.btnPause = new JToggleButton();
-      this.btnPause.setSelected(true);
-      this.btnPause.setIcon(Icons.PAUSE);
+      btnPause = new JToggleButton();
+      btnPause.setSelected(true);
+      btnPause.setIcon(Icons.PAUSE);
 
-      setLayout(this.createLayout());
-      this.setupChangedListeners();
+      setLayout(createLayout());
+      setupChangedListeners();
     }
 
     @Override
     protected LayoutManager createLayout() {
       LayoutItem[] layoutItems = new LayoutItem[] { new LayoutItem("emitter_spawnrate", spawnRateSpinner), new LayoutItem("emitter_spawnamount", spawnAmountSpinner), new LayoutItem("emitter_updateDelay", updateDelaySpinner), new LayoutItem("emitter_ttl", ttlSpinner),
           new LayoutItem("emitter_maxparticles", maxParticlesSpinner) };
-      return this.createLayout(layoutItems, this.btnPause);
+      return createLayout(layoutItems, btnPause);
     }
 
     @Override
     protected void clearControls() {
-      this.spawnRateSpinner.setValue(0);
-      this.spawnAmountSpinner.setValue(0);
-      this.updateDelaySpinner.setValue(0);
-      this.ttlSpinner.setValue(0);
-      this.maxParticlesSpinner.setValue(0);
+      spawnRateSpinner.setValue(0);
+      spawnAmountSpinner.setValue(0);
+      updateDelaySpinner.setValue(0);
+      ttlSpinner.setValue(0);
+      maxParticlesSpinner.setValue(0);
     }
 
     @Override
     protected void setControlValues(IMapObject mapObject) {
-      this.emitter = Game.world().environment().getEmitter(mapObject.getId());
-      this.spawnRateSpinner.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.SPAWNRATE));
-      this.spawnAmountSpinner.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.SPAWNAMOUNT));
-      this.updateDelaySpinner.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.UPDATERATE));
-      this.ttlSpinner.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.TIMETOLIVE));
-      this.maxParticlesSpinner.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.MAXPARTICLES));
+      emitter = Game.world().environment().getEmitter(mapObject.getId());
+      spawnRateSpinner.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.SPAWNRATE));
+      spawnAmountSpinner.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.SPAWNAMOUNT));
+      updateDelaySpinner.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.UPDATERATE));
+      ttlSpinner.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.TIMETOLIVE));
+      maxParticlesSpinner.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.MAXPARTICLES));
     }
 
     @Override
     protected void setupChangedListeners() {
-      this.setup(this.spawnRateSpinner, MapObjectProperty.Emitter.SPAWNRATE);
-      this.setup(this.spawnAmountSpinner, MapObjectProperty.Emitter.SPAWNAMOUNT);
-      this.setup(this.updateDelaySpinner, MapObjectProperty.Emitter.UPDATERATE);
-      this.setup(this.ttlSpinner, MapObjectProperty.Emitter.TIMETOLIVE);
-      this.setup(this.maxParticlesSpinner, MapObjectProperty.Emitter.MAXPARTICLES);
-      this.btnPause.addActionListener(a -> {
-        if (this.emitter != null) {
-          this.emitter.togglePaused();
+      setup(spawnRateSpinner, MapObjectProperty.Emitter.SPAWNRATE);
+      setup(spawnAmountSpinner, MapObjectProperty.Emitter.SPAWNAMOUNT);
+      setup(updateDelaySpinner, MapObjectProperty.Emitter.UPDATERATE);
+      setup(ttlSpinner, MapObjectProperty.Emitter.TIMETOLIVE);
+      setup(maxParticlesSpinner, MapObjectProperty.Emitter.MAXPARTICLES);
+      btnPause.addActionListener(a -> {
+        if (emitter != null) {
+          emitter.togglePaused();
         }
 
         if (!btnPause.isSelected()) {
-          this.btnPause.setIcon(Icons.PLAY);
+          btnPause.setIcon(Icons.PLAY);
         } else {
-          this.btnPause.setIcon(Icons.PAUSE);
+          btnPause.setIcon(Icons.PAUSE);
         }
       });
     }
@@ -164,47 +158,48 @@ public abstract class UpdatedEmitterPropertyPanel extends PropertyPanel {
   private static class ParticleStylePanel extends UpdatedEmitterPropertyPanel {
     private JComboBox<ParticleType> comboBoxParticleType;
     private JToggleButton fade;
-    private final DefaultListModel<Color> colorListModel;
-    private final JList<Color> colorList;
+    private final ColorList colorList;
+    private final JScrollPane colorListScrollPane;
 
     private ParticleStylePanel() {
       super();
-      this.comboBoxParticleType = new JComboBox<>(new DefaultComboBoxModel<ParticleType>(ParticleType.values()));
-      this.fade = new JToggleButton();
-      this.fade.putClientProperty("JToggleButton.variant", DarkToggleButtonUI.VARIANT_SLIDER);
-      this.colorListModel = new DefaultListModel<>();
-      this.colorList = new JList<>();
-      this.colorList.setModel(this.colorListModel);
-      this.colorList.setCellRenderer(new ColorListCellRenderer());
+      comboBoxParticleType = new JComboBox<>(new DefaultComboBoxModel<ParticleType>(ParticleType.values()));
+      fade = new JToggleButton();
+      fade.putClientProperty("JToggleButton.variant", DarkToggleButtonUI.VARIANT_SLIDER);
 
-      setLayout(this.createLayout());
-      this.setupChangedListeners();
+      colorList = new ColorList();
+      colorListScrollPane = new JScrollPane();
+      colorListScrollPane.setViewportView(colorList);
+
+      setLayout(createLayout());
+      setupChangedListeners();
     }
 
     @Override
     protected void clearControls() {
-      this.comboBoxParticleType.setSelectedItem(EmitterData.DEFAULT_PARTICLE_TYPE);
-      this.fade.setSelected(EmitterData.DEFAULT_FADE);
-      this.colorListModel.clear();
+      comboBoxParticleType.setSelectedItem(EmitterData.DEFAULT_PARTICLE_TYPE);
+      fade.setSelected(EmitterData.DEFAULT_FADE);
+      colorList.clear();
     }
 
     @Override
     protected void setControlValues(IMapObject mapObject) {
-      this.emitter = Game.world().environment().getEmitter(mapObject.getId());
-      this.comboBoxParticleType.setSelectedItem(mapObject.getEnumValue(MapObjectProperty.Emitter.PARTICLETYPE, ParticleType.class, EmitterData.DEFAULT_PARTICLE_TYPE));
-      this.fade.setSelected(mapObject.getBoolValue(MapObjectProperty.Particle.FADE));
+      emitter = Game.world().environment().getEmitter(mapObject.getId());
+      comboBoxParticleType.setSelectedItem(mapObject.getEnumValue(MapObjectProperty.Emitter.PARTICLETYPE, ParticleType.class, EmitterData.DEFAULT_PARTICLE_TYPE));
+      fade.setSelected(mapObject.getBoolValue(MapObjectProperty.Particle.FADE));
+      colorList.setColors(mapObject.getStringValue(MapObjectProperty.Emitter.COLORS));
     }
 
     @Override
     protected LayoutManager createLayout() {
-      LayoutItem[] layoutItems = new LayoutItem[] { new LayoutItem("emitter_particleType", comboBoxParticleType), new LayoutItem("particle_fade", fade) };
+      LayoutItem[] layoutItems = new LayoutItem[] { new LayoutItem("emitter_particleType", comboBoxParticleType), new LayoutItem("particle_fade", fade), new LayoutItem("particle_colors", colorListScrollPane, CONTROL_HEIGHT * 3) };
       return this.createLayout(layoutItems);
     }
 
     @Override
     protected void setupChangedListeners() {
-      this.setup(this.comboBoxParticleType, MapObjectProperty.Emitter.PARTICLETYPE);
-      this.setup(this.fade, MapObjectProperty.Particle.FADE);
+      setup(comboBoxParticleType, MapObjectProperty.Emitter.PARTICLETYPE);
+      setup(fade, MapObjectProperty.Particle.FADE);
     }
   }
 

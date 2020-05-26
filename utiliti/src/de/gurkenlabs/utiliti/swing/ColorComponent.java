@@ -108,8 +108,7 @@ public class ColorComponent extends JPanel {
   }
 
   public void setColor(final Color color) {
-    final String h = ColorHelper.encode(color);
-    this.setHexColor(h);
+    setHexColor(ColorHelper.encode(color));
   }
 
   public void clear() {
