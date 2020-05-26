@@ -24,6 +24,7 @@ import de.gurkenlabs.litiengine.graphics.emitters.particles.ShimmerParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.SpriteParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.TextParticle;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 
 @EmitterInfo
@@ -185,16 +186,16 @@ public class CustomEmitter extends Emitter {
     }
     particle.setX(x);
     particle.setY(y);
-    
+
     particle.setDeltaIncX(gravityX);
     particle.setDeltaIncY(gravityY);
-    
+
     particle.setDeltaX(deltaX);
     particle.setDeltaY(deltaY);
 
     particle.setDeltaWidth(deltaWidth);
     particle.setDeltaHeight(deltaHeight);
-    
+
     particle.setCollisionType(this.getEmitterData().getCollisionType());
     particle.setFade(this.getEmitterData().isFading());
     return particle;
@@ -213,8 +214,8 @@ public class CustomEmitter extends Emitter {
     this.setOriginAlign(this.getEmitterData().getOriginAlign());
     this.setOriginValign(this.getEmitterData().getOriginValign());
 
-    for (final ParticleColor color : this.getEmitterData().getColors()) {
-      this.addParticleColor(color.toColor());
+    for (final String color : this.getEmitterData().getColors()) {
+      this.addParticleColor(ColorHelper.decode(color));
     }
   }
 }

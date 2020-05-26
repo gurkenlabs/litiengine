@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -28,7 +29,7 @@ import de.gurkenlabs.litiengine.util.MathUtilities;
 public class EmitterData implements Serializable, Resource {
   private static final long serialVersionUID = 50238884097993529L;
 
-  public static final ParticleColor DEFAULT_COLOR = new ParticleColor(ColorHelper.decode("#CC00a5bc"));
+  public static final Color DEFAULT_COLOR = ColorHelper.decode("#CC00a5bc");
 
   public static final String DEFAULT_COLOR_PROBABILITIES = "";
   public static final String DEFAULT_SPRITESHEET = "";
@@ -97,9 +98,9 @@ public class EmitterData implements Serializable, Resource {
   @XmlElement
   private String colorProbabilities;
 
-  @XmlElementWrapper(name = "colors")
-  @XmlElement(name = "color")
-  private List<ParticleColor> colors;
+  @XmlElementWrapper
+  @XmlElement(name="color")
+  private List<String> colors;
 
   @XmlElement
   private ParticleParameter deltaHeight;
@@ -190,8 +191,7 @@ public class EmitterData implements Serializable, Resource {
     this.gravityY = new ParticleParameter(DEFAULT_MIN_GRAVITY_Y, DEFAULT_MAX_GRAVITY_Y);
     this.particleWidth = new ParticleParameter(DEFAULT_MIN_WIDTH, DEFAULT_MAX_WIDTH);
     this.particleHeight = new ParticleParameter(DEFAULT_MIN_HEIGHT, DEFAULT_MAX_HEIGHT);
-    this.colors = new ArrayList<>();
-    this.colors.add(DEFAULT_COLOR);
+    this.setColor(DEFAULT_COLOR);
     this.colorProbabilities = DEFAULT_COLOR_PROBABILITIES;
     this.emitterTTL = DEFAULT_TTL;
     this.width = DEFAULT_WIDTH;
@@ -236,7 +236,7 @@ public class EmitterData implements Serializable, Resource {
   }
 
   @XmlTransient
-  public List<ParticleColor> getColors() {
+  public List<String> getColors() {
     return this.colors;
   }
 
@@ -386,8 +386,8 @@ public class EmitterData implements Serializable, Resource {
   }
 
   public void setColor(final Color color) {
-    final List<ParticleColor> tmpList = new ArrayList<>();
-    tmpList.add(new ParticleColor(color));
+    final List<String> tmpList = new ArrayList<>();
+    tmpList.add(ColorHelper.encode(color));
     this.colors = tmpList;
   }
 
@@ -403,7 +403,7 @@ public class EmitterData implements Serializable, Resource {
     this.colorProbabilities = colorProbabilities;
   }
 
-  public void setColors(final List<ParticleColor> colors) {
+  public void setColors(final List<String> colors) {
     this.colors = colors;
   }
 

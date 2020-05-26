@@ -426,7 +426,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
 
   protected Color getRandomParticleColor() {
     if (this.colors.isEmpty()) {
-      return EmitterData.DEFAULT_COLOR.toColor();
+      return EmitterData.DEFAULT_COLOR;
     }
 
     return this.colors.get(ThreadLocalRandom.current().nextInt(this.colors.size()));

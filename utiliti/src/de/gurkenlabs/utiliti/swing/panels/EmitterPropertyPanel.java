@@ -36,11 +36,12 @@ import de.gurkenlabs.litiengine.environment.EmitterMapObjectLoader;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.ParticleType;
-import de.gurkenlabs.litiengine.graphics.emitters.xml.ParticleColor;
+import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.litiengine.physics.Collision;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
+import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.utiliti.Style;
 import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.swing.Icons;
@@ -55,7 +56,7 @@ public class EmitterPropertyPanel extends PropertyPanel {
   private final DefaultTableModel model;
   private final JTextField txt;
   private final JTable table;
-  private final List<ParticleColor> colors;
+  private final List<Color> colors;
   private transient IMapObject backupMapObject;
   private final JTabbedPane tabbedPanel;
   private final JPanel colorPanel;
@@ -913,15 +914,14 @@ public class EmitterPropertyPanel extends PropertyPanel {
         return;
       }
 
-      ParticleColor color = colors.get(table.getSelectedRow());
-      Color result = JColorChooser.showDialog(null, Resources.strings().get("panel_selectEmitterColor"), color.toColor());
+      Color color = colors.get(table.getSelectedRow());
+      Color result = JColorChooser.showDialog(null, Resources.strings().get("panel_selectEmitterColor"), color);
       if (result == null) {
         return;
       }
 
-      ParticleColor c = new ParticleColor(result);
-      colors.set(table.getSelectedRow(), c);
-      model.setValueAt(c, table.getSelectedRow(), 1);
+      colors.set(table.getSelectedRow(), result);
+      model.setValueAt(result, table.getSelectedRow(), 1);
       if (getDataSource() != null) {
         String commaSeperated = ArrayUtilities.join(colors);
         this.getDataSource().setValue(MapObjectProperty.Emitter.COLORS, commaSeperated);
@@ -942,7 +942,7 @@ public class EmitterPropertyPanel extends PropertyPanel {
     });
 
     this.btnAddColor.addActionListener(a -> {
-      ParticleColor c = new ParticleColor();
+      Color c = EmitterData.DEFAULT_COLOR;
       colors.add(c);
       model.addRow(new Object[] { null, c.toString() });
     });
@@ -1159,8 +1159,8 @@ public class EmitterPropertyPanel extends PropertyPanel {
     this.rdbtnRandomStartY.setSelected(mapObject.getBoolValue(MapObjectProperty.Particle.Y_RANDOM));
 
     this.model.setRowCount(0);
-    for (ParticleColor color : EmitterMapObjectLoader.getColors(mapObject)) {
-      this.colors.add(color);
+    for (String color : EmitterMapObjectLoader.getColors(mapObject)) {
+      this.colors.add(ColorHelper.decode(color));
       this.model.addRow(new Object[] { null, color.toString() });
     }
     
@@ -1216,7 +1216,7 @@ public class EmitterPropertyPanel extends PropertyPanel {
         return l;
       }
 
-      Color bg = colors.get(row).toColor();
+      Color bg = colors.get(row);
       l.setBackground(bg);
       l.setForeground(bg.getAlpha() > 100 ? Color.WHITE : Color.BLACK);
 

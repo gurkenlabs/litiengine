@@ -24,6 +24,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
@@ -133,6 +134,10 @@ public abstract class PropertyPanel extends JPanel {
   protected abstract void clearControls();
 
   protected abstract void setControlValues(IMapObject mapObject);
+
+  protected void setup(JToggleButton toggle, String property) {
+    toggle.addActionListener(new MapObjectPropertyActionListener(m -> m.setValue(property, toggle.isSelected())));
+  }
 
   protected void setup(JCheckBox checkbox, String property) {
     checkbox.addActionListener(new MapObjectPropertyActionListener(m -> m.setValue(property, checkbox.isSelected())));
