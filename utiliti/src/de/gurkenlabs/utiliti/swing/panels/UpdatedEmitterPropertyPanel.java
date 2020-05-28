@@ -6,6 +6,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
+import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.EmptyBorder;
@@ -18,7 +19,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.ParticleType;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
-import de.gurkenlabs.utiliti.swing.ColorList;
+import de.gurkenlabs.utiliti.swing.ColorTable;
 import de.gurkenlabs.utiliti.swing.Icons;
 import de.gurkenlabs.utiliti.swing.panels.UpdatedEmitterPanel.EmitterPropertyGroup;
 
@@ -158,28 +159,29 @@ public abstract class UpdatedEmitterPropertyPanel extends PropertyPanel {
   private static class ParticleStylePanel extends UpdatedEmitterPropertyPanel {
     private JComboBox<ParticleType> comboBoxParticleType;
     private JToggleButton fade;
-    private final ColorList colorList;
-    private final JScrollPane colorListScrollPane;
+    private final ColorTable colorTable;
 
     private ParticleStylePanel() {
       super();
       comboBoxParticleType = new JComboBox<>(new DefaultComboBoxModel<ParticleType>(ParticleType.values()));
       fade = new JToggleButton();
       fade.putClientProperty("JToggleButton.variant", DarkToggleButtonUI.VARIANT_SLIDER);
-
-      colorList = new ColorList();
-      colorListScrollPane = new JScrollPane();
-      colorListScrollPane.setViewportView(colorList);
+      colorTable = new ColorTable();
 
       setLayout(createLayout());
       setupChangedListeners();
     }
 
     @Override
+    public void bind(IMapObject mapObject) {
+      super.bind(mapObject);
+      colorTable.bind(mapObject);
+    }
+    
+    @Override
     protected void clearControls() {
       comboBoxParticleType.setSelectedItem(EmitterData.DEFAULT_PARTICLE_TYPE);
       fade.setSelected(EmitterData.DEFAULT_FADE);
-      colorList.clear();
     }
 
     @Override
@@ -187,12 +189,11 @@ public abstract class UpdatedEmitterPropertyPanel extends PropertyPanel {
       emitter = Game.world().environment().getEmitter(mapObject.getId());
       comboBoxParticleType.setSelectedItem(mapObject.getEnumValue(MapObjectProperty.Emitter.PARTICLETYPE, ParticleType.class, EmitterData.DEFAULT_PARTICLE_TYPE));
       fade.setSelected(mapObject.getBoolValue(MapObjectProperty.Particle.FADE));
-      colorList.setColors(mapObject.getStringValue(MapObjectProperty.Emitter.COLORS));
     }
 
     @Override
     protected LayoutManager createLayout() {
-      LayoutItem[] layoutItems = new LayoutItem[] { new LayoutItem("emitter_particleType", comboBoxParticleType), new LayoutItem("particle_fade", fade), new LayoutItem("particle_colors", colorListScrollPane, CONTROL_HEIGHT * 3) };
+      LayoutItem[] layoutItems = new LayoutItem[] { new LayoutItem("emitter_particleType", comboBoxParticleType), new LayoutItem("particle_fade", fade), new LayoutItem("particle_colors", colorTable, CONTROL_HEIGHT * 3) };
       return this.createLayout(layoutItems);
     }
 

@@ -1,6 +1,7 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -9,6 +10,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -23,18 +25,22 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.swing.ControlBehavior;
@@ -50,6 +56,7 @@ public abstract class PropertyPanel extends JPanel {
   public static final int CONTROL_MARGIN = (int) (5 * Editor.preferences().getUiScale());
   public static final int PANEL_WIDTH = 2 * (CONTROL_WIDTH + LABEL_WIDTH + CONTROL_MARGIN);
   public static final int LABEL_GAP = 0;
+  public static final Dimension BUTTON_SIZE = new Dimension(CONTROL_HEIGHT, CONTROL_HEIGHT);
 
   protected boolean isFocussing;
   protected transient IMapObject dataSource;
@@ -170,6 +177,10 @@ public abstract class PropertyPanel extends JPanel {
     textList.addActionListener(new MapObjectPropertyActionListener(m -> m.setValue(property, textList.getJoinedString())));
   }
 
+  protected void setup(JTable table, String... properties) {
+    table.getModel().addTableModelListener(new TableListener(table, properties));
+  }
+
   protected class MapObjectPropertyItemListener implements ItemListener {
     private final Consumer<IMapObject> updateAction;
 
@@ -204,6 +215,24 @@ public abstract class PropertyPanel extends JPanel {
     }
   }
 
+  protected class MabObjectPropertyTableModelListener implements TableModelListener {
+    private final Consumer<IMapObject> updateAction;
+
+    MabObjectPropertyTableModelListener(Consumer<IMapObject> updateAction) {
+      this.updateAction = updateAction;
+    }
+
+    @Override
+    public void tableChanged(TableModelEvent e) {
+      if (getDataSource() == null || isFocussing) {
+        return;
+      }
+      applyChanges(this.updateAction);
+
+    }
+
+  }
+
   protected class MapObjectPropertyChangeListener implements ChangeListener {
     private final Consumer<IMapObject> updateAction;
 
@@ -224,6 +253,22 @@ public abstract class PropertyPanel extends JPanel {
   protected class SpinnerListener extends MapObjectPropertyChangeListener {
     SpinnerListener(String mapObjectProperty, JSpinner spinner) {
       super(m -> m.setValue(mapObjectProperty, spinner.getValue().toString()));
+    }
+  }
+
+  protected class TableListener extends MabObjectPropertyTableModelListener {
+    TableListener(JTable table, String... mapObjectProperties) {
+      super(m -> {
+        int column = 0;
+        for (String prop : mapObjectProperties) {
+          ArrayList<Object> values = new ArrayList<>();
+          for (int i = 0; i < table.getRowCount(); i++) {
+            values.add(table.getValueAt(i, column));
+          }
+          m.setValue(prop, ArrayUtilities.join(values, ","));
+          column++;
+        }
+      });
     }
   }
 
