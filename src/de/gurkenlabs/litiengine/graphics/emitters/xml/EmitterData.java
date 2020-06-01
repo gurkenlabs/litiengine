@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -47,8 +46,8 @@ public class EmitterData implements Serializable, Resource {
 
   public static final float DEFAULT_WIDTH = 16f;
   public static final float DEFAULT_HEIGHT = 16f;
-  public static final float DEFAULT_COLOR_DEVIATION = 0f;
-  public static final float DEFAULT_ALPHA_DEVIATION = 0f;
+  public static final float DEFAULT_COLOR_VARIANCE = 0f;
+  public static final float DEFAULT_ALPHA_VARIANCE = 0f;
 
   public static final int DEFAULT_UPDATERATE = 40;
   public static final int DEFAULT_SPAWNAMOUNT = 20;
@@ -84,7 +83,7 @@ public class EmitterData implements Serializable, Resource {
   public static final float DEFAULT_MAX_HEIGHT = 6f;
 
   @XmlElement
-  private float alphaDeviation;
+  private float alphaVariance;
 
   @XmlElement
   private boolean animateSprite;
@@ -93,7 +92,7 @@ public class EmitterData implements Serializable, Resource {
   private Collision collisionType;
 
   @XmlElement
-  private float colorDeviation;
+  private float colorVariance;
 
   @XmlElement
   private String colorProbabilities;
@@ -196,8 +195,8 @@ public class EmitterData implements Serializable, Resource {
     this.emitterTTL = DEFAULT_TTL;
     this.width = DEFAULT_WIDTH;
     this.height = DEFAULT_HEIGHT;
-    this.colorDeviation = DEFAULT_COLOR_DEVIATION;
-    this.alphaDeviation = DEFAULT_ALPHA_DEVIATION;
+    this.colorVariance = DEFAULT_COLOR_VARIANCE;
+    this.alphaVariance = DEFAULT_ALPHA_VARIANCE;
     this.updateRate = DEFAULT_UPDATERATE;
     this.collisionType = DEFAULT_COLLISION;
     this.maxParticles = DEFAULT_MAXPARTICLES;
@@ -216,8 +215,8 @@ public class EmitterData implements Serializable, Resource {
   }
 
   @XmlTransient
-  public float getAlphaDeviation() {
-    return this.alphaDeviation;
+  public float getAlphaVariance() {
+    return this.alphaVariance;
   }
 
   @XmlTransient
@@ -226,8 +225,8 @@ public class EmitterData implements Serializable, Resource {
   }
 
   @XmlTransient
-  public float getColorDeviation() {
-    return this.colorDeviation;
+  public float getColorVariance() {
+    return this.colorVariance;
   }
 
   @XmlTransient
@@ -373,8 +372,8 @@ public class EmitterData implements Serializable, Resource {
     return this.fade;
   }
 
-  public void setAlphaDeviation(final float alphaDeviation) {
-    this.alphaDeviation = MathUtilities.clamp(alphaDeviation, 0, 1);
+  public void setAlphaVariance(final float alphaVariance) {
+    this.alphaVariance = MathUtilities.clamp(alphaVariance, 0, 1);
   }
 
   public void setAnimateSprite(final boolean animateSprite) {
@@ -391,8 +390,8 @@ public class EmitterData implements Serializable, Resource {
     this.colors = tmpList;
   }
 
-  public void setColorDeviation(final float colorDeviation) {
-    this.colorDeviation = MathUtilities.clamp(colorDeviation, 0, 1);
+  public void setColorVariance(final float colorVariance) {
+    this.colorVariance = MathUtilities.clamp(colorVariance, 0, 1);
   }
 
   public void setColorProbabilities(final double[] colorProbabilities) {

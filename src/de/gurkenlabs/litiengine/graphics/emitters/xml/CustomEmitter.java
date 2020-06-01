@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.graphics.emitters.xml;
 
+import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.net.URL;
@@ -123,6 +124,15 @@ public class CustomEmitter extends Emitter {
 
   public EmitterData getEmitterData() {
     return this.emitterData;
+  }
+
+  @Override
+  protected Color getRandomParticleColor() {
+    if (this.getColors().isEmpty()) {
+      return EmitterData.DEFAULT_COLOR;
+    }
+
+    return ColorHelper.getRandomVariant(this.getColors().get(ThreadLocalRandom.current().nextInt(this.getColors().size())), this.getEmitterData().getColorVariance(), this.getEmitterData().getAlphaVariance());
   }
 
   @Override

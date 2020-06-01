@@ -1005,8 +1005,8 @@ public class EmitterPropertyPanel extends PropertyPanel {
     this.spinnerMinStartY.addChangeListener(new SpinnerListener(MapObjectProperty.Particle.MINY, this.spinnerMinStartY));
     this.spinnerMaxStartY.addChangeListener(new SpinnerListener(MapObjectProperty.Particle.MAXY, this.spinnerMaxStartY));
     
-    this.spinnerColorDeviation.addChangeListener(new SpinnerListener(MapObjectProperty.Emitter.COLORDEVIATION, this.spinnerColorDeviation));
-    this.spinnerAlphaDeviation.addChangeListener(new SpinnerListener(MapObjectProperty.Emitter.ALPHADEVIATION, this.spinnerAlphaDeviation));
+    this.spinnerColorDeviation.addChangeListener(new SpinnerListener(MapObjectProperty.Emitter.COLORVARIANCE, this.spinnerColorDeviation));
+    this.spinnerAlphaDeviation.addChangeListener(new SpinnerListener(MapObjectProperty.Emitter.ALPHAVARIANCE, this.spinnerAlphaDeviation));
 
     this.txt.addActionListener(new MapObjectPropertyActionListener(m -> m.setValue(MapObjectProperty.Particle.TEXT, this.txt.getText())));
     
@@ -1110,8 +1110,8 @@ public class EmitterPropertyPanel extends PropertyPanel {
 //    this.spinnerTTL.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.TIMETOLIVE));
 //    this.spinnerMaxParticles.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.MAXPARTICLES, Emitter.DEFAULT_MAXPARTICLES));
 
-    this.spinnerColorDeviation.setValue(mapObject.getDoubleValue(MapObjectProperty.Emitter.COLORDEVIATION));
-    this.spinnerAlphaDeviation.setValue(mapObject.getDoubleValue(MapObjectProperty.Emitter.ALPHADEVIATION));
+    this.spinnerColorDeviation.setValue(mapObject.getDoubleValue(MapObjectProperty.Emitter.COLORVARIANCE));
+    this.spinnerAlphaDeviation.setValue(mapObject.getDoubleValue(MapObjectProperty.Emitter.ALPHAVARIANCE));
 
     this.spinnerMinDeltaX.setValue(mapObject.getDoubleValue(MapObjectProperty.Particle.MINDELTAX, -PARTICLEDELTA_DEFAULT_VALUE));
     this.spinnerMaxDeltaX.setValue(mapObject.getDoubleValue(MapObjectProperty.Particle.MAXDELTAX, PARTICLEDELTA_DEFAULT_VALUE));
