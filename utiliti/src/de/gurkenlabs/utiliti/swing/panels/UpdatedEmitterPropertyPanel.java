@@ -11,7 +11,9 @@ import javax.swing.border.EmptyBorder;
 
 import com.github.weisj.darklaf.ui.togglebutton.DarkToggleButtonUI;
 
+import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
@@ -43,7 +45,7 @@ public abstract class UpdatedEmitterPropertyPanel extends PropertyPanel {
     case EMISSION:
       return new EmissionPanel();
     case ORIGIN:
-      return new ParticleOffsetPanel();
+      return new ParticleOriginPanel();
     case SIZE:
       return new ParticleSizePanel();
     case STYLE:
@@ -232,7 +234,6 @@ public abstract class UpdatedEmitterPropertyPanel extends PropertyPanel {
 
     @Override
     protected LayoutManager createLayout() {
-      // TODO Auto-generated method stub
       return null;
     }
 
@@ -243,32 +244,43 @@ public abstract class UpdatedEmitterPropertyPanel extends PropertyPanel {
     }
   }
 
-  private static class ParticleOffsetPanel extends UpdatedEmitterPropertyPanel {
-    private ParticleOffsetPanel() {
+  private static class ParticleOriginPanel extends UpdatedEmitterPropertyPanel {
+    private JComboBox<Align> comboBoxAlign;
+    private JComboBox<Valign> comboBoxValign;
+
+    private ParticleOriginPanel() {
       super();
+      comboBoxAlign = new JComboBox<>(new DefaultComboBoxModel<Align>(Align.values()));
+      comboBoxValign = new JComboBox<>(new DefaultComboBoxModel<Valign>(Valign.values()));
+      setLayout(createLayout());
+      setupChangedListeners();
     }
 
     @Override
     protected void clearControls() {
-      // TODO Auto-generated method stub
+      comboBoxAlign.setSelectedItem(EmitterData.DEFAULT_ORIGIN_ALIGN);
+      comboBoxValign.setSelectedItem(EmitterData.DEFAULT_ORIGIN_VALIGN);
 
     }
 
     @Override
     protected void setControlValues(IMapObject mapObject) {
       this.emitter = Game.world().environment().getEmitter(mapObject.getId());
+      comboBoxAlign.setSelectedItem(mapObject.getEnumValue(MapObjectProperty.Emitter.ORIGIN_ALIGN, Align.class, EmitterData.DEFAULT_ORIGIN_ALIGN));
+      comboBoxValign.setSelectedItem(mapObject.getEnumValue(MapObjectProperty.Emitter.ORIGIN_VALIGN, Valign.class, EmitterData.DEFAULT_ORIGIN_VALIGN));
 
     }
 
     @Override
     protected LayoutManager createLayout() {
-      // TODO Auto-generated method stub
-      return null;
+      LayoutItem[] layoutItems = new LayoutItem[] { new LayoutItem("emitter_originAlign", comboBoxAlign), new LayoutItem("emitter_originValign", comboBoxValign) };
+      return this.createLayout(layoutItems);
     }
 
     @Override
     protected void setupChangedListeners() {
-      // TODO Auto-generated method stub
+      setup(comboBoxAlign, MapObjectProperty.Emitter.ORIGIN_ALIGN);
+      setup(comboBoxValign, MapObjectProperty.Emitter.ORIGIN_VALIGN);
 
     }
   }
