@@ -17,11 +17,11 @@ import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.EllipseParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.LeftLineParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.Particle;
+import de.gurkenlabs.litiengine.graphics.emitters.particles.PolygonParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.RectangleParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.RightLineParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.SpriteParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.TextParticle;
-import de.gurkenlabs.litiengine.graphics.emitters.particles.TriangleParticle;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
@@ -167,7 +167,10 @@ public class CustomEmitter extends Emitter {
       particle = new RectangleParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL());
       break;
     case TRIANGLE:
-      particle = new TriangleParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL());
+      particle = new PolygonParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL(), 3);
+      break;
+    case DIAMOND:
+      particle = new PolygonParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL(), 4);
       break;
     case LEFTLINE:
       particle = new LeftLineParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL());
