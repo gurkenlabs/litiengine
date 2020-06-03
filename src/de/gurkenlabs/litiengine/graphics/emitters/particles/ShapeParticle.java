@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.graphics.emitters.particles;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Shape;
@@ -14,11 +15,13 @@ public abstract class ShapeParticle extends Particle {
   }
 
   protected abstract Shape getShape(final Point2D emitterOrigin);
-  
+
   @Override
   public void render(final Graphics2D g, final Point2D emitterOrigin) {
     g.setColor(this.getColor());
-
-    Game.graphics().renderShape(g, this.getShape(emitterOrigin));
+    if (this.isOutlineOnly()) {
+      Game.graphics().renderOutline(g, this.getShape(emitterOrigin), new BasicStroke(1.0f / Game.graphics().getBaseRenderScale()));
+    } else
+      Game.graphics().renderShape(g, this.getShape(emitterOrigin));
   }
 }

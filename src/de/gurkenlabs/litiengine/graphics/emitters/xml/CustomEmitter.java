@@ -14,15 +14,14 @@ import javax.xml.bind.JAXBException;
 import de.gurkenlabs.litiengine.entities.EmitterInfo;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
-import de.gurkenlabs.litiengine.graphics.emitters.particles.EllipseOutlineParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.EllipseParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.LeftLineParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.Particle;
-import de.gurkenlabs.litiengine.graphics.emitters.particles.RectangleFillParticle;
-import de.gurkenlabs.litiengine.graphics.emitters.particles.RectangleOutlineParticle;
+import de.gurkenlabs.litiengine.graphics.emitters.particles.RectangleParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.RightLineParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.SpriteParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.TextParticle;
+import de.gurkenlabs.litiengine.graphics.emitters.particles.TriangleParticle;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
@@ -164,14 +163,11 @@ public class CustomEmitter extends Emitter {
     case ELLIPSE:
       particle = new EllipseParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL());
       break;
-    case ELLIPSE_OUTLINE:
-      particle = new EllipseOutlineParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL());
-      break;
     case RECTANGLE:
-      particle = new RectangleFillParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL());
+      particle = new RectangleParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL());
       break;
-    case RECTANGLE_OUTLINE:
-      particle = new RectangleOutlineParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL());
+    case TRIANGLE:
+      particle = new TriangleParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL());
       break;
     case LEFTLINE:
       particle = new LeftLineParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL());
@@ -191,7 +187,7 @@ public class CustomEmitter extends Emitter {
       particle = new SpriteParticle(sprite.getSprite(ThreadLocalRandom.current().nextInt(0, sprite.getTotalNumberOfSprites() - 1)), this.getRandomParticleTTL());
       break;
     default:
-      particle = new RectangleFillParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL());
+      particle = new RectangleParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL());
       break;
     }
     particle.setX(x);
@@ -207,6 +203,7 @@ public class CustomEmitter extends Emitter {
     particle.setDeltaHeight(deltaHeight);
 
     particle.setCollisionType(this.getEmitterData().getCollisionType());
+    particle.setOutlineOnly(this.getEmitterData().isOutlineOnly());
     particle.setFade(this.getEmitterData().isFading());
     return particle;
   }

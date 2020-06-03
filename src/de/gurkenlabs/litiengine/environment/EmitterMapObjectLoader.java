@@ -97,6 +97,7 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     data.setSpritesheet(mapObject.getStringValue(MapObjectProperty.Particle.SPRITE));
     data.setAnimateSprite(mapObject.getBoolValue(MapObjectProperty.Particle.ANIMATESPRITE));
     data.setFade(mapObject.getBoolValue(MapObjectProperty.Particle.FADE));
+    data.setOutlineOnly(mapObject.getBoolValue(MapObjectProperty.Particle.OUTLINEONLY));
     return data;
   }
 
@@ -154,6 +155,7 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     mo.setValue(MapObjectProperty.Particle.SPRITE, emitterData.getSpritesheet());
     mo.setValue(MapObjectProperty.Particle.ANIMATESPRITE, emitterData.isAnimateSprite());
     mo.setValue(MapObjectProperty.Particle.FADE, emitterData.isFading());
+    mo.setValue(MapObjectProperty.Particle.OUTLINEONLY, emitterData.isOutlineOnly());
   }
 
   public static IMapObject createMapObject(EmitterData emitterData) {

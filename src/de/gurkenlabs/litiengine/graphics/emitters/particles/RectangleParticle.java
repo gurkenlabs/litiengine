@@ -5,8 +5,9 @@ import java.awt.Shape;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
-public class RectangleOutlineParticle extends OutlineParticle {
-  public RectangleOutlineParticle(final float width, final float height, final Color color, final int ttl) {
+public class RectangleParticle extends ShapeParticle {
+
+  public RectangleParticle(final float width, final float height, final Color color, final int ttl) {
     super(width, height, color, ttl);
   }
 

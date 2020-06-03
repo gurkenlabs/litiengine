@@ -22,6 +22,7 @@ public abstract class Particle implements ITimeToLive {
   private float deltaWidth;
   private float deltaX;
   private float deltaY;
+  private boolean outlineOnly;
 
   /**
    * The gravitational pull to the left (negative) and right (positive) acting
@@ -132,6 +133,10 @@ public abstract class Particle implements ITimeToLive {
 
   public float getHeight() {
     return this.height;
+  }
+
+  public boolean isOutlineOnly() {
+    return this.outlineOnly;
   }
 
   /**
@@ -273,6 +278,11 @@ public abstract class Particle implements ITimeToLive {
 
   public Particle setHeight(final float height) {
     this.height = height;
+    return this;
+  }
+
+  public Particle setOutlineOnly(final boolean outlineOnly) {
+    this.outlineOnly = outlineOnly;
     return this;
   }
 

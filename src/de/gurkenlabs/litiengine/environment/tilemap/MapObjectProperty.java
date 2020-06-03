@@ -122,6 +122,7 @@ public final class MapObjectProperty {
     public static final String MINTTL = "particleMinTTL";
     public static final String MAXTTL = "particleMaxTTL";
     public static final String FADE = "particleFade";
+    public static final String OUTLINEONLY = "particleOutlineOnly";
 
     private Particle() {
     }

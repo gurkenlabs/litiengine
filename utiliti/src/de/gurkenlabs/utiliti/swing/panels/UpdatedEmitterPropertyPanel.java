@@ -159,6 +159,7 @@ public abstract class UpdatedEmitterPropertyPanel extends PropertyPanel {
   private static class ParticleStylePanel extends UpdatedEmitterPropertyPanel {
     private JComboBox<ParticleType> comboBoxParticleType;
     private JToggleButton fade;
+    private JToggleButton outlineOnly;
     private final ColorTable colorTable;
     private JSpinner colorVariance;
     private JSpinner alphaVariance;
@@ -166,6 +167,8 @@ public abstract class UpdatedEmitterPropertyPanel extends PropertyPanel {
     private ParticleStylePanel() {
       super();
       comboBoxParticleType = new JComboBox<>(new DefaultComboBoxModel<ParticleType>(ParticleType.values()));
+      outlineOnly = new JToggleButton();
+      outlineOnly.putClientProperty("JToggleButton.variant", DarkToggleButtonUI.VARIANT_SLIDER);
       fade = new JToggleButton();
       fade.putClientProperty("JToggleButton.variant", DarkToggleButtonUI.VARIANT_SLIDER);
       colorTable = new ColorTable();
@@ -185,6 +188,7 @@ public abstract class UpdatedEmitterPropertyPanel extends PropertyPanel {
     @Override
     protected void clearControls() {
       comboBoxParticleType.setSelectedItem(EmitterData.DEFAULT_PARTICLE_TYPE);
+      outlineOnly.setSelected(EmitterData.DEFAULT_OUTLINE_ONLY);
       fade.setSelected(EmitterData.DEFAULT_FADE);
       colorVariance.setValue(EmitterData.DEFAULT_COLOR_VARIANCE);
       alphaVariance.setValue(EmitterData.DEFAULT_ALPHA_VARIANCE);
@@ -194,6 +198,7 @@ public abstract class UpdatedEmitterPropertyPanel extends PropertyPanel {
     protected void setControlValues(IMapObject mapObject) {
       emitter = Game.world().environment().getEmitter(mapObject.getId());
       comboBoxParticleType.setSelectedItem(mapObject.getEnumValue(MapObjectProperty.Emitter.PARTICLETYPE, ParticleType.class, EmitterData.DEFAULT_PARTICLE_TYPE));
+      outlineOnly.setSelected(mapObject.getBoolValue(MapObjectProperty.Particle.OUTLINEONLY, EmitterData.DEFAULT_OUTLINE_ONLY));
       fade.setSelected(mapObject.getBoolValue(MapObjectProperty.Particle.FADE, EmitterData.DEFAULT_FADE));
       colorVariance.setValue(mapObject.getFloatValue(MapObjectProperty.Emitter.COLORVARIANCE, EmitterData.DEFAULT_COLOR_VARIANCE));
       alphaVariance.setValue(mapObject.getFloatValue(MapObjectProperty.Emitter.ALPHAVARIANCE, EmitterData.DEFAULT_ALPHA_VARIANCE));
@@ -201,14 +206,15 @@ public abstract class UpdatedEmitterPropertyPanel extends PropertyPanel {
 
     @Override
     protected LayoutManager createLayout() {
-      LayoutItem[] layoutItems = new LayoutItem[] { new LayoutItem("emitter_particleType", comboBoxParticleType), new LayoutItem("particle_fade", fade), new LayoutItem("particle_colors", colorTable, CONTROL_HEIGHT * 3), new LayoutItem("emitter_colorVariance", colorVariance),
-          new LayoutItem("emitter_alphaVariance", alphaVariance) };
+      LayoutItem[] layoutItems = new LayoutItem[] { new LayoutItem("emitter_particleType", comboBoxParticleType), new LayoutItem("particle_fade", fade), new LayoutItem("particle_outlineonly", outlineOnly), new LayoutItem("particle_colors", colorTable, CONTROL_HEIGHT * 3),
+          new LayoutItem("emitter_colorVariance", colorVariance), new LayoutItem("emitter_alphaVariance", alphaVariance) };
       return this.createLayout(layoutItems);
     }
 
     @Override
     protected void setupChangedListeners() {
       setup(comboBoxParticleType, MapObjectProperty.Emitter.PARTICLETYPE);
+      setup(outlineOnly, MapObjectProperty.Particle.OUTLINEONLY);
       setup(fade, MapObjectProperty.Particle.FADE);
       setup(colorVariance, MapObjectProperty.Emitter.COLORVARIANCE);
       setup(alphaVariance, MapObjectProperty.Emitter.ALPHAVARIANCE);

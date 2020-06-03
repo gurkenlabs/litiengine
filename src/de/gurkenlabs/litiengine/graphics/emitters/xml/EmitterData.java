@@ -37,6 +37,7 @@ public class EmitterData implements Serializable, Resource {
 
   public static final boolean DEFAULT_ANIMATE_SPRITE = true;
   public static final boolean DEFAULT_FADE = true;
+  public static final boolean DEFAULT_OUTLINE_ONLY = false;
 
   public static final Collision DEFAULT_COLLISION = Collision.NONE;
   public static final ParticleType DEFAULT_PARTICLE_TYPE = ParticleType.RECTANGLE;
@@ -98,7 +99,7 @@ public class EmitterData implements Serializable, Resource {
   private String colorProbabilities;
 
   @XmlElementWrapper
-  @XmlElement(name="color")
+  @XmlElement(name = "color")
   private List<String> colors;
 
   @XmlElement
@@ -118,6 +119,9 @@ public class EmitterData implements Serializable, Resource {
 
   @XmlElement
   private boolean fade;
+
+  @XmlElement
+  private boolean outlineOnly;
 
   @XmlElement
   private ParticleParameter gravityX;
@@ -212,6 +216,7 @@ public class EmitterData implements Serializable, Resource {
     this.originValign = DEFAULT_ORIGIN_VALIGN;
     this.originAlign = DEFAULT_ORIGIN_ALIGN;
     this.fade = DEFAULT_FADE;
+    this.outlineOnly = DEFAULT_OUTLINE_ONLY;
   }
 
   @XmlTransient
@@ -372,6 +377,10 @@ public class EmitterData implements Serializable, Resource {
     return this.fade;
   }
 
+  public boolean isOutlineOnly() {
+    return this.outlineOnly;
+  }
+
   public void setAlphaVariance(final float alphaVariance) {
     this.alphaVariance = MathUtilities.clamp(alphaVariance, 0, 1);
   }
@@ -457,6 +466,10 @@ public class EmitterData implements Serializable, Resource {
 
   public void setOriginValign(final Valign valign) {
     this.originValign = valign;
+  }
+
+  public void setOutlineOnly(final boolean outlineOnly) {
+    this.outlineOnly = outlineOnly;
   }
 
   public void setParticleHeight(final ParticleParameter particleHeight) {

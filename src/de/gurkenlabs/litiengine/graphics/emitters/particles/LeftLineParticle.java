@@ -5,7 +5,7 @@ import java.awt.Shape;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 
-public class LeftLineParticle extends OutlineParticle {
+public class LeftLineParticle extends ShapeParticle {
 
   public LeftLineParticle(final float width, final float height, final Color color, final int ttl) {
     super(width, height, color, ttl);

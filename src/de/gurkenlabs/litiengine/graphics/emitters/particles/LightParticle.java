@@ -3,7 +3,7 @@ package de.gurkenlabs.litiengine.graphics.emitters.particles;
 import java.awt.Color;
 import java.awt.geom.Point2D;
 
-public class LightParticle extends RectangleFillParticle {
+public class LightParticle extends RectangleParticle {
   private final float maxHeight;
   private final float maxWidth;
 
