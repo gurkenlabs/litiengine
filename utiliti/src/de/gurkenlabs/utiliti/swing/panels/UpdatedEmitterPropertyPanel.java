@@ -247,13 +247,25 @@ public abstract class UpdatedEmitterPropertyPanel extends PropertyPanel {
   private static class ParticleOriginPanel extends UpdatedEmitterPropertyPanel {
     private JComboBox<Align> comboBoxAlign;
     private JComboBox<Valign> comboBoxValign;
+    private ParticleParameterModifier offsetX;
+    private ParticleParameterModifier offsetY;
 
     private ParticleOriginPanel() {
       super();
       comboBoxAlign = new JComboBox<>(new DefaultComboBoxModel<Align>(Align.values()));
       comboBoxValign = new JComboBox<>(new DefaultComboBoxModel<Valign>(Valign.values()));
+      offsetX = new ParticleParameterModifier(MapObjectProperty.Particle.MINX, MapObjectProperty.Particle.MAXX, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_OFFSET_X, EmitterData.DEFAULT_MAX_OFFSET_X, 1);
+      offsetY = new ParticleParameterModifier(MapObjectProperty.Particle.MINY, MapObjectProperty.Particle.MAXY, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_OFFSET_Y, EmitterData.DEFAULT_MAX_OFFSET_Y, 1);
+
       setLayout(createLayout());
       setupChangedListeners();
+    }
+
+    @Override
+    public void bind(IMapObject mapObject) {
+      super.bind(mapObject);
+      offsetX.bind(mapObject);
+      offsetY.bind(mapObject);
     }
 
     @Override
@@ -268,12 +280,11 @@ public abstract class UpdatedEmitterPropertyPanel extends PropertyPanel {
       this.emitter = Game.world().environment().getEmitter(mapObject.getId());
       comboBoxAlign.setSelectedItem(mapObject.getEnumValue(MapObjectProperty.Emitter.ORIGIN_ALIGN, Align.class, EmitterData.DEFAULT_ORIGIN_ALIGN));
       comboBoxValign.setSelectedItem(mapObject.getEnumValue(MapObjectProperty.Emitter.ORIGIN_VALIGN, Valign.class, EmitterData.DEFAULT_ORIGIN_VALIGN));
-
     }
 
     @Override
     protected LayoutManager createLayout() {
-      LayoutItem[] layoutItems = new LayoutItem[] { new LayoutItem("emitter_originAlign", comboBoxAlign), new LayoutItem("emitter_originValign", comboBoxValign) };
+      LayoutItem[] layoutItems = new LayoutItem[] { new LayoutItem("emitter_originAlign", comboBoxAlign), new LayoutItem("emitter_originValign", comboBoxValign), new LayoutItem("emitter_offsetX", offsetX), new LayoutItem("emitter_offsetY", offsetY) };
       return this.createLayout(layoutItems);
     }
 

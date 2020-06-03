@@ -97,41 +97,30 @@ public final class MapObjectProperty {
   public static final class Particle {
     public static final String MINX = "particleMinX";
     public static final String MAXX = "particleMaxX";
-    public static final String X_RANDOM = "particleXRandom";
     public static final String MINY = "particleMinY";
     public static final String MAXY = "particleMaxY";
-    public static final String Y_RANDOM = "particleYRandom";
     public static final String MINDELTAX = "particleMinDeltaX";
     public static final String MAXDELTAX = "particleMaxDeltaX";
-    public static final String DELTAX_RANDOM = "particleDeltaXRandom";
     public static final String MINDELTAY = "particleMinDeltaY";
     public static final String MAXDELTAY = "particleMaxDeltaY";
-    public static final String DELTAY_RANDOM = "particleDeltaYRandom";
     public static final String MINGRAVITYX = "particleMinGravityX";
     public static final String MAXGRAVITYX = "particleMaxGravityX";
-    public static final String GRAVITYX_RANDOM = "particleGravityXRandom";
     public static final String MINGRAVITYY = "particleMinGravityY";
     public static final String MAXGRAVITYY = "particleMaxGravityY";
-    public static final String GRAVITYY_RANDOM = "particleGravityYRandom";
     public static final String MINSTARTWIDTH = "particleMinStartWidth";
     public static final String MAXSTARTWIDTH = "particleMaxStartWidth";
-    public static final String STARTWIDTH_RANDOM = "particleStartWidthRandom";
     public static final String MINSTARTHEIGHT = "particleMinStartHeight";
     public static final String MAXSTARTHEIGHT = "particleMaxStartHeight";
-    public static final String STARTHEIGHT_RANDOM = "particleStartHeightRandom";
     public static final String MINDELTAWIDTH = "particleMinDeltaWidth";
     public static final String MAXDELTAWIDTH = "particleMaxDeltaWidth";
-    public static final String DELTAWIDTH_RANDOM = "particleDeltaWidthRandom";
     public static final String MINDELTAHEIGHT = "particleMinDeltaHeight";
     public static final String MAXDELTAHEIGHT = "particleMaxDeltaHeight";
-    public static final String DELTAHEIGHT_RANDOM = "particleDeltaHeightRandom";
     public static final String SPRITE = "particleSprite";
     public static final String ANIMATESPRITE = "particleAnimateSprite";
     public static final String COLLISIONTYPE = "particlePhysics";
     public static final String TEXT = "particleText";
     public static final String MINTTL = "particleMinTTL";
     public static final String MAXTTL = "particleMaxTTL";
-    public static final String TTL_RANDOM = "particleTTLRandom";
     public static final String FADE = "particleFade";
 
     private Particle() {
