@@ -1,5 +1,5 @@
 package de.gurkenlabs.litiengine.graphics.emitters.particles;
 
 public enum ParticleType {
-  RECTANGLE, LEFTLINE, DISC, RECTANGLE_OUTLINE, RIGHTLINE, SHIMMER, TEXT, SPRITE
+  RECTANGLE, RECTANGLE_OUTLINE, ELLIPSE, ELLIPSE_OUTLINE, LEFTLINE, RIGHTLINE, TEXT, SPRITE
 }

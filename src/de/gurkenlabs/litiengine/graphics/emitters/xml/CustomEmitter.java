@@ -2,7 +2,6 @@ package de.gurkenlabs.litiengine.graphics.emitters.xml;
 
 import java.awt.Color;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,13 +14,13 @@ import javax.xml.bind.JAXBException;
 import de.gurkenlabs.litiengine.entities.EmitterInfo;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
+import de.gurkenlabs.litiengine.graphics.emitters.particles.EllipseOutlineParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.EllipseParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.LeftLineParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.Particle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.RectangleFillParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.RectangleOutlineParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.RightLineParticle;
-import de.gurkenlabs.litiengine.graphics.emitters.particles.ShimmerParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.SpriteParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.TextParticle;
 import de.gurkenlabs.litiengine.resources.Resources;
@@ -161,11 +160,12 @@ public class CustomEmitter extends Emitter {
 
     Particle particle;
     switch (this.getEmitterData().getParticleType()) {
-    case LEFTLINE:
-      particle = new LeftLineParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL());
-      break;
-    case DISC:
+
+    case ELLIPSE:
       particle = new EllipseParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL());
+      break;
+    case ELLIPSE_OUTLINE:
+      particle = new EllipseOutlineParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL());
       break;
     case RECTANGLE:
       particle = new RectangleFillParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL());
@@ -173,11 +173,11 @@ public class CustomEmitter extends Emitter {
     case RECTANGLE_OUTLINE:
       particle = new RectangleOutlineParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL());
       break;
+    case LEFTLINE:
+      particle = new LeftLineParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL());
+      break;
     case RIGHTLINE:
       particle = new RightLineParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL());
-      break;
-    case SHIMMER:
-      particle = new ShimmerParticle(new Rectangle2D.Float(x, y, (float) this.getWidth(), (float) this.getHeight()), width, height, this.getRandomParticleColor());
       break;
     case TEXT:
       particle = new TextParticle(this.getEmitterData().getParticleText(), this.getRandomParticleColor(), this.getRandomParticleTTL());
