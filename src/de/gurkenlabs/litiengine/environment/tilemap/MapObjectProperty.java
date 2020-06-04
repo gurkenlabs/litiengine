@@ -95,26 +95,26 @@ public final class MapObjectProperty {
   }
 
   public static final class Particle {
-    public static final String MINX = "particleMinX";
-    public static final String MAXX = "particleMaxX";
-    public static final String MINY = "particleMinY";
-    public static final String MAXY = "particleMaxY";
-    public static final String MINDELTAX = "particleMinDeltaX";
-    public static final String MAXDELTAX = "particleMaxDeltaX";
-    public static final String MINDELTAY = "particleMinDeltaY";
-    public static final String MAXDELTAY = "particleMaxDeltaY";
-    public static final String MINGRAVITYX = "particleMinGravityX";
-    public static final String MAXGRAVITYX = "particleMaxGravityX";
-    public static final String MINGRAVITYY = "particleMinGravityY";
-    public static final String MAXGRAVITYY = "particleMaxGravityY";
-    public static final String MINSTARTWIDTH = "particleMinStartWidth";
-    public static final String MAXSTARTWIDTH = "particleMaxStartWidth";
-    public static final String MINSTARTHEIGHT = "particleMinStartHeight";
-    public static final String MAXSTARTHEIGHT = "particleMaxStartHeight";
-    public static final String MINDELTAWIDTH = "particleMinDeltaWidth";
-    public static final String MAXDELTAWIDTH = "particleMaxDeltaWidth";
-    public static final String MINDELTAHEIGHT = "particleMinDeltaHeight";
-    public static final String MAXDELTAHEIGHT = "particleMaxDeltaHeight";
+    public static final String OFFSET_X_MIN = "particleMinOffsetX";
+    public static final String OFFSET_X_MAX = "particleMaxOffsetX";
+    public static final String OFFSET_Y_MIN = "particleMinOffsetY";
+    public static final String OFFSET_Y_MAX = "particleMaxOffsetY";
+    public static final String VELOCITY_X_MIN = "particleMinVelocityX";
+    public static final String VELOCITY_X_MAX = "particleMaxVelocityX";
+    public static final String VELOCITY_Y_MIN = "particleMinVelocityY";
+    public static final String VELOCITY_Y_MAX = "particleMaxVelocityY";
+    public static final String ACCELERATION_X_MIN = "particleMinAccelerationX";
+    public static final String ACCELERATION_X_MAX = "particleMaxAccelerationX";
+    public static final String ACCELERATION_Y_MIN = "particleMinAccelerationY";
+    public static final String ACCELERATION_Y_MAX = "particleMaxAccelerationY";
+    public static final String STARTWIDTH_MIN = "particleMinStartWidth";
+    public static final String STARTWIDTH_MAX = "particleMaxStartWidth";
+    public static final String STARTHEIGHT_MIN = "particleMinStartHeight";
+    public static final String STARTHEIGHT_MAX = "particleMaxStartHeight";
+    public static final String DELTAWIDTH_MIN = "particleMinDeltaWidth";
+    public static final String DELTAWIDTH_MAX = "particleMaxDeltaWidth";
+    public static final String DELTAHEIGHT_MIN = "particleMinDeltaHeight";
+    public static final String DELTAHEIGHT_MAX = "particleMaxDeltaHeight";
     public static final String SPRITE = "particleSprite";
     public static final String ANIMATESPRITE = "particleAnimateSprite";
     public static final String COLLISIONTYPE = "particlePhysics";

@@ -38,8 +38,6 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
 
   public static EmitterPropertyPanel getEmitterPropertyPanel(EmitterPropertyGroup category) {
     switch (category) {
-    case ACCELERATION:
-      return new ParticleAccelerationPanel();
     case COLLISION:
       return new ParticleCollisionPanel();
     case EMISSION:
@@ -50,8 +48,8 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
       return new ParticleSizePanel();
     case STYLE:
       return new ParticleStylePanel();
-    case VELOCITY:
-      return new ParticleVelocityPanel();
+    case MOTION:
+      return new ParticleMotionPanel();
     default:
       return null;
     }
@@ -229,10 +227,10 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
 
     private ParticleSizePanel() {
       super();
-      startWidth = new ParticleParameterModifier(MapObjectProperty.Particle.MINSTARTWIDTH, MapObjectProperty.Particle.MAXSTARTWIDTH, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_WIDTH, EmitterData.DEFAULT_MAX_WIDTH, 1);
-      startHeight = new ParticleParameterModifier(MapObjectProperty.Particle.MINSTARTHEIGHT, MapObjectProperty.Particle.MAXSTARTHEIGHT, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_HEIGHT, EmitterData.DEFAULT_MAX_HEIGHT, 1);
-      deltaWidth = new ParticleParameterModifier(MapObjectProperty.Particle.MINDELTAWIDTH, MapObjectProperty.Particle.MAXDELTAWIDTH, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_DELTA_WIDTH, EmitterData.DEFAULT_MAX_DELTA_WIDTH, .01f);
-      deltaHeight = new ParticleParameterModifier(MapObjectProperty.Particle.MINDELTAHEIGHT, MapObjectProperty.Particle.MAXDELTAHEIGHT, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_DELTA_HEIGHT, EmitterData.DEFAULT_MAX_DELTA_HEIGHT, .01f);
+      startWidth = new ParticleParameterModifier(MapObjectProperty.Particle.STARTWIDTH_MIN, MapObjectProperty.Particle.STARTWIDTH_MAX, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_WIDTH, EmitterData.DEFAULT_MAX_WIDTH, 1);
+      startHeight = new ParticleParameterModifier(MapObjectProperty.Particle.STARTHEIGHT_MIN, MapObjectProperty.Particle.STARTHEIGHT_MAX, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_HEIGHT, EmitterData.DEFAULT_MAX_HEIGHT, 1);
+      deltaWidth = new ParticleParameterModifier(MapObjectProperty.Particle.DELTAWIDTH_MIN, MapObjectProperty.Particle.DELTAWIDTH_MAX, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_DELTA_WIDTH, EmitterData.DEFAULT_MAX_DELTA_WIDTH, .01f);
+      deltaHeight = new ParticleParameterModifier(MapObjectProperty.Particle.DELTAHEIGHT_MIN, MapObjectProperty.Particle.DELTAHEIGHT_MAX, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_DELTA_HEIGHT, EmitterData.DEFAULT_MAX_DELTA_HEIGHT, .01f);
       setLayout(createLayout());
       setupChangedListeners();
     }
@@ -279,8 +277,8 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
       super();
       comboBoxAlign = new JComboBox<>(new DefaultComboBoxModel<Align>(Align.values()));
       comboBoxValign = new JComboBox<>(new DefaultComboBoxModel<Valign>(Valign.values()));
-      offsetX = new ParticleParameterModifier(MapObjectProperty.Particle.MINX, MapObjectProperty.Particle.MAXX, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_OFFSET_X, EmitterData.DEFAULT_MAX_OFFSET_X, 1);
-      offsetY = new ParticleParameterModifier(MapObjectProperty.Particle.MINY, MapObjectProperty.Particle.MAXY, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_OFFSET_Y, EmitterData.DEFAULT_MAX_OFFSET_Y, 1);
+      offsetX = new ParticleParameterModifier(MapObjectProperty.Particle.OFFSET_X_MIN, MapObjectProperty.Particle.OFFSET_X_MAX, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_OFFSET_X, EmitterData.DEFAULT_MAX_OFFSET_X, 1);
+      offsetY = new ParticleParameterModifier(MapObjectProperty.Particle.OFFSET_Y_MIN, MapObjectProperty.Particle.OFFSET_Y_MAX, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_OFFSET_Y, EmitterData.DEFAULT_MAX_OFFSET_Y, 1);
 
       setLayout(createLayout());
       setupChangedListeners();
@@ -321,9 +319,29 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
     }
   }
 
-  private static class ParticleVelocityPanel extends EmitterPropertyPanel {
-    private ParticleVelocityPanel() {
+  private static class ParticleMotionPanel extends EmitterPropertyPanel {
+    private ParticleParameterModifier velocityX;
+    private ParticleParameterModifier velocityY;
+    private ParticleParameterModifier accelerationX;
+    private ParticleParameterModifier accelerationY;
+
+    private ParticleMotionPanel() {
       super();
+      velocityX = new ParticleParameterModifier(MapObjectProperty.Particle.VELOCITY_X_MIN, MapObjectProperty.Particle.VELOCITY_X_MAX, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_VELOCITY_X, EmitterData.DEFAULT_MAX_DELTA_X, .01f);
+      velocityY = new ParticleParameterModifier(MapObjectProperty.Particle.VELOCITY_Y_MIN, MapObjectProperty.Particle.VELOCITY_Y_MAX, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_VELOCITY_Y, EmitterData.DEFAULT_MAX_VELOCITY_Y, .01f);
+      accelerationX = new ParticleParameterModifier(MapObjectProperty.Particle.ACCELERATION_X_MIN, MapObjectProperty.Particle.ACCELERATION_X_MAX, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_ACCELERATION_X, EmitterData.DEFAULT_MAX_ACCELERATION_X, .01f);
+      accelerationY = new ParticleParameterModifier(MapObjectProperty.Particle.ACCELERATION_Y_MIN, MapObjectProperty.Particle.ACCELERATION_Y_MAX, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_ACCELERATION_Y, EmitterData.DEFAULT_MAX_ACCELERATION_Y, .01f);
+      setLayout(createLayout());
+      setupChangedListeners();
+    }
+
+    @Override
+    public void bind(IMapObject mapObject) {
+      super.bind(mapObject);
+      velocityX.bind(mapObject);
+      velocityY.bind(mapObject);
+      accelerationX.bind(mapObject);
+      accelerationY.bind(mapObject);
     }
 
     @Override
@@ -340,38 +358,8 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
 
     @Override
     protected LayoutManager createLayout() {
-      // TODO Auto-generated method stub
-      return null;
-    }
-
-    @Override
-    protected void setupChangedListeners() {
-      // TODO Auto-generated method stub
-
-    }
-  }
-
-  private static class ParticleAccelerationPanel extends EmitterPropertyPanel {
-    private ParticleAccelerationPanel() {
-      super();
-    }
-
-    @Override
-    protected void clearControls() {
-      // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    protected void setControlValues(IMapObject mapObject) {
-      this.emitter = Game.world().environment().getEmitter(mapObject.getId());
-
-    }
-
-    @Override
-    protected LayoutManager createLayout() {
-      // TODO Auto-generated method stub
-      return null;
+      LayoutItem[] layoutItems = new LayoutItem[] { new LayoutItem("emitter_velocityX", velocityX), new LayoutItem("emitter_velocityY", velocityY), new LayoutItem("emitter_accelerationX", accelerationX), new LayoutItem("emitter_accelerationY", accelerationY) };
+      return this.createLayout(layoutItems);
     }
 
     @Override

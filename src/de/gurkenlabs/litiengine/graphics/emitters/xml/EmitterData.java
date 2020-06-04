@@ -68,15 +68,15 @@ public class EmitterData implements Serializable, Resource {
   public static final float DEFAULT_MIN_DELTA_HEIGHT = -.1f;
   public static final float DEFAULT_MAX_DELTA_HEIGHT = .1f;
 
-  public static final float DEFAULT_MIN_GRAVITY_X = -.01f;
-  public static final float DEFAULT_MAX_GRAVITY_X = .01f;
-  public static final float DEFAULT_MIN_GRAVITY_Y = -.01f;
-  public static final float DEFAULT_MAX_GRAVITY_Y = .01f;
+  public static final float DEFAULT_MIN_ACCELERATION_X = -.01f;
+  public static final float DEFAULT_MAX_ACCELERATION_X = .01f;
+  public static final float DEFAULT_MIN_ACCELERATION_Y = -.01f;
+  public static final float DEFAULT_MAX_ACCELERATION_Y = .01f;
 
-  public static final float DEFAULT_MIN_DELTA_X = -.1f;
+  public static final float DEFAULT_MIN_VELOCITY_X = -.1f;
   public static final float DEFAULT_MAX_DELTA_X = .1f;
-  public static final float DEFAULT_MIN_DELTA_Y = -.1f;
-  public static final float DEFAULT_MAX_DELTA_Y = .1f;
+  public static final float DEFAULT_MIN_VELOCITY_Y = -.1f;
+  public static final float DEFAULT_MAX_VELOCITY_Y = .1f;
 
   public static final float DEFAULT_MIN_WIDTH = 2f;
   public static final float DEFAULT_MAX_WIDTH = 6f;
@@ -188,10 +188,10 @@ public class EmitterData implements Serializable, Resource {
     this.offsetY = new ParticleParameter(DEFAULT_MIN_OFFSET_Y, DEFAULT_MAX_OFFSET_Y);
     this.deltaWidth = new ParticleParameter(DEFAULT_MIN_DELTA_WIDTH, DEFAULT_MAX_DELTA_WIDTH);
     this.deltaHeight = new ParticleParameter(DEFAULT_MIN_DELTA_HEIGHT, DEFAULT_MAX_DELTA_HEIGHT);
-    this.deltaX = new ParticleParameter(DEFAULT_MIN_DELTA_X, DEFAULT_MAX_DELTA_X);
-    this.deltaY = new ParticleParameter(DEFAULT_MIN_DELTA_Y, DEFAULT_MAX_DELTA_Y);
-    this.gravityX = new ParticleParameter(DEFAULT_MIN_GRAVITY_X, DEFAULT_MAX_GRAVITY_X);
-    this.gravityY = new ParticleParameter(DEFAULT_MIN_GRAVITY_Y, DEFAULT_MAX_GRAVITY_Y);
+    this.deltaX = new ParticleParameter(DEFAULT_MIN_VELOCITY_X, DEFAULT_MAX_DELTA_X);
+    this.deltaY = new ParticleParameter(DEFAULT_MIN_VELOCITY_Y, DEFAULT_MAX_VELOCITY_Y);
+    this.gravityX = new ParticleParameter(DEFAULT_MIN_ACCELERATION_X, DEFAULT_MAX_ACCELERATION_X);
+    this.gravityY = new ParticleParameter(DEFAULT_MIN_ACCELERATION_Y, DEFAULT_MAX_ACCELERATION_Y);
     this.particleWidth = new ParticleParameter(DEFAULT_MIN_WIDTH, DEFAULT_MAX_WIDTH);
     this.particleHeight = new ParticleParameter(DEFAULT_MIN_HEIGHT, DEFAULT_MAX_HEIGHT);
     this.setColor(DEFAULT_COLOR);

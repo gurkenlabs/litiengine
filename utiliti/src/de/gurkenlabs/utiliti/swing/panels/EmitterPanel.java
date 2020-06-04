@@ -13,7 +13,7 @@ import de.gurkenlabs.utiliti.swing.Icons;
 public class EmitterPanel extends PropertyPanel {
 
   public enum EmitterPropertyGroup {
-    EMISSION, STYLE, SIZE, ORIGIN, VELOCITY, ACCELERATION, COLLISION
+    EMISSION, STYLE, SIZE, ORIGIN, MOTION, COLLISION
   }
 
   JTabbedPane propertyGrouptabs;
