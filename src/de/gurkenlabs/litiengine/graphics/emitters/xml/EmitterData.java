@@ -54,9 +54,10 @@ public class EmitterData implements Serializable, Resource {
   public static final int DEFAULT_SPAWNAMOUNT = 20;
   public static final int DEFAULT_SPAWNRATE = 100;
   public static final int DEFAULT_MAXPARTICLES = 400;
-  public static final int DEFAULT_TTL = 0;
-  public static final int DEFAULT_MAX_PARTICLE_TTL = 1500;
+  public static final int DEFAULT_DURATION = 0;
+
   public static final int DEFAULT_MIN_PARTICLE_TTL = 400;
+  public static final int DEFAULT_MAX_PARTICLE_TTL = 1500;
 
   public static final float DEFAULT_MIN_OFFSET_X = -4f;
   public static final float DEFAULT_MAX_OFFSET_X = 4f;
@@ -115,7 +116,7 @@ public class EmitterData implements Serializable, Resource {
   private ParticleParameter deltaY;
 
   @XmlAttribute
-  private int emitterTTL;
+  private int emitterDuration;
 
   @XmlElement
   private boolean fade;
@@ -147,11 +148,8 @@ public class EmitterData implements Serializable, Resource {
   @XmlElement
   private ParticleParameter particleHeight;
 
-  @XmlAttribute
-  private int particleMaxTTL;
-
-  @XmlAttribute
-  private int particleMinTTL;
+  @XmlElement
+  private ParticleParameter particleTTL;
 
   @XmlElement
   private String particleText;
@@ -194,9 +192,10 @@ public class EmitterData implements Serializable, Resource {
     this.gravityY = new ParticleParameter(DEFAULT_MIN_ACCELERATION_Y, DEFAULT_MAX_ACCELERATION_Y);
     this.particleWidth = new ParticleParameter(DEFAULT_MIN_WIDTH, DEFAULT_MAX_WIDTH);
     this.particleHeight = new ParticleParameter(DEFAULT_MIN_HEIGHT, DEFAULT_MAX_HEIGHT);
+    this.particleTTL = new ParticleParameter(DEFAULT_MIN_PARTICLE_TTL, DEFAULT_MAX_PARTICLE_TTL);
     this.setColor(DEFAULT_COLOR);
     this.colorProbabilities = DEFAULT_COLOR_PROBABILITIES;
-    this.emitterTTL = DEFAULT_TTL;
+    this.emitterDuration = DEFAULT_DURATION;
     this.width = DEFAULT_WIDTH;
     this.height = DEFAULT_HEIGHT;
     this.colorVariance = DEFAULT_COLOR_VARIANCE;
@@ -205,8 +204,6 @@ public class EmitterData implements Serializable, Resource {
     this.collisionType = DEFAULT_COLLISION;
     this.maxParticles = DEFAULT_MAXPARTICLES;
     this.name = DEFAULT_NAME;
-    this.particleMinTTL = DEFAULT_MIN_PARTICLE_TTL;
-    this.particleMaxTTL = DEFAULT_MAX_PARTICLE_TTL;
     this.particleText = DEFAULT_TEXT;
     this.particleType = DEFAULT_PARTICLE_TYPE;
     this.spawnAmount = DEFAULT_SPAWNAMOUNT;
@@ -265,8 +262,8 @@ public class EmitterData implements Serializable, Resource {
   }
 
   @XmlTransient
-  public int getEmitterTTL() {
-    return this.emitterTTL;
+  public int getEmitterDuration() {
+    return this.emitterDuration;
   }
 
   @XmlTransient
@@ -310,13 +307,8 @@ public class EmitterData implements Serializable, Resource {
   }
 
   @XmlTransient
-  public int getParticleMaxTTL() {
-    return this.particleMaxTTL;
-  }
-
-  @XmlTransient
-  public int getParticleMinTTL() {
-    return this.particleMinTTL;
+  public ParticleParameter getParticleTTL() {
+    return this.particleTTL;
   }
 
   @XmlTransient
@@ -431,8 +423,8 @@ public class EmitterData implements Serializable, Resource {
     this.deltaY = deltaY;
   }
 
-  public void setEmitterTTL(final int emitterTTL) {
-    this.emitterTTL = emitterTTL;
+  public void setEmitterDuration(final int emitterDuration) {
+    this.emitterDuration = emitterDuration;
   }
 
   public void setFade(final boolean fade) {
@@ -476,12 +468,8 @@ public class EmitterData implements Serializable, Resource {
     this.particleHeight = particleHeight;
   }
 
-  public void setParticleMaxTTL(final int particleMaxTTL) {
-    this.particleMaxTTL = particleMaxTTL;
-  }
-
-  public void setParticleMinTTL(final int particleMinTTL) {
-    this.particleMinTTL = particleMinTTL;
+  public void setParticleTTL(final ParticleParameter particleTTL) {
+    this.particleTTL = particleTTL;
   }
 
   public void setParticleText(final String particleText) {

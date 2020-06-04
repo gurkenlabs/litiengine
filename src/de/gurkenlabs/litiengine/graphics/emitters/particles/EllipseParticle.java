@@ -7,8 +7,8 @@ import java.awt.geom.Point2D;
 
 public class EllipseParticle extends ShapeParticle {
 
-  public EllipseParticle(final float width, final float height, final Color color, final int ttl) {
-    super(width, height, color, ttl);
+  public EllipseParticle(final float width, final float height, final Color color) {
+    super(width, height, color);
   }
 
   @Override

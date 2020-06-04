@@ -104,7 +104,7 @@ public class LightSourcePanel extends PropertyPanel {
   private LayoutManager createLayout() {
 
     LayoutItem[] layoutItems = new LayoutItem[] { new LayoutItem("panel_shape", this.comboBoxLightShape), new LayoutItem("panel_color", this.colorControl, this.colorControl.getPreferredSize().height), new LayoutItem("panel_intensity", this.spinnerIntensity),
-        new LayoutItem("panel_offsetX", this.sliderOffsetX), new LayoutItem("panel_offsetY", this.sliderOffsetY), };
+        new LayoutItem("offsetX", this.sliderOffsetX), new LayoutItem("offsetY", this.sliderOffsetY), };
 
     return this.createLayout(layoutItems, this.checkBoxIsActive);
   }

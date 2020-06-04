@@ -84,7 +84,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
       this.maxParticles = info.maxParticles();
       this.spawnAmount = info.spawnAmount();
       this.spawnRate = info.spawnRate();
-      this.timeToLive = info.emitterTTL();
+      this.timeToLive = info.duration();
       this.particleMinTTL = info.particleMinTTL();
       this.particleMaxTTL = info.particleMaxTTL();
       this.particleUpdateDelay = info.particleUpdateRate();
@@ -344,7 +344,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     this.spawnRate = spawnRate;
   }
 
-  public void setTimeToLive(final int ttl) {
+  public void setDuration(final int ttl) {
     this.timeToLive = ttl;
   }
 

@@ -26,7 +26,7 @@ public class EmitterPanel extends PropertyPanel {
     this.propertyGrouptabs.setTabPlacement(JTabbedPane.LEFT);
     for (EmitterPropertyGroup e : EmitterPropertyGroup.values()) {
       String localized = Resources.strings().get(String.format("emitter_%s", e.name().toLowerCase()));
-      this.propertyGrouptabs.insertTab(String.format("<html><p style=\"text-align: left; width: %spx\">%s</p></html>", LABEL_WIDTH * 1.5, localized), null, EmitterPropertyPanel.getEmitterPropertyPanel(e), Resources.strings().get(String.format("emitter_tip_%s", e.name().toLowerCase())),
+      this.propertyGrouptabs.insertTab(String.format("<html><p style=\"text-align: left; width: %spx\">%s</p></html>", LABEL_WIDTH * 1.5, localized), null, EmitterPropertyPanel.getEmitterPropertyPanel(e), Resources.strings().get(String.format("emitter_%s_tip", e.name().toLowerCase())),
           e.ordinal());
     }
 

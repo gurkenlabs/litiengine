@@ -60,7 +60,7 @@ public class EmitterTests {
   
   @EmitterInfo(
       activateOnInit = false,
-      emitterTTL = 2500,
+      duration = 2500,
       maxParticles = 500,
       originAlign = Align.CENTER,
       originVAlign = Valign.MIDDLE,

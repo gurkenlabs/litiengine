@@ -32,17 +32,17 @@ public class ParticleTests {
 
   @Test
   public void initializeParticleTypes() {
-    assertDoesNotThrow(() -> new LeftLineParticle(10, 10, Color.WHITE, 300));
-    assertDoesNotThrow(() -> new LightParticle(100, 100, 10, 10, Color.WHITE, 300));
-    assertDoesNotThrow(() -> new RectangleParticle(10, 10, Color.WHITE, 300));
-    assertDoesNotThrow(() -> new RightLineParticle(10, 10, Color.WHITE, 300));
-    assertDoesNotThrow(() -> new TextParticle(null, Color.WHITE, 300));
-    assertDoesNotThrow(() -> new TextParticle("test", Color.WHITE, 300));
+    assertDoesNotThrow(() -> new LeftLineParticle(10, 10, Color.WHITE));
+    assertDoesNotThrow(() -> new LightParticle(100, 100, 10, 10, Color.WHITE));
+    assertDoesNotThrow(() -> new RectangleParticle(10, 10, Color.WHITE));
+    assertDoesNotThrow(() -> new RightLineParticle(10, 10, Color.WHITE));
+    assertDoesNotThrow(() -> new TextParticle(null, Color.WHITE));
+    assertDoesNotThrow(() -> new TextParticle("test", Color.WHITE));
   }
 
   @Test
   public void testDeltaSize() {
-    RectangleParticle part = new RectangleParticle(10, 10, Color.WHITE, 300);
+    RectangleParticle part = new RectangleParticle(10, 10, Color.WHITE);
     part.setCollisionType(Collision.NONE);
     part.setDeltaHeight(0.1f);
     part.setDeltaWidth(0.1f);
@@ -55,12 +55,12 @@ public class ParticleTests {
 
   @Test
   public void testDeltaLocation() {
-    RectangleParticle part = new RectangleParticle(10, 10, Color.WHITE, 300);
+    RectangleParticle part = new RectangleParticle(10, 10, Color.WHITE);
     part.setCollisionType(Collision.NONE);
-    part.setDeltaX(0.1f);
-    part.setDeltaY(0.1f);
-    part.setDeltaIncX(0.01f);
-    part.setDeltaIncY(0.01f);
+    part.setVelocityX(0.1f);
+    part.setVelocityY(0.1f);
+    part.setAccelerationX(0.01f);
+    part.setAccelerationY(0.01f);
     part.update(new Point2D.Double(0, 0), 1);
 
     assertEquals(0.1f, part.getX());

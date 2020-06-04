@@ -67,7 +67,7 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     data.setSpawnRate(mapObject.getIntValue(MapObjectProperty.Emitter.SPAWNRATE, EmitterData.DEFAULT_SPAWNRATE));
     data.setSpawnAmount(mapObject.getIntValue(MapObjectProperty.Emitter.SPAWNAMOUNT, EmitterData.DEFAULT_SPAWNAMOUNT));
     data.setUpdateRate(mapObject.getIntValue(MapObjectProperty.Emitter.UPDATERATE, EmitterData.DEFAULT_UPDATERATE));
-    data.setEmitterTTL(mapObject.getIntValue(MapObjectProperty.Emitter.TIMETOLIVE, EmitterData.DEFAULT_TTL));
+    data.setEmitterDuration(mapObject.getIntValue(MapObjectProperty.Emitter.DURATION, EmitterData.DEFAULT_DURATION));
     data.setMaxParticles(mapObject.getIntValue(MapObjectProperty.Emitter.MAXPARTICLES, EmitterData.DEFAULT_MAXPARTICLES));
     data.setParticleType(mapObject.getEnumValue(MapObjectProperty.Emitter.PARTICLETYPE, ParticleType.class, EmitterData.DEFAULT_PARTICLE_TYPE));
     data.setColorVariance(mapObject.getFloatValue(MapObjectProperty.Emitter.COLORVARIANCE, EmitterData.DEFAULT_COLOR_VARIANCE));
@@ -88,9 +88,8 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     data.setGravityY(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.ACCELERATION_Y_MIN), mapObject.getFloatValue(MapObjectProperty.Particle.ACCELERATION_Y_MAX)));
     data.setDeltaWidth(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.DELTAWIDTH_MIN), mapObject.getFloatValue(MapObjectProperty.Particle.DELTAWIDTH_MAX)));
     data.setDeltaHeight(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.DELTAHEIGHT_MIN), mapObject.getFloatValue(MapObjectProperty.Particle.DELTAHEIGHT_MAX)));
+    data.setParticleTTL(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.TTL_MIN), mapObject.getFloatValue(MapObjectProperty.Particle.TTL_MAX)));
 
-    data.setParticleMinTTL(mapObject.getIntValue(MapObjectProperty.Particle.MINTTL));
-    data.setParticleMaxTTL(mapObject.getIntValue(MapObjectProperty.Particle.MAXTTL));
     data.setCollisionType(mapObject.getEnumValue(MapObjectProperty.Particle.COLLISIONTYPE, Collision.class, Collision.NONE));
 
     data.setParticleText(mapObject.getStringValue(MapObjectProperty.Particle.TEXT));
@@ -111,7 +110,7 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     mo.setValue(MapObjectProperty.Emitter.SPAWNRATE, emitterData.getSpawnRate());
     mo.setValue(MapObjectProperty.Emitter.SPAWNAMOUNT, emitterData.getSpawnAmount());
     mo.setValue(MapObjectProperty.Emitter.UPDATERATE, emitterData.getUpdateRate());
-    mo.setValue(MapObjectProperty.Emitter.TIMETOLIVE, emitterData.getEmitterTTL());
+    mo.setValue(MapObjectProperty.Emitter.DURATION, emitterData.getEmitterDuration());
     mo.setValue(MapObjectProperty.Emitter.MAXPARTICLES, emitterData.getMaxParticles());
     mo.setValue(MapObjectProperty.Emitter.PARTICLETYPE, emitterData.getParticleType());
     mo.setValue(MapObjectProperty.Emitter.COLORVARIANCE, emitterData.getColorVariance());
@@ -147,8 +146,8 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     mo.setValue(MapObjectProperty.Particle.DELTAHEIGHT_MAX, emitterData.getDeltaHeight().getMaxValue());
 
     // particle
-    mo.setValue(MapObjectProperty.Particle.MINTTL, emitterData.getParticleMinTTL());
-    mo.setValue(MapObjectProperty.Particle.MAXTTL, emitterData.getParticleMaxTTL());
+    mo.setValue(MapObjectProperty.Particle.TTL_MIN, emitterData.getParticleTTL().getMinValue());
+    mo.setValue(MapObjectProperty.Particle.TTL_MAX, emitterData.getParticleTTL().getMaxValue());
     mo.setValue(MapObjectProperty.Particle.COLLISIONTYPE, emitterData.getCollisionType());
 
     mo.setValue(MapObjectProperty.Particle.TEXT, emitterData.getParticleText());

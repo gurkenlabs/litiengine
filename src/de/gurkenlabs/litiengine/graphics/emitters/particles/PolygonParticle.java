@@ -8,8 +8,8 @@ import java.awt.geom.Point2D;
 public class PolygonParticle extends ShapeParticle {
   private int sides;
 
-  public PolygonParticle(float width, float height, Color color, int ttl, int sides) {
-    super(width, height, color, ttl);
+  public PolygonParticle(float width, float height, Color color, int sides) {
+    super(width, height, color);
     this.sides = sides;
   }
 

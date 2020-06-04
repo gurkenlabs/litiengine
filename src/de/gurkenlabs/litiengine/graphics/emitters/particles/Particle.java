@@ -20,23 +20,27 @@ public abstract class Particle implements ITimeToLive {
   private int colorAlpha = 255;
   private float deltaHeight;
   private float deltaWidth;
-  private float deltaX;
-  private float deltaY;
+  /**
+   * The horizontal velocity (horizontal movement per update) for this particle.
+   */
+  private float velocityX;
+  /**
+   * The vertical velocity (vertical movement per update) for this particle.
+   */
+  private float velocityY;
   private boolean outlineOnly;
 
   /**
-   * The gravitational pull to the left (negative) and right (positive) acting
-   * on this particle.
+   * The horizontal acceleration (increase / decrease in velocity over time) for this particle.
    */
-  private float gravityX;
+  private float accelerationX;
 
   /**
-   * The gravitational pull to the up (negative) and down (positive) acting on
-   * this particle.
+   * The vertical acceleration (increase / decrease in velocity over time) for this particle.
    */
-  private float gravityY;
+  private float accelerationY;
   private float height;
-  private final int timeToLive;
+  private int timeToLive;
   private float width;
 
   /** The currentlocation of the particle on the X-axis. */
@@ -72,11 +76,10 @@ public abstract class Particle implements ITimeToLive {
    * @param color
    *          The color of the effect.
    */
-  public Particle(final float width, final float height, final Color color, final int ttl) {
+  public Particle(final float width, final float height, final Color color) {
     this.setCustomRenderType(RenderType.NONE);
     this.setWidth(width);
     this.setHeight(height);
-    this.timeToLive = ttl;
     this.color = color;
     this.colorAlpha = this.color.getAlpha();
     this.collisionType = Collision.NONE;
@@ -116,19 +119,19 @@ public abstract class Particle implements ITimeToLive {
   }
 
   public float getDx() {
-    return this.deltaX;
+    return this.velocityX;
   }
 
   public float getDy() {
-    return this.deltaY;
+    return this.velocityY;
   }
 
   public float getGravityX() {
-    return this.gravityX;
+    return this.accelerationX;
   }
 
   public float getGravityY() {
-    return this.gravityY;
+    return this.accelerationY;
   }
 
   public float getHeight() {
@@ -241,13 +244,13 @@ public abstract class Particle implements ITimeToLive {
     return this;
   }
 
-  public Particle setDeltaIncX(final float gravityX) {
-    this.gravityX = gravityX;
+  public Particle setAccelerationX(final float accelerationX) {
+    this.accelerationX = accelerationX;
     return this;
   }
 
-  public Particle setDeltaIncY(final float gravityY) {
-    this.gravityY = gravityY;
+  public Particle setAccelerationY(final float accelerationY) {
+    this.accelerationY = accelerationY;
     return this;
   }
 
@@ -256,13 +259,13 @@ public abstract class Particle implements ITimeToLive {
     return this;
   }
 
-  public Particle setDeltaX(final float dx) {
-    this.deltaX = dx;
+  public Particle setVelocityX(final float velocityX) {
+    this.velocityX = velocityX;
     return this;
   }
 
-  public Particle setDeltaY(final float dy) {
-    this.deltaY = dy;
+  public Particle setVelocityY(final float velocityY) {
+    this.velocityY = velocityY;
     return this;
   }
 
@@ -304,6 +307,11 @@ public abstract class Particle implements ITimeToLive {
 
   public Particle setY(final float y) {
     this.y = y;
+    return this;
+  }
+
+  public Particle setTimeToLive(final int ttl) {
+    this.timeToLive = ttl;
     return this;
   }
 
@@ -367,11 +375,11 @@ public abstract class Particle implements ITimeToLive {
     }
 
     if (this.getGravityX() != 0) {
-      this.deltaX += this.getGravityX() * updateRatio;
+      this.velocityX += this.getGravityX() * updateRatio;
     }
 
     if (this.getGravityY() != 0) {
-      this.deltaY += this.getGravityY() * updateRatio;
+      this.velocityY += this.getGravityY() * updateRatio;
     }
   }
 

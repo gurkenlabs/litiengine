@@ -13,8 +13,8 @@ public class SpriteParticle extends Particle {
   private float angle;
   private final Image image;
 
-  public SpriteParticle(final Image sprite, final int ttl) {
-    super(0, 0, Color.WHITE, ttl);
+  public SpriteParticle(final Image sprite) {
+    super(0, 0, Color.WHITE);
     this.image = sprite;
     this.setWidth(this.image.getWidth(null));
     this.setHeight(this.image.getHeight(null));

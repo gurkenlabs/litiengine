@@ -146,6 +146,7 @@ public class CustomEmitter extends Emitter {
     float height;
     float deltaWidth;
     float deltaHeight;
+    int ttl;
 
     x = (float) this.getEmitterData().getParticleOffsetX().get();
     y = (float) this.getEmitterData().getParticleOffsetY().get();
@@ -157,54 +158,56 @@ public class CustomEmitter extends Emitter {
     height = (float) this.getEmitterData().getParticleHeight().get();
     deltaWidth = (float) this.getEmitterData().getDeltaWidth().get();
     deltaHeight = (float) this.getEmitterData().getDeltaHeight().get();
+    ttl = (int) this.getEmitterData().getParticleTTL().get();
 
     Particle particle;
     switch (this.getEmitterData().getParticleType()) {
 
     case ELLIPSE:
-      particle = new EllipseParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL());
+      particle = new EllipseParticle(width, height, this.getRandomParticleColor());
       break;
     case RECTANGLE:
-      particle = new RectangleParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL());
+      particle = new RectangleParticle(width, height, this.getRandomParticleColor());
       break;
     case TRIANGLE:
-      particle = new PolygonParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL(), 3);
+      particle = new PolygonParticle(width, height, this.getRandomParticleColor(), 3);
       break;
     case DIAMOND:
-      particle = new PolygonParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL(), 4);
+      particle = new PolygonParticle(width, height, this.getRandomParticleColor(), 4);
       break;
     case LEFTLINE:
-      particle = new LeftLineParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL());
+      particle = new LeftLineParticle(width, height, this.getRandomParticleColor());
       break;
     case RIGHTLINE:
-      particle = new RightLineParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL());
+      particle = new RightLineParticle(width, height, this.getRandomParticleColor());
       break;
     case TEXT:
-      particle = new TextParticle(this.getEmitterData().getParticleText(), this.getRandomParticleColor(), this.getRandomParticleTTL());
+      particle = new TextParticle(this.getEmitterData().getParticleText(), this.getRandomParticleColor());
       break;
     case SPRITE:
       Spritesheet sprite = Resources.spritesheets().get(this.getEmitterData().getSpritesheet());
       if (sprite == null) {
         return null;
       }
-
-      particle = new SpriteParticle(sprite.getSprite(ThreadLocalRandom.current().nextInt(0, sprite.getTotalNumberOfSprites() - 1)), this.getRandomParticleTTL());
+      particle = new SpriteParticle(sprite.getSprite(ThreadLocalRandom.current().nextInt(0, sprite.getTotalNumberOfSprites() - 1)));
       break;
     default:
-      particle = new RectangleParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL());
+      particle = new RectangleParticle(width, height, this.getRandomParticleColor());
       break;
     }
     particle.setX(x);
     particle.setY(y);
 
-    particle.setDeltaIncX(gravityX);
-    particle.setDeltaIncY(gravityY);
+    particle.setAccelerationX(gravityX);
+    particle.setAccelerationY(gravityY);
 
-    particle.setDeltaX(deltaX);
-    particle.setDeltaY(deltaY);
+    particle.setVelocityX(deltaX);
+    particle.setVelocityY(deltaY);
 
     particle.setDeltaWidth(deltaWidth);
     particle.setDeltaHeight(deltaHeight);
+    
+    particle.setTimeToLive(ttl);
 
     particle.setCollisionType(this.getEmitterData().getCollisionType());
     particle.setOutlineOnly(this.getEmitterData().isOutlineOnly());
@@ -215,9 +218,7 @@ public class CustomEmitter extends Emitter {
   private void init() {
     // set emitter parameters
     this.setMaxParticles(this.getEmitterData().getMaxParticles());
-    this.setParticleMinTTL(this.getEmitterData().getParticleMinTTL());
-    this.setParticleMaxTTL(this.getEmitterData().getParticleMaxTTL());
-    this.setTimeToLive(this.getEmitterData().getEmitterTTL());
+    this.setDuration(this.getEmitterData().getEmitterDuration());
     this.setSpawnAmount(this.getEmitterData().getSpawnAmount());
     this.setSpawnRate(this.getEmitterData().getSpawnRate());
     this.setParticleUpdateRate(this.getEmitterData().getUpdateRate());

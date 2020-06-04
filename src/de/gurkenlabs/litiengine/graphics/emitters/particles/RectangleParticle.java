@@ -7,8 +7,8 @@ import java.awt.geom.Rectangle2D;
 
 public class RectangleParticle extends ShapeParticle {
 
-  public RectangleParticle(final float width, final float height, final Color color, final int ttl) {
-    super(width, height, color, ttl);
+  public RectangleParticle(final float width, final float height, final Color color) {
+    super(width, height, color);
   }
 
   @Override

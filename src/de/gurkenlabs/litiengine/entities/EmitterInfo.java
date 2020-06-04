@@ -21,7 +21,7 @@ public @interface EmitterInfo {
 
   boolean activateOnInit() default true;
 
-  int emitterTTL() default EmitterData.DEFAULT_TTL;
+  int duration() default EmitterData.DEFAULT_DURATION;
 
   int maxParticles() default EmitterData.DEFAULT_MAXPARTICLES;
 

@@ -33,12 +33,12 @@ public class ParticleParameterModifier extends PropertyPanel {
     min.setMinimumSize(SPINNER_DIMENSION);
     min.setMaximumSize(SPINNER_DIMENSION);
     min.setPreferredSize(SPINNER_DIMENSION);
-    minLbl = new JLabel(Resources.strings().get("panel_min"));
+    minLbl = new JLabel(Resources.strings().get("min"));
     max = new JSpinner(new SpinnerNumberModel(defaultMax, lowerBound, upperBound, step));
     max.setMinimumSize(SPINNER_DIMENSION);
     max.setMaximumSize(SPINNER_DIMENSION);
     max.setPreferredSize(SPINNER_DIMENSION);
-    maxLbl = new JLabel(Resources.strings().get("panel_max"));
+    maxLbl = new JLabel(Resources.strings().get("max"));
 
     GroupLayout grplayout = new GroupLayout(this);
     grplayout.setAutoCreateGaps(true);

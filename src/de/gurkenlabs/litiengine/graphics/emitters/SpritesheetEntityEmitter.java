@@ -31,8 +31,6 @@ public class SpritesheetEntityEmitter extends EntityEmitter {
 
   @Override
   protected Particle createNewParticle() {
-    final int life = this.getRandomParticleTTL();
-
-    return new SpriteParticle(this.getRandomSprite(), life);
+    return new SpriteParticle(this.getRandomSprite());
   }
 }

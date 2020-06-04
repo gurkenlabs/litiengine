@@ -10,8 +10,8 @@ import de.gurkenlabs.litiengine.Game;
 
 public abstract class ShapeParticle extends Particle {
 
-  public ShapeParticle(float width, float height, Color color, int ttl) {
-    super(width, height, color, ttl);
+  public ShapeParticle(float width, float height, Color color) {
+    super(width, height, color);
   }
 
   protected abstract Shape getShape(final Point2D emitterOrigin);

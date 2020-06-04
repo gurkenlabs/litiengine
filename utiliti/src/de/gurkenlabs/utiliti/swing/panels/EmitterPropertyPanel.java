@@ -27,9 +27,9 @@ import de.gurkenlabs.utiliti.swing.panels.EmitterPanel.EmitterPropertyGroup;
 public abstract class EmitterPropertyPanel extends PropertyPanel {
 
   protected transient Emitter emitter;
-  private static final float STEP_ONE = 1;
-  private static final float STEP_COARSE = 10;
-  private static final float STEP_SPARSE = 100;
+  private static final int STEP_ONE = 1;
+  private static final int STEP_COARSE = 10;
+  private static final int STEP_SPARSE = 100;
   private static final float STEP_FINE = .05f;
   private static final float STEP_FINEST = .01f;
 
@@ -65,7 +65,7 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
     private JSpinner spawnRateSpinner;
     private JSpinner spawnAmountSpinner;
     private JSpinner updateDelaySpinner;
-    private JSpinner ttlSpinner;
+    private JSpinner durationSpinner;
     private JSpinner maxParticlesSpinner;
     private JToggleButton btnPause;
 
@@ -74,12 +74,13 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
       spawnRateSpinner = new JSpinner(new SpinnerNumberModel(EmitterData.DEFAULT_SPAWNRATE, 10, Integer.MAX_VALUE, STEP_COARSE));
       spawnAmountSpinner = new JSpinner(new SpinnerNumberModel(EmitterData.DEFAULT_SPAWNAMOUNT, 1, 500, STEP_ONE));
       updateDelaySpinner = new JSpinner(new SpinnerNumberModel(EmitterData.DEFAULT_UPDATERATE, 0, Integer.MAX_VALUE, STEP_COARSE));
-      ttlSpinner = new JSpinner(new SpinnerNumberModel(EmitterData.DEFAULT_TTL, 0, Integer.MAX_VALUE, STEP_SPARSE));
+      durationSpinner = new JSpinner(new SpinnerNumberModel(EmitterData.DEFAULT_DURATION, 0, Integer.MAX_VALUE, STEP_SPARSE));
       maxParticlesSpinner = new JSpinner(new SpinnerNumberModel(EmitterData.DEFAULT_MAXPARTICLES, 1, Integer.MAX_VALUE, STEP_ONE));
 
       btnPause = new JToggleButton();
       btnPause.setSelected(true);
       btnPause.setIcon(Icons.PAUSE);
+      btnPause.setSelectedIcon(Icons.PLAY);
 
       setLayout(createLayout());
       setupChangedListeners();
@@ -87,18 +88,19 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
 
     @Override
     protected LayoutManager createLayout() {
-      LayoutItem[] layoutItems = new LayoutItem[] { new LayoutItem("emitter_spawnrate", spawnRateSpinner), new LayoutItem("emitter_spawnamount", spawnAmountSpinner), new LayoutItem("emitter_updateDelay", updateDelaySpinner), new LayoutItem("emitter_ttl", ttlSpinner),
+      LayoutItem[] layoutItems = new LayoutItem[] { new LayoutItem("emitter_spawnrate", spawnRateSpinner), new LayoutItem("emitter_spawnamount", spawnAmountSpinner), new LayoutItem("emitter_updateDelay", updateDelaySpinner), new LayoutItem("emitter_duration", durationSpinner),
           new LayoutItem("emitter_maxparticles", maxParticlesSpinner) };
       return createLayout(layoutItems, btnPause);
     }
 
     @Override
     protected void clearControls() {
-      spawnRateSpinner.setValue(0);
-      spawnAmountSpinner.setValue(0);
-      updateDelaySpinner.setValue(0);
-      ttlSpinner.setValue(0);
-      maxParticlesSpinner.setValue(0);
+      spawnRateSpinner.setValue(EmitterData.DEFAULT_SPAWNRATE);
+      spawnAmountSpinner.setValue(EmitterData.DEFAULT_SPAWNAMOUNT);
+      updateDelaySpinner.setValue(EmitterData.DEFAULT_UPDATERATE);
+      durationSpinner.setValue(EmitterData.DEFAULT_DURATION);
+      maxParticlesSpinner.setValue(EmitterData.DEFAULT_MAXPARTICLES);
+      btnPause.setSelected(true);
     }
 
     @Override
@@ -107,8 +109,9 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
       spawnRateSpinner.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.SPAWNRATE));
       spawnAmountSpinner.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.SPAWNAMOUNT));
       updateDelaySpinner.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.UPDATERATE));
-      ttlSpinner.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.TIMETOLIVE));
+      durationSpinner.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.DURATION));
       maxParticlesSpinner.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.MAXPARTICLES));
+      btnPause.setSelected(emitter.isPaused());
     }
 
     @Override
@@ -116,20 +119,16 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
       setup(spawnRateSpinner, MapObjectProperty.Emitter.SPAWNRATE);
       setup(spawnAmountSpinner, MapObjectProperty.Emitter.SPAWNAMOUNT);
       setup(updateDelaySpinner, MapObjectProperty.Emitter.UPDATERATE);
-      setup(ttlSpinner, MapObjectProperty.Emitter.TIMETOLIVE);
+      setup(durationSpinner, MapObjectProperty.Emitter.DURATION);
       setup(maxParticlesSpinner, MapObjectProperty.Emitter.MAXPARTICLES);
       btnPause.addActionListener(a -> {
         if (emitter != null) {
           emitter.togglePaused();
         }
-
-        if (!btnPause.isSelected()) {
-          btnPause.setIcon(Icons.PLAY);
-        } else {
-          btnPause.setIcon(Icons.PAUSE);
-        }
       });
     }
+
+
   }
 
   private static class ParticleStylePanel extends EmitterPropertyPanel {
@@ -205,8 +204,8 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
 
     private ParticleSizePanel() {
       super();
-      startWidth = new ParticleParameterModifier(MapObjectProperty.Particle.STARTWIDTH_MIN, MapObjectProperty.Particle.STARTWIDTH_MAX, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_WIDTH, EmitterData.DEFAULT_MAX_WIDTH, STEP_ONE);
-      startHeight = new ParticleParameterModifier(MapObjectProperty.Particle.STARTHEIGHT_MIN, MapObjectProperty.Particle.STARTHEIGHT_MAX, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_HEIGHT, EmitterData.DEFAULT_MAX_HEIGHT, STEP_ONE);
+      startWidth = new ParticleParameterModifier(MapObjectProperty.Particle.STARTWIDTH_MIN, MapObjectProperty.Particle.STARTWIDTH_MAX, 0, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_WIDTH, EmitterData.DEFAULT_MAX_WIDTH, STEP_ONE);
+      startHeight = new ParticleParameterModifier(MapObjectProperty.Particle.STARTHEIGHT_MIN, MapObjectProperty.Particle.STARTHEIGHT_MAX, 0, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_HEIGHT, EmitterData.DEFAULT_MAX_HEIGHT, STEP_ONE);
       deltaWidth = new ParticleParameterModifier(MapObjectProperty.Particle.DELTAWIDTH_MIN, MapObjectProperty.Particle.DELTAWIDTH_MAX, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_DELTA_WIDTH, EmitterData.DEFAULT_MAX_DELTA_WIDTH, STEP_FINEST);
       deltaHeight = new ParticleParameterModifier(MapObjectProperty.Particle.DELTAHEIGHT_MIN, MapObjectProperty.Particle.DELTAHEIGHT_MAX, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_DELTA_HEIGHT, EmitterData.DEFAULT_MAX_DELTA_HEIGHT, STEP_FINEST);
       setLayout(createLayout());
@@ -285,7 +284,7 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
 
     @Override
     protected LayoutManager createLayout() {
-      LayoutItem[] layoutItems = new LayoutItem[] { new LayoutItem("emitter_originAlign", comboBoxAlign), new LayoutItem("emitter_originValign", comboBoxValign), new LayoutItem("emitter_offsetX", offsetX), new LayoutItem("emitter_offsetY", offsetY) };
+      LayoutItem[] layoutItems = new LayoutItem[] { new LayoutItem("emitter_originAlign", comboBoxAlign), new LayoutItem("emitter_originValign", comboBoxValign), new LayoutItem("offsetX", offsetX), new LayoutItem("offsetY", offsetY) };
       return this.createLayout(layoutItems);
     }
 

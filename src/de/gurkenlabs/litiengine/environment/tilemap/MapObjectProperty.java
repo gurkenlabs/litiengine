@@ -82,7 +82,7 @@ public final class MapObjectProperty {
     public static final String SPAWNRATE = "emitterSpawnRate";
     public static final String SPAWNAMOUNT = "emitterSpawnAmount";
     public static final String UPDATERATE = "emitterUpdateDelay";
-    public static final String TIMETOLIVE = "emitterTimeToLive";
+    public static final String DURATION = "emitterDuration";
     public static final String MAXPARTICLES = "emitterMaxParticles";
     public static final String PARTICLETYPE = "emitterParticleType";
     public static final String COLORVARIANCE = "emitterColorVariance";
@@ -115,12 +115,12 @@ public final class MapObjectProperty {
     public static final String DELTAWIDTH_MAX = "particleMaxDeltaWidth";
     public static final String DELTAHEIGHT_MIN = "particleMinDeltaHeight";
     public static final String DELTAHEIGHT_MAX = "particleMaxDeltaHeight";
+    public static final String TTL_MIN = "particleMinTTL";
+    public static final String TTL_MAX = "particleMaxTTL";
     public static final String SPRITE = "particleSprite";
     public static final String ANIMATESPRITE = "particleAnimateSprite";
     public static final String COLLISIONTYPE = "particlePhysics";
     public static final String TEXT = "particleText";
-    public static final String MINTTL = "particleMinTTL";
-    public static final String MAXTTL = "particleMaxTTL";
     public static final String FADE = "particleFade";
     public static final String OUTLINEONLY = "particleOutlineOnly";
 
