@@ -37,6 +37,7 @@ public class EmitterData implements Serializable, Resource {
 
   public static final boolean DEFAULT_ANIMATE_SPRITE = true;
   public static final boolean DEFAULT_FADE = true;
+  public static final boolean DEFAULT_FADE_ON_COLLISION = false;
   public static final boolean DEFAULT_OUTLINE_ONLY = false;
 
   public static final Collision DEFAULT_COLLISION = Collision.NONE;
@@ -110,10 +111,10 @@ public class EmitterData implements Serializable, Resource {
   private ParticleParameter deltaWidth;
 
   @XmlElement
-  private ParticleParameter deltaX;
+  private ParticleParameter velocityX;
 
   @XmlElement
-  private ParticleParameter deltaY;
+  private ParticleParameter velocityY;
 
   @XmlAttribute
   private int emitterDuration;
@@ -122,13 +123,16 @@ public class EmitterData implements Serializable, Resource {
   private boolean fade;
 
   @XmlElement
+  private boolean fadeOnCollision;
+
+  @XmlElement
   private boolean outlineOnly;
 
   @XmlElement
-  private ParticleParameter gravityX;
+  private ParticleParameter accelerationX;
 
   @XmlElement
-  private ParticleParameter gravityY;
+  private ParticleParameter accelerationY;
 
   @XmlAttribute
   private float height;
@@ -186,10 +190,10 @@ public class EmitterData implements Serializable, Resource {
     this.offsetY = new ParticleParameter(DEFAULT_MIN_OFFSET_Y, DEFAULT_MAX_OFFSET_Y);
     this.deltaWidth = new ParticleParameter(DEFAULT_MIN_DELTA_WIDTH, DEFAULT_MAX_DELTA_WIDTH);
     this.deltaHeight = new ParticleParameter(DEFAULT_MIN_DELTA_HEIGHT, DEFAULT_MAX_DELTA_HEIGHT);
-    this.deltaX = new ParticleParameter(DEFAULT_MIN_VELOCITY_X, DEFAULT_MAX_DELTA_X);
-    this.deltaY = new ParticleParameter(DEFAULT_MIN_VELOCITY_Y, DEFAULT_MAX_VELOCITY_Y);
-    this.gravityX = new ParticleParameter(DEFAULT_MIN_ACCELERATION_X, DEFAULT_MAX_ACCELERATION_X);
-    this.gravityY = new ParticleParameter(DEFAULT_MIN_ACCELERATION_Y, DEFAULT_MAX_ACCELERATION_Y);
+    this.velocityX = new ParticleParameter(DEFAULT_MIN_VELOCITY_X, DEFAULT_MAX_DELTA_X);
+    this.velocityY = new ParticleParameter(DEFAULT_MIN_VELOCITY_Y, DEFAULT_MAX_VELOCITY_Y);
+    this.accelerationX = new ParticleParameter(DEFAULT_MIN_ACCELERATION_X, DEFAULT_MAX_ACCELERATION_X);
+    this.accelerationY = new ParticleParameter(DEFAULT_MIN_ACCELERATION_Y, DEFAULT_MAX_ACCELERATION_Y);
     this.particleWidth = new ParticleParameter(DEFAULT_MIN_WIDTH, DEFAULT_MAX_WIDTH);
     this.particleHeight = new ParticleParameter(DEFAULT_MIN_HEIGHT, DEFAULT_MAX_HEIGHT);
     this.particleTTL = new ParticleParameter(DEFAULT_MIN_PARTICLE_TTL, DEFAULT_MAX_PARTICLE_TTL);
@@ -213,6 +217,7 @@ public class EmitterData implements Serializable, Resource {
     this.originValign = DEFAULT_ORIGIN_VALIGN;
     this.originAlign = DEFAULT_ORIGIN_ALIGN;
     this.fade = DEFAULT_FADE;
+    this.fadeOnCollision = DEFAULT_FADE_ON_COLLISION;
     this.outlineOnly = DEFAULT_OUTLINE_ONLY;
   }
 
@@ -252,13 +257,13 @@ public class EmitterData implements Serializable, Resource {
   }
 
   @XmlTransient
-  public ParticleParameter getDeltaX() {
-    return this.deltaX;
+  public ParticleParameter getVelocityX() {
+    return this.velocityX;
   }
 
   @XmlTransient
-  public ParticleParameter getDeltaY() {
-    return this.deltaY;
+  public ParticleParameter getVelocityY() {
+    return this.velocityY;
   }
 
   @XmlTransient
@@ -267,13 +272,13 @@ public class EmitterData implements Serializable, Resource {
   }
 
   @XmlTransient
-  public ParticleParameter getGravityX() {
-    return this.gravityX;
+  public ParticleParameter getAccelerationX() {
+    return this.accelerationX;
   }
 
   @XmlTransient
-  public ParticleParameter getGravityY() {
-    return this.gravityY;
+  public ParticleParameter getAccelerationY() {
+    return this.accelerationY;
   }
 
   @XmlTransient
@@ -369,6 +374,10 @@ public class EmitterData implements Serializable, Resource {
     return this.fade;
   }
 
+  public boolean isFadingOnCollision() {
+    return this.fadeOnCollision;
+  }
+
   public boolean isOutlineOnly() {
     return this.outlineOnly;
   }
@@ -415,12 +424,12 @@ public class EmitterData implements Serializable, Resource {
     this.deltaWidth = deltaWidth;
   }
 
-  public void setDeltaX(final ParticleParameter deltaX) {
-    this.deltaX = deltaX;
+  public void setVelocityX(final ParticleParameter velocityX) {
+    this.velocityX = velocityX;
   }
 
-  public void setDeltaY(final ParticleParameter deltaY) {
-    this.deltaY = deltaY;
+  public void setDeltaY(final ParticleParameter velocityY) {
+    this.velocityY = velocityY;
   }
 
   public void setEmitterDuration(final int emitterDuration) {
@@ -431,12 +440,16 @@ public class EmitterData implements Serializable, Resource {
     this.fade = fade;
   }
 
-  public void setGravityX(final ParticleParameter gravityX) {
-    this.gravityX = gravityX;
+  public void setFadeOnCollision(final boolean fadeOnCollision) {
+    this.fadeOnCollision = fadeOnCollision;
   }
 
-  public void setGravityY(final ParticleParameter gravityY) {
-    this.gravityY = gravityY;
+  public void setAccelerationX(final ParticleParameter accelerationX) {
+    this.accelerationX = accelerationX;
+  }
+
+  public void setAccelerationY(final ParticleParameter accelerationY) {
+    this.accelerationY = accelerationY;
   }
 
   public void setHeight(final float height) {

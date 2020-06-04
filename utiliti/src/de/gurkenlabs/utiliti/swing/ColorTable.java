@@ -53,7 +53,7 @@ public class ColorTable extends PropertyPanel {
     btnRemove.setPreferredSize(BUTTON_SIZE);
     btnRemove.setMinimumSize(BUTTON_SIZE);
     btnRemove.setMaximumSize(BUTTON_SIZE);
-    btnEdit = new JButton(Icons.PENCIL);
+    btnEdit = new JButton(Icons.COLOR);
     btnEdit.setPreferredSize(BUTTON_SIZE);
     btnEdit.setMinimumSize(BUTTON_SIZE);
     btnEdit.setMaximumSize(BUTTON_SIZE);

@@ -43,7 +43,7 @@ public abstract class Particle implements ITimeToLive {
   private int timeToLive;
   private float width;
 
-  /** The currentlocation of the particle on the X-axis. */
+  /** The current location of the particle on the X-axis. */
   private float x;
 
   /** The current location of the particle on the Y-axis. */
@@ -92,6 +92,13 @@ public abstract class Particle implements ITimeToLive {
     return this.aliveTime;
   }
 
+  /**
+   * Gets the current bounding box of the particle, depending on its spawn location.
+   * 
+   * @param origin
+   *          the spawn location of this particle
+   * @return
+   */
   public Rectangle2D getBoundingBox(final Point2D origin) {
     return new Rectangle2D.Double(origin.getX() + this.getX(), origin.getY() + this.getY(), this.getWidth(), this.getHeight());
   }
@@ -116,19 +123,19 @@ public abstract class Particle implements ITimeToLive {
     return this.deltaWidth;
   }
 
-  public float getDx() {
+  public float getVelocityX() {
     return this.velocityX;
   }
 
-  public float getDy() {
+  public float getVelocityY() {
     return this.velocityY;
   }
 
-  public float getGravityX() {
+  public float getAccelerationX() {
     return this.accelerationX;
   }
 
-  public float getGravityY() {
+  public float getAccelerationY() {
     return this.accelerationY;
   }
 
@@ -333,16 +340,19 @@ public abstract class Particle implements ITimeToLive {
     }
 
     this.aliveTime = Game.time().since(this.aliveTick);
-    if (this.timeToLiveReached() || this.colliding) {
+    if (this.timeToLiveReached()) {
       return;
     }
 
     if (this.isFading()) {
       this.opacity = (float) (this.getTimeToLive() > 0 ? (this.getTimeToLive() - this.getAliveTime()) / (double) this.getTimeToLive() : 1);
     }
-
     final int alpha = (int) (this.getOpacity() * this.getColorAlpha());
     this.color = new Color(this.color.getRed(), this.color.getGreen(), this.color.getBlue(), alpha >= 0 ? alpha : 0);
+
+    if (this.colliding) {
+      return;
+    }
 
     if (this.getDeltaWidth() != 0) {
       this.width += this.getDeltaWidth() * updateRatio;
@@ -353,8 +363,8 @@ public abstract class Particle implements ITimeToLive {
     }
 
     // test for ray cast collision
-    final float targetX = this.x + this.getDx() * updateRatio;
-    final float targetY = this.y + this.getDy() * updateRatio;
+    final float targetX = this.x + this.getVelocityX() * updateRatio;
+    final float targetY = this.y + this.getVelocityY() * updateRatio;
 
     if (targetX == this.x && targetY == this.y) {
       return;
@@ -364,20 +374,20 @@ public abstract class Particle implements ITimeToLive {
       return;
     }
 
-    if (this.getDx() != 0) {
+    if (this.getVelocityX() != 0) {
       this.x = targetX;
     }
 
-    if (this.getDy() != 0) {
+    if (this.getVelocityY() != 0) {
       this.y = targetY;
     }
 
-    if (this.getGravityX() != 0) {
-      this.velocityX += this.getGravityX() * updateRatio;
+    if (this.getAccelerationX() != 0) {
+      this.velocityX += this.getAccelerationX() * updateRatio;
     }
 
-    if (this.getGravityY() != 0) {
-      this.velocityY += this.getGravityY() * updateRatio;
+    if (this.getAccelerationY() != 0) {
+      this.velocityY += this.getAccelerationY() * updateRatio;
     }
   }
 
@@ -388,28 +398,29 @@ public abstract class Particle implements ITimeToLive {
 
     if (this.isContinuousCollisionEnabled()) {
       Point2D start = this.getAbsoluteLocation(emitterOrigin);
-      double endX = emitterOrigin.getX() + targetX - this.getWidth() / 2.0;
-      double endY = emitterOrigin.getY() + targetY - this.getHeight() / 2.0;
-
+      double endX = emitterOrigin.getX() + targetX;
+      double endY = emitterOrigin.getY() + targetY;
       Line2D ray = new Line2D.Double(start.getX(), start.getY(), endX, endY);
       if (this.getCollisionType() != Collision.NONE && Game.physics() != null && Game.physics().collides(ray, this.getCollisionType())) {
-        if (this.isFadingOnCollision()) {
-          this.opacity = 0;
-        }
+        collide();
 
-        this.colliding = true;
         return true;
       }
     } else if (this.getCollisionType() != Collision.NONE && Game.physics() != null && Game.physics().collides(this.getBoundingBox(emitterOrigin), this.getCollisionType())) {
-      if (this.isFadingOnCollision()) {
-        this.opacity = 0;
-      }
-
-      this.colliding = true;
+      collide();
       return true;
     }
 
     return false;
+  }
+
+  private void collide() {
+    if (!this.colliding) {
+      this.colliding = true;
+      if (this.isFadingOnCollision()) {
+        this.setFade(true);
+      }
+    }
   }
 
   public Point2D getAbsoluteLocation(final Point2D effectLocation) {

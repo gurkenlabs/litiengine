@@ -79,7 +79,7 @@ public class CollisionPanel extends PropertyPanel {
         new LayoutItem("panel_height", this.spinnerHeight),
         new LayoutItem("panel_align", this.comboBoxAlign),
         new LayoutItem("panel_valign", this.comboBoxValign),
-        new LayoutItem("panel_collisionType", this.comboBoxColl), 
+        new LayoutItem("collisionType", this.comboBoxColl), 
     };
     
     return this.createLayout(layoutItems, this.chckbxHasCollision);

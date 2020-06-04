@@ -19,6 +19,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.ParticleType;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
+import de.gurkenlabs.litiengine.physics.Collision;
 import de.gurkenlabs.utiliti.swing.ColorTable;
 import de.gurkenlabs.utiliti.swing.Icons;
 import de.gurkenlabs.utiliti.swing.panels.EmitterPanel.EmitterPropertyGroup;
@@ -355,32 +356,41 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
   }
 
   private static class ParticleCollisionPanel extends EmitterPropertyPanel {
+    JComboBox<Collision> collisionType;
+    JToggleButton fadeOnCollision;
+
     private ParticleCollisionPanel() {
       super();
+      collisionType = new JComboBox<Collision>(new DefaultComboBoxModel<Collision>(Collision.values()));
+      fadeOnCollision = new JToggleButton();
+      fadeOnCollision.putClientProperty("JToggleButton.variant", DarkToggleButtonUI.VARIANT_SLIDER);
+      setLayout(createLayout());
+      setupChangedListeners();
     }
 
     @Override
     protected void clearControls() {
-      // TODO Auto-generated method stub
-
+      collisionType.setSelectedItem(EmitterData.DEFAULT_COLLISION);
+      fadeOnCollision.setSelected(EmitterData.DEFAULT_FADE_ON_COLLISION);
     }
 
     @Override
     protected void setControlValues(IMapObject mapObject) {
-      this.emitter = Game.world().environment().getEmitter(mapObject.getId());
+      collisionType.setSelectedItem(mapObject.getEnumValue(MapObjectProperty.COLLISION_TYPE, Collision.class, EmitterData.DEFAULT_COLLISION));
+      fadeOnCollision.setSelected(mapObject.getBoolValue(MapObjectProperty.Particle.FADEONCOLLISION, EmitterData.DEFAULT_FADE_ON_COLLISION));
 
     }
 
     @Override
     protected LayoutManager createLayout() {
-      // TODO Auto-generated method stub
-      return null;
+      LayoutItem[] layoutItems = new LayoutItem[] { new LayoutItem("collisionType", collisionType), new LayoutItem("particle_fadeOnCollision", fadeOnCollision) };
+      return this.createLayout(layoutItems);
     }
 
     @Override
     protected void setupChangedListeners() {
-      // TODO Auto-generated method stub
-
+      setup(collisionType, MapObjectProperty.COLLISION_TYPE);
+      setup(fadeOnCollision, MapObjectProperty.Particle.FADEONCOLLISION);
     }
   }
 

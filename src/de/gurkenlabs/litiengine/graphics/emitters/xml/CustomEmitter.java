@@ -150,10 +150,10 @@ public class CustomEmitter extends Emitter {
 
     x = (float) this.getEmitterData().getParticleOffsetX().get();
     y = (float) this.getEmitterData().getParticleOffsetY().get();
-    deltaX = (float) this.getEmitterData().getDeltaX().get();
-    deltaY = (float) this.getEmitterData().getDeltaY().get();
-    gravityX = (float) this.getEmitterData().getGravityX().get();
-    gravityY = (float) this.getEmitterData().getGravityY().get();
+    deltaX = (float) this.getEmitterData().getVelocityX().get();
+    deltaY = (float) this.getEmitterData().getVelocityY().get();
+    gravityX = (float) this.getEmitterData().getAccelerationX().get();
+    gravityY = (float) this.getEmitterData().getAccelerationY().get();
     width = (float) this.getEmitterData().getParticleWidth().get();
     height = (float) this.getEmitterData().getParticleHeight().get();
     deltaWidth = (float) this.getEmitterData().getDeltaWidth().get();
@@ -212,6 +212,7 @@ public class CustomEmitter extends Emitter {
     particle.setCollisionType(this.getEmitterData().getCollisionType());
     particle.setOutlineOnly(this.getEmitterData().isOutlineOnly());
     particle.setFade(this.getEmitterData().isFading());
+    particle.setFadeOnCollision(this.getEmitterData().isFadingOnCollision());
     return particle;
   }
 
