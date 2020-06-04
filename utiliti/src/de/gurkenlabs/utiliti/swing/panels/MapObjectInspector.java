@@ -62,7 +62,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.panels.put(MapObjectType.TRIGGER, new TriggerPanel());
     this.panels.put(MapObjectType.LIGHTSOURCE, new LightSourcePanel());
     this.panels.put(MapObjectType.SPAWNPOINT, new SpawnpointPanel());
-    this.panels.put(MapObjectType.EMITTER, new UpdatedEmitterPanel());
+    this.panels.put(MapObjectType.EMITTER, new EmitterPanel());
     this.panels.put(MapObjectType.CREATURE, new CreaturePanel());
     this.collisionPanel = new CollisionPanel();
     this.combatPanel = new CombatPanel();
