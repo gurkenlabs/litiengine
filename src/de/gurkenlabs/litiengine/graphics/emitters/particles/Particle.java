@@ -71,8 +71,6 @@ public abstract class Particle implements ITimeToLive {
    *          the width
    * @param height
    *          the height
-   * @param ttl
-   *          The remaining time to live of the particle.
    * @param color
    *          The color of the effect.
    */
