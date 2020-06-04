@@ -222,25 +222,44 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
   }
 
   private static class ParticleSizePanel extends EmitterPropertyPanel {
+    private ParticleParameterModifier startWidth;
+    private ParticleParameterModifier startHeight;
+    private ParticleParameterModifier deltaWidth;
+    private ParticleParameterModifier deltaHeight;
+
     private ParticleSizePanel() {
       super();
+      startWidth = new ParticleParameterModifier(MapObjectProperty.Particle.MINSTARTWIDTH, MapObjectProperty.Particle.MAXSTARTWIDTH, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_WIDTH, EmitterData.DEFAULT_MAX_WIDTH, 1);
+      startHeight = new ParticleParameterModifier(MapObjectProperty.Particle.MINSTARTHEIGHT, MapObjectProperty.Particle.MAXSTARTHEIGHT, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_HEIGHT, EmitterData.DEFAULT_MAX_HEIGHT, 1);
+      deltaWidth = new ParticleParameterModifier(MapObjectProperty.Particle.MINDELTAWIDTH, MapObjectProperty.Particle.MAXDELTAWIDTH, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_DELTA_WIDTH, EmitterData.DEFAULT_MAX_DELTA_WIDTH, .01f);
+      deltaHeight = new ParticleParameterModifier(MapObjectProperty.Particle.MINDELTAHEIGHT, MapObjectProperty.Particle.MAXDELTAHEIGHT, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_DELTA_HEIGHT, EmitterData.DEFAULT_MAX_DELTA_HEIGHT, .01f);
+      setLayout(createLayout());
+      setupChangedListeners();
+    }
+
+    @Override
+    public void bind(IMapObject mapObject) {
+      super.bind(mapObject);
+      startWidth.bind(mapObject);
+      startHeight.bind(mapObject);
+      deltaWidth.bind(mapObject);
+      deltaHeight.bind(mapObject);
     }
 
     @Override
     protected void clearControls() {
-      // TODO Auto-generated method stub
 
     }
 
     @Override
     protected void setControlValues(IMapObject mapObject) {
-      this.emitter = Game.world().environment().getEmitter(mapObject.getId());
 
     }
 
     @Override
     protected LayoutManager createLayout() {
-      return null;
+      LayoutItem[] layoutItems = new LayoutItem[] { new LayoutItem("emitter_startWidth", startWidth), new LayoutItem("emitter_startHeight", startHeight), new LayoutItem("emitter_deltaWidth", deltaWidth), new LayoutItem("emitter_deltaHeight", deltaHeight) };
+      return this.createLayout(layoutItems);
     }
 
     @Override
