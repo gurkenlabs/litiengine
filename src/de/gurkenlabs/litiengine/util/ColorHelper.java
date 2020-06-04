@@ -4,8 +4,6 @@ import java.awt.Color;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.gurkenlabs.litiengine.Game;
-
 public final class ColorHelper {
   private static final Logger log = Logger.getLogger(ColorHelper.class.getName());
   private static final int HEX_STRING_LENGTH = 7;
@@ -121,26 +119,6 @@ public final class ColorHelper {
    */
   public static int ensureColorValueRange(int value) {
     return Math.min(Math.max(value, 0), MAX_RGB_VALUE);
-  }
-
-  /**
-   * Returns a randomized variant of a given color.
-   * 
-   * @param originalColor
-   *          The original color to be modified.
-   * @param colorVariance
-   *          The float value between 0 and 1 defining how strong the new Color's RGB values will deviate from the original Color.
-   * @param alphaVariance
-   *          The float value between 0 and 1 defining how strong the new Color's Alpha will deviate from the original Color.
-   * @return A pseudo-randomized variant of the original Color.
-   */
-  public static Color getRandomVariant(Color originalColor, float colorVariance, float alphaVariance) {
-    int red = MathUtilities.clamp((int) (originalColor.getRed() + (originalColor.getRed() * Game.random().nextFloat(colorVariance) * Game.random().nextSign())), 0, 255);
-    int green = MathUtilities.clamp((int) (originalColor.getGreen() + (originalColor.getGreen() * Game.random().nextFloat(colorVariance) * Game.random().nextSign())), 0, 255);
-    int blue = MathUtilities.clamp((int) (originalColor.getBlue() + (originalColor.getBlue() * Game.random().nextFloat(colorVariance) * Game.random().nextSign())), 0, 255);
-    int alpha = MathUtilities.clamp((int) (originalColor.getAlpha() + (originalColor.getAlpha() * Game.random().nextFloat(colorVariance) * Game.random().nextSign())), 0, 255);
-    return new Color(red, green, blue, alpha);
-
   }
 
   /**

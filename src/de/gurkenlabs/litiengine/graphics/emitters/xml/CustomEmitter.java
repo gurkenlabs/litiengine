@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.EmitterInfo;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
@@ -130,7 +131,7 @@ public class CustomEmitter extends Emitter {
       return EmitterData.DEFAULT_COLOR;
     }
 
-    return ColorHelper.getRandomVariant(this.getColors().get(ThreadLocalRandom.current().nextInt(this.getColors().size())), this.getEmitterData().getColorVariance(), this.getEmitterData().getAlphaVariance());
+    return Game.random().nextColor(this.getColors().get(ThreadLocalRandom.current().nextInt(this.getColors().size())), this.getEmitterData().getColorVariance(), this.getEmitterData().getAlphaVariance());
   }
 
   @Override
