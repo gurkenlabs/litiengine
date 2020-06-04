@@ -67,6 +67,7 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
     private JSpinner updateDelaySpinner;
     private JSpinner durationSpinner;
     private JSpinner maxParticlesSpinner;
+    private ParticleParameterModifier ttl;
     private JToggleButton btnPause;
 
     private EmissionPanel() {
@@ -76,6 +77,7 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
       updateDelaySpinner = new JSpinner(new SpinnerNumberModel(EmitterData.DEFAULT_UPDATERATE, 0, Integer.MAX_VALUE, STEP_COARSE));
       durationSpinner = new JSpinner(new SpinnerNumberModel(EmitterData.DEFAULT_DURATION, 0, Integer.MAX_VALUE, STEP_SPARSE));
       maxParticlesSpinner = new JSpinner(new SpinnerNumberModel(EmitterData.DEFAULT_MAXPARTICLES, 1, Integer.MAX_VALUE, STEP_ONE));
+      ttl = new ParticleParameterModifier(MapObjectProperty.Particle.TTL_MIN, MapObjectProperty.Particle.TTL_MIN, Integer.MIN_VALUE, Integer.MAX_VALUE, EmitterData.DEFAULT_MIN_PARTICLE_TTL, EmitterData.DEFAULT_MAX_PARTICLE_TTL, STEP_SPARSE);
 
       btnPause = new JToggleButton();
       btnPause.setSelected(true);
@@ -87,9 +89,15 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
     }
 
     @Override
+    public void bind(IMapObject mapObject) {
+      super.bind(mapObject);
+      ttl.bind(mapObject);
+    }
+
+    @Override
     protected LayoutManager createLayout() {
       LayoutItem[] layoutItems = new LayoutItem[] { new LayoutItem("emitter_spawnrate", spawnRateSpinner), new LayoutItem("emitter_spawnamount", spawnAmountSpinner), new LayoutItem("emitter_updateDelay", updateDelaySpinner), new LayoutItem("emitter_duration", durationSpinner),
-          new LayoutItem("emitter_maxparticles", maxParticlesSpinner) };
+          new LayoutItem("emitter_maxparticles", maxParticlesSpinner), new LayoutItem("emitter_particleTTL", ttl) };
       return createLayout(layoutItems, btnPause);
     }
 
@@ -100,6 +108,7 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
       updateDelaySpinner.setValue(EmitterData.DEFAULT_UPDATERATE);
       durationSpinner.setValue(EmitterData.DEFAULT_DURATION);
       maxParticlesSpinner.setValue(EmitterData.DEFAULT_MAXPARTICLES);
+      emitter = null;
       btnPause.setSelected(true);
     }
 
@@ -111,7 +120,7 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
       updateDelaySpinner.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.UPDATERATE));
       durationSpinner.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.DURATION));
       maxParticlesSpinner.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.MAXPARTICLES));
-      btnPause.setSelected(emitter.isPaused());
+      btnPause.setSelected(emitter != null ? emitter.isPaused() : true);
     }
 
     @Override
@@ -127,7 +136,6 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
         }
       });
     }
-
 
   }
 

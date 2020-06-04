@@ -58,7 +58,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   private int particleUpdateDelay;
   private int spawnAmount;
   private int spawnRate;
-  private int timeToLive;
+  private int duration;
   private Valign originValign;
   private Align originAlign;
 
@@ -84,7 +84,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
       this.maxParticles = info.maxParticles();
       this.spawnAmount = info.spawnAmount();
       this.spawnRate = info.spawnRate();
-      this.timeToLive = info.duration();
+      this.duration = info.duration();
       this.particleMinTTL = info.particleMinTTL();
       this.particleMaxTTL = info.particleMaxTTL();
       this.particleUpdateDelay = info.particleUpdateRate();
@@ -114,7 +114,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   }
 
   /**
-   * Sets all of the data of the specified particle to the new data provided.
+   * Adds a particle to this Emitter's list of Particles.
    *
    * @param particle
    *          the particle
@@ -241,7 +241,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
    */
   @Override
   public int getTimeToLive() {
-    return this.timeToLive;
+    return this.duration;
   }
 
   public boolean isActivateOnInit() {
@@ -253,14 +253,12 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   }
 
   /**
-   * Checks if is finished.
+   * Checks if the emitter duration is reached.
    *
-   * @return true, if is finished
+   * @return true, if the emitter is finished
    */
   public boolean isFinished() {
-    // if a time to live is set and reached or ir the emitter has been started
-    // and no particles are left
-    return this.getTimeToLive() > 0 && this.timeToLiveReached() || this.activated && this.lastSpawn > 0 && this.getParticles().isEmpty();
+    return this.getTimeToLive() > 0 && this.timeToLiveReached();
   }
 
   /**
@@ -345,7 +343,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   }
 
   public void setDuration(final int ttl) {
-    this.timeToLive = ttl;
+    this.duration = ttl;
   }
 
   /**
@@ -394,8 +392,8 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     }
 
     this.aliveTime = Game.time().since(this.activationTick);
-
     if ((this.getSpawnRate() == 0 || Game.time().since(this.lastSpawn) >= this.getSpawnRate())) {
+      this.lastSpawn = Game.time().now();
       this.spawnParticle();
     }
   }
@@ -430,27 +428,6 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     }
 
     return this.colors.get(ThreadLocalRandom.current().nextInt(this.colors.size()));
-  }
-
-  protected int getRandomParticleTTL() {
-    if (this.getParticleMaxTTL() == 0) {
-      return this.getParticleMinTTL();
-    }
-
-    final int ttlDiff = this.getParticleMaxTTL() - this.getParticleMinTTL();
-    if (ttlDiff <= 0) {
-      return this.getParticleMaxTTL();
-    }
-
-    return ThreadLocalRandom.current().nextInt(this.getParticleMaxTTL() - this.getParticleMinTTL()) + this.getParticleMinTTL();
-  }
-
-  protected int getRandomParticleX() {
-    return ThreadLocalRandom.current().nextInt((int) this.getWidth());
-  }
-
-  protected int getRandomParticleY() {
-    return ThreadLocalRandom.current().nextInt((int) this.getHeight());
   }
 
   /**
