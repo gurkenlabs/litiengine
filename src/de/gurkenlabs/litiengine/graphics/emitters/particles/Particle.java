@@ -78,8 +78,10 @@ public abstract class Particle implements ITimeToLive {
     this.setCustomRenderType(RenderType.NONE);
     this.setWidth(width);
     this.setHeight(height);
-    this.color = color;
-    this.colorAlpha = this.color.getAlpha();
+    if (color != null) {
+      this.color = color;
+      this.colorAlpha = this.color.getAlpha();
+    }
     this.collisionType = Collision.NONE;
     this.opacity = 1;
     this.fade = true;
@@ -348,7 +350,9 @@ public abstract class Particle implements ITimeToLive {
       this.opacity = (float) (this.getTimeToLive() > 0 ? (this.getTimeToLive() - this.getAliveTime()) / (double) this.getTimeToLive() : 1);
     }
     final int alpha = (int) (this.getOpacity() * this.getColorAlpha());
-    this.color = new Color(this.color.getRed(), this.color.getGreen(), this.color.getBlue(), alpha >= 0 ? alpha : 0);
+    if (this.color != null) {
+      this.color = new Color(this.color.getRed(), this.color.getGreen(), this.color.getBlue(), alpha >= 0 ? alpha : 0);
+    }
 
     if (this.colliding) {
       return;

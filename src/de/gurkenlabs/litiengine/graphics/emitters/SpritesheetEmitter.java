@@ -1,7 +1,7 @@
 package de.gurkenlabs.litiengine.graphics.emitters;
 
-import java.awt.Image;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 import java.util.concurrent.ThreadLocalRandom;
 
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
@@ -21,7 +21,7 @@ public abstract class SpritesheetEmitter extends Emitter {
     return this.spriteSheet;
   }
 
-  protected Image getRandomSprite() {
+  protected BufferedImage getRandomSprite() {
     return this.getSpritesheet().getSprite(ThreadLocalRandom.current().nextInt(this.getSpritesheet().getTotalNumberOfSprites()));
   }
 

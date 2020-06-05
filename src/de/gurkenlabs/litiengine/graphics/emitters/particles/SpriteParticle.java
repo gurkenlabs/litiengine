@@ -1,23 +1,26 @@
 package de.gurkenlabs.litiengine.graphics.emitters.particles;
 
 import java.awt.AlphaComposite;
-import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 
 import de.gurkenlabs.litiengine.graphics.ImageRenderer;
 
 public class SpriteParticle extends Particle {
   private float angle;
-  private final Image image;
+  private final BufferedImage image;
 
-  public SpriteParticle(final Image sprite) {
-    super(0, 0, Color.WHITE);
+  public SpriteParticle(final BufferedImage sprite) {
+    super(0, 0, null);
     this.image = sprite;
-    this.setWidth(this.image.getWidth(null));
-    this.setHeight(this.image.getHeight(null));
+    if (sprite == null) {
+      return;
+    }
+    this.setWidth(sprite.getWidth());
+    this.setHeight(sprite.getHeight());
   }
 
   public float getAngle() {
@@ -36,6 +39,11 @@ public class SpriteParticle extends Particle {
       ImageRenderer.render(g, this.image, renderLocation);
     }
     g.setComposite(oldComp);
+  }
+
+  @Override
+  public Rectangle2D getBoundingBox(final Point2D origin) {
+    return new Rectangle2D.Double(origin.getX() + this.getX() - this.getWidth() / 2, origin.getY() + this.getY() - this.getHeight() / 2, this.getWidth(), this.getHeight());
   }
 
   public Particle setAngle(final float angle) {

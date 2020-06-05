@@ -142,6 +142,7 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
     private JToggleButton outlineOnly;
     private final EmitterColorPanel colorPanel;
     private final EmitterTextPanel textPanel;
+    private final EmitterSpritePanel spritePanel;
     private JTabbedPane styleTabs;
 
     private ParticleStylePanel() {
@@ -153,9 +154,11 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
       fade.putClientProperty("JToggleButton.variant", DarkToggleButtonUI.VARIANT_SLIDER);
       colorPanel = new EmitterColorPanel();
       textPanel = new EmitterTextPanel();
+      spritePanel = new EmitterSpritePanel();
       styleTabs = new JTabbedPane();
       styleTabs.add(Resources.strings().get("particle_colors"), colorPanel);
       styleTabs.add(Resources.strings().get("particle_text"), textPanel);
+      styleTabs.add(Resources.strings().get("particle_sprite"), spritePanel);
 
       setLayout(createLayout());
       setupChangedListeners();
@@ -166,6 +169,7 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
       super.bind(mapObject);
       colorPanel.bind(mapObject);
       textPanel.bind(mapObject);
+      spritePanel.bind(mapObject);
     }
 
     @Override
@@ -192,9 +196,30 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
     @Override
     protected void setupChangedListeners() {
       setup(comboBoxParticleType, MapObjectProperty.Emitter.PARTICLETYPE);
+      comboBoxParticleType.addItemListener(e -> {
+        switch ((ParticleType) e.getItem()) {
+        case SPRITE:
+          styleTabs.setEnabledAt(0, false);
+          styleTabs.setEnabledAt(1, false);
+          styleTabs.setEnabledAt(2, true);
+          styleTabs.setSelectedIndex(2);
+          break;
+        case TEXT:
+          styleTabs.setEnabledAt(0, true);
+          styleTabs.setEnabledAt(1, true);
+          styleTabs.setEnabledAt(2, false);
+          styleTabs.setSelectedIndex(1);
+          break;
+        default:
+          styleTabs.setEnabledAt(0, true);
+          styleTabs.setEnabledAt(1, false);
+          styleTabs.setEnabledAt(2, false);
+          styleTabs.setSelectedIndex(0);
+          break;
+        }
+      });
       setup(outlineOnly, MapObjectProperty.Particle.OUTLINEONLY);
       setup(fade, MapObjectProperty.Particle.FADE);
-
     }
   }
 

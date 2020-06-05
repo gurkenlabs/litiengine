@@ -117,7 +117,6 @@ public final class MapObjectProperty {
     public static final String DELTAHEIGHT_MAX = "particleMaxDeltaHeight";
     public static final String TTL_MIN = "particleMinTTL";
     public static final String TTL_MAX = "particleMaxTTL";
-    public static final String SPRITE = "particleSprite";
     public static final String ANIMATESPRITE = "particleAnimateSprite";
     public static final String TEXTS = "particleTexts";
     public static final String FADE = "particleFade";

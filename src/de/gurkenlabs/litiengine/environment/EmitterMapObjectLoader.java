@@ -93,7 +93,7 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     data.setCollisionType(mapObject.getEnumValue(MapObjectProperty.COLLISION_TYPE, Collision.class, Collision.NONE));
 
     data.setTexts(Arrays.asList(mapObject.getStringValue(MapObjectProperty.Particle.TEXTS).split(",")));
-    data.setSpritesheet(mapObject.getStringValue(MapObjectProperty.Particle.SPRITE));
+    data.setSpritesheet(mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME));
     data.setAnimateSprite(mapObject.getBoolValue(MapObjectProperty.Particle.ANIMATESPRITE));
     data.setFade(mapObject.getBoolValue(MapObjectProperty.Particle.FADE));
     data.setFadeOnCollision(mapObject.getBoolValue(MapObjectProperty.Particle.FADEONCOLLISION));
@@ -151,8 +151,8 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     mo.setValue(MapObjectProperty.COLLISION_TYPE, emitterData.getCollisionType());
     String commaSeperatedTexts = ArrayUtilities.join(emitterData.getTexts());
     mo.setValue(MapObjectProperty.Particle.TEXTS, commaSeperatedTexts);
-    
-    mo.setValue(MapObjectProperty.Particle.SPRITE, emitterData.getSpritesheet());
+
+    mo.setValue(MapObjectProperty.SPRITESHEETNAME, emitterData.getSpritesheet());
     mo.setValue(MapObjectProperty.Particle.ANIMATESPRITE, emitterData.isAnimateSprite());
     mo.setValue(MapObjectProperty.Particle.FADE, emitterData.isFading());
     mo.setValue(MapObjectProperty.Particle.FADEONCOLLISION, emitterData.isFadingOnCollision());

@@ -16,9 +16,7 @@ import com.github.weisj.darklaf.components.border.DarkBorders;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
-import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.utiliti.swing.Icons;
-import de.gurkenlabs.utiliti.swing.panels.PropertyPanel.LayoutItem;
 
 @SuppressWarnings("serial")
 public class EmitterTextPanel extends PropertyPanel {

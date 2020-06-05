@@ -192,10 +192,10 @@ public class CustomEmitter extends Emitter {
       break;
     case SPRITE:
       Spritesheet sprite = Resources.spritesheets().get(this.getEmitterData().getSpritesheet());
-      if (sprite == null) {
+      if (sprite == null || sprite.getTotalNumberOfSprites() <= 0) {
         return null;
       }
-      particle = new SpriteParticle(sprite.getSprite(ThreadLocalRandom.current().nextInt(0, sprite.getTotalNumberOfSprites() - 1)));
+      particle = new SpriteParticle(sprite.getSprite(ThreadLocalRandom.current().nextInt(sprite.getTotalNumberOfSprites())));
       break;
     default:
       particle = new RectangleParticle(width, height, this.getRandomParticleColor());
