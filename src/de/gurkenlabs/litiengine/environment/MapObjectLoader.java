@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.environment;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -85,13 +86,25 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
       }
     });
   }
-  
+
+  public static List<String> getCommaSeparatedValues(IMapObject mapObject, String mapObjectProperty, String defaultValue) {
+    List<String> values = new ArrayList<>();
+    String valuesStr = mapObject.getStringValue(mapObjectProperty, defaultValue);
+    if (valuesStr != null && !valuesStr.isEmpty()) {
+      for (String value : valuesStr.split(","))
+        if (value != null) {
+          values.add(value);
+        }
+    }
+    return values;
+  }
+
   protected boolean isMatchingType(IMapObject mapObject) {
     if (!mapObject.getType().equalsIgnoreCase(this.getMapObjectType())) {
       log.log(Level.SEVERE, "Cannot load a mapobject of the type [{0}] with a loader of type [{1}].", new Object[] { mapObject.getType(), this.getClass() });
       return false;
     }
-    
+
     return true;
   }
 

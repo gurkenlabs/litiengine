@@ -48,7 +48,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 
 public class MapObjectLoaderTests {
   private Environment testEnvironment;
-  
+
   @BeforeAll
   public static void initGame() {
 
@@ -61,7 +61,7 @@ public class MapObjectLoaderTests {
   public static void terminateGame() {
     GameTest.resetGame();
   }
-  
+
   @BeforeEach
   public void initEnvironment() {
     IMap map = mock(IMap.class);
@@ -69,10 +69,9 @@ public class MapObjectLoaderTests {
     when(map.getSizeInTiles()).thenReturn(new Dimension(10, 10));
     when(map.getOrientation()).thenReturn(MapOrientations.ORTHOGONAL);
     when(map.getRenderLayers()).thenReturn(new ArrayList<>());
-    
+
     this.testEnvironment = new Environment(map);
   }
-  
 
   @Test
   public void testCreatureMapObjectLoader() {
@@ -82,14 +81,14 @@ public class MapObjectLoaderTests {
     mapObject.setId(111);
     mapObject.setName("testCreature");
     mapObject.setLocation(100, 100);
-    
+
     // collision
     mapObject.setValue(MapObjectProperty.COLLISION, true);
     mapObject.setValue(MapObjectProperty.COLLISIONBOX_WIDTH, 100.0f);
     mapObject.setValue(MapObjectProperty.COLLISIONBOX_HEIGHT, 100.0f);
     mapObject.setValue(MapObjectProperty.COLLISION_ALIGN, Align.LEFT);
     mapObject.setValue(MapObjectProperty.COLLISION_VALIGN, Valign.MIDDLE);
-    
+
     // combat
     mapObject.setValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE, true);
     mapObject.setValue(MapObjectProperty.COMBAT_HITPOINTS, 100);
@@ -100,25 +99,25 @@ public class MapObjectLoaderTests {
     mapObject.setValue(MapObjectProperty.MOVEMENT_ACCELERATION, 150);
     mapObject.setValue(MapObjectProperty.MOVEMENT_DECELERATION, 160);
     mapObject.setValue(MapObjectProperty.MOVEMENT_TURNONMOVE, true);
-    
+
     Collection<IEntity> entities = loader.load(this.testEnvironment, mapObject);
     Optional<IEntity> opt = entities.stream().findFirst();
     assertTrue(opt.isPresent());
-    
+
     IEntity entity = opt.get();
     assertNotNull(entity);
     assertEquals(111, entity.getMapId());
     assertEquals("testCreature", entity.getName());
     assertEquals(100, entity.getX(), 0.0001);
     assertEquals(100, entity.getY(), 0.0001);
-    
+
     Creature creature = (Creature) entity;
     assertTrue(creature.hasCollision());
     assertEquals(100.0, creature.getCollisionBoxWidth(), 0.0001);
     assertEquals(100.0, creature.getCollisionBoxHeight(), 0.0001);
     assertEquals(Align.LEFT, creature.getCollisionBoxAlign());
     assertEquals(Valign.MIDDLE, creature.getCollisionBoxValign());
-    
+
     assertTrue(creature.isIndestructible());
     assertEquals(100, creature.getHitPoints().getMax().intValue());
     assertEquals(100, creature.getHitPoints().get().intValue());
@@ -129,7 +128,7 @@ public class MapObjectLoaderTests {
     assertEquals(160f, creature.getDeceleration());
     assertTrue(creature.turnOnMove());
   }
-  
+
   @Test
   public void testPropMapObjectLoader() {
     PropMapObjectLoader loader = new PropMapObjectLoader();
@@ -139,13 +138,13 @@ public class MapObjectLoaderTests {
     mapObject.setName("testProp");
     mapObject.setLocation(100, 100);
     mapObject.setValue(MapObjectProperty.PROP_MATERIAL, Material.PLASTIC.getName());
-    
+
     mapObject.setValue(MapObjectProperty.COLLISION, true);
     mapObject.setValue(MapObjectProperty.COLLISIONBOX_WIDTH, 100.0f);
     mapObject.setValue(MapObjectProperty.COLLISIONBOX_HEIGHT, 100.0f);
     mapObject.setValue(MapObjectProperty.COLLISION_ALIGN, Align.LEFT);
     mapObject.setValue(MapObjectProperty.COLLISION_VALIGN, Valign.MIDDLE);
-    
+
     mapObject.setValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE, true);
     mapObject.setValue(MapObjectProperty.COMBAT_HITPOINTS, 100);
     mapObject.setValue(MapObjectProperty.COMBAT_TEAM, 1);
@@ -169,7 +168,7 @@ public class MapObjectLoaderTests {
     assertEquals(100.0, prop.getCollisionBoxHeight(), 0.0001);
     assertEquals(Align.LEFT, prop.getCollisionBoxAlign());
     assertEquals(Valign.MIDDLE, prop.getCollisionBoxValign());
-    
+
     assertTrue(prop.isIndestructible());
     assertEquals(100, prop.getHitPoints().getMax().intValue());
     assertEquals(100, prop.getHitPoints().get().intValue());
@@ -324,7 +323,6 @@ public class MapObjectLoaderTests {
     when(mapObject.getStringValue("bar")).thenReturn("111");
     when(mapObject.getStringValue("bar", null)).thenReturn("111");
 
-
     IMap map = mock(IMap.class);
     when(map.getSizeInPixels()).thenReturn(new Dimension(100, 100));
     when(map.getSizeInTiles()).thenReturn(new Dimension(10, 10));
@@ -341,7 +339,7 @@ public class MapObjectLoaderTests {
     assertEquals("foovalue", customEntity.getFoo());
     assertEquals(111, customEntity.getBar());
   }
-  
+
   @Test
   public void customPropertiesShoudBePassedToTheEntity() {
     Environment.registerCustomEntityType(CustomEntity.class);
