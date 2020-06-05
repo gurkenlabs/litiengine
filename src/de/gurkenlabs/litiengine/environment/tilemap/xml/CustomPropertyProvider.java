@@ -2,7 +2,9 @@ package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.awt.Color;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
@@ -176,7 +178,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
     if (property == null) {
       return defaultValue;
     }
-    
+
     return property.getAsDouble();
   }
 
@@ -347,5 +349,18 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
 
   void finish(URL location) throws TmxException {
     // blank base case
+  }
+
+  @Override
+  public List<String> getCommaSeparatedStringValues(String propertyName, String defaultValue) {
+    List<String> values = new ArrayList<>();
+    String valuesStr = this.getStringValue(propertyName, defaultValue);
+    if (valuesStr != null && !valuesStr.isEmpty()) {
+      for (String value : valuesStr.split(","))
+        if (value != null) {
+          values.add(value);
+        }
+    }
+    return values;
   }
 }

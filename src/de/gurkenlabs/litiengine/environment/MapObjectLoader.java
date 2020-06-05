@@ -87,17 +87,7 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
     });
   }
 
-  public static List<String> getCommaSeparatedValues(IMapObject mapObject, String mapObjectProperty, String defaultValue) {
-    List<String> values = new ArrayList<>();
-    String valuesStr = mapObject.getStringValue(mapObjectProperty, defaultValue);
-    if (valuesStr != null && !valuesStr.isEmpty()) {
-      for (String value : valuesStr.split(","))
-        if (value != null) {
-          values.add(value);
-        }
-    }
-    return values;
-  }
+
 
   protected boolean isMatchingType(IMapObject mapObject) {
     if (!mapObject.getType().equalsIgnoreCase(this.getMapObjectType())) {

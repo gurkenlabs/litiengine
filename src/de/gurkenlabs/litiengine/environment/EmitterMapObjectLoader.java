@@ -60,7 +60,7 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     data.setAlphaVariance(mapObject.getFloatValue(MapObjectProperty.Emitter.ALPHAVARIANCE, EmitterData.DEFAULT_ALPHA_VARIANCE));
     data.setOriginAlign(mapObject.getEnumValue(MapObjectProperty.Emitter.ORIGIN_ALIGN, Align.class, EmitterData.DEFAULT_ORIGIN_ALIGN));
     data.setOriginValign(mapObject.getEnumValue(MapObjectProperty.Emitter.ORIGIN_VALIGN, Valign.class, EmitterData.DEFAULT_ORIGIN_VALIGN));
-    data.setColors(getCommaSeparatedValues(mapObject, MapObjectProperty.Emitter.COLORS, ColorHelper.encode(EmitterData.DEFAULT_COLOR)));
+    data.setColors(mapObject.getCommaSeparatedStringValues(MapObjectProperty.Emitter.COLORS, ColorHelper.encode(EmitterData.DEFAULT_COLOR)));
 
     // particle
     data.setParticleX(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.OFFSET_X_MIN), mapObject.getFloatValue(MapObjectProperty.Particle.OFFSET_X_MAX)));
@@ -77,7 +77,7 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
 
     data.setCollisionType(mapObject.getEnumValue(MapObjectProperty.COLLISION_TYPE, Collision.class, Collision.NONE));
 
-    data.setTexts(getCommaSeparatedValues(mapObject, MapObjectProperty.Particle.TEXTS, EmitterData.DEFAULT_TEXT));
+    data.setTexts(mapObject.getCommaSeparatedStringValues(MapObjectProperty.Particle.TEXTS, EmitterData.DEFAULT_TEXT));
     data.setSpritesheet(mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME));
     data.setAnimateSprite(mapObject.getBoolValue(MapObjectProperty.Particle.ANIMATESPRITE));
     data.setFade(mapObject.getBoolValue(MapObjectProperty.Particle.FADE));
