@@ -119,7 +119,7 @@ public final class MapObjectProperty {
     public static final String TTL_MAX = "particleMaxTTL";
     public static final String SPRITE = "particleSprite";
     public static final String ANIMATESPRITE = "particleAnimateSprite";
-    public static final String TEXT = "particleText";
+    public static final String TEXTS = "particleTexts";
     public static final String FADE = "particleFade";
     public static final String FADEONCOLLISION = "particleFadeOnCollision";
     public static final String OUTLINEONLY = "particleOutlineOnly";

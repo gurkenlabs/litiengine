@@ -159,7 +159,7 @@ public final class GameRandom extends java.util.Random {
 
     return array[this.nextInt(array.length)];
   }
-  
+
   /**
    * Chooses a pseudo-random element from the specified array.
    * 
@@ -782,11 +782,14 @@ public final class GameRandom extends java.util.Random {
    * @return A pseudo-randomized variant of the original Color.
    */
   public Color nextColor(Color originalColor, float colorVariance, float alphaVariance) {
+    if (originalColor == null) {
+      return null;
+    }
     int red = MathUtilities.clamp((int) (originalColor.getRed() + (originalColor.getRed() * this.nextFloat(colorVariance) * this.nextSign())), 0, 255);
     int green = MathUtilities.clamp((int) (originalColor.getGreen() + (originalColor.getGreen() * this.nextFloat(colorVariance) * this.nextSign())), 0, 255);
     int blue = MathUtilities.clamp((int) (originalColor.getBlue() + (originalColor.getBlue() * this.nextFloat(colorVariance) * this.nextSign())), 0, 255);
     int alpha = MathUtilities.clamp((int) (originalColor.getAlpha() + (originalColor.getAlpha() * this.nextFloat(colorVariance) * this.nextSign())), 0, 255);
     return new Color(red, green, blue, alpha);
-  
+
   }
 }

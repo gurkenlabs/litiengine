@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.environment;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -75,7 +76,6 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     data.setOriginAlign(mapObject.getEnumValue(MapObjectProperty.Emitter.ORIGIN_ALIGN, Align.class, EmitterData.DEFAULT_ORIGIN_ALIGN));
     data.setOriginValign(mapObject.getEnumValue(MapObjectProperty.Emitter.ORIGIN_VALIGN, Valign.class, EmitterData.DEFAULT_ORIGIN_VALIGN));
     data.setColors(getColors(mapObject));
-    data.setColorProbabilities(mapObject.getStringValue(MapObjectProperty.Emitter.COLORPROBABILITIES, EmitterData.DEFAULT_COLOR_PROBABILITIES));
 
     // particle
     data.setParticleX(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.OFFSET_X_MIN), mapObject.getFloatValue(MapObjectProperty.Particle.OFFSET_X_MAX)));
@@ -92,7 +92,7 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
 
     data.setCollisionType(mapObject.getEnumValue(MapObjectProperty.COLLISION_TYPE, Collision.class, Collision.NONE));
 
-    data.setParticleText(mapObject.getStringValue(MapObjectProperty.Particle.TEXT));
+    data.setTexts(Arrays.asList(mapObject.getStringValue(MapObjectProperty.Particle.TEXTS).split(",")));
     data.setSpritesheet(mapObject.getStringValue(MapObjectProperty.Particle.SPRITE));
     data.setAnimateSprite(mapObject.getBoolValue(MapObjectProperty.Particle.ANIMATESPRITE));
     data.setFade(mapObject.getBoolValue(MapObjectProperty.Particle.FADE));
@@ -122,8 +122,6 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     String commaSeperatedColors = ArrayUtilities.join(emitterData.getColors());
     mo.setValue(MapObjectProperty.Emitter.COLORS, commaSeperatedColors);
 
-    mo.setValue(MapObjectProperty.Emitter.PARTICLETYPE, ArrayUtilities.join(emitterData.getColorProbabilities()));
-
     mo.setValue(MapObjectProperty.Particle.OFFSET_X_MIN, emitterData.getParticleOffsetX().getMinValue());
     mo.setValue(MapObjectProperty.Particle.OFFSET_Y_MIN, emitterData.getParticleOffsetY().getMinValue());
     mo.setValue(MapObjectProperty.Particle.STARTWIDTH_MIN, emitterData.getParticleWidth().getMinValue());
@@ -151,8 +149,9 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     mo.setValue(MapObjectProperty.Particle.TTL_MAX, emitterData.getParticleTTL().getMaxValue());
 
     mo.setValue(MapObjectProperty.COLLISION_TYPE, emitterData.getCollisionType());
-
-    mo.setValue(MapObjectProperty.Particle.TEXT, emitterData.getParticleText());
+    String commaSeperatedTexts = ArrayUtilities.join(emitterData.getTexts());
+    mo.setValue(MapObjectProperty.Particle.TEXTS, commaSeperatedTexts);
+    
     mo.setValue(MapObjectProperty.Particle.SPRITE, emitterData.getSpritesheet());
     mo.setValue(MapObjectProperty.Particle.ANIMATESPRITE, emitterData.isAnimateSprite());
     mo.setValue(MapObjectProperty.Particle.FADE, emitterData.isFading());

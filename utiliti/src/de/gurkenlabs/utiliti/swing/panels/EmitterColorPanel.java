@@ -1,15 +1,20 @@
-package de.gurkenlabs.utiliti.swing;
+package de.gurkenlabs.utiliti.swing.panels;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.LayoutManager;
 
 import javax.swing.Box;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
@@ -22,10 +27,11 @@ import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.utiliti.SwingHelpers;
-import de.gurkenlabs.utiliti.swing.panels.PropertyPanel;
+import de.gurkenlabs.utiliti.swing.ControlBehavior;
+import de.gurkenlabs.utiliti.swing.Icons;
 
 @SuppressWarnings("serial")
-public class ColorTable extends PropertyPanel {
+public class EmitterColorPanel extends PropertyPanel {
   private final DefaultTableModel model;
   private final JTable table;
   private final Box ctrlButtonBox;
@@ -33,10 +39,15 @@ public class ColorTable extends PropertyPanel {
   private final JButton btnRemove;
   private final JButton btnEdit;
   private final JScrollPane scrollPanel;
+  private final JPanel colorControls;
+  private JSpinner colorVariance;
+  private JSpinner alphaVariance;
 
-  public ColorTable() {
+  public EmitterColorPanel() {
     super();
-
+    setMinimumSize(new Dimension(PANEL_WIDTH, CONTROL_HEIGHT * 6));
+    // setMaximumSize(new Dimension(PANEL_WIDTH, CONTROL_HEIGHT * 6));
+    setPreferredSize(new Dimension(PANEL_WIDTH, CONTROL_HEIGHT * 6));
     model = new DefaultTableModel(0, 1);
     table = new JTable(model);
     table.getColumnModel().getColumn(0).setCellRenderer(new ColorListCellRenderer());
@@ -61,10 +72,17 @@ public class ColorTable extends PropertyPanel {
     ctrlButtonBox.add(btnAdd);
     ctrlButtonBox.add(btnRemove);
     ctrlButtonBox.add(btnEdit);
-    GroupLayout grplayout = new GroupLayout(this);
+
+    colorControls = new JPanel();
+    GroupLayout grplayout = new GroupLayout(colorControls);
     grplayout.setHorizontalGroup(grplayout.createSequentialGroup().addComponent(ctrlButtonBox).addComponent(scrollPanel));
     grplayout.setVerticalGroup(grplayout.createParallelGroup().addComponent(ctrlButtonBox).addComponent(scrollPanel));
-    this.setLayout(grplayout);
+    colorControls.setLayout(grplayout);
+
+    colorVariance = new JSpinner(new SpinnerNumberModel(EmitterData.DEFAULT_COLOR_VARIANCE, 0d, 1d, STEP_FINE));
+    alphaVariance = new JSpinner(new SpinnerNumberModel(EmitterData.DEFAULT_ALPHA_VARIANCE, 0d, 1d, STEP_FINE));
+
+    setLayout(createLayout());
     setupChangedListeners();
   }
 
@@ -72,18 +90,30 @@ public class ColorTable extends PropertyPanel {
   protected void clearControls() {
     model.setRowCount(0);
     table.clearSelection();
+    colorVariance.setValue(EmitterData.DEFAULT_COLOR_VARIANCE);
+    alphaVariance.setValue(EmitterData.DEFAULT_ALPHA_VARIANCE);
   }
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
     setColors(mapObject.getStringValue(MapObjectProperty.Emitter.COLORS));
+    colorVariance.setValue(mapObject.getFloatValue(MapObjectProperty.Emitter.COLORVARIANCE, EmitterData.DEFAULT_COLOR_VARIANCE));
+    alphaVariance.setValue(mapObject.getFloatValue(MapObjectProperty.Emitter.ALPHAVARIANCE, EmitterData.DEFAULT_ALPHA_VARIANCE));
   }
 
   private void setColors(String commaSeparatedHexstrings) {
+    if (commaSeparatedHexstrings == null) {
+      return;
+    }
     model.setRowCount(0);
     for (String colorStr : commaSeparatedHexstrings.split(",")) {
       model.addRow(new Object[] { colorStr });
     }
+  }
+
+  protected LayoutManager createLayout() {
+    LayoutItem[] layoutItems = new LayoutItem[] { new LayoutItem(colorControls, CONTROL_HEIGHT * 3), new LayoutItem("emitter_colorVariance", colorVariance, CONTROL_HEIGHT), new LayoutItem("emitter_alphaVariance", alphaVariance, CONTROL_HEIGHT) };
+    return this.createLayout(layoutItems);
   }
 
   private void setupChangedListeners() {
@@ -95,6 +125,8 @@ public class ColorTable extends PropertyPanel {
       table.setValueAt(ColorHelper.encode(result), table.getSelectedRow(), table.getSelectedColumn());
     });
     setup(table, MapObjectProperty.Emitter.COLORS);
+    setup(colorVariance, MapObjectProperty.Emitter.COLORVARIANCE);
+    setup(alphaVariance, MapObjectProperty.Emitter.ALPHAVARIANCE);
 
   }
 

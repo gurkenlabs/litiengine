@@ -5,6 +5,7 @@ import java.awt.LayoutManager;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JSpinner;
+import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.EmptyBorder;
@@ -20,7 +21,7 @@ import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.ParticleType;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.litiengine.physics.Collision;
-import de.gurkenlabs.utiliti.swing.ColorTable;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.swing.Icons;
 import de.gurkenlabs.utiliti.swing.panels.EmitterPanel.EmitterPropertyGroup;
 
@@ -28,11 +29,6 @@ import de.gurkenlabs.utiliti.swing.panels.EmitterPanel.EmitterPropertyGroup;
 public abstract class EmitterPropertyPanel extends PropertyPanel {
 
   protected transient Emitter emitter;
-  private static final int STEP_ONE = 1;
-  private static final int STEP_COARSE = 10;
-  private static final int STEP_SPARSE = 100;
-  private static final float STEP_FINE = .05f;
-  private static final float STEP_FINEST = .01f;
 
   private EmitterPropertyPanel() {
     super();
@@ -144,9 +140,9 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
     private JComboBox<ParticleType> comboBoxParticleType;
     private JToggleButton fade;
     private JToggleButton outlineOnly;
-    private final ColorTable colorTable;
-    private JSpinner colorVariance;
-    private JSpinner alphaVariance;
+    private final EmitterColorPanel colorPanel;
+    private final EmitterTextPanel textPanel;
+    private JTabbedPane styleTabs;
 
     private ParticleStylePanel() {
       super();
@@ -155,9 +151,11 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
       outlineOnly.putClientProperty("JToggleButton.variant", DarkToggleButtonUI.VARIANT_SLIDER);
       fade = new JToggleButton();
       fade.putClientProperty("JToggleButton.variant", DarkToggleButtonUI.VARIANT_SLIDER);
-      colorTable = new ColorTable();
-      colorVariance = new JSpinner(new SpinnerNumberModel(EmitterData.DEFAULT_COLOR_VARIANCE, 0d, 1d, STEP_FINE));
-      alphaVariance = new JSpinner(new SpinnerNumberModel(EmitterData.DEFAULT_ALPHA_VARIANCE, 0d, 1d, STEP_FINE));
+      colorPanel = new EmitterColorPanel();
+      textPanel = new EmitterTextPanel();
+      styleTabs = new JTabbedPane();
+      styleTabs.add(Resources.strings().get("particle_colors"), colorPanel);
+      styleTabs.add(Resources.strings().get("particle_text"), textPanel);
 
       setLayout(createLayout());
       setupChangedListeners();
@@ -166,7 +164,8 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
     @Override
     public void bind(IMapObject mapObject) {
       super.bind(mapObject);
-      colorTable.bind(mapObject);
+      colorPanel.bind(mapObject);
+      textPanel.bind(mapObject);
     }
 
     @Override
@@ -174,8 +173,6 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
       comboBoxParticleType.setSelectedItem(EmitterData.DEFAULT_PARTICLE_TYPE);
       outlineOnly.setSelected(EmitterData.DEFAULT_OUTLINE_ONLY);
       fade.setSelected(EmitterData.DEFAULT_FADE);
-      colorVariance.setValue(EmitterData.DEFAULT_COLOR_VARIANCE);
-      alphaVariance.setValue(EmitterData.DEFAULT_ALPHA_VARIANCE);
     }
 
     @Override
@@ -184,15 +181,12 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
       comboBoxParticleType.setSelectedItem(mapObject.getEnumValue(MapObjectProperty.Emitter.PARTICLETYPE, ParticleType.class, EmitterData.DEFAULT_PARTICLE_TYPE));
       outlineOnly.setSelected(mapObject.getBoolValue(MapObjectProperty.Particle.OUTLINEONLY, EmitterData.DEFAULT_OUTLINE_ONLY));
       fade.setSelected(mapObject.getBoolValue(MapObjectProperty.Particle.FADE, EmitterData.DEFAULT_FADE));
-      colorVariance.setValue(mapObject.getFloatValue(MapObjectProperty.Emitter.COLORVARIANCE, EmitterData.DEFAULT_COLOR_VARIANCE));
-      alphaVariance.setValue(mapObject.getFloatValue(MapObjectProperty.Emitter.ALPHAVARIANCE, EmitterData.DEFAULT_ALPHA_VARIANCE));
     }
 
     @Override
     protected LayoutManager createLayout() {
-      LayoutItem[] layoutItems = new LayoutItem[] { new LayoutItem("emitter_particleType", comboBoxParticleType), new LayoutItem("particle_fade", fade), new LayoutItem("particle_outlineonly", outlineOnly), new LayoutItem("particle_colors", colorTable, CONTROL_HEIGHT * 3),
-          new LayoutItem("emitter_colorVariance", colorVariance), new LayoutItem("emitter_alphaVariance", alphaVariance) };
-      return this.createLayout(layoutItems);
+      LayoutItem[] layoutItems = new LayoutItem[] { new LayoutItem("emitter_particleType", comboBoxParticleType), new LayoutItem("particle_fade", fade), new LayoutItem("particle_outlineonly", outlineOnly) };
+      return this.createLayout(layoutItems, styleTabs);
     }
 
     @Override
@@ -200,8 +194,7 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
       setup(comboBoxParticleType, MapObjectProperty.Emitter.PARTICLETYPE);
       setup(outlineOnly, MapObjectProperty.Particle.OUTLINEONLY);
       setup(fade, MapObjectProperty.Particle.FADE);
-      setup(colorVariance, MapObjectProperty.Emitter.COLORVARIANCE);
-      setup(alphaVariance, MapObjectProperty.Emitter.ALPHAVARIANCE);
+
     }
   }
 

@@ -51,12 +51,18 @@ import de.gurkenlabs.utiliti.swing.UI;
 public abstract class PropertyPanel extends JPanel {
   public static final int LABEL_WIDTH = (int) (40 * Editor.preferences().getUiScale());
   public static final int CONTROL_MIN_WIDTH = (int) (100 * Editor.preferences().getUiScale());
-  public static final int CONTROL_WIDTH = (int) (150 * Editor.preferences().getUiScale());
+  public static final int CONTROL_WIDTH = (int) (160 * Editor.preferences().getUiScale());
   public static final int CONTROL_HEIGHT = (int) (30 * Editor.preferences().getUiScale());
   public static final int CONTROL_MARGIN = (int) (5 * Editor.preferences().getUiScale());
   public static final int PANEL_WIDTH = 2 * (CONTROL_WIDTH + LABEL_WIDTH + CONTROL_MARGIN);
   public static final int LABEL_GAP = 0;
   public static final Dimension BUTTON_SIZE = new Dimension(CONTROL_HEIGHT, CONTROL_HEIGHT);
+
+  public static final int STEP_ONE = 1;
+  public static final int STEP_COARSE = 10;
+  public static final int STEP_SPARSE = 100;
+  public static final float STEP_FINE = .05f;
+  public static final float STEP_FINEST = .01f;
 
   protected boolean isFocussing;
   protected transient IMapObject dataSource;
@@ -308,7 +314,13 @@ public abstract class PropertyPanel extends JPanel {
     }
 
     for (LayoutItem item : layoutItems) {
-      parallel.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup().addComponent(item.getLabel(), LABEL_WIDTH, LABEL_WIDTH, Short.MAX_VALUE).addPreferredGap(ComponentPlacement.UNRELATED).addComponent(item.getComponent(), CONTROL_MIN_WIDTH, CONTROL_WIDTH, Short.MAX_VALUE));
+      SequentialGroup horGrp = groupLayout.createSequentialGroup();
+      if (item.getLabel() != null) {
+        horGrp.addComponent(item.getLabel(), LABEL_WIDTH, LABEL_WIDTH, Short.MAX_VALUE).addPreferredGap(ComponentPlacement.UNRELATED).addComponent(item.getComponent(), CONTROL_MIN_WIDTH, CONTROL_WIDTH, Short.MAX_VALUE);
+      } else {
+        horGrp.addComponent(item.getComponent(), CONTROL_MIN_WIDTH, CONTROL_WIDTH, Short.MAX_VALUE);
+      }
+      parallel.addGroup(Alignment.LEADING, horGrp);
     }
 
     // initialize the horizontal layout group with the parallel groups for
@@ -320,8 +332,14 @@ public abstract class PropertyPanel extends JPanel {
     SequentialGroup current = seq.addGap(CONTROL_MARGIN);
 
     for (LayoutItem item : layoutItems) {
-      current = current.addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(item.getComponent(), item.getMinHeight(), item.getMinHeight(), item.getMinHeight()).addComponent(item.getLabel(), GroupLayout.PREFERRED_SIZE, item.getMinHeight(), item.getMinHeight()))
-          .addGap(CONTROL_MARGIN);
+      ParallelGroup verGrp = groupLayout.createParallelGroup(Alignment.LEADING);
+      if (item.getLabel() != null) {
+        verGrp.addComponent(item.getComponent(), item.getMinHeight(), item.getMinHeight(), item.getMinHeight()).addComponent(item.getLabel(), GroupLayout.PREFERRED_SIZE, item.getMinHeight(), item.getMinHeight()).addGap(CONTROL_MARGIN);
+      } else {
+        verGrp.addComponent(item.getComponent(), item.getMinHeight(), item.getMinHeight(), item.getMinHeight());
+      }
+
+      current = current.addGroup(verGrp);
     }
 
     current.addPreferredGap(ComponentPlacement.UNRELATED);
@@ -346,6 +364,19 @@ public abstract class PropertyPanel extends JPanel {
     private final JLabel label;
 
     private int minHeight;
+
+    public LayoutItem(Component component) {
+      this.component = component;
+      this.label = null;
+      this.caption = "";
+      this.setMinHeight(CONTROL_HEIGHT);
+      ControlBehavior.apply(this.getComponent());
+    }
+
+    public LayoutItem(Component component, int minHeight) {
+      this(component);
+      this.setMinHeight(minHeight);
+    }
 
     public LayoutItem(String resource, Component component) {
       this.caption = Resources.strings().get(resource);

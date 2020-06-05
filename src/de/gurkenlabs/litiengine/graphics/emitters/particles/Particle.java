@@ -403,7 +403,6 @@ public abstract class Particle implements ITimeToLive {
       Line2D ray = new Line2D.Double(start.getX(), start.getY(), endX, endY);
       if (this.getCollisionType() != Collision.NONE && Game.physics() != null && Game.physics().collides(ray, this.getCollisionType())) {
         collide();
-
         return true;
       }
     } else if (this.getCollisionType() != Collision.NONE && Game.physics() != null && Game.physics().collides(this.getBoundingBox(emitterOrigin), this.getCollisionType())) {

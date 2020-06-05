@@ -9,6 +9,7 @@ import javax.swing.SpinnerNumberModel;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.utiliti.components.Editor;
 
 @SuppressWarnings("serial")
 public class ParticleParameterModifier extends PropertyPanel {
@@ -22,7 +23,7 @@ public class ParticleParameterModifier extends PropertyPanel {
   private float defaultMin;
   private float defaultMax;
 
-  private final static Dimension SPINNER_DIMENSION = new Dimension(CONTROL_WIDTH * 2 / 5, CONTROL_HEIGHT);
+  private final static Dimension SPINNER_DIMENSION = new Dimension((int) (70 * Editor.preferences().getUiScale()), CONTROL_HEIGHT);
 
   public ParticleParameterModifier(String minPropertyName, String maxPropertyName, float lowerBound, float upperBound, float defaultMin, float defaultMax, float step) {
     this.minPropertyName = minPropertyName;

@@ -110,7 +110,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
                             .addPreferredGap(ComponentPlacement.UNRELATED).addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false).addComponent(lblHeight, LABEL_WIDTH, LABEL_WIDTH, LABEL_WIDTH).addComponent(lblYcoordinate, LABEL_WIDTH, LABEL_WIDTH, LABEL_WIDTH)).addGap(0)
                             .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addComponent(spinnerY, Alignment.LEADING, CONTROL_MIN_WIDTH, CONTROL_WIDTH, CONTROL_WIDTH).addComponent(spinnerHeight, Alignment.LEADING, CONTROL_MIN_WIDTH, CONTROL_WIDTH, CONTROL_WIDTH))))))
                     .addGap(CONTROL_MARGIN))
-                .addGroup(Alignment.LEADING, groupLayout.createSequentialGroup().addGap(CONTROL_MARGIN).addComponent(infoPanel, GroupLayout.DEFAULT_SIZE, PANEL_WIDTH, Short.MAX_VALUE).addGap(CONTROL_MARGIN)));
+                .addGroup(Alignment.LEADING, groupLayout.createSequentialGroup().addGap(CONTROL_MARGIN).addComponent(infoPanel, PANEL_WIDTH, PANEL_WIDTH, Short.MAX_VALUE).addGap(CONTROL_MARGIN)));
     groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
         .addGroup(groupLayout.createSequentialGroup().addGap(CONTROL_MARGIN).addComponent(infoPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addGap(CONTROL_MARGIN)
             .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(lblX, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE).addComponent(spinnerX, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE)

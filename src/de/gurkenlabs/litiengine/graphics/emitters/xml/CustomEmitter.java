@@ -182,7 +182,13 @@ public class CustomEmitter extends Emitter {
       particle = new RightLineParticle(width, height, this.getRandomParticleColor());
       break;
     case TEXT:
-      particle = new TextParticle(this.getEmitterData().getParticleText(), this.getRandomParticleColor());
+      String text;
+      if (this.getEmitterData().getTexts().isEmpty()) {
+        text = EmitterData.DEFAULT_TEXT;
+      } else {
+        text = Game.random().choose(this.getEmitterData().getTexts());
+      }
+      particle = new TextParticle(text, this.getRandomParticleColor());
       break;
     case SPRITE:
       Spritesheet sprite = Resources.spritesheets().get(this.getEmitterData().getSpritesheet());
@@ -206,7 +212,7 @@ public class CustomEmitter extends Emitter {
 
     particle.setDeltaWidth(deltaWidth);
     particle.setDeltaHeight(deltaHeight);
-    
+
     particle.setTimeToLive(ttl);
 
     particle.setCollisionType(this.getEmitterData().getCollisionType());

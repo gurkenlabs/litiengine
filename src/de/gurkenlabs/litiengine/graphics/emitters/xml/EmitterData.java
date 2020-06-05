@@ -30,7 +30,6 @@ public class EmitterData implements Serializable, Resource {
 
   public static final Color DEFAULT_COLOR = ColorHelper.decode("#CC00a5bc");
 
-  public static final String DEFAULT_COLOR_PROBABILITIES = "";
   public static final String DEFAULT_SPRITESHEET = "";
   public static final String DEFAULT_NAME = "Custom Emitter";
   public static final String DEFAULT_TEXT = "LITI";
@@ -97,9 +96,6 @@ public class EmitterData implements Serializable, Resource {
   @XmlElement
   private float colorVariance;
 
-  @XmlElement
-  private String colorProbabilities;
-
   @XmlElementWrapper
   @XmlElement(name = "color")
   private List<String> colors;
@@ -155,8 +151,9 @@ public class EmitterData implements Serializable, Resource {
   @XmlElement
   private ParticleParameter particleTTL;
 
-  @XmlElement
-  private String particleText;
+  @XmlElementWrapper
+  @XmlElement(name = "text")
+  private List<String> texts;
 
   @XmlAttribute
   private ParticleType particleType;
@@ -198,7 +195,6 @@ public class EmitterData implements Serializable, Resource {
     this.particleHeight = new ParticleParameter(DEFAULT_MIN_HEIGHT, DEFAULT_MAX_HEIGHT);
     this.particleTTL = new ParticleParameter(DEFAULT_MIN_PARTICLE_TTL, DEFAULT_MAX_PARTICLE_TTL);
     this.setColor(DEFAULT_COLOR);
-    this.colorProbabilities = DEFAULT_COLOR_PROBABILITIES;
     this.emitterDuration = DEFAULT_DURATION;
     this.width = DEFAULT_WIDTH;
     this.height = DEFAULT_HEIGHT;
@@ -208,7 +204,7 @@ public class EmitterData implements Serializable, Resource {
     this.collisionType = DEFAULT_COLLISION;
     this.maxParticles = DEFAULT_MAXPARTICLES;
     this.name = DEFAULT_NAME;
-    this.particleText = DEFAULT_TEXT;
+    this.setText(DEFAULT_TEXT);
     this.particleType = DEFAULT_PARTICLE_TYPE;
     this.spawnAmount = DEFAULT_SPAWNAMOUNT;
     this.spawnRate = DEFAULT_SPAWNRATE;
@@ -234,11 +230,6 @@ public class EmitterData implements Serializable, Resource {
   @XmlTransient
   public float getColorVariance() {
     return this.colorVariance;
-  }
-
-  @XmlTransient
-  public double[] getColorProbabilities() {
-    return ArrayUtilities.splitDouble(this.colorProbabilities);
   }
 
   @XmlTransient
@@ -317,8 +308,8 @@ public class EmitterData implements Serializable, Resource {
   }
 
   @XmlTransient
-  public String getParticleText() {
-    return this.particleText;
+  public List<String> getTexts() {
+    return this.texts;
   }
 
   @XmlTransient
@@ -404,14 +395,6 @@ public class EmitterData implements Serializable, Resource {
     this.colorVariance = MathUtilities.clamp(colorVariance, 0, 1);
   }
 
-  public void setColorProbabilities(final double[] colorProbabilities) {
-    this.colorProbabilities = ArrayUtilities.join(colorProbabilities);
-  }
-
-  public void setColorProbabilities(final String colorProbabilities) {
-    this.colorProbabilities = colorProbabilities;
-  }
-
   public void setColors(final List<String> colors) {
     this.colors = colors;
   }
@@ -485,10 +468,6 @@ public class EmitterData implements Serializable, Resource {
     this.particleTTL = particleTTL;
   }
 
-  public void setParticleText(final String particleText) {
-    this.particleText = particleText;
-  }
-
   public void setParticleType(final ParticleType particleType) {
     this.particleType = particleType;
   }
@@ -515,6 +494,16 @@ public class EmitterData implements Serializable, Resource {
 
   public void setSpritesheet(final String spritesheet) {
     this.spritesheet = spritesheet;
+  }
+
+  public void setText(final String text) {
+    final List<String> tmpList = new ArrayList<>();
+    tmpList.add(text);
+    this.texts = tmpList;
+  }
+  
+  public void setTexts(final List<String> texts) {
+    this.texts = texts;
   }
 
   public void setUpdateRate(final int updateRate) {
