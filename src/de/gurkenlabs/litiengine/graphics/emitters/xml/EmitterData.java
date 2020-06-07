@@ -19,7 +19,6 @@ import de.gurkenlabs.litiengine.configuration.Quality;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.ParticleType;
 import de.gurkenlabs.litiengine.physics.Collision;
 import de.gurkenlabs.litiengine.resources.Resource;
-import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 
@@ -35,6 +34,7 @@ public class EmitterData implements Serializable, Resource {
   public static final String DEFAULT_TEXT = "LITI";
 
   public static final boolean DEFAULT_ANIMATE_SPRITE = true;
+  public static final boolean DEFAULT_LOOP_SPRITE = true;
   public static final boolean DEFAULT_FADE = true;
   public static final boolean DEFAULT_FADE_ON_COLLISION = false;
   public static final boolean DEFAULT_OUTLINE_ONLY = false;
@@ -89,6 +89,9 @@ public class EmitterData implements Serializable, Resource {
 
   @XmlElement
   private boolean animateSprite;
+
+  @XmlElement
+  private boolean loopSprite;
 
   @XmlElement
   private Collision collisionType;
@@ -209,6 +212,7 @@ public class EmitterData implements Serializable, Resource {
     this.spawnAmount = DEFAULT_SPAWNAMOUNT;
     this.spawnRate = DEFAULT_SPAWNRATE;
     this.animateSprite = DEFAULT_ANIMATE_SPRITE;
+    this.loopSprite = DEFAULT_LOOP_SPRITE;
     this.spritesheet = DEFAULT_SPRITESHEET;
     this.originValign = DEFAULT_ORIGIN_VALIGN;
     this.originAlign = DEFAULT_ORIGIN_ALIGN;
@@ -357,8 +361,12 @@ public class EmitterData implements Serializable, Resource {
     return this.width;
   }
 
-  public boolean isAnimateSprite() {
+  public boolean isAnimatingSprite() {
     return this.animateSprite;
+  }
+
+  public boolean isLoopingSprite() {
+    return this.loopSprite;
   }
 
   public boolean isFading() {
@@ -379,6 +387,10 @@ public class EmitterData implements Serializable, Resource {
 
   public void setAnimateSprite(final boolean animateSprite) {
     this.animateSprite = animateSprite;
+  }
+
+  public void setLoopSprite(final boolean loopSprite) {
+    this.loopSprite = loopSprite;
   }
 
   public void setCollisionType(final Collision physics) {
@@ -501,7 +513,7 @@ public class EmitterData implements Serializable, Resource {
     tmpList.add(text);
     this.texts = tmpList;
   }
-  
+
   public void setTexts(final List<String> texts) {
     this.texts = texts;
   }

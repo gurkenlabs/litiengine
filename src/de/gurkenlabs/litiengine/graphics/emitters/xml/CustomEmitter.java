@@ -195,7 +195,9 @@ public class CustomEmitter extends Emitter {
       if (sprite == null || sprite.getTotalNumberOfSprites() <= 0) {
         return null;
       }
-      particle = new SpriteParticle(sprite.getSprite(ThreadLocalRandom.current().nextInt(sprite.getTotalNumberOfSprites())));
+      particle = new SpriteParticle(sprite);
+      ((SpriteParticle) particle).setAnimateSprite(this.getEmitterData().isAnimatingSprite());
+      ((SpriteParticle) particle).setLoopSprite(this.getEmitterData().isLoopingSprite());
       break;
     default:
       particle = new RectangleParticle(width, height, this.getRandomParticleColor());
@@ -218,6 +220,7 @@ public class CustomEmitter extends Emitter {
     particle.setCollisionType(this.getEmitterData().getCollisionType());
     particle.setOutlineOnly(this.getEmitterData().isOutlineOnly());
     particle.setFade(this.getEmitterData().isFading());
+
     particle.setFadeOnCollision(this.getEmitterData().isFadingOnCollision());
     return particle;
   }

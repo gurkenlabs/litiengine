@@ -26,7 +26,6 @@ public class Animation implements IUpdateable, ILaunchable {
   private static final Logger log = Logger.getLogger(Animation.class.getName());
 
   private final List<KeyFrame> keyframes;
-  private final boolean loop;
   private final String name;
   private Spritesheet spritesheet;
 
@@ -35,6 +34,7 @@ public class Animation implements IUpdateable, ILaunchable {
   private KeyFrame firstFrame;
   private int frameDuration = DEFAULT_FRAME_DURATION;
 
+  private boolean loop;
   private boolean paused;
   private boolean playing;
 
@@ -263,6 +263,16 @@ public class Animation implements IUpdateable, ILaunchable {
     for (int i = 0; i < this.getKeyframes().size(); i++) {
       this.getKeyframes().get(i).setDuration(keyFrameDurations[i]);
     }
+  }
+
+  /**
+   * Sets the looping behavior for this animation.
+   * 
+   * @param loop
+   *          if true, restart the animation infinitely after its last frame.
+   */
+  public void setLooping(boolean loop) {
+    this.loop = loop;
   }
 
   @Override

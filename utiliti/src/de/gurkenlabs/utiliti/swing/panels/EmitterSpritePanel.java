@@ -20,6 +20,7 @@ import de.gurkenlabs.utiliti.swing.LabelListCellRenderer;
 public class EmitterSpritePanel extends PropertyPanel {
   private final JComboBox<JLabel> spritesheet;
   private final JToggleButton animateSprite;
+  private final JToggleButton loopSprite;
 
   public EmitterSpritePanel() {
     super();
@@ -27,6 +28,8 @@ public class EmitterSpritePanel extends PropertyPanel {
     spritesheet.setRenderer(new LabelListCellRenderer());
     animateSprite = new JToggleButton();
     animateSprite.putClientProperty("JToggleButton.variant", DarkToggleButtonUI.VARIANT_SLIDER);
+    loopSprite = new JToggleButton();
+    loopSprite.putClientProperty("JToggleButton.variant", DarkToggleButtonUI.VARIANT_SLIDER);
     setLayout(createLayout());
     setupChangedListeners();
   }
@@ -36,7 +39,7 @@ public class EmitterSpritePanel extends PropertyPanel {
     spritesheet.removeAllItems();
     spritesheet.setSelectedItem(null);
     animateSprite.setSelected(EmitterData.DEFAULT_ANIMATE_SPRITE);
-
+    loopSprite.setSelected(EmitterData.DEFAULT_LOOP_SPRITE);
   }
 
   @Override
@@ -44,17 +47,22 @@ public class EmitterSpritePanel extends PropertyPanel {
     loadSpritesheets();
     selectSpriteSheet(spritesheet, mapObject);
     animateSprite.setSelected(mapObject.getBoolValue(MapObjectProperty.Particle.ANIMATESPRITE, EmitterData.DEFAULT_ANIMATE_SPRITE));
+    loopSprite.setSelected(mapObject.getBoolValue(MapObjectProperty.Particle.LOOPSPRITE, EmitterData.DEFAULT_LOOP_SPRITE));
 
   }
 
   protected LayoutManager createLayout() {
-    LayoutItem[] layoutItems = new LayoutItem[] { new LayoutItem("particle_spritesheet", spritesheet), new LayoutItem("particle_animatesprite", animateSprite) };
+    LayoutItem[] layoutItems = new LayoutItem[] { new LayoutItem("particle_spritesheet", spritesheet), new LayoutItem("particle_animatesprite", animateSprite), new LayoutItem("particle_loopsprite", loopSprite) };
     return this.createLayout(layoutItems);
   }
 
   private void setupChangedListeners() {
     setupL(spritesheet, MapObjectProperty.SPRITESHEETNAME);
     setup(animateSprite, MapObjectProperty.Particle.ANIMATESPRITE);
+    animateSprite.addItemListener(e -> {
+      loopSprite.setEnabled(animateSprite.isSelected());
+    });
+    setup(loopSprite, MapObjectProperty.Particle.LOOPSPRITE);
   }
 
   private void loadSpritesheets() {

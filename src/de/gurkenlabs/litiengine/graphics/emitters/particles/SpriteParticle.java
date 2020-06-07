@@ -8,19 +8,26 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
 import de.gurkenlabs.litiengine.graphics.ImageRenderer;
+import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.graphics.animation.AnimationController;
 
 public class SpriteParticle extends Particle {
   private float angle;
-  private final BufferedImage image;
+  private AnimationController animation;
+  private boolean animateSprite;
+  private boolean loopSprite;
+  private BufferedImage currentImage;
+  private Spritesheet spritesheet;
 
-  public SpriteParticle(final BufferedImage sprite) {
+  public SpriteParticle(final Spritesheet spritesheet) {
     super(0, 0, null);
-    this.image = sprite;
-    if (sprite == null) {
+    this.spritesheet = spritesheet;
+    if (spritesheet == null) {
       return;
     }
-    this.setWidth(sprite.getWidth());
-    this.setHeight(sprite.getHeight());
+    this.setWidth(spritesheet.getSpriteWidth());
+    this.setHeight(spritesheet.getSpriteHeight());
+    this.animation = new AnimationController(this.spritesheet);
   }
 
   public float getAngle() {
@@ -29,16 +36,24 @@ public class SpriteParticle extends Particle {
 
   @Override
   public void render(final Graphics2D g, final Point2D emitterOrigin) {
-    final Point2D renderLocation = this.getRenderLocation(emitterOrigin);
-
+    final Point2D renderLocation = getRenderLocation(emitterOrigin);
+    if (isAnimatingSprite()) {
+      currentImage = animation.getCurrentImage();
+    }
     Composite oldComp = g.getComposite();
-    g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, this.getOpacity()));
-    if (this.getAngle() != 0) {
-      ImageRenderer.renderRotated(g, this.image, renderLocation, this.getAngle());
+    g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, getOpacity()));
+    if (getAngle() != 0) {
+      ImageRenderer.renderRotated(g, currentImage, renderLocation, getAngle());
     } else {
-      ImageRenderer.render(g, this.image, renderLocation);
+      ImageRenderer.render(g, currentImage, renderLocation);
     }
     g.setComposite(oldComp);
+  }
+
+  @Override
+  public void update(Point2D emitterOrigin, float updateRatio) {
+    super.update(emitterOrigin, updateRatio);
+    this.animation.update();
   }
 
   @Override
@@ -50,4 +65,25 @@ public class SpriteParticle extends Particle {
     this.angle = angle;
     return this;
   }
+
+  public boolean isAnimatingSprite() {
+    return animateSprite;
+  }
+
+  public void setAnimateSprite(boolean animateSprite) {
+    this.animateSprite = animateSprite;
+    if (!this.animateSprite) {
+      this.currentImage = spritesheet.getRandomSprite();
+    }
+  }
+
+  public boolean isLoopingSprite() {
+    return loopSprite;
+  }
+
+  public void setLoopSprite(boolean loopSprite) {
+    this.loopSprite = loopSprite;
+    this.animation.getDefault().setLooping(loopSprite);
+  }
+
 }

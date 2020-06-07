@@ -8,6 +8,8 @@ import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.Particle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.SpriteParticle;
 
+@Deprecated
+
 public class SpritesheetEntityEmitter extends EntityEmitter {
 
   private final Spritesheet spriteSheet;
@@ -31,6 +33,6 @@ public class SpritesheetEntityEmitter extends EntityEmitter {
 
   @Override
   protected Particle createNewParticle() {
-    return new SpriteParticle(this.getRandomSprite());
+    return new SpriteParticle(this.spriteSheet);
   }
 }

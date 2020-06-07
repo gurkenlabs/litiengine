@@ -27,6 +27,6 @@ public abstract class SpritesheetEmitter extends Emitter {
 
   @Override
   protected Particle createNewParticle() {
-    return new SpriteParticle(this.getRandomSprite());
+    return new SpriteParticle(this.spriteSheet);
   }
 }

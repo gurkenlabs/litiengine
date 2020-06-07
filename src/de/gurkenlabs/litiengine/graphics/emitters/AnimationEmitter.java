@@ -16,6 +16,7 @@ import de.gurkenlabs.litiengine.graphics.emitters.particles.Particle;
  * The time to live is set by the total duration of the animation.
  */
 @EmitterInfo(maxParticles = 0, spawnAmount = 0)
+@Deprecated
 public class AnimationEmitter extends SpritesheetEmitter {
 
   public AnimationEmitter(Spritesheet spriteSheet, Point2D origin) {
