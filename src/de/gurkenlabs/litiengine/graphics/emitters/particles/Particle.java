@@ -15,6 +15,9 @@ import de.gurkenlabs.litiengine.physics.Collision;
 public abstract class Particle implements ITimeToLive {
   private long aliveTick;
   private long aliveTime;
+  private float angle;
+  private float deltaAngle;
+
   private Collision collisionType;
   private Color color;
   private int colorAlpha = 255;
@@ -29,6 +32,7 @@ public abstract class Particle implements ITimeToLive {
    */
   private float velocityY;
   private boolean outlineOnly;
+  private boolean antiAliasing;
 
   /**
    * The horizontal acceleration (increase / decrease in velocity over time) for this particle.
@@ -141,12 +145,24 @@ public abstract class Particle implements ITimeToLive {
     return this.accelerationY;
   }
 
+  public float getAngle() {
+    return this.angle;
+  }
+
+  public float getDeltaAngle() {
+    return this.deltaAngle;
+  }
+
   public float getHeight() {
     return this.height;
   }
 
   public boolean isOutlineOnly() {
     return this.outlineOnly;
+  }
+
+  public boolean isAntiAliased() {
+    return this.antiAliasing;
   }
 
   /**
@@ -261,6 +277,16 @@ public abstract class Particle implements ITimeToLive {
     return this;
   }
 
+  public Particle setAngle(final float angle) {
+    this.angle = angle;
+    return this;
+  }
+
+  public Particle setDeltaAngle(final float deltaAngle) {
+    this.deltaAngle = deltaAngle;
+    return this;
+  }
+
   public Particle setDeltaWidth(final float deltaWidth) {
     this.deltaWidth = deltaWidth;
     return this;
@@ -293,6 +319,11 @@ public abstract class Particle implements ITimeToLive {
 
   public Particle setOutlineOnly(final boolean outlineOnly) {
     this.outlineOnly = outlineOnly;
+    return this;
+  }
+
+  public Particle setAntiAliasing(final boolean antiAliasing) {
+    this.antiAliasing = antiAliasing;
     return this;
   }
 
@@ -366,6 +397,10 @@ public abstract class Particle implements ITimeToLive {
       this.height += this.getDeltaHeight() * updateRatio;
     }
 
+    if (this.getDeltaAngle() != 0) {
+      this.angle += this.getDeltaAngle() * updateRatio;
+    }
+
     // test for ray cast collision
     final float targetX = this.x + this.getVelocityX() * updateRatio;
     final float targetY = this.y + this.getVelocityY() * updateRatio;
@@ -409,7 +444,7 @@ public abstract class Particle implements ITimeToLive {
         collide();
         return true;
       }
-    } else if (this.getCollisionType() != Collision.NONE && Game.physics() != null && Game.physics().collides(this.getBoundingBox(emitterOrigin), this.getCollisionType())) {
+    } else if (this.getCollisionType() != Collision.NONE && Game.physics() != null && Game.physics().collides(this.getBoundingBox(emitterOrigin).getBounds2D(), this.getCollisionType())) {
       collide();
       return true;
     }

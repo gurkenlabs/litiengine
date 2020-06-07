@@ -115,6 +115,10 @@ public final class MapObjectProperty {
     public static final String DELTAWIDTH_MAX = "particleMaxDeltaWidth";
     public static final String DELTAHEIGHT_MIN = "particleMinDeltaHeight";
     public static final String DELTAHEIGHT_MAX = "particleMaxDeltaHeight";
+    public static final String ROTATION_MIN = "particleMinRotation";
+    public static final String ROTATION_MAX = "particleMaxRotation";
+    public static final String DELTAROTATION_MIN = "particleMinDeltaRotation";
+    public static final String DELTAROTATION_MAX = "particleMaxDeltaRotation";
     public static final String TTL_MIN = "particleMinTTL";
     public static final String TTL_MAX = "particleMaxTTL";
     public static final String ANIMATESPRITE = "particleAnimateSprite";
@@ -123,6 +127,7 @@ public final class MapObjectProperty {
     public static final String FADE = "particleFade";
     public static final String FADEONCOLLISION = "particleFadeOnCollision";
     public static final String OUTLINEONLY = "particleOutlineOnly";
+    public static final String ANTIALIASING = "particleAntiAliasing";
 
     private Particle() {
     }

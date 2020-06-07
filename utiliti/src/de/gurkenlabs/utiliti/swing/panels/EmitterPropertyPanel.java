@@ -43,6 +43,8 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
       return new EmissionPanel();
     case ORIGIN:
       return new ParticleOriginPanel();
+    case ROTATION:
+      return new ParticleRotationPanel();
     case SIZE:
       return new ParticleSizePanel();
     case STYLE:
@@ -140,6 +142,7 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
     private JComboBox<ParticleType> comboBoxParticleType;
     private JToggleButton fade;
     private JToggleButton outlineOnly;
+    private JToggleButton antiAliasing;
     private final EmitterColorPanel colorPanel;
     private final EmitterTextPanel textPanel;
     private final EmitterSpritePanel spritePanel;
@@ -148,10 +151,12 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
     private ParticleStylePanel() {
       super();
       comboBoxParticleType = new JComboBox<>(new DefaultComboBoxModel<ParticleType>(ParticleType.values()));
-      outlineOnly = new JToggleButton();
-      outlineOnly.putClientProperty("JToggleButton.variant", DarkToggleButtonUI.VARIANT_SLIDER);
       fade = new JToggleButton();
       fade.putClientProperty("JToggleButton.variant", DarkToggleButtonUI.VARIANT_SLIDER);
+      outlineOnly = new JToggleButton();
+      outlineOnly.putClientProperty("JToggleButton.variant", DarkToggleButtonUI.VARIANT_SLIDER);
+      antiAliasing = new JToggleButton();
+      antiAliasing.putClientProperty("JToggleButton.variant", DarkToggleButtonUI.VARIANT_SLIDER);
       colorPanel = new EmitterColorPanel();
       textPanel = new EmitterTextPanel();
       spritePanel = new EmitterSpritePanel();
@@ -175,21 +180,23 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
     @Override
     protected void clearControls() {
       comboBoxParticleType.setSelectedItem(EmitterData.DEFAULT_PARTICLE_TYPE);
-      outlineOnly.setSelected(EmitterData.DEFAULT_OUTLINE_ONLY);
       fade.setSelected(EmitterData.DEFAULT_FADE);
+      outlineOnly.setSelected(EmitterData.DEFAULT_OUTLINE_ONLY);
+      antiAliasing.setSelected(EmitterData.DEFAULT_ANTIALIASING);
     }
 
     @Override
     protected void setControlValues(IMapObject mapObject) {
       emitter = Game.world().environment().getEmitter(mapObject.getId());
       comboBoxParticleType.setSelectedItem(mapObject.getEnumValue(MapObjectProperty.Emitter.PARTICLETYPE, ParticleType.class, EmitterData.DEFAULT_PARTICLE_TYPE));
-      outlineOnly.setSelected(mapObject.getBoolValue(MapObjectProperty.Particle.OUTLINEONLY, EmitterData.DEFAULT_OUTLINE_ONLY));
       fade.setSelected(mapObject.getBoolValue(MapObjectProperty.Particle.FADE, EmitterData.DEFAULT_FADE));
+      outlineOnly.setSelected(mapObject.getBoolValue(MapObjectProperty.Particle.OUTLINEONLY, EmitterData.DEFAULT_OUTLINE_ONLY));
+      antiAliasing.setSelected(mapObject.getBoolValue(MapObjectProperty.Particle.ANTIALIASING, EmitterData.DEFAULT_ANTIALIASING));
     }
 
     @Override
     protected LayoutManager createLayout() {
-      LayoutItem[] layoutItems = new LayoutItem[] { new LayoutItem("emitter_particleType", comboBoxParticleType), new LayoutItem("particle_fade", fade), new LayoutItem("particle_outlineonly", outlineOnly) };
+      LayoutItem[] layoutItems = new LayoutItem[] { new LayoutItem("emitter_particleType", comboBoxParticleType), new LayoutItem("particle_fade", fade), new LayoutItem("particle_outlineonly", outlineOnly), new LayoutItem("particle_antiAliasing", antiAliasing) };
       return this.createLayout(layoutItems, styleTabs);
     }
 
@@ -218,8 +225,9 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
           break;
         }
       });
-      setup(outlineOnly, MapObjectProperty.Particle.OUTLINEONLY);
       setup(fade, MapObjectProperty.Particle.FADE);
+      setup(outlineOnly, MapObjectProperty.Particle.OUTLINEONLY);
+      setup(antiAliasing, MapObjectProperty.Particle.ANTIALIASING);
     }
   }
 
@@ -323,6 +331,48 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
     }
   }
 
+  private static class ParticleRotationPanel extends EmitterPropertyPanel {
+    private ParticleParameterModifier startAngle;
+    private ParticleParameterModifier deltaAngle;
+
+    private ParticleRotationPanel() {
+      super();
+      startAngle = new ParticleParameterModifier(MapObjectProperty.Particle.ROTATION_MIN, MapObjectProperty.Particle.ROTATION_MAX, -360, 360, EmitterData.DEFAULT_MIN_ROTATION, EmitterData.DEFAULT_MAX_ROTATION, STEP_ONE);
+      deltaAngle = new ParticleParameterModifier(MapObjectProperty.Particle.DELTAROTATION_MIN, MapObjectProperty.Particle.DELTAROTATION_MAX, -360, 360, EmitterData.DEFAULT_MIN_DELTA_ROTATION, EmitterData.DEFAULT_MAX_DELTA_ROTATION, STEP_FINE);
+
+      setLayout(createLayout());
+      setupChangedListeners();
+    }
+
+    @Override
+    public void bind(IMapObject mapObject) {
+      super.bind(mapObject);
+      startAngle.bind(mapObject);
+      deltaAngle.bind(mapObject);
+    }
+
+    @Override
+    protected void clearControls() {
+
+    }
+
+    @Override
+    protected void setControlValues(IMapObject mapObject) {
+      this.emitter = Game.world().environment().getEmitter(mapObject.getId());
+    }
+
+    @Override
+    protected LayoutManager createLayout() {
+      LayoutItem[] layoutItems = new LayoutItem[] { new LayoutItem("particle_startAngle", startAngle), new LayoutItem("particle_deltaAngle", deltaAngle) };
+      return this.createLayout(layoutItems);
+    }
+
+    @Override
+    protected void setupChangedListeners() {
+
+    }
+  }
+
   private static class ParticleMotionPanel extends EmitterPropertyPanel {
     private ParticleParameterModifier velocityX;
     private ParticleParameterModifier velocityY;
@@ -331,7 +381,7 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
 
     private ParticleMotionPanel() {
       super();
-      velocityX = new ParticleParameterModifier(MapObjectProperty.Particle.VELOCITY_X_MIN, MapObjectProperty.Particle.VELOCITY_X_MAX, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_VELOCITY_X, EmitterData.DEFAULT_MAX_DELTA_X, .01f);
+      velocityX = new ParticleParameterModifier(MapObjectProperty.Particle.VELOCITY_X_MIN, MapObjectProperty.Particle.VELOCITY_X_MAX, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_VELOCITY_X, EmitterData.DEFAULT_MAX_VELOCITY_X, .01f);
       velocityY = new ParticleParameterModifier(MapObjectProperty.Particle.VELOCITY_Y_MIN, MapObjectProperty.Particle.VELOCITY_Y_MAX, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_VELOCITY_Y, EmitterData.DEFAULT_MAX_VELOCITY_Y, .01f);
       accelerationX = new ParticleParameterModifier(MapObjectProperty.Particle.ACCELERATION_X_MIN, MapObjectProperty.Particle.ACCELERATION_X_MAX, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_ACCELERATION_X, EmitterData.DEFAULT_MAX_ACCELERATION_X, .01f);
       accelerationY = new ParticleParameterModifier(MapObjectProperty.Particle.ACCELERATION_Y_MIN, MapObjectProperty.Particle.ACCELERATION_Y_MAX, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_ACCELERATION_Y, EmitterData.DEFAULT_MAX_ACCELERATION_Y, .01f);

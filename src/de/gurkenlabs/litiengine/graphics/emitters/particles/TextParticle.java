@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
@@ -39,6 +40,8 @@ public class TextParticle extends Particle {
     this.setHeight(g.getFont().getSize2D());
 
     final Point2D renderLocation = this.getRenderLocation(emitterOrigin);
+    final AffineTransform rotate = AffineTransform.getRotateInstance(Math.toRadians(this.getAngle()), this.getWidth() * 0.5, this.getHeight() * 0.5);
+    g.setFont(g.getFont().deriveFont(rotate));
     g.setColor(this.getColor());
     g.drawString(text, (float) renderLocation.getX(), (float) renderLocation.getY());
     g.setFont(oldFont);
@@ -50,7 +53,7 @@ public class TextParticle extends Particle {
 
   @Override
   public Rectangle2D getBoundingBox(final Point2D origin) {
-    return new Rectangle2D.Double(origin.getX() + this.getX() - this.getWidth() / 2, origin.getY() + this.getY() - this.getHeight()*1.5, this.getWidth(), this.getHeight());
+    return new Rectangle2D.Double(origin.getX() + this.getX() - this.getWidth() / 2, origin.getY() + this.getY() - this.getHeight() * 1.5, this.getWidth(), this.getHeight());
   }
 
 }

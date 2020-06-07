@@ -44,7 +44,7 @@ public final class ImageRenderer {
    * @param y
    *          The y-coordinate of the image
    * @param angle
-   *          The angle by which the image will be rotated.s
+   *          The angle by which the image will be rotated.
    */
   public static void renderRotated(final Graphics2D g, final Image image, final double x, final double y, final double angle) {
     if (image == null) {

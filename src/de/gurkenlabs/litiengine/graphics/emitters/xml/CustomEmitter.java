@@ -16,11 +16,10 @@ import de.gurkenlabs.litiengine.entities.EmitterInfo;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.EllipseParticle;
-import de.gurkenlabs.litiengine.graphics.emitters.particles.LeftLineParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.Particle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.PolygonParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.RectangleParticle;
-import de.gurkenlabs.litiengine.graphics.emitters.particles.RightLineParticle;
+import de.gurkenlabs.litiengine.graphics.emitters.particles.LineParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.SpriteParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.TextParticle;
 import de.gurkenlabs.litiengine.resources.Resources;
@@ -146,6 +145,8 @@ public class CustomEmitter extends Emitter {
     float height;
     float deltaWidth;
     float deltaHeight;
+    float angle;
+    float deltaAngle;
     int ttl;
 
     x = (float) this.getEmitterData().getParticleOffsetX().get();
@@ -158,6 +159,8 @@ public class CustomEmitter extends Emitter {
     height = (float) this.getEmitterData().getParticleHeight().get();
     deltaWidth = (float) this.getEmitterData().getDeltaWidth().get();
     deltaHeight = (float) this.getEmitterData().getDeltaHeight().get();
+    angle = (float) this.getEmitterData().getAngle().get();
+    deltaAngle = (float) this.getEmitterData().getDeltaAngle().get();
     ttl = (int) this.getEmitterData().getParticleTTL().get();
 
     Particle particle;
@@ -175,11 +178,8 @@ public class CustomEmitter extends Emitter {
     case DIAMOND:
       particle = new PolygonParticle(width, height, this.getRandomParticleColor(), 4);
       break;
-    case LEFTLINE:
-      particle = new LeftLineParticle(width, height, this.getRandomParticleColor());
-      break;
-    case RIGHTLINE:
-      particle = new RightLineParticle(width, height, this.getRandomParticleColor());
+    case LINE:
+      particle = new LineParticle(width, height, this.getRandomParticleColor());
       break;
     case TEXT:
       String text;
@@ -215,10 +215,14 @@ public class CustomEmitter extends Emitter {
     particle.setDeltaWidth(deltaWidth);
     particle.setDeltaHeight(deltaHeight);
 
+    particle.setAngle(angle);
+    particle.setDeltaAngle(deltaAngle);
+
     particle.setTimeToLive(ttl);
 
     particle.setCollisionType(this.getEmitterData().getCollisionType());
     particle.setOutlineOnly(this.getEmitterData().isOutlineOnly());
+    particle.setAntiAliasing(this.getEmitterData().isAntiAliased());
     particle.setFade(this.getEmitterData().isFading());
 
     particle.setFadeOnCollision(this.getEmitterData().isFadingOnCollision());

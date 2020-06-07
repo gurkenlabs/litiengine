@@ -12,7 +12,6 @@ import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.animation.AnimationController;
 
 public class SpriteParticle extends Particle {
-  private float angle;
   private AnimationController animation;
   private boolean animateSprite;
   private boolean loopSprite;
@@ -30,9 +29,6 @@ public class SpriteParticle extends Particle {
     this.animation = new AnimationController(this.spritesheet);
   }
 
-  public float getAngle() {
-    return this.angle;
-  }
 
   @Override
   public void render(final Graphics2D g, final Point2D emitterOrigin) {
@@ -61,10 +57,7 @@ public class SpriteParticle extends Particle {
     return new Rectangle2D.Double(origin.getX() + this.getX() - this.getWidth() / 2, origin.getY() + this.getY() - this.getHeight() / 2, this.getWidth(), this.getHeight());
   }
 
-  public Particle setAngle(final float angle) {
-    this.angle = angle;
-    return this;
-  }
+
 
   public boolean isAnimatingSprite() {
     return animateSprite;

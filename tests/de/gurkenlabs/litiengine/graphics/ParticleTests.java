@@ -12,10 +12,8 @@ import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameTest;
-import de.gurkenlabs.litiengine.graphics.emitters.particles.LeftLineParticle;
-import de.gurkenlabs.litiengine.graphics.emitters.particles.LightParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.RectangleParticle;
-import de.gurkenlabs.litiengine.graphics.emitters.particles.RightLineParticle;
+import de.gurkenlabs.litiengine.graphics.emitters.particles.LineParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.TextParticle;
 import de.gurkenlabs.litiengine.physics.Collision;
 
@@ -32,10 +30,8 @@ public class ParticleTests {
 
   @Test
   public void initializeParticleTypes() {
-    assertDoesNotThrow(() -> new LeftLineParticle(10, 10, Color.WHITE));
-    assertDoesNotThrow(() -> new LightParticle(100, 100, 10, 10, Color.WHITE));
     assertDoesNotThrow(() -> new RectangleParticle(10, 10, Color.WHITE));
-    assertDoesNotThrow(() -> new RightLineParticle(10, 10, Color.WHITE));
+    assertDoesNotThrow(() -> new LineParticle(10, 10, Color.WHITE));
     assertDoesNotThrow(() -> new TextParticle(null, Color.WHITE));
     assertDoesNotThrow(() -> new TextParticle("test", Color.WHITE));
   }

@@ -13,7 +13,7 @@ import de.gurkenlabs.utiliti.swing.Icons;
 public class EmitterPanel extends PropertyPanel {
 
   public enum EmitterPropertyGroup {
-    EMISSION, STYLE, SIZE, ORIGIN, MOTION, COLLISION
+    EMISSION, STYLE, SIZE, ORIGIN, ROTATION, MOTION, COLLISION
   }
 
   JTabbedPane propertyGrouptabs;
@@ -26,8 +26,7 @@ public class EmitterPanel extends PropertyPanel {
     this.propertyGrouptabs.setTabPlacement(JTabbedPane.LEFT);
     for (EmitterPropertyGroup e : EmitterPropertyGroup.values()) {
       String localized = Resources.strings().get(String.format("emitter_%s", e.name().toLowerCase()));
-      this.propertyGrouptabs.insertTab(String.format("<html><p style=\"text-align: left; width: %spx\">%s</p></html>", LABEL_WIDTH * 1.5, localized), null, EmitterPropertyPanel.getEmitterPropertyPanel(e), Resources.strings().get(String.format("emitter_%s_tip", e.name().toLowerCase())),
-          e.ordinal());
+      this.propertyGrouptabs.insertTab(String.format("<html><p style=\"text-align: left; width: %spx\">%s</p></html>", LABEL_WIDTH * 1.5, localized), null, EmitterPropertyPanel.getEmitterPropertyPanel(e), Resources.strings().get(String.format("emitter_%s_tip", e.name().toLowerCase())), e.ordinal());
     }
 
     this.add(this.propertyGrouptabs);
@@ -39,7 +38,7 @@ public class EmitterPanel extends PropertyPanel {
       ((EmitterPropertyPanel) this.propertyGrouptabs.getComponent(e.ordinal())).bind(mapObject);
     }
   }
-  
+
   @Override
   protected void clearControls() {
 

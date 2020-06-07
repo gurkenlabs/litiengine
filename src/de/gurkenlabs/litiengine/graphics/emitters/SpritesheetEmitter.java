@@ -7,7 +7,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.Particle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.SpriteParticle;
-
+@Deprecated
 public abstract class SpritesheetEmitter extends Emitter {
   private final Spritesheet spriteSheet;
 
