@@ -17,8 +17,8 @@ public class PolygonParticle extends ShapeParticle {
   @Override
   protected Shape getShape(Point2D emitterOrigin) {
     Polygon p = new Polygon();
-    float x = this.getAbsoluteX(emitterOrigin);
-    float y = this.getAbsoluteY(emitterOrigin);
+    float x = this.getAbsoluteX(emitterOrigin)+this.getWidth()/2;
+    float y = this.getAbsoluteY(emitterOrigin)+this.getHeight()/2;
     float theta = (float) (2 * Math.PI / this.sides);
     for (int i = 0; i < this.sides; i++) {
       p.addPoint((int) (x + this.getWidth() * Math.cos(theta * i)), (int) (y + this.getHeight() * Math.sin(theta * i)));

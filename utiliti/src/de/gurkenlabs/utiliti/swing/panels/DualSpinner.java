@@ -1,7 +1,5 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
-import java.awt.Dimension;
-
 import javax.swing.GroupLayout;
 import javax.swing.JLabel;
 import javax.swing.JSpinner;
@@ -9,10 +7,9 @@ import javax.swing.SpinnerNumberModel;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.utiliti.components.Editor;
 
 @SuppressWarnings("serial")
-public class ParticleParameterModifier extends PropertyPanel {
+public class DualSpinner extends PropertyPanel {
   private JSpinner min;
   private JLabel minLbl;
   private JSpinner max;
@@ -23,23 +20,20 @@ public class ParticleParameterModifier extends PropertyPanel {
   private float defaultMin;
   private float defaultMax;
 
-  private final static Dimension SPINNER_DIMENSION = new Dimension((int) (70 * Editor.preferences().getUiScale()), CONTROL_HEIGHT);
-
-  public ParticleParameterModifier(String minPropertyName, String maxPropertyName, float lowerBound, float upperBound, float defaultMin, float defaultMax, float step) {
+  public DualSpinner(String minPropertyName, String maxPropertyName, float lowerBound, float upperBound, float defaultMin, float defaultMax, float step) {
     this.minPropertyName = minPropertyName;
     this.maxPropertyName = maxPropertyName;
     this.defaultMin = defaultMin;
     this.defaultMax = defaultMax;
     min = new JSpinner(new SpinnerNumberModel(defaultMin, lowerBound, upperBound, step));
-    min.setMinimumSize(SPINNER_DIMENSION);
-    min.setMaximumSize(SPINNER_DIMENSION);
-    min.setPreferredSize(SPINNER_DIMENSION);
+    min.setMinimumSize(SPINNER_SIZE);
     minLbl = new JLabel(Resources.strings().get("min"));
+    minLbl.setMinimumSize(LABEL_SIZE);
+
     max = new JSpinner(new SpinnerNumberModel(defaultMax, lowerBound, upperBound, step));
-    max.setMinimumSize(SPINNER_DIMENSION);
-    max.setMaximumSize(SPINNER_DIMENSION);
-    max.setPreferredSize(SPINNER_DIMENSION);
+    max.setMinimumSize(SPINNER_SIZE);
     maxLbl = new JLabel(Resources.strings().get("max"));
+    maxLbl.setMinimumSize(LABEL_SIZE);
 
     GroupLayout grplayout = new GroupLayout(this);
     grplayout.setAutoCreateGaps(true);

@@ -30,6 +30,8 @@ import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingConstants;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.TableModelEvent;
@@ -49,14 +51,21 @@ import de.gurkenlabs.utiliti.swing.UI;
 
 @SuppressWarnings("serial")
 public abstract class PropertyPanel extends JPanel {
-  public static final int LABEL_WIDTH = (int) (40 * Editor.preferences().getUiScale());
-  public static final int CONTROL_MIN_WIDTH = (int) (100 * Editor.preferences().getUiScale());
+  public static final int LABEL_WIDTH = (int) (35 * Editor.preferences().getUiScale());
+  public static final int CONTROL_MIN_WIDTH = (int) (80 * Editor.preferences().getUiScale());
   public static final int CONTROL_WIDTH = (int) (160 * Editor.preferences().getUiScale());
+  public static final int SPINNER_WIDTH = (int) (70 * Editor.preferences().getUiScale());
   public static final int CONTROL_HEIGHT = (int) (30 * Editor.preferences().getUiScale());
   public static final int CONTROL_MARGIN = (int) (5 * Editor.preferences().getUiScale());
   public static final int PANEL_WIDTH = 2 * (CONTROL_WIDTH + LABEL_WIDTH + CONTROL_MARGIN);
   public static final int LABEL_GAP = 0;
+  public static final int DUAL_SPINNER_GAP = CONTROL_WIDTH - 2 * (LABEL_WIDTH + SPINNER_WIDTH);
+  public static final Dimension LABEL_SIZE = new Dimension(LABEL_WIDTH, CONTROL_HEIGHT);
   public static final Dimension BUTTON_SIZE = new Dimension(CONTROL_HEIGHT, CONTROL_HEIGHT);
+  public final static Dimension SPINNER_SIZE = new Dimension(SPINNER_WIDTH, CONTROL_HEIGHT);
+  public static final Dimension SMALL_CONTROL_SIZE = new Dimension(CONTROL_MIN_WIDTH, CONTROL_HEIGHT);
+  public static final Dimension LARGE_CONTROL_SIZE = new Dimension(CONTROL_WIDTH, CONTROL_HEIGHT);
+  public static final Border STANDARDBORDER = new EmptyBorder(0, 4, 0, 4);
 
   public static final int STEP_ONE = 1;
   public static final int STEP_COARSE = 10;
@@ -149,14 +158,23 @@ public abstract class PropertyPanel extends JPanel {
   protected abstract void setControlValues(IMapObject mapObject);
 
   protected void setup(JToggleButton toggle, String property) {
+    if (property == null || property.isEmpty()) {
+      return;
+    }
     toggle.addActionListener(new MapObjectPropertyActionListener(m -> m.setValue(property, toggle.isSelected())));
   }
 
   protected void setup(JCheckBox checkbox, String property) {
+    if (property == null || property.isEmpty()) {
+      return;
+    }
     checkbox.addActionListener(new MapObjectPropertyActionListener(m -> m.setValue(property, checkbox.isSelected())));
   }
 
   protected <T> void setup(JComboBox<T> comboBox, String property) {
+    if (property == null || property.isEmpty()) {
+      return;
+    }
     comboBox.addActionListener(new MapObjectPropertyActionListener(m -> {
       T value = comboBox.getModel().getElementAt(comboBox.getSelectedIndex());
       m.setValue(property, value.toString());
@@ -164,6 +182,9 @@ public abstract class PropertyPanel extends JPanel {
   }
 
   protected void setupL(JComboBox<JLabel> comboBox, String property) {
+    if (property == null || property.isEmpty()) {
+      return;
+    }
     comboBox.addActionListener(new MapObjectPropertyActionListener(m -> {
       JLabel value = comboBox.getModel().getElementAt(comboBox.getSelectedIndex());
       m.setValue(property, value.getText());
@@ -171,19 +192,31 @@ public abstract class PropertyPanel extends JPanel {
   }
 
   protected void setup(JSpinner spinner, String property) {
+    if (property == null || property.isEmpty()) {
+      return;
+    }
     spinner.addChangeListener(new SpinnerListener(property, spinner));
   }
 
   protected void setup(JTextField textField, String property) {
+    if (property == null || property.isEmpty()) {
+      return;
+    }
     textField.addFocusListener(new MapObjectPropteryFocusListener(m -> m.setValue(property, textField.getText())));
     textField.addActionListener(new MapObjectPropertyActionListener(m -> m.setValue(property, textField.getText())));
   }
 
   protected void setup(TextList textList, String property) {
+    if (property == null || property.isEmpty()) {
+      return;
+    }
     textList.addActionListener(new MapObjectPropertyActionListener(m -> m.setValue(property, textList.getJoinedString())));
   }
 
   protected void setup(JTable table, String... properties) {
+    if (properties == null || properties.length == 0) {
+      return;
+    }
     table.getModel().addTableModelListener(new TableListener(table, properties));
   }
 

@@ -1,32 +1,30 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.LayoutManager;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Supplier;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
-import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.Style;
-import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.components.PropertyInspector;
 import de.gurkenlabs.utiliti.handlers.Transform;
 import de.gurkenlabs.utiliti.swing.ControlBehavior;
@@ -44,17 +42,21 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
   private final MovementPanel movementPanel;
   private final CustomPanel customPanel;
   private final JTextField textFieldName;
-  private final JSpinner spinnerY;
-  private final JSpinner spinnerX;
-  private final JSpinner spinnerWidth;
-  private final JSpinner spinnerHeight;
+  private JLabel lblRenderType;
+  private JComboBox<RenderType> renderType;
+
   private final JLabel labelEntityID;
   private TagPanel tagPanel;
   private JLabel lblLayer;
-  private JLabel lblRendering;
   private JPanel infoPanel;
 
+  private JPanel transformPanel, scalePanel;
+  private JLabel lblX, lblY, lblWidth, lblHeight;
+  private JSpinner x, y, width, height;
+
   public MapObjectInspector() {
+    super();
+    this.setBorder(STANDARDBORDER);
     this.panels = new ConcurrentHashMap<>();
     this.panels.put(MapObjectType.PROP, new PropPanel());
     this.panels.put(MapObjectType.COLLISIONBOX, new CollisionBoxPanel());
@@ -69,26 +71,18 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.movementPanel = new MovementPanel();
     this.customPanel = new CustomPanel();
 
-    setMinimumSize(new Dimension(250, 500));
-
-    JLabel lblX = new JLabel(Resources.strings().get("panel_x"));
-    JLabel lblYcoordinate = new JLabel(Resources.strings().get("panel_y"));
-    JLabel lblWidth = new JLabel(Resources.strings().get("panel_width"));
-    JLabel lblHeight = new JLabel(Resources.strings().get("panel_height"));
-    JLabel lblName = new JLabel(Resources.strings().get("panel_name"));
-    JLabel lblTags = new JLabel(Resources.strings().get("panel_tags"));
-
     this.textFieldName = new JTextField();
     this.textFieldName.setColumns(10);
 
     ControlBehavior.apply(this.textFieldName);
 
-    this.spinnerX = new JSpinner();
-    this.spinnerY = new JSpinner();
-    this.spinnerWidth = new JSpinner();
-    this.spinnerHeight = new JSpinner();
+    this.lblRenderType = new JLabel(Resources.strings().get("panel_rendertype"));
+    this.lblRenderType.setHorizontalAlignment(SwingConstants.LEADING);
+    this.lblRenderType.setForeground(Color.LIGHT_GRAY);
+    this.lblRenderType.setFont(this.lblRenderType.getFont().deriveFont(Style.getDefaultFont().getSize() * 0.75f));
 
-    this.updateSpinnerModels();
+    this.renderType = new JComboBox<RenderType>(RenderType.values());
+    this.renderType.setMinimumSize(SMALL_CONTROL_SIZE);
 
     this.tagPanel = new TagPanel();
 
@@ -96,45 +90,15 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.tabbedPanel.setFont(Style.getHeaderFont());
 
     this.infoPanel = new JPanel();
-
-    GroupLayout groupLayout = new GroupLayout(this);
-    groupLayout
-        .setHorizontalGroup(
-            groupLayout.createParallelGroup(Alignment.TRAILING)
-                .addGroup(groupLayout.createSequentialGroup().addGap(CONTROL_MARGIN).addGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addComponent(tabbedPanel, Alignment.LEADING, PANEL_WIDTH, PANEL_WIDTH, PANEL_WIDTH).addGroup(groupLayout.createSequentialGroup()
-                    .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING, false).addComponent(lblX, Alignment.LEADING, LABEL_WIDTH, LABEL_WIDTH, Short.MAX_VALUE).addComponent(lblWidth, Alignment.LEADING, LABEL_WIDTH, LABEL_WIDTH, PANEL_WIDTH)
-                        .addComponent(lblName, Alignment.LEADING, LABEL_WIDTH, LABEL_WIDTH, Short.MAX_VALUE).addComponent(lblTags, Alignment.LEADING, LABEL_WIDTH, LABEL_WIDTH, Short.MAX_VALUE))
-                    .addPreferredGap(ComponentPlacement.RELATED)
-                    .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addComponent(tagPanel, CONTROL_MIN_WIDTH, CONTROL_WIDTH, PANEL_WIDTH).addComponent(textFieldName, CONTROL_MIN_WIDTH, CONTROL_WIDTH, PANEL_WIDTH).addGap(0)
-                        .addGroup(groupLayout.createSequentialGroup().addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(spinnerWidth, CONTROL_MIN_WIDTH, CONTROL_WIDTH, CONTROL_WIDTH).addComponent(spinnerX, Alignment.TRAILING, CONTROL_MIN_WIDTH, CONTROL_WIDTH, CONTROL_WIDTH))
-                            .addPreferredGap(ComponentPlacement.UNRELATED).addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false).addComponent(lblHeight, LABEL_WIDTH, LABEL_WIDTH, LABEL_WIDTH).addComponent(lblYcoordinate, LABEL_WIDTH, LABEL_WIDTH, LABEL_WIDTH)).addGap(0)
-                            .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addComponent(spinnerY, Alignment.LEADING, CONTROL_MIN_WIDTH, CONTROL_WIDTH, CONTROL_WIDTH).addComponent(spinnerHeight, Alignment.LEADING, CONTROL_MIN_WIDTH, CONTROL_WIDTH, CONTROL_WIDTH))))))
-                    .addGap(CONTROL_MARGIN))
-                .addGroup(Alignment.LEADING, groupLayout.createSequentialGroup().addGap(CONTROL_MARGIN).addComponent(infoPanel, PANEL_WIDTH, PANEL_WIDTH, Short.MAX_VALUE).addGap(CONTROL_MARGIN)));
-    groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-        .addGroup(groupLayout.createSequentialGroup().addGap(CONTROL_MARGIN).addComponent(infoPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addGap(CONTROL_MARGIN)
-            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(lblX, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE).addComponent(spinnerX, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE)
-                .addComponent(lblYcoordinate, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE).addComponent(spinnerY, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE))
-            .addGap(CONTROL_MARGIN)
-            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(spinnerWidth, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE).addComponent(lblHeight, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE)
-                .addComponent(spinnerHeight, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE).addComponent(lblWidth, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE))
-            .addGap(CONTROL_MARGIN).addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(textFieldName, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE).addComponent(lblName, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE))
-            .addGap(5).addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(tagPanel, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE).addComponent(lblTags, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE)).addGap(5)
-            .addComponent(tabbedPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addGap(CONTROL_MARGIN)));
     this.infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.X_AXIS));
 
-    JLabel lblEntityId = new JLabel("ID");
+    JLabel lblEntityId = new JLabel(Resources.strings().get("panel_ID"));
     lblEntityId.setFont(lblEntityId.getFont().deriveFont(Font.BOLD));
 
     this.labelEntityID = new JLabel("####");
     this.labelEntityID.setFont(labelEntityID.getFont());
 
     this.lblLayer = new JLabel("");
-
-    this.lblRendering = new JLabel("");
-    this.lblRendering.setForeground(Color.LIGHT_GRAY);
-    this.lblRendering.setFont(lblRendering.getFont().deriveFont(Style.getDefaultFont().getSize() * 0.75f));
-
     this.lblLayer.setHorizontalAlignment(SwingConstants.TRAILING);
     this.lblLayer.setForeground(Color.LIGHT_GRAY);
     this.lblLayer.setFont(this.lblLayer.getFont().deriveFont(Style.getDefaultFont().getSize() * 0.75f));
@@ -143,22 +107,13 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.infoPanel.add(Box.createHorizontalStrut(47));
     this.infoPanel.add(labelEntityID);
     this.infoPanel.add(Box.createGlue());
-    this.infoPanel.add(lblRendering);
-    this.infoPanel.add(Box.createHorizontalStrut(15));
     this.infoPanel.add(lblLayer);
 
-    setLayout(groupLayout);
+    this.initSpinners();
 
+    setLayout(createLayout());
     this.setupChangedListeners();
     UI.getLayerController().onLayersChanged(map -> this.bind(this.getDataSource()));
-  }
-
-  public void updateSpinnerModels() {
-    if (Editor.preferences().snapToPixels()) {
-      this.updateSpinnerModels(MapObjectInspector::getIntegerModel);
-    } else {
-      this.updateSpinnerModels(MapObjectInspector::getFloatModel);
-    }
   }
 
   @Override
@@ -168,7 +123,8 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
   @Override
   public void refresh() {
-    this.updateSpinnerModels();
+    // TODO Auto-generated method stub
+
   }
 
   @Override
@@ -199,6 +155,12 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
     this.customPanel.bind(this.getDataSource());
     this.isFocussing = false;
+  }
+
+  private LayoutManager createLayout() {
+    LayoutItem[] layoutItems = new LayoutItem[] { new LayoutItem(infoPanel), new LayoutItem("panel_rendertype", renderType), new LayoutItem("panel_transform", transformPanel), new LayoutItem("panel_scale", scalePanel), new LayoutItem("panel_name", textFieldName),
+        new LayoutItem("panel_tags", tagPanel), new LayoutItem(tabbedPanel, GroupLayout.PREFERRED_SIZE) };
+    return this.createLayout(layoutItems);
   }
 
   private void switchPanel() {
@@ -278,114 +240,110 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
   @Override
   protected void clearControls() {
     // clear controls
-    this.spinnerX.setValue(0);
-    this.spinnerY.setValue(0);
-    this.spinnerWidth.setValue(0);
-    this.spinnerHeight.setValue(0);
     this.type = null;
-
+    this.x.setValue(0);
+    this.y.setValue(0);
+    this.width.setValue(0);
+    this.height.setValue(0);
     this.textFieldName.setText("");
     this.labelEntityID.setText("####");
     this.lblLayer.setText("");
-    this.lblRendering.setText("");
+    this.renderType.setSelectedIndex(0);
+    this.renderType.setVisible(false);
     this.tagPanel.clear();
   }
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    this.spinnerX.setValue(mapObject.getLocation().getX());
-    this.spinnerY.setValue(mapObject.getLocation().getY());
-    this.spinnerWidth.setValue(mapObject.getWidth());
-    this.spinnerHeight.setValue(mapObject.getHeight());
 
     this.type = MapObjectType.get(mapObject.getType());
     this.textFieldName.setText(mapObject.getName());
-
+    this.x.setValue(mapObject.getX());
+    this.y.setValue(mapObject.getY());
+    this.width.setValue(mapObject.getWidth());
+    this.height.setValue(mapObject.getHeight());
     this.tagPanel.bind(mapObject.getStringValue(MapObjectProperty.TAGS));
 
     this.labelEntityID.setText(Integer.toString(mapObject.getId()));
 
     this.lblLayer.setText("Layer: " + mapObject.getLayer().getName());
-    String info = getRendering(mapObject);
-    if (info == null) {
-      this.lblRendering.setText("");
-    } else {
-      this.lblRendering.setText("Render: " + getRendering(mapObject));
-    }
-  }
 
-  private static String getRendering(IMapObject mapObject) {
-    switch (MapObjectType.get(mapObject.getType())) {
-    case PROP:
-    case EMITTER:
-    case CREATURE:
-      RenderType renderType = mapObject.getEnumValue(MapObjectProperty.RENDERTYPE, RenderType.class, RenderType.NORMAL);
-      if (mapObject.getLayer() != null && mapObject.getBoolValue(MapObjectProperty.RENDERWITHLAYER)) {
-        return "layer (" + mapObject.getLayer().getRenderType() + ")";
-      }
-      return renderType.toString();
-    default:
-      return null;
+    RenderType rt = mapObject.getEnumValue(MapObjectProperty.RENDERTYPE, RenderType.class);
+    boolean showRenderTypeControls = Game.world().environment().get(mapObject.getId()).getRenderType() != RenderType.NONE;
+    this.lblRenderType.setVisible(showRenderTypeControls);
+    this.renderType.setVisible(showRenderTypeControls);
+
+    if (rt != null) {
+      this.renderType.setSelectedItem(rt);
     }
   }
 
   private void setupChangedListeners() {
-
+    setup(renderType, MapObjectProperty.RENDERTYPE);
+    this.x.addChangeListener(new MapObjectPropertyChangeListener(m -> {
+      m.setX(getSpinnerValue(x));
+      Transform.updateAnchors();
+    }));
+    this.width.addChangeListener(new MapObjectPropertyChangeListener(m -> {
+      m.setWidth(getSpinnerValue(width));
+      Transform.updateAnchors();
+    }));
+    this.height.addChangeListener(new MapObjectPropertyChangeListener(m -> {
+      m.setHeight(getSpinnerValue(height));
+      Transform.updateAnchors();
+    }));
+    this.y.addChangeListener(new MapObjectPropertyChangeListener(m -> {
+      m.setY(getSpinnerValue(y));
+      Transform.updateAnchors();
+    }));
     this.textFieldName.addFocusListener(new MapObjectPropteryFocusListener(m -> m.setName(textFieldName.getText())));
 
     this.textFieldName.addActionListener(new MapObjectPropertyActionListener(m -> m.setName(textFieldName.getText())));
 
-    // TODO: wrap the value changing with the spin controls into one undo
-    // operation.
-    this.spinnerX.addChangeListener(new MapObjectPropertyChangeListener(m -> {
-
-      m.setX(getSpinnerValue(spinnerX));
-      Transform.updateAnchors();
-    }));
-
-    this.spinnerY.addChangeListener(new MapObjectPropertyChangeListener(m -> {
-      m.setY(getSpinnerValue(spinnerY));
-      Transform.updateAnchors();
-    }));
-
-    this.spinnerWidth.addChangeListener(new MapObjectPropertyChangeListener(m -> {
-      m.setWidth(getSpinnerValue(spinnerWidth));
-      Transform.updateAnchors();
-    }));
-
-    this.spinnerHeight.addChangeListener(new MapObjectPropertyChangeListener(m -> {
-      m.setHeight(getSpinnerValue(spinnerHeight));
-      Transform.updateAnchors();
-    }));
-
     this.tagPanel.addActionListener(new MapObjectPropertyActionListener(m -> m.setValue(MapObjectProperty.TAGS, this.tagPanel.getTagsString())));
+  }
+
+  private void initSpinners() {
+    x = new JSpinner(new SpinnerNumberModel(0, 0, Short.MAX_VALUE, STEP_ONE));
+    x.setMinimumSize(SPINNER_SIZE);
+    lblX = new JLabel(Resources.strings().get("panel_x"));
+    lblX.setMinimumSize(LABEL_SIZE);
+    y = new JSpinner(new SpinnerNumberModel(0, 0, Short.MAX_VALUE, STEP_ONE));
+    y.setMinimumSize(SPINNER_SIZE);
+    lblY = new JLabel(Resources.strings().get("panel_y"));
+    lblY.setMinimumSize(LABEL_SIZE);
+
+    transformPanel = new JPanel();
+    GroupLayout grplayoutTransform = new GroupLayout(transformPanel);
+    grplayoutTransform.setAutoCreateGaps(true);
+    grplayoutTransform.setHorizontalGroup(grplayoutTransform.createSequentialGroup().addContainerGap().addComponent(lblX).addComponent(x).addComponent(lblY).addComponent(y).addContainerGap());
+    grplayoutTransform.setVerticalGroup(grplayoutTransform.createParallelGroup().addComponent(lblX, GroupLayout.Alignment.CENTER).addComponent(x).addComponent(lblY, GroupLayout.Alignment.CENTER).addComponent(y));
+    transformPanel.setLayout(grplayoutTransform);
+
+    width = new JSpinner(new SpinnerNumberModel(0, 0, Short.MAX_VALUE, STEP_ONE));
+    width.setMinimumSize(SPINNER_SIZE);
+    lblWidth = new JLabel(Resources.strings().get("panel_width"));
+    lblWidth.setMinimumSize(LABEL_SIZE);
+    height = new JSpinner(new SpinnerNumberModel(0, 0, Short.MAX_VALUE, STEP_ONE));
+    height.setMinimumSize(SPINNER_SIZE);
+    lblHeight = new JLabel(Resources.strings().get("panel_height"));
+    lblHeight.setMinimumSize(LABEL_SIZE);
+
+    scalePanel = new JPanel();
+    GroupLayout grplayoutScale = new GroupLayout(scalePanel);
+    grplayoutScale.setAutoCreateGaps(true);
+    grplayoutScale.setHorizontalGroup(grplayoutScale.createSequentialGroup().addContainerGap().addComponent(lblWidth).addComponent(width).addComponent(lblHeight).addComponent(height).addContainerGap());
+    grplayoutScale.setVerticalGroup(grplayoutScale.createParallelGroup().addComponent(lblWidth, GroupLayout.Alignment.CENTER).addComponent(width).addComponent(lblHeight, GroupLayout.Alignment.CENTER).addComponent(height));
+    scalePanel.setLayout(grplayoutScale);
   }
 
   private static float getSpinnerValue(JSpinner spinner) {
     if (spinner.getValue() instanceof Integer) {
-      return (int) spinner.getValue();
+      return ((Integer) spinner.getValue()).floatValue();
+    } else if (spinner.getValue() instanceof Double) {
+      return ((Double) spinner.getValue()).floatValue();
     } else {
-      return (float) (double) spinner.getValue();
+      return (float) spinner.getValue();
     }
-  }
-
-  private static SpinnerNumberModel getFloatModel() {
-    return new SpinnerNumberModel(0f, 0f, 10000f, 0.01f);
-  }
-
-  private static SpinnerNumberModel getIntegerModel() {
-    return new SpinnerNumberModel(0, 0, 10000, 1);
-  }
-
-  private void updateSpinnerModels(Supplier<SpinnerNumberModel> supp) {
-    this.spinnerX.setModel(supp.get());
-    this.spinnerY.setModel(supp.get());
-    this.spinnerWidth.setModel(supp.get());
-    this.spinnerHeight.setModel(supp.get());
-
-    ControlBehavior.apply(this.spinnerX);
-    ControlBehavior.apply(this.spinnerY);
-    ControlBehavior.apply(this.spinnerWidth);
-    ControlBehavior.apply(this.spinnerHeight);
   }
 }

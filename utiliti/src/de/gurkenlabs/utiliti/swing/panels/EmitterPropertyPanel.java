@@ -8,7 +8,6 @@ import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.border.EmptyBorder;
 
 import com.github.weisj.darklaf.ui.togglebutton.DarkToggleButtonUI;
 
@@ -32,7 +31,7 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
 
   private EmitterPropertyPanel() {
     super();
-    this.setBorder(new EmptyBorder(0, 4, 0, 0));
+    this.setBorder(STANDARDBORDER);
   }
 
   public static EmitterPropertyPanel getEmitterPropertyPanel(EmitterPropertyGroup category) {
@@ -66,7 +65,7 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
     private JSpinner updateDelaySpinner;
     private JSpinner durationSpinner;
     private JSpinner maxParticlesSpinner;
-    private ParticleParameterModifier ttl;
+    private DualSpinner ttl;
     private JToggleButton btnPause;
 
     private EmissionPanel() {
@@ -76,7 +75,7 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
       updateDelaySpinner = new JSpinner(new SpinnerNumberModel(EmitterData.DEFAULT_UPDATERATE, 0, Integer.MAX_VALUE, STEP_COARSE));
       durationSpinner = new JSpinner(new SpinnerNumberModel(EmitterData.DEFAULT_DURATION, 0, Integer.MAX_VALUE, STEP_SPARSE));
       maxParticlesSpinner = new JSpinner(new SpinnerNumberModel(EmitterData.DEFAULT_MAXPARTICLES, 1, Integer.MAX_VALUE, STEP_ONE));
-      ttl = new ParticleParameterModifier(MapObjectProperty.Particle.TTL_MIN, MapObjectProperty.Particle.TTL_MIN, Integer.MIN_VALUE, Integer.MAX_VALUE, EmitterData.DEFAULT_MIN_PARTICLE_TTL, EmitterData.DEFAULT_MAX_PARTICLE_TTL, STEP_SPARSE);
+      ttl = new DualSpinner(MapObjectProperty.Particle.TTL_MIN, MapObjectProperty.Particle.TTL_MAX, Integer.MIN_VALUE, Integer.MAX_VALUE, EmitterData.DEFAULT_MIN_PARTICLE_TTL, EmitterData.DEFAULT_MAX_PARTICLE_TTL, STEP_SPARSE);
 
       btnPause = new JToggleButton();
       btnPause.setSelected(true);
@@ -232,17 +231,17 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
   }
 
   private static class ParticleSizePanel extends EmitterPropertyPanel {
-    private ParticleParameterModifier startWidth;
-    private ParticleParameterModifier startHeight;
-    private ParticleParameterModifier deltaWidth;
-    private ParticleParameterModifier deltaHeight;
+    private DualSpinner startWidth;
+    private DualSpinner startHeight;
+    private DualSpinner deltaWidth;
+    private DualSpinner deltaHeight;
 
     private ParticleSizePanel() {
       super();
-      startWidth = new ParticleParameterModifier(MapObjectProperty.Particle.STARTWIDTH_MIN, MapObjectProperty.Particle.STARTWIDTH_MAX, 0, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_WIDTH, EmitterData.DEFAULT_MAX_WIDTH, STEP_ONE);
-      startHeight = new ParticleParameterModifier(MapObjectProperty.Particle.STARTHEIGHT_MIN, MapObjectProperty.Particle.STARTHEIGHT_MAX, 0, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_HEIGHT, EmitterData.DEFAULT_MAX_HEIGHT, STEP_ONE);
-      deltaWidth = new ParticleParameterModifier(MapObjectProperty.Particle.DELTAWIDTH_MIN, MapObjectProperty.Particle.DELTAWIDTH_MAX, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_DELTA_WIDTH, EmitterData.DEFAULT_MAX_DELTA_WIDTH, STEP_FINEST);
-      deltaHeight = new ParticleParameterModifier(MapObjectProperty.Particle.DELTAHEIGHT_MIN, MapObjectProperty.Particle.DELTAHEIGHT_MAX, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_DELTA_HEIGHT, EmitterData.DEFAULT_MAX_DELTA_HEIGHT, STEP_FINEST);
+      startWidth = new DualSpinner(MapObjectProperty.Particle.STARTWIDTH_MIN, MapObjectProperty.Particle.STARTWIDTH_MAX, 0, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_WIDTH, EmitterData.DEFAULT_MAX_WIDTH, STEP_ONE);
+      startHeight = new DualSpinner(MapObjectProperty.Particle.STARTHEIGHT_MIN, MapObjectProperty.Particle.STARTHEIGHT_MAX, 0, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_HEIGHT, EmitterData.DEFAULT_MAX_HEIGHT, STEP_ONE);
+      deltaWidth = new DualSpinner(MapObjectProperty.Particle.DELTAWIDTH_MIN, MapObjectProperty.Particle.DELTAWIDTH_MAX, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_DELTA_WIDTH, EmitterData.DEFAULT_MAX_DELTA_WIDTH, STEP_FINEST);
+      deltaHeight = new DualSpinner(MapObjectProperty.Particle.DELTAHEIGHT_MIN, MapObjectProperty.Particle.DELTAHEIGHT_MAX, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_DELTA_HEIGHT, EmitterData.DEFAULT_MAX_DELTA_HEIGHT, STEP_FINEST);
       setLayout(createLayout());
       setupChangedListeners();
     }
@@ -282,15 +281,15 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
   private static class ParticleOriginPanel extends EmitterPropertyPanel {
     private JComboBox<Align> comboBoxAlign;
     private JComboBox<Valign> comboBoxValign;
-    private ParticleParameterModifier offsetX;
-    private ParticleParameterModifier offsetY;
+    private DualSpinner offsetX;
+    private DualSpinner offsetY;
 
     private ParticleOriginPanel() {
       super();
       comboBoxAlign = new JComboBox<>(new DefaultComboBoxModel<Align>(Align.values()));
       comboBoxValign = new JComboBox<>(new DefaultComboBoxModel<Valign>(Valign.values()));
-      offsetX = new ParticleParameterModifier(MapObjectProperty.Particle.OFFSET_X_MIN, MapObjectProperty.Particle.OFFSET_X_MAX, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_OFFSET_X, EmitterData.DEFAULT_MAX_OFFSET_X, STEP_ONE);
-      offsetY = new ParticleParameterModifier(MapObjectProperty.Particle.OFFSET_Y_MIN, MapObjectProperty.Particle.OFFSET_Y_MAX, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_OFFSET_Y, EmitterData.DEFAULT_MAX_OFFSET_Y, STEP_ONE);
+      offsetX = new DualSpinner(MapObjectProperty.Particle.OFFSET_X_MIN, MapObjectProperty.Particle.OFFSET_X_MAX, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_OFFSET_X, EmitterData.DEFAULT_MAX_OFFSET_X, STEP_ONE);
+      offsetY = new DualSpinner(MapObjectProperty.Particle.OFFSET_Y_MIN, MapObjectProperty.Particle.OFFSET_Y_MAX, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_OFFSET_Y, EmitterData.DEFAULT_MAX_OFFSET_Y, STEP_ONE);
 
       setLayout(createLayout());
       setupChangedListeners();
@@ -332,13 +331,13 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
   }
 
   private static class ParticleRotationPanel extends EmitterPropertyPanel {
-    private ParticleParameterModifier startAngle;
-    private ParticleParameterModifier deltaAngle;
+    private DualSpinner startAngle;
+    private DualSpinner deltaAngle;
 
     private ParticleRotationPanel() {
       super();
-      startAngle = new ParticleParameterModifier(MapObjectProperty.Particle.ROTATION_MIN, MapObjectProperty.Particle.ROTATION_MAX, -360, 360, EmitterData.DEFAULT_MIN_ROTATION, EmitterData.DEFAULT_MAX_ROTATION, STEP_ONE);
-      deltaAngle = new ParticleParameterModifier(MapObjectProperty.Particle.DELTAROTATION_MIN, MapObjectProperty.Particle.DELTAROTATION_MAX, -360, 360, EmitterData.DEFAULT_MIN_DELTA_ROTATION, EmitterData.DEFAULT_MAX_DELTA_ROTATION, STEP_FINE);
+      startAngle = new DualSpinner(MapObjectProperty.Particle.ROTATION_MIN, MapObjectProperty.Particle.ROTATION_MAX, -360, 360, EmitterData.DEFAULT_MIN_ROTATION, EmitterData.DEFAULT_MAX_ROTATION, STEP_ONE);
+      deltaAngle = new DualSpinner(MapObjectProperty.Particle.DELTAROTATION_MIN, MapObjectProperty.Particle.DELTAROTATION_MAX, -360, 360, EmitterData.DEFAULT_MIN_DELTA_ROTATION, EmitterData.DEFAULT_MAX_DELTA_ROTATION, STEP_FINE);
 
       setLayout(createLayout());
       setupChangedListeners();
@@ -374,17 +373,17 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
   }
 
   private static class ParticleMotionPanel extends EmitterPropertyPanel {
-    private ParticleParameterModifier velocityX;
-    private ParticleParameterModifier velocityY;
-    private ParticleParameterModifier accelerationX;
-    private ParticleParameterModifier accelerationY;
+    private DualSpinner velocityX;
+    private DualSpinner velocityY;
+    private DualSpinner accelerationX;
+    private DualSpinner accelerationY;
 
     private ParticleMotionPanel() {
       super();
-      velocityX = new ParticleParameterModifier(MapObjectProperty.Particle.VELOCITY_X_MIN, MapObjectProperty.Particle.VELOCITY_X_MAX, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_VELOCITY_X, EmitterData.DEFAULT_MAX_VELOCITY_X, .01f);
-      velocityY = new ParticleParameterModifier(MapObjectProperty.Particle.VELOCITY_Y_MIN, MapObjectProperty.Particle.VELOCITY_Y_MAX, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_VELOCITY_Y, EmitterData.DEFAULT_MAX_VELOCITY_Y, .01f);
-      accelerationX = new ParticleParameterModifier(MapObjectProperty.Particle.ACCELERATION_X_MIN, MapObjectProperty.Particle.ACCELERATION_X_MAX, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_ACCELERATION_X, EmitterData.DEFAULT_MAX_ACCELERATION_X, .01f);
-      accelerationY = new ParticleParameterModifier(MapObjectProperty.Particle.ACCELERATION_Y_MIN, MapObjectProperty.Particle.ACCELERATION_Y_MAX, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_ACCELERATION_Y, EmitterData.DEFAULT_MAX_ACCELERATION_Y, .01f);
+      velocityX = new DualSpinner(MapObjectProperty.Particle.VELOCITY_X_MIN, MapObjectProperty.Particle.VELOCITY_X_MAX, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_VELOCITY_X, EmitterData.DEFAULT_MAX_VELOCITY_X, STEP_FINEST);
+      velocityY = new DualSpinner(MapObjectProperty.Particle.VELOCITY_Y_MIN, MapObjectProperty.Particle.VELOCITY_Y_MAX, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_VELOCITY_Y, EmitterData.DEFAULT_MAX_VELOCITY_Y, STEP_FINEST);
+      accelerationX = new DualSpinner(MapObjectProperty.Particle.ACCELERATION_X_MIN, MapObjectProperty.Particle.ACCELERATION_X_MAX, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_ACCELERATION_X, EmitterData.DEFAULT_MAX_ACCELERATION_X, STEP_FINEST);
+      accelerationY = new DualSpinner(MapObjectProperty.Particle.ACCELERATION_Y_MIN, MapObjectProperty.Particle.ACCELERATION_Y_MAX, Short.MIN_VALUE, Short.MAX_VALUE, EmitterData.DEFAULT_MIN_ACCELERATION_Y, EmitterData.DEFAULT_MAX_ACCELERATION_Y, STEP_FINEST);
       setLayout(createLayout());
       setupChangedListeners();
     }
@@ -429,7 +428,7 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
 
     private ParticleCollisionPanel() {
       super();
-      collisionType = new JComboBox<Collision>(new DefaultComboBoxModel<Collision>(Collision.values()));
+      collisionType = new JComboBox<Collision>(Collision.values());
       fadeOnCollision = new JToggleButton();
       fadeOnCollision.putClientProperty("JToggleButton.variant", DarkToggleButtonUI.VARIANT_SLIDER);
       setLayout(createLayout());
