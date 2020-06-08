@@ -188,6 +188,7 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
     protected void setControlValues(IMapObject mapObject) {
       emitter = Game.world().environment().getEmitter(mapObject.getId());
       comboBoxParticleType.setSelectedItem(mapObject.getEnumValue(MapObjectProperty.Emitter.PARTICLETYPE, ParticleType.class, EmitterData.DEFAULT_PARTICLE_TYPE));
+      updateTabSelection();
       fade.setSelected(mapObject.getBoolValue(MapObjectProperty.Particle.FADE, EmitterData.DEFAULT_FADE));
       outlineOnly.setSelected(mapObject.getBoolValue(MapObjectProperty.Particle.OUTLINEONLY, EmitterData.DEFAULT_OUTLINE_ONLY));
       antiAliasing.setSelected(mapObject.getBoolValue(MapObjectProperty.Particle.ANTIALIASING, EmitterData.DEFAULT_ANTIALIASING));
@@ -203,30 +204,34 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
     protected void setupChangedListeners() {
       setup(comboBoxParticleType, MapObjectProperty.Emitter.PARTICLETYPE);
       comboBoxParticleType.addItemListener(e -> {
-        switch ((ParticleType) e.getItem()) {
-        case SPRITE:
-          styleTabs.setEnabledAt(0, false);
-          styleTabs.setEnabledAt(1, false);
-          styleTabs.setEnabledAt(2, true);
-          styleTabs.setSelectedIndex(2);
-          break;
-        case TEXT:
-          styleTabs.setEnabledAt(0, true);
-          styleTabs.setEnabledAt(1, true);
-          styleTabs.setEnabledAt(2, false);
-          styleTabs.setSelectedIndex(1);
-          break;
-        default:
-          styleTabs.setEnabledAt(0, true);
-          styleTabs.setEnabledAt(1, false);
-          styleTabs.setEnabledAt(2, false);
-          styleTabs.setSelectedIndex(0);
-          break;
-        }
+        updateTabSelection();
       });
       setup(fade, MapObjectProperty.Particle.FADE);
       setup(outlineOnly, MapObjectProperty.Particle.OUTLINEONLY);
       setup(antiAliasing, MapObjectProperty.Particle.ANTIALIASING);
+    }
+
+    private void updateTabSelection() {
+      switch ((ParticleType) comboBoxParticleType.getSelectedItem()) {
+      case SPRITE:
+        styleTabs.setEnabledAt(0, false);
+        styleTabs.setEnabledAt(1, false);
+        styleTabs.setEnabledAt(2, true);
+        styleTabs.setSelectedIndex(2);
+        break;
+      case TEXT:
+        styleTabs.setEnabledAt(0, true);
+        styleTabs.setEnabledAt(1, true);
+        styleTabs.setEnabledAt(2, false);
+        styleTabs.setSelectedIndex(1);
+        break;
+      default:
+        styleTabs.setEnabledAt(0, true);
+        styleTabs.setEnabledAt(1, false);
+        styleTabs.setEnabledAt(2, false);
+        styleTabs.setSelectedIndex(0);
+        break;
+      }
     }
   }
 
