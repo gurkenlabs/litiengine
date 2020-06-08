@@ -12,13 +12,10 @@ import javax.swing.GroupLayout;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
-import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 
-import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
@@ -42,17 +39,13 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
   private final MovementPanel movementPanel;
   private final CustomPanel customPanel;
   private final JTextField textFieldName;
-  private JLabel lblRenderType;
   private JComboBox<RenderType> renderType;
 
   private final JLabel labelEntityID;
   private TagPanel tagPanel;
   private JLabel lblLayer;
   private JPanel infoPanel;
-
-  private JPanel transformPanel, scalePanel;
-  private JLabel lblX, lblY, lblWidth, lblHeight;
-  private JSpinner x, y, width, height;
+  private DualSpinner transform, scale;
 
   public MapObjectInspector() {
     super();
@@ -75,11 +68,6 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.textFieldName.setColumns(10);
 
     ControlBehavior.apply(this.textFieldName);
-
-    this.lblRenderType = new JLabel(Resources.strings().get("panel_rendertype"));
-    this.lblRenderType.setHorizontalAlignment(SwingConstants.LEADING);
-    this.lblRenderType.setForeground(Color.LIGHT_GRAY);
-    this.lblRenderType.setFont(this.lblRenderType.getFont().deriveFont(Style.getDefaultFont().getSize() * 0.75f));
 
     this.renderType = new JComboBox<RenderType>(RenderType.values());
     this.renderType.setMinimumSize(SMALL_CONTROL_SIZE);
@@ -109,7 +97,8 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.infoPanel.add(Box.createGlue());
     this.infoPanel.add(lblLayer);
 
-    this.initSpinners();
+    this.transform = new DualSpinner(Resources.strings().get("panel_x"), Resources.strings().get("panel_y"), 0, Short.MAX_VALUE);
+    this.scale = new DualSpinner(Resources.strings().get("panel_width"), Resources.strings().get("panel_height"), 0, Short.MAX_VALUE);
 
     setLayout(createLayout());
     this.setupChangedListeners();
@@ -123,14 +112,12 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
   @Override
   public void refresh() {
-    // TODO Auto-generated method stub
-
   }
 
   @Override
   public void bind(IMapObject mapObject) {
-    super.bind(mapObject);
     this.isFocussing = true;
+    super.bind(mapObject);
 
     if (mapObject != null) {
       MapObjectType t = MapObjectType.get(mapObject.getType());
@@ -158,8 +145,8 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
   }
 
   private LayoutManager createLayout() {
-    LayoutItem[] layoutItems = new LayoutItem[] { new LayoutItem(infoPanel), new LayoutItem("panel_rendertype", renderType), new LayoutItem("panel_transform", transformPanel), new LayoutItem("panel_scale", scalePanel), new LayoutItem("panel_name", textFieldName),
-        new LayoutItem("panel_tags", tagPanel), new LayoutItem(tabbedPanel, GroupLayout.PREFERRED_SIZE) };
+    LayoutItem[] layoutItems = new LayoutItem[] { new LayoutItem(infoPanel), new LayoutItem("panel_rendertype", renderType), new LayoutItem("panel_transform", transform), new LayoutItem("panel_scale", scale), new LayoutItem("panel_name", textFieldName), new LayoutItem("panel_tags", tagPanel),
+        new LayoutItem(tabbedPanel, GroupLayout.PREFERRED_SIZE) };
     return this.createLayout(layoutItems);
   }
 
@@ -241,16 +228,14 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
   protected void clearControls() {
     // clear controls
     this.type = null;
-    this.x.setValue(0);
-    this.y.setValue(0);
-    this.width.setValue(0);
-    this.height.setValue(0);
     this.textFieldName.setText("");
     this.labelEntityID.setText("####");
     this.lblLayer.setText("");
     this.renderType.setSelectedIndex(0);
-    this.renderType.setVisible(false);
+    this.renderType.setEnabled(false);
     this.tagPanel.clear();
+    this.transform.bind(null);
+    this.scale.bind(null);
   }
 
   @Override
@@ -258,10 +243,10 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
     this.type = MapObjectType.get(mapObject.getType());
     this.textFieldName.setText(mapObject.getName());
-    this.x.setValue(mapObject.getX());
-    this.y.setValue(mapObject.getY());
-    this.width.setValue(mapObject.getWidth());
-    this.height.setValue(mapObject.getHeight());
+    this.transform.bind(mapObject);
+    this.scale.bind(mapObject);
+    this.transform.setValues(mapObject.getX(), mapObject.getY());
+    this.scale.setValues(mapObject.getWidth(), mapObject.getHeight());
     this.tagPanel.bind(mapObject.getStringValue(MapObjectProperty.TAGS));
 
     this.labelEntityID.setText(Integer.toString(mapObject.getId()));
@@ -269,9 +254,8 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.lblLayer.setText("Layer: " + mapObject.getLayer().getName());
 
     RenderType rt = mapObject.getEnumValue(MapObjectProperty.RENDERTYPE, RenderType.class);
-    boolean showRenderTypeControls = Game.world().environment().get(mapObject.getId()).getRenderType() != RenderType.NONE;
-    this.lblRenderType.setVisible(showRenderTypeControls);
-    this.renderType.setVisible(showRenderTypeControls);
+    boolean showRenderTypeControls = MapObjectType.get(mapObject.getType()) == MapObjectType.CREATURE || MapObjectType.get(mapObject.getType()) == MapObjectType.EMITTER || MapObjectType.get(mapObject.getType()) == MapObjectType.PROP;
+    this.renderType.setEnabled(showRenderTypeControls);
 
     if (rt != null) {
       this.renderType.setSelectedItem(rt);
@@ -280,22 +264,23 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
   private void setupChangedListeners() {
     setup(renderType, MapObjectProperty.RENDERTYPE);
-    this.x.addChangeListener(new MapObjectPropertyChangeListener(m -> {
-      m.setX(getSpinnerValue(x));
+
+    this.transform.addSpinnerListeners(m -> {
+      m.setX(getSpinnerValue(this.transform.getSpinner1()));
       Transform.updateAnchors();
-    }));
-    this.width.addChangeListener(new MapObjectPropertyChangeListener(m -> {
-      m.setWidth(getSpinnerValue(width));
+    }, m -> {
+      m.setY(getSpinnerValue(this.transform.getSpinner2()));
       Transform.updateAnchors();
-    }));
-    this.height.addChangeListener(new MapObjectPropertyChangeListener(m -> {
-      m.setHeight(getSpinnerValue(height));
+    });
+
+    this.scale.addSpinnerListeners(m -> {
+      m.setWidth(getSpinnerValue(this.scale.getSpinner1()));
       Transform.updateAnchors();
-    }));
-    this.y.addChangeListener(new MapObjectPropertyChangeListener(m -> {
-      m.setY(getSpinnerValue(y));
+    }, m -> {
+      m.setHeight(getSpinnerValue(this.scale.getSpinner2()));
       Transform.updateAnchors();
-    }));
+    });
+
     this.textFieldName.addFocusListener(new MapObjectPropteryFocusListener(m -> m.setName(textFieldName.getText())));
 
     this.textFieldName.addActionListener(new MapObjectPropertyActionListener(m -> m.setName(textFieldName.getText())));
@@ -303,47 +288,4 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.tagPanel.addActionListener(new MapObjectPropertyActionListener(m -> m.setValue(MapObjectProperty.TAGS, this.tagPanel.getTagsString())));
   }
 
-  private void initSpinners() {
-    x = new JSpinner(new SpinnerNumberModel(0, 0, Short.MAX_VALUE, STEP_ONE));
-    x.setMinimumSize(SPINNER_SIZE);
-    lblX = new JLabel(Resources.strings().get("panel_x"));
-    lblX.setMinimumSize(LABEL_SIZE);
-    y = new JSpinner(new SpinnerNumberModel(0, 0, Short.MAX_VALUE, STEP_ONE));
-    y.setMinimumSize(SPINNER_SIZE);
-    lblY = new JLabel(Resources.strings().get("panel_y"));
-    lblY.setMinimumSize(LABEL_SIZE);
-
-    transformPanel = new JPanel();
-    GroupLayout grplayoutTransform = new GroupLayout(transformPanel);
-    grplayoutTransform.setAutoCreateGaps(true);
-    grplayoutTransform.setHorizontalGroup(grplayoutTransform.createSequentialGroup().addContainerGap().addComponent(lblX).addComponent(x).addComponent(lblY).addComponent(y).addContainerGap());
-    grplayoutTransform.setVerticalGroup(grplayoutTransform.createParallelGroup().addComponent(lblX, GroupLayout.Alignment.CENTER).addComponent(x).addComponent(lblY, GroupLayout.Alignment.CENTER).addComponent(y));
-    transformPanel.setLayout(grplayoutTransform);
-
-    width = new JSpinner(new SpinnerNumberModel(0, 0, Short.MAX_VALUE, STEP_ONE));
-    width.setMinimumSize(SPINNER_SIZE);
-    lblWidth = new JLabel(Resources.strings().get("panel_width"));
-    lblWidth.setMinimumSize(LABEL_SIZE);
-    height = new JSpinner(new SpinnerNumberModel(0, 0, Short.MAX_VALUE, STEP_ONE));
-    height.setMinimumSize(SPINNER_SIZE);
-    lblHeight = new JLabel(Resources.strings().get("panel_height"));
-    lblHeight.setMinimumSize(LABEL_SIZE);
-
-    scalePanel = new JPanel();
-    GroupLayout grplayoutScale = new GroupLayout(scalePanel);
-    grplayoutScale.setAutoCreateGaps(true);
-    grplayoutScale.setHorizontalGroup(grplayoutScale.createSequentialGroup().addContainerGap().addComponent(lblWidth).addComponent(width).addComponent(lblHeight).addComponent(height).addContainerGap());
-    grplayoutScale.setVerticalGroup(grplayoutScale.createParallelGroup().addComponent(lblWidth, GroupLayout.Alignment.CENTER).addComponent(width).addComponent(lblHeight, GroupLayout.Alignment.CENTER).addComponent(height));
-    scalePanel.setLayout(grplayoutScale);
-  }
-
-  private static float getSpinnerValue(JSpinner spinner) {
-    if (spinner.getValue() instanceof Integer) {
-      return ((Integer) spinner.getValue()).floatValue();
-    } else if (spinner.getValue() instanceof Double) {
-      return ((Double) spinner.getValue()).floatValue();
-    } else {
-      return (float) spinner.getValue();
-    }
-  }
 }

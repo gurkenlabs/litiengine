@@ -9,7 +9,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
 import javax.swing.SpinnerNumberModel;
 
-import com.github.weisj.darklaf.ui.togglebutton.DarkToggleButtonUI;
+import com.github.weisj.darklaf.ui.togglebutton.ToggleButtonConstants;
 
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Game;
@@ -53,7 +53,7 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
     default:
       return null;
     }
-  };
+  }
 
   protected abstract LayoutManager createLayout();
 
@@ -118,7 +118,7 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
       updateDelaySpinner.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.UPDATERATE));
       durationSpinner.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.DURATION));
       maxParticlesSpinner.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.MAXPARTICLES));
-      btnPause.setSelected(emitter != null ? emitter.isPaused() : true);
+      btnPause.setSelected(emitter == null || emitter.isPaused());
     }
 
     @Override
@@ -151,11 +151,11 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
       super();
       comboBoxParticleType = new JComboBox<>(new DefaultComboBoxModel<ParticleType>(ParticleType.values()));
       fade = new JToggleButton();
-      fade.putClientProperty("JToggleButton.variant", DarkToggleButtonUI.VARIANT_SLIDER);
+      fade.putClientProperty(ToggleButtonConstants.KEY_VARIANT, ToggleButtonConstants.VARIANT_SLIDER);
       outlineOnly = new JToggleButton();
-      outlineOnly.putClientProperty("JToggleButton.variant", DarkToggleButtonUI.VARIANT_SLIDER);
+      outlineOnly.putClientProperty(ToggleButtonConstants.KEY_VARIANT, ToggleButtonConstants.VARIANT_SLIDER);
       antiAliasing = new JToggleButton();
-      antiAliasing.putClientProperty("JToggleButton.variant", DarkToggleButtonUI.VARIANT_SLIDER);
+      antiAliasing.putClientProperty(ToggleButtonConstants.KEY_VARIANT, ToggleButtonConstants.VARIANT_SLIDER);
       colorPanel = new EmitterColorPanel();
       textPanel = new EmitterTextPanel();
       spritePanel = new EmitterSpritePanel();
@@ -257,12 +257,12 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
 
     @Override
     protected void clearControls() {
-
+      // do nothing
     }
 
     @Override
     protected void setControlValues(IMapObject mapObject) {
-
+      // do nothing
     }
 
     @Override
@@ -273,8 +273,7 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
 
     @Override
     protected void setupChangedListeners() {
-      // TODO Auto-generated method stub
-
+      // do nothing
     }
   }
 
@@ -352,7 +351,7 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
 
     @Override
     protected void clearControls() {
-
+      // do nothing
     }
 
     @Override
@@ -368,7 +367,7 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
 
     @Override
     protected void setupChangedListeners() {
-
+      // do nothing
     }
   }
 
@@ -399,8 +398,7 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
 
     @Override
     protected void clearControls() {
-      // TODO Auto-generated method stub
-
+      // do nothing
     }
 
     @Override
@@ -417,8 +415,7 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
 
     @Override
     protected void setupChangedListeners() {
-      // TODO Auto-generated method stub
-
+      // do nothing
     }
   }
 
@@ -428,9 +425,9 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
 
     private ParticleCollisionPanel() {
       super();
-      collisionType = new JComboBox<Collision>(Collision.values());
+      collisionType = new JComboBox<>(Collision.values());
       fadeOnCollision = new JToggleButton();
-      fadeOnCollision.putClientProperty("JToggleButton.variant", DarkToggleButtonUI.VARIANT_SLIDER);
+      fadeOnCollision.putClientProperty(ToggleButtonConstants.KEY_VARIANT, ToggleButtonConstants.VARIANT_SLIDER);
       setLayout(createLayout());
       setupChangedListeners();
     }

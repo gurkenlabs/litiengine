@@ -93,6 +93,16 @@ public abstract class PropertyPanel extends JPanel {
     UI.addOrphanComponent(this);
   }
 
+  public static float getSpinnerValue(JSpinner spinner) {
+    if (spinner.getValue() instanceof Integer) {
+      return ((Integer) spinner.getValue()).floatValue();
+    } else if (spinner.getValue() instanceof Double) {
+      return ((Double) spinner.getValue()).floatValue();
+    } else {
+      return (float) spinner.getValue();
+    }
+  }
+
   protected IMapObject getDataSource() {
     return this.dataSource;
   }

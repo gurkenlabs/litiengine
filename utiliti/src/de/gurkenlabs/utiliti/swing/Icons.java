@@ -5,7 +5,6 @@ import javax.swing.ImageIcon;
 
 import de.gurkenlabs.litiengine.resources.ResourceLoadException;
 import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.utiliti.Style.Theme;
 import de.gurkenlabs.utiliti.components.Editor;
 
 public final class Icons {

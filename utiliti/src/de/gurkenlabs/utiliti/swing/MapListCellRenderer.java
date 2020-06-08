@@ -10,6 +10,7 @@ import javax.swing.border.EmptyBorder;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.utiliti.UndoManager;
 
+@SuppressWarnings("serial")
 public class MapListCellRenderer extends JLabel implements ListCellRenderer<IMap> {
   public MapListCellRenderer() {
     setOpaque(true);
