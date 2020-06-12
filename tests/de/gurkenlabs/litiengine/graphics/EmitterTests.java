@@ -30,8 +30,6 @@ public class EmitterTests {
     assertEquals(500, testEmitter.getMaxParticles());
     assertEquals(1000, testEmitter.getParticleMaxTTL());
     assertEquals(100, testEmitter.getParticleMinTTL());
-    assertTrue(testEmitter.getRandomParticleTTL() >= 100);
-    assertTrue(testEmitter.getRandomParticleTTL() <= 1000);
     
     assertEquals(10, testEmitter.getParticleUpdateRate());
     assertEquals(Quality.HIGH, testEmitter.getRequiredQuality());
@@ -49,9 +47,7 @@ public class EmitterTests {
   @Test
   public void testRandomValueGeneration() {
     TestEmitter testEmitter = new TestEmitter();
-    assertTrue(testEmitter.getRandomParticleTTL() >= 100);
-    assertTrue(testEmitter.getRandomParticleTTL() <= 1000);
-    
+   
     Color [] colors = new Color [] {Color.RED, Color.ORANGE, Color.YELLOW};
     testEmitter.setColors(colors);
     
@@ -60,7 +56,7 @@ public class EmitterTests {
   
   @EmitterInfo(
       activateOnInit = false,
-      emitterTTL = 2500,
+      duration = 2500,
       maxParticles = 500,
       originAlign = Align.CENTER,
       originVAlign = Valign.MIDDLE,
@@ -77,12 +73,7 @@ public class EmitterTests {
     protected Particle createNewParticle() {
       return null;
     }
-    
-    @Override
-    public int getRandomParticleTTL() {
-      return super.getRandomParticleTTL();
-    }
-    
+        
     @Override
     public Color getRandomParticleColor() {
       return super.getRandomParticleColor();

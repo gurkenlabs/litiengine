@@ -315,8 +315,8 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
     sb.append("#" + this.getId() + ": ");
     sb.append(this.getName() == null ? "" : "\'" + this.getName() + "\' ");
     sb.append("" + this.getType());
-    sb.append("; x: " + this.getX());
-    sb.append("; y: " + this.getY());
+    sb.append("; x: " + this.getX() == null ? "" : this.getX());
+    sb.append("; y: " + this.getY() == null ? "" : this.getY());
     sb.append("; width: " + this.getWidth());
     sb.append("; height: " + this.getHeight());
     return sb.toString();
@@ -329,7 +329,7 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
       return this.x - map.getChunkOffsetX() * map.getTileWidth();
     }
 
-    return this.x;
+    return this.x == null ? 0 : this.x;
   }
 
   @Override
@@ -339,7 +339,7 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
       return this.y - map.getChunkOffsetY() * map.getTileHeight();
     }
 
-    return this.y;
+    return this.y == null ? 0 : this.y;
   }
 
   @Override

@@ -16,10 +16,10 @@ public class CustomEntityEmitter extends CustomEmitter {
     super(entity.getX(), entity.getY(), emitterXml);
     this.entity = entity;
     this.setSize(this.getEntity().getWidth(), this.getEntity().getHeight());
-    this.getEmitterData().getParticleX().setMinValue(0);
-    this.getEmitterData().getParticleX().setMaxValue(this.getWidth());
-    this.getEmitterData().getParticleY().setMinValue(0);
-    this.getEmitterData().getParticleY().setMaxValue(this.getHeight());
+    this.getEmitterData().getParticleOffsetX().setMinValue(0);
+    this.getEmitterData().getParticleOffsetX().setMaxValue(this.getWidth());
+    this.getEmitterData().getParticleOffsetY().setMinValue(0);
+    this.getEmitterData().getParticleOffsetY().setMaxValue(this.getHeight());
   }
 
   public IEntity getEntity() {

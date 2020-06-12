@@ -1,7 +1,7 @@
 package de.gurkenlabs.litiengine.graphics.emitters.xml;
 
+import java.awt.Color;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -11,22 +11,22 @@ import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.EmitterInfo;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.EllipseParticle;
-import de.gurkenlabs.litiengine.graphics.emitters.particles.LeftLineParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.Particle;
-import de.gurkenlabs.litiengine.graphics.emitters.particles.RectangleFillParticle;
-import de.gurkenlabs.litiengine.graphics.emitters.particles.RectangleOutlineParticle;
-import de.gurkenlabs.litiengine.graphics.emitters.particles.RightLineParticle;
-import de.gurkenlabs.litiengine.graphics.emitters.particles.ShimmerParticle;
+import de.gurkenlabs.litiengine.graphics.emitters.particles.PolygonParticle;
+import de.gurkenlabs.litiengine.graphics.emitters.particles.RectangleParticle;
+import de.gurkenlabs.litiengine.graphics.emitters.particles.LineParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.SpriteParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.TextParticle;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 
-@EmitterInfo(maxParticles = 0, spawnAmount = 0, activateOnInit = true)
+@EmitterInfo
 public class CustomEmitter extends Emitter {
   private static final Map<String, EmitterData> loadedCustomEmitters;
 
@@ -125,6 +125,15 @@ public class CustomEmitter extends Emitter {
   }
 
   @Override
+  protected Color getRandomParticleColor() {
+    if (this.getColors().isEmpty()) {
+      return EmitterData.DEFAULT_COLOR;
+    }
+
+    return Game.random().nextColor(this.getColors().get(ThreadLocalRandom.current().nextInt(this.getColors().size())), this.getEmitterData().getColorVariance(), this.getEmitterData().getAlphaVariance());
+  }
+
+  @Override
   protected Particle createNewParticle() {
     float x;
     float y;
@@ -136,69 +145,94 @@ public class CustomEmitter extends Emitter {
     float height;
     float deltaWidth;
     float deltaHeight;
+    float angle;
+    float deltaAngle;
+    int ttl;
 
-    x = (float) this.getEmitterData().getParticleX().get();
-    y = (float) this.getEmitterData().getParticleY().get();
-    deltaX = (float) this.getEmitterData().getDeltaX().get();
-    deltaY = (float) this.getEmitterData().getDeltaY().get();
-    gravityX = (float) this.getEmitterData().getGravityX().get();
-    gravityY = (float) this.getEmitterData().getGravityY().get();
+    x = (float) this.getEmitterData().getParticleOffsetX().get();
+    y = (float) this.getEmitterData().getParticleOffsetY().get();
+    deltaX = (float) this.getEmitterData().getVelocityX().get();
+    deltaY = (float) this.getEmitterData().getVelocityY().get();
+    gravityX = (float) this.getEmitterData().getAccelerationX().get();
+    gravityY = (float) this.getEmitterData().getAccelerationY().get();
     width = (float) this.getEmitterData().getParticleWidth().get();
     height = (float) this.getEmitterData().getParticleHeight().get();
     deltaWidth = (float) this.getEmitterData().getDeltaWidth().get();
     deltaHeight = (float) this.getEmitterData().getDeltaHeight().get();
+    angle = (float) this.getEmitterData().getAngle().get();
+    deltaAngle = (float) this.getEmitterData().getDeltaAngle().get();
+    ttl = (int) this.getEmitterData().getParticleTTL().get();
 
     Particle particle;
     switch (this.getEmitterData().getParticleType()) {
-    case LEFTLINE:
-      particle = new LeftLineParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL()).setX(x).setY(y).setDeltaIncX(gravityX).setDeltaIncY(gravityY).setDeltaX(deltaX).setDeltaY(deltaY).setDeltaWidth(deltaWidth).setDeltaHeight(deltaHeight);
-      break;
-    case DISC:
-      particle = new EllipseParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL()).setX(x).setY(y).setDeltaIncX(gravityX).setDeltaIncY(gravityY).setDeltaX(deltaX).setDeltaY(deltaY).setDeltaWidth(deltaWidth).setDeltaHeight(deltaHeight);
+
+    case ELLIPSE:
+      particle = new EllipseParticle(width, height, this.getRandomParticleColor());
       break;
     case RECTANGLE:
-      particle = new RectangleFillParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL()).setX(x).setY(y).setDeltaIncX(gravityX).setDeltaIncY(gravityY).setDeltaX(deltaX).setDeltaY(deltaY).setDeltaWidth(deltaWidth).setDeltaHeight(deltaHeight);
+      particle = new RectangleParticle(width, height, this.getRandomParticleColor());
       break;
-    case RECTANGLE_OUTLINE:
-      particle = new RectangleOutlineParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL()).setX(x).setY(y).setDeltaIncX(gravityX).setDeltaIncY(gravityY).setDeltaX(deltaX).setDeltaY(deltaY).setDeltaWidth(deltaWidth).setDeltaHeight(deltaHeight);
+    case TRIANGLE:
+      particle = new PolygonParticle(width, height, this.getRandomParticleColor(), 3);
       break;
-    case RIGHTLINE:
-      particle = new RightLineParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL()).setX(x).setY(y).setDeltaIncX(gravityX).setDeltaIncY(gravityY).setDeltaX(deltaX).setDeltaY(deltaY).setDeltaWidth(deltaWidth).setDeltaHeight(deltaHeight);
+    case DIAMOND:
+      particle = new PolygonParticle(width, height, this.getRandomParticleColor(), 4);
       break;
-    case SHIMMER:
-      particle = new ShimmerParticle(new Rectangle2D.Float(x, y, (float) this.getWidth(), (float) this.getHeight()), width, height, this.getRandomParticleColor()).setX(x).setY(y).setDeltaIncX(gravityX).setDeltaIncY(gravityY).setDeltaX(deltaX).setDeltaY(deltaY).setDeltaWidth(deltaWidth)
-          .setDeltaHeight(deltaHeight);
+    case LINE:
+      particle = new LineParticle(width, height, this.getRandomParticleColor());
       break;
     case TEXT:
-      particle = new TextParticle(this.getEmitterData().getParticleText(), this.getRandomParticleColor(), this.getRandomParticleTTL()).setX(x).setY(y).setDeltaIncX(gravityX).setDeltaIncY(gravityY).setDeltaX(deltaX).setDeltaY(deltaY).setDeltaWidth(deltaWidth).setDeltaHeight(deltaHeight);
+      String text;
+      if (this.getEmitterData().getTexts().isEmpty()) {
+        text = EmitterData.DEFAULT_TEXT;
+      } else {
+        text = Game.random().choose(this.getEmitterData().getTexts());
+      }
+      particle = new TextParticle(text, this.getRandomParticleColor());
       break;
     case SPRITE:
       Spritesheet sprite = Resources.spritesheets().get(this.getEmitterData().getSpritesheet());
-      if (sprite == null) {
+      if (sprite == null || sprite.getTotalNumberOfSprites() <= 0) {
         return null;
       }
-
-      particle = new SpriteParticle(sprite.getSprite(ThreadLocalRandom.current().nextInt(0, sprite.getTotalNumberOfSprites() - 1)), this.getRandomParticleTTL()).setX(x).setY(y).setDeltaIncX(gravityX).setDeltaIncY(gravityY).setDeltaX(deltaX).setDeltaY(deltaY).setDeltaWidth(deltaWidth)
-          .setDeltaHeight(deltaHeight);
+      particle = new SpriteParticle(sprite);
+      ((SpriteParticle) particle).setAnimateSprite(this.getEmitterData().isAnimatingSprite());
+      ((SpriteParticle) particle).setLoopSprite(this.getEmitterData().isLoopingSprite());
       break;
     default:
-      particle = new RectangleFillParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL()).setX(x).setY(y).setDeltaIncX(gravityX).setDeltaIncY(gravityY).setDeltaX(deltaX).setDeltaY(deltaY).setDeltaWidth(deltaWidth).setDeltaHeight(deltaHeight);
+      particle = new RectangleParticle(width, height, this.getRandomParticleColor());
       break;
     }
+    particle.setX(x);
+    particle.setY(y);
+
+    particle.setAccelerationX(gravityX);
+    particle.setAccelerationY(gravityY);
+
+    particle.setVelocityX(deltaX);
+    particle.setVelocityY(deltaY);
 
     particle.setDeltaWidth(deltaWidth);
     particle.setDeltaHeight(deltaHeight);
+
+    particle.setAngle(angle);
+    particle.setDeltaAngle(deltaAngle);
+
+    particle.setTimeToLive(ttl);
+
     particle.setCollisionType(this.getEmitterData().getCollisionType());
+    particle.setOutlineOnly(this.getEmitterData().isOutlineOnly());
+    particle.setAntiAliasing(this.getEmitterData().isAntiAliased());
     particle.setFade(this.getEmitterData().isFading());
+
+    particle.setFadeOnCollision(this.getEmitterData().isFadingOnCollision());
     return particle;
   }
 
   private void init() {
     // set emitter parameters
     this.setMaxParticles(this.getEmitterData().getMaxParticles());
-    this.setParticleMinTTL(this.getEmitterData().getParticleMinTTL());
-    this.setParticleMaxTTL(this.getEmitterData().getParticleMaxTTL());
-    this.setTimeToLive(this.getEmitterData().getEmitterTTL());
+    this.setDuration(this.getEmitterData().getEmitterDuration());
     this.setSpawnAmount(this.getEmitterData().getSpawnAmount());
     this.setSpawnRate(this.getEmitterData().getSpawnRate());
     this.setParticleUpdateRate(this.getEmitterData().getUpdateRate());
@@ -206,8 +240,8 @@ public class CustomEmitter extends Emitter {
     this.setOriginAlign(this.getEmitterData().getOriginAlign());
     this.setOriginValign(this.getEmitterData().getOriginValign());
 
-    for (final ParticleColor color : this.getEmitterData().getColors()) {
-      this.addParticleColor(color.toColor());
+    for (final String color : this.getEmitterData().getColors()) {
+      this.addParticleColor(ColorHelper.decode(color));
     }
   }
 }

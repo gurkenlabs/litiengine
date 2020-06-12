@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.environment.tilemap;
 
 import java.awt.Color;
 import java.net.URL;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -49,6 +50,17 @@ public interface ICustomPropertyProvider {
    * @return the string value of the custom property, if present. Otherwise, the provided default value is returned.
    */
   public String getStringValue(String propertyName, String defaultValue);
+
+  /**
+   * Gets a list of strings stored in a single comma-separated property.
+   *
+   * @param propertyName
+   *          the name of the custom property
+   * @param defaultValue
+   *          the fallback value in case the property value is null.
+   * @return the list of comma-separated strings in the custom property, if present. Otherwise, the provided default value is returned.
+   */
+  public List<String> getCommaSeparatedStringValues(String propertyName, String defaultValue);
 
   /**
    * Gets the int value of the custom property with the provided name.

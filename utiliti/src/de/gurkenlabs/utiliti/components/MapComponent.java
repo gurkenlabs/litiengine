@@ -30,6 +30,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.environment.EmitterMapObjectLoader;
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
@@ -44,6 +45,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.litiengine.gui.ComponentMouseEvent;
 import de.gurkenlabs.litiengine.gui.ComponentMouseWheelEvent;
 import de.gurkenlabs.litiengine.gui.GuiComponent;
@@ -876,6 +878,13 @@ public class MapComponent extends GuiComponent {
     mo.setName("");
 
     switch (type) {
+    case EMITTER:
+      EmitterData defaultData = new EmitterData();
+      defaultData.setWidth(mo.getWidth());
+      defaultData.setHeight(mo.getHeight());
+      defaultData.setName(mo.getName());
+      EmitterMapObjectLoader.updateMapObject(defaultData, mo);
+      break;
     case PROP:
       mo.setValue(MapObjectProperty.COLLISIONBOX_WIDTH, (newObjectArea.getWidth() * 0.4));
       mo.setValue(MapObjectProperty.COLLISIONBOX_HEIGHT, (newObjectArea.getHeight() * 0.4));

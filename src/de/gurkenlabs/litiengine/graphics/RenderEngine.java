@@ -232,6 +232,23 @@ public final class RenderEngine {
    *          Configure whether or not to render the shape with antialiasing.
    */
   public void renderShape(final Graphics2D g, final Shape shape, boolean antialiasing) {
+    renderShape(g, shape, antialiasing, 0);
+  }
+
+  /**
+   * Renders the specified shape to the translated location in the game world.
+   * 
+   * @param g
+   *          The graphics object to render on.
+   * @param shape
+   *          The shape to be rendered.
+   * @param antialiasing
+   *          Configure whether or not to render the shape with antialiasing.
+   * @param angle
+   *          The angle by which the shape will be rotated.
+   * 
+   */
+  public void renderShape(final Graphics2D g, final Shape shape, boolean antialiasing, double angle) {
     if (shape == null) {
       return;
     }
@@ -241,6 +258,7 @@ public final class RenderEngine {
     final AffineTransform t = new AffineTransform();
     t.scale(Game.world().camera().getRenderScale(), Game.world().camera().getRenderScale());
     t.translate(Game.world().camera().getPixelOffsetX(), Game.world().camera().getPixelOffsetY());
+    t.rotate(Math.toRadians(angle), shape.getBounds().getX() + shape.getBounds().getWidth() * 0.5, shape.getBounds().getY() + shape.getBounds().getHeight() * 0.5);
 
     ShapeRenderer.renderTransformed(g, shape, t);
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, hint);
@@ -303,6 +321,25 @@ public final class RenderEngine {
    * @see Stroke
    */
   public void renderOutline(final Graphics2D g, final Shape shape, final Stroke stroke, boolean antialiasing) {
+    renderOutline(g, shape, stroke, antialiasing, 0);
+  }
+
+  /**
+   * Renders the outline with the defined <code>Stroke</code> of the specified shape to the translated location in the game world.
+   * 
+   * @param g
+   *          The graphics object to render on.
+   * @param shape
+   *          The shape to be rendered.
+   * @param stroke
+   *          The stroke that is used to render the shape.
+   * @param antialiasing
+   *          Configure whether or not to render the shape with antialiasing.
+   * @param angle
+   *          The angle by which the shape will be rotated.
+   * @see Stroke
+   */
+  public void renderOutline(final Graphics2D g, final Shape shape, final Stroke stroke, boolean antialiasing, double angle) {
     if (shape == null) {
       return;
     }
@@ -312,6 +349,7 @@ public final class RenderEngine {
     final AffineTransform t = new AffineTransform();
     t.scale(Game.world().camera().getRenderScale(), Game.world().camera().getRenderScale());
     t.translate(Game.world().camera().getPixelOffsetX(), Game.world().camera().getPixelOffsetY());
+    t.rotate(Math.toRadians(angle), shape.getBounds().getX() + shape.getBounds().getWidth() * 0.5, shape.getBounds().getY() + shape.getBounds().getHeight() * 0.5);
 
     ShapeRenderer.renderOutlineTransformed(g, shape, t, stroke);
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, hint);

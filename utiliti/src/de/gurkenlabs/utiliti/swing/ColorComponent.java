@@ -100,8 +100,7 @@ public class ColorComponent extends JPanel {
     if (c == null) {
       return;
     }
-    this.textFieldColor.setText(color);
-    SwingHelpers.updateColorTextField(this.textFieldColor);
+    SwingHelpers.updateColorTextField(this.textFieldColor, ColorHelper.decode(color));
     this.spinnerAlpha.setValue(c.getAlpha());
     for (ActionListener listener : this.listeners) {
       listener.actionPerformed(null);
@@ -109,8 +108,7 @@ public class ColorComponent extends JPanel {
   }
 
   public void setColor(final Color color) {
-    final String h = ColorHelper.encode(color);
-    this.setHexColor(h);
+    setHexColor(ColorHelper.encode(color));
   }
 
   public void clear() {

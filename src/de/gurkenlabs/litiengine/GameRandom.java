@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine;
 
+import java.awt.Color;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
+import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 /**
@@ -157,7 +159,7 @@ public final class GameRandom extends java.util.Random {
 
     return array[this.nextInt(array.length)];
   }
-  
+
   /**
    * Chooses a pseudo-random element from the specified array.
    * 
@@ -766,5 +768,28 @@ public final class GameRandom extends java.util.Random {
    */
   public String nextAlphabetic(final int length, final boolean lowerCase) {
     return this.nextAlphanumeric(length, false, lowerCase);
+  }
+
+  /**
+   * Returns a randomized variant of a given color.
+   * 
+   * @param originalColor
+   *          The original color to be modified.
+   * @param colorVariance
+   *          The float value between 0 and 1 defining how strong the new Color's RGB values will deviate from the original Color.
+   * @param alphaVariance
+   *          The float value between 0 and 1 defining how strong the new Color's Alpha will deviate from the original Color.
+   * @return A pseudo-randomized variant of the original Color.
+   */
+  public Color nextColor(Color originalColor, float colorVariance, float alphaVariance) {
+    if (originalColor == null) {
+      return null;
+    }
+    int red = MathUtilities.clamp((int) (originalColor.getRed() + (originalColor.getRed() * this.nextFloat(colorVariance) * this.nextSign())), 0, 255);
+    int green = MathUtilities.clamp((int) (originalColor.getGreen() + (originalColor.getGreen() * this.nextFloat(colorVariance) * this.nextSign())), 0, 255);
+    int blue = MathUtilities.clamp((int) (originalColor.getBlue() + (originalColor.getBlue() * this.nextFloat(colorVariance) * this.nextSign())), 0, 255);
+    int alpha = MathUtilities.clamp((int) (originalColor.getAlpha() + (originalColor.getAlpha() * this.nextFloat(colorVariance) * this.nextSign())), 0, 255);
+    return new Color(red, green, blue, alpha);
+
   }
 }

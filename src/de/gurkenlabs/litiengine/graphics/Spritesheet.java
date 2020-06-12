@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.resources.ImageFormat;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.AlphanumComparator;
@@ -119,6 +120,10 @@ public final class Spritesheet implements Comparable<Spritesheet> {
 
   public int getRows() {
     return this.rows;
+  }
+
+  public BufferedImage getRandomSprite() {
+    return Game.random().choose(this.sprites);
   }
 
   public BufferedImage getSprite(final int index) {

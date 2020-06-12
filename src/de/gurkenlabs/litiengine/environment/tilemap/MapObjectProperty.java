@@ -82,11 +82,11 @@ public final class MapObjectProperty {
     public static final String SPAWNRATE = "emitterSpawnRate";
     public static final String SPAWNAMOUNT = "emitterSpawnAmount";
     public static final String UPDATERATE = "emitterUpdateDelay";
-    public static final String TIMETOLIVE = "emitterTimeToLive";
+    public static final String DURATION = "emitterDuration";
     public static final String MAXPARTICLES = "emitterMaxParticles";
     public static final String PARTICLETYPE = "emitterParticleType";
-    public static final String COLORDEVIATION = "emitterColorDeviation";
-    public static final String ALPHADEVIATION = "emitterAlphaDeviation";
+    public static final String COLORVARIANCE = "emitterColorVariance";
+    public static final String ALPHAVARIANCE = "emitterAlphaVariance";
     public static final String ORIGIN_ALIGN = "emitterOriginAlign";
     public static final String ORIGIN_VALIGN = "emitterOriginValign";
 
@@ -95,44 +95,39 @@ public final class MapObjectProperty {
   }
 
   public static final class Particle {
-    public static final String MINX = "particleMinX";
-    public static final String MAXX = "particleMaxX";
-    public static final String X_RANDOM = "particleXRandom";
-    public static final String MINY = "particleMinY";
-    public static final String MAXY = "particleMaxY";
-    public static final String Y_RANDOM = "particleYRandom";
-    public static final String MINDELTAX = "particleMinDeltaX";
-    public static final String MAXDELTAX = "particleMaxDeltaX";
-    public static final String DELTAX_RANDOM = "particleDeltaXRandom";
-    public static final String MINDELTAY = "particleMinDeltaY";
-    public static final String MAXDELTAY = "particleMaxDeltaY";
-    public static final String DELTAY_RANDOM = "particleDeltaYRandom";
-    public static final String MINGRAVITYX = "particleMinGravityX";
-    public static final String MAXGRAVITYX = "particleMaxGravityX";
-    public static final String GRAVITYX_RANDOM = "particleGravityXRandom";
-    public static final String MINGRAVITYY = "particleMinGravityY";
-    public static final String MAXGRAVITYY = "particleMaxGravityY";
-    public static final String GRAVITYY_RANDOM = "particleGravityYRandom";
-    public static final String MINSTARTWIDTH = "particleMinStartWidth";
-    public static final String MAXSTARTWIDTH = "particleMaxStartWidth";
-    public static final String STARTWIDTH_RANDOM = "particleStartWidthRandom";
-    public static final String MINSTARTHEIGHT = "particleMinStartHeight";
-    public static final String MAXSTARTHEIGHT = "particleMaxStartHeight";
-    public static final String STARTHEIGHT_RANDOM = "particleStartHeightRandom";
-    public static final String MINDELTAWIDTH = "particleMinDeltaWidth";
-    public static final String MAXDELTAWIDTH = "particleMaxDeltaWidth";
-    public static final String DELTAWIDTH_RANDOM = "particleDeltaWidthRandom";
-    public static final String MINDELTAHEIGHT = "particleMinDeltaHeight";
-    public static final String MAXDELTAHEIGHT = "particleMaxDeltaHeight";
-    public static final String DELTAHEIGHT_RANDOM = "particleDeltaHeightRandom";
-    public static final String SPRITE = "particleSprite";
+    public static final String OFFSET_X_MIN = "particleMinOffsetX";
+    public static final String OFFSET_X_MAX = "particleMaxOffsetX";
+    public static final String OFFSET_Y_MIN = "particleMinOffsetY";
+    public static final String OFFSET_Y_MAX = "particleMaxOffsetY";
+    public static final String VELOCITY_X_MIN = "particleMinVelocityX";
+    public static final String VELOCITY_X_MAX = "particleMaxVelocityX";
+    public static final String VELOCITY_Y_MIN = "particleMinVelocityY";
+    public static final String VELOCITY_Y_MAX = "particleMaxVelocityY";
+    public static final String ACCELERATION_X_MIN = "particleMinAccelerationX";
+    public static final String ACCELERATION_X_MAX = "particleMaxAccelerationX";
+    public static final String ACCELERATION_Y_MIN = "particleMinAccelerationY";
+    public static final String ACCELERATION_Y_MAX = "particleMaxAccelerationY";
+    public static final String STARTWIDTH_MIN = "particleMinStartWidth";
+    public static final String STARTWIDTH_MAX = "particleMaxStartWidth";
+    public static final String STARTHEIGHT_MIN = "particleMinStartHeight";
+    public static final String STARTHEIGHT_MAX = "particleMaxStartHeight";
+    public static final String DELTAWIDTH_MIN = "particleMinDeltaWidth";
+    public static final String DELTAWIDTH_MAX = "particleMaxDeltaWidth";
+    public static final String DELTAHEIGHT_MIN = "particleMinDeltaHeight";
+    public static final String DELTAHEIGHT_MAX = "particleMaxDeltaHeight";
+    public static final String ROTATION_MIN = "particleMinRotation";
+    public static final String ROTATION_MAX = "particleMaxRotation";
+    public static final String DELTAROTATION_MIN = "particleMinDeltaRotation";
+    public static final String DELTAROTATION_MAX = "particleMaxDeltaRotation";
+    public static final String TTL_MIN = "particleMinTTL";
+    public static final String TTL_MAX = "particleMaxTTL";
     public static final String ANIMATESPRITE = "particleAnimateSprite";
-    public static final String COLLISIONTYPE = "particlePhysics";
-    public static final String TEXT = "particleText";
-    public static final String MINTTL = "particleMinTTL";
-    public static final String MAXTTL = "particleMaxTTL";
-    public static final String TTL_RANDOM = "particleTTLRandom";
+    public static final String LOOPSPRITE = "particleLoopSprite";
+    public static final String TEXTS = "particleTexts";
     public static final String FADE = "particleFade";
+    public static final String FADEONCOLLISION = "particleFadeOnCollision";
+    public static final String OUTLINEONLY = "particleOutlineOnly";
+    public static final String ANTIALIASING = "particleAntiAliasing";
 
     private Particle() {
     }

@@ -49,7 +49,7 @@ public class CollisionBoxPanel extends PropertyPanel {
   
   private LayoutManager createLayout() {
     LayoutItem[] layoutItems = new LayoutItem [] {
-        new LayoutItem("panel_collisionType", this.comboBoxColl), 
+        new LayoutItem("collisionType", this.comboBoxColl), 
     };
     
     return this.createLayout(layoutItems, this.chckbxIsObstructingLights);

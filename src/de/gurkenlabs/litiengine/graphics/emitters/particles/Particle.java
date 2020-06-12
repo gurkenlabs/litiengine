@@ -15,30 +15,39 @@ import de.gurkenlabs.litiengine.physics.Collision;
 public abstract class Particle implements ITimeToLive {
   private long aliveTick;
   private long aliveTime;
+  private float angle;
+  private float deltaAngle;
+
   private Collision collisionType;
   private Color color;
   private int colorAlpha = 255;
   private float deltaHeight;
   private float deltaWidth;
-  private float deltaX;
-  private float deltaY;
+  /**
+   * The horizontal velocity (horizontal movement per update) for this particle.
+   */
+  private float velocityX;
+  /**
+   * The vertical velocity (vertical movement per update) for this particle.
+   */
+  private float velocityY;
+  private boolean outlineOnly;
+  private boolean antiAliasing;
 
   /**
-   * The gravitational pull to the left (negative) and right (positive) acting
-   * on this particle.
+   * The horizontal acceleration (increase / decrease in velocity over time) for this particle.
    */
-  private float gravityX;
+  private float accelerationX;
 
   /**
-   * The gravitational pull to the up (negative) and down (positive) acting on
-   * this particle.
+   * The vertical acceleration (increase / decrease in velocity over time) for this particle.
    */
-  private float gravityY;
+  private float accelerationY;
   private float height;
-  private final int timeToLive;
+  private int timeToLive;
   private float width;
 
-  /** The currentlocation of the particle on the X-axis. */
+  /** The current location of the particle on the X-axis. */
   private float x;
 
   /** The current location of the particle on the Y-axis. */
@@ -66,18 +75,17 @@ public abstract class Particle implements ITimeToLive {
    *          the width
    * @param height
    *          the height
-   * @param ttl
-   *          The remaining time to live of the particle.
    * @param color
    *          The color of the effect.
    */
-  public Particle(final float width, final float height, final Color color, final int ttl) {
+  public Particle(final float width, final float height, final Color color) {
     this.setCustomRenderType(RenderType.NONE);
     this.setWidth(width);
     this.setHeight(height);
-    this.timeToLive = ttl;
-    this.color = color;
-    this.colorAlpha = this.color.getAlpha();
+    if (color != null) {
+      this.color = color;
+      this.colorAlpha = this.color.getAlpha();
+    }
     this.collisionType = Collision.NONE;
     this.opacity = 1;
     this.fade = true;
@@ -90,6 +98,13 @@ public abstract class Particle implements ITimeToLive {
     return this.aliveTime;
   }
 
+  /**
+   * Gets the current bounding box of the particle, depending on its spawn location.
+   * 
+   * @param origin
+   *          the spawn location of this particle
+   * @return
+   */
   public Rectangle2D getBoundingBox(final Point2D origin) {
     return new Rectangle2D.Double(origin.getX() + this.getX(), origin.getY() + this.getY(), this.getWidth(), this.getHeight());
   }
@@ -114,24 +129,40 @@ public abstract class Particle implements ITimeToLive {
     return this.deltaWidth;
   }
 
-  public float getDx() {
-    return this.deltaX;
+  public float getVelocityX() {
+    return this.velocityX;
   }
 
-  public float getDy() {
-    return this.deltaY;
+  public float getVelocityY() {
+    return this.velocityY;
   }
 
-  public float getGravityX() {
-    return this.gravityX;
+  public float getAccelerationX() {
+    return this.accelerationX;
   }
 
-  public float getGravityY() {
-    return this.gravityY;
+  public float getAccelerationY() {
+    return this.accelerationY;
+  }
+
+  public float getAngle() {
+    return this.angle;
+  }
+
+  public float getDeltaAngle() {
+    return this.deltaAngle;
   }
 
   public float getHeight() {
     return this.height;
+  }
+
+  public boolean isOutlineOnly() {
+    return this.outlineOnly;
+  }
+
+  public boolean isAntiAliased() {
+    return this.antiAliasing;
   }
 
   /**
@@ -236,13 +267,23 @@ public abstract class Particle implements ITimeToLive {
     return this;
   }
 
-  public Particle setDeltaIncX(final float gravityX) {
-    this.gravityX = gravityX;
+  public Particle setAccelerationX(final float accelerationX) {
+    this.accelerationX = accelerationX;
     return this;
   }
 
-  public Particle setDeltaIncY(final float gravityY) {
-    this.gravityY = gravityY;
+  public Particle setAccelerationY(final float accelerationY) {
+    this.accelerationY = accelerationY;
+    return this;
+  }
+
+  public Particle setAngle(final float angle) {
+    this.angle = angle;
+    return this;
+  }
+
+  public Particle setDeltaAngle(final float deltaAngle) {
+    this.deltaAngle = deltaAngle;
     return this;
   }
 
@@ -251,13 +292,13 @@ public abstract class Particle implements ITimeToLive {
     return this;
   }
 
-  public Particle setDeltaX(final float dx) {
-    this.deltaX = dx;
+  public Particle setVelocityX(final float velocityX) {
+    this.velocityX = velocityX;
     return this;
   }
 
-  public Particle setDeltaY(final float dy) {
-    this.deltaY = dy;
+  public Particle setVelocityY(final float velocityY) {
+    this.velocityY = velocityY;
     return this;
   }
 
@@ -273,6 +314,16 @@ public abstract class Particle implements ITimeToLive {
 
   public Particle setHeight(final float height) {
     this.height = height;
+    return this;
+  }
+
+  public Particle setOutlineOnly(final boolean outlineOnly) {
+    this.outlineOnly = outlineOnly;
+    return this;
+  }
+
+  public Particle setAntiAliasing(final boolean antiAliasing) {
+    this.antiAliasing = antiAliasing;
     return this;
   }
 
@@ -297,6 +348,11 @@ public abstract class Particle implements ITimeToLive {
     return this;
   }
 
+  public Particle setTimeToLive(final int ttl) {
+    this.timeToLive = ttl;
+    return this;
+  }
+
   @Override
   public boolean timeToLiveReached() {
     return this.getTimeToLive() > 0 && this.getAliveTime() >= this.getTimeToLive();
@@ -317,16 +373,21 @@ public abstract class Particle implements ITimeToLive {
     }
 
     this.aliveTime = Game.time().since(this.aliveTick);
-    if (this.timeToLiveReached() || this.colliding) {
+    if (this.timeToLiveReached()) {
       return;
     }
 
     if (this.isFading()) {
       this.opacity = (float) (this.getTimeToLive() > 0 ? (this.getTimeToLive() - this.getAliveTime()) / (double) this.getTimeToLive() : 1);
     }
-
     final int alpha = (int) (this.getOpacity() * this.getColorAlpha());
-    this.color = new Color(this.color.getRed(), this.color.getGreen(), this.color.getBlue(), alpha >= 0 ? alpha : 0);
+    if (this.color != null) {
+      this.color = new Color(this.color.getRed(), this.color.getGreen(), this.color.getBlue(), alpha >= 0 ? alpha : 0);
+    }
+
+    if (this.colliding) {
+      return;
+    }
 
     if (this.getDeltaWidth() != 0) {
       this.width += this.getDeltaWidth() * updateRatio;
@@ -336,9 +397,13 @@ public abstract class Particle implements ITimeToLive {
       this.height += this.getDeltaHeight() * updateRatio;
     }
 
+    if (this.getDeltaAngle() != 0) {
+      this.angle += this.getDeltaAngle() * updateRatio;
+    }
+
     // test for ray cast collision
-    final float targetX = this.x + this.getDx() * updateRatio;
-    final float targetY = this.y + this.getDy() * updateRatio;
+    final float targetX = this.x + this.getVelocityX() * updateRatio;
+    final float targetY = this.y + this.getVelocityY() * updateRatio;
 
     if (targetX == this.x && targetY == this.y) {
       return;
@@ -348,20 +413,20 @@ public abstract class Particle implements ITimeToLive {
       return;
     }
 
-    if (this.getDx() != 0) {
+    if (this.getVelocityX() != 0) {
       this.x = targetX;
     }
 
-    if (this.getDy() != 0) {
+    if (this.getVelocityY() != 0) {
       this.y = targetY;
     }
 
-    if (this.getGravityX() != 0) {
-      this.deltaX += this.getGravityX() * updateRatio;
+    if (this.getAccelerationX() != 0) {
+      this.velocityX += this.getAccelerationX() * updateRatio;
     }
 
-    if (this.getGravityY() != 0) {
-      this.deltaY += this.getGravityY() * updateRatio;
+    if (this.getAccelerationY() != 0) {
+      this.velocityY += this.getAccelerationY() * updateRatio;
     }
   }
 
@@ -372,28 +437,28 @@ public abstract class Particle implements ITimeToLive {
 
     if (this.isContinuousCollisionEnabled()) {
       Point2D start = this.getAbsoluteLocation(emitterOrigin);
-      double endX = emitterOrigin.getX() + targetX - this.getWidth() / 2.0;
-      double endY = emitterOrigin.getY() + targetY - this.getHeight() / 2.0;
-
+      double endX = emitterOrigin.getX() + targetX;
+      double endY = emitterOrigin.getY() + targetY;
       Line2D ray = new Line2D.Double(start.getX(), start.getY(), endX, endY);
       if (this.getCollisionType() != Collision.NONE && Game.physics() != null && Game.physics().collides(ray, this.getCollisionType())) {
-        if (this.isFadingOnCollision()) {
-          this.opacity = 0;
-        }
-
-        this.colliding = true;
+        collide();
         return true;
       }
-    } else if (this.getCollisionType() != Collision.NONE && Game.physics() != null && Game.physics().collides(this.getBoundingBox(emitterOrigin), this.getCollisionType())) {
-      if (this.isFadingOnCollision()) {
-        this.opacity = 0;
-      }
-
-      this.colliding = true;
+    } else if (this.getCollisionType() != Collision.NONE && Game.physics() != null && Game.physics().collides(this.getBoundingBox(emitterOrigin).getBounds2D(), this.getCollisionType())) {
+      collide();
       return true;
     }
 
     return false;
+  }
+
+  private void collide() {
+    if (!this.colliding) {
+      this.colliding = true;
+      if (this.isFadingOnCollision()) {
+        this.setFade(true);
+      }
+    }
   }
 
   public Point2D getAbsoluteLocation(final Point2D effectLocation) {
