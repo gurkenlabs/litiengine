@@ -62,7 +62,7 @@ public abstract class PropertyPanel extends JPanel {
   public static final int DUAL_SPINNER_GAP = CONTROL_WIDTH - 2 * (LABEL_WIDTH + SPINNER_WIDTH);
   public static final Dimension LABEL_SIZE = new Dimension(LABEL_WIDTH, CONTROL_HEIGHT);
   public static final Dimension BUTTON_SIZE = new Dimension(CONTROL_HEIGHT, CONTROL_HEIGHT);
-  public final static Dimension SPINNER_SIZE = new Dimension(SPINNER_WIDTH, CONTROL_HEIGHT);
+  public static final Dimension SPINNER_SIZE = new Dimension(SPINNER_WIDTH, CONTROL_HEIGHT);
   public static final Dimension SMALL_CONTROL_SIZE = new Dimension(CONTROL_MIN_WIDTH, CONTROL_HEIGHT);
   public static final Dimension LARGE_CONTROL_SIZE = new Dimension(CONTROL_WIDTH, CONTROL_HEIGHT);
   public static final Border STANDARDBORDER = new EmptyBorder(0, 4, 0, 4);

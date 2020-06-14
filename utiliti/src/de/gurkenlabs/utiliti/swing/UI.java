@@ -55,7 +55,6 @@ import de.gurkenlabs.utiliti.swing.panels.MapObjectInspector;
 public final class UI {
   private static final List<JComponent> orphanComponents = new CopyOnWriteArrayList<>();
   private static final int SCROLL_MAX = 100;
-  private static JPanel renderPanel;
   private static JScrollBar horizontalScroll;
   private static JScrollBar verticalScroll;
   private static JPopupMenu canvasPopup;
@@ -218,17 +217,11 @@ public final class UI {
       Game.world().camera().setFocus(newFocus);
     });
 
-    Game.world().camera().onZoom(e -> {
-      updateScrollBars();
-    });
+    Game.world().camera().onZoom(e -> updateScrollBars());
 
-    Game.world().camera().onFocus(e -> {
-      updateScrollBars();
-    });
+    Game.world().camera().onFocus(e -> updateScrollBars());
 
-    Game.world().onLoaded(e -> {
-      updateScrollBars();
-    });
+    Game.world().onLoaded(e -> updateScrollBars());
   }
 
   private static void setupInterface() {
@@ -240,6 +233,7 @@ public final class UI {
 
     // remove canvas because we want to add a wrapping panel
     window.remove(canvas);
+    JPanel renderPanel;
 
     renderPanel = new JPanel(new BorderLayout());
     renderPanel.add(canvas);
@@ -399,7 +393,6 @@ public final class UI {
       Game.window().getRenderComponent().setBackground(UIManager.getColor("Panel.background"));
     }
     Editor.preferences().setTheme(theme);
-    Icons.initialize();
     loadingTheme = false;
   }
 

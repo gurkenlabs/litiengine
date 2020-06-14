@@ -333,7 +333,7 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
       this.controller.setDefault(newAnim);
       this.controller.play(newAnim.getName());
     } catch (IllegalArgumentException e) {
-      log.log(Level.WARNING, "The sprite file '" + file.name + "' cannot be scaled correctly for the preview window. Please check if the image file's dimensions are divisible by the desired sprite dimensions without remainder.", e);
+      log.log(Level.WARNING, "The sprite file {0} cannot be scaled correctly for the preview window. Please check if the image file dimensions are divisible by the desired sprite dimensions without remainder.", file.name);
     } finally {
       this.isUpdating = false;
     }

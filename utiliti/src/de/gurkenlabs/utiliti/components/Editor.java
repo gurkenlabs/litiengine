@@ -586,6 +586,9 @@ public class Editor extends Screen {
   }
 
   public void loadTileset(ITileset tileset, boolean embedded) {
+    if (tileset == null) {
+      return;
+    }
     Spritesheet sprite = Resources.spritesheets().get(tileset.getImage().getSource());
     if (sprite != null) {
       Resources.spritesheets().remove(sprite.getName());

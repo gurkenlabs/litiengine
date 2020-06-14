@@ -72,7 +72,7 @@ public final class FileMenu extends JMenu {
       if (recent != null && !recent.isEmpty() && new File(recent).exists()) {
         JMenuItem fileButton = new JMenuItem(recent);
         fileButton.addActionListener(a -> {
-          log.log(Level.INFO, "load " + fileButton.getText());
+          log.log(Level.INFO, "load {0}", fileButton.getText());
           Editor.instance().load(new File(fileButton.getText()), false);
         });
 

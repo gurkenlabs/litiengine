@@ -27,7 +27,8 @@ public abstract class ShapeParticle extends Particle {
     g.setColor(this.getColor());
     if (this.isOutlineOnly()) {
       Game.graphics().renderOutline(g, this.getShape(emitterOrigin), new BasicStroke(1.0f / Game.graphics().getBaseRenderScale()), this.isAntiAliased());
-    } else
+    } else {
       Game.graphics().renderShape(g, this.getShape(emitterOrigin), this.isAntiAliased());
+    }
   }
 }

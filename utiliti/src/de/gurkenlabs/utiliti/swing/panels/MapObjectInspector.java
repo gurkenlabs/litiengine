@@ -45,7 +45,8 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
   private TagPanel tagPanel;
   private JLabel lblLayer;
   private JPanel infoPanel;
-  private DualSpinner transform, scale;
+  private DualSpinner transform;
+  private DualSpinner scale;
 
   public MapObjectInspector() {
     super();
@@ -69,7 +70,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
     ControlBehavior.apply(this.textFieldName);
 
-    this.renderType = new JComboBox<RenderType>(RenderType.values());
+    this.renderType = new JComboBox<>(RenderType.values());
     this.renderType.setMinimumSize(SMALL_CONTROL_SIZE);
 
     this.tagPanel = new TagPanel();
@@ -112,6 +113,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
   @Override
   public void refresh() {
+    // Do nothing
   }
 
   @Override

@@ -7,7 +7,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JToggleButton;
 
-import com.github.weisj.darklaf.ui.togglebutton.DarkToggleButtonUI;
+import com.github.weisj.darklaf.ui.togglebutton.ToggleButtonConstants;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
@@ -27,9 +27,9 @@ public class EmitterSpritePanel extends PropertyPanel {
     spritesheet = new JComboBox<>();
     spritesheet.setRenderer(new LabelListCellRenderer());
     animateSprite = new JToggleButton();
-    animateSprite.putClientProperty("JToggleButton.variant", DarkToggleButtonUI.VARIANT_SLIDER);
+    animateSprite.putClientProperty(ToggleButtonConstants.KEY_VARIANT, ToggleButtonConstants.VARIANT_SLIDER);
     loopSprite = new JToggleButton();
-    loopSprite.putClientProperty("JToggleButton.variant", DarkToggleButtonUI.VARIANT_SLIDER);
+    loopSprite.putClientProperty(ToggleButtonConstants.KEY_VARIANT, ToggleButtonConstants.VARIANT_SLIDER);
     setLayout(createLayout());
     setupChangedListeners();
   }
@@ -59,9 +59,7 @@ public class EmitterSpritePanel extends PropertyPanel {
   private void setupChangedListeners() {
     setupL(spritesheet, MapObjectProperty.SPRITESHEETNAME);
     setup(animateSprite, MapObjectProperty.Particle.ANIMATESPRITE);
-    animateSprite.addItemListener(e -> {
-      loopSprite.setEnabled(animateSprite.isSelected());
-    });
+    animateSprite.addItemListener(e -> loopSprite.setEnabled(animateSprite.isSelected()));
     setup(loopSprite, MapObjectProperty.Particle.LOOPSPRITE);
   }
 

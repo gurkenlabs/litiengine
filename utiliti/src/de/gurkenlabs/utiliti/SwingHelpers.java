@@ -44,21 +44,20 @@ public class SwingHelpers {
     if (color == null) {
       return;
     }
-    final float[] hsb = Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), null);
     label.setText(ColorHelper.encode(color));
-    if (color != null) {
-      final String cacheKey = ColorHelper.encode(color);
 
-      BufferedImage newIconImage = Resources.images().get(cacheKey, () -> {
-        BufferedImage img = Imaging.getCompatibleImage(10, 10);
-        Graphics2D g = (Graphics2D) img.getGraphics();
-        g.setColor(color);
-        g.fillRect(0, 0, PropertyPanel.CONTROL_HEIGHT, PropertyPanel.CONTROL_HEIGHT);
-        g.dispose();
-        return img;
-      });
+    final String cacheKey = ColorHelper.encode(color);
 
-      label.setIcon(new ImageIcon(newIconImage));
-    }
+    BufferedImage newIconImage = Resources.images().get(cacheKey, () -> {
+      BufferedImage img = Imaging.getCompatibleImage(10, 10);
+      Graphics2D g = (Graphics2D) img.getGraphics();
+      g.setColor(color);
+      g.fillRect(0, 0, PropertyPanel.CONTROL_HEIGHT, PropertyPanel.CONTROL_HEIGHT);
+      g.dispose();
+      return img;
+    });
+
+    label.setIcon(new ImageIcon(newIconImage));
+
   }
 }

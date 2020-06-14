@@ -4,6 +4,7 @@ import java.awt.Component;
 
 import javax.swing.BoxLayout;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingConstants;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.resources.Resources;
@@ -23,7 +24,7 @@ public class EmitterPanel extends PropertyPanel {
     setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
     this.propertyGrouptabs = new JTabbedPane();
     this.propertyGrouptabs.setAlignmentX(Component.LEFT_ALIGNMENT);
-    this.propertyGrouptabs.setTabPlacement(JTabbedPane.LEFT);
+    this.propertyGrouptabs.setTabPlacement(SwingConstants.LEFT);
     for (EmitterPropertyGroup e : EmitterPropertyGroup.values()) {
       String localized = Resources.strings().get(String.format("emitter_%s", e.name().toLowerCase()));
       this.propertyGrouptabs.insertTab(String.format("<html><p style=\"text-align: left; width: %spx\">%s</p></html>", LABEL_WIDTH * 1.5, localized), null, EmitterPropertyPanel.getEmitterPropertyPanel(e), Resources.strings().get(String.format("emitter_%s_tip", e.name().toLowerCase())), e.ordinal());
@@ -41,12 +42,12 @@ public class EmitterPanel extends PropertyPanel {
 
   @Override
   protected void clearControls() {
-
+    // do nothing
   }
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-
+    // do nothing
   }
 
 }

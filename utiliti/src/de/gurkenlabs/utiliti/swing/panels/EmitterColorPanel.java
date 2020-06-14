@@ -15,6 +15,7 @@ import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
@@ -46,7 +47,6 @@ public class EmitterColorPanel extends PropertyPanel {
   public EmitterColorPanel() {
     super();
     setMinimumSize(new Dimension(PANEL_WIDTH, CONTROL_HEIGHT * 6));
-    // setMaximumSize(new Dimension(PANEL_WIDTH, CONTROL_HEIGHT * 6));
     setPreferredSize(new Dimension(PANEL_WIDTH, CONTROL_HEIGHT * 6));
     model = new DefaultTableModel(0, 1);
     table = new JTable(model);
@@ -131,12 +131,12 @@ public class EmitterColorPanel extends PropertyPanel {
   }
 
   private class ColorListCellRenderer extends JTextField implements TableCellRenderer {
-    Border focusBorder = DarkBorders.createLineBorder(1, 1, 1, 1);
+    private transient Border focusBorder = DarkBorders.createLineBorder(1, 1, 1, 1);
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
       this.setColumns(9);
-      this.setHorizontalAlignment(JTextField.CENTER);
+      this.setHorizontalAlignment(SwingConstants.CENTER);
       SwingHelpers.updateColorTextField(this, ColorHelper.decode((String) value));
       this.setBorder(hasFocus ? focusBorder : null);
       if (hasFocus) {

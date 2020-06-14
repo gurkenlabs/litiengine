@@ -203,9 +203,7 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
     @Override
     protected void setupChangedListeners() {
       setup(comboBoxParticleType, MapObjectProperty.Emitter.PARTICLETYPE);
-      comboBoxParticleType.addItemListener(e -> {
-        updateTabSelection();
-      });
+      comboBoxParticleType.addItemListener(e -> updateTabSelection());
       setup(fade, MapObjectProperty.Particle.FADE);
       setup(outlineOnly, MapObjectProperty.Particle.OUTLINEONLY);
       setup(antiAliasing, MapObjectProperty.Particle.ANTIALIASING);

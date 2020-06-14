@@ -13,37 +13,42 @@ import de.gurkenlabs.litiengine.util.UriUtilities;
 
 @SuppressWarnings("serial")
 public final class HelpMenu extends JMenu {
+  private static final String LINKS = "links";
+
   public HelpMenu() {
     super(Resources.strings().get("menu_help"));
     this.setMnemonic('H');
 
     JMenuItem tutorialMenuItem = new JMenuItem(Resources.strings().get("menu_help_tutorial"));
-    tutorialMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().getFrom("links", "link_LITIengine_tutorials"))));
+    tutorialMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().getFrom(LINKS, "link_LITIengine_tutorials"))));
 
     JMenuItem docsMenuItem = new JMenuItem(Resources.strings().get("menu_help_docs"));
-    docsMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().getFrom("links", "link_LITIengine_docs"))));
+    docsMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().getFrom(LINKS, "link_LITIengine_docs"))));
 
     JMenuItem forumMenuItem = new JMenuItem(Resources.strings().get("menu_help_forum"));
-    forumMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().getFrom("links", "link_LITIengine_forum"))));
+    forumMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().getFrom(LINKS, "link_LITIengine_forum"))));
 
     JMenuItem javadocsMenuItem = new JMenuItem(Resources.strings().get("menu_help_javadocs"));
-    javadocsMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().getFrom("links", "link_LITIengine_javadocs"))));
+    javadocsMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().getFrom(LINKS, "link_LITIengine_javadocs"))));
 
     JMenuItem bugMenuItem = new JMenuItem(Resources.strings().get("menu_help_bug"));
-    bugMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().getFrom("links", "link_LITIengine_bug"))));
+    bugMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().getFrom(LINKS, "link_LITIengine_bug"))));
 
     JMenuItem releaseMenuItem = new JMenuItem(Resources.strings().get("menu_help_releasenotes"));
-    releaseMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().getFrom("links", "link_LITIengine_releasenotes"))));
+    releaseMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().getFrom(LINKS, "link_LITIengine_releasenotes"))));
 
     JMenuItem patreonMenuItem = new JMenuItem(Resources.strings().get("menu_help_patreon"));
-    patreonMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().getFrom("links", "link_patreon"))));
+    patreonMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().getFrom(LINKS, "link_patreon"))));
 
     JMenuItem payPalMenuItem = new JMenuItem(Resources.strings().get("menu_help_paypal"));
-    payPalMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().getFrom("links", "link_paypal"))));
+    payPalMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().getFrom(LINKS, "link_paypal"))));
 
     JMenuItem aboutMenuItem = new JMenuItem(Resources.strings().get("menu_help_about"));
-    aboutMenuItem.addActionListener(event -> JOptionPane.showMessageDialog(((JFrame) Game.window().getHostControl()), Resources.strings().get("menu_help_abouttext") + "\n" + Resources.strings().get("menu_help_releases") + Resources.strings().getFrom("links", "link_LITIengine_releases") + "\n\n"
-        + Resources.strings().get("copyright_gurkenlabs", "2020") + "\n" + Resources.strings().get("copyright_LITIengine"), Resources.strings().get("menu_help_about") + " " + Game.info().getVersion(), JOptionPane.INFORMATION_MESSAGE));
+    aboutMenuItem.addActionListener(event -> JOptionPane.showMessageDialog(((JFrame) Game.window().getHostControl()),
+        String.format("%s%n%s%s%n%n%s%n%s", Resources.strings().get("menu_help_abouttext"), Resources.strings().get("menu_help_releases"), Resources.strings().getFrom(LINKS, "link_LITIengine_releases"), Resources.strings().get("copyright_gurkenlabs", "2020"),
+            Resources.strings().get("copyright_LITIengine")),
+
+        Resources.strings().get("menu_help_about") + " " + Game.info().getVersion(), JOptionPane.INFORMATION_MESSAGE));
 
     this.add(tutorialMenuItem);
     this.add(docsMenuItem);
