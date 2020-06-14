@@ -76,6 +76,8 @@ public class Editor extends Screen {
   private static final String SPRITESHEET_FILE_NAME = "Spritesheet Image";
   private static final String TEXTUREATLAS_FILE_NAME = "Texture Atlas XML (generic)";
 
+  private static final String IMPORT_DIALOGUE = "import_something";
+
   private static Editor instance;
   private static UserPreferences preferences;
 
@@ -353,7 +355,7 @@ public class Editor extends Screen {
 
   public void importSpriteFile() {
 
-    if (EditorFileChooser.showFileDialog(SPRITE_FILE_NAME, Resources.strings().get("import_something", SPRITE_FILE_NAME), false, SpritesheetResource.PLAIN_TEXT_FILE_EXTENSION) == JFileChooser.APPROVE_OPTION) {
+    if (EditorFileChooser.showFileDialog(SPRITE_FILE_NAME, Resources.strings().get(IMPORT_DIALOGUE, SPRITE_FILE_NAME), false, SpritesheetResource.PLAIN_TEXT_FILE_EXTENSION) == JFileChooser.APPROVE_OPTION) {
       File spriteFile = EditorFileChooser.instance().getSelectedFile();
       if (spriteFile == null) {
         return;
@@ -373,13 +375,13 @@ public class Editor extends Screen {
   }
 
   public void importSpriteSheets() {
-    if (EditorFileChooser.showFileDialog(SPRITESHEET_FILE_NAME, Resources.strings().get("import_something", SPRITE_FILE_NAME), true, ImageFormat.getAllExtensions()) == JFileChooser.APPROVE_OPTION) {
+    if (EditorFileChooser.showFileDialog(SPRITESHEET_FILE_NAME, Resources.strings().get(IMPORT_DIALOGUE, SPRITE_FILE_NAME), true, ImageFormat.getAllExtensions()) == JFileChooser.APPROVE_OPTION) {
       this.importSpriteSheets(EditorFileChooser.instance().getSelectedFiles());
     }
   }
 
   public void importSounds() {
-    if (EditorFileChooser.showFileDialog(AUDIO_FILE_NAME, Resources.strings().get("import_something", AUDIO_FILE_NAME), true, SoundFormat.getAllExtensions()) == JFileChooser.APPROVE_OPTION) {
+    if (EditorFileChooser.showFileDialog(AUDIO_FILE_NAME, Resources.strings().get(IMPORT_DIALOGUE, AUDIO_FILE_NAME), true, SoundFormat.getAllExtensions()) == JFileChooser.APPROVE_OPTION) {
       this.importSounds(EditorFileChooser.instance().getSelectedFiles());
     }
   }
@@ -413,12 +415,11 @@ public class Editor extends Screen {
     Collections.sort(allSpriteSheets);
     try (BufferedWriter writer = new BufferedWriter(new FileWriter(chooser.getSelectedFile()));) {
       // print the spritesheet information to the info file
-      for (Object spriteObject : allSpriteSheets) {
-        Spritesheet sprite = (Spritesheet) spriteObject;
+      for (Spritesheet spritesheet : allSpriteSheets) {
         // check for keyframes
-        int[] keyFrames = Resources.spritesheets().getCustomKeyFrameDurations(sprite);
-        String fileExtension = sprite.getImageFormat() == ImageFormat.UNSUPPORTED ? "" : sprite.getImageFormat().toFileExtension();
-        writer.write(String.format("%s%s,%d,%d", sprite.getName(), fileExtension, sprite.getSpriteWidth(), sprite.getSpriteHeight()));
+        int[] keyFrames = Resources.spritesheets().getCustomKeyFrameDurations(spritesheet);
+        String fileExtension = spritesheet.getImageFormat() == ImageFormat.UNSUPPORTED ? "" : spritesheet.getImageFormat().toFileExtension();
+        writer.write(String.format("%s%s,%d,%d", spritesheet.getName(), fileExtension, spritesheet.getSpriteWidth(), spritesheet.getSpriteHeight()));
         // print keyframes (if they exist)
         if (keyFrames.length > 0) {
           writer.write(";");
@@ -433,7 +434,7 @@ public class Editor extends Screen {
   }
 
   public void importTextureAtlas() {
-    if (EditorFileChooser.showFileDialog(TEXTUREATLAS_FILE_NAME, Resources.strings().get("import_something", TEXTUREATLAS_FILE_NAME), false, "xml") == JFileChooser.APPROVE_OPTION) {
+    if (EditorFileChooser.showFileDialog(TEXTUREATLAS_FILE_NAME, Resources.strings().get(IMPORT_DIALOGUE, TEXTUREATLAS_FILE_NAME), false, "xml") == JFileChooser.APPROVE_OPTION) {
       TextureAtlas atlas = TextureAtlas.read(EditorFileChooser.instance().getSelectedFile().getAbsolutePath());
       if (atlas == null) {
         return;
@@ -493,7 +494,7 @@ public class Editor extends Screen {
       try {
         emitter = XmlUtilities.read(EmitterData.class, file.toURI().toURL());
       } catch (IOException | JAXBException e) {
-        log.log(Level.SEVERE, "could not load emitter data from " + file, e);
+        log.log(Level.SEVERE, String.format("could not load emitter data from %s", file), e);
         return;
       }
 
@@ -516,7 +517,7 @@ public class Editor extends Screen {
       try {
         blueprint = XmlUtilities.read(Blueprint.class, file.toURI().toURL());
       } catch (IOException | JAXBException e) {
-        log.log(Level.SEVERE, "could not load blueprint from " + file, e);
+        log.log(Level.SEVERE, String.format("could not load blueprint from %s", file), e);
         return;
       }
       if (blueprint == null) {
@@ -545,7 +546,7 @@ public class Editor extends Screen {
         tileset = XmlUtilities.read(Tileset.class, path);
         tileset.finish(path);
       } catch (IOException | JAXBException e) {
-        log.log(Level.SEVERE, "could not load tileset from " + file, e);
+        log.log(Level.SEVERE, String.format("could not load tileset from %s", file), e);
         return;
       }
 

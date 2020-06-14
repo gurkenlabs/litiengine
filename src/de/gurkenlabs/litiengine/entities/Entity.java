@@ -52,15 +52,15 @@ public abstract class Entity implements IEntity, EntityRenderListener {
   private String name;
 
   private double width;
-  
+
   private double height;
-  
+
   @TmxProperty(name = MapObjectProperty.TAGS)
   private final List<String> tags = new CopyOnWriteArrayList<>();
-  
+
   @TmxProperty(name = MapObjectProperty.RENDERWITHLAYER)
   private boolean renderWithLayer;
-  
+
   @TmxProperty(name = MapObjectProperty.RENDERTYPE)
   private RenderType renderType;
 
@@ -571,7 +571,7 @@ public abstract class Entity implements IEntity, EntityRenderListener {
         try {
           method.invoke(this);
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-          log.log(Level.SEVERE, "Could not perform the entity action " + actionName, e);
+          log.log(Level.SEVERE, String.format("Could not perform the entity action %s", actionName), e);
         }
       });
 

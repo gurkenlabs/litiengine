@@ -21,7 +21,7 @@ import de.gurkenlabs.utiliti.swing.UI;
 public class UndoManager {
   private static final Logger log = Logger.getLogger(UndoManager.class.getName());
   private static final int MAX_STACK_SIZE = 10000;
-  private static int nextOperation = 1;
+  private int nextOperation = 1;
   private UndoState[] undoStack;
   private List<IMapObject> changing;
   private int currentIndex = -1;

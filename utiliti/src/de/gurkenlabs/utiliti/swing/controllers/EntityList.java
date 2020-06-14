@@ -82,14 +82,16 @@ public final class EntityList extends JPanel implements EntityController {
     this.btnCollape.addActionListener(e -> collapseAll());
     this.btnCollape.setIcon(Icons.COLLAPSE);
 
-    this.textField = new JTextField(Resources.strings().get("panel_entities_search_default"));
+    final String entitySearchDefault = Resources.strings().get("panel_entities_search_default");
+
+    this.textField = new JTextField(entitySearchDefault);
     this.textField.setOpaque(false);
     this.textField.setColumns(10);
     this.textField.addActionListener(e -> search());
     this.textField.addFocusListener(new FocusAdapter() {
       @Override
       public void focusGained(final FocusEvent e) {
-        if (textField.getText() != null && textField.getText().equals(Resources.strings().get("panel_entities_search_default"))) {
+        if (textField.getText() != null && textField.getText().equals(entitySearchDefault)) {
           textField.setText(null);
         }
 
@@ -100,7 +102,7 @@ public final class EntityList extends JPanel implements EntityController {
       @Override
       public void focusLost(FocusEvent e) {
         if (textField.getText() == null || textField.getText().isEmpty()) {
-          textField.setText(Resources.strings().get("panel_entities_search_default"));
+          textField.setText(entitySearchDefault);
         }
         super.focusLost(e);
       }
@@ -226,7 +228,7 @@ public final class EntityList extends JPanel implements EntityController {
       return;
     }
   }
-  
+
   @Override
   public void refresh() {
     this.nodeRoot.setUserObject(new IconTreeListItem((Game.world().environment() == null ? 0 : Game.world().environment().getEntities().size()) + " " + Resources.strings().get("panel_mapselection_entities"), Icons.FOLDER));

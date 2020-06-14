@@ -18,20 +18,14 @@ public final class StreamUtilities {
   }
 
   public static void copy(final File file, final OutputStream out) throws IOException {
-    final InputStream in = new FileInputStream(file);
-    try {
+    try (InputStream in = new FileInputStream(file)) {
       copy(in, out);
-    } finally {
-      in.close();
     }
   }
 
   public static void copy(final InputStream in, final File file) throws IOException {
-    final OutputStream out = new FileOutputStream(file);
-    try {
+    try (OutputStream out = new FileOutputStream(file)) {
       copy(in, out);
-    } finally {
-      out.close();
     }
   }
 
@@ -41,7 +35,7 @@ public final class StreamUtilities {
     if (in.markSupported()) {
       in.mark(Integer.MAX_VALUE);
     }
-    
+
     while (true) {
       final int readCount = in.read(buffer);
       if (readCount < 0) {
@@ -49,7 +43,7 @@ public final class StreamUtilities {
       }
       out.write(buffer, 0, readCount);
     }
-    
+
     if (in.markSupported()) {
       in.reset();
     }

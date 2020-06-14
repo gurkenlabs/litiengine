@@ -315,8 +315,8 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
     sb.append("#" + this.getId() + ": ");
     sb.append(this.getName() == null ? "" : "\'" + this.getName() + "\' ");
     sb.append("" + this.getType());
-    sb.append("; x: " + this.getX() == null ? "" : this.getX());
-    sb.append("; y: " + this.getY() == null ? "" : this.getY());
+    sb.append("; x: " + this.getX());
+    sb.append("; y: " + this.getY());
     sb.append("; width: " + this.getWidth());
     sb.append("; height: " + this.getHeight());
     return sb.toString();

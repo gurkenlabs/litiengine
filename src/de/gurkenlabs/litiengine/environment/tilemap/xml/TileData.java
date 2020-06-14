@@ -350,7 +350,7 @@ public class TileData {
         if (tileId == Tile.NONE) {
           parsed.add(Tile.EMPTY);
         } else {
-          parsed.add(new Tile((int) tileId));
+          parsed.add(new Tile(tileId));
         }
       }
     }
@@ -485,15 +485,15 @@ public class TileData {
   }
 
   private List<Tile> parseData() throws InvalidTileLayerException {
-    List<Tile> tiles;
+    List<Tile> tmpTiles;
     if (this.getEncoding().equals(Encoding.BASE64)) {
-      tiles = parseBase64Data(this.value, this.compression);
+      tmpTiles = parseBase64Data(this.value, this.compression);
     } else if (this.getEncoding().equals(Encoding.CSV)) {
-      tiles = parseCsvData(this.value);
+      tmpTiles = parseCsvData(this.value);
     } else {
       throw new IllegalArgumentException("Unsupported tile layer encoding " + this.getEncoding());
     }
 
-    return tiles;
+    return tmpTiles;
   }
 }

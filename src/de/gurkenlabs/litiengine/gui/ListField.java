@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.IntConsumer;
@@ -165,7 +166,7 @@ public class ListField extends GuiComponent {
    */
   public List<ImageComponent> getListEntry(final int column) {
     if (column < 0 || column >= this.listEntries.size()) {
-      return null;
+      return new ArrayList<>();
     }
     return this.listEntries.get(column);
   }
