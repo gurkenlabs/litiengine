@@ -543,7 +543,6 @@ public class MapComponent extends GuiComponent {
 
       Editor.instance().getGameFile().getEmitters().removeIf(x -> x.getName().equals(data.getName()));
       Editor.instance().getGameFile().getEmitters().add(data);
-      return;
     }
 
     Blueprint blueprint = new Blueprint(name.toString(), this.getSelectedMapObjects().toArray(new MapObject[this.getSelectedMapObjects().size()]));
