@@ -89,7 +89,7 @@ public final class ReflectionUtilities {
         }
       }
     } catch (final SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-      log.log(Level.SEVERE, e.getMessage() + " (" + fieldName + " - " + value + ")", e);
+      log.log(Level.SEVERE, String.format("%s (%s-%s)", e.getMessage(), fieldName, value), e);
     }
 
     return false;

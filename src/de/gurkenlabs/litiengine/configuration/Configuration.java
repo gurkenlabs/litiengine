@@ -130,7 +130,7 @@ public class Configuration {
           this.createDefaultSettingsFile(out);
         }
 
-        log.log(Level.INFO, "Default configuration " + this.getFileName() + " created");
+        log.log(Level.INFO, "Default configuration {0} created", this.getFileName());
         return;
       }
     } catch (final IOException e) {
@@ -148,7 +148,7 @@ public class Configuration {
         stream.close();
 
         this.initializeSettingsByProperties(properties);
-        log.log(Level.INFO, "Configuration " + this.getFileName() + " loaded");
+        log.log(Level.INFO, "Configuration {0} created", this.getFileName());
       } catch (final IOException e) {
         log.log(Level.SEVERE, e.getMessage(), e);
       }
@@ -171,7 +171,7 @@ public class Configuration {
 
         storeConfigurationGroup(out, group);
       }
-      log.log(Level.INFO, "Configuration " + this.getFileName() + " saved");
+      log.log(Level.INFO, "Configuration {0} saved", this.getFileName());
     } catch (final IOException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
     }

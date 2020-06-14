@@ -21,6 +21,7 @@ import java.awt.image.ImageProducer;
 import java.awt.image.RGBImageFilter;
 import java.awt.image.WritableRaster;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.UnaryOperator;
 
 import de.gurkenlabs.litiengine.entities.Rotation;
@@ -420,11 +421,11 @@ public final class Imaging {
    */
   public static BufferedImage replaceColors(final BufferedImage bufferedImage, Map<Color, Color> colorMappings) {
     BufferedImage recoloredImage = copy(bufferedImage);
-    for (Color originalColor : colorMappings.keySet()) {
+    for (Entry<Color, Color> c : colorMappings.entrySet()) {
       for (int y = 0; y < recoloredImage.getHeight(); y++) {
         for (int x = 0; x < recoloredImage.getWidth(); x++) {
-          if (recoloredImage.getRGB(x, y) == originalColor.getRGB()) {
-            int newColor = colorMappings.get(originalColor).getRGB();
+          if (recoloredImage.getRGB(x, y) == c.getKey().getRGB()) {
+            int newColor = c.getValue().getRGB();
             recoloredImage.setRGB(x, y, newColor);
           }
         }
@@ -591,6 +592,9 @@ public final class Imaging {
     }
 
     final BufferedImage compatibleImg = getCompatibleImage(image.getWidth(), image.getHeight());
+    if (compatibleImg == null) {
+      return null;
+    }
     compatibleImg.createGraphics().drawImage(image, 0, 0, null);
 
     return compatibleImg;

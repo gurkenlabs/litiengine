@@ -1,7 +1,8 @@
 package de.gurkenlabs.litiengine.util;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ListUtilities {
   private ListUtilities() {
@@ -13,11 +14,6 @@ public class ListUtilities {
   }
 
   public static List<Integer> getIntList(int... values) {
-    List<Integer> list = new ArrayList<>();
-    for (int upKey : values) {
-      list.add(upKey);
-    }
-
-    return list;
+    return Arrays.stream(values).boxed().collect(Collectors.toList());
   }
 }
