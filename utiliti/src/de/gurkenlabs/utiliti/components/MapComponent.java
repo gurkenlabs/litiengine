@@ -45,6 +45,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.litiengine.gui.ComponentMouseEvent;
 import de.gurkenlabs.litiengine.gui.ComponentMouseWheelEvent;
@@ -535,9 +536,17 @@ public class MapComponent extends GuiComponent {
     if (name == null) {
       return;
     }
+    if (this.getFocusedMapObject().getType().equals(MapObjectType.EMITTER.toString())) {
+      Emitter emitter = Game.world().environment().getEmitter(this.getFocusedMapObject().getId());
+      final EmitterData data = emitter.data();
+      data.setName(name.toString());
+
+      Editor.instance().getGameFile().getEmitters().removeIf(x -> x.getName().equals(data.getName()));
+      Editor.instance().getGameFile().getEmitters().add(data);
+      return;
+    }
 
     Blueprint blueprint = new Blueprint(name.toString(), this.getSelectedMapObjects().toArray(new MapObject[this.getSelectedMapObjects().size()]));
-
     Editor.instance().getGameFile().getBluePrints().add(blueprint);
   }
 

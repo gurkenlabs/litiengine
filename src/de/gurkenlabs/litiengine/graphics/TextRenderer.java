@@ -64,9 +64,9 @@ public final class TextRenderer {
    * @param verticalAlignment
    *          The vertical alignment.
    */
-  public static void render(final Graphics2D g, final String text, Align alignment, Valign verticalAlignment, double offesetX, double offsetY) {
+  public static void render(final Graphics2D g, final String text, Align alignment, Valign verticalAlignment, double offsetX, double offsetY) {
     final Rectangle2D bounds = g.getClipBounds();
-    render(g, text, bounds, alignment, verticalAlignment, offesetX, offsetY, false);
+    render(g, text, bounds, alignment, verticalAlignment, offsetX, offsetY, false);
   }
 
   public static void render(final Graphics2D g, final String text, Rectangle2D bounds, Align alignment, Valign verticalAlignment, boolean scaleFont) {

@@ -74,11 +74,9 @@ public abstract class Particle implements ITimeToLive {
    * Constructs a new particle.
    * 
    * @param width
-   *          the width
+   *          the particle width in pixels
    * @param height
-   *          the height
-   * @param color
-   *          The color of the effect.
+   *          the particle height in pixels
    */
   public Particle(final float width, final float height) {
     this.setCustomRenderType(RenderType.NONE);

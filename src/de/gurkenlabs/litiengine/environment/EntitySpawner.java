@@ -51,6 +51,8 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
    * 
    * @param amount
    *          The amount of entities to spawn on every spawn event.
+   * @param spawnMode
+   *          the spawning behaviour
    */
   public EntitySpawner(final List<Spawnpoint> spawnpoints, final int interval, final int amount, SpawnMode spawnMode) {
     this.interval = interval;
