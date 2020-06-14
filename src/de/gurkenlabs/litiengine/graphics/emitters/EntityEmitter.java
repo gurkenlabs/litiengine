@@ -3,16 +3,35 @@ package de.gurkenlabs.litiengine.graphics.emitters;
 import java.awt.geom.Point2D;
 
 import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 
 /**
- * An abstract implementation for emitters that are bound to <code>IEntity.getLocation()</code>.
+ * A standard implementation for emitters that are bound to <code>IEntity.getLocation()</code>.
  * 
  * @see IEntity#getLocation()
  */
-public abstract class EntityEmitter extends Emitter {
+public class EntityEmitter extends Emitter {
 
   private final IEntity entity;
   private boolean dynamicLocation;
+
+  public EntityEmitter(final IEntity entity, final String emitterXml, final boolean dynamicLocation) {
+    this(entity, dynamicLocation);
+    setEmitterData(emitterXml);
+  }
+
+  public EntityEmitter(final IEntity entity, final String emitterXml) {
+    this(entity, emitterXml, false);
+  }
+
+  public EntityEmitter(final IEntity entity, final EmitterData emitterData, final boolean dynamicLocation) {
+    this(entity, dynamicLocation);
+    setEmitterData(emitterData);
+  }
+
+  public EntityEmitter(final IEntity entity, final EmitterData emitterData) {
+    this(entity, emitterData, false);
+  }
 
   /**
    * Instantiates a new entity emitter.

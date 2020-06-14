@@ -3,7 +3,6 @@ package de.gurkenlabs.litiengine.graphics;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.awt.Color;
 import java.awt.geom.Point2D;
 
 import org.junit.jupiter.api.AfterAll;
@@ -12,8 +11,8 @@ import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameTest;
-import de.gurkenlabs.litiengine.graphics.emitters.particles.RectangleParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.LineParticle;
+import de.gurkenlabs.litiengine.graphics.emitters.particles.RectangleParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.TextParticle;
 import de.gurkenlabs.litiengine.physics.Collision;
 
@@ -30,15 +29,15 @@ public class ParticleTests {
 
   @Test
   public void initializeParticleTypes() {
-    assertDoesNotThrow(() -> new RectangleParticle(10, 10, Color.WHITE));
-    assertDoesNotThrow(() -> new LineParticle(10, 10, Color.WHITE));
-    assertDoesNotThrow(() -> new TextParticle(null, Color.WHITE));
-    assertDoesNotThrow(() -> new TextParticle("test", Color.WHITE));
+    assertDoesNotThrow(() -> new RectangleParticle(10, 10));
+    assertDoesNotThrow(() -> new LineParticle(10, 10));
+    assertDoesNotThrow(() -> new TextParticle(null));
+    assertDoesNotThrow(() -> new TextParticle("test"));
   }
 
   @Test
   public void testDeltaSize() {
-    RectangleParticle part = new RectangleParticle(10, 10, Color.WHITE);
+    RectangleParticle part = new RectangleParticle(10, 10);
     part.setCollisionType(Collision.NONE);
     part.setDeltaHeight(0.1f);
     part.setDeltaWidth(0.1f);
@@ -51,7 +50,7 @@ public class ParticleTests {
 
   @Test
   public void testDeltaLocation() {
-    RectangleParticle part = new RectangleParticle(10, 10, Color.WHITE);
+    RectangleParticle part = new RectangleParticle(10, 10);
     part.setCollisionType(Collision.NONE);
     part.setVelocityX(0.1f);
     part.setVelocityY(0.1f);

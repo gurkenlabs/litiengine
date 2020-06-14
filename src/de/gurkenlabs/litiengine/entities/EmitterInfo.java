@@ -9,6 +9,7 @@ import java.lang.annotation.Target;
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.configuration.Quality;
+import de.gurkenlabs.litiengine.graphics.emitters.particles.ParticleType;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 
 /**
@@ -35,9 +36,11 @@ public @interface EmitterInfo {
 
   int spawnRate() default EmitterData.DEFAULT_SPAWNRATE;
 
-  Align originAlign() default Align.LEFT;
+  Align originAlign() default Align.CENTER;
 
-  Valign originVAlign() default Valign.TOP;
+  Valign originValign() default Valign.MIDDLE;
 
   Quality requiredQuality() default Quality.VERYLOW;
+
+  ParticleType particleType() default ParticleType.RECTANGLE;
 }

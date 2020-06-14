@@ -1,6 +1,5 @@
 package de.gurkenlabs.litiengine.graphics.emitters.particles;
 
-import java.awt.Color;
 import java.awt.Polygon;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
@@ -9,8 +8,8 @@ import java.awt.geom.Point2D;
 public class PolygonParticle extends ShapeParticle {
   private int sides;
 
-  public PolygonParticle(float width, float height, Color color, int sides) {
-    super(width, height, color);
+  public PolygonParticle(float width, float height, int sides) {
+    super(width, height);
     this.sides = sides;
   }
 

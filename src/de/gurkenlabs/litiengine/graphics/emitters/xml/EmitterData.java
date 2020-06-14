@@ -3,7 +3,9 @@ package de.gurkenlabs.litiengine.graphics.emitters.xml;
 import java.awt.Color;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -16,6 +18,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.configuration.Quality;
+import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.ParticleType;
 import de.gurkenlabs.litiengine.physics.Collision;
 import de.gurkenlabs.litiengine.resources.Resource;
@@ -75,10 +78,10 @@ public class EmitterData implements Serializable, Resource {
   public static final float DEFAULT_MIN_ACCELERATION_Y = -.01f;
   public static final float DEFAULT_MAX_ACCELERATION_Y = .01f;
 
-  public static final float DEFAULT_MIN_ROTATION = 0;
+  public static final float DEFAULT_MIN_ANGLE = 0;
   public static final float DEFAULT_MAX_ROTATION = 360;
-  public static final float DEFAULT_MIN_DELTA_ROTATION = -1;
-  public static final float DEFAULT_MAX_DELTA_ROTATION = 1;
+  public static final float DEFAULT_MIN_DELTA_ANGLE = -1;
+  public static final float DEFAULT_MAX_DELTA_ANGLE = 1;
 
   public static final float DEFAULT_MIN_VELOCITY_X = -.1f;
   public static final float DEFAULT_MAX_VELOCITY_X = .1f;
@@ -101,6 +104,9 @@ public class EmitterData implements Serializable, Resource {
 
   @XmlElement
   private Collision collisionType;
+
+  @XmlElement
+  private Quality requiredQuality;
 
   @XmlElement
   private float colorVariance;
@@ -143,10 +149,10 @@ public class EmitterData implements Serializable, Resource {
   private ParticleParameter accelerationY;
 
   @XmlElement
-  private ParticleParameter rotation;
+  private ParticleParameter angle;
 
   @XmlElement
-  private ParticleParameter deltaRotation;
+  private ParticleParameter deltaAngle;
 
   @XmlAttribute
   private float height;
@@ -201,42 +207,26 @@ public class EmitterData implements Serializable, Resource {
   private ParticleParameter offsetY;
 
   public EmitterData() {
-    this.offsetX = new ParticleParameter(DEFAULT_MIN_OFFSET_X, DEFAULT_MAX_OFFSET_X);
-    this.offsetY = new ParticleParameter(DEFAULT_MIN_OFFSET_Y, DEFAULT_MAX_OFFSET_Y);
-    this.deltaWidth = new ParticleParameter(DEFAULT_MIN_DELTA_WIDTH, DEFAULT_MAX_DELTA_WIDTH);
-    this.deltaHeight = new ParticleParameter(DEFAULT_MIN_DELTA_HEIGHT, DEFAULT_MAX_DELTA_HEIGHT);
-    this.rotation = new ParticleParameter(DEFAULT_MIN_ROTATION, DEFAULT_MAX_ROTATION);
-    this.deltaRotation = new ParticleParameter(DEFAULT_MIN_DELTA_ROTATION, DEFAULT_MAX_DELTA_ROTATION);
-    this.velocityX = new ParticleParameter(DEFAULT_MIN_VELOCITY_X, DEFAULT_MAX_VELOCITY_X);
-    this.velocityY = new ParticleParameter(DEFAULT_MIN_VELOCITY_Y, DEFAULT_MAX_VELOCITY_Y);
-    this.accelerationX = new ParticleParameter(DEFAULT_MIN_ACCELERATION_X, DEFAULT_MAX_ACCELERATION_X);
-    this.accelerationY = new ParticleParameter(DEFAULT_MIN_ACCELERATION_Y, DEFAULT_MAX_ACCELERATION_Y);
-    this.particleWidth = new ParticleParameter(DEFAULT_MIN_WIDTH, DEFAULT_MAX_WIDTH);
-    this.particleHeight = new ParticleParameter(DEFAULT_MIN_HEIGHT, DEFAULT_MAX_HEIGHT);
-    this.particleTTL = new ParticleParameter(DEFAULT_MIN_PARTICLE_TTL, DEFAULT_MAX_PARTICLE_TTL);
-    this.setColor(DEFAULT_COLOR);
-    this.emitterDuration = DEFAULT_DURATION;
-    this.width = DEFAULT_WIDTH;
-    this.height = DEFAULT_HEIGHT;
-    this.colorVariance = DEFAULT_COLOR_VARIANCE;
-    this.alphaVariance = DEFAULT_ALPHA_VARIANCE;
-    this.updateRate = DEFAULT_UPDATERATE;
+    // initialize fields required for rendering and updating properly.
+    this.requiredQuality = DEFAULT_REQUIRED_QUALITY;
+    this.offsetX = new ParticleParameter();
+    this.offsetY = new ParticleParameter();
+    this.deltaWidth = new ParticleParameter();
+    this.deltaHeight = new ParticleParameter();
+    this.angle = new ParticleParameter();
+    this.deltaAngle = new ParticleParameter();
+    this.velocityX = new ParticleParameter();
+    this.velocityY = new ParticleParameter();
+    this.accelerationX = new ParticleParameter();
+    this.accelerationY = new ParticleParameter();
+    this.particleWidth = new ParticleParameter();
+    this.particleHeight = new ParticleParameter();
+    this.particleTTL = new ParticleParameter();
     this.collisionType = DEFAULT_COLLISION;
-    this.maxParticles = DEFAULT_MAXPARTICLES;
-    this.name = DEFAULT_NAME;
-    this.setText(DEFAULT_TEXT);
     this.particleType = DEFAULT_PARTICLE_TYPE;
-    this.spawnAmount = DEFAULT_SPAWNAMOUNT;
-    this.spawnRate = DEFAULT_SPAWNRATE;
-    this.animateSprite = DEFAULT_ANIMATE_SPRITE;
-    this.loopSprite = DEFAULT_LOOP_SPRITE;
-    this.spritesheet = DEFAULT_SPRITESHEET;
     this.originValign = DEFAULT_ORIGIN_VALIGN;
     this.originAlign = DEFAULT_ORIGIN_ALIGN;
-    this.fade = DEFAULT_FADE;
-    this.fadeOnCollision = DEFAULT_FADE_ON_COLLISION;
-    this.outlineOnly = DEFAULT_OUTLINE_ONLY;
-    this.antiAliasing = DEFAULT_ANTIALIASING;
+    this.setColor(DEFAULT_COLOR);
   }
 
   @XmlTransient
@@ -247,6 +237,11 @@ public class EmitterData implements Serializable, Resource {
   @XmlTransient
   public Collision getCollisionType() {
     return this.collisionType;
+  }
+
+  @XmlTransient
+  public Quality getRequiredQuality() {
+    return this.requiredQuality;
   }
 
   @XmlTransient
@@ -271,12 +266,12 @@ public class EmitterData implements Serializable, Resource {
 
   @XmlTransient
   public ParticleParameter getAngle() {
-    return this.rotation;
+    return this.angle;
   }
 
   @XmlTransient
   public ParticleParameter getDeltaAngle() {
-    return this.deltaRotation;
+    return this.deltaAngle;
   }
 
   @XmlTransient
@@ -425,8 +420,12 @@ public class EmitterData implements Serializable, Resource {
     this.loopSprite = loopSprite;
   }
 
-  public void setCollisionType(final Collision physics) {
-    this.collisionType = physics;
+  public void setCollisionType(final Collision collisionType) {
+    this.collisionType = collisionType;
+  }
+
+  public void setRequiredQuality(final Quality minQuality) {
+    this.requiredQuality = minQuality;
   }
 
   public void setColor(final Color color) {
@@ -443,6 +442,10 @@ public class EmitterData implements Serializable, Resource {
     this.colors = colors;
   }
 
+  public void setColors(final Color... colors) {
+    this.colors = Arrays.stream(colors).map(ColorHelper::encode).collect(Collectors.toList());
+  }
+
   public void setDeltaHeight(final ParticleParameter deltaHeight) {
     this.deltaHeight = deltaHeight;
   }
@@ -451,12 +454,61 @@ public class EmitterData implements Serializable, Resource {
     this.deltaWidth = deltaWidth;
   }
 
-  public void setRotation(final ParticleParameter rotation) {
-    this.rotation = rotation;
+  public void initDefaults() {
+    this.width = DEFAULT_WIDTH;
+    this.height = DEFAULT_HEIGHT;
+    this.offsetX.setMinValue(DEFAULT_MIN_OFFSET_X);
+    this.offsetX.setMaxValue(DEFAULT_MAX_OFFSET_X);
+    this.offsetY.setMinValue(DEFAULT_MIN_OFFSET_Y);
+    this.offsetY.setMaxValue(DEFAULT_MAX_OFFSET_Y);
+    this.deltaWidth.setMinValue(DEFAULT_MIN_DELTA_WIDTH);
+    this.deltaWidth.setMaxValue(DEFAULT_MAX_DELTA_WIDTH);
+    this.deltaHeight.setMinValue(DEFAULT_MIN_DELTA_HEIGHT);
+    this.deltaHeight.setMaxValue(DEFAULT_MAX_DELTA_HEIGHT);
+    this.angle.setMinValue(DEFAULT_MIN_ANGLE);
+    this.angle.setMaxValue(DEFAULT_MAX_ROTATION);
+    this.deltaAngle.setMinValue(DEFAULT_MIN_DELTA_ANGLE);
+    this.deltaAngle.setMaxValue(DEFAULT_MAX_DELTA_ANGLE);
+    this.velocityX.setMinValue(DEFAULT_MIN_VELOCITY_X);
+    this.velocityX.setMaxValue(DEFAULT_MAX_VELOCITY_X);
+    this.velocityY.setMinValue(DEFAULT_MIN_VELOCITY_Y);
+    this.velocityY.setMaxValue(DEFAULT_MAX_VELOCITY_Y);
+    this.accelerationX.setMinValue(DEFAULT_MIN_ACCELERATION_X);
+    this.accelerationX.setMaxValue(DEFAULT_MAX_ACCELERATION_X);
+    this.accelerationY.setMinValue(DEFAULT_MIN_ACCELERATION_Y);
+    this.accelerationY.setMaxValue(DEFAULT_MAX_ACCELERATION_Y);
+    this.particleWidth.setMinValue(DEFAULT_MIN_WIDTH);
+    this.particleWidth.setMaxValue(DEFAULT_MAX_WIDTH);
+    this.particleHeight.setMinValue(DEFAULT_MIN_HEIGHT);
+    this.particleHeight.setMaxValue(DEFAULT_MAX_HEIGHT);
+    this.particleTTL.setMinValue(DEFAULT_MIN_PARTICLE_TTL);
+    this.particleTTL.setMaxValue(DEFAULT_MAX_PARTICLE_TTL);
+
+    this.setColor(DEFAULT_COLOR);
+    this.emitterDuration = DEFAULT_DURATION;
+    this.colorVariance = DEFAULT_COLOR_VARIANCE;
+    this.alphaVariance = DEFAULT_ALPHA_VARIANCE;
+    this.updateRate = DEFAULT_UPDATERATE;
+    this.maxParticles = DEFAULT_MAXPARTICLES;
+    this.name = DEFAULT_NAME;
+    this.setText(DEFAULT_TEXT);
+    this.spawnAmount = DEFAULT_SPAWNAMOUNT;
+    this.spawnRate = DEFAULT_SPAWNRATE;
+    this.animateSprite = DEFAULT_ANIMATE_SPRITE;
+    this.loopSprite = DEFAULT_LOOP_SPRITE;
+    this.spritesheet = DEFAULT_SPRITESHEET;
+    this.fade = DEFAULT_FADE;
+    this.fadeOnCollision = DEFAULT_FADE_ON_COLLISION;
+    this.outlineOnly = DEFAULT_OUTLINE_ONLY;
+    this.antiAliasing = DEFAULT_ANTIALIASING;
+  }
+
+  public void setAngle(final ParticleParameter angle) {
+    this.angle = angle;
   }
 
   public void setDeltaRotation(final ParticleParameter deltaRotation) {
-    this.deltaRotation = deltaRotation;
+    this.deltaAngle = deltaRotation;
   }
 
   public void setVelocityX(final ParticleParameter velocityX) {
@@ -548,8 +600,12 @@ public class EmitterData implements Serializable, Resource {
     this.spawnRate = spawnRate;
   }
 
-  public void setSpritesheet(final String spritesheet) {
-    this.spritesheet = spritesheet;
+  public void setSpritesheet(final String spritesheetName) {
+    this.spritesheet = spritesheetName;
+  }
+
+  public void setSpritesheet(final Spritesheet spritesheet) {
+    this.spritesheet = spritesheet.getName();
   }
 
   public void setText(final String text) {

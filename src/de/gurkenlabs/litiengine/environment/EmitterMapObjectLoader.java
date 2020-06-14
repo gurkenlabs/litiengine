@@ -5,13 +5,14 @@ import java.util.Collection;
 
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Valign;
+import de.gurkenlabs.litiengine.configuration.Quality;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
+import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.ParticleType;
-import de.gurkenlabs.litiengine.graphics.emitters.xml.CustomEmitter;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.ParticleParameter;
 import de.gurkenlabs.litiengine.physics.Collision;
@@ -33,16 +34,12 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
 
     EmitterData data = createEmitterData(mapObject);
 
-    CustomEmitter emitter = this.createCustomEmitter(data);
+    Emitter emitter = new Emitter(data);
     loadDefaultProperties(emitter, mapObject);
 
     entities.add(emitter);
 
     return entities;
-  }
-
-  protected CustomEmitter createCustomEmitter(EmitterData data) {
-    return new CustomEmitter(data);
   }
 
   public static EmitterData createEmitterData(IMapObject mapObject) {
@@ -73,11 +70,12 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     data.setAccelerationY(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.ACCELERATION_Y_MIN), mapObject.getFloatValue(MapObjectProperty.Particle.ACCELERATION_Y_MAX)));
     data.setDeltaWidth(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.DELTAWIDTH_MIN), mapObject.getFloatValue(MapObjectProperty.Particle.DELTAWIDTH_MAX)));
     data.setDeltaHeight(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.DELTAHEIGHT_MIN), mapObject.getFloatValue(MapObjectProperty.Particle.DELTAHEIGHT_MAX)));
-    data.setRotation(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.ROTATION_MIN), mapObject.getFloatValue(MapObjectProperty.Particle.ROTATION_MAX)));
-    data.setDeltaRotation(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.DELTAROTATION_MIN), mapObject.getFloatValue(MapObjectProperty.Particle.DELTAROTATION_MAX)));
+    data.setAngle(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.ANGLE_MIN), mapObject.getFloatValue(MapObjectProperty.Particle.ANGLE_MAX)));
+    data.setDeltaRotation(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.DELTA_ANGLE_MIN), mapObject.getFloatValue(MapObjectProperty.Particle.DELTA_ANGLE_MAX)));
     data.setParticleTTL(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.TTL_MIN), mapObject.getFloatValue(MapObjectProperty.Particle.TTL_MAX)));
 
-    data.setCollisionType(mapObject.getEnumValue(MapObjectProperty.COLLISION_TYPE, Collision.class, Collision.NONE));
+    data.setCollisionType(mapObject.getEnumValue(MapObjectProperty.COLLISION_TYPE, Collision.class, EmitterData.DEFAULT_COLLISION));
+    data.setRequiredQuality(mapObject.getEnumValue(MapObjectProperty.REQUIRED_QUALITY, Quality.class, EmitterData.DEFAULT_REQUIRED_QUALITY));
 
     data.setTexts(mapObject.getCommaSeparatedStringValues(MapObjectProperty.Particle.TEXTS, EmitterData.DEFAULT_TEXT));
     data.setSpritesheet(mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME));
@@ -122,8 +120,8 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     mo.setValue(MapObjectProperty.Particle.ACCELERATION_Y_MIN, emitterData.getAccelerationY().getMinValue());
     mo.setValue(MapObjectProperty.Particle.DELTAWIDTH_MIN, emitterData.getDeltaWidth().getMinValue());
     mo.setValue(MapObjectProperty.Particle.DELTAHEIGHT_MIN, emitterData.getDeltaHeight().getMinValue());
-    mo.setValue(MapObjectProperty.Particle.ROTATION_MIN, emitterData.getAngle().getMinValue());
-    mo.setValue(MapObjectProperty.Particle.DELTAROTATION_MIN, emitterData.getDeltaAngle().getMinValue());
+    mo.setValue(MapObjectProperty.Particle.ANGLE_MIN, emitterData.getAngle().getMinValue());
+    mo.setValue(MapObjectProperty.Particle.DELTA_ANGLE_MIN, emitterData.getDeltaAngle().getMinValue());
     mo.setValue(MapObjectProperty.Particle.TTL_MIN, emitterData.getParticleTTL().getMinValue());
     //  Particle parameters, max bounds
     mo.setValue(MapObjectProperty.Particle.OFFSET_X_MAX, emitterData.getParticleOffsetX().getMaxValue());
@@ -136,11 +134,12 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     mo.setValue(MapObjectProperty.Particle.ACCELERATION_Y_MAX, emitterData.getAccelerationY().getMaxValue());
     mo.setValue(MapObjectProperty.Particle.DELTAWIDTH_MAX, emitterData.getDeltaWidth().getMaxValue());
     mo.setValue(MapObjectProperty.Particle.DELTAHEIGHT_MAX, emitterData.getDeltaHeight().getMaxValue());
-    mo.setValue(MapObjectProperty.Particle.ROTATION_MAX, emitterData.getAngle().getMaxValue());
-    mo.setValue(MapObjectProperty.Particle.DELTAROTATION_MAX, emitterData.getDeltaAngle().getMaxValue());
+    mo.setValue(MapObjectProperty.Particle.ANGLE_MAX, emitterData.getAngle().getMaxValue());
+    mo.setValue(MapObjectProperty.Particle.DELTA_ANGLE_MAX, emitterData.getDeltaAngle().getMaxValue());
     mo.setValue(MapObjectProperty.Particle.TTL_MAX, emitterData.getParticleTTL().getMaxValue());
 
     mo.setValue(MapObjectProperty.COLLISION_TYPE, emitterData.getCollisionType());
+    mo.setValue(MapObjectProperty.REQUIRED_QUALITY, emitterData.getRequiredQuality());
     String commaSeperatedTexts = ArrayUtilities.join(emitterData.getTexts());
     mo.setValue(MapObjectProperty.Particle.TEXTS, commaSeperatedTexts);
 

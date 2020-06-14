@@ -1,6 +1,5 @@
 package de.gurkenlabs.litiengine.graphics.emitters.particles;
 
-import java.awt.Color;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
@@ -8,8 +7,8 @@ import java.awt.geom.Point2D;
 
 public class LineParticle extends ShapeParticle {
 
-  public LineParticle(final float width, final float height, final Color color) {
-    super(width, height, color);
+  public LineParticle(final float width, final float height) {
+    super(width, height);
   }
 
   @Override

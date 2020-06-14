@@ -19,7 +19,7 @@ public class SpriteParticle extends Particle {
   private Spritesheet spritesheet;
 
   public SpriteParticle(final Spritesheet spritesheet) {
-    super(0, 0, null);
+    super(0, 0);
     this.spritesheet = spritesheet;
     if (spritesheet == null) {
       return;

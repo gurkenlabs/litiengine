@@ -13,6 +13,7 @@ public final class MapObjectProperty {
   public static final String TAGS = "tags";
   public static final String RENDERTYPE = "renderType";
   public static final String RENDERWITHLAYER = "renderWithLayer";
+  public static final String REQUIRED_QUALITY="requiredQuality";  
 
   // collision entity
   public static final String COLLISION = "collision";
@@ -115,10 +116,10 @@ public final class MapObjectProperty {
     public static final String DELTAWIDTH_MAX = "particleMaxDeltaWidth";
     public static final String DELTAHEIGHT_MIN = "particleMinDeltaHeight";
     public static final String DELTAHEIGHT_MAX = "particleMaxDeltaHeight";
-    public static final String ROTATION_MIN = "particleMinRotation";
-    public static final String ROTATION_MAX = "particleMaxRotation";
-    public static final String DELTAROTATION_MIN = "particleMinDeltaRotation";
-    public static final String DELTAROTATION_MAX = "particleMaxDeltaRotation";
+    public static final String ANGLE_MIN = "particleMinAngle";
+    public static final String ANGLE_MAX = "particleMaxAngle";
+    public static final String DELTA_ANGLE_MIN = "particleMinDeltaAngle";
+    public static final String DELTA_ANGLE_MAX = "particleMaxDeltaAngle";
     public static final String TTL_MIN = "particleMinTTL";
     public static final String TTL_MAX = "particleMaxTTL";
     public static final String ANIMATESPRITE = "particleAnimateSprite";
@@ -128,9 +129,6 @@ public final class MapObjectProperty {
     public static final String FADEONCOLLISION = "particleFadeOnCollision";
     public static final String OUTLINEONLY = "particleOutlineOnly";
     public static final String ANTIALIASING = "particleAntiAliasing";
-
-    private Particle() {
-    }
   }
 
   private MapObjectProperty() {

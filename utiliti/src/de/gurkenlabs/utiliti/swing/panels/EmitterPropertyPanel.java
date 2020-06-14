@@ -338,8 +338,8 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
 
     private ParticleRotationPanel() {
       super();
-      startAngle = new DualSpinner(MapObjectProperty.Particle.ROTATION_MIN, MapObjectProperty.Particle.ROTATION_MAX, -360, 360, EmitterData.DEFAULT_MIN_ROTATION, EmitterData.DEFAULT_MAX_ROTATION, STEP_ONE);
-      deltaAngle = new DualSpinner(MapObjectProperty.Particle.DELTAROTATION_MIN, MapObjectProperty.Particle.DELTAROTATION_MAX, -360, 360, EmitterData.DEFAULT_MIN_DELTA_ROTATION, EmitterData.DEFAULT_MAX_DELTA_ROTATION, STEP_FINE);
+      startAngle = new DualSpinner(MapObjectProperty.Particle.ANGLE_MIN, MapObjectProperty.Particle.ANGLE_MAX, -360, 360, EmitterData.DEFAULT_MIN_ANGLE, EmitterData.DEFAULT_MAX_ROTATION, STEP_ONE);
+      deltaAngle = new DualSpinner(MapObjectProperty.Particle.DELTA_ANGLE_MIN, MapObjectProperty.Particle.DELTA_ANGLE_MAX, -360, 360, EmitterData.DEFAULT_MIN_DELTA_ANGLE, EmitterData.DEFAULT_MAX_DELTA_ANGLE, STEP_FINE);
 
       setLayout(createLayout());
       setupChangedListeners();

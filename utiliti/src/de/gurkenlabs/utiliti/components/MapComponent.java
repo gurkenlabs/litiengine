@@ -880,6 +880,7 @@ public class MapComponent extends GuiComponent {
     switch (type) {
     case EMITTER:
       EmitterData defaultData = new EmitterData();
+      defaultData.initDefaults();
       defaultData.setWidth(mo.getWidth());
       defaultData.setHeight(mo.getHeight());
       defaultData.setName(mo.getName());

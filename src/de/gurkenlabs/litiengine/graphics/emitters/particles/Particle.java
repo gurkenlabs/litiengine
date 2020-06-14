@@ -10,7 +10,9 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.ITimeToLive;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
+import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.litiengine.physics.Collision;
+import de.gurkenlabs.litiengine.util.ColorHelper;
 
 public abstract class Particle implements ITimeToLive {
   private long aliveTick;
@@ -78,14 +80,10 @@ public abstract class Particle implements ITimeToLive {
    * @param color
    *          The color of the effect.
    */
-  public Particle(final float width, final float height, final Color color) {
+  public Particle(final float width, final float height) {
     this.setCustomRenderType(RenderType.NONE);
     this.setWidth(width);
     this.setHeight(height);
-    if (color != null) {
-      this.color = color;
-      this.colorAlpha = this.color.getAlpha();
-    }
     this.collisionType = Collision.NONE;
     this.opacity = 1;
     this.fade = true;
@@ -240,7 +238,10 @@ public abstract class Particle implements ITimeToLive {
   }
 
   public Particle setColor(final Color color) {
-    this.color = color;
+    if (color != null) {
+      this.color = color;
+      this.colorAlpha = this.color.getAlpha();
+    }
     return this;
   }
 
@@ -350,6 +351,34 @@ public abstract class Particle implements ITimeToLive {
 
   public Particle setTimeToLive(final int ttl) {
     this.timeToLive = ttl;
+    return this;
+  }
+
+  public Particle init(final EmitterData data) {
+    this.setX((float) data.getParticleOffsetX().get());
+    this.setY((float) data.getParticleOffsetY().get());
+
+    this.setAccelerationX((float) data.getAccelerationX().get());
+    this.setAccelerationY((float) data.getAccelerationY().get());
+
+    this.setVelocityX((float) data.getVelocityX().get());
+    this.setVelocityY((float) data.getVelocityY().get());
+
+    this.setDeltaWidth((float) data.getDeltaWidth().get());
+    this.setDeltaHeight((float) data.getDeltaHeight().get());
+
+    this.setAngle((float) data.getAngle().get());
+    this.setDeltaAngle((float) data.getDeltaAngle().get());
+
+    this.setTimeToLive((int) data.getParticleTTL().get());
+    this.setColor(ColorHelper.decode(Game.random().choose(data.getColors())));
+
+    this.setCollisionType(data.getCollisionType());
+    this.setOutlineOnly(data.isOutlineOnly());
+    this.setAntiAliasing(data.isAntiAliased());
+    this.setFade(data.isFading());
+
+    this.setFadeOnCollision(data.isFadingOnCollision());
     return this;
   }
 

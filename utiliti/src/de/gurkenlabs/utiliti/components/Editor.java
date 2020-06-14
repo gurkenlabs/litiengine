@@ -38,8 +38,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.TextRenderer;
-import de.gurkenlabs.litiengine.graphics.emitters.xml.CustomEmitter;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
+import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterLoader;
 import de.gurkenlabs.litiengine.gui.screens.Screen;
 import de.gurkenlabs.litiengine.resources.ImageFormat;
 import de.gurkenlabs.litiengine.resources.ResourceBundle;
@@ -722,8 +722,8 @@ public class Editor extends Screen {
   }
 
   private static void loadCustomEmitters(List<EmitterData> emitters) {
-    for (EmitterData emitter : emitters) {
-      CustomEmitter.load(emitter);
+    for (EmitterData emitterData : emitters) {
+      EmitterLoader.load(emitterData);
     }
   }
 

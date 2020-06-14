@@ -1,6 +1,5 @@
 package de.gurkenlabs.litiengine.graphics.emitters.particles;
 
-import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
@@ -12,8 +11,8 @@ public class TextParticle extends Particle {
   private Font font;
   private final String text;
 
-  public TextParticle(final String text, final Color color) {
-    super(0, 0, color);
+  public TextParticle(final String text) {
+    super(0, 0);
     this.text = text;
   }
 
