@@ -33,7 +33,7 @@ If applicable, add screenshots to help explain your problem.
 **Your System:**
  - OS: [e.g. iOS]
  - LITIENGINE version: [e.g. 0.4.14-alpha]
- - Screen resolution:
+ - Screen resolution: [e.g. 1920x1080]
 
 **Additional context**
 Add any other context about the problem here.
