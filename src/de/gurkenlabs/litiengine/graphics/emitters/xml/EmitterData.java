@@ -584,11 +584,11 @@ public class EmitterData implements Serializable, Resource {
     this.particleWidth = particleWidth;
   }
 
-  public void setParticleX(final ParticleParameter x) {
+  public void setParticleOffsetX(final ParticleParameter x) {
     this.offsetX = x;
   }
 
-  public void setParticleY(final ParticleParameter y) {
+  public void setParticleOffsetY(final ParticleParameter y) {
     this.offsetY = y;
   }
 

@@ -404,12 +404,10 @@ public abstract class Particle implements ITimeToLive {
       return;
     }
 
-    if (this.isFading()) {
-      this.opacity = (float) (this.getTimeToLive() > 0 ? (this.getTimeToLive() - this.getAliveTime()) / (double) this.getTimeToLive() : 1);
-    }
     final int alpha = (int) (this.getOpacity() * this.getColorAlpha());
+
     if (this.color != null) {
-      this.color = new Color(this.color.getRed(), this.color.getGreen(), this.color.getBlue(), alpha >= 0 ? alpha : 0);
+      this.setColor(new Color(this.getColor().getRed(), this.getColor().getGreen(), this.getColor().getBlue(), alpha >= 0 ? alpha : 0));
     }
 
     if (this.colliding) {
@@ -501,7 +499,11 @@ public abstract class Particle implements ITimeToLive {
   }
 
   protected float getOpacity() {
-    return this.opacity;
+    if (this.isFading() && this.getTimeToLive() > 0) {
+      this.opacity = 1 - (float) this.getAliveTime() / this.getTimeToLive();
+      return this.opacity;
+    }
+    return 1;
   }
 
   public boolean usesCustomRenderType() {

@@ -60,8 +60,8 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     data.setColors(mapObject.getCommaSeparatedStringValues(MapObjectProperty.Emitter.COLORS, ColorHelper.encode(EmitterData.DEFAULT_COLOR)));
 
     // particle
-    data.setParticleX(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.OFFSET_X_MIN), mapObject.getFloatValue(MapObjectProperty.Particle.OFFSET_X_MAX)));
-    data.setParticleY(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.OFFSET_Y_MIN), mapObject.getFloatValue(MapObjectProperty.Particle.OFFSET_Y_MAX)));
+    data.setParticleOffsetX(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.OFFSET_X_MIN), mapObject.getFloatValue(MapObjectProperty.Particle.OFFSET_X_MAX)));
+    data.setParticleOffsetY(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.OFFSET_Y_MIN), mapObject.getFloatValue(MapObjectProperty.Particle.OFFSET_Y_MAX)));
     data.setParticleWidth(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.STARTWIDTH_MIN), mapObject.getFloatValue(MapObjectProperty.Particle.STARTWIDTH_MAX)));
     data.setParticleHeight(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.STARTHEIGHT_MIN), mapObject.getFloatValue(MapObjectProperty.Particle.STARTHEIGHT_MAX)));
     data.setVelocityX(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.VELOCITY_X_MIN), mapObject.getFloatValue(MapObjectProperty.Particle.VELOCITY_X_MAX)));
