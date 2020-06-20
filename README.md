@@ -6,6 +6,7 @@
 [![Coverage](https://img.shields.io/sonar/coverage/de.gurkenlabs:litiengine?server=https%3A%2F%2Fsonarcloud.io&style=flat-square)](https://sonarcloud.io/dashboard?id=de.gurkenlabs%3Alitiengine)
 [![Maven Central](https://img.shields.io/maven-central/v/de.gurkenlabs/litiengine.svg?style=flat-square)](https://maven-badges.herokuapp.com/maven-central/de.gurkenlabs/litiengine)
 [![MIT License](https://img.shields.io/github/license/gurkenlabs/litiengine?style=flat-square)](https://github.com/gurkenlabs/litiengine/blob/master/LICENSE)
+[![Discord chat](https://img.shields.io/discord/326074836508213258?style=flat-square&logo=discord)](https://discord.gg/rRB9cKD)
 
 
 ## Main Features
