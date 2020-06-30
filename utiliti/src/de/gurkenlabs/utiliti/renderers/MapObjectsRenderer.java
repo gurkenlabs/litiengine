@@ -89,7 +89,8 @@ public class MapObjectsRenderer implements IEditorRenderer {
   }
 
   private static void renderUnsupportedMapObject(Graphics2D g, IMapObject mapObject, BasicStroke shapeStroke) {
-    g.setColor(Style.COLOR_UNSUPPORTED);
+    Color color = mapObject.getLayer().getColor() == null ? Style.COLOR_UNSUPPORTED : mapObject.getLayer().getColor();
+    g.setColor(color);
     Point2D start = new Point2D.Double(mapObject.getLocation().getX(), mapObject.getLocation().getY());
     StringBuilder info = new StringBuilder("#");
     info.append(mapObject.getId());

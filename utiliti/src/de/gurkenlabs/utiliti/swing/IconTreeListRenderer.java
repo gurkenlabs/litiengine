@@ -67,10 +67,11 @@ public class IconTreeListRenderer implements TreeCellRenderer {
     }
 
     UIDefaults defaults = UIManager.getDefaults();
-    this.label.setOpaque(true);
-    this.label.setBackground(hasFocus || selected ? defaults.getColor("Tree.selectionBackground") : defaults.getColor("Tree.background"));
-    this.label.setForeground(hasFocus || selected ? defaults.getColor("Tree.selectionForeground") : defaults.getColor("Tree.foreground"));
-    this.label.setBorder(hasFocus ? focusBorder : normalBorder);
+//    this.label.setOpaque(true);
+//    Color backgroundColor = selected ? defaults.getColor("Tree.backgroundSelected") : defaults.getColor("Tree.background");
+//    this.label.setBackground(backgroundColor);
+//    this.label.setForeground(hasFocus || selected ? defaults.getColor("Tree.selectionForeground") : defaults.getColor("Tree.foreground"));
+//    this.label.setBorder(hasFocus ? focusBorder : normalBorder);
 
     return label;
   }
