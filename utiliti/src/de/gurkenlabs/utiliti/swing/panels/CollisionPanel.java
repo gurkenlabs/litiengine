@@ -31,8 +31,8 @@ public class CollisionPanel extends PropertyPanel {
     super("panel_collisionEntity");
 
     this.chckbxHasCollision = new JCheckBox(Resources.strings().get("panel_collision"));
-    this.spinnerWidth = new JSpinner(new SpinnerNumberModel(0.0, 0.0, 100.0, 0.1));
-    this.spinnerHeight = new JSpinner(new SpinnerNumberModel(0.0, 0.0, 100.0, 0.1));
+    this.spinnerWidth = new JSpinner(new SpinnerNumberModel(0.0, 0.0, Integer.MAX_VALUE, 0.2));
+    this.spinnerHeight = new JSpinner(new SpinnerNumberModel(0.0, 0.0, Integer.MAX_VALUE, 0.2));
     this.comboBoxAlign = new JComboBox<>();
     this.comboBoxAlign.setModel(new DefaultComboBoxModel<>(Align.values()));
     this.comboBoxValign = new JComboBox<>();

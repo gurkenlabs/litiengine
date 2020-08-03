@@ -6,16 +6,14 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
 
-import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JTree;
-import javax.swing.UIDefaults;
-import javax.swing.UIManager;
-import javax.swing.border.Border;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeCellRenderer;
+
+import com.github.weisj.darklaf.components.border.DarkBorders;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.Creature;
@@ -31,14 +29,11 @@ import de.gurkenlabs.litiengine.util.Imaging;
 
 public class IconTreeListRenderer implements TreeCellRenderer {
 
-  private static final Border normalBorder = BorderFactory.createEmptyBorder(1, 1, 1, 1);
-  private static final Border focusBorder = BorderFactory.createDashedBorder(UIManager.getDefaults().getColor("Tree.selectionBorderColor"));
-
   private final JLabel label;
 
   public IconTreeListRenderer() {
     this.label = new JLabel();
-    this.label.setBorder(normalBorder);
+    this.label.setBorder(DarkBorders.createLineBorder(1, 1, 1, 1));
   }
 
   @Override
@@ -65,14 +60,6 @@ public class IconTreeListRenderer implements TreeCellRenderer {
         }
       }
     }
-
-    UIDefaults defaults = UIManager.getDefaults();
-//    this.label.setOpaque(true);
-//    Color backgroundColor = selected ? defaults.getColor("Tree.backgroundSelected") : defaults.getColor("Tree.background");
-//    this.label.setBackground(backgroundColor);
-//    this.label.setForeground(hasFocus || selected ? defaults.getColor("Tree.selectionForeground") : defaults.getColor("Tree.foreground"));
-//    this.label.setBorder(hasFocus ? focusBorder : normalBorder);
-
     return label;
   }
 

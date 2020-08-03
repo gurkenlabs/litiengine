@@ -52,6 +52,8 @@ public final class Icons {
   public static final Icon SOUND = get("sound");
   public static final Icon TILESET = get("tileset");
   public static final Icon TRIGGER = get("trigger");
+  public static final Icon VISIBLE = get("visible");
+  public static final Icon INVISIBLE = get("invisible");
 
   private static ImageIcon get(String identifier) {
     ImageIcon ic;

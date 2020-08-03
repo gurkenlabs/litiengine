@@ -242,7 +242,9 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-
+    if (mapObject == null) {
+      return;
+    }
     this.type = MapObjectType.get(mapObject.getType());
     this.textFieldName.setText(mapObject.getName());
     this.transform.bind(mapObject);
@@ -252,8 +254,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.tagPanel.bind(mapObject.getStringValue(MapObjectProperty.TAGS));
 
     this.labelEntityID.setText(Integer.toString(mapObject.getId()));
-
-    this.lblLayer.setText("Layer: " + mapObject.getLayer().getName());
+    this.lblLayer.setText("Layer: " + mapObject.getLayer());
 
     RenderType rt = mapObject.getEnumValue(MapObjectProperty.RENDERTYPE, RenderType.class);
     boolean showRenderTypeControls = MapObjectType.get(mapObject.getType()) == MapObjectType.CREATURE || MapObjectType.get(mapObject.getType()) == MapObjectType.EMITTER || MapObjectType.get(mapObject.getType()) == MapObjectType.PROP;

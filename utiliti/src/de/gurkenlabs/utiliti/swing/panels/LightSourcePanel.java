@@ -5,7 +5,6 @@ import java.awt.LayoutManager;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
@@ -21,8 +20,8 @@ public class LightSourcePanel extends PropertyPanel {
   private final JComboBox<String> comboBoxLightShape;
   private JSpinner spinnerIntensity;
   private JCheckBox checkBoxIsActive;
-  private JSlider sliderOffsetX;
-  private JSlider sliderOffsetY;
+  private JSpinner offsetX;
+  private JSpinner offsetY;
   private final ColorComponent colorControl;
 
   public LightSourcePanel() {
@@ -31,14 +30,14 @@ public class LightSourcePanel extends PropertyPanel {
     this.colorControl = new ColorComponent();
 
     this.comboBoxLightShape = new JComboBox<>();
-    this.comboBoxLightShape.setModel(new DefaultComboBoxModel<String>(new String[] { "ellipse", "rectangle" }));
+    this.comboBoxLightShape.setModel(new DefaultComboBoxModel<>(new String[] { "ellipse", "rectangle" }));
 
     this.spinnerIntensity = new JSpinner(new SpinnerNumberModel(0, 0, 255, 5));
     this.checkBoxIsActive = new JCheckBox("is active");
     this.checkBoxIsActive.setSelected(true);
 
-    this.sliderOffsetX = new JSlider(-100, 100, 0);
-    this.sliderOffsetY = new JSlider(-100, 100, 0);
+    this.offsetX = new JSpinner(new SpinnerNumberModel(0.0, -0.5, 0.5, 0.1));
+    this.offsetY = new JSpinner(new SpinnerNumberModel(0.0, -0.5, 0.5, 0.1));
 
     setLayout(this.createLayout());
     this.setupChangedListeners();
@@ -63,8 +62,8 @@ public class LightSourcePanel extends PropertyPanel {
     this.colorControl.setHexColor(color);
     this.comboBoxLightShape.setSelectedItem(shape);
     this.checkBoxIsActive.setSelected(isActive);
-    this.sliderOffsetX.setValue((int) Math.max(Math.min(100 * mapObject.getDoubleValue(MapObjectProperty.LIGHT_FOCUSOFFSETX), 100), -100));
-    this.sliderOffsetY.setValue((int) Math.max(Math.min(100 * mapObject.getDoubleValue(MapObjectProperty.LIGHT_FOCUSOFFSETY), 100), -100));
+    this.offsetX.setValue((int) Math.max(Math.min(100 * mapObject.getDoubleValue(MapObjectProperty.LIGHT_FOCUSOFFSETX), 100), -100));
+    this.offsetY.setValue((int) Math.max(Math.min(100 * mapObject.getDoubleValue(MapObjectProperty.LIGHT_FOCUSOFFSETY), 100), -100));
   }
 
   private void setupChangedListeners() {
@@ -75,36 +74,26 @@ public class LightSourcePanel extends PropertyPanel {
         Game.world().environment().updateLighting(getDataSource().getBoundingBox());
       }
     }));
+    this.setup(this.spinnerIntensity, MapObjectProperty.LIGHT_INTENSITY);
+    this.spinnerIntensity.addChangeListener(m -> Game.world().environment().updateLighting(getDataSource().getBoundingBox()));
 
-    this.spinnerIntensity.addChangeListener(new MapObjectPropertyChangeListener(m -> {
-      m.setValue(MapObjectProperty.LIGHT_INTENSITY, spinnerIntensity.getValue().toString());
-      Game.world().environment().updateLighting(getDataSource().getBoundingBox());
-    }));
-    this.comboBoxLightShape.addActionListener(new MapObjectPropertyActionListener(m -> {
-      m.setValue(MapObjectProperty.LIGHT_SHAPE, comboBoxLightShape.getSelectedItem().toString());
-      Game.world().environment().updateLighting(getDataSource().getBoundingBox());
-    }));
+    this.setup(this.comboBoxLightShape, MapObjectProperty.LIGHT_SHAPE);
+    this.comboBoxLightShape.addActionListener(m -> Game.world().environment().updateLighting(getDataSource().getBoundingBox()));
 
-    this.checkBoxIsActive.addActionListener(new MapObjectPropertyActionListener(m -> {
-      m.setValue(MapObjectProperty.LIGHT_ACTIVE, checkBoxIsActive.isSelected());
-      Game.world().environment().updateLighting(getDataSource().getBoundingBox());
-    }));
+    this.setup(this.checkBoxIsActive, MapObjectProperty.LIGHT_ACTIVE);
+    this.checkBoxIsActive.addActionListener(m -> Game.world().environment().updateLighting(getDataSource().getBoundingBox()));
 
-    this.sliderOffsetX.addChangeListener(new MapObjectPropertyChangeListener(m -> {
-      m.setValue(MapObjectProperty.LIGHT_FOCUSOFFSETX, this.sliderOffsetX.getValue() / 100.0);
-      Game.world().environment().updateLighting(getDataSource().getBoundingBox());
-    }));
+    this.setup(this.offsetX, MapObjectProperty.LIGHT_FOCUSOFFSETX);
+    this.offsetX.addChangeListener(m -> Game.world().environment().updateLighting(getDataSource().getBoundingBox()));
 
-    this.sliderOffsetY.addChangeListener(new MapObjectPropertyChangeListener(m -> {
-      m.setValue(MapObjectProperty.LIGHT_FOCUSOFFSETY, this.sliderOffsetY.getValue() / 100.0);
-      Game.world().environment().updateLighting(getDataSource().getBoundingBox());
-    }));
+    this.setup(this.offsetY, MapObjectProperty.LIGHT_FOCUSOFFSETY);
+    this.offsetY.addChangeListener(m -> Game.world().environment().updateLighting(getDataSource().getBoundingBox()));
   }
 
   private LayoutManager createLayout() {
 
-    LayoutItem[] layoutItems = new LayoutItem[] { new LayoutItem("panel_shape", this.comboBoxLightShape), new LayoutItem("panel_color", this.colorControl, this.colorControl.getPreferredSize().height), new LayoutItem("panel_intensity", this.spinnerIntensity),
-        new LayoutItem("offsetX", this.sliderOffsetX), new LayoutItem("offsetY", this.sliderOffsetY), };
+    LayoutItem[] layoutItems = new LayoutItem[] { new LayoutItem("panel_shape", this.comboBoxLightShape), new LayoutItem("panel_color", this.colorControl, this.colorControl.getPreferredSize().height), new LayoutItem("panel_intensity", this.spinnerIntensity), new LayoutItem("offsetX", this.offsetX),
+        new LayoutItem("offsetY", this.offsetY), };
 
     return this.createLayout(layoutItems, this.checkBoxIsActive);
   }

@@ -26,7 +26,7 @@ public class FocusRenderer implements IEditorRenderer {
     final Rectangle2D focus = Editor.instance().getMapComponent().getFocusBounds();
     final IMapObject focusedMapObject = Editor.instance().getMapComponent().getFocusedMapObject();
     if (focus != null && focusedMapObject != null) {
-      Stroke stroke = new BasicStroke(1 / Game.world().camera().getRenderScale(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER, 4, new float[] { 1f, 1f }, Game.time().now() / 15);
+      Stroke stroke = new BasicStroke(1 / Game.world().camera().getRenderScale(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER, 4, new float[] { 1f, 1f }, Game.time().now() / 15f);
 
       g.setColor(Color.BLACK);
 

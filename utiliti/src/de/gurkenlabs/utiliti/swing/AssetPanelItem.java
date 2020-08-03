@@ -34,7 +34,6 @@ import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.filechooser.FileFilter;
@@ -100,7 +99,6 @@ public class AssetPanelItem extends JPanel {
     addFocusListener(new FocusAdapter() {
       @Override
       public void focusGained(FocusEvent e) {
-        UIDefaults defaults = UIManager.getDefaults();
         setBorder(focusBorder);
 
         if (getOrigin() instanceof SpritesheetResource || getOrigin() instanceof EmitterData) {
@@ -128,7 +126,6 @@ public class AssetPanelItem extends JPanel {
 
       @Override
       public void focusLost(FocusEvent e) {
-        UIDefaults defaults = UIManager.getDefaults();
         setBorder(normalBorder);
 
         btnEdit.setVisible(false);
@@ -364,10 +361,10 @@ public class AssetPanelItem extends JPanel {
         return false;
       }
 
-      mo.setX((int) Game.world().camera().getFocus().getX() - info.getWidth() / 2);
-      mo.setY((int) Game.world().camera().getFocus().getY() - info.getHeight() / 2);
-      mo.setWidth((int) info.getWidth());
-      mo.setHeight((int) info.getHeight());
+      mo.setX((int) Game.world().camera().getFocus().getX() - info.getWidth() / 2f);
+      mo.setY((int) Game.world().camera().getFocus().getY() - info.getHeight() / 2f);
+      mo.setWidth( info.getWidth());
+      mo.setHeight(info.getHeight());
       mo.setId(Game.world().environment().getNextMapId());
       mo.setName("");
       mo.setValue(MapObjectProperty.COLLISIONBOX_WIDTH, info.getWidth() * 0.4);
