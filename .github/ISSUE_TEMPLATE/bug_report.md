@@ -11,6 +11,7 @@ assignees: ''
 A clear and concise description of what the bug is.
 
 **Stack Trace**
+The error message you get either in your console or the `crash.txt` located in your program's root directory.
 ```java
 java.lang.NullPointerException
     at de.gurkenlabs.utiliti.components.EditorScreen.load(EditorScreen.java:308)
