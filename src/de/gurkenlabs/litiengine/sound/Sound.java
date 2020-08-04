@@ -104,4 +104,9 @@ public final class Sound {
     final float rate = inFormat.getSampleRate();
     return new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, rate, 16, ch, ch * 2, rate, false);
   }
+
+  @Override
+  public String toString() {
+    return this.getName();
+  }
 }

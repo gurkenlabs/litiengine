@@ -42,7 +42,7 @@ public class PropPanel extends PropertyPanel {
     this.comboBoxSpriteSheets.setRenderer(new LabelListCellRenderer());
 
     this.comboBoxMaterial = new JComboBox<>();
-    this.comboBoxMaterial.setModel(new DefaultComboBoxModel<Material>(Material.getMaterials().toArray(new Material[Material.getMaterials().size()])));
+    this.comboBoxMaterial.setModel(new DefaultComboBoxModel<>(Material.getMaterials().toArray(new Material[0])));
 
     this.comboBoxRotation = new JComboBox<>();
     this.comboBoxRotation.setModel(new DefaultComboBoxModel<>(Rotation.values()));

@@ -186,6 +186,12 @@ public class MapObjectsRenderer implements IEditorRenderer {
     g.setColor(borderColor);
 
     Game.graphics().renderOutline(g, mapObject.getBoundingBox(), shapeStroke);
+    if (type == MapObjectType.SOUNDSOURCE) {
+      final int range = (int) Game.audio().getMaxDistance();
+      final float[] dash1 = { 10.0f };
+      final BasicStroke dashed = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, dash1, 0.0f);
+      Game.graphics().renderOutline(g, new Ellipse2D.Double(mapObject.getBoundingBox().getCenterX() - range, mapObject.getBoundingBox().getCenterY() - range, range * 2, range * 2), dashed);
+    }
 
     if (Editor.preferences().renderNames()) {
       renderName(g, mapObject);

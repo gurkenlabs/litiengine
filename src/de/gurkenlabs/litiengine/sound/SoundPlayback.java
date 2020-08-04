@@ -279,9 +279,6 @@ public abstract class SoundPlayback implements Runnable {
       if (value < 0f) {
         throw new IllegalArgumentException("negative volume");
       }
-      if (value < 0f) {
-        throw new IllegalArgumentException("negative volume");
-      }
       this.value = value;
       SoundPlayback.this.updateVolume();
     }

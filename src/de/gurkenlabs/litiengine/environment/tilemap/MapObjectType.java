@@ -1,7 +1,7 @@
 package de.gurkenlabs.litiengine.environment.tilemap;
 
 public enum MapObjectType {
-  AREA, COLLISIONBOX, EMITTER, LIGHTSOURCE, PROP, CREATURE, SPAWNPOINT, TRIGGER, STATICSHADOW;
+  AREA, COLLISIONBOX, EMITTER, LIGHTSOURCE, PROP, CREATURE, SOUNDSOURCE, SPAWNPOINT, TRIGGER, STATICSHADOW;
 
   /*
    * Note that this is not part of the enum since we consider this enum a set of valid types in many places in the engine.

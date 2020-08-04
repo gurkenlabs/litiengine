@@ -56,6 +56,10 @@ public final class AddMenu extends JMenu {
     JMenuItem addEmitter = new JMenuItem(Resources.strings().get("menu_add_emitter"), Icons.EMITTER);
     addEmitter.addActionListener(a -> setCreateMode(MapObjectType.EMITTER));
     addEmitter.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_9, InputEvent.CTRL_DOWN_MASK));
+    
+    JMenuItem addSoundSource = new JMenuItem(Resources.strings().get("menu_add_soundsource"), Icons.SOUND);
+    addSoundSource.addActionListener(a -> setCreateMode(MapObjectType.SOUNDSOURCE));
+    addSoundSource.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_0, InputEvent.CTRL_DOWN_MASK));
 
     this.add(addProp);
     this.add(addCreature);
@@ -66,6 +70,7 @@ public final class AddMenu extends JMenu {
     this.add(addLight);
     this.add(addShadow);
     this.add(addEmitter);
+    this.add(addSoundSource);
     
     this.setEnabled(false);
     Editor.instance().onLoaded(() -> this.setEnabled(Editor.instance().getCurrentResourceFile() != null));

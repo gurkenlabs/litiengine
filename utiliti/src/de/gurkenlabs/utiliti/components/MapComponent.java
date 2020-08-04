@@ -909,7 +909,12 @@ public class MapComponent extends GuiComponent {
     case COLLISIONBOX:
       mo.setValue(MapObjectProperty.COLLISION_TYPE, Collision.STATIC);
       break;
+    case SOUNDSOURCE:
+      mo.setValue(MapObjectProperty.SOUND_VOLUME, 1);
+      mo.setValue(MapObjectProperty.SOUND_LOOP, true);
+      break;
     case SPAWNPOINT:
+      break;
     default:
       break;
     }

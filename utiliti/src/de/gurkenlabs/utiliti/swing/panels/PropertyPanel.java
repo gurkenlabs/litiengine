@@ -24,6 +24,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -201,6 +202,13 @@ public abstract class PropertyPanel extends JPanel {
     }));
   }
 
+  protected void setup(JSlider slider, String property) {
+    if (property == null || property.isEmpty()) {
+      return;
+    }
+    slider.addChangeListener(new SliderListener(property, slider));
+  }
+
   protected void setup(JSpinner spinner, String property) {
     if (property == null || property.isEmpty()) {
       return;
@@ -302,6 +310,12 @@ public abstract class PropertyPanel extends JPanel {
   protected class SpinnerListener extends MapObjectPropertyChangeListener {
     SpinnerListener(String mapObjectProperty, JSpinner spinner) {
       super(m -> m.setValue(mapObjectProperty, spinner.getValue().toString()));
+    }
+  }
+
+  protected class SliderListener extends MapObjectPropertyChangeListener {
+    SliderListener(String mapObjectProperty, JSlider slider) {
+      super(m -> m.setValue(mapObjectProperty, slider.getValue()));
     }
   }
 

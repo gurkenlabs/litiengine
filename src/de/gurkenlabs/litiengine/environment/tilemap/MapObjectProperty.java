@@ -55,6 +55,11 @@ public final class MapObjectProperty {
   public static final String LIGHT_ACTIVE = "lightActive";
   public static final String LIGHT_FOCUSOFFSETX = "lightFocusOffsetX";
   public static final String LIGHT_FOCUSOFFSETY = "lightFocusOffsetY";
+  
+  //sound source
+  public static final String SOUND_VOLUME = "soundVolume";
+  public static final String SOUND_LOOP = "soundLoop";
+  public static final String SOUND_NAME = "soundName";
 
   // static shadow
   public static final String SHADOW_TYPE = "shadowType";
