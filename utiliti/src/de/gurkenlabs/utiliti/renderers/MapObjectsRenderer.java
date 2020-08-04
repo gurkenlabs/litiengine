@@ -190,7 +190,7 @@ public class MapObjectsRenderer implements IEditorRenderer {
       final int range = (int) Game.audio().getMaxDistance();
       final float[] dash1 = { 10.0f };
       final BasicStroke dashed = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, dash1, 0.0f);
-      Game.graphics().renderOutline(g, new Ellipse2D.Double(mapObject.getBoundingBox().getCenterX() - range, mapObject.getBoundingBox().getCenterY() - range, range * 2, range * 2), dashed);
+      Game.graphics().renderOutline(g, new Ellipse2D.Double(mapObject.getBoundingBox().getCenterX() - range, mapObject.getBoundingBox().getCenterY() - range, range * 2d, range * 2d), dashed);
     }
 
     if (Editor.preferences().renderNames()) {
