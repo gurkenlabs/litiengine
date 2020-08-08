@@ -28,6 +28,7 @@ import de.gurkenlabs.litiengine.graphics.RenderComponent;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.ShapeRenderer;
 import de.gurkenlabs.litiengine.graphics.TextRenderer;
+import de.gurkenlabs.litiengine.gui.GuiComponent;
 import de.gurkenlabs.litiengine.gui.screens.Screen;
 import de.gurkenlabs.litiengine.gui.screens.ScreenManager;
 import de.gurkenlabs.litiengine.input.Input;
@@ -37,8 +38,11 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.sound.Sound;
 import de.gurkenlabs.litiengine.sound.SoundEngine;
 import de.gurkenlabs.litiengine.sound.SoundPlayback;
+import de.gurkenlabs.litiengine.tweening.GuiComponentTweenAccessor;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
+import dorkbox.tweenEngine.EngineBuilder;
+import dorkbox.tweenEngine.TweenEngine;
 
 /***
  * <p>
@@ -73,6 +77,8 @@ public final class Game {
   private static final RenderEngine graphicsEngine = new RenderEngine();
   private static final SoundEngine soundEngine = new SoundEngine();
   private static final PhysicsEngine physicsEngine = new PhysicsEngine();
+  private static final EngineBuilder tweenEngineBuilder = TweenEngine.create();
+  private static final TweenEngine tweenEngine;
 
   private static final GameConfiguration configuration = new GameConfiguration();
   private static final GameMetrics metrics = new GameMetrics();
@@ -96,6 +102,8 @@ public final class Game {
   static {
     world.onLoaded(gameTime);
     addGameListener(new InputGameAdapter());
+    tweenEngineBuilder.registerAccessor(GuiComponent.class, new GuiComponentTweenAccessor());
+    tweenEngine = tweenEngineBuilder.build();
   }
 
   private Game() {
@@ -263,6 +271,10 @@ public final class Game {
    */
   public static GameTime time() {
     return gameTime;
+  }
+
+  public static TweenEngine tweens() {
+    return tweenEngine;
   }
 
   /**
