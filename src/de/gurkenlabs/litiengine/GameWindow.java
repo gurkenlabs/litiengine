@@ -237,7 +237,7 @@ public final class GameWindow {
   }
 
   /**
-   * Sets the icon image.
+   * Sets the icon image for the window's hosting {@code JFrame}.
    * 
    * @param image
    *          The {@code Image} to be used as the window icon.
@@ -249,12 +249,12 @@ public final class GameWindow {
   }
 
   /**
-   * Sets the icon image.
+   * Sets the icons for the window's hosting {@code JFrame}. Depending on the platform specifications, one or several {@code Icon}s with the correct Dimension
+   * will be chosen automatically from the list.
    * 
    * @param images
    *          A list of {@code Images} to be used as the window icons.
-   *          Depending on the platform specifications, one or several {@code Icon}s with the correct Dimension will be chosen automatically from
-   *          the list.
+   * 
    * @see JFrame#setIconImages
    * 
    */
