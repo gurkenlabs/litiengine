@@ -39,7 +39,7 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
   private String randomDeathSprite;
 
   /**
-   * Initializes a new instance of the <code>CreatureAnimationController</code> class.
+   * Initializes a new instance of the {@code CreatureAnimationController} class.
    * 
    * @param creature
    *          The creature related to this controller.
@@ -56,7 +56,7 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
   }
 
   /**
-   * Initializes a new instance of the <code>CreatureAnimationController</code> class.
+   * Initializes a new instance of the {@code CreatureAnimationController} class.
    * 
    * @param creature
    *          The creature related to this controller.
@@ -72,7 +72,7 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
   }
 
   /**
-   * Initializes a new instance of the <code>CreatureAnimationController</code> class.
+   * Initializes a new instance of the {@code CreatureAnimationController} class.
    * 
    * @param creature
    *          The creature related to this controller.

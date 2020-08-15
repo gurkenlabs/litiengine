@@ -8,7 +8,7 @@ public interface IPolyShape {
    * Gets all points of a polyline. The points are relative to the x and y
    * coordinate of the parent {@link IMapObject}.
    * 
-   * <p><i>To get a <code>Path2D</code> object, you should use <code>Map</code></i></p>
+   * <p><i>To get a {@code Path2D} object, you should use {@code Map}</i></p>
    * 
    * @return A list containing all points of the polyline.
    */

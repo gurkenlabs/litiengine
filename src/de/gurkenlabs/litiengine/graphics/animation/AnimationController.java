@@ -30,7 +30,7 @@ public class AnimationController implements IAnimationController {
   private final List<AnimationListener> listeners;
 
   /**
-   * Initializes a new instance of the <code>AnimationController</code> class.
+   * Initializes a new instance of the {@code AnimationController} class.
    */
   public AnimationController() {
     this.animations = new ConcurrentHashMap<>();
@@ -40,7 +40,7 @@ public class AnimationController implements IAnimationController {
   }
 
   /**
-   * Initializes a new instance of the <code>AnimationController</code> class with the specified default animation.
+   * Initializes a new instance of the {@code AnimationController} class with the specified default animation.
    * 
    * @param defaultAnimation
    *          The default animation for this controller.
@@ -53,7 +53,7 @@ public class AnimationController implements IAnimationController {
   }
 
   /**
-   * Initializes a new instance of the <code>AnimationController</code> class with the specified default animation.
+   * Initializes a new instance of the {@code AnimationController} class with the specified default animation.
    * 
    * @param defaultAnimation
    *          The default animation for this controller.
@@ -76,7 +76,7 @@ public class AnimationController implements IAnimationController {
   }
 
   /**
-   * Initializes a new instance of the <code>AnimationController</code> class with the specified default animation.
+   * Initializes a new instance of the {@code AnimationController} class with the specified default animation.
    * 
    * @param sprite
    *          The sprite sheet used by the default animation of this controller.
@@ -86,7 +86,7 @@ public class AnimationController implements IAnimationController {
   }
 
   /**
-   * Initializes a new instance of the <code>AnimationController</code> class with the specified default animation.
+   * Initializes a new instance of the {@code AnimationController} class with the specified default animation.
    * 
    * @param sprite
    *          The sprite sheet used by the default animation of this controller.
@@ -123,7 +123,7 @@ public class AnimationController implements IAnimationController {
   }
 
   /**
-   * Attach the <code>AnimationController</code>, as well as all its <code>Animation</code>s to the Game loop.
+   * Attach the {@code AnimationController}, as well as all its {@code Animation}s to the Game loop.
    * 
    * @see ILoop
    */
@@ -137,7 +137,7 @@ public class AnimationController implements IAnimationController {
   }
 
   /**
-   * Detach the <code>AnimationController</code>, as well as all its <code>Animation</code>s from the Game loop.
+   * Detach the {@code AnimationController}, as well as all its {@code Animation}s from the Game loop.
    * 
    * @see ILoop
    */
@@ -355,7 +355,7 @@ public class AnimationController implements IAnimationController {
 
   /**
    * Build a unique cache key for the current frame.
-   * The spritesheet's <code>hashCode</code>, the current keyframe's sprite index, as well as all applied <code>ImageEffect</code>s' names, are
+   * The spritesheet's {@code hashCode}, the current keyframe's sprite index, as well as all applied {@code ImageEffect}s' names, are
    * considered when determining the current cache key.
    * 
    * @return the unique cache key for the current key frame

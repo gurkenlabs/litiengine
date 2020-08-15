@@ -395,7 +395,7 @@ public final class Mouse implements MouseListener, MouseMotionListener, MouseWhe
       // get diff relative from grabbed position
       final double screenCenterX = Game.window().getResolution().getWidth() * 0.5;
       final double screenCenterY = Game.window().getResolution().getHeight() * 0.5;
-      final Point screenLocation = Game.window().getWindowLocation();
+      final Point screenLocation = Game.window().getLocationOnScreen();
       final int grabX = (int) (screenLocation.x + screenCenterX);
       final int grabY = (int) (screenLocation.y + screenCenterY);
 

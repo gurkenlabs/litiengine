@@ -12,12 +12,12 @@ import javax.xml.bind.annotation.XmlTransient;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.CustomPropertyProvider;
 
 /**
- * The <code>GameInfo</code> class contains basic information about a LITIengine game.
- * The information can be accessed via <code>Game.getInfo()</code> and the infrastructure also internally uses this information
+ * The {@code GameInfo} class contains basic information about a LITIengine game.
+ * The information can be accessed via {@code Game.getInfo()} and the infrastructure also internally uses this information
  * e.g. to setup the main window of the Game by providing an appropriate title.
  * <p>
  * It should be the first thing that you do in you application entry point to setup or load this information.
- * Note that it's possible to keep this information in an XML file and load it up by calling <code>Game.setInfo(String)</code>.
+ * Note that it's possible to keep this information in an XML file and load it up by calling {@code Game.setInfo(String)}.
  * </p>
  * 
  * @see Game#info()
@@ -52,7 +52,7 @@ public class GameInfo extends CustomPropertyProvider {
   private String[] developers;
 
   /**
-   * Initializes a new instance of the <code>GameInfo</code> class.
+   * Initializes a new instance of the {@code GameInfo} class.
    */
   public GameInfo() {
     this.company = "gurkenlabs";
@@ -95,10 +95,10 @@ public class GameInfo extends CustomPropertyProvider {
   }
 
   /**
-   * Gets the {@link #getWebsite()} as an <code>URL</code> object that can be used to further process the information.
+   * Gets the {@link #getWebsite()} as an {@code URL} object that can be used to further process the information.
    * (e.g. the web site can be opened in the browser).
    * 
-   * @return The game's web site as <code>URL</code>
+   * @return The game's web site as {@code URL}
    * 
    * @see URL
    * @see #getWebsite()

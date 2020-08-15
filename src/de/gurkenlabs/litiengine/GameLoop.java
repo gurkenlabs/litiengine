@@ -7,7 +7,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import de.gurkenlabs.litiengine.graphics.RenderComponent;
 
 /**
- * The main update loop that executes the game logic by calling the update functions on all registered <code>IUpdatable</code> instances.
+ * The main update loop that executes the game logic by calling the update functions on all registered {@code IUpdatable} instances.
  * Subsequently, it performs the rendering of the current frame and tracks some performance metrics on the process.
  *
  * @see IUpdateable#update()
@@ -72,7 +72,7 @@ public final class GameLoop extends UpdateLoop implements IGameLoop {
   }
 
   /**
-   * In addition to the normal base implementation, the <code>GameLoop</code> performs registered action at the required
+   * In addition to the normal base implementation, the {@code GameLoop} performs registered action at the required
    * time and tracks some detailed metrics.
    */
   @Override

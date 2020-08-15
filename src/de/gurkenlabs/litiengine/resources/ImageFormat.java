@@ -11,11 +11,11 @@ public enum ImageFormat {
   UNSUPPORTED, PNG, GIF, BMP, JPG;
 
   /**
-   * Gets the <code>ImageFormat</code> of the specified format string.
+   * Gets the {@code ImageFormat} of the specified format string.
    * 
    * @param imageFormat
    *          The format string from which to extract the format.
-   * @return The format of the specified string or <code>UNDEFINED</code> if not supported.
+   * @return The format of the specified string or {@code UNDEFINED} if not supported.
    */
   public static ImageFormat get(String imageFormat) {
     return DataFormat.get(imageFormat, values(), UNSUPPORTED);

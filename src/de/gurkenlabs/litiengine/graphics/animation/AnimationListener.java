@@ -3,7 +3,7 @@ package de.gurkenlabs.litiengine.graphics.animation;
 import java.util.EventListener;
 
 /**
- * This listener provides call-backs for when an <code>Animation</code> is played or the play back was finished.
+ * This listener provides call-backs for when an {@code Animation} is played or the play back was finished.
  */
 public interface AnimationListener extends EventListener {
   /**

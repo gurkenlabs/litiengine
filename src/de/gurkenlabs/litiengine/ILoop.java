@@ -3,10 +3,10 @@ package de.gurkenlabs.litiengine;
 import java.util.concurrent.locks.Lock;
 
 /**
- * The <code>ILoop</code> interface provide method for game loops that are publicly exposed.
+ * The {@code ILoop} interface provide method for game loops that are publicly exposed.
  * 
  * <p>
- * A loop is an implementation that performs actions (e.g. physics, rendering, input processing, ...) and updates other <code>IUpdatable</code>
+ * A loop is an implementation that performs actions (e.g. physics, rendering, input processing, ...) and updates other {@code IUpdatable}
  * instances while the game is running.
  * </p>
  * 
@@ -32,7 +32,7 @@ public interface ILoop extends ILaunchable {
   public void detach(final IUpdateable updatable);
 
   /**
-   * Gets the amount of attached <code>IUpdatable</code> instances of this loop.
+   * Gets the amount of attached {@code IUpdatable} instances of this loop.
    * 
    * @return The amount instances attached to this loop.
    */

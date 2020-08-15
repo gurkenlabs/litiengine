@@ -8,7 +8,7 @@ import javax.sound.sampled.AudioFormat;
 import de.gurkenlabs.litiengine.resources.Resources;
 
 /**
- * A <code>Track</code> that plays a sound once and then stops.
+ * A {@code Track} that plays a sound once and then stops.
  */
 public class SinglePlayTrack implements Track {
   private Sound sound;
@@ -32,7 +32,7 @@ public class SinglePlayTrack implements Track {
   }
 
   /**
-   * Initializes a new <code>SinglePlayTrack</code> for the specified sound.
+   * Initializes a new {@code SinglePlayTrack} for the specified sound.
    * 
    * @param soundName
    *          The name of the sound to be played by this track.
@@ -42,7 +42,7 @@ public class SinglePlayTrack implements Track {
   }
 
   /**
-   * Initializes a new <code>SinglePlayTrack</code> for the specified sound.
+   * Initializes a new {@code SinglePlayTrack} for the specified sound.
    * 
    * @param sound
    *          The sound to be played by this track.

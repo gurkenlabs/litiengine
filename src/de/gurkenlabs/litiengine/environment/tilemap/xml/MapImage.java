@@ -33,14 +33,14 @@ public class MapImage extends CustomPropertyProvider implements IMapImage {
   private URL absolutePath;
 
   /**
-   * Instantiates a new <code>MapImage</code> instance.
+   * Instantiates a new {@code MapImage} instance.
    */
   public MapImage() {
     super();
   }
 
   /**
-   * Instantiates a new <code>MapImage</code> instance by copying the specified original.
+   * Instantiates a new {@code MapImage} instance by copying the specified original.
    *
    * @param original
    *          the original we want to copy

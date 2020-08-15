@@ -6,7 +6,7 @@ import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 
 /**
- * A standard implementation for emitters that are bound to <code>IEntity.getLocation()</code>.
+ * A standard implementation for emitters that are bound to {@code IEntity.getLocation()}.
  * 
  * @see IEntity#getLocation()
  */

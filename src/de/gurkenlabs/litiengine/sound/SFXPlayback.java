@@ -9,7 +9,7 @@ import javax.sound.sampled.LineUnavailableException;
 import de.gurkenlabs.litiengine.Game;
 
 /**
- * A <code>SoundPlayback</code> implementation for the playback of sound effects.
+ * A {@code SoundPlayback} implementation for the playback of sound effects.
  */
 public class SFXPlayback extends SoundPlayback {
   private Sound sound;

@@ -3,7 +3,7 @@ package de.gurkenlabs.litiengine.entities;
 import java.util.EventListener;
 
 /**
- * This listener provides callbacks for when an <code>Entity</code> received a message.
+ * This listener provides callbacks for when an {@code Entity} received a message.
  */
 @FunctionalInterface
 public interface EntityMessageListener extends EventListener {

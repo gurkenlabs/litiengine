@@ -25,7 +25,7 @@ public final class Sounds extends ResourcesContainer<Sound> {
    * @param resource
    *          The XML resource that contains the sound as Base64 string.
    * 
-   * @return The <code>Sound</code> instance loaded from the specified resource.
+   * @return The {@code Sound} instance loaded from the specified resource.
    * 
    * @see Codec#decode(String)
    */

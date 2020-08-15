@@ -11,7 +11,7 @@ public class LoopedTrack implements Track, Iterator<Sound> {
   private Sound track;
 
   /**
-   * Initializes a new <code>LoopedTrack</code> for the specified sound.
+   * Initializes a new {@code LoopedTrack} for the specified sound.
    * 
    * @param soundName
    *          The name of the sound to be played by this track.
@@ -21,7 +21,7 @@ public class LoopedTrack implements Track, Iterator<Sound> {
   }
 
   /**
-   * Initializes a new <code>LoopedTrack</code> for the specified sound.
+   * Initializes a new {@code LoopedTrack} for the specified sound.
    * 
    * @param sound
    *          The sound to be played by this track.

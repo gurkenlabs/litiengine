@@ -13,7 +13,7 @@ import de.gurkenlabs.litiengine.environment.Environment;
 public class StaticShadowLayer extends ColorLayer {
 
   /**
-   * Instantiates a new <code>StaticShadowLayer</code> instance.
+   * Instantiates a new {@code StaticShadowLayer} instance.
    *
    * @param environment
    *          The environment to which this instance is assigned.

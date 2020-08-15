@@ -6,7 +6,7 @@ import javax.xml.bind.annotation.XmlEnumValue;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 
 /**
- * The enum <code>Align</code> defines a range of horizontal alignments.
+ * The enum {@code Align} defines a range of horizontal alignments.
  */
 @XmlEnum
 public enum Align {

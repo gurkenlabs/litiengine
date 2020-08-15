@@ -10,7 +10,7 @@ public class RotationImageEffect extends ImageEffect {
   private final float angle;
 
   /**
-   * Initializes a new instance of the <code>RotationImageEffect</code>.
+   * Initializes a new instance of the {@code RotationImageEffect}.
    *
    * @param ttl
    *          The time to live of this effect.

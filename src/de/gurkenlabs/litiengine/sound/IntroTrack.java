@@ -8,14 +8,14 @@ import javax.sound.sampled.AudioFormat;
 import de.gurkenlabs.litiengine.resources.Resources;
 
 /**
- * A <code>Track</code> that plays an intro sound and then loops the specified music sound.
+ * A {@code Track} that plays an intro sound and then loops the specified music sound.
  */
 public class IntroTrack implements Track {
   private Sound intro;
   private Sound loop;
 
   /**
-   * Initializes a new <code>IntroTrack</code> for the specified sound.
+   * Initializes a new {@code IntroTrack} for the specified sound.
    * 
    * @param intro
    *          The name of the sound to be played as intro.
@@ -27,7 +27,7 @@ public class IntroTrack implements Track {
   }
 
   /**
-   * Initializes a new <code>IntroTrack</code> for the specified sound.
+   * Initializes a new {@code IntroTrack} for the specified sound.
    * 
    * @param intro
    *          The sound to be played as intro.
@@ -39,7 +39,7 @@ public class IntroTrack implements Track {
   }
 
   /**
-   * Initializes a new <code>IntroTrack</code> for the specified sound.
+   * Initializes a new {@code IntroTrack} for the specified sound.
    * 
    * @param intro
    *          The name of the sound to be played as intro.
@@ -51,7 +51,7 @@ public class IntroTrack implements Track {
   }
 
   /**
-   * Initializes a new <code>IntroTrack</code> for the specified sound.
+   * Initializes a new {@code IntroTrack} for the specified sound.
    * 
    * @param intro
    *          The sound to be played as intro.

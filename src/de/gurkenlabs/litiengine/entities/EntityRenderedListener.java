@@ -5,7 +5,7 @@ import java.util.EventListener;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 
 /**
- * This listener interface is used for receiving events after an entity was rendered with the game's <code>RenderEngine</code>.
+ * This listener interface is used for receiving events after an entity was rendered with the game's {@code RenderEngine}.
  * 
  * @see RenderEngine#renderEntity(java.awt.Graphics2D, IEntity)
  */

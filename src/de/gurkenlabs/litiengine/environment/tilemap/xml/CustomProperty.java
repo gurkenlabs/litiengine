@@ -14,10 +14,10 @@ public class CustomProperty implements ICustomProperty {
   private URL location;
 
   /**
-   * Instantiates a new <code>CustomProperty</code> instance.
+   * Instantiates a new {@code CustomProperty} instance.
    * 
    * <p>
-   * The default type for a custom property is <code>string</code> if not explicitly specified.
+   * The default type for a custom property is {@code string} if not explicitly specified.
    * </p>
    */
   public CustomProperty() {
@@ -26,7 +26,7 @@ public class CustomProperty implements ICustomProperty {
   }
 
   /**
-   * Instantiates a new <code>CustomProperty</code> instance.
+   * Instantiates a new {@code CustomProperty} instance.
    *
    * @param value
    *          The value of this custom property.
@@ -37,7 +37,7 @@ public class CustomProperty implements ICustomProperty {
   }
 
   /**
-   * Instantiates a new <code>CustomProperty</code> instance.
+   * Instantiates a new {@code CustomProperty} instance.
    * 
    * @param type
    *          The type of this custom property.
@@ -50,7 +50,7 @@ public class CustomProperty implements ICustomProperty {
   }
 
   /**
-   * Instantiates a new <code>CustomProperty</code> instance.
+   * Instantiates a new {@code CustomProperty} instance.
    * 
    * @param location
    *          The location of the file represented by this custom property.
@@ -62,7 +62,7 @@ public class CustomProperty implements ICustomProperty {
   }
 
   /**
-   * Instantiates a new <code>CustomProperty</code> instance by copying from the specified instance.
+   * Instantiates a new {@code CustomProperty} instance by copying from the specified instance.
    *
    * @param propertyToBeCopied
    *          The property to be copied.

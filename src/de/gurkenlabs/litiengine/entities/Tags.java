@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 
 /**
  * This attribute provides initial values for Entity tags. Annotate an Entity with one or multiple Tags to add them automatically when the constructor
- * is called. <code>Tags</code> is just intended as a container class, use the repeatable <code>Tag</code> annotation instead.
+ * is called. {@code Tags} is just intended as a container class, use the repeatable {@code Tag} annotation instead.
  * 
  * @see IEntity#addTag(String)
  * @see Tag

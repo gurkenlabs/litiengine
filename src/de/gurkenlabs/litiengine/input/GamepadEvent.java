@@ -62,8 +62,8 @@ public class GamepadEvent extends EventObject {
   }
 
   /**
-   * Returns <code>true</code> if data returned from <code>poll</code>
-   * is relative to the last call, or <code>false</code> if data
+   * Returns {@code true} if data returned from {@code poll}
+   * is relative to the last call, or {@code false} if data
    * is absolute.
    * 
    * @return True if the data is relative; otherwise false.

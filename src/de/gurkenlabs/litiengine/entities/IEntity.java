@@ -103,9 +103,9 @@ public interface IEntity{
   public EntityActionMap actions();
 
   /**
-   * Performs an <code>EntityAction</code> that was previously registered for this entity.
+   * Performs an {@code EntityAction} that was previously registered for this entity.
    * <p>
-   * <i>Does nothing in case no action has been registered for the specified <code>actionName</code>.</i>
+   * <i>Does nothing in case no action has been registered for the specified {@code actionName}.</i>
    * </p>
    * 
    * @param actionName
@@ -117,8 +117,8 @@ public interface IEntity{
   public void perform(String actionName);
 
   /**
-   * Registers an <code>EntityAction</code> with the specified name.
-   * It's later possible to execute these actions on the entity by using the <code>Entity.perform(String actionName)</code> method.
+   * Registers an {@code EntityAction} with the specified name.
+   * It's later possible to execute these actions on the entity by using the {@code Entity.perform(String actionName)} method.
    * 
    * @param name
    *          The name of the action to be registered.
@@ -157,11 +157,11 @@ public interface IEntity{
 
   /**
    * Determines whether this entity is being rendered with the layer it's originating from.
-   * This ignores the specified <code>RenderType</code> and makes the entity dependent upon the visibility of it's layer.
+   * This ignores the specified {@code RenderType} and makes the entity dependent upon the visibility of it's layer.
    * <p>
-   * This can only be used, of course, if the entity is related to a <code>MapObject</code>.
+   * This can only be used, of course, if the entity is related to a {@code MapObject}.
    * <br>
-   * This defaults to <code>false</code> if not explicitly set on the <code>MapObject</code>.
+   * This defaults to {@code false} if not explicitly set on the {@code MapObject}.
    * </p>
    * 
    * @return True if the entity should be rendered with the layer of the corresponding map object; otherwise false.

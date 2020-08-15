@@ -69,13 +69,13 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   private transient MapObjectLayer layer;
 
   /**
-   * Instantiates a new <code>MapObject</code> instance.
+   * Instantiates a new {@code MapObject} instance.
    */
   public MapObject() {
   }
 
   /**
-   * Instantiates a new <code>MapObject</code> instance.
+   * Instantiates a new {@code MapObject} instance.
    *
    * @param type
    *          The type of this map object.
@@ -85,7 +85,7 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   }
 
   /**
-   * Instantiates a new <code>MapObject</code> instance by copying the specified original instance.
+   * Instantiates a new {@code MapObject} instance by copying the specified original instance.
    * <p>
    * This variant of the constructor will assign an entirely new ID to the newly created MapObject.
    * </p>
@@ -111,7 +111,7 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   }
 
   /**
-   * Instantiates a new <code>MapObject</code> instance by copying the specified original instance.
+   * Instantiates a new {@code MapObject} instance by copying the specified original instance.
    * <p>
    * This variant of the constructor lets you decide if the copy instance will get the same ID as the old MapObject or get a new ID.
    * </p>
@@ -129,7 +129,7 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   }
 
   /**
-   * Instantiates a new <code>MapObject</code> instance by copying the specified original instance.
+   * Instantiates a new {@code MapObject} instance by copying the specified original instance.
    *
    * @param original
    *          the MapObject we want to copy

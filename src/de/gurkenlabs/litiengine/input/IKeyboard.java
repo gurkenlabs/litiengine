@@ -5,7 +5,7 @@ import java.awt.event.KeyListener;
 import java.util.EventListener;
 
 /**
- * The <code>IKeyboard</code> interface is the engine's API for receiving keyboard input events.
+ * The {@code IKeyboard} interface is the engine's API for receiving keyboard input events.
  */
 public interface IKeyboard {
 
@@ -25,7 +25,7 @@ public interface IKeyboard {
   public void consumeAlt(boolean consume);
 
   /**
-   * Checks whether the key with the specified <code>keyCode</code> is currently being pressed.
+   * Checks whether the key with the specified {@code keyCode} is currently being pressed.
    * 
    * @param keyCode
    *          The keyCode to check for.
@@ -38,7 +38,7 @@ public interface IKeyboard {
   public boolean isPressed(int keyCode);
 
   /**
-   * Adds the specified key pressed listener to receive events when the key with the defined <code>keyCode</code> has been pressed.
+   * Adds the specified key pressed listener to receive events when the key with the defined {@code keyCode} has been pressed.
    * 
    * @param keyCode
    *          The keyCode to capture the key pressed event for.
@@ -61,7 +61,7 @@ public interface IKeyboard {
   public void removeKeyPressedListener(int keyCode, KeyPressedListener listener);
 
   /**
-   * Adds the specified key released listener to receive events when the key with the defined <code>keyCode</code> has been released.
+   * Adds the specified key released listener to receive events when the key with the defined {@code keyCode} has been released.
    * 
    * @param keyCode
    *          The keyCode to capture the key released event for.
@@ -84,7 +84,7 @@ public interface IKeyboard {
   public void removeKeyReleasedListener(int keyCode, KeyReleasedListener listener);
 
   /**
-   * Adds the specified key typed listener to receive events when the key with the defined <code>keyCode</code> has been typed.
+   * Adds the specified key typed listener to receive events when the key with the defined {@code keyCode} has been typed.
    * 
    * @param keyCode
    *          The keyCode to capture the key typed event for.
@@ -164,7 +164,7 @@ public interface IKeyboard {
   public void removeKeyTypedListener(KeyTypedListener listener);
 
   /**
-   * Removes all registered event consumers from the Keyboard instance. This <b>does not affect</b> registered <code>KeyListener</code> instances.
+   * Removes all registered event consumers from the Keyboard instance. This <b>does not affect</b> registered {@code KeyListener} instances.
    * 
    * @see #onKeyPressed(KeyPressedListener)
    * @see #onKeyPressed(int, KeyPressedListener)

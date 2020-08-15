@@ -12,13 +12,13 @@ import de.gurkenlabs.litiengine.GameWindow;
 import de.gurkenlabs.litiengine.graphics.RenderComponent;
 
 /**
- * The <code>ScreenManager</code> holds instances of all available screens and handles whenever a different <code>Screen</code> should be shown to the
+ * The {@code ScreenManager} holds instances of all available screens and handles whenever a different {@code Screen} should be shown to the
  * player. It provides the
- * currently active Screen for the Game’s <code>RenderComponent</code> which calls the <code>Screen.render(Graphics2D)</code> method on every tick of
- * the <code>RenderLoop</code>.
+ * currently active Screen for the Game’s {@code RenderComponent} which calls the {@code Screen.render(Graphics2D)} method on every tick of
+ * the {@code RenderLoop}.
  * Overwriting this method provides the ability to define a customized render pipeline that suits the need of a particular Screen implementation. With
- * the GameScreen, the LITIengine provides a simple default Screen implementation that renders the current <code>Environment</code> and all its
- * <code>GuiComponents</code>.
+ * the GameScreen, the LITIengine provides a simple default Screen implementation that renders the current {@code Environment} and all its
+ * {@code GuiComponents}.
  * 
  * @see Screen
  * @see RenderComponent
@@ -40,7 +40,7 @@ public final class ScreenManager {
 
   /**
    * <p>
-   * <b>You should never call this manually! Instead use the <code>Game.screens()</code> instance.</b>
+   * <b>You should never call this manually! Instead use the {@code Game.screens()} instance.</b>
    * </p>
    * 
    * @see Game#screens()
@@ -142,7 +142,7 @@ public final class ScreenManager {
   }
 
   /**
-   * Displays the <code>Screen</code> with the specified name.
+   * Displays the {@code Screen} with the specified name.
    * 
    * @param screenName
    *          The name of the screen to be displayed.
@@ -190,7 +190,7 @@ public final class ScreenManager {
   }
 
   /**
-   * Gets the currently active screen that is being rendered by the <code>RenderComponent</code>.
+   * Gets the currently active screen that is being rendered by the {@code RenderComponent}.
    * 
    * @return The currently active screen.
    * 

@@ -26,7 +26,7 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.sound.SoundPlayback.VolumeControl;
 
 /**
- * This <code>SoundEngine</code> class provides all methods to play back sounds and music in your
+ * This {@code SoundEngine} class provides all methods to play back sounds and music in your
  * game. It allows to define the 2D coordinates of the sound or even pass in the
  * source entity of the sound which will adjust the position according to the
  * position of the entity.
@@ -59,7 +59,7 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
 
   /**
    * <p>
-   * <b>You should never call this manually! Instead use the <code>Game.audio()</code> instance.</b>
+   * <b>You should never call this manually! Instead use the {@code Game.audio()} instance.</b>
    * </p>
    * 
    * @see Game#audio()
@@ -81,11 +81,11 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
   }
 
   /**
-   * Sets the currently playing track to a <code>LoopedTrack</code> with the sound defined by the specified music name. This has no effect if the
+   * Sets the currently playing track to a {@code LoopedTrack} with the sound defined by the specified music name. This has no effect if the
    * specified track is already playing.
    *
    * @param musicName
-   *          The name of the <code>Sound</code> to be played.
+   *          The name of the {@code Sound} to be played.
    * @return The playback of the music
    */
   public MusicPlayback playMusic(String musicName) {
@@ -93,11 +93,11 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
   }
 
   /**
-   * Sets the currently playing track to a <code>LoopedTrack</code> with the specified music <code>Sound</code>. This has no effect if the specified
+   * Sets the currently playing track to a {@code LoopedTrack} with the specified music {@code Sound}. This has no effect if the specified
    * track is already playing.
    *
    * @param music
-   *          The <code>Sound</code> to be played.
+   *          The {@code Sound} to be played.
    * @return The playback of the music
    */
   public MusicPlayback playMusic(Sound music) {
@@ -262,7 +262,7 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
   }
 
   /**
-   * Plays a <code>Sound</code> with the specified name and updates its volume and pan by the current
+   * Plays a {@code Sound} with the specified name and updates its volume and pan by the current
    * entity location in relation to the listener location.
    * 
    * @param entity
@@ -295,7 +295,7 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
   }
 
   /**
-   * Plays a <code>Sound</code> with the specified name and updates its volume and pan by the current
+   * Plays a {@code Sound} with the specified name and updates its volume and pan by the current
    * entity location in relation to the listener location.
    * 
    * @param entity
@@ -328,7 +328,7 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
   }
 
   /**
-   * Plays a <code>Sound</code> with the specified name at the specified location and updates the volume
+   * Plays a {@code Sound} with the specified name at the specified location and updates the volume
    * and pan in relation to the listener location.
    * 
    * @param location
@@ -362,7 +362,7 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
   }
 
   /**
-   * Plays a <code>Sound</code> with the specified name at the specified location and updates the volume
+   * Plays a {@code Sound} with the specified name at the specified location and updates the volume
    * and pan in relation to the listener location.
    * 
    * @param x
@@ -397,7 +397,7 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
   }
 
   /**
-   * Plays a <code>Sound</code> with the specified name at the specified location and updates the volume
+   * Plays a {@code Sound} with the specified name at the specified location and updates the volume
    * and pan in relation to the listener location.
    * 
    * @param location
@@ -434,7 +434,7 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
   }
 
   /**
-   * Plays a <code>Sound</code> with the specified name at the specified location and updates the volume
+   * Plays a {@code Sound} with the specified name at the specified location and updates the volume
    * and pan in relation to the listener location.
    * 
    * @param x
@@ -468,7 +468,7 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
   }
 
   /**
-   * Plays a <code>Sound</code> with the specified name with the volume configured in the SOUND config
+   * Plays a {@code Sound} with the specified name with the volume configured in the SOUND config
    * with a center pan.
    * 
    * @param soundName
@@ -497,7 +497,7 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
   }
 
   /**
-   * Plays a <code>Sound</code> with the specified name with the volume configured in the SOUND config
+   * Plays a {@code Sound} with the specified name with the volume configured in the SOUND config
    * with a center pan.
    * 
    * @param soundName

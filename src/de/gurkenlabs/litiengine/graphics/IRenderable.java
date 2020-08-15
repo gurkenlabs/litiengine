@@ -13,7 +13,7 @@ public interface IRenderable {
    * Renders the visual contents of this instance onto the provided graphics context.
    * 
    * <p>
-   * If an <code>Entity</code> implements this interface, this method will be called right after the entity was rendered from the environment.
+   * If an {@code Entity} implements this interface, this method will be called right after the entity was rendered from the environment.
    * Allowing for a custom rendering mechanism.
    * </p>
    * 

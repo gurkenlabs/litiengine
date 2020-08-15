@@ -15,7 +15,7 @@ import de.gurkenlabs.litiengine.GameWindow;
  * 
  * <p>
  * This class also provides access to predefined known resolutions of the different aspect ratios which can be used
- * to set the resolution of the <code>GameWindow</code>.
+ * to set the resolution of the {@code GameWindow}.
  * </p>
  * <ul>
  * <li>{@link Ratio4x3}</li>
@@ -95,7 +95,7 @@ public class Resolution {
   }
 
   /**
-   * Contains predefined <code>Resolutions</code> with an aspect ratio of 4:3.
+   * Contains predefined {@code Resolutions} with an aspect ratio of 4:3.
    */
   public static class Ratio4x3 extends Ratio {
     public static final Resolution RES_640x480 = new Resolution(640, 480, new Ratio4x3());
@@ -122,7 +122,7 @@ public class Resolution {
   }
 
   /**
-   * Contains predefined <code>Resolutions</code> with an aspect ratio of 5:4.
+   * Contains predefined {@code Resolutions} with an aspect ratio of 5:4.
    */
   public static class Ratio5x4 extends Ratio {
     public static final Resolution RES_1280x1024 = new Resolution(1280, 1024, new Ratio5x4());
@@ -142,7 +142,7 @@ public class Resolution {
   }
 
   /**
-   * Contains predefined <code>Resolutions</code> with an aspect ratio of 16:9.
+   * Contains predefined {@code Resolutions} with an aspect ratio of 16:9.
    */
   public static class Ratio16x9 extends Ratio {
     public static final Resolution RES_1280x720 = new Resolution(1280, 720, new Ratio16x9());
@@ -168,7 +168,7 @@ public class Resolution {
   }
 
   /**
-   * Contains predefined <code>Resolutions</code> with an aspect ratio of 16:10.
+   * Contains predefined {@code Resolutions} with an aspect ratio of 16:10.
    */
   public static class Ratio16x10 extends Ratio {
     public static final Resolution RES_720x480 = new Resolution(720, 480, new Ratio16x10());

@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import de.gurkenlabs.litiengine.environment.Environment;
+
 public interface ILayerList extends ICustomPropertyProvider {
 
   /**
@@ -23,7 +25,7 @@ public interface ILayerList extends ICustomPropertyProvider {
   public List<IMapObjectLayer> getMapObjectLayers();
 
   /**
-   * Adds an <code>ILayer</code> to the Layer list.
+   * Adds an {@code ILayer} to the Layer list.
    *
    * @param layer
    *          the layer to be added
@@ -31,7 +33,7 @@ public interface ILayerList extends ICustomPropertyProvider {
   public void addLayer(ILayer layer);
 
   /**
-   * Adds an <code>ILayer</code> to the Layer list at the given index.
+   * Adds an {@code ILayer} to the Layer list at the given index.
    *
    * @param index
    *          the index
@@ -41,7 +43,7 @@ public interface ILayerList extends ICustomPropertyProvider {
   public void addLayer(int index, ILayer layer);
 
   /**
-   * Removes an <code>ILayer</code> from the Layer list.
+   * Removes an {@code ILayer} from the Layer list.
    *
    * @param layer
    *          the layer to be removed
@@ -49,7 +51,7 @@ public interface ILayerList extends ICustomPropertyProvider {
   public void removeLayer(ILayer layer);
 
   /**
-   * Gets the <code>IMapObjectLayer</code> containing a given <code>IMapObject</code>.
+   * Gets the {@code IMapObjectLayer} containing a given {@code IMapObject}.
    *
    * @param mapObject
    *          the map object being searched
@@ -136,14 +138,15 @@ public interface ILayerList extends ICustomPropertyProvider {
 
   /**
    * Gets all map objects in the layer list using the map IDs passed as a parameter. Please note that map IDs are intended to be unique identifiers
-   * for <code>IMapObject</code>s (and their corresponding <code>Entity</code>). This method is just a way of checking for non-unique IDs and
-   * re-assigning
-   * them before adding entities.
+   * for {@code IMapObject}s (and their corresponding {@code Entity}). This method is just a way of checking for non-unique IDs and
+   * re-assigning them before adding entities.
    * 
-   * @see <code>Environment.add(final IEntity entity)</code>
    * @param mapIDs
    *          an array of mapIDs for which the layer list is searched
+   * 
    * @return a Collection of IMapObjects matching the given MapObject IDs
+   * @see Environment#add
+   * 
    */
   public default Collection<IMapObject> getMapObjects(int... mapIDs) {
     List<IMapObject> mapObjects = new ArrayList<>();
@@ -163,11 +166,11 @@ public interface ILayerList extends ICustomPropertyProvider {
   }
 
   /**
-   * Gets the first <code>IMapObject</code> with the given ID from a layer list.
+   * Gets the first {@code IMapObject} with the given ID from a layer list.
    *
    * @param mapId
-   *          the map id of the desired <code>IMapObject</code>
-   * @return the <code>IMapObject</code> with the given ID
+   *          the map id of the desired {@code IMapObject}
+   * @return the {@code IMapObject} with the given ID
    */
   public default IMapObject getMapObject(int mapId) {
     if (this.getMapObjectLayers() == null) {
@@ -190,10 +193,10 @@ public interface ILayerList extends ICustomPropertyProvider {
   }
 
   /**
-   * Removes the first <code>IMapObject</code> with the given ID.
+   * Removes the first {@code IMapObject} with the given ID.
    *
    * @param mapId
-   *          the map id of the <code>IMapObject</code> we want to remove
+   *          the map id of the {@code IMapObject} we want to remove
    */
   public default void removeMapObject(int mapId) {
     for (IMapObjectLayer layer : this.getMapObjectLayers()) {
@@ -213,23 +216,23 @@ public interface ILayerList extends ICustomPropertyProvider {
   }
 
   /**
-   * Gets the <code>ITileLayer</code>s contained in a Layer list.
+   * Gets the {@code ITileLayer}s contained in a Layer list.
    *
-   * @return a <code>List</code> of all <code>ITileLayer</code>s
+   * @return a {@code List} of all {@code ITileLayer}s
    */
   public List<ITileLayer> getTileLayers();
 
   /**
-   * Gets the <code>IImageLayer</code>s contained in a Layer list.
+   * Gets the {@code IImageLayer}s contained in a Layer list.
    *
-   * @return a <code>List</code> of all <code>IImageLayer</code>s
+   * @return a {@code List} of all {@code IImageLayer}s
    */
   public List<IImageLayer> getImageLayers();
 
   /**
-   * Gets the <code>IGroupLayer</code>s contained in a Layer list.
+   * Gets the {@code IGroupLayer}s contained in a Layer list.
    *
-   * @return a <code>List</code> of all <code>IGroupLayer</code>s
+   * @return a {@code List} of all {@code IGroupLayer}s
    */
   public List<IGroupLayer> getGroupLayers();
 

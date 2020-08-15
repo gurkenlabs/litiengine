@@ -29,7 +29,7 @@ import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
 
 /**
  * The 2D Render Engine is used to render texts, shapes and entities at their location in the
- * <code>Environment</code> and with respect to the <code>Camera</code> location and zoom.
+ * {@code Environment} and with respect to the {@code Camera} location and zoom.
  * 
  * <p>
  * <i>Internally, it uses the static renderer implementations to actually execute the rendering process.
@@ -54,7 +54,7 @@ public final class RenderEngine {
 
   /**
    * <p>
-   * <b>You should never call this manually! Instead use the <code>Game.graphics()</code> instance.</b>
+   * <b>You should never call this manually! Instead use the {@code Game.graphics()} instance.</b>
    * </p>
    * 
    * @see Game#graphics()
@@ -69,7 +69,7 @@ public final class RenderEngine {
    * Adds the specified entity rendered listener to receive events when entities were rendered.
    * 
    * <p>
-   * This is the global equivalent to <code>IEntity.addEntityRenderedListener</code>
+   * This is the global equivalent to {@code IEntity.addEntityRenderedListener}
    * </p>
    * 
    * @param listener
@@ -95,7 +95,7 @@ public final class RenderEngine {
    * Adds the specified entity render listener to receive events and callbacks about the rendering process of entities.
    * 
    * <p>
-   * This is the global equivalent to <code>IEntity.addEntityRenderListener</code>
+   * This is the global equivalent to {@code IEntity.addEntityRenderListener}
    * </p>
    * 
    * @param listener
@@ -291,7 +291,7 @@ public final class RenderEngine {
   }
 
   /**
-   * Renders the outline with the defined <code>Stroke</code> of the specified shape to the translated location in the game world.
+   * Renders the outline with the defined {@code Stroke} of the specified shape to the translated location in the game world.
    * 
    * @param g
    *          The graphics object to render on.
@@ -307,7 +307,7 @@ public final class RenderEngine {
   }
 
   /**
-   * Renders the outline with the defined <code>Stroke</code> of the specified shape to the translated location in the game world.
+   * Renders the outline with the defined {@code Stroke} of the specified shape to the translated location in the game world.
    * 
    * @param g
    *          The graphics object to render on.
@@ -325,7 +325,7 @@ public final class RenderEngine {
   }
 
   /**
-   * Renders the outline with the defined <code>Stroke</code> of the specified shape to the translated location in the game world.
+   * Renders the outline with the defined {@code Stroke} of the specified shape to the translated location in the game world.
    * 
    * @param g
    *          The graphics object to render on.
@@ -401,7 +401,7 @@ public final class RenderEngine {
   /**
    * Renders the specified entities at their current location in the environment.
    * <p>
-   * This method sorts the specified entities by their y-coordinate unless the <code>sort</code> parameter is set to false.
+   * This method sorts the specified entities by their y-coordinate unless the {@code sort} parameter is set to false.
    * </p>
    * 
    * @param g
@@ -409,7 +409,7 @@ public final class RenderEngine {
    * @param entities
    *          The entities to be rendered.
    * @param sort
-   *          Defines whether the entities should be sorted by the <code>EntityYComparator</code> to simulate 2.5D graphics.
+   *          Defines whether the entities should be sorted by the {@code EntityYComparator} to simulate 2.5D graphics.
    * 
    * @see EntityYComparator
    */
@@ -442,12 +442,12 @@ public final class RenderEngine {
   /**
    * Renders the specified entity at its current location in the environment.
    * <p>
-   * This method uses the <code>IEntityAnimationController</code> to render the appropriate <code>Animation</code>.<br>
-   * If the entity implements the <code>IRenderable</code> interface, its render method is being called afterwards.
+   * This method uses the {@code IEntityAnimationController} to render the appropriate {@code Animation}.<br>
+   * If the entity implements the {@code IRenderable} interface, its render method is being called afterwards.
    * </p>
    * 
    * <p>
-   * To listen to events about this process, you can add a <code>EntityRenderListener</code> or <code>EntityRenderedListener</code> to the render
+   * To listen to events about this process, you can add a {@code EntityRenderListener} or {@code EntityRenderedListener} to the render
    * engine.
    * </p>
    * 
@@ -532,10 +532,10 @@ public final class RenderEngine {
   }
 
   /**
-   * Determines whether the specified entity can be rendered by evaluating the callbacks to all registered <code>EntityRenderListeners</code>.
+   * Determines whether the specified entity can be rendered by evaluating the callbacks to all registered {@code EntityRenderListeners}.
    *
    * <p>
-   * If the <code>RenderType</code> of the specified entity is set to <code>NONE</code> or there are any callbacks that prevent the entity from being
+   * If the {@code RenderType} of the specified entity is set to {@code NONE} or there are any callbacks that prevent the entity from being
    * rendered, this method will return false.
    * </p>
    * 

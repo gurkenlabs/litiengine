@@ -33,7 +33,7 @@ import java.util.logging.Logger;
  * component and a <tt>Listener</tt> to receive notification when file(s) have
  * been dropped. Here is an example:
  * 
- * <code>
+ * {@code 
  *      JPanel myPanel = new JPanel();
  *      new FileDrop( myPanel, new FileDrop.Listener()
  *      {   public void filesDropped( java.io.File[] files )
@@ -42,7 +42,7 @@ import java.util.logging.Logger;
  *              ...
  *          }   // end filesDropped
  *      }); // end FileDrop.Listener
- * </code>
+ * }
  * 
  * You can specify the border that will appear when files are being dragged by
  * calling the constructor with a <tt>javax.swing.border.Border</tt>. Only
@@ -377,7 +377,7 @@ public class FileDrop {
 
   /**
    * Implement this inner interface to listen for when files are dropped. For
-   * example your class declaration may begin like this: <code>
+   * example your class declaration may begin like this: {@code 
    *      public class MyClass implements FileDrop.Listener
    *      ...
    *      public void filesDropped( java.io.File[] files )
@@ -385,7 +385,7 @@ public class FileDrop {
    *          ...
    *      }   // end filesDropped
    *      ...
-   * </code>
+   * }
    *
    * @since 1.1
    */
@@ -450,12 +450,12 @@ public class FileDrop {
    * your object. For example:
    * 
    * <pre>
-   * <code>
+   * {@code 
    *      ...
    *      MyCoolClass myObj = new MyCoolClass();
    *      Transferable xfer = new TransferableObject( myObj );
    *      ...
-   * </code>
+   * }
    * </pre>
    * 
    * Or if you need to know when the data was actually dropped, like when you're
@@ -464,7 +464,7 @@ public class FileDrop {
    * in Time. For example:
    * 
    * <pre>
-   * <code>
+   * {@code 
    *      ...
    *      final MyCoolClass myObj = new MyCoolClass();
    *
@@ -474,7 +474,7 @@ public class FileDrop {
    *
    *      Transferable xfer = new TransferableObject( fetcher );
    *      ...
-   * </code>
+   * }
    * </pre>
    *
    * The {@link java.awt.datatransfer.DataFlavor} associated with
@@ -520,7 +520,7 @@ public class FileDrop {
      * Creates a new {@link TransferableObject} that wraps <var>data</var>.
      * Along with the {@link #DATA_FLAVOR} associated with this class, this
      * creates a custom data flavor with a representation class determined from
-     * <code>data.getClass()</code> and the MIME type
+     * {@code data.getClass()} and the MIME type
      * <tt>application/x-net.iharder.dnd.TransferableObject</tt>.
      *
      * @param data
@@ -623,7 +623,7 @@ public class FileDrop {
 
     /**
      * Returns <tt>true</tt> if <var>flavor</var> is one of the supported
-     * flavors. Flavors are supported using the <code>equals(...)</code> method.
+     * flavors. Flavors are supported using the {@code equals(...)} method.
      *
      * @param flavor
      *          The data flavor to check

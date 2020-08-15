@@ -99,7 +99,7 @@ public abstract class Particle implements ITimeToLive {
    * 
    * @param origin
    *          the spawn location of this particle
-   * @return
+   * @return The Rectangular particle bounding box.
    */
   public Rectangle2D getBoundingBox(final Point2D origin) {
     return new Rectangle2D.Double(origin.getX() + this.getX(), origin.getY() + this.getY(), this.getWidth(), this.getHeight());

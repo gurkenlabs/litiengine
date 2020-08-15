@@ -17,15 +17,15 @@ import de.gurkenlabs.litiengine.graphics.ICamera;
 import de.gurkenlabs.litiengine.resources.Resources;
 
 /**
- * The <code>GameWorld</code> class is a global environment manager that contains all <code>Environments</code>
- * and provides the currently active <code>Environment</code> and <code>Camera</code>.<br>
+ * The {@code GameWorld} class is a global environment manager that contains all {@code Environments}
+ * and provides the currently active {@code Environment} and {@code Camera}.<br>
  * <p>
- * The <code>GameWorld</code> returns the same instance for a particular map/mapName until the
- * <code>GameWorld.reset(String)</code> method is called.
+ * The {@code GameWorld} returns the same instance for a particular map/mapName until the
+ * {@code GameWorld.reset(String)} method is called.
  * </p>
  * 
- * Moreover, it provides the possibility to attach game logic via <code>EnvironmentListeners</code> to different events of the
- * <code>Envrionment's</code> life cycle (e.g. loaded, initialized, ...).<br>
+ * Moreover, it provides the possibility to attach game logic via {@code EnvironmentListeners} to different events of the
+ * {@code Envrionment's} life cycle (e.g. loaded, initialized, ...).<br>
  * <i>This is typically used to provide some per-level logic or to trigger
  * general loading behavior.</i>
  * 
@@ -54,7 +54,7 @@ public final class GameWorld implements IUpdateable {
 
   /**
    * <p>
-   * <b>You should never call this manually! Instead use the <code>Game.world()</code> instance.</b>
+   * <b>You should never call this manually! Instead use the {@code Game.world()} instance.</b>
    * </p>
    * 
    * @see Game#world()
@@ -242,7 +242,7 @@ public final class GameWorld implements IUpdateable {
   }
 
   /**
-   * Gets the game's current <code>Camera</code>.
+   * Gets the game's current {@code Camera}.
    * 
    * @return The currently active camera.
    * 
@@ -253,7 +253,7 @@ public final class GameWorld implements IUpdateable {
   }
 
   /**
-   * Gets the game's current <code>Environment</code>.
+   * Gets the game's current {@code Environment}.
    * 
    * @return The currently active environment.
    * 
@@ -301,7 +301,7 @@ public final class GameWorld implements IUpdateable {
 
   /**
    * Gets the environment that's related to the specified mapName.<br>
-   * This method implicitly creates a new <code>Environment</code> if necessary.
+   * This method implicitly creates a new {@code Environment} if necessary.
    * 
    * @param mapName
    *          The map name by which the environment is identified.
@@ -318,7 +318,7 @@ public final class GameWorld implements IUpdateable {
 
   /**
    * Gets the environment that's related to the specified map.<br>
-   * This method implicitly creates a new <code>Environment</code> if necessary.
+   * This method implicitly creates a new {@code Environment} if necessary.
    * 
    * @param map
    *          The map by which the environment is identified.
@@ -341,7 +341,7 @@ public final class GameWorld implements IUpdateable {
   }
 
   /**
-   * Indicates whether this instance already contains an <code>Environment</code> for the specified map name.
+   * Indicates whether this instance already contains an {@code Environment} for the specified map name.
    * 
    * @param mapName
    *          The map name by which the environment is identified.
@@ -352,11 +352,11 @@ public final class GameWorld implements IUpdateable {
   }
 
   /**
-   * Loads the specified <code>Environment</code> and sets it as current environment of the game.
+   * Loads the specified {@code Environment} and sets it as current environment of the game.
    * This implicitly unloads the previously loaded environment (if present).
    * 
    * <p>
-   * <i>The loaded environment can then be accessed via <code>GameWorld#environment()</code>.</i>
+   * <i>The loaded environment can then be accessed via {@code GameWorld#environment()}.</i>
    * </p>
    * 
    * @param env
@@ -402,11 +402,11 @@ public final class GameWorld implements IUpdateable {
   }
 
   /**
-   * Loads the <code>Environment</code> that is identified by the specified map name and sets it as current environment of the game.
+   * Loads the {@code Environment} that is identified by the specified map name and sets it as current environment of the game.
    * This implicitly unloads the previously loaded environment (if present).
    * 
    * <p>
-   * <i>The loaded environment can then be accessed via <code>GameWorld#environment()</code>.</i>
+   * <i>The loaded environment can then be accessed via {@code GameWorld#environment()}.</i>
    * </p>
    * 
    * @param mapName
@@ -423,11 +423,11 @@ public final class GameWorld implements IUpdateable {
   }
 
   /**
-   * Loads the <code>Environment</code> that is identified by the specified map and sets it as current environment of the game.
+   * Loads the {@code Environment} that is identified by the specified map and sets it as current environment of the game.
    * This implicitly unloads the previously loaded environment (if present).
    * 
    * <p>
-   * <i>The loaded environment can then be accessed via <code>GameWorld#environment()</code>.</i>
+   * <i>The loaded environment can then be accessed via {@code GameWorld#environment()}.</i>
    * </p>
    * 
    * @param map
@@ -444,7 +444,7 @@ public final class GameWorld implements IUpdateable {
   }
 
   /**
-   * Unloads the current <code>Environment</code> and sets it to null.
+   * Unloads the current {@code Environment} and sets it to null.
    */
   public void unloadEnvironment() {
     if (this.environment() != null) {
@@ -467,7 +467,7 @@ public final class GameWorld implements IUpdateable {
   }
 
   /**
-   * Resets the previously loaded <code>Environment</code> for the specified map name so that it can be re-initiated upon the next access.
+   * Resets the previously loaded {@code Environment} for the specified map name so that it can be re-initiated upon the next access.
    * 
    * <p>
    * <i>This can be used if one wants to completely reset the state of a level to its initial state. It'll just throw away the current environment
@@ -490,7 +490,7 @@ public final class GameWorld implements IUpdateable {
   }
 
   /**
-   * Resets the previously loaded <code>Environment</code> for the specified map so that it can be re-initiated upon the next access.
+   * Resets the previously loaded {@code Environment} for the specified map so that it can be re-initiated upon the next access.
    * 
    * <p>
    * <i>This can be used if one wants to completely reset the state of a level to its initial state. It'll just throw away the current environment
@@ -552,7 +552,7 @@ public final class GameWorld implements IUpdateable {
 
   /**
    * Specify the general gravity that will be used as default value for all environments that are loaded.
-   * The value's unit of measure is pixel/second (similar to the velocity of a <code>IMobileEntity</code>.
+   * The value's unit of measure is pixel/second (similar to the velocity of a {@code IMobileEntity}.
    * 
    * @param gravity
    *          The default gravity for all environments.

@@ -28,7 +28,7 @@ public abstract class ConfigurationGroup {
   private boolean debug;
 
   /**
-   * Initializes a new instance of the <code>ConfigurationGroup</code> class.
+   * Initializes a new instance of the {@code ConfigurationGroup} class.
    */
   protected ConfigurationGroup() {
     final ConfigurationGroupInfo info = this.getClass().getAnnotation(ConfigurationGroupInfo.class);
@@ -150,7 +150,7 @@ public abstract class ConfigurationGroup {
   }
 
   /**
-   * Use this method to set configuration properties if you want to support <code>configurationChanged</code> for your property.
+   * Use this method to set configuration properties if you want to support {@code configurationChanged} for your property.
    * 
    * @param <T>
    *          The type of the value to set.

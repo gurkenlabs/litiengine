@@ -15,7 +15,7 @@ import javax.swing.SwingUtilities;
 @SuppressWarnings("serial")
 public class WrapLayout extends FlowLayout {
   /**
-   * Constructs a new <code>WrapLayout</code> with a left alignment and a
+   * Constructs a new {@code WrapLayout} with a left alignment and a
    * default 5-unit horizontal and vertical gap.
    */
   public WrapLayout() {
@@ -23,10 +23,10 @@ public class WrapLayout extends FlowLayout {
   }
 
   /**
-   * Constructs a new <code>FlowLayout</code> with the specified alignment and a
+   * Constructs a new {@code FlowLayout} with the specified alignment and a
    * default 5-unit horizontal and vertical gap. The value of the alignment
-   * argument must be one of <code>WrapLayout</code>, <code>WrapLayout</code>,
-   * or <code>WrapLayout</code>.
+   * argument must be one of {@code WrapLayout}, {@code WrapLayout},
+   * or {@code WrapLayout}.
    * 
    * @param align
    *          the alignment value
@@ -39,8 +39,8 @@ public class WrapLayout extends FlowLayout {
    * Creates a new flow layout manager with the indicated alignment and the
    * indicated horizontal and vertical gaps.
    * <p>
-   * The value of the alignment argument must be one of <code>WrapLayout</code>,
-   * <code>WrapLayout</code>, or <code>WrapLayout</code>.
+   * The value of the alignment argument must be one of {@code WrapLayout},
+   * {@code WrapLayout}, or {@code WrapLayout}.
    * 
    * @param align
    *          the alignment value

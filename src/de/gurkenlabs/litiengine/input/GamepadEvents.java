@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * The <code>GamepadEvents</code> class is the engine's implementation for receiving gamepad input events.
+ * The {@code GamepadEvents} class is the engine's implementation for receiving gamepad input events.
  */
 public abstract class GamepadEvents {
   protected final Map<String, Collection<GamepadPollListener>> componentPollListeners;

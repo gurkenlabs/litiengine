@@ -24,11 +24,11 @@ import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 /**
  * This class is used to hold all collision aware instances and static collision boxes.
- * It is responsible for resolving movement that respects the collision boxes in the game. This is achieved by the <b><code>move</code></b> method
+ * It is responsible for resolving movement that respects the collision boxes in the game. This is achieved by the <b>{@code move}</b> method
  * group.
  * <br>
- * The <b><code>collides</code></b> method group can detect a collision at a certain location, for rectangles, or collision aware entities.
- * Also, there's an overload that takes a <code>Line2D</code> to perform a basic raycast check.
+ * The <b>{@code collides}</b> method group can detect a collision at a certain location, for rectangles, or collision aware entities.
+ * Also, there's an overload that takes a {@code Line2D} to perform a basic raycast check.
  */
 public final class PhysicsEngine implements IUpdateable {
   private Rectangle2D environmentBounds;
@@ -38,7 +38,7 @@ public final class PhysicsEngine implements IUpdateable {
 
   /**
    * <p>
-   * <b>You should never call this manually! Instead use the <code>Game.physics()</code> instance.</b>
+   * <b>You should never call this manually! Instead use the {@code Game.physics()} instance.</b>
    * </p>
    * 
    * @see Game#physics()
@@ -61,7 +61,7 @@ public final class PhysicsEngine implements IUpdateable {
    * Adds the specified collision aware entity to the physics engine which will make it respect the entity's collision box for upcoming calls.
    * 
    * <p>
-   * <i>If you add a <code>ICollisionEntiy</code> to your Environment, it will automatically be added to the the PhysicsEngine. There is typically no
+   * <i>If you add a {@code ICollisionEntiy} to your Environment, it will automatically be added to the the PhysicsEngine. There is typically no
    * need to call this explicitly.</i>
    * </p>
    * 

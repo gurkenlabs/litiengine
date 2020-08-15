@@ -59,7 +59,7 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   private boolean isActivated;
 
   /**
-   * Instantiates a new <code>Trigger</code> entity.
+   * Instantiates a new {@code Trigger} entity.
    *
    * @param activation
    *          The activation method for this trigger.
@@ -71,7 +71,7 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   }
 
   /**
-   * Instantiates a new <code>Trigger</code> entity.
+   * Instantiates a new {@code Trigger} entity.
    *
    * @param activation
    *          The activation method for this trigger.
@@ -85,7 +85,7 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   }
 
   /**
-   * Instantiates a new <code>Trigger</code> entity.
+   * Instantiates a new {@code Trigger} entity.
    *
    * @param activation
    *          The activation method for this trigger.
@@ -101,7 +101,7 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   }
 
   /**
-   * Instantiates a new <code>Trigger</code> entity.
+   * Instantiates a new {@code Trigger} entity.
    *
    * @param activation
    *          The activation method for this trigger.
@@ -118,7 +118,7 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   }
 
   /**
-   * Initializes a new instance of the <code>Trigger</code> class.
+   * Initializes a new instance of the {@code Trigger} class.
    *
    * @param activation
    *          The activation method for this trigger.

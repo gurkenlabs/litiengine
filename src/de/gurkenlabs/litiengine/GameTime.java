@@ -4,7 +4,7 @@ import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.EnvironmentLoadedListener;
 
 /**
- * The <code>GameTime</code> class provides temporal information that can be used to perform time based events.
+ * The {@code GameTime} class provides temporal information that can be used to perform time based events.
  *
  * <p>
  * The time provided by this class is measured in (game loop) ticks which is essentially an iteration of the game's main update loop.
@@ -12,7 +12,7 @@ import de.gurkenlabs.litiengine.environment.EnvironmentLoadedListener;
  *
  * <p>
  * <b>Examples</b><br>
- * A common use-case is to track the passed time since a certain event occurred (e.g. some action was performed by an <code>Entity</code>).<br>
+ * A common use-case is to track the passed time since a certain event occurred (e.g. some action was performed by an {@code Entity}).<br>
  * Another example is an environment that has a time limit.
  * </p>
  * 

@@ -3,7 +3,7 @@ package de.gurkenlabs.litiengine.entities;
 import java.util.EventListener;
 
 /**
- * This listener provides a callback that allows to check conditions for activating a <code>Trigger</code> and prevent the activation if necessary.
+ * This listener provides a callback that allows to check conditions for activating a {@code Trigger} and prevent the activation if necessary.
  */
 @FunctionalInterface
 public interface TriggerActivatingCondition extends EventListener {
