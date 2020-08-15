@@ -24,7 +24,7 @@ public abstract class ShapeParticle extends Particle {
   @Override
   public void render(final Graphics2D g, final Point2D emitterOrigin) {
     g.setColor(this.getColor());
-    if (this.isOutlineOnly()) {
+    if (this.isOutlineOnly() || this instanceof LineParticle) {
       Game.graphics().renderOutline(g, this.getShape(emitterOrigin), new BasicStroke(1.0f / Game.graphics().getBaseRenderScale()), this.isAntiAliased());
     } else {
       Game.graphics().renderShape(g, this.getShape(emitterOrigin), this.isAntiAliased());
