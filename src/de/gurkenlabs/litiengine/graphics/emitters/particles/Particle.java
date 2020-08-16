@@ -13,6 +13,7 @@ import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.litiengine.physics.Collision;
 import de.gurkenlabs.litiengine.util.ColorHelper;
+import de.gurkenlabs.litiengine.util.MathUtilities;
 
 public abstract class Particle implements ITimeToLive {
   private long aliveTick;
@@ -22,7 +23,7 @@ public abstract class Particle implements ITimeToLive {
 
   private Collision collisionType;
   private Color color;
-  private int colorAlpha = 255;
+  private float colorAlpha = 1;
   private float deltaHeight;
   private float deltaWidth;
   /**
@@ -113,7 +114,7 @@ public abstract class Particle implements ITimeToLive {
     return this.color;
   }
 
-  public int getColorAlpha() {
+  public float getColorAlpha() {
     return this.colorAlpha;
   }
 
@@ -238,26 +239,21 @@ public abstract class Particle implements ITimeToLive {
   public Particle setColor(final Color color) {
     if (color != null) {
       this.color = color;
-      this.colorAlpha = this.color.getAlpha();
+      this.setColorAlpha((float) this.color.getAlpha() / 255);
     }
     return this;
   }
 
   /**
-   * Sets the color alpha. A value between 0 and 100 is expected. Otherwise it
-   * won't be set.
+   * Sets the color alpha. A float value between 0 and 1 is expected.
    *
    * @param colorAlpha
    *          the new color alpha
    * 
    * @return This {@link Particle} instance to chain further setter calls.
    */
-  public Particle setColorAlpha(final int colorAlpha) {
-    if (colorAlpha < 0 || colorAlpha > 100) {
-      return this;
-    }
-
-    this.colorAlpha = colorAlpha;
+  public Particle setColorAlpha(final float colorAlpha) {
+    this.colorAlpha = MathUtilities.clamp(colorAlpha, 0, 1);
     return this;
   }
 
@@ -403,11 +399,11 @@ public abstract class Particle implements ITimeToLive {
     if (this.timeToLiveReached()) {
       return;
     }
-
-    final int alpha = (int) (this.getOpacity() * this.getColorAlpha());
+    System.out.println(String.format("%s, %s, %s", this.getOpacity(), this.getColorAlpha(), (int) (this.getOpacity() * this.getColorAlpha() * 255)));
+    final int alpha = (int) (this.getOpacity() * 255);
 
     if (this.color != null) {
-      this.setColor(new Color(this.getColor().getRed(), this.getColor().getGreen(), this.getColor().getBlue(), alpha >= 0 ? alpha : 0));
+      this.setColor(new Color(this.getColor().getRed(), this.getColor().getGreen(), this.getColor().getBlue(), MathUtilities.clamp(alpha, 0, 255)));
     }
 
     if (this.colliding) {
@@ -500,7 +496,7 @@ public abstract class Particle implements ITimeToLive {
 
   protected float getOpacity() {
     if (this.isFading() && this.getTimeToLive() > 0) {
-      this.opacity = 1 - (float) this.getAliveTime() / this.getTimeToLive();
+      this.opacity = MathUtilities.clamp(1 - this.getColorAlpha() - (float) this.getAliveTime() / this.getTimeToLive(), 0, 1);
       return this.opacity;
     }
     return 1;
