@@ -20,11 +20,6 @@
 * Entity Framework
 * Message Based Networking Framework
 
-> ## :construction: Important Note
-
-> Currently the LITIENGINE is being actively developed and therefore some parts of the framework are not final yet. Be aware that the engine API might change over the course of the next releases up until beta (v0.5.0-beta).
-Nonetheless, the LITIENGINE can of course already be used to make fully functioning **2D java games**.
-
 ## Installation
 The library is distributed over the [Maven Central Repository](https://search.maven.org/artifact/de.gurkenlabs/LITIENGINE/) and you can grab the necessary .jar-file(s) from there by using your favorite build automation tool or manually download the library.
 
@@ -47,22 +42,22 @@ dependencies {
   <version>0.5.0</version>
 </dependency>
 ```
-[More Installation Instructions](https://docs.litiengine.com/basics/getting-started/get-litiengine)
+[More Installation Instructions](https://litiengine.com/download/)
 ## Getting Started
 
-1. [Setup the Game Project](https://litiengine.com/getting-started-setup-the-game-project/)
-2. [Learning the Basics](https://litiengine.com/getting-started-learning-the-basics)
-3. [Configuring the Game](https://litiengine.com/getting-started-configuring-the-game/)
+1. [Setup the Game Project](https://litiengine.com/docs/getting-started/)
+2. [Running the Game](https://litiengine.com/docs/getting-started/run-the-game/)
+3. [Configuring the Game](https://litiengine.com/docs/configuration/)
 4. [Loading a .tmx Map](https://youtu.be/RR3QxOhV8hM)
 
 ## Documentation
-The [LITIENGINE documentation pages](https://docs.litiengine.com/) containing in-depth guides for LITIengine are currently in deployment. We're looking forward to your contributions!
+The [LITIENGINE documentation pages](https://litiengine.com/docs/) containing in-depth guides for LITIengine are currently in deployment. We're looking forward to your contributions!
 
 > :warning: We are aware that there is currently a **lack of documentation**, but we're planning to document the most important parts of the library and use-cases with the first beta release to ensure that features don't get deprecated before they're even used.
 
 If you are searching for a particular method or class within the API or just want to further explore the engine's possiblities, the Javadocs are a good place to start. 
 
-[![Javadocs](http://www.javadoc.io/badge/de.gurkenlabs/litiengine.svg)](http://www.javadoc.io/doc/de.gurkenlabs/litiengine) 
+[![Javadocs](http://www.javadoc.io/badge/de.gurkenlabs/litiengine.svg)](https://litiengine.com/api/) 
 ## Questions?
 Visit the official [LITIENGINE forum](https://forum.litiengine.com/) for troubleshooting or to learn about the LITIengine community. If you encounter bugs or want to request fancy new features, you can also open an issue in our [Issue Tracker](https://github.com/gurkenlabs/litiengine/issues).
 
@@ -91,7 +86,7 @@ If you want to cite parts of the LITIengie in your academic work, you can use th
 * Facebook [gurkenlabsofficial](https://www.facebook.com/gurkenlabsofficial/)
 * YouTube [Gurkenlabs](https://www.youtube.com/channel/UCN7-9zYTxip_Hl1LvCQ8RBA)
 * Bug Reports [Issue Tracker](https://github.com/gurkenlabs/litiengine/issues)
-* E-Mail info@litiengine.com, info@gurkenlabs.de
+* E-Mail info@litiengine.com
 * Forum [forum.litiengine.com](https://forum.litiengine.com/)
 
 ## Authors
@@ -103,5 +98,4 @@ If you want to cite parts of the LITIengie in your academic work, you can use th
 
 ## Support the devs
 
-* [PayPal.me](https://www.paypal.me/gurkenlabsmatthias)
-* [Patreon](https://www.patreon.com/gurkenlabs)
+* [Open Collective](https://opencollective.com/litiengine)
