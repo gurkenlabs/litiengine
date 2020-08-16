@@ -382,6 +382,7 @@ public class MapComponent extends GuiComponent {
 
     layer.addMapObject(mapObject);
     Game.world().environment().loadFromMap(mapObject.getId());
+    UI.getLayerController().refresh();
 
     Game.window().getRenderComponent().requestFocus();
     this.setFocus(mapObject, false);
@@ -518,9 +519,11 @@ public class MapComponent extends GuiComponent {
     if (mapObject == null) {
       return;
     }
+    UI.getLayerController().refresh();
 
     Game.world().environment().getMap().removeMapObject(mapObject.getId());
     Game.world().environment().remove(mapObject.getId());
+    UI.getLayerController().refresh();
 
     if (mapObject.equals(this.getFocusedMapObject())) {
       this.setFocus(null, true);
@@ -1103,6 +1106,8 @@ public class MapComponent extends GuiComponent {
       if (Transform.type() == TransformType.RESIZE) {
         if (!this.isResizing) {
           this.isResizing = true;
+
+          UndoManager.instance().beginOperation();
           UndoManager.instance().mapObjectChanging(this.getFocusedMapObject());
         }
 

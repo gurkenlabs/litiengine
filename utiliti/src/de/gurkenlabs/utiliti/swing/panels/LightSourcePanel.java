@@ -47,7 +47,6 @@ public class LightSourcePanel extends PropertyPanel {
   protected void clearControls() {
     this.spinnerIntensity.setValue(LightSource.DEFAULT_INTENSITY);
     this.colorControl.clear();
-    this.comboBoxLightShape.setSelectedItem("ellipse");
     this.checkBoxIsActive.setSelected(true);
   }
 

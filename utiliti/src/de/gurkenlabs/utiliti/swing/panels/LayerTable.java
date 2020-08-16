@@ -12,7 +12,6 @@ import javax.swing.table.TableCellRenderer;
 
 import com.github.weisj.darklaf.ui.table.renderer.DarkTableCellEditor;
 import com.github.weisj.darklaf.ui.table.renderer.DarkTableCellRenderer;
-import com.github.weisj.darklaf.ui.table.renderer.DarkTableCellRendererDelegate;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
