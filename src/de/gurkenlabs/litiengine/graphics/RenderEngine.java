@@ -26,6 +26,7 @@ import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.GameWorld;
 import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
+import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
 
 /**
  * The 2D Render Engine is used to render texts, shapes and entities at their location in the
@@ -414,11 +415,10 @@ public final class RenderEngine {
    * @see EntityYComparator
    */
   public void renderEntities(final Graphics2D g, final Collection<? extends IEntity> entities, final boolean sort) {
-    // in order to render the entities in a 2.5D manner, we sort them by their
-    // max Y Coordinate
+    // filter out entities that are outside of the viewport and always include emitters which have an internal mechanism do determine on a per-particle basis whether it should be rendered
+    final List<? extends IEntity> entitiesToRender = entities.stream().filter(x -> Game.world().camera().getViewport().intersects(x.getBoundingBox()) || x instanceof Emitter).collect(Collectors.toList());
 
-    final List<? extends IEntity> entitiesToRender = entities.stream().filter(x -> Game.world().camera().getViewport().intersects(x.getBoundingBox())).collect(Collectors.toList());
-
+    // in order to render the entities in a 2.5D manner, we sort them by their max Y Coordinate
     if (sort) {
       // THIS COSTS THE MOST TIME OF THE RENDERING LOOP... MAYBE USE A
       // BETTER DATASTRUCTURE FOR THE (HEAP)
