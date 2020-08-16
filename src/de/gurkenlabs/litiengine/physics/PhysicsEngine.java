@@ -30,12 +30,6 @@ import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
  * The <b>{@code collides}</b> method group can detect a collision at a certain location, for rectangles, or collision aware entities.
  * Also, there's an overload that takes a {@code Line2D} to perform a basic raycast check.
  */
-/**
- *
- */
-/**
- *
- */
 public final class PhysicsEngine implements IUpdateable {
   private Rectangle2D environmentBounds;
 
