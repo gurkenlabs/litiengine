@@ -399,7 +399,6 @@ public abstract class Particle implements ITimeToLive {
     if (this.timeToLiveReached()) {
       return;
     }
-    System.out.println(String.format("%s, %s, %s", this.getOpacity(), this.getColorAlpha(), (int) (this.getOpacity() * this.getColorAlpha() * 255)));
     final int alpha = (int) (this.getOpacity() * 255);
 
     if (this.color != null) {
