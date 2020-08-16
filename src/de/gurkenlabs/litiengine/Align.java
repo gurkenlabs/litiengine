@@ -16,8 +16,6 @@ public enum Align {
   LEFT(0f),
   @XmlEnumValue("right")
   RIGHT(1f),
-  @XmlEnumValue("justify")
-  JUSTIFY(Float.NaN), // for use in TMX maps
   CENTER_LEFT(0.25f),
   CENTER_RIGHT(0.75f);
 
