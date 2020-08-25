@@ -25,12 +25,12 @@ import java.util.logging.Logger;
 
 /**
  * This class makes it easy to drag and drop files from the operating system to
- * a Java program. Any <tt>java.awt.Component</tt> can be dropped onto, but only
- * <tt>javax.swing.JComponent</tt>s will indicate the drop event with a changed
+ * a Java program. Any {@code java.awt.Component} can be dropped onto, but only
+ * {@code javax.swing.JComponent}s will indicate the drop event with a changed
  * border.
  *
- * To use this class, construct a new <tt>FileDrop</tt> by passing it the target
- * component and a <tt>Listener</tt> to receive notification when file(s) have
+ * To use this class, construct a new {@code FileDrop} by passing it the target
+ * component and a {@code Listener} to receive notification when file(s) have
  * been dropped. Here is an example:
  * 
  * {@code 
@@ -45,12 +45,12 @@ import java.util.logging.Logger;
  * }
  * 
  * You can specify the border that will appear when files are being dragged by
- * calling the constructor with a <tt>javax.swing.border.Border</tt>. Only
- * <tt>JComponent</tt>s will show any indication with a border.
+ * calling the constructor with a {@code javax.swing.border.Border}. Only
+ * {@code JComponent}s will show any indication with a border.
  * 
- * You can turn on some debugging features by passing a <tt>PrintStream</tt>
- * object (such as <tt>System.out</tt>) into the full constructor. A
- * <tt>null</tt> value will result in no extra debugging information being
+ * You can turn on some debugging features by passing a {@code PrintStream}
+ * object (such as {@code System.out}) into the full constructor. A
+ * {@code null} value will result in no extra debugging information being
  * output.
  * 
  */
@@ -66,14 +66,14 @@ public class FileDrop {
   /**
    * Constructor with a specified border and debugging optionally turned on.
    * With Debugging turned on, more status messages will be displayed to
-   * <tt>out</tt>. A common way to use this constructor is with
-   * <tt>System.out</tt> or <tt>System.err</tt>. A <tt>null</tt> value for the
-   * parameter <tt>out</tt> will result in no debugging output.
+   * {@code out}. A common way to use this constructor is with
+   * {@code System.out} or {@code System.err}. A {@code null} value for the
+   * parameter {@code out} will result in no debugging output.
    *
    * @param c
    *          Component on which files will be dropped.
    * @param listener
-   *          Listens for <tt>filesDropped</tt>.
+   *          Listens for {@code filesDropped}.
    * @since 1.0
    */
   public FileDrop(final Component c, final Listener listener) {
@@ -83,16 +83,16 @@ public class FileDrop {
   /**
    * Full constructor with a specified border and debugging optionally turned
    * on. With Debugging turned on, more status messages will be displayed to
-   * <tt>out</tt>. A common way to use this constructor is with
-   * <tt>System.out</tt> or <tt>System.err</tt>. A <tt>null</tt> value for the
-   * parameter <tt>out</tt> will result in no debugging output.
+   * {@code out}. A common way to use this constructor is with
+   * {@code System.out} or {@code System.err}. A {@code null} value for the
+   * parameter {@code out} will result in no debugging output.
    *
    * @param c
    *          Component on which files will be dropped.
    * @param recursive
    *          Recursively set children as drop targets.
    * @param listener
-   *          Listens for <tt>filesDropped</tt>.
+   *          Listens for {@code filesDropped}.
    * @since 1.0
    */
   public FileDrop(final Component c, final boolean recursive, final Listener listener) {
@@ -395,7 +395,7 @@ public class FileDrop {
      * This method is called when files have been successfully dropped.
      *
      * @param files
-     *          An array of <tt>File</tt>s that were dropped.
+     *          An array of {@code File}s that were dropped.
      * @since 1.0
      */
     public abstract void filesDropped(File[] files);
@@ -479,8 +479,8 @@ public class FileDrop {
    *
    * The {@link java.awt.datatransfer.DataFlavor} associated with
    * {@link TransferableObject} has the representation class
-   * <tt>net.iharder.dnd.TransferableObject.class</tt> and MIME type
-   * <tt>application/x-net.iharder.dnd.TransferableObject</tt>. This data flavor
+   * {@code net.iharder.dnd.TransferableObject.class} and MIME type
+   * {@code application/x-net.iharder.dnd.TransferableObject}. This data flavor
    * is accessible via the static {@link #DATA_FLAVOR} property.
    *
    *
@@ -495,7 +495,7 @@ public class FileDrop {
   public static class TransferableObject implements Transferable {
     /**
      * The MIME type for {@link #DATA_FLAVOR} is
-     * <tt>application/x-net.iharder.dnd.TransferableObject</tt>.
+     * {@code application/x-net.iharder.dnd.TransferableObject}.
      *
      * @since 1.1
      */
@@ -504,8 +504,8 @@ public class FileDrop {
     /**
      * The default {@link java.awt.datatransfer.DataFlavor} for
      * {@link TransferableObject} has the representation class
-     * <tt>net.iharder.dnd.TransferableObject.class</tt> and the MIME type
-     * <tt>application/x-net.iharder.dnd.TransferableObject</tt>.
+     * {@code net.iharder.dnd.TransferableObject.class} and the MIME type
+     * {@code application/x-net.iharder.dnd.TransferableObject}.
      *
      * @since 1.1
      */
@@ -521,7 +521,7 @@ public class FileDrop {
      * Along with the {@link #DATA_FLAVOR} associated with this class, this
      * creates a custom data flavor with a representation class determined from
      * {@code data.getClass()} and the MIME type
-     * <tt>application/x-net.iharder.dnd.TransferableObject</tt>.
+     * {@code application/x-net.iharder.dnd.TransferableObject}.
      *
      * @param data
      *          The data to transfer
@@ -551,7 +551,7 @@ public class FileDrop {
      * is returned by <var>fetcher</var>. Along with the {@link #DATA_FLAVOR}
      * associated with this class, this creates a custom data flavor with a
      * representation class <var>dataClass</var> and the MIME type
-     * <tt>application/x-net.iharder.dnd.TransferableObject</tt>.
+     * {@code application/x-net.iharder.dnd.TransferableObject}.
      *
      * @see Fetcher
      * @param dataClass
@@ -567,7 +567,7 @@ public class FileDrop {
 
     /**
      * Returns the custom {@link java.awt.datatransfer.DataFlavor} associated
-     * with the encapsulated object or <tt>null</tt> if the {@link Fetcher}
+     * with the encapsulated object or {@code null} if the {@link Fetcher}
      * constructor was used without passing a {@link java.lang.Class}.
      *
      * @return The custom data flavor for the encapsulated object
@@ -622,7 +622,7 @@ public class FileDrop {
     }
 
     /**
-     * Returns <tt>true</tt> if <var>flavor</var> is one of the supported
+     * Returns {@code true} if <var>flavor</var> is one of the supported
      * flavors. Flavors are supported using the {@code equals(...)} method.
      *
      * @param flavor
