@@ -98,6 +98,8 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     this.message = message;
     this.isOneTimeTrigger = isOneTime;
     this.activationType = activation;
+    this.setCollisionBoxWidth(this.getWidth());
+    this.setCollisionBoxHeight(this.getHeight());
   }
 
   /**
