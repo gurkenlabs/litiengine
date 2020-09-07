@@ -239,19 +239,19 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
     Optional<Animation> rightWalkAnimation = this.getAll().stream().filter(x -> x.getName().equals(rightWalk)).findFirst();
 
     if (!leftIdleAnimation.isPresent() && rightIdleAnimation.isPresent()) {
-      this.add(flipAnimation(rightIdleAnimation.get().getSpritesheet(), leftIdle));
+      this.add(flipAnimation(rightIdleAnimation.get(), leftIdle));
     }
 
     if (!leftWalkAnimation.isPresent() && rightWalkAnimation.isPresent()) {
-      this.add(flipAnimation(rightWalkAnimation.get().getSpritesheet(), leftWalk));
+      this.add(flipAnimation(rightWalkAnimation.get(), leftWalk));
     }
 
     if (!rightIdleAnimation.isPresent() && leftIdleAnimation.isPresent()) {
-      this.add(flipAnimation(leftIdleAnimation.get().getSpritesheet(), rightIdle));
+      this.add(flipAnimation(leftIdleAnimation.get(), rightIdle));
     }
 
     if (!rightWalkAnimation.isPresent() && leftWalkAnimation.isPresent()) {
-      this.add(flipAnimation(leftWalkAnimation.get().getSpritesheet(), rightWalk));
+      this.add(flipAnimation(leftWalkAnimation.get(), rightWalk));
     }
   }
 
@@ -326,9 +326,9 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
     }
   }
 
-  private Animation flipAnimation(Spritesheet spriteToFlip, String newSpriteName) {
-    final BufferedImage leftIdleSprite = Imaging.flipSpritesHorizontally(spriteToFlip);
-    Spritesheet leftIdleSpritesheet = Resources.spritesheets().load(leftIdleSprite, newSpriteName, spriteToFlip.getSpriteWidth(), spriteToFlip.getSpriteHeight());
-    return new Animation(leftIdleSpritesheet, true);
+  private Animation flipAnimation(Animation anim, String newSpriteName) {
+    final BufferedImage flippedImage = Imaging.flipSpritesHorizontally(anim.getSpritesheet());
+    Spritesheet flippedSpritesheet = Resources.spritesheets().load(flippedImage, newSpriteName, anim.getSpritesheet().getSpriteWidth(), anim.getSpritesheet().getSpriteHeight());
+    return new Animation(flippedSpritesheet, true, anim.getKeyFrameDurations());
   }
 }

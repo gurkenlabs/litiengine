@@ -266,6 +266,15 @@ public class Animation implements IUpdateable, ILaunchable {
   }
 
   /**
+   * Gets an array of this animation's keyframe durations by streaming the keyframe list and mapping the durations to an int array.
+   * 
+   * @return An array of this animation's keyframe durations.
+   */
+  public int[] getKeyFrameDurations() {
+    return this.getKeyframes().stream().mapToInt(KeyFrame::getDuration).toArray();
+  }
+
+  /**
    * Sets the looping behavior for this animation.
    * 
    * @param loop
