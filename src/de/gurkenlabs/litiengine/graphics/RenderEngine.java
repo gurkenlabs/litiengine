@@ -508,6 +508,7 @@ public final class RenderEngine {
 
           if (Game.config().debug().renderBoundingBoxes()) {
             g.setColor(new Color(255, 0, 0, 50));
+            renderOutline(g, new Rectangle2D.Double(entity.getX(), entity.getY(), img.getWidth(), img.getWidth()));
             ShapeRenderer.renderOutlineTransformed(g, new Rectangle2D.Double(renderLocation.getX(), renderLocation.getY(), img.getWidth(), img.getWidth()), animationController.getAffineTransform(), 0.25f);
           }
         }

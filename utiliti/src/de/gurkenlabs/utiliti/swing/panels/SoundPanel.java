@@ -52,8 +52,8 @@ public class SoundPanel extends PropertyPanel {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    this.volume.setValue((int) MathUtilities.clamp(Game.config().sound().getSoundVolume() * 100, 0, 100));
-    this.range.setValue((int) Game.audio().getMaxDistance());
+    this.volume.setValue((int) MathUtilities.clamp(mapObject.getIntValue(MapObjectProperty.SOUND_VOLUME), 0, 100));
+    this.range.setValue(mapObject.getIntValue(MapObjectProperty.SOUND_RANGE));
     this.loop.setSelected(mapObject.getBoolValue(MapObjectProperty.SOUND_LOOP));
     updateModel();
     if (mapObject.getStringValue(MapObjectProperty.SOUND_NAME) == null || !Resources.sounds().contains(mapObject.getStringValue(MapObjectProperty.SOUND_NAME))) {
@@ -67,8 +67,8 @@ public class SoundPanel extends PropertyPanel {
   }
 
   private void setupChangedListeners() {
-    this.volume.addChangeListener(l -> Game.config().sound().setSoundVolume(this.volume.getValue() / 100f));
-    this.range.addChangeListener(l -> Game.audio().setMaxDistance((int) this.range.getValue()));
+    this.volume.addChangeListener(l -> Game.config().sound().setSoundVolume(this.volume.getValue()));
+    this.setup(this.range, MapObjectProperty.SOUND_RANGE);
     this.setup(this.loop, MapObjectProperty.SOUND_LOOP);
     this.setup(this.soundResource, MapObjectProperty.SOUND_NAME);
   }

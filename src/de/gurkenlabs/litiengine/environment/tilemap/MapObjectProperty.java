@@ -60,6 +60,7 @@ public final class MapObjectProperty {
   public static final String SOUND_VOLUME = "soundVolume";
   public static final String SOUND_LOOP = "soundLoop";
   public static final String SOUND_NAME = "soundName";
+  public static final String SOUND_RANGE = "soundRange";
 
   // static shadow
   public static final String SHADOW_TYPE = "shadowType";

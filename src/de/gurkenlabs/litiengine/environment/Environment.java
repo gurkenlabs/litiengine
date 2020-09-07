@@ -42,6 +42,7 @@ import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.entities.LightSource;
 import de.gurkenlabs.litiengine.entities.MapArea;
 import de.gurkenlabs.litiengine.entities.Prop;
+import de.gurkenlabs.litiengine.entities.SoundSource;
 import de.gurkenlabs.litiengine.entities.Spawnpoint;
 import de.gurkenlabs.litiengine.entities.StaticShadow;
 import de.gurkenlabs.litiengine.entities.Trigger;
@@ -95,6 +96,7 @@ public final class Environment implements IRenderable {
   private final Collection<Creature> creatures = ConcurrentHashMap.newKeySet();
   private final Collection<StaticShadow> staticShadows = ConcurrentHashMap.newKeySet();
   private final Collection<LightSource> lightSources = ConcurrentHashMap.newKeySet();
+  private final Collection<SoundSource> soundSources = ConcurrentHashMap.newKeySet();
   private final Collection<Spawnpoint> spawnPoints = ConcurrentHashMap.newKeySet();
   private final Collection<MapArea> mapAreas = ConcurrentHashMap.newKeySet();
   private final Collection<Trigger> triggers = ConcurrentHashMap.newKeySet();
@@ -117,6 +119,7 @@ public final class Environment implements IRenderable {
     registerMapObjectLoader(new MapAreaMapObjectLoader());
     registerMapObjectLoader(new StaticShadowMapObjectLoader());
     registerMapObjectLoader(new CreatureMapObjectLoader());
+    registerMapObjectLoader(new SoundSourceMapObjectLoader());
   }
 
   /**
@@ -484,6 +487,7 @@ public final class Environment implements IRenderable {
     this.mobileEntities.clear();
     this.lightSources.clear();
     this.spawnPoints.clear();
+    this.soundSources.clear();
     this.mapAreas.clear();
     this.triggers.clear();
 
@@ -1428,6 +1432,54 @@ public final class Environment implements IRenderable {
   }
 
   /**
+   * Gets an immutable collection containing all {@link SoundSource} entities on this environment.
+   * 
+   * <p>
+   * To add or remove entities, use the corresponding methods on this environment.
+   * </p>
+   * 
+   * @return An immutable collection with all {@link SoundSource} entities.
+   * 
+   * @see #add(IEntity)
+   * @see #addAll(Iterable)
+   * @see #remove(IEntity)
+   * @see #removeAll(Iterable)
+   */
+  public Collection<SoundSource> getSoundSources() {
+    return Collections.unmodifiableCollection(this.soundSources);
+  }
+
+  /**
+   * Gets the {@link SoundSource} with the specified map ID from this environment.
+   * 
+   * @param mapId
+   *          The map ID of the entity.
+   * 
+   * @return The {@link SoundSource} with the specified map ID or null if no entity is found.
+   * 
+   * @see #getSpawnpoint(String)
+   * @see #getSpawnPoints()
+   */
+  public SoundSource getSoundSource(final int mapId) {
+    return getById(this.soundSources, mapId);
+  }
+
+  /**
+   * Gets the {@link SoundSource} with the specified name from this environment.
+   * 
+   * @param name
+   *          The name of the entity.
+   * 
+   * @return The {@link SoundSource} with the specified name or null if no entity is found.
+   * 
+   * @see #getSpawnpoint(int)
+   * @see #getSpawnPoints()
+   */
+  public SoundSource getSoundSource(final String name) {
+    return getByName(this.soundSources, name);
+  }
+
+  /**
    * Gets an immutable collection containing all {@link StaticShadow} entities on this environment.
    * 
    * <p>
@@ -1788,6 +1840,9 @@ public final class Environment implements IRenderable {
 
     if (entity instanceof Spawnpoint) {
       this.spawnPoints.remove(entity);
+    }
+    if (entity instanceof SoundSource) {
+      this.soundSources.remove(entity);
     }
 
     if (entity instanceof StaticShadow) {
@@ -2247,6 +2302,9 @@ public final class Environment implements IRenderable {
 
     if (entity instanceof Spawnpoint) {
       this.spawnPoints.add((Spawnpoint) entity);
+    }
+    if (entity instanceof SoundSource) {
+      this.soundSources.add((SoundSource) entity);
     }
 
     if (entity instanceof StaticShadow) {
