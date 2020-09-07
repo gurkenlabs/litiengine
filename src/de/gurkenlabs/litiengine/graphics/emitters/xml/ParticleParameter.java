@@ -20,6 +20,11 @@ public class ParticleParameter implements Serializable {
   public ParticleParameter() {
   }
 
+  public ParticleParameter(final float value) {
+    this.setMinValue(value);
+    this.setMaxValue(value);
+  }
+
   public ParticleParameter(final float minValue, final float maxValue) {
     this.setMinValue(minValue);
     this.setMaxValue(maxValue);
