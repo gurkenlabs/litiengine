@@ -1,7 +1,7 @@
 package de.gurkenlabs.litiengine;
 
 /**
- * The <code>IGameLoop</code> interface provides special methods for the game's main loop
+ * The {@code IGameLoop} interface provides special methods for the game's main loop
  */
 public interface IGameLoop extends ILoop {
 
@@ -12,7 +12,7 @@ public interface IGameLoop extends ILoop {
    *          The delay in milliseconds.
    * @param action
    *          The action to perform, once the delay has passed.
-   * @return The id of the <code>TimedAction</code> that can be used to alter the execution time of the action or remove it.
+   * @return The id of the {@code TimedAction} that can be used to alter the execution time of the action or remove it.
    * 
    * @see IGameLoop#alterExecutionTime(int, long)
    */
@@ -22,17 +22,17 @@ public interface IGameLoop extends ILoop {
    * Alters the execution time of the timed action with the specified index to the defined tick. This overwrites the originally specified delay.
    * 
    * @param id
-   *          The id of the <code>TimedAction</code>.
+   *          The id of the {@code TimedAction}.
    * @param tick
    *          The tick at which to perform the action instead.
    */
   public void alterExecutionTime(int id, long tick);
 
   /**
-   * Removes the <code>TimedAction</code> with the specified it.
+   * Removes the {@code TimedAction} with the specified it.
    * 
    * @param id
-   *          The id of the <code>TimedAction</code>.
+   *          The id of the {@code TimedAction}.
    */
   public void removeAction(int id);
 

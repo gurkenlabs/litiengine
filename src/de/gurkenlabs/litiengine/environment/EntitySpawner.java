@@ -41,7 +41,7 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
   }
 
   /**
-   * Initializes a new instance of the <code>EntitySpawner</code> class.
+   * Initializes a new instance of the {@code EntitySpawner} class.
    *
    * @param spawnpoints
    *          The spawnpoints from which this instance will choose from when spawning entities.
@@ -142,7 +142,7 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
   }
 
   /**
-   * Spawn new entities, depending on the <code>SpawnMode</code>, spawnAmount, spawnDelay, and spawnInterval of an <code>EntitySpawner</code>.
+   * Spawn new entities, depending on the {@code SpawnMode}, spawnAmount, spawnDelay, and spawnInterval of an {@code EntitySpawner}.
    * 
    * @see SpawnMode
    */

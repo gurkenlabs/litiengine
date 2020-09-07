@@ -42,20 +42,20 @@ import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 
 /***
  * <p>
- * The <code>Game</code> class is without any doubt one of the classes that you will call a lot when creating a game with the LITIengine.
- * It is designed to be the static container that provides access to all important aspects of the engine, e.g. it holds the <code>GameInfo</code>,
- * the <code>RenderEngine</code>, the <code>SoundEngine</code> and many other major components.
+ * The {@code Game} class is without any doubt one of the classes that you will call a lot when creating a game with the LITIengine.
+ * It is designed to be the static container that provides access to all important aspects of the engine, e.g. it holds the {@code GameInfo},
+ * the {@code RenderEngine}, the {@code SoundEngine} and many other major components.
  * </p>
  * <p>
- * We designed the API such that all important parts that make up the game are directly accessible via the <code>Game</code> class in a static manner.
+ * We designed the API such that all important parts that make up the game are directly accessible via the {@code Game} class in a static manner.
  * To be a little bit more technical, it is essentially a collection of core Singleton instances.
  * </p>
  * <p>
  * This class will also be your starting point when setting up a new LITIengine project. In order to launch your game,
- * you need to at least call {@link Game#init(String...)} and {@link Game#start()} from your programs <code>main(String[])</code> method.
+ * you need to at least call {@link Game#init(String...)} and {@link Game#start()} from your programs {@code main(String[])} method.
  * </p>
  * <p>
- * Additionally, it provides an interface to hook up event listeners (e.g. <code>GameListener</code> or <code>EnvironmentLoadedListener</code>) for
+ * Additionally, it provides an interface to hook up event listeners (e.g. {@code GameListener} or {@code EnvironmentLoadedListener}) for
  * the most basic operations of a Game life cycle. 
  * </p>
  * 
@@ -137,11 +137,11 @@ public final class Game {
   }
 
   /**
-   * This flag indicates whether the game should display the <code>GameWindow</code> or not.
-   * This can only be set before the game has been initialized with the <code>Game.init(String...)</code> method. Afterwards it doesn't have an effect
+   * This flag indicates whether the game should display the {@code GameWindow} or not.
+   * This can only be set before the game has been initialized with the {@code Game.init(String...)} method. Afterwards it doesn't have an effect
    * anymore.
-   * If enabled, the <code>ScreenManager#setVisible(boolean)</code> method won't be set to true and the <code>RenderLoop</code> won't be started.
-   * Also the <code>Camera</code> won't be updated.
+   * If enabled, the {@code ScreenManager#setVisible(boolean)} method won't be set to true and the {@code RenderLoop} won't be started.
+   * Also the {@code Camera} won't be updated.
    * 
    * @param noGui
    *          If set to true, the GUI will be hidden.
@@ -168,7 +168,7 @@ public final class Game {
   }
 
   /**
-   * Indicates whether the game should display the <code>GameWindow</code> or not.
+   * Indicates whether the game should display the {@code GameWindow} or not.
    * 
    * @return True if the game should display visual components; otherwise false.
    */
@@ -192,7 +192,7 @@ public final class Game {
    * This can be used to define meta information about your game, like it's name, version or web site.<br>
    * <br>
    * <i>It's also possible to provide additional custom information using the method group <br>
-   * <code>Game.getInfo().setValue("CUSTOM_STRING", "my-value")</code>.</i>
+   * {@code Game.getInfo().setValue("CUSTOM_STRING", "my-value")}.</i>
    * 
    * @return The game's basic meta information.
    * 
@@ -235,8 +235,8 @@ public final class Game {
    * <p>
    * <i>
    * This information can be rendered by setting <br>
-   * <code>Game.config().client().setShowGameMetrics(boolean)</code> to true or <br>
-   * <code>cl_showGameMetrics=true</code> in the config.settings.
+   * {@code Game.config().client().setShowGameMetrics(boolean)} to true or <br>
+   * {@code cl_showGameMetrics=true} in the config.settings.
    * </i>
    * </p>
    * 
@@ -266,10 +266,10 @@ public final class Game {
   }
 
   /**
-   * Gets the game's window in which the <code>RenderComponent</code> lives.<br>
+   * Gets the game's window in which the {@code RenderComponent} lives.<br>
    * This class e.g. provides the possibility to set a title, provide an icon, get information about the resolution or set a cursor.
    * 
-   * @return The window that hosts the game's <code>RenderComponent</code>.
+   * @return The window that hosts the game's {@code RenderComponent}.
    * 
    * @see RenderComponent
    * @see GameWindow#getResolution()
@@ -282,17 +282,17 @@ public final class Game {
   }
 
   /**
-   * Gets the engine's <code>SoundEngine</code> component that can be used to play sounds and music.<br>
-   * Sound can be loaded and accessed using the <code>Resources</code> API and are managed by the<br>
-   * <code>Resources.sounds()</code> resource container.
+   * Gets the engine's {@code SoundEngine} component that can be used to play sounds and music.<br>
+   * Sound can be loaded and accessed using the {@code Resources} API and are managed by the<br>
+   * {@code Resources.sounds()} resource container.
    * 
    * <p>
    * <i>
-   * Upon playing a sound, the engine returns an <code>SoundPlayback</code> instance that can then be used to further control the audio line.
+   * Upon playing a sound, the engine returns an {@code SoundPlayback} instance that can then be used to further control the audio line.
    * </i>
    * </p>
    * 
-   * @return The engine's <code>SoundEngine</code> component.
+   * @return The engine's {@code SoundEngine} component.
    * 
    * @see Sound
    * @see Resources#sounds()
@@ -305,16 +305,16 @@ public final class Game {
   }
 
   /**
-   * Gets the engine's <code>PhysicsEngine</code> component that can be used to detect and resolve collision and move entities with respect to all
+   * Gets the engine's {@code PhysicsEngine} component that can be used to detect and resolve collision and move entities with respect to all
    * collision
    * entities on the environment.<br>
    * The boundaries of the loaded environment also pose a "non-walkable" area that will be taken into account when moving entities with this engine.
    * 
    * <p>
-   * <i>It is also possible to manually register static collision <code>Rectangles</code> that can further restrict the game world.</i>
+   * <i>It is also possible to manually register static collision {@code Rectangles} that can further restrict the game world.</i>
    * </p>
    * 
-   * @return The engine's <code>PhysicsEngine</code> component.
+   * @return The engine's {@code PhysicsEngine} component.
    * 
    * @see PhysicsEngine
    * @see PhysicsEngine#move(IMobileEntity, float)
@@ -325,15 +325,15 @@ public final class Game {
   }
 
   /**
-   * Gets the engine's <code>RenderEngine</code> component that is used to render <code>Images, Shapes or Text</code> with respect to the environment
-   * and the render scale and the <code>Camera</code>.
+   * Gets the engine's {@code RenderEngine} component that is used to render {@code Images, Shapes or Text} with respect to the environment
+   * and the render scale and the {@code Camera}.
    * 
    * <p>
    * <i>In case you want to render something in a static manner that is unrelated to the environment, you can use the engine's different static
-   * <code>Renderer</code> implementations.</i>
+   * {@code Renderer} implementations.</i>
    * </p>
    * 
-   * @return The engine's <code>RenderEngine</code> component.
+   * @return The engine's {@code RenderEngine} component.
    * 
    * @see RenderEngine#getBaseRenderScale()
    * @see TextRenderer
@@ -346,11 +346,11 @@ public final class Game {
 
   /**
    * Gets the game's main loop that is used to execute and manage all game logic apart from input processing.<br>
-   * You can attach any <code>Updatable</code> instance to this loop if you want to execute custom game logic that is executed at the configured
+   * You can attach any {@code Updatable} instance to this loop if you want to execute custom game logic that is executed at the configured
    * max fps.
    * 
-   * The game's loop also executes the rendering process on the GameFrame's <code>RenderComponent</code>.<br>
-   * This internally renders the currently active screen which passes the <code>Graphics2D</code> object to all <code>GuiComponents</code> and the
+   * The game's loop also executes the rendering process on the GameFrame's {@code RenderComponent}.<br>
+   * This internally renders the currently active screen which passes the {@code Graphics2D} object to all {@code GuiComponents} and the
    * Environment for rendering.
    * <p>
    * <i>The LITIengine has two separate loops for game logic/rendering and input processing. <br>
@@ -393,7 +393,7 @@ public final class Game {
   }
 
   /**
-   * Gets the game's pseudo-random generator that enhances the default Java <code>Random</code> implementation
+   * Gets the game's pseudo-random generator that enhances the default Java {@code Random} implementation
    * with helpful additions.
    * 
    * @return The game's pseudo random generator.
@@ -403,8 +403,8 @@ public final class Game {
   }
 
   /**
-   * Gets the game's <code>ScreenManager</code> that is responsible for organizing all <code>Screens</code> of your game and providing the currently
-   * active <code>Screen</code> that is used to render the current <code>Environment</code>.<br>
+   * Gets the game's {@code ScreenManager} that is responsible for organizing all {@code Screens} of your game and providing the currently
+   * active {@code Screen} that is used to render the current {@code Environment}.<br>
    * Screens are the containers that allow you to organize the visible contents of your game and are identified and addressed by a unique name.
    * 
    * <p>
@@ -422,16 +422,16 @@ public final class Game {
   }
 
   /**
-   * Gets the game's world which is a global environment manager that contains all <code>Environments</code>
-   * and provides the currently active <code>Environment</code> and
-   * <code>Camera</code>.<br>
+   * Gets the game's world which is a global environment manager that contains all {@code Environments}
+   * and provides the currently active {@code Environment} and
+   * {@code Camera}.<br>
    * <p>
-   * The <code>GameWorld</code> returns the same instance for a particular map/mapName until the
-   * <code>GameWorld.reset(String)</code> method is called.
+   * The {@code GameWorld} returns the same instance for a particular map/mapName until the
+   * {@code GameWorld.reset(String)} method is called.
    * </p>
    * 
-   * Moreover, it provides the possibility to attach game logic via <code>EnvironmentListeners</code> to different events of the
-   * <code>Envrionment's</code> life cycle (e.g. loaded, initialized, ...).<br>
+   * Moreover, it provides the possibility to attach game logic via {@code EnvironmentListeners} to different events of the
+   * {@code Envrionment's} life cycle (e.g. loaded, initialized, ...).<br>
    * <i>This is typically used to provide some per-level logic or to trigger
    * general loading behavior.</i>
    * 
@@ -453,15 +453,15 @@ public final class Game {
    * 
    * The following tasks are carried out by this method:
    * <ul>
-   * <li>load the <code>GameConfiguration</code></li>
+   * <li>load the {@code GameConfiguration}</li>
    * <li>handle the specified program parameters</li>
    * <li>configure the logging</li>
-   * <li>set the programs <code>Locale</code> according to the configured values.</li>
-   * <li>initialize and attach core components like the <code>PhysicsEngine</code></li>
-   * <li>initialize the <code>ScreenManger</code></li>
-   * <li>initialize the <code>Input</code></li>
-   * <li>initialize the <code>GameLoop</code> and <code>RenderLoop</code></li>
-   * <li>set a default <code>Camera</code></li>
+   * <li>set the programs {@code Locale} according to the configured values.</li>
+   * <li>initialize and attach core components like the {@code PhysicsEngine}</li>
+   * <li>initialize the {@code ScreenManger}</li>
+   * <li>initialize the {@code Input}</li>
+   * <li>initialize the {@code GameLoop} and {@code RenderLoop}</li>
+   * <li>set a default {@code Camera}</li>
    * </ul>
    * 
    * @param args
@@ -523,7 +523,7 @@ public final class Game {
   }
 
   /**
-   * Sets an <code>UncaughtExceptionHandler</code> used to handle all unexpected exceptions happening in the game.
+   * Sets an {@code UncaughtExceptionHandler} used to handle all unexpected exceptions happening in the game.
    * 
    * @param uncaughtExceptionHandler
    *          The handler to be used for uncaught exceptions.
@@ -536,13 +536,13 @@ public final class Game {
 
   /***
    * <p>
-   * Starts the <code>GameLoops</code> and other components.
-   * After this method is called, the engine will start to render contents of the current <code>Screen</code> of the <code>ScreenManager</code>,
-   * the <code>SoundEngine</code> will start to playback <code>Sounds</code>
-   * and the different input devices (e.g. <code>Mouse</code>, <code>Keyboard</code>) will start to process player input.
+   * Starts the {@code GameLoops} and other components.
+   * After this method is called, the engine will start to render contents of the current {@code Screen} of the {@code ScreenManager},
+   * the {@code SoundEngine} will start to playback {@code Sounds}
+   * and the different input devices (e.g. {@code Mouse}, {@code Keyboard}) will start to process player input.
    * </p>
    * <p>
-   * When the <code>Game</code> has started up successfully, it'll callback to the registered <code>GameListeners</code>.
+   * When the {@code Game} has started up successfully, it'll callback to the registered {@code GameListeners}.
    * </p>
    * 
    * @see ScreenManager#current()
@@ -569,16 +569,16 @@ public final class Game {
   }
 
   /**
-   * Sets the <code>Game's</code> basic information by the specified <code>GameInfo</code> instance.
+   * Sets the {@code Game's} basic information by the specified {@code GameInfo} instance.
    * <p>
-   * <i>Typically, this should not be called manually because the <code>Game</code> already provides a <code>GameInfo</code> object which can be
+   * <i>Typically, this should not be called manually because the {@code Game} already provides a {@code GameInfo} object which can be
    * adjusted.<br>
    * If you just want to edit some of it's information, use the provided instance of {@link Game#info()}.
    * </i>
    * </p>
    * 
    * @param info
-   *          The <code>GameInfo</code> that contains the basic information for the game.
+   *          The {@code GameInfo} that contains the basic information for the game.
    * 
    * @see Game#info()
    * @see GameInfo
@@ -588,10 +588,10 @@ public final class Game {
   }
 
   /**
-   * Sets the <code>Game's</code> basic information by loading the <code>GameInfo</code> from the specified path to an XML file.
+   * Sets the {@code Game's} basic information by loading the {@code GameInfo} from the specified path to an XML file.
    * 
    * @param gameInfoFile
-   *          The path to the XML file that contains the serialized <code>GameInfo</code>.
+   *          The path to the XML file that contains the serialized {@code GameInfo}.
    * 
    * @see Game#setInfo(GameInfo)
    * @see Game#info()

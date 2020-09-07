@@ -20,7 +20,7 @@ import net.java.games.input.Controller.Type;
 import net.java.games.input.ControllerEnvironment;
 
 /**
- * The <code>GamepadManager</code> provides access to all gamepad input devices.
+ * The {@code GamepadManager} provides access to all gamepad input devices.
  * 
  * <p>
  * Gamepads don't need to be added explicitly, the manager supports hot-plugging at runtime and will auto-detect any

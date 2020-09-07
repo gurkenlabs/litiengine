@@ -6,7 +6,7 @@ public class EntityRotationImageEffect extends RotationImageEffect {
   private final IEntity entity;
 
   /**
-   * Initializes a new instance of the <code>EntityRotationImageEffect</code>.
+   * Initializes a new instance of the {@code EntityRotationImageEffect}.
    *
    * @param entity
    *          The entity to which this affect will be applied.

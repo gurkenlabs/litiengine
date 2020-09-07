@@ -57,8 +57,6 @@ public class SpriteParticle extends Particle {
     return new Rectangle2D.Double(origin.getX() + this.getX() - this.getWidth() / 2, origin.getY() + this.getY() - this.getHeight() / 2, this.getWidth(), this.getHeight());
   }
 
-
-
   public boolean isAnimatingSprite() {
     return animateSprite;
   }

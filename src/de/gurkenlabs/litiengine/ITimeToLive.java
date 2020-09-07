@@ -1,7 +1,7 @@
 package de.gurkenlabs.litiengine;
 
 /**
- * The <code>ITimeToLive</code> interface defines methods for instances the have a limited time to live.
+ * The {@code ITimeToLive} interface defines methods for instances the have a limited time to live.
  */
 public interface ITimeToLive {
   /**

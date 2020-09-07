@@ -14,7 +14,7 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
 /**
- * The <code>SoundPlayback</code> class is a wrapper <code>SourceDataLine</code> on which a <code>Sound</code> playback can be carried out.
+ * The {@code SoundPlayback} class is a wrapper {@code SourceDataLine} on which a {@code Sound} playback can be carried out.
  * 
  * @see #play(Sound)
  */
@@ -57,20 +57,20 @@ public abstract class SoundPlayback implements Runnable {
   }
 
   /**
-   * Adds a <code>SoundPlaybackListener</code> to this instance.
+   * Adds a {@code SoundPlaybackListener} to this instance.
    *
    * @param listener
-   *          The <code>SoundPlaybackListener</code> to be added.
+   *          The {@code SoundPlaybackListener} to be added.
    */
   public void addSoundPlaybackListener(SoundPlaybackListener listener) {
     this.listeners.add(listener);
   }
 
   /**
-   * Removes a <code>SoundPlaybackListener</code> from this instance.
+   * Removes a {@code SoundPlaybackListener} from this instance.
    *
    * @param listener
-   *          The <code>SoundPlaybackListener</code> to be removed.
+   *          The {@code SoundPlaybackListener} to be removed.
    */
   public void removeSoundPlaybackListener(SoundPlaybackListener listener) {
     this.listeners.remove(listener);

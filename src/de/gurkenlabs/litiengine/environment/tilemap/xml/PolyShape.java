@@ -15,7 +15,7 @@ public class PolyShape implements IPolyShape {
   private List<Point2D> points;
 
   /**
-   * Instantiates a new <code>PolyShape</code> instance.
+   * Instantiates a new {@code PolyShape} instance.
    */
   public PolyShape() {
     super();
@@ -23,7 +23,7 @@ public class PolyShape implements IPolyShape {
   }
 
   /**
-   * Instantiates a new <code>PolyShape</code> instance by copying from the specified original.
+   * Instantiates a new {@code PolyShape} instance by copying from the specified original.
    *
    * @param original
    *          The poly line to be copied.

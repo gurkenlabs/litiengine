@@ -29,7 +29,7 @@ public interface IAnimationController extends IUpdateable {
   public void removeListener(AnimationListener listener);
 
   /**
-   * Add the specified <code>Animation</code> to this controller instance.
+   * Add the specified {@code Animation} to this controller instance.
    * 
    * <p>
    * Animations with the same name will be replaced by this method.
@@ -45,7 +45,7 @@ public interface IAnimationController extends IUpdateable {
   public void add(Animation animation);
 
   /**
-   * Removes the specified <code>Animation</code> from this controller instance.
+   * Removes the specified {@code Animation} from this controller instance.
    * 
    * @param animation
    *          The animation to remove.
@@ -57,22 +57,22 @@ public interface IAnimationController extends IUpdateable {
   public void remove(Animation animation);
 
   /**
-   * Remove all <code>Animation</code>s from the <code>AnimationController</code>.
+   * Remove all {@code Animation}s from the {@code AnimationController}.
    */
   public void clear();
 
   /**
-   * Gets all <code>Animation</code> instances managed by this controller.
+   * Gets all {@code Animation} instances managed by this controller.
    * 
-   * @return All <code>Animation</code> instances.
+   * @return All {@code Animation} instances.
    */
   public Collection<Animation> getAll();
 
   /**
-   * Gets the <code>Animation</code> instance with the specified name from this controller.
+   * Gets the {@code Animation} instance with the specified name from this controller.
    * 
    * <p>
-   * The name of an <code>Animation</code> is case sensitive.
+   * The name of an {@code Animation} is case sensitive.
    * </p>
    * 
    * @param animationName
@@ -87,7 +87,7 @@ public interface IAnimationController extends IUpdateable {
   public Animation get(String animationName);
 
   /**
-   * Gets the currently active <code>Animation</code> of this controller.
+   * Gets the currently active {@code Animation} of this controller.
    * 
    * <p>
    * The current active animation provides the current image that is being rendered by consumers of this controller
@@ -103,7 +103,7 @@ public interface IAnimationController extends IUpdateable {
   public Animation getCurrent();
 
   /**
-   * Gets the default <code>Animation</code> of this controller.
+   * Gets the default {@code Animation} of this controller.
    * 
    * <p>
    * This animation is played when no other animation is currently active.
@@ -118,16 +118,16 @@ public interface IAnimationController extends IUpdateable {
   public Animation getDefault();
 
   /**
-   * Determines whether this controller has an <code>Animation</code> with the specified name.
+   * Determines whether this controller has an {@code Animation} with the specified name.
    * 
    * <p>
-   * The name of an <code>Animation</code> is case sensitive.
+   * The name of an {@code Animation} is case sensitive.
    * </p>
    * 
    * @param animationName
    *          The name of the animation.
    * 
-   * @return True if this controller contains an <code>Animation</code> with the specified name; otherwise false.
+   * @return True if this controller contains an {@code Animation} with the specified name; otherwise false.
    * 
    * @see #add(Animation)
    * @see #remove(Animation)
@@ -135,41 +135,41 @@ public interface IAnimationController extends IUpdateable {
   public boolean hasAnimation(String animationName);
 
   /**
-   * Determines whether this controller is currently playing an <code>Animation</code> with the specified name.
+   * Determines whether this controller is currently playing an {@code Animation} with the specified name.
    * 
    * <p>
-   * The name of an <code>Animation</code> is case sensitive.
+   * The name of an {@code Animation} is case sensitive.
    * </p>
    * 
    * @param animationName
    *          The name of the animation.
    * 
-   * @return True if this controller is currently playing the <code>Animation</code> with the specified name.
+   * @return True if this controller is currently playing the {@code Animation} with the specified name.
    * 
    * @see #getCurrent()
    */
   public boolean isPlaying(String animationName);
 
   /**
-   * Plays the <code>Animation</code> with the specified name.
+   * Plays the {@code Animation} with the specified name.
    * 
    * <p>
-   * Does nothing if this controller doesn't contain an <code>Animation</code> with the specified name.
+   * Does nothing if this controller doesn't contain an {@code Animation} with the specified name.
    * </p>
    * 
    * <p>
-   * This method also publishes the "played" event to all subscribed <code>AnimationListener</code> instances.
+   * This method also publishes the "played" event to all subscribed {@code AnimationListener} instances.
    * </p>
    * 
    * @param animationName
-   *          The name of the <code>Animation</code> to be played.
+   *          The name of the {@code Animation} to be played.
    * 
    * @see AnimationListener#played(Animation)
    */
   public void play(final String animationName);
 
   /**
-   * Sets the specified <code>Animation</code> as default for this controller.
+   * Sets the specified {@code Animation} as default for this controller.
    * 
    * @param animation
    *          The animation to be set as default.
@@ -182,7 +182,7 @@ public interface IAnimationController extends IUpdateable {
    * Gets the current sprite (keyframe) of the currently active animation of this controller.
    * 
    * <p>
-   * The implementation of this method applies all registered <code>ImageEffects</code>.
+   * The implementation of this method applies all registered {@code ImageEffects}.
    * </p>
    * 
    * @return The current sprite of the current animation with applied effects; or null, if this controller is currently disabled.
@@ -197,7 +197,7 @@ public interface IAnimationController extends IUpdateable {
    * Gets the current sprite scaled by the specified dimensions of the currently active animation of this controller.
    * 
    * <p>
-   * The implementation of this method applies all registered <code>ImageEffects</code>.
+   * The implementation of this method applies all registered {@code ImageEffects}.
    * </p>
    * 
    * @param width
@@ -217,10 +217,10 @@ public interface IAnimationController extends IUpdateable {
   public BufferedImage getCurrentImage(int width, int height);
 
   /**
-   * Gets the <code>AffineTransform</code> instance assigned to this controller that can be used to externally transform
-   * the current image when rendering it with the <code>ImageRenderer</code>.
+   * Gets the {@code AffineTransform} instance assigned to this controller that can be used to externally transform
+   * the current image when rendering it with the {@code ImageRenderer}.
    * 
-   * @return The <code>AffineTransform</code> instance assigned to this controller or null.
+   * @return The {@code AffineTransform} instance assigned to this controller or null.
    * 
    * @see AffineTransform
    * @see ImageRenderer#renderTransformed(java.awt.Graphics2D, java.awt.Image, AffineTransform)
@@ -230,11 +230,11 @@ public interface IAnimationController extends IUpdateable {
   public AffineTransform getAffineTransform();
 
   /**
-   * Sets the <code>AffineTransform</code> instance for this controller that can be used to externally transform
-   * the current image when rendering it with the <code>ImageRenderer</code>.
+   * Sets the {@code AffineTransform} instance for this controller that can be used to externally transform
+   * the current image when rendering it with the {@code ImageRenderer}.
    * 
    * @param affineTransform
-   *          The <code>AffineTransform</code> instance for this controller.
+   *          The {@code AffineTransform} instance for this controller.
    * 
    * @see AffineTransform
    * @see #getAffineTransform()
@@ -242,7 +242,7 @@ public interface IAnimationController extends IUpdateable {
   public void setAffineTransform(AffineTransform affineTransform);
 
   /**
-   * Adds the specified <code>ImageEffect</code> to be applied when the current image is retrieved from this controller.
+   * Adds the specified {@code ImageEffect} to be applied when the current image is retrieved from this controller.
    * 
    * @param effect
    *          The image effect to be added.
@@ -250,7 +250,7 @@ public interface IAnimationController extends IUpdateable {
   public void add(ImageEffect effect);
 
   /**
-   * Removes the specified <code>ImageEffect</code> from this controller.
+   * Removes the specified {@code ImageEffect} from this controller.
    * 
    * @param effect
    *          The image effect to be removed.

@@ -26,7 +26,7 @@ import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.physics.Collision;
 
 /**
- * The <code>DebugRenderer</code> class implements default debug rendering and exposes extension points to reder your own
+ * The {@code DebugRenderer} class implements default debug rendering and exposes extension points to reder your own
  * debug information via callbacks.
  */
 public final class DebugRenderer {
@@ -63,7 +63,7 @@ public final class DebugRenderer {
   }
 
   /**
-   * Add the specified map rendered listener to attach custom debug rendering after layers of the type <code>GROUND</code> have beend rendered.
+   * Add the specified map rendered listener to attach custom debug rendering after layers of the type {@code GROUND} have beend rendered.
    * 
    * @param listener
    *          The listener to add.

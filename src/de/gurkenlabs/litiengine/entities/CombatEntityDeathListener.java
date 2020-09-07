@@ -3,7 +3,7 @@ package de.gurkenlabs.litiengine.entities;
 import java.util.EventListener;
 
 /**
- * This listener provides callbacks for when an <code>ICombatEntity</code> died.
+ * This listener provides callbacks for when an {@code ICombatEntity} died.
  * 
  * @see ICombatEntity#die()
  */
@@ -11,7 +11,7 @@ import java.util.EventListener;
 public interface CombatEntityDeathListener extends EventListener {
   
   /**
-   * This method is called whenever a <code>ICombatEntity</code> dies.
+   * This method is called whenever a {@code ICombatEntity} dies.
    * 
    * @param entity
    *          The combat entity that died.

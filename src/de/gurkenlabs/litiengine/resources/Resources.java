@@ -28,7 +28,7 @@ import de.gurkenlabs.litiengine.util.TimeUtilities;
 
 /**
  * This class is the engines entry point for accessing any kind of resources. A resource is any non-executable data that is deployed with your game.
- * The <code>Resources</code> class provides access to types of <code>ResourcesContainers</code> and is used by different (loading) mechanisms to make
+ * The {@code Resources} class provides access to types of {@code ResourcesContainers} and is used by different (loading) mechanisms to make
  * resources available during runtime.
  * <p>
  * The LITIengine supports a variety of different resource types, including:
@@ -61,7 +61,7 @@ public final class Resources {
   }
 
   /**
-   * Gets the container that manages <code>Font</code> resources.
+   * Gets the container that manages {@code Font} resources.
    * 
    * @return The Font resource container.
    * 
@@ -72,7 +72,7 @@ public final class Resources {
   }
 
   /**
-   * Gets the container that manages <code>Sound</code> resources.
+   * Gets the container that manages {@code Sound} resources.
    * 
    * @return The Sound resource container.
    * 
@@ -83,7 +83,7 @@ public final class Resources {
   }
 
   /**
-   * Gets the container that manages <code>IMap</code> resources.
+   * Gets the container that manages {@code IMap} resources.
    * 
    * @return The IMap resource container.
    * 
@@ -94,7 +94,7 @@ public final class Resources {
   }
 
   /**
-   * Gets the container that manages <code>Tileset</code> resources.<br>
+   * Gets the container that manages {@code Tileset} resources.<br>
    * This implementation uses raw {@code Tileset}s, to avoid problems with
    * {@code Tileset} methods that aren't in the {@code ITileset} interface.
    * 
@@ -107,7 +107,7 @@ public final class Resources {
   }
 
   /**
-   * Gets a container that manages <code>String</code> resources.<br>
+   * Gets a container that manages {@code String} resources.<br>
    * This instance can be used to access localizable string from a ".properties" file.
    * 
    * @return The String resource container.
@@ -117,7 +117,7 @@ public final class Resources {
   }
 
   /**
-   * Gets the container that manages <code>BufferedImage</code> resources.
+   * Gets the container that manages {@code BufferedImage} resources.
    * 
    * @return The BufferedImage resource container.
    * 
@@ -128,7 +128,7 @@ public final class Resources {
   }
 
   /**
-   * Gets the container that manages <code>Spritesheet</code> resources.
+   * Gets the container that manages {@code Spritesheet} resources.
    * 
    * @return The Spritesheet resource container.
    * 
@@ -139,7 +139,7 @@ public final class Resources {
   }
 
   /**
-   * Gets the container that manages <code>Blueprint</code> resources.
+   * Gets the container that manages {@code Blueprint} resources.
    * 
    * @return The Blueprint resource container.
    * 
@@ -150,8 +150,8 @@ public final class Resources {
   }
 
   /**
-   * Load <code>Spritesheets</code>, <code>Tilesets</code> and <code>Maps</code> from a game resource file created with the utiLITI editor.
-   * After loading, these resources can be accessed via this API (e.g. <code>Resources.maps().get("mapname")</code>.
+   * Load {@code Spritesheets}, {@code Tilesets} and {@code Maps} from a game resource file created with the utiLITI editor.
+   * After loading, these resources can be accessed via this API (e.g. {@code Resources.maps().get("mapname")}.
    * 
    * @param gameResourceFile
    *          The file name of the game resource file
@@ -161,8 +161,8 @@ public final class Resources {
   }
 
   /**
-   * Load <code>Spritesheets</code>, <code>Tilesets</code> and <code>Maps</code> from a game resource file created with the utiLITI editor.
-   * After loading, these resources can be accessed via this API (e.g. <code>Resources.maps().get("mapname")</code>.
+   * Load {@code Spritesheets}, {@code Tilesets} and {@code Maps} from a game resource file created with the utiLITI editor.
+   * After loading, these resources can be accessed via this API (e.g. {@code Resources.maps().get("mapname")}.
    * 
    * @param gameResourceFile
    *          The URL to the game resource file

@@ -13,7 +13,7 @@ import de.gurkenlabs.litiengine.configuration.ClientConfiguration;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 
 /**
- * The class <code>GameMetrics</code> provides meta information about the game's metrics. This allows the developer to
+ * The class {@code GameMetrics} provides meta information about the game's metrics. This allows the developer to
  * get a feeling about the performance of different aspects (e.g. memory consumption, potential fps, network traffic, ...) and to identify potential
  * issues.
  * 
@@ -163,7 +163,7 @@ public final class GameMetrics implements IRenderable {
   }
 
   /**
-   * Sets the color that is used when rendering the metrics if <code>cl_showGameMetrics = true</code>.
+   * Sets the color that is used when rendering the metrics if {@code cl_showGameMetrics = true}.
    * 
    * @param color
    *          The color for rendering the metrics.

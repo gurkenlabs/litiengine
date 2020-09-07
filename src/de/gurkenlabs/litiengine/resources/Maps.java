@@ -86,7 +86,7 @@ public final class Maps extends ResourcesContainer<IMap> {
    *          The height of a tile (in pixels).
    * @param tilesets
    *          Tilesets that will be used by the map.
-   * @return A <code>MapGenerator</code> instance used to add additional layers or objects to the map.
+   * @return A {@code MapGenerator} instance used to add additional layers or objects to the map.
    */
   public MapGenerator generate(IMapOrientation orientation, String name, int width, int height, int tileWidth, int tileHeight, ITileset... tilesets) {
     TmxMap map = new TmxMap(orientation);
@@ -203,13 +203,13 @@ public final class Maps extends ResourcesContainer<IMap> {
     }
 
     /**
-     * Adds a <code>MapObject</code> created by the specified entity to the map of this instance.
+     * Adds a {@code MapObject} created by the specified entity to the map of this instance.
      * <p>
-     * If no layer has been added yet, a default <code>MapObjectLayer</code> will be created by this method.
+     * If no layer has been added yet, a default {@code MapObjectLayer} will be created by this method.
      * </p>
      * 
      * @param entity
-     *          The entity to be converted to a map object and added to the first <code>MapObjectLayer</code> of the generated map.
+     *          The entity to be converted to a map object and added to the first {@code MapObjectLayer} of the generated map.
      * @return The created map object.
      */
     public IMapObject add(IEntity entity) {
@@ -217,12 +217,12 @@ public final class Maps extends ResourcesContainer<IMap> {
     }
 
     /**
-     * Adds a <code>MapObject</code> created by the specified entity to the map of this instance.
+     * Adds a {@code MapObject} created by the specified entity to the map of this instance.
      * 
      * @param layer
      *          The layer to which the map object will be added.
      * @param entity
-     *          The entity to be converted to a map object and added to the specified <code>MapObjectLayer</code>.
+     *          The entity to be converted to a map object and added to the specified {@code MapObjectLayer}.
      * @return The created map object.
      */
     public IMapObject add(IMapObjectLayer layer, IEntity entity) {
@@ -233,11 +233,11 @@ public final class Maps extends ResourcesContainer<IMap> {
     /**
      * Adds the specified map object to the map of this instance.
      * <p>
-     * If no layer has been added yet, a default <code>MapObjectLayer</code> will be created by this method.
+     * If no layer has been added yet, a default {@code MapObjectLayer} will be created by this method.
      * </p>
      * 
      * @param mapObject
-     *          The mapObject to be added to the first <code>MapObjectLayer</code> of the generated map.
+     *          The mapObject to be added to the first {@code MapObjectLayer} of the generated map.
      * @return The added map object.
      */
     public IMapObject add(IMapObject mapObject) {
@@ -259,7 +259,7 @@ public final class Maps extends ResourcesContainer<IMap> {
      * @param layer
      *          The layer to which the map object will be added.
      * @param mapObject
-     *          The mapObject to be added to the specified <code>MapObjectLayer</code>.
+     *          The mapObject to be added to the specified {@code MapObjectLayer}.
      * @return The added map object.
      */
     public IMapObject add(IMapObjectLayer layer, IMapObject mapObject) {
@@ -270,7 +270,7 @@ public final class Maps extends ResourcesContainer<IMap> {
     /**
      * <b>It is crucial to call this before using the generated map of this instance.</b><br>
      * <p>
-     * This will call the <code>finish</code> method on the map instance and make sure that the generated map is available
+     * This will call the {@code finish} method on the map instance and make sure that the generated map is available
      * over the resources API.
      * </p>
      * 

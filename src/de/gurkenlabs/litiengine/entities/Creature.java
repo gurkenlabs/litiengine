@@ -52,7 +52,7 @@ public class Creature extends CombatEntity implements IMobileEntity {
   }
 
   /**
-   * Instantiates a new <code>Creature</code> entity.
+   * Instantiates a new {@code Creature} entity.
    *
    * @param spritesheetName
    *          The spritesheet name that identifies the sprites bound to this instance.

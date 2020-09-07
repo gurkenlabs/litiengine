@@ -14,7 +14,7 @@ import de.gurkenlabs.litiengine.GameWindow;
 import de.gurkenlabs.litiengine.graphics.MouseCursor;
 
 /**
- * The <code>IMouse</code> interface is the engine's API for receiving mouse input events.
+ * The {@code IMouse} interface is the engine's API for receiving mouse input events.
  */
 public interface IMouse {
   /**
@@ -181,8 +181,8 @@ public interface IMouse {
   public void removeMouseMotionListener(MouseMotionListener listener);
 
   /**
-   * Removes all registered event listeners from the Mouse instance. This <b>does not affect</b> registered <code>MouseListener</code>,
-   * <code>MouseMotionListener</code> or <code>MouseWheelListener</code> instances.
+   * Removes all registered event listeners from the Mouse instance. This <b>does not affect</b> registered {@code MouseListener},
+   * {@code MouseMotionListener} or {@code MouseWheelListener} instances.
    * 
    * @see #onClicked(MouseClickedListener)
    * @see #onDragged(MouseDraggedListener)
@@ -327,13 +327,13 @@ public interface IMouse {
   public interface MouseDraggedListener extends EventListener {
     /**
      * Invoked when a mouse button is pressed on the game window and then
-     * dragged. <code>MOUSE_DRAGGED</code> events will continue to be
+     * dragged. {@code MOUSE_DRAGGED} events will continue to be
      * delivered to the component where the drag originated until the
      * mouse button is released (regardless of whether the mouse position
      * is within the bounds of the component).
      * <p>
      * Due to platform-dependent Drag&amp;Drop implementations,
-     * <code>MOUSE_DRAGGED</code> events may not be delivered during a native
+     * {@code MOUSE_DRAGGED} events may not be delivered during a native
      * Drag&amp;Drop operation.
      *
      * @param event

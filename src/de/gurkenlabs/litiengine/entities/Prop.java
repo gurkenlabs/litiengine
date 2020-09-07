@@ -36,7 +36,7 @@ public class Prop extends CombatEntity {
   private String spritesheetName;
 
   /**
-   * Instantiates a new <code>Prop</code> entity.
+   * Instantiates a new {@code Prop} entity.
    *
    * @param spritesheetName
    *          The spritesheet name of this prop.
@@ -46,7 +46,7 @@ public class Prop extends CombatEntity {
   }
 
   /**
-   * Instantiates a new <code>Prop</code> entity.
+   * Instantiates a new {@code Prop} entity.
    *
    * @param x
    *          The x-coordinate of this prop.
@@ -60,7 +60,7 @@ public class Prop extends CombatEntity {
   }
 
   /**
-   * Instantiates a new <code>Prop</code> entity.
+   * Instantiates a new {@code Prop} entity.
    *
    * @param x
    *          The x-coordinate of this prop.
@@ -76,7 +76,7 @@ public class Prop extends CombatEntity {
   }
 
   /**
-   * Instantiates a new <code>Prop</code> entity.
+   * Instantiates a new {@code Prop} entity.
    *
    * @param location
    *          The location of this prop.
@@ -88,7 +88,7 @@ public class Prop extends CombatEntity {
   }
 
   /**
-   * Instantiates a new <code>Prop</code> entity.
+   * Instantiates a new {@code Prop} entity.
    *
    * @param location
    *          The location of this prop.

@@ -5,7 +5,7 @@ public enum MapObjectType {
 
   /*
    * Note that this is not part of the enum since we consider this enum a set of valid types in many places in the engine.
-   * Usually there is no need to use this explicitly. This is only used to identify <code>MapObjects</code> that don't have a type specified (aka. raw Tiled MapObjects).
+   * Usually there is no need to use this explicitly. This is only used to identify {@code MapObjects} that don't have a type specified (aka. raw Tiled MapObjects).
    */
   public static final String UNDEFINED_MAPOBJECTTYPE = "UNDEFINED";
 

@@ -3,12 +3,12 @@ package de.gurkenlabs.litiengine.entities;
 import java.util.EventListener;
 
 /**
- * This listener provides callbacks for when an <code>Entity</code> was moved or changed its size.
+ * This listener provides callbacks for when an {@code Entity} was moved or changed its size.
  */
 public interface EntityTransformListener extends EventListener {
 
   /**
-   * This method is called whenever the location of an <code>IEntity</code> was changed.
+   * This method is called whenever the location of an {@code IEntity} was changed.
    * 
    * @param entity
    *          The entity that changed its location.
@@ -21,7 +21,7 @@ public interface EntityTransformListener extends EventListener {
   public default void locationChanged(IEntity entity) {}
 
   /**
-   * This method is called whenever the size of an <code>IEntity</code> was changed.
+   * This method is called whenever the size of an {@code IEntity} was changed.
    * 
    * @param entity
    *          The entity that changed its size.

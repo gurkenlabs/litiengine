@@ -1,7 +1,7 @@
 package de.gurkenlabs.litiengine.configuration;
 
 /**
- * This class contains all default <code>ConfigurationGroups</code> that are provided by the LITIengine.
+ * This class contains all default {@code ConfigurationGroups} that are provided by the LITIengine.
  * Additionally, it can be used to register and manage custom settings that are specific to your game.
  *
  * @see ConfigurationGroup

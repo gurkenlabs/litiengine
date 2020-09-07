@@ -12,7 +12,7 @@ import de.gurkenlabs.litiengine.configuration.ClientConfiguration;
 /**
  * Handles the uncaught exceptions that might occur while running a game or application with the LITIengine.
  * <p>
- * It provides proper logging of the exception in a <code>crash.txt</code> file in the game's root directory that can be
+ * It provides proper logging of the exception in a {@code crash.txt} file in the game's root directory that can be
  * further used to report the issue if it's a generic one.
  * </p>
  * 
@@ -27,7 +27,7 @@ public class DefaultUncaughtExceptionHandler implements UncaughtExceptionHandler
   private boolean exitOnException;
 
   /**
-   * Initializes a new instance of the <code>DefaultUncaughtExceptionHandler</code> class.
+   * Initializes a new instance of the {@code DefaultUncaughtExceptionHandler} class.
    *
    * @param exitOnException
    *          A flag indicating whether the game should exit when an unexpected error occurs.

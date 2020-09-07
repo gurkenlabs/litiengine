@@ -70,7 +70,7 @@ public enum Direction {
    * 
    * @param flagValue
    *          The flag value to convert to a direction.
-   * @return A direction that corresponds to the specified flag value or <code>UNDEFINED</code>.
+   * @return A direction that corresponds to the specified flag value or {@code UNDEFINED}.
    */
   public static Direction fromFlagValue(final byte flagValue) {
     for (final Direction dir : Direction.values()) {

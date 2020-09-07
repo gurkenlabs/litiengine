@@ -38,13 +38,13 @@ public class Tile extends CustomPropertyProvider implements ITile {
   private transient boolean flipped;
 
   /**
-   * Instantiates a new <code>Tile</code> instance.
+   * Instantiates a new {@code Tile} instance.
    */
   public Tile() {
   }
 
   /**
-   * Instantiates a new <code>Tile</code> instance.
+   * Instantiates a new {@code Tile} instance.
    *
    * @param gidBitmask
    *          The grid ID bitmask used to identify flags of this instance.

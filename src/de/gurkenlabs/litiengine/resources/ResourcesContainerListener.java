@@ -1,7 +1,7 @@
 package de.gurkenlabs.litiengine.resources;
 
 /**
- * This listener provides callbacks to observe <code>ResourcesContainer</code> instances.
+ * This listener provides callbacks to observe {@code ResourcesContainer} instances.
  *
  * @param <T>
  *          The type of the resource that is managed by the container.
@@ -17,7 +17,7 @@ package de.gurkenlabs.litiengine.resources;
 public interface ResourcesContainerListener<T> extends ResourcesContainerClearedListener {
 
   /**
-   * This method gets called after the <code>ResourcesContainer.add</code> method was executed.
+   * This method gets called after the {@code ResourcesContainer.add} method was executed.
    * 
    * @param resourceName
    *          The name by which the added resource is identified.
@@ -29,7 +29,7 @@ public interface ResourcesContainerListener<T> extends ResourcesContainerCleared
   }
 
   /**
-   * This method gets called after the <code>ResourcesContainer.remove</code> method was executed.
+   * This method gets called after the {@code ResourcesContainer.remove} method was executed.
    * 
    * @param resourceName
    *          The name by which the removed resource was identified.

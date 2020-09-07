@@ -9,7 +9,7 @@ import java.util.EventListener;
 public interface SoundPlaybackListener extends EventListener {
 
   /**
-   * This method gets called when a <code>SoundPlayback</code> is cancelled.
+   * This method gets called when a {@code SoundPlayback} is cancelled.
    *
    * @param event
    *          a {@link SoundEvent} object describing the
@@ -18,7 +18,7 @@ public interface SoundPlaybackListener extends EventListener {
   public default void cancelled(SoundEvent event) {}
 
   /**
-   * This method gets called when a <code>SoundPlayback</code> is finished.
+   * This method gets called when a {@code SoundPlayback} is finished.
    *
    * @param event
    *          a {@link SoundEvent} object describing the

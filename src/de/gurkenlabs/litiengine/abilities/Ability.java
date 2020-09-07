@@ -40,7 +40,7 @@ public abstract class Ability implements IRenderable {
   private AbilityExecution currentExecution;
 
   /**
-   * Initializes a new instance of the <code>Ability</code> class.
+   * Initializes a new instance of the {@code Ability} class.
    *
    * @param executor
    *          The executing entity

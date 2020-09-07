@@ -6,15 +6,15 @@ import de.gurkenlabs.litiengine.physics.CollisionEvent;
 import de.gurkenlabs.litiengine.physics.PhysicsEngine;
 
 /**
- * This listener provides callbacks for collision events on <code>ICollisionEntity</code>.
+ * This listener provides callbacks for collision events on {@code ICollisionEntity}.
  */
 @FunctionalInterface
 public interface CollisionListener extends EventListener {
 
   /**
-   * This method gets called after a collision has been resolved with the related <code>ICollisionEntity</code>.
+   * This method gets called after a collision has been resolved with the related {@code ICollisionEntity}.
    * <p>
-   * If the entity is considered to be the "active collider" of the collision (i.e. it was moved with the <code>PhysicsEngine</code>),
+   * If the entity is considered to be the "active collider" of the collision (i.e. it was moved with the {@code PhysicsEngine}),
    * the event provides all other entities for which a collision had to be resolved during the movement.
    * </p>
    * <p>

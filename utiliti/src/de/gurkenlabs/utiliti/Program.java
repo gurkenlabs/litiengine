@@ -20,7 +20,7 @@ public class Program {
     // setup basic settings
     Game.info().setName("utiLITI");
     Game.info().setSubTitle("LITIengine Creation Kit");
-    Game.info().setVersion("v0.4.20-alpha");
+    Game.info().setVersion("v0.5.0-beta");
     Resources.strings().setEncoding(StandardCharsets.UTF_8);
 
     // hook up configuration and initialize the game

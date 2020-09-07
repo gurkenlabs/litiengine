@@ -18,13 +18,13 @@ public class CollisionBox extends CollisionEntity {
   private boolean obstructingLight;
 
   /**
-   * Instantiates a new <code>CollisionBox</code> entity.
+   * Instantiates a new {@code CollisionBox} entity.
    */
   public CollisionBox() {
   }
 
   /**
-   * Instantiates a new <code>CollisionBox</code> entity.
+   * Instantiates a new {@code CollisionBox} entity.
    * 
    * @param obstructingLight
    *          A flag indicating whether this instance should obstruct lights.
@@ -34,7 +34,7 @@ public class CollisionBox extends CollisionEntity {
   }
 
   /**
-   * Instantiates a new <code>CollisionBox</code> entity.
+   * Instantiates a new {@code CollisionBox} entity.
    *
    * @param width
    *          The width of this instance.
@@ -49,7 +49,7 @@ public class CollisionBox extends CollisionEntity {
   }
 
   /**
-   * Instantiates a new <code>CollisionBox</code> entity.
+   * Instantiates a new {@code CollisionBox} entity.
    *
    * @param x
    *          The x-coordinate of this instance.
@@ -67,7 +67,7 @@ public class CollisionBox extends CollisionEntity {
   }
 
   /**
-   * Instantiates a new <code>CollisionBox</code> entity.
+   * Instantiates a new {@code CollisionBox} entity.
    *
    * @param box
    *          The rectangle defining the location and dimension of this instnace.

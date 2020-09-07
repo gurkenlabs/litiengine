@@ -18,7 +18,7 @@ public interface ITileLayer extends ILayer {
    * Gets the tile at the specified map grid location.
    * 
    * <p>
-   * To retrieve map grid coordinates from a location on the map, use the <code>MapUtilities#getTile(Point2D)</code> method.
+   * To retrieve map grid coordinates from a location on the map, use the {@code MapUtilities#getTile(Point2D)} method.
    * </p>
    * 
    * @param x

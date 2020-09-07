@@ -13,7 +13,7 @@ import net.java.games.input.Controller;
 import net.java.games.input.Event;
 
 /**
- * The <code>Gamepad</code> class is designed as a wrapper implementation for any gamepad input that provides events and information
+ * The {@code Gamepad} class is designed as a wrapper implementation for any gamepad input that provides events and information
  * about player input via gamepad.
  * 
  * @see Controller

@@ -7,14 +7,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation is used by the LITIengine to identify methods that should be registered as <code>EntityAction</code> by the entity framework.
+ * This annotation is used by the LITIengine to identify methods that should be registered as {@code EntityAction} by the entity framework.
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 public @interface Action {
   /**
-   * The name of the <code>EntityAction</code>.
+   * The name of the {@code EntityAction}.
    * <p>
    * <i>
    * If null or empty, the framework will use the name of the methods that this annotation was declared on.

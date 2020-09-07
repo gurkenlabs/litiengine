@@ -312,7 +312,7 @@ public final class Imaging {
   }
 
   /**
-   * Creates a new <code>BufferedImage</code> instance from the specified image.
+   * Creates a new {@code BufferedImage} instance from the specified image.
    * 
    * @param image
    *          The image to be copied.

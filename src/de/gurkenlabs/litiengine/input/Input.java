@@ -8,7 +8,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameListener;
 
 /**
- * The static <code>Input</code> class is the LITIengine's access point to devices that capture physical player input.
+ * The static {@code Input} class is the LITIengine's access point to devices that capture physical player input.
  * It manages input from different devices, i.e. keyboard, mouse or gamepad, and provides a unified API to access this information.
  * 
  * @see #mouse()
@@ -36,7 +36,7 @@ public final class Input {
    * </p>
    * 
    * <p>
-   * <b>This returns null if <code>Game.config().input().isGamepadSupport()</code> is set to false.</b>
+   * <b>This returns null if {@code Game.config().input().isGamepadSupport()} is set to false.</b>
    * </p>
    * 
    * @return The gamepad manager.

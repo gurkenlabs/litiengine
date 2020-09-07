@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.graphics.emitters;
 
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.EventListener;
 import java.util.List;
@@ -425,14 +426,13 @@ public class Emitter extends Entity implements IUpdateable, ITimeToLive, IRender
       return;
     }
 
-    if (Game.screens() != null && Game.world().camera() != null && !Game.world().camera().getViewport().intersects(this.getBoundingBox())) {
-      return;
-    }
-
     final Point2D origin = this.getOrigin();
+    final Rectangle2D viewport = Game.screens() != null && Game.world().camera() != null ? Game.world().camera().getViewport() : null;
     for (Particle particle : this.particles) {
-      if (!particle.usesCustomRenderType() && renderType == RenderType.NONE
-          || particle.usesCustomRenderType() && particle.getCustomRenderType() == renderType) {
+      if (((!particle.usesCustomRenderType() && renderType == RenderType.NONE)
+          || (particle.usesCustomRenderType() && particle.getCustomRenderType() == renderType))
+          && viewport != null && viewport.intersects(particle.getBoundingBox(origin))
+          ) {
         particle.render(g, origin);
       }
     }

@@ -6,7 +6,7 @@ import java.util.EventObject;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 
 /**
- * This <code>EventObject</code> contains data about the rendering process of an entity.
+ * This {@code EventObject} contains data about the rendering process of an entity.
  * 
  * @see RenderEngine#renderEntity(Graphics2D, IEntity)
  */

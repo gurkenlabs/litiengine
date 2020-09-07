@@ -65,7 +65,7 @@ public class LightSource extends Entity implements IRenderable {
   private int radius;
 
   /**
-   * Instantiates a new <code>LightSource</code> entity.
+   * Instantiates a new {@code LightSource} entity.
    *
    * @param intensity
    *          The intensity of this instance.
