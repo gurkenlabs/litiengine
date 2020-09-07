@@ -291,7 +291,7 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    *         and control the played sound.
    */
   public SFXPlayback playSound(final Sound sound, final IEntity entity, boolean loop) {
-    return playSound(sound, entity, loop, getMaxDistance());
+    return playSound(sound, entity, loop, getMaxDistance(), 1f);
   }
 
   /**
@@ -310,7 +310,28 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    *         and control the played sound.
    */
   public SFXPlayback playSound(final Sound sound, final IEntity entity, boolean loop, int range) {
-    return playSound(sound, entity::getCenter, loop, range);
+    return playSound(sound, entity::getCenter, loop, range, 1f);
+  }
+
+  /**
+   * Plays the specified sound and updates its volume and pan by the current
+   * entity location in relation to the listener location.
+   * 
+   * @param entity
+   *          The entity at which location the sound should be played.
+   * @param sound
+   *          The sound to play.
+   * @param loop
+   *          Determines whether this playback should be looped or not.
+   * @param range
+   *          the range in pixels for which this sound can be heard
+   * @param volume
+   *          The volume modifier for the sound playback instance.
+   * @return An {@link SFXPlayback} instance that allows to further process
+   *         and control the played sound.
+   */
+  public SFXPlayback playSound(final Sound sound, final IEntity entity, boolean loop, int range, float volume) {
+    return playSound(sound, entity::getCenter, loop, range, volume);
   }
 
   /**
@@ -412,7 +433,7 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    *         and control the played sound.
    */
   public SFXPlayback playSound(final Sound sound, final Point2D location, boolean loop) {
-    return playSound(sound, () -> location, loop, getMaxDistance());
+    return playSound(sound, () -> location, loop, getMaxDistance(), 1f);
   }
 
   /**
@@ -431,7 +452,28 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    *         and control the played sound.
    */
   public SFXPlayback playSound(final Sound sound, final Point2D location, boolean loop, int range) {
-    return playSound(sound, () -> location, loop, range);
+    return playSound(sound, () -> location, loop, range, 1f);
+  }
+
+  /**
+   * Plays the specified sound at the specified location and updates the volume
+   * and pan in relation to the listener location.
+   * 
+   * @param location
+   *          The location at which to play the sound.
+   * @param sound
+   *          The sound to play.
+   * @param loop
+   *          Determines whether this playback should be looped or not.
+   * @param range
+   *          the range in pixels for which this sound can be heard
+   * @param volume
+   *          The volume modifier for the sound playback instance.
+   * @return An {@link SFXPlayback} instance that allows to further process
+   *         and control the played sound.
+   */
+  public SFXPlayback playSound(final Sound sound, final Point2D location, boolean loop, int range, float volume) {
+    return playSound(sound, () -> location, loop, range, volume);
   }
 
   /**
@@ -531,7 +573,7 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    *         and control the played sound.
    */
   public SFXPlayback playSound(final Sound sound, boolean loop) {
-    return playSound(sound, () -> null, loop, getMaxDistance());
+    return playSound(sound, () -> null, loop, getMaxDistance(), 1f);
   }
 
   /**
@@ -548,7 +590,26 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    *         and control the played sound.
    */
   public SFXPlayback playSound(final Sound sound, boolean loop, int range) {
-    return playSound(sound, () -> null, loop, range);
+    return playSound(sound, () -> null, loop, range, 1f);
+  }
+
+  /**
+   * Plays the specified sound with the volume configured in the SOUND config
+   * with a center pan.
+   * 
+   * @param sound
+   *          The sound to play.
+   * @param loop
+   *          Determines whether this playback should be looped or not.
+   * @param range
+   *          the range in pixels for which this sound can be heard
+   * @param volume
+   *          The volume modifier for the sound playback instance.
+   * @return An {@link SFXPlayback} instance that allows to further process
+   *         and control the played sound.
+   */
+  public SFXPlayback playSound(final Sound sound, boolean loop, int range, float volume) {
+    return playSound(sound, () -> null, loop, range, volume);
   }
 
   /**
@@ -605,9 +666,9 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    *          the range in pixels for which this sound can be heard
    * @return An {@code SFXPlayback} object that can be configured prior to starting, but will need to be manually started.
    */
-  public SFXPlayback createSound(Sound sound, Supplier<Point2D> supplier, boolean loop, int range) {
+  public SFXPlayback createSound(Sound sound, Supplier<Point2D> supplier, boolean loop, int range, float volume) {
     try {
-      return new SFXPlayback(sound, supplier, loop, range);
+      return new SFXPlayback(sound, supplier, loop, range, volume);
     } catch (LineUnavailableException | IllegalArgumentException e) {
       resourceFailure(e);
       return null;
@@ -693,12 +754,12 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
     this.sounds.add(playback);
   }
 
-  private SFXPlayback playSound(Sound sound, Supplier<Point2D> supplier, boolean loop, int range) {
+  private SFXPlayback playSound(Sound sound, Supplier<Point2D> supplier, boolean loop, int range, float volume) {
     if (sound == null) {
       return null;
     }
 
-    SFXPlayback playback = createSound(sound, supplier, loop, range);
+    SFXPlayback playback = createSound(sound, supplier, loop, range, volume);
     if (playback == null) {
       return null;
     }

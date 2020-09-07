@@ -44,7 +44,7 @@ public class SoundPanel extends PropertyPanel {
 
   @Override
   protected void clearControls() {
-    this.volume.setValue((int) MathUtilities.clamp(Game.config().sound().getSoundVolume() * 100, 0, 100));
+    this.volume.setValue(100);
     this.range.setValue((int) Game.audio().getMaxDistance());
     this.loop.setSelected(false);
     updateModel();
@@ -67,7 +67,7 @@ public class SoundPanel extends PropertyPanel {
   }
 
   private void setupChangedListeners() {
-    this.volume.addChangeListener(l -> Game.config().sound().setSoundVolume(this.volume.getValue()));
+    this.setup(this.volume, MapObjectProperty.SOUND_VOLUME);
     this.setup(this.range, MapObjectProperty.SOUND_RANGE);
     this.setup(this.loop, MapObjectProperty.SOUND_LOOP);
     this.setup(this.soundResource, MapObjectProperty.SOUND_NAME);

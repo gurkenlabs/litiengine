@@ -88,7 +88,7 @@ public class SoundSource extends Entity {
   }
 
   public void play() {
-    this.playback = Game.audio().playSound(this.getSound(), this, this.isLoop(), this.getRange());
+    this.playback = Game.audio().playSound(this.getSound(), this, this.isLoop(), this.getRange(), this.getVolume() / 100f);
   }
 
   public void pause() {
