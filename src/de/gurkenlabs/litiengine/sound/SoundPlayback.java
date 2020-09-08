@@ -241,6 +241,7 @@ public abstract class SoundPlayback implements Runnable {
   }
 
   @Override
+  @Deprecated
   protected void finalize() {
     // resources will not be released if the start method is never called
     if (this.line != null && this.line.isOpen()) {
@@ -284,6 +285,7 @@ public abstract class SoundPlayback implements Runnable {
     }
 
     @Override
+    @Deprecated
     protected void finalize() {
       // clean up the instance without affecting the volume
       SoundPlayback.this.miscVolume.accumulateAndGet(Float.floatToRawIntBits(this.value), (a, b) -> Float.floatToRawIntBits(Float.intBitsToFloat(a) * Float.intBitsToFloat(b)));

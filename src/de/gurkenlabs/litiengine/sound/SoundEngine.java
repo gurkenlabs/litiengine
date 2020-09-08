@@ -664,6 +664,8 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    *          Whether to loop the sound
    * @param range
    *          the range in pixels for which this sound can be heard
+   * @param volume
+   *          The volume modifier for the sound playback instance.
    * @return An {@code SFXPlayback} object that can be configured prior to starting, but will need to be manually started.
    */
   public SFXPlayback createSound(Sound sound, Supplier<Point2D> supplier, boolean loop, int range, float volume) {

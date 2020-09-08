@@ -7,8 +7,10 @@ import de.gurkenlabs.litiengine.environment.tilemap.TmxType;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.physics.Collision;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.resources.Sounds;
 import de.gurkenlabs.litiengine.sound.SFXPlayback;
 import de.gurkenlabs.litiengine.sound.Sound;
+import de.gurkenlabs.litiengine.sound.SoundEngine;
 
 /**
  * This is an Entity that can play or loop ambient sound effects within a given range and with a given volume.
@@ -174,7 +176,7 @@ public class SoundSource extends Entity {
    * 
    * @param name
    *          The name of the Sound resource.
-   * @see ResourcesContainer#get(String)
+   * @see Sounds#get(String)
    */
   public void setSound(String name) {
     this.sound = Resources.sounds().get(name);

@@ -37,7 +37,7 @@ public class SoundPanel extends PropertyPanel {
     this.loop.putClientProperty(ToggleButtonConstants.KEY_VARIANT, ToggleButtonConstants.VARIANT_SLIDER);
     this.soundResource = new JComboBox<>();
     this.play = new JButton(Resources.strings().get("panel_play_sound"), Icons.PLAY);
-    this.play.addActionListener(l -> Game.audio().playSound((Sound) this.soundResource.getSelectedItem()));
+    this.play.addActionListener(l -> Game.audio().playSound((Sound) this.soundResource.getSelectedItem(), false, (int) this.range.getValue(), this.volume.getValue() / 50f));
     setLayout(this.createLayout());
     this.setupChangedListeners();
   }
