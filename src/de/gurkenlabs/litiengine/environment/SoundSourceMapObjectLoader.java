@@ -33,7 +33,7 @@ public class SoundSourceMapObjectLoader extends MapObjectLoader {
   protected SoundSource createSoundSource(IMapObject mapObject) {
     SoundSource sound = new SoundSource();
     sound.setSound(mapObject.getStringValue(MapObjectProperty.SOUND_NAME));
-    sound.setVolume(mapObject.getIntValue(MapObjectProperty.SOUND_VOLUME));
+    sound.setVolume(mapObject.getFloatValue(MapObjectProperty.SOUND_VOLUME));
     sound.setLoop(mapObject.getBoolValue(MapObjectProperty.SOUND_LOOP));
     sound.setRange(mapObject.getIntValue(MapObjectProperty.SOUND_RANGE));
 

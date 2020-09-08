@@ -32,7 +32,7 @@ public class SoundPanel extends PropertyPanel {
     super("panel_sound", Icons.SOUND);
     this.volume = new VolumeSlider();
     this.volume.setShowVolumeIcon(true);
-    this.range = new JSpinner(new SpinnerNumberModel((int) Game.audio().getMaxDistance(), 0, Integer.MAX_VALUE, 2));
+    this.range = new JSpinner(new SpinnerNumberModel(Game.audio().getMaxDistance(), 0, Integer.MAX_VALUE, 2));
     this.loop = new JToggleButton();
     this.loop.putClientProperty(ToggleButtonConstants.KEY_VARIANT, ToggleButtonConstants.VARIANT_SLIDER);
     this.soundResource = new JComboBox<>();
@@ -44,15 +44,15 @@ public class SoundPanel extends PropertyPanel {
 
   @Override
   protected void clearControls() {
-    this.volume.setValue(100);
-    this.range.setValue((int) Game.audio().getMaxDistance());
+    this.volume.setValue((int) MathUtilities.clamp(Game.config().sound().getSoundVolume() * 50, 0, 100));
+    this.range.setValue(Game.audio().getMaxDistance());
     this.loop.setSelected(false);
     updateModel();
   }
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    this.volume.setValue((int) MathUtilities.clamp(mapObject.getIntValue(MapObjectProperty.SOUND_VOLUME), 0, 100));
+    this.volume.setValue((int) MathUtilities.clamp(mapObject.getFloatValue(MapObjectProperty.SOUND_VOLUME) * 50, 0, 100));
     this.range.setValue(mapObject.getIntValue(MapObjectProperty.SOUND_RANGE));
     this.loop.setSelected(mapObject.getBoolValue(MapObjectProperty.SOUND_LOOP));
     updateModel();
@@ -67,7 +67,7 @@ public class SoundPanel extends PropertyPanel {
   }
 
   private void setupChangedListeners() {
-    this.setup(this.volume, MapObjectProperty.SOUND_VOLUME);
+    this.setup(this.volume, MapObjectProperty.SOUND_VOLUME, 1 / 50f);
     this.setup(this.range, MapObjectProperty.SOUND_RANGE);
     this.setup(this.loop, MapObjectProperty.SOUND_LOOP);
     this.setup(this.soundResource, MapObjectProperty.SOUND_NAME);
