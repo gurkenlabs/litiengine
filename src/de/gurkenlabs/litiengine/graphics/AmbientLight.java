@@ -25,7 +25,7 @@ public class AmbientLight extends ColorLayer {
   public static final Color DEFAULT_COLOR = new Color(0, 0, 0, 0);
 
   /**
-   * Instantiates a new <code>AmbientLight</code> instance.
+   * Instantiates a new {@code AmbientLight} instance.
    *
    * @param environment
    *          The environment to which this instance is assigned.

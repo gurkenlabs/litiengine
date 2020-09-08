@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 import de.gurkenlabs.litiengine.util.TimeUtilities;
 
 /**
- * The <code>UpdateLoop</code> is a basic loop implementation that performs operations at the specified <code>tickRate</code>
+ * The {@code UpdateLoop} is a basic loop implementation that performs operations at the specified {@code tickRate}
  * by continuously processing the registered logic and delaying the loop until the requested rate is met.
  *
  * @see #process()
@@ -35,7 +35,7 @@ public class UpdateLoop extends Thread implements AutoCloseable, ILoop {
   }
 
   /**
-   * The loop implementation, executing the <code>process()</code> method which does the actual work.
+   * The loop implementation, executing the {@code process()} method which does the actual work.
    * It also tracks the processing time and the total number of performed ticks while making sure that the expected
    * tick rate is met by delaying the loop accordingly.
    * 
@@ -143,7 +143,7 @@ public class UpdateLoop extends Thread implements AutoCloseable, ILoop {
   }
 
   /**
-   * Calls the <code>update()</code> procedure on all registered instances.
+   * Calls the {@code update()} procedure on all registered instances.
    * 
    * @see IUpdateable#update()
    */

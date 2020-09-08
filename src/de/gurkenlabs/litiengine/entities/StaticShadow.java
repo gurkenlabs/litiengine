@@ -26,7 +26,7 @@ public class StaticShadow extends MapArea {
   private Area area;
 
   /**
-   * Instantiates a new <code>StaticShadow</code> entity.
+   * Instantiates a new {@code StaticShadow} entity.
    *
    * @param shadowType
    *          The type of the static shadow.
@@ -40,7 +40,7 @@ public class StaticShadow extends MapArea {
   }
 
   /**
-   * Instantiates a new <code>StaticShadow</code> entity.
+   * Instantiates a new {@code StaticShadow} entity.
    *
    * @param shadowType
    *          The type of the static shadow.
@@ -52,7 +52,7 @@ public class StaticShadow extends MapArea {
   }
 
   /**
-   * Instantiates a new <code>StaticShadow</code> entity.
+   * Instantiates a new {@code StaticShadow} entity.
    *
    * @param x
    *          The x-coordinate of this instance.
@@ -70,7 +70,7 @@ public class StaticShadow extends MapArea {
   }
 
   /**
-   * Instantiates a new <code>StaticShadow</code> entity.
+   * Instantiates a new {@code StaticShadow} entity.
    *
    * @param id
    *          The id of this entity.
@@ -90,7 +90,7 @@ public class StaticShadow extends MapArea {
   }
 
   /**
-   * Instantiates a new <code>StaticShadow</code> entity.
+   * Instantiates a new {@code StaticShadow} entity.
    *
    * @param id
    *          The id of this entity.
@@ -115,7 +115,7 @@ public class StaticShadow extends MapArea {
   }
 
   /**
-   * Instantiates a new <code>StaticShadow</code> entity.
+   * Instantiates a new {@code StaticShadow} entity.
    *
    * @param collisionBox
    *          The collision box from which this shadow instance originates from.

@@ -6,7 +6,7 @@ import javax.xml.bind.annotation.XmlEnumValue;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 
 /**
- * The enum <code>Valign</code> defines a range of vertical alignments.
+ * The enum {@code Valign} defines a range of vertical alignments.
  */
 @XmlEnum
 public enum Valign {

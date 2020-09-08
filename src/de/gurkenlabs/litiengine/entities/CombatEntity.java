@@ -40,7 +40,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   private long lastHit;
 
   /**
-   * Instantiates a new <code>CombatEntity</code>.
+   * Instantiates a new {@code CombatEntity}.
    */
   public CombatEntity() {
     super();

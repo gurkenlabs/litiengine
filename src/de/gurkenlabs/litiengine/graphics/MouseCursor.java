@@ -18,7 +18,7 @@ import de.gurkenlabs.litiengine.input.Mouse;
 import de.gurkenlabs.litiengine.util.Imaging;
 
 /**
- * The visual representation of the <code>Mouse</code> in the LITIengine.<br>
+ * The visual representation of the {@code Mouse} in the LITIengine.<br>
  * It controls the appearance of the rendered cursor and allows to specify offsets from the actual mouse location.
  * 
  * @see Mouse
@@ -51,7 +51,7 @@ public final class MouseCursor implements IRenderable {
   }
 
   /**
-   * Initializes a new instance of the <code>MouseCursor</code> class.
+   * Initializes a new instance of the {@code MouseCursor} class.
    */
   public MouseCursor() {
     this.visible = true;
@@ -87,7 +87,7 @@ public final class MouseCursor implements IRenderable {
 
   /**
    * Determines whether the cursor is currently visible (and will thereby be rendered),
-   * by checking the <code>visible</code> flag and whether the specified cursor image is null.
+   * by checking the {@code visible} flag and whether the specified cursor image is null.
    * 
    * @return True if the cursor is currently visible; otherwise false.
    */

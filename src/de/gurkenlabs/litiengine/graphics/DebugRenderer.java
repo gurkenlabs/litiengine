@@ -6,6 +6,7 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.text.DecimalFormat;
@@ -18,6 +19,7 @@ import de.gurkenlabs.litiengine.entities.EntityRenderedListener;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.entities.SoundSource;
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.ITile;
@@ -26,7 +28,7 @@ import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.physics.Collision;
 
 /**
- * The <code>DebugRenderer</code> class implements default debug rendering and exposes extension points to reder your own
+ * The {@code DebugRenderer} class implements default debug rendering and exposes extension points to reder your own
  * debug information via callbacks.
  */
 public final class DebugRenderer {
@@ -63,7 +65,7 @@ public final class DebugRenderer {
   }
 
   /**
-   * Add the specified map rendered listener to attach custom debug rendering after layers of the type <code>GROUND</code> have beend rendered.
+   * Add the specified map rendered listener to attach custom debug rendering after layers of the type {@code GROUND} have beend rendered.
    * 
    * @param listener
    *          The listener to add.
@@ -102,6 +104,13 @@ public final class DebugRenderer {
     if (Game.config().debug().renderBoundingBoxes()) {
       g.setColor(Color.RED);
       Game.graphics().renderOutline(g, entity.getBoundingBox());
+      
+      if (entity instanceof SoundSource) {
+        final int range = ((SoundSource) entity).getRange();
+        final float[] dash1 = { 10f };
+        final BasicStroke dashed = new BasicStroke(.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, dash1, 0.0f);
+        Game.graphics().renderOutline(g, new Ellipse2D.Double(entity.getBoundingBox().getCenterX() - range, entity.getBoundingBox().getCenterY() - range, range * 2d, range * 2d), dashed);
+      }
     }
 
     if (Game.config().debug().renderCollisionBoxes() && entity instanceof ICollisionEntity) {

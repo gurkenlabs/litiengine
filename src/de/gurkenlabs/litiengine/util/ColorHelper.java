@@ -22,8 +22,8 @@ public final class ColorHelper {
    * <li>#AARRGGBB - For colors with alpha</li>
    * </ul>
    * Examples: <br>
-   * <code>Color.RED</code> = "#ff0000"<br>
-   * <code>new Color(255, 0, 0, 200)</code> = "#c8ff0000"
+   * {@code Color.RED} = "#ff0000"<br>
+   * {@code new Color(255, 0, 0, 200)} = "#c8ff0000"
    * 
    * @param color
    *          The color that is encoded.
@@ -48,15 +48,15 @@ public final class ColorHelper {
   }
 
   /**
-   * Decodes the specified color string to an actual <code>Color</code> instance.
+   * Decodes the specified color string to an actual {@code Color} instance.
    * The accepted format is:
    * <ul>
    * <li>#RRGGBB - For colors without alpha</li>
    * <li>#AARRGGBB - For colors with alpha</li>
    * </ul>
    * Examples: <br>
-   * "#ff0000" = <code>Color.RED</code><br>
-   * "#c8ff0000" = <code>new Color(255, 0, 0, 200)</code>
+   * "#ff0000" = {@code Color.RED}<br>
+   * "#c8ff0000" = {@code new Color(255, 0, 0, 200)}
    * 
    * @param colorHexString
    *          The hexadecimal encodes color string representation.

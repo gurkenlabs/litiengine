@@ -96,7 +96,7 @@ public abstract class ResourcesContainer<T> {
 
   /**
    * Add the specified resource to this container.<br>
-   * The added element can later be retrieved from this container by calling <code>get(resourceName)</code>.
+   * The added element can later be retrieved from this container by calling {@code get(resourceName)}.
    * <p>
    * Use this method to make a resource accessible over this container during runtime.
    * </p>
@@ -214,7 +214,7 @@ public abstract class ResourcesContainer<T> {
   /**
    * Gets the resource with the specified name.<br>
    * <p>
-   * If no such resource is currently present on the container, it will be loaded with the specified <code>loadCallback</code> and added to this
+   * If no such resource is currently present on the container, it will be loaded with the specified {@code loadCallback} and added to this
    * container.
    * </p>
    * 
@@ -339,7 +339,7 @@ public abstract class ResourcesContainer<T> {
    * Tries to get a resource with the specified name from this container.
    * <p>
    * This method should be used, if it's not clear whether the resource is present on this container.<br>
-   * It is basically a combination of <code>get(String)</code> and <code>contains(String)</code> and allows
+   * It is basically a combination of {@code get(String)} and {@code contains(String)} and allows
    * to check whether a resource is present while also fetching it from the container.
    * </p>
    * 

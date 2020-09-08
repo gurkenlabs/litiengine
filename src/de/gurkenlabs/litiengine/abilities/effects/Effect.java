@@ -253,7 +253,7 @@ public abstract class Effect implements IUpdateable {
 
   /**
    * Overwrite this method to implement a custom target predicate that determines whether an entity can be affected by this effect.
-   * The targets of this effect need to include the <code>CUSTOM</code> value in order for this function to be evaluated.
+   * The targets of this effect need to include the {@code CUSTOM} value in order for this function to be evaluated.
    * 
    * @param entity
    *          The entity to check against the custom target predicate.

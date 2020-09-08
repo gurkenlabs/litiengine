@@ -49,7 +49,7 @@ public class Camera implements ICamera {
   private Valign valign = Valign.TOP;
 
   /**
-   * Instantiates a new <code>Camera</code> instance.
+   * Instantiates a new {@code Camera} instance.
    */
   public Camera() {
     this.focus = new Point2D.Double();

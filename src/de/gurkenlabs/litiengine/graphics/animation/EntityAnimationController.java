@@ -19,7 +19,7 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
   private boolean autoScaling;
 
   /**
-   * Initializes a new instance of the <code>EntityAnimationController</code> class.
+   * Initializes a new instance of the {@code EntityAnimationController} class.
    * 
    * @param entity
    *          The entity related to this animation controller.
@@ -36,7 +36,7 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
   }
 
   /**
-   * Initializes a new instance of the <code>EntityAnimationController</code> class.
+   * Initializes a new instance of the {@code EntityAnimationController} class.
    * 
    * @param entity
    *          The entity related to this animation controller.
@@ -59,7 +59,7 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
   }
 
   /**
-   * Initializes a new instance of the <code>EntityAnimationController</code> class.
+   * Initializes a new instance of the {@code EntityAnimationController} class.
    * 
    * @param entity
    *          The entity related to this animation controller.
@@ -72,7 +72,7 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
   }
 
   /**
-   * Initializes a new instance of the <code>EntityAnimationController</code> class.
+   * Initializes a new instance of the {@code EntityAnimationController} class.
    * 
    * @param entity
    *          The entity related to this animation controller.

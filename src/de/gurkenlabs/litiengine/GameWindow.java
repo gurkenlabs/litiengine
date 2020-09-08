@@ -31,7 +31,7 @@ import de.gurkenlabs.litiengine.graphics.RenderComponent;
 import de.gurkenlabs.litiengine.gui.screens.Resolution;
 
 /**
- * The <code>GameWindow</code> class is a wrapper for the game's visual window in which the <code>RenderComponent</code> lives.<br>
+ * The {@code GameWindow} class is a wrapper for the game's visual window in which the {@code RenderComponent} lives.<br>
  * It provides the possibility to set a title, provide an icon, configure the cursor or get information about the resolution.
  * 
  * @see RenderComponent
@@ -75,6 +75,11 @@ public final class GameWindow {
     }
   }
 
+  /**
+   * Returns true if the GameWindow is the focus owner.
+   * 
+   * @return true if the GameWindow is the focus owner; false otherwise
+   */
   public boolean isFocusOwner() {
     if (this.getRenderComponent() instanceof Component && this.getRenderComponent().isFocusOwner()) {
       return true;
@@ -103,30 +108,80 @@ public final class GameWindow {
     this.resolutionChangedListeners.remove(listener);
   }
 
+  /**
+   * Sets the resolution for the GameWindow.
+   * 
+   * @param res
+   *          The desired Resolution to set for the GameWindow.
+   * @see Resolution
+   * 
+   */
   public void setResolution(Resolution res) {
     this.resolutionScale = setResolution(this.getHostControl(), res.getDimension());
   }
 
+  /**
+   * Gets the current resolution scale. The resolution scale is a float value dictating how much larger or smaller each pixel is rendered on screen.
+   * 
+   * @return
+   *         The GameWindow's current resolution scale.
+   * 
+   */
   public float getResolutionScale() {
     return this.resolutionScale;
   }
 
+  /**
+   * Gets the current resolution scale. The resolution scale is a float value dictating how much larger or smaller each pixel is rendered on screen.
+   * 
+   * @return
+   *         The {@code GameWindow}'s current resolution scale.
+   * 
+   */
   public Point2D getCenter() {
     return new Point2D.Double(this.getWidth() / 2.0, this.getHeight() / 2.0);
   }
 
+  /**
+   * Gets the {@code GameWindow}'s JFrame, abstracted as a Container.
+   * 
+   * @return
+   *         The {@code GameWindow}'s {@code JFrame} as an abstract AWT {@code Container}.
+   * 
+   */
   public Container getHostControl() {
     return this.hostControl;
   }
 
+  /**
+   * Gets the window width and height wrapped in a {@code Dimension} object.
+   * 
+   * @return
+   *         The {@code GameWindow}'s size as a {@link Dimension}.
+   * 
+   */
   public Dimension getSize() {
     return this.hostControl.getSize();
   }
 
+  /**
+   * Gets the window width.
+   * 
+   * @return
+   *         The window width.
+   * 
+   */
   public int getWidth() {
     return this.hostControl.getWidth();
   }
 
+  /**
+   * Gets the window height.
+   * 
+   * @return
+   *         The window height.
+   * 
+   */
   public int getHeight() {
     return this.hostControl.getHeight();
   }
@@ -141,7 +196,7 @@ public final class GameWindow {
   }
 
   /**
-   * Gets the visual representation of the mouse cursor on the <code>GameWindow</code>.
+   * Gets the visual representation of the mouse cursor on the {@code GameWindow}.
    * 
    * <p>
    * This can be used to provide a custom cursor image, define its visibility or specify a rendering offset from the actual position.
@@ -153,11 +208,26 @@ public final class GameWindow {
     return this.cursor;
   }
 
+  /**
+   * Gets the window resolution wrapped in a {@code Dimension} object.
+   * 
+   * @return
+   *         The {@code GameWindow}'s internal resolution as a {@link Dimension}.
+   * 
+   */
   public Dimension getResolution() {
     return this.resolution;
   }
 
-  public Point getWindowLocation() {
+  /**
+   * Gets the screen location of the window's top left corner.
+   * 
+   * @return
+   *         The {@code Point} of the window's top left corner.
+   * @see Container#getLocationOnScreen
+   * 
+   */
+  public Point getLocationOnScreen() {
     if (this.screenLocation != null) {
       return this.screenLocation;
     }
@@ -166,18 +236,62 @@ public final class GameWindow {
     return this.screenLocation;
   }
 
+  /**
+   * Sets the icon image for the window's hosting {@code JFrame}.
+   * 
+   * @param image
+   *          The {@code Image} to be used as the window icon.
+   * @see JFrame#setIconImage
+   * 
+   */
   public void setIcon(Image image) {
     this.hostControl.setIconImage(image);
   }
 
-  public void setIcons(List<? extends Image> image) {
-    this.hostControl.setIconImages(image);
+  /**
+   * Sets the icons for the window's hosting {@code JFrame}. Depending on the platform specifications, one or several {@code Icon}s with the correct Dimension
+   * will be chosen automatically from the list.
+   * 
+   * @param images
+   *          A list of {@code Images} to be used as the window icons.
+   * 
+   * @see JFrame#setIconImages
+   * 
+   */
+  public void setIcons(List<? extends Image> images) {
+    this.hostControl.setIconImages(images);
   }
 
-  public void setTitle(String name) {
-    this.hostControl.setTitle(name);
+  /**
+   * Sets the title for this window to the specified string.
+   * 
+   * @param title
+   *          the window title to be displayed in the frame's border.
+   *          A {@code null} value
+   *          is treated as an empty string, "".
+   * @see Frame#setTitle
+   */
+  public void setTitle(String title) {
+    this.hostControl.setTitle(title);
   }
 
+  /**
+   * Initialize a {@code JFrame} to host the window with a given {@code DisplayMode} and resolution.
+   * <p>
+   * For example, {@code BORDERLESS} windows are not
+   * resizable and are rendered without a border.
+   * </p>
+   * 
+   * @param host
+   *          The {@code JFrame} that hosts this window.
+   * @param displaymode
+   *          The {@code DisplayMode} for this window.
+   * @param resolution
+   *          The desired window resolution.
+   * @see DisplayMode
+   * @see JFrame
+   * @see #setResolution
+   */
   static void prepareHostControl(JFrame host, DisplayMode displaymode, Dimension resolution) {
     switch (displaymode) {
     case BORDERLESS:
@@ -209,6 +323,17 @@ public final class GameWindow {
     setResolution(host, resolution);
   }
 
+  /**
+   * Initialize the {@code GameWindow}.
+   * If the Game is in "No GUI"-mode, the window resolution is set to (0,0) and the hosting JFrame is hidden.
+   * Otherwise, the {@code JFrame} is initialized with the {@code DisplayMode} and resolution defined in the Graphics Configuration.
+   * After initializing the hosting {@code JFrame}, the {@code RenderComponent} is also initialized and the window requests focus.
+   * 
+   * @see Game#isisInNoGUIMode
+   * @see #prepareHostControl
+   * @see GraphicsConfiguration
+   * @see RenderComponent
+   */
   void init() {
     if (Game.isInNoGUIMode()) {
       this.resolution = new Dimension(0, 0);
@@ -301,7 +426,7 @@ public final class GameWindow {
   @FunctionalInterface
   public interface ResolutionChangedListener extends EventListener {
     /**
-     * Invoked when the resolution of the <code>GameWindow</code> changed.
+     * Invoked when the resolution of the {@code GameWindow} changed.
      * 
      * @param resolution
      *          The new resolution.

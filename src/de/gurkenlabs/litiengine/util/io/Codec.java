@@ -149,7 +149,7 @@ public final class Codec {
   }
 
   /**
-   * Decodes the specified <code>Base64</code> string to a byte array.
+   * Decodes the specified {@code Base64} string to a byte array.
    * 
    * @param base64
    *          The Base64 string containing the encoded binary data.

@@ -18,7 +18,7 @@ import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 /**
- * A random number generator instance that provides enhanced functionalities for the java default <code>Random</code> implementation.
+ * A random number generator instance that provides enhanced functionalities for the java default {@code Random} implementation.
  */
 @SuppressWarnings("serial")
 public final class GameRandom extends java.util.Random {

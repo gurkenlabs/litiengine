@@ -549,7 +549,7 @@ public abstract class Entity implements IEntity, EntityRenderListener {
   }
 
   /**
-   * Registers all default actions that are annotated with a <code>EntityAction</code> annotation.
+   * Registers all default actions that are annotated with a {@code EntityAction} annotation.
    */
   private void registerActions() {
     List<Method> methods = ReflectionUtilities.getMethodsAnnotatedWith(this.getClass(), Action.class);

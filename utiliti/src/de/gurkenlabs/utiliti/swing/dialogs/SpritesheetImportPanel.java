@@ -95,8 +95,8 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
   public SpritesheetImportPanel() {
     this.controller = new AnimationController();
     fileListModel = new DefaultListModel<>();
-    setPreferredSize(new Dimension(454, 392));
-    setLayout(new BorderLayout(0, 0));
+    setPreferredSize(new Dimension(500, 400));
+    setLayout(new BorderLayout(10, 10));
 
     fileList = new JList<>();
     fileList.setCellRenderer(new DefaultListCellRenderer() {
@@ -323,11 +323,11 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
       this.labelImage.setIcon(file.getIcon());
       this.controller.getAll().clear();
 
-      int factor = PREVIEW_SIZE / Math.max(file.getSpriteWidth(), file.getSpriteHeight());
+      double factor = (double) PREVIEW_SIZE / Math.max(file.getSpriteWidth(), file.getSpriteHeight());
 
       BufferedImage img = Imaging.scale(file.getImage(), factor, true);
 
-      Spritesheet sprite = new Spritesheet(img, file.getName() + "-preview", file.getSpriteWidth() * factor, file.getSpriteHeight() * factor);
+      Spritesheet sprite = new Spritesheet(img, file.getName() + "-preview", (int) (file.getSpriteWidth() * factor), (int) (file.getSpriteHeight() * factor));
       Animation newAnim = new Animation(sprite, true, file.keyFrames);
 
       this.controller.setDefault(newAnim);

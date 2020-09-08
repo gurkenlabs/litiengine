@@ -1,7 +1,7 @@
 package de.gurkenlabs.litiengine.environment;
 
 /**
- * This listener provides callbacks for different points over the life cycle of an <code>IEnvironment</code> (loaded/unloaded/cleared/initialized).
+ * This listener provides callbacks for different points over the life cycle of an {@code IEnvironment} (loaded/unloaded/cleared/initialized).
  * 
  * @see Environment#load()
  * @see Environment#unload()

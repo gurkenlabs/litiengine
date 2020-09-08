@@ -3,7 +3,7 @@ package de.gurkenlabs.litiengine.sound;
 import java.util.EventObject;
 
 /**
- * This implementation is used for all events that need to pass a <code>Sound</code> object to their listeners.
+ * This implementation is used for all events that need to pass a {@code Sound} object to their listeners.
  * 
  * @see SoundPlayback#cancel()
  * @see SoundPlayback#finish()
@@ -19,7 +19,7 @@ public class SoundEvent extends EventObject {
   }
 
   /**
-   * Gets the related <code>Sound</code> instance.
+   * Gets the related {@code Sound} instance.
    * 
    * @return The sound object.
    */

@@ -34,14 +34,14 @@ public class Spawnpoint extends Entity {
   private double spawnOffsetY;
 
   /**
-   * Instantiates a new <code>Spawnpoint</code> entity.
+   * Instantiates a new {@code Spawnpoint} entity.
    */
   public Spawnpoint() {
     this.setSize(1, 1);
   }
 
   /**
-   * Instantiates a new <code>Spawnpoint</code> entity.
+   * Instantiates a new {@code Spawnpoint} entity.
    *
    * @param x
    *          The x-coordinate of this instance.
@@ -65,7 +65,7 @@ public class Spawnpoint extends Entity {
   }
 
   /**
-   * Instantiates a new <code>Spawnpoint</code> entity.
+   * Instantiates a new {@code Spawnpoint} entity.
    *
    * @param mapId
    *          The map id of this instance.
@@ -79,7 +79,7 @@ public class Spawnpoint extends Entity {
   }
 
   /**
-   * Instantiates a new <code>Spawnpoint</code> entity.
+   * Instantiates a new {@code Spawnpoint} entity.
    *
    * @param mapId
    *          The map id of this instance.
@@ -93,7 +93,7 @@ public class Spawnpoint extends Entity {
   }
 
   /**
-   * Instantiates a new <code>Spawnpoint</code> entity.
+   * Instantiates a new {@code Spawnpoint} entity.
    *
    * @param mapId
    *          The map id of this instance.
@@ -109,7 +109,7 @@ public class Spawnpoint extends Entity {
   }
 
   /**
-   * Instantiates a new <code>Spawnpoint</code> entity.
+   * Instantiates a new {@code Spawnpoint} entity.
    *
    * @param mapId
    *          The map id of this instance.
@@ -124,7 +124,7 @@ public class Spawnpoint extends Entity {
   }
 
   /**
-   * Instantiates a new <code>Spawnpoint</code> entity.
+   * Instantiates a new {@code Spawnpoint} entity.
    *
    * @param direction
    *          The direction in which entities will be spawned by this instance.
@@ -134,7 +134,7 @@ public class Spawnpoint extends Entity {
   }
 
   /**
-   * Instantiates a new <code>Spawnpoint</code> entity.
+   * Instantiates a new {@code Spawnpoint} entity.
    *
    * @param direction
    *          The direction in which entities will be spawned by this instance.
@@ -207,7 +207,7 @@ public class Spawnpoint extends Entity {
   }
 
   /**
-   * Spawns the specified entity to the <code>Environment</code> of the <code>Spawnpoint</code> or the currently active <code>Environment</code>.
+   * Spawns the specified entity to the {@code Environment} of the {@code Spawnpoint} or the currently active {@code Environment}.
    * 
    * <p>
    * Spawning will set the location of the entity to the location defined by the spawnpoint and optionally also set the angle of the entity,

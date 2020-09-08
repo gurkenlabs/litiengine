@@ -12,7 +12,6 @@ import javax.swing.table.TableCellRenderer;
 
 import com.github.weisj.darklaf.ui.table.renderer.DarkTableCellEditor;
 import com.github.weisj.darklaf.ui.table.renderer.DarkTableCellRenderer;
-import com.github.weisj.darklaf.ui.table.renderer.DarkTableCellRendererDelegate;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
@@ -96,7 +95,7 @@ public class LayerTable extends JTable {
 
   @Override
   public TableCellRenderer getCellRenderer(final int row, final int column) {
-    return new DarkTableCellRendererDelegate(new DarkTableCellRenderer()) {
+    return new DarkTableCellRenderer() {
       @Override
       public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);

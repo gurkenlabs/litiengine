@@ -9,13 +9,13 @@ import de.gurkenlabs.litiengine.graphics.RenderType;
 public class MapArea extends Entity {
 
   /**
-   * Instantiates a new <code>MapArea</code> entity.
+   * Instantiates a new {@code MapArea} entity.
    */
   public MapArea() {
   }
 
   /**
-   * Instantiates a new <code>MapArea</code> entity.
+   * Instantiates a new {@code MapArea} entity.
    *
    * @param x
    *          The x-coordinate of this instance.
@@ -31,7 +31,7 @@ public class MapArea extends Entity {
   }
 
   /**
-   * Instantiates a new <code>MapArea</code> entity.
+   * Instantiates a new {@code MapArea} entity.
    *
    * @param id
    *          The id of this instance.

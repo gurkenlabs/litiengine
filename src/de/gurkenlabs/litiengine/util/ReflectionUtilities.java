@@ -246,7 +246,7 @@ public final class ReflectionUtilities {
   /**
    * Gets the events for the specified type.
    * <p>
-   * This will search for all methods that have a parameter of type <code>EventListener</code> and match the LITIengine's naming conventions
+   * This will search for all methods that have a parameter of type {@code EventListener} and match the LITIengine's naming conventions
    * for event subscription (i.e. the method name starts with one of the prefixes "add" or "on".
    * </p>
    * 

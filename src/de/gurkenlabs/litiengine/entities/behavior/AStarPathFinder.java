@@ -104,10 +104,10 @@ public class AStarPathFinder extends PathFinder {
   }
 
   /**
-   * Updates the costs and the predecessor of all neighbors of the specified <code>currentNode</code>.<br>
-   * If a neighbor was previously not part of the <code>opened</code> list it will be added to it.<br>
+   * Updates the costs and the predecessor of all neighbors of the specified {@code currentNode}.<br>
+   * If a neighbor was previously not part of the {@code opened} list it will be added to it.<br>
    * If a neighbor is already closed, it will be ignored.<br>
-   * If the {@link AStarNode#isWalkable()} method of a neighbor returns <code>false</code> it will also not be considered.
+   * If the {@link AStarNode#isWalkable()} method of a neighbor returns {@code false} it will also not be considered.
    * 
    * @param currentNode
    *          The node for which the neighbors will be searched for.

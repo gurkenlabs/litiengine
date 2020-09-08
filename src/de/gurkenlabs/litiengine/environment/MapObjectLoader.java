@@ -31,7 +31,7 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
   }
 
   /**
-   * Loads engine default properties to the specified <code>IEntity</code> instance:
+   * Loads engine default properties to the specified {@code IEntity} instance:
    * <ul>
    * <li>width, height</li>
    * <li>mapId</li>
@@ -39,7 +39,7 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
    * <li>location</li>
    * <li>tags</li>
    * </ul>
-   * Also, this supports predefined <code>CustomMapObjectProperties</code>. It loads the specified custom properties via reflection.
+   * Also, this supports predefined {@code CustomMapObjectProperties}. It loads the specified custom properties via reflection.
    * 
    * @param entity
    *          The entity instance that will be initialized.

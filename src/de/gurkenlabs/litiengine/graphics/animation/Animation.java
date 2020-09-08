@@ -12,9 +12,9 @@ import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
 
 /**
- * The <code>Animation</code> class keeps track of the current keyframe which is used to animate a visual element.
+ * The {@code Animation} class keeps track of the current keyframe which is used to animate a visual element.
  * It iterates over all defined keyframes with respect to their duration and provides information
- * for the related <code>AnimationController</code> which keyframe should currently be rendered.
+ * for the related {@code AnimationController} which keyframe should currently be rendered.
  * 
  * @see IAnimationController#getCurrent()
  */
@@ -39,7 +39,7 @@ public class Animation implements IUpdateable, ILaunchable {
   private boolean playing;
 
   /**
-   * Initializes a new instance of the <code>Animation</code> class.
+   * Initializes a new instance of the {@code Animation} class.
    * 
    * @param spriteSheetName
    *          The name of the spritesheet used by this animation.
@@ -57,7 +57,7 @@ public class Animation implements IUpdateable, ILaunchable {
   }
 
   /**
-   * Initializes a new instance of the <code>Animation</code> class.
+   * Initializes a new instance of the {@code Animation} class.
    * 
    * @param spritesheet
    *          The spritesheet used by this animation.
@@ -75,7 +75,7 @@ public class Animation implements IUpdateable, ILaunchable {
   }
 
   /**
-   * Initializes a new instance of the <code>Animation</code> class.
+   * Initializes a new instance of the {@code Animation} class.
    * 
    * @param spritesheet
    *          The spritesheet used by this animation.
@@ -90,7 +90,7 @@ public class Animation implements IUpdateable, ILaunchable {
   }
 
   /**
-   * Initializes a new instance of the <code>Animation</code> class.
+   * Initializes a new instance of the {@code Animation} class.
    * 
    * @param name
    *          The name of this animation.
@@ -116,7 +116,7 @@ public class Animation implements IUpdateable, ILaunchable {
   }
 
   /**
-   * Initializes a new instance of the <code>Animation</code> class.
+   * Initializes a new instance of the {@code Animation} class.
    * 
    * @param name
    *          The name of this animation.
@@ -266,6 +266,15 @@ public class Animation implements IUpdateable, ILaunchable {
   }
 
   /**
+   * Gets an array of this animation's keyframe durations by streaming the keyframe list and mapping the durations to an int array.
+   * 
+   * @return An array of this animation's keyframe durations.
+   */
+  public int[] getKeyFrameDurations() {
+    return this.getKeyframes().stream().mapToInt(KeyFrame::getDuration).toArray();
+  }
+
+  /**
    * Sets the looping behavior for this animation.
    * 
    * @param loop
@@ -333,7 +342,7 @@ public class Animation implements IUpdateable, ILaunchable {
    * Initializes the animation key frames by the specified durations.
    * 
    * <p>
-   * The amount of keyframes is defined by the available sprites of the assigned <code>Spritesheet</code>. For each
+   * The amount of keyframes is defined by the available sprites of the assigned {@code Spritesheet}. For each
    * sprite, a new keyframe will be initialized.
    * </p>
    * 

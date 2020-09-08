@@ -14,7 +14,7 @@ public class PropAnimationController<T extends Prop> extends EntityAnimationCont
   public static final String PROP_IDENTIFIER = "prop-";
 
   /**
-   * Initializes a new instance of the <code>PropAnimationController</code> class.
+   * Initializes a new instance of the {@code PropAnimationController} class.
    * 
    * @param prop
    *          The prop related to this controller.

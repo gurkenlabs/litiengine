@@ -209,6 +209,13 @@ public abstract class PropertyPanel extends JPanel {
     slider.addChangeListener(new SliderListener(property, slider));
   }
 
+  protected void setup(JSlider slider, String property, float factor) {
+    if (property == null || property.isEmpty()) {
+      return;
+    }
+    slider.addChangeListener(new SliderListener(property, slider, factor));
+  }
+
   protected void setup(JSpinner spinner, String property) {
     if (property == null || property.isEmpty()) {
       return;
@@ -316,6 +323,10 @@ public abstract class PropertyPanel extends JPanel {
   protected class SliderListener extends MapObjectPropertyChangeListener {
     SliderListener(String mapObjectProperty, JSlider slider) {
       super(m -> m.setValue(mapObjectProperty, slider.getValue()));
+    }
+
+    SliderListener(String mapObjectProperty, JSlider slider, float factor) {
+      super(m -> m.setValue(mapObjectProperty, slider.getValue() * factor));
     }
   }
 

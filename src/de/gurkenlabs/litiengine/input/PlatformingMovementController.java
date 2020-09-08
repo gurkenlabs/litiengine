@@ -17,10 +17,10 @@ import de.gurkenlabs.litiengine.util.ListUtilities;
  */
 public class PlatformingMovementController<T extends IMobileEntity> extends KeyboardEntityController<T> {
   /**
-   * The identifier that is used by this controller to execute the jumping <code>EntityAction</code> on the related entity.
+   * The identifier that is used by this controller to execute the jumping {@code EntityAction} on the related entity.
    * <p>
-   * <i>Note that the entity needs to either specify a method with an <code>Action</code> annotation that corresponds to this identifier or it needs
-   * to explicitly register an <code>EntityAction</code>.</i>
+   * <i>Note that the entity needs to either specify a method with an {@code Action} annotation that corresponds to this identifier or it needs
+   * to explicitly register an {@code EntityAction}.</i>
    * </p>
    * 
    * @see IEntity#register(String, Runnable)

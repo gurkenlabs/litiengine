@@ -8,7 +8,7 @@ public class SoundConfiguration extends ConfigurationGroup {
   private float soundVolume;
 
   SoundConfiguration() {
-    this.soundVolume = 0.5F;
+    this.setSoundVolume(0.5f);
     this.setMusicVolume(0.5f);
   }
 

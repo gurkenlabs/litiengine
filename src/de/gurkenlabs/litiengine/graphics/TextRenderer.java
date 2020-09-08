@@ -249,8 +249,6 @@ public final class TextRenderer {
       final LineBreakMeasurer measurer = new LineBreakMeasurer(iterator, frc);
       while (true) {
         TextLayout nextLayout = measurer.nextLayout((float) width);
-        if (align == Align.JUSTIFY && measurer.getPosition() < text.length())
-          nextLayout = nextLayout.getJustifiedLayout((float) width);
         lines.add(nextLayout);
         textHeight += nextLayout.getAscent() + nextLayout.getDescent();
         if (measurer.getPosition() >= text.length()) {
@@ -262,7 +260,7 @@ public final class TextRenderer {
     float textY = (float) (y + valign.getLocation(height, textHeight));
     for (TextLayout layout : lines) {
       textY += layout.getAscent();
-      layout.draw(g, (float)(x + (align == Align.JUSTIFY ? 0.0 : align.getLocation(width, layout.getAdvance()))), textY);
+      layout.draw(g, (float) (x + align.getLocation(width, layout.getAdvance())), textY);
       textY += layout.getDescent() + layout.getLeading();
     }
     g.setRenderingHints(originalHints);
@@ -322,7 +320,7 @@ public final class TextRenderer {
   public static void renderWithOutline(final Graphics2D g, final String text, final double x, final double y, final Color outlineColor, final float stroke, final boolean antiAliasing) {
     renderWithOutline(g, text, x, y, 0.0, 0.0, outlineColor, stroke, Align.LEFT, Valign.TOP, antiAliasing);
   }
-  
+
   /**
    * Draw text at the given coordinates with an outline in the provided color and a provided Anti-Aliasing parameter.
    * 

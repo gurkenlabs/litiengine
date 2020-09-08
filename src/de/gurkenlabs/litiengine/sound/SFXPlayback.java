@@ -9,22 +9,26 @@ import javax.sound.sampled.LineUnavailableException;
 import de.gurkenlabs.litiengine.Game;
 
 /**
- * A <code>SoundPlayback</code> implementation for the playback of sound effects.
+ * A {@code SoundPlayback} implementation for the playback of sound effects.
  */
 public class SFXPlayback extends SoundPlayback {
   private Sound sound;
   private FloatControl panControl;
   private Supplier<Point2D> source;
-  private VolumeControl distance;
+  private int range;
+  private float volumeModifier;
+  private VolumeControl volume;
   private boolean loop;
 
-  SFXPlayback(Sound sound, Supplier<Point2D> source, boolean loop) throws LineUnavailableException {
+  SFXPlayback(Sound sound, Supplier<Point2D> source, boolean loop, int range, float volumeModifier) throws LineUnavailableException {
     super(sound.getFormat());
     this.loop = loop;
     this.sound = sound;
     this.panControl = this.line.isControlSupported(FloatControl.Type.PAN) ? (FloatControl) this.line.getControl(FloatControl.Type.PAN) : null;
     this.source = source;
-    this.distance = this.createVolumeControl();
+    this.range = range;
+    this.volumeModifier = volumeModifier;
+    this.volume = this.createVolumeControl();
   }
 
   @Override
@@ -46,9 +50,9 @@ public class SFXPlayback extends SoundPlayback {
       if (this.panControl != null) {
         this.panControl.setValue(dist > 0 ? (float) (dx / dist) : 0f);
       }
-      this.distance.set(Game.config().sound().getSoundVolume() * (float) Math.max(1.0 - dist / Game.audio().getMaxDistance(), 0.0));
+      this.volume.set(Game.config().sound().getSoundVolume() * this.volumeModifier * (float) Math.max(1.0 - dist / this.range, 0.0));
     } else {
-      this.distance.set(Game.config().sound().getSoundVolume());
+      this.volume.set(Game.config().sound().getSoundVolume() * this.volumeModifier);
     }
   }
 

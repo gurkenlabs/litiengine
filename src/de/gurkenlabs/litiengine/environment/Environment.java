@@ -42,6 +42,7 @@ import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.entities.LightSource;
 import de.gurkenlabs.litiengine.entities.MapArea;
 import de.gurkenlabs.litiengine.entities.Prop;
+import de.gurkenlabs.litiengine.entities.SoundSource;
 import de.gurkenlabs.litiengine.entities.Spawnpoint;
 import de.gurkenlabs.litiengine.entities.StaticShadow;
 import de.gurkenlabs.litiengine.entities.Trigger;
@@ -95,6 +96,7 @@ public final class Environment implements IRenderable {
   private final Collection<Creature> creatures = ConcurrentHashMap.newKeySet();
   private final Collection<StaticShadow> staticShadows = ConcurrentHashMap.newKeySet();
   private final Collection<LightSource> lightSources = ConcurrentHashMap.newKeySet();
+  private final Collection<SoundSource> soundSources = ConcurrentHashMap.newKeySet();
   private final Collection<Spawnpoint> spawnPoints = ConcurrentHashMap.newKeySet();
   private final Collection<MapArea> mapAreas = ConcurrentHashMap.newKeySet();
   private final Collection<Trigger> triggers = ConcurrentHashMap.newKeySet();
@@ -117,10 +119,11 @@ public final class Environment implements IRenderable {
     registerMapObjectLoader(new MapAreaMapObjectLoader());
     registerMapObjectLoader(new StaticShadowMapObjectLoader());
     registerMapObjectLoader(new CreatureMapObjectLoader());
+    registerMapObjectLoader(new SoundSourceMapObjectLoader());
   }
 
   /**
-   * Instantiates a new <code>Environment</code> for the specified map.
+   * Instantiates a new {@code Environment} for the specified map.
    *
    * @param map
    *          The map that defines this environment.
@@ -135,7 +138,7 @@ public final class Environment implements IRenderable {
   }
 
   /**
-   * Instantiates a new <code>Environment</code> for the specified map.
+   * Instantiates a new {@code Environment} for the specified map.
    *
    * @param mapPath
    *          The path to the map resource that defines this environment.
@@ -169,28 +172,28 @@ public final class Environment implements IRenderable {
   }
 
   /**
-   * Registers a custom <code>IEntity</code> implementation to support being loaded from an <code>IMap</code> instance.
+   * Registers a custom {@code IEntity} implementation to support being loaded from an {@code IMap} instance.
    * Note that the specified class needs to be accessible in a static manner. Inner classes that aren't declared statically are not supported.
    * 
-   * This is an overload of the {@link #registerCustomEntityType(Class)} method that allows to explicitly specify the <code>MapObjectType</code>
+   * This is an overload of the {@link #registerCustomEntityType(Class)} method that allows to explicitly specify the {@code MapObjectType}
    * without
-   * having to provide an <code>EntityInfo</code> annotation containing this information.
+   * having to provide an {@code EntityInfo} annotation containing this information.
    * 
    * <p>
    * Custom entity types need to provide at least one constructor that matches the following criteria:
    * </p>
    * 
    * <ul>
-   * <li>has 2 parameters: <code>Environment, IMapObject</code></li>
-   * <li>has 2 parameters: <code>IMapObject, Environment</code></li>
-   * <li>has 1 parameter: <code>IMapObject</code></li>
-   * <li>has 1 parameter: <code>Environment</code></li>
+   * <li>has 2 parameters: {@code Environment, IMapObject}</li>
+   * <li>has 2 parameters: {@code IMapObject, Environment}</li>
+   * <li>has 1 parameter: {@code IMapObject}</li>
+   * <li>has 1 parameter: {@code Environment}</li>
    * <li>is empty constructor</li>
    * </ul>
    * 
    * 
    * @param mapObjectType
-   *          The custom mapobjectType that is used by <code>IMapObjects</code> to determine the target entity implementation.
+   *          The custom mapobjectType that is used by {@code IMapObjects} to determine the target entity implementation.
    * @param entityType
    *          The class type of the custom entity implementation.
    * 
@@ -214,10 +217,10 @@ public final class Environment implements IRenderable {
   }
 
   /**
-   * Registers a custom <code>IEntity</code> implementation to support being loaded from an <code>IMap</code> instance.
+   * Registers a custom {@code IEntity} implementation to support being loaded from an {@code IMap} instance.
    * Note that the specified class needs to be accessible in a static manner. Inner classes that aren't declared statically are not supported.
    * 
-   * This implementation uses the provided <code>EntityInfo.customMapObjectType()</code> to determine for which type the specified class should be
+   * This implementation uses the provided {@code EntityInfo.customMapObjectType()} to determine for which type the specified class should be
    * used.
    * 
    * @param entityType
@@ -395,14 +398,14 @@ public final class Environment implements IRenderable {
   }
 
   /**
-   * Adds the specified instance to be rendered with the defined <code>RenderType</code> whenever the environment's render pipeline is executed.
+   * Adds the specified instance to be rendered with the defined {@code RenderType} whenever the environment's render pipeline is executed.
    * 
    * <p>
    * This method can be used for any custom rendering that is not related to an entity, a GUI component or the map.
    * </p>
    * 
    * <p>
-   * Note that you don't need to explicitly add an <code>Entity</code> if it implements <code>IRenderable</code>. The render engine will inherently
+   * Note that you don't need to explicitly add an {@code Entity} if it implements {@code IRenderable}. The render engine will inherently
    * call an entity's render method.
    * </p>
    * 
@@ -484,6 +487,7 @@ public final class Environment implements IRenderable {
     this.mobileEntities.clear();
     this.lightSources.clear();
     this.spawnPoints.clear();
+    this.soundSources.clear();
     this.mapAreas.clear();
     this.triggers.clear();
 
@@ -1043,8 +1047,8 @@ public final class Environment implements IRenderable {
   /**
    * Gets the entities with the specified render type that are not bound to layers.
    * <p>
-   * Entities are unbound from there originating <code>MapObjectLayer</code> if their <code>RenderType</code> differs
-   * from the layer's <code>RenderType</code>.
+   * Entities are unbound from there originating {@code MapObjectLayer} if their {@code RenderType} differs
+   * from the layer's {@code RenderType}.
    * </p>
    *
    * @param renderType
@@ -1061,7 +1065,7 @@ public final class Environment implements IRenderable {
   /**
    * Gets the entities that are bound to the specified layer.
    * <p>
-   * Entities are bound to a layer if their <code>RenderType</code> matches the layer's <code>RenderType</code>
+   * Entities are bound to a layer if their {@code RenderType} matches the layer's {@code RenderType}
    * </p>
    * 
    * @param layer
@@ -1082,7 +1086,7 @@ public final class Environment implements IRenderable {
   /**
    * Gets the entities that are bound to layer with the specified name.
    * <p>
-   * Entities are bound to a layer if their <code>RenderType</code> matches the layer's <code>RenderType</code>
+   * Entities are bound to a layer if their {@code RenderType} matches the layer's {@code RenderType}
    * </p>
    * 
    * @param name
@@ -1110,7 +1114,7 @@ public final class Environment implements IRenderable {
   /**
    * Gets the entities that are bound to layer with the specified layer ID.
    * <p>
-   * Entities are bound to a layer if their <code>RenderType</code> matches the layer's <code>RenderType</code>
+   * Entities are bound to a layer if their {@code RenderType} matches the layer's {@code RenderType}
    * </p>
    * 
    * @param layerId
@@ -1425,6 +1429,54 @@ public final class Environment implements IRenderable {
    */
   public Spawnpoint getSpawnpoint(final String name) {
     return getByName(this.spawnPoints, name);
+  }
+
+  /**
+   * Gets an immutable collection containing all {@link SoundSource} entities on this environment.
+   * 
+   * <p>
+   * To add or remove entities, use the corresponding methods on this environment.
+   * </p>
+   * 
+   * @return An immutable collection with all {@link SoundSource} entities.
+   * 
+   * @see #add(IEntity)
+   * @see #addAll(Iterable)
+   * @see #remove(IEntity)
+   * @see #removeAll(Iterable)
+   */
+  public Collection<SoundSource> getSoundSources() {
+    return Collections.unmodifiableCollection(this.soundSources);
+  }
+
+  /**
+   * Gets the {@link SoundSource} with the specified map ID from this environment.
+   * 
+   * @param mapId
+   *          The map ID of the entity.
+   * 
+   * @return The {@link SoundSource} with the specified map ID or null if no entity is found.
+   * 
+   * @see #getSpawnpoint(String)
+   * @see #getSpawnPoints()
+   */
+  public SoundSource getSoundSource(final int mapId) {
+    return getById(this.soundSources, mapId);
+  }
+
+  /**
+   * Gets the {@link SoundSource} with the specified name from this environment.
+   * 
+   * @param name
+   *          The name of the entity.
+   * 
+   * @return The {@link SoundSource} with the specified name or null if no entity is found.
+   * 
+   * @see #getSpawnpoint(int)
+   * @see #getSpawnPoints()
+   */
+  public SoundSource getSoundSource(final String name) {
+    return getByName(this.soundSources, name);
   }
 
   /**
@@ -1788,6 +1840,9 @@ public final class Environment implements IRenderable {
 
     if (entity instanceof Spawnpoint) {
       this.spawnPoints.remove(entity);
+    }
+    if (entity instanceof SoundSource) {
+      this.soundSources.remove(entity);
     }
 
     if (entity instanceof StaticShadow) {
@@ -2247,6 +2302,9 @@ public final class Environment implements IRenderable {
 
     if (entity instanceof Spawnpoint) {
       this.spawnPoints.add((Spawnpoint) entity);
+    }
+    if (entity instanceof SoundSource) {
+      this.soundSources.add((SoundSource) entity);
     }
 
     if (entity instanceof StaticShadow) {

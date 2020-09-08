@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 /**
- * Some common implementations that are used by different kinds of file classes (e.g. <code>SoundFormat</code>, <code>ImageFormat</code>.
+ * Some common implementations that are used by different kinds of file classes (e.g. {@code SoundFormat}, {@code ImageFormat}.
  */
 final class DataFormat {
   private DataFormat() {

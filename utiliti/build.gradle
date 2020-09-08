@@ -7,7 +7,7 @@ apply plugin: 'eclipse'
 apply plugin: 'application'
 
 archivesBaseName = "utiliti"
-version = "v0.4.20-alpha"
+version = "v0.5.0-beta"
 mainClassName = "de.gurkenlabs.utiliti.Program"
 
 sourceSets {
@@ -27,6 +27,16 @@ dependencies {
   implementation project(':')
   implementation 'com.github.weisj:darklaf-core:2.4.1'
   implementation 'com.github.weisj:darklaf-theme:2.4.1'
+  implementation 'com.github.weisj:darklaf-property-loader:2.4.1'
+  implementation 'com.github.weisj:darklaf-utils:2.4.1'
+  implementation 'com.github.weisj:darklaf-native-utils:2.4.1'
+  implementation 'com.github.weisj:darklaf-platform-base:2.4.1'
+  implementation 'com.github.weisj:darklaf-windows:2.4.1'
+  implementation 'net.java.dev.jna:jna:5.6.0'
+  implementation 'org.swinglabs:jxlayer:3.0.4'
+  implementation 'org.swinglabs:swingx:1.6.1'
+  implementation 'com.formdev:svgSalamander:1.1.2.1'
+  implementation 'com.fifesoft:rsyntaxtextarea:3.1.1'
 
   testImplementation 'org.junit.jupiter:junit-jupiter-api:5.4.+'
   testImplementation 'org.junit.jupiter:junit-jupiter-params:5.4.+'
@@ -48,16 +58,18 @@ jar {
     }
   }  {
     exclude 'META-INF/services/**'
+    exclude 'META-INF/*.SF'
+    exclude 'META-INF/*.DSA'
+    exclude 'META-INF/*.RSA'
   }
 
   duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
-  exclude '**/*.dll'
   exclude '**/*.jnilib'
   exclude '**/*.dylib'
   exclude '**/*.so'
   exclude 'junit**/**'
-
+  
   manifest {
     attributes 'Main-Class': 'de.gurkenlabs.utiliti.Program'
   }
@@ -67,10 +79,10 @@ launch4j {
   mainClassName = 'de.gurkenlabs.utiliti.Program'
   icon = 'pixel-icon-utiLITI.ico'
   outputDir = 'libs'
-  outfile = archivesBaseName + '-v0.4.20-alpha.exe'
+  outfile = archivesBaseName + '-v0.5.0-beta.exe'
   companyName = 'gurkenlabs.de'
-  version = '0.4.20'
-  textVersion = '0.4.20'
+  version = '0.5.0'
+  textVersion = '0.5.0'
   copyright = '2020 gurkenlabs.de'
   jvmOptions = ['-Xms256m', '-Xmx1024m']
 }

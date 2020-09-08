@@ -93,7 +93,7 @@ public class TileData {
   private int minChunkOffsetYMap;
 
   /**
-   * Instantiates a new <code>TileData</code> instance.
+   * Instantiates a new {@code TileData} instance.
    */
   public TileData() {
     // keep for serialization
@@ -403,7 +403,7 @@ public class TileData {
   }
 
   /**
-   * For infinite maps, the size of a tile layer depends on the <code>TileChunks</code> it contains.
+   * For infinite maps, the size of a tile layer depends on the {@code TileChunks} it contains.
    */
   private void updateDimensionsByTileData() {
     int minX = 0;
