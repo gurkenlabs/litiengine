@@ -196,7 +196,7 @@ public class SoundSource extends Entity {
    * Starts a new playback in the SoundEngine and saves a reference to it in the SoundSource instance. The playback reference can be called with
    * {@link #getPlayback()}.
    * 
-   * @see SoundEngine#playSound()
+   * @see SoundEngine#playSound(Sound, IEntity, boolean, int, float)
    * @see SFXPlayback
    */
   public void play() {
