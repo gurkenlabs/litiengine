@@ -52,16 +52,16 @@ public class MapImage extends CustomPropertyProvider implements IMapImage {
       return;
     }
 
-    this.source = original.source;
-    if (original.transparentcolor != null) {
-      this.transparentcolor = new Color(original.transparentcolor.getRed(),
-          original.transparentcolor.getGreen(),
-          original.transparentcolor.getBlue(),
-          original.transparentcolor.getAlpha());
+    this.source = original.getSource();
+    if (original.getTransparentColor() != null) {
+      this.transparentcolor = new Color(original.getTransparentColor().getRed(),
+          original.getTransparentColor().getGreen(),
+          original.getTransparentColor().getBlue(),
+          original.getTransparentColor().getAlpha());
     }
-    this.width = original.width;
-    this.height = original.height;
-    this.absolutePath = original.absolutePath;
+    this.width = original.getWidth();
+    this.height = original.getHeight();
+    this.absolutePath = original.getAbsoluteSourcePath();
   }
 
   @Override
