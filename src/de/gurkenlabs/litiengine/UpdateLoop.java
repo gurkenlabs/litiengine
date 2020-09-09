@@ -161,7 +161,6 @@ public class UpdateLoop extends Thread implements AutoCloseable, ILoop {
         log.log(Level.SEVERE, e.getMessage(), e);
       }
     }
-    Game.tweens().update();
   }
 
   /**

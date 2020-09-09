@@ -27,12 +27,14 @@ import de.gurkenlabs.litiengine.graphics.TextRenderer;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.sound.Sound;
+import de.gurkenlabs.litiengine.tweening.TweenType;
+import de.gurkenlabs.litiengine.tweening.Tweenable;
 
 /**
  * The abstract Class GuiComponent provides all properties and methods needed for screens, built-in, and custom GUI components such as buttons,
  * sliders, etc... It includes mouse event handling, different hovering states and appearances, and texts to be rendered.
  */
-public abstract class GuiComponent implements MouseListener, MouseMotionListener, MouseWheelListener, IRenderable {
+public abstract class GuiComponent implements MouseListener, MouseMotionListener, MouseWheelListener, IRenderable, Tweenable {
 
   protected static final Font ICON_FONT;
   private static int id = 0;
@@ -737,6 +739,55 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     if (Game.config().debug().renderGuiComponentBoundingBoxes()) {
       g.setColor(Color.RED);
       ShapeRenderer.renderOutline(g, this.getBoundingBox());
+    }
+  }
+
+  @Override
+  public float[] getValues(TweenType tweenType) {
+    switch (tweenType) {
+    case POSITION_X:
+      return new float[] { (float) this.getX() };
+    case POSITION_Y:
+      return new float[] { (float) this.getY() };
+    case POSITION_XY:
+      return new float[] { (float) this.getX(), (float) this.getY() };
+    case SIZE_WIDTH:
+      return new float[] { (float) this.getWidth() };
+    case SIZE_HEIGHT:
+      return new float[] { (float) this.getHeight() };
+    case SIZE_BOTH:
+      return new float[] { (float) this.getWidth(), (float) this.getHeight() };
+    default:
+      return new float[0];
+    }
+  }
+
+  @Override
+  public void setValues(TweenType tweenType, float[] newValues) {
+    switch (tweenType) {
+    case POSITION_X:
+      this.setX(newValues[0]);
+      break;
+    case POSITION_Y:
+      this.setY(newValues[0]);
+      break;
+    case POSITION_XY:
+      this.setX(newValues[0]);
+      this.setY(newValues[1]);
+      break;
+    case SIZE_WIDTH:
+      this.setWidth(newValues[0]);
+      break;
+    case SIZE_HEIGHT:
+      this.setHeight(newValues[0]);
+      break;
+    case SIZE_BOTH:
+      this.setWidth(newValues[0]);
+      this.setHeight(newValues[1]);
+      break;
+    default:
+      assert false;
+      break;
     }
   }
 

@@ -33,9 +33,6 @@ repositories {
 }
 
 dependencies {
-  compile "com.dorkbox:TweenEngine:8.3"
-  compile "com.dorkbox:ObjectPool:2.9"
-  
   implementation 'net.java.jinput:jinput:2.0.9'
   implementation 'net.java.jinput:jinput:2.0.9:natives-all'
   implementation 'com.googlecode.soundlibs:jorbis:0.0.17.4'
