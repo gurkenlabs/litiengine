@@ -62,6 +62,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   private final Appearance disabledAppearance;
 
   private boolean drawTextShadow = false;
+  private boolean autoAdjustTextPosition = true;
   private boolean enabled;
   private Font font;
   private boolean forwardMouseEvents = true;
@@ -410,6 +411,16 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   }
 
   /**
+   * Getter for the automatic adjustment of text position when the component is resized
+   * 
+   * @param autoAdjustTextPosition
+   *          if {@code true}, adjust the text position automatically when the component is resized
+   */
+  public boolean isAutoAdjustingTextPosition() {
+    return this.autoAdjustTextPosition;
+  }
+
+  /**
    * Checks if the cursor bounding box intersects with this GuiCOmponent's bounding box.
    *
    * @return true, if the GuiComponent is hovered
@@ -743,7 +754,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   }
 
   @Override
-  public float[] getValues(TweenType tweenType) {
+  public float[] getTweenValues(TweenType tweenType) {
     switch (tweenType) {
     case POSITION_X:
       return new float[] { (float) this.getX() };
@@ -763,7 +774,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   }
 
   @Override
-  public void setValues(TweenType tweenType, float[] newValues) {
+  public void setTweenValues(TweenType tweenType, float[] newValues) {
     switch (tweenType) {
     case POSITION_X:
       this.setX(newValues[0]);
@@ -797,6 +808,16 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
       return this.getBoundingBox();
     }
     return new RoundRectangle2D.Double(this.getX(), this.getY(), this.getWidth(), this.getHeight(), this.getCurrentAppearance().getBorderRadius(), this.getCurrentAppearance().getBorderRadius());
+  }
+
+  /**
+   * Setter for the automatic adjustment of text position when the component is resized
+   * 
+   * @param autoAdjustTextPosition
+   *          if {@code true}, adjust the text position automatically when the component is resized
+   */
+  public void setAutoAdjustTextPosition(boolean autoAdjustTextPosition) {
+    this.autoAdjustTextPosition = autoAdjustTextPosition;
   }
 
   /**
@@ -1244,11 +1265,11 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
       defaultTextX = this.getWidth() / 2 - fm.stringWidth(this.getTextToRender(g)) / 2.0;
       break;
     }
-    if (this.getTextY() == 0) {
+    if (this.getTextY() == 0 || this.autoAdjustTextPosition) {
       this.setTextY(defaultTextY);
     }
 
-    if (this.getTextX() == 0) {
+    if (this.getTextX() == 0 || this.autoAdjustTextPosition) {
       this.setTextX(defaultTextX);
     }
 

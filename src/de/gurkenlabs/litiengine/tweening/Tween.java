@@ -1,11 +1,13 @@
 package de.gurkenlabs.litiengine.tweening;
 
+import java.util.Arrays;
+
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
 
 public class Tween implements IUpdateable {
   public static Tween to(Tweenable target, TweenType type, long duration) {
-    return new Tween(target, type, duration).ease(TweenEquations.Quad_InOut);
+    return new Tween(target, type, duration).ease(TweenFunction.QUAD_INOUT);
   }
 
   private TweenType type;
@@ -20,7 +22,7 @@ public class Tween implements IUpdateable {
     this.target = target;
     this.type = type;
     this.duration = duration;
-    this.startValues = this.target.getValues(type);
+    this.startValues = this.target.getTweenValues(type);
     this.targetValues = new float[this.startValues.length];
   }
 
@@ -29,14 +31,20 @@ public class Tween implements IUpdateable {
     return this;
   }
 
-  public Tween ease(TweenEquations easeEquation) {
-    this.equation = easeEquation.getEquation();
+  public Tween ease(TweenFunction easingFunction) {
+    this.equation = easingFunction.getEquation();
     return this;
   }
 
   public Tween target(final float... targetValues) {
+    this.targetValues = Arrays.copyOf(targetValues, targetValues.length);
+    return this;
+  }
+
+  public Tween targetRelative(final float... targetValues) {
+    this.targetValues = new float[targetValues.length];
     for (int i = 0; i < targetValues.length; i++) {
-      this.targetValues[i] = targetValues[i];
+      this.targetValues[i] = this.startValues[i] + targetValues[i];
     }
     return this;
   }
@@ -54,7 +62,6 @@ public class Tween implements IUpdateable {
 
   @Override
   public void update() {
-    long time = Game.time().now();
     long elapsed = Game.time().since(this.started);
     if (elapsed >= this.duration) {
       this.end();
@@ -62,9 +69,9 @@ public class Tween implements IUpdateable {
     }
     float[] currentValues = new float[this.targetValues.length];
     for (int i = 0; i < this.targetValues.length; i++) {
-      currentValues[i] = this.startValues[i] + this.equation.compute(elapsed / (float) (this.duration)) * this.targetValues[i];
+      currentValues[i] = this.startValues[i] + this.equation.compute(elapsed / (float) this.duration) * (this.targetValues[i] - this.startValues[i]);
     }
-    this.target.setValues(this.type, currentValues);
+    this.target.setTweenValues(this.type, currentValues);
   }
 
 }

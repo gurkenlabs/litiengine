@@ -6,18 +6,17 @@ public interface Tweenable {
    * given tween type. It is used by the Tween Engine to determine starting
    * values.
    *
-   * @param tweenType An arbitrary number used to associate an interpolation type for a tween in the TweenAccessor get/setValues() methods
+   * @param tweenType The tween typ e of this interpikation, determining which values are modified.
    *
    * @return The array of current tween values.
    */
-  float[] getValues(TweenType tweenType);
+  float[] getTweenValues(TweenType tweenType);
 
   /**
-   * This method is called by the Tween Engine each time a running tween
-   * associated with the current target object has been updated.
+   * This method is called in a Tween's update() method to set the new interpolated values.
    *
-   * @param tweenType An arbitrary number used to associate an interpolation type for a tween in the TweenAccessor get/setValues() methods
-   * @param newValues The new values determined by the Tween Engine.
+   * @param tweenType The tween typ e of this interpikation, determining which values are modified.
+   * @param newValues The new values determined by the tween equation.
    */
-  void setValues(TweenType tweenType, float[] newValues);
+  void setTweenValues(TweenType tweenType, float[] newValues);
 }
