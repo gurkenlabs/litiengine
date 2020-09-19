@@ -10,7 +10,6 @@ public abstract class State {
 
   protected State(final String name) {
     this.transitions = new CopyOnWriteArrayList<>();
-
     this.name = name;
   }
 

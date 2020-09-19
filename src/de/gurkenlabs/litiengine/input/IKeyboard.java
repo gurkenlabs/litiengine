@@ -36,6 +36,19 @@ public interface IKeyboard {
    * @see #onKeyPressed(int, KeyPressedListener)
    */
   public boolean isPressed(int keyCode);
+  
+  /**
+   * Checks whether the key with the specified {@code keyCode} was recently released.
+   * 
+   * @param keyCode
+   *          The keyCode to check for.
+   * 
+   * @return True if the key with the specified code was recently released.
+   * 
+   * @see #onKeyReleased(KeyReleasedListener)
+   * @see #onKeyReleased(int, KeyReleasedListener)
+   */
+  public boolean wasReleased(int keyCode);
 
   /**
    * Adds the specified key pressed listener to receive events when the key with the defined {@code keyCode} has been pressed.
