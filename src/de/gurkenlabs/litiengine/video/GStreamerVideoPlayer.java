@@ -342,4 +342,13 @@ final class GStreamerVideoPlayer implements VideoPlayer, Closeable{
     }
   }
   
+  @Override
+  public void finalize() { //Cleanup just in case
+    try {
+      close();
+    } catch (IOException e) {
+      //exceptions in finalize are ignored by the JVM anyway
+    }
+  }
+  
 }
