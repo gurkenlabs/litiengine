@@ -2,25 +2,25 @@ package de.gurkenlabs.litiengine.resources;
 
 import java.net.URL;
 
-import de.gurkenlabs.litiengine.video.VideoManager;
+import de.gurkenlabs.litiengine.video.GStreamerVideoManager;
 
-public class Videos extends ResourcesContainer<VideoManager>{
+public class Videos extends ResourcesContainer<GStreamerVideoManager>{
 
   Videos(){}
   
-  public VideoManager load(VideoResource video) throws NoClassDefFoundError {
+  public GStreamerVideoManager load(VideoResource video) throws NoClassDefFoundError {
     return load(video, false);
   }
   
-  public VideoManager load(VideoResource video, boolean play) throws NoClassDefFoundError {
-    VideoManager videoManager = new VideoManager(video, play);
+  public GStreamerVideoManager load(VideoResource video, boolean play) throws NoClassDefFoundError {
+    GStreamerVideoManager videoManager = new GStreamerVideoManager(video, play);
     this.add(video.getName(), videoManager);
     return videoManager;
   }
   
   @Override
-  protected VideoManager load(URL resourceName) throws Exception, NoClassDefFoundError {
-    return new VideoManager(resourceName);
+  protected GStreamerVideoManager load(URL resourceName) throws Exception, NoClassDefFoundError {
+    return new GStreamerVideoManager(resourceName);
   }
 
 }

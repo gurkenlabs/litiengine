@@ -2,15 +2,15 @@ package de.gurkenlabs.litiengine.graphics;
 
 import java.awt.Graphics2D;
 
-import de.gurkenlabs.litiengine.video.VideoManager;
+import de.gurkenlabs.litiengine.video.GStreamerVideoManager;
 
-public final class VideoRenderer {
+public final class GStreamerVideoRenderer {
 
-  private VideoRenderer() {
+  private GStreamerVideoRenderer() {
     throw new UnsupportedOperationException();
   }
   
-  public static void render(final Graphics2D g, final VideoManager video) {
+  public static void render(final Graphics2D g, final GStreamerVideoManager video) {
     if(video == null || video.isStatusUnknown()) {
       return;
     }

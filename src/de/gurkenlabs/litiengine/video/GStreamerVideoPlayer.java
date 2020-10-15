@@ -1,99 +1,110 @@
 package de.gurkenlabs.litiengine.video;
 
+import static org.freedesktop.gstreamer.lowlevel.GstClockAPI.GSTCLOCK_API;
 import static java.time.Duration.ZERO;
-import static javafx.scene.media.MediaPlayer.Status.*;
 
+import java.awt.Container;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.time.Duration;
 
 import javax.net.ssl.SSLHandshakeException;
-import javax.swing.JComponent;
+import javax.swing.JFrame;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.resources.VideoResource;
 
-import javafx.application.Platform;
-import javafx.embed.swing.JFXPanel;
-import javafx.scene.Group;
-import javafx.scene.Scene;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaException;
-import javafx.scene.media.MediaPlayer;
-import javafx.scene.media.MediaView;
+import org.freedesktop.gstreamer.Clock;
+import org.freedesktop.gstreamer.Gst;
+import static org.freedesktop.gstreamer.State.*;
+import org.freedesktop.gstreamer.elements.PlayBin;
+import org.freedesktop.gstreamer.swing.GstVideoComponent;
 
-final class VideoManagerImpl implements VideoPlayer{
+final class GStreamerVideoPlayer implements VideoPlayer, Closeable{
   
-  private volatile JFXPanel panel = new JFXPanel();
-  private volatile MediaView mediaView;
+  static {
+    Gst.init("VideoPlayer");
+  }
+  
+  private volatile PlayBin media;
+  private volatile GstVideoComponent component;
 
   @Override
   public synchronized void setVideo(VideoResource video) {
-    if(video.getURI().startsWith("http")) {
-      try {
-        setVideo(new URL(video.getURI()));
-      } catch (IOException e) {
-        throw new UncheckedIOException(e);
-      }
+    try {
+      setVideo(new URL(video.getURI()));
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
     }
-    setMedia(new Media(video.getURI()));
   }
 
   @Override
   public synchronized void play(VideoResource video) {
     setVideo(video);
-    while(isStatusUnknown());
     play();
   }
 
   @Override
   public synchronized void setVideo(URL url) throws IOException {
     if(url.getProtocol().startsWith("http")) {
-      if(!VideoManager.allowNetworkConnections) {
+      if(!GStreamerVideoManager.allowNetworkConnections) {
         throw new IOException("Network access disallowed");
       }
       if(url.getProtocol().equals("http")) {
         throw new SSLHandshakeException("Insecure protocol: http. Use https");
       }
     }
-    setMedia(new Media(url.toString()));
+    PlayBin media;
+    try {
+      media = new PlayBin("VideoPlayer", url.toURI());
+    } catch (URISyntaxException e) {
+      throw new IOException(e);
+    }
+    setMedia(media);
   }
 
   @Override
   public synchronized void play(URL url) throws IOException {
     setVideo(url);
-    while(isStatusUnknown());
     play();
   }
   
   public synchronized void play() {
     if(playerValid()) {
-      panel.setVisible(true);
-      Platform.runLater(() -> {
-        getPlayer().play();
-      });
+      component.setVisible(true);
+      media.setState(PLAYING);
+    }
+    else {
+      throw new IllegalStateException();
     }
   }
   
-  private synchronized void setMedia(Media media) {
-    Platform.runLater(() -> {
-      final MediaPlayer player = getPlayer();
-      if(player != null) {
-        player.dispose();
-      }
-      
-      this.mediaView = new MediaView(new MediaPlayer(media));
-      Group root = new Group(mediaView);
-      Scene scene = new Scene(root, media.getWidth(), media.getHeight());
-      mediaView.autosize();
-      panel.setScene(scene);
-      mediaView.getMediaPlayer().setOnReady(() -> panel.setSize(media.getWidth(), media.getHeight()));
-    });
+  private synchronized void setMedia(PlayBin media) {
+    try {
+      close();
+    }
+    catch(IOException e) {
+      throw new UncheckedIOException(e);
+    }
+    JFrame frame = (JFrame) Game.window().getHostControl();
+    GstVideoComponent vid = new GstVideoComponent();
+    vid.setSize(300, 300);
+    frame.setVisible(true);
+    Container container = new Container();
+    container.add(vid);
+    frame.add(container);
+    media.setVideoSink(vid.getElement());
+    component = vid;
+    this.media = media;
   }
   
   @Override
   public boolean isStatusUnknown() {
     if(playerValid()) {
-      return getPlayer().getStatus() == UNKNOWN;
+      return getPlayer().getState() == NULL;
     }
     return true;
   }
@@ -101,7 +112,7 @@ final class VideoManagerImpl implements VideoPlayer{
   @Override
   public boolean isReady() {
     if(playerValid()) {
-      return getPlayer().getStatus() == READY;
+      return getPlayer().getState() == READY;
     }
     return false;
   }
@@ -109,7 +120,7 @@ final class VideoManagerImpl implements VideoPlayer{
   @Override
   public boolean isPlaying() {
     if(playerValid()) {
-      return getPlayer().getStatus() == PLAYING;
+      return getPlayer().getState() == PLAYING;
     }
     return false;
   }
@@ -117,7 +128,7 @@ final class VideoManagerImpl implements VideoPlayer{
   @Override
   public boolean isErrored() {
     if(playerValid()) {
-      return getPlayer().getStatus() == HALTED;
+      return false;
     }
     return false;
   }
@@ -125,7 +136,7 @@ final class VideoManagerImpl implements VideoPlayer{
   @Override
   public boolean isPaused() {
     if(playerValid()) {
-      return getPlayer().getStatus() == PAUSED;
+      return getPlayer().getState() == PAUSED;
     }
     return false;
   }
@@ -133,7 +144,7 @@ final class VideoManagerImpl implements VideoPlayer{
   @Override
   public boolean isBuffering() {
     if(playerValid()) {
-      return getPlayer().getStatus() == STALLED;
+      return false;
     }
     return false;
   }
@@ -141,26 +152,20 @@ final class VideoManagerImpl implements VideoPlayer{
   @Override
   public boolean isStopped() {
     if(playerValid()) {
-      return getPlayer().getStatus() == STOPPED;
+      return getPlayer().getState() == VOID_PENDING;
     }
     return false;
   }
   
   public VideoPlayer.Status getStatus() {
-    switch (getPlayer().getStatus()) {
-    case DISPOSED:
-      return Status.DISPOSED;
-    case HALTED:
-      return Status.ERRORED;
+    switch (getPlayer().getState()) {
     case PAUSED:
       return Status.PAUSED;
     case PLAYING:
       return Status.PLAYING;
     case READY:
       return Status.READY;
-    case STALLED:
-      return Status.STALLED;
-    case STOPPED:
+    case VOID_PENDING:
       return Status.STOPPED;
     default:
       return Status.UNKNOWN;
@@ -173,41 +178,32 @@ final class VideoManagerImpl implements VideoPlayer{
   }
 
   @Override
-  public MediaException getError() {
-    if(playerValid()) {
-      return getPlayer().getError();
-    }
+  public Throwable getError() {
     return null;
   }
 
   @Override
   public double getBalance() {
-    if(playerValid()) {
-      return getPlayer().getBalance();
-    }
     return 0;
   }
 
   @Override
   public java.time.Duration getBufferProgressTime() {
-    if(playerValid()) {
-      return convertDuration(getPlayer().getBufferProgressTime());
-    }
-    return ZERO;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public int getCurrentCount() {
-    if(playerValid()) {
-      return getPlayer().getCurrentCount();
-    }
-    return 0;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public double getCurrentRate() {
     if(playerValid()) {
-      return getPlayer().getCurrentRate();
+      if(isPaused()) {
+        return 0;
+      }
+      return getRate();
     }
     return 0;
   }
@@ -215,7 +211,8 @@ final class VideoManagerImpl implements VideoPlayer{
   @Override
   public java.time.Duration getCurrentTime() {
     if(playerValid()) {
-      return convertDuration(getPlayer().getCurrentTime());
+      Clock clock = getPlayer().getClock();
+      return convertDuration(clock.getTime());
     }
     return ZERO;
   }
@@ -223,7 +220,10 @@ final class VideoManagerImpl implements VideoPlayer{
   @Override
   public double getRate() {
     if(playerValid()) {
-      return getPlayer().getRate();
+      long[] numerator = new long[]{0};
+      long[] denominator = new long[] {0};
+      GSTCLOCK_API.gst_clock_get_calibration(media.getClock(), null, null, numerator, denominator); //must use GSTCLOCK_API due to https://github.com/gstreamer-java/gst1-java-core/issues/212
+      return (double)((double)numerator[0]/(double)denominator[0]);
     }
     return 0;
   }
@@ -239,7 +239,7 @@ final class VideoManagerImpl implements VideoPlayer{
   @Override
   public java.time.Duration getStopTime() {
     if(playerValid()) {
-      return convertDuration(getPlayer().getStopTime());
+      return convertDuration(getPlayer().getBaseTime()); //TODO: update when setStopTime() is implemented
     }
     return ZERO;
   }
@@ -247,7 +247,7 @@ final class VideoManagerImpl implements VideoPlayer{
   @Override
   public java.time.Duration getTotalDuration() {
     if(playerValid()) {
-      return convertDuration(getPlayer().getTotalDuration());
+      return convertDuration(getPlayer().getBaseTime());
     }
     return ZERO;
   }
@@ -276,15 +276,14 @@ final class VideoManagerImpl implements VideoPlayer{
 
   @Override
   public void setBalance(double value) {
-    if(playerValid()) {
-      getPlayer().setBalance(value);
-    }
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public void setRate(double value) {
     if(playerValid()) {
-      getPlayer().setRate(value);
+      Clock clock = getPlayer().getClock();
+      clock.setCalibration(clock.getInternalTime(), clock.getInternalTime(), (long)value, (long)1);
     }
   }
 
@@ -297,9 +296,7 @@ final class VideoManagerImpl implements VideoPlayer{
 
   @Override
   public void setStopTime(java.time.Duration value) {
-    if(playerValid()) {
-      getPlayer().setStopTime(convertDuration(value));
-    }
+    throw new UnsupportedOperationException(); //TODO: Figure out how to implement
   }
 
   @Override
@@ -317,27 +314,35 @@ final class VideoManagerImpl implements VideoPlayer{
   }
   
   @Override
-  public JComponent getPanel() {
-    return panel;
+  public GstVideoComponent getPanel() {
+    return component;
   }
   
-  private java.time.Duration convertDuration(javafx.util.Duration duration) {
-    return java.time.Duration.ofSeconds((long) duration.toSeconds());
+  private Duration convertDuration(long duration) {
+    return Duration.ofSeconds(duration);
   }
   
-  private javafx.util.Duration convertDuration(java.time.Duration duration) {
-    return javafx.util.Duration.seconds((double)duration.getSeconds());
+  private long convertDuration(Duration duration) {
+    return duration.toNanos();
   }
   
-  private MediaPlayer getPlayer() {
-    if(mediaView != null) {
-      return mediaView.getMediaPlayer();
+  private PlayBin getPlayer() {
+    if(media != null) {
+      return media;
     }
     return null;
   }
   
   private boolean playerValid() {
     return getPlayer() != null;
+  }
+
+  @Override
+  public void close() throws IOException {
+    if(media != null) {
+      Game.window().getHostControl().remove(component);
+      media.close();
+    }
   }
   
 }

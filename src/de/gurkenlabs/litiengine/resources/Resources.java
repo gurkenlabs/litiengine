@@ -156,7 +156,7 @@ public final class Resources {
    * 
    * @return The VideoManager resource container.
    * 
-   * @see de.gurkenlabs.litiengine.video.VideoManager
+   * @see de.gurkenlabs.litiengine.video.GStreamerVideoManager
    */
   public static Videos videos() {
     return videos;

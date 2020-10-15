@@ -1,21 +1,11 @@
 package de.gurkenlabs.litiengine.video;
 
-import java.awt.Container;
+import java.awt.Component;
 import java.io.IOException;
 import java.net.URL;
 import java.time.Duration;
 
 import de.gurkenlabs.litiengine.resources.VideoResource;
-
-/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
- * 
- * Do not import anything from javafx into this interface!
- * 
- * Not all JREs contain javafx. Java will throw a
- * java.lang.Error if we accidentally try to load a 
- * javafx class if the library doesn't exist!
- *
- *!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
 interface VideoPlayer {
   void dispose();
@@ -53,11 +43,8 @@ interface VideoPlayer {
   void setStopTime(Duration value);
   void setVolume(double value);
   void stop();
-  Container getPanel();
+  Component getPanel();
   
-  /**
-   * @see javafx.scene.media.MediaPlayer.Status
-   */
   public static enum Status {
     DISPOSED,
     ERRORED, //HALTED
