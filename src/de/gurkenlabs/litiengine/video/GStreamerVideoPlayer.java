@@ -281,10 +281,7 @@ final class GStreamerVideoPlayer implements VideoPlayer, Closeable{
 
   @Override
   public void setRate(double value) {
-    if(playerValid()) {
-      Clock clock = getPlayer().getClock();
-      clock.setCalibration(clock.getInternalTime(), clock.getInternalTime(), (long)value, (long)1);
-    }
+    throw new UnsupportedOperationException();
   }
 
   @Override
