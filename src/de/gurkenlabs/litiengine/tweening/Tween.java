@@ -3,18 +3,14 @@ package de.gurkenlabs.litiengine.tweening;
 import java.util.Arrays;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.IUpdateable;
 
-public class Tween implements IUpdateable {
-  public static Tween to(Tweenable target, TweenType type, long duration) {
-    return new Tween(target, type, duration).ease(TweenFunction.QUAD_INOUT);
-  }
-
+public class Tween {
   private TweenType type;
   private TweenEquation equation;
   private long duration;
   private Tweenable target;
   private long started;
+  private boolean stopped;
   private float[] startValues;
   private float[] targetValues;
 
@@ -24,6 +20,42 @@ public class Tween implements IUpdateable {
     this.duration = duration;
     this.startValues = this.target.getTweenValues(type);
     this.targetValues = new float[this.startValues.length];
+  }
+
+  public boolean hasStopped() {
+    return this.stopped;
+  }
+
+  public void setDuration(long duration) {
+    this.duration = duration;
+  }
+
+  public TweenEquation getEquation() {
+    return this.equation;
+  }
+
+  public long getDuration() {
+    return this.duration;
+  }
+
+  public Tweenable getTarget() {
+    return this.target;
+  }
+
+  public long getStartTime() {
+    return this.started;
+  }
+
+  public float[] getStartValues() {
+    return this.startValues;
+  }
+
+  public float[] getTargetValues() {
+    return this.targetValues;
+  }
+
+  public TweenType getType() {
+    return this.type;
   }
 
   public Tween ease(TweenEquation easeEquation) {
@@ -50,28 +82,18 @@ public class Tween implements IUpdateable {
   }
 
   public Tween start() {
-    Game.loop().attach(this);
     this.started = Game.time().now();
+    this.stopped = false;
     return this;
   }
 
-  public Tween end() {
-    Game.loop().detach(this);
+  public Tween resume() {
+    this.stopped = false;
     return this;
   }
 
-  @Override
-  public void update() {
-    long elapsed = Game.time().since(this.started);
-    if (elapsed >= this.duration) {
-      this.end();
-      return;
-    }
-    float[] currentValues = new float[this.targetValues.length];
-    for (int i = 0; i < this.targetValues.length; i++) {
-      currentValues[i] = this.startValues[i] + this.equation.compute(elapsed / (float) this.duration) * (this.targetValues[i] - this.startValues[i]);
-    }
-    this.target.setTweenValues(this.type, currentValues);
+  public Tween stop() {
+    this.stopped = true;
+    return this;
   }
-
 }

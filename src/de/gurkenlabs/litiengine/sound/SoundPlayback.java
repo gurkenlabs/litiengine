@@ -13,7 +13,7 @@ import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
-import de.gurkenlabs.litiengine.tweening.Tween;
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.tweening.TweenFunction;
 import de.gurkenlabs.litiengine.tweening.TweenType;
 import de.gurkenlabs.litiengine.tweening.Tweenable;
@@ -135,7 +135,7 @@ public abstract class SoundPlayback implements Runnable {
    */
   public void fade(long duration, float target, TweenFunction easingType) {
     for (VolumeControl v : this.getVolumeControls()) {
-      Tween.to(v, TweenType.VOLUME, duration).target(target).ease(easingType).start();
+      Game.tweens().startTween(v, TweenType.VOLUME, duration).target(target).ease(easingType).start();
     }
   }
 

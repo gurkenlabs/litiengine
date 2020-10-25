@@ -37,6 +37,7 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.sound.Sound;
 import de.gurkenlabs.litiengine.sound.SoundEngine;
 import de.gurkenlabs.litiengine.sound.SoundPlayback;
+import de.gurkenlabs.litiengine.tweening.TweenEngine;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 
@@ -80,6 +81,7 @@ public final class Game {
   private static final GameTime gameTime = new GameTime();
   private static final GameRandom random = new GameRandom();
   private static GameInfo gameInfo = new GameInfo();
+  private static final TweenEngine tweenEngine = new TweenEngine();
 
   private static GameLoop gameLoop;
   private static UpdateLoop inputLoop;
@@ -447,6 +449,15 @@ public final class Game {
   public static GameWorld world() {
     return world;
   }
+  
+  /**
+   * Gets the game's Tween manager that holds all currently active Tween instances.
+   * 
+   * @return The game's Tween manager.
+   */
+  public static TweenEngine tweens() {
+    return tweenEngine;
+  }
 
   /***
    * Initializes the infrastructure of the LITIengine game.
@@ -558,7 +569,7 @@ public final class Game {
 
     gameLoop.start();
     inputLoop.start();
-
+    tweenEngine.start();
     soundEngine.start();
 
     for (final GameListener listener : gameListeners) {
@@ -639,7 +650,7 @@ public final class Game {
     config().save();
     gameLoop.terminate();
     inputLoop.terminate();
-
+    tweenEngine.terminate();
     soundEngine.terminate();
 
     world().clear();
