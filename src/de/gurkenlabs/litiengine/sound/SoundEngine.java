@@ -720,7 +720,7 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
   }
 
   Point2D getListenerLocation() {
-    return (Point2D) this.listenerLocation.clone();
+    return this.listenerLocation == null ? new Point2D.Double(0, 0) : (Point2D) this.listenerLocation.clone();
   }
 
   void addSound(SFXPlayback playback) {

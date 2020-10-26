@@ -1,28 +1,45 @@
 package de.gurkenlabs.litiengine.tweening;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.ILaunchable;
 import de.gurkenlabs.litiengine.IUpdateable;
 
 public class TweenEngine implements IUpdateable, ILaunchable {
-  public Tween startTween(Tweenable target, TweenType type, long duration) {
+  private Map<Tweenable, Map<TweenType, Tween>> tweens;
 
+  public Tween begin(Tweenable target, TweenType type, long duration) {
     Tween tween = this.getTween(target, type);
     if (tween == null) {
       tween = new Tween(target, type, duration).ease(TweenFunction.QUAD_INOUT);
-      this.getTweens().add(tween);
+      this.getTweens().get(target).put(type, tween);
     } else {
       tween.setDuration(duration);
-      tween.start();
+      tween.begin();
     }
     return tween;
   }
 
-  public Tween stopTween(Tweenable target, TweenType type) {
+  public Tween reset(Tweenable target, TweenType type) {
+    Tween tween = this.getTween(target, type);
+    if (tween != null) {
+      tween.stop();
+      tween.reset();
+    }
+    return tween;
+  }
+
+  public Tween resume(Tweenable target, TweenType type) {
+    Tween tween = this.getTween(target, type);
+    if (tween != null) {
+      tween.resume();
+    }
+    return tween;
+  }
+
+  public Tween stop(Tweenable target, TweenType type) {
     Tween tween = this.getTween(target, type);
     if (tween != null) {
       tween.stop();
@@ -30,45 +47,40 @@ public class TweenEngine implements IUpdateable, ILaunchable {
     return tween;
   }
 
-  private List<Tween> tweens;
-
   public TweenEngine() {
-    this.tweens = new CopyOnWriteArrayList<>();
+    this.tweens = new ConcurrentHashMap<>();
   }
 
-  public List<Tween> getTweens() {
+  public Map<Tweenable, Map<TweenType, Tween>> getTweens() {
     return this.tweens;
   }
 
-  public Tween getTween(Tweenable tweenable, TweenType type) {
-    Optional<Tween> filter = this.getTweens().stream().filter(c -> c.getTarget() == tweenable && c.getType() == type).findFirst();
-    return filter.isPresent() ? filter.get() : null;
-  }
-
-  public void register(Tween tween) {
-    if (this.getTweens().contains(tween)) {
-      return;
+  public Tween getTween(Tweenable target, TweenType type) {
+    if (this.getTweens().get(target) == null) {
+      this.getTweens().put(target, new ConcurrentHashMap<>());
     }
-    this.getTweens().add(tween);
+
+    return this.getTweens().get(target).get(type);
   }
 
   @Override
   public void update() {
-    for (Tween tween : this.getTweens()) {
-      if (tween.hasStopped()) {
-        continue;
+    for (Tweenable target : this.getTweens().keySet()) {
+      for (Tween tween : this.getTweens().get(target).values()) {
+        if (tween.hasStopped()) {
+          continue;
+        }
+        long elapsed = Game.time().since(tween.getStartTime());
+        if (elapsed >= tween.getDuration()) {
+          tween.stop();
+          continue;
+        }
+        float[] currentValues = new float[tween.getTargetValues().length];
+        for (int i = 0; i < tween.getTargetValues().length; i++) {
+          currentValues[i] = tween.getStartValues()[i] + tween.getEquation().compute(elapsed / (float) tween.getDuration()) * (tween.getTargetValues()[i] - tween.getStartValues()[i]);
+        }
+        tween.getTarget().setTweenValues(tween.getType(), currentValues);
       }
-      long elapsed = Game.time().since(tween.getStartTime());
-      if (elapsed >= tween.getDuration()) {
-        tween.stop();
-        this.getTweens().remove(tween);
-        continue;
-      }
-      float[] currentValues = new float[tween.getTargetValues().length];
-      for (int i = 0; i < tween.getTargetValues().length; i++) {
-        currentValues[i] = tween.getStartValues()[i] + tween.getEquation().compute(elapsed / (float) tween.getDuration()) * (tween.getTargetValues()[i] - tween.getStartValues()[i]);
-      }
-      tween.getTarget().setTweenValues(tween.getType(), currentValues);
     }
   }
 

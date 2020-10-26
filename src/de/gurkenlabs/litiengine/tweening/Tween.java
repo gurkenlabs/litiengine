@@ -76,12 +76,12 @@ public class Tween {
   public Tween targetRelative(final float... targetValues) {
     this.targetValues = new float[targetValues.length];
     for (int i = 0; i < targetValues.length; i++) {
-      this.targetValues[i] = this.startValues[i] + targetValues[i];
+      this.targetValues[i] = this.getStartValues()[i] + targetValues[i];
     }
     return this;
   }
 
-  public Tween start() {
+  public Tween begin() {
     this.started = Game.time().now();
     this.stopped = false;
     return this;
@@ -89,6 +89,11 @@ public class Tween {
 
   public Tween resume() {
     this.stopped = false;
+    return this;
+  }
+
+  public Tween reset() {
+    this.getTarget().setTweenValues(this.getType(), this.startValues);
     return this;
   }
 
