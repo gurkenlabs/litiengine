@@ -11,8 +11,8 @@ public class ImageComponentList extends GuiComponent {
   private final Spritesheet background;
   private final List<ImageComponent> cells;
   private List<Image> images;
-  private final double rowHeight;
-  private final double columnWidth;
+  private double rowHeight;
+  private double columnWidth;
   private final int rows;
   private final int columns;
   private double xOffset;
@@ -85,7 +85,7 @@ public class ImageComponentList extends GuiComponent {
           } else {
             img = null;
           }
-          final ImageComponent cell = this.createNewEntry(this.getX() + i * (this.columnWidth + this.xOffset), this.getY() + j * (this.rowHeight + this.yOffset), this.columnWidth, this.rowHeight, this.getBackground(), "", img);
+          final ImageComponent cell = this.createNewEntry(this.getX() + i * (this.getColumnWidth() + this.xOffset), this.getY() + j * (this.getRowHeight() + this.yOffset), this.getColumnWidth(), this.getRowHeight(), this.getBackground(), "", img);
           this.cells.add(cell);
         }
       }
@@ -97,18 +97,30 @@ public class ImageComponentList extends GuiComponent {
     super.prepare();
   }
 
+  public double getRowHeight() {
+    return this.rowHeight;
+  }
+
+  public void setRowHeight(double rowHeight) {
+    this.rowHeight = rowHeight;
+  }
+
+  public double getColumnWidth() {
+    return this.columnWidth;
+  }
+
+  public void setColumnWidth(double columnWidth) {
+    this.columnWidth = columnWidth;
+  }
+
   public void setXOffset(final double xOffset) {
     this.xOffset = xOffset;
-    this.suspend();
-    this.prepare();
   }
 
   public void setYOffset(final double yOffset) {
     this.yOffset = yOffset;
-    this.suspend();
-    this.prepare();
   }
-  
+
   protected ImageComponent createNewEntry(final double x, final double y, final double width, final double height, final Spritesheet spritesheet, final String text, final Image image) {
     return new ImageComponent(x, y, width, height, spritesheet, text, image);
   }
