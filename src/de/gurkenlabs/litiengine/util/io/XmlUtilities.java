@@ -94,6 +94,7 @@ public final class XmlUtilities {
     }
 
     final Unmarshaller um = jaxbContext.createUnmarshaller();
+    um.setAdapter(new URLAdapter(path));
 
     return cls.cast(um.unmarshal(path));
   }
