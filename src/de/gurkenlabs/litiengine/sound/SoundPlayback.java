@@ -178,7 +178,7 @@ public abstract class SoundPlayback implements Runnable {
     this.masterVolume.set(volume);
   }
 
-  VolumeControl createVolumeControl() {
+  public VolumeControl createVolumeControl() {
     VolumeControl control = new VolumeControl();
     this.volumeControls.add(control);
     return control;
@@ -255,7 +255,7 @@ public abstract class SoundPlayback implements Runnable {
    *
    * @see SoundPlayback#createVolumeControl()
    */
-  class VolumeControl {
+  public class VolumeControl {
     private volatile float value = 1f;
 
     private VolumeControl() {
