@@ -178,9 +178,9 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
   }
 
   /**
-   * Fades out the music over the specified time, if playing.
+   * Fades out all music volume to 0 over the specified time.
    *
-   * @param time
+   * @param duration
    *          The fade duration in ticks
    */
   public void fadeMusic(long duration) {
@@ -188,10 +188,14 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
   }
 
   /**
-   * Fades out the music over the specified time, if playing.
-   *
-   * @param time
+   * Fades all music volume to a given value over the specified time.
+   * 
+   * @param duration
    *          The fade duration in ticks
+   * @param target
+   *          The target volume.
+   * @param easeType
+   *          The easing Function used for Tweening the volume
    */
   public void fadeMusic(long duration, float target, TweenFunction easeType) {
     this.allMusic.forEach(m -> m.fade(duration, target, easeType));

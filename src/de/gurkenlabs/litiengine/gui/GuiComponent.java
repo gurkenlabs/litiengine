@@ -411,10 +411,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   }
 
   /**
-   * Getter for the automatic adjustment of text position when the component is resized
-   * 
-   * @param autoAdjustTextPosition
-   *          if {@code true}, adjust the text position automatically when the component is resized
+   * Checks if the text position is automatically adjusted when the component is resized
    */
   public boolean isAutoAdjustingTextPosition() {
     return this.autoAdjustTextPosition;
@@ -768,6 +765,8 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
       return new float[] { (float) this.getHeight() };
     case SIZE_BOTH:
       return new float[] { (float) this.getWidth(), (float) this.getHeight() };
+    case ANGLE:
+      return new float[] { (float) this.getTextAngle() };
     default:
       return new float[0];
     }
@@ -795,6 +794,9 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     case SIZE_BOTH:
       this.setWidth(newValues[0]);
       this.setHeight(newValues[1]);
+      break;
+    case ANGLE:
+      this.setTextAngle(Math.round(newValues[0]));
       break;
     default:
       assert false;

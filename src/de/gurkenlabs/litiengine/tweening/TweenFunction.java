@@ -47,15 +47,15 @@
 package de.gurkenlabs.litiengine.tweening;
 
 /**
- * Easing equation based on Robert Penner's work: http://robertpenner.com/easing/
+ * Easing equations based on Robert Penner's work: http://robertpenner.com/easing/
  *
  * @author Aurelien Ribon | http://www.aurelienribon.com/
  * @author Various optimizations by Michael "Code Poet" Pohoreski | https://github.com/Michaelangel007/
  * @author dorkbox, llc
  * @author gurkenlabs
  */
-
 public enum TweenFunction {
+
   LINEAR(time -> time),
 
   ///////////////////////////////////////////////////////
@@ -136,7 +136,6 @@ public enum TweenFunction {
     final float k = 1.70158F;
     return (float) (1f + Math.pow(time - 1f, 2) * ((time - 1f) * (k + 1f) + k));
   }),
-
   BACK_INOUT(time -> {
     final float k2 = 1.70158F * 1.525F;
     return (float) (time < .5f ? Math.pow(time, 2) * 2.0F * (time * 2.0F * (k2 + 1.0F) - k2) : 1.0F + 2.0F * Math.pow(time - 1f, 2) * (2.0F * (time - 1.0F) * (k2 + 1.0F) + k2));
@@ -171,6 +170,7 @@ public enum TweenFunction {
       return BOUNCE_K0 * t * t + 0.984375F;
     }
   }),
+
   BOUNCE_IN(time -> 1f - BOUNCE_OUT.equation.compute(1f - time)),
   BOUNCE_INOUT(time -> (float) (time * 2f < 1f ? 0.5F - 0.5F * BOUNCE_OUT.equation.compute(1.0F - time * 2) : 0.5F + 0.5F * BOUNCE_OUT.equation.compute(time * 2 - 1.0F))),
 
@@ -179,24 +179,35 @@ public enum TweenFunction {
   ///////////////////////////////////////////////////////
   ELASTIC_IN(time -> (float) (-Math.pow(2, 10f * (time - 1f)) * Math.sin(((time - 1f) * 40f - 3f) * Math.PI / 6f))),
   ELASTIC_OUT(time -> (float) (1f + (Math.pow(2, 10f * -time) * Math.sin((-time * 40f - 3f) * Math.PI / 6f)))),
-  ELASTIC_INOUT(time->{
-      time *= 2.0F; // remap: [0,0.5] -> [-1,0]
-      time -= 1.0F; // and    [0.5,1] -> [0,+1]
+  ELASTIC_INOUT(time -> {
+    time *= 2.0F; // remap: [0,0.5] -> [-1,0]
+    time -= 1.0F; // and    [0.5,1] -> [0,+1]
 
-      final float k = (float)((80f * time - 9f) * Math.PI / 18f);
+    final float k = (float) ((80f * time - 9f) * Math.PI / 18f);
 
-      if (time < 0.0F) {
-        return (float) (-.5f * Math.pow(2, 10f * time) * Math.sin(k));
-      }
-      return (float) (1f + .5F * Math.pow(2, -10f * time) * Math.sin(k));
+    if (time < 0.0F) {
+      return (float) (-.5f * Math.pow(2, 10f * time) * Math.sin(k));
+    }
+    return (float) (1f + .5F * Math.pow(2, -10f * time) * Math.sin(k));
   });
 
   private final transient TweenEquation equation;
 
+  /**
+   * Instantiates a new tween function with a given mathematical equation.
+   *
+   * @param equation
+   *          the equation
+   */
   TweenFunction(final TweenEquation equation) {
     this.equation = equation;
   }
 
+  /**
+   * Gets the mathematical equation.
+   *
+   * @return the equation
+   */
   public TweenEquation getEquation() {
     return equation;
   }

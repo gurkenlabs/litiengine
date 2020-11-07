@@ -17,6 +17,7 @@ import de.gurkenlabs.litiengine.graphics.animation.EntityAnimationController;
 import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
 import de.gurkenlabs.litiengine.physics.IMovementController;
 import de.gurkenlabs.litiengine.physics.MovementController;
+import de.gurkenlabs.litiengine.tweening.TweenType;
 
 /**
  * TODO: Add idle event
@@ -85,6 +86,27 @@ public class Creature extends CombatEntity implements IMobileEntity {
   @Override
   public void removeMovedListener(EntityMovedListener listener) {
     this.movedListeners.remove(listener);
+  }
+
+  @Override
+  public float[] getTweenValues(TweenType tweenType) {
+    switch (tweenType) {
+    case VELOCITY:
+      return new float[] { (float) this.getVelocity().get() };
+    default:
+      return super.getTweenValues(tweenType);
+    }
+  }
+
+  @Override
+  public void setTweenValues(TweenType tweenType, float[] newValues) {
+    switch (tweenType) {
+    case VELOCITY:
+      this.getVelocity().setBaseValue(newValues[0]);
+      break;
+    default:
+      super.setTweenValues(tweenType, newValues);
+    }
   }
 
   @Override

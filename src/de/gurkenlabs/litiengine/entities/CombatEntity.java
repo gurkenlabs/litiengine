@@ -15,6 +15,7 @@ import de.gurkenlabs.litiengine.attributes.Modification;
 import de.gurkenlabs.litiengine.attributes.RangeAttribute;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
+import de.gurkenlabs.litiengine.tweening.TweenType;
 
 @CombatInfo
 @CollisionInfo(collision = true)
@@ -136,6 +137,27 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   @Override
   public int getTeam() {
     return this.team;
+  }
+
+  @Override
+  public float[] getTweenValues(TweenType tweenType) {
+    switch (tweenType) {
+    case HITPOINTS:
+      return new float[] { (float) this.getHitPoints().get() };
+    default:
+      return super.getTweenValues(tweenType);
+    }
+  }
+
+  @Override
+  public void setTweenValues(TweenType tweenType, float[] newValues) {
+    switch (tweenType) {
+    case HITPOINTS:
+      this.getHitPoints().setBaseValue(Math.round(newValues[0]));
+      break;
+    default:
+      super.setTweenValues(tweenType, newValues);
+    }
   }
 
   @Override
