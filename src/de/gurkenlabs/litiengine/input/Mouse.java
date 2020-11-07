@@ -22,7 +22,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 
 /**
- * This implementation provides information about the mouse input in the LITIengine.
+ * This implementation provides information about the mouse input in the LITIENGINE.
  */
 public final class Mouse implements MouseListener, MouseMotionListener, MouseWheelListener, IMouse, IUpdateable {
   private static final Logger log = Logger.getLogger(Mouse.class.getName());

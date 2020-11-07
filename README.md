@@ -59,7 +59,7 @@ If you are searching for a particular method or class within the API or just wan
 
 [![Javadocs](http://www.javadoc.io/badge/de.gurkenlabs/litiengine.svg)](https://litiengine.com/api/) 
 ## Questions?
-Visit the official [LITIENGINE forum](https://forum.litiengine.com/) for troubleshooting or to learn about the LITIengine community. If you encounter bugs or want to request fancy new features, you can also open an issue in our [Issue Tracker](https://github.com/gurkenlabs/litiengine/issues).
+Visit the official [LITIENGINE forum](https://forum.litiengine.com/) for troubleshooting or to learn about the LITIENGINE community. If you encounter bugs or want to request fancy new features, you can also open an issue in our [Issue Tracker](https://github.com/gurkenlabs/litiengine/issues).
 
 ## Libraries Used
 

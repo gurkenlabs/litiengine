@@ -19,7 +19,7 @@ public class Program {
   public static void main(String[] args) {
     // setup basic settings
     Game.info().setName("utiLITI");
-    Game.info().setSubTitle("LITIengine Creation Kit");
+    Game.info().setSubTitle("LITIENGINE Creation Kit");
     Game.info().setVersion("v0.5.0-beta");
     Resources.strings().setEncoding(StandardCharsets.UTF_8);
 

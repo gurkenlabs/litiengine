@@ -12,7 +12,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.CustomPropertyProvider;
 
 /**
- * The {@code GameInfo} class contains basic information about a LITIengine game.
+ * The {@code GameInfo} class contains basic information about a LITIENGINE game.
  * The information can be accessed via {@code Game.getInfo()} and the infrastructure also internally uses this information
  * e.g. to setup the main window of the Game by providing an appropriate title.
  * <p>
@@ -56,9 +56,9 @@ public class GameInfo extends CustomPropertyProvider {
    */
   public GameInfo() {
     this.company = "gurkenlabs";
-    this.name = "LITIengine Game";
+    this.name = "LITIENGINE Game";
     this.subtitle = "The pure 2D java game engine";
-    this.description = "A game, created with the allmighty LITIengine.";
+    this.description = "A game, created with the allmighty LITIENGINE.";
     this.developers = new String[] { "Steffen Wilke", "Matthias Wilke" };
     this.version = "v1.0";
     this.website = "https://litiengine.com";
@@ -128,7 +128,7 @@ public class GameInfo extends CustomPropertyProvider {
   }
 
   /**
-   * Gets the name of the LITIengine game.
+   * Gets the name of the LITIENGINE game.
    * 
    * @return The game's name.
    */

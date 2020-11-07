@@ -17,7 +17,7 @@ import de.gurkenlabs.litiengine.graphics.RenderComponent;
  * currently active Screen for the Game’s {@code RenderComponent} which calls the {@code Screen.render(Graphics2D)} method on every tick of
  * the {@code RenderLoop}.
  * Overwriting this method provides the ability to define a customized render pipeline that suits the need of a particular Screen implementation. With
- * the GameScreen, the LITIengine provides a simple default Screen implementation that renders the current {@code Environment} and all its
+ * the GameScreen, the LITIENGINE provides a simple default Screen implementation that renders the current {@code Environment} and all its
  * {@code GuiComponents}.
  * 
  * @see Screen

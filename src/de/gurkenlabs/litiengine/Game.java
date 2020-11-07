@@ -42,7 +42,7 @@ import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 
 /***
  * <p>
- * The {@code Game} class is without any doubt one of the classes that you will call a lot when creating a game with the LITIengine.
+ * The {@code Game} class is without any doubt one of the classes that you will call a lot when creating a game with the LITIENGINE.
  * It is designed to be the static container that provides access to all important aspects of the engine, e.g. it holds the {@code GameInfo},
  * the {@code RenderEngine}, the {@code SoundEngine} and many other major components.
  * </p>
@@ -51,7 +51,7 @@ import de.gurkenlabs.litiengine.util.io.XmlUtilities;
  * To be a little bit more technical, it is essentially a collection of core Singleton instances.
  * </p>
  * <p>
- * This class will also be your starting point when setting up a new LITIengine project. In order to launch your game,
+ * This class will also be your starting point when setting up a new LITIENGINE project. In order to launch your game,
  * you need to at least call {@link Game#init(String...)} and {@link Game#start()} from your programs {@code main(String[])} method.
  * </p>
  * <p>
@@ -353,7 +353,7 @@ public final class Game {
    * This internally renders the currently active screen which passes the {@code Graphics2D} object to all {@code GuiComponents} and the
    * Environment for rendering.
    * <p>
-   * <i>The LITIengine has two separate loops for game logic/rendering and input processing. <br>
+   * <i>The LITIENGINE has two separate loops for game logic/rendering and input processing. <br>
    * This prevents them from interfering with each other and to be able to process player input independent of the game's framerate.</i>
    * </p>
    * 
@@ -449,7 +449,7 @@ public final class Game {
   }
 
   /***
-   * Initializes the infrastructure of the LITIengine game.
+   * Initializes the infrastructure of the LITIENGINE game.
    * 
    * The following tasks are carried out by this method:
    * <ul>

@@ -18,7 +18,7 @@ import de.gurkenlabs.litiengine.input.Mouse;
 import de.gurkenlabs.litiengine.util.Imaging;
 
 /**
- * The visual representation of the {@code Mouse} in the LITIengine.<br>
+ * The visual representation of the {@code Mouse} in the LITIENGINE.<br>
  * It controls the appearance of the rendered cursor and allows to specify offsets from the actual mouse location.
  * 
  * @see Mouse
