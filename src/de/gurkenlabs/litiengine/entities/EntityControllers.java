@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.entities;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -33,11 +34,20 @@ public final class EntityControllers {
   }
 
   public <T extends IEntityController> void clearControllers(Class<T> clss) {
-    this.controllers.entrySet().removeIf(e -> clss.isAssignableFrom(e.getKey()));
+    Optional<Class<? extends IEntityController>> typeKey = this.controllers.keySet().stream().filter(x -> clss.isAssignableFrom(clss)).findFirst();
+    if (typeKey.isPresent()) {
+      IEntityController controller = this.controllers.get(typeKey.get());
+      controller.detach();
+      this.controllers.remove(typeKey.get());
+    }
   }
 
   public <T extends IEntityController> void addController(T controller) {
     controllers.put(controller.getClass(), controller);
+
+    if (controller.getEntity().isLoaded()) {
+      controller.attach();
+    }
   }
 
   public <T extends IEntityController> void setController(Class<T> clss, T controller) {
