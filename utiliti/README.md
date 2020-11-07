@@ -1,2 +1,2 @@
 # utiLITI
-The editor for the LITIengine - The pure 2D java game engine.
+The editor for the LITIENGINE - The pure 2D java game engine.

@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 import de.gurkenlabs.litiengine.configuration.ClientConfiguration;
 
 /**
- * Handles the uncaught exceptions that might occur while running a game or application with the LITIengine.
+ * Handles the uncaught exceptions that might occur while running a game or application with the LITIENGINE.
  * <p>
  * It provides proper logging of the exception in a {@code crash.txt} file in the game's root directory that can be
  * further used to report the issue if it's a generic one.

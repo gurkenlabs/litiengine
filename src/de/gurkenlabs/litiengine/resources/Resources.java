@@ -31,7 +31,7 @@ import de.gurkenlabs.litiengine.util.TimeUtilities;
  * The {@code Resources} class provides access to types of {@code ResourcesContainers} and is used by different (loading) mechanisms to make
  * resources available during runtime.
  * <p>
- * The LITIengine supports a variety of different resource types, including:
+ * The LITIENGINE supports a variety of different resource types, including:
  * </p>
  * 
  * <ul>
