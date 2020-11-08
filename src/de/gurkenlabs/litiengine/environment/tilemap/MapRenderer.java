@@ -181,7 +181,13 @@ public class MapRenderer {
 
   protected static void renderImageLayer(Graphics2D g, IImageLayer layer, final IMap map, Rectangle2D viewport, float opacity) {
     Spritesheet sprite = Resources.spritesheets().get(layer.getImage().getSource());
+    BufferedImage img;
     if (sprite == null) {
+      img = Resources.images().get(layer.getImage().getAbsoluteSourcePath());
+    } else {
+      img = sprite.getImage();
+    }
+    if (img == null) {
       return;
     }
 
@@ -192,7 +198,7 @@ public class MapRenderer {
     final double viewportOffsetX = layer.getOffset().x - viewport.getX();
     final double viewportOffsetY = layer.getOffset().y - viewport.getY();
 
-    ImageRenderer.render(g, sprite.getImage(), viewportOffsetX, viewportOffsetY);
+    ImageRenderer.render(g, img, viewportOffsetX, viewportOffsetY);
     g.setComposite(oldComp);
 
     final LayerRenderEvent event = new LayerRenderEvent(g, map, layer);
