@@ -13,6 +13,11 @@ import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.tweening.TweenFunction;
+import de.gurkenlabs.litiengine.tweening.TweenType;
+import de.gurkenlabs.litiengine.tweening.Tweenable;
+
 /**
  * The {@code SoundPlayback} class is a wrapper {@code SourceDataLine} on which a {@code Sound} playback can be carried out.
  * 
@@ -109,6 +114,32 @@ public abstract class SoundPlayback implements Runnable {
   }
 
   /**
+   * Fades this playback's volume to 0 over the given duration.
+   * 
+   * @param duration
+   *          the fade duration in ticks.
+   */
+  public void fade(long duration) {
+    this.fade(duration, 0f, TweenFunction.LINEAR);
+  }
+
+  /**
+   * Fades this playback's volume to the target value over the given duration using the given {@code TweenFunction}.
+   * 
+   * @param duration
+   *          the fade duration in ticks.
+   * @param target
+   *          the target volume at the end of the fade
+   * @param easingType
+   *          the TweenFunction determining the falloff curve of this fade.
+   */
+  public void fade(long duration, float target, TweenFunction easingType) {
+    for (VolumeControl v : this.getVolumeControls()) {
+      Game.tweens().begin(v, TweenType.VOLUME, duration).target(target).ease(easingType);
+    }
+  }
+
+  /**
    * Determines if this playback is paused.
    * 
    * @return Whether this playback is paused
@@ -178,10 +209,15 @@ public abstract class SoundPlayback implements Runnable {
     this.masterVolume.set(volume);
   }
 
+
   public VolumeControl createVolumeControl() {
     VolumeControl control = new VolumeControl();
     this.volumeControls.add(control);
     return control;
+  }
+
+  public Collection<VolumeControl> getVolumeControls() {
+    return this.volumeControls;
   }
 
   void play() {
@@ -255,7 +291,8 @@ public abstract class SoundPlayback implements Runnable {
    *
    * @see SoundPlayback#createVolumeControl()
    */
-  public class VolumeControl {
+
+  public class VolumeControl implements Tweenable {
     private volatile float value = 1f;
 
     private VolumeControl() {
@@ -289,6 +326,28 @@ public abstract class SoundPlayback implements Runnable {
     protected void finalize() {
       // clean up the instance without affecting the volume
       SoundPlayback.this.miscVolume.accumulateAndGet(Float.floatToRawIntBits(this.value), (a, b) -> Float.floatToRawIntBits(Float.intBitsToFloat(a) * Float.intBitsToFloat(b)));
+    }
+
+    @Override
+    public float[] getTweenValues(TweenType tweenType) {
+      switch (tweenType) {
+      case VOLUME:
+        return new float[] { (float) this.get() };
+      default:
+        return Tweenable.super.getTweenValues(tweenType);
+      }
+    }
+
+    @Override
+    public void setTweenValues(TweenType tweenType, float[] newValues) {
+      switch (tweenType) {
+      case VOLUME:
+        this.set(newValues[0]);
+        break;
+      default:
+        Tweenable.super.setTweenValues(tweenType, newValues);
+        break;
+      }
     }
   }
 }

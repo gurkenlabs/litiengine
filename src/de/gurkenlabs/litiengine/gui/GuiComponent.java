@@ -27,12 +27,14 @@ import de.gurkenlabs.litiengine.graphics.TextRenderer;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.sound.Sound;
+import de.gurkenlabs.litiengine.tweening.TweenType;
+import de.gurkenlabs.litiengine.tweening.Tweenable;
 
 /**
  * The abstract Class GuiComponent provides all properties and methods needed for screens, built-in, and custom GUI components such as buttons,
  * sliders, etc... It includes mouse event handling, different hovering states and appearances, and texts to be rendered.
  */
-public abstract class GuiComponent implements MouseListener, MouseMotionListener, MouseWheelListener, IRenderable {
+public abstract class GuiComponent implements MouseListener, MouseMotionListener, MouseWheelListener, IRenderable, Tweenable {
 
   protected static final Font ICON_FONT;
   private static int id = 0;
@@ -60,6 +62,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   private final Appearance disabledAppearance;
 
   private boolean drawTextShadow = false;
+  private boolean autoAdjustTextPosition = true;
   private boolean enabled;
   private Font font;
   private boolean forwardMouseEvents = true;
@@ -408,6 +411,13 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   }
 
   /**
+   * Checks if the text position is automatically adjusted when the component is resized
+   */
+  public boolean isAutoAdjustingTextPosition() {
+    return this.autoAdjustTextPosition;
+  }
+
+  /**
    * Checks if the cursor bounding box intersects with this GuiCOmponent's bounding box.
    *
    * @return true, if the GuiComponent is hovered
@@ -740,12 +750,76 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     }
   }
 
+  @Override
+  public float[] getTweenValues(TweenType tweenType) {
+    switch (tweenType) {
+    case POSITION_X:
+      return new float[] { (float) this.getX() };
+    case POSITION_Y:
+      return new float[] { (float) this.getY() };
+    case POSITION_XY:
+      return new float[] { (float) this.getX(), (float) this.getY() };
+    case SIZE_WIDTH:
+      return new float[] { (float) this.getWidth() };
+    case SIZE_HEIGHT:
+      return new float[] { (float) this.getHeight() };
+    case SIZE_BOTH:
+      return new float[] { (float) this.getWidth(), (float) this.getHeight() };
+    case ANGLE:
+      return new float[] { (float) this.getTextAngle() };
+    default:
+      return Tweenable.super.getTweenValues(tweenType);
+    }
+  }
+
+  @Override
+  public void setTweenValues(TweenType tweenType, float[] newValues) {
+    switch (tweenType) {
+    case POSITION_X:
+      this.setX(newValues[0]);
+      break;
+    case POSITION_Y:
+      this.setY(newValues[0]);
+      break;
+    case POSITION_XY:
+      this.setX(newValues[0]);
+      this.setY(newValues[1]);
+      break;
+    case SIZE_WIDTH:
+      this.setWidth(newValues[0]);
+      break;
+    case SIZE_HEIGHT:
+      this.setHeight(newValues[0]);
+      break;
+    case SIZE_BOTH:
+      this.setWidth(newValues[0]);
+      this.setHeight(newValues[1]);
+      break;
+    case ANGLE:
+      this.setTextAngle(Math.round(newValues[0]));
+      break;
+    default:
+      Tweenable.super.setTweenValues(tweenType, newValues);
+      break;
+    }
+  }
+
   public RectangularShape getShape() {
     float radius = this.getCurrentAppearance().getBorderRadius();
     if (radius == 0f) {
       return this.getBoundingBox();
     }
     return new RoundRectangle2D.Double(this.getX(), this.getY(), this.getWidth(), this.getHeight(), this.getCurrentAppearance().getBorderRadius(), this.getCurrentAppearance().getBorderRadius());
+  }
+
+  /**
+   * Setter for the automatic adjustment of text position when the component is resized
+   * 
+   * @param autoAdjustTextPosition
+   *          if {@code true}, adjust the text position automatically when the component is resized
+   */
+  public void setAutoAdjustTextPosition(boolean autoAdjustTextPosition) {
+    this.autoAdjustTextPosition = autoAdjustTextPosition;
   }
 
   /**
@@ -1193,11 +1267,11 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
       defaultTextX = this.getWidth() / 2 - fm.stringWidth(this.getTextToRender(g)) / 2.0;
       break;
     }
-    if (this.getTextY() == 0) {
+    if (this.getTextY() == 0 || this.autoAdjustTextPosition) {
       this.setTextY(defaultTextY);
     }
 
-    if (this.getTextX() == 0) {
+    if (this.getTextX() == 0 || this.autoAdjustTextPosition) {
       this.setTextX(defaultTextX);
     }
 

@@ -22,7 +22,8 @@ public class ImageComponent extends GuiComponent {
   public static final int BACKGROUND_PRESSED_INDEX = 2;
   public static final int BACKGROUND_DISABLED_INDEX = 3;
 
-  private Image image;
+  private BufferedImage baseImage;
+  private BufferedImage scaledImage;
 
   private Spritesheet spritesheet;
 
@@ -32,7 +33,7 @@ public class ImageComponent extends GuiComponent {
 
   public ImageComponent(final double x, final double y, final Image image) {
     super(x, y, image.getWidth(null), image.getHeight(null));
-    this.image = image;
+    this.baseImage = (BufferedImage) image;
   }
 
   public ImageComponent(final double x, final double y, final double width, final double height) {
@@ -54,12 +55,12 @@ public class ImageComponent extends GuiComponent {
   }
 
   public ImageComponent(final double x, final double y, final double width, final double height, final Spritesheet spritesheet, final String text, final Image image) {
-    this(x, y, width, height,text);
+    this(x, y, width, height, text);
     this.spritesheet = spritesheet;
     this.setImageAlign(Align.LEFT);
     this.setImageValign(Valign.TOP);
     if (image != null) {
-      this.image = image;
+      this.baseImage = (BufferedImage) image;
     }
   }
 
@@ -91,45 +92,42 @@ public class ImageComponent extends GuiComponent {
     return img;
   }
 
-  public Image getImage() {
-    BufferedImage bufferedImage = Imaging.toBufferedImage(this.image);
-    if (bufferedImage != null) {
-      int imageWidth = this.image.getWidth(null);
-      int imageHeight = this.image.getHeight(null);
-      if (this.getImageScaleMode() != null) {
-        boolean keepRatio;
+  public void rescaleImage() {
+    if (this.baseImage == null) {
+      return;
+    }
+    int imageWidth = (int) this.getWidth();
+    int imageHeight = (int) this.getHeight();
+    boolean keepRatio;
 
-        switch (this.getImageScaleMode()) {
-        case STRETCH:
-          imageWidth = (int) this.getWidth();
-          imageHeight = (int) this.getHeight();
-          keepRatio = false;
-          break;
-        case FIT:
-          imageWidth = (int) this.getWidth();
-          imageHeight = (int) this.getHeight();
-          keepRatio = true;
-          break;
-        default:
-          keepRatio = false;
-          break;
-        }
-
-        bufferedImage = Imaging.scale(bufferedImage, imageWidth, imageHeight, keepRatio);
-        imageWidth = bufferedImage.getWidth();
-        imageHeight = bufferedImage.getHeight();
-      }
-
-      final String cacheKey = this.image.hashCode() + "_" + imageWidth + "+" + imageHeight;
-      Optional<BufferedImage> opt = Resources.images().tryGet(cacheKey);
-      if (opt.isPresent()) {
-        return opt.get();
-      }
-
-      Resources.images().add(cacheKey, bufferedImage);
+    switch (this.getImageScaleMode()) {
+    case STRETCH:
+      keepRatio = false;
+      break;
+    case FIT:
+      keepRatio = true;
+      break;
+    default:
+      return;
     }
 
-    return bufferedImage;
+    final String cacheKey = String.format("%s_%dx%d_%b", this.baseImage.hashCode(), imageWidth, imageHeight, keepRatio);
+
+    Optional<BufferedImage> opt = Resources.images().tryGet(cacheKey);
+    if (opt.isPresent()) {
+      this.scaledImage = opt.get();
+      return;
+    } else {
+      this.scaledImage = Imaging.scale(this.baseImage, imageWidth, imageHeight, keepRatio);
+    }
+    Resources.images().add(cacheKey, this.scaledImage);
+  }
+
+  public BufferedImage getImage() {
+    if (this.scaledImage == null) {
+      return this.baseImage;
+    }
+    return this.scaledImage;
   }
 
   public Align getImageAlign() {
@@ -155,7 +153,7 @@ public class ImageComponent extends GuiComponent {
       ImageRenderer.render(g, bg, this.getLocation());
     }
 
-    final Image img = this.getImage();
+    final BufferedImage img = this.getImage();
     if (img != null) {
       ImageRenderer.render(g, img, this.getImageLocation(img));
     }
@@ -163,11 +161,13 @@ public class ImageComponent extends GuiComponent {
   }
 
   public void setImage(final Image image) {
-    this.image = image;
+    this.baseImage = (BufferedImage) image;
+    this.rescaleImage();
   }
 
   public void setImageScaleMode(ImageScaleMode imageScaleMode) {
     this.imageScaleMode = imageScaleMode;
+    this.rescaleImage();
   }
 
   public void setSpriteSheet(final Spritesheet spr) {
@@ -181,7 +181,19 @@ public class ImageComponent extends GuiComponent {
   public void setImageValign(Valign imageValign) {
     this.imageValign = imageValign;
   }
-  
+
+  @Override
+  public void setHeight(double height) {
+    super.setHeight(height);
+    this.rescaleImage();
+  }
+
+  @Override
+  public void setWidth(double width) {
+    super.setWidth(width);
+    this.rescaleImage();
+  }
+
   protected Spritesheet getSpritesheet() {
     return this.spritesheet;
   }

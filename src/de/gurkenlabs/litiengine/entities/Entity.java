@@ -22,10 +22,12 @@ import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.CustomPropertyProvider;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
+import de.gurkenlabs.litiengine.tweening.TweenType;
+import de.gurkenlabs.litiengine.tweening.Tweenable;
 import de.gurkenlabs.litiengine.util.ReflectionUtilities;
 
 @EntityInfo
-public abstract class Entity implements IEntity, EntityRenderListener {
+public abstract class Entity implements IEntity, EntityRenderListener, Tweenable {
   private static final Logger log = Logger.getLogger(Entity.class.getName());
   public static final String ANY_MESSAGE = "";
   private final Collection<EntityTransformListener> transformListeners = ConcurrentHashMap.newKeySet();
@@ -409,6 +411,60 @@ public abstract class Entity implements IEntity, EntityRenderListener {
     this.getEnvironment().getEntitiesByTag().get(tag).remove(this);
     if (this.getEnvironment().getEntitiesByTag().get(tag).isEmpty()) {
       this.getEnvironment().getEntitiesByTag().remove(tag);
+    }
+  }
+
+  @Override
+  public float[] getTweenValues(TweenType tweenType) {
+    switch (tweenType) {
+    case POSITION_X:
+      return new float[] { (float) this.getX() };
+    case POSITION_Y:
+      return new float[] { (float) this.getY() };
+    case POSITION_XY:
+      return new float[] { (float) this.getX(), (float) this.getY() };
+    case SIZE_WIDTH:
+      return new float[] { (float) this.getWidth() };
+    case SIZE_HEIGHT:
+      return new float[] { (float) this.getHeight() };
+    case SIZE_BOTH:
+      return new float[] { (float) this.getWidth(), (float) this.getHeight() };
+    case ANGLE:
+      return new float[] { (float) this.getAngle() };
+    default:
+      return Tweenable.super.getTweenValues(tweenType);
+    }
+  }
+
+  @Override
+  public void setTweenValues(TweenType tweenType, float[] newValues) {
+    switch (tweenType) {
+    case POSITION_X:
+      this.setX(newValues[0]);
+      break;
+    case POSITION_Y:
+      this.setY(newValues[0]);
+      break;
+    case POSITION_XY:
+      this.setX(newValues[0]);
+      this.setY(newValues[1]);
+      break;
+    case SIZE_WIDTH:
+      this.setWidth(newValues[0]);
+      break;
+    case SIZE_HEIGHT:
+      this.setHeight(newValues[0]);
+      break;
+    case SIZE_BOTH:
+      this.setWidth(newValues[0]);
+      this.setHeight(newValues[1]);
+      break;
+    case ANGLE:
+      this.setAngle(newValues[0]);
+      break;
+    default:
+      Tweenable.super.setTweenValues(tweenType, newValues);
+      break;
     }
   }
 

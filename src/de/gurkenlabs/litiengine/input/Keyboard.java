@@ -76,6 +76,17 @@ public final class Keyboard implements KeyEventDispatcher, IKeyboard, IUpdateabl
   }
 
   @Override
+  public boolean wasReleased(final int keyCode) {
+    for (final KeyEvent key : this.releasedKeys) {
+      if (key.getKeyCode() == keyCode) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  @Override
   public void onKeyPressed(final int keyCode, final KeyPressedListener listener) {
     this.keySpecificPressedListener.computeIfAbsent(keyCode, ConcurrentHashMap::newKeySet).add(listener);
   }

@@ -3,9 +3,7 @@ package de.gurkenlabs.litiengine.sound;
 import java.awt.geom.Point2D;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -23,7 +21,7 @@ import de.gurkenlabs.litiengine.ILaunchable;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.litiengine.sound.SoundPlayback.VolumeControl;
+import de.gurkenlabs.litiengine.tweening.TweenFunction;
 
 /**
  * This {@code SoundEngine} class provides all methods to play back sounds and music in your
@@ -180,50 +178,27 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
   }
 
   /**
-   * Fades out the music over the specified time, if playing.
+   * Fades out all music volume to 0 over the specified time.
    *
-   * @param time
-   *          The time in frames to make the existing music fade out for if present
+   * @param duration
+   *          The fade duration in ticks
    */
-  public void fadeMusic(int time) {
-    fadeMusic(time, null);
+  public void fadeMusic(long duration) {
+    this.allMusic.forEach(m -> m.fade(duration));
   }
 
   /**
-   * Fades out the music over the specified time, then calls the provided callback.
-   *
-   * @param time
-   *          The time in frames to make the existing music fade out for if present
-   * @param callback
-   *          The callback for when the fade finishes
+   * Fades all music volume to a given value over the specified time.
+   * 
+   * @param duration
+   *          The fade duration in ticks
+   * @param target
+   *          The target volume.
+   * @param easeType
+   *          The easing Function used for Tweening the volume
    */
-  public synchronized void fadeMusic(final int time, final Runnable callback) {
-    music = null;
-    final Map<MusicPlayback, VolumeControl> faders = new HashMap<>(allMusic.size());
-    for (MusicPlayback track : allMusic) {
-      faders.put(track, track.createVolumeControl());
-    }
-    Game.loop().attach(new IUpdateable() {
-      private int remaining = time;
-
-      @Override
-      public void update() {
-        this.remaining--;
-        if (this.remaining == 0) {
-          Game.loop().detach(this);
-          for (MusicPlayback track : faders.keySet()) {
-            track.cancel();
-          }
-          if (callback != null) {
-            callback.run();
-          }
-        } else {
-          for (VolumeControl fader : faders.values()) {
-            fader.set((float) this.remaining / time);
-          }
-        }
-      }
-    });
+  public void fadeMusic(long duration, float target, TweenFunction easeType) {
+    this.allMusic.forEach(m -> m.fade(duration, target, easeType));
   }
 
   /**
@@ -749,7 +724,7 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
   }
 
   Point2D getListenerLocation() {
-    return (Point2D) this.listenerLocation.clone();
+    return this.listenerLocation == null ? new Point2D.Double(0, 0) : (Point2D) this.listenerLocation.clone();
   }
 
   void addSound(SFXPlayback playback) {

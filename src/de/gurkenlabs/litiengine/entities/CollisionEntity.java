@@ -14,6 +14,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.physics.Collision;
 import de.gurkenlabs.litiengine.physics.CollisionEvent;
+import de.gurkenlabs.litiengine.tweening.TweenType;
 
 @CollisionInfo(collision = true)
 public abstract class CollisionEntity extends Entity implements ICollisionEntity {
@@ -121,6 +122,38 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
   @Override
   public Collision getCollisionType() {
     return this.collisionType;
+  }
+
+  @Override
+  public float[] getTweenValues(TweenType tweenType) {
+    switch (tweenType) {
+    case COLLISION_WIDTH:
+      return new float[] { (float) this.getCollisionBoxWidth() };
+    case COLLISION_HEIGHT:
+      return new float[] { (float) this.getCollisionBoxHeight() };
+    case COLLISION_BOTH:
+      return new float[] { (float) this.getCollisionBoxWidth(), (float) this.getCollisionBoxHeight() };
+    default:
+      return super.getTweenValues(tweenType);
+    }
+  }
+
+  @Override
+  public void setTweenValues(TweenType tweenType, float[] newValues) {
+    switch (tweenType) {
+    case COLLISION_WIDTH:
+      this.setCollisionBoxWidth(newValues[0]);
+      break;
+    case COLLISION_HEIGHT:
+      this.setCollisionBoxHeight(newValues[0]);
+      break;
+    case COLLISION_BOTH:
+      this.setCollisionBoxWidth(newValues[0]);
+      this.setCollisionBoxHeight(newValues[1]);
+      break;
+    default:
+      super.setTweenValues(tweenType, newValues);
+    }
   }
 
   /**

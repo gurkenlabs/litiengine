@@ -23,7 +23,6 @@ public abstract class Particle implements ITimeToLive {
 
   private Collision collisionType;
   private Color color;
-  private float colorAlpha = 1;
   private float deltaHeight;
   private float deltaWidth;
   /**
@@ -59,8 +58,6 @@ public abstract class Particle implements ITimeToLive {
   private RenderType customRenderType;
   private boolean useCustomRenderType;
 
-  private float opacity;
-
   private boolean fade;
 
   private boolean fadeOnCollision;
@@ -84,7 +81,6 @@ public abstract class Particle implements ITimeToLive {
     this.setWidth(width);
     this.setHeight(height);
     this.collisionType = Collision.NONE;
-    this.opacity = 1;
     this.fade = true;
     this.setStopOnCollision(true);
     this.setContinuousCollision(false);
@@ -112,10 +108,6 @@ public abstract class Particle implements ITimeToLive {
 
   public Color getColor() {
     return this.color;
-  }
-
-  public float getColorAlpha() {
-    return this.colorAlpha;
   }
 
   public float getDeltaHeight() {
@@ -160,6 +152,13 @@ public abstract class Particle implements ITimeToLive {
 
   public boolean isAntiAliased() {
     return this.antiAliasing;
+  }
+
+  public float getOpacity() {
+    if (this.isFading() && this.getTimeToLive() > 0) {
+      return MathUtilities.clamp(this.getColor().getAlpha() / 255f - (float) this.getAliveTime() / this.getTimeToLive(), 0, 1);
+    }
+    return 1;
   }
 
   /**
@@ -239,21 +238,7 @@ public abstract class Particle implements ITimeToLive {
   public Particle setColor(final Color color) {
     if (color != null) {
       this.color = color;
-      this.setColorAlpha((float) this.color.getAlpha() / 255);
     }
-    return this;
-  }
-
-  /**
-   * Sets the color alpha. A float value between 0 and 1 is expected.
-   *
-   * @param colorAlpha
-   *          the new color alpha
-   * 
-   * @return This {@link Particle} instance to chain further setter calls.
-   */
-  public Particle setColorAlpha(final float colorAlpha) {
-    this.colorAlpha = MathUtilities.clamp(colorAlpha, 0, 1);
     return this;
   }
 
@@ -399,11 +384,6 @@ public abstract class Particle implements ITimeToLive {
     if (this.timeToLiveReached()) {
       return;
     }
-    final int alpha = (int) (this.getOpacity() * 255);
-
-    if (this.color != null) {
-      this.setColor(new Color(this.getColor().getRed(), this.getColor().getGreen(), this.getColor().getBlue(), MathUtilities.clamp(alpha, 0, 255)));
-    }
 
     if (this.colliding) {
       return;
@@ -491,14 +471,6 @@ public abstract class Particle implements ITimeToLive {
 
   protected float getAbsoluteY(Point2D emitterOrigin) {
     return (float) (emitterOrigin.getY() + this.getY() - this.getHeight() / 2.0);
-  }
-
-  protected float getOpacity() {
-    if (this.isFading() && this.getTimeToLive() > 0) {
-      this.opacity = MathUtilities.clamp(1 - this.getColorAlpha() - (float) this.getAliveTime() / this.getTimeToLive(), 0, 1);
-      return this.opacity;
-    }
-    return 1;
   }
 
   public boolean usesCustomRenderType() {
