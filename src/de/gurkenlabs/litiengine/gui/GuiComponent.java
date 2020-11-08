@@ -768,7 +768,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     case ANGLE:
       return new float[] { (float) this.getTextAngle() };
     default:
-      return new float[0];
+      return Tweenable.super.getTweenValues(tweenType);
     }
   }
 
@@ -799,7 +799,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
       this.setTextAngle(Math.round(newValues[0]));
       break;
     default:
-      assert false;
+      Tweenable.super.setTweenValues(tweenType, newValues);
       break;
     }
   }

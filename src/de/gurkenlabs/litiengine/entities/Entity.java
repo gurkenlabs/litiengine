@@ -432,7 +432,7 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
     case ANGLE:
       return new float[] { (float) this.getAngle() };
     default:
-      return new float[0];
+      return Tweenable.super.getTweenValues(tweenType);
     }
   }
 
@@ -463,7 +463,7 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
       this.setAngle(newValues[0]);
       break;
     default:
-      assert false;
+      Tweenable.super.setTweenValues(tweenType, newValues);
       break;
     }
   }

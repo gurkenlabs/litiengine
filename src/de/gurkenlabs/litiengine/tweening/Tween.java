@@ -9,14 +9,14 @@ import de.gurkenlabs.litiengine.Game;
  * function ({@code TweenEquation}) each tick.
  */
 public class Tween {
-  private TweenType type;
-  private TweenEquation equation;
   private long duration;
-  private Tweenable target;
+  private TweenEquation equation;
   private long started;
+  private final float[] startValues;
   private boolean stopped;
-  private float[] startValues;
+  private final Tweenable target;
   private float[] targetValues;
+  private final TweenType type;
 
   /**
    * Instantiates a new tween.
@@ -28,7 +28,7 @@ public class Tween {
    * @param duration
    *          the duration of the Tween in milliseconds.
    */
-  public Tween(Tweenable target, TweenType type, long duration) {
+  public Tween(final Tweenable target, final TweenType type, final long duration) {
     this.target = target;
     this.type = type;
     this.duration = duration;
@@ -37,31 +37,38 @@ public class Tween {
   }
 
   /**
-   * Checks if the Tween has stopped.
+   * Begins the Tween by setting its start time to the current game time in ticks.
    *
-   * @return true, if successful
+   * @return the Tween instance
    */
-  public boolean hasStopped() {
-    return this.stopped;
+  public Tween begin() {
+    this.started = Game.time().now();
+    this.stopped = false;
+    return this;
   }
 
   /**
-   * Sets the Tween duration.
+   * Sets a custom easing function for this Tween.
    *
-   * @param duration
-   *          the new duration in milliseconds
+   * @param easeEquation
+   *          the {@code TweenEquation} applied to the tween values.
+   * @return the Tween instance.
    */
-  public void setDuration(long duration) {
-    this.duration = duration;
+  public Tween ease(final TweenEquation easeEquation) {
+    this.equation = easeEquation;
+    return this;
   }
 
   /**
-   * Gets the tween equation that modifies the start values each tick.
+   * Sets a predefined easing function for this Tween.
    *
-   * @return the TweenEquation
+   * @param easingFunction
+   *          the {@code TweenFunction} applied to the tween values.
+   * @return the Tween instance.
    */
-  public TweenEquation getEquation() {
-    return this.equation;
+  public Tween ease(final TweenFunction easingFunction) {
+    this.equation = easingFunction.getEquation();
+    return this;
   }
 
   /**
@@ -74,12 +81,12 @@ public class Tween {
   }
 
   /**
-   * Gets the {@code Tweenable} target object.
+   * Gets the tween equation that modifies the start values each tick.
    *
-   * @return the target
+   * @return the TweenEquation
    */
-  public Tweenable getTarget() {
-    return this.target;
+  public TweenEquation getEquation() {
+    return this.equation;
   }
 
   /**
@@ -101,6 +108,15 @@ public class Tween {
   }
 
   /**
+   * Gets the {@code Tweenable} target object.
+   *
+   * @return the target
+   */
+  public Tweenable getTarget() {
+    return this.target;
+  }
+
+  /**
    * Gets the target values.
    *
    * @return the target values
@@ -119,64 +135,21 @@ public class Tween {
   }
 
   /**
-   * Sets a custom easing function for this Tween.
+   * Checks if the Tween has stopped.
    *
-   * @param easeEquation
-   *          the {@code TweenEquation} applied to the tween values.
-   * @return the Tween instance.
+   * @return true, if successful
    */
-  public Tween ease(TweenEquation easeEquation) {
-    this.equation = easeEquation;
-    return this;
+  public boolean hasStopped() {
+    return this.stopped;
   }
 
   /**
-   * Sets a predefined easing function for this Tween.
-   *
-   * @param easingFunction
-   *          the {@code TweenFunction} applied to the tween values.
-   * @return the Tween instance.
-   */
-  public Tween ease(TweenFunction easingFunction) {
-    this.equation = easingFunction.getEquation();
-    return this;
-  }
-
-  /**
-   * Sets the target values absolutely.
-   *
-   * @param targetValues
-   *          the absolute target values
-   * @return the Tween instance
-   */
-  public Tween target(final float... targetValues) {
-    this.targetValues = Arrays.copyOf(targetValues, targetValues.length);
-    return this;
-  }
-
-  /**
-   * Sets the target values relatively to the start values.
-   *
-   * @param targetValues
-   *          the relative target values with respect to the start values
-   * @return the Tween instance
-   */
-  public Tween targetRelative(final float... targetValues) {
-    this.targetValues = new float[targetValues.length];
-    for (int i = 0; i < targetValues.length; i++) {
-      this.targetValues[i] = this.getStartValues()[i] + targetValues[i];
-    }
-    return this;
-  }
-
-  /**
-   * Begins the Tween by setting its start time to the current game time in ticks.
+   * Resets the Tween values to the start values.
    *
    * @return the Tween instance
    */
-  public Tween begin() {
-    this.started = Game.time().now();
-    this.stopped = false;
+  public Tween reset() {
+    this.getTarget().setTweenValues(this.getType(), this.startValues);
     return this;
   }
 
@@ -191,13 +164,13 @@ public class Tween {
   }
 
   /**
-   * Resets the Tween values to the start values.
+   * Sets the Tween duration.
    *
-   * @return the Tween instance
+   * @param duration
+   *          the new duration in milliseconds
    */
-  public Tween reset() {
-    this.getTarget().setTweenValues(this.getType(), this.startValues);
-    return this;
+  public void setDuration(final long duration) {
+    this.duration = duration;
   }
 
   /**
@@ -207,6 +180,39 @@ public class Tween {
    */
   public Tween stop() {
     this.stopped = true;
+    return this;
+  }
+
+  /**
+   * Sets the target values absolutely.
+   *
+   * @param targetValues
+   *          the absolute target values
+   * @return the Tween instance
+   */
+  public Tween target(final float... targetValues) {
+    if (this.getStartValues().length == 0 || targetValues.length == 0) {
+      return this;
+    }
+    this.targetValues = Arrays.copyOf(targetValues, targetValues.length);
+    return this;
+  }
+
+  /**
+   * Sets the target values relatively to the start values.
+   *
+   * @param targetValues
+   *          the relative target values with respect to the start values
+   * @return the Tween instance
+   */
+  public Tween targetRelative(final float... targetValues) {
+    if (this.getStartValues().length == 0 || targetValues.length == 0) {
+      return this;
+    }
+    this.targetValues = new float[targetValues.length];
+    for (int i = 0; i < targetValues.length; i++) {
+      this.targetValues[i] = this.getStartValues()[i] + targetValues[i];
+    }
     return this;
   }
 }

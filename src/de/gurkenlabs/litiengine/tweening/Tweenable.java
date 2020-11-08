@@ -1,10 +1,14 @@
 package de.gurkenlabs.litiengine.tweening;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * The Tweenable interface allows modifying an object's attributes smoothly over time using {@code Tween} instances managed by the
  * {@code TweenEngine}.
  */
 public interface Tweenable {
+
   /**
    * Gets one or many values from the target object associated to the
    * given tween type. It is used by the Tween Engine to determine starting
@@ -15,7 +19,10 @@ public interface Tweenable {
    *
    * @return The array of current tween values.
    */
-  float[] getTweenValues(TweenType tweenType);
+  default float[] getTweenValues(final TweenType tweenType) {
+    Logger.getLogger(this.getClass().getName()).log(Level.WARNING, () -> String.format("TweenType %s unsupported for Tweenable '%s'", tweenType.name(), this.getClass().getName()));
+    return new float[0];
+  }
 
   /**
    * This method is called in a Tween's update() method to set the new interpolated values.
@@ -25,5 +32,7 @@ public interface Tweenable {
    * @param newValues
    *          The new values determined by the tween equation.
    */
-  void setTweenValues(TweenType tweenType, float[] newValues);
+  default void setTweenValues(final TweenType tweenType, final float[] newValues) {
+    Logger.getLogger(this.getClass().getName()).log(Level.WARNING, () -> String.format("TweenType %s unsupported for Tweenable '%s'", tweenType.name(), this.getClass().getName()));
+  }
 }

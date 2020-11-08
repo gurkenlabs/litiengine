@@ -334,7 +334,7 @@ public abstract class SoundPlayback implements Runnable {
       case VOLUME:
         return new float[] { (float) this.get() };
       default:
-        return new float[0];
+        return Tweenable.super.getTweenValues(tweenType);
       }
     }
 
@@ -345,7 +345,7 @@ public abstract class SoundPlayback implements Runnable {
         this.set(newValues[0]);
         break;
       default:
-        assert false;
+        Tweenable.super.setTweenValues(tweenType, newValues);
         break;
       }
     }
