@@ -33,14 +33,14 @@ public final class ReflectionUtilities {
       }
     }
 
-    if (cls.getSuperclass() != null && !cls.getSuperclass().equals(Object.class)) {
-      Field f = getField(cls.getSuperclass(), fieldName, recursive);
+    if (recursive && cls.getSuperclass() != null && !cls.getSuperclass().equals(Object.class)) {
+      Field f = getField(cls.getSuperclass(), fieldName, true);
       if (f != null) {
         return f;
       }
     }
 
-    log.log(Level.WARNING, "Could not find field [{0}] on class [{1}] or its parents.", new Object[] { fieldName, cls });
+    log.log(Level.WARNING, "Could not find field [{0}] on class [{1}] or its parents.", new Object[]{fieldName, cls});
     return null;
   }
 
@@ -58,14 +58,42 @@ public final class ReflectionUtilities {
     }
   }
 
+  /**
+   * Recursively gets all fields of the specified type, respecting parent classes.
+   *
+   * @param fields The list containing all fields.
+   * @param type   The type to retrieve the fields from.
+   * @return All fields of the specified type, including the fields of the parent classes.
+   */
   public static List<Field> getAllFields(List<Field> fields, Class<?> type) {
     fields.addAll(Arrays.asList(type.getDeclaredFields()));
 
-    if (type.getSuperclass() != null) {
+    if (type.getSuperclass() != null && !type.getSuperclass().equals(Object.class)) {
       getAllFields(fields, type.getSuperclass());
     }
 
     return fields;
+  }
+
+  /**
+   * Recursively gets a method by the the specified name respecting the parent classes and the parameters of the declaration.
+   *
+   * @param name           The name of the method.
+   * @param type           The type on which to search for the method.
+   * @param parameterTypes The types of the parameters defined by the method declaration.
+   * @return The found method or null if no such method exists.
+   */
+  public static Method getMethod(String name, Class<?> type, Class<?>... parameterTypes) {
+    Method method = null;
+    try {
+      method = type.getDeclaredMethod(name, parameterTypes);
+    } catch (NoSuchMethodException e) {
+      if (type.getSuperclass() != null && !type.getSuperclass().equals(Object.class)) {
+        return getMethod(name, type.getSuperclass(), parameterTypes);
+      }
+    }
+
+    return method;
   }
 
   public static <T, C> boolean setValue(Class<C> cls, Object instance, final String fieldName, final T value) {
@@ -249,11 +277,9 @@ public final class ReflectionUtilities {
    * This will search for all methods that have a parameter of type {@code EventListener} and match the LITIENGINE's naming conventions
    * for event subscription (i.e. the method name starts with one of the prefixes "add" or "on".
    * </p>
-   * 
-   * @param type
-   *          The type to inspect the events on.
+   *
+   * @param type The type to inspect the events on.
    * @return All methods on the specified type that are considered to be events.
-   * 
    * @see EventListener
    */
   public static Collection<Method> getEvents(final Class<?> type) {
