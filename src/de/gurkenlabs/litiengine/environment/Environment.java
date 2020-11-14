@@ -1710,6 +1710,7 @@ public final class Environment implements IRenderable {
     if (loader != null) {
       Collection<IEntity> loadedEntities;
       loadedEntities = loader.load(this, mapObject);
+      loader.afterLoad(loadedEntities, mapObject);
       for (IEntity entity : loadedEntities) {
         if (entity != null) {
 

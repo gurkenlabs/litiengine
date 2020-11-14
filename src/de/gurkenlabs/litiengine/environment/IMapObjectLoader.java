@@ -13,7 +13,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
  * <br>
  * The engine provides default implementations for all predefined {@code Entity} types (e.g. {@code Prop or Creature}).
  * You can inherit/call the abstract {@code MapObjectLoader} implementation to make use of predefined loading logic.
- * 
+ *
  * @see Environment#registerMapObjectLoader(IMapObjectLoader)
  * @see MapObjectLoader#loadDefaultProperties(IEntity, IMapObject)
  */
@@ -21,4 +21,12 @@ public interface IMapObjectLoader {
   String getMapObjectType();
 
   Collection<IEntity> load(Environment environment, IMapObject mapObject);
+
+  /**
+   * This method is called externally on the loader instance after the entities have been loaded.
+   *
+   * @param entities  The loaded entities.
+   * @param mapObject The map object by which the entities have been loaded.
+   */
+  void afterLoad(Collection<IEntity> entities, IMapObject mapObject);
 }
