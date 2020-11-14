@@ -23,7 +23,7 @@ public final class ReflectionUtilities {
   }
 
   public static <T> Field getField(Class<T> cls, final String fieldName) {
-    return getField(cls, fieldName, false);
+    return getField(cls, fieldName, true);
   }
 
   public static <T> Field getField(Class<T> cls, final String fieldName, boolean recursive) {
