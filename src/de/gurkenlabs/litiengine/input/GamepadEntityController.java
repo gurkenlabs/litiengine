@@ -8,7 +8,7 @@ import de.gurkenlabs.litiengine.physics.MovementController;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 public class GamepadEntityController<T extends IMobileEntity> extends MovementController<T> {
-  private int gamePadIndex = -1;
+  private int gamepadId = -1;
   private double gamepadDeadzone = Game.config().input().getGamepadStickDeadzone();
   private double gamepadRightStick = Game.config().input().getGamepadStickDeadzone();
   private boolean rotateWithRightStick = false;
@@ -16,22 +16,22 @@ public class GamepadEntityController<T extends IMobileEntity> extends MovementCo
   public GamepadEntityController(final T entity, boolean rotateWithRightStick) {
     super(entity);
     if (Input.gamepads().current() != null) {
-      this.gamePadIndex = Input.gamepads().current().getIndex();
+      this.gamepadId = Input.gamepads().current().getId();
     }
 
     this.rotateWithRightStick = rotateWithRightStick;
     Input.gamepads().onAdded(pad -> {
-      if (this.gamePadIndex == -1) {
-        this.gamePadIndex = pad.getIndex();
+      if (this.gamepadId == -1) {
+        this.gamepadId = pad.getId();
       }
     });
 
     Input.gamepads().onRemoved(pad -> {
-      if (this.gamePadIndex == pad.getIndex()) {
-        this.gamePadIndex = -1;
+      if (this.gamepadId == pad.getId()) {
+        this.gamepadId = -1;
         final Gamepad newGamePad = Input.gamepads().current();
         if (newGamePad != null) {
-          this.gamePadIndex = newGamePad.getIndex();
+          this.gamepadId = newGamePad.getId();
         }
       }
     });
@@ -69,12 +69,12 @@ public class GamepadEntityController<T extends IMobileEntity> extends MovementCo
   }
 
   private void retrieveGamepadValues() {
-    if (this.gamePadIndex == -1 || this.gamePadIndex != -1 && Input.gamepads().get(this.gamePadIndex) == null) {
+    if (this.gamepadId == -1 || this.gamepadId != -1 && Input.gamepads().getById(this.gamepadId) == null) {
       return;
     }
 
-    final float x = Input.gamepads().get(this.gamePadIndex).getPollData(Gamepad.Axis.X);
-    final float y = Input.gamepads().get(this.gamePadIndex).getPollData(Gamepad.Axis.Y);
+    final float x = Input.gamepads().get(this.gamepadId).getPollData(Gamepad.Axis.X);
+    final float y = Input.gamepads().get(this.gamepadId).getPollData(Gamepad.Axis.Y);
 
     if (Math.abs(x) > this.gamepadDeadzone) {
       this.setDx(x);
@@ -85,8 +85,8 @@ public class GamepadEntityController<T extends IMobileEntity> extends MovementCo
     }
 
     if (this.isRotateWithRightStick()) {
-      final float rightX = Input.gamepads().get(this.gamePadIndex).getPollData(Gamepad.Axis.RX);
-      final float rightY = Input.gamepads().get(this.gamePadIndex).getPollData(Gamepad.Axis.RY);
+      final float rightX = Input.gamepads().get(this.gamepadId).getPollData(Gamepad.Axis.RX);
+      final float rightY = Input.gamepads().get(this.gamepadId).getPollData(Gamepad.Axis.RY);
       float targetX = 0;
       float targetY = 0;
       if (Math.abs(rightX) > this.gamepadRightStick) {
