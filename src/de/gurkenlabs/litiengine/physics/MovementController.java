@@ -18,10 +18,8 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
 
   private float dx;
   private float dy;
-  private boolean movedX;
-  private boolean movedY;
-  private double velocityX;
-  private double velocityY;
+  private double velocity;
+  private double lastMoveAngle;
 
   public MovementController(final T mobileEntity) {
     this.activeForces = new CopyOnWriteArrayList<>();
@@ -64,7 +62,6 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
   @Override
   public void setDx(float dx) {
     this.dx = dx;
-    this.setMovedX(this.dx != 0);
   }
 
   @Override
@@ -75,7 +72,6 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
   @Override
   public void setDy(float dy) {
     this.dy = dy;
-    this.setMovedY(this.dy != 0);
   }
 
   @Override
@@ -93,72 +89,40 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
 
   public void handleMovement() {
     if (!this.isMovementAllowed()) {
-      this.velocityX = 0;
-      this.velocityY = 0;
+      this.velocity = 0;
       return;
     }
 
+    // max distance an entity can travel within one tick
     final double maxPixelsPerTick = this.getEntity().getTickVelocity();
-
     final double deltaTime = Game.loop().getDeltaTime() * Game.loop().getTimeScale();
-    double accelerationRatio = deltaTime / (double) this.getEntity().getAcceleration();
-    double decelerationRatio = deltaTime / (double) this.getEntity().getDeceleration();
 
-    double inc = this.getEntity().getAcceleration() == 0 ? maxPixelsPerTick : accelerationRatio * maxPixelsPerTick;
-    final double dec = this.getEntity().getDeceleration() == 0 ? maxPixelsPerTick : decelerationRatio * maxPixelsPerTick;
+    final double acceleration = this.getEntity().getAcceleration() == 0 ? maxPixelsPerTick : deltaTime / this.getEntity().getAcceleration() * maxPixelsPerTick;
+    final double deceleration = this.getEntity().getDeceleration() == 0 ? this.getVelocity() : deltaTime / this.getEntity().getDeceleration() * maxPixelsPerTick;
 
-    if (this.isMovedX() && this.isMovedY()) {
-      // we don't want the entity to move faster when moving diagonally
-      // calculate a new x by dissolving the formula for diagonals of squares
-      // sqrt(2 * x^2)
-      inc /= (Math.sqrt(2) / Game.loop().getTimeScale());
-    }
+    double dx = this.getDx();
+    double dy = this.getDy();
+    this.setDx(0);
+    this.setDy(0);
 
-    // update velocity x
-    if (this.isMovedX()) {
-      double newVelocity = this.getVelocityX() + (this.getDx() > 0 ? inc : -inc);
-      this.setVelocityX(MathUtilities.clamp(newVelocity, -maxPixelsPerTick, maxPixelsPerTick));
-      this.setDx(0);
+    final double deltaVelocity = Math.min(Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2)), acceleration);
+    if (deltaVelocity != 0) {
+      double newVelocity = this.getVelocity() + deltaVelocity;
+      this.setVelocity(newVelocity);
     } else {
-      this.decelerateVelocityX(dec);
+      final double newVelocity = Math.max(0, this.getVelocity() - deceleration);
+      this.setVelocity(newVelocity);
+      dx = GeometricUtilities.getDeltaX(this.lastMoveAngle);
+      dy = GeometricUtilities.getDeltaY(this.lastMoveAngle);
     }
 
-    // update velocity y
-    if (this.isMovedY()) {
-      double newVelocity = this.getVelocityY() + (this.getDy() > 0 ? inc : -inc);
-      newVelocity = MathUtilities.clamp(newVelocity, -maxPixelsPerTick, maxPixelsPerTick);
-      this.setVelocityY(newVelocity);
-      this.setDy(0);
-    } else {
-      this.decelerateVelocityY(dec);
-    }
-
-    if (this.getVelocityX() == 0 && this.getVelocityY() == 0) {
+    if (this.getVelocity() == 0) {
+      this.lastMoveAngle = 0;
       return;
     }
 
     // actually move entity
-    this.moveEntity(this.getVelocityX(), this.getVelocityY());
-  }
-
-  public boolean isMovedX() {
-    return this.movedX;
-  }
-
-  public void setMovedX(boolean movedX) {
-    this.movedX = movedX;
-  }
-
-  public boolean isMovedY() {
-    return this.movedY;
-  }
-
-  public void setMovedY(boolean movedY) {
-    this.movedY = movedY;
-  }
-
-  public double getVelocityX() {
-    return this.velocityX;
+    this.moveEntity(dx, dy);
   }
 
   @Override
@@ -170,66 +134,21 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
     return this.getActiveForces().stream().filter(x -> x.getIdentifier() != null && x.getIdentifier().equals(identifier)).findFirst().orElse(null);
   }
 
-  public void decelerateVelocityX(double dec) {
-    if (this.getVelocityX() > 0) {
-      if (dec > this.getVelocityX()) {
-        this.setVelocityX(0);
-      } else {
-        this.setVelocityX(this.getVelocityX() - dec);
-      }
-    } else if (this.getVelocityX() < 0) {
-      if (dec < this.getVelocityX()) {
-        this.setVelocityX(0);
-      } else {
-        this.setVelocityX(this.getVelocityX() + dec);
-      }
-    }
-
-    if (Math.abs(this.getVelocityX()) < this.getStopThreshold()) {
-      this.setVelocityX(0);
-    }
+  protected void setVelocity(double velocity) {
+    final double maxVelocity = this.getEntity().getTickVelocity();
+    this.velocity = MathUtilities.clamp(velocity, -maxVelocity, maxVelocity);
   }
 
-  public void decelerateVelocityY(double dec) {
-    if (this.getVelocityY() > 0) {
-      if (dec > this.getVelocityY()) {
-        this.setVelocityY(0);
-      } else {
-        this.setVelocityY(this.getVelocityY() - dec);
-      }
-    } else if (this.getVelocityY() < 0) {
-      if (dec < this.getVelocityY()) {
-        this.setVelocityY(0);
-      } else {
-        this.setVelocityY(this.getVelocityY() + dec);
-      }
-    }
-
-    if (Math.abs(this.getVelocityY()) < this.getStopThreshold()) {
-      this.setVelocityY(0);
-    }
-  }
-
-  protected void setVelocityX(double velocityX) {
-    this.velocityX = velocityX;
-  }
-
-  protected void setVelocityY(double velocityY) {
-    this.velocityY = velocityY;
-  }
-
-  public double getVelocityY() {
-    return velocityY;
-  }
-
-  protected double getStopThreshold() {
-    return 0.0025 * Game.loop().getDeltaTime();
+  public double getVelocity() {
+    return this.velocity;
   }
 
   protected void moveEntity(double deltaX, double deltaY) {
-    final Point2D newLocation = new Point2D.Double(this.getEntity().getX() + deltaX, this.getEntity().getY() + deltaY);
     final Point2D oldLocation = this.getEntity().getLocation();
-    Game.physics().move(this.getEntity(), newLocation);
+    double angle = Math.toDegrees(Math.atan2(deltaX, deltaY));
+
+    this.lastMoveAngle = angle;
+    Game.physics().move(this.getEntity(), angle, this.getVelocity());
 
     this.getEntity().fireMovedEvent(new EntityMovedEvent(this.getEntity(), this.getEntity().getX() - oldLocation.getX(), this.getEntity().getY() - oldLocation.getY()));
   }
