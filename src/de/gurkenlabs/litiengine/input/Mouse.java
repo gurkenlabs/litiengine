@@ -72,8 +72,6 @@ public final class Mouse implements MouseListener, MouseMotionListener, MouseWhe
     this.lastLocation = this.location;
     this.sensitivity = Game.config().input().getMouseSensitivity();
     this.grabMouse = false;
-
-    Game.inputLoop().attach(this);
   }
 
   @Override
@@ -376,8 +374,7 @@ public final class Mouse implements MouseListener, MouseMotionListener, MouseWhe
    * Calculates the location of the ingame mouse by the position diff and locks
    * the original mouse to the center of the screen.
    *
-   * @param mouseLocation
-   *          The location of the original mouse.
+   * @param e The event containing information about the original mouse.
    */
   private void setLocation(final MouseEvent e) {
     if (this.grabMouse && !Game.window().isFocusOwner()) {

@@ -84,7 +84,6 @@ public final class Game {
   private static final TweenEngine tweenEngine = new TweenEngine();
 
   private static GameLoop gameLoop;
-  private static UpdateLoop inputLoop;
   private static ScreenManager screenManager;
   private static GameWindow gameWindow;
 
@@ -365,23 +364,9 @@ public final class Game {
    * @see IUpdateable
    * @see ILoop#attach(IUpdateable)
    * @see ILoop#detach(IUpdateable)
-   * @see Game#inputLoop()
    */
   public static IGameLoop loop() {
     return gameLoop;
-  }
-
-  /**
-   * Gets the game's input loop that processes all the player input.
-   * 
-   * <p>
-   * <i>We need an own update loop because otherwise input won't work if the game has been paused.</i>
-   * </p>
-   * 
-   * @return The game's input loop.
-   */
-  public static ILoop inputLoop() {
-    return inputLoop;
   }
 
   /**
@@ -495,8 +480,6 @@ public final class Game {
     loop().attach(world());
 
     // setup default exception handling for render and update loop
-    inputLoop = new UpdateLoop("Input Loop", loop().getTickRate());
-
     setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(config().client().exitOnError()));
 
     screenManager = new ScreenManager();
@@ -541,7 +524,6 @@ public final class Game {
    */
   public static void setUncaughtExceptionHandler(UncaughtExceptionHandler uncaughtExceptionHandler) {
     gameLoop.setUncaughtExceptionHandler(uncaughtExceptionHandler);
-    inputLoop.setUncaughtExceptionHandler(uncaughtExceptionHandler);
     Thread.setDefaultUncaughtExceptionHandler(uncaughtExceptionHandler);
   }
 
@@ -568,7 +550,6 @@ public final class Game {
     }
 
     gameLoop.start();
-    inputLoop.start();
     tweenEngine.start();
     soundEngine.start();
 
@@ -649,7 +630,6 @@ public final class Game {
 
     config().save();
     gameLoop.terminate();
-    inputLoop.terminate();
     tweenEngine.terminate();
     soundEngine.terminate();
 
@@ -664,7 +644,6 @@ public final class Game {
     }
 
     gameLoop = null;
-    inputLoop = null;
     screenManager = null;
     gameWindow = null;
   }

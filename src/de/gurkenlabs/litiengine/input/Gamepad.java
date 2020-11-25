@@ -35,7 +35,6 @@ public final class Gamepad extends GamepadEvents implements IUpdateable {
 
     this.id = index;
     this.controller = controller;
-    Game.inputLoop().attach(this);
   }
 
   /**
@@ -201,7 +200,6 @@ public final class Gamepad extends GamepadEvents implements IUpdateable {
   }
 
   private void dispose() {
-    Game.inputLoop().detach(this);
     this.componentPollListeners.clear();
     this.componentPressedListeners.clear();
     Input.gamepads().remove(this);

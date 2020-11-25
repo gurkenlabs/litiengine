@@ -668,13 +668,11 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
 
   @Override
   public void start() {
-    Game.inputLoop().attach(this);
     listenerLocation = Game.world().camera().getFocus();
   }
 
   @Override
   public void terminate() {
-    Game.inputLoop().detach(this);
     if (music != null && music.isPlaying()) {
       music.cancel();
       music = null;
