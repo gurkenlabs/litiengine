@@ -52,7 +52,7 @@ a few of which we want to mention here:
 
 ### Nothing of the above applies to you?
 Well... if you still want to support us, you could consider helping us bear the development costs for LITIENGINE (e.g. servers and equipment).
-You can do so by [becoming our Patron](https://www.patreon.com/gurkenlabs) or [donating via Paypal](https://www.paypal.me/gurkenlabsmatthias).
+You can do so by sponsoring [LITIENGINE on OpenCollective](https://opencollective.com/litiengine) or sponsoring the devs [Steffen](https://github.com/sponsors/steffen-wilke) and [Matthias](https://github.com/sponsors/nightm4re94)directly on GitHub.
 
 ## How do I contribute?
 * Create a Github account
