@@ -11,8 +11,8 @@ public enum Modification {
   DIVIDE(4),
   MULTIPLY(3),
   SET(7),
-  SUBSTRACT(2),
-  SUBSTRACTPERCENT(6),
+  SUBTRACT(2),
+  SUBTRACTPERCENT(6),
   UNKNOWN(-1);
 
   private final int applyOrder;
