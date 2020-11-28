@@ -72,6 +72,8 @@ public interface IMovementController extends IEntityController {
   
   public Force getForce(String identifier);
 
+  public double getMoveAngle();
+  
   /**
    * Checks given conditions before moving.
    *

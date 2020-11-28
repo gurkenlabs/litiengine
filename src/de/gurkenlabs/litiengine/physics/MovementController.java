@@ -19,7 +19,7 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
   private float dx;
   private float dy;
   private double velocity;
-  private double lastMoveAngle;
+  private double moveAngle;
 
   public MovementController(final T mobileEntity) {
     this.activeForces = new CopyOnWriteArrayList<>();
@@ -112,12 +112,12 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
     } else {
       final double newVelocity = Math.max(0, this.getVelocity() - deceleration);
       this.setVelocity(newVelocity);
-      dx = GeometricUtilities.getDeltaX(this.lastMoveAngle);
-      dy = GeometricUtilities.getDeltaY(this.lastMoveAngle);
+      dx = GeometricUtilities.getDeltaX(this.moveAngle);
+      dy = GeometricUtilities.getDeltaY(this.moveAngle);
     }
 
     if (this.getVelocity() == 0) {
-      this.lastMoveAngle = 0;
+      this.moveAngle = 0;
       return;
     }
 
@@ -149,7 +149,7 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
     final Point2D oldLocation = this.getEntity().getLocation();
     double angle = Math.toDegrees(Math.atan2(deltaX, deltaY));
 
-    this.lastMoveAngle = angle;
+    this.moveAngle = angle;
     Game.physics().move(this.getEntity(), angle, this.getVelocity());
 
     this.getEntity().fireMovedEvent(new EntityMovedEvent(this.getEntity(), this.getEntity().getX() - oldLocation.getX(), this.getEntity().getY() - oldLocation.getY()));
