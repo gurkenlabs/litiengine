@@ -307,7 +307,8 @@ public final class GamepadManager extends GamepadEvents implements ILaunchable {
       for (int i = 0; i < ControllerEnvironment.getDefaultEnvironment().getControllers().length; i++) {
         final Controller controller = ControllerEnvironment.getDefaultEnvironment().getControllers()[i];
         final Type type = controller.getType();
-        if (!type.equals(Type.GAMEPAD)) {
+
+        if (type.equals(Type.KEYBOARD) || type.equals(Type.MOUSE) || type.equals(Type.UNKNOWN)) {
           continue;
         }
 
