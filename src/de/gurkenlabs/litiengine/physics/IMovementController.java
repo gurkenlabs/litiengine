@@ -42,6 +42,20 @@ public interface IMovementController extends IEntityController {
   public void setDy(float dy);
 
   /**
+   * Get the current velocity.
+   *
+   * @return The current velocity.
+   */
+  public double getVelocity();
+
+  /**
+   * Sets the current velocity.
+   *
+   * @param velocity The velocity to set.
+   */
+  public void setVelocity(double velocity);
+
+  /**
    * Apply the force to the entity.
    *
    * @param force

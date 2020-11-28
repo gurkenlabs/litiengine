@@ -134,11 +134,13 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
     return this.getActiveForces().stream().filter(x -> x.getIdentifier() != null && x.getIdentifier().equals(identifier)).findFirst().orElse(null);
   }
 
-  protected void setVelocity(double velocity) {
+  @Override
+  public void setVelocity(double velocity) {
     final double maxVelocity = this.getEntity().getTickVelocity();
     this.velocity = MathUtilities.clamp(velocity, -maxVelocity, maxVelocity);
   }
 
+  @Override
   public double getVelocity() {
     return this.velocity;
   }
