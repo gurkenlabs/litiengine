@@ -135,6 +135,11 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
   }
 
   @Override
+  public double getMoveAngle() {
+    return this.moveAngle;
+  }
+  
+  @Override
   public void setVelocity(double velocity) {
     final double maxVelocity = this.getEntity().getTickVelocity();
     this.velocity = MathUtilities.clamp(velocity, -maxVelocity, maxVelocity);
