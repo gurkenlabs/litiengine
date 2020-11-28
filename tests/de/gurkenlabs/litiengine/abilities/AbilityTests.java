@@ -139,7 +139,7 @@ public class AbilityTests {
     assertEquals(35.5, a.getY(), 0.001);
     assertEquals(111, a.getHeight(), 0.001);
     assertEquals(111, a.getWidth(), 0.001);
-    assertEquals(-90, a.getAngleStart(), 0.001);
+    assertEquals(-180, a.getAngleStart(), 0.001);
     assertEquals(180, a.getAngleExtent(), 0.001);
   }
 
