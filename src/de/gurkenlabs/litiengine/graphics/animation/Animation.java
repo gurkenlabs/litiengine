@@ -9,7 +9,6 @@ import java.util.logging.Logger;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.ILaunchable;
 import de.gurkenlabs.litiengine.IUpdateable;
-import de.gurkenlabs.litiengine.entities.EntityRenderedListener;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
 
@@ -138,6 +137,7 @@ public class Animation implements IUpdateable, ILaunchable {
     this.spritesheet = spritesheet;
     this.loop = loop;
     this.keyframes = new ArrayList<>();
+    this.listeners = new CopyOnWriteArrayList<>();
 
     if (spritesheet == null) {
       log.log(Level.WARNING, "no spritesheet defined for animation {0}", this.getName());
