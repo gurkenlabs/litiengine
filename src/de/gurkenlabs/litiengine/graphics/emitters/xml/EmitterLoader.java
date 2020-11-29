@@ -16,7 +16,6 @@ public class EmitterLoader {
   private static final Logger log = Logger.getLogger(EmitterLoader.class.getName());
 
   private EmitterLoader() {
-
   }
 
   static {
@@ -24,6 +23,10 @@ public class EmitterLoader {
   }
 
   public static EmitterData load(String emitterXml) {
+    if (loadedEmitters.containsKey(emitterXml)) {
+      return loadedEmitters.get(emitterXml);
+    }
+
     return load(Resources.getLocation(emitterXml));
   }
 
