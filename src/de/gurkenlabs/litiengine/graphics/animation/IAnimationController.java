@@ -165,6 +165,7 @@ public interface IAnimationController extends IUpdateable {
    *          The name of the {@code Animation} to be played.
    * 
    * @see AnimationListener#played(Animation)
+   * @see #getCurrent()
    */
   public void play(final String animationName);
 
