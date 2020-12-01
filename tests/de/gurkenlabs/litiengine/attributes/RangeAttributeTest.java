@@ -162,7 +162,7 @@ public class RangeAttributeTest {
     void testGetWithValueOutOfRangeMin() {
         final RangeAttribute<Byte> testRangeAttributeByte = new RangeAttribute<>((byte) 10, (byte) 1, (byte) 5);
 
-        testRangeAttributeByte.addModifier(new AttributeModifier<>(Modification.SUBSTRACT, 15));
+        testRangeAttributeByte.addModifier(new AttributeModifier<>(Modification.SUBTRACT, 15));
 
         assertEquals((byte) 1, testRangeAttributeByte.get().byteValue());
     }

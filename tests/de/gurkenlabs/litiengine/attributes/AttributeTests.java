@@ -286,7 +286,7 @@ public class AttributeTests {
     final Attribute<Byte> testAttributeByte = new Attribute<>((byte) 10);
     final AttributeModifier<Byte> multiplyAttributeModifier = new AttributeModifier<Byte>(Modification.MULTIPLY, 2);
     final AttributeModifier<Byte> addAttributeModifier = new AttributeModifier<Byte>(Modification.ADD, 50);
-    final AttributeModifier<Byte> subtractAttributeModifier = new AttributeModifier<Byte>(Modification.SUBSTRACT, 25);
+    final AttributeModifier<Byte> subtractAttributeModifier = new AttributeModifier<Byte>(Modification.SUBTRACT, 25);
 
     testAttributeByte.addModifier(multiplyAttributeModifier);
     testAttributeByte.addModifier(addAttributeModifier);
@@ -302,7 +302,7 @@ public class AttributeTests {
     final Attribute<Byte> testAttributeByte = new Attribute<>((byte) 10);
     final AttributeModifier<Byte> multiplyAttributeModifier = new AttributeModifier<Byte>(Modification.MULTIPLY, 2);
     final AttributeModifier<Byte> addAttributeModifier = new AttributeModifier<Byte>(Modification.ADD, 50);
-    final AttributeModifier<Byte> subtractAttributeModifier = new AttributeModifier<Byte>(Modification.SUBSTRACT, 25);
+    final AttributeModifier<Byte> subtractAttributeModifier = new AttributeModifier<Byte>(Modification.SUBTRACT, 25);
 
     testAttributeByte.addModifier(multiplyAttributeModifier);
     testAttributeByte.addModifier(addAttributeModifier);
