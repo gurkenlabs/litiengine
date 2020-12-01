@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.graphics.animation;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -19,6 +20,7 @@ import de.gurkenlabs.litiengine.resources.Resources;
  * @see IAnimationController#getCurrent()
  */
 public class Animation implements IUpdateable, ILaunchable {
+  private final List<KeyFrameListener> listeners;
   /**
    * The default frame duration in milliseconds.
    */
@@ -135,6 +137,7 @@ public class Animation implements IUpdateable, ILaunchable {
     this.spritesheet = spritesheet;
     this.loop = loop;
     this.keyframes = new ArrayList<>();
+    this.listeners = new CopyOnWriteArrayList<>();
 
     if (spritesheet == null) {
       log.log(Level.WARNING, "no spritesheet defined for animation {0}", this.getName());
@@ -284,6 +287,14 @@ public class Animation implements IUpdateable, ILaunchable {
     this.loop = loop;
   }
 
+  public void onKeyFrameChanged(KeyFrameListener listener) {
+    this.listeners.add(listener);
+  }
+
+  public void removeKeyFrameListener(final KeyFrameListener listener) {
+    this.listeners.remove(listener);
+  }
+
   @Override
   public void start() {
     this.playing = true;
@@ -326,7 +337,13 @@ public class Animation implements IUpdateable, ILaunchable {
 
     // make sure, we stay inside the keyframe list
     final int newFrameIndex = (this.getKeyframes().indexOf(this.currentFrame) + 1) % this.getKeyframes().size();
+    final KeyFrame previousFrame = this.currentFrame;
     this.currentFrame = this.getKeyframes().get(newFrameIndex);
+
+    for (KeyFrameListener listener : this.listeners) {
+      listener.currentFrameChanged(previousFrame, this.currentFrame);
+    }
+
     this.lastFrameUpdate = Game.loop().getTicks();
   }
 

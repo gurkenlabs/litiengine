@@ -172,7 +172,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
     }
 
     if (!this.isIndestructible()) {
-      this.getHitPoints().modifyBaseValue(new AttributeModifier<>(Modification.SUBSTRACT, damage));
+      this.getHitPoints().modifyBaseValue(new AttributeModifier<>(Modification.SUBTRACT, damage));
     }
 
     if (this.isDead()) {

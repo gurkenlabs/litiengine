@@ -218,7 +218,7 @@ public abstract class Ability implements IRenderable {
 
     // project
     final Point2D appliedRange = GeometricUtilities.project(new Point2D.Double(arcX, arcY), angle, this.getAttributes().range().get() * 0.5);
-    final double start = angle - 90;
+    final double start = angle - 90 - (impactAngle / 2.0);
     if (impactAngle % 360 == 0) {
       return new Ellipse2D.Double(appliedRange.getX(), appliedRange.getY(), impact, impact);
     }

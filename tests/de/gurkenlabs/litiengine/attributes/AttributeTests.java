@@ -165,13 +165,13 @@ public class AttributeTests {
     final Attribute<Float> testAttributeFloat = new Attribute<>(10.0f);
     final Attribute<Double> testAttributeDouble = new Attribute<>(10.0);
 
-    testAttributeByte.modifyBaseValue(new AttributeModifier<Byte>(Modification.SUBSTRACT, (byte) 1));
-    testAttributeShort.modifyBaseValue(new AttributeModifier<Short>(Modification.SUBSTRACT, (short) 1));
-    testAttributeInt.modifyBaseValue(new AttributeModifier<Integer>(Modification.SUBSTRACT, 1));
-    testAttributeLong.modifyBaseValue(new AttributeModifier<Long>(Modification.SUBSTRACT, 1));
+    testAttributeByte.modifyBaseValue(new AttributeModifier<Byte>(Modification.SUBTRACT, (byte) 1));
+    testAttributeShort.modifyBaseValue(new AttributeModifier<Short>(Modification.SUBTRACT, (short) 1));
+    testAttributeInt.modifyBaseValue(new AttributeModifier<Integer>(Modification.SUBTRACT, 1));
+    testAttributeLong.modifyBaseValue(new AttributeModifier<Long>(Modification.SUBTRACT, 1));
 
-    testAttributeFloat.modifyBaseValue(new AttributeModifier<Float>(Modification.SUBSTRACT, 0.9f));
-    testAttributeDouble.modifyBaseValue(new AttributeModifier<Double>(Modification.SUBSTRACT, 0.9));
+    testAttributeFloat.modifyBaseValue(new AttributeModifier<Float>(Modification.SUBTRACT, 0.9f));
+    testAttributeDouble.modifyBaseValue(new AttributeModifier<Double>(Modification.SUBTRACT, 0.9));
 
     assertEquals((byte) 9, testAttributeByte.get().byteValue());
     assertEquals((short) 9, testAttributeShort.get().shortValue());
@@ -192,13 +192,13 @@ public class AttributeTests {
     final Attribute<Float> testAttributeFloat = new Attribute<>(10.0f);
     final Attribute<Double> testAttributeDouble = new Attribute<>(10.0);
 
-    testAttributeByte.modifyBaseValue(new AttributeModifier<Byte>(Modification.SUBSTRACTPERCENT, 10));
-    testAttributeShort.modifyBaseValue(new AttributeModifier<Short>(Modification.SUBSTRACTPERCENT, 10));
-    testAttributeInt.modifyBaseValue(new AttributeModifier<Integer>(Modification.SUBSTRACTPERCENT, 10));
-    testAttributeLong.modifyBaseValue(new AttributeModifier<Long>(Modification.SUBSTRACTPERCENT, 10));
+    testAttributeByte.modifyBaseValue(new AttributeModifier<Byte>(Modification.SUBTRACTPERCENT, 10));
+    testAttributeShort.modifyBaseValue(new AttributeModifier<Short>(Modification.SUBTRACTPERCENT, 10));
+    testAttributeInt.modifyBaseValue(new AttributeModifier<Integer>(Modification.SUBTRACTPERCENT, 10));
+    testAttributeLong.modifyBaseValue(new AttributeModifier<Long>(Modification.SUBTRACTPERCENT, 10));
 
-    testAttributeFloat.modifyBaseValue(new AttributeModifier<Float>(Modification.SUBSTRACTPERCENT, 9));
-    testAttributeDouble.modifyBaseValue(new AttributeModifier<Double>(Modification.SUBSTRACTPERCENT, 9));
+    testAttributeFloat.modifyBaseValue(new AttributeModifier<Float>(Modification.SUBTRACTPERCENT, 9));
+    testAttributeDouble.modifyBaseValue(new AttributeModifier<Double>(Modification.SUBTRACTPERCENT, 9));
 
     assertEquals((byte) 9, testAttributeByte.get().byteValue());
     assertEquals((short) 9, testAttributeShort.get().shortValue());
@@ -219,13 +219,13 @@ public class AttributeTests {
     final RangeAttribute<Float> testAttributeFloat = new RangeAttribute<>(10F, 0F, 10F);
     final RangeAttribute<Double> testAttributeDouble = new RangeAttribute<>(10.0, 0.0, 10.0);
     
-    testAttributeByte.modifyMaxBaseValue(new AttributeModifier<Byte>(Modification.SUBSTRACTPERCENT, 10));
-    testAttributeShort.modifyMaxBaseValue(new AttributeModifier<Short>(Modification.SUBSTRACTPERCENT, 10));
-    testAttributeInt.modifyMaxBaseValue(new AttributeModifier<Integer>(Modification.SUBSTRACTPERCENT, 10));
-    testAttributeLong.modifyMaxBaseValue(new AttributeModifier<Long>(Modification.SUBSTRACTPERCENT, 10));
+    testAttributeByte.modifyMaxBaseValue(new AttributeModifier<Byte>(Modification.SUBTRACTPERCENT, 10));
+    testAttributeShort.modifyMaxBaseValue(new AttributeModifier<Short>(Modification.SUBTRACTPERCENT, 10));
+    testAttributeInt.modifyMaxBaseValue(new AttributeModifier<Integer>(Modification.SUBTRACTPERCENT, 10));
+    testAttributeLong.modifyMaxBaseValue(new AttributeModifier<Long>(Modification.SUBTRACTPERCENT, 10));
 
-    testAttributeFloat.modifyMaxBaseValue(new AttributeModifier<Float>(Modification.SUBSTRACTPERCENT, 9));
-    testAttributeDouble.modifyMaxBaseValue(new AttributeModifier<Double>(Modification.SUBSTRACTPERCENT, 9));
+    testAttributeFloat.modifyMaxBaseValue(new AttributeModifier<Float>(Modification.SUBTRACTPERCENT, 9));
+    testAttributeDouble.modifyMaxBaseValue(new AttributeModifier<Double>(Modification.SUBTRACTPERCENT, 9));
     
     assertEquals((byte) 9, testAttributeByte.getMax().byteValue());
     assertEquals((short) 9, testAttributeShort.getMax().shortValue());

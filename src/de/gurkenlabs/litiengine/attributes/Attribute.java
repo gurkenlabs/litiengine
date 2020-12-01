@@ -116,6 +116,18 @@ public class Attribute<T extends Number> {
   }
 
   /**
+   * Adjusts the base value of this attribute once with the specified modifier.
+   *
+   * @param modification
+   *          The modification type.
+   * @param value
+   *          The modification value to be applied.
+   */
+  public void modifyBaseValue(final Modification modification, double value) {
+    this.baseValue = new AttributeModifier<T>(modification, value).modify(this.getBase());
+  }
+
+  /**
    * Sets the base value of this attribute.
    * 
    * @param baseValue

@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.gurkenlabs.litiengine.graphics.RenderComponent;
+import de.gurkenlabs.litiengine.input.Input;
+import de.gurkenlabs.litiengine.input.Keyboard;
+import de.gurkenlabs.litiengine.input.Mouse;
 
 /**
  * The main update loop that executes the game logic by calling the update functions on all registered {@code IUpdatable} instances.
@@ -77,6 +80,8 @@ public final class GameLoop extends UpdateLoop implements IGameLoop {
    */
   @Override
   protected void process() {
+    this.updateInvariableEngineComponents();
+
     if (this.getTimeScale() > 0) {
       super.process();
       this.executeTimedActions();
@@ -113,6 +118,19 @@ public final class GameLoop extends UpdateLoop implements IGameLoop {
     Game.metrics().setEstimatedMaxFramesPerSecond((int) (1000.0 / this.getProcessTime()));
     if (Game.config().debug().trackRenderTimes()) {
       Game.metrics().trackRenderTime("total", this.getProcessTime());
+    }
+  }
+
+  private void updateInvariableEngineComponents() {
+    Game.audio().update();
+
+    ((Keyboard) Input.keyboard()).update();
+    ((Mouse) Input.mouse()).update();
+
+    if (Game.config().input().isGamepadSupport()) {
+      for (IUpdateable gamepad : Input.gamepads().getAll()) {
+        gamepad.update();
+      }
     }
   }
 

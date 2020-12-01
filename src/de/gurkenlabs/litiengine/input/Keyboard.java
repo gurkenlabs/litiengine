@@ -30,7 +30,6 @@ public final class Keyboard implements KeyEventDispatcher, IKeyboard, IUpdateabl
   Keyboard() {
     KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
 
-    Game.inputLoop().attach(this);
     this.consumeAlt = true;
   }
 
