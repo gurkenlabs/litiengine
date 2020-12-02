@@ -325,10 +325,4 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
       this.customDeathAnimations = new String[0];
     }
   }
-
-  private Animation flipAnimation(Animation anim, String newSpriteName) {
-    final BufferedImage flippedImage = Imaging.flipSpritesHorizontally(anim.getSpritesheet());
-    Spritesheet flippedSpritesheet = Resources.spritesheets().load(flippedImage, newSpriteName, anim.getSpritesheet().getSpriteWidth(), anim.getSpritesheet().getSpriteHeight());
-    return new Animation(flippedSpritesheet, true, anim.getKeyFrameDurations());
-  }
 }
