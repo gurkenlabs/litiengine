@@ -11,6 +11,7 @@ public final class Icons {
   public static final Icon ADD = get("add");
   public static final Icon ASSET = get("asset");
   public static final Icon BLUEPRINT = get("blueprint");
+  public static final Icon CLEAR_CONSOLE = get("clear_console");
   public static final Icon COLLAPSE = get("collapse");
   public static final Icon COLLISIONBOX = get("collisionbox");
   public static final Icon COLOR = get("color");
@@ -45,6 +46,7 @@ public final class Icons {
   public static final Icon PLAY = get("play");
   public static final Icon PROP = get("entity");
   public static final Icon RENAME = get("rename");
+  public static final Icon SCROLL_DOWN = get("scroll_down");
   public static final Icon SEARCH = get("search");
   public static final Icon SHADOWBOX = get("shadowbox");
   public static final Icon SPAWNPOINT = get("spawnpoint");
