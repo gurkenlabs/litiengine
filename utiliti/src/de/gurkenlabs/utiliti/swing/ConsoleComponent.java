@@ -1,17 +1,19 @@
 package de.gurkenlabs.utiliti.swing;
 
-import java.util.logging.Logger;
+import javax.swing.JPanel;
+import javax.swing.BoxLayout;
+import java.awt.LayoutManager;
 
-import com.github.weisj.darklaf.components.text.NumberedTextComponent;
+public class ConsoleComponent extends JPanel {
 
-import javax.swing.*;
+    public ConsoleComponent() {
+        super();
+        LayoutManager layout = new BoxLayout(this, BoxLayout.X_AXIS);
+        this.setLayout(layout);
 
-@SuppressWarnings("serial")
-public class ConsoleComponent extends NumberedTextComponent {
+        ConsolePanel consolePanel = new ConsolePanel();
 
-  public ConsoleComponent() {
-    super(new JTextPane());
-    this.textComponent.setEditable(false);
-    Logger.getLogger("").addHandler(new LogHandler((JTextPane) this.textComponent));
-  }
+        this.add(new ConsoleActionPanel());
+        this.add(consolePanel);
+    }
 }

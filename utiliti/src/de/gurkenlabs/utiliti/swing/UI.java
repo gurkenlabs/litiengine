@@ -343,7 +343,7 @@ public final class UI {
 
     assetComponent = new AssetList();
     bottomTab.addTab(Resources.strings().get("assettree_assets"), Icons.ASSET, assetComponent);
-    bottomTab.addTab(Resources.strings().get("assettree_console"), Icons.CONSOLE, new ConsolePane());
+    bottomTab.addTab(Resources.strings().get("assettree_console"), Icons.CONSOLE, new ConsoleComponent());
 
     bottomPanel.add(StatusBar.create(), BorderLayout.NORTH);
     bottomPanel.add(bottomTab, BorderLayout.CENTER);
