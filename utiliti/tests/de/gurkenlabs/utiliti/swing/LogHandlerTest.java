@@ -1,0 +1,71 @@
+package de.gurkenlabs.utiliti.swing;
+
+import org.junit.jupiter.api.Test;
+
+import javax.swing.*;
+import javax.swing.text.*;
+
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+public class LogHandlerTest {
+
+    @Test
+    public void publish() {
+        JTextPane textPane = new JTextPane();
+        LogHandler logHandler = new LogHandler(textPane);
+
+        StyledDocument styledDocument = textPane.getStyledDocument();
+
+        assertEquals(0, styledDocument.getLength());
+        assertEquals(0, textPane.getCaretPosition());
+
+        logHandler.publish(new LogRecord(Level.INFO, "Hello World"));
+        logHandler.publish(new LogRecord(Level.SEVERE, "This is a severe test!"));
+
+        assertEquals(55, styledDocument.getLength());
+        assertEquals(55, textPane.getCaretPosition());
+    }
+
+    @Test
+    public void flush() {
+        JTextPane textPane = new JTextPane();
+        LogHandler logHandler = new LogHandler(textPane);
+
+        logHandler.publish(new LogRecord(Level.INFO, "Hello World"));
+        logHandler.publish(new LogRecord(Level.INFO, "This is a test"));
+
+        StyledDocument styledDocument = textPane.getStyledDocument();
+
+        assertEquals(47, styledDocument.getLength());
+        assertEquals(47, textPane.getCaretPosition());
+
+        logHandler.flush();
+
+        assertEquals(0, styledDocument.getLength());
+        assertEquals(0, textPane.getCaretPosition());
+    }
+
+    @Test
+    public void scrollToLast() {
+        JTextPane textPane = new JTextPane();
+        textPane.setBounds(5, 5, 200, 10);
+        LogHandler logHandler = new LogHandler(textPane);
+
+        logHandler.publish(new LogRecord(Level.INFO, "Hello World"));
+        logHandler.publish(new LogRecord(Level.INFO, "This is a test"));
+
+        StyledDocument styledDocument = textPane.getStyledDocument();
+        textPane.setCaretPosition(0);
+
+        assertEquals(47, styledDocument.getLength());
+        assertEquals(0, textPane.getCaretPosition());
+
+        logHandler.scrollToLast();
+
+        assertEquals(47, styledDocument.getLength());
+        assertEquals(47, textPane.getCaretPosition());
+    }
+}
