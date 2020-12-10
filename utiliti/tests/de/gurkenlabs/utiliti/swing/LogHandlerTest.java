@@ -64,6 +64,11 @@ public class LogHandlerTest {
         assertEquals(0, textPane.getCaretPosition());
 
         try {
+          System.out.println(logHandler != null);
+          if(logHandler != null) {
+            System.out.println("TextPane = " + logHandler.textPane);
+            System.out.println("doc = " + logHandler.textPane.getStyledDocument());
+          }
           logHandler.scrollToLast();
         }
         catch(Throwable t) {
