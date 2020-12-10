@@ -63,7 +63,13 @@ public class LogHandlerTest {
         assertEquals(47, styledDocument.getLength());
         assertEquals(0, textPane.getCaretPosition());
 
-        logHandler.scrollToLast();
+        try {
+          logHandler.scrollToLast();
+        }
+        catch(Throwable t) {
+          t.printStackTrace();
+          throw t;
+        }
 
         assertEquals(47, styledDocument.getLength());
         assertEquals(47, textPane.getCaretPosition());
