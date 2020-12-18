@@ -59,7 +59,7 @@ public class ResourcesTests {
 
   @Test
   public void testResourceFromWeb() throws IOException {
-    try (InputStream stream = Resources.get("https://github.com/gurkenlabs/litiengine/raw/master/resources/LITIEngine_Logo_big.png")) {
+    try (InputStream stream = Resources.get("https://github.com/gurkenlabs/litiengine/raw/master/resources/litiengine-banner.png")) {
       assertNotNull(stream);
     }
   }
