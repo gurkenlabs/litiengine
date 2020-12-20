@@ -77,7 +77,7 @@ public class LogHandler extends java.util.logging.Handler {
         StyledDocument doc = textPane.getStyledDocument();
         Rectangle2D bounds = null;
         try {
-            bounds = textPane.modelToView2D(textPane.getCaretPosition());
+            bounds = textPane.modelToView(textPane.getCaretPosition());
             textPane.scrollRectToVisible(bounds.getBounds());
         } catch (BadLocationException e) {
             // if an exception occurs while logging, just ignore it
