@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -22,14 +24,14 @@ import de.gurkenlabs.litiengine.abilities.effects.EffectTarget;
 import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.entities.EntityPivotType;
 
-public class AbilityTests {
+class AbilityTests {
   @BeforeEach
   public void init() {
     Game.init(Game.COMMADLINE_ARG_NOGUI);
   }
 
   @Test
-  public void testGetRemainingCooldownInSeconds() {
+  void testGetRemainingCooldownInSeconds() {
     Creature creature = mock(Creature.class);
     TestAbility ability = new TestAbility(creature);
     float actual = ability.getRemainingCooldownInSeconds();
@@ -37,7 +39,7 @@ public class AbilityTests {
   }
 
   @Test
-  public void testGetRemainingCooldownInSecondsNoCast() {
+  void testGetRemainingCooldownInSecondsNoCast() {
     Creature creature = mock(Creature.class);
     TestAbility ability = new TestAbility(creature);
     float actual = ability.getRemainingCooldownInSeconds();
@@ -45,7 +47,7 @@ public class AbilityTests {
   }
 
   @Test
-  public void testGetRemainingCooldownInSecondsCreatureIsDead() {
+  void testGetRemainingCooldownInSecondsCreatureIsDead() {
     Creature creature = mock(Creature.class);
     when(creature.isDead()).thenReturn(true);
     TestAbility ability = new TestAbility(creature);
@@ -55,7 +57,7 @@ public class AbilityTests {
   }
 
   @Test
-  public void testInitialization() {
+  void testInitialization() {
     TestAbility ability = new TestAbility(new Creature());
 
     assertEquals("I do somethin", ability.getName());
@@ -72,7 +74,7 @@ public class AbilityTests {
   }
 
   @Test
-  public void testEffectInitialization() {
+  void testEffectInitialization() {
     Creature entity = new Creature();
     TestAbility ability = new TestAbility(new Creature());
 
@@ -101,7 +103,7 @@ public class AbilityTests {
    * i.e. the bounding rectangle should have its upper left corner at (-9.0, -59.0) and sides of length 150
    */
   @Test
-  public void testInternalCalculateImpactArea360() {
+  void testInternalCalculateImpactArea360() {
     TestAbility360 ability = new TestAbility360(new Creature());
     Shape s = ability.internalCalculateImpactArea(90);
     Ellipse2D e = (Ellipse2D) s;
@@ -130,7 +132,7 @@ public class AbilityTests {
    * i.e. the bounding rectangle should have its upper left corner at (-39.5, 35.5) and sides of length 111
    */
   @Test
-  public void testInternalCalculateImpactArea180() {
+  void testInternalCalculateImpactArea180() {
     TestAbility180 ability = new TestAbility180(new Creature());
     Shape s = ability.internalCalculateImpactArea(0);
     Arc2D a = (Arc2D) s;
@@ -148,7 +150,7 @@ public class AbilityTests {
    * Expect same shape from the public and the internal method
    */
   @Test
-  public void testCalculateImpactArea() {
+  void testCalculateImpactArea() {
     Creature c = new Creature();
     TestAbility360 ability = new TestAbility360(c);
     Ellipse2D ePub = (Ellipse2D) ability.calculateImpactArea();
@@ -164,7 +166,7 @@ public class AbilityTests {
    * Expect same shape from the public and the internal method
    */
   @Test
-  public void testCalculateImpactArea45() {
+  void testCalculateImpactArea45() {
     Creature c = new Creature();
     c.setAngle(45);
     TestAbility360 ability = new TestAbility360(c);
@@ -180,7 +182,7 @@ public class AbilityTests {
    * Test the function getOrigin() with valid inputs when AbilityOrigin = LOCATION.
    */
   @Test
-  public void testGetOriginLocation() {
+  void testGetOriginLocation() {
     Point2D point1 = new Point2D.Double(0, 0);
     Point2D point2 = new Point2D.Double(1, 1);
 
@@ -208,7 +210,7 @@ public class AbilityTests {
    * Test the function getOrigin() with valid inputs when AbilityOrigin = CUSTOM.
    */
   @Test
-  public void testGetOriginCustom() {
+  void testGetOriginCustom() {
     Point2D point2 = new Point2D.Double(1, 1);
     Point2D point3 = new Point2D.Double(2, 2);
 
@@ -236,7 +238,7 @@ public class AbilityTests {
    * Test the function getOrigin() with valid inputs when AbilityOrigin = DIMENSION_CENTER.
    */
   @Test
-  public void testGetOriginDimension() {
+  void testGetOriginDimension() {
     Point2D point1 = new Point2D.Double(16, 16);
 
     /*
@@ -256,7 +258,7 @@ public class AbilityTests {
    */
 
   @Test
-  public void testGetOriginCollisionBox() {
+  void testGetOriginCollisionBox() {
     Point2D point1 = new Point2D.Double(16, 25.6);
     Rectangle2D shape1 = new Rectangle2D.Double(9.6, 19.2, 12.8, 12.8);
 
@@ -332,7 +334,7 @@ public class AbilityTests {
    * and a zero width and height.
    */
   @Test
-  public void testGetPotentialCollisionZeroBoxZeroImpact() {
+  void testGetPotentialCollisionZeroBoxZeroImpact() {
     Rectangle2D collisonBox = new Rectangle2D.Double(0, 0, 0, 0);
     Ellipse2D ellipse = new Ellipse2D.Double(0, 0, 0, 0);
 
@@ -351,7 +353,7 @@ public class AbilityTests {
    * corresponding to the collisionbox and a zero width and height.
    */
   @Test
-  public void testGetPotentialCollisionBoxNonZeroBoxZeroImpact() {
+  void testGetPotentialCollisionBoxNonZeroBoxZeroImpact() {
     Rectangle2D collisonBox = new Rectangle2D.Double(1, 1, 1, 1);
     Ellipse2D ellipse = new Ellipse2D.Double(collisonBox.getCenterX(), collisonBox.getCenterY(), 0, 0);
 
@@ -371,7 +373,7 @@ public class AbilityTests {
    * and a width and height corresponding to the impact.
    */
   @Test
-  public void testGetPotentialCollisionBoxZeroBoxNonZeroImpact() {
+  void testGetPotentialCollisionBoxZeroBoxNonZeroImpact() {
     Rectangle2D collisonBox = new Rectangle2D.Double(0, 0, 0, 0);
     Ellipse2D ellipse = new Ellipse2D.Double(0 - 111 * 0.5, 0 - 111 * 0.5, 111, 111);
 
@@ -391,7 +393,7 @@ public class AbilityTests {
    * and a width and height corresponding to the impact.
    */
   @Test
-  public void testGetPotentialCollisionBoxNonZeroBoxNonZeroImpact() {
+  void testGetPotentialCollisionBoxNonZeroBoxNonZeroImpact() {
     Rectangle2D collisonBox = new Rectangle2D.Double(1, 1, 0, 0);
     Ellipse2D ellipse = new Ellipse2D.Double(1 - 111 * 0.5, 1 - 111 * 0.5, 111, 111);
 
@@ -407,7 +409,7 @@ public class AbilityTests {
    * Expected: canCast() is false.
    */
   @Test
-  public void testCanCastWhenDead() {
+  void testCanCastWhenDead() {
     Creature entity = mock(Creature.class);
     when(entity.isDead()).thenReturn(true);
 
@@ -423,7 +425,7 @@ public class AbilityTests {
    * Expected: canCast() is true.
    */
   @Test
-  public void testCanCastWhenNoExecution() {
+  void testCanCastWhenNoExecution() {
     Creature entity = mock(Creature.class);
     when(entity.isDead()).thenReturn(false);
 
@@ -432,7 +434,7 @@ public class AbilityTests {
 
     assertEquals(a.getExecutor(), entity);
     assertTrue(!a.getExecutor().isDead());
-    assertTrue(a.getCurrentExecution() == null);
+    assertNull(a.getCurrentExecution());
     assertTrue(a.canCast());
   }
 
@@ -442,7 +444,7 @@ public class AbilityTests {
    * Expected: canCast() is true.
    */
   @Test
-  public void testCanCastWhenNoExecutionticks() {
+  void testCanCastWhenNoExecutionticks() {
     Creature entity = mock(Creature.class);
     when(entity.isDead()).thenReturn(false);
 
@@ -454,8 +456,8 @@ public class AbilityTests {
 
     assertEquals(a.getExecutor(), entity);
     assertTrue(!a.getExecutor().isDead());
-    assertFalse(a.getCurrentExecution() == null);
-    assertTrue(a.getCurrentExecution().getExecutionTicks() == 0);
+    assertNotNull(a.getCurrentExecution());
+    assertEquals(0, a.getCurrentExecution().getExecutionTicks());
     assertTrue(a.canCast());
   }
 }

@@ -1,27 +1,27 @@
 package de.gurkenlabs.litiengine.attributes;
 
-import org.junit.jupiter.api.Test;
-
-import java.util.Collections;
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.Arrays;
+import java.util.Collections;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * The Class AttributeTests.
  */
-public class AttributeTests {
+class AttributeTests {
 
   @Test
-  public void testAttributeInitialization() {
+  void testAttributeInitialization() {
     final Attribute<Integer> testAttribute = new Attribute<>(10);
     assertEquals(10, testAttribute.get().intValue());
   }
 
   @Test
-  public void testModifyBaseValueWithAddModification() {
+  void testModifyBaseValueWithAddModification() {
     final Attribute<Byte> testAttributeByte = new Attribute<>((byte) 10);
     final Attribute<Short> testAttributeShort = new Attribute<>((short) 10);
     final Attribute<Integer> testAttributeInt = new Attribute<>(10);
@@ -48,7 +48,7 @@ public class AttributeTests {
   }
 
   @Test
-  public void testModifyBaseValueWithAddPercentModification() {
+  void testModifyBaseValueWithAddPercentModification() {
     final Attribute<Byte> testAttributeByte = new Attribute<>((byte) 10);
     final Attribute<Short> testAttributeShort = new Attribute<>((short) 10);
     final Attribute<Integer> testAttributeInt = new Attribute<>(10);
@@ -75,7 +75,7 @@ public class AttributeTests {
   }
 
   @Test
-  public void testModifyBaseValueWithDivideModification() {
+  void testModifyBaseValueWithDivideModification() {
     final Attribute<Byte> testAttributeByte = new Attribute<>((byte) 10);
     final Attribute<Short> testAttributeShort = new Attribute<>((short) 10);
     final Attribute<Integer> testAttributeInt = new Attribute<>(10);
@@ -102,7 +102,7 @@ public class AttributeTests {
   }
 
   @Test
-  public void testModifyBaseValueWithMultiplyModification() {
+  void testModifyBaseValueWithMultiplyModification() {
     final Attribute<Byte> testAttributeByte = new Attribute<>((byte) 10);
     final Attribute<Short> testAttributeShort = new Attribute<>((short) 10);
     final Attribute<Integer> testAttributeInt = new Attribute<>(10);
@@ -129,7 +129,7 @@ public class AttributeTests {
   }
 
   @Test
-  public void testModifyBaseValueWithSetModification() {
+  void testModifyBaseValueWithSetModification() {
     final Attribute<Byte> testAttributeByte = new Attribute<>((byte) 10);
     final Attribute<Short> testAttributeShort = new Attribute<>((short) 10);
     final Attribute<Integer> testAttributeInt = new Attribute<>(10);
@@ -156,7 +156,7 @@ public class AttributeTests {
   }
 
   @Test
-  public void testModifyBaseValueWithSubstractModification() {
+  void testModifyBaseValueWithSubstractModification() {
     final Attribute<Byte> testAttributeByte = new Attribute<>((byte) 10);
     final Attribute<Short> testAttributeShort = new Attribute<>((short) 10);
     final Attribute<Integer> testAttributeInt = new Attribute<>(10);
@@ -183,7 +183,7 @@ public class AttributeTests {
   }
 
   @Test
-  public void testModifyBaseValueWithSubstractPercentModification() {
+  void testModifyBaseValueWithSubstractPercentModification() {
     final Attribute<Byte> testAttributeByte = new Attribute<>((byte) 10);
     final Attribute<Short> testAttributeShort = new Attribute<>((short) 10);
     final Attribute<Integer> testAttributeInt = new Attribute<>(10);
@@ -210,7 +210,7 @@ public class AttributeTests {
   }
 
   @Test
-  public void testModifyBaseValueRangeAttributeMaxModification() {
+  void testModifyBaseValueRangeAttributeMaxModification() {
     final RangeAttribute<Byte> testAttributeByte = new RangeAttribute<>((byte) 10, (byte) 0, (byte) 10);
     final RangeAttribute<Short> testAttributeShort = new RangeAttribute<>((short) 10, (short) 0, (short) 10);
     final RangeAttribute<Integer> testAttributeInt = new RangeAttribute<>(10, 0, 10);
@@ -218,7 +218,7 @@ public class AttributeTests {
 
     final RangeAttribute<Float> testAttributeFloat = new RangeAttribute<>(10F, 0F, 10F);
     final RangeAttribute<Double> testAttributeDouble = new RangeAttribute<>(10.0, 0.0, 10.0);
-    
+
     testAttributeByte.modifyMaxBaseValue(new AttributeModifier<Byte>(Modification.SUBTRACTPERCENT, 10));
     testAttributeShort.modifyMaxBaseValue(new AttributeModifier<Short>(Modification.SUBTRACTPERCENT, 10));
     testAttributeInt.modifyMaxBaseValue(new AttributeModifier<Integer>(Modification.SUBTRACTPERCENT, 10));
@@ -226,7 +226,7 @@ public class AttributeTests {
 
     testAttributeFloat.modifyMaxBaseValue(new AttributeModifier<Float>(Modification.SUBTRACTPERCENT, 9));
     testAttributeDouble.modifyMaxBaseValue(new AttributeModifier<Double>(Modification.SUBTRACTPERCENT, 9));
-    
+
     assertEquals((byte) 9, testAttributeByte.getMax().byteValue());
     assertEquals((short) 9, testAttributeShort.getMax().shortValue());
     assertEquals(9, testAttributeInt.getMax().intValue());
@@ -234,7 +234,7 @@ public class AttributeTests {
 
     assertEquals(9.1f, testAttributeFloat.getMax().floatValue(), 0.0001f);
     assertEquals(9.1, testAttributeDouble.getMax().doubleValue(), 0.0000001);
-    
+
     testAttributeByte.addMaxModifier(new AttributeModifier<Byte>(Modification.ADDPERCENT, 50));
     testAttributeShort.addMaxModifier(new AttributeModifier<Short>(Modification.ADDPERCENT, 50));
     testAttributeInt.addMaxModifier(new AttributeModifier<Integer>(Modification.ADDPERCENT, 50));
@@ -242,7 +242,7 @@ public class AttributeTests {
 
     testAttributeFloat.addMaxModifier(new AttributeModifier<Float>(Modification.ADDPERCENT, 50));
     testAttributeDouble.addMaxModifier(new AttributeModifier<Double>(Modification.ADDPERCENT, 50));
-    
+
     assertEquals((byte) 13, testAttributeByte.getMax().byteValue());
     assertEquals((short) 13, testAttributeShort.getMax().shortValue());
     assertEquals(13, testAttributeInt.getMax().intValue());
@@ -261,10 +261,10 @@ public class AttributeTests {
     assertEquals(Collections.emptyList(), testAttributeByte.getModifiers());
 
     testAttributeByte.addModifier(multiplyAttributeModifier);
-    assertEquals(List.of(multiplyAttributeModifier), testAttributeByte.getModifiers());
+    assertEquals(Arrays.asList(multiplyAttributeModifier), testAttributeByte.getModifiers());
 
     testAttributeByte.addModifier(addAttributeModifier);
-    assertEquals(List.of(addAttributeModifier, multiplyAttributeModifier), testAttributeByte.getModifiers());
+    assertEquals(Arrays.asList(addAttributeModifier, multiplyAttributeModifier), testAttributeByte.getModifiers());
   }
 
   @Test
@@ -275,10 +275,10 @@ public class AttributeTests {
     assertEquals(Collections.emptyList(), testAttributeByte.getModifiers());
 
     testAttributeByte.addModifier(addAttributeModifier);
-    assertEquals(List.of(addAttributeModifier), testAttributeByte.getModifiers());
+    assertEquals(Arrays.asList(addAttributeModifier), testAttributeByte.getModifiers());
 
     testAttributeByte.addModifier(addAttributeModifier);
-    assertEquals(List.of(addAttributeModifier), testAttributeByte.getModifiers());
+    assertEquals(Arrays.asList(addAttributeModifier), testAttributeByte.getModifiers());
   }
 
   @Test
@@ -291,10 +291,10 @@ public class AttributeTests {
     testAttributeByte.addModifier(multiplyAttributeModifier);
     testAttributeByte.addModifier(addAttributeModifier);
     testAttributeByte.addModifier(subtractAttributeModifier);
-    assertEquals(List.of(addAttributeModifier, subtractAttributeModifier, multiplyAttributeModifier), testAttributeByte.getModifiers());
+    assertEquals(Arrays.asList(addAttributeModifier, subtractAttributeModifier, multiplyAttributeModifier), testAttributeByte.getModifiers());
 
     testAttributeByte.removeModifier(subtractAttributeModifier);
-    assertEquals(List.of(addAttributeModifier, multiplyAttributeModifier), testAttributeByte.getModifiers());
+    assertEquals(Arrays.asList(addAttributeModifier, multiplyAttributeModifier), testAttributeByte.getModifiers());
   }
 
   @Test
@@ -306,7 +306,7 @@ public class AttributeTests {
 
     testAttributeByte.addModifier(multiplyAttributeModifier);
     testAttributeByte.addModifier(addAttributeModifier);
-    assertEquals(List.of(addAttributeModifier, multiplyAttributeModifier), testAttributeByte.getModifiers());
+    assertEquals(Arrays.asList(addAttributeModifier, multiplyAttributeModifier), testAttributeByte.getModifiers());
 
     assertTrue(testAttributeByte.isModifierApplied(addAttributeModifier));
     assertTrue(testAttributeByte.isModifierApplied(multiplyAttributeModifier));

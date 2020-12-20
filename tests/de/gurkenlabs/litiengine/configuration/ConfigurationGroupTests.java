@@ -13,52 +13,51 @@ import org.junit.jupiter.api.Test;
 import de.gurkenlabs.litiengine.configuration.ConfigurationGroup.ConfigurationChangedListener;
 import de.gurkenlabs.litiengine.util.ReflectionUtilities;
 
-public class ConfigurationGroupTests {
+class ConfigurationGroupTests {
 
   @Test
-  public void testPropertyChangedClientConfig() {
+  void testPropertyChangedClientConfig() {
     this.testConfigurationChanged(new ClientConfiguration());
   }
 
   @Test
-  public void testPropertyChangedGraphicsConfig() {
+  void testPropertyChangedGraphicsConfig() {
     this.testConfigurationChanged(new GraphicConfiguration());
   }
 
   @Test
-  public void testPropertyChangedSoundConfig() {
+  void testPropertyChangedSoundConfig() {
     this.testConfigurationChanged(new SoundConfiguration());
   }
 
   @Test
-  public void testPropertyChangedInputConfig() {
+  void testPropertyChangedInputConfig() {
     this.testConfigurationChanged(new InputConfiguration());
   }
 
   @Test
-  public void testPropertyChangedDebugConfig() {
+  void testPropertyChangedDebugConfig() {
     this.testConfigurationChanged(new DebugConfiguration());
   }
 
   @Test
-  public void testPropertyChangedEventValues() {
+  void testPropertyChangedEventValues() {
     GraphicConfiguration config = new GraphicConfiguration();
     TestConfigurationChangedListener listener = new TestConfigurationChangedListener();
 
     config.onChanged(listener);
-    
+
     boolean old = config.antiAlising();
     config.setAntiAliasing(true);
-    
 
     assertEquals("antiAliasing", listener.name);
     assertEquals(true, listener.newVal);
     assertEquals(old, listener.oldVal);
     assertEquals(config, listener.source);
-    
+
     DisplayMode oldDisplayMode = config.getDisplayMode();
     config.setDisplayMode(DisplayMode.FULLSCREEN);
-    
+
     assertEquals("displayMode", listener.name);
     assertEquals(DisplayMode.FULLSCREEN, listener.newVal);
     assertEquals(oldDisplayMode, listener.oldVal);
@@ -66,7 +65,7 @@ public class ConfigurationGroupTests {
   }
 
   @Test
-  public void testReflectionBasedSetters() {
+  void testReflectionBasedSetters() {
     GraphicConfiguration config = new GraphicConfiguration();
     config.setAntiAliasing(true);
     config.setColorInterpolation(true);
