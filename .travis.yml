@@ -4,7 +4,7 @@ before_install:
   - chmod +x gradlew
   - sudo apt-get -y install at-spi2-core
 
-jdk: openjdk11
+jdk: openjdk8
 
 git:
   depth: false
