@@ -61,6 +61,7 @@ import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import de.gurkenlabs.litiengine.util.io.ImageSerializer;
 import de.gurkenlabs.utiliti.Cursors;
 import de.gurkenlabs.utiliti.UndoManager;
+import de.gurkenlabs.utiliti.handlers.Scroll;
 import de.gurkenlabs.utiliti.handlers.Snap;
 import de.gurkenlabs.utiliti.handlers.Transform;
 import de.gurkenlabs.utiliti.handlers.Transform.TransformType;
@@ -83,8 +84,6 @@ public class MapComponent extends GuiComponent {
   public static final int EDITMODE_MOVE = 2;
   private static final Logger log = Logger.getLogger(MapComponent.class.getName());
 
-  private static final int BASE_SCROLL_SPEED = 50;
-
   private final List<IntConsumer> editModeChangedConsumer;
   private final List<Consumer<IMapObject>> focusChangedConsumer;
   private final List<Consumer<List<IMapObject>>> selectionChangedConsumer;
@@ -100,8 +99,6 @@ public class MapComponent extends GuiComponent {
   private int editMode = EDITMODE_EDIT;
 
   private final List<TmxMap> maps;
-
-  private double scrollSpeed = BASE_SCROLL_SPEED;
 
   private Point2D startPoint;
   private Blueprint copiedBlueprint;
@@ -276,7 +273,6 @@ public class MapComponent extends GuiComponent {
   public void prepare() {
     Game.world().camera().onZoom(event -> {
       Transform.updateAnchors();
-      this.scrollSpeed = BASE_SCROLL_SPEED / event.getZoom();
     });
 
     Zoom.applyPreference();
@@ -1018,16 +1014,12 @@ public class MapComponent extends GuiComponent {
       return;
     }
 
-    final Point2D currentFocus = Game.world().camera().getFocus();
     // horizontal scrolling
     if (Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
       if (e.getEvent().getWheelRotation() < 0) {
-
-        Point2D newFocus = new Point2D.Double(currentFocus.getX() - this.scrollSpeed, currentFocus.getY());
-        Game.world().camera().setFocus(newFocus);
+        Scroll.left();
       } else {
-        Point2D newFocus = new Point2D.Double(currentFocus.getX() + this.scrollSpeed, currentFocus.getY());
-        Game.world().camera().setFocus(newFocus);
+        Scroll.right();
       }
 
       return;
@@ -1044,12 +1036,9 @@ public class MapComponent extends GuiComponent {
     }
 
     if (e.getEvent().getWheelRotation() < 0) {
-      Point2D newFocus = new Point2D.Double(currentFocus.getX(), currentFocus.getY() - this.scrollSpeed);
-      Game.world().camera().setFocus(newFocus);
-
+      Scroll.up();
     } else {
-      Point2D newFocus = new Point2D.Double(currentFocus.getX(), currentFocus.getY() + this.scrollSpeed);
-      Game.world().camera().setFocus(newFocus);
+      Scroll.down();
     }
   }
 
