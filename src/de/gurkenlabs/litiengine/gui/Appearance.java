@@ -21,11 +21,9 @@ public class Appearance {
   private float borderRadius;
   private boolean horizontalBackgroundGradient;
   private boolean transparentBackground;
-  private boolean textAntialiasing;
 
   public Appearance() {
     this.changedConsumer = new CopyOnWriteArrayList<>();
-    this.textAntialiasing = false;
   }
 
   public Appearance(Color foreColor) {
@@ -49,8 +47,7 @@ public class Appearance {
       return false;
     }
     Appearance other = (Appearance) obj;
-    return this.textAntialiasing == other.textAntialiasing
-        && this.transparentBackground == other.transparentBackground
+    return this.transparentBackground == other.transparentBackground
         && this.horizontalBackgroundGradient == other.horizontalBackgroundGradient
         && Float.floatToIntBits(this.borderRadius) == Float.floatToIntBits(other.borderRadius)
         && Objects.equals(this.borderColor, other.borderColor)
@@ -62,7 +59,7 @@ public class Appearance {
 
   @Override
   public int hashCode() {
-    return Objects.hash(this.textAntialiasing, this.transparentBackground, this.horizontalBackgroundGradient, this.borderRadius,
+    return Objects.hash(this.transparentBackground, this.horizontalBackgroundGradient, this.borderRadius,
         this.borderColor, this.borderStyle, this.backgroundColor1, this.backgroundColor2, this.foreColor);
   }
 
@@ -105,10 +102,6 @@ public class Appearance {
 
   public float getBorderRadius() {
     return this.borderRadius;
-  }
-
-  public boolean getTextAntialiasing() {
-    return this.textAntialiasing;
   }
 
   public boolean isHorizontalBackgroundGradient() {
@@ -156,16 +149,6 @@ public class Appearance {
     this.fireOnChangeEvent();
   }
 
-  /**
-   * Sets the {@link RenderingHints#KEY_TEXT_ANTIALIASING} settings for the rendered text.
-   * 
-   * @param antialiasing
-   *          Either {@link RenderingHints#VALUE_TEXT_ANTIALIAS_ON} or {@link RenderingHints#VALUE_TEXT_ANTIALIAS_OFF}
-   */
-  public void setTextAntialiasing(boolean antialiasing) {
-    this.textAntialiasing = antialiasing;
-  }
-
   public void onChange(Consumer<Appearance> cons) {
     this.changedConsumer.add(cons);
   }
@@ -176,7 +159,6 @@ public class Appearance {
     this.setForeColor(updateAppearance.getForeColor());
     this.setHorizontalBackgroundGradient(updateAppearance.isHorizontalBackgroundGradient());
     this.setTransparentBackground(updateAppearance.isTransparentBackground());
-    this.setTextAntialiasing(updateAppearance.getTextAntialiasing());
   }
 
   protected void fireOnChangeEvent() {

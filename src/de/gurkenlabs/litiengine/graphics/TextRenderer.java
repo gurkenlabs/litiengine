@@ -41,7 +41,7 @@ public final class TextRenderer {
    * @param y    the min y coordinate
    */
   public static void render(final Graphics2D g, final String text, final double x, final double y) {
-    render(g, text, x, y, GuiProperties.getDefaultAppearance().getTextAntialiasing());
+    render(g, text, x, y, true);
   }
 
   public static void render(final Graphics2D g, final String text, Point2D location) {
@@ -162,7 +162,7 @@ public final class TextRenderer {
    * @param lineWidth the max line width
    */
   public static void renderWithLinebreaks(final Graphics2D g, final String text, final double x, final double y, final double lineWidth) {
-    renderWithLinebreaks(g, text, x, y, lineWidth, GuiProperties.getDefaultAppearance().getTextAntialiasing());
+    renderWithLinebreaks(g, text, x, y, lineWidth, true);
   }
 
   public static void renderWithLinebreaks(final Graphics2D g, final String text, Point2D location, final double lineWidth) {

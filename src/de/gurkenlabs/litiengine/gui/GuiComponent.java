@@ -1,11 +1,6 @@
 package de.gurkenlabs.litiengine.gui;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics2D;
-import java.awt.Shape;
-import java.awt.Stroke;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -71,9 +66,8 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   private double height;
 
   private Sound hoverSound;
-
+  private boolean textAntialiasing;
   private boolean isHovered;
-
   private boolean isPressed;
   private boolean isSelected;
   private String name;
@@ -321,6 +315,10 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
    */
   public int getTextAngle() {
     return this.textAngle;
+  }
+
+  public boolean hasTextAntialiasing() {
+    return this.textAntialiasing;
   }
 
   /**
@@ -972,6 +970,15 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   }
 
   /**
+   * Sets the {@link RenderingHints#KEY_TEXT_ANTIALIASING} settings for the rendered text.
+   *
+   * @param antialiasing Either {@link RenderingHints#VALUE_TEXT_ANTIALIAS_ON} or {@link RenderingHints#VALUE_TEXT_ANTIALIAS_OFF}
+   */
+  public void setTextAntialiasing(boolean antialiasing) {
+    this.textAntialiasing = antialiasing;
+  }
+
+  /**
    * Sets the horizontal text alignment.
    *
    * @param textAlign the new text align
@@ -1253,29 +1260,22 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
         this.getTextX();
     double yCoord = this.getTextValign() != null ?
         this.getY() + this.getTextValign().getLocation(this.getHeight(), textHeight) : this.getTextY();
-    boolean antialiasing = this.getAppearance().getTextAntialiasing();
-    if (this.isHovered()) {
-      antialiasing = this.getAppearanceHovered().getTextAntialiasing();
-    }
-    if (!this.isEnabled()) {
-      antialiasing = this.getAppearanceDisabled().getTextAntialiasing();
-    }
     if (this.getTextAngle() == 0) {
       if (this.drawTextShadow()) {
         TextRenderer
             .renderWithOutline(g, this.getTextToRender(g), this.getX(), yCoord + fm.getLeading(), this.getWidth(),
                 this.getHeight() + textHeight,
                 this.getTextShadowColor(),
-                this.getTextShadowStroke(), this.getTextAlign(), this.getTextValign(), antialiasing);
+                this.getTextShadowStroke(), this.getTextAlign(), this.getTextValign(), this.hasTextAntialiasing());
       } else {
-        TextRenderer.render(g, this.getTextToRender(g), xCoord, yCoord + textHeight * 3 / 4d, antialiasing);
+        TextRenderer.render(g, this.getTextToRender(g), xCoord, yCoord + textHeight - fm.getLeading() * 2, this.hasTextAntialiasing());
       }
     } else if (this.getTextAngle() == 90) {
       TextRenderer.renderRotated(g, this.getTextToRender(g), xCoord,
-          yCoord - fm.stringWidth(this.getTextToRender(g)), this.getTextAngle(), antialiasing);
+          yCoord - fm.stringWidth(this.getTextToRender(g)), this.getTextAngle(), this.hasTextAntialiasing());
     } else {
       TextRenderer
-          .renderRotated(g, this.getTextToRender(g), xCoord, yCoord, this.getTextAngle(), antialiasing);
+          .renderRotated(g, this.getTextToRender(g), xCoord, yCoord, this.getTextAngle(), this.hasTextAntialiasing());
     }
   }
 }
