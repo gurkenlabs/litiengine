@@ -21,6 +21,7 @@ import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.graphics.ShapeRenderer;
 import de.gurkenlabs.litiengine.graphics.TextRenderer;
@@ -38,6 +39,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
 
   protected static final Font ICON_FONT;
   private static int id = 0;
+
   static {
     final Font icon = Resources.fonts().get("fontello.ttf");
     ICON_FONT = icon != null ? icon.deriveFont(16f) : null;
@@ -78,10 +80,12 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   private boolean suspended;
   private Object tag;
   private String text;
-  private Align textAlignment = Align.CENTER;
+  private Align textAlign = Align.CENTER;
+  private Valign textValign = Valign.MIDDLE;
   private int textAngle = 0;
 
   private Color textShadowColor;
+  private float textShadowStroke = 2f;
   private double textX;
   private double textY;
   private boolean visible;
@@ -93,10 +97,8 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   /**
    * Instantiates a new gui component with the dimension (0,0) at the given location.
    *
-   * @param x
-   *          the x
-   * @param y
-   *          the y
+   * @param x the x
+   * @param y the y
    */
   protected GuiComponent(final double x, final double y) {
     this(x, y, 0, 0);
@@ -105,14 +107,10 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   /**
    * Instantiates a new gui component at the point (x,y) with the dimension (width,height).
    *
-   * @param x
-   *          the x
-   * @param y
-   *          the y
-   * @param width
-   *          the width
-   * @param height
-   *          the height
+   * @param x      the x
+   * @param y      the y
+   * @param width  the width
+   * @param height the height
    */
   protected GuiComponent(final double x, final double y, final double width, final double height) {
     this.components = new CopyOnWriteArrayList<>();
@@ -304,7 +302,16 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
    * @return the horizontal text alignment
    */
   public Align getTextAlign() {
-    return this.textAlignment;
+    return this.textAlign;
+  }
+
+  /**
+   * Gets the vertical text alignment.
+   *
+   * @return the vertical text alignment
+   */
+  public Valign getTextValign() {
+    return this.textValign;
   }
 
   /**
@@ -326,11 +333,19 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   }
 
   /**
+   * Gets the text shadow thickness.
+   *
+   * @return the float value determining how thick the outline will be rendered.
+   */
+  public float getTextShadowStroke() {
+    return this.textShadowStroke;
+  }
+
+  /**
    * Gets only the non-cropped bits of Text visible on this GuiComponent.m
    * To retrieve only the entire text associated with this GuiComponent, use {@code GuiComponent.getText()}.
    *
-   * @param g
-   *          The graphics object to render on.
+   * @param g The graphics object to render on.
    * @return the text to render
    */
   public String getTextToRender(final Graphics2D g) {
@@ -341,7 +356,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     String newText = this.getText();
 
     while (newText.length() > 1 && fm.stringWidth(newText) >= this.getWidth() - this.getHorizontalTextMargin()) {
-      newText = newText.substring(1, newText.length());
+      newText = newText.substring(1);
     }
     return newText;
 
@@ -418,7 +433,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   }
 
   /**
-   * Checks if the cursor bounding box intersects with this GuiCOmponent's bounding box.
+   * Checks if the cursor bounding box intersects with this GuiComponent's bounding box.
    *
    * @return true, if the GuiComponent is hovered
    */
@@ -569,8 +584,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   /**
    * Add a callback that is being executed if this GuiComponent is clicked once.
    *
-   * @param callback
-   *          the callback
+   * @param callback the callback
    */
   public void onClicked(final Consumer<ComponentMouseEvent> callback) {
     if (!this.getClickConsumer().contains(callback)) {
@@ -581,8 +595,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   /**
    * Add a callback that is being executed if this GuiComponent is hovered with the mouse.
    *
-   * @param callback
-   *          the callback
+   * @param callback the callback
    */
   public void onHovered(final Consumer<ComponentMouseEvent> callback) {
     if (!this.getHoverConsumer().contains(callback)) {
@@ -593,8 +606,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   /**
    * Add a callback that is being executed if the mouse is pressed and moving around while within the bounds of this GuiComponent.
    *
-   * @param callback
-   *          the callback
+   * @param callback the callback
    */
   public void onMouseDragged(final Consumer<ComponentMouseEvent> callback) {
     if (!this.getMouseDraggedConsumer().contains(callback)) {
@@ -605,8 +617,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   /**
    * Add a callback that is being executed if the mouse enters the bounds of this GuiComponent.
    *
-   * @param callback
-   *          the callback
+   * @param callback the callback
    */
   public void onMouseEnter(final Consumer<ComponentMouseEvent> callback) {
     if (!this.getMouseEnterConsumer().contains(callback)) {
@@ -617,8 +628,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   /**
    * Add a callback that is being executed if the mouse leaves the bounds of this GuiComponent.
    *
-   * @param callback
-   *          the callback
+   * @param callback the callback
    */
   public void onMouseLeave(final Consumer<ComponentMouseEvent> callback) {
     if (!this.getMouseLeaveConsumer().contains(callback)) {
@@ -629,8 +639,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   /**
    * Add a callback that is being executed if the mouse is moving around while within the bounds of this GuiComponent.
    *
-   * @param callback
-   *          the callback
+   * @param callback the callback
    */
   public void onMouseMoved(final Consumer<ComponentMouseEvent> callback) {
     if (!this.getMouseMovedConsumer().contains(callback)) {
@@ -641,8 +650,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   /**
    * Add a callback that is being executed if the mouse is continually pressed while within the bounds of this GuiComponent.
    *
-   * @param callback
-   *          the callback
+   * @param callback the callback
    */
   public void onMousePressed(final Consumer<ComponentMouseEvent> callback) {
     if (!this.getMousePressedConsumer().contains(callback)) {
@@ -653,8 +661,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   /**
    * Add a callback that is being executed if the mouse button is released while within the bounds of this GuiComponent.
    *
-   * @param callback
-   *          the callback
+   * @param callback the callback
    */
   public void onMouseReleased(final Consumer<ComponentMouseEvent> callback) {
     if (!this.getMouseReleasedConsumer().contains(callback)) {
@@ -665,8 +672,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   /**
    * Add a callback that is being executed if the mouse wheel is scrolled while within the bounds of this GuiComponent.
    *
-   * @param callback
-   *          the callback
+   * @param callback the callback
    */
   public void onMouseWheelScrolled(final Consumer<ComponentMouseWheelEvent> callback) {
     if (!this.getMouseWheelConsumer().contains(callback)) {
@@ -677,8 +683,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   /**
    * Add a callback that is being executed if the text on this GuiComponent changes.
    *
-   * @param cons
-   *          the cons
+   * @param cons the cons
    */
   public void onTextChanged(final Consumer<String> cons) {
     this.textChangedConsumer.add(cons);
@@ -687,7 +692,6 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   /**
    * Prepare the GuiComponent and all its child Components (Makes the GuiComponent visible and adds mouse listeners.).
    * This is, for example, done right before switching to a new screen.
-   *
    */
   public void prepare() {
     this.suspended = false;
@@ -809,14 +813,14 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     if (radius == 0f) {
       return this.getBoundingBox();
     }
-    return new RoundRectangle2D.Double(this.getX(), this.getY(), this.getWidth(), this.getHeight(), this.getCurrentAppearance().getBorderRadius(), this.getCurrentAppearance().getBorderRadius());
+    return new RoundRectangle2D.Double(this.getX(), this.getY(), this.getWidth(), this.getHeight(), this.getCurrentAppearance().getBorderRadius(),
+        this.getCurrentAppearance().getBorderRadius());
   }
 
   /**
    * Setter for the automatic adjustment of text position when the component is resized
-   * 
-   * @param autoAdjustTextPosition
-   *          if {@code true}, adjust the text position automatically when the component is resized
+   *
+   * @param autoAdjustTextPosition if {@code true}, adjust the text position automatically when the component is resized
    */
   public void setAutoAdjustTextPosition(boolean autoAdjustTextPosition) {
     this.autoAdjustTextPosition = autoAdjustTextPosition;
@@ -825,10 +829,8 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   /**
    * Sets the width and height of this GuiComponent.
    *
-   * @param width
-   *          the width
-   * @param height
-   *          the height
+   * @param width  the width
+   * @param height the height
    */
   public void setDimension(final double width, final double height) {
     this.width = width;
@@ -838,8 +840,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   /**
    * Sets the "enabled" property on this GuiComponent and its child components.
    *
-   * @param enabled
-   *          the new enabled property
+   * @param enabled the new enabled property
    */
   public void setEnabled(final boolean enabled) {
     this.enabled = enabled;
@@ -851,8 +852,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   /**
    * Sets the font for this GuiComponent's text.
    *
-   * @param font
-   *          the new font
+   * @param font the new font
    */
   public void setFont(final Font font) {
     this.font = font;
@@ -861,8 +861,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   /**
    * Sets the font size for this GuiComponent's text.
    *
-   * @param size
-   *          the new font size
+   * @param size the new font size
    */
   public void setFontSize(final float size) {
     this.font = this.font.deriveFont(size);
@@ -871,8 +870,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   /**
    * Enable or disable forwarding mouse events by this GuiComponent.
    *
-   * @param forwardMouseEvents
-   *          the new forward mouse events
+   * @param forwardMouseEvents the new forward mouse events
    */
   public void setForwardMouseEvents(final boolean forwardMouseEvents) {
     this.forwardMouseEvents = forwardMouseEvents;
@@ -881,8 +879,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   /**
    * Sets the GuiComponent's height.
    *
-   * @param height
-   *          the new height
+   * @param height the new height
    */
   public void setHeight(final double height) {
     this.height = height;
@@ -891,8 +888,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   /**
    * Sets the margin size between the GuiComponent's left and right border and the Text bounds.
    *
-   * @param xMargin
-   *          the new text X margin
+   * @param xMargin the new text X margin
    */
   public void setHorizontalTextMargin(final double xMargin) {
     this.xMargin = xMargin;
@@ -901,8 +897,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   /**
    * Sets the "enabled" property on this GuiComponent.
    *
-   * @param hovered
-   *          the new hovered
+   * @param hovered the new hovered
    */
   public void setHovered(final boolean hovered) {
     this.isHovered = hovered;
@@ -911,8 +906,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   /**
    * Sets the hover sound.
    *
-   * @param hoverSound
-   *          the new hover sound
+   * @param hoverSound the new hover sound
    */
   public void setHoverSound(final Sound hoverSound) {
     this.hoverSound = hoverSound;
@@ -921,10 +915,8 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   /**
    * Sets this GuiComponent's location.
    *
-   * @param x
-   *          the new x coordinate
-   * @param y
-   *          the new y coordinate
+   * @param x the new x coordinate
+   * @param y the new y coordinate
    */
   public void setLocation(final double x, final double y) {
     this.setX(x);
@@ -934,8 +926,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   /**
    * Sets this GuiComponent's location.
    *
-   * @param location
-   *          the new location
+   * @param location the new location
    */
   public void setLocation(final Point2D location) {
     this.setLocation(location.getX(), location.getY());
@@ -944,8 +935,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   /**
    * Sets this GuiComponent's name.
    *
-   * @param name
-   *          the new name
+   * @param name the new name
    */
   public void setName(final String name) {
     this.name = name;
@@ -954,8 +944,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   /**
    * Sets the "selected" property on this GuiComponent.
    *
-   * @param bool
-   *          the new selected
+   * @param bool the new selected
    */
   public void setSelected(final boolean bool) {
     this.isSelected = bool;
@@ -964,8 +953,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   /**
    * Sets the tag.
    *
-   * @param tag
-   *          the new tag
+   * @param tag the new tag
    */
   public void setTag(final Object tag) {
     this.tag = tag;
@@ -974,32 +962,37 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   /**
    * Sets the text.
    *
-   * @param text
-   *          the new text
+   * @param text the new text
    */
   public void setText(final String text) {
     this.text = text;
     for (final Consumer<String> cons : this.textChangedConsumer) {
       cons.accept(this.getText());
     }
-    this.setTextX(0);
   }
 
   /**
    * Sets the horizontal text alignment.
    *
-   * @param textAlignment
-   *          the new text align
+   * @param textAlign the new text align
    */
-  public void setTextAlign(final Align textAlignment) {
-    this.textAlignment = textAlignment;
+  public void setTextAlign(final Align textAlign) {
+    this.textAlign = textAlign;
+  }
+
+  /**
+   * Sets the vertical text alignment.
+   *
+   * @param textValign the new text align
+   */
+  public void setTextValign(final Valign textValign) {
+    this.textValign = textValign;
   }
 
   /**
    * Sets the text angle in degrees.
    *
-   * @param textAngle
-   *          the new text angle in degrees
+   * @param textAngle the new text angle in degrees
    */
   public void setTextAngle(final int textAngle) {
     this.textAngle = textAngle;
@@ -1008,8 +1001,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   /**
    * Enable or disable the shadow being drawn below the text
    *
-   * @param drawTextShadow
-   *          the boolean determining if a text shadow should be drawn
+   * @param drawTextShadow the boolean determining if a text shadow should be drawn
    */
   public void setTextShadow(final boolean drawTextShadow) {
     this.drawTextShadow = drawTextShadow;
@@ -1021,18 +1013,25 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   /**
    * Sets the text shadow color.
    *
-   * @param textShadowColor
-   *          the new text shadow color
+   * @param textShadowColor the new text shadow color
    */
   public void setTextShadowColor(final Color textShadowColor) {
     this.textShadowColor = textShadowColor;
   }
 
   /**
+   * Sets the text shadow thickness.
+   *
+   * @param textShadowStroke the thickness of the outline.
+   */
+  public void setTextShadowStroke(final float textShadowStroke) {
+    this.textShadowStroke = textShadowStroke;
+  }
+
+  /**
    * Sets the text X coordinate.
    *
-   * @param x
-   *          the new text X
+   * @param x the new text X
    */
   public void setTextX(final double x) {
     this.textX = x;
@@ -1041,8 +1040,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   /**
    * Sets the text Y coordinate.
    *
-   * @param y
-   *          the new text Y
+   * @param y the new text Y
    */
   public void setTextY(final double y) {
     this.textY = y;
@@ -1051,8 +1049,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   /**
    * Sets the "visible" property on this GuiComponent.
    *
-   * @param visible
-   *          the new visible
+   * @param visible the new visible
    */
   public void setVisible(final boolean visible) {
     this.visible = visible;
@@ -1064,8 +1061,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   /**
    * Sets the GuiComponent's width.
    *
-   * @param width
-   *          the new width
+   * @param width the new width
    */
   public void setWidth(final double width) {
     this.width = width;
@@ -1074,8 +1070,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   /**
    * Sets the GuiComponent's x coordinate.
    *
-   * @param x
-   *          the new x coordinate
+   * @param x the new x coordinate
    */
   public void setX(final double x) {
     final double delta = x - this.x;
@@ -1089,8 +1084,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   /**
    * Sets the GuiComponent's y coordinate.
    *
-   * @param y
-   *          the new y coordinate
+   * @param y the new y coordinate
    */
   public void setY(final double y) {
     final double delta = y - this.y;
@@ -1102,7 +1096,6 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
 
   /**
    * Suspend the GuiComponent and all its child Components (Makes the GuiComponent invisible and removes mouse listeners.).
-   *
    */
   public void suspend() {
     Input.mouse().removeMouseListener(this);
@@ -1232,19 +1225,18 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   /**
    * Check if a Mouse event should be forwarded.
    *
-   * @param e
-   *          the mouse event
+   * @param e the mouse event
    * @return true, if the Mouse event should be forwarded
    */
   protected boolean mouseEventShouldBeForwarded(final MouseEvent e) {
-    return this.isForwardMouseEvents() && this.isVisible() && this.isEnabled() && !this.isSuspended() && e != null && this.getBoundingBox().contains(e.getPoint());
+    return this.isForwardMouseEvents() && this.isVisible() && this.isEnabled() && !this.isSuspended() && e != null && this.getBoundingBox()
+        .contains(e.getPoint());
   }
 
   /**
    * Render this GuiComponent's text.
    *
-   * @param g
-   *          the {@code Graphics2D} object used for drawing
+   * @param g the {@code Graphics2D} object used for drawing
    */
   private void renderText(final Graphics2D g) {
     if (this.getText() == null || this.getText().isEmpty()) {
@@ -1253,28 +1245,14 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
 
     final FontMetrics fm = g.getFontMetrics();
 
-    double defaultTextX;
-    final double defaultTextY = fm.getAscent() + (this.getHeight() - (fm.getAscent() + fm.getDescent())) / 2;
-    switch (this.getTextAlign()) {
-    case LEFT:
-      defaultTextX = this.getHorizontalTextMargin();
-      break;
-    case RIGHT:
-      defaultTextX = this.getWidth() - this.getHorizontalTextMargin() - fm.stringWidth(this.getTextToRender(g));
-      break;
-    case CENTER:
-    default:
-      defaultTextX = this.getWidth() / 2 - fm.stringWidth(this.getTextToRender(g)) / 2.0;
-      break;
-    }
-    if (this.getTextY() == 0 || this.autoAdjustTextPosition) {
-      this.setTextY(defaultTextY);
-    }
+    double textWidth = fm.stringWidth(this.getTextToRender(g));
+    double textHeight = fm.getAscent() + fm.getDescent();
 
-    if (this.getTextX() == 0 || this.autoAdjustTextPosition) {
-      this.setTextX(defaultTextX);
-    }
-
+    double xCoord = this.getTextAlign() != null ?
+        this.getX() + this.getTextAlign().getLocation(this.getWidth(), textWidth) :
+        this.getTextX();
+    double yCoord = this.getTextValign() != null ?
+        this.getY() + this.getTextValign().getLocation(this.getHeight(), textHeight) : this.getTextY();
     boolean antialiasing = this.getAppearance().getTextAntialiasing();
     if (this.isHovered()) {
       antialiasing = this.getAppearanceHovered().getTextAntialiasing();
@@ -1282,17 +1260,22 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     if (!this.isEnabled()) {
       antialiasing = this.getAppearanceDisabled().getTextAntialiasing();
     }
-
     if (this.getTextAngle() == 0) {
       if (this.drawTextShadow()) {
-        TextRenderer.renderWithOutline(g, this.getTextToRender(g), this.getX() + this.getTextX(), this.getY() + this.getTextY(), this.getTextShadowColor(), antialiasing);
+        TextRenderer
+            .renderWithOutline(g, this.getTextToRender(g), this.getX(), yCoord + fm.getLeading(), this.getWidth(),
+                this.getHeight() + textHeight,
+                this.getTextShadowColor(),
+                this.getTextShadowStroke(), this.getTextAlign(), this.getTextValign(), antialiasing);
       } else {
-        TextRenderer.render(g, this.getTextToRender(g), this.getX() + this.getTextX(), this.getY() + this.getTextY(), antialiasing);
+        TextRenderer.render(g, this.getTextToRender(g), xCoord, yCoord + textHeight * 3 / 4d, antialiasing);
       }
     } else if (this.getTextAngle() == 90) {
-      TextRenderer.renderRotated(g, this.getTextToRender(g), this.getX() + this.getTextX(), this.getY() + this.getTextY() - fm.stringWidth(this.getTextToRender(g)), this.getTextAngle(), antialiasing);
+      TextRenderer.renderRotated(g, this.getTextToRender(g), xCoord,
+          yCoord - fm.stringWidth(this.getTextToRender(g)), this.getTextAngle(), antialiasing);
     } else {
-      TextRenderer.renderRotated(g, this.getTextToRender(g), this.getX() + this.getTextX(), this.getY() + this.getTextY(), this.getTextAngle(), antialiasing);
+      TextRenderer
+          .renderRotated(g, this.getTextToRender(g), xCoord, yCoord, this.getTextAngle(), antialiasing);
     }
   }
 }
