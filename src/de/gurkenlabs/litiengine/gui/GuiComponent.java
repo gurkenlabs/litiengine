@@ -59,7 +59,6 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   private final Appearance disabledAppearance;
 
   private boolean drawTextShadow = false;
-  private boolean autoAdjustTextPosition = true;
   private boolean enabled;
   private Font font;
   private boolean forwardMouseEvents = true;
@@ -76,6 +75,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   private String text;
   private Align textAlign = Align.CENTER;
   private Valign textValign = Valign.MIDDLE;
+  private boolean automaticLineBreaks;
   private int textAngle = 0;
 
   private Color textShadowColor;
@@ -85,7 +85,6 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   private boolean visible;
   private double width;
   private double x;
-  private double xMargin;
   private double y;
 
   /**
@@ -146,8 +145,6 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
 
     this.setLocation(x, y);
     this.setDimension(width, height);
-
-    this.setHorizontalTextMargin(this.getWidth() / 16);
     this.setFont(GuiProperties.getDefaultFont());
     this.setSelected(false);
     this.setEnabled(true);
@@ -236,15 +233,6 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   }
 
   /**
-   * Gets the margin size between the GuiComponent's left and right border and the Text bounds.
-   *
-   * @return the horizontal text margin
-   */
-  public double getHorizontalTextMargin() {
-    return this.xMargin;
-  }
-
-  /**
    * Gets the sound that is played when hovering the GuiComponent.
    *
    * @return the hover sound
@@ -321,6 +309,10 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     return this.textAntialiasing;
   }
 
+  public boolean hasAutomaticLineBreaks() {
+    return this.automaticLineBreaks;
+  }
+
   /**
    * Gets the text shadow color.
    *
@@ -349,11 +341,13 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   public String getTextToRender(final Graphics2D g) {
     if (this.getText() == null) {
       return "";
+    } else if (this.hasAutomaticLineBreaks()) {
+      return this.getText();
     }
     final FontMetrics fm = g.getFontMetrics();
     String newText = this.getText();
 
-    while (newText.length() > 1 && fm.stringWidth(newText) >= this.getWidth() - this.getHorizontalTextMargin()) {
+    while (newText.length() > 1 && fm.stringWidth(newText) >= this.getWidth()) {
       newText = newText.substring(1);
     }
     return newText;
@@ -421,13 +415,6 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
    */
   public boolean isForwardMouseEvents() {
     return this.forwardMouseEvents;
-  }
-
-  /**
-   * Checks if the text position is automatically adjusted when the component is resized
-   */
-  public boolean isAutoAdjustingTextPosition() {
-    return this.autoAdjustTextPosition;
   }
 
   /**
@@ -816,15 +803,6 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   }
 
   /**
-   * Setter for the automatic adjustment of text position when the component is resized
-   *
-   * @param autoAdjustTextPosition if {@code true}, adjust the text position automatically when the component is resized
-   */
-  public void setAutoAdjustTextPosition(boolean autoAdjustTextPosition) {
-    this.autoAdjustTextPosition = autoAdjustTextPosition;
-  }
-
-  /**
    * Sets the width and height of this GuiComponent.
    *
    * @param width  the width
@@ -881,15 +859,6 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
    */
   public void setHeight(final double height) {
     this.height = height;
-  }
-
-  /**
-   * Sets the margin size between the GuiComponent's left and right border and the Text bounds.
-   *
-   * @param xMargin the new text X margin
-   */
-  public void setHorizontalTextMargin(final double xMargin) {
-    this.xMargin = xMargin;
   }
 
   /**
@@ -976,6 +945,10 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
    */
   public void setTextAntialiasing(boolean antialiasing) {
     this.textAntialiasing = antialiasing;
+  }
+
+  public void setAutomaticLineBreaks(boolean automaticLineBreaks) {
+    this.automaticLineBreaks = automaticLineBreaks;
   }
 
   /**
@@ -1268,7 +1241,9 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
                 this.getTextShadowColor(),
                 this.getTextShadowStroke(), this.getTextAlign(), this.getTextValign(), this.hasTextAntialiasing());
       } else {
-        TextRenderer.render(g, this.getTextToRender(g), xCoord, yCoord + textHeight - fm.getLeading() * 2, this.hasTextAntialiasing());
+        TextRenderer
+            .renderWithLinebreaks(g, this.getTextToRender(g), this.getTextAlign(), this.getTextValign(), this.getX(), this.getY(), this.getWidth(),
+                this.getHeight(), this.hasTextAntialiasing());
       }
     } else if (this.getTextAngle() == 90) {
       TextRenderer.renderRotated(g, this.getTextToRender(g), xCoord,
