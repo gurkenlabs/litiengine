@@ -13,7 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 public class LogHandler extends java.util.logging.Handler {
-    final JTextPane textPane;
+    private final JTextPane textPane;
 
     public LogHandler(final JTextPane textPane) {
         this.textPane = textPane;
