@@ -27,9 +27,9 @@ public class ImageComponent extends GuiComponent {
 
   private Spritesheet spritesheet;
 
-  private ImageScaleMode imageScaleMode;
-  private Align imageAlign;
-  private Valign imageValign;
+  private ImageScaleMode imageScaleMode = ImageScaleMode.NORMAL;
+  private Align imageAlign = Align.CENTER;
+  private Valign imageValign = Valign.MIDDLE;
 
   public ImageComponent(final double x, final double y, final Image image) {
     super(x, y, image.getWidth(null), image.getHeight(null));
@@ -54,7 +54,8 @@ public class ImageComponent extends GuiComponent {
     this.setImage(image);
   }
 
-  public ImageComponent(final double x, final double y, final double width, final double height, final Spritesheet spritesheet, final String text, final Image image) {
+  public ImageComponent(final double x, final double y, final double width, final double height, final Spritesheet spritesheet, final String text,
+      final Image image) {
     this(x, y, width, height, text);
     this.spritesheet = spritesheet;
     this.setImageAlign(Align.LEFT);
@@ -69,7 +70,9 @@ public class ImageComponent extends GuiComponent {
       return null;
     }
 
-    final String cacheKey = this.getSpritesheet().getName().hashCode() + "_" + this.isHovered() + "_" + this.isPressed() + "_" + this.isEnabled() + "_" + this.getWidth() + "x" + this.getHeight();
+    final String cacheKey =
+        this.getSpritesheet().getName().hashCode() + "_" + this.isHovered() + "_" + this.isPressed() + "_" + this.isEnabled() + "_" + this.getWidth()
+            + "x" + this.getHeight();
     Optional<BufferedImage> opt = Resources.images().tryGet(cacheKey);
     if (opt.isPresent()) {
       return opt.get();
