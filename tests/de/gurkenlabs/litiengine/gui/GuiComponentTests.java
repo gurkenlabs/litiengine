@@ -13,7 +13,9 @@ import javax.swing.SwingUtilities;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+@ExtendWith(SwingTestSuite.class)
 public class GuiComponentTests {
 
   @BeforeEach

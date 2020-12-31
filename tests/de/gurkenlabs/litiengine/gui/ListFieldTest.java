@@ -9,9 +9,11 @@ import javax.swing.SwingUtilities;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import de.gurkenlabs.litiengine.Game;
 
+@ExtendWith(SwingTestSuite.class)
 class ListFieldTest {
 
   private final String[] content_1D = new String[] {
