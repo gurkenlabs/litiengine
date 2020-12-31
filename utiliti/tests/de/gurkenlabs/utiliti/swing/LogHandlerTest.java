@@ -1,6 +1,10 @@
 package de.gurkenlabs.utiliti.swing;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import de.gurkenlabs.litiengine.gui.SwingTestSuite;
 
 import javax.swing.*;
 import javax.swing.text.*;
@@ -10,8 +14,14 @@ import java.util.logging.LogRecord;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(SwingTestSuite.class)
 public class LogHandlerTest {
 
+    @BeforeEach
+    public void assertOnSwingThread() {
+      assertTrue(SwingUtilities.isEventDispatchThread());
+    }
+  
     @Test
     public void publish() {
         JTextPane textPane = new JTextPane();
