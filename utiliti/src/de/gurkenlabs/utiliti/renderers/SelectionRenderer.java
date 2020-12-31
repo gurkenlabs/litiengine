@@ -63,11 +63,8 @@ public class SelectionRenderer implements IEditorRenderer {
       return;
     }
 
-    Font previousFont = g.getFont();
+    Font previousFont = Style.FONT_BOLD;
     Font idFont = previousFont.deriveFont(Math.max(8f, (float) (10 * Math.sqrt(Game.world().camera().getRenderScale()))) * Editor.preferences().getUiScale());
-    if (Zoom.get() > 1) {
-      idFont = idFont.deriveFont(Font.BOLD);
-    }
 
     Point2D loc = Game.world().camera().getViewportLocation(new Point2D.Double(mapObject.getX() + mapObject.getWidth() / 2, mapObject.getY()));
     g.setColor(Style.COLOR_STATUS);
@@ -76,13 +73,8 @@ public class SelectionRenderer implements IEditorRenderer {
     String id = Integer.toString(mapObject.getId());
 
     double x = loc.getX() * Game.world().camera().getRenderScale() - g.getFontMetrics().stringWidth(id) / 2.0;
-    double y = loc.getY() * Game.world().camera().getRenderScale() - (g.getFontMetrics().getHeight() * .30);
-
-    if (Zoom.get() < 1) {
-      TextRenderer.render(g, id, x, y);
-    } else {
-      TextRenderer.renderWithOutline(g, id, x, y, Style.COLOR_DARKBORDER, 5, true);
-    }
+    double y = loc.getY() * Game.world().camera().getRenderScale() - (g.getFontMetrics().getHeight());
+    TextRenderer.render(g, id, x, y, true);
 
     g.setFont(previousFont);
   }
