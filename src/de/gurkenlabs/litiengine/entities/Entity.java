@@ -57,7 +57,6 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
 
   private double height;
 
-  @TmxProperty(name = MapObjectProperty.TAGS)
   private final List<String> tags = new CopyOnWriteArrayList<>();
 
   @TmxProperty(name = MapObjectProperty.RENDERWITHLAYER)
