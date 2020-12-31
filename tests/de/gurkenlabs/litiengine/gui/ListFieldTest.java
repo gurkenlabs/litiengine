@@ -5,6 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import javax.swing.SwingUtilities;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.litiengine.Game;
@@ -20,6 +23,11 @@ class ListFieldTest {
       { "P", "Q", "R", "S", "T", "U", "V" },
       { "W", "X", "Y", "Z" }
   };
+  
+  @BeforeEach
+  public void assertOnSwingThread() {
+    assertTrue(SwingUtilities.isEventDispatchThread());
+  }
 
   @Test
   void testInitialization() {
