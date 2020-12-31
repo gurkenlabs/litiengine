@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxType;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.DecimalFloatAdapter;
@@ -34,6 +35,11 @@ public final class MapObjectSerializer {
     }
 
     serialize(entity.getClass(), entity, obj);
+
+    if (!entity.getTags().isEmpty()) {
+      obj.setValue(MapObjectProperty.TAGS, ArrayUtilities.join(entity.getTags()));
+    }
+
     return obj;
   }
 
