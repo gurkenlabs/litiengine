@@ -310,10 +310,10 @@ public final class TextRenderer {
 
     // create a glyph vector from your text
     GlyphVector glyphVector = g.getFont().createGlyphVector(g.getFontRenderContext(), text);
-    Rectangle2D bounds = getBounds(g, text);
+    Rectangle2D bounds = glyphVector.getVisualBounds();
     // get the shape object
     AffineTransform at = new AffineTransform();
-    at.translate(x + align.getLocation(width, bounds.getWidth()), y + valign.getLocation(height, bounds.getHeight()));
+    at.translate(x + align.getLocation(width, bounds.getWidth()), y + valign.getLocation(height, bounds.getHeight()) + bounds.getHeight());
     Shape textShape = at.createTransformedShape(glyphVector.getOutline());
 
     // activate anti aliasing for text rendering (if you want it to look nice)
@@ -321,7 +321,6 @@ public final class TextRenderer {
     if (antiAliasing) {
       enableTextAntiAliasing(g);
     }
-
     g.setColor(outlineColor);
     g.setStroke(outlineStroke);
     g.draw(textShape); // draw outline

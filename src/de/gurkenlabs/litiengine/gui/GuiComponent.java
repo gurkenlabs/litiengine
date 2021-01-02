@@ -1236,10 +1236,9 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     if (this.getTextAngle() == 0) {
       if (this.drawTextShadow()) {
         TextRenderer
-            .renderWithOutline(g, this.getTextToRender(g), this.getX(), yCoord + fm.getLeading(), this.getWidth(),
-                this.getHeight() + textHeight,
-                this.getTextShadowColor(),
-                this.getTextShadowStroke(), this.getTextAlign(), this.getTextValign(), this.hasTextAntialiasing());
+            .renderWithOutline(g, this.getTextToRender(g), this.getX(),  this.getY(), this.getWidth(), this.getHeight(),
+                this.getTextShadowColor(), this.getTextShadowStroke(), this.getTextAlign(), this.getTextValign(),
+                this.hasTextAntialiasing());
       } else {
         TextRenderer
             .renderWithLinebreaks(g, this.getTextToRender(g), this.getTextAlign(), this.getTextValign(), this.getX(), this.getY(), this.getWidth(),
