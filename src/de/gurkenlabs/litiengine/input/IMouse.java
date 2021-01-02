@@ -256,6 +256,26 @@ public interface IMouse {
   public boolean isRightButtonPressed();
 
   /**
+   * Returns true if the mouse event specifies the left mouse button.
+   *
+   * @param event
+   *         The MouseEvent object
+   *
+   * @return true if the left mouse button was active.
+   */
+  public boolean isLeftButton(MouseEvent event);
+
+  /**
+   * Returns true if the mouse event specifies the right mouse button.
+   *
+   * @param event
+   *         The MouseEvent object
+   *
+   * @return true if the right mouse button was active.
+   */
+  public boolean isRightButton(MouseEvent event);
+
+  /**
    * If set to true, the mouse will be locked to the render component of the game.
    * 
    * <p>

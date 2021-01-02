@@ -128,6 +128,16 @@ public final class Mouse implements MouseListener, MouseMotionListener, MouseWhe
   }
 
   @Override
+  public boolean isLeftButton(MouseEvent event) {
+    return SwingUtilities.isLeftMouseButton(event);
+  }
+
+  @Override
+  public boolean isRightButton(MouseEvent event) {
+    return SwingUtilities.isRightMouseButton(event);
+  }
+
+  @Override
   public void mouseClicked(final MouseEvent e) {
     this.updateLocation(e);
     final MouseEvent wrappedEvent = this.createEvent(e);
