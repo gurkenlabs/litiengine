@@ -1,5 +1,7 @@
 package de.gurkenlabs.litiengine.util;
 
+import de.gurkenlabs.litiengine.entities.Material;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -245,6 +247,8 @@ public final class ReflectionUtilities {
         return setValue(cls, instance, fieldName, value.split(","));
       } else if (field.getType() instanceof Class && field.getType().isEnum()) {
         return setEnumPropertyValue(cls, instance, field, fieldName, value);
+      } else if (field.getType().equals(Material.class)) {
+        return setValue(cls, instance, fieldName, Material.get(value));
       }
       // TODO: implement support for Attribute and RangeAttribute fields
     } catch (final NumberFormatException e) {
