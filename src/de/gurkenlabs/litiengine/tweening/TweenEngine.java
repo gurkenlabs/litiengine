@@ -107,6 +107,19 @@ public class TweenEngine implements IUpdateable, ILaunchable {
   }
 
   /**
+   * Looks for a registered Tween instance with the given target and type. Attempts to remove the Tween from the TweenEngine.
+   *
+   * @param target the {@code Tweenable} target object
+   * @param type   the {@code TweenType} determining which values of the target object will be modified.
+   */
+  public void remove(final Tweenable target, final TweenType type) {
+    final Tween tween = this.getTween(target, type);
+    if (tween != null) {
+      this.getTweens().get(target).remove(type);
+    }
+  }
+
+  /**
    * Looks for a registered Tween instance with the given target and type. Attempts to stop the Tween.
    *
    * @param target the {@code Tweenable} target object
