@@ -42,6 +42,11 @@ public class LightSourcePanel extends PropertyPanel {
     setLayout(this.createLayout());
     this.setupChangedListeners();
   }
+  @Override
+  public void bind(IMapObject mapObject) {
+    super.bind(mapObject);
+    this.updateLighting();
+  }
 
   @Override
   protected void clearControls() {
@@ -74,19 +79,32 @@ public class LightSourcePanel extends PropertyPanel {
       }
     }));
     this.setup(this.spinnerIntensity, MapObjectProperty.LIGHT_INTENSITY);
-    this.spinnerIntensity.addChangeListener(m -> Game.world().environment().updateLighting(getDataSource().getBoundingBox()));
+    this.spinnerIntensity.addChangeListener(m -> this.updateLighting());
 
     this.setup(this.comboBoxLightShape, MapObjectProperty.LIGHT_SHAPE);
-    this.comboBoxLightShape.addActionListener(m -> Game.world().environment().updateLighting(getDataSource().getBoundingBox()));
+    this.comboBoxLightShape.addActionListener(m -> this.updateLighting());
 
     this.setup(this.checkBoxIsActive, MapObjectProperty.LIGHT_ACTIVE);
-    this.checkBoxIsActive.addActionListener(m -> Game.world().environment().updateLighting(getDataSource().getBoundingBox()));
+    this.checkBoxIsActive.addActionListener(m -> this.updateLighting());
 
     this.setup(this.offsetX, MapObjectProperty.LIGHT_FOCUSOFFSETX);
-    this.offsetX.addChangeListener(m -> Game.world().environment().updateLighting(getDataSource().getBoundingBox()));
+    this.offsetX.addChangeListener(m -> this.updateLighting());
 
     this.setup(this.offsetY, MapObjectProperty.LIGHT_FOCUSOFFSETY);
-    this.offsetY.addChangeListener(m -> Game.world().environment().updateLighting(getDataSource().getBoundingBox()));
+    this.offsetY.addChangeListener(m -> this.updateLighting());
+  }
+
+  private void updateLighting() {
+    if (this.isFocussing) {
+      return;
+    }
+
+    final IMapObject datasource = getDataSource();
+    if (datasource == null) {
+      return;
+    }
+
+    Game.world().environment().updateLighting(getDataSource().getBoundingBox());
   }
 
   private LayoutManager createLayout() {
