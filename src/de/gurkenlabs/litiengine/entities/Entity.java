@@ -188,7 +188,7 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
 
   @Override
   public IEntityAnimationController<?> animations() {
-    return this.getController(IEntityAnimationController.class);
+    return this.controllers.getAnimationController();
   }
 
   @Override

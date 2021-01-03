@@ -1,5 +1,7 @@
 package de.gurkenlabs.litiengine.entities;
 
+import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
+
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -10,14 +12,22 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class EntityControllers {
   private Map<Class<? extends IEntityController>, IEntityController> controllers;
+  private IEntityAnimationController animationController;
 
   EntityControllers() {
     this.controllers = new ConcurrentHashMap<>();
   }
 
+  public IEntityAnimationController getAnimationController() {
+    if (this.animationController == null) {
+      this.animationController = this.getController(IEntityAnimationController.class);
+    }
+
+    return this.animationController;
+  }
+
   @SuppressWarnings("unchecked")
   public <T extends IEntityController> T getController(Class<T> clss) {
-
     T explicitController = this.getExplicitController(clss);
     if (explicitController != null) {
       return explicitController;
@@ -39,6 +49,7 @@ public final class EntityControllers {
       IEntityController controller = this.controllers.get(typeKey.get());
       controller.detach();
       this.controllers.remove(typeKey.get());
+      this.animationController = null;
     }
   }
 
@@ -48,11 +59,14 @@ public final class EntityControllers {
     if (controller.getEntity().isLoaded()) {
       controller.attach();
     }
+
+    this.animationController = null;
   }
 
   public <T extends IEntityController> void setController(Class<T> clss, T controller) {
     this.clearControllers(clss);
     this.addController(controller);
+    this.animationController = null;
   }
 
   public void detachAll() {
