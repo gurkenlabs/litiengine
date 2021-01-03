@@ -972,8 +972,10 @@ public class MapComponent extends GuiComponent {
       return;
     }
 
-    this.beforeArrowKeyPressed();
-    Transform.moveEntities(this.getSelectedMapObjects(), x, y);
+    SwingUtilities.invokeLater(() -> {
+      this.beforeArrowKeyPressed();
+      Transform.moveEntities(this.getSelectedMapObjects(), x, y);
+    });
   }
 
   private void beforeArrowKeyPressed() {
