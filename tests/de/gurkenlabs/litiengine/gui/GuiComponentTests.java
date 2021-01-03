@@ -9,11 +9,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.awt.event.MouseEvent;
 
 import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+@ExtendWith(SwingTestSuite.class)
 public class GuiComponentTests {
 
+  @BeforeEach
+  public void assertOnSwingThread() {
+    assertTrue(SwingUtilities.isEventDispatchThread());
+  }
+  
   @Test
   public void testInitializaion() {
     TestComponent component = new TestComponent(10, 20, 100, 50);

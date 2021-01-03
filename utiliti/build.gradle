@@ -38,10 +38,11 @@ dependencies {
   implementation 'com.formdev:svgSalamander:1.1.2.1'
   implementation 'com.fifesoft:rsyntaxtextarea:3.1.1'
 
-  testImplementation 'org.junit.jupiter:junit-jupiter-api:5.4.+'
-  testImplementation 'org.junit.jupiter:junit-jupiter-params:5.4.+'
-  testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.4.+'
-  testImplementation 'org.mockito:mockito-core:2.25.+'
+  testImplementation project(':').sourceSets.test.output //needed for swing tests
+  testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
+  testImplementation 'org.junit.jupiter:junit-jupiter-params:5.6.0'
+  testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.0'
+  testImplementation 'org.mockito:mockito-core:3.3.3'
 }
 
 test {
