@@ -4,21 +4,27 @@ import java.util.concurrent.TimeUnit;
 
 public final class TimeUtilities {
   public enum TimerFormat {
-    UNDEFINED, HH_MM_SS, MM_SS_000, MM_SS_0, HH_MM_SS_000, DD_HH_MM;
+    UNDEFINED(null),
+    HH_MM_SS("%02d:%02d:%02d"),
+    MM_SS_000("%02d:%02d.%03d"),
+    MM_SS_0("%02d:%02d.%01d"),
+    SS_000("%02d.%03d"),
+    SS_00("%02d.%02d"),
+    SS_0("%02d.%01d"),
+    S_000("%01d.%03d"),
+    S_00("%01d.%02d"),
+    S_0("%01d.%01d"),
+    HH_MM_SS_000("%02d:%02d:%02d.%03d"),
+    HH_MM_SS_0("%02d:%02d:%02d.%01d");
 
-    public String toFormatString() {
-      switch (this) {
-      case HH_MM_SS:
-        return "%02d:%02d:%02d";
-      case HH_MM_SS_000:
-        return "%02d:%02d:%02d.%03d";
-      case MM_SS_000:
-        return "%02d:%02d.%03d";
-      case MM_SS_0:
-        return "%02d:%02d.%01d";
-      default:
-        return null;
-      }
+    private final String formatString;
+
+    TimerFormat(String formatString){
+      this.formatString = formatString;
+    }
+
+    public String getFormatString() {
+      return formatString;
     }
   }
 
@@ -73,17 +79,28 @@ public final class TimeUtilities {
     long ms = getRemainingMilliSeconds(duration);
 
     switch (format) {
-    case HH_MM_SS:
-      return String.format(format.toFormatString(), h, m, s);
-    case HH_MM_SS_000:
-      return String.format(format.toFormatString(), h, m, s, ms);
-    case MM_SS_000:
-      return String.format(format.toFormatString(), m, s, ms);
-    case MM_SS_0:
-      return String.format(format.toFormatString(), m, s, ms / 100);
-    case UNDEFINED:
-    default:
-      return Long.toString(ms);
+      case HH_MM_SS:
+        return String.format(format.getFormatString(), h, m, s);
+      case HH_MM_SS_000:
+        return String.format(format.getFormatString(), h, m, s, ms);
+      case HH_MM_SS_0:
+        return String.format(format.getFormatString(), h, m, s, ms / 100);
+      case MM_SS_000:
+        return String.format(format.getFormatString(), m, s, ms);
+      case MM_SS_0:
+        return String.format(format.getFormatString(), m, s, ms / 100);
+      case SS_000:
+      case S_000:
+        return String.format(format.getFormatString(), s, ms);
+      case SS_00:
+      case S_00:
+        return String.format(format.getFormatString(), s, ms / 10);
+      case SS_0:
+      case S_0:
+        return String.format(format.getFormatString(), s, ms / 100);
+      case UNDEFINED:
+      default:
+        return Long.toString(ms);
     }
   }
 }
