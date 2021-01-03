@@ -993,13 +993,15 @@ public class MapComponent extends GuiComponent {
 
   private void afterArrowKeysReleased() {
     if (this.isMovingWithKeyboard) {
-      for (IMapObject selected : this.getSelectedMapObjects()) {
-        UndoManager.instance().mapObjectChanged(selected);
-      }
+      SwingUtilities.invokeLater(() -> {
+        for (IMapObject selected : this.getSelectedMapObjects()) {
+          UndoManager.instance().mapObjectChanged(selected);
+        }
 
-      UndoManager.instance().endOperation();
-      this.isMovingWithKeyboard = false;
-      Transform.resetDragging();
+        UndoManager.instance().endOperation();
+        this.isMovingWithKeyboard = false;
+        Transform.resetDragging();
+      });
     }
   }
 
