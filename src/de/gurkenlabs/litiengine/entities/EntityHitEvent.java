@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.entities;
 
 import java.util.EventObject;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.abilities.Ability;
 
 public class EntityHitEvent extends EventObject {
@@ -12,6 +13,7 @@ public class EntityHitEvent extends EventObject {
   private final transient ICombatEntity executor;
   private final transient ICombatEntity hitEntity;
   private final transient Ability ability;
+  private final long time;
 
   EntityHitEvent(final ICombatEntity hitEntity, final Ability ability, final int damage, final boolean kill) {
     super(hitEntity);
@@ -20,6 +22,7 @@ public class EntityHitEvent extends EventObject {
     this.ability = ability;
     this.damage = damage;
     this.kill = kill;
+    this.time = Game.time().now();
   }
 
   public int getDamage() {
@@ -41,4 +44,6 @@ public class EntityHitEvent extends EventObject {
   public Ability getAbility() {
     return this.ability;
   }
+
+  public long getTime() { return time; }
 }
