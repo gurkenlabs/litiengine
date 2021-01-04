@@ -19,13 +19,13 @@ public interface IEntity{
 
   public void onMessage(String message, EntityMessageListener listener);
 
-  public void removeMessageListener(EntityMessageListener listener);
-
   public void addTransformListener(EntityTransformListener listener);
 
-  public void removeTransformListener(EntityTransformListener listener);
-
   public void addListener(EntityListener listener);
+
+  public void removeListener(EntityMessageListener listener);
+
+  public void removeListener(EntityTransformListener listener);
 
   public void removeListener(EntityListener listener);
 
@@ -43,7 +43,7 @@ public interface IEntity{
    * @param listener
    *          The listener to remove.
    */
-  public void removeEntityRenderedListener(final EntityRenderedListener listener);
+  public void removeListener(final EntityRenderedListener listener);
 
   /**
    * Adds the specified entity render listener to receive events and callbacks about the rendering process of entities.
@@ -59,7 +59,7 @@ public interface IEntity{
    * @param listener
    *          The listener to remove.
    */
-  public void removeEntityRenderListener(final EntityRenderListener listener);
+  public void removeListener(final EntityRenderListener listener);
 
   public double getAngle();
 

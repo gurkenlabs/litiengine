@@ -22,10 +22,12 @@ import de.gurkenlabs.litiengine.tweening.TweenType;
 public class CombatEntity extends CollisionEntity implements ICombatEntity {
   public static final int DEFAULT_HITPOINTS = 100;
 
-  private final List<Effect> appliedEffects;
   private final Collection<CombatEntityListener> listeners;
   private final Collection<CombatEntityDeathListener> deathListeners;
+  private final Collection<CombatEntityResurrectListener> resurrectListeners;
   private final Collection<CombatEntityHitListener> hitListeners;
+
+  private final List<Effect> appliedEffects;
   private final RangeAttribute<Integer> hitPoints;
 
   @TmxProperty(name = MapObjectProperty.COMBAT_INDESTRUCTIBLE)
@@ -47,6 +49,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
     super();
     this.listeners = ConcurrentHashMap.newKeySet();
     this.deathListeners = ConcurrentHashMap.newKeySet();
+    this.resurrectListeners = ConcurrentHashMap.newKeySet();
     this.hitListeners = ConcurrentHashMap.newKeySet();
     this.appliedEffects = new CopyOnWriteArrayList<>();
 
@@ -78,19 +81,21 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   }
 
   @Override
-  public void removeHitListener(CombatEntityHitListener listener) {
+  public void onDeath(CombatEntityDeathListener listener) { this.deathListeners.add(listener); }
+
+  @Override
+  public void onResurrect(CombatEntityResurrectListener listener) { this.resurrectListeners.add(listener); }
+
+  @Override
+  public void removeListener(CombatEntityHitListener listener) {
     this.hitListeners.remove(listener);
   }
 
   @Override
-  public void onDeath(CombatEntityDeathListener listener) {
-    this.deathListeners.add(listener);
-  }
+  public void removeListener(CombatEntityDeathListener listener) { this.deathListeners.remove(listener); }
 
   @Override
-  public void removeDeathListener(CombatEntityDeathListener listener) {
-    this.deathListeners.remove(listener);
-  }
+  public void removeListener(CombatEntityResurrectListener listener) { this.resurrectListeners.remove(listener); }
 
   @Override
   public void die() {
@@ -142,21 +147,21 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   @Override
   public float[] getTweenValues(TweenType tweenType) {
     switch (tweenType) {
-    case HITPOINTS:
-      return new float[] { (float) this.getHitPoints().get() };
-    default:
-      return super.getTweenValues(tweenType);
+      case HITPOINTS:
+        return new float[]{(float) this.getHitPoints().get()};
+      default:
+        return super.getTweenValues(tweenType);
     }
   }
 
   @Override
   public void setTweenValues(TweenType tweenType, float[] newValues) {
     switch (tweenType) {
-    case HITPOINTS:
-      this.getHitPoints().setBaseValue(Math.round(newValues[0]));
-      break;
-    default:
-      super.setTweenValues(tweenType, newValues);
+      case HITPOINTS:
+        this.getHitPoints().setBaseValue(Math.round(newValues[0]));
+        break;
+      default:
+        super.setTweenValues(tweenType, newValues);
     }
   }
 
@@ -175,20 +180,29 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
       this.getHitPoints().modifyBaseValue(new AttributeModifier<>(Modification.SUBTRACT, damage));
     }
 
+    final EntityHitEvent event = new EntityHitEvent(this, ability, damage, this.isDead());
+
+    for(final CombatEntityListener listener : this.listeners){
+      listener.hit(event);
+    }
+
+    for (final CombatEntityHitListener listener : this.hitListeners) {
+      listener.hit(event);
+    }
+
     if (this.isDead()) {
       this.fireDeathEvent();
       this.setCollision(false);
-    }
-
-    final EntityHitEvent event = new EntityHitEvent(this, ability, damage, this.isDead());
-    for (final CombatEntityHitListener listener : this.hitListeners) {
-      listener.hit(event);
     }
 
     this.lastHit = Game.time().now();
   }
 
   private void fireDeathEvent() {
+    for(final CombatEntityListener listener : this.listeners){
+      listener.death(this);
+    }
+
     for (final CombatEntityDeathListener listener : this.deathListeners) {
       listener.death(this);
     }
@@ -208,7 +222,8 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
    * Checks if is friendly.
    *
    * @param entity
-   *          the entity
+   *         the entity
+   *
    * @return true, if is friendly
    */
   @Override
@@ -246,6 +261,10 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
       listener.resurrect(this);
     }
 
+    for (final CombatEntityResurrectListener listener : this.resurrectListeners) {
+      listener.resurrect(this);
+    }
+
     this.setCollision(true);
   }
 
@@ -263,7 +282,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
    * Sets the team.
    *
    * @param team
-   *          the new team
+   *         the new team
    */
   @Override
   public void setTeam(final int team) {

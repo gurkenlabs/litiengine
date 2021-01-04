@@ -107,7 +107,7 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
   }
 
   @Override
-  public void removeTransformListener(EntityTransformListener listener) {
+  public void removeListener(EntityTransformListener listener) {
     this.transformListeners.remove(listener);
   }
 
@@ -127,7 +127,7 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
   }
 
   @Override
-  public void removeEntityRenderedListener(final EntityRenderedListener listener) {
+  public void removeListener(final EntityRenderedListener listener) {
     this.renderedListeners.remove(listener);
   }
 
@@ -137,7 +137,7 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
   }
 
   @Override
-  public void removeEntityRenderListener(final EntityRenderListener listener) {
+  public void removeListener(final EntityRenderListener listener) {
     this.renderListeners.remove(listener);
   }
 
@@ -156,7 +156,7 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
   }
 
   @Override
-  public void removeMessageListener(EntityMessageListener listener) {
+  public void removeListener(EntityMessageListener listener) {
     for (Collection<EntityMessageListener> listenerType : this.messageListeners.values()) {
       if (listenerType == null || listenerType.isEmpty()) {
         continue;

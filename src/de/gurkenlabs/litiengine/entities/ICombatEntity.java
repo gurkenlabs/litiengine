@@ -14,11 +14,15 @@ public interface ICombatEntity extends ICollisionEntity {
 
   public void onHit(CombatEntityHitListener listener);
 
-  public void removeHitListener(CombatEntityHitListener listener);
+  public void removeListener(CombatEntityHitListener listener);
 
   public void onDeath(CombatEntityDeathListener listener);
 
-  public void removeDeathListener(CombatEntityDeathListener listener);
+  public void removeListener(CombatEntityDeathListener listener);
+
+  public void onResurrect(CombatEntityResurrectListener listener);
+
+  public void removeListener(CombatEntityResurrectListener listener);
 
   public void die();
 

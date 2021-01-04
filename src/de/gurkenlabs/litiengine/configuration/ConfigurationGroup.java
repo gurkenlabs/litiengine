@@ -56,7 +56,7 @@ public abstract class ConfigurationGroup {
     this.listeners.add(listener);
   }
 
-  public void removeChangedListener(ConfigurationChangedListener listener) {
+  public void removeListener(ConfigurationChangedListener listener) {
     this.listeners.remove(listener);
   }
 

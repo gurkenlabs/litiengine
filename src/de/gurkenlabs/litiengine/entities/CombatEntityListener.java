@@ -9,13 +9,5 @@ import java.util.EventListener;
  * @see ICombatEntity#resurrect()
  * @see ICombatEntity#hit(int)
  */
-public interface CombatEntityListener extends CombatEntityHitListener, CombatEntityDeathListener, EventListener {
-
-  /**
-   * This method is called whenever a {@code ICombatEntity} was resurrected.
-   * 
-   * @param entity
-   *          The combat entity that was resurrected.
-   */
-  public void resurrect(ICombatEntity entity);
+public interface CombatEntityListener extends CombatEntityHitListener, CombatEntityDeathListener, CombatEntityResurrectListener, EventListener {
 }

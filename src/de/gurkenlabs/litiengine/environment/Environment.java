@@ -259,7 +259,7 @@ public final class Environment implements IRenderable {
    * @param listener
    *          The listener to remove.
    */
-  public void removeRenderListener(EnvironmentRenderedListener listener) {
+  public void removeListener(EnvironmentRenderedListener listener) {
     for (Collection<EnvironmentRenderedListener> rends : this.renderListeners.values()) {
       rends.remove(listener);
     }
