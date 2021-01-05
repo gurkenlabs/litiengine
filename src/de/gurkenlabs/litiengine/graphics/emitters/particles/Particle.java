@@ -55,7 +55,7 @@ public abstract class Particle implements ITimeToLive {
   /** The current location of the particle on the Y-axis. */
   private float y;
 
-  private RenderType customRenderType;
+  private RenderType customRenderType = RenderType.NONE;
   private boolean useCustomRenderType;
 
   private boolean fade;
@@ -77,7 +77,6 @@ public abstract class Particle implements ITimeToLive {
    *          the particle height in pixels
    */
   public Particle(final float width, final float height) {
-    this.setCustomRenderType(RenderType.NONE);
     this.setWidth(width);
     this.setHeight(height);
     this.collisionType = Collision.NONE;
