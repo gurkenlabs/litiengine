@@ -1,8 +1,11 @@
 package de.gurkenlabs.litiengine.graphics.emitters.particles;
 
+import de.gurkenlabs.litiengine.graphics.TextRenderer;
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -12,7 +15,7 @@ public class TextParticle extends Particle {
   private final String text;
 
   public TextParticle(final String text) {
-    super(0, 0);
+    super(1, 1);
     this.text = text;
   }
 
@@ -41,9 +44,17 @@ public class TextParticle extends Particle {
     final Point2D renderLocation = this.getRenderLocation(emitterOrigin);
     final AffineTransform rotate = AffineTransform.getRotateInstance(Math.toRadians(this.getAngle()), this.getWidth() * 0.5, this.getHeight() * 0.5);
     g.setFont(g.getFont().deriveFont(rotate));
-    g.setColor(this.getColor());
+
+    RenderingHints originalHints = g.getRenderingHints();
+    g.setColor(new Color(this.getColor().getRed() / 255f, this.getColor().getGreen() / 255f, this.getColor().getBlue() / 255f, this.getOpacity()));
+
+    if (this.isAntiAliased()) {
+      TextRenderer.enableTextAntiAliasing(g);
+    }
+
     g.drawString(text, (float) renderLocation.getX(), (float) renderLocation.getY());
     g.setFont(oldFont);
+    g.setRenderingHints(originalHints);
   }
 
   public void setFont(final Font font) {
