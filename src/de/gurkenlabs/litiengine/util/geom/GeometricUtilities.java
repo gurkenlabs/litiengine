@@ -24,13 +24,13 @@ public class GeometricUtilities {
     throw new UnsupportedOperationException();
   }
 
-  public static float calcRotationAngleInDegrees(final double centerX, final double centerY, final double targetX, final double targetY) {
+  public static double calcRotationAngleInDegrees(final double centerX, final double centerY, final double targetX, final double targetY) {
     // calculate the angle theta from the deltaY and deltaX values
     // (atan2 returns radians values from [-PI,PI])
     // 0 currently points EAST.
     // NOTE: By preserving Y and X param order to atan2, we are expecting
     // a CLOCKWISE angle direction.
-    final double theta = Math.atan2((float) (targetY - centerY), (float) (targetX - centerX));
+    final double theta = Math.atan2((targetY - centerY), (targetX - centerX));
 
     // convert from radians to degrees
     // this will give you an angle from [0->270],[-180,0]
@@ -47,7 +47,7 @@ public class GeometricUtilities {
       angle += 360;
     }
 
-    return (float) (360 - angle) % 360;
+    return (360 - angle) % 360;
   }
 
   /**
@@ -65,7 +65,7 @@ public class GeometricUtilities {
    *          Point we want to calcuate the angle to.
    * @return angle in degrees. This is the angle from centerPt to targetPt.
    */
-  public static float calcRotationAngleInDegrees(final Point2D centerPt, final Point2D targetPt) {
+  public static double calcRotationAngleInDegrees(final Point2D centerPt, final Point2D targetPt) {
     return calcRotationAngleInDegrees(centerPt.getX(), centerPt.getY(), targetPt.getX(), targetPt.getY());
   }
 
