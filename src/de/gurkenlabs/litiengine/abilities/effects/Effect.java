@@ -265,15 +265,15 @@ public abstract class Effect implements IUpdateable {
     return entity != null;
   }
 
-  private boolean canAttackEntity(ICombatEntity entity) {
+  protected boolean canAttackEntity(ICombatEntity entity) {
     return !entity.equals(this.getAbility().getExecutor()) && !entity.isFriendly(this.getAbility().getExecutor()) && !entity.isDead();
   }
 
-  private boolean isAliveFriendlyEntity(ICombatEntity entity) {
+  protected boolean isAliveFriendlyEntity(ICombatEntity entity) {
     return !entity.equals(this.getAbility().getExecutor()) && entity.isFriendly(this.getAbility().getExecutor()) && !entity.isDead();
   }
 
-  private boolean isDeadFriendlyEntity(ICombatEntity entity) {
+  protected boolean isDeadFriendlyEntity(ICombatEntity entity) {
     return !entity.equals(this.getAbility().getExecutor()) && entity.isFriendly(this.getAbility().getExecutor()) && entity.isDead();
   }
 
