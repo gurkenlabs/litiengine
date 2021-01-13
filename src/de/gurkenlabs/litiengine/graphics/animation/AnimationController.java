@@ -110,6 +110,11 @@ public class AnimationController implements IAnimationController {
       return;
     }
 
+    // the first animation that is added to the controller is defined as default animation
+    if (this.defaultAnimation == null) {
+      this.defaultAnimation = animation;
+    }
+
     this.animations.put(animation.getName(), animation);
   }
 
