@@ -302,7 +302,7 @@ public class Animation implements IUpdateable, ILaunchable {
       return;
     }
 
-    this.currentFrame = this.firstFrame;
+    this.restart();
   }
 
   /**
@@ -310,6 +310,7 @@ public class Animation implements IUpdateable, ILaunchable {
    */
   public void restart() {
     this.currentFrame = this.firstFrame;
+    this.lastFrameUpdate = Game.loop().getTicks();
   }
 
   @Override
