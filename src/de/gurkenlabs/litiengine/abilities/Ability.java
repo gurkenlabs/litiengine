@@ -206,9 +206,7 @@ public abstract class Ability implements IRenderable {
     this.currentExecution = ae;
   }
 
-  protected List<Effect> getEffects() {
-    return this.effects;
-  }
+  public List<Effect> getEffects() { return this.effects; }
 
   protected Shape internalCalculateImpactArea(final double angle) {
     final int impact = this.getAttributes().impact().get();
