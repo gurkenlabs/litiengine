@@ -756,6 +756,8 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
       return new float[] { (float) this.getWidth(), (float) this.getHeight() };
     case ANGLE:
       return new float[] { (float) this.getTextAngle() };
+    case FONTSIZE:
+      return new float[] { this.getFont().getSize2D() };
     default:
       return Tweenable.super.getTweenValues(tweenType);
     }
@@ -787,6 +789,8 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     case ANGLE:
       this.setTextAngle(Math.round(newValues[0]));
       break;
+    case FONTSIZE:
+      this.setFontSize(newValues[0]);
     default:
       Tweenable.super.setTweenValues(tweenType, newValues);
       break;
@@ -840,6 +844,9 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
    * @param size the new font size
    */
   public void setFontSize(final float size) {
+    if (this.font == null) {
+      return;
+    }
     this.font = this.font.deriveFont(size);
   }
 
@@ -1236,7 +1243,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     if (this.getTextAngle() == 0) {
       if (this.drawTextShadow()) {
         TextRenderer
-            .renderWithOutline(g, this.getTextToRender(g), this.getX(),  this.getY(), this.getWidth(), this.getHeight(),
+            .renderWithOutline(g, this.getTextToRender(g), this.getX(), this.getY(), this.getWidth(), this.getHeight(),
                 this.getTextShadowColor(), this.getTextShadowStroke(), this.getTextAlign(), this.getTextValign(),
                 this.hasTextAntialiasing());
       } else {
