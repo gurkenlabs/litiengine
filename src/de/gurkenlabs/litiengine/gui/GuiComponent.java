@@ -791,6 +791,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
       break;
     case FONTSIZE:
       this.setFontSize(newValues[0]);
+      break;
     default:
       Tweenable.super.setTweenValues(tweenType, newValues);
       break;
