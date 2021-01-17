@@ -586,7 +586,7 @@ public class EnvironmentTests {
     assertThrows(UnsupportedOperationException.class, () -> this.testEnvironment.getMobileEntities().add(null));
     assertThrows(UnsupportedOperationException.class, () -> this.testEnvironment.getProps().add(null));
     assertThrows(UnsupportedOperationException.class, () -> this.testEnvironment.getCreatures().add(null));
-    assertThrows(UnsupportedOperationException.class, () -> this.testEnvironment.getSpawnPoints().add(null));
+    assertThrows(UnsupportedOperationException.class, () -> this.testEnvironment.getSpawnpoints().add(null));
     assertThrows(UnsupportedOperationException.class, () -> this.testEnvironment.getStaticShadows().add(null));
     assertThrows(UnsupportedOperationException.class, () -> this.testEnvironment.getTriggers().add(null));
 

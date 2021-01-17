@@ -1620,7 +1620,7 @@ public final class Environment implements IRenderable {
    * @see #remove(IEntity)
    * @see #removeAll(Iterable)
    */
-  public Collection<Spawnpoint> getSpawnPoints() {
+  public Collection<Spawnpoint> getSpawnpoints() {
     return Collections.unmodifiableCollection(this.spawnPoints);
   }
 
@@ -1635,15 +1635,15 @@ public final class Environment implements IRenderable {
    *
    * @return An immutable collection with all {@link Spawnpoint} entities with the specified tag.
    *
-   * @see #getSpawnPoints()
+   * @see #getSpawnpoints()
    * @see #add(IEntity)
    * @see #addAll(Iterable)
    * @see #remove(IEntity)
    * @see #removeAll(Iterable)
    */
-  public Collection<Spawnpoint> getSpawnPoints(String tag) {
+  public Collection<Spawnpoint> getSpawnpoints(String tag) {
     if(tag == null || tag.isEmpty()) {
-      return this.getSpawnPoints();
+      return this.getSpawnpoints();
     }
 
     return Collections.unmodifiableCollection(this.spawnPoints.stream().filter(p -> p.hasTag(tag)).collect(Collectors.toList()));
@@ -1658,7 +1658,7 @@ public final class Environment implements IRenderable {
    * @return The {@link Spawnpoint} with the specified map ID or null if no entity is found.
    * 
    * @see #getSpawnpoint(String)
-   * @see #getSpawnPoints()
+   * @see #getSpawnpoints()
    */
   public Spawnpoint getSpawnpoint(final int mapId) {
     return getById(this.spawnPoints, mapId);
@@ -1673,7 +1673,7 @@ public final class Environment implements IRenderable {
    * @return The {@link Spawnpoint} with the specified name or null if no entity is found.
    * 
    * @see #getSpawnpoint(int)
-   * @see #getSpawnPoints()
+   * @see #getSpawnpoints()
    */
   public Spawnpoint getSpawnpoint(final String name) {
     return getByName(this.spawnPoints, name);
@@ -1731,7 +1731,7 @@ public final class Environment implements IRenderable {
    * @return The {@link SoundSource} with the specified map ID or null if no entity is found.
    * 
    * @see #getSpawnpoint(String)
-   * @see #getSpawnPoints()
+   * @see #getSpawnpoints()
    */
   public SoundSource getSoundSource(final int mapId) {
     return getById(this.soundSources, mapId);
@@ -1746,7 +1746,7 @@ public final class Environment implements IRenderable {
    * @return The {@link SoundSource} with the specified name or null if no entity is found.
    * 
    * @see #getSpawnpoint(int)
-   * @see #getSpawnPoints()
+   * @see #getSpawnpoints()
    */
   public SoundSource getSoundSource(final String name) {
     return getByName(this.soundSources, name);
