@@ -805,6 +805,31 @@ public final class Environment implements IRenderable {
   }
 
   /**
+   * Gets an immutable collection containing all {@link MapArea} entities with the specified tag.
+   *
+   * <p>
+   * To add or remove entities, use the corresponding methods on this environment.
+   * </p>
+   *
+   * @param tag The tag that the {@link MapArea} entities have to provide to be returned.
+   *
+   * @return An immutable collection with all {@link MapArea} entities with the specified tag.
+   *
+   * @see #getAreas()
+   * @see #add(IEntity)
+   * @see #addAll(Iterable)
+   * @see #remove(IEntity)
+   * @see #removeAll(Iterable)
+   */
+  public Collection<MapArea> getAreas(String tag) {
+    if(tag == null || tag.isEmpty()) {
+      return this.getAreas();
+    }
+
+    return Collections.unmodifiableCollection(this.mapAreas.stream().filter(p -> p.hasTag(tag)).collect(Collectors.toList()));
+  }
+
+  /**
    * Gets the {@link MapArea} with the specified map ID from this environment.
    * 
    * @param mapId
@@ -850,6 +875,31 @@ public final class Environment implements IRenderable {
    */
   public Collection<Emitter> getEmitters() {
     return Collections.unmodifiableCollection(this.emitters);
+  }
+
+  /**
+   * Gets an immutable collection containing all {@link Emitter} entities with the specified tag.
+   *
+   * <p>
+   * To add or remove entities, use the corresponding methods on this environment.
+   * </p>
+   *
+   * @param tag The tag that the {@link Emitter} entities have to provide to be returned.
+   *
+   * @return An immutable collection with all {@link Emitter} entities with the specified tag.
+   *
+   * @see #getEmitters()
+   * @see #add(IEntity)
+   * @see #addAll(Iterable)
+   * @see #remove(IEntity)
+   * @see #removeAll(Iterable)
+   */
+  public Collection<Emitter> getEmitters(String tag) {
+    if(tag == null || tag.isEmpty()) {
+      return this.getEmitters();
+    }
+
+    return Collections.unmodifiableCollection(this.emitters.stream().filter(p -> p.hasTag(tag)).collect(Collectors.toList()));
   }
 
   /**
@@ -901,6 +951,31 @@ public final class Environment implements IRenderable {
   }
 
   /**
+   * Gets an immutable collection containing all {@link CollisionBox} entities with the specified tag.
+   *
+   * <p>
+   * To add or remove entities, use the corresponding methods on this environment.
+   * </p>
+   *
+   * @param tag The tag that the {@link CollisionBox} entities have to provide to be returned.
+   *
+   * @return An immutable collection with all {@link CollisionBox} entities with the specified tag.
+   *
+   * @see #getCollisionBoxes()
+   * @see #add(IEntity)
+   * @see #addAll(Iterable)
+   * @see #remove(IEntity)
+   * @see #removeAll(Iterable)
+   */
+  public Collection<CollisionBox> getCollisionBoxes(String tag) {
+    if(tag == null || tag.isEmpty()) {
+      return this.getCollisionBoxes();
+    }
+
+    return Collections.unmodifiableCollection(this.colliders.stream().filter(p -> p.hasTag(tag)).collect(Collectors.toList()));
+  }
+
+  /**
    * Gets the {@link CollisionBox} with the specified map ID from this environment.
    * 
    * @param mapId
@@ -946,6 +1021,31 @@ public final class Environment implements IRenderable {
    */
   public Collection<ICombatEntity> getCombatEntities() {
     return Collections.unmodifiableCollection(this.combatEntities.values());
+  }
+
+  /**
+   * Gets an immutable collection containing all {@link ICombatEntity} entities with the specified tag.
+   *
+   * <p>
+   * To add or remove entities, use the corresponding methods on this environment.
+   * </p>
+   *
+   * @param tag The tag that the {@link ICombatEntity} entities have to provide to be returned.
+   *
+   * @return An immutable collection with all {@link ICombatEntity} entities with the specified tag.
+   *
+   * @see #getMobileEntities()
+   * @see #add(IEntity)
+   * @see #addAll(Iterable)
+   * @see #remove(IEntity)
+   * @see #removeAll(Iterable)
+   */
+  public Collection<ICombatEntity> getCombatEntities(String tag) {
+    if(tag == null || tag.isEmpty()) {
+      return this.getCombatEntities();
+    }
+
+    return Collections.unmodifiableCollection(this.combatEntities.values().stream().filter(p -> p.hasTag(tag)).collect(Collectors.toList()));
   }
 
   /**
@@ -1010,6 +1110,29 @@ public final class Environment implements IRenderable {
     Collection<T> foundEntities = new ArrayList<>();
     for (IEntity ent : this.allEntities.values()) {
       if (cls.isInstance(ent)) {
+        foundEntities.add(cls.cast(ent));
+      }
+    }
+
+    return foundEntities;
+  }
+
+  /**
+   * Gets all entities of the specified type on this environment.
+   *
+   * @param <T>
+   *          The type of the entity.
+   * @param cls
+   *          The class instance defining the type of the entity.
+   * @param tag
+   *          A tag that decides whether the defined entity should be included in the result.
+   *
+   * @return All entities of the specified type.
+   */
+  public <T> Collection<T> getEntities(Class<? extends T> cls, String tag) {
+    Collection<T> foundEntities = new ArrayList<>();
+    for (IEntity ent : this.allEntities.values()) {
+      if (cls.isInstance(ent) && ent.hasTag(tag)) {
         foundEntities.add(cls.cast(ent));
       }
     }
@@ -1163,6 +1286,31 @@ public final class Environment implements IRenderable {
   }
 
   /**
+   * Gets an immutable collection containing all {@link LightSource} entities with the specified tag.
+   *
+   * <p>
+   * To add or remove entities, use the corresponding methods on this environment.
+   * </p>
+   *
+   * @param tag The tag that the {@link LightSource} entities have to provide to be returned.
+   *
+   * @return An immutable collection with all {@link LightSource} entities with the specified tag.
+   *
+   * @see #getLightSources()
+   * @see #add(IEntity)
+   * @see #addAll(Iterable)
+   * @see #remove(IEntity)
+   * @see #removeAll(Iterable)
+   */
+  public Collection<LightSource> getLightSources(String tag) {
+    if(tag == null || tag.isEmpty()) {
+      return this.getLightSources();
+    }
+
+    return Collections.unmodifiableCollection(this.lightSources.stream().filter(p -> p.hasTag(tag)).collect(Collectors.toList()));
+  }
+
+  /**
    * Gets the {@link LightSource} with the specified map ID from this environment.
    * 
    * @param mapId
@@ -1226,6 +1374,31 @@ public final class Environment implements IRenderable {
    */
   public Collection<IMobileEntity> getMobileEntities() {
     return Collections.unmodifiableCollection(this.mobileEntities.values());
+  }
+
+  /**
+   * Gets an immutable collection containing all {@link IMobileEntity} entities with the specified tag.
+   *
+   * <p>
+   * To add or remove entities, use the corresponding methods on this environment.
+   * </p>
+   *
+   * @param tag The tag that the {@link IMobileEntity} entities have to provide to be returned.
+   *
+   * @return An immutable collection with all {@link IMobileEntity} entities with the specified tag.
+   *
+   * @see #getMobileEntities()
+   * @see #add(IEntity)
+   * @see #addAll(Iterable)
+   * @see #remove(IEntity)
+   * @see #removeAll(Iterable)
+   */
+  public Collection<IMobileEntity> getMobileEntities(String tag) {
+    if(tag == null || tag.isEmpty()) {
+      return this.getMobileEntities();
+    }
+
+    return Collections.unmodifiableCollection(this.mobileEntities.values().stream().filter(p -> p.hasTag(tag)).collect(Collectors.toList()));
   }
 
   /**
@@ -1306,6 +1479,31 @@ public final class Environment implements IRenderable {
   }
 
   /**
+   * Gets an immutable collection containing all {@link Prop} entities with the specified tag.
+   *
+   * <p>
+   * To add or remove entities, use the corresponding methods on this environment.
+   * </p>
+   *
+   * @param tag The tag that the {@link Prop} entities have to provide to be returned.
+   *
+   * @return An immutable collection with all {@link Prop} entities with the specified tag.
+   *
+   * @see #getProps()
+   * @see #add(IEntity)
+   * @see #addAll(Iterable)
+   * @see #remove(IEntity)
+   * @see #removeAll(Iterable)
+   */
+  public Collection<Prop> getProps(String tag) {
+    if(tag == null || tag.isEmpty()) {
+      return this.getProps();
+    }
+
+    return Collections.unmodifiableCollection(this.props.stream().filter(p -> p.hasTag(tag)).collect(Collectors.toList()));
+  }
+
+  /**
    * Gets the {@link Prop} with the specified map ID from this environment.
    * 
    * @param mapId
@@ -1351,6 +1549,31 @@ public final class Environment implements IRenderable {
    */
   public Collection<Creature> getCreatures() {
     return Collections.unmodifiableCollection(this.creatures);
+  }
+
+  /**
+   * Gets an immutable collection containing all {@link Creature} entities with the specified tag.
+   *
+   * <p>
+   * To add or remove entities, use the corresponding methods on this environment.
+   * </p>
+   *
+   * @param tag The tag that the {@link Creature} entities have to provide to be returned.
+   *
+   * @return An immutable collection with all {@link Creature} entities with the specified tag.
+   *
+   * @see #getCreatures()
+   * @see #add(IEntity)
+   * @see #addAll(Iterable)
+   * @see #remove(IEntity)
+   * @see #removeAll(Iterable)
+   */
+  public Collection<Creature> getCreatures(String tag) {
+    if(tag == null || tag.isEmpty()) {
+      return this.getCreatures();
+    }
+
+    return Collections.unmodifiableCollection(this.creatures.stream().filter(p -> p.hasTag(tag)).collect(Collectors.toList()));
   }
 
   /**
@@ -1402,6 +1625,31 @@ public final class Environment implements IRenderable {
   }
 
   /**
+   * Gets an immutable collection containing all {@link Spawnpoint} entities with the specified tag.
+   *
+   * <p>
+   * To add or remove entities, use the corresponding methods on this environment.
+   * </p>
+   *
+   * @param tag The tag that the {@link Spawnpoint} entities have to provide to be returned.
+   *
+   * @return An immutable collection with all {@link Spawnpoint} entities with the specified tag.
+   *
+   * @see #getSpawnPoints()
+   * @see #add(IEntity)
+   * @see #addAll(Iterable)
+   * @see #remove(IEntity)
+   * @see #removeAll(Iterable)
+   */
+  public Collection<Spawnpoint> getSpawnPoints(String tag) {
+    if(tag == null || tag.isEmpty()) {
+      return this.getSpawnPoints();
+    }
+
+    return Collections.unmodifiableCollection(this.spawnPoints.stream().filter(p -> p.hasTag(tag)).collect(Collectors.toList()));
+  }
+
+  /**
    * Gets the {@link Spawnpoint} with the specified map ID from this environment.
    * 
    * @param mapId
@@ -1447,6 +1695,31 @@ public final class Environment implements IRenderable {
    */
   public Collection<SoundSource> getSoundSources() {
     return Collections.unmodifiableCollection(this.soundSources);
+  }
+
+  /**
+   * Gets an immutable collection containing all {@link SoundSource} entities with the specified tag.
+   *
+   * <p>
+   * To add or remove entities, use the corresponding methods on this environment.
+   * </p>
+   *
+   * @param tag The tag that the {@link SoundSource} entities have to provide to be returned.
+   *
+   * @return An immutable collection with all {@link SoundSource} entities with the specified tag.
+   *
+   * @see #getSoundSources()
+   * @see #add(IEntity)
+   * @see #addAll(Iterable)
+   * @see #remove(IEntity)
+   * @see #removeAll(Iterable)
+   */
+  public Collection<SoundSource> getSoundSources(String tag) {
+    if(tag == null || tag.isEmpty()) {
+      return this.getSoundSources();
+    }
+
+    return Collections.unmodifiableCollection(this.soundSources.stream().filter(p -> p.hasTag(tag)).collect(Collectors.toList()));
   }
 
   /**
@@ -1498,6 +1771,31 @@ public final class Environment implements IRenderable {
   }
 
   /**
+   * Gets an immutable collection containing all {@link StaticShadow} entities with the specified tag.
+   *
+   * <p>
+   * To add or remove entities, use the corresponding methods on this environment.
+   * </p>
+   *
+   * @param tag The tag that the {@link StaticShadow} entities have to provide to be returned.
+   *
+   * @return An immutable collection with all {@link StaticShadow} entities with the specified tag.
+   *
+   * @see #getStaticShadows()
+   * @see #add(IEntity)
+   * @see #addAll(Iterable)
+   * @see #remove(IEntity)
+   * @see #removeAll(Iterable)
+   */
+  public Collection<StaticShadow> getStaticShadows(String tag) {
+    if(tag == null || tag.isEmpty()) {
+      return this.getStaticShadows();
+    }
+
+    return Collections.unmodifiableCollection(this.staticShadows.stream().filter(p -> p.hasTag(tag)).collect(Collectors.toList()));
+  }
+
+  /**
    * Gets the {@link StaticShadow} with the specified map ID from this environment.
    * 
    * @param mapId
@@ -1543,6 +1841,31 @@ public final class Environment implements IRenderable {
    */
   public Collection<Trigger> getTriggers() {
     return Collections.unmodifiableCollection(this.triggers);
+  }
+
+  /**
+   * Gets an immutable collection containing all {@link Trigger} entities with the specified tag.
+   *
+   * <p>
+   * To add or remove entities, use the corresponding methods on this environment.
+   * </p>
+   *
+   * @param tag The tag that the {@link Trigger} entities have to provide to be returned.
+   *
+   * @return An immutable collection with all {@link Trigger} entities with the specified tag.
+   *
+   * @see #getTriggers()
+   * @see #add(IEntity)
+   * @see #addAll(Iterable)
+   * @see #remove(IEntity)
+   * @see #removeAll(Iterable)
+   */
+  public Collection<Trigger> getTriggers(String tag) {
+    if(tag == null || tag.isEmpty()) {
+      return this.getTriggers();
+    }
+
+    return Collections.unmodifiableCollection(this.triggers.stream().filter(p -> p.hasTag(tag)).collect(Collectors.toList()));
   }
 
   /**
