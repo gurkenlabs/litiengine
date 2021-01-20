@@ -1,6 +1,6 @@
 ![LITIENGINE Logo](resources/litiengine-banner.png "LITIENGINE Logo")
 
-**LITIENGINE** is a free and open source Java 2D Game Engine. It provides all the infrastructure to create tile based 2D games with plain java, be it a platformer or a top-down adventure. 
+**LITIENGINE** is a free and open source Java 2D Game Engine. It provides a comprehensive Java library and a dedicated map editor to create tile-based 2D games.
 
 [![Build Status](https://img.shields.io/travis/gurkenlabs/litiengine/master?style=flat-square)](https://travis-ci.com/gurkenlabs/litiengine)
 [![Coverage](https://img.shields.io/sonar/coverage/de.gurkenlabs:litiengine?server=https%3A%2F%2Fsonarcloud.io&style=flat-square)](https://sonarcloud.io/dashboard?id=de.gurkenlabs%3Alitiengine)
@@ -18,7 +18,6 @@
 * Support for Tile Maps in .tmx format (e.g. made with [Tiled Editor](http://www.mapeditor.org/))
 * Player Input via Gamepad/Keyboard/Mouse
 * Entity Framework
-* Message Based Networking Framework
 
 ## Installation
 The library is distributed over the [Maven Central Repository](https://search.maven.org/artifact/de.gurkenlabs/LITIENGINE/) and you can grab the necessary .jar-file(s) from there by using your favorite build automation tool or manually download the library.
@@ -30,7 +29,7 @@ repositories {
 }
 
 dependencies {
-  compile 'de.gurkenlabs:litiengine:0.5.0'
+  implementation 'de.gurkenlabs:litiengine:0.5.0'
 }
 ```
 
@@ -75,7 +74,7 @@ Visit the official [LITIENGINE forum](https://forum.litiengine.com/) for trouble
 * Agree to our [Code of Conduct](https://github.com/gurkenlabs/litiengine/blob/master/CODE_OF_CONDUCT.md)
 * View our [Contribution guidelines](https://github.com/gurkenlabs/litiengine/blob/master/CONTRIBUTING.md)
 
-## Cite the LITIENGINE
+## Citations
 If you want to cite parts of the LITIengie in your academic work, you can use the following Digital Object Identifier:
 
 [![DOI](https://zenodo.org/badge/87944612.svg)](https://zenodo.org/badge/latestdoi/87944612)
