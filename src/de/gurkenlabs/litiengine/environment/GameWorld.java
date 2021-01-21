@@ -280,6 +280,7 @@ public final class GameWorld implements IUpdateable {
     this.unloadEnvironment();
     this.environments.clear();
     this.setCamera(null);
+    Game.physics().clear();
 
     this.environmentListeners.clear();
     this.environmentLoadedListeners.clear();

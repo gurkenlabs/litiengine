@@ -21,6 +21,7 @@ public class PhysicsTests {
   @BeforeEach
   public void init() {
     Game.init(Game.COMMADLINE_ARG_NOGUI);
+    Game.physics().clear();
   }
   
   @AfterEach
