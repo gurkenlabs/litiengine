@@ -560,6 +560,12 @@ public final class Game {
     hasStarted = true;
   }
 
+  public static void exit(){
+    if (terminating()){
+      System.exit(Game.EXIT_GAME_CLOSED);
+    }
+  }
+
   /**
    * Sets the {@code Game's} basic information by the specified {@code GameInfo} instance.
    * <p>

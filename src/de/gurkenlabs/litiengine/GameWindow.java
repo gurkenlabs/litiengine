@@ -410,9 +410,7 @@ public final class GameWindow {
     window.addWindowListener(new WindowAdapter() {
       @Override
       public void windowClosing(final WindowEvent event) {
-        if (Game.terminating()) {
-          System.exit(Game.EXIT_GAME_CLOSED);
-        }
+        Game.exit();
       }
     });
   }

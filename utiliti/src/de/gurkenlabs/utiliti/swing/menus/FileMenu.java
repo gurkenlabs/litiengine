@@ -10,6 +10,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.components.Editor;
 
@@ -51,7 +52,7 @@ public final class FileMenu extends JMenu {
 
     JMenuItem exit = new JMenuItem(Resources.strings().get("menu_exit"));
     exit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, InputEvent.CTRL_DOWN_MASK));
-    exit.addActionListener(a -> System.exit(0));
+    exit.addActionListener(a -> Game.exit());
 
     this.add(create);
     this.add(load);

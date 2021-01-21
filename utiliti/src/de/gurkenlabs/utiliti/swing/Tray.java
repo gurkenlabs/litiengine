@@ -24,7 +24,7 @@ public final class Tray {
       SystemTray tray = SystemTray.getSystemTray();
       PopupMenu menu = new PopupMenu();
       MenuItem exitItem = new MenuItem(Resources.strings().get("menu_exit"));
-      exitItem.addActionListener(a -> System.exit(0));
+      exitItem.addActionListener(a -> Game.exit());
       menu.add(exitItem);
 
       trayIcon = new TrayIcon(Resources.images().get("liti-logo-x16.png"), Game.info().toString(), menu);
