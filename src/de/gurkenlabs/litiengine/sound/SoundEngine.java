@@ -30,7 +30,7 @@ import de.gurkenlabs.litiengine.tweening.TweenFunction;
  * position of the entity.
  * 
  * <p>
- * The LILIengine sound engine supports .wav, .mp3 and
+ * The sound engine supports .wav, .mp3 and
  * .ogg by default. If you need other file extensions, you have to write an own
  * SPI implementation and inject it in your project.
  * </p>
@@ -181,9 +181,9 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    * Fades out all music volume to 0 over the specified time.
    *
    * @param duration
-   *          The fade duration in ticks
+   *          The fade duration in milliseconds
    */
-  public void fadeMusic(long duration) {
+  public void fadeMusic(int duration) {
     this.allMusic.forEach(m -> m.fade(duration));
   }
 
@@ -191,13 +191,13 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    * Fades all music volume to a given value over the specified time.
    * 
    * @param duration
-   *          The fade duration in ticks
+   *          The fade duration in milliseconds
    * @param target
    *          The target volume.
    * @param easeType
    *          The easing Function used for Tweening the volume
    */
-  public void fadeMusic(long duration, float target, TweenFunction easeType) {
+  public void fadeMusic(int duration, float target, TweenFunction easeType) {
     this.allMusic.forEach(m -> m.fade(duration, target, easeType));
   }
 

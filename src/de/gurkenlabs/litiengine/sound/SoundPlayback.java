@@ -117,9 +117,9 @@ public abstract class SoundPlayback implements Runnable {
    * Fades this playback's volume to 0 over the given duration.
    * 
    * @param duration
-   *          the fade duration in ticks.
+   *          the fade duration in milliseconds.
    */
-  public void fade(long duration) {
+  public void fade(int duration) {
     this.fade(duration, 0f, TweenFunction.LINEAR);
   }
 
@@ -127,13 +127,13 @@ public abstract class SoundPlayback implements Runnable {
    * Fades this playback's volume to the target value over the given duration using the given {@code TweenFunction}.
    * 
    * @param duration
-   *          the fade duration in ticks.
+   *          the fade duration in milliseconds.
    * @param target
    *          the target volume at the end of the fade
    * @param easingType
    *          the TweenFunction determining the falloff curve of this fade.
    */
-  public void fade(long duration, float target, TweenFunction easingType) {
+  public void fade(int duration, float target, TweenFunction easingType) {
     for (VolumeControl v : this.getVolumeControls()) {
       Game.tweens().begin(v, TweenType.VOLUME, duration).target(target).ease(easingType);
     }
