@@ -137,18 +137,22 @@ public final class EntityList extends JPanel implements EntityController {
 
       this.isFocussing = true;
       try {
-        if (e.getPath().getLastPathComponent() instanceof DefaultMutableTreeNode) {
-          DefaultMutableTreeNode node = (DefaultMutableTreeNode) e.getPath().getLastPathComponent();
-          if (node.getUserObject() instanceof IconTreeListItem) {
-            IconTreeListItem item = (IconTreeListItem) node.getUserObject();
-            if (item.getUserObject() instanceof IEntity) {
-              IMapObject obj = env.getMap().getMapObject(((IEntity) item.getUserObject()).getMapId());
-              if (obj != null) {
-                Editor.instance().getMapComponent().setFocus(obj, true);
-              }
-            }
-          }
-        }
+
+       final TreePath path = e.getNewLeadSelectionPath();
+       if(path != null) {
+         if (path.getLastPathComponent() instanceof DefaultMutableTreeNode) {
+           DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
+           if (node.getUserObject() instanceof IconTreeListItem) {
+             IconTreeListItem item = (IconTreeListItem) node.getUserObject();
+             if (item.getUserObject() instanceof IEntity) {
+               IMapObject obj = env.getMap().getMapObject(((IEntity) item.getUserObject()).getMapId());
+               if (obj != null) {
+                 Editor.instance().getMapComponent().setFocus(obj, true);
+               }
+             }
+           }
+         }
+       }
       } finally {
         this.isFocussing = false;
       }
