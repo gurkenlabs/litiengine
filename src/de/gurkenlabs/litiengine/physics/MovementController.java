@@ -151,13 +151,8 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
   }
 
   protected void moveEntity(double deltaX, double deltaY) {
-    final Point2D oldLocation = this.getEntity().getLocation();
-    double angle = Math.toDegrees(Math.atan2(deltaX, deltaY));
-
-    this.moveAngle = angle;
-    Game.physics().move(this.getEntity(), angle, this.getVelocity());
-
-    this.getEntity().fireMovedEvent(new EntityMovedEvent(this.getEntity(), this.getEntity().getX() - oldLocation.getX(), this.getEntity().getY() - oldLocation.getY()));
+    this.moveAngle = Math.toDegrees(Math.atan2(deltaX, deltaY));
+    Game.physics().move(this.getEntity(), this.moveAngle, this.getVelocity());
   }
 
   protected boolean isMovementAllowed() {

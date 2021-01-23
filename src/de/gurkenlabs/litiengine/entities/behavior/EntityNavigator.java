@@ -175,9 +175,6 @@ public class EntityNavigator implements IUpdateable, IRenderable {
 
     final double angle = GeometricUtilities.calcRotationAngleInDegrees(this.entity.getCollisionBox().getCenterX(), this.entity.getCollisionBox().getCenterY(), coordinates[0], coordinates[1]);
     final float pixelsPerTick = this.entity.getTickVelocity();
-    final Point2D oldLocation = this.getEntity().getLocation();
     Game.physics().move(this.entity, (float) angle, (float) (distance < pixelsPerTick ? distance : pixelsPerTick));
-
-    this.getEntity().fireMovedEvent(new EntityMovedEvent(this.getEntity(), this.getEntity().getX() - oldLocation.getX(), this.getEntity().getY() - oldLocation.getY()));
   }
 }

@@ -110,13 +110,6 @@ public class Creature extends CombatEntity implements IMobileEntity {
   }
 
   @Override
-  public void fireMovedEvent(EntityMovedEvent event) {
-    for (EntityMovedListener listener : this.movedListeners) {
-      listener.moved(event);
-    }
-  }
-
-  @Override
   public int getAcceleration() {
     return this.acceleration;
   }
@@ -195,11 +188,13 @@ public class Creature extends CombatEntity implements IMobileEntity {
     if (this.isDead() || position == null) {
       return;
     }
-
+    
+    final Point2D oldLocation = this.getLocation();
     super.setLocation(position);
 
-    if (Game.hasStarted()) {
+    if (Game.hasStarted() && this.isLoaded()) {
       this.lastMoved = Game.time().now();
+      this.fireMovedEvent(new EntityMovedEvent(this, this.getX() - oldLocation.getX(), this.getY() - oldLocation.getY()));
     }
   }
 
@@ -259,5 +254,11 @@ public class Creature extends CombatEntity implements IMobileEntity {
 
   protected IMovementController createMovementController() {
     return new MovementController<>(this);
+  }
+
+  private void fireMovedEvent(EntityMovedEvent event) {
+    for (EntityMovedListener listener : this.movedListeners) {
+      listener.moved(event);
+    }
   }
 }

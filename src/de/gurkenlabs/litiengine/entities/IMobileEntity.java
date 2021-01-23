@@ -9,6 +9,10 @@ public interface IMobileEntity extends ICollisionEntity {
 
   /**
    * Adds the specified entity moved listener to receive events when this entity was moved.
+   * <p>
+   *   In comparison to the {@link EntityTransformListener#locationChanged(IEntity)} event, this provides some additional information
+   *   about the movement (e.g. distance) and is only fired if the entity instance is currently loaded. 
+   * </p>
    * 
    * @param listener
    *          The listener to add.
@@ -22,8 +26,6 @@ public interface IMobileEntity extends ICollisionEntity {
    *          The listener to remove.
    */
   public void removeMovedListener(EntityMovedListener listener);
-
-  void fireMovedEvent(EntityMovedEvent event);
 
   /**
    * Gets a value that defines how long it takes the entity to reach the full
