@@ -27,5 +27,5 @@ public interface CollisionListener extends EventListener {
    * @see PhysicsEngine#move(IMobileEntity, double, double)
    * @see CollisionEvent#getInvolvedEntities()
    */
-  public void collisionResolved(CollisionEvent event);
+  void collisionResolved(CollisionEvent event);
 }

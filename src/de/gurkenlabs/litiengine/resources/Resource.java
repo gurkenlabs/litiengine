@@ -9,12 +9,12 @@ public interface Resource extends Comparable<Resource> {
    *
    * @return the name
    */
-  public String getName();
+  String getName();
 
-  public void setName(String name);
+  void setName(String name);
 
   @Override
-  public default int compareTo(Resource obj) {
+  default int compareTo(Resource obj) {
     return AlphanumComparator.compareTo(this.getName(), obj.getName());
   }
 }

@@ -14,5 +14,5 @@ public interface EntityMessageListener extends EventListener {
    * @param event
    *          The event data that contains information about the received message and sender.
    */
-  public void messageReceived(EntityMessageEvent event);
+  void messageReceived(EntityMessageEvent event);
 }

@@ -16,7 +16,7 @@ public interface EnvironmentListener extends EnvironmentLoadedListener, Environm
    * @param environment
    *          The environment that was cleared.
    */
-  public default void cleared(Environment environment) {}
+  default void cleared(Environment environment) {}
 
   /**
    * This method was called after the environment was initialized.
@@ -24,11 +24,11 @@ public interface EnvironmentListener extends EnvironmentLoadedListener, Environm
    * @param environment
    *          The environment that was initialized.
    */
-  public default void initialized(Environment environment) {}
+  default void initialized(Environment environment) {}
 
   @Override
-  public default void loaded(Environment environment) {}
+  default void loaded(Environment environment) {}
 
   @Override
-  public default void unloaded(Environment environment) {}
+  default void unloaded(Environment environment) {}
 }

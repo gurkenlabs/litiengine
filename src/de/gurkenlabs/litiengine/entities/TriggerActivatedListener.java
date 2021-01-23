@@ -16,5 +16,5 @@ public interface TriggerActivatedListener extends EventListener {
    * 
    * @see Trigger#isActivated()
    */
-  public void activated(TriggerEvent event);
+  void activated(TriggerEvent event);
 }

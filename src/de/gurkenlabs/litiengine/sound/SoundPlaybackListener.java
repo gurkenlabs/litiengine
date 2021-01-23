@@ -15,7 +15,7 @@ public interface SoundPlaybackListener extends EventListener {
    *          a {@link SoundEvent} object describing the
    *          event source and the related {@link Sound}.
    */
-  public default void cancelled(SoundEvent event) {}
+  default void cancelled(SoundEvent event) {}
 
   /**
    * This method gets called when a {@code SoundPlayback} is finished.
@@ -24,5 +24,5 @@ public interface SoundPlaybackListener extends EventListener {
    *          a {@link SoundEvent} object describing the
    *          event source and the related {@link Sound}.
    */
-  public default void finished(SoundEvent event) {}
+  default void finished(SoundEvent event) {}
 }

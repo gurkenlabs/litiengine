@@ -15,19 +15,19 @@ import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
 
 public interface IEntity{
-  public void onMessage(EntityMessageListener listener);
+  void onMessage(EntityMessageListener listener);
 
-  public void onMessage(String message, EntityMessageListener listener);
+  void onMessage(String message, EntityMessageListener listener);
 
-  public void addTransformListener(EntityTransformListener listener);
+  void addTransformListener(EntityTransformListener listener);
 
-  public void addListener(EntityListener listener);
+  void addListener(EntityListener listener);
 
-  public void removeListener(EntityMessageListener listener);
+  void removeListener(EntityMessageListener listener);
 
-  public void removeListener(EntityTransformListener listener);
+  void removeListener(EntityTransformListener listener);
 
-  public void removeListener(EntityListener listener);
+  void removeListener(EntityListener listener);
 
   /**
    * Adds the specified entity rendered listener to receive events when entities were rendered.
@@ -35,7 +35,7 @@ public interface IEntity{
    * @param listener
    *          The listener to add.
    */
-  public void onRendered(final EntityRenderedListener listener);
+  void onRendered(final EntityRenderedListener listener);
 
   /**
    * Removes the specified entity rendered listener.
@@ -43,7 +43,7 @@ public interface IEntity{
    * @param listener
    *          The listener to remove.
    */
-  public void removeListener(final EntityRenderedListener listener);
+  void removeListener(final EntityRenderedListener listener);
 
   /**
    * Adds the specified entity render listener to receive events and callbacks about the rendering process of entities.
@@ -51,7 +51,7 @@ public interface IEntity{
    * @param listener
    *          The listener to add.
    */
-  public void addEntityRenderListener(final EntityRenderListener listener);
+  void addEntityRenderListener(final EntityRenderListener listener);
 
   /**
    * Removes the specified entity render listener.
@@ -59,9 +59,9 @@ public interface IEntity{
    * @param listener
    *          The listener to remove.
    */
-  public void removeListener(final EntityRenderListener listener);
+  void removeListener(final EntityRenderListener listener);
 
-  public double getAngle();
+  double getAngle();
 
   /**
    * Sets the angle (in degrees) in which the entity is directed.
@@ -69,7 +69,7 @@ public interface IEntity{
    * @param angle
    *          the new angle in degrees
    */
-  public void setAngle(double angle);
+  void setAngle(double angle);
 
   /**
    * Gets the entities animation controller.
@@ -78,19 +78,19 @@ public interface IEntity{
    * 
    * @see RenderEngine#renderEntity(java.awt.Graphics2D, IEntity)
    */
-  public IEntityAnimationController<?> animations();
+  IEntityAnimationController<?> animations();
 
-  public boolean isVisible();
+  boolean isVisible();
 
-  public void setVisible(boolean visible);
+  void setVisible(boolean visible);
 
-  public IBehaviorController behavior();
+  IBehaviorController behavior();
 
-  public void addController(IEntityController controller);
+  void addController(IEntityController controller);
 
-  public <T extends IEntityController> void setController(Class<T> clss, T controller);
+  <T extends IEntityController> void setController(Class<T> clss, T controller);
 
-  public <T extends IEntityController> T getController(Class<T> clss);
+  <T extends IEntityController> T getController(Class<T> clss);
 
   /**
    * All registered actions of this entity.
@@ -100,7 +100,7 @@ public interface IEntity{
    * @see EntityActionMap
    * @see IEntity#register(String, Runnable)
    */
-  public EntityActionMap actions();
+  EntityActionMap actions();
 
   /**
    * Performs an {@code EntityAction} that was previously registered for this entity.
@@ -114,7 +114,7 @@ public interface IEntity{
    * @see IEntity#actions()
    * @see IEntity#register(String, Runnable)
    */
-  public void perform(String actionName);
+  void perform(String actionName);
 
   /**
    * Registers an {@code EntityAction} with the specified name.
@@ -130,30 +130,30 @@ public interface IEntity{
    * @see IEntity#perform(String)
    * @see IEntity#actions()
    */
-  public EntityAction register(String name, Runnable action);
+  EntityAction register(String name, Runnable action);
 
-  public void detachControllers();
+  void detachControllers();
 
-  public void attachControllers();
+  void attachControllers();
 
-  public Rectangle2D getBoundingBox();
+  Rectangle2D getBoundingBox();
 
-  public Point2D getCenter();
+  Point2D getCenter();
 
-  public double getHeight();
+  double getHeight();
 
-  public Point2D getLocation();
+  Point2D getLocation();
 
-  public int getMapId();
+  int getMapId();
 
   /***
    * Gets the name of this entity.
    * 
    * @return The name of this entity.
    */
-  public String getName();
+  String getName();
 
-  public RenderType getRenderType();
+  RenderType getRenderType();
 
   /**
    * Determines whether this entity is being rendered with the layer it's originating from.
@@ -171,27 +171,27 @@ public interface IEntity{
    * @see Environment#getEntitiesByLayer(int)
    * @see Environment#getEntitiesByLayer(String)
    */
-  public boolean renderWithLayer();
+  boolean renderWithLayer();
 
-  public double getWidth();
+  double getWidth();
 
-  public double getX();
+  double getX();
 
-  public double getY();
+  double getY();
 
-  public String sendMessage(Object sender, String message);
+  String sendMessage(Object sender, String message);
 
-  public void setHeight(double height);
+  void setHeight(double height);
 
-  public void setLocation(double x, double y);
+  void setLocation(double x, double y);
 
-  public boolean hasTag(String tag);
+  boolean hasTag(String tag);
 
-  public List<String> getTags();
+  List<String> getTags();
 
-  public void addTag(String tag);
+  void addTag(String tag);
 
-  public void removeTag(String tag);
+  void removeTag(String tag);
 
   /**
    * Sets the map location.
@@ -199,7 +199,7 @@ public interface IEntity{
    * @param location
    *          the new map location
    */
-  public void setLocation(Point2D location);
+  void setLocation(Point2D location);
 
   /**
    * Sets an id which should only be filled when an entity gets added due to map
@@ -208,30 +208,30 @@ public interface IEntity{
    * @param mapId
    *          The unique map ID for this {@link IEntity}
    */
-  public void setMapId(int mapId);
+  void setMapId(int mapId);
 
-  public void setName(String name);
+  void setName(String name);
 
-  public void setRenderType(RenderType renderType);
+  void setRenderType(RenderType renderType);
 
-  public void setRenderWithLayer(boolean renderWithLayer);
+  void setRenderWithLayer(boolean renderWithLayer);
 
-  public void setSize(double width, double height);
+  void setSize(double width, double height);
 
-  public void setWidth(double width);
+  void setWidth(double width);
 
-  public void setX(double x);
+  void setX(double x);
 
-  public void setY(double y);
+  void setY(double y);
 
-  public ICustomPropertyProvider getProperties();
+  ICustomPropertyProvider getProperties();
 
   /**
    * Gets the environment the entity was loaded to or null if it is not loaded.
    * 
    * @return The entity's environment.
    */
-  public Environment getEnvironment();
+  Environment getEnvironment();
 
   /**
    * This method provides the possibility to implement behavior whenever this entity was added to the environment.
@@ -241,7 +241,7 @@ public interface IEntity{
    * 
    * @see IEntity#addListener(EntityListener)
    */
-  public void loaded(Environment environment);
+  void loaded(Environment environment);
 
   /**
    * This method provides the possibility to implement behavior whenever this entity was removed from the environment.
@@ -251,7 +251,7 @@ public interface IEntity{
    * 
    * @see IEntity#addListener(EntityListener)
    */
-  public void removed(Environment environment);
+  void removed(Environment environment);
 
   /**
    * Indicates whether this entity is loaded on the currently active environment.
@@ -262,5 +262,5 @@ public interface IEntity{
    * @see IEntity#loaded(Environment)
    * @see IEntity#removed(Environment)
    */
-  public boolean isLoaded();
+  boolean isLoaded();
 }

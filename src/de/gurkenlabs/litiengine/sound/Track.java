@@ -11,5 +11,5 @@ import javax.sound.sampled.AudioFormat;
  * @see SoundEngine#playMusic(Track)
  */
 public interface Track extends Iterable<Sound> {
-  public AudioFormat getFormat();
+  AudioFormat getFormat();
 }

@@ -8,10 +8,10 @@ public interface ILaunchable {
   /**
    * Starts the operation of this instance.
    */
-  public void start();
+  void start();
 
   /**
    * Terminates the operation of this instance.
    */
-  public void terminate();
+  void terminate();
 }

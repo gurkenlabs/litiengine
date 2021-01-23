@@ -5,7 +5,7 @@ import java.util.EventListener;
 import de.gurkenlabs.litiengine.entities.IEntity;
 
 public interface EnvironmentEntityListener extends EventListener {
-  public default void entityAdded(IEntity entity) {}
+  default void entityAdded(IEntity entity) {}
 
-  public default void entityRemoved(IEntity entity) {}
+  default void entityRemoved(IEntity entity) {}
 }

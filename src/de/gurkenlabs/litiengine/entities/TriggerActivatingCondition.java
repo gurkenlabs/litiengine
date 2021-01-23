@@ -19,5 +19,5 @@ public interface TriggerActivatingCondition extends EventListener {
    *          The event data that contains information about the trigger.
    * @return The reason why the trigger cannot be activated or null if it can be activated.
    */
-  public String canActivate(TriggerEvent event);
+  String canActivate(TriggerEvent event);
 }

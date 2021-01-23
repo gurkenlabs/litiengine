@@ -17,5 +17,5 @@ public interface EntityRenderedListener extends EventListener {
    * @param event
    *          The event that contains the render data.
    */
-  public void rendered(EntityRenderEvent event);
+  void rendered(EntityRenderEvent event);
 }

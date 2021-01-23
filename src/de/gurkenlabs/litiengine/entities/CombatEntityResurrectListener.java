@@ -15,5 +15,5 @@ public interface CombatEntityResurrectListener extends EventListener {
    * @param entity
    *         The combat entity that was resurrected.
    */
-  public void resurrect(ICombatEntity entity);
+  void resurrect(ICombatEntity entity);
 }

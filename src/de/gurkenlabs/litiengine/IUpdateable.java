@@ -23,5 +23,5 @@ public interface IUpdateable {
    *
    * @see ClientConfiguration#setMaxFps(int)
    */
-  public void update();
+  void update();
 }

@@ -16,7 +16,7 @@ public interface IMovementController extends IEntityController {
    *
    * @return the dx
    */
-  public float getDx();
+  float getDx();
 
   /**
    * Gets the delta x for each horizontal movement.
@@ -24,14 +24,14 @@ public interface IMovementController extends IEntityController {
    * @param dx
    *          the new dx
    */
-  public void setDx(float dx);
+  void setDx(float dx);
 
   /**
    * Sets the delta y for each vertical movement.
    *
    * @return the dy
    */
-  public float getDy();
+  float getDy();
 
   /**
    * Sets the delta y for each vertical movement.
@@ -39,21 +39,21 @@ public interface IMovementController extends IEntityController {
    * @param dy
    *          the new dy
    */
-  public void setDy(float dy);
+  void setDy(float dy);
 
   /**
    * Get the current velocity.
    *
    * @return The current velocity.
    */
-  public double getVelocity();
+  double getVelocity();
 
   /**
    * Sets the current velocity.
    *
    * @param velocity The velocity to set.
    */
-  public void setVelocity(double velocity);
+  void setVelocity(double velocity);
 
   /**
    * Apply the force to the entity.
@@ -61,18 +61,18 @@ public interface IMovementController extends IEntityController {
    * @param force
    *          the force being applied to the entity
    */
-  public void apply(Force force);
+  void apply(Force force);
 
   /**
    * Gets the active forces.
    *
    * @return the active forces
    */
-  public List<Force> getActiveForces();
+  List<Force> getActiveForces();
   
-  public Force getForce(String identifier);
+  Force getForce(String identifier);
 
-  public double getMoveAngle();
+  double getMoveAngle();
   
   /**
    * Checks given conditions before moving.
@@ -80,5 +80,5 @@ public interface IMovementController extends IEntityController {
    * @param predicate
    *          the conditions that need to apply before moving. If they don't apply, the entity won't be moved.
    */
-  public void onMovementCheck(Predicate<IMobileEntity> predicate);
+  void onMovementCheck(Predicate<IMobileEntity> predicate);
 }

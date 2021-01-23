@@ -25,7 +25,7 @@ public interface ResourcesContainerListener<T> extends ResourcesContainerCleared
    *          The added resource.
    * @see ResourcesContainer#add(String, Object)
    */
-  public default void added(String resourceName, T resource) {
+  default void added(String resourceName, T resource) {
   }
 
   /**
@@ -37,9 +37,9 @@ public interface ResourcesContainerListener<T> extends ResourcesContainerCleared
    *          The removed resource.
    * @see ResourcesContainer#remove(String)
    */
-  public default void removed(String resourceName, T resource) {
+  default void removed(String resourceName, T resource) {
   }
 
-  public default void cleared() {
+  default void cleared() {
   }
 }

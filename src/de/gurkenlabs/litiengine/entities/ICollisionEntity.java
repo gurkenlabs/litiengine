@@ -9,20 +9,20 @@ import de.gurkenlabs.litiengine.physics.Collision;
 import de.gurkenlabs.litiengine.physics.CollisionEvent;
 
 public interface ICollisionEntity extends IEntity {
-  public void onCollision(CollisionListener listener);
+  void onCollision(CollisionListener listener);
 
-  public void removeCollisionListener(CollisionListener listener);
+  void removeCollisionListener(CollisionListener listener);
 
-  public void fireCollisionEvent(CollisionEvent event);
+  void fireCollisionEvent(CollisionEvent event);
 
-  public boolean canCollideWith(ICollisionEntity otherEntity);
+  boolean canCollideWith(ICollisionEntity otherEntity);
 
   /**
    * Gets the collision box.
    *
    * @return the collision box
    */
-  public Rectangle2D getCollisionBox();
+  Rectangle2D getCollisionBox();
 
   /**
    * Gets the collision box.
@@ -31,31 +31,31 @@ public interface ICollisionEntity extends IEntity {
    *          the location
    * @return the collision box
    */
-  public Rectangle2D getCollisionBox(Point2D location);
+  Rectangle2D getCollisionBox(Point2D location);
 
   /**
    * Gets the center {@link Point2D} of the entities collision box.
    * 
    * @return The center {@link Point2D} of the entities collision box
    */
-  public Point2D getCollisionBoxCenter();
+  Point2D getCollisionBoxCenter();
 
-  public Valign getCollisionBoxValign();
+  Valign getCollisionBoxValign();
 
-  public Align getCollisionBoxAlign();
+  Align getCollisionBoxAlign();
 
-  public Collision getCollisionType();
+  Collision getCollisionType();
 
-  public double getCollisionBoxHeight();
+  double getCollisionBoxHeight();
 
-  public double getCollisionBoxWidth();
+  double getCollisionBoxWidth();
 
   /**
    * Checks for collision.
    *
    * @return true, if successful
    */
-  public boolean hasCollision();
+  boolean hasCollision();
 
   /**
    * Sets the collision.
@@ -63,15 +63,15 @@ public interface ICollisionEntity extends IEntity {
    * @param collision
    *          the new collision
    */
-  public void setCollision(boolean collision);
+  void setCollision(boolean collision);
 
-  public void setCollisionBoxHeight(final double collisionBoxHeight);
+  void setCollisionBoxHeight(final double collisionBoxHeight);
 
-  public void setCollisionBoxWidth(final double collisionBoxWidth);
+  void setCollisionBoxWidth(final double collisionBoxWidth);
 
-  public void setCollisionBoxAlign(final Align align);
+  void setCollisionBoxAlign(final Align align);
 
-  public void setCollisionBoxValign(final Valign valign);
+  void setCollisionBoxValign(final Valign valign);
 
-  public void setCollisionType(Collision collisionType);
+  void setCollisionType(Collision collisionType);
 }

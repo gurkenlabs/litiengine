@@ -16,7 +16,7 @@ public interface IEntitySpawner<T extends IEntity> extends IUpdateable {
    * <li><b>RANDOMSPAWNPOINTS</b>: the specified spawnAmount is distributed equally to all of the SpawnPoints</li>
    * </ul>
    */
-  public enum SpawnMode {
+  enum SpawnMode {
 
     /**
      * Spawns the amount of mobs for all the spawnpoints available.
@@ -41,28 +41,28 @@ public interface IEntitySpawner<T extends IEntity> extends IUpdateable {
    *
    * @return the Entity instance which will be spawned
    */
-  public T createNew();
+  T createNew();
 
   /**
    * Gets the amount of Entities that are spawned in each wave.
    *
    * @return the spawn amount
    */
-  public int getSpawnAmount();
+  int getSpawnAmount();
 
   /**
    * Gets the interval between spawn waves.
    *
    * @return the spawn interval
    */
-  public int getSpawnInterval();
+  int getSpawnInterval();
 
   /**
    * Gets the delay between spawning individual Entities of one wave.
    *
    * @return the spawn delay
    */
-  public int getSpawnDelay();
+  int getSpawnDelay();
 
   /**
    * Gets the spawn mode for an EntitySpawner.
@@ -70,14 +70,14 @@ public interface IEntitySpawner<T extends IEntity> extends IUpdateable {
    * @see SpawnMode
    * @return the spawn mode
    */
-  public SpawnMode getSpawnMode();
+  SpawnMode getSpawnMode();
 
   /**
    * Gets the list of SpawnPoints that a EntitySpawner uses.
    *
    * @return the spawn points
    */
-  public List<Spawnpoint> getSpawnPoints();
+  List<Spawnpoint> getSpawnPoints();
 
   /**
    * Sets the amount of Entities that spawn in each wave.
@@ -85,7 +85,7 @@ public interface IEntitySpawner<T extends IEntity> extends IUpdateable {
    * @param amount
    *          the new amount
    */
-  public void setSpawnAmount(int amount);
+  void setSpawnAmount(int amount);
 
   /**
    * Sets the interval in milliseconds between each spawn wave.
@@ -93,7 +93,7 @@ public interface IEntitySpawner<T extends IEntity> extends IUpdateable {
    * @param interval
    *          the new interval
    */
-  public void setSpawnInterval(int interval);
+  void setSpawnInterval(int interval);
 
   /**
    * Gets the delay in milliseconds between spawning individual Entities of one wave.
@@ -101,7 +101,7 @@ public interface IEntitySpawner<T extends IEntity> extends IUpdateable {
    * @param delay
    *          the new spawn delay
    */
-  public void setSpawnDelay(int delay);
+  void setSpawnDelay(int delay);
 
   /**
    * Sets the spawn mode.
@@ -110,5 +110,5 @@ public interface IEntitySpawner<T extends IEntity> extends IUpdateable {
    *          the new spawn mode
    * @see SpawnMode
    */
-  public void setSpawnMode(SpawnMode mode);
+  void setSpawnMode(SpawnMode mode);
 }

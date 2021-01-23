@@ -16,5 +16,5 @@ public interface TriggerDeactivatedListener extends EventListener {
    * 
    * @see Trigger#isActivated()
    */
-  public void deactivated(TriggerEvent event);
+  void deactivated(TriggerEvent event);
 }

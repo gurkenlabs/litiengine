@@ -22,7 +22,7 @@ public interface IKeyboard {
    * @see KeyEvent#consume()
    * @see KeyEvent#isAltDown()
    */
-  public void consumeAlt(boolean consume);
+  void consumeAlt(boolean consume);
 
   /**
    * Checks whether the key with the specified {@code keyCode} is currently being pressed.
@@ -35,7 +35,7 @@ public interface IKeyboard {
    * @see #onKeyPressed(KeyPressedListener)
    * @see #onKeyPressed(int, KeyPressedListener)
    */
-  public boolean isPressed(int keyCode);
+  boolean isPressed(int keyCode);
   
   /**
    * Checks whether the key with the specified {@code keyCode} was recently released.
@@ -48,7 +48,7 @@ public interface IKeyboard {
    * @see #onKeyReleased(KeyReleasedListener)
    * @see #onKeyReleased(int, KeyReleasedListener)
    */
-  public boolean wasReleased(int keyCode);
+  boolean wasReleased(int keyCode);
 
   /**
    * Adds the specified key pressed listener to receive events when the key with the defined {@code keyCode} has been pressed.
@@ -61,7 +61,7 @@ public interface IKeyboard {
    * @see KeyListener#keyPressed(KeyEvent)
    * @see KeyEvent#KEY_PRESSED
    */
-  public void onKeyPressed(int keyCode, KeyPressedListener listener);
+  void onKeyPressed(int keyCode, KeyPressedListener listener);
 
   /**
    * Unregister the specified listener from key pressed events.
@@ -71,7 +71,7 @@ public interface IKeyboard {
    * @param listener
    *          The listener to remove.
    */
-  public void removeKeyPressedListener(int keyCode, KeyPressedListener listener);
+  void removeKeyPressedListener(int keyCode, KeyPressedListener listener);
 
   /**
    * Adds the specified key released listener to receive events when the key with the defined {@code keyCode} has been released.
@@ -84,7 +84,7 @@ public interface IKeyboard {
    * @see KeyListener#keyReleased(KeyEvent)
    * @see KeyEvent#KEY_RELEASED
    */
-  public void onKeyReleased(int keyCode, KeyReleasedListener listener);
+  void onKeyReleased(int keyCode, KeyReleasedListener listener);
 
   /**
    * Unregister the specified listener from key released events.
@@ -94,7 +94,7 @@ public interface IKeyboard {
    * @param listener
    *          The listener to remove.
    */
-  public void removeKeyReleasedListener(int keyCode, KeyReleasedListener listener);
+  void removeKeyReleasedListener(int keyCode, KeyReleasedListener listener);
 
   /**
    * Adds the specified key typed listener to receive events when the key with the defined {@code keyCode} has been typed.
@@ -107,7 +107,7 @@ public interface IKeyboard {
    * @see KeyListener#keyTyped(KeyEvent)
    * @see KeyEvent#KEY_TYPED
    */
-  public void onKeyTyped(int keyCode, KeyTypedListener listener);
+  void onKeyTyped(int keyCode, KeyTypedListener listener);
 
   /**
    * Unregister the specified listener from key typed events.
@@ -117,7 +117,7 @@ public interface IKeyboard {
    * @param listener
    *          The listener to remove.
    */
-  public void removeKeyTypedListener(int keyCode, KeyTypedListener listener);
+  void removeKeyTypedListener(int keyCode, KeyTypedListener listener);
 
   /**
    * Adds the specified key pressed listener to receive events when any key has been pressed.
@@ -128,7 +128,7 @@ public interface IKeyboard {
    * @see KeyListener#keyPressed(KeyEvent)
    * @see KeyEvent#KEY_PRESSED
    */
-  public void onKeyPressed(KeyPressedListener listener);
+  void onKeyPressed(KeyPressedListener listener);
 
   /**
    * Unregister the specified listener from key pressed events.
@@ -136,7 +136,7 @@ public interface IKeyboard {
    * @param listener
    *          The listener to remove.
    */
-  public void removeKeyPressedListener(KeyPressedListener listener);
+  void removeKeyPressedListener(KeyPressedListener listener);
 
   /**
    * Adds the specified key released listener to receive events when any key has been released.
@@ -147,7 +147,7 @@ public interface IKeyboard {
    * @see KeyListener#keyReleased(KeyEvent)
    * @see KeyEvent#KEY_RELEASED
    */
-  public void onKeyReleased(KeyReleasedListener listener);
+  void onKeyReleased(KeyReleasedListener listener);
 
   /**
    * Unregister the specified listener from key released events.
@@ -155,7 +155,7 @@ public interface IKeyboard {
    * @param listener
    *          The listener to remove.
    */
-  public void removeKeyReleasedListener(KeyReleasedListener listener);
+  void removeKeyReleasedListener(KeyReleasedListener listener);
 
   /**
    * Adds the specified key typed listener to receive events when any key has been typed.
@@ -166,7 +166,7 @@ public interface IKeyboard {
    * @see KeyListener#keyTyped(KeyEvent)
    * @see KeyEvent#KEY_TYPED
    */
-  public void onKeyTyped(KeyTypedListener listener);
+  void onKeyTyped(KeyTypedListener listener);
 
   /**
    * Unregister the specified listener from key typed events.
@@ -174,7 +174,7 @@ public interface IKeyboard {
    * @param listener
    *          The listener to remove.
    */
-  public void removeKeyTypedListener(KeyTypedListener listener);
+  void removeKeyTypedListener(KeyTypedListener listener);
 
   /**
    * Removes all registered event consumers from the Keyboard instance. This <b>does not affect</b> registered {@code KeyListener} instances.
@@ -186,7 +186,7 @@ public interface IKeyboard {
    * @see #onKeyTyped(KeyTypedListener)
    * @see #onKeyTyped(int, KeyTypedListener)
    */
-  public void clearExplicitListeners();
+  void clearExplicitListeners();
 
   /**
    * Register for key events.
@@ -194,7 +194,7 @@ public interface IKeyboard {
    * @param listener
    *          The listener to add.
    */
-  public void addKeyListener(KeyListener listener);
+  void addKeyListener(KeyListener listener);
 
   /**
    * Unregister the specified listener from key events.
@@ -202,7 +202,7 @@ public interface IKeyboard {
    * @param listener
    *          The listener to remove.
    */
-  public void removeKeyListener(KeyListener listener);
+  void removeKeyListener(KeyListener listener);
 
   /**
    * This listener interface receives pressed events for the keyboard.
@@ -212,7 +212,7 @@ public interface IKeyboard {
    * @see KeyListener#keyPressed(KeyEvent)
    */
   @FunctionalInterface
-  public interface KeyPressedListener extends EventListener {
+  interface KeyPressedListener extends EventListener {
     /**
      * Invoked when a key has been pressed.
      * See the class description for {@link KeyEvent} for a definition of
@@ -232,7 +232,7 @@ public interface IKeyboard {
    * @see KeyListener#keyReleased(KeyEvent)
    */
   @FunctionalInterface
-  public interface KeyReleasedListener extends EventListener {
+  interface KeyReleasedListener extends EventListener {
     /**
      * Invoked when a key has been released.
      * See the class description for {@link KeyEvent} for a definition of
@@ -252,7 +252,7 @@ public interface IKeyboard {
    * @see KeyListener#keyTyped(KeyEvent)
    */
   @FunctionalInterface
-  public interface KeyTypedListener extends EventListener {
+  interface KeyTypedListener extends EventListener {
     /**
      * Invoked when a key has been typed.
      * See the class description for {@link KeyEvent} for a definition of

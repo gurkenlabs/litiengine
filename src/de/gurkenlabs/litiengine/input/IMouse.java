@@ -26,7 +26,7 @@ public interface IMouse {
    * @see MouseListener#mouseClicked(MouseEvent)
    * @see MouseEvent#MOUSE_CLICKED
    */
-  public void onClicked(MouseClickedListener listener);
+  void onClicked(MouseClickedListener listener);
 
   /**
    * Unregisters the specified mouse clicked listener.
@@ -34,7 +34,7 @@ public interface IMouse {
    * @param listener
    *          The listener to remove.
    */
-  public void removeMouseClickedListener(MouseClickedListener listener);
+  void removeMouseClickedListener(MouseClickedListener listener);
 
   /**
    * Adds the specified mouse dragged listener to receive events when the mouse has been dragged.
@@ -46,7 +46,7 @@ public interface IMouse {
    * @see MouseMotionListener#mouseDragged(MouseEvent)
    * @see MouseEvent#MOUSE_DRAGGED
    */
-  public void onDragged(MouseDraggedListener listener);
+  void onDragged(MouseDraggedListener listener);
 
   /**
    * Unregisters the specified mouse dragged listener.
@@ -54,7 +54,7 @@ public interface IMouse {
    * @param listener
    *          The listener to remove.
    */
-  public void removeMouseDraggedListener(MouseDraggedListener listener);
+  void removeMouseDraggedListener(MouseDraggedListener listener);
 
   /**
    * Adds the specified mouse moved listener to receive events when the mouse has been moved.
@@ -65,7 +65,7 @@ public interface IMouse {
    * @see MouseMotionListener#mouseMoved(MouseEvent)
    * @see MouseEvent#MOUSE_MOVED
    */
-  public void onMoved(MouseMovedListener listener);
+  void onMoved(MouseMovedListener listener);
 
   /**
    * Unregisters the specified mouse moved listener.
@@ -73,7 +73,7 @@ public interface IMouse {
    * @param listener
    *          The listener to remove.
    */
-  public void removeMouseMovedListener(MouseMovedListener listener);
+  void removeMouseMovedListener(MouseMovedListener listener);
 
   /**
    * Adds the specified mouse pressed listener to receive events when the mouse has been pressed.
@@ -84,7 +84,7 @@ public interface IMouse {
    * @see MouseListener#mousePressed(MouseEvent)
    * @see MouseEvent#MOUSE_PRESSED
    */
-  public void onPressed(MousePressedListener listener);
+  void onPressed(MousePressedListener listener);
 
   /**
    * Unregisters the specified mouse pressed listener.
@@ -92,7 +92,7 @@ public interface IMouse {
    * @param listener
    *          The listener to remove.
    */
-  public void removeMousePressedListener(MousePressedListener listener);
+  void removeMousePressedListener(MousePressedListener listener);
 
   /**
    * Adds the specified mouse pressing listener to receive continuous events while the mouse is being pressed.
@@ -100,7 +100,7 @@ public interface IMouse {
    * @param listener
    *          The listener to add.
    */
-  public void onPressing(MousePressingListener listener);
+  void onPressing(MousePressingListener listener);
 
   /**
    * Unregisters the specified mouse pressing listener.
@@ -108,7 +108,7 @@ public interface IMouse {
    * @param listener
    *          The listener to remove.
    */
-  public void removeMousePressingListener(MousePressingListener listener);
+  void removeMousePressingListener(MousePressingListener listener);
 
   /**
    * Adds the specified mouse released listener to receive events when the mouse has been released.
@@ -119,7 +119,7 @@ public interface IMouse {
    * @see MouseListener#mouseReleased(MouseEvent)
    * @see MouseEvent#MOUSE_RELEASED
    */
-  public void onReleased(MouseReleasedListener listener);
+  void onReleased(MouseReleasedListener listener);
 
   /**
    * Unregisters the specified mouse released listener.
@@ -127,7 +127,7 @@ public interface IMouse {
    * @param listener
    *          The listener to remove.
    */
-  public void removeMouseReleasedListener(MouseReleasedListener listener);
+  void removeMouseReleasedListener(MouseReleasedListener listener);
 
   /**
    * Adds the specified mouse wheel listener to receive events when the mouse wheel has been moved.
@@ -138,7 +138,7 @@ public interface IMouse {
    * @see MouseWheelListener#mouseWheelMoved(java.awt.event.MouseWheelEvent)
    * @see MouseWheelEvent
    */
-  public void onWheelMoved(MouseWheelListener listener);
+  void onWheelMoved(MouseWheelListener listener);
 
   /**
    * Unregisters the specified mouse wheel listener.
@@ -146,7 +146,7 @@ public interface IMouse {
    * @param listener
    *          The listener to remove.
    */
-  public void removeMouseWheelListener(MouseWheelListener listener);
+  void removeMouseWheelListener(MouseWheelListener listener);
 
   /**
    * Register mouse listener.
@@ -154,7 +154,7 @@ public interface IMouse {
    * @param listener
    *          the listener
    */
-  public void addMouseListener(MouseListener listener);
+  void addMouseListener(MouseListener listener);
 
   /**
    * Unregister mouse listener.
@@ -162,7 +162,7 @@ public interface IMouse {
    * @param listener
    *          the listener
    */
-  public void removeMouseListener(MouseListener listener);
+  void removeMouseListener(MouseListener listener);
 
   /**
    * Register mouse motion listener.
@@ -170,7 +170,7 @@ public interface IMouse {
    * @param listener
    *          the listener
    */
-  public void addMouseMotionListener(MouseMotionListener listener);
+  void addMouseMotionListener(MouseMotionListener listener);
 
   /**
    * Unregister mouse motion listener.
@@ -178,7 +178,7 @@ public interface IMouse {
    * @param listener
    *          the listener
    */
-  public void removeMouseMotionListener(MouseMotionListener listener);
+  void removeMouseMotionListener(MouseMotionListener listener);
 
   /**
    * Removes all registered event listeners from the Mouse instance. This <b>does not affect</b> registered {@code MouseListener},
@@ -191,7 +191,7 @@ public interface IMouse {
    * @see #onPressing(MousePressingListener)
    * @see #onReleased(MouseReleasedListener)
    */
-  public void clearExplicitListeners();
+  void clearExplicitListeners();
 
   /**
    * Gets the current location of the mouse within the game window.
@@ -205,7 +205,7 @@ public interface IMouse {
    * 
    * @see #getMapLocation()
    */
-  public Point2D getLocation();
+  Point2D getLocation();
 
   /**
    * Gets the location of the mouse on the current map.
@@ -218,42 +218,42 @@ public interface IMouse {
    * 
    * @see IMouse#getLocation()
    */
-  public Point2D getMapLocation();
+  Point2D getMapLocation();
 
   /**
    * Gets the coordinates of the tile on the map on which the mouse is currently located at.
    * 
    * @return The tile on which the mouse is currently located at.
    */
-  public Point getTile();
+  Point getTile();
 
   /**
    * A flag indicating whether the mouse should be grabbed by the game's window.
    * 
    * @return True if the mouse is locked to the game window; otherwise false.
    */
-  public boolean isGrabMouse();
+  boolean isGrabMouse();
 
   /**
    * A flag indicating whether any mouse button is currently pressed.
    * 
    * @return True if any mouse button is currently pressed; otherwise false.
    */
-  public boolean isPressed();
+  boolean isPressed();
 
   /**
    * A flag indicating whether the left mouse button is currently pressed.
    * 
    * @return True if the left mouse button is currently pressed; otherwise false.
    */
-  public boolean isLeftButtonPressed();
+  boolean isLeftButtonPressed();
 
   /**
    * A flag indicating whether the right mouse button is currently pressed.
    * 
    * @return True if the right mouse button is currently pressed; otherwise false.
    */
-  public boolean isRightButtonPressed();
+  boolean isRightButtonPressed();
 
   /**
    * Returns true if the mouse event specifies the left mouse button.
@@ -263,7 +263,7 @@ public interface IMouse {
    *
    * @return true if the left mouse button was active.
    */
-  public boolean isLeftButton(MouseEvent event);
+  boolean isLeftButton(MouseEvent event);
 
   /**
    * Returns true if the mouse event specifies the right mouse button.
@@ -273,7 +273,7 @@ public interface IMouse {
    *
    * @return true if the right mouse button was active.
    */
-  public boolean isRightButton(MouseEvent event);
+  boolean isRightButton(MouseEvent event);
 
   /**
    * If set to true, the mouse will be locked to the render component of the game.
@@ -289,7 +289,7 @@ public interface IMouse {
    * @see GameWindow#cursor()
    * @see Game#window()
    */
-  public void setGrabMouse(boolean grab);
+  void setGrabMouse(boolean grab);
 
   /**
    * Sets the current mouse location to the specified location in the game window.
@@ -303,7 +303,7 @@ public interface IMouse {
    * 
    * @see #getLocation()
    */
-  public void setLocation(Point2D newLocation);
+  void setLocation(Point2D newLocation);
 
   /**
    * Sets the current mouse location to the specified location in the game window.
@@ -319,7 +319,7 @@ public interface IMouse {
    * 
    * @see #getLocation()
    */
-  public void setLocation(double x, double y);
+  void setLocation(double x, double y);
 
   /**
    * This listener interface receives clicked events for the mouse.
@@ -327,7 +327,7 @@ public interface IMouse {
    * @see IMouse#onClicked(MouseClickedListener)
    */
   @FunctionalInterface
-  public interface MouseClickedListener extends EventListener {
+  interface MouseClickedListener extends EventListener {
     /**
      * Invoked when the mouse button has been clicked (pressed
      * and released) on the game window.
@@ -344,7 +344,7 @@ public interface IMouse {
    * @see IMouse#onDragged(MouseDraggedListener)
    */
   @FunctionalInterface
-  public interface MouseDraggedListener extends EventListener {
+  interface MouseDraggedListener extends EventListener {
     /**
      * Invoked when a mouse button is pressed on the game window and then
      * dragged. {@code MOUSE_DRAGGED} events will continue to be
@@ -368,7 +368,7 @@ public interface IMouse {
    * @see IMouse#onMoved(MouseMovedListener)
    */
   @FunctionalInterface
-  public interface MouseMovedListener extends EventListener {
+  interface MouseMovedListener extends EventListener {
     /**
      * Invoked when the mouse cursor has been moved on the game window
      * but no buttons have been pushed.
@@ -385,7 +385,7 @@ public interface IMouse {
    * @see IMouse#onPressed(MousePressedListener)
    */
   @FunctionalInterface
-  public interface MousePressedListener extends EventListener {
+  interface MousePressedListener extends EventListener {
     /**
      * Invoked when a mouse button has been pressed on the game window.
      * 
@@ -401,7 +401,7 @@ public interface IMouse {
    * @see IMouse#onPressing(MousePressingListener)
    */
   @FunctionalInterface
-  public interface MousePressingListener extends EventListener {
+  interface MousePressingListener extends EventListener {
     /**
      * Invoked continuously while a mouse button is being pressed on the game window.
      */
@@ -414,7 +414,7 @@ public interface IMouse {
    * @see IMouse#onReleased(MouseReleasedListener)
    */
   @FunctionalInterface
-  public interface MouseReleasedListener extends EventListener {
+  interface MouseReleasedListener extends EventListener {
     /**
      * Invoked when a mouse button has been released on the game window.
      * 

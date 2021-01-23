@@ -14,7 +14,7 @@ public interface EntityRenderListener extends EntityRenderedListener {
    * @param event
    *          The event that contains the render data.
    */
-  public default void rendering(EntityRenderEvent event) {
+  default void rendering(EntityRenderEvent event) {
   }
 
   /**
@@ -26,7 +26,7 @@ public interface EntityRenderListener extends EntityRenderedListener {
    * 
    * @return True if the entity should be rendered; otherwise false.
    */
-  public default boolean canRender(IEntity entity) {
+  default boolean canRender(IEntity entity) {
     return true;
   }
 }

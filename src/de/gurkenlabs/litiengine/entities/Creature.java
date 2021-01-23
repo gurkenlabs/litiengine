@@ -92,7 +92,7 @@ public class Creature extends CombatEntity implements IMobileEntity {
   public float[] getTweenValues(TweenType tweenType) {
     switch (tweenType) {
     case VELOCITY:
-      return new float[] { (float) this.getVelocity().get() };
+      return new float[] { this.getVelocity().get() };
     default:
       return super.getTweenValues(tweenType);
     }
@@ -188,7 +188,7 @@ public class Creature extends CombatEntity implements IMobileEntity {
     if (this.isDead() || position == null) {
       return;
     }
-    
+
     final Point2D oldLocation = this.getLocation();
     super.setLocation(position);
 

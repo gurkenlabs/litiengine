@@ -12,5 +12,5 @@ public interface TweenEquation {
    *          the current value
    * @return a {@code float} representing the result of applying the {@code TweenEquation} to the value.
    */
-  public float compute(final float progress);
+  float compute(final float progress);
 }

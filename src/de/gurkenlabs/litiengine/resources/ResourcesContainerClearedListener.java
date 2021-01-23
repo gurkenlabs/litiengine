@@ -14,5 +14,5 @@ public interface ResourcesContainerClearedListener extends EventListener {
    * 
    * @see ResourcesContainer#clear()
    */
-  public void cleared();
+  void cleared();
 }

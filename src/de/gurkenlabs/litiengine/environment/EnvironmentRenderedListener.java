@@ -20,5 +20,5 @@ public interface EnvironmentRenderedListener extends EventListener {
    * @param type
    *          The render type for which all instances were just rendered.
    */
-  public void rendered(Graphics2D g, RenderType type);
+  void rendered(Graphics2D g, RenderType type);
 }

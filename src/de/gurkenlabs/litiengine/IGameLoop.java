@@ -16,7 +16,7 @@ public interface IGameLoop extends ILoop {
    * 
    * @see IGameLoop#alterExecutionTime(int, long)
    */
-  public int perform(int delay, Runnable action);
+  int perform(int delay, Runnable action);
 
   /**
    * Alters the execution time of the timed action with the specified index to the defined tick. This overwrites the originally specified delay.
@@ -26,7 +26,7 @@ public interface IGameLoop extends ILoop {
    * @param tick
    *          The tick at which to perform the action instead.
    */
-  public void alterExecutionTime(int id, long tick);
+  void alterExecutionTime(int id, long tick);
 
   /**
    * Removes the {@code TimedAction} with the specified it.
@@ -34,14 +34,14 @@ public interface IGameLoop extends ILoop {
    * @param id
    *          The id of the {@code TimedAction}.
    */
-  public void removeAction(int id);
+  void removeAction(int id);
 
   /**
    * Gets the game loop's current time scale (default = 1).
    * 
    * @return The game loop's current time scale.
    */
-  public float getTimeScale();
+  float getTimeScale();
 
   /**
    * Sets the game loop's time scale.
@@ -52,5 +52,5 @@ public interface IGameLoop extends ILoop {
    * @param timeScale
    *          The time scale to set.
    */
-  public void setTimeScale(float timeScale);
+  void setTimeScale(float timeScale);
 }

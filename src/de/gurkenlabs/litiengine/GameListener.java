@@ -12,7 +12,7 @@ public interface GameListener extends EventListener {
    * 
    * @see Game#start()
    */
-  public default void started() {}
+  default void started() {}
 
   /**
    * This method gets called after the {@code Game.init(String...)} method was executed.
@@ -21,7 +21,7 @@ public interface GameListener extends EventListener {
    *          The arguments that were passed to the application.
    * @see Game#init(String...)
    */
-  public default void initialized(String... args) {}
+  default void initialized(String... args) {}
 
   /**
    * This method gets called before the {@code Game} is about to be terminated.
@@ -29,12 +29,12 @@ public interface GameListener extends EventListener {
    *
    * @return Return false to interrupt the termination process.
    */
-  public default boolean terminating() {
+  default boolean terminating() {
     return true;
   }
 
   /**
    * This method is called when the {@code Game} was terminated (just before {@code System.exit} is about to be called).
    */
-  public default void terminated() {}
+  default void terminated() {}
 }

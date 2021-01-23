@@ -3,9 +3,9 @@ package de.gurkenlabs.litiengine.entities;
 import de.gurkenlabs.litiengine.IUpdateable;
 
 public interface IEntityController extends IUpdateable {
-  public void attach();
+  void attach();
 
-  public void detach();
+  void detach();
 
-  public IEntity getEntity();
+  IEntity getEntity();
 }

@@ -26,5 +26,5 @@ public interface IRenderable {
    * 
    * @see RenderEngine#renderEntity(Graphics2D, de.gurkenlabs.litiengine.entities.IEntity)
    */
-  public void render(Graphics2D g);
+  void render(Graphics2D g);
 }
