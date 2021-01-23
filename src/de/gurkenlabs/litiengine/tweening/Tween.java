@@ -9,7 +9,7 @@ import de.gurkenlabs.litiengine.Game;
  * function ({@code TweenEquation}) each tick.
  */
 public class Tween {
-  private long duration;
+  private int duration;
   private TweenEquation equation;
   private long started;
   private final float[] startValues;
@@ -28,7 +28,7 @@ public class Tween {
    * @param duration
    *          the duration of the Tween in milliseconds.
    */
-  public Tween(final Tweenable target, final TweenType type, final long duration) {
+  public Tween(final Tweenable target, final TweenType type, final int duration) {
     this.target = target;
     this.type = type;
     this.duration = duration;
@@ -169,7 +169,7 @@ public class Tween {
    * @param duration
    *          the new duration in milliseconds
    */
-  public void setDuration(final long duration) {
+  public void setDuration(final int duration) {
     this.duration = duration;
   }
 

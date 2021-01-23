@@ -30,7 +30,7 @@ public class TweenEngine implements IUpdateable, ILaunchable {
    * @param duration the duration of the Tween in milliseconds.
    * @return the Tween instance
    */
-  public Tween begin(final Tweenable target, final TweenType type, final long duration) {
+  public Tween begin(final Tweenable target, final TweenType type, final int duration) {
     Tween tween = this.getTween(target, type);
     if (tween == null) {
       tween = new Tween(target, type, duration).ease(TweenFunction.QUAD_INOUT);
