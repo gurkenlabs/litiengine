@@ -30,7 +30,6 @@ public final class Style {
   public static final Color COLOR_MOUSE_SELECTION_AREA_FILL = new Color(0, 130, 152, 80);
   public static final Color COLOR_MOUSE_SELECTION_AREA_BORDER = new Color(0, 130, 152, 150);
   public static final Color COLOR_DEFAULT_TAG = new Color(99, 113, 118);
-  public static final Color COLOR_DEFAULT_TAG_HOVER = COLOR_DEFAULT_TAG.darker();
   public static final Color COLOR_STATUS = Color.WHITE;
 
   public static final Color COLOR_DARKTHEME_FOREGROUND = new Color(224, 224, 224);

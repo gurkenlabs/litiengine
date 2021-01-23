@@ -35,31 +35,13 @@ public class Tag extends JPanel {
 
     this.panel = new InternalTagPanel();
     this.panel.setBackground(Style.COLOR_DEFAULT_TAG);
-    this.panel.setLayout(new FlowLayout(FlowLayout.LEADING, 2, 2));
+    this.panel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 2));
     add(this.panel);
-    FlowLayout flowLayout = (FlowLayout) getLayout();
-    flowLayout.setVgap(2);
-    flowLayout.setHgap(2);
-    flowLayout.setAlignment(FlowLayout.LEFT);
 
     this.lblText = new JLabel("New label");
     this.lblText.setForeground(Color.WHITE);
     this.lblText.setFont(this.lblText.getFont().deriveFont(Style.getDefaultFont().getSize() * 0.75f));
     this.panel.add(this.lblText);
-
-    this.addMouseListener(new MouseAdapter() {
-      @Override
-      public void mouseEntered(final MouseEvent e) {
-        panel.setBackground(Style.COLOR_DEFAULT_TAG_HOVER);
-      }
-
-      @Override
-      public void mouseExited(final MouseEvent e) {
-        if (!deleteHovered) {
-          panel.setBackground(Style.COLOR_DEFAULT_TAG);
-        }
-      }
-    });
 
     this.btnDelete = new JButton();
     this.btnDelete.addActionListener(e -> {
@@ -73,7 +55,6 @@ public class Tag extends JPanel {
       public void mouseEntered(final MouseEvent e) {
         btnDelete.setIcon(Icons.DELETE_X7);
 
-        panel.setBackground(Style.COLOR_DEFAULT_TAG_HOVER);
         deleteHovered = true;
       }
 
@@ -99,12 +80,12 @@ public class Tag extends JPanel {
       }
     });
 
-    this.btnDelete.setMargin(new Insets(2, 5, 2, 5));
+    this.btnDelete.setMargin(new Insets(2, 0, 2, 0));
     this.btnDelete.setContentAreaFilled(false);
     this.btnDelete.setBorderPainted(false);
     this.btnDelete.setFocusPainted(false);
     this.btnDelete.setBorder(null);
-    this.btnDelete.setPreferredSize(new Dimension(7, 7));
+    this.btnDelete.setPreferredSize(new Dimension(9, 9));
     this.btnDelete.setIcon(Icons.DELETE_X7_DISABLED);
     this.panel.add(this.btnDelete);
   }
