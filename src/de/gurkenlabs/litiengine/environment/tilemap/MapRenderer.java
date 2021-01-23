@@ -8,6 +8,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
 import java.util.EventListener;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import de.gurkenlabs.litiengine.Game;
@@ -75,7 +76,8 @@ public class MapRenderer {
   }
 
   private static void renderLayers(final Graphics2D g, final IMap map, ILayerList layers, final Rectangle2D viewport, Environment env, RenderType[] renderTypes, float opacity) {
-    for (final ILayer layer : layers.getRenderLayers()) {
+    final List<ILayer> renderLayers = layers.getRenderLayers();
+    for (final ILayer layer : renderLayers) {
       if (layer == null || !shouldBeRendered(g, map, layer, renderTypes)) {
         continue;
       }
