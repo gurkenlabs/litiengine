@@ -26,6 +26,7 @@ import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
 import de.gurkenlabs.litiengine.configuration.DisplayMode;
+import de.gurkenlabs.litiengine.configuration.GraphicConfiguration;
 import de.gurkenlabs.litiengine.graphics.MouseCursor;
 import de.gurkenlabs.litiengine.graphics.RenderComponent;
 import de.gurkenlabs.litiengine.gui.screens.Resolution;
@@ -329,9 +330,9 @@ public final class GameWindow {
    * Otherwise, the {@code JFrame} is initialized with the {@code DisplayMode} and resolution defined in the Graphics Configuration.
    * After initializing the hosting {@code JFrame}, the {@code RenderComponent} is also initialized and the window requests focus.
    * 
-   * @see Game#isisInNoGUIMode
+   * @see Game#isInNoGUIMode
    * @see #prepareHostControl
-   * @see GraphicsConfiguration
+   * @see GraphicConfiguration
    * @see RenderComponent
    */
   void init() {
