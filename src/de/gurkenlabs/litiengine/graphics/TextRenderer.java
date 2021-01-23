@@ -23,7 +23,6 @@ import java.util.List;
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Valign;
-import de.gurkenlabs.litiengine.gui.GuiProperties;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 
 public final class TextRenderer {
@@ -53,12 +52,14 @@ public final class TextRenderer {
    *
    * @param g                 the Graphics2D object to draw on
    * @param text              the String to be distributed over all generated lines
-   * @param alignment         The horizontal alignment.
-   * @param verticalAlignment The vertical alignment.
+   * @param align             The horizontal alignment.
+   * @param valign            The vertical alignment.
+   * @param offsetX           The horizontal offset that is added to the alignment.
+   * @param offsetY           The vertical offset that is added to the alignment.
    */
-  public static void render(final Graphics2D g, final String text, Align alignment, Valign verticalAlignment, double offsetX, double offsetY) {
+  public static void render(final Graphics2D g, final String text, Align align, Valign valign, double offsetX, double offsetY) {
     final Rectangle2D bounds = g.getClipBounds();
-    render(g, text, bounds, alignment, verticalAlignment, offsetX, offsetY, false);
+    render(g, text, bounds, align, valign, offsetX, offsetY, false);
   }
 
   public static void render(final Graphics2D g, final String text, Rectangle2D bounds, Align alignment, Valign verticalAlignment, boolean scaleFont) {
@@ -71,11 +72,13 @@ public final class TextRenderer {
    * @param g                 the Graphics2D object to draw on
    * @param text              the String to be distributed over all generated lines
    * @param bounds            the Rectangle defining the boundaries used for alignment and scaling.
-   * @param alignment         The horizontal alignment.
-   * @param verticalAlignment The vertical alignment.
+   * @param align             The horizontal alignment.
+   * @param valign            The vertical alignment.
+   * @param offsetX           The horizontal offset that is added to the alignment.
+   * @param offsetY           The vertical offset that is added to the alignment.
    * @param scaleFont         if true, scale the font so that the text will fit inside the given rectangle. If not, use the Graphics context's previous font size.
    */
-  public static void render(final Graphics2D g, final String text, Rectangle2D bounds, Align alignment, Valign verticalAlignment, double offsetX,
+  public static void render(final Graphics2D g, final String text, Rectangle2D bounds, Align align, Valign valign, double offsetX,
       double offsetY, boolean scaleFont) {
     if (bounds == null) {
       return;
@@ -88,9 +91,9 @@ public final class TextRenderer {
         g.setFont(g.getFont().deriveFont(currentFontSize));
       }
     }
-    double locationX = bounds.getX() + alignment.getLocation(bounds.getWidth(), g.getFontMetrics().stringWidth(text)) + offsetX;
+    double locationX = bounds.getX() + align.getLocation(bounds.getWidth(), g.getFontMetrics().stringWidth(text)) + offsetX;
     double locationY =
-        bounds.getY() + verticalAlignment.getLocation(bounds.getHeight(), getHeight(g, text)) + g.getFontMetrics().getAscent() + offsetY;
+        bounds.getY() + valign.getLocation(bounds.getHeight(), getHeight(g, text)) + g.getFontMetrics().getAscent() + offsetY;
     render(g, text, locationX, locationY);
     g.setFont(g.getFont().deriveFont(previousFontSize));
   }
@@ -190,8 +193,11 @@ public final class TextRenderer {
    *
    * @param g            the Graphics2D object to draw on
    * @param text         the String to be distributed over all generated lines
+   * @param align        The horizontal alignment.
+   * @param valign       The vertical alignment.
    * @param x            the min x coordinate
    * @param y            the min y coordinate
+   * @param height       the line height.
    * @param width        the line width
    * @param antiAliasing Configure whether or not to render the text with antialiasing.
    * @see RenderingHints
@@ -291,7 +297,9 @@ public final class TextRenderer {
    * @param height       the height of the  bounding box in which the text will be aligned
    * @param outlineColor the outline color
    * @param stroke       the thickness of the outline
-   * @param antiAliasing the Anti-Aliasing object (e.g. RenderingHints.VALUE_TEXT_ANTIALIAS_OFF)
+   * @param align        The horizontal alignment.
+   * @param valign       The vertical alignment.
+   * @param antiAliasing Configure whether or not to render the text with antialiasing.
    * @see RenderingHints
    */
   public static void renderWithOutline(final Graphics2D g, final String text, final double x, final double y, double width, double height,
