@@ -66,6 +66,7 @@ import de.gurkenlabs.utiliti.handlers.Snap;
 import de.gurkenlabs.utiliti.handlers.Transform;
 import de.gurkenlabs.utiliti.handlers.Transform.TransformType;
 import de.gurkenlabs.utiliti.handlers.Zoom;
+import de.gurkenlabs.utiliti.renderers.GridRenderer;
 import de.gurkenlabs.utiliti.renderers.Renderers;
 import de.gurkenlabs.utiliti.swing.UI;
 import de.gurkenlabs.utiliti.swing.dialogs.ConfirmDialog;
@@ -696,6 +697,7 @@ public class MapComponent extends GuiComponent {
     }
 
     Editor.instance().updateGameFileMaps();
+    Renderers.get(GridRenderer.class).clearCache();
   }
 
   public void importMap() {
@@ -755,6 +757,7 @@ public class MapComponent extends GuiComponent {
 
       Editor.instance().updateGameFileMaps();
       Resources.images().clear();
+      Renderers.get(GridRenderer.class).clearCache();
       if (this.environments.containsKey(map.getName())) {
         this.environments.remove(map.getName());
       }
