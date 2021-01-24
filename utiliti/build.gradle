@@ -25,13 +25,13 @@ repositories {
 
 dependencies {
   implementation project(':')
-  implementation 'com.github.weisj:darklaf-core:2.5.1'
-  implementation 'com.github.weisj:darklaf-theme:2.5.1'
-  implementation 'com.github.weisj:darklaf-property-loader:2.5.1'
-  implementation 'com.github.weisj:darklaf-utils:2.5.1'
-  implementation 'com.github.weisj:darklaf-native-utils:2.5.1'
-  implementation 'com.github.weisj:darklaf-platform-base:2.5.1'
-  implementation 'com.github.weisj:darklaf-windows:2.5.1'
+  implementation 'com.github.weisj:darklaf-core:2.5.4'
+  implementation 'com.github.weisj:darklaf-theme:2.5.4'
+  implementation 'com.github.weisj:darklaf-property-loader:2.5.4'
+  implementation 'com.github.weisj:darklaf-utils:2.5.4'
+  implementation 'com.github.weisj:darklaf-native-utils:2.5.4'
+  implementation 'com.github.weisj:darklaf-platform-base:2.5.4'
+  implementation 'com.github.weisj:darklaf-windows:2.5.4'
   implementation 'net.java.dev.jna:jna:5.6.0'
   implementation 'org.swinglabs:jxlayer:3.0.4'
   implementation 'org.swinglabs:swingx:1.6.1'
