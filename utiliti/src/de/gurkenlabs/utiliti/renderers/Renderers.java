@@ -25,4 +25,14 @@ public class Renderers {
       renderer.render(g);
     }
   }
+
+  public static <T> T get(Class<? extends T> cls) {
+    for (IEditorRenderer ent : editorRenderers) {
+      if (cls.isInstance(ent)) {
+        return cls.cast(ent);
+      }
+    }
+
+    return null;
+  }
 }

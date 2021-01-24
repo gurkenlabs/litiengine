@@ -17,6 +17,8 @@ import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.utiliti.Style.Theme;
 import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.handlers.Zoom;
+import de.gurkenlabs.utiliti.renderers.GridRenderer;
+import de.gurkenlabs.utiliti.renderers.Renderers;
 import de.gurkenlabs.utiliti.swing.UI;
 import de.gurkenlabs.utiliti.swing.dialogs.GridEditPanel;
 
@@ -93,6 +95,7 @@ public final class ViewMenu extends JMenu {
         Editor.preferences().setGridColor(ColorHelper.encode(panel.getGridColor()));
         Editor.preferences().setGridLineWidth(panel.getStrokeWidth());
         Editor.preferences().setSnapDivision(panel.getSnapDivision());
+        Renderers.get(GridRenderer.class).clearCache();
       }
     });
 
