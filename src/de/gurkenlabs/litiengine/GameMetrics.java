@@ -32,6 +32,7 @@ public final class GameMetrics implements IRenderable {
   private final List<RenderMetrics> renderMetrics;
 
   private final Runtime runtime;
+  private final String javaVersion;
 
   private Color renderColor = Color.RED;
 
@@ -45,6 +46,7 @@ public final class GameMetrics implements IRenderable {
   GameMetrics() {
     this.renderMetrics = new CopyOnWriteArrayList<>();
     this.runtime = Runtime.getRuntime();
+    this.javaVersion = System.getProperty("java.version") + " (VM: " + System.getProperty("java.vm.name") + ", VENDOR: " + System.getProperty("java.vendor") + ")";
   }
 
   public int getFramesPerSecond() {
@@ -84,7 +86,7 @@ public final class GameMetrics implements IRenderable {
     // render jvm metrics if debug is enabled
     if (Game.config().debug().isDebugEnabled()) {
       this.drawTitle(g, "[jvm]");
-      this.drawMetric(g, "java      : " + Runtime.class.getPackage().getImplementationVersion());
+      this.drawMetric(g, "java      : " + this.javaVersion);
       this.drawMetric(g, "memory    : " + String.format("%-5.5s", this.usedMemory) + " MB");
       this.drawMetric(g, "threads   : " + Thread.activeCount());
     }
