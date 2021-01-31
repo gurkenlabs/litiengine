@@ -34,6 +34,7 @@ If applicable, add screenshots to help explain your problem.
 **Your System:**
  - OS: [e.g. iOS]
  - LITIENGINE version: [e.g. 0.5.0-beta]
+ - Java JDK/JRE version: [e.g. jdk1.8.0_201] 
  - Screen resolution: [e.g. 1920x1080]
 
 **Additional context**
