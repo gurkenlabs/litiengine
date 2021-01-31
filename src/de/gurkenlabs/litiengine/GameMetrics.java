@@ -6,7 +6,6 @@ import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.gurkenlabs.litiengine.configuration.ClientConfiguration;
@@ -30,8 +29,6 @@ public final class GameMetrics implements IRenderable {
   private static final int OFFSET_X = 5;
   private static final int OFFSET_Y = 14;
 
-  private final List<Long> bytesReceived;
-  private final List<Long> bytesSent;
   private final List<RenderMetrics> renderMetrics;
 
   private final Runtime runtime;
@@ -40,47 +37,18 @@ public final class GameMetrics implements IRenderable {
 
   private int currentOffsetY;
 
-  private long downStreamInBytes;
-  private long lastNetworkTickTime;
-  private int packagesReceived;
-  private int packagesSent;
-  private long ping;
-  private long upStreamInBytes;
-
   private int framesPerSecond;
   private int maxFramesPerSecond;
 
   private float usedMemory;
 
   GameMetrics() {
-    this.bytesSent = new CopyOnWriteArrayList<>();
-    this.bytesReceived = new CopyOnWriteArrayList<>();
     this.renderMetrics = new CopyOnWriteArrayList<>();
     this.runtime = Runtime.getRuntime();
   }
 
-  public float getDownStreamInBytes() {
-    return this.downStreamInBytes;
-  }
-
   public int getFramesPerSecond() {
     return this.framesPerSecond;
-  }
-
-  public int getPackagesReceived() {
-    return this.packagesReceived;
-  }
-
-  public int getPackagesSent() {
-    return this.packagesSent;
-  }
-
-  public long getPing() {
-    return this.ping;
-  }
-
-  public float getUpStreamInBytes() {
-    return this.upStreamInBytes;
   }
 
   public float getUsedMemory() {
@@ -89,14 +57,6 @@ public final class GameMetrics implements IRenderable {
 
   public Color getRenderColor() {
     return this.renderColor;
-  }
-
-  public void packageReceived(final long size) {
-    this.bytesReceived.add(size);
-  }
-
-  public void packageSent(final long size) {
-    this.bytesSent.add(size);
   }
 
   public void trackRenderTime(String name, double renderTime, RenderInfo... infos) {
@@ -129,15 +89,6 @@ public final class GameMetrics implements IRenderable {
       this.drawMetric(g, "threads   : " + Thread.activeCount());
     }
 
-    // render network metrics
-    final float downStream = Math.round(this.getDownStreamInBytes() / 1024f * 100) * 0.01f;
-    final float upStream = Math.round(this.getUpStreamInBytes() / 1024f * 100) * 0.01f;
-
-    this.drawTitle(g, "[network]");
-    this.drawMetric(g, "ping      : " + this.getPing() + " ms");
-    this.drawMetric(g, "in        : " + this.getPackagesReceived() + " - " + downStream + " kb/s");
-    this.drawMetric(g, "out       : " + this.getPackagesSent() + " - " + upStream + " kb/s");
-
     // render rendering metrics
     if (!this.renderMetrics.isEmpty()) {
       this.drawTitle(g, "[update]");
@@ -158,10 +109,6 @@ public final class GameMetrics implements IRenderable {
     this.maxFramesPerSecond = maxFrames;
   }
 
-  public void setPing(final long ping) {
-    this.ping = ping;
-  }
-
   /**
    * Sets the color that is used when rendering the metrics if {@code cl_showGameMetrics = true}.
    * 
@@ -177,27 +124,6 @@ public final class GameMetrics implements IRenderable {
 
   private void updateMetrics() {
     this.usedMemory = Math.round((this.runtime.totalMemory() - this.runtime.freeMemory()) / (1024f * 1024f) * 10) * 0.1f;
-
-    final long currentMillis = System.currentTimeMillis();
-    if (currentMillis - this.lastNetworkTickTime >= 1000) {
-      this.lastNetworkTickTime = currentMillis;
-
-      if (!this.bytesSent.isEmpty()) {
-        Optional<Long> sentOpt = this.bytesSent.parallelStream().reduce((n1, n2) -> n1 + n2);
-        final long sumUp = !this.bytesSent.isEmpty() && sentOpt.isPresent() ? sentOpt.get() : 0;
-        this.upStreamInBytes = sumUp;
-        this.packagesSent = this.bytesSent.size();
-        this.bytesSent.clear();
-      }
-
-      if (!this.bytesReceived.isEmpty()) {
-        Optional<Long> receivedOpt = this.bytesReceived.parallelStream().reduce((n1, n2) -> n1 + n2);
-        final long sumDown = !this.bytesReceived.isEmpty() && receivedOpt.isPresent() ? receivedOpt.get() : 0;
-        this.downStreamInBytes = sumDown;
-        this.packagesReceived = this.bytesReceived.size();
-        this.bytesReceived.clear();
-      }
-    }
   }
 
   private void drawTitle(Graphics2D g, String title) {
