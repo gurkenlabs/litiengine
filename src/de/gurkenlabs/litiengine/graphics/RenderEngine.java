@@ -257,7 +257,10 @@ public final class RenderEngine {
     Object hint = g.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, antialiasing ? RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF);
     final AffineTransform t = new AffineTransform();
-    t.scale(Game.world().camera().getRenderScale(), Game.world().camera().getRenderScale());
+    if(Game.world().environment() == null || !Game.world().environment().isRendering()){
+      t.scale(Game.world().camera().getRenderScale(), Game.world().camera().getRenderScale());
+    }
+
     t.translate(Game.world().camera().getPixelOffsetX(), Game.world().camera().getPixelOffsetY());
     t.rotate(Math.toRadians(angle), shape.getBounds().getX() + shape.getBounds().getWidth() * 0.5, shape.getBounds().getY() + shape.getBounds().getHeight() * 0.5);
 
@@ -348,7 +351,11 @@ public final class RenderEngine {
     Object hint = g.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, antialiasing ? RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF);
     final AffineTransform t = new AffineTransform();
-    t.scale(Game.world().camera().getRenderScale(), Game.world().camera().getRenderScale());
+
+    if(Game.world().environment() == null || !Game.world().environment().isRendering()){
+      t.scale(Game.world().camera().getRenderScale(), Game.world().camera().getRenderScale());
+    }
+
     t.translate(Game.world().camera().getPixelOffsetX(), Game.world().camera().getPixelOffsetY());
     t.rotate(Math.toRadians(angle), shape.getBounds().getX() + shape.getBounds().getWidth() * 0.5, shape.getBounds().getY() + shape.getBounds().getHeight() * 0.5);
 

@@ -109,6 +109,8 @@ public final class Environment implements IRenderable {
 
   private int gravity;
 
+  private boolean rendering;
+
   static {
     registerMapObjectLoader(new PropMapObjectLoader());
     registerMapObjectLoader(new CollisionBoxMapObjectLoader());
@@ -2278,48 +2280,53 @@ public final class Environment implements IRenderable {
   public void render(final Graphics2D g) {
     long renderStart = System.nanoTime();
 
-    AffineTransform otx = g.getTransform();
-    g.scale(Game.world().camera().getRenderScale(), Game.world().camera().getRenderScale());
-    if (this.getMap() != null && this.getMap().getBackgroundColor() != null) {
-      g.setColor(this.getMap().getBackgroundColor());
-      g.fill(new Rectangle2D.Double(0.0, 0.0, Game.world().camera().getViewport().getWidth(), Game.world().camera().getViewport().getHeight()));
+    final AffineTransform otx = g.getTransform();
+    this.rendering = true;
+
+    try {
+      g.scale(Game.world().camera().getRenderScale(), Game.world().camera().getRenderScale());
+      if (this.getMap() != null && this.getMap().getBackgroundColor() != null) {
+        g.setColor(this.getMap().getBackgroundColor());
+        g.fill(new Rectangle2D.Double(0.0, 0.0, Game.world().camera().getViewport().getWidth(), Game.world().camera().getViewport().getHeight()));
+      }
+
+      this.render(g, RenderType.BACKGROUND);
+
+      this.render(g, RenderType.GROUND);
+      DebugRenderer.renderMapDebugInfo(g, this.getMap());
+
+      this.render(g, RenderType.SURFACE);
+      this.render(g, RenderType.NORMAL);
+      this.render(g, RenderType.OVERLAY);
+
+      long ambientStart = System.nanoTime();
+      if (Game.config().graphics().getGraphicQuality().ordinal() >= Quality.MEDIUM.ordinal() && this.getAmbientLight() != null && this.getAmbientLight().getColor().getAlpha() != 0) {
+        this.getAmbientLight().render(g);
+      }
+
+      final double ambientTime = TimeUtilities.nanoToMs(System.nanoTime() - ambientStart);
+
+      long shadowRenderStart = System.nanoTime();
+      if (this.getStaticShadows().stream().anyMatch(x -> x.getShadowType() != StaticShadowType.NONE)) {
+        this.getStaticShadowLayer().render(g);
+      }
+
+      final double shadowTime = TimeUtilities.nanoToMs(System.nanoTime() - shadowRenderStart);
+
+      this.render(g, RenderType.UI);
+
+      if (Game.config().debug().trackRenderTimes()) {
+
+        final double totalRenderTime = TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
+
+        Game.metrics().trackRenderTime("shadow", shadowTime);
+        Game.metrics().trackRenderTime("ambient", ambientTime);
+        Game.metrics().trackRenderTime("world", totalRenderTime);
+      }
+    } finally {
+      this.rendering = false;
+      g.setTransform(otx);
     }
-
-    this.render(g, RenderType.BACKGROUND);
-
-    this.render(g, RenderType.GROUND);
-    DebugRenderer.renderMapDebugInfo(g, this.getMap());
-
-    this.render(g, RenderType.SURFACE);
-    this.render(g, RenderType.NORMAL);
-    this.render(g, RenderType.OVERLAY);
-
-    long ambientStart = System.nanoTime();
-    if (Game.config().graphics().getGraphicQuality().ordinal() >= Quality.MEDIUM.ordinal() && this.getAmbientLight() != null && this.getAmbientLight().getColor().getAlpha() != 0) {
-      this.getAmbientLight().render(g);
-    }
-
-    final double ambientTime = TimeUtilities.nanoToMs(System.nanoTime() - ambientStart);
-
-    long shadowRenderStart = System.nanoTime();
-    if (this.getStaticShadows().stream().anyMatch(x -> x.getShadowType() != StaticShadowType.NONE)) {
-      this.getStaticShadowLayer().render(g);
-    }
-
-    final double shadowTime = TimeUtilities.nanoToMs(System.nanoTime() - shadowRenderStart);
-
-    this.render(g, RenderType.UI);
-
-    if (Game.config().debug().trackRenderTimes()) {
-
-      final double totalRenderTime = TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
-
-      Game.metrics().trackRenderTime("shadow", shadowTime);
-      Game.metrics().trackRenderTime("ambient", ambientTime);
-      Game.metrics().trackRenderTime("world", totalRenderTime);
-    }
-
-    g.setTransform(otx);
   }
 
   /**
@@ -2385,6 +2392,10 @@ public final class Environment implements IRenderable {
 
     this.loaded = false;
     this.fireEvent(l -> l.unloaded(this));
+  }
+
+  public boolean isRendering(){
+    return this.rendering;
   }
 
   private static <T extends IEntity> T getById(Collection<T> entities, int mapId) {

@@ -50,10 +50,8 @@ public final class ShapeRenderer {
   }
 
   public static void renderTransformed(final Graphics2D g, final Shape shape, AffineTransform transform) {
-    final AffineTransform oldTransForm = g.getTransform();
-    g.setTransform(transform);
-    render(g, shape);
-    g.setTransform(oldTransForm);
+
+    render(g, transform.createTransformedShape(shape));
   }
 
   public static void renderOutlineTransformed(final Graphics2D g, final Shape shape, AffineTransform transform) {
@@ -70,9 +68,6 @@ public final class ShapeRenderer {
       return;
     }
 
-    final AffineTransform oldTransForm = g.getTransform();
-    g.setTransform(transform);
-    renderOutline(g, shape, stroke);
-    g.setTransform(oldTransForm);
+    renderOutline(g, transform.createTransformedShape(shape), stroke);
   }
 }
