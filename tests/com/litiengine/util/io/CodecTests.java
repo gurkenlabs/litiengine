@@ -61,7 +61,7 @@ public class CodecTests {
 
   @Test
   public void testImageCodec() {
-    BufferedImage image = Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag.png");
+    BufferedImage image = Resources.images().get("tests/com/litiengine/util/prop-flag.png");
 
     String encodedImage = Codec.encode(image);
     BufferedImage decodedImage = Codec.decodeImage(encodedImage);

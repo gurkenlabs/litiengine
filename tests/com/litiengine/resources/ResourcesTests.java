@@ -52,7 +52,7 @@ public class ResourcesTests {
 
   @Test
   public void testMapResourcesAlias() {
-    IMap map = Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
+    IMap map = Resources.maps().get("tests/com/litiengine/environment/tilemap/xml/test-map.tmx");
 
     assertEquals(map, Resources.maps().get("test-map"));
   }
@@ -66,7 +66,7 @@ public class ResourcesTests {
 
   @Test
   public void testSoundResources() {
-    Sound sound = Resources.sounds().get("tests/de/gurkenlabs/litiengine/resources/bip.ogg");
+    Sound sound = Resources.sounds().get("tests/com/litiengine/resources/bip.ogg");
     Sound nonExisting = Resources.sounds().get("randomname.mp3");
 
     assertNotNull(sound);
@@ -76,19 +76,19 @@ public class ResourcesTests {
   
   @Test
   public void testReadStringResources() {
-    String fileContent = Resources.read("tests/de/gurkenlabs/litiengine/resources/stringfile-utf8.txt");
+    String fileContent = Resources.read("tests/com/litiengine/resources/stringfile-utf8.txt");
     assertEquals("my utf8 èncöded strîng!!1$", fileContent);
   }
   
   @Test
   public void testReadStringCharsetResources() {
-    String fileContent = Resources.read("tests/de/gurkenlabs/litiengine/resources/stringfile-iso8859-1.txt", StandardCharsets.ISO_8859_1);
+    String fileContent = Resources.read("tests/com/litiengine/resources/stringfile-iso8859-1.txt", StandardCharsets.ISO_8859_1);
     assertEquals("my iso8859 èncöded strîng!!1$", fileContent);
   }
 
   @Test
   public void testStringList() {
-    String[] strings = Resources.strings().getList("tests/de/gurkenlabs/litiengine/resources/test.txt");
+    String[] strings = Resources.strings().getList("tests/com/litiengine/resources/test.txt");
 
     assertEquals(4, strings.length);
 
@@ -100,7 +100,7 @@ public class ResourcesTests {
 
   @Test
   public void testLocalizableString() {
-    final String bundleName = "de/gurkenlabs/litiengine/resources/custom-strings";
+    final String bundleName = "com/litiengine/resources/custom-strings";
     String myString = Resources.strings().getFrom(bundleName, "mystring");
     String myOtherString = Resources.strings().getFrom(bundleName, "myOtherString");
     String lowerCase = Resources.strings().getFrom(bundleName, "myotherstring");
@@ -112,7 +112,7 @@ public class ResourcesTests {
 
   @Test
   public void testLocalizedString() {
-    final String bundleName = "de/gurkenlabs/litiengine/resources/custom-strings";
+    final String bundleName = "com/litiengine/resources/custom-strings";
 
     String oldLang = Game.config().client().getLanguage();
     String oldCountry = Game.config().client().getCountry();

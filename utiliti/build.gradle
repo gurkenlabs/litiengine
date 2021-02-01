@@ -8,7 +8,7 @@ apply plugin: 'application'
 
 archivesBaseName = "utiliti"
 version = "v0.5.0-beta"
-mainClassName = "de.gurkenlabs.utiliti.Program"
+mainClassName = "com.litiengine.utiliti.Program"
 
 sourceSets {
   main.java.srcDir "src"
@@ -72,12 +72,12 @@ jar {
   exclude 'junit**/**'
   
   manifest {
-    attributes 'Main-Class': 'de.gurkenlabs.utiliti.Program'
+    attributes 'Main-Class': 'com.litiengine.utiliti.Program'
   }
 }
 
 launch4j {
-  mainClassName = 'de.gurkenlabs.utiliti.Program'
+  mainClassName = 'com.litiengine.utiliti.Program'
   icon = 'pixel-icon-utiLITI.ico'
   outputDir = 'libs'
   outfile = archivesBaseName + '-v0.5.0-beta.exe'
