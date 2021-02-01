@@ -70,7 +70,7 @@ public class GameWorldTests {
       }
     });
 
-    IMap map = Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
+    IMap map = Resources.maps().get("tests/com/litiengine/environment/tilemap/xml/test-map.tmx");
 
     Environment env = Game.world().loadEnvironment(map);
 
@@ -81,7 +81,7 @@ public class GameWorldTests {
 
     assertTrue(mapCleared.wasCalled);
 
-    IMap map2 = Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-mapobject.tmx");
+    IMap map2 = Resources.maps().get("tests/com/litiengine/environment/tilemap/xml/test-mapobject.tmx");
 
     Game.world().loadEnvironment(map2);
 
@@ -96,7 +96,7 @@ public class GameWorldTests {
 
     Game.world().onLoaded("test-map", e -> mapLoaded.wasCalled = true);
 
-    IMap map = Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
+    IMap map = Resources.maps().get("tests/com/litiengine/environment/tilemap/xml/test-map.tmx");
 
     Game.world().loadEnvironment(map);
 
@@ -109,7 +109,7 @@ public class GameWorldTests {
 
     Game.world().onUnloaded("test-map", e -> mapUnloaded.wasCalled = true);
 
-    IMap map = Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
+    IMap map = Resources.maps().get("tests/com/litiengine/environment/tilemap/xml/test-map.tmx");
 
     Game.world().loadEnvironment(map);
 

@@ -12,7 +12,7 @@ public class TextureAtlasTests {
 
   @Test
   public void testReadTextureAtlasFromFile() {
-    TextureAtlas atlas = TextureAtlas.read("tests/de/gurkenlabs/litiengine/resources/gurk-nukem-atlas.xml");
+    TextureAtlas atlas = TextureAtlas.read("tests/com/litiengine/resources/gurk-nukem-atlas.xml");
 
     assertNotNull(atlas);
     assertEquals(123, atlas.getWidth());
@@ -38,7 +38,7 @@ public class TextureAtlasTests {
 
   @Test
   public void testTextureAtlasLoad() {
-    TextureAtlas atlas = TextureAtlas.read("tests/de/gurkenlabs/litiengine/resources/gurk-nukem-atlas.xml");
+    TextureAtlas atlas = TextureAtlas.read("tests/com/litiengine/resources/gurk-nukem-atlas.xml");
     Resources.images().load(atlas);
 
     BufferedImage deanIdle = Resources.images().get("Dean-idle-left.png");
