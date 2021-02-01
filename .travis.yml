@@ -5,8 +5,8 @@ before_install:
   - sudo apt-get -y install at-spi2-core
 
 jdk:
-  openjdk8
-  openjdk11
+  - openjdk8
+  - openjdk11
 
 git:
   depth: false
