@@ -48,6 +48,7 @@ import de.gurkenlabs.utiliti.swing.ControlBehavior;
 @SuppressWarnings("serial")
 public class SpritesheetImportPanel extends JPanel implements IUpdateable {
   private static final int PREVIEW_SIZE = 128;
+  private static final int SPINNER_WIDTH = 100;
 
   private JTextField textField;
   private JTable tableKeyFrames;
@@ -95,7 +96,7 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
   public SpritesheetImportPanel() {
     this.controller = new AnimationController();
     fileListModel = new DefaultListModel<>();
-    setPreferredSize(new Dimension(500, 400));
+    setPreferredSize(new Dimension(600, 500));
     setLayout(new BorderLayout(10, 10));
 
     fileList = new JList<>();
@@ -149,6 +150,9 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
     JLabel lblSpritewidth = new JLabel("spritewidth:");
 
     spinnerWidth = new JSpinner();
+    spinnerWidth.setPreferredSize(new Dimension(SPINNER_WIDTH, spinnerWidth.getPreferredSize().height));
+    spinnerWidth.setMinimumSize(new Dimension(SPINNER_WIDTH, spinnerWidth.getPreferredSize().height));
+    spinnerWidth.setMaximumSize(new Dimension(SPINNER_WIDTH, spinnerWidth.getPreferredSize().height));
     spinnerWidth.setModel(new SpinnerNumberModel(1, 1, null, 1));
     spinnerWidth.addChangeListener(e -> {
       if (this.isUpdating) {
@@ -163,6 +167,9 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
     JLabel lblSpriteheight = new JLabel("spriteheight:");
 
     spinnerHeight = new JSpinner();
+    spinnerHeight.setPreferredSize(new Dimension(SPINNER_WIDTH, spinnerHeight.getPreferredSize().height));
+    spinnerHeight.setMinimumSize(new Dimension(SPINNER_WIDTH, spinnerHeight.getPreferredSize().height));
+    spinnerHeight.setMaximumSize(new Dimension(SPINNER_WIDTH, spinnerHeight.getPreferredSize().height));
     spinnerHeight.setModel(new SpinnerNumberModel(1, 1, null, 1));
     spinnerHeight.addChangeListener(e -> {
       if (this.isUpdating) {
@@ -209,28 +216,51 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
     glPanel
         .setHorizontalGroup(glPanel.createParallelGroup(Alignment.LEADING)
             .addGroup(glPanel.createSequentialGroup().addContainerGap()
-                .addGroup(glPanel.createParallelGroup(Alignment.LEADING).addGroup(glPanel.createSequentialGroup().addComponent(labelImage, GroupLayout.DEFAULT_SIZE, 284, Short.MAX_VALUE).addContainerGap()).addGroup(glPanel.createSequentialGroup()
-                    .addGroup(glPanel.createParallelGroup(Alignment.LEADING).addComponent(lblKeyframes, GroupLayout.DEFAULT_SIZE, 74, Short.MAX_VALUE).addComponent(lblName, GroupLayout.DEFAULT_SIZE, 74, Short.MAX_VALUE).addComponent(lblNewLabel, GroupLayout.DEFAULT_SIZE, 74, Short.MAX_VALUE)
-                        .addComponent(lblSpritewidth, GroupLayout.DEFAULT_SIZE, 74, Short.MAX_VALUE))
-                    .addGap(10)
-                    .addGroup(glPanel.createParallelGroup(Alignment.LEADING, false).addComponent(scrollPane1, 0, 0, Short.MAX_VALUE)
-                        .addGroup(glPanel.createSequentialGroup().addGroup(glPanel.createParallelGroup(Alignment.TRAILING, false).addComponent(labelWidth, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addComponent(spinnerWidth, GroupLayout.DEFAULT_SIZE, 50, Short.MAX_VALUE))
-                            .addPreferredGap(ComponentPlacement.UNRELATED)
-                            .addGroup(glPanel.createParallelGroup(Alignment.LEADING, false).addComponent(lblHeightText, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addComponent(lblSpriteheight, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE,
-                                GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addPreferredGap(ComponentPlacement.UNRELATED)
-                            .addGroup(glPanel.createParallelGroup(Alignment.LEADING, false).addComponent(labelHeight, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addComponent(spinnerHeight, GroupLayout.DEFAULT_SIZE, 50, Short.MAX_VALUE)))
-                        .addComponent(textField))
-                    .addContainerGap(29, Short.MAX_VALUE)))));
+                .addGroup(glPanel.createParallelGroup(Alignment.LEADING).addGroup(
+                    glPanel.createSequentialGroup().addComponent(labelImage, GroupLayout.DEFAULT_SIZE, 284, Short.MAX_VALUE).addContainerGap())
+                    .addGroup(glPanel.createSequentialGroup()
+                        .addGroup(
+                            glPanel.createParallelGroup(Alignment.LEADING).addComponent(lblKeyframes, GroupLayout.DEFAULT_SIZE, 74, Short.MAX_VALUE)
+                                .addComponent(lblName, GroupLayout.DEFAULT_SIZE, 74, Short.MAX_VALUE)
+                                .addComponent(lblNewLabel, GroupLayout.DEFAULT_SIZE, 74, Short.MAX_VALUE)
+                                .addComponent(lblSpritewidth, GroupLayout.DEFAULT_SIZE, 74, Short.MAX_VALUE))
+                        .addGap(10)
+                        .addGroup(glPanel.createParallelGroup(Alignment.LEADING, false).addComponent(scrollPane1, 0, 0, Short.MAX_VALUE)
+                            .addGroup(glPanel.createSequentialGroup().addGroup(glPanel.createParallelGroup(Alignment.TRAILING, false)
+                                .addComponent(labelWidth, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(spinnerWidth, GroupLayout.DEFAULT_SIZE, 50, Short.MAX_VALUE))
+                                .addPreferredGap(ComponentPlacement.UNRELATED)
+                                .addGroup(glPanel.createParallelGroup(Alignment.LEADING, false)
+                                    .addComponent(lblHeightText, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE,
+                                        Short.MAX_VALUE).addComponent(lblSpriteheight, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE,
+                                        GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addPreferredGap(ComponentPlacement.UNRELATED)
+                                .addGroup(glPanel.createParallelGroup(Alignment.LEADING, false)
+                                    .addComponent(labelHeight, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(spinnerHeight, GroupLayout.DEFAULT_SIZE, 50, Short.MAX_VALUE)))
+                            .addComponent(textField))
+                        .addContainerGap(29, Short.MAX_VALUE)))));
     glPanel.setVerticalGroup(glPanel.createParallelGroup(Alignment.LEADING)
-        .addGroup(glPanel.createSequentialGroup().addContainerGap().addComponent(labelImage, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addPreferredGap(ComponentPlacement.RELATED)
-            .addGroup(glPanel.createParallelGroup(Alignment.LEADING).addGroup(glPanel.createParallelGroup(Alignment.BASELINE).addComponent(labelWidth, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE).addComponent(lblNewLabel))
-                .addGroup(glPanel.createParallelGroup(Alignment.BASELINE).addComponent(lblHeightText, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE).addComponent(labelHeight, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE)))
+        .addGroup(glPanel.createSequentialGroup().addContainerGap()
+            .addComponent(labelImage, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+            .addPreferredGap(ComponentPlacement.RELATED)
+            .addGroup(glPanel.createParallelGroup(Alignment.LEADING).addGroup(
+                glPanel.createParallelGroup(Alignment.BASELINE).addComponent(labelWidth, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblNewLabel))
+                .addGroup(glPanel.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblHeightText, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(labelHeight, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE)))
             .addGap(14)
-            .addGroup(glPanel.createParallelGroup(Alignment.BASELINE).addComponent(lblSpriteheight).addComponent(lblSpritewidth).addComponent(spinnerWidth, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addComponent(spinnerHeight, GroupLayout.PREFERRED_SIZE,
-                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-            .addPreferredGap(ComponentPlacement.UNRELATED).addGroup(glPanel.createParallelGroup(Alignment.LEADING).addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addComponent(lblName)).addGroup(glPanel.createParallelGroup(Alignment.LEADING)
-                .addGroup(glPanel.createSequentialGroup().addGap(13).addComponent(lblKeyframes)).addGroup(glPanel.createSequentialGroup().addPreferredGap(ComponentPlacement.UNRELATED).addComponent(scrollPane1, GroupLayout.DEFAULT_SIZE, 153, Short.MAX_VALUE)))
+            .addGroup(glPanel.createParallelGroup(Alignment.BASELINE).addComponent(lblSpriteheight).addComponent(lblSpritewidth)
+                .addComponent(spinnerWidth, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addComponent(spinnerHeight, GroupLayout.PREFERRED_SIZE,
+                    GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+            .addPreferredGap(ComponentPlacement.UNRELATED).addGroup(glPanel.createParallelGroup(Alignment.LEADING)
+                .addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addComponent(lblName))
+            .addGroup(glPanel.createParallelGroup(Alignment.LEADING)
+                .addGroup(glPanel.createSequentialGroup().addGap(13).addComponent(lblKeyframes)).addGroup(
+                    glPanel.createSequentialGroup().addPreferredGap(ComponentPlacement.UNRELATED)
+                        .addComponent(scrollPane1, GroupLayout.DEFAULT_SIZE, 153, Short.MAX_VALUE)))
             .addContainerGap()));
 
     tableKeyFrames = new JTable();
@@ -327,13 +357,16 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
 
       BufferedImage img = Imaging.scale(file.getImage(), factor, true);
 
-      Spritesheet sprite = new Spritesheet(img, file.getName() + "-preview", (int) (file.getSpriteWidth() * factor), (int) (file.getSpriteHeight() * factor));
+      Spritesheet sprite = new Spritesheet(img, file.getName() + "-preview", (int) (file.getSpriteWidth() * factor),
+          (int) (file.getSpriteHeight() * factor));
       Animation newAnim = new Animation(sprite, true, file.keyFrames);
 
       this.controller.setDefault(newAnim);
       this.controller.play(newAnim.getName());
     } catch (IllegalArgumentException e) {
-      log.log(Level.WARNING, "The sprite file {0} cannot be scaled correctly for the preview window. Please check if the image file dimensions are divisible by the desired sprite dimensions without remainder.", file.name);
+      log.log(Level.WARNING,
+          "The sprite file {0} cannot be scaled correctly for the preview window. Please check if the image file dimensions are divisible by the desired sprite dimensions without remainder.",
+          file.name);
     } finally {
       this.isUpdating = false;
     }
