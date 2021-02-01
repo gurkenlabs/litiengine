@@ -4,7 +4,9 @@ before_install:
   - chmod +x gradlew
   - sudo apt-get -y install at-spi2-core
 
-jdk: openjdk8
+jdk:
+  openjdk8
+  openjdk11
 
 git:
   depth: false
@@ -16,11 +18,6 @@ addons:
 services:
   - xvfb
 
-script: 
-- ./gradlew fullbuild --warning-mode all
-- if [ $TRAVIS_PULL_REQUEST = 'false' ]; then 
-    sonar-scanner; 
-  fi
 
 cache:
   directories:
@@ -28,3 +25,16 @@ cache:
     - '$HOME/.sonar/cache'
     - '$HOME/.gradle/caches/'
     - '$HOME/.gradle/wrapper/'
+
+jobs:
+  include:
+    - stage: "Fullbuild"
+      name: "Build, report coverage, and create Docs"
+      script: ./gradlew fullbuild --warning-mode all
+    - stage: "Scan"
+      name: "Sonarqube Scan"
+      script:
+        export JAVA_HOME= "/usr/local/lib/jvm/openjdk11"
+        if [ $TRAVIS_PULL_REQUEST = 'false' ]; then
+          sonar-scanner;
+        fi
