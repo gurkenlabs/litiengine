@@ -1,0 +1,80 @@
+package com.litiengine.utiliti.renderers;
+
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.Stroke;
+import java.awt.geom.Point2D;
+
+import com.litiengine.Game;
+import com.litiengine.environment.tilemap.IMapObject;
+import com.litiengine.graphics.TextRenderer;
+import com.litiengine.utiliti.components.Editor;
+import com.litiengine.utiliti.Style;
+
+public class SelectionRenderer implements IEditorRenderer {
+  private Color colorSelectionBorder;
+  private float selectionBorderBrightness = 0;
+  private boolean selectionBorderBrightnessIncreasing = true;
+
+  @Override
+  public String getName() {
+    return "SELECTION";
+  }
+
+  @Override
+  public void render(Graphics2D g) {
+    this.updateSelectionColor();
+
+    for (IMapObject mapObject : Editor.instance().getMapComponent().getSelectedMapObjects()) {
+      renderObjectId(g, mapObject);
+
+      if (mapObject.equals(Editor.instance().getMapComponent().getFocusedMapObject())) {
+        continue;
+      }
+
+      Stroke stroke = new BasicStroke(1 / Game.world().camera().getRenderScale());
+
+      g.setColor(colorSelectionBorder);
+      Game.graphics().renderOutline(g, mapObject.getBoundingBox(), stroke);
+    }
+  }
+
+  private void updateSelectionColor() {
+    if (this.selectionBorderBrightness <= 0.4) {
+      this.selectionBorderBrightnessIncreasing = true;
+    } else if (this.selectionBorderBrightness >= 0.9) {
+      this.selectionBorderBrightnessIncreasing = false;
+    }
+
+    if (this.selectionBorderBrightnessIncreasing && this.selectionBorderBrightness < 0.9) {
+      this.selectionBorderBrightness += 0.01;
+    } else if (!selectionBorderBrightnessIncreasing && this.selectionBorderBrightness >= 0.4) {
+      this.selectionBorderBrightness -= 0.01;
+    }
+
+    this.colorSelectionBorder = Color.getHSBColor(0, 0, this.selectionBorderBrightness);
+  }
+
+  private static void renderObjectId(Graphics2D g, IMapObject mapObject) {
+    if (!Editor.preferences().renderMapIds()) {
+      return;
+    }
+
+    Font previousFont = Style.FONT_BOLD;
+    Font idFont = previousFont.deriveFont(Math.max(8f, (float) (10 * Math.sqrt(Game.world().camera().getRenderScale()))) * Editor.preferences().getUiScale());
+
+    Point2D loc = Game.world().camera().getViewportLocation(new Point2D.Double(mapObject.getX() + mapObject.getWidth() / 2, mapObject.getY()));
+    g.setColor(Style.COLOR_STATUS);
+
+    g.setFont(idFont);
+    String id = Integer.toString(mapObject.getId());
+
+    double x = loc.getX() * Game.world().camera().getRenderScale() - g.getFontMetrics().stringWidth(id) / 2.0;
+    double y = loc.getY() * Game.world().camera().getRenderScale() - (g.getFontMetrics().getHeight());
+    TextRenderer.render(g, id, x, y, true);
+
+    g.setFont(previousFont);
+  }
+}

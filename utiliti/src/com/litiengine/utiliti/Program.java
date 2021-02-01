@@ -1,0 +1,87 @@
+package com.litiengine.utiliti;
+
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Paths;
+
+import javax.swing.SwingUtilities;
+
+import com.litiengine.DefaultUncaughtExceptionHandler;
+import com.litiengine.Game;
+import com.litiengine.configuration.Quality;
+import com.litiengine.input.Input;
+import com.litiengine.resources.Resources;
+import com.litiengine.utiliti.components.Editor;
+import com.litiengine.utiliti.swing.UI;
+
+public class Program {
+  public static void main(String[] args) {
+    // setup basic settings
+    Game.info().setName("utiLITI");
+    Game.info().setSubTitle("LITIENGINE Creation Kit");
+    Game.info().setVersion("v0.5.0-beta");
+    Resources.strings().setEncoding(StandardCharsets.UTF_8);
+
+    // hook up configuration and initialize the game
+    Game.config().add(Editor.preferences());
+
+    Game.config().load();
+    SwingUtilities.invokeLater(() -> {
+      UI.initLookAndFeel();
+      Game.init(args);
+      forceBasicEditorConfiguration();
+      Game.world().camera().onZoom(event -> Editor.preferences().setZoom((float) event.getZoom()));
+
+      // the editor should never crash, even if an exception occurs
+      Game.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(false));
+
+      // prepare UI and start the game
+      UI.init();
+      Game.start();
+
+      // configure input settings
+      Input.mouse().setGrabMouse(false);
+      Input.keyboard().consumeAlt(true);
+
+      // load up previously opened project file or the one that is specified in
+      // the command line arguments
+      handleArgs(args);
+
+      String gameFile = Editor.preferences().getLastGameFile();
+      if (!Editor.instance().fileLoaded() && gameFile != null && !gameFile.isEmpty()) {
+        Editor.instance().load(new File(gameFile.trim()), false);
+      }
+    });
+  }
+
+  private static void forceBasicEditorConfiguration() {
+    // force configuration elements that are crucial for the editor
+    Game.graphics().setBaseRenderScale(1.0f);
+    Game.config().debug().setDebugEnabled(true);
+    Game.config().graphics().setGraphicQuality(Quality.VERYHIGH);
+    Game.config().graphics().setReduceFramesWhenNotFocused(false);
+    Game.config().graphics().setEnableResolutionScale(false);
+  }
+
+  private static void handleArgs(String[] args) {
+    if (args.length == 0) {
+      return;
+    }
+
+    String gameFile = args[0].trim();
+    if (gameFile == null || gameFile.isEmpty()) {
+      return;
+    }
+
+    // handle file loading
+    try {
+      Paths.get(gameFile);
+    } catch (InvalidPathException e) {
+      return;
+    }
+
+    File f = new File(gameFile);
+    Editor.instance().load(f, false);
+  }
+}

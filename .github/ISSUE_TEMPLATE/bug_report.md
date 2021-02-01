@@ -15,7 +15,7 @@ The error message you get either in your console or the `crash.txt` located in y
 ```java
 java.lang.NullPointerException
     at de.gurkenlabs.utiliti.components.EditorScreen.load(EditorScreen.java:308)
-    at de.gurkenlabs.utiliti.Program.main(Program.java:141)
+    at Program.main(Program.java:141)
 ```
 
 **To Reproduce**
