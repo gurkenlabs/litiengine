@@ -9,7 +9,7 @@ import java.io.File;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
-class GameTest {
+public class GameTest {
   // test-only helper method to call the package-private Game.terminate
   public static void resetGame() {
     Game.terminate();
