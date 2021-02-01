@@ -15,7 +15,9 @@ public enum TweenFunction {
   // Circle
   CIRCLE_IN(time -> (float) (1.0F - Math.sqrt(1.0F - Math.pow(time, 2)))),
   CIRCLE_OUT(time -> (float) Math.sqrt(1.0F - Math.pow(time - 1f, 2))),
-  CIRCLE_INOUT(time -> (float) (time * 2f < 1f ? (1f - Math.sqrt(1.0F - Math.pow(time * 2f, 2))) * 0.5 : (Math.sqrt(1f - 4 * Math.pow((time - 1f), 2)) + 1.0f) * 0.5f)),
+  CIRCLE_INOUT(time -> (float) (time * 2f < 1f ?
+      (1f - Math.sqrt(1.0F - Math.pow(time * 2f, 2))) * 0.5 :
+      (Math.sqrt(1f - 4 * Math.pow((time - 1f), 2)) + 1.0f) * 0.5f)),
 
   // Sine
   SINE_IN(time -> (float) (1.0f - Math.cos(time * Math.PI / 2f))),
@@ -35,7 +37,9 @@ public enum TweenFunction {
   }),
   BACK_INOUT(time -> {
     final float k2 = 1.70158F * 1.525F;
-    return (float) (time < .5f ? Math.pow(time, 2) * 2.0F * (time * 2.0F * (k2 + 1.0F) - k2) : 1.0F + 2.0F * Math.pow(time - 1f, 2) * (2.0F * (time - 1.0F) * (k2 + 1.0F) + k2));
+    return (float) (time < .5f ?
+        Math.pow(time, 2) * 2.0F * (time * 2.0F * (k2 + 1.0F) - k2) :
+        1.0F + 2.0F * Math.pow(time - 1f, 2) * (2.0F * (time - 1.0F) * (k2 + 1.0F) + k2));
   }),
 
   // Bounce
@@ -67,7 +71,9 @@ public enum TweenFunction {
   }),
 
   BOUNCE_IN(time -> 1f - BOUNCE_OUT.equation.compute(1f - time)),
-  BOUNCE_INOUT(time -> (float) (time * 2f < 1f ? 0.5F - 0.5F * BOUNCE_OUT.equation.compute(1.0F - time * 2) : 0.5F + 0.5F * BOUNCE_OUT.equation.compute(time * 2 - 1.0F))),
+  BOUNCE_INOUT(time -> time * 2f < 1f ?
+      0.5F - 0.5F * BOUNCE_OUT.equation.compute(1.0F - time * 2) :
+      0.5F + 0.5F * BOUNCE_OUT.equation.compute(time * 2 - 1.0F)),
 
   // Elastic
   ELASTIC_IN(time -> (float) (-Math.pow(2, 10f * (time - 1f)) * Math.sin(((time - 1f) * 40f - 3f) * Math.PI / 6f))),
@@ -89,8 +95,7 @@ public enum TweenFunction {
   /**
    * Instantiates a new tween function with a given mathematical equation.
    *
-   * @param equation
-   *          the equation
+   * @param equation the equation
    */
   TweenFunction(final TweenEquation equation) {
     this.equation = equation;
@@ -108,9 +113,7 @@ public enum TweenFunction {
   /**
    * Computes the next value of the interpolation.
    *
-   * @param time
-   *          The current progress of the tween duration, between 0 and 1.
-   *
+   * @param time The current progress of the tween duration, between 0 and 1.
    * @return The next interpolated value.
    */
   public float compute(float time) {

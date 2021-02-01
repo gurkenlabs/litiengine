@@ -30,7 +30,7 @@ public class GridRenderer implements IEditorRenderer {
     if (Editor.preferences().showGrid() && camera.getRenderScale() >= 1 && Game.world().environment() != null) {
       final IMap map = Game.world().environment().getMap();
 
-      if (map == null || map.getName() == null || camera == null) {
+      if (map == null || map.getName() == null) {
         return;
       }
 
@@ -40,14 +40,20 @@ public class GridRenderer implements IEditorRenderer {
 
       Point2D viewPortLocation = Game.world().camera().getViewportLocation(0, 0);
 
-      final float scale = camera.getRenderScale() > GridImages.RENDERSCALE_LARGE ? GridImages.LARGE_GRID_SCALE : camera.getRenderScale() > GridImages.RENDERSCALE_MID ? GridImages.MID_GRID_SCALE : GridImages.SMALL_GRID_SCALE;
+      final float scale = camera.getRenderScale() > GridImages.RENDERSCALE_LARGE ?
+          GridImages.LARGE_GRID_SCALE :
+          camera.getRenderScale() > GridImages.RENDERSCALE_MID ? GridImages.MID_GRID_SCALE : GridImages.SMALL_GRID_SCALE;
       final GridImages images = gridCache.get(map.getName());
-      final BufferedImage image = camera.getRenderScale() > GridImages.RENDERSCALE_LARGE ? images.getLargeImage() : camera.getRenderScale() > GridImages.RENDERSCALE_MID ? images.getMidImage() : images.getSmallImage();
-      ImageRenderer.renderScaled(g, image, viewPortLocation.getX() * camera.getRenderScale(), viewPortLocation.getY() * Game.world().camera().getRenderScale(), camera.getRenderScale() / scale);
+      final BufferedImage image = camera.getRenderScale() > GridImages.RENDERSCALE_LARGE ?
+          images.getLargeImage() :
+          camera.getRenderScale() > GridImages.RENDERSCALE_MID ? images.getMidImage() : images.getSmallImage();
+      ImageRenderer
+          .renderScaled(g, image, viewPortLocation.getX() * camera.getRenderScale(), viewPortLocation.getY() * Game.world().camera().getRenderScale(),
+              camera.getRenderScale() / scale);
     }
   }
 
-  public void clearCache(){
+  public void clearCache() {
     gridCache.clear();
   }
 
@@ -81,11 +87,11 @@ public class GridRenderer implements IEditorRenderer {
     }
 
     private static BufferedImage createImage(IMap map, float scale) {
-      BufferedImage image = Imaging.getCompatibleImage((int)(map.getSizeInPixels().width * scale) + 1, (int)(map.getSizeInPixels().height * scale) + 1);
+      BufferedImage image = Imaging
+          .getCompatibleImage((int) (map.getSizeInPixels().width * scale) + 1, (int) (map.getSizeInPixels().height * scale) + 1);
       Graphics2D graphics = (Graphics2D) image.getGraphics();
 
-
-      final float lineSize = Editor.preferences().getGridLineWidth() / (float) scale;
+      final float lineSize = Editor.preferences().getGridLineWidth() / scale;
       final Stroke stroke = new BasicStroke(lineSize);
       graphics.setColor(Editor.preferences().getGridColor());
       for (int x = 0; x < map.getWidth(); x++) {

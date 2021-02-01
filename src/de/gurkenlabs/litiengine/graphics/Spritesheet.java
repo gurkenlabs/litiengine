@@ -213,13 +213,13 @@ public final class Spritesheet implements Comparable<Spritesheet> {
     checkDimension(value, this.getImage().getHeight(), this.getName(), "height");
   }
 
-  private static void checkDimension(int value, int imageValue, String image_name, String dimension) {
+  private static void checkDimension(int value, int imageValue, String imageName, String dimension) {
     if (value <= 0) {
-      throw new IllegalArgumentException("Invalid sprite dimensions (" + image_name + ")! Sprite " + dimension + " must to be greater than 0.");
+      throw new IllegalArgumentException("Invalid sprite dimensions (" + imageName + ")! Sprite " + dimension + " must to be greater than 0.");
     }
 
     if (value > imageValue) {
-      throw new IllegalArgumentException("Invalid sprite dimensions (" + image_name + ")! Sprite " + dimension + "(" + value + ") cannot be greater than the image " + dimension + "(" + imageValue + ").");
+      throw new IllegalArgumentException("Invalid sprite dimensions (" + imageName + ")! Sprite " + dimension + "(" + value + ") cannot be greater than the image " + dimension + "(" + imageValue + ").");
     }
   }
 

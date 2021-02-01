@@ -1234,7 +1234,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     final FontMetrics fm = g.getFontMetrics();
 
     double textWidth = fm.stringWidth(this.getTextToRender(g));
-    double textHeight = fm.getAscent() + fm.getDescent();
+    double textHeight = (double) (fm.getAscent() + fm.getDescent());
 
     double xCoord = this.getTextAlign() != null ?
         this.getX() + this.getTextAlign().getLocation(this.getWidth(), textWidth) :

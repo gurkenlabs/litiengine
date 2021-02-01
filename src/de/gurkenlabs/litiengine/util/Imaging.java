@@ -49,7 +49,7 @@ public final class Imaging {
    * pixels to a semi-transparent black 2. Flip the image vertically 3. Scale it
    * down 4. Render original image and shadow on a buffered image
    * <p>
-   * TODO: Add support for different shadow types. Add an ellipse shadow, similar to the Lepus reatures.
+   * TODO: Add support for different shadow types. Add an ellipse shadow, etc..
    * </p>
    * 
    * @param image

@@ -3,7 +3,6 @@ package de.gurkenlabs.litiengine.gui;
 import java.awt.Color;
 import java.awt.GradientPaint;
 import java.awt.Paint;
-import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.util.List;
 import java.util.Objects;

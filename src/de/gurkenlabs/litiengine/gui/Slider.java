@@ -22,7 +22,7 @@ public abstract class Slider extends GuiComponent {
   private final float maxValue;
   private float stepSize;
 
-  public Slider(final double x, final double y, final double width, final double height, final float minValue, final float maxValue, final float stepSize) {
+  protected Slider(final double x, final double y, final double width, final double height, final float minValue, final float maxValue, final float stepSize) {
     super(x, y, width, height);
     this.changeConsumer = new CopyOnWriteArrayList<>();
     this.minValue = minValue;
