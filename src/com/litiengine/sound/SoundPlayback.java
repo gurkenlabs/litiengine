@@ -20,7 +20,7 @@ import com.litiengine.tweening.TweenType;
 
 /**
  * The {@code SoundPlayback} class is a wrapper {@code SourceDataLine} on which a {@code Sound} playback can be carried out.
- * 
+ *
  * @see #play(Sound)
  */
 public abstract class SoundPlayback implements Runnable {
@@ -50,8 +50,7 @@ public abstract class SoundPlayback implements Runnable {
   /**
    * Starts playing the audio.
    *
-   * @throws IllegalStateException
-   *           if the audio has already been started
+   * @throws IllegalStateException if the audio has already been started
    */
   public synchronized void start() {
     if (this.started) {
@@ -64,8 +63,7 @@ public abstract class SoundPlayback implements Runnable {
   /**
    * Adds a {@code SoundPlaybackListener} to this instance.
    *
-   * @param listener
-   *          The {@code SoundPlaybackListener} to be added.
+   * @param listener The {@code SoundPlaybackListener} to be added.
    */
   public void addSoundPlaybackListener(SoundPlaybackListener listener) {
     this.listeners.add(listener);
@@ -74,8 +72,7 @@ public abstract class SoundPlayback implements Runnable {
   /**
    * Removes a {@code SoundPlaybackListener} from this instance.
    *
-   * @param listener
-   *          The {@code SoundPlaybackListener} to be removed.
+   * @param listener The {@code SoundPlaybackListener} to be removed.
    */
   public void removeSoundPlaybackListener(SoundPlaybackListener listener) {
     this.listeners.remove(listener);
@@ -83,9 +80,8 @@ public abstract class SoundPlayback implements Runnable {
 
   /**
    * Sets the paused state of this playback to the provided value.
-   * 
-   * @param paused
-   *          Whether to pause or resume this playback
+   *
+   * @param paused Whether to pause or resume this playback
    */
   public void setPaused(boolean paused) {
     if (paused) {
@@ -115,9 +111,8 @@ public abstract class SoundPlayback implements Runnable {
 
   /**
    * Fades this playback's volume to 0 over the given duration.
-   * 
-   * @param duration
-   *          the fade duration in milliseconds.
+   *
+   * @param duration the fade duration in milliseconds.
    */
   public void fade(int duration) {
     this.fade(duration, 0f, TweenFunction.LINEAR);
@@ -125,13 +120,10 @@ public abstract class SoundPlayback implements Runnable {
 
   /**
    * Fades this playback's volume to the target value over the given duration using the given {@code TweenFunction}.
-   * 
-   * @param duration
-   *          the fade duration in milliseconds.
-   * @param target
-   *          the target volume at the end of the fade
-   * @param easingType
-   *          the TweenFunction determining the falloff curve of this fade.
+   *
+   * @param duration   the fade duration in milliseconds.
+   * @param target     the target volume at the end of the fade
+   * @param easingType the TweenFunction determining the falloff curve of this fade.
    */
   public void fade(int duration, float target, TweenFunction easingType) {
     for (VolumeControl v : this.getVolumeControls()) {
@@ -141,7 +133,7 @@ public abstract class SoundPlayback implements Runnable {
 
   /**
    * Determines if this playback is paused.
-   * 
+   *
    * @return Whether this playback is paused
    */
   public boolean isPaused() {
@@ -151,7 +143,7 @@ public abstract class SoundPlayback implements Runnable {
   /**
    * Determines if this playback has sound to play. If it is paused but still in the middle of playback, it will return {@code true}, but it will
    * return {@code false} if it has finished or it has been cancelled.
-   * 
+   *
    * @return Whether this playback has sound to play
    */
   public boolean isPlaying() {
@@ -179,7 +171,7 @@ public abstract class SoundPlayback implements Runnable {
 
   /**
    * Gets the current volume of this playback, considering all {@code VolumeControl} objects created for it.
-   * 
+   *
    * @return The current volume.
    */
   public float getMasterVolume() {
@@ -192,7 +184,7 @@ public abstract class SoundPlayback implements Runnable {
   /**
    * Gets the current master volume of this playback. This will be approximately equal to the value set by a previous call to {@code setVolume},
    * though rounding errors may occur.
-   * 
+   *
    * @return The settable volume.
    */
   public float getVolume() {
@@ -201,14 +193,12 @@ public abstract class SoundPlayback implements Runnable {
 
   /**
    * Sets the master volume of this playback.
-   * 
-   * @param volume
-   *          The new volume.
+   *
+   * @param volume The new volume.
    */
   public void setVolume(float volume) {
     this.masterVolume.set(volume);
   }
-
 
   public VolumeControl createVolumeControl() {
     VolumeControl control = new VolumeControl();
@@ -227,8 +217,7 @@ public abstract class SoundPlayback implements Runnable {
   /**
    * Plays a sound to this object's data line.
    *
-   * @param sound
-   *          The sound to play
+   * @param sound The sound to play
    * @return Whether the sound was cancelled while playing
    */
   boolean play(Sound sound) {
@@ -300,7 +289,7 @@ public abstract class SoundPlayback implements Runnable {
 
     /**
      * Gets the value of this volume control.
-     * 
+     *
      * @return The value of this control.
      */
     public float get() {
@@ -309,9 +298,8 @@ public abstract class SoundPlayback implements Runnable {
 
     /**
      * Sets the value of this volume control.
-     * 
-     * @param value
-     *          The value to be set.
+     *
+     * @param value The value to be set.
      */
     public void set(float value) {
       if (value < 0f) {
@@ -325,14 +313,15 @@ public abstract class SoundPlayback implements Runnable {
     @Deprecated
     protected void finalize() {
       // clean up the instance without affecting the volume
-      SoundPlayback.this.miscVolume.accumulateAndGet(Float.floatToRawIntBits(this.value), (a, b) -> Float.floatToRawIntBits(Float.intBitsToFloat(a) * Float.intBitsToFloat(b)));
+      SoundPlayback.this.miscVolume.accumulateAndGet(Float.floatToRawIntBits(this.value),
+          (a, b) -> Float.floatToRawIntBits(Float.intBitsToFloat(a) * Float.intBitsToFloat(b)));
     }
 
     @Override
     public float[] getTweenValues(TweenType tweenType) {
       switch (tweenType) {
       case VOLUME:
-        return new float[] { (float) this.get() };
+        return new float[] { this.get() };
       default:
         return Tweenable.super.getTweenValues(tweenType);
       }

@@ -2,7 +2,7 @@ package com.litiengine.environment.tilemap;
 
 public interface ITileOffset {
   
-  public int getX();
+  int getX();
 
-  public int getY();
+  int getY();
 }

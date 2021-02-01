@@ -96,23 +96,25 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
     final double maxPixelsPerTick = this.getEntity().getTickVelocity();
     final double deltaTime = Game.loop().getDeltaTime() * Game.loop().getTimeScale();
 
-    final double acceleration = this.getEntity().getAcceleration() == 0 ? maxPixelsPerTick : deltaTime / this.getEntity().getAcceleration() * maxPixelsPerTick;
-    final double deceleration = this.getEntity().getDeceleration() == 0 ? this.getVelocity() : deltaTime / this.getEntity().getDeceleration() * maxPixelsPerTick;
+    final double acceleration =
+        this.getEntity().getAcceleration() == 0 ? maxPixelsPerTick : deltaTime / this.getEntity().getAcceleration() * maxPixelsPerTick;
+    final double deceleration =
+        this.getEntity().getDeceleration() == 0 ? this.getVelocity() : deltaTime / this.getEntity().getDeceleration() * maxPixelsPerTick;
 
-    double dx = this.getDx();
-    double dy = this.getDy();
+    double dxTmp = this.getDx();
+    double dyTmp = this.getDy();
     this.setDx(0);
     this.setDy(0);
 
-    final double deltaVelocity = Math.min(Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2)), acceleration);
+    final double deltaVelocity = Math.min(Math.sqrt(Math.pow(dxTmp, 2) + Math.pow(dyTmp, 2)), acceleration);
     if (deltaVelocity != 0) {
       double newVelocity = this.getVelocity() + deltaVelocity;
       this.setVelocity(newVelocity);
     } else {
       final double newVelocity = Math.max(0, this.getVelocity() - deceleration);
       this.setVelocity(newVelocity);
-      dx = GeometricUtilities.getDeltaX(this.moveAngle);
-      dy = GeometricUtilities.getDeltaY(this.moveAngle);
+      dxTmp = GeometricUtilities.getDeltaX(this.moveAngle);
+      dyTmp = GeometricUtilities.getDeltaY(this.moveAngle);
     }
 
     if (this.getVelocity() == 0) {
@@ -121,7 +123,7 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
     }
 
     // actually move entity
-    this.moveEntity(dx, dy);
+    this.moveEntity(dxTmp, dyTmp);
   }
 
   @Override
@@ -137,7 +139,7 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
   public double getMoveAngle() {
     return this.moveAngle;
   }
-  
+
   @Override
   public void setVelocity(double velocity) {
     final double maxVelocity = this.getEntity().getTickVelocity();

@@ -9,7 +9,7 @@ import java.io.File;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
-public class GameTest {
+class GameTest {
   // test-only helper method to call the package-private Game.terminate
   public static void resetGame() {
     Game.terminate();
@@ -21,16 +21,16 @@ public class GameTest {
     if (configFile.exists()) {
       configFile.delete();
     }
-    
+
     resetGame();
   }
 
-  private class Status {
+  private static class Status {
     boolean wasCalled = false;
   }
 
   @Test
-  public void testStartup() {
+  void testStartup() {
     final Status initialized = new Status();
     final Status started = new Status();
 
@@ -39,6 +39,7 @@ public class GameTest {
       public void initialized(String... args) {
         initialized.wasCalled = true;
       }
+
       @Override
       public void started() {
         started.wasCalled = true;

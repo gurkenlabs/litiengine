@@ -32,7 +32,7 @@ final class DataFormat {
 
   protected static <T extends Enum<T>> boolean isSupported(String fileName, T[] values, T defaultValue) {
     String extension = FileUtilities.getExtension(fileName);
-    if (extension == null || extension.isEmpty()) {
+    if (extension.isEmpty()) {
       return false;
     }
 
@@ -53,6 +53,6 @@ final class DataFormat {
       }
     }
 
-    return arrList.toArray(new String[arrList.size()]);
+    return arrList.toArray(new String[0]);
   }
 }
