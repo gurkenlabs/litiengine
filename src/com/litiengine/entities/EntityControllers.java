@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * a single hub to access and manage all the controllers.
  */
 public final class EntityControllers {
-  private Map<Class<? extends IEntityController>, IEntityController> controllers;
+  private final Map<Class<? extends IEntityController>, IEntityController> controllers;
   private IEntityAnimationController animationController;
 
   EntityControllers() {
@@ -86,7 +86,7 @@ public final class EntityControllers {
     // if there's an exact match, return it
     if (this.controllers.containsKey(clss)) {
       IEntityController controller = this.controllers.get(clss);
-      if (controller != null && clss.isInstance(controller)) {
+      if (clss.isInstance(controller)) {
         return (T) this.controllers.get(clss);
       }
     }

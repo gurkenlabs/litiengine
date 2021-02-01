@@ -21,7 +21,7 @@ public enum Align {
 
   private final float portion;
 
-  private Align(float portion) {
+  Align(float portion) {
     this.portion = portion;
   }
 

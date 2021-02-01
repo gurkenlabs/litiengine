@@ -16,11 +16,9 @@ public class IntroTrack implements Track {
 
   /**
    * Initializes a new {@code IntroTrack} for the specified sound.
-   * 
-   * @param intro
-   *          The name of the sound to be played as intro.
-   * @param loop
-   *          The name of the sound to be looped.
+   *
+   * @param intro The name of the sound to be played as intro.
+   * @param loop  The name of the sound to be looped.
    */
   public IntroTrack(String intro, String loop) {
     this(Resources.sounds().get(intro), Resources.sounds().get(loop));
@@ -28,11 +26,9 @@ public class IntroTrack implements Track {
 
   /**
    * Initializes a new {@code IntroTrack} for the specified sound.
-   * 
-   * @param intro
-   *          The sound to be played as intro.
-   * @param loop
-   *          The name of the sound to be looped.
+   *
+   * @param intro The sound to be played as intro.
+   * @param loop  The name of the sound to be looped.
    */
   public IntroTrack(Sound intro, String loop) {
     this(intro, Resources.sounds().get(loop));
@@ -40,11 +36,9 @@ public class IntroTrack implements Track {
 
   /**
    * Initializes a new {@code IntroTrack} for the specified sound.
-   * 
-   * @param intro
-   *          The name of the sound to be played as intro.
-   * @param loop
-   *          The sound to be looped.
+   *
+   * @param intro The name of the sound to be played as intro.
+   * @param loop  The sound to be looped.
    */
   public IntroTrack(String intro, Sound loop) {
     this(Resources.sounds().get(intro), loop);
@@ -52,11 +46,9 @@ public class IntroTrack implements Track {
 
   /**
    * Initializes a new {@code IntroTrack} for the specified sound.
-   * 
-   * @param intro
-   *          The sound to be played as intro.
-   * @param loop
-   *          The sound to be looped.
+   *
+   * @param intro The sound to be played as intro.
+   * @param loop  The sound to be looped.
    */
   public IntroTrack(Sound intro, Sound loop) {
     Objects.requireNonNull(intro);

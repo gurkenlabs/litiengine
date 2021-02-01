@@ -37,7 +37,7 @@ public final class Maps extends ResourcesContainer<IMap> {
 
   public static boolean isSupported(String fileName) {
     String extension = FileUtilities.getExtension(fileName);
-    return extension != null && !extension.isEmpty() && extension.equalsIgnoreCase(TmxMap.FILE_EXTENSION);
+    return !extension.isEmpty() && extension.equalsIgnoreCase(TmxMap.FILE_EXTENSION);
   }
 
   /**

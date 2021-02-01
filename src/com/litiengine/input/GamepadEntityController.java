@@ -11,7 +11,7 @@ public class GamepadEntityController<T extends IMobileEntity> extends MovementCo
   private int gamepadId = -1;
   private double gamepadDeadzone = Game.config().input().getGamepadStickDeadzone();
   private double gamepadRightStick = Game.config().input().getGamepadStickDeadzone();
-  private boolean rotateWithRightStick = false;
+  private boolean rotateWithRightStick;
 
   public GamepadEntityController(final T entity, boolean rotateWithRightStick) {
     super(entity);

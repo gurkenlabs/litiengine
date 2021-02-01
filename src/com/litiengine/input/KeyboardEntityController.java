@@ -2,6 +2,7 @@ package com.litiengine.input;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.litiengine.entities.IMobileEntity;
@@ -126,8 +127,6 @@ public class KeyboardEntityController<T extends IMobileEntity> extends MovementC
 
   private static void set(List<Integer> keyList, List<Integer> keys) {
     keyList.clear();
-    for (int key : keys) {
-      keyList.add(key);
-    }
+    keyList.addAll(keys);
   }
 }

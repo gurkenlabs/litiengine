@@ -621,7 +621,7 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
         continue;
       }
 
-      final String actionName = info.name() == null || info.name().isEmpty() ? method.getName() : info.name();
+      final String actionName = info.name().isEmpty() ? method.getName() : info.name();
       EntityAction action = this.register(actionName, () -> {
         try {
           method.invoke(this);

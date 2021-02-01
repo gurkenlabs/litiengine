@@ -21,16 +21,16 @@ public class GameTest {
     if (configFile.exists()) {
       configFile.delete();
     }
-    
+
     resetGame();
   }
 
-  private class Status {
+  private static class Status {
     boolean wasCalled = false;
   }
 
   @Test
-  public void testStartup() {
+  void testStartup() {
     final Status initialized = new Status();
     final Status started = new Status();
 
@@ -39,6 +39,7 @@ public class GameTest {
       public void initialized(String... args) {
         initialized.wasCalled = true;
       }
+
       @Override
       public void started() {
         started.wasCalled = true;
