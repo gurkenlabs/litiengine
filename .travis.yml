@@ -6,7 +6,6 @@ before_install:
 
 jdk:
   - openjdk8
-  - openjdk11
 
 git:
   depth: false
@@ -33,6 +32,7 @@ jobs:
       script: ./gradlew fullbuild --warning-mode all
     - stage: "Scan"
       name: "Sonarqube Scan"
+      jdk: openjdk11
       script:
         export JAVA_HOME= "/usr/local/lib/jvm/openjdk11"
         if [ $TRAVIS_PULL_REQUEST = 'false' ]; then
