@@ -100,7 +100,7 @@ task distZip(type: Zip) {
     group 'build'
     from 'build/libs/'
     include '*'
-    exclude archiveName
+    exclude archiveFileName.get()
     destinationDirectory = file('build/libs/')
 
     dependsOn ":utiliti:build"
