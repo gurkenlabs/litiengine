@@ -17,7 +17,6 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.utiliti.UndoManager;
 
-@SuppressWarnings("serial")
 public class LayerTable extends JTable {
   protected static final String[] columns = new String[] { "visible", "name", "objects" };
 
