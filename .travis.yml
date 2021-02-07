@@ -17,6 +17,11 @@ addons:
 services:
   - xvfb
 
+script:
+  - ./gradlew fullbuild --warning-mode all
+  - if [ $TRAVIS_PULL_REQUEST = 'false' ]; then
+    sonar-scanner;
+    fi
 
 cache:
   directories:
@@ -24,15 +29,3 @@ cache:
     - '$HOME/.sonar/cache'
     - '$HOME/.gradle/caches/'
     - '$HOME/.gradle/wrapper/'
-
-jobs:
-  include:
-    - stage: "Fullbuild"
-      name: "Build, report coverage, and create Docs"
-      script: ./gradlew fullbuild --warning-mode all
-    - stage: "Scan"
-      name: "Sonarqube Scan"
-      script:
-        if [ $TRAVIS_PULL_REQUEST = 'false' ]; then
-          sonar-scanner;
-        fi

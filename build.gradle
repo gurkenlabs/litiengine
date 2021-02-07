@@ -1,131 +1,131 @@
 buildscript {
-  repositories {
-    mavenCentral()
-  }
+    repositories {
+        mavenCentral()
+    }
 }
- 
- plugins {
-  id 'com.stehno.natives' version '0.3.1'
-  id 'org.sonarqube' version '3.1.1'
+
+plugins {
+    id 'com.stehno.natives' version '0.3.1'
+    id 'org.sonarqube' version '3.1.1'
+    id 'java'
+    id 'jacoco'
 }
 
 natives {
-  configurations = ['runtimeClasspath']
-  outputDir = 'libs'
+    configurations = ['runtimeClasspath']
+    outputDir = 'libs'
 }
-
-apply plugin: 'java'
-apply plugin: 'jacoco'
 
 archivesBaseName = "litiengine"
 version = "v0.5.1-beta"
 
 sourceSets {
-  main.java.srcDir "src"
-  main.resources.srcDir "resources"
-  
-  test.java.srcDir "tests"
-  test.resources.srcDir "tests"
+    main.java.srcDir "src"
+    main.resources.srcDir "resources"
+
+    test.java.srcDir "tests"
+    test.resources.srcDir "tests"
 }
 
 repositories {
-   mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-  implementation 'net.java.jinput:jinput:2.0.9'
-  implementation 'net.java.jinput:jinput:2.0.9:natives-all'
-  implementation 'com.googlecode.soundlibs:jorbis:0.0.17.4'
-  implementation 'com.googlecode.soundlibs:tritonus-share:0.3.7.4'
-  implementation 'com.googlecode.soundlibs:vorbisspi:1.0.3.3'
-  implementation ('com.googlecode.soundlibs:mp3spi:1.9.5.4') {
-    exclude group:'junit'
-  }
+    implementation 'net.java.jinput:jinput:2.0.9'
+    implementation 'net.java.jinput:jinput:2.0.9:natives-all'
+    implementation 'com.googlecode.soundlibs:jorbis:0.0.17.4'
+    implementation 'com.googlecode.soundlibs:tritonus-share:0.3.7.4'
+    implementation 'com.googlecode.soundlibs:vorbisspi:1.0.3.3'
+    implementation('com.googlecode.soundlibs:mp3spi:1.9.5.4') {
+        exclude group: 'junit'
+    }
 
-  implementation 'com.code-disaster.steamworks4j:steamworks4j:1.8.0'
-  
-  // JAXB modules for JDK 9 or higher
-  implementation 'javax.activation:javax.activation-api:1.2.0'
-  implementation 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
-  implementation 'com.sun.xml.bind:jaxb-core:2.3.0.1'
-  implementation 'com.sun.xml.bind:jaxb-impl:2.3.2'
+    implementation 'com.code-disaster.steamworks4j:steamworks4j:1.8.0'
 
-  testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
-  testImplementation 'org.junit.jupiter:junit-jupiter-params:5.6.0'
-  testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.0'
-  testImplementation 'org.mockito:mockito-core:3.3.3'
+    // JAXB modules for JDK 9 or higher
+    implementation 'javax.activation:javax.activation-api:1.2.0'
+    implementation 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
+    implementation 'com.sun.xml.bind:jaxb-core:2.3.0.1'
+    implementation 'com.sun.xml.bind:jaxb-impl:2.3.2'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.6.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.0'
+    testImplementation 'org.mockito:mockito-core:3.3.3'
 }
 
 test {
-  useJUnitPlatform()
-}
-
-jar {
-  from {
-    configurations.compileClasspath.collect { zipTree it } 
-  } 
-  
-  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-  
-  exclude 'META-INF/services/**'
-  exclude 'module-info.*'
-  exclude '**/*.dll'
-  exclude '**/*.jnilib'
-  exclude '**/*.dylib'
-  exclude '**/*.so'
-  exclude 'junit**/**'
+    useJUnitPlatform()
 }
 
 jacocoTestReport {
-  sourceSets(sourceSets.main)
-  getSourceDirectories().setFrom(sourceSets.main.allSource.srcDirs)
-  getClassDirectories().setFrom(sourceSets.main.output)
+    sourceSets(sourceSets.main)
+    getSourceDirectories().setFrom(sourceSets.main.allSource.srcDirs)
+    getClassDirectories().setFrom(sourceSets.main.output)
 
-  reports {
-    xml.enabled true
-    html.enabled true
-    xml.destination file("${buildDir}/jacoco/report.xml")
-    html.destination file("${buildDir}/jacoco/html")
-  }
+    reports {
+        xml.enabled true
+        html.enabled true
+        xml.destination file("${buildDir}/jacoco/report.xml")
+        html.destination file("${buildDir}/jacoco/html")
+    }
+}
+
+jar {
+    from {
+        configurations.compileClasspath.collect { zipTree it }
+    }
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    exclude 'META-INF/services/**'
+    exclude 'module-info.*'
+    exclude '**/*.dll'
+    exclude '**/*.jnilib'
+    exclude '**/*.dylib'
+    exclude '**/*.so'
+    exclude 'junit**/**'
 }
 
 task createJavadocs(type: Javadoc) {
-  source sourceSets.main.allJava
-  classpath = project.sourceSets.main.runtimeClasspath
-  options.encoding 'UTF-8'
-  // options.addBooleanOption('html5', true)
-  dependsOn build
+    source sourceSets.main.allJava
+    classpath = project.sourceSets.main.runtimeClasspath
+    options.encoding 'UTF-8'
+    // options.addBooleanOption('html5', true)
+    dependsOn build
 }
 
 task distZip(type: Zip) {
-  group 'build'
-  from 'build/libs/'
-  include '*'
-  exclude archiveName
-  destinationDirectory = file('build/libs/')
-  
-  dependsOn ":utiliti:build"
-  dependsOn ":utiliti:distZipLinuxMac"
+    group 'build'
+    from 'build/libs/'
+    include '*'
+    exclude archiveName
+    destinationDirectory = file('build/libs/')
+
+    dependsOn ":utiliti:build"
+    dependsOn ":utiliti:distZipLinuxMac"
 }
 
-task fullbuild{
-  group 'build'
-  description 'executes the build including coverage reports and javadoc'
-  
+task fullbuild {
+    group 'build'
+    description 'executes the build including coverage reports and javadoc'
 
-  dependsOn createJavadocs
-  dependsOn jacocoTestReport
-  dependsOn distZip
+
+    dependsOn createJavadocs
+    dependsOn test
+    dependsOn jacocoTestReport
+    dependsOn distZip
 }
 
-task copyLicense(type: Copy) { 
-  from(new File('.')) { include 'LICENSE' }
-  into new File(buildDir, 'libs')
+task copyLicense(type: Copy) {
+    from(new File('.')) { include 'LICENSE' }
+    into new File(buildDir, 'libs')
 }
 
 compileJava.dependsOn includeNatives
 includeNatives.dependsOn copyLicense
 
 tasks.withType(JavaCompile) {
-  options.encoding = 'UTF-8'
+    options.encoding = 'UTF-8'
 }
