@@ -1,5 +1,5 @@
 plugins {
-  id 'edu.sc.seis.launch4j' version '2.4.4'
+  id 'edu.sc.seis.launch4j' version '2.4.9'
 }
 
 apply plugin: 'java'
@@ -25,13 +25,13 @@ repositories {
 
 dependencies {
   implementation project(':')
-  implementation 'com.github.weisj:darklaf-core:2.5.4'
-  implementation 'com.github.weisj:darklaf-theme:2.5.4'
-  implementation 'com.github.weisj:darklaf-property-loader:2.5.4'
-  implementation 'com.github.weisj:darklaf-utils:2.5.4'
-  implementation 'com.github.weisj:darklaf-native-utils:2.5.4'
-  implementation 'com.github.weisj:darklaf-platform-base:2.5.4'
-  implementation 'com.github.weisj:darklaf-windows:2.5.4'
+  implementation 'com.github.weisj:darklaf-core:2.5.5'
+  implementation 'com.github.weisj:darklaf-theme:2.5.5'
+  implementation 'com.github.weisj:darklaf-property-loader:2.5.5'
+  implementation 'com.github.weisj:darklaf-utils:2.5.5'
+  implementation 'com.github.weisj:darklaf-native-utils:2.5.5'
+  implementation 'com.github.weisj:darklaf-platform-base:2.5.5'
+  implementation 'com.github.weisj:darklaf-windows:2.5.5'
   implementation 'net.java.dev.jna:jna:5.6.0'
   implementation 'org.swinglabs:jxlayer:3.0.4'
   implementation 'org.swinglabs:swingx:1.6.1'
@@ -80,10 +80,10 @@ launch4j {
   mainClassName = 'de.gurkenlabs.utiliti.Program'
   icon = 'pixel-icon-utiLITI.ico'
   outputDir = 'libs'
-  outfile = archivesBaseName + '-v0.5.0-beta.exe'
+  outfile = archivesBaseName + '-v0.5.1-beta.exe'
   companyName = 'gurkenlabs.de'
-  version = '0.5.0'
-  textVersion = '0.5.0'
+  version = '0.5.1'
+  textVersion = '0.5.1'
   copyright = '2020 gurkenlabs.de'
   jvmOptions = ['-Xms256m', '-Xmx1024m']
 }

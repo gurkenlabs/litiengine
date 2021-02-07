@@ -5,7 +5,7 @@ before_install:
   - sudo apt-get -y install at-spi2-core
 
 jdk:
-  - openjdk8
+  - openjdk15
 
 git:
   depth: false
@@ -32,7 +32,6 @@ jobs:
       script: ./gradlew fullbuild --warning-mode all
     - stage: "Scan"
       name: "Sonarqube Scan"
-      jdk: openjdk15
       script:
         if [ $TRAVIS_PULL_REQUEST = 'false' ]; then
           sonar-scanner;

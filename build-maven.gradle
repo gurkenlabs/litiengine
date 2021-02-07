@@ -92,7 +92,7 @@ tasks.withType(JavaCompile) {
 
 group = "de.gurkenlabs"
 archivesBaseName = "litiengine"
-version = "0.5.0"
+version = "0.5.1"
 
 publishing {
   publications {
@@ -102,7 +102,7 @@ publishing {
       pom {
         name = 'litiengine'
         packaging = 'jar'
-        description = 'LITIENGINE is the pure 2D free java game engine. Written in plain Java 8 it provides all the infrastructure to create a 2D tile based java game, be it a platformer or a top-down adventure.'
+        description = 'LITIENGINE is a free and open source Java 2D Game Engine. It provides a comprehensive Java library and a dedicated map editor to create tile-based 2D games.'
         url = 'http://litiengine.com'
 
         scm {
