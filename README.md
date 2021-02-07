@@ -29,7 +29,7 @@ repositories {
 }
 
 dependencies {
-  implementation 'de.gurkenlabs:litiengine:0.5.0'
+  implementation 'de.gurkenlabs:litiengine:0.5.1'
 }
 ```
 
@@ -38,7 +38,7 @@ dependencies {
 <dependency>
   <groupId>de.gurkenlabs</groupId>
   <artifactId>litiengine</artifactId>
-  <version>0.5.0</version>
+  <version>0.5.1</version>
 </dependency>
 ```
 [More Installation Instructions](https://litiengine.com/download/)
