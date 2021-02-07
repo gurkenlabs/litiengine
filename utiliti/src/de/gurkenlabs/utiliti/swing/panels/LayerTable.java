@@ -99,7 +99,7 @@ public class LayerTable extends JTable {
       @Override
       public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-        if (column == 0) {
+        if (column == 0 && Game.world().environment().getMap() != null && Game.world().environment().getMap().getMapObjectLayers().get(row) != null) {
           c.setBackground(Game.world().environment().getMap().getMapObjectLayers().get(row).getColor());
         }
         return c;
@@ -117,7 +117,8 @@ public class LayerTable extends JTable {
     }
     boolean layersChanged = false;
     for (int row = 0; row < this.getMap().getMapObjectLayers().size(); row++) {
-      if (this.getMap().getMapObjectLayers().get(row).isVisible() != (boolean) this.getModel().getValueAt(row, 0) || !this.getMap().getMapObjectLayers().get(row).getName().equals(this.getModel().getValueAt(row, 1).toString())) {
+      if (this.getMap().getMapObjectLayers().get(row).isVisible() != (boolean) this.getModel().getValueAt(row, 0) || !this.getMap()
+          .getMapObjectLayers().get(row).getName().equals(this.getModel().getValueAt(row, 1).toString())) {
         layersChanged = true;
       }
       this.getMap().getMapObjectLayers().get(row).setVisible((boolean) this.getModel().getValueAt(row, 0));
