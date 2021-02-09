@@ -93,6 +93,7 @@ task copyDistFiles(type: Copy) {
   from('/dist/'){
     include 'pixel-icon-utiliti.ico'
     include 'config.properties'
+    include 'README'
   }
 
   into buildFolder
