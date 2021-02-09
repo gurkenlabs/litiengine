@@ -40,7 +40,8 @@ public final class HelpMenu extends JMenu {
     JMenuItem openCollectiveMenuItem = new JMenuItem(Resources.strings().get("menu_help_opencollective"));
     openCollectiveMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().getFrom(LINKS, "link_opencollective"))));
 
-    String aboutMessage = String.format("%s%n%n%s", Resources.strings().get("menu_help_abouttext"), Resources.strings().get("copyright", "2020"));
+    String javaVersion = System.getProperty("java.version") + " (vendor: " + System.getProperty("java.vendor") + ")";
+    String aboutMessage = String.format("%s%n%n%s%n%nJava: %s", Resources.strings().get("menu_help_abouttext"), Resources.strings().get("copyright", "2020"), javaVersion);
     String aboutTitle = String.format("%s %s, %s", Resources.strings().get("menu_help_about"), Resources.strings().get("menu_help_utiliti"), Game.info().getVersion());
     JMenuItem aboutMenuItem = new JMenuItem(Resources.strings().get("menu_help_about"));
     aboutMenuItem.addActionListener(event -> JOptionPane.showMessageDialog(((JFrame) Game.window().getHostControl()), aboutMessage, aboutTitle, JOptionPane.INFORMATION_MESSAGE));
