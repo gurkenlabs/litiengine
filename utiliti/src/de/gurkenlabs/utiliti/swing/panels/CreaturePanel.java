@@ -44,19 +44,19 @@ public class CreaturePanel extends PropertyPanel {
   public static String getCreatureSpriteName(String name) {
     for (CreatureAnimationState state : CreatureAnimationState.values()) {
       if (name.endsWith(state.spriteString())) {
-        return name.substring(0, name.length() - state.spriteString().length() - 1);
+        return name.substring(0, name.length() - state.spriteString().length());
       }
     }
 
     for (Direction dir : Direction.values()) {
       String idle = CreatureAnimationState.IDLE.spriteString() + "-" + dir.toString().toLowerCase();
       if (name.endsWith(idle)) {
-        return name.substring(0, name.length() - idle.length() - 1);
+        return name.substring(0, name.length() - idle.length());
       }
 
       String walk = CreatureAnimationState.WALK.spriteString() + "-" + dir.toString().toLowerCase();
       if (name.endsWith(walk)) {
-        return name.substring(0, name.length() - walk.length() - 1);
+        return name.substring(0, name.length() - walk.length());
       }
     }
 
