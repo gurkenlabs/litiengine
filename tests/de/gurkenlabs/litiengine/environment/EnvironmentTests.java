@@ -108,6 +108,28 @@ public class EnvironmentTests {
   }
 
   @Test
+  public void testRemoveEntityByName() {
+    ICombatEntity testEntity = mock(ICombatEntity.class);
+    when(testEntity.getMapId()).thenReturn(1);
+    when(testEntity.getName()).thenReturn("testEntity");
+    when(testEntity.getRenderType()).thenReturn(RenderType.NORMAL);
+
+    this.testEnvironment.add(testEntity);
+
+    assertNotNull(this.testEnvironment.getCombatEntity("testEntity"));
+    assertEquals(1, this.testEnvironment.getCombatEntities().size());
+    assertEquals(1, this.testEnvironment.getEntities(ICombatEntity.class).size());
+    assertEquals(1, this.testEnvironment.getEntities().size());
+
+    this.testEnvironment.remove("testEntity");
+
+    assertNull(this.testEnvironment.getCombatEntity("testEntity"));
+    assertEquals(0, this.testEnvironment.getCombatEntities().size());
+    assertEquals(0, this.testEnvironment.getEntities(ICombatEntity.class).size());
+    assertEquals(0, this.testEnvironment.getEntities().size());
+  }
+
+  @Test
   public void testGetByName() {
     ICombatEntity combatEntity = mock(ICombatEntity.class);
     when(combatEntity.getMapId()).thenReturn(1);
