@@ -41,6 +41,7 @@ import de.gurkenlabs.litiengine.entities.Trigger;
 import de.gurkenlabs.litiengine.entities.Trigger.TriggerActivation;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.graphics.RenderType;
+import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.graphics.StaticShadowType;
 import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.Particle;
@@ -127,6 +128,16 @@ public class EnvironmentTests {
     assertEquals(0, this.testEnvironment.getCombatEntities().size());
     assertEquals(0, this.testEnvironment.getEntities(ICombatEntity.class).size());
     assertEquals(0, this.testEnvironment.getEntities().size());
+  }
+
+  @Test
+  public void testAddRenderable() {
+    LightSource testLightSource = mock(LightSource.class);
+    this.testEnvironment.add(testLightSource, RenderType.NORMAL);
+    Collection<IRenderable> testRenderables = this.testEnvironment.getRenderables(RenderType.NORMAL);
+
+    assertEquals(1, testRenderables.size());
+    assertTrue(testRenderables.contains(testLightSource));
   }
 
   @Test
