@@ -55,4 +55,17 @@ public class Vector2DTest {
         assertEquals(unitVector.getY(), 0.0);
 
     }
+
+    @Test
+    public void testVector2DToString(){
+        double xValue = 10.0;
+        double yValue = 5.0;
+        String expected = "Vector2D(10.0, 5.0)";
+
+        Vector2D vectorDouble = new Vector2D(xValue, yValue);
+
+        assertEquals(expected, vectorDouble.toString());
+
+
+    }
 }
