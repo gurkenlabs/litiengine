@@ -103,4 +103,22 @@ public class Vector2DTest {
         assertEquals(result.getX(), expectedX);
         assertEquals(result.getY(), expectedY);
     }
+
+    /**
+     * Test dot product
+     */
+    @Test
+    public void testVector2DDot(){
+        double xValue1 = 5.0;
+        double yValue1 = 10.0;
+        double xValue2 = 3.0;
+        double yValue2 = 2.0;
+        double expected = 35.0;
+
+        Vector2D vector1 = new Vector2D(xValue1, yValue1);
+        Vector2D vector2 = new Vector2D(xValue2, yValue2);
+        double result = vector1.dotProduct(vector2);
+        assertEquals(result, expected);
+
+    }
 }
