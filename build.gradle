@@ -57,6 +57,10 @@ dependencies {
 
 test {
     useJUnitPlatform()
+    testLogging.showStandardStreams = true
+	testLogging {
+    events "passed", "skipped", "failed"
+    exceptionFormat "full" }
 }
 
 jacocoTestReport {
