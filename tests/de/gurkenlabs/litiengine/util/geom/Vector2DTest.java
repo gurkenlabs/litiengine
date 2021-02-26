@@ -119,6 +119,25 @@ public class Vector2DTest {
         Vector2D vector2 = new Vector2D(xValue2, yValue2);
         double result = vector1.dotProduct(vector2);
         assertEquals(result, expected);
+    }
+    
+    /**
+     * Test sub
+     */
+    @Test
+    public void testVector2DSub(){
+        double xValue1 = 5.0;
+        double yValue1 = 10.0;
+        double xValue2 = 3.0;
+        double yValue2 = 2.0;
+        double expectedX = 2.0;
+        double expectedY = 8.0;
 
+        Vector2D vector1 = new Vector2D(xValue1, yValue1);
+        Vector2D vector2 = new Vector2D(xValue2, yValue2);
+        Vector2D result = vector1.sub(vector2);
+
+        assertEquals(result.getX(), expectedX);
+        assertEquals(result.getY(), expectedY);
     }
 }
