@@ -56,6 +56,9 @@ public class Vector2DTest {
 
     }
 
+    /**
+     * Test toString method
+     */
     @Test
     public void testVector2DToString(){
         double xValue = 10.0;
@@ -65,7 +68,22 @@ public class Vector2DTest {
         Vector2D vectorDouble = new Vector2D(xValue, yValue);
 
         assertEquals(expected, vectorDouble.toString());
+    }
 
+    /**
+     * Test normal vector
+     */
+    @Test
+    public void testVector2DNormal(){
+        double xValue = 5.0;
+        double yValue = 0.0;
+        double expectedX = 0.0;
+        double expectedY = -5.0;
 
+        Vector2D vector= new Vector2D(xValue, yValue);
+        Vector2D result = vector.normalVector();
+
+        assertEquals(result.getX(), expectedX);
+        assertEquals(result.getY(), expectedY);   
     }
 }
