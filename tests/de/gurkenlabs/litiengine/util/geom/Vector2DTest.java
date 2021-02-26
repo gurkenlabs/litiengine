@@ -34,4 +34,25 @@ public class Vector2DTest {
         assertEquals(vectorResult1.dY, vectorResult1.getY());
 
     }
+
+    /**
+     * Test unitVector-function in Vector2D class
+     */
+    @Test
+    public void testVector2DUnit(){
+        double xValue = 0.0;
+        double yValue = 5.0;
+
+        Vector2D vectorDouble = new Vector2D(xValue, yValue);
+        Vector2D unitVector = vectorDouble.unitVector();
+        assertEquals(unitVector.getY(), 1.0);
+        assertEquals(unitVector.getX(), 0.0);
+
+        yValue = 0.0;
+        Vector2D zeroLengthVector = new Vector2D(xValue,yValue);
+        unitVector = zeroLengthVector.unitVector();
+        assertEquals(unitVector.getX(), 0.0);
+        assertEquals(unitVector.getY(), 0.0);
+
+    }
 }
