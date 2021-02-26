@@ -86,4 +86,21 @@ public class Vector2DTest {
         assertEquals(result.getX(), expectedX);
         assertEquals(result.getY(), expectedY);   
     }
+
+    /**
+     * Test scale vector
+     */
+    @Test
+    public void testVector2DScale(){
+        double xValue = 5.0;
+        double yValue = 0.0;
+        double scalefactor = 3.0;
+        double expectedX = 15.0;
+        double expectedY = 0.0;
+        Vector2D vector = new Vector2D(xValue, yValue);
+        Vector2D result  = vector.scale(scalefactor);
+
+        assertEquals(result.getX(), expectedX);
+        assertEquals(result.getY(), expectedY);
+    }
 }
