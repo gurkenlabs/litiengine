@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.xml.bind.JAXBException;
@@ -156,7 +157,9 @@ public class Editor extends Screen {
     TextRenderer.render(g, Game.metrics().getFramesPerSecond() + " FPS", 10, Game.window().getResolution().getHeight() - 20, true);
 
     if (Game.time().now() % 4 == 0) {
-      StatusBar.update();
+      SwingUtilities.invokeLater(() -> {
+        StatusBar.update();
+      });
     }
 
     // render status
