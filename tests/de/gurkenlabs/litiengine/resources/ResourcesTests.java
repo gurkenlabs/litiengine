@@ -129,4 +129,13 @@ public class ResourcesTests {
       Game.config().client().setCountry(oldCountry);
     }
   }
+
+  @Test
+  public void testStringsWithNoArgs(){
+    final String bundleName = "de/gurkenlabs/litiengine/resources/custom-strings";
+
+    String result = Resources.strings().getFrom(bundleName, "mystring", new Object[1]);
+
+    assertEquals("test me once", result);
+  }
 }
