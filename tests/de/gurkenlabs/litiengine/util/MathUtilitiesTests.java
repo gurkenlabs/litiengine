@@ -3,6 +3,8 @@ package de.gurkenlabs.litiengine.util;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 public class MathUtilitiesTests {
 
@@ -48,6 +50,18 @@ public class MathUtilitiesTests {
     assertEquals(5.0f, MathUtilities.clamp(toLow, 5, 10), 0.0001);
     assertEquals(10.0f, MathUtilities.clamp(toHigh, 5, 10), 0.0001);
     assertEquals(6.6f, MathUtilities.clamp(inRange, 5, 10), 0.0001);
+  }
+
+  @ParameterizedTest(name="value={0}, min={1}, max={2}, result={3}")
+  @CsvSource({"42, 64, 100, 64", "42, 10, 40, 40", "42, 10, 100, 42" })
+  public void testByteClamp(byte value, byte min, byte max, byte result){
+    assertEquals(result, MathUtilities.clamp(value, min, max));
+  }
+
+  @ParameterizedTest(name="value={0}, min={1}, max={2}, result={3}")
+  @CsvSource({"4200, 7344, 12567, 7344", "4200, 1200, 3511, 3511", "4200, 1337, 28111, 4200" })
+  public void testShortClamp(short value, short min, short max, short result){
+    assertEquals(result, MathUtilities.clamp(value, min, max));
   }
 
   @Test
