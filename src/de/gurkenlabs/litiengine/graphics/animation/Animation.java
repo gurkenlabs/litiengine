@@ -27,9 +27,9 @@ public class Animation implements IUpdateable, ILaunchable {
   public static final int DEFAULT_FRAME_DURATION = 120;
   private static final Logger log = Logger.getLogger(Animation.class.getName());
 
-  public final List<KeyFrame> keyframes;
-  public final String name;
-  public Spritesheet spritesheet;
+  private final List<KeyFrame> keyframes;
+  private final String name;
+  private Spritesheet spritesheet;
 
   private KeyFrame currentFrame;
   private long lastFrameUpdate;
