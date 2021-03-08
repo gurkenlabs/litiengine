@@ -16,13 +16,33 @@ import de.gurkenlabs.litiengine.graphics.Spritesheet;
 
 public class AsepriteHandler {
 
-    
+    /**
+     * Error that is thrown by the export class
+     */
+    public static class ExportAnimationException extends Error {
+        public ExportAnimationException(String message) {
+            super(message);
+        }
+    }
+
+    /** 
+     * Creates the json representation of an animation object and prints it.
+     * This is the public accesible function and can/should be changed to fit into the UI.
+     * 
+     * @param animation the animation object to export
+     */
     public void exportAnimation(Animation animation){
 
         String json = createJson(animation);
         System.out.println("JSON: " + json);
     }
 
+    /**
+     * Creates the json representation of an animation object and returns it as a string.
+     * 
+     * @param animation animation object to export as json.
+     * @return the json as a string.
+     */
     private String createJson(Animation animation){
         Spritesheet spritesheet = animation.getSpritesheet();
         List<KeyFrame> keyframes = animation.getKeyframes();
@@ -30,7 +50,8 @@ public class AsepriteHandler {
 
         if(frames.length != spritesheet.getTotalNumberOfSprites()){
             //ERROR
-            System.out.println("ERROR"); 
+            System.out.println("ERROR");
+            throw new ExportAnimationException("Different dimensions of keyframes and sprites in spritesheet"); 
         }
 
         // Build the frames object in the json
@@ -71,9 +92,6 @@ public class AsepriteHandler {
             }
         }
 
-
-        
-
         // Build the meta object in the json
         int spritesheetWidth = frameWidth * numCol;
         int spritesheetHeight = frameHeight * numRows;
@@ -90,8 +108,8 @@ public class AsepriteHandler {
     
         // Create the json as string
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
         StringBuilder sb = new StringBuilder();
+
         sb.append("{ \"frames\": {\n");
         for(int i = 0; i < frames.length; i++){
             String json = gson.toJson(frames[i]);
@@ -104,6 +122,9 @@ public class AsepriteHandler {
         return sb.toString();
     }
 
+    /**
+     * Frames class for Aseprite json structure.
+     */
     private class Frames {
         transient String name; 
         Map<String, Integer> frame;
@@ -113,6 +134,16 @@ public class AsepriteHandler {
         Map<String, Integer> sourceSize;
         int duration;
 
+        /**
+         * 
+         * @param name name of frame
+         * @param frame x, y, w, h on the substruction of the sprite in the spritesheet.
+         * @param rotated is the frame rotated?
+         * @param trimmed  is the frame trimmed?
+         * @param spriteSourceSize how the sprite is trimmed.
+         * @param sourceSize the original sprite size.
+         * @param duration the duration of the frame
+         */
         public Frames(String name, Map<String, Integer> frame, boolean rotated, boolean trimmed, Map<String, Integer> spriteSourceSize, Map<String, Integer> sourceSize, int duration){
             this.name = name;
             this.frame = frame;
@@ -122,10 +153,11 @@ public class AsepriteHandler {
             this.sourceSize = sourceSize;
             this.duration = duration;
         }
-
-        
     }
 
+    /**
+     * Meta data class for Aseprite json structure.
+     */
     private class Meta {
         String app;
         String version;
@@ -135,8 +167,16 @@ public class AsepriteHandler {
         String scale;
         Layer[] layers;
 
-
-
+        /**
+         * 
+         * @param app the application the json format comes from, in this case Aseprite.
+         * @param version Version of application.
+         * @param image filename of spritesheet.
+         * @param format color format of spritesheet image.
+         * @param size Size of spritesheet.
+         * @param scale Scale of spritesheet.
+         * @param layers Layers of spritesheet.
+         */
         public Meta(String app, String version, String image, String format, Map<String, Integer> size, String scale, Layer[] layers){
             this.app = app;
             this.version = version;
@@ -145,16 +185,23 @@ public class AsepriteHandler {
             this.size = size;
             this. scale = scale;
             this.layers = layers;
-
-        }
-        
+        }  
     }
-
+    
+    /**
+     * Layer class for Aseprite json structure.
+     */
     private class Layer {
         String name;
         int opacity;
         String blendMode;
 
+        /**
+         * 
+         * @param name Name of layer.
+         * @param opacity Opacity level of layer.
+         * @param blendMode Blendmode of layer.
+         */
         public Layer(String name, int opacity, String blendMode){
             this.name = name;
             this.opacity = opacity;
