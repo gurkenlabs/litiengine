@@ -99,7 +99,7 @@ public class AsepriteHandler {
         }
         sb.append(" },\n");
         String json = gson.toJson(meta);
-        sb.append("\"meta\":").append(json);
+        sb.append("\"meta\":").append(json).append("\n}");
 
         return sb.toString();
     }
