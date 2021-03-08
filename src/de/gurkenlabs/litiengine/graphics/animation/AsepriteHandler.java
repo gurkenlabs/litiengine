@@ -33,6 +33,7 @@ public class AsepriteHandler {
             System.out.println("ERROR"); 
         }
 
+        // Build the frames object in the json
         int numCol = spritesheet.getColumns();
         int numRows = spritesheet.getRows();
         int frameWidth = spritesheet.getSpriteWidth();
@@ -71,6 +72,23 @@ public class AsepriteHandler {
         }
 
 
+        
+
+        // Build the meta object in the json
+        int spritesheetWidth = frameWidth * numCol;
+        int spritesheetHeight = frameHeight * numRows;
+        Map<String, Integer> size= new HashMap<>(){{
+            put("w", spritesheetWidth);
+            put("h", spritesheetHeight);
+        }};
+        String spritesheetName = spritesheet.getName();
+        Layer[] layers = {new Layer("Layer",255,"normal")};
+        Meta meta = new Meta("http://www.aseprite.org/",
+        "1.2.16.3-x64",
+        spritesheetName,
+        "RGBA8888", size, "1", layers);
+    
+        // Create the json as string
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
         StringBuilder sb = new StringBuilder();
@@ -80,7 +98,8 @@ public class AsepriteHandler {
             sb.append(" \"" + frames[i].name + "\": ").append(json).append(",\n");
         }
         sb.append(" },\n");
-        //System.out.println("JSON:\n" + sb.toString());
+        String json = gson.toJson(meta);
+        sb.append("\"meta\":").append(json);
 
         return sb.toString();
     }
