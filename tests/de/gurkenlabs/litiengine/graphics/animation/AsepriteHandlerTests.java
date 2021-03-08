@@ -16,7 +16,7 @@ public class AsepriteHandlerTests {
 
   @Test
   public void exportAnimationTest() {
-    String spritesheetPath = "tests/de/gurkenlabs/litiengine/graphics/animation/aseprite_test_animation/Sprite-0001.json";
+    String spritesheetPath = "C:/Users/Nikla/Documents/Programmering/SoftwareFundamentals/Assignment-3-EC/litiengine/tests/de/gurkenlabs/litiengine/graphics/animation/aseprite_test_animation/Sprite-0001-sheet.png";
     BufferedImage image = new BufferedImage(96, 32, BufferedImage.TYPE_4BYTE_ABGR);
     Spritesheet spritesheet = new Spritesheet(image, spritesheetPath, 32, 32);
     Animation animation = new Animation(spritesheet, false, false, 2,2,2);
