@@ -14,6 +14,9 @@ import de.gurkenlabs.litiengine.graphics.animation.Animation;
 public class AsepriteHandlerTests {
 
 
+  /**
+   * Test that just create a json and prints in to standard output. 
+   */
   @Test
   public void exportAnimationTest() {
     String spritesheetPath = "C:/Users/Nikla/Documents/Programmering/SoftwareFundamentals/Assignment-3-EC/litiengine/tests/de/gurkenlabs/litiengine/graphics/animation/aseprite_test_animation/Sprite-0001-sheet.png";
@@ -22,7 +25,8 @@ public class AsepriteHandlerTests {
     Animation animation = new Animation(spritesheet, false, false, 2,2,2);
 
     AsepriteHandler aseprite = new AsepriteHandler();
-    aseprite.exportAnimation(animation);
+    String result = aseprite.exportAnimation(animation);
+    System.out.println(result);
 
   }
 }

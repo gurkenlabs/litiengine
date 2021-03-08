@@ -26,15 +26,15 @@ public class AsepriteHandler {
     }
 
     /** 
-     * Creates the json representation of an animation object and prints it.
+     * Creates the json representation of an animation object and returns it.
      * This is the public accesible function and can/should be changed to fit into the UI.
      * 
      * @param animation the animation object to export
      */
-    public void exportAnimation(Animation animation){
+    public String exportAnimation(Animation animation){
 
         String json = createJson(animation);
-        System.out.println("JSON: " + json);
+        return json;
     }
 
     /**
@@ -49,8 +49,6 @@ public class AsepriteHandler {
         Frames[] frames = new Frames[keyframes.size()];
 
         if(frames.length != spritesheet.getTotalNumberOfSprites()){
-            //ERROR
-            System.out.println("ERROR");
             throw new ExportAnimationException("Different dimensions of keyframes and sprites in spritesheet"); 
         }
 
@@ -208,12 +206,7 @@ public class AsepriteHandler {
             this.blendMode = blendMode;
         }
 
-    }
-
-    
-    
-    
-    
+    } 
 }
 
 
