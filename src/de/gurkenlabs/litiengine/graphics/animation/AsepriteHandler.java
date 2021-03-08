@@ -59,7 +59,8 @@ public class AsepriteHandler {
                     put("h", frameHeight);
                 }};
                 int duration = keyframes.get(i+j).getDuration();
-                frames[i+j] = new Frames("frame " + i*j, 
+                String index = String.valueOf(i+j);
+                frames[i+j] = new Frames("frame " + index, 
                                         frame, 
                                         false, 
                                         false, 
