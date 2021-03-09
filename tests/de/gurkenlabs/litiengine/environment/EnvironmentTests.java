@@ -52,21 +52,9 @@ import de.gurkenlabs.litiengine.physics.Collision;
 public class EnvironmentTests {
   private Environment testEnvironment;
 
-  @Test
-  public void testInitialization() {
-    IMap map = mock(IMap.class);
-    when(map.getSizeInPixels()).thenReturn(new Dimension(100, 100));
-    when(map.getSizeInTiles()).thenReturn(new Dimension(10, 10));
-    Environment env = new Environment(map);
-
-    assertNotNull(env);
-  }
-
   @BeforeAll
   public static void initGame() {
-
-    // necessary because the environment need access to the game loop and other
-    // stuff
+    // necessary because the environment need access to the game loop and other stuff
     Game.init(Game.COMMADLINE_ARG_NOGUI);
   }
 
@@ -82,6 +70,16 @@ public class EnvironmentTests {
     when(map.getSizeInTiles()).thenReturn(new Dimension(10, 10));
     this.testEnvironment = new Environment(map);
     this.testEnvironment.init();
+  }
+
+  @Test
+  public void testInitialization() {
+    IMap map = mock(IMap.class);
+    when(map.getSizeInPixels()).thenReturn(new Dimension(100, 100));
+    when(map.getSizeInTiles()).thenReturn(new Dimension(10, 10));
+    Environment env = new Environment(map);
+
+    assertNotNull(env);
   }
 
   @Test
@@ -622,13 +620,11 @@ public class EnvironmentTests {
     CollisionBox testCollider = new CollisionBox(true);
     testCollider.setMapId(1);
     testCollider.setName("test");
-
     this.testEnvironment.add(testCollider);
 
     Prop testProp = new Prop(0, 0, null);
     testProp.setMapId(1);
     testProp.setName("test");
-
     this.testEnvironment.add(testProp);
 
     Emitter testEmitter = new Emitter(1, 1) {
@@ -637,10 +633,8 @@ public class EnvironmentTests {
         return null;
       }
     };
-
     testEmitter.setMapId(1);
     testEmitter.setName("test");
-
     this.testEnvironment.add(testEmitter);
 
     this.testEnvironment.load();
@@ -653,11 +647,9 @@ public class EnvironmentTests {
     CollisionBox testCollider2 = new CollisionBox(true);
     testCollider.setMapId(2);
     testCollider.setName("test2");
-
     this.testEnvironment.add(testCollider2);
 
     this.testEnvironment.unload();
-
     assertFalse(this.testEnvironment.isLoaded());
   }
 
@@ -676,7 +668,6 @@ public class EnvironmentTests {
     assertThrows(UnsupportedOperationException.class, () -> this.testEnvironment.getSpawnpoints().add(null));
     assertThrows(UnsupportedOperationException.class, () -> this.testEnvironment.getStaticShadows().add(null));
     assertThrows(UnsupportedOperationException.class, () -> this.testEnvironment.getTriggers().add(null));
-
     assertThrows(UnsupportedOperationException.class, () -> this.testEnvironment.getUsedTags().add(null));
   }
 }
