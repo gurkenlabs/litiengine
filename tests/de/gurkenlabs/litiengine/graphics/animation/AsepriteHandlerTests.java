@@ -18,7 +18,7 @@ public class AsepriteHandlerTests {
 
   /**
    * Tests that Aseprite animation import works as expected when given valid input.
-   * */
+   */
   @Test
   public void importAsepriteAnimationTest() {
     try {
@@ -73,5 +73,20 @@ public class AsepriteHandlerTests {
     assertEquals("FileNotFoundException: Could not find .json file tests/de/gurkenlabs/litiengine/graphics/animation/aseprite_test_animations/Sprite-0003.json", exception_withoutJsonFile.getMessage());
     Throwable exception_withoutSpriteSheet = assertThrows(FileNotFoundException.class, () -> AsepriteHandler.importAnimation("tests/de/gurkenlabs/litiengine/graphics/animation/aseprite_test_animations/Sprite-0004.json"));
     assertEquals("FileNotFoundException: Could not find sprite sheet file. Expected location is 'image' in .json metadata, which evaluates to: tests/de/gurkenlabs/litiengine/graphics/animation/aseprite_test_animations/Sprite-0002-sheet.png", exception_withoutSpriteSheet.getMessage());
+  }
+
+  /**
+   * Test that just create a json and prints in to standard output. 
+   */
+  @Test
+  public void exportAnimationTest() {
+    String spritesheetPath = "tests/de/gurkenlabs/litiengine/graphics/animation/aseprite_test_animations/Sprite-0001-sheet.png";
+    BufferedImage image = new BufferedImage(96, 32, BufferedImage.TYPE_4BYTE_ABGR);
+    Spritesheet spritesheet = new Spritesheet(image, spritesheetPath, 32, 32);
+    Animation animation = new Animation(spritesheet, false, false, 2,2,2);
+
+    AsepriteHandler aseprite = new AsepriteHandler();
+    String result = aseprite.exportAnimation(animation);
+    System.out.println(result);
   }
 }
