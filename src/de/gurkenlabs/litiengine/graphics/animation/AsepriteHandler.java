@@ -56,13 +56,9 @@ public class AsepriteHandler {
     }
 
     Dimension keyFrameDimensions = getKeyFrameDimensions(rootElement);
-    Dimension spriteSheetDimensions = getSpriteSheetDimensions(rootElement);
     if(areKeyFramesSameDimensions(rootElement, keyFrameDimensions)) {
 
-      BufferedImage image = new BufferedImage((int)spriteSheetDimensions.getWidth(),
-                                              (int)spriteSheetDimensions.getHeight(),
-                                              BufferedImage.TYPE_4BYTE_ABGR);
-
+      BufferedImage image = null;
       try { image = ImageIO.read(spriteSheetFile); }
       catch(IOException e) {
         throw new IOException("IOException: Could not write sprite sheet data to BufferedImage object.");
@@ -106,22 +102,6 @@ public class AsepriteHandler {
     String spriteSheetPath = metaData.getAsJsonObject().get("image").getAsString();
 
     return spriteSheetPath;
-  }
-
-  /**
-   * @param rootElement root element of JSON data.
-   *
-   * @return dimensions of animation sprite sheet. 
-   * */
-  private static Dimension getSpriteSheetDimensions(JsonElement rootElement) {
-
-    JsonElement metadata = rootElement.getAsJsonObject().get("meta");
-    JsonObject spriteSheetSize = metadata.getAsJsonObject().get("size").getAsJsonObject();
-
-    int spriteSheetWidth = spriteSheetSize.get("w").getAsInt();
-    int spriteSheetHeight = spriteSheetSize.get("h").getAsInt();
-
-    return new Dimension(spriteSheetWidth, spriteSheetHeight);
   }
 
   /**
