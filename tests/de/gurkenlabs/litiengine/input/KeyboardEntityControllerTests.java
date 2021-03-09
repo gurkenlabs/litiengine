@@ -23,7 +23,7 @@ public class KeyboardEntityControllerTests {
     }
 
     @Test
-    public void testHandleUpKeyPressed() {
+    public void handleUpKeyPressed() {
         // arrange
         int keyCode = KeyEvent.VK_W;
         char keyChar = 'W';
@@ -44,7 +44,7 @@ public class KeyboardEntityControllerTests {
     }
 
     @Test
-    public void testHandleDownKeyPressed() {
+    public void handleDownKeyPressed() {
         // arrange
         int keyCode = KeyEvent.VK_S;
         char keyChar = 'S';
@@ -65,7 +65,7 @@ public class KeyboardEntityControllerTests {
     }
 
     @Test
-    public void testHandleLeftKeyPressed() {
+    public void handleLeftKeyPressed() {
         // arrange
         int keyCode = KeyEvent.VK_A;
         char keyChar = 'A';
@@ -86,7 +86,7 @@ public class KeyboardEntityControllerTests {
     }
 
     @Test
-    public void testHandleRightKeyPressed() {
+    public void handleRightKeyPressed() {
         // arrange
         int keyCode = KeyEvent.VK_D;
         char keyChar = 'D';
