@@ -23,6 +23,8 @@ import com.google.gson.JsonObject;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.animation.Animation;
 import de.gurkenlabs.litiengine.graphics.animation.KeyFrame;
+import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 
 /**
  * Offers an interface to import Aseprite JSON export format.
@@ -189,24 +191,25 @@ public class AsepriteHandler {
      * Creates the json representation of an animation object and returns it.
      * This is the public accesible function and can/should be changed to fit into the UI.
      * 
-     * @param animation the animation object to export
+     * @param spritesheetResource the animation object to export
      */
-    public String exportAnimation(Animation animation){
+    public String exportAnimation(SpritesheetResource spritesheetResource){
 
-        String json = createJson(animation);
+        String json = createJson(spritesheetResource);
         return json;
     }
 
     /**
      * Creates the json representation of an animation object and returns it as a string.
      * 
-     * @param animation animation object to export as json.
+     * @param spritesheetResource spritesheetResource object to export as json.
      * @return the json as a string.
      */
-    private String createJson(Animation animation){
-        Spritesheet spritesheet = animation.getSpritesheet();
-        List<KeyFrame> keyframes = animation.getKeyframes();
-        Frames[] frames = new Frames[keyframes.size()];
+    private String createJson(SpritesheetResource spritesheetResource){
+        Spritesheet spritesheet = Resources.spritesheets().load(spritesheetResource);
+        assert spritesheet != null;
+        int[] keyframes = Resources.spritesheets().getCustomKeyFrameDurations(spritesheet);
+        Frames[] frames = new Frames[keyframes.length];
 
         if(frames.length != spritesheet.getTotalNumberOfSprites()){
             throw new ExportAnimationException("Different dimensions of keyframes and sprites in spritesheet"); 
@@ -238,7 +241,7 @@ public class AsepriteHandler {
                     put("w", frameWidth);
                     put("h", frameHeight);
                 }};
-                int duration = keyframes.get(i+j).getDuration();
+                int duration = keyframes[i+j];
                 String index = String.valueOf(i+j);
                 frames[i+j] = new Frames("frame " + index, 
                                         frame, 
