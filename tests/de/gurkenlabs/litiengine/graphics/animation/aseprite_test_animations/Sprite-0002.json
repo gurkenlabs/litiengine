@@ -1,0 +1,41 @@
+{ "frames": {
+    "Sprite-0002 0.png": {
+     "frame": { "x": 0, "y": 0, "w": 32, "h": 32 },
+     "rotated": false,
+     "trimmed": false,
+     "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+     "sourceSize": { "w": 32, "h": 32 },
+     "duration": 100
+    },
+    "Sprite-0002 1.png": {
+     "frame": { "x": 32, "y": 0, "w": 32, "h": 32 },
+     "rotated": false,
+     "trimmed": false,
+     "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+     "sourceSize": { "w": 64, "h": 64 },
+     "duration": 100
+    },
+    "Sprite-0002 2.png": {
+     "frame": { "x": 64, "y": 0, "w": 32, "h": 32 },
+     "rotated": false,
+     "trimmed": false,
+     "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+     "sourceSize": { "w": 32, "h": 32 },
+     "duration": 100
+    }
+  },
+  "meta": {
+   "app": "http://www.aseprite.org/",
+   "version": "1.1.9-dev",
+   "image": "tests/de/gurkenlabs/litiengine/graphics/animation/aseprite_test_animations/Sprite-0001-sheet.png",
+   "format": "RGBA8888",
+   "size": { "w": 96, "h": 32 },
+   "scale": "1",
+   "frameTags": [
+   ],
+   "layers": [
+    { "name": "Layer 1", "opacity": 255, "blendMode": "normal" }
+   ]
+  }
+ }
+ 

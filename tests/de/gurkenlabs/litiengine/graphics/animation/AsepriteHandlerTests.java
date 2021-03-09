@@ -4,15 +4,16 @@ import java.io.IOException;
 import java.io.FileNotFoundException;
 import java.awt.image.BufferedImage;
 
+
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
-
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.animation.Animation;
 import de.gurkenlabs.litiengine.resources.ImageFormat;
-
+import de.gurkenlabs.litiengine.graphics.animation.AsepriteHandler.ImportAnimationException;
 public class AsepriteHandlerTests {
 
   /**
@@ -49,4 +50,29 @@ public class AsepriteHandlerTests {
       fail(e.getMessage());
     }
   }
+  /**
+   * Test that if AsepriteHandler.ImportAnimationException will be throwed if different frame dimensions are provided.
+   *
+   */
+  @Test
+  public void ImportAnimationExceptionTest() {
+
+      Throwable exception = assertThrows(ImportAnimationException.class, () -> AsepriteHandler.importAnimation("tests/de/gurkenlabs/litiengine/graphics/animation/aseprite_test_animations/Sprite-0002.json"));
+      assertEquals("AsepriteHandler.ImportAnimationException: animation key frames require same dimensions.", exception.getMessage());   
+  }
+  /**
+   * 1.first, we test if FileNotFoundException would be throwed if .json file cannot be found.
+   * 2.then we test if FileNotFoundException would be throwed if spritesheet file cannot be found.
+   */
+
+
+  @Test
+  public void FileNotFoundExceptionTest(){
+    Throwable exception_withoutJsonFile = assertThrows(FileNotFoundException.class, () -> AsepriteHandler.importAnimation("tests/de/gurkenlabs/litiengine/graphics/animation/aseprite_test_animations/Sprite-0003.json"));
+    assertEquals("FileNotFoundException: Could not find .json file tests/de/gurkenlabs/litiengine/graphics/animation/aseprite_test_animations/Sprite-0003.json", exception_withoutJsonFile.getMessage());
+    Throwable exception_withoutSpriteSheet = assertThrows(FileNotFoundException.class, () -> AsepriteHandler.importAnimation("tests/de/gurkenlabs/litiengine/graphics/animation/aseprite_test_animations/Sprite-0004.json"));
+    assertEquals("FileNotFoundException: Could not find sprite sheet file. Expected location is 'image' in .json metadata, which evaluates to: tests/de/gurkenlabs/litiengine/graphics/animation/aseprite_test_animations/Sprite-0002-sheet.png", exception_withoutSpriteSheet.getMessage());
+    
+  }
+
 }
