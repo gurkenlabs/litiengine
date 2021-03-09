@@ -211,30 +211,61 @@ public class EnvironmentTests {
 
   @Test
   public void testGetById() {
+    // arrange
     ICombatEntity combatEntity = mock(ICombatEntity.class);
     when(combatEntity.getMapId()).thenReturn(1);
     when(combatEntity.getRenderType()).thenReturn(RenderType.NORMAL);
-
     ICombatEntity combatEntity2 = mock(ICombatEntity.class);
     when(combatEntity2.getMapId()).thenReturn(2);
     when(combatEntity2.getRenderType()).thenReturn(RenderType.NORMAL);
-
     this.testEnvironment.add(combatEntity);
     this.testEnvironment.add(combatEntity2);
 
-    List<IEntity> noEntities = this.testEnvironment.get((int[]) null);
-    List<IEntity> entities = this.testEnvironment.get(1, 2);
-
+    // act, assert
     assertNotNull(this.testEnvironment.get(1));
     assertNotNull(this.testEnvironment.get(2));
+  }
 
-    assertNotNull(noEntities);
-    assertEquals(0, noEntities.size());
+  @Test
+  public void testGetByIdArray_ValidArray() {
+    // arrange
+    ICombatEntity combatEntity = mock(ICombatEntity.class);
+    when(combatEntity.getMapId()).thenReturn(1);
+    when(combatEntity.getRenderType()).thenReturn(RenderType.NORMAL);
+    ICombatEntity combatEntity2 = mock(ICombatEntity.class);
+    when(combatEntity2.getMapId()).thenReturn(2);
+    when(combatEntity2.getRenderType()).thenReturn(RenderType.NORMAL);
+    this.testEnvironment.add(combatEntity);
+    this.testEnvironment.add(combatEntity2);
 
+    // act
+    List<IEntity> entities = this.testEnvironment.get(1, 2);
+
+    // assert
     assertNotNull(entities);
     assertEquals(2, entities.size());
     assertTrue(entities.contains(combatEntity));
     assertTrue(entities.contains(combatEntity2));
+  }
+
+  @Test
+  public void testGetByIdArray_NullArray() {
+    // arrange
+    ICombatEntity combatEntity = mock(ICombatEntity.class);
+    when(combatEntity.getMapId()).thenReturn(1);
+    when(combatEntity.getRenderType()).thenReturn(RenderType.NORMAL);
+    ICombatEntity combatEntity2 = mock(ICombatEntity.class);
+    when(combatEntity2.getMapId()).thenReturn(2);
+    when(combatEntity2.getRenderType()).thenReturn(RenderType.NORMAL);
+    this.testEnvironment.add(combatEntity);
+    this.testEnvironment.add(combatEntity2);
+
+    // act
+    List<IEntity> noEntities = this.testEnvironment.get((int[]) null);
+
+    // assert
+    assertNotNull(noEntities);
+    assertEquals(0, noEntities.size());
   }
 
   @Test
