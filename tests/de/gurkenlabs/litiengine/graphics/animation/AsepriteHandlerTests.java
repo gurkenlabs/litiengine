@@ -13,6 +13,8 @@ import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.animation.Animation;
 import de.gurkenlabs.litiengine.graphics.animation.AsepriteHandler.ImportAnimationException;
 import de.gurkenlabs.litiengine.resources.ImageFormat;
+import de.gurkenlabs.litiengine.resources.SpritesheetResource;
+
 
 public class AsepriteHandlerTests {
 
@@ -84,9 +86,12 @@ public class AsepriteHandlerTests {
     BufferedImage image = new BufferedImage(96, 32, BufferedImage.TYPE_4BYTE_ABGR);
     Spritesheet spritesheet = new Spritesheet(image, spritesheetPath, 32, 32);
     Animation animation = new Animation(spritesheet, false, false, 2,2,2);
-
+    int[] keyFrames = animation.getKeyFrameDurations();
+    SpritesheetResource spritesheetResource = new SpritesheetResource(animation.getSpritesheet());
+    spritesheetResource.setKeyframes(keyFrames);
+    
     AsepriteHandler aseprite = new AsepriteHandler();
-    String result = aseprite.exportAnimation(animation);
+    String result = aseprite.exportAnimation(spritesheetResource);
     System.out.println(result);
   }
 }
