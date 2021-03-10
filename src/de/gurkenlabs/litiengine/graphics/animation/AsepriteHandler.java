@@ -105,18 +105,6 @@ public class AsepriteHandler {
   }
   
   /**
-   * @param rootElement root element of JSON data.
-   * @return path (including filename) to animation sprite sheet.
-   */
-  private static String getSpriteSheetPath(JsonElement rootElement) {
-    
-    JsonElement metaData = rootElement.getAsJsonObject().get("meta");
-    String spriteSheetPath = metaData.getAsJsonObject().get("image").getAsString();
-    
-    return spriteSheetPath;
-  }
-  
-  /**
    * Searches for sprite sheet path through .json metadata and same folder as .json file.
    *
    * @param rootElement root element of JSON data.
