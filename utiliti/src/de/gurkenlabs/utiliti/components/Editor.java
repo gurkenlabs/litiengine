@@ -79,7 +79,7 @@ public class Editor extends Screen {
   private static final String TEXTUREATLAS_FILE_NAME = "Texture Atlas XML (generic)";
 
   private static final String IMPORT_DIALOGUE = "import_something";
-	private static final String ANIMATION_FILE_NAME = "Animation file";
+  private static final String ANIMATION_FILE_NAME = "Animation file";
 
   private static Editor instance;
   private static UserPreferences preferences;
