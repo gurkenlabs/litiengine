@@ -7,18 +7,14 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.awt.Dimension;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.util.Set;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Arrays;
 import javax.imageio.ImageIO;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.annotations.SerializedName;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonObject;
