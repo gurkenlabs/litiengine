@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-public class GameLoopTest {
+public class GameTimeTests {
 
   @Test
   public void testTimeCalculation100() {
