@@ -74,7 +74,7 @@ public class AsepriteHandlerTests {
 		Throwable exception_withoutJsonFile = assertThrows(FileNotFoundException.class, () -> AsepriteHandler.importAnimation("tests/de/gurkenlabs/litiengine/graphics/animation/aseprite_test_animations/Sprite-0003.json"));
 		assertEquals("FileNotFoundException: Could not find .json file tests/de/gurkenlabs/litiengine/graphics/animation/aseprite_test_animations/Sprite-0003.json", exception_withoutJsonFile.getMessage());
 		Throwable exception_withoutSpriteSheet = assertThrows(FileNotFoundException.class, () -> AsepriteHandler.importAnimation("tests/de/gurkenlabs/litiengine/graphics/animation/aseprite_test_animations/Sprite-0004.json"));
-		assertEquals("FileNotFoundException: Could not find sprite sheet file. Expected location is 'image' in .json metadata, which evaluates to: tests/de/gurkenlabs/litiengine/graphics/animation/aseprite_test_animations/Sprite-0002-sheet.png", exception_withoutSpriteSheet.getMessage());
+		assertEquals("FileNotFoundException: Could not find sprite sheet file. Expected location is 'image' in .json metadata, or same folder as .json file.", exception_withoutSpriteSheet.getMessage());
 	}
 	
 	/**

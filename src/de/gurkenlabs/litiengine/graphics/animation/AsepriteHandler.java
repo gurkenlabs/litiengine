@@ -43,7 +43,6 @@ public class AsepriteHandler {
 	
 	/**
 	 * Imports an Aseprite animation (.json + sprite sheet).
-	 * Note: searches for sprite sheet path through .json metadata, specifically 'image' element. This should be an absolute path in system.
 	 *
 	 * @param jsonPath path (including filename) to Aseprite JSON.
 	 * @return Animation object represented by each key frame in Aseprite sprite sheet.
@@ -57,11 +56,11 @@ public class AsepriteHandler {
 			throw new FileNotFoundException("FileNotFoundException: Could not find .json file " + jsonPath);
 		}
 		
-		String spriteSheetPath = getSpriteSheetPath(rootElement);
-		File spriteSheetFile = new File(spriteSheetPath);
-		if (!spriteSheetFile.exists()) {
+		File spriteSheetFile = null;
+		try { spriteSheetFile = getSpriteSheetFile(rootElement, jsonPath); }
+		catch(FileNotFoundException e) {
 			throw new FileNotFoundException("FileNotFoundException: Could not find sprite sheet file. " +
-							"Expected location is 'image' in .json metadata, which evaluates to: " + spriteSheetPath);
+			"Expected location is 'image' in .json metadata, or same folder as .json file.");
 		}
 		
 		Dimension keyFrameDimensions = getKeyFrameDimensions(rootElement);
@@ -75,7 +74,7 @@ public class AsepriteHandler {
 			}
 			
 			Spritesheet spriteSheet = new Spritesheet(image,
-							spriteSheetPath,
+							spriteSheetFile.getPath().toString(),
 							(int) keyFrameDimensions.getWidth(),
 							(int) keyFrameDimensions.getHeight());
 			
@@ -111,6 +110,51 @@ public class AsepriteHandler {
 		String spriteSheetPath = metaData.getAsJsonObject().get("image").getAsString();
 		
 		return spriteSheetPath;
+	}
+	
+	/**
+	 * Searches for sprite sheet path through .json metadata, or same folder as .json file.
+	 * @param rootElement root element of JSON data.
+	 * @param jsonPath path (including filename) to .json Aseprite file.
+	 *
+	 * @return sprite sheet file if it can be found, else an exception is thrown.
+	 * */
+	private static File getSpriteSheetFile(JsonElement rootElement, String jsonPath) throws FileNotFoundException {
+		
+		//try searching path supplied in .json data
+		JsonElement metaData = rootElement.getAsJsonObject().get("meta");
+		String spriteSheetPath = metaData.getAsJsonObject().get("image").getAsString();
+		
+		File spriteSheetFile = new File(spriteSheetPath);
+		
+		if(spriteSheetFile.exists())
+			return spriteSheetFile;
+		
+		//try searching local directory
+		Path jsonFilePath = Paths.get(jsonPath);
+		String dirPath = jsonFilePath.getParent().toString();
+		String fileName1 = jsonFilePath.getFileName().toString();
+		String alternative1 = fileName1.substring(0, fileName1.lastIndexOf(".")); //same file name as .json
+		
+		Path spriteSheetFilePath = Paths.get(spriteSheetPath);
+		String fileName2 = spriteSheetFilePath.getFileName().toString();
+		String alternative2 = fileName2.substring(0, fileName2.lastIndexOf(".")); //same file name as 'image' element
+		
+		List<String> suffixes = Arrays.asList(".png", ".jpg", ".jpeg");
+		for(String suffix : suffixes) {
+			
+			String alternativeFile1 = dirPath + "/" + alternative1 + suffix;
+			spriteSheetFile = new File(alternativeFile1);
+			if(spriteSheetFile.exists())
+				return spriteSheetFile;
+			
+			String alternativeFile2 = dirPath + "/" + alternative2 + suffix;
+			spriteSheetFile = new File(alternativeFile2);
+			if(spriteSheetFile.exists())
+				return spriteSheetFile;
+		}
+		
+		throw new FileNotFoundException();
 	}
 	
 	/**
