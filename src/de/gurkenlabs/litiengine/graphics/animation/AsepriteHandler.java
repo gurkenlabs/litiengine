@@ -133,31 +133,29 @@ public class AsepriteHandler {
     
     if (spriteSheetFile.exists())
       return spriteSheetFile;
-    
+
     //try searching local directory
     Path jsonFilePath = Paths.get(jsonPath);
     String dirPath = jsonFilePath.getParent().toString();
-    String fileName1 = jsonFilePath.getFileName().toString();
-    String alternative1 = fileName1.substring(0, fileName1.lastIndexOf(".")); //same file name as .json
-    
-    Path spriteSheetFilePath = Paths.get(spriteSheetPath);
-    String fileName2 = spriteSheetFilePath.getFileName().toString();
-    String alternative2 = fileName2.substring(0, fileName2.lastIndexOf(".")); //same file name as 'image' element
-    
-    List<String> suffixes = Arrays.asList(".png", ".jpg", ".jpeg");
-    for (String suffix : suffixes) {
-      
-      String alternativeFile1 = dirPath + "/" + alternative1 + suffix;
-      spriteSheetFile = new File(alternativeFile1);
-      if (spriteSheetFile.exists())
-        return spriteSheetFile;
-      
-      String alternativeFile2 = dirPath + "/" + alternative2 + suffix;
-      spriteSheetFile = new File(alternativeFile2);
-      if (spriteSheetFile.exists())
-        return spriteSheetFile;
-    }
-    
+
+    //same name as filename in 'image' element
+    String fileNameSheet = Paths.get(spriteSheetPath).getFileName().toString(); //name of spritesheet
+    String alternativePath1 = dirPath + "/" + fileNameSheet;
+
+    spriteSheetFile = new File(alternativePath1);
+    if(spriteSheetFile.exists())
+      return spriteSheetFile;
+
+    //same name as .json file
+    String fileNameJson = jsonFilePath.getFileName().toString();
+    String trimmedJsonName = fileNameJson.substring(0, fileNameJson.indexOf("."));  //without suffix
+    String sheetSuffix = fileNameSheet.substring(fileNameSheet.indexOf("."), fileNameSheet.length());
+    String alternativePath2 = dirPath + "/" + trimmedJsonName + sheetSuffix;
+
+    spriteSheetFile = new File(alternativePath2);
+    if(spriteSheetFile.exists())
+      return spriteSheetFile;
+
     throw new FileNotFoundException();
   }
   
