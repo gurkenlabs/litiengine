@@ -1,9 +1,8 @@
 package de.gurkenlabs.litiengine;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class GameTimeTests {
   @Test
@@ -68,5 +67,16 @@ public class GameTimeTests {
 
     // act, assert
     assertEquals(0, time.toMilliseconds(0, 1000));
+  }
+
+  @Test
+  public void toMilliseconds_ZeroUpdateRateThrows() {
+    // arrange
+    GameTime time = new GameTime();
+
+    // act, assert
+    assertThrows(ArithmeticException.class, () -> {
+      long failed = time.toMilliseconds(100, 0);
+    });
   }
 }

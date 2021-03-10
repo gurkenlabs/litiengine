@@ -89,6 +89,7 @@ public final class GameTime implements EnvironmentLoadedListener {
    * @return The milliseconds that correspond to the specified ticks.
    */
   public long toMilliseconds(final long ticks, int updateRate) {
+    if (updateRate == 0) throw new ArithmeticException("/ by zero");
     return (long) (ticks / (updateRate / 1000.0));
   }
 
