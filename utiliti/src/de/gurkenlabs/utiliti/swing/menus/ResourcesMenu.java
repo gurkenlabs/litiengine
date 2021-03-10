@@ -54,8 +54,8 @@ public final class ResourcesMenu extends JMenu {
     exportSpriteSheets.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK));
     exportSpriteSheets.addActionListener(a -> Editor.instance().exportSpriteSheets());
     
-  	JMenuItem importAnimation = new JMenuItem(Resources.strings().get("menu_assets_importAnimation"));
-		importAnimation.addActionListener(a -> Editor.instance().importAnimation());
+    JMenuItem importAnimation = new JMenuItem(Resources.strings().get("menu_assets_importAnimation"));
+    importAnimation.addActionListener(a -> Editor.instance().importAnimation());
     importAnimation.setEnabled(false);
 
     Editor.instance().onLoaded(() -> {
@@ -67,7 +67,7 @@ public final class ResourcesMenu extends JMenu {
       importTilesets.setEnabled(Editor.instance().getCurrentResourceFile() != null);
       importSounds.setEnabled(Editor.instance().getCurrentResourceFile() != null);
       exportSpriteSheets.setEnabled(Editor.instance().getCurrentResourceFile() != null);
-			importAnimation.setEnabled(Editor.instance().getCurrentResourceFile() != null);
+      importAnimation.setEnabled(Editor.instance().getCurrentResourceFile() != null);
     });
 
     this.add(importSprite);
@@ -77,8 +77,8 @@ public final class ResourcesMenu extends JMenu {
     this.add(importBlueprints);
     this.add(importTilesets);
     this.add(importSounds);
-		this.add(importAnimation);
-		this.addSeparator();
+    this.add(importAnimation);
+    this.addSeparator();
     this.add(exportSpriteSheets);
     this.add(compress);
   }
