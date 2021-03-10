@@ -15,9 +15,7 @@ import de.gurkenlabs.litiengine.graphics.animation.AsepriteHandler.ImportAnimati
 import de.gurkenlabs.litiengine.resources.ImageFormat;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 
-
 import static org.junit.jupiter.api.Assertions.*;
-
 
 public class AsepriteHandlerTests {
 	
