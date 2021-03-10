@@ -12,6 +12,9 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 import javax.imageio.ImageIO;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
