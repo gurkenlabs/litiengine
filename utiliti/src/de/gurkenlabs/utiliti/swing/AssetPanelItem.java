@@ -435,7 +435,7 @@ public class AssetPanelItem extends JPanel {
 
       ImageFormat format = sprite.getImageFormat() != ImageFormat.UNSUPPORTED ? sprite.getImageFormat() : ImageFormat.PNG;
 
-      Object[] options = { ".xml", format.toFileExtension() };
+      Object[] options = { ".xml", format.toFileExtension(), ".json"};
       int answer = JOptionPane.showOptionDialog(Game.window().getRenderComponent(), "Select an export format:", "Export Spritesheet", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
 
       try {
