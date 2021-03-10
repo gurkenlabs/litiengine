@@ -193,7 +193,7 @@ public class AsepriteHandler {
      * 
      * @param spritesheetResource the animation object to export
      */
-    public String exportAnimation(SpritesheetResource spritesheetResource){
+    public static String exportAnimation(SpritesheetResource spritesheetResource){
 
         String json = createJson(spritesheetResource);
         return json;
@@ -205,7 +205,7 @@ public class AsepriteHandler {
      * @param spritesheetResource spritesheetResource object to export as json.
      * @return the json as a string.
      */
-    private String createJson(SpritesheetResource spritesheetResource){
+    private static String createJson(SpritesheetResource spritesheetResource){
         Spritesheet spritesheet = Resources.spritesheets().load(spritesheetResource);
         assert spritesheet != null;
         int[] keyframes = Resources.spritesheets().getCustomKeyFrameDurations(spritesheet);
@@ -286,8 +286,8 @@ public class AsepriteHandler {
     /**
      * Frames class for Aseprite json structure.
      */
-    private class Frames {
         transient String name; 
+    private static class Frames {
         Map<String, Integer> frame;
         boolean rotated;
         boolean trimmed;
@@ -319,7 +319,7 @@ public class AsepriteHandler {
     /**
      * Meta data class for Aseprite json structure.
      */
-    private class Meta {
+    private static class Meta {
         String app;
         String version;
         String image;
@@ -352,7 +352,7 @@ public class AsepriteHandler {
     /**
      * Layer class for Aseprite json structure.
      */
-    private class Layer {
+    private static class Layer {
         String name;
         int opacity;
         String blendMode;
