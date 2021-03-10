@@ -26,6 +26,8 @@ public class AsepriteHandlerTests {
   public void importAsepriteAnimationTest() {
     try {
       Animation animation = AsepriteHandler.importAnimation("tests/de/gurkenlabs/litiengine/graphics/animation/aseprite_test_animations/Sprite-0001.json");
+      Animation animation2 = AsepriteHandler.importAnimation("tests/de/gurkenlabs/litiengine/graphics/animation/aseprite_test_animations/Sprite-0005.json");
+      assertEquals("Sprite-0005", animation2.getName());
       assertEquals("Sprite-0001-sheet", animation.getName());
       assertEquals(300, animation.getTotalDuration());
       for (int keyFrameDuration : animation.getKeyFrameDurations())
@@ -75,21 +77,4 @@ public class AsepriteHandlerTests {
     assertEquals("FileNotFoundException: Could not find sprite sheet file. Expected location is 'image' in .json metadata, or same folder as .json file.", exception_withoutSpriteSheet.getMessage());
   }
   
-  /**
-   * Test that just create a json and prints in to standard output.
-   */
-  @Test
-  public void exportAnimationTest() {
-    String spritesheetPath = "tests/de/gurkenlabs/litiengine/graphics/animation/aseprite_test_animations/Sprite-0001-sheet.png";
-    BufferedImage image = new BufferedImage(96, 32, BufferedImage.TYPE_4BYTE_ABGR);
-    Spritesheet spritesheet = new Spritesheet(image, spritesheetPath, 32, 32);
-    Animation animation = new Animation(spritesheet, false, false, 2, 2, 2);
-    int[] keyFrames = animation.getKeyFrameDurations();
-    SpritesheetResource spritesheetResource = new SpritesheetResource(animation.getSpritesheet());
-    spritesheetResource.setKeyframes(keyFrames);
-    
-    AsepriteHandler aseprite = new AsepriteHandler();
-    String result = aseprite.exportAnimation(spritesheetResource);
-    System.out.println(result);
-  }
 }
