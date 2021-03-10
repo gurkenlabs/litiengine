@@ -286,9 +286,9 @@ public class AsepriteHandler {
     /**
      * Frames class for Aseprite json structure.
      */
-        transient String name; 
     private static class Frames {
-        Map<String, Integer> frame;
+			transient String name;
+			Map<String, Integer> frame;
         boolean rotated;
         boolean trimmed;
         Map<String, Integer> spriteSourceSize;
