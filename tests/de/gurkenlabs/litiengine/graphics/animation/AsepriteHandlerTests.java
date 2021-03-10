@@ -19,6 +19,7 @@ import de.gurkenlabs.litiengine.resources.ImageFormat;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 
 public class AsepriteHandlerTests { 
+
   /**
    * Tests that Aseprite animation import works as expected when given valid input.
    */
