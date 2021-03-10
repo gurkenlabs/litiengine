@@ -516,10 +516,10 @@ public class Editor extends Screen {
 			}
 			this.loadSpriteSheets(sprites, true);
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+		} catch (AsepriteHandler.ImportAnimationException | IOException e) {
+      log.log(Level.SEVERE,  e.getMessage(), e);
+    }
+  }
 
   public void importEmitters() {
     XmlImportDialog.importXml("Emitter", file -> {
