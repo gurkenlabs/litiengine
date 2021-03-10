@@ -11,6 +11,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.Writer;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collection;
@@ -48,7 +50,9 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.graphics.animation.AsepriteHandler;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
+import de.gurkenlabs.litiengine.graphics.animation.AsepriteHandler;
 import de.gurkenlabs.litiengine.resources.ImageFormat;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.resources.SoundFormat;
@@ -431,7 +435,7 @@ public class AssetPanelItem extends JPanel {
 
       ImageFormat format = sprite.getImageFormat() != ImageFormat.UNSUPPORTED ? sprite.getImageFormat() : ImageFormat.PNG;
 
-      Object[] options = { ".xml", format.toFileExtension() };
+      Object[] options = { ".xml", format.toFileExtension(), ".json"};
       int answer = JOptionPane.showOptionDialog(Game.window().getRenderComponent(), "Select an export format:", "Export Spritesheet", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
 
       try {
@@ -441,21 +445,48 @@ public class AssetPanelItem extends JPanel {
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         chooser.setDialogType(JFileChooser.SAVE_DIALOG);
         chooser.setDialogTitle("Export Spritesheet");
-        if (answer == 0) {
-          XmlExportDialog.export(spriteSheetInfo, "Spritesheet", spriteSheetInfo.getName());
-        } else if (answer == 1) {
-          FileFilter filter = new FileNameExtensionFilter(format.toString() + " - Image", format.toString());
-          chooser.setFileFilter(filter);
-          chooser.addChoosableFileFilter(filter);
-          chooser.setSelectedFile(new File(spriteSheetInfo.getName() + format.toFileExtension()));
-
-          int result = chooser.showSaveDialog(Game.window().getRenderComponent());
-          if (result == JFileChooser.APPROVE_OPTION) {
-            ImageSerializer.saveImage(chooser.getSelectedFile().toString(), sprite.getImage(), format);
-            log.log(Level.INFO, "exported spritesheet {0} to {1}", new Object[] { spriteSheetInfo.getName(), chooser.getSelectedFile() });
+        switch (answer) {
+          case 0: {
+            XmlExportDialog.export(spriteSheetInfo, "Spritesheet", spriteSheetInfo.getName());
+            break;
+          }
+          case 1: {
+            FileFilter filter = new FileNameExtensionFilter(format.toString() + " - Image", format.toString());
+            chooser.setFileFilter(filter);
+            chooser.addChoosableFileFilter(filter);
+            chooser.setSelectedFile(new File(spriteSheetInfo.getName() + format.toFileExtension()));
+            
+            int result = chooser.showSaveDialog(Game.window().getRenderComponent());
+            if (result == JFileChooser.APPROVE_OPTION) {
+              ImageSerializer.saveImage(chooser.getSelectedFile().toString(), sprite.getImage(), format);
+              log.log(Level.INFO, "exported spritesheet {0} to {1}", new Object[]{spriteSheetInfo.getName(), chooser.getSelectedFile()});
+            }
+            break;
+          }
+          case 2: {
+            FileFilter filter = new FileNameExtensionFilter(".json" + " - " + "Spritesheet" + " JSON", "json");
+            chooser.setFileFilter(filter);
+            chooser.addChoosableFileFilter(filter);
+            chooser.setSelectedFile(new File(spriteSheetInfo.getName() + "." + "json"));
+            
+            int result = chooser.showSaveDialog(Game.window().getRenderComponent());
+            if (result == JFileChooser.APPROVE_OPTION) {
+              String fileNameWithExtension = chooser.getSelectedFile().toString();
+              if (!fileNameWithExtension.endsWith(".json")) {
+                fileNameWithExtension += ".json";
+              }
+              String json = AsepriteHandler.exportAnimation(spriteSheetInfo);
+              try (Writer writer = new FileWriter(fileNameWithExtension)) {
+                writer.write(json);
+                log.log(Level.INFO, "Exported {0} {1} to {2}", new Object[]{"Spritesheet", spriteSheetInfo.getName(), fileNameWithExtension});
+              } catch (IOException e) {
+                e.printStackTrace();
+              }
+            }
+            break;
           }
         }
-      } catch (IOException e) {
+      } catch (AsepriteHandler.ExportAnimationException | IOException e) {
         log.log(Level.SEVERE, e.getMessage(), e);
       }
     }

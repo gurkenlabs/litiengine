@@ -38,6 +38,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.TextRenderer;
+import de.gurkenlabs.litiengine.graphics.animation.Animation;
+import de.gurkenlabs.litiengine.graphics.animation.AsepriteHandler;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterLoader;
 import de.gurkenlabs.litiengine.gui.screens.Screen;
@@ -77,6 +79,7 @@ public class Editor extends Screen {
   private static final String TEXTUREATLAS_FILE_NAME = "Texture Atlas XML (generic)";
 
   private static final String IMPORT_DIALOGUE = "import_something";
+  private static final String ANIMATION_FILE_NAME = "Animation file";
 
   private static Editor instance;
   private static UserPreferences preferences;
@@ -380,6 +383,12 @@ public class Editor extends Screen {
     }
   }
 
+  public void importAnimation() {
+    if (EditorFileChooser.showFileDialog(ANIMATION_FILE_NAME, Resources.strings().get(IMPORT_DIALOGUE, ANIMATION_FILE_NAME), false, "json") == JFileChooser.APPROVE_OPTION) {
+      this.processAnimation(EditorFileChooser.instance().getSelectedFile());
+    }
+  }
+
   public void importSounds() {
     if (EditorFileChooser.showFileDialog(AUDIO_FILE_NAME, Resources.strings().get(IMPORT_DIALOGUE, AUDIO_FILE_NAME), true, SoundFormat.getAllExtensions()) == JFileChooser.APPROVE_OPTION) {
       this.importSounds(EditorFileChooser.instance().getSelectedFiles());
@@ -486,6 +495,30 @@ public class Editor extends Screen {
     }
 
     this.loadSpriteSheets(sprites, true);
+  }
+
+  /**
+   * Loads an animation (spritesheet with keyframes) in to the editor
+   * @param file - a json file, encoded by the asesprite export standard
+   */
+  public void processAnimation(File file) {
+    try {
+      Animation animation = AsepriteHandler.importAnimation(file.getAbsolutePath());
+      int[] keyFrames = animation.getKeyFrameDurations();
+      SpritesheetResource spritesheetResource = new SpritesheetResource(animation.getSpritesheet());
+      spritesheetResource.setKeyframes(keyFrames);
+      Collection<SpritesheetResource> sprites = new ArrayList<>(Collections.singleton(spritesheetResource));
+      for (SpritesheetResource info : sprites) {
+        Resources.spritesheets().getAll().removeIf(x -> x.getName().equals(info.getName() + "-preview"));
+        this.getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(info.getName()));
+        this.getGameFile().getSpriteSheets().add(info);
+        log.log(Level.INFO, "imported spritesheet {0}", new Object[]{info.getName()});
+      }
+      this.loadSpriteSheets(sprites, true);
+  
+    } catch (AsepriteHandler.ImportAnimationException | IOException e) {
+      log.log(Level.SEVERE,  e.getMessage(), e);
+    }
   }
 
   public void importEmitters() {
