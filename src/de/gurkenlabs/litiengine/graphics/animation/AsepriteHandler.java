@@ -7,18 +7,14 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.awt.Dimension;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.util.Set;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Arrays;
 import javax.imageio.ImageIO;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.annotations.SerializedName;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonObject;
@@ -105,18 +101,6 @@ public class AsepriteHandler {
   }
   
   /**
-   * @param rootElement root element of JSON data.
-   * @return path (including filename) to animation sprite sheet.
-   */
-  private static String getSpriteSheetPath(JsonElement rootElement) {
-    
-    JsonElement metaData = rootElement.getAsJsonObject().get("meta");
-    String spriteSheetPath = metaData.getAsJsonObject().get("image").getAsString();
-    
-    return spriteSheetPath;
-  }
-  
-  /**
    * Searches for sprite sheet path through .json metadata and same folder as .json file.
    *
    * @param rootElement root element of JSON data.
@@ -133,31 +117,29 @@ public class AsepriteHandler {
     
     if (spriteSheetFile.exists())
       return spriteSheetFile;
-    
+
     //try searching local directory
     Path jsonFilePath = Paths.get(jsonPath);
     String dirPath = jsonFilePath.getParent().toString();
-    String fileName1 = jsonFilePath.getFileName().toString();
-    String alternative1 = fileName1.substring(0, fileName1.lastIndexOf(".")); //same file name as .json
-    
-    Path spriteSheetFilePath = Paths.get(spriteSheetPath);
-    String fileName2 = spriteSheetFilePath.getFileName().toString();
-    String alternative2 = fileName2.substring(0, fileName2.lastIndexOf(".")); //same file name as 'image' element
-    
-    List<String> suffixes = Arrays.asList(".png", ".jpg", ".jpeg");
-    for (String suffix : suffixes) {
-      
-      String alternativeFile1 = dirPath + "/" + alternative1 + suffix;
-      spriteSheetFile = new File(alternativeFile1);
-      if (spriteSheetFile.exists())
-        return spriteSheetFile;
-      
-      String alternativeFile2 = dirPath + "/" + alternative2 + suffix;
-      spriteSheetFile = new File(alternativeFile2);
-      if (spriteSheetFile.exists())
-        return spriteSheetFile;
-    }
-    
+
+    //same name as filename in 'image' element
+    String fileNameSheet = Paths.get(spriteSheetPath).getFileName().toString(); //name of spritesheet
+    String alternativePath1 = dirPath + "/" + fileNameSheet;
+
+    spriteSheetFile = new File(alternativePath1);
+    if(spriteSheetFile.exists())
+      return spriteSheetFile;
+
+    //same name as .json file
+    String fileNameJson = jsonFilePath.getFileName().toString();
+    String trimmedJsonName = fileNameJson.substring(0, fileNameJson.indexOf("."));  //without suffix
+    String sheetSuffix = fileNameSheet.substring(fileNameSheet.indexOf("."), fileNameSheet.length());
+    String alternativePath2 = dirPath + "/" + trimmedJsonName + sheetSuffix;
+
+    spriteSheetFile = new File(alternativePath2);
+    if(spriteSheetFile.exists())
+      return spriteSheetFile;
+
     throw new FileNotFoundException();
   }
   
