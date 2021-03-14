@@ -393,4 +393,16 @@ public class MapObjectLoaderTests {
       return this.bar;
     }
   }
+
+  @Test
+  public void testMapObjectType(){
+
+    String mapObject1 = null;
+    String mapObject2 = "";
+
+    assertEquals(null, MapObjectType.get(mapObject1));
+    assertEquals(null, MapObjectType.get(mapObject2));
+
+
+  }
 }
