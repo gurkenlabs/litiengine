@@ -16,21 +16,21 @@ public class GameRandomTests {
     }
 
     @Test
-    public void testNextDoubleMinEqualsBound(){
-        double result = this.gameRandom.nextDouble(42, 42);
+    public void testNextIntMinEqualsBound(){
+        double result = this.gameRandom.nextInt(42, 42);
 
         assertEquals(42, result);
     }
 
     @Test
-    public void testNextDoubleMinGreaterThanBound(){
-        assertThrows(IllegalArgumentException.class, () -> this.gameRandom.nextDouble(42, 40));
+    public void testNextIntMinGreaterThanBound(){
+        assertThrows(IllegalArgumentException.class, () -> this.gameRandom.nextInt(42, 40));
     }
 
     @Test
-    public void testNextDoubleMinSmallerThanBound(){
-        double result = this.gameRandom.nextDouble(40, 42);
+    public void testNextIntMinSmallerThanBound(){
+        double result = this.gameRandom.nextInt(40, 42);
 
-        assertEquals(41.319859569489644d, result);
+        assertEquals(41, result);
     }
 }
