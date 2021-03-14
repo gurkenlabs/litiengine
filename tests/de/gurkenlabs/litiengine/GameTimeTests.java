@@ -24,6 +24,8 @@ public class GameTimeTests {
     // act, assert
     assertEquals(-200, time.toMilliseconds(-20, 100));
     assertEquals(-400, time.toMilliseconds(1000, -2500));
+
+    assertEquals(200, time.toMilliseconds(-100, -500));
   }
 
   @Test
