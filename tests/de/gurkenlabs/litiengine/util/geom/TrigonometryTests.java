@@ -13,7 +13,6 @@ public class TrigonometryTests {
             "'On-point x=0', 1f, 0f, 1.5707964f",
             "'On-point y=0 x=0', 0f, 0f, 0f",
             "'Off-point y negative x positive', -0.0000001f, 0.0000001f, -0.7853982f",
-            "'Off-point y negative x positive', -0.0000001f, 0.0000001f, -0.7853982f",
             "'Off-point y positive x negative', 0.0000001f, -0.0000001f, 2.3561945f",
             "'Off-point y positive x positive', 0.0000001f, 0.0000001f, 0.7853982f",
             "'Off-point y negative x negative', -0.0000001f, -0.0000001f, -2.3561945f",
