@@ -15,6 +15,7 @@ public class EntityDistanceComparatorTests
                 "'second-entity-closer', 2.0d, 2.0d, 1.0d, 1.0d, 1"
     })
     public void testDistanceComparison(String partition, double x1, double y1, double x2, double y2, int expectedResult){
+        // arrange
         EntityDistanceComparator comparator = new EntityDistanceComparator(new TestEntity());
 
         TestEntity entity1 = new TestEntity();
@@ -23,6 +24,7 @@ public class EntityDistanceComparatorTests
         entity1.setLocation(new Point2D.Double(x1, y1));
         entity2.setLocation(new Point2D.Double(x2, y2));
 
+        // act, assert
         assertEquals(expectedResult, comparator.compare(entity1, entity2));
     }
 
