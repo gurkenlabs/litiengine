@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.image.BufferedImage;
 
+import de.gurkenlabs.litiengine.resources.ImageFormat;
+import de.gurkenlabs.litiengine.util.MathUtilities;
 import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.litiengine.resources.Resources;
@@ -48,6 +50,7 @@ public class CodecTests {
   @Test
   public void testAngleEncoding() {
     final float angle = 99.99999F;
+    final float angle2 = -1F;
 
     final byte encoded = Codec.encodeAngle(angle);
     final float decoded = Codec.decodeAngle(encoded);
@@ -55,8 +58,13 @@ public class CodecTests {
     final short encodedShort = Codec.encodeAnglePrecise(angle);
     final float decodedShort = Codec.decodeAngle(encodedShort);
 
+    final short encodedShort2 = Codec.encodeAnglePrecise(angle2);
+    final float decodedShort2 = Codec.decodeAngle(encodedShort2);
+
+
     assertEquals(99.99999, decoded, 1.43);
     assertEquals(99.99999, decodedShort, 0.1F);
+    assertEquals(359.0, decodedShort2, 0.1F);
   }
 
   @Test
@@ -69,5 +77,7 @@ public class CodecTests {
     assertEquals(image.getWidth(), decodedImage.getWidth());
     assertEquals(image.getHeight(), decodedImage.getHeight());
     assertTrue(Imaging.areEqual(image, decodedImage));
+
+    assertEquals(null, Codec.encode(null, ImageFormat.PNG));
   }
 }
