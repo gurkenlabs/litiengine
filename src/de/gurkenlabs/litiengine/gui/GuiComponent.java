@@ -689,6 +689,9 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     }
   }
 
+  /**
+   * Note: If you override this and are modifying swing components, be sure you are in the AWT thread when you do so!
+   */
   @Override
   public void render(final Graphics2D g) {
     if (this.isSuspended() || !this.isVisible()) {
