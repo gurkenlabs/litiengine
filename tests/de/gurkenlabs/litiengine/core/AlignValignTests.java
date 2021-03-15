@@ -32,6 +32,12 @@ public class AlignValignTests {
   }
 
   @Test
+  public void testGet(){
+    assertEquals(Valign.DOWN, Valign.get(""));
+    assertEquals(Valign.DOWN, Valign.get(null));
+  }
+
+  @Test
   public void testAlignGetWithInvalidAlignString(){
     assertEquals(Align.CENTER, Align.get("INVALID_ALIGN"));
   }
