@@ -20,8 +20,6 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonObject;
 
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.litiengine.graphics.animation.Animation;
-import de.gurkenlabs.litiengine.graphics.animation.KeyFrame;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 
@@ -34,9 +32,17 @@ public class AsepriteHandler {
   /**
    * Thrown to indicate error when importing Aseprite JSON format.
    */
-  public static class ImportAnimationException extends Error {
+  public static class ImportAnimationException extends IOException {
     public ImportAnimationException(String message) {
       super(message);
+    }
+    
+    public ImportAnimationException(String message, Throwable cause) {
+      super(message, cause);
+    }
+    
+    public ImportAnimationException(Throwable cause) {
+      super(cause);
     }
   }
   
@@ -208,9 +214,17 @@ public class AsepriteHandler {
   /**
    * Error that is thrown by the export class
    */
-  public static class ExportAnimationException extends Error {
+  public static class ExportAnimationException extends IOException {
     public ExportAnimationException(String message) {
       super(message);
+    }
+    
+    public ExportAnimationException(String message, Throwable cause) {
+      super(message, cause);
+    }
+    
+    public ExportAnimationException(Throwable cause) {
+      super(cause);
     }
   }
   
@@ -219,8 +233,9 @@ public class AsepriteHandler {
    * This is the public accesible function and can/should be changed to fit into the UI.
    *
    * @param spritesheetResource the animation object to export
+   * @throws ExportAnimationException if the export fails
    */
-  public static String exportAnimation(SpritesheetResource spritesheetResource) {
+  public static String exportAnimation(SpritesheetResource spritesheetResource) throws ExportAnimationException {
     String json = createJson(spritesheetResource);
     return json;
   }
@@ -230,8 +245,9 @@ public class AsepriteHandler {
    *
    * @param spritesheetResource spritesheetResource object to export as json.
    * @return the json as a string.
+   * @throws ExportAnimationException if the export fails
    */
-  private static String createJson(SpritesheetResource spritesheetResource) {
+  private static String createJson(SpritesheetResource spritesheetResource) throws ExportAnimationException {
     Spritesheet spritesheet = Resources.spritesheets().load(spritesheetResource);
     assert spritesheet != null;
     int[] keyframes = Resources.spritesheets().getCustomKeyFrameDurations(spritesheet);
@@ -251,19 +267,19 @@ public class AsepriteHandler {
       for (int j = 0; j < numCol; j++) {
         final int row = i;
         final int col = j;
-        Map<String, Integer> frame = new HashMap<>() {{
+        Map<String, Integer> frame = new HashMap<String, Integer>() {{
           put("x", (0 + col * frameWidth));
           put("y", (0 + row * frameHeight));
           put("w", frameWidth);
           put("h", frameHeight);
         }};
-        Map<String, Integer> spriteSourceSize = new HashMap<>() {{
+        Map<String, Integer> spriteSourceSize = new HashMap<String, Integer>() {{
           put("x", 0);
           put("y", 0);
           put("w", frameWidth);
           put("h", frameHeight);
         }};
-        Map<String, Integer> sourceSize = new HashMap<>() {{
+        Map<String, Integer> sourceSize = new HashMap<String, Integer>() {{
           put("w", frameWidth);
           put("h", frameHeight);
         }};
@@ -282,7 +298,7 @@ public class AsepriteHandler {
     // Build the meta object in the json
     int spritesheetWidth = frameWidth * numCol;
     int spritesheetHeight = frameHeight * numRows;
-    Map<String, Integer> size = new HashMap<>() {{
+    Map<String, Integer> size = new HashMap<String, Integer>() {{
       put("w", spritesheetWidth);
       put("h", spritesheetHeight);
     }};
