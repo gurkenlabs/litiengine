@@ -20,8 +20,6 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonObject;
 
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.litiengine.graphics.animation.Animation;
-import de.gurkenlabs.litiengine.graphics.animation.KeyFrame;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 
