@@ -61,13 +61,13 @@ public class NumberAdjusterTests {
         BigDecimal currentValue3 = new BigDecimal("456.0");
 
         number.setLowerBound(currentValue);
-        assertFalse( lowerBound.compareTo(currentValue) < 0);
+        assertFalse(lowerBound.compareTo(currentValue) < 0);
 
         number.setLowerBound(currentValue2);
-        assertTrue( lowerBound.compareTo(currentValue2) == 0);
+        assertTrue(lowerBound.compareTo(currentValue2) == 0);
 
         number.setLowerBound(currentValue3);
-        assertTrue( lowerBound.compareTo(currentValue3) < 0);
+        assertTrue(lowerBound.compareTo(currentValue3) < 0);
 
     }
 
