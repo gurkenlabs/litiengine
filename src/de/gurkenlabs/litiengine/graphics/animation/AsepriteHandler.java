@@ -267,19 +267,19 @@ public class AsepriteHandler {
       for (int j = 0; j < numCol; j++) {
         final int row = i;
         final int col = j;
-        Map<String, Integer> frame = new HashMap<>() {{
+        Map<String, Integer> frame = new HashMap<String, Integer>() {{
           put("x", (0 + col * frameWidth));
           put("y", (0 + row * frameHeight));
           put("w", frameWidth);
           put("h", frameHeight);
         }};
-        Map<String, Integer> spriteSourceSize = new HashMap<>() {{
+        Map<String, Integer> spriteSourceSize = new HashMap<String, Integer>() {{
           put("x", 0);
           put("y", 0);
           put("w", frameWidth);
           put("h", frameHeight);
         }};
-        Map<String, Integer> sourceSize = new HashMap<>() {{
+        Map<String, Integer> sourceSize = new HashMap<String, Integer>() {{
           put("w", frameWidth);
           put("h", frameHeight);
         }};
@@ -298,7 +298,7 @@ public class AsepriteHandler {
     // Build the meta object in the json
     int spritesheetWidth = frameWidth * numCol;
     int spritesheetHeight = frameHeight * numRows;
-    Map<String, Integer> size = new HashMap<>() {{
+    Map<String, Integer> size = new HashMap<String, Integer>() {{
       put("w", spritesheetWidth);
       put("h", spritesheetHeight);
     }};
