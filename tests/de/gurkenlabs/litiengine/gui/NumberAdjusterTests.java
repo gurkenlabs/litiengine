@@ -1,21 +1,14 @@
 package de.gurkenlabs.litiengine.gui;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.input.Input;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeAll;
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.input.Input;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class NumberAdjusterTests {
 
@@ -46,29 +39,24 @@ public class NumberAdjusterTests {
 
         assertNotEquals(newValueNeg,upperBound);
         assertNotEquals(newValue,lowerBound);
-
-
     }
 
     @Test
     public void testSetLowerBound(){
-
+        // arrange
         NumberAdjuster number = new NumberAdjuster(0,0,150,300,0,400,1,4);
-
-        BigDecimal lowerBound = number.getLowerBound();
-        BigDecimal currentValue = new BigDecimal("-456.0");
+        BigDecimal currentValue1 = new BigDecimal("-456.0");
         BigDecimal currentValue2 = new BigDecimal("0");
         BigDecimal currentValue3 = new BigDecimal("456.0");
 
-        number.setLowerBound(currentValue);
-        assertFalse(lowerBound.compareTo(currentValue) < 0);
+        // act, assert
+        number.setLowerBound(currentValue1);
+        assertEquals(currentValue1, number.getLowerBound());
 
         number.setLowerBound(currentValue2);
-        assertTrue(lowerBound.compareTo(currentValue2) == 0);
+        assertEquals(currentValue2, number.getLowerBound());
 
         number.setLowerBound(currentValue3);
-        assertTrue(lowerBound.compareTo(currentValue3) < 0);
-
+        assertEquals(currentValue3, number.getLowerBound());
     }
-
 }
