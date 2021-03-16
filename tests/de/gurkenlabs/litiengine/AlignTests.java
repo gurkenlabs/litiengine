@@ -18,7 +18,7 @@ public class AlignTests {
         double onPointLocation = alignObject.getLocation(1.0, 1.0);
 
         // assert
-        assertEquals(0.0, onPointLocation); // clamp(0.5, 0, 0)
+        assertEquals(0.0, onPointLocation, 0.001); // clamp(0.5, 0, 0)
     }
 
     @Test
@@ -27,7 +27,7 @@ public class AlignTests {
         double offPointLocation = alignObject.getLocation(1.0, 1.1);
 
         // assert
-        assertEquals(0.45, offPointLocation); // 1.0 - 1.1 / 2.0
+        assertEquals(0.45, offPointLocation, 0.001); // 1.0 - 1.1 / 2.0
     }
 
     @Test
@@ -36,7 +36,7 @@ public class AlignTests {
         double inPointLocation = alignObject.getLocation(1.0, 5.0);
 
         // assert
-        assertEquals(-1.5, inPointLocation); // 1.0 - 5.0 / 2.0
+        assertEquals(-1.5, inPointLocation, 0.001); // 1.0 - 5.0 / 2.0
     }
 
     @Test
@@ -45,6 +45,6 @@ public class AlignTests {
         double outPointLocation = alignObject.getLocation(1.0, 0.5);
 
         // assert
-        assertEquals(0.5, outPointLocation); // clamp(0.75, 0, 0.5)
+        assertEquals(0.5, outPointLocation, 0.001); // clamp(0.75, 0, 0.5)
     }
 }

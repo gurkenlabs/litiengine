@@ -1,11 +1,9 @@
 package de.gurkenlabs.litiengine;
 
-import javax.xml.bind.annotation.XmlEnum;
-import javax.xml.bind.annotation.XmlEnumValue;
-
 import de.gurkenlabs.litiengine.util.MathUtilities;
 
-import java.math.BigDecimal;
+import javax.xml.bind.annotation.XmlEnum;
+import javax.xml.bind.annotation.XmlEnumValue;
 
 /**
  * The enum {@code Align} defines a range of horizontal alignments.
@@ -92,7 +90,7 @@ public enum Align {
    */
   public double getLocation(final double width, final double objectWidth) {
     double value = this.getValue(width);
-    double location = BigDecimal.valueOf(value).subtract(BigDecimal.valueOf(objectWidth).divide(BigDecimal.valueOf(2.0))).doubleValue();
+    double location = value - objectWidth / 2.0;
     if (objectWidth > width) {
       return location;
     }
