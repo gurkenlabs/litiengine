@@ -4,7 +4,7 @@ import de.gurkenlabs.litiengine.attributes.AttributeModifier;
 import de.gurkenlabs.litiengine.attributes.Modification;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class PropTests {
 
@@ -19,7 +19,7 @@ public class PropTests {
 
         // assert
         assertEquals(PropState.INTACT, propState);
-        assertEquals(false, prop.isDead());
+        assertFalse(prop.isDead());
     }
 
     @Test
@@ -34,7 +34,7 @@ public class PropTests {
 
         // assert
         assertEquals(PropState.DAMAGED, propState);
-        assertEquals(false, prop.isDead());
+        assertFalse(prop.isDead());
     }
 
     @Test
@@ -49,7 +49,6 @@ public class PropTests {
 
         // assert
         assertEquals(PropState.DESTROYED, propState);
-        assertEquals(true, prop.isDead());
-
+        assertTrue(prop.isDead());
     }
 }

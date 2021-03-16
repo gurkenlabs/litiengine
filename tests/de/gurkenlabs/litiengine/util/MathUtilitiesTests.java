@@ -1,6 +1,6 @@
 package de.gurkenlabs.litiengine.util;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
@@ -103,8 +103,8 @@ public class MathUtilitiesTests {
     int oddNumber = 1;
     int evenNumber = 2;
 
-    assertEquals(true, MathUtilities.isOddNumber(oddNumber));
-    assertEquals(false, MathUtilities.isOddNumber(evenNumber));
+    assertTrue(MathUtilities.isOddNumber(oddNumber));
+    assertFalse(MathUtilities.isOddNumber(evenNumber));
   }
 
   @Test

@@ -1,9 +1,5 @@
 package de.gurkenlabs.litiengine.util.io;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.awt.image.BufferedImage;
 
 import de.gurkenlabs.litiengine.resources.ImageFormat;
@@ -12,6 +8,8 @@ import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.Imaging;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CodecTests {
   @Test
@@ -78,6 +76,6 @@ public class CodecTests {
     assertEquals(image.getHeight(), decodedImage.getHeight());
     assertTrue(Imaging.areEqual(image, decodedImage));
 
-    assertEquals(null, Codec.encode(null, ImageFormat.PNG));
+    assertNull(Codec.encode(null, ImageFormat.PNG));
   }
 }

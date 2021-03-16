@@ -1,8 +1,5 @@
 package de.gurkenlabs.litiengine.util;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -11,6 +8,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.shadow.com.univocity.parsers.conversions.ToStringConversion;
 import org.junit.platform.commons.util.ToStringBuilder;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ArrayUtilitiesTests {
 
@@ -58,8 +57,6 @@ public class ArrayUtilitiesTests {
     double[] stringWithoutDoubles = ArrayUtilities.splitDouble(testStringWithoutDoubles);
     double[] nullString = ArrayUtilities.splitDouble(testNull);
     double[] emptyString = ArrayUtilities.splitDouble(testEmpty);
-
-
 
     assertArrayEquals(new double[] { 100.1, 200.2, 300.3, 1.4, 2.5, 3.6 }, doublesFromString);
     assertArrayEquals(new double[] { 0, 0, 0 }, stringWithoutDoubles);
@@ -123,11 +120,10 @@ public class ArrayUtilitiesTests {
   public void testContains() {
     Object [] first = new Object[] { 1, 2, 3, 4, 5, null };
     Object [] second = new Object[] {};
-    Object [] third = new Object[1];
 
-    assertEquals(true, ArrayUtilities.contains(first, 2));
-    assertEquals(true, ArrayUtilities.contains(first, null));
-    assertEquals(false, ArrayUtilities.contains(second, ""));
+    assertTrue(ArrayUtilities.contains(first, 2));
+    assertTrue(ArrayUtilities.contains(first, null));
+    assertFalse(ArrayUtilities.contains(second, ""));
   }
 
   @Test
