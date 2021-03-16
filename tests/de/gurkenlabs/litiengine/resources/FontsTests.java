@@ -2,7 +2,8 @@ package de.gurkenlabs.litiengine.resources;
 
 import org.junit.jupiter.api.Test;
 
-import java.awt.*;
+
+import java.awt.Font;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
