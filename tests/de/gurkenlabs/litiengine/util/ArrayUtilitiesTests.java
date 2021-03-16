@@ -1,13 +1,15 @@
 package de.gurkenlabs.litiengine.util;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ArrayUtilitiesTests {
 
@@ -42,6 +44,24 @@ public class ArrayUtilitiesTests {
     assertArrayEquals(new int[] { 0, 0, 0 }, stringWithoutInts);
     assertArrayEquals(new int[] {}, nullString);
     assertArrayEquals(new int[] {}, emptyString);
+  }
+
+  @Test
+  public void testDoubleArrayFromCommaSeparatedString() {
+    String testStringWithDoubles = "100.1,200.2,300.3,1.4,2.5,3.6";
+    String testStringWithoutDoubles = "paslikodja,2asdasd,sadasd";
+    String testNull = null;
+    String testEmpty = "";
+
+    double[] doublesFromString = ArrayUtilities.splitDouble(testStringWithDoubles);
+    double[] stringWithoutDoubles = ArrayUtilities.splitDouble(testStringWithoutDoubles);
+    double[] nullString = ArrayUtilities.splitDouble(testNull);
+    double[] emptyString = ArrayUtilities.splitDouble(testEmpty);
+
+    assertArrayEquals(new double[] { 100.1, 200.2, 300.3, 1.4, 2.5, 3.6 }, doublesFromString);
+    assertArrayEquals(new double[] { 0, 0, 0 }, stringWithoutDoubles);
+    assertArrayEquals(new double[] {}, nullString);
+    assertArrayEquals(new double[] {}, emptyString);
   }
 
   @Test
@@ -95,4 +115,23 @@ public class ArrayUtilitiesTests {
 
     assertArrayEquals(new Integer[] { 1, 2, 3, 4, 5, 6 }, result);
   }
+
+  @Test
+  public void testContains() {
+    Object [] first = new Object[] { 1, 2, 3, 4, 5, null };
+    Object [] second = new Object[] {};
+
+    assertTrue(ArrayUtilities.contains(first, 2));
+    assertTrue(ArrayUtilities.contains(first, null));
+    assertFalse(ArrayUtilities.contains(second, ""));
+  }
+
+  @Test
+  public void testRemove() {
+    Integer[] test = new Integer[] { 1, 2, 3, 4, 5 };
+    Integer[] result = ArrayUtilities.remove(test, 6);
+
+    assertArrayEquals(new Integer[] { 1, 2, 3, 4, 5 }, result);
+  }
+
 }
