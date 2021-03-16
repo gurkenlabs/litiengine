@@ -1,9 +1,9 @@
 package de.gurkenlabs.litiengine;
 
+import de.gurkenlabs.litiengine.util.MathUtilities;
+
 import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlEnumValue;
-
-import de.gurkenlabs.litiengine.util.MathUtilities;
 
 /**
  * The enum {@code Align} defines a range of horizontal alignments.

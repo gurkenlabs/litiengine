@@ -142,4 +142,18 @@ public class GeometricUtilitiesTests {
     assertEquals(-10, end4.getX(), 0.001);
     assertEquals(-10, end4.getY(), 0.001);
   }
+
+  @Test
+  public void testDeltaX() {
+    double actualAngle1 = GeometricUtilities.getDeltaX(45);
+    double actualAngle2 = GeometricUtilities.getDeltaX(0);
+    double actualAngle3 = GeometricUtilities.getDeltaX(-45);
+    double actualAngle4 = GeometricUtilities.getDeltaX(360);
+
+
+    assertEquals(0.70656418800354, (float) actualAngle1, 0.0001);
+    assertEquals(-7.670362E-4, (float) actualAngle2, 0.0001);
+    assertEquals(-0.70764893, (float) actualAngle3, 0.0001);
+    assertEquals(actualAngle2, actualAngle4);
+  }
 }
