@@ -5,11 +5,12 @@ import de.gurkenlabs.litiengine.entities.Creature;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.awt.*;
+import java.awt.Component;
 import java.awt.event.KeyEvent;
 
-import static org.junit.jupiter.api.Assertions.*;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class KeyboardEntityControllerTests {
     @BeforeAll

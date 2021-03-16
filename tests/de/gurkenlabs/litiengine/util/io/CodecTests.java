@@ -3,13 +3,15 @@ package de.gurkenlabs.litiengine.util.io;
 import java.awt.image.BufferedImage;
 
 import de.gurkenlabs.litiengine.resources.ImageFormat;
-import de.gurkenlabs.litiengine.util.MathUtilities;
 import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.Imaging;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CodecTests {
   @Test
