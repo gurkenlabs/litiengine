@@ -1,15 +1,19 @@
 package de.gurkenlabs.litiengine;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class RandomTests {
   @Test
@@ -51,24 +55,58 @@ public class RandomTests {
   }
 
   @Test
+  public void nextDouble_OnPoint() { // ==
+    // assert
+    assertEquals(1.0, Game.random().nextDouble(1.0, 1.0));
+  }
+
+  @Test
+  public void nextDouble_OffPoint() { // else
+    // arrange
+    GameRandom random = mock(GameRandom.class);
+    when(random.nextDouble()).thenReturn(0.5);
+    when(random.nextDouble(anyDouble(), anyDouble())).thenCallRealMethod();
+
+    // act, assert
+    assertEquals(1.05, random.nextDouble(1.0, 1.1)); // 1.0 + rand * (1.1 - 1.0)
+  }
+
+  @Test
+  public void nextDouble_InPoint() { // greater
+    // assert
+    assertThrows(IllegalArgumentException.class, () -> Game.random().nextDouble(1.1, 1.0));
+  }
+
+  @Test
+  public void nextDouble_OutPoint() { // else
+    // arrange
+    GameRandom random = mock(GameRandom.class);
+    when(random.nextDouble()).thenReturn(0.5);
+    when(random.nextDouble(anyDouble(), anyDouble())).thenCallRealMethod();
+
+    // act, assert
+    assertEquals(6.5, random.nextDouble(4.0, 9.0)); // 4.0 + rand * (9.0 - 4.0)
+  }
+
+  @Test
   public void testAlphaNumeric() {
     for (int i = 0; i < 10; i++) {
-      assertTrue(Game.random().nextAlphanumeric(i).length() == i);
+      assertEquals(i, Game.random().nextAlphanumeric(i).length());
     }
   }
 
   @Test
   public void testAlphabetic() {
     for (int i = 0; i < 10; i++) {
-      assertTrue(Game.random().nextAlphabetic(i).length() == i);
-      assertTrue(Game.random().nextAlphabetic(i, true).length() == i);
+      assertEquals(i, Game.random().nextAlphabetic(i).length());
+      assertEquals(i, Game.random().nextAlphabetic(i, true).length());
     }
   }
 
   @Test
   public void testAsciiStrings() {
     for (int i = 0; i < 10; i++) {
-      assertTrue(Game.random().nextAscii(i).length() == i);
+      assertEquals(i, Game.random().nextAscii(i).length());
     }
   }
 

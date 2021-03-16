@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.util.geom;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.awt.geom.Point2D;
 import java.util.Arrays;
@@ -34,5 +35,18 @@ public class PointDistanceComparatorTests {
     final Point2D relativePoint3 = new Point2D.Double(2.4, 2.4);
     Arrays.sort(points, new PointDistanceComparator(relativePoint3));
     assertArrayEquals(new Point2D[] { point2, point3, point1, point4 }, points);
+  }
+
+  @Test
+  public void testPointDistanceComparatorWithIdenticalPoints(){
+    Point2D referencePoint = new Point2D.Double(0d, 0d);
+    PointDistanceComparator pointDistanceComparator = new PointDistanceComparator(referencePoint);
+
+    Point2D point1 = new Point2D.Double(1.5d, 2.9d);
+    Point2D point2 = new Point2D.Double(1.5d, 2.9d);
+
+    int result = pointDistanceComparator.compare(point1, point2);
+
+    assertEquals(0, result);
   }
 }

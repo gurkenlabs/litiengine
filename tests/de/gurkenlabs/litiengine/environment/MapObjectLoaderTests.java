@@ -4,7 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -392,5 +394,14 @@ public class MapObjectLoaderTests {
     public int getBar() {
       return this.bar;
     }
+  }
+
+  @Test
+  public void testMapObjectType(){
+    String mapObject1 = null;
+    String mapObject2 = "";
+
+    assertNull(MapObjectType.get(mapObject1));
+    assertNull(MapObjectType.get(mapObject2));
   }
 }
