@@ -74,9 +74,7 @@ public class RandomTests {
   @Test
   public void nextDouble_InPoint() { // greater
     // assert
-    assertThrows(IllegalArgumentException.class, () -> {
-      Game.random().nextDouble(1.1, 1.0);
-    });
+    assertThrows(IllegalArgumentException.class, () -> Game.random().nextDouble(1.1, 1.0));
   }
 
   @Test
@@ -93,22 +91,22 @@ public class RandomTests {
   @Test
   public void testAlphaNumeric() {
     for (int i = 0; i < 10; i++) {
-      assertTrue(Game.random().nextAlphanumeric(i).length() == i);
+      assertEquals(i, Game.random().nextAlphanumeric(i).length());
     }
   }
 
   @Test
   public void testAlphabetic() {
     for (int i = 0; i < 10; i++) {
-      assertTrue(Game.random().nextAlphabetic(i).length() == i);
-      assertTrue(Game.random().nextAlphabetic(i, true).length() == i);
+      assertEquals(i, Game.random().nextAlphabetic(i).length());
+      assertEquals(i, Game.random().nextAlphabetic(i, true).length());
     }
   }
 
   @Test
   public void testAsciiStrings() {
     for (int i = 0; i < 10; i++) {
-      assertTrue(Game.random().nextAscii(i).length() == i);
+      assertEquals(i, Game.random().nextAscii(i).length());
     }
   }
 
