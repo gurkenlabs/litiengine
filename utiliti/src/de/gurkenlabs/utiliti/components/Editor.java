@@ -516,7 +516,7 @@ public class Editor extends Screen {
       }
       this.loadSpriteSheets(sprites, true);
   
-    } catch (AsepriteHandler.ImportAnimationException | IOException e) {
+    } catch (IOException e) {
       log.log(Level.SEVERE,  e.getMessage(), e);
     }
   }

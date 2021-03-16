@@ -48,8 +48,6 @@ public class AsepriteHandlerTests {
       fail(e.getMessage());
     } catch (IOException e) {
       fail(e.getMessage());
-    } catch (AsepriteHandler.ImportAnimationException e) {
-      fail(e.getMessage());
     }
   } 
 

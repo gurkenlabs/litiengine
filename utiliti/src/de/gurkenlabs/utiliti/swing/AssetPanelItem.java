@@ -486,7 +486,7 @@ public class AssetPanelItem extends JPanel {
             break;
           }
         }
-      } catch (AsepriteHandler.ExportAnimationException | IOException e) {
+      } catch (IOException e) {
         log.log(Level.SEVERE, e.getMessage(), e);
       }
     }

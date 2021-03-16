@@ -32,9 +32,17 @@ public class AsepriteHandler {
   /**
    * Thrown to indicate error when importing Aseprite JSON format.
    */
-  public static class ImportAnimationException extends Error {
+  public static class ImportAnimationException extends IOException {
     public ImportAnimationException(String message) {
       super(message);
+    }
+    
+    public ImportAnimationException(String message, Throwable cause) {
+      super(message, cause);
+    }
+    
+    public ImportAnimationException(Throwable cause) {
+      super(cause);
     }
   }
   
@@ -206,9 +214,17 @@ public class AsepriteHandler {
   /**
    * Error that is thrown by the export class
    */
-  public static class ExportAnimationException extends Error {
+  public static class ExportAnimationException extends IOException {
     public ExportAnimationException(String message) {
       super(message);
+    }
+    
+    public ExportAnimationException(String message, Throwable cause) {
+      super(message, cause);
+    }
+    
+    public ExportAnimationException(Throwable cause) {
+      super(cause);
     }
   }
   
@@ -217,8 +233,9 @@ public class AsepriteHandler {
    * This is the public accesible function and can/should be changed to fit into the UI.
    *
    * @param spritesheetResource the animation object to export
+   * @throws ExportAnimationException if the export fails
    */
-  public static String exportAnimation(SpritesheetResource spritesheetResource) {
+  public static String exportAnimation(SpritesheetResource spritesheetResource) throws ExportAnimationException {
     String json = createJson(spritesheetResource);
     return json;
   }
@@ -228,8 +245,9 @@ public class AsepriteHandler {
    *
    * @param spritesheetResource spritesheetResource object to export as json.
    * @return the json as a string.
+   * @throws ExportAnimationException if the export fails
    */
-  private static String createJson(SpritesheetResource spritesheetResource) {
+  private static String createJson(SpritesheetResource spritesheetResource) throws ExportAnimationException {
     Spritesheet spritesheet = Resources.spritesheets().load(spritesheetResource);
     assert spritesheet != null;
     int[] keyframes = Resources.spritesheets().getCustomKeyFrameDurations(spritesheet);
