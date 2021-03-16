@@ -1,10 +1,8 @@
 package de.gurkenlabs.litiengine.graphics.animation;
 
-import java.io.File;
-import java.io.FileReader;
-
 import java.io.IOException;
 import java.io.FileNotFoundException;
+
 import java.awt.image.BufferedImage;
 
 import static org.junit.jupiter.api.Assertions.fail;
