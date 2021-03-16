@@ -59,18 +59,23 @@ public class ImagingTests {
     BufferedImage expectedRotate90 = Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag-90.png");
     BufferedImage expectedRotate180 = Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag-180.png");
     BufferedImage expectedRotate270 = Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag-270.png");
+
+    int[] expectedPixels0 = ((DataBufferInt) image.getData().getDataBuffer()).getData();
     int[] expectedPixels90 = ((DataBufferInt) expectedRotate90.getData().getDataBuffer()).getData();
     int[] expectedPixels180 = ((DataBufferInt) expectedRotate180.getData().getDataBuffer()).getData();
     int[] expectedPixels270 = ((DataBufferInt) expectedRotate270.getData().getDataBuffer()).getData();
 
+    BufferedImage rotated0 = Imaging.rotate(image, Rotation.NONE);
     BufferedImage rotated90 = Imaging.rotate(image, Rotation.ROTATE_90);
     BufferedImage rotated180 = Imaging.rotate(image, Rotation.ROTATE_180);
     BufferedImage rotated270 = Imaging.rotate(image, Rotation.ROTATE_270);
 
+    int[] actualPixels0 = ((DataBufferInt) rotated0.getData().getDataBuffer()).getData();
     int[] actualPixels90 = ((DataBufferInt) rotated90.getData().getDataBuffer()).getData();
     int[] actualPixels180 = ((DataBufferInt) rotated180.getData().getDataBuffer()).getData();
     int[] actualPixels270 = ((DataBufferInt) rotated270.getData().getDataBuffer()).getData();
 
+    assertArrayEquals(expectedPixels0, actualPixels0);
     assertArrayEquals(expectedPixels90, actualPixels90);
     assertArrayEquals(expectedPixels180, actualPixels180);
     assertArrayEquals(expectedPixels270, actualPixels270);

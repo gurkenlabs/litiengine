@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 public class MathUtilitiesTests {
 
@@ -62,6 +64,26 @@ public class MathUtilitiesTests {
     assertEquals(5.0f, MathUtilities.clamp(toLow, 5, 10), 0.0001);
     assertEquals(10.0f, MathUtilities.clamp(toHigh, 5, 10), 0.0001);
     assertEquals(6.6f, MathUtilities.clamp(inRange, 5, 10), 0.0001);
+  }
+
+  @ParameterizedTest(name="{0}: (value={1}, min={2}, max={3}) = {4}")
+  @CsvSource({
+          "'value < min',42, 64, 100, 64",
+          "'value >= min && value > max',42, 10, 40, 40",
+          "'value >= min && value <= max',42, 10, 100, 42"
+  })
+  public void testByteClamp(String partition, byte value, byte min, byte max, byte result){
+    assertEquals(result, MathUtilities.clamp(value, min, max));
+  }
+
+  @ParameterizedTest(name="{0}: (value={1}, min={2}, max={3}) = {4}")
+  @CsvSource({
+          "'value < min', 4200, 7344, 12567, 7344",
+          "'value >= min && value > max', 4200, 1200, 3511, 3511",
+          "'value >= min && value <= max', 4200, 1337, 28111, 4200"
+  })
+  public void testShortClamp(String partition, short value, short min, short max, short result){
+    assertEquals(result, MathUtilities.clamp(value, min, max));
   }
 
   @Test

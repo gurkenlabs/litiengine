@@ -52,21 +52,9 @@ import de.gurkenlabs.litiengine.physics.Collision;
 public class EnvironmentTests {
   private Environment testEnvironment;
 
-  @Test
-  public void testInitialization() {
-    IMap map = mock(IMap.class);
-    when(map.getSizeInPixels()).thenReturn(new Dimension(100, 100));
-    when(map.getSizeInTiles()).thenReturn(new Dimension(10, 10));
-    Environment env = new Environment(map);
-
-    assertNotNull(env);
-  }
-
   @BeforeAll
   public static void initGame() {
-
-    // necessary because the environment need access to the game loop and other
-    // stuff
+    // necessary because the environment need access to the game loop and other stuff
     Game.init(Game.COMMADLINE_ARG_NOGUI);
   }
 
@@ -82,6 +70,16 @@ public class EnvironmentTests {
     when(map.getSizeInTiles()).thenReturn(new Dimension(10, 10));
     this.testEnvironment = new Environment(map);
     this.testEnvironment.init();
+  }
+
+  @Test
+  public void testInitialization() {
+    IMap map = mock(IMap.class);
+    when(map.getSizeInPixels()).thenReturn(new Dimension(100, 100));
+    when(map.getSizeInTiles()).thenReturn(new Dimension(10, 10));
+    Environment env = new Environment(map);
+
+    assertNotNull(env);
   }
 
   @Test
@@ -213,30 +211,101 @@ public class EnvironmentTests {
 
   @Test
   public void testGetById() {
+    // arrange
     ICombatEntity combatEntity = mock(ICombatEntity.class);
     when(combatEntity.getMapId()).thenReturn(1);
     when(combatEntity.getRenderType()).thenReturn(RenderType.NORMAL);
-
     ICombatEntity combatEntity2 = mock(ICombatEntity.class);
     when(combatEntity2.getMapId()).thenReturn(2);
     when(combatEntity2.getRenderType()).thenReturn(RenderType.NORMAL);
-
     this.testEnvironment.add(combatEntity);
     this.testEnvironment.add(combatEntity2);
 
-    List<IEntity> noEntities = this.testEnvironment.get((int[]) null);
-    List<IEntity> entities = this.testEnvironment.get(1, 2);
-
+    // act, assert
     assertNotNull(this.testEnvironment.get(1));
     assertNotNull(this.testEnvironment.get(2));
+  }
 
+  @Test
+  public void testGetByIdArray_NotContained() {
+    // arrange
+    ICombatEntity combatEntity = mock(ICombatEntity.class);
+    when(combatEntity.getMapId()).thenReturn(1);
+    when(combatEntity.getRenderType()).thenReturn(RenderType.NORMAL);
+    ICombatEntity combatEntity2 = mock(ICombatEntity.class);
+    when(combatEntity2.getMapId()).thenReturn(2);
+    when(combatEntity2.getRenderType()).thenReturn(RenderType.NORMAL);
+    this.testEnvironment.add(combatEntity);
+    this.testEnvironment.add(combatEntity2);
+
+    // act
+    List<IEntity> noEntities = this.testEnvironment.get(3, 4);
+
+    // assert
     assertNotNull(noEntities);
     assertEquals(0, noEntities.size());
+  }
 
+  @Test
+  public void testGetByIdArray_NegativeIndex() {
+    // arrange
+    ICombatEntity combatEntity = mock(ICombatEntity.class);
+    when(combatEntity.getMapId()).thenReturn(1);
+    when(combatEntity.getRenderType()).thenReturn(RenderType.NORMAL);
+    ICombatEntity combatEntity2 = mock(ICombatEntity.class);
+    when(combatEntity2.getMapId()).thenReturn(2);
+    when(combatEntity2.getRenderType()).thenReturn(RenderType.NORMAL);
+    this.testEnvironment.add(combatEntity);
+    this.testEnvironment.add(combatEntity2);
+
+    // act
+    List<IEntity> noEntities = this.testEnvironment.get(-1, -2);
+
+    // assert
+    assertNotNull(noEntities);
+    assertEquals(0, noEntities.size());
+  }
+
+  @Test
+  public void testGetByIdArray_ValidArray() {
+    // arrange
+    ICombatEntity combatEntity = mock(ICombatEntity.class);
+    when(combatEntity.getMapId()).thenReturn(1);
+    when(combatEntity.getRenderType()).thenReturn(RenderType.NORMAL);
+    ICombatEntity combatEntity2 = mock(ICombatEntity.class);
+    when(combatEntity2.getMapId()).thenReturn(2);
+    when(combatEntity2.getRenderType()).thenReturn(RenderType.NORMAL);
+    this.testEnvironment.add(combatEntity);
+    this.testEnvironment.add(combatEntity2);
+
+    // act
+    List<IEntity> entities = this.testEnvironment.get(1, 2);
+
+    // assert
     assertNotNull(entities);
     assertEquals(2, entities.size());
     assertTrue(entities.contains(combatEntity));
     assertTrue(entities.contains(combatEntity2));
+  }
+
+  @Test
+  public void testGetByIdArray_NullArray() {
+    // arrange
+    ICombatEntity combatEntity = mock(ICombatEntity.class);
+    when(combatEntity.getMapId()).thenReturn(1);
+    when(combatEntity.getRenderType()).thenReturn(RenderType.NORMAL);
+    ICombatEntity combatEntity2 = mock(ICombatEntity.class);
+    when(combatEntity2.getMapId()).thenReturn(2);
+    when(combatEntity2.getRenderType()).thenReturn(RenderType.NORMAL);
+    this.testEnvironment.add(combatEntity);
+    this.testEnvironment.add(combatEntity2);
+
+    // act
+    List<IEntity> noEntities = this.testEnvironment.get((int[]) null);
+
+    // assert
+    assertNotNull(noEntities);
+    assertEquals(0, noEntities.size());
   }
 
   @Test
@@ -622,13 +691,11 @@ public class EnvironmentTests {
     CollisionBox testCollider = new CollisionBox(true);
     testCollider.setMapId(1);
     testCollider.setName("test");
-
     this.testEnvironment.add(testCollider);
 
     Prop testProp = new Prop(0, 0, null);
     testProp.setMapId(1);
     testProp.setName("test");
-
     this.testEnvironment.add(testProp);
 
     Emitter testEmitter = new Emitter(1, 1) {
@@ -637,10 +704,8 @@ public class EnvironmentTests {
         return null;
       }
     };
-
     testEmitter.setMapId(1);
     testEmitter.setName("test");
-
     this.testEnvironment.add(testEmitter);
 
     this.testEnvironment.load();
@@ -653,11 +718,9 @@ public class EnvironmentTests {
     CollisionBox testCollider2 = new CollisionBox(true);
     testCollider.setMapId(2);
     testCollider.setName("test2");
-
     this.testEnvironment.add(testCollider2);
 
     this.testEnvironment.unload();
-
     assertFalse(this.testEnvironment.isLoaded());
   }
 
@@ -676,7 +739,6 @@ public class EnvironmentTests {
     assertThrows(UnsupportedOperationException.class, () -> this.testEnvironment.getSpawnpoints().add(null));
     assertThrows(UnsupportedOperationException.class, () -> this.testEnvironment.getStaticShadows().add(null));
     assertThrows(UnsupportedOperationException.class, () -> this.testEnvironment.getTriggers().add(null));
-
     assertThrows(UnsupportedOperationException.class, () -> this.testEnvironment.getUsedTags().add(null));
   }
 }
