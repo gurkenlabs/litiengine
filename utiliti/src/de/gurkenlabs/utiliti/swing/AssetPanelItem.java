@@ -479,8 +479,6 @@ public class AssetPanelItem extends JPanel {
               try (Writer writer = new FileWriter(fileNameWithExtension)) {
                 writer.write(json);
                 log.log(Level.INFO, "Exported {0} {1} to {2}", new Object[]{"Spritesheet", spriteSheetInfo.getName(), fileNameWithExtension});
-              } catch (IOException e) {
-                e.printStackTrace();
               }
             }
             break;
