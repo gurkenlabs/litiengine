@@ -2,6 +2,8 @@ package de.gurkenlabs.litiengine;
 
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.MockedStatic;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -78,5 +80,65 @@ public class DirectionTests {
 
         // cleanup
         geomUtilsMockStatic.close();
+    }
+
+    @Test
+    public void testGetOpposite_ofLeft(){
+        // arrange
+        Direction left = Direction.LEFT;
+
+        // act
+        Direction opposite = left.getOpposite();
+
+        // assert
+        assertEquals(Direction.RIGHT, opposite);
+    }
+
+    @Test
+    public void testGetOpposite_ofRight(){
+        // arrange
+        Direction right = Direction.RIGHT;
+
+        // act
+        Direction opposite = right.getOpposite();
+
+        // assert
+        assertEquals(Direction.LEFT, opposite);
+    }
+
+    @Test
+    public void testGetOpposite_ofUp(){
+        // arrange
+        Direction up = Direction.UP;
+
+        // act
+        Direction opposite = up.getOpposite();
+
+        // assert
+        assertEquals(Direction.DOWN, opposite);
+    }
+
+    @Test
+    public void testGetOpposite_ofDown(){
+        // arrange
+        Direction down = Direction.DOWN;
+
+        // act
+        Direction opposite = down.getOpposite();
+
+        // assert
+        assertEquals(Direction.UP, opposite);
+    }
+
+    @Test
+    public void testGetOpposite_ofUndefined(){
+        // arrange
+        Direction undefined = Direction.UNDEFINED;
+
+        // act
+        Direction opposite = undefined.getOpposite();
+
+        // assert
+        assertEquals(Direction.UNDEFINED, opposite);
     }
 }
