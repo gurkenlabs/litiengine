@@ -3,8 +3,11 @@ package de.gurkenlabs.litiengine;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.MockedStatic;
+
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyDouble;
@@ -82,63 +85,24 @@ public class DirectionTests {
         geomUtilsMockStatic.close();
     }
 
-    @Test
-    public void testGetOpposite_ofLeft(){
-        // arrange
-        Direction left = Direction.LEFT;
-
+    @ParameterizedTest
+    @MethodSource("getOppositeParameters")
+    public void testGetOpposite(Direction initialDirection, Direction expectedOppositeDirection){
         // act
-        Direction opposite = left.getOpposite();
+        Direction actualOpposite = initialDirection.getOpposite();
 
         // assert
-        assertEquals(Direction.RIGHT, opposite);
+        assertEquals(expectedOppositeDirection, actualOpposite);
     }
 
-    @Test
-    public void testGetOpposite_ofRight(){
+    private static Stream<Arguments> getOppositeParameters(){
         // arrange
-        Direction right = Direction.RIGHT;
-
-        // act
-        Direction opposite = right.getOpposite();
-
-        // assert
-        assertEquals(Direction.LEFT, opposite);
-    }
-
-    @Test
-    public void testGetOpposite_ofUp(){
-        // arrange
-        Direction up = Direction.UP;
-
-        // act
-        Direction opposite = up.getOpposite();
-
-        // assert
-        assertEquals(Direction.DOWN, opposite);
-    }
-
-    @Test
-    public void testGetOpposite_ofDown(){
-        // arrange
-        Direction down = Direction.DOWN;
-
-        // act
-        Direction opposite = down.getOpposite();
-
-        // assert
-        assertEquals(Direction.UP, opposite);
-    }
-
-    @Test
-    public void testGetOpposite_ofUndefined(){
-        // arrange
-        Direction undefined = Direction.UNDEFINED;
-
-        // act
-        Direction opposite = undefined.getOpposite();
-
-        // assert
-        assertEquals(Direction.UNDEFINED, opposite);
+        return Stream.of(
+                Arguments.of(Direction.LEFT, Direction.RIGHT),
+                Arguments.of(Direction.RIGHT, Direction.LEFT),
+                Arguments.of(Direction.UP, Direction.DOWN),
+                Arguments.of(Direction.DOWN, Direction.UP),
+                Arguments.of(Direction.UNDEFINED, Direction.UNDEFINED)
+        );
     }
 }
