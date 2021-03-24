@@ -16,6 +16,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class RandomTests {
+
+  private static final String SEED = "myseed";
+
   @Test
   public void testRandomInRange() {
     for (int i = 0; i < 100; i++) {
@@ -36,22 +39,73 @@ public class RandomTests {
   }
 
   @Test
-  public void testSeed() {
-    Game.random().setSeed("myseed");
+  public void testSeed_nextInt(){
+    // arrange
+    Game.random().setSeed(SEED);
+    int expectedValue = Game.random().nextInt();
 
-    int val1 = Game.random().nextInt();
-    char val2 = Game.random().nextChar();
-    double val3 = Game.random().nextDouble();
-    long val4 = Game.random().nextLong();
-    float val5 = Game.random().nextFloat();
+    // act
+    Game.random().setSeed(SEED);
+    int actualValue = Game.random().nextInt();
 
-    Game.random().setSeed("myseed");
+    // assert: check if the same integer is returned after resetting the seed
+    assertEquals(expectedValue, actualValue);
+  }
 
-    assertEquals(val1, Game.random().nextInt());
-    assertEquals(val2, Game.random().nextChar());
-    assertEquals(val3, Game.random().nextDouble());
-    assertEquals(val4, Game.random().nextLong());
-    assertEquals(val5, Game.random().nextFloat());
+  @Test
+  public void testSeed_nextChar(){
+    // arrange
+    Game.random().setSeed(SEED);
+    char expectedValue = Game.random().nextChar();
+
+    // act
+    Game.random().setSeed(SEED);
+    char actualValue = Game.random().nextChar();
+
+    // assert: check if the same character is returned after resetting the seed
+    assertEquals(expectedValue, actualValue);
+  }
+
+  @Test
+  public void testSeed_nextDouble(){
+    // arrange
+    Game.random().setSeed(SEED);
+    double expectedValue = Game.random().nextDouble();
+
+    // act
+    Game.random().setSeed(SEED);
+    double actualValue = Game.random().nextDouble();
+
+    // assert: check if the same double is returned after resetting the seed
+    assertEquals(expectedValue, actualValue);
+  }
+
+  @Test
+  public void testSeed_nextLong(){
+    // arrange
+    Game.random().setSeed(SEED);
+    long expectedValue = Game.random().nextLong();
+
+    // act
+    Game.random().setSeed(SEED);
+    long actualValue = Game.random().nextLong();
+
+    // assert: check if the same long is returned after resetting the seed
+    assertEquals(expectedValue, actualValue);
+  }
+
+  @Test
+  public void testSeed_nextFloat(){
+    // arrange
+    Game.random().setSeed(SEED);
+    float expectedValue = Game.random().nextFloat();
+
+    // act
+    Game.random().setSeed(SEED);
+    float actualValue = Game.random().nextFloat();
+
+    // assert: check if the same float is returned after resetting the seed
+    assertEquals(expectedValue, actualValue);
   }
 
   @Test
