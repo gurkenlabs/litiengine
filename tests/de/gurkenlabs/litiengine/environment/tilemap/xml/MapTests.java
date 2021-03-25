@@ -21,6 +21,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
 import de.gurkenlabs.litiengine.environment.tilemap.RenderOrder;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.io.URLAdapter;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 public class MapTests {
   @BeforeEach
@@ -135,14 +137,23 @@ public class MapTests {
     assertEquals(0, map.getMapObjectLayers().size());
   }
 
-  @Test
-  public void testDecimalFloatAdapter() throws Exception {
+  @ParameterizedTest(name="testDecimalFloatAdapter value={0}, expected={1}")
+  @CsvSource({
+          "1f, '1'",
+          "1.0f, '1'",
+          "1.00f, '1'",
+          "1.1f, '1.1'",
+          "1.00003f, '1.00003'"
+  })
+  public void testDecimalFloatAdapter(float value, String expected) throws Exception{
+    // arrange
     DecimalFloatAdapter adapter = new DecimalFloatAdapter();
-    assertEquals("1", adapter.marshal(1f));
-    assertEquals("1", adapter.marshal(1.0f));
-    assertEquals("1", adapter.marshal(1.00f));
-    assertEquals("1.1", adapter.marshal(1.1f));
-    assertEquals("1.00003", adapter.marshal(1.00003f));
+
+    // act
+    String actual = adapter.marshal(value);
+
+    // assert
+    assertEquals(expected, actual);
   }
 
   @Test
