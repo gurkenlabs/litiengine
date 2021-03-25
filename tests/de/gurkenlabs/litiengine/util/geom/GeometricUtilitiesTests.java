@@ -179,17 +179,18 @@ public class GeometricUtilitiesTests {
     assertEquals(expectedY, actualY, 0.001);
   }
 
-  @Test
-  public void testDeltaX() {
-    double actualAngle1 = GeometricUtilities.getDeltaX(45);
-    double actualAngle2 = GeometricUtilities.getDeltaX(0);
-    double actualAngle3 = GeometricUtilities.getDeltaX(-45);
-    double actualAngle4 = GeometricUtilities.getDeltaX(360);
+  @ParameterizedTest(name="testDeltaX angle={0}, expectedDeltaX={1}")
+  @CsvSource({
+          "45.0d, 0.70656418800354d",
+          "0, -7.670362E-4d",
+          "-45, -0.70764893d",
+          "360, -7.670362E-4d"
+  })
+  public void testDeltaX(double angle, double expectedDeltaX){
+    // arrange, act
+    double actualDeltaX = GeometricUtilities.getDeltaX(angle);
 
-
-    assertEquals(0.70656418800354, (float) actualAngle1, 0.0001);
-    assertEquals(-7.670362E-4, (float) actualAngle2, 0.0001);
-    assertEquals(-0.70764893, (float) actualAngle3, 0.0001);
-    assertEquals(actualAngle2, actualAngle4);
+    // assert
+    assertEquals(expectedDeltaX, (float) actualDeltaX, 0.001);
   }
 }
