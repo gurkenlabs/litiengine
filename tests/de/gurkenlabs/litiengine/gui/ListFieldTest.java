@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.gui;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -81,5 +82,43 @@ class ListFieldTest {
 
     assertFalse(listField_1D.isSliderInside());
     assertFalse(listField_2D.isSliderInside());
+  }
+
+  @Test
+  void initSliders_with2dSlider() {
+    // arrange
+    ListField listField = new ListField(0, 0, 100, 50, this.content_2D, content_2D_shownRows, content_2D_shownColumns);
+
+    assertNotNull(listField.getHorizontalSlider());
+    assertEquals(100, listField.getHorizontalSlider().getWidth());
+    assertNotNull(listField.getVerticalSlider());
+    assertEquals(50, listField.getVerticalSlider().getHeight());
+
+    // act
+    listField.setSliderInside(true);
+
+    // assert
+    assertNotNull(listField.getHorizontalSlider());
+    assertEquals(90, listField.getHorizontalSlider().getWidth()); // 100 - (50/5)
+    assertNotNull(listField.getVerticalSlider());
+    assertEquals(40, listField.getVerticalSlider().getHeight()); // 50 - (50/5)
+  }
+
+  @Test
+  void initSliders_nullHorizontalSlider() {
+    // arrange
+    ListField listField = new ListField(0, 0, 100, 50, this.content_2D, content_2D_shownRows, content_2D.length);
+
+    assertNull(listField.getHorizontalSlider());
+    assertNotNull(listField.getVerticalSlider());
+    assertEquals(100, listField.getVerticalSlider().getX());
+
+    // act
+    listField.setSliderInside(true);
+
+    // assert
+    assertNull(listField.getHorizontalSlider());
+    assertNotNull(listField.getVerticalSlider());
+    assertEquals(90, listField.getVerticalSlider().getX()); // 100 - (50/5)
   }
 }
