@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import javax.swing.SwingUtilities;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,7 +26,12 @@ class ListFieldTest {
       { "P", "Q", "R", "S", "T", "U", "V" },
       { "W", "X", "Y", "Z" }
   };
-  
+
+  @BeforeAll
+  public static void initGame() {
+    Game.init(Game.COMMADLINE_ARG_NOGUI);
+  }
+
   @BeforeEach
   public void assertOnSwingThread() {
     assertTrue(SwingUtilities.isEventDispatchThread());
@@ -33,8 +39,6 @@ class ListFieldTest {
 
   @Test
   void testInitialization() {
-    Game.init(Game.COMMADLINE_ARG_NOGUI);
-
     ListField listField_1D = new ListField(0, 0, 100, 50, this.content_1D, 4);
     ListField listField_2D = new ListField(0, 0, 100, 50, this.content_2D, 7, 3);
 
