@@ -31,29 +31,35 @@ class AbilityTests {
   }
 
   @Test
-  void testGetRemainingCooldownInSeconds() {
-    Creature creature = mock(Creature.class);
-    TestAbility ability = new TestAbility(creature);
+  void getRemainingCooldownInSeconds_NoCast() {
+    // arrange
+    TestAbility ability = setupAbility();
+
+    // act
     float actual = ability.getRemainingCooldownInSeconds();
+
+    // assert
     assertEquals(0, actual);
   }
 
   @Test
-  void testGetRemainingCooldownInSecondsNoCast() {
-    Creature creature = mock(Creature.class);
-    TestAbility ability = new TestAbility(creature);
-    float actual = ability.getRemainingCooldownInSeconds();
-    assertEquals(0, actual);
-  }
-
-  @Test
-  void testGetRemainingCooldownInSecondsCreatureIsDead() {
+  void getRemainingCooldownInSeconds_CreatureIsDead() {
+    // arrange
     Creature creature = mock(Creature.class);
     when(creature.isDead()).thenReturn(true);
     TestAbility ability = new TestAbility(creature);
     ability.cast();
+
+    // act
     float actual = ability.getRemainingCooldownInSeconds();
+
+    // assert
     assertEquals(0, actual);
+  }
+
+  private TestAbility setupAbility() {
+    Creature creature = mock(Creature.class);
+    return new TestAbility(creature);
   }
 
   @Test
