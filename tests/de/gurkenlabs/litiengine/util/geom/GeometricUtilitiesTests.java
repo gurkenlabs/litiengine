@@ -10,6 +10,8 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 public class GeometricUtilitiesTests {
 
@@ -31,25 +33,27 @@ public class GeometricUtilitiesTests {
     assertEquals(8, newDimension2.getHeight(), 0.0001);
   }
 
-  @Test
-  public void testCalcRotationAngles() {
-    double rotationAngle = GeometricUtilities.calcRotationAngleInDegrees(new Point2D.Double(0, 0), new Point2D.Double(1, 1));
-    double rotationAngle2 = GeometricUtilities.calcRotationAngleInDegrees(new Point2D.Double(0, 0), new Point2D.Double(1, 0));
-    double rotationAngle3 = GeometricUtilities.calcRotationAngleInDegrees(new Point2D.Double(0, 0), new Point2D.Double(0, 1));
-    double rotationAngle4 = GeometricUtilities.calcRotationAngleInDegrees(new Point2D.Double(0, 0), new Point2D.Double(-1, -1));
-    double rotationAngle5 = GeometricUtilities.calcRotationAngleInDegrees(new Point2D.Double(0, 0), new Point2D.Double(-1, 0));
-    double rotationAngle6 = GeometricUtilities.calcRotationAngleInDegrees(new Point2D.Double(0, 0), new Point2D.Double(0, -1));
-    double rotationAngle7 = GeometricUtilities.calcRotationAngleInDegrees(new Point2D.Double(0, 0), new Point2D.Double(1, -1));
-    double rotationAngle8 = GeometricUtilities.calcRotationAngleInDegrees(new Point2D.Double(0, 0), new Point2D.Double(-1, 1));
+  @ParameterizedTest(name="testCalcRotationAngleInDegrees x={0}, y={1}, expectedAngle={2}")
+  @CsvSource({
+    "1.0d, 1.0d, 45.0f",
+    "1.0d, 0, 90.0d",
+    "0, 1.0d, 0",
+    "-1.0d, -1.0d, 225.0f",
+    "-1.0d, 0, 270.0f",
+    "0, -1.0d, 180.0f",
+    "1.0d, -1.0d, 135.0f",
+    "-1.0d, 1.0d, 315.0f"
+  })
+  public void testCalcRotationAngleInDegrees(double x, double y, float expectedAngle){
+    // arrange
+    Point2D.Double centerPoint = new Point2D.Double(0, 0);
+    Point2D.Double targetPoint = new Point2D.Double(x, y);
 
-    assertEquals(45, (float) rotationAngle);
-    assertEquals(90, (float) rotationAngle2);
-    assertEquals(0, (float) rotationAngle3);
-    assertEquals(225, (float) rotationAngle4);
-    assertEquals(270, (float) rotationAngle5);
-    assertEquals(180, (float) rotationAngle6);
-    assertEquals(135, (float) rotationAngle7);
-    assertEquals(315, (float) rotationAngle8);
+    // act
+    double rotationAngle = GeometricUtilities.calcRotationAngleInDegrees(centerPoint, targetPoint);
+
+    // assert
+    assertEquals(expectedAngle, (float)rotationAngle);
   }
 
   @Test
