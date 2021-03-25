@@ -31,6 +31,68 @@ class AbilityTests {
   }
 
   @Test
+  public void isOnCooldown_noCurrentExecution() {
+    // arrange
+    TestAbility ability = setupAbility();
+
+    ability.setCurrentExecution(null);
+
+    // act
+    boolean onCooldown = ability.isOnCooldown();
+
+    // assert
+    assertFalse(onCooldown);
+  }
+
+  @Test
+  public void isOnCooldown_currentExecutionOver() {
+    // arrange
+    TestAbility ability = setupAbility();
+
+    AbilityExecution abExec = mock(AbilityExecution.class);
+    when(abExec.getExecutionTicks()).thenReturn(0L);
+    ability.setCurrentExecution(abExec);
+
+    // act
+    boolean onCooldown = ability.isOnCooldown();
+
+    // assert
+    assertFalse(onCooldown);
+  }
+
+  @Test
+  public void isOnCooldown_cooldownOver() {
+    // arrange
+    TestAbility ability = setupAbility();
+
+    AbilityExecution abExec = mock(AbilityExecution.class);
+    when(abExec.getExecutionTicks()).thenReturn(Game.time().now() - (ability.getAttributes().cooldown().get() + 1));
+    ability.setCurrentExecution(abExec);
+
+    // act
+    boolean onCooldown = ability.isOnCooldown();
+
+    // assert
+    assertFalse(onCooldown);
+  }
+
+  @Test
+  public void isOnCooldown_stillOnCooldown() {
+    // arrange
+    TestAbility ability = setupAbility();
+
+    AbilityExecution abExec = mock(AbilityExecution.class);
+    when(abExec.getExecutionTicks()).thenReturn(1L);
+    ability.setCurrentExecution(abExec);
+
+    // act
+    boolean onCooldown = ability.isOnCooldown();
+
+    // assert
+    assertTrue(onCooldown);
+  }
+
+  @Test
   void getRemainingCooldownInSeconds_NoCast() {
     // arrange
     TestAbility ability = setupAbility();
