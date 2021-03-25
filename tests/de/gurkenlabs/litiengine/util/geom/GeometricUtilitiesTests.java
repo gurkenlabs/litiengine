@@ -101,26 +101,42 @@ public class GeometricUtilitiesTests {
     assertArrayEquals(new Point2D[] { expected4, expected5 }, possiblePoint2);
   }
   
-  @Test
-  public void testProjectionByAngle() {
+  @ParameterizedTest(name="testProjectByAngle_xCoordinate angle={0}, expectedX={1}")
+  @CsvSource({
+          "90.0d, 1.0d",
+          "180.0d, 0",
+          "270.0d, -1.0d",
+          "360, 0"
+  })
+  public void testProjectByAngle_xCoordinate(double angle, double expectedX){
+    // arrange
     final Point2D start = new Point2D.Double(0, 0);
-    
-    Point2D end = GeometricUtilities.project(start, 90, 1);
-    Point2D end2 = GeometricUtilities.project(start, 180, 1);
-    Point2D end3 = GeometricUtilities.project(start, 270, 1);
-    Point2D end4 = GeometricUtilities.project(start, 360, 1);
 
-    assertEquals(1, end.getX(), 0.001);
-    assertEquals(0, end.getY(), 0.001);
-    
-    assertEquals(0, end2.getX(), 0.001);
-    assertEquals(-1, end2.getY(), 0.001);
-    
-    assertEquals(-1, end3.getX(), 0.001);
-    assertEquals(0, end3.getY(), 0.001);
-    
-    assertEquals(0, end4.getX(), 0.001);
-    assertEquals(1, end4.getY(), 0.001);
+    // act
+    Point2D end = GeometricUtilities.project(start, angle, 1);
+    double actualX = end.getX();
+
+    // assert
+    assertEquals(expectedX, actualX, 0.001);
+  }
+
+  @ParameterizedTest(name="testProjectByAngle_yCoordinate angle={0}, expectedY={1}")
+  @CsvSource({
+          "90.0d, 0d",
+          "180.0d, -1.0d",
+          "270.0d, 0",
+          "360, 1.0d"
+  })
+  public void testProjectByAngle_yCoordinate(double angle, double expectedY){
+    // arrange
+    final Point2D start = new Point2D.Double(0, 0);
+
+    // act
+    Point2D end = GeometricUtilities.project(start, angle, 1);
+    double actualY = end.getY();
+
+    // assert
+    assertEquals(expectedY, actualY, 0.001);
   }
   
   @Test
