@@ -108,7 +108,7 @@ public class GeometricUtilitiesTests {
           "270.0d, -1.0d",
           "360, 0"
   })
-  public void testProjectByAngle_xCoordinate(double angle, double expectedX){
+  public void testProjectionByAngle_xCoordinate(double angle, double expectedX){
     // arrange
     final Point2D start = new Point2D.Double(0, 0);
 
@@ -127,7 +127,7 @@ public class GeometricUtilitiesTests {
           "270.0d, 0",
           "360, 1.0d"
   })
-  public void testProjectByAngle_yCoordinate(double angle, double expectedY){
+  public void testProjectionByAngle_yCoordinate(double angle, double expectedY){
     // arrange
     final Point2D start = new Point2D.Double(0, 0);
 
@@ -139,28 +139,44 @@ public class GeometricUtilitiesTests {
     assertEquals(expectedY, actualY, 0.001);
   }
   
-  @Test
-  public void testProjectionByScalar() {
+  @ParameterizedTest(name="testProjectionByScalar_xCoordinate x={0}, y={1}, scalar={2}, expectedX={3}")
+  @CsvSource({
+          "10.0d, 10.0d, 1.414d, 1.0d",
+          "10.0d, 10.0d, 14.142d, 10.0d",
+          "-10.0d, -10.0d, 3.536d, -2.5d",
+          "-10.0d, -10.0d, 14.142d, -10.0d"
+  })
+  public void testProjectionByScalar_xCoordinate(double x, double y, double scalar, double expectedX){
+    // arrange
     final Point2D start = new Point2D.Double(0, 0);
-    final Point2D target = new Point2D.Double(10, 10);
-    final Point2D target2 = new Point2D.Double(-10, -10);
-    
-    Point2D end = GeometricUtilities.project(start, target, 1.414);
-    Point2D end2 = GeometricUtilities.project(start, target2, 3.536);
-    Point2D end3 = GeometricUtilities.project(start, target, 14.142);
-    Point2D end4 = GeometricUtilities.project(start, target2, 14.142);
-    
-    assertEquals(1, end.getX(), 0.001);
-    assertEquals(1, end.getY(), 0.001);
-    
-    assertEquals(-2.5, end2.getX(), 0.001);
-    assertEquals(-2.5, end2.getY(), 0.001);
-    
-    assertEquals(10, end3.getX(), 0.001);
-    assertEquals(10, end3.getY(), 0.001);
-    
-    assertEquals(-10, end4.getX(), 0.001);
-    assertEquals(-10, end4.getY(), 0.001);
+    final Point2D target = new Point2D.Double(x, y);
+
+    // act
+    Point2D end = GeometricUtilities.project(start, target, scalar);
+    double actualX = end.getX();
+
+    // assert
+    assertEquals(expectedX, actualX, 0.001);
+  }
+
+  @ParameterizedTest(name="testProjectionByScalar_yCoordinate")
+  @CsvSource({
+          "10.0d, 10.0d, 1.414d, 1.0d",
+          "10.0d, 10.0d, 14.142d, 10.0d",
+          "-10.0d, -10.0d, 3.536d, -2.5d",
+          "-10.0d, -10.0d, 14.142d, -10.0d"
+  })
+  public void testProjectionByScalar_yCoordinate(double x, double y, double scalar, double expectedY){
+    // arrange
+    final Point2D start = new Point2D.Double(0, 0);
+    final Point2D target = new Point2D.Double(x, y);
+
+    // act
+    Point2D end = GeometricUtilities.project(start, target, scalar);
+    double actualY = end.getY();
+
+    // assert
+    assertEquals(expectedY, actualY, 0.001);
   }
 
   @Test
