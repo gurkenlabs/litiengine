@@ -20,12 +20,16 @@ class ListFieldTest {
   private final String[] content_1D = new String[] {
       "A", "B", "C", "D", "E", "F", "G"
   };
+  private final int content_1D_shownRows = 4;
+
   private final String[][] content_2D = new String[][] {
       { "A", "B", "C", "D", "E", "F", "G" },
       { "H", "I", "J", "K", "L", "M", "N", "O" },
       { "P", "Q", "R", "S", "T", "U", "V" },
       { "W", "X", "Y", "Z" }
   };
+  private final int content_2D_shownRows = 7;
+  private final int content_2D_shownColumns = 3;
 
   @BeforeAll
   public static void initGame() {
@@ -39,8 +43,8 @@ class ListFieldTest {
 
   @Test
   void testInitialization() {
-    ListField listField_1D = new ListField(0, 0, 100, 50, this.content_1D, 4);
-    ListField listField_2D = new ListField(0, 0, 100, 50, this.content_2D, 7, 3);
+    ListField listField_1D = new ListField(0, 0, 100, 50, this.content_1D, content_1D_shownRows);
+    ListField listField_2D = new ListField(0, 0, 100, 50, this.content_2D, content_2D_shownRows, content_2D_shownColumns);
 
     assertNotNull(listField_1D);
     assertNotNull(listField_2D);
