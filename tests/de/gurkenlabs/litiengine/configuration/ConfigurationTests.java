@@ -8,6 +8,7 @@ import java.io.File;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -15,7 +16,16 @@ import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 class ConfigurationTests {
 
-  private static void deleteTempConfigFile(final Configuration config) {
+  private Configuration config;
+
+  @BeforeEach
+  public void setup() {
+    Logger.getLogger(FileUtilities.class.getName()).setUseParentHandlers(false);
+    Logger.getLogger(Configuration.class.getName()).setUseParentHandlers(false);
+  }
+
+  @AfterEach
+  public void deleteConfigFile() {
     if (config != null) {
       final File configFile = new File(config.getFileName());
       if (configFile.exists()) {
@@ -24,82 +34,67 @@ class ConfigurationTests {
     }
   }
 
-  @BeforeEach
-  public void setup() {
-    Logger.getLogger(FileUtilities.class.getName()).setUseParentHandlers(false);
-    Logger.getLogger(Configuration.class.getName()).setUseParentHandlers(false);
-  }
-
   @Test
   void testConfigurationGroupInitialization() {
-    Configuration config = null;
+    // arrange
     final TestConfigurationGroup group = new TestConfigurationGroup();
 
-    try {
-      config = new Configuration(group);
-      config.load();
-      assertEquals(config.getConfigurationGroup(group.getClass()), group);
-      assertEquals("test-prefix", group.getPrefix());
-      assertEquals(config.getConfigurationGroup("test-prefix"), group);
+    // act
+    config = new Configuration(group);
+    config.load();
 
-    } finally {
-      deleteTempConfigFile(config);
-    }
+    // assert
+    assertEquals(config.getConfigurationGroup(group.getClass()), group);
+    assertEquals("test-prefix", group.getPrefix());
+    assertEquals(config.getConfigurationGroup("test-prefix"), group);
   }
 
   @Test
   void testDefaultFileCreation() {
-    Configuration config = null;
-    try {
-      config = new Configuration();
-      config.load();
-      assertTrue(new File(config.getFileName()).exists());
-    } finally {
-      deleteTempConfigFile(config);
-    }
+    // arrange
+    config = new Configuration();
+    config.load();
+
+    // act, assert
+    assertTrue(new File(config.getFileName()).exists());
   }
 
   @Test
   void testFieldInitialization() {
-    Configuration config = null;
+    // arrange
     final TestConfigurationGroup group = new TestConfigurationGroup();
+    config = new Configuration(group);
+    config.load();
+    assertTrue(new File(config.getFileName()).exists());
 
-    try {
-      deleteTempConfigFile(config);
-      config = new Configuration(group);
-      config.load();
-      assertTrue(new File(config.getFileName()).exists());
+    // act
+    final TestConfigurationGroup configGroup = config.getConfigurationGroup(TestConfigurationGroup.class);
 
-      config.load();
-      final TestConfigurationGroup configGroup = config.getConfigurationGroup(TestConfigurationGroup.class);
-      assertEquals(100, configGroup.getTestInt());
-      assertEquals(101, configGroup.getTestByte());
-      assertEquals(102, configGroup.getTestShort());
-      assertEquals(103, configGroup.getTestLong());
-      assertEquals(104.0d, configGroup.getTestDouble(), 0.00001);
-      assertEquals(105.0f, configGroup.getTestFloat(), 0.00001f);
-      assertEquals("test", configGroup.getTestString());
-      assertEquals(true, configGroup.isTestBoolean());
-      assertEquals(TEST.TEST1, configGroup.getTestEnum());
-      assertEquals("", configGroup.getTestWithNoSetter());
-      assertArrayEquals(new String[] { "test", "testicle" }, configGroup.getTestStringArray());
-    } finally {
-
-      deleteTempConfigFile(config);
-    }
+    // assert
+    assertEquals(100, configGroup.getTestInt());
+    assertEquals(101, configGroup.getTestByte());
+    assertEquals(102, configGroup.getTestShort());
+    assertEquals(103, configGroup.getTestLong());
+    assertEquals(104.0d, configGroup.getTestDouble(), 0.00001);
+    assertEquals(105.0f, configGroup.getTestFloat(), 0.00001f);
+    assertEquals("test", configGroup.getTestString());
+    assertEquals(true, configGroup.isTestBoolean());
+    assertEquals(TEST.TEST1, configGroup.getTestEnum());
+    assertEquals("", configGroup.getTestWithNoSetter());
+    assertArrayEquals(new String[] { "test", "testicle" }, configGroup.getTestStringArray());
   }
 
   @Test
   void testFileName() {
+    // arrange
     final String testFileName = UUID.randomUUID().toString() + ".properties";
-    Configuration config = null;
-    try {
-      config = new Configuration(testFileName);
-      config.load();
-      assertTrue(new File(testFileName).exists());
-    } finally {
-      deleteTempConfigFile(config);
-    }
+
+    // act
+    config = new Configuration(testFileName);
+    config.load();
+
+    // assert
+    assertTrue(new File(testFileName).exists());
   }
 
   private enum TEST {
