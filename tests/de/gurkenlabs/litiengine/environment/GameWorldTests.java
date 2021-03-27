@@ -15,9 +15,7 @@ public class GameWorldTests {
 
   @BeforeAll
   public static void initGame() {
-
-    // necessary because the environment need access to the game loop and other
-    // stuff
+    // necessary because the environment need access to the game loop and other stuff
     Game.init(Game.COMMADLINE_ARG_NOGUI);
   }
 
@@ -58,7 +56,6 @@ public class GameWorldTests {
     });
 
     Game.world().addListener("test-mapobject", new EnvironmentListener() {
-
       @Override
       public void initialized(Environment environment) {
         map2Initialized.wasCalled = true;
@@ -71,18 +68,15 @@ public class GameWorldTests {
     });
 
     IMap map = Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
-
     Environment env = Game.world().loadEnvironment(map);
 
     assertTrue(mapLoaded.wasCalled);
     assertTrue(mapInitialized.wasCalled);
 
     env.clear();
-
     assertTrue(mapCleared.wasCalled);
 
     IMap map2 = Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-mapobject.tmx");
-
     Game.world().loadEnvironment(map2);
 
     assertTrue(mapUnloaded.wasCalled);
@@ -92,29 +86,30 @@ public class GameWorldTests {
 
   @Test
   public void testMapSpecificLoadedListeners() {
+    // arrange
     Status mapLoaded = new Status();
-
     Game.world().onLoaded("test-map", e -> mapLoaded.wasCalled = true);
-
     IMap map = Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
 
+    // act
     Game.world().loadEnvironment(map);
 
+    // assert
     assertTrue(mapLoaded.wasCalled);
   }
 
   @Test
   public void testMapSpecificUnloadedListeners() {
+    // arrange
     Status mapUnloaded = new Status();
-
     Game.world().onUnloaded("test-map", e -> mapUnloaded.wasCalled = true);
-
     IMap map = Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
-
     Game.world().loadEnvironment(map);
 
+    // act
     Game.world().unloadEnvironment();
 
+    // assert
     assertTrue(mapUnloaded.wasCalled);
   }
 
