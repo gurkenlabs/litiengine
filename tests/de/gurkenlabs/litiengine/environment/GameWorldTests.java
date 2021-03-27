@@ -1,9 +1,10 @@
 package de.gurkenlabs.litiengine.environment;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.litiengine.Game;
@@ -13,25 +14,22 @@ import de.gurkenlabs.litiengine.resources.Resources;
 
 public class GameWorldTests {
 
-  @BeforeAll
-  public static void initGame() {
-    // necessary because the environment need access to the game loop and other stuff
+  @BeforeEach
+  public void initGame() {
+    // necessary because the environment needs access to the game loop and other stuff
     Game.init(Game.COMMADLINE_ARG_NOGUI);
   }
 
-  @AfterAll
-  public static void terminateGame() {
+  @AfterEach
+  public void terminateGame() {
     GameTest.terminateGame();
   }
 
   @Test
-  public void testListeners() {
-    Status mapLoaded = new Status();
-    Status mapUnloaded = new Status();
+  public void testListeners_loadEnvironment() {
+    // arrange
     Status mapInitialized = new Status();
-    Status mapCleared = new Status();
-    Status map2Loaded = new Status();
-    Status map2Initialized = new Status();
+    Status mapLoaded = new Status();
 
     Game.world().addListener("test-map", new EnvironmentListener() {
       @Override
@@ -43,7 +41,24 @@ public class GameWorldTests {
       public void loaded(Environment environment) {
         mapLoaded.wasCalled = true;
       }
+    });
+    IMap map = Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
 
+    // act
+    Environment env = Game.world().loadEnvironment(map);
+
+    // assert
+    assertNotNull(env);
+    assertTrue(mapInitialized.wasCalled);
+    assertTrue(mapLoaded.wasCalled);
+  }
+
+  @Test
+  public void testListeners_clearEnvironment() {
+    Status mapUnloaded = new Status();
+    Status mapCleared = new Status();
+
+    Game.world().addListener("test-map", new EnvironmentListener() {
       @Override
       public void unloaded(Environment environment) {
         mapUnloaded.wasCalled = true;
@@ -52,6 +67,28 @@ public class GameWorldTests {
       @Override
       public void cleared(Environment environment) {
         mapCleared.wasCalled = true;
+      }
+    });
+    IMap map = Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
+    Environment env = Game.world().loadEnvironment(map);
+
+    // act
+    env.clear();
+
+    // assert
+    assertTrue(mapCleared.wasCalled);
+  }
+
+  @Test
+  public void testListeners_loadDifferentEnvironment() {
+    Status mapUnloaded = new Status();
+    Status map2Initialized = new Status();
+    Status map2Loaded = new Status();
+
+    Game.world().addListener("test-map", new EnvironmentListener() {
+      @Override
+      public void unloaded(Environment environment) {
+        mapUnloaded.wasCalled = true;
       }
     });
 
@@ -66,19 +103,14 @@ public class GameWorldTests {
         map2Loaded.wasCalled = true;
       }
     });
-
     IMap map = Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
-    Environment env = Game.world().loadEnvironment(map);
-
-    assertTrue(mapLoaded.wasCalled);
-    assertTrue(mapInitialized.wasCalled);
-
-    env.clear();
-    assertTrue(mapCleared.wasCalled);
-
+    Game.world().loadEnvironment(map);
     IMap map2 = Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-mapobject.tmx");
+
+    // act
     Game.world().loadEnvironment(map2);
 
+    // assert
     assertTrue(mapUnloaded.wasCalled);
     assertTrue(map2Loaded.wasCalled);
     assertTrue(map2Initialized.wasCalled);
