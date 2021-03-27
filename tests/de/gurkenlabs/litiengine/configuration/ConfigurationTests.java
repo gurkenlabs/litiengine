@@ -29,7 +29,7 @@ class ConfigurationTests {
     if (config != null) {
       final File configFile = new File(config.getFileName());
       if (configFile.exists()) {
-        configFile.delete();
+        assertTrue(configFile.delete());
       }
     }
   }
@@ -44,9 +44,9 @@ class ConfigurationTests {
     config.load();
 
     // assert
-    assertEquals(config.getConfigurationGroup(group.getClass()), group);
+    assertEquals(group, config.getConfigurationGroup(group.getClass()));
     assertEquals("test-prefix", group.getPrefix());
-    assertEquals(config.getConfigurationGroup("test-prefix"), group);
+    assertEquals(group, config.getConfigurationGroup("test-prefix"));
   }
 
   @Test
@@ -60,14 +60,26 @@ class ConfigurationTests {
   }
 
   @Test
+  void testCustomFileName() {
+    // arrange
+    final String testFileName = UUID.randomUUID().toString() + ".properties";
+
+    // act
+    config = new Configuration(testFileName);
+    config.load();
+
+    // assert
+    assertTrue(new File(testFileName).exists());
+  }
+
+  @Test
   void testFieldInitialization() {
     // arrange
     final TestConfigurationGroup group = new TestConfigurationGroup();
     config = new Configuration(group);
-    config.load();
-    assertTrue(new File(config.getFileName()).exists());
 
     // act
+    config.load();
     final TestConfigurationGroup configGroup = config.getConfigurationGroup(TestConfigurationGroup.class);
 
     // assert
@@ -78,23 +90,10 @@ class ConfigurationTests {
     assertEquals(104.0d, configGroup.getTestDouble(), 0.00001);
     assertEquals(105.0f, configGroup.getTestFloat(), 0.00001f);
     assertEquals("test", configGroup.getTestString());
-    assertEquals(true, configGroup.isTestBoolean());
+    assertTrue(configGroup.isTestBoolean());
     assertEquals(TEST.TEST1, configGroup.getTestEnum());
     assertEquals("", configGroup.getTestWithNoSetter());
     assertArrayEquals(new String[] { "test", "testicle" }, configGroup.getTestStringArray());
-  }
-
-  @Test
-  void testFileName() {
-    // arrange
-    final String testFileName = UUID.randomUUID().toString() + ".properties";
-
-    // act
-    config = new Configuration(testFileName);
-    config.load();
-
-    // assert
-    assertTrue(new File(testFileName).exists());
   }
 
   private enum TEST {
@@ -114,7 +113,7 @@ class ConfigurationTests {
     private boolean testBoolean = true;
     private TEST testEnum = TEST.TEST1;
     private String[] testStringArray = new String[] { "test", "testicle" };
-    private String testWithNoSetter = "";
+    private final String testWithNoSetter = "";
 
     public byte getTestByte() {
       return this.testByte;
