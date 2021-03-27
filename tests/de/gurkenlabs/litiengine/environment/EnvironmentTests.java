@@ -60,7 +60,7 @@ public class EnvironmentTests {
 
   @AfterAll
   public static void terminateGame() {
-    GameTest.resetGame();
+    GameTest.terminateGame();
   }
 
   @BeforeEach

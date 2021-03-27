@@ -38,7 +38,7 @@ public class EnvironmentEventTests {
 
   @AfterAll
   public static void terminateGame() {
-    GameTest.resetGame();
+    GameTest.terminateGame();
   }
   
   @BeforeEach

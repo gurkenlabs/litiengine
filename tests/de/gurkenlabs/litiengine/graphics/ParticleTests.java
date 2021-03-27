@@ -24,7 +24,7 @@ public class ParticleTests {
 
   @AfterAll
   public static void terminateGame() {
-    GameTest.resetGame();
+    GameTest.terminateGame();
   }
 
   @Test

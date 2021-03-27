@@ -61,7 +61,7 @@ public class MapObjectLoaderTests {
 
   @AfterAll
   public static void terminateGame() {
-    GameTest.resetGame();
+    GameTest.terminateGame();
   }
 
   @BeforeEach
