@@ -21,13 +21,13 @@ public class DirectionTests {
         assertEquals(Direction.DOWN, Direction.fromAngle(angle));
     }
 
-    @Test
-    public void fromAngle_Right() {
+    @ParameterizedTest(name="fromAngle_Down angle={0}")
+    @CsvSource({
+            "45.0d", "45.1d", "134.9d"
+    })
+    public void fromAngle_Right(double angle) {
         // assert
-        assertEquals(Direction.RIGHT, Direction.fromAngle(45.0));
-        assertEquals(Direction.RIGHT, Direction.fromAngle(45.1));
-
-        assertEquals(Direction.RIGHT, Direction.fromAngle(134.9));
+        assertEquals(Direction.RIGHT, Direction.fromAngle(angle));
     }
 
     @Test
