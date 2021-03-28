@@ -21,7 +21,7 @@ public class DirectionTests {
         assertEquals(Direction.DOWN, Direction.fromAngle(angle));
     }
 
-    @ParameterizedTest(name="fromAngle_Down angle={0}")
+    @ParameterizedTest(name="fromAngle_Right angle={0}")
     @CsvSource({
             "45.0d", "45.1d", "134.9d"
     })
