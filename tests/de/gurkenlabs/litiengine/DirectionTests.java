@@ -2,6 +2,8 @@ package de.gurkenlabs.litiengine;
 
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.MockedStatic;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -9,17 +11,14 @@ import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.Mockito.mockStatic;
 
 public class DirectionTests {
-    @Test
-    public void fromAngle_Down() {
-        // assert
-        assertEquals(Direction.DOWN, Direction.fromAngle(0.0));
-        assertEquals(Direction.DOWN, Direction.fromAngle(0.1));
-        assertEquals(Direction.DOWN, Direction.fromAngle(44.9));
 
-        assertEquals(Direction.DOWN, Direction.fromAngle(315.0));
-        assertEquals(Direction.DOWN, Direction.fromAngle(315.1));
-        assertEquals(Direction.DOWN, Direction.fromAngle(359.9));
-        assertEquals(Direction.DOWN, Direction.fromAngle(360.0));
+    @ParameterizedTest(name="fromAngle_Down angle={0}")
+    @CsvSource({
+            "0.0d", "0.1d", "44.9d", "315.0d", "315.1d", "359.9d", "360.0d"
+    })
+    public void fromAngle_Down(double angle) {
+        // assert
+        assertEquals(Direction.DOWN, Direction.fromAngle(angle));
     }
 
     @Test
