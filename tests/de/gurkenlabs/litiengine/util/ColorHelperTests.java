@@ -40,15 +40,42 @@ public class ColorHelperTests {
   }
 
   @Test
-  public void testColorFromAlphaHexString() {
+  public void testRedFromAlphaHexString() {
     String red200 = "#c8ff0000";
 
     Color redDecoded = ColorHelper.decode(red200);
 
     Color alphaRed = new Color(255, 0, 0, 200);
     assertEquals(alphaRed.getRed(), redDecoded.getRed());
+  }
+
+  @Test
+  public void testGreenFromAlphaHexString() {
+    String red200 = "#c8ff0000";
+
+    Color redDecoded = ColorHelper.decode(red200);
+
+    Color alphaRed = new Color(255, 0, 0, 200);
     assertEquals(alphaRed.getGreen(), redDecoded.getGreen());
+  }
+
+  @Test
+  public void testBlueFromAlphaHexString() {
+    String red200 = "#c8ff0000";
+
+    Color redDecoded = ColorHelper.decode(red200);
+
+    Color alphaRed = new Color(255, 0, 0, 200);
     assertEquals(alphaRed.getBlue(), redDecoded.getBlue());
+  }
+
+  @Test
+  public void testAlphaFromAlphaHexString() {
+    String red200 = "#c8ff0000";
+
+    Color redDecoded = ColorHelper.decode(red200);
+
+    Color alphaRed = new Color(255, 0, 0, 200);
     assertEquals(alphaRed.getAlpha(), redDecoded.getAlpha());
   }
 
