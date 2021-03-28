@@ -1,19 +1,25 @@
 package de.gurkenlabs.litiengine;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class GameTimeTests {
-  @Test
-  public void toMilliseconds_Positive() {
+  @ParameterizedTest(name="toMilliseconds_Positive ticks={0}, updateRate={1}, expected={2}")
+  @CsvSource({
+          "100, 50, 2000",
+          "450, 33, 13636",
+          "33, 100, 330"
+  })
+  public void toMilliseconds_Positive(long ticks, int updateRate, long expected) {
     // arrange
     GameTime time = new GameTime();
 
     // act, assert
-    assertEquals(2000, time.toMilliseconds(100, 50));
-    assertEquals(13636, time.toMilliseconds(450, 33));
-    assertEquals(330, time.toMilliseconds(33, 100));
+    assertEquals(expected, time.toMilliseconds(ticks, updateRate));
+
   }
 
   @Test
