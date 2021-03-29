@@ -2,28 +2,39 @@ package de.gurkenlabs.litiengine.resources;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Arrays;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 public class DataFormatTests {
 
-  @Test
-  public void testImageFormat() {
-    assertTrue(ImageFormat.isSupported("test.gif"));
-    assertTrue(ImageFormat.isSupported("test.png"));
-    assertTrue(ImageFormat.isSupported("test.jpg"));
-    assertTrue(ImageFormat.isSupported("test.bmp"));
+  @ParameterizedTest
+  @MethodSource("getImageFormat")
+  public void testImageFormat(String fileName, boolean assertValue) {
 
-    assertFalse(ImageFormat.isSupported("test.test"));
-    assertFalse(ImageFormat.isSupported("test.undefined"));
+    assertEquals(ImageFormat.isSupported(fileName), assertValue);
 
     String[] expected = new String[] { "gif", "png", "jpg", "bmp" };
 
     for (String actual : ImageFormat.getAllExtensions()) {
       assertTrue(Arrays.stream(expected).anyMatch(actual::equals));
     }
+  }
+  private static Stream<Arguments> getImageFormat() {
+    return Stream.of(
+            Arguments.of("test.gif", true),
+            Arguments.of("test.png", true),
+            Arguments.of("test.jpg", true),
+            Arguments.of("test.bmp", true),
+            Arguments.of("test.test", false),
+            Arguments.of("test.undefined", false)
+    );
   }
 
   @Test
