@@ -7,6 +7,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import java.util.stream.Stream;
 
 public class EntityTests {
 
@@ -76,12 +80,18 @@ public class EntityTests {
     assertDoesNotThrow(() -> entity.perform("I don't exist!"));
   }
 
-  @Test
-  public void testDefaultTags() {
+  @ParameterizedTest
+  @MethodSource("getDefaultTags")
+  public void testDefaultTags(String tag) {
     TestEntity entity = new TestEntity();
+    assertTrue(entity.hasTag(tag));
+  }
 
-    assertTrue(entity.hasTag("some tag"));
-    assertTrue(entity.hasTag("another tag"));
+  private static Stream<Arguments> getDefaultTags() {
+    return Stream.of(
+            Arguments.of("some tag"),
+            Arguments.of("another tag")
+    );
   }
 
   @Tag("some tag")
