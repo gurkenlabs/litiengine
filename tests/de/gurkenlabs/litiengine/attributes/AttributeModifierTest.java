@@ -16,16 +16,13 @@ class AttributeModifierTest {
   }
 
   @Test
-  void testModifyValueWithInactiveAttributeModifierActive() {
+  void testModifyValueWithInactiveAttributeModifier() {
     final AttributeModifier<Integer> testAttributeModifierActive = new AttributeModifier<>(Modification.ADD, 5);
-    testAttributeModifierActive.setActive(true);
-    assertEquals(7, testAttributeModifierActive.modify(2));
-  }
-
-  @Test
-  void testModifyValueWithInactiveAttributeModifierInactive() {
     final AttributeModifier<Integer> testAttributeModifierInactive = new AttributeModifier<>(Modification.ADD, 5);
+    testAttributeModifierActive.setActive(true);
     testAttributeModifierInactive.setActive(false);
+
+    assertEquals(7, testAttributeModifierActive.modify(2));
     assertEquals(2, testAttributeModifierInactive.modify(2));
   }
 }
