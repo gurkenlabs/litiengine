@@ -131,20 +131,15 @@ public class MathUtilitiesTests {
     assertFalse(MathUtilities.isOddNumber(evenNumber));
   }
 
-  @Test
-  public void testGetFullPercent(){
-    double percent1 = 4.3;
-    double percent2 = 0.0;
-    double percent3 = 0;
-    double percent4 = 10.4;
-
-    double fraction1 = 2.15;
-    double fraction2 = 2.6;
-
-    assertEquals(50.0, MathUtilities.getFullPercent(percent1,fraction1));
-    assertEquals(0, MathUtilities.getFullPercent(percent2,fraction1));
-    assertEquals(0, MathUtilities.getFullPercent(percent3,fraction2));
-    assertEquals(25.0, MathUtilities.getFullPercent(percent4,fraction2));
+  @ParameterizedTest(name="testGetFullPercent percent={0}, fraction={2}, expectedValue={3}")
+  @CsvSource({
+          "4.3d, 2.15d, 50.0d",
+          "0, 2.15d, 0",
+          "0, 2.6d, 0",
+          "10.4, 2.6d, 25.0d"
+  })
+  public void testGetFullPercent(double percent, double fraction, double expectedValue){
+    assertEquals(expectedValue, MathUtilities.getFullPercent(percent,fraction));
   }
 
   @Test
