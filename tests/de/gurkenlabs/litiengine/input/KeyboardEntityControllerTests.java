@@ -24,7 +24,7 @@ public class KeyboardEntityControllerTests {
     }
 
     @Test
-    public void handleUpKeyPressed() {
+    public void handleUpKeyPressed_X() {
         // arrange
         int keyCode = KeyEvent.VK_W;
         char keyChar = 'W';
@@ -34,13 +34,30 @@ public class KeyboardEntityControllerTests {
         Creature entity = new Creature();
         KeyboardEntityController<Creature> controller = new KeyboardEntityController<>(entity);
         controller.setDx(1);
-        controller.setDy(1);
 
         // act
         controller.handlePressedKey(keyEvent);
 
         // assert
         assertEquals(1, controller.getDx()); // =
+    }
+
+    @Test
+    public void handleUpKeyPressed_Y() {
+        // arrange
+        int keyCode = KeyEvent.VK_W;
+        char keyChar = 'W';
+        Component source = new TestComponent();
+        KeyEvent keyEvent = new KeyEvent(source, KeyEvent.KEY_PRESSED, System.currentTimeMillis(), 0, keyCode, keyChar);
+
+        Creature entity = new Creature();
+        KeyboardEntityController<Creature> controller = new KeyboardEntityController<>(entity);
+        controller.setDy(1);
+
+        // act
+        controller.handlePressedKey(keyEvent);
+
+        // assert
         assertEquals(0, controller.getDy()); // +1
     }
 
