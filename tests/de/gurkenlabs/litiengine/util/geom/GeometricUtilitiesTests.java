@@ -159,7 +159,7 @@ public class GeometricUtilitiesTests {
     assertEquals(expectedX, actualX, 0.001);
   }
 
-  @ParameterizedTest(name="testProjectionByScalar_yCoordinate")
+  @ParameterizedTest(name="testProjectionByScalar_yCoordinate x={0}, y={1}, scalar={2}, expectedY={3}")
   @CsvSource({
           "10.0d, 10.0d, 1.414d, 1.0d",
           "10.0d, 10.0d, 14.142d, 10.0d",
