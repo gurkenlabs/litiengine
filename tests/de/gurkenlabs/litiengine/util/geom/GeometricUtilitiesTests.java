@@ -10,6 +10,8 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 public class GeometricUtilitiesTests {
 
@@ -31,25 +33,27 @@ public class GeometricUtilitiesTests {
     assertEquals(8, newDimension2.getHeight(), 0.0001);
   }
 
-  @Test
-  public void testCalcRotationAngles() {
-    double rotationAngle = GeometricUtilities.calcRotationAngleInDegrees(new Point2D.Double(0, 0), new Point2D.Double(1, 1));
-    double rotationAngle2 = GeometricUtilities.calcRotationAngleInDegrees(new Point2D.Double(0, 0), new Point2D.Double(1, 0));
-    double rotationAngle3 = GeometricUtilities.calcRotationAngleInDegrees(new Point2D.Double(0, 0), new Point2D.Double(0, 1));
-    double rotationAngle4 = GeometricUtilities.calcRotationAngleInDegrees(new Point2D.Double(0, 0), new Point2D.Double(-1, -1));
-    double rotationAngle5 = GeometricUtilities.calcRotationAngleInDegrees(new Point2D.Double(0, 0), new Point2D.Double(-1, 0));
-    double rotationAngle6 = GeometricUtilities.calcRotationAngleInDegrees(new Point2D.Double(0, 0), new Point2D.Double(0, -1));
-    double rotationAngle7 = GeometricUtilities.calcRotationAngleInDegrees(new Point2D.Double(0, 0), new Point2D.Double(1, -1));
-    double rotationAngle8 = GeometricUtilities.calcRotationAngleInDegrees(new Point2D.Double(0, 0), new Point2D.Double(-1, 1));
+  @ParameterizedTest(name="testCalcRotationAngleInDegrees x={0}, y={1}, expectedAngle={2}")
+  @CsvSource({
+    "1.0d, 1.0d, 45.0f",
+    "1.0d, 0, 90.0d",
+    "0, 1.0d, 0",
+    "-1.0d, -1.0d, 225.0f",
+    "-1.0d, 0, 270.0f",
+    "0, -1.0d, 180.0f",
+    "1.0d, -1.0d, 135.0f",
+    "-1.0d, 1.0d, 315.0f"
+  })
+  public void testCalcRotationAngleInDegrees(double x, double y, float expectedAngle){
+    // arrange
+    Point2D.Double centerPoint = new Point2D.Double(0, 0);
+    Point2D.Double targetPoint = new Point2D.Double(x, y);
 
-    assertEquals(45, (float) rotationAngle);
-    assertEquals(90, (float) rotationAngle2);
-    assertEquals(0, (float) rotationAngle3);
-    assertEquals(225, (float) rotationAngle4);
-    assertEquals(270, (float) rotationAngle5);
-    assertEquals(180, (float) rotationAngle6);
-    assertEquals(135, (float) rotationAngle7);
-    assertEquals(315, (float) rotationAngle8);
+    // act
+    double rotationAngle = GeometricUtilities.calcRotationAngleInDegrees(centerPoint, targetPoint);
+
+    // assert
+    assertEquals(expectedAngle, (float)rotationAngle);
   }
 
   @Test
@@ -97,63 +101,96 @@ public class GeometricUtilitiesTests {
     assertArrayEquals(new Point2D[] { expected4, expected5 }, possiblePoint2);
   }
   
-  @Test
-  public void testProjectionByAngle() {
+  @ParameterizedTest(name="testProjectByAngle_xCoordinate angle={0}, expectedX={1}")
+  @CsvSource({
+          "90.0d, 1.0d",
+          "180.0d, 0",
+          "270.0d, -1.0d",
+          "360, 0"
+  })
+  public void testProjectionByAngle_xCoordinate(double angle, double expectedX){
+    // arrange
     final Point2D start = new Point2D.Double(0, 0);
-    
-    Point2D end = GeometricUtilities.project(start, 90, 1);
-    Point2D end2 = GeometricUtilities.project(start, 180, 1);
-    Point2D end3 = GeometricUtilities.project(start, 270, 1);
-    Point2D end4 = GeometricUtilities.project(start, 360, 1);
 
-    assertEquals(1, end.getX(), 0.001);
-    assertEquals(0, end.getY(), 0.001);
-    
-    assertEquals(0, end2.getX(), 0.001);
-    assertEquals(-1, end2.getY(), 0.001);
-    
-    assertEquals(-1, end3.getX(), 0.001);
-    assertEquals(0, end3.getY(), 0.001);
-    
-    assertEquals(0, end4.getX(), 0.001);
-    assertEquals(1, end4.getY(), 0.001);
+    // act
+    Point2D end = GeometricUtilities.project(start, angle, 1);
+    double actualX = end.getX();
+
+    // assert
+    assertEquals(expectedX, actualX, 0.001);
+  }
+
+  @ParameterizedTest(name="testProjectByAngle_yCoordinate angle={0}, expectedY={1}")
+  @CsvSource({
+          "90.0d, 0d",
+          "180.0d, -1.0d",
+          "270.0d, 0",
+          "360, 1.0d"
+  })
+  public void testProjectionByAngle_yCoordinate(double angle, double expectedY){
+    // arrange
+    final Point2D start = new Point2D.Double(0, 0);
+
+    // act
+    Point2D end = GeometricUtilities.project(start, angle, 1);
+    double actualY = end.getY();
+
+    // assert
+    assertEquals(expectedY, actualY, 0.001);
   }
   
-  @Test
-  public void testProjectionByScalar() {
+  @ParameterizedTest(name="testProjectionByScalar_xCoordinate x={0}, y={1}, scalar={2}, expectedX={3}")
+  @CsvSource({
+          "10.0d, 10.0d, 1.414d, 1.0d",
+          "10.0d, 10.0d, 14.142d, 10.0d",
+          "-10.0d, -10.0d, 3.536d, -2.5d",
+          "-10.0d, -10.0d, 14.142d, -10.0d"
+  })
+  public void testProjectionByScalar_xCoordinate(double x, double y, double scalar, double expectedX){
+    // arrange
     final Point2D start = new Point2D.Double(0, 0);
-    final Point2D target = new Point2D.Double(10, 10);
-    final Point2D target2 = new Point2D.Double(-10, -10);
-    
-    Point2D end = GeometricUtilities.project(start, target, 1.414);
-    Point2D end2 = GeometricUtilities.project(start, target2, 3.536);
-    Point2D end3 = GeometricUtilities.project(start, target, 14.142);
-    Point2D end4 = GeometricUtilities.project(start, target2, 14.142);
-    
-    assertEquals(1, end.getX(), 0.001);
-    assertEquals(1, end.getY(), 0.001);
-    
-    assertEquals(-2.5, end2.getX(), 0.001);
-    assertEquals(-2.5, end2.getY(), 0.001);
-    
-    assertEquals(10, end3.getX(), 0.001);
-    assertEquals(10, end3.getY(), 0.001);
-    
-    assertEquals(-10, end4.getX(), 0.001);
-    assertEquals(-10, end4.getY(), 0.001);
+    final Point2D target = new Point2D.Double(x, y);
+
+    // act
+    Point2D end = GeometricUtilities.project(start, target, scalar);
+    double actualX = end.getX();
+
+    // assert
+    assertEquals(expectedX, actualX, 0.001);
   }
 
-  @Test
-  public void testDeltaX() {
-    double actualAngle1 = GeometricUtilities.getDeltaX(45);
-    double actualAngle2 = GeometricUtilities.getDeltaX(0);
-    double actualAngle3 = GeometricUtilities.getDeltaX(-45);
-    double actualAngle4 = GeometricUtilities.getDeltaX(360);
+  @ParameterizedTest(name="testProjectionByScalar_yCoordinate x={0}, y={1}, scalar={2}, expectedY={3}")
+  @CsvSource({
+          "10.0d, 10.0d, 1.414d, 1.0d",
+          "10.0d, 10.0d, 14.142d, 10.0d",
+          "-10.0d, -10.0d, 3.536d, -2.5d",
+          "-10.0d, -10.0d, 14.142d, -10.0d"
+  })
+  public void testProjectionByScalar_yCoordinate(double x, double y, double scalar, double expectedY){
+    // arrange
+    final Point2D start = new Point2D.Double(0, 0);
+    final Point2D target = new Point2D.Double(x, y);
 
+    // act
+    Point2D end = GeometricUtilities.project(start, target, scalar);
+    double actualY = end.getY();
 
-    assertEquals(0.70656418800354, (float) actualAngle1, 0.0001);
-    assertEquals(-7.670362E-4, (float) actualAngle2, 0.0001);
-    assertEquals(-0.70764893, (float) actualAngle3, 0.0001);
-    assertEquals(actualAngle2, actualAngle4);
+    // assert
+    assertEquals(expectedY, actualY, 0.001);
+  }
+
+  @ParameterizedTest(name="testDeltaX angle={0}, expectedDeltaX={1}")
+  @CsvSource({
+          "45.0d, 0.70656418800354d",
+          "0, -7.670362E-4d",
+          "-45, -0.70764893d",
+          "360, -7.670362E-4d"
+  })
+  public void testDeltaX(double angle, double expectedDeltaX){
+    // arrange, act
+    double actualDeltaX = GeometricUtilities.getDeltaX(angle);
+
+    // assert
+    assertEquals(expectedDeltaX, (float) actualDeltaX, 0.001);
   }
 }

@@ -24,15 +24,13 @@ public class SpawnpointTests {
 
   @BeforeAll
   public static void initGame() {
-
-    // necessary because the environment need access to the game loop and other
-    // stuff
+    // necessary because the environment need access to the game loop and other stuff
     Game.init(Game.COMMADLINE_ARG_NOGUI);
   }
 
   @AfterAll
   public static void terminateGame() {
-    GameTest.resetGame();
+    GameTest.terminateGame();
   }
 
   @BeforeEach

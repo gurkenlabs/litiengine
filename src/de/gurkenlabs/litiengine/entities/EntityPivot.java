@@ -6,6 +6,9 @@ import java.awt.geom.Rectangle2D;
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Valign;
 
+import static de.gurkenlabs.litiengine.entities.EntityPivotType.COLLISIONBOX_CENTER;
+import static de.gurkenlabs.litiengine.entities.EntityPivotType.DIMENSION_CENTER;
+
 public class EntityPivot {
   private final IEntity entity;
   private final EntityPivotType type;
@@ -19,7 +22,7 @@ public class EntityPivot {
     this.offsetX = offsetX;
     this.offsetY = offsetY;
 
-    if (type == EntityPivotType.COLLISIONBOX_CENTER && !(entity instanceof ICollisionEntity)) {
+    if (type == COLLISIONBOX_CENTER && !(entity instanceof ICollisionEntity)) {
       throw new IllegalArgumentException("Pivot type COLLISIONBOX_CENTER is only supported for collision entities.");
     }
   }
@@ -50,15 +53,13 @@ public class EntityPivot {
   }
 
   public Point2D getPoint() {
-    switch (this.getType()) {
-    case COLLISIONBOX_CENTER:
+    EntityPivotType type = this.getType();
+    if (type == COLLISIONBOX_CENTER) {
       Rectangle2D collisionBox = ((ICollisionEntity) this.getEntity()).getCollisionBox();
       return new Point2D.Double(collisionBox.getCenterX() + this.getOffsetX(), collisionBox.getCenterY() + this.getOffsetY());
-    case DIMENSION_CENTER:
+    } else if(type == DIMENSION_CENTER) {
       return this.getEntity().getCenter();
-    case OFFSET:
-    case LOCATION:
-    default:
+    } else {
       return new Point2D.Double(this.getEntity().getX() + this.getOffsetX(), this.getEntity().getY() + this.getOffsetY());
     }
   }

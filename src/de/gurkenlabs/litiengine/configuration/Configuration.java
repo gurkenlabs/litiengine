@@ -119,7 +119,7 @@ public class Configuration {
 
   /**
    * Tries to load the configuration from file in the application folder. If none
-   * exists, it tires to load the file from any resource folder. If none exists,
+   * exists, it tries to load the file from any resource folder. If none exists,
    * it creates a new configuration file in the application folder.
    */
   public void load() {

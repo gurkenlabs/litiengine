@@ -7,6 +7,8 @@ import java.awt.Color;
 import java.util.logging.Logger;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 public class ColorHelperTests {
 
@@ -38,15 +40,42 @@ public class ColorHelperTests {
   }
 
   @Test
-  public void testColorFromAlphaHexString() {
+  public void testRedFromAlphaHexString() {
     String red200 = "#c8ff0000";
 
     Color redDecoded = ColorHelper.decode(red200);
 
     Color alphaRed = new Color(255, 0, 0, 200);
     assertEquals(alphaRed.getRed(), redDecoded.getRed());
+  }
+
+  @Test
+  public void testGreenFromAlphaHexString() {
+    String red200 = "#c8ff0000";
+
+    Color redDecoded = ColorHelper.decode(red200);
+
+    Color alphaRed = new Color(255, 0, 0, 200);
     assertEquals(alphaRed.getGreen(), redDecoded.getGreen());
+  }
+
+  @Test
+  public void testBlueFromAlphaHexString() {
+    String red200 = "#c8ff0000";
+
+    Color redDecoded = ColorHelper.decode(red200);
+
+    Color alphaRed = new Color(255, 0, 0, 200);
     assertEquals(alphaRed.getBlue(), redDecoded.getBlue());
+  }
+
+  @Test
+  public void testAlphaFromAlphaHexString() {
+    String red200 = "#c8ff0000";
+
+    Color redDecoded = ColorHelper.decode(red200);
+
+    Color alphaRed = new Color(255, 0, 0, 200);
     assertEquals(alphaRed.getAlpha(), redDecoded.getAlpha());
   }
 
@@ -109,24 +138,19 @@ public class ColorHelperTests {
     assertEquals("#c80000ff", blueEncoded);
   }
 
-  @Test
-  public void testRgbBounds() {
-    int negative = -10;
-    int zero = 0;
-    int inRange = 158;
-    int max = 255;
-    int outOfRange = 300;
+  @ParameterizedTest(name="testRgbBounds {0}, colorValue={1}, expectedRgb={2}")
+  @CsvSource({
+          "Negative, -10, 0",
+          "Zero, 0, 0",
+          "InRange, 158, 158",
+          "Max, 255, 255",
+          "OutOfRange, 300, 255"
+  })
+  public void testRgbBounds(String rgbBound, int colorValue, int expectedRgb){
+    // arrange, act
+    int actualRgb = ColorHelper.ensureColorValueRange(colorValue);
 
-    int rgbNegative = ColorHelper.ensureColorValueRange(negative);
-    int rgbZero = ColorHelper.ensureColorValueRange(zero);
-    int rgbInRange = ColorHelper.ensureColorValueRange(inRange);
-    int rgbMax = ColorHelper.ensureColorValueRange(max);
-    int rgbOutOfRange = ColorHelper.ensureColorValueRange(outOfRange);
-
-    assertEquals(0, rgbNegative);
-    assertEquals(0, rgbZero);
-    assertEquals(158, rgbInRange);
-    assertEquals(rgbMax, 255);
-    assertEquals(rgbOutOfRange, 255);
+    // assert
+    assertEquals(expectedRgb, actualRgb);
   }
 }

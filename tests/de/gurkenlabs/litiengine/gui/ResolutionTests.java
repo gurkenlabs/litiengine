@@ -3,10 +3,14 @@ package de.gurkenlabs.litiengine.gui;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.litiengine.gui.screens.Resolution;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 public class ResolutionTests {
 
@@ -18,30 +22,23 @@ public class ResolutionTests {
     assertEquals("1280---720", res.toDimensionString("---"));
   }
 
-  @Test
-  public void testCorrectRatio() {
-    List<Resolution> resolutions16x9 = Resolution.Ratio16x9.getAll();
-
-    for (Resolution res : resolutions16x9) {
-      assertEquals("16:9", res.getRatio().getName());
+  @ParameterizedTest
+  @MethodSource("getRatioParameters")
+  public void testCorrectRatio(List<Resolution> resolutions, String expectedResolution){
+    // act assert
+    for(Resolution res: resolutions){
+      String actualResolution = res.getRatio().getName();
+      assertEquals(expectedResolution, actualResolution);
     }
-    
-    List<Resolution> resolutions16x10 = Resolution.Ratio16x10.getAll();
+  }
 
-    for (Resolution res : resolutions16x10) {
-      assertEquals("16:10", res.getRatio().getName());
-    }
-    
-    List<Resolution> resolutions4x3 = Resolution.Ratio4x3.getAll();
-
-    for (Resolution res : resolutions4x3) {
-      assertEquals("4:3", res.getRatio().getName());
-    }
-    
-    List<Resolution> resolutions5x4 = Resolution.Ratio5x4.getAll();
-
-    for (Resolution res : resolutions5x4) {
-      assertEquals("5:4", res.getRatio().getName());
-    }
+  private static Stream<Arguments> getRatioParameters(){
+    // arrange
+    return Stream.of(
+            Arguments.of(Resolution.Ratio16x9.getAll(), "16:9"),
+            Arguments.of(Resolution.Ratio16x10.getAll(), "16:10"),
+            Arguments.of(Resolution.Ratio4x3.getAll(), "4:3"),
+            Arguments.of(Resolution.Ratio5x4.getAll(), "5:4")
+    );
   }
 }

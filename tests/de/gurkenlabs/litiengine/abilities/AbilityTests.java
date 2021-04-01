@@ -246,102 +246,56 @@ class AbilityTests {
     assertEquals(ePub.getHeight(), eInt.getHeight(), 0.001);
   }
 
-  /*
-   * Test the function getOrigin() with valid inputs when AbilityOrigin = LOCATION.
-   */
   @Test
   void testGetOriginLocation() {
-    Point2D point1 = new Point2D.Double(0, 0);
-    Point2D point2 = new Point2D.Double(1, 1);
-
-    /*
-     * If AbilityOrigin = LOCATION; (default) mapLocation = Point2D.Double(0,0)
-     * --> return Point2D.Double(0,0)
-     */
+    // arrange
     Creature entity = mock(Creature.class);
-    when(entity.getLocation()).thenReturn(point1);
 
+    // act
     TestOriginLocation abilityLocation = new TestOriginLocation(entity);
-    assertEquals(point1, abilityLocation.getPivot().getPoint());
 
-    /*
-     * If AbilityOrigin = LOCATION; mapLocation = Point2D.Double(1,1)
-     * --> return Point2D.Double(1,1)
-     */
-    when(entity.getLocation()).thenReturn(point2);
-    when(entity.getX()).thenReturn((double) 1);
-    when(entity.getY()).thenReturn((double) 1);
-    assertEquals(point2, abilityLocation.getPivot().getPoint());
+    // assert
+    assertEquals(entity, abilityLocation.getPivot().getEntity());
+    assertEquals(EntityPivotType.LOCATION, abilityLocation.getPivot().getType());
   }
 
-  /*
-   * Test the function getOrigin() with valid inputs when AbilityOrigin = CUSTOM.
-   */
   @Test
   void testGetOriginCustom() {
-    Point2D point2 = new Point2D.Double(1, 1);
-    Point2D point3 = new Point2D.Double(2, 2);
-
-    /*
-     * If AbilityOrigin = CUSTOM; origin = null; (default) mapLocation = Point2D.Double(0,0)
-     * --> return Point2D.Double(0,0)
-     */
+    // arrange
     Creature entity = mock(Creature.class);
-    when(entity.getLocation()).thenReturn(point2);
-    when(entity.getX()).thenReturn((double) 1);
-    when(entity.getY()).thenReturn((double) 1);
 
-    TestOriginCustom abilityCustom = new TestOriginCustom(entity);
-    assertEquals(point2, abilityCustom.getPivot().getPoint());
+    // act
+    TestOriginCustom abilityLocation = new TestOriginCustom(entity);
 
-    /*
-     * If AbilityOrigin = CUSTOM; origin = Point2D.Double(1,1); mapLocation = Point2D.Double(1,1)
-     * --> return Point2D.Double(2,2).
-     */
-    abilityCustom.getPivot().setOffset(point2);
-    assertEquals(point3, abilityCustom.getPivot().getPoint());
+    // assert
+    assertEquals(entity, abilityLocation.getPivot().getEntity());
+    assertEquals(EntityPivotType.OFFSET, abilityLocation.getPivot().getType());
   }
 
-  /*
-   * Test the function getOrigin() with valid inputs when AbilityOrigin = DIMENSION_CENTER.
-   */
   @Test
   void testGetOriginDimension() {
-    Point2D point1 = new Point2D.Double(16, 16);
-
-    /*
-     * If AbilityOrigin = DIMENSION_CENTER; (default) mapLocation = Point2D.Double(0,0); (default) height = 32; (default) width = 32
-     * --> return Point2D.Double(16,16)
-     */
-
+    // arrange
     Creature entity = mock(Creature.class);
-    when(entity.getCenter()).thenReturn(point1);
 
-    TestOriginDimension abilityDimension = new TestOriginDimension(entity);
-    assertEquals(point1, abilityDimension.getPivot().getPoint());
+    // act
+    TestOriginDimension abilityLocation = new TestOriginDimension(entity);
+
+    // assert
+    assertEquals(entity, abilityLocation.getPivot().getEntity());
+    assertEquals(EntityPivotType.DIMENSION_CENTER, abilityLocation.getPivot().getType());
   }
-
-  /*
-   * Test the function getOrigin() with valid inputs when AbilityOrigin = COLLISIONBOX_CENTER.
-   */
 
   @Test
   void testGetOriginCollisionBox() {
-    Point2D point1 = new Point2D.Double(16, 25.6);
-    Rectangle2D shape1 = new Rectangle2D.Double(9.6, 19.2, 12.8, 12.8);
-
-    /*
-     * If AbilityOrigin = COLLISIONBOX_CENTER; (default) mapLocation = Point2D.Double(0,0); (default) height = 32; (default) width = 32;
-     * (default) Valign = DOWN; (default) Align = CENTER; (default) collisionBoxHeight = -1; (default) collisionBoxwidth = -1
-     * --> return Point2D(16, 25.6)
-     */
-
+    // arrange
     Creature entity = mock(Creature.class);
-    when(entity.getCollisionBox()).thenReturn(shape1);
 
-    TestOriginCollisionBox abilityCollision = new TestOriginCollisionBox(entity);
-    assertEquals(point1, abilityCollision.getPivot().getPoint());
+    // act
+    TestOriginCollisionBox abilityLocation = new TestOriginCollisionBox(entity);
 
+    // assert
+    assertEquals(entity, abilityLocation.getPivot().getEntity());
+    assertEquals(EntityPivotType.COLLISIONBOX_CENTER, abilityLocation.getPivot().getType());
   }
 
   @AbilityInfo(castType = CastType.ONCONFIRM, name = "I do somethin", description = "does somethin", cooldown = 333, duration = 222, impact = 111, impactAngle = 99, multiTarget = true, origin = EntityPivotType.COLLISIONBOX_CENTER, range = 444, value = 999)

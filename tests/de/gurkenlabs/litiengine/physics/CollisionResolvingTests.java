@@ -13,6 +13,8 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.entities.CollisionBox;
 import de.gurkenlabs.litiengine.entities.Creature;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 public class CollisionResolvingTests {
   final double EPSILON = 1e-6;
@@ -219,8 +221,12 @@ public class CollisionResolvingTests {
     assertEquals(15.0, ent.getY(), EPSILON);
   }
 
-  @Test
-  public void testCollisionWithMapBounds() {
+  @ParameterizedTest(name="testCollisionWithMapBounds_xCoordinate angle={0}, distance={1}, expectedX={2}")
+  @CsvSource({
+          "270.0d, 20.0d, -10.0d",
+          "90.0d, 50.0d, 30.0d",
+  })
+  public void testCollisionWithMapBounds_xCoordinate(double angle, double distance, double expectedX) {
     Creature ent = getNewCreature();
     ent.setWidth(30);
     ent.setHeight(30);
@@ -229,26 +235,28 @@ public class CollisionResolvingTests {
 
     Game.physics().setBounds(new Rectangle2D.Double(0, 0, 50, 50));
     Game.physics().add(ent);
+    Game.physics().move(ent, angle, distance);
+    double actualX = ent.getX();
+    assertEquals(expectedX, actualX, EPSILON);
+  }
 
-    // move back 20 px to the left
-    Game.physics().move(ent, 270, 20);
+  @ParameterizedTest(name="testCollisionWithMapBounds_yCoordinate angle={0}, distance={1}, expectedY={2}")
+  @CsvSource({
+          "180.0d, 20.0d, -10.0d",
+          "0, 50.0d, 30.0d",
+  })
+  public void testCollisionWithMapBounds_yCoordinate(double angle, double distance, double expectedY) {
+    Creature ent = getNewCreature();
+    ent.setWidth(30);
+    ent.setHeight(30);
+    ent.setCollisionBoxAlign(Align.CENTER);
+    ent.setCollisionBoxValign(Valign.MIDDLE);
 
-    assertEquals(-10, ent.getX(), EPSILON);
-
-    // move back 20 px up
-    Game.physics().move(ent, 180, 20);
-
-    assertEquals(-10, ent.getY(), EPSILON);
-
-    // move back 50 px right
-    Game.physics().move(ent, 90, 50);
-
-    assertEquals(30, ent.getX(), EPSILON);
-
-    // move 50 px down
-    Game.physics().move(ent, 0, 50);
-
-    assertEquals(30, ent.getY(), EPSILON);
+    Game.physics().setBounds(new Rectangle2D.Double(0, 0, 50, 50));
+    Game.physics().add(ent);
+    Game.physics().move(ent, angle, distance);
+    double actualY = ent.getY();
+    assertEquals(expectedY, actualY, EPSILON);
   }
 
   private static Creature getNewCreature() {

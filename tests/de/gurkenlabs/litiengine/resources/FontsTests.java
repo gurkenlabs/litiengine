@@ -26,7 +26,7 @@ public class FontsTests {
     }
 
     @Test
-    public void get_SizeStyleZero() {
+    public void get_StyleZero() {
         // arrange
         Font testFont = new Font("test", Font.BOLD, 1);
         Fonts fonts = new Fonts();
@@ -38,6 +38,20 @@ public class FontsTests {
         // assert
         assertNotNull(result);
         assertEquals(Font.PLAIN, result.getStyle());
+    }
+
+    @Test
+    public void get_SizeZero() {
+        // arrange
+        Font testFont = new Font("test", Font.BOLD, 1);
+        Fonts fonts = new Fonts();
+        fonts.add("test", testFont);
+
+        // act
+        Font result = fonts.get("test", Font.PLAIN, 0f);
+
+        // assert
+        assertNotNull(result);
         assertEquals(0, result.getSize());
     }
 

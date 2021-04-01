@@ -24,7 +24,7 @@ class AbilityExecutionTest {
 
     @AfterEach
     void tearDown() {
-        GameTest.resetGame();
+        GameTest.terminateGame();
     }
 
     @Test

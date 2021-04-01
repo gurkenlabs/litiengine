@@ -37,7 +37,7 @@ public class AStarTests {
 
   @AfterAll
   public static void terminateGame() {
-    GameTest.resetGame();
+    GameTest.terminateGame();
   }
 
   @BeforeEach
