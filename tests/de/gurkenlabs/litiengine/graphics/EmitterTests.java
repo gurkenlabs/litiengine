@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.Color;
 import java.util.Arrays;
-
+import de.gurkenlabs.litiengine.graphics.emitters.xml.ParticleParameter;
 import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.litiengine.Align;
@@ -17,6 +17,9 @@ import de.gurkenlabs.litiengine.entities.EntityInfo;
 import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.Particle;
 import de.gurkenlabs.litiengine.util.ColorHelper;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class EmitterTests {
 
@@ -54,6 +57,28 @@ public class EmitterTests {
     testEmitter.data().setColors(colors);
 
     assertTrue(Arrays.asList(colors).contains(ColorHelper.decode(Game.random().choose(testEmitter.data().getColors()))));
+  }
+
+  @Test
+  public void testGetMin() {
+    ParticleParameter particleParameter = new ParticleParameter();
+    particleParameter.setMaxValue(1);
+    particleParameter.setMinValue(10);
+
+    double minValue = particleParameter.getMinValue();
+
+    assertEquals(minValue, particleParameter.get());
+  }
+
+  @Test
+  public void testGetMax() {
+    ParticleParameter particleParameter = new ParticleParameter();
+    particleParameter.setMaxValue(10);
+    particleParameter.setMinValue(1);
+
+    double minValue = particleParameter.getMinValue();
+
+    assertNotEquals(minValue, particleParameter.get());
   }
 
   @EmitterInfo(activateOnInit = false, duration = 2500, maxParticles = 500, originAlign = Align.CENTER, originValign = Valign.MIDDLE, particleMaxTTL = 1000, particleMinTTL = 100, particleUpdateRate = 10, requiredQuality = Quality.HIGH, spawnAmount = 15, spawnRate = 20)

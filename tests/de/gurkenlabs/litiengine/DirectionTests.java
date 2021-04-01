@@ -2,7 +2,12 @@ package de.gurkenlabs.litiengine;
 
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.MockedStatic;
+
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyDouble;
@@ -78,5 +83,26 @@ public class DirectionTests {
 
         // cleanup
         geomUtilsMockStatic.close();
+    }
+
+    @ParameterizedTest
+    @MethodSource("getOppositeParameters")
+    public void testGetOpposite(Direction initialDirection, Direction expectedOppositeDirection){
+        // act
+        Direction actualOpposite = initialDirection.getOpposite();
+
+        // assert
+        assertEquals(expectedOppositeDirection, actualOpposite);
+    }
+
+    private static Stream<Arguments> getOppositeParameters(){
+        // arrange
+        return Stream.of(
+                Arguments.of(Direction.LEFT, Direction.RIGHT),
+                Arguments.of(Direction.RIGHT, Direction.LEFT),
+                Arguments.of(Direction.UP, Direction.DOWN),
+                Arguments.of(Direction.DOWN, Direction.UP),
+                Arguments.of(Direction.UNDEFINED, Direction.UNDEFINED)
+        );
     }
 }

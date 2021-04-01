@@ -31,29 +31,97 @@ class AbilityTests {
   }
 
   @Test
-  void testGetRemainingCooldownInSeconds() {
-    Creature creature = mock(Creature.class);
-    TestAbility ability = new TestAbility(creature);
+  public void isOnCooldown_noCurrentExecution() {
+    // arrange
+    TestAbility ability = setupAbility();
+
+    ability.setCurrentExecution(null);
+
+    // act
+    boolean onCooldown = ability.isOnCooldown();
+
+    // assert
+    assertFalse(onCooldown);
+  }
+
+  @Test
+  public void isOnCooldown_currentExecutionOver() {
+    // arrange
+    TestAbility ability = setupAbility();
+
+    AbilityExecution abExec = mock(AbilityExecution.class);
+    when(abExec.getExecutionTicks()).thenReturn(0L);
+    ability.setCurrentExecution(abExec);
+
+    // act
+    boolean onCooldown = ability.isOnCooldown();
+
+    // assert
+    assertFalse(onCooldown);
+  }
+
+  @Test
+  public void isOnCooldown_cooldownOver() {
+    // arrange
+    TestAbility ability = setupAbility();
+
+    AbilityExecution abExec = mock(AbilityExecution.class);
+    when(abExec.getExecutionTicks()).thenReturn(Game.time().now() - (ability.getAttributes().cooldown().get() + 1));
+    ability.setCurrentExecution(abExec);
+
+    // act
+    boolean onCooldown = ability.isOnCooldown();
+
+    // assert
+    assertFalse(onCooldown);
+  }
+
+  @Test
+  public void isOnCooldown_stillOnCooldown() {
+    // arrange
+    TestAbility ability = setupAbility();
+
+    AbilityExecution abExec = mock(AbilityExecution.class);
+    when(abExec.getExecutionTicks()).thenReturn(1L);
+    ability.setCurrentExecution(abExec);
+
+    // act
+    boolean onCooldown = ability.isOnCooldown();
+
+    // assert
+    assertTrue(onCooldown);
+  }
+
+  @Test
+  void getRemainingCooldownInSeconds_NoCast() {
+    // arrange
+    TestAbility ability = setupAbility();
+
+    // act
     float actual = ability.getRemainingCooldownInSeconds();
+
+    // assert
     assertEquals(0, actual);
   }
 
   @Test
-  void testGetRemainingCooldownInSecondsNoCast() {
-    Creature creature = mock(Creature.class);
-    TestAbility ability = new TestAbility(creature);
-    float actual = ability.getRemainingCooldownInSeconds();
-    assertEquals(0, actual);
-  }
-
-  @Test
-  void testGetRemainingCooldownInSecondsCreatureIsDead() {
+  void getRemainingCooldownInSeconds_CreatureIsDead() {
+    // arrange
     Creature creature = mock(Creature.class);
     when(creature.isDead()).thenReturn(true);
     TestAbility ability = new TestAbility(creature);
     ability.cast();
+
+    // act
     float actual = ability.getRemainingCooldownInSeconds();
+
+    // assert
     assertEquals(0, actual);
+  }
+
+  private TestAbility setupAbility() {
+    Creature creature = mock(Creature.class);
+    return new TestAbility(creature);
   }
 
   @Test
