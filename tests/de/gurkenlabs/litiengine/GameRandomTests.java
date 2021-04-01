@@ -38,4 +38,19 @@ public class GameRandomTests {
         // act, assert
         assertEquals(41, result);
     }
+
+    @Test
+    public void chooseStringArray_ThrowsOnNull() {
+        // act, assert
+        assertThrows(IllegalArgumentException.class, () -> gameRandom.choose((String[]) null));
+    }
+
+    @Test
+    public void chooseStringArray_ThrowsOnEmpty() {
+        // arrange
+        final String[] arr = new String[] {};
+
+        // act, assert
+        assertThrows(IllegalArgumentException.class, () -> gameRandom.choose(arr));
+    }
 }

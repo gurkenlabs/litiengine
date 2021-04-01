@@ -111,7 +111,7 @@ public final class GameRandom extends java.util.Random {
    * 
    * @param array
    *          The array to choose from.
-   * @return A pseudo-random element from the array or 0 if the array is empty.
+   * @return A pseudo-random element from the array.
    * 
    * @throws IllegalArgumentException
    *           When the specified array is null or empty.
@@ -129,7 +129,7 @@ public final class GameRandom extends java.util.Random {
    * 
    * @param array
    *          The array to choose from.
-   * @return A pseudo-random element from the array or 0 if the array is empty.
+   * @return A pseudo-random element from the array.
    * 
    * @throws IllegalArgumentException
    *           When the specified array is null or empty.
@@ -147,7 +147,7 @@ public final class GameRandom extends java.util.Random {
    * 
    * @param array
    *          The array to choose from.
-   * @return A pseudo-random element from the array or 0 if the array is empty.
+   * @return A pseudo-random element from the array.
    * 
    * @throws IllegalArgumentException
    *           When the specified array is null or empty.
@@ -165,7 +165,7 @@ public final class GameRandom extends java.util.Random {
    * 
    * @param array
    *          The array to choose from.
-   * @return A pseudo-random element from the array or 0 if the array is empty.
+   * @return A pseudo-random element from the array.
    * 
    * @throws IllegalArgumentException
    *           When the specified array is null or empty.
