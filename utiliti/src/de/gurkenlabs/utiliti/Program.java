@@ -17,40 +17,54 @@ import de.gurkenlabs.utiliti.swing.UI;
 
 public class Program {
   public static void main(String[] args) {
-    // setup basic settings
-    Game.info().setName("utiLITI");
-    Game.info().setSubTitle("LITIENGINE Creation Kit");
-    Game.info().setVersion("v0.5.1-beta");
-    Resources.strings().setEncoding(StandardCharsets.UTF_8);
-
-    // hook up configuration and initialize the game
-    Game.config().add(Editor.preferences());
-
-    Game.config().load();
     SwingUtilities.invokeLater(() -> {
-      UI.initLookAndFeel();
-      Game.init(args);
-      forceBasicEditorConfiguration();
-      Game.world().camera().onZoom(event -> Editor.preferences().setZoom((float) event.getZoom()));
-
-      // the editor should never crash, even if an exception occurs
       Game.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(false));
+      try {
+        try {
+          // setup basic settings
+          Game.info().setName("utiLITI");
+          Game.info().setSubTitle("LITIENGINE Creation Kit");
+          Game.info().setVersion("v0.5.1-beta");
+          Resources.strings().setEncoding(StandardCharsets.UTF_8);
 
-      // prepare UI and start the game
-      UI.init();
-      Game.start();
+          // hook up configuration and initialize the game
+          Game.config().add(Editor.preferences());
 
-      // configure input settings
-      Input.mouse().setGrabMouse(false);
-      Input.keyboard().consumeAlt(true);
-
-      // load up previously opened project file or the one that is specified in
-      // the command line arguments
-      handleArgs(args);
-
-      String gameFile = Editor.preferences().getLastGameFile();
-      if (!Editor.instance().fileLoaded() && gameFile != null && !gameFile.isEmpty()) {
-        Editor.instance().load(new File(gameFile.trim()), false);
+          Game.config().load();
+          
+          UI.initLookAndFeel();
+          Game.init(args);
+          forceBasicEditorConfiguration();
+          Game.world().camera().onZoom(event -> Editor.preferences().setZoom((float) event.getZoom()));
+    
+          // prepare UI and start the game
+          UI.init();
+          Game.start();
+        }
+        catch(Throwable t) {
+          throw new UtiLITIInitializationError("UtiLITI failed to initialize, see the stacktrace below for more information", t);
+        }
+  
+        // configure input settings
+        Input.mouse().setGrabMouse(false);
+        Input.keyboard().consumeAlt(true);
+  
+        // load up previously opened project file or the one that is specified in
+        // the command line arguments
+        handleArgs(args);
+  
+        String gameFile = Editor.preferences().getLastGameFile();
+        if (!Editor.instance().fileLoaded() && gameFile != null && !gameFile.isEmpty()) {
+          Editor.instance().load(new File(gameFile.trim()), false);
+        }
+      }
+      catch(Error e) { //the editor SHOULD crash if an Error occurs, as long as the Error !instanceof ThreadDeath
+        if(e instanceof ThreadDeath) {
+          throw e;
+        }
+        DefaultUncaughtExceptionHandler exceptionHandler = (DefaultUncaughtExceptionHandler) Thread.getDefaultUncaughtExceptionHandler();
+        exceptionHandler.setExitOnException(true);
+        throw e;
       }
     });
   }
