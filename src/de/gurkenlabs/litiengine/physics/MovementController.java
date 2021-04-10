@@ -93,12 +93,11 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
       return;
     }
 
-    // max distance an entity can travel within one tick
-    final double maxPixelsPerTick = this.getEntity().getTickVelocity();
+
     final double deltaTime = Game.loop().getDeltaTime() * Game.loop().getTimeScale();
 
-    final double acceleration = this.getEntity().getAcceleration() == 0 ? maxPixelsPerTick : deltaTime / this.getEntity().getAcceleration() * maxPixelsPerTick;
-    final double deceleration = this.getEntity().getDeceleration() == 0 ? this.getVelocity() : deltaTime / this.getEntity().getDeceleration() * maxPixelsPerTick;
+    final double acceleration = this.getEntity().getAcceleration(deltaTime);
+    final double deceleration = this.getEntity().getDeceleration(deltaTime, getVelocity());
 
     double dx = this.getDx();
     double dy = this.getDy();
