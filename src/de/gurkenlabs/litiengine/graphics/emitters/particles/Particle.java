@@ -5,6 +5,8 @@ import java.awt.Graphics2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.ITimeToLive;
@@ -388,28 +390,36 @@ public abstract class Particle implements ITimeToLive {
       return;
     }
 
-    if (this.getDeltaWidth() != 0) {
-      this.width += this.getDeltaWidth() * updateRatio;
+    applyUpdateRatioToMember(this::getWidth, this::setWidth, this.getDeltaWidth(), updateRatio);
+    applyUpdateRatioToMember(this::getHeight, this::setHeight, this.getDeltaHeight(), updateRatio);
+    applyUpdateRatioToMember(this::getAngle, this::setAngle, this.getDeltaAngle(), updateRatio);
+
+    if(hasRayCastCollision(emitterOrigin, updateRatio)){
+      return;
     }
 
-    if (this.getDeltaHeight() != 0) {
-      this.height += this.getDeltaHeight() * updateRatio;
-    }
+    applyUpdateRatioToMember(this::getVelocityX, this::setVelocityX, this.getAccelerationX(), updateRatio);
+    applyUpdateRatioToMember(this::getVelocityY, this::setVelocityY, this.getAccelerationY(), updateRatio);
+  }
 
-    if (this.getDeltaAngle() != 0) {
-      this.angle += this.getDeltaAngle() * updateRatio;
-    }
-
-    // test for ray cast collision
+  /**
+   * Test for ray cast collisions
+   * @param emitterOrigin
+   *          The current {@link Emitter} origin
+   * @param updateRatio
+   *          The update ratio for this particle.
+   * @return True if ray cast collision occurs
+   */
+  protected boolean hasRayCastCollision(final Point2D emitterOrigin, final float updateRatio){
     final float targetX = this.x + this.getVelocityX() * updateRatio;
     final float targetY = this.y + this.getVelocityY() * updateRatio;
 
     if (targetX == this.x && targetY == this.y) {
-      return;
+      return true;
     }
 
     if (this.checkForCollision(emitterOrigin, targetX, targetY)) {
-      return;
+      return true;
     }
 
     if (this.getVelocityX() != 0) {
@@ -420,12 +430,19 @@ public abstract class Particle implements ITimeToLive {
       this.y = targetY;
     }
 
-    if (this.getAccelerationX() != 0) {
-      this.velocityX += this.getAccelerationX() * updateRatio;
-    }
+    return false;
+  }
 
-    if (this.getAccelerationY() != 0) {
-      this.velocityY += this.getAccelerationY() * updateRatio;
+  /**
+   * Updates the specified member considering the current delta value and update ratio.
+   * @param valueGetter Accessor to get the intended member
+   * @param valueSetter Accessor to set the intended member
+   * @param deltaValue Current delta value
+   * @param updateRatio Current update ratio
+   */
+  protected void applyUpdateRatioToMember(Supplier<Float> valueGetter, Consumer<Float> valueSetter, final float deltaValue, final float updateRatio){
+    if(deltaValue != 0){
+      valueSetter.accept(valueGetter.get() + (deltaValue * updateRatio));
     }
   }
 
