@@ -93,7 +93,6 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
       return;
     }
 
-
     final double deltaTime = Game.loop().getDeltaTime() * Game.loop().getTimeScale();
 
     final double acceleration = this.getEntity().getAcceleration(deltaTime);
