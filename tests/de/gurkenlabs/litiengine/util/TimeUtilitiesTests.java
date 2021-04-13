@@ -5,6 +5,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.litiengine.util.TimeUtilities.TimerFormat;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.util.stream.Stream;
 
 public class TimeUtilitiesTests {
 
@@ -29,18 +35,52 @@ public class TimeUtilitiesTests {
     assertEquals(1, days2);
   }
 
-  @Test
-  public void testToTimerFormat() {
-    // test hh:mm:ss
+  @ParameterizedTest(name = "testGetRemainingDays time={0} expectedRemainingDays={1}")
+  @CsvSource({
+          "3600123, 0",
+          "999991239, 11",
+          "-100000000, -1",
+          "0, 0"
+  })
+  public void testGetRemainingDays(long time, long expectedRemainingDays){
+    // act
+    long actualRemainingDays = TimeUtilities.getRemainingDays(time);
 
-    long ms = 3600123;
-    long ms2 = 3599123;
-    String timerHH_MM_SS = TimeUtilities.toTimerFormat(ms, TimerFormat.HH_MM_SS);
-    String timerHH_MM_SS_000 = TimeUtilities.toTimerFormat(ms, TimerFormat.HH_MM_SS_000);
-    String timerMM_SS_000 = TimeUtilities.toTimerFormat(ms2, TimerFormat.MM_SS_000);
+    // assert
+    assertEquals(expectedRemainingDays, actualRemainingDays);
+  }
 
-    assertEquals("01:00:00", timerHH_MM_SS);
-    assertEquals("01:00:00.123", timerHH_MM_SS_000);
-    assertEquals("59:59.123", timerMM_SS_000);
+  @ParameterizedTest(name = "testToTimerFormat duration={0} format={1} expectedTime={2}")
+  @MethodSource("getToTimerFormatArguments")
+  public void testToTimerFormat(long duration, TimerFormat format, String expectedTime){
+    // act
+    String actualTime = TimeUtilities.toTimerFormat(duration, format);
+
+    // assert
+    assertEquals(expectedTime, actualTime);
+  }
+
+  /**
+   * Used for @see{@link de.gurkenlabs.litiengine.util.TimeUtilities::testToTimerFormat}
+   * Suppression of unused warning is added because usage through MethodSource is not detected
+   * @return Input arguments for the unit test
+   */
+  @SuppressWarnings("unused")
+  private static Stream<Arguments> getToTimerFormatArguments(){
+    // arrange,
+    return Stream.of(
+            Arguments.of(3600123l, TimerFormat.HH_MM_SS, "01:00:00"),
+            Arguments.of(3600123l, TimerFormat.HH_MM_SS_000, "01:00:00.123"),
+            Arguments.of(3599123l, TimerFormat.MM_SS_000, "59:59.123"),
+            Arguments.of(3600123l, TimerFormat.HH_MM_SS_0, "01:00:00.1"),
+            Arguments.of(3599123l, TimerFormat.MM_SS_0, "59:59.1"),
+            Arguments.of(3599123l, TimerFormat.SS_000, "59.123"),
+            Arguments.of(3599123l, TimerFormat.S_000, "59.123"),
+            Arguments.of(3599123l, TimerFormat.SS_00, "59.12"),
+            Arguments.of(3599123l, TimerFormat.S_00, "59.12"),
+            Arguments.of(3599123l, TimerFormat.SS_0, "59.1"),
+            Arguments.of(3599123l, TimerFormat.S_0, "59.1"),
+            Arguments.of(3599123l, TimerFormat.UNDEFINED, "123")
+    );
   }
 }
