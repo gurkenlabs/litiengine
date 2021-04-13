@@ -21,6 +21,7 @@ import de.gurkenlabs.litiengine.GameTest;
 public class EntitySpawnerTests {
     private Environment testEnvironment;
     private Spawnpoint spawnPoint;
+    private Creature spawnedCreature;
     private EntitySpawner<Creature> spawner;
     final int spawnAmount = 10;
 
@@ -40,6 +41,7 @@ public class EntitySpawnerTests {
         testEnvironment = mock(Environment.class);
         spawnPoint = mock(Spawnpoint.class);
         spawner = new TestCreatureSpawner(spawnPoint, spawnAmount);
+        spawnedCreature = new Creature();
     }
 
     @Test
@@ -77,7 +79,7 @@ public class EntitySpawnerTests {
         spawner.spawnNewEntities();
 
         // assert
-        verify(spawnPoint, times(spawnAmount)).spawn(any(Creature.class));
+        verify(spawnPoint, times(spawnAmount)).spawn(spawnedCreature);
     }
 
     private class TestCreatureSpawner extends EntitySpawner<Creature> {
@@ -87,7 +89,7 @@ public class EntitySpawnerTests {
 
         @Override
         public Creature createNew() {
-            return new Creature();
+            return spawnedCreature;
         }
     }
 }
