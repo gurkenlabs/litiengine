@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.entities;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.mockito.Mockito.mock;
@@ -8,21 +9,27 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class EntityControllersTests {
-    @Test
-    public void detachAll_delegatesCorrectly() {
-        // arrange
-        final EntityControllers controllers = new EntityControllers();
-        final IEntityController controllerA = mock(EntityControllerDummyA.class);
-        final IEntityController controllerB = mock(EntityControllerDummyB.class);
+    private EntityControllers controllers;
+    private IEntityController controllerA;
+    private IEntityController controllerB;
+
+    @BeforeEach
+    public void setupWithTwoMockedControllers() {
+        controllers = new EntityControllers();
+        controllerA = mock(EntityControllerDummyA.class);
+        controllerB = mock(EntityControllerDummyB.class);
 
         final IEntity mockedEntity = mock(IEntity.class);
-        when(mockedEntity.isLoaded()).thenReturn(false); // skip attach because irrelevant for test scenario
+        when(mockedEntity.isLoaded()).thenReturn(false); // avoid prematurely calling attach()
         when(controllerA.getEntity()).thenReturn(mockedEntity);
         when(controllerB.getEntity()).thenReturn(mockedEntity);
 
         controllers.addController(controllerA);
         controllers.addController(controllerB);
+    }
 
+    @Test
+    public void detachAll_delegatesCorrectly() {
         // act
         controllers.detachAll();
 
@@ -33,19 +40,6 @@ public class EntityControllersTests {
 
     @Test
     public void attachAll_delegatesCorrectly() {
-        // arrange
-        final EntityControllers controllers = new EntityControllers();
-        final IEntityController controllerA = mock(EntityControllerDummyA.class);
-        final IEntityController controllerB = mock(EntityControllerDummyB.class);
-
-        final IEntity mockedEntity = mock(IEntity.class);
-        when(mockedEntity.isLoaded()).thenReturn(false); // avoid prematurely calling attach()
-        when(controllerA.getEntity()).thenReturn(mockedEntity);
-        when(controllerB.getEntity()).thenReturn(mockedEntity);
-
-        controllers.addController(controllerA);
-        controllers.addController(controllerB);
-
         // act
         controllers.attachAll();
 
