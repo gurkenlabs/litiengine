@@ -68,7 +68,7 @@ public class Creature extends CombatEntity implements IMobileEntity {
       this.acceleration = movementInfo.acceleration();
       this.deceleration = movementInfo.deceleration();
       this.setTurnOnMove(movementInfo.turnOnMove());
-      this.addController(this.createMovementController());
+      this.addController(new MovementController<>(this));
     }
 
     if (spritesheetName != null) {
@@ -241,19 +241,11 @@ public class Creature extends CombatEntity implements IMobileEntity {
   }
 
   protected void updateAnimationController() {
-    IEntityAnimationController<?> controller = this.createAnimationController();
+    IEntityAnimationController<?> controller = new CreatureAnimationController<>(this, true);
     this.getControllers().addController(controller);
     if (Game.world().environment() != null && Game.world().environment().isLoaded()) {
       Game.loop().attach(controller);
     }
-  }
-
-  protected IEntityAnimationController<?> createAnimationController() {
-    return new CreatureAnimationController<>(this, true);
-  }
-
-  protected IMovementController createMovementController() {
-    return new MovementController<>(this);
   }
 
   private void fireMovedEvent(EntityMovedEvent event) {
