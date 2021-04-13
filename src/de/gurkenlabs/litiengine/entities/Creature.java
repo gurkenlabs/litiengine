@@ -90,21 +90,17 @@ public class Creature extends CombatEntity implements IMobileEntity {
 
   @Override
   public float[] getTweenValues(TweenType tweenType) {
-    switch (tweenType) {
-    case VELOCITY:
-      return new float[] { this.getVelocity().get() };
-    default:
-      return super.getTweenValues(tweenType);
+    if (tweenType == TweenType.VELOCITY) {
+      return new float[]{this.getVelocity().get()};
     }
+    return super.getTweenValues(tweenType);
   }
 
   @Override
   public void setTweenValues(TweenType tweenType, float[] newValues) {
-    switch (tweenType) {
-    case VELOCITY:
+    if (tweenType == TweenType.VELOCITY) {
       this.getVelocity().setBaseValue(newValues[0]);
-      break;
-    default:
+    } else {
       super.setTweenValues(tweenType, newValues);
     }
   }
