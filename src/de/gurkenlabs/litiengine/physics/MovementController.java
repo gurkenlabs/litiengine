@@ -165,46 +165,54 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
 
   private void handleForces() {
     // clean up forces
-    this.activeForces.forEach(x -> {
-      if (x.hasEnded()) {
-        this.activeForces.remove(x);
-      }
-    });
-
     if (this.activeForces.isEmpty()) {
       return;
     }
+    this.activeForces.stream().filter(Force::hasEnded).forEach(this.activeForces::remove);
 
-    // disable turn-on-move for force handling
+    // ensure turn-on-move is disabled for force handling
     boolean turn = this.getEntity().turnOnMove();
     this.getEntity().setTurnOnMove(false);
     try {
-      double deltaX = 0;
-      double deltaY = 0;
-      for (final Force force : this.activeForces) {
-        if (force.cancelOnReached() && force.hasReached(this.getEntity())) {
-          force.end();
-          continue;
-        }
-
-        final Point2D collisionBoxCenter = this.getEntity().getCollisionBoxCenter();
-        final double angle = GeometricUtilities.calcRotationAngleInDegrees(collisionBoxCenter, force.getLocation());
-        final double strength = Game.loop().getDeltaTime() * 0.001f * force.getStrength() * Game.loop().getTimeScale();
-        deltaX += GeometricUtilities.getDeltaX(angle, strength);
-        deltaY += GeometricUtilities.getDeltaY(angle, strength);
-      }
-
-      final Point2D target = new Point2D.Double(this.getEntity().getX() + deltaX, this.getEntity().getY() + deltaY);
-      final boolean success = Game.physics().move(this.getEntity(), target);
-      if (!success) {
-        for (final Force force : this.activeForces) {
-          if (force.cancelOnCollision()) {
-            force.end();
-          }
-        }
-      }
+      this.moveEntityByActiveForces();
     } finally {
       this.getEntity().setTurnOnMove(turn);
     }
+  }
+
+  private void moveEntityByActiveForces() {
+    final Point2D combinedForcesVector = this.combineActiveForces();
+    final Point2D target = new Point2D.Double(
+            this.getEntity().getX() + combinedForcesVector.getX(),
+            this.getEntity().getY() + combinedForcesVector.getY()
+    );
+
+    final boolean success = Game.physics().move(this.getEntity(), target);
+    if (!success) {
+      for (final Force force : this.activeForces) {
+        if (force.cancelOnCollision()) {
+          force.end();
+        }
+      }
+    }
+  }
+
+  private Point2D combineActiveForces() {
+    double deltaX = 0;
+    double deltaY = 0;
+    for (final Force force : this.activeForces) {
+      if (force.cancelOnReached() && force.hasReached(this.getEntity())) {
+        force.end();
+        continue;
+      }
+
+      final Point2D collisionBoxCenter = this.getEntity().getCollisionBoxCenter();
+      final double angle = GeometricUtilities.calcRotationAngleInDegrees(collisionBoxCenter, force.getLocation());
+      final double strength = Game.loop().getDeltaTime() * 0.001f * force.getStrength() * Game.loop().getTimeScale();
+      deltaX += GeometricUtilities.getDeltaX(angle, strength);
+      deltaY += GeometricUtilities.getDeltaY(angle, strength);
+    }
+
+    return new Point2D.Double(deltaX, deltaY);
   }
 }
