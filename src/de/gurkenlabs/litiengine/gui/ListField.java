@@ -600,17 +600,17 @@ public class ListField extends GuiComponent {
 
   private void selectComponent() {
     if (!this.isEntireRowSelected() &&
-            this.selectionColumn >= this.getHorizontalLowerBound() &&
-            this.selectionColumn < this.getHorizontalLowerBound() + this.getNumberOfShownColumns() &&
-            this.selectionRow >= this.getVerticalLowerBound() &&
-            this.selectionRow < this.getVerticalLowerBound() + this.getNumberOfShownRows()) {
-      this.selectedComponent = this.getListEntry(this.selectionColumn - this.getHorizontalLowerBound()).get(this.selectionRow - this.getVerticalLowerBound());
+            this.getSelectionColumn() >= this.getHorizontalLowerBound() &&
+            this.getSelectionColumn() < this.getHorizontalLowerBound() + this.getNumberOfShownColumns() &&
+            this.getSelectionRow() >= this.getVerticalLowerBound() &&
+            this.getSelectionRow() < this.getVerticalLowerBound() + this.getNumberOfShownRows()) {
+      this.selectedComponent = this.getListEntry(this.getSelectionColumn() - this.getHorizontalLowerBound(), this.getSelectionRow() - this.getVerticalLowerBound());
     } else if (this.isEntireRowSelected() &&
-            this.selectionColumn >= 0 &&
-            this.selectionColumn < this.nbOfColumns &&
-            this.selectionRow >= this.getVerticalLowerBound() &&
-            this.selectionRow < this.getVerticalLowerBound() + this.getNumberOfShownRows()) {
-      this.selectedComponent = this.getListEntry(0).get(this.selectionRow - this.getVerticalLowerBound());
+            this.getSelectionColumn() >= 0 &&
+            this.getSelectionColumn() < this.nbOfColumns &&
+            this.getSelectionRow() >= this.getVerticalLowerBound() &&
+            this.getSelectionRow() < this.getVerticalLowerBound() + this.getNumberOfShownRows()) {
+      this.selectedComponent = this.getListEntry(0, this.getSelectionRow() - this.getVerticalLowerBound());
     } else {
       this.selectedComponent = null;
     }
