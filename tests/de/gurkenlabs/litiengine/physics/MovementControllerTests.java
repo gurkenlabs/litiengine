@@ -1,30 +1,45 @@
 package de.gurkenlabs.litiengine.physics;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.GameLoop;
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
+import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
+import java.awt.geom.Point2D;
+import java.util.Arrays;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyDouble;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class MovementControllerTests {
 
-    private MovementController controller;
+    private MovementController<IMobileEntity> controller;
     private IMobileEntity mobileEntity;
 
     @BeforeEach
     public void setUp(){
-        // arrange
         Game.init(Game.COMMADLINE_ARG_NOGUI);
-        mobileEntity = new Creature();
+        IMobileEntity actualEntity = new Creature();
+        mobileEntity = spy(actualEntity);
         mobileEntity.setDeceleration(20);
         mobileEntity.setAcceleration(42);
         mobileEntity.setVelocity(39);
-        controller = new MovementController(mobileEntity);
+        controller = new MovementController<>(mobileEntity);
     }
 
     @Test
@@ -63,7 +78,7 @@ public class MovementControllerTests {
         try(MockedStatic<Game> gameMockedStatic = mockStatic(Game.class)){
             IGameLoop mockGameLoop = mock(IGameLoop.class);
             PhysicsEngine physicsEngine = new PhysicsEngine();
-            when(mockGameLoop.getDeltaTime()).thenReturn(10l);
+            when(mockGameLoop.getDeltaTime()).thenReturn(10L);
             when(mockGameLoop.getTimeScale()).thenReturn(2f);
 
             gameMockedStatic.when(Game::loop).thenReturn(mockGameLoop);
@@ -78,5 +93,67 @@ public class MovementControllerTests {
             // assert
             assertEquals(0.764400030374527, controller.getVelocity());
         }
+    }
+
+    @Test
+    public void handleForces_disablesAndResetsTurnOnMove() {
+        // arrange
+        mobileEntity.setTurnOnMove(true);
+        assertTrue(mobileEntity.turnOnMove());
+        ArgumentCaptor<Boolean> turnOnMoveCaptor = ArgumentCaptor.forClass(Boolean.class);
+
+        Force activeForce = spy(new Force(new Point2D.Double(0, 0), 1, 1));
+        controller.apply(activeForce);
+        assertEquals(1, controller.getActiveForces().size());
+
+        // act
+        controller.update();
+
+        // assert
+        verify(mobileEntity, times(3)).setTurnOnMove(turnOnMoveCaptor.capture());
+        List<Boolean> turnOnMoveCallArguments = turnOnMoveCaptor.getAllValues();
+        assertEquals(Arrays.asList(true, false, true), turnOnMoveCallArguments); // first "true" for setup
+
+        assertTrue(mobileEntity.turnOnMove());
+    }
+
+    @Test
+    public void moveEntityByActiveForces_movesEntityToCorrectTarget() {
+        // arrange
+        // Game environment
+        PhysicsEngine physicsEngineMock = mock(PhysicsEngine.class);
+        when(physicsEngineMock.move(any(IMobileEntity.class), any(Point2D.class))).thenReturn(true);
+
+        GameLoop loopMock = mock(GameLoop.class);
+
+        MockedStatic<Game> gameMockedStatic = mockStatic(Game.class);
+        gameMockedStatic.when(Game::physics).thenReturn(physicsEngineMock);
+        gameMockedStatic.when(Game::loop).thenReturn(loopMock);
+
+        // private method return: combineActiveForces()
+        MockedStatic<GeometricUtilities> geomUtilsMockedStatic = mockStatic(GeometricUtilities.class);
+        when(GeometricUtilities.getDeltaX(anyDouble(), anyDouble())).thenReturn(4d);
+        when(GeometricUtilities.getDeltaY(anyDouble(), anyDouble())).thenReturn(3d);
+
+        // test-entity properties
+        Force activeForce = spy(new Force(new Point2D.Double(0, 0), 1, 1));
+        controller.apply(activeForce);
+        assertEquals(1, controller.getActiveForces().size());
+
+        when(mobileEntity.getX()).thenReturn(1d);
+        when(mobileEntity.getY()).thenReturn(2d);
+
+        Point2D targetPoint = new Point2D.Double(5, 5);
+
+        // act
+        controller.update();
+
+        // assert
+        verify(physicsEngineMock, times(1)).move(mobileEntity, targetPoint);
+        verify(activeForce, times(0)).end();
+
+        // cleanup
+        gameMockedStatic.close();
+        geomUtilsMockedStatic.close();
     }
 }
