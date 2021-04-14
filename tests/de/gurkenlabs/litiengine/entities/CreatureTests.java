@@ -69,7 +69,7 @@ public class CreatureTests {
   })
   public void testAcceleration(int initialAcceleration, double expectedAcceleration){
     // arrange
-    IMobileEntity mobileEntitySpy = spy(new TestMobileEntity());
+    IMobileEntity mobileEntitySpy = spy(creature);
     when(mobileEntitySpy.getTickVelocity()).thenReturn(50f);
     mobileEntitySpy.setAcceleration(initialAcceleration);
 
@@ -87,7 +87,7 @@ public class CreatureTests {
   })
   public void testDeceleration(int initialDeceleration, double expectedDeceleration){
     // arrange
-    IMobileEntity mobileEntitySpy = spy(new TestMobileEntity());
+    IMobileEntity mobileEntitySpy = spy(creature);
     when(mobileEntitySpy.getTickVelocity()).thenReturn(50f);
     mobileEntitySpy.setDeceleration(initialDeceleration);
 
