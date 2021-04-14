@@ -480,7 +480,6 @@ public class ListField extends GuiComponent {
         } else {
           this.slideDown();
         }
-        return;
       }
     });
   }
@@ -489,7 +488,7 @@ public class ListField extends GuiComponent {
     final double columnWidth = this.getWidth() / this.getNumberOfShownColumns();
     final double rowHeight = this.getHeight() / this.getNumberOfShownRows();
     for (int column = 0; column < this.getNumberOfShownColumns(); column++) {
-      this.listEntries.add(new CopyOnWriteArrayList<ImageComponent>());
+      this.listEntries.add(new CopyOnWriteArrayList<>());
       for (int row = 0; row < this.getNumberOfShownRows(); row++) {
         if (this.getContent()[column].length <= row) {
           continue;
