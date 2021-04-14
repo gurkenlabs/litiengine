@@ -156,4 +156,40 @@ public class MovementControllerTests {
         gameMockedStatic.close();
         geomUtilsMockedStatic.close();
     }
+
+    @Test
+    public void moveEntityByActiveForces_endsForcesOnFailure() {
+        // arrange
+        // Game environment
+        PhysicsEngine physicsEngineMock = mock(PhysicsEngine.class);
+        when(physicsEngineMock.move(any(IMobileEntity.class), any(Point2D.class))).thenReturn(false);
+
+        GameLoop loopMock = mock(GameLoop.class);
+
+        MockedStatic<Game> gameMockedStatic = mockStatic(Game.class);
+        gameMockedStatic.when(Game::physics).thenReturn(physicsEngineMock);
+        gameMockedStatic.when(Game::loop).thenReturn(loopMock);
+
+        // private method combineActiveForces()
+        MockedStatic<GeometricUtilities> geomUtilsMockedStatic = mockStatic(GeometricUtilities.class);
+
+        // test-entity properties
+        Force forcePenetrateOnCollision = spy(new Force(new Point2D.Double(0, 0), 3, 1));
+        forcePenetrateOnCollision.setCancelOnCollision(false);
+        Force forceCancelOnCollision = spy(new Force(new Point2D.Double(0, 0), 1, 1));
+        controller.apply(forcePenetrateOnCollision);
+        controller.apply(forceCancelOnCollision);
+        assertEquals(2, controller.getActiveForces().size());
+
+        // act
+        controller.update();
+
+        // assert
+        verify(forcePenetrateOnCollision, times(0)).end();
+        verify(forceCancelOnCollision, times(1)).end();
+
+        // cleanup
+        gameMockedStatic.close();
+        geomUtilsMockedStatic.close();
+    }
 }
