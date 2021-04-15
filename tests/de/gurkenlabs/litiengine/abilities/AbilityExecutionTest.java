@@ -2,23 +2,31 @@ package de.gurkenlabs.litiengine.abilities;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameTest;
+import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.abilities.effects.Effect;
 import de.gurkenlabs.litiengine.abilities.effects.EffectTarget;
 import de.gurkenlabs.litiengine.entities.Creature;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 
+import java.awt.Shape;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 class AbilityExecutionTest {
 
     private TestAbility testAbility;
-    private TestEffect testEffect;
+    private TestEffect testEffectSpy;
 
     @BeforeEach
     public void setup() {
@@ -26,8 +34,8 @@ class AbilityExecutionTest {
 
         Creature testCreature = new Creature();
         testAbility = new TestAbility(testCreature);
-        testEffect = new TestEffect(testAbility);
-        testAbility.addEffect(testEffect);
+        testEffectSpy = spy(new TestEffect(testAbility));
+        testAbility.addEffect(testEffectSpy);
     }
 
     @AfterEach
@@ -49,53 +57,68 @@ class AbilityExecutionTest {
     }
 
     @Test
-    void update() {
+    void update_noAppliedEffect() {
         // arrange
         AbilityExecution testAbilityExecution = new AbilityExecution(testAbility);
 
         assertEquals(3, Game.loop().getUpdatableCount());
-        assertFalse(testAbilityExecution.getAppliedEffects().contains(testEffect));
+        assertFalse(testAbilityExecution.getAppliedEffects().contains(testEffectSpy));
 
         // act
         testAbilityExecution.update();
 
         // assert
         assertEquals(4, Game.loop().getUpdatableCount());
-        assertTrue(testAbilityExecution.getAppliedEffects().contains(testEffect));
+        assertTrue(testAbilityExecution.getAppliedEffects().contains(testEffectSpy));
+        verify(testEffectSpy, times(1)).apply(any(Shape.class));
     }
 
     @Test
-    void updateWithAlreadyAppliedEffects() {
+    void update_alreadyAppliedEffect() {
         // arrange
-        TestEffect testOtherEffect = new TestEffect(testAbility);
-        testAbility.addEffect(testOtherEffect);
+        TestEffect testOtherEffectSpy = spy(new TestEffect(testAbility));
+        testAbility.addEffect(testOtherEffectSpy);
 
         AbilityExecution testAbilityExecution = new AbilityExecution(testAbility);
-        testAbilityExecution.getAppliedEffects().add(testEffect);
+        testAbilityExecution.getAppliedEffects().add(testEffectSpy);
 
         assertEquals(3, Game.loop().getUpdatableCount());
-        assertTrue(testAbilityExecution.getAppliedEffects().contains(testEffect));
+        assertTrue(testAbilityExecution.getAppliedEffects().contains(testEffectSpy));
 
         // act
         testAbilityExecution.update();
 
         // assert
         assertEquals(4, Game.loop().getUpdatableCount());
-        assertTrue(testAbilityExecution.getAppliedEffects().contains(testEffect));
+        assertTrue(testAbilityExecution.getAppliedEffects().contains(testEffectSpy));
+        verify(testEffectSpy, times(0)).apply(any(Shape.class));
+        verify(testOtherEffectSpy, times(1)).apply(any(Shape.class));
     }
 
     @Test
-    void updateWithNoEffects() {
+    void update_noEffects() {
+        // arrange
         Creature testCreature = new Creature();
         TestAbility testAbility = new TestAbility(testCreature); // make ability without any effects
+
+        IGameLoop loopSpy = spy(Game.loop());
+        MockedStatic<Game> gameMockedStatic = mockStatic(Game.class);
+        gameMockedStatic.when(Game::time).thenCallRealMethod(); // otherwise Game.time() returns null because of the mock
+        gameMockedStatic.when(Game::loop).thenReturn(loopSpy);
+
         AbilityExecution testAbilityExecution = new AbilityExecution(testAbility);
         assertEquals(3, Game.loop().getUpdatableCount());
+        assertTrue(testAbilityExecution.getAppliedEffects().isEmpty());
 
         // act
         testAbilityExecution.update();
 
         // assert
         assertEquals(2, Game.loop().getUpdatableCount());
+        verify(loopSpy, times(1)).detach(testAbilityExecution);
+
+        // cleanup
+        gameMockedStatic.close();
     }
 
     private class TestAbility extends Ability {
