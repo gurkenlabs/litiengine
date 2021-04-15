@@ -137,9 +137,9 @@ public class LightSource extends Entity implements IRenderable {
   }
 
   @Override
-  public void render(final Graphics2D g) {
+  public void render(final Graphics2D graphic) {
     if (Game.config().graphics().renderDynamicShadows()) {
-      this.renderShadows(g);
+      this.renderShadows(graphic);
     }
   }
 
@@ -151,8 +151,8 @@ public class LightSource extends Entity implements IRenderable {
     this.focusOffsetY = focusOffsetY;
   }
 
-  public void setColor(final Color result) {
-    this.color = result;
+  public void setColor(final Color color) {
+    this.color = color;
     this.updateAmbientLayers();
   }
 
@@ -325,12 +325,10 @@ public class LightSource extends Entity implements IRenderable {
    *     render with RadialGradientPaint to give it a "fade-out" appearance
    * </pre>
    *
-   * @param g
+   * @param graphic
    *          the graphics to use for rendering
-   * @param center
-   *          the center
    */
-  private void renderShadows(final Graphics2D g) {
+  private void renderShadows(final Graphics2D graphic) {
     if (!Game.world().environment().getCombatEntities().stream().anyMatch(isInRange(this.getCenter(), SHADOW_GRADIENT_SIZE))) {
       return;
     }
@@ -339,8 +337,8 @@ public class LightSource extends Entity implements IRenderable {
     final Paint gradientPaint = new RadialGradientPaint(Game.world().camera().getViewportDimensionCenter(this), SHADOW_GRADIENT_SIZE, SHADOW_GRADIENT_FRACTIONS, SHADOW_GRADIENT_COLORS);
 
     // old Paint object for resetting it later
-    final Paint oldPaint = g.getPaint();
-    g.setPaint(gradientPaint);
+    final Paint oldPaint = graphic.getPaint();
+    graphic.setPaint(gradientPaint);
 
     // for each entity
     for (final ICombatEntity mob : Game.world().environment().getCombatEntities()) {
@@ -351,11 +349,11 @@ public class LightSource extends Entity implements IRenderable {
       final Shape obstructedVision = getObstructedVisionArea(mob, Game.world().camera().getViewportDimensionCenter(this));
       // fill the polygon with the gradient paint
 
-      ShapeRenderer.render(g, obstructedVision);
+      ShapeRenderer.render(graphic, obstructedVision);
     }
 
     // reset to old Paint object
-    g.setPaint(oldPaint);
+    graphic.setPaint(oldPaint);
   }
 
   private void setRadius(final int radius) {
