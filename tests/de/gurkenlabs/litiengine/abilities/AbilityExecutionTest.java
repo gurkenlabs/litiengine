@@ -17,9 +17,17 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class AbilityExecutionTest {
 
+    private TestAbility testAbility;
+    private TestEffect testEffect;
+
     @BeforeEach
     public void setup() {
         Game.init(Game.COMMADLINE_ARG_NOGUI);
+
+        Creature testCreature = new Creature();
+        testAbility = new TestAbility(testCreature);
+        testEffect = new TestEffect(testAbility);
+        testAbility.addEffect(testEffect);
     }
 
     @AfterEach
@@ -28,13 +36,11 @@ class AbilityExecutionTest {
     }
 
     @Test
-    void initAbilityExecution() {
-        Creature testCreature = new Creature();
-        TestAbility testAbility = new TestAbility(testCreature);
-        TestEffect testEffect = new TestEffect(testAbility);
-        testAbility.addEffect(testEffect);
+    void testAbilityExecutionInitialization() {
+        // act
         AbilityExecution testAbilityExecution = new AbilityExecution(testAbility);
 
+        // assert
         assertTrue(testAbilityExecution.getAppliedEffects().isEmpty());
         assertEquals(testAbility, testAbilityExecution.getAbility());
         assertEquals(0L, testAbilityExecution.getExecutionTicks());
@@ -44,29 +50,23 @@ class AbilityExecutionTest {
 
     @Test
     void update() {
-        Creature testCreature = new Creature();
-        TestAbility testAbility = new TestAbility(testCreature);
-        TestEffect testEffect = new TestEffect(testAbility);
-        testAbility.addEffect(testEffect);
-
+        // arrange
         AbilityExecution testAbilityExecution = new AbilityExecution(testAbility);
 
         assertEquals(3, Game.loop().getUpdatableCount());
         assertFalse(testAbilityExecution.getAppliedEffects().contains(testEffect));
 
+        // act
         testAbilityExecution.update();
 
+        // assert
         assertEquals(4, Game.loop().getUpdatableCount());
         assertTrue(testAbilityExecution.getAppliedEffects().contains(testEffect));
     }
 
     @Test
     void updateWithAlreadyAppliedEffects() {
-        Creature testCreature = new Creature();
-        TestAbility testAbility = new TestAbility(testCreature);
-        TestEffect testEffect = new TestEffect(testAbility);
-        testAbility.addEffect(testEffect);
-
+        // arrange
         TestEffect testOtherEffect = new TestEffect(testAbility);
         testAbility.addEffect(testOtherEffect);
 
@@ -76,8 +76,10 @@ class AbilityExecutionTest {
         assertEquals(3, Game.loop().getUpdatableCount());
         assertTrue(testAbilityExecution.getAppliedEffects().contains(testEffect));
 
+        // act
         testAbilityExecution.update();
 
+        // assert
         assertEquals(4, Game.loop().getUpdatableCount());
         assertTrue(testAbilityExecution.getAppliedEffects().contains(testEffect));
     }
@@ -85,13 +87,14 @@ class AbilityExecutionTest {
     @Test
     void updateWithNoEffects() {
         Creature testCreature = new Creature();
-        TestAbility testAbility = new TestAbility(testCreature);
+        TestAbility testAbility = new TestAbility(testCreature); // make ability without any effects
         AbilityExecution testAbilityExecution = new AbilityExecution(testAbility);
-
         assertEquals(3, Game.loop().getUpdatableCount());
 
+        // act
         testAbilityExecution.update();
 
+        // assert
         assertEquals(2, Game.loop().getUpdatableCount());
     }
 
