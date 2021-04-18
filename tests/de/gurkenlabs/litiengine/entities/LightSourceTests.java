@@ -223,6 +223,63 @@ public class LightSourceTests {
     }
 
     @Test
+    public void updateAmbientLayers_doesNothingWithoutGameEnvironment() {
+        // arrange
+        when(lightSourceInactiveSpy.isLoaded()).thenReturn(true);
+
+        GameWorld actualWorld = spy(Game.world());
+        MockedStatic<Game> gameMockedStatic = mockStatic(Game.class);
+        gameMockedStatic.when(Game::world).thenReturn(actualWorld); // otherwise it is null because of the mock
+        Environment environmentMock = mock(Environment.class);
+        when(actualWorld.environment()).thenReturn(null);
+
+        AmbientLight ambientLightMock = mock(AmbientLight.class);
+        when(environmentMock.getAmbientLight()).thenReturn(ambientLightMock);
+        StaticShadowLayer staticShadowLayerMock = mock(StaticShadowLayer.class);
+        when(environmentMock.getStaticShadowLayer()).thenReturn(staticShadowLayerMock);
+
+        // act
+        lightSourceInactiveSpy.setColor(Color.GREEN); // means to trigger private method within
+
+        // assert
+        verify(lightSourceInactiveSpy, times(1)).isLoaded(); // entry point of private method updateAmbientLayers()
+        verify(actualWorld, times(2)).environment();
+        verify(ambientLightMock, times(0)).updateSection(any(Rectangle2D.class));
+        verify(staticShadowLayerMock, times(0)).updateSection(any(Rectangle2D.class));
+
+        // cleanup
+        gameMockedStatic.close();
+    }
+
+    @Test
+    public void updateAmbientLayers_doesNothingWithoutLayers() {
+        // arrange
+        when(lightSourceInactiveSpy.isLoaded()).thenReturn(true);
+
+        GameWorld actualWorld = spy(Game.world());
+        MockedStatic<Game> gameMockedStatic = mockStatic(Game.class);
+        gameMockedStatic.when(Game::world).thenReturn(actualWorld); // otherwise it is null because of the mock
+        Environment environmentMock = mock(Environment.class);
+        when(actualWorld.environment()).thenReturn(environmentMock);
+
+        AmbientLight ambientLightMock = mock(AmbientLight.class);
+        when(environmentMock.getAmbientLight()).thenReturn(null);
+        StaticShadowLayer staticShadowLayerMock = mock(StaticShadowLayer.class);
+        when(environmentMock.getStaticShadowLayer()).thenReturn(null);
+
+        // act
+        lightSourceInactiveSpy.setColor(Color.GREEN); // means to trigger private method within
+
+        // assert
+        verify(lightSourceInactiveSpy, times(1)).isLoaded(); // entry point of private method updateAmbientLayers()
+        verify(ambientLightMock, times(0)).updateSection(any(Rectangle2D.class));
+        verify(staticShadowLayerMock, times(0)).updateSection(any(Rectangle2D.class));
+
+        // cleanup
+        gameMockedStatic.close();
+    }
+
+    @Test
     public void toggle_togglesActivatedAndUpdates() {
         // arrange
         assertFalse(lightSourceInactiveSpy.isActive());
