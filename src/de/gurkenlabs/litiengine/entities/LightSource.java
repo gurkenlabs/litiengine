@@ -371,16 +371,10 @@ public class LightSource extends Entity implements IRenderable {
   }
 
   private void updateShape() {
-    switch (this.getLightShapeType()) {
-    case ELLIPSE:
-      this.lightShape = new Ellipse2D.Double(this.getX(), this.getY(), this.getWidth(), this.getHeight());
-      break;
-    case RECTANGLE:
+    if (this.getLightShapeType() == Type.RECTANGLE) {
       this.lightShape = new Rectangle2D.Double(this.getX(), this.getY(), this.getWidth(), this.getHeight());
-      break;
-    default:
+    } else {
       this.lightShape = new Ellipse2D.Double(this.getX(), this.getY(), this.getWidth(), this.getHeight());
-      break;
     }
   }
 }

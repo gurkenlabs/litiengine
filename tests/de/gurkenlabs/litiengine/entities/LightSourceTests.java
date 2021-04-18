@@ -13,6 +13,7 @@ import org.mockito.MockedStatic;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
@@ -41,7 +42,7 @@ public class LightSourceTests {
     }
 
 
-    // FUNCTIONALITY
+    // BEHAVIOR
 
 
     @Test
@@ -262,6 +263,38 @@ public class LightSourceTests {
         // act, assert
         assertEquals("true", lightSourceInactiveSpy.sendMessage(lightSourceInactiveSpy, LightSource.TOGGLE_MESSAGE));
         verify(lightSourceInactiveSpy, times(1)).toggle();
+    }
+
+    @Test
+    public void updateShape_updatesRectangularShape() {
+        // arrange
+        Point2D newShapeLocation = new Point2D.Double(42, 42);
+        Rectangle2D newShape = new Rectangle2D.Double(newShapeLocation.getX(), newShapeLocation.getY(), 32, 32); // 32 is default
+
+        lightSourceInactiveSpy.setLightShapeType(LightSource.Type.RECTANGLE);
+        assertEquals(LightSource.Type.RECTANGLE, lightSourceInactiveSpy.getLightShapeType());
+
+        // act
+        lightSourceInactiveSpy.setLocation(newShapeLocation); // means to trigger private method within
+
+        // assert
+        assertEquals(newShape, lightSourceInactiveSpy.getLightShape());
+    }
+
+    @Test
+    public void updateShape_updatesEllipticalShape() {
+        // arrange
+        Point2D newShapeLocation = new Point2D.Double(42, 42);
+        Ellipse2D newShape = new Ellipse2D.Double(newShapeLocation.getX(), newShapeLocation.getY(), 32, 32); // 32 is default
+
+        lightSourceInactiveSpy.setLightShapeType(LightSource.Type.ELLIPSE);
+        assertEquals(LightSource.Type.ELLIPSE, lightSourceInactiveSpy.getLightShapeType());
+
+        // act
+        lightSourceInactiveSpy.setLocation(newShapeLocation); // means to trigger private method within
+
+        // assert
+        assertEquals(newShape, lightSourceInactiveSpy.getLightShape());
     }
 
 
