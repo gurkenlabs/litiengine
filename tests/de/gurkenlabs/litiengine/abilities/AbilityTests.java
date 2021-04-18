@@ -501,4 +501,20 @@ class AbilityTests {
     assertEquals(0, a.getCurrentExecution().getExecutionTicks());
     assertTrue(a.canCast());
   }
+
+  @Test
+  public void testOnEffectApplied(){
+    final Effect.EffectAppliedListener listener;
+    final Effect effect;
+    Ability ability = new TestAbility(new Creature());
+    listener = mock(Effect.EffectAppliedListener.class);
+    effect = mock(Effect.class);
+    when(effect.getDelay()).thenReturn(22);
+    ability.addEffect(effect);
+    ability.onEffectApplied(listener);
+
+    verify(listener, times(0)).applied(any());
+
+  }
+
 }
