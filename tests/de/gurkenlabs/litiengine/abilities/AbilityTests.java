@@ -504,12 +504,11 @@ class AbilityTests {
 
   @Test
   public void testOnEffectApplied(){
-    final Effect.EffectAppliedListener listener;
-    final Effect effect;
+    Effect.EffectAppliedListener listener;
+    Effect effect;
     Ability ability = new TestAbility(new Creature());
     listener = mock(Effect.EffectAppliedListener.class);
     effect = mock(Effect.class);
-    when(effect.getDelay()).thenReturn(22);
     ability.addEffect(effect);
     ability.onEffectApplied(listener);
 
