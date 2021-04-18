@@ -18,6 +18,7 @@ import java.awt.geom.Rectangle2D;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyDouble;
@@ -239,6 +240,30 @@ public class LightSourceTests {
         verify(lightSourceActiveSpy, times(1)).isLoaded(); // entry point of private method updateAmbientLayers()
     }
 
+    @Test
+    public void sendMessage_returnsNullOnEmptyMessage() {
+        // act, assert
+        assertNull(lightSourceInactiveSpy.sendMessage(lightSourceInactiveSpy, null));
+        assertNull(lightSourceInactiveSpy.sendMessage(lightSourceInactiveSpy, ""));
+    }
+
+    @Test
+    public void sendMessage_returnsNullOnInvalidMessage() {
+        // act, assert
+        assertNull(lightSourceInactiveSpy.sendMessage(lightSourceInactiveSpy, "random gibberish"));
+    }
+
+    @Test
+    public void sendMessage_togglesOnValidMessage() {
+        // arrange
+        when(lightSourceInactiveSpy.isLoaded()).thenReturn(false); // prevent further actions in private methods
+        assertFalse(lightSourceInactiveSpy.isActive());
+
+        // act, assert
+        assertEquals("true", lightSourceInactiveSpy.sendMessage(lightSourceInactiveSpy, LightSource.TOGGLE_MESSAGE));
+        verify(lightSourceInactiveSpy, times(1)).toggle();
+    }
+
 
     // ACCESSORS
 
@@ -365,5 +390,43 @@ public class LightSourceTests {
         // assert
         assertEquals(newLocation, lightSourceInactiveSpy.getLocation());
         verify(lightSourceInactiveSpy, times(1)).getLightShapeType(); // entry point of private method updateShape()
+    }
+
+    @Test
+    public void setSize_setsSize() {
+        // arrange
+        double width = 10d;
+        double height = 20d;
+
+        // act
+        lightSourceInactiveSpy.setSize(width, height);
+
+        // assert
+        assertEquals(width, lightSourceInactiveSpy.getWidth());
+        assertEquals(height, lightSourceInactiveSpy.getHeight());
+    }
+
+    @Test
+    public void setSize_setsShorterSideAsRadius() {
+        // arrange
+        double firstWidth = 20d;
+        double firstHeight = 10d;
+        int firstRadius = 5;
+        double secondWidth = 2d;
+        double secondHeight = 10d;
+        int secondRadius = 1;
+
+        LightSource firstLightSourceSpy = spy(new LightSource(10, Color.WHITE, LightSource.Type.ELLIPSE, false));
+        LightSource secondLightSourceSpy = spy(new LightSource(10, Color.WHITE, LightSource.Type.ELLIPSE, false));
+        assertEquals(0, firstLightSourceSpy.getRadius());
+        assertEquals(0, secondLightSourceSpy.getRadius());
+
+        // act
+        firstLightSourceSpy.setSize(firstWidth, firstHeight);
+        secondLightSourceSpy.setSize(secondWidth, secondHeight);
+
+        // assert
+        assertEquals(firstRadius, firstLightSourceSpy.getRadius());
+        assertEquals(secondRadius, secondLightSourceSpy.getRadius());
     }
 }
