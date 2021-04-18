@@ -516,4 +516,18 @@ class AbilityTests {
 
   }
 
+  @Test
+  public void testOnEffectCeased(){
+    Effect.EffectCeasedListener listener;
+    Effect effect;
+    Ability ability = new TestAbility(new Creature());
+    listener = mock(Effect.EffectCeasedListener.class);
+    effect = mock(Effect.class);
+    ability.addEffect(effect);
+    ability.onEffectCeased(listener);
+
+    verify(listener, times(0)).ceased(any());
+
+  }
+
 }
