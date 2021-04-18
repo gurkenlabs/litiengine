@@ -202,11 +202,7 @@ public class LightSource extends Entity implements IRenderable {
   @Override
   public void setSize(final double width, final double height) {
     super.setSize(width, height);
-    double shorterDimension = width;
-    if (width > height) {
-      shorterDimension = height;
-    }
-    this.setRadius((int) shorterDimension / 2);
+    this.setRadius((int) Math.min(width, height) / 2);
   }
 
   public void toggle() {
