@@ -136,13 +136,6 @@ public class LightSource extends Entity implements IRenderable {
     return this.activated;
   }
 
-  @Override
-  public void render(final Graphics2D graphic) {
-    if (Game.config().graphics().renderDynamicShadows()) {
-      this.renderShadows(graphic);
-    }
-  }
-
   public void setFocusOffsetX(double focusOffsetX) {
     this.focusOffsetX = focusOffsetX;
   }
@@ -224,14 +217,91 @@ public class LightSource extends Entity implements IRenderable {
     return null;
   }
 
-  private static Ellipse2D getShadowEllipse(final IEntity entity) {
-    final int shadowHeight = (int) (entity.getHeight() / 4);
-    final int shadowWidth = (int) (entity.getWidth() / 3);
+  @Override
+  public void render(final Graphics2D graphic) {
+    if (Game.config().graphics().renderDynamicShadows()) {
+      this.renderShadows(graphic);
+    }
+  }
 
-    final int yOffset = (int) entity.getHeight();
-    final double x = entity.getX() + (entity.getWidth() - shadowWidth) / 2;
-    final double y = entity.getY() + yOffset - shadowHeight / 2.0;
-    return new Ellipse2D.Double(x, y, shadowWidth, shadowHeight);
+  private void setRadius(final int radius) {
+    this.radius = radius;
+  }
+
+  private void updateAmbientLayers() {
+    if (!this.isLoaded()) {
+      return;
+    }
+
+    if (Game.world().environment() != null && Game.world().environment().getAmbientLight() != null) {
+      Game.world().environment().getAmbientLight().updateSection(this.getBoundingBox());
+    }
+
+    if (Game.world().environment() != null && Game.world().environment().getStaticShadowLayer() != null) {
+      Game.world().environment().getStaticShadowLayer().updateSection(this.getBoundingBox());
+    }
+  }
+
+  private void updateShape() {
+    if (this.getLightShapeType() == Type.RECTANGLE) {
+      this.lightShape = new Rectangle2D.Double(this.getX(), this.getY(), this.getWidth(), this.getHeight());
+    } else {
+      this.lightShape = new Ellipse2D.Double(this.getX(), this.getY(), this.getWidth(), this.getHeight());
+    }
+  }
+
+  /**
+   * Renders the shadows using simple vector math. The steps are as follows:
+   *
+   * <pre>
+   * for each entity
+   *     if entity is not moving:
+   *         ignore entity
+   *     if entity is too far from mouse:
+   *         ignore entity
+   *
+   *     determine unit vector from mouse to entity center
+   *     get perpendicular of unit vector
+   *
+   *     Create Points A + B:
+   *         extrude perpendicular in either direction, by the half-size of the entity
+   *     Create Points C + D:
+   *         extrude A + B away from mouse position
+   *
+   *     construct polygon with points A, B, C, D
+   *
+   *     render with RadialGradientPaint to give it a "fade-out" appearance
+   * </pre>
+   *
+   * @param graphic
+   *          the graphics to use for rendering
+   */
+  private void renderShadows(final Graphics2D graphic) {
+    if (!Game.world().environment().getCombatEntities().stream().anyMatch(isInRange(this.getCenter(), SHADOW_GRADIENT_SIZE))) {
+      return;
+    }
+
+    // we'll use a radial gradient
+    final Paint gradientPaint = new RadialGradientPaint(Game.world().camera().getViewportDimensionCenter(this), SHADOW_GRADIENT_SIZE, SHADOW_GRADIENT_FRACTIONS, SHADOW_GRADIENT_COLORS);
+
+    // old Paint object for resetting it later
+    final Paint oldPaint = graphic.getPaint();
+    graphic.setPaint(gradientPaint);
+
+    // for each entity
+    for (final ICombatEntity mob : Game.world().environment().getCombatEntities()) {
+      if (mob.isDead() || !isInRange(this.getCenter(), SHADOW_GRADIENT_SIZE).test(mob)) {
+        continue;
+      }
+
+      final Shape obstructedVision = getObstructedVisionArea(mob, Game.world().camera().getViewportDimensionCenter(this));
+      // fill the polygon with the gradient paint
+
+      ShapeRenderer.render(graphic, obstructedVision);
+    }
+
+    // reset to old Paint object
+    graphic.setPaint(oldPaint);
   }
 
   private static Predicate<? super IEntity> isInRange(final Point2D center, final float radius) {
@@ -298,83 +368,13 @@ public class LightSource extends Entity implements IRenderable {
     return shadowArea;
   }
 
-  /**
-   * Renders the shadows using simple vector math. The steps are as follows:
-   *
-   * <pre>
-   * for each entity
-   *     if entity is not moving:
-   *         ignore entity
-   *     if entity is too far from mouse:
-   *         ignore entity
-   *
-   *     determine unit vector from mouse to entity center
-   *     get perpendicular of unit vector
-   *
-   *     Create Points A + B:
-   *         extrude perpendicular in either direction, by the half-size of the entity
-   *     Create Points C + D:
-   *         extrude A + B away from mouse position
-   *
-   *     construct polygon with points A, B, C, D
-   *
-   *     render with RadialGradientPaint to give it a "fade-out" appearance
-   * </pre>
-   *
-   * @param graphic
-   *          the graphics to use for rendering
-   */
-  private void renderShadows(final Graphics2D graphic) {
-    if (!Game.world().environment().getCombatEntities().stream().anyMatch(isInRange(this.getCenter(), SHADOW_GRADIENT_SIZE))) {
-      return;
-    }
+  private static Ellipse2D getShadowEllipse(final IEntity entity) {
+    final int shadowHeight = (int) (entity.getHeight() / 4);
+    final int shadowWidth = (int) (entity.getWidth() / 3);
 
-    // we'll use a radial gradient
-    final Paint gradientPaint = new RadialGradientPaint(Game.world().camera().getViewportDimensionCenter(this), SHADOW_GRADIENT_SIZE, SHADOW_GRADIENT_FRACTIONS, SHADOW_GRADIENT_COLORS);
-
-    // old Paint object for resetting it later
-    final Paint oldPaint = graphic.getPaint();
-    graphic.setPaint(gradientPaint);
-
-    // for each entity
-    for (final ICombatEntity mob : Game.world().environment().getCombatEntities()) {
-      if (mob.isDead() || !isInRange(this.getCenter(), SHADOW_GRADIENT_SIZE).test(mob)) {
-        continue;
-      }
-
-      final Shape obstructedVision = getObstructedVisionArea(mob, Game.world().camera().getViewportDimensionCenter(this));
-      // fill the polygon with the gradient paint
-
-      ShapeRenderer.render(graphic, obstructedVision);
-    }
-
-    // reset to old Paint object
-    graphic.setPaint(oldPaint);
-  }
-
-  private void setRadius(final int radius) {
-    this.radius = radius;
-  }
-
-  private void updateAmbientLayers() {
-    if (!this.isLoaded()) {
-      return;
-    }
-
-    if (Game.world().environment() != null && Game.world().environment().getAmbientLight() != null) {
-      Game.world().environment().getAmbientLight().updateSection(this.getBoundingBox());
-    }
-
-    if (Game.world().environment() != null && Game.world().environment().getStaticShadowLayer() != null) {
-      Game.world().environment().getStaticShadowLayer().updateSection(this.getBoundingBox());
-    }
-  }
-
-  private void updateShape() {
-    if (this.getLightShapeType() == Type.RECTANGLE) {
-      this.lightShape = new Rectangle2D.Double(this.getX(), this.getY(), this.getWidth(), this.getHeight());
-    } else {
-      this.lightShape = new Ellipse2D.Double(this.getX(), this.getY(), this.getWidth(), this.getHeight());
-    }
+    final int yOffset = (int) entity.getHeight();
+    final double x = entity.getX() + (entity.getWidth() - shadowWidth) / 2;
+    final double y = entity.getY() + yOffset - shadowHeight / 2.0;
+    return new Ellipse2D.Double(x, y, shadowWidth, shadowHeight);
   }
 }
