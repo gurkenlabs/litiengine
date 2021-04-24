@@ -9,9 +9,14 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.RectangularShape;
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
 public class GeometricUtilitiesTests {
 
@@ -57,30 +62,83 @@ public class GeometricUtilitiesTests {
   }
 
   @Test
-  public void testGetMidPoint() {
-    Point2D mid = GeometricUtilities.getCenter(new Point2D.Double(0, 0), new Point2D.Double(0, 1));
-    Point2D mid2 = GeometricUtilities.getCenter(new Line2D.Double(new Point2D.Double(0,0), new Point2D.Double(0,1)));
-    Point2D mid3 = GeometricUtilities.getCenter(0, 0, 1, 1);
-    Point2D mid4 = GeometricUtilities.getCenter(GeometricUtilities.getCircle(new Point2D.Double(0.5d, 0.5d), 0.5d));
-    Point2D mid5 = GeometricUtilities.getCenter(new Ellipse2D.Double(0, 0, 1, 1));
-    Point2D mid6 = GeometricUtilities.getCenter(new Rectangle2D.Double(0, 0, 1, 1));
-    Point2D mid7 = GeometricUtilities.getCenter(new Arc2D.Double(0, 0, 1, 1, 1, 1, Arc2D.OPEN));
-    
-    Rectangle2D rectangle8 = new Rectangle2D.Double(5, 5, 10, 10);
-    Point2D mid8 = GeometricUtilities.getCenter(rectangle8);
-    
-    Rectangle2D rectangle9 = new Rectangle2D.Double(-5, -5, 10, 10);
-    Point2D mid9 = GeometricUtilities.getCenter(rectangle9);
-    
+  public void testGetCenterPointPoint(){
+    // arrange
+    Point2D point1 = new Point2D.Double(0, 0);
+    Point2D point2 = new Point2D.Double(0, 1);
+
+    // act
+    Point2D mid = GeometricUtilities.getCenter(point1, point2);
+
+    // assert
     assertEquals(new Point2D.Double(0, 0.5), mid);
-    assertEquals(new Point2D.Double(0, 0.5), mid2);
-    assertEquals(new Point2D.Double(0.5, 0.5), mid3);
-    assertEquals(new Point2D.Double(0.5, 0.5), mid4);
-    assertEquals(new Point2D.Double(0.5, 0.5), mid5);
-    assertEquals(new Point2D.Double(0.5, 0.5), mid6);
-    assertEquals(new Point2D.Double(0.5, 0.5), mid7);
-    assertEquals(new Point2D.Double(10, 10), mid8);
-    assertEquals(new Point2D.Double(0, 0), mid9);
+  }
+
+  @Test
+  public void testGetCenterLine(){
+    // arrange
+    Line2D line = new Line2D.Double(new Point2D.Double(0,0), new Point2D.Double(0,1));
+
+    // act
+    Point2D mid = GeometricUtilities.getCenter(line);
+
+    // assert
+    assertEquals(new Point2D.Double(0, 0.5), mid);
+  }
+
+  @Test
+  public void testGetCenterDouble(){
+    // arrange
+    double x1 = 0;
+    double y1 = 0;
+    double x2 = 1;
+    double y2 = 1;
+
+    // act
+    Point2D mid = GeometricUtilities.getCenter(x1, y1, x2, y2);
+
+    // assert
+    assertEquals(new Point2D.Double(0.5, 0.5), mid);
+  }
+
+  @ParameterizedTest
+  @MethodSource("getCenterRectangularShapeArguments")
+  public void testGetCenterRectangularShape(String name, RectangularShape shape, double expectedX, double expectedY){
+    // act
+    Point2D center = GeometricUtilities.getCenter(shape);
+
+    // assert
+    assertEquals(new Point2D.Double(expectedX, expectedY), center);
+  }
+
+  /**
+   * This method is used to provide arguments for {@link #testGetCenterRectangularShape(String, RectangularShape, double, double)}
+   * @return Test arguments
+   */
+  @SuppressWarnings("unused")
+  private static Stream<Arguments> getCenterRectangularShapeArguments(){
+    return Stream.of(
+            Arguments.of("Arc", new Arc2D.Double(0, 0, 1, 1, 1, 1, Arc2D.OPEN), 0.5, 0.5),
+            Arguments.of("Ellipse", new Ellipse2D.Double(0, 0, 1, 1), 0.5, 0.5),
+            Arguments.of("Circle", GeometricUtilities.getCircle(new Point2D.Double(0.5d, 0.5d), 0.5d), 0.5, 0.5)
+    );
+  }
+
+  @ParameterizedTest(name = "testGetCenterRectangle x1={0}, y1={1}, x2={2}, y2={3}")
+  @CsvSource({
+          "0, 0, 1, 1, 0.5, 0.5",
+          "5, 5, 10, 10, 10, 10",
+          "-5, -5, 10, 10, 0, 0"
+  })
+  public void testGetCenterRectangle(double x1, double y1, double x2, double y2, double expectedX, double expectedY){
+    // arrange
+    Rectangle2D rectangle = new Rectangle2D.Double(x1, y1, x2, y2);
+
+    // act
+    Point2D mid = GeometricUtilities.getCenter(rectangle);
+
+    // assert
+    assertEquals(new Point2D.Double(expectedX, expectedY), mid);
   }
 
   @Test
