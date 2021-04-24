@@ -10,6 +10,7 @@ import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +23,9 @@ import de.gurkenlabs.litiengine.environment.tilemap.RenderOrder;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.io.URLAdapter;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
 public class MapTests {
   @BeforeEach
@@ -63,13 +66,19 @@ public class MapTests {
     assertEquals(0, map.getMapObjects().size());
   }
 
-  @Test
-  public void testTileCustomProperties() {
+  @ParameterizedTest
+  @MethodSource("getTileCustomProperties")
+  public void testTileCustomProperties(int tileLayers, int x, int y, String propertyName, String expectedValue) {
     IMap map = Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
+    assertEquals(expectedValue, map.getTileLayers().get(tileLayers).getTile(x, y).getStringValue(propertyName));
+  }
 
-    assertEquals("bar", map.getTileLayers().get(0).getTile(5, 3).getStringValue("foo"));
-    assertEquals("bap", map.getTileLayers().get(0).getTile(9, 5).getStringValue("baz"));
-    assertEquals("multiline\nproperty", map.getTileLayers().get(0).getTile(10, 10).getStringValue("custom"));
+  private static Stream<Arguments> getTileCustomProperties(){
+    return Stream.of(
+            Arguments.of(0, 5, 3, "foo", "bar"),
+            Arguments.of(0, 9, 5, "baz", "bap"),
+            Arguments.of(0, 10, 10, "custom", "multiline\nproperty")
+    );
   }
 
   @Test
