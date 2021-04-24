@@ -2,12 +2,8 @@ package de.gurkenlabs.litiengine.attributes;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -97,30 +93,75 @@ class AttributeTests {
   }
 
   @Test
-  void testModifyBaseValueWithAddPercentModification() {
+  void testModifyBaseValueWithAddPercentModificationByte() {
+    // arrange
     final Attribute<Byte> testAttributeByte = new Attribute<>((byte) 10);
+
+    // act
+    testAttributeByte.modifyBaseValue(new AttributeModifier<Byte>(Modification.ADDPERCENT, 10));
+
+    // assert
+    assertEquals((byte) 11, testAttributeByte.get().byteValue());
+  }
+
+  @Test
+  void testModifyBaseValueWithAddPercentModificationShort() {
+    // arrange
     final Attribute<Short> testAttributeShort = new Attribute<>((short) 10);
+
+    // act
+    testAttributeShort.modifyBaseValue(new AttributeModifier<Short>(Modification.ADDPERCENT, 10));
+
+    // assert
+    assertEquals((short) 11, testAttributeShort.get().shortValue());
+  }
+
+  @Test
+  void testModifyBaseValueWithAddPercentModificationInteger() {
+    // arrange
     final Attribute<Integer> testAttributeInt = new Attribute<>(10);
+
+    // act
+    testAttributeInt.modifyBaseValue(new AttributeModifier<Integer>(Modification.ADDPERCENT, 10));
+
+    // assert
+    assertEquals(11, testAttributeInt.get().intValue());
+  }
+
+  @Test
+  void testModifyBaseValueWithAddPercentModificationLong() {
+    // arrange
     final Attribute<Long> testAttributeLong = new Attribute<>(10L);
 
+    // act
+    testAttributeLong.modifyBaseValue(new AttributeModifier<Long>(Modification.ADDPERCENT, 10));
+
+    // assert
+    assertEquals(11L, testAttributeLong.get().longValue());
+  }
+
+  @Test
+  void testModifyBaseValueWithAddPercentModificationFloat() {
+    // arrange
     final Attribute<Float> testAttributeFloat = new Attribute<>(10.0f);
+
+    // act
+    testAttributeFloat.modifyBaseValue(new AttributeModifier<Float>(Modification.ADDPERCENT, 11));
+
+    // assert
+    assertEquals(11.1f, testAttributeFloat.get().floatValue(), 0.0001f);
+  }
+
+  @Test
+  void testModifyBaseValueWithAddPercentModificationDouble() {
+    // arrange
     final Attribute<Double> testAttributeDouble = new Attribute<>(10.0);
 
-    testAttributeByte.modifyBaseValue(new AttributeModifier<>(Modification.ADDPERCENT, 10));
-    testAttributeShort.modifyBaseValue(new AttributeModifier<>(Modification.ADDPERCENT, 10));
-    testAttributeInt.modifyBaseValue(new AttributeModifier<>(Modification.ADDPERCENT, 10));
-    testAttributeLong.modifyBaseValue(new AttributeModifier<>(Modification.ADDPERCENT, 10));
+    // act
+    testAttributeDouble.modifyBaseValue(new AttributeModifier<Double>(Modification.ADDPERCENT, 11));
 
-    testAttributeFloat.modifyBaseValue(new AttributeModifier<>(Modification.ADDPERCENT, 11));
-    testAttributeDouble.modifyBaseValue(new AttributeModifier<>(Modification.ADDPERCENT, 11));
-
-    assertEquals((byte) 11, testAttributeByte.get().byteValue());
-    assertEquals((short) 11, testAttributeShort.get().shortValue());
-    assertEquals(11, testAttributeInt.get().intValue());
-    assertEquals(11L, testAttributeLong.get().longValue());
-
-    assertEquals(11.1f, testAttributeFloat.get(), 0.0001f);
-    assertEquals(11.1, testAttributeDouble.get(), 0.0000001);
+    // assert
+    assertEquals(11.1, testAttributeDouble.get().doubleValue(), 0.0000001);
   }
 
   @Test
