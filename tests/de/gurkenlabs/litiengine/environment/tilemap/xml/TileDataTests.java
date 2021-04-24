@@ -116,7 +116,7 @@ public class TileDataTests {
             new Tile(1), new Tile(1), new Tile(1), new Tile(0), new Tile(2), new Tile(0), new Tile(1), new Tile(1), new Tile(1),
             new Tile(1), new Tile(1), new Tile(1), new Tile(0), new Tile(1), new Tile(0), new Tile(1), new Tile(1), new Tile(1),
     };
-    
+
     TileData data = new TileData(Arrays.asList(tiles), 9, 3, encoding, compression);
 
     // act

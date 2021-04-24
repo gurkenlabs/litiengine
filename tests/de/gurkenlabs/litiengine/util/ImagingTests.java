@@ -1,19 +1,25 @@
 package de.gurkenlabs.litiengine.util;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+import java.io.File;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.litiengine.entities.Rotation;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class ImagingTests {
 
@@ -53,32 +59,47 @@ public class ImagingTests {
     assertArrayEquals(expectedPixels, actualPixels);
   }
 
-  @Test
-  public void testRotation() {
-    BufferedImage image = Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag.png");
-    BufferedImage expectedRotate90 = Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag-90.png");
-    BufferedImage expectedRotate180 = Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag-180.png");
-    BufferedImage expectedRotate270 = Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag-270.png");
+  @ParameterizedTest(name = "testRotate rotatedImagePath={0}, rotation={1}")
+  @MethodSource("getRotateArguments")
+  public void testRotate(String rotatedImagePath, Rotation rotation){
+    // precondition check to prevent resource optimism
+    String imagePath = "tests/de/gurkenlabs/litiengine/util/prop-flag.png";
 
-    int[] expectedPixels0 = ((DataBufferInt) image.getData().getDataBuffer()).getData();
-    int[] expectedPixels90 = ((DataBufferInt) expectedRotate90.getData().getDataBuffer()).getData();
-    int[] expectedPixels180 = ((DataBufferInt) expectedRotate180.getData().getDataBuffer()).getData();
-    int[] expectedPixels270 = ((DataBufferInt) expectedRotate270.getData().getDataBuffer()).getData();
+    // image must be available on the file system
+    if(! new File(imagePath).exists()){
+      fail();
+    }
 
-    BufferedImage rotated0 = Imaging.rotate(image, Rotation.NONE);
-    BufferedImage rotated90 = Imaging.rotate(image, Rotation.ROTATE_90);
-    BufferedImage rotated180 = Imaging.rotate(image, Rotation.ROTATE_180);
-    BufferedImage rotated270 = Imaging.rotate(image, Rotation.ROTATE_270);
+    // rotated image must be available on the file system
+    if(! new File(rotatedImagePath).exists()){
+      fail();
+    }
 
-    int[] actualPixels0 = ((DataBufferInt) rotated0.getData().getDataBuffer()).getData();
-    int[] actualPixels90 = ((DataBufferInt) rotated90.getData().getDataBuffer()).getData();
-    int[] actualPixels180 = ((DataBufferInt) rotated180.getData().getDataBuffer()).getData();
-    int[] actualPixels270 = ((DataBufferInt) rotated270.getData().getDataBuffer()).getData();
+    // arrange
+    BufferedImage image = Resources.images().get(imagePath);
+    BufferedImage expectedRotatedImage = Resources.images().get(rotatedImagePath);
+    int[] expectedPixels = ((DataBufferInt) expectedRotatedImage.getData().getDataBuffer()).getData();
 
-    assertArrayEquals(expectedPixels0, actualPixels0);
-    assertArrayEquals(expectedPixels90, actualPixels90);
-    assertArrayEquals(expectedPixels180, actualPixels180);
-    assertArrayEquals(expectedPixels270, actualPixels270);
+    // act
+    BufferedImage actualRotated = Imaging.rotate(image, rotation);
+    int[] actualPixels = ((DataBufferInt) actualRotated.getData().getDataBuffer()).getData();
+
+    // assert
+    assertArrayEquals(expectedPixels, actualPixels);
+  }
+
+  /**
+   * This method is used for defining the input arguments of the parameterized test {@link #testRotate(String, Rotation)}
+   * @return Test arguments
+   */
+  @SuppressWarnings("unused")
+  private static Stream<Arguments> getRotateArguments(){
+    return Stream.of(
+            Arguments.of("tests/de/gurkenlabs/litiengine/util/prop-flag.png", Rotation.NONE),
+            Arguments.of("tests/de/gurkenlabs/litiengine/util/prop-flag-90.png", Rotation.ROTATE_90),
+            Arguments.of("tests/de/gurkenlabs/litiengine/util/prop-flag-180.png", Rotation.ROTATE_180),
+            Arguments.of("tests/de/gurkenlabs/litiengine/util/prop-flag-270.png", Rotation.ROTATE_270)
+    );
   }
 
   @Test
