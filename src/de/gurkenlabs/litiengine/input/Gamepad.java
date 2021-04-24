@@ -421,4 +421,33 @@ public final class Gamepad extends GamepadEvents implements IUpdateable {
     private Xbox() {
     }
   }
+
+  public static class DualShock4 {
+    public static final String SQUARE = Buttons.BUTTON_0;
+    public static final String CROSS = Buttons.BUTTON_1;
+    public static final String CIRCLE = Buttons.BUTTON_2;
+    public static final String TRIANGLE = Buttons.BUTTON_3;
+    public static final String L1 = Buttons.BUTTON_4;
+    public static final String R1 = Buttons.BUTTON_5;
+    public static final String L2 = Buttons.BUTTON_6;
+    public static final String R2 = Buttons.BUTTON_7;
+    public static final String SHARE = Buttons.BUTTON_8;
+    public static final String OPTIONS = Buttons.BUTTON_9;
+    public static final String LEFT_STICK_PRESS = Buttons.BUTTON_10;
+    public static final String RIGHT_STICK_PRESS = Buttons.BUTTON_11;
+    public static final String PS_BUTTON = Buttons.BUTTON_12;
+    public static final String TOUCHPAD = Buttons.BUTTON_13;
+    public static final String DPAD = Axis.POV;
+
+    // range -1 - 1
+    public static final String LEFT_STICK_X = Axis.X;
+    public static final String LEFT_STICK_Y = Axis.Y;
+    public static final String RIGHT_STICK_X = Axis.Z;
+    public static final String RIGHT_STICK_Y = Axis.RZ;
+    public static final String R2_TRIGGER = Axis.RY;
+    public static final String L2_TRIGGER = Axis.RX;
+
+    private DualShock4() {
+    }
+  }
 }
