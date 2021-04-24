@@ -1,42 +1,85 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 import java.util.Hashtable;
+import java.util.Map;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 public class CustomPropertyProviderTests {
 
+  private CustomPropertyProvider provider;
+
+  @BeforeEach
+  public void setUp(){
+    provider = new CustomPropertyProvider();
+  }
+
   @Test
-  public void testSetCustomProperty() {
-    CustomPropertyProvider propProvider = new CustomPropertyProvider() {};
-    propProvider.setValue("test", "testvalue");
+  public void testSetProperty(){
+    // arrange
+    String value = "value";
 
-    assertEquals("testvalue", propProvider.getStringValue("test"));
-    assertFalse(propProvider.hasCustomProperty("test2"));
-    assertEquals(1, propProvider.getProperties().size());
+    // act
+    provider.setValue("test", value);
 
-    propProvider.setValue("test", "testvalue2");
+    // assert
+    assertEquals(value, provider.getStringValue("test"));
+  }
 
-    assertEquals("testvalue2", propProvider.getStringValue("test"));
+  @Test
+  public void testHasCustomProperty(){
+    // arrange
+    provider.setValue("test1", "value");
 
-    java.util.Map<String, ICustomProperty> props = new Hashtable<>(2);
-    props.put("test2", new CustomProperty("testvalue3"));
-    props.put("test3", new CustomProperty("testvalue4"));
+    // act
+    boolean hasProperty = provider.hasCustomProperty("test1");
 
-    propProvider.setProperties(props);
+    // assert
+    assertTrue(hasProperty);
+  }
 
-    assertEquals(2, propProvider.getProperties().size());
-    assertEquals("testvalue3", propProvider.getStringValue("test2"));
-    assertEquals("testvalue4", propProvider.getStringValue("test3"));
+  @Test
+  public void testGetProperties(){
+    // arrange
+    provider.setValue("test1", "value1");
+    provider.setValue("test2", "value2");
 
-    propProvider.setProperties(null);
-    assertNotNull(propProvider.getProperties());
-    assertEquals(0, propProvider.getProperties().size());
+    // act
+    Map<String, ICustomProperty> properties = provider.getProperties();
+
+    // assert
+    assertEquals(2, properties.size());
+  }
+
+  @Test
+  public void testSetProperties(){
+    // arrange
+    Map<String, ICustomProperty> props = new Hashtable<>(2);
+    props.put("test1", new CustomProperty("value1"));
+    props.put("test2", new CustomProperty("value2"));
+
+    // act
+    provider.setProperties(props);
+
+    assertEquals(props, provider.getProperties());
+  }
+
+  @Test
+  public void testSetPropertiesNull(){
+    // arrange
+    Map<String, ICustomProperty> props = new Hashtable<>(2);
+    props.put("test42", new CustomProperty("value42"));
+
+    // act
+    provider.setProperties(props);
+    provider.setProperties(null);
+
+    // assert
+    assertEquals(0, provider.getProperties().size());
   }
 }
