@@ -335,7 +335,7 @@ class AttributeTests {
 
     assertEquals((byte) 13, testAttributeByte.getMax().byteValue());
     assertEquals((short) 13, testAttributeShort.getMax().shortValue());
-    assertEquals(13, testAttributeInt.getMax().intValue());PercentModification
+    assertEquals(13, testAttributeInt.getMax().intValue());
     assertEquals(13L, testAttributeLong.getMax().longValue());
 
     assertEquals(13.65f, testAttributeFloat.getMax(), 0.0001f);
