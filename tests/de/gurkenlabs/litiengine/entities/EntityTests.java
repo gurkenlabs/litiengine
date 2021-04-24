@@ -1,44 +1,29 @@
 package de.gurkenlabs.litiengine.entities;
 
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.params.*;
-import org.junit.jupiter.params.provider.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.stream.*;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-class EntityTests {
+public class EntityTests {
 
   @Test
-  void testEntityAction() {
+  public void testActions() {
+    // arrange
     TestEntity entity = new TestEntity();
 
-    assertTrue(entity.actions().exists("doSomething"));
-    assertFalse(entity.actions().exists("imNotAnAction"));
+    // act
+    EntityActionMap actions = entity.actions();
 
-    assertEquals(2, entity.actions().getActions().size());
-
-    EntityAction action = entity.actions().get("doSomething");
-
-    assertEquals("doSomething", action.getName());
-    assertEquals("does something", action.getDescription());
-
-    assertNotNull(action);
-
-    action.perform();
-
-    assertTrue(entity.didSomething);
-
-    entity.actions().unregister(action);
-
-    assertEquals(1, entity.actions().getActions().size());
-    assertFalse(entity.actions().exists("doSomething"));
-
-    entity.actions().register(action);
-
-    assertEquals(2, entity.actions().getActions().size());
-    assertTrue(entity.actions().exists("doSomething"));
+    // assert
+    assertTrue(actions.exists("doSomething"));
+    assertFalse(actions.exists("imNotAnAction"));
   }
 
   @Test
