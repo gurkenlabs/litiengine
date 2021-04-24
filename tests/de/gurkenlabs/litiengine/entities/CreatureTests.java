@@ -8,18 +8,17 @@ import org.junit.jupiter.api.Test;
 
 public class CreatureTests {
 
-  private IMobileEntity mobileEntity;
+  private Creature creature;
 
   @BeforeEach
   public void setUp(){
-    // arrange
-    mobileEntity = new TestMobileEntity();
+    creature = new TestCreature();
   }
 
   @Test
   public void testInitializationByAnnotation_velocity(){
     // act
-    int actualVelocity = mobileEntity.getVelocity().get().intValue();
+    int actualVelocity = creature.getVelocity().get().intValue();
 
     // assert
     assertEquals(111, actualVelocity);
@@ -28,7 +27,7 @@ public class CreatureTests {
   @Test
   public void testInitializationByAnnotation_acceleration(){
     // act
-    int actualAcceleration = mobileEntity.getAcceleration();
+    int actualAcceleration = creature.getAcceleration();
 
     // assert
     assertEquals(222, actualAcceleration);
@@ -37,7 +36,7 @@ public class CreatureTests {
   @Test
   public void testInitializationByAnnotation_deceleration(){
     // act
-    int actualDeceleration = mobileEntity.getDeceleration();
+    int actualDeceleration = creature.getDeceleration();
 
     // assert
     assertEquals(333, actualDeceleration);
@@ -46,14 +45,13 @@ public class CreatureTests {
   @Test
   public void testInitializationByAnnotation_turnOnMove(){
     // act
-    boolean canTurnOnMove = mobileEntity.turnOnMove();
+    boolean canTurnOnMove = creature.turnOnMove();
 
     // assert
     assertFalse(canTurnOnMove);
   }
 
   @MovementInfo(velocity = 111, acceleration = 222, deceleration = 333, turnOnMove = false)
-  private class TestMobileEntity extends Creature {
-
+  private class TestCreature extends Creature {
   }
 }

@@ -6,15 +6,15 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
+import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Ellipse2D;
-import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
+import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -23,6 +23,7 @@ import de.gurkenlabs.litiengine.abilities.effects.Effect;
 import de.gurkenlabs.litiengine.abilities.effects.EffectTarget;
 import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.entities.EntityPivotType;
+import org.mockito.MockedStatic;
 
 class AbilityTests {
   @BeforeEach
@@ -31,7 +32,7 @@ class AbilityTests {
   }
 
   @Test
-  public void isOnCooldown_noCurrentExecution() {
+  public void isOnCooldownNoCurrentExecution() {
     // arrange
     TestAbility ability = setupAbility();
 
@@ -45,7 +46,7 @@ class AbilityTests {
   }
 
   @Test
-  public void isOnCooldown_currentExecutionOver() {
+  public void isOnCooldownCurrentExecutionOver() {
     // arrange
     TestAbility ability = setupAbility();
 
@@ -61,7 +62,7 @@ class AbilityTests {
   }
 
   @Test
-  public void isOnCooldown_cooldownOver() {
+  public void isOnCooldownCooldownOver() {
     // arrange
     TestAbility ability = setupAbility();
 
@@ -77,7 +78,7 @@ class AbilityTests {
   }
 
   @Test
-  public void isOnCooldown_stillOnCooldown() {
+  public void isOnCooldownStillOnCooldown() {
     // arrange
     TestAbility ability = setupAbility();
 
@@ -93,7 +94,7 @@ class AbilityTests {
   }
 
   @Test
-  void getRemainingCooldownInSeconds_NoCast() {
+  void getRemainingCooldownInSecondsNoCast() {
     // arrange
     TestAbility ability = setupAbility();
 
@@ -105,7 +106,7 @@ class AbilityTests {
   }
 
   @Test
-  void getRemainingCooldownInSeconds_CreatureIsDead() {
+  void getRemainingCooldownInSecondsCreatureIsDead() {
     // arrange
     Creature creature = mock(Creature.class);
     when(creature.isDead()).thenReturn(true);
@@ -298,6 +299,25 @@ class AbilityTests {
     assertEquals(EntityPivotType.COLLISIONBOX_CENTER, abilityLocation.getPivot().getType());
   }
 
+  @Test
+  public void testRender(){
+    // arrange
+    TestAbility ability = new TestAbility(new Creature());
+    Graphics2D graphics = mock(Graphics2D.class);
+    RenderEngine renderEngine = mock(RenderEngine.class);
+
+    try (MockedStatic<Game> gameMockedStatic = mockStatic(Game.class)){
+      gameMockedStatic.when(Game::graphics).thenReturn(renderEngine);
+
+      // act
+      ability.render(graphics);
+
+      // assert
+      verify(renderEngine, times(1)).renderShape(any(Graphics2D.class), any(Shape.class));
+      verify(renderEngine, times(1)).renderOutline(any(Graphics2D.class), any(Shape.class));
+    }
+  }
+
   @AbilityInfo(castType = CastType.ONCONFIRM, name = "I do somethin", description = "does somethin", cooldown = 333, duration = 222, impact = 111, impactAngle = 99, multiTarget = true, origin = EntityPivotType.COLLISIONBOX_CENTER, range = 444, value = 999)
   private class TestAbility extends Ability {
 
@@ -482,4 +502,33 @@ class AbilityTests {
     assertEquals(0, a.getCurrentExecution().getExecutionTicks());
     assertTrue(a.canCast());
   }
+
+  @Test
+  public void testOnEffectApplied(){
+    Effect.EffectAppliedListener listener;
+    Effect effect;
+    Ability ability = new TestAbility(new Creature());
+    listener = mock(Effect.EffectAppliedListener.class);
+    effect = mock(Effect.class);
+    ability.addEffect(effect);
+    ability.onEffectApplied(listener);
+
+    verify(listener, times(0)).applied(any());
+
+  }
+
+  @Test
+  public void testOnEffectCeased(){
+    Effect.EffectCeasedListener listener;
+    Effect effect;
+    Ability ability = new TestAbility(new Creature());
+    listener = mock(Effect.EffectCeasedListener.class);
+    effect = mock(Effect.class);
+    ability.addEffect(effect);
+    ability.onEffectCeased(listener);
+
+    verify(listener, times(0)).ceased(any());
+
+  }
+
 }
