@@ -13,6 +13,10 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.physics.Collision;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import java.util.stream.Stream;
 
 public class MapObjectSerializerTests {
 
@@ -75,27 +79,67 @@ public class MapObjectSerializerTests {
   }
 
   @Test
-  public void testTmxPropertyAnnotation() {
+  public void testTmxPropertyAnnotationBoolean() {
     IMapObject mapObject = MapObjectSerializer.serialize(new TestProp());
-
     assertEquals(true, mapObject.getBoolValue("testBool"));
-    assertEquals(1, mapObject.getIntValue("testInt"));
-    assertEquals(2, mapObject.getShortValue("testShort"));
-    assertEquals(3, mapObject.getLongValue("testLong"));
-    assertEquals(4, mapObject.getByteValue("testByte"));
-    assertEquals(5.5, mapObject.getDoubleValue("testDouble"));
-    assertEquals(6.6f, mapObject.getFloatValue("testFloat"));
-    assertEquals("test", mapObject.getStringValue("testString"));
+  }
 
-    assertEquals("false,false", mapObject.getStringValue("testBoolArr"));
-    assertEquals("0", mapObject.getStringValue("testIntArr"));
-    assertEquals("0,0", mapObject.getStringValue("testShortArr"));
-    assertEquals("0,0,0", mapObject.getStringValue("testLongArr"));
-    assertEquals("0,0,0,0", mapObject.getStringValue("testByteArr"));
-    assertEquals("0.0,0.0", mapObject.getStringValue("testDoubleArr"));
-    assertEquals("0,0,0,0", mapObject.getStringValue("testByteArr"));
-    assertEquals("0.0,0.0", mapObject.getStringValue("testFloatArr"));
-    assertEquals("null,null", mapObject.getStringValue("testStringArr"));
+  @Test
+  public void testTmxPropertyAnnotationInt() {
+    IMapObject mapObject = MapObjectSerializer.serialize(new TestProp());
+    assertEquals(1, mapObject.getIntValue("testInt"));
+  }
+
+  @Test
+  public void testTmxPropertyAnnotationShort() {
+    IMapObject mapObject = MapObjectSerializer.serialize(new TestProp());
+    assertEquals(2, mapObject.getShortValue("testShort"));
+  }
+
+  @Test
+  public void testTmxPropertyAnnotationLong() {
+    IMapObject mapObject = MapObjectSerializer.serialize(new TestProp());
+    assertEquals(3, mapObject.getLongValue("testLong"));
+  }
+
+  @Test
+  public void testTmxPropertyAnnotationByte() {
+    IMapObject mapObject = MapObjectSerializer.serialize(new TestProp());
+    assertEquals(4, mapObject.getByteValue("testByte"));
+  }
+
+  @Test
+  public void testTmxPropertyAnnotationDouble() {
+    IMapObject mapObject = MapObjectSerializer.serialize(new TestProp());
+    assertEquals(5.5, mapObject.getDoubleValue("testDouble"));
+  }
+
+  @Test
+  public void testTmxPropertyAnnotationFloat() {
+    IMapObject mapObject = MapObjectSerializer.serialize(new TestProp());
+    assertEquals(6.6f, mapObject.getFloatValue("testFloat"));
+  }
+
+  @ParameterizedTest
+  @MethodSource("getTmxPropertyAnnotationString")
+  public void testTmxPropertyAnnotationString(String propertyName, String expectedValue) {
+    IMapObject mapObject = MapObjectSerializer.serialize(new TestProp());
+    assertEquals(expectedValue, mapObject.getStringValue(propertyName));
+  }
+
+  private static Stream<Arguments> getTmxPropertyAnnotationString(){
+    return Stream.of(
+            Arguments.of("testString", "test"),
+            Arguments.of("testBoolArr", "false,false"),
+            Arguments.of("testIntArr", "0"),
+            Arguments.of("testShortArr", "0,0"),
+            Arguments.of("testLongArr", "0,0,0"),
+            Arguments.of("testByteArr", "0,0,0,0"),
+            Arguments.of("testDoubleArr", "0.0,0.0"),
+            Arguments.of("testByteArr", "0,0,0,0"),
+            Arguments.of("testFloatArr", "0.0,0.0"),
+            Arguments.of("testStringArr", "null,null")
+            );
   }
 
   private class TestProp extends Prop {
