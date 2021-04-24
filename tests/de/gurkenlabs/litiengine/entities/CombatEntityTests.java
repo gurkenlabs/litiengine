@@ -31,7 +31,7 @@ public class CombatEntityTests {
     }
 
     @Test
-    public void testHit_notDead(){
+    public void testHitNotDead(){
         // arrange
         int hitPoints = 100;
 
@@ -43,7 +43,7 @@ public class CombatEntityTests {
     }
 
     @Test
-    public void testHit_dead(){
+    public void testHitDead(){
         // arrange
         int hitPoints = 100;
         combatEntity.die();
@@ -56,7 +56,7 @@ public class CombatEntityTests {
     }
 
     @Test
-    public void testHit_indestructible(){
+    public void testHitIndestructible(){
         // arrange
         int hitPoints = 100;
         combatEntity.setIndestructible(true);
@@ -69,7 +69,7 @@ public class CombatEntityTests {
     }
 
     @Test
-    public void testHit_getsKilledWithThisHit(){
+    public void testHitGetsKilledWithThisHit(){
         // arrange
         int hitPoints = 250;
 

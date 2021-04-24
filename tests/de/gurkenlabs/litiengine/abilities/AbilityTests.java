@@ -8,7 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.*;
 
-import java.awt.*;
+import java.awt.Graphics2D;
+import java.awt.Shape;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
@@ -31,7 +32,7 @@ class AbilityTests {
   }
 
   @Test
-  public void isOnCooldown_noCurrentExecution() {
+  public void isOnCooldownNoCurrentExecution() {
     // arrange
     TestAbility ability = setupAbility();
 
@@ -45,7 +46,7 @@ class AbilityTests {
   }
 
   @Test
-  public void isOnCooldown_currentExecutionOver() {
+  public void isOnCooldownCurrentExecutionOver() {
     // arrange
     TestAbility ability = setupAbility();
 
@@ -61,7 +62,7 @@ class AbilityTests {
   }
 
   @Test
-  public void isOnCooldown_cooldownOver() {
+  public void isOnCooldownCooldownOver() {
     // arrange
     TestAbility ability = setupAbility();
 
@@ -77,7 +78,7 @@ class AbilityTests {
   }
 
   @Test
-  public void isOnCooldown_stillOnCooldown() {
+  public void isOnCooldownStillOnCooldown() {
     // arrange
     TestAbility ability = setupAbility();
 
@@ -93,7 +94,7 @@ class AbilityTests {
   }
 
   @Test
-  void getRemainingCooldownInSeconds_NoCast() {
+  void getRemainingCooldownInSecondsNoCast() {
     // arrange
     TestAbility ability = setupAbility();
 
@@ -105,7 +106,7 @@ class AbilityTests {
   }
 
   @Test
-  void getRemainingCooldownInSeconds_CreatureIsDead() {
+  void getRemainingCooldownInSecondsCreatureIsDead() {
     // arrange
     Creature creature = mock(Creature.class);
     when(creature.isDead()).thenReturn(true);
