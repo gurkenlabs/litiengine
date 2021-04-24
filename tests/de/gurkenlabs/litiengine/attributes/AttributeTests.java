@@ -404,27 +404,44 @@ class AttributeTests {
   }
 
   @Test
-  void testGet() {
+  void testGetByte() {
     final Attribute<Byte> testAttributeByte = new Attribute<>((byte) 10);
-    final Attribute<Short> testAttributeShort = new Attribute<>((short) 10);
-    final Attribute<Integer> testAttributeInt = new Attribute<>(10);
-    final Attribute<Long> testAttributeLong = new Attribute<>(10L);
-
-    final Attribute<Float> testAttributeFloat = new Attribute<>(10.0f);
-    final Attribute<Double> testAttributeDouble = new Attribute<>(10.0);
-
-    testAttributeByte.addModifier(new AttributeModifier<>(Modification.MULTIPLY, 2));
-    testAttributeShort.addModifier(new AttributeModifier<>(Modification.MULTIPLY, 2));
-    testAttributeInt.addModifier(new AttributeModifier<>(Modification.MULTIPLY, 2));
-    testAttributeLong.addModifier(new AttributeModifier<>(Modification.MULTIPLY, 2));
-    testAttributeFloat.addModifier(new AttributeModifier<>(Modification.MULTIPLY, 2));
-    testAttributeDouble.addModifier(new AttributeModifier<>(Modification.MULTIPLY, 2));
-
+    testAttributeByte.addModifier(new AttributeModifier<Byte>(Modification.MULTIPLY, 2));
     assertEquals((byte) 20, testAttributeByte.get().byteValue());
+  }
+
+  @Test
+  void testGetShort() {
+    final Attribute<Short> testAttributeShort = new Attribute<>((short) 10);
+    testAttributeShort.addModifier(new AttributeModifier<Short>(Modification.MULTIPLY, 2));
     assertEquals((short) 20, testAttributeShort.get().byteValue());
+  }
+
+  @Test
+  void testGetInteger() {
+    final Attribute<Integer> testAttributeInt = new Attribute<>(10);
+    testAttributeInt.addModifier(new AttributeModifier<Integer>(Modification.MULTIPLY, 2));
     assertEquals(20, testAttributeInt.get().intValue());
+  }
+
+  @Test
+  void testGetLong() {
+    final Attribute<Long> testAttributeLong = new Attribute<>(10L);
+    testAttributeLong.addModifier(new AttributeModifier<Long>(Modification.MULTIPLY, 2));
     assertEquals(20L, testAttributeLong.get().longValue());
+  }
+
+  @Test
+  void testGetFloat() {
+    final Attribute<Float> testAttributeFloat = new Attribute<>(10.0f);
+    testAttributeFloat.addModifier(new AttributeModifier<Float>(Modification.MULTIPLY, 2));
     assertEquals(20.0f, testAttributeFloat.get().floatValue());
+  }
+
+  @Test
+  void testGetDouble() {
+    final Attribute<Double> testAttributeDouble = new Attribute<>(10.0);
+    testAttributeDouble.addModifier(new AttributeModifier<Double>(Modification.MULTIPLY, 2));
     assertEquals((byte) 20.0, testAttributeDouble.get().doubleValue());
   }
 
