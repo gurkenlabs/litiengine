@@ -45,7 +45,7 @@ public class EntitySpawnerTests {
     }
 
     @Test
-    public void testSpawn_noEnvironment() {
+    public void testSpawnNoEnvironment() {
         // arrange
         when(spawnPoint.getEnvironment()).thenReturn(null);
 
@@ -57,7 +57,7 @@ public class EntitySpawnerTests {
     }
 
     @Test
-    public void testSpawn_environmentNotLoaded() {
+    public void testSpawnEnvironmentNotLoaded() {
         // arrange
         when(testEnvironment.isLoaded()).thenReturn(false);
         when(spawnPoint.getEnvironment()).thenReturn(testEnvironment);
@@ -70,7 +70,7 @@ public class EntitySpawnerTests {
     }
 
     @Test
-    public void testSpawn_spawnConfiguredAmount() {
+    public void testSpawnSpawnConfiguredAmount() {
         // arrange
         when(testEnvironment.isLoaded()).thenReturn(true);
         when(spawnPoint.getEnvironment()).thenReturn(testEnvironment);
