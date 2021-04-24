@@ -1,10 +1,17 @@
 package de.gurkenlabs.litiengine.attributes;
 
-import org.junit.jupiter.api.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.stream.Stream;
 
-import java.util.*;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * The Class AttributeTests.
@@ -18,30 +25,75 @@ class AttributeTests {
   }
 
   @Test
-  void testModifyBaseValueWithAddModification() {
+  void testModifyBaseValueWithAddModificationByte() {
+    // arrange
     final Attribute<Byte> testAttributeByte = new Attribute<>((byte) 10);
+
+    // act
+    testAttributeByte.modifyBaseValue(new AttributeModifier(Modification.ADD, (byte) 100));
+
+    // assert
+    assertEquals((byte) 110, testAttributeByte.get().byteValue());
+  }
+
+  @Test
+  void testModifyBaseValueWithAddModificationShort() {
+    // arrange
     final Attribute<Short> testAttributeShort = new Attribute<>((short) 10);
+
+    // act
+    testAttributeShort.modifyBaseValue(new AttributeModifier<>(Modification.ADD, (short) 100));
+
+    // assert
+    assertEquals((short) 110, testAttributeShort.get().shortValue());
+  }
+
+  @Test
+  void testModifyBaseValueWithAddModificationInteger() {
+    // arrange
     final Attribute<Integer> testAttributeInt = new Attribute<>(10);
+
+    // act
+    testAttributeInt.modifyBaseValue(new AttributeModifier<>(Modification.ADD, 100));
+
+    // assert
+    assertEquals(110, testAttributeInt.get().intValue());
+  }
+
+  @Test
+  void testModifyBaseValueWithAddModificationLong() {
+    // arrange
     final Attribute<Long> testAttributeLong = new Attribute<>(10L);
 
-    final Attribute<Float> testAttributeFloat = new Attribute<>(10.0f);
-    final Attribute<Double> testAttributeDouble = new Attribute<>(10.0);
-
-    testAttributeByte.modifyBaseValue(new AttributeModifier<>(Modification.ADD, (byte) 100));
-    testAttributeShort.modifyBaseValue(new AttributeModifier<>(Modification.ADD, (short) 100));
-    testAttributeInt.modifyBaseValue(new AttributeModifier<>(Modification.ADD, 100));
+    // act
     testAttributeLong.modifyBaseValue(new AttributeModifier<>(Modification.ADD, 1000L));
 
+    // assert
+    assertEquals(1010L, testAttributeLong.get().longValue());
+  }
+
+  @Test
+  void testModifyBaseValueWithAddModificationFloat() {
+    // arrange
+    final Attribute<Float> testAttributeFloat = new Attribute<>(10.0f);
+
+    // act
     testAttributeFloat.modifyBaseValue(new AttributeModifier<>(Modification.ADD, 101.1f));
+
+    // assert
+    assertEquals(111.1f, testAttributeFloat.get().floatValue(), 0.0001f);
+  }
+
+  @Test
+  void testModifyBaseValueWithAddModificationDouble() {
+    // arrange
+    final Attribute<Double> testAttributeDouble = new Attribute<>(10.0);
+
+    // act
     testAttributeDouble.modifyBaseValue(new AttributeModifier<>(Modification.ADD, 101.1));
 
-    assertEquals((byte) 110, testAttributeByte.get().byteValue());
-    assertEquals((short) 110, testAttributeShort.get().shortValue());
-    assertEquals(110, testAttributeInt.get().intValue());
-    assertEquals(1010L, testAttributeLong.get().longValue());
-
-    assertEquals(111.1f, testAttributeFloat.get(), 0.0001f);
-    assertEquals(111.1, testAttributeDouble.get(), 0.0000001);
+    // assert
+    assertEquals(111.1, testAttributeDouble.get().doubleValue(), 0.0000001);
   }
 
   @Test
