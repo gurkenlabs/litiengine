@@ -21,6 +21,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 
 public class SpawnpointTests {
   private Environment testEnvironment;
+  private boolean eventCalled;
 
   @BeforeAll
   public static void initGame() {
@@ -90,24 +91,21 @@ public class SpawnpointTests {
     assertEquals(60, creature.getY());
   }
 
-  boolean eventCalled = false;
-
   @Test
   public void testSpawnEvent() {
+    // arrange
     Creature creature = new Creature();
-
     Spawnpoint spawn = new Spawnpoint(20, 20);
 
     this.testEnvironment.add(spawn);
-
     Game.world().loadEnvironment(this.testEnvironment);
 
     spawn.onSpawned(e -> {
       eventCalled = true;
     });
 
+    // act, assert
     assertTrue(spawn.spawn(creature));
-
     assertTrue(eventCalled);
   }
 }
