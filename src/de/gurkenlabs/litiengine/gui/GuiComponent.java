@@ -59,7 +59,6 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   private final List<GuiComponent> components;
   private final Appearance disabledAppearance;
 
-  private boolean drawTextShadow = false;
   private boolean enabled;
   private Font font;
   private boolean forwardMouseEvents = true;
@@ -67,6 +66,11 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
 
   private Sound hoverSound;
   private boolean textAntialiasing;
+  private boolean textShadow;
+
+  private Color textShadowColor;
+  private float textShadowRadius;
+
   private boolean isHovered;
   private boolean isPressed;
   private boolean isSelected;
@@ -74,13 +78,11 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   private boolean suspended;
   private Object tag;
   private String text;
-  private Align textAlign = Align.CENTER;
-  private Valign textValign = Valign.MIDDLE;
+  private Align textAlign;
+  private Valign textValign;
   private boolean automaticLineBreaks;
   private int textAngle = 0;
 
-  private Color textShadowColor;
-  private float textShadowStroke = 2f;
   private double textX;
   private double textY;
   private boolean visible;
@@ -142,6 +144,15 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
         child.getAppearanceDisabled().update(this.getAppearanceDisabled());
       }
     });
+
+    this.setTextAlign(GuiProperties.getDefaultTextAlign());
+    this.setTextValign(GuiProperties.getDefaultTextValign());
+
+    this.setTextAntialiasing(GuiProperties.getDefaultTextAntialiasing());
+    this.setTextShadow(GuiProperties.getDefaultTextShadow());
+    this.setTextShadowColor(GuiProperties.getDefaultTextShadowColor());
+    this.setTextShadowRadius(GuiProperties.getDefaultTextShadowRadius());
+
     this.componentId = ++id;
 
     this.setLocation(x, y);
@@ -150,15 +161,6 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     this.setSelected(false);
     this.setEnabled(true);
     this.initializeComponents();
-  }
-
-  /**
-   * Draw text shadow.
-   *
-   * @return true, if successful
-   */
-  public boolean drawTextShadow() {
-    return this.drawTextShadow;
   }
 
   /**
@@ -306,30 +308,42 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     return this.textAngle;
   }
 
+  /**
+   * Check whether text antialiasing is activated.
+   *
+   * @return true, if this GuiComponent is currently configured to draw its text with antialiasing.
+   */
   public boolean hasTextAntialiasing() {
     return this.textAntialiasing;
   }
 
+  /**
+   * Check whether text shadow is activated.
+   *
+   * @return true, if this GuiComponent is currently configured to draw a shadow below its text.
+   */
+  public boolean hasTextShadow() {
+    return this.textShadow;
+  }
+
+  public Color getTextShadowColor() {
+    return textShadowColor;
+  }
+
+  public void setTextShadowColor(Color textShadowColor) {
+    this.textShadowColor = textShadowColor;
+  }
+
+  public float getTextShadowRadius() {
+    return textShadowRadius;
+  }
+
+  public void setTextShadowRadius(float textShadowRadius) {
+    this.textShadowRadius = textShadowRadius;
+  }
+
   public boolean hasAutomaticLineBreaks() {
     return this.automaticLineBreaks;
-  }
-
-  /**
-   * Gets the text shadow color.
-   *
-   * @return the text shadow color
-   */
-  public Color getTextShadowColor() {
-    return this.textShadowColor;
-  }
-
-  /**
-   * Gets the text shadow thickness.
-   *
-   * @return the float value determining how thick the outline will be rendered.
-   */
-  public float getTextShadowStroke() {
-    return this.textShadowStroke;
   }
 
   /**
@@ -699,33 +713,24 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
       return;
     }
 
-    Appearance currentAppearance = this.getAppearance();
-    if (this.isHovered()) {
-      currentAppearance = this.getAppearanceHovered();
-    }
-
-    if (!this.isEnabled()) {
-      currentAppearance = this.getAppearanceDisabled();
-    }
-
     Shape clip = g.getClip();
     g.clip(this.getShape());
 
-    if (!currentAppearance.isTransparentBackground()) {
-      g.setPaint(currentAppearance.getBackgroundPaint(this.getWidth(), this.getHeight()));
+    if (!getCurrentAppearance().isTransparentBackground()) {
+      g.setPaint(getCurrentAppearance().getBackgroundPaint(this.getWidth(), this.getHeight()));
       g.fill(this.getBoundingBox());
     }
 
-    g.setColor(currentAppearance.getForeColor());
+    g.setColor(getCurrentAppearance().getForeColor());
     g.setFont(this.getFont());
 
     this.renderText(g);
 
     g.setClip(clip);
-    if (currentAppearance.getBorderColor() != null && currentAppearance.getBorderStyle() != null) {
+    if (getCurrentAppearance().getBorderColor() != null && getCurrentAppearance().getBorderStyle() != null) {
       Stroke s = g.getStroke();
-      g.setStroke(currentAppearance.getBorderStyle());
-      g.setColor(currentAppearance.getBorderColor());
+      g.setStroke(getCurrentAppearance().getBorderStyle());
+      g.setColor(getCurrentAppearance().getBorderColor());
       g.draw(this.getShape());
       g.setStroke(s);
     }
@@ -1015,28 +1020,10 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
    * @param drawTextShadow the boolean determining if a text shadow should be drawn
    */
   public void setTextShadow(final boolean drawTextShadow) {
-    this.drawTextShadow = drawTextShadow;
+    this.textShadow = drawTextShadow;
     for (final GuiComponent comp : this.getComponents()) {
       comp.setTextShadow(drawTextShadow);
     }
-  }
-
-  /**
-   * Sets the text shadow color.
-   *
-   * @param textShadowColor the new text shadow color
-   */
-  public void setTextShadowColor(final Color textShadowColor) {
-    this.textShadowColor = textShadowColor;
-  }
-
-  /**
-   * Sets the text shadow thickness.
-   *
-   * @param textShadowStroke the thickness of the outline.
-   */
-  public void setTextShadowStroke(final float textShadowStroke) {
-    this.textShadowStroke = textShadowStroke;
   }
 
   /**
@@ -1138,7 +1125,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     }
   }
 
-  protected Appearance getCurrentAppearance() {
+  public Appearance getCurrentAppearance() {
     if (!this.isEnabled()) {
       return this.getAppearanceDisabled();
     }
@@ -1265,11 +1252,10 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     double yCoord = this.getTextValign() != null ?
         this.getY() + this.getTextValign().getLocation(this.getHeight(), textHeight) : this.getTextY();
     if (this.getTextAngle() == 0) {
-      if (this.drawTextShadow()) {
+      if (this.hasTextShadow()) {
         TextRenderer
             .renderWithOutline(g, this.getTextToRender(g), this.getX(), this.getY(), this.getWidth(), this.getHeight(),
-                this.getTextShadowColor(), this.getTextShadowStroke(), this.getTextAlign(), this.getTextValign(),
-                this.hasTextAntialiasing());
+                this.getTextShadowColor(), this.getTextShadowRadius(), this.getTextAlign(), this.getTextValign(), this.hasTextAntialiasing());
       } else {
         TextRenderer
             .renderWithLinebreaks(g, this.getTextToRender(g), this.getTextAlign(), this.getTextValign(), this.getX(), this.getY(), this.getWidth(),
