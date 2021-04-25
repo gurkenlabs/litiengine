@@ -30,32 +30,59 @@ public class CollisionResolvingTests {
   }
 
   @Test
-  public void testBasicMovement() {
-    Creature ent = getNewCreature();
-
+  public void testBasicMoveLeft() {
+    // arrange
+    Creature ent = getNewCreature(); // pos: (10,10)
     Game.physics().add(ent);
 
-    // large rectangle at the bottom of the entity
+    // act
+    Game.physics().move(ent, 270, 5);
 
-    Game.physics().add(new CollisionBox(0, 25, 100, 10));
-
-    // move 10 px to the right
-    Game.physics().update();
-    Game.physics().move(ent, 90, 10);
-
-    assertEquals(20, ent.getX(), EPSILON);
+    // assert
+    assertEquals(5, ent.getX(), EPSILON);
     assertEquals(10, ent.getY(), EPSILON);
+  }
 
-    // move back 10 px to the left
-    Game.physics().move(ent, 270, 10);
+  @Test
+  public void testBasicMoveRight() {
+    // arrange
+    Creature ent = getNewCreature(); // pos: (10,10)
+    Game.physics().add(ent);
 
-    assertEquals(10, ent.getX(), EPSILON);
+    // act
+    Game.physics().move(ent, 90, 5);
 
-    // move 5 px up where no collision is
+    // assert
+    assertEquals(15, ent.getX(), EPSILON);
+    assertEquals(10, ent.getY(), EPSILON);
+  }
+
+  @Test
+  public void testBasicMoveUp() {
+    // arrange
+    Creature ent = getNewCreature(); // pos: (10,10)
+    Game.physics().add(ent);
+
+    // act
     Game.physics().move(ent, 180, 5);
 
-    assertEquals(5, ent.getY(), EPSILON);
+    // assert
     assertEquals(10, ent.getX(), EPSILON);
+    assertEquals(5, ent.getY(), EPSILON);
+  }
+
+  @Test
+  public void testBasicMoveDown() {
+    // arrange
+    Creature ent = getNewCreature(); // pos: (10,10)
+    Game.physics().add(ent);
+
+    // act
+    Game.physics().move(ent, 0, 5);
+
+    // assert
+    assertEquals(10, ent.getX(), EPSILON);
+    assertEquals(15, ent.getY(), EPSILON);
   }
 
   @Test
