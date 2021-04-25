@@ -18,6 +18,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 public class CollisionResolvingTests {
   final double EPSILON = 1e-6;
+  final double MOVE_10X10Y_DISTANCE = 14.14213562373095; // = root of 200 because 10² + 10² = 200
 
   @BeforeEach
   public void init() {
@@ -169,7 +170,7 @@ public class CollisionResolvingTests {
 
     // act
     // "slide" along the rectangle to the top left
-    Game.physics().move(ent, 225, 14.14213562373095);
+    Game.physics().move(ent, 225, MOVE_10X10Y_DISTANCE);
 
     // assert
     assertEquals(0, ent.getX(), EPSILON);
@@ -188,7 +189,7 @@ public class CollisionResolvingTests {
 
     // act
     // "slide" along the rectangle to the bottom right
-    Game.physics().move(ent, 45, 14.14213562373095);
+    Game.physics().move(ent, 45, MOVE_10X10Y_DISTANCE);
 
     // assert
     assertEquals(20, ent.getX(), EPSILON);
@@ -207,7 +208,7 @@ public class CollisionResolvingTests {
 
     // act
     // "slide" along the rectangle to the top right
-    Game.physics().move(ent, 135, 14.14213562373095);
+    Game.physics().move(ent, 135, MOVE_10X10Y_DISTANCE);
 
     // assert
     assertEquals(10, ent.getX(), EPSILON);
@@ -231,8 +232,8 @@ public class CollisionResolvingTests {
     // "slide" along the rectangle to the bottom left
     // TODO: target collision box wrongfully detects an intersection with blocking collision box due to floating point precision miscalculation
     //  within method GeometricUtilities.intersects - intersection is marginally positive in case of left movement, but marginally negative in right movement
-    // Game.physics().move(ent, 315, 14.14213562373095);
-    Game.physics().move(ent, 315, 14.14213562373094);
+    // Game.physics().move(ent, 315, MOVE_10X10Y_DISTANCE);
+    Game.physics().move(ent, 315, MOVE_10X10Y_DISTANCE-(1e-14));
 
     // assert
     assertEquals(10, ent.getX(), EPSILON);
@@ -255,7 +256,7 @@ public class CollisionResolvingTests {
     ent.setLocation(55, 10);
 
     // now "slide" again
-    Game.physics().move(ent, 45, 14.14213562373095);
+    Game.physics().move(ent, 45, MOVE_10X10Y_DISTANCE);
 
     // the entity just went through the corner
     assertEquals(65.0, ent.getX(), EPSILON);
@@ -265,10 +266,10 @@ public class CollisionResolvingTests {
     ent.setLocation(49, 10);
 
     // now "slide" again
-    Game.physics().move(ent, 45, 14.14213562373095);
+    Game.physics().move(ent, 45, MOVE_10X10Y_DISTANCE);
 
-    assertEquals(10.0, ent.getY(), EPSILON);
     assertEquals(59.0, ent.getX(), EPSILON);
+    assertEquals(10.0, ent.getY(), EPSILON);
   }
 
   // TODO
