@@ -5,10 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.awt.Color;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
 public class ColorHelperTests {
 
@@ -24,19 +27,19 @@ public class ColorHelperTests {
     assertNull(redDecoded2);
   }
 
-  @Test
-  public void testColorFromHexString() {
-    String red = "#ff0000";
-    String green = "#00ff00";
-    String blue = "#0000ff";
+  @ParameterizedTest
+  @MethodSource("getColorFromHexString")
+  public void testColorFromHexString( String colorHex, Color expectedColor) {
+    Color colorDecoded = ColorHelper.decode(colorHex);
+    assertEquals(expectedColor, colorDecoded);
+  }
 
-    Color redDecoded = ColorHelper.decode(red);
-    Color greenDecoded = ColorHelper.decode(green);
-    Color blueDecoded = ColorHelper.decode(blue);
-
-    assertEquals(Color.RED, redDecoded);
-    assertEquals(Color.GREEN, greenDecoded);
-    assertEquals(Color.BLUE, blueDecoded);
+  private static Stream<Arguments> getColorFromHexString(){
+    return Stream.of(
+            Arguments.of("#ff0000", Color.RED),
+            Arguments.of("#00ff00", Color.GREEN),
+            Arguments.of("#0000ff", Color.BLUE)
+    );
   }
 
   @Test
