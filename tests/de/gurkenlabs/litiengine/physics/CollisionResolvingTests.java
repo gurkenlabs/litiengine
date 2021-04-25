@@ -1,20 +1,22 @@
 package de.gurkenlabs.litiengine.physics;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.awt.geom.Rectangle2D;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.entities.CollisionBox;
 import de.gurkenlabs.litiengine.entities.Creature;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.awt.geom.Rectangle2D;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CollisionResolvingTests {
   final double EPSILON = 1e-6;
@@ -30,193 +32,63 @@ public class CollisionResolvingTests {
     Game.physics().clear();
   }
 
-  @Test
-  public void testBasicMoveLeft() {
+  @ParameterizedTest(name = "testBasicMove: {0}")
+  @MethodSource("getBasicMoveParameters")
+  public void testBasicMove(String direction, int angle, int distance, int targetX, int targetY) {
     // arrange
     Creature ent = getNewCreature(); // pos: (10,10)
     Game.physics().add(ent);
 
     // act
-    Game.physics().move(ent, 270, 5);
+    Game.physics().move(ent, angle, distance);
 
     // assert
-    assertEquals(5, ent.getX(), EPSILON);
-    assertEquals(10, ent.getY(), EPSILON);
+    assertEquals(targetX, ent.getX(), EPSILON);
+    assertEquals(targetY, ent.getY(), EPSILON);
   }
 
-  @Test
-  public void testBasicMoveRight() {
-    // arrange
-    Creature ent = getNewCreature(); // pos: (10,10)
-    Game.physics().add(ent);
-
-    // act
-    Game.physics().move(ent, 90, 5);
-
-    // assert
-    assertEquals(15, ent.getX(), EPSILON);
-    assertEquals(10, ent.getY(), EPSILON);
-  }
-
-  @Test
-  public void testBasicMoveUp() {
-    // arrange
-    Creature ent = getNewCreature(); // pos: (10,10)
-    Game.physics().add(ent);
-
-    // act
-    Game.physics().move(ent, 180, 5);
-
-    // assert
-    assertEquals(10, ent.getX(), EPSILON);
-    assertEquals(5, ent.getY(), EPSILON);
-  }
-
-  @Test
-  public void testBasicMoveDown() {
-    // arrange
-    Creature ent = getNewCreature(); // pos: (10,10)
-    Game.physics().add(ent);
-
-    // act
-    Game.physics().move(ent, 0, 5);
-
-    // assert
-    assertEquals(10, ent.getX(), EPSILON);
-    assertEquals(15, ent.getY(), EPSILON);
-  }
-
-  @Test
-  public void testCollidingMoveLeft() {
+  @ParameterizedTest(name = "testCollidingMoveBlock: {0}")
+  @MethodSource("getCollidingMoveBlockParameters")
+  public void testCollidingMoveBlock(String direction, CollisionBox collisionBox, int angle, int distance, int targetX, int targetY) {
     // arrange
     Creature ent = getNewCreature(); // pos: (10,10), w/h: 10/10
     Game.physics().add(ent);
 
     // large rectangle to the left of the entity
-    Game.physics().add(new CollisionBox(0, 0, 5, 100));
+    Game.physics().add(collisionBox);
     Game.physics().update();
 
     // act
-    Game.physics().move(ent, 270, 10);
+    Game.physics().move(ent, angle, distance);
 
     // assert
-    assertEquals(5, ent.getX(), EPSILON); // block movement for remaining 5px
-    assertEquals(10, ent.getY(), EPSILON);
+    // block movement for remaining 5px
+    assertEquals(targetX, ent.getX(), EPSILON);
+    assertEquals(targetY, ent.getY(), EPSILON);
   }
 
-  @Test
-  public void testCollidingMoveRight() {
+  @ParameterizedTest(name = "testCollidingMoveSlide: {0}")
+  @MethodSource("getCollidingMoveSlideParameters")
+  public void testCollidingMoveSlide(String direction, CollisionBox collisionBox, int angle, int targetX, int targetY) {
     // arrange
     Creature ent = getNewCreature(); // pos: (10,10), w/h: 10/10
     Game.physics().add(ent);
 
-    // large rectangle to the right of the entity
-    Game.physics().add(new CollisionBox(25, 0, 10, 100));
+    // large rectangle right next to the entity
+    Game.physics().add(collisionBox);
     Game.physics().update();
 
     // act
-    Game.physics().move(ent, 90, 10);
+    // "slide" along the rectangle in direction
+    Game.physics().move(ent, angle, MOVE_10X10Y_DISTANCE);
 
     // assert
-    assertEquals(15, ent.getX(), EPSILON); // block movement for remaining 5px
-    assertEquals(10, ent.getY(), EPSILON);
+    assertEquals(targetX, ent.getX(), EPSILON);
+    assertEquals(targetY, ent.getY(), EPSILON);
   }
 
   @Test
-  public void testCollidingMoveUp() {
-    // arrange
-    Creature ent = getNewCreature(); // pos: (10,10), w/h: 10/10
-    Game.physics().add(ent);
-
-    // large rectangle above the entity
-    Game.physics().add(new CollisionBox(0, 0, 100, 5));
-    Game.physics().update();
-
-    // act
-    Game.physics().move(ent, 180, 10);
-
-    // assert
-    assertEquals(10, ent.getX(), EPSILON);
-    assertEquals(5, ent.getY(), EPSILON); // block movement for remaining 5px
-  }
-
-  @Test
-  public void testCollidingMoveDown() {
-    // arrange
-    Creature ent = getNewCreature(); // pos: (10,10), w/h: 10/10
-    Game.physics().add(ent);
-
-    // large rectangle below the entity
-    Game.physics().add(new CollisionBox(0, 25, 100, 10));
-    Game.physics().update();
-
-    // act
-    Game.physics().move(ent, 0, 10);
-
-    // assert
-    assertEquals(10, ent.getX(), EPSILON);
-    assertEquals(15, ent.getY(), EPSILON); // block movement for remaining 5px
-  }
-
-  @Test
-  public void testCollidingSlideLeft() {
-    // arrange
-    Creature ent = getNewCreature(); // pos: (10,10), w/h: 10/10
-    Game.physics().add(ent);
-
-    // large rectangle above the entity
-    Game.physics().add(new CollisionBox(0, 0, 100, 10));
-    Game.physics().update();
-
-    // act
-    // "slide" along the rectangle to the top left
-    Game.physics().move(ent, 225, MOVE_10X10Y_DISTANCE);
-
-    // assert
-    assertEquals(0, ent.getX(), EPSILON);
-    assertEquals(10, ent.getY(), EPSILON);
-  }
-
-  @Test
-  public void testCollidingSlideRight() {
-    // arrange
-    Creature ent = getNewCreature(); // pos: (10,10), w/h: 10/10
-    Game.physics().add(ent);
-
-    // large rectangle below the entity
-    Game.physics().add(new CollisionBox(0, 20, 100, 10));
-    Game.physics().update();
-
-    // act
-    // "slide" along the rectangle to the bottom right
-    Game.physics().move(ent, 45, MOVE_10X10Y_DISTANCE);
-
-    // assert
-    assertEquals(20, ent.getX(), EPSILON);
-    assertEquals(10, ent.getY(), EPSILON);
-  }
-
-  @Test
-  public void testCollidingSlideUp() {
-    // arrange
-    Creature ent = getNewCreature(); // pos: (10,10), w/h: 10/10
-    Game.physics().add(ent);
-
-    // large rectangle to the right of the entity
-    Game.physics().add(new CollisionBox(20, 0, 10, 100));
-    Game.physics().update();
-
-    // act
-    // "slide" along the rectangle to the top right
-    Game.physics().move(ent, 135, MOVE_10X10Y_DISTANCE);
-
-    // assert
-    assertEquals(10, ent.getX(), EPSILON);
-    assertEquals(0, ent.getY(), EPSILON);
-  }
-
-  @Test
-  public void testCollidingSlideDown() {
+  public void testCollidingMoveSlideDown() {
     // arrange
     Creature ent = getNewCreature(); // pos: (10,10), w/h: 10/10
     Game.physics().add(ent);
@@ -224,9 +96,6 @@ public class CollisionResolvingTests {
     // large rectangle to the left of the entity
     Game.physics().add(new CollisionBox(0, 0, 10, 100));
     Game.physics().update();
-    assertEquals(10, ent.getX(), EPSILON);
-    assertEquals(10, ent.getY(), EPSILON);
-    System.out.println(Game.physics().getCollisionEntities());
 
     // act
     // "slide" along the rectangle to the bottom left
@@ -369,5 +238,31 @@ public class CollisionResolvingTests {
     ent.setCollision(true);
 
     return ent;
+  }
+
+  private static Stream<Arguments> getBasicMoveParameters() {
+    return Stream.of(
+            Arguments.of("left", 270, 5, 5, 10),
+            Arguments.of("right", 90, 5, 15, 10),
+            Arguments.of("up", 180, 5, 10, 5),
+            Arguments.of("down", 0, 5, 10, 15)
+    );
+  }
+
+  private static Stream<Arguments> getCollidingMoveBlockParameters() {
+    return Stream.of(
+            Arguments.of("left", new CollisionBox(0, 0, 5, 100), 270, 10, 5, 10),
+            Arguments.of("right", new CollisionBox(25, 0, 10, 100), 90, 10, 15, 10),
+            Arguments.of("up", new CollisionBox(0, 0, 100, 5), 180, 10, 10, 5),
+            Arguments.of("down", new CollisionBox(0, 25, 100, 10), 0, 10, 10, 15)
+    );
+  }
+
+  private static Stream<Arguments> getCollidingMoveSlideParameters() {
+    return Stream.of(
+            Arguments.of("left top-left", new CollisionBox(0, 0, 100, 10), 225, 0, 10),
+            Arguments.of("right bottom-right", new CollisionBox(0, 20, 100, 10), 45, 20, 10),
+            Arguments.of("up top-right", new CollisionBox(20, 0, 10, 100), 135, 10, 0)
+    );
   }
 }
