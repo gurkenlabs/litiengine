@@ -25,6 +25,7 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.sound.Sound;
 import de.gurkenlabs.litiengine.tweening.TweenType;
 import de.gurkenlabs.litiengine.tweening.Tweenable;
+import de.gurkenlabs.litiengine.util.ColorHelper;
 
 /**
  * The abstract Class GuiComponent provides all properties and methods needed for screens, built-in, and custom GUI components such as buttons,
@@ -761,6 +762,15 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
       return new float[] { (float) this.getTextAngle() };
     case FONTSIZE:
       return new float[] { this.getFont().getSize2D() };
+    case OPACITY:
+      Color bg1 = this.getCurrentAppearance().getBackgroundColor1();
+      Color bg2 = this.getCurrentAppearance().getBackgroundColor2();
+      Color fore = this.getCurrentAppearance().getForeColor();
+      Color border = this.getCurrentAppearance().getBorderColor();
+      return new float[] { (float) (bg1 == null ? 0 : bg1.getAlpha()),
+          (float) (bg2 == null ? 0 : bg2.getAlpha()),
+          (float) (fore == null ? 0 : fore.getAlpha()),
+          (float) (border == null ? 0 : border.getAlpha()) };
     default:
       return Tweenable.super.getTweenValues(tweenType);
     }
@@ -794,6 +804,16 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
       break;
     case FONTSIZE:
       this.setFontSize(newValues[0]);
+      break;
+    case OPACITY:
+      Color bg1 = this.getCurrentAppearance().getBackgroundColor1();
+      Color bg2 = this.getCurrentAppearance().getBackgroundColor2();
+      Color fore = this.getCurrentAppearance().getForeColor();
+      Color border = this.getCurrentAppearance().getBorderColor();
+      getCurrentAppearance().setBackgroundColor1(bg1 == null ? null : ColorHelper.getTransparentVariant(bg1, (int) newValues[0]));
+      getCurrentAppearance().setBackgroundColor2(bg2 == null ? null : ColorHelper.getTransparentVariant(bg2, (int) newValues[1]));
+      getCurrentAppearance().setForeColor(fore == null ? null : ColorHelper.getTransparentVariant(fore, (int) newValues[2]));
+      getCurrentAppearance().setBorderColor(border == null ? null : ColorHelper.getTransparentVariant(border, (int) newValues[3]));
       break;
     default:
       Tweenable.super.setTweenValues(tweenType, newValues);
@@ -873,7 +893,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   }
 
   /**
-   * Sets the "enabled" property on this GuiComponent.
+   * Sets the "hovered" property on this GuiComponent.
    *
    * @param hovered the new hovered
    */
@@ -1237,7 +1257,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     final FontMetrics fm = g.getFontMetrics();
 
     double textWidth = fm.stringWidth(this.getTextToRender(g));
-    double textHeight = (double) (fm.getAscent() + fm.getDescent());
+    double textHeight = (double) fm.getAscent() + fm.getDescent();
 
     double xCoord = this.getTextAlign() != null ?
         this.getX() + this.getTextAlign().getLocation(this.getWidth(), textWidth) :
