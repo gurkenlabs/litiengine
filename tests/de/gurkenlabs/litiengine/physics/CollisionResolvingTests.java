@@ -252,28 +252,6 @@ public class CollisionResolvingTests {
     Game.physics().add(new CollisionBox(50, 20, 10, 100));
 
     // first relocate the entity
-    ent.setLocation(45, 10);
-
-    // move 10 px down
-    Game.physics().move(ent, 0, 10);
-
-    // the movement should have been denied
-    assertEquals(45.0, ent.getX(), EPSILON);
-    assertEquals(10.0, ent.getY(), EPSILON);
-
-    // now "slide" along the rectangle to the bottom right
-    Game.physics().move(ent, 45, 14.14213562373095);
-
-    assertEquals(55.0, ent.getX(), EPSILON);
-    assertEquals(10.0, ent.getY(), EPSILON);
-
-    // now "slide" back
-    Game.physics().move(ent, 315, 14.14213562373095);
-
-    assertEquals(45.0, ent.getX(), EPSILON);
-    assertEquals(10.0, ent.getY(), EPSILON);
-
-    // first relocate the entity
     ent.setLocation(55, 10);
 
     // now "slide" again
@@ -311,13 +289,6 @@ public class CollisionResolvingTests {
 
     // first relocate the entity
     ent.setLocation(45, 10);
-
-    // move 10 px down
-    Game.physics().move(ent, 0, 10);
-
-    // the movement should have been denied
-    assertEquals(45.0, ent.getX(), EPSILON);
-    assertEquals(10.0, ent.getY(), EPSILON);
 
     // move along the square to the left
     Game.physics().move(ent, -90, 10);
