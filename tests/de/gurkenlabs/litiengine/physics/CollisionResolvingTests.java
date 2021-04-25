@@ -112,7 +112,7 @@ public class CollisionResolvingTests {
   @Test
   public void testCollisionWithCorner_passingThroughIfFree() {
     // arrange
-    Creature ent = getNewCreature();
+    Creature ent = getNewCreature(); // pos: (10,10), w/h: 10/10
     Game.physics().add(ent);
 
     // rectangle with corner on the top-right side
@@ -132,7 +132,7 @@ public class CollisionResolvingTests {
   @Test
   public void testCollisionWithCorner_slideIfBlocked() {
     // arrange
-    Creature ent = getNewCreature();
+    Creature ent = getNewCreature(); // pos: (10,10), w/h: 10/10
     Game.physics().add(ent);
 
     // rectangle with corner on the top-right side
@@ -151,41 +151,36 @@ public class CollisionResolvingTests {
     assertEquals(10.0, ent.getY(), EPSILON);
   }
 
-  // TODO
   @Test
   public void testMultipleIntersection() {
-    Creature ent = getNewCreature();
-
+    // arrange
+    Creature ent = getNewCreature(); // pos: (10,10), w/h: 10/10
     Game.physics().add(ent);
 
     // thin rectangle at the bottom of the entity
-    Game.physics().add(new CollisionBox(0, 25, 50, 10));
-
+    Game.physics().add(new CollisionBox(0, 25, 15, 10));
     // small square to top the right corner of the thin rectangle
-    Game.physics().add(new CollisionBox(50, 20, 5, 5));
-
+    Game.physics().add(new CollisionBox(15, 20, 5, 5));
     // large rectangle at the right of the square
-    Game.physics().add(new CollisionBox(55, 0, 50, 100));
+    Game.physics().add(new CollisionBox(20, 0, 50, 100));
+    Game.physics().update();
 
-    // first relocate the entity
-    ent.setLocation(45, 10);
+    // TODO: technically, should the square block the entity from moving into it?
+    //  When removing the right rectangle (which collides in movement step 3), the entity moves to (10,15) and
+    //  overlaps with the square instead of being blocked. This is only avoided by the right rectangle...
 
+    // act, assert
     // move along the square to the left
     Game.physics().move(ent, -90, 10);
-
-    assertEquals(35.0, ent.getX(), EPSILON);
+    assertEquals(0.0, ent.getX(), EPSILON);
     assertEquals(10.0, ent.getY(), EPSILON);
-
     // move along the square downwards
     Game.physics().move(ent, 0, 10);
-
-    assertEquals(35.0, ent.getX(), EPSILON);
+    assertEquals(0.0, ent.getX(), EPSILON);
     assertEquals(15.0, ent.getY(), EPSILON);
-
     // move along the thin rectangle to the right
     Game.physics().move(ent, 90, 15);
-
-    assertEquals(40.0, ent.getX(), EPSILON);
+    assertEquals(5.0, ent.getX(), EPSILON);
     assertEquals(15.0, ent.getY(), EPSILON);
   }
 
