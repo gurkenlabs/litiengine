@@ -4,9 +4,13 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.Creature;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.awt.Component;
 import java.awt.event.KeyEvent;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -23,109 +27,24 @@ public class KeyboardEntityControllerTests {
         adapter.initialized();
     }
 
-    @Test
-    public void handleUpKeyPressed() {
+    @ParameterizedTest(name="handleKeyPressed: {0}")
+    @MethodSource("supplyHandleKeyPressedParameters")
+    public void testHandleKeyPressed(String key, int keyCode, char keyChar, int dX, int dY, int resX, int resY) {
         // arrange
-        int keyCode = KeyEvent.VK_W;
-        char keyChar = 'W';
         Component source = new TestComponent();
         KeyEvent keyEvent = new KeyEvent(source, KeyEvent.KEY_PRESSED, System.currentTimeMillis(), 0, keyCode, keyChar);
 
         Creature entity = new Creature();
         KeyboardEntityController<Creature> controller = new KeyboardEntityController<>(entity);
-        controller.setDx(1);
-        controller.setDy(1);
+        controller.setDx(dX);
+        controller.setDy(dY);
 
         // act
         controller.handlePressedKey(keyEvent);
 
         // assert
-        assertEquals(1, controller.getDx()); // =
-        assertEquals(0, controller.getDy()); // +1
-    }
-
-    @Test
-    public void handleDownKeyPressed() {
-        // arrange
-        int keyCode = KeyEvent.VK_S;
-        char keyChar = 'S';
-        Component source = new TestComponent();
-        KeyEvent keyEvent = new KeyEvent(source, KeyEvent.KEY_PRESSED, System.currentTimeMillis(), 0, keyCode, keyChar);
-
-        Creature entity = new Creature();
-        KeyboardEntityController<Creature> controller = new KeyboardEntityController<>(entity);
-        controller.setDx(0);
-        controller.setDy(0);
-
-        // act
-        controller.handlePressedKey(keyEvent);
-
-        // assert
-        assertEquals(0, controller.getDx()); // =
-        assertEquals(1, controller.getDy()); // -1
-    }
-
-    @Test
-    public void handleLeftKeyPressed() {
-        // arrange
-        int keyCode = KeyEvent.VK_A;
-        char keyChar = 'A';
-        Component source = new TestComponent();
-        KeyEvent keyEvent = new KeyEvent(source, KeyEvent.KEY_PRESSED, System.currentTimeMillis(), 0, keyCode, keyChar);
-
-        Creature entity = new Creature();
-        KeyboardEntityController<Creature> controller = new KeyboardEntityController<>(entity);
-        controller.setDx(1);
-        controller.setDy(1);
-
-        // act
-        controller.handlePressedKey(keyEvent);
-
-        // assert
-        assertEquals(0, controller.getDx()); // -1
-        assertEquals(1, controller.getDy()); // =
-    }
-
-    @Test
-    public void handleRightKeyPressed() {
-        // arrange
-        int keyCode = KeyEvent.VK_D;
-        char keyChar = 'D';
-        Component source = new TestComponent();
-        KeyEvent keyEvent = new KeyEvent(source, KeyEvent.KEY_PRESSED, System.currentTimeMillis(), 0, keyCode, keyChar);
-
-        Creature entity = new Creature();
-        KeyboardEntityController<Creature> controller = new KeyboardEntityController<>(entity);
-        controller.setDx(0);
-        controller.setDy(0);
-
-        // act
-        controller.handlePressedKey(keyEvent);
-
-        // assert
-        assertEquals(1, controller.getDx()); // +1
-        assertEquals(0, controller.getDy()); // =
-    }
-
-    @Test
-    public void unchangedForOtherKeyPressed() {
-        // arrange
-        int keyCode = KeyEvent.VK_P;
-        char keyChar = 'P';
-        Component source = new TestComponent();
-        KeyEvent keyEvent = new KeyEvent(source, KeyEvent.KEY_PRESSED, System.currentTimeMillis(), 0, keyCode, keyChar);
-
-        Creature entity = new Creature();
-        KeyboardEntityController<Creature> controller = new KeyboardEntityController<>(entity);
-        controller.setDx(1);
-        controller.setDy(1);
-
-        // act
-        controller.handlePressedKey(keyEvent);
-
-        // assert
-        assertEquals(1, controller.getDx()); // =
-        assertEquals(1, controller.getDy()); // =
+        assertEquals(resX, controller.getDx());
+        assertEquals(resY, controller.getDy());
     }
 
     @Test
@@ -269,5 +188,15 @@ public class KeyboardEntityControllerTests {
     }
 
     private class TestComponent extends Component {
+    }
+
+    private static Stream<Arguments> supplyHandleKeyPressedParameters() {
+        return Stream.of(
+                Arguments.of("Up", KeyEvent.VK_W, "W", 1, 1, 1, 0),
+                Arguments.of("Down", KeyEvent.VK_S, "S", 0, 0, 0, 1),
+                Arguments.of("Left", KeyEvent.VK_A, "A", 1, 1, 0, 1),
+                Arguments.of("Right", KeyEvent.VK_D, "D", 0, 0, 1, 0),
+                Arguments.of("Other", KeyEvent.VK_P, "P", 1, 1, 1, 1)
+        );
     }
 }
