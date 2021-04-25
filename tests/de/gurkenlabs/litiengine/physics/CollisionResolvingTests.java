@@ -241,34 +241,44 @@ public class CollisionResolvingTests {
   }
 
   @Test
-  public void testFailingPhysics() {
+  public void testCollisionWithCorner_passingThroughIfFree() {
+    // arrange
     Creature ent = getNewCreature();
-
     Game.physics().add(ent);
 
-    // large rectangle at the bottom of the entity
-    Game.physics().add(new CollisionBox(0, 20, 50, 30));
+    // rectangle with corner on the top-right side
+    Game.physics().add(new CollisionBox(5, 20, 10, 100));
+    Game.physics().update();
 
-    // another rectangle that creates an angle on the right side
-    Game.physics().add(new CollisionBox(50, 20, 10, 100));
-
-    // first relocate the entity
-    ent.setLocation(55, 10);
-
-    // now "slide" again
+    // act
+    // "slide" to bottom right through corner to location outside of box
     Game.physics().move(ent, 45, MOVE_10X10Y_DISTANCE);
 
+    // assert
     // the entity just went through the corner
-    assertEquals(65.0, ent.getX(), EPSILON);
+    assertEquals(20.0, ent.getX(), EPSILON);
     assertEquals(20.0, ent.getY(), EPSILON);
+  }
 
-    // first relocate the entity
-    ent.setLocation(49, 10);
+  @Test
+  public void testCollisionWithCorner_slideIfBlocked() {
+    // arrange
+    Creature ent = getNewCreature();
+    Game.physics().add(ent);
 
-    // now "slide" again
+    // rectangle with corner on the top-right side
+    Game.physics().add(new CollisionBox(5, 20, 10, 100));
+    // rectangle right next to previous rectangle
+    Game.physics().add(new CollisionBox(15, 20, 10, 100));
+    Game.physics().update();
+
+    // act
+    // "slide" to bottom right to location inside next box
     Game.physics().move(ent, 45, MOVE_10X10Y_DISTANCE);
 
-    assertEquals(59.0, ent.getX(), EPSILON);
+    // assert
+    // the entity slid along the box instead of passing through the corner
+    assertEquals(20.0, ent.getX(), EPSILON);
     assertEquals(10.0, ent.getY(), EPSILON);
   }
 
