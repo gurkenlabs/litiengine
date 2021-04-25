@@ -1,9 +1,5 @@
 package de.gurkenlabs.litiengine.resources;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.awt.image.BufferedImage;
 import java.util.stream.Stream;
 
@@ -11,6 +7,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class TextureAtlasTests {
 
@@ -45,6 +45,12 @@ public class TextureAtlasTests {
   @MethodSource("getTextureAtlasLoadResourceName")
   public void testTextureAtlasLoad(String resourceName) {
     TextureAtlas atlas = TextureAtlas.read("tests/de/gurkenlabs/litiengine/resources/gurk-nukem-atlas.xml");
+
+    // file must be available on the file system
+    if(atlas == null){
+      fail();
+    }
+
     Resources.images().load(atlas);
 
     BufferedImage img = Resources.images().get(resourceName);
@@ -72,6 +78,12 @@ public class TextureAtlasTests {
   @MethodSource("getTextureAtlasLoadWidthHeight")
   public void testTextureAtlasLoadWidth(String resourceName, int expectedWidth, int expectedHeight) {
     TextureAtlas atlas = TextureAtlas.read("tests/de/gurkenlabs/litiengine/resources/gurk-nukem-atlas.xml");
+
+    // file must be available on the file system
+    if(atlas == null){
+      fail();
+    }
+
     Resources.images().load(atlas);
 
     BufferedImage img = Resources.images().get(resourceName);
@@ -82,6 +94,12 @@ public class TextureAtlasTests {
   @MethodSource("getTextureAtlasLoadWidthHeight")
   public void testTextureAtlasLoadHeight(String resourceName, int expectedWidth, int expectedHeight) {
     TextureAtlas atlas = TextureAtlas.read("tests/de/gurkenlabs/litiengine/resources/gurk-nukem-atlas.xml");
+
+    // file must be available on the file system
+    if(atlas == null){
+      fail();
+    }
+
     Resources.images().load(atlas);
 
     BufferedImage img = Resources.images().get(resourceName);
