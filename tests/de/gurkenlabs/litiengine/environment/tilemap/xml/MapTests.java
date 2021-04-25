@@ -1,8 +1,6 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
 import java.awt.Color;
@@ -70,6 +68,9 @@ public class MapTests {
   @MethodSource("getTileCustomProperties")
   public void testTileCustomProperties(int tileLayers, int x, int y, String propertyName, String expectedValue) {
     IMap map = Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
+    if(! Resources.maps().contains(map)){
+      fail();
+    }
     assertEquals(expectedValue, map.getTileLayers().get(tileLayers).getTile(x, y).getStringValue(propertyName));
   }
 
