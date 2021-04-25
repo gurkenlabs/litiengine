@@ -771,10 +771,12 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
       Color bg1 = this.getCurrentAppearance().getBackgroundColor1();
       Color bg2 = this.getCurrentAppearance().getBackgroundColor2();
       Color fore = this.getCurrentAppearance().getForeColor();
+      Color shadow = this.getTextShadowColor();
       Color border = this.getCurrentAppearance().getBorderColor();
       return new float[] { (float) (bg1 == null ? 0 : bg1.getAlpha()),
           (float) (bg2 == null ? 0 : bg2.getAlpha()),
           (float) (fore == null ? 0 : fore.getAlpha()),
+          (float) (shadow == null ? 0 : shadow.getAlpha()),
           (float) (border == null ? 0 : border.getAlpha()) };
     default:
       return Tweenable.super.getTweenValues(tweenType);
@@ -818,7 +820,8 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
       getCurrentAppearance().setBackgroundColor1(bg1 == null ? null : ColorHelper.getTransparentVariant(bg1, (int) newValues[0]));
       getCurrentAppearance().setBackgroundColor2(bg2 == null ? null : ColorHelper.getTransparentVariant(bg2, (int) newValues[1]));
       getCurrentAppearance().setForeColor(fore == null ? null : ColorHelper.getTransparentVariant(fore, (int) newValues[2]));
-      getCurrentAppearance().setBorderColor(border == null ? null : ColorHelper.getTransparentVariant(border, (int) newValues[3]));
+      setTextShadowColor(getTextShadowColor() == null ? null : ColorHelper.getTransparentVariant(getTextShadowColor(), (int) newValues[3]));
+      getCurrentAppearance().setBorderColor(border == null ? null : ColorHelper.getTransparentVariant(border, (int) newValues[4]));
       break;
     default:
       Tweenable.super.setTweenValues(tweenType, newValues);
