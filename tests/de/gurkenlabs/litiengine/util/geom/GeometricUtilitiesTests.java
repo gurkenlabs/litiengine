@@ -20,22 +20,24 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 public class GeometricUtilitiesTests {
 
-  @Test
-  public void testScaleWithRatio() {
-    int width1 = 16;
-    int height1 = 32;
+  @ParameterizedTest(name="testScaleWithRatioWidth width={0}, height={1}, max={2}, expectedValue={3}")
+  @CsvSource({
+          "16, 32, 16, 8",
+          "32, 16, 16, 16"
+  })
+  public void testScaleWithRatioWidth(int width, int height, int max, int expectedValue) {
+    Dimension2D newDimension = GeometricUtilities.scaleWithRatio(width, height, max);
+    assertEquals(expectedValue, newDimension.getWidth(), 0.0001);
+  }
 
-    int width2 = 32;
-    int height2 = 16;
-
-    Dimension2D newDimension1 = GeometricUtilities.scaleWithRatio(width1, height1, 16);
-    Dimension2D newDimension2 = GeometricUtilities.scaleWithRatio(width2, height2, 16);
-
-    assertEquals(8, newDimension1.getWidth(), 0.0001);
-    assertEquals(16, newDimension1.getHeight(), 0.0001);
-
-    assertEquals(16, newDimension2.getWidth(), 0.0001);
-    assertEquals(8, newDimension2.getHeight(), 0.0001);
+  @ParameterizedTest(name="testScaleWithRatioHeight width={0}, height={1}, max={2}, expectedValue={3}")
+  @CsvSource({
+          "16, 32, 16, 16",
+          "32, 16, 16, 8"
+  })
+  public void testScaleWithRatioHeight(int width, int height, int max, int expectedValue) {
+    Dimension2D newDimension1 = GeometricUtilities.scaleWithRatio(width, height, max);
+    assertEquals(expectedValue, newDimension1.getHeight(), 0.0001);
   }
 
   @ParameterizedTest(name="testCalcRotationAngleInDegrees x={0}, y={1}, expectedAngle={2}")
