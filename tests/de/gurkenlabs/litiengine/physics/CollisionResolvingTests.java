@@ -201,7 +201,7 @@ public class CollisionResolvingTests {
     assertEquals(10, ent.getX(), EPSILON);
     assertEquals(30, ent.getY(), EPSILON);
 
-    // now "slide" along the rectangle to the top left
+    // now "slide" along the rectangle to the top right
     Game.physics().move(ent, 135, 14.14213562373095);
 
     assertEquals(10, ent.getX(), EPSILON);
