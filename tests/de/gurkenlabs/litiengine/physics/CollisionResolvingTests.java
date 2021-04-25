@@ -86,25 +86,84 @@ public class CollisionResolvingTests {
   }
 
   @Test
+  public void testCollidingMoveLeft() {
+    // arrange
+    Creature ent = getNewCreature(); // pos: (10,10), w/h: 10/10
+    Game.physics().add(ent);
+
+    // large rectangle to the left of the entity
+    Game.physics().add(new CollisionBox(0, 0, 5, 100));
+    Game.physics().update();
+
+    // act
+    Game.physics().move(ent, 270, 10);
+
+    // assert
+    assertEquals(5, ent.getX(), EPSILON); // block movement for remaining 5px
+    assertEquals(10, ent.getY(), EPSILON);
+  }
+
+  @Test
+  public void testCollidingMoveRight() {
+    // arrange
+    Creature ent = getNewCreature(); // pos: (10,10), w/h: 10/10
+    Game.physics().add(ent);
+
+    // large rectangle to the right of the entity
+    Game.physics().add(new CollisionBox(25, 0, 10, 100));
+    Game.physics().update();
+
+    // act
+    Game.physics().move(ent, 90, 10);
+
+    // assert
+    assertEquals(15, ent.getX(), EPSILON); // block movement for remaining 5px
+    assertEquals(10, ent.getY(), EPSILON);
+  }
+
+  @Test
+  public void testCollidingMoveUp() {
+    // arrange
+    Creature ent = getNewCreature(); // pos: (10,10), w/h: 10/10
+    Game.physics().add(ent);
+
+    // large rectangle above the entity
+    Game.physics().add(new CollisionBox(0, 0, 100, 5));
+    Game.physics().update();
+
+    // act
+    Game.physics().move(ent, 180, 10);
+
+    // assert
+    assertEquals(10, ent.getX(), EPSILON);
+    assertEquals(5, ent.getY(), EPSILON); // block movement for remaining 5px
+  }
+
+  @Test
+  public void testCollidingMoveDown() {
+    // arrange
+    Creature ent = getNewCreature(); // pos: (10,10), w/h: 10/10
+    Game.physics().add(ent);
+
+    // large rectangle below the entity
+    Game.physics().add(new CollisionBox(0, 25, 100, 10));
+    Game.physics().update();
+
+    // act
+    Game.physics().move(ent, 0, 10);
+
+    // assert
+    assertEquals(10, ent.getX(), EPSILON);
+    assertEquals(15, ent.getY(), EPSILON); // block movement for remaining 5px
+  }
+
+  @Test
   public void testCollidingHorizontalMovement() {
     Creature ent = getNewCreature();
-
     Game.physics().add(ent);
 
     // large rectangle at the bottom of the entity
     Game.physics().add(new CollisionBox(0, 20, 100, 10));
-
-    // move 10 px to the right
-    Game.physics().update();
-    Game.physics().move(ent, 90, 10);
-
-    assertEquals(20, ent.getX(), EPSILON);
-    assertEquals(10, ent.getY(), EPSILON);
-
-    // move back 10 px to the left
-    Game.physics().move(ent, 270, 10);
-
-    assertEquals(10, ent.getX(), EPSILON);
 
     // now "slide" along the rectangle to the bottom right
     Game.physics().move(ent, 45, 14.14213562373095);
