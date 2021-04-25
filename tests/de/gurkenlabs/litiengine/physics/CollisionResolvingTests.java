@@ -33,7 +33,7 @@ public class CollisionResolvingTests {
   }
 
   @ParameterizedTest(name = "testBasicMove: {0}")
-  @MethodSource("getBasicMoveParameters")
+  @MethodSource("supplyBasicMoveParameters")
   public void testBasicMove(String direction, int angle, int distance, int targetX, int targetY) {
     // arrange
     Creature ent = getNewCreature(); // pos: (10,10)
@@ -48,7 +48,7 @@ public class CollisionResolvingTests {
   }
 
   @ParameterizedTest(name = "testCollidingMoveBlock: {0}")
-  @MethodSource("getCollidingMoveBlockParameters")
+  @MethodSource("supplyCollidingMoveBlockParameters")
   public void testCollidingMoveBlock(String direction, CollisionBox collisionBox, int angle, int distance, int targetX, int targetY) {
     // arrange
     Creature ent = getNewCreature(); // pos: (10,10), w/h: 10/10
@@ -68,7 +68,7 @@ public class CollisionResolvingTests {
   }
 
   @ParameterizedTest(name = "testCollidingMoveSlide: {0}")
-  @MethodSource("getCollidingMoveSlideParameters")
+  @MethodSource("supplyCollidingMoveSlideParameters")
   public void testCollidingMoveSlide(String direction, CollisionBox collisionBox, int angle, int targetX, int targetY) {
     // arrange
     Creature ent = getNewCreature(); // pos: (10,10), w/h: 10/10
@@ -235,7 +235,7 @@ public class CollisionResolvingTests {
     return ent;
   }
 
-  private static Stream<Arguments> getBasicMoveParameters() {
+  private static Stream<Arguments> supplyBasicMoveParameters() {
     return Stream.of(
             Arguments.of("left", 270, 5, 5, 10),
             Arguments.of("right", 90, 5, 15, 10),
@@ -244,7 +244,7 @@ public class CollisionResolvingTests {
     );
   }
 
-  private static Stream<Arguments> getCollidingMoveBlockParameters() {
+  private static Stream<Arguments> supplyCollidingMoveBlockParameters() {
     return Stream.of(
             Arguments.of("left", new CollisionBox(0, 0, 5, 100), 270, 10, 5, 10),
             Arguments.of("right", new CollisionBox(25, 0, 10, 100), 90, 10, 15, 10),
@@ -253,7 +253,7 @@ public class CollisionResolvingTests {
     );
   }
 
-  private static Stream<Arguments> getCollidingMoveSlideParameters() {
+  private static Stream<Arguments> supplyCollidingMoveSlideParameters() {
     return Stream.of(
             Arguments.of("left top-left", new CollisionBox(0, 0, 100, 10), 225, 0, 10),
             Arguments.of("right bottom-right", new CollisionBox(0, 20, 100, 10), 45, 20, 10),
