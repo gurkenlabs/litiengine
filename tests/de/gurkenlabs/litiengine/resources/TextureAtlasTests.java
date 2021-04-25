@@ -5,8 +5,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.image.BufferedImage;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 public class TextureAtlasTests {
 
@@ -36,57 +40,62 @@ public class TextureAtlasTests {
     assertEquals(122, image.getHeight());
   }
 
-  @Test
-  public void testTextureAtlasLoad() {
+
+  @ParameterizedTest
+  @MethodSource("getTextureAtlasLoadResourceName")
+  public void testTextureAtlasLoad(String resourceName) {
     TextureAtlas atlas = TextureAtlas.read("tests/de/gurkenlabs/litiengine/resources/gurk-nukem-atlas.xml");
     Resources.images().load(atlas);
 
-    BufferedImage deanIdle = Resources.images().get("Dean-idle-left.png");
-    BufferedImage deanWalk = Resources.images().get("Dean-walk-left.png");
-    BufferedImage gurknukemIdle = Resources.images().get("gurknukem-idle-left.png");
-    BufferedImage gurknukemWalk = Resources.images().get("gurknukem-walk-left.png");
-    BufferedImage icon = Resources.images().get("icon.png");
-    BufferedImage jorgeIdle = Resources.images().get("Jorge-idle-left.png");
-    BufferedImage jorgeWalk = Resources.images().get("Jorge-walk-left.png");
-    BufferedImage propBarrel1 = Resources.images().get("prop-barrel-damaged.png");
-    BufferedImage propBarrel2 = Resources.images().get("prop-barrel-destroyed.png");
-    BufferedImage propBarrel3 = Resources.images().get("prop-barrel-intact.png");
-    BufferedImage propBunker = Resources.images().get("prop-bunker.png");
-    BufferedImage propFlag = Resources.images().get("prop-flag.png");
+    BufferedImage img = Resources.images().get(resourceName);
+    assertNotNull(img);
+  }
 
-    assertNotNull(deanIdle);
-    assertNotNull(deanWalk);
-    assertNotNull(gurknukemIdle);
-    assertNotNull(gurknukemWalk);
-    assertNotNull(icon);
-    assertNotNull(jorgeIdle);
-    assertNotNull(jorgeWalk);
-    assertNotNull(propBarrel1);
-    assertNotNull(propBarrel2);
-    assertNotNull(propBarrel3);
-    assertNotNull(propBunker);
-    assertNotNull(propFlag);
+  private static Stream<Arguments> getTextureAtlasLoadResourceName() {
+    return Stream.of(
+            Arguments.of("Dean-idle-left.png"),
+            Arguments.of("Dean-walk-left.png"),
+            Arguments.of("gurknukem-idle-left.png"),
+            Arguments.of("gurknukem-walk-left.png"),
+            Arguments.of("icon.png"),
+            Arguments.of("Jorge-idle-left.png"),
+            Arguments.of("Jorge-walk-left.png"),
+            Arguments.of("prop-barrel-damaged.png"),
+            Arguments.of("prop-barrel-destroyed.png"),
+            Arguments.of("prop-barrel-intact.png"),
+            Arguments.of("prop-bunker.png"),
+            Arguments.of("prop-flag.png")
+    );
+  }
 
-    // now ensure that dimensions are correct (especially for rotated sprites)
-    assertEquals(32, deanIdle.getWidth());
-    assertEquals(18, deanIdle.getHeight());
+  @ParameterizedTest
+  @MethodSource("getTextureAtlasLoadWidthHeight")
+  public void testTextureAtlasLoadWidth(String resourceName, int expectedWidth, int expectedHeight) {
+    TextureAtlas atlas = TextureAtlas.read("tests/de/gurkenlabs/litiengine/resources/gurk-nukem-atlas.xml");
+    Resources.images().load(atlas);
 
-    assertEquals(64, deanWalk.getWidth());
-    assertEquals(18, deanWalk.getHeight());
+    BufferedImage img = Resources.images().get(resourceName);
+    assertEquals(expectedWidth, img.getWidth());
+  }
 
-    assertEquals(36, gurknukemIdle.getWidth());
-    assertEquals(18, gurknukemIdle.getHeight());
+  @ParameterizedTest
+  @MethodSource("getTextureAtlasLoadWidthHeight")
+  public void testTextureAtlasLoadHeight(String resourceName, int expectedWidth, int expectedHeight) {
+    TextureAtlas atlas = TextureAtlas.read("tests/de/gurkenlabs/litiengine/resources/gurk-nukem-atlas.xml");
+    Resources.images().load(atlas);
 
-    assertEquals(72, gurknukemWalk.getWidth());
-    assertEquals(18, gurknukemWalk.getHeight());
-
-    assertEquals(64, icon.getWidth());
-    assertEquals(64, icon.getHeight());
-    
-    assertEquals(10, propBarrel1.getWidth());
-    assertEquals(12, propBarrel1.getHeight());
-    
-    assertEquals(104, propBunker.getWidth());
-    assertEquals(41, propBunker.getHeight());
+    BufferedImage img = Resources.images().get(resourceName);
+    assertEquals(expectedHeight, img.getHeight());
+  }
+  private static Stream<Arguments> getTextureAtlasLoadWidthHeight() {
+    return Stream.of(
+            Arguments.of("Dean-idle-left.png", 32, 18),
+            Arguments.of("Dean-walk-left.png", 64, 18),
+            Arguments.of("gurknukem-idle-left.png", 36, 18),
+            Arguments.of("gurknukem-walk-left.png", 72, 18),
+            Arguments.of("icon.png", 64, 64),
+            Arguments.of("prop-barrel-damaged.png", 10, 12),
+            Arguments.of("prop-bunker.png", 104, 41)
+    );
   }
 }
