@@ -276,7 +276,7 @@ public class GeometricUtilitiesTests {
     assertTrue(pointsBetweenPoints.stream().allMatch(point -> line.ptLineDist(point) < 0.5d));
   }
 
-  @ParameterizedTest(name = "testGetPerpendicularIntersection lineStart ({0},{1}), lineEnd({2},{3}), point({4},{5})")
+  @ParameterizedTest(name = "testGetPerpendicularIntersection lineStart=({0},{1}), lineEnd=({2},{3}), point=({4},{5})")
   @CsvSource({
           "1.0d, 1.0d, 9.0d, 1.0d, 4.0d, 3.0d", // orthogonal
           "0.0d, 0.0d, 12.75d, -13.5d, 5.32d, 4.21d", // crooked
@@ -295,5 +295,27 @@ public class GeometricUtilitiesTests {
     //  point, this means that the intersection point is correct (distance measured at closest point, which is true
     //  if the intersection line is perpendicular)
     assertEquals(distanceToLine, intersection.distance(point), 0.000001d);
+  }
+
+  @ParameterizedTest(name = "testGetPointOnCircle circleCenter=({0},{1}), circleRadius={2}, angle={3}, expectedPoint=({4},{5})")
+  @CsvSource({
+          "0d, 0d, 1.0d, 0d, 1.0d, 0d", // 0 degrees
+          "0d, 0d, 1.0d, 45d, 0.7071d, 0.7071d", // 45 degrees
+          "0d, 0d, 1.0d, 90d, 0d, 1.0d", // 90 degrees
+          "0d, 0d, 1.0d, 180d, -1.0d, 0d", //  180 degrees
+          "0d, 0d, 1.0d, 270d, 0d, -1.0d", // 270 degrees
+          "0d, 0d, 1.0d, 360d, 1.0d, 0d", // 360 degrees = 0 degrees
+          "1.5d, 2.74d, 2.0d, 84.84d, 1.679874d, 4.73189d" // 84.84 degrees, offset center
+  })
+  public void testGetPointOnCircle(double centerX, double centerY, double radius, double angle, double expectedX, double expectedY){
+    // arrange
+    Point2D center = new Point2D.Double(centerX, centerY);
+
+    // act
+    Point2D pointOnCircle = GeometricUtilities.getPointOnCircle(center, radius, angle);
+
+    // assert
+    assertEquals(expectedX, pointOnCircle.getX(), 0.0001d);
+    assertEquals(expectedY, pointOnCircle.getY(), 0.0001d);
   }
 }
