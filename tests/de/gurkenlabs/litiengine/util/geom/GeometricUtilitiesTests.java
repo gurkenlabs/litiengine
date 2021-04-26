@@ -1,17 +1,21 @@
 package de.gurkenlabs.litiengine.util.geom;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
+import java.awt.*;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Dimension2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class GeometricUtilitiesTests {
 
@@ -192,5 +196,45 @@ public class GeometricUtilitiesTests {
 
     // assert
     assertEquals(expectedDeltaX, (float) actualDeltaX, 0.001);
+  }
+
+  @ParameterizedTest(name = "testDeltaY angle={0}, expectedDeltaY={1}")
+  @CsvSource({
+          "0, 1.0d",
+          "30, 0.8658d",
+          "360, 1.0d",
+          "-42, 0.7435d"
+  })
+  public void testDeltaY(double angle, double expectedDeltaY){
+    // act
+    double actualDeltaY = GeometricUtilities.getDeltaY(angle);
+
+    // assert
+    assertEquals(expectedDeltaY, (float) actualDeltaY, 0.001);
+  }
+
+  @ParameterizedTest(name = "testContains")
+  @MethodSource("getContainsArguments")
+  public void testContains(Rectangle2D rectangle, Point2D point, boolean expectedResult){
+    // act
+    boolean contains = GeometricUtilities.contains(rectangle, point);
+
+    // assert
+    assertEquals(expectedResult, contains);
+  }
+
+  private static Stream<Arguments> getContainsArguments(){
+    // arrange
+    return Stream.of(
+            Arguments.of(new Rectangle2D.Double(0, 0, 10, 10), new Point2D.Double(9.9d, 9.9d), true), // both in
+            Arguments.of(new Rectangle2D.Double(0, 0, 10, 10), new Point2D.Double(0, 0), true), // boundary top left
+            Arguments.of(new Rectangle2D.Double(0, 0, 10, 10), new Point2D.Double(10, 10), true), // boundary bottom right
+            Arguments.of(new Rectangle2D.Double(0, 0, 10, 10), new Point2D.Double(10, 0), true), // boundary top right
+            Arguments.of(new Rectangle2D.Double(0, 0, 10, 10), new Point2D.Double(0, 10), true), // boundary bottom left
+            Arguments.of(new Rectangle2D.Double(0, 0, 10, 10), new Point2D.Double(-0.1d, -0.1d), false), // both out
+            Arguments.of(new Rectangle2D.Double(0, 0, 10, 10), new Point2D.Double(10.1d, 10.1d), false), // both out
+            Arguments.of(new Rectangle2D.Double(0, 0, 10, 10), new Point2D.Double(9.9d, 10.1d), false), // x in y out
+            Arguments.of(new Rectangle2D.Double(0, 0, 10, 10), new Point2D.Double(10.1d, 9.9d), false) // y in x out
+    );
   }
 }
