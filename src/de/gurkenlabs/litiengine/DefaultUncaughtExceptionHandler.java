@@ -27,8 +27,8 @@ import de.gurkenlabs.litiengine.configuration.ClientConfiguration;
 public class DefaultUncaughtExceptionHandler implements UncaughtExceptionHandler {
   private static final Logger log = Logger.getLogger(DefaultUncaughtExceptionHandler.class.getName());
 
-  private boolean exitOnException;
-  private boolean dumpThreads;
+  private volatile boolean exitOnException;
+  private volatile boolean dumpThreads;
 
   /**
    * Initializes a new instance of the {@code DefaultUncaughtExceptionHandler} class.
