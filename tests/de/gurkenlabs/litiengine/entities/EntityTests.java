@@ -23,7 +23,6 @@ public class EntityTests {
 
     // assert
     assertTrue(actions.exists("doSomething"));
-    assertFalse(actions.exists("imNotAnAction"));
   }
 
   @Test
