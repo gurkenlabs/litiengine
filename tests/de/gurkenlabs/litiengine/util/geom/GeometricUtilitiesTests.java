@@ -1,12 +1,8 @@
 package de.gurkenlabs.litiengine.util.geom;
 
 import java.awt.*;
-import java.awt.geom.Arc2D;
-import java.awt.geom.Dimension2D;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
+import java.awt.geom.*;
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
@@ -236,5 +232,29 @@ public class GeometricUtilitiesTests {
             Arguments.of(new Rectangle2D.Double(0, 0, 10, 10), new Point2D.Double(9.9d, 10.1d), false), // x in y out
             Arguments.of(new Rectangle2D.Double(0, 0, 10, 10), new Point2D.Double(10.1d, 9.9d), false) // y in x out
     );
+  }
+
+  @ParameterizedTest(name = "testGetConstrainingLines {0}, lineNumber={1}, expectedStart ({2},{3}), expectedEnd ({4},{5})")
+  @CsvSource({
+          "topLeft-topRight, 0, 0, 0, 0, 10",
+          "topRight-bottomRight, 1, 0, 10, 10, 10",
+          "bottomRight-bottomLeft, 2, 10, 10, 10, 0",
+          "bottomLeft-topLeft, 3, 10, 0, 0, 0"
+  })
+  public void testGetConstrainingLines(String caption, int lineNumber, double expectedX1, double expectedY1, double expectedX2, double expectedY2){
+    // arrange
+    Rectangle2D bounds = new Rectangle2D.Double(0, 0, 10, 10);
+    Area area = new Area(bounds);
+
+    // act
+    List<Line2D.Double> constrainingLines = GeometricUtilities.getConstrainingLines(area);
+    Line2D.Double firstLine = constrainingLines.get(lineNumber);
+
+    // assert
+    assertEquals(4, constrainingLines.size());
+    assertEquals(expectedX1, firstLine.x1);
+    assertEquals(expectedY1, firstLine.y1);
+    assertEquals(expectedX2, firstLine.x2);
+    assertEquals(expectedY2, firstLine.y2);
   }
 }
