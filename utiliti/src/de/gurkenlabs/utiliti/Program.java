@@ -13,9 +13,12 @@ import de.gurkenlabs.litiengine.configuration.Quality;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.components.Editor;
+import de.gurkenlabs.utiliti.handlers.DebugCrasher;
 import de.gurkenlabs.utiliti.swing.UI;
 
 public class Program {
+  public static boolean debugCrash = false;
+  
   public static void main(String[] args) {
     SwingUtilities.invokeLater(() -> {
         try {
@@ -34,12 +37,19 @@ public class Program {
           Game.init(args);
           DefaultUncaughtExceptionHandler handler = new DefaultUncaughtExceptionHandler(false);
           Game.setUncaughtExceptionHandler(handler);
+          Game.loop().attach(() -> {
+            if(debugCrash) {
+              handler.dumpThreads(true);
+              throw new Error("Manually triggered debug crash"); //Press CTRL + SHIFT + ALT + C to generate debug crash report
+            }
+          });
           forceBasicEditorConfiguration();
           Game.world().camera().onZoom(event -> Editor.preferences().setZoom((float) event.getZoom()));
     
           // prepare UI and start the game
           UI.init();
           Game.start();
+          Game.window().getHostControl().addKeyListener(new DebugCrasher());
         }
         catch(Throwable t) {
           throw new UtiLITIInitializationError("UtiLITI failed to initialize, see the stacktrace below for more information", t);
