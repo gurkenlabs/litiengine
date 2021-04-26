@@ -275,4 +275,25 @@ public class GeometricUtilitiesTests {
     // assert, checks if all generated points are on within margin of error of the Bresenham algorithm (0.5)
     assertTrue(pointsBetweenPoints.stream().allMatch(point -> line.ptLineDist(point) < 0.5d));
   }
+
+  @ParameterizedTest(name = "testGetPerpendicularIntersection lineStart ({0},{1}), lineEnd({2},{3}), point({4},{5})")
+  @CsvSource({
+          "1.0d, 1.0d, 9.0d, 1.0d, 4.0d, 3.0d", // orthogonal
+          "0.0d, 0.0d, 12.75d, -13.5d, 5.32d, 4.21d", // crooked
+          "1.0d, 1.0d, 3.0d, 3.0d, 2.0d, 2.0d" // point on the line
+  })
+  public void testGetPerpendicularIntersection(double x1, double y1, double x2, double y2, double pointX, double pointY){
+    // arrange
+    Point2D point = new Point2D.Double(pointX, pointY);
+    Line2D line = new Line2D.Double(x1, y1, x2, y2);
+    double distanceToLine = line.ptLineDist(point); // shortest distance between the point and the line
+
+    // act
+    Point2D intersection = GeometricUtilities.getPerpendicularIntersection(point, line);
+
+    // assert, if the distance from the line to the point is equal to the distance between the intersection and the
+    //  point, this means that the intersection point is correct (distance measured at closest point, which is true
+    //  if the intersection line is perpendicular)
+    assertEquals(distanceToLine, intersection.distance(point), 0.000001d);
+  }
 }
