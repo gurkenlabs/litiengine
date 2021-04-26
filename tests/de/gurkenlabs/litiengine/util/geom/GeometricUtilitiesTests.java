@@ -248,13 +248,31 @@ public class GeometricUtilitiesTests {
 
     // act
     List<Line2D.Double> constrainingLines = GeometricUtilities.getConstrainingLines(area);
-    Line2D.Double firstLine = constrainingLines.get(lineNumber);
+    Line2D.Double line = constrainingLines.get(lineNumber);
 
     // assert
-    assertEquals(4, constrainingLines.size());
-    assertEquals(expectedX1, firstLine.x1);
-    assertEquals(expectedY1, firstLine.y1);
-    assertEquals(expectedX2, firstLine.x2);
-    assertEquals(expectedY2, firstLine.y2);
+    assertEquals(expectedX1, line.x1);
+    assertEquals(expectedY1, line.y1);
+    assertEquals(expectedX2, line.x2);
+    assertEquals(expectedY2, line.y2);
+  }
+
+  @ParameterizedTest(name = "testGetPointsBetweenPoints start=({0},{1}) end=({2},{3})")
+  @CsvSource({
+          "0, 0, 10, 10",
+          "2.0d, 7.42d, -1.1d, -2.4d",
+          "0, 0, 100, 1"
+  })
+  public void testGetPointsBetweenPoints(double x1, double y1, double x2, double y2){
+    // arrange
+    Point2D start = new Point2D.Double(x1, y1);
+    Point2D end = new Point2D.Double(x2, y2);
+    Line2D line = new Line2D.Double(start.getX(), start.getY(), end.getX(), end.getY());
+
+    // act
+    List<Point2D> pointsBetweenPoints = GeometricUtilities.getPointsBetweenPoints(start, end);
+
+    // assert, checks if all generated points are on within margin of error of the Bresenham algorithm (0.5)
+    assertTrue(pointsBetweenPoints.stream().allMatch(point -> line.ptLineDist(point) < 0.5d));
   }
 }
