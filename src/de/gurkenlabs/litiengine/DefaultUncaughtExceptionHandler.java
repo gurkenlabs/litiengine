@@ -108,10 +108,10 @@ public class DefaultUncaughtExceptionHandler implements UncaughtExceptionHandler
   }
   
   /**
-   * Set whether the generated crash report will contain an additonal thread dump
+   * Set whether the generated crash report will contain an additional thread dump
    * 
-   * @param exit
-   *          The flag that defines whether the game will exit upon an unhandled exception.
+   * @param dumpThreads
+   *          The flag that defines whether crash report will contain a thread dump.
    */
   public void dumpThreads(boolean dumpThreads) {
     this.dumpThreads = dumpThreads;
