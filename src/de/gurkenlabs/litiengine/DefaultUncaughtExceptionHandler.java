@@ -30,7 +30,8 @@ public class DefaultUncaughtExceptionHandler implements UncaughtExceptionHandler
    * Initializes a new instance of the {@code DefaultUncaughtExceptionHandler} class.
    *
    * @param exitOnException
-   *          A flag indicating whether the game should exit when an unexpected error occurs.
+   *          A flag indicating whether the game should exit when an unexpected exception occurs.
+   *          The game will still exit if it encounters an Error.
    */
   public DefaultUncaughtExceptionHandler(boolean exitOnException) {
     this.exitOnException = exitOnException;
@@ -51,13 +52,15 @@ public class DefaultUncaughtExceptionHandler implements UncaughtExceptionHandler
 
     log.log(Level.SEVERE, "Game crashed! :(", e);
 
-    if (this.exitOnException()) {
+    if (this.exitOnException() || e instanceof Error) {
       System.exit(Game.EXIT_GAME_CRASHED);
     }
   }
 
   /**
    * Indicates whether this hander currently exits the game upon an unhandled exception.
+   * 
+   * Note that this handler will still exit if it encounters an unhandled Error.
    * 
    * @return True if the game will exit upon an unhandled exception; otherwise false.
    */

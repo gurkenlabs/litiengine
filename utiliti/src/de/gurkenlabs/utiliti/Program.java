@@ -18,8 +18,6 @@ import de.gurkenlabs.utiliti.swing.UI;
 public class Program {
   public static void main(String[] args) {
     SwingUtilities.invokeLater(() -> {
-      Game.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(false));
-      try {
         try {
           // setup basic settings
           Game.info().setName("utiLITI");
@@ -34,6 +32,8 @@ public class Program {
           
           UI.initLookAndFeel();
           Game.init(args);
+          DefaultUncaughtExceptionHandler handler = new DefaultUncaughtExceptionHandler(false);
+          Game.setUncaughtExceptionHandler(handler);
           forceBasicEditorConfiguration();
           Game.world().camera().onZoom(event -> Editor.preferences().setZoom((float) event.getZoom()));
     
@@ -52,20 +52,10 @@ public class Program {
         // load up previously opened project file or the one that is specified in
         // the command line arguments
         handleArgs(args);
-  
         String gameFile = Editor.preferences().getLastGameFile();
         if (!Editor.instance().fileLoaded() && gameFile != null && !gameFile.isEmpty()) {
           Editor.instance().load(new File(gameFile.trim()), false);
         }
-      }
-      catch(Error e) { //the editor SHOULD crash if an Error occurs, as long as the Error !instanceof ThreadDeath
-        if(e instanceof ThreadDeath) {
-          throw e;
-        }
-        DefaultUncaughtExceptionHandler exceptionHandler = (DefaultUncaughtExceptionHandler) Thread.getDefaultUncaughtExceptionHandler();
-        exceptionHandler.setExitOnException(true);
-        throw e;
-      }
     });
   }
 
