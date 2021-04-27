@@ -1,5 +1,7 @@
 package de.gurkenlabs.litiengine.entities;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -11,6 +13,9 @@ import static org.mockito.Mockito.when;
 import java.awt.Dimension;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -26,7 +31,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.physics.Collision;
 
-public class TriggerTests {
+
+class TriggerTests {
   private Environment testEnvironment;
 
   @BeforeAll
@@ -54,7 +60,7 @@ public class TriggerTests {
   }
 
   @Test
-  public void testInteractTrigger() {
+  void testInteractTrigger() {
     Trigger trigger = new Trigger(TriggerActivation.INTERACT, "testrigger", "testmessage");
     this.testEnvironment.add(trigger);
 
@@ -75,7 +81,7 @@ public class TriggerTests {
   }
 
   @Test
-  public void onlyActivatorsCanTrigger() {
+  void onlyActivatorsCanTrigger() {
     Trigger trigger = new Trigger(TriggerActivation.INTERACT, "testrigger", "testmessage");
     trigger.getActivators().add(111);
     this.testEnvironment.add(trigger);
@@ -88,7 +94,7 @@ public class TriggerTests {
   }
 
   @Test
-  public void testOneTimeTrigger() {
+  void testOneTimeTrigger() {
     Trigger trigger = new Trigger(TriggerActivation.INTERACT, "testrigger", "testmessage", true);
     this.testEnvironment.add(trigger);
 
@@ -98,7 +104,7 @@ public class TriggerTests {
   }
 
   @Test
-  public void testMultipleInteractions() {
+  void testMultipleInteractions() {
     Trigger trigger = new Trigger(TriggerActivation.INTERACT, "testrigger", "testmessage");
     this.testEnvironment.add(trigger);
 
@@ -109,11 +115,9 @@ public class TriggerTests {
   }
 
   @Test
-  public void testInteractPredicate() {
+  void testInteractPredicate() {
     Trigger trigger = new Trigger(TriggerActivation.INTERACT, "testrigger", "testmessage", true);
-    trigger.addActivatingCondition(e -> {
-      return "You shall not pass!";
-    });
+    trigger.addActivatingCondition(e -> "You shall not pass!");
     this.testEnvironment.add(trigger);
 
     IEntity activator = mockEntity(111);
@@ -125,38 +129,38 @@ public class TriggerTests {
   }
 
   @Test
-  public void testCollisionTriggerActivates() {
+  void testCollisionTriggerActivates() {
     Trigger trigger = new Trigger(TriggerActivation.COLLISION, "testrigger", "testmessage");
-    
+
     // collision box width == width for triggers
     trigger.setSize(16, 16);
     trigger.setLocation(0, 0);
     this.testEnvironment.add(trigger);
     Game.world().loadEnvironment(this.testEnvironment);
-    
+
     // collisionentity that is colliding with the trigger
     mockCollisionEntity(111, 8, 8);
-    
+
     trigger.update();
-    
+
     assertTrue(trigger.isActivated());
   }
-  
+
   @Test
-  public void testCollisionTriggerDoesntActivate() {
+  void testCollisionTriggerDoesntActivate() {
     Trigger trigger = new Trigger(TriggerActivation.COLLISION, "testrigger", "testmessage");
-    
+
     // collision box width == width for triggers
     trigger.setSize(16, 16);
     trigger.setLocation(0, 0);
     this.testEnvironment.add(trigger);
     Game.world().loadEnvironment(this.testEnvironment);
-    
+
     // collisionentity that is colliding with the trigger
     mockCollisionEntity(111, 16, 16);
-    
+
     trigger.update();
-    
+
     assertFalse(trigger.isActivated());
   }
 
@@ -170,13 +174,13 @@ public class TriggerTests {
 
     return entity;
   }
-  
+
   private ICollisionEntity mockCollisionEntity(int id, int x, int y) {
     ICollisionEntity entity = mock(ICollisionEntity.class);
     when(entity.getMapId()).thenReturn(id);
     when(entity.getRenderType()).thenReturn(RenderType.NONE);
     when(entity.sendMessage(any(Object.class), any(String.class))).thenReturn("answer");
-    
+
     when(entity.getCollisionBox()).thenReturn(new Rectangle2D.Double(x, y, 8, 8));
     when(entity.hasCollision()).thenReturn(true);
     when(entity.getCollisionType()).thenReturn(Collision.DYNAMIC);
@@ -185,4 +189,38 @@ public class TriggerTests {
 
     return entity;
   }
+
+  @Test
+  public void testCollisionActivation() {
+    Trigger trigger = new Trigger(TriggerActivation.COLLISION, "testrigger", "testmessage");
+    testEnvironment = mock(Environment.class);
+    Game.world().loadEnvironment(this.testEnvironment);
+    trigger.loaded(testEnvironment);
+
+    IEntity ent = mock(IEntity.class);
+    List<IEntity> collEntities = mock(List.class);
+    collEntities.add(ent);
+    Iterator<IEntity> iter = mock(Iterator.class);
+    when(iter.hasNext()).thenReturn(true);
+
+    assertFalse(collEntities.contains(ent));
+
+    List<Integer> triggerTargets = mock(ArrayList.class);
+    when(triggerTargets.isEmpty()).thenReturn(true);
+    trigger.update();
+  }
+
+  @Test
+  public void testDeactivatedListener(){
+    Trigger trigger = new Trigger(TriggerActivation.COLLISION, "testrigger", "testmessage");
+    testEnvironment = mock(Environment.class);
+    Game.world().loadEnvironment(this.testEnvironment);
+    trigger.loaded(testEnvironment);
+    TriggerDeactivatedListener listener = mock(TriggerDeactivatedListener.class);
+    trigger.addDeactivatedListener(listener);
+    verify(listener, times(0)).deactivated(any());
+    trigger.update();
+
+  }
 }
+

@@ -5,6 +5,12 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import javax.swing.SwingUtilities;
 
@@ -120,5 +126,69 @@ class ListFieldTest {
     assertNull(listField.getHorizontalSlider());
     assertNotNull(listField.getVerticalSlider());
     assertEquals(90, listField.getVerticalSlider().getX()); // 100 - (50/5)
+  }
+
+  @Test
+  public void refresh_selectComponent_selectSingleSelected() {
+    // arrange
+    ListField actualListField = new ListField(0, 0, 100, 50, this.content_2D, content_2D_shownRows, content_2D_shownColumns);
+    ListField listField = spy(actualListField);
+    when(listField.isEntireRowSelected()).thenReturn(false);
+    when(listField.getSelectionColumn()).thenReturn(1); // default lower bound is 0, shown cols is 3
+    when(listField.getSelectionRow()).thenReturn(2); // default lower bound is 0, shown rows is 7
+
+    ImageComponent imageComp = mock(ImageComponent.class);
+    when(listField.getListEntry(anyInt(), anyInt())).thenReturn(imageComp);
+
+    assertNull(listField.getSelectedComponent());
+
+    // act
+    listField.refresh();
+
+    // assert
+    assertEquals(imageComp, listField.getSelectedComponent());
+    verify(imageComp, times(1)).setSelected(true);
+  }
+
+  @Test
+  public void refresh_selectComponent_selectEntireRowSelected() {
+    // arrange
+    ListField actualListField = new ListField(0, 0, 100, 50, this.content_2D, content_2D_shownRows, content_2D_shownColumns);
+    ListField listField = spy(actualListField);
+    when(listField.isEntireRowSelected()).thenReturn(true);
+    when(listField.getSelectionColumn()).thenReturn(1); // default lower bound is 0, nb cols is 4 (content length)
+    when(listField.getSelectionRow()).thenReturn(2); // default lower bound is 0, shown rows is 7
+
+    ImageComponent imageComp = mock(ImageComponent.class);
+    when(listField.getListEntry(anyInt(), anyInt())).thenReturn(imageComp);
+
+    assertNull(listField.getSelectedComponent());
+
+    // act
+    listField.refresh();
+
+    // assert
+    assertEquals(imageComp, listField.getSelectedComponent());
+    verify(imageComp, times(1)).setSelected(true);
+  }
+
+  @Test
+  public void refresh_selectComponent_noSelectNull() {
+    // arrange
+    ListField actualListField = new ListField(0, 0, 100, 50, this.content_2D, content_2D_shownRows, content_2D.length);
+    ListField listField = spy(actualListField);
+    when(listField.isEntireRowSelected()).thenReturn(true);
+
+    ImageComponent imageComp = mock(ImageComponent.class);
+    when(listField.getListEntry(anyInt(), anyInt())).thenReturn(imageComp);
+
+    assertNull(listField.getSelectedComponent());
+
+    // act
+    listField.refresh();
+
+    // assert
+    assertNull(listField.getSelectedComponent());
+    verify(imageComp, times(0)).setSelected(true);
   }
 }

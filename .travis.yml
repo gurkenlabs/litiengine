@@ -5,6 +5,7 @@ before_install:
   - sudo apt-get -y install at-spi2-core
 
 jdk:
+  - openjdk8
   - openjdk15
 
 git:
@@ -18,11 +19,13 @@ services:
   - xvfb
 
 script:
+  - echo $JAVA_HOME
   - ./gradlew fullbuild --warning-mode all
-  - if [[ $TRAVIS_PULL_REQUEST = 'false' && $TRAVIS_REPO_SLUG = "gurkenlabs/litiengine" ]]; then
+
+  - if [[ $TRAVIS_PULL_REQUEST = 'false' && "$JAVA_HOME" = "/home/travis/openjdk15" && $TRAVIS_REPO_SLUG = "gurkenlabs/litiengine" ]]; then
     sonar-scanner;
     elif true; then
-    echo skipping sonar-scanner;
+    echo skipping sonar scanner;
     fi
 
 cache:
