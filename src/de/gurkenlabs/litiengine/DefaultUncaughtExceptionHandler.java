@@ -3,6 +3,9 @@ package de.gurkenlabs.litiengine;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.lang.Thread.UncaughtExceptionHandler;
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadInfo;
+import java.lang.management.ThreadMXBean;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,16 +27,32 @@ import de.gurkenlabs.litiengine.configuration.ClientConfiguration;
 public class DefaultUncaughtExceptionHandler implements UncaughtExceptionHandler {
   private static final Logger log = Logger.getLogger(DefaultUncaughtExceptionHandler.class.getName());
 
-  private boolean exitOnException;
+  private volatile boolean exitOnException;
+  private volatile boolean dumpThreads;
 
   /**
    * Initializes a new instance of the {@code DefaultUncaughtExceptionHandler} class.
    *
    * @param exitOnException
-   *          A flag indicating whether the game should exit when an unexpected error occurs.
+   *          A flag indicating whether the game should exit when an unexpected exception occurs.
+   *          The game will still exit if it encounters an Error.
    */
   public DefaultUncaughtExceptionHandler(boolean exitOnException) {
+    this(exitOnException, false);
+  }
+  
+  /**
+   * Initializes a new instance of the {@code DefaultUncaughtExceptionHandler} class.
+   *
+   * @param exitOnException
+   *          A flag indicating whether the game should exit when an unexpected exception occurs.
+   *          The game will still exit if it encounters an Error
+   * @param dumpThreads
+   *          A flag indicating whether the crash report should contain an additional thread dump.
+   */
+  public DefaultUncaughtExceptionHandler(boolean exitOnException, boolean dumpThreads) {
     this.exitOnException = exitOnException;
+    this.dumpThreads = dumpThreads;
   }
 
   @Override
@@ -45,13 +64,17 @@ public class DefaultUncaughtExceptionHandler implements UncaughtExceptionHandler
       stream.print(new Date() + " ");
       stream.println(t.getName() + " threw an exception:");
       e.printStackTrace(stream);
+      if(dumpsThreads()) {
+        stream.println();
+        stream.println(dump());
+      }
     } catch (FileNotFoundException e2) {
       log.log(Level.WARNING, "Could not create crash report file.", e);
     }
 
     log.log(Level.SEVERE, "Game crashed! :(", e);
 
-    if (this.exitOnException()) {
+    if (this.exitOnException() || e instanceof Error) {
       System.exit(Game.EXIT_GAME_CRASHED);
     }
   }
@@ -59,10 +82,19 @@ public class DefaultUncaughtExceptionHandler implements UncaughtExceptionHandler
   /**
    * Indicates whether this hander currently exits the game upon an unhandled exception.
    * 
+   * Note that this handler will still exit if it encounters an unhandled Error.
+   * 
    * @return True if the game will exit upon an unhandled exception; otherwise false.
    */
   public boolean exitOnException() {
     return this.exitOnException;
+  }
+  
+  /**
+   * @return true if the generated crash report will contain a thread dump
+   */
+  public boolean dumpsThreads() {
+    return this.dumpThreads;
   }
 
   /**
@@ -74,4 +106,40 @@ public class DefaultUncaughtExceptionHandler implements UncaughtExceptionHandler
   public void setExitOnException(boolean exit) {
     this.exitOnException = exit;
   }
+  
+  /**
+   * Set whether the generated crash report will contain an additional thread dump
+   * 
+   * @param dumpThreads
+   *          The flag that defines whether crash report will contain a thread dump.
+   */
+  public void dumpThreads(boolean dumpThreads) {
+    this.dumpThreads = dumpThreads;
+  }
+  
+  protected static String dump() {
+    StringBuilder text = new StringBuilder();
+    ThreadMXBean threads = ManagementFactory.getThreadMXBean();
+    ThreadInfo[] dumps = threads.getThreadInfo(threads.getAllThreadIds(), 255);
+    text.append("====THREAD DUMP====\n\n");
+    for(ThreadInfo dump : dumps) {
+      text.append("\"" + dump.getThreadName() + "\"\n");
+      Thread.State state = dump.getThreadState();
+      text.append("\tState: " + state);
+      String blockedBy = dump.getLockOwnerName();
+      if(blockedBy != null) {
+        text.append(" on " + blockedBy);
+      }
+      text.append("\n");
+      StackTraceElement[] elements = dump.getStackTrace();
+      for(StackTraceElement element : elements) {
+        text.append("\t\tat ");
+        text.append(element);
+        text.append("\n");
+      }
+      text.append("\n\n");
+    }
+    return text.toString();
+  }
+  
 }

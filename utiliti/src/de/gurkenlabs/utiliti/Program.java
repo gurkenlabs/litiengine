@@ -13,13 +13,14 @@ import de.gurkenlabs.litiengine.configuration.Quality;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.components.Editor;
+import de.gurkenlabs.utiliti.handlers.DebugCrasher;
 import de.gurkenlabs.utiliti.swing.UI;
 
 public class Program {
+  public static boolean debugCrash = false;
+  
   public static void main(String[] args) {
     SwingUtilities.invokeLater(() -> {
-      Game.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(false));
-      try {
         try {
           // setup basic settings
           Game.info().setName("utiLITI");
@@ -34,12 +35,21 @@ public class Program {
           
           UI.initLookAndFeel();
           Game.init(args);
+          DefaultUncaughtExceptionHandler handler = new DefaultUncaughtExceptionHandler(false);
+          Game.setUncaughtExceptionHandler(handler);
+          Game.loop().attach(() -> {
+            if(debugCrash) {
+              handler.dumpThreads(true);
+              throw new Error("Manually triggered debug crash"); //Press CTRL + SHIFT + ALT + C to generate debug crash report
+            }
+          });
           forceBasicEditorConfiguration();
           Game.world().camera().onZoom(event -> Editor.preferences().setZoom((float) event.getZoom()));
     
           // prepare UI and start the game
           UI.init();
           Game.start();
+          Game.window().getHostControl().addKeyListener(new DebugCrasher());
         }
         catch(Throwable t) {
           throw new UtiLITIInitializationError("UtiLITI failed to initialize, see the stacktrace below for more information", t);
@@ -52,20 +62,10 @@ public class Program {
         // load up previously opened project file or the one that is specified in
         // the command line arguments
         handleArgs(args);
-  
         String gameFile = Editor.preferences().getLastGameFile();
         if (!Editor.instance().fileLoaded() && gameFile != null && !gameFile.isEmpty()) {
           Editor.instance().load(new File(gameFile.trim()), false);
         }
-      }
-      catch(Error e) { //the editor SHOULD crash if an Error occurs, as long as the Error !instanceof ThreadDeath
-        if(e instanceof ThreadDeath) {
-          throw e;
-        }
-        DefaultUncaughtExceptionHandler exceptionHandler = (DefaultUncaughtExceptionHandler) Thread.getDefaultUncaughtExceptionHandler();
-        exceptionHandler.setExitOnException(true);
-        throw e;
-      }
     });
   }
 
