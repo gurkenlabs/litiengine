@@ -9,7 +9,10 @@ import org.junit.jupiter.api.Test;
 import java.awt.Shape;
 import java.util.Arrays;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 class EffectTests {
 

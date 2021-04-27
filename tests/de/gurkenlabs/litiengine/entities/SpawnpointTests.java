@@ -1,25 +1,16 @@
 package de.gurkenlabs.litiengine.entities;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import de.gurkenlabs.litiengine.*;
+import de.gurkenlabs.litiengine.environment.*;
+import de.gurkenlabs.litiengine.environment.tilemap.*;
+import org.junit.jupiter.api.*;
 
-import java.awt.Dimension;
+import java.awt.*;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-import de.gurkenlabs.litiengine.Direction;
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.GameTest;
-import de.gurkenlabs.litiengine.environment.Environment;
-import de.gurkenlabs.litiengine.environment.tilemap.IMap;
-
-public class SpawnpointTests {
+class SpawnpointTests {
   private Environment testEnvironment;
   private boolean eventCalled;
 
@@ -45,7 +36,7 @@ public class SpawnpointTests {
   }
 
   @Test
-  public void testSpawn() {
+  void testSpawn() {
     Creature creature = new Creature();
 
     Spawnpoint spawn1 = new Spawnpoint();
@@ -92,7 +83,7 @@ public class SpawnpointTests {
   }
 
   @Test
-  public void testSpawnEvent() {
+  void testSpawnEvent() {
     // arrange
     Creature creature = new Creature();
     Spawnpoint spawn = new Spawnpoint(20, 20);
@@ -100,9 +91,7 @@ public class SpawnpointTests {
     this.testEnvironment.add(spawn);
     Game.world().loadEnvironment(this.testEnvironment);
 
-    spawn.onSpawned(e -> {
-      eventCalled = true;
-    });
+    spawn.onSpawned(e -> eventCalled = true);
 
     // act, assert
     assertTrue(spawn.spawn(creature));
