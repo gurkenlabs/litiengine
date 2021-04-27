@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -127,7 +128,7 @@ public class GameRandomTests {
     @Test
     public void chooseIntegerCollection_empty(){
         // arrange
-        Collection<Integer> collection = List.of();
+        Collection<Integer> collection = new ArrayList<Integer>();
 
         // act
         Integer result = this.gameRandom.choose(collection);
