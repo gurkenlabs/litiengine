@@ -19,8 +19,10 @@ services:
 
 script:
   - ./gradlew fullbuild --warning-mode all
-  - if [ $TRAVIS_PULL_REQUEST = 'false' ]; then
+  - if [[ $TRAVIS_PULL_REQUEST = 'false' && $TRAVIS_REPO_SLUG = "gurkenlabs/litiengine" ]]; then
     sonar-scanner;
+    elif true; then
+    echo skipping sonar-scanner;
     fi
 
 cache:
