@@ -18,10 +18,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class GeometricUtilitiesTests {
 
@@ -355,6 +352,47 @@ public class GeometricUtilitiesTests {
 
     // assert
     assertNull(avgPosition);
+  }
+
+  /**
+   * Note: Sometimes, floating point precision can stand in the way of calculating accurate intersections, this
+   *  should probably be investigated. @see{@link java.awt.geom.RectangularShape#intersects(Rectangle2D)}
+   *  The inaccurate cases are marked in @see{getIntersectsEllipseArguments}
+   * @param caption
+   * @param baseEllipse
+   * @param intersectionEllipse
+   * @param expectedIntersection
+   */
+  @ParameterizedTest(name = "testIntersectsEllipse {0}")
+  @MethodSource("getIntersectsEllipseArguments")
+  public void testIntersectsEllipse(String caption, Ellipse2D baseEllipse, Ellipse2D intersectionEllipse, boolean expectedIntersection){
+    // act
+    boolean intersects = GeometricUtilities.intersects(baseEllipse, intersectionEllipse);
+
+    // assert
+    assertEquals(expectedIntersection, intersects);
+  }
+
+  /**
+   * Supplies the test arguments for testIntersectsEllipse
+   * @return Arguments for the unit test
+   */
+  @SuppressWarnings("unused")
+  private static Stream<Arguments> getIntersectsEllipseArguments(){
+    // arrange
+    return Stream.of(
+            Arguments.of("both ellipses, no contact", new Ellipse2D.Double(0, 0, 10.75d, 20.0d), new Ellipse2D.Double(10.76d, 0, 10.75d, 20.0d), false),
+            Arguments.of("both ellipses, touch (at one point)", new Ellipse2D.Double(0, 0, 10.75d, 20.0d), new Ellipse2D.Double(10.75d, 0, 10.75d, 20.0d), false),  // calculation inaccurate
+            Arguments.of("both ellipses, intersect", new Ellipse2D.Double(0, 0, 10.75d, 20.0d), new Ellipse2D.Double(10.74d, 0, 10.75d, 20.0d), true),
+            Arguments.of("both circles, no contact", new Ellipse2D.Double(0, 0, 10.75d, 10.0d), new Ellipse2D.Double(10.76d, 0, 10.75d, 10.75d), false),
+            Arguments.of("both circles, touch (at one point)", new Ellipse2D.Double(0, 0, 10.75d, 10.75d), new Ellipse2D.Double(10.75d, 0, 10.75d, 10.75d), true),
+            Arguments.of("both circles, intersect", new Ellipse2D.Double(0, 0, 10.75d, 10.75d), new Ellipse2D.Double(10.74d, 0, 10.75d, 10.75d), true),
+            Arguments.of("both circles, far apart", new Ellipse2D.Double(-1.56d, -9.265d, 10.75d, 10.75d), new Ellipse2D.Double(999.0d, 1024.75d, 10.75d, 10.75d), false),
+            Arguments.of("circle, ellipse, no contact", new Ellipse2D.Double(0, 0, 10.75d, 10.75d), new Ellipse2D.Double(10.76d, 0, 10.75d, 20.0d), false),
+            Arguments.of("circle, ellipse, touch (at one point)", new Ellipse2D.Double(0, 0, 10.75d, 10.75d), new Ellipse2D.Double(10.75d, 4.625d, 10.75d, 20.0d), false), // calculation inaccurate
+            Arguments.of("circle, ellipse, intersect", new Ellipse2D.Double(0, 0, 10.75d, 10.75d), new Ellipse2D.Double(9.9d, 0, 10.75d, 20.0d), true)
+
+    );
   }
 
 }
