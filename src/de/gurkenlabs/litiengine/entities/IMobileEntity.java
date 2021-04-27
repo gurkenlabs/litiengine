@@ -36,11 +36,37 @@ public interface IMobileEntity extends ICollisionEntity {
   int getAcceleration();
 
   /**
+   * Gets the corrected acceleration velocity for movement calculations
+   * @param deltaTime Delta time
+   * @return the corrected acceleration value
+   */
+  default double getAcceleration(double deltaTime){
+    // max distance an entity can travel within one tick
+    float maxPixelsPerTick = getTickVelocity();
+    int acceleration = getAcceleration();
+    return acceleration == 0 ? maxPixelsPerTick : deltaTime / acceleration * maxPixelsPerTick;
+  }
+
+
+  /**
    * Gets a value that defines how long it takes the entity to stop when slowing down from movements (in ms).
    * 
    * @return the deceleration value
    */
   int getDeceleration();
+
+  /**
+   * Gets the corrected deceleration velocity for movement calculations
+   * @param deltaTime  Delta time
+   * @param velocity Current velocity
+   * @return the corrected deceleration value
+   */
+  default double getDeceleration(double deltaTime, double velocity){
+    // max distance an entity can travel within one tick
+    float maxPixelsPerTick = getTickVelocity();
+    int deceleration = getDeceleration();
+    return deceleration == 0 ? velocity : deltaTime / deceleration * maxPixelsPerTick;
+  }
 
   /**
    * Gets the entity's velocity in PIXELS per Second.

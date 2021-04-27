@@ -46,8 +46,8 @@ public class AbilityExecution implements IUpdateable {
   }
 
   /**
-   * 1. Apply all ability effects after their delay. 
-   * 2. Unregister this instance after all effects were applied. 
+   * 1. Apply all ability effects after their delay.
+   * 2. Unregister this instance after all effects were applied.
    * 3. Effects will apply their follow up effects on their own.
    */
   @Override
@@ -57,17 +57,17 @@ public class AbilityExecution implements IUpdateable {
       Game.loop().detach(this);
       return;
     }
+    this.applyAbilityEffects();
+  }
 
-    // handle all effects from the ability that were not applied yet
-    for (final Effect effect : this.getAbility().getEffects()) {
-      // if the ability was not executed yet or the delay of the effect is not
-      // yet reached
-      if (this.getAppliedEffects().contains(effect) || Game.time().since(this.getExecutionTicks()) < effect.getDelay()) {
-        continue;
-      }
-
-      effect.apply(this.getExecutionImpactArea());
-      this.getAppliedEffects().add(effect);
-    }
+  private void applyAbilityEffects() {
+    long gameTicksSinceExecution = Game.time().since(this.getExecutionTicks());
+    // ability not executed yet or delay of effect not yet reached
+    this.getAbility().getEffects().stream()
+        .filter(effect -> !this.getAppliedEffects().contains(effect) && gameTicksSinceExecution >= effect.getDelay())
+        .forEach(effect -> {
+          effect.apply(this.getExecutionImpactArea());
+          this.getAppliedEffects().add(effect);
+    });
   }
 }

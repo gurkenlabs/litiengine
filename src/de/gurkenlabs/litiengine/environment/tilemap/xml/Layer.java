@@ -217,24 +217,73 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
       this.parentMap = (TmxMap) parent;
     }
 
-    if (this.offsetx != null && this.offsetx.intValue() == 0) {
+    resetOffsetX();
+    resetOffsetY();
+    resetWidth();
+    resetHeight();
+    resetOpacity();
+  }
+
+  /**
+   * Resets offsetx if it is resettable
+   */
+  protected void resetOffsetX(){
+    if (isResettable(this.offsetx)) {
       this.offsetx = null;
     }
+  }
 
-    if (this.offsety != null && this.offsety.intValue() == 0) {
+  /**
+   * Resets offsety if it is resettable
+   */
+  protected void resetOffsetY(){
+    if (isResettable(this.offsety)) {
       this.offsety = null;
     }
+  }
 
-    if (this.width != null && this.width.intValue() == 0) {
+  /**
+   * Resets width if it is resettable
+   */
+  protected void resetWidth(){
+    if (isResettable(this.width)) {
       this.width = null;
     }
+  }
 
-    if (this.height != null && this.height.intValue() == 0) {
+  /**
+   * Resets height if it is resettable
+   */
+  protected void resetHeight(){
+    if (isResettable(this.height)) {
       this.height = null;
     }
+  }
 
-    if (this.opacity != null && this.opacity.floatValue() == 1.0f) {
+  /**
+   * Resets opacity if it is resettable
+   */
+  protected void resetOpacity(){
+    if (isResettable(this.opacity)) {
       this.opacity = null;
     }
+  }
+
+  /**
+   * Decides if a value satisfies the criteria for being set to null
+   * @param value Integer value to be checked
+   * @return True if the value satisfies the reset criteria
+   */
+  protected boolean isResettable(Integer value){
+    return value != null && value.intValue() == 0;
+  }
+
+  /**
+   * Decides if a value satisfies the criteria for being set to null
+   * @param value Float value to be checked
+   * @return True if the value satisfies the reset criteria
+   */
+  protected boolean isResettable(Float value){
+    return value != null && value.floatValue() == 1.0f;
   }
 }

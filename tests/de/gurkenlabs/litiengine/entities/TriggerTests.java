@@ -1,20 +1,36 @@
 package de.gurkenlabs.litiengine.entities;
 
-import de.gurkenlabs.litiengine.*;
-import de.gurkenlabs.litiengine.entities.Trigger.*;
-import de.gurkenlabs.litiengine.environment.*;
-import de.gurkenlabs.litiengine.environment.tilemap.*;
-import de.gurkenlabs.litiengine.graphics.*;
-import de.gurkenlabs.litiengine.physics.*;
-import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-import java.awt.*;
-import java.awt.geom.*;
-import java.util.*;
+import java.awt.Dimension;
+import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.GameTest;
+import de.gurkenlabs.litiengine.entities.Trigger.TriggerActivation;
+import de.gurkenlabs.litiengine.environment.Environment;
+import de.gurkenlabs.litiengine.environment.tilemap.IMap;
+import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
+import de.gurkenlabs.litiengine.graphics.RenderType;
+import de.gurkenlabs.litiengine.physics.Collision;
+
 
 class TriggerTests {
   private Environment testEnvironment;
@@ -173,4 +189,38 @@ class TriggerTests {
 
     return entity;
   }
+
+  @Test
+  public void testCollisionActivation() {
+    Trigger trigger = new Trigger(TriggerActivation.COLLISION, "testrigger", "testmessage");
+    testEnvironment = mock(Environment.class);
+    Game.world().loadEnvironment(this.testEnvironment);
+    trigger.loaded(testEnvironment);
+
+    IEntity ent = mock(IEntity.class);
+    List<IEntity> collEntities = mock(List.class);
+    collEntities.add(ent);
+    Iterator<IEntity> iter = mock(Iterator.class);
+    when(iter.hasNext()).thenReturn(true);
+
+    assertFalse(collEntities.contains(ent));
+
+    List<Integer> triggerTargets = mock(ArrayList.class);
+    when(triggerTargets.isEmpty()).thenReturn(true);
+    trigger.update();
+  }
+
+  @Test
+  public void testDeactivatedListener(){
+    Trigger trigger = new Trigger(TriggerActivation.COLLISION, "testrigger", "testmessage");
+    testEnvironment = mock(Environment.class);
+    Game.world().loadEnvironment(this.testEnvironment);
+    trigger.loaded(testEnvironment);
+    TriggerDeactivatedListener listener = mock(TriggerDeactivatedListener.class);
+    trigger.addDeactivatedListener(listener);
+    verify(listener, times(0)).deactivated(any());
+    trigger.update();
+
+  }
 }
+
