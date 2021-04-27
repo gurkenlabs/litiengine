@@ -21,7 +21,7 @@ services:
 script:
   - echo $JAVA_HOME
   - ./gradlew fullbuild --warning-mode all
-  - if [[ $TRAVIS_PULL_REQUEST = 'false' && "$JAVA_HOME" = "/home/travis/openjdk15" ]]; then
+    - if [[ $TRAVIS_PULL_REQUEST = 'false' && "$JAVA_HOME" = "/home/travis/openjdk15" && $TRAVIS_REPO_SLUG = "gurkenlabs/litiengine" ]]; then
     sonar-scanner;
     elif true; then
     echo skipping sonar scanner;
