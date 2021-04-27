@@ -409,4 +409,58 @@ public class GeometricUtilitiesTests {
     assertTrue(points.containsAll(referencePoints));
   }
 
+  @ParameterizedTest(name = "testDistance point1=({0},{1}), point2=({2},{3})")
+  @MethodSource("getDistanceArguments")
+  public void testDistanceCoordinates(double x1, double y1, double x2, double y2, double expectedDistance){
+    // act
+    double actualDistance = GeometricUtilities.distance(x1, y1, x2, y2);
+
+    // assert
+    assertEquals(expectedDistance, actualDistance, 0.00001d);
+  }
+
+  @ParameterizedTest(name = "testDistance point1=({0},{1}), point2=({2},{3})")
+  @MethodSource("getDistanceArguments")
+  public void testDistancePoints(double x1, double y1, double x2, double y2, double expectedDistance){
+    // arrange
+    Point2D point1 = new Point2D.Double(x1, y1);
+    Point2D point2 = new Point2D.Double(x2, y2);
+
+    // act
+    double actualDistance = GeometricUtilities.distance(point1,point2);
+
+    // assert
+    assertEquals(expectedDistance, actualDistance, 0.00001d);
+  }
+
+  /**
+   * Provides the test arguments for @see testDistanceCoordinates and @see testDistancePoints
+   * @return Input arguments for the test
+   */
+  @SuppressWarnings("unused")
+  private static Stream<Arguments> getDistanceArguments(){
+    return Stream.of(
+            Arguments.of(0, 0, 0, 0, 0),
+            Arguments.of(2.756d, 12.5635d, -1.246d, 20.822d, 9.177082d)
+    );
+  }
+
+  @ParameterizedTest(name = "testDistanceRectanglePoint point=({0},{1})")
+  @CsvSource({
+          "-9.53d, 15.23d, 29.9870105d",
+          "23.95d, -8.23d, 19.5528105d",
+          "20.15d, 10.95d, 0d"
+  })
+  public void testDistanceRectanglePoint(double px, double py, double expectedDistance){
+    // arrange
+    Rectangle2D rectangle = new Rectangle2D.Double(20.15d, 10.95d, 10, 20);
+    Point2D point = new Point2D.Double(px, py);
+
+    // act
+    double actualDistance = GeometricUtilities.distance(rectangle, point);
+
+    // assert
+    assertEquals(expectedDistance, actualDistance, 0.000001d);
+  }
+
 }
