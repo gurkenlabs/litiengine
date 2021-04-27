@@ -1,12 +1,6 @@
 package de.gurkenlabs.litiengine.util.geom;
 
-import java.awt.geom.Arc2D;
-import java.awt.geom.Area;
-import java.awt.geom.Dimension2D;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
+import java.awt.geom.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -391,8 +385,28 @@ public class GeometricUtilitiesTests {
             Arguments.of("circle, ellipse, no contact", new Ellipse2D.Double(0, 0, 10.75d, 10.75d), new Ellipse2D.Double(10.76d, 0, 10.75d, 20.0d), false),
             Arguments.of("circle, ellipse, touch (at one point)", new Ellipse2D.Double(0, 0, 10.75d, 10.75d), new Ellipse2D.Double(10.75d, 4.625d, 10.75d, 20.0d), false), // calculation inaccurate
             Arguments.of("circle, ellipse, intersect", new Ellipse2D.Double(0, 0, 10.75d, 10.75d), new Ellipse2D.Double(9.9d, 0, 10.75d, 20.0d), true)
-
     );
+  }
+
+  @Test
+  public void testGetPoints(){
+    // arrange
+    Path2D path = new Path2D.Double();
+    List<Point2D> referencePoints = new ArrayList<>();
+
+    referencePoints.add(new Point2D.Double(7.83d, 9.81d));
+    referencePoints.add(new Point2D.Double(-12.16d, -9.32d));
+    referencePoints.add(new Point2D.Double(101.53d, -22.347d));
+
+    path.moveTo(referencePoints.get(0).getX(), referencePoints.get(0).getY());
+
+    referencePoints.forEach(referencePoint -> path.lineTo(referencePoint.getX(), referencePoint.getY()));
+
+    // act
+    List<Point2D> points = GeometricUtilities.getPoints(path);
+
+    // assert
+    assertTrue(points.containsAll(referencePoints));
   }
 
 }
