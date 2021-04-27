@@ -1,7 +1,14 @@
 package de.gurkenlabs.litiengine.util.geom;
 
-import java.awt.*;
-import java.awt.geom.*;
+import java.awt.geom.Arc2D;
+import java.awt.geom.Area;
+import java.awt.geom.Dimension2D;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -11,7 +18,10 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class GeometricUtilitiesTests {
 
@@ -318,4 +328,33 @@ public class GeometricUtilitiesTests {
     assertEquals(expectedX, pointOnCircle.getX(), 0.0001d);
     assertEquals(expectedY, pointOnCircle.getY(), 0.0001d);
   }
+
+  @Test
+  public void testGetAveragePosition(){
+    // arrange
+    Collection<Point2D> points = new ArrayList<>();
+    points.add(new Point2D.Double(2.03d, 4.93d));
+    points.add(new Point2D.Double(-1.78d, 3.12d));
+    points.add(new Point2D.Double(1.053d, 0d));
+
+    // act
+    Point2D avgPosition = GeometricUtilities.getAveragePosition(points);
+
+    // assert
+    assertEquals(0.4343d, avgPosition.getX(), 0.0001d);
+    assertEquals(2.6833d, avgPosition.getY(), 0.0001d);
+  }
+
+  @Test
+  public void testGetAveragePositionEmpty(){
+    // arrange
+    Collection<Point2D> points = new ArrayList<>();
+
+    // act
+    Point2D avgPosition = GeometricUtilities.getAveragePosition(points);
+
+    // assert
+    assertNull(avgPosition);
+  }
+
 }
