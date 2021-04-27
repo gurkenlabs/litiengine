@@ -63,7 +63,7 @@ public class Appearance {
   }
 
   public Color getForeColor() {
-    return this.foreColor;
+    return foreColor;
   }
 
   public Color getBackgroundColor1() {
@@ -156,6 +156,9 @@ public class Appearance {
     this.setBackgroundColor1(updateAppearance.getBackgroundColor1());
     this.setBackgroundColor2(updateAppearance.getBackgroundColor2());
     this.setForeColor(updateAppearance.getForeColor());
+    this.setBorderColor(updateAppearance.getBorderColor());
+    this.setBorderRadius(updateAppearance.getBorderRadius());
+    this.setBorderStyle(updateAppearance.getBorderStyle());
     this.setHorizontalBackgroundGradient(updateAppearance.isHorizontalBackgroundGradient());
     this.setTransparentBackground(updateAppearance.isTransparentBackground());
   }

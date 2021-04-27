@@ -24,11 +24,9 @@ public final class ColorHelper {
    * Examples: <br>
    * {@code Color.RED} = "#ff0000"<br>
    * {@code new Color(255, 0, 0, 200)} = "#c8ff0000"
-   * 
-   * @param color
-   *          The color that is encoded.
+   *
+   * @param color The color that is encoded.
    * @return An hexadecimal string representation of the specified color.
-   * 
    * @see ColorHelper#decode(String)
    * @see Color
    * @see Color#getRGB()
@@ -57,11 +55,9 @@ public final class ColorHelper {
    * Examples: <br>
    * "#ff0000" = {@code Color.RED}<br>
    * "#c8ff0000" = {@code new Color(255, 0, 0, 200)}
-   * 
-   * @param colorHexString
-   *          The hexadecimal encodes color string representation.
+   *
+   * @param colorHexString The hexadecimal encodes color string representation.
    * @return The decoded color.
-   * 
    * @see ColorHelper#encode(Color)
    * @see Color
    * @see Color#decode(String)
@@ -91,7 +87,8 @@ public final class ColorHelper {
     case HEX_STRING_LENGTH_ALPHA:
       return decodeHexStringWithAlpha(colorHexString, solid);
     default:
-      log.log(Level.SEVERE, "Could not parse color string \"{0}\". Invalid string length \"{1}\"!\nAccepted lengths:\n\t{2} for Colors without Alpha (#ff0000)\n\t{3} for Colors with Alpha (#c8ff0000)",
+      log.log(Level.SEVERE,
+          "Could not parse color string \"{0}\". Invalid string length \"{1}\"!\nAccepted lengths:\n\t{2} for Colors without Alpha (#ff0000)\n\t{3} for Colors with Alpha (#c8ff0000)",
           new Object[] { colorHexString, colorHexString.length(), HEX_STRING_LENGTH, HEX_STRING_LENGTH_ALPHA });
       return null;
     }
@@ -100,9 +97,8 @@ public final class ColorHelper {
   /**
    * Ensures that the specified value lies within the accepted range for Color values (0-255).
    * Smaller values will be forced to be 0 and larger values will result in 255.
-   * 
-   * @param value
-   *          The value to check for.
+   *
+   * @param value The value to check for.
    * @return An integer value that fits the color value restrictions.
    */
   public static int ensureColorValueRange(float value) {
@@ -112,27 +108,30 @@ public final class ColorHelper {
   /**
    * Ensures that the specified value lies within the accepted range for Color values (0-255).
    * Smaller values will be forced to be 0 and larger values will result in 255.
-   * 
-   * @param value
-   *          The value to check for.
+   *
+   * @param value The value to check for.
    * @return An integer value that fits the color value restrictions.
    */
   public static int ensureColorValueRange(int value) {
-    return Math.min(Math.max(value, 0), MAX_RGB_VALUE);
+    return MathUtilities.clamp(value, 0, MAX_RGB_VALUE);
   }
 
   /**
    * Premultiplies the alpha on the given color.
-   * 
-   * @param color
-   *          The color to premultiply
+   *
+   * @param color The color to premultiply
    * @return The color given, with alpha replaced with a black background.
    */
   public static Color premultiply(Color color) {
     if (color.getAlpha() == 255) {
       return color;
     }
-    return new Color(premultiply(color.getRed(), color.getAlpha()), premultiply(color.getGreen(), color.getAlpha()), premultiply(color.getBlue(), color.getAlpha()));
+    return new Color(premultiply(color.getRed(), color.getAlpha()), premultiply(color.getGreen(), color.getAlpha()),
+        premultiply(color.getBlue(), color.getAlpha()));
+  }
+
+  public static Color getTransparentVariant(Color color, int newAlpha) {
+    return new Color(color.getRed(), color.getGreen(), color.getRed(), ensureColorValueRange(newAlpha));
   }
 
   private static Color decodeWellformedHexString(String hexString) {

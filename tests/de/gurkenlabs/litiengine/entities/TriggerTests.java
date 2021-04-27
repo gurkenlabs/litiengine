@@ -31,7 +31,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.physics.Collision;
 
-public class TriggerTests {
+
+class TriggerTests {
   private Environment testEnvironment;
 
   @BeforeAll
@@ -59,7 +60,7 @@ public class TriggerTests {
   }
 
   @Test
-  public void testInteractTrigger() {
+  void testInteractTrigger() {
     Trigger trigger = new Trigger(TriggerActivation.INTERACT, "testrigger", "testmessage");
     this.testEnvironment.add(trigger);
 
@@ -80,7 +81,7 @@ public class TriggerTests {
   }
 
   @Test
-  public void onlyActivatorsCanTrigger() {
+  void onlyActivatorsCanTrigger() {
     Trigger trigger = new Trigger(TriggerActivation.INTERACT, "testrigger", "testmessage");
     trigger.getActivators().add(111);
     this.testEnvironment.add(trigger);
@@ -93,7 +94,7 @@ public class TriggerTests {
   }
 
   @Test
-  public void testOneTimeTrigger() {
+  void testOneTimeTrigger() {
     Trigger trigger = new Trigger(TriggerActivation.INTERACT, "testrigger", "testmessage", true);
     this.testEnvironment.add(trigger);
 
@@ -103,7 +104,7 @@ public class TriggerTests {
   }
 
   @Test
-  public void testMultipleInteractions() {
+  void testMultipleInteractions() {
     Trigger trigger = new Trigger(TriggerActivation.INTERACT, "testrigger", "testmessage");
     this.testEnvironment.add(trigger);
 
@@ -114,11 +115,9 @@ public class TriggerTests {
   }
 
   @Test
-  public void testInteractPredicate() {
+  void testInteractPredicate() {
     Trigger trigger = new Trigger(TriggerActivation.INTERACT, "testrigger", "testmessage", true);
-    trigger.addActivatingCondition(e -> {
-      return "You shall not pass!";
-    });
+    trigger.addActivatingCondition(e -> "You shall not pass!");
     this.testEnvironment.add(trigger);
 
     IEntity activator = mockEntity(111);
@@ -130,7 +129,7 @@ public class TriggerTests {
   }
 
   @Test
-  public void testCollisionTriggerActivates() {
+  void testCollisionTriggerActivates() {
     Trigger trigger = new Trigger(TriggerActivation.COLLISION, "testrigger", "testmessage");
 
     // collision box width == width for triggers
@@ -148,7 +147,7 @@ public class TriggerTests {
   }
 
   @Test
-  public void testCollisionTriggerDoesntActivate() {
+  void testCollisionTriggerDoesntActivate() {
     Trigger trigger = new Trigger(TriggerActivation.COLLISION, "testrigger", "testmessage");
 
     // collision box width == width for triggers
