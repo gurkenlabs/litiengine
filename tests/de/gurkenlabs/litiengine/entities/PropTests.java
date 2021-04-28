@@ -54,30 +54,34 @@ class PropTests {
     assertTrue(prop.isDead());
   }
 
-    @Test
-    public void testToStringNull(){
-        Prop prop = new Prop(0, 0, null);
-        prop.setMapId(1);
-        prop.getMapId();
-        assertEquals("#1: Prop (null)", prop.toString());
-    }
+  @Test
+  public void testToStringNull(){
+    // arrange
+    Prop prop = new Prop(0, 0, null);
+    prop.setMapId(1);
 
-    @Test
-    public void testToStringEmpty(){
-        Prop prop = new Prop(0, 0, "");
-        prop.setMapId(1);
-        prop.getMapId();
-        assertEquals("#1: Prop ()", prop.toString());
-    }
+    // act, assert
+    assertEquals("#1: Prop (null)", prop.toString());
+  }
 
-    @Test
-    public void testToStringNotNull(){
-        Prop prop = new Prop(0, 0, "Test");
-        prop.setMapId(1);
-        prop.getMapId();
-        prop.setName("Test");
-        prop.getName();
-        assertEquals("#1: Test (Test)", prop.toString());
-    }
+  @Test
+  public void testToStringEmpty(){
+    // arrange
+    Prop prop = new Prop(0, 0, "");
+    prop.setMapId(1);
 
+    // act, assert
+    assertEquals("#1: Prop ()", prop.toString());
+  }
+
+  @Test
+  public void testToStringNotNull(){
+    // arrange
+    Prop prop = new Prop(0, 0, "Test");
+    prop.setMapId(1);
+    prop.setName("Test");
+
+    // act, assert
+    assertEquals("#1: Test (Test)", prop.toString());
+  }
 }
