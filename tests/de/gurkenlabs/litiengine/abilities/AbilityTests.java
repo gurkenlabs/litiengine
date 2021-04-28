@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.abilities;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -117,6 +118,40 @@ class AbilityTests {
     float actual = ability.getRemainingCooldownInSeconds();
 
     // assert
+    assertEquals(0, actual);
+  }
+
+  @Test
+  public void testGetRemainingCooldownInSeconds_returnTime() {
+    Creature creature = mock(Creature.class);
+    TestAbility ability = new TestAbility(creature);
+    ability.canCast();
+
+    AbilityExecution ae = mock(AbilityExecution.class);
+    when(ae.getExecutionTicks()).thenReturn(10l);
+    ability.setCurrentExecution(ae);
+
+    //act
+    float actual = ability.getRemainingCooldownInSeconds();
+
+    //assert
+    assertEquals(0.499, actual, 0.0001);
+  }
+
+  @Test
+  public void testGetRemainingCooldownInSeconds_returnZero() {
+    Creature creature = mock(Creature.class);
+    TestAbility ability = new TestAbility(creature);
+    ability.canCast();
+
+    AbilityExecution ae = mock(AbilityExecution.class);
+    when(ae.getExecutionTicks()).thenReturn(0l);
+    ability.setCurrentExecution(ae);
+
+    //act
+    float actual = ability.getRemainingCooldownInSeconds();
+
+    //assert
     assertEquals(0, actual);
   }
 

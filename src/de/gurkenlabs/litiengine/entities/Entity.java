@@ -315,7 +315,7 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
   @Override
   public void setHeight(final double height) {
     this.height = height;
-    this.boundingBox = null;
+    this.boundingBox = null; // trigger recreation in next boundingBox getter call
     this.fireSizeChangedEvent();
   }
 
@@ -333,7 +333,7 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
   @Override
   public void setLocation(final Point2D location) {
     this.mapLocation = location;
-    this.boundingBox = null;
+    this.boundingBox = null; // trigger recreation in next boundingBox getter call
     this.fireLocationChangedEvent();
   }
 
@@ -360,14 +360,14 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
   public void setSize(final double width, final double height) {
     this.width = width;
     this.height = height;
-    this.boundingBox = null;
+    this.boundingBox = null; // trigger recreation in next boundingBox getter call
     this.fireSizeChangedEvent();
   }
 
   @Override
   public void setWidth(final double width) {
     this.width = width;
-    this.boundingBox = null;
+    this.boundingBox = null; // trigger recreation in next boundingBox getter call
     this.fireSizeChangedEvent();
   }
 

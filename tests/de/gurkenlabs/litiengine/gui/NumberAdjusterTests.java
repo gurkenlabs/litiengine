@@ -59,4 +59,23 @@ public class NumberAdjusterTests {
         number.setLowerBound(currentValue3);
         assertEquals(currentValue3, number.getLowerBound());
     }
+
+    @Test
+    public void testSetUpperBound(){
+        // arrange
+        NumberAdjuster number = new NumberAdjuster(0,0,150,300,0,400,1,4);
+        BigDecimal currentValue1 = new BigDecimal("456.0");
+        BigDecimal currentValue2 = new BigDecimal("0");
+        BigDecimal currentValue3 = new BigDecimal("-456.0");
+
+        // act, assert
+        number.setUpperBound(currentValue1);
+        assertEquals(currentValue1, number.getUpperBound());
+
+        number.setUpperBound(currentValue2);
+        assertEquals(currentValue2, number.getUpperBound());
+
+        number.setUpperBound(currentValue3);
+        assertEquals(currentValue3, number.getUpperBound());
+    }
 }
