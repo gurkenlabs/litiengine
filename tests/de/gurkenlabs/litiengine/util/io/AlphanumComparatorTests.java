@@ -1,6 +1,8 @@
 package de.gurkenlabs.litiengine.util.io;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import de.gurkenlabs.litiengine.util.AlphanumComparator;
 
@@ -28,34 +30,44 @@ public class AlphanumComparatorTests implements Comparator<String> {
         assertEquals(0, AlphanumComparator.compareTo(s1, s2));
     }
 
-    @Test
-    public void testCompareTo_EmptyString() {
-        String s1 = "";
-        String s2 = "";
-
-        assertEquals(0, AlphanumComparator.compareTo(s1, s2));
+    @ParameterizedTest(name="testCompareTo_EmptyString s1={0}, s2={1}, expected={2}")
+    @CsvSource({
+            "'','', 0",
+            "'',test, -4",
+            "test,'', 4"
+    })
+    public void testCompareTo_EmptyString(String s1, String s2, int expected) {
+        assertEquals(expected, AlphanumComparator.compareTo(s1, s2));
     }
 
-    @Test
-    public void testCompareTo_NumericCharacters() {
-        String s1 = "123";
-        String s2 = "123";
-        String s3 = "a456";
-        String s4 = "456";
-
-        assertEquals(0, AlphanumComparator.compareTo(s1, s2));
-        assertEquals(-48, AlphanumComparator.compareTo(s1, s3));
-        assertEquals(-3, AlphanumComparator.compareTo(s1, s4));
+    @ParameterizedTest(name="testCompareTo_NumericCharacters s1={0}, s2={1}, expected={2}")
+    @CsvSource({
+            "123, 123, 0",
+            "123, a456, -48",
+            "123, 456, -3",
+            "70, 19, 6",
+            "123, test, -67"
+    })
+    public void testCompareTo_NumericCharacters(String s1, String s2, int expected) {
+        assertEquals(expected, AlphanumComparator.compareTo(s1, s2));
     }
 
-    @Test
-    public void testCompareTo_Strings() {
-        String s1 = "test";
-        String s2 = "test";
-        String s3 = "Atest";
+    @ParameterizedTest(name="testCompareTo_NumericStrings s1={0}, s2={1}, expected={2}")
+    @CsvSource({
+            "100test, 100test, 0",
+            "100test, 70, 1"
+    })
+    public void testCompareTo_NumericStrings(String s1, String s2, int expected) {
+        assertEquals(expected, AlphanumComparator.compareTo(s1, s2));
+    }
 
-        assertEquals(0, AlphanumComparator.compareTo(s1, s2));
-        assertEquals(51, AlphanumComparator.compareTo(s1, s3));
+    @ParameterizedTest(name="testCompareTo_Strings s1={0}, s2={1}, expected={2}")
+    @CsvSource({
+            "test, test, 0",
+            "test, Atest, 51"
+    })
+    public void testCompareTo_Strings(String s1, String s2, int expected) {
+        assertEquals(expected, AlphanumComparator.compareTo(s1, s2));
     }
 
 }
