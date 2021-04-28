@@ -1,119 +1,125 @@
 package de.gurkenlabs.litiengine.entities;
 
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.params.*;
-import org.junit.jupiter.params.provider.*;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.stream.*;
+import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class EntityTests {
+public class EntityTests {
 
-  @Test
-  void testEntityAction() {
-    TestEntity entity = new TestEntity();
+    @Test
+     void testEntityAction() {
+        TestEntity entity = new TestEntity();
 
-    assertTrue(entity.actions().exists("doSomething"));
-    assertFalse(entity.actions().exists("imNotAnAction"));
+        assertTrue(entity.actions().exists("doSomething"));
+        assertFalse(entity.actions().exists("imNotAnAction"));
 
-    assertEquals(2, entity.actions().getActions().size());
+        assertEquals(2, entity.actions().getActions().size());
 
-    EntityAction action = entity.actions().get("doSomething");
+        EntityAction action = entity.actions().get("doSomething");
 
-    assertEquals("doSomething", action.getName());
-    assertEquals("does something", action.getDescription());
+        assertEquals("doSomething", action.getName());
+        assertEquals("does something", action.getDescription());
 
-    assertNotNull(action);
+        assertNotNull(action);
 
-    action.perform();
+        action.perform();
 
-    assertTrue(entity.didSomething);
+        assertTrue(entity.didSomething);
 
-    entity.actions().unregister(action);
+        entity.actions().unregister(action);
 
-    assertEquals(1, entity.actions().getActions().size());
-    assertFalse(entity.actions().exists("doSomething"));
+        assertEquals(1, entity.actions().getActions().size());
+        assertFalse(entity.actions().exists("doSomething"));
 
-    entity.actions().register(action);
+        entity.actions().register(action);
 
-    assertEquals(2, entity.actions().getActions().size());
-    assertTrue(entity.actions().exists("doSomething"));
-  }
-
-  @Test
-  void testNamedAction() {
-    TestEntity entity = new TestEntity();
-
-    assertTrue(entity.actions().exists("myName"));
-
-    EntityAction action = entity.actions().get("myName");
-
-    assertNotNull(action);
-
-    action.perform();
-
-    assertTrue(entity.didNamedAction);
-  }
-
-  @Test
-  void testCustomAction() {
-    TestEntity entity = new TestEntity();
-    entity.register("customAction", () -> entity.customActionPerformed = true);
-
-    assertTrue(entity.actions().exists("customAction"));
-
-    entity.perform("customAction");
-    assertTrue(entity.customActionPerformed);
-
-    entity.actions().unregister("customAction");
-
-    assertFalse(entity.actions().exists("customAction"));
-
-    assertDoesNotThrow(() -> entity.perform("I don't exist!"));
-  }
-
-  @ParameterizedTest
-  @MethodSource("getDefaultTags")
-  void testDefaultTags(String tag) {
-    TestEntity entity = new TestEntity();
-    assertTrue(entity.hasTag(tag));
-  }
-
-  private static Stream<Arguments> getDefaultTags() {
-    return Stream.of(
-        Arguments.of("some tag"),
-        Arguments.of("another tag")
-    );
-  }
-
-  @Tag("some tag")
-  @Tag("another tag")
-  private static class TestEntity extends Entity {
-    private boolean didSomething;
-    private boolean didNamedAction;
-    private boolean customActionPerformed;
-
-    @Action(description = "does something")
-    public void doSomething() {
-      didSomething = true;
+        assertEquals(2, entity.actions().getActions().size());
+        assertTrue(entity.actions().exists("doSomething"));
     }
 
-    @Action(name = "myName")
-    public void namedAction() {
-      didNamedAction = true;
+    @Test
+     void testNamedAction() {
+        TestEntity entity = new TestEntity();
+
+        assertTrue(entity.actions().exists("myName"));
+
+        EntityAction action = entity.actions().get("myName");
+
+        assertNotNull(action);
+
+        action.perform();
+
+        assertTrue(entity.didNamedAction);
     }
 
-    @SuppressWarnings("unused")
-    public void imNotAnAction() {
+    @Test
+     void testCustomAction() {
+        TestEntity entity = new TestEntity();
+        entity.register("customAction", () ->
+            entity.customActionPerformed = true);
+
+        assertTrue(entity.actions().exists("customAction"));
+
+        entity.perform("customAction");
+        assertTrue(entity.customActionPerformed);
+
+        entity.actions().unregister("customAction");
+
+        assertFalse(entity.actions().exists("customAction"));
+
+        assertDoesNotThrow(() -> entity.perform("I don't exist!"));
     }
 
-    @Action
-    public void imNotParameterless(int something) {
+    @ParameterizedTest
+    @MethodSource("getDefaultTags")
+     void testDefaultTags(String tag) {
+        TestEntity entity = new TestEntity();
+        assertTrue(entity.hasTag(tag));
     }
 
-    @Action
-    private void privateAction() {
+    private static Stream<Arguments> getDefaultTags() {
+        return Stream.of(
+                Arguments.of("some tag"),
+                Arguments.of("another tag")
+        );
     }
-  }
+
+    @Tag("some tag")
+    @Tag("another tag")
+    private static class TestEntity extends Entity {
+        private boolean didSomething;
+        private boolean didNamedAction;
+        private boolean customActionPerformed;
+
+        @Action(description = "does something")
+        public void doSomething() {
+            didSomething = true;
+        }
+
+        @Action(name = "myName")
+        public void namedAction() {
+            didNamedAction = true;
+        }
+
+        @SuppressWarnings("unused")
+        public void imNotAnAction() {
+        }
+
+        @Action
+        public void imNotParameterless(int something) {
+        }
+
+        @Action
+        private void privateAction() {
+        }
+    }
 }
