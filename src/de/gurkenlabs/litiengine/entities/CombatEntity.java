@@ -81,10 +81,14 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   }
 
   @Override
-  public void onDeath(CombatEntityDeathListener listener) { this.deathListeners.add(listener); }
+  public void onDeath(CombatEntityDeathListener listener) {
+    this.deathListeners.add(listener);
+  }
 
   @Override
-  public void onResurrect(CombatEntityResurrectListener listener) { this.resurrectListeners.add(listener); }
+  public void onResurrect(CombatEntityResurrectListener listener) {
+    this.resurrectListeners.add(listener);
+  }
 
   @Override
   public void removeListener(CombatEntityHitListener listener) {
@@ -92,10 +96,14 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   }
 
   @Override
-  public void removeListener(CombatEntityDeathListener listener) { this.deathListeners.remove(listener); }
+  public void removeListener(CombatEntityDeathListener listener) {
+    this.deathListeners.remove(listener);
+  }
 
   @Override
-  public void removeListener(CombatEntityResurrectListener listener) { this.resurrectListeners.remove(listener); }
+  public void removeListener(CombatEntityResurrectListener listener) {
+    this.resurrectListeners.remove(listener);
+  }
 
   @Override
   public void die() {
