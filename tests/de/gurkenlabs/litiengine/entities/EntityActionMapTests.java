@@ -7,7 +7,9 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import java.util.Collection;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EntityActionMapTests {
 
@@ -32,8 +34,6 @@ public class EntityActionMapTests {
         boolean exists = actionMap.exists(actionName);
 
         // assert
-        // for this test to work with parameters, it is necessary not to use
-        // assertTrue / assertFalse due to varying expected results
         assertEquals(expectedResult, exists);
     }
 
