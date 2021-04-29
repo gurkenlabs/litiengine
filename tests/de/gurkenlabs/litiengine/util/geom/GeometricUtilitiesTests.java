@@ -1,6 +1,13 @@
 package de.gurkenlabs.litiengine.util.geom;
 
-import java.awt.geom.*;
+import java.awt.geom.Arc2D;
+import java.awt.geom.Area;
+import java.awt.geom.Dimension2D;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
+import java.awt.geom.Path2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -12,7 +19,10 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class GeometricUtilitiesTests {
 
@@ -220,20 +230,7 @@ public class GeometricUtilitiesTests {
     assertEquals(expectedResult, contains);
   }
 
-  private static Stream<Arguments> getContainsArguments(){
-    // arrange
-    return Stream.of(
-            Arguments.of(new Rectangle2D.Double(0, 0, 10, 10), new Point2D.Double(9.9d, 9.9d), true), // both in
-            Arguments.of(new Rectangle2D.Double(0, 0, 10, 10), new Point2D.Double(0, 0), true), // boundary top left
-            Arguments.of(new Rectangle2D.Double(0, 0, 10, 10), new Point2D.Double(10, 10), true), // boundary bottom right
-            Arguments.of(new Rectangle2D.Double(0, 0, 10, 10), new Point2D.Double(10, 0), true), // boundary top right
-            Arguments.of(new Rectangle2D.Double(0, 0, 10, 10), new Point2D.Double(0, 10), true), // boundary bottom left
-            Arguments.of(new Rectangle2D.Double(0, 0, 10, 10), new Point2D.Double(-0.1d, -0.1d), false), // both out
-            Arguments.of(new Rectangle2D.Double(0, 0, 10, 10), new Point2D.Double(10.1d, 10.1d), false), // both out
-            Arguments.of(new Rectangle2D.Double(0, 0, 10, 10), new Point2D.Double(9.9d, 10.1d), false), // x in y out
-            Arguments.of(new Rectangle2D.Double(0, 0, 10, 10), new Point2D.Double(10.1d, 9.9d), false) // y in x out
-    );
-  }
+
 
   @ParameterizedTest(name = "testGetConstrainingLines {0}, lineNumber={1}, expectedStart ({2},{3}), expectedEnd ({4},{5})")
   @CsvSource({
@@ -349,13 +346,9 @@ public class GeometricUtilitiesTests {
   }
 
   /**
-   * Note: Sometimes, floating point precision can stand in the way of calculating accurate intersections, this
+   * TODO: Sometimes, floating point precision can stand in the way of calculating accurate intersections, this
    *  should probably be investigated. @see{@link java.awt.geom.RectangularShape#intersects(Rectangle2D)}
    *  The inaccurate cases are marked in @see{getIntersectsEllipseArguments}
-   * @param caption
-   * @param baseEllipse
-   * @param intersectionEllipse
-   * @param expectedIntersection
    */
   @ParameterizedTest(name = "testIntersectsEllipse {0}")
   @MethodSource("getIntersectsEllipseArguments")
@@ -365,27 +358,6 @@ public class GeometricUtilitiesTests {
 
     // assert
     assertEquals(expectedIntersection, intersects);
-  }
-
-  /**
-   * Supplies the test arguments for testIntersectsEllipse
-   * @return Arguments for the unit test
-   */
-  @SuppressWarnings("unused")
-  private static Stream<Arguments> getIntersectsEllipseArguments(){
-    // arrange
-    return Stream.of(
-            Arguments.of("both ellipses, no contact", new Ellipse2D.Double(0, 0, 10.75d, 20.0d), new Ellipse2D.Double(10.76d, 0, 10.75d, 20.0d), false),
-            Arguments.of("both ellipses, touch (at one point)", new Ellipse2D.Double(0, 0, 10.75d, 20.0d), new Ellipse2D.Double(10.75d, 0, 10.75d, 20.0d), false),  // calculation inaccurate
-            Arguments.of("both ellipses, intersect", new Ellipse2D.Double(0, 0, 10.75d, 20.0d), new Ellipse2D.Double(10.74d, 0, 10.75d, 20.0d), true),
-            Arguments.of("both circles, no contact", new Ellipse2D.Double(0, 0, 10.75d, 10.0d), new Ellipse2D.Double(10.76d, 0, 10.75d, 10.75d), false),
-            Arguments.of("both circles, touch (at one point)", new Ellipse2D.Double(0, 0, 10.75d, 10.75d), new Ellipse2D.Double(10.75d, 0, 10.75d, 10.75d), true),
-            Arguments.of("both circles, intersect", new Ellipse2D.Double(0, 0, 10.75d, 10.75d), new Ellipse2D.Double(10.74d, 0, 10.75d, 10.75d), true),
-            Arguments.of("both circles, far apart", new Ellipse2D.Double(-1.56d, -9.265d, 10.75d, 10.75d), new Ellipse2D.Double(999.0d, 1024.75d, 10.75d, 10.75d), false),
-            Arguments.of("circle, ellipse, no contact", new Ellipse2D.Double(0, 0, 10.75d, 10.75d), new Ellipse2D.Double(10.76d, 0, 10.75d, 20.0d), false),
-            Arguments.of("circle, ellipse, touch (at one point)", new Ellipse2D.Double(0, 0, 10.75d, 10.75d), new Ellipse2D.Double(10.75d, 4.625d, 10.75d, 20.0d), false), // calculation inaccurate
-            Arguments.of("circle, ellipse, intersect", new Ellipse2D.Double(0, 0, 10.75d, 10.75d), new Ellipse2D.Double(9.9d, 0, 10.75d, 20.0d), true)
-    );
   }
 
   @Test
@@ -433,18 +405,6 @@ public class GeometricUtilitiesTests {
     assertEquals(expectedDistance, actualDistance, 0.00001d);
   }
 
-  /**
-   * Provides the test arguments for @see testDistanceCoordinates and @see testDistancePoints
-   * @return Input arguments for the test
-   */
-  @SuppressWarnings("unused")
-  private static Stream<Arguments> getDistanceArguments(){
-    return Stream.of(
-            Arguments.of(0, 0, 0, 0, 0),
-            Arguments.of(2.756d, 12.5635d, -1.246d, 20.822d, 9.177082d)
-    );
-  }
-
   @ParameterizedTest(name = "testDistanceRectanglePoint point=({0},{1})")
   @CsvSource({
           "-9.53d, 15.23d, 29.9870105d",
@@ -463,4 +423,56 @@ public class GeometricUtilitiesTests {
     assertEquals(expectedDistance, actualDistance, 0.000001d);
   }
 
+  /**
+   * This method is used to provide input arguments for @see{testContains}
+   * @return Arguments for the unit test
+   */
+  @SuppressWarnings("unused")
+  private static Stream<Arguments> getContainsArguments(){
+    // arrange
+    return Stream.of(
+            Arguments.of(new Rectangle2D.Double(0, 0, 10, 10), new Point2D.Double(9.9d, 9.9d), true), // both in
+            Arguments.of(new Rectangle2D.Double(0, 0, 10, 10), new Point2D.Double(0, 0), true), // boundary top left
+            Arguments.of(new Rectangle2D.Double(0, 0, 10, 10), new Point2D.Double(10, 10), true), // boundary bottom right
+            Arguments.of(new Rectangle2D.Double(0, 0, 10, 10), new Point2D.Double(10, 0), true), // boundary top right
+            Arguments.of(new Rectangle2D.Double(0, 0, 10, 10), new Point2D.Double(0, 10), true), // boundary bottom left
+            Arguments.of(new Rectangle2D.Double(0, 0, 10, 10), new Point2D.Double(-0.1d, -0.1d), false), // both out
+            Arguments.of(new Rectangle2D.Double(0, 0, 10, 10), new Point2D.Double(10.1d, 10.1d), false), // both out
+            Arguments.of(new Rectangle2D.Double(0, 0, 10, 10), new Point2D.Double(9.9d, 10.1d), false), // x in y out
+            Arguments.of(new Rectangle2D.Double(0, 0, 10, 10), new Point2D.Double(10.1d, 9.9d), false) // y in x out
+    );
+  }
+
+  /**
+   * Supplies the test arguments for @see{testIntersectsEllipse}
+   * @return Arguments for the unit test
+   */
+  @SuppressWarnings("unused")
+  private static Stream<Arguments> getIntersectsEllipseArguments(){
+    // arrange
+    return Stream.of(
+            Arguments.of("both ellipses, no contact", new Ellipse2D.Double(0, 0, 10.75d, 20.0d), new Ellipse2D.Double(10.76d, 0, 10.75d, 20.0d), false),
+            Arguments.of("both ellipses, touch (at one point)", new Ellipse2D.Double(0, 0, 10.75d, 20.0d), new Ellipse2D.Double(10.75d, 0, 10.75d, 20.0d), false),  // calculation inaccurate
+            Arguments.of("both ellipses, intersect", new Ellipse2D.Double(0, 0, 10.75d, 20.0d), new Ellipse2D.Double(10.74d, 0, 10.75d, 20.0d), true),
+            Arguments.of("both circles, no contact", new Ellipse2D.Double(0, 0, 10.75d, 10.0d), new Ellipse2D.Double(10.76d, 0, 10.75d, 10.75d), false),
+            Arguments.of("both circles, touch (at one point)", new Ellipse2D.Double(0, 0, 10.75d, 10.75d), new Ellipse2D.Double(10.75d, 0, 10.75d, 10.75d), true),
+            Arguments.of("both circles, intersect", new Ellipse2D.Double(0, 0, 10.75d, 10.75d), new Ellipse2D.Double(10.74d, 0, 10.75d, 10.75d), true),
+            Arguments.of("both circles, far apart", new Ellipse2D.Double(-1.56d, -9.265d, 10.75d, 10.75d), new Ellipse2D.Double(999.0d, 1024.75d, 10.75d, 10.75d), false),
+            Arguments.of("circle, ellipse, no contact", new Ellipse2D.Double(0, 0, 10.75d, 10.75d), new Ellipse2D.Double(10.76d, 0, 10.75d, 20.0d), false),
+            Arguments.of("circle, ellipse, touch (at one point)", new Ellipse2D.Double(0, 0, 10.75d, 10.75d), new Ellipse2D.Double(10.75d, 4.625d, 10.75d, 20.0d), false), // calculation inaccurate
+            Arguments.of("circle, ellipse, intersect", new Ellipse2D.Double(0, 0, 10.75d, 10.75d), new Ellipse2D.Double(9.9d, 0, 10.75d, 20.0d), true)
+    );
+  }
+
+  /**
+   * Provides the test arguments for @see testDistanceCoordinates and @see testDistancePoints
+   * @return Arguments for the unit test
+   */
+  @SuppressWarnings("unused")
+  private static Stream<Arguments> getDistanceArguments(){
+    return Stream.of(
+            Arguments.of(0, 0, 0, 0, 0),
+            Arguments.of(2.756d, 12.5635d, -1.246d, 20.822d, 9.177082d)
+    );
+  }
 }
