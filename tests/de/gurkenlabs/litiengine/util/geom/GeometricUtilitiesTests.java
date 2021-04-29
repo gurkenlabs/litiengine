@@ -258,8 +258,11 @@ public class GeometricUtilitiesTests {
   @ParameterizedTest(name = "testGetPointsBetweenPoints start=({0},{1}) end=({2},{3})")
   @CsvSource({
           "0, 0, 10, 10",
-          "2.0d, 7.42d, -1.1d, -2.4d",
-          "0, 0, 100, 1"
+          "0, 0, 0, 10",
+          "0, 0, 10, 0",
+          "2.0, 7, -1, -2",
+          "-9, -8, 2, 19",
+          "0, 0, 1000, 1"
   })
   public void testGetPointsBetweenPoints(double x1, double y1, double x2, double y2){
     // arrange
@@ -270,7 +273,7 @@ public class GeometricUtilitiesTests {
     // act
     List<Point2D> pointsBetweenPoints = GeometricUtilities.getPointsBetweenPoints(start, end);
 
-    // assert, checks if all generated points are on within margin of error of the Bresenham algorithm (0.5)
+    // assert, checks if all generated points are within margin of error of the Bresenham algorithm (0.5)
     assertTrue(pointsBetweenPoints.stream().allMatch(point -> line.ptLineDist(point) < 0.5d));
   }
 
