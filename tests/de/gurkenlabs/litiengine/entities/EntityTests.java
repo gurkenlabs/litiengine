@@ -183,7 +183,7 @@ public class EntityTests {
     @Test
     public void testSendMessage() {
         // arrange
-        TestEntity entitySpy = spy(new TestEntity());
+        TestEntity entitySpy = new TestEntity();
         Creature sender = mock(Creature.class); // arbitrary object
 
         // act
