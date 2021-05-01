@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import java.util.ArrayList;
@@ -11,6 +12,10 @@ import java.util.Collection;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.params.provider.MethodSource;
+import java.awt.Color;
+import java.util.stream.Stream;
+import java.util.Arrays;
 
 public class GameRandomTests {
 
@@ -19,6 +24,30 @@ public class GameRandomTests {
     public void initSeed(){
         gameRandom = new GameRandom();
         gameRandom.setSeed(1337);
+    }
+
+    @Test
+    public void testSampleArrayEmpty(){
+        Integer [] array = new Integer[]{};
+        assertThrows(IllegalArgumentException.class, () -> this.gameRandom.sample(array, 1, false));
+    }
+
+    @Test
+    public void testSampleCollectionEmpty(){
+        List<Integer> list = Arrays.asList();
+        assertThrows(IllegalArgumentException.class, () -> this.gameRandom.sample(list, 1, false));
+    }
+
+    @Test
+    public void testSampleCollectionReplacementFalse(){
+        List<Integer> list = Arrays.asList(1, 2);
+        assertEquals(Arrays.asList(1, 2),this.gameRandom.sample(list, 2, false));
+    }
+
+    @Test
+    public void testSampleCollectionReplacementTrue(){
+        List<Integer> list = Arrays.asList(1, 2);
+        assertEquals(Arrays.asList(2, 1),this.gameRandom.sample(list, 2, true));
     }
 
     @ParameterizedTest(name = "testNextInt partition={0} min={1} bound={2} expectedValue={3}")
@@ -214,5 +243,30 @@ public class GameRandomTests {
         // act, assert
         assertThrows(IllegalArgumentException.class, () -> this.gameRandom.choose(doubles));
     }
+
+    @Test
+    public void testNextColorNull(){
+        GameRandom gameRandom = new GameRandom();
+        assertNull(gameRandom.nextColor(null, 0.1f, 0.5f));
+    }
+
+    @ParameterizedTest
+    @MethodSource("getColor")
+    public void testNextColor(Color color, float variance, float alpha, Color expected){
+        Color result = this.gameRandom.nextColor(color, variance, alpha);
+        assertEquals(expected, result);
+    }
+
+    private static Stream<Arguments> getColor() {
+        return Stream.of(
+                Arguments.of(Color.RED, 0.1f, 0.5f, new Color(238, 0, 0)),
+                Arguments.of(Color.GREEN, 0.1f, 0.5f, Color.GREEN),
+                Arguments.of(Color.BLUE, 0.1f, 0.5f, Color.BLUE),
+                Arguments.of(Color.RED, 0f, 0f, Color.RED),
+                Arguments.of(Color.GREEN, 0f, 0f, Color.GREEN),
+                Arguments.of(Color.BLUE, 0f, 0f, Color.BLUE)
+        );
+    }
+
 
 }
