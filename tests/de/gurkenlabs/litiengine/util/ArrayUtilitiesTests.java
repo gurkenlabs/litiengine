@@ -2,15 +2,17 @@ package de.gurkenlabs.litiengine.util;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ArrayUtilitiesTests {
 
@@ -286,41 +288,43 @@ public class ArrayUtilitiesTests {
     assertArrayEquals(new Integer[] { 1, 2, 3, 4, 5, 6 }, result);
   }
 
-  @Test
-  public void testContains() {
-    Object [] first = new Object[] { 1, 2, 3, 4, 5, null };
-    Object [] second = new Object[] {};
-    Object [] third = new Object[] {null};
-    Object [] fourth = new Object[] {4};
-
-    assertTrue(ArrayUtilities.contains(first, 2));
-    assertTrue(ArrayUtilities.contains(first, null));
-    assertFalse(ArrayUtilities.contains(second, ""));
-    assertTrue(ArrayUtilities.contains(third, null));
-    assertTrue(ArrayUtilities.contains(fourth, 4));
+  @ParameterizedTest
+  @MethodSource("getContains")
+  public void testContains(Object[] array, Object value, Boolean expected) {
+    assertEquals(expected, ArrayUtilities.contains(array, value));
   }
 
-  @Test
-  public void testContainsString() {
-    String [] first = new String[] {"test", "test123"};
-    String [] second = new String[] {"test", "test123", null, ""};
-    String [] third = new String[] {};
-    String [] four = new String[] {null};
-    String [] sixth = null;
-    String [] fifth = new String[] {"test"};
+  private static Stream<Arguments> getContains() {
+    return Stream.of(
+            Arguments.of(new Object[] { 1, 2, 3, 4, 5, null }, 2, true),
+            Arguments.of(new Object[] { 1, 2, 3, 4, 5, null }, null, true),
+            Arguments.of(new Object[] {}, "", false),
+            Arguments.of(new Object[] {null}, null, true),
+            Arguments.of(new Object[] {4}, 4, true)
+    );
+  }
 
+  @ParameterizedTest
+  @MethodSource("getContainsString")
+  public void testContainsString(String[] string, String argument, Boolean ignoreCase, Boolean expected) {
+    assertEquals(expected, ArrayUtilities.contains(string, argument, ignoreCase));
+  }
 
-    assertTrue(ArrayUtilities.contains(first, "Test", true));
-    assertFalse(ArrayUtilities.contains(first, "Test", false));
-    assertFalse(ArrayUtilities.contains(second, "Test", false));
-    assertFalse(ArrayUtilities.contains(third, "", true));
-    assertFalse(ArrayUtilities.contains(four, null, false));
-    assertFalse(ArrayUtilities.contains(four, null, true));
-    assertFalse(ArrayUtilities.contains(second, null, false));
-    assertTrue(ArrayUtilities.contains(fifth, "Test", true));
-    assertTrue(ArrayUtilities.contains(fifth, "test", false));
-    assertFalse(ArrayUtilities.contains(second, null, false));
-    assertFalse(ArrayUtilities.contains(sixth, null, false));
+  private static Stream<Arguments> getContainsString() {
+    return Stream.of(
+            Arguments.of(new String[] {"test", "test123"}, "Test", true, true),
+            Arguments.of(new String[] {"test", "test123"}, "Test", false, false),
+            Arguments.of(new String[] {"test", "test123", null, ""}, "Test", false, false),
+            Arguments.of(new String[] {"test", "test123", null, ""}, null, false, false),
+            Arguments.of(new String[] {}, "", true, false),
+            Arguments.of(new String[] {}, "", true, false),
+            Arguments.of(new String[] {null}, null, false, false),
+            Arguments.of(new String[] {null}, null, true, false),
+            Arguments.of(new String[] {"test"}, "Test", true, true),
+            Arguments.of(new String[] {"test"}, "test", false, true),
+            Arguments.of(null, null, false, false)
+
+    );
   }
 
   @Test
