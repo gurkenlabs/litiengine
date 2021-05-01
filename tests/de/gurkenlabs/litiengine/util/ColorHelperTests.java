@@ -84,10 +84,14 @@ public class ColorHelperTests {
     String red200 = "#c8ff0000";
     String green00 = "#c800ff00";
     String blue200 = "#c80000ff";
+    String emptyColor = "";
+    String nullColor = null;
 
     Color redDecoded = ColorHelper.decode(red200, true);
     Color greenDecoded = ColorHelper.decode(green00, true);
     Color blueDecoded = ColorHelper.decode(blue200, true);
+    Color emptyDecoded = ColorHelper.decode(emptyColor, true);
+    Color nullDecoded = ColorHelper.decode(nullColor, true);
 
     Color solidAlphaRed = new Color(228, 0, 0);
     Color solidAlphaGreen = new Color(0, 228, 0);
@@ -96,6 +100,8 @@ public class ColorHelperTests {
     assertEquals(solidAlphaRed, redDecoded);
     assertEquals(solidAlphaGreen, greenDecoded);
     assertEquals(solidAlphaBlue, blueDecoded);
+    assertNull(emptyDecoded);
+    assertNull(nullDecoded);
   }
 
   @Test
@@ -103,14 +109,17 @@ public class ColorHelperTests {
     String red = "ff0000";
     String green = "00ff00";
     String blue = "0000ff";
+    String nullColor = "000";
 
     Color redDecoded = ColorHelper.decode(red);
     Color greenDecoded = ColorHelper.decode(green);
     Color blueDecoded = ColorHelper.decode(blue);
+    Color nullDecoded = ColorHelper.decode(nullColor);
 
     assertEquals(Color.RED, redDecoded);
     assertEquals(Color.GREEN, greenDecoded);
     assertEquals(Color.BLUE, blueDecoded);
+    assertNull(nullDecoded);
   }
 
   @Test
@@ -153,4 +162,11 @@ public class ColorHelperTests {
     // assert
     assertEquals(expectedRgb, actualRgb);
   }
+
+  @Test
+  public void testPremultiply(){
+    Color color = new Color(225, 0, 0);
+    assertEquals(new Color(225, 0, 0), ColorHelper.premultiply(color));
+  }
+
 }
