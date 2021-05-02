@@ -442,7 +442,7 @@ class AttributeTests {
   void testGetDouble() {
     final Attribute<Double> testAttributeDouble = new Attribute<>(10.0);
     testAttributeDouble.addModifier(new AttributeModifier<Double>(Modification.MULTIPLY, 2));
-    assertEquals((byte) 20.0, testAttributeDouble.get().doubleValue());
+    assertEquals( 20.0d, testAttributeDouble.get().doubleValue());
   }
 
   @Test
