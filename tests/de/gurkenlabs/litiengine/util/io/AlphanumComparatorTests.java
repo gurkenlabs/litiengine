@@ -2,9 +2,9 @@ package de.gurkenlabs.litiengine.util.io;
 
 import org.junit.jupiter.api.Test;
 
+import de.gurkenlabs.litiengine.util.AlphanumComparator;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
-
 
 import java.util.Comparator;
 
