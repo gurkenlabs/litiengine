@@ -39,22 +39,32 @@ public class AppearanceTests {
 
     @Test
     public void testGetBackgroundGradientTrue(){
+        //arrange
         Appearance appearance = new Appearance(Color.RED, Color.BLUE);
         appearance.setHorizontalBackgroundGradient(true);
         appearance.setBackgroundColor2(Color.RED);
-        Paint paint = appearance.getBackgroundPaint(0, 0);
+
+        //act
+        Paint paint = appearance.getBackgroundPaint(100, 100);
         GradientPaint gp = (GradientPaint)paint;
-        assertEquals(gp.getColor1(), gp.getColor1());
+
+        //assert
+        assertEquals(Color.RED, gp.getColor2());
     }
 
     @Test
     public void testGetBackgroundGradientFalse(){
+        //arrange
         Appearance appearance = new Appearance(Color.RED, Color.BLUE);
         appearance.setHorizontalBackgroundGradient(false);
         appearance.setBackgroundColor2(Color.RED);
-        Paint paint = appearance.getBackgroundPaint(0, 0);
+
+        //act
+        Paint paint = appearance.getBackgroundPaint(100, 100);
         GradientPaint gp = (GradientPaint)paint;
-        assertEquals(gp.getColor2(), gp.getColor2());
+
+        //assert
+        assertEquals(Color.RED, gp.getColor2());
     }
 
 }
