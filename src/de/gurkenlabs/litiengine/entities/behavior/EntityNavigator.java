@@ -11,7 +11,6 @@ import java.util.function.Predicate;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
-import de.gurkenlabs.litiengine.entities.EntityMovedEvent;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;

@@ -1,6 +1,5 @@
 package de.gurkenlabs.litiengine.graphics.animation;
 
-import java.awt.image.BufferedImage;
 import java.util.Optional;
 
 import de.gurkenlabs.litiengine.Direction;
@@ -10,7 +9,6 @@ import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.graphics.CreatureAnimationState;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.litiengine.util.Imaging;
 
 /**
  * This {@link AnimationController} implementation provides animation rules that

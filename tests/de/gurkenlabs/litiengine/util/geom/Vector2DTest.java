@@ -3,7 +3,6 @@ package de.gurkenlabs.litiengine.util.geom;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.awt.geom.Point2D;
-import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 
