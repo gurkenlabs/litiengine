@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.environment;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
@@ -81,7 +82,7 @@ public class MapObjectSerializerTests {
   @Test
   public void testTmxPropertyAnnotationBoolean() {
     IMapObject mapObject = MapObjectSerializer.serialize(new TestProp());
-    assertEquals(true, mapObject.getBoolValue("testBool"));
+    assertTrue(mapObject.getBoolValue("testBool"));
   }
 
   @Test
