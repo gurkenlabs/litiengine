@@ -17,9 +17,8 @@ import de.gurkenlabs.litiengine.entities.EntityInfo;
 import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.Particle;
 import de.gurkenlabs.litiengine.util.ColorHelper;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class EmitterTests {
 

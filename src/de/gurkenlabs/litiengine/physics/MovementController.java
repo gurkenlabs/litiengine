@@ -6,7 +6,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.entities.EntityMovedEvent;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;

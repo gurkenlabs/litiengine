@@ -9,7 +9,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
 
 public final class Keyboard implements KeyEventDispatcher, IKeyboard, IUpdateable {

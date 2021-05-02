@@ -1,25 +1,14 @@
 package de.gurkenlabs.litiengine.gui;
 
 
-import java.awt.geom.Point2D;
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Consumer;
-
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.input.Input;
-import de.gurkenlabs.litiengine.gui.HorizontalSlider;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class SliderTests {
 
