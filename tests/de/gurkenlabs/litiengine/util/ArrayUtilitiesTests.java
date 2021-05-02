@@ -1,11 +1,9 @@
 package de.gurkenlabs.litiengine.util;
 
-import de.gurkenlabs.litiengine.Direction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.Arrays;
@@ -99,7 +97,7 @@ public class ArrayUtilitiesTests {
     }
   }
 
-  static Stream<Arguments> getArray() {
+  private static Stream<Arguments> getArray() {
     return Stream.of(
             Arguments.of(Arrays.asList(0, 0, 0, 1, 1, 1, 2, 2, 2))
     );
