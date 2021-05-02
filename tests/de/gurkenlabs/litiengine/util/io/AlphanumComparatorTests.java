@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.util.io;
 
+import de.gurkenlabs.litiengine.util.AlphanumComparator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
