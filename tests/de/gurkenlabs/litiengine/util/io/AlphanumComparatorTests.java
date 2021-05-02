@@ -1,4 +1,4 @@
-package de.gurkenlabs.litiengine.util;
+package de.gurkenlabs.litiengine.util.io;
 
 import org.junit.jupiter.api.Test;
 
