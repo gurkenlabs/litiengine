@@ -202,7 +202,7 @@ public class GeometricUtilitiesTests {
     double actualDeltaX = GeometricUtilities.getDeltaX(angle);
 
     // assert
-    assertEquals(expectedDeltaX, (float) actualDeltaX, 0.001);
+    assertEquals(expectedDeltaX, actualDeltaX, 0.001d);
   }
 
   @ParameterizedTest(name = "testDeltaY angle={0}, expectedDeltaY={1}")
@@ -217,7 +217,7 @@ public class GeometricUtilitiesTests {
     double actualDeltaY = GeometricUtilities.getDeltaY(angle);
 
     // assert
-    assertEquals(expectedDeltaY, (float) actualDeltaY, 0.001);
+    assertEquals(expectedDeltaY, actualDeltaY, 0.001d);
   }
 
   @ParameterizedTest(name = "testContains")
@@ -229,8 +229,6 @@ public class GeometricUtilitiesTests {
     // assert
     assertEquals(expectedResult, contains);
   }
-
-
 
   @ParameterizedTest(name = "testGetConstrainingLines {0}, lineNumber={1}, expectedStart ({2},{3}), expectedEnd ({4},{5})")
   @CsvSource({
