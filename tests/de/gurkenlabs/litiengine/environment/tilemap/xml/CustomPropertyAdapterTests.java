@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Test;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -28,7 +28,7 @@ public class CustomPropertyAdapterTests {
         // arrange
         CustomPropertyAdapter.Property property = new CustomPropertyAdapter.Property("PropertyA", "float");
         property.value = "42.0f";
-        CustomPropertyAdapter.PropertyList propertyList = new CustomPropertyAdapter.PropertyList(List.of(property));
+        CustomPropertyAdapter.PropertyList propertyList = new CustomPropertyAdapter.PropertyList(Collections.singletonList(property));
 
         // act
         Map<String, ICustomProperty> unmarshal = adapter.unmarshal(propertyList);
@@ -43,7 +43,7 @@ public class CustomPropertyAdapterTests {
         CustomPropertyAdapter.Property property = new CustomPropertyAdapter.Property("PropertyA", "float");
         property.value = "42.0f";
         property.location = new URL("http://localhost/");
-        CustomPropertyAdapter.PropertyList propertyList = new CustomPropertyAdapter.PropertyList(List.of(property));
+        CustomPropertyAdapter.PropertyList propertyList = new CustomPropertyAdapter.PropertyList(Collections.singletonList(property));
 
         // act
         Map<String, ICustomProperty> unmarshal = adapter.unmarshal(propertyList);
