@@ -31,7 +31,9 @@ public class AppearanceTests {
     @Test
     public void testGetBackgroundPaintBackgroundNull(){
         Appearance appearance = new Appearance(Color.BLUE, null);
-        assertNull(appearance.getBackgroundPaint(0,0));
+        appearance.setBackgroundColor2(Color.GREEN);
+
+        assertEquals(Color.GREEN, appearance.getBackgroundPaint(0,0));
     }
 
     @Test
