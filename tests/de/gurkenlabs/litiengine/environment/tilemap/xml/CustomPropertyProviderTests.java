@@ -8,7 +8,8 @@ import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CustomPropertyProviderTests {
 
@@ -76,7 +77,6 @@ public class CustomPropertyProviderTests {
     props.put("test42", new CustomProperty("value42"));
 
     // act
-    provider.setProperties(props);
     provider.setProperties(null);
 
     // assert

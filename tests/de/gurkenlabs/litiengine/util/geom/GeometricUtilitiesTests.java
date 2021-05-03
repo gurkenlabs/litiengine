@@ -90,14 +90,8 @@ public class GeometricUtilitiesTests {
 
   @Test
   public void testGetCenterDouble(){
-    // arrange
-    double x1 = 0;
-    double y1 = 0;
-    double x2 = 1;
-    double y2 = 1;
-
-    // act
-    Point2D mid = GeometricUtilities.getCenter(x1, y1, x2, y2);
+    // arrange, act
+    Point2D mid = GeometricUtilities.getCenter(0, 0, 1, 1);
 
     // assert
     assertEquals(new Point2D.Double(0.5, 0.5), mid);

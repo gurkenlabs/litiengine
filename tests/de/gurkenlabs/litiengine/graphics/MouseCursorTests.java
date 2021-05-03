@@ -43,11 +43,11 @@ public class MouseCursorTests {
   }
 
   @Test
-  public void testSetIsVisible(){
-    // act
+  public void testIsVisible(){
+    // arrange
     cursor.set(new BufferedImage(30, 30, BufferedImage.TYPE_INT_ARGB));
 
-    // assert
+    // act, assert
     // as soon as an image is set, the cursor should be visible by default
     assertTrue(cursor.isVisible());
   }
@@ -64,6 +64,10 @@ public class MouseCursorTests {
 
   @Test
   public void testSetVisible(){
+    // arrange
+    cursor.set(new BufferedImage(30, 30, BufferedImage.TYPE_INT_ARGB));
+    assertTrue(cursor.isVisible());
+
     // act
     cursor.setVisible(false);
 

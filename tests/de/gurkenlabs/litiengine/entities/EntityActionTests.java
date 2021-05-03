@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class EntityActionTests {
 
     private EntityAction entityAction;
-    private boolean hasBeenPerformed = false;
+    private boolean hasBeenPerformed;
     private final String ACTION_NAME = "actionSetHasBeenPerformed";
 
     @BeforeEach
