@@ -27,23 +27,23 @@ import static org.mockito.Mockito.when;
 
 class CombatEntityTests {
 
-  private CombatEntity combatEntitySpy;
-  private CombatEntityListener entityListener;
-  private Ability ability;
+    private CombatEntity combatEntitySpy;
+    private CombatEntityListener entityListener;
+    private Ability ability;
 
-  @BeforeEach
-  public void setUp() {
-    Game.init(Game.COMMADLINE_ARG_NOGUI);
+    @BeforeEach
+    public void setUp() {
+        Game.init(Game.COMMADLINE_ARG_NOGUI);
 
-    combatEntitySpy = spy(new CombatEntity());
+        combatEntitySpy = spy(new CombatEntity());
 
         entityListener = mock(CombatEntityListener.class);
         combatEntitySpy.addCombatEntityListener(entityListener);
 
-    ability = mock(Ability.class);
-  }
+        ability = mock(Ability.class);
+    }
 
-  @Test
+    @Test
     public void testDieIsDead() {
         // arrange
         when(combatEntitySpy.isDead()).thenReturn(true);
@@ -151,53 +151,53 @@ class CombatEntityTests {
     }
 
     @Test
-  void testHitNotDead() {
-    // arrange
-    int hitPoints = 100;
+    void testHitNotDead() {
+        // arrange
+        int hitPoints = 100;
 
-    // act
-    combatEntitySpy.hit(hitPoints, ability);
+        // act
+        combatEntitySpy.hit(hitPoints, ability);
 
-    // assert
-    verify(entityListener, times(2)).hit(any());
-  }
+        // assert
+        verify(entityListener, times(2)).hit(any());
+    }
 
-  @Test
-  void testHitDead() {
-    // arrange
-    int hitPoints = 100;
-    combatEntitySpy.die();
+    @Test
+    void testHitDead() {
+        // arrange
+        int hitPoints = 100;
+        combatEntitySpy.die();
 
-    // act
-    combatEntitySpy.hit(hitPoints, ability);
+        // act
+        combatEntitySpy.hit(hitPoints, ability);
 
-    // assert
-    verify(entityListener, times(0)).hit(any());
-  }
+        // assert
+        verify(entityListener, times(0)).hit(any());
+    }
 
-  @Test
-  void testHitIndestructible() {
-    // arrange
-    int hitPoints = 100;
-    combatEntitySpy.setIndestructible(true);
+    @Test
+    void testHitIndestructible() {
+        // arrange
+        int hitPoints = 100;
+        combatEntitySpy.setIndestructible(true);
 
-    // act
-    combatEntitySpy.hit(hitPoints, ability);
+        // act
+        combatEntitySpy.hit(hitPoints, ability);
 
-    // assert
-    assertEquals(100, combatEntitySpy.getHitPoints().get());
-  }
+        // assert
+        assertEquals(100, combatEntitySpy.getHitPoints().get());
+    }
 
-  @Test
-  void testHitGetsKilledWithThisHit() {
-    // arrange
-    int hitPoints = 250;
+    @Test
+    void testHitGetsKilledWithThisHit() {
+        // arrange
+        int hitPoints = 250;
 
-    // act
-    combatEntitySpy.hit(hitPoints, ability);
+        // act
+        combatEntitySpy.hit(hitPoints, ability);
 
-    // assert
-    verify(entityListener, times(2)).death(combatEntitySpy);
+        // assert
+        verify(entityListener, times(2)).death(combatEntitySpy);
     }
 
     @Test
@@ -237,7 +237,8 @@ class CombatEntityTests {
         combatEntitySpy.setTeam(5);
 
         // act, assert
-        assertFalse(combatEntitySpy.isNeutral());    }
+        assertFalse(combatEntitySpy.isNeutral());
+    }
 
     @Test
     public void testResurrectDead() {
@@ -329,5 +330,5 @@ class CombatEntityTests {
 
         // cleanup
         gameMockedStatic.close();
-  }
+    }
 }
