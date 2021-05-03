@@ -1,10 +1,13 @@
 package de.gurkenlabs.litiengine.gui;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.awt.Color;
 import java.awt.Paint;
 import java.awt.GradientPaint;
+import java.awt.geom.Point2D;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -32,40 +35,28 @@ public class AppearanceTests {
     }
 
     @Test
-    public void testBackgroundTransparent(){
+    public void testBackgroundPaintTransparent(){
         Appearance appearance = new Appearance(null);
         assertNull(appearance.getBackgroundPaint(0,0));
     }
 
-    @Test
-    public void testGetBackgroundGradientTrue(){
+    @ParameterizedTest(name="testGetBackgroundPaint gradient is {0}")
+    @CsvSource({
+            "true, 50, 0",
+            "false, 0, 50"
+    })
+    public void testGetBackgroundPaintGradientTrue(boolean backgroundGradient, int expectedX, int expectedY){
         //arrange
         Appearance appearance = new Appearance(Color.RED, Color.BLUE);
-        appearance.setHorizontalBackgroundGradient(true);
         appearance.setBackgroundColor2(Color.RED);
+        appearance.setHorizontalBackgroundGradient(backgroundGradient);
 
         //act
         Paint paint = appearance.getBackgroundPaint(100, 100);
-        GradientPaint gp = (GradientPaint)paint;
 
         //assert
-        assertEquals(Color.RED, gp.getColor2());
+        Point2D paintPoint = ((GradientPaint) paint).getPoint2();
+        assertEquals(expectedX, paintPoint.getX());
+        assertEquals(expectedY, paintPoint.getY());
     }
-
-    @Test
-    public void testGetBackgroundGradientFalse(){
-        //arrange
-        Appearance appearance = new Appearance(Color.RED, Color.BLUE);
-        appearance.setHorizontalBackgroundGradient(false);
-        appearance.setBackgroundColor2(Color.RED);
-
-        //act
-        Paint paint = appearance.getBackgroundPaint(100, 100);
-        GradientPaint gp = (GradientPaint)paint;
-
-        //assert
-        assertEquals(Color.RED, gp.getColor2());
-    }
-
 }
-
