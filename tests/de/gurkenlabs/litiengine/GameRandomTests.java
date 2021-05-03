@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.params.provider.MethodSource;
 import java.awt.Color;
+import java.util.List;
 import java.util.stream.Stream;
 import java.util.Arrays;
 
