@@ -35,52 +35,52 @@ public class EntityTests {
   @Test
   public void testSetX() {
     // arrange
-    TestEntity entitySpy = new TestEntity();
-    assertEquals(0, entitySpy.getX());
+    TestEntity entity = new TestEntity();
+    assertEquals(0, entity.getX());
 
     // act
-    entitySpy.setX(5);
+    entity.setX(5);
 
     // assert
-    assertEquals(5, entitySpy.getX());
+    assertEquals(5, entity.getX());
   }
 
   @Test
   public void testSetY() {
     // arrange
-    TestEntity entitySpy = new TestEntity();
-    assertEquals(0, entitySpy.getY());
+    TestEntity entity = new TestEntity();
+    assertEquals(0, entity.getY());
 
     // act
-    entitySpy.setY(5);
+    entity.setY(5);
 
     // assert
-    assertEquals(5, entitySpy.getY());
+    assertEquals(5, entity.getY());
   }
 
   @Test
   public void testHasTag() {
     // arrange
     String tag = "test tag";
-    TestEntity entitySpy = new TestEntity();
-    entitySpy.addTag(tag);
+    TestEntity entity = new TestEntity();
+    entity.addTag(tag);
 
     // act, assert
-    assertTrue(entitySpy.hasTag(tag));
+    assertTrue(entity.hasTag(tag));
   }
 
   @Test
   public void testAddTagNotContained() {
     // arrange
     String tag = "test tag";
-    TestEntity entitySpy = new TestEntity();
-    assertFalse(entitySpy.hasTag(tag));
+    TestEntity entity = new TestEntity();
+    assertFalse(entity.hasTag(tag));
 
     // act
-    entitySpy.addTag(tag);
+    entity.addTag(tag);
 
     // assert
-    assertTrue(entitySpy.hasTag(tag));
+    assertTrue(entity.hasTag(tag));
   }
 
   @Test
@@ -165,11 +165,11 @@ public class EntityTests {
     when(entitySpy.getTags()).thenReturn(tagListSpy);
 
     Environment environmentMock = mock(Environment.class);
-    Map<String, Collection<IEntity>> entitiesSpy = new HashMap<>();
+    Map<String, Collection<IEntity>> entities = new HashMap<>();
     List<IEntity> entitiesContent = new ArrayList<>();
     entitiesContent.add(entitySpy);
-    entitiesSpy.put(tag, entitiesContent);
-    when(environmentMock.getEntitiesByTag()).thenReturn(entitiesSpy);
+    entities.put(tag, entitiesContent);
+    when(environmentMock.getEntitiesByTag()).thenReturn(entities);
     when(entitySpy.getEnvironment()).thenReturn(environmentMock);
 
     MockedStatic<Game> gameMockedStatic = mockStatic(Game.class);
@@ -177,14 +177,14 @@ public class EntityTests {
     when(gameWorldMock.environment()).thenReturn(mock(Environment.class));
     gameMockedStatic.when(Game::world).thenReturn(gameWorldMock);
 
-    assertEquals(1, entitiesSpy.size());
+    assertEquals(1, entities.size());
 
     // act
     entitySpy.removeTag(tag);
 
     // assert
     verify(tagListSpy, times(1)).remove(tag);
-    assertEquals(0, entitiesSpy.size());
+    assertEquals(0, entities.size());
 
     // cleanup
     gameMockedStatic.close();
