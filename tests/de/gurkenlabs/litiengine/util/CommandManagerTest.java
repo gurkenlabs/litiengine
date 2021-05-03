@@ -7,14 +7,13 @@ import java.util.function.Predicate;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.spy;
 
 public class CommandManagerTest {
 
     @Test
     public void bindAddNewCommand(){
         // arrange
-        CommandManager commandManager = spy(new CommandManager());
+        CommandManager commandManager = new CommandManager();
         assertFalse(commandManager.executeCommand("command predicate"));
         Predicate<String []> predicate = arr -> arr.length == 2;
 
@@ -28,7 +27,7 @@ public class CommandManagerTest {
     @Test
     public void bindThrowsIfContained(){
         // arrange
-        CommandManager commandManager = spy(new CommandManager());
+        CommandManager commandManager = new CommandManager();
 
         Predicate<String []> predicate = arr -> arr.length == 2;
         commandManager.bind("command", predicate);
@@ -86,7 +85,7 @@ public class CommandManagerTest {
     @Test
     public void executeCommandKeywordContainedNotMatching(){
         // arrange
-        CommandManager commandManager = spy(new CommandManager());
+        CommandManager commandManager = new CommandManager();
         Predicate<String []> predicate = arr -> arr.length > 5;
         commandManager.bind("apple", predicate);
 
@@ -97,7 +96,7 @@ public class CommandManagerTest {
     @Test
     public void executeCommandKeywordContainedMatching(){
         // arrange
-        CommandManager commandManager = spy(new CommandManager());
+        CommandManager commandManager = new CommandManager();
         Predicate<String []> predicate = arr -> arr.length < 5;
         commandManager.bind("pear", predicate);
 
