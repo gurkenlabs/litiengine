@@ -190,49 +190,20 @@ public class EntityTests {
     gameMockedStatic.close();
   }
 
-  @Test
-  public void testToStringNameNull() {
+  @ParameterizedTest(name="testToString name is {0}")
+  @MethodSource("getToStringParameters")
+  public void testToString(String testName, int mapId, String name, int getNameInvocations, String expectedName){
     // arrange
     TestEntity entitySpy = spy(new TestEntity());
-    when(entitySpy.getMapId()).thenReturn(5);
-    when(entitySpy.getName()).thenReturn(null);
+    when(entitySpy.getMapId()).thenReturn(mapId);
+    when(entitySpy.getName()).thenReturn(name);
 
     // act
     String result = entitySpy.toString();
 
     // assert
-    verify(entitySpy, times(1)).getName(); // second in if is dropped when first is false
-    assertEquals("#5: TestEntity", result);
-  }
-
-  @Test
-  public void testToStringNameEmpty() {
-    // arrange
-    TestEntity entitySpy = spy(new TestEntity());
-    when(entitySpy.getMapId()).thenReturn(5);
-    when(entitySpy.getName()).thenReturn("");
-
-    // act
-    String result = entitySpy.toString();
-
-    // assert
-    verify(entitySpy, times(2)).getName();
-    assertEquals("#5: TestEntity", result);
-  }
-
-  @Test
-  public void testToStringNameValid() {
-    // arrange
-    TestEntity entitySpy = spy(new TestEntity());
-    when(entitySpy.getMapId()).thenReturn(5);
-    when(entitySpy.getName()).thenReturn("test name");
-
-    // act
-    String result = entitySpy.toString();
-
-    // assert
-    verify(entitySpy, times(3)).getName();
-    assertEquals("#5: test name", result);
+    verify(entitySpy, times(getNameInvocations)).getName();
+    assertEquals(expectedName, result);
   }
 
   @Test
@@ -354,6 +325,14 @@ public class EntityTests {
     return Stream.of(
         Arguments.of("some tag"),
         Arguments.of("another tag")
+    );
+  }
+
+  private static Stream<Arguments> getToStringParameters(){
+    return Stream.of(
+            Arguments.of("null", 5, null, 1, "#5: TestEntity"), // second in if is dropped when first is false
+            Arguments.of("empty", 5, "", 2, "#5: TestEntity"),
+            Arguments.of("valid", 5, "test name", 3, "#5: test name")
     );
   }
 
