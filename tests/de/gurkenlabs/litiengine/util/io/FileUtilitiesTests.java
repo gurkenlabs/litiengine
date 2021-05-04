@@ -119,4 +119,28 @@ public class FileUtilitiesTests {
     assertEquals("", extension4);
     assertEquals("", extension5);
   }
+  
+  @Test
+  public void testHumanReadableByteCount() {
+    long zero = 0;
+    long lessThanKibibyte = 1023;
+    long kibibyte = 1024;
+    long moreThanKibibyte = 1025;
+    long mebibyte = 1048576;
+    long gibibyte = 1073741824;
+    long tebibyte = 1099511627776l;
+    long exbibyte = 1152921504606846976l;
+    long max = Long.MAX_VALUE;
+    
+    assertEquals("0 bytes", FileUtilities.humanReadableByteCount(zero));
+    assertEquals("1023 bytes", FileUtilities.humanReadableByteCount(lessThanKibibyte));
+    assertEquals("1.0 kibibytes", FileUtilities.humanReadableByteCount(kibibyte));
+    assertEquals("1.0 kibibytes", FileUtilities.humanReadableByteCount(moreThanKibibyte));
+    assertEquals("1.5 kibibytes", FileUtilities.humanReadableByteCount(kibibyte + kibibyte / 2));
+    assertEquals("1.0 mebibytes", FileUtilities.humanReadableByteCount(mebibyte));
+    assertEquals("1.0 gibibytes", FileUtilities.humanReadableByteCount(gibibyte));
+    assertEquals("1.0 tebibytes", FileUtilities.humanReadableByteCount(tebibyte));
+    assertEquals("1.0 exbibytes", FileUtilities.humanReadableByteCount(exbibyte));
+    assertEquals("8.0 exbibytes", FileUtilities.humanReadableByteCount(max));
+  }
 }
