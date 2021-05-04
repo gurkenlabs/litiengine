@@ -1,16 +1,21 @@
 package de.gurkenlabs.litiengine;
 
+import java.awt.DisplayMode;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
+import java.time.Duration;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.configuration.ClientConfiguration;
+import static de.gurkenlabs.litiengine.util.io.FileUtilities.humanReadableByteCount;
 
 /**
  * Handles the uncaught exceptions that might occur while running a game or application with the LITIENGINE.
@@ -64,6 +69,7 @@ public class DefaultUncaughtExceptionHandler implements UncaughtExceptionHandler
       stream.print(new Date() + " ");
       stream.println(t.getName() + " threw an exception:");
       e.printStackTrace(stream);
+      stream.println("\n" + getSystemInfo());
       if(dumpsThreads()) {
         stream.println();
         stream.println(dump());
@@ -138,6 +144,38 @@ public class DefaultUncaughtExceptionHandler implements UncaughtExceptionHandler
         text.append("\n");
       }
       text.append("\n\n");
+    }
+    return text.toString();
+  }
+  
+  protected static String getSystemInfo() {
+    StringBuilder text = new StringBuilder();
+    text.append("====Runtime Information====\n");
+    text.append("Operating System: " + System.getProperty("os.name") + "\n"); 
+    text.append("\tArchitecture: " + System.getProperty("os.arch") + "\n");
+    text.append("\tVersion: " + System.getProperty("os.version") + "\n");
+    text.append("Memory:\n");
+    long heapSize = Runtime.getRuntime().totalMemory();
+    long maxHeapSize = Runtime.getRuntime().maxMemory();
+    long freeHeapSize = Runtime.getRuntime().freeMemory();
+    text.append("\tMax heap size: " + humanReadableByteCount(maxHeapSize) + "\n");
+    text.append("\tCurrent heap size: " + humanReadableByteCount(heapSize) + "\n");
+    text.append("\tHeap used: " + humanReadableByteCount(heapSize - freeHeapSize) + "\n");
+    text.append("\tFree heap: " + humanReadableByteCount(freeHeapSize) + "\n");
+    text.append("Java Version: " + System.getProperty("java.runtime.name") + " " + System.getProperty("java.runtime.version")+ " \n");
+    text.append("\tVendor: " + System.getProperty("java.vm.vendor") + "\n");
+    text.append("Uptime: " + Duration.ofMillis(ManagementFactory.getRuntimeMXBean().getUptime()) + "\n");
+    GraphicsEnvironment g = GraphicsEnvironment.getLocalGraphicsEnvironment();
+    GraphicsDevice[] screens = g.getScreenDevices();
+    text.append("Screens: " + screens.length + "\n");
+    for(int i = 0; i < screens.length;) {
+      GraphicsDevice screen = screens[i];
+      DisplayMode displayMode = screen.getDisplayMode();
+      text.append("\tScreen " + ++i +": "+ displayMode.getWidth() + "x" + displayMode.getHeight());
+      if(displayMode.getRefreshRate() != DisplayMode.REFRESH_RATE_UNKNOWN) {
+        text.append("@" + displayMode.getRefreshRate() + "hz");
+      }
+      text.append("\n");
     }
     return text.toString();
   }
