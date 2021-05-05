@@ -119,4 +119,63 @@ public class FileUtilitiesTests {
     assertEquals("", extension4);
     assertEquals("", extension5);
   }
+  
+  @Test
+  public void testHumanReadableByteCount() {
+    long zero = 0;
+    long max = Long.MAX_VALUE;
+    {
+      long lessThanKibibyte = 1023;
+      long kibibyte = 1024;
+      long moreThanKibibyte = 1025;
+      long mebibyte = 1048576;
+      long gibibyte = 1073741824;
+      long tebibyte = 1099511627776l;
+      long pebibyte = 1125899906842624l;
+      long exbibyte = 1152921504606846976l;
+      
+      assertEquals("0 bytes", FileUtilities.humanReadableByteCount(zero));
+      assertEquals("1023 bytes", FileUtilities.humanReadableByteCount(lessThanKibibyte));
+      assertEquals("1.0 KiB", FileUtilities.humanReadableByteCount(kibibyte));
+      assertEquals("1.0 KiB", FileUtilities.humanReadableByteCount(moreThanKibibyte));
+      assertEquals("1.5 KiB", FileUtilities.humanReadableByteCount(kibibyte + kibibyte / 2));
+      assertEquals("1.0 MiB", FileUtilities.humanReadableByteCount(mebibyte));
+      assertEquals("1.0 GiB", FileUtilities.humanReadableByteCount(gibibyte));
+      assertEquals("1.0 TiB", FileUtilities.humanReadableByteCount(tebibyte));
+      assertEquals("1.0 PiB", FileUtilities.humanReadableByteCount(pebibyte));
+      assertEquals("1.5 PiB", FileUtilities.humanReadableByteCount(pebibyte + pebibyte / 2));
+      assertEquals("1.0 EiB", FileUtilities.humanReadableByteCount(exbibyte));
+      assertEquals("8.0 EiB", FileUtilities.humanReadableByteCount(max));
+      
+      assertEquals("1.2 EB", FileUtilities.humanReadableByteCount(exbibyte, true));
+      
+    }
+    
+    {
+      long lessThanKilobyte = 999;
+      long kilobyte = 1000;
+      long moreThanOneKilobyte = 1001;
+      long megabyte = 1000000;
+      long gigabyte = 1000000000;
+      long terabyte = 1000000000000l;
+      long petabyte = 1000000000000000l;
+      long exabyte =  1000000000000000000l;
+      
+      assertEquals("0 bytes", FileUtilities.humanReadableByteCount(zero, true));
+      assertEquals("999 bytes", FileUtilities.humanReadableByteCount(lessThanKilobyte, true));
+      assertEquals("1.0 KB", FileUtilities.humanReadableByteCount(moreThanOneKilobyte, true));
+      assertEquals("1.0 KB", FileUtilities.humanReadableByteCount(kilobyte, true));
+      assertEquals("1.5 KB", FileUtilities.humanReadableByteCount(kilobyte + kilobyte / 2, true));
+      assertEquals("1.0 MB", FileUtilities.humanReadableByteCount(megabyte, true));
+      assertEquals("1.0 GB", FileUtilities.humanReadableByteCount(gigabyte, true));
+      assertEquals("1.0 TB", FileUtilities.humanReadableByteCount(terabyte, true));
+      assertEquals("1.0 PB", FileUtilities.humanReadableByteCount(petabyte, true));
+      assertEquals("1.5 PB", FileUtilities.humanReadableByteCount(petabyte + petabyte / 2, true));
+      assertEquals("1.0 EB", FileUtilities.humanReadableByteCount(exabyte, true));
+      assertEquals("9.2 EB", FileUtilities.humanReadableByteCount(max, true));
+      
+      assertEquals("888.2 PiB", FileUtilities.humanReadableByteCount(exabyte, false));
+      
+    }
+  }
 }
