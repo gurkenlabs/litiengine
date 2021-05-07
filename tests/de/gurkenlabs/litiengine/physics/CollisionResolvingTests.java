@@ -21,7 +21,7 @@ public class CollisionResolvingTests {
 
   @BeforeEach
   public void init() {
-    Game.init(Game.COMMADLINE_ARG_NOGUI);
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
   }
 
   @AfterEach

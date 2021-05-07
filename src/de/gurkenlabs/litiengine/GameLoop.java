@@ -134,7 +134,7 @@ public final class GameLoop extends UpdateLoop implements IGameLoop {
     }
   }
 
-  private class TimedAction {
+  private static class TimedAction {
     private final Runnable action;
     private long execution;
     private final int id;

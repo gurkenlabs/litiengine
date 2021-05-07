@@ -23,7 +23,7 @@ class EffectTests {
   @BeforeEach
   public void setUp() {
     // arrange
-    Game.init(Game.COMMADLINE_ARG_NOGUI);
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
     creature = new Creature();
     TestAbility ability = new TestAbility(creature);
     testEffect = new TestEffect(ability);

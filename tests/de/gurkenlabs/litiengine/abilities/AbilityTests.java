@@ -28,7 +28,7 @@ import org.mockito.MockedStatic;
 class AbilityTests {
   @BeforeEach
   public void init() {
-    Game.init(Game.COMMADLINE_ARG_NOGUI);
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
   }
 
   @Test

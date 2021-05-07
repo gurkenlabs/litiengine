@@ -33,7 +33,7 @@ public class MovementControllerTests {
 
     @BeforeEach
     public void setUp(){
-        Game.init(Game.COMMADLINE_ARG_NOGUI);
+        Game.init(Game.COMMANDLINE_ARG_NOGUI);
         IMobileEntity actualEntity = new Creature();
         mobileEntity = spy(actualEntity);
         mobileEntity.setDeceleration(20);

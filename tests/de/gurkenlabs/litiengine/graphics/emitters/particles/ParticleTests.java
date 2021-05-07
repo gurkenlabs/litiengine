@@ -34,7 +34,7 @@ public class ParticleTests {
     public void testUpdate_hasCollision(){
         // arrange
         Particle testParticle = spy(particle);
-        Game.init(Game.COMMADLINE_ARG_NOGUI);
+        Game.init(Game.COMMANDLINE_ARG_NOGUI);
 
         // act
         testParticle.update(new Point2D.Double(1, 1), 1.2f);
@@ -49,7 +49,7 @@ public class ParticleTests {
         Particle testParticle = spy(particle);
         when(testParticle.getAliveTime()).thenReturn(100000l);
         when(testParticle.getTimeToLive()).thenReturn(10);
-        Game.init(Game.COMMADLINE_ARG_NOGUI);
+        Game.init(Game.COMMANDLINE_ARG_NOGUI);
 
         // act
         testParticle.update(new Point2D.Double(1, 1), 1.2f);
@@ -66,7 +66,7 @@ public class ParticleTests {
         testParticle.setY(42);
         testParticle.setVelocityX(5);
         testParticle.setVelocityY(10);
-        Game.init(Game.COMMADLINE_ARG_NOGUI);
+        Game.init(Game.COMMANDLINE_ARG_NOGUI);
 
         // act
         testParticle.update(new Point2D.Double(1, 1), 1.2f);

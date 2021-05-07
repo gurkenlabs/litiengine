@@ -19,7 +19,7 @@ import de.gurkenlabs.litiengine.physics.Collision;
 public class ParticleTests {
   @BeforeAll
   public static void setup() {
-    Game.init(Game.COMMADLINE_ARG_NOGUI);
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
   }
 
   @AfterAll

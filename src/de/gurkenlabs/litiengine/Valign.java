@@ -21,7 +21,7 @@ public enum Valign {
 
   private final float portion;
 
-  private Valign(float portion) {
+  Valign(float portion) {
     this.portion = portion;
   }
 

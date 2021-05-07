@@ -16,7 +16,7 @@ public class KeyboardEntityControllerTests {
     @BeforeAll
     public static void initializeKeyboard() {
         // init required Game environment
-        Game.init(Game.COMMADLINE_ARG_NOGUI);
+        Game.init(Game.COMMANDLINE_ARG_NOGUI);
 
         // init Keyboard
         Input.InputGameAdapter adapter = new Input.InputGameAdapter();

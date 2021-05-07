@@ -20,7 +20,7 @@ import de.gurkenlabs.litiengine.entities.IMobileEntity;
 public class PhysicsTests {
   @BeforeEach
   public void init() {
-    Game.init(Game.COMMADLINE_ARG_NOGUI);
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
     Game.physics().clear();
   }
   

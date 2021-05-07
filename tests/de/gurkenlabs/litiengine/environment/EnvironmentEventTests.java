@@ -33,7 +33,7 @@ public class EnvironmentEventTests {
 
     // necessary because the environment need access to the game loop and other
     // stuff
-    Game.init(Game.COMMADLINE_ARG_NOGUI);
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
   }
 
   @AfterAll

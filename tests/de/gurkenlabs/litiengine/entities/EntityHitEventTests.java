@@ -11,7 +11,7 @@ class EntityHitEventTests {
   @BeforeAll
   public static void initGame() {
     // necessary because the environment need access to the current game time
-    Game.init(Game.COMMADLINE_ARG_NOGUI);
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
   }
 
   @AbilityInfo(castType = CastType.ONCONFIRM, name = "random name", description = "random description", cooldown = 333, duration = 222, impact = 111,
