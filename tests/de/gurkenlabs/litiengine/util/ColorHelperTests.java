@@ -5,10 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.awt.Color;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
 public class ColorHelperTests {
 
@@ -79,38 +82,37 @@ public class ColorHelperTests {
     assertEquals(alphaRed.getAlpha(), redDecoded.getAlpha());
   }
 
-  @Test
-  public void testSolidColorFromAlphaHexString() {
-    String red200 = "#c8ff0000";
-    String green00 = "#c800ff00";
-    String blue200 = "#c80000ff";
-
-    Color redDecoded = ColorHelper.decode(red200, true);
-    Color greenDecoded = ColorHelper.decode(green00, true);
-    Color blueDecoded = ColorHelper.decode(blue200, true);
-
-    Color solidAlphaRed = new Color(228, 0, 0);
-    Color solidAlphaGreen = new Color(0, 228, 0);
-    Color solidAlphaBlue = new Color(0, 0, 228);
-
-    assertEquals(solidAlphaRed, redDecoded);
-    assertEquals(solidAlphaGreen, greenDecoded);
-    assertEquals(solidAlphaBlue, blueDecoded);
+  @ParameterizedTest
+  @MethodSource("getSolidColorFromAlphaHexString")
+  public void testSolidColorFromAlphaHexString(String color, Boolean isSolid, Color solidColor ) {
+    Color colorDecoded = ColorHelper.decode(color, isSolid);
+    assertEquals(solidColor, colorDecoded);
   }
 
-  @Test
-  public void testHexStringWithoutHashtag() {
-    String red = "ff0000";
-    String green = "00ff00";
-    String blue = "0000ff";
+  private static Stream<Arguments> getSolidColorFromAlphaHexString(){
+    return Stream.of(
+            Arguments.of("#c8ff0000", true, new Color(228, 0, 0)),
+            Arguments.of("#c800ff00", true, new Color(0, 228, 0)),
+            Arguments.of("#c80000ff", true, new Color(0, 0, 228)),
+            Arguments.of("", true, null),
+            Arguments.of(null, true, null)
+    );
+  }
 
-    Color redDecoded = ColorHelper.decode(red);
-    Color greenDecoded = ColorHelper.decode(green);
-    Color blueDecoded = ColorHelper.decode(blue);
+  @ParameterizedTest
+  @MethodSource("getHexStringWithoutHashtag")
+  public void testHexStringWithoutHashtag(String color, Color expectedColor) {
+    Color colorDecoded = ColorHelper.decode(color);
+    assertEquals(expectedColor, colorDecoded);
+  }
 
-    assertEquals(Color.RED, redDecoded);
-    assertEquals(Color.GREEN, greenDecoded);
-    assertEquals(Color.BLUE, blueDecoded);
+  private static Stream<Arguments> getHexStringWithoutHashtag(){
+    return Stream.of(
+            Arguments.of("ff0000", Color.RED),
+            Arguments.of("00ff00", Color.GREEN),
+            Arguments.of("0000ff", Color.BLUE),
+            Arguments.of("000", null)
+    );
   }
 
   @Test
@@ -153,4 +155,11 @@ public class ColorHelperTests {
     // assert
     assertEquals(expectedRgb, actualRgb);
   }
+
+  @Test
+  public void testPremultiply(){
+    Color color = new Color(225, 0, 0);
+    assertEquals(new Color(225, 0, 0), ColorHelper.premultiply(color));
+  }
+
 }
