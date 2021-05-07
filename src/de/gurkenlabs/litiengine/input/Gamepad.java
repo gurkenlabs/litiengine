@@ -39,7 +39,7 @@ public final class Gamepad extends GamepadEvents implements IUpdateable {
     this.controller = controller;
 
     ArrayList<String> componentNames = new ArrayList<>();
-    for(Component comp : this.controller.getComponents()){
+    for (Component comp : this.controller.getComponents()) {
       componentNames.add(comp.getIdentifier().getName());
     }
 
@@ -124,12 +124,13 @@ public final class Gamepad extends GamepadEvents implements IUpdateable {
     return this.pressedComponents.stream().anyMatch(x -> x.equals(gamepadComponent));
   }
 
-  public Collection<String> getComponents(){
+  public Collection<String> getComponents() {
     return this.gamepadComponents;
   }
+
   public boolean hasComponent(String gamepadComponent) {
-    for(Component comp : this.controller.getComponents()){
-      if(comp.getIdentifier().getName().equals(gamepadComponent)){
+    for (Component comp : this.controller.getComponents()) {
+      if (comp.getIdentifier().getName().equals(gamepadComponent)) {
         return true;
       }
     }
@@ -198,54 +199,55 @@ public final class Gamepad extends GamepadEvents implements IUpdateable {
    * any type of gamepad by providing the same components and the same name. There is nothing like a unique identifier
    * or a fixed rule, that the name of a controller must be set properly.
    * </p>
+   *
    * @param gamepad The gamepad to guess the type for.
    * @return The type name of the gamepad evaluated by a best guess.s
    */
-  private static String guessGamepadType(Gamepad gamepad){
+  private static String guessGamepadType(Gamepad gamepad) {
     int xboxComponents = 0;
 
     // count how many components match the expected Xbox components
-    for(String comp : Xbox.ALL_COMPONENTS) {
-      if(gamepad.hasComponent(comp)){
+    for (String comp : Xbox.ALL_COMPONENTS) {
+      if (gamepad.hasComponent(comp)) {
         xboxComponents++;
       }
     }
 
-    double xboxScore = xboxComponents / (double)Xbox.ALL_COMPONENTS.length;
-    if(gamepad.getName().toUpperCase().contains("XBOX")){
+    double xboxScore = xboxComponents / (double) Xbox.ALL_COMPONENTS.length;
+    if (gamepad.getName().toUpperCase().contains("XBOX")) {
       // if the name of the controller also contains the word "Xbox" we're pretty sure about the type
       xboxScore += 1;
     }
 
     int dualShockComponents = 0;
     // count how many components match the expected DualShock 4 components
-    for(String comp : DualShock4.ALL_COMPONENTS) {
-      if(gamepad.hasComponent(comp)){
+    for (String comp : DualShock4.ALL_COMPONENTS) {
+      if (gamepad.hasComponent(comp)) {
         dualShockComponents++;
       }
     }
 
-    double dualshockScore = dualShockComponents / (double)DualShock4.ALL_COMPONENTS.length;
-    if(gamepad.getName().toUpperCase().contains("WIRELESS CONTROLLER")){
+    double dualshockScore = dualShockComponents / (double) DualShock4.ALL_COMPONENTS.length;
+    if (gamepad.getName().toUpperCase().contains("WIRELESS CONTROLLER")) {
       // if the name of the controller also matches the expected name for a DualShock controller
       // we are a bit more certain
       dualshockScore += 0.3;
     }
 
-    if(xboxScore < 0.5 && dualshockScore < 0.5){
+    if (xboxScore < 0.5 && dualshockScore < 0.5) {
       // if the score is less than 0.5 for both, Xbox and DualShock, we can't guess the type
       return "Unknown";
     }
 
     // return the type with a higher score
-    if(xboxScore > dualshockScore){
+    if (xboxScore > dualshockScore) {
       return Xbox.GAMEPAD_TYPE;
     }
 
     return DualShock4.GAMEPAD_TYPE;
   }
 
-  private static final String addComponent(final Identifier identifier) {
+  private static String addComponent(final Identifier identifier) {
     components.put(identifier.getName(), identifier);
     return identifier.getName();
   }
@@ -272,7 +274,7 @@ public final class Gamepad extends GamepadEvents implements IUpdateable {
 
   private float getDeadZone(final Identifier ident) {
     if (ident.getName().equals(Axis.X)
-            || ident.getName().equals(Axis.Y)) {
+        || ident.getName().equals(Axis.Y)) {
       return this.getAxisDeadzone();
     }
 
@@ -502,8 +504,10 @@ public final class Gamepad extends GamepadEvents implements IUpdateable {
 
     public static final String Y = Buttons.BUTTON_3;
 
-    public static final String[] ALL_COMPONENTS = { A, B, DPAD, LB, LEFT_STICK_PRESS, LEFT_STICK_X, LEFT_STICK_Y, LT, RB, RIGHT_STICK_PRESS, RIGHT_STICK_X, RIGHT_STICK_Y, RT, SELECT, START, X, Y };
+    protected static final String[] ALL_COMPONENTS = { A, B, DPAD, LB, LEFT_STICK_PRESS, LEFT_STICK_X, LEFT_STICK_Y, LT, RB, RIGHT_STICK_PRESS,
+        RIGHT_STICK_X, RIGHT_STICK_Y, RT, SELECT, START, X, Y };
     public static final String GAMEPAD_TYPE = "Xbox";
+
     private Xbox() {
     }
   }
@@ -533,7 +537,8 @@ public final class Gamepad extends GamepadEvents implements IUpdateable {
     public static final String R2_TRIGGER = Axis.RY;
     public static final String L2_TRIGGER = Axis.RX;
 
-    public static final String[] ALL_COMPONENTS = { SQUARE, CROSS, CIRCLE, TRIANGLE, L1, R1, L2, R2, SHARE, OPTIONS, LEFT_STICK_PRESS, RIGHT_STICK_PRESS,PS_BUTTON, TOUCHPAD, DPAD, LEFT_STICK_X, LEFT_STICK_Y, RIGHT_STICK_X, RIGHT_STICK_Y, R2_TRIGGER, L2_TRIGGER };
+    protected static final String[] ALL_COMPONENTS = { SQUARE, CROSS, CIRCLE, TRIANGLE, L1, R1, L2, R2, SHARE, OPTIONS, LEFT_STICK_PRESS,
+        RIGHT_STICK_PRESS, PS_BUTTON, TOUCHPAD, DPAD, LEFT_STICK_X, LEFT_STICK_Y, RIGHT_STICK_X, RIGHT_STICK_Y, R2_TRIGGER, L2_TRIGGER };
     public static final String GAMEPAD_TYPE = "DualShock4";
 
     private DualShock4() {
