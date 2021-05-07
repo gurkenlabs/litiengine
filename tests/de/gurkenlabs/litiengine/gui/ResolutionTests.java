@@ -2,43 +2,60 @@ package de.gurkenlabs.litiengine.gui;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.List;
-import java.util.stream.Stream;
+import java.awt.Dimension;
 
 import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.litiengine.gui.screens.Resolution;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 
 public class ResolutionTests {
 
   @Test
+  public void testCustom(){
+    // arrange
+    int width = 999;
+    int height = 888;
+    String resolutionName = "9:8";
+
+    // act
+    Resolution resolution = Resolution.custom(width, height, resolutionName);
+
+    // assert
+    assertEquals(resolutionName, resolution.getRatio().getName());
+  }
+
+  @Test
   public void testDimensionString() {
+    // act
     Resolution res = Resolution.Ratio16x9.RES_1280x720;
 
+    // assert
     assertEquals("1280x720", res.toDimensionString());
     assertEquals("1280---720", res.toDimensionString("---"));
   }
 
-  @ParameterizedTest
-  @MethodSource("getRatioParameters")
-  public void testCorrectRatio(List<Resolution> resolutions, String expectedResolution){
-    // act assert
-    for(Resolution res: resolutions){
-      String actualResolution = res.getRatio().getName();
-      assertEquals(expectedResolution, actualResolution);
-    }
+  @Test
+  public void testToString(){
+    // arrange
+    Resolution resolution = Resolution.Ratio16x10.RES_1920x1200;
+
+    // act
+    String resolutionString = resolution.toString();
+
+    // assert
+    assertEquals("1920x1200", resolutionString);
   }
 
-  private static Stream<Arguments> getRatioParameters(){
+  @Test
+  public void testGetDimension(){
     // arrange
-    return Stream.of(
-            Arguments.of(Resolution.Ratio16x9.getAll(), "16:9"),
-            Arguments.of(Resolution.Ratio16x10.getAll(), "16:10"),
-            Arguments.of(Resolution.Ratio4x3.getAll(), "4:3"),
-            Arguments.of(Resolution.Ratio5x4.getAll(), "5:4")
-    );
+    Resolution resolution = Resolution.Ratio4x3.RES_800x600;
+
+    // act
+    Dimension dimension = resolution.getDimension();
+
+    // assert
+    assertEquals(600, dimension.height);
+    assertEquals(800, dimension.width);
   }
 }
