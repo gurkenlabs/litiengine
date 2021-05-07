@@ -1,13 +1,5 @@
 package de.gurkenlabs.utiliti;
 
-import java.io.File;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.InvalidPathException;
-import java.nio.file.Paths;
-
-import javax.swing.SwingUtilities;
-
-import de.gurkenlabs.litiengine.DefaultUncaughtExceptionHandler;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.configuration.Quality;
 import de.gurkenlabs.litiengine.input.Input;
@@ -15,6 +7,12 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.handlers.DebugCrasher;
 import de.gurkenlabs.utiliti.swing.UI;
+
+import javax.swing.SwingUtilities;
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Paths;
 
 public class Program {
 
