@@ -34,15 +34,13 @@ public class Program {
 
         UI.initLookAndFeel();
         Game.init(args);
-        Game.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(false));
-
         forceBasicEditorConfiguration();
         Game.world().camera().onZoom(event -> Editor.preferences().setZoom((float) event.getZoom()));
 
         // prepare UI and start the game
         UI.init();
         Game.start();
-        Game.window().getHostControl().addKeyListener(new DebugCrasher());
+        Input.keyboard().addKeyListener(new DebugCrasher());
       } catch (Throwable t) {
         throw new UtiLITIInitializationError("UtiLITI failed to initialize, see the stacktrace below for more information", t);
       }
