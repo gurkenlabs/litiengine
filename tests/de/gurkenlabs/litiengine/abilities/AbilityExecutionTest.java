@@ -34,7 +34,7 @@ class AbilityExecutionTest {
 
     @BeforeEach
     public void setup() {
-        Game.init(Game.COMMADLINE_ARG_NOGUI);
+        Game.init(Game.COMMANDLINE_ARG_NOGUI);
 
         Creature testCreature = new Creature();
         ability = new TestAbility(testCreature);

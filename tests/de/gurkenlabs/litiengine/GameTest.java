@@ -53,7 +53,7 @@ public class GameTest {
     // static classes and the way the tests are executed but I don't know enough about the gradle test execution to be 
     // sure about the reason here.
     Game.terminate();
-    Game.init(Game.COMMADLINE_ARG_NOGUI);
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
 
     assertTrue(initialized.wasCalled);
     assertFalse(started.wasCalled);

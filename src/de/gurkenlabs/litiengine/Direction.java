@@ -20,7 +20,7 @@ public enum Direction {
   private final byte flagValue;
   private final float angle;
 
-  private Direction(final byte flagValue, float angle) {
+  Direction(final byte flagValue, float angle) {
     this.flagValue = flagValue;
     this.angle = angle;
   }

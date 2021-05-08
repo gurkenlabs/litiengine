@@ -36,7 +36,7 @@ public class AStarTests {
 
     // necessary because the environment need access to the game loop and other
     // stuff
-    Game.init(Game.COMMADLINE_ARG_NOGUI);
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
   }
 
   @AfterAll
@@ -111,7 +111,7 @@ public class AStarTests {
 
   @Test
   public void testGridPopulation() {
-    Game.init(Game.COMMADLINE_ARG_NOGUI);
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
     AStarGrid grid = new AStarGrid(320, 240, 4);
 
     AStarNode node = grid.getNode(new Point2D.Double(10, 10));
@@ -130,7 +130,7 @@ public class AStarTests {
 
   @Test
   public void testGetNeighbors() {
-    Game.init(Game.COMMADLINE_ARG_NOGUI);
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
     AStarGrid grid = new AStarGrid(320, 240, 4);
 
     AStarNode node = grid.getNode(new Point2D.Double(10, 10));

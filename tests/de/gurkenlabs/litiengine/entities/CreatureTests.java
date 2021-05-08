@@ -18,7 +18,7 @@ public class CreatureTests {
 
   @BeforeAll
   public static void init(){
-    Game.init(Game.COMMADLINE_ARG_NOGUI);
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
   }
 
   @BeforeEach

@@ -53,11 +53,11 @@ public class EntityPivot {
   }
 
   public Point2D getPoint() {
-    EntityPivotType type = this.getType();
-    if (type == COLLISIONBOX_CENTER) {
+    EntityPivotType pivot = this.getType();
+    if (pivot == COLLISIONBOX_CENTER) {
       Rectangle2D collisionBox = ((ICollisionEntity) this.getEntity()).getCollisionBox();
       return new Point2D.Double(collisionBox.getCenterX() + this.getOffsetX(), collisionBox.getCenterY() + this.getOffsetY());
-    } else if(type == DIMENSION_CENTER) {
+    } else if(pivot == DIMENSION_CENTER) {
       return this.getEntity().getCenter();
     } else {
       return new Point2D.Double(this.getEntity().getX() + this.getOffsetX(), this.getEntity().getY() + this.getOffsetY());

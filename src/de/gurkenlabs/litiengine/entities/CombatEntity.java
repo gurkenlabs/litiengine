@@ -81,10 +81,14 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   }
 
   @Override
-  public void onDeath(CombatEntityDeathListener listener) { this.deathListeners.add(listener); }
+  public void onDeath(CombatEntityDeathListener listener) {
+    this.deathListeners.add(listener);
+  }
 
   @Override
-  public void onResurrect(CombatEntityResurrectListener listener) { this.resurrectListeners.add(listener); }
+  public void onResurrect(CombatEntityResurrectListener listener) {
+    this.resurrectListeners.add(listener);
+  }
 
   @Override
   public void removeListener(CombatEntityHitListener listener) {
@@ -92,10 +96,14 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   }
 
   @Override
-  public void removeListener(CombatEntityDeathListener listener) { this.deathListeners.remove(listener); }
+  public void removeListener(CombatEntityDeathListener listener) {
+    this.deathListeners.remove(listener);
+  }
 
   @Override
-  public void removeListener(CombatEntityResurrectListener listener) { this.resurrectListeners.remove(listener); }
+  public void removeListener(CombatEntityResurrectListener listener) {
+    this.resurrectListeners.remove(listener);
+  }
 
   @Override
   public void die() {
@@ -146,22 +154,18 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
 
   @Override
   public float[] getTweenValues(TweenType tweenType) {
-    switch (tweenType) {
-      case HITPOINTS:
-        return new float[]{(float) this.getHitPoints().get()};
-      default:
-        return super.getTweenValues(tweenType);
+    if (tweenType == TweenType.HITPOINTS) {
+      return new float[]{(float) this.getHitPoints().get()};
     }
+    return super.getTweenValues(tweenType);
   }
 
   @Override
   public void setTweenValues(TweenType tweenType, float[] newValues) {
-    switch (tweenType) {
-      case HITPOINTS:
-        this.getHitPoints().setBaseValue(Math.round(newValues[0]));
-        break;
-      default:
-        super.setTweenValues(tweenType, newValues);
+    if (tweenType == TweenType.HITPOINTS) {
+      this.getHitPoints().setBaseValue(Math.round(newValues[0]));
+    } else {
+      super.setTweenValues(tweenType, newValues);
     }
   }
 

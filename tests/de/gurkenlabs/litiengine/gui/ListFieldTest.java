@@ -40,7 +40,7 @@ class ListFieldTest {
 
   @BeforeAll
   public static void initGame() {
-    Game.init(Game.COMMADLINE_ARG_NOGUI);
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
   }
 
   @BeforeEach
