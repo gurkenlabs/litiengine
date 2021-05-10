@@ -295,27 +295,25 @@ public class ArrayUtilitiesTests {
     assertEquals("test;test2;test3", testStringWithCollectionDelimiter);
   }
 
-  @Test
-  public void testTwoDimensionalArrayToList() {
+  @ParameterizedTest
+  @MethodSource("getArray")
+  public void testTwoDimensionalArrayToList(List<Integer> expectedValue) {
     Integer[][] arr = new Integer[][] {
-        { 0, 0, 0, },
-        { 1, 1, 1, },
-        { 2, 2, 2, },
+            { 0, 0, 0, },
+            { 1, 1, 1, },
+            { 2, 2, 2, },
     };
 
     List<Integer> list = ArrayUtilities.toList(arr);
+    for (int i = 0; i < list.size(); i++) {
+      assertEquals(expectedValue.get(i).intValue(), list.get(i).intValue());
+    }
+  }
 
-    assertEquals(0, list.get(0).intValue());
-    assertEquals(0, list.get(1).intValue());
-    assertEquals(0, list.get(2).intValue());
-
-    assertEquals(1, list.get(3).intValue());
-    assertEquals(1, list.get(4).intValue());
-    assertEquals(1, list.get(5).intValue());
-
-    assertEquals(2, list.get(6).intValue());
-    assertEquals(2, list.get(7).intValue());
-    assertEquals(2, list.get(8).intValue());
+  private static Stream<Arguments> getArray() {
+    return Stream.of(
+            Arguments.of(Arrays.asList(0, 0, 0, 1, 1, 1, 2, 2, 2))
+    );
   }
 
   @Test

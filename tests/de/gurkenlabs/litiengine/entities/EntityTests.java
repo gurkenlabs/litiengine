@@ -38,7 +38,7 @@ import static org.mockito.Mockito.when;
 class EntityTests {
 
     @Test
-    public void testSetX() {
+    void testSetX() {
         // arrange
         TestEntity entity = new TestEntity();
         assertEquals(0, entity.getX());
@@ -51,7 +51,7 @@ class EntityTests {
     }
 
     @Test
-    public void testSetY() {
+    void testSetY() {
         // arrange
         TestEntity entity = new TestEntity();
         assertEquals(0, entity.getY());
@@ -64,7 +64,7 @@ class EntityTests {
     }
 
     @Test
-    public void testHasTag() {
+    void testHasTag() {
         // arrange
         String tag = "test tag";
         TestEntity entity = new TestEntity();
@@ -75,7 +75,7 @@ class EntityTests {
     }
 
     @Test
-    public void testAddTagNotContained() {
+    void testAddTagNotContained() {
         // arrange
         String tag = "test tag";
         TestEntity entity = new TestEntity();
@@ -89,7 +89,7 @@ class EntityTests {
     }
 
     @Test
-    public void testAddTagContained() {
+    void testAddTagContained() {
         // arrange
         String tag = "test tag";
         List<String> tagListSpy = spy(Collections.singletonList(tag));
@@ -105,7 +105,7 @@ class EntityTests {
     }
 
     @Test
-    public void testAddTagEnvironmentNull() {
+    void testAddTagEnvironmentNull() {
         // arrange
         String tag = "test tag";
         TestEntity entitySpy = spy(new TestEntity());
@@ -121,7 +121,7 @@ class EntityTests {
     }
 
     @Test
-    public void testAddTagEnvironmentValid() {
+    void testAddTagEnvironmentValid() {
         // arrange
         String tag = "test tag";
         TestEntity entitySpy = spy(new TestEntity());
@@ -136,7 +136,7 @@ class EntityTests {
     }
 
     @Test
-    public void testRemoveTagGameEnvironmentNull() {
+    void testRemoveTagGameEnvironmentNull() {
         // arrange
         String tag = "test tag";
         List<String> tagListSpy = spy(new ArrayList<>());
@@ -161,7 +161,7 @@ class EntityTests {
     }
 
     @Test
-    public void testRemoveTagEmpty() {
+    void testRemoveTagEmpty() {
         // arrange
         String tag = "test tag";
         List<String> tagListSpy = spy(new ArrayList<>());
@@ -195,9 +195,9 @@ class EntityTests {
         gameMockedStatic.close();
     }
 
-    @ParameterizedTest(name="testToString name is {0}")
+    @ParameterizedTest(name = "testToString name is {0}")
     @MethodSource("getToStringParameters")
-    public void testToString(String testName, int mapId, String name, int getNameInvocations, String expectedName){
+    void testToString(String testName, int mapId, String name, int getNameInvocations, String expectedName) {
         // arrange
         TestEntity entitySpy = spy(new TestEntity());
         when(entitySpy.getMapId()).thenReturn(mapId);
@@ -212,7 +212,7 @@ class EntityTests {
     }
 
     @Test
-    public void testLoaded() {
+    void testLoaded() {
         // arrange
         TestEntity entity = new TestEntity();
 
@@ -234,7 +234,7 @@ class EntityTests {
     }
 
     @Test
-    public void testRemoved() {
+    void testRemoved() {
         // arrange
         TestEntity entity = new TestEntity();
 
@@ -257,7 +257,7 @@ class EntityTests {
     }
 
     @Test
-    public void testOnMessageDelegates() {
+    void testOnMessageDelegates() {
         // arrange
         TestEntity entitySpy = spy(new TestEntity());
         EntityMessageListener listenerMock = mock(EntityMessageListener.class);
@@ -270,7 +270,7 @@ class EntityTests {
     }
 
     @Test
-    public void testGetAngle() {
+    void testGetAngle() {
         // arrange
         TestEntity entity = new TestEntity();
 
@@ -282,7 +282,7 @@ class EntityTests {
     }
 
     @Test
-    public void testSetAngle() {
+    void testSetAngle() {
         // arrange
         TestEntity entity = new TestEntity();
         assertEquals(0, entity.getAngle()); // default
@@ -295,7 +295,7 @@ class EntityTests {
     }
 
     @Test
-    public void testBehavior() {
+    void testBehavior() {
         // arrange
         TestEntity entitySpy = spy(new TestEntity());
 
@@ -307,7 +307,7 @@ class EntityTests {
     }
 
     @Test
-    public void testGetCenter() {
+    void testGetCenter() {
         // arrange
         TestEntity entitySpy = spy(new TestEntity());
         when(entitySpy.getX()).thenReturn(5d);
@@ -323,7 +323,7 @@ class EntityTests {
     }
 
     @Test
-    public void testGetRenderType() {
+    void testGetRenderType() {
         // arrange
         TestEntity entity = new TestEntity();
 
@@ -335,7 +335,7 @@ class EntityTests {
     }
 
     @Test
-    public void testSetRenderType() {
+    void testSetRenderType() {
         // arrange
         TestEntity entity = new TestEntity();
         assertEquals(RenderType.NORMAL, entity.getRenderType()); // default
@@ -348,7 +348,7 @@ class EntityTests {
     }
 
     @Test
-    public void testIsVisibleNull() {
+    void testIsVisibleNull() {
         // arrange
         TestEntity entitySpy = spy(new TestEntity());
         when(entitySpy.animations()).thenReturn(null);
@@ -358,7 +358,7 @@ class EntityTests {
     }
 
     @Test
-    public void testIsVisibleNotEnabled() {
+    void testIsVisibleNotEnabled() {
         // arrange
         TestEntity entitySpy = spy(new TestEntity());
         IEntityAnimationController animationControllerMock = mock(IEntityAnimationController.class);
@@ -370,7 +370,7 @@ class EntityTests {
     }
 
     @Test
-    public void testIsVisibleEnabled() {
+    void testIsVisibleEnabled() {
         // arrange
         TestEntity entitySpy = spy(new TestEntity());
         IEntityAnimationController animationControllerMock = mock(IEntityAnimationController.class);
@@ -382,7 +382,7 @@ class EntityTests {
     }
 
     @Test
-    public void testSetVisibleAnimationsNull() {
+    void testSetVisibleAnimationsNull() {
         // arrange
         TestEntity entitySpy = spy(new TestEntity());
         when(entitySpy.animations()).thenReturn(null);
@@ -397,7 +397,7 @@ class EntityTests {
     }
 
     @Test
-    public void testSetVisibleDelegates() {
+    void testSetVisibleDelegates() {
         // arrange
         TestEntity entitySpy = spy(new TestEntity());
         IEntityAnimationController animationControllerMock = mock(IEntityAnimationController.class);
@@ -411,7 +411,7 @@ class EntityTests {
     }
 
     @Test
-    public void testSendMessage() {
+    void testSendMessage() {
         // arrange
         TestEntity entitySpy = new TestEntity();
         Creature sender = mock(Creature.class); // arbitrary object
@@ -424,38 +424,19 @@ class EntityTests {
     }
 
     @Test
-     void testEntityAction() {
+    void testActions() {
+        // arrange
         TestEntity entity = new TestEntity();
 
-        assertTrue(entity.actions().exists("doSomething"));
-        assertFalse(entity.actions().exists("imNotAnAction"));
+        // act
+        EntityActionMap actions = entity.actions();
 
-        assertEquals(2, entity.actions().getActions().size());
-
-        EntityAction action = entity.actions().get("doSomething");
-
-        assertEquals("doSomething", action.getName());
-        assertEquals("does something", action.getDescription());
-
-        assertNotNull(action);
-
-        action.perform();
-
-        assertTrue(entity.didSomething);
-
-        entity.actions().unregister(action);
-
-        assertEquals(1, entity.actions().getActions().size());
-        assertFalse(entity.actions().exists("doSomething"));
-
-        entity.actions().register(action);
-
-        assertEquals(2, entity.actions().getActions().size());
-        assertTrue(entity.actions().exists("doSomething"));
+        // assert
+        assertTrue(actions.exists("doSomething"));
     }
 
     @Test
-     void testNamedAction() {
+    void testNamedAction() {
         TestEntity entity = new TestEntity();
 
         assertTrue(entity.actions().exists("myName"));
@@ -470,10 +451,10 @@ class EntityTests {
     }
 
     @Test
-     void testCustomAction() {
+    void testCustomAction() {
         TestEntity entity = new TestEntity();
         entity.register("customAction", () ->
-            entity.customActionPerformed = true);
+                entity.customActionPerformed = true);
 
         assertTrue(entity.actions().exists("customAction"));
 
@@ -489,7 +470,7 @@ class EntityTests {
 
     @ParameterizedTest
     @MethodSource("getDefaultTags")
-     void testDefaultTags(String tag) {
+    void testDefaultTags(String tag) {
         TestEntity entity = new TestEntity();
         assertTrue(entity.hasTag(tag));
     }
@@ -501,20 +482,20 @@ class EntityTests {
         );
     }
 
-    private static Stream<Arguments> getToStringParameters(){
-    return Stream.of(
-            Arguments.of("null", 5, null, 1, "#5: TestEntity"), // second in if is dropped when first is false
-            Arguments.of("empty", 5, "", 2, "#5: TestEntity"),
-            Arguments.of("valid", 5, "test name", 3, "#5: test name")
-    );
-  }
+    private static Stream<Arguments> getToStringParameters() {
+        return Stream.of(
+                Arguments.of("null", 5, null, 1, "#5: TestEntity"), // second in if is dropped when first is false
+                Arguments.of("empty", 5, "", 2, "#5: TestEntity"),
+                Arguments.of("valid", 5, "test name", 3, "#5: test name")
+        );
+    }
 
-  @Tag("some tag")
-  @Tag("another tag")
-  private static class TestEntity extends Entity {
-    private boolean didSomething;
-    private boolean didNamedAction;
-    private boolean customActionPerformed;
+    @Tag("some tag")
+    @Tag("another tag")
+    private static class TestEntity extends Entity {
+        private boolean didSomething;
+        private boolean didNamedAction;
+        private boolean customActionPerformed;
 
         @Action(description = "does something")
         public void doSomething() {

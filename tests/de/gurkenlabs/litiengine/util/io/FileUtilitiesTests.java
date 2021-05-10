@@ -3,6 +3,11 @@ package de.gurkenlabs.litiengine.util.io;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.util.stream.Stream;
 
 public class FileUtilitiesTests {
 
@@ -75,28 +80,22 @@ public class FileUtilitiesTests {
     assertEquals("/test/test2  sadasd sadsad/test222/sadasd sadsad/", combined);
   }
 
-  @Test
-  public void testGetFileName() {
-    String file1 = "C:\\test\\test2\\test.txt";
-    String file2 = "/somepath/123/456/test.txt";
-    String file3 = "/somepath/123/456/test";
-    String file4 = "/somepath/123/456/";
-    String file5 = "/somep.ath/1.23/45.6/test.txt";
-    String file6 = "/somep.ath/1.23/45.6/";
+  @ParameterizedTest(name = "testGetFileName file={0}, expectedValue={1}")
+  @MethodSource("getFileNames")
+  public void testGetFileName( String file, String expectedValue) {
+    String filename = FileUtilities.getFileName(file);
+    assertEquals(expectedValue, filename);
+  }
 
-    String filename = FileUtilities.getFileName(file1);
-    String filename2 = FileUtilities.getFileName(file2);
-    String filename3 = FileUtilities.getFileName(file3);
-    String filename4 = FileUtilities.getFileName(file4);
-    String filename5 = FileUtilities.getFileName(file5);
-    String filename6 = FileUtilities.getFileName(file6);
-
-    assertEquals("test", filename);
-    assertEquals("test", filename2);
-    assertEquals("test", filename3);
-    assertEquals("", filename4);
-    assertEquals("test", filename5);
-    assertEquals("", filename6);
+  private static Stream<Arguments> getFileNames(){
+    return Stream.of(
+            Arguments.of("C:\\test\\test2\\test.txt", "test"),
+            Arguments.of("/somepath/123/456/test.txt", "test"),
+            Arguments.of("/somepath/123/456/test", "test"),
+            Arguments.of("/somepath/123/456/", ""),
+            Arguments.of("/somep.ath/1.23/45.6/test.txt", "test"),
+            Arguments.of("/somep.ath/1.23/45.6/", "")
+    );
   }
 
   @Test
