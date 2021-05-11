@@ -1,14 +1,13 @@
 package de.gurkenlabs.litiengine.physics;
 
-import java.awt.geom.Point2D;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Predicate;
-
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
+import java.awt.geom.Point2D;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Predicate;
 
 public class MovementController<T extends IMobileEntity> implements IMovementController {
   private final List<Force> activeForces;
@@ -102,7 +101,8 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
     this.setDx(0);
     this.setDy(0);
 
-    final double deltaVelocity = Math.min(Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2)), acceleration);
+    final double deltaVelocity =
+        Math.min(Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2)), acceleration);
     if (deltaVelocity != 0) {
       double newVelocity = this.getVelocity() + deltaVelocity;
       this.setVelocity(newVelocity);
@@ -128,14 +128,17 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
       return null;
     }
 
-    return this.getActiveForces().stream().filter(x -> x.getIdentifier() != null && x.getIdentifier().equals(identifier)).findFirst().orElse(null);
+    return this.getActiveForces().stream()
+        .filter(x -> x.getIdentifier() != null && x.getIdentifier().equals(identifier))
+        .findFirst()
+        .orElse(null);
   }
 
   @Override
   public double getMoveAngle() {
     return this.moveAngle;
   }
-  
+
   @Override
   public void setVelocity(double velocity) {
     final double maxVelocity = this.getEntity().getTickVelocity();
@@ -181,10 +184,10 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
 
   private void moveEntityByActiveForces() {
     final Point2D combinedForcesVector = this.combineActiveForces();
-    final Point2D target = new Point2D.Double(
+    final Point2D target =
+        new Point2D.Double(
             this.getEntity().getX() + combinedForcesVector.getX(),
-            this.getEntity().getY() + combinedForcesVector.getY()
-    );
+            this.getEntity().getY() + combinedForcesVector.getY());
 
     final boolean success = Game.physics().move(this.getEntity(), target);
     if (!success) {
@@ -206,8 +209,10 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
       }
 
       final Point2D collisionBoxCenter = this.getEntity().getCollisionBoxCenter();
-      final double angle = GeometricUtilities.calcRotationAngleInDegrees(collisionBoxCenter, force.getLocation());
-      final double strength = Game.loop().getDeltaTime() * 0.001f * force.getStrength() * Game.loop().getTimeScale();
+      final double angle =
+          GeometricUtilities.calcRotationAngleInDegrees(collisionBoxCenter, force.getLocation());
+      final double strength =
+          Game.loop().getDeltaTime() * 0.001f * force.getStrength() * Game.loop().getTimeScale();
       deltaX += GeometricUtilities.getDeltaX(angle, strength);
       deltaY += GeometricUtilities.getDeltaY(angle, strength);
     }

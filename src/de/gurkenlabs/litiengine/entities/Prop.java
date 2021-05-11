@@ -1,7 +1,5 @@
 package de.gurkenlabs.litiengine.entities;
 
-import java.awt.geom.Point2D;
-
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
@@ -9,6 +7,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxType;
 import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
 import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
+import java.awt.geom.Point2D;
 
 @AnimationInfo(spritePrefix = PropAnimationController.PROP_IDENTIFIER)
 @TmxType(MapObjectType.PROP)
@@ -38,8 +37,7 @@ public class Prop extends CombatEntity {
   /**
    * Instantiates a new {@code Prop} entity.
    *
-   * @param spritesheetName
-   *          The spritesheet name of this prop.
+   * @param spritesheetName The spritesheet name of this prop.
    */
   public Prop(final String spritesheetName) {
     this(0, 0, spritesheetName);
@@ -48,12 +46,9 @@ public class Prop extends CombatEntity {
   /**
    * Instantiates a new {@code Prop} entity.
    *
-   * @param x
-   *          The x-coordinate of this prop.
-   * @param y
-   *          The y-coordinate of this prop.
-   * @param spritesheetName
-   *          The spritesheet name of this prop.
+   * @param x The x-coordinate of this prop.
+   * @param y The y-coordinate of this prop.
+   * @param spritesheetName The spritesheet name of this prop.
    */
   public Prop(double x, double y, final String spritesheetName) {
     this(x, y, spritesheetName, Material.UNDEFINED);
@@ -62,14 +57,10 @@ public class Prop extends CombatEntity {
   /**
    * Instantiates a new {@code Prop} entity.
    *
-   * @param x
-   *          The x-coordinate of this prop.
-   * @param y
-   *          The y-coordinate of this prop.
-   * @param spritesheetName
-   *          The spritesheet name of this prop.
-   * @param material
-   *          The material of this prop.
+   * @param x The x-coordinate of this prop.
+   * @param y The y-coordinate of this prop.
+   * @param spritesheetName The spritesheet name of this prop.
+   * @param material The material of this prop.
    */
   public Prop(double x, double y, final String spritesheetName, final Material material) {
     this(new Point2D.Double(x, y), spritesheetName, material);
@@ -78,10 +69,8 @@ public class Prop extends CombatEntity {
   /**
    * Instantiates a new {@code Prop} entity.
    *
-   * @param location
-   *          The location of this prop.
-   * @param spritesheetName
-   *          The spritesheet name of this prop.
+   * @param location The location of this prop.
+   * @param spritesheetName The spritesheet name of this prop.
    */
   public Prop(final Point2D location, final String spritesheetName) {
     this(location, spritesheetName, Material.UNDEFINED);
@@ -90,12 +79,9 @@ public class Prop extends CombatEntity {
   /**
    * Instantiates a new {@code Prop} entity.
    *
-   * @param location
-   *          The location of this prop.
-   * @param spritesheetName
-   *          The spritesheet name of this prop.
-   * @param material
-   *          The material of this prop.
+   * @param location The location of this prop.
+   * @param spritesheetName The spritesheet name of this prop.
+   * @param material The material of this prop.
    */
   public Prop(final Point2D location, final String spritesheetName, final Material material) {
     super();
@@ -122,7 +108,8 @@ public class Prop extends CombatEntity {
   public PropState getState() {
     if (!this.isIndestructible() && this.getHitPoints().get() <= 0) {
       return PropState.DESTROYED;
-    } else if (!this.isIndestructible() && this.getHitPoints().get() <= this.getHitPoints().getMax() * 0.5) {
+    } else if (!this.isIndestructible()
+        && this.getHitPoints().get() <= this.getHitPoints().getMax() * 0.5) {
       return PropState.DAMAGED;
     } else {
       return PropState.INTACT;

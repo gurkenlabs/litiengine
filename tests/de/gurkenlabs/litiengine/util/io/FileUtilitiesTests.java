@@ -2,12 +2,11 @@ package de.gurkenlabs.litiengine.util.io;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-
-import java.util.stream.Stream;
 
 public class FileUtilitiesTests {
 
@@ -17,7 +16,7 @@ public class FileUtilitiesTests {
     String relativePath = "./test/test2";
     String relativePath2 = "../test/test2/";
     String relativePath3 = "../somepath/123/456/";
-    
+
     String otherPath = "somepath/123/456/";
 
     String somefile = "../file.txt";
@@ -68,34 +67,33 @@ public class FileUtilitiesTests {
     assertEquals("somepath/123/file.txt", combined6);
     assertEquals("somepath/123/456/file.txt", combined7);
   }
-  
+
   @Test
   public void testCombinePathsWithSpace() {
     String path = "\\test\\test2  sadasd sadsad\\";
-    
+
     String path2 = "test222\\sadasd sadsad\\";
-    
+
     String combined = FileUtilities.combine(path, path2);
-    
+
     assertEquals("/test/test2  sadasd sadsad/test222/sadasd sadsad/", combined);
   }
 
   @ParameterizedTest(name = "testGetFileName file={0}, expectedValue={1}")
   @MethodSource("getFileNames")
-  public void testGetFileName( String file, String expectedValue) {
+  public void testGetFileName(String file, String expectedValue) {
     String filename = FileUtilities.getFileName(file);
     assertEquals(expectedValue, filename);
   }
 
-  private static Stream<Arguments> getFileNames(){
+  private static Stream<Arguments> getFileNames() {
     return Stream.of(
-            Arguments.of("C:\\test\\test2\\test.txt", "test"),
-            Arguments.of("/somepath/123/456/test.txt", "test"),
-            Arguments.of("/somepath/123/456/test", "test"),
-            Arguments.of("/somepath/123/456/", ""),
-            Arguments.of("/somep.ath/1.23/45.6/test.txt", "test"),
-            Arguments.of("/somep.ath/1.23/45.6/", "")
-    );
+        Arguments.of("C:\\test\\test2\\test.txt", "test"),
+        Arguments.of("/somepath/123/456/test.txt", "test"),
+        Arguments.of("/somepath/123/456/test", "test"),
+        Arguments.of("/somepath/123/456/", ""),
+        Arguments.of("/somep.ath/1.23/45.6/test.txt", "test"),
+        Arguments.of("/somep.ath/1.23/45.6/", ""));
   }
 
   @Test
@@ -118,7 +116,7 @@ public class FileUtilitiesTests {
     assertEquals("", extension4);
     assertEquals("", extension5);
   }
-  
+
   @Test
   public void testHumanReadableByteCount() {
     long zero = 0;
@@ -132,7 +130,7 @@ public class FileUtilitiesTests {
       long tebibyte = 1099511627776l;
       long pebibyte = 1125899906842624l;
       long exbibyte = 1152921504606846976l;
-      
+
       assertEquals("0 bytes", FileUtilities.humanReadableByteCount(zero));
       assertEquals("1023 bytes", FileUtilities.humanReadableByteCount(lessThanKibibyte));
       assertEquals("1.0 KiB", FileUtilities.humanReadableByteCount(kibibyte));
@@ -145,11 +143,10 @@ public class FileUtilitiesTests {
       assertEquals("1.5 PiB", FileUtilities.humanReadableByteCount(pebibyte + pebibyte / 2));
       assertEquals("1.0 EiB", FileUtilities.humanReadableByteCount(exbibyte));
       assertEquals("8.0 EiB", FileUtilities.humanReadableByteCount(max));
-      
+
       assertEquals("1.2 EB", FileUtilities.humanReadableByteCount(exbibyte, true));
-      
     }
-    
+
     {
       long lessThanKilobyte = 999;
       long kilobyte = 1000;
@@ -158,8 +155,8 @@ public class FileUtilitiesTests {
       long gigabyte = 1000000000;
       long terabyte = 1000000000000l;
       long petabyte = 1000000000000000l;
-      long exabyte =  1000000000000000000l;
-      
+      long exabyte = 1000000000000000000l;
+
       assertEquals("0 bytes", FileUtilities.humanReadableByteCount(zero, true));
       assertEquals("999 bytes", FileUtilities.humanReadableByteCount(lessThanKilobyte, true));
       assertEquals("1.0 KB", FileUtilities.humanReadableByteCount(moreThanOneKilobyte, true));
@@ -172,9 +169,8 @@ public class FileUtilitiesTests {
       assertEquals("1.5 PB", FileUtilities.humanReadableByteCount(petabyte + petabyte / 2, true));
       assertEquals("1.0 EB", FileUtilities.humanReadableByteCount(exabyte, true));
       assertEquals("9.2 EB", FileUtilities.humanReadableByteCount(max, true));
-      
+
       assertEquals("888.2 PiB", FileUtilities.humanReadableByteCount(exabyte, false));
-      
     }
   }
 }

@@ -1,17 +1,5 @@
 package de.gurkenlabs.utiliti.renderers;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.FontMetrics;
-import java.awt.Graphics2D;
-import java.awt.Stroke;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Path2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.RoundRectangle2D;
-import java.util.List;
-
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Valign;
@@ -25,6 +13,17 @@ import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.utiliti.Style;
 import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.components.MapComponent;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
+import java.awt.Stroke;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Path2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.geom.RoundRectangle2D;
+import java.util.List;
 
 public class MapObjectsRenderer implements IEditorRenderer {
   private static final int MAX_NAME_DISPLAY_LENGTH = 50;
@@ -57,7 +56,8 @@ public class MapObjectsRenderer implements IEditorRenderer {
         }
 
         MapObjectType type = MapObjectType.get(mapObject.getType());
-        final BasicStroke shapeStroke = new BasicStroke(1f / Game.world().camera().getRenderScale());
+        final BasicStroke shapeStroke =
+            new BasicStroke(1f / Game.world().camera().getRenderScale());
         if (type == null) {
           if (Editor.preferences().renderCustomMapObjects()) {
             renderUnsupportedMapObject(g, mapObject, shapeStroke);
@@ -69,13 +69,25 @@ public class MapObjectsRenderer implements IEditorRenderer {
         // render spawn points
         if (type == MapObjectType.SPAWNPOINT) {
           g.setColor(Style.COLOR_SPAWNPOINT);
-          Game.graphics().renderShape(g, new Rectangle2D.Double(mapObject.getBoundingBox().getCenterX() - 1, mapObject.getBoundingBox().getCenterY() - 1, 2, 2));
+          Game.graphics()
+              .renderShape(
+                  g,
+                  new Rectangle2D.Double(
+                      mapObject.getBoundingBox().getCenterX() - 1,
+                      mapObject.getBoundingBox().getCenterY() - 1,
+                      2,
+                      2));
         }
 
         if (type != MapObjectType.COLLISIONBOX) {
           Color colorBoundingBoxFill;
           if (layer.getColor() != null) {
-            colorBoundingBoxFill = new Color(layer.getColor().getRed(), layer.getColor().getGreen(), layer.getColor().getBlue(), 15);
+            colorBoundingBoxFill =
+                new Color(
+                    layer.getColor().getRed(),
+                    layer.getColor().getGreen(),
+                    layer.getColor().getBlue(),
+                    15);
           } else {
             colorBoundingBoxFill = Style.COLOR_DEFAULT_BOUNDING_BOX_FILL;
           }
@@ -88,10 +100,15 @@ public class MapObjectsRenderer implements IEditorRenderer {
     }
   }
 
-  private static void renderUnsupportedMapObject(Graphics2D g, IMapObject mapObject, BasicStroke shapeStroke) {
-    Color color = mapObject.getLayer().getColor() == null ? Style.COLOR_UNSUPPORTED : mapObject.getLayer().getColor();
+  private static void renderUnsupportedMapObject(
+      Graphics2D g, IMapObject mapObject, BasicStroke shapeStroke) {
+    Color color =
+        mapObject.getLayer().getColor() == null
+            ? Style.COLOR_UNSUPPORTED
+            : mapObject.getLayer().getColor();
     g.setColor(color);
-    Point2D start = new Point2D.Double(mapObject.getLocation().getX(), mapObject.getLocation().getY());
+    Point2D start =
+        new Point2D.Double(mapObject.getLocation().getX(), mapObject.getLocation().getY());
     StringBuilder info = new StringBuilder("#");
     info.append(mapObject.getId());
     if (mapObject.getName() != null && !mapObject.getName().isEmpty()) {
@@ -148,7 +165,8 @@ public class MapObjectsRenderer implements IEditorRenderer {
     }
   }
 
-  private static void renderBoundingBox(Graphics2D g, IMapObject mapObject, Color colorBoundingBoxFill, BasicStroke shapeStroke) {
+  private static void renderBoundingBox(
+      Graphics2D g, IMapObject mapObject, Color colorBoundingBoxFill, BasicStroke shapeStroke) {
     MapObjectType type = MapObjectType.get(mapObject.getType());
     Color fillColor = colorBoundingBoxFill;
     if (type == MapObjectType.TRIGGER) {
@@ -173,14 +191,20 @@ public class MapObjectsRenderer implements IEditorRenderer {
       final String mapObjectColor = mapObject.getStringValue(MapObjectProperty.LIGHT_COLOR);
       if (mapObjectColor != null && !mapObjectColor.isEmpty()) {
         Color lightColor = ColorHelper.decode(mapObjectColor);
-        borderColor = new Color(lightColor.getRed(), lightColor.getGreen(), lightColor.getBlue(), 255);
+        borderColor =
+            new Color(lightColor.getRed(), lightColor.getGreen(), lightColor.getBlue(), 255);
       }
     } else if (type == MapObjectType.STATICSHADOW) {
       borderColor = Style.COLOR_SHADOW_BORDER;
     } else if (type == MapObjectType.SPAWNPOINT) {
       borderColor = Style.COLOR_SPAWNPOINT;
     } else {
-      borderColor = new Color(colorBoundingBoxFill.getRed(), colorBoundingBoxFill.getGreen(), colorBoundingBoxFill.getBlue(), 150);
+      borderColor =
+          new Color(
+              colorBoundingBoxFill.getRed(),
+              colorBoundingBoxFill.getGreen(),
+              colorBoundingBoxFill.getBlue(),
+              150);
     }
 
     g.setColor(borderColor);
@@ -188,9 +212,18 @@ public class MapObjectsRenderer implements IEditorRenderer {
     Game.graphics().renderOutline(g, mapObject.getBoundingBox(), shapeStroke);
     if (type == MapObjectType.SOUNDSOURCE) {
       final int range = mapObject.getIntValue(MapObjectProperty.SOUND_RANGE);
-      final float[] dash1 = { 10.0f };
-      final BasicStroke dashed = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, dash1, 0.0f);
-      Game.graphics().renderOutline(g, new Ellipse2D.Double(mapObject.getBoundingBox().getCenterX() - range, mapObject.getBoundingBox().getCenterY() - range, range * 2d, range * 2d), dashed);
+      final float[] dash1 = {10.0f};
+      final BasicStroke dashed =
+          new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, dash1, 0.0f);
+      Game.graphics()
+          .renderOutline(
+              g,
+              new Ellipse2D.Double(
+                  mapObject.getBoundingBox().getCenterX() - range,
+                  mapObject.getBoundingBox().getCenterY() - range,
+                  range * 2d,
+                  range * 2d),
+              dashed);
     }
 
     if (Editor.preferences().renderNames()) {
@@ -198,7 +231,8 @@ public class MapObjectsRenderer implements IEditorRenderer {
     }
   }
 
-  private static void renderCollisionBox(Graphics2D g, IMapObject mapObject, BasicStroke shapeStroke) {
+  private static void renderCollisionBox(
+      Graphics2D g, IMapObject mapObject, BasicStroke shapeStroke) {
     // render collision boxes
     boolean collision = mapObject.getBoolValue(MapObjectProperty.COLLISION, false);
     float collisionBoxWidth = mapObject.getFloatValue(MapObjectProperty.COLLISIONBOX_WIDTH, -1);
@@ -215,12 +249,29 @@ public class MapObjectsRenderer implements IEditorRenderer {
     if (collisionBoxWidth != -1 && collisionBoxHeight != -1) {
 
       g.setColor(Style.COLOR_COLLISION_FILL);
-      Rectangle2D collisionBox = CollisionEntity.getCollisionBox(mapObject.getLocation(), mapObject.getWidth(), mapObject.getHeight(), collisionBoxWidth, collisionBoxHeight, align, valign);
+      Rectangle2D collisionBox =
+          CollisionEntity.getCollisionBox(
+              mapObject.getLocation(),
+              mapObject.getWidth(),
+              mapObject.getHeight(),
+              collisionBoxWidth,
+              collisionBoxHeight,
+              align,
+              valign);
 
       Game.graphics().renderShape(g, collisionBox);
       g.setColor(collision ? Style.COLOR_COLLISION_BORDER : Style.COLOR_NOCOLLISION_BORDER);
 
-      Stroke collisionStroke = collision ? shapeStroke : new BasicStroke(1 / Game.world().camera().getRenderScale(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL, 0, new float[] { 1f }, 0);
+      Stroke collisionStroke =
+          collision
+              ? shapeStroke
+              : new BasicStroke(
+                  1 / Game.world().camera().getRenderScale(),
+                  BasicStroke.CAP_ROUND,
+                  BasicStroke.JOIN_BEVEL,
+                  0,
+                  new float[] {1f},
+                  0);
       Game.graphics().renderOutline(g, collisionBox, collisionStroke);
     }
   }

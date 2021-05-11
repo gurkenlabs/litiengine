@@ -1,34 +1,5 @@
 package de.gurkenlabs.utiliti.components;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics2D;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Consumer;
-import java.util.function.IntConsumer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
-
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.EmitterMapObjectLoader;
 import de.gurkenlabs.litiengine.environment.Environment;
@@ -72,17 +43,42 @@ import de.gurkenlabs.utiliti.swing.UI;
 import de.gurkenlabs.utiliti.swing.dialogs.ConfirmDialog;
 import de.gurkenlabs.utiliti.swing.dialogs.XmlExportDialog;
 import de.gurkenlabs.utiliti.swing.dialogs.XmlImportDialog;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics2D;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
+import java.util.function.IntConsumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 public class MapComponent extends GuiComponent {
 
   public static final int EDITMODE_CREATE = 0;
   public static final int EDITMODE_EDIT = 1;
 
-  /**
-   * @deprecated Will be replaced by {@link TransformType#MOVE}
-   */
-  @Deprecated()
-  public static final int EDITMODE_MOVE = 2;
+  /** @deprecated Will be replaced by {@link TransformType#MOVE} */
+  @Deprecated() public static final int EDITMODE_MOVE = 2;
+
   private static final Logger log = Logger.getLogger(MapComponent.class.getName());
 
   private final List<IntConsumer> editModeChangedConsumer;
@@ -105,44 +101,40 @@ public class MapComponent extends GuiComponent {
   private Blueprint copiedBlueprint;
 
   /**
-   * This flag is used to control the undo behavior of a <b>move
-   * transformation</b>. It ensures that the UndoManager tracks the "changing"
-   * event in the beginning of the operation (when the key event is recorded for
-   * the first time) and also triggers the "changed" event upon key release.
+   * This flag is used to control the undo behavior of a <b>move transformation</b>. It ensures that
+   * the UndoManager tracks the "changing" event in the beginning of the operation (when the key
+   * event is recorded for the first time) and also triggers the "changed" event upon key release.
    */
   private boolean isMoving;
 
   /**
-   * This flag is used to control the undo behavior of a <b>resize
-   * transformation</b>. It ensures that the UndoManager tracks the "changing"
-   * event in the beginning of the operation (when the key event is recorded for
-   * the first time) and also triggers the "changed" event upon key release.
+   * This flag is used to control the undo behavior of a <b>resize transformation</b>. It ensures
+   * that the UndoManager tracks the "changing" event in the beginning of the operation (when the
+   * key event is recorded for the first time) and also triggers the "changed" event upon key
+   * release.
    */
   private boolean isResizing;
 
   /**
-   * This flag is used to bundle a move operation over several key events until
-   * the arrow keys are released. This allows for the UndoManager to revert the
-   * keyboard move operation once instead of having to revert for each
-   * individual key stroke.
+   * This flag is used to bundle a move operation over several key events until the arrow keys are
+   * released. This allows for the UndoManager to revert the keyboard move operation once instead of
+   * having to revert for each individual key stroke.
    */
   private boolean isMovingWithKeyboard;
 
   /**
-   * This flag prevents circular focusing approaches while this instance is
-   * already performing a focus process.
+   * This flag prevents circular focusing approaches while this instance is already performing a
+   * focus process.
    */
   private boolean isFocussing;
 
   /**
-   * This flag prevents certain UI operations from executing while the editor is
-   * loading an environment.
+   * This flag prevents certain UI operations from executing while the editor is loading an
+   * environment.
    */
   private boolean loading;
 
-  /**
-   * Ensures that various initialization processes are only carried out once.
-   */
+  /** Ensures that various initialization processes are only carried out once. */
   private boolean initialized;
 
   public MapComponent() {
@@ -203,15 +195,16 @@ public class MapComponent extends GuiComponent {
   }
 
   public void loadMaps(String projectPath) {
-    final List<String> files = FileUtilities.findFilesByExtension(new ArrayList<>(), Paths.get(projectPath), "tmx");
-    log.log(Level.INFO, "{0} maps found in folder {1}", new Object[] { files.size(), projectPath });
+    final List<String> files =
+        FileUtilities.findFilesByExtension(new ArrayList<>(), Paths.get(projectPath), "tmx");
+    log.log(Level.INFO, "{0} maps found in folder {1}", new Object[] {files.size(), projectPath});
     final List<TmxMap> loadedMaps = new ArrayList<>();
     for (final String mapFile : files) {
       TmxMap map = (TmxMap) Resources.maps().get(mapFile);
       if (map != null) { // if an error occurred or it's not in the expected
-                         // format
+        // format
         loadedMaps.add(map);
-        log.log(Level.INFO, "map found: {0}", new Object[] { map.getName() });
+        log.log(Level.INFO, "map found: {0}", new Object[] {map.getName()});
       }
     }
 
@@ -272,19 +265,25 @@ public class MapComponent extends GuiComponent {
 
   @Override
   public void prepare() {
-    Game.world().camera().onZoom(event -> {
-      Transform.updateAnchors();
-    });
+    Game.world()
+        .camera()
+        .onZoom(
+            event -> {
+              Transform.updateAnchors();
+            });
 
     Zoom.applyPreference();
 
     if (!this.initialized) {
-      Game.window().getRenderComponent().addFocusListener(new FocusAdapter() {
-        @Override
-        public void focusLost(FocusEvent e) {
-          startPoint = null;
-        }
-      });
+      Game.window()
+          .getRenderComponent()
+          .addFocusListener(
+              new FocusAdapter() {
+                @Override
+                public void focusLost(FocusEvent e) {
+                  startPoint = null;
+                }
+              });
 
       this.setupKeyboardControls();
       this.setupMouseControls();
@@ -309,7 +308,10 @@ public class MapComponent extends GuiComponent {
       }
 
       for (Consumer<TmxMap> cons : this.loadingConsumer) {
-        cons.accept(Game.world().environment() != null ? ((TmxMap) Game.world().environment().getMap()) : null);
+        cons.accept(
+            Game.world().environment() != null
+                ? ((TmxMap) Game.world().environment().getMap())
+                : null);
       }
 
       Point2D newFocus = null;
@@ -317,7 +319,9 @@ public class MapComponent extends GuiComponent {
       if (this.cameraFocus.containsKey(map.getName())) {
         newFocus = this.cameraFocus.get(map.getName());
       } else {
-        newFocus = new Point2D.Double(map.getSizeInPixels().getWidth() / 2, map.getSizeInPixels().getHeight() / 2);
+        newFocus =
+            new Point2D.Double(
+                map.getSizeInPixels().getWidth() / 2, map.getSizeInPixels().getHeight() / 2);
         this.cameraFocus.put(map.getName(), newFocus);
       }
 
@@ -391,7 +395,9 @@ public class MapComponent extends GuiComponent {
       return;
     }
 
-    boolean shadow = layer.getMapObjects().stream().anyMatch(x -> MapObjectType.get(x.getType()) == MapObjectType.STATICSHADOW);
+    boolean shadow =
+        layer.getMapObjects().stream()
+            .anyMatch(x -> MapObjectType.get(x.getType()) == MapObjectType.STATICSHADOW);
     for (IMapObject mapObject : layer.getMapObjects()) {
       if (!shadow && MapObjectType.get(mapObject.getType()) == MapObjectType.LIGHTSOURCE) {
         Game.world().environment().updateLighting(mapObject.getBoundingBox());
@@ -410,7 +416,11 @@ public class MapComponent extends GuiComponent {
   }
 
   public void copy() {
-    this.setCopyBlueprint(new Blueprint("", this.getSelectedMapObjects().toArray(new MapObject[this.getSelectedMapObjects().size()])));
+    this.setCopyBlueprint(
+        new Blueprint(
+            "",
+            this.getSelectedMapObjects()
+                .toArray(new MapObject[this.getSelectedMapObjects().size()])));
   }
 
   public void paste() {
@@ -447,7 +457,12 @@ public class MapComponent extends GuiComponent {
   }
 
   public void cut() {
-    this.setCopyBlueprint(new Blueprint("", true, this.getSelectedMapObjects().toArray(new MapObject[this.getSelectedMapObjects().size()])));
+    this.setCopyBlueprint(
+        new Blueprint(
+            "",
+            true,
+            this.getSelectedMapObjects()
+                .toArray(new MapObject[this.getSelectedMapObjects().size()])));
 
     UndoManager.instance().beginOperation();
     try {
@@ -532,7 +547,15 @@ public class MapComponent extends GuiComponent {
       return;
     }
 
-    Object name = JOptionPane.showInputDialog(Game.window().getRenderComponent(), Resources.strings().get("input_prompt_name"), Resources.strings().get("input_prompt_name_title"), JOptionPane.PLAIN_MESSAGE, null, null, this.getFocusedMapObject().getName());
+    Object name =
+        JOptionPane.showInputDialog(
+            Game.window().getRenderComponent(),
+            Resources.strings().get("input_prompt_name"),
+            Resources.strings().get("input_prompt_name_title"),
+            JOptionPane.PLAIN_MESSAGE,
+            null,
+            null,
+            this.getFocusedMapObject().getName());
     if (name == null) {
       return;
     }
@@ -541,11 +564,18 @@ public class MapComponent extends GuiComponent {
       final EmitterData data = emitter.data();
       data.setName(name.toString());
 
-      Editor.instance().getGameFile().getEmitters().removeIf(x -> x.getName().equals(data.getName()));
+      Editor.instance()
+          .getGameFile()
+          .getEmitters()
+          .removeIf(x -> x.getName().equals(data.getName()));
       Editor.instance().getGameFile().getEmitters().add(data);
     }
 
-    Blueprint blueprint = new Blueprint(name.toString(), this.getSelectedMapObjects().toArray(new MapObject[this.getSelectedMapObjects().size()]));
+    Blueprint blueprint =
+        new Blueprint(
+            name.toString(),
+            this.getSelectedMapObjects()
+                .toArray(new MapObject[this.getSelectedMapObjects().size()]));
     Editor.instance().getGameFile().getBluePrints().add(blueprint);
   }
 
@@ -579,19 +609,19 @@ public class MapComponent extends GuiComponent {
     }
 
     switch (editMode) {
-    case EDITMODE_CREATE:
-      this.setFocus(null, true);
-      UI.getInspector().bind(null);
-      Game.window().cursor().set(Cursors.ADD, 0, 0);
-      break;
-    case EDITMODE_EDIT:
-      Game.window().cursor().set(Cursors.DEFAULT, 0, 0);
-      break;
-    case EDITMODE_MOVE:
-      Game.window().cursor().set(Cursors.MOVE, 0, 0);
-      break;
-    default:
-      break;
+      case EDITMODE_CREATE:
+        this.setFocus(null, true);
+        UI.getInspector().bind(null);
+        Game.window().cursor().set(Cursors.ADD, 0, 0);
+        break;
+      case EDITMODE_EDIT:
+        Game.window().cursor().set(Cursors.DEFAULT, 0, 0);
+        break;
+      case EDITMODE_MOVE:
+        Game.window().cursor().set(Cursors.MOVE, 0, 0);
+        break;
+      default:
+        break;
     }
 
     this.editMode = editMode;
@@ -608,7 +638,8 @@ public class MapComponent extends GuiComponent {
     this.isFocussing = true;
     try {
       final IMapObject currentFocus = this.getFocusedMapObject();
-      if (mapObject != null && currentFocus != null && mapObject.equals(currentFocus) || mapObject == null && currentFocus == null) {
+      if (mapObject != null && currentFocus != null && mapObject.equals(currentFocus)
+          || mapObject == null && currentFocus == null) {
         return;
       }
 
@@ -640,7 +671,8 @@ public class MapComponent extends GuiComponent {
   }
 
   public void setSelection(IMapObject mapObject, boolean clearSelection) {
-    this.setSelection(mapObject == null ? null : Collections.singletonList(mapObject), clearSelection);
+    this.setSelection(
+        mapObject == null ? null : Collections.singletonList(mapObject), clearSelection);
   }
 
   public void setSelection(List<IMapObject> mapObjects, boolean clearSelection) {
@@ -681,7 +713,11 @@ public class MapComponent extends GuiComponent {
       return;
     }
 
-    if (!ConfirmDialog.show(Resources.strings().get("hud_deleteMap"), Resources.strings().get("hud_deleteMapMessage") + "\n" + Game.world().environment().getMap().getName())) {
+    if (!ConfirmDialog.show(
+        Resources.strings().get("hud_deleteMap"),
+        Resources.strings().get("hud_deleteMapMessage")
+            + "\n"
+            + Game.world().environment().getMap().getName())) {
       return;
     }
 
@@ -705,68 +741,76 @@ public class MapComponent extends GuiComponent {
       return;
     }
 
-    XmlImportDialog.importXml("Tilemap", file -> {
-      String mapPath = file.toURI().toString();
-      Resources.maps().clear();
-      TmxMap map = (TmxMap) Resources.maps().get(mapPath);
-      if (map == null) {
-        log.log(Level.WARNING, "could not load map from file {0}", new Object[] { mapPath });
-        return;
-      }
+    XmlImportDialog.importXml(
+        "Tilemap",
+        file -> {
+          String mapPath = file.toURI().toString();
+          Resources.maps().clear();
+          TmxMap map = (TmxMap) Resources.maps().get(mapPath);
+          if (map == null) {
+            log.log(Level.WARNING, "could not load map from file {0}", new Object[] {mapPath});
+            return;
+          }
 
-      if (map.getMapObjectLayers().isEmpty()) {
+          if (map.getMapObjectLayers().isEmpty()) {
 
-        // make sure there's a map object layer on the map because we need one
-        // to add any kind of entities
-        MapObjectLayer layer = new MapObjectLayer();
-        layer.setName(MapObjectLayer.DEFAULT_MAPOBJECTLAYER_NAME);
-        map.addLayer(layer);
-      }
+            // make sure there's a map object layer on the map because we need one
+            // to add any kind of entities
+            MapObjectLayer layer = new MapObjectLayer();
+            layer.setName(MapObjectLayer.DEFAULT_MAPOBJECTLAYER_NAME);
+            map.addLayer(layer);
+          }
 
-      Optional<TmxMap> current = this.maps.stream().filter(x -> x.getName().equals(map.getName())).findFirst();
-      if (current.isPresent()) {
-        if (ConfirmDialog.show(Resources.strings().get("input_replace_map_title"), Resources.strings().get("input_replace_map", map.getName()))) {
-          this.getMaps().remove(current.get());
-        } else {
-          return;
-        }
-      }
+          Optional<TmxMap> current =
+              this.maps.stream().filter(x -> x.getName().equals(map.getName())).findFirst();
+          if (current.isPresent()) {
+            if (ConfirmDialog.show(
+                Resources.strings().get("input_replace_map_title"),
+                Resources.strings().get("input_replace_map", map.getName()))) {
+              this.getMaps().remove(current.get());
+            } else {
+              return;
+            }
+          }
 
-      this.getMaps().add(map);
-      Collections.sort(this.getMaps());
+          this.getMaps().add(map);
+          Collections.sort(this.getMaps());
 
-      for (IImageLayer imageLayer : map.getImageLayers()) {
-        BufferedImage img = Resources.images().get(imageLayer.getImage().getAbsoluteSourcePath(), true);
-        if (img == null) {
-          continue;
-        }
+          for (IImageLayer imageLayer : map.getImageLayers()) {
+            BufferedImage img =
+                Resources.images().get(imageLayer.getImage().getAbsoluteSourcePath(), true);
+            if (img == null) {
+              continue;
+            }
 
-        Spritesheet sprite = Resources.spritesheets().load(img, imageLayer.getImage().getSource(), img.getWidth(), img.getHeight());
-        Editor.instance().getGameFile().getSpriteSheets().add(new SpritesheetResource(sprite));
-      }
+            Spritesheet sprite =
+                Resources.spritesheets()
+                    .load(img, imageLayer.getImage().getSource(), img.getWidth(), img.getHeight());
+            Editor.instance().getGameFile().getSpriteSheets().add(new SpritesheetResource(sprite));
+          }
 
-      // remove old spritesheets
-      for (ITileset tileSet : map.getTilesets()) {
-        Editor.instance().loadTileset(tileSet, true);
-      }
+          // remove old spritesheets
+          for (ITileset tileSet : map.getTilesets()) {
+            Editor.instance().loadTileset(tileSet, true);
+          }
 
-      // remove old tilesets
-      for (ITileset tileset : map.getExternalTilesets()) {
-        Editor.instance().loadTileset(tileset, false);
-      }
+          // remove old tilesets
+          for (ITileset tileset : map.getExternalTilesets()) {
+            Editor.instance().loadTileset(tileset, false);
+          }
 
-      Editor.instance().updateGameFileMaps();
-      Resources.images().clear();
-      Renderers.get(GridRenderer.class).clearCache();
-      if (this.environments.containsKey(map.getName())) {
-        this.environments.remove(map.getName());
-      }
+          Editor.instance().updateGameFileMaps();
+          Resources.images().clear();
+          Renderers.get(GridRenderer.class).clearCache();
+          if (this.environments.containsKey(map.getName())) {
+            this.environments.remove(map.getName());
+          }
 
-      UI.getMapController().bind(this.getMaps(), true);
-      this.loadEnvironment(map);
-      log.log(Level.INFO, "imported map {0}", new Object[] { map.getName() });
-    }, TmxMap.FILE_EXTENSION);
-
+          UI.getMapController().bind(this.getMaps(), true);
+          this.loadEnvironment(map);
+          log.log(Level.INFO, "imported map {0}", new Object[] {map.getName()});
+        },
+        TmxMap.FILE_EXTENSION);
   }
 
   public void exportMap() {
@@ -779,17 +823,26 @@ public class MapComponent extends GuiComponent {
       return;
     }
 
-    XmlExportDialog.export(map, "Map", map.getName(), TmxMap.FILE_EXTENSION, dir -> {
-      for (ITileset tileSet : map.getTilesets()) {
-        ImageFormat format = ImageFormat.get(FileUtilities.getExtension(tileSet.getImage().getSource()));
-        ImageSerializer.saveImage(Paths.get(dir, tileSet.getImage().getSource()).toString(), Resources.spritesheets().get(tileSet.getImage().getSource()).getImage(), format);
+    XmlExportDialog.export(
+        map,
+        "Map",
+        map.getName(),
+        TmxMap.FILE_EXTENSION,
+        dir -> {
+          for (ITileset tileSet : map.getTilesets()) {
+            ImageFormat format =
+                ImageFormat.get(FileUtilities.getExtension(tileSet.getImage().getSource()));
+            ImageSerializer.saveImage(
+                Paths.get(dir, tileSet.getImage().getSource()).toString(),
+                Resources.spritesheets().get(tileSet.getImage().getSource()).getImage(),
+                format);
 
-        Tileset tile = (Tileset) tileSet;
-        if (tile.isExternal()) {
-          tile.saveSource(dir);
-        }
-      }
-    });
+            Tileset tile = (Tileset) tileSet;
+            if (tile.isExternal()) {
+              tile.saveSource(dir);
+            }
+          }
+        });
   }
 
   public void reassignIds(TmxMap map, int startID) {
@@ -807,12 +860,16 @@ public class MapComponent extends GuiComponent {
     Game.world().environment().clear();
     Game.world().environment().load();
     UI.getMapController().refresh();
-    log.log(Level.INFO, "Reassigned IDs for Map {0}.", new Object[] { map.getName() });
+    log.log(Level.INFO, "Reassigned IDs for Map {0}.", new Object[] {map.getName()});
   }
 
   @Override
   protected boolean mouseEventShouldBeForwarded(final MouseEvent e) {
-    return this.isForwardMouseEvents() && this.isVisible() && this.isEnabled() && !this.isSuspended() && e != null;
+    return this.isForwardMouseEvents()
+        && this.isVisible()
+        && this.isEnabled()
+        && !this.isSuspended()
+        && e != null;
   }
 
   public void saveMapSnapshot() {
@@ -833,7 +890,7 @@ public class MapComponent extends GuiComponent {
       }
       File snapshot = new File("./screenshots/" + timeStamp + ImageFormat.PNG.toFileExtension());
       ImageSerializer.saveImage(snapshot.toString(), img);
-      log.log(Level.INFO, "Saved map snapshot to {0}", new Object[] { snapshot.getCanonicalPath() });
+      log.log(Level.INFO, "Saved map snapshot to {0}", new Object[] {snapshot.getCanonicalPath()});
     } catch (Exception e) {
       log.log(Level.SEVERE, e.getLocalizedMessage(), e);
     }
@@ -888,37 +945,37 @@ public class MapComponent extends GuiComponent {
     mo.setName("");
 
     switch (type) {
-    case EMITTER:
-      EmitterData defaultData = new EmitterData();
-      defaultData.initDefaults();
-      defaultData.setWidth(mo.getWidth());
-      defaultData.setHeight(mo.getHeight());
-      defaultData.setName(mo.getName());
-      EmitterMapObjectLoader.updateMapObject(defaultData, mo);
-      break;
-    case PROP:
-      mo.setValue(MapObjectProperty.COLLISIONBOX_WIDTH, (newObjectArea.getWidth() * 0.4));
-      mo.setValue(MapObjectProperty.COLLISIONBOX_HEIGHT, (newObjectArea.getHeight() * 0.4));
-      mo.setValue(MapObjectProperty.COLLISION, true);
-      mo.setValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE, false);
-      mo.setValue(MapObjectProperty.PROP_ADDSHADOW, true);
-      break;
-    case LIGHTSOURCE:
-      mo.setValue(MapObjectProperty.LIGHT_COLOR, Color.WHITE);
-      mo.setValue(MapObjectProperty.LIGHT_SHAPE, "ellipse");
-      mo.setValue(MapObjectProperty.LIGHT_ACTIVE, true);
-      break;
-    case COLLISIONBOX:
-      mo.setValue(MapObjectProperty.COLLISION_TYPE, Collision.STATIC);
-      break;
-    case SOUNDSOURCE:
-      mo.setValue(MapObjectProperty.SOUND_VOLUME, 1);
-      mo.setValue(MapObjectProperty.SOUND_LOOP, true);
-      break;
-    case SPAWNPOINT:
-      break;
-    default:
-      break;
+      case EMITTER:
+        EmitterData defaultData = new EmitterData();
+        defaultData.initDefaults();
+        defaultData.setWidth(mo.getWidth());
+        defaultData.setHeight(mo.getHeight());
+        defaultData.setName(mo.getName());
+        EmitterMapObjectLoader.updateMapObject(defaultData, mo);
+        break;
+      case PROP:
+        mo.setValue(MapObjectProperty.COLLISIONBOX_WIDTH, (newObjectArea.getWidth() * 0.4));
+        mo.setValue(MapObjectProperty.COLLISIONBOX_HEIGHT, (newObjectArea.getHeight() * 0.4));
+        mo.setValue(MapObjectProperty.COLLISION, true);
+        mo.setValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE, false);
+        mo.setValue(MapObjectProperty.PROP_ADDSHADOW, true);
+        break;
+      case LIGHTSOURCE:
+        mo.setValue(MapObjectProperty.LIGHT_COLOR, Color.WHITE);
+        mo.setValue(MapObjectProperty.LIGHT_SHAPE, "ellipse");
+        mo.setValue(MapObjectProperty.LIGHT_ACTIVE, true);
+        break;
+      case COLLISIONBOX:
+        mo.setValue(MapObjectProperty.COLLISION_TYPE, Collision.STATIC);
+        break;
+      case SOUNDSOURCE:
+        mo.setValue(MapObjectProperty.SOUND_VOLUME, 1);
+        mo.setValue(MapObjectProperty.SOUND_LOOP, true);
+        break;
+      case SPAWNPOINT:
+        break;
+      default:
+        break;
     }
 
     this.add(mo);
@@ -933,36 +990,53 @@ public class MapComponent extends GuiComponent {
   }
 
   private void setupKeyboardControls() {
-    Input.keyboard().onKeyPressed(KeyEvent.VK_CONTROL, e -> {
-      if (this.editMode == EDITMODE_EDIT && this.getFocusBounds() != null) {
-        this.setEditMode(EDITMODE_MOVE);
-      }
-    });
+    Input.keyboard()
+        .onKeyPressed(
+            KeyEvent.VK_CONTROL,
+            e -> {
+              if (this.editMode == EDITMODE_EDIT && this.getFocusBounds() != null) {
+                this.setEditMode(EDITMODE_MOVE);
+              }
+            });
 
-    Input.keyboard().onKeyReleased(KeyEvent.VK_CONTROL, e -> {
-      if (this.editMode == EDITMODE_MOVE) {
-        this.setEditMode(EDITMODE_EDIT);
-      }
-    });
+    Input.keyboard()
+        .onKeyReleased(
+            KeyEvent.VK_CONTROL,
+            e -> {
+              if (this.editMode == EDITMODE_MOVE) {
+                this.setEditMode(EDITMODE_EDIT);
+              }
+            });
 
-    Input.keyboard().onKeyPressed(KeyEvent.VK_ESCAPE, e -> {
-      if (this.editMode == EDITMODE_CREATE) {
-        this.setEditMode(EDITMODE_EDIT);
-      }
-    });
+    Input.keyboard()
+        .onKeyPressed(
+            KeyEvent.VK_ESCAPE,
+            e -> {
+              if (this.editMode == EDITMODE_CREATE) {
+                this.setEditMode(EDITMODE_EDIT);
+              }
+            });
 
-    Input.keyboard().onKeyReleased(e -> {
-      if (e.getKeyCode() != KeyEvent.VK_RIGHT && e.getKeyCode() != KeyEvent.VK_LEFT && e.getKeyCode() != KeyEvent.VK_UP && e.getKeyCode() != KeyEvent.VK_DOWN) {
-        return;
-      }
+    Input.keyboard()
+        .onKeyReleased(
+            e -> {
+              if (e.getKeyCode() != KeyEvent.VK_RIGHT
+                  && e.getKeyCode() != KeyEvent.VK_LEFT
+                  && e.getKeyCode() != KeyEvent.VK_UP
+                  && e.getKeyCode() != KeyEvent.VK_DOWN) {
+                return;
+              }
 
-      // if one of the move buttons is still pressed, don't end the operation
-      if (Input.keyboard().isPressed(KeyEvent.VK_RIGHT) || Input.keyboard().isPressed(KeyEvent.VK_LEFT) || Input.keyboard().isPressed(KeyEvent.VK_UP) || Input.keyboard().isPressed(KeyEvent.VK_DOWN)) {
-        return;
-      }
+              // if one of the move buttons is still pressed, don't end the operation
+              if (Input.keyboard().isPressed(KeyEvent.VK_RIGHT)
+                  || Input.keyboard().isPressed(KeyEvent.VK_LEFT)
+                  || Input.keyboard().isPressed(KeyEvent.VK_UP)
+                  || Input.keyboard().isPressed(KeyEvent.VK_DOWN)) {
+                return;
+              }
 
-      this.afterArrowKeysReleased();
-    });
+              this.afterArrowKeysReleased();
+            });
 
     Input.keyboard().onKeyPressed(KeyEvent.VK_RIGHT, e -> this.handleKeyboardTransform(1, 0));
     Input.keyboard().onKeyPressed(KeyEvent.VK_LEFT, e -> this.handleKeyboardTransform(-1, 0));
@@ -975,10 +1049,11 @@ public class MapComponent extends GuiComponent {
       return;
     }
 
-    SwingUtilities.invokeLater(() -> {
-      this.beforeArrowKeyPressed();
-      Transform.moveEntities(this.getSelectedMapObjects(), x, y);
-    });
+    SwingUtilities.invokeLater(
+        () -> {
+          this.beforeArrowKeyPressed();
+          Transform.moveEntities(this.getSelectedMapObjects(), x, y);
+        });
   }
 
   private void beforeArrowKeyPressed() {
@@ -996,15 +1071,16 @@ public class MapComponent extends GuiComponent {
 
   private void afterArrowKeysReleased() {
     if (this.isMovingWithKeyboard) {
-      SwingUtilities.invokeLater(() -> {
-        for (IMapObject selected : this.getSelectedMapObjects()) {
-          UndoManager.instance().mapObjectChanged(selected);
-        }
+      SwingUtilities.invokeLater(
+          () -> {
+            for (IMapObject selected : this.getSelectedMapObjects()) {
+              UndoManager.instance().mapObjectChanged(selected);
+            }
 
-        UndoManager.instance().endOperation();
-        this.isMovingWithKeyboard = false;
-        Transform.resetDragging();
-      });
+            UndoManager.instance().endOperation();
+            this.isMovingWithKeyboard = false;
+            Transform.resetDragging();
+          });
     }
   }
 
@@ -1055,7 +1131,7 @@ public class MapComponent extends GuiComponent {
    * <li>Set cursor image depending on the hovered transform control</li>
    * <li>Update the currently active transform field.</li>
    * </ol>
-   * 
+   *
    * @param e
    *          The mouse event of the calling {@link GuiComponent}
    */
@@ -1073,22 +1149,24 @@ public class MapComponent extends GuiComponent {
     }
 
     switch (this.editMode) {
-    case EDITMODE_CREATE:
-    case EDITMODE_MOVE:
-      if (SwingUtilities.isLeftMouseButton(e.getEvent())) {
-        this.startPoint = Input.mouse().getMapLocation();
-      }
-      break;
-    case EDITMODE_EDIT:
-      if (this.isMoving || Transform.type() == TransformType.RESIZE || SwingUtilities.isRightMouseButton(e.getEvent())) {
-        return;
-      }
+      case EDITMODE_CREATE:
+      case EDITMODE_MOVE:
+        if (SwingUtilities.isLeftMouseButton(e.getEvent())) {
+          this.startPoint = Input.mouse().getMapLocation();
+        }
+        break;
+      case EDITMODE_EDIT:
+        if (this.isMoving
+            || Transform.type() == TransformType.RESIZE
+            || SwingUtilities.isRightMouseButton(e.getEvent())) {
+          return;
+        }
 
-      final Point2D mouse = Input.mouse().getMapLocation();
-      this.startPoint = mouse;
-      break;
-    default:
-      break;
+        final Point2D mouse = Input.mouse().getMapLocation();
+        this.startPoint = mouse;
+        break;
+      default:
+        break;
     }
   }
 
@@ -1098,34 +1176,34 @@ public class MapComponent extends GuiComponent {
     }
 
     switch (this.editMode) {
-    case EDITMODE_EDIT:
-      if (Transform.type() == TransformType.RESIZE) {
-        if (!this.isResizing) {
-          this.isResizing = true;
+      case EDITMODE_EDIT:
+        if (Transform.type() == TransformType.RESIZE) {
+          if (!this.isResizing) {
+            this.isResizing = true;
+
+            UndoManager.instance().beginOperation();
+            UndoManager.instance().mapObjectChanging(this.getFocusedMapObject());
+          }
+
+          Transform.resize();
+        }
+
+        break;
+      case EDITMODE_MOVE:
+        if (!this.isMoving) {
+          this.isMoving = true;
 
           UndoManager.instance().beginOperation();
-          UndoManager.instance().mapObjectChanging(this.getFocusedMapObject());
+          for (IMapObject selected : this.getSelectedMapObjects()) {
+            UndoManager.instance().mapObjectChanging(selected);
+          }
         }
 
-        Transform.resize();
-      }
+        Transform.move();
 
-      break;
-    case EDITMODE_MOVE:
-      if (!this.isMoving) {
-        this.isMoving = true;
-
-        UndoManager.instance().beginOperation();
-        for (IMapObject selected : this.getSelectedMapObjects()) {
-          UndoManager.instance().mapObjectChanging(selected);
-        }
-      }
-
-      Transform.move();
-
-      break;
-    default:
-      break;
+        break;
+      default:
+        break;
     }
   }
 
@@ -1137,50 +1215,49 @@ public class MapComponent extends GuiComponent {
     Transform.resetDragging();
 
     switch (this.editMode) {
-    case EDITMODE_CREATE:
-      if (SwingUtilities.isRightMouseButton(e.getEvent())) {
-        this.setEditMode(EDITMODE_EDIT);
-        break;
-      }
-
-      IMapObject mo = this.createNewMapObject(UI.getInspector().getObjectType());
-
-      this.setFocus(mo, !Input.keyboard().isPressed(KeyEvent.VK_SHIFT));
-      UI.getInspector().bind(mo);
-      this.setEditMode(EDITMODE_EDIT);
-      break;
-    case EDITMODE_MOVE:
-
-      if (this.isMoving) {
-        this.isMoving = false;
-
-        for (IMapObject selected : this.getSelectedMapObjects()) {
-          UndoManager.instance().mapObjectChanged(selected);
+      case EDITMODE_CREATE:
+        if (SwingUtilities.isRightMouseButton(e.getEvent())) {
+          this.setEditMode(EDITMODE_EDIT);
+          break;
         }
 
-        UndoManager.instance().endOperation();
+        IMapObject mo = this.createNewMapObject(UI.getInspector().getObjectType());
+
+        this.setFocus(mo, !Input.keyboard().isPressed(KeyEvent.VK_SHIFT));
+        UI.getInspector().bind(mo);
         this.setEditMode(EDITMODE_EDIT);
-      } else {
-        this.setEditMode(EDITMODE_EDIT);
+        break;
+      case EDITMODE_MOVE:
+        if (this.isMoving) {
+          this.isMoving = false;
+
+          for (IMapObject selected : this.getSelectedMapObjects()) {
+            UndoManager.instance().mapObjectChanged(selected);
+          }
+
+          UndoManager.instance().endOperation();
+          this.setEditMode(EDITMODE_EDIT);
+        } else {
+          this.setEditMode(EDITMODE_EDIT);
+          this.evaluateFocus();
+        }
+
+        break;
+      case EDITMODE_EDIT:
+        if (this.isMoving || this.isResizing) {
+          this.isMoving = false;
+          this.isResizing = false;
+          UndoManager.instance().mapObjectChanged(this.getFocusedMapObject());
+        }
+
+        if (this.startPoint == null) {
+          return;
+        }
+
         this.evaluateFocus();
-      }
-
-      break;
-    case EDITMODE_EDIT:
-      if (this.isMoving || this.isResizing) {
-        this.isMoving = false;
-        this.isResizing = false;
-        UndoManager.instance().mapObjectChanged(this.getFocusedMapObject());
-      }
-
-      if (this.startPoint == null) {
-        return;
-      }
-
-      this.evaluateFocus();
-      break;
-    default:
-      break;
+        break;
+      default:
+        break;
     }
 
     this.startPoint = null;
@@ -1209,7 +1286,8 @@ public class MapComponent extends GuiComponent {
           continue;
         }
 
-        if (this.getFocusedMapObject() != null && mapObject.getId() == this.getFocusedMapObject().getId()) {
+        if (this.getFocusedMapObject() != null
+            && mapObject.getId() == this.getFocusedMapObject().getId()) {
           currentObjectFocused = true;
           continue;
         }

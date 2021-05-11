@@ -1,5 +1,11 @@
 package de.gurkenlabs.litiengine.graphics;
 
+import de.gurkenlabs.litiengine.Align;
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.Valign;
+import de.gurkenlabs.litiengine.input.Input;
+import de.gurkenlabs.litiengine.input.Mouse;
+import de.gurkenlabs.litiengine.util.Imaging;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics2D;
@@ -10,17 +16,11 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 
-import de.gurkenlabs.litiengine.Align;
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.Valign;
-import de.gurkenlabs.litiengine.input.Input;
-import de.gurkenlabs.litiengine.input.Mouse;
-import de.gurkenlabs.litiengine.util.Imaging;
-
 /**
  * The visual representation of the {@code Mouse} in the LITIENGINE.<br>
- * It controls the appearance of the rendered cursor and allows to specify offsets from the actual mouse location.
- * 
+ * It controls the appearance of the rendered cursor and allows to specify offsets from the actual
+ * mouse location.
+ *
  * @see Mouse
  */
 public final class MouseCursor implements IRenderable {
@@ -35,9 +35,11 @@ public final class MouseCursor implements IRenderable {
   private int offsetY;
 
   private boolean visible;
+
   static {
     final BufferedImage cursorImg = Imaging.getCompatibleImage(16, 16);
-    BLANK_CURSOR = Toolkit.getDefaultToolkit().createCustomCursor(cursorImg, new Point(0, 0), "blank cursor");
+    BLANK_CURSOR =
+        Toolkit.getDefaultToolkit().createCustomCursor(cursorImg, new Point(0, 0), "blank cursor");
 
     final BufferedImage debugCursorImg = Imaging.getCompatibleImage(16, 16);
     Graphics2D g = debugCursorImg.createGraphics();
@@ -50,9 +52,7 @@ public final class MouseCursor implements IRenderable {
     DEBUG_CURSOR_IMAGE = debugCursorImg;
   }
 
-  /**
-   * Initializes a new instance of the {@code MouseCursor} class.
-   */
+  /** Initializes a new instance of the {@code MouseCursor} class. */
   public MouseCursor() {
     this.visible = true;
   }
@@ -60,7 +60,10 @@ public final class MouseCursor implements IRenderable {
   @Override
   public void render(Graphics2D g) {
     if (this.isVisible()) {
-      final Point2D locationWithOffset = new Point2D.Double(Input.mouse().getLocation().getX() + this.getOffsetX(), Input.mouse().getLocation().getY() + this.getOffsetY());
+      final Point2D locationWithOffset =
+          new Point2D.Double(
+              Input.mouse().getLocation().getX() + this.getOffsetX(),
+              Input.mouse().getLocation().getY() + this.getOffsetY());
       ImageRenderer.renderTransformed(g, this.getImage(), locationWithOffset, this.getTransform());
     }
 
@@ -86,9 +89,9 @@ public final class MouseCursor implements IRenderable {
   }
 
   /**
-   * Determines whether the cursor is currently visible (and will thereby be rendered),
-   * by checking the {@code visible} flag and whether the specified cursor image is null.
-   * 
+   * Determines whether the cursor is currently visible (and will thereby be rendered), by checking
+   * the {@code visible} flag and whether the specified cursor image is null.
+   *
    * @return True if the cursor is currently visible; otherwise false.
    */
   public boolean isVisible() {

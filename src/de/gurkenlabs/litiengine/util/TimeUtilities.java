@@ -19,7 +19,7 @@ public final class TimeUtilities {
 
     private final String formatString;
 
-    TimerFormat(String formatString){
+    TimerFormat(String formatString) {
       this.formatString = formatString;
     }
 

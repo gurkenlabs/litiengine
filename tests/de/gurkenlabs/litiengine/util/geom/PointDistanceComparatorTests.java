@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.awt.geom.Point2D;
 import java.util.Arrays;
-
 import org.junit.jupiter.api.Test;
 
 public class PointDistanceComparatorTests {
@@ -26,19 +25,19 @@ public class PointDistanceComparatorTests {
 
     final Point2D relativePoint = new Point2D.Double(0, 0);
     Arrays.sort(points, new PointDistanceComparator(relativePoint));
-    assertArrayEquals(new Point2D[] { point1, point2, point3, point4 }, points);
+    assertArrayEquals(new Point2D[] {point1, point2, point3, point4}, points);
 
     final Point2D relativePoint2 = new Point2D.Double(5, 5);
     Arrays.sort(points, new PointDistanceComparator(relativePoint2));
-    assertArrayEquals(new Point2D[] { point4, point3, point2, point1 }, points);
+    assertArrayEquals(new Point2D[] {point4, point3, point2, point1}, points);
 
     final Point2D relativePoint3 = new Point2D.Double(2.4, 2.4);
     Arrays.sort(points, new PointDistanceComparator(relativePoint3));
-    assertArrayEquals(new Point2D[] { point2, point3, point1, point4 }, points);
+    assertArrayEquals(new Point2D[] {point2, point3, point1, point4}, points);
   }
 
   @Test
-  public void testPointDistanceComparatorWithIdenticalPoints(){
+  public void testPointDistanceComparatorWithIdenticalPoints() {
     Point2D referencePoint = new Point2D.Double(0d, 0d);
     PointDistanceComparator pointDistanceComparator = new PointDistanceComparator(referencePoint);
 

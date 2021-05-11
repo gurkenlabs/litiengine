@@ -1,5 +1,11 @@
 package de.gurkenlabs.litiengine.graphics;
 
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.resources.ImageFormat;
+import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.util.AlphanumComparator;
+import de.gurkenlabs.litiengine.util.Imaging;
+import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.awt.image.RasterFormatException;
@@ -7,13 +13,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
-
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.resources.ImageFormat;
-import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.litiengine.util.AlphanumComparator;
-import de.gurkenlabs.litiengine.util.Imaging;
-import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 public final class Spritesheet implements Comparable<Spritesheet> {
   private static final Logger log = Logger.getLogger(Spritesheet.class.getName());
@@ -31,19 +30,17 @@ public final class Spritesheet implements Comparable<Spritesheet> {
   private int spriteWidth;
 
   /**
-   * Instantiates a new {@code Spritesheet} instance. Depending on the given {@code spriteWidth} and {@code spriteHeight}, the
-   * sub-images will be cropped from the spritesheet image when accessing individual sprites.
+   * Instantiates a new {@code Spritesheet} instance. Depending on the given {@code spriteWidth} and
+   * {@code spriteHeight}, the sub-images will be cropped from the spritesheet image when accessing
+   * individual sprites.
    *
-   * @param image
-   *          the spritesheet image
-   * @param path
-   *          the path (or name) of the spritesheet image
-   * @param spriteWidth
-   *          the width in pixels of each sprite in the spritesheet.
-   * @param spriteHeight
-   *          the height in pixels of each sprite in the spritesheet.
+   * @param image the spritesheet image
+   * @param path the path (or name) of the spritesheet image
+   * @param spriteWidth the width in pixels of each sprite in the spritesheet.
+   * @param spriteHeight the height in pixels of each sprite in the spritesheet.
    */
-  public Spritesheet(final BufferedImage image, final String path, final int spriteWidth, final int spriteHeight) {
+  public Spritesheet(
+      final BufferedImage image, final String path, final int spriteWidth, final int spriteHeight) {
     checkImage(image, path);
     this.image = image;
     this.name = FileUtilities.getFileName(path);
@@ -59,10 +56,12 @@ public final class Spritesheet implements Comparable<Spritesheet> {
 
     Resources.spritesheets().add(this.name, this);
 
-    Resources.images().addClearedListener(() -> {
-      this.emptySprites.clear();
-      this.sprites = new BufferedImage[this.getTotalNumberOfSprites()];
-    });
+    Resources.images()
+        .addClearedListener(
+            () -> {
+              this.emptySprites.clear();
+              this.sprites = new BufferedImage[this.getTotalNumberOfSprites()];
+            });
   }
 
   @Override
@@ -109,8 +108,8 @@ public final class Spritesheet implements Comparable<Spritesheet> {
   }
 
   /**
-   * The unique name of this spritesheet. A spritesheet can always be identified
-   * by this name within a game project.
+   * The unique name of this spritesheet. A spritesheet can always be identified by this name within
+   * a game project.
    *
    * @return The name of the spritesheet.
    */
@@ -146,7 +145,8 @@ public final class Spritesheet implements Comparable<Spritesheet> {
 
     final Point position = this.getLocation(index, margin, spacing);
     try {
-      final BufferedImage sprite = this.getImage().getSubimage(position.x, position.y, this.spriteWidth, this.spriteHeight);
+      final BufferedImage sprite =
+          this.getImage().getSubimage(position.x, position.y, this.spriteWidth, this.spriteHeight);
       if (Imaging.isEmpty(sprite)) {
         emptySprites.add(index);
         return null;
@@ -155,7 +155,18 @@ public final class Spritesheet implements Comparable<Spritesheet> {
       this.sprites[index] = sprite;
       return sprite;
     } catch (final RasterFormatException rfe) {
-      log.warning("could not read sprite of size [" + this.spriteWidth + "x" + this.spriteHeight + " at position [" + position.x + "," + position.y + "] from sprite'" + this.getName() + "'");
+      log.warning(
+          "could not read sprite of size ["
+              + this.spriteWidth
+              + "x"
+              + this.spriteHeight
+              + " at position ["
+              + position.x
+              + ","
+              + position.y
+              + "] from sprite'"
+              + this.getName()
+              + "'");
       return null;
     }
   }
@@ -188,7 +199,8 @@ public final class Spritesheet implements Comparable<Spritesheet> {
   }
 
   public boolean isLoaded() {
-    return Resources.spritesheets().contains(this.getName()) && Resources.spritesheets().get(this.getName()).equals(this);
+    return Resources.spritesheets().contains(this.getName())
+        && Resources.spritesheets().get(this.getName()).equals(this);
   }
 
   public void setSpriteHeight(final int spriteHeight) {
@@ -213,13 +225,30 @@ public final class Spritesheet implements Comparable<Spritesheet> {
     checkDimension(value, this.getImage().getHeight(), this.getName(), "height");
   }
 
-  private static void checkDimension(int value, int imageValue, String imageName, String dimension) {
+  private static void checkDimension(
+      int value, int imageValue, String imageName, String dimension) {
     if (value <= 0) {
-      throw new IllegalArgumentException("Invalid sprite dimensions (" + imageName + ")! Sprite " + dimension + " must to be greater than 0.");
+      throw new IllegalArgumentException(
+          "Invalid sprite dimensions ("
+              + imageName
+              + ")! Sprite "
+              + dimension
+              + " must to be greater than 0.");
     }
 
     if (value > imageValue) {
-      throw new IllegalArgumentException("Invalid sprite dimensions (" + imageName + ")! Sprite " + dimension + "(" + value + ") cannot be greater than the image " + dimension + "(" + imageValue + ").");
+      throw new IllegalArgumentException(
+          "Invalid sprite dimensions ("
+              + imageName
+              + ")! Sprite "
+              + dimension
+              + "("
+              + value
+              + ") cannot be greater than the image "
+              + dimension
+              + "("
+              + imageValue
+              + ").");
     }
   }
 
@@ -229,7 +258,10 @@ public final class Spritesheet implements Comparable<Spritesheet> {
     }
 
     if (image.getWidth() <= 0 || image.getHeight() <= 0) {
-      String error = String.format("Invalid image dimensions for spritesheet %s! Width and height must be greater than 0 (actual dimensions: %dx%d).", name, image.getWidth(), image.getHeight());
+      String error =
+          String.format(
+              "Invalid image dimensions for spritesheet %s! Width and height must be greater than 0 (actual dimensions: %dx%d).",
+              name, image.getWidth(), image.getHeight());
       throw new IllegalArgumentException(error);
     }
   }
@@ -238,7 +270,9 @@ public final class Spritesheet implements Comparable<Spritesheet> {
     final int row = index / this.getColumns();
     final int column = index % this.getColumns();
 
-    return new Point(margin + column * (this.getSpriteWidth() + spacing), margin + row * (this.getSpriteHeight() + spacing));
+    return new Point(
+        margin + column * (this.getSpriteWidth() + spacing),
+        margin + row * (this.getSpriteHeight() + spacing));
   }
 
   private void updateRowsAndCols() {

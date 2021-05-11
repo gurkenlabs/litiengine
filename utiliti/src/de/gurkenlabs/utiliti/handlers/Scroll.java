@@ -2,7 +2,6 @@ package de.gurkenlabs.utiliti.handlers;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.utiliti.components.Editor;
-
 import java.awt.geom.Point2D;
 import java.util.EventListener;
 
@@ -18,8 +17,7 @@ public final class Scroll {
 
   private static boolean updating;
 
-  private Scroll() {
-  }
+  private Scroll() {}
 
   public static void up() {
     final Point2D currentFocus = Game.world().camera().getFocus();
@@ -61,17 +59,25 @@ public final class Scroll {
     verticalHandler = vertical;
     horizontalHandler = horizontal;
 
-    getVerticalHandler().onScrolled((handler) -> {
-      final double y = getScrollValue(handler, Game.world().environment().getMap().getSizeInPixels().height);
+    getVerticalHandler()
+        .onScrolled(
+            handler -> {
+              final double y =
+                  getScrollValue(
+                      handler, Game.world().environment().getMap().getSizeInPixels().height);
 
-      scroll(Game.world().camera().getFocus().getX(), y);
-    });
+              scroll(Game.world().camera().getFocus().getX(), y);
+            });
 
-    getHorizontalHandler().onScrolled((handler) -> {
-      final double x = getScrollValue(handler, Game.world().environment().getMap().getSizeInPixels().width);
+    getHorizontalHandler()
+        .onScrolled(
+            handler -> {
+              final double x =
+                  getScrollValue(
+                      handler, Game.world().environment().getMap().getSizeInPixels().width);
 
-      scroll(x, Game.world().camera().getFocus().getY());
-    });
+              scroll(x, Game.world().camera().getFocus().getY());
+            });
 
     Game.world().camera().onZoom(e -> updateScrollHandlers());
 
@@ -88,11 +94,16 @@ public final class Scroll {
     updating = true;
 
     try {
-      double relativeX = Game.world().camera().getFocus().getX() / Game.world().environment().getMap().getSizeInPixels().width;
-      double relativeY = Game.world().camera().getFocus().getY() / Game.world().environment().getMap().getSizeInPixels().height;
+      double relativeX =
+          Game.world().camera().getFocus().getX()
+              / Game.world().environment().getMap().getSizeInPixels().width;
+      double relativeY =
+          Game.world().camera().getFocus().getY()
+              / Game.world().environment().getMap().getSizeInPixels().height;
 
       // decouple the scrollbar from the environment
-      currentScrollSize = Math.round(SCROLL_MAX * Math.sqrt(Game.world().camera().getRenderScale()));
+      currentScrollSize =
+          Math.round(SCROLL_MAX * Math.sqrt(Game.world().camera().getRenderScale()));
       currentScrollSpeed = SCROLL_SPEED / Game.world().camera().getZoom();
 
       getHorizontalHandler().setMinimum(0);

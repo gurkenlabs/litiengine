@@ -1,12 +1,5 @@
 package de.gurkenlabs.litiengine;
 
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Point2D;
-import java.util.Arrays;
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -14,6 +7,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D;
+import java.util.Arrays;
+import java.util.List;
+import org.junit.jupiter.api.Test;
 
 public class RandomTests {
 
@@ -39,7 +38,7 @@ public class RandomTests {
   }
 
   @Test
-  public void testSeed_nextInt(){
+  public void testSeed_nextInt() {
     // arrange
     Game.random().setSeed(SEED);
     int expectedValue = Game.random().nextInt();
@@ -53,7 +52,7 @@ public class RandomTests {
   }
 
   @Test
-  public void testSeed_nextChar(){
+  public void testSeed_nextChar() {
     // arrange
     Game.random().setSeed(SEED);
     char expectedValue = Game.random().nextChar();
@@ -67,7 +66,7 @@ public class RandomTests {
   }
 
   @Test
-  public void testSeed_nextDouble(){
+  public void testSeed_nextDouble() {
     // arrange
     Game.random().setSeed(SEED);
     double expectedValue = Game.random().nextDouble();
@@ -81,7 +80,7 @@ public class RandomTests {
   }
 
   @Test
-  public void testSeed_nextLong(){
+  public void testSeed_nextLong() {
     // arrange
     Game.random().setSeed(SEED);
     long expectedValue = Game.random().nextLong();
@@ -95,7 +94,7 @@ public class RandomTests {
   }
 
   @Test
-  public void testSeed_nextFloat(){
+  public void testSeed_nextFloat() {
     // arrange
     Game.random().setSeed(SEED);
     float expectedValue = Game.random().nextFloat();
@@ -166,11 +165,11 @@ public class RandomTests {
 
   @Test
   public void testArrayChose() {
-    int[] testInt = new int[] { 1, 2, 3, 4, 5, 6 };
-    long[] testLong = new long[] { 1, 2, 3, 4, 5, 6 };
-    double[] testDouble = new double[] { 1, 2, 3, 4, 5, 6 };
+    int[] testInt = new int[] {1, 2, 3, 4, 5, 6};
+    long[] testLong = new long[] {1, 2, 3, 4, 5, 6};
+    double[] testDouble = new double[] {1, 2, 3, 4, 5, 6};
 
-    Integer[] testWrapper = new Integer[] { 1, 2, 3 };
+    Integer[] testWrapper = new Integer[] {1, 2, 3};
 
     int chosenInt = Game.random().choose(testInt);
     long chosenLong = Game.random().choose(testLong);
@@ -195,11 +194,11 @@ public class RandomTests {
 
   @Test
   public void testArrayShuffle() {
-    int[] testInt = new int[] { 1, 2, 3, 4, 5, 6 };
-    long[] testLong = new long[] { 1, 2, 3, 4, 5, 6 };
-    double[] testDouble = new double[] { 1, 2, 3, 4, 5, 6 };
+    int[] testInt = new int[] {1, 2, 3, 4, 5, 6};
+    long[] testLong = new long[] {1, 2, 3, 4, 5, 6};
+    double[] testDouble = new double[] {1, 2, 3, 4, 5, 6};
 
-    Integer[] testWrapper = new Integer[] { 1, 2, 3, 4, 5, 6 };
+    Integer[] testWrapper = new Integer[] {1, 2, 3, 4, 5, 6};
 
     // set seed to make results reproducible
     Game.random().setSeed(12345);
@@ -209,10 +208,10 @@ public class RandomTests {
     Game.random().shuffle(testDouble);
     Game.random().shuffle(testWrapper);
 
-    assertArrayEquals(new int[] { 3, 1, 4, 2, 6, 5 }, testInt);
-    assertArrayEquals(new long[] { 5, 3, 2, 4, 6, 1 }, testLong);
-    assertArrayEquals(new double[] { 5.0, 4.0, 3.0, 2.0, 6.0, 1.0 }, testDouble);
-    assertArrayEquals(new Integer[] { 3, 2, 6, 4, 1, 5 }, testWrapper);
+    assertArrayEquals(new int[] {3, 1, 4, 2, 6, 5}, testInt);
+    assertArrayEquals(new long[] {5, 3, 2, 4, 6, 1}, testLong);
+    assertArrayEquals(new double[] {5.0, 4.0, 3.0, 2.0, 6.0, 1.0}, testDouble);
+    assertArrayEquals(new Integer[] {3, 2, 6, 4, 1, 5}, testWrapper);
   }
 
   @Test
@@ -223,7 +222,7 @@ public class RandomTests {
       Point2D rnd = Game.random().getLocation(circle);
       assertTrue(rnd.getX() >= 0, rnd.getX() + "should be >= 0");
       assertTrue(rnd.getY() >= 0, rnd.getY() + "should be >= 0");
-      
+
       assertTrue(rnd.getX() <= 100, rnd.getX() + "should be <= 0");
       assertTrue(rnd.getY() <= 100, rnd.getY() + "should be <= 0");
     }
@@ -231,7 +230,7 @@ public class RandomTests {
 
   @Test
   public void testGetIndex() {
-    double[] probabilities = new double[] { .5, .25, .125, .125 };
+    double[] probabilities = new double[] {.5, .25, .125, .125};
 
     // set seed to make results reproducible
     Game.random().setSeed(1222225);

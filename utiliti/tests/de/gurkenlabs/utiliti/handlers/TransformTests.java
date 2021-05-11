@@ -2,22 +2,20 @@ package de.gurkenlabs.utiliti.handlers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import de.gurkenlabs.utiliti.handlers.Transform.ResizeAnchor;
 import java.awt.geom.Rectangle2D;
-
 import org.junit.jupiter.api.Test;
 
-import de.gurkenlabs.utiliti.handlers.Transform.ResizeAnchor;
-
-public class TransformTests {
+class TransformTests {
   @Test
-  public void testAnchorUpdate() {
+  void testAnchorUpdate() {
     Transform.updateAnchors();
 
     assertEquals(0, Transform.getAnchors().size());
   }
 
   @Test
-  public void testResizeTransform() {
+  void testResizeTransform() {
 
     Rectangle2D down = ResizeAnchor.DOWN.getNewBounds(10, 10, 20, 20, 10, 10);
 
@@ -77,21 +75,21 @@ public class TransformTests {
   }
 
   @Test
-  public void ensureThatResizeTransformDoesNotOvershoot() {
+  void ensureThatResizeTransformDoesNotOvershoot() {
     Rectangle2D up = ResizeAnchor.UP.getNewBounds(10, 100, 20, 20, 10, 10);
 
     assertEquals(20, up.getX());
     assertEquals(30, up.getY());
     assertEquals(10, up.getWidth());
     assertEquals(0, up.getHeight());
-    
+
     Rectangle2D upRight = ResizeAnchor.UPRIGHT.getNewBounds(10, 100, 20, 20, 10, 10);
 
     assertEquals(20, upRight.getX());
     assertEquals(30, upRight.getY());
     assertEquals(20, upRight.getWidth());
     assertEquals(0, upRight.getHeight());
-    
+
     Rectangle2D upLeft = ResizeAnchor.UPLEFT.getNewBounds(-100, 100, 20, 20, 10, 10);
 
     assertEquals(-80, upLeft.getX());

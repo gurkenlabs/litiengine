@@ -1,25 +1,21 @@
 package de.gurkenlabs.litiengine;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 public class GameTimeTests {
-  @ParameterizedTest(name="toMilliseconds_Positive ticks={0}, updateRate={1}, expected={2}")
-  @CsvSource({
-          "100, 50, 2000",
-          "450, 33, 13636",
-          "33, 100, 330"
-  })
+  @ParameterizedTest(name = "toMilliseconds_Positive ticks={0}, updateRate={1}, expected={2}")
+  @CsvSource({"100, 50, 2000", "450, 33, 13636", "33, 100, 330"})
   public void toMilliseconds_Positive(long ticks, int updateRate, long expected) {
     // arrange
     GameTime time = new GameTime();
 
     // act, assert
     assertEquals(expected, time.toMilliseconds(ticks, updateRate));
-
   }
 
   @Test
@@ -49,8 +45,10 @@ public class GameTimeTests {
     GameTime time = new GameTime();
 
     // act, assert
-    assertThrows(ArithmeticException.class, () -> {
-      long failed = time.toMilliseconds(100, 0);
-    });
+    assertThrows(
+        ArithmeticException.class,
+        () -> {
+          long failed = time.toMilliseconds(100, 0);
+        });
   }
 }

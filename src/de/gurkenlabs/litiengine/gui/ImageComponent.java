@@ -1,20 +1,18 @@
 package de.gurkenlabs.litiengine.gui;
 
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.geom.Point2D;
-import java.awt.image.BufferedImage;
-import java.util.Optional;
-
-import javax.swing.JLabel;
-
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.graphics.ImageRenderer;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.Imaging;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
+import java.util.Optional;
+import javax.swing.JLabel;
 
 public class ImageComponent extends GuiComponent {
   public static final int BACKGROUND_INDEX = 0;
@@ -40,7 +38,8 @@ public class ImageComponent extends GuiComponent {
     super(x, y, width, height);
   }
 
-  public ImageComponent(final double x, final double y, final double width, final double height, final String text) {
+  public ImageComponent(
+      final double x, final double y, final double width, final double height, final String text) {
     super(x, y, width, height);
     Font defFont = new JLabel().getFont().deriveFont((float) (this.getHeight() * 3 / 6f));
     if (this.getFont() == null) {
@@ -49,12 +48,19 @@ public class ImageComponent extends GuiComponent {
     this.setText(text);
   }
 
-  public ImageComponent(final double x, final double y, final double width, final double height, final Image image) {
+  public ImageComponent(
+      final double x, final double y, final double width, final double height, final Image image) {
     super(x, y, width, height);
     this.setImage(image);
   }
 
-  public ImageComponent(final double x, final double y, final double width, final double height, final Spritesheet spritesheet, final String text,
+  public ImageComponent(
+      final double x,
+      final double y,
+      final double width,
+      final double height,
+      final Spritesheet spritesheet,
+      final String text,
       final Image image) {
     this(x, y, width, height, text);
     this.spritesheet = spritesheet;
@@ -71,23 +77,39 @@ public class ImageComponent extends GuiComponent {
     }
 
     final String cacheKey =
-        this.getSpritesheet().getName().hashCode() + "_" + this.isHovered() + "_" + this.isPressed() + "_" + this.isEnabled() + "_" + this.getWidth()
-            + "x" + this.getHeight();
+        this.getSpritesheet().getName().hashCode()
+            + "_"
+            + this.isHovered()
+            + "_"
+            + this.isPressed()
+            + "_"
+            + this.isEnabled()
+            + "_"
+            + this.getWidth()
+            + "x"
+            + this.getHeight();
     Optional<BufferedImage> opt = Resources.images().tryGet(cacheKey);
     if (opt.isPresent()) {
       return opt.get();
     }
 
     int spriteIndex = BACKGROUND_INDEX;
-    if (!this.isEnabled() && this.getSpritesheet().getTotalNumberOfSprites() > BACKGROUND_DISABLED_INDEX) {
+    if (!this.isEnabled()
+        && this.getSpritesheet().getTotalNumberOfSprites() > BACKGROUND_DISABLED_INDEX) {
       spriteIndex = BACKGROUND_DISABLED_INDEX;
-    } else if (this.isPressed() && this.getSpritesheet().getTotalNumberOfSprites() > BACKGROUND_PRESSED_INDEX) {
+    } else if (this.isPressed()
+        && this.getSpritesheet().getTotalNumberOfSprites() > BACKGROUND_PRESSED_INDEX) {
       spriteIndex = BACKGROUND_PRESSED_INDEX;
-    } else if (this.isHovered() && this.getSpritesheet().getTotalNumberOfSprites() > BACKGROUND_HOVER_INDEX) {
+    } else if (this.isHovered()
+        && this.getSpritesheet().getTotalNumberOfSprites() > BACKGROUND_HOVER_INDEX) {
       spriteIndex = BACKGROUND_HOVER_INDEX;
     }
 
-    BufferedImage img = Imaging.scale(this.getSpritesheet().getSprite(spriteIndex), (int) this.getWidth(), (int) this.getHeight());
+    BufferedImage img =
+        Imaging.scale(
+            this.getSpritesheet().getSprite(spriteIndex),
+            (int) this.getWidth(),
+            (int) this.getHeight());
     if (img != null) {
       Resources.images().add(cacheKey, img);
     }
@@ -104,17 +126,18 @@ public class ImageComponent extends GuiComponent {
     boolean keepRatio;
 
     switch (this.getImageScaleMode()) {
-    case STRETCH:
-      keepRatio = false;
-      break;
-    case FIT:
-      keepRatio = true;
-      break;
-    default:
-      return;
+      case STRETCH:
+        keepRatio = false;
+        break;
+      case FIT:
+        keepRatio = true;
+        break;
+      default:
+        return;
     }
 
-    final String cacheKey = String.format("%s_%dx%d_%b", this.baseImage.hashCode(), imageWidth, imageHeight, keepRatio);
+    final String cacheKey =
+        String.format("%s_%dx%d_%b", this.baseImage.hashCode(), imageWidth, imageHeight, keepRatio);
 
     Optional<BufferedImage> opt = Resources.images().tryGet(cacheKey);
     if (opt.isPresent()) {

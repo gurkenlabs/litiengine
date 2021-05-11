@@ -18,6 +18,7 @@ public class MousePathController extends MovementController<IMobileEntity> {
   public EntityNavigator getNavigator() {
     return this.navigator;
   }
+
   @Override
   public void update() {
     super.update();

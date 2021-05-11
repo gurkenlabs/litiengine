@@ -17,7 +17,15 @@ public class NumberAdjuster extends TextFieldComponent {
   private BigDecimal currentValue;
   private final List<Consumer<BigDecimal>> valueChangeConsumers;
 
-  public NumberAdjuster(final double x, final double y, final double width, final double height,  final double lowerBound, final double upperBound, final double startValue, final double stepSize) {
+  public NumberAdjuster(
+      final double x,
+      final double y,
+      final double width,
+      final double height,
+      final double lowerBound,
+      final double upperBound,
+      final double startValue,
+      final double stepSize) {
     super(x, y, width, height, Double.toString(startValue));
     this.valueChangeConsumers = new CopyOnWriteArrayList<>();
     this.lowerBound = BigDecimal.valueOf(lowerBound);
@@ -57,8 +65,20 @@ public class NumberAdjuster extends TextFieldComponent {
 
   @Override
   public void prepare() {
-    ImageComponent buttonUp = new ImageComponent(this.getX() + this.getWidth(), this.getY(), this.getHeight() / 2, this.getHeight() / 2,  ARROW_UP.getText());
-    ImageComponent buttonDown = new ImageComponent(this.getX() + this.getWidth(), this.getY() + this.getHeight() / 2, this.getHeight() / 2, this.getHeight() / 2, ARROW_DOWN.getText());
+    ImageComponent buttonUp =
+        new ImageComponent(
+            this.getX() + this.getWidth(),
+            this.getY(),
+            this.getHeight() / 2,
+            this.getHeight() / 2,
+            ARROW_UP.getText());
+    ImageComponent buttonDown =
+        new ImageComponent(
+            this.getX() + this.getWidth(),
+            this.getY() + this.getHeight() / 2,
+            this.getHeight() / 2,
+            this.getHeight() / 2,
+            ARROW_DOWN.getText());
     buttonUp.setFont(ARROW_UP.getFont());
     buttonDown.setFont(ARROW_UP.getFont());
 
@@ -67,13 +87,14 @@ public class NumberAdjuster extends TextFieldComponent {
     super.prepare();
     buttonUp.onClicked(c -> this.increment());
     buttonDown.onClicked(c -> this.decrement());
-    this.onChangeConfirmed(e -> {
-      try {
-        this.setCurrentValue(BigDecimal.valueOf(Double.parseDouble(this.getText())));
-      } catch (final Exception ex) {
-        log.log(Level.SEVERE, ex.getMessage(), ex);
-      }
-    });
+    this.onChangeConfirmed(
+        e -> {
+          try {
+            this.setCurrentValue(BigDecimal.valueOf(Double.parseDouble(this.getText())));
+          } catch (final Exception ex) {
+            log.log(Level.SEVERE, ex.getMessage(), ex);
+          }
+        });
   }
 
   public void setCurrentValue(final BigDecimal newValue) {
@@ -86,7 +107,6 @@ public class NumberAdjuster extends TextFieldComponent {
     }
     this.setText(this.getCurrentValue() + "");
     this.valueChangeConsumers.forEach(c -> c.accept(this.getCurrentValue()));
-
   }
 
   public void setLowerBound(final BigDecimal lowerBound) {

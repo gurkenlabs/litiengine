@@ -1,41 +1,41 @@
 package de.gurkenlabs.litiengine.gui;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.Test;
+
 public class CheckBoxTests {
-    @Test
-    public void testSetChecked() {
-        // arrange
-        CheckBox box = new CheckBox(1, 2, 3, 4, null, false);
+  @Test
+  public void testSetChecked() {
+    // arrange
+    CheckBox box = new CheckBox(1, 2, 3, 4, null, false);
 
-        assertFalse(box.isChecked());
-        assertEquals(CheckBox.CROSS.getText(), box.getText());
+    assertFalse(box.isChecked());
+    assertEquals(CheckBox.CROSS.getText(), box.getText());
 
-        // act
-        box.setChecked(true);
+    // act
+    box.setChecked(true);
 
-        // assert
-        assertTrue(box.isChecked());
-        assertEquals(CheckBox.CHECK.getText(), box.getText());
-    }
+    // assert
+    assertTrue(box.isChecked());
+    assertEquals(CheckBox.CHECK.getText(), box.getText());
+  }
 
-    @Test
-    public void testSetUnchecked() {
-        // arrange
-        CheckBox box = new CheckBox(1, 2, 3, 4, null, true);
+  @Test
+  public void testSetUnchecked() {
+    // arrange
+    CheckBox box = new CheckBox(1, 2, 3, 4, null, true);
 
-        assertTrue(box.isChecked());
-        assertEquals(CheckBox.CHECK.getText(), box.getText());
+    assertTrue(box.isChecked());
+    assertEquals(CheckBox.CHECK.getText(), box.getText());
 
-        // act
-        box.setChecked(false);
+    // act
+    box.setChecked(false);
 
-        // assert
-        assertFalse(box.isChecked());
-        assertEquals(CheckBox.CROSS.getText(), box.getText());
-    }
+    // assert
+    assertFalse(box.isChecked());
+    assertEquals(CheckBox.CROSS.getText(), box.getText());
+  }
 }

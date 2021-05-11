@@ -13,7 +13,16 @@ public class RectangleParticle extends ShapeParticle {
 
   @Override
   protected Shape getShape(Point2D emitterOrigin) {
-    final AffineTransform rotate = AffineTransform.getRotateInstance(Math.toRadians(this.getAngle()), this.getAbsoluteX(emitterOrigin) + this.getWidth() * 0.5, this.getAbsoluteY(emitterOrigin) + this.getHeight() * 0.5);
-    return rotate.createTransformedShape(new Rectangle2D.Float(this.getAbsoluteX(emitterOrigin), this.getAbsoluteY(emitterOrigin), this.getWidth(), this.getHeight()));
+    final AffineTransform rotate =
+        AffineTransform.getRotateInstance(
+            Math.toRadians(this.getAngle()),
+            this.getAbsoluteX(emitterOrigin) + this.getWidth() * 0.5,
+            this.getAbsoluteY(emitterOrigin) + this.getHeight() * 0.5);
+    return rotate.createTransformedShape(
+        new Rectangle2D.Float(
+            this.getAbsoluteX(emitterOrigin),
+            this.getAbsoluteY(emitterOrigin),
+            this.getWidth(),
+            this.getHeight()));
   }
 }

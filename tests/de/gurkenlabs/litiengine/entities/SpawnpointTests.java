@@ -1,14 +1,21 @@
 package de.gurkenlabs.litiengine.entities;
 
-import de.gurkenlabs.litiengine.*;
-import de.gurkenlabs.litiengine.environment.*;
-import de.gurkenlabs.litiengine.environment.tilemap.*;
-import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-import java.awt.*;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import de.gurkenlabs.litiengine.Direction;
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.GameTest;
+import de.gurkenlabs.litiengine.environment.Environment;
+import de.gurkenlabs.litiengine.environment.tilemap.IMap;
+import java.awt.Dimension;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class SpawnpointTests {
   private Environment testEnvironment;

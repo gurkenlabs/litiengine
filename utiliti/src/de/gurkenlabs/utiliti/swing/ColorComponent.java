@@ -1,11 +1,14 @@
 package de.gurkenlabs.utiliti.swing;
 
+import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.util.ColorHelper;
+import de.gurkenlabs.utiliti.SwingHelpers;
+import de.gurkenlabs.utiliti.swing.panels.PropertyPanel;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
@@ -16,11 +19,6 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SpinnerNumberModel;
-
-import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.litiengine.util.ColorHelper;
-import de.gurkenlabs.utiliti.SwingHelpers;
-import de.gurkenlabs.utiliti.swing.panels.PropertyPanel;
 
 @SuppressWarnings("serial")
 public class ColorComponent extends JPanel {
@@ -43,35 +41,88 @@ public class ColorComponent extends JPanel {
 
     this.btnSelectColor = new JButton();
     this.btnSelectColor.setIcon(Icons.COLOR);
-    this.btnSelectColor.addActionListener(a -> {
-      final Color result = JColorChooser.showDialog(null, Resources.strings().get("panel_selectAmbientColor"), ColorHelper.decode(this.textFieldColor.getText()));
-      this.setColor(result);
-    });
+    this.btnSelectColor.addActionListener(
+        a -> {
+          final Color result =
+              JColorChooser.showDialog(
+                  null,
+                  Resources.strings().get("panel_selectAmbientColor"),
+                  ColorHelper.decode(this.textFieldColor.getText()));
+          this.setColor(result);
+        });
 
     final JLabel lblAlpha = new JLabel(Resources.strings().get("panel_alpha"));
 
     this.spinnerAlpha = new JSpinner();
 
     this.spinnerAlpha.setModel(new SpinnerNumberModel(0, 0, 255, 5));
-    this.spinnerAlpha.addChangeListener(a -> {
-      final Color oldColor = ColorHelper.decode(this.textFieldColor.getText());
-      if (oldColor == null) {
-        return;
-      }
+    this.spinnerAlpha.addChangeListener(
+        a -> {
+          final Color oldColor = ColorHelper.decode(this.textFieldColor.getText());
+          if (oldColor == null) {
+            return;
+          }
 
-      final Color newColor = new Color(oldColor.getRed(), oldColor.getGreen(), oldColor.getBlue(), (int) this.spinnerAlpha.getValue());
-      this.setColor(newColor);
-    });
+          final Color newColor =
+              new Color(
+                  oldColor.getRed(),
+                  oldColor.getGreen(),
+                  oldColor.getBlue(),
+                  (int) this.spinnerAlpha.getValue());
+          this.setColor(newColor);
+        });
 
     ControlBehavior.apply(this.spinnerAlpha);
 
     GroupLayout groupLayout = new GroupLayout(this);
-    groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-        .addGroup(groupLayout.createSequentialGroup().addComponent(btnSelectColor, PropertyPanel.CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE).addPreferredGap(ComponentPlacement.RELATED).addComponent(textFieldColor, GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE))
-        .addGroup(groupLayout.createSequentialGroup().addComponent(lblAlpha).addPreferredGap(ComponentPlacement.RELATED).addComponent(spinnerAlpha, GroupLayout.DEFAULT_SIZE, 95, Short.MAX_VALUE)));
-    groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup()
-        .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(btnSelectColor, PropertyPanel.CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE).addComponent(textFieldColor, GroupLayout.PREFERRED_SIZE, PropertyPanel.CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE))
-        .addGap(PropertyPanel.CONTROL_MARGIN).addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(lblAlpha).addComponent(spinnerAlpha, PropertyPanel.CONTROL_HEIGHT, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))));
+    groupLayout.setHorizontalGroup(
+        groupLayout
+            .createParallelGroup(Alignment.LEADING)
+            .addGroup(
+                groupLayout
+                    .createSequentialGroup()
+                    .addComponent(
+                        btnSelectColor,
+                        PropertyPanel.CONTROL_HEIGHT,
+                        GroupLayout.PREFERRED_SIZE,
+                        GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(ComponentPlacement.RELATED)
+                    .addComponent(textFieldColor, GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE))
+            .addGroup(
+                groupLayout
+                    .createSequentialGroup()
+                    .addComponent(lblAlpha)
+                    .addPreferredGap(ComponentPlacement.RELATED)
+                    .addComponent(spinnerAlpha, GroupLayout.DEFAULT_SIZE, 95, Short.MAX_VALUE)));
+    groupLayout.setVerticalGroup(
+        groupLayout
+            .createParallelGroup(Alignment.LEADING)
+            .addGroup(
+                groupLayout
+                    .createSequentialGroup()
+                    .addGroup(
+                        groupLayout
+                            .createParallelGroup(Alignment.BASELINE)
+                            .addComponent(
+                                btnSelectColor,
+                                PropertyPanel.CONTROL_HEIGHT,
+                                GroupLayout.PREFERRED_SIZE,
+                                GroupLayout.PREFERRED_SIZE)
+                            .addComponent(
+                                textFieldColor,
+                                GroupLayout.PREFERRED_SIZE,
+                                PropertyPanel.CONTROL_HEIGHT,
+                                GroupLayout.PREFERRED_SIZE))
+                    .addGap(PropertyPanel.CONTROL_MARGIN)
+                    .addGroup(
+                        groupLayout
+                            .createParallelGroup(Alignment.BASELINE)
+                            .addComponent(lblAlpha)
+                            .addComponent(
+                                spinnerAlpha,
+                                PropertyPanel.CONTROL_HEIGHT,
+                                GroupLayout.DEFAULT_SIZE,
+                                GroupLayout.PREFERRED_SIZE))));
     setLayout(groupLayout);
   }
 

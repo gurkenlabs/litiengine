@@ -1,9 +1,8 @@
 package de.gurkenlabs.utiliti.components;
 
-import java.util.function.Consumer;
-
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
+import java.util.function.Consumer;
 
 public interface LayerController extends Controller {
   IMapObjectLayer getCurrentLayer();

@@ -5,8 +5,7 @@ public class EntityDistanceComparator extends RelativeEntityComparator {
   /**
    * Initializes a new instance of the {@code EntityDistanceComparator} class.
    *
-   * @param relativeEntity
-   *          The entity that is used as reference for distance comparison.
+   * @param relativeEntity The entity that is used as reference for distance comparison.
    */
   public EntityDistanceComparator(final IEntity relativeEntity) {
     super(relativeEntity);

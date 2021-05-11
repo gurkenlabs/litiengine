@@ -1,16 +1,14 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
-import java.awt.LayoutManager;
-
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComboBox;
-import javax.swing.JSpinner;
-
 import de.gurkenlabs.litiengine.entities.StaticShadow;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.StaticShadowType;
 import de.gurkenlabs.utiliti.swing.Icons;
+import java.awt.LayoutManager;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
+import javax.swing.JSpinner;
 
 @SuppressWarnings("serial")
 public class StaticShadowPanel extends PropertyPanel {
@@ -21,7 +19,8 @@ public class StaticShadowPanel extends PropertyPanel {
     super("panel_staticShadow", Icons.SHADOWBOX);
 
     this.comboBoxShadowType = new JComboBox<>();
-    this.comboBoxShadowType.setModel(new DefaultComboBoxModel<StaticShadowType>(StaticShadowType.values()));
+    this.comboBoxShadowType.setModel(
+        new DefaultComboBoxModel<StaticShadowType>(StaticShadowType.values()));
 
     this.spinnerOffset = new JSpinner();
 
@@ -42,16 +41,20 @@ public class StaticShadowPanel extends PropertyPanel {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    this.comboBoxShadowType.setSelectedItem(mapObject.getEnumValue(MapObjectProperty.SHADOW_TYPE, StaticShadowType.class, StaticShadowType.NONE));
-    this.spinnerOffset.setValue(mapObject.getIntValue(MapObjectProperty.SHADOW_OFFSET, StaticShadow.DEFAULT_OFFSET));
+    this.comboBoxShadowType.setSelectedItem(
+        mapObject.getEnumValue(
+            MapObjectProperty.SHADOW_TYPE, StaticShadowType.class, StaticShadowType.NONE));
+    this.spinnerOffset.setValue(
+        mapObject.getIntValue(MapObjectProperty.SHADOW_OFFSET, StaticShadow.DEFAULT_OFFSET));
   }
-  
+
   private LayoutManager createLayout() {
-    LayoutItem[] layoutItems = new LayoutItem [] {
-        new LayoutItem("panel_shadowType", this.comboBoxShadowType),
-        new LayoutItem("panel_offset", this.spinnerOffset),
-    };
-    
+    LayoutItem[] layoutItems =
+        new LayoutItem[] {
+            new LayoutItem("panel_shadowType", this.comboBoxShadowType),
+            new LayoutItem("panel_offset", this.spinnerOffset),
+        };
+
     return this.createLayout(layoutItems);
   }
 }

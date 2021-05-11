@@ -1,8 +1,12 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
+import com.github.weisj.darklaf.components.border.DarkBorders;
+import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
+import de.gurkenlabs.utiliti.swing.Icons;
 import java.awt.Dimension;
 import java.awt.LayoutManager;
-
 import javax.swing.Box;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
@@ -10,13 +14,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
-
-import com.github.weisj.darklaf.components.border.DarkBorders;
-
-import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
-import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
-import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
-import de.gurkenlabs.utiliti.swing.Icons;
 
 @SuppressWarnings("serial")
 public class EmitterTextPanel extends PropertyPanel {
@@ -54,8 +51,10 @@ public class EmitterTextPanel extends PropertyPanel {
 
     textControls = new JPanel();
     GroupLayout grplayout = new GroupLayout(textControls);
-    grplayout.setHorizontalGroup(grplayout.createSequentialGroup().addComponent(ctrlButtonBox).addComponent(scrollPanel));
-    grplayout.setVerticalGroup(grplayout.createParallelGroup().addComponent(ctrlButtonBox).addComponent(scrollPanel));
+    grplayout.setHorizontalGroup(
+        grplayout.createSequentialGroup().addComponent(ctrlButtonBox).addComponent(scrollPanel));
+    grplayout.setVerticalGroup(
+        grplayout.createParallelGroup().addComponent(ctrlButtonBox).addComponent(scrollPanel));
     textControls.setLayout(grplayout);
 
     setLayout(createLayout());
@@ -71,11 +70,10 @@ public class EmitterTextPanel extends PropertyPanel {
   @Override
   protected void setControlValues(IMapObject mapObject) {
     setTexts(mapObject.getStringValue(MapObjectProperty.Particle.TEXTS));
-
   }
 
   protected LayoutManager createLayout() {
-    LayoutItem[] layoutItems = new LayoutItem[] { new LayoutItem(textControls, CONTROL_HEIGHT * 2) };
+    LayoutItem[] layoutItems = new LayoutItem[] {new LayoutItem(textControls, CONTROL_HEIGHT * 2)};
     return this.createLayout(layoutItems);
   }
 
@@ -85,14 +83,13 @@ public class EmitterTextPanel extends PropertyPanel {
     }
     model.setRowCount(0);
     for (String colorStr : commaSeparatedTexts.split(",")) {
-      model.addRow(new Object[] { colorStr });
+      model.addRow(new Object[] {colorStr});
     }
   }
 
   private void setupChangedListeners() {
-    btnAdd.addActionListener(a -> model.addRow(new Object[] { EmitterData.DEFAULT_TEXT }));
+    btnAdd.addActionListener(a -> model.addRow(new Object[] {EmitterData.DEFAULT_TEXT}));
     btnRemove.addActionListener(a -> model.removeRow(table.getSelectedRow()));
     setup(table, MapObjectProperty.Particle.TEXTS);
-
   }
 }

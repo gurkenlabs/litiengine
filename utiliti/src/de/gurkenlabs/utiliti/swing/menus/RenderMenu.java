@@ -1,12 +1,5 @@
 package de.gurkenlabs.utiliti.swing.menus;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
@@ -16,6 +9,11 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.swing.UI;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 
 @SuppressWarnings("serial")
 public final class RenderMenu extends JMenu {
@@ -24,7 +22,9 @@ public final class RenderMenu extends JMenu {
 
     Game.world().onLoaded(e -> this.setEnabled(false));
 
-    UI.getLayerController().onLayersChanged(map -> this.updateMenu(Editor.instance().getMapComponent().getSelectedMapObjects()));
+    UI.getLayerController()
+        .onLayersChanged(
+            map -> this.updateMenu(Editor.instance().getMapComponent().getSelectedMapObjects()));
     Editor.instance().getMapComponent().onSelectionChanged(this::updateMenu);
   }
 
@@ -37,10 +37,15 @@ public final class RenderMenu extends JMenu {
     // which are always rendered at a particular
     // section of the rendering pipeline (regardless of any explicitly set
     // render types).
-    if (selectedMapObjects.isEmpty() || !selectedMapObjects.stream().allMatch(x -> {
-      MapObjectType type = MapObjectType.get(x.getType());
-      return type == MapObjectType.PROP || type == MapObjectType.CREATURE || type == MapObjectType.EMITTER;
-    })) {
+    if (selectedMapObjects.isEmpty()
+        || !selectedMapObjects.stream()
+            .allMatch(
+                x -> {
+                  MapObjectType type = MapObjectType.get(x.getType());
+                  return type == MapObjectType.PROP
+                      || type == MapObjectType.CREATURE
+                      || type == MapObjectType.EMITTER;
+                })) {
       this.setEnabled(false);
       return;
     }
@@ -91,7 +96,7 @@ public final class RenderMenu extends JMenu {
       UndoManager.instance().mapObjectChanging(object);
 
       object.removeProperty(MapObjectProperty.RENDERWITHLAYER);
-      
+
       // for default value, just clear the property
       if (renderType == RenderType.NORMAL) {
         object.removeProperty(MapObjectProperty.RENDERTYPE);

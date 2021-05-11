@@ -1,14 +1,12 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
+import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.util.ColorHelper;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
-
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
-
-import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.litiengine.util.ColorHelper;
 
 @SuppressWarnings("serial")
 public class AmbientLightPreviewPanel extends JPanel {
@@ -44,5 +42,4 @@ public class AmbientLightPreviewPanel extends JPanel {
     g.fillRect(0, 0, 82, 116);
     g.fillRect(156, 0, 72, 116);
   }
-
 }

@@ -1,27 +1,25 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
-import java.util.Hashtable;
-import java.util.Map;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
+import java.util.Hashtable;
+import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class CustomPropertyProviderTests {
 
   private CustomPropertyProvider provider;
 
   @BeforeEach
-  public void setUp(){
+  public void setUp() {
     provider = new CustomPropertyProvider();
   }
 
   @Test
-  public void testSetProperty(){
+  public void testSetProperty() {
     // arrange
     String value = "value";
 
@@ -33,7 +31,7 @@ public class CustomPropertyProviderTests {
   }
 
   @Test
-  public void testHasCustomProperty(){
+  public void testHasCustomProperty() {
     // arrange
     provider.setValue("test1", "value");
 
@@ -45,7 +43,7 @@ public class CustomPropertyProviderTests {
   }
 
   @Test
-  public void testGetProperties(){
+  public void testGetProperties() {
     // arrange
     provider.setValue("test1", "value1");
     provider.setValue("test2", "value2");
@@ -58,7 +56,7 @@ public class CustomPropertyProviderTests {
   }
 
   @Test
-  public void testSetProperties(){
+  public void testSetProperties() {
     // arrange
     Map<String, ICustomProperty> props = new Hashtable<>(2);
     props.put("test1", new CustomProperty("value1"));
@@ -71,7 +69,7 @@ public class CustomPropertyProviderTests {
   }
 
   @Test
-  public void testSetPropertiesNull(){
+  public void testSetPropertiesNull() {
     // arrange
     Map<String, ICustomProperty> props = new Hashtable<>(2);
     props.put("test42", new CustomProperty("value42"));

@@ -1,10 +1,9 @@
 package de.gurkenlabs.litiengine.physics;
 
-import java.awt.geom.Point2D;
-
 import de.gurkenlabs.litiengine.Direction;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
+import java.awt.geom.Point2D;
 
 public class GravityForce extends Force {
   private final float directionAngle;
@@ -35,7 +34,10 @@ public class GravityForce extends Force {
 
   @Override
   public Point2D getLocation() {
-    return GeometricUtilities.project(this.getForceEntity().getCenter(), this.directionAngle, Math.max(this.forceEntity.getHeight(), this.forceEntity.getWidth() * 2 + this.getStrength()));
+    return GeometricUtilities.project(
+        this.getForceEntity().getCenter(),
+        this.directionAngle,
+        Math.max(
+            this.forceEntity.getHeight(), this.forceEntity.getWidth() * 2 + this.getStrength()));
   }
-
 }

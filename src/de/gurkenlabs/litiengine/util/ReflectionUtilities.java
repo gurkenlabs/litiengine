@@ -1,7 +1,6 @@
 package de.gurkenlabs.litiengine.util;
 
 import de.gurkenlabs.litiengine.entities.Material;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -42,7 +41,10 @@ public final class ReflectionUtilities {
       }
     }
 
-    log.log(Level.WARNING, "Could not find field [{0}] on class [{1}] or its parents.", new Object[]{fieldName, cls});
+    log.log(
+        Level.WARNING,
+        "Could not find field [{0}] on class [{1}] or its parents.",
+        new Object[] {fieldName, cls});
     return null;
   }
 
@@ -64,7 +66,7 @@ public final class ReflectionUtilities {
    * Recursively gets all fields of the specified type, respecting parent classes.
    *
    * @param fields The list containing all fields.
-   * @param type   The type to retrieve the fields from.
+   * @param type The type to retrieve the fields from.
    * @return All fields of the specified type, including the fields of the parent classes.
    */
   public static List<Field> getAllFields(List<Field> fields, Class<?> type) {
@@ -78,10 +80,11 @@ public final class ReflectionUtilities {
   }
 
   /**
-   * Recursively gets a method by the the specified name respecting the parent classes and the parameters of the declaration.
+   * Recursively gets a method by the the specified name respecting the parent classes and the
+   * parameters of the declaration.
    *
-   * @param name           The name of the method.
-   * @param type           The type on which to search for the method.
+   * @param name The name of the method.
+   * @param type The type on which to search for the method.
    * @param parameterTypes The types of the parameters defined by the method declaration.
    * @return The found method or null if no such method exists.
    */
@@ -98,7 +101,8 @@ public final class ReflectionUtilities {
     return method;
   }
 
-  public static <T, C> boolean setValue(Class<C> cls, Object instance, final String fieldName, final T value) {
+  public static <T, C> boolean setValue(
+      Class<C> cls, Object instance, final String fieldName, final T value) {
     try {
       final Method method = getSetter(cls, fieldName);
       if (method != null) {
@@ -108,7 +112,10 @@ public final class ReflectionUtilities {
       } else {
         // if no setter is present, try to set the field directly
         for (final Field field : cls.getDeclaredFields()) {
-          if (field.getName().equals(fieldName) && (field.getType() == value.getClass() || isWrapperType(field.getType(), value.getClass()) || isWrapperType(value.getClass(), field.getType()))) {
+          if (field.getName().equals(fieldName)
+              && (field.getType() == value.getClass()
+                  || isWrapperType(field.getType(), value.getClass())
+                  || isWrapperType(value.getClass(), field.getType()))) {
             if (!field.isAccessible()) {
               field.setAccessible(true);
             }
@@ -118,19 +125,24 @@ public final class ReflectionUtilities {
           }
         }
       }
-    } catch (final SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+    } catch (final SecurityException
+        | IllegalAccessException
+        | IllegalArgumentException
+        | InvocationTargetException e) {
       log.log(Level.SEVERE, String.format("%s (%s-%s)", e.getMessage(), fieldName, value), e);
     }
 
     return false;
   }
 
-  public static <T> boolean setEnumPropertyValue(Class<T> cls, Object instance, final Field field, String propertyName, String value) {
+  public static <T> boolean setEnumPropertyValue(
+      Class<T> cls, Object instance, final Field field, String propertyName, String value) {
     final Object[] enumArray = field.getType().getEnumConstants();
 
     for (final Object enumConst : enumArray) {
       if (enumConst != null && enumConst.toString().equalsIgnoreCase(value)) {
-        return ReflectionUtilities.setValue(cls, instance, propertyName, field.getType().cast(enumConst));
+        return ReflectionUtilities.setValue(
+            cls, instance, propertyName, field.getType().cast(enumConst));
       }
     }
 
@@ -213,7 +225,8 @@ public final class ReflectionUtilities {
     return false;
   }
 
-  public static <T> boolean setFieldValue(final Class<T> cls, final Object instance, final String fieldName, final String value) {
+  public static <T> boolean setFieldValue(
+      final Class<T> cls, final Object instance, final String fieldName, final String value) {
     // if a setter is present, instance method will use it, otherwise it will
     // directly try to set the field.
     final Field field = getField(cls, fieldName);
@@ -258,11 +271,16 @@ public final class ReflectionUtilities {
     return false;
   }
 
-  public static List<Method> getMethodsAnnotatedWith(final Class<?> type, final Class<? extends Annotation> annotation) {
+  public static List<Method> getMethodsAnnotatedWith(
+      final Class<?> type, final Class<? extends Annotation> annotation) {
     final List<Method> methods = new ArrayList<>();
     Class<?> clazz = type;
-    while (clazz != Object.class) { // need to iterated thought hierarchy in order to retrieve methods from above the current instance
-      // iterate though the list of methods declared in the class represented by class variable, and add those annotated with the specified annotation
+    while (clazz
+        != Object
+            .class) { // need to iterated thought hierarchy in order to retrieve methods from above
+                      // the current instance
+      // iterate though the list of methods declared in the class represented by class variable, and
+      // add those annotated with the specified annotation
       final List<Method> allMethods = new ArrayList<>(Arrays.asList(clazz.getDeclaredMethods()));
       for (final Method method : allMethods) {
         if (method.isAnnotationPresent(annotation)) {
@@ -277,10 +295,10 @@ public final class ReflectionUtilities {
 
   /**
    * Gets the events for the specified type.
-   * <p>
-   * This will search for all methods that have a parameter of type {@code EventListener} and match the LITIENGINE's naming conventions
-   * for event subscription (i.e. the method name starts with one of the prefixes "add" or "on".
-   * </p>
+   *
+   * <p>This will search for all methods that have a parameter of type {@code EventListener} and
+   * match the LITIENGINE's naming conventions for event subscription (i.e. the method name starts
+   * with one of the prefixes "add" or "on".
    *
    * @param type The type to inspect the events on.
    * @return All methods on the specified type that are considered to be events.
@@ -292,12 +310,18 @@ public final class ReflectionUtilities {
 
     final List<Method> events = new ArrayList<>();
     Class<?> clazz = type;
-    while (clazz != Object.class) { // need to iterated thought hierarchy in order to retrieve methods from above the current instance
-      // iterate though the list of methods declared in the class represented by class variable, and add those annotated with the specified annotation
+    while (clazz
+        != Object
+            .class) { // need to iterated thought hierarchy in order to retrieve methods from above
+                      // the current instance
+      // iterate though the list of methods declared in the class represented by class variable, and
+      // add those annotated with the specified annotation
       final List<Method> allMethods = new ArrayList<>(Arrays.asList(clazz.getDeclaredMethods()));
       for (final Method method : allMethods) {
         for (Class<?> paramtype : method.getParameterTypes()) {
-          if (EventListener.class.isAssignableFrom(paramtype) && (method.getName().startsWith(eventAddPrefix) || method.getName().startsWith(eventOnPrefix))) {
+          if (EventListener.class.isAssignableFrom(paramtype)
+              && (method.getName().startsWith(eventAddPrefix)
+                  || method.getName().startsWith(eventOnPrefix))) {
             events.add(method);
           }
         }

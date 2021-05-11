@@ -1,7 +1,6 @@
 package de.gurkenlabs.litiengine.input;
 
 import java.util.EventObject;
-
 import net.java.games.input.Component;
 
 public class GamepadEvent extends EventObject {
@@ -32,11 +31,10 @@ public class GamepadEvent extends EventObject {
   }
 
   /**
-   * Gets the data from the last time the component has been polled.
-   * If this axis is a button, the value returned will be either 0.0f or 1.0f.
-   * If this axis is normalized, the value returned will be between -1.0f and
-   * 1.0f.
-   * 
+   * Gets the data from the last time the component has been polled. If this axis is a button, the
+   * value returned will be either 0.0f or 1.0f. If this axis is normalized, the value returned will
+   * be between -1.0f and 1.0f.
+   *
    * @return The last poll value of the component of this event.
    */
   public float getValue() {
@@ -45,7 +43,7 @@ public class GamepadEvent extends EventObject {
 
   /**
    * Gets the identifier of the component that caused this event.
-   * 
+   *
    * @return The human-readable name of the component.
    */
   public String getComponent() {
@@ -54,7 +52,7 @@ public class GamepadEvent extends EventObject {
 
   /**
    * Gets the gamepad that caused the event.
-   * 
+   *
    * @return The gamepad of this event.
    */
   public Gamepad getGamepad() {
@@ -62,10 +60,9 @@ public class GamepadEvent extends EventObject {
   }
 
   /**
-   * Returns {@code true} if data returned from {@code poll}
-   * is relative to the last call, or {@code false} if data
-   * is absolute.
-   * 
+   * Returns {@code true} if data returned from {@code poll} is relative to the last call, or {@code
+   * false} if data is absolute.
+   *
    * @return True if the data is relative; otherwise false.
    */
   public boolean isRelative() {
@@ -74,7 +71,7 @@ public class GamepadEvent extends EventObject {
 
   /**
    * Returns whether or not the axis is analog, or false if it is digital.
-   * 
+   *
    * @return True if the component is analog; otherwise false.
    */
   public boolean isAnalog() {

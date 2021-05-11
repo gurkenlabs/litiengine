@@ -6,16 +6,14 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.environment.tilemap.IMap;
+import de.gurkenlabs.litiengine.sound.Sound;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-
 import org.junit.jupiter.api.Test;
-
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.environment.tilemap.IMap;
-import de.gurkenlabs.litiengine.sound.Sound;
 
 public class ResourcesTests {
 
@@ -52,14 +50,17 @@ public class ResourcesTests {
 
   @Test
   public void testMapResourcesAlias() {
-    IMap map = Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
+    IMap map =
+        Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
 
     assertEquals(map, Resources.maps().get("test-map"));
   }
 
   @Test
   public void testResourceFromWeb() throws IOException {
-    try (InputStream stream = Resources.get("https://github.com/gurkenlabs/litiengine/raw/master/resources/litiengine-banner.png")) {
+    try (InputStream stream =
+        Resources.get(
+            "https://github.com/gurkenlabs/litiengine/raw/master/resources/litiengine-banner.png")) {
       assertNotNull(stream);
     }
   }
@@ -73,22 +74,27 @@ public class ResourcesTests {
     assertEquals("bip", sound.getName());
     assertNull(nonExisting);
   }
-  
+
   @Test
   public void testReadStringResources() {
-    String fileContent = Resources.read("tests/de/gurkenlabs/litiengine/resources/stringfile-utf8.txt");
+    String fileContent =
+        Resources.read("tests/de/gurkenlabs/litiengine/resources/stringfile-utf8.txt");
     assertEquals("my utf8 èncöded strîng!!1$", fileContent);
   }
-  
+
   @Test
   public void testReadStringCharsetResources() {
-    String fileContent = Resources.read("tests/de/gurkenlabs/litiengine/resources/stringfile-iso8859-1.txt", StandardCharsets.ISO_8859_1);
+    String fileContent =
+        Resources.read(
+            "tests/de/gurkenlabs/litiengine/resources/stringfile-iso8859-1.txt",
+            StandardCharsets.ISO_8859_1);
     assertEquals("my iso8859 èncöded strîng!!1$", fileContent);
   }
 
   @Test
   public void testStringList() {
-    String[] strings = Resources.strings().getList("tests/de/gurkenlabs/litiengine/resources/test.txt");
+    String[] strings =
+        Resources.strings().getList("tests/de/gurkenlabs/litiengine/resources/test.txt");
 
     assertEquals(4, strings.length);
 
@@ -131,7 +137,7 @@ public class ResourcesTests {
   }
 
   @Test
-  public void testStringsWithNoArgs(){
+  public void testStringsWithNoArgs() {
     final String bundleName = "de/gurkenlabs/litiengine/resources/custom-strings";
 
     String result = Resources.strings().getFrom(bundleName, "mystring", new Object[1]);

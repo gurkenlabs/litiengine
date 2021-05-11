@@ -1,19 +1,17 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
-import java.awt.LayoutManager;
-
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
-
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.LightSource;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.utiliti.swing.ColorComponent;
 import de.gurkenlabs.utiliti.swing.Icons;
+import java.awt.LayoutManager;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 
 @SuppressWarnings("serial")
 public class LightSourcePanel extends PropertyPanel {
@@ -30,7 +28,8 @@ public class LightSourcePanel extends PropertyPanel {
     this.colorControl = new ColorComponent();
 
     this.comboBoxLightShape = new JComboBox<>();
-    this.comboBoxLightShape.setModel(new DefaultComboBoxModel<>(new String[] { "ellipse", "rectangle" }));
+    this.comboBoxLightShape.setModel(
+        new DefaultComboBoxModel<>(new String[] {"ellipse", "rectangle"}));
 
     this.spinnerIntensity = new JSpinner(new SpinnerNumberModel(0, 0, 255, 5));
     this.checkBoxIsActive = new JCheckBox("is active");
@@ -42,6 +41,7 @@ public class LightSourcePanel extends PropertyPanel {
     setLayout(this.createLayout());
     this.setupChangedListeners();
   }
+
   @Override
   public void bind(IMapObject mapObject) {
     super.bind(mapObject);
@@ -62,22 +62,36 @@ public class LightSourcePanel extends PropertyPanel {
     final String active = mapObject.getStringValue(MapObjectProperty.LIGHT_ACTIVE);
 
     boolean isActive = active == null || active.isEmpty() || Boolean.parseBoolean(active);
-    this.spinnerIntensity.setValue(mapObject.getIntValue(MapObjectProperty.LIGHT_INTENSITY, LightSource.DEFAULT_INTENSITY));
+    this.spinnerIntensity.setValue(
+        mapObject.getIntValue(MapObjectProperty.LIGHT_INTENSITY, LightSource.DEFAULT_INTENSITY));
     this.colorControl.setHexColor(color);
     this.comboBoxLightShape.setSelectedItem(shape);
     this.checkBoxIsActive.setSelected(isActive);
-    this.offsetX.setValue((int) Math.max(Math.min(100 * mapObject.getDoubleValue(MapObjectProperty.LIGHT_FOCUSOFFSETX), 100), -100));
-    this.offsetY.setValue((int) Math.max(Math.min(100 * mapObject.getDoubleValue(MapObjectProperty.LIGHT_FOCUSOFFSETY), 100), -100));
+    this.offsetX.setValue(
+        (int)
+            Math.max(
+                Math.min(100 * mapObject.getDoubleValue(MapObjectProperty.LIGHT_FOCUSOFFSETX), 100),
+                -100));
+    this.offsetY.setValue(
+        (int)
+            Math.max(
+                Math.min(100 * mapObject.getDoubleValue(MapObjectProperty.LIGHT_FOCUSOFFSETY), 100),
+                -100));
   }
 
   private void setupChangedListeners() {
-    this.colorControl.addActionListener(new MapObjectPropertyActionListener(m -> {
-      if (getDataSource() != null) {
-        getDataSource().setValue(MapObjectProperty.LIGHT_COLOR, this.colorControl.getHexColor());
-        getDataSource().setValue(MapObjectProperty.LIGHT_INTENSITY, (int) this.spinnerIntensity.getValue());
-        Game.world().environment().updateLighting(getDataSource().getBoundingBox());
-      }
-    }));
+    this.colorControl.addActionListener(
+        new MapObjectPropertyActionListener(
+            m -> {
+              if (getDataSource() != null) {
+                getDataSource()
+                    .setValue(MapObjectProperty.LIGHT_COLOR, this.colorControl.getHexColor());
+                getDataSource()
+                    .setValue(
+                        MapObjectProperty.LIGHT_INTENSITY, (int) this.spinnerIntensity.getValue());
+                Game.world().environment().updateLighting(getDataSource().getBoundingBox());
+              }
+            }));
     this.setup(this.spinnerIntensity, MapObjectProperty.LIGHT_INTENSITY);
     this.spinnerIntensity.addChangeListener(m -> this.updateLighting());
 
@@ -109,8 +123,15 @@ public class LightSourcePanel extends PropertyPanel {
 
   private LayoutManager createLayout() {
 
-    LayoutItem[] layoutItems = new LayoutItem[] { new LayoutItem("panel_shape", this.comboBoxLightShape), new LayoutItem("panel_color", this.colorControl, this.colorControl.getPreferredSize().height), new LayoutItem("panel_intensity", this.spinnerIntensity), new LayoutItem("offsetX", this.offsetX),
-        new LayoutItem("offsetY", this.offsetY), };
+    LayoutItem[] layoutItems =
+        new LayoutItem[] {
+            new LayoutItem("panel_shape", this.comboBoxLightShape),
+            new LayoutItem(
+                "panel_color", this.colorControl, this.colorControl.getPreferredSize().height),
+            new LayoutItem("panel_intensity", this.spinnerIntensity),
+            new LayoutItem("offsetX", this.offsetX),
+            new LayoutItem("offsetY", this.offsetY),
+        };
 
     return this.createLayout(layoutItems, this.checkBoxIsActive);
   }

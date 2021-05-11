@@ -1,14 +1,12 @@
 package de.gurkenlabs.utiliti.swing;
 
+import de.gurkenlabs.litiengine.environment.tilemap.IMap;
+import de.gurkenlabs.utiliti.UndoManager;
 import java.awt.Component;
-
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 import javax.swing.border.EmptyBorder;
-
-import de.gurkenlabs.litiengine.environment.tilemap.IMap;
-import de.gurkenlabs.utiliti.UndoManager;
 
 @SuppressWarnings("serial")
 public class MapListCellRenderer extends JLabel implements ListCellRenderer<IMap> {
@@ -18,7 +16,8 @@ public class MapListCellRenderer extends JLabel implements ListCellRenderer<IMap
   }
 
   @Override
-  public Component getListCellRendererComponent(JList<? extends IMap> list, IMap map, int index, boolean isSelected, boolean cellHasFocus) {
+  public Component getListCellRendererComponent(
+      JList<? extends IMap> list, IMap map, int index, boolean isSelected, boolean cellHasFocus) {
     if (UndoManager.hasChanges(map)) {
       setText(map.getName() + " *");
     } else {
@@ -33,5 +32,4 @@ public class MapListCellRenderer extends JLabel implements ListCellRenderer<IMap
     }
     return this;
   }
-
 }

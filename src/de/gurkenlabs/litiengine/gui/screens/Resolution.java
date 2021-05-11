@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.gui.screens;
 
+import de.gurkenlabs.litiengine.GameWindow;
 import java.awt.Dimension;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -8,20 +9,18 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.gurkenlabs.litiengine.GameWindow;
-
 /**
- * Represents the resolution of the game window consisting of the width and height and information about the ratio.
- * 
- * <p>
- * This class also provides access to predefined known resolutions of the different aspect ratios which can be used
- * to set the resolution of the {@code GameWindow}.
- * </p>
+ * Represents the resolution of the game window consisting of the width and height and information
+ * about the ratio.
+ *
+ * <p>This class also provides access to predefined known resolutions of the different aspect ratios
+ * which can be used to set the resolution of the {@code GameWindow}.
+ *
  * <ul>
- * <li>{@link Ratio4x3}</li>
- * <li>{@link Ratio5x4}</li>
- * <li>{@link Ratio16x9}</li>
- * <li>{@link Ratio16x10}</li>
+ *   <li>{@link Ratio4x3}
+ *   <li>{@link Ratio5x4}
+ *   <li>{@link Ratio16x9}
+ *   <li>{@link Ratio16x10}
  * </ul>
  *
  * @see GameWindow#setResolution(Resolution)
@@ -47,7 +46,7 @@ public class Resolution {
 
   /**
    * Gets the height of this resolution.
-   * 
+   *
    * @return The height of the resolution.
    */
   public int getHeight() {
@@ -56,7 +55,7 @@ public class Resolution {
 
   /**
    * Gets the width of this resolution.
-   * 
+   *
    * @return The width of the resolution.
    */
   public int getWidth() {
@@ -65,7 +64,7 @@ public class Resolution {
 
   /**
    * Gets the dimension of this resolution consisting of it's width and height.
-   * 
+   *
    * @return The dimension of the resolution.
    */
   public Dimension getDimension() {
@@ -87,16 +86,14 @@ public class Resolution {
 
   /**
    * Gets the aspect ratio of this resolution.
-   * 
+   *
    * @return The aspect ratio of this resolution.
    */
   public Ratio getRatio() {
     return this.ratio;
   }
 
-  /**
-   * Contains predefined {@code Resolutions} with an aspect ratio of 4:3.
-   */
+  /** Contains predefined {@code Resolutions} with an aspect ratio of 4:3. */
   public static class Ratio4x3 extends Ratio {
     public static final Resolution RES_640x480 = new Resolution(640, 480, new Ratio4x3());
     public static final Resolution RES_720x576 = new Resolution(720, 576, new Ratio4x3());
@@ -113,7 +110,7 @@ public class Resolution {
 
     /**
      * Gets all predefined resolutions with an aspect ratio of 4:3.
-     * 
+     *
      * @return All predefined resolutions with an aspect ratio of 4:3.
      */
     public static List<Resolution> getAll() {
@@ -121,9 +118,7 @@ public class Resolution {
     }
   }
 
-  /**
-   * Contains predefined {@code Resolutions} with an aspect ratio of 5:4.
-   */
+  /** Contains predefined {@code Resolutions} with an aspect ratio of 5:4. */
   public static class Ratio5x4 extends Ratio {
     public static final Resolution RES_1280x1024 = new Resolution(1280, 1024, new Ratio5x4());
 
@@ -133,7 +128,7 @@ public class Resolution {
 
     /**
      * Gets all predefined resolutions with an aspect ratio of 5:4.
-     * 
+     *
      * @return All predefined resolutions with an aspect ratio of 5:4.
      */
     public static List<Resolution> getAll() {
@@ -141,9 +136,7 @@ public class Resolution {
     }
   }
 
-  /**
-   * Contains predefined {@code Resolutions} with an aspect ratio of 16:9.
-   */
+  /** Contains predefined {@code Resolutions} with an aspect ratio of 16:9. */
   public static class Ratio16x9 extends Ratio {
     public static final Resolution RES_1280x720 = new Resolution(1280, 720, new Ratio16x9());
     public static final Resolution RES_1360x768 = new Resolution(1360, 768, new Ratio16x9());
@@ -159,7 +152,7 @@ public class Resolution {
 
     /**
      * Gets all predefined resolutions with an aspect ratio of 16:9.
-     * 
+     *
      * @return All predefined resolutions with an aspect ratio of 16:9.
      */
     public static List<Resolution> getAll() {
@@ -167,9 +160,7 @@ public class Resolution {
     }
   }
 
-  /**
-   * Contains predefined {@code Resolutions} with an aspect ratio of 16:10.
-   */
+  /** Contains predefined {@code Resolutions} with an aspect ratio of 16:10. */
   public static class Ratio16x10 extends Ratio {
     public static final Resolution RES_720x480 = new Resolution(720, 480, new Ratio16x10());
     public static final Resolution RES_1280x800 = new Resolution(1280, 800, new Ratio16x10());
@@ -183,7 +174,7 @@ public class Resolution {
 
     /**
      * Gets all predefined resolutions with an aspect ratio of 16:10.
-     * 
+     *
      * @return All predefined resolutions with an aspect ratio of 16:10.
      */
     public static List<Resolution> getAll() {
@@ -210,7 +201,9 @@ public class Resolution {
       List<Resolution> resolutions = new ArrayList<>();
 
       for (final Field field : clz.getDeclaredFields()) {
-        if (field.getType() == Resolution.class && Modifier.isStatic(field.getModifiers()) && Modifier.isPublic(field.getModifiers())) {
+        if (field.getType() == Resolution.class
+            && Modifier.isStatic(field.getModifiers())
+            && Modifier.isPublic(field.getModifiers())) {
           try {
             resolutions.add((Resolution) field.get(null));
           } catch (final IllegalArgumentException | IllegalAccessException e) {
@@ -224,7 +217,7 @@ public class Resolution {
 
     /**
      * Gets the name of this aspect ratio
-     * 
+     *
      * @return The name of this aspect ratio.
      */
     public String getName() {
@@ -233,7 +226,7 @@ public class Resolution {
 
     /**
      * Gets the x-value of this aspect ratio.
-     * 
+     *
      * @return The x-value of this aspect ratio.
      */
     public int getX() {
@@ -242,7 +235,7 @@ public class Resolution {
 
     /**
      * Gets the y-value of this aspect ratio.
-     * 
+     *
      * @return The y-value of this aspect ratio.
      */
     public int getY() {

@@ -1,15 +1,13 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
-import java.awt.LayoutManager;
-
-import javax.swing.JCheckBox;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
-
 import de.gurkenlabs.litiengine.entities.CombatEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.resources.Resources;
+import java.awt.LayoutManager;
+import javax.swing.JCheckBox;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 
 @SuppressWarnings("serial")
 public class CombatPanel extends PropertyPanel {
@@ -17,9 +15,7 @@ public class CombatPanel extends PropertyPanel {
   private JSpinner spinnerHitpoints;
   private JSpinner spinnerTeam;
 
-  /**
-   * Create the panel.
-   */
+  /** Create the panel. */
   public CombatPanel() {
     super("panel_combatEntity");
 
@@ -40,8 +36,10 @@ public class CombatPanel extends PropertyPanel {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    this.chckbxIndestructible.setSelected(mapObject.getBoolValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE));
-    this.spinnerHitpoints.setValue(mapObject.getIntValue(MapObjectProperty.COMBAT_HITPOINTS, CombatEntity.DEFAULT_HITPOINTS));
+    this.chckbxIndestructible.setSelected(
+        mapObject.getBoolValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE));
+    this.spinnerHitpoints.setValue(
+        mapObject.getIntValue(MapObjectProperty.COMBAT_HITPOINTS, CombatEntity.DEFAULT_HITPOINTS));
     this.spinnerTeam.setValue(mapObject.getIntValue(MapObjectProperty.COMBAT_TEAM));
   }
 
@@ -52,11 +50,12 @@ public class CombatPanel extends PropertyPanel {
   }
 
   private LayoutManager createLayout() {
-    LayoutItem[] layoutItems = new LayoutItem [] {
-        new LayoutItem("panel_hitpoints", this.spinnerHitpoints),
-        new LayoutItem("panel_team", this.spinnerTeam)
-    };
-    
+    LayoutItem[] layoutItems =
+        new LayoutItem[] {
+            new LayoutItem("panel_hitpoints", this.spinnerHitpoints),
+            new LayoutItem("panel_team", this.spinnerTeam)
+        };
+
     return this.createLayout(layoutItems, this.chckbxIndestructible);
   }
 }

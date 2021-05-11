@@ -5,17 +5,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.awt.geom.Line2D;
-import java.awt.geom.Rectangle2D;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.CollisionBox;
 import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
+import java.awt.geom.Line2D;
+import java.awt.geom.Rectangle2D;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class PhysicsTests {
   @BeforeEach
@@ -23,7 +21,7 @@ public class PhysicsTests {
     Game.init(Game.COMMANDLINE_ARG_NOGUI);
     Game.physics().clear();
   }
-  
+
   @AfterEach
   public void clear() {
     Game.physics().clear();

@@ -1,18 +1,5 @@
 package de.gurkenlabs.litiengine.graphics;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.text.DecimalFormat;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.EntityRenderEvent;
 import de.gurkenlabs.litiengine.entities.EntityRenderedListener;
@@ -26,10 +13,22 @@ import de.gurkenlabs.litiengine.environment.tilemap.ITile;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.physics.Collision;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.text.DecimalFormat;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * The {@code DebugRenderer} class implements default debug rendering and exposes extension points to reder your own
- * debug information via callbacks.
+ * The {@code DebugRenderer} class implements default debug rendering and exposes extension points
+ * to reder your own debug information via callbacks.
  */
 public final class DebugRenderer {
   private static List<MapRenderedListener> mapDebugListener;
@@ -45,10 +44,10 @@ public final class DebugRenderer {
   }
 
   /**
-   * Add the specified entity rendered listener to attach custom debug rendering after the default debug information for an entity has been rendered.
-   * 
-   * @param listener
-   *          The listener to add.
+   * Add the specified entity rendered listener to attach custom debug rendering after the default
+   * debug information for an entity has been rendered.
+   *
+   * @param listener The listener to add.
    */
   public static void addEntityDebugListener(EntityRenderedListener listener) {
     entityDebugListeners.add(listener);
@@ -56,20 +55,18 @@ public final class DebugRenderer {
 
   /**
    * Removes the specified entity rendered listener.
-   * 
-   * @param listener
-   *          The listener to remove.
+   *
+   * @param listener The listener to remove.
    */
   public static void removeEntityDebugListener(EntityRenderedListener listener) {
     entityDebugListeners.remove(listener);
   }
 
   /**
-   * Add the specified map rendered listener to attach custom debug rendering after layers of the type {@code GROUND} have beend rendered.
-   * 
-   * @param listener
-   *          The listener to add.
-   * 
+   * Add the specified map rendered listener to attach custom debug rendering after layers of the
+   * type {@code GROUND} have beend rendered.
+   *
+   * @param listener The listener to add.
    * @see RenderType#GROUND
    * @see Environment#render(Graphics2D)
    */
@@ -79,9 +76,8 @@ public final class DebugRenderer {
 
   /**
    * Removes the specified map rendered listener.
-   * 
-   * @param listener
-   *          The listener to remove.
+   *
+   * @param listener The listener to remove.
    */
   public static void removeMapRenderedListener(MapRenderedListener listener) {
     mapDebugListener.remove(listener);
@@ -104,12 +100,21 @@ public final class DebugRenderer {
     if (Game.config().debug().renderBoundingBoxes()) {
       g.setColor(Color.RED);
       Game.graphics().renderOutline(g, entity.getBoundingBox());
-      
+
       if (entity instanceof SoundSource) {
         final int range = ((SoundSource) entity).getRange();
-        final float[] dash1 = { 10f };
-        final BasicStroke dashed = new BasicStroke(.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, dash1, 0.0f);
-        Game.graphics().renderOutline(g, new Ellipse2D.Double(entity.getBoundingBox().getCenterX() - range, entity.getBoundingBox().getCenterY() - range, range * 2d, range * 2d), dashed);
+        final float[] dash1 = {10f};
+        final BasicStroke dashed =
+            new BasicStroke(.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, dash1, 0.0f);
+        Game.graphics()
+            .renderOutline(
+                g,
+                new Ellipse2D.Double(
+                    entity.getBoundingBox().getCenterX() - range,
+                    entity.getBoundingBox().getCenterY() - range,
+                    range * 2d,
+                    range * 2d),
+                dashed);
       }
     }
 
@@ -129,7 +134,7 @@ public final class DebugRenderer {
     if (!Game.config().debug().isDebugEnabled()) {
       return;
     }
-    
+
     // draw collision boxes from shape layer
     if (Game.config().debug().renderCollisionBoxes()) {
       final BasicStroke shapeStroke = new BasicStroke(1 / Game.world().camera().getRenderScale());
@@ -156,12 +161,17 @@ public final class DebugRenderer {
     final double x = Game.world().camera().getViewportDimensionCenter(entity).getX() + 10;
     final double y = Game.world().camera().getViewportDimensionCenter(entity).getY();
     TextRenderer.render(g, Integer.toString(entity.getMapId()), x, y);
-    final String locationString = new DecimalFormat("##.##").format(entity.getX()) + ";" + new DecimalFormat("##.##").format(entity.getY());
+    final String locationString =
+        new DecimalFormat("##.##").format(entity.getX())
+            + ";"
+            + new DecimalFormat("##.##").format(entity.getY());
     TextRenderer.render(g, locationString, x, y + 5.0);
   }
 
-  private static void drawTileBoundingBox(final Graphics2D g, final IMap map, final Point2D location) {
-    final Rectangle2D playerTile = map.getOrientation().getEnclosingTileShape(location, map).getBounds2D();
+  private static void drawTileBoundingBox(
+      final Graphics2D g, final IMap map, final Point2D location) {
+    final Rectangle2D playerTile =
+        map.getOrientation().getEnclosingTileShape(location, map).getBounds2D();
 
     // draw rect
     g.setColor(Color.CYAN);
@@ -172,8 +182,13 @@ public final class DebugRenderer {
     final String locationText = tileLocation.x + ", " + tileLocation.y;
     g.setFont(g.getFont().deriveFont(3f));
     final FontMetrics fm = g.getFontMetrics();
-    final Point2D relative = Game.world().camera().getViewportLocation(playerTile.getX(), playerTile.getY());
-    TextRenderer.render(g, locationText, (float) (relative.getX() + playerTile.getWidth() + 3), (float) (relative.getY() + fm.getHeight()));
+    final Point2D relative =
+        Game.world().camera().getViewportLocation(playerTile.getX(), playerTile.getY());
+    TextRenderer.render(
+        g,
+        locationText,
+        (float) (relative.getX() + playerTile.getWidth() + 3),
+        (float) (relative.getY() + fm.getHeight()));
 
     final List<ITile> tiles = MapUtilities.getTilesByPixelLocation(map, location);
     final StringBuilder sb = new StringBuilder();
@@ -181,6 +196,10 @@ public final class DebugRenderer {
       sb.append("[gid: " + tile.getGridId() + "] ");
     }
 
-    TextRenderer.render(g, sb.toString(), (float) (relative.getX() + playerTile.getWidth() + 3), (float) (relative.getY() + fm.getHeight() * 2 + 2));
+    TextRenderer.render(
+        g,
+        sb.toString(),
+        (float) (relative.getX() + playerTile.getWidth() + 3),
+        (float) (relative.getY() + fm.getHeight() * 2 + 2));
   }
 }

@@ -5,7 +5,6 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.util.EventObject;
-
 import javax.swing.DefaultCellEditor;
 import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
@@ -27,23 +26,25 @@ public class SpinnerCellEditor extends DefaultCellEditor {
     spinner = new JSpinner();
     editor = ((JSpinner.DefaultEditor) spinner.getEditor());
     textField = editor.getTextField();
-    textField.addFocusListener(new FocusAdapter() {
-      @Override
-      public void focusGained(FocusEvent fe) {
-        SwingUtilities.invokeLater(() -> {
-          if (valueSet) {
-            textField.setCaretPosition(1);
+    textField.addFocusListener(
+        new FocusAdapter() {
+          @Override
+          public void focusGained(FocusEvent fe) {
+            SwingUtilities.invokeLater(
+                () -> {
+                  if (valueSet) {
+                    textField.setCaretPosition(1);
+                  }
+                });
           }
         });
-      }
-    });
     textField.addActionListener(ae -> this.stopCellEditing());
-
   }
 
   // Prepares the spinner component and returns it.
   @Override
-  public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+  public Component getTableCellEditorComponent(
+      JTable table, Object value, boolean isSelected, int row, int column) {
     if (!valueSet) {
       spinner.setValue(value);
     }

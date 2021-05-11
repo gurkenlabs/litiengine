@@ -1,22 +1,19 @@
 package de.gurkenlabs.litiengine.graphics.emitters.xml;
 
+import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.xml.bind.JAXBException;
-
-import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 
 public class EmitterLoader {
   private static final Map<String, EmitterData> loadedEmitters;
   private static final Logger log = Logger.getLogger(EmitterLoader.class.getName());
 
-  private EmitterLoader() {
-  }
+  private EmitterLoader() {}
 
   static {
     loadedEmitters = new ConcurrentHashMap<>();
@@ -62,5 +59,4 @@ public class EmitterLoader {
     }
     return null;
   }
-
 }

@@ -25,7 +25,11 @@ public class EntityMovedEvent extends EventObject {
     return this.deltaX;
   }
 
-  public double getDeltaY() { return this.deltaY; }
+  public double getDeltaY() {
+    return this.deltaY;
+  }
 
-  public double getDistance() { return this.distance; }
+  public double getDistance() {
+    return this.distance;
+  }
 }

@@ -1,14 +1,14 @@
 package de.gurkenlabs.utiliti;
 
+import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.utiliti.components.Editor;
 import java.awt.Color;
 import java.awt.Font;
 
-import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.utiliti.components.Editor;
-
 public final class Style {
   public enum Theme {
-    LIGHT, DARK
+    LIGHT,
+    DARK
   }
 
   public static final Color COLOR_DEFAULT_BOUNDING_BOX_FILL = new Color(0, 0, 0, 35);
@@ -38,9 +38,12 @@ public final class Style {
   public static final float FONT_DEFAULT_SIZE = 13;
   public static final float FONT_HEADER_SIZE = 14;
   public static final String FONTNAME_CONSOLE = "Consolas";
-  public static final Font FONT_BOLD = Resources.fonts().get("Roboto-Black.ttf", Font.BOLD, FONT_HEADER_SIZE);
-  private static final Font FONT_DEFAULT = Resources.fonts().get("Roboto-Regular.ttf", Font.PLAIN, FONT_DEFAULT_SIZE);
-  private static final Font FONT_HEADER = Resources.fonts().get("Roboto-Regular.ttf", Font.PLAIN, FONT_HEADER_SIZE);
+  public static final Font FONT_BOLD =
+      Resources.fonts().get("Roboto-Black.ttf", Font.BOLD, FONT_HEADER_SIZE);
+  private static final Font FONT_DEFAULT =
+      Resources.fonts().get("Roboto-Regular.ttf", Font.PLAIN, FONT_DEFAULT_SIZE);
+  private static final Font FONT_HEADER =
+      Resources.fonts().get("Roboto-Regular.ttf", Font.PLAIN, FONT_HEADER_SIZE);
 
   private static Font scaledDefaultFont;
   private static Font scaledHeaderFont;
@@ -51,7 +54,8 @@ public final class Style {
 
   public static Font getDefaultFont() {
     if (scaledDefaultFont == null) {
-      scaledDefaultFont = FONT_DEFAULT.deriveFont(FONT_DEFAULT_SIZE * Editor.preferences().getUiScale());
+      scaledDefaultFont =
+          FONT_DEFAULT.deriveFont(FONT_DEFAULT_SIZE * Editor.preferences().getUiScale());
     }
 
     return scaledDefaultFont;
@@ -59,7 +63,8 @@ public final class Style {
 
   public static Font getHeaderFont() {
     if (scaledHeaderFont == null) {
-      scaledHeaderFont = FONT_HEADER.deriveFont(FONT_HEADER_SIZE * Editor.preferences().getUiScale());
+      scaledHeaderFont =
+          FONT_HEADER.deriveFont(FONT_HEADER_SIZE * Editor.preferences().getUiScale());
     }
 
     return scaledHeaderFont;

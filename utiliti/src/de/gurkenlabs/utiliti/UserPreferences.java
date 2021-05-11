@@ -1,15 +1,14 @@
 package de.gurkenlabs.utiliti;
 
-import java.awt.Color;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import de.gurkenlabs.litiengine.configuration.ConfigurationGroup;
 import de.gurkenlabs.litiengine.configuration.ConfigurationGroupInfo;
 import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.utiliti.Style.Theme;
+import java.awt.Color;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 @ConfigurationGroupInfo(prefix = "user_")
 public class UserPreferences extends ConfigurationGroup {
@@ -94,7 +93,6 @@ public class UserPreferences extends ConfigurationGroup {
     for (int i = 0; i < newFiles.size(); i++) {
       this.lastOpenedFiles[i] = newFiles.get(i);
     }
-
   }
 
   public float getZoom() {

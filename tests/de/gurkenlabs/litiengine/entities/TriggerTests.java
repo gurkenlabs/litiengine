@@ -2,24 +2,11 @@ package de.gurkenlabs.litiengine.entities;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import java.awt.Dimension;
-import java.awt.geom.Rectangle2D;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameTest;
@@ -29,7 +16,15 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.physics.Collision;
-
+import java.awt.Dimension;
+import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class TriggerTests {
   private Environment testEnvironment;
@@ -210,7 +205,7 @@ class TriggerTests {
   }
 
   @Test
-  public void testDeactivatedListener(){
+  public void testDeactivatedListener() {
     Trigger trigger = new Trigger(TriggerActivation.COLLISION, "testrigger", "testmessage");
     testEnvironment = mock(Environment.class);
     Game.world().loadEnvironment(this.testEnvironment);
@@ -219,7 +214,5 @@ class TriggerTests {
     trigger.addDeactivatedListener(listener);
     verify(listener, times(0)).deactivated(any());
     trigger.update();
-
   }
 }
-

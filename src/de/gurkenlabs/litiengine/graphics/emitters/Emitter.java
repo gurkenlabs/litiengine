@@ -1,16 +1,5 @@
 package de.gurkenlabs.litiengine.graphics.emitters;
 
-import java.awt.Graphics2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.util.Collection;
-import java.util.EventListener;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collectors;
-
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.ITimeToLive;
 import de.gurkenlabs.litiengine.IUpdateable;
@@ -33,10 +22,18 @@ import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterLoader;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.ParticleParameter;
 import de.gurkenlabs.litiengine.resources.Resources;
+import java.awt.Graphics2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.util.Collection;
+import java.util.EventListener;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
-/**
- * A standard implementation for emitters that provide a particle effect.
- */
+/** A standard implementation for emitters that provide a particle effect. */
 @CollisionInfo(collision = false)
 @EmitterInfo
 @TmxType(MapObjectType.EMITTER)
@@ -82,7 +79,8 @@ public class Emitter extends Entity implements IUpdateable, ITimeToLive, IRender
       this.emitterData.setSpawnAmount(info.spawnAmount());
       this.emitterData.setSpawnRate(info.spawnRate());
       this.emitterData.setEmitterDuration(info.duration());
-      this.emitterData.setParticleTTL(new ParticleParameter(info.particleMinTTL(), info.particleMaxTTL()));
+      this.emitterData.setParticleTTL(
+          new ParticleParameter(info.particleMinTTL(), info.particleMaxTTL()));
       this.emitterData.setUpdateRate(info.particleUpdateRate());
       this.emitterData.setOriginAlign(info.originAlign());
       this.emitterData.setOriginValign(info.originValign());
@@ -137,8 +135,7 @@ public class Emitter extends Entity implements IUpdateable, ITimeToLive, IRender
   /**
    * Adds a particle to this Emitter's list of Particles.
    *
-   * @param particle
-   *          the particle
+   * @param particle the particle
    */
   public void addParticle(final Particle particle) {
     if (this.isStopped()) {
@@ -147,9 +144,7 @@ public class Emitter extends Entity implements IUpdateable, ITimeToLive, IRender
     this.particles.add(particle);
   }
 
-  /**
-   * Deactivate.
-   */
+  /** Deactivate. */
   public void deactivate() {
     if (!this.activated) {
       return;
@@ -190,7 +185,9 @@ public class Emitter extends Entity implements IUpdateable, ITimeToLive, IRender
   }
 
   public Point2D getOrigin() {
-    return new Point2D.Double(this.getX() + this.data().getOriginAlign().getValue(this.getWidth()), this.getY() + this.data().getOriginValign().getValue(this.getHeight()));
+    return new Point2D.Double(
+        this.getX() + this.data().getOriginAlign().getValue(this.getWidth()),
+        this.getY() + this.data().getOriginValign().getValue(this.getHeight()));
   }
 
   public IRenderable getRenderable(RenderType type) {
@@ -256,8 +253,7 @@ public class Emitter extends Entity implements IUpdateable, ITimeToLive, IRender
   /**
    * Sets the paused.
    *
-   * @param paused
-   *          the new paused
+   * @param paused the new paused
    */
   public void setPaused(final boolean paused) {
     this.paused = paused;
@@ -286,7 +282,9 @@ public class Emitter extends Entity implements IUpdateable, ITimeToLive, IRender
    */
   @Override
   public boolean timeToLiveReached() {
-    return this.activated && this.getTimeToLive() > 0 && this.getAliveTime() >= this.getTimeToLive();
+    return this.activated
+        && this.getTimeToLive() > 0
+        && this.getAliveTime() >= this.getTimeToLive();
   }
 
   public void togglePaused() {
@@ -325,7 +323,8 @@ public class Emitter extends Entity implements IUpdateable, ITimeToLive, IRender
     }
 
     this.aliveTime = Game.time().since(this.activationTick);
-    if ((this.data().getSpawnRate() == 0 || Game.time().since(this.lastSpawn) >= this.data().getSpawnRate())) {
+    if ((this.data().getSpawnRate() == 0
+        || Game.time().since(this.lastSpawn) >= this.data().getSpawnRate())) {
       this.lastSpawn = Game.time().now();
       this.spawnParticle();
     }
@@ -352,7 +351,6 @@ public class Emitter extends Entity implements IUpdateable, ITimeToLive, IRender
 
     Particle particle;
     switch (this.data().getParticleType()) {
-
       case ELLIPSE:
         particle = new EllipseParticle(width, height);
         break;
@@ -396,8 +394,7 @@ public class Emitter extends Entity implements IUpdateable, ITimeToLive, IRender
   /**
    * Particle can be removed.
    *
-   * @param particle
-   *          the particle
+   * @param particle the particle
    * @return true, if successful
    */
   protected boolean particleCanBeRemoved(final Particle particle) {
@@ -405,18 +402,14 @@ public class Emitter extends Entity implements IUpdateable, ITimeToLive, IRender
   }
 
   /**
-   * Render particles of this effect. The particles are always rendered
-   * relatively to this effects render location. A particle doesn't have an own
-   * map location. It is always relative to the effect it is assigned to.
+   * Render particles of this effect. The particles are always rendered relatively to this effects
+   * render location. A particle doesn't have an own map location. It is always relative to the
+   * effect it is assigned to.
    *
-   * @param g
-   *          the g
-   * @param p
-   *          the p
+   * @param g the g
+   * @param p the p
    */
-  /**
-   * Spawn particle.
-   */
+  /** Spawn particle. */
   protected void spawnParticle() {
     for (short i = 0; i < this.data().getSpawnAmount(); i++) {
       if (!this.canTakeNewParticles()) {
@@ -431,17 +424,21 @@ public class Emitter extends Entity implements IUpdateable, ITimeToLive, IRender
   }
 
   private void renderParticles(final Graphics2D g, final RenderType renderType) {
-    if (Game.config().graphics().getGraphicQuality().getValue() < this.data().getRequiredQuality().getValue()) {
+    if (Game.config().graphics().getGraphicQuality().getValue()
+        < this.data().getRequiredQuality().getValue()) {
       return;
     }
 
     final Point2D origin = this.getOrigin();
-    final Rectangle2D viewport = Game.screens() != null && Game.world().camera() != null ? Game.world().camera().getViewport() : null;
+    final Rectangle2D viewport =
+        Game.screens() != null && Game.world().camera() != null
+            ? Game.world().camera().getViewport()
+            : null;
     for (Particle particle : this.particles) {
       if (((!particle.usesCustomRenderType() && renderType == RenderType.NONE)
-          || (particle.usesCustomRenderType() && particle.getCustomRenderType() == renderType))
-          && viewport != null && viewport.intersects(particle.getBoundingBox(origin))
-          ) {
+              || (particle.usesCustomRenderType() && particle.getCustomRenderType() == renderType))
+          && viewport != null
+          && viewport.intersects(particle.getBoundingBox(origin))) {
         particle.render(g, origin);
       }
     }
@@ -451,5 +448,4 @@ public class Emitter extends Entity implements IUpdateable, ITimeToLive, IRender
   public int getTimeToLive() {
     return this.data().getEmitterDuration();
   }
-
 }

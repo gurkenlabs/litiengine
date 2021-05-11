@@ -1,12 +1,12 @@
 package de.gurkenlabs.litiengine.entities;
 
-import de.gurkenlabs.litiengine.attributes.AttributeModifier;
-import de.gurkenlabs.litiengine.attributes.Modification;
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import de.gurkenlabs.litiengine.attributes.AttributeModifier;
+import de.gurkenlabs.litiengine.attributes.Modification;
+import org.junit.jupiter.api.Test;
 
 class PropTests {
 
@@ -55,7 +55,7 @@ class PropTests {
   }
 
   @Test
-  public void testToStringNull(){
+  public void testToStringNull() {
     // arrange
     Prop prop = new Prop(0, 0, null);
     prop.setMapId(1);
@@ -65,7 +65,7 @@ class PropTests {
   }
 
   @Test
-  public void testToStringEmpty(){
+  public void testToStringEmpty() {
     // arrange
     Prop prop = new Prop(0, 0, "");
     prop.setMapId(1);
@@ -75,7 +75,7 @@ class PropTests {
   }
 
   @Test
-  public void testToStringNotNull(){
+  public void testToStringNotNull() {
     // arrange
     Prop prop = new Prop(0, 0, "Test");
     prop.setMapId(1);

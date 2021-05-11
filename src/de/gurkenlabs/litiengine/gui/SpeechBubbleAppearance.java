@@ -25,7 +25,8 @@ public class SpeechBubbleAppearance extends Appearance {
     this.borderColor = borderColor;
   }
 
-  public SpeechBubbleAppearance(Color foreColor, Color backColor, Color borderColor, float padding) {
+  public SpeechBubbleAppearance(
+      Color foreColor, Color backColor, Color borderColor, float padding) {
     this(foreColor, backColor, borderColor);
     this.padding = padding;
   }
@@ -54,7 +55,15 @@ public class SpeechBubbleAppearance extends Appearance {
 
   @Override
   public int hashCode() {
-    return Objects.hash(this.getBorderColor(), this.getPadding(), this.isRenderIndicator(), this.getForeColor(), this.getBackgroundColor1(), this.getBackgroundColor2(), this.isHorizontalBackgroundGradient(), this.isTransparentBackground());
+    return Objects.hash(
+        this.getBorderColor(),
+        this.getPadding(),
+        this.isRenderIndicator(),
+        this.getForeColor(),
+        this.getBackgroundColor1(),
+        this.getBackgroundColor2(),
+        this.isHorizontalBackgroundGradient(),
+        this.isTransparentBackground());
   }
 
   @Override

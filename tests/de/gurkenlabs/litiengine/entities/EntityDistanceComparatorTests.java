@@ -1,19 +1,20 @@
 package de.gurkenlabs.litiengine.entities;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.awt.geom.Point2D;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import java.awt.geom.Point2D;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 class EntityDistanceComparatorTests {
   @ParameterizedTest(name = "{0}: (x1={1}, y1={2}, x2={3}, y2={4}) = {5}")
-  @CsvSource({ "'equal-distance', 1.0d, 1.0d, -1.0d, -1.0d, 0",
-      "'first-entity-closer', 1.0d, 1.0d, 2.0d, 2.0d, -1",
-      "'second-entity-closer', 2.0d, 2.0d, 1.0d, 1.0d, 1"
+  @CsvSource({
+    "'equal-distance', 1.0d, 1.0d, -1.0d, -1.0d, 0",
+    "'first-entity-closer', 1.0d, 1.0d, 2.0d, 2.0d, -1",
+    "'second-entity-closer', 2.0d, 2.0d, 1.0d, 1.0d, 1"
   })
-  void testDistanceComparison(String partition, double x1, double y1, double x2, double y2, int expectedResult) {
+  void testDistanceComparison(
+      String partition, double x1, double y1, double x2, double y2, int expectedResult) {
     // arrange
     EntityDistanceComparator comparator = new EntityDistanceComparator(new TestEntity());
 

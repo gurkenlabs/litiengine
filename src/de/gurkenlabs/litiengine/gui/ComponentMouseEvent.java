@@ -3,8 +3,8 @@ package de.gurkenlabs.litiengine.gui;
 import java.awt.event.MouseEvent;
 
 /**
- * A ComponentMouseEvent contains the original MouseEvent and the GuiComponent
- * that sent the event as sender.
+ * A ComponentMouseEvent contains the original MouseEvent and the GuiComponent that sent the event
+ * as sender.
  */
 public class ComponentMouseEvent {
 
@@ -17,10 +17,8 @@ public class ComponentMouseEvent {
   /**
    * Instantiates a new component mouse event.
    *
-   * @param event
-   *          the event
-   * @param sender
-   *          the sender
+   * @param event the event
+   * @param sender the sender
    */
   public ComponentMouseEvent(final MouseEvent event, final GuiComponent sender) {
     this.event = event;

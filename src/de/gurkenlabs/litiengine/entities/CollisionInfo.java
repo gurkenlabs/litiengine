@@ -1,14 +1,13 @@
 package de.gurkenlabs.litiengine.entities;
 
+import de.gurkenlabs.litiengine.Align;
+import de.gurkenlabs.litiengine.Valign;
+import de.gurkenlabs.litiengine.physics.Collision;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-
-import de.gurkenlabs.litiengine.Align;
-import de.gurkenlabs.litiengine.Valign;
-import de.gurkenlabs.litiengine.physics.Collision;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
@@ -23,6 +22,6 @@ public @interface CollisionInfo {
   float collisionBoxWidth() default 0;
 
   Valign valign() default Valign.DOWN;
-  
+
   Collision collisionType() default Collision.DYNAMIC;
 }

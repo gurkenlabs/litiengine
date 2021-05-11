@@ -1,13 +1,12 @@
 package de.gurkenlabs.litiengine.entities;
 
-import java.awt.geom.Rectangle2D;
-
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxType;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.physics.Collision;
+import java.awt.geom.Rectangle2D;
 
 @EntityInfo(renderType = RenderType.OVERLAY)
 @CollisionInfo(collision = true, collisionType = Collision.STATIC)
@@ -17,17 +16,13 @@ public class CollisionBox extends CollisionEntity {
   @TmxProperty(name = MapObjectProperty.COLLISIONBOX_OBSTRUCTINGLIGHTS)
   private boolean obstructingLight;
 
-  /**
-   * Instantiates a new {@code CollisionBox} entity.
-   */
-  public CollisionBox() {
-  }
+  /** Instantiates a new {@code CollisionBox} entity. */
+  public CollisionBox() {}
 
   /**
    * Instantiates a new {@code CollisionBox} entity.
-   * 
-   * @param obstructingLight
-   *          A flag indicating whether this instance should obstruct lights.
+   *
+   * @param obstructingLight A flag indicating whether this instance should obstruct lights.
    */
   public CollisionBox(final boolean obstructingLight) {
     this.obstructingLight = obstructingLight;
@@ -36,10 +31,8 @@ public class CollisionBox extends CollisionEntity {
   /**
    * Instantiates a new {@code CollisionBox} entity.
    *
-   * @param width
-   *          The width of this instance.
-   * @param height
-   *          The height of this instance.
+   * @param width The width of this instance.
+   * @param height The height of this instance.
    */
   public CollisionBox(double width, double height) {
     this.setWidth(width);
@@ -51,14 +44,10 @@ public class CollisionBox extends CollisionEntity {
   /**
    * Instantiates a new {@code CollisionBox} entity.
    *
-   * @param x
-   *          The x-coordinate of this instance.
-   * @param y
-   *          The y-coordinate of this instance.
-   * @param width
-   *          The width of this instance.
-   * @param height
-   *          The height of this instance.
+   * @param x The x-coordinate of this instance.
+   * @param y The y-coordinate of this instance.
+   * @param width The width of this instance.
+   * @param height The height of this instance.
    */
   public CollisionBox(double x, double y, double width, double height) {
     this(width, height);
@@ -69,8 +58,7 @@ public class CollisionBox extends CollisionEntity {
   /**
    * Instantiates a new {@code CollisionBox} entity.
    *
-   * @param box
-   *          The rectangle defining the location and dimension of this instnace.
+   * @param box The rectangle defining the location and dimension of this instnace.
    */
   public CollisionBox(Rectangle2D box) {
     this(box.getX(), box.getY(), box.getWidth(), box.getHeight());

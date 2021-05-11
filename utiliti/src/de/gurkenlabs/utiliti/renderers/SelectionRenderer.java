@@ -1,18 +1,16 @@
 package de.gurkenlabs.utiliti.renderers;
 
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
+import de.gurkenlabs.litiengine.graphics.TextRenderer;
+import de.gurkenlabs.utiliti.Style;
+import de.gurkenlabs.utiliti.components.Editor;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.geom.Point2D;
-
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
-import de.gurkenlabs.litiengine.graphics.TextRenderer;
-import de.gurkenlabs.utiliti.Style;
-import de.gurkenlabs.utiliti.components.Editor;
-import de.gurkenlabs.utiliti.handlers.Zoom;
 
 public class SelectionRenderer implements IEditorRenderer {
   private Color colorSelectionBorder;
@@ -64,16 +62,26 @@ public class SelectionRenderer implements IEditorRenderer {
     }
 
     Font previousFont = Style.FONT_BOLD;
-    Font idFont = previousFont.deriveFont(Math.max(8f, (float) (10 * Math.sqrt(Game.world().camera().getRenderScale()))) * Editor.preferences().getUiScale());
+    Font idFont =
+        previousFont.deriveFont(
+            Math.max(8f, (float) (10 * Math.sqrt(Game.world().camera().getRenderScale())))
+                * Editor.preferences().getUiScale());
 
-    Point2D loc = Game.world().camera().getViewportLocation(new Point2D.Double(mapObject.getX() + mapObject.getWidth() / 2, mapObject.getY()));
+    Point2D loc =
+        Game.world()
+            .camera()
+            .getViewportLocation(
+                new Point2D.Double(mapObject.getX() + mapObject.getWidth() / 2, mapObject.getY()));
     g.setColor(Style.COLOR_STATUS);
 
     g.setFont(idFont);
     String id = Integer.toString(mapObject.getId());
 
-    double x = loc.getX() * Game.world().camera().getRenderScale() - g.getFontMetrics().stringWidth(id) / 2.0;
-    double y = loc.getY() * Game.world().camera().getRenderScale() - (g.getFontMetrics().getHeight());
+    double x =
+        loc.getX() * Game.world().camera().getRenderScale()
+            - g.getFontMetrics().stringWidth(id) / 2.0;
+    double y =
+        loc.getY() * Game.world().camera().getRenderScale() - (g.getFontMetrics().getHeight());
     TextRenderer.render(g, id, x, y, true);
 
     g.setFont(previousFont);

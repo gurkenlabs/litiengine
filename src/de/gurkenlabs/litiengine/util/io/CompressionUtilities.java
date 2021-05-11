@@ -34,7 +34,7 @@ public final class CompressionUtilities {
     try {
       while (!deflater.finished()) {
         final int count = deflater.deflate(buffer); // returns the generated
-                                                    // code...
+        // code...
         // index
         outputStream.write(buffer, 0, count);
       }

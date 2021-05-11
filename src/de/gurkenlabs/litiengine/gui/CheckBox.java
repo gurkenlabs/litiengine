@@ -1,10 +1,9 @@
 package de.gurkenlabs.litiengine.gui;
 
+import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
-
-import de.gurkenlabs.litiengine.graphics.Spritesheet;
 
 public class CheckBox extends ImageComponent {
   public static final FontIcon CHECK = new FontIcon(ICON_FONT, "\uE847");
@@ -12,7 +11,13 @@ public class CheckBox extends ImageComponent {
   private final List<Consumer<Boolean>> changeConsumer;
   private boolean checked;
 
-  public CheckBox(final double x, final double y, final double width, final double height, final Spritesheet spritesheet, final boolean checked) {
+  public CheckBox(
+      final double x,
+      final double y,
+      final double width,
+      final double height,
+      final Spritesheet spritesheet,
+      final boolean checked) {
     super(x, y, width, height, spritesheet, "", null);
     this.changeConsumer = new CopyOnWriteArrayList<>();
     this.setFont(CHECK.getFont());

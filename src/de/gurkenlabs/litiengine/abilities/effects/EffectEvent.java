@@ -1,8 +1,7 @@
 package de.gurkenlabs.litiengine.abilities.effects;
 
-import java.util.EventObject;
-
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
+import java.util.EventObject;
 
 public class EffectEvent extends EventObject {
   private static final long serialVersionUID = -6911987630602502891L;

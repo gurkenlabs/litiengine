@@ -24,7 +24,8 @@ public class GeometricUtilities {
     throw new UnsupportedOperationException();
   }
 
-  public static double calcRotationAngleInDegrees(final double centerX, final double centerY, final double targetX, final double targetY) {
+  public static double calcRotationAngleInDegrees(
+      final double centerX, final double centerY, final double targetX, final double targetY) {
     // calculate the angle theta from the deltaY and deltaX values
     // (atan2 returns radians values from [-PI,PI])
     // 0 currently points EAST.
@@ -51,47 +52,53 @@ public class GeometricUtilities {
   }
 
   /**
-   * Calculates the angle from centerPt to targetPt in degrees. The return
-   * should range from [0,360), rotating CLOCKWISE, 0 and 360 degrees represents
-   * NORTH, 90 degrees represents EAST, etc...
-   * <p>
-   * Assumes all points are in the same coordinate space. If they are not, you
-   * will need to call SwingUtilities.convertPointToScreen or equivalent on all
-   * arguments before passing them to this function.
+   * Calculates the angle from centerPt to targetPt in degrees. The return should range from
+   * [0,360), rotating CLOCKWISE, 0 and 360 degrees represents NORTH, 90 degrees represents EAST,
+   * etc...
+   *
+   * <p>Assumes all points are in the same coordinate space. If they are not, you will need to call
+   * SwingUtilities.convertPointToScreen or equivalent on all arguments before passing them to this
+   * function.
    *
    * @param centerPt Point we are rotating around.
    * @param targetPt Point we want to calcuate the angle to.
    * @return angle in degrees. This is the angle from centerPt to targetPt.
    */
   public static double calcRotationAngleInDegrees(final Point2D centerPt, final Point2D targetPt) {
-    return calcRotationAngleInDegrees(centerPt.getX(), centerPt.getY(), targetPt.getX(), targetPt.getY());
+    return calcRotationAngleInDegrees(
+        centerPt.getX(), centerPt.getY(), targetPt.getX(), targetPt.getY());
   }
 
   /**
    * Contains.
    *
    * @param rectangle the rectangle
-   * @param p         the p
+   * @param p the p
    * @return true, if successful
    */
   public static boolean contains(final Rectangle2D rectangle, final Point2D p) {
-    return rectangle.getX() <= p.getX() && rectangle.getY() <= p.getY() && rectangle.getX() + rectangle.getWidth() >= p.getX()
+    return rectangle.getX() <= p.getX()
+        && rectangle.getY() <= p.getY()
+        && rectangle.getX() + rectangle.getWidth() >= p.getX()
         && rectangle.getY() + rectangle.getHeight() >= p.getY();
   }
 
-  public static double distance(final double p1X, final double p1Y, final double p2X, final double p2Y) {
+  public static double distance(
+      final double p1X, final double p1Y, final double p2X, final double p2Y) {
     return Math.sqrt((p1X - p2X) * (p1X - p2X) + (p1Y - p2Y) * (p1Y - p2Y));
   }
 
   public static double distance(final Point2D p1, final Point2D p2) {
-    return Math.sqrt((p1.getX() - p2.getX()) * (p1.getX() - p2.getX()) + (p1.getY() - p2.getY()) * (p1.getY() - p2.getY()));
+    return Math.sqrt(
+        (p1.getX() - p2.getX()) * (p1.getX() - p2.getX())
+            + (p1.getY() - p2.getY()) * (p1.getY() - p2.getY()));
   }
 
   /**
    * Distance.
    *
    * @param rect the rect
-   * @param p    the p
+   * @param p the p
    * @return the double
    */
   public static double distance(final Rectangle2D rect, final Point2D p) {
@@ -101,7 +108,11 @@ public class GeometricUtilities {
   }
 
   public static Rectangle2D extrude(Rectangle2D rect, double ext) {
-    return new Rectangle2D.Double(rect.getX() - ext, rect.getY() - ext, rect.getWidth() + ext * 2, rect.getHeight() + ext * 2);
+    return new Rectangle2D.Double(
+        rect.getX() - ext,
+        rect.getY() - ext,
+        rect.getWidth() + ext * 2,
+        rect.getHeight() + ext * 2);
   }
 
   public static boolean equals(final Point2D point1, final Point2D point2, final double epsilon) {
@@ -112,7 +123,8 @@ public class GeometricUtilities {
     final Line2D[] lines = new Line2D[rectPoints.length];
 
     for (int i = 0; i < rectPoints.length; i++) {
-      lines[i] = new Line2D.Double(point.getX(), point.getY(), rectPoints[i].getX(), rectPoints[i].getY());
+      lines[i] =
+          new Line2D.Double(point.getX(), point.getY(), rectPoints[i].getX(), rectPoints[i].getY());
     }
 
     return lines;
@@ -129,7 +141,7 @@ public class GeometricUtilities {
       final int type = pi.currentSegment(coords);
 
       // We record a double array of x coord and y coord
-      final double[] pathIteratorCoords = { type, coords[0], coords[1] };
+      final double[] pathIteratorCoords = {type, coords[0], coords[1]};
       areaPoints.add(pathIteratorCoords);
     }
 
@@ -141,7 +153,7 @@ public class GeometricUtilities {
       final double[] currentElement = areaPoints.get(i);
 
       // We need a default value in case we've reached the end of the ArrayList
-      double[] nextElement = { -1, -1, -1 };
+      double[] nextElement = {-1, -1, -1};
       if (i < areaPoints.size() - 1) {
         nextElement = areaPoints.get(i + 1);
       }
@@ -153,9 +165,12 @@ public class GeometricUtilities {
       }
 
       if (nextElement[0] == PathIterator.SEG_LINETO) {
-        areaSegments.add(new Line2D.Double(currentElement[1], currentElement[2], nextElement[1], nextElement[2]));
+        areaSegments.add(
+            new Line2D.Double(
+                currentElement[1], currentElement[2], nextElement[1], nextElement[2]));
       } else if (nextElement[0] == PathIterator.SEG_CLOSE) {
-        areaSegments.add(new Line2D.Double(currentElement[1], currentElement[2], start[1], start[2]));
+        areaSegments.add(
+            new Line2D.Double(currentElement[1], currentElement[2], start[1], start[2]));
       }
     }
     return areaSegments;
@@ -217,7 +232,9 @@ public class GeometricUtilities {
       final double xi = ((x3 - x4) * (x1 * y2 - y1 * x2) - (x1 - x2) * (x3 * y4 - y3 * x4)) / d;
       final double yi = ((y3 - y4) * (x1 * y2 - y1 * x2) - (y1 - y2) * (x3 * y4 - y3 * x4)) / d;
 
-      if (xi >= Math.min(lineA.getX1(), lineA.getX2()) && xi <= Math.max(lineA.getX1(), lineA.getX2()) && yi >= Math.min(lineA.getY1(), lineA.getY2())
+      if (xi >= Math.min(lineA.getX1(), lineA.getX2())
+          && xi <= Math.max(lineA.getX1(), lineA.getX2())
+          && yi >= Math.min(lineA.getY1(), lineA.getY2())
           && yi <= Math.max(lineA.getY1(), lineA.getY2())) {
         p = new Point2D.Double(xi, yi);
       }
@@ -229,7 +246,7 @@ public class GeometricUtilities {
   /**
    * Intersects.
    *
-   * @param line      the line
+   * @param line the line
    * @param rectangle the rectangle
    * @return the point2 d
    */
@@ -246,11 +263,12 @@ public class GeometricUtilities {
   /**
    * Gets the intersection points.
    *
-   * @param line      the line
+   * @param line the line
    * @param rectangle the rectangle
    * @return the intersection points
    */
-  public static List<Point2D> getIntersectionPoints(final Line2D line, final Rectangle2D rectangle) {
+  public static List<Point2D> getIntersectionPoints(
+      final Line2D line, final Rectangle2D rectangle) {
     final ArrayList<Point2D> intersectionPoints = new ArrayList<>();
     final Line2D[] lines = getLines(rectangle);
     final Line2D topLine = lines[0];
@@ -272,13 +290,21 @@ public class GeometricUtilities {
 
     // Left side...
     final Point2D p3 = getIntersectionPoint(line, leftLine);
-    if (p3 != null && !p3.equals(p1) && !p3.equals(p2) && contains(rectangle, p3) && !intersectionPoints.contains(p3)) {
+    if (p3 != null
+        && !p3.equals(p1)
+        && !p3.equals(p2)
+        && contains(rectangle, p3)
+        && !intersectionPoints.contains(p3)) {
       intersectionPoints.add(p3);
     }
 
     // Right side
     final Point2D p4 = getIntersectionPoint(line, rightLine);
-    if (p4 != null && !p4.equals(p1) && !p4.equals(p2) && contains(rectangle, p4) && !intersectionPoints.contains(p4)) {
+    if (p4 != null
+        && !p4.equals(p1)
+        && !p4.equals(p2)
+        && contains(rectangle, p4)
+        && !intersectionPoints.contains(p4)) {
       intersectionPoints.add(p4);
     }
 
@@ -294,10 +320,18 @@ public class GeometricUtilities {
    */
   public static Line2D[] getLines(final Rectangle2D rectangle) {
     final Line2D[] lines = new Line2D[4];
-    lines[0] = new Line2D.Double(rectangle.getMinX(), rectangle.getMinY(), rectangle.getMinX(), rectangle.getMaxY());
-    lines[1] = new Line2D.Double(rectangle.getMinX(), rectangle.getMaxY(), rectangle.getMaxX(), rectangle.getMaxY());
-    lines[2] = new Line2D.Double(rectangle.getMaxX(), rectangle.getMaxY(), rectangle.getMaxX(), rectangle.getMinY());
-    lines[3] = new Line2D.Double(rectangle.getMaxX(), rectangle.getMinY(), rectangle.getMinX(), rectangle.getMinY());
+    lines[0] =
+        new Line2D.Double(
+            rectangle.getMinX(), rectangle.getMinY(), rectangle.getMinX(), rectangle.getMaxY());
+    lines[1] =
+        new Line2D.Double(
+            rectangle.getMinX(), rectangle.getMaxY(), rectangle.getMaxX(), rectangle.getMaxY());
+    lines[2] =
+        new Line2D.Double(
+            rectangle.getMaxX(), rectangle.getMaxY(), rectangle.getMaxX(), rectangle.getMinY());
+    lines[3] =
+        new Line2D.Double(
+            rectangle.getMaxX(), rectangle.getMinY(), rectangle.getMinX(), rectangle.getMinY());
     return lines;
   }
 
@@ -317,15 +351,15 @@ public class GeometricUtilities {
     return getCenter(p1.getX(), p2.getX(), p1.getY(), p2.getY());
   }
 
-  public static Point2D getCenter(final double x1, final double y1, final double x2, final double y2) {
+  public static Point2D getCenter(
+      final double x1, final double y1, final double x2, final double y2) {
     return new Point2D.Double((x1 + x2) / 2, (y1 + y2) / 2);
   }
 
   /**
    * Returns the center of a shape whose geometry is defined by a rectangular frame.
-   * <p>
-   * Works for any subclass of RectuangularShape, including:<br>
    *
+   * <p>Works for any subclass of RectuangularShape, including:<br>
    * <br>
    * Arc2D<br>
    * Ellipse2D<br>
@@ -342,7 +376,8 @@ public class GeometricUtilities {
   }
 
   public static Ellipse2D getCircle(Point2D center, double radius) {
-    return new Ellipse2D.Double(center.getX() - radius, center.getY() - radius, radius * 2, radius * 2);
+    return new Ellipse2D.Double(
+        center.getX() - radius, center.getY() - radius, radius * 2, radius * 2);
   }
 
   public static Point2D getAveragePosition(Collection<Point2D> points) {
@@ -370,7 +405,7 @@ public class GeometricUtilities {
    * Gets the perpendicular intersection.
    *
    * @param point the point
-   * @param line  the line
+   * @param line the line
    * @return the perpendicular intersection
    */
   public static Point2D getPerpendicularIntersection(final Point2D point, final Line2D line) {
@@ -382,14 +417,17 @@ public class GeometricUtilities {
     final double x3 = point.getX();
     final double y3 = point.getY();
 
-    final double k = ((y2 - y1) * (x3 - x1) - (x2 - x1) * (y3 - y1)) / (Math.pow(y2 - y1, 2) + Math.pow(x2 - x1, 2));
+    final double k =
+        ((y2 - y1) * (x3 - x1) - (x2 - x1) * (y3 - y1))
+            / (Math.pow(y2 - y1, 2) + Math.pow(x2 - x1, 2));
     final double x4 = x3 - k * (y2 - y1);
     final double y4 = y3 + k * (x2 - x1);
 
     return new Point2D.Double(x4, y4);
   }
 
-  public static Point2D getPointOnCircle(final Point2D center, final double radius, final double angle) {
+  public static Point2D getPointOnCircle(
+      final Point2D center, final double radius, final double angle) {
     final double x = center.getX() + radius * Math.cos(Math.toRadians(angle));
     final double y = center.getY() + radius * Math.sin(Math.toRadians(angle));
 
@@ -481,14 +519,17 @@ public class GeometricUtilities {
       return shapeIntersects(a, b);
     }
 
-    double distSq = Math.pow((a.getCenterX() - b.getCenterX()), 2) + Math.pow((a.getCenterY() - b.getCenterY()), 2);
+    double distSq =
+        Math.pow((a.getCenterX() - b.getCenterX()), 2)
+            + Math.pow((a.getCenterY() - b.getCenterY()), 2);
     double radSumSq = Math.pow((a.getWidth() / 2.0 + b.getWidth() / 2.0), 2);
 
     return distSq <= radSumSq;
   }
 
   /**
-   * Project a line from a point with a given length and angle, return the point where the line ends.
+   * Project a line from a point with a given length and angle, return the point where the line
+   * ends.
    *
    * @param start The starting point of the projection.
    * @param angle The angle of the projection in degrees.
@@ -509,11 +550,10 @@ public class GeometricUtilities {
   }
 
   /**
-   * Projects a point from end along the vector (end - start) by the given
-   * scalar amount.
+   * Projects a point from end along the vector (end - start) by the given scalar amount.
    *
-   * @param start  the start
-   * @param end    the end
+   * @param start the start
+   * @param end the end
    * @param scalar the scalar
    * @return the point2 d. double
    */
@@ -533,7 +573,8 @@ public class GeometricUtilities {
     rectPoints.sort(new PointDistanceComparator(point));
 
     // 2. connect point with all rectangle points
-    final Line2D[] connectingLines = getConnectingLines(point, rectPoints.toArray(new Point2D[rectPoints.size()]));
+    final Line2D[] connectingLines =
+        getConnectingLines(point, rectPoints.toArray(new Point2D[rectPoints.size()]));
     final ArrayList<Point2D> resultPoints = new ArrayList<>();
 
     for (int i = 0; i < rectPoints.size(); i++) {
@@ -543,7 +584,11 @@ public class GeometricUtilities {
       // raycast needs to pass the rectangle first.
       // Thus, the rectangle point at index i will not be added to the result.
       if (intersectionPoints.stream()
-          .anyMatch(intersectionPoint -> rectPoints.stream().noneMatch(rectPoint -> equals(rectPoint, intersectionPoint, RAYCAST_EPSILON)))) {
+          .anyMatch(
+              intersectionPoint ->
+                  rectPoints.stream()
+                      .noneMatch(
+                          rectPoint -> equals(rectPoint, intersectionPoint, RAYCAST_EPSILON)))) {
         continue;
       }
 
@@ -560,7 +605,8 @@ public class GeometricUtilities {
       return shape;
     }
 
-    final AffineTransform transform = AffineTransform.getScaleInstance(newDimension.getWidth(), newDimension.getHeight());
+    final AffineTransform transform =
+        AffineTransform.getScaleInstance(newDimension.getWidth(), newDimension.getHeight());
     return transform.createTransformedShape(shape);
   }
 
@@ -596,8 +642,8 @@ public class GeometricUtilities {
   }
 
   /**
-   * Shape intersects. WARNING: USE THIS METHOD WITH CAUTION BECAUSE IT IS A
-   * VERY SLOW WAY OF CALCULATING INTERSECTIONS.
+   * Shape intersects. WARNING: USE THIS METHOD WITH CAUTION BECAUSE IT IS A VERY SLOW WAY OF
+   * CALCULATING INTERSECTIONS.
    *
    * @param shapeA the shape a
    * @param shapeB the shape b
@@ -619,7 +665,9 @@ public class GeometricUtilities {
 
   public static Shape translateShape(final Shape shape, final Point2D newLocation) {
     final AffineTransform t = new AffineTransform();
-    t.translate(newLocation.getX() - shape.getBounds2D().getX(), newLocation.getY() - shape.getBounds2D().getY());
+    t.translate(
+        newLocation.getX() - shape.getBounds2D().getX(),
+        newLocation.getY() - shape.getBounds2D().getY());
     return t.createTransformedShape(shape);
   }
 

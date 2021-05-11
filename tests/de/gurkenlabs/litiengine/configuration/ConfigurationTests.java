@@ -4,15 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import java.io.File;
 import java.util.UUID;
 import java.util.logging.Logger;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 class ConfigurationTests {
 
@@ -80,7 +78,8 @@ class ConfigurationTests {
 
     // act
     config.load();
-    final TestConfigurationGroup configGroup = config.getConfigurationGroup(TestConfigurationGroup.class);
+    final TestConfigurationGroup configGroup =
+        config.getConfigurationGroup(TestConfigurationGroup.class);
 
     // assert
     assertEquals(100, configGroup.getTestInt());
@@ -93,11 +92,12 @@ class ConfigurationTests {
     assertTrue(configGroup.isTestBoolean());
     assertEquals(TEST.TEST1, configGroup.getTestEnum());
     assertEquals("", configGroup.getTestWithNoSetter());
-    assertArrayEquals(new String[] { "test", "testicle" }, configGroup.getTestStringArray());
+    assertArrayEquals(new String[] {"test", "testicle"}, configGroup.getTestStringArray());
   }
 
   private enum TEST {
-    TEST1, TEST2;
+    TEST1,
+    TEST2;
   }
 
   @ConfigurationGroupInfo(prefix = "test-prefix")
@@ -112,7 +112,7 @@ class ConfigurationTests {
     private String testString = "test";
     private boolean testBoolean = true;
     private TEST testEnum = TEST.TEST1;
-    private String[] testStringArray = new String[] { "test", "testicle" };
+    private String[] testStringArray = new String[] {"test", "testicle"};
     private final String testWithNoSetter = "";
 
     public byte getTestByte() {

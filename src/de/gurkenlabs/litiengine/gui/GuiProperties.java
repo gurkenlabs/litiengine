@@ -2,13 +2,12 @@ package de.gurkenlabs.litiengine.gui;
 
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Valign;
-
 import java.awt.Color;
 import java.awt.Font;
 
 /**
- * This class contains globally used properties for all the
- * {@link GuiComponent}s that might be added to the game.
+ * This class contains globally used properties for all the {@link GuiComponent}s that might be
+ * added to the game.
  */
 public class GuiProperties {
   private static Appearance defaultAppearance = new Appearance(new Color(255, 255, 255));
@@ -25,8 +24,7 @@ public class GuiProperties {
   private static Color defaultTextShadowColor;
   private static float defaultTextShadowRadius = 2f;
 
-  private GuiProperties() {
-  }
+  private GuiProperties() {}
 
   public static Appearance getDefaultAppearance() {
     return defaultAppearance;
@@ -90,7 +88,6 @@ public class GuiProperties {
 
   public static void setDefaultTextShadowRadius(float newDefault) {
     defaultTextShadowRadius = newDefault;
-
   }
 
   public static Align getDefaultTextAlign() {

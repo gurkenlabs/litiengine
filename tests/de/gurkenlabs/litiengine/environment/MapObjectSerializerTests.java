@@ -3,8 +3,6 @@ package de.gurkenlabs.litiengine.environment;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.jupiter.api.Test;
-
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.entities.Material;
@@ -14,10 +12,11 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.physics.Collision;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import java.util.stream.Stream;
 
 public class MapObjectSerializerTests {
 
@@ -64,16 +63,24 @@ public class MapObjectSerializerTests {
     assertEquals(true, mapObject.getBoolValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE));
     assertEquals(2, mapObject.getIntValue(MapObjectProperty.COMBAT_TEAM));
 
-    assertEquals(Align.CENTER_LEFT, mapObject.getEnumValue(MapObjectProperty.COLLISION_ALIGN, Align.class));
-    assertEquals(Valign.MIDDLE_DOWN, mapObject.getEnumValue(MapObjectProperty.COLLISION_VALIGN, Valign.class));
+    assertEquals(
+        Align.CENTER_LEFT, mapObject.getEnumValue(MapObjectProperty.COLLISION_ALIGN, Align.class));
+    assertEquals(
+        Valign.MIDDLE_DOWN,
+        mapObject.getEnumValue(MapObjectProperty.COLLISION_VALIGN, Valign.class));
     assertEquals(true, mapObject.getBoolValue(MapObjectProperty.COLLISION));
     assertEquals(5, mapObject.getFloatValue(MapObjectProperty.COLLISIONBOX_WIDTH));
     assertEquals(5, mapObject.getFloatValue(MapObjectProperty.COLLISIONBOX_HEIGHT));
 
-    assertEquals(Material.CERAMIC, Material.get(mapObject.getStringValue(MapObjectProperty.PROP_MATERIAL)));
-    assertEquals(Collision.STATIC, mapObject.getEnumValue(MapObjectProperty.COLLISION_TYPE, Collision.class));
+    assertEquals(
+        Material.CERAMIC, Material.get(mapObject.getStringValue(MapObjectProperty.PROP_MATERIAL)));
+    assertEquals(
+        Collision.STATIC,
+        mapObject.getEnumValue(MapObjectProperty.COLLISION_TYPE, Collision.class));
     assertEquals(true, mapObject.getBoolValue(MapObjectProperty.PROP_ADDSHADOW));
-    assertEquals(Rotation.ROTATE_270, mapObject.getEnumValue(MapObjectProperty.PROP_ROTATION, Rotation.class));
+    assertEquals(
+        Rotation.ROTATE_270,
+        mapObject.getEnumValue(MapObjectProperty.PROP_ROTATION, Rotation.class));
     assertEquals(true, mapObject.getBoolValue(MapObjectProperty.PROP_FLIPHORIZONTALLY));
     assertEquals(true, mapObject.getBoolValue(MapObjectProperty.PROP_FLIPVERTICALLY));
     assertEquals(true, mapObject.getBoolValue(MapObjectProperty.SCALE_SPRITE));
@@ -128,19 +135,18 @@ public class MapObjectSerializerTests {
     assertEquals(expectedValue, mapObject.getStringValue(propertyName));
   }
 
-  private static Stream<Arguments> getTmxPropertyAnnotationString(){
+  private static Stream<Arguments> getTmxPropertyAnnotationString() {
     return Stream.of(
-            Arguments.of("testString", "test"),
-            Arguments.of("testBoolArr", "false,false"),
-            Arguments.of("testIntArr", "0"),
-            Arguments.of("testShortArr", "0,0"),
-            Arguments.of("testLongArr", "0,0,0"),
-            Arguments.of("testByteArr", "0,0,0,0"),
-            Arguments.of("testDoubleArr", "0.0,0.0"),
-            Arguments.of("testByteArr", "0,0,0,0"),
-            Arguments.of("testFloatArr", "0.0,0.0"),
-            Arguments.of("testStringArr", "null,null")
-            );
+        Arguments.of("testString", "test"),
+        Arguments.of("testBoolArr", "false,false"),
+        Arguments.of("testIntArr", "0"),
+        Arguments.of("testShortArr", "0,0"),
+        Arguments.of("testLongArr", "0,0,0"),
+        Arguments.of("testByteArr", "0,0,0,0"),
+        Arguments.of("testDoubleArr", "0.0,0.0"),
+        Arguments.of("testByteArr", "0,0,0,0"),
+        Arguments.of("testFloatArr", "0.0,0.0"),
+        Arguments.of("testStringArr", "null,null"));
   }
 
   private class TestProp extends Prop {

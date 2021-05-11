@@ -7,8 +7,12 @@ public class FontUtilities {
   private FontUtilities() {
     throw new UnsupportedOperationException();
   }
-  
-  public static Font getFallbackFontIfNecessary(final String stringToWrite, final float textSize, final Font primaryFont, final Font fallbackFont) {
+
+  public static Font getFallbackFontIfNecessary(
+      final String stringToWrite,
+      final float textSize,
+      final Font primaryFont,
+      final Font fallbackFont) {
     Font fontToReturn;
     if (primaryFont.canDisplayUpTo(stringToWrite) == -1) {
       fontToReturn = primaryFont.deriveFont(textSize);
@@ -17,5 +21,4 @@ public class FontUtilities {
     }
     return fontToReturn;
   }
-
 }

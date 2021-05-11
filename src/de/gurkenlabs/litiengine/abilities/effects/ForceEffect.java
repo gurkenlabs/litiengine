@@ -9,7 +9,8 @@ public abstract class ForceEffect extends Effect {
   private final float strength;
   private Force appliedForce;
 
-  protected ForceEffect(final Ability ability, final float strength, final EffectTarget... targets) {
+  protected ForceEffect(
+      final Ability ability, final float strength, final EffectTarget... targets) {
     super(ability, targets);
     this.strength = strength;
   }

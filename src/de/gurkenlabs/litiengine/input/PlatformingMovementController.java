@@ -1,28 +1,28 @@
 package de.gurkenlabs.litiengine.input;
 
-import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.List;
-
 import de.gurkenlabs.litiengine.entities.Action;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.util.ListUtilities;
+import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A movement controller that supports keyboard input for horizontal entity movement.
  *
- * @param <T>
- *          The type of the controlled entity.
+ * @param <T> The type of the controlled entity.
  */
-public class PlatformingMovementController<T extends IMobileEntity> extends KeyboardEntityController<T> {
+public class PlatformingMovementController<T extends IMobileEntity>
+    extends KeyboardEntityController<T> {
   /**
-   * The identifier that is used by this controller to execute the jumping {@code EntityAction} on the related entity.
-   * <p>
-   * <i>Note that the entity needs to either specify a method with an {@code Action} annotation that corresponds to this identifier or it needs
-   * to explicitly register an {@code EntityAction}.</i>
-   * </p>
-   * 
+   * The identifier that is used by this controller to execute the jumping {@code EntityAction} on
+   * the related entity.
+   *
+   * <p><i>Note that the entity needs to either specify a method with an {@code Action} annotation
+   * that corresponds to this identifier or it needs to explicitly register an {@code
+   * EntityAction}.</i>
+   *
    * @see IEntity#register(String, Runnable)
    * @see Action
    */
@@ -34,8 +34,7 @@ public class PlatformingMovementController<T extends IMobileEntity> extends Keyb
   /**
    * Instantiates a new platforming movement controller.
    *
-   * @param entity
-   *          the entity
+   * @param entity the entity
    */
   public PlatformingMovementController(final T entity) {
     this(entity, KeyEvent.VK_SPACE);
@@ -44,10 +43,8 @@ public class PlatformingMovementController<T extends IMobileEntity> extends Keyb
   /**
    * Instantiates a new platforming movement controller.
    *
-   * @param entity
-   *          the entity
-   * @param jump
-   *          the jump
+   * @param entity the entity
+   * @param jump the jump
    */
   public PlatformingMovementController(T entity, final int jump) {
     super(entity);
@@ -69,8 +66,7 @@ public class PlatformingMovementController<T extends IMobileEntity> extends Keyb
   /**
    * Adds a jump key.
    *
-   * @param keyCode
-   *          the key code for the newly added jump key
+   * @param keyCode the key code for the newly added jump key
    */
   public void addJumpKey(int keyCode) {
     if (this.jump.contains(keyCode)) {
@@ -92,11 +88,9 @@ public class PlatformingMovementController<T extends IMobileEntity> extends Keyb
   /**
    * Initializes the jump keys with a given array of key codes.
    *
-   * @param jump
-   *          the new jump keys
+   * @param jump the new jump keys
    */
   public void setJumpKeys(int... jump) {
     this.setUpKeys(ListUtilities.getIntList(jump));
   }
-
 }

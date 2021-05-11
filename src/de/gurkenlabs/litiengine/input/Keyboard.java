@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.input;
 
+import de.gurkenlabs.litiengine.IUpdateable;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
@@ -9,13 +10,14 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import de.gurkenlabs.litiengine.IUpdateable;
-
 public final class Keyboard implements KeyEventDispatcher, IKeyboard, IUpdateable {
   private final Collection<KeyListener> keyListeners = ConcurrentHashMap.newKeySet();
-  private final Map<Integer, Collection<KeyPressedListener>> keySpecificPressedListener = new ConcurrentHashMap<>();
-  private final Map<Integer, Collection<KeyReleasedListener>> keySpecificReleasedListener = new ConcurrentHashMap<>();
-  private final Map<Integer, Collection<KeyTypedListener>> keySpecificTypedListener = new ConcurrentHashMap<>();
+  private final Map<Integer, Collection<KeyPressedListener>> keySpecificPressedListener =
+      new ConcurrentHashMap<>();
+  private final Map<Integer, Collection<KeyReleasedListener>> keySpecificReleasedListener =
+      new ConcurrentHashMap<>();
+  private final Map<Integer, Collection<KeyTypedListener>> keySpecificTypedListener =
+      new ConcurrentHashMap<>();
   private final Collection<KeyPressedListener> keyPressedListener = ConcurrentHashMap.newKeySet();
   private final Collection<KeyReleasedListener> keyReleasedListener = ConcurrentHashMap.newKeySet();
   private final Collection<KeyTypedListener> keyTypedListener = ConcurrentHashMap.newKeySet();
@@ -44,19 +46,19 @@ public final class Keyboard implements KeyEventDispatcher, IKeyboard, IUpdateabl
     }
     final int eventId = e.getID();
     switch (eventId) {
-    case KeyEvent.KEY_PRESSED:
-      // on an avg. win 10 machine, this event fires every ~33 ms when a key is
-      // pressed down
-      this.addPressedKey(e);
-      break;
-    case KeyEvent.KEY_RELEASED:
-      this.removePressedKey(e);
-      this.addTypedKey(e);
-      this.addReleasedKey(e);
+      case KeyEvent.KEY_PRESSED:
+        // on an avg. win 10 machine, this event fires every ~33 ms when a key is
+        // pressed down
+        this.addPressedKey(e);
+        break;
+      case KeyEvent.KEY_RELEASED:
+        this.removePressedKey(e);
+        this.addTypedKey(e);
+        this.addReleasedKey(e);
 
-      break;
-    default:
-      break;
+        break;
+      default:
+        break;
     }
 
     return false;
@@ -86,7 +88,9 @@ public final class Keyboard implements KeyEventDispatcher, IKeyboard, IUpdateabl
 
   @Override
   public void onKeyPressed(final int keyCode, final KeyPressedListener listener) {
-    this.keySpecificPressedListener.computeIfAbsent(keyCode, ConcurrentHashMap::newKeySet).add(listener);
+    this.keySpecificPressedListener
+        .computeIfAbsent(keyCode, ConcurrentHashMap::newKeySet)
+        .add(listener);
   }
 
   @Override
@@ -100,7 +104,9 @@ public final class Keyboard implements KeyEventDispatcher, IKeyboard, IUpdateabl
 
   @Override
   public void onKeyReleased(final int keyCode, final KeyReleasedListener listener) {
-    this.keySpecificReleasedListener.computeIfAbsent(keyCode, ConcurrentHashMap::newKeySet).add(listener);
+    this.keySpecificReleasedListener
+        .computeIfAbsent(keyCode, ConcurrentHashMap::newKeySet)
+        .add(listener);
   }
 
   @Override
@@ -114,7 +120,9 @@ public final class Keyboard implements KeyEventDispatcher, IKeyboard, IUpdateabl
 
   @Override
   public void onKeyTyped(final int keyCode, final KeyTypedListener listener) {
-    this.keySpecificTypedListener.computeIfAbsent(keyCode, ConcurrentHashMap::newKeySet).add(listener);
+    this.keySpecificTypedListener
+        .computeIfAbsent(keyCode, ConcurrentHashMap::newKeySet)
+        .add(listener);
   }
 
   @Override
@@ -192,8 +200,7 @@ public final class Keyboard implements KeyEventDispatcher, IKeyboard, IUpdateabl
   /**
    * Adds the pressed key.
    *
-   * @param keyCode
-   *          the key code
+   * @param keyCode the key code
    */
   private void addPressedKey(final KeyEvent keyCode) {
     if (this.pressedKeys.stream().anyMatch(key -> key.getKeyCode() == keyCode.getKeyCode())) {
@@ -206,8 +213,7 @@ public final class Keyboard implements KeyEventDispatcher, IKeyboard, IUpdateabl
   /**
    * Adds the released key.
    *
-   * @param keyCode
-   *          the key code
+   * @param keyCode the key code
    */
   private void addReleasedKey(final KeyEvent keyCode) {
     if (this.releasedKeys.stream().anyMatch(key -> key.getKeyCode() == keyCode.getKeyCode())) {
@@ -220,8 +226,7 @@ public final class Keyboard implements KeyEventDispatcher, IKeyboard, IUpdateabl
   /**
    * Adds the typed key.
    *
-   * @param keyCode
-   *          the key code
+   * @param keyCode the key code
    */
   private void addTypedKey(final KeyEvent keyCode) {
     if (this.typedKeys.stream().anyMatch(key -> key.getKeyCode() == keyCode.getKeyCode())) {
@@ -231,43 +236,46 @@ public final class Keyboard implements KeyEventDispatcher, IKeyboard, IUpdateabl
     this.typedKeys.add(keyCode);
   }
 
-  /**
-   * Execute pressed keys.
-   */
+  /** Execute pressed keys. */
   private void executePressedKeys() {
     // called at the rate of the updaterate
-    this.pressedKeys.forEach(key -> {
-      this.keySpecificPressedListener.getOrDefault(key.getKeyCode(), Collections.emptySet()).forEach(listener -> listener.keyPressed(key));
+    this.pressedKeys.forEach(
+        key -> {
+          this.keySpecificPressedListener
+              .getOrDefault(key.getKeyCode(), Collections.emptySet())
+              .forEach(listener -> listener.keyPressed(key));
 
-      this.keyPressedListener.forEach(listener -> listener.keyPressed(key));
-      this.keyListeners.forEach(listener -> listener.keyPressed(key));
-    });
+          this.keyPressedListener.forEach(listener -> listener.keyPressed(key));
+          this.keyListeners.forEach(listener -> listener.keyPressed(key));
+        });
   }
 
-  /**
-   * Execute released keys.
-   */
+  /** Execute released keys. */
   private void executeReleasedKeys() {
-    this.releasedKeys.forEach(key -> {
-      this.keySpecificReleasedListener.getOrDefault(key.getKeyCode(), Collections.emptySet()).forEach(listener -> listener.keyReleased(key));
+    this.releasedKeys.forEach(
+        key -> {
+          this.keySpecificReleasedListener
+              .getOrDefault(key.getKeyCode(), Collections.emptySet())
+              .forEach(listener -> listener.keyReleased(key));
 
-      this.keyReleasedListener.forEach(listener -> listener.keyReleased(key));
-      this.keyListeners.forEach(listener -> listener.keyReleased(key));
-    });
+          this.keyReleasedListener.forEach(listener -> listener.keyReleased(key));
+          this.keyListeners.forEach(listener -> listener.keyReleased(key));
+        });
 
     this.releasedKeys.clear();
   }
 
-  /**
-   * Execute typed keys.
-   */
+  /** Execute typed keys. */
   private void executeTypedKeys() {
-    this.typedKeys.forEach(key -> {
-      this.keySpecificTypedListener.getOrDefault(key.getKeyCode(), Collections.emptySet()).forEach(listener -> listener.keyTyped(key));
+    this.typedKeys.forEach(
+        key -> {
+          this.keySpecificTypedListener
+              .getOrDefault(key.getKeyCode(), Collections.emptySet())
+              .forEach(listener -> listener.keyTyped(key));
 
-      this.keyTypedListener.forEach(listener -> listener.keyTyped(key));
-      this.keyListeners.forEach(listener -> listener.keyTyped(key));
-    });
+          this.keyTypedListener.forEach(listener -> listener.keyTyped(key));
+          this.keyListeners.forEach(listener -> listener.keyTyped(key));
+        });
 
     this.typedKeys.clear();
   }
@@ -275,8 +283,7 @@ public final class Keyboard implements KeyEventDispatcher, IKeyboard, IUpdateabl
   /**
    * Removes the pressed key.
    *
-   * @param keyCode
-   *          the key code
+   * @param keyCode the key code
    */
   private void removePressedKey(final KeyEvent keyCode) {
     for (final KeyEvent removeKey : this.pressedKeys) {

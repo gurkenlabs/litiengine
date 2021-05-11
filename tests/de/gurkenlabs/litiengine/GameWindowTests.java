@@ -4,13 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.awt.Dimension;
-
-import javax.swing.JFrame;
-
-import org.junit.jupiter.api.Test;
-
 import de.gurkenlabs.litiengine.configuration.DisplayMode;
+import java.awt.Dimension;
+import javax.swing.JFrame;
+import org.junit.jupiter.api.Test;
 
 public class GameWindowTests {
 
@@ -36,7 +33,7 @@ public class GameWindowTests {
 
     frame.dispose();
   }
-  
+
   @Test
   public void borderlessNeedstoBeUndecorated() {
     JFrame frame = new JFrame();
@@ -45,7 +42,7 @@ public class GameWindowTests {
 
     assertFalse(frame.isResizable());
     assertTrue(frame.isUndecorated());
-    
+
     frame.dispose();
   }
 }

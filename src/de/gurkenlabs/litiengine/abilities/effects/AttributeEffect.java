@@ -7,18 +7,21 @@ import de.gurkenlabs.litiengine.attributes.Modification;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 
 /**
- * An attribute effect appies an attribute modifier to the affected entity when
- * applied and removes it when ceased.
+ * An attribute effect appies an attribute modifier to the affected entity when applied and removes
+ * it when ceased.
  *
- * @param <T>
- *          the generic type
+ * @param <T> the generic type
  */
 public abstract class AttributeEffect<T extends Number> extends Effect {
 
   /** The modifier. */
   private final AttributeModifier<T> modifier;
 
-  protected AttributeEffect(final Ability ability, final Modification modification, final double delta, final EffectTarget... targtes) {
+  protected AttributeEffect(
+      final Ability ability,
+      final Modification modification,
+      final double delta,
+      final EffectTarget... targtes) {
     super(ability, targtes);
     this.modifier = new AttributeModifier<>(modification, delta);
   }

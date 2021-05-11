@@ -1,5 +1,6 @@
 package de.gurkenlabs.utiliti.swing;
 
+import de.gurkenlabs.utiliti.Style;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -9,12 +10,9 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-
-import de.gurkenlabs.utiliti.Style;
 
 @SuppressWarnings("serial")
 public class Tag extends JPanel {
@@ -40,45 +38,49 @@ public class Tag extends JPanel {
 
     this.lblText = new JLabel("New label");
     this.lblText.setForeground(Color.WHITE);
-    this.lblText.setFont(this.lblText.getFont().deriveFont(Style.getDefaultFont().getSize() * 0.75f));
+    this.lblText.setFont(
+        this.lblText.getFont().deriveFont(Style.getDefaultFont().getSize() * 0.75f));
     this.panel.add(this.lblText);
 
     this.btnDelete = new JButton();
-    this.btnDelete.addActionListener(e -> {
-      final Container parent = this.getParent();
-      parent.remove(this);
-      parent.revalidate();
-    });
+    this.btnDelete.addActionListener(
+        e -> {
+          final Container parent = this.getParent();
+          parent.remove(this);
+          parent.revalidate();
+        });
 
-    this.btnDelete.addMouseListener(new MouseAdapter() {
-      @Override
-      public void mouseEntered(final MouseEvent e) {
-        btnDelete.setIcon(Icons.DELETE_X7);
+    this.btnDelete.addMouseListener(
+        new MouseAdapter() {
+          @Override
+          public void mouseEntered(final MouseEvent e) {
+            btnDelete.setIcon(Icons.DELETE_X7);
 
-        deleteHovered = true;
-      }
+            deleteHovered = true;
+          }
 
-      @Override
-      public void mouseExited(final MouseEvent e) {
-        if (!btnDelete.hasFocus()) {
-          btnDelete.setIcon(Icons.DELETE_X7_DISABLED);
-        }
+          @Override
+          public void mouseExited(final MouseEvent e) {
+            if (!btnDelete.hasFocus()) {
+              btnDelete.setIcon(Icons.DELETE_X7_DISABLED);
+            }
 
-        deleteHovered = false;
-      }
-    });
+            deleteHovered = false;
+          }
+        });
 
-    this.btnDelete.addFocusListener(new FocusListener() {
-      @Override
-      public void focusLost(FocusEvent e) {
-        btnDelete.setIcon(Icons.DELETE_X7_DISABLED);
-      }
+    this.btnDelete.addFocusListener(
+        new FocusListener() {
+          @Override
+          public void focusLost(FocusEvent e) {
+            btnDelete.setIcon(Icons.DELETE_X7_DISABLED);
+          }
 
-      @Override
-      public void focusGained(FocusEvent e) {
-        btnDelete.setIcon(Icons.DELETE_X7);
-      }
-    });
+          @Override
+          public void focusGained(FocusEvent e) {
+            btnDelete.setIcon(Icons.DELETE_X7);
+          }
+        });
 
     this.btnDelete.setMargin(new Insets(2, 0, 2, 0));
     this.btnDelete.setContentAreaFilled(false);

@@ -1,10 +1,9 @@
 package de.gurkenlabs.litiengine.graphics;
 
-import java.awt.geom.Point2D;
-
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.input.Input;
+import java.awt.geom.Point2D;
 
 public class FreeFlightCamera extends Camera implements IUpdateable {
   private static final double DEFAULT_SCROLL_PIXELS_PER_SECOND = 400;
@@ -13,9 +12,7 @@ public class FreeFlightCamera extends Camera implements IUpdateable {
   private double velocity;
   private double scrollPadding;
 
-  /**
-   * Initializes a new instance of the {@code FreeFlightCamera}.
-   */
+  /** Initializes a new instance of the {@code FreeFlightCamera}. */
   public FreeFlightCamera() {
     this(0, 0);
   }
@@ -23,10 +20,8 @@ public class FreeFlightCamera extends Camera implements IUpdateable {
   /**
    * Initializes a new instance of the {@code FreeFlightCamera} with the specified initial focus.
    *
-   * @param x
-   *          The x-coordinate of the initial focus of this instance.
-   * @param y
-   *          The y-coordinate of the initial focus of this instance.
+   * @param x The x-coordinate of the initial focus of this instance.
+   * @param y The y-coordinate of the initial focus of this instance.
    */
   public FreeFlightCamera(double x, double y) {
     this(new Point2D.Double(x, y));
@@ -35,9 +30,7 @@ public class FreeFlightCamera extends Camera implements IUpdateable {
   /**
    * Initializes a new instance of the {@code FreeFlightCamera} with the specified initial focus.
    *
-   *
-   * @param focus
-   *          The initial focus of this instance.
+   * @param focus The initial focus of this instance.
    */
   public FreeFlightCamera(final Point2D focus) {
     this.setFocus(focus);
@@ -76,7 +69,10 @@ public class FreeFlightCamera extends Camera implements IUpdateable {
 
     final Point2D mouseLocation = Input.mouse().getLocation();
 
-    final double scrollSpeed = this.getVelocity() / (double) Game.loop().getTickRate() * Game.config().input().getMouseSensitivity();
+    final double scrollSpeed =
+        this.getVelocity()
+            / (double) Game.loop().getTickRate()
+            * Game.config().input().getMouseSensitivity();
 
     double x = this.getFocus().getX();
     double y = this.getFocus().getY();
@@ -84,14 +80,16 @@ public class FreeFlightCamera extends Camera implements IUpdateable {
     double deltaX = 0;
     if (mouseLocation.getX() < this.getScrollPadding()) {
       deltaX -= scrollSpeed;
-    } else if (Game.window().getResolution().getWidth() - mouseLocation.getX() < this.getScrollPadding()) {
+    } else if (Game.window().getResolution().getWidth() - mouseLocation.getX()
+        < this.getScrollPadding()) {
       deltaX += scrollSpeed;
     }
 
     double deltaY = 0;
     if (mouseLocation.getY() < this.getScrollPadding()) {
       deltaY -= scrollSpeed;
-    } else if (Game.window().getResolution().getHeight() - mouseLocation.getY() < this.getScrollPadding()) {
+    } else if (Game.window().getResolution().getHeight() - mouseLocation.getY()
+        < this.getScrollPadding()) {
       deltaY += scrollSpeed;
     }
 

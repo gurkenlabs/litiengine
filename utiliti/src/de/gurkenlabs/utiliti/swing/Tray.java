@@ -1,5 +1,7 @@
 package de.gurkenlabs.utiliti.swing;
 
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.resources.Resources;
 import java.awt.AWTException;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
@@ -8,15 +10,11 @@ import java.awt.TrayIcon;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.resources.Resources;
-
 public final class Tray {
   private static final Logger log = Logger.getLogger(Tray.class.getName());
   private static TrayIcon trayIcon;
 
-  private Tray() {
-  }
+  private Tray() {}
 
   public static void init() {
     // add system tray icon with popup menu
@@ -27,7 +25,8 @@ public final class Tray {
       exitItem.addActionListener(a -> Game.exit());
       menu.add(exitItem);
 
-      trayIcon = new TrayIcon(Resources.images().get("liti-logo-x16.png"), Game.info().toString(), menu);
+      trayIcon =
+          new TrayIcon(Resources.images().get("liti-logo-x16.png"), Game.info().toString(), menu);
       trayIcon.setImageAutoSize(true);
       try {
         tray.add(trayIcon);

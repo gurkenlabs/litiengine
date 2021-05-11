@@ -1,10 +1,9 @@
 package de.gurkenlabs.litiengine.graphics;
 
+import de.gurkenlabs.litiengine.util.Imaging;
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
-
-import de.gurkenlabs.litiengine.util.Imaging;
 
 public class RotationImageEffect extends ImageEffect {
   private final float angle;
@@ -12,10 +11,8 @@ public class RotationImageEffect extends ImageEffect {
   /**
    * Initializes a new instance of the {@code RotationImageEffect}.
    *
-   * @param ttl
-   *          The time to live of this effect.
-   * @param angle
-   *          The angle by which this effect rotates the base image.
+   * @param ttl The time to live of this effect.
+   * @param angle The angle by which this effect rotates the base image.
    */
   public RotationImageEffect(final int ttl, final float angle) {
     super(ttl, "RotationImageEffect");

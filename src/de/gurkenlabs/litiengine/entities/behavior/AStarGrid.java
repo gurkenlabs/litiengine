@@ -1,5 +1,10 @@
 package de.gurkenlabs.litiengine.entities.behavior;
 
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.entities.Prop;
+import de.gurkenlabs.litiengine.graphics.IRenderable;
+import de.gurkenlabs.litiengine.physics.Collision;
+import de.gurkenlabs.litiengine.util.MathUtilities;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
@@ -8,12 +13,6 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
-
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.entities.Prop;
-import de.gurkenlabs.litiengine.graphics.IRenderable;
-import de.gurkenlabs.litiengine.physics.Collision;
-import de.gurkenlabs.litiengine.util.MathUtilities;
 
 public class AStarGrid implements IRenderable {
   public static final double PENALTY_STATIC_PROP = 5;
@@ -139,7 +138,11 @@ public class AStarGrid implements IRenderable {
       for (int y = startY; y <= endY; y++) {
         AStarNode node = this.getGrid()[x][y];
         if (node.isWalkable()) {
-          Game.graphics().renderShape(g, new Rectangle2D.Double(node.getLocation().x - 0.25, node.getLocation().y - 0.25, 0.5, 0.5));
+          Game.graphics()
+              .renderShape(
+                  g,
+                  new Rectangle2D.Double(
+                      node.getLocation().x - 0.25, node.getLocation().y - 0.25, 0.5, 0.5));
         } else {
           Game.graphics().renderShape(g, node.getBounds());
         }
@@ -156,11 +159,9 @@ public class AStarGrid implements IRenderable {
   }
 
   /**
-   * Updates the walkable attribute of nodes intersected by the specified
-   * rectangle.
+   * Updates the walkable attribute of nodes intersected by the specified rectangle.
    *
-   * @param rectangle
-   *          The rectangle within which the nodes should be updated.
+   * @param rectangle The rectangle within which the nodes should be updated.
    */
   public void updateWalkable(final Rectangle2D rectangle) {
     for (final AStarNode node : this.getIntersectedNodes(rectangle)) {
@@ -176,7 +177,9 @@ public class AStarGrid implements IRenderable {
     // by default we calculate a penalty for props that cannot be destroyed
     int penalty = 0;
     for (Prop prop : Game.world().environment().getProps()) {
-      if (!prop.hasCollision() || !prop.isIndestructible() || !prop.getBoundingBox().intersects(node.getBounds())) {
+      if (!prop.hasCollision()
+          || !prop.isIndestructible()
+          || !prop.getBoundingBox().intersects(node.getBounds())) {
         continue;
       }
 
@@ -199,9 +202,18 @@ public class AStarGrid implements IRenderable {
     }
   }
 
-  private void addDiagonalNode(final List<AStarNode> neighbors, AStarNode node, AStarNode diagonalNeighbor1, AStarNode diagonalNeighbor2) {
+  private void addDiagonalNode(
+      final List<AStarNode> neighbors,
+      AStarNode node,
+      AStarNode diagonalNeighbor1,
+      AStarNode diagonalNeighbor2) {
     // only add diagonal neighbors when they are not on a corner
-    if (node != null && this.isDiagonalCornerMovementAllowed() || node != null && diagonalNeighbor1 != null && diagonalNeighbor1.isWalkable() && diagonalNeighbor2 != null && diagonalNeighbor2.isWalkable()) {
+    if (node != null && this.isDiagonalCornerMovementAllowed()
+        || node != null
+            && diagonalNeighbor1 != null
+            && diagonalNeighbor1.isWalkable()
+            && diagonalNeighbor2 != null
+            && diagonalNeighbor2.isWalkable()) {
       neighbors.add(node);
     }
   }
@@ -225,8 +237,10 @@ public class AStarGrid implements IRenderable {
   private void populateGrid(final int gridSizeX, final int gridSizeY) {
     for (int x = 0; x < gridSizeX; x++) {
       for (int y = 0; y < gridSizeY; y++) {
-        final Rectangle nodeBounds = new Rectangle(x * this.nodeSize, y * this.nodeSize, this.nodeSize, this.nodeSize);
-        final AStarNode node = new AStarNode(!Game.physics().collides(nodeBounds, Collision.STATIC), nodeBounds, x, y);
+        final Rectangle nodeBounds =
+            new Rectangle(x * this.nodeSize, y * this.nodeSize, this.nodeSize, this.nodeSize);
+        final AStarNode node =
+            new AStarNode(!Game.physics().collides(nodeBounds, Collision.STATIC), nodeBounds, x, y);
         this.assignPenalty(node);
         this.getGrid()[x][y] = node;
       }

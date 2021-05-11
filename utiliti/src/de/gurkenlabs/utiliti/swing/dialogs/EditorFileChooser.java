@@ -1,14 +1,12 @@
 package de.gurkenlabs.utiliti.swing.dialogs;
 
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.utiliti.components.Editor;
 import java.io.File;
-
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
-
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.utiliti.components.Editor;
 
 @SuppressWarnings("serial")
 public final class EditorFileChooser extends JFileChooser {
@@ -20,7 +18,8 @@ public final class EditorFileChooser extends JFileChooser {
     this.setDialogType(JFileChooser.OPEN_DIALOG);
   }
 
-  public static int showFileDialog(String description, String title, boolean multiselect, String... extensions) {
+  public static int showFileDialog(
+      String description, String title, boolean multiselect, String... extensions) {
     FileFilter filter = new FileNameExtensionFilter(description, extensions);
     instance().setFileFilter(filter);
     instance().addChoosableFileFilter(filter);

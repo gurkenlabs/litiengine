@@ -4,7 +4,7 @@ import java.util.EventObject;
 
 /**
  * This implementation is used for events that contain information about a received message.
- * 
+ *
  * @see IEntity#sendMessage(Object, String)
  */
 public class EntityMessageEvent extends EventObject {
@@ -20,7 +20,7 @@ public class EntityMessageEvent extends EventObject {
 
   /**
    * Gets the entity that received the message.
-   * 
+   *
    * @return The entity that received the message.
    */
   public IEntity getEntity() {
@@ -29,7 +29,7 @@ public class EntityMessageEvent extends EventObject {
 
   /**
    * Gets the message that was received.
-   * 
+   *
    * @return The message.
    */
   public String getMessage() {

@@ -9,11 +9,13 @@ public final class Snap {
 
   private static final int DEFAULT_PRECISION = 2;
 
-  private Snap() {
-  }
+  private Snap() {}
 
   public static float x(double x) {
-    final IMap map = Game.world() != null && Game.world().environment() != null ? Game.world().environment().getMap() : null;
+    final IMap map =
+        Game.world() != null && Game.world().environment() != null
+            ? Game.world().environment().getMap()
+            : null;
     int gridSize = map != null ? map.getTileSize().width : 1;
 
     return x(x, gridSize, Editor.preferences().snapToGrid(), Editor.preferences().snapToPixels());
@@ -24,7 +26,10 @@ public final class Snap {
   }
 
   public static float y(double y) {
-    final IMap map = Game.world() != null && Game.world().environment() != null ? Game.world().environment().getMap() : null;
+    final IMap map =
+        Game.world() != null && Game.world().environment() != null
+            ? Game.world().environment().getMap()
+            : null;
     int gridSize = map != null ? map.getTileSize().height : 1;
 
     return y(y, gridSize, Editor.preferences().snapToGrid(), Editor.preferences().snapToPixels());

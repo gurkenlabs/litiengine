@@ -1,21 +1,5 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.LayoutManager;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.GroupLayout;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
-
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
@@ -27,6 +11,20 @@ import de.gurkenlabs.utiliti.handlers.Transform;
 import de.gurkenlabs.utiliti.swing.ControlBehavior;
 import de.gurkenlabs.utiliti.swing.TagPanel;
 import de.gurkenlabs.utiliti.swing.UI;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.LayoutManager;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.GroupLayout;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
 @SuppressWarnings("serial")
 public class MapObjectInspector extends PropertyPanel implements PropertyInspector {
@@ -91,7 +89,8 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.lblLayer = new JLabel("");
     this.lblLayer.setHorizontalAlignment(SwingConstants.TRAILING);
     this.lblLayer.setForeground(Color.LIGHT_GRAY);
-    this.lblLayer.setFont(this.lblLayer.getFont().deriveFont(Style.getDefaultFont().getSize() * 0.75f));
+    this.lblLayer.setFont(
+        this.lblLayer.getFont().deriveFont(Style.getDefaultFont().getSize() * 0.75f));
 
     this.infoPanel.add(lblEntityId);
     this.infoPanel.add(Box.createHorizontalStrut(47));
@@ -99,8 +98,18 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.infoPanel.add(Box.createGlue());
     this.infoPanel.add(lblLayer);
 
-    this.transform = new DualSpinner(Resources.strings().get("panel_x"), Resources.strings().get("panel_y"), 0, Short.MAX_VALUE);
-    this.scale = new DualSpinner(Resources.strings().get("panel_width"), Resources.strings().get("panel_height"), 0, Short.MAX_VALUE);
+    this.transform =
+        new DualSpinner(
+            Resources.strings().get("panel_x"),
+            Resources.strings().get("panel_y"),
+            0,
+            Short.MAX_VALUE);
+    this.scale =
+        new DualSpinner(
+            Resources.strings().get("panel_width"),
+            Resources.strings().get("panel_height"),
+            0,
+            Short.MAX_VALUE);
 
     setLayout(createLayout());
     this.setupChangedListeners();
@@ -148,8 +157,16 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
   }
 
   private LayoutManager createLayout() {
-    LayoutItem[] layoutItems = new LayoutItem[] { new LayoutItem(infoPanel), new LayoutItem("panel_rendertype", renderType), new LayoutItem("panel_transform", transform), new LayoutItem("panel_scale", scale), new LayoutItem("panel_name", textFieldName), new LayoutItem("panel_tags", tagPanel),
-        new LayoutItem(tabbedPanel, GroupLayout.PREFERRED_SIZE) };
+    LayoutItem[] layoutItems =
+        new LayoutItem[] {
+            new LayoutItem(infoPanel),
+            new LayoutItem("panel_rendertype", renderType),
+            new LayoutItem("panel_transform", transform),
+            new LayoutItem("panel_scale", scale),
+            new LayoutItem("panel_name", textFieldName),
+            new LayoutItem("panel_tags", tagPanel),
+            new LayoutItem(tabbedPanel, GroupLayout.PREFERRED_SIZE)
+        };
     return this.createLayout(layoutItems);
   }
 
@@ -178,27 +195,37 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
     // add/remove collision panel
     if (currentType == MapObjectType.PROP || currentType == MapObjectType.CREATURE) {
-      tabbedPanel.addTab(Resources.strings().get(this.collisionPanel.getIdentifier()), this.collisionPanel.getIcon(), this.collisionPanel);
+      tabbedPanel.addTab(
+          Resources.strings().get(this.collisionPanel.getIdentifier()),
+          this.collisionPanel.getIcon(),
+          this.collisionPanel);
     } else {
       this.tabbedPanel.remove(this.collisionPanel);
     }
 
     // add/remove combat panel
     if (currentType == MapObjectType.PROP || currentType == MapObjectType.CREATURE) {
-      tabbedPanel.addTab(Resources.strings().get(this.combatPanel.getIdentifier()), this.combatPanel);
+      tabbedPanel.addTab(
+          Resources.strings().get(this.combatPanel.getIdentifier()), this.combatPanel);
     } else {
       this.tabbedPanel.remove(this.combatPanel);
     }
 
     // add/remove movement panel
     if (currentType == MapObjectType.CREATURE) {
-      tabbedPanel.addTab(Resources.strings().get(this.movementPanel.getIdentifier()), this.movementPanel.getIcon(), this.movementPanel);
+      tabbedPanel.addTab(
+          Resources.strings().get(this.movementPanel.getIdentifier()),
+          this.movementPanel.getIcon(),
+          this.movementPanel);
     } else {
       this.tabbedPanel.remove(this.movementPanel);
     }
 
     // always add custom panel
-    tabbedPanel.addTab(Resources.strings().get(this.customPanel.getIdentifier()), this.customPanel.getIcon(), this.customPanel);
+    tabbedPanel.addTab(
+        Resources.strings().get(this.customPanel.getIdentifier()),
+        this.customPanel.getIcon(),
+        this.customPanel);
 
     this.currentPanel = panel != null ? panel : this.customPanel;
     this.tabbedPanel.revalidate();
@@ -258,7 +285,10 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.lblLayer.setText("Layer: " + mapObject.getLayer());
 
     RenderType rt = mapObject.getEnumValue(MapObjectProperty.RENDERTYPE, RenderType.class);
-    boolean showRenderTypeControls = MapObjectType.get(mapObject.getType()) == MapObjectType.CREATURE || MapObjectType.get(mapObject.getType()) == MapObjectType.EMITTER || MapObjectType.get(mapObject.getType()) == MapObjectType.PROP;
+    boolean showRenderTypeControls =
+        MapObjectType.get(mapObject.getType()) == MapObjectType.CREATURE
+            || MapObjectType.get(mapObject.getType()) == MapObjectType.EMITTER
+            || MapObjectType.get(mapObject.getType()) == MapObjectType.PROP;
     this.renderType.setEnabled(showRenderTypeControls);
 
     if (rt != null) {
@@ -269,27 +299,34 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
   private void setupChangedListeners() {
     setup(renderType, MapObjectProperty.RENDERTYPE);
 
-    this.transform.addSpinnerListeners(m -> {
-      m.setX(getSpinnerValue(this.transform.getSpinner1()));
-      Transform.updateAnchors();
-    }, m -> {
-      m.setY(getSpinnerValue(this.transform.getSpinner2()));
-      Transform.updateAnchors();
-    });
+    this.transform.addSpinnerListeners(
+        m -> {
+          m.setX(getSpinnerValue(this.transform.getSpinner1()));
+          Transform.updateAnchors();
+        },
+        m -> {
+          m.setY(getSpinnerValue(this.transform.getSpinner2()));
+          Transform.updateAnchors();
+        });
 
-    this.scale.addSpinnerListeners(m -> {
-      m.setWidth(getSpinnerValue(this.scale.getSpinner1()));
-      Transform.updateAnchors();
-    }, m -> {
-      m.setHeight(getSpinnerValue(this.scale.getSpinner2()));
-      Transform.updateAnchors();
-    });
+    this.scale.addSpinnerListeners(
+        m -> {
+          m.setWidth(getSpinnerValue(this.scale.getSpinner1()));
+          Transform.updateAnchors();
+        },
+        m -> {
+          m.setHeight(getSpinnerValue(this.scale.getSpinner2()));
+          Transform.updateAnchors();
+        });
 
-    this.textFieldName.addFocusListener(new MapObjectPropteryFocusListener(m -> m.setName(textFieldName.getText())));
+    this.textFieldName.addFocusListener(
+        new MapObjectPropteryFocusListener(m -> m.setName(textFieldName.getText())));
 
-    this.textFieldName.addActionListener(new MapObjectPropertyActionListener(m -> m.setName(textFieldName.getText())));
+    this.textFieldName.addActionListener(
+        new MapObjectPropertyActionListener(m -> m.setName(textFieldName.getText())));
 
-    this.tagPanel.addActionListener(new MapObjectPropertyActionListener(m -> m.setValue(MapObjectProperty.TAGS, this.tagPanel.getTagsString())));
+    this.tagPanel.addActionListener(
+        new MapObjectPropertyActionListener(
+            m -> m.setValue(MapObjectProperty.TAGS, this.tagPanel.getTagsString())));
   }
-
 }

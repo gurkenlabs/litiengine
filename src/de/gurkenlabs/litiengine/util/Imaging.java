@@ -1,5 +1,8 @@
 package de.gurkenlabs.litiengine.util;
 
+import de.gurkenlabs.litiengine.entities.Rotation;
+import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Composite;
@@ -24,10 +27,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.UnaryOperator;
 
-import de.gurkenlabs.litiengine.entities.Rotation;
-import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
-
 public final class Imaging {
   public static final int CROP_ALIGN_CENTER = 0;
   public static final int CROP_ALIGN_LEFT = 1;
@@ -45,22 +44,19 @@ public final class Imaging {
   }
 
   /**
-   * Adds a shadow effect by executing the following steps: 1. Transform visible
-   * pixels to a semi-transparent black 2. Flip the image vertically 3. Scale it
-   * down 4. Render original image and shadow on a buffered image
-   * <p>
-   * TODO: Add support for different shadow types. Add an ellipse shadow, etc..
-   * </p>
-   * 
-   * @param image
-   *          the image
-   * @param xOffset
-   *          the x offset
-   * @param yOffset
-   *          the y offset
+   * Adds a shadow effect by executing the following steps: 1. Transform visible pixels to a
+   * semi-transparent black 2. Flip the image vertically 3. Scale it down 4. Render original image
+   * and shadow on a buffered image
+   *
+   * <p>TODO: Add support for different shadow types. Add an ellipse shadow, etc..
+   *
+   * @param image the image
+   * @param xOffset the x offset
+   * @param yOffset the y offset
    * @return the buffered image
    */
-  public static BufferedImage addShadow(final BufferedImage image, final int xOffset, final int yOffset) {
+  public static BufferedImage addShadow(
+      final BufferedImage image, final int xOffset, final int yOffset) {
     if (image == null) {
       return image;
     }
@@ -101,10 +97,8 @@ public final class Imaging {
   /**
    * All pixels that have the specified color are rendered transparent.
    *
-   * @param img
-   *          the img
-   * @param color
-   *          the color
+   * @param img the img
+   * @param color the color
    * @return the image
    */
   public static BufferedImage applyAlphaChannel(final BufferedImage img, final Color color) {
@@ -112,29 +106,32 @@ public final class Imaging {
       return img;
     }
 
-    final ImageFilter filter = new RGBImageFilter() {
+    final ImageFilter filter =
+        new RGBImageFilter() {
 
-      // the color we are looking for... Alpha bits are set to opaque
-      public final int markerRGB = color.getRGB() | 0xFF000000;
+          // the color we are looking for... Alpha bits are set to opaque
+          public final int markerRGB = color.getRGB() | 0xFF000000;
 
-      @Override
-      public final int filterRGB(final int x, final int y, final int rgb) {
-        if ((rgb | 0xFF000000) == this.markerRGB) {
-          // Mark the alpha bits as zero - transparent
-          return 0x00FFFFFF & rgb;
-        } else {
-          // nothing to do
-          return rgb;
-        }
-      }
-    };
+          @Override
+          public final int filterRGB(final int x, final int y, final int rgb) {
+            if ((rgb | 0xFF000000) == this.markerRGB) {
+              // Mark the alpha bits as zero - transparent
+              return 0x00FFFFFF & rgb;
+            } else {
+              // nothing to do
+              return rgb;
+            }
+          }
+        };
 
     final ImageProducer ip = new FilteredImageSource(img.getSource(), filter);
     return toBufferedImage(Toolkit.getDefaultToolkit().createImage(ip));
   }
 
-  public static BufferedImage borderAlpha(final BufferedImage image, final Color strokeColor, boolean borderOnly) {
-    final BufferedImage bimage = getCompatibleImage(image.getWidth(null) + 2, image.getHeight(null) + 2);
+  public static BufferedImage borderAlpha(
+      final BufferedImage image, final Color strokeColor, boolean borderOnly) {
+    final BufferedImage bimage =
+        getCompatibleImage(image.getWidth(null) + 2, image.getHeight(null) + 2);
     if (bimage == null) {
       return image;
     }
@@ -200,84 +197,76 @@ public final class Imaging {
   /**
    * Crops a sub image from the specified image.
    *
-   * @param image
-   *          The image to crop the sub-image from.
-   * @param cropAlignment
-   *          use the following consts: <br>
-   *          <ul>
-   *          <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_ALIGN_CENTER
-   *          CROP_ALIGN_CENTER}</li>
-   *          <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_ALIGN_LEFT
-   *          CROP_ALIGN_LEFT}</li>
-   *          <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_ALIGN_RIGHT
-   *          CROP_ALIGN_RIGHT}</li>
-   *          </ul>
-   * @param cropVerticlaAlignment
-   *          use the following consts: <br>
-   *          <ul>
-   *          <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_VALIGN_CENTER
-   *          CROP_VALIGN_CENTER}</li>
-   *          <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_VALIGN_TOP
-   *          CROP_VALIGN_TOP}</li>
-   *          <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_VALIGN_TOPCENTER
-   *          CROP_VALIGN_TOPCENTER}</li>
-   *          <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_VALIGN_BOTTOM
-   *          CROP_VALIGN_BOTTOM}</li>
-   *          </ul>
-   * @param width
-   *          The width to crop.
-   * @param height
-   *          The height to crop.
-   * @return The cropped image or the original image if it is smaller than the
-   *         specified dimensions.
+   * @param image The image to crop the sub-image from.
+   * @param cropAlignment use the following consts: <br>
+   *     <ul>
+   *       <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_ALIGN_CENTER CROP_ALIGN_CENTER}
+   *       <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_ALIGN_LEFT CROP_ALIGN_LEFT}
+   *       <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_ALIGN_RIGHT CROP_ALIGN_RIGHT}
+   *     </ul>
+   *
+   * @param cropVerticlaAlignment use the following consts: <br>
+   *     <ul>
+   *       <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_VALIGN_CENTER CROP_VALIGN_CENTER}
+   *       <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_VALIGN_TOP CROP_VALIGN_TOP}
+   *       <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_VALIGN_TOPCENTER
+   *           CROP_VALIGN_TOPCENTER}
+   *       <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_VALIGN_BOTTOM CROP_VALIGN_BOTTOM}
+   *     </ul>
+   *
+   * @param width The width to crop.
+   * @param height The height to crop.
+   * @return The cropped image or the original image if it is smaller than the specified dimensions.
    */
-  public static BufferedImage crop(final BufferedImage image, final int cropAlignment, final int cropVerticlaAlignment, final int width, final int height) {
+  public static BufferedImage crop(
+      final BufferedImage image,
+      final int cropAlignment,
+      final int cropVerticlaAlignment,
+      final int width,
+      final int height) {
     if (width > image.getWidth() || height > image.getHeight()) {
       return image;
     }
 
     int x;
     switch (cropAlignment) {
-    case CROP_ALIGN_CENTER:
-      x = image.getWidth() / 2 - width / 2;
-      break;
-    case CROP_ALIGN_RIGHT:
-      x = image.getWidth() - width;
-      break;
-    case CROP_ALIGN_LEFT:
-    default:
-      x = 0;
-      break;
+      case CROP_ALIGN_CENTER:
+        x = image.getWidth() / 2 - width / 2;
+        break;
+      case CROP_ALIGN_RIGHT:
+        x = image.getWidth() - width;
+        break;
+      case CROP_ALIGN_LEFT:
+      default:
+        x = 0;
+        break;
     }
 
     int y;
     switch (cropVerticlaAlignment) {
-    case CROP_VALIGN_CENTER:
-      y = image.getHeight() / 2 - height / 2;
-      break;
-    case CROP_VALIGN_BOTTOM:
-      y = image.getHeight() - height;
-      break;
-    case CROP_VALIGN_TOPCENTER:
-      y = image.getHeight() / 2 - height;
-      break;
-    case CROP_VALIGN_TOP:
-    default:
-      y = 0;
-      break;
+      case CROP_VALIGN_CENTER:
+        y = image.getHeight() / 2 - height / 2;
+        break;
+      case CROP_VALIGN_BOTTOM:
+        y = image.getHeight() - height;
+        break;
+      case CROP_VALIGN_TOPCENTER:
+        y = image.getHeight() / 2 - height;
+        break;
+      case CROP_VALIGN_TOP:
+      default:
+        y = 0;
+        break;
     }
 
     return image.getSubimage(x, y, width, height);
   }
 
   /**
-   * All pixels that are not transparent are replaced by a pixel of the
-   * specified flashColor.
+   * All pixels that are not transparent are replaced by a pixel of the specified flashColor.
    *
-   * @param image
-   *          the image
-   * @param flashColor
-   *          the flash color
+   * @param image the image
+   * @param flashColor the flash color
    * @return the buffered image
    */
   public static BufferedImage flashVisiblePixels(final Image image, final Color flashColor) {
@@ -313,9 +302,8 @@ public final class Imaging {
 
   /**
    * Creates a new {@code BufferedImage} instance from the specified image.
-   * 
-   * @param image
-   *          The image to be copied.
+   *
+   * @param image The image to be copied.
    * @return A copy of the specified image.
    */
   public static BufferedImage copy(BufferedImage image) {
@@ -340,19 +328,16 @@ public final class Imaging {
   }
 
   /**
-   * Gets a two dimensional grid that contains parts of the specified image.
-   * Splits up the specified image into a grid with the defined number of rows and columns.
-   * 
-   * @param image
-   *          The base image that will be split up.
-   * @param rows
-   *          The number of rows.
-   * @param columns
-   *          The number or columns.
+   * Gets a two dimensional grid that contains parts of the specified image. Splits up the specified
+   * image into a grid with the defined number of rows and columns.
    *
+   * @param image The base image that will be split up.
+   * @param rows The number of rows.
+   * @param columns The number or columns.
    * @return A two dimensional array with all the sub-images.
    */
-  public static BufferedImage[][] getSubImages(final BufferedImage image, final int rows, final int columns) {
+  public static BufferedImage[][] getSubImages(
+      final BufferedImage image, final int rows, final int columns) {
     final BufferedImage[][] smallImages = new BufferedImage[rows][columns];
     final int smallWidth = image.getWidth() / columns;
     final int smallHeight = image.getHeight() / rows;
@@ -371,8 +356,7 @@ public final class Imaging {
   /**
    * Flips the specified image horizontally.
    *
-   * @param img
-   *          The image to be flipped.
+   * @param img The image to be flipped.
    * @return The flipped image.
    */
   public static BufferedImage horizontalFlip(final BufferedImage img) {
@@ -392,8 +376,7 @@ public final class Imaging {
   /**
    * Flips the specified image vertically.
    *
-   * @param img
-   *          The image to be flipped.
+   * @param img The image to be flipped.
    * @return The flipped image.
    */
   public static BufferedImage verticalFlip(final BufferedImage img) {
@@ -411,15 +394,16 @@ public final class Imaging {
   }
 
   /**
-   * Replace colors in an image according to a Map containing source colors and target colors, then return the result.
-   * 
-   * @param bufferedImage
-   *          the original image
-   * @param colorMappings
-   *          a Map with source colors as keys and target colors as values
-   * @return a new version of the original image, where the source colors are replaced with the target colors.
+   * Replace colors in an image according to a Map containing source colors and target colors, then
+   * return the result.
+   *
+   * @param bufferedImage the original image
+   * @param colorMappings a Map with source colors as keys and target colors as values
+   * @return a new version of the original image, where the source colors are replaced with the
+   *     target colors.
    */
-  public static BufferedImage replaceColors(final BufferedImage bufferedImage, Map<Color, Color> colorMappings) {
+  public static BufferedImage replaceColors(
+      final BufferedImage bufferedImage, Map<Color, Color> colorMappings) {
     BufferedImage recoloredImage = copy(bufferedImage);
     for (Entry<Color, Color> c : colorMappings.entrySet()) {
       for (int y = 0; y < recoloredImage.getHeight(); y++) {
@@ -464,7 +448,8 @@ public final class Imaging {
   }
 
   public static BufferedImage scale(final BufferedImage image, final int max) {
-    Dimension2D newDimension = GeometricUtilities.scaleWithRatio(image.getWidth(), image.getHeight(), max);
+    Dimension2D newDimension =
+        GeometricUtilities.scaleWithRatio(image.getWidth(), image.getHeight(), max);
     return scale(image, (int) newDimension.getWidth(), (int) newDimension.getHeight());
   }
 
@@ -472,38 +457,45 @@ public final class Imaging {
     return scale(image, factor, false);
   }
 
-  public static BufferedImage scale(final BufferedImage image, final double factor, boolean keepRatio) {
+  public static BufferedImage scale(
+      final BufferedImage image, final double factor, boolean keepRatio) {
     if (image == null) {
       return null;
     }
     final double width = image.getWidth();
     final double height = image.getHeight();
 
-    return scale(image, (int) Math.max(1, Math.round(width * factor)), (int) Math.max(1, Math.round(height * factor)), keepRatio);
+    return scale(
+        image,
+        (int) Math.max(1, Math.round(width * factor)),
+        (int) Math.max(1, Math.round(height * factor)),
+        keepRatio);
   }
 
   /**
-   * The specified image is scaled to a new dimension with the specified width
-   * and height. This method doesn't use anti aliasing for this process to keep
-   * the indy look.
+   * The specified image is scaled to a new dimension with the specified width and height. This
+   * method doesn't use anti aliasing for this process to keep the indy look.
    *
-   * @param image
-   *          the image
-   * @param width
-   *          the width
-   * @param height
-   *          the height
+   * @param image the image
+   * @param width the width
+   * @param height the height
    * @return the buffered image
    */
   public static BufferedImage scale(final BufferedImage image, final int width, final int height) {
     return scale(image, width, height, false);
   }
 
-  public static BufferedImage scale(final BufferedImage image, final int width, final int height, final boolean keepRatio) {
+  public static BufferedImage scale(
+      final BufferedImage image, final int width, final int height, final boolean keepRatio) {
     return scale(image, width, height, keepRatio, true);
   }
 
-  public static BufferedImage scale(final BufferedImage image, final int width, final int height, final boolean keepRatio, final boolean fill) {
+  public static BufferedImage scale(
+      final BufferedImage image,
+      final int width,
+      final int height,
+      final boolean keepRatio,
+      final boolean fill) {
     if (width == 0 || height == 0 || image == null) {
       return null;
     }
@@ -526,8 +518,10 @@ public final class Imaging {
     final double scaleX = newWidth / imageWidth;
     final double scaleY = newHeight / imageHeight;
     final AffineTransform scaleTransform = AffineTransform.getScaleInstance(scaleX, scaleY);
-    final AffineTransformOp bilinearScaleOp = new AffineTransformOp(scaleTransform, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
-    final BufferedImage scaled = bilinearScaleOp.filter(image, getCompatibleImage((int) newWidth, (int) newHeight));
+    final AffineTransformOp bilinearScaleOp =
+        new AffineTransformOp(scaleTransform, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+    final BufferedImage scaled =
+        bilinearScaleOp.filter(image, getCompatibleImage((int) newWidth, (int) newHeight));
     final BufferedImage newImg = getCompatibleImage((int) newWidth, (int) newHeight);
     if (newImg == null) {
       return image;
@@ -540,7 +534,8 @@ public final class Imaging {
     if (fill && (newWidth != width || newHeight != height)) {
       final BufferedImage wrapperImage = getCompatibleImage(width, height);
       final Graphics2D g2 = (Graphics2D) wrapperImage.getGraphics();
-      g2.drawImage(newImg, (int) ((width - newWidth) / 2.0), (int) ((height - newHeight) / 2.0), null);
+      g2.drawImage(
+          newImg, (int) ((width - newWidth) / 2.0), (int) ((height - newHeight) / 2.0), null);
       g2.dispose();
       return wrapperImage;
     }
@@ -549,8 +544,7 @@ public final class Imaging {
   }
 
   public static BufferedImage setOpacity(final Image img, final float opacity) {
-    if (img == null)
-      return null;
+    if (img == null) return null;
     final BufferedImage bimage = getCompatibleImage(img.getWidth(null), img.getHeight(null));
     if (bimage == null) {
       return null;
@@ -600,8 +594,12 @@ public final class Imaging {
     return compatibleImg;
   }
 
-  private static BufferedImage flipSprites(final Spritesheet sprite, UnaryOperator<BufferedImage> flipFunction) {
-    final BufferedImage flippedSprite = Imaging.getCompatibleImage(sprite.getSpriteWidth() * sprite.getColumns(), sprite.getSpriteHeight() * sprite.getRows());
+  private static BufferedImage flipSprites(
+      final Spritesheet sprite, UnaryOperator<BufferedImage> flipFunction) {
+    final BufferedImage flippedSprite =
+        Imaging.getCompatibleImage(
+            sprite.getSpriteWidth() * sprite.getColumns(),
+            sprite.getSpriteHeight() * sprite.getRows());
     if (flippedSprite == null) {
       return null;
     }
@@ -610,7 +608,11 @@ public final class Imaging {
     int index = 0;
     for (int column = 0; column < sprite.getColumns(); column++) {
       for (int row = 0; row < sprite.getRows(); row++) {
-        g.drawImage(flipFunction.apply(sprite.getSprite(index)), column * sprite.getSpriteWidth(), row * sprite.getSpriteHeight(), null);
+        g.drawImage(
+            flipFunction.apply(sprite.getSprite(index)),
+            column * sprite.getSpriteWidth(),
+            row * sprite.getSpriteHeight(),
+            null);
         index++;
       }
     }

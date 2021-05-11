@@ -1,18 +1,17 @@
 package de.gurkenlabs.litiengine.abilities.effects;
 
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.abilities.Ability;
-import de.gurkenlabs.litiengine.entities.Creature;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.awt.Shape;
-import java.util.Arrays;
-
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.abilities.Ability;
+import de.gurkenlabs.litiengine.entities.Creature;
+import java.awt.Shape;
+import java.util.Arrays;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class EffectTests {
 
@@ -45,8 +44,8 @@ class EffectTests {
     // arrange
     Shape shape = mock(Shape.class);
 
-    EffectApplication effectApplication = new EffectApplication(
-        Arrays.asList(new Creature(), new Creature(), new Creature()), shape);
+    EffectApplication effectApplication =
+        new EffectApplication(Arrays.asList(new Creature(), new Creature(), new Creature()), shape);
 
     // act
     testEffect.cease(effectApplication);
@@ -55,18 +54,14 @@ class EffectTests {
     verify(listener, times(3)).ceased(any());
   }
 
-  /**
-   * Same as in the AbilityExecutionTests
-   */
+  /** Same as in the AbilityExecutionTests */
   private static class TestAbility extends Ability {
     protected TestAbility(Creature executor) {
       super(executor);
     }
   }
 
-  /**
-   * Same as in the AbilityExecutionTests
-   */
+  /** Same as in the AbilityExecutionTests */
   private static class TestEffect extends Effect {
     protected TestEffect(Ability ability, EffectTarget... targets) {
       super(ability, targets);

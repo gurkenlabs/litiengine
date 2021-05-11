@@ -4,9 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-public class ZoomTests {
+class ZoomTests {
   @Test
-  public void testZoomIn() {
+  void testZoomIn() {
     for (int i = 0; i < 100; i++) {
       Zoom.in();
     }
@@ -15,7 +15,7 @@ public class ZoomTests {
   }
 
   @Test
-  public void testZoomOut() {
+  void testZoomOut() {
     for (int i = 0; i < 100; i++) {
       Zoom.out();
     }
@@ -24,7 +24,7 @@ public class ZoomTests {
   }
 
   @Test
-  public void testZoomMatchToPresets() {
+  void testZoomMatchToPresets() {
     int matched1 = Zoom.match(1.11111f);
     int matched2 = Zoom.match(101f);
     int matched3 = Zoom.match(1000000f);

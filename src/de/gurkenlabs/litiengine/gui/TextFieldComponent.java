@@ -1,5 +1,8 @@
 package de.gurkenlabs.litiengine.gui;
 
+import de.gurkenlabs.litiengine.Align;
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.input.Input;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
@@ -11,10 +14,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import de.gurkenlabs.litiengine.Align;
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.input.Input;
 
 public class TextFieldComponent extends ImageComponent {
   public static final String DOUBLE_FORMAT = "[-+]?[0-9]*\\.?[0-9]*([eE][-+]?[0-9]*)?";
@@ -29,23 +28,27 @@ public class TextFieldComponent extends ImageComponent {
   private long lastToggled;
   private int maxLength = 0;
 
-  public TextFieldComponent(final double x, final double y, final double width, final double height, final String text) {
+  public TextFieldComponent(
+      final double x, final double y, final double width, final double height, final String text) {
     super(x, y, width, height, text);
     this.changeConfirmedConsumers = new CopyOnWriteArrayList<>();
     this.setText(text);
     this.flickerDelay = 100;
     Input.keyboard().onKeyTyped(this::handleTypedKey);
-    this.onClicked(e -> {
-      if (!this.isSelected()) {
-        this.toggleSelection();
-      }
-    });
+    this.onClicked(
+        e -> {
+          if (!this.isSelected()) {
+            this.toggleSelection();
+          }
+        });
 
-    Input.mouse().onClicked(e -> {
-      if (!this.getBoundingBox().contains(Input.mouse().getLocation())) {
-        this.setSelected(false);
-      }
-    });
+    Input.mouse()
+        .onClicked(
+            e -> {
+              if (!this.getBoundingBox().contains(Input.mouse().getLocation())) {
+                this.setSelected(false);
+              }
+            });
 
     this.setTextAlign(Align.LEFT);
   }
@@ -69,23 +72,26 @@ public class TextFieldComponent extends ImageComponent {
     }
 
     switch (event.getKeyCode()) {
-    case KeyEvent.VK_BACK_SPACE:
-      this.handleBackSpace();
-      break;
-    case KeyEvent.VK_SPACE:
-      if (!this.getText().equals("")) {
-        this.setText(this.getText() + " ");
-      }
-      break;
-    case KeyEvent.VK_ENTER:
-      this.toggleSelection();
-      this.changeConfirmedConsumers.forEach(c -> c.accept(this.getText()));
+      case KeyEvent.VK_BACK_SPACE:
+        this.handleBackSpace();
+        break;
+      case KeyEvent.VK_SPACE:
+        if (!this.getText().equals("")) {
+          this.setText(this.getText() + " ");
+        }
+        break;
+      case KeyEvent.VK_ENTER:
+        this.toggleSelection();
+        this.changeConfirmedConsumers.forEach(c -> c.accept(this.getText()));
 
-      log.log(Level.INFO, "{0} typed into TextField with ComponentID {1}", new Object[] { this.getText(), this.getComponentId() });
-      break;
-    default:
-      this.handleNormalTyping(event);
-      break;
+        log.log(
+            Level.INFO,
+            "{0} typed into TextField with ComponentID {1}",
+            new Object[] {this.getText(), this.getComponentId()});
+        break;
+      default:
+        this.handleNormalTyping(event);
+        break;
     }
   }
 
@@ -104,7 +110,12 @@ public class TextFieldComponent extends ImageComponent {
       this.lastToggled = Game.time().now();
     }
     if (this.isSelected() && this.cursorVisible) {
-      final Rectangle2D cursor = new Rectangle2D.Double(this.getX() + this.getTextX() + fm.stringWidth(this.getTextToRender(g)), this.getY() + this.getTextY(), this.getFont().getSize2D() * 3 / 5, this.getFont().getSize2D() * 1 / 5);
+      final Rectangle2D cursor =
+          new Rectangle2D.Double(
+              this.getX() + this.getTextX() + fm.stringWidth(this.getTextToRender(g)),
+              this.getY() + this.getTextY(),
+              this.getFont().getSize2D() * 3 / 5,
+              this.getFont().getSize2D() * 1 / 5);
       g.setColor(this.getAppearance().getForeColor());
       g.fill(cursor);
     }
@@ -125,11 +136,13 @@ public class TextFieldComponent extends ImageComponent {
 
   private void handleBackSpace() {
     if (Input.keyboard().isPressed(KeyEvent.VK_SHIFT)) {
-      while (this.getText().length() >= 1 && this.getText().charAt(this.getText().length() - 1) == ' ') {
+      while (this.getText().length() >= 1
+          && this.getText().charAt(this.getText().length() - 1) == ' ') {
         this.setText(this.getText().substring(0, this.getText().length() - 1));
       }
 
-      while (this.getText().length() >= 1 && this.getText().charAt(this.getText().length() - 1) != ' ') {
+      while (this.getText().length() >= 1
+          && this.getText().charAt(this.getText().length() - 1) != ' ') {
         this.setText(this.getText().substring(0, this.getText().length() - 1));
       }
     } else if (this.getText().length() >= 1) {
@@ -168,6 +181,7 @@ public class TextFieldComponent extends ImageComponent {
   }
 
   private boolean isKnownNumericFormat() {
-    return this.getFormat() != null && (this.getFormat().equals(INTEGER_FORMAT) || this.getFormat().equals(DOUBLE_FORMAT));
+    return this.getFormat() != null
+        && (this.getFormat().equals(INTEGER_FORMAT) || this.getFormat().equals(DOUBLE_FORMAT));
   }
 }

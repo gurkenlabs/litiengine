@@ -1,10 +1,14 @@
 package de.gurkenlabs.litiengine.entities;
 
-import de.gurkenlabs.litiengine.*;
-import de.gurkenlabs.litiengine.abilities.*;
-import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-import static org.junit.jupiter.api.Assertions.*;
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.abilities.Ability;
+import de.gurkenlabs.litiengine.abilities.AbilityInfo;
+import de.gurkenlabs.litiengine.abilities.CastType;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 class EntityHitEventTests {
 
@@ -14,8 +18,18 @@ class EntityHitEventTests {
     Game.init(Game.COMMANDLINE_ARG_NOGUI);
   }
 
-  @AbilityInfo(castType = CastType.ONCONFIRM, name = "random name", description = "random description", cooldown = 333, duration = 222, impact = 111,
-      impactAngle = 99, multiTarget = true, origin = EntityPivotType.OFFSET, range = 444, value = 999)
+  @AbilityInfo(
+      castType = CastType.ONCONFIRM,
+      name = "random name",
+      description = "random description",
+      cooldown = 333,
+      duration = 222,
+      impact = 111,
+      impactAngle = 99,
+      multiTarget = true,
+      origin = EntityPivotType.OFFSET,
+      range = 444,
+      value = 999)
   private static class TestAbility extends Ability {
     protected TestAbility(Creature executor) {
       super(executor);

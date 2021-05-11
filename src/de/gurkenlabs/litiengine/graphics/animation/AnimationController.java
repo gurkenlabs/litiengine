@@ -1,5 +1,11 @@
 package de.gurkenlabs.litiengine.graphics.animation;
 
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.ILoop;
+import de.gurkenlabs.litiengine.graphics.ImageEffect;
+import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.util.Imaging;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -10,13 +16,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.ILoop;
-import de.gurkenlabs.litiengine.graphics.ImageEffect;
-import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.litiengine.util.Imaging;
 
 public class AnimationController implements IAnimationController {
   private static final int MAX_IMAGE_EFFECTS = 20;
@@ -29,9 +28,7 @@ public class AnimationController implements IAnimationController {
   private final List<ImageEffect> imageEffects;
   private final List<AnimationListener> listeners;
 
-  /**
-   * Initializes a new instance of the {@code AnimationController} class.
-   */
+  /** Initializes a new instance of the {@code AnimationController} class. */
   public AnimationController() {
     this.animations = new ConcurrentHashMap<>();
     this.imageEffects = new CopyOnWriteArrayList<>();
@@ -40,11 +37,10 @@ public class AnimationController implements IAnimationController {
   }
 
   /**
-   * Initializes a new instance of the {@code AnimationController} class with the specified default animation.
-   * 
-   * @param defaultAnimation
-   *          The default animation for this controller.
-   * 
+   * Initializes a new instance of the {@code AnimationController} class with the specified default
+   * animation.
+   *
+   * @param defaultAnimation The default animation for this controller.
    * @see #getDefault()
    */
   public AnimationController(final Animation defaultAnimation) {
@@ -53,13 +49,11 @@ public class AnimationController implements IAnimationController {
   }
 
   /**
-   * Initializes a new instance of the {@code AnimationController} class with the specified default animation.
-   * 
-   * @param defaultAnimation
-   *          The default animation for this controller.
-   * @param animations
-   *          Additional animations that are managed by this controller instance.
-   * 
+   * Initializes a new instance of the {@code AnimationController} class with the specified default
+   * animation.
+   *
+   * @param defaultAnimation The default animation for this controller.
+   * @param animations Additional animations that are managed by this controller instance.
    * @see #getDefault()
    * @see #getAll()
    */
@@ -76,23 +70,22 @@ public class AnimationController implements IAnimationController {
   }
 
   /**
-   * Initializes a new instance of the {@code AnimationController} class with the specified default animation.
-   * 
-   * @param sprite
-   *          The sprite sheet used by the default animation of this controller.
+   * Initializes a new instance of the {@code AnimationController} class with the specified default
+   * animation.
+   *
+   * @param sprite The sprite sheet used by the default animation of this controller.
    */
   public AnimationController(final Spritesheet sprite) {
     this(sprite, true);
   }
 
   /**
-   * Initializes a new instance of the {@code AnimationController} class with the specified default animation.
-   * 
-   * @param sprite
-   *          The sprite sheet used by the default animation of this controller.
-   * 
-   * @param loop
-   *          A flag indicating whether the default animation should be looped or only played once.
+   * Initializes a new instance of the {@code AnimationController} class with the specified default
+   * animation.
+   *
+   * @param sprite The sprite sheet used by the default animation of this controller.
+   * @param loop A flag indicating whether the default animation should be looped or only played
+   *     once.
    */
   public AnimationController(final Spritesheet sprite, final boolean loop) {
     this(new Animation(sprite, loop, Resources.spritesheets().getCustomKeyFrameDurations(sprite)));
@@ -100,7 +93,13 @@ public class AnimationController implements IAnimationController {
 
   public static Animation flipAnimation(Animation anim, String newSpriteName) {
     final BufferedImage flippedImage = Imaging.flipSpritesHorizontally(anim.getSpritesheet());
-    Spritesheet flippedSpritesheet = Resources.spritesheets().load(flippedImage, newSpriteName, anim.getSpritesheet().getSpriteWidth(), anim.getSpritesheet().getSpriteHeight());
+    Spritesheet flippedSpritesheet =
+        Resources.spritesheets()
+            .load(
+                flippedImage,
+                newSpriteName,
+                anim.getSpritesheet().getSpriteWidth(),
+                anim.getSpritesheet().getSpriteHeight());
     return new Animation(flippedSpritesheet, anim.isLooping(), anim.getKeyFrameDurations());
   }
 
@@ -135,7 +134,7 @@ public class AnimationController implements IAnimationController {
 
   /**
    * Attach the {@code AnimationController}, as well as all its {@code Animation}s to the Game loop.
-   * 
+   *
    * @see ILoop
    */
   public void attach() {
@@ -148,8 +147,9 @@ public class AnimationController implements IAnimationController {
   }
 
   /**
-   * Detach the {@code AnimationController}, as well as all its {@code Animation}s from the Game loop.
-   * 
+   * Detach the {@code AnimationController}, as well as all its {@code Animation}s from the Game
+   * loop.
+   *
    * @see ILoop
    */
   public void detach() {
@@ -187,7 +187,9 @@ public class AnimationController implements IAnimationController {
     }
 
     final Animation current = this.getCurrent();
-    if (current == null || current.getSpritesheet() == null || current.getCurrentKeyFrame() == null) {
+    if (current == null
+        || current.getSpritesheet() == null
+        || current.getCurrentKeyFrame() == null) {
       return null;
     }
 
@@ -197,7 +199,8 @@ public class AnimationController implements IAnimationController {
       return opt.get();
     }
 
-    BufferedImage sprite = current.getSpritesheet().getSprite(current.getCurrentKeyFrame().getSpriteIndex());
+    BufferedImage sprite =
+        current.getSpritesheet().getSprite(current.getCurrentKeyFrame().getSpriteIndex());
     for (final ImageEffect effect : this.getImageEffects()) {
       sprite = effect.apply(sprite);
     }
@@ -255,7 +258,9 @@ public class AnimationController implements IAnimationController {
 
   @Override
   public boolean isPlaying(final String animationName) {
-    return this.getCurrent() != null && this.getCurrent().getName() != null && this.getCurrent().getName().equalsIgnoreCase(animationName);
+    return this.getCurrent() != null
+        && this.getCurrent().getName() != null
+        && this.getCurrent().getName().equalsIgnoreCase(animationName);
   }
 
   @Override
@@ -343,7 +348,7 @@ public class AnimationController implements IAnimationController {
     for (final Animation animation : this.getAll()) {
       animation.update();
     }
-    
+
     if (this.getCurrent() != null && this.getCurrent().isPaused()) {
       return;
     }
@@ -365,14 +370,16 @@ public class AnimationController implements IAnimationController {
   }
 
   /**
-   * Build a unique cache key for the current frame.
-   * The spritesheet's {@code hashCode}, the current keyframe's sprite index, as well as all applied {@code ImageEffect}s' names, are
-   * considered when determining the current cache key.
-   * 
+   * Build a unique cache key for the current frame. The spritesheet's {@code hashCode}, the current
+   * keyframe's sprite index, as well as all applied {@code ImageEffect}s' names, are considered
+   * when determining the current cache key.
+   *
    * @return the unique cache key for the current key frame
    */
   protected String buildCurrentCacheKey() {
-    if (this.getCurrent() == null || this.getCurrent().getCurrentKeyFrame() == null || this.getCurrent().getSpritesheet() == null) {
+    if (this.getCurrent() == null
+        || this.getCurrent().getCurrentKeyFrame() == null
+        || this.getCurrent().getSpritesheet() == null) {
       return null;
     }
     final StringBuilder cacheKey = new StringBuilder();

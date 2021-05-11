@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -39,19 +38,16 @@ public final class XmlUtilities {
   }
 
   /**
-   * Saves the XML, contained by the specified input with the custom
-   * indentation. If the input is the result of jaxb marshalling, make sure to
-   * set Marshaller.JAXB_FORMATTED_OUTPUT to false in order for this method to
-   * work properly.
-   * 
-   * @param input
-   *          The input stream that contains the original XML.
-   * @param fos
-   *          The output stream that is used to save the XML.
-   * @param indentation
-   *          The indentation with which the XML should be saved.
+   * Saves the XML, contained by the specified input with the custom indentation. If the input is
+   * the result of jaxb marshalling, make sure to set Marshaller.JAXB_FORMATTED_OUTPUT to false in
+   * order for this method to work properly.
+   *
+   * @param input The input stream that contains the original XML.
+   * @param fos The output stream that is used to save the XML.
+   * @param indentation The indentation with which the XML should be saved.
    */
-  public static void saveWithCustomIndentation(ByteArrayInputStream input, FileOutputStream fos, int indentation) {
+  public static void saveWithCustomIndentation(
+      ByteArrayInputStream input, FileOutputStream fos, int indentation) {
     try {
       TransformerFactory transformerFactory = TransformerFactory.newInstance();
       transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, ""); // Compliant
@@ -59,7 +55,8 @@ public final class XmlUtilities {
       Transformer transformer = transformerFactory.newTransformer();
       transformer.setOutputProperty(OutputKeys.DOCTYPE_PUBLIC, "yes");
       transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-      transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", String.valueOf(indentation));
+      transformer.setOutputProperty(
+          "{http://xml.apache.org/xslt}indent-amount", String.valueOf(indentation));
       Source xmlSource = new SAXSource(new org.xml.sax.InputSource(input));
       StreamResult res = new StreamResult(fos);
       transformer.transform(xmlSource, res);
@@ -121,7 +118,8 @@ public final class XmlUtilities {
       jaxbMarshaller.marshal(object, out);
 
       // second: postprocess xml and then write it to the file
-      XmlUtilities.saveWithCustomIndentation(new ByteArrayInputStream(out.toByteArray()), fileOut, 1);
+      XmlUtilities.saveWithCustomIndentation(
+          new ByteArrayInputStream(out.toByteArray()), fileOut, 1);
       out.close();
 
       jaxbMarshaller.marshal(object, out);

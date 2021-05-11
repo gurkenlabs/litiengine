@@ -1,23 +1,21 @@
 package de.gurkenlabs.litiengine.graphics.animation;
 
-import java.awt.image.BufferedImage;
-import java.util.Optional;
-
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.PropState;
 import de.gurkenlabs.litiengine.entities.Rotation;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.Imaging;
+import java.awt.image.BufferedImage;
+import java.util.Optional;
 
 public class PropAnimationController<T extends Prop> extends EntityAnimationController<T> {
   public static final String PROP_IDENTIFIER = "prop-";
 
   /**
    * Initializes a new instance of the {@code PropAnimationController} class.
-   * 
-   * @param prop
-   *          The prop related to this controller.
+   *
+   * @param prop The prop related to this controller.
    */
   public PropAnimationController(final T prop) {
     super(prop);
@@ -29,15 +27,10 @@ public class PropAnimationController<T extends Prop> extends EntityAnimationCont
 
   /**
    * Gets the sprite name for the specified prop and state.
-   * 
-   * @param prop
-   *          The prop to retrieve the sprite name for.
-   * 
-   * @param appendState
-   *          A flag indicating whether the state should be appended to the name.
-   * 
+   *
+   * @param prop The prop to retrieve the sprite name for.
+   * @param appendState A flag indicating whether the state should be appended to the name.
    * @return A string representing the sprite name for the specified prop in its state.
-   * 
    * @see Prop#getSpritesheetName()
    * @see Prop#getState()
    */
@@ -47,18 +40,11 @@ public class PropAnimationController<T extends Prop> extends EntityAnimationCont
 
   /**
    * Gets the sprite name for the specified prop and state.
-   * 
-   * @param prop
-   *          The prop to retrieve the sprite name for.
-   * 
-   * @param state
-   *          The state of the prop.
-   * 
-   * @param appendState
-   *          A flag indicating whether the state should be appended to the name.
-   * 
+   *
+   * @param prop The prop to retrieve the sprite name for.
+   * @param state The state of the prop.
+   * @param appendState A flag indicating whether the state should be appended to the name.
    * @return A string representing the sprite name for the specified prop in its state.
-   * 
    * @see Prop#getSpritesheetName()
    * @see Prop#getState()
    */
@@ -137,7 +123,12 @@ public class PropAnimationController<T extends Prop> extends EntityAnimationCont
       return null;
     }
 
-    return new Animation(state.spriteString(), spritesheet, true, true, Resources.spritesheets().getCustomKeyFrameDurations(spritesheet.getName()));
+    return new Animation(
+        state.spriteString(),
+        spritesheet,
+        true,
+        true,
+        Resources.spritesheets().getCustomKeyFrameDurations(spritesheet.getName()));
   }
 
   private static Spritesheet findSpriteSheet(final Prop prop, final PropState state) {

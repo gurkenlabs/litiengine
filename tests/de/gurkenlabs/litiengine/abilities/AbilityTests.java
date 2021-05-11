@@ -3,26 +3,29 @@ package de.gurkenlabs.litiengine.abilities;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.Mockito.*;
-
-import java.awt.Graphics2D;
-import java.awt.Shape;
-import java.awt.geom.Arc2D;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Rectangle2D;
-
-import de.gurkenlabs.litiengine.graphics.RenderEngine;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.abilities.effects.Effect;
 import de.gurkenlabs.litiengine.abilities.effects.EffectTarget;
 import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.entities.EntityPivotType;
+import de.gurkenlabs.litiengine.graphics.RenderEngine;
+import java.awt.Graphics2D;
+import java.awt.Shape;
+import java.awt.geom.Arc2D;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Rectangle2D;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
 class AbilityTests {
@@ -67,7 +70,8 @@ class AbilityTests {
     TestAbility ability = setupAbility();
 
     AbilityExecution abExec = mock(AbilityExecution.class);
-    when(abExec.getExecutionTicks()).thenReturn(Game.time().now() - (ability.getAttributes().cooldown().get() + 1));
+    when(abExec.getExecutionTicks())
+        .thenReturn(Game.time().now() - (ability.getAttributes().cooldown().get() + 1));
     ability.setCurrentExecution(abExec);
 
     // act
@@ -130,10 +134,10 @@ class AbilityTests {
     when(ae.getExecutionTicks()).thenReturn(10l);
     ability.setCurrentExecution(ae);
 
-    //act
+    // act
     float actual = ability.getRemainingCooldownInSeconds();
 
-    //assert
+    // assert
     assertEquals(0.499, actual, 0.0001);
   }
 
@@ -147,10 +151,10 @@ class AbilityTests {
     when(ae.getExecutionTicks()).thenReturn(0l);
     ability.setCurrentExecution(ae);
 
-    //act
+    // act
     float actual = ability.getRemainingCooldownInSeconds();
 
-    //assert
+    // assert
     assertEquals(0, actual);
   }
 
@@ -186,10 +190,14 @@ class AbilityTests {
     assertEquals(ability, effect.getAbility());
     assertEquals(0, effect.getFollowUpEffects().size());
     assertFalse(effect.isActive(entity));
-    assertArrayEquals(new EffectTarget[] { EffectTarget.ENEMY }, effect.getEffectTargets());
+    assertArrayEquals(new EffectTarget[] {EffectTarget.ENEMY}, effect.getEffectTargets());
   }
 
-  @AbilityInfo(impact = 150, impactAngle = 360, origin = EntityPivotType.DIMENSION_CENTER, range = 100)
+  @AbilityInfo(
+      impact = 150,
+      impactAngle = 360,
+      origin = EntityPivotType.DIMENSION_CENTER,
+      range = 100)
   private class TestAbility360 extends Ability {
 
     protected TestAbility360(Creature executor) {
@@ -215,10 +223,13 @@ class AbilityTests {
     assertEquals(-59.0, e.getY(), 0.001);
     assertEquals(150, e.getHeight(), 0.001);
     assertEquals(150, e.getWidth(), 0.001);
-
   }
 
-  @AbilityInfo(impact = 111, impactAngle = 180, origin = EntityPivotType.DIMENSION_CENTER, range = 150)
+  @AbilityInfo(
+      impact = 111,
+      impactAngle = 180,
+      origin = EntityPivotType.DIMENSION_CENTER,
+      range = 150)
   private class TestAbility180 extends Ability {
 
     protected TestAbility180(Creature executor) {
@@ -334,13 +345,13 @@ class AbilityTests {
   }
 
   @Test
-  public void testRender(){
+  public void testRender() {
     // arrange
     TestAbility ability = new TestAbility(new Creature());
     Graphics2D graphics = mock(Graphics2D.class);
     RenderEngine renderEngine = mock(RenderEngine.class);
 
-    try (MockedStatic<Game> gameMockedStatic = mockStatic(Game.class)){
+    try (MockedStatic<Game> gameMockedStatic = mockStatic(Game.class)) {
       gameMockedStatic.when(Game::graphics).thenReturn(renderEngine);
 
       // act
@@ -352,7 +363,18 @@ class AbilityTests {
     }
   }
 
-  @AbilityInfo(castType = CastType.ONCONFIRM, name = "I do somethin", description = "does somethin", cooldown = 333, duration = 222, impact = 111, impactAngle = 99, multiTarget = true, origin = EntityPivotType.COLLISIONBOX_CENTER, range = 444, value = 999)
+  @AbilityInfo(
+      castType = CastType.ONCONFIRM,
+      name = "I do somethin",
+      description = "does somethin",
+      cooldown = 333,
+      duration = 222,
+      impact = 111,
+      impactAngle = 99,
+      multiTarget = true,
+      origin = EntityPivotType.COLLISIONBOX_CENTER,
+      range = 444,
+      value = 999)
   private class TestAbility extends Ability {
 
     protected TestAbility(Creature executor) {
@@ -403,11 +425,11 @@ class AbilityTests {
   }
 
   /**
-   * Test getPotentialCollisionBox when the collision box of the entity is the zero rectangle
-   * and the impact of the of the ability is zero.
-   * 
-   * Expected: potentialImpactArea() is an ellipse with a center in the origin
-   * and a zero width and height.
+   * Test getPotentialCollisionBox when the collision box of the entity is the zero rectangle and
+   * the impact of the of the ability is zero.
+   *
+   * <p>Expected: potentialImpactArea() is an ellipse with a center in the origin and a zero width
+   * and height.
    */
   @Test
   void testGetPotentialCollisionZeroBoxZeroImpact() {
@@ -422,16 +444,17 @@ class AbilityTests {
   }
 
   /**
-   * Test getPotentialCollisionBox when the collision box of the entity is non-zero
-   * and the impact of the of the ability is zero.
-   * 
-   * Expected: potentialImpactArea() is an ellipse with a center
-   * corresponding to the collisionbox and a zero width and height.
+   * Test getPotentialCollisionBox when the collision box of the entity is non-zero and the impact
+   * of the of the ability is zero.
+   *
+   * <p>Expected: potentialImpactArea() is an ellipse with a center corresponding to the
+   * collisionbox and a zero width and height.
    */
   @Test
   void testGetPotentialCollisionBoxNonZeroBoxZeroImpact() {
     Rectangle2D collisonBox = new Rectangle2D.Double(1, 1, 1, 1);
-    Ellipse2D ellipse = new Ellipse2D.Double(collisonBox.getCenterX(), collisonBox.getCenterY(), 0, 0);
+    Ellipse2D ellipse =
+        new Ellipse2D.Double(collisonBox.getCenterX(), collisonBox.getCenterY(), 0, 0);
 
     Creature entity = mock(Creature.class);
     when(entity.getCollisionBox()).thenReturn(collisonBox);
@@ -441,12 +464,11 @@ class AbilityTests {
   }
 
   /**
-   * Test getPotentialCollisionBox when the collision box of the entity is the zero rectangle,
-   * and the impact of the of the ability is non-zero.
-   * 
-   * Expected: potentialImpactArea() is an ellipse with a center
-   * shifted by half of the negative impact from the origin,
-   * and a width and height corresponding to the impact.
+   * Test getPotentialCollisionBox when the collision box of the entity is the zero rectangle, and
+   * the impact of the of the ability is non-zero.
+   *
+   * <p>Expected: potentialImpactArea() is an ellipse with a center shifted by half of the negative
+   * impact from the origin, and a width and height corresponding to the impact.
    */
   @Test
   void testGetPotentialCollisionBoxZeroBoxNonZeroImpact() {
@@ -461,12 +483,12 @@ class AbilityTests {
   }
 
   /**
-   * Test getPotentialCollisionBox when the collision box of the entity is non-zero,
-   * and the impact of the of the ability is non-zero.
-   * 
-   * Expected: potentialImpactArea() is an ellipse with a center
-   * corresponding to the collisionbox shifted by half of the negative impact,
-   * and a width and height corresponding to the impact.
+   * Test getPotentialCollisionBox when the collision box of the entity is non-zero, and the impact
+   * of the of the ability is non-zero.
+   *
+   * <p>Expected: potentialImpactArea() is an ellipse with a center corresponding to the
+   * collisionbox shifted by half of the negative impact, and a width and height corresponding to
+   * the impact.
    */
   @Test
   void testGetPotentialCollisionBoxNonZeroBoxNonZeroImpact() {
@@ -480,10 +502,7 @@ class AbilityTests {
     assertEquals(ellipse, ability.calculatePotentialImpactArea());
   }
 
-  /**
-   * If the executor is dead it is not possible to cast
-   * Expected: canCast() is false.
-   */
+  /** If the executor is dead it is not possible to cast Expected: canCast() is false. */
   @Test
   void testCanCastWhenDead() {
     Creature entity = mock(Creature.class);
@@ -496,8 +515,7 @@ class AbilityTests {
   }
 
   /**
-   * If the executor is alive and the ability has no current execution,
-   * it is possible to cast.
+   * If the executor is alive and the ability has no current execution, it is possible to cast.
    * Expected: canCast() is true.
    */
   @Test
@@ -515,8 +533,7 @@ class AbilityTests {
   }
 
   /**
-   * If the executor is alive and the execution has no execution ticks left,
-   * it is possible to cast.
+   * If the executor is alive and the execution has no execution ticks left, it is possible to cast.
    * Expected: canCast() is true.
    */
   @Test
@@ -538,7 +555,7 @@ class AbilityTests {
   }
 
   @Test
-  public void testOnEffectApplied(){
+  public void testOnEffectApplied() {
     Effect.EffectAppliedListener listener;
     Effect effect;
     Ability ability = new TestAbility(new Creature());
@@ -548,11 +565,10 @@ class AbilityTests {
     ability.onEffectApplied(listener);
 
     verify(listener, times(0)).applied(any());
-
   }
 
   @Test
-  public void testOnEffectCeased(){
+  public void testOnEffectCeased() {
     Effect.EffectCeasedListener listener;
     Effect effect;
     Ability ability = new TestAbility(new Creature());
@@ -562,7 +578,5 @@ class AbilityTests {
     ability.onEffectCeased(listener);
 
     verify(listener, times(0)).ceased(any());
-
   }
-
 }

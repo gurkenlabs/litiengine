@@ -5,10 +5,16 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.GameTest;
+import de.gurkenlabs.litiengine.entities.ICombatEntity;
+import de.gurkenlabs.litiengine.environment.tilemap.IMap;
+import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
+import de.gurkenlabs.litiengine.graphics.RenderType;
+import de.gurkenlabs.litiengine.physics.Collision;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
-
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,17 +23,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.EnumSource.Mode;
 
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.GameTest;
-import de.gurkenlabs.litiengine.entities.ICombatEntity;
-import de.gurkenlabs.litiengine.environment.tilemap.IMap;
-import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
-import de.gurkenlabs.litiengine.graphics.RenderType;
-import de.gurkenlabs.litiengine.physics.Collision;
-
 public class EnvironmentEventTests {
   private Environment testEnvironment;
-  
+
   @BeforeAll
   public static void initGame() {
 
@@ -40,7 +38,7 @@ public class EnvironmentEventTests {
   public static void terminateGame() {
     GameTest.terminateGame();
   }
-  
+
   @BeforeEach
   public void initEnvironment() {
     IMap map = mock(IMap.class);
@@ -48,7 +46,7 @@ public class EnvironmentEventTests {
     when(map.getSizeInTiles()).thenReturn(new Dimension(10, 10));
     when(map.getOrientation()).thenReturn(MapOrientations.ORTHOGONAL);
     when(map.getRenderLayers()).thenReturn(new ArrayList<>());
-    
+
     this.testEnvironment = new Environment(map);
   }
 
@@ -60,7 +58,6 @@ public class EnvironmentEventTests {
     this.testEnvironment.init();
 
     verify(environmentListener, times(1)).initialized(this.testEnvironment);
-
   }
 
   @Test

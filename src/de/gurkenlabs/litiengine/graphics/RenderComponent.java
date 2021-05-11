@@ -1,5 +1,11 @@
 package de.gurkenlabs.litiengine.graphics;
 
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.gui.screens.Screen;
+import de.gurkenlabs.litiengine.resources.ImageFormat;
+import de.gurkenlabs.litiengine.util.MathUtilities;
+import de.gurkenlabs.litiengine.util.TimeUtilities;
+import de.gurkenlabs.litiengine.util.io.ImageSerializer;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -17,13 +23,6 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
-
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.gui.screens.Screen;
-import de.gurkenlabs.litiengine.resources.ImageFormat;
-import de.gurkenlabs.litiengine.util.MathUtilities;
-import de.gurkenlabs.litiengine.util.TimeUtilities;
-import de.gurkenlabs.litiengine.util.io.ImageSerializer;
 
 @SuppressWarnings("serial")
 public class RenderComponent extends Canvas {
@@ -114,8 +113,16 @@ public class RenderComponent extends Canvas {
         g.setClip(bounds);
         g.fill(bounds);
 
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, Game.config().graphics().colorInterpolation() ? RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF);
-        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, Game.config().graphics().colorInterpolation() ? RenderingHints.VALUE_INTERPOLATION_BILINEAR : RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+        g.setRenderingHint(
+            RenderingHints.KEY_ANTIALIASING,
+            Game.config().graphics().colorInterpolation()
+                ? RenderingHints.VALUE_ANTIALIAS_ON
+                : RenderingHints.VALUE_ANTIALIAS_OFF);
+        g.setRenderingHint(
+            RenderingHints.KEY_INTERPOLATION,
+            Game.config().graphics().colorInterpolation()
+                ? RenderingHints.VALUE_INTERPOLATION_BILINEAR
+                : RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
 
         final Screen currentScreen = Game.screens().current();
         if (currentScreen != null) {
@@ -135,13 +142,16 @@ public class RenderComponent extends Canvas {
         }
 
         if (this.currentAlpha != Float.NaN) {
-          final int visibleAlpha = MathUtilities.clamp(Math.round(255 * (1 - this.currentAlpha)), 0, 255);
-          g.setColor(new Color(this.getBackground().getRGB() & 0xffffff | visibleAlpha << 24, true));
+          final int visibleAlpha =
+              MathUtilities.clamp(Math.round(255 * (1 - this.currentAlpha)), 0, 255);
+          g.setColor(
+              new Color(this.getBackground().getRGB() & 0xffffff | visibleAlpha << 24, true));
           g.fill(bounds);
         }
 
         if (this.takeScreenShot && currentScreen != null) {
-          final BufferedImage img = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
+          final BufferedImage img =
+              new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
           final Graphics2D imgGraphics = img.createGraphics();
           currentScreen.render(imgGraphics);
 
@@ -197,7 +207,9 @@ public class RenderComponent extends Canvas {
         folder.mkdirs();
       }
 
-      ImageSerializer.saveImage(new File("./screenshots/" + timeStamp + ImageFormat.PNG.toFileExtension()).toString(), img);
+      ImageSerializer.saveImage(
+          new File("./screenshots/" + timeStamp + ImageFormat.PNG.toFileExtension()).toString(),
+          img);
     } finally {
       this.takeScreenShot = false;
     }

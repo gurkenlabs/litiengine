@@ -1,16 +1,14 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
-import java.awt.LayoutManager;
-
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.physics.Collision;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.swing.Icons;
+import java.awt.LayoutManager;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 
 @SuppressWarnings("serial")
 public class CollisionBoxPanel extends PropertyPanel {
@@ -21,9 +19,11 @@ public class CollisionBoxPanel extends PropertyPanel {
     super("panel_collisionBox", Icons.COLLISIONBOX);
 
     this.comboBoxColl = new JComboBox<>();
-    this.comboBoxColl.setModel(new DefaultComboBoxModel<>(new Collision[] { Collision.DYNAMIC, Collision.STATIC }));
+    this.comboBoxColl.setModel(
+        new DefaultComboBoxModel<>(new Collision[] {Collision.DYNAMIC, Collision.STATIC}));
 
-    this.chckbxIsObstructingLights = new JCheckBox(Resources.strings().get("panel_isObstructingLights"));
+    this.chckbxIsObstructingLights =
+        new JCheckBox(Resources.strings().get("panel_isObstructingLights"));
 
     setLayout(this.createLayout());
     this.setupChangedListeners();
@@ -35,23 +35,26 @@ public class CollisionBoxPanel extends PropertyPanel {
     this.chckbxIsObstructingLights.setSelected(false);
   }
 
-
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    this.comboBoxColl.setSelectedItem(mapObject.getEnumValue(MapObjectProperty.COLLISION_TYPE, Collision.class, Collision.STATIC));
-    this.chckbxIsObstructingLights.setSelected(mapObject.getBoolValue(MapObjectProperty.COLLISIONBOX_OBSTRUCTINGLIGHTS));
+    this.comboBoxColl.setSelectedItem(
+        mapObject.getEnumValue(
+            MapObjectProperty.COLLISION_TYPE, Collision.class, Collision.STATIC));
+    this.chckbxIsObstructingLights.setSelected(
+        mapObject.getBoolValue(MapObjectProperty.COLLISIONBOX_OBSTRUCTINGLIGHTS));
   }
 
   private void setupChangedListeners() {
     this.setup(this.comboBoxColl, MapObjectProperty.COLLISION_TYPE);
     this.setup(this.chckbxIsObstructingLights, MapObjectProperty.COLLISIONBOX_OBSTRUCTINGLIGHTS);
   }
-  
+
   private LayoutManager createLayout() {
-    LayoutItem[] layoutItems = new LayoutItem [] {
-        new LayoutItem("collisionType", this.comboBoxColl), 
-    };
-    
+    LayoutItem[] layoutItems =
+        new LayoutItem[] {
+            new LayoutItem("collisionType", this.comboBoxColl),
+        };
+
     return this.createLayout(layoutItems, this.chckbxIsObstructingLights);
   }
 }

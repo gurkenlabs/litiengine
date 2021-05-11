@@ -1,16 +1,12 @@
 package de.gurkenlabs.litiengine.sound;
 
+import de.gurkenlabs.litiengine.Game;
 import java.awt.geom.Point2D;
 import java.util.function.Supplier;
-
 import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 
-import de.gurkenlabs.litiengine.Game;
-
-/**
- * A {@code SoundPlayback} implementation for the playback of sound effects.
- */
+/** A {@code SoundPlayback} implementation for the playback of sound effects. */
 public class SFXPlayback extends SoundPlayback {
   private Sound sound;
   private FloatControl panControl;
@@ -20,11 +16,15 @@ public class SFXPlayback extends SoundPlayback {
   private VolumeControl volume;
   private boolean loop;
 
-  SFXPlayback(Sound sound, Supplier<Point2D> source, boolean loop, int range, float volumeModifier) throws LineUnavailableException {
+  SFXPlayback(Sound sound, Supplier<Point2D> source, boolean loop, int range, float volumeModifier)
+      throws LineUnavailableException {
     super(sound.getFormat());
     this.loop = loop;
     this.sound = sound;
-    this.panControl = this.line.isControlSupported(FloatControl.Type.PAN) ? (FloatControl) this.line.getControl(FloatControl.Type.PAN) : null;
+    this.panControl =
+        this.line.isControlSupported(FloatControl.Type.PAN)
+            ? (FloatControl) this.line.getControl(FloatControl.Type.PAN)
+            : null;
     this.source = source;
     this.range = range;
     this.volumeModifier = volumeModifier;
@@ -50,7 +50,10 @@ public class SFXPlayback extends SoundPlayback {
       if (this.panControl != null) {
         this.panControl.setValue(dist > 0 ? (float) (dx / dist) : 0f);
       }
-      this.volume.set(Game.config().sound().getSoundVolume() * this.volumeModifier * (float) Math.max(1.0 - dist / this.range, 0.0));
+      this.volume.set(
+          Game.config().sound().getSoundVolume()
+              * this.volumeModifier
+              * (float) Math.max(1.0 - dist / this.range, 0.0));
     } else {
       this.volume.set(Game.config().sound().getSoundVolume() * this.volumeModifier);
     }

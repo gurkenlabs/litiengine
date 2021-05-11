@@ -1,13 +1,12 @@
 package de.gurkenlabs.litiengine.util;
 
+import de.gurkenlabs.litiengine.ILaunchable;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import de.gurkenlabs.litiengine.ILaunchable;
 
 public class CommandManager implements ILaunchable {
   private static final Logger log = Logger.getLogger(CommandManager.class.getName());
@@ -21,7 +20,8 @@ public class CommandManager implements ILaunchable {
 
   public void bind(final String command, final Predicate<String[]> commandConsumer) {
     if (this.commandConsumers.containsKey(command)) {
-      throw new IllegalArgumentException("Cannot bind command " + command + " because it is already bound.");
+      throw new IllegalArgumentException(
+          "Cannot bind command " + command + " because it is already bound.");
     }
 
     this.commandConsumers.put(command, commandConsumer);

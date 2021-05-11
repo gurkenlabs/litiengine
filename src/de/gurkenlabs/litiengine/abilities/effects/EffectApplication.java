@@ -1,10 +1,9 @@
 package de.gurkenlabs.litiengine.abilities.effects;
 
-import java.awt.Shape;
-import java.util.List;
-
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
+import java.awt.Shape;
+import java.util.List;
 
 public class EffectApplication {
   private final List<ICombatEntity> affectedEntities;

@@ -1,17 +1,15 @@
 package de.gurkenlabs.litiengine.util.io;
 
-import java.awt.image.BufferedImage;
-
-import de.gurkenlabs.litiengine.resources.ImageFormat;
-import org.junit.jupiter.api.Test;
-
-import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.litiengine.util.Imaging;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import de.gurkenlabs.litiengine.resources.ImageFormat;
+import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.util.Imaging;
+import java.awt.image.BufferedImage;
+import org.junit.jupiter.api.Test;
 
 public class CodecTests {
   @Test
@@ -38,13 +36,15 @@ public class CodecTests {
   public void testSmallFloatEncodingNegative() {
     final float small = -1;
 
-    assertThrows(IllegalArgumentException.class, () -> Codec.encodeSmallFloatingPointNumber(small, 1));
+    assertThrows(
+        IllegalArgumentException.class, () -> Codec.encodeSmallFloatingPointNumber(small, 1));
   }
 
   @Test
   public void testSmallFloatEncodingTooLarge() {
     final float small = 6553.51254F;
-    assertThrows(IllegalArgumentException.class, () -> Codec.encodeSmallFloatingPointNumber(small, 2));
+    assertThrows(
+        IllegalArgumentException.class, () -> Codec.encodeSmallFloatingPointNumber(small, 2));
   }
 
   @Test
@@ -61,7 +61,6 @@ public class CodecTests {
     final short encodedShort2 = Codec.encodeAnglePrecise(angle2);
     final float decodedShort2 = Codec.decodeAngle(encodedShort2);
 
-
     assertEquals(99.99999, decoded, 1.43);
     assertEquals(99.99999, decodedShort, 0.1F);
     assertEquals(359.0, decodedShort2, 0.1F);
@@ -69,7 +68,8 @@ public class CodecTests {
 
   @Test
   public void testImageCodec() {
-    BufferedImage image = Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag.png");
+    BufferedImage image =
+        Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag.png");
 
     String encodedImage = Codec.encode(image);
     BufferedImage decodedImage = Codec.decodeImage(encodedImage);

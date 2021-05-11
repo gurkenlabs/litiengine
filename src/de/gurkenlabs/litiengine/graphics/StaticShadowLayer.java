@@ -1,5 +1,7 @@
 package de.gurkenlabs.litiengine.graphics;
 
+import de.gurkenlabs.litiengine.entities.StaticShadow;
+import de.gurkenlabs.litiengine.environment.Environment;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -7,19 +9,13 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 
-import de.gurkenlabs.litiengine.entities.StaticShadow;
-import de.gurkenlabs.litiengine.environment.Environment;
-
 public class StaticShadowLayer extends ColorLayer {
 
   /**
    * Instantiates a new {@code StaticShadowLayer} instance.
    *
-   * @param environment
-   *          The environment to which this instance is assigned.
-   * 
-   * @param color
-   *          The color of this instance.
+   * @param environment The environment to which this instance is assigned.
+   * @param color The color of this instance.
    */
   public StaticShadowLayer(Environment environment, Color color) {
     super(environment, color);
@@ -35,7 +31,8 @@ public class StaticShadowLayer extends ColorLayer {
     // list of static shadows.
     final Area ar = new Area();
     for (final StaticShadow staticShadow : this.getEnvironment().getStaticShadows()) {
-      if (!staticShadow.getBoundingBox().intersects(section) || staticShadow.getShadowType() == StaticShadowType.NONE) {
+      if (!staticShadow.getBoundingBox().intersects(section)
+          || staticShadow.getShadowType() == StaticShadowType.NONE) {
         continue;
       }
 

@@ -1,20 +1,17 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
-import java.awt.LayoutManager;
-
-import javax.swing.ImageIcon;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JToggleButton;
-
 import com.github.weisj.darklaf.ui.togglebutton.ToggleButtonConstants;
-
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.swing.LabelListCellRenderer;
+import java.awt.LayoutManager;
+import javax.swing.ImageIcon;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JToggleButton;
 
 @SuppressWarnings("serial")
 public class EmitterSpritePanel extends PropertyPanel {
@@ -27,9 +24,11 @@ public class EmitterSpritePanel extends PropertyPanel {
     spritesheet = new JComboBox<>();
     spritesheet.setRenderer(new LabelListCellRenderer());
     animateSprite = new JToggleButton();
-    animateSprite.putClientProperty(ToggleButtonConstants.KEY_VARIANT, ToggleButtonConstants.VARIANT_SLIDER);
+    animateSprite.putClientProperty(
+        ToggleButtonConstants.KEY_VARIANT, ToggleButtonConstants.VARIANT_SLIDER);
     loopSprite = new JToggleButton();
-    loopSprite.putClientProperty(ToggleButtonConstants.KEY_VARIANT, ToggleButtonConstants.VARIANT_SLIDER);
+    loopSprite.putClientProperty(
+        ToggleButtonConstants.KEY_VARIANT, ToggleButtonConstants.VARIANT_SLIDER);
     setLayout(createLayout());
     setupChangedListeners();
   }
@@ -46,13 +45,21 @@ public class EmitterSpritePanel extends PropertyPanel {
   protected void setControlValues(IMapObject mapObject) {
     loadSpritesheets();
     selectSpriteSheet(spritesheet, mapObject);
-    animateSprite.setSelected(mapObject.getBoolValue(MapObjectProperty.Particle.ANIMATESPRITE, EmitterData.DEFAULT_ANIMATE_SPRITE));
-    loopSprite.setSelected(mapObject.getBoolValue(MapObjectProperty.Particle.LOOPSPRITE, EmitterData.DEFAULT_LOOP_SPRITE));
-
+    animateSprite.setSelected(
+        mapObject.getBoolValue(
+            MapObjectProperty.Particle.ANIMATESPRITE, EmitterData.DEFAULT_ANIMATE_SPRITE));
+    loopSprite.setSelected(
+        mapObject.getBoolValue(
+            MapObjectProperty.Particle.LOOPSPRITE, EmitterData.DEFAULT_LOOP_SPRITE));
   }
 
   protected LayoutManager createLayout() {
-    LayoutItem[] layoutItems = new LayoutItem[] { new LayoutItem("particle_spritesheet", spritesheet), new LayoutItem("particle_animatesprite", animateSprite), new LayoutItem("particle_loopsprite", loopSprite) };
+    LayoutItem[] layoutItems =
+        new LayoutItem[] {
+            new LayoutItem("particle_spritesheet", spritesheet),
+            new LayoutItem("particle_animatesprite", animateSprite),
+            new LayoutItem("particle_loopsprite", loopSprite)
+        };
     return this.createLayout(layoutItems);
   }
 

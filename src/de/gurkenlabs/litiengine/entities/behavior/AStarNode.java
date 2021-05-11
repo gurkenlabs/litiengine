@@ -16,7 +16,8 @@ public class AStarNode {
   private AStarNode predecessor;
   private boolean walkable;
 
-  public AStarNode(final boolean walkable, final Rectangle bound, final int gridX, final int gridY) {
+  public AStarNode(
+      final boolean walkable, final Rectangle bound, final int gridX, final int gridY) {
     this.bound = bound;
     this.gridX = gridX;
     this.gridY = gridY;
@@ -41,7 +42,7 @@ public class AStarNode {
 
   /**
    * Gets the total costs for this node.
-   * 
+   *
    * @return The total costs.
    */
   public double getFCost() {
@@ -50,7 +51,7 @@ public class AStarNode {
 
   /**
    * Gets the costs so far for this node.
-   * 
+   *
    * @return The costs so far.
    */
   public double getGCost() {
@@ -67,7 +68,7 @@ public class AStarNode {
 
   /**
    * Gets the estimated costs for this node.
-   * 
+   *
    * @return The estimated costs.
    */
   public double getHCost() {
@@ -110,9 +111,7 @@ public class AStarNode {
     this.walkable = walkable;
   }
 
-  /**
-   * Clears the assigned costs and the predecessor.
-   */
+  /** Clears the assigned costs and the predecessor. */
   public void clear() {
     this.setGCost(0);
     this.setHCost(0);
@@ -121,6 +120,16 @@ public class AStarNode {
 
   @Override
   public String toString() {
-    return "[" + this.getGridX() + "," + this.getGridY() + "] - (f:" + this.getFCost() + ", g:" + this.getGCost() + ", h:" + this.getHCost() + ")";
+    return "["
+        + this.getGridX()
+        + ","
+        + this.getGridY()
+        + "] - (f:"
+        + this.getFCost()
+        + ", g:"
+        + this.getGCost()
+        + ", h:"
+        + this.getHCost()
+        + ")";
   }
 }

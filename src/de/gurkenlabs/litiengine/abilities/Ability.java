@@ -1,5 +1,13 @@
 package de.gurkenlabs.litiengine.abilities;
 
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.abilities.effects.Effect;
+import de.gurkenlabs.litiengine.abilities.effects.Effect.EffectAppliedListener;
+import de.gurkenlabs.litiengine.abilities.effects.Effect.EffectCeasedListener;
+import de.gurkenlabs.litiengine.entities.Creature;
+import de.gurkenlabs.litiengine.entities.EntityPivot;
+import de.gurkenlabs.litiengine.graphics.IRenderable;
+import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -13,15 +21,6 @@ import java.util.EventListener;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.abilities.effects.Effect;
-import de.gurkenlabs.litiengine.abilities.effects.Effect.EffectAppliedListener;
-import de.gurkenlabs.litiengine.abilities.effects.Effect.EffectCeasedListener;
-import de.gurkenlabs.litiengine.entities.Creature;
-import de.gurkenlabs.litiengine.entities.EntityPivot;
-import de.gurkenlabs.litiengine.graphics.IRenderable;
-import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 @AbilityInfo
 public abstract class Ability implements IRenderable {
@@ -42,8 +41,7 @@ public abstract class Ability implements IRenderable {
   /**
    * Initializes a new instance of the {@code Ability} class.
    *
-   * @param executor
-   *          The executing entity
+   * @param executor The executing entity
    */
   protected Ability(final Creature executor) {
     this.abilityCastListeners = ConcurrentHashMap.newKeySet();
@@ -56,7 +54,8 @@ public abstract class Ability implements IRenderable {
     this.multiTarget = info.multiTarget();
     this.description = info.description();
     this.castType = info.castType();
-    this.entityPivot = new EntityPivot(executor, info.origin(), info.pivotOffsetX(), info.pivotOffsetY());
+    this.entityPivot =
+        new EntityPivot(executor, info.origin(), info.pivotOffsetX(), info.pivotOffsetY());
   }
 
   public void onCast(final AbilityCastListener listener) {
@@ -102,16 +101,19 @@ public abstract class Ability implements IRenderable {
   }
 
   public boolean isOnCooldown() {
-    return (this.getCurrentExecution() != null && this.getCurrentExecution().getExecutionTicks() > 0 && Game.time().since(this.getCurrentExecution().getExecutionTicks()) < this.getAttributes().cooldown().get());
+    return (this.getCurrentExecution() != null
+        && this.getCurrentExecution().getExecutionTicks() > 0
+        && Game.time().since(this.getCurrentExecution().getExecutionTicks())
+            < this.getAttributes().cooldown().get());
   }
 
   /**
-   * Casts the ability by the temporal conditions of the specified game loop and
-   * the spatial circumstances of the specified environment. An ability execution
-   * will be taken out that start applying all the effects of this ability.
-   * 
-   * @return An {@link AbilityExecution} object that wraps all information about
-   *         this execution of the ability.
+   * Casts the ability by the temporal conditions of the specified game loop and the spatial
+   * circumstances of the specified environment. An ability execution will be taken out that start
+   * applying all the effects of this ability.
+   *
+   * @return An {@link AbilityExecution} object that wraps all information about this execution of
+   *     the ability.
    */
   public AbilityExecution cast() {
     if (!this.canCast()) {
@@ -159,16 +161,25 @@ public abstract class Ability implements IRenderable {
   }
 
   public float getRemainingCooldownInSeconds() {
-    if (this.getCurrentExecution() == null || this.getExecutor() == null || this.getExecutor().isDead()) {
+    if (this.getCurrentExecution() == null
+        || this.getExecutor() == null
+        || this.getExecutor().isDead()) {
       return 0;
     }
 
     // calculate cooldown in seconds
-    return (float) (!this.canCast() ? (this.getAttributes().cooldown().get() - Game.time().since(this.getCurrentExecution().getExecutionTicks())) * 0.001 : 0);
+    return (float)
+        (!this.canCast()
+            ? (this.getAttributes().cooldown().get()
+                    - Game.time().since(this.getCurrentExecution().getExecutionTicks()))
+                * 0.001
+            : 0);
   }
 
   public boolean isActive() {
-    return this.getCurrentExecution() != null && Game.time().since(this.getCurrentExecution().getExecutionTicks()) < this.getAttributes().duration().get();
+    return this.getCurrentExecution() != null
+        && Game.time().since(this.getCurrentExecution().getExecutionTicks())
+            < this.getAttributes().duration().get();
   }
 
   public boolean isMultiTarget() {
@@ -206,7 +217,9 @@ public abstract class Ability implements IRenderable {
     this.currentExecution = ae;
   }
 
-  public List<Effect> getEffects() { return this.effects; }
+  public List<Effect> getEffects() {
+    return this.effects;
+  }
 
   protected Shape internalCalculateImpactArea(final double angle) {
     final int impact = this.getAttributes().impact().get();
@@ -215,13 +228,16 @@ public abstract class Ability implements IRenderable {
     final double arcY = this.getPivot().getPoint().getY() - impact * 0.5;
 
     // project
-    final Point2D appliedRange = GeometricUtilities.project(new Point2D.Double(arcX, arcY), angle, this.getAttributes().range().get() * 0.5);
+    final Point2D appliedRange =
+        GeometricUtilities.project(
+            new Point2D.Double(arcX, arcY), angle, this.getAttributes().range().get() * 0.5);
     final double start = angle - 90 - (impactAngle / 2.0);
     if (impactAngle % 360 == 0) {
       return new Ellipse2D.Double(appliedRange.getX(), appliedRange.getY(), impact, impact);
     }
 
-    return new Arc2D.Double(appliedRange.getX(), appliedRange.getY(), impact, impact, start, impactAngle, Arc2D.PIE);
+    return new Arc2D.Double(
+        appliedRange.getX(), appliedRange.getY(), impact, impact, start, impactAngle, Arc2D.PIE);
   }
 
   private void onEffectApplied(final Effect effect, final EffectAppliedListener listener) {

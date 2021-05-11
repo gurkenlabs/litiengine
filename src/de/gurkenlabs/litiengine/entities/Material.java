@@ -1,10 +1,9 @@
 package de.gurkenlabs.litiengine.entities;
 
+import de.gurkenlabs.litiengine.environment.tilemap.xml.CustomPropertyProvider;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import de.gurkenlabs.litiengine.environment.tilemap.xml.CustomPropertyProvider;
 
 public class Material extends CustomPropertyProvider {
   private static final Map<String, Material> materials = new ConcurrentHashMap<>();
@@ -22,8 +21,7 @@ public class Material extends CustomPropertyProvider {
   /**
    * Initializes a new instance of the {@code Material} class.
    *
-   * @param name
-   *          The name of the material.
+   * @param name The name of the material.
    */
   public Material(String name) {
     this.name = name;

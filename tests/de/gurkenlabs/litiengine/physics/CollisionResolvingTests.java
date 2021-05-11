@@ -1,10 +1,14 @@
 package de.gurkenlabs.litiengine.physics;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.entities.CollisionBox;
 import de.gurkenlabs.litiengine.entities.Creature;
+import java.awt.geom.Rectangle2D;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,11 +16,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
-
-import java.awt.geom.Rectangle2D;
-import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CollisionResolvingTests {
   final double EPSILON = 1e-6;
@@ -49,7 +48,13 @@ public class CollisionResolvingTests {
 
   @ParameterizedTest(name = "testCollidingMoveBlock: {0}")
   @MethodSource("supplyCollidingMoveBlockParameters")
-  public void testCollidingMoveBlock(String direction, CollisionBox collisionBox, int angle, int distance, int targetX, int targetY) {
+  public void testCollidingMoveBlock(
+      String direction,
+      CollisionBox collisionBox,
+      int angle,
+      int distance,
+      int targetX,
+      int targetY) {
     // arrange
     Creature ent = getNewCreature(); // pos: (10,10), w/h: 10/10
     Game.physics().add(ent);
@@ -69,7 +74,8 @@ public class CollisionResolvingTests {
 
   @ParameterizedTest(name = "testCollidingMoveSlide: {0}")
   @MethodSource("supplyCollidingMoveSlideParameters")
-  public void testCollidingMoveSlide(String direction, CollisionBox collisionBox, int angle, int targetX, int targetY) {
+  public void testCollidingMoveSlide(
+      String direction, CollisionBox collisionBox, int angle, int targetX, int targetY) {
     // arrange
     Creature ent = getNewCreature(); // pos: (10,10), w/h: 10/10
     Game.physics().add(ent);
@@ -99,10 +105,12 @@ public class CollisionResolvingTests {
 
     // act
     // "slide" along the rectangle to the bottom left
-    // TODO: target collision box wrongfully detects an intersection with blocking collision box due to floating point precision miscalculation
-    //  within method GeometricUtilities.intersects - intersection is marginally positive in case of left movement, but marginally negative in right movement
+    // TODO: target collision box wrongfully detects an intersection with blocking collision box due
+    // to floating point precision miscalculation
+    //  within method GeometricUtilities.intersects - intersection is marginally positive in case of
+    // left movement, but marginally negative in right movement
     // Game.physics().move(ent, 315, MOVE_10X10Y_DISTANCE);
-    Game.physics().move(ent, 315, MOVE_10X10Y_DISTANCE-(1e-14));
+    Game.physics().move(ent, 315, MOVE_10X10Y_DISTANCE - (1e-14));
 
     // assert
     assertEquals(10, ent.getX(), EPSILON);
@@ -166,8 +174,10 @@ public class CollisionResolvingTests {
     Game.physics().update();
 
     // TODO: technically, should the square block the entity from moving into it?
-    //  When removing the right rectangle (which collides in movement step 3), the entity moves to (10,15) and
-    //  overlaps with the square instead of being blocked. This is only avoided by the right rectangle...
+    //  When removing the right rectangle (which collides in movement step 3), the entity moves to
+    // (10,15) and
+    //  overlaps with the square instead of being blocked. This is only avoided by the right
+    // rectangle...
 
     // act, assert
     // move along the square to the left
@@ -184,12 +194,14 @@ public class CollisionResolvingTests {
     assertEquals(15.0, ent.getY(), EPSILON);
   }
 
-  @ParameterizedTest(name="testCollisionWithMapBounds_xCoordinate angle={0}, distance={1}, expectedX={2}")
+  @ParameterizedTest(
+      name = "testCollisionWithMapBounds_xCoordinate angle={0}, distance={1}, expectedX={2}")
   @CsvSource({
-          "270.0d, 20.0d, -10.0d",
-          "90.0d, 50.0d, 30.0d",
+    "270.0d, 20.0d, -10.0d",
+    "90.0d, 50.0d, 30.0d",
   })
-  public void testCollisionWithMapBounds_xCoordinate(double angle, double distance, double expectedX) {
+  public void testCollisionWithMapBounds_xCoordinate(
+      double angle, double distance, double expectedX) {
     Creature ent = getNewCreature();
     ent.setWidth(30);
     ent.setHeight(30);
@@ -203,12 +215,14 @@ public class CollisionResolvingTests {
     assertEquals(expectedX, actualX, EPSILON);
   }
 
-  @ParameterizedTest(name="testCollisionWithMapBounds_yCoordinate angle={0}, distance={1}, expectedY={2}")
+  @ParameterizedTest(
+      name = "testCollisionWithMapBounds_yCoordinate angle={0}, distance={1}, expectedY={2}")
   @CsvSource({
-          "180.0d, 20.0d, -10.0d",
-          "0, 50.0d, 30.0d",
+    "180.0d, 20.0d, -10.0d",
+    "0, 50.0d, 30.0d",
   })
-  public void testCollisionWithMapBounds_yCoordinate(double angle, double distance, double expectedY) {
+  public void testCollisionWithMapBounds_yCoordinate(
+      double angle, double distance, double expectedY) {
     Creature ent = getNewCreature();
     ent.setWidth(30);
     ent.setHeight(30);
@@ -237,27 +251,24 @@ public class CollisionResolvingTests {
 
   private static Stream<Arguments> supplyBasicMoveParameters() {
     return Stream.of(
-            Arguments.of("left", 270, 5, 5, 10),
-            Arguments.of("right", 90, 5, 15, 10),
-            Arguments.of("up", 180, 5, 10, 5),
-            Arguments.of("down", 0, 5, 10, 15)
-    );
+        Arguments.of("left", 270, 5, 5, 10),
+        Arguments.of("right", 90, 5, 15, 10),
+        Arguments.of("up", 180, 5, 10, 5),
+        Arguments.of("down", 0, 5, 10, 15));
   }
 
   private static Stream<Arguments> supplyCollidingMoveBlockParameters() {
     return Stream.of(
-            Arguments.of("left", new CollisionBox(0, 0, 5, 100), 270, 10, 5, 10),
-            Arguments.of("right", new CollisionBox(25, 0, 10, 100), 90, 10, 15, 10),
-            Arguments.of("up", new CollisionBox(0, 0, 100, 5), 180, 10, 10, 5),
-            Arguments.of("down", new CollisionBox(0, 25, 100, 10), 0, 10, 10, 15)
-    );
+        Arguments.of("left", new CollisionBox(0, 0, 5, 100), 270, 10, 5, 10),
+        Arguments.of("right", new CollisionBox(25, 0, 10, 100), 90, 10, 15, 10),
+        Arguments.of("up", new CollisionBox(0, 0, 100, 5), 180, 10, 10, 5),
+        Arguments.of("down", new CollisionBox(0, 25, 100, 10), 0, 10, 10, 15));
   }
 
   private static Stream<Arguments> supplyCollidingMoveSlideParameters() {
     return Stream.of(
-            Arguments.of("left top-left", new CollisionBox(0, 0, 100, 10), 225, 0, 10),
-            Arguments.of("right bottom-right", new CollisionBox(0, 20, 100, 10), 45, 20, 10),
-            Arguments.of("up top-right", new CollisionBox(20, 0, 10, 100), 135, 10, 0)
-    );
+        Arguments.of("left top-left", new CollisionBox(0, 0, 100, 10), 225, 0, 10),
+        Arguments.of("right bottom-right", new CollisionBox(0, 20, 100, 10), 45, 20, 10),
+        Arguments.of("up top-right", new CollisionBox(20, 0, 10, 100), 135, 10, 0));
   }
 }

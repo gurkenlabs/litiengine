@@ -1,16 +1,15 @@
 package de.gurkenlabs.litiengine.graphics;
 
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.environment.Environment;
+import de.gurkenlabs.litiengine.util.Imaging;
+import de.gurkenlabs.litiengine.util.MathUtilities;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.environment.Environment;
-import de.gurkenlabs.litiengine.util.Imaging;
-import de.gurkenlabs.litiengine.util.MathUtilities;
 
 public abstract class ColorLayer implements IRenderable {
   private final Environment environment;
@@ -38,7 +37,12 @@ public abstract class ColorLayer implements IRenderable {
   }
 
   public void setAlpha(int ambientAlpha) {
-    this.setColor(new Color(this.getColor().getRed(), this.getColor().getGreen(), this.getColor().getBlue(), MathUtilities.clamp(ambientAlpha, 0, 255)));
+    this.setColor(
+        new Color(
+            this.getColor().getRed(),
+            this.getColor().getGreen(),
+            this.getColor().getBlue(),
+            MathUtilities.clamp(ambientAlpha, 0, 255)));
     this.updateSection(this.environment.getMap().getBounds());
   }
 
@@ -67,7 +71,7 @@ public abstract class ColorLayer implements IRenderable {
   }
 
   protected abstract void renderSection(Graphics2D g, Rectangle2D section);
-  
+
   protected abstract void clearSection(Graphics2D g, Rectangle2D section);
 
   protected Environment getEnvironment() {

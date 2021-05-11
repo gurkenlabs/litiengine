@@ -1,5 +1,10 @@
 package de.gurkenlabs.litiengine.entities.behavior;
 
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.IUpdateable;
+import de.gurkenlabs.litiengine.entities.IMobileEntity;
+import de.gurkenlabs.litiengine.graphics.IRenderable;
+import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Path2D;
@@ -8,12 +13,6 @@ import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
-
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.IUpdateable;
-import de.gurkenlabs.litiengine.entities.IMobileEntity;
-import de.gurkenlabs.litiengine.graphics.IRenderable;
-import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 public class EntityNavigator implements IUpdateable, IRenderable {
 
@@ -31,11 +30,9 @@ public class EntityNavigator implements IUpdateable, IRenderable {
 
   /**
    * Instantiates a new entity navigator.
-   * 
-   * @param entity
-   *          The entity that will be navigated by this instance
-   * @param pathFinder
-   *          The pathfinder that is used to navigate the entity
+   *
+   * @param entity The entity that will be navigated by this instance
+   * @param pathFinder The pathfinder that is used to navigate the entity
    */
   public EntityNavigator(final IMobileEntity entity, final PathFinder pathFinder) {
     this.cancelNavigationConditions = new CopyOnWriteArrayList<>();
@@ -104,7 +101,12 @@ public class EntityNavigator implements IUpdateable, IRenderable {
   }
 
   public void rotateTowards(final Point2D target) {
-    final double angle = GeometricUtilities.calcRotationAngleInDegrees(this.entity.getCollisionBox().getCenterX(), this.entity.getCollisionBox().getCenterY(), target.getX(), target.getY());
+    final double angle =
+        GeometricUtilities.calcRotationAngleInDegrees(
+            this.entity.getCollisionBox().getCenterX(),
+            this.entity.getCollisionBox().getCenterY(),
+            target.getX(),
+            target.getY());
     this.entity.setAngle((float) angle);
   }
 
@@ -166,14 +168,28 @@ public class EntityNavigator implements IUpdateable, IRenderable {
 
     pi.currentSegment(coordinates);
 
-    final double distance = GeometricUtilities.distance(this.entity.getCollisionBox().getCenterX(), this.entity.getCollisionBox().getCenterY(), coordinates[0], coordinates[1]);
+    final double distance =
+        GeometricUtilities.distance(
+            this.entity.getCollisionBox().getCenterX(),
+            this.entity.getCollisionBox().getCenterY(),
+            coordinates[0],
+            coordinates[1]);
     if (distance < this.getAcceptableError()) {
       ++this.currentSegment;
       return;
     }
 
-    final double angle = GeometricUtilities.calcRotationAngleInDegrees(this.entity.getCollisionBox().getCenterX(), this.entity.getCollisionBox().getCenterY(), coordinates[0], coordinates[1]);
+    final double angle =
+        GeometricUtilities.calcRotationAngleInDegrees(
+            this.entity.getCollisionBox().getCenterX(),
+            this.entity.getCollisionBox().getCenterY(),
+            coordinates[0],
+            coordinates[1]);
     final float pixelsPerTick = this.entity.getTickVelocity();
-    Game.physics().move(this.entity, (float) angle, (float) (distance < pixelsPerTick ? distance : pixelsPerTick));
+    Game.physics()
+        .move(
+            this.entity,
+            (float) angle,
+            (float) (distance < pixelsPerTick ? distance : pixelsPerTick));
   }
 }

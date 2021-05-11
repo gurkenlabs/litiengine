@@ -49,20 +49,24 @@ public final class ShapeRenderer {
     g.setStroke(oldStroke);
   }
 
-  public static void renderTransformed(final Graphics2D g, final Shape shape, AffineTransform transform) {
+  public static void renderTransformed(
+      final Graphics2D g, final Shape shape, AffineTransform transform) {
 
     render(g, transform.createTransformedShape(shape));
   }
 
-  public static void renderOutlineTransformed(final Graphics2D g, final Shape shape, AffineTransform transform) {
+  public static void renderOutlineTransformed(
+      final Graphics2D g, final Shape shape, AffineTransform transform) {
     renderOutlineTransformed(g, shape, transform, DEFAULT_STROKE);
   }
 
-  public static void renderOutlineTransformed(final Graphics2D g, final Shape shape, AffineTransform transform, final float stroke) {
+  public static void renderOutlineTransformed(
+      final Graphics2D g, final Shape shape, AffineTransform transform, final float stroke) {
     renderOutlineTransformed(g, shape, transform, new BasicStroke(stroke));
   }
 
-  public static void renderOutlineTransformed(final Graphics2D g, final Shape shape, AffineTransform transform, final Stroke stroke) {
+  public static void renderOutlineTransformed(
+      final Graphics2D g, final Shape shape, AffineTransform transform, final Stroke stroke) {
     if (transform == null) {
       renderOutline(g, shape, stroke);
       return;

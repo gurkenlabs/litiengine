@@ -2,7 +2,6 @@ package de.gurkenlabs.utiliti.swing.menus;
 
 import javax.swing.JMenuBar;
 
-@SuppressWarnings("serial")
 public class MainMenuBar extends JMenuBar {
   public MainMenuBar() {
     this.add(new FileMenu());

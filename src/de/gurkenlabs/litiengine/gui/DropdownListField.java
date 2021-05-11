@@ -1,13 +1,12 @@
 package de.gurkenlabs.litiengine.gui;
 
+import de.gurkenlabs.litiengine.Align;
+import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.input.Input;
 import java.awt.event.KeyEvent;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.IntConsumer;
-
-import de.gurkenlabs.litiengine.Align;
-import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.litiengine.input.Input;
 
 public class DropdownListField extends GuiComponent {
   public static final FontIcon ARROW_DOWN = new FontIcon(ICON_FONT, "\uE804");
@@ -19,6 +18,7 @@ public class DropdownListField extends GuiComponent {
   private ListField contentList;
   /** The drop down button. */
   private ImageComponent dropDownButton;
+
   private ImageComponent chosenElementComponent;
   private Spritesheet entrySprite;
   private Spritesheet buttonSprite;
@@ -26,12 +26,17 @@ public class DropdownListField extends GuiComponent {
 
   private final int numberOfShownElements;
 
-  public DropdownListField(final double x, final double y, final double width, final double height, final Object[] content, final int elementsShown) {
+  public DropdownListField(
+      final double x,
+      final double y,
+      final double width,
+      final double height,
+      final Object[] content,
+      final int elementsShown) {
     super(x, y, width, height);
     this.content = content;
     this.numberOfShownElements = elementsShown;
     this.changeConsumer = new CopyOnWriteArrayList<>();
-
   }
 
   public Spritesheet getButtonSprite() {
@@ -96,14 +101,37 @@ public class DropdownListField extends GuiComponent {
 
   @Override
   public void prepare() {
-    this.contentList = new ListField(this.getX(), this.getY(), this.getWidth(), this.getHeight(), this.getContentArray(), this.numberOfShownElements);
+    this.contentList =
+        new ListField(
+            this.getX(),
+            this.getY(),
+            this.getWidth(),
+            this.getHeight(),
+            this.getContentArray(),
+            this.numberOfShownElements);
     this.contentList.setButtonSprite(this.buttonSprite);
     this.contentList.setEntrySprite(this.entrySprite);
-    this.chosenElementComponent = new ImageComponent(this.getX(), this.getY(), this.getWidth(), this.getHeight() / this.getNumberOfShownElements(), this.getEntrySprite(), "", null);
+    this.chosenElementComponent =
+        new ImageComponent(
+            this.getX(),
+            this.getY(),
+            this.getWidth(),
+            this.getHeight() / this.getNumberOfShownElements(),
+            this.getEntrySprite(),
+            "",
+            null);
     this.chosenElementComponent.setTextAlign(Align.LEFT);
     final double buttonHeight = this.getHeight() / this.getNumberOfShownElements();
     double buttonWidth = buttonHeight;
-    this.dropDownButton = new ImageComponent(this.getX() - buttonWidth, this.getY(), buttonWidth, buttonHeight, this.getButtonSprite(), ARROW_DOWN.getText(), null);
+    this.dropDownButton =
+        new ImageComponent(
+            this.getX() - buttonWidth,
+            this.getY(),
+            buttonWidth,
+            buttonHeight,
+            this.getButtonSprite(),
+            ARROW_DOWN.getText(),
+            null);
     this.dropDownButton.setFont(ARROW_DOWN.getFont());
 
     this.getComponents().clear();
@@ -120,15 +148,20 @@ public class DropdownListField extends GuiComponent {
 
     this.dropDownButton.onClicked(e -> this.toggleDropDown());
 
-    this.onChange(c -> {
-      this.chosenElementComponent.setText(this.getContentArray()[c].toString());
-      if (this.getContentList().isSuspended() || !this.getContentList().isVisible()) {
-        return;
-      }
-      this.toggleDropDown();
-    });
+    this.onChange(
+        c -> {
+          this.chosenElementComponent.setText(this.getContentArray()[c].toString());
+          if (this.getContentList().isSuspended() || !this.getContentList().isVisible()) {
+            return;
+          }
+          this.toggleDropDown();
+        });
 
-    this.getContentList().onChange(c -> this.getChangeConsumer().forEach(consumer -> consumer.accept(this.getSelectedIndex())));
+    this.getContentList()
+        .onChange(
+            c ->
+                this.getChangeConsumer()
+                    .forEach(consumer -> consumer.accept(this.getSelectedIndex())));
   }
 
   public void setArrowKeyNavigation(final boolean arrowKeyNavigation) {
@@ -164,9 +197,7 @@ public class DropdownListField extends GuiComponent {
     }
   }
 
-  /**
-   * Toggle drop down.
-   */
+  /** Toggle drop down. */
   public void toggleDropDown() {
     if (this.isDroppedDown()) {
       this.getContentList().suspend();
@@ -180,30 +211,45 @@ public class DropdownListField extends GuiComponent {
   }
 
   private void prepareInput() {
-    Input.keyboard().onKeyTyped(KeyEvent.VK_UP, e -> {
-      if (this.isSuspended() || !this.isVisible() || !this.isArrowKeyNavigation() || !this.getChosenElementComponent().isHovered()) {
-        return;
-      }
-      this.getContentList().setSelection(0, this.getSelectedIndex() - 1);
-    });
+    Input.keyboard()
+        .onKeyTyped(
+            KeyEvent.VK_UP,
+            e -> {
+              if (this.isSuspended()
+                  || !this.isVisible()
+                  || !this.isArrowKeyNavigation()
+                  || !this.getChosenElementComponent().isHovered()) {
+                return;
+              }
+              this.getContentList().setSelection(0, this.getSelectedIndex() - 1);
+            });
 
-    Input.keyboard().onKeyTyped(KeyEvent.VK_DOWN, e -> {
-      if (this.isSuspended() || !this.isVisible() || !this.isArrowKeyNavigation() || !this.getChosenElementComponent().isHovered()) {
-        return;
-      }
-      this.getContentList().setSelection(0, this.getSelectedIndex() + 1);
-    });
+    Input.keyboard()
+        .onKeyTyped(
+            KeyEvent.VK_DOWN,
+            e -> {
+              if (this.isSuspended()
+                  || !this.isVisible()
+                  || !this.isArrowKeyNavigation()
+                  || !this.getChosenElementComponent().isHovered()) {
+                return;
+              }
+              this.getContentList().setSelection(0, this.getSelectedIndex() + 1);
+            });
 
-    this.onMouseWheelScrolled(e -> {
-      if (this.isSuspended() || !this.isVisible() || !this.getChosenElementComponent().isHovered()) {
-        return;
-      }
-      if (e.getEvent().getWheelRotation() < 0) {
-        this.getContentList().setSelection(0, this.getSelectedIndex() - 1);
-      } else {
-        this.getContentList().setSelection(0, this.getSelectedIndex() + 1);
-      }
-      return;
-    });
+    this.onMouseWheelScrolled(
+        e -> {
+          if (this.isSuspended()
+              || !this.isVisible()
+              || !this.getChosenElementComponent().isHovered()) {
+            return;
+          }
+          if (e.getEvent().getWheelRotation() < 0) {
+            this.getContentList().setSelection(0, this.getSelectedIndex() - 1);
+          } else {
+            this.getContentList().setSelection(0, this.getSelectedIndex() + 1);
+          }
+          return;
+        });
   }
 }

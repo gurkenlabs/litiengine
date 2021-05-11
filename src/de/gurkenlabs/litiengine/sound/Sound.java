@@ -1,18 +1,16 @@
 package de.gurkenlabs.litiengine.sound;
 
+import de.gurkenlabs.litiengine.util.io.StreamUtilities;
 import java.io.IOException;
 import java.io.InputStream;
-
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
-import de.gurkenlabs.litiengine.util.io.StreamUtilities;
-
 /**
- * This class implements all required functionality to load sounds from the file
- * system and provide a stream that can later on be used for the sound playback.
+ * This class implements all required functionality to load sounds from the file system and provide
+ * a stream that can later on be used for the sound playback.
  */
 public final class Sound {
 
@@ -27,21 +25,16 @@ public final class Sound {
   private byte[] data;
 
   /**
-   * Creates a new Sound instance by the specified file path. Loads the sound
-   * data into a byte array and also retrieves information about the format of
-   * the sound file.
-   * 
-   * Note that the constructor is private. In order to load files use the static
-   * {@code Resources.sounds().get(String)} method.
-   * 
-   * @param is
-   *          The input stream to load the sound from.
-   * @param name
-   *          The name of this sound file.
-   * @throws IOException
-   *           If something went wrong loading the file
-   * @throws UnsupportedAudioFileException
-   *           If the audio format is not supported
+   * Creates a new Sound instance by the specified file path. Loads the sound data into a byte array
+   * and also retrieves information about the format of the sound file.
+   *
+   * <p>Note that the constructor is private. In order to load files use the static {@code
+   * Resources.sounds().get(String)} method.
+   *
+   * @param is The input stream to load the sound from.
+   * @param name The name of this sound file.
+   * @throws IOException If something went wrong loading the file
+   * @throws UnsupportedAudioFileException If the audio format is not supported
    */
   public Sound(InputStream is, String name) throws IOException, UnsupportedAudioFileException {
     this.name = name;
@@ -62,7 +55,7 @@ public final class Sound {
 
   /**
    * Gets the audio format of this sound instance.
-   * 
+   *
    * @return The audio format of this instance.
    */
   public AudioFormat getFormat() {
@@ -71,7 +64,7 @@ public final class Sound {
 
   /**
    * Gets the name of this instance that is used to uniquely identify the resource of this sound.
-   * 
+   *
    * @return The name of this sound.
    */
   public String getName() {
@@ -80,11 +73,9 @@ public final class Sound {
 
   /**
    * Gets the raw data of this sound as byte array.
-   * 
-   * <p>
-   * This is used during resource serialization.
-   * </p>
-   * 
+   *
+   * <p>This is used during resource serialization.
+   *
    * @return The raw data of this sound as byte array.
    */
   public byte[] getRawData() {

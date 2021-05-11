@@ -1,12 +1,12 @@
 package de.gurkenlabs.litiengine.entities;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class EntityControllersTests {
   private EntityControllers controllers;
@@ -48,9 +48,7 @@ class EntityControllersTests {
     verify(controllerB, times(1)).attach();
   }
 
-  private abstract static class EntityControllerDummyA implements IEntityController {
-  }
+  private abstract static class EntityControllerDummyA implements IEntityController {}
 
-  private abstract static class EntityControllerDummyB implements IEntityController {
-  }
+  private abstract static class EntityControllerDummyB implements IEntityController {}
 }

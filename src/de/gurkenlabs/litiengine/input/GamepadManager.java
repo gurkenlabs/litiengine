@@ -1,5 +1,8 @@
 package de.gurkenlabs.litiengine.input;
 
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.GameListener;
+import de.gurkenlabs.litiengine.ILaunchable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.Collection;
@@ -11,10 +14,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.GameListener;
-import de.gurkenlabs.litiengine.ILaunchable;
 import net.java.games.input.Controller;
 import net.java.games.input.Controller.Type;
 import net.java.games.input.ControllerEnvironment;
@@ -22,10 +21,8 @@ import net.java.games.input.ControllerEnvironment;
 /**
  * The {@code GamepadManager} provides access to all gamepad input devices.
  *
- * <p>
- * Gamepads don't need to be added explicitly, the manager supports hot-plugging at runtime and will auto-detect any
- * added/removed gamepads.
- * </p>
+ * <p>Gamepads don't need to be added explicitly, the manager supports hot-plugging at runtime and
+ * will auto-detect any added/removed gamepads.
  *
  * @see #current()
  * @see #get(int)
@@ -49,43 +46,48 @@ public final class GamepadManager extends GamepadEvents implements ILaunchable {
 
     this.gamePads = new CopyOnWriteArrayList<>();
 
-    this.hotPlugThread = new Thread(() -> {
-      while (!Thread.interrupted()) {
-        this.updateGamepads();
+    this.hotPlugThread =
+        new Thread(
+            () -> {
+              while (!Thread.interrupted()) {
+                this.updateGamepads();
 
-        try {
-          Thread.sleep(1000);
-        } catch (InterruptedException e) {
-          Thread.currentThread().interrupt();
-          break;
-        }
-      }
-    });
+                try {
+                  Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                  Thread.currentThread().interrupt();
+                  break;
+                }
+              }
+            });
 
-    Game.addGameListener(new GameListener() {
-      @Override
-      public void terminated() {
-        hotPlugThread.interrupt();
-      }
-    });
+    Game.addGameListener(
+        new GameListener() {
+          @Override
+          public void terminated() {
+            hotPlugThread.interrupt();
+          }
+        });
 
-    this.onAdded(pad -> {
-      if (this.defaultgamepadId == -1) {
-        this.defaultgamepadId = pad.getId();
-        this.hookupToGamepad(pad);
-      }
-    });
+    this.onAdded(
+        pad -> {
+          if (this.defaultgamepadId == -1) {
+            this.defaultgamepadId = pad.getId();
+            this.hookupToGamepad(pad);
+          }
+        });
 
-    this.onRemoved(pad -> {
-      if (this.defaultgamepadId == pad.getId()) {
-        this.defaultgamepadId = -1;
-        final Gamepad newGamePad = current();
-        if (newGamePad != null) {
-          this.defaultgamepadId = newGamePad.getId();
-          this.hookupToGamepad(newGamePad);
-        }
-      }
-    });
+    this.onRemoved(
+        pad -> {
+          if (this.defaultgamepadId == pad.getId()) {
+            this.defaultgamepadId = -1;
+            final Gamepad newGamePad = current();
+            if (newGamePad != null) {
+              this.defaultgamepadId = newGamePad.getId();
+              this.hookupToGamepad(newGamePad);
+            }
+          }
+        });
 
     updateGamepads();
   }
@@ -165,8 +167,8 @@ public final class GamepadManager extends GamepadEvents implements ILaunchable {
   }
 
   /**
-   * Gets the gamepad with the specified id if it is still plugged in. After
-   * re-plugging a controller while the game is running, its id might change.
+   * Gets the gamepad with the specified id if it is still plugged in. After re-plugging a
+   * controller while the game is running, its id might change.
    *
    * @param id The id of the {@link Gamepad}.
    * @return The {@link Gamepad} with the specified index.
@@ -189,17 +191,13 @@ public final class GamepadManager extends GamepadEvents implements ILaunchable {
     return current != null && current.isPressed(gamepadComponent);
   }
 
-  /**
-   * DON'T CALL THIS EXPLICITLY! THE LITIENGINE WILL MANAGE THE LIFECYCLE OF THIS INSTANCE.
-   */
+  /** DON'T CALL THIS EXPLICITLY! THE LITIENGINE WILL MANAGE THE LIFECYCLE OF THIS INSTANCE. */
   @Override
   public void start() {
     this.hotPlugThread.start();
   }
 
-  /**
-   * DON'T CALL THIS EXPLICITLY! THE LITIENGINE WILL MANAGE THE LIFECYCLE OF THIS INSTANCE.
-   */
+  /** DON'T CALL THIS EXPLICITLY! THE LITIENGINE WILL MANAGE THE LIFECYCLE OF THIS INSTANCE. */
   @Override
   public void terminate() {
     int totalWait = 0;
@@ -215,9 +213,7 @@ public final class GamepadManager extends GamepadEvents implements ILaunchable {
     this.hotPlugThread.interrupt();
   }
 
-  /**
-   * DON'T CALL THIS EXPLICITLY! THE LITIENGINE WILL MANAGE THE LIFECYCLE OF GAMEPADS.
-   */
+  /** DON'T CALL THIS EXPLICITLY! THE LITIENGINE WILL MANAGE THE LIFECYCLE OF GAMEPADS. */
   void remove(final Gamepad gamepad) {
     if (gamepad == null) {
       return;
@@ -230,10 +226,9 @@ public final class GamepadManager extends GamepadEvents implements ILaunchable {
   }
 
   /**
-   * In JInput it is not possible to get newly added controllers or detached
-   * controllers because it will never update its controllers. If you would
-   * restart the application it would work... so we just reset the environment via
-   * reflection and it'll do it ;).
+   * In JInput it is not possible to get newly added controllers or detached controllers because it
+   * will never update its controllers. If you would restart the application it would work... so we
+   * just reset the environment via reflection and it'll do it ;).
    */
   private static void hackTheShitOutOfJInput() {
     try {
@@ -268,19 +263,22 @@ public final class GamepadManager extends GamepadEvents implements ILaunchable {
   }
 
   private void hookupToGamepad(final Gamepad pad) {
-    for (final Map.Entry<String, Collection<GamepadPollListener>> entry : this.componentPollListeners.entrySet()) {
+    for (final Map.Entry<String, Collection<GamepadPollListener>> entry :
+        this.componentPollListeners.entrySet()) {
       for (final GamepadPollListener listener : entry.getValue()) {
         pad.onPoll(entry.getKey(), listener);
       }
     }
 
-    for (final Map.Entry<String, Collection<GamepadPressedListener>> entry : this.componentPressedListeners.entrySet()) {
+    for (final Map.Entry<String, Collection<GamepadPressedListener>> entry :
+        this.componentPressedListeners.entrySet()) {
       for (final GamepadPressedListener listener : entry.getValue()) {
         pad.onPressed(entry.getKey(), listener);
       }
     }
 
-    for (final Map.Entry<String, Collection<GamepadReleasedListener>> entry : this.componentReleasedListeners.entrySet()) {
+    for (final Map.Entry<String, Collection<GamepadReleasedListener>> entry :
+        this.componentReleasedListeners.entrySet()) {
       for (final GamepadReleasedListener listener : entry.getValue()) {
         pad.onReleased(entry.getKey(), listener);
       }
@@ -304,8 +302,11 @@ public final class GamepadManager extends GamepadEvents implements ILaunchable {
     try {
       hackTheShitOutOfJInput();
       // update plugged in gamepads
-      for (int i = 0; i < ControllerEnvironment.getDefaultEnvironment().getControllers().length; i++) {
-        final Controller controller = ControllerEnvironment.getDefaultEnvironment().getControllers()[i];
+      for (int i = 0;
+          i < ControllerEnvironment.getDefaultEnvironment().getControllers().length;
+          i++) {
+        final Controller controller =
+            ControllerEnvironment.getDefaultEnvironment().getControllers()[i];
         final Type type = controller.getType();
 
         if (type.equals(Type.KEYBOARD) || type.equals(Type.MOUSE) || type.equals(Type.UNKNOWN)) {

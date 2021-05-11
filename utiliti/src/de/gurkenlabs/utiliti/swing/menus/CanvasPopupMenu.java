@@ -1,16 +1,14 @@
 package de.gurkenlabs.utiliti.swing.menus;
 
+import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.utiliti.components.Editor;
+import de.gurkenlabs.utiliti.swing.Icons;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
-
-import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.utiliti.components.Editor;
-import de.gurkenlabs.utiliti.swing.Icons;
 
 @SuppressWarnings("serial")
 public final class CanvasPopupMenu extends JPopupMenu {
@@ -35,7 +33,8 @@ public final class CanvasPopupMenu extends JPopupMenu {
     paste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK));
     paste.setEnabled(false);
 
-    JMenuItem blueprint = new JMenuItem(Resources.strings().get("menu_edit_blueprint"), Icons.BLUEPRINT);
+    JMenuItem blueprint =
+        new JMenuItem(Resources.strings().get("menu_edit_blueprint"), Icons.BLUEPRINT);
     blueprint.addActionListener(e -> Editor.instance().getMapComponent().defineBlueprint());
     blueprint.setEnabled(false);
 
@@ -44,7 +43,7 @@ public final class CanvasPopupMenu extends JPopupMenu {
 
     JMenu renderMenu = new RenderMenu();
     renderMenu.setEnabled(false);
-    
+
     this.add(new AddMenu());
     this.add(paste);
     this.addSeparator();
@@ -56,15 +55,21 @@ public final class CanvasPopupMenu extends JPopupMenu {
     this.add(renderMenu);
     this.add(blueprint);
 
-    Editor.instance().getMapComponent().onFocusChanged(mo -> {
-      copy.setEnabled(mo != null);
-      cut.setEnabled(mo != null);
-      delete.setEnabled(mo != null);
-      blueprint.setEnabled(mo != null);
-      paste.setEnabled(Editor.instance().getMapComponent().getCopiedBlueprint() != null);
-    });
+    Editor.instance()
+        .getMapComponent()
+        .onFocusChanged(
+            mo -> {
+              copy.setEnabled(mo != null);
+              cut.setEnabled(mo != null);
+              delete.setEnabled(mo != null);
+              blueprint.setEnabled(mo != null);
+              paste.setEnabled(Editor.instance().getMapComponent().getCopiedBlueprint() != null);
+            });
 
-    Editor.instance().getMapComponent().onEditModeChanged(mode -> paste.setEnabled(Editor.instance().getMapComponent().getCopiedBlueprint() != null));
-
+    Editor.instance()
+        .getMapComponent()
+        .onEditModeChanged(
+            mode ->
+                paste.setEnabled(Editor.instance().getMapComponent().getCopiedBlueprint() != null));
   }
 }

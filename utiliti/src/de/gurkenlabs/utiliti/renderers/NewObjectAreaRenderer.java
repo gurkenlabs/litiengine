@@ -1,14 +1,13 @@
 package de.gurkenlabs.utiliti.renderers;
 
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
-
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.utiliti.Style;
 import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.components.MapComponent;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
+import java.awt.geom.Rectangle2D;
 
 public class NewObjectAreaRenderer extends MouseSelectAreaRenderer {
 
@@ -24,7 +23,8 @@ public class NewObjectAreaRenderer extends MouseSelectAreaRenderer {
   @Override
   public void render(Graphics2D g) {
     final Rectangle2D rect = Editor.instance().getMapComponent().getMouseSelectArea(true);
-    if (rect == null || Editor.instance().getMapComponent().getEditMode() != MapComponent.EDITMODE_CREATE) {
+    if (rect == null
+        || Editor.instance().getMapComponent().getEditMode() != MapComponent.EDITMODE_CREATE) {
       return;
     }
 
@@ -36,7 +36,17 @@ public class NewObjectAreaRenderer extends MouseSelectAreaRenderer {
 
     String width = rect.getWidth() + "";
     String height = rect.getHeight() + "";
-    Game.graphics().renderText(g, width, rect.getX() + rect.getWidth() / 2.0 - fm.stringWidth(width) / 2.0, rect.getY() - 5);
-    Game.graphics().renderText(g, height, rect.getX() - (fm.stringWidth(height) + 3), rect.getY() + rect.getHeight() / 2);
+    Game.graphics()
+        .renderText(
+            g,
+            width,
+            rect.getX() + rect.getWidth() / 2.0 - fm.stringWidth(width) / 2.0,
+            rect.getY() - 5);
+    Game.graphics()
+        .renderText(
+            g,
+            height,
+            rect.getX() - (fm.stringWidth(height) + 3),
+            rect.getY() + rect.getHeight() / 2);
   }
 }

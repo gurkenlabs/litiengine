@@ -1,20 +1,17 @@
 package de.gurkenlabs.litiengine.sound;
 
+import de.gurkenlabs.litiengine.resources.Resources;
 import java.util.Iterator;
 import java.util.Objects;
-
 import javax.sound.sampled.AudioFormat;
-
-import de.gurkenlabs.litiengine.resources.Resources;
 
 public class LoopedTrack implements Track, Iterator<Sound> {
   private Sound track;
 
   /**
    * Initializes a new {@code LoopedTrack} for the specified sound.
-   * 
-   * @param soundName
-   *          The name of the sound to be played by this track.
+   *
+   * @param soundName The name of the sound to be played by this track.
    */
   public LoopedTrack(String soundName) {
     this(Resources.sounds().get(soundName));
@@ -22,9 +19,8 @@ public class LoopedTrack implements Track, Iterator<Sound> {
 
   /**
    * Initializes a new {@code LoopedTrack} for the specified sound.
-   * 
-   * @param sound
-   *          The sound to be played by this track.
+   *
+   * @param sound The sound to be played by this track.
    */
   public LoopedTrack(Sound sound) {
     this.track = Objects.requireNonNull(sound);
@@ -54,7 +50,8 @@ public class LoopedTrack implements Track, Iterator<Sound> {
 
   @Override
   public boolean equals(Object anObject) {
-    return this == anObject || anObject instanceof LoopedTrack && ((LoopedTrack) anObject).track.equals(this.track);
+    return this == anObject
+        || anObject instanceof LoopedTrack && ((LoopedTrack) anObject).track.equals(this.track);
   }
 
   @Override

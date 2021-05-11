@@ -1,22 +1,5 @@
 package de.gurkenlabs.utiliti.swing.controllers;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-
-import javax.swing.Box;
-import javax.swing.Icon;
-import javax.swing.JButton;
-import javax.swing.JColorChooser;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
@@ -30,6 +13,21 @@ import de.gurkenlabs.utiliti.components.LayerController;
 import de.gurkenlabs.utiliti.handlers.Transform;
 import de.gurkenlabs.utiliti.swing.Icons;
 import de.gurkenlabs.utiliti.swing.panels.LayerTable;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import javax.swing.Box;
+import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.JColorChooser;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 @SuppressWarnings("serial")
 public final class LayerList extends JPanel implements LayerController {
@@ -71,94 +69,131 @@ public final class LayerList extends JPanel implements LayerController {
     this.add(layerButtonBox);
     this.add(scrollPane);
 
-    this.buttonAddLayer = createButton(Icons.ADD, (map, selectedLayer) -> {
-      MapObjectLayer layer = new MapObjectLayer();
-      layer.setName("new layer");
-      int selIndex = this.layerTable.getSelectedRow();
-      if (selIndex < 0 || selIndex >= map.getMapObjectLayers().size()) {
-        map.addLayer(layer);
-      } else {
-        map.addLayer(getAbsoluteIndex(map, this.layerTable.getSelectedRow()), layer);
-      }
-      this.layerTable.bind(map);
-      this.layerTable.select(selIndex);
-      Transform.updateAnchors();
-    }, false);
+    this.buttonAddLayer =
+        createButton(
+            Icons.ADD,
+            (map, selectedLayer) -> {
+              MapObjectLayer layer = new MapObjectLayer();
+              layer.setName("new layer");
+              int selIndex = this.layerTable.getSelectedRow();
+              if (selIndex < 0 || selIndex >= map.getMapObjectLayers().size()) {
+                map.addLayer(layer);
+              } else {
+                map.addLayer(getAbsoluteIndex(map, this.layerTable.getSelectedRow()), layer);
+              }
+              this.layerTable.bind(map);
+              this.layerTable.select(selIndex);
+              Transform.updateAnchors();
+            },
+            false);
 
-    this.buttonRemoveLayer = createButton(Icons.DELETE, (map, selectedLayer) -> {
-      // we need at least on mapobject layer to work with LITIENGINE entities.
-      if (map.getMapObjectLayers().size() <= 1) {
-        return;
-      }
+    this.buttonRemoveLayer =
+        createButton(
+            Icons.DELETE,
+            (map, selectedLayer) -> {
+              // we need at least on mapobject layer to work with LITIENGINE entities.
+              if (map.getMapObjectLayers().size() <= 1) {
+                return;
+              }
 
-      if (JOptionPane.showConfirmDialog(null, Resources.strings().get("panel_confirmDeleteLayer"), "", JOptionPane.YES_NO_OPTION) != 0) {
-        return;
-      }
+              if (JOptionPane.showConfirmDialog(
+                      null,
+                      Resources.strings().get("panel_confirmDeleteLayer"),
+                      "",
+                      JOptionPane.YES_NO_OPTION)
+                  != 0) {
+                return;
+              }
 
-      Editor.instance().getMapComponent().delete(selectedLayer);
-      map.removeLayer(selectedLayer);
-      this.layerTable.bind(map);
-      Transform.updateAnchors();
-    });
+              Editor.instance().getMapComponent().delete(selectedLayer);
+              map.removeLayer(selectedLayer);
+              this.layerTable.bind(map);
+              Transform.updateAnchors();
+            });
 
-    this.buttonDuplicateLayer = createButton(Icons.COPY, (map, selectedLayer) -> {
-      IMapObjectLayer copiedLayer = new MapObjectLayer((MapObjectLayer) selectedLayer);
-      map.addLayer(getAbsoluteIndex(map, this.layerTable.getSelectedRow()), copiedLayer);
-      this.refresh();
-      Editor.instance().getMapComponent().add(copiedLayer);
-    });
+    this.buttonDuplicateLayer =
+        createButton(
+            Icons.COPY,
+            (map, selectedLayer) -> {
+              IMapObjectLayer copiedLayer = new MapObjectLayer((MapObjectLayer) selectedLayer);
+              map.addLayer(getAbsoluteIndex(map, this.layerTable.getSelectedRow()), copiedLayer);
+              this.refresh();
+              Editor.instance().getMapComponent().add(copiedLayer);
+            });
 
-    this.buttonSetColor = createButton(Icons.COLOR, (map, selectedLayer) -> {
-      Color newColor = JColorChooser.showDialog(null, Resources.strings().get("panel_selectLayerColor"), selectedLayer.getColor());
-      if (newColor == null) {
-        return;
-      }
+    this.buttonSetColor =
+        createButton(
+            Icons.COLOR,
+            (map, selectedLayer) -> {
+              Color newColor =
+                  JColorChooser.showDialog(
+                      null,
+                      Resources.strings().get("panel_selectLayerColor"),
+                      selectedLayer.getColor());
+              if (newColor == null) {
+                return;
+              }
 
-      selectedLayer.setColor(ColorHelper.encode(newColor));
-    });
+              selectedLayer.setColor(ColorHelper.encode(newColor));
+            });
 
-    this.buttonRenameLayer = createButton(Icons.RENAME, (map, selectedLayer) -> {
-      String newLayerName = JOptionPane.showInputDialog(Resources.strings().get("panel_renameLayer"), selectedLayer.getName());
-      if (newLayerName == null) {
-        return;
-      }
+    this.buttonRenameLayer =
+        createButton(
+            Icons.RENAME,
+            (map, selectedLayer) -> {
+              String newLayerName =
+                  JOptionPane.showInputDialog(
+                      Resources.strings().get("panel_renameLayer"), selectedLayer.getName());
+              if (newLayerName == null) {
+                return;
+              }
 
-      selectedLayer.setName(newLayerName);
-    });
+              selectedLayer.setName(newLayerName);
+            });
 
-    this.buttonHideOtherLayers = createButton(Icons.HIDEOTHER, (map, selectedLayer) -> {
-      for (int i = 0; i < map.getMapObjectLayers().size(); i++) {
-        if (i != this.layerTable.getSelectedRow()) {
-          map.getMapObjectLayers().get(i).setVisible(false);
-        } else if (!map.getMapObjectLayers().get(i).isVisible()) {
-          map.getMapObjectLayers().get(i).setVisible(true);
-        }
-      }
+    this.buttonHideOtherLayers =
+        createButton(
+            Icons.HIDEOTHER,
+            (map, selectedLayer) -> {
+              for (int i = 0; i < map.getMapObjectLayers().size(); i++) {
+                if (i != this.layerTable.getSelectedRow()) {
+                  map.getMapObjectLayers().get(i).setVisible(false);
+                } else if (!map.getMapObjectLayers().get(i).isVisible()) {
+                  map.getMapObjectLayers().get(i).setVisible(true);
+                }
+              }
 
-      Transform.updateAnchors();
-    }, true);
+              Transform.updateAnchors();
+            },
+            true);
 
-    this.buttonLiftLayer = createButton(Icons.LIFT, (map, selectedLayer) -> {
-      final int selLayerIndex = this.layerTable.getSelectedRow();
-      if (selLayerIndex < 0 || selLayerIndex >= map.getMapObjectLayers().size()) {
-        return;
-      }
+    this.buttonLiftLayer =
+        createButton(
+            Icons.LIFT,
+            (map, selectedLayer) -> {
+              final int selLayerIndex = this.layerTable.getSelectedRow();
+              if (selLayerIndex < 0 || selLayerIndex >= map.getMapObjectLayers().size()) {
+                return;
+              }
 
-      map.removeLayer(selectedLayer);
-      map.addLayer(getAbsoluteIndex(map, selLayerIndex), selectedLayer);
-      this.layerTable.select(selLayerIndex + 1);
-    });
+              map.removeLayer(selectedLayer);
+              map.addLayer(getAbsoluteIndex(map, selLayerIndex), selectedLayer);
+              this.layerTable.select(selLayerIndex + 1);
+            });
 
-    this.buttonLowerLayer = createButton(Icons.LOWER, (map, selectedLayer) -> {
-      int selLayerIndex = this.layerTable.getSelectedRow();
-      if (selLayerIndex <= 0 || selLayerIndex >= map.getMapObjectLayers().size()) {
-        return;
-      }
+    this.buttonLowerLayer =
+        createButton(
+            Icons.LOWER,
+            (map, selectedLayer) -> {
+              int selLayerIndex = this.layerTable.getSelectedRow();
+              if (selLayerIndex <= 0 || selLayerIndex >= map.getMapObjectLayers().size()) {
+                return;
+              }
 
-      map.removeLayer(selectedLayer);
-      map.addLayer(getAbsoluteIndex(map, selLayerIndex - 2), selectedLayer);
-      this.layerTable.select(selLayerIndex - 1);
-    });
+              map.removeLayer(selectedLayer);
+              map.addLayer(getAbsoluteIndex(map, selLayerIndex - 2), selectedLayer);
+              this.layerTable.select(selLayerIndex - 1);
+            });
     this.layerButtonBox.add(Box.createHorizontalGlue());
 
     this.layerButtonBox.add(this.buttonAddLayer);
@@ -186,24 +221,32 @@ public final class LayerList extends JPanel implements LayerController {
     this.layerButtonBox.add(Box.createHorizontalGlue());
 
     // TODO: enabled states for all commands
-    this.layerTable.getSelectionModel().addListSelectionListener(e -> {
-      if (Game.world().environment() == null) {
-        return;
-      }
+    this.layerTable
+        .getSelectionModel()
+        .addListSelectionListener(
+            e -> {
+              if (Game.world().environment() == null) {
+                return;
+              }
 
-      IMap map = Game.world().environment().getMap();
-      if (map == null || Editor.instance().getMapComponent().isLoading() || this.refreshing) {
-        return;
-      }
+              IMap map = Game.world().environment().getMap();
+              if (map == null
+                  || Editor.instance().getMapComponent().isLoading()
+                  || this.refreshing) {
+                return;
+              }
 
-      selectedLayers.put(map.getName(), layerTable.getSelectedRow());
-    });
+              selectedLayers.put(map.getName(), layerTable.getSelectedRow());
+            });
 
-    Editor.instance().getMapComponent().onMapLoaded(map -> {
-      if (this.selectedLayers.containsKey(map.getName())) {
-        this.layerTable.select(this.selectedLayers.get(map.getName()));
-      }
-    });
+    Editor.instance()
+        .getMapComponent()
+        .onMapLoaded(
+            map -> {
+              if (this.selectedLayers.containsKey(map.getName())) {
+                this.layerTable.select(this.selectedLayers.get(map.getName()));
+              }
+            });
   }
 
   @Override
@@ -218,7 +261,11 @@ public final class LayerList extends JPanel implements LayerController {
     } else if (this.layerTable.getSelectedRow() < 0) {
       return Game.world().environment().getMap().getMapObjectLayers().get(0);
     }
-    return Game.world().environment().getMap().getMapObjectLayers().get(this.layerTable.getSelectedRow());
+    return Game.world()
+        .environment()
+        .getMap()
+        .getMapObjectLayers()
+        .get(this.layerTable.getSelectedRow());
   }
 
   @Override
@@ -262,31 +309,33 @@ public final class LayerList extends JPanel implements LayerController {
     return createButton(icon, consumer, true);
   }
 
-  private JButton createButton(Icon icon, BiConsumer<IMap, IMapObjectLayer> consumer, boolean requireLayer) {
+  private JButton createButton(
+      Icon icon, BiConsumer<IMap, IMapObjectLayer> consumer, boolean requireLayer) {
     JButton button = new JButton("");
     button.setPreferredSize(BUTTON_SIZE);
     button.setMinimumSize(BUTTON_SIZE);
     button.setMaximumSize(BUTTON_SIZE);
     button.setIcon(icon);
 
-    button.addActionListener(a -> {
-      final IMap currentMap = getCurrentMap();
-      if (currentMap == null) {
-        return;
-      }
+    button.addActionListener(
+        a -> {
+          final IMap currentMap = getCurrentMap();
+          if (currentMap == null) {
+            return;
+          }
 
-      IMapObjectLayer layer = this.getCurrentLayer();
-      if (requireLayer && layer == null) {
-        return;
-      }
+          IMapObjectLayer layer = this.getCurrentLayer();
+          if (requireLayer && layer == null) {
+            return;
+          }
 
-      consumer.accept(currentMap, layer);
-      this.refresh();
-      UndoManager.instance().recordChanges();
-      for (Consumer<IMap> c : this.layerChangedListeners) {
-        c.accept(getCurrentMap());
-      }
-    });
+          consumer.accept(currentMap, layer);
+          this.refresh();
+          UndoManager.instance().recordChanges();
+          for (Consumer<IMap> c : this.layerChangedListeners) {
+            c.accept(getCurrentMap());
+          }
+        });
     return button;
   }
 

@@ -1,13 +1,12 @@
 package de.gurkenlabs.litiengine.entities;
 
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
+import static de.gurkenlabs.litiengine.entities.EntityPivotType.COLLISIONBOX_CENTER;
+import static de.gurkenlabs.litiengine.entities.EntityPivotType.DIMENSION_CENTER;
 
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Valign;
-
-import static de.gurkenlabs.litiengine.entities.EntityPivotType.COLLISIONBOX_CENTER;
-import static de.gurkenlabs.litiengine.entities.EntityPivotType.DIMENSION_CENTER;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 
 public class EntityPivot {
   private final IEntity entity;
@@ -23,13 +22,13 @@ public class EntityPivot {
     this.offsetY = offsetY;
 
     if (type == COLLISIONBOX_CENTER && !(entity instanceof ICollisionEntity)) {
-      throw new IllegalArgumentException("Pivot type COLLISIONBOX_CENTER is only supported for collision entities.");
+      throw new IllegalArgumentException(
+          "Pivot type COLLISIONBOX_CENTER is only supported for collision entities.");
     }
   }
 
   public EntityPivot(IEntity entity, Align align, Valign valign) {
     this(entity, align.getValue(entity.getWidth()), valign.getValue(entity.getHeight()));
-
   }
 
   public EntityPivot(IEntity entity, double offsetX, double offsetY) {
@@ -56,11 +55,14 @@ public class EntityPivot {
     EntityPivotType pivot = this.getType();
     if (pivot == COLLISIONBOX_CENTER) {
       Rectangle2D collisionBox = ((ICollisionEntity) this.getEntity()).getCollisionBox();
-      return new Point2D.Double(collisionBox.getCenterX() + this.getOffsetX(), collisionBox.getCenterY() + this.getOffsetY());
-    } else if(pivot == DIMENSION_CENTER) {
+      return new Point2D.Double(
+          collisionBox.getCenterX() + this.getOffsetX(),
+          collisionBox.getCenterY() + this.getOffsetY());
+    } else if (pivot == DIMENSION_CENTER) {
       return this.getEntity().getCenter();
     } else {
-      return new Point2D.Double(this.getEntity().getX() + this.getOffsetX(), this.getEntity().getY() + this.getOffsetY());
+      return new Point2D.Double(
+          this.getEntity().getX() + this.getOffsetX(), this.getEntity().getY() + this.getOffsetY());
     }
   }
 

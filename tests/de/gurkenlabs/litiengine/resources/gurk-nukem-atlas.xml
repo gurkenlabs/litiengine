@@ -20,16 +20,16 @@ verticesUV => points in sheet coordinate system (x0,y0,x1,y1,x2,y2, ...)
 triangles  => sprite triangulation, 3 vertex indices per triangle
 -->
 <TextureAtlas imagePath="gurk-nukem-atlas.png" width="123" height="122">
-    <sprite n="Dean-idle-left.png" x="105" y="0" w="18" h="32" r="y"/>
-    <sprite n="Dean-walk-left.png" x="0" y="64" w="64" h="18"/>
-    <sprite n="gurknukem-idle-left.png" x="0" y="100" w="36" h="18"/>
-    <sprite n="gurknukem-walk-left.png" x="48" y="104" w="72" h="18"/>
-    <sprite n="icon.png" x="0" y="0" w="64" h="64"/>
-    <sprite n="Jorge-idle-left.png" x="105" y="32" w="18" h="32" r="y"/>
-    <sprite n="Jorge-walk-left.png" x="0" y="82" w="64" h="18"/>
-    <sprite n="prop-barrel-damaged.png" x="36" y="100" w="12" h="10" r="y"/>
-    <sprite n="prop-barrel-destroyed.png" x="36" y="110" w="10" h="12"/>
-    <sprite n="prop-barrel-intact.png" x="105" y="94" w="12" h="10" r="y"/>
-    <sprite n="prop-bunker.png" x="64" y="0" w="41" h="104" r="y"/>
-    <sprite n="prop-flag.png" x="105" y="64" w="16" h="30" r="y"/>
+  <sprite n="Dean-idle-left.png" x="105" y="0" w="18" h="32" r="y"/>
+  <sprite n="Dean-walk-left.png" x="0" y="64" w="64" h="18"/>
+  <sprite n="gurknukem-idle-left.png" x="0" y="100" w="36" h="18"/>
+  <sprite n="gurknukem-walk-left.png" x="48" y="104" w="72" h="18"/>
+  <sprite n="icon.png" x="0" y="0" w="64" h="64"/>
+  <sprite n="Jorge-idle-left.png" x="105" y="32" w="18" h="32" r="y"/>
+  <sprite n="Jorge-walk-left.png" x="0" y="82" w="64" h="18"/>
+  <sprite n="prop-barrel-damaged.png" x="36" y="100" w="12" h="10" r="y"/>
+  <sprite n="prop-barrel-destroyed.png" x="36" y="110" w="10" h="12"/>
+  <sprite n="prop-barrel-intact.png" x="105" y="94" w="12" h="10" r="y"/>
+  <sprite n="prop-bunker.png" x="64" y="0" w="41" h="104" r="y"/>
+  <sprite n="prop-flag.png" x="105" y="64" w="16" h="30" r="y"/>
 </TextureAtlas>

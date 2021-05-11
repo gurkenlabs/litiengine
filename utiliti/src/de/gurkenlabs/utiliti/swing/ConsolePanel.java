@@ -1,9 +1,7 @@
 package de.gurkenlabs.utiliti.swing;
 
-import java.util.logging.Logger;
-
 import com.github.weisj.darklaf.components.text.NumberedTextComponent;
-
+import java.util.logging.Logger;
 import javax.swing.JTextPane;
 
 @SuppressWarnings("serial")

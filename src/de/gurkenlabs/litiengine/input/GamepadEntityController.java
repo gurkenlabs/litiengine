@@ -1,11 +1,10 @@
 package de.gurkenlabs.litiengine.input;
 
-import java.awt.geom.Point2D;
-
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.physics.MovementController;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
+import java.awt.geom.Point2D;
 
 public class GamepadEntityController<T extends IMobileEntity> extends MovementController<T> {
   private int gamepadId = -1;
@@ -20,21 +19,25 @@ public class GamepadEntityController<T extends IMobileEntity> extends MovementCo
     }
 
     this.rotateWithRightStick = rotateWithRightStick;
-    Input.gamepads().onAdded(pad -> {
-      if (this.gamepadId == -1) {
-        this.gamepadId = pad.getId();
-      }
-    });
+    Input.gamepads()
+        .onAdded(
+            pad -> {
+              if (this.gamepadId == -1) {
+                this.gamepadId = pad.getId();
+              }
+            });
 
-    Input.gamepads().onRemoved(pad -> {
-      if (this.gamepadId == pad.getId()) {
-        this.gamepadId = -1;
-        final Gamepad newGamePad = Input.gamepads().current();
-        if (newGamePad != null) {
-          this.gamepadId = newGamePad.getId();
-        }
-      }
-    });
+    Input.gamepads()
+        .onRemoved(
+            pad -> {
+              if (this.gamepadId == pad.getId()) {
+                this.gamepadId = -1;
+                final Gamepad newGamePad = Input.gamepads().current();
+                if (newGamePad != null) {
+                  this.gamepadId = newGamePad.getId();
+                }
+              }
+            });
   }
 
   @Override
@@ -69,7 +72,8 @@ public class GamepadEntityController<T extends IMobileEntity> extends MovementCo
   }
 
   private void retrieveGamepadValues() {
-    if (this.gamepadId == -1 || this.gamepadId != -1 && Input.gamepads().getById(this.gamepadId) == null) {
+    if (this.gamepadId == -1
+        || this.gamepadId != -1 && Input.gamepads().getById(this.gamepadId) == null) {
       return;
     }
 
@@ -97,8 +101,12 @@ public class GamepadEntityController<T extends IMobileEntity> extends MovementCo
       }
 
       if (targetX != 0 || targetY != 0) {
-        final Point2D target = new Point2D.Double(this.getEntity().getCenter().getX() + targetX, this.getEntity().getCenter().getY() + targetY);
-        final double angle = GeometricUtilities.calcRotationAngleInDegrees(this.getEntity().getCenter(), target);
+        final Point2D target =
+            new Point2D.Double(
+                this.getEntity().getCenter().getX() + targetX,
+                this.getEntity().getCenter().getY() + targetY);
+        final double angle =
+            GeometricUtilities.calcRotationAngleInDegrees(this.getEntity().getCenter(), target);
         this.getEntity().setAngle((float) angle);
       }
     }

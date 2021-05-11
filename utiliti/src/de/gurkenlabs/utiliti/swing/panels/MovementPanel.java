@@ -1,14 +1,12 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
-import java.awt.LayoutManager;
-
-import javax.swing.JCheckBox;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
-
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.resources.Resources;
+import java.awt.LayoutManager;
+import javax.swing.JCheckBox;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 
 @SuppressWarnings("serial")
 public class MovementPanel extends PropertyPanel {
@@ -17,9 +15,7 @@ public class MovementPanel extends PropertyPanel {
   private final JSpinner spinnerDeceleration;
   private final JSpinner spinnerVelocity;
 
-  /**
-   * Create the panel.
-   */
+  /** Create the panel. */
   public MovementPanel() {
     super("panel_mobileEntity");
 
@@ -49,19 +45,23 @@ public class MovementPanel extends PropertyPanel {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    this.chckbxTurnOnMove.setSelected(mapObject.getBoolValue(MapObjectProperty.MOVEMENT_TURNONMOVE));
-    this.spinnerAcceleration.setValue(mapObject.getDoubleValue(MapObjectProperty.MOVEMENT_ACCELERATION));
-    this.spinnerDeceleration.setValue(mapObject.getDoubleValue(MapObjectProperty.MOVEMENT_DECELERATION));
+    this.chckbxTurnOnMove.setSelected(
+        mapObject.getBoolValue(MapObjectProperty.MOVEMENT_TURNONMOVE));
+    this.spinnerAcceleration.setValue(
+        mapObject.getDoubleValue(MapObjectProperty.MOVEMENT_ACCELERATION));
+    this.spinnerDeceleration.setValue(
+        mapObject.getDoubleValue(MapObjectProperty.MOVEMENT_DECELERATION));
     this.spinnerVelocity.setValue(mapObject.getDoubleValue(MapObjectProperty.MOVEMENT_VELOCITY));
   }
-  
+
   private LayoutManager createLayout() {
-    LayoutItem[] layoutItems = new LayoutItem [] {
-        new LayoutItem("panel_acceleration", this.spinnerAcceleration),
-        new LayoutItem("panel_deceleration", this.spinnerDeceleration),
-        new LayoutItem("panel_velocity", this.spinnerVelocity),
-    };
-    
+    LayoutItem[] layoutItems =
+        new LayoutItem[] {
+            new LayoutItem("panel_acceleration", this.spinnerAcceleration),
+            new LayoutItem("panel_deceleration", this.spinnerDeceleration),
+            new LayoutItem("panel_velocity", this.spinnerVelocity),
+        };
+
     return this.createLayout(layoutItems, this.chckbxTurnOnMove);
   }
 }

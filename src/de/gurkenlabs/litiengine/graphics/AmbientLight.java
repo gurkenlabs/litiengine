@@ -1,5 +1,11 @@
 package de.gurkenlabs.litiengine.graphics;
 
+import de.gurkenlabs.litiengine.entities.LightSource;
+import de.gurkenlabs.litiengine.entities.StaticShadow;
+import de.gurkenlabs.litiengine.environment.Environment;
+import de.gurkenlabs.litiengine.util.MathUtilities;
+import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
+import de.gurkenlabs.litiengine.util.geom.Vector2D;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -14,36 +20,28 @@ import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
-import de.gurkenlabs.litiengine.entities.LightSource;
-import de.gurkenlabs.litiengine.entities.StaticShadow;
-import de.gurkenlabs.litiengine.environment.Environment;
-import de.gurkenlabs.litiengine.util.MathUtilities;
-import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
-import de.gurkenlabs.litiengine.util.geom.Vector2D;
-
 public class AmbientLight extends ColorLayer {
   public static final Color DEFAULT_COLOR = new Color(0, 0, 0, 0);
 
   /**
    * Instantiates a new {@code AmbientLight} instance.
    *
-   * @param environment
-   *          The environment to which this instance is assigned.
-   * @param ambientColor
-   *          The color of this instance.
+   * @param environment The environment to which this instance is assigned.
+   * @param ambientColor The color of this instance.
    */
   public AmbientLight(final Environment environment, final Color ambientColor) {
     super(environment, ambientColor);
   }
 
   /**
-   * @see <a href="https://docs.oracle.com/javase/tutorial/2d/advanced/compositing.html">Compositing Graphics</a>
+   * @see <a href="https://docs.oracle.com/javase/tutorial/2d/advanced/compositing.html">Compositing
+   *     Graphics</a>
    */
   @Override
   protected void renderSection(Graphics2D g, Rectangle2D section) {
     this.renderAmbient(g, section);
 
-    // carve out the lights that will be added 
+    // carve out the lights that will be added
     g.setComposite(AlphaComposite.getInstance(AlphaComposite.DST_OUT, 1));
     for (final LightSource light : this.getEnvironment().getLightSources()) {
       if (!light.getBoundingBox().intersects(section) || !light.isActive()) {
@@ -55,7 +53,9 @@ public class AmbientLight extends ColorLayer {
 
     // render the actual lights, depending on their intensity
     for (final LightSource light : this.getEnvironment().getLightSources()) {
-      if (!light.getBoundingBox().intersects(section) || !light.isActive() || light.getIntensity() <= 0) {
+      if (!light.getBoundingBox().intersects(section)
+          || !light.isActive()
+          || light.getIntensity() <= 0) {
         continue;
       }
 
@@ -68,7 +68,11 @@ public class AmbientLight extends ColorLayer {
   @Override
   protected void clearSection(Graphics2D g, Rectangle2D section) {
     g.setColor(new Color(0, 0, 0, 0));
-    g.clearRect((int) section.getX(), (int) section.getY(), (int) section.getWidth(), (int) section.getHeight());
+    g.clearRect(
+        (int) section.getX(),
+        (int) section.getY(),
+        (int) section.getWidth(),
+        (int) section.getHeight());
   }
 
   private void renderAmbient(Graphics2D g, Rectangle2D section) {
@@ -89,13 +93,26 @@ public class AmbientLight extends ColorLayer {
     double longerDimension = mapWidth < mapHeight ? mapHeight : mapWidth;
 
     final Point2D lightCenter = light.getCenter();
-    final Point2D lightFocus = new Point2D.Double(lightCenter.getX() + light.getBoundingBox().getWidth() * light.getFocusOffsetX(), lightCenter.getY() + light.getBoundingBox().getHeight() * light.getFocusOffsetY());
+    final Point2D lightFocus =
+        new Point2D.Double(
+            lightCenter.getX() + light.getBoundingBox().getWidth() * light.getFocusOffsetX(),
+            lightCenter.getY() + light.getBoundingBox().getHeight() * light.getFocusOffsetY());
     Shape fillShape;
 
     Area lightArea = null;
     if (light.getLightShapeType() == LightSource.Type.RECTANGLE) {
-      g.setColor(new Color(light.getColor().getRed(), light.getColor().getGreen(), light.getColor().getBlue(), light.getColor().getAlpha()));
-      fillShape = new Rectangle2D.Double(light.getBoundingBox().getX() - section.getX(), light.getBoundingBox().getY() - section.getY(), light.getBoundingBox().getWidth(), light.getBoundingBox().getHeight());
+      g.setColor(
+          new Color(
+              light.getColor().getRed(),
+              light.getColor().getGreen(),
+              light.getColor().getBlue(),
+              light.getColor().getAlpha()));
+      fillShape =
+          new Rectangle2D.Double(
+              light.getBoundingBox().getX() - section.getX(),
+              light.getBoundingBox().getY() - section.getY(),
+              light.getBoundingBox().getWidth(),
+              light.getBoundingBox().getHeight());
       g.fill(fillShape);
       return;
     }
@@ -122,13 +139,18 @@ public class AmbientLight extends ColorLayer {
         final Vector2D lineVector = new Vector2D(line.getP1(), line.getP2());
         final Vector2D lightVector = new Vector2D(lightFocus, line.getP1());
 
-        if (light.getCenter().getY() < line.getY1() && light.getCenter().getY() < line.getY2() && col.getBoundingBox().contains(light.getCenter()) || lineVector.normalVector().dotProduct(lightVector) >= 0) {
+        if (light.getCenter().getY() < line.getY1()
+                && light.getCenter().getY() < line.getY2()
+                && col.getBoundingBox().contains(light.getCenter())
+            || lineVector.normalVector().dotProduct(lightVector) >= 0) {
           continue;
         }
 
         final Path2D shadowParallelogram = new Path2D.Double();
-        final Point2D shadowPoint1 = GeometricUtilities.project(lightFocus, line.getP1(), longerDimension);
-        final Point2D shadowPoint2 = GeometricUtilities.project(lightFocus, line.getP2(), longerDimension);
+        final Point2D shadowPoint1 =
+            GeometricUtilities.project(lightFocus, line.getP1(), longerDimension);
+        final Point2D shadowPoint2 =
+            GeometricUtilities.project(lightFocus, line.getP2(), longerDimension);
 
         // construct a shape from our points
         shadowParallelogram.moveTo(line.getP1().getX(), line.getP1().getY());
@@ -138,7 +160,8 @@ public class AmbientLight extends ColorLayer {
         shadowParallelogram.closePath();
 
         final Area shadowArea = new Area(shadowParallelogram);
-        if (light.getCenter().getY() < col.getBoundingBox().getMaxY() && !col.getBoundingBox().contains(light.getCenter())) {
+        if (light.getCenter().getY() < col.getBoundingBox().getMaxY()
+            && !col.getBoundingBox().contains(light.getCenter())) {
           shadowArea.add(boxInLight);
         }
         shadowArea.intersect(lightArea);
@@ -152,17 +175,32 @@ public class AmbientLight extends ColorLayer {
     // color to transparent
     final Shape lightShape = light.getLightShape();
 
-    final double radius = lightShape.getBounds2D().getWidth() > lightShape.getBounds2D().getHeight() ? lightShape.getBounds2D().getWidth() : lightShape.getBounds2D().getHeight();
-    final Color[] transColors = new Color[] { light.getColor(), new Color(light.getColor().getRed(), light.getColor().getGreen(), light.getColor().getBlue(), 0) };
-    final Point2D center = new Point2D.Double(lightShape.getBounds2D().getCenterX() - section.getX(), lightShape.getBounds2D().getCenterY() - section.getY());
-    final Point2D focus = new Point2D.Double(center.getX() + lightShape.getBounds2D().getWidth() * light.getFocusOffsetX(), center.getY() + lightShape.getBounds2D().getHeight() * light.getFocusOffsetY());
-    RadialGradientPaint paint = new RadialGradientPaint(
-        center,
-        (float) (radius / 2d),
-        focus,
-        new float[] { 0.0f, 1.00f },
-        transColors,
-        CycleMethod.NO_CYCLE);
+    final double radius =
+        lightShape.getBounds2D().getWidth() > lightShape.getBounds2D().getHeight()
+            ? lightShape.getBounds2D().getWidth()
+            : lightShape.getBounds2D().getHeight();
+    final Color[] transColors =
+        new Color[] {
+          light.getColor(),
+          new Color(
+              light.getColor().getRed(), light.getColor().getGreen(), light.getColor().getBlue(), 0)
+        };
+    final Point2D center =
+        new Point2D.Double(
+            lightShape.getBounds2D().getCenterX() - section.getX(),
+            lightShape.getBounds2D().getCenterY() - section.getY());
+    final Point2D focus =
+        new Point2D.Double(
+            center.getX() + lightShape.getBounds2D().getWidth() * light.getFocusOffsetX(),
+            center.getY() + lightShape.getBounds2D().getHeight() * light.getFocusOffsetY());
+    RadialGradientPaint paint =
+        new RadialGradientPaint(
+            center,
+            (float) (radius / 2d),
+            focus,
+            new float[] {0.0f, 1.00f},
+            transColors,
+            CycleMethod.NO_CYCLE);
 
     g.setPaint(paint);
 
@@ -170,7 +208,12 @@ public class AmbientLight extends ColorLayer {
       lightArea.transform(AffineTransform.getTranslateInstance(-section.getX(), -section.getY()));
       fillShape = lightArea;
     } else {
-      fillShape = new Rectangle2D.Double(light.getBoundingBox().getX() - section.getX(), light.getBoundingBox().getY() - section.getY(), light.getBoundingBox().getWidth(), light.getBoundingBox().getHeight());
+      fillShape =
+          new Rectangle2D.Double(
+              light.getBoundingBox().getX() - section.getX(),
+              light.getBoundingBox().getY() - section.getY(),
+              light.getBoundingBox().getWidth(),
+              light.getBoundingBox().getHeight());
     }
 
     g.fill(fillShape);

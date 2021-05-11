@@ -58,8 +58,15 @@ public class Appearance {
 
   @Override
   public int hashCode() {
-    return Objects.hash(this.transparentBackground, this.horizontalBackgroundGradient, this.borderRadius,
-        this.borderColor, this.borderStyle, this.backgroundColor1, this.backgroundColor2, this.foreColor);
+    return Objects.hash(
+        this.transparentBackground,
+        this.horizontalBackgroundGradient,
+        this.borderRadius,
+        this.borderColor,
+        this.borderStyle,
+        this.backgroundColor1,
+        this.backgroundColor2,
+        this.foreColor);
   }
 
   public Color getForeColor() {
@@ -85,9 +92,11 @@ public class Appearance {
     }
 
     if (this.horizontalBackgroundGradient) {
-      return new GradientPaint(0, 0, this.backgroundColor1, (float) (width / 2.0), 0, this.backgroundColor2);
+      return new GradientPaint(
+          0, 0, this.backgroundColor1, (float) (width / 2.0), 0, this.backgroundColor2);
     } else {
-      return new GradientPaint(0, 0, this.backgroundColor1, 0, (float) (height / 2.0), this.backgroundColor2);
+      return new GradientPaint(
+          0, 0, this.backgroundColor1, 0, (float) (height / 2.0), this.backgroundColor2);
     }
   }
 

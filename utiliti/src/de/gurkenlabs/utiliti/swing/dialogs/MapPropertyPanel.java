@@ -1,11 +1,19 @@
 package de.gurkenlabs.utiliti.swing.dialogs;
 
+import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.IMap;
+import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
+import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.util.ColorHelper;
+import de.gurkenlabs.utiliti.Style;
+import de.gurkenlabs.utiliti.swing.ColorComponent;
+import de.gurkenlabs.utiliti.swing.ControlBehavior;
+import de.gurkenlabs.utiliti.swing.panels.AmbientLightPreviewPanel;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
@@ -20,16 +28,6 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
-
-import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
-import de.gurkenlabs.litiengine.environment.tilemap.IMap;
-import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
-import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.litiengine.util.ColorHelper;
-import de.gurkenlabs.utiliti.Style;
-import de.gurkenlabs.utiliti.swing.ColorComponent;
-import de.gurkenlabs.utiliti.swing.ControlBehavior;
-import de.gurkenlabs.utiliti.swing.panels.AmbientLightPreviewPanel;
 
 @SuppressWarnings("serial")
 public class MapPropertyPanel extends JPanel {
@@ -64,24 +62,31 @@ public class MapPropertyPanel extends JPanel {
     this.scrollPane = new JScrollPane();
 
     final JButton buttonAdd = new JButton("+");
-    buttonAdd.addActionListener(a -> this.model.addRow(new Object[] { "", "" }));
+    buttonAdd.addActionListener(a -> this.model.addRow(new Object[] {"", ""}));
 
     final JButton buttonRemove = new JButton("-");
-    buttonRemove.addActionListener(a -> {
-      final int[] rows = this.tableCustomProperties.getSelectedRows();
-      for (int i = 0; i < rows.length; i++) {
-        this.model.removeRow(rows[i] - i);
-      }
-    });
+    buttonRemove.addActionListener(
+        a -> {
+          final int[] rows = this.tableCustomProperties.getSelectedRows();
+          for (int i = 0; i < rows.length; i++) {
+            this.model.removeRow(rows[i] - i);
+          }
+        });
     this.ambientlightPreview = new AmbientLightPreviewPanel();
     this.ambientColorComponent = new ColorComponent();
-    this.ambientColorComponent.addActionListener(a -> this.ambientlightPreview.setAmbientColor(this.ambientColorComponent.getColor()));
+    this.ambientColorComponent.addActionListener(
+        a -> this.ambientlightPreview.setAmbientColor(this.ambientColorComponent.getColor()));
 
     this.tableCustomProperties = new JTable();
     this.tableCustomProperties.getTableHeader().setReorderingAllowed(false);
     this.tableCustomProperties.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     this.scrollPane.setViewportView(this.tableCustomProperties);
-    this.tableCustomProperties.setModel(new DefaultTableModel(new Object[][] {}, new String[] { Resources.strings().get("panel_name"), Resources.strings().get("panel_value") }));
+    this.tableCustomProperties.setModel(
+        new DefaultTableModel(
+            new Object[][] {},
+            new String[] {
+              Resources.strings().get("panel_name"), Resources.strings().get("panel_value")
+            }));
 
     this.model = (DefaultTableModel) this.tableCustomProperties.getModel();
 
@@ -113,40 +118,253 @@ public class MapPropertyPanel extends JPanel {
     this.spinnerGravity = new JSpinner();
     ControlBehavior.apply(this.spinnerGravity);
 
-    final JLabel lblCustomProperties = new JLabel(Resources.strings().get("panel_customProperties"));
+    final JLabel lblCustomProperties =
+        new JLabel(Resources.strings().get("panel_customProperties"));
     lblCustomProperties.setFont(Style.getDefaultFont());
     this.shadowColorComponent = new ColorComponent();
-    this.shadowColorComponent.addActionListener(a -> this.ambientlightPreview.setStaticShadowColor(this.shadowColorComponent.getColor()));
+    this.shadowColorComponent.addActionListener(
+        a -> this.ambientlightPreview.setStaticShadowColor(this.shadowColorComponent.getColor()));
 
     JScrollPane scrollPaneDesc = new JScrollPane();
 
     final GroupLayout groupLayout = new GroupLayout(this);
-    groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup().addContainerGap()
-        .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup().addComponent(lblGeneral).addPreferredGap(ComponentPlacement.RELATED, 263, GroupLayout.PREFERRED_SIZE)).addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+    groupLayout.setHorizontalGroup(
+        groupLayout
+            .createParallelGroup(Alignment.LEADING)
             .addGroup(
-                groupLayout.createSequentialGroup().addComponent(lblCustomProperties, GroupLayout.DEFAULT_SIZE, 160, Short.MAX_VALUE).addGap(52).addComponent(buttonAdd).addPreferredGap(ComponentPlacement.RELATED).addComponent(buttonRemove, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE))
-            .addGroup(groupLayout.createSequentialGroup()
-                .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addComponent(lblGravity, GroupLayout.DEFAULT_SIZE, 110, Short.MAX_VALUE).addComponent(lblMapTitle, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 110, Short.MAX_VALUE)
-                    .addComponent(lblMapName, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 110, Short.MAX_VALUE).addComponent(lblAmbientLight, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 110, Short.MAX_VALUE)
-                    .addComponent(lblStaticShadows, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 110, Short.MAX_VALUE).addComponent(lblDesc, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 110, Short.MAX_VALUE))
-                .addPreferredGap(ComponentPlacement.RELATED)
-                .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(scrollPaneDesc, GroupLayout.DEFAULT_SIZE, 183, Short.MAX_VALUE).addComponent(spinnerGravity, GroupLayout.DEFAULT_SIZE, 183, Short.MAX_VALUE)
-                    .addComponent(ambientColorComponent, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addComponent(shadowColorComponent, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(textFieldTitle, GroupLayout.DEFAULT_SIZE, 183, Short.MAX_VALUE).addComponent(textFieldName, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 183, Short.MAX_VALUE))
-                .addGap(3))
-            .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING, false).addComponent(scrollPane, Alignment.LEADING, 0, 0, Short.MAX_VALUE).addComponent(ambientlightPreview, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 300, GroupLayout.PREFERRED_SIZE))))
-        .addGap(233)));
-    groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-        .addGroup(groupLayout.createSequentialGroup().addContainerGap().addComponent(lblGeneral).addPreferredGap(ComponentPlacement.UNRELATED)
-            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(lblMapName, GroupLayout.DEFAULT_SIZE, 17, Short.MAX_VALUE).addComponent(textFieldName, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)).addGap(7)
-            .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addGroup(groupLayout.createSequentialGroup().addComponent(textFieldTitle, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addPreferredGap(ComponentPlacement.RELATED))
-                .addGroup(Alignment.LEADING, groupLayout.createSequentialGroup().addComponent(lblMapTitle, GroupLayout.PREFERRED_SIZE, 18, GroupLayout.PREFERRED_SIZE).addGap(8)))
-            .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(scrollPaneDesc, GroupLayout.PREFERRED_SIZE, 47, GroupLayout.PREFERRED_SIZE).addComponent(lblDesc, GroupLayout.PREFERRED_SIZE, 16, GroupLayout.PREFERRED_SIZE)).addPreferredGap(ComponentPlacement.RELATED)
-            .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(spinnerGravity, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addComponent(lblGravity, GroupLayout.PREFERRED_SIZE, 17, GroupLayout.PREFERRED_SIZE)).addGap(15)
-            .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(ambientColorComponent, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addComponent(lblAmbientLight)).addPreferredGap(ComponentPlacement.RELATED)
-            .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(lblStaticShadows).addComponent(shadowColorComponent, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)).addPreferredGap(ComponentPlacement.RELATED)
-            .addComponent(ambientlightPreview, GroupLayout.PREFERRED_SIZE, 116, GroupLayout.PREFERRED_SIZE).addPreferredGap(ComponentPlacement.RELATED).addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(lblCustomProperties).addComponent(buttonRemove).addComponent(buttonAdd))
-            .addPreferredGap(ComponentPlacement.RELATED).addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 123, GroupLayout.PREFERRED_SIZE).addGap(47)));
+                groupLayout
+                    .createSequentialGroup()
+                    .addContainerGap()
+                    .addGroup(
+                        groupLayout
+                            .createParallelGroup(Alignment.LEADING)
+                            .addGroup(
+                                groupLayout
+                                    .createSequentialGroup()
+                                    .addComponent(lblGeneral)
+                                    .addPreferredGap(
+                                        ComponentPlacement.RELATED,
+                                        263,
+                                        GroupLayout.PREFERRED_SIZE))
+                            .addGroup(
+                                groupLayout
+                                    .createParallelGroup(Alignment.LEADING)
+                                    .addGroup(
+                                        groupLayout
+                                            .createSequentialGroup()
+                                            .addComponent(
+                                                lblCustomProperties,
+                                                GroupLayout.DEFAULT_SIZE,
+                                                160,
+                                                Short.MAX_VALUE)
+                                            .addGap(52)
+                                            .addComponent(buttonAdd)
+                                            .addPreferredGap(ComponentPlacement.RELATED)
+                                            .addComponent(
+                                                buttonRemove,
+                                                GroupLayout.PREFERRED_SIZE,
+                                                41,
+                                                GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(
+                                        groupLayout
+                                            .createSequentialGroup()
+                                            .addGroup(
+                                                groupLayout
+                                                    .createParallelGroup(Alignment.TRAILING)
+                                                    .addComponent(
+                                                        lblGravity,
+                                                        GroupLayout.DEFAULT_SIZE,
+                                                        110,
+                                                        Short.MAX_VALUE)
+                                                    .addComponent(
+                                                        lblMapTitle,
+                                                        Alignment.LEADING,
+                                                        GroupLayout.DEFAULT_SIZE,
+                                                        110,
+                                                        Short.MAX_VALUE)
+                                                    .addComponent(
+                                                        lblMapName,
+                                                        Alignment.LEADING,
+                                                        GroupLayout.DEFAULT_SIZE,
+                                                        110,
+                                                        Short.MAX_VALUE)
+                                                    .addComponent(
+                                                        lblAmbientLight,
+                                                        Alignment.LEADING,
+                                                        GroupLayout.DEFAULT_SIZE,
+                                                        110,
+                                                        Short.MAX_VALUE)
+                                                    .addComponent(
+                                                        lblStaticShadows,
+                                                        Alignment.LEADING,
+                                                        GroupLayout.DEFAULT_SIZE,
+                                                        110,
+                                                        Short.MAX_VALUE)
+                                                    .addComponent(
+                                                        lblDesc,
+                                                        Alignment.LEADING,
+                                                        GroupLayout.DEFAULT_SIZE,
+                                                        110,
+                                                        Short.MAX_VALUE))
+                                            .addPreferredGap(ComponentPlacement.RELATED)
+                                            .addGroup(
+                                                groupLayout
+                                                    .createParallelGroup(Alignment.LEADING)
+                                                    .addComponent(
+                                                        scrollPaneDesc,
+                                                        GroupLayout.DEFAULT_SIZE,
+                                                        183,
+                                                        Short.MAX_VALUE)
+                                                    .addComponent(
+                                                        spinnerGravity,
+                                                        GroupLayout.DEFAULT_SIZE,
+                                                        183,
+                                                        Short.MAX_VALUE)
+                                                    .addComponent(
+                                                        ambientColorComponent,
+                                                        Alignment.TRAILING,
+                                                        GroupLayout.DEFAULT_SIZE,
+                                                        GroupLayout.DEFAULT_SIZE,
+                                                        Short.MAX_VALUE)
+                                                    .addComponent(
+                                                        shadowColorComponent,
+                                                        Alignment.TRAILING,
+                                                        GroupLayout.DEFAULT_SIZE,
+                                                        GroupLayout.DEFAULT_SIZE,
+                                                        Short.MAX_VALUE)
+                                                    .addComponent(
+                                                        textFieldTitle,
+                                                        GroupLayout.DEFAULT_SIZE,
+                                                        183,
+                                                        Short.MAX_VALUE)
+                                                    .addComponent(
+                                                        textFieldName,
+                                                        Alignment.TRAILING,
+                                                        GroupLayout.DEFAULT_SIZE,
+                                                        183,
+                                                        Short.MAX_VALUE))
+                                            .addGap(3))
+                                    .addGroup(
+                                        groupLayout
+                                            .createParallelGroup(Alignment.TRAILING, false)
+                                            .addComponent(
+                                                scrollPane,
+                                                Alignment.LEADING,
+                                                0,
+                                                0,
+                                                Short.MAX_VALUE)
+                                            .addComponent(
+                                                ambientlightPreview,
+                                                Alignment.LEADING,
+                                                GroupLayout.PREFERRED_SIZE,
+                                                300,
+                                                GroupLayout.PREFERRED_SIZE))))
+                    .addGap(233)));
+    groupLayout.setVerticalGroup(
+        groupLayout
+            .createParallelGroup(Alignment.LEADING)
+            .addGroup(
+                groupLayout
+                    .createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(lblGeneral)
+                    .addPreferredGap(ComponentPlacement.UNRELATED)
+                    .addGroup(
+                        groupLayout
+                            .createParallelGroup(Alignment.BASELINE)
+                            .addComponent(lblMapName, GroupLayout.DEFAULT_SIZE, 17, Short.MAX_VALUE)
+                            .addComponent(
+                                textFieldName,
+                                GroupLayout.PREFERRED_SIZE,
+                                GroupLayout.DEFAULT_SIZE,
+                                GroupLayout.PREFERRED_SIZE))
+                    .addGap(7)
+                    .addGroup(
+                        groupLayout
+                            .createParallelGroup(Alignment.TRAILING)
+                            .addGroup(
+                                groupLayout
+                                    .createSequentialGroup()
+                                    .addComponent(
+                                        textFieldTitle,
+                                        GroupLayout.PREFERRED_SIZE,
+                                        GroupLayout.DEFAULT_SIZE,
+                                        GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(ComponentPlacement.RELATED))
+                            .addGroup(
+                                Alignment.LEADING,
+                                groupLayout
+                                    .createSequentialGroup()
+                                    .addComponent(
+                                        lblMapTitle,
+                                        GroupLayout.PREFERRED_SIZE,
+                                        18,
+                                        GroupLayout.PREFERRED_SIZE)
+                                    .addGap(8)))
+                    .addGroup(
+                        groupLayout
+                            .createParallelGroup(Alignment.LEADING)
+                            .addComponent(
+                                scrollPaneDesc,
+                                GroupLayout.PREFERRED_SIZE,
+                                47,
+                                GroupLayout.PREFERRED_SIZE)
+                            .addComponent(
+                                lblDesc,
+                                GroupLayout.PREFERRED_SIZE,
+                                16,
+                                GroupLayout.PREFERRED_SIZE))
+                    .addPreferredGap(ComponentPlacement.RELATED)
+                    .addGroup(
+                        groupLayout
+                            .createParallelGroup(Alignment.LEADING)
+                            .addComponent(
+                                spinnerGravity,
+                                GroupLayout.PREFERRED_SIZE,
+                                GroupLayout.DEFAULT_SIZE,
+                                GroupLayout.PREFERRED_SIZE)
+                            .addComponent(
+                                lblGravity,
+                                GroupLayout.PREFERRED_SIZE,
+                                17,
+                                GroupLayout.PREFERRED_SIZE))
+                    .addGap(15)
+                    .addGroup(
+                        groupLayout
+                            .createParallelGroup(Alignment.LEADING)
+                            .addComponent(
+                                ambientColorComponent,
+                                GroupLayout.PREFERRED_SIZE,
+                                GroupLayout.DEFAULT_SIZE,
+                                GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblAmbientLight))
+                    .addPreferredGap(ComponentPlacement.RELATED)
+                    .addGroup(
+                        groupLayout
+                            .createParallelGroup(Alignment.LEADING)
+                            .addComponent(lblStaticShadows)
+                            .addComponent(
+                                shadowColorComponent,
+                                GroupLayout.PREFERRED_SIZE,
+                                GroupLayout.DEFAULT_SIZE,
+                                GroupLayout.PREFERRED_SIZE))
+                    .addPreferredGap(ComponentPlacement.RELATED)
+                    .addComponent(
+                        ambientlightPreview,
+                        GroupLayout.PREFERRED_SIZE,
+                        116,
+                        GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(ComponentPlacement.RELATED)
+                    .addGroup(
+                        groupLayout
+                            .createParallelGroup(Alignment.BASELINE)
+                            .addComponent(lblCustomProperties)
+                            .addComponent(buttonRemove)
+                            .addComponent(buttonAdd))
+                    .addPreferredGap(ComponentPlacement.RELATED)
+                    .addComponent(
+                        scrollPane, GroupLayout.PREFERRED_SIZE, 123, GroupLayout.PREFERRED_SIZE)
+                    .addGap(47)));
 
     this.textFieldDesc = new JEditorPane();
     scrollPaneDesc.setViewportView(textFieldDesc);
@@ -185,8 +403,10 @@ public class MapPropertyPanel extends JPanel {
         this.dataSource.setValue(name, value);
       }
     }
-    this.dataSource.getProperties().keySet().removeIf(p -> !setProperties.contains(p) && MapProperty.isCustom(p));
-
+    this.dataSource
+        .getProperties()
+        .keySet()
+        .removeIf(p -> !setProperties.contains(p) && MapProperty.isCustom(p));
   }
 
   private void setControlValues(final IMap map) {
@@ -207,10 +427,14 @@ public class MapPropertyPanel extends JPanel {
     this.spinnerGravity.setValue(map.getIntValue(MapProperty.GRAVITY));
 
     for (Map.Entry<String, ICustomProperty> prop : map.getProperties().entrySet()) {
-      if (prop.getKey().equals(MapProperty.AMBIENTCOLOR) || prop.getKey().equals(MapProperty.GRAVITY) || prop.getKey().equals(MapProperty.MAP_DESCRIPTION) || prop.getKey().equals(MapProperty.MAP_TITLE) || prop.getKey().equals(MapProperty.SHADOWCOLOR)) {
+      if (prop.getKey().equals(MapProperty.AMBIENTCOLOR)
+          || prop.getKey().equals(MapProperty.GRAVITY)
+          || prop.getKey().equals(MapProperty.MAP_DESCRIPTION)
+          || prop.getKey().equals(MapProperty.MAP_TITLE)
+          || prop.getKey().equals(MapProperty.SHADOWCOLOR)) {
         continue;
       }
-      this.model.addRow(new Object[] { prop.getKey(), prop.getValue().getAsString() });
+      this.model.addRow(new Object[] {prop.getKey(), prop.getValue().getAsString()});
     }
   }
 }

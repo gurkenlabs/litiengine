@@ -1,5 +1,19 @@
 package de.gurkenlabs.utiliti.swing.dialogs;
 
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.IUpdateable;
+import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.graphics.animation.Animation;
+import de.gurkenlabs.litiengine.graphics.animation.AnimationController;
+import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.resources.SpritesheetResource;
+import de.gurkenlabs.litiengine.resources.TextureAtlas;
+import de.gurkenlabs.litiengine.util.Imaging;
+import de.gurkenlabs.litiengine.util.MathUtilities;
+import de.gurkenlabs.litiengine.util.io.Codec;
+import de.gurkenlabs.litiengine.util.io.FileUtilities;
+import de.gurkenlabs.utiliti.Style;
+import de.gurkenlabs.utiliti.swing.ControlBehavior;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -12,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
@@ -29,21 +42,6 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
-
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.IUpdateable;
-import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.litiengine.graphics.animation.Animation;
-import de.gurkenlabs.litiengine.graphics.animation.AnimationController;
-import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.litiengine.resources.SpritesheetResource;
-import de.gurkenlabs.litiengine.resources.TextureAtlas;
-import de.gurkenlabs.litiengine.util.Imaging;
-import de.gurkenlabs.litiengine.util.MathUtilities;
-import de.gurkenlabs.litiengine.util.io.Codec;
-import de.gurkenlabs.litiengine.util.io.FileUtilities;
-import de.gurkenlabs.utiliti.Style;
-import de.gurkenlabs.utiliti.swing.ControlBehavior;
 
 @SuppressWarnings("serial")
 public class SpritesheetImportPanel extends JPanel implements IUpdateable {
@@ -100,36 +98,44 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
     setLayout(new BorderLayout(10, 10));
 
     fileList = new JList<>();
-    fileList.setCellRenderer(new DefaultListCellRenderer() {
-      @Override
-      public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-        Component renderer = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-        if (renderer instanceof JLabel && value instanceof SpriteFileWrapper) {
-          ((JLabel) renderer).setText(((SpriteFileWrapper) value).getName());
-        }
-        return renderer;
-      }
-    });
+    fileList.setCellRenderer(
+        new DefaultListCellRenderer() {
+          @Override
+          public Component getListCellRendererComponent(
+              JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            Component renderer =
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            if (renderer instanceof JLabel && value instanceof SpriteFileWrapper) {
+              ((JLabel) renderer).setText(((SpriteFileWrapper) value).getName());
+            }
+            return renderer;
+          }
+        });
 
-    fileList.getSelectionModel().addListSelectionListener(e -> {
-      this.isUpdating = true;
-      try {
-        SpriteFileWrapper file = fileList.getSelectedValue();
-        labelImage.setIcon(file.getIcon());
-        labelWidth.setText(file.getWidth() + "px");
-        labelHeight.setText(file.getHeight() + "px");
-        spinnerWidth.setModel(new SpinnerNumberModel(file.getSpriteWidth(), 1, file.getWidth(), 1));
-        spinnerHeight.setModel(new SpinnerNumberModel(file.getSpriteHeight(), 1, file.getHeight(), 1));
+    fileList
+        .getSelectionModel()
+        .addListSelectionListener(
+            e -> {
+              this.isUpdating = true;
+              try {
+                SpriteFileWrapper file = fileList.getSelectedValue();
+                labelImage.setIcon(file.getIcon());
+                labelWidth.setText(file.getWidth() + "px");
+                labelHeight.setText(file.getHeight() + "px");
+                spinnerWidth.setModel(
+                    new SpinnerNumberModel(file.getSpriteWidth(), 1, file.getWidth(), 1));
+                spinnerHeight.setModel(
+                    new SpinnerNumberModel(file.getSpriteHeight(), 1, file.getHeight(), 1));
 
-        this.updateKeyframeTable(file);
-        textField.setText(file.getName());
+                this.updateKeyframeTable(file);
+                textField.setText(file.getName());
 
-        this.updatePreview(file);
+                this.updatePreview(file);
 
-      } finally {
-        this.isUpdating = false;
-      }
-    });
+              } finally {
+                this.isUpdating = false;
+              }
+            });
 
     JScrollPane scrollPane = new JScrollPane();
     scrollPane.setPreferredSize(new Dimension(150, 2));
@@ -150,36 +156,44 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
     JLabel lblSpritewidth = new JLabel("spritewidth:");
 
     spinnerWidth = new JSpinner();
-    spinnerWidth.setPreferredSize(new Dimension(SPINNER_WIDTH, spinnerWidth.getPreferredSize().height));
-    spinnerWidth.setMinimumSize(new Dimension(SPINNER_WIDTH, spinnerWidth.getPreferredSize().height));
-    spinnerWidth.setMaximumSize(new Dimension(SPINNER_WIDTH, spinnerWidth.getPreferredSize().height));
+    spinnerWidth.setPreferredSize(
+        new Dimension(SPINNER_WIDTH, spinnerWidth.getPreferredSize().height));
+    spinnerWidth.setMinimumSize(
+        new Dimension(SPINNER_WIDTH, spinnerWidth.getPreferredSize().height));
+    spinnerWidth.setMaximumSize(
+        new Dimension(SPINNER_WIDTH, spinnerWidth.getPreferredSize().height));
     spinnerWidth.setModel(new SpinnerNumberModel(1, 1, null, 1));
-    spinnerWidth.addChangeListener(e -> {
-      if (this.isUpdating) {
-        return;
-      }
+    spinnerWidth.addChangeListener(
+        e -> {
+          if (this.isUpdating) {
+            return;
+          }
 
-      fileList.getSelectedValue().setSpriteWidth((int) this.spinnerWidth.getValue());
-      this.updateKeyframeTable(fileList.getSelectedValue());
-      this.updatePreview(fileList.getSelectedValue());
-    });
+          fileList.getSelectedValue().setSpriteWidth((int) this.spinnerWidth.getValue());
+          this.updateKeyframeTable(fileList.getSelectedValue());
+          this.updatePreview(fileList.getSelectedValue());
+        });
 
     JLabel lblSpriteheight = new JLabel("spriteheight:");
 
     spinnerHeight = new JSpinner();
-    spinnerHeight.setPreferredSize(new Dimension(SPINNER_WIDTH, spinnerHeight.getPreferredSize().height));
-    spinnerHeight.setMinimumSize(new Dimension(SPINNER_WIDTH, spinnerHeight.getPreferredSize().height));
-    spinnerHeight.setMaximumSize(new Dimension(SPINNER_WIDTH, spinnerHeight.getPreferredSize().height));
+    spinnerHeight.setPreferredSize(
+        new Dimension(SPINNER_WIDTH, spinnerHeight.getPreferredSize().height));
+    spinnerHeight.setMinimumSize(
+        new Dimension(SPINNER_WIDTH, spinnerHeight.getPreferredSize().height));
+    spinnerHeight.setMaximumSize(
+        new Dimension(SPINNER_WIDTH, spinnerHeight.getPreferredSize().height));
     spinnerHeight.setModel(new SpinnerNumberModel(1, 1, null, 1));
-    spinnerHeight.addChangeListener(e -> {
-      if (this.isUpdating) {
-        return;
-      }
+    spinnerHeight.addChangeListener(
+        e -> {
+          if (this.isUpdating) {
+            return;
+          }
 
-      fileList.getSelectedValue().setSpriteHeight((int) this.spinnerHeight.getValue());
-      this.updateKeyframeTable(fileList.getSelectedValue());
-      this.updatePreview(fileList.getSelectedValue());
-    });
+          fileList.getSelectedValue().setSpriteHeight((int) this.spinnerHeight.getValue());
+          this.updateKeyframeTable(fileList.getSelectedValue());
+          this.updatePreview(fileList.getSelectedValue());
+        });
 
     JLabel lblNewLabel = new JLabel("width:");
 
@@ -196,12 +210,13 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
     textField.setColumns(10);
     textField.addActionListener(e -> fileList.getSelectedValue().setName(textField.getText()));
 
-    textField.addFocusListener(new FocusAdapter() {
-      @Override
-      public void focusLost(FocusEvent e) {
-        fileList.getSelectedValue().setName(textField.getText());
-      }
-    });
+    textField.addFocusListener(
+        new FocusAdapter() {
+          @Override
+          public void focusLost(FocusEvent e) {
+            fileList.getSelectedValue().setName(textField.getText());
+          }
+        });
 
     JLabel lblKeyframes = new JLabel("keyframes:");
 
@@ -213,85 +228,218 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
 
     JScrollPane scrollPane1 = new JScrollPane();
     GroupLayout glPanel = new GroupLayout(panel);
-    glPanel
-        .setHorizontalGroup(glPanel.createParallelGroup(Alignment.LEADING)
-            .addGroup(glPanel.createSequentialGroup().addContainerGap()
-                .addGroup(glPanel.createParallelGroup(Alignment.LEADING).addGroup(
-                    glPanel.createSequentialGroup().addComponent(labelImage, GroupLayout.DEFAULT_SIZE, 284, Short.MAX_VALUE).addContainerGap())
-                    .addGroup(glPanel.createSequentialGroup()
-                        .addGroup(
-                            glPanel.createParallelGroup(Alignment.LEADING).addComponent(lblKeyframes, GroupLayout.DEFAULT_SIZE, 74, Short.MAX_VALUE)
-                                .addComponent(lblName, GroupLayout.DEFAULT_SIZE, 74, Short.MAX_VALUE)
-                                .addComponent(lblNewLabel, GroupLayout.DEFAULT_SIZE, 74, Short.MAX_VALUE)
-                                .addComponent(lblSpritewidth, GroupLayout.DEFAULT_SIZE, 74, Short.MAX_VALUE))
-                        .addGap(10)
-                        .addGroup(glPanel.createParallelGroup(Alignment.LEADING, false).addComponent(scrollPane1, 0, 0, Short.MAX_VALUE)
-                            .addGroup(glPanel.createSequentialGroup().addGroup(glPanel.createParallelGroup(Alignment.TRAILING, false)
-                                .addComponent(labelWidth, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(spinnerWidth, GroupLayout.DEFAULT_SIZE, 50, Short.MAX_VALUE))
-                                .addPreferredGap(ComponentPlacement.UNRELATED)
-                                .addGroup(glPanel.createParallelGroup(Alignment.LEADING, false)
-                                    .addComponent(lblHeightText, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE,
-                                        Short.MAX_VALUE).addComponent(lblSpriteheight, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE,
-                                        GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addPreferredGap(ComponentPlacement.UNRELATED)
-                                .addGroup(glPanel.createParallelGroup(Alignment.LEADING, false)
-                                    .addComponent(labelHeight, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(spinnerHeight, GroupLayout.DEFAULT_SIZE, 50, Short.MAX_VALUE)))
-                            .addComponent(textField))
-                        .addContainerGap(29, Short.MAX_VALUE)))));
-    glPanel.setVerticalGroup(glPanel.createParallelGroup(Alignment.LEADING)
-        .addGroup(glPanel.createSequentialGroup().addContainerGap()
-            .addComponent(labelImage, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-            .addPreferredGap(ComponentPlacement.RELATED)
-            .addGroup(glPanel.createParallelGroup(Alignment.LEADING).addGroup(
-                glPanel.createParallelGroup(Alignment.BASELINE).addComponent(labelWidth, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblNewLabel))
-                .addGroup(glPanel.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblHeightText, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE)
-                    .addComponent(labelHeight, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE)))
-            .addGap(14)
-            .addGroup(glPanel.createParallelGroup(Alignment.BASELINE).addComponent(lblSpriteheight).addComponent(lblSpritewidth)
-                .addComponent(spinnerWidth, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addComponent(spinnerHeight, GroupLayout.PREFERRED_SIZE,
-                    GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-            .addPreferredGap(ComponentPlacement.UNRELATED).addGroup(glPanel.createParallelGroup(Alignment.LEADING)
-                .addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addComponent(lblName))
-            .addGroup(glPanel.createParallelGroup(Alignment.LEADING)
-                .addGroup(glPanel.createSequentialGroup().addGap(13).addComponent(lblKeyframes)).addGroup(
-                    glPanel.createSequentialGroup().addPreferredGap(ComponentPlacement.UNRELATED)
-                        .addComponent(scrollPane1, GroupLayout.DEFAULT_SIZE, 153, Short.MAX_VALUE)))
-            .addContainerGap()));
+    glPanel.setHorizontalGroup(
+        glPanel
+            .createParallelGroup(Alignment.LEADING)
+            .addGroup(
+                glPanel
+                    .createSequentialGroup()
+                    .addContainerGap()
+                    .addGroup(
+                        glPanel
+                            .createParallelGroup(Alignment.LEADING)
+                            .addGroup(
+                                glPanel
+                                    .createSequentialGroup()
+                                    .addComponent(
+                                        labelImage, GroupLayout.DEFAULT_SIZE, 284, Short.MAX_VALUE)
+                                    .addContainerGap())
+                            .addGroup(
+                                glPanel
+                                    .createSequentialGroup()
+                                    .addGroup(
+                                        glPanel
+                                            .createParallelGroup(Alignment.LEADING)
+                                            .addComponent(
+                                                lblKeyframes,
+                                                GroupLayout.DEFAULT_SIZE,
+                                                74,
+                                                Short.MAX_VALUE)
+                                            .addComponent(
+                                                lblName,
+                                                GroupLayout.DEFAULT_SIZE,
+                                                74,
+                                                Short.MAX_VALUE)
+                                            .addComponent(
+                                                lblNewLabel,
+                                                GroupLayout.DEFAULT_SIZE,
+                                                74,
+                                                Short.MAX_VALUE)
+                                            .addComponent(
+                                                lblSpritewidth,
+                                                GroupLayout.DEFAULT_SIZE,
+                                                74,
+                                                Short.MAX_VALUE))
+                                    .addGap(10)
+                                    .addGroup(
+                                        glPanel
+                                            .createParallelGroup(Alignment.LEADING, false)
+                                            .addComponent(scrollPane1, 0, 0, Short.MAX_VALUE)
+                                            .addGroup(
+                                                glPanel
+                                                    .createSequentialGroup()
+                                                    .addGroup(
+                                                        glPanel
+                                                            .createParallelGroup(
+                                                                Alignment.TRAILING, false)
+                                                            .addComponent(
+                                                                labelWidth,
+                                                                GroupLayout.DEFAULT_SIZE,
+                                                                GroupLayout.DEFAULT_SIZE,
+                                                                Short.MAX_VALUE)
+                                                            .addComponent(
+                                                                spinnerWidth,
+                                                                GroupLayout.DEFAULT_SIZE,
+                                                                50,
+                                                                Short.MAX_VALUE))
+                                                    .addPreferredGap(ComponentPlacement.UNRELATED)
+                                                    .addGroup(
+                                                        glPanel
+                                                            .createParallelGroup(
+                                                                Alignment.LEADING, false)
+                                                            .addComponent(
+                                                                lblHeightText,
+                                                                Alignment.TRAILING,
+                                                                GroupLayout.DEFAULT_SIZE,
+                                                                GroupLayout.DEFAULT_SIZE,
+                                                                Short.MAX_VALUE)
+                                                            .addComponent(
+                                                                lblSpriteheight,
+                                                                Alignment.TRAILING,
+                                                                GroupLayout.DEFAULT_SIZE,
+                                                                GroupLayout.DEFAULT_SIZE,
+                                                                Short.MAX_VALUE))
+                                                    .addPreferredGap(ComponentPlacement.UNRELATED)
+                                                    .addGroup(
+                                                        glPanel
+                                                            .createParallelGroup(
+                                                                Alignment.LEADING, false)
+                                                            .addComponent(
+                                                                labelHeight,
+                                                                GroupLayout.DEFAULT_SIZE,
+                                                                GroupLayout.DEFAULT_SIZE,
+                                                                Short.MAX_VALUE)
+                                                            .addComponent(
+                                                                spinnerHeight,
+                                                                GroupLayout.DEFAULT_SIZE,
+                                                                50,
+                                                                Short.MAX_VALUE)))
+                                            .addComponent(textField))
+                                    .addContainerGap(29, Short.MAX_VALUE)))));
+    glPanel.setVerticalGroup(
+        glPanel
+            .createParallelGroup(Alignment.LEADING)
+            .addGroup(
+                glPanel
+                    .createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(
+                        labelImage,
+                        GroupLayout.PREFERRED_SIZE,
+                        GroupLayout.DEFAULT_SIZE,
+                        GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(ComponentPlacement.RELATED)
+                    .addGroup(
+                        glPanel
+                            .createParallelGroup(Alignment.LEADING)
+                            .addGroup(
+                                glPanel
+                                    .createParallelGroup(Alignment.BASELINE)
+                                    .addComponent(
+                                        labelWidth,
+                                        GroupLayout.PREFERRED_SIZE,
+                                        19,
+                                        GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lblNewLabel))
+                            .addGroup(
+                                glPanel
+                                    .createParallelGroup(Alignment.BASELINE)
+                                    .addComponent(
+                                        lblHeightText,
+                                        GroupLayout.PREFERRED_SIZE,
+                                        19,
+                                        GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(
+                                        labelHeight,
+                                        GroupLayout.PREFERRED_SIZE,
+                                        19,
+                                        GroupLayout.PREFERRED_SIZE)))
+                    .addGap(14)
+                    .addGroup(
+                        glPanel
+                            .createParallelGroup(Alignment.BASELINE)
+                            .addComponent(lblSpriteheight)
+                            .addComponent(lblSpritewidth)
+                            .addComponent(
+                                spinnerWidth,
+                                GroupLayout.PREFERRED_SIZE,
+                                GroupLayout.DEFAULT_SIZE,
+                                GroupLayout.PREFERRED_SIZE)
+                            .addComponent(
+                                spinnerHeight,
+                                GroupLayout.PREFERRED_SIZE,
+                                GroupLayout.DEFAULT_SIZE,
+                                GroupLayout.PREFERRED_SIZE))
+                    .addPreferredGap(ComponentPlacement.UNRELATED)
+                    .addGroup(
+                        glPanel
+                            .createParallelGroup(Alignment.LEADING)
+                            .addComponent(
+                                textField,
+                                GroupLayout.PREFERRED_SIZE,
+                                GroupLayout.DEFAULT_SIZE,
+                                GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblName))
+                    .addGroup(
+                        glPanel
+                            .createParallelGroup(Alignment.LEADING)
+                            .addGroup(
+                                glPanel
+                                    .createSequentialGroup()
+                                    .addGap(13)
+                                    .addComponent(lblKeyframes))
+                            .addGroup(
+                                glPanel
+                                    .createSequentialGroup()
+                                    .addPreferredGap(ComponentPlacement.UNRELATED)
+                                    .addComponent(
+                                        scrollPane1,
+                                        GroupLayout.DEFAULT_SIZE,
+                                        153,
+                                        Short.MAX_VALUE)))
+                    .addContainerGap()));
 
     tableKeyFrames = new JTable();
     scrollPane1.setViewportView(tableKeyFrames);
-    treeModel = new DefaultTableModel(new Object[][] {}, new String[] { "sprite", "duration" }) {
-      Class<?>[] columnTypes = new Class<?>[] { Integer.class, Integer.class };
+    treeModel =
+        new DefaultTableModel(new Object[][] {}, new String[] {"sprite", "duration"}) {
+          Class<?>[] columnTypes = new Class<?>[] {Integer.class, Integer.class};
 
-      @Override
-      public Class<?> getColumnClass(int columnIndex) {
-        return columnTypes[columnIndex];
-      }
+          @Override
+          public Class<?> getColumnClass(int columnIndex) {
+            return columnTypes[columnIndex];
+          }
 
-      @Override
-      public boolean isCellEditable(int row, int column) {
-        return column != 0;
-      }
-    };
+          @Override
+          public boolean isCellEditable(int row, int column) {
+            return column != 0;
+          }
+        };
 
     tableKeyFrames.setModel(treeModel);
-    treeModel.addTableModelListener(e -> {
-      if (this.isUpdating) {
-        return;
-      }
+    treeModel.addTableModelListener(
+        e -> {
+          if (this.isUpdating) {
+            return;
+          }
 
-      for (int row = 0; row < treeModel.getRowCount(); row++) {
-        int keyFrame = (int) treeModel.getValueAt(row, 1);
-        fileList.getSelectedValue().getKeyFrames()[row] = keyFrame;
-      }
+          for (int row = 0; row < treeModel.getRowCount(); row++) {
+            int keyFrame = (int) treeModel.getValueAt(row, 1);
+            fileList.getSelectedValue().getKeyFrames()[row] = keyFrame;
+          }
 
-      this.updatePreview(fileList.getSelectedValue());
-    });
+          this.updatePreview(fileList.getSelectedValue());
+        });
     panel.setLayout(glPanel);
 
     Game.loop().attach(this);
@@ -332,7 +480,7 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
       }
 
       for (int i = 0; i < file.getKeyFrames().length; i++) {
-        treeModel.addRow(new Object[] { i + 1, file.getKeyFrames()[i] });
+        treeModel.addRow(new Object[] {i + 1, file.getKeyFrames()[i]});
       }
     } finally {
       this.isUpdating = false;
@@ -353,18 +501,24 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
       this.labelImage.setIcon(file.getIcon());
       this.controller.getAll().clear();
 
-      double factor = (double) PREVIEW_SIZE / Math.max(file.getSpriteWidth(), file.getSpriteHeight());
+      double factor =
+          (double) PREVIEW_SIZE / Math.max(file.getSpriteWidth(), file.getSpriteHeight());
 
       BufferedImage img = Imaging.scale(file.getImage(), factor, true);
 
-      Spritesheet sprite = new Spritesheet(img, file.getName() + "-preview", (int) (file.getSpriteWidth() * factor),
-          (int) (file.getSpriteHeight() * factor));
+      Spritesheet sprite =
+          new Spritesheet(
+              img,
+              file.getName() + "-preview",
+              (int) (file.getSpriteWidth() * factor),
+              (int) (file.getSpriteHeight() * factor));
       Animation newAnim = new Animation(sprite, true, file.keyFrames);
 
       this.controller.setDefault(newAnim);
       this.controller.play(newAnim.getName());
     } catch (IllegalArgumentException e) {
-      log.log(Level.WARNING,
+      log.log(
+          Level.WARNING,
           "The sprite file {0} cannot be scaled correctly for the preview window. Please check if the image file dimensions are divisible by the desired sprite dimensions without remainder.",
           file.name);
     } finally {
@@ -393,7 +547,9 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
     }
 
     public SpriteFileWrapper(File file) {
-      this(Resources.images().get(file.getAbsolutePath()), FileUtilities.getFileName(file.getName()));
+      this(
+          Resources.images().get(file.getAbsolutePath()),
+          FileUtilities.getFileName(file.getName()));
       this.spriteWidth = this.width;
       this.spriteHeight = this.height;
       this.updateSprite();
@@ -466,7 +622,8 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
     }
 
     public void updateSprite() {
-      int totalSprites = (this.getWidth() / this.getSpriteWidth()) * (this.getHeight() / this.getSpriteHeight());
+      int totalSprites =
+          (this.getWidth() / this.getSpriteWidth()) * (this.getHeight() / this.getSpriteHeight());
       this.keyFrames = new int[totalSprites];
       for (int i = 0; i < totalSprites; i++) {
         this.keyFrames[i] = Animation.DEFAULT_FRAME_DURATION;
@@ -476,7 +633,8 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
     }
 
     private void updateGridImage() {
-      BufferedImage scaled = Imaging.scale(this.image, MAX_WIDTH_ICON, MAX_HEIGHT_ICON, true, false);
+      BufferedImage scaled =
+          Imaging.scale(this.image, MAX_WIDTH_ICON, MAX_HEIGHT_ICON, true, false);
       BufferedImage img = Imaging.getCompatibleImage(scaled.getWidth() + 1, scaled.getHeight() + 1);
       int cols = this.getWidth() / this.getSpriteWidth();
       int rows = this.getHeight() / this.getSpriteHeight();
@@ -502,7 +660,9 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
     }
 
     public SpritesheetResource createSpritesheetInfo() {
-      SpritesheetResource info = new SpritesheetResource(this.image, this.getName(), this.getSpriteWidth(), this.getSpriteHeight());
+      SpritesheetResource info =
+          new SpritesheetResource(
+              this.image, this.getName(), this.getSpriteWidth(), this.getSpriteHeight());
 
       boolean nonDefaultFrames = false;
       for (int i = 0; i < this.getKeyFrames().length; i++) {

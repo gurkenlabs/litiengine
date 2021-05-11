@@ -1,11 +1,10 @@
 package de.gurkenlabs.utiliti.swing;
 
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-
 import de.gurkenlabs.litiengine.resources.ResourceLoadException;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.components.Editor;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 
 public final class Icons {
   public static final Icon ADD = get("add");
@@ -61,7 +60,13 @@ public final class Icons {
     ImageIcon ic;
 
     try {
-      ic = new ImageIcon(Resources.images().get(String.format("%s_%s.png", identifier, Editor.preferences().getTheme().name().toLowerCase())));
+      ic =
+          new ImageIcon(
+              Resources.images()
+                  .get(
+                      String.format(
+                          "%s_%s.png",
+                          identifier, Editor.preferences().getTheme().name().toLowerCase())));
     } catch (ResourceLoadException rle1) {
       try {
         ic = new ImageIcon(Resources.images().get(String.format("%s.png", identifier)));
@@ -72,6 +77,5 @@ public final class Icons {
     return ic;
   }
 
-  private Icons() {
-  }
+  private Icons() {}
 }

@@ -16,7 +16,7 @@ public final class EntityActionMap {
     if (name == null || name.isEmpty() || action == null) {
       return null;
     }
-    
+
     EntityAction entityAction = new EntityAction(name, action);
     this.actions.put(name, entityAction);
     return entityAction;

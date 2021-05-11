@@ -1,7 +1,11 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
+import com.github.weisj.darklaf.ui.table.renderer.DarkTableCellEditor;
+import com.github.weisj.darklaf.ui.table.renderer.DarkTableCellRenderer;
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.environment.tilemap.IMap;
+import de.gurkenlabs.utiliti.UndoManager;
 import java.awt.Component;
-
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
@@ -10,17 +14,11 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 
-import com.github.weisj.darklaf.ui.table.renderer.DarkTableCellEditor;
-import com.github.weisj.darklaf.ui.table.renderer.DarkTableCellRenderer;
-
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.environment.tilemap.IMap;
-import de.gurkenlabs.utiliti.UndoManager;
-
 public class LayerTable extends JTable {
-  protected static final String[] columns = new String[] { "visible", "name", "objects" };
+  protected static final String[] columns = new String[] {"visible", "name", "objects"};
 
-  private static final TableCellEditor visibilityEditor = new DarkTableCellEditor(new JToggleButton());
+  private static final TableCellEditor visibilityEditor =
+      new DarkTableCellEditor(new JToggleButton());
   private static final TableCellEditor nameEditor = new DarkTableCellEditor(new JTextField());
   private int lastSelection = 0;
   private IMap map;
@@ -38,7 +36,6 @@ public class LayerTable extends JTable {
     this.getColumnModel().getColumn(0).setPreferredWidth(50);
     this.doLayout();
     this.resizeAndRepaint();
-
   }
 
   public void select(int selectedLayer) {
@@ -65,7 +62,6 @@ public class LayerTable extends JTable {
     int selection = super.getSelectedRow();
     if (selection != this.lastSelection) {
       this.lastSelection = selection;
-
     }
     return this.lastSelection;
   }
@@ -96,14 +92,18 @@ public class LayerTable extends JTable {
   public TableCellRenderer getCellRenderer(final int row, final int column) {
     return new DarkTableCellRenderer() {
       @Override
-      public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-        if (Game.world().environment() == null || Game.world().environment().getMap() == null
+      public Component getTableCellRendererComponent(
+          JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+        Component c =
+            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+        if (Game.world().environment() == null
+            || Game.world().environment().getMap() == null
             || Game.world().environment().getMap().getMapObjectLayers().get(row) == null) {
           return c;
         }
         if (column == 0) {
-          c.setBackground(Game.world().environment().getMap().getMapObjectLayers().get(row).getColor());
+          c.setBackground(
+              Game.world().environment().getMap().getMapObjectLayers().get(row).getColor());
         }
         return c;
       }
@@ -120,12 +120,23 @@ public class LayerTable extends JTable {
     }
     boolean layersChanged = false;
     for (int row = 0; row < this.getMap().getMapObjectLayers().size(); row++) {
-      if (this.getMap().getMapObjectLayers().get(row).isVisible() != (boolean) this.getModel().getValueAt(row, 0) || !this.getMap()
-          .getMapObjectLayers().get(row).getName().equals(this.getModel().getValueAt(row, 1).toString())) {
+      if (this.getMap().getMapObjectLayers().get(row).isVisible()
+              != (boolean) this.getModel().getValueAt(row, 0)
+          || !this.getMap()
+              .getMapObjectLayers()
+              .get(row)
+              .getName()
+              .equals(this.getModel().getValueAt(row, 1).toString())) {
         layersChanged = true;
       }
-      this.getMap().getMapObjectLayers().get(row).setVisible((boolean) this.getModel().getValueAt(row, 0));
-      this.getMap().getMapObjectLayers().get(row).setName(this.getModel().getValueAt(row, 1).toString());
+      this.getMap()
+          .getMapObjectLayers()
+          .get(row)
+          .setVisible((boolean) this.getModel().getValueAt(row, 0));
+      this.getMap()
+          .getMapObjectLayers()
+          .get(row)
+          .setName(this.getModel().getValueAt(row, 1).toString());
     }
     if (layersChanged) {
       UndoManager.instance().recordChanges();

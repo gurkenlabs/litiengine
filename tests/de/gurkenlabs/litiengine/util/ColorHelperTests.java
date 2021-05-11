@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import java.awt.Color;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -29,17 +28,16 @@ public class ColorHelperTests {
 
   @ParameterizedTest
   @MethodSource("getColorFromHexString")
-  public void testColorFromHexString( String colorHex, Color expectedColor) {
+  public void testColorFromHexString(String colorHex, Color expectedColor) {
     Color colorDecoded = ColorHelper.decode(colorHex);
     assertEquals(expectedColor, colorDecoded);
   }
 
-  private static Stream<Arguments> getColorFromHexString(){
+  private static Stream<Arguments> getColorFromHexString() {
     return Stream.of(
-            Arguments.of("#ff0000", Color.RED),
-            Arguments.of("#00ff00", Color.GREEN),
-            Arguments.of("#0000ff", Color.BLUE)
-    );
+        Arguments.of("#ff0000", Color.RED),
+        Arguments.of("#00ff00", Color.GREEN),
+        Arguments.of("#0000ff", Color.BLUE));
   }
 
   @Test
@@ -84,19 +82,18 @@ public class ColorHelperTests {
 
   @ParameterizedTest
   @MethodSource("getSolidColorFromAlphaHexString")
-  public void testSolidColorFromAlphaHexString(String color, Boolean isSolid, Color solidColor ) {
+  public void testSolidColorFromAlphaHexString(String color, Boolean isSolid, Color solidColor) {
     Color colorDecoded = ColorHelper.decode(color, isSolid);
     assertEquals(solidColor, colorDecoded);
   }
 
-  private static Stream<Arguments> getSolidColorFromAlphaHexString(){
+  private static Stream<Arguments> getSolidColorFromAlphaHexString() {
     return Stream.of(
-            Arguments.of("#c8ff0000", true, new Color(228, 0, 0)),
-            Arguments.of("#c800ff00", true, new Color(0, 228, 0)),
-            Arguments.of("#c80000ff", true, new Color(0, 0, 228)),
-            Arguments.of("", true, null),
-            Arguments.of(null, true, null)
-    );
+        Arguments.of("#c8ff0000", true, new Color(228, 0, 0)),
+        Arguments.of("#c800ff00", true, new Color(0, 228, 0)),
+        Arguments.of("#c80000ff", true, new Color(0, 0, 228)),
+        Arguments.of("", true, null),
+        Arguments.of(null, true, null));
   }
 
   @ParameterizedTest
@@ -106,13 +103,12 @@ public class ColorHelperTests {
     assertEquals(expectedColor, colorDecoded);
   }
 
-  private static Stream<Arguments> getHexStringWithoutHashtag(){
+  private static Stream<Arguments> getHexStringWithoutHashtag() {
     return Stream.of(
-            Arguments.of("ff0000", Color.RED),
-            Arguments.of("00ff00", Color.GREEN),
-            Arguments.of("0000ff", Color.BLUE),
-            Arguments.of("000", null)
-    );
+        Arguments.of("ff0000", Color.RED),
+        Arguments.of("00ff00", Color.GREEN),
+        Arguments.of("0000ff", Color.BLUE),
+        Arguments.of("000", null));
   }
 
   @Test
@@ -140,15 +136,15 @@ public class ColorHelperTests {
     assertEquals("#c80000ff", blueEncoded);
   }
 
-  @ParameterizedTest(name="testRgbBounds {0}, colorValue={1}, expectedRgb={2}")
+  @ParameterizedTest(name = "testRgbBounds {0}, colorValue={1}, expectedRgb={2}")
   @CsvSource({
-          "Negative, -10, 0",
-          "Zero, 0, 0",
-          "InRange, 158, 158",
-          "Max, 255, 255",
-          "OutOfRange, 300, 255"
+    "Negative, -10, 0",
+    "Zero, 0, 0",
+    "InRange, 158, 158",
+    "Max, 255, 255",
+    "OutOfRange, 300, 255"
   })
-  public void testRgbBounds(String rgbBound, int colorValue, int expectedRgb){
+  public void testRgbBounds(String rgbBound, int colorValue, int expectedRgb) {
     // arrange, act
     int actualRgb = ColorHelper.ensureColorValueRange(colorValue);
 
@@ -157,9 +153,8 @@ public class ColorHelperTests {
   }
 
   @Test
-  public void testPremultiply(){
+  public void testPremultiply() {
     Color color = new Color(225, 0, 0);
     assertEquals(new Color(225, 0, 0), ColorHelper.premultiply(color));
   }
-
 }

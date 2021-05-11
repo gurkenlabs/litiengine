@@ -6,23 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Point;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Game;
@@ -47,6 +32,18 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.CustomProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class MapObjectLoaderTests {
   private Environment testEnvironment;
@@ -218,7 +215,8 @@ public class MapObjectLoaderTests {
     when(mapObject.getHeight()).thenReturn(200f);
 
     when(mapObject.getStringValue(MapObjectProperty.TRIGGER_MESSAGE)).thenReturn("message");
-    when(mapObject.getStringValue(MapObjectProperty.TRIGGER_ACTIVATION)).thenReturn(TriggerActivation.INTERACT.name());
+    when(mapObject.getStringValue(MapObjectProperty.TRIGGER_ACTIVATION))
+        .thenReturn(TriggerActivation.INTERACT.name());
     when(mapObject.getStringValue(MapObjectProperty.TRIGGER_TARGETS)).thenReturn("1,2,3");
     when(mapObject.getStringValue(MapObjectProperty.TRIGGER_ACTIVATORS)).thenReturn("4,5,6");
     when(mapObject.getStringValue(MapObjectProperty.TRIGGER_ONETIME)).thenReturn("false");
@@ -239,8 +237,8 @@ public class MapObjectLoaderTests {
 
     assertFalse(trigger.isOneTimeTrigger());
     assertEquals(TriggerActivation.INTERACT, trigger.getActivationType());
-    assertArrayEquals(new Integer[] { 1, 2, 3 }, trigger.getTargets().toArray());
-    assertArrayEquals(new Integer[] { 4, 5, 6 }, trigger.getActivators().toArray());
+    assertArrayEquals(new Integer[] {1, 2, 3}, trigger.getTargets().toArray());
+    assertArrayEquals(new Integer[] {4, 5, 6}, trigger.getActivators().toArray());
     assertEquals(200.0, trigger.getCollisionBoxWidth(), 0.0001);
     assertEquals(200.0, trigger.getCollisionBoxHeight(), 0.0001);
   }
@@ -277,9 +275,11 @@ public class MapObjectLoaderTests {
     when(mapObject.getLocation()).thenReturn(new Point(100, 100));
 
     when(mapObject.getIntValue(MapObjectProperty.LIGHT_INTENSITY, 100)).thenReturn(100);
-    when(mapObject.getColorValue(MapObjectProperty.LIGHT_COLOR)).thenReturn(new Color(255, 255, 255, 100));
+    when(mapObject.getColorValue(MapObjectProperty.LIGHT_COLOR))
+        .thenReturn(new Color(255, 255, 255, 100));
     when(mapObject.getBoolValue(MapObjectProperty.LIGHT_ACTIVE, true)).thenReturn(true);
-    when(mapObject.getEnumValue(MapObjectProperty.LIGHT_SHAPE, LightSource.Type.class)).thenReturn(LightSource.Type.ELLIPSE);
+    when(mapObject.getEnumValue(MapObjectProperty.LIGHT_SHAPE, LightSource.Type.class))
+        .thenReturn(LightSource.Type.ELLIPSE);
     when(mapObject.getStringValue(MapObjectProperty.LIGHT_SHAPE)).thenReturn("ellipse");
 
     Collection<IEntity> entities = loader.load(this.testEnvironment, mapObject);
@@ -384,8 +384,7 @@ public class MapObjectLoaderTests {
     @TmxProperty(name = "bar")
     private int bar;
 
-    public CustomEntity(IMapObject mo) {
-    }
+    public CustomEntity(IMapObject mo) {}
 
     public String getFoo() {
       return this.foo;
@@ -397,7 +396,7 @@ public class MapObjectLoaderTests {
   }
 
   @Test
-  public void testMapObjectType(){
+  public void testMapObjectType() {
     String mapObject1 = null;
     String mapObject2 = "";
 

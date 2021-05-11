@@ -1,15 +1,14 @@
 package de.gurkenlabs.litiengine.graphics.emitters.particles;
 
+import de.gurkenlabs.litiengine.graphics.ImageRenderer;
+import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.graphics.animation.AnimationController;
 import java.awt.AlphaComposite;
 import java.awt.Composite;
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-
-import de.gurkenlabs.litiengine.graphics.ImageRenderer;
-import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.litiengine.graphics.animation.AnimationController;
 
 public class SpriteParticle extends Particle {
   private AnimationController animation;
@@ -28,7 +27,6 @@ public class SpriteParticle extends Particle {
     this.setHeight(spritesheet.getSpriteHeight());
     this.animation = new AnimationController(this.spritesheet);
   }
-
 
   @Override
   public void render(final Graphics2D g, final Point2D emitterOrigin) {
@@ -54,7 +52,11 @@ public class SpriteParticle extends Particle {
 
   @Override
   public Rectangle2D getBoundingBox(final Point2D origin) {
-    return new Rectangle2D.Double(origin.getX() + this.getX() - this.getWidth() / 2, origin.getY() + this.getY() - this.getHeight() / 2, this.getWidth(), this.getHeight());
+    return new Rectangle2D.Double(
+        origin.getX() + this.getX() - this.getWidth() / 2,
+        origin.getY() + this.getY() - this.getHeight() / 2,
+        this.getWidth(),
+        this.getHeight());
   }
 
   public boolean isAnimatingSprite() {
@@ -76,5 +78,4 @@ public class SpriteParticle extends Particle {
     this.loopSprite = loopSprite;
     this.animation.getDefault().setLooping(loopSprite);
   }
-
 }

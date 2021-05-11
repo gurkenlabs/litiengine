@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 
 public final class FileUtilities {
   private static final Logger log = Logger.getLogger(FileUtilities.class.getName());
-  private static final String[] DIR_BLACKLIST = new String[] { "\\bin", "\\screenshots" };
+  private static final String[] DIR_BLACKLIST = new String[] {"\\bin", "\\screenshots"};
   private static final String FILE_SEPARATOR_WIN = "\\";
   private static final String FILE_SEPARATOR = "/";
 
@@ -43,7 +43,8 @@ public final class FileUtilities {
     return true;
   }
 
-  public static List<String> findFilesByExtension(final List<String> fileNames, final Path dir, final String extension) {
+  public static List<String> findFilesByExtension(
+      final List<String> fileNames, final Path dir, final String extension) {
     try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
       for (final Path path : stream) {
         if (path.toFile().isDirectory()) {
@@ -63,7 +64,8 @@ public final class FileUtilities {
     return fileNames;
   }
 
-  public static List<String> findFiles(final List<String> fileNames, final Path dir, final String... files) {
+  public static List<String> findFiles(
+      final List<String> fileNames, final Path dir, final String... files) {
     try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
       for (final Path path : stream) {
         if (path.toFile().isDirectory()) {
@@ -113,7 +115,10 @@ public final class FileUtilities {
   }
 
   public static String getFileName(final String path, boolean extension) {
-    if (path == null || path.isEmpty() || path.endsWith(FILE_SEPARATOR_WIN) || path.endsWith(FILE_SEPARATOR)) {
+    if (path == null
+        || path.isEmpty()
+        || path.endsWith(FILE_SEPARATOR_WIN)
+        || path.endsWith(FILE_SEPARATOR)) {
       return "";
     }
 
@@ -159,13 +164,11 @@ public final class FileUtilities {
   }
 
   /**
-   * This method combines the specified basepath with the parts provided as
-   * arguments. The output will use the path separator of the current system;
-   * 
-   * @param basePath
-   *          The base path for the combined path.
-   * @param paths
-   *          The parts of the path to be constructed.
+   * This method combines the specified basepath with the parts provided as arguments. The output
+   * will use the path separator of the current system;
+   *
+   * @param basePath The base path for the combined path.
+   * @param paths The parts of the path to be constructed.
    * @return The combined path.
    */
   public static String combine(String basePath, final String... paths) {
@@ -200,16 +203,16 @@ public final class FileUtilities {
 
     return false;
   }
-  
+
   public static String humanReadableByteCount(long bytes) {
     return humanReadableByteCount(bytes, false);
   }
-  
+
   public static String humanReadableByteCount(long bytes, boolean decimal) {
     int unit = decimal ? 1000 : 1024;
     if (bytes < unit) return bytes + " bytes";
     int exp = (int) (Math.log(bytes) / Math.log(unit));
-    String pre = new String[] {"K", "M", "G", "T", "P", "E"}[exp-1];
+    String pre = new String[] {"K", "M", "G", "T", "P", "E"}[exp - 1];
     pre = decimal ? pre : pre + "i";
     return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
   }

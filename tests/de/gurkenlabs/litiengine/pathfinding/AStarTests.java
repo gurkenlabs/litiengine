@@ -7,18 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.awt.Dimension;
-import java.awt.Rectangle;
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
-
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameTest;
 import de.gurkenlabs.litiengine.entities.behavior.AStarGrid;
@@ -26,6 +14,16 @@ import de.gurkenlabs.litiengine.entities.behavior.AStarNode;
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
+import java.awt.Dimension;
+import java.awt.Rectangle;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -57,7 +55,7 @@ public class AStarTests {
 
   @ParameterizedTest(name = "testGetCostsSimpleDirections: {0}, expectedCost={2}")
   @MethodSource("getCostsSimpleDirectionsArguments")
-  public void testGetCostsSimpleDirections(String name, AStarNode remoteNode, double expectedCost){
+  public void testGetCostsSimpleDirections(String name, AStarNode remoteNode, double expectedCost) {
     // arrange
     AStarNode originNode = new AStarNode(false, new Rectangle(50, 50, 10, 10), 5, 5);
 
@@ -69,22 +67,23 @@ public class AStarTests {
   }
 
   /**
-   * This method is used to fill in the arguments of the parametrized test {@link #testGetCostsSimpleDirections(String, AStarNode, double)}
+   * This method is used to fill in the arguments of the parametrized test {@link
+   * #testGetCostsSimpleDirections(String, AStarNode, double)}
+   *
    * @return Test arguments
    */
   @SuppressWarnings("unused")
-  private static Stream<Arguments> getCostsSimpleDirectionsArguments(){
+  private static Stream<Arguments> getCostsSimpleDirectionsArguments() {
     return Stream.of(
-            Arguments.of("down", new AStarNode(false, new Rectangle(50, 100, 10, 10), 5, 10), 5.0),
-            Arguments.of("up", new AStarNode(false, new Rectangle(50, 40, 10, 10), 5, 4), 1.0),
-            Arguments.of("left", new AStarNode(false, new Rectangle(30, 50, 10, 10), 3, 5), 2.0),
-            Arguments.of("right", new AStarNode(false, new Rectangle(60, 50, 10, 10), 6, 5), 1.0)
-    );
+        Arguments.of("down", new AStarNode(false, new Rectangle(50, 100, 10, 10), 5, 10), 5.0),
+        Arguments.of("up", new AStarNode(false, new Rectangle(50, 40, 10, 10), 5, 4), 1.0),
+        Arguments.of("left", new AStarNode(false, new Rectangle(30, 50, 10, 10), 3, 5), 2.0),
+        Arguments.of("right", new AStarNode(false, new Rectangle(60, 50, 10, 10), 6, 5), 1.0));
   }
 
   @ParameterizedTest(name = "testGetCostsAdvancedDirections: {0}")
   @MethodSource("getCostsAdvancedDirectionsArguments")
-  public void testGetCostsAdvancedDirections(String name, AStarNode remoteNode){
+  public void testGetCostsAdvancedDirections(String name, AStarNode remoteNode) {
     // arrange
     AStarNode originNode = new AStarNode(false, new Rectangle(50, 50, 10, 10), 5, 5);
 
@@ -96,17 +95,18 @@ public class AStarTests {
   }
 
   /**
-   * This method is used to fill in the arguments of the parametrized test {@link #testGetCostsAdvancedDirections(String, AStarNode)}
+   * This method is used to fill in the arguments of the parametrized test {@link
+   * #testGetCostsAdvancedDirections(String, AStarNode)}
+   *
    * @return Test arguments
    */
   @SuppressWarnings("unused")
-  private static Stream<Arguments> getCostsAdvancedDirectionsArguments(){
+  private static Stream<Arguments> getCostsAdvancedDirectionsArguments() {
     return Stream.of(
-            Arguments.of("downLeft", new AStarNode(false, new Rectangle(40, 60, 10, 10), 4, 6)),
-            Arguments.of("downRight", new AStarNode(false, new Rectangle(60, 60, 10, 10), 6, 6)),
-            Arguments.of("upLeft", new AStarNode(false, new Rectangle(40, 40, 10, 10), 4, 4)),
-            Arguments.of("upRight", new AStarNode(false, new Rectangle(60, 40, 10, 10), 6, 4))
-    );
+        Arguments.of("downLeft", new AStarNode(false, new Rectangle(40, 60, 10, 10), 4, 6)),
+        Arguments.of("downRight", new AStarNode(false, new Rectangle(60, 60, 10, 10), 6, 6)),
+        Arguments.of("upLeft", new AStarNode(false, new Rectangle(40, 40, 10, 10), 4, 4)),
+        Arguments.of("upRight", new AStarNode(false, new Rectangle(60, 40, 10, 10), 6, 4)));
   }
 
   @Test

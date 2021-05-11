@@ -1,20 +1,17 @@
 package de.gurkenlabs.litiengine.entities;
 
+import de.gurkenlabs.litiengine.Align;
+import de.gurkenlabs.litiengine.Valign;
+import de.gurkenlabs.litiengine.configuration.Quality;
+import de.gurkenlabs.litiengine.graphics.emitters.particles.ParticleType;
+import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import de.gurkenlabs.litiengine.Align;
-import de.gurkenlabs.litiengine.Valign;
-import de.gurkenlabs.litiengine.configuration.Quality;
-import de.gurkenlabs.litiengine.graphics.emitters.particles.ParticleType;
-import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
-
-/**
- * This annotation contains default values for the initialization of an emitter.
- */
+/** This annotation contains default values for the initialization of an emitter. */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited

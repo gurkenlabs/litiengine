@@ -1,9 +1,8 @@
 package de.gurkenlabs.litiengine.graphics;
 
-import java.awt.image.BufferedImage;
-
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.ITimeToLive;
+import java.awt.image.BufferedImage;
 
 public abstract class ImageEffect implements ITimeToLive, Comparable<ImageEffect> {
   private final long aliveTick;
@@ -48,7 +47,7 @@ public abstract class ImageEffect implements ITimeToLive, Comparable<ImageEffect
   public void setPriority(int priority) {
     this.priority = priority;
   }
-  
+
   public void setName(String name) {
     this.name = name;
   }

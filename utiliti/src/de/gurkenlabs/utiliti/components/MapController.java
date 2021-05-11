@@ -1,8 +1,7 @@
 package de.gurkenlabs.utiliti.components;
 
-import java.util.List;
-
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
+import java.util.List;
 
 public interface MapController extends Controller {
   TmxMap getCurrentMap();

@@ -28,6 +28,6 @@ public abstract class State {
   public List<Transition> getTransitions() {
     return this.transitions;
   }
-  
+
   protected abstract void perform();
 }

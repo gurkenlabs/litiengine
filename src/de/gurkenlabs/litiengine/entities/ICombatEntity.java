@@ -1,11 +1,10 @@
 package de.gurkenlabs.litiengine.entities;
 
-import java.awt.Shape;
-import java.util.List;
-
 import de.gurkenlabs.litiengine.abilities.Ability;
 import de.gurkenlabs.litiengine.abilities.effects.Effect;
 import de.gurkenlabs.litiengine.attributes.RangeAttribute;
+import java.awt.Shape;
+import java.util.List;
 
 public interface ICombatEntity extends ICollisionEntity {
   void addCombatEntityListener(CombatEntityListener listener);

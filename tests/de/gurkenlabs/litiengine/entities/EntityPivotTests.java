@@ -1,13 +1,12 @@
 package de.gurkenlabs.litiengine.entities;
 
-import org.junit.jupiter.api.Test;
-
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import org.junit.jupiter.api.Test;
 
 class EntityPivotTests {
   @Test

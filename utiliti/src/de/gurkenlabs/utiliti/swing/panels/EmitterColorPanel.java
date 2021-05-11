@@ -1,10 +1,18 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
+import com.github.weisj.darklaf.components.border.DarkBorders;
+import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
+import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.util.ColorHelper;
+import de.gurkenlabs.utiliti.SwingHelpers;
+import de.gurkenlabs.utiliti.swing.ControlBehavior;
+import de.gurkenlabs.utiliti.swing.Icons;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.LayoutManager;
-
 import javax.swing.Box;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
@@ -19,17 +27,6 @@ import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
-
-import com.github.weisj.darklaf.components.border.DarkBorders;
-
-import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
-import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
-import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
-import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.litiengine.util.ColorHelper;
-import de.gurkenlabs.utiliti.SwingHelpers;
-import de.gurkenlabs.utiliti.swing.ControlBehavior;
-import de.gurkenlabs.utiliti.swing.Icons;
 
 @SuppressWarnings("serial")
 public class EmitterColorPanel extends PropertyPanel {
@@ -75,12 +72,16 @@ public class EmitterColorPanel extends PropertyPanel {
 
     colorControls = new JPanel();
     GroupLayout grplayout = new GroupLayout(colorControls);
-    grplayout.setHorizontalGroup(grplayout.createSequentialGroup().addComponent(ctrlButtonBox).addComponent(scrollPanel));
-    grplayout.setVerticalGroup(grplayout.createParallelGroup().addComponent(ctrlButtonBox).addComponent(scrollPanel));
+    grplayout.setHorizontalGroup(
+        grplayout.createSequentialGroup().addComponent(ctrlButtonBox).addComponent(scrollPanel));
+    grplayout.setVerticalGroup(
+        grplayout.createParallelGroup().addComponent(ctrlButtonBox).addComponent(scrollPanel));
     colorControls.setLayout(grplayout);
 
-    colorVariance = new JSpinner(new SpinnerNumberModel(EmitterData.DEFAULT_COLOR_VARIANCE, 0d, 1d, STEP_FINE));
-    alphaVariance = new JSpinner(new SpinnerNumberModel(EmitterData.DEFAULT_ALPHA_VARIANCE, 0d, 1d, STEP_FINE));
+    colorVariance =
+        new JSpinner(new SpinnerNumberModel(EmitterData.DEFAULT_COLOR_VARIANCE, 0d, 1d, STEP_FINE));
+    alphaVariance =
+        new JSpinner(new SpinnerNumberModel(EmitterData.DEFAULT_ALPHA_VARIANCE, 0d, 1d, STEP_FINE));
 
     setLayout(createLayout());
     setupChangedListeners();
@@ -97,8 +98,12 @@ public class EmitterColorPanel extends PropertyPanel {
   @Override
   protected void setControlValues(IMapObject mapObject) {
     setColors(mapObject.getStringValue(MapObjectProperty.Emitter.COLORS));
-    colorVariance.setValue(mapObject.getFloatValue(MapObjectProperty.Emitter.COLORVARIANCE, EmitterData.DEFAULT_COLOR_VARIANCE));
-    alphaVariance.setValue(mapObject.getFloatValue(MapObjectProperty.Emitter.ALPHAVARIANCE, EmitterData.DEFAULT_ALPHA_VARIANCE));
+    colorVariance.setValue(
+        mapObject.getFloatValue(
+            MapObjectProperty.Emitter.COLORVARIANCE, EmitterData.DEFAULT_COLOR_VARIANCE));
+    alphaVariance.setValue(
+        mapObject.getFloatValue(
+            MapObjectProperty.Emitter.ALPHAVARIANCE, EmitterData.DEFAULT_ALPHA_VARIANCE));
   }
 
   private void setColors(String commaSeparatedHexstrings) {
@@ -107,34 +112,46 @@ public class EmitterColorPanel extends PropertyPanel {
     }
     model.setRowCount(0);
     for (String colorStr : commaSeparatedHexstrings.split(",")) {
-      model.addRow(new Object[] { colorStr });
+      model.addRow(new Object[] {colorStr});
     }
   }
 
   protected LayoutManager createLayout() {
-    LayoutItem[] layoutItems = new LayoutItem[] { new LayoutItem(colorControls, CONTROL_HEIGHT * 3), new LayoutItem("emitter_colorVariance", colorVariance, CONTROL_HEIGHT), new LayoutItem("emitter_alphaVariance", alphaVariance, CONTROL_HEIGHT) };
+    LayoutItem[] layoutItems =
+        new LayoutItem[] {
+            new LayoutItem(colorControls, CONTROL_HEIGHT * 3),
+            new LayoutItem("emitter_colorVariance", colorVariance, CONTROL_HEIGHT),
+            new LayoutItem("emitter_alphaVariance", alphaVariance, CONTROL_HEIGHT)
+        };
     return this.createLayout(layoutItems);
   }
 
   private void setupChangedListeners() {
-    btnAdd.addActionListener(a -> model.addRow(new Object[] { ColorHelper.encode(EmitterData.DEFAULT_COLOR.brighter()) }));
+    btnAdd.addActionListener(
+        a -> model.addRow(new Object[] {ColorHelper.encode(EmitterData.DEFAULT_COLOR.brighter())}));
     btnRemove.addActionListener(a -> model.removeRow(table.getSelectedRow()));
-    btnEdit.addActionListener(a -> {
-      Color previousColor = ColorHelper.decode(table.getValueAt(table.getSelectedRow(), table.getSelectedColumn()).toString());
-      final Color result = JColorChooser.showDialog(null, Resources.strings().get("particle_editcolor"), previousColor);
-      table.setValueAt(ColorHelper.encode(result), table.getSelectedRow(), table.getSelectedColumn());
-    });
+    btnEdit.addActionListener(
+        a -> {
+          Color previousColor =
+              ColorHelper.decode(
+                  table.getValueAt(table.getSelectedRow(), table.getSelectedColumn()).toString());
+          final Color result =
+              JColorChooser.showDialog(
+                  null, Resources.strings().get("particle_editcolor"), previousColor);
+          table.setValueAt(
+              ColorHelper.encode(result), table.getSelectedRow(), table.getSelectedColumn());
+        });
     setup(table, MapObjectProperty.Emitter.COLORS);
     setup(colorVariance, MapObjectProperty.Emitter.COLORVARIANCE);
     setup(alphaVariance, MapObjectProperty.Emitter.ALPHAVARIANCE);
-
   }
 
   private class ColorListCellRenderer extends JTextField implements TableCellRenderer {
     private transient Border focusBorder = DarkBorders.createLineBorder(1, 1, 1, 1);
 
     @Override
-    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+    public Component getTableCellRendererComponent(
+        JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
       this.setColumns(9);
       this.setHorizontalAlignment(SwingConstants.CENTER);
       SwingHelpers.updateColorTextField(this, ColorHelper.decode((String) value));
@@ -144,6 +161,5 @@ public class EmitterColorPanel extends PropertyPanel {
       }
       return this;
     }
-
   }
 }

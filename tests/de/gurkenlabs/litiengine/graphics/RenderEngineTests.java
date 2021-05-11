@@ -5,15 +5,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+import de.gurkenlabs.litiengine.util.Imaging;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
-
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-
-import de.gurkenlabs.litiengine.util.Imaging;
 
 public class RenderEngineTests {
 

@@ -1,23 +1,28 @@
 package de.gurkenlabs.litiengine.gui;
 
+import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.util.Imaging;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-
 import javax.swing.SwingUtilities;
-
-import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.litiengine.util.Imaging;
 
 public class MouseDrawComponent extends ImageComponent {
   private double brushSize = 2;
   private BufferedImage drawingSpace;
   private Color drawingColor = Color.WHITE;
 
-  public MouseDrawComponent(double x, double y, double width, double height, Spritesheet spritesheet, String text, Image image) {
+  public MouseDrawComponent(
+      double x,
+      double y,
+      double width,
+      double height,
+      Spritesheet spritesheet,
+      String text,
+      Image image) {
     super(x, y, width, height, spritesheet, text, image);
     this.drawingSpace = Imaging.getCompatibleImage((int) width, (int) height);
   }
@@ -56,7 +61,11 @@ public class MouseDrawComponent extends ImageComponent {
       g.fillRect(brushXInt, brushYInt, brushSizeInt, brushSizeInt);
     } else if (SwingUtilities.isRightMouseButton(e)) {
       g.setComposite(AlphaComposite.Clear);
-      g.fillRect(brushXInt - brushSizeInt / 2, brushYInt - brushSizeInt / 2, brushSizeInt * 2, brushSizeInt * 2);
+      g.fillRect(
+          brushXInt - brushSizeInt / 2,
+          brushYInt - brushSizeInt / 2,
+          brushSizeInt * 2,
+          brushSizeInt * 2);
     }
   }
 

@@ -14,5 +14,4 @@ public class FocusChangedEvent extends CameraEvent {
   public Point2D getFocus() {
     return this.focus;
   }
-
 }

@@ -1,20 +1,18 @@
 package de.gurkenlabs.litiengine.util.io;
 
+import de.gurkenlabs.litiengine.resources.ImageFormat;
+import de.gurkenlabs.litiengine.util.Imaging;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.FileImageOutputStream;
-
-import de.gurkenlabs.litiengine.resources.ImageFormat;
-import de.gurkenlabs.litiengine.util.Imaging;
 
 public final class ImageSerializer {
   private static final Logger log = Logger.getLogger(ImageSerializer.class.getName());
@@ -36,7 +34,8 @@ public final class ImageSerializer {
         return null;
       }
 
-      final BufferedImage compatibleImg = Imaging.getCompatibleImage(img.getWidth(), img.getHeight());
+      final BufferedImage compatibleImg =
+          Imaging.getCompatibleImage(img.getWidth(), img.getHeight());
       compatibleImg.createGraphics().drawImage(img, 0, 0, null);
       compatibleImg.createGraphics().dispose();
 
@@ -51,7 +50,8 @@ public final class ImageSerializer {
     saveImage(fileName, image, ImageFormat.PNG);
   }
 
-  public static void saveImage(final String fileName, final BufferedImage image, ImageFormat imageFormat) {
+  public static void saveImage(
+      final String fileName, final BufferedImage image, ImageFormat imageFormat) {
     try {
       final File file = new File(fileName);
       final String extension = FileUtilities.getExtension(fileName);

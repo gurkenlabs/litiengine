@@ -1,17 +1,17 @@
 package de.gurkenlabs.utiliti.renderers;
 
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.utiliti.Style;
+import de.gurkenlabs.utiliti.components.Editor;
+import de.gurkenlabs.utiliti.components.MapComponent;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.utiliti.Style;
-import de.gurkenlabs.utiliti.components.Editor;
-import de.gurkenlabs.utiliti.components.MapComponent;
-
 public class MouseSelectAreaRenderer implements IEditorRenderer {
-  private final BasicStroke shapeStroke = new BasicStroke(1 / Game.world().camera().getRenderScale());
+  private final BasicStroke shapeStroke =
+      new BasicStroke(1 / Game.world().camera().getRenderScale());
   private final Color fillColor;
   private final Color borderColor;
 
@@ -32,7 +32,8 @@ public class MouseSelectAreaRenderer implements IEditorRenderer {
   @Override
   public void render(Graphics2D g) {
     final Rectangle2D rect = Editor.instance().getMapComponent().getMouseSelectArea(false);
-    if (rect == null || Editor.instance().getMapComponent().getEditMode() != MapComponent.EDITMODE_EDIT) {
+    if (rect == null
+        || Editor.instance().getMapComponent().getEditMode() != MapComponent.EDITMODE_EDIT) {
       return;
     }
 

@@ -1,13 +1,32 @@
 package de.gurkenlabs.utiliti.handlers;
 
-import java.util.Arrays;
-
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.utiliti.components.Editor;
+import java.util.Arrays;
 
 public final class Zoom implements Comparable<Zoom> {
-  private static final Zoom[] zooms = new Zoom[] { new Zoom(0.1f), new Zoom(0.25f), new Zoom(0.5f), new Zoom(1), new Zoom(1.5f), new Zoom(2f), new Zoom(3f), new Zoom(4f), new Zoom(5f), new Zoom(6f), new Zoom(7f), new Zoom(8f), new Zoom(9f), new Zoom(10f), new Zoom(16f), new Zoom(32f), new Zoom(50f),
-      new Zoom(80f), new Zoom(100f) };
+  private static final Zoom[] zooms =
+      new Zoom[] {
+        new Zoom(0.1f),
+        new Zoom(0.25f),
+        new Zoom(0.5f),
+        new Zoom(1),
+        new Zoom(1.5f),
+        new Zoom(2f),
+        new Zoom(3f),
+        new Zoom(4f),
+        new Zoom(5f),
+        new Zoom(6f),
+        new Zoom(7f),
+        new Zoom(8f),
+        new Zoom(9f),
+        new Zoom(10f),
+        new Zoom(16f),
+        new Zoom(32f),
+        new Zoom(50f),
+        new Zoom(80f),
+        new Zoom(100f)
+      };
   private static final int DEFAULT_ZOOM_INDEX = 3;
   private static int currentZoomIndex = DEFAULT_ZOOM_INDEX;
 
@@ -48,14 +67,11 @@ public final class Zoom implements Comparable<Zoom> {
   }
 
   /**
-   * Matches the specified zoom with the closest zoom level that is provided by
-   * this class.
-   * <p>
-   * For example: 1.111f would be converted to the preset 1.0f zoom level.
-   * </p>
-   * 
-   * @param preference
-   *          The preferred zoom.
+   * Matches the specified zoom with the closest zoom level that is provided by this class.
+   *
+   * <p>For example: 1.111f would be converted to the preset 1.0f zoom level.
+   *
+   * @param preference The preferred zoom.
    * @return The index of the matched zoom provided by this class.
    */
   public static int match(float preference) {
@@ -64,7 +80,8 @@ public final class Zoom implements Comparable<Zoom> {
       return index;
     }
     index = -(index + 1);
-    if (index == zooms.length || index > 0 && zooms[index].getValue() + zooms[index - 1].getValue() > 2 * preference) {
+    if (index == zooms.length
+        || index > 0 && zooms[index].getValue() + zooms[index - 1].getValue() > 2 * preference) {
       index--;
     }
     return index;

@@ -1,5 +1,11 @@
 package de.gurkenlabs.litiengine.graphics;
 
+import de.gurkenlabs.litiengine.Align;
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.Valign;
+import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
+import de.gurkenlabs.litiengine.util.MathUtilities;
 import java.awt.Dimension;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -8,16 +14,10 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
-import de.gurkenlabs.litiengine.Align;
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.Valign;
-import de.gurkenlabs.litiengine.entities.IEntity;
-import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
-import de.gurkenlabs.litiengine.util.MathUtilities;
-
 public class Camera implements ICamera {
   private final Collection<ZoomChangedListener> zoomListeners = ConcurrentHashMap.newKeySet();
-  private final Collection<FocusChangedListener> focusChangedListeners = ConcurrentHashMap.newKeySet();
+  private final Collection<FocusChangedListener> focusChangedListeners =
+      ConcurrentHashMap.newKeySet();
 
   private Point2D focus;
   private long lastShake;
@@ -48,9 +48,7 @@ public class Camera implements ICamera {
   private Align align = Align.LEFT;
   private Valign valign = Valign.TOP;
 
-  /**
-   * Instantiates a new {@code Camera} instance.
-   */
+  /** Instantiates a new {@code Camera} instance. */
   public Camera() {
     this.focus = new Point2D.Double();
     this.viewport = new Rectangle2D.Double();
@@ -90,7 +88,9 @@ public class Camera implements ICamera {
 
     final IAnimationController animationController = entity.animations();
     if (animationController == null || animationController.getCurrent() == null) {
-      return new Point2D.Double(viewPortLocation.getX() + entity.getWidth() * 0.5, viewPortLocation.getY() + entity.getHeight() * 0.5);
+      return new Point2D.Double(
+          viewPortLocation.getX() + entity.getWidth() * 0.5,
+          viewPortLocation.getY() + entity.getHeight() * 0.5);
     }
 
     final Spritesheet spriteSheet = animationController.getCurrent().getSpritesheet();
@@ -98,7 +98,9 @@ public class Camera implements ICamera {
       return viewPortLocation;
     }
 
-    return new Point2D.Double(viewPortLocation.getX() + spriteSheet.getSpriteWidth() * 0.5, viewPortLocation.getY() + spriteSheet.getSpriteHeight() * 0.5);
+    return new Point2D.Double(
+        viewPortLocation.getX() + spriteSheet.getSpriteWidth() * 0.5,
+        viewPortLocation.getY() + spriteSheet.getSpriteHeight() * 0.5);
   }
 
   @Override
@@ -169,7 +171,7 @@ public class Camera implements ICamera {
       this.zoomDelay = 0;
       this.zoomTick = 0;
       this.zoomStep = 0;
-      
+
       final ZoomChangedEvent event = new ZoomChangedEvent(this, targetZoom);
       for (final ZoomChangedListener listener : this.zoomListeners) {
         listener.zoomChanged(event);
@@ -223,8 +225,10 @@ public class Camera implements ICamera {
         this.targetFocus = null;
       } else {
         double diff = this.panTime / (this.panTime + 1.0);
-        this.focus = new Point2D.Double(this.focus.getX() * diff + this.targetFocus.getX() * (1.0 - diff),
-            this.focus.getY() * diff + this.targetFocus.getY() * (1.0 - diff));
+        this.focus =
+            new Point2D.Double(
+                this.focus.getX() * diff + this.targetFocus.getX() * (1.0 - diff),
+                this.focus.getY() * diff + this.targetFocus.getY() * (1.0 - diff));
       }
     }
 
@@ -290,7 +294,9 @@ public class Camera implements ICamera {
   // TODO: write a unit test for this
   protected Point2D clampToMap(Point2D focus) {
 
-    if (Game.world().environment() == null || Game.world().environment().getMap() == null || !this.isClampToMap()) {
+    if (Game.world().environment() == null
+        || Game.world().environment().getMap() == null
+        || !this.isClampToMap()) {
       return new Point2D.Double(focus.getX(), focus.getY());
     }
 
@@ -301,9 +307,16 @@ public class Camera implements ICamera {
     double minY = this.getViewportHeight() / 2.0;
     double maxY = mapSize.getHeight() - minY;
 
-    // implementation note: inside the "true" sections, min and max are effectively swapped and become max and min for alignment
-    double x = maxX < minX ? maxX + this.align.getValue(minX - maxX - mapSize.getWidth()) : MathUtilities.clamp(focus.getX(), minX, maxX);
-    double y = maxY < minY ? maxY + this.valign.getValue(minY - maxY - mapSize.getHeight()) : MathUtilities.clamp(focus.getY(), minY, maxY);
+    // implementation note: inside the "true" sections, min and max are effectively swapped and
+    // become max and min for alignment
+    double x =
+        maxX < minX
+            ? maxX + this.align.getValue(minX - maxX - mapSize.getWidth())
+            : MathUtilities.clamp(focus.getX(), minX, maxX);
+    double y =
+        maxY < minY
+            ? maxY + this.valign.getValue(minY - maxY - mapSize.getHeight())
+            : MathUtilities.clamp(focus.getY(), minY, maxY);
 
     return new Point2D.Double(x, y);
   }
@@ -323,13 +336,13 @@ public class Camera implements ICamera {
   /**
    * Apply shake effect.
    *
-   * @param cameraLocation
-   *          the camera location
+   * @param cameraLocation the camera location
    * @return the point2 d
    */
   private Point2D applyShakeEffect(final Point2D cameraLocation) {
     if (this.isShakeEffectActive()) {
-      return new Point2D.Double(cameraLocation.getX() + this.shakeOffsetX, cameraLocation.getY() + this.shakeOffsetY);
+      return new Point2D.Double(
+          cameraLocation.getX() + this.shakeOffsetX, cameraLocation.getY() + this.shakeOffsetY);
     }
 
     return cameraLocation;
@@ -371,6 +384,7 @@ public class Camera implements ICamera {
   }
 
   private boolean isShakeEffectActive() {
-    return this.getShakeTick() != 0 && Game.time().since(this.getShakeTick()) < this.getShakeDuration();
+    return this.getShakeTick() != 0
+        && Game.time().since(this.getShakeTick()) < this.getShakeDuration();
   }
 }

@@ -1,15 +1,12 @@
 package de.gurkenlabs.utiliti.swing.dialogs;
 
+import de.gurkenlabs.utiliti.swing.UI;
 import java.io.File;
 import java.util.function.Consumer;
-
 import javax.swing.JFileChooser;
 
-import de.gurkenlabs.utiliti.swing.UI;
-
 public final class XmlImportDialog {
-  private XmlImportDialog() {
-  }
+  private XmlImportDialog() {}
 
   public static void importXml(String name, Consumer<File> consumer) {
     importXml(name, consumer, "xml");
@@ -28,7 +25,8 @@ public final class XmlImportDialog {
     }
 
     sb.append(" - " + name + " XML");
-    if (EditorFileChooser.showFileDialog(sb.toString(), "Import " + name + " XML", true, extensions) == JFileChooser.APPROVE_OPTION) {
+    if (EditorFileChooser.showFileDialog(sb.toString(), "Import " + name + " XML", true, extensions)
+        == JFileChooser.APPROVE_OPTION) {
       for (File file : EditorFileChooser.instance().getSelectedFiles()) {
         consumer.accept(file);
       }

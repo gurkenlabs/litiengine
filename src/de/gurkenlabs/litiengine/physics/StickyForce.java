@@ -1,12 +1,9 @@
 package de.gurkenlabs.litiengine.physics;
 
+import de.gurkenlabs.litiengine.entities.IEntity;
 import java.awt.geom.Point2D;
 
-import de.gurkenlabs.litiengine.entities.IEntity;
-
-/**
- * The Force implementation sticks to an entity in terms of its location.
- */
+/** The Force implementation sticks to an entity in terms of its location. */
 public class StickyForce extends Force {
 
   /** The force entiy. */
@@ -14,7 +11,7 @@ public class StickyForce extends Force {
 
   /***
    * Instantiates a new sticky force.
-   * 
+   *
    * @param forceEntity
    *          The entity to who's location this force will be bound
    * @param strength

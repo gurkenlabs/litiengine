@@ -1,12 +1,11 @@
 package de.gurkenlabs.litiengine.gui;
 
+import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.input.Input;
 import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
-
-import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.litiengine.input.Input;
 
 public abstract class Slider extends GuiComponent {
   private ImageComponent button1;
@@ -22,7 +21,14 @@ public abstract class Slider extends GuiComponent {
   private final float maxValue;
   private float stepSize;
 
-  protected Slider(final double x, final double y, final double width, final double height, final float minValue, final float maxValue, final float stepSize) {
+  protected Slider(
+      final double x,
+      final double y,
+      final double width,
+      final double height,
+      final float minValue,
+      final float maxValue,
+      final float stepSize) {
     super(x, y, width, height);
     this.changeConsumer = new CopyOnWriteArrayList<>();
     this.minValue = minValue;
@@ -107,39 +113,44 @@ public abstract class Slider extends GuiComponent {
 
   protected void setButton1(final ImageComponent button1) {
     this.button1 = button1;
-    this.button1.onClicked(e -> {
-      this.setCurrentValue(this.getCurrentValue() - this.getStepSize());
-      this.getChangeConsumer().forEach(consumer -> consumer.accept(this.getCurrentValue()));
-    });
+    this.button1.onClicked(
+        e -> {
+          this.setCurrentValue(this.getCurrentValue() - this.getStepSize());
+          this.getChangeConsumer().forEach(consumer -> consumer.accept(this.getCurrentValue()));
+        });
     this.getComponents().add(this.getButton1());
   }
 
   protected void setButton2(final ImageComponent button2) {
     this.button2 = button2;
-    this.button2.onClicked(e -> {
-      this.setCurrentValue(this.getCurrentValue() + this.getStepSize());
-      this.getChangeConsumer().forEach(consumer -> consumer.accept(this.getCurrentValue()));
-
-    });
+    this.button2.onClicked(
+        e -> {
+          this.setCurrentValue(this.getCurrentValue() + this.getStepSize());
+          this.getChangeConsumer().forEach(consumer -> consumer.accept(this.getCurrentValue()));
+        });
     this.getComponents().add(this.getButton2());
-
   }
 
   protected void setSliderComponent(final ImageComponent slider) {
     this.sliderComponent = slider;
     this.sliderComponent.onMousePressed(e -> this.isDragging = true);
-    Input.mouse().onDragged(e -> {
-      if (this.isDragging()) {
-        this.setValueRelativeToMousePosition();
-        this.getChangeConsumer().forEach(consumer -> consumer.accept(this.getCurrentValue()));
-      }
-    });
+    Input.mouse()
+        .onDragged(
+            e -> {
+              if (this.isDragging()) {
+                this.setValueRelativeToMousePosition();
+                this.getChangeConsumer()
+                    .forEach(consumer -> consumer.accept(this.getCurrentValue()));
+              }
+            });
 
-    Input.mouse().onReleased(e -> {
-      if (this.isDragging()) {
-        this.isDragging = false;
-      }
-    });
+    Input.mouse()
+        .onReleased(
+            e -> {
+              if (this.isDragging()) {
+                this.isDragging = false;
+              }
+            });
     this.getComponents().add(this.getSliderComponent());
   }
 }

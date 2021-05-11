@@ -3,10 +3,7 @@ package de.gurkenlabs.litiengine.util.geom;
 import java.awt.geom.Point2D;
 import java.util.Comparator;
 
-/**
- * The Class PointDistanceComparator order points by their distance to the
- * relative point.
- */
+/** The Class PointDistanceComparator order points by their distance to the relative point. */
 public class PointDistanceComparator implements Comparator<Point2D> {
 
   private final Point2D relativePoint;

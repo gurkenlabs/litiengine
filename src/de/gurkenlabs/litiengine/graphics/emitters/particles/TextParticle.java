@@ -42,11 +42,18 @@ public class TextParticle extends Particle {
     this.setHeight(g.getFont().getSize2D());
 
     final Point2D renderLocation = this.getRenderLocation(emitterOrigin);
-    final AffineTransform rotate = AffineTransform.getRotateInstance(Math.toRadians(this.getAngle()), this.getWidth() * 0.5, this.getHeight() * 0.5);
+    final AffineTransform rotate =
+        AffineTransform.getRotateInstance(
+            Math.toRadians(this.getAngle()), this.getWidth() * 0.5, this.getHeight() * 0.5);
     g.setFont(g.getFont().deriveFont(rotate));
 
     RenderingHints originalHints = g.getRenderingHints();
-    g.setColor(new Color(this.getColor().getRed() / 255f, this.getColor().getGreen() / 255f, this.getColor().getBlue() / 255f, this.getOpacity()));
+    g.setColor(
+        new Color(
+            this.getColor().getRed() / 255f,
+            this.getColor().getGreen() / 255f,
+            this.getColor().getBlue() / 255f,
+            this.getOpacity()));
 
     if (this.isAntiAliased()) {
       TextRenderer.enableTextAntiAliasing(g);
@@ -63,7 +70,10 @@ public class TextParticle extends Particle {
 
   @Override
   public Rectangle2D getBoundingBox(final Point2D origin) {
-    return new Rectangle2D.Double(origin.getX() + this.getX() - this.getWidth() / 2, origin.getY() + this.getY() - this.getHeight() * 1.5, this.getWidth(), this.getHeight());
+    return new Rectangle2D.Double(
+        origin.getX() + this.getX() - this.getWidth() / 2,
+        origin.getY() + this.getY() - this.getHeight() * 1.5,
+        this.getWidth(),
+        this.getHeight());
   }
-
 }

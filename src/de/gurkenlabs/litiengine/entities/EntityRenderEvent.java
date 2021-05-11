@@ -1,13 +1,12 @@
 package de.gurkenlabs.litiengine.entities;
 
+import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import java.awt.Graphics2D;
 import java.util.EventObject;
 
-import de.gurkenlabs.litiengine.graphics.RenderEngine;
-
 /**
  * This {@code EventObject} contains data about the rendering process of an entity.
- * 
+ *
  * @see RenderEngine#renderEntity(Graphics2D, IEntity)
  */
 public class EntityRenderEvent extends EventObject {
@@ -25,7 +24,7 @@ public class EntityRenderEvent extends EventObject {
 
   /**
    * Gets the graphics object on which the entity is rendered.
-   * 
+   *
    * @return The graphics object on which the entity is rendered.
    */
   public Graphics2D getGraphics() {
@@ -34,7 +33,7 @@ public class EntityRenderEvent extends EventObject {
 
   /**
    * Get the entity involved with the rendering process.
-   * 
+   *
    * @return The entity involved with the rendering process.
    */
   public IEntity getEntity() {

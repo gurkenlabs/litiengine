@@ -71,7 +71,7 @@ public final class Trigonometry {
       add = 0.0f;
     }
 
-    final float invDiv = 1.0f / (Math.max(x,y) * INV_ATAN2_DIM_MINUS_1);
+    final float invDiv = 1.0f / (Math.max(x, y) * INV_ATAN2_DIM_MINUS_1);
 
     final int xi = (int) (x * invDiv);
     final int yi = (int) (y * invDiv);

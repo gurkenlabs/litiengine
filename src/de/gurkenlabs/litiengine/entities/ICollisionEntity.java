@@ -1,12 +1,11 @@
 package de.gurkenlabs.litiengine.entities;
 
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.physics.Collision;
 import de.gurkenlabs.litiengine.physics.CollisionEvent;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 
 public interface ICollisionEntity extends IEntity {
   void onCollision(CollisionListener listener);
@@ -27,15 +26,14 @@ public interface ICollisionEntity extends IEntity {
   /**
    * Gets the collision box.
    *
-   * @param location
-   *          the location
+   * @param location the location
    * @return the collision box
    */
   Rectangle2D getCollisionBox(Point2D location);
 
   /**
    * Gets the center {@link Point2D} of the entities collision box.
-   * 
+   *
    * @return The center {@link Point2D} of the entities collision box
    */
   Point2D getCollisionBoxCenter();
@@ -60,8 +58,7 @@ public interface ICollisionEntity extends IEntity {
   /**
    * Sets the collision.
    *
-   * @param collision
-   *          the new collision
+   * @param collision the new collision
    */
   void setCollision(boolean collision);
 

@@ -1,10 +1,9 @@
 package de.gurkenlabs.litiengine.graphics;
 
+import de.gurkenlabs.litiengine.util.Imaging;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-
-import de.gurkenlabs.litiengine.util.Imaging;
 
 public class OverlayPixelsImageEffect extends ImageEffect {
   private final Color color;
@@ -12,10 +11,8 @@ public class OverlayPixelsImageEffect extends ImageEffect {
   /**
    * Initializes a new instance of the {@code OverlayPixelsImageEffect}.
    *
-   * @param ttl
-   *          The time to live of this effect.
-   * @param color
-   *          The color of this effect.
+   * @param ttl The time to live of this effect.
+   * @param color The color of this effect.
    */
   public OverlayPixelsImageEffect(final int ttl, final Color color) {
     super(ttl, "OverlayPixels" + color.getRed() + "" + color.getGreen() + "" + color.getBlue());
@@ -24,7 +21,8 @@ public class OverlayPixelsImageEffect extends ImageEffect {
 
   @Override
   public BufferedImage apply(final BufferedImage image) {
-    final BufferedImage bimage = Imaging.getCompatibleImage(image.getWidth(null), image.getHeight(null));
+    final BufferedImage bimage =
+        Imaging.getCompatibleImage(image.getWidth(null), image.getHeight(null));
 
     // Draw the image on to the buffered image
     final Graphics2D bGr = bimage.createGraphics();

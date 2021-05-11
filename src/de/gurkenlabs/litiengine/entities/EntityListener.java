@@ -1,8 +1,7 @@
 package de.gurkenlabs.litiengine.entities;
 
-import java.util.EventListener;
-
 import de.gurkenlabs.litiengine.environment.Environment;
+import java.util.EventListener;
 
 public interface EntityListener extends EventListener {
 

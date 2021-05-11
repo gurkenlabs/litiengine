@@ -1,8 +1,7 @@
 package de.gurkenlabs.litiengine.physics;
 
-import java.awt.geom.Point2D;
-
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
+import java.awt.geom.Point2D;
 
 public class RaycastHit {
   private final Point2D point;

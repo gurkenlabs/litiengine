@@ -1,13 +1,5 @@
 package de.gurkenlabs.utiliti.swing.menus;
 
-import java.awt.Component;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
@@ -17,6 +9,12 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.swing.UI;
+import java.awt.Component;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 
 @SuppressWarnings("serial")
 public final class LayerMenu extends JMenu {
@@ -35,7 +33,8 @@ public final class LayerMenu extends JMenu {
     for (Component item : this.getMenuComponents()) {
       if (item instanceof JMenuItem) {
         JMenuItem menuItem = (JMenuItem) item;
-        menuItem.setEnabled(mapObjects.stream().anyMatch(x -> !x.getLayer().getName().equals(menuItem.getText())));
+        menuItem.setEnabled(
+            mapObjects.stream().anyMatch(x -> !x.getLayer().getName().equals(menuItem.getText())));
       }
     }
   }

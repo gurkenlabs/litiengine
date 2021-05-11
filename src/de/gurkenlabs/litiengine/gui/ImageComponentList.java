@@ -1,10 +1,9 @@
 package de.gurkenlabs.litiengine.gui;
 
+import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import java.awt.Image;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import de.gurkenlabs.litiengine.graphics.Spritesheet;
 
 public class ImageComponentList extends GuiComponent {
 
@@ -19,7 +18,15 @@ public class ImageComponentList extends GuiComponent {
   private double yOffset;
   private boolean initialized;
 
-  public ImageComponentList(final double x, final double y, final double width, final double height, final int rows, final int columns, final List<Image> images, final Spritesheet background) {
+  public ImageComponentList(
+      final double x,
+      final double y,
+      final double width,
+      final double height,
+      final int rows,
+      final int columns,
+      final List<Image> images,
+      final Spritesheet background) {
     super(x, y, width, height);
     if (images != null) {
       this.images = images;
@@ -46,7 +53,6 @@ public class ImageComponentList extends GuiComponent {
     } else {
       this.columnWidth = this.getWidth() / this.getColumns() * 9 / 10;
       this.xOffset = this.getWidth() / (this.getColumns() - 1) * 1 / 10;
-
     }
   }
 
@@ -85,7 +91,15 @@ public class ImageComponentList extends GuiComponent {
           } else {
             img = null;
           }
-          final ImageComponent cell = this.createNewEntry(this.getX() + i * (this.getColumnWidth() + this.xOffset), this.getY() + j * (this.getRowHeight() + this.yOffset), this.getColumnWidth(), this.getRowHeight(), this.getBackground(), "", img);
+          final ImageComponent cell =
+              this.createNewEntry(
+                  this.getX() + i * (this.getColumnWidth() + this.xOffset),
+                  this.getY() + j * (this.getRowHeight() + this.yOffset),
+                  this.getColumnWidth(),
+                  this.getRowHeight(),
+                  this.getBackground(),
+                  "",
+                  img);
           this.cells.add(cell);
         }
       }
@@ -121,7 +135,14 @@ public class ImageComponentList extends GuiComponent {
     this.yOffset = yOffset;
   }
 
-  protected ImageComponent createNewEntry(final double x, final double y, final double width, final double height, final Spritesheet spritesheet, final String text, final Image image) {
+  protected ImageComponent createNewEntry(
+      final double x,
+      final double y,
+      final double width,
+      final double height,
+      final Spritesheet spritesheet,
+      final String text,
+      final Image image) {
     return new ImageComponent(x, y, width, height, spritesheet, text, image);
   }
 }

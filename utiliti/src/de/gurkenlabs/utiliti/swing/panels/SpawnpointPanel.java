@@ -1,18 +1,16 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
-import java.awt.LayoutManager;
-
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComboBox;
-import javax.swing.JSpinner;
-import javax.swing.JTextField;
-import javax.swing.SpinnerNumberModel;
-
 import de.gurkenlabs.litiengine.Direction;
 import de.gurkenlabs.litiengine.entities.EntityPivotType;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.utiliti.swing.Icons;
+import java.awt.LayoutManager;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
 
 @SuppressWarnings("serial")
 public class SpawnpointPanel extends PropertyPanel {
@@ -34,7 +32,8 @@ public class SpawnpointPanel extends PropertyPanel {
     this.comboBoxDirection.setModel(new DefaultComboBoxModel<Direction>(Direction.values()));
 
     this.comboBoxPivot = new JComboBox<>();
-    this.comboBoxPivot.setModel(new DefaultComboBoxModel<EntityPivotType>(EntityPivotType.values()));
+    this.comboBoxPivot.setModel(
+        new DefaultComboBoxModel<EntityPivotType>(EntityPivotType.values()));
 
     setLayout(this.createLayout());
     this.setupChangedListeners();
@@ -54,8 +53,13 @@ public class SpawnpointPanel extends PropertyPanel {
     this.textFieldInfo.setText(mapObject.getStringValue(MapObjectProperty.SPAWN_INFO));
     this.spinnerOffsetX.setValue(mapObject.getDoubleValue(MapObjectProperty.SPAWN_PIVOT_OFFSETX));
     this.spinnerOffsetY.setValue(mapObject.getDoubleValue(MapObjectProperty.SPAWN_PIVOT_OFFSETY));
-    this.comboBoxDirection.setSelectedItem(mapObject.getEnumValue(MapObjectProperty.SPAWN_DIRECTION, Direction.class, Direction.DOWN));
-    this.comboBoxPivot.setSelectedItem(mapObject.getEnumValue(MapObjectProperty.SPAWN_PIVOT, EntityPivotType.class, EntityPivotType.DIMENSION_CENTER));
+    this.comboBoxDirection.setSelectedItem(
+        mapObject.getEnumValue(MapObjectProperty.SPAWN_DIRECTION, Direction.class, Direction.DOWN));
+    this.comboBoxPivot.setSelectedItem(
+        mapObject.getEnumValue(
+            MapObjectProperty.SPAWN_PIVOT,
+            EntityPivotType.class,
+            EntityPivotType.DIMENSION_CENTER));
   }
 
   private void setupChangedListeners() {
@@ -67,8 +71,14 @@ public class SpawnpointPanel extends PropertyPanel {
   }
 
   private LayoutManager createLayout() {
-    LayoutItem[] layoutItems = new LayoutItem[] { new LayoutItem("panel_direction", this.comboBoxDirection), new LayoutItem("panel_pivot", this.comboBoxPivot), new LayoutItem("panel_pivotOffsetX", this.spinnerOffsetX), new LayoutItem("panel_pivotOffsetY", this.spinnerOffsetY),
-        new LayoutItem("panel_entity", this.textFieldInfo), };
+    LayoutItem[] layoutItems =
+        new LayoutItem[] {
+            new LayoutItem("panel_direction", this.comboBoxDirection),
+            new LayoutItem("panel_pivot", this.comboBoxPivot),
+            new LayoutItem("panel_pivotOffsetX", this.spinnerOffsetX),
+            new LayoutItem("panel_pivotOffsetY", this.spinnerOffsetY),
+            new LayoutItem("panel_entity", this.textFieldInfo),
+        };
 
     return this.createLayout(layoutItems);
   }

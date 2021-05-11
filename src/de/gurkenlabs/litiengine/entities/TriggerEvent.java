@@ -21,7 +21,7 @@ public class TriggerEvent extends EventObject {
 
   /**
    * Get the entity that activated the Trigger.
-   * 
+   *
    * @return The entity that activated the trigger.
    */
   public IEntity getEntity() {
@@ -30,7 +30,7 @@ public class TriggerEvent extends EventObject {
 
   /**
    * Get this Trigger's message.
-   * 
+   *
    * @return The trigger's message.
    */
   public String getMessage() {
@@ -39,7 +39,7 @@ public class TriggerEvent extends EventObject {
 
   /**
    * Get the entities that are affected by the Trigger.
-   * 
+   *
    * @return Target entities of the trigger.
    */
   public List<Integer> getTargets() {
@@ -48,7 +48,7 @@ public class TriggerEvent extends EventObject {
 
   /**
    * Get the Trigger affected by this event.
-   * 
+   *
    * @return The trigger.
    */
   public Trigger getTrigger() {

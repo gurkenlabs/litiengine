@@ -15,12 +15,13 @@ public final class ColorHelper {
   }
 
   /**
-   * Encodes the specified color to a hexadecimal string representation.
-   * The output format is:
+   * Encodes the specified color to a hexadecimal string representation. The output format is:
+   *
    * <ul>
-   * <li>#RRGGBB - For colors without alpha</li>
-   * <li>#AARRGGBB - For colors with alpha</li>
+   *   <li>#RRGGBB - For colors without alpha
+   *   <li>#AARRGGBB - For colors with alpha
    * </ul>
+   *
    * Examples: <br>
    * {@code Color.RED} = "#ff0000"<br>
    * {@code new Color(255, 0, 0, 200)} = "#c8ff0000"
@@ -46,12 +47,13 @@ public final class ColorHelper {
   }
 
   /**
-   * Decodes the specified color string to an actual {@code Color} instance.
-   * The accepted format is:
+   * Decodes the specified color string to an actual {@code Color} instance. The accepted format is:
+   *
    * <ul>
-   * <li>#RRGGBB - For colors without alpha</li>
-   * <li>#AARRGGBB - For colors with alpha</li>
+   *   <li>#RRGGBB - For colors without alpha
+   *   <li>#AARRGGBB - For colors with alpha
    * </ul>
+   *
    * Examples: <br>
    * "#ff0000" = {@code Color.RED}<br>
    * "#c8ff0000" = {@code new Color(255, 0, 0, 200)}
@@ -73,24 +75,31 @@ public final class ColorHelper {
     }
 
     if (!colorHexString.startsWith("#")) {
-      if (colorHexString.length() == HEX_STRING_LENGTH - 1 || colorHexString.length() == HEX_STRING_LENGTH_ALPHA - 1) {
+      if (colorHexString.length() == HEX_STRING_LENGTH - 1
+          || colorHexString.length() == HEX_STRING_LENGTH_ALPHA - 1) {
         colorHexString = "#" + colorHexString;
       } else {
-        log.log(Level.SEVERE, "Could not parse color string \"{0}\". A color string needs to start with a \"#\" character.", colorHexString);
+        log.log(
+            Level.SEVERE,
+            "Could not parse color string \"{0}\". A color string needs to start with a \"#\" character.",
+            colorHexString);
         return null;
       }
     }
 
     switch (colorHexString.length()) {
-    case HEX_STRING_LENGTH:
-      return decodeWellformedHexString(colorHexString);
-    case HEX_STRING_LENGTH_ALPHA:
-      return decodeHexStringWithAlpha(colorHexString, solid);
-    default:
-      log.log(Level.SEVERE,
-          "Could not parse color string \"{0}\". Invalid string length \"{1}\"!\nAccepted lengths:\n\t{2} for Colors without Alpha (#ff0000)\n\t{3} for Colors with Alpha (#c8ff0000)",
-          new Object[] { colorHexString, colorHexString.length(), HEX_STRING_LENGTH, HEX_STRING_LENGTH_ALPHA });
-      return null;
+      case HEX_STRING_LENGTH:
+        return decodeWellformedHexString(colorHexString);
+      case HEX_STRING_LENGTH_ALPHA:
+        return decodeHexStringWithAlpha(colorHexString, solid);
+      default:
+        log.log(
+            Level.SEVERE,
+            "Could not parse color string \"{0}\". Invalid string length \"{1}\"!\nAccepted lengths:\n\t{2} for Colors without Alpha (#ff0000)\n\t{3} for Colors with Alpha (#c8ff0000)",
+            new Object[] {
+              colorHexString, colorHexString.length(), HEX_STRING_LENGTH, HEX_STRING_LENGTH_ALPHA
+            });
+        return null;
     }
   }
 
@@ -126,12 +135,15 @@ public final class ColorHelper {
     if (color.getAlpha() == 255) {
       return color;
     }
-    return new Color(premultiply(color.getRed(), color.getAlpha()), premultiply(color.getGreen(), color.getAlpha()),
+    return new Color(
+        premultiply(color.getRed(), color.getAlpha()),
+        premultiply(color.getGreen(), color.getAlpha()),
         premultiply(color.getBlue(), color.getAlpha()));
   }
 
   public static Color getTransparentVariant(Color color, int newAlpha) {
-    return new Color(color.getRed(), color.getGreen(), color.getRed(), ensureColorValueRange(newAlpha));
+    return new Color(
+        color.getRed(), color.getGreen(), color.getRed(), ensureColorValueRange(newAlpha));
   }
 
   private static Color decodeWellformedHexString(String hexString) {

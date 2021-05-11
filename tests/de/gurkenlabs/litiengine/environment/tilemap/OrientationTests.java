@@ -10,7 +10,6 @@ import java.awt.Point;
 import java.awt.Shape;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
-
 import org.junit.jupiter.api.Test;
 
 public class OrientationTests {

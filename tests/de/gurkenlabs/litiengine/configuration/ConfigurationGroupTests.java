@@ -5,13 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.beans.PropertyChangeEvent;
-import java.lang.reflect.Method;
-
-import org.junit.jupiter.api.Test;
-
 import de.gurkenlabs.litiengine.configuration.ConfigurationGroup.ConfigurationChangedListener;
 import de.gurkenlabs.litiengine.util.ReflectionUtilities;
+import java.beans.PropertyChangeEvent;
+import java.lang.reflect.Method;
+import org.junit.jupiter.api.Test;
 
 class ConfigurationGroupTests {
 
@@ -90,7 +88,9 @@ class ConfigurationGroupTests {
       assertDoesNotThrow(() -> method.invoke(instance, value));
       assertNotNull(method.getName());
       assertNotNull(listener.name, method.getName());
-      assertTrue(method.getName().toLowerCase().contains(listener.name.toLowerCase()), method.getName() + " == " + listener.name);
+      assertTrue(
+          method.getName().toLowerCase().contains(listener.name.toLowerCase()),
+          method.getName() + " == " + listener.name);
     }
   }
 

@@ -1,5 +1,17 @@
 package de.gurkenlabs.litiengine.entities;
 
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.entities.behavior.IBehaviorController;
+import de.gurkenlabs.litiengine.environment.Environment;
+import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.CustomPropertyProvider;
+import de.gurkenlabs.litiengine.graphics.RenderType;
+import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
+import de.gurkenlabs.litiengine.tweening.TweenType;
+import de.gurkenlabs.litiengine.tweening.Tweenable;
+import de.gurkenlabs.litiengine.util.ReflectionUtilities;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.lang.reflect.InvocationTargetException;
@@ -13,28 +25,18 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.entities.behavior.IBehaviorController;
-import de.gurkenlabs.litiengine.environment.Environment;
-import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
-import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
-import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
-import de.gurkenlabs.litiengine.environment.tilemap.xml.CustomPropertyProvider;
-import de.gurkenlabs.litiengine.graphics.RenderType;
-import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
-import de.gurkenlabs.litiengine.tweening.TweenType;
-import de.gurkenlabs.litiengine.tweening.Tweenable;
-import de.gurkenlabs.litiengine.util.ReflectionUtilities;
-
 @EntityInfo
 public abstract class Entity implements IEntity, EntityRenderListener, Tweenable {
   private static final Logger log = Logger.getLogger(Entity.class.getName());
   public static final String ANY_MESSAGE = "";
-  private final Collection<EntityTransformListener> transformListeners = ConcurrentHashMap.newKeySet();
+  private final Collection<EntityTransformListener> transformListeners =
+      ConcurrentHashMap.newKeySet();
   private final Collection<EntityListener> listeners = ConcurrentHashMap.newKeySet();
   private final Collection<EntityRenderListener> renderListeners = ConcurrentHashMap.newKeySet();
-  private final Collection<EntityRenderedListener> renderedListeners = ConcurrentHashMap.newKeySet();
-  private final Map<String, Collection<EntityMessageListener>> messageListeners = new ConcurrentHashMap<>();
+  private final Collection<EntityRenderedListener> renderedListeners =
+      ConcurrentHashMap.newKeySet();
+  private final Map<String, Collection<EntityMessageListener>> messageListeners =
+      new ConcurrentHashMap<>();
 
   private final EntityControllers controllers = new EntityControllers();
   private final EntityActionMap actions = new EntityActionMap();
@@ -217,13 +219,15 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
       return this.boundingBox;
     }
 
-    this.boundingBox = new Rectangle2D.Double(this.getX(), this.getY(), this.getWidth(), this.getHeight());
+    this.boundingBox =
+        new Rectangle2D.Double(this.getX(), this.getY(), this.getWidth(), this.getHeight());
     return this.boundingBox;
   }
 
   @Override
   public Point2D getCenter() {
-    return new Point2D.Double(this.getX() + this.getWidth() * 0.5, this.getY() + this.getHeight() * 0.5);
+    return new Point2D.Double(
+        this.getX() + this.getWidth() * 0.5, this.getY() + this.getHeight() * 0.5);
   }
 
   @Override
@@ -292,7 +296,10 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
     }
 
     if (!this.actions.exists(actionName)) {
-      log.log(Level.INFO, "Entity \"{0}\" could not perform the action \"{1}\". \nMaybe you need to register the action or provide an appropriate Action annotation on the method you want to call.", new Object[] { this, actionName });
+      log.log(
+          Level.INFO,
+          "Entity \"{0}\" could not perform the action \"{1}\". \nMaybe you need to register the action or provide an appropriate Action annotation on the method you want to call.",
+          new Object[] {this, actionName});
       return;
     }
 
@@ -327,8 +334,7 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
   /**
    * Sets the map location.
    *
-   * @param location
-   *          the new map location
+   * @param location the new map location
    */
   @Override
   public void setLocation(final Point2D location) {
@@ -337,10 +343,7 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
     this.fireLocationChangedEvent();
   }
 
-  /**
-   * Sets an id which should only be filled when an entity gets added due to map
-   * information.
-   */
+  /** Sets an id which should only be filled when an entity gets added due to map information. */
   @Override
   public void setMapId(final int mapId) {
     this.mapId = mapId;
@@ -397,7 +400,10 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
       this.getTags().add(tag);
     }
     if (this.getEnvironment() != null) {
-      this.getEnvironment().getEntitiesByTag().computeIfAbsent(tag, t -> new CopyOnWriteArrayList<>()).add(this);
+      this.getEnvironment()
+          .getEntitiesByTag()
+          .computeIfAbsent(tag, t -> new CopyOnWriteArrayList<>())
+          .add(this);
     }
   }
 
@@ -416,54 +422,54 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
   @Override
   public float[] getTweenValues(TweenType tweenType) {
     switch (tweenType) {
-    case POSITION_X:
-      return new float[] { (float) this.getX() };
-    case POSITION_Y:
-      return new float[] { (float) this.getY() };
-    case POSITION_XY:
-      return new float[] { (float) this.getX(), (float) this.getY() };
-    case SIZE_WIDTH:
-      return new float[] { (float) this.getWidth() };
-    case SIZE_HEIGHT:
-      return new float[] { (float) this.getHeight() };
-    case SIZE_BOTH:
-      return new float[] { (float) this.getWidth(), (float) this.getHeight() };
-    case ANGLE:
-      return new float[] { (float) this.getAngle() };
-    default:
-      return Tweenable.super.getTweenValues(tweenType);
+      case POSITION_X:
+        return new float[] {(float) this.getX()};
+      case POSITION_Y:
+        return new float[] {(float) this.getY()};
+      case POSITION_XY:
+        return new float[] {(float) this.getX(), (float) this.getY()};
+      case SIZE_WIDTH:
+        return new float[] {(float) this.getWidth()};
+      case SIZE_HEIGHT:
+        return new float[] {(float) this.getHeight()};
+      case SIZE_BOTH:
+        return new float[] {(float) this.getWidth(), (float) this.getHeight()};
+      case ANGLE:
+        return new float[] {(float) this.getAngle()};
+      default:
+        return Tweenable.super.getTweenValues(tweenType);
     }
   }
 
   @Override
   public void setTweenValues(TweenType tweenType, float[] newValues) {
     switch (tweenType) {
-    case POSITION_X:
-      this.setX(newValues[0]);
-      break;
-    case POSITION_Y:
-      this.setY(newValues[0]);
-      break;
-    case POSITION_XY:
-      this.setX(newValues[0]);
-      this.setY(newValues[1]);
-      break;
-    case SIZE_WIDTH:
-      this.setWidth(newValues[0]);
-      break;
-    case SIZE_HEIGHT:
-      this.setHeight(newValues[0]);
-      break;
-    case SIZE_BOTH:
-      this.setWidth(newValues[0]);
-      this.setHeight(newValues[1]);
-      break;
-    case ANGLE:
-      this.setAngle(newValues[0]);
-      break;
-    default:
-      Tweenable.super.setTweenValues(tweenType, newValues);
-      break;
+      case POSITION_X:
+        this.setX(newValues[0]);
+        break;
+      case POSITION_Y:
+        this.setY(newValues[0]);
+        break;
+      case POSITION_XY:
+        this.setX(newValues[0]);
+        this.setY(newValues[1]);
+        break;
+      case SIZE_WIDTH:
+        this.setWidth(newValues[0]);
+        break;
+      case SIZE_HEIGHT:
+        this.setHeight(newValues[0]);
+        break;
+      case SIZE_BOTH:
+        this.setWidth(newValues[0]);
+        this.setHeight(newValues[1]);
+        break;
+      case ANGLE:
+        this.setAngle(newValues[0]);
+        break;
+      default:
+        Tweenable.super.setTweenValues(tweenType, newValues);
+        break;
     }
   }
 
@@ -584,12 +590,14 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
     }
   }
 
-  private EntityMessageEvent fireMessageReceived(Object sender, String listenerMessage, String message, EntityMessageEvent event) {
+  private EntityMessageEvent fireMessageReceived(
+      Object sender, String listenerMessage, String message, EntityMessageEvent event) {
     if (message == null) {
       return event;
     }
 
-    if (this.messageListeners.containsKey(listenerMessage) && this.messageListeners.get(listenerMessage) != null) {
+    if (this.messageListeners.containsKey(listenerMessage)
+        && this.messageListeners.get(listenerMessage) != null) {
       EntityMessageEvent receivedEvent = event;
       for (EntityMessageListener listener : this.messageListeners.get(listenerMessage)) {
         if (receivedEvent == null) {
@@ -603,16 +611,18 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
     return event;
   }
 
-  /**
-   * Registers all default actions that are annotated with a {@code EntityAction} annotation.
-   */
+  /** Registers all default actions that are annotated with a {@code EntityAction} annotation. */
   private void registerActions() {
-    List<Method> methods = ReflectionUtilities.getMethodsAnnotatedWith(this.getClass(), Action.class);
+    List<Method> methods =
+        ReflectionUtilities.getMethodsAnnotatedWith(this.getClass(), Action.class);
 
     // iterate over all methods that have the EntityActionInfo annotation and register them
     for (Method method : methods) {
       if (!Modifier.isPublic(method.getModifiers()) || method.getParameterCount() > 0) {
-        log.log(Level.INFO, "\"{0}\" is not a valid entity action. Either make it public and parameterless or remove the Action annotation.", new Object[] { method });
+        log.log(
+            Level.INFO,
+            "\"{0}\" is not a valid entity action. Either make it public and parameterless or remove the Action annotation.",
+            new Object[] {method});
         continue;
       }
 
@@ -621,14 +631,23 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
         continue;
       }
 
-      final String actionName = info.name() == null || info.name().isEmpty() ? method.getName() : info.name();
-      EntityAction action = this.register(actionName, () -> {
-        try {
-          method.invoke(this);
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-          log.log(Level.SEVERE, String.format("Could not perform the entity action %s", actionName), e);
-        }
-      });
+      final String actionName =
+          info.name() == null || info.name().isEmpty() ? method.getName() : info.name();
+      EntityAction action =
+          this.register(
+              actionName,
+              () -> {
+                try {
+                  method.invoke(this);
+                } catch (IllegalAccessException
+                    | IllegalArgumentException
+                    | InvocationTargetException e) {
+                  log.log(
+                      Level.SEVERE,
+                      String.format("Could not perform the entity action %s", actionName),
+                      e);
+                }
+              });
 
       if (action != null) {
         action.setDescription(info.description());

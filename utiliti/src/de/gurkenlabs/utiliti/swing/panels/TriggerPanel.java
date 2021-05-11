@@ -1,19 +1,17 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
-import java.awt.LayoutManager;
-
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JSpinner;
-import javax.swing.JTextField;
-
 import de.gurkenlabs.litiengine.entities.Trigger.TriggerActivation;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.swing.Icons;
 import de.gurkenlabs.utiliti.swing.TextList;
+import java.awt.LayoutManager;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
 
 @SuppressWarnings("serial")
 public class TriggerPanel extends PropertyPanel {
@@ -56,11 +54,17 @@ public class TriggerPanel extends PropertyPanel {
   protected void setControlValues(IMapObject mapObject) {
     this.textFieldMessage.setText(mapObject.getStringValue(MapObjectProperty.TRIGGER_MESSAGE));
 
-    this.textListTargets.setJoinedString(mapObject.getStringValue(MapObjectProperty.TRIGGER_TARGETS));
-    this.textListActivators.setJoinedString(mapObject.getStringValue(MapObjectProperty.TRIGGER_ACTIVATORS));
+    this.textListTargets.setJoinedString(
+        mapObject.getStringValue(MapObjectProperty.TRIGGER_TARGETS));
+    this.textListActivators.setJoinedString(
+        mapObject.getStringValue(MapObjectProperty.TRIGGER_ACTIVATORS));
 
     this.chckbxOneTimeOnly.setSelected(mapObject.getBoolValue(MapObjectProperty.TRIGGER_ONETIME));
-    final TriggerActivation act = mapObject.getStringValue(MapObjectProperty.TRIGGER_ACTIVATION) == null ? TriggerActivation.COLLISION : TriggerActivation.valueOf(mapObject.getStringValue(MapObjectProperty.TRIGGER_ACTIVATION));
+    final TriggerActivation act =
+        mapObject.getStringValue(MapObjectProperty.TRIGGER_ACTIVATION) == null
+            ? TriggerActivation.COLLISION
+            : TriggerActivation.valueOf(
+                mapObject.getStringValue(MapObjectProperty.TRIGGER_ACTIVATION));
     this.comboBoxActivationType.setSelectedItem(act);
     this.spinnerCooldown.setValue(mapObject.getIntValue(MapObjectProperty.TRIGGER_COOLDOWN));
   }
@@ -75,12 +79,14 @@ public class TriggerPanel extends PropertyPanel {
   }
 
   private LayoutManager createLayout() {
-    LayoutItem[] layoutItems = new LayoutItem [] {
-        new LayoutItem("panel_activation", this.comboBoxActivationType),
-        new LayoutItem("panel_message", this.textFieldMessage),
-        new LayoutItem("panel_cooldown", this.spinnerCooldown),
-    };
-    
-    return this.createLayout(layoutItems, this.textListTargets, this.textListActivators, this.chckbxOneTimeOnly);
+    LayoutItem[] layoutItems =
+        new LayoutItem[] {
+            new LayoutItem("panel_activation", this.comboBoxActivationType),
+            new LayoutItem("panel_message", this.textFieldMessage),
+            new LayoutItem("panel_cooldown", this.spinnerCooldown),
+        };
+
+    return this.createLayout(
+        layoutItems, this.textListTargets, this.textListActivators, this.chckbxOneTimeOnly);
   }
 }

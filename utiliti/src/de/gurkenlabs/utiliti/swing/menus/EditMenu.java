@@ -1,16 +1,14 @@
 package de.gurkenlabs.utiliti.swing.menus;
 
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.KeyStroke;
-
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.swing.Icons;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
 
 @SuppressWarnings("serial")
 public final class EditMenu extends JMenu {
@@ -64,29 +62,44 @@ public final class EditMenu extends JMenu {
     JMenu renderMenu = new RenderMenu();
     renderMenu.setEnabled(false);
 
-    JMenuItem blueprint = new JMenuItem(Resources.strings().get("menu_edit_blueprint"), Icons.BLUEPRINT);
+    JMenuItem blueprint =
+        new JMenuItem(Resources.strings().get("menu_edit_blueprint"), Icons.BLUEPRINT);
     blueprint.addActionListener(e -> Editor.instance().getMapComponent().defineBlueprint());
     blueprint.setEnabled(false);
 
-    Editor.instance().getMapComponent().onFocusChanged(mo -> {
-      copy.setEnabled(mo != null);
-      cut.setEnabled(mo != null);
-      delete.setEnabled(mo != null);
-      blueprint.setEnabled(mo != null);
-      paste.setEnabled(Editor.instance().getMapComponent().getCopiedBlueprint() != null);
-      undo.setEnabled(UndoManager.instance().canUndo());
-      redo.setEnabled(UndoManager.instance().canRedo());
-    });
+    Editor.instance()
+        .getMapComponent()
+        .onFocusChanged(
+            mo -> {
+              copy.setEnabled(mo != null);
+              cut.setEnabled(mo != null);
+              delete.setEnabled(mo != null);
+              blueprint.setEnabled(mo != null);
+              paste.setEnabled(Editor.instance().getMapComponent().getCopiedBlueprint() != null);
+              undo.setEnabled(UndoManager.instance().canUndo());
+              redo.setEnabled(UndoManager.instance().canRedo());
+            });
 
-    Editor.instance().getMapComponent().onCopyTargetChanged(target -> paste.setEnabled(target != null));
-    Editor.instance().getMapComponent().onEditModeChanged(mode -> paste.setEnabled(Editor.instance().getMapComponent().getCopiedBlueprint() != null));
+    Editor.instance()
+        .getMapComponent()
+        .onCopyTargetChanged(target -> paste.setEnabled(target != null));
+    Editor.instance()
+        .getMapComponent()
+        .onEditModeChanged(
+            mode ->
+                paste.setEnabled(Editor.instance().getMapComponent().getCopiedBlueprint() != null));
 
-    UndoManager.onUndoStackChanged(manager -> {
-      undo.setEnabled(UndoManager.instance().canUndo());
-      redo.setEnabled(UndoManager.instance().canRedo());
-    });
+    UndoManager.onUndoStackChanged(
+        manager -> {
+          undo.setEnabled(UndoManager.instance().canUndo());
+          redo.setEnabled(UndoManager.instance().canRedo());
+        });
 
-    Editor.instance().getMapComponent().onEditModeChanged(mode -> paste.setEnabled(Editor.instance().getMapComponent().getCopiedBlueprint() != null));
+    Editor.instance()
+        .getMapComponent()
+        .onEditModeChanged(
+            mode ->
+                paste.setEnabled(Editor.instance().getMapComponent().getCopiedBlueprint() != null));
 
     this.add(addMenu);
     this.addSeparator();

@@ -1,14 +1,11 @@
 package de.gurkenlabs.litiengine.physics;
 
+import de.gurkenlabs.litiengine.entities.IEntityController;
+import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import java.util.List;
 import java.util.function.Predicate;
 
-import de.gurkenlabs.litiengine.entities.IEntityController;
-import de.gurkenlabs.litiengine.entities.IMobileEntity;
-
-/**
- * The Interface IMovementController is used for moving entities by applying forces to them.
- */
+/** The Interface IMovementController is used for moving entities by applying forces to them. */
 public interface IMovementController extends IEntityController {
 
   /**
@@ -21,8 +18,7 @@ public interface IMovementController extends IEntityController {
   /**
    * Gets the delta x for each horizontal movement.
    *
-   * @param dx
-   *          the new dx
+   * @param dx the new dx
    */
   void setDx(float dx);
 
@@ -36,8 +32,7 @@ public interface IMovementController extends IEntityController {
   /**
    * Sets the delta y for each vertical movement.
    *
-   * @param dy
-   *          the new dy
+   * @param dy the new dy
    */
   void setDy(float dy);
 
@@ -58,8 +53,7 @@ public interface IMovementController extends IEntityController {
   /**
    * Apply the force to the entity.
    *
-   * @param force
-   *          the force being applied to the entity
+   * @param force the force being applied to the entity
    */
   void apply(Force force);
 
@@ -69,16 +63,16 @@ public interface IMovementController extends IEntityController {
    * @return the active forces
    */
   List<Force> getActiveForces();
-  
+
   Force getForce(String identifier);
 
   double getMoveAngle();
-  
+
   /**
    * Checks given conditions before moving.
    *
-   * @param predicate
-   *          the conditions that need to apply before moving. If they don't apply, the entity won't be moved.
+   * @param predicate the conditions that need to apply before moving. If they don't apply, the
+   *     entity won't be moved.
    */
   void onMovementCheck(Predicate<IMobileEntity> predicate);
 }

@@ -1,16 +1,13 @@
 package de.gurkenlabs.litiengine.entities;
 
+import de.gurkenlabs.litiengine.graphics.RenderType;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import de.gurkenlabs.litiengine.graphics.RenderType;
-
-/**
- * This annotation contains default values for an entity implementation.
- */
+/** This annotation contains default values for an entity implementation. */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited

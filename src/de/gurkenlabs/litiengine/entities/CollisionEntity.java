@@ -1,12 +1,5 @@
 package de.gurkenlabs.litiengine.entities;
 
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.util.Collection;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Valign;
@@ -16,6 +9,12 @@ import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.physics.Collision;
 import de.gurkenlabs.litiengine.physics.CollisionEvent;
 import de.gurkenlabs.litiengine.tweening.TweenType;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.util.Collection;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @CollisionInfo(collision = true)
 public abstract class CollisionEntity extends Entity implements ICollisionEntity {
@@ -59,7 +58,14 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
     this.refreshCollisionBox();
   }
 
-  public static Rectangle2D getCollisionBox(final Point2D location, final double entityWidth, final double entityHeight, final double collisionBoxWidth, final double collisionBoxHeight, final Align align, final Valign valign) {
+  public static Rectangle2D getCollisionBox(
+      final Point2D location,
+      final double entityWidth,
+      final double entityHeight,
+      final double collisionBoxWidth,
+      final double collisionBoxHeight,
+      final Align align,
+      final Valign valign) {
     double x = location.getX() + align.getLocation(entityWidth, collisionBoxWidth);
     double y = location.getY() + valign.getLocation(entityHeight, collisionBoxHeight);
     return new Rectangle2D.Double(x, y, collisionBoxWidth, collisionBoxHeight);
@@ -93,10 +99,23 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
    */
   @Override
   public Rectangle2D getCollisionBox(final Point2D location) {
-    final double newCollisionBoxWidth = this.getCollisionBoxWidth() != -1 ? this.getCollisionBoxWidth() : this.getWidth() * WIDTH_FACTOR;
-    final double newCollisionBoxHeight = this.getCollisionBoxHeight() != -1 ? this.getCollisionBoxHeight() : this.getHeight() * HEIGHT_FACTOR;
+    final double newCollisionBoxWidth =
+        this.getCollisionBoxWidth() != -1
+            ? this.getCollisionBoxWidth()
+            : this.getWidth() * WIDTH_FACTOR;
+    final double newCollisionBoxHeight =
+        this.getCollisionBoxHeight() != -1
+            ? this.getCollisionBoxHeight()
+            : this.getHeight() * HEIGHT_FACTOR;
 
-    return getCollisionBox(location, this.getWidth(), this.getHeight(), newCollisionBoxWidth, newCollisionBoxHeight, this.getCollisionBoxAlign(), this.getCollisionBoxValign());
+    return getCollisionBox(
+        location,
+        this.getWidth(),
+        this.getHeight(),
+        newCollisionBoxWidth,
+        newCollisionBoxHeight,
+        this.getCollisionBoxAlign(),
+        this.getCollisionBoxValign());
   }
 
   @Override
@@ -111,7 +130,8 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
 
   @Override
   public Point2D getCollisionBoxCenter() {
-    return new Point2D.Double(this.getCollisionBox().getCenterX(), this.getCollisionBox().getCenterY());
+    return new Point2D.Double(
+        this.getCollisionBox().getCenterX(), this.getCollisionBox().getCenterY());
   }
 
   @Override
@@ -128,11 +148,13 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
   public float[] getTweenValues(TweenType tweenType) {
     switch (tweenType) {
       case COLLISION_WIDTH:
-        return new float[]{(float) this.getCollisionBoxWidth()};
+        return new float[] {(float) this.getCollisionBoxWidth()};
       case COLLISION_HEIGHT:
-        return new float[]{(float) this.getCollisionBoxHeight()};
+        return new float[] {(float) this.getCollisionBoxHeight()};
       case COLLISION_BOTH:
-        return new float[]{(float) this.getCollisionBoxWidth(), (float) this.getCollisionBoxHeight()};
+        return new float[] {
+          (float) this.getCollisionBoxWidth(), (float) this.getCollisionBoxHeight()
+        };
       default:
         return super.getTweenValues(tweenType);
     }
@@ -227,12 +249,15 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
   @Override
   public void setCollisionType(Collision type) {
     if (type == Collision.ANY) {
-      log.log(Level.WARNING, "CollistionType.ALL is not allowed to be assigned to an entity. It may only be used for filtering in the PhysicsEngine.");
+      log.log(
+          Level.WARNING,
+          "CollistionType.ALL is not allowed to be assigned to an entity. It may only be used for filtering in the PhysicsEngine.");
       return;
     }
 
     if (this.getEnvironment() != null && this.getEnvironment().isLoaded()) {
-      // re-add the entity to the physics engine so it will be treated with the updated collision type
+      // re-add the entity to the physics engine so it will be treated with the updated collision
+      // type
       Game.physics().remove(this);
       this.collisionType = type;
       Game.physics().add(this);

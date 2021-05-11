@@ -1,15 +1,5 @@
 package de.gurkenlabs.utiliti.handlers;
 
-import java.awt.event.KeyEvent;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
-
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
@@ -23,25 +13,47 @@ import de.gurkenlabs.utiliti.Cursors;
 import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.components.MapComponent;
 import de.gurkenlabs.utiliti.swing.UI;
+import java.awt.event.KeyEvent;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class Transform {
 
   public enum ResizeAnchor {
-    UP(0, -1, 0, 1), DOWN(0, 1, 0, 0), LEFT(-1, 0, 1, 0), RIGHT(1, 0, 0, 0), UPLEFT(-1, -1, 1, 1), UPRIGHT(1, -1, 0, 1), DOWNLEFT(-1, 1, 1, 0), DOWNRIGHT(1, 1, 0, 0);
+    UP(0, -1, 0, 1),
+    DOWN(0, 1, 0, 0),
+    LEFT(-1, 0, 1, 0),
+    RIGHT(1, 0, 0, 0),
+    UPLEFT(-1, -1, 1, 1),
+    UPRIGHT(1, -1, 0, 1),
+    DOWNLEFT(-1, 1, 1, 0),
+    DOWNRIGHT(1, 1, 0, 0);
 
     private final int w;
     private final int h;
     private final int x;
     private final int y;
 
-    private ResizeAnchor(int widthFactor, int heightFactor, int xFactor, int yFactor) {
+    ResizeAnchor(int widthFactor, int heightFactor, int xFactor, int yFactor) {
       this.w = widthFactor;
       this.h = heightFactor;
       this.x = xFactor;
       this.y = yFactor;
     }
 
-    protected Rectangle2D getNewBounds(double deltaX, double deltaY, double originalX, double originalY, double originalWidth, double originalHeight) {
+    protected Rectangle2D getNewBounds(
+        double deltaX,
+        double deltaY,
+        double originalX,
+        double originalY,
+        double originalWidth,
+        double originalHeight) {
 
       double newWidth = originalWidth;
       double newHeight = originalHeight;
@@ -68,7 +80,9 @@ public final class Transform {
   }
 
   public enum TransformType {
-    NONE, RESIZE, MOVE
+    NONE,
+    RESIZE,
+    MOVE
   }
 
   private static final Map<ResizeAnchor, Rectangle2D> resizeAnchors = new ConcurrentHashMap<>();
@@ -81,9 +95,8 @@ public final class Transform {
   private static ResizeAnchor anchor;
 
   private static DragData drag;
-  
-  private Transform() {
-  }
+
+  private Transform() {}
 
   public static TransformType type() {
     return type;
@@ -99,7 +112,10 @@ public final class Transform {
 
   public static void resize() {
     final IMapObject transformObject = Editor.instance().getMapComponent().getFocusedMapObject();
-    if (transformObject == null || Editor.instance().getMapComponent().getEditMode() != MapComponent.EDITMODE_EDIT || type() != TransformType.RESIZE || anchor() == null) {
+    if (transformObject == null
+        || Editor.instance().getMapComponent().getEditMode() != MapComponent.EDITMODE_EDIT
+        || type() != TransformType.RESIZE
+        || anchor() == null) {
       return;
     }
 
@@ -114,7 +130,15 @@ public final class Transform {
     final double mouseDeltaX = newMouseLocation.getX() - drag.mouseLocation.getX();
     final double mouseDeltaY = newMouseLocation.getY() - drag.mouseLocation.getY();
 
-    final Rectangle2D newBound = Transform.anchor().getNewBounds(mouseDeltaX, mouseDeltaY, drag.minX, drag.minY, drag.originalBounds.get(transformObject).getWidth(), drag.originalBounds.get(transformObject).getHeight());
+    final Rectangle2D newBound =
+        Transform.anchor()
+            .getNewBounds(
+                mouseDeltaX,
+                mouseDeltaY,
+                drag.minX,
+                drag.minY,
+                drag.originalBounds.get(transformObject).getWidth(),
+                drag.originalBounds.get(transformObject).getHeight());
 
     double newX = newBound.getX();
     double newY = newBound.getY();
@@ -157,20 +181,21 @@ public final class Transform {
   }
 
   /**
-   * Moves the currently selected map objects by the distance the mouse passed
-   * since starting to drag.
-   * 
-   * <p>
-   * Map objects are moved relative to the corners of the most left and most top
-   * objects, i.e. the snapping will only be applied to the objects on the
-   * border and all the other objects keep their relative distances. <br>
-   * In a way this means that we're not moving the objects individually but
-   * instead move them as a group that doesn't change its internal positioning.
-   * </p>
+   * Moves the currently selected map objects by the distance the mouse passed since starting to
+   * drag.
+   *
+   * <p>Map objects are moved relative to the corners of the most left and most top objects, i.e.
+   * the snapping will only be applied to the objects on the border and all the other objects keep
+   * their relative distances. <br>
+   * In a way this means that we're not moving the objects individually but instead move them as a
+   * group that doesn't change its internal positioning.
    */
   public static void move() {
-    final List<IMapObject> selectedMapObjects = Editor.instance().getMapComponent().getSelectedMapObjects();
-    if (selectedMapObjects.isEmpty() || (!Input.keyboard().isPressed(KeyEvent.VK_CONTROL) && Editor.instance().getMapComponent().getEditMode() != MapComponent.EDITMODE_MOVE)) {
+    final List<IMapObject> selectedMapObjects =
+        Editor.instance().getMapComponent().getSelectedMapObjects();
+    if (selectedMapObjects.isEmpty()
+        || (!Input.keyboard().isPressed(KeyEvent.VK_CONTROL)
+            && Editor.instance().getMapComponent().getEditMode() != MapComponent.EDITMODE_MOVE)) {
       return;
     }
 
@@ -210,9 +235,11 @@ public final class Transform {
 
     moveEntities(selectedMapObjects, deltaX, deltaY);
 
-    if (selectedMapObjects.stream().anyMatch(x -> MapObjectType.get(x.getType()) == MapObjectType.STATICSHADOW)) {
+    if (selectedMapObjects.stream()
+        .anyMatch(x -> MapObjectType.get(x.getType()) == MapObjectType.STATICSHADOW)) {
       Game.world().environment().updateLighting();
-    } else if (selectedMapObjects.stream().anyMatch(x -> MapObjectType.get(x.getType()) == MapObjectType.LIGHTSOURCE)) {
+    } else if (selectedMapObjects.stream()
+        .anyMatch(x -> MapObjectType.get(x.getType()) == MapObjectType.LIGHTSOURCE)) {
       final Rectangle2D afterBounds = MapObject.getBounds(selectedMapObjects);
       double x = Math.min(beforeBounds.getX(), afterBounds.getX());
       double y = Math.min(beforeBounds.getY(), afterBounds.getY());
@@ -256,9 +283,11 @@ public final class Transform {
       if (hoverrect.contains(Input.mouse().getMapLocation())) {
         if (entry.getKey() == ResizeAnchor.DOWN || entry.getKey() == ResizeAnchor.UP) {
           Game.window().cursor().set(Cursors.TRANS_VERTICAL, 0, 0);
-        } else if (entry.getKey() == ResizeAnchor.UPLEFT || entry.getKey() == ResizeAnchor.DOWNRIGHT) {
+        } else if (entry.getKey() == ResizeAnchor.UPLEFT
+            || entry.getKey() == ResizeAnchor.DOWNRIGHT) {
           Game.window().cursor().set(Cursors.TRANS_DIAGONAL_LEFT, 0, 0);
-        } else if (entry.getKey() == ResizeAnchor.UPRIGHT || entry.getKey() == ResizeAnchor.DOWNLEFT) {
+        } else if (entry.getKey() == ResizeAnchor.UPRIGHT
+            || entry.getKey() == ResizeAnchor.DOWNLEFT) {
           Game.window().cursor().set(Cursors.TRANS_DIAGONAL_RIGHT, 0, 0);
         } else {
           Game.window().cursor().set(Cursors.TRANS_HORIZONTAL, 0, 0);
@@ -287,7 +316,10 @@ public final class Transform {
   }
 
   public static void updateAnchors() {
-    transformRectSize = Zoom.get() < Zoom.getDefault() ? TRANSFORM_RECT_SIZE : TRANSFORM_RECT_SIZE / (Math.sqrt(Zoom.get() * 1.25));
+    transformRectSize =
+        Zoom.get() < Zoom.getDefault()
+            ? TRANSFORM_RECT_SIZE
+            : TRANSFORM_RECT_SIZE / (Math.sqrt(Zoom.get() * 1.25));
     final Rectangle2D focus = Editor.instance().getMapComponent().getFocusBounds();
     if (focus == null) {
       resizeAnchors.clear();
@@ -295,7 +327,12 @@ public final class Transform {
     }
 
     for (ResizeAnchor trans : ResizeAnchor.values()) {
-      Rectangle2D transRect = new Rectangle2D.Double(getAnchorX(trans, focus), getAnchorY(trans, focus), transformRectSize, transformRectSize);
+      Rectangle2D transRect =
+          new Rectangle2D.Double(
+              getAnchorX(trans, focus),
+              getAnchorY(trans, focus),
+              transformRectSize,
+              transformRectSize);
       resizeAnchors.put(trans, transRect);
     }
   }
@@ -310,37 +347,37 @@ public final class Transform {
 
   private static double getAnchorX(ResizeAnchor type, Rectangle2D focus) {
     switch (type) {
-    case DOWN:
-    case UP:
-      return focus.getCenterX() - transformRectSize / 2;
-    case LEFT:
-    case DOWNLEFT:
-    case UPLEFT:
-      return focus.getX() - transformRectSize;
-    case RIGHT:
-    case DOWNRIGHT:
-    case UPRIGHT:
-      return focus.getMaxX();
-    default:
-      return 0;
+      case DOWN:
+      case UP:
+        return focus.getCenterX() - transformRectSize / 2;
+      case LEFT:
+      case DOWNLEFT:
+      case UPLEFT:
+        return focus.getX() - transformRectSize;
+      case RIGHT:
+      case DOWNRIGHT:
+      case UPRIGHT:
+        return focus.getMaxX();
+      default:
+        return 0;
     }
   }
 
   private static double getAnchorY(ResizeAnchor type, Rectangle2D focus) {
     switch (type) {
-    case DOWN:
-    case DOWNLEFT:
-    case DOWNRIGHT:
-      return focus.getMaxY();
-    case UP:
-    case UPLEFT:
-    case UPRIGHT:
-      return focus.getY() - transformRectSize;
-    case LEFT:
-    case RIGHT:
-      return focus.getCenterY() - transformRectSize / 2;
-    default:
-      return 0;
+      case DOWN:
+      case DOWNLEFT:
+      case DOWNRIGHT:
+        return focus.getMaxY();
+      case UP:
+      case UPLEFT:
+      case UPRIGHT:
+        return focus.getY() - transformRectSize;
+      case LEFT:
+      case RIGHT:
+        return focus.getCenterY() - transformRectSize / 2;
+      default:
+        return 0;
     }
   }
 

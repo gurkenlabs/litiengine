@@ -1,10 +1,9 @@
 package de.gurkenlabs.utiliti.swing;
 
 import de.gurkenlabs.utiliti.handlers.Scroll;
-
-import javax.swing.*;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import javax.swing.JScrollBar;
 
 public class ScrollHandlerBar extends JScrollBar implements Scroll.ScrollHandler {
   private final List<Scroll.ScrollHandlerEventListener> listeners;
@@ -15,11 +14,12 @@ public class ScrollHandlerBar extends JScrollBar implements Scroll.ScrollHandler
     this.listeners = new CopyOnWriteArrayList<>();
 
     this.setDoubleBuffered(true);
-    this.addAdjustmentListener(e -> {
-      for (Scroll.ScrollHandlerEventListener listener : listeners) {
-        listener.scrolled(this);
-      }
-    });
+    this.addAdjustmentListener(
+        e -> {
+          for (Scroll.ScrollHandlerEventListener listener : listeners) {
+            listener.scrolled(this);
+          }
+        });
   }
 
   @Override

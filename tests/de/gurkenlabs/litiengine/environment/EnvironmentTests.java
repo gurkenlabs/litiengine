@@ -10,6 +10,28 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.GameTest;
+import de.gurkenlabs.litiengine.entities.CollisionBox;
+import de.gurkenlabs.litiengine.entities.Creature;
+import de.gurkenlabs.litiengine.entities.ICombatEntity;
+import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.entities.IMobileEntity;
+import de.gurkenlabs.litiengine.entities.LightSource;
+import de.gurkenlabs.litiengine.entities.MapArea;
+import de.gurkenlabs.litiengine.entities.Prop;
+import de.gurkenlabs.litiengine.entities.SoundSource;
+import de.gurkenlabs.litiengine.entities.Spawnpoint;
+import de.gurkenlabs.litiengine.entities.StaticShadow;
+import de.gurkenlabs.litiengine.entities.Trigger;
+import de.gurkenlabs.litiengine.entities.Trigger.TriggerActivation;
+import de.gurkenlabs.litiengine.environment.tilemap.IMap;
+import de.gurkenlabs.litiengine.graphics.IRenderable;
+import de.gurkenlabs.litiengine.graphics.RenderType;
+import de.gurkenlabs.litiengine.graphics.StaticShadowType;
+import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
+import de.gurkenlabs.litiengine.graphics.emitters.particles.Particle;
+import de.gurkenlabs.litiengine.physics.Collision;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.geom.Ellipse2D;
@@ -18,36 +40,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.GameTest;
-import de.gurkenlabs.litiengine.entities.CollisionBox;
-import de.gurkenlabs.litiengine.entities.ICombatEntity;
-import de.gurkenlabs.litiengine.entities.IEntity;
-import de.gurkenlabs.litiengine.entities.IMobileEntity;
-import de.gurkenlabs.litiengine.entities.LightSource;
-import de.gurkenlabs.litiengine.entities.SoundSource;
-import de.gurkenlabs.litiengine.entities.Creature;
-import de.gurkenlabs.litiengine.entities.MapArea;
-import de.gurkenlabs.litiengine.entities.Prop;
-import de.gurkenlabs.litiengine.entities.Spawnpoint;
-import de.gurkenlabs.litiengine.entities.StaticShadow;
-import de.gurkenlabs.litiengine.entities.Trigger;
-import de.gurkenlabs.litiengine.entities.Trigger.TriggerActivation;
-import de.gurkenlabs.litiengine.environment.tilemap.IMap;
-import de.gurkenlabs.litiengine.graphics.RenderType;
-import de.gurkenlabs.litiengine.graphics.IRenderable;
-import de.gurkenlabs.litiengine.graphics.StaticShadowType;
-import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
-import de.gurkenlabs.litiengine.graphics.emitters.particles.Particle;
-import de.gurkenlabs.litiengine.physics.Collision;
 
 public class EnvironmentTests {
   private Environment testEnvironment;
@@ -186,7 +184,8 @@ public class EnvironmentTests {
   public void testAddRenderable() {
     LightSource testLightSource = mock(LightSource.class);
     this.testEnvironment.add(testLightSource, RenderType.NORMAL);
-    Collection<IRenderable> testRenderables = this.testEnvironment.getRenderables(RenderType.NORMAL);
+    Collection<IRenderable> testRenderables =
+        this.testEnvironment.getRenderables(RenderType.NORMAL);
 
     assertEquals(1, testRenderables.size());
     assertTrue(testRenderables.contains(testLightSource));
@@ -396,7 +395,8 @@ public class EnvironmentTests {
 
   @Test
   public void testLightSource() {
-    LightSource testLight = new LightSource(100, new Color(255, 255, 255, 100), LightSource.Type.ELLIPSE, true);
+    LightSource testLight =
+        new LightSource(100, new Color(255, 255, 255, 100), LightSource.Type.ELLIPSE, true);
     testLight.setMapId(999);
     testLight.setName("test");
 
@@ -438,12 +438,13 @@ public class EnvironmentTests {
 
   @Test
   public void testEmitter() {
-    Emitter testEmitter = new Emitter(1, 1) {
-      @Override
-      protected Particle createNewParticle() {
-        return null;
-      }
-    };
+    Emitter testEmitter =
+        new Emitter(1, 1) {
+          @Override
+          protected Particle createNewParticle() {
+            return null;
+          }
+        };
 
     testEmitter.setMapId(1);
     testEmitter.setName("test");
@@ -652,8 +653,10 @@ public class EnvironmentTests {
     this.testEnvironment.add(entity);
     this.testEnvironment.add(entity2);
 
-    Collection<IEntity> found = this.testEnvironment.findEntities(new Rectangle2D.Double(0, 0, 10, 10));
-    Collection<IEntity> found2 = this.testEnvironment.findEntities(new Ellipse2D.Double(0, 0, 10, 10));
+    Collection<IEntity> found =
+        this.testEnvironment.findEntities(new Rectangle2D.Double(0, 0, 10, 10));
+    Collection<IEntity> found2 =
+        this.testEnvironment.findEntities(new Ellipse2D.Double(0, 0, 10, 10));
     assertTrue(found.contains(entity));
     assertFalse(found.contains(entity2));
     assertTrue(found2.contains(entity));
@@ -677,8 +680,10 @@ public class EnvironmentTests {
     this.testEnvironment.add(combatEntity);
     this.testEnvironment.add(combatEntity2);
 
-    Collection<ICombatEntity> found = this.testEnvironment.findCombatEntities(new Rectangle2D.Double(0, 0, 10, 10));
-    Collection<ICombatEntity> found2 = this.testEnvironment.findCombatEntities(new Ellipse2D.Double(0, 0, 10, 10));
+    Collection<ICombatEntity> found =
+        this.testEnvironment.findCombatEntities(new Rectangle2D.Double(0, 0, 10, 10));
+    Collection<ICombatEntity> found2 =
+        this.testEnvironment.findCombatEntities(new Ellipse2D.Double(0, 0, 10, 10));
 
     assertTrue(found.contains(combatEntity));
     assertFalse(found.contains(combatEntity2));
@@ -698,12 +703,13 @@ public class EnvironmentTests {
     testProp.setName("test");
     this.testEnvironment.add(testProp);
 
-    Emitter testEmitter = new Emitter(1, 1) {
-      @Override
-      protected Particle createNewParticle() {
-        return null;
-      }
-    };
+    Emitter testEmitter =
+        new Emitter(1, 1) {
+          @Override
+          protected Particle createNewParticle() {
+            return null;
+          }
+        };
     testEmitter.setMapId(1);
     testEmitter.setName("test");
     this.testEnvironment.add(testEmitter);
@@ -726,19 +732,38 @@ public class EnvironmentTests {
 
   @Test
   public void testCollectionGettersNeedToBeUnmodifiable() {
-    // entities need to be added/removed with the provided methods of the environment. Adding them to an internal collection can have unforeseen consequences
-    assertThrows(UnsupportedOperationException.class, () -> this.testEnvironment.getAreas().add(null));
-    assertThrows(UnsupportedOperationException.class, () -> this.testEnvironment.getEmitters().add(null));
-    assertThrows(UnsupportedOperationException.class, () -> this.testEnvironment.getCollisionBoxes().add(null));
-    assertThrows(UnsupportedOperationException.class, () -> this.testEnvironment.getCombatEntities().add(null));
-    assertThrows(UnsupportedOperationException.class, () -> this.testEnvironment.getEntities().add(null));
-    assertThrows(UnsupportedOperationException.class, () -> this.testEnvironment.getLightSources().add(null));
-    assertThrows(UnsupportedOperationException.class, () -> this.testEnvironment.getMobileEntities().add(null));
-    assertThrows(UnsupportedOperationException.class, () -> this.testEnvironment.getProps().add(null));
-    assertThrows(UnsupportedOperationException.class, () -> this.testEnvironment.getCreatures().add(null));
-    assertThrows(UnsupportedOperationException.class, () -> this.testEnvironment.getSpawnpoints().add(null));
-    assertThrows(UnsupportedOperationException.class, () -> this.testEnvironment.getStaticShadows().add(null));
-    assertThrows(UnsupportedOperationException.class, () -> this.testEnvironment.getTriggers().add(null));
-    assertThrows(UnsupportedOperationException.class, () -> this.testEnvironment.getUsedTags().add(null));
+    // entities need to be added/removed with the provided methods of the environment. Adding them
+    // to an internal collection can have unforeseen consequences
+    assertThrows(
+        UnsupportedOperationException.class, () -> this.testEnvironment.getAreas().add(null));
+    assertThrows(
+        UnsupportedOperationException.class, () -> this.testEnvironment.getEmitters().add(null));
+    assertThrows(
+        UnsupportedOperationException.class,
+        () -> this.testEnvironment.getCollisionBoxes().add(null));
+    assertThrows(
+        UnsupportedOperationException.class,
+        () -> this.testEnvironment.getCombatEntities().add(null));
+    assertThrows(
+        UnsupportedOperationException.class, () -> this.testEnvironment.getEntities().add(null));
+    assertThrows(
+        UnsupportedOperationException.class,
+        () -> this.testEnvironment.getLightSources().add(null));
+    assertThrows(
+        UnsupportedOperationException.class,
+        () -> this.testEnvironment.getMobileEntities().add(null));
+    assertThrows(
+        UnsupportedOperationException.class, () -> this.testEnvironment.getProps().add(null));
+    assertThrows(
+        UnsupportedOperationException.class, () -> this.testEnvironment.getCreatures().add(null));
+    assertThrows(
+        UnsupportedOperationException.class, () -> this.testEnvironment.getSpawnpoints().add(null));
+    assertThrows(
+        UnsupportedOperationException.class,
+        () -> this.testEnvironment.getStaticShadows().add(null));
+    assertThrows(
+        UnsupportedOperationException.class, () -> this.testEnvironment.getTriggers().add(null));
+    assertThrows(
+        UnsupportedOperationException.class, () -> this.testEnvironment.getUsedTags().add(null));
   }
 }
