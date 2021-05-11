@@ -62,7 +62,7 @@ You can do so by sponsoring [LITIENGINE on OpenCollective](https://opencollectiv
   * Commits should be logical and atomic units. Commit often!
   * We expect any new methods that you write to be fully documented
   * Make sure to also include unit tests for new features
-  * Clean up your code following our style and formatting guide (Which we don't have ready yet. Heh.)
+  * Clean up your code following our style guide below.
 * File a Pull Request
   * We try to review pull requests as often as possible, but don't be mad if it takes us some days before reviewing yours.
   * As soon as your changes were reviewed and approved, we will merge them into the master branch.
@@ -70,3 +70,6 @@ You can do so by sponsoring [LITIENGINE on OpenCollective](https://opencollectiv
   * Changes resulting in build and test pipeline failures that cannot be resolved within two days will be reverted.
   
   If you want to help in other ways, like hosting workshops or becoming a community moderator, just contact us at info@LITIENGINE.com to specify the details.
+
+### Style Guide
+Code in the LITIENGINE repository needs to be formatted in compliance with the  [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html). The tool [google-java-format](https://github.com/google/google-java-format) will provide automatic formatting for that purpose. It is available as a plugin for all popular Java IDEs. Note that the IntelliJ plugin doesn't come with automatic import reordering, which is handled by [this external style file](https://raw.githubusercontent.com/google/styleguide/gh-pages/intellij-java-google-style.xml)  you need to integrate via `File→Settings→Editor→Code Style`.
