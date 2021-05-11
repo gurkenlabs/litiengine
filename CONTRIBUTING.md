@@ -52,11 +52,11 @@ a few of which we want to mention here:
 
 ### Nothing of the above applies to you?
 Well... if you still want to support us, you could consider helping us bear the development costs for LITIENGINE (e.g. servers and equipment).
-You can do so by sponsoring [LITIENGINE on OpenCollective](https://opencollective.com/litiengine) or sponsoring the devs [Steffen](https://github.com/sponsors/steffen-wilke) and [Matthias](https://github.com/sponsors/nightm4re94)directly on GitHub.
+You can do so by sponsoring [LITIENGINE on OpenCollective](https://opencollective.com/litiengine) or sponsoring the devs [Steffen](https://github.com/sponsors/steffen-wilke) and [Matthias](https://github.com/sponsors/nightm4re94) directly on GitHub.
 
-## How do I contribute?
-* Create a Github account
-* Fork the LITIENGINE repository
+## How do I contribute to the LITIENGINE repository?
+* Create a GitHub account
+* Fork the [LITIENGINE repository](https://github.com/gurkenlabs/litiengine)
 * Create a thematically labelled branch
 * Commit & Push your changes to the branch
   * Commits should be logical and atomic units. Commit often!
@@ -66,10 +66,16 @@ You can do so by sponsoring [LITIENGINE on OpenCollective](https://opencollectiv
 * File a Pull Request
   * We try to review pull requests as often as possible, but don't be mad if it takes us some days before reviewing yours.
   * As soon as your changes were reviewed and approved, we will merge them into the master branch.
-  * Due to questionable design decisions, violations of our code of conduct, or bugs, we may reject pull requests. Again, this is nothing to be mad about: After you've revised the questionable portions of your pull request, we'll happily review it once more.
+  * Due to questionable design decisions, violations of our code of conduct, or bugs, we may reject pull requests. Again, this is nothing to be mad about: After you've revised the defective portions of your pull request, we'll happily review it once more.
   * Changes resulting in build and test pipeline failures that cannot be resolved within two days will be reverted.
   
-  If you want to help in other ways, like hosting workshops or becoming a community moderator, just contact us at info@LITIENGINE.com to specify the details.
 
 ### Style Guide
-Code in the LITIENGINE repository needs to be formatted in compliance with the  [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html). The tool [google-java-format](https://github.com/google/google-java-format) will provide automatic formatting for that purpose. It is available as a plugin for all popular Java IDEs. Note that the IntelliJ plugin doesn't come with automatic import reordering, which is handled by [this external style file](https://raw.githubusercontent.com/google/styleguide/gh-pages/intellij-java-google-style.xml)  you need to integrate via `File→Settings→Editor→Code Style`.
+Code in the LITIENGINE repository needs to be formatted in compliance with the  [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html). The tool [google-java-format](https://github.com/google/google-java-format) will provide automatic formatting for that purpose. It is available as a plugin for all popular Java IDEs. Note that the IntelliJ plugin doesn't come with automatic import reordering, which is handled by [this external style file](https://raw.githubusercontent.com/google/styleguide/gh-pages/intellij-java-google-style.xml)  you need to integrate via 
+```
+File → Settings → Editor → Code Style
+```
+
+## What else can I do?
+>  If you want to help in other ways we have not mentioned above, just contact us at info@LITIENGINE.com to specify the details.
+
