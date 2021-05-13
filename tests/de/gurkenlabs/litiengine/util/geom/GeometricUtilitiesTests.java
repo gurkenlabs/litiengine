@@ -489,7 +489,7 @@ public class GeometricUtilitiesTests {
   }
 
   /**
-   * This method is used to provide input arguments for @see{testContains}
+   * This method is used to provide input arguments for {@link #testContains}.
    *
    * @return Arguments for the unit test
    */
@@ -535,7 +535,7 @@ public class GeometricUtilitiesTests {
   }
 
   /**
-   * Supplies the test arguments for @see{testIntersectsEllipse}
+   * Supplies the test arguments for {@link #testIntersectsEllipse}.
    *
    * @return Arguments for the unit test
    */
@@ -596,7 +596,7 @@ public class GeometricUtilitiesTests {
   }
 
   /**
-   * Provides the test arguments for @see testDistanceCoordinates and @see testDistancePoints
+   * Provides the test arguments for {@link #testDistanceCoordinates} and {@link #testDistancePoints}.
    *
    * @return Arguments for the unit test
    */
