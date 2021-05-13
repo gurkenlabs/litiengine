@@ -1,8 +1,7 @@
-package de.gurkenlabs.litiengine.util.io;
+package de.gurkenlabs.litiengine.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import de.gurkenlabs.litiengine.util.AlphanumComparator;
 import java.util.Comparator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
