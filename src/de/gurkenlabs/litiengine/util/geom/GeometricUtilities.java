@@ -656,7 +656,7 @@ public class GeometricUtilities {
     }
 
     if (shapeA instanceof Rectangle2D && shapeB instanceof Rectangle2D) {
-      return shapeA.intersects((Rectangle2D) shapeB);
+      return intersects((Rectangle2D) shapeA, (Rectangle2D) shapeB) ;
     }
 
     if (shapeA instanceof Line2D) {
