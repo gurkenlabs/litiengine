@@ -25,8 +25,17 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     
-    - name: Build with Gradle
-      run: ./gradlew fullbuild --warning-mode all
+    - name: Build and Create JavaDocs
+      run: ./gradlew createJavadocs
+      
+    - name: Run Tests
+      run: ./gradlew test
+    
+    - name: Save Test Reports
+      run: ./gradlew jacocoTestReport
+      
+    - name: Build utiLITI
+      run: ./gradlew distZip    
     
     - name: Maven repo and sonar cache
       uses: actions/cache@v2
