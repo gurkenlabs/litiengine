@@ -13,8 +13,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.awt.geom.Line2D;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class PhysicsEngineTests {
 
@@ -26,6 +25,12 @@ public class PhysicsEngineTests {
     @AfterEach
     void tearDown(){
         Game.physics().clear();
+    }
+
+    @Test
+    void testConstructorNoInstancesAllowed(){
+        // arrange, act, assert
+        assertThrows(UnsupportedOperationException.class, () -> new PhysicsEngine());
     }
 
     @ParameterizedTest
