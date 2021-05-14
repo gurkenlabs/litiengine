@@ -21,8 +21,8 @@ public abstract class AttributeEffect<T extends Number> extends Effect {
       final Ability ability,
       final Modification modification,
       final double delta,
-      final EffectTarget... targtes) {
-    super(ability, targtes);
+      final EffectTarget... targets) {
+    super(ability, targets);
     this.modifier = new AttributeModifier<>(modification, delta);
   }
 
