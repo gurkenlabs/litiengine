@@ -26,7 +26,9 @@ jobs:
       run: chmod +x gradlew
     
     - name: Build and Create JavaDocs
-      run: ./gradlew createJavadocs
+      uses: GabrielBB/xvfb-action@v1
+      with:
+        run: ./gradlew createJavadocs
       
     - name: Run Tests
       run: ./gradlew test
