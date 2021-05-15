@@ -16,6 +16,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -51,6 +52,7 @@ public class PhysicsEngineTests {
         RaycastHit hit = Game.physics().raycast(rayLine, Collision.ANY, collisionBox1);
 
         // assert
+        assertNotNull(hit);
         assertEquals(expectedHitX, hit.getPoint().getX());
         assertEquals(expectedHitY, hit.getPoint().getY());
     }
