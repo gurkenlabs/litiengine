@@ -4,11 +4,16 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.tweening.TweenType;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.util.stream.Stream;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,7 +22,16 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(SwingTestSuite.class)
 public class GuiComponentTests {
@@ -310,6 +324,37 @@ public class GuiComponentTests {
     assertNull(currentAppearance.getForeColor());
     assertNull(currentAppearance.getBorderColor());
     assertNull(component.getTextShadowColor());
+  }
+
+  @ParameterizedTest
+  @MethodSource("getTextToRenderArguments")
+  void testGetTextToRender(int stringWidth, boolean autoLineBreaks, String initialText, String expectedText){
+    // arrange
+    TestComponent component = new TestComponent(10, 15, 50, 75);
+    component.setText(initialText);
+    component.setAutomaticLineBreaks(autoLineBreaks);
+
+    FontMetrics fm = mock(FontMetrics.class);
+    Graphics2D g = spy(new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB).createGraphics());
+    when(fm.stringWidth(any(String.class))).thenReturn(stringWidth);
+    when(g.getFontMetrics()).thenReturn(fm);
+
+    // act
+    String actualText = component.getTextToRender(g);
+
+    // assert
+    assertEquals(expectedText, actualText);
+  }
+
+  @SuppressWarnings("unused")
+  private static Stream<Arguments> getTextToRenderArguments() {
+    return Stream.of(
+            Arguments.of(90, false, null, ""),
+            Arguments.of(90, false, "", ""),
+            Arguments.of(90, false, "test", "t"),
+            Arguments.of(20, false, "test", "test"),
+            Arguments.of(120, true, "test", "test")
+    );
   }
 
   @SuppressWarnings("unused")
