@@ -2,6 +2,12 @@ name: Build
 
 on:
   push:
+    paths:
+      - "**.gradle"
+      - "**.properties"
+      - "**.java"
+      - "**.xml"
+      - ".github/workflows/gradle.yml"
   pull_request:
     branches: [ master ]
 
