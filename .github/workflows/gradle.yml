@@ -1,4 +1,4 @@
-name: Gradle Fullbuild
+name: Build
 
 on:
   push:
