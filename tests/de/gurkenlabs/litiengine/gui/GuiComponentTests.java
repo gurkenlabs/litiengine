@@ -1,22 +1,23 @@
 package de.gurkenlabs.litiengine.gui;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.tweening.TweenType;
-import java.awt.Font;
+
+import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.util.stream.Stream;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SwingTestSuite.class)
 public class GuiComponentTests {
@@ -171,7 +172,6 @@ public class GuiComponentTests {
   @Test
   public void testTweenPOSITION_X() {
     TestComponent component = new TestComponent(0, 0, 100, 50);
-    component.getTweenValues(TweenType.POSITION_X);
     component.setTweenValues(TweenType.POSITION_X, new float[] {2, 2, 1, 1, 1, 2});
     assertEquals(2, component.getX());
   }
@@ -179,7 +179,6 @@ public class GuiComponentTests {
   @Test
   public void testTweenPOSITION_Y() {
     TestComponent component = new TestComponent(0, 0, 100, 50);
-    component.getTweenValues(TweenType.POSITION_Y);
     component.setTweenValues(TweenType.POSITION_Y, new float[] {2, 2, 1, 1, 1, 2});
     assertEquals(2, component.getY());
   }
@@ -187,7 +186,6 @@ public class GuiComponentTests {
   @Test
   public void testTweenPOSITION_XY() {
     TestComponent component = new TestComponent(10, 20, 100, 50);
-    component.getTweenValues(TweenType.POSITION_XY);
     component.setTweenValues(TweenType.POSITION_XY, new float[] {2, 0, 1, 1, 1, 2});
     assertEquals(2, component.getX());
     assertEquals(0, component.getY());
@@ -196,7 +194,6 @@ public class GuiComponentTests {
   @Test
   public void testTweenSIZE_WIDTH() {
     TestComponent component = new TestComponent(10, 20, 100, 50);
-    component.getTweenValues(TweenType.SIZE_WIDTH);
     component.setTweenValues(TweenType.SIZE_WIDTH, new float[] {10, 20, 50, 100});
     assertEquals(10, component.getWidth());
   }
@@ -204,7 +201,6 @@ public class GuiComponentTests {
   @Test
   public void testTweenSIZE_HEIGHT() {
     TestComponent component = new TestComponent(10, 20, 100, 50);
-    component.getTweenValues(TweenType.SIZE_HEIGHT);
     component.setTweenValues(TweenType.SIZE_HEIGHT, new float[] {10, 20, 50, 100});
     assertEquals(10, component.getHeight());
   }
@@ -212,7 +208,6 @@ public class GuiComponentTests {
   @Test
   public void testTweenSIZE_BOTH() {
     TestComponent component = new TestComponent(10, 20, 100, 50);
-    component.getTweenValues(TweenType.SIZE_BOTH);
     component.setTweenValues(TweenType.SIZE_BOTH, new float[] {10, 20, 50, 100});
     assertEquals(10, component.getWidth());
     assertEquals(20, component.getHeight());
@@ -221,7 +216,6 @@ public class GuiComponentTests {
   @Test
   public void testTweenDANGLE() {
     TestComponent component = new TestComponent(10, 20, 100, 50);
-    component.getTweenValues(TweenType.ANGLE);
     component.setTweenValues(TweenType.ANGLE, new float[] {10.123f, 20.987f});
     assertEquals(10, component.getTextAngle());
   }
@@ -230,7 +224,6 @@ public class GuiComponentTests {
   public void testTweenFONTSIZE() {
     TestComponent component = new TestComponent(10, 20, 100, 50);
     component.setFont(new Font("Times", Font.PLAIN, 12));
-    component.getTweenValues(TweenType.FONTSIZE);
     component.setTweenValues(TweenType.FONTSIZE, new float[] {8, 9, 10});
     assertEquals(8, component.getFont().getSize2D());
   }
@@ -238,8 +231,109 @@ public class GuiComponentTests {
   @Test
   public void testTweenDefault() {
     TestComponent component = new TestComponent(0, 0, 100, 50);
-    component.getTweenValues(TweenType.UNDEFINED);
     component.setTweenValues(TweenType.UNDEFINED, new float[] {});
+  }
+
+  @ParameterizedTest
+  @MethodSource("getTweenValuesArguments")
+  void testGetTweenValues(TweenType tweenType, float[] expectedValues){
+    // arrange
+    TestComponent component = new TestComponent(10, 15, 50, 75);
+    component.setFont(new Font("Times", 10, 10));
+
+    // act
+    float[] tweenValues = component.getTweenValues(tweenType);
+
+    // assert
+    assertArrayEquals(expectedValues, tweenValues);
+  }
+
+  @ParameterizedTest
+  @MethodSource("getTweenValuesOpacityArguments")
+  void testGetTweenValuesOpacity(Color bg1, Color bg2, Color fg, Color border, Color shadow, float[] expectedValues){
+    // arrange
+    TestComponent component = new TestComponent(10, 15, 50, 75);
+    component.getCurrentAppearance().setBackgroundColor1(bg1);
+    component.getCurrentAppearance().setBackgroundColor2(bg2);
+    component.getCurrentAppearance().setForeColor(fg);
+    component.getCurrentAppearance().setBorderColor(border);
+    component.setTextShadowColor(shadow);
+
+    // act
+    float[] tweenValues = component.getTweenValues(TweenType.OPACITY);
+
+    // assert
+    assertArrayEquals(expectedValues, tweenValues);
+  }
+
+  @Test
+  void testSetTweenValuesOpacity(){
+    // arrange
+    TestComponent component = new TestComponent(10, 15, 50, 75);
+    component.getCurrentAppearance().setBackgroundColor1(Color.RED);
+    component.getCurrentAppearance().setBackgroundColor2(Color.GREEN);
+    component.getCurrentAppearance().setForeColor(Color.BLUE);
+    component.getCurrentAppearance().setBorderColor(Color.YELLOW);
+    component.setTextShadowColor(Color.PINK);
+
+    // act
+    component.setTweenValues(TweenType.OPACITY, new float[] {128f, 128f, 128f, 128f, 128f});
+
+    // assert
+    Appearance appearance = component.getCurrentAppearance();
+
+    assertTrue(new Color(255, 0, 255, 128).equals(appearance.getBackgroundColor1()));
+    assertTrue(new Color(0, 255, 0, 128).equals(appearance.getBackgroundColor2()));
+    assertTrue(new Color(0, 0, 0, 128).equals(appearance.getForeColor()));
+    assertTrue(new Color(255, 255, 255, 128).equals(appearance.getBorderColor()));
+    assertTrue(new Color(255, 175, 255, 128).equals(component.getTextShadowColor()));
+  }
+
+  @Test
+  void testSetTweenValuesOpacityNull(){
+    // arrange
+    TestComponent component = new TestComponent(10, 15, 50, 75);
+    component.getCurrentAppearance().setBackgroundColor1(null);
+    component.getCurrentAppearance().setBackgroundColor2(null);
+    component.getCurrentAppearance().setForeColor(null);
+    component.getCurrentAppearance().setBorderColor(null);
+    component.setTextShadowColor(null);
+
+    // act
+    component.setTweenValues(TweenType.OPACITY, new float[] {128f, 128f, 128f, 128f, 128f});
+
+    // assert
+    Appearance currentAppearance = component.getCurrentAppearance();
+
+    assertNull(currentAppearance.getBackgroundColor1());
+    assertNull(currentAppearance.getBackgroundColor2());
+    assertNull(currentAppearance.getForeColor());
+    assertNull(currentAppearance.getBorderColor());
+    assertNull(component.getTextShadowColor());
+  }
+
+  @SuppressWarnings("unused")
+  private static Stream<Arguments> getTweenValuesArguments(){
+    return Stream.of(
+            Arguments.of(TweenType.POSITION_X, new float[] {10f}),
+            Arguments.of(TweenType.POSITION_Y, new float[] {15f}),
+            Arguments.of(TweenType.POSITION_XY, new float[] {10f, 15f}),
+            Arguments.of(TweenType.SIZE_WIDTH, new float[] {50f}),
+            Arguments.of(TweenType.SIZE_HEIGHT, new float[] {75f}),
+            Arguments.of(TweenType.SIZE_BOTH, new float[] {50f, 75f}),
+            Arguments.of(TweenType.ANGLE, new float[] {0f}),
+            Arguments.of(TweenType.FONTSIZE, new float[] {10f}),
+            Arguments.of(TweenType.OPACITY, new float[] {0f, 0f, 255f, 0f, 0f}),
+            Arguments.of(TweenType.UNDEFINED, new float[] {})
+    );
+  }
+
+  @SuppressWarnings("unused")
+  private static Stream<Arguments> getTweenValuesOpacityArguments(){
+    return Stream.of(
+            Arguments.of(null, null, null, null, null, new float[] {0f, 0f, 0f, 0f, 0f}),
+            Arguments.of(Color.RED, Color.GREEN, Color.BLUE, Color.PINK, Color.YELLOW, new float[] {255f, 255f, 255f, 255f, 255f})
+    );
   }
 
   private static MouseEvent createTestEvent(int x, int y) {
