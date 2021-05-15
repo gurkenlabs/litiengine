@@ -9,6 +9,8 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
+import java.awt.geom.RectangularShape;
+import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.stream.Stream;
 import javax.swing.JLabel;
@@ -344,6 +346,39 @@ public class GuiComponentTests {
 
     // assert
     assertEquals(expectedText, actualText);
+  }
+
+  @Test
+  void testGetShape(){
+    // arrange
+    TestComponent component = new TestComponent(10, 15, 50, 75);
+
+    // act
+    RectangularShape shape = component.getShape();
+
+    // assert
+    assertEquals(10, shape.getX());
+    assertEquals(15, shape.getY());
+    assertEquals(50, shape.getWidth());
+    assertEquals(75, shape.getHeight());
+  }
+
+  @Test
+  void testGetShapeRadius(){
+    // arrange
+    TestComponent component = new TestComponent(10, 15, 50, 75);
+    component.getCurrentAppearance().setBorderRadius(5f);
+
+    // act
+    RoundRectangle2D shape = (RoundRectangle2D)component.getShape();
+
+    // assert
+    assertEquals(10, shape.getX());
+    assertEquals(15, shape.getY());
+    assertEquals(50, shape.getWidth());
+    assertEquals(75, shape.getHeight());
+    assertEquals(5, shape.getArcHeight());
+    assertEquals(5, shape.getArcWidth());
   }
 
   @SuppressWarnings("unused")
