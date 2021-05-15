@@ -25,19 +25,10 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     
-    - name: Build and Create JavaDocs
+    - name: Gradle Fullbuild
       uses: GabrielBB/xvfb-action@v1
       with:
-        run: ./gradlew createJavadocs
-      
-    - name: Run Tests
-      run: ./gradlew test
-    
-    - name: Save Test Reports
-      run: ./gradlew jacocoTestReport
-      
-    - name: Build utiLITI
-      run: ./gradlew distZip    
+        run: ./gradlew fullbuild
     
     - name: Maven repo and sonar cache
       uses: actions/cache@v2
