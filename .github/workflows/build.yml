@@ -14,10 +14,8 @@ on:
 jobs:
   fullbuild:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        java: [ '8', '15' ]
-    name: Java ${{ matrix.Java }} build
+
+    name: Java 8 build
     steps:
       - uses: actions/checkout@v2
 
@@ -29,11 +27,11 @@ jobs:
             ~/.gradle/wrapper/'
           key: ${{ runner.os }}-gradle_cache
 
-      - name: Set up JDK ${{ matrix.Java }}
+      - name: Set up JDK 8
         uses: actions/setup-java@v2
         with:
           distribution: 'adopt'
-          java-version: ${{ matrix.java }}
+          java-version: '8'
 
       - name: Install D-BUS AT-SPI core
         run: sudo apt-get -y install at-spi2-core
