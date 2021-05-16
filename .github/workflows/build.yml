@@ -52,6 +52,7 @@ jobs:
   sonarcloud:
     runs-on:
       ubuntu-latest
+    name: Static Analysis
     steps:
       - uses: actions/checkout@v2
         with:
