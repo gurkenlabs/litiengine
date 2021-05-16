@@ -7,7 +7,7 @@ on:
       - "**.properties"
       - "**.java"
       - "**.xml"
-      - ".github/workflows/gradle.yml"
+      - ".github/workflows/*.yml"
   pull_request:
     branches: [ master ]
 
@@ -16,6 +16,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+
+    - name: Gradle cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.gradle/caches/'
+          ~/.gradle/wrapper/'
+        key: ${{ runner.os }}-gradle_cache
+
     - name: Set up JDK 8
       uses: actions/setup-java@v2
       with:
@@ -35,20 +44,7 @@ jobs:
       uses: GabrielBB/xvfb-action@v1
       with:
         run: ./gradlew fullbuild
-    
-    - name: Maven repo and sonar cache
-      uses: actions/cache@v2
-      with:
-        path: |
-          ~/.m2/repository'
-          ~/.sonar/cache'
-        key: ${{ runner.os }}-mvn_sonar_cache
 
-    - name: Gradle cache
-      uses: actions/cache@v2
-      with:
-        path: |
-          ~/.gradle/caches/'
-          ~/.gradle/wrapper/'
-        key: ${{ runner.os }}-gradle_cache
+
+
         
