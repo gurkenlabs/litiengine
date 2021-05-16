@@ -1,7 +1,7 @@
+name: Build
+
 on:
   push:
-    branches:
-      - master
     paths:
       - "**.gradle"
       - "**.properties"
@@ -9,11 +9,49 @@ on:
       - "**.xml"
       - ".github/workflows/*.yml"
   pull_request:
-    types: [opened, synchronize, reopened]
-name: Static Analysis
+    branches: [ master ]
+
 jobs:
-  sonarcloud:
+  fullbuild:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [ '8', '15' ]
+    name: Java ${{ matrix.Java }} build
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Gradle cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches/'
+            ~/.gradle/wrapper/'
+          key: ${{ runner.os }}-gradle_cache
+
+      - name: Set up JDK ${{ matrix.Java }}
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: ${{ matrix.java }}
+
+      - name: Install D-BUS AT-SPI core
+        run: sudo apt-get -y install at-spi2-core
+
+      - name: Check Java Directory
+        run: echo $JAVA_HOME
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Gradle Fullbuild
+        uses: GabrielBB/xvfb-action@v1
+        with:
+          run: ./gradlew fullbuild
+
+  sonarcloud:
+    runs-on:
+      ubuntu-latest
     steps:
       - uses: actions/checkout@v2
         with:
@@ -49,3 +87,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+
