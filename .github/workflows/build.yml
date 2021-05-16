@@ -48,24 +48,19 @@ jobs:
         uses: GabrielBB/xvfb-action@v1
         with:
           run: ./gradlew fullbuild
-      
+
       - name: Set up JDK 15 for static analysis
-        if: ${{env.GITHUB_REPOSITORY == 'gurkenlabs/litiengine'}}
         uses: actions/setup-java@v2
         with:
           java-version: '15'
           distribution: 'adopt'
-          
+
       - name: Gradle SonarQube Scan
-        if: ${{env.GITHUB_REPOSITORY == 'gurkenlabs/litiengine'}}
         uses: GabrielBB/xvfb-action@v1
         with:
           run: ./gradlew sonarqube
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-
-
 
 
