@@ -83,7 +83,8 @@ jobs:
 
       - name: Gradle SonarQube Scan
         uses: GabrielBB/xvfb-action@v1
-        run: ./gradlew test jacocoTestReport sonarqube
+        with:
+          run: ./gradlew test jacocoTestReport sonarqube
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
