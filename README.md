@@ -3,7 +3,7 @@
 **LITIENGINE** is a free and open source Java 2D Game Engine. It provides a comprehensive Java library and a dedicated map editor to create tile-based 2D games.
 
 [![Build](https://github.com/gurkenlabs/litiengine/actions/workflows/build.yml/badge.svg)](https://github.com/gurkenlabs/litiengine/actions/workflows/build.yml)
-[![Coverage](https://img.shields.io/sonar/coverage/de.gurkenlabs:litiengine?server=https%3A%2F%2Fsonarcloud.io&style=flat-square)](https://sonarcloud.io/dashboard?id=de.gurkenlabs%3Alitiengine)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=de.gurkenlabs%3Alitiengine&metric=coverage)](https://sonarcloud.io/dashboard?id=de.gurkenlabs%3Alitiengine)
 [![Maven Central](https://img.shields.io/maven-central/v/de.gurkenlabs/litiengine.svg?style=flat-square)](https://maven-badges.herokuapp.com/maven-central/de.gurkenlabs/litiengine)
 [![MIT License](https://img.shields.io/github/license/gurkenlabs/litiengine?style=flat-square)](https://github.com/gurkenlabs/litiengine/blob/master/LICENSE)
 [![Discord chat](https://img.shields.io/discord/326074836508213258?style=flat-square&logo=discord)](https://discord.gg/rRB9cKD)
