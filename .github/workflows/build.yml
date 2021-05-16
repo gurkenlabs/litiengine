@@ -82,6 +82,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Gradle SonarQube Scan
+        uses: GabrielBB/xvfb-action@v1
         run: ./gradlew test jacocoTestReport sonarqube
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
