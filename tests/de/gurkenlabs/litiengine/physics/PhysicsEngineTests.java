@@ -42,7 +42,7 @@ public class PhysicsEngineTests {
     @MethodSource("getRaycastCollisionArguments")
     void testRaycastCollision(Line2D rayLine, double expectedHitX, double expectedHitY){
         // arrange
-        ICollisionEntity collisionBox1 = new CollisionBox(1, 3, 5, 5);
+        ICollisionEntity collisionBox1 = new CollisionBox(1, 1, 5, 5);
         ICollisionEntity collisionBox2 = new CollisionBox(7, 5, 1, 4);
 
         Game.physics().add(collisionBox1);
@@ -237,8 +237,8 @@ public class PhysicsEngineTests {
     @SuppressWarnings("unused")
     private static Stream<Arguments> getRaycastCollisionArguments(){
         return Stream.of(
-                Arguments.of(new Line2D.Double(0, 0, 10, 10), 7, 7),
-                Arguments.of(new Line2D.Double(10, 10, 0, 0), 8, 8)
+                Arguments.of(new Line2D.Double(3.5d, 3.5d, 10, 10), 7, 7),
+                Arguments.of(new Line2D.Double(10, 10, 3.5, 3.5d), 8, 8)
         );
     }
 }
