@@ -67,24 +67,50 @@ public class FileUtilitiesTests {
     }
 
     @Test
-    void testFindFilesByExtension() throws IOException {
+    void testFindFilesByExtensionDirectory() throws IOException {
         // arrange
-        Path directory1 = Files.createDirectories(tempPath.resolve("test"));
-        Path directory2 = Files.createDirectories(tempPath.resolve("\\bin"));
-
-        Files.createFile(tempPath.resolve("file1.txt"));
-        Path file2 = Files.createFile(tempPath.resolve("file2.pdf"));
-        Path file3 = Files.createFile(directory1.resolve("file3.pdf"));
-        Files.createFile(directory2.resolve("file4.pdf"));
+        Files.createFile(tempPath.resolve("notToBeFound.pdf"));
+        Path testFile = Files.createFile(tempPath.resolve("test.txt"));
 
         List<String> fileNames = new LinkedList<>(Collections.emptyList());
-        List<String> expectedFile = new LinkedList<>(Arrays.asList(file3.toAbsolutePath().toString(), file2.toAbsolutePath().toString()));
+        List<String> expectedFiles = new LinkedList<>(Collections.singletonList(testFile.toAbsolutePath().toString()));
 
         // act
-        List<String> actualFile = FileUtilities.findFilesByExtension(fileNames, tempPath, "pdf");
+        List<String> actualFiles = FileUtilities.findFilesByExtension(fileNames, tempPath, "txt");
 
         // assert
-        assertTrue(expectedFile.size() == actualFile.size() && expectedFile.containsAll(actualFile) && actualFile.containsAll(expectedFile));
+        assertEquals(expectedFiles, actualFiles);
+    }
+
+    @Test
+    void testFindFilesByExtensionSubDirectory() throws IOException {
+        // arrange
+        Path subDirectory = Files.createDirectories(tempPath.resolve("test"));
+        Path textFileSub = Files.createFile(subDirectory.resolve("test.txt"));
+
+        List<String> fileNames = new LinkedList<>(Collections.emptyList());
+        List<String> expectedFiles = new LinkedList<>(Collections.singletonList(textFileSub.toAbsolutePath().toString()));
+
+        // act
+        List<String> actualFiles = FileUtilities.findFilesByExtension(fileNames, tempPath, "txt");
+
+        // assert
+        assertEquals(expectedFiles, actualFiles);
+    }
+
+    @Test
+    void testFindFilesByExtensionBlackListedDirectory() throws IOException {
+        //arrange
+        Path blackListedDir = Files.createDirectories(tempPath.resolve("\\bin"));
+        Files.createFile(blackListedDir.resolve("test.txt"));
+
+        List<String> fileNames = new LinkedList<>(Collections.emptyList());
+
+        //act
+        List<String> actualFiles = FileUtilities.findFilesByExtension(fileNames, tempPath, "txt");
+
+        //assert
+        assertEquals(0, actualFiles.size());
     }
 
     @ParameterizedTest(name = "testCombinePaths path1={0}, path2={1}, expectedValue={2}")
