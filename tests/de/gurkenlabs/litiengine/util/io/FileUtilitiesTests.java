@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -21,6 +22,9 @@ public class FileUtilitiesTests {
 
   @TempDir
   File tempDir;
+
+  @TempDir
+  Path tempPath;
 
   @Test
   public void testDeleteNoneDir(){
@@ -55,20 +59,24 @@ public class FileUtilitiesTests {
   }
 
   @Test
-  void testFindFilesByExtension(@TempDir Path tempDir) throws IOException {
+  void testFindFilesByExtension() throws IOException {
+    // arrange
+    Path directory1 = Files.createDirectories(tempPath.resolve("test"));
+    Path directory2 = Files.createDirectories(tempPath.resolve("\\bin"));
 
-    Path directory1 = Files.createDirectories(tempDir.resolve("test"));
-    Path directory2 = Files.createDirectories(tempDir.resolve("\\bin"));
-
-    Path file1 = Files.createFile(tempDir.resolve("file1.txt"));
-    Path file2 = Files.createFile(tempDir.resolve("file2.pdf"));
+    Files.createFile(tempPath.resolve("file1.txt"));
+    Path file2 = Files.createFile(tempPath.resolve("file2.pdf"));
     Path file3 = Files.createFile(directory1.resolve("file3.pdf"));
-    Path file4 = Files.createFile(directory2.resolve("file4.pdf"));
+    Files.createFile(directory2.resolve("file4.pdf"));
 
-    List<String> fileNames = new LinkedList<>(Arrays.asList());
+    List<String> fileNames = new LinkedList<>(Collections.emptyList());
     List<String> expectedFile = new LinkedList<>(Arrays.asList(file3.toAbsolutePath().toString(), file2.toAbsolutePath().toString()));
 
-    assertEquals(expectedFile, FileUtilities.findFilesByExtension(fileNames, tempDir, "pdf"));
+    // act
+    List<String> actualFile = FileUtilities.findFilesByExtension(fileNames, tempPath, "pdf");
+
+    // assert
+    assertTrue(expectedFile.size() == actualFile.size() && expectedFile.containsAll(actualFile) && actualFile.containsAll(expectedFile));
   }
 
   @ParameterizedTest(name = "testCombinePaths path1={0}, path2={1}, expectedValue={2}")
@@ -224,6 +232,4 @@ public class FileUtilitiesTests {
             Arguments.of(1000000000000000000l, false, "888.2 PiB")
     );
   }
-
-
 }
