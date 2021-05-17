@@ -42,14 +42,14 @@ public class PhysicsEngineTests {
     @MethodSource("getRaycastCollisionArguments")
     void testRaycastCollision(Line2D rayLine, double expectedHitX, double expectedHitY){
         // arrange
-        ICollisionEntity collisionBox1 = new CollisionBox(1, 1, 5, 5);
-        ICollisionEntity collisionBox2 = new CollisionBox(7, 5, 1, 4);
+        ICollisionEntity sourceEntity = new CollisionBox(1, 1, 5, 5);
+        ICollisionEntity targetEntity = new CollisionBox(7, 5, 1, 4);
 
-        Game.physics().add(collisionBox1);
-        Game.physics().add(collisionBox2);
+        Game.physics().add(sourceEntity);
+        Game.physics().add(targetEntity);
 
         // act
-        RaycastHit hit = Game.physics().raycast(rayLine, Collision.ANY, collisionBox1);
+        RaycastHit hit = Game.physics().raycast(rayLine, Collision.ANY, sourceEntity);
 
         // assert
         assertNotNull(hit);
@@ -60,12 +60,12 @@ public class PhysicsEngineTests {
     @Test
     void testRaycastNoCollisionNoOtherEntity(){
         // arrange
-        ICollisionEntity collisionBox = new CollisionBox(1, 3, 5, 5);
+        ICollisionEntity sourceEntity = new CollisionBox(1, 3, 5, 5);
         Line2D line = new Line2D.Double(0, 0, 10, 10);
-        Game.physics().add(collisionBox);
+        Game.physics().add(sourceEntity);
 
         // act
-        RaycastHit hit = Game.physics().raycast(line, Collision.ANY, collisionBox);
+        RaycastHit hit = Game.physics().raycast(line, Collision.ANY, sourceEntity);
 
         // assert
         assertNull(hit);
@@ -74,14 +74,14 @@ public class PhysicsEngineTests {
     @Test
     void testRaycastNoCollisionOtherEntity(){
         // arrange
-        ICollisionEntity collisionBox1 = new CollisionBox(1, 3, 5, 5);
-        ICollisionEntity collisionBox2 = new CollisionBox(10, 30, 5, 5);
+        ICollisionEntity sourceEntity = new CollisionBox(1, 3, 5, 5);
+        ICollisionEntity otherEntity = new CollisionBox(10, 30, 5, 5);
         Line2D line = new Line2D.Double(0, 0, 10, 10);
-        Game.physics().add(collisionBox1);
-        Game.physics().add(collisionBox2);
+        Game.physics().add(sourceEntity);
+        Game.physics().add(otherEntity);
 
         // act
-        RaycastHit hit = Game.physics().raycast(line, Collision.ANY, collisionBox1);
+        RaycastHit hit = Game.physics().raycast(line, Collision.ANY, sourceEntity);
 
         // assert
         assertNull(hit);
@@ -102,9 +102,9 @@ public class PhysicsEngineTests {
     @Test
     void testRaycastLine2DHit(){
         // arrange
-        ICollisionEntity collisionBox = new CollisionBox(1, 3, 5, 5);
+        ICollisionEntity targetEntity = new CollisionBox(1, 3, 5, 5);
         Line2D line = new Line2D.Double(0, 0, 10, 10);
-        Game.physics().add(collisionBox);
+        Game.physics().add(targetEntity);
 
         // act
         RaycastHit hit = Game.physics().raycast(line);
@@ -130,10 +130,10 @@ public class PhysicsEngineTests {
     @Test
     void testRaycastPoint2DPoint2DHit(){
         // arrange
-        ICollisionEntity collisionBox = new CollisionBox(1, 3, 5, 5);
+        ICollisionEntity targetEntity = new CollisionBox(1, 3, 5, 5);
         Point2D point1 = new Point2D.Double(0, 0);
         Point2D point2 = new Point2D.Double(10, 10);
-        Game.physics().add(collisionBox);
+        Game.physics().add(targetEntity);
 
         // act
         RaycastHit hit = Game.physics().raycast(point1, point2);
@@ -146,8 +146,8 @@ public class PhysicsEngineTests {
     @Test
     void testRaycastPoint2DAngleHit(){
         // arrange
-        ICollisionEntity collisionBox = new CollisionBox(1, 3, 5, 5);
-        Game.physics().add(collisionBox);
+        ICollisionEntity targetEntity = new CollisionBox(1, 3, 5, 5);
+        Game.physics().add(targetEntity);
         Game.physics().setBounds(new Rectangle2D.Double(0, 0, 100, 100));
         Point2D source = new Point2D.Double(0, 10);
 
@@ -162,8 +162,8 @@ public class PhysicsEngineTests {
     @Test
     void testRaycastPoint2DAngleNoHit(){
         // arrange
-        ICollisionEntity collisionBox = new CollisionBox(1, 3, 5, 5);
-        Game.physics().add(collisionBox);
+        ICollisionEntity otherEntity = new CollisionBox(1, 3, 5, 5);
+        Game.physics().add(otherEntity);
         Game.physics().setBounds(new Rectangle2D.Double(0, 0, 100, 100));
         Point2D source = new Point2D.Double(0, 10);
 
@@ -177,8 +177,8 @@ public class PhysicsEngineTests {
     @Test
     void testRaycastLine2DCollisionHit(){
         // arrange
-        ICollisionEntity collisionBox = new CollisionBox(1, 3, 5, 5);
-        Game.physics().add(collisionBox);
+        ICollisionEntity targetEntity = new CollisionBox(1, 3, 5, 5);
+        Game.physics().add(targetEntity);
         Line2D line = new Line2D.Double(0, 0, 20, 20);
 
         // act
@@ -192,8 +192,8 @@ public class PhysicsEngineTests {
     @Test
     void testRaycastLine2DCollisionNoHit(){
         // arrange
-        ICollisionEntity collisionBox = new CollisionBox(8, 1, 5, 5);
-        Game.physics().add(collisionBox);
+        ICollisionEntity otherEntity = new CollisionBox(8, 1, 5, 5);
+        Game.physics().add(otherEntity);
         Line2D line = new Line2D.Double(0, 0, 20, 20);
 
         // act
@@ -206,13 +206,13 @@ public class PhysicsEngineTests {
     @Test
     void testRaycastLine2DEntityHit(){
         // arrange
-        ICollisionEntity entity = new CollisionBox(1, 3, 5, 5);
+        ICollisionEntity sourceEntity = new CollisionBox(1, 3, 5, 5);
         Line2D line = new Line2D.Double(0, 10, 10, 0);
-        ICollisionEntity collisionBox = new CollisionBox(8, 1, 5, 5);
-        Game.physics().add(collisionBox);
+        ICollisionEntity targetEntity = new CollisionBox(8, 1, 5, 5);
+        Game.physics().add(targetEntity);
 
         // act
-        RaycastHit hit = Game.physics().raycast(line, entity);
+        RaycastHit hit = Game.physics().raycast(line, sourceEntity);
 
         // assert
         assertEquals(8, hit.getPoint().getX());
@@ -222,13 +222,13 @@ public class PhysicsEngineTests {
     @Test
     void testRaycastLine2DEntityNoHit(){
         // arrange
-        ICollisionEntity entity = new CollisionBox(1, 3, 5, 5);
+        ICollisionEntity sourceEntity = new CollisionBox(1, 3, 5, 5);
         Line2D line = new Line2D.Double(0, 10, 10, 0);
-        ICollisionEntity collisionBox = new CollisionBox(18, 1, 5, 5);
-        Game.physics().add(collisionBox);
+        ICollisionEntity otherEntity = new CollisionBox(18, 1, 5, 5);
+        Game.physics().add(otherEntity);
 
         // act
-        RaycastHit hit = Game.physics().raycast(line, entity);
+        RaycastHit hit = Game.physics().raycast(line, sourceEntity);
 
         // assert
         assertNull(hit);
