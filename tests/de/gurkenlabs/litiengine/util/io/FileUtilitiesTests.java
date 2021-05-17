@@ -1,14 +1,81 @@
 package de.gurkenlabs.litiengine.util.io;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.io.File;
 
-import java.util.stream.Stream;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+
 public class FileUtilitiesTests {
+
+  @TempDir
+  File tempDir;
+
+  @Test
+  public void testDeleteNoneDir(){
+    File dir = new File("/test/test2/");
+    assertFalse(FileUtilities.deleteDir(dir));
+  }
+
+  @Test
+  public void testDeleteExistingDirZeroChildren() throws IOException {
+    assertTrue(FileUtilities.deleteDir(tempDir));
+  }
+
+  @Test
+  public void testDeleteExistingDir() throws IOException {
+    File file1 = new File(tempDir, "file1.txt");
+    file1.createNewFile();
+    assertTrue(FileUtilities.deleteDir(tempDir));
+  }
+
+  @Test
+  public void testDeleteExistingDirNewFiles() throws IOException {
+    File file1 = new File(tempDir, "file1.txt");
+    file1.createNewFile();
+    File file2 = new File(tempDir, "file2.txt");
+    file2.createNewFile();
+    assertTrue(FileUtilities.deleteDir(tempDir));
+  }
+
+  @Test
+  public void testDeleteExistingDirNoChildren() {
+    assertFalse(FileUtilities.deleteDir(new File("")));
+  }
+
+  @Test
+  void testFindFilesByExtension(@TempDir Path tempDir) throws IOException {
+
+    Path directory1 = Files.createDirectories(tempDir.resolve("test"));
+    Path directory2 = Files.createDirectories(tempDir.resolve("\\bin"));
+
+    Path file1 = Files.createFile(tempDir.resolve("file1.txt"));
+    Path file2 = Files.createFile(tempDir.resolve("file2.pdf"));
+    Path file3 = Files.createFile(directory1.resolve("file3.pdf"));
+    Path file4 = Files.createFile(directory2.resolve("file4.pdf"));
+
+    List<String> fileNames = new LinkedList<>(Arrays.asList());
+    List<String> expectedFile = new LinkedList<>(Arrays.asList(file3.toAbsolutePath().toString(), file2.toAbsolutePath().toString()));
+
+    assertEquals(expectedFile, FileUtilities.findFilesByExtension(fileNames, tempDir, "pdf"));
+  }
 
   @ParameterizedTest(name = "testCombinePaths path1={0}, path2={1}, expectedValue={2}")
   @MethodSource("getCombinedPaths")
@@ -163,4 +230,6 @@ public class FileUtilitiesTests {
             Arguments.of(1000000000000000000l, false, "888.2 PiB")
     );
   }
+
+
 }
