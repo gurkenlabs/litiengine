@@ -43,6 +43,15 @@ public class EntityNavigator implements IUpdateable, IRenderable {
     Game.loop().attach(this);
   }
 
+  /**
+   * Instantiates a new entity navigator without a pre-initialized PathFinder.
+   *
+   * @param entity The entity that will be navigated by this instance
+   */
+  public EntityNavigator(final IMobileEntity entity) {
+    this(entity, null);
+  }
+
   public void addNavigationListener(NavigationListener listener) {
     this.listeners.add(listener);
   }
