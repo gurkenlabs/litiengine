@@ -56,6 +56,7 @@ jobs:
           distribution: 'adopt'
 
       - name: Gradle SonarQube Scan
+        if: ${{ !github.event.pull_request.head.repo.fork}}   
         uses: GabrielBB/xvfb-action@v1
         with:
           run: ./gradlew sonarqube
