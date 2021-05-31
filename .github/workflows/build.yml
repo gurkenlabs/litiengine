@@ -62,7 +62,7 @@ jobs:
         uses: GabrielBB/xvfb-action@v1
         with:
           run: |
-            echo github.event.push.repository.fork
+            echo ${{ github.event.push.repository.fork }}
             ./gradlew sonarqube
           
           
