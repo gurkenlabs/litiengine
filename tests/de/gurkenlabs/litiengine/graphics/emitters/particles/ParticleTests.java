@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.graphics.emitters.particles;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -14,6 +15,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.GameTest;
 import de.gurkenlabs.litiengine.GameTime;
 import de.gurkenlabs.litiengine.physics.Collision;
 import de.gurkenlabs.litiengine.physics.PhysicsEngine;
@@ -21,6 +23,9 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -31,6 +36,16 @@ public class ParticleTests {
 
   private Particle particle;
 
+  @BeforeAll
+  public static void setup() {
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
+  }
+
+  @AfterAll
+  public static void terminateGame() {
+    GameTest.terminateGame();
+  }
+
   @BeforeEach
   public void setUp() {
     // arrange
@@ -38,10 +53,17 @@ public class ParticleTests {
   }
 
   @Test
+  public void initializeParticleTypes() {
+    assertDoesNotThrow(() -> new RectangleParticle(10, 10));
+    assertDoesNotThrow(() -> new LineParticle(10, 10));
+    assertDoesNotThrow(() -> new TextParticle(null));
+    assertDoesNotThrow(() -> new TextParticle("test"));
+  }
+
+  @Test
   public void testUpdate_hasCollision() {
     // arrange
     Particle testParticle = spy(particle);
-    Game.init(Game.COMMANDLINE_ARG_NOGUI);
 
     // act
     testParticle.update(new Point2D.Double(1, 1), 1.2f);
@@ -56,9 +78,8 @@ public class ParticleTests {
   public void testUpdate_ttlExpired() {
     // arrange
     Particle testParticle = spy(particle);
-    when(testParticle.getAliveTime()).thenReturn(100000l);
+    when(testParticle.getAliveTime()).thenReturn(100000L);
     when(testParticle.getTimeToLive()).thenReturn(10);
-    Game.init(Game.COMMANDLINE_ARG_NOGUI);
 
     // act
     testParticle.update(new Point2D.Double(1, 1), 1.2f);
@@ -77,7 +98,6 @@ public class ParticleTests {
     testParticle.setY(42);
     testParticle.setVelocityX(5);
     testParticle.setVelocityY(10);
-    Game.init(Game.COMMANDLINE_ARG_NOGUI);
 
     // act
     testParticle.update(new Point2D.Double(1, 1), 1.2f);
@@ -95,7 +115,7 @@ public class ParticleTests {
     PhysicsEngine physicsEngine = mock(PhysicsEngine.class);
     GameTime gameTime = mock(GameTime.class);
     when(physicsEngine.collides(any(Line2D.class), any(Collision.class))).thenReturn(true);
-    when(gameTime.now()).thenReturn(100000l);
+    when(gameTime.now()).thenReturn(100000L);
 
     try (MockedStatic<Game> gameMockedStatic = mockStatic(Game.class)) {
       gameMockedStatic.when(Game::physics).thenReturn(physicsEngine);
@@ -175,5 +195,37 @@ public class ParticleTests {
 
     // assert
     assertFalse(result);
+  }
+
+  @Test
+  public void testDeltaSize() {
+    RectangleParticle part = new RectangleParticle(10, 10);
+    part.setCollisionType(Collision.NONE);
+    part.setDeltaHeight(0.1f);
+    part.setDeltaWidth(0.1f);
+
+    part.update(new Point2D.Double(0, 0), 1);
+
+    assertEquals(10.1f, part.getWidth());
+    assertEquals(10.1f, part.getHeight());
+  }
+
+  @Test
+  public void testDeltaLocation() {
+    RectangleParticle part = new RectangleParticle(10, 10);
+    part.setCollisionType(Collision.NONE);
+    part.setVelocityX(0.1f);
+    part.setVelocityY(0.1f);
+    part.setAccelerationX(0.01f);
+    part.setAccelerationY(0.01f);
+    part.update(new Point2D.Double(0, 0), 1);
+
+    assertEquals(0.1f, part.getX());
+    assertEquals(0.1f, part.getY());
+
+    part.update(new Point2D.Double(0, 0), 1);
+
+    assertEquals(0.21f, part.getX(), 0.0001);
+    assertEquals(0.21f, part.getY(), 0.0001);
   }
 }

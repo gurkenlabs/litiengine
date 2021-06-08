@@ -650,12 +650,22 @@ public class GeometricUtilities {
    * @return true, if successful
    */
   public static boolean shapeIntersects(final Shape shapeA, final Shape shapeB) {
+    // compute rough estimate of boundary intersection to avoid more costly checks if not intersecting
     if (!shapeA.getBounds2D().intersects(shapeB.getBounds2D())) {
       return false;
     }
 
     if (shapeA instanceof Rectangle2D && shapeB instanceof Rectangle2D) {
-      return ((Rectangle2D) shapeA).intersects((Rectangle2D) shapeB);
+      return intersects((Rectangle2D) shapeA, (Rectangle2D) shapeB) ;
+    }
+
+    if (shapeA instanceof Line2D) {
+      if (shapeB instanceof Line2D) {
+        return ((Line2D) shapeA).intersectsLine((Line2D) shapeB); // intersectsLine() not defined on Shape thus casting
+      }
+      return shapeA.intersects(shapeB.getBounds2D());
+    } else if (shapeB instanceof Line2D) {
+      return shapeB.intersects(shapeA.getBounds2D());
     }
 
     final Area areaA = new Area(shapeA);
