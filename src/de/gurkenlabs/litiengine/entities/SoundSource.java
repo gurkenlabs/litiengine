@@ -173,6 +173,9 @@ public class SoundSource extends Entity {
    * @see Sounds#get(String)
    */
   public void setSound(String name) {
+    if (name == null) {
+      return;
+    }
     this.sound = Resources.sounds().get(name);
   }
 
