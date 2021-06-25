@@ -225,6 +225,9 @@ public class SoundSource extends Entity {
    * @see SFXPlayback#cancel()
    */
   public void stop() {
-    this.getPlayback().cancel();
+    if (getPlayback() == null) {
+      return;
+    }
+    getPlayback().cancel();
   }
 }
