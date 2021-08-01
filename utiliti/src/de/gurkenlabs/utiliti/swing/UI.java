@@ -5,6 +5,8 @@ import com.github.weisj.darklaf.theme.IntelliJTheme;
 import com.github.weisj.darklaf.theme.OneDarkTheme;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameListener;
+import de.gurkenlabs.litiengine.environment.Environment;
+import de.gurkenlabs.litiengine.environment.EnvironmentListener;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.Cursors;
 import de.gurkenlabs.utiliti.Style;
@@ -165,6 +167,22 @@ public final class UI {
     ScrollHandlerBar horizontalScroll = new ScrollHandlerBar(java.awt.Adjustable.HORIZONTAL);
     ScrollHandlerBar verticalScroll = new ScrollHandlerBar(java.awt.Adjustable.VERTICAL);
 
+    EnvironmentListener environmentListener = new EnvironmentListener() {
+      @Override
+      public void loaded(Environment environment) {
+        boolean hasMap = environment != null && environment.getMap() != null;
+        horizontalScroll.setVisible(hasMap);
+        verticalScroll.setVisible(hasMap);
+      }
+
+      @Override
+      public void unloaded(Environment environment) {
+        horizontalScroll.setVisible(false);
+        verticalScroll.setVisible(false);
+      }
+    };
+    environmentListener.loaded(Game.world().environment());
+    Game.world().addListener(environmentListener);
     renderPane.add(horizontalScroll, BorderLayout.SOUTH);
     renderPane.add(verticalScroll, BorderLayout.EAST);
 
