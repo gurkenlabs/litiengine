@@ -18,6 +18,7 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.KeyStroke;
 
 @SuppressWarnings("serial")
@@ -29,20 +30,9 @@ public final class ViewMenu extends JMenu {
     JMenu themeMenu = new JMenu(Resources.strings().get("menu_view_theme"));
     ButtonGroup themegroup = new ButtonGroup();
     for (Theme theme : Theme.values()) {
-      JCheckBoxMenuItem menuItem =
-          new JCheckBoxMenuItem(
-              Resources.strings().get("menu_view_theme_" + theme.name().toLowerCase()));
-      menuItem.setState(Editor.preferences().getTheme() == theme);
-
-      ActionListener themeActionListener =
-          event -> {
-            JCheckBoxMenuItem box = (JCheckBoxMenuItem) event.getSource();
-            if (box == menuItem) {
-              UI.setTheme(theme);
-            }
-          };
-      menuItem.addActionListener(themeActionListener);
-
+      JRadioButtonMenuItem menuItem = new JRadioButtonMenuItem(Resources.strings().get("menu_view_theme_" + theme.name().toLowerCase()));
+      menuItem.setSelected(Editor.preferences().getTheme() == theme);
+      menuItem.addActionListener(e -> UI.setTheme(theme));
       themegroup.add(menuItem);
       themeMenu.add(menuItem);
     }
