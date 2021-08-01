@@ -93,13 +93,6 @@ public class AssetTree extends JTree {
     loadAssetsOfCurrentSelection(this.getSelectionPath());
   }
 
-  @Override
-  protected void setExpandedState(TreePath path, boolean state) {
-    if (state) {
-      super.setExpandedState(path, state);
-    }
-  }
-
   private void loadAssetsOfCurrentSelection(TreePath selectedPath) {
     if (selectedPath == null) {
       return;

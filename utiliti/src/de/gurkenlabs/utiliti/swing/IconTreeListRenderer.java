@@ -30,7 +30,6 @@ public class IconTreeListRenderer implements TreeCellRenderer {
 
   public IconTreeListRenderer() {
     this.label = new JLabel();
-    this.label.setBorder(DarkBorders.createLineBorder(1, 1, 1, 1));
   }
 
   @Override
@@ -44,7 +43,6 @@ public class IconTreeListRenderer implements TreeCellRenderer {
       boolean hasFocus) {
     this.label.setIcon(Icons.DEFAULT_NODE);
     this.label.setText(value.toString());
-
     if (value instanceof DefaultMutableTreeNode) {
       DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
       if (node.getUserObject() instanceof IconTreeListItem) {
