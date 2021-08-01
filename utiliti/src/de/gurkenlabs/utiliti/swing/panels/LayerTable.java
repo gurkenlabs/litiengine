@@ -28,7 +28,7 @@ public class LayerTable extends JTable {
     this.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     this.setRowSelectionAllowed(true);
     this.setColumnSelectionAllowed(false);
-    this.setModel(new DefaultTableModel(columns, 999));
+    this.setModel(new DefaultTableModel(columns, 0));
     this.getModel().addTableModelListener(e -> this.updateLayers());
     this.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
     this.getColumnModel().getColumn(0).setMaxWidth(50);
