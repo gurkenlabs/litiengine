@@ -1,5 +1,7 @@
 package de.gurkenlabs.utiliti.swing.controllers;
 
+import com.github.weisj.darklaf.components.OverlayScrollPane;
+import com.github.weisj.darklaf.ui.text.DarkTextUI;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.Entity;
 import de.gurkenlabs.litiengine.entities.IEntity;
@@ -16,8 +18,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.Rectangle;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -37,7 +36,6 @@ import javax.swing.tree.TreePath;
 
 @SuppressWarnings("serial")
 public final class EntityList extends JPanel implements EntityController {
-  private final JScrollPane entityScrollPane;
   private final JPanel searchPanel;
 
   // commands and search
@@ -66,11 +64,6 @@ public final class EntityList extends JPanel implements EntityController {
     this.setName(Resources.strings().get("panel_entities"));
     this.setLayout(new BorderLayout(0, 0));
 
-    this.entityScrollPane = new JScrollPane();
-    this.entityScrollPane.setViewportBorder(null);
-    this.entityScrollPane.setMinimumSize(new Dimension(150, 0));
-    this.entityScrollPane.setMaximumSize(new Dimension(0, 250));
-
     this.searchPanel = new JPanel();
     this.searchPanel.setLayout(new BorderLayout(0, 0));
 
@@ -82,30 +75,10 @@ public final class EntityList extends JPanel implements EntityController {
 
     final String entitySearchDefault = Resources.strings().get("panel_entities_search_default");
 
-    this.textField = new JTextField(entitySearchDefault);
-    this.textField.setOpaque(false);
+    this.textField = new JTextField();
+    this.textField.putClientProperty(DarkTextUI.KEY_DEFAULT_TEXT, entitySearchDefault);
     this.textField.setColumns(10);
     this.textField.addActionListener(e -> search());
-    this.textField.addFocusListener(
-        new FocusAdapter() {
-          @Override
-          public void focusGained(final FocusEvent e) {
-            if (textField.getText() != null && textField.getText().equals(entitySearchDefault)) {
-              textField.setText(null);
-            }
-
-            textField.selectAll();
-            super.focusGained(e);
-          }
-
-          @Override
-          public void focusLost(FocusEvent e) {
-            if (textField.getText() == null || textField.getText().isEmpty()) {
-              textField.setText(entitySearchDefault);
-            }
-            super.focusLost(e);
-          }
-        });
 
     this.btnSearch = new JButton("");
     this.btnSearch.setBorderPainted(false);
@@ -125,7 +98,6 @@ public final class EntityList extends JPanel implements EntityController {
     this.tree.setShowsRootHandles(true);
 
     this.tree.setCellRenderer(new IconTreeListRenderer());
-    this.tree.setMaximumSize(new Dimension(0, 250));
     this.tree.setRowHeight((int) (this.tree.getRowHeight() * Editor.preferences().getUiScale()));
 
     this.tree.addTreeSelectionListener(
@@ -228,8 +200,7 @@ public final class EntityList extends JPanel implements EntityController {
     tree.setModel(this.entitiesTreeModel);
     tree.addMouseListener(ml);
 
-    this.entityScrollPane.setViewportView(this.tree);
-    this.add(this.entityScrollPane);
+    this.add(new OverlayScrollPane(tree));
     this.add(this.searchPanel, BorderLayout.NORTH);
   }
 

@@ -21,65 +21,73 @@ public final class ResourcesMenu extends JMenu {
     compress.setState(Editor.preferences().compressFile());
     compress.addItemListener(e -> Editor.preferences().setCompressFile(compress.getState()));
 
+    JMenu importMenu = new JMenu(Resources.strings().get("menu_assets_import"));
+
     JMenuItem importSpriteFile =
         new JMenuItem(Resources.strings().get("menu_assets_importSpriteFile"));
     importSpriteFile.addActionListener(a -> Editor.instance().importSpriteFile());
     importSpriteFile.setEnabled(false);
 
-    JMenuItem importSprite = new JMenuItem(Resources.strings().get("menu_assets_importSprite"));
+    importMenu.add(importSpriteFile);
+
+    JMenuItem importSprite =
+        new JMenuItem(Resources.strings().get("menu_assets_importSprite"));
     importSprite.addActionListener(a -> Editor.instance().importSpriteSheets());
     importSprite.setEnabled(false);
+    importMenu.add(importSprite);
 
     JMenuItem importTextureAtlas =
         new JMenuItem(Resources.strings().get("menu_assets_importTextureAtlas"));
     importTextureAtlas.addActionListener(a -> Editor.instance().importTextureAtlas());
     importTextureAtlas.setEnabled(false);
+    importMenu.add(importTextureAtlas);
 
-    JMenuItem importEmitters = new JMenuItem(Resources.strings().get("menu_assets_importEmitters"));
+    JMenuItem importEmitters =
+        new JMenuItem(Resources.strings().get("menu_assets_importEmitters"));
     importEmitters.addActionListener(a -> Editor.instance().importEmitters());
     importEmitters.setEnabled(false);
+    importMenu.add(importEmitters);
 
     JMenuItem importBlueprints =
         new JMenuItem(Resources.strings().get("menu_assets_importBlueprints"));
     importBlueprints.addActionListener(a -> Editor.instance().importBlueprints());
     importBlueprints.setEnabled(false);
+    importMenu.add(importBlueprints);
 
-    JMenuItem importTilesets = new JMenuItem(Resources.strings().get("menu_assets_importTilesets"));
+    JMenuItem importTilesets =
+        new JMenuItem(Resources.strings().get("menu_assets_importTilesets"));
     importTilesets.addActionListener(a -> Editor.instance().importTilesets());
     importTilesets.setEnabled(false);
+    importMenu.add(importTilesets);
 
-    JMenuItem importSounds = new JMenuItem(Resources.strings().get("menu_assets_importSounds"));
+    JMenuItem importSounds =
+        new JMenuItem(Resources.strings().get("menu_assets_importSounds"));
     importSounds.addActionListener(a -> Editor.instance().importSounds());
     importSounds.setEnabled(false);
+    importMenu.add(importSounds);
+
+    JMenu exportMenu = new JMenu(Resources.strings().get("menu_assets_export"));
 
     JMenuItem exportSpriteSheets =
         new JMenuItem(Resources.strings().get("menu_export_spriteSheets"));
     exportSpriteSheets.setAccelerator(
         KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK));
     exportSpriteSheets.addActionListener(a -> Editor.instance().exportSpriteSheets());
+    exportMenu.add(exportSpriteSheets);
 
-    Editor.instance()
-        .onLoaded(
-            () -> {
-              importSpriteFile.setEnabled(Editor.instance().getCurrentResourceFile() != null);
-              importSprite.setEnabled(Editor.instance().getCurrentResourceFile() != null);
-              importTextureAtlas.setEnabled(Editor.instance().getCurrentResourceFile() != null);
-              importEmitters.setEnabled(Editor.instance().getCurrentResourceFile() != null);
-              importBlueprints.setEnabled(Editor.instance().getCurrentResourceFile() != null);
-              importTilesets.setEnabled(Editor.instance().getCurrentResourceFile() != null);
-              importSounds.setEnabled(Editor.instance().getCurrentResourceFile() != null);
-              exportSpriteSheets.setEnabled(Editor.instance().getCurrentResourceFile() != null);
-            });
+    Editor.instance().onLoaded(() -> {
+      importSpriteFile.setEnabled(Editor.instance().getCurrentResourceFile() != null);
+      importSprite.setEnabled(Editor.instance().getCurrentResourceFile() != null);
+      importTextureAtlas.setEnabled(Editor.instance().getCurrentResourceFile() != null);
+      importEmitters.setEnabled(Editor.instance().getCurrentResourceFile() != null);
+      importBlueprints.setEnabled(Editor.instance().getCurrentResourceFile() != null);
+      importTilesets.setEnabled(Editor.instance().getCurrentResourceFile() != null);
+      importSounds.setEnabled(Editor.instance().getCurrentResourceFile() != null);
+      exportSpriteSheets.setEnabled(Editor.instance().getCurrentResourceFile() != null);
+    });
 
-    this.add(importSprite);
-    this.add(importTextureAtlas);
-    this.add(importSpriteFile);
-    this.add(importEmitters);
-    this.add(importBlueprints);
-    this.add(importTilesets);
-    this.add(importSounds);
-    this.addSeparator();
-    this.add(exportSpriteSheets);
+    this.add(importMenu);
+    this.add(exportMenu);
     this.add(compress);
   }
 }

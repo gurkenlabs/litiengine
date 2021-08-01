@@ -1,6 +1,7 @@
 package de.gurkenlabs.utiliti.handlers;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.utiliti.components.Editor;
 import java.awt.geom.Point2D;
 import java.util.EventListener;
@@ -62,9 +63,9 @@ public final class Scroll {
     getVerticalHandler()
         .onScrolled(
             handler -> {
-              final double y =
-                  getScrollValue(
-                      handler, Game.world().environment().getMap().getSizeInPixels().height);
+              IMap map = Game.world().environment().getMap();
+              if (map == null) return;
+              final double y = getScrollValue(handler, map.getSizeInPixels().height);
 
               scroll(Game.world().camera().getFocus().getX(), y);
             });
@@ -72,9 +73,9 @@ public final class Scroll {
     getHorizontalHandler()
         .onScrolled(
             handler -> {
-              final double x =
-                  getScrollValue(
-                      handler, Game.world().environment().getMap().getSizeInPixels().width);
+              IMap map = Game.world().environment().getMap();
+              if (map == null) return;
+              final double x = getScrollValue(handler, map.getSizeInPixels().width);
 
               scroll(x, Game.world().camera().getFocus().getY());
             });
@@ -94,12 +95,12 @@ public final class Scroll {
     updating = true;
 
     try {
+      IMap map = Game.world().environment().getMap();
+      if (map == null) return;
       double relativeX =
-          Game.world().camera().getFocus().getX()
-              / Game.world().environment().getMap().getSizeInPixels().width;
+          Game.world().camera().getFocus().getX() / map.getSizeInPixels().width;
       double relativeY =
-          Game.world().camera().getFocus().getY()
-              / Game.world().environment().getMap().getSizeInPixels().height;
+          Game.world().camera().getFocus().getY() / map.getSizeInPixels().height;
 
       // decouple the scrollbar from the environment
       currentScrollSize =
