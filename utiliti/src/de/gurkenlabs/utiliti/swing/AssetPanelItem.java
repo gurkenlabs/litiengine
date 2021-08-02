@@ -1,5 +1,6 @@
 package de.gurkenlabs.utiliti.swing;
 
+import com.github.weisj.darklaf.components.border.DarkBorders;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.EmitterMapObjectLoader;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
@@ -23,11 +24,10 @@ import de.gurkenlabs.utiliti.swing.dialogs.SpritesheetImportPanel;
 import de.gurkenlabs.utiliti.swing.dialogs.XmlExportDialog;
 import de.gurkenlabs.utiliti.swing.panels.CreaturePanel;
 import de.gurkenlabs.utiliti.swing.panels.PropPanel;
-import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
@@ -45,6 +45,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -61,13 +63,16 @@ import javax.swing.border.Border;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-@SuppressWarnings("serial")
 public class AssetPanelItem extends JPanel {
   private static final Logger log = Logger.getLogger(AssetPanelItem.class.getName());
-  private static final Border normalBorder = BorderFactory.createEmptyBorder(1, 1, 1, 1);
+  private static final Border normalBorder = DarkBorders.createLineBorder(1, 1, 1, 1);
   private static final Border focusBorder =
       BorderFactory.createDashedBorder(
           UIManager.getDefaults().getColor("Tree.selectionBorderColor"));
+
+  private static final Dimension BUTTON_MIN = new Dimension(16, 16);
+  private static final Dimension BUTTON_MAX = new Dimension(64, 64);
+  private static final Dimension BUTTON_PREF = new Dimension(24, 24);
 
   private final JLabel iconLabel;
   private final JTextArea textField;
@@ -79,18 +84,14 @@ public class AssetPanelItem extends JPanel {
 
   private final transient Object origin;
 
-  public AssetPanelItem() {
-    this(null);
-  }
-
   public AssetPanelItem(Object origin) {
     setPreferredSize(new Dimension(100, 120));
     this.origin = origin;
-    this.setBorder(normalBorder);
+    setBorder(normalBorder);
 
-    this.getInputMap(JComponent.WHEN_FOCUSED)
+    getInputMap(JComponent.WHEN_FOCUSED)
         .put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deleteAsset");
-    this.getActionMap()
+    getActionMap()
         .put(
             "deleteAsset",
             new AbstractAction() {
@@ -105,7 +106,6 @@ public class AssetPanelItem extends JPanel {
           @Override
           public void focusGained(FocusEvent e) {
             setBorder(focusBorder);
-
             if (getOrigin() instanceof SpritesheetResource || getOrigin() instanceof EmitterData) {
               btnEdit.setVisible(true);
               btnAdd.setVisible(true);
@@ -132,7 +132,6 @@ public class AssetPanelItem extends JPanel {
           @Override
           public void focusLost(FocusEvent e) {
             setBorder(normalBorder);
-
             btnEdit.setVisible(false);
             btnAdd.setVisible(false);
             btnDelete.setVisible(false);
@@ -140,10 +139,10 @@ public class AssetPanelItem extends JPanel {
           }
         });
 
-    setLayout(new BorderLayout(0, 0));
-    this.setFocusable(true);
-    this.setRequestFocusEnabled(true);
-    this.addMouseListener(
+    setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+    setFocusable(true);
+    setRequestFocusEnabled(true);
+    addMouseListener(
         new MouseAdapter() {
           @Override
           public void mouseClicked(MouseEvent e) {
@@ -151,155 +150,90 @@ public class AssetPanelItem extends JPanel {
           }
         });
 
-    this.iconLabel = new JLabel("");
-    iconLabel.setPreferredSize(new Dimension(64, 64));
-    this.iconLabel.setSize(64, 64);
-    this.iconLabel.setMinimumSize(new Dimension(64, 64));
-    this.iconLabel.addMouseListener(
+    iconLabel = new JLabel();
+
+    JPanel iconAlignPanel = new JPanel();
+    iconAlignPanel.setLayout(new BoxLayout(iconAlignPanel, BoxLayout.X_AXIS));
+    iconAlignPanel.add(Box.createHorizontalGlue());
+    iconAlignPanel.add(iconLabel);
+    iconAlignPanel.add(Box.createHorizontalGlue());
+    iconAlignPanel.addMouseListener(
         new MouseAdapter() {
           @Override
           public void mouseClicked(MouseEvent e) {
             requestFocus();
-          }
-        });
-    add(this.iconLabel, BorderLayout.NORTH);
-
-    this.iconLabel.addMouseListener(
-        new MouseAdapter() {
-          @Override
-          public void mouseClicked(MouseEvent e) {
             if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e) && addEntity()) {
               e.consume();
             }
           }
         });
 
-    this.textField = new JTextArea();
+    textField = new JTextArea();
     textField.setWrapStyleWord(true);
     textField.setRows(2);
     textField.setLineWrap(true);
-    add(this.textField, BorderLayout.SOUTH);
-    this.textField.setColumns(10);
-    this.textField.setBorder(null);
-    this.textField.setEditable(false);
-
-    this.setMinimumSize(new Dimension(100, 100));
-
-    GridLayout buttonGridLayout = new GridLayout(0, 5, 0, 0);
-    buttonPanel = new JPanel(buttonGridLayout);
-    buttonPanel.setPreferredSize(new Dimension(100, 20));
-    buttonPanel.setMinimumSize(new Dimension(100, 20));
-    buttonPanel.setOpaque(false);
-    add(buttonPanel, BorderLayout.WEST);
-
-    btnAdd = new JButton("");
-    btnAdd.setToolTipText("Add Entity");
-    btnAdd.addActionListener(e -> this.addEntity());
-    btnAdd.setMaximumSize(new Dimension(16, 16));
-    btnAdd.setMinimumSize(new Dimension(16, 16));
-    btnAdd.setPreferredSize(new Dimension(16, 16));
-    btnAdd.setOpaque(false);
-    btnAdd.setIcon(Icons.ADD);
-    btnAdd.setVisible(false);
-    btnAdd.setEnabled(canAdd());
-
-    btnEdit = new JButton("");
-    btnEdit.setToolTipText("Edit Asset");
-    btnEdit.addActionListener(
-        e -> {
-          if (!(this.getOrigin() instanceof SpritesheetResource)) {
-            return;
+    textField.setColumns(10);
+    textField.setBorder(null);
+    textField.setEditable(false);
+    textField.addMouseListener(
+        new MouseAdapter() {
+          @Override
+          public void mouseClicked(MouseEvent e) {
+            requestFocus();
           }
-          SpritesheetImportPanel spritePanel =
-              new SpritesheetImportPanel((SpritesheetResource) this.getOrigin());
-          int option =
-              JOptionPane.showConfirmDialog(
-                  Game.window().getRenderComponent(),
-                  spritePanel,
-                  Resources.strings().get("menu_assets_editSprite"),
-                  JOptionPane.OK_CANCEL_OPTION,
-                  JOptionPane.PLAIN_MESSAGE);
-          if (option != JOptionPane.OK_OPTION) {
-            return;
-          }
-
-          final Collection<SpritesheetResource> sprites = spritePanel.getSpriteSheets();
-          for (SpritesheetResource spriteFile : sprites) {
-            int index = -1;
-            Optional<SpritesheetResource> old =
-                Editor.instance().getGameFile().getSpriteSheets().stream()
-                    .filter((x -> x.getName().equals(spriteFile.getName())))
-                    .findFirst();
-            if (old.isPresent()) {
-              index = Editor.instance().getGameFile().getSpriteSheets().indexOf(old.get());
-              Editor.instance().getGameFile().getSpriteSheets().remove(index);
-            }
-
-            Editor.instance()
-                .getGameFile()
-                .getSpriteSheets()
-                .removeIf(x -> x.getName().equals(spriteFile.getName()));
-            if (index != -1) {
-              Editor.instance().getGameFile().getSpriteSheets().add(index, spriteFile);
-            } else {
-              Editor.instance().getGameFile().getSpriteSheets().add(spriteFile);
-            }
-          }
-
-          Editor.instance()
-              .loadSpriteSheets(Editor.instance().getGameFile().getSpriteSheets(), true);
         });
-    btnEdit.setMaximumSize(new Dimension(16, 16));
-    btnEdit.setMinimumSize(new Dimension(16, 16));
-    btnEdit.setPreferredSize(new Dimension(16, 16));
-    btnEdit.setOpaque(false);
-    btnEdit.setIcon(Icons.PENCIL);
-    btnEdit.setVisible(false);
 
-    btnDelete = new JButton("");
-    btnDelete.setToolTipText("Delete Asset");
-    btnDelete.addActionListener(e -> this.deleteAsset());
-    btnDelete.setMaximumSize(new Dimension(16, 16));
-    btnDelete.setMinimumSize(new Dimension(16, 16));
-    btnDelete.setPreferredSize(new Dimension(16, 16));
-    btnDelete.setOpaque(false);
-    btnDelete.setIcon(Icons.DELETE);
-    btnDelete.setVisible(false);
+    buttonPanel = new JPanel();
+    buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+    buttonPanel.setOpaque(false);
 
-    btnExport = new JButton("");
-    btnExport.setToolTipText("Export Asset");
-    btnExport.addActionListener(e -> this.export());
-    btnExport.setMaximumSize(new Dimension(16, 16));
-    btnExport.setMinimumSize(new Dimension(16, 16));
-    btnExport.setPreferredSize(new Dimension(16, 16));
-    btnExport.setOpaque(false);
-    btnExport.setIcon(Icons.EXPORT);
-    btnExport.setVisible(false);
+    buttonPanel.add(Box.createHorizontalGlue());
+    btnAdd = new JButton();
+    initButton(btnAdd, "assetpanel_add", Icons.ADD, e -> this.addEntity());
+    btnAdd.setEnabled(canAdd());
+    btnEdit = new JButton();
+    initButton(btnEdit, "assetpanel_edit", Icons.PENCIL, e -> this.editAsset());
+    btnDelete = new JButton();
+    initButton(btnDelete, "assetpanel_delete", Icons.DELETE, e -> this.deleteAsset());
+    btnExport = new JButton();
+    initButton(btnExport, "assetpanel_export", Icons.EXPORT, e -> this.exportAsset());
+    buttonPanel.add(Box.createHorizontalGlue());
+    buttonPanel.addMouseListener(
+        new MouseAdapter() {
+          @Override
+          public void mouseClicked(MouseEvent e) {
+            requestFocus();
+          }
+        });
 
-    buttonPanel.add(btnEdit);
-    buttonPanel.add(btnAdd);
-    buttonPanel.add(btnDelete);
-    buttonPanel.add(btnExport);
+    add(iconAlignPanel);
+    add(textField);
+    add(buttonPanel);
   }
 
   public AssetPanelItem(Icon icon, String text, Object origin) {
     this(origin);
-    this.iconLabel.setHorizontalAlignment(SwingConstants.CENTER);
-    this.iconLabel.setIcon(icon);
-    this.textField.setText(text);
-    this.setToolTipText("Name: " + text + "\nDetails: " + origin);
-
+    iconLabel.setHorizontalAlignment(SwingConstants.CENTER);
+    iconLabel.setIcon(icon);
+    textField.setText(text);
+    setToolTipText(
+        String.format(
+            "%s:\t%s%n%s:\t%s",
+            Resources.strings().get("assetpanel_assetname"),
+            text,
+            Resources.strings().get("assetpanel_assetdetails"),
+            origin));
     StringBuilder sb = new StringBuilder();
-    sb.append("<html><b>Name:</b> ");
+    sb.append("<html>");
+    sb.append(String.format("<b>%s:</b>\t", Resources.strings().get("assetpanel_assetname")));
     sb.append(text);
     for (Map.Entry<String, String> entry : getDetails(origin).entrySet()) {
       sb.append("<br>");
-      sb.append(entry.getKey() + ": ");
+      sb.append(entry.getKey());
+      sb.append(":\t");
       sb.append(entry.getValue());
     }
-
     sb.append("</html>");
-
     String tooltip = sb.toString();
     for (Component component : this.getComponents()) {
       if (component instanceof JComponent) {
@@ -323,61 +257,52 @@ public class AssetPanelItem extends JPanel {
     return details;
   }
 
+  private void initButton(
+      JButton button, String tooltipStringIdentifier, Icon icon, ActionListener action) {
+    button.setToolTipText(Resources.strings().get(tooltipStringIdentifier));
+    button.setMinimumSize(BUTTON_MIN);
+    button.setMaximumSize(BUTTON_MAX);
+    button.setPreferredSize(BUTTON_PREF);
+    button.setOpaque(false);
+    button.setIcon(icon);
+    button.setVisible(false);
+    button.addActionListener(action);
+    buttonPanel.add(button);
+  }
+
   private void deleteAsset() {
     if (getOrigin() instanceof SpritesheetResource) {
       SpritesheetResource info = (SpritesheetResource) getOrigin();
-      int n =
-          JOptionPane.showConfirmDialog(
-              Game.window().getRenderComponent(),
-              "Do you really want to delete the spritesheet ["
-                  + info.getName()
-                  + "]?\n Entities that use the sprite won't be rendered anymore!",
-              "Delete Spritesheet?",
-              JOptionPane.YES_NO_OPTION);
+      int n = getDeleteDialog("spritesheet", info.getName());
 
       if (n == JOptionPane.OK_OPTION) {
         Editor.instance().getGameFile().getSpriteSheets().remove(getOrigin());
         Resources.images().clear();
         Resources.spritesheets().remove(info.getName());
         Editor.instance().getMapComponent().reloadEnvironment();
-
         UI.getAssetController().refresh();
       }
     } else if (getOrigin() instanceof EmitterData) {
       EmitterData emitter = (EmitterData) getOrigin();
-      int n =
-          JOptionPane.showConfirmDialog(
-              Game.window().getRenderComponent(),
-              "Do you really want to delete the emitter [" + emitter.getName() + "]",
-              "Delete Emitter?",
-              JOptionPane.YES_NO_OPTION);
+      int n = getDeleteDialog("emitter", emitter.getName());
 
       if (n == JOptionPane.OK_OPTION) {
         Editor.instance().getGameFile().getEmitters().remove(getOrigin());
         Editor.instance().getMapComponent().reloadEnvironment();
-
         UI.getAssetController().refresh();
       }
     } else if (getOrigin() instanceof Blueprint) {
       Blueprint blueprint = (Blueprint) getOrigin();
-      int n =
-          JOptionPane.showConfirmDialog(
-              Game.window().getRenderComponent(),
-              "Do you really want to delete the blueprint [" + blueprint.getName() + "]?",
-              "Delete Blueprint?",
-              JOptionPane.YES_NO_OPTION);
+      int n = getDeleteDialog("blueprint", blueprint.getName());
+
       if (n == JOptionPane.OK_OPTION) {
         Editor.instance().getGameFile().getBluePrints().remove(getOrigin());
         UI.getAssetController().refresh();
       }
     } else if (getOrigin() instanceof SoundResource) {
       SoundResource sound = (SoundResource) getOrigin();
-      int n =
-          JOptionPane.showConfirmDialog(
-              Game.window().getRenderComponent(),
-              "Do you really want to delete the sound [" + sound.getName() + "]?",
-              "Delete Sound?",
-              JOptionPane.YES_NO_OPTION);
+      int n = getDeleteDialog("sound", sound.getName());
+
       if (n == JOptionPane.OK_OPTION) {
         Editor.instance().getGameFile().getSounds().remove(getOrigin());
         UI.getAssetController().refresh();
@@ -455,7 +380,50 @@ public class AssetPanelItem extends JPanel {
     return false;
   }
 
-  private void export() {
+  private void editAsset() {
+    if (!(this.getOrigin() instanceof SpritesheetResource)) {
+      return;
+    }
+    SpritesheetImportPanel spritePanel =
+        new SpritesheetImportPanel((SpritesheetResource) this.getOrigin());
+    int option =
+        JOptionPane.showConfirmDialog(
+            Game.window().getRenderComponent(),
+            spritePanel,
+            Resources.strings().get("menu_assets_editSprite"),
+            JOptionPane.OK_CANCEL_OPTION,
+            JOptionPane.PLAIN_MESSAGE);
+    if (option != JOptionPane.OK_OPTION) {
+      return;
+    }
+
+    final Collection<SpritesheetResource> sprites = spritePanel.getSpriteSheets();
+    for (SpritesheetResource spriteFile : sprites) {
+      int index = -1;
+      Optional<SpritesheetResource> old =
+          Editor.instance().getGameFile().getSpriteSheets().stream()
+              .filter((x -> x.getName().equals(spriteFile.getName())))
+              .findFirst();
+      if (old.isPresent()) {
+        index = Editor.instance().getGameFile().getSpriteSheets().indexOf(old.get());
+        Editor.instance().getGameFile().getSpriteSheets().remove(index);
+      }
+
+      Editor.instance()
+          .getGameFile()
+          .getSpriteSheets()
+          .removeIf(x -> x.getName().equals(spriteFile.getName()));
+      if (index != -1) {
+        Editor.instance().getGameFile().getSpriteSheets().add(index, spriteFile);
+      } else {
+        Editor.instance().getGameFile().getSpriteSheets().add(spriteFile);
+      }
+    }
+
+    Editor.instance().loadSpriteSheets(Editor.instance().getGameFile().getSpriteSheets(), true);
+  }
+
+  private void exportAsset() {
     if (this.getOrigin() instanceof Tileset) {
       this.exportTileset();
     } else if (this.getOrigin() instanceof SpritesheetResource) {
@@ -505,8 +473,7 @@ public class AssetPanelItem extends JPanel {
         if (answer == 0) {
           XmlExportDialog.export(spriteSheetInfo, "Spritesheet", spriteSheetInfo.getName());
         } else if (answer == 1) {
-          FileFilter filter =
-              new FileNameExtensionFilter(format.toString() + " - Image", format.toString());
+          FileFilter filter = new FileNameExtensionFilter(format + " - Image", format.toString());
           chooser.setFileFilter(filter);
           chooser.addChoosableFileFilter(filter);
           chooser.setSelectedFile(new File(spriteSheetInfo.getName() + format.toFileExtension()));
@@ -603,5 +570,14 @@ public class AssetPanelItem extends JPanel {
     }
 
     return this.getOrigin() instanceof MapObject || this.getOrigin() instanceof EmitterData;
+  }
+
+  private static int getDeleteDialog(String assetType, String assetName) {
+    return JOptionPane.showConfirmDialog(
+        Game.window().getRenderComponent(),
+        Resources.strings().get(String.format("assetpanel_confirmdelete_%s", assetType), assetName),
+        Resources.strings().get(String.format("assetpanel_confirmdelete_%s_title", assetType)),
+        JOptionPane.YES_NO_OPTION,
+        JOptionPane.QUESTION_MESSAGE);
   }
 }

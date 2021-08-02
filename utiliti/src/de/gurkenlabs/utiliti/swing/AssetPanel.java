@@ -44,12 +44,9 @@ public class AssetPanel extends JPanel {
             } else {
               icon = null;
             }
-            // Drop the prop prefix in the Asset panel.
-            String spriteName =
-                info.getName().startsWith("prop-")
-                    ? info.getName().replace("prop-", "")
-                    : info.getName();
-            AssetPanelItem panelItem = new AssetPanelItem(icon, spriteName, info);
+
+            AssetPanelItem panelItem =
+                new AssetPanelItem(icon, getResourceNameWithoutPrefix(info), info);
             this.add(panelItem);
             panelItem.validate();
           }
@@ -111,5 +108,11 @@ public class AssetPanel extends JPanel {
     this.removeAll();
     runnable.run();
     this.getRootPane().repaint();
+  }
+
+  private static String getResourceNameWithoutPrefix(SpritesheetResource info) {
+    return info.getName().startsWith("prop-")
+        ? info.getName().replace("prop-", "")
+        : info.getName();
   }
 }
