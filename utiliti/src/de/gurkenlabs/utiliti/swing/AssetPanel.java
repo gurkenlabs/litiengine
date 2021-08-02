@@ -1,5 +1,7 @@
 package de.gurkenlabs.utiliti.swing;
 
+import static java.awt.FlowLayout.LEFT;
+
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
@@ -16,7 +18,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-@SuppressWarnings("serial")
 public class AssetPanel extends JPanel {
   private final WrapLayout layout;
 
@@ -24,7 +25,7 @@ public class AssetPanel extends JPanel {
     this.layout = new WrapLayout();
     this.layout.setVgap(5);
     this.layout.setHgap(5);
-    this.layout.setAlignment(WrapLayout.LEFT);
+    this.layout.setAlignment(LEFT);
     this.setLayout(this.layout);
 
     this.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -43,8 +44,12 @@ public class AssetPanel extends JPanel {
             } else {
               icon = null;
             }
-
-            AssetPanelItem panelItem = new AssetPanelItem(icon, info.getName(), info);
+            // Drop the prop prefix in the Asset panel.
+            String spriteName =
+                info.getName().startsWith("prop-")
+                    ? info.getName().replace("prop-", "")
+                    : info.getName();
+            AssetPanelItem panelItem = new AssetPanelItem(icon, spriteName, info);
             this.add(panelItem);
             panelItem.validate();
           }
