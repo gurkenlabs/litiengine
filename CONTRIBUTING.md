@@ -75,6 +75,10 @@ Code in the LITIENGINE repository needs to be formatted in compliance with the  
 ```
 File → Settings → Editor → Code Style
 ```
+You can also automatically format your code using the following gradle command:
+```
+gradlew spotlessApply
+```
 
 ## What else can I do?
 >  If you want to help in other ways we have not mentioned above, just contact us at info@LITIENGINE.com to specify the details.
