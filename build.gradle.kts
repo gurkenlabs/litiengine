@@ -11,8 +11,10 @@ plugins {
     eclipse
     id("com.github.vlsi.crlf")
     id("com.github.vlsi.gradle-extensions")
+    id("com.diffplug.spotless")
 }
 
+val skipSpotless by props(false)
 val skipJavadoc by props()
 val enableMavenLocal by props(false)
 val enableGradleMetadata by props()
@@ -50,6 +52,21 @@ allprojects {
     if (!enableGradleMetadata) {
         tasks.withType<GenerateModuleMetadata> {
             enabled = false
+        }
+    }
+
+    if (!skipSpotless) {
+        apply (plugin = "com.diffplug.spotless")
+        spotless {
+            kotlinGradle {
+                ktlint()
+            }
+            plugins.withType<JavaPlugin>().configureEach {
+                java {
+                    removeUnusedImports()
+                    googleJavaFormat()
+                }
+            }
         }
     }
 
