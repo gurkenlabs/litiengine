@@ -1,0 +1,14 @@
+name: Spotless
+
+on: [push, pull_request]
+
+jobs:
+  autostlye:
+    name: "Spotless"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 10
+      - name: Check
+        run: ./gradlew spotlessCheck
