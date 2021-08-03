@@ -31,11 +31,11 @@ jobs:
             ~/.gradle/wrapper/'
           key: ${{ runner.os }}-mvn_sonar_gradle_cache
 
-      - name: Set up JDK 8
+      - name: Set up JDK 11
         uses: actions/setup-java@v2
         with:
           distribution: 'adopt'
-          java-version: '8'
+          java-version: '11'
 
       - name: Install D-BUS AT-SPI core
         run: sudo apt-get -y install at-spi2-core
@@ -49,7 +49,7 @@ jobs:
       - name: Gradle Fullbuild
         uses: GabrielBB/xvfb-action@v1
         with:
-          run: ./gradlew fullbuild
+          run: ./gradlew build jacocoTestReport
 
       - name: Set up JDK 15 for static analysis
         uses: actions/setup-java@v2
@@ -64,8 +64,6 @@ jobs:
           run: |
             echo ${{ github.event.push.repository.fork }}
             ./gradlew sonarqube
-          
-          
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
