@@ -19,7 +19,7 @@ val enableGradleMetadata by props()
 val isRelease = project.stringProperty("release").toBool()
 
 val String.v: String get() = rootProject.extra["$this.version"] as String
-val buildVersion = "litiengine".v + if (isRelease) "" else "SNAPSHOT"
+val buildVersion = "litiengine".v + if (isRelease) "" else "-SNAPSHOT"
 
 allprojects {
     group = "de.gurkenlabs"
@@ -29,7 +29,14 @@ allprojects {
         if (enableMavenLocal) {
             mavenLocal()
         }
+        if (!isRelease) {
+            maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots/") }
+        }
         mavenCentral()
+    }
+
+    configurations.all {
+        resolutionStrategy.cacheChangingModulesFor(0, "seconds")
     }
 
     tasks.withType<AbstractArchiveTask>().configureEach {
