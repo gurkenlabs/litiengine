@@ -14,5 +14,6 @@ pluginManagement {
 
 include(
     "litiengine",
-    "utiliti"
+    "utiliti",
+    "test-common"
 )
