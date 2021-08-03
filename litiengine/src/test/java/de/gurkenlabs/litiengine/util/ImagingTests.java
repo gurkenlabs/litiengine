@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine.util;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -24,7 +25,7 @@ public class ImagingTests {
   @Test
   public void testSubImage() {
     BufferedImage image =
-        Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag.png");
+        Resources.images().get("de/gurkenlabs/litiengine/util/prop-flag.png");
     BufferedImage[][] subImages = Imaging.getSubImages(image, 1, 2);
 
     assertEquals(2, subImages[0].length);
@@ -37,9 +38,9 @@ public class ImagingTests {
   @Test
   public void testHorizontalFlip() {
     BufferedImage image =
-        Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag.png");
+        Resources.images().get("de/gurkenlabs/litiengine/util/prop-flag.png");
     BufferedImage flippedReferenceImage =
-        Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag-flip-hor.png");
+        Resources.images().get("de/gurkenlabs/litiengine/util/prop-flag-flip-hor.png");
     int[] expectedPixels =
         ((DataBufferInt) flippedReferenceImage.getData().getDataBuffer()).getData();
 
@@ -52,9 +53,9 @@ public class ImagingTests {
   @Test
   public void testVerticalFlip() {
     BufferedImage image =
-        Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag.png");
+        Resources.images().get("de/gurkenlabs/litiengine/util/prop-flag.png");
     BufferedImage flippedReferenceImage =
-        Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag-flip-vert.png");
+        Resources.images().get("de/gurkenlabs/litiengine/util/prop-flag-flip-vert.png");
     int[] expectedPixels =
         ((DataBufferInt) flippedReferenceImage.getData().getDataBuffer()).getData();
 
@@ -68,21 +69,13 @@ public class ImagingTests {
   @MethodSource("getRotateArguments")
   public void testRotate(String rotatedImagePath, Rotation rotation) {
     // precondition check to prevent resource optimism
-    String imagePath = "tests/de/gurkenlabs/litiengine/util/prop-flag.png";
-
-    // image must be available on the file system
-    if (!new File(imagePath).exists()) {
-      fail();
-    }
-
-    // rotated image must be available on the file system
-    if (!new File(rotatedImagePath).exists()) {
-      fail();
-    }
+    String imagePath = "de/gurkenlabs/litiengine/util/prop-flag.png";
 
     // arrange
     BufferedImage image = Resources.images().get(imagePath);
+    assertNotNull(image);
     BufferedImage expectedRotatedImage = Resources.images().get(rotatedImagePath);
+    assertNotNull(expectedRotatedImage);
     int[] expectedPixels =
         ((DataBufferInt) expectedRotatedImage.getData().getDataBuffer()).getData();
 
@@ -103,22 +96,22 @@ public class ImagingTests {
   @SuppressWarnings("unused")
   private static Stream<Arguments> getRotateArguments() {
     return Stream.of(
-        Arguments.of("tests/de/gurkenlabs/litiengine/util/prop-flag.png", Rotation.NONE),
-        Arguments.of("tests/de/gurkenlabs/litiengine/util/prop-flag-90.png", Rotation.ROTATE_90),
-        Arguments.of("tests/de/gurkenlabs/litiengine/util/prop-flag-180.png", Rotation.ROTATE_180),
-        Arguments.of("tests/de/gurkenlabs/litiengine/util/prop-flag-270.png", Rotation.ROTATE_270));
+        Arguments.of("de/gurkenlabs/litiengine/util/prop-flag.png", Rotation.NONE),
+        Arguments.of("de/gurkenlabs/litiengine/util/prop-flag-90.png", Rotation.ROTATE_90),
+        Arguments.of("de/gurkenlabs/litiengine/util/prop-flag-180.png", Rotation.ROTATE_180),
+        Arguments.of("de/gurkenlabs/litiengine/util/prop-flag-270.png", Rotation.ROTATE_270));
   }
 
   @Test
   public void testScaling() {
     BufferedImage image =
-        Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag.png");
+        Resources.images().get("de/gurkenlabs/litiengine/util/prop-flag.png");
     BufferedImage expectedx2 =
-        Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag-scale-x2.png");
+        Resources.images().get("de/gurkenlabs/litiengine/util/prop-flag-scale-x2.png");
     BufferedImage expectedStretched =
-        Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag-stretch.png");
+        Resources.images().get("de/gurkenlabs/litiengine/util/prop-flag-stretch.png");
     BufferedImage expectedStretchedRatio =
-        Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag-stretch-ratio.png");
+        Resources.images().get("de/gurkenlabs/litiengine/util/prop-flag-stretch-ratio.png");
     int[] expectedPixelsx2 = ((DataBufferInt) expectedx2.getData().getDataBuffer()).getData();
     int[] expectedPixelsStretched =
         ((DataBufferInt) expectedStretched.getData().getDataBuffer()).getData();
@@ -146,11 +139,11 @@ public class ImagingTests {
   @Test
   public void testOpacity() {
     BufferedImage image =
-        Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag.png");
+        Resources.images().get("de/gurkenlabs/litiengine/util/prop-flag.png");
     BufferedImage expected25 =
-        Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag-opacity-25.png");
+        Resources.images().get("de/gurkenlabs/litiengine/util/prop-flag-opacity-25.png");
     BufferedImage expected50 =
-        Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag-opacity-50.png");
+        Resources.images().get("de/gurkenlabs/litiengine/util/prop-flag-opacity-50.png");
     int[] expectedPixels25 = ((DataBufferInt) expected25.getData().getDataBuffer()).getData();
     int[] expectedPixels50 = ((DataBufferInt) expected50.getData().getDataBuffer()).getData();
 
@@ -167,9 +160,9 @@ public class ImagingTests {
   @Test
   public void testFlash() {
     BufferedImage image =
-        Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag.png");
+        Resources.images().get("de/gurkenlabs/litiengine/util/prop-flag.png");
     BufferedImage expectedFlash =
-        Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag-flash.png");
+        Resources.images().get("de/gurkenlabs/litiengine/util/prop-flag-flash.png");
     int[] expectedPixelsFlash = ((DataBufferInt) expectedFlash.getData().getDataBuffer()).getData();
 
     BufferedImage flash = Imaging.flashVisiblePixels(image, Color.RED);
@@ -182,9 +175,9 @@ public class ImagingTests {
   @Test
   public void testAlpha() {
     BufferedImage expected =
-        Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag.png");
+        Resources.images().get("de/gurkenlabs/litiengine/util/prop-flag.png");
     BufferedImage alpha =
-        Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag-alpha.png");
+        Resources.images().get("de/gurkenlabs/litiengine/util/prop-flag-alpha.png");
 
     int[] expectedPixels = ((DataBufferInt) expected.getData().getDataBuffer()).getData();
 
@@ -198,11 +191,11 @@ public class ImagingTests {
   @Test
   public void testBorder() {
     BufferedImage image =
-        Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag.png");
+        Resources.images().get("de/gurkenlabs/litiengine/util/prop-flag.png");
     BufferedImage expectedBorder =
-        Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag-border.png");
+        Resources.images().get("de/gurkenlabs/litiengine/util/prop-flag-border.png");
     BufferedImage expectedBorderOnly =
-        Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag-border-only.png");
+        Resources.images().get("de/gurkenlabs/litiengine/util/prop-flag-border-only.png");
 
     int[] expectedPixels = ((DataBufferInt) expectedBorder.getData().getDataBuffer()).getData();
     int[] expectedPixelsBorderOnly =
@@ -221,9 +214,9 @@ public class ImagingTests {
   @Test
   public void testEmpty() {
     BufferedImage image =
-        Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag.png");
+        Resources.images().get("de/gurkenlabs/litiengine/util/prop-flag.png");
     BufferedImage imageEmpty =
-        Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag-empty.png");
+        Resources.images().get("de/gurkenlabs/litiengine/util/prop-flag-empty.png");
 
     assertFalse(Imaging.isEmpty(image));
     assertTrue(Imaging.isEmpty(imageEmpty));
@@ -232,7 +225,7 @@ public class ImagingTests {
   @Test
   public void testCopy() {
     BufferedImage image =
-        Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag.png");
+        Resources.images().get("de/gurkenlabs/litiengine/util/prop-flag.png");
     int[] expectedPixels = ((DataBufferInt) image.getData().getDataBuffer()).getData();
 
     BufferedImage copy = Imaging.copy(image);
@@ -244,11 +237,11 @@ public class ImagingTests {
   @Test
   public void testSpriteFlipHorizontally() {
     BufferedImage image =
-        Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag.png");
+        Resources.images().get("de/gurkenlabs/litiengine/util/prop-flag.png");
     Spritesheet sprite =
-        new Spritesheet(image, "tests/de/gurkenlabs/litiengine/util/prop-flag.png", 15, 16);
+        new Spritesheet(image, "de/gurkenlabs/litiengine/util/prop-flag.png", 15, 16);
     BufferedImage imageFlippedHor =
-        Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag-spriteflip-hor.png");
+        Resources.images().get("de/gurkenlabs/litiengine/util/prop-flag-spriteflip-hor.png");
 
     int[] expectedPixels = ((DataBufferInt) imageFlippedHor.getData().getDataBuffer()).getData();
 
@@ -260,11 +253,11 @@ public class ImagingTests {
   @Test
   public void testSpriteFlipVertically() {
     BufferedImage image =
-        Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag-2rows.png");
+        Resources.images().get("de/gurkenlabs/litiengine/util/prop-flag-2rows.png");
     Spritesheet sprite =
-        new Spritesheet(image, "tests/de/gurkenlabs/litiengine/util/prop-flag-2rows.png", 15, 16);
+        new Spritesheet(image, "de/gurkenlabs/litiengine/util/prop-flag-2rows.png", 15, 16);
     BufferedImage imageFlippedVer =
-        Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag-spriteflip-ver.png");
+        Resources.images().get("de/gurkenlabs/litiengine/util/prop-flag-spriteflip-ver.png");
 
     int[] expectedPixels = ((DataBufferInt) imageFlippedVer.getData().getDataBuffer()).getData();
 

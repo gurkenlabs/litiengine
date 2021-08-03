@@ -102,6 +102,8 @@ public class FileUtilitiesTests {
     void testFindFilesByExtensionBlackListedDirectory() throws IOException {
         //arrange
         Path blackListedDir = Files.createDirectories(tempPath.resolve("\\bin"));
+        Path testFile = blackListedDir.resolve("test.txt");
+        if (Files.exists(testFile)) Files.delete(testFile);
         Files.createFile(blackListedDir.resolve("test.txt"));
 
         List<String> fileNames = new LinkedList<>(Collections.emptyList());

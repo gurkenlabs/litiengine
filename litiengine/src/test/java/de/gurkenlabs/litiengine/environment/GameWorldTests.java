@@ -45,7 +45,7 @@ public class GameWorldTests {
               }
             });
     IMap map =
-        Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
+        Resources.maps().get("de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
 
     // act
     Environment env = Game.world().loadEnvironment(map);
@@ -76,7 +76,7 @@ public class GameWorldTests {
               }
             });
     IMap map =
-        Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
+        Resources.maps().get("de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
     Environment env = Game.world().loadEnvironment(map);
 
     // act
@@ -117,11 +117,11 @@ public class GameWorldTests {
               }
             });
     IMap map =
-        Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
+        Resources.maps().get("de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
     Game.world().loadEnvironment(map);
     IMap map2 =
         Resources.maps()
-            .get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-mapobject.tmx");
+            .get("de/gurkenlabs/litiengine/environment/tilemap/xml/test-mapobject.tmx");
 
     // act
     Game.world().loadEnvironment(map2);
@@ -138,7 +138,7 @@ public class GameWorldTests {
     Status mapLoaded = new Status();
     Game.world().onLoaded("test-map", e -> mapLoaded.wasCalled = true);
     IMap map =
-        Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
+        Resources.maps().get("de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
 
     // act
     Game.world().loadEnvironment(map);
@@ -153,7 +153,7 @@ public class GameWorldTests {
     Status mapUnloaded = new Status();
     Game.world().onUnloaded("test-map", e -> mapUnloaded.wasCalled = true);
     IMap map =
-        Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
+        Resources.maps().get("de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
     Game.world().loadEnvironment(map);
 
     // act
