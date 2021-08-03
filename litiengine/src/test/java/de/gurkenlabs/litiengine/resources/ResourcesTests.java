@@ -51,8 +51,9 @@ public class ResourcesTests {
   @Test
   public void testMapResourcesAlias() {
     IMap map =
-        Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
+        Resources.maps().get("de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
 
+    assertNotNull(map);
     assertEquals(map, Resources.maps().get("test-map"));
   }
 
@@ -67,7 +68,7 @@ public class ResourcesTests {
 
   @Test
   public void testSoundResources() {
-    Sound sound = Resources.sounds().get("tests/de/gurkenlabs/litiengine/resources/bip.ogg");
+    Sound sound = Resources.sounds().get("de/gurkenlabs/litiengine/resources/bip.ogg");
     Sound nonExisting = Resources.sounds().get("randomname.mp3");
 
     assertNotNull(sound);
@@ -78,15 +79,14 @@ public class ResourcesTests {
   @Test
   public void testReadStringResources() {
     String fileContent =
-        Resources.read("tests/de/gurkenlabs/litiengine/resources/stringfile-utf8.txt");
+        Resources.read("de/gurkenlabs/litiengine/resources/stringfile-utf8.txt");
     assertEquals("my utf8 èncöded strîng!!1$", fileContent);
   }
 
   @Test
   public void testReadStringCharsetResources() {
     String fileContent =
-        Resources.read(
-            "tests/de/gurkenlabs/litiengine/resources/stringfile-iso8859-1.txt",
+        Resources.read("de/gurkenlabs/litiengine/resources/stringfile-iso8859-1.txt",
             StandardCharsets.ISO_8859_1);
     assertEquals("my iso8859 èncöded strîng!!1$", fileContent);
   }
@@ -94,7 +94,7 @@ public class ResourcesTests {
   @Test
   public void testStringList() {
     String[] strings =
-        Resources.strings().getList("tests/de/gurkenlabs/litiengine/resources/test.txt");
+        Resources.strings().getList("de/gurkenlabs/litiengine/resources/test.txt");
 
     assertEquals(4, strings.length);
 
