@@ -97,10 +97,8 @@ public final class Scroll {
     try {
       IMap map = Game.world().environment().getMap();
       if (map == null) return;
-      double relativeX =
-          Game.world().camera().getFocus().getX() / map.getSizeInPixels().width;
-      double relativeY =
-          Game.world().camera().getFocus().getY() / map.getSizeInPixels().height;
+      double relativeX = Game.world().camera().getFocus().getX() / map.getSizeInPixels().width;
+      double relativeY = Game.world().camera().getFocus().getY() / map.getSizeInPixels().height;
 
       // decouple the scrollbar from the environment
       currentScrollSize =

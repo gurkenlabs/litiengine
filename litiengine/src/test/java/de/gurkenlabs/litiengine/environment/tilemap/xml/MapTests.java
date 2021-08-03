@@ -15,8 +15,6 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.io.URLAdapter;
 import java.awt.Color;
 import java.awt.geom.Rectangle2D;
-import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -90,8 +88,7 @@ public class MapTests {
   public void testSettingProperties() {
     TmxMap map =
         (TmxMap)
-            Resources.maps()
-                .get("de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
+            Resources.maps().get("de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
     map.setOrientation(MapOrientations.ISOMETRIC_STAGGERED);
     map.setTiledVersion("0.0.0");
     map.setVersion(2.0);
@@ -117,8 +114,7 @@ public class MapTests {
   @Test
   public void testMapObjectLayers() {
     IMap map =
-        Resources.maps()
-            .get("de/gurkenlabs/litiengine/environment/tilemap/xml/test-mapobject.tmx");
+        Resources.maps().get("de/gurkenlabs/litiengine/environment/tilemap/xml/test-mapobject.tmx");
     assertEquals(1, map.getMapObjectLayers().size());
 
     IMapObjectLayer layer = map.getMapObjectLayers().get(0);
@@ -174,8 +170,7 @@ public class MapTests {
     TmxMap map =
         (TmxMap)
             Resources.maps()
-                .get(
-                    "de/gurkenlabs/litiengine/environment/tilemap/xml/test-infinite-map.tmx");
+                .get("de/gurkenlabs/litiengine/environment/tilemap/xml/test-infinite-map.tmx");
 
     assertTrue(map.isInfinite());
     assertEquals(64, map.getWidth());

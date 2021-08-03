@@ -30,8 +30,7 @@ public final class ResourcesMenu extends JMenu {
 
     importMenu.add(importSpriteFile);
 
-    JMenuItem importSprite =
-        new JMenuItem(Resources.strings().get("menu_assets_importSprite"));
+    JMenuItem importSprite = new JMenuItem(Resources.strings().get("menu_assets_importSprite"));
     importSprite.addActionListener(a -> Editor.instance().importSpriteSheets());
     importSprite.setEnabled(false);
     importMenu.add(importSprite);
@@ -42,8 +41,7 @@ public final class ResourcesMenu extends JMenu {
     importTextureAtlas.setEnabled(false);
     importMenu.add(importTextureAtlas);
 
-    JMenuItem importEmitters =
-        new JMenuItem(Resources.strings().get("menu_assets_importEmitters"));
+    JMenuItem importEmitters = new JMenuItem(Resources.strings().get("menu_assets_importEmitters"));
     importEmitters.addActionListener(a -> Editor.instance().importEmitters());
     importEmitters.setEnabled(false);
     importMenu.add(importEmitters);
@@ -54,14 +52,12 @@ public final class ResourcesMenu extends JMenu {
     importBlueprints.setEnabled(false);
     importMenu.add(importBlueprints);
 
-    JMenuItem importTilesets =
-        new JMenuItem(Resources.strings().get("menu_assets_importTilesets"));
+    JMenuItem importTilesets = new JMenuItem(Resources.strings().get("menu_assets_importTilesets"));
     importTilesets.addActionListener(a -> Editor.instance().importTilesets());
     importTilesets.setEnabled(false);
     importMenu.add(importTilesets);
 
-    JMenuItem importSounds =
-        new JMenuItem(Resources.strings().get("menu_assets_importSounds"));
+    JMenuItem importSounds = new JMenuItem(Resources.strings().get("menu_assets_importSounds"));
     importSounds.addActionListener(a -> Editor.instance().importSounds());
     importSounds.setEnabled(false);
     importMenu.add(importSounds);
@@ -75,16 +71,18 @@ public final class ResourcesMenu extends JMenu {
     exportSpriteSheets.addActionListener(a -> Editor.instance().exportSpriteSheets());
     exportMenu.add(exportSpriteSheets);
 
-    Editor.instance().onLoaded(() -> {
-      importSpriteFile.setEnabled(Editor.instance().getCurrentResourceFile() != null);
-      importSprite.setEnabled(Editor.instance().getCurrentResourceFile() != null);
-      importTextureAtlas.setEnabled(Editor.instance().getCurrentResourceFile() != null);
-      importEmitters.setEnabled(Editor.instance().getCurrentResourceFile() != null);
-      importBlueprints.setEnabled(Editor.instance().getCurrentResourceFile() != null);
-      importTilesets.setEnabled(Editor.instance().getCurrentResourceFile() != null);
-      importSounds.setEnabled(Editor.instance().getCurrentResourceFile() != null);
-      exportSpriteSheets.setEnabled(Editor.instance().getCurrentResourceFile() != null);
-    });
+    Editor.instance()
+        .onLoaded(
+            () -> {
+              importSpriteFile.setEnabled(Editor.instance().getCurrentResourceFile() != null);
+              importSprite.setEnabled(Editor.instance().getCurrentResourceFile() != null);
+              importTextureAtlas.setEnabled(Editor.instance().getCurrentResourceFile() != null);
+              importEmitters.setEnabled(Editor.instance().getCurrentResourceFile() != null);
+              importBlueprints.setEnabled(Editor.instance().getCurrentResourceFile() != null);
+              importTilesets.setEnabled(Editor.instance().getCurrentResourceFile() != null);
+              importSounds.setEnabled(Editor.instance().getCurrentResourceFile() != null);
+              exportSpriteSheets.setEnabled(Editor.instance().getCurrentResourceFile() != null);
+            });
 
     this.add(importMenu);
     this.add(exportMenu);

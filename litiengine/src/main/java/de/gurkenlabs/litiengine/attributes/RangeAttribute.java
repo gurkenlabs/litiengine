@@ -14,12 +14,9 @@ public class RangeAttribute<T extends Number> extends Attribute<T> {
   /**
    * Initializes a new instance of the {@code RangeAttribute} class.
    *
-   * @param maxValue
-   *          The max value of this attribute.
-   * @param minValue
-   *          The min value of this attribute
-   * @param baseValue
-   *          The base (initial) value of this attribute
+   * @param maxValue The max value of this attribute.
+   * @param minValue The min value of this attribute
+   * @param baseValue The base (initial) value of this attribute
    */
   public RangeAttribute(final T maxValue, final T minValue, final T baseValue) {
     super(baseValue);

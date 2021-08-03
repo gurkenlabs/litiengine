@@ -1,21 +1,22 @@
 package de.gurkenlabs.litiengine.resources;
 
-import java.io.IOException;
-import java.net.URL;
-
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxException;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
+import java.io.IOException;
+import java.net.URL;
 
 public class Blueprints extends ResourcesContainer<Blueprint> {
 
-  Blueprints() {
-  }
+  Blueprints() {}
 
   public static boolean isSupported(String fileName) {
     String extension = FileUtilities.getExtension(fileName);
-    return extension != null && !extension.isEmpty() && (extension.equalsIgnoreCase(Blueprint.BLUEPRINT_FILE_EXTENSION) || extension.equalsIgnoreCase(Blueprint.TEMPLATE_FILE_EXTENSION));
+    return extension != null
+        && !extension.isEmpty()
+        && (extension.equalsIgnoreCase(Blueprint.BLUEPRINT_FILE_EXTENSION)
+            || extension.equalsIgnoreCase(Blueprint.TEMPLATE_FILE_EXTENSION));
   }
 
   @Override
@@ -32,7 +33,10 @@ public class Blueprints extends ResourcesContainer<Blueprint> {
 
   @Override
   protected String getAlias(String resourceName, Blueprint resource) {
-    if (resource == null || resource.getName() == null || resource.getName().isEmpty() || resource.getName().equalsIgnoreCase(resourceName)) {
+    if (resource == null
+        || resource.getName() == null
+        || resource.getName().isEmpty()
+        || resource.getName().equalsIgnoreCase(resourceName)) {
       return null;
     }
 

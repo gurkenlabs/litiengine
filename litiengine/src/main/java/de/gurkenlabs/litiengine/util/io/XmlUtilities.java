@@ -1,5 +1,9 @@
 package de.gurkenlabs.litiengine.util.io;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -11,10 +15,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.XMLConstants;
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Marshaller;
-import jakarta.xml.bind.Unmarshaller;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -86,17 +86,17 @@ public final class XmlUtilities {
 
   public static <T> T read(Class<T> cls, URL path) throws IOException {
     try {
-        final JAXBContext jaxbContext = getContext(cls);
-        if (jaxbContext == null) {
-            return null;
-        }
+      final JAXBContext jaxbContext = getContext(cls);
+      if (jaxbContext == null) {
+        return null;
+      }
 
-        final Unmarshaller um = jaxbContext.createUnmarshaller();
-        um.setAdapter(new URLAdapter(path));
+      final Unmarshaller um = jaxbContext.createUnmarshaller();
+      um.setAdapter(new URLAdapter(path));
 
-        return cls.cast(um.unmarshal(path));
+      return cls.cast(um.unmarshal(path));
     } catch (JAXBException e) {
-        throw new IOException(e);
+      throw new IOException(e);
     }
   }
 

@@ -52,8 +52,8 @@ public class CombatPanel extends PropertyPanel {
   private LayoutManager createLayout() {
     LayoutItem[] layoutItems =
         new LayoutItem[] {
-            new LayoutItem("panel_hitpoints", this.spinnerHitpoints),
-            new LayoutItem("panel_team", this.spinnerTeam)
+          new LayoutItem("panel_hitpoints", this.spinnerHitpoints),
+          new LayoutItem("panel_team", this.spinnerTeam)
         };
 
     return this.createLayout(layoutItems, this.chckbxIndestructible);

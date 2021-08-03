@@ -119,9 +119,9 @@ public class EmitterColorPanel extends PropertyPanel {
   protected LayoutManager createLayout() {
     LayoutItem[] layoutItems =
         new LayoutItem[] {
-            new LayoutItem(colorControls, CONTROL_HEIGHT * 3),
-            new LayoutItem("emitter_colorVariance", colorVariance, CONTROL_HEIGHT),
-            new LayoutItem("emitter_alphaVariance", alphaVariance, CONTROL_HEIGHT)
+          new LayoutItem(colorControls, CONTROL_HEIGHT * 3),
+          new LayoutItem("emitter_colorVariance", colorVariance, CONTROL_HEIGHT),
+          new LayoutItem("emitter_alphaVariance", alphaVariance, CONTROL_HEIGHT)
         };
     return this.createLayout(layoutItems);
   }

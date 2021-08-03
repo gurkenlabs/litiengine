@@ -8,71 +8,63 @@ import java.awt.Shape;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
-/**
- * A class containing various standard map orientations.
- */
+/** A class containing various standard map orientations. */
 public class MapOrientations {
   /**
-   * <p>
    * An {@code IMapOrientation} for orthogonal maps, consistent with the behavior of Tiled.
    *
-   * <p>
-   * With this orientation, tiles are treated as rectangles with dimensions equal to the tile size, layed out in rows and columns starting with the
-   * origin.
+   * <p>With this orientation, tiles are treated as rectangles with dimensions equal to the tile
+   * size, layed out in rows and columns starting with the origin.
    */
   public static final IMapOrientation ORTHOGONAL = new Orthogonal();
 
   /**
-   * <p>
    * An isometric {@code IMapOrientation}, consistent with the behavior of Tiled.
    *
-   * <p>
-   * With this orientation, the shapes of tiles are transformed into an isometric coordinate system via the transformation
-   * {@code (x, y) -> ((x-y)/2, (x+y)/2)}. Rectangles within this coordinate system are rendered as diamond shapes. Points are also translated such
-   * that every tile in a map fits in the first quadrant.
+   * <p>With this orientation, the shapes of tiles are transformed into an isometric coordinate
+   * system via the transformation {@code (x, y) -> ((x-y)/2, (x+y)/2)}. Rectangles within this
+   * coordinate system are rendered as diamond shapes. Points are also translated such that every
+   * tile in a map fits in the first quadrant.
    *
-   * <p>
-   * This orientation does <em>not</em> transform map objects into its coordinate system. Maps with an odd-numbered tile width or height will throw
-   * {@code IllegalArgumentException}s when using this orientation.
+   * <p>This orientation does <em>not</em> transform map objects into its coordinate system. Maps
+   * with an odd-numbered tile width or height will throw {@code IllegalArgumentException}s when
+   * using this orientation.
    */
   public static final IMapOrientation ISOMETRIC = new Isometric();
 
   /**
-   * <p>
    * A staggered isometric {@code IMapOrientation}, consistent with the behavior of Tiled.
    *
-   * <p>
-   * This orientation is similar to the isometric orientation, but the tile coordinates are changed to be arranged in a rectangular area. The
-   * locations of tiles are positioned using rectangular coordinates, with tiles with parity on the stagger axis matching the stagger index filling
-   * the gaps between the other tiles.
+   * <p>This orientation is similar to the isometric orientation, but the tile coordinates are
+   * changed to be arranged in a rectangular area. The locations of tiles are positioned using
+   * rectangular coordinates, with tiles with parity on the stagger axis matching the stagger index
+   * filling the gaps between the other tiles.
    *
-   * <p>
-   * This orientation requires that a stagger axis and stagger index be set. If either are missing, an {@code IllegalArgumentException} will be
-   * thrown. Like the standard isometric orientation, this orientation will also throw an {@code IllegalArgumentException} when used with a map with
-   * an odd-numbered tile width or height.
+   * <p>This orientation requires that a stagger axis and stagger index be set. If either are
+   * missing, an {@code IllegalArgumentException} will be thrown. Like the standard isometric
+   * orientation, this orientation will also throw an {@code IllegalArgumentException} when used
+   * with a map with an odd-numbered tile width or height.
    */
   public static final IMapOrientation ISOMETRIC_STAGGERED = new StaggeredIsometric();
 
   /**
-   * <p>
    * A hexagonal {@code IMapOrientation}, consistent with the behavior of Tiled.
    *
-   * <p>
-   * Tiles are arranged in the same manner as the staggered isometric orientation (the staggered isometric orientation can be viewed as a special case
-   * of this orientation with a hex side length of 0), with extra space between tiles (the hex side length) added on the stagger axis to allow for a
-   * hexagonal shape.
+   * <p>Tiles are arranged in the same manner as the staggered isometric orientation (the staggered
+   * isometric orientation can be viewed as a special case of this orientation with a hex side
+   * length of 0), with extra space between tiles (the hex side length) added on the stagger axis to
+   * allow for a hexagonal shape.
    *
-   * <p>
-   * This orientation has the same requirements as staggered isometric, with the additional restriction that the hex side length must be an even
-   * number.
+   * <p>This orientation has the same requirements as staggered isometric, with the additional
+   * restriction that the hex side length must be an even number.
    */
   public static final IMapOrientation HEXAGONAL = new Hexagonal();
 
   /**
-   * Determines the appropriate {@code IMapOrientation} instance for the given name. If no such orientation exists, this method returns {@code null}.
+   * Determines the appropriate {@code IMapOrientation} instance for the given name. If no such
+   * orientation exists, this method returns {@code null}.
    *
-   * @param name
-   *          The name of the orientation, as stored in the TMX file
+   * @param name The name of the orientation, as stored in the TMX file
    * @return The {@code IMapOrientation} by the given name
    */
   public static IMapOrientation forName(String name) {
@@ -153,7 +145,8 @@ public class MapOrientations {
 
     @Override
     public Dimension getSize(IMap map) {
-      return new Dimension(map.getWidth() * map.getTileWidth(), map.getHeight() * map.getTileHeight());
+      return new Dimension(
+          map.getWidth() * map.getTileWidth(), map.getHeight() * map.getTileHeight());
     }
 
     @Override
@@ -164,13 +157,15 @@ public class MapOrientations {
     @Override
     public Shape getShape(int x, int y, IMap map) {
       Dimension tileSize = map.getTileSize();
-      return new Rectangle(x * tileSize.width, y * tileSize.height, tileSize.width, tileSize.height);
+      return new Rectangle(
+          x * tileSize.width, y * tileSize.height, tileSize.width, tileSize.height);
     }
 
     @Override
     public Point getTile(double x, double y, IMap map) {
       checkTileSize(map);
-      return new Point((int) Math.floor(x / map.getTileWidth()), (int) Math.floor(y / map.getTileHeight()));
+      return new Point(
+          (int) Math.floor(x / map.getTileWidth()), (int) Math.floor(y / map.getTileHeight()));
     }
   }
 
@@ -190,14 +185,20 @@ public class MapOrientations {
     @Override
     public Point getLocation(int x, int y, IMap map) {
       checkSizeParity(map);
-      return new Point((x - y + map.getHeight() - 1) * map.getTileWidth() / 2, (x + y + 2) * map.getTileHeight() / 2);
+      return new Point(
+          (x - y + map.getHeight() - 1) * map.getTileWidth() / 2,
+          (x + y + 2) * map.getTileHeight() / 2);
     }
 
     @Override
     public Shape getShape(int x, int y, IMap map) {
       Point loc = this.getLocation(x, y, map);
       Dimension tileSize = map.getTileSize();
-      Polygon pg = new Polygon(new int[] { 0, tileSize.width / 2, tileSize.width, tileSize.width / 2 }, new int[] { tileSize.height / -2, -tileSize.height, tileSize.height / -2, 0 }, 4);
+      Polygon pg =
+          new Polygon(
+              new int[] {0, tileSize.width / 2, tileSize.width, tileSize.width / 2},
+              new int[] {tileSize.height / -2, -tileSize.height, tileSize.height / -2, 0},
+              4);
       pg.translate(loc.x, loc.y);
       return pg;
     }
@@ -210,7 +211,8 @@ public class MapOrientations {
       x /= map.getTileWidth();
       y /= map.getTileHeight();
       x -= 0.5 * map.getHeight();
-      // this uses ceil(y)-1 instead of floor(y) to be consistent with getShape; see the definition of "insideness" in the Shape class
+      // this uses ceil(y)-1 instead of floor(y) to be consistent with getShape; see the definition
+      // of "insideness" in the Shape class
       return new Point((int) Math.floor(y + x), (int) Math.ceil(y - x) - 1);
     }
 
@@ -275,7 +277,11 @@ public class MapOrientations {
     public Shape getShape(int x, int y, IMap map) {
       Point loc = this.getLocation(x, y, map);
       Dimension tileSize = map.getTileSize();
-      Polygon pg = new Polygon(new int[] { 0, tileSize.width / 2, tileSize.width, tileSize.width / 2 }, new int[] { tileSize.height / -2, -tileSize.height, tileSize.height / -2, 0 }, 4);
+      Polygon pg =
+          new Polygon(
+              new int[] {0, tileSize.width / 2, tileSize.width, tileSize.width / 2},
+              new int[] {tileSize.height / -2, -tileSize.height, tileSize.height / -2, 0},
+              4);
       pg.translate(loc.x, loc.y);
       return pg;
     }
@@ -374,12 +380,21 @@ public class MapOrientations {
       int[] yp;
       if (map.getStaggerAxis() == StaggerAxis.X) {
         int off = (tileSize.width - hexSide) / 2;
-        xp = new int[] { 0, off, tileSize.width - off, tileSize.width, tileSize.width - off, off };
-        yp = new int[] { tileSize.height / -2, -tileSize.height, -tileSize.height, tileSize.height / -2, 0, 0 };
+        xp = new int[] {0, off, tileSize.width - off, tileSize.width, tileSize.width - off, off};
+        yp =
+            new int[] {
+              tileSize.height / -2, -tileSize.height, -tileSize.height, tileSize.height / -2, 0, 0
+            };
       } else {
         int off = (tileSize.height - hexSide) / 2;
-        xp = new int[] { tileSize.width / 2, tileSize.width, tileSize.width, tileSize.width / 2, 0, 0 };
-        yp = new int[] { 0, -off, off - tileSize.height, -tileSize.height, off - tileSize.height, -off };
+        xp =
+            new int[] {
+              tileSize.width / 2, tileSize.width, tileSize.width, tileSize.width / 2, 0, 0
+            };
+        yp =
+            new int[] {
+              0, -off, off - tileSize.height, -tileSize.height, off - tileSize.height, -off
+            };
       }
       Polygon pg = new Polygon(xp, yp, 6);
       pg.translate(loc.x, loc.y);
@@ -404,10 +419,12 @@ public class MapOrientations {
       int hs = map.getHexSideLength();
       int wp = w + hs;
       if (wp == 0) {
-        throw new ArithmeticException("tile " + (axis == StaggerAxis.Y ? "height" : "width") + " + hex side length == 0");
+        throw new ArithmeticException(
+            "tile " + (axis == StaggerAxis.Y ? "height" : "width") + " + hex side length == 0");
       }
       if (h == 0) {
-        throw new ArithmeticException("tile " + (axis == StaggerAxis.Y ? "width" : "height") + " == 0");
+        throw new ArithmeticException(
+            "tile " + (axis == StaggerAxis.Y ? "width" : "height") + " == 0");
       }
       int wm = w - hs;
       double frac = (double) wm / wp;

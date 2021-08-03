@@ -1,5 +1,7 @@
 package de.gurkenlabs.litiengine;
 
+import de.gurkenlabs.litiengine.configuration.ClientConfiguration;
+import de.gurkenlabs.litiengine.graphics.IRenderable;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -8,17 +10,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import de.gurkenlabs.litiengine.configuration.ClientConfiguration;
-import de.gurkenlabs.litiengine.graphics.IRenderable;
-
 /**
- * The class {@code GameMetrics} provides meta information about the game's metrics. This allows the developer to
- * get a feeling about the performance of different aspects (e.g. memory consumption, potential fps, network traffic, ...) and to identify potential
- * issues.
- * 
- * <p>
- * This information can be rendered as debug information if configured to get live data during a gameplay session.
- * </p>
+ * The class {@code GameMetrics} provides meta information about the game's metrics. This allows the
+ * developer to get a feeling about the performance of different aspects (e.g. memory consumption,
+ * potential fps, network traffic, ...) and to identify potential issues.
+ *
+ * <p>This information can be rendered as debug information if configured to get live data during a
+ * gameplay session.
  *
  * @see ClientConfiguration#showGameMetrics()
  * @see #render(Graphics2D)
@@ -46,7 +44,13 @@ public final class GameMetrics implements IRenderable {
   GameMetrics() {
     this.renderMetrics = new CopyOnWriteArrayList<>();
     this.runtime = Runtime.getRuntime();
-    this.javaVersion = System.getProperty("java.version") + " (VM: " + System.getProperty("java.vm.name") + ", VENDOR: " + System.getProperty("java.vendor") + ")";
+    this.javaVersion =
+        System.getProperty("java.version")
+            + " (VM: "
+            + System.getProperty("java.vm.name")
+            + ", VENDOR: "
+            + System.getProperty("java.vendor")
+            + ")";
   }
 
   public int getFramesPerSecond() {
@@ -113,10 +117,8 @@ public final class GameMetrics implements IRenderable {
 
   /**
    * Sets the color that is used when rendering the metrics if {@code cl_showGameMetrics = true}.
-   * 
-   * @param color
-   *          The color for rendering the metrics.
-   * 
+   *
+   * @param color The color for rendering the metrics.
    * @see ClientConfiguration#showGameMetrics()
    * @see GameMetrics#render(Graphics2D)
    */
@@ -125,7 +127,9 @@ public final class GameMetrics implements IRenderable {
   }
 
   private void updateMetrics() {
-    this.usedMemory = Math.round((this.runtime.totalMemory() - this.runtime.freeMemory()) / (1024f * 1024f) * 10) * 0.1f;
+    this.usedMemory =
+        Math.round((this.runtime.totalMemory() - this.runtime.freeMemory()) / (1024f * 1024f) * 10)
+            * 0.1f;
   }
 
   private void drawTitle(Graphics2D g, String title) {

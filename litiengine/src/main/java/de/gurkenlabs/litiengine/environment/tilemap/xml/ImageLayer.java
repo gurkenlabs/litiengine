@@ -1,19 +1,16 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
-import java.awt.Color;
-import java.net.URL;
-
+import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
+import de.gurkenlabs.litiengine.environment.tilemap.IMapImage;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
-import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
-import de.gurkenlabs.litiengine.environment.tilemap.IMapImage;
+import java.awt.Color;
+import java.net.URL;
 
 public class ImageLayer extends Layer implements IImageLayer {
 
-  @XmlElement
-  private MapImage image;
+  @XmlElement private MapImage image;
 
   @XmlAttribute
   @XmlJavaTypeAdapter(ColorAdapter.class)

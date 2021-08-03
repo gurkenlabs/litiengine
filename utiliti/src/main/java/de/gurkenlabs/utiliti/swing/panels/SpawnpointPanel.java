@@ -73,11 +73,11 @@ public class SpawnpointPanel extends PropertyPanel {
   private LayoutManager createLayout() {
     LayoutItem[] layoutItems =
         new LayoutItem[] {
-            new LayoutItem("panel_direction", this.comboBoxDirection),
-            new LayoutItem("panel_pivot", this.comboBoxPivot),
-            new LayoutItem("panel_pivotOffsetX", this.spinnerOffsetX),
-            new LayoutItem("panel_pivotOffsetY", this.spinnerOffsetY),
-            new LayoutItem("panel_entity", this.textFieldInfo),
+          new LayoutItem("panel_direction", this.comboBoxDirection),
+          new LayoutItem("panel_pivot", this.comboBoxPivot),
+          new LayoutItem("panel_pivotOffsetX", this.spinnerOffsetX),
+          new LayoutItem("panel_pivotOffsetY", this.spinnerOffsetY),
+          new LayoutItem("panel_entity", this.textFieldInfo),
         };
 
     return this.createLayout(layoutItems);

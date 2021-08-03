@@ -1,10 +1,9 @@
 package de.gurkenlabs.litiengine.environment.tilemap;
 
-import java.awt.Color;
-import java.awt.Font;
-
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Valign;
+import java.awt.Color;
+import java.awt.Font;
 
 public interface IMapObjectText {
   public String getText();

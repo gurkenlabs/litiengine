@@ -1,5 +1,20 @@
 package de.gurkenlabs.litiengine.resources;
 
+import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
+import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
+import de.gurkenlabs.litiengine.util.io.XmlUtilities;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElementWrapper;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlTransient;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -17,23 +32,6 @@ import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipException;
-
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Marshaller;
-import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.XmlAttribute;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlElementWrapper;
-import jakarta.xml.bind.annotation.XmlRootElement;
-import jakarta.xml.bind.annotation.XmlTransient;
-
-import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
-import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
-import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
-import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
-import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
-import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 
 @XmlRootElement(name = "litidata")
 public class ResourceBundle implements Serializable {
@@ -183,7 +181,8 @@ public class ResourceBundle implements Serializable {
         out.flush();
 
         // second: postprocess xml and then write it to the file
-        XmlUtilities.saveWithCustomIndentation(new ByteArrayInputStream(out.toByteArray()), fileOut, 1);
+        XmlUtilities.saveWithCustomIndentation(
+            new ByteArrayInputStream(out.toByteArray()), fileOut, 1);
         out.close();
       }
     } catch (final JAXBException | IOException e) {
@@ -196,7 +195,10 @@ public class ResourceBundle implements Serializable {
   void beforeMarshal(Marshaller m) {
     List<SpritesheetResource> distinctList = new ArrayList<>();
     for (SpritesheetResource sprite : this.getSpriteSheets()) {
-      if (distinctList.stream().anyMatch(x -> x.getName().equals(sprite.getName()) && x.getImage().equals(sprite.getImage()))) {
+      if (distinctList.stream()
+          .anyMatch(
+              x ->
+                  x.getName().equals(sprite.getName()) && x.getImage().equals(sprite.getImage()))) {
         continue;
       }
 

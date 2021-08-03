@@ -15,7 +15,6 @@ import de.gurkenlabs.utiliti.swing.IconTreeListItem;
 import de.gurkenlabs.utiliti.swing.IconTreeListRenderer;
 import de.gurkenlabs.utiliti.swing.Icons;
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;

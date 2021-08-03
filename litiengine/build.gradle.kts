@@ -5,6 +5,7 @@ plugins {
     `java-library`
     jacoco
     id("com.stehno.natives")
+    id("org.sonarqube")
     signing
     `maven-publish`
 }

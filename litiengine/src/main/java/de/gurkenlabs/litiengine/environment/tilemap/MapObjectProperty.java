@@ -13,7 +13,7 @@ public final class MapObjectProperty {
   public static final String TAGS = "tags";
   public static final String RENDERTYPE = "renderType";
   public static final String RENDERWITHLAYER = "renderWithLayer";
-  public static final String REQUIRED_QUALITY="requiredQuality";  
+  public static final String REQUIRED_QUALITY = "requiredQuality";
 
   // collision entity
   public static final String COLLISION = "collision";
@@ -55,8 +55,8 @@ public final class MapObjectProperty {
   public static final String LIGHT_ACTIVE = "lightActive";
   public static final String LIGHT_FOCUSOFFSETX = "lightFocusOffsetX";
   public static final String LIGHT_FOCUSOFFSETY = "lightFocusOffsetY";
-  
-  //sound source
+
+  // sound source
   public static final String SOUND_VOLUME = "soundVolume";
   public static final String SOUND_LOOP = "soundLoop";
   public static final String SOUND_NAME = "soundName";
@@ -97,8 +97,7 @@ public final class MapObjectProperty {
     public static final String ORIGIN_ALIGN = "emitterOriginAlign";
     public static final String ORIGIN_VALIGN = "emitterOriginValign";
 
-    private Emitter() {
-    }
+    private Emitter() {}
   }
 
   public static final class Particle {
@@ -137,8 +136,7 @@ public final class MapObjectProperty {
     public static final String ANTIALIASING = "particleAntiAliasing";
   }
 
-  private MapObjectProperty() {
-  }
+  private MapObjectProperty() {}
 
   public static List<String> getAvailableProperties() {
     if (availableProperties.isEmpty()) {
@@ -156,7 +154,9 @@ public final class MapObjectProperty {
 
   private static void addAvailableProperties(Class<?> clz) {
     for (final Field field : clz.getDeclaredFields()) {
-      if (field.getType() == String.class && Modifier.isStatic(field.getModifiers()) && Modifier.isPublic(field.getModifiers())) {
+      if (field.getType() == String.class
+          && Modifier.isStatic(field.getModifiers())
+          && Modifier.isPublic(field.getModifiers())) {
         try {
           availableProperties.add((String) field.get(null));
         } catch (final IllegalArgumentException | IllegalAccessException e) {

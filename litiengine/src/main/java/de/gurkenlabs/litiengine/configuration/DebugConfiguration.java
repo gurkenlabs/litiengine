@@ -27,7 +27,7 @@ public class DebugConfiguration extends ConfigurationGroup {
   DebugConfiguration() {
     super();
   }
-  
+
   /**
    * Checks if is debug enabled.
    *
@@ -98,7 +98,7 @@ public class DebugConfiguration extends ConfigurationGroup {
   public boolean trackRenderTimes() {
     return this.isDebugEnabled() && this.trackRenderTimes;
   }
-  
+
   public void setDebugEnabled(final boolean debugEnabled) {
     this.set("debugEnabled", debugEnabled);
   }

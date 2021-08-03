@@ -62,7 +62,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-
 public class Editor extends Screen {
   private static final Logger log = Logger.getLogger(Editor.class.getName());
   private static final int STATUS_DURATION = 5000;

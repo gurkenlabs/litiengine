@@ -56,7 +56,7 @@ allprojects {
     }
 
     if (!skipSpotless) {
-        apply (plugin = "com.diffplug.spotless")
+        apply(plugin = "com.diffplug.spotless")
         spotless {
             kotlinGradle {
                 ktlint()

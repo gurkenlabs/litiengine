@@ -1,15 +1,14 @@
 package de.gurkenlabs.litiengine.resources;
 
+import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import java.util.ArrayList;
 
-import de.gurkenlabs.litiengine.util.io.FileUtilities;
-
 /**
- * Some common implementations that are used by different kinds of file classes (e.g. {@code SoundFormat}, {@code ImageFormat}.
+ * Some common implementations that are used by different kinds of file classes (e.g. {@code
+ * SoundFormat}, {@code ImageFormat}.
  */
 final class DataFormat {
-  private DataFormat() {
-  }
+  private DataFormat() {}
 
   protected static <T extends Enum<T>> T get(String format, T[] values, T defaultValue) {
     if (format == null || format.isEmpty()) {
@@ -30,7 +29,8 @@ final class DataFormat {
     return defaultValue;
   }
 
-  protected static <T extends Enum<T>> boolean isSupported(String fileName, T[] values, T defaultValue) {
+  protected static <T extends Enum<T>> boolean isSupported(
+      String fileName, T[] values, T defaultValue) {
     String extension = FileUtilities.getExtension(fileName);
     if (extension == null || extension.isEmpty()) {
       return false;

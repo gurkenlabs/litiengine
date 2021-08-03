@@ -1,9 +1,8 @@
 package de.gurkenlabs.litiengine.environment.tilemap;
 
+import de.gurkenlabs.litiengine.graphics.RenderType;
 import java.awt.Dimension;
 import java.awt.Point;
-
-import de.gurkenlabs.litiengine.graphics.RenderType;
 
 public interface ILayer extends ICustomPropertyProvider {
 

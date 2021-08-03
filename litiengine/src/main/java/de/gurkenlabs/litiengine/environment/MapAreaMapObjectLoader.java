@@ -1,12 +1,11 @@
 package de.gurkenlabs.litiengine.environment;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.MapArea;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class MapAreaMapObjectLoader extends MapObjectLoader {
 

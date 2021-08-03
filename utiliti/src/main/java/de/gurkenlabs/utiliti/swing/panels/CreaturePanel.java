@@ -108,8 +108,8 @@ public class CreaturePanel extends PropertyPanel {
   private LayoutManager createLayout() {
     LayoutItem[] layoutItems =
         new LayoutItem[] {
-            new LayoutItem("panel_sprite", this.comboBoxSpriteSheets),
-            new LayoutItem("panel_direction", this.comboBoxDirection),
+          new LayoutItem("panel_sprite", this.comboBoxSpriteSheets),
+          new LayoutItem("panel_direction", this.comboBoxDirection),
         };
 
     return this.createLayout(layoutItems, this.checkBoxScale);

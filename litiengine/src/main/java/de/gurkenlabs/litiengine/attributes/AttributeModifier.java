@@ -1,12 +1,9 @@
 package de.gurkenlabs.litiengine.attributes;
 
 /**
- * An attribute modifier allows to modify attributes by the
- * specified Modification and modify value.
+ * An attribute modifier allows to modify attributes by the specified Modification and modify value.
  *
- * @param <T>
- *          the generic type
- *
+ * @param <T> the generic type
  * @see Attribute#addModifier(AttributeModifier)
  * @see Attribute#modifyBaseValue(AttributeModifier)
  */
@@ -18,10 +15,8 @@ public class AttributeModifier<T extends Number> implements Comparable<Attribute
   /**
    * Initializes a new instance of the {@code AttributeModifier} class.
    *
-   * @param mod
-   *          The modification type.
-   * @param modifyValue
-   *          The modification value to be applied by this instance.
+   * @param mod The modification type.
+   * @param modifyValue The modification value to be applied by this instance.
    */
   public AttributeModifier(final Modification mod, final double modifyValue) {
     this.modification = mod;
@@ -31,14 +26,17 @@ public class AttributeModifier<T extends Number> implements Comparable<Attribute
 
   @Override
   public int compareTo(final AttributeModifier<T> otherModifier) {
-    return Integer.compare(this.getModification().getApplyOrder(), otherModifier.getModification().getApplyOrder());
+    return Integer.compare(
+        this.getModification().getApplyOrder(), otherModifier.getModification().getApplyOrder());
   }
 
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof AttributeModifier<?>) {
       AttributeModifier<?> attr = (AttributeModifier<?>) obj;
-      return this.isActive() == attr.isActive() && this.getModification() == attr.getModification() && this.getModifyValue() == attr.getModifyValue();
+      return this.isActive() == attr.isActive()
+          && this.getModification() == attr.getModification()
+          && this.getModifyValue() == attr.getModifyValue();
     }
 
     return super.equals(obj);
@@ -51,7 +49,7 @@ public class AttributeModifier<T extends Number> implements Comparable<Attribute
 
   /**
    * Gets the modification type applied by this modifier.
-   * 
+   *
    * @return The modification type applied by this modifier.
    */
   public Modification getModification() {
@@ -60,7 +58,7 @@ public class AttributeModifier<T extends Number> implements Comparable<Attribute
 
   /**
    * Gets the value that is used to modify an attribute.
-   * 
+   *
    * @return The value that is used to modify an attribute.
    */
   public double getModifyValue() {
@@ -77,23 +75,33 @@ public class AttributeModifier<T extends Number> implements Comparable<Attribute
     }
 
     switch (this.getModification()) {
-    case ADD:
-      return this.ensureType(Double.valueOf(modvalue.doubleValue() + this.getModifyValue()), modvalue);
-    case SUBTRACT:
-      return this.ensureType(Double.valueOf(modvalue.doubleValue() - this.getModifyValue()), modvalue);
-    case MULTIPLY:
-      return this.ensureType(Double.valueOf(modvalue.doubleValue() * this.getModifyValue()), modvalue);
-    case DIVIDE:
-      return this.ensureType(Double.valueOf(modvalue.doubleValue() / this.getModifyValue()), modvalue);
-    case ADDPERCENT:
-      return this.ensureType(Double.valueOf(modvalue.doubleValue() + modvalue.doubleValue() / 100 * this.getModifyValue()), modvalue);
-    case SUBTRACTPERCENT:
-      return this.ensureType(Double.valueOf(modvalue.doubleValue() - modvalue.doubleValue() / 100 * this.getModifyValue()), modvalue);
-    case SET:
-      return this.ensureType(Double.valueOf(this.getModifyValue()), modvalue);
-    case UNKNOWN:
-    default:
-      return modvalue;
+      case ADD:
+        return this.ensureType(
+            Double.valueOf(modvalue.doubleValue() + this.getModifyValue()), modvalue);
+      case SUBTRACT:
+        return this.ensureType(
+            Double.valueOf(modvalue.doubleValue() - this.getModifyValue()), modvalue);
+      case MULTIPLY:
+        return this.ensureType(
+            Double.valueOf(modvalue.doubleValue() * this.getModifyValue()), modvalue);
+      case DIVIDE:
+        return this.ensureType(
+            Double.valueOf(modvalue.doubleValue() / this.getModifyValue()), modvalue);
+      case ADDPERCENT:
+        return this.ensureType(
+            Double.valueOf(
+                modvalue.doubleValue() + modvalue.doubleValue() / 100 * this.getModifyValue()),
+            modvalue);
+      case SUBTRACTPERCENT:
+        return this.ensureType(
+            Double.valueOf(
+                modvalue.doubleValue() - modvalue.doubleValue() / 100 * this.getModifyValue()),
+            modvalue);
+      case SET:
+        return this.ensureType(Double.valueOf(this.getModifyValue()), modvalue);
+      case UNKNOWN:
+      default:
+        return modvalue;
     }
   }
 

@@ -1,40 +1,32 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.net.MalformedURLException;
-import java.net.URL;
-
+import de.gurkenlabs.litiengine.environment.tilemap.IMapImage;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlTransient;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
-import de.gurkenlabs.litiengine.environment.tilemap.IMapImage;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 public class MapImage extends CustomPropertyProvider implements IMapImage {
 
-  @XmlAttribute
-  private String source;
+  @XmlAttribute private String source;
 
   @XmlAttribute(name = "trans")
   @XmlJavaTypeAdapter(ColorAdapter.class)
   private Color transparentcolor;
 
-  @XmlAttribute
-  private int width;
+  @XmlAttribute private int width;
 
-  @XmlAttribute
-  private int height;
+  @XmlAttribute private int height;
 
-  @XmlTransient
-  private URL absolutePath;
+  @XmlTransient private URL absolutePath;
 
-  /**
-   * Instantiates a new {@code MapImage} instance.
-   */
+  /** Instantiates a new {@code MapImage} instance. */
   public MapImage() {
     super();
   }
@@ -42,8 +34,7 @@ public class MapImage extends CustomPropertyProvider implements IMapImage {
   /**
    * Instantiates a new {@code MapImage} instance by copying the specified original.
    *
-   * @param original
-   *          the original we want to copy
+   * @param original the original we want to copy
    */
   public MapImage(MapImage original) {
     super(original);
@@ -54,10 +45,12 @@ public class MapImage extends CustomPropertyProvider implements IMapImage {
 
     this.source = original.getSource();
     if (original.getTransparentColor() != null) {
-      this.transparentcolor = new Color(original.getTransparentColor().getRed(),
-          original.getTransparentColor().getGreen(),
-          original.getTransparentColor().getBlue(),
-          original.getTransparentColor().getAlpha());
+      this.transparentcolor =
+          new Color(
+              original.getTransparentColor().getRed(),
+              original.getTransparentColor().getGreen(),
+              original.getTransparentColor().getBlue(),
+              original.getTransparentColor().getAlpha());
     }
     this.width = original.getWidth();
     this.height = original.getHeight();
@@ -140,13 +133,13 @@ public class MapImage extends CustomPropertyProvider implements IMapImage {
     }
 
     IMapImage other = (IMapImage) anObject;
-    return this.getTransparentColor().equals(other.getTransparentColor()) && this.getAbsoluteSourcePath().equals(other.getAbsoluteSourcePath());
+    return this.getTransparentColor().equals(other.getTransparentColor())
+        && this.getAbsoluteSourcePath().equals(other.getAbsoluteSourcePath());
   }
 
   /**
-   * Computes a hash code for this map image. The hash code for
-   * a map image is equal to the hash code of its absolute source
-   * path xor the hash code of its transparent color.
+   * Computes a hash code for this map image. The hash code for a map image is equal to the hash
+   * code of its absolute source path xor the hash code of its transparent color.
    *
    * @return The hash code for this map image
    */

@@ -51,8 +51,8 @@ public class StaticShadowPanel extends PropertyPanel {
   private LayoutManager createLayout() {
     LayoutItem[] layoutItems =
         new LayoutItem[] {
-            new LayoutItem("panel_shadowType", this.comboBoxShadowType),
-            new LayoutItem("panel_offset", this.spinnerOffset),
+          new LayoutItem("panel_shadowType", this.comboBoxShadowType),
+          new LayoutItem("panel_offset", this.spinnerOffset),
         };
 
     return this.createLayout(layoutItems);

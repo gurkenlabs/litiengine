@@ -1,16 +1,5 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
-import java.awt.image.BufferedImage;
-import java.net.URL;
-import java.util.Arrays;
-
-import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlAttribute;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlTransient;
-
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ITerrain;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileAnimation;
@@ -18,45 +7,43 @@ import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.ITilesetEntry;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlTransient;
+import java.awt.image.BufferedImage;
+import java.net.URL;
+import java.util.Arrays;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 public class TilesetEntry extends CustomPropertyProvider implements ITilesetEntry {
-  @XmlTransient
-  private Tileset tileset;
+  @XmlTransient private Tileset tileset;
 
   private transient ITerrain[] terrains;
 
-  @XmlAttribute
-  private Integer id;
+  @XmlAttribute private Integer id;
 
-  @XmlAttribute
-  private String terrain;
+  @XmlAttribute private String terrain;
 
-  @XmlElement
-  private TileAnimation animation;
+  @XmlElement private TileAnimation animation;
 
-  @XmlElement
-  private MapImage image;
+  @XmlElement private MapImage image;
 
-  @XmlAttribute
-  private String type;
+  @XmlAttribute private String type;
 
-  @XmlElement(name="objectgroup")
+  @XmlElement(name = "objectgroup")
   private MapObjectLayer collisionData;
 
-  /**
-   * Instantiates a new {@code TilesetEntry}.
-   */
-  public TilesetEntry() {
-  }
+  /** Instantiates a new {@code TilesetEntry}. */
+  public TilesetEntry() {}
 
   /**
    * Instantiates a new {@code TilesetEntry} from the specified tileset.
    *
-   * @param tileset
-   *          The tileset that contains this entry.
-   * @param id
-   *          The identifier of this instance.
+   * @param tileset The tileset that contains this entry.
+   * @param id The identifier of this instance.
    */
   public TilesetEntry(Tileset tileset, int id) {
     this.tileset = tileset;
@@ -95,7 +82,9 @@ public class TilesetEntry extends CustomPropertyProvider implements ITilesetEntr
     if (this.image != null) {
       return Resources.images().get(this.image.getAbsoluteSourcePath());
     }
-    return this.tileset.getSpritesheet().getSprite(this.getId(), this.tileset.getMargin(), this.tileset.getSpacing());
+    return this.tileset
+        .getSpritesheet()
+        .getSprite(this.getId(), this.tileset.getMargin(), this.tileset.getSpacing());
   }
 
   @Override
@@ -118,7 +107,7 @@ public class TilesetEntry extends CustomPropertyProvider implements ITilesetEntr
   }
 
   protected int[] getTerrainIds() {
-    int[] terrainIds = new int[] { Terrain.NONE, Terrain.NONE, Terrain.NONE, Terrain.NONE };
+    int[] terrainIds = new int[] {Terrain.NONE, Terrain.NONE, Terrain.NONE, Terrain.NONE};
     if (this.terrain == null || this.terrain.isEmpty()) {
       return terrainIds;
     }
@@ -147,7 +136,10 @@ public class TilesetEntry extends CustomPropertyProvider implements ITilesetEntr
   }
 
   boolean shouldBeSaved() {
-    return this.terrain != null || this.image != null || this.animation != null || this.type != null;
+    return this.terrain != null
+        || this.image != null
+        || this.animation != null
+        || this.type != null;
   }
 
   @SuppressWarnings("unused")

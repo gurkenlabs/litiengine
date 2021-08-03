@@ -167,20 +167,21 @@ public final class UI {
     ScrollHandlerBar horizontalScroll = new ScrollHandlerBar(java.awt.Adjustable.HORIZONTAL);
     ScrollHandlerBar verticalScroll = new ScrollHandlerBar(java.awt.Adjustable.VERTICAL);
 
-    EnvironmentListener environmentListener = new EnvironmentListener() {
-      @Override
-      public void loaded(Environment environment) {
-        boolean hasMap = environment != null && environment.getMap() != null;
-        horizontalScroll.setVisible(hasMap);
-        verticalScroll.setVisible(hasMap);
-      }
+    EnvironmentListener environmentListener =
+        new EnvironmentListener() {
+          @Override
+          public void loaded(Environment environment) {
+            boolean hasMap = environment != null && environment.getMap() != null;
+            horizontalScroll.setVisible(hasMap);
+            verticalScroll.setVisible(hasMap);
+          }
 
-      @Override
-      public void unloaded(Environment environment) {
-        horizontalScroll.setVisible(false);
-        verticalScroll.setVisible(false);
-      }
-    };
+          @Override
+          public void unloaded(Environment environment) {
+            horizontalScroll.setVisible(false);
+            verticalScroll.setVisible(false);
+          }
+        };
     environmentListener.loaded(Game.world().environment());
     Game.world().addListener(environmentListener);
     renderPane.add(horizontalScroll, BorderLayout.SOUTH);

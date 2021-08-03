@@ -1,19 +1,16 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
+import de.gurkenlabs.litiengine.environment.tilemap.ITileOffset;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlAttribute;
 
-import de.gurkenlabs.litiengine.environment.tilemap.ITileOffset;
-
 @XmlAccessorType(XmlAccessType.FIELD)
 public class TileOffset implements ITileOffset {
 
-  @XmlAttribute
-  private int x;
+  @XmlAttribute private int x;
 
-  @XmlAttribute
-  private int y;
+  @XmlAttribute private int y;
 
   @Override
   public int getX() {

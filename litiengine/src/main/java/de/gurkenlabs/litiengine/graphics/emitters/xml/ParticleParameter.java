@@ -1,10 +1,10 @@
 package de.gurkenlabs.litiengine.graphics.emitters.xml;
 
-import java.io.Serializable;
-import java.util.concurrent.ThreadLocalRandom;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlTransient;
+import java.io.Serializable;
+import java.util.concurrent.ThreadLocalRandom;
 
 @XmlRootElement(name = "param")
 public class ParticleParameter implements Serializable {

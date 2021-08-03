@@ -1,26 +1,5 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
-import java.awt.Dimension;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import jakarta.xml.bind.Marshaller;
-import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlAttribute;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlElementWrapper;
-import jakarta.xml.bind.annotation.XmlRootElement;
-import jakarta.xml.bind.annotation.XmlTransient;
-
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapImage;
 import de.gurkenlabs.litiengine.environment.tilemap.ITerrain;
@@ -32,6 +11,25 @@ import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElementWrapper;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlTransient;
+import java.awt.Dimension;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @XmlRootElement(name = "tileset")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -39,38 +37,28 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   private static final Logger log = Logger.getLogger(Tileset.class.getName());
   public static final String FILE_EXTENSION = "tsx";
 
-  @XmlAttribute
-  private int firstgid;
+  @XmlAttribute private int firstgid;
 
-  @XmlElement
-  private MapImage image;
+  @XmlElement private MapImage image;
 
-  @XmlAttribute
-  private Integer margin;
+  @XmlAttribute private Integer margin;
 
-  @XmlAttribute
-  private String name;
+  @XmlAttribute private String name;
 
-  @XmlAttribute
-  private Integer tilewidth;
+  @XmlAttribute private Integer tilewidth;
 
-  @XmlAttribute
-  private Integer tileheight;
+  @XmlAttribute private Integer tileheight;
 
   @XmlElement(name = "tileoffset")
   private TileOffset tileoffset;
 
-  @XmlAttribute
-  private Integer tilecount;
+  @XmlAttribute private Integer tilecount;
 
-  @XmlAttribute
-  private Integer columns;
+  @XmlAttribute private Integer columns;
 
-  @XmlAttribute
-  private Integer spacing;
+  @XmlAttribute private Integer spacing;
 
-  @XmlAttribute
-  private String source;
+  @XmlAttribute private String source;
 
   @XmlElementWrapper(name = "terraintypes")
   @XmlElement(name = "terrain")
@@ -79,11 +67,9 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   @XmlElement(name = "tile")
   private List<TilesetEntry> tiles = null;
 
-  @XmlTransient
-  private List<TilesetEntry> allTiles;
+  @XmlTransient private List<TilesetEntry> allTiles;
 
-  @XmlTransient
-  protected Tileset sourceTileset;
+  @XmlTransient protected Tileset sourceTileset;
 
   private transient Spritesheet spriteSheet;
 
@@ -176,7 +162,9 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
 
   @Override
   public Dimension getTileDimension() {
-    return this.sourceTileset != null ? this.sourceTileset.getTileDimension() : new Dimension(this.getTileWidth(), this.getTileHeight());
+    return this.sourceTileset != null
+        ? this.sourceTileset.getTileDimension()
+        : new Dimension(this.getTileWidth(), this.getTileHeight());
   }
 
   /**
@@ -281,7 +269,9 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   @Override
   public boolean containsTile(ITile tile) {
     ITilesetEntry entry = tile.getTilesetEntry();
-    return entry == null ? this.containsTile(tile.getGridId()) : this.containsTile(tile.getTilesetEntry());
+    return entry == null
+        ? this.containsTile(tile.getGridId())
+        : this.containsTile(tile.getTilesetEntry());
   }
 
   @Override
@@ -342,7 +332,8 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
       return;
     }
 
-    XmlUtilities.save(this.sourceTileset, FileUtilities.combine(basePath, this.source), FILE_EXTENSION);
+    XmlUtilities.save(
+        this.sourceTileset, FileUtilities.combine(basePath, this.source), FILE_EXTENSION);
   }
 
   public boolean isExternal() {
@@ -378,7 +369,10 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
         }
       }
       if (iter.hasNext()) {
-        log.log(Level.WARNING, "tileset \"{0}\" had a tilecount attribute of {1} but had tile IDs going beyond that", new Object[] { this.name, this.getTileCount() });
+        log.log(
+            Level.WARNING,
+            "tileset \"{0}\" had a tilecount attribute of {1} but had tile IDs going beyond that",
+            new Object[] {this.name, this.getTileCount()});
         while (iter.hasNext()) {
           int nextId = iter.next().getId();
           iter.previous();

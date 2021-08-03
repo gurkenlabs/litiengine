@@ -1,44 +1,35 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
-import java.awt.Dimension;
-import java.awt.Point;
-
-import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.XmlAttribute;
-import jakarta.xml.bind.annotation.XmlTransient;
-import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
 import de.gurkenlabs.litiengine.environment.tilemap.ILayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.LayerProperty;
 import de.gurkenlabs.litiengine.graphics.RenderType;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlTransient;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.awt.Dimension;
+import java.awt.Point;
 
 public abstract class Layer extends CustomPropertyProvider implements ILayer {
 
-  @XmlAttribute
-  private int id;
+  @XmlAttribute private int id;
 
-  @XmlAttribute
-  private String name;
+  @XmlAttribute private String name;
 
-  @XmlAttribute
-  private Integer width;
+  @XmlAttribute private Integer width;
 
-  @XmlAttribute
-  private Integer height;
+  @XmlAttribute private Integer height;
 
-  @XmlAttribute
-  private Float opacity;
+  @XmlAttribute private Float opacity;
 
   @XmlAttribute
   @XmlJavaTypeAdapter(BooleanIntegerAdapter.class)
   private Boolean visible;
 
-  @XmlAttribute
-  private Integer offsetx;
+  @XmlAttribute private Integer offsetx;
 
-  @XmlAttribute
-  private Integer offsety;
+  @XmlAttribute private Integer offsety;
 
   private transient TmxMap parentMap;
   private transient RenderType renderType;
@@ -51,8 +42,7 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
   /**
    * Copy Constructor for copying instances of Layers.
    *
-   * @param layerToBeCopied
-   *          the layer we want to copy
+   * @param layerToBeCopied the layer we want to copy
    */
   public Layer(Layer layerToBeCopied) {
     super(layerToBeCopied);
@@ -130,7 +120,8 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
       return this.renderType;
     }
 
-    this.renderType = this.getEnumValue(LayerProperty.LAYER_RENDER_TYPE, RenderType.class, RenderType.GROUND);
+    this.renderType =
+        this.getEnumValue(LayerProperty.LAYER_RENDER_TYPE, RenderType.class, RenderType.GROUND);
     this.renderTypeLoaded = true;
     return this.renderType;
   }
@@ -224,46 +215,36 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
     resetOpacity();
   }
 
-  /**
-   * Resets offsetx if it is resettable
-   */
-  protected void resetOffsetX(){
+  /** Resets offsetx if it is resettable */
+  protected void resetOffsetX() {
     if (isResettable(this.offsetx)) {
       this.offsetx = null;
     }
   }
 
-  /**
-   * Resets offsety if it is resettable
-   */
-  protected void resetOffsetY(){
+  /** Resets offsety if it is resettable */
+  protected void resetOffsetY() {
     if (isResettable(this.offsety)) {
       this.offsety = null;
     }
   }
 
-  /**
-   * Resets width if it is resettable
-   */
-  protected void resetWidth(){
+  /** Resets width if it is resettable */
+  protected void resetWidth() {
     if (isResettable(this.width)) {
       this.width = null;
     }
   }
 
-  /**
-   * Resets height if it is resettable
-   */
-  protected void resetHeight(){
+  /** Resets height if it is resettable */
+  protected void resetHeight() {
     if (isResettable(this.height)) {
       this.height = null;
     }
   }
 
-  /**
-   * Resets opacity if it is resettable
-   */
-  protected void resetOpacity(){
+  /** Resets opacity if it is resettable */
+  protected void resetOpacity() {
     if (isResettable(this.opacity)) {
       this.opacity = null;
     }
@@ -271,19 +252,21 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
 
   /**
    * Decides if a value satisfies the criteria for being set to null
+   *
    * @param value Integer value to be checked
    * @return True if the value satisfies the reset criteria
    */
-  protected boolean isResettable(Integer value){
+  protected boolean isResettable(Integer value) {
     return value != null && value.intValue() == 0;
   }
 
   /**
    * Decides if a value satisfies the criteria for being set to null
+   *
    * @param value Float value to be checked
    * @return True if the value satisfies the reset criteria
    */
-  protected boolean isResettable(Float value){
+  protected boolean isResettable(Float value) {
     return value != null && value.floatValue() == 1.0f;
   }
 }

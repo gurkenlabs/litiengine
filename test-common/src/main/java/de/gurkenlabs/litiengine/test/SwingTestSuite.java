@@ -1,13 +1,12 @@
 package de.gurkenlabs.litiengine.test;
 
-import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.jupiter.api.extension.InvocationInterceptor;
-import org.junit.jupiter.api.extension.ReflectiveInvocationContext;
-
-import javax.swing.SwingUtilities;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.concurrent.CompletionException;
+import javax.swing.SwingUtilities;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.InvocationInterceptor;
+import org.junit.jupiter.api.extension.ReflectiveInvocationContext;
 
 public class SwingTestSuite implements InvocationInterceptor {
 

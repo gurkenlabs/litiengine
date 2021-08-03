@@ -16,15 +16,16 @@ public final class MapProperty {
   public static final String MAP_TITLE = "MAP_TITLE";
   public static final String GRAVITY = "GRAVITY";
 
-  private MapProperty() {
-  }
+  private MapProperty() {}
 
   private static List<String> availableProperties = new ArrayList<>();
 
   public static List<String> getAvailableProperties() {
     if (availableProperties.isEmpty()) {
       for (final Field field : MapProperty.class.getDeclaredFields()) {
-        if (field.getType() == String.class && Modifier.isStatic(field.getModifiers()) && Modifier.isPublic(field.getModifiers())) {
+        if (field.getType() == String.class
+            && Modifier.isStatic(field.getModifiers())
+            && Modifier.isPublic(field.getModifiers())) {
           try {
             availableProperties.add((String) field.get(null));
           } catch (final IllegalArgumentException | IllegalAccessException e) {
@@ -39,5 +40,4 @@ public final class MapProperty {
   public static boolean isCustom(final String name) {
     return getAvailableProperties().stream().noneMatch(x -> x.equalsIgnoreCase(name));
   }
-
 }

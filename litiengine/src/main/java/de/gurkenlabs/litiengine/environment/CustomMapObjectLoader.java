@@ -1,5 +1,7 @@
 package de.gurkenlabs.litiengine.environment;
 
+import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -7,16 +9,14 @@ import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.gurkenlabs.litiengine.entities.IEntity;
-import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
-
 public final class CustomMapObjectLoader extends MapObjectLoader {
   private static final Logger log = Logger.getLogger(CustomMapObjectLoader.class.getName());
   private final ConstructorInvocation invoke;
 
   @FunctionalInterface
   interface ConstructorInvocation {
-    IEntity invoke(Environment environment, IMapObject mapObject) throws InvocationTargetException, IllegalAccessException, InstantiationException;
+    IEntity invoke(Environment environment, IMapObject mapObject)
+        throws InvocationTargetException, IllegalAccessException, InstantiationException;
   }
 
   CustomMapObjectLoader(String mapObjectType, ConstructorInvocation invocation) {
@@ -32,7 +32,11 @@ public final class CustomMapObjectLoader extends MapObjectLoader {
       Class<?>[] classes = constructor.getParameterTypes();
       if (classes.length == 2) {
         if (classes[0] == Environment.class && classes[1] == IMapObject.class) {
-          return (e, o) -> (IEntity) constructor.newInstance(e, o); // exit early because we've already found the highest priority constructor
+          return (e, o) ->
+              (IEntity)
+                  constructor.newInstance(
+                      e,
+                      o); // exit early because we've already found the highest priority constructor
         } else if (classes[0] == IMapObject.class && classes[1] == Environment.class) {
           inv = (e, o) -> (IEntity) constructor.newInstance(o, e);
           priority = 3;

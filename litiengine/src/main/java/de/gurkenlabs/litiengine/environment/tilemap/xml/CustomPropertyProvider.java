@@ -1,5 +1,12 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
+import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.awt.Color;
 import java.net.URL;
 import java.util.ArrayList;
@@ -9,15 +16,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
-import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
-import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
-
 @XmlAccessorType(XmlAccessType.FIELD)
 public class CustomPropertyProvider implements ICustomPropertyProvider {
   @XmlElement
@@ -25,17 +23,19 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
   private Map<String, ICustomProperty> properties;
 
   public CustomPropertyProvider() {
-    this.properties = new Hashtable<>(); // use Hashtable because it rejects null keys and null values
+    this.properties =
+        new Hashtable<>(); // use Hashtable because it rejects null keys and null values
   }
 
   /**
    * Copy Constructor for copying instances of CustomPropertyProviders.
    *
-   * @param propertyProviderToBeCopied
-   *          the PropertyProvider we want to copy
+   * @param propertyProviderToBeCopied the PropertyProvider we want to copy
    */
   public CustomPropertyProvider(ICustomPropertyProvider propertyProviderToBeCopied) {
-    this.properties = propertyProviderToBeCopied.getProperties().entrySet().stream().collect(Collectors.toMap(Entry::getKey, e -> new CustomProperty((e.getValue()))));
+    this.properties =
+        propertyProviderToBeCopied.getProperties().entrySet().stream()
+            .collect(Collectors.toMap(Entry::getKey, e -> new CustomProperty((e.getValue()))));
   }
 
   @Override
@@ -208,7 +208,8 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
   }
 
   @Override
-  public <T extends Enum<T>> T getEnumValue(String propertyName, Class<T> enumType, T defaultValue) {
+  public <T extends Enum<T>> T getEnumValue(
+      String propertyName, Class<T> enumType, T defaultValue) {
     ICustomProperty property = this.getProperty(propertyName);
     if (property == null) {
       return defaultValue;

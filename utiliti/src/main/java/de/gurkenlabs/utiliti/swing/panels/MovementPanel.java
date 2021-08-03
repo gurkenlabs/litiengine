@@ -57,9 +57,9 @@ public class MovementPanel extends PropertyPanel {
   private LayoutManager createLayout() {
     LayoutItem[] layoutItems =
         new LayoutItem[] {
-            new LayoutItem("panel_acceleration", this.spinnerAcceleration),
-            new LayoutItem("panel_deceleration", this.spinnerDeceleration),
-            new LayoutItem("panel_velocity", this.spinnerVelocity),
+          new LayoutItem("panel_acceleration", this.spinnerAcceleration),
+          new LayoutItem("panel_deceleration", this.spinnerDeceleration),
+          new LayoutItem("panel_velocity", this.spinnerVelocity),
         };
 
     return this.createLayout(layoutItems, this.chckbxTurnOnMove);

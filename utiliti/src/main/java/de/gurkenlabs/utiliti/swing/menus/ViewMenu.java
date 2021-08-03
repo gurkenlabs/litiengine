@@ -10,7 +10,6 @@ import de.gurkenlabs.utiliti.renderers.GridRenderer;
 import de.gurkenlabs.utiliti.renderers.Renderers;
 import de.gurkenlabs.utiliti.swing.UI;
 import de.gurkenlabs.utiliti.swing.dialogs.GridEditPanel;
-import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.ButtonGroup;
@@ -30,7 +29,9 @@ public final class ViewMenu extends JMenu {
     JMenu themeMenu = new JMenu(Resources.strings().get("menu_view_theme"));
     ButtonGroup themegroup = new ButtonGroup();
     for (Theme theme : Theme.values()) {
-      JRadioButtonMenuItem menuItem = new JRadioButtonMenuItem(Resources.strings().get("menu_view_theme_" + theme.name().toLowerCase()));
+      JRadioButtonMenuItem menuItem =
+          new JRadioButtonMenuItem(
+              Resources.strings().get("menu_view_theme_" + theme.name().toLowerCase()));
       menuItem.setSelected(Editor.preferences().getTheme() == theme);
       menuItem.addActionListener(e -> UI.setTheme(theme));
       themegroup.add(menuItem);

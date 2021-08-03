@@ -2,7 +2,7 @@ package de.gurkenlabs.litiengine.attributes;
 
 /**
  * The different modification types that can be applied to an {@code Attribute}.
- * 
+ *
  * @see AttributeModifier#getModification()
  */
 public enum Modification {

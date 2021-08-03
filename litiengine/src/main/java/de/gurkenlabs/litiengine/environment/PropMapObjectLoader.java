@@ -1,13 +1,5 @@
 package de.gurkenlabs.litiengine.environment;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import de.gurkenlabs.litiengine.entities.AnimationInfo;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.Material;
@@ -17,6 +9,13 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.graphics.animation.EntityAnimationController;
 import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class PropMapObjectLoader extends MapObjectLoader {
   private static final Logger log = Logger.getLogger(PropMapObjectLoader.class.getName());
@@ -31,34 +30,24 @@ public class PropMapObjectLoader extends MapObjectLoader {
   }
 
   /**
-   * <p>
-   * Registers a custom {@link Prop} implementation that can be automatically
-   * provided by this {@link MapObjectLoader}.
-   * </p>
-   * 
-   * <p>
-   * <b>This should only be used if the particular implementation doesn't
-   * require any additional map object properties to be initialized.</b>
-   * </p>
-   * 
-   * Make sure that the implementation has the following present:
+   * Registers a custom {@link Prop} implementation that can be automatically provided by this
+   * {@link MapObjectLoader}.
+   *
+   * <p><b>This should only be used if the particular implementation doesn't require any additional
+   * map object properties to be initialized.</b> Make sure that the implementation has the
+   * following present:
+   *
    * <ol>
-   * <li>An {@link AnimationInfo} annotation with one or more sprite prefixes
-   * defined</li>
-   * <li>Either an empty constructor or a constructor that takes in the sprite
-   * prefix from the loader.</li>
+   *   <li>An {@link AnimationInfo} annotation with one or more sprite prefixes defined
+   *   <li>Either an empty constructor or a constructor that takes in the sprite prefix from the
+   *       loader.
    * </ol>
-   * 
-   * <p>
-   * The latter is particularly useful for classes that can have different
-   * sprite sheets, i.e. share the same logic but might have a different
-   * appearance.
-   * </p>
-   * 
-   * @param <T>
-   *          The type of the custom creature implementation.
-   * @param propType
-   *          The class of the custom {@link Prop} implementation.
+   *
+   * <p>The latter is particularly useful for classes that can have different sprite sheets, i.e.
+   * share the same logic but might have a different appearance.
+   *
+   * @param <T> The type of the custom creature implementation.
+   * @param propType The class of the custom {@link Prop} implementation.
    */
   public static <T extends Prop> void registerCustomPropType(Class<T> propType) {
     customPropType.add(propType);
@@ -71,10 +60,10 @@ public class PropMapObjectLoader extends MapObjectLoader {
       return entities;
     }
 
-
-    final Prop prop = this.createNewProp(mapObject, mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME));
+    final Prop prop =
+        this.createNewProp(mapObject, mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME));
     loadDefaultProperties(prop, mapObject);
-    
+
     prop.setMaterial(Material.get(mapObject.getStringValue(MapObjectProperty.PROP_MATERIAL)));
 
     entities.add(prop);
@@ -84,7 +73,8 @@ public class PropMapObjectLoader extends MapObjectLoader {
   protected Prop createNewProp(IMapObject mapObject, String spriteSheet) {
     for (Class<? extends Prop> customProp : customPropType) {
       for (String prefix : EntityAnimationController.getDefaultSpritePrefixes(customProp)) {
-        if (prefix != null && (PropAnimationController.PROP_IDENTIFIER + spriteSheet).equalsIgnoreCase(prefix)) {
+        if (prefix != null
+            && (PropAnimationController.PROP_IDENTIFIER + spriteSheet).equalsIgnoreCase(prefix)) {
           Prop created = createCustomProp(customProp, spriteSheet);
           if (created != null) {
             return created;
@@ -99,13 +89,26 @@ public class PropMapObjectLoader extends MapObjectLoader {
   private static Prop createCustomProp(Class<? extends Prop> customProp, String spriteSheet) {
     try {
       return customProp.getConstructor(String.class).newInstance(spriteSheet);
-    } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+    } catch (InstantiationException
+        | IllegalAccessException
+        | IllegalArgumentException
+        | InvocationTargetException
+        | NoSuchMethodException
+        | SecurityException e) {
       try {
         Prop creature = customProp.getConstructor().newInstance();
         creature.setSpritesheetName(spriteSheet);
         return creature;
-      } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException ex) {
-        log.log(Level.SEVERE, "Could not automatically create prop of type {0} because a matching constructor is missing.", new Object[] { customProp });
+      } catch (InstantiationException
+          | IllegalAccessException
+          | IllegalArgumentException
+          | InvocationTargetException
+          | NoSuchMethodException
+          | SecurityException ex) {
+        log.log(
+            Level.SEVERE,
+            "Could not automatically create prop of type {0} because a matching constructor is missing.",
+            new Object[] {customProp});
         log.log(Level.SEVERE, ex.getMessage(), ex);
       }
     }

@@ -120,8 +120,7 @@ public class GameWorldTests {
         Resources.maps().get("de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
     Game.world().loadEnvironment(map);
     IMap map2 =
-        Resources.maps()
-            .get("de/gurkenlabs/litiengine/environment/tilemap/xml/test-mapobject.tmx");
+        Resources.maps().get("de/gurkenlabs/litiengine/environment/tilemap/xml/test-mapobject.tmx");
 
     // act
     Game.world().loadEnvironment(map2);

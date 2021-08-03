@@ -1,32 +1,31 @@
 package de.gurkenlabs.litiengine.util.geom;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.awt.Shape;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Area;
 import java.awt.geom.Dimension2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
+import java.awt.geom.Path2D;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
 import java.awt.geom.RoundRectangle2D;
-import java.awt.geom.Path2D;
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
-
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class GeometricUtilitiesTests {
 
@@ -412,9 +411,9 @@ public class GeometricUtilitiesTests {
 
   /**
    * TODO: Sometimes, floating point precision can stand in the way of calculating accurate
-   *  intersections, this should probably be investigated. @see{@link
-   *  java.awt.geom.RectangularShape#intersects(Rectangle2D)} The inaccurate cases are marked
-   *  in @see{getIntersectsEllipseArguments}
+   * intersections, this should probably be investigated. @see{@link
+   * java.awt.geom.RectangularShape#intersects(Rectangle2D)} The inaccurate cases are marked
+   * in @see{getIntersectsEllipseArguments}
    */
   @ParameterizedTest(name = "testIntersectsEllipse {0}")
   @MethodSource("getIntersectsEllipseArguments")
@@ -492,16 +491,18 @@ public class GeometricUtilitiesTests {
     assertEquals(expectedDistance, actualDistance, 0.000001d);
   }
 
-  @ParameterizedTest(name="testShapeIntersects no intersection {0} -> {1} ({2})")
+  @ParameterizedTest(name = "testShapeIntersects no intersection {0} -> {1} ({2})")
   @MethodSource("shapeIntersectsNoIntersectionArguments")
-  public void testShapeIntersects_NoIntersection(String typeShape1, String typeShape2, String typeUnits, Shape shape1, Shape shape2) {
+  public void testShapeIntersects_NoIntersection(
+      String typeShape1, String typeShape2, String typeUnits, Shape shape1, Shape shape2) {
     // act, assert
     assertFalse(GeometricUtilities.shapeIntersects(shape1, shape2));
   }
 
-  @ParameterizedTest(name="testShapeIntersects intersecting {0} -> {1} ({2})")
+  @ParameterizedTest(name = "testShapeIntersects intersecting {0} -> {1} ({2})")
   @MethodSource("shapeIntersectsIntersectingArguments")
-  public void testShapeIntersects_Intersecting(String typeShape1, String typeShape2, String typeUnits, Shape shape1, Shape shape2) {
+  public void testShapeIntersects_Intersecting(
+      String typeShape1, String typeShape2, String typeUnits, Shape shape1, Shape shape2) {
     // act, assert
     assertTrue(GeometricUtilities.shapeIntersects(shape1, shape2));
   }
@@ -614,7 +615,8 @@ public class GeometricUtilitiesTests {
   }
 
   /**
-   * Provides the test arguments for {@link #testDistanceCoordinates} and {@link #testDistancePoints}.
+   * Provides the test arguments for {@link #testDistanceCoordinates} and {@link
+   * #testDistancePoints}.
    *
    * @return Arguments for the unit test
    */
@@ -633,105 +635,200 @@ public class GeometricUtilitiesTests {
     // Shape -> Ellipse2D, RoundRectangle2D, Rectangle2D, Line2D
     // visualize with https://www.geogebra.org/classic
     return Stream.of(
-            // double
-            Arguments.of("Ellipse2D", "Ellipse2D", "double",
-                    new Ellipse2D.Double(0, 0, 10, 20),
-                    new Ellipse2D.Double(20, 20, 10, 20)),
-            Arguments.of("Ellipse2D", "RoundRectangle2D", "double",
-                    new Ellipse2D.Double(0, 0, 10, 20),
-                    new RoundRectangle2D.Double(20, 20, 10, 20, 3, 1)),
-            Arguments.of("Ellipse2D", "Rectangle2D", "double",
-                    new Ellipse2D.Double(0, 0, 10, 20),
-                    new Rectangle2D.Double(20, 20, 10, 20)),
-            Arguments.of("Ellipse2D", "Line2D", "double",
-                    new Ellipse2D.Double(0, 0, 10, 20),
-                    new Line2D.Double(20, 20, 10, 20)),
-            Arguments.of("RoundRectangle2D", "Ellipse2D", "double",
-                    new RoundRectangle2D.Double(80, 80, 15, 15, 5, 5),
-                    new Ellipse2D.Double(10, 10, 3, 3)),
-            Arguments.of("RoundRectangle2D", "RoundRectangle2D", "double",
-                    new RoundRectangle2D.Double(80, 80, 15, 15, 5, 4),
-                    new RoundRectangle2D.Double(10, 10, 3, 3, 5, 4)),
-            Arguments.of("RoundRectangle2D", "Rectangle2D", "double",
-                    new RoundRectangle2D.Double(80, 80, 15, 15, 5, 3),
-                    new Rectangle2D.Double(10, 10, 3, 3)),
-            Arguments.of("RoundRectangle2D", "Line2D", "double",
-                    new RoundRectangle2D.Double(80, 80, 15, 15, 1, 2),
-                    new Line2D.Double(10, 10, 3, 3)),
-            Arguments.of("Rectangle2D", "Ellipse2D", "double",
-                    new Rectangle2D.Double(20, 20, 14.9, 14.9),
-                    new Ellipse2D.Double(35, 35, 50, 50)),
-            Arguments.of("Rectangle2D", "RoundRectangle2D", "double",
-                    new Rectangle2D.Double(20, 20, 14.9, 14.9),
-                    new RoundRectangle2D.Double(35, 35, 50, 50, 7, 9)),
-            Arguments.of("Rectangle2D", "Rectangle2D", "double",
-                    new Rectangle2D.Double(20, 20, 14.9, 14.9),
-                    new Rectangle2D.Double(35, 35, 50, 50)),
-            Arguments.of("Rectangle2D", "Line2D", "double",
-                    new Rectangle2D.Double(20, 20, 14.9, 14.9),
-                    new Line2D.Double(35, 35, 50, 50)),
-            Arguments.of("Line2D", "Ellipse2D", "double",
-                    new Line2D.Double(100, 100, 456.78, 987.65),
-                    new Ellipse2D.Double(666, 666, 42, 42)),
-            Arguments.of("Line2D", "RoundRectangle2D", "double",
-                    new Line2D.Double(100, 100, 456.78, 987.65),
-                    new RoundRectangle2D.Double(666, 666, 42, 42, 7, 4)),
-            Arguments.of("Line2D", "Rectangle2D", "double",
-                    new Line2D.Double(100, 100, 456.78, 987.65),
-                    new Rectangle2D.Double(666, 666, 42, 42)),
-            Arguments.of("Line2D", "Line2D", "double",
-                    new Line2D.Double(99.1, 101, 456.78, 987.65),
-                    new Line2D.Double(666, 666, 42, 42)),
-            // float
-            Arguments.of("Ellipse2D", "Ellipse2D", "float",
-                    new Ellipse2D.Float(0f, 0f, 10.5f, 20.98f),
-                    new Ellipse2D.Float(20f, 20f, 10.1f, 20f)),
-            Arguments.of("Ellipse2D", "RoundRectangle2D", "float",
-                    new Ellipse2D.Float(0f, 0f, 10f, 20f),
-                    new RoundRectangle2D.Float(20f, 20f, 10f, 20f, 1f, 2.3f)),
-            Arguments.of("Ellipse2D", "Rectangle2D", "float",
-                    new Ellipse2D.Float(0f, 0f, 10f, 20f),
-                    new Rectangle2D.Float(20f, 20f, 10f, 20f)),
-            Arguments.of("Ellipse2D", "Line2D", "float",
-                    new Ellipse2D.Float(0f, 0f, 10f, 20f),
-                    new Line2D.Float(20f, 20f, 10f, 20f)),
-            Arguments.of("RoundRectangle2D", "Ellipse2D", "float",
-                    new RoundRectangle2D.Float(80f, 80f, 15f, 15f, 8f, 0.5f),
-                    new Ellipse2D.Float(10f, 10f, 3f, 3f)),
-            Arguments.of("RoundRectangle2D", "RoundRectangle2D", "float",
-                    new RoundRectangle2D.Float(80f, 80f, 15f, 15.15f, 1.2f, 6.3f),
-                    new RoundRectangle2D.Float(10f, 10f, 6.3f, 8f, 2.1f, 1.2f)),
-            Arguments.of("RoundRectangle2D", "Rectangle2D", "float",
-                    new RoundRectangle2D.Float(80f, 80f, 15f, 15f, 0.3f, 0.8f),
-                    new Rectangle2D.Float(10f, 10f, 3f, 3f)),
-            Arguments.of("RoundRectangle2D", "Line2D", "float",
-                    new RoundRectangle2D.Float(80f, 80f, 15f, 15f, 2.2f, 1.8f),
-                    new Line2D.Float(10f, 10f, 3f, 3f)),
-            Arguments.of("Rectangle2D", "Ellipse2D", "float",
-                    new Rectangle2D.Float(20f, 20f, 14.9f, 14.9f),
-                    new Ellipse2D.Float(35f, 35f, 50f, 50f)),
-            Arguments.of("Rectangle2D", "RoundRectangle2D", "float",
-                    new Rectangle2D.Float(20f, 20f, 14.9f, 14.9f),
-                    new RoundRectangle2D.Float(35f, 35f, 50f, 50f, 8f, 9.3f)),
-            Arguments.of("Rectangle2D", "Rectangle2D", "float",
-                    new Rectangle2D.Float(20f, 20f, 14.9f, 15.1f),
-                    new Rectangle2D.Float(35f, 35f, 50f, 50.2f)),
-            Arguments.of("Rectangle2D", "Line2D", "float",
-                    new Rectangle2D.Float(20f, 20f, 14.9f, 14.9f),
-                    new Line2D.Float(35f, 35f, 50f, 50f)),
-            Arguments.of("Line2D", "Ellipse2D", "float",
-                    new Line2D.Float(100f, 100f, 456.78f, 987.65f),
-                    new Ellipse2D.Float(666f, 666f, 42f, 42f)),
-            Arguments.of("Line2D", "RoundRectangle2D", "float",
-                    new Line2D.Float(100f, 100f, 456.78f, 987.65f),
-                    new RoundRectangle2D.Float(666f, 666f, 42f, 42f, 3.5f, 12.9f)),
-            Arguments.of("Line2D", "Rectangle2D", "float",
-                    new Line2D.Float(100f, 100f, 456.78f, 987.65f),
-                    new Rectangle2D.Float(666f, 666f, 42f, 42f)),
-            Arguments.of("Line2D", "Line2D", "float",
-                    new Line2D.Float(99.94f, 101.2f, 456.78f, 987.65f),
-                    new Line2D.Float(666f, 666f, 42f, 42.42f))
-    );
+        // double
+        Arguments.of(
+            "Ellipse2D",
+            "Ellipse2D",
+            "double",
+            new Ellipse2D.Double(0, 0, 10, 20),
+            new Ellipse2D.Double(20, 20, 10, 20)),
+        Arguments.of(
+            "Ellipse2D",
+            "RoundRectangle2D",
+            "double",
+            new Ellipse2D.Double(0, 0, 10, 20),
+            new RoundRectangle2D.Double(20, 20, 10, 20, 3, 1)),
+        Arguments.of(
+            "Ellipse2D",
+            "Rectangle2D",
+            "double",
+            new Ellipse2D.Double(0, 0, 10, 20),
+            new Rectangle2D.Double(20, 20, 10, 20)),
+        Arguments.of(
+            "Ellipse2D",
+            "Line2D",
+            "double",
+            new Ellipse2D.Double(0, 0, 10, 20),
+            new Line2D.Double(20, 20, 10, 20)),
+        Arguments.of(
+            "RoundRectangle2D",
+            "Ellipse2D",
+            "double",
+            new RoundRectangle2D.Double(80, 80, 15, 15, 5, 5),
+            new Ellipse2D.Double(10, 10, 3, 3)),
+        Arguments.of(
+            "RoundRectangle2D",
+            "RoundRectangle2D",
+            "double",
+            new RoundRectangle2D.Double(80, 80, 15, 15, 5, 4),
+            new RoundRectangle2D.Double(10, 10, 3, 3, 5, 4)),
+        Arguments.of(
+            "RoundRectangle2D",
+            "Rectangle2D",
+            "double",
+            new RoundRectangle2D.Double(80, 80, 15, 15, 5, 3),
+            new Rectangle2D.Double(10, 10, 3, 3)),
+        Arguments.of(
+            "RoundRectangle2D",
+            "Line2D",
+            "double",
+            new RoundRectangle2D.Double(80, 80, 15, 15, 1, 2),
+            new Line2D.Double(10, 10, 3, 3)),
+        Arguments.of(
+            "Rectangle2D",
+            "Ellipse2D",
+            "double",
+            new Rectangle2D.Double(20, 20, 14.9, 14.9),
+            new Ellipse2D.Double(35, 35, 50, 50)),
+        Arguments.of(
+            "Rectangle2D",
+            "RoundRectangle2D",
+            "double",
+            new Rectangle2D.Double(20, 20, 14.9, 14.9),
+            new RoundRectangle2D.Double(35, 35, 50, 50, 7, 9)),
+        Arguments.of(
+            "Rectangle2D",
+            "Rectangle2D",
+            "double",
+            new Rectangle2D.Double(20, 20, 14.9, 14.9),
+            new Rectangle2D.Double(35, 35, 50, 50)),
+        Arguments.of(
+            "Rectangle2D",
+            "Line2D",
+            "double",
+            new Rectangle2D.Double(20, 20, 14.9, 14.9),
+            new Line2D.Double(35, 35, 50, 50)),
+        Arguments.of(
+            "Line2D",
+            "Ellipse2D",
+            "double",
+            new Line2D.Double(100, 100, 456.78, 987.65),
+            new Ellipse2D.Double(666, 666, 42, 42)),
+        Arguments.of(
+            "Line2D",
+            "RoundRectangle2D",
+            "double",
+            new Line2D.Double(100, 100, 456.78, 987.65),
+            new RoundRectangle2D.Double(666, 666, 42, 42, 7, 4)),
+        Arguments.of(
+            "Line2D",
+            "Rectangle2D",
+            "double",
+            new Line2D.Double(100, 100, 456.78, 987.65),
+            new Rectangle2D.Double(666, 666, 42, 42)),
+        Arguments.of(
+            "Line2D",
+            "Line2D",
+            "double",
+            new Line2D.Double(99.1, 101, 456.78, 987.65),
+            new Line2D.Double(666, 666, 42, 42)),
+        // float
+        Arguments.of(
+            "Ellipse2D",
+            "Ellipse2D",
+            "float",
+            new Ellipse2D.Float(0f, 0f, 10.5f, 20.98f),
+            new Ellipse2D.Float(20f, 20f, 10.1f, 20f)),
+        Arguments.of(
+            "Ellipse2D",
+            "RoundRectangle2D",
+            "float",
+            new Ellipse2D.Float(0f, 0f, 10f, 20f),
+            new RoundRectangle2D.Float(20f, 20f, 10f, 20f, 1f, 2.3f)),
+        Arguments.of(
+            "Ellipse2D",
+            "Rectangle2D",
+            "float",
+            new Ellipse2D.Float(0f, 0f, 10f, 20f),
+            new Rectangle2D.Float(20f, 20f, 10f, 20f)),
+        Arguments.of(
+            "Ellipse2D",
+            "Line2D",
+            "float",
+            new Ellipse2D.Float(0f, 0f, 10f, 20f),
+            new Line2D.Float(20f, 20f, 10f, 20f)),
+        Arguments.of(
+            "RoundRectangle2D",
+            "Ellipse2D",
+            "float",
+            new RoundRectangle2D.Float(80f, 80f, 15f, 15f, 8f, 0.5f),
+            new Ellipse2D.Float(10f, 10f, 3f, 3f)),
+        Arguments.of(
+            "RoundRectangle2D",
+            "RoundRectangle2D",
+            "float",
+            new RoundRectangle2D.Float(80f, 80f, 15f, 15.15f, 1.2f, 6.3f),
+            new RoundRectangle2D.Float(10f, 10f, 6.3f, 8f, 2.1f, 1.2f)),
+        Arguments.of(
+            "RoundRectangle2D",
+            "Rectangle2D",
+            "float",
+            new RoundRectangle2D.Float(80f, 80f, 15f, 15f, 0.3f, 0.8f),
+            new Rectangle2D.Float(10f, 10f, 3f, 3f)),
+        Arguments.of(
+            "RoundRectangle2D",
+            "Line2D",
+            "float",
+            new RoundRectangle2D.Float(80f, 80f, 15f, 15f, 2.2f, 1.8f),
+            new Line2D.Float(10f, 10f, 3f, 3f)),
+        Arguments.of(
+            "Rectangle2D",
+            "Ellipse2D",
+            "float",
+            new Rectangle2D.Float(20f, 20f, 14.9f, 14.9f),
+            new Ellipse2D.Float(35f, 35f, 50f, 50f)),
+        Arguments.of(
+            "Rectangle2D",
+            "RoundRectangle2D",
+            "float",
+            new Rectangle2D.Float(20f, 20f, 14.9f, 14.9f),
+            new RoundRectangle2D.Float(35f, 35f, 50f, 50f, 8f, 9.3f)),
+        Arguments.of(
+            "Rectangle2D",
+            "Rectangle2D",
+            "float",
+            new Rectangle2D.Float(20f, 20f, 14.9f, 15.1f),
+            new Rectangle2D.Float(35f, 35f, 50f, 50.2f)),
+        Arguments.of(
+            "Rectangle2D",
+            "Line2D",
+            "float",
+            new Rectangle2D.Float(20f, 20f, 14.9f, 14.9f),
+            new Line2D.Float(35f, 35f, 50f, 50f)),
+        Arguments.of(
+            "Line2D",
+            "Ellipse2D",
+            "float",
+            new Line2D.Float(100f, 100f, 456.78f, 987.65f),
+            new Ellipse2D.Float(666f, 666f, 42f, 42f)),
+        Arguments.of(
+            "Line2D",
+            "RoundRectangle2D",
+            "float",
+            new Line2D.Float(100f, 100f, 456.78f, 987.65f),
+            new RoundRectangle2D.Float(666f, 666f, 42f, 42f, 3.5f, 12.9f)),
+        Arguments.of(
+            "Line2D",
+            "Rectangle2D",
+            "float",
+            new Line2D.Float(100f, 100f, 456.78f, 987.65f),
+            new Rectangle2D.Float(666f, 666f, 42f, 42f)),
+        Arguments.of(
+            "Line2D",
+            "Line2D",
+            "float",
+            new Line2D.Float(99.94f, 101.2f, 456.78f, 987.65f),
+            new Line2D.Float(666f, 666f, 42f, 42.42f)));
   }
 
   /**
@@ -743,104 +840,199 @@ public class GeometricUtilitiesTests {
     // Shape -> Ellipse2D, RoundRectangle2D, Rectangle2D, Line2D
     // visualize with https://www.geogebra.org/classic
     return Stream.of(
-            // double
-            Arguments.of("Ellipse2D", "Ellipse2D", "double",
-                    new Ellipse2D.Double(0, 0, 10, 20),
-                    new Ellipse2D.Double(0, 0, 10, 20)),
-            Arguments.of("Ellipse2D", "RoundRectangle2D", "double",
-                    new Ellipse2D.Double(0, 0, 25, 21),
-                    new RoundRectangle2D.Double(20, 10, 10, 20, 3, 1)),
-            Arguments.of("Ellipse2D", "Rectangle2D", "double",
-                    new Ellipse2D.Double(4, 0, 10, 20),
-                    new Rectangle2D.Double(10, 5, 5, 20)),
-            Arguments.of("Ellipse2D", "Line2D", "double",
-                    new Ellipse2D.Double(30, 0, 10, 60),
-                    new Line2D.Double(30, 40, 50, 20)),
-            Arguments.of("RoundRectangle2D", "Ellipse2D", "double",
-                    new RoundRectangle2D.Double(80, 80, 25, 15, 5, 5),
-                    new Ellipse2D.Double(90, 70, 3, 50)),
-            Arguments.of("RoundRectangle2D", "RoundRectangle2D", "double",
-                    new RoundRectangle2D.Double(80, 80, 15, 15, 5, 4),
-                    new RoundRectangle2D.Double(70, 70, 30, 30, 5, 4)),
-            Arguments.of("RoundRectangle2D", "Rectangle2D", "double",
-                    new RoundRectangle2D.Double(60, 60, 15, 15, 5, 3),
-                    new Rectangle2D.Double(50, 10, 30, 100)),
-            Arguments.of("RoundRectangle2D", "Line2D", "double",
-                    new RoundRectangle2D.Double(20, 0, 15, 15, 1, 2),
-                    new Line2D.Double(10, 10, 70, 13)),
-            Arguments.of("Rectangle2D", "Ellipse2D", "double",
-                    new Rectangle2D.Double(28, 30, 14.9, 14.9),
-                    new Ellipse2D.Double(20, 25, 50, 50)),
-            Arguments.of("Rectangle2D", "RoundRectangle2D", "double",
-                    new Rectangle2D.Double(20, 20, 11.9, 14.4),
-                    new RoundRectangle2D.Double(10, 5, 50, 50, 7, 9)),
-            Arguments.of("Rectangle2D", "Rectangle2D", "double",
-                    new Rectangle2D.Double(33, 29, 14.9, 14.9),
-                    new Rectangle2D.Double(35, 35, 50, 50)),
-            Arguments.of("Rectangle2D", "Line2D", "double",
-                    new Rectangle2D.Double(30, 26, 14.9, 14.9),
-                    new Line2D.Double(35, 30, 50, 50)),
-            Arguments.of("Line2D", "Ellipse2D", "double",
-                    new Line2D.Double(50, 10, 72.78, 97.65),
-                    new Ellipse2D.Double(40, 40, 40, 42)),
-            Arguments.of("Line2D", "RoundRectangle2D", "double",
-                    new Line2D.Double(600, 0, 693.43, 789.12),
-                    new RoundRectangle2D.Double(666, 666, 42, 42, 7, 4)),
-            Arguments.of("Line2D", "Rectangle2D", "double",
-                    new Line2D.Double(600, 100, 720.78, 987.65),
-                    new Rectangle2D.Double(666, 666, 42, 42)),
-            Arguments.of("Line2D", "Line2D", "double",
-                    new Line2D.Double(100, 100, 456.78, 987.65),
-                    new Line2D.Double(666, 666, 42, 342)),
-            // float
-            Arguments.of("Ellipse2D", "Ellipse2D", "float",
-                    new Ellipse2D.Float(20f, 0f, 10.5f, 20.98f),
-                    new Ellipse2D.Float(20f, 20f, 10.1f, 20f)),
-            Arguments.of("Ellipse2D", "RoundRectangle2D", "float",
-                    new Ellipse2D.Float(0f, 0f, 10f, 20f),
-                    new RoundRectangle2D.Float(0f, 0f, 20f, 50f, 1f, 2.3f)),
-            Arguments.of("Ellipse2D", "Rectangle2D", "float",
-                    new Ellipse2D.Float(0f, 10f, 18f, 40f),
-                    new Rectangle2D.Float(10f, 20f, 10f, 20f)),
-            Arguments.of("Ellipse2D", "Line2D", "float",
-                    new Ellipse2D.Float(0f, 0f, 10f, 20f),
-                    new Line2D.Float(5f, 2f, 10f, 20f)),
-            Arguments.of("RoundRectangle2D", "Ellipse2D", "float",
-                    new RoundRectangle2D.Float(70f, 80f, 15f, 15f, 8f, 0.5f),
-                    new Ellipse2D.Float(80f, 70f, 3f, 43f)),
-            Arguments.of("RoundRectangle2D", "RoundRectangle2D", "float",
-                    new RoundRectangle2D.Float(80f, 80f, 15f, 15.15f, 1.2f, 6.3f),
-                    new RoundRectangle2D.Float(80f, 90f, 6.3f, 8f, 2.1f, 1.2f)),
-            Arguments.of("RoundRectangle2D", "Rectangle2D", "float",
-                    new RoundRectangle2D.Float(80f, 80f, 15f, 15f, 0.3f, 0.8f),
-                    new Rectangle2D.Float(90f, 80f, 3f, 3f)),
-            Arguments.of("RoundRectangle2D", "Line2D", "float",
-                    new RoundRectangle2D.Float(70f, 80f, 15f, 15f, 2.2f, 1.8f),
-                    new Line2D.Float(70f, 103f, 93f, 30f)),
-            Arguments.of("Rectangle2D", "Ellipse2D", "float",
-                    new Rectangle2D.Float(20f, 70f, 14.9f, 14.9f),
-                    new Ellipse2D.Float(0f, 35f, 50f, 50f)),
-            Arguments.of("Rectangle2D", "RoundRectangle2D", "float",
-                    new Rectangle2D.Float(20f, 20f, 34.9f, 24.9f),
-                    new RoundRectangle2D.Float(35f, 35f, 50f, 50f, 8f, 9.3f)),
-            Arguments.of("Rectangle2D", "Rectangle2D", "float",
-                    new Rectangle2D.Float(35f, 20f, 14.2f, 99.9f),
-                    new Rectangle2D.Float(35f, 35f, 50f, 50.2f)),
-            Arguments.of("Rectangle2D", "Line2D", "float",
-                    new Rectangle2D.Float(20f, 20f, 1f, 8.9f),
-                    new Line2D.Float(5f, 10f, 50f, 50f)),
-            Arguments.of("Line2D", "Ellipse2D", "float",
-                    new Line2D.Float(10f, 765.4321f, 456.78f, 123.4f),
-                    new Ellipse2D.Float(42f, 666f, 42f, 42f)),
-            Arguments.of("Line2D", "RoundRectangle2D", "float",
-                    new Line2D.Float(100f, 987.65f, 234.5678f, 5f),
-                    new RoundRectangle2D.Float(220f, 66f, 42f, 42f, 3.5f, 12.9f)),
-            Arguments.of("Line2D", "Rectangle2D", "float",
-                    new Line2D.Float(50f, 640f, 456.78f, 987.65f),
-                    new Rectangle2D.Float(66f, 666f, 42f, 42f)),
-            Arguments.of("Line2D", "Line2D", "float",
-                    new Line2D.Float(270f, 100f, 456.78f, 987.65f),
-                    new Line2D.Float(666f, 666f, 42f, 42.42f))
-    );
+        // double
+        Arguments.of(
+            "Ellipse2D",
+            "Ellipse2D",
+            "double",
+            new Ellipse2D.Double(0, 0, 10, 20),
+            new Ellipse2D.Double(0, 0, 10, 20)),
+        Arguments.of(
+            "Ellipse2D",
+            "RoundRectangle2D",
+            "double",
+            new Ellipse2D.Double(0, 0, 25, 21),
+            new RoundRectangle2D.Double(20, 10, 10, 20, 3, 1)),
+        Arguments.of(
+            "Ellipse2D",
+            "Rectangle2D",
+            "double",
+            new Ellipse2D.Double(4, 0, 10, 20),
+            new Rectangle2D.Double(10, 5, 5, 20)),
+        Arguments.of(
+            "Ellipse2D",
+            "Line2D",
+            "double",
+            new Ellipse2D.Double(30, 0, 10, 60),
+            new Line2D.Double(30, 40, 50, 20)),
+        Arguments.of(
+            "RoundRectangle2D",
+            "Ellipse2D",
+            "double",
+            new RoundRectangle2D.Double(80, 80, 25, 15, 5, 5),
+            new Ellipse2D.Double(90, 70, 3, 50)),
+        Arguments.of(
+            "RoundRectangle2D",
+            "RoundRectangle2D",
+            "double",
+            new RoundRectangle2D.Double(80, 80, 15, 15, 5, 4),
+            new RoundRectangle2D.Double(70, 70, 30, 30, 5, 4)),
+        Arguments.of(
+            "RoundRectangle2D",
+            "Rectangle2D",
+            "double",
+            new RoundRectangle2D.Double(60, 60, 15, 15, 5, 3),
+            new Rectangle2D.Double(50, 10, 30, 100)),
+        Arguments.of(
+            "RoundRectangle2D",
+            "Line2D",
+            "double",
+            new RoundRectangle2D.Double(20, 0, 15, 15, 1, 2),
+            new Line2D.Double(10, 10, 70, 13)),
+        Arguments.of(
+            "Rectangle2D",
+            "Ellipse2D",
+            "double",
+            new Rectangle2D.Double(28, 30, 14.9, 14.9),
+            new Ellipse2D.Double(20, 25, 50, 50)),
+        Arguments.of(
+            "Rectangle2D",
+            "RoundRectangle2D",
+            "double",
+            new Rectangle2D.Double(20, 20, 11.9, 14.4),
+            new RoundRectangle2D.Double(10, 5, 50, 50, 7, 9)),
+        Arguments.of(
+            "Rectangle2D",
+            "Rectangle2D",
+            "double",
+            new Rectangle2D.Double(33, 29, 14.9, 14.9),
+            new Rectangle2D.Double(35, 35, 50, 50)),
+        Arguments.of(
+            "Rectangle2D",
+            "Line2D",
+            "double",
+            new Rectangle2D.Double(30, 26, 14.9, 14.9),
+            new Line2D.Double(35, 30, 50, 50)),
+        Arguments.of(
+            "Line2D",
+            "Ellipse2D",
+            "double",
+            new Line2D.Double(50, 10, 72.78, 97.65),
+            new Ellipse2D.Double(40, 40, 40, 42)),
+        Arguments.of(
+            "Line2D",
+            "RoundRectangle2D",
+            "double",
+            new Line2D.Double(600, 0, 693.43, 789.12),
+            new RoundRectangle2D.Double(666, 666, 42, 42, 7, 4)),
+        Arguments.of(
+            "Line2D",
+            "Rectangle2D",
+            "double",
+            new Line2D.Double(600, 100, 720.78, 987.65),
+            new Rectangle2D.Double(666, 666, 42, 42)),
+        Arguments.of(
+            "Line2D",
+            "Line2D",
+            "double",
+            new Line2D.Double(100, 100, 456.78, 987.65),
+            new Line2D.Double(666, 666, 42, 342)),
+        // float
+        Arguments.of(
+            "Ellipse2D",
+            "Ellipse2D",
+            "float",
+            new Ellipse2D.Float(20f, 0f, 10.5f, 20.98f),
+            new Ellipse2D.Float(20f, 20f, 10.1f, 20f)),
+        Arguments.of(
+            "Ellipse2D",
+            "RoundRectangle2D",
+            "float",
+            new Ellipse2D.Float(0f, 0f, 10f, 20f),
+            new RoundRectangle2D.Float(0f, 0f, 20f, 50f, 1f, 2.3f)),
+        Arguments.of(
+            "Ellipse2D",
+            "Rectangle2D",
+            "float",
+            new Ellipse2D.Float(0f, 10f, 18f, 40f),
+            new Rectangle2D.Float(10f, 20f, 10f, 20f)),
+        Arguments.of(
+            "Ellipse2D",
+            "Line2D",
+            "float",
+            new Ellipse2D.Float(0f, 0f, 10f, 20f),
+            new Line2D.Float(5f, 2f, 10f, 20f)),
+        Arguments.of(
+            "RoundRectangle2D",
+            "Ellipse2D",
+            "float",
+            new RoundRectangle2D.Float(70f, 80f, 15f, 15f, 8f, 0.5f),
+            new Ellipse2D.Float(80f, 70f, 3f, 43f)),
+        Arguments.of(
+            "RoundRectangle2D",
+            "RoundRectangle2D",
+            "float",
+            new RoundRectangle2D.Float(80f, 80f, 15f, 15.15f, 1.2f, 6.3f),
+            new RoundRectangle2D.Float(80f, 90f, 6.3f, 8f, 2.1f, 1.2f)),
+        Arguments.of(
+            "RoundRectangle2D",
+            "Rectangle2D",
+            "float",
+            new RoundRectangle2D.Float(80f, 80f, 15f, 15f, 0.3f, 0.8f),
+            new Rectangle2D.Float(90f, 80f, 3f, 3f)),
+        Arguments.of(
+            "RoundRectangle2D",
+            "Line2D",
+            "float",
+            new RoundRectangle2D.Float(70f, 80f, 15f, 15f, 2.2f, 1.8f),
+            new Line2D.Float(70f, 103f, 93f, 30f)),
+        Arguments.of(
+            "Rectangle2D",
+            "Ellipse2D",
+            "float",
+            new Rectangle2D.Float(20f, 70f, 14.9f, 14.9f),
+            new Ellipse2D.Float(0f, 35f, 50f, 50f)),
+        Arguments.of(
+            "Rectangle2D",
+            "RoundRectangle2D",
+            "float",
+            new Rectangle2D.Float(20f, 20f, 34.9f, 24.9f),
+            new RoundRectangle2D.Float(35f, 35f, 50f, 50f, 8f, 9.3f)),
+        Arguments.of(
+            "Rectangle2D",
+            "Rectangle2D",
+            "float",
+            new Rectangle2D.Float(35f, 20f, 14.2f, 99.9f),
+            new Rectangle2D.Float(35f, 35f, 50f, 50.2f)),
+        Arguments.of(
+            "Rectangle2D",
+            "Line2D",
+            "float",
+            new Rectangle2D.Float(20f, 20f, 1f, 8.9f),
+            new Line2D.Float(5f, 10f, 50f, 50f)),
+        Arguments.of(
+            "Line2D",
+            "Ellipse2D",
+            "float",
+            new Line2D.Float(10f, 765.4321f, 456.78f, 123.4f),
+            new Ellipse2D.Float(42f, 666f, 42f, 42f)),
+        Arguments.of(
+            "Line2D",
+            "RoundRectangle2D",
+            "float",
+            new Line2D.Float(100f, 987.65f, 234.5678f, 5f),
+            new RoundRectangle2D.Float(220f, 66f, 42f, 42f, 3.5f, 12.9f)),
+        Arguments.of(
+            "Line2D",
+            "Rectangle2D",
+            "float",
+            new Line2D.Float(50f, 640f, 456.78f, 987.65f),
+            new Rectangle2D.Float(66f, 666f, 42f, 42f)),
+        Arguments.of(
+            "Line2D",
+            "Line2D",
+            "float",
+            new Line2D.Float(270f, 100f, 456.78f, 987.65f),
+            new Line2D.Float(666f, 666f, 42f, 42.42f)));
   }
 }

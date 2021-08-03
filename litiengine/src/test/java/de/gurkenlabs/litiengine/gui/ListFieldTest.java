@@ -13,9 +13,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.gurkenlabs.litiengine.Game;
-import javax.swing.SwingUtilities;
-
 import de.gurkenlabs.litiengine.test.SwingTestSuite;
+import javax.swing.SwingUtilities;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

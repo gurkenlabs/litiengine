@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine;
 
+import de.gurkenlabs.litiengine.util.TimeUtilities;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
@@ -7,11 +8,10 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.gurkenlabs.litiengine.util.TimeUtilities;
-
 /**
- * The {@code UpdateLoop} is a basic loop implementation that performs operations at the specified {@code tickRate}
- * by continuously processing the registered logic and delaying the loop until the requested rate is met.
+ * The {@code UpdateLoop} is a basic loop implementation that performs operations at the specified
+ * {@code tickRate} by continuously processing the registered logic and delaying the loop until the
+ * requested rate is met.
  *
  * @see #process()
  * @see #delay()
@@ -35,10 +35,10 @@ public class UpdateLoop extends Thread implements AutoCloseable, ILoop {
   }
 
   /**
-   * The loop implementation, executing the {@code process()} method which does the actual work.
-   * It also tracks the processing time and the total number of performed ticks while making sure that the expected
-   * tick rate is met by delaying the loop accordingly.
-   * 
+   * The loop implementation, executing the {@code process()} method which does the actual work. It
+   * also tracks the processing time and the total number of performed ticks while making sure that
+   * the expected tick rate is met by delaying the loop accordingly.
+   *
    * @see #process()
    * @see #delay()
    * @see #getDeltaTime()
@@ -88,7 +88,7 @@ public class UpdateLoop extends Thread implements AutoCloseable, ILoop {
     }
 
     if (!this.updatables.add(updatable)) {
-      log.log(Level.FINE, "Updatable {0} already registered for update!", new Object[] { updatable });
+      log.log(Level.FINE, "Updatable {0} already registered for update!", new Object[] {updatable});
     }
   }
 
@@ -131,8 +131,8 @@ public class UpdateLoop extends Thread implements AutoCloseable, ILoop {
   }
 
   /**
-   * Performs the actual workload of a tick. This base implementation just calls the update method on all registered instances.
-   * For derived loop implementations this is more sophisticated.
+   * Performs the actual workload of a tick. This base implementation just calls the update method
+   * on all registered instances. For derived loop implementations this is more sophisticated.
    */
   protected void process() {
     this.update();
@@ -144,7 +144,7 @@ public class UpdateLoop extends Thread implements AutoCloseable, ILoop {
 
   /**
    * Calls the {@code update()} procedure on all registered instances.
-   * 
+   *
    * @see IUpdateable#update()
    */
   protected void update() {
@@ -164,19 +164,21 @@ public class UpdateLoop extends Thread implements AutoCloseable, ILoop {
   }
 
   /**
-   * This method determines how long the current tick should be delayed to match the expected delta time for the specified tick rate.
-   * It then delays the execution of this loop by pausing the thread for the necessary delay.
-   * 
+   * This method determines how long the current tick should be delayed to match the expected delta
+   * time for the specified tick rate. It then delays the execution of this loop by pausing the
+   * thread for the necessary delay.
+   *
    * @return The delay for which this tick was paused after the actual processing.
-   * @throws InterruptedException
-   *           If the thread was interrupted while sleeping
+   * @throws InterruptedException If the thread was interrupted while sleeping
    */
   protected double delay() throws InterruptedException {
     double delay = Math.max(0, this.getExpectedDelta() - this.getProcessTime());
     long sleepDelay = Math.round(delay);
 
-    // since thread sleep only supports long values and no double values, there will always be some error that we need to account for
-    // we'll aggregate the error until its absolute value is greater than 1 and then add it to the current delay and subtract it from the current delay error 
+    // since thread sleep only supports long values and no double values, there will always be some
+    // error that we need to account for
+    // we'll aggregate the error until its absolute value is greater than 1 and then add it to the
+    // current delay and subtract it from the current delay error
     this.delayError += delay - sleepDelay;
     if (Math.abs(this.delayError) > 1) {
       long errorAdjustment = (long) this.delayError;

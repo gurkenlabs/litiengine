@@ -2,9 +2,7 @@ package de.gurkenlabs.litiengine.configuration;
 
 import java.util.Locale;
 
-/**
- * The client configuration contains client specific configuration elements.
- */
+/** The client configuration contains client specific configuration elements. */
 @ConfigurationGroupInfo(prefix = "cl_")
 public class ClientConfiguration extends ConfigurationGroup {
 
@@ -18,9 +16,7 @@ public class ClientConfiguration extends ConfigurationGroup {
 
   private boolean exitOnError;
 
-  /**
-   * Instantiates a new client configuration.
-   */
+  /** Instantiates a new client configuration. */
   ClientConfiguration() {
     super();
     this.setMaxFps(60);
@@ -66,8 +62,7 @@ public class ClientConfiguration extends ConfigurationGroup {
   /**
    * Sets the max fps.
    *
-   * @param maxFps
-   *          the new max fps
+   * @param maxFps the new max fps
    */
   public void setMaxFps(final int maxFps) {
     this.set("maxFps", Math.max(1, maxFps));

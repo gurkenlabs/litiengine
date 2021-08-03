@@ -56,9 +56,9 @@ public class EmitterSpritePanel extends PropertyPanel {
   protected LayoutManager createLayout() {
     LayoutItem[] layoutItems =
         new LayoutItem[] {
-            new LayoutItem("particle_spritesheet", spritesheet),
-            new LayoutItem("particle_animatesprite", animateSprite),
-            new LayoutItem("particle_loopsprite", loopSprite)
+          new LayoutItem("particle_spritesheet", spritesheet),
+          new LayoutItem("particle_animatesprite", animateSprite),
+          new LayoutItem("particle_loopsprite", loopSprite)
         };
     return this.createLayout(layoutItems);
   }

@@ -2,7 +2,6 @@ package de.gurkenlabs.litiengine.graphics.emitters.xml;
 
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
-
 import java.io.IOException;
 import java.net.URL;
 import java.util.Map;

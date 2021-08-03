@@ -1,13 +1,10 @@
 package de.gurkenlabs.litiengine;
 
 import de.gurkenlabs.litiengine.util.MathUtilities;
-
 import jakarta.xml.bind.annotation.XmlEnum;
 import jakarta.xml.bind.annotation.XmlEnumValue;
 
-/**
- * The enum {@code Align} defines a range of horizontal alignments.
- */
+/** The enum {@code Align} defines a range of horizontal alignments. */
 @XmlEnum
 public enum Align {
   @XmlEnumValue("center")
@@ -29,7 +26,8 @@ public enum Align {
    * Gets the align enumeration value for the specified string.
    *
    * @param alignString The string representing the enum value.
-   * @return The enum value represented by the specified string or {@link Align#CENTER} if the specified string is invalid.
+   * @return The enum value represented by the specified string or {@link Align#CENTER} if the
+   *     specified string is invalid.
    */
   public static Align get(final String alignString) {
     if (alignString == null || alignString.isEmpty()) {
@@ -74,10 +72,12 @@ public enum Align {
   }
 
   /**
-   * Gets the location for the specified object height to be horizontally aligned within the bounds of the specified width.
+   * Gets the location for the specified object height to be horizontally aligned within the bounds
+   * of the specified width.
    *
-   * @param width       The width, limiting the horizontal alignment.
-   * @param objectWidth The width of the object for which to calculate the horizontally aligned location.
+   * @param width The width, limiting the horizontal alignment.
+   * @param objectWidth The width of the object for which to calculate the horizontally aligned
+   *     location.
    * @return The x-coordinate for the location of the object with the specified width.
    */
   public double getLocation(final double width, final double objectWidth) {

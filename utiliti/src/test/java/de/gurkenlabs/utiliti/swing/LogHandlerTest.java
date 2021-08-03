@@ -3,13 +3,12 @@ package de.gurkenlabs.utiliti.swing;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.gurkenlabs.litiengine.test.SwingTestSuite;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.text.StyledDocument;
-
-import de.gurkenlabs.litiengine.test.SwingTestSuite;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

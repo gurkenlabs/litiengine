@@ -78,23 +78,22 @@ public class ResourcesTests {
 
   @Test
   public void testReadStringResources() {
-    String fileContent =
-        Resources.read("de/gurkenlabs/litiengine/resources/stringfile-utf8.txt");
+    String fileContent = Resources.read("de/gurkenlabs/litiengine/resources/stringfile-utf8.txt");
     assertEquals("my utf8 èncöded strîng!!1$", fileContent);
   }
 
   @Test
   public void testReadStringCharsetResources() {
     String fileContent =
-        Resources.read("de/gurkenlabs/litiengine/resources/stringfile-iso8859-1.txt",
+        Resources.read(
+            "de/gurkenlabs/litiengine/resources/stringfile-iso8859-1.txt",
             StandardCharsets.ISO_8859_1);
     assertEquals("my iso8859 èncöded strîng!!1$", fileContent);
   }
 
   @Test
   public void testStringList() {
-    String[] strings =
-        Resources.strings().getList("de/gurkenlabs/litiengine/resources/test.txt");
+    String[] strings = Resources.strings().getList("de/gurkenlabs/litiengine/resources/test.txt");
 
     assertEquals(4, strings.length);
 

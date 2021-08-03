@@ -1,12 +1,12 @@
 package de.gurkenlabs.litiengine.util.io;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Objects;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Objects;
 
 /**
  * This class allows for absolute and relative URLs to be unmarshalled as Java URL objects.

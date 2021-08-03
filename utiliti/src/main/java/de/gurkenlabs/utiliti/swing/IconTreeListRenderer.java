@@ -1,6 +1,5 @@
 package de.gurkenlabs.utiliti.swing;
 
-import com.github.weisj.darklaf.components.border.DarkBorders;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.entities.LightSource;
