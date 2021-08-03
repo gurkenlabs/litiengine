@@ -1,6 +1,6 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
 public class BooleanIntegerAdapter extends XmlAdapter<Integer, Boolean> {
   @Override

@@ -9,9 +9,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
@@ -20,7 +20,7 @@ import de.gurkenlabs.litiengine.util.ColorHelper;
 
 public class MapObjectLayer extends Layer implements IMapObjectLayer {
   public static final String DEFAULT_MAPOBJECTLAYER_NAME = "default";
-  
+
   @XmlElement(name = "object")
   private ArrayList<MapObject> objects = new ArrayList<>();
 

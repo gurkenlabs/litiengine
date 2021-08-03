@@ -21,9 +21,9 @@ dependencies {
 
     // JAXB modules for JDK 9 or higher
     implementation("javax.activation:javax.activation-api:1.2.0")
-    implementation("javax.xml.bind:jaxb-api:2.4.0-b180830.0359")
-    implementation("com.sun.xml.bind:jaxb-core:3.0.1")
-    implementation("com.sun.xml.bind:jaxb-impl:3.0.1")
+    implementation("jakarta.xml.bind:jakarta.xml.bind-api:3.0.1")
+    runtimeOnly("com.sun.xml.bind:jaxb-core:3.0.1")
+    runtimeOnly("com.sun.xml.bind:jaxb-impl:3.0.1")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.2")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.7.2")

@@ -1,7 +1,7 @@
 package de.gurkenlabs.litiengine.resources;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlTransient;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlTransient;
 
 public abstract class NamedResource implements Resource {
   @XmlAttribute
