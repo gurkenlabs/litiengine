@@ -1,20 +1,18 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
+import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.ITile;
+import de.gurkenlabs.litiengine.environment.tilemap.ITilesetEntry;
 import java.awt.Point;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.util.Collections;
 import java.util.Objects;
-
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
-
-import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
-import de.gurkenlabs.litiengine.environment.tilemap.ITile;
-import de.gurkenlabs.litiengine.environment.tilemap.ITilesetEntry;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Tile extends CustomPropertyProvider implements ITile {
@@ -23,10 +21,10 @@ public class Tile extends CustomPropertyProvider implements ITile {
   protected static final int FLIPPED_HORIZONTALLY_FLAG = 0x80000000;
   protected static final int FLIPPED_VERTICALLY_FLAG = 0x40000000;
   protected static final int FLIPPED_DIAGONALLY_FLAG = 0x20000000;
-  private static final AffineTransform TX_DIAGONAL_FLIP = new AffineTransform(0.0, 1.0, 1.0, 0.0, 0.0, 0.0);
+  private static final AffineTransform TX_DIAGONAL_FLIP =
+      new AffineTransform(0.0, 1.0, 1.0, 0.0, 0.0, 0.0);
 
-  @XmlAttribute
-  private Integer gid;
+  @XmlAttribute private Integer gid;
 
   private transient Point tileCoordinate;
 
@@ -37,17 +35,13 @@ public class Tile extends CustomPropertyProvider implements ITile {
   private transient boolean flippedVertically;
   private transient boolean flipped;
 
-  /**
-   * Instantiates a new {@code Tile} instance.
-   */
-  public Tile() {
-  }
+  /** Instantiates a new {@code Tile} instance. */
+  public Tile() {}
 
   /**
    * Instantiates a new {@code Tile} instance with the same attributes as a given {@code Tile}.
    *
-   * @param original
-   *         The original tile from which the values will be copied to this new instance.
+   * @param original The original tile from which the values will be copied to this new instance.
    */
   public Tile(Tile original) {
     this.flipped = original.isFlipped();
@@ -62,9 +56,7 @@ public class Tile extends CustomPropertyProvider implements ITile {
   /**
    * Instantiates a new {@code Tile} instance.
    *
-   * @param gidBitmask
-   *         The grid ID bitmask used to identify flags of this instance.
-   *
+   * @param gidBitmask The grid ID bitmask used to identify flags of this instance.
    * @see Tile#FLIPPED_HORIZONTALLY_FLAG
    * @see Tile#FLIPPED_DIAGONALLY_FLAG
    * @see Tile#FLIPPED_VERTICALLY_FLAG
@@ -75,18 +67,25 @@ public class Tile extends CustomPropertyProvider implements ITile {
     this.flippedHorizontally = (gidBitmask & FLIPPED_HORIZONTALLY_FLAG) != 0;
     this.flippedVertically = (gidBitmask & FLIPPED_VERTICALLY_FLAG) != 0;
 
-    this.flipped = this.isFlippedDiagonally() || this.isFlippedHorizontally() || this.isFlippedVertically();
-    this.gid = gidBitmask & ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG);
+    this.flipped =
+        this.isFlippedDiagonally() || this.isFlippedHorizontally() || this.isFlippedVertically();
+    this.gid =
+        gidBitmask
+            & ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG);
   }
 
   @Override
   public boolean hasCustomProperty(String name) {
-    return this.getTilesetEntry() == null ? super.hasCustomProperty(name) : this.getTilesetEntry().hasCustomProperty(name);
+    return this.getTilesetEntry() == null
+        ? super.hasCustomProperty(name)
+        : this.getTilesetEntry().hasCustomProperty(name);
   }
 
   @Override
   public java.util.Map<String, ICustomProperty> getProperties() {
-    return this.getTilesetEntry() == null ? Collections.emptyMap() : this.getTilesetEntry().getProperties();
+    return this.getTilesetEntry() == null
+        ? Collections.emptyMap()
+        : this.getTilesetEntry().getProperties();
   }
 
   @Override
@@ -172,7 +171,10 @@ public class Tile extends CustomPropertyProvider implements ITile {
       return false;
     }
     ITile other = (ITile) anObject;
-    return this.getGridId() == other.getGridId() && this.isFlippedDiagonally() == other.isFlippedDiagonally() && this.isFlippedHorizontally() == other.isFlippedHorizontally() && this.isFlippedVertically() == other.isFlippedVertically();
+    return this.getGridId() == other.getGridId()
+        && this.isFlippedDiagonally() == other.isFlippedDiagonally()
+        && this.isFlippedHorizontally() == other.isFlippedHorizontally()
+        && this.isFlippedVertically() == other.isFlippedVertically();
   }
 
   @Override
@@ -208,8 +210,7 @@ public class Tile extends CustomPropertyProvider implements ITile {
   /**
    * Sets the tile coordinate.
    *
-   * @param tileCoordinate
-   *         the new tile coordinate
+   * @param tileCoordinate the new tile coordinate
    */
   void setTileCoordinate(final Point tileCoordinate) {
     this.tileCoordinate = tileCoordinate;

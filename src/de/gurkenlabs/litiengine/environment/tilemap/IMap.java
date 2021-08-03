@@ -1,12 +1,11 @@
 package de.gurkenlabs.litiengine.environment.tilemap;
 
+import de.gurkenlabs.litiengine.util.AlphanumComparator;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.geom.Rectangle2D;
 import java.net.URL;
 import java.util.List;
-
-import de.gurkenlabs.litiengine.util.AlphanumComparator;
 
 public interface IMap extends ILayerList, Comparable<IMap> {
 
@@ -119,8 +118,7 @@ public interface IMap extends ILayerList, Comparable<IMap> {
   /**
    * Sets the name.
    *
-   * @param name
-   *          the new name
+   * @param name the new name
    */
   public void setName(String name);
 

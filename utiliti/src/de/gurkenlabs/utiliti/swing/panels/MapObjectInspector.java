@@ -159,13 +159,13 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
   private LayoutManager createLayout() {
     LayoutItem[] layoutItems =
         new LayoutItem[] {
-            new LayoutItem(infoPanel),
-            new LayoutItem("panel_rendertype", renderType),
-            new LayoutItem("panel_transform", transform),
-            new LayoutItem("panel_scale", scale),
-            new LayoutItem("panel_name", textFieldName),
-            new LayoutItem("panel_tags", tagPanel),
-            new LayoutItem(tabbedPanel, GroupLayout.PREFERRED_SIZE)
+          new LayoutItem(infoPanel),
+          new LayoutItem("panel_rendertype", renderType),
+          new LayoutItem("panel_transform", transform),
+          new LayoutItem("panel_scale", scale),
+          new LayoutItem("panel_name", textFieldName),
+          new LayoutItem("panel_tags", tagPanel),
+          new LayoutItem(tabbedPanel, GroupLayout.PREFERRED_SIZE)
         };
     return this.createLayout(layoutItems);
   }

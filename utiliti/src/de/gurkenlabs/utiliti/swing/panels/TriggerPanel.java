@@ -81,9 +81,9 @@ public class TriggerPanel extends PropertyPanel {
   private LayoutManager createLayout() {
     LayoutItem[] layoutItems =
         new LayoutItem[] {
-            new LayoutItem("panel_activation", this.comboBoxActivationType),
-            new LayoutItem("panel_message", this.textFieldMessage),
-            new LayoutItem("panel_cooldown", this.spinnerCooldown),
+          new LayoutItem("panel_activation", this.comboBoxActivationType),
+          new LayoutItem("panel_message", this.textFieldMessage),
+          new LayoutItem("panel_cooldown", this.spinnerCooldown),
         };
 
     return this.createLayout(

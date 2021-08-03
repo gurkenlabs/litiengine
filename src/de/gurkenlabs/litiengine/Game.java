@@ -1,15 +1,5 @@
 package de.gurkenlabs.litiengine;
 
-import java.awt.event.KeyEvent;
-import java.lang.Thread.UncaughtExceptionHandler;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import de.gurkenlabs.litiengine.configuration.ClientConfiguration;
 import de.gurkenlabs.litiengine.configuration.DebugConfiguration;
 import de.gurkenlabs.litiengine.configuration.GameConfiguration;
@@ -40,6 +30,15 @@ import de.gurkenlabs.litiengine.sound.SoundPlayback;
 import de.gurkenlabs.litiengine.tweening.TweenEngine;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
+import java.awt.event.KeyEvent;
+import java.lang.Thread.UncaughtExceptionHandler;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /***
  * <p>
@@ -57,7 +56,7 @@ import de.gurkenlabs.litiengine.util.io.XmlUtilities;
  * </p>
  * <p>
  * Additionally, it provides an interface to hook up event listeners (e.g. {@code GameListener} or {@code EnvironmentLoadedListener}) for
- * the most basic operations of a Game life cycle. 
+ * the most basic operations of a Game life cycle.
  * </p>
  *
  * @see GameListener
@@ -122,11 +121,12 @@ public final class Game {
   }
 
   /**
-   * This flag indicates if the game currently supports debugging. This should
-   * be set to false for release builds.
-   * <p>
-   * The default value here is true and will allow debugging unless explicitly
-   * disabled by calling this method or providing the command line argument {@link #COMMANDLINE_ARG_RELEASE} when running the game.
+   * This flag indicates if the game currently supports debugging. This should be set to false for
+   * release builds.
+   *
+   * <p>The default value here is true and will allow debugging unless explicitly disabled by
+   * calling this method or providing the command line argument {@link #COMMANDLINE_ARG_RELEASE}
+   * when running the game.
    *
    * @param allow If set to true, the game will be told to allow debugging.
    */
@@ -135,11 +135,11 @@ public final class Game {
   }
 
   /**
-   * This flag indicates whether the game should display the {@code GameWindow} or not.
-   * This can only be set before the game has been initialized with the {@code Game.init(String...)} method. Afterwards it doesn't have an effect
-   * anymore.
-   * If enabled, the {@code ScreenManager#setVisible(boolean)} method won't be set to true and the {@code RenderLoop} won't be started.
-   * Also the {@code Camera} won't be updated.
+   * This flag indicates whether the game should display the {@code GameWindow} or not. This can
+   * only be set before the game has been initialized with the {@code Game.init(String...)} method.
+   * Afterwards it doesn't have an effect anymore. If enabled, the {@code
+   * ScreenManager#setVisible(boolean)} method won't be set to true and the {@code RenderLoop} won't
+   * be started. Also the {@code Camera} won't be updated.
    *
    * @param noGui If set to true, the GUI will be hidden.
    * @see GameWindow
@@ -152,8 +152,8 @@ public final class Game {
   }
 
   /**
-   * This flag globally controls the game's debugging state. If enabled, debugging functionality (e.g. rendering collision boxes)
-   * can potentially be enabled in the configuration.
+   * This flag globally controls the game's debugging state. If enabled, debugging functionality
+   * (e.g. rendering collision boxes) can potentially be enabled in the configuration.
    *
    * @return True if debugging functionality is enabled; otherwise false.
    * @see Game#allowDebug(boolean)
@@ -184,7 +184,8 @@ public final class Game {
 
   /**
    * Gets the static meta information about this game.<br>
-   * This can be used to define meta information about your game, like it's name, version or web site.<br>
+   * This can be used to define meta information about your game, like it's name, version or web
+   * site.<br>
    * <br>
    * <i>It's also possible to provide additional custom information using the method group <br>
    * {@code Game.getInfo().setValue("CUSTOM_STRING", "my-value")}.</i>
@@ -201,14 +202,14 @@ public final class Game {
 
   /**
    * Gets the game's runtime configuration.<br>
-   * It contains default engine settings for the game client, graphics, audio, input and debugging.<br>
-   * Additionally, it can be used to register and manage custom settings that are specific to your game.
-   * <p>
-   * <i>
-   * Elements of this configuration are also presented in a config.properties file in the game's root directory. <br>
-   * This way its possible to adjust elements without having to recompile the game.
-   * </i>
-   * </p>
+   * It contains default engine settings for the game client, graphics, audio, input and debugging.
+   * <br>
+   * Additionally, it can be used to register and manage custom settings that are specific to your
+   * game.
+   *
+   * <p><i> Elements of this configuration are also presented in a config.properties file in the
+   * game's root directory. <br>
+   * This way its possible to adjust elements without having to recompile the game. </i>
    *
    * @return The game's runtime configuration.
    * @see SoundConfiguration
@@ -222,16 +223,12 @@ public final class Game {
   }
 
   /**
-   * Gets basic client metrics about the game's runtime.
-   * This includes information about network, the frames-per-second or the updates-per-second and the used memory.
+   * Gets basic client metrics about the game's runtime. This includes information about network,
+   * the frames-per-second or the updates-per-second and the used memory.
    *
-   * <p>
-   * <i>
-   * This information can be rendered by setting <br>
+   * <p><i> This information can be rendered by setting <br>
    * {@code Game.config().client().setShowGameMetrics(boolean)} to true or <br>
-   * {@code cl_showGameMetrics=true} in the config.settings.
-   * </i>
-   * </p>
+   * {@code cl_showGameMetrics=true} in the config.settings. </i>
    *
    * @return Metrics about the game's runtime.
    * @see GameMetrics#getFramesPerSecond()
@@ -244,10 +241,8 @@ public final class Game {
   /**
    * Gets time information about the running game/environment.
    *
-   * <p>
-   * This allow to measure the time between actions, track how long something took, evaluate cooldowns or just get information about the played game
-   * time.
-   * </p>
+   * <p>This allow to measure the time between actions, track how long something took, evaluate
+   * cooldowns or just get information about the played game time.
    *
    * @return The game's temporal information.
    * @see GameTime#now()
@@ -258,7 +253,8 @@ public final class Game {
 
   /**
    * Gets the game's window in which the {@code RenderComponent} lives.<br>
-   * This class e.g. provides the possibility to set a title, provide an icon, get information about the resolution or set a cursor.
+   * This class e.g. provides the possibility to set a title, provide an icon, get information about
+   * the resolution or set a cursor.
    *
    * @return The window that hosts the game's {@code RenderComponent}.
    * @see RenderComponent
@@ -276,11 +272,8 @@ public final class Game {
    * Sound can be loaded and accessed using the {@code Resources} API and are managed by the<br>
    * {@code Resources.sounds()} resource container.
    *
-   * <p>
-   * <i>
-   * Upon playing a sound, the engine returns an {@code SoundPlayback} instance that can then be used to further control the audio line.
-   * </i>
-   * </p>
+   * <p><i> Upon playing a sound, the engine returns an {@code SoundPlayback} instance that can then
+   * be used to further control the audio line. </i>
    *
    * @return The engine's {@code SoundEngine} component.
    * @see Sound
@@ -294,14 +287,13 @@ public final class Game {
   }
 
   /**
-   * Gets the engine's {@code PhysicsEngine} component that can be used to detect and resolve collision and move entities with respect to all
-   * collision
-   * entities on the environment.<br>
-   * The boundaries of the loaded environment also pose a "non-walkable" area that will be taken into account when moving entities with this engine.
+   * Gets the engine's {@code PhysicsEngine} component that can be used to detect and resolve
+   * collision and move entities with respect to all collision entities on the environment.<br>
+   * The boundaries of the loaded environment also pose a "non-walkable" area that will be taken
+   * into account when moving entities with this engine.
    *
-   * <p>
-   * <i>It is also possible to manually register static collision {@code Rectangles} that can further restrict the game world.</i>
-   * </p>
+   * <p><i>It is also possible to manually register static collision {@code Rectangles} that can
+   * further restrict the game world.</i>
    *
    * @return The engine's {@code PhysicsEngine} component.
    * @see PhysicsEngine
@@ -313,13 +305,11 @@ public final class Game {
   }
 
   /**
-   * Gets the engine's {@code RenderEngine} component that is used to render {@code Images, Shapes or Text} with respect to the environment
-   * and the render scale and the {@code Camera}.
+   * Gets the engine's {@code RenderEngine} component that is used to render {@code Images, Shapes
+   * or Text} with respect to the environment and the render scale and the {@code Camera}.
    *
-   * <p>
-   * <i>In case you want to render something in a static manner that is unrelated to the environment, you can use the engine's different static
-   * {@code Renderer} implementations.</i>
-   * </p>
+   * <p><i>In case you want to render something in a static manner that is unrelated to the
+   * environment, you can use the engine's different static {@code Renderer} implementations.</i>
    *
    * @return The engine's {@code RenderEngine} component.
    * @see RenderEngine#getBaseRenderScale()
@@ -332,17 +322,19 @@ public final class Game {
   }
 
   /**
-   * Gets the game's main loop that is used to execute and manage all game logic apart from input processing.<br>
-   * You can attach any {@code Updatable} instance to this loop if you want to execute custom game logic that is executed at the configured
-   * max fps.
-   * <p>
-   * The game's loop also executes the rendering process on the GameFrame's {@code RenderComponent}.<br>
-   * This internally renders the currently active screen which passes the {@code Graphics2D} object to all {@code GuiComponents} and the
-   * Environment for rendering.
-   * <p>
-   * <i>The LITIENGINE has two separate loops for game logic/rendering and input processing. <br>
-   * This prevents them from interfering with each other and to be able to process player input independent of the game's framerate.</i>
-   * </p>
+   * Gets the game's main loop that is used to execute and manage all game logic apart from input
+   * processing.<br>
+   * You can attach any {@code Updatable} instance to this loop if you want to execute custom game
+   * logic that is executed at the configured max fps.
+   *
+   * <p>The game's loop also executes the rendering process on the GameFrame's {@code
+   * RenderComponent}.<br>
+   * This internally renders the currently active screen which passes the {@code Graphics2D} object
+   * to all {@code GuiComponents} and the Environment for rendering.
+   *
+   * <p><i>The LITIENGINE has two separate loops for game logic/rendering and input processing. <br>
+   * This prevents them from interfering with each other and to be able to process player input
+   * independent of the game's framerate.</i>
    *
    * @return The game's main loop.
    * @see ClientConfiguration#getMaxFps()
@@ -355,8 +347,8 @@ public final class Game {
   }
 
   /**
-   * Gets the game's default logger instance that can be used to quickly log messages without the need to initialize
-   * custom logger instances.
+   * Gets the game's default logger instance that can be used to quickly log messages without the
+   * need to initialize custom logger instances.
    *
    * @return The game's default logger instance.
    */
@@ -365,8 +357,8 @@ public final class Game {
   }
 
   /**
-   * Gets the game's pseudo-random generator that enhances the default Java {@code Random} implementation
-   * with helpful additions.
+   * Gets the game's pseudo-random generator that enhances the default Java {@code Random}
+   * implementation with helpful additions.
    *
    * @return The game's pseudo random generator.
    */
@@ -375,13 +367,13 @@ public final class Game {
   }
 
   /**
-   * Gets the game's {@code ScreenManager} that is responsible for organizing all {@code Screens} of your game and providing the currently
-   * active {@code Screen} that is used to render the current {@code Environment}.<br>
-   * Screens are the containers that allow you to organize the visible contents of your game and are identified and addressed by a unique name.
+   * Gets the game's {@code ScreenManager} that is responsible for organizing all {@code Screens} of
+   * your game and providing the currently active {@code Screen} that is used to render the current
+   * {@code Environment}.<br>
+   * Screens are the containers that allow you to organize the visible contents of your game and are
+   * identified and addressed by a unique name.
    *
-   * <p>
-   * <i>Examples: Menu Screen, Credits Screen, Game Screen, Inventory Screen</i>
-   * </p>
+   * <p><i>Examples: Menu Screen, Credits Screen, Game Screen, Inventory Screen</i>
    *
    * @return The game's screen manager.
    * @see Screen
@@ -393,18 +385,17 @@ public final class Game {
   }
 
   /**
-   * Gets the game's world which is a global environment manager that contains all {@code Environments}
-   * and provides the currently active {@code Environment} and
-   * {@code Camera}.<br>
-   * <p>
-   * The {@code GameWorld} returns the same instance for a particular map/mapName until the
+   * Gets the game's world which is a global environment manager that contains all {@code
+   * Environments} and provides the currently active {@code Environment} and {@code Camera}.<br>
+   *
+   * <p>The {@code GameWorld} returns the same instance for a particular map/mapName until the
    * {@code GameWorld.reset(String)} method is called.
-   * </p>
-   * <p>
-   * Moreover, it provides the possibility to attach game logic via {@code EnvironmentListeners} to different events of the
-   * {@code Envrionment's} life cycle (e.g. loaded, initialized, ...).<br>
-   * <i>This is typically used to provide some per-level logic or to trigger
-   * general loading behavior.</i>
+   *
+   * <p>Moreover, it provides the possibility to attach game logic via {@code EnvironmentListeners}
+   * to different events of the {@code Envrionment's} life cycle (e.g. loaded, initialized, ...).
+   * <br>
+   * <i>This is typically used to provide some per-level logic or to trigger general loading
+   * behavior.</i>
    *
    * @return The game's environment manager.
    * @see GameWorld
@@ -463,7 +454,8 @@ public final class Game {
     loop().attach(world());
 
     // setup default exception handling for render and update loop
-    setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(config().client().exitOnError()));
+    setUncaughtExceptionHandler(
+        new DefaultUncaughtExceptionHandler(config().client().exitOnError()));
 
     screenManager = new ScreenManager();
     gameWindow = new GameWindow();
@@ -479,20 +471,30 @@ public final class Game {
     if (!isInNoGUIMode()) {
       window().getRenderComponent().onRendered(g -> metrics().render(g));
 
-      graphics().addEntityRenderedListener(e -> DebugRenderer.renderEntityDebugInfo(e.getGraphics(), e.getEntity()));
+      graphics()
+          .addEntityRenderedListener(
+              e -> DebugRenderer.renderEntityDebugInfo(e.getGraphics(), e.getEntity()));
 
       window().getRenderComponent().onFpsChanged(fps -> metrics().setFramesPerSecond(fps));
-      window().setIcons(Arrays.asList(Resources.images().get("liti-logo-x16.png"), Resources.images().get("liti-logo-x20.png"),
-          Resources.images().get("liti-logo-x32.png"), Resources.images().get("liti-logo-x48.png")));
+      window()
+          .setIcons(
+              Arrays.asList(
+                  Resources.images().get("liti-logo-x16.png"),
+                  Resources.images().get("liti-logo-x20.png"),
+                  Resources.images().get("liti-logo-x32.png"),
+                  Resources.images().get("liti-logo-x48.png")));
 
-      Input.keyboard().onKeyTyped(KeyEvent.VK_PRINTSCREEN, key -> {
-        // don't take a screenshot if a modifier is active
-        if (key.getModifiers() != 0) {
-          return;
-        }
+      Input.keyboard()
+          .onKeyTyped(
+              KeyEvent.VK_PRINTSCREEN,
+              key -> {
+                // don't take a screenshot if a modifier is active
+                if (key.getModifiers() != 0) {
+                  return;
+                }
 
-        window().getRenderComponent().takeScreenshot();
-      });
+                window().getRenderComponent().takeScreenshot();
+              });
     }
 
     Runtime.getRuntime().addShutdownHook(new Thread(Game::terminate, "Shutdown"));
@@ -501,11 +503,13 @@ public final class Game {
   }
 
   /**
-   * Sets an {@code UncaughtExceptionHandler} used to handle all unexpected exceptions happening in the game.
+   * Sets an {@code UncaughtExceptionHandler} used to handle all unexpected exceptions happening in
+   * the game.
    *
    * @param uncaughtExceptionHandler The handler to be used for uncaught exceptions.
    */
-  public static void setUncaughtExceptionHandler(UncaughtExceptionHandler uncaughtExceptionHandler) {
+  public static void setUncaughtExceptionHandler(
+      UncaughtExceptionHandler uncaughtExceptionHandler) {
     gameLoop.setUncaughtExceptionHandler(uncaughtExceptionHandler);
     Thread.setDefaultUncaughtExceptionHandler(uncaughtExceptionHandler);
   }
@@ -529,7 +533,8 @@ public final class Game {
    */
   public static synchronized void start() {
     if (!initialized) {
-      throw new IllegalStateException("The game cannot be started without being first initialized. Call Game.init(...) before Game.start().");
+      throw new IllegalStateException(
+          "The game cannot be started without being first initialized. Call Game.init(...) before Game.start().");
     }
 
     gameLoop.start();
@@ -551,12 +556,11 @@ public final class Game {
 
   /**
    * Sets the {@code Game's} basic information by the specified {@code GameInfo} instance.
-   * <p>
-   * <i>Typically, this should not be called manually because the {@code Game} already provides a {@code GameInfo} object which can be
-   * adjusted.<br>
-   * If you just want to edit some of it's information, use the provided instance of {@link Game#info()}.
-   * </i>
-   * </p>
+   *
+   * <p><i>Typically, this should not be called manually because the {@code Game} already provides a
+   * {@code GameInfo} object which can be adjusted.<br>
+   * If you just want to edit some of it's information, use the provided instance of {@link
+   * Game#info()}. </i>
    *
    * @param info The {@code GameInfo} that contains the basic information for the game.
    * @see Game#info()
@@ -567,7 +571,8 @@ public final class Game {
   }
 
   /**
-   * Sets the {@code Game's} basic information by loading the {@code GameInfo} from the specified path to an XML file.
+   * Sets the {@code Game's} basic information by loading the {@code GameInfo} from the specified
+   * path to an XML file.
    *
    * @param gameInfoFile The path to the XML file that contains the serialized {@code GameInfo}.
    * @see Game#setInfo(GameInfo)
@@ -583,7 +588,7 @@ public final class Game {
     try {
       info = XmlUtilities.read(GameInfo.class, gameInfoFile);
     } catch (Exception e) {
-      log().log(Level.WARNING, "Could not read game info from {0}", new Object[] { gameInfoFile });
+      log().log(Level.WARNING, "Could not read game info from {0}", new Object[] {gameInfoFile});
       setInfo((GameInfo) null);
       return;
     }

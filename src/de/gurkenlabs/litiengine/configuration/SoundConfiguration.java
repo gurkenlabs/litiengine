@@ -32,8 +32,7 @@ public class SoundConfiguration extends ConfigurationGroup {
   /**
    * Sets the sound volume.
    *
-   * @param soundVolume
-   *          the new sound volume
+   * @param soundVolume the new sound volume
    */
   public void setSoundVolume(final float soundVolume) {
     this.set("soundVolume", soundVolume);

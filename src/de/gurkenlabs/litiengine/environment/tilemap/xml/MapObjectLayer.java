@@ -1,5 +1,9 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
+import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
+import de.gurkenlabs.litiengine.util.ColorHelper;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.net.URL;
@@ -8,24 +12,17 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
-import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
-import de.gurkenlabs.litiengine.util.ColorHelper;
-
 public class MapObjectLayer extends Layer implements IMapObjectLayer {
   public static final String DEFAULT_MAPOBJECTLAYER_NAME = "default";
-  
+
   @XmlElement(name = "object")
   private ArrayList<MapObject> objects = new ArrayList<>();
 
-  @XmlAttribute
-  private String color;
+  @XmlAttribute private String color;
 
   private transient Color decodedColor;
 
@@ -33,9 +30,7 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
 
   private transient boolean added;
 
-  /**
-   * Instantiates a new {@code MapObjectLayer} instance.
-   */
+  /** Instantiates a new {@code MapObjectLayer} instance. */
   public MapObjectLayer() {
     super();
   }
@@ -43,8 +38,7 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
   /**
    * Instantiates a new {@code MapObjectLayer} instance by copying from the specified original.
    *
-   * @param original
-   *          the layer we want to copy
+   * @param original the layer we want to copy
    */
   public MapObjectLayer(MapObjectLayer original) {
     super(original);
@@ -138,7 +132,8 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
   public Collection<IMapObject> getMapObjects(String... types) {
     List<IMapObject> objs = new ArrayList<>();
     for (IMapObject mapObject : this.getMapObjects()) {
-      if (mapObject != null && Arrays.stream(types).anyMatch(type -> type.equals(mapObject.getType()))) {
+      if (mapObject != null
+          && Arrays.stream(types).anyMatch(type -> type.equals(mapObject.getType()))) {
         objs.add(mapObject);
       }
     }

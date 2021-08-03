@@ -1,5 +1,9 @@
 package de.gurkenlabs.litiengine.resources;
 
+import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
+import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.util.io.Codec;
+import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,20 +20,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
-import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.litiengine.util.io.Codec;
-import de.gurkenlabs.litiengine.util.io.FileUtilities;
-
 public final class Spritesheets {
   private final Map<String, int[]> customKeyFrameDurations = new ConcurrentHashMap<>();
   private final Map<String, Spritesheet> loadedSpritesheets = new ConcurrentHashMap<>();
-  private final Collection<ResourcesContainerClearedListener> listeners = ConcurrentHashMap.newKeySet();
+  private final Collection<ResourcesContainerClearedListener> listeners =
+      ConcurrentHashMap.newKeySet();
   private static final Logger log = Logger.getLogger(Spritesheets.class.getName());
   private static final String SPRITE_INFO_COMMENT_CHAR = "#";
 
-  Spritesheets() {
-  }
+  Spritesheets() {}
 
   public void add(String name, Spritesheet spritesheet) {
     this.loadedSpritesheets.put(name, spritesheet);
@@ -52,13 +51,10 @@ public final class Spritesheets {
   }
 
   /**
-   * Finds Spritesheets that were previously loaded by any load method or by the
-   * sprites.info file.
-   * 
-   * @param path
-   *          The path of the spritesheet.
-   * @return The {@link Spritesheet} associated with the path or null if not
-   *         loaded yet
+   * Finds Spritesheets that were previously loaded by any load method or by the sprites.info file.
+   *
+   * @param path The path of the spritesheet.
+   * @return The {@link Spritesheet} associated with the path or null if not loaded yet
    */
   public Spritesheet get(final String path) {
     if (path == null || path.isEmpty()) {
@@ -90,7 +86,8 @@ public final class Spritesheets {
     return getCustomKeyFrameDurations(sprite.getName());
   }
 
-  public Spritesheet load(final BufferedImage image, final String path, final int spriteWidth, final int spriteHeight) {
+  public Spritesheet load(
+      final BufferedImage image, final String path, final int spriteWidth, final int spriteHeight) {
     return new Spritesheet(image, path, spriteWidth, spriteHeight);
   }
 
@@ -103,17 +100,30 @@ public final class Spritesheets {
       return null;
     }
 
-    return new Spritesheet(Resources.images().get(tileset.getImage().getAbsoluteSourcePath(), true), tileset.getImage().getSource(), tileset.getTileDimension().width, tileset.getTileDimension().height);
+    return new Spritesheet(
+        Resources.images().get(tileset.getImage().getAbsoluteSourcePath(), true),
+        tileset.getImage().getSource(),
+        tileset.getTileDimension().width,
+        tileset.getTileDimension().height);
   }
 
   public Spritesheet load(final SpritesheetResource info) {
     Spritesheet sprite = null;
     if (info.getImage() == null || info.getImage().isEmpty()) {
-      log.log(Level.SEVERE, "Sprite {0} could not be loaded because no image is defined.", new Object[] { info.getName() });
+      log.log(
+          Level.SEVERE,
+          "Sprite {0} could not be loaded because no image is defined.",
+          new Object[] {info.getName()});
       return null;
     } else {
-      String fileExtension = info.getImageFormat() == null ? "" : info.getImageFormat().toFileExtension();
-      sprite = load(Codec.decodeImage(info.getImage()), info.getName() + fileExtension, info.getWidth(), info.getHeight());
+      String fileExtension =
+          info.getImageFormat() == null ? "" : info.getImageFormat().toFileExtension();
+      sprite =
+          load(
+              Codec.decodeImage(info.getImage()),
+              info.getName() + fileExtension,
+              info.getWidth(),
+              info.getHeight());
     }
 
     if (info.getKeyframes() != null && info.getKeyframes().length > 0) {
@@ -124,11 +134,9 @@ public final class Spritesheets {
   }
 
   /**
-   * The sprite info file must be located under the
-   * GameInfo#getSpritesDirectory() directory.
+   * The sprite info file must be located under the GameInfo#getSpritesDirectory() directory.
    *
-   * @param spriteInfoFile
-   *          The path to the sprite info file.
+   * @param spriteInfoFile The path to the sprite info file.
    * @return A list of spritesheets that were loaded from the info file.
    */
   public List<Spritesheet> loadFrom(final String spriteInfoFile) {
@@ -157,10 +165,14 @@ public final class Spritesheets {
           continue;
         }
 
-        getSpriteSheetFromSpriteInfoLine(FileUtilities.getParentDirPath(spriteInfoFile), sprites, items, parts);
+        getSpriteSheetFromSpriteInfoLine(
+            FileUtilities.getParentDirPath(spriteInfoFile), sprites, items, parts);
       }
 
-      log.log(Level.INFO, "{0} spritesheets loaded from {1}", new Object[] { sprites.size(), spriteInfoFile });
+      log.log(
+          Level.INFO,
+          "{0} spritesheets loaded from {1}",
+          new Object[] {sprites.size(), spriteInfoFile});
     } catch (final IOException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
     }
@@ -197,7 +209,8 @@ public final class Spritesheets {
     }
   }
 
-  private void getSpriteSheetFromSpriteInfoLine(String baseDirectory, ArrayList<Spritesheet> sprites, List<String> items, String[] parts) {
+  private void getSpriteSheetFromSpriteInfoLine(
+      String baseDirectory, ArrayList<Spritesheet> sprites, List<String> items, String[] parts) {
     try {
       final String name = baseDirectory + items.get(0);
 

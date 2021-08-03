@@ -1,10 +1,9 @@
 package de.gurkenlabs.litiengine.environment.tilemap;
 
-import java.awt.Dimension;
-import java.util.List;
-
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resource;
+import java.awt.Dimension;
+import java.util.List;
 
 public interface ITileset extends ICustomPropertyProvider, Resource {
 

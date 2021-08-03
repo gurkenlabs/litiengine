@@ -144,9 +144,9 @@ public class PropPanel extends PropertyPanel {
   private LayoutManager createLayout() {
     LayoutItem[] layoutItems =
         new LayoutItem[] {
-            new LayoutItem("panel_sprite", this.comboBoxSpriteSheets),
-            new LayoutItem("panel_material", this.comboBoxMaterial),
-            new LayoutItem("panel_rotation", this.comboBoxRotation),
+          new LayoutItem("panel_sprite", this.comboBoxSpriteSheets),
+          new LayoutItem("panel_material", this.comboBoxMaterial),
+          new LayoutItem("panel_rotation", this.comboBoxRotation),
         };
 
     return this.createLayout(

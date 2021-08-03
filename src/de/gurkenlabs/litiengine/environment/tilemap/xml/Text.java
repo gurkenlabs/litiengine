@@ -1,56 +1,43 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
+import de.gurkenlabs.litiengine.Align;
+import de.gurkenlabs.litiengine.Valign;
+import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectText;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.font.TextAttribute;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlValue;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import de.gurkenlabs.litiengine.Align;
-import de.gurkenlabs.litiengine.Valign;
-import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectText;
-
 public class Text implements IMapObjectText {
-  @XmlAttribute
-  private String fontfamily;
+  @XmlAttribute private String fontfamily;
 
-  @XmlAttribute
-  private Integer pixelsize;
+  @XmlAttribute private Integer pixelsize;
 
-  @XmlAttribute
-  private Integer wrap;
+  @XmlAttribute private Integer wrap;
 
   @XmlAttribute
   @XmlJavaTypeAdapter(ColorAdapter.class)
   private Color color;
 
-  @XmlAttribute
-  private Integer bold;
+  @XmlAttribute private Integer bold;
 
-  @XmlAttribute
-  private Integer italic;
+  @XmlAttribute private Integer italic;
 
-  @XmlAttribute
-  private Integer underline;
+  @XmlAttribute private Integer underline;
 
-  @XmlAttribute
-  private Integer strikeout;
+  @XmlAttribute private Integer strikeout;
 
-  @XmlAttribute
-  private Integer kerning;
+  @XmlAttribute private Integer kerning;
 
-  @XmlAttribute
-  private Align halign;
+  @XmlAttribute private Align halign;
 
-  @XmlAttribute
-  private Valign valign;
+  @XmlAttribute private Valign valign;
 
-  @XmlValue
-  private String text;
+  @XmlValue private String text;
 
   @Override
   public String getText() {
@@ -62,8 +49,12 @@ public class Text implements IMapObjectText {
     Map<TextAttribute, Object> properties = new HashMap<>();
     properties.put(TextAttribute.FAMILY, this.getFontName());
     properties.put(TextAttribute.SIZE, this.getPixelSize() * 0.75f); // pixels to points
-    properties.put(TextAttribute.WEIGHT, this.isBold() ? TextAttribute.WEIGHT_BOLD : TextAttribute.WEIGHT_REGULAR);
-    properties.put(TextAttribute.POSTURE, this.isItalic() ? TextAttribute.POSTURE_OBLIQUE : TextAttribute.POSTURE_REGULAR);
+    properties.put(
+        TextAttribute.WEIGHT,
+        this.isBold() ? TextAttribute.WEIGHT_BOLD : TextAttribute.WEIGHT_REGULAR);
+    properties.put(
+        TextAttribute.POSTURE,
+        this.isItalic() ? TextAttribute.POSTURE_OBLIQUE : TextAttribute.POSTURE_REGULAR);
     properties.put(TextAttribute.UNDERLINE, this.isUnderlined() ? TextAttribute.UNDERLINE_ON : -1);
     properties.put(TextAttribute.STRIKETHROUGH, this.isStrikeout());
     properties.put(TextAttribute.KERNING, this.useKerning() ? TextAttribute.KERNING_ON : 0);

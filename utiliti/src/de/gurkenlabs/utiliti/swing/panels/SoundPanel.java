@@ -90,10 +90,10 @@ public class SoundPanel extends PropertyPanel {
   private LayoutManager createLayout() {
     LayoutItem[] layoutItems =
         new LayoutItem[] {
-            new LayoutItem("panel_soundname", this.soundResource),
-            new LayoutItem("panel_range", this.range),
-            new LayoutItem("panel_volume", this.volume),
-            new LayoutItem("panel_loop", this.loop),
+          new LayoutItem("panel_soundname", this.soundResource),
+          new LayoutItem("panel_range", this.range),
+          new LayoutItem("panel_volume", this.volume),
+          new LayoutItem("panel_loop", this.loop),
         };
 
     return this.createLayout(layoutItems, this.play);

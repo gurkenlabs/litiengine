@@ -1,36 +1,32 @@
 package de.gurkenlabs.litiengine.environment;
 
-import java.util.List;
-
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.Spawnpoint;
+import java.util.List;
 
 public interface IEntitySpawner<T extends IEntity> extends IUpdateable {
 
   /**
    * SpawnMode specifies the behaviour of the EntitySpawner:
+   *
    * <ul>
-   * <li><b>ALLSPAWNPOINTS</b>: the specified spawnAmount is spawned at each of the SpawnPoints individually</li>
-   * <li><b>ONERANDOMSPAWNPOINT</b>: the specified spawnAmount is spawned at one random SpawnPoint</li>
-   * <li><b>RANDOMSPAWNPOINTS</b>: the specified spawnAmount is distributed equally to all of the SpawnPoints</li>
+   *   <li><b>ALLSPAWNPOINTS</b>: the specified spawnAmount is spawned at each of the SpawnPoints
+   *       individually
+   *   <li><b>ONERANDOMSPAWNPOINT</b>: the specified spawnAmount is spawned at one random SpawnPoint
+   *   <li><b>RANDOMSPAWNPOINTS</b>: the specified spawnAmount is distributed equally to all of the
+   *       SpawnPoints
    * </ul>
    */
   enum SpawnMode {
 
-    /**
-     * Spawns the amount of mobs for all the spawnpoints available.
-     */
+    /** Spawns the amount of mobs for all the spawnpoints available. */
     ALLSPAWNPOINTS,
 
-    /**
-     * Spawns the amount of mobs on one random spawnpoint.
-     */
+    /** Spawns the amount of mobs on one random spawnpoint. */
     ONERANDOMSPAWNPOINT,
 
-    /**
-     * Spawns the amount of mobs, distributed to random spawnpoints.
-     */
+    /** Spawns the amount of mobs, distributed to random spawnpoints. */
     RANDOMSPAWNPOINTS,
 
     CUSTOMSPAWNPOINTS,
@@ -82,32 +78,28 @@ public interface IEntitySpawner<T extends IEntity> extends IUpdateable {
   /**
    * Sets the amount of Entities that spawn in each wave.
    *
-   * @param amount
-   *          the new amount
+   * @param amount the new amount
    */
   void setSpawnAmount(int amount);
 
   /**
    * Sets the interval in milliseconds between each spawn wave.
    *
-   * @param interval
-   *          the new interval
+   * @param interval the new interval
    */
   void setSpawnInterval(int interval);
 
   /**
    * Gets the delay in milliseconds between spawning individual Entities of one wave.
    *
-   * @param delay
-   *          the new spawn delay
+   * @param delay the new spawn delay
    */
   void setSpawnDelay(int delay);
 
   /**
    * Sets the spawn mode.
-   * 
-   * @param mode
-   *          the new spawn mode
+   *
+   * @param mode the new spawn mode
    * @see SpawnMode
    */
   void setSpawnMode(SpawnMode mode);

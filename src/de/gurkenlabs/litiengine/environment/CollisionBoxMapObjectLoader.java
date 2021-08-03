@@ -1,13 +1,12 @@
 package de.gurkenlabs.litiengine.environment;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import de.gurkenlabs.litiengine.entities.CollisionBox;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.StaticShadow;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class CollisionBoxMapObjectLoader extends MapObjectLoader {
 

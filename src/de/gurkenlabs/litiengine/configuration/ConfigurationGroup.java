@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.configuration;
 
+import de.gurkenlabs.litiengine.util.ReflectionUtilities;
 import java.beans.PropertyChangeEvent;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -10,13 +11,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.gurkenlabs.litiengine.util.ReflectionUtilities;
-
 /**
- * This class contains some basic functionality for all setting groups. It gets
- * the SettingsGroupInfo annotation and reads out the prefix that is used when
- * reading/ writing the settings into a property file.
- * 
+ * This class contains some basic functionality for all setting groups. It gets the
+ * SettingsGroupInfo annotation and reads out the prefix that is used when reading/ writing the
+ * settings into a property file.
  */
 @ConfigurationGroupInfo
 public abstract class ConfigurationGroup {
@@ -27,9 +25,7 @@ public abstract class ConfigurationGroup {
   private final String prefix;
   private boolean debug;
 
-  /**
-   * Initializes a new instance of the {@code ConfigurationGroup} class.
-   */
+  /** Initializes a new instance of the {@code ConfigurationGroup} class. */
   protected ConfigurationGroup() {
     final ConfigurationGroupInfo info = this.getClass().getAnnotation(ConfigurationGroupInfo.class);
     this.prefix = info.prefix();
@@ -37,19 +33,16 @@ public abstract class ConfigurationGroup {
   }
 
   /**
-   * Adds the specified configuration changed listener to receive events about any configuration property that changed.
-   * 
-   * <p>
-   * The event is supported for any property that uses the {@link #set(String, Object)} method to set the field value.
-   * </p>
-   * 
-   * <p>
-   * The event will provide you with the fieldName of the called setter (e.g. "debug" for the "setDebug" call).
-   * </p>
-   * 
-   * @param listener
-   *          The listener to add.
-   * 
+   * Adds the specified configuration changed listener to receive events about any configuration
+   * property that changed.
+   *
+   * <p>The event is supported for any property that uses the {@link #set(String, Object)} method to
+   * set the field value.
+   *
+   * <p>The event will provide you with the fieldName of the called setter (e.g. "debug" for the
+   * "setDebug" call).
+   *
+   * @param listener The listener to add.
    * @see ConfigurationGroup#set(String, Object)
    */
   public void onChanged(ConfigurationChangedListener listener) {
@@ -80,10 +73,8 @@ public abstract class ConfigurationGroup {
   /**
    * Initialize by property.
    *
-   * @param key
-   *          the key
-   * @param value
-   *          the value
+   * @param key the key
+   * @param value the value
    */
   protected void initializeByProperty(final String key, final String value) {
     final String propertyName = key.substring(this.getPrefix().length());
@@ -91,14 +82,11 @@ public abstract class ConfigurationGroup {
   }
 
   /**
-   * Store properties. By default, it is supported to store the following types:
-   * boolean, int, double, float, String and enum values. If you need to store
-   * any other object, you should overwrite this method as well as the
-   * initializeProperty method and implement a custom approach.
+   * Store properties. By default, it is supported to store the following types: boolean, int,
+   * double, float, String and enum values. If you need to store any other object, you should
+   * overwrite this method as well as the initializeProperty method and implement a custom approach.
    *
-   *
-   * @param properties
-   *          the properties
+   * @param properties the properties
    */
   protected void storeProperties(final Properties properties) {
     try {
@@ -128,7 +116,8 @@ public abstract class ConfigurationGroup {
         } else if (field.getType().equals(long.class)) {
           properties.setProperty(propertyKey, Long.toString(field.getLong(this)));
         } else if (field.getType().equals(String.class)) {
-          properties.setProperty(propertyKey, field.get(this) != null ? (String) field.get(this) : "");
+          properties.setProperty(
+              propertyKey, field.get(this) != null ? (String) field.get(this) : "");
         } else if (field.getType().equals(String[].class)) {
           if (field.get(this) == null) {
             properties.setProperty(propertyKey, "");
@@ -140,7 +129,10 @@ public abstract class ConfigurationGroup {
           }
         } else if (field.getType().isEnum()) {
           Object val = field.get(this);
-          final String value = val == null && field.getType().getEnumConstants().length > 0 ? field.getType().getEnumConstants()[0].toString() : "";
+          final String value =
+              val == null && field.getType().getEnumConstants().length > 0
+                  ? field.getType().getEnumConstants()[0].toString()
+                  : "";
           properties.setProperty(propertyKey, val != null ? val.toString() : value);
         }
       }
@@ -150,14 +142,12 @@ public abstract class ConfigurationGroup {
   }
 
   /**
-   * Use this method to set configuration properties if you want to support {@code configurationChanged} for your property.
-   * 
-   * @param <T>
-   *          The type of the value to set.
-   * @param fieldName
-   *          The name of the field to set.
-   * @param value
-   *          The value to set.
+   * Use this method to set configuration properties if you want to support {@code
+   * configurationChanged} for your property.
+   *
+   * @param <T> The type of the value to set.
+   * @param fieldName The name of the field to set.
+   * @param value The value to set.
    */
   protected <T> void set(String fieldName, T value) {
     Field field = ReflectionUtilities.getField(this.getClass(), fieldName, true);
@@ -169,7 +159,8 @@ public abstract class ConfigurationGroup {
 
         final Object currentValue = field.get(this);
 
-        final PropertyChangeEvent event = new PropertyChangeEvent(this, fieldName, currentValue, value);
+        final PropertyChangeEvent event =
+            new PropertyChangeEvent(this, fieldName, currentValue, value);
         field.set(this, value);
 
         for (ConfigurationChangedListener listener : this.listeners) {
@@ -183,17 +174,16 @@ public abstract class ConfigurationGroup {
 
   /**
    * This listener interface receives events when any property of the configuration changed.
-   * 
+   *
    * @see ConfigurationGroup#onChanged(ConfigurationChangedListener)
    */
   @FunctionalInterface
   public interface ConfigurationChangedListener extends EventListener {
     /**
-     * Invoked when a a property of the configuration has been changed using the {@link ConfigurationGroup#set(String, Object)} method to support this
-     * event.
-     * 
-     * @param event
-     *          The property changed event.
+     * Invoked when a a property of the configuration has been changed using the {@link
+     * ConfigurationGroup#set(String, Object)} method to support this event.
+     *
+     * @param event The property changed event.
      */
     void configurationChanged(PropertyChangeEvent event);
   }

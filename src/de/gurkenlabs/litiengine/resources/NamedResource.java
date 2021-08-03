@@ -4,8 +4,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlTransient;
 
 public abstract class NamedResource implements Resource {
-  @XmlAttribute
-  private String name;
+  @XmlAttribute private String name;
 
   @XmlTransient
   @Override

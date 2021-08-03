@@ -1,17 +1,17 @@
 package de.gurkenlabs.litiengine;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-
 import de.gurkenlabs.litiengine.graphics.RenderComponent;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.input.Keyboard;
 import de.gurkenlabs.litiengine.input.Mouse;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * The main update loop that executes the game logic by calling the update functions on all registered {@code IUpdatable} instances.
- * Subsequently, it performs the rendering of the current frame and tracks some performance metrics on the process.
+ * The main update loop that executes the game logic by calling the update functions on all
+ * registered {@code IUpdatable} instances. Subsequently, it performs the rendering of the current
+ * frame and tracks some performance metrics on the process.
  *
  * @see IUpdateable#update()
  * @see Game#loop()
@@ -20,10 +20,11 @@ import de.gurkenlabs.litiengine.input.Mouse;
 public final class GameLoop extends UpdateLoop implements IGameLoop {
   /**
    * The tick {@link #getDeltaTime()} at which we consider the game not to run fluently anymore.
+   *
    * <ul>
-   * <li>16.6 ms: 60 FPS</li>
-   * <li>33.3 ms: 30 FPS</li>
-   * <li>66.6 ms: 15 FPS</li>
+   *   <li>16.6 ms: 60 FPS
+   *   <li>33.3 ms: 30 FPS
+   *   <li>66.6 ms: 15 FPS
    * </ul>
    */
   public static final int TICK_DELTATIME_LAG = 67;
@@ -75,8 +76,8 @@ public final class GameLoop extends UpdateLoop implements IGameLoop {
   }
 
   /**
-   * In addition to the normal base implementation, the {@code GameLoop} performs registered action at the required
-   * time and tracks some detailed metrics.
+   * In addition to the normal base implementation, the {@code GameLoop} performs registered action
+   * at the required time and tracks some detailed metrics.
    */
   @Override
   protected void process() {

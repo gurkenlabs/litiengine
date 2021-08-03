@@ -1,10 +1,11 @@
 package de.gurkenlabs.litiengine.resources;
 
+import de.gurkenlabs.litiengine.util.io.FileUtilities;
+import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -13,9 +14,6 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import de.gurkenlabs.litiengine.util.io.FileUtilities;
-import de.gurkenlabs.litiengine.util.io.XmlUtilities;
-
 @XmlRootElement(name = "TextureAtlas")
 public class TextureAtlas {
   private static final Logger log = Logger.getLogger(TextureAtlas.class.getName());
@@ -23,11 +21,9 @@ public class TextureAtlas {
   @XmlAttribute(name = "imagePath")
   private String rawImagePath;
 
-  @XmlAttribute
-  private int width;
+  @XmlAttribute private int width;
 
-  @XmlAttribute
-  private int height;
+  @XmlAttribute private int height;
 
   @XmlElement(name = "sprite")
   private List<Sprite> sprites;
@@ -40,7 +36,8 @@ public class TextureAtlas {
 
   public static TextureAtlas read(String textureAtlasFile) {
     try {
-      TextureAtlas atlas = XmlUtilities.read(TextureAtlas.class, Resources.getLocation(textureAtlasFile));
+      TextureAtlas atlas =
+          XmlUtilities.read(TextureAtlas.class, Resources.getLocation(textureAtlasFile));
       if (atlas == null) {
         return null;
       }
@@ -83,7 +80,10 @@ public class TextureAtlas {
       return null;
     }
 
-    return this.getSprites().stream().filter(x -> x.getName().equals(name)).findFirst().orElse(null);
+    return this.getSprites().stream()
+        .filter(x -> x.getName().equals(name))
+        .findFirst()
+        .orElse(null);
   }
 
   public void setImagePath(String imagePath) {
@@ -107,11 +107,9 @@ public class TextureAtlas {
     @XmlAttribute(name = "n")
     private String name;
 
-    @XmlAttribute()
-    private int x;
+    @XmlAttribute() private int x;
 
-    @XmlAttribute()
-    private int y;
+    @XmlAttribute() private int y;
 
     @XmlAttribute(name = "w")
     private int width;
@@ -214,7 +212,10 @@ public class TextureAtlas {
         return false;
       }
 
-      return v.equalsIgnoreCase("y") || v.equalsIgnoreCase("yes") || v.equals("1") || v.equalsIgnoreCase("true");
+      return v.equalsIgnoreCase("y")
+          || v.equalsIgnoreCase("yes")
+          || v.equals("1")
+          || v.equalsIgnoreCase("true");
     }
 
     @Override

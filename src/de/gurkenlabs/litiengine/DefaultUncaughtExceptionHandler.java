@@ -1,5 +1,8 @@
 package de.gurkenlabs.litiengine;
 
+import static de.gurkenlabs.litiengine.util.io.FileUtilities.humanReadableByteCount;
+
+import de.gurkenlabs.litiengine.configuration.ClientConfiguration;
 import java.awt.DisplayMode;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -14,24 +17,21 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.gurkenlabs.litiengine.configuration.ClientConfiguration;
-
-import static de.gurkenlabs.litiengine.util.io.FileUtilities.humanReadableByteCount;
-
 /**
- * Handles the uncaught exceptions that might occur while running a game or application with the LITIENGINE.
- * <p>
- * It provides proper logging of the exception in a {@code crash.txt} file in the game's root directory that can be
- * further used to report the issue if it's a generic one.
- * </p>
- * <p>
- * Depending on the configuration, the default behavior might force the game to exit upon an unexpected exception which
- * can be useful to detect problems in your game early.
+ * Handles the uncaught exceptions that might occur while running a game or application with the
+ * LITIENGINE.
+ *
+ * <p>It provides proper logging of the exception in a {@code crash.txt} file in the game's root
+ * directory that can be further used to report the issue if it's a generic one.
+ *
+ * <p>Depending on the configuration, the default behavior might force the game to exit upon an
+ * unexpected exception which can be useful to detect problems in your game early.
  *
  * @see ClientConfiguration#exitOnError()
  */
 public class DefaultUncaughtExceptionHandler implements UncaughtExceptionHandler {
-  private static final Logger log = Logger.getLogger(DefaultUncaughtExceptionHandler.class.getName());
+  private static final Logger log =
+      Logger.getLogger(DefaultUncaughtExceptionHandler.class.getName());
 
   private volatile boolean exitOnException;
   private volatile boolean dumpThreads;
@@ -39,8 +39,8 @@ public class DefaultUncaughtExceptionHandler implements UncaughtExceptionHandler
   /**
    * Initializes a new instance of the {@code DefaultUncaughtExceptionHandler} class.
    *
-   * @param exitOnException A flag indicating whether the game should exit when an unexpected exception occurs.
-   *                        The game will still exit if it encounters an Error.
+   * @param exitOnException A flag indicating whether the game should exit when an unexpected
+   *     exception occurs. The game will still exit if it encounters an Error.
    */
   public DefaultUncaughtExceptionHandler(boolean exitOnException) {
     this(exitOnException, false);
@@ -49,9 +49,10 @@ public class DefaultUncaughtExceptionHandler implements UncaughtExceptionHandler
   /**
    * Initializes a new instance of the {@code DefaultUncaughtExceptionHandler} class.
    *
-   * @param exitOnException A flag indicating whether the game should exit when an unexpected exception occurs.
-   *                        The game will still exit if it encounters an Error
-   * @param dumpThreads     A flag indicating whether the crash report should contain an additional thread dump.
+   * @param exitOnException A flag indicating whether the game should exit when an unexpected
+   *     exception occurs. The game will still exit if it encounters an Error
+   * @param dumpThreads A flag indicating whether the crash report should contain an additional
+   *     thread dump.
    */
   public DefaultUncaughtExceptionHandler(boolean exitOnException, boolean dumpThreads) {
     this.exitOnException = exitOnException;
@@ -60,8 +61,7 @@ public class DefaultUncaughtExceptionHandler implements UncaughtExceptionHandler
 
   @Override
   public void uncaughtException(final Thread t, final Throwable e) {
-    if (e instanceof ThreadDeath)
-      return;
+    if (e instanceof ThreadDeath) return;
 
     try (PrintStream stream = new PrintStream("crash.txt")) {
       stream.print(new Date() + " ");
@@ -85,8 +85,8 @@ public class DefaultUncaughtExceptionHandler implements UncaughtExceptionHandler
 
   /**
    * Indicates whether this hander currently exits the game upon an unhandled exception.
-   * <p>
-   * Note that this handler will still exit if it encounters an unhandled Error.
+   *
+   * <p>Note that this handler will still exit if it encounters an unhandled Error.
    *
    * @return True if the game will exit upon an unhandled exception; otherwise false.
    */
@@ -94,9 +94,7 @@ public class DefaultUncaughtExceptionHandler implements UncaughtExceptionHandler
     return this.exitOnException;
   }
 
-  /**
-   * @return true if the generated crash report will contain a thread dump
-   */
+  /** @return true if the generated crash report will contain a thread dump */
   public boolean dumpsThreads() {
     return this.dumpThreads;
   }
@@ -156,19 +154,31 @@ public class DefaultUncaughtExceptionHandler implements UncaughtExceptionHandler
     long freeHeapSize = Runtime.getRuntime().freeMemory();
     text.append("\tMax heap size: ").append(humanReadableByteCount(maxHeapSize)).append("\n");
     text.append("\tCurrent heap size: ").append(humanReadableByteCount(heapSize)).append("\n");
-    text.append("\tHeap used: ").append(humanReadableByteCount(heapSize - freeHeapSize)).append("\n");
+    text.append("\tHeap used: ")
+        .append(humanReadableByteCount(heapSize - freeHeapSize))
+        .append("\n");
     text.append("\tFree heap: ").append(humanReadableByteCount(freeHeapSize)).append("\n");
-    text.append("Java Version: ").append(System.getProperty("java.runtime.name")).append(" ").append(System.getProperty("java.runtime.version"))
+    text.append("Java Version: ")
+        .append(System.getProperty("java.runtime.name"))
+        .append(" ")
+        .append(System.getProperty("java.runtime.version"))
         .append(" \n");
     text.append("\tVendor: ").append(System.getProperty("java.vm.vendor")).append("\n");
-    text.append("Uptime: ").append(Duration.ofMillis(ManagementFactory.getRuntimeMXBean().getUptime())).append("\n");
+    text.append("Uptime: ")
+        .append(Duration.ofMillis(ManagementFactory.getRuntimeMXBean().getUptime()))
+        .append("\n");
     GraphicsEnvironment g = GraphicsEnvironment.getLocalGraphicsEnvironment();
     GraphicsDevice[] screens = g.getScreenDevices();
     text.append("Screens: ").append(screens.length).append("\n");
     for (int i = 0; i < screens.length; i++) {
       GraphicsDevice screen = screens[i];
       DisplayMode displayMode = screen.getDisplayMode();
-      text.append("\tScreen ").append(i).append(": ").append(displayMode.getWidth()).append("x").append(displayMode.getHeight());
+      text.append("\tScreen ")
+          .append(i)
+          .append(": ")
+          .append(displayMode.getWidth())
+          .append("x")
+          .append(displayMode.getHeight());
       if (displayMode.getRefreshRate() != DisplayMode.REFRESH_RATE_UNKNOWN) {
         text.append("@").append(displayMode.getRefreshRate()).append("hz");
       }
@@ -176,5 +186,4 @@ public class DefaultUncaughtExceptionHandler implements UncaughtExceptionHandler
     }
     return text.toString();
   }
-
 }

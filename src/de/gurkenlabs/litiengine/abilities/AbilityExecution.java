@@ -1,13 +1,12 @@
 package de.gurkenlabs.litiengine.abilities;
 
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.IUpdateable;
+import de.gurkenlabs.litiengine.abilities.effects.Effect;
 import java.awt.Shape;
 import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.IUpdateable;
-import de.gurkenlabs.litiengine.abilities.effects.Effect;
 
 public class AbilityExecution implements IUpdateable {
   private final Ability ability;
@@ -46,14 +45,14 @@ public class AbilityExecution implements IUpdateable {
   }
 
   /**
-   * 1. Apply all ability effects after their delay.
-   * 2. Unregister this instance after all effects were applied.
-   * 3. Effects will apply their follow up effects on their own.
+   * 1. Apply all ability effects after their delay. 2. Unregister this instance after all effects
+   * were applied. 3. Effects will apply their follow up effects on their own.
    */
   @Override
   public void update() {
     // if there a no effects to apply -> unregister this instance and we're done
-    if (this.getAbility().getEffects().isEmpty() || this.getAbility().getEffects().size() == this.getAppliedEffects().size()) {
+    if (this.getAbility().getEffects().isEmpty()
+        || this.getAbility().getEffects().size() == this.getAppliedEffects().size()) {
       Game.loop().detach(this);
       return;
     }
@@ -64,10 +63,14 @@ public class AbilityExecution implements IUpdateable {
     long gameTicksSinceExecution = Game.time().since(this.getExecutionTicks());
     // ability not executed yet or delay of effect not yet reached
     this.getAbility().getEffects().stream()
-        .filter(effect -> !this.getAppliedEffects().contains(effect) && gameTicksSinceExecution >= effect.getDelay())
-        .forEach(effect -> {
-          effect.apply(this.getExecutionImpactArea());
-          this.getAppliedEffects().add(effect);
-    });
+        .filter(
+            effect ->
+                !this.getAppliedEffects().contains(effect)
+                    && gameTicksSinceExecution >= effect.getDelay())
+        .forEach(
+            effect -> {
+              effect.apply(this.getExecutionImpactArea());
+              this.getAppliedEffects().add(effect);
+            });
   }
 }

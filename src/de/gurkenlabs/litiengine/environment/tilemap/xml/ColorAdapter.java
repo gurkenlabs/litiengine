@@ -1,10 +1,8 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
-import java.awt.Color;
-
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-
 import de.gurkenlabs.litiengine.util.ColorHelper;
+import java.awt.Color;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 public class ColorAdapter extends XmlAdapter<String, Color> {
 

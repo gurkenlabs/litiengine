@@ -1,16 +1,5 @@
 package de.gurkenlabs.litiengine.resources;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.IntBinaryOperator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.xml.bind.JAXBException;
-
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.MapObjectSerializer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
@@ -28,27 +17,36 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.IntBinaryOperator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.xml.bind.JAXBException;
 
 public final class Maps extends ResourcesContainer<IMap> {
   private static final Logger log = Logger.getLogger(Maps.class.getName());
 
-  Maps() {
-  }
+  Maps() {}
 
   public static boolean isSupported(String fileName) {
     String extension = FileUtilities.getExtension(fileName);
-    return extension != null && !extension.isEmpty() && extension.equalsIgnoreCase(TmxMap.FILE_EXTENSION);
+    return extension != null
+        && !extension.isEmpty()
+        && extension.equalsIgnoreCase(TmxMap.FILE_EXTENSION);
   }
 
   /**
    * Starts a process that allows the generation of maps from code.
-   * <p>
-   * Notice that you must call this within a try-with block or ensure that {@link MapGenerator#close()} is called before
-   * using the generated map instance.
-   * <p>
-   * 
-   * <b>Example usage:</b>
-   * 
+   *
+   * <p>Notice that you must call this within a try-with block or ensure that {@link
+   * MapGenerator#close()} is called before using the generated map instance.
+   *
+   * <p><b>Example usage:</b>
+   *
    * <pre>
    * IMap map;
    * try (MapGenerator generator = Resources.maps().generate("name", 50, 50, 16, 16, Resources.tilesets().get("tileset.tsx"))) {
@@ -57,38 +55,38 @@ public final class Maps extends ResourcesContainer<IMap> {
    *       // draw a diagonal in another tile color
    *       return 2;
    *     }
-   * 
+   *
    *     // fill the entire map with this tile
    *     return 1;
    *   });
-   * 
+   *
    *   // set an explicit tile at a location
    *   tileLayer.setTile(10, 10, 3);
-   * 
+   *
    *   // add a collision box to the map
    *   generator.add(new CollisionBox(0, 64, 100, 10));
-   * 
+   *
    *   map = generator.getMap();
    * }
    * </pre>
-   * 
-   * @param orientation
-   *          The orientation of the map to be generated.
-   * @param name
-   *          The name of the map to be generated.
-   * @param width
-   *          The width (in tiles).
-   * @param height
-   *          The height (in tiles).
-   * @param tileWidth
-   *          The width of a tile (in pixels).
-   * @param tileHeight
-   *          The height of a tile (in pixels).
-   * @param tilesets
-   *          Tilesets that will be used by the map.
+   *
+   * @param orientation The orientation of the map to be generated.
+   * @param name The name of the map to be generated.
+   * @param width The width (in tiles).
+   * @param height The height (in tiles).
+   * @param tileWidth The width of a tile (in pixels).
+   * @param tileHeight The height of a tile (in pixels).
+   * @param tilesets Tilesets that will be used by the map.
    * @return A {@code MapGenerator} instance used to add additional layers or objects to the map.
    */
-  public MapGenerator generate(IMapOrientation orientation, String name, int width, int height, int tileWidth, int tileHeight, ITileset... tilesets) {
+  public MapGenerator generate(
+      IMapOrientation orientation,
+      String name,
+      int width,
+      int height,
+      int tileWidth,
+      int tileHeight,
+      ITileset... tilesets) {
     TmxMap map = new TmxMap(orientation);
     map.setTileWidth(tileWidth);
     map.setTileHeight(tileHeight);
@@ -121,16 +119,17 @@ public final class Maps extends ResourcesContainer<IMap> {
 
   @Override
   protected String getAlias(String resourceName, IMap resource) {
-    if (resource == null || resource.getName() == null || resource.getName().isEmpty() || resource.getName().equalsIgnoreCase(resourceName)) {
+    if (resource == null
+        || resource.getName() == null
+        || resource.getName().isEmpty()
+        || resource.getName().equalsIgnoreCase(resourceName)) {
       return null;
     }
 
     return resource.getName();
   }
 
-  /**
-   * This class provides the API to simplify the generation of map resources from code.
-   */
+  /** This class provides the API to simplify the generation of map resources from code. */
   public class MapGenerator implements AutoCloseable {
     private final TmxMap map;
 
@@ -140,12 +139,10 @@ public final class Maps extends ResourcesContainer<IMap> {
 
     /**
      * Gets the map generated by this instance.
-     * <p>
-     * Make sure this instance is closed before using the map in your game.
-     * </p>
-     * 
+     *
+     * <p>Make sure this instance is closed before using the map in your game.
+     *
      * @return The map generated by this instance.
-     * 
      * @see #close()
      */
     public IMap getMap() {
@@ -154,25 +151,24 @@ public final class Maps extends ResourcesContainer<IMap> {
 
     /**
      * Adds a new tile tile layer to the generated map of this instance.
-     * 
-     * <b>Example for a tileCallback:</b>
-     * 
+     *
+     * <p><b>Example for a tileCallback:</b>
+     *
      * <pre>
      * (x, y) -&gt; {
      *   if (x == y) {
      *     // draw a diagonal in another tile color
      *     return 2;
      *   }
-     * 
+     *
      *   // fill the entire map with this tile
      *   return 1;
      * }
      * </pre>
-     * 
-     * @param renderType
-     *          The rendertype of the added layer.
-     * @param tileCallback
-     *          The callback that defines which tile gid will be assigned at the specified x, y grid coordinates.
+     *
+     * @param renderType The rendertype of the added layer.
+     * @param tileCallback The callback that defines which tile gid will be assigned at the
+     *     specified x, y grid coordinates.
      * @return The newly added tile layer.
      */
     public ITileLayer addTileLayer(RenderType renderType, IntBinaryOperator tileCallback) {
@@ -186,7 +182,13 @@ public final class Maps extends ResourcesContainer<IMap> {
 
       TileData data;
       try {
-        data = new TileData(tiles, this.map.getWidth(), this.map.getHeight(), TileData.Encoding.CSV, TileData.Compression.NONE);
+        data =
+            new TileData(
+                tiles,
+                this.map.getWidth(),
+                this.map.getHeight(),
+                TileData.Encoding.CSV,
+                TileData.Compression.NONE);
         data.setValue(TileData.encode(data));
       } catch (IOException e) {
         log.log(Level.SEVERE, e.getMessage(), e);
@@ -204,12 +206,12 @@ public final class Maps extends ResourcesContainer<IMap> {
 
     /**
      * Adds a {@code MapObject} created by the specified entity to the map of this instance.
-     * <p>
-     * If no layer has been added yet, a default {@code MapObjectLayer} will be created by this method.
-     * </p>
-     * 
-     * @param entity
-     *          The entity to be converted to a map object and added to the first {@code MapObjectLayer} of the generated map.
+     *
+     * <p>If no layer has been added yet, a default {@code MapObjectLayer} will be created by this
+     * method.
+     *
+     * @param entity The entity to be converted to a map object and added to the first {@code
+     *     MapObjectLayer} of the generated map.
      * @return The created map object.
      */
     public IMapObject add(IEntity entity) {
@@ -218,11 +220,10 @@ public final class Maps extends ResourcesContainer<IMap> {
 
     /**
      * Adds a {@code MapObject} created by the specified entity to the map of this instance.
-     * 
-     * @param layer
-     *          The layer to which the map object will be added.
-     * @param entity
-     *          The entity to be converted to a map object and added to the specified {@code MapObjectLayer}.
+     *
+     * @param layer The layer to which the map object will be added.
+     * @param entity The entity to be converted to a map object and added to the specified {@code
+     *     MapObjectLayer}.
      * @return The created map object.
      */
     public IMapObject add(IMapObjectLayer layer, IEntity entity) {
@@ -232,12 +233,12 @@ public final class Maps extends ResourcesContainer<IMap> {
 
     /**
      * Adds the specified map object to the map of this instance.
-     * <p>
-     * If no layer has been added yet, a default {@code MapObjectLayer} will be created by this method.
-     * </p>
-     * 
-     * @param mapObject
-     *          The mapObject to be added to the first {@code MapObjectLayer} of the generated map.
+     *
+     * <p>If no layer has been added yet, a default {@code MapObjectLayer} will be created by this
+     * method.
+     *
+     * @param mapObject The mapObject to be added to the first {@code MapObjectLayer} of the
+     *     generated map.
      * @return The added map object.
      */
     public IMapObject add(IMapObject mapObject) {
@@ -255,11 +256,9 @@ public final class Maps extends ResourcesContainer<IMap> {
 
     /**
      * Adds the specified map object to the map of this instance.
-     * 
-     * @param layer
-     *          The layer to which the map object will be added.
-     * @param mapObject
-     *          The mapObject to be added to the specified {@code MapObjectLayer}.
+     *
+     * @param layer The layer to which the map object will be added.
+     * @param mapObject The mapObject to be added to the specified {@code MapObjectLayer}.
      * @return The added map object.
      */
     public IMapObject add(IMapObjectLayer layer, IMapObject mapObject) {
@@ -269,11 +268,10 @@ public final class Maps extends ResourcesContainer<IMap> {
 
     /**
      * <b>It is crucial to call this before using the generated map of this instance.</b><br>
-     * <p>
-     * This will call the {@code finish} method on the map instance and make sure that the generated map is available
-     * over the resources API.
-     * </p>
-     * 
+     *
+     * <p>This will call the {@code finish} method on the map instance and make sure that the
+     * generated map is available over the resources API.
+     *
      * @see TmxMap#finish(URL)
      */
     @Override
@@ -288,5 +286,4 @@ public final class Maps extends ResourcesContainer<IMap> {
       }
     }
   }
-
 }

@@ -1,8 +1,5 @@
 package de.gurkenlabs.litiengine.environment;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.Trigger;
 import de.gurkenlabs.litiengine.entities.Trigger.TriggerActivation;
@@ -10,6 +7,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class TriggerMapObjectLoader extends MapObjectLoader {
 
@@ -25,7 +24,11 @@ public class TriggerMapObjectLoader extends MapObjectLoader {
     }
 
     final String message = mapObject.getStringValue(MapObjectProperty.TRIGGER_MESSAGE);
-    final TriggerActivation act = mapObject.getStringValue(MapObjectProperty.TRIGGER_ACTIVATION) != null ? TriggerActivation.valueOf(mapObject.getStringValue(MapObjectProperty.TRIGGER_ACTIVATION)) : TriggerActivation.COLLISION;
+    final TriggerActivation act =
+        mapObject.getStringValue(MapObjectProperty.TRIGGER_ACTIVATION) != null
+            ? TriggerActivation.valueOf(
+                mapObject.getStringValue(MapObjectProperty.TRIGGER_ACTIVATION))
+            : TriggerActivation.COLLISION;
     final boolean oneTime = mapObject.getBoolValue(MapObjectProperty.TRIGGER_ONETIME);
     final int coolDown = mapObject.getIntValue(MapObjectProperty.TRIGGER_COOLDOWN);
 
@@ -38,7 +41,8 @@ public class TriggerMapObjectLoader extends MapObjectLoader {
     return entities;
   }
 
-  protected Trigger createTrigger(IMapObject mapObject, TriggerActivation act, String message, boolean oneTime, int coolDown) {
+  protected Trigger createTrigger(
+      IMapObject mapObject, TriggerActivation act, String message, boolean oneTime, int coolDown) {
     return new Trigger(act, message, oneTime, coolDown);
   }
 

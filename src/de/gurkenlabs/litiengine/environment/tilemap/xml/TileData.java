@@ -1,5 +1,7 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
+import de.gurkenlabs.litiengine.util.ArrayUtilities;
+import de.gurkenlabs.litiengine.util.io.Codec;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -15,16 +17,12 @@ import java.util.zip.DeflaterOutputStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.InflaterInputStream;
-
 import javax.xml.bind.DatatypeConverter;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlMixed;
 import javax.xml.bind.annotation.XmlTransient;
-
-import de.gurkenlabs.litiengine.util.ArrayUtilities;
-import de.gurkenlabs.litiengine.util.io.Codec;
 
 public class TileData {
   private static final Logger log = Logger.getLogger(TileData.class.getName());
@@ -33,11 +31,12 @@ public class TileData {
     public static final String BASE64 = "base64";
     public static final String CSV = "csv";
 
-    private Encoding() {
-    }
+    private Encoding() {}
 
     public static boolean isValid(String encoding) {
-      return encoding != null && !encoding.isEmpty() && (encoding.equals(BASE64) || encoding.equals(CSV));
+      return encoding != null
+          && !encoding.isEmpty()
+          && (encoding.equals(BASE64) || encoding.equals(CSV));
     }
   }
 
@@ -46,66 +45,68 @@ public class TileData {
     public static final String ZLIB = "zlib";
     public static final String NONE = null;
 
-    private Compression() {
-    }
+    private Compression() {}
 
     public static boolean isValid(String compression) {
       // null equals no compression which is an accepted value
-      return compression == null || !compression.isEmpty() && (compression.equals(GZIP) || compression.equals(ZLIB));
+      return compression == null
+          || !compression.isEmpty() && (compression.equals(GZIP) || compression.equals(ZLIB));
     }
   }
 
-  @XmlAttribute
-  private String encoding;
+  @XmlAttribute private String encoding;
 
-  @XmlAttribute
-  private String compression;
+  @XmlAttribute private String compression;
 
   @XmlMixed
   @XmlElementRef(type = TileChunk.class, name = "chunk")
   private List<Object> rawValue;
 
-  @XmlTransient
-  private String value;
+  @XmlTransient private String value;
 
-  @XmlTransient
-  private List<TileChunk> chunks;
+  @XmlTransient private List<TileChunk> chunks;
 
-  @XmlTransient
-  private List<Tile> tiles;
+  @XmlTransient private List<Tile> tiles;
 
-  @XmlTransient
-  private int width;
+  @XmlTransient private int width;
 
-  @XmlTransient
-  private int height;
+  @XmlTransient private int height;
 
-  @XmlTransient
-  private int offsetX;
+  @XmlTransient private int offsetX;
 
-  @XmlTransient
-  private int offsetY;
+  @XmlTransient private int offsetY;
 
-  @XmlTransient
-  private int minChunkOffsetXMap;
+  @XmlTransient private int minChunkOffsetXMap;
 
-  @XmlTransient
-  private int minChunkOffsetYMap;
+  @XmlTransient private int minChunkOffsetYMap;
 
-  /**
-   * Instantiates a new {@code TileData} instance.
-   */
+  /** Instantiates a new {@code TileData} instance. */
   public TileData() {
     // keep for serialization
   }
 
-  public TileData(List<Tile> tiles, int width, int height, String encoding, String compression) throws TmxException {
+  public TileData(List<Tile> tiles, int width, int height, String encoding, String compression)
+      throws TmxException {
     if (!Encoding.isValid(encoding)) {
-      throw new TmxException("Invalid tile data encoding '" + encoding + "'. Supported encodings are " + Encoding.CSV + " and " + Encoding.BASE64 + ".");
+      throw new TmxException(
+          "Invalid tile data encoding '"
+              + encoding
+              + "'. Supported encodings are "
+              + Encoding.CSV
+              + " and "
+              + Encoding.BASE64
+              + ".");
     }
 
     if (!Compression.isValid(compression)) {
-      throw new TmxException("Invalid tile data compression '" + compression + "'. Supported compressions are " + Compression.GZIP + " and " + Compression.ZLIB + ".");
+      throw new TmxException(
+          "Invalid tile data compression '"
+              + compression
+              + "'. Supported compressions are "
+              + Compression.GZIP
+              + " and "
+              + Compression.ZLIB
+              + ".");
     }
 
     this.tiles = tiles;
@@ -275,7 +276,8 @@ public class TileData {
     return this.offsetY;
   }
 
-  protected static List<Tile> parseBase64Data(String value, String compression) throws InvalidTileLayerException {
+  protected static List<Tile> parseBase64Data(String value, String compression)
+      throws InvalidTileLayerException {
     List<Tile> parsed = new ArrayList<>();
 
     String enc = value.trim();
@@ -295,7 +297,8 @@ public class TileData {
       } else if (compression.equals(Compression.ZLIB)) {
         is = new InflaterInputStream(bais);
       } else {
-        throw new IllegalArgumentException("Unsupported tile layer compression method " + compression);
+        throw new IllegalArgumentException(
+            "Unsupported tile layer compression method " + compression);
       }
 
       int read;
@@ -371,8 +374,9 @@ public class TileData {
   }
 
   /**
-   * This method processes the {@link XmlMixed} contents that were unmarshalled and extract either the string value containing the information
-   * about the layer of a set of {@link TileChunk}s if the map is infinite.
+   * This method processes the {@link XmlMixed} contents that were unmarshalled and extract either
+   * the string value containing the information about the layer of a set of {@link TileChunk}s if
+   * the map is infinite.
    */
   private void processMixedData() {
     if (this.rawValue == null || this.rawValue.isEmpty()) {
@@ -402,9 +406,7 @@ public class TileData {
     this.chunks = rawChunks;
   }
 
-  /**
-   * For infinite maps, the size of a tile layer depends on the {@code TileChunks} it contains.
-   */
+  /** For infinite maps, the size of a tile layer depends on the {@code TileChunks} it contains. */
   private void updateDimensionsByTileData() {
     int minX = 0;
     int maxX = 0;

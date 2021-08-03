@@ -1,22 +1,21 @@
 package de.gurkenlabs.litiengine.resources;
 
+import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.util.ArrayUtilities;
+import de.gurkenlabs.litiengine.util.io.Codec;
 import java.awt.image.BufferedImage;
 import java.io.Serializable;
-
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.litiengine.util.ArrayUtilities;
-import de.gurkenlabs.litiengine.util.io.Codec;
-
 @XmlRootElement(name = "sprite")
 public class SpritesheetResource extends NamedResource implements Serializable {
   public static final String PLAIN_TEXT_FILE_EXTENSION = "info";
   private static final long serialVersionUID = 3864637034834813554L;
+
   @XmlAttribute(name = "width")
   private int width;
 
@@ -43,7 +42,8 @@ public class SpritesheetResource extends NamedResource implements Serializable {
     this.setKeyframes(Resources.spritesheets().getCustomKeyFrameDurations(sprite));
   }
 
-  public SpritesheetResource(final BufferedImage image, String name, final int width, final int height) {
+  public SpritesheetResource(
+      final BufferedImage image, String name, final int width, final int height) {
     this(width, height, name);
     this.setImage(Codec.encode(image));
     this.setImageFormat(ImageFormat.PNG);

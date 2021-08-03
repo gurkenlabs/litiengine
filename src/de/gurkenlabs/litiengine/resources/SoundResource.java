@@ -1,15 +1,13 @@
 package de.gurkenlabs.litiengine.resources;
 
+import de.gurkenlabs.litiengine.sound.Sound;
+import de.gurkenlabs.litiengine.util.io.Codec;
 import java.io.IOException;
 import java.io.InputStream;
-
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
-
-import de.gurkenlabs.litiengine.sound.Sound;
-import de.gurkenlabs.litiengine.util.io.Codec;
 
 @XmlRootElement(name = "sound")
 public class SoundResource extends NamedResource {
@@ -29,7 +27,8 @@ public class SoundResource extends NamedResource {
     this.format = format;
   }
 
-  public SoundResource(InputStream data, String name, SoundFormat format) throws IOException, UnsupportedAudioFileException {
+  public SoundResource(InputStream data, String name, SoundFormat format)
+      throws IOException, UnsupportedAudioFileException {
     this(new Sound(data, name), format);
   }
 

@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.resources;
 
+import de.gurkenlabs.litiengine.Game;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,14 +18,13 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.gurkenlabs.litiengine.Game;
-
 public final class Strings {
   public static final String DEFAULT_BUNDLE = "strings";
-  
+
   private static final Logger log = Logger.getLogger(Strings.class.getName());
 
-  // default encoding for properties is ISO_8859_1 see: https://docs.oracle.com/javase/7/docs/api/java/util/Properties.html
+  // default encoding for properties is ISO_8859_1 see:
+  // https://docs.oracle.com/javase/7/docs/api/java/util/Properties.html
   private Charset charset = StandardCharsets.ISO_8859_1;
 
   Strings() {
@@ -57,11 +57,15 @@ public final class Strings {
     }
 
     try {
-      final ResourceBundle defaultBundle = ResourceBundle.getBundle(bundleName, Game.config().client().getLocale());
+      final ResourceBundle defaultBundle =
+          ResourceBundle.getBundle(bundleName, Game.config().client().getLocale());
 
       String value = defaultBundle.getString(key);
 
-      String decodedValue = this.charset.equals(StandardCharsets.ISO_8859_1) ? value : new String(value.getBytes(StandardCharsets.ISO_8859_1), this.charset);
+      String decodedValue =
+          this.charset.equals(StandardCharsets.ISO_8859_1)
+              ? value
+              : new String(value.getBytes(StandardCharsets.ISO_8859_1), this.charset);
       if (args.length > 0) {
         return MessageFormat.format(decodedValue, args);
       }
@@ -78,13 +82,12 @@ public final class Strings {
   }
 
   /**
-   * Get a list of strings from the specified raw text files. Strings are
-   * separated by a new line. <br>
-   * <b>This method is not cached. Ever call will open up a new
-   * {@link InputStream} to read the strings from the text file.</b>
-   * 
-   * @param textFile
-   *          The text file that will be retrieved.
+   * Get a list of strings from the specified raw text files. Strings are separated by a new line.
+   * <br>
+   * <b>This method is not cached. Ever call will open up a new {@link InputStream} to read the
+   * strings from the text file.</b>
+   *
+   * @param textFile The text file that will be retrieved.
    * @return A list with all strings that are contained by the text file.
    */
   public String[] getList(String textFile) {
@@ -122,7 +125,8 @@ public final class Strings {
 
   public boolean contains(final String bundleName, final String key) {
     try {
-      final ResourceBundle defaultBundle = ResourceBundle.getBundle(bundleName, Game.config().client().getLocale());
+      final ResourceBundle defaultBundle =
+          ResourceBundle.getBundle(bundleName, Game.config().client().getLocale());
       return defaultBundle.containsKey(key);
     } catch (final MissingResourceException me) {
       final StringWriter sw = new StringWriter();

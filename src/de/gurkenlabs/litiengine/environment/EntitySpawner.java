@@ -1,17 +1,15 @@
 package de.gurkenlabs.litiengine.environment;
 
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.entities.Spawnpoint;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.entities.IEntity;
-import de.gurkenlabs.litiengine.entities.Spawnpoint;
-
 /**
- * TODO: Implement spawn event/listener
- * TODO: Implement additional constructors to enhance the API
+ * TODO: Implement spawn event/listener TODO: Implement additional constructors to enhance the API
  */
 public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner<T> {
   private int amount;
@@ -43,18 +41,17 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
   /**
    * Initializes a new instance of the {@code EntitySpawner} class.
    *
-   * @param spawnpoints
-   *          The spawnpoints from which this instance will choose from when spawning entities.
-   * 
-   * @param interval
-   *          The interval in which entities will be spawned.
-   * 
-   * @param amount
-   *          The amount of entities to spawn on every spawn event.
-   * @param spawnMode
-   *          the spawning behaviour
+   * @param spawnpoints The spawnpoints from which this instance will choose from when spawning
+   *     entities.
+   * @param interval The interval in which entities will be spawned.
+   * @param amount The amount of entities to spawn on every spawn event.
+   * @param spawnMode the spawning behaviour
    */
-  public EntitySpawner(final List<Spawnpoint> spawnpoints, final int interval, final int amount, SpawnMode spawnMode) {
+  public EntitySpawner(
+      final List<Spawnpoint> spawnpoints,
+      final int interval,
+      final int amount,
+      SpawnMode spawnMode) {
     this.interval = interval;
     this.spawnDelay = 1000;
     this.amount = amount;
@@ -62,7 +59,8 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
     this.spawnMode = spawnMode;
   }
 
-  public EntitySpawner(final int amount, Function<IEntitySpawner<T>, List<Spawnpoint>> spawnpointCallback) {
+  public EntitySpawner(
+      final int amount, Function<IEntitySpawner<T>, List<Spawnpoint>> spawnpointCallback) {
     Objects.nonNull(spawnpointCallback);
 
     this.amount = amount;
@@ -70,7 +68,10 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
     this.spawnMode = SpawnMode.CUSTOMSPAWNPOINTS;
   }
 
-  public EntitySpawner(final int interval, final int amount, Function<IEntitySpawner<T>, List<Spawnpoint>> spawnpointCallback) {
+  public EntitySpawner(
+      final int interval,
+      final int amount,
+      Function<IEntitySpawner<T>, List<Spawnpoint>> spawnpointCallback) {
     this(new ArrayList<Spawnpoint>(), interval, amount);
     Objects.nonNull(spawnpointCallback);
 
@@ -134,7 +135,8 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
   }
 
   protected boolean shouldSpawn() {
-    return this.lastSpawnWave == 0 || Game.time().since(this.lastSpawnWave) >= this.getSpawnInterval();
+    return this.lastSpawnWave == 0
+        || Game.time().since(this.lastSpawnWave) >= this.getSpawnInterval();
   }
 
   protected List<Spawnpoint> getCustomSpawnpoints() {
@@ -142,8 +144,9 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
   }
 
   /**
-   * Spawn new entities, depending on the {@code SpawnMode}, spawnAmount, spawnDelay, and spawnInterval of an {@code EntitySpawner}.
-   * 
+   * Spawn new entities, depending on the {@code SpawnMode}, spawnAmount, spawnDelay, and
+   * spawnInterval of an {@code EntitySpawner}.
+   *
    * @see SpawnMode
    */
   protected void spawnNewEntities() {
@@ -152,31 +155,42 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
     }
 
     switch (this.getSpawnMode()) {
-    case ALLSPAWNPOINTS:
-      for (int i = 0; i < this.getSpawnPoints().size(); i++) {
-        final int index = i;
-        Game.loop().perform(this.getSpawnDelay() + this.getSpawnDelay() * i, () -> this.spawn(this.getSpawnPoints().get(index), this.getSpawnAmount()));
-      }
-      break;
-    case ONERANDOMSPAWNPOINT:
-      this.spawn(Game.random().choose(this.getSpawnPoints()), this.getSpawnAmount());
-      break;
-    case RANDOMSPAWNPOINTS:
-      for (int i = 0; i < this.getSpawnAmount(); i++) {
-        Game.loop().perform(this.getSpawnDelay() + this.getSpawnDelay() * i, () -> this.spawn(Game.random().choose(this.getSpawnPoints()), 1));
-      }
-      break;
-    case CUSTOMSPAWNPOINTS:
-      List<Spawnpoint> spawnPoints = this.customSpawnpoints != null ? this.customSpawnpoints.apply(this) : this.getCustomSpawnpoints();
+      case ALLSPAWNPOINTS:
+        for (int i = 0; i < this.getSpawnPoints().size(); i++) {
+          final int index = i;
+          Game.loop()
+              .perform(
+                  this.getSpawnDelay() + this.getSpawnDelay() * i,
+                  () -> this.spawn(this.getSpawnPoints().get(index), this.getSpawnAmount()));
+        }
+        break;
+      case ONERANDOMSPAWNPOINT:
+        this.spawn(Game.random().choose(this.getSpawnPoints()), this.getSpawnAmount());
+        break;
+      case RANDOMSPAWNPOINTS:
+        for (int i = 0; i < this.getSpawnAmount(); i++) {
+          Game.loop()
+              .perform(
+                  this.getSpawnDelay() + this.getSpawnDelay() * i,
+                  () -> this.spawn(Game.random().choose(this.getSpawnPoints()), 1));
+        }
+        break;
+      case CUSTOMSPAWNPOINTS:
+        List<Spawnpoint> spawnPoints =
+            this.customSpawnpoints != null
+                ? this.customSpawnpoints.apply(this)
+                : this.getCustomSpawnpoints();
 
-      int index = 0;
-      for (Spawnpoint spawn : spawnPoints) {
-        Game.loop().perform(this.getSpawnDelay() + this.getSpawnDelay() * index, () -> this.spawn(spawn, 1));
-        index++;
-      }
-      break;
-    default:
-      break;
+        int index = 0;
+        for (Spawnpoint spawn : spawnPoints) {
+          Game.loop()
+              .perform(
+                  this.getSpawnDelay() + this.getSpawnDelay() * index, () -> this.spawn(spawn, 1));
+          index++;
+        }
+        break;
+      default:
+        break;
     }
   }
 

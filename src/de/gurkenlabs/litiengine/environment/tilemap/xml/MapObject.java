@@ -1,36 +1,30 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.net.URL;
-import java.util.Arrays;
-
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectText;
 import de.gurkenlabs.litiengine.environment.tilemap.IPolyShape;
 import de.gurkenlabs.litiengine.environment.tilemap.ITilesetEntry;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.net.URL;
+import java.util.Arrays;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 public class MapObject extends CustomPropertyProvider implements IMapObject {
-  @XmlAttribute
-  private int id;
+  @XmlAttribute private int id;
 
-  @XmlAttribute
-  private Integer gid;
+  @XmlAttribute private Integer gid;
 
-  @XmlAttribute
-  private String name;
+  @XmlAttribute private String name;
 
-  @XmlAttribute
-  private String type;
+  @XmlAttribute private String type;
 
   @XmlAttribute
   @XmlJavaTypeAdapter(value = DecimalFloatAdapter.class)
@@ -48,8 +42,7 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   @XmlJavaTypeAdapter(value = DecimalFloatAdapter.class)
   private Float height = 0f;
 
-  @XmlTransient
-  private ITilesetEntry tile;
+  @XmlTransient private ITilesetEntry tile;
 
   @XmlElement(name = "polyline")
   private PolyShape polyline;
@@ -57,28 +50,21 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   @XmlElement(name = "polygon")
   private PolyShape polygon;
 
-  @XmlElement
-  private String point;
+  @XmlElement private String point;
 
-  @XmlElement
-  private String ellipse;
+  @XmlElement private String ellipse;
 
-  @XmlElement
-  private Text text;
+  @XmlElement private Text text;
 
   private transient MapObjectLayer layer;
 
-  /**
-   * Instantiates a new {@code MapObject} instance.
-   */
-  public MapObject() {
-  }
+  /** Instantiates a new {@code MapObject} instance. */
+  public MapObject() {}
 
   /**
    * Instantiates a new {@code MapObject} instance.
    *
-   * @param type
-   *          The type of this map object.
+   * @param type The type of this map object.
    */
   public MapObject(String type) {
     this.type = type;
@@ -86,19 +72,24 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
 
   /**
    * Instantiates a new {@code MapObject} instance by copying the specified original instance.
-   * <p>
-   * This variant of the constructor will assign an entirely new ID to the newly created MapObject.
-   * </p>
    *
-   * @param original
-   *          the MapObject we want to copy
+   * <p>This variant of the constructor will assign an entirely new ID to the newly created
+   * MapObject.
+   *
+   * @param original the MapObject we want to copy
    */
   public MapObject(MapObject original) {
     super(original);
     this.setName(original.getName());
     this.setId(Game.world().environment().getNextMapId());
-    this.polyline = (original.getPolyline() != null && !original.getPolyline().getPoints().isEmpty()) ? new PolyShape(original.getPolyline()) : null;
-    this.polygon = (original.getPolygon() != null && !original.getPolygon().getPoints().isEmpty()) ? new PolyShape(original.getPolygon()) : null;
+    this.polyline =
+        (original.getPolyline() != null && !original.getPolyline().getPoints().isEmpty())
+            ? new PolyShape(original.getPolyline())
+            : null;
+    this.polygon =
+        (original.getPolygon() != null && !original.getPolygon().getPoints().isEmpty())
+            ? new PolyShape(original.getPolygon())
+            : null;
     this.setType(original.getType());
     this.setX(original.getX());
     this.setY(original.getY());
@@ -112,14 +103,13 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
 
   /**
    * Instantiates a new {@code MapObject} instance by copying the specified original instance.
-   * <p>
-   * This variant of the constructor lets you decide if the copy instance will get the same ID as the old MapObject or get a new ID.
-   * </p>
-   * 
-   * @param original
-   *          the MapObject we want to copy
-   * @param keepID
-   *          decide if the new instance will adopt the old MapObject's ID or get a new, unique one.
+   *
+   * <p>This variant of the constructor lets you decide if the copy instance will get the same ID as
+   * the old MapObject or get a new ID.
+   *
+   * @param original the MapObject we want to copy
+   * @param keepID decide if the new instance will adopt the old MapObject's ID or get a new, unique
+   *     one.
    */
   public MapObject(MapObject original, boolean keepID) {
     this(original);
@@ -131,10 +121,8 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   /**
    * Instantiates a new {@code MapObject} instance by copying the specified original instance.
    *
-   * @param original
-   *          the MapObject we want to copy
-   * @param id
-   *          The id of this instance.
+   * @param original the MapObject we want to copy
+   * @param id The id of this instance.
    */
   public MapObject(MapObject original, int id) {
     this(original);
@@ -391,7 +379,8 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
 
   @SuppressWarnings("unused")
   private void afterUnmarshal(Unmarshaller u, Object parent) {
-    // MapObjects don't necessarily have to be children of a layer. E.g. they can also be children of a Blueprint.
+    // MapObjects don't necessarily have to be children of a layer. E.g. they can also be children
+    // of a Blueprint.
     if (parent instanceof MapObjectLayer) {
       this.setLayer((MapObjectLayer) parent);
     }
@@ -422,6 +411,9 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   }
 
   private boolean isInfiniteMap() {
-    return this.getLayer() != null && this.getLayer().getMap() != null && this.getLayer().getMap().isInfinite() && this.getLayer().getMap() instanceof TmxMap;
+    return this.getLayer() != null
+        && this.getLayer().getMap() != null
+        && this.getLayer().getMap().isInfinite()
+        && this.getLayer().getMap() instanceof TmxMap;
   }
 }

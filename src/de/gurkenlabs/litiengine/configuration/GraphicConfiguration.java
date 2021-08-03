@@ -26,9 +26,7 @@ public class GraphicConfiguration extends ConfigurationGroup {
 
   private boolean colorInterpolation;
 
-  /**
-   * Instantiates a new graphic configuration.
-   */
+  /** Instantiates a new graphic configuration. */
   GraphicConfiguration() {
     this.graphicQuality = Quality.LOW;
     this.displayMode = DisplayMode.WINDOWED;
@@ -58,7 +56,8 @@ public class GraphicConfiguration extends ConfigurationGroup {
    */
   public Dimension getResolution() {
     if (this.getDisplayMode() == DisplayMode.FULLSCREEN) {
-      final GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+      final GraphicsDevice gd =
+          GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
       final int width = gd.getDisplayMode().getWidth();
       final int height = gd.getDisplayMode().getHeight();
       return new Dimension(width, height);
@@ -98,8 +97,7 @@ public class GraphicConfiguration extends ConfigurationGroup {
   /**
    * Sets the graphic quality.
    *
-   * @param graphicQuality
-   *          the new graphic quality
+   * @param graphicQuality the new graphic quality
    */
   public void setGraphicQuality(final Quality graphicQuality) {
     this.set("graphicQuality", graphicQuality);

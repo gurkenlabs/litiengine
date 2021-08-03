@@ -1,14 +1,13 @@
 package de.gurkenlabs.litiengine.environment;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import de.gurkenlabs.litiengine.Direction;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.Spawnpoint;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class SpawnpointMapObjectLoader extends MapObjectLoader {
 
@@ -23,7 +22,10 @@ public class SpawnpointMapObjectLoader extends MapObjectLoader {
       return entities;
     }
 
-    final Direction direction = mapObject.getStringValue(MapObjectProperty.SPAWN_DIRECTION) != null ? Direction.valueOf(mapObject.getStringValue(MapObjectProperty.SPAWN_DIRECTION)) : Direction.DOWN;
+    final Direction direction =
+        mapObject.getStringValue(MapObjectProperty.SPAWN_DIRECTION) != null
+            ? Direction.valueOf(mapObject.getStringValue(MapObjectProperty.SPAWN_DIRECTION))
+            : Direction.DOWN;
     final String spawnType = mapObject.getStringValue(MapObjectProperty.SPAWN_INFO);
 
     final Spawnpoint spawn = this.createSpawnpoint(mapObject, direction, spawnType);
@@ -33,7 +35,8 @@ public class SpawnpointMapObjectLoader extends MapObjectLoader {
     return entities;
   }
 
-  protected Spawnpoint createSpawnpoint(IMapObject mapObject, Direction direction, String spawnType) {
+  protected Spawnpoint createSpawnpoint(
+      IMapObject mapObject, Direction direction, String spawnType) {
     return new Spawnpoint(direction, spawnType);
   }
 }

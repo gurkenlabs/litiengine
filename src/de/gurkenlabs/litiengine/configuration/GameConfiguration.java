@@ -2,7 +2,8 @@ package de.gurkenlabs.litiengine.configuration;
 
 /**
  * This class contains all default {@code ConfigurationGroups} that are provided by the LITIENGINE.
- * Additionally, it can be used to register and manage custom settings that are specific to your game.
+ * Additionally, it can be used to register and manage custom settings that are specific to your
+ * game.
  *
  * @see ConfigurationGroup
  * @see Configuration#add(ConfigurationGroup)
@@ -31,7 +32,7 @@ public final class GameConfiguration extends Configuration {
 
   /**
    * Gets the basic game client configuration like update-rate or localization.
-   * 
+   *
    * @return The game client configuration.
    */
   public ClientConfiguration client() {
@@ -40,7 +41,7 @@ public final class GameConfiguration extends Configuration {
 
   /**
    * Gets the configuration group with all default debugging settings.
-   * 
+   *
    * @return The debugging configuration.
    */
   public DebugConfiguration debug() {
@@ -48,9 +49,9 @@ public final class GameConfiguration extends Configuration {
   }
 
   /**
-   * Gets the configuration group with all default graphics settings.
-   * Elements in this group will allow you to adjust the game's rendering behavior.
-   * 
+   * Gets the configuration group with all default graphics settings. Elements in this group will
+   * allow you to adjust the game's rendering behavior.
+   *
    * @return The graphics configuration.
    */
   public GraphicConfiguration graphics() {
@@ -59,7 +60,7 @@ public final class GameConfiguration extends Configuration {
 
   /**
    * Gets the configuration group with all default input settings.
-   * 
+   *
    * @return The input configuration.
    */
   public InputConfiguration input() {
@@ -68,7 +69,7 @@ public final class GameConfiguration extends Configuration {
 
   /**
    * Gets the configuration group with all default sound settings.
-   * 
+   *
    * @return The sound configuration.
    */
   public SoundConfiguration sound() {

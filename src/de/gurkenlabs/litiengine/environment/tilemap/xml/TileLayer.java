@@ -1,30 +1,25 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
+import de.gurkenlabs.litiengine.environment.tilemap.ITile;
+import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
+import de.gurkenlabs.litiengine.environment.tilemap.ITilesetEntry;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
-
 import javax.xml.bind.annotation.XmlElement;
-
-import de.gurkenlabs.litiengine.environment.tilemap.ITile;
-import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
-import de.gurkenlabs.litiengine.environment.tilemap.ITilesetEntry;
 
 public class TileLayer extends Layer implements ITileLayer {
 
-  @XmlElement
-  private TileData data = null;
+  @XmlElement private TileData data = null;
 
   private transient List<ITile> tileList;
 
   private transient Tile[][] tiles;
 
-  /**
-   * Instantiates a new {@code TileLayer} instance.
-   */
+  /** Instantiates a new {@code TileLayer} instance. */
   public TileLayer() {
     // keep for serialization
   }
@@ -32,8 +27,7 @@ public class TileLayer extends Layer implements ITileLayer {
   /**
    * Instantiates a new {@code TileLayer} instance with the specified data.
    *
-   * @param data
-   *          The tile data of this instance.
+   * @param data The tile data of this instance.
    */
   public TileLayer(TileData data) {
     this.data = data;
@@ -41,7 +35,8 @@ public class TileLayer extends Layer implements ITileLayer {
 
   @Override
   public ITile getTileByLocation(final Point2D location) {
-    final Optional<ITile> tile = this.getTiles().stream().filter(x -> x.getTileCoordinate().equals(location)).findFirst();
+    final Optional<ITile> tile =
+        this.getTiles().stream().filter(x -> x.getTileCoordinate().equals(location)).findFirst();
     return tile.isPresent() ? tile.get() : null;
   }
 

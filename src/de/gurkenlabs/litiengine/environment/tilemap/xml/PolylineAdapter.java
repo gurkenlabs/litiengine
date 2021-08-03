@@ -4,7 +4,6 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 public class PolylineAdapter extends XmlAdapter<String, List<Point2D>> {
@@ -40,7 +39,7 @@ public class PolylineAdapter extends XmlAdapter<String, List<Point2D>> {
 
   private static String save(double d) {
     if (d % 1.0 == 0.0 && d >= Long.MIN_VALUE && d <= Long.MAX_VALUE) {
-      return Long.toString((long)d);
+      return Long.toString((long) d);
     } else {
       return Double.toString(d);
     }

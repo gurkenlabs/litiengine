@@ -1,5 +1,7 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
+import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
+import de.gurkenlabs.litiengine.util.io.URLAdapter;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -7,7 +9,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -18,10 +19,8 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlValue;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
-import de.gurkenlabs.litiengine.util.io.URLAdapter;
-
-public class CustomPropertyAdapter extends XmlAdapter<CustomPropertyAdapter.PropertyList, Map<String, ICustomProperty>> {
+public class CustomPropertyAdapter
+    extends XmlAdapter<CustomPropertyAdapter.PropertyList, Map<String, ICustomProperty>> {
   private static class PropertyType {
     private static final String STRING = "string";
     private static final String FLOAT = "float";
@@ -31,7 +30,7 @@ public class CustomPropertyAdapter extends XmlAdapter<CustomPropertyAdapter.Prop
     private static final String COLOR = "color";
 
     private static String[] values() {
-      return new String[] { STRING, FLOAT, INT, BOOL, FILE, COLOR };
+      return new String[] {STRING, FLOAT, INT, BOOL, FILE, COLOR};
     }
 
     private static boolean isValid(String type) {
@@ -47,19 +46,13 @@ public class CustomPropertyAdapter extends XmlAdapter<CustomPropertyAdapter.Prop
 
   @XmlAccessorType(XmlAccessType.FIELD)
   static class Property implements Comparable<Property> {
-    @XmlAttribute
-    String name;
-    @XmlAttribute
-    String type;
-    @XmlAttribute
-    String value;
-    @XmlValue
-    String contents;
-    @XmlTransient
-    URL location;
+    @XmlAttribute String name;
+    @XmlAttribute String type;
+    @XmlAttribute String value;
+    @XmlValue String contents;
+    @XmlTransient URL location;
 
-    Property() {
-    }
+    Property() {}
 
     Property(String name, String type) {
       this.name = name;
@@ -109,8 +102,7 @@ public class CustomPropertyAdapter extends XmlAdapter<CustomPropertyAdapter.Prop
     @XmlElement(name = "property")
     List<Property> properties;
 
-    PropertyList() {
-    }
+    PropertyList() {}
 
     PropertyList(List<Property> properties) {
       this.properties = properties;
@@ -119,9 +111,12 @@ public class CustomPropertyAdapter extends XmlAdapter<CustomPropertyAdapter.Prop
 
   @Override
   public Map<String, ICustomProperty> unmarshal(PropertyList v) {
-    Map<String, ICustomProperty> map = new HashMap<>(v.properties.size()); // use hashtable to reject null keys/values
+    Map<String, ICustomProperty> map =
+        new HashMap<>(v.properties.size()); // use hashtable to reject null keys/values
     for (Property property : v.properties) {
-      CustomProperty prop = new CustomProperty(property.type, property.value != null ? property.value : property.contents);
+      CustomProperty prop =
+          new CustomProperty(
+              property.type, property.value != null ? property.value : property.contents);
       if (property.location != null) {
         prop.setValue(property.location);
       }

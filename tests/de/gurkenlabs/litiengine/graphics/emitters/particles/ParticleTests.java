@@ -23,7 +23,6 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;

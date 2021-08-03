@@ -1,11 +1,10 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
+import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
+import de.gurkenlabs.litiengine.util.ColorHelper;
 import java.awt.Color;
 import java.net.URL;
 import java.util.Objects;
-
-import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
-import de.gurkenlabs.litiengine.util.ColorHelper;
 
 public class CustomProperty implements ICustomProperty {
 
@@ -15,10 +14,8 @@ public class CustomProperty implements ICustomProperty {
 
   /**
    * Instantiates a new {@code CustomProperty} instance.
-   * 
-   * <p>
-   * The default type for a custom property is {@code string} if not explicitly specified.
-   * </p>
+   *
+   * <p>The default type for a custom property is {@code string} if not explicitly specified.
    */
   public CustomProperty() {
     this.type = "string";
@@ -28,8 +25,7 @@ public class CustomProperty implements ICustomProperty {
   /**
    * Instantiates a new {@code CustomProperty} instance.
    *
-   * @param value
-   *          The value of this custom property.
+   * @param value The value of this custom property.
    */
   public CustomProperty(String value) {
     this.type = "string";
@@ -38,11 +34,9 @@ public class CustomProperty implements ICustomProperty {
 
   /**
    * Instantiates a new {@code CustomProperty} instance.
-   * 
-   * @param type
-   *          The type of this custom property.
-   * @param value
-   *          The value of this custom property.
+   *
+   * @param type The type of this custom property.
+   * @param value The value of this custom property.
    */
   public CustomProperty(String type, String value) {
     this.type = Objects.requireNonNull(type);
@@ -51,9 +45,8 @@ public class CustomProperty implements ICustomProperty {
 
   /**
    * Instantiates a new {@code CustomProperty} instance.
-   * 
-   * @param location
-   *          The location of the file represented by this custom property.
+   *
+   * @param location The location of the file represented by this custom property.
    */
   public CustomProperty(URL location) {
     this.type = "file";
@@ -64,8 +57,7 @@ public class CustomProperty implements ICustomProperty {
   /**
    * Instantiates a new {@code CustomProperty} instance by copying from the specified instance.
    *
-   * @param propertyToBeCopied
-   *          The property to be copied.
+   * @param propertyToBeCopied The property to be copied.
    */
   public CustomProperty(ICustomProperty propertyToBeCopied) {
     this.type = propertyToBeCopied.getType();
@@ -128,7 +120,9 @@ public class CustomProperty implements ICustomProperty {
 
   @Override
   public char getAsChar() {
-    return this.value.charAt(0); // TODO Is this enough? Should it check if it's the right length and throw an exception if it's not?
+    return this.value.charAt(
+        0); // TODO Is this enough? Should it check if it's the right length and throw an exception
+    // if it's not?
   }
 
   @Override

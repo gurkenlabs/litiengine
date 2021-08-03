@@ -1,22 +1,18 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
+import de.gurkenlabs.litiengine.environment.tilemap.IPolyShape;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
-import de.gurkenlabs.litiengine.environment.tilemap.IPolyShape;
 
 public class PolyShape implements IPolyShape {
   @XmlAttribute
   @XmlJavaTypeAdapter(PolylineAdapter.class)
   private List<Point2D> points;
 
-  /**
-   * Instantiates a new {@code PolyShape} instance.
-   */
+  /** Instantiates a new {@code PolyShape} instance. */
   public PolyShape() {
     super();
     this.points = new ArrayList<>();
@@ -25,8 +21,7 @@ public class PolyShape implements IPolyShape {
   /**
    * Instantiates a new {@code PolyShape} instance by copying from the specified original.
    *
-   * @param original
-   *          The poly line to be copied.
+   * @param original The poly line to be copied.
    */
   public PolyShape(IPolyShape original) {
     this();

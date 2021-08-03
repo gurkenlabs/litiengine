@@ -11,8 +11,7 @@ import java.util.logging.Logger;
 public final class Fonts extends ResourcesContainer<Font> {
   private static final Logger log = Logger.getLogger(Fonts.class.getName());
 
-  Fonts() {
-  }
+  Fonts() {}
 
   public Font get(String name, float size) {
     Font font = this.get(name);
@@ -48,7 +47,7 @@ public final class Fonts extends ResourcesContainer<Font> {
    * @param resourceName
    *          The name of the font
    * @return The loaded font.
-   * 
+   *
    * @see Font#createFont(int, java.io.File)
    * @see Font#getFont(String)
    */
