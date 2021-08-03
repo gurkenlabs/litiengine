@@ -2,10 +2,6 @@ plugins {
     id 'edu.sc.seis.launch4j' version '2.4.9'
 }
 
-apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: 'application'
-
 archivesBaseName = "utiliti"
 version = "v0.5.1-beta"
 mainClassName = "de.gurkenlabs.utiliti.Program"
@@ -17,25 +13,6 @@ sourceSets {
 
     test.java.srcDir "tests"
     test.resources.srcDir "tests"
-}
-
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    implementation project(':')
-    implementation 'com.github.weisj:darklaf-core:2.7.2'
-
-    testImplementation project(':').sourceSets.test.output //needed for swing tests
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
-    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.6.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.0'
-    testImplementation 'org.mockito:mockito-core:3.3.3'
-}
-
-test {
-    useJUnitPlatform()
 }
 
 jar {
@@ -111,3 +88,4 @@ task distZipLinuxMac(type: Zip) {
 }
 
 build.dependsOn copyDistFiles
+
