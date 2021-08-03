@@ -39,6 +39,10 @@ natives {
 
 tasks {
     test {
+        workingDir = buildDir.resolve("test")
+        doFirst {
+            workingDir.mkdirs()
+        }
         useJUnitPlatform()
         testLogging {
             events(TestLogEvent.FAILED)
