@@ -104,7 +104,7 @@ public class ResourceBundle implements Serializable {
       }
 
       return gameFile;
-    } catch (final JAXBException | IOException e) {
+    } catch (final IOException e) {
       log.log(Level.SEVERE, file + " - " + e.getMessage(), e);
     }
 
@@ -221,10 +221,10 @@ public class ResourceBundle implements Serializable {
     }
   }
 
-  private static ResourceBundle getResourceBundle(URL file) throws JAXBException, IOException {
+  private static ResourceBundle getResourceBundle(URL file) throws IOException {
     final JAXBContext jaxbContext = XmlUtilities.getContext(ResourceBundle.class);
-    final Unmarshaller um = jaxbContext.createUnmarshaller();
     try (InputStream inputStream = Resources.get(file)) {
+      final Unmarshaller um = jaxbContext.createUnmarshaller();
 
       // try to get compressed game file
       final GZIPInputStream zipStream = new GZIPInputStream(inputStream);
@@ -233,6 +233,8 @@ public class ResourceBundle implements Serializable {
 
       // if it fails to load the compressed file, get it from plain XML
       return XmlUtilities.read(ResourceBundle.class, file);
+    } catch (JAXBException e) {
+      throw new IOException(e);
     }
   }
 }

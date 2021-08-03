@@ -1,8 +1,7 @@
 package de.gurkenlabs.litiengine.resources;
 
+import java.io.IOException;
 import java.net.URL;
-
-import jakarta.xml.bind.JAXBException;
 
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxException;
@@ -24,7 +23,7 @@ public class Blueprints extends ResourcesContainer<Blueprint> {
     Blueprint blueprint;
     try {
       blueprint = XmlUtilities.read(Blueprint.class, resourceName);
-    } catch (JAXBException e) {
+    } catch (IOException e) {
       throw new TmxException("could not parse xml data", e);
     }
 

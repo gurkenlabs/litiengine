@@ -84,16 +84,20 @@ public final class XmlUtilities {
     return null;
   }
 
-  public static <T> T read(Class<T> cls, URL path) throws JAXBException {
-    final JAXBContext jaxbContext = getContext(cls);
-    if (jaxbContext == null) {
-      return null;
+  public static <T> T read(Class<T> cls, URL path) throws IOException {
+    try {
+        final JAXBContext jaxbContext = getContext(cls);
+        if (jaxbContext == null) {
+            return null;
+        }
+
+        final Unmarshaller um = jaxbContext.createUnmarshaller();
+        um.setAdapter(new URLAdapter(path));
+
+        return cls.cast(um.unmarshal(path));
+    } catch (JAXBException e) {
+        throw new IOException(e);
     }
-
-    final Unmarshaller um = jaxbContext.createUnmarshaller();
-    um.setAdapter(new URLAdapter(path));
-
-    return cls.cast(um.unmarshal(path));
   }
 
   public static File save(Object object, String fileName) {

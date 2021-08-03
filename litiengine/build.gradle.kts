@@ -28,7 +28,7 @@ dependencies {
 
     // JAXB modules for JDK 9 or higher
     implementation("javax.activation:javax.activation-api:1.2.0")
-    implementation("jakarta.xml.bind:jakarta.xml.bind-api:3.0.1")
+    api("jakarta.xml.bind:jakarta.xml.bind-api:3.0.1")
     runtimeOnly("com.sun.xml.bind:jaxb-core:3.0.1")
     runtimeOnly("com.sun.xml.bind:jaxb-impl:3.0.1")
 

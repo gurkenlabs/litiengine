@@ -61,7 +61,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.xml.bind.JAXBException;
+
 
 public class Editor extends Screen {
   private static final Logger log = Logger.getLogger(Editor.class.getName());
@@ -592,7 +592,7 @@ public class Editor extends Screen {
           EmitterData emitter;
           try {
             emitter = XmlUtilities.read(EmitterData.class, file.toURI().toURL());
-          } catch (IOException | JAXBException e) {
+          } catch (IOException e) {
             log.log(Level.SEVERE, String.format("could not load emitter data from %s", file), e);
             return;
           }
@@ -621,7 +621,7 @@ public class Editor extends Screen {
           Blueprint blueprint;
           try {
             blueprint = XmlUtilities.read(Blueprint.class, file.toURI().toURL());
-          } catch (IOException | JAXBException e) {
+          } catch (IOException e) {
             log.log(Level.SEVERE, String.format("could not load blueprint from %s", file), e);
             return;
           }
@@ -660,7 +660,7 @@ public class Editor extends Screen {
             URL path = file.toURI().toURL();
             tileset = XmlUtilities.read(Tileset.class, path);
             tileset.finish(path);
-          } catch (IOException | JAXBException e) {
+          } catch (IOException e) {
             log.log(Level.SEVERE, String.format("could not load tileset from %s", file), e);
             return;
           }

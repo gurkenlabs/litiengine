@@ -9,8 +9,6 @@ import java.util.function.IntBinaryOperator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import jakarta.xml.bind.JAXBException;
-
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.MapObjectSerializer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
@@ -108,7 +106,7 @@ public final class Maps extends ResourcesContainer<IMap> {
     TmxMap map;
     try {
       map = XmlUtilities.read(TmxMap.class, resourceName);
-    } catch (JAXBException e) {
+    } catch (IOException e) {
       throw new TmxException(e.getMessage(), e);
     }
 

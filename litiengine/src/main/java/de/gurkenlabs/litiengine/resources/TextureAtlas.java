@@ -1,11 +1,11 @@
 package de.gurkenlabs.litiengine.resources;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
@@ -48,7 +48,7 @@ public class TextureAtlas {
       String directory = FileUtilities.getParentDirPath(textureAtlasFile);
       atlas.absoluteImagePath = FileUtilities.combine(directory, atlas.rawImagePath);
       return atlas;
-    } catch (JAXBException e) {
+    } catch (IOException e) {
       log.log(Level.SEVERE, "TextureAtlas " + textureAtlasFile + " could not be read.", e);
       return null;
     }

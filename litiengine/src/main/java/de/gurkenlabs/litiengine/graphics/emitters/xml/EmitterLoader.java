@@ -2,12 +2,13 @@ package de.gurkenlabs.litiengine.graphics.emitters.xml;
 
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
+
+import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import jakarta.xml.bind.JAXBException;
 
 public class EmitterLoader {
   private static final Map<String, EmitterData> loadedEmitters;
@@ -36,7 +37,7 @@ public class EmitterLoader {
     EmitterData loaded;
     try {
       loaded = XmlUtilities.read(EmitterData.class, emitterXml);
-    } catch (JAXBException e) {
+    } catch (IOException e) {
       log.log(Level.SEVERE, String.format("Failed to load emitter data for %s", emitterXml), e);
       return null;
     }
