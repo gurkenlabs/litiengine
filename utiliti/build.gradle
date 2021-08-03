@@ -1,10 +1,17 @@
 plugins {
+    id 'java'
+    id 'eclipse'
+    id 'application'
     id 'edu.sc.seis.launch4j' version '2.4.9'
+    id 'com.diffplug.spotless'
 }
 
-apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: 'application'
+spotless {
+    java {
+        removeUnusedImports()
+        googleJavaFormat()
+    }
+}
 
 archivesBaseName = "utiliti"
 version = "v0.5.1-beta"
