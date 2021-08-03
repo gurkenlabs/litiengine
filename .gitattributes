@@ -1,0 +1,25 @@
+# Auto detect text files and perform LF normalization
+*        text=auto
+
+*.java   text
+*.html   text
+*.css    text
+*.js     text
+*.sql    text
+*.q      text
+
+# Note: executable is a non-standard attribute, and it is used by the release plugin
+*.sh     text eol=lf executable
+*.cgi    text eol=lf executable
+
+*.bat    text eol=crlf
+*.cmd    text eol=crlf
+
+# Images are explicitly configured as binary, just in case
+*.gif binary
+*.jpg binary
+*.jpeg binary
+*.png binary
+
+# Below files don't have extension, so we mention them explicitly
+/gradlew           text eol=lf executable
