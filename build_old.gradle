@@ -1,0 +1,64 @@
+natives {
+    configurations = ['runtimeClasspath']
+    outputDir = 'libs'
+}
+
+archivesBaseName = "litiengine"
+version = "v0.5.1-beta"
+
+sourceSets {
+    main.java.srcDir "src"
+    main.resources.srcDir "resources"
+
+    test.java.srcDir "tests"
+    test.resources.srcDir "tests"
+}
+
+jar {
+    from {
+        configurations.compileClasspath.collect { zipTree it }
+    }
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    exclude 'META-INF/services/**'
+    exclude 'module-info.*'
+    exclude '**/*.dll'
+    exclude '**/*.jnilib'
+    exclude '**/*.dylib'
+    exclude '**/*.so'
+    exclude 'junit**/**'
+}
+
+task createJavadocs(type: Javadoc) {
+    source sourceSets.main.allJava
+    classpath = project.sourceSets.main.runtimeClasspath
+    options.encoding 'UTF-8'
+    // options.addBooleanOption('html5', true)
+    dependsOn build
+}
+
+task distZip(type: Zip) {
+    group 'build'
+    from 'build/libs/'
+    include '*'
+    exclude archiveFileName.get()
+    destinationDirectory = file('build/libs/')
+
+    dependsOn ":utiliti:build"
+    dependsOn ":utiliti:distZipLinuxMac"
+}
+
+task fullbuild {
+    group 'build'
+    description 'executes the build including coverage reports and javadoc'
+
+
+    dependsOn createJavadocs
+    dependsOn test
+    dependsOn jacocoTestReport
+    dependsOn distZip
+}
+
+compileJava.dependsOn includeNatives
+includeNatives.dependsOn copyLicense
