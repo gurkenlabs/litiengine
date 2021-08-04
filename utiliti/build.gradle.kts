@@ -6,6 +6,10 @@ plugins {
     id("org.beryx.runtime")
 }
 
+description = """
+    UTILITI is the editor for the open source Java 2D Game Engine LITIENGINE
+""".trimIndent()
+
 sourceSets {
     main {
         java {
@@ -53,6 +57,7 @@ runtime {
         imageOptions.addAll(
             listOf(
                 "--icon", project.file("dist/pixel-icon-utiliti.ico").path,
+                "--description", project.description,
                 "--copyright", "2020-${Calendar.getInstance().get(Calendar.YEAR)} gurkenlabs.de",
                 "--vendor", "gurkenlabs.de",
                 "--java-options", "-Xms256m",
