@@ -7,8 +7,6 @@ import com.github.vlsi.gradle.publishing.dsl.simplifyXml
 import com.github.vlsi.gradle.publishing.dsl.versionFromResolution
 
 plugins {
-    idea
-    eclipse
     id("com.github.vlsi.crlf")
     id("com.github.vlsi.gradle-extensions")
     id("com.diffplug.spotless")
@@ -71,6 +69,9 @@ allprojects {
     }
 
     plugins.withType<JavaPlugin> {
+        apply<IdeaPlugin>()
+        apply<EclipsePlugin>()
+
         configure<JavaPluginExtension> {
             sourceCompatibility = JavaVersion.VERSION_11
             targetCompatibility = JavaVersion.VERSION_11
