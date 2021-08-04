@@ -16,29 +16,16 @@ description = """
 """.trimIndent()
 
 dependencies {
-    implementation("net.java.jinput:jinput:2.0.9")
-    implementation("net.java.jinput:jinput:2.0.9:natives-all")
-    implementation("com.googlecode.soundlibs:jorbis:0.0.17.4")
-    implementation("com.googlecode.soundlibs:tritonus-share:0.3.7.4")
-    implementation("com.googlecode.soundlibs:vorbisspi:1.0.3.3")
-    implementation("com.googlecode.soundlibs:mp3spi:1.9.5.4") {
-        exclude(group = "junit")
-    }
+    implementation(libs.bundles.jinput)
+    implementation(libs.bundles.soundlibs)
+    implementation(libs.steamworks)
 
-    implementation("com.code-disaster.steamworks4j:steamworks4j:1.8.0")
-
-    // JAXB modules for JDK 9 or higher
-    implementation("javax.activation:javax.activation-api:1.2.0")
-    api("jakarta.xml.bind:jakarta.xml.bind-api:3.0.1")
-    runtimeOnly("com.sun.xml.bind:jaxb-core:3.0.1")
-    runtimeOnly("com.sun.xml.bind:jaxb-impl:3.0.1")
+    implementation(libs.javax.activation)
+    // This needs to be api to make the annotations on the class visible to the compiler.
+    api(libs.xml.api)
+    runtimeOnly(libs.bundles.xml.runtime)
 
     testImplementation(project(":test-common"))
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.2")
-    testImplementation("org.junit.jupiter:junit-jupiter-params:5.7.2")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.2")
-    testImplementation("org.mockito:mockito-core:3.10.0")
-    testImplementation("org.mockito:mockito-inline:3.10.0")
 }
 
 natives {

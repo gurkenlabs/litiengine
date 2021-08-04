@@ -3,5 +3,8 @@ plugins {
 }
 
 dependencies {
-    implementation("org.junit.jupiter:junit-jupiter-api:5.7.2")
+    api(testLibs.bundles.mockito)
+    api(testLibs.junit.api)
+    api(testLibs.junit.params)
+    runtimeOnly(testLibs.junit.engine)
 }
