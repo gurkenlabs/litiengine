@@ -57,7 +57,7 @@ allprojects {
         apply(plugin = "com.diffplug.spotless")
         spotless {
             kotlinGradle {
-                ktlint()
+                ktlint("ktlint".v)
             }
             plugins.withType<JavaPlugin>().configureEach {
                 java {
