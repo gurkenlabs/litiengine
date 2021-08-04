@@ -73,8 +73,9 @@ allprojects {
         apply<EclipsePlugin>()
 
         configure<JavaPluginExtension> {
-            sourceCompatibility = JavaVersion.VERSION_11
-            targetCompatibility = JavaVersion.VERSION_11
+            toolchain {
+                languageVersion.set(JavaLanguageVersion.of(16))
+            }
             withSourcesJar()
             if (!skipJavadoc && isRelease) {
                 withJavadocJar()
