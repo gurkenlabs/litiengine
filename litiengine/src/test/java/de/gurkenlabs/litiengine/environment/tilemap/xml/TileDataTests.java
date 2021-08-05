@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
@@ -112,21 +111,13 @@ public class TileDataTests {
   }
 
   @ParameterizedTest(name = "testEncode {0}, encoding={1}, compression={2}")
-  @MethodSource("getEncodeArguments")
+  @MethodSource("getEncodeDecodeArguments")
   public void testEncode(String name, String encoding, String compression, String expectedEncoded)
       throws IOException {
     // arrange
-    Tile[] tiles =
-        new Tile[] {
-          new Tile(1), new Tile(1), new Tile(1), new Tile(0), new Tile(0), new Tile(0), new Tile(1),
-              new Tile(1), new Tile(1),
-          new Tile(1), new Tile(1), new Tile(1), new Tile(0), new Tile(2), new Tile(0), new Tile(1),
-              new Tile(1), new Tile(1),
-          new Tile(1), new Tile(1), new Tile(1), new Tile(0), new Tile(1), new Tile(0), new Tile(1),
-              new Tile(1), new Tile(1),
-        };
+    List<Tile> tiles = getTileList();
 
-    TileData data = new TileData(Arrays.asList(tiles), 9, 3, encoding, compression);
+    TileData data = new TileData(tiles, 9, 3, encoding, compression);
 
     // act
     String actualEncoded = TileData.encode(data);
@@ -135,14 +126,38 @@ public class TileDataTests {
     assertEquals(expectedEncoded, actualEncoded);
   }
 
+  @ParameterizedTest(name = "testDecode {0}, encoding={1}, compression={2}")
+  @MethodSource("getEncodeDecodeArguments")
+  public void testDecode(String name, String encoding, String compression, String encodedInput)
+      throws IOException {
+    // arrange
+    List<Tile> expectedDecoded = getTileList();
+
+    TileData data = new TileData(null, 9, 3, encoding, compression);
+
+    // act
+    data.setValue(encodedInput);
+    List<Tile> actualDecoded = data.getTiles();
+
+    // assert
+    assertEquals(expectedDecoded, actualDecoded);
+  }
+
+  private static List<Tile> getTileList() {
+    return Stream.of(
+            1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 2, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1)
+        .map(Tile::new)
+        .toList();
+  }
+
   /**
    * Supplies the arguments for the parameterized test {@link #testEncode(String, String, String,
-   * String)}
+   * String)} and {@link #testDecode(String, String, String, String)}
    *
    * @return Test arguments
    */
   @SuppressWarnings("unused")
-  private static Stream<Arguments> getEncodeArguments() {
+  private static Stream<Arguments> getEncodeDecodeArguments() {
     return Stream.of(
         Arguments.of(
             "base64",
