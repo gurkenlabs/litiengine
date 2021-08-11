@@ -29,6 +29,7 @@ sourceSets {
             srcDir(rootDir.resolve("tests"))
         }
         resources {
+            srcDir(rootDir.resolve("testsResources"))
         }
     }
 }

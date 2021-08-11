@@ -17,7 +17,7 @@ public class TextureAtlasTests {
   @Test
   public void testReadTextureAtlasFromFile() {
     TextureAtlas atlas =
-        TextureAtlas.read("tests/de/gurkenlabs/litiengine/resources/gurk-nukem-atlas.xml");
+        TextureAtlas.read("de/gurkenlabs/litiengine/resources/gurk-nukem-atlas.xml");
 
     assertNotNull(atlas);
     assertEquals(123, atlas.getWidth());
@@ -45,7 +45,7 @@ public class TextureAtlasTests {
   @MethodSource("getTextureAtlasLoadResourceName")
   public void testTextureAtlasLoad(String resourceName) {
     TextureAtlas atlas =
-        TextureAtlas.read("tests/de/gurkenlabs/litiengine/resources/gurk-nukem-atlas.xml");
+        TextureAtlas.read("de/gurkenlabs/litiengine/resources/gurk-nukem-atlas.xml");
 
     // file must be available on the file system
     if (atlas == null) {
@@ -79,7 +79,7 @@ public class TextureAtlasTests {
   public void testTextureAtlasLoadWidth(
       String resourceName, int expectedWidth, int expectedHeight) {
     TextureAtlas atlas =
-        TextureAtlas.read("tests/de/gurkenlabs/litiengine/resources/gurk-nukem-atlas.xml");
+        TextureAtlas.read("de/gurkenlabs/litiengine/resources/gurk-nukem-atlas.xml");
 
     // file must be available on the file system
     if (atlas == null) {
@@ -97,7 +97,7 @@ public class TextureAtlasTests {
   public void testTextureAtlasLoadHeight(
       String resourceName, int expectedWidth, int expectedHeight) {
     TextureAtlas atlas =
-        TextureAtlas.read("tests/de/gurkenlabs/litiengine/resources/gurk-nukem-atlas.xml");
+        TextureAtlas.read("de/gurkenlabs/litiengine/resources/gurk-nukem-atlas.xml");
 
     // file must be available on the file system
     if (atlas == null) {
