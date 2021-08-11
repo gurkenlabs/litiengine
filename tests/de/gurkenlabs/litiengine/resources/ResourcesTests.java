@@ -60,7 +60,7 @@ public class ResourcesTests {
   public void testResourceFromWeb() throws IOException {
     try (InputStream stream =
         Resources.get(
-            "https://github.com/gurkenlabs/litiengine/raw/master/resources/litiengine-banner.png")) {
+            "https://github.com/gurkenlabs/litiengine/blob/1ab49e67edf67242f1e1e6a67b54f36dd9b09c7e/resources/litiengine-banner.png?raw=true")) {
       assertNotNull(stream);
     }
   }
