@@ -24,8 +24,7 @@ dependencyResolutionManagement {
             versionId("soundlibs.mp3spi")
             versionId("steamworks")
             versionId("javax.activation")
-            versionId("javax.xml")
-            versionId("javax.xmlImpl")
+            versionId("jakarta.xml")
 
             alias("darklaf-core").to("com.github.weisj", "darklaf-core")
                 .versionRef("darklaf")
@@ -57,12 +56,12 @@ dependencyResolutionManagement {
 
             alias("javax-activation").to("javax.activation", "javax.activation-api")
                 .versionRef("javax.activation")
-            alias("xml-api").to("javax.xml.bind", "jaxb-api")
-                .versionRef("javax.xml")
+            alias("xml-api").to("jakarta.xml.bind", "jakarta.xml.bind-api")
+                .versionRef("jakarta.xml")
             alias("xml-runtime-core").to("com.sun.xml.bind", "jaxb-core")
-                .versionRef("javax.xmlImpl")
+                .versionRef("jakarta.xml")
             alias("xml-runtime-impl").to("com.sun.xml.bind", "jaxb-impl")
-                .versionRef("javax.xmlImpl")
+                .versionRef("jakarta.xml")
             bundle(
                 "xml-runtime",
                 listOf("xml-runtime-core", "xml-runtime-impl")

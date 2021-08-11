@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlTransient;
 
 import de.gurkenlabs.litiengine.sound.Sound;
 import de.gurkenlabs.litiengine.util.io.Codec;

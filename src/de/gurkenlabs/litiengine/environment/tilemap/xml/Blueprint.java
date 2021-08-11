@@ -5,9 +5,9 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlTransient;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
@@ -43,7 +43,7 @@ public class Blueprint extends MapObject {
    *
    * @param name
    *          The name of the blueprint.
-   * 
+   *
    * @param mapObjects
    *          The map objects to build the blueprint from.
    */
@@ -56,10 +56,10 @@ public class Blueprint extends MapObject {
    *
    * @param name
    *          The name of the blueprint.
-   * 
+   *
    * @param keepIds
    *          A flag indicating whether the IDs of the specified map objects should be kept.
-   * 
+   *
    * @param mapObjects
    *          The map objects to build the blueprint from.
    */
@@ -91,7 +91,7 @@ public class Blueprint extends MapObject {
    * Gets a value that indicates whether the IDs if this blueprint's map-objects
    * should be kept. This is currently used when objects are cut and pasted
    * afterwards.
-   * 
+   *
    * @return True if the ids for all {@link IMapObject}s of this {@link Blueprint} should be re-applied after building new instances.
    */
   public boolean keepIds() {

@@ -6,11 +6,11 @@ import java.awt.geom.Rectangle2D;
 import java.net.URL;
 import java.util.Arrays;
 
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlTransient;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
@@ -115,7 +115,7 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
    * <p>
    * This variant of the constructor lets you decide if the copy instance will get the same ID as the old MapObject or get a new ID.
    * </p>
-   * 
+   *
    * @param original
    *          the MapObject we want to copy
    * @param keepID

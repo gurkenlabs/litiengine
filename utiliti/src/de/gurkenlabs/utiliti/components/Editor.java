@@ -61,7 +61,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 public class Editor extends Screen {
   private static final Logger log = Logger.getLogger(Editor.class.getName());

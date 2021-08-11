@@ -1,7 +1,7 @@
 package de.gurkenlabs.litiengine;
 
-import javax.xml.bind.annotation.XmlEnum;
-import javax.xml.bind.annotation.XmlEnumValue;
+import jakarta.xml.bind.annotation.XmlEnum;
+import jakarta.xml.bind.annotation.XmlEnumValue;
 
 import de.gurkenlabs.litiengine.util.MathUtilities;
 
