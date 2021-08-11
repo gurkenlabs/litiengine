@@ -46,10 +46,10 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Gradle Fullbuild
+      - name: Gradle Build
         uses: GabrielBB/xvfb-action@v1
         with:
-          run: ./gradlew fullbuild
+          run: ./gradlew build
 
       - name: Set up JDK 15 for static analysis
         uses: actions/setup-java@v2
