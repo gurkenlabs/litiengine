@@ -93,5 +93,6 @@ dependencyResolutionManagement {
 
 include(
     "litiengine",
-    "utiliti"
+    "utiliti",
+    "test-common"
 )

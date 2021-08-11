@@ -42,10 +42,7 @@ dependencies {
     api(libs.xml.api)
     runtimeOnly(libs.bundles.xml.runtime)
 
-    api(testLibs.bundles.mockito)
-    api(testLibs.junit.api)
-    api(testLibs.junit.params)
-    runtimeOnly(testLibs.junit.engine)
+    testImplementation(project(":test-common"))
 }
 
 natives {

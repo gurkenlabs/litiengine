@@ -38,10 +38,7 @@ dependencies {
     implementation(project(":litiengine"))
     implementation(libs.darklaf.core)
 
-    api(testLibs.bundles.mockito)
-    api(testLibs.junit.api)
-    api(testLibs.junit.params)
-    runtimeOnly(testLibs.junit.engine)
+    testImplementation(project(":test-common"))
 }
 
 tasks {
