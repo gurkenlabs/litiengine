@@ -153,7 +153,7 @@ public class TileDataTests {
             "base64gzip",
             TileData.Encoding.BASE64,
             TileData.Compression.GZIP,
-            "H4sIAAAAAAAAAGNkYGBghGJkwIgDgwATEWoYsagBAFsJTlBsAAAA"),
+            "H4sIAAAAAAAA/2NkYGBghGJkwIgDgwATEWoYsagBAFsJTlBsAAAA"),
         Arguments.of(
             "base64zlib",
             TileData.Encoding.BASE64,
