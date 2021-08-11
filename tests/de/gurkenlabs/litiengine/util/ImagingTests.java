@@ -71,12 +71,12 @@ public class ImagingTests {
     String imagePath = "de/gurkenlabs/litiengine/util/prop-flag.png";
 
     // image must be available on the file system
-    if (!new File(imagePath).exists()) {
+    if (getClass().getClassLoader().getResource(imagePath) == null) {
       fail();
     }
 
     // rotated image must be available on the file system
-    if (!new File(rotatedImagePath).exists()) {
+    if (getClass().getClassLoader().getResource(rotatedImagePath) == null) {
       fail();
     }
 

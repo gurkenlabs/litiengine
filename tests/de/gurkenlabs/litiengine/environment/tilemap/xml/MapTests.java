@@ -50,11 +50,7 @@ public class MapTests {
     assertEquals(1, map.getNextObjectId());
 
     assertEquals("test-map", map.getName());
-    assertEquals(
-        (new File("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx"))
-            .toURI()
-            .toURL(),
-        map.getPath());
+    assertEquals(MapTests.class.getResource("test-map.tmx"), map.getPath());
     assertEquals(new Color(0xaa3df675, true), map.getBackgroundColor());
     assertEquals(new Rectangle2D.Double(0, 0, 256, 256), map.getBounds());
     assertEquals(2, map.getTilesets().size());
