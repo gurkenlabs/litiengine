@@ -1,11 +1,12 @@
 **/.gradle/
-/build/
-/bin/
-/config.properties
-.DS_Store
-crash.txt
-game.log*
-hs_err_pid*.log
+**/build/
+**/bin/
+
+**/config.properties
+**/.DS_Store
+**/crash.txt
+**/game.log*
+**/hs_err_pid*.log
 /utiliti/out
 
 # Eclipse
