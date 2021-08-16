@@ -6,6 +6,14 @@
 crash.txt
 game.log*
 hs_err_pid*.log
+/utiliti/out
+
+# Eclipse
+**/.classpath
+**/.project
+**/.settings/
+
+# Idea
 /.idea
 /out
-/utiliti/out
+*.iml
