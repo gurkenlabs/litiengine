@@ -43,25 +43,15 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.Icon;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.KeyStroke;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.plaf.TextUI;
+import javax.swing.plaf.basic.BasicTextAreaUI;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 
 public class AssetPanelItem extends JPanel {
   private static final Logger log = Logger.getLogger(AssetPanelItem.class.getName());
@@ -75,7 +65,7 @@ public class AssetPanelItem extends JPanel {
   private static final Dimension BUTTON_PREF = new Dimension(24, 24);
 
   private final JLabel iconLabel;
-  private final JTextArea textField;
+  private final JTextPane textField;
   private final JPanel buttonPanel;
   private final JButton btnEdit;
   private final JButton btnDelete;
@@ -85,7 +75,7 @@ public class AssetPanelItem extends JPanel {
   private final transient Object origin;
 
   public AssetPanelItem(Object origin) {
-    setPreferredSize(new Dimension(100, 120));
+    setPreferredSize(new Dimension(100, 135));
     this.origin = origin;
     setBorder(normalBorder);
 
@@ -166,19 +156,30 @@ public class AssetPanelItem extends JPanel {
               e.consume();
             }
           }
+          @Override
+          public void mouseReleased(MouseEvent e) {
+            requestFocus();
+            if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e) && addEntity()) {
+              e.consume();
+            }
+          }
         });
 
-    textField = new JTextArea();
-    textField.setWrapStyleWord(true);
-    textField.setRows(2);
-    textField.setLineWrap(true);
-    textField.setColumns(10);
+    SimpleAttributeSet attributes = new SimpleAttributeSet();
+    StyleConstants.setAlignment(attributes, StyleConstants.ALIGN_CENTER);
+
+    textField = new WordWrapPane(2, 10);
+    textField.setParagraphAttributes(attributes, false);
     textField.setBorder(null);
     textField.setEditable(false);
     textField.addMouseListener(
         new MouseAdapter() {
           @Override
           public void mouseClicked(MouseEvent e) {
+            requestFocus();
+          }
+          @Override
+          public void mouseReleased(MouseEvent e) {
             requestFocus();
           }
         });
