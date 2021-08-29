@@ -21,14 +21,34 @@ import de.gurkenlabs.utiliti.swing.dialogs.XmlExportDialog;
 import de.gurkenlabs.utiliti.swing.panels.CreaturePanel;
 import de.gurkenlabs.utiliti.swing.panels.PropPanel;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -52,7 +72,7 @@ public class AssetPanelItem extends JPanel {
   private static final Dimension BUTTON_PREF = new Dimension(24, 24);
 
   private final JLabel iconLabel;
-  private final JTextPane textField;
+  private final JTextArea textField;
   private final JPanel buttonPanel;
   private final JButton btnEdit;
   private final JButton btnDelete;
@@ -152,11 +172,9 @@ public class AssetPanelItem extends JPanel {
           }
         });
 
-    SimpleAttributeSet attributes = new SimpleAttributeSet();
-    StyleConstants.setAlignment(attributes, StyleConstants.ALIGN_CENTER);
-
-    textField = new WordWrapPane(2, 10);
-    textField.setParagraphAttributes(attributes, false);
+    textField = new RowLimitedTextArea(2, 10);
+    textField.setLineWrap(true);
+    textField.setWrapStyleWord(true);
     textField.setBorder(null);
     textField.setEditable(false);
     textField.addMouseListener(
