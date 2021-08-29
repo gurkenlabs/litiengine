@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.gui;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.input.Input;
+import de.gurkenlabs.litiengine.test.SwingTestSuite;
 import de.gurkenlabs.litiengine.tweening.TweenType;
 
 import java.awt.Color;

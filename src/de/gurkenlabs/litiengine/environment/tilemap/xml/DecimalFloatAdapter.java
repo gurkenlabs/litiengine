@@ -1,6 +1,6 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
 /**
  * This adapter implementation ensures that the float value is serialized

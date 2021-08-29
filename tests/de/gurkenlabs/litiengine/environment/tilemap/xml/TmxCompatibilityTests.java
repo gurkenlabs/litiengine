@@ -15,8 +15,8 @@ public class TmxCompatibilityTests {
   @Test
   public void infiniteMapNeedsToBeCompatibleToDefaultTmxFormat() {
 
-    String source = "tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-infinite-map.tmx";
-    String target = "tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map-out.tmx";
+    String source = "de/gurkenlabs/litiengine/environment/tilemap/xml/test-infinite-map.tmx";
+    String target = "de/gurkenlabs/litiengine/environment/tilemap/xml/test-map-out.tmx";
     IMap map = Resources.maps().get(source);
     XmlUtilities.save(map, target);
 
@@ -29,8 +29,8 @@ public class TmxCompatibilityTests {
   @Test
   public void mapObjectMapNeedsToBeCompatibleToDefaultTmxFormat() {
 
-    String source = "tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-mapobject.tmx";
-    String target = "tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map-out.tmx";
+    String source = "de/gurkenlabs/litiengine/environment/tilemap/xml/test-mapobject.tmx";
+    String target = "de/gurkenlabs/litiengine/environment/tilemap/xml/test-map-out.tmx";
     IMap map = Resources.maps().get(source);
     XmlUtilities.save(map, target);
 

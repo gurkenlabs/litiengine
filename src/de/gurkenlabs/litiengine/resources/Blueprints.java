@@ -2,7 +2,7 @@ package de.gurkenlabs.litiengine.resources;
 
 import java.net.URL;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxException;
@@ -30,7 +30,7 @@ public class Blueprints extends ResourcesContainer<Blueprint> {
 
     return blueprint;
   }
-  
+
   @Override
   protected String getAlias(String resourceName, Blueprint resource) {
     if (resource == null || resource.getName() == null || resource.getName().isEmpty() || resource.getName().equalsIgnoreCase(resourceName)) {

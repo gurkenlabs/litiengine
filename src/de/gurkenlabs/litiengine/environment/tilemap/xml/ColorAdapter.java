@@ -2,7 +2,7 @@ package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.awt.Color;
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
 import de.gurkenlabs.litiengine.util.ColorHelper;
 

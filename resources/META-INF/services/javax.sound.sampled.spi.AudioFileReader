@@ -1,5 +1,0 @@
-#  for the javalayer mp3 decoder
-javazoom.spi.mpeg.sampled.file.MpegAudioFileReader
-
-# for the vorbis decoder
-javazoom.spi.vorbis.sampled.file.VorbisAudioFileReader

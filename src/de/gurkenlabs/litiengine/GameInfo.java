@@ -5,9 +5,9 @@ import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlTransient;
 
 import de.gurkenlabs.litiengine.environment.tilemap.xml.CustomPropertyProvider;
 
@@ -19,7 +19,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.CustomPropertyProvider;
  * It should be the first thing that you do in you application entry point to setup or load this information.
  * Note that it's possible to keep this information in an XML file and load it up by calling {@code Game.setInfo(String)}.
  * </p>
- * 
+ *
  * @see Game#info()
  * @see Game#setInfo(String)
  */
@@ -66,7 +66,7 @@ public class GameInfo extends CustomPropertyProvider {
 
   /**
    * Gets the company that created the game.
-   * 
+   *
    * @return The company that created the game.
    */
   @XmlTransient
@@ -76,7 +76,7 @@ public class GameInfo extends CustomPropertyProvider {
 
   /**
    * Gets a textual description that explains what the game is all about.
-   * 
+   *
    * @return The game's description.
    */
   @XmlTransient
@@ -86,7 +86,7 @@ public class GameInfo extends CustomPropertyProvider {
 
   /**
    * Gets the web site of this game project.
-   * 
+   *
    * @return The web site of the game.
    */
   @XmlTransient
@@ -97,9 +97,9 @@ public class GameInfo extends CustomPropertyProvider {
   /**
    * Gets the {@link #getWebsite()} as an {@code URL} object that can be used to further process the information.
    * (e.g. the web site can be opened in the browser).
-   * 
+   *
    * @return The game's web site as {@code URL}
-   * 
+   *
    * @see URL
    * @see #getWebsite()
    */
@@ -119,7 +119,7 @@ public class GameInfo extends CustomPropertyProvider {
 
   /**
    * Gets the developers of the game. This can e.g. be used for credits.
-   * 
+   *
    * @return The game's developers.
    */
   @XmlTransient
@@ -129,7 +129,7 @@ public class GameInfo extends CustomPropertyProvider {
 
   /**
    * Gets the name of the LITIENGINE game.
-   * 
+   *
    * @return The game's name.
    */
   @XmlTransient
@@ -139,7 +139,7 @@ public class GameInfo extends CustomPropertyProvider {
 
   /**
    * Gets the publisher of the game.
-   * 
+   *
    * @return The game's publisher.
    */
   @XmlTransient
@@ -149,7 +149,7 @@ public class GameInfo extends CustomPropertyProvider {
 
   /**
    * Gets the sub title of the game. It is basically an addendum to the {@link #getName()}.
-   * 
+   *
    * @return The game's sub title.
    */
   @XmlTransient
@@ -159,7 +159,7 @@ public class GameInfo extends CustomPropertyProvider {
 
   /**
    * Gets the version of the game.
-   * 
+   *
    * @return The game's version.
    */
   @XmlTransient
@@ -175,9 +175,9 @@ public class GameInfo extends CustomPropertyProvider {
    * <li>The game's version</li>
    * <li><i>opt. The game's subtitle</i></li>
    * </ul>
-   * 
+   *
    * @return The game's title.
-   * 
+   *
    * @see #getName()
    * @see #getSubTitle()
    * @see #getVersion()
@@ -188,7 +188,7 @@ public class GameInfo extends CustomPropertyProvider {
 
   /**
    * Sets the company that created the game.
-   * 
+   *
    * @param company
    *          The company that created the game.
    */
@@ -198,10 +198,10 @@ public class GameInfo extends CustomPropertyProvider {
 
   /**
    * Sets the game's description. This can be seen as additional information about the game and will not be part of the game's title.
-   * 
+   *
    * @param description
    *          The game's description.
-   * 
+   *
    * @see #getTitle()
    */
   public void setDescription(final String description) {
@@ -210,7 +210,7 @@ public class GameInfo extends CustomPropertyProvider {
 
   /**
    * Sets the game's developers.
-   * 
+   *
    * @param developers
    *          The game's developers.
    */
@@ -222,10 +222,10 @@ public class GameInfo extends CustomPropertyProvider {
    * Sets the game's name.
    * <br>
    * This is the most basic information about a game and will be part of the game's title.
-   * 
+   *
    * @param name
    *          The game's name.
-   * 
+   *
    * @see #getTitle()
    */
   public void setName(final String name) {
@@ -236,10 +236,10 @@ public class GameInfo extends CustomPropertyProvider {
    * Sets the game's sub title.
    * <br>
    * This is basically an addendum to the game's name and will also be part of the game's title.
-   * 
+   *
    * @param subTitle
    *          The game's sub title.
-   * 
+   *
    * @see #getName()
    * @see #getTitle()
    */
@@ -258,10 +258,10 @@ public class GameInfo extends CustomPropertyProvider {
    * <li>v1.0.0-RC1</li>
    * <li>v0.0.1-alpha</li>
    * </ul>
-   * 
+   *
    * @param version
    *          The game's version.
-   * 
+   *
    * @see #getTitle()
    */
   public void setVersion(final String version) {
@@ -270,7 +270,7 @@ public class GameInfo extends CustomPropertyProvider {
 
   /**
    * Sets the game's web site.
-   * 
+   *
    * @param website
    *          The game's web site.
    */

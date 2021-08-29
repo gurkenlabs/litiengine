@@ -3,7 +3,7 @@ package de.gurkenlabs.utiliti.swing;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.gurkenlabs.litiengine.gui.SwingTestSuite;
+import de.gurkenlabs.litiengine.test.SwingTestSuite;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import javax.swing.JTextPane;

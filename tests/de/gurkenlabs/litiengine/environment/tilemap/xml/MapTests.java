@@ -35,7 +35,7 @@ public class MapTests {
   @Test
   public void testBasicProperties() throws MalformedURLException {
     IMap map =
-        Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
+        Resources.maps().get("de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
 
     assertEquals(1.0, map.getVersion());
     assertEquals("1.1.4", map.getTiledVersion());
@@ -50,11 +50,7 @@ public class MapTests {
     assertEquals(1, map.getNextObjectId());
 
     assertEquals("test-map", map.getName());
-    assertEquals(
-        (new File("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx"))
-            .toURI()
-            .toURL(),
-        map.getPath());
+    assertEquals(MapTests.class.getResource("test-map.tmx"), map.getPath());
     assertEquals(new Color(0xaa3df675, true), map.getBackgroundColor());
     assertEquals(new Rectangle2D.Double(0, 0, 256, 256), map.getBounds());
     assertEquals(2, map.getTilesets().size());
@@ -75,7 +71,7 @@ public class MapTests {
   public void testTileCustomProperties(
       int tileLayers, int x, int y, String propertyName, String expectedValue) {
     IMap map =
-        Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
+        Resources.maps().get("de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
     if (!Resources.maps().contains(map)) {
       fail();
     }
@@ -96,7 +92,7 @@ public class MapTests {
     TmxMap map =
         (TmxMap)
             Resources.maps()
-                .get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
+                .get("de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
     map.setOrientation(MapOrientations.ISOMETRIC_STAGGERED);
     map.setTiledVersion("0.0.0");
     map.setVersion(2.0);
@@ -123,7 +119,7 @@ public class MapTests {
   public void testMapObjectLayers() {
     IMap map =
         Resources.maps()
-            .get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-mapobject.tmx");
+            .get("de/gurkenlabs/litiengine/environment/tilemap/xml/test-mapobject.tmx");
     assertEquals(1, map.getMapObjectLayers().size());
 
     IMapObjectLayer layer = map.getMapObjectLayers().get(0);
@@ -180,7 +176,7 @@ public class MapTests {
         (TmxMap)
             Resources.maps()
                 .get(
-                    "tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-infinite-map.tmx");
+                    "de/gurkenlabs/litiengine/environment/tilemap/xml/test-infinite-map.tmx");
 
     assertTrue(map.isInfinite());
     assertEquals(64, map.getWidth());

@@ -1,4 +1,4 @@
-package de.gurkenlabs.litiengine.gui;
+package de.gurkenlabs.litiengine.test;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
