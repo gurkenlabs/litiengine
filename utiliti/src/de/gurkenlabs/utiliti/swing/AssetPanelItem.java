@@ -24,25 +24,7 @@ import de.gurkenlabs.utiliti.swing.dialogs.SpritesheetImportPanel;
 import de.gurkenlabs.utiliti.swing.dialogs.XmlExportDialog;
 import de.gurkenlabs.utiliti.swing.panels.CreaturePanel;
 import de.gurkenlabs.utiliti.swing.panels.PropPanel;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -62,6 +44,25 @@ import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class AssetPanelItem extends JPanel {
   private static final Logger log = Logger.getLogger(AssetPanelItem.class.getName());
@@ -85,7 +86,7 @@ public class AssetPanelItem extends JPanel {
   private final transient Object origin;
 
   public AssetPanelItem(Object origin) {
-    setPreferredSize(new Dimension(100, 120));
+    setPreferredSize(new Dimension(100, 135));
     this.origin = origin;
     setBorder(normalBorder);
 
@@ -166,19 +167,28 @@ public class AssetPanelItem extends JPanel {
               e.consume();
             }
           }
+          @Override
+          public void mouseReleased(MouseEvent e) {
+            requestFocus();
+            if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e) && addEntity()) {
+              e.consume();
+            }
+          }
         });
 
-    textField = new JTextArea();
-    textField.setWrapStyleWord(true);
-    textField.setRows(2);
+    textField = new RowLimitedTextArea(2, 10);
     textField.setLineWrap(true);
-    textField.setColumns(10);
+    textField.setWrapStyleWord(true);
     textField.setBorder(null);
     textField.setEditable(false);
     textField.addMouseListener(
         new MouseAdapter() {
           @Override
           public void mouseClicked(MouseEvent e) {
+            requestFocus();
+          }
+          @Override
+          public void mouseReleased(MouseEvent e) {
             requestFocus();
           }
         });
