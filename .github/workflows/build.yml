@@ -57,11 +57,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         if: ${{!github.event.pull_request.head.repo.fork}}
-        uses: GabrielBB/xvfb-action@v1
         with:
-          run: |
-            echo ${{ github.event.push.repository.fork }}
-            ./gradlew sonarqube --info
+          run: ./gradlew sonarqube --info
 
 
 
