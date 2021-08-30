@@ -9,10 +9,10 @@ on:
       - "**.xml"
       - ".github/workflows/*.yml"
     branches:
-    - master
+      - master
   pull_request:
     branches:
-    - master
+      - master
 jobs:
   fullbuild:
     runs-on: ubuntu-latest
@@ -20,7 +20,8 @@ jobs:
     name: Java 16 build
     steps:
       - uses: actions/checkout@v2
-
+        with:
+          fetch-depth: 0
       - name: Gradle cache
         uses: actions/cache@v2
         with:
@@ -52,15 +53,16 @@ jobs:
           run: ./gradlew build
 
       - name: Gradle SonarQube Scan
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         if: ${{!github.event.pull_request.head.repo.fork}}
         uses: GabrielBB/xvfb-action@v1
         with:
           run: |
             echo ${{ github.event.push.repository.fork }}
-            ./gradlew sonarqube
+            ./gradlew sonarqube --info
 
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
 
 
