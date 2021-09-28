@@ -1,4 +1,5 @@
 enableFeaturePreview("VERSION_CATALOGS")
+rootProject.name = "litiengine-root"
 
 pluginManagement {
     plugins {
