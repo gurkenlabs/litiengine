@@ -1,16 +1,16 @@
 package de.gurkenlabs.litiengine.gui;
 
+import de.gurkenlabs.litiengine.graphics.ShapeRenderer;
 import de.gurkenlabs.litiengine.input.Input;
-import java.awt.BasicStroke;
+import de.gurkenlabs.litiengine.util.MathUtilities;
 import java.awt.Graphics2D;
-import java.awt.Stroke;
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 
 public class VerticalSlider extends Slider {
+
   public static final FontIcon ARROW_DOWN = new FontIcon(ICON_FONT, "\uE804");
   public static final FontIcon ARROW_UP = new FontIcon(ICON_FONT, "\uE807");
-  private double minSliderY;
-  private double maxSliderY;
 
   public VerticalSlider(
       final double x,
@@ -25,69 +25,78 @@ public class VerticalSlider extends Slider {
 
   @Override
   public Point2D getRelativeSliderPosition() {
-    return new Point2D.Double(
-        this.getX(),
-        this.minSliderY
-            + this.getCurrentValue()
-                / (this.getMaxValue() - this.getMinValue())
-                * (this.maxSliderY - this.minSliderY));
-  }
-
-  @Override
-  public void render(final Graphics2D g) {
-    final Stroke oldStroke = g.getStroke();
-    g.setStroke(new BasicStroke((float) (this.getWidth() / 8)));
-    g.setColor(this.getAppearance().getForeColor());
-    g.drawLine(
-        (int) (this.getX() + this.getWidth() / 2),
-        (int) this.minSliderY,
-        (int) (this.getX() + this.getWidth() / 2),
-        (int) (this.getY() + this.getHeight() - this.getWidth()));
-    g.setStroke(oldStroke);
-    super.render(g);
-  }
-
-  @Override
-  public void setValueRelativeToMousePosition() {
-    final double mouseY = Input.mouse().getLocation().getY();
-    if (mouseY >= this.minSliderY && mouseY <= this.maxSliderY) {
-      final double relativeMouseX = mouseY - this.minSliderY;
-      final double percentage = relativeMouseX / (this.maxSliderY - this.minSliderY);
-      this.setCurrentValue(
-          (float) (this.getMinValue() + percentage * (this.getMaxValue() - this.getMinValue())));
+    try {
+      float frac = MathUtilities.clamp(
+          (getCurrentValue() - getMinValue()) / (getMaxValue() - getMinValue()), 0, 1);
+      int currentStep = (int) (frac * (getSteps() - 1));
+      return new Point2D.Double(getX(), getY() + currentStep * getSliderComponent().getHeight());
+    } catch (Exception e) {
+      return new Point2D.Double(0, 0);
     }
+  }
+
+
+  @Override
+  protected void updateSliderDimensions() {
+    getSliderComponent().setHeight(getHeight() / (getSteps()));
+  }
+
+  @Override
+  protected void renderBar(Graphics2D g) {
+    ShapeRenderer.renderOutline(g,
+        new Line2D.Double(getX() + getWidth() / 2d, getY(),
+            getX() + getWidth() / 2d, getY() + getHeight()),
+        (float) (getWidth() / 10f) * getTickSize());
+  }
+
+  @Override
+  protected void renderTicks(Graphics2D g) {
+    for (int i = 1; i < getSteps(); i++) {
+      ShapeRenderer.renderOutline(g,
+          new Line2D.Double(getX() + getWidth() / 2d - getTickSize() * getWidth() / 2d,
+              getY() + i * getHeight() / getSteps(),
+              getX() + getWidth() / 2d + getTickSize() * getWidth() / 2d,
+              getY() + i * getHeight() / getSteps()),
+          (float) (getWidth() / 200f * getTickSize()));
+    }
+  }
+
+  @Override
+  protected float getRelativeMouseValue() {
+    return (float) ((Input.mouse().getLocation().getY() - getY()) / getHeight());
   }
 
   @Override
   protected void initializeComponents() {
     super.initializeComponents();
-    this.setButton1(
+    setButton1(
         new ImageComponent(
-            this.getX(), this.getY(), this.getWidth(), this.getWidth(), ARROW_UP.getText()));
-    this.getButton1().setFont(ARROW_UP.getFont());
-    this.getButton1().setSpriteSheet(this.getButtonSpritesheet());
-    this.setButton2(
+            getX(),
+            getY() - getWidth(),
+            getWidth(),
+            getWidth(),
+            getButtonSpritesheet(),
+            ARROW_UP.getText(),
+            null));
+    getButton1().setFont(ARROW_UP.getFont());
+    setButton2(
         new ImageComponent(
-            this.getX(),
-            this.getY() + this.getHeight() - this.getWidth(),
-            this.getWidth(),
-            this.getWidth(),
-            ARROW_DOWN.getText()));
-    this.getButton2().setFont(ARROW_DOWN.getFont());
-    this.getButton2().setSpriteSheet(this.getButtonSpritesheet());
-
-    final double sliderHeight = (this.getHeight() - this.getWidth() * 2) * 1 / 6.0;
-    this.minSliderY = this.getY() + this.getWidth();
-    this.maxSliderY = this.getY() + this.getHeight() - (this.getWidth() + sliderHeight);
-    this.setSliderComponent(
+            getX(),
+            getY() + getHeight(),
+            getWidth(),
+            getWidth(),
+            getButtonSpritesheet(),
+            ARROW_DOWN.getText(),
+            null));
+    getButton2().setFont(ARROW_DOWN.getFont());
+    setSliderComponent(
         new ImageComponent(
-            this.getRelativeSliderPosition().getX(),
-            this.getRelativeSliderPosition().getY(),
-            this.getWidth(),
-            sliderHeight,
-            this.getSliderSpritesheet(),
+            getRelativeSliderPosition().getX(),
+            getRelativeSliderPosition().getY(),
+            getWidth(),
+            getWidth() * 2,
+            getSliderSpritesheet(),
             "",
             null));
-    this.getSliderComponent().setSpriteSheet(this.getSliderSpritesheet());
   }
 }
