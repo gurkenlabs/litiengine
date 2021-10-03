@@ -15,7 +15,8 @@ pluginManagement {
 
 dependencyResolutionManagement {
     versionCatalogs {
-        fun VersionCatalogBuilder.versionId(id: String) = version(id, extra["$id.version"].toString())
+        fun VersionCatalogBuilder.versionId(id: String) =
+            version(id, extra["$id.version"].toString())
         create("libs") {
             versionId("darklaf")
             versionId("jinput")
@@ -49,7 +50,12 @@ dependencyResolutionManagement {
                 .versionRef("soundlibs.mp3spi")
             bundle(
                 "soundlibs",
-                listOf("soundlibs-jorbis", "soundlibs-tritonus", "soundlibs-vorbisspi", "soundlibs-mp3spi")
+                listOf(
+                    "soundlibs-jorbis",
+                    "soundlibs-tritonus",
+                    "soundlibs-vorbisspi",
+                    "soundlibs-mp3spi"
+                )
             )
 
             alias("steamworks").to("com.code-disaster.steamworks4j", "steamworks4j")
