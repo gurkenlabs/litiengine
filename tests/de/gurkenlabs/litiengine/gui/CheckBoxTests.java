@@ -6,9 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
-public class CheckBoxTests {
+class CheckBoxTests {
   @Test
-  public void testSetChecked() {
+  void testSetChecked() {
     // arrange
     CheckBox box = new CheckBox(1, 2, 3, 4, null, false);
 
@@ -24,7 +24,7 @@ public class CheckBoxTests {
   }
 
   @Test
-  public void testSetUnchecked() {
+  void testSetUnchecked() {
     // arrange
     CheckBox box = new CheckBox(1, 2, 3, 4, null, true);
 

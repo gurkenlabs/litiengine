@@ -35,7 +35,7 @@ class AbilityTests {
   }
 
   @Test
-  public void isOnCooldownNoCurrentExecution() {
+  void isOnCooldownNoCurrentExecution() {
     // arrange
     TestAbility ability = setupAbility();
 
@@ -49,7 +49,7 @@ class AbilityTests {
   }
 
   @Test
-  public void isOnCooldownCurrentExecutionOver() {
+  void isOnCooldownCurrentExecutionOver() {
     // arrange
     TestAbility ability = setupAbility();
 
@@ -65,7 +65,7 @@ class AbilityTests {
   }
 
   @Test
-  public void isOnCooldownCooldownOver() {
+  void isOnCooldownCooldownOver() {
     // arrange
     TestAbility ability = setupAbility();
 
@@ -82,7 +82,7 @@ class AbilityTests {
   }
 
   @Test
-  public void isOnCooldownStillOnCooldown() {
+  void isOnCooldownStillOnCooldown() {
     // arrange
     TestAbility ability = setupAbility();
 
@@ -125,7 +125,7 @@ class AbilityTests {
   }
 
   @Test
-  public void testGetRemainingCooldownInSeconds_returnTime() {
+  void testGetRemainingCooldownInSeconds_returnTime() {
     Creature creature = mock(Creature.class);
     TestAbility ability = new TestAbility(creature);
     ability.canCast();
@@ -142,7 +142,7 @@ class AbilityTests {
   }
 
   @Test
-  public void testGetRemainingCooldownInSeconds_returnZero() {
+  void testGetRemainingCooldownInSeconds_returnZero() {
     Creature creature = mock(Creature.class);
     TestAbility ability = new TestAbility(creature);
     ability.canCast();
@@ -345,7 +345,7 @@ class AbilityTests {
   }
 
   @Test
-  public void testRender() {
+  void testRender() {
     // arrange
     TestAbility ability = new TestAbility(new Creature());
     Graphics2D graphics = mock(Graphics2D.class);
@@ -555,7 +555,7 @@ class AbilityTests {
   }
 
   @Test
-  public void testOnEffectApplied() {
+  void testOnEffectApplied() {
     Effect.EffectAppliedListener listener;
     Effect effect;
     Ability ability = new TestAbility(new Creature());
@@ -568,7 +568,7 @@ class AbilityTests {
   }
 
   @Test
-  public void testOnEffectCeased() {
+  void testOnEffectCeased() {
     Effect.EffectCeasedListener listener;
     Effect effect;
     Ability ability = new TestAbility(new Creature());

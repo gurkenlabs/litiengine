@@ -2,12 +2,11 @@ import java.util.Calendar
 
 plugins {
     `java-library`
-    application
     id("org.beryx.runtime")
 }
 
 description = """
-    UTILITI is the editor for the open source Java 2D Game Engine LITIENGINE
+    utiLITI is the official project / asset manager and map editor for the open source Java 2D Game Engine LITIENGINE.
 """.trimIndent()
 
 sourceSets {

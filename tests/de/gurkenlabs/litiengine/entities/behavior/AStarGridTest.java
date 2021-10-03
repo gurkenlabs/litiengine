@@ -8,7 +8,7 @@ import java.awt.geom.Rectangle2D;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class AStarGridTest {
+class AStarGridTest {
   private Rectangle2D rectangle;
   private AStarGrid aStarGrid;
   private AStarNode node;
@@ -23,7 +23,7 @@ public class AStarGridTest {
   }
 
   @Test
-  public void testUpdateWalkable() {
+  void testUpdateWalkable() {
     verify(rectangle, times(0)).intersects(rectangle);
   }
 }

@@ -13,7 +13,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class ArrayUtilitiesTests {
+class ArrayUtilitiesTests {
 
   @BeforeEach
   public void setup() {
@@ -21,7 +21,7 @@ public class ArrayUtilitiesTests {
   }
 
   @Test
-  public void testByteArrayConcat() {
+  void testByteArrayConcat() {
     byte[] arr1 = new byte[] {1, 2, 3, 4, 5};
     byte[] arr2 = new byte[] {6, 7, 8, 9};
 
@@ -31,7 +31,7 @@ public class ArrayUtilitiesTests {
   }
 
   @Test
-  public void testIntArrayConcat() {
+  void testIntArrayConcat() {
     int[] arr1 = new int[] {1, 2, 3, 4, 5};
     int[] arr2 = new int[] {6, 7, 8, 9};
 
@@ -41,7 +41,7 @@ public class ArrayUtilitiesTests {
   }
 
   @Test
-  public void testLongArrayConcat() {
+  void testLongArrayConcat() {
     long[] arr1 = new long[] {1, 2, 3, 4, 5};
     long[] arr2 = new long[] {6, 7, 8, 9};
 
@@ -51,7 +51,7 @@ public class ArrayUtilitiesTests {
   }
 
   @Test
-  public void testDoubleArrayConcat() {
+  void testDoubleArrayConcat() {
     double[] arr1 = new double[] {1.0, 2.0, 3.0, 4.0, 5.0};
     double[] arr2 = new double[] {6.0, 7.0, 8.0, 9.0};
 
@@ -61,7 +61,7 @@ public class ArrayUtilitiesTests {
   }
 
   @Test
-  public void testTArrayConcat() {
+  void testTArrayConcat() {
     Integer[] arr1 = {1, 2, 3, 4, 5};
     Integer[] arr2 = {6, 7, 8, 9};
 
@@ -71,7 +71,7 @@ public class ArrayUtilitiesTests {
   }
 
   @Test
-  public void testIntegerArrayFromCommaSeparatedString() {
+  void testIntegerArrayFromCommaSeparatedString() {
     String testStringWithInts = "100,200,300,1,2,3";
     String testStringWithoutInts = "paslikodja,2asdasd,sadasd";
     String testNull = null;
@@ -92,7 +92,7 @@ public class ArrayUtilitiesTests {
   }
 
   @Test
-  public void testDoubleArrayFromCommaSeparatedString() {
+  void testDoubleArrayFromCommaSeparatedString() {
     String testStringWithDoubles = "100.1,200.2,300.3,1.4,2.5,3.6";
     String testStringWithoutDoubles = "paslikodja,2asdasd,sadasd";
     String testNull = null;
@@ -113,181 +113,181 @@ public class ArrayUtilitiesTests {
   }
 
   @Test
-  public void testCommaSeparatedStringFromIntegerArray() {
+  void testCommaSeparatedStringFromIntegerArray() {
     int[] intsArr = new int[] {100, 200, 300, 1, 2, 3};
     String testStringWithInts = ArrayUtilities.join(intsArr);
     assertEquals("100,200,300,1,2,3", testStringWithInts);
   }
 
   @Test
-  public void testCommaSeparatedStringFromIntegerArrayEmpty() {
+  void testCommaSeparatedStringFromIntegerArrayEmpty() {
     String testEmpty = ArrayUtilities.join(new int[] {});
     assertEquals("", testEmpty);
   }
 
   @Test
-  public void testCommaSeparatedStringFromIntegerArrayDelimiter() {
+  void testCommaSeparatedStringFromIntegerArrayDelimiter() {
     int[] intsArr = new int[] {100, 200, 300, 1, 2, 3};
     String testStringWithIntsDelimiter = ArrayUtilities.join(intsArr, ";");
     assertEquals("100;200;300;1;2;3", testStringWithIntsDelimiter);
   }
 
   @Test
-  public void testCommaSeparatedStringFromBooleanArray() {
+  void testCommaSeparatedStringFromBooleanArray() {
     boolean[] boolArr = new boolean[] {true, false, true};
     String testStringWithBool = ArrayUtilities.join(boolArr);
     assertEquals("true,false,true", testStringWithBool);
   }
 
   @Test
-  public void testCommaSeparatedStringFromBooleanEmpty() {
+  void testCommaSeparatedStringFromBooleanEmpty() {
     String testEmpty = ArrayUtilities.join(new boolean[] {});
     assertEquals("", testEmpty);
   }
 
   @Test
-  public void testCommaSeparatedStringFromBooleanArrayDelimiter() {
+  void testCommaSeparatedStringFromBooleanArrayDelimiter() {
     boolean[] boolArr = new boolean[] {true, false, true};
     String testStringWithBoolDelimiter = ArrayUtilities.join(boolArr, ";");
     assertEquals("true;false;true", testStringWithBoolDelimiter);
   }
 
   @Test
-  public void testCommaSeparatedStringFromDoubleArray() {
+  void testCommaSeparatedStringFromDoubleArray() {
     double[] doubleArr = new double[] {100.0, 200.0, 300.0, 1.0, 2.0, 3.0};
     String testStringWithDouble = ArrayUtilities.join(doubleArr);
     assertEquals("100.0,200.0,300.0,1.0,2.0,3.0", testStringWithDouble);
   }
 
   @Test
-  public void testCommaSeparatedStringFromDoubleArrayEmpty() {
+  void testCommaSeparatedStringFromDoubleArrayEmpty() {
     String testEmpty = ArrayUtilities.join(new double[] {});
     assertEquals("", testEmpty);
   }
 
   @Test
-  public void testCommaSeparatedStringFromDoubleArrayDelimiter() {
+  void testCommaSeparatedStringFromDoubleArrayDelimiter() {
     double[] doubleArr = new double[] {100.0, 200.0, 300.0, 1.0, 2.0, 3.0};
     String testStringWithDoubleDelimiter = ArrayUtilities.join(doubleArr, ";");
     assertEquals("100.0;200.0;300.0;1.0;2.0;3.0", testStringWithDoubleDelimiter);
   }
 
   @Test
-  public void testCommaSeparatedStringFromFloatArray() {
+  void testCommaSeparatedStringFromFloatArray() {
     float[] floatArr = new float[] {100.0f, 200.0f, 300.0f, 1.0f, 2.0f, 3.0f};
     String testStringWithFloat = ArrayUtilities.join(floatArr);
     assertEquals("100.0,200.0,300.0,1.0,2.0,3.0", testStringWithFloat);
   }
 
   @Test
-  public void testCommaSeparatedStringFromFloatArrayEmpty() {
+  void testCommaSeparatedStringFromFloatArrayEmpty() {
     String testEmpty = ArrayUtilities.join(new double[] {});
     assertEquals("", testEmpty);
   }
 
   @Test
-  public void testCommaSeparatedStringFromFloatArrayDelimiter() {
+  void testCommaSeparatedStringFromFloatArrayDelimiter() {
     float[] floatArr = new float[] {100.0f, 200.0f, 300.0f, 1.0f, 2.0f, 3.0f};
     String testStringWithFloatDelimiter = ArrayUtilities.join(floatArr, ";");
     assertEquals("100.0;200.0;300.0;1.0;2.0;3.0", testStringWithFloatDelimiter);
   }
 
   @Test
-  public void testCommaSeparatedStringFromStringArray() {
+  void testCommaSeparatedStringFromStringArray() {
     String[] stringArr = new String[] {"test", "test2", "test3"};
     String testStringWithString = ArrayUtilities.join(stringArr);
     assertEquals("test,test2,test3", testStringWithString);
   }
 
   @Test
-  public void testCommaSeparatedStringFromStringArrayEmpty() {
+  void testCommaSeparatedStringFromStringArrayEmpty() {
     String testEmpty = ArrayUtilities.join(new String[] {});
     assertEquals("", testEmpty);
   }
 
   @Test
-  public void testCommaSeparatedStringFromStringArrayDelimiter() {
+  void testCommaSeparatedStringFromStringArrayDelimiter() {
     String[] stringArr = new String[] {"test", "test2", "test3"};
     String testStringWithStringDelimiter = ArrayUtilities.join(stringArr, ";");
     assertEquals("test;test2;test3", testStringWithStringDelimiter);
   }
 
   @Test
-  public void testCommaSeparatedStringFromShortArray() {
+  void testCommaSeparatedStringFromShortArray() {
     short[] shortArr = new short[] {100, 200, 300, 1, 2, 3};
     String testStringWithShort = ArrayUtilities.join(shortArr);
     assertEquals("100,200,300,1,2,3", testStringWithShort);
   }
 
   @Test
-  public void testCommaSeparatedStringFromShortArrayEmpty() {
+  void testCommaSeparatedStringFromShortArrayEmpty() {
     String testEmpty = ArrayUtilities.join(new short[] {});
     assertEquals("", testEmpty);
   }
 
   @Test
-  public void testCommaSeparatedStringFromShortArrayDelimiter() {
+  void testCommaSeparatedStringFromShortArrayDelimiter() {
     short[] shortArr = new short[] {100, 200, 300, 1, 2, 3};
     String testStringWithShortDelimiter = ArrayUtilities.join(shortArr, ";");
     assertEquals("100;200;300;1;2;3", testStringWithShortDelimiter);
   }
 
   @Test
-  public void testCommaSeparatedStringFromLongArray() {
+  void testCommaSeparatedStringFromLongArray() {
     long[] longArr = new long[] {100, 200, 300, 1, 2, 3};
     String testStringWithLong = ArrayUtilities.join(longArr);
     assertEquals("100,200,300,1,2,3", testStringWithLong);
   }
 
   @Test
-  public void testCommaSeparatedStringFromLongArrayEmpty() {
+  void testCommaSeparatedStringFromLongArrayEmpty() {
     long[] longArr = new long[] {100, 200, 300, 1, 2, 3};
     String testStringWithLongDelimiter = ArrayUtilities.join(longArr, ";");
     assertEquals("100;200;300;1;2;3", testStringWithLongDelimiter);
   }
 
   @Test
-  public void testCommaSeparatedStringFromLongArrayDelimiter() {
+  void testCommaSeparatedStringFromLongArrayDelimiter() {
     long[] longArr = new long[] {100, 200, 300, 1, 2, 3};
     String testStringWithLongDelimiter = ArrayUtilities.join(longArr, ";");
     assertEquals("100;200;300;1;2;3", testStringWithLongDelimiter);
   }
 
   @Test
-  public void testCommaSeparatedStringFromByteArray() {
+  void testCommaSeparatedStringFromByteArray() {
     byte[] byteArr = new byte[] {100, 127, -128, 1, 2, 3};
     String testStringWithByte = ArrayUtilities.join(byteArr);
     assertEquals("100,127,-128,1,2,3", testStringWithByte);
   }
 
   @Test
-  public void testCommaSeparatedStringFromByteArrayEmpty() {
+  void testCommaSeparatedStringFromByteArrayEmpty() {
     String testEmpty = ArrayUtilities.join(new byte[] {});
     assertEquals("", testEmpty);
   }
 
   @Test
-  public void testCommaSeparatedStringFromByteArrayDelimiter() {
+  void testCommaSeparatedStringFromByteArrayDelimiter() {
     byte[] byteArr = new byte[] {100, 127, -128, 1, 2, 3};
     String testStringWithByteDelimiter = ArrayUtilities.join(byteArr, ";");
     assertEquals("100;127;-128;1;2;3", testStringWithByteDelimiter);
   }
 
   @Test
-  public void testCommaSeparatedStringFromCollectionArray() {
+  void testCommaSeparatedStringFromCollectionArray() {
     List<String> collectionArr = Arrays.asList("test", "test2", "test3");
     String testStringWithCollectionDelimiter = ArrayUtilities.join(collectionArr, ";");
     assertEquals("test;test2;test3", testStringWithCollectionDelimiter);
   }
 
   @Test
-  public void testCommaSeparatedStringFromCollectionArrayEmpty() {
+  void testCommaSeparatedStringFromCollectionArrayEmpty() {
     String testEmpty = ArrayUtilities.join(new String[] {});
     assertEquals("", testEmpty);
   }
 
   @Test
-  public void testCommaSeparatedStringFromCollectionArrayDelimiter() {
+  void testCommaSeparatedStringFromCollectionArrayDelimiter() {
     List<String> collectionArr = Arrays.asList("test", "test2", "test3");
     String testStringWithCollectionDelimiter = ArrayUtilities.join(collectionArr, ";");
     assertEquals("test;test2;test3", testStringWithCollectionDelimiter);
@@ -295,7 +295,7 @@ public class ArrayUtilitiesTests {
 
   @ParameterizedTest
   @MethodSource("getArray")
-  public void testTwoDimensionalArrayToList(List<Integer> expectedValue) {
+  void testTwoDimensionalArrayToList(List<Integer> expectedValue) {
     Integer[][] arr =
         new Integer[][] {
           {
@@ -320,7 +320,7 @@ public class ArrayUtilitiesTests {
   }
 
   @Test
-  public void testAppend() {
+  void testAppend() {
     Integer[] test = new Integer[] {1, 2, 3, 4, 5};
     Integer[] result = ArrayUtilities.append(test, 6);
 
@@ -328,7 +328,7 @@ public class ArrayUtilitiesTests {
   }
 
   @Test
-  public void testDistinct() {
+  void testDistinct() {
     Integer[] first = new Integer[] {1, 2, 3, 4, 5};
     Integer[] second = new Integer[] {1, 2, 3, 4, 5, 6};
     Integer[] result = ArrayUtilities.distinct(first, second);
@@ -338,7 +338,7 @@ public class ArrayUtilitiesTests {
 
   @ParameterizedTest
   @MethodSource("getContains")
-  public void testContains(Object[] array, Object value, Boolean expected) {
+  void testContains(Object[] array, Object value, Boolean expected) {
     assertEquals(expected, ArrayUtilities.contains(array, value));
   }
 
@@ -353,8 +353,7 @@ public class ArrayUtilitiesTests {
 
   @ParameterizedTest
   @MethodSource("getContainsString")
-  public void testContainsString(
-      String[] string, String argument, Boolean ignoreCase, Boolean expected) {
+  void testContainsString(String[] string, String argument, Boolean ignoreCase, Boolean expected) {
     assertEquals(expected, ArrayUtilities.contains(string, argument, ignoreCase));
   }
 
@@ -374,7 +373,7 @@ public class ArrayUtilitiesTests {
   }
 
   @Test
-  public void testRemove() {
+  void testRemove() {
     Integer[] test = new Integer[] {1, 2, 3, 4, 5};
     Integer[] result = ArrayUtilities.remove(test, 6);
 

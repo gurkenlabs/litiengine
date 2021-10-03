@@ -11,9 +11,9 @@ import de.gurkenlabs.litiengine.util.Imaging;
 import java.awt.image.BufferedImage;
 import org.junit.jupiter.api.Test;
 
-public class CodecTests {
+class CodecTests {
   @Test
-  public void testSmallFloatEncodingMax() {
+  void testSmallFloatEncodingMax() {
     final float small = 6553.41254F;
 
     final short encoded = Codec.encodeSmallFloatingPointNumber(small, 1);
@@ -23,7 +23,7 @@ public class CodecTests {
   }
 
   @Test
-  public void testSmallFloatEncodingMin() {
+  void testSmallFloatEncodingMin() {
     final float small = 0F;
 
     final short encoded = Codec.encodeSmallFloatingPointNumber(small, 1);
@@ -33,7 +33,7 @@ public class CodecTests {
   }
 
   @Test
-  public void testSmallFloatEncodingNegative() {
+  void testSmallFloatEncodingNegative() {
     final float small = -1;
 
     assertThrows(
@@ -41,14 +41,14 @@ public class CodecTests {
   }
 
   @Test
-  public void testSmallFloatEncodingTooLarge() {
+  void testSmallFloatEncodingTooLarge() {
     final float small = 6553.51254F;
     assertThrows(
         IllegalArgumentException.class, () -> Codec.encodeSmallFloatingPointNumber(small, 2));
   }
 
   @Test
-  public void testAngleEncoding() {
+  void testAngleEncoding() {
     final float angle = 99.99999F;
     final float angle2 = -1F;
 
@@ -67,9 +67,8 @@ public class CodecTests {
   }
 
   @Test
-  public void testImageCodec() {
-    BufferedImage image =
-        Resources.images().get("de/gurkenlabs/litiengine/util/prop-flag.png");
+  void testImageCodec() {
+    BufferedImage image = Resources.images().get("de/gurkenlabs/litiengine/util/prop-flag.png");
 
     String encodedImage = Codec.encode(image);
     BufferedImage decodedImage = Codec.decodeImage(encodedImage);

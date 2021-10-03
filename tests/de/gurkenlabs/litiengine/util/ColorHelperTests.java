@@ -12,10 +12,10 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class ColorHelperTests {
+class ColorHelperTests {
 
   @Test
-  public void testMalformedColorHexString() {
+  void testMalformedColorHexString() {
     Logger.getLogger(ColorHelper.class.getName()).setUseParentHandlers(false);
 
     String red = "~#ff0000";
@@ -28,7 +28,7 @@ public class ColorHelperTests {
 
   @ParameterizedTest
   @MethodSource("getColorFromHexString")
-  public void testColorFromHexString(String colorHex, Color expectedColor) {
+  void testColorFromHexString(String colorHex, Color expectedColor) {
     Color colorDecoded = ColorHelper.decode(colorHex);
     assertEquals(expectedColor, colorDecoded);
   }
@@ -41,7 +41,7 @@ public class ColorHelperTests {
   }
 
   @Test
-  public void testRedFromAlphaHexString() {
+  void testRedFromAlphaHexString() {
     String red200 = "#c8ff0000";
 
     Color redDecoded = ColorHelper.decode(red200);
@@ -51,7 +51,7 @@ public class ColorHelperTests {
   }
 
   @Test
-  public void testGreenFromAlphaHexString() {
+  void testGreenFromAlphaHexString() {
     String red200 = "#c8ff0000";
 
     Color redDecoded = ColorHelper.decode(red200);
@@ -61,7 +61,7 @@ public class ColorHelperTests {
   }
 
   @Test
-  public void testBlueFromAlphaHexString() {
+  void testBlueFromAlphaHexString() {
     String red200 = "#c8ff0000";
 
     Color redDecoded = ColorHelper.decode(red200);
@@ -71,7 +71,7 @@ public class ColorHelperTests {
   }
 
   @Test
-  public void testAlphaFromAlphaHexString() {
+  void testAlphaFromAlphaHexString() {
     String red200 = "#c8ff0000";
 
     Color redDecoded = ColorHelper.decode(red200);
@@ -82,7 +82,7 @@ public class ColorHelperTests {
 
   @ParameterizedTest
   @MethodSource("getSolidColorFromAlphaHexString")
-  public void testSolidColorFromAlphaHexString(String color, Boolean isSolid, Color solidColor) {
+  void testSolidColorFromAlphaHexString(String color, Boolean isSolid, Color solidColor) {
     Color colorDecoded = ColorHelper.decode(color, isSolid);
     assertEquals(solidColor, colorDecoded);
   }
@@ -98,7 +98,7 @@ public class ColorHelperTests {
 
   @ParameterizedTest
   @MethodSource("getHexStringWithoutHashtag")
-  public void testHexStringWithoutHashtag(String color, Color expectedColor) {
+  void testHexStringWithoutHashtag(String color, Color expectedColor) {
     Color colorDecoded = ColorHelper.decode(color);
     assertEquals(expectedColor, colorDecoded);
   }
@@ -112,7 +112,7 @@ public class ColorHelperTests {
   }
 
   @Test
-  public void testEncodeColor() {
+  void testEncodeColor() {
     String redEncoded = ColorHelper.encode(Color.RED);
     String greenEncoded = ColorHelper.encode(Color.GREEN);
     String blueEncoded = ColorHelper.encode(Color.BLUE);
@@ -126,7 +126,7 @@ public class ColorHelperTests {
   }
 
   @Test
-  public void testEncodeAlphaColor() {
+  void testEncodeAlphaColor() {
     String redEncoded = ColorHelper.encode(new Color(255, 0, 0, 200));
     String greenEncoded = ColorHelper.encode(new Color(0, 255, 0, 200));
     String blueEncoded = ColorHelper.encode(new Color(0, 0, 255, 200));
@@ -144,7 +144,7 @@ public class ColorHelperTests {
     "Max, 255, 255",
     "OutOfRange, 300, 255"
   })
-  public void testRgbBounds(String rgbBound, int colorValue, int expectedRgb) {
+  void testRgbBounds(String rgbBound, int colorValue, int expectedRgb) {
     // arrange, act
     int actualRgb = ColorHelper.ensureColorValueRange(colorValue);
 
@@ -153,7 +153,7 @@ public class ColorHelperTests {
   }
 
   @Test
-  public void testPremultiply() {
+  void testPremultiply() {
     Color color = new Color(225, 0, 0);
     assertEquals(new Color(225, 0, 0), ColorHelper.premultiply(color));
   }

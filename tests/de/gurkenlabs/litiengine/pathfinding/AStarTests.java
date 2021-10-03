@@ -55,7 +55,7 @@ public class AStarTests {
 
   @ParameterizedTest(name = "testGetCostsSimpleDirections: {0}, expectedCost={2}")
   @MethodSource("getCostsSimpleDirectionsArguments")
-  public void testGetCostsSimpleDirections(String name, AStarNode remoteNode, double expectedCost) {
+  void testGetCostsSimpleDirections(String name, AStarNode remoteNode, double expectedCost) {
     // arrange
     AStarNode originNode = new AStarNode(false, new Rectangle(50, 50, 10, 10), 5, 5);
 
@@ -83,7 +83,7 @@ public class AStarTests {
 
   @ParameterizedTest(name = "testGetCostsAdvancedDirections: {0}")
   @MethodSource("getCostsAdvancedDirectionsArguments")
-  public void testGetCostsAdvancedDirections(String name, AStarNode remoteNode) {
+  void testGetCostsAdvancedDirections(String name, AStarNode remoteNode) {
     // arrange
     AStarNode originNode = new AStarNode(false, new Rectangle(50, 50, 10, 10), 5, 5);
 
@@ -110,7 +110,7 @@ public class AStarTests {
   }
 
   @Test
-  public void testGridPopulation() {
+  void testGridPopulation() {
     Game.init(Game.COMMANDLINE_ARG_NOGUI);
     AStarGrid grid = new AStarGrid(320, 240, 4);
 
@@ -129,7 +129,7 @@ public class AStarTests {
   }
 
   @Test
-  public void testGetNeighbors() {
+  void testGetNeighbors() {
     Game.init(Game.COMMANDLINE_ARG_NOGUI);
     AStarGrid grid = new AStarGrid(320, 240, 4);
 

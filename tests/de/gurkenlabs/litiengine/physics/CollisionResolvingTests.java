@@ -17,7 +17,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class CollisionResolvingTests {
+class CollisionResolvingTests {
   final double EPSILON = 1e-6;
   final double MOVE_10X10Y_DISTANCE = 14.14213562373095; // = root of 200 because 10² + 10² = 200
 
@@ -33,7 +33,7 @@ public class CollisionResolvingTests {
 
   @ParameterizedTest(name = "testBasicMove: {0}")
   @MethodSource("supplyBasicMoveParameters")
-  public void testBasicMove(String direction, int angle, int distance, int targetX, int targetY) {
+  void testBasicMove(String direction, int angle, int distance, int targetX, int targetY) {
     // arrange
     Creature ent = getNewCreature(); // pos: (10,10)
     Game.physics().add(ent);
@@ -48,7 +48,7 @@ public class CollisionResolvingTests {
 
   @ParameterizedTest(name = "testCollidingMoveBlock: {0}")
   @MethodSource("supplyCollidingMoveBlockParameters")
-  public void testCollidingMoveBlock(
+  void testCollidingMoveBlock(
       String direction,
       CollisionBox collisionBox,
       int angle,
@@ -74,7 +74,7 @@ public class CollisionResolvingTests {
 
   @ParameterizedTest(name = "testCollidingMoveSlide: {0}")
   @MethodSource("supplyCollidingMoveSlideParameters")
-  public void testCollidingMoveSlide(
+  void testCollidingMoveSlide(
       String direction, CollisionBox collisionBox, int angle, int targetX, int targetY) {
     // arrange
     Creature ent = getNewCreature(); // pos: (10,10), w/h: 10/10
@@ -94,7 +94,7 @@ public class CollisionResolvingTests {
   }
 
   @Test
-  public void testCollidingMoveSlideDown() {
+  void testCollidingMoveSlideDown() {
     // arrange
     Creature ent = getNewCreature(); // pos: (10,10), w/h: 10/10
     Game.physics().add(ent);
@@ -118,7 +118,7 @@ public class CollisionResolvingTests {
   }
 
   @Test
-  public void testCollisionWithCorner_passingThroughIfFree() {
+  void testCollisionWithCorner_passingThroughIfFree() {
     // arrange
     Creature ent = getNewCreature(); // pos: (10,10), w/h: 10/10
     Game.physics().add(ent);
@@ -138,7 +138,7 @@ public class CollisionResolvingTests {
   }
 
   @Test
-  public void testCollisionWithCorner_slideIfBlocked() {
+  void testCollisionWithCorner_slideIfBlocked() {
     // arrange
     Creature ent = getNewCreature(); // pos: (10,10), w/h: 10/10
     Game.physics().add(ent);
@@ -160,7 +160,7 @@ public class CollisionResolvingTests {
   }
 
   @Test
-  public void testMultipleIntersection() {
+  void testMultipleIntersection() {
     // arrange
     Creature ent = getNewCreature(); // pos: (10,10), w/h: 10/10
     Game.physics().add(ent);
@@ -200,8 +200,7 @@ public class CollisionResolvingTests {
     "270.0d, 20.0d, -10.0d",
     "90.0d, 50.0d, 30.0d",
   })
-  public void testCollisionWithMapBounds_xCoordinate(
-      double angle, double distance, double expectedX) {
+  void testCollisionWithMapBounds_xCoordinate(double angle, double distance, double expectedX) {
     Creature ent = getNewCreature();
     ent.setWidth(30);
     ent.setHeight(30);
@@ -221,8 +220,7 @@ public class CollisionResolvingTests {
     "180.0d, 20.0d, -10.0d",
     "0, 50.0d, 30.0d",
   })
-  public void testCollisionWithMapBounds_yCoordinate(
-      double angle, double distance, double expectedY) {
+  void testCollisionWithMapBounds_yCoordinate(double angle, double distance, double expectedY) {
     Creature ent = getNewCreature();
     ent.setWidth(30);
     ent.setHeight(30);

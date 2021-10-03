@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class AlignTests {
+class AlignTests {
   private Align alignObject;
 
   @BeforeEach
@@ -14,7 +14,7 @@ public class AlignTests {
   }
 
   @Test
-  public void getLocation_OnPoint() {
+  void getLocation_OnPoint() {
     // act
     double onPointLocation = alignObject.getLocation(1.0, 1.0);
 
@@ -23,7 +23,7 @@ public class AlignTests {
   }
 
   @Test
-  public void getLocation_OffPoint() {
+  void getLocation_OffPoint() {
     // act
     double offPointLocation = alignObject.getLocation(1.0, 1.1);
 
@@ -32,7 +32,7 @@ public class AlignTests {
   }
 
   @Test
-  public void getLocation_InPoint() {
+  void getLocation_InPoint() {
     // act
     double inPointLocation = alignObject.getLocation(1.0, 5.0);
 
@@ -41,7 +41,7 @@ public class AlignTests {
   }
 
   @Test
-  public void getLocation_OutPoint() {
+  void getLocation_OutPoint() {
     // act
     double outPointLocation = alignObject.getLocation(1.0, 0.5);
 

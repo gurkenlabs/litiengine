@@ -152,7 +152,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   @Override
   public float[] getTweenValues(TweenType tweenType) {
     if (tweenType == TweenType.HITPOINTS) {
-      return new float[] {(float) this.getHitPoints().get()};
+      return new float[] {getHitPoints().get()};
     }
     return super.getTweenValues(tweenType);
   }
@@ -160,7 +160,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   @Override
   public void setTweenValues(TweenType tweenType, float[] newValues) {
     if (tweenType == TweenType.HITPOINTS) {
-      this.getHitPoints().setBaseValue(Math.round(newValues[0]));
+      getHitPoints().setBaseValue(Math.round(newValues[0]));
     } else {
       super.setTweenValues(tweenType, newValues);
     }

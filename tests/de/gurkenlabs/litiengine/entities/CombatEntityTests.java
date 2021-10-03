@@ -43,7 +43,7 @@ class CombatEntityTests {
   }
 
   @Test
-  public void testDieIsDead() {
+  void testDieIsDead() {
     // arrange
     when(combatEntitySpy.isDead()).thenReturn(true);
     verify(combatEntitySpy, times(1)).isDead(); // apparently when() counts as interaction
@@ -57,7 +57,7 @@ class CombatEntityTests {
   }
 
   @Test
-  public void testDieIsAlive() {
+  void testDieIsAlive() {
     // arrange
     when(combatEntitySpy.isDead()).thenReturn(false);
     verify(combatEntitySpy, times(1)).isDead(); // apparently when() counts as interaction
@@ -72,7 +72,7 @@ class CombatEntityTests {
   }
 
   @Test
-  public void testGetHitBox() {
+  void testGetHitBox() {
     // arrange
     when(combatEntitySpy.getX()).thenReturn(5d);
     when(combatEntitySpy.getY()).thenReturn(10d);
@@ -87,7 +87,7 @@ class CombatEntityTests {
   }
 
   @Test
-  public void testGetTweenValuesHitPoints() {
+  void testGetTweenValuesHitPoints() {
     // act
     float[] tweenValues = combatEntitySpy.getTweenValues(TweenType.HITPOINTS);
 
@@ -97,7 +97,7 @@ class CombatEntityTests {
   }
 
   @Test
-  public void testGetTweenValuesOtherType() {
+  void testGetTweenValuesOtherType() {
     // arrange
     combatEntitySpy.setCollisionBoxHeight(42d);
     combatEntitySpy.setCollisionBoxWidth(42d);
@@ -112,7 +112,7 @@ class CombatEntityTests {
   }
 
   @Test
-  public void testSetTweenValuesHitPoints() {
+  void testSetTweenValuesHitPoints() {
     // arrange
     float[] newValues = {42.3f, 1f, 99f};
     RangeAttribute<Integer> hitPointsMock = mock(RangeAttribute.class);
@@ -127,7 +127,7 @@ class CombatEntityTests {
   }
 
   @Test
-  public void testSetTweenValuesOtherType() {
+  void testSetTweenValuesOtherType() {
     // arrange
     float[] newValues = {42.3f, 1f, 99f};
 
@@ -141,7 +141,7 @@ class CombatEntityTests {
   }
 
   @Test
-  public void testHitWithoutAbilityDelegates() {
+  void testHitWithoutAbilityDelegates() {
     // act
     combatEntitySpy.hit(9000);
 
@@ -200,7 +200,7 @@ class CombatEntityTests {
   }
 
   @Test
-  public void testIsFriendlySameTeam() {
+  void testIsFriendlySameTeam() {
     // arrange
     combatEntitySpy.setTeam(5);
     ICombatEntity friendlyEntity = mock(ICombatEntity.class);
@@ -211,7 +211,7 @@ class CombatEntityTests {
   }
 
   @Test
-  public void testIsFriendlyOtherTeam() {
+  void testIsFriendlyOtherTeam() {
     // arrange
     combatEntitySpy.setTeam(5);
     ICombatEntity enemyEntity = mock(ICombatEntity.class);
@@ -222,7 +222,7 @@ class CombatEntityTests {
   }
 
   @Test
-  public void testIsNeutralZeroTeam() {
+  void testIsNeutralZeroTeam() {
     // arrange
     combatEntitySpy.setTeam(0); // should be default, making sure
 
@@ -231,7 +231,7 @@ class CombatEntityTests {
   }
 
   @Test
-  public void testIsNeutralOtherTeam() {
+  void testIsNeutralOtherTeam() {
     // arrange
     combatEntitySpy.setTeam(5);
 
@@ -240,7 +240,7 @@ class CombatEntityTests {
   }
 
   @Test
-  public void testResurrectDead() {
+  void testResurrectDead() {
     // arrange
     CombatEntityListener entityListenerMock = mock(CombatEntityListener.class);
     CombatEntityResurrectListener resurrectListenerMock = mock(CombatEntityResurrectListener.class);
@@ -262,7 +262,7 @@ class CombatEntityTests {
   }
 
   @Test
-  public void testResurrectAlive() {
+  void testResurrectAlive() {
     // arrange
     when(combatEntitySpy.isDead()).thenReturn(false);
     verify(combatEntitySpy, times(1)).isDead(); // apparently when() counts as interaction
@@ -276,7 +276,7 @@ class CombatEntityTests {
   }
 
   @Test
-  public void testGetAndSetTarget() {
+  void testGetAndSetTarget() {
     // arrange
     ICombatEntity entityMock = mock(CombatEntity.class);
     assertNull(combatEntitySpy.getTarget());
@@ -287,7 +287,7 @@ class CombatEntityTests {
   }
 
   @Test
-  public void testWasHitInTimespan() {
+  void testWasHitInTimespan() {
     // arrange
     GameTime timeMock = mock(GameTime.class);
     when(timeMock.since(anyLong())).thenReturn(500L);
@@ -302,7 +302,7 @@ class CombatEntityTests {
   }
 
   @Test
-  public void testWasHitOnTimespan() {
+  void testWasHitOnTimespan() {
     // arrange
     GameTime timeMock = mock(GameTime.class);
     when(timeMock.since(anyLong())).thenReturn(500L);
@@ -317,7 +317,7 @@ class CombatEntityTests {
   }
 
   @Test
-  public void testWasHitOutsideTimespan() {
+  void testWasHitOutsideTimespan() {
     // arrange
     GameTime timeMock = mock(GameTime.class);
     when(timeMock.since(anyLong())).thenReturn(500L);

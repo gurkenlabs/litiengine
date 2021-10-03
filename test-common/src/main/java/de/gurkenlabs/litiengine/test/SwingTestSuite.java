@@ -4,6 +4,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.concurrent.CompletionException;
 import javax.swing.SwingUtilities;
+import org.junit.jupiter.api.extension.DynamicTestInvocationContext;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.InvocationInterceptor;
 import org.junit.jupiter.api.extension.ReflectiveInvocationContext;
@@ -18,10 +19,7 @@ public class SwingTestSuite implements InvocationInterceptor {
       ExtensionContext extensionContext)
       throws Throwable {
     final Object[] ret = new Object[1];
-    SwingUtilities.invokeAndWait(
-        () -> {
-          ret[0] = proceed(invocation);
-        });
+    SwingUtilities.invokeAndWait(() -> ret[0] = proceed(invocation));
     return (T) ret[0];
   }
 
@@ -60,10 +58,7 @@ public class SwingTestSuite implements InvocationInterceptor {
       ExtensionContext extensionContext)
       throws Throwable {
     final Object[] ret = new Object[1];
-    SwingUtilities.invokeAndWait(
-        () -> {
-          ret[0] = proceed(invocation);
-        });
+    SwingUtilities.invokeAndWait(() -> ret[0] = proceed(invocation));
     return (T) ret[0];
   }
 
@@ -77,7 +72,10 @@ public class SwingTestSuite implements InvocationInterceptor {
   }
 
   @Override
-  public void interceptDynamicTest(Invocation<Void> invocation, ExtensionContext extensionContext)
+  public void interceptDynamicTest(
+      Invocation<Void> invocation,
+      DynamicTestInvocationContext invocationContext,
+      ExtensionContext extensionContext)
       throws Throwable {
     proceedAndWait(invocation);
   }
@@ -101,10 +99,7 @@ public class SwingTestSuite implements InvocationInterceptor {
   }
 
   private void proceedAndWait(Invocation<Void> invocation) throws Throwable {
-    SwingUtilities.invokeAndWait(
-        () -> {
-          proceed(invocation);
-        });
+    SwingUtilities.invokeAndWait(() -> proceed(invocation));
   }
 
   private <T> T proceed(Invocation<T> invocation) {

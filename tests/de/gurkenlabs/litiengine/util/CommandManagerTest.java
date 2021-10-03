@@ -7,10 +7,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.function.Predicate;
 import org.junit.jupiter.api.Test;
 
-public class CommandManagerTest {
+class CommandManagerTest {
 
   @Test
-  public void bindAddNewCommand() {
+  void bindAddNewCommand() {
     // arrange
     CommandManager commandManager = new CommandManager();
     assertFalse(commandManager.executeCommand("command predicate"));
@@ -26,7 +26,7 @@ public class CommandManagerTest {
   }
 
   @Test
-  public void bindThrowsIfContained() {
+  void bindThrowsIfContained() {
     // arrange
     CommandManager commandManager = new CommandManager();
 
@@ -41,7 +41,7 @@ public class CommandManagerTest {
   }
 
   @Test
-  public void executeCommandNull() {
+  void executeCommandNull() {
     // arrange
     CommandManager commandManager = new CommandManager();
 
@@ -50,7 +50,7 @@ public class CommandManagerTest {
   }
 
   @Test
-  public void executeCommandEmpty() {
+  void executeCommandEmpty() {
     // arrange
     CommandManager commandManager = new CommandManager();
 
@@ -59,7 +59,7 @@ public class CommandManagerTest {
   }
 
   @Test
-  public void executeCommandBlankSpace() {
+  void executeCommandBlankSpace() {
     // arrange
     CommandManager commandManager = new CommandManager();
 
@@ -68,7 +68,7 @@ public class CommandManagerTest {
   }
 
   @Test
-  public void executeCommandSingleWord() {
+  void executeCommandSingleWord() {
     // arrange
     CommandManager commandManager = new CommandManager();
 
@@ -77,7 +77,7 @@ public class CommandManagerTest {
   }
 
   @Test
-  public void executeCommandMultiWordNotContained() {
+  void executeCommandMultiWordNotContained() {
     // arrange
     CommandManager commandManager = new CommandManager();
 
@@ -86,7 +86,7 @@ public class CommandManagerTest {
   }
 
   @Test
-  public void executeCommandKeywordContainedNotMatching() {
+  void executeCommandKeywordContainedNotMatching() {
     // arrange
     CommandManager commandManager = new CommandManager();
     Predicate<String[]> predicate = arr -> arr.length > 5;
@@ -97,7 +97,7 @@ public class CommandManagerTest {
   }
 
   @Test
-  public void executeCommandKeywordContainedMatching() {
+  void executeCommandKeywordContainedMatching() {
     // arrange
     CommandManager commandManager = new CommandManager();
     Predicate<String[]> predicate = arr -> arr.length < 5;
