@@ -1,5 +1,5 @@
 enableFeaturePreview("VERSION_CATALOGS")
-rootProject.name = "litiengine-root"
+rootProject.name = "litiengine"
 
 pluginManagement {
     plugins {
@@ -100,7 +100,7 @@ dependencyResolutionManagement {
 include(
     "core",
     "utiliti",
-    "test-common"
+    "shared"
 )
 
 gradle.projectsLoaded {

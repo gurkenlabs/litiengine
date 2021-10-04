@@ -30,7 +30,9 @@ allprojects {
         if (!isRelease) {
             maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots/") }
         }
+        maven { url = uri("https://plugins.gradle.org/m2/") }
         mavenCentral()
+        gradlePluginPortal()
     }
 
     configurations.all {
@@ -146,8 +148,8 @@ allprojects {
                     simplifyXml()
                     description.set(project.description!!)
                     name.set(
-                        (project.findProperty("artifact.name") as? String)
-                            ?: project.name.capitalize().replace("-", " ")
+                            (project.findProperty("artifact.name") as? String)
+                                    ?: project.name.capitalize().replace("-", " ")
                     )
                     url.set("https://litiengine.com")
                     organization {

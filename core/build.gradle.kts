@@ -4,10 +4,10 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 plugins {
     `java-library`
     jacoco
-    id("com.stehno.natives")
-    id("org.sonarqube")
     signing
     `maven-publish`
+    id("com.stehno.natives")
+    id("org.sonarqube")
 }
 
 description = """
@@ -18,18 +18,18 @@ description = """
 sourceSets {
     main {
         java {
-            srcDir(projectDir.resolve("src"))
+            srcDir("src")
         }
         resources {
-            srcDir(projectDir.resolve("resources"))
+            srcDir("resources")
         }
     }
     test {
         java {
-            srcDir(projectDir.resolve("tests"))
+            srcDir("tests")
         }
         resources {
-            srcDir(projectDir.resolve("testsResources"))
+            srcDir("testsResources")
         }
     }
 }
@@ -42,7 +42,7 @@ dependencies {
     // This needs to be api to make the annotations on the class visible to the compiler.
     api(libs.xml.api)
     runtimeOnly(libs.bundles.xml.runtime)
-    testImplementation(project(":test-common"))
+    testImplementation(project(":shared"))
 }
 
 natives {
