@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - "**.gradle"
+      - "**.kts"
       - "**.properties"
       - "**.java"
       - "**.xml"
@@ -22,15 +23,6 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: Gradle cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.m2/repository'
-            ~/.sonar/cache'
-            ~/.gradle/caches/'
-            ~/.gradle/wrapper/'
-          key: ${{ runner.os }}-mvn_sonar_gradle_cache
 
       - name: Set up JDK 16
         uses: actions/setup-java@v2
@@ -38,11 +30,24 @@ jobs:
           distribution: 'adopt'
           java-version: '16'
 
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v1
+        with:
+          path:
+            ~/.gradle/caches/
+            ~/.gradle/wrapper/
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: ${{ runner.os }}-gradle
+
       - name: Install D-BUS AT-SPI core
         run: sudo apt-get -y install at-spi2-core
-
-      - name: Check Java Directory
-        run: echo $JAVA_HOME
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
