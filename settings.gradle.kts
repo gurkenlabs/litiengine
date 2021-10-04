@@ -102,3 +102,9 @@ include(
     "utiliti",
     "test-common"
 )
+
+gradle.projectsLoaded {
+    rootProject.allprojects {
+        buildDir = File("../build/${project.name}")
+    }
+}

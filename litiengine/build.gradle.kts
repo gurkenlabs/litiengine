@@ -42,7 +42,6 @@ dependencies {
     // This needs to be api to make the annotations on the class visible to the compiler.
     api(libs.xml.api)
     runtimeOnly(libs.bundles.xml.runtime)
-
     testImplementation(project(":test-common"))
 }
 
