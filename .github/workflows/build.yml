@@ -29,15 +29,21 @@ jobs:
           distribution: 'adopt'
           java-version: '16'
 
-      - name: Cache packages
-        uses: actions/cache@v2
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v1
         with:
-          path: |
-            ~/.m2/repository'
-            ~/.sonar/cache'
-            ~/.gradle/caches/'
-            ~/.gradle/wrapper/'
-          key: ${{ runner.os }}-mvn_sonar_gradle_cache
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v1
+        with:
+          path:
+            ~/.gradle/caches/
+            ~/.gradle/wrapper/
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: ${{ runner.os }}-gradle
 
       - name: Install D-BUS AT-SPI core
         run: sudo apt-get -y install at-spi2-core
