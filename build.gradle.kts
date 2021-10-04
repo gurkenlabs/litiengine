@@ -77,7 +77,7 @@ allprojects {
                     attributes["Implementation-Version"] = project.version
                     attributes["Specification-Vendor"] = "Gurkenlabs"
                     attributes["Specification-Version"] = project.version
-                    attributes["Specification-Title"] = "Litiengine"
+                    attributes["Specification-Title"] = "LITIENGINE"
                     attributes["Implementation-Vendor"] = "Gurkenlabs"
                     attributes["Implementation-Vendor-Id"] = "de.gurkenlabs"
                 }
@@ -152,7 +152,7 @@ allprojects {
                     url.set("https://litiengine.com")
                     organization {
                         name.set("Gurkenlabs")
-                        url.set("https://github.com/gurkenlabs")
+                        url.set("https://gurkenlabs.de/")
                     }
                     issueManagement {
                         system.set("GitHub")
