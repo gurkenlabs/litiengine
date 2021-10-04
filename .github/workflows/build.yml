@@ -47,7 +47,8 @@ jobs:
 
       - name: Gradle Build
         uses: GabrielBB/xvfb-action@v1
-        run: ./gradlew build jacocoTestReport
+        with:
+          run: ./gradlew build jacocoTestReport
 
       - name: Gradle SonarQube Scan
         env:
