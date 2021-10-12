@@ -102,6 +102,7 @@ include(
     "utiliti",
     "shared"
 )
+project(":core").name = "litiengine"
 
 gradle.projectsLoaded {
     rootProject.allprojects {
