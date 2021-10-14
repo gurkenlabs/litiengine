@@ -11,17 +11,8 @@ description = """
 
 sourceSets {
     main {
-        java {
-            srcDir("src")
-        }
         resources {
             srcDir("localization")
-            srcDir("resources")
-        }
-    }
-    test {
-        java {
-            srcDir("tests")
         }
     }
 }
@@ -29,7 +20,7 @@ sourceSets {
 application {
     mainClass.set("de.gurkenlabs.utiliti.Program")
     applicationDistribution.into(executableDir) {
-        from("dist")
+        from("src/dist")
     }
 }
 
@@ -63,7 +54,7 @@ runtime {
         skipInstaller = true
         imageOptions.addAll(
             listOf(
-                "--icon", project.file("dist/pixel-icon-utiliti.ico").path,
+                "--icon", project.file("src/dist/pixel-icon-utiliti.ico").path,
                 "--description", project.description,
                 "--copyright", "2020-${Calendar.getInstance().get(Calendar.YEAR)} gurkenlabs.de",
                 "--vendor", "gurkenlabs.de",
