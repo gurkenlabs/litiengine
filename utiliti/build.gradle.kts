@@ -34,9 +34,9 @@ application {
 }
 
 dependencies {
-    implementation(project(":core"))
+    implementation(projects.litiengineCore)
     implementation(libs.darklaf.core)
-    testImplementation(project(":shared"))
+    testImplementation(projects.litiengineShared)
 }
 
 tasks {

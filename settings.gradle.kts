@@ -1,3 +1,4 @@
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 enableFeaturePreview("VERSION_CATALOGS")
 rootProject.name = "litiengine"
 
@@ -102,6 +103,13 @@ include(
     "utiliti",
     "shared"
 )
+
+for (p in rootProject.children) {
+    if (p.children.isEmpty()) {
+        // Rename leaf projects only
+        p.name = "${rootProject.name}-${p.name}"
+    }
+}
 
 gradle.projectsLoaded {
     rootProject.allprojects {
