@@ -10,6 +10,7 @@ pluginManagement {
     idv("com.github.vlsi.crlf", "com.github.vlsi.vlsi-release-plugins")
     idv("com.github.vlsi.gradle-extensions", "com.github.vlsi.vlsi-release-plugins")
     idv("com.github.vlsi.license-gather", "com.github.vlsi.vlsi-release-plugins")
+    idv("com.diffplug.spotless")
   }
 }
 
