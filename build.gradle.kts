@@ -81,7 +81,7 @@ allprojects {
                     attributes["Specification-Version"] = project.version
                     attributes["Specification-Title"] = "LITIENGINE"
                     attributes["Implementation-Vendor"] = "Gurkenlabs"
-                    attributes["Implementation-Vendor-Id"] = "de.gurkenlabs"
+                    attributes["Implementation-Vendor-Id"] = project.group
                 }
 
                 CrLfSpec(LineEndings.LF).run {
