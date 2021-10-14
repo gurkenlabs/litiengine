@@ -15,25 +15,6 @@ description = """
     It provides a comprehensive Java library and a dedicated map editor to create tile-based 2D games.
 """.trimIndent()
 
-sourceSets {
-    main {
-        java {
-            srcDir("src")
-        }
-        resources {
-            srcDir("resources")
-        }
-    }
-    test {
-        java {
-            srcDir("tests")
-        }
-        resources {
-            srcDir("testsResources")
-        }
-    }
-}
-
 dependencies {
     implementation(libs.bundles.jinput)
     implementation(libs.bundles.soundlibs)
