@@ -18,10 +18,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class MapObjectSerializerTests {
+class MapObjectSerializerTests {
 
   @Test
-  public void testSerialization() {
+  void testSerialization() {
     Prop p = new Prop("something");
 
     // general entity fields
@@ -87,50 +87,50 @@ public class MapObjectSerializerTests {
   }
 
   @Test
-  public void testTmxPropertyAnnotationBoolean() {
+  void testTmxPropertyAnnotationBoolean() {
     IMapObject mapObject = MapObjectSerializer.serialize(new TestProp());
     assertTrue(mapObject.getBoolValue("testBool"));
   }
 
   @Test
-  public void testTmxPropertyAnnotationInt() {
+  void testTmxPropertyAnnotationInt() {
     IMapObject mapObject = MapObjectSerializer.serialize(new TestProp());
     assertEquals(1, mapObject.getIntValue("testInt"));
   }
 
   @Test
-  public void testTmxPropertyAnnotationShort() {
+  void testTmxPropertyAnnotationShort() {
     IMapObject mapObject = MapObjectSerializer.serialize(new TestProp());
     assertEquals(2, mapObject.getShortValue("testShort"));
   }
 
   @Test
-  public void testTmxPropertyAnnotationLong() {
+  void testTmxPropertyAnnotationLong() {
     IMapObject mapObject = MapObjectSerializer.serialize(new TestProp());
     assertEquals(3, mapObject.getLongValue("testLong"));
   }
 
   @Test
-  public void testTmxPropertyAnnotationByte() {
+  void testTmxPropertyAnnotationByte() {
     IMapObject mapObject = MapObjectSerializer.serialize(new TestProp());
     assertEquals(4, mapObject.getByteValue("testByte"));
   }
 
   @Test
-  public void testTmxPropertyAnnotationDouble() {
+  void testTmxPropertyAnnotationDouble() {
     IMapObject mapObject = MapObjectSerializer.serialize(new TestProp());
     assertEquals(5.5, mapObject.getDoubleValue("testDouble"));
   }
 
   @Test
-  public void testTmxPropertyAnnotationFloat() {
+  void testTmxPropertyAnnotationFloat() {
     IMapObject mapObject = MapObjectSerializer.serialize(new TestProp());
     assertEquals(6.6f, mapObject.getFloatValue("testFloat"));
   }
 
   @ParameterizedTest
   @MethodSource("getTmxPropertyAnnotationString")
-  public void testTmxPropertyAnnotationString(String propertyName, String expectedValue) {
+  void testTmxPropertyAnnotationString(String propertyName, String expectedValue) {
     IMapObject mapObject = MapObjectSerializer.serialize(new TestProp());
     assertEquals(expectedValue, mapObject.getStringValue(propertyName));
   }

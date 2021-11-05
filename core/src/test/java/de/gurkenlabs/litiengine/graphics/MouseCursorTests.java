@@ -10,7 +10,7 @@ import java.awt.image.BufferedImage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class MouseCursorTests {
+class MouseCursorTests {
 
   private MouseCursor cursor;
 
@@ -20,7 +20,7 @@ public class MouseCursorTests {
   }
 
   @Test
-  public void testDefaultValues() {
+  void testDefaultValues() {
     assertEquals(0, cursor.getOffsetX());
     assertEquals(0, cursor.getOffsetY());
 
@@ -31,7 +31,7 @@ public class MouseCursorTests {
   }
 
   @Test
-  public void testSet() {
+  void testSet() {
     // act
     cursor.set(new BufferedImage(30, 30, BufferedImage.TYPE_INT_ARGB));
 
@@ -42,7 +42,7 @@ public class MouseCursorTests {
   }
 
   @Test
-  public void testIsVisible() {
+  void testIsVisible() {
     // arrange
     cursor.set(new BufferedImage(30, 30, BufferedImage.TYPE_INT_ARGB));
 
@@ -52,7 +52,7 @@ public class MouseCursorTests {
   }
 
   @Test
-  public void testSetOffset() {
+  void testSetOffset() {
     // act
     cursor.setOffset(15, 15);
 
@@ -62,7 +62,7 @@ public class MouseCursorTests {
   }
 
   @Test
-  public void testSetVisible() {
+  void testSetVisible() {
     // arrange
     cursor.set(new BufferedImage(30, 30, BufferedImage.TYPE_INT_ARGB));
     assertTrue(cursor.isVisible());
@@ -75,7 +75,7 @@ public class MouseCursorTests {
   }
 
   @Test
-  public void testSetTransform() {
+  void testSetTransform() {
     // arrange
     AffineTransform trans = AffineTransform.getTranslateInstance(1, 2);
 

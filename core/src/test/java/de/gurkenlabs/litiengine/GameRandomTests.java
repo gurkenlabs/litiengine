@@ -17,7 +17,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class GameRandomTests {
+class GameRandomTests {
 
   private GameRandom gameRandom;
 
@@ -28,32 +28,32 @@ public class GameRandomTests {
   }
 
   @Test
-  public void testSampleArrayEmpty() {
+  void testSampleArrayEmpty() {
     Integer[] array = new Integer[] {};
     assertThrows(IllegalArgumentException.class, () -> this.gameRandom.sample(array, 1, false));
   }
 
   @Test
-  public void testSampleCollectionEmpty() {
+  void testSampleCollectionEmpty() {
     List<Integer> list = Arrays.asList();
     assertThrows(IllegalArgumentException.class, () -> this.gameRandom.sample(list, 1, false));
   }
 
   @Test
-  public void testSampleCollectionReplacementFalse() {
+  void testSampleCollectionReplacementFalse() {
     List<Integer> list = Arrays.asList(1, 2);
     assertEquals(Arrays.asList(1, 2), this.gameRandom.sample(list, 2, false));
   }
 
   @Test
-  public void testSampleCollectionReplacementTrue() {
+  void testSampleCollectionReplacementTrue() {
     List<Integer> list = Arrays.asList(1, 2);
     assertEquals(Arrays.asList(2, 1), this.gameRandom.sample(list, 2, true));
   }
 
   @ParameterizedTest(name = "testNextInt partition={0} min={1} bound={2} expectedValue={3}")
   @CsvSource({"minEqualsBound, 42, 42, 42", "minSmallerThanBound, 40, 42, 41"})
-  public void testNextInt_partitions(String caption, int min, int bound, int expectedValue) {
+  void testNextInt_partitions(String caption, int min, int bound, int expectedValue) {
     // act
     double actualValue = this.gameRandom.nextInt(min, bound);
 
@@ -62,14 +62,14 @@ public class GameRandomTests {
   }
 
   @Test
-  public void testNextInt_minGreaterThanBound() {
+  void testNextInt_minGreaterThanBound() {
     // arrange, act, assert
     assertThrows(IllegalArgumentException.class, () -> this.gameRandom.nextInt(42, 40));
   }
 
   @ParameterizedTest(name = "testNextFloat partition={0} min={1} bound={2} expectedValue={3}")
   @CsvSource({"minEqualsBound, 28.1, 28.1, 28.1", "minSmallerThanBound, 28.7, 30.5, 29.887875"})
-  public void testNextFloat_partitions(
+  void testNextFloat_partitions(
       String caption, float min, float bound, float expectedValue) {
     // act
     float actualValue = this.gameRandom.nextFloat(min, bound);
@@ -79,7 +79,7 @@ public class GameRandomTests {
   }
 
   @Test
-  public void testNextFloat_minGreaterThanBound() {
+  void testNextFloat_minGreaterThanBound() {
     // arrange, act, assert
     assertThrows(IllegalArgumentException.class, () -> this.gameRandom.nextFloat(28.9f, 27.1f));
   }
@@ -87,7 +87,7 @@ public class GameRandomTests {
   @ParameterizedTest(
       name = "testNextFloat_withSingleArgument partition={0} bound={1} expectedValue={2}")
   @CsvSource({"bound == 0, 0, 0", "bound > 0, 4192910.168351, 2767026.2"})
-  public void testNextFloat_withSingleArgument(String caption, float bound, float expectedValue) {
+  void testNextFloat_withSingleArgument(String caption, float bound, float expectedValue) {
     // act
     float actualValue = this.gameRandom.nextFloat(bound);
 
@@ -96,7 +96,7 @@ public class GameRandomTests {
   }
 
   @Test
-  public void testNextFloat_withSingleArgumentBelowZero() {
+  void testNextFloat_withSingleArgumentBelowZero() {
     // act, assert
     assertThrows(IllegalArgumentException.class, () -> this.gameRandom.nextFloat(-100000));
   }
@@ -106,7 +106,7 @@ public class GameRandomTests {
     "minEqualsBound, 128643212354, 128643212354, 128643212354",
     "minSmallerThanBound, 128643212354, 297536421382, -1716035126107589342"
   })
-  public void testNextLong_partitions(String caption, long min, long bound, long expectedValue) {
+  void testNextLong_partitions(String caption, long min, long bound, long expectedValue) {
     // arrange
     long actualValue = this.gameRandom.nextLong(min, bound);
 
@@ -115,7 +115,7 @@ public class GameRandomTests {
   }
 
   @Test
-  public void testNextLong_minGreaterThanBound() {
+  void testNextLong_minGreaterThanBound() {
     // arrange, act, assert
     assertThrows(
         IllegalArgumentException.class,
@@ -123,13 +123,13 @@ public class GameRandomTests {
   }
 
   @Test
-  public void chooseStringArray_ThrowsOnNull() {
+  void chooseStringArray_ThrowsOnNull() {
     // act, assert
     assertThrows(IllegalArgumentException.class, () -> gameRandom.choose((String[]) null));
   }
 
   @Test
-  public void chooseStringArray_ThrowsOnEmpty() {
+  void chooseStringArray_ThrowsOnEmpty() {
     // arrange
     final String[] arr = new String[] {};
 
@@ -138,7 +138,7 @@ public class GameRandomTests {
   }
 
   @Test
-  public void chooseIntegerCollection_null() {
+  void chooseIntegerCollection_null() {
     // arrange
     Collection<Integer> collection = null;
 
@@ -150,7 +150,7 @@ public class GameRandomTests {
   }
 
   @Test
-  public void chooseIntegerCollection_empty() {
+  void chooseIntegerCollection_empty() {
     // arrange
     Collection<Integer> collection = new ArrayList<Integer>();
 
@@ -162,7 +162,7 @@ public class GameRandomTests {
   }
 
   @Test
-  public void chooseIntegerArray_null() {
+  void chooseIntegerArray_null() {
     // arrange
     Integer[] integers = null;
 
@@ -174,7 +174,7 @@ public class GameRandomTests {
   }
 
   @Test
-  public void chooseIntegerArray_empty() {
+  void chooseIntegerArray_empty() {
     // arrange
     Integer[] integers = new Integer[0];
 
@@ -186,7 +186,7 @@ public class GameRandomTests {
   }
 
   @Test
-  public void chooseIntArray_null() {
+  void chooseIntArray_null() {
     // arrange
     int[] integers = null;
 
@@ -195,7 +195,7 @@ public class GameRandomTests {
   }
 
   @Test
-  public void chooseIntArray_empty() {
+  void chooseIntArray_empty() {
     // arrange
     int[] integers = new int[0];
 
@@ -204,7 +204,7 @@ public class GameRandomTests {
   }
 
   @Test
-  public void chooseLongArray_null() {
+  void chooseLongArray_null() {
     // arrange
     long[] longs = null;
 
@@ -213,7 +213,7 @@ public class GameRandomTests {
   }
 
   @Test
-  public void chooseLongArray_empty() {
+  void chooseLongArray_empty() {
     // arrange
     long[] longs = new long[0];
 
@@ -222,7 +222,7 @@ public class GameRandomTests {
   }
 
   @Test
-  public void chooseDoubleArray_null() {
+  void chooseDoubleArray_null() {
     // arrange
     double[] doubles = null;
 
@@ -231,7 +231,7 @@ public class GameRandomTests {
   }
 
   @Test
-  public void chooseDoubleArray_empty() {
+  void chooseDoubleArray_empty() {
     // arrange
     double[] doubles = new double[0];
 
@@ -240,14 +240,14 @@ public class GameRandomTests {
   }
 
   @Test
-  public void testNextColorNull() {
+  void testNextColorNull() {
     GameRandom gameRandom = new GameRandom();
     assertNull(gameRandom.nextColor(null, 0.1f, 0.5f));
   }
 
   @ParameterizedTest
   @MethodSource("getColor")
-  public void testNextColor(Color color, float variance, float alpha, Color expected) {
+  void testNextColor(Color color, float variance, float alpha, Color expected) {
     Color result = this.gameRandom.nextColor(color, variance, alpha);
     assertEquals(expected, result);
   }

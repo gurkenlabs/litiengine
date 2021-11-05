@@ -30,7 +30,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
-public class LightSourceTests {
+class LightSourceTests {
   private LightSource lightSourceInactiveSpy;
   private LightSource lightSourceActiveSpy;
 
@@ -43,7 +43,7 @@ public class LightSourceTests {
   // BEHAVIOR
 
   @Test
-  public void initializeLightSource() {
+  void initializeLightSource() {
     // arrange
     int intensity = 42;
     Color lightColor = Color.GREEN;
@@ -61,7 +61,7 @@ public class LightSourceTests {
   }
 
   @Test
-  public void activate_inactive() {
+  void activate_inactive() {
     // arrange
     assertFalse(lightSourceInactiveSpy.isActive());
 
@@ -75,7 +75,7 @@ public class LightSourceTests {
   }
 
   @Test
-  public void activate_alreadyActive() {
+  void activate_alreadyActive() {
     // arrange
     assertTrue(lightSourceActiveSpy.isActive());
 
@@ -89,7 +89,7 @@ public class LightSourceTests {
   }
 
   @Test
-  public void deactivate_active() {
+  void deactivate_active() {
     // arrange
     assertTrue(lightSourceActiveSpy.isActive());
 
@@ -103,7 +103,7 @@ public class LightSourceTests {
   }
 
   @Test
-  public void deactivate_alreadyInactive() {
+  void deactivate_alreadyInactive() {
     // arrange
     assertFalse(lightSourceInactiveSpy.isActive());
 
@@ -117,7 +117,7 @@ public class LightSourceTests {
   }
 
   @Test
-  public void render_withDynamicShadows() {
+  void render_withDynamicShadows() {
     // arrange
     GameConfiguration actualGameConfigSpy = spy(Game.config());
     GraphicConfiguration actualGraphicsConfigSpy = spy(actualGameConfigSpy.graphics());
@@ -149,7 +149,7 @@ public class LightSourceTests {
   }
 
   @Test
-  public void render_noDynamicShadows() {
+  void render_noDynamicShadows() {
     // arrange
     GameWorld mockedWorld = mock(GameWorld.class);
     MockedStatic<Game> gameMockedStatic = mockStatic(Game.class);
@@ -174,7 +174,7 @@ public class LightSourceTests {
   }
 
   @Test
-  public void updateAmbientLayers_delegatesWhenLoaded() {
+  void updateAmbientLayers_delegatesWhenLoaded() {
     // arrange
     when(lightSourceInactiveSpy.isLoaded()).thenReturn(true);
 
@@ -205,7 +205,7 @@ public class LightSourceTests {
   }
 
   @Test
-  public void updateAmbientLayers_doesNothingWhenNotLoaded() {
+  void updateAmbientLayers_doesNothingWhenNotLoaded() {
     // arrange
     when(lightSourceInactiveSpy.isLoaded())
         .thenReturn(false); // should be default, just making sure
@@ -237,7 +237,7 @@ public class LightSourceTests {
   }
 
   @Test
-  public void updateAmbientLayers_doesNothingWithoutGameEnvironment() {
+  void updateAmbientLayers_doesNothingWithoutGameEnvironment() {
     // arrange
     when(lightSourceInactiveSpy.isLoaded()).thenReturn(true);
 
@@ -269,7 +269,7 @@ public class LightSourceTests {
   }
 
   @Test
-  public void updateAmbientLayers_doesNothingWithoutLayers() {
+  void updateAmbientLayers_doesNothingWithoutLayers() {
     // arrange
     when(lightSourceInactiveSpy.isLoaded()).thenReturn(true);
 
@@ -300,7 +300,7 @@ public class LightSourceTests {
   }
 
   @Test
-  public void toggle_togglesActivatedAndUpdates() {
+  void toggle_togglesActivatedAndUpdates() {
     // arrange
     assertFalse(lightSourceInactiveSpy.isActive());
     assertTrue(lightSourceActiveSpy.isActive());
@@ -322,20 +322,20 @@ public class LightSourceTests {
   }
 
   @Test
-  public void sendMessage_returnsNullOnEmptyMessage() {
+  void sendMessage_returnsNullOnEmptyMessage() {
     // act, assert
     assertNull(lightSourceInactiveSpy.sendMessage(lightSourceInactiveSpy, null));
     assertNull(lightSourceInactiveSpy.sendMessage(lightSourceInactiveSpy, ""));
   }
 
   @Test
-  public void sendMessage_returnsNullOnInvalidMessage() {
+  void sendMessage_returnsNullOnInvalidMessage() {
     // act, assert
     assertNull(lightSourceInactiveSpy.sendMessage(lightSourceInactiveSpy, "random gibberish"));
   }
 
   @Test
-  public void sendMessage_togglesOnValidMessage() {
+  void sendMessage_togglesOnValidMessage() {
     // arrange
     when(lightSourceInactiveSpy.isLoaded())
         .thenReturn(false); // prevent further actions in private methods
@@ -349,7 +349,7 @@ public class LightSourceTests {
   }
 
   @Test
-  public void updateShape_updatesRectangularShape() {
+  void updateShape_updatesRectangularShape() {
     // arrange
     Point2D newShapeLocation = new Point2D.Double(42, 42);
     Rectangle2D newShape =
@@ -367,7 +367,7 @@ public class LightSourceTests {
   }
 
   @Test
-  public void updateShape_updatesEllipticalShape() {
+  void updateShape_updatesEllipticalShape() {
     // arrange
     Point2D newShapeLocation = new Point2D.Double(42, 42);
     Ellipse2D newShape =
@@ -387,19 +387,19 @@ public class LightSourceTests {
   // ACCESSORS
 
   @Test
-  public void getIntensity_active() {
+  void getIntensity_active() {
     // act, assert
     assertEquals(10, lightSourceActiveSpy.getIntensity());
   }
 
   @Test
-  public void getIntensity_inactive() {
+  void getIntensity_inactive() {
     // act, assert
     assertEquals(0, lightSourceInactiveSpy.getIntensity());
   }
 
   @Test
-  public void setColor_setsColorAndUpdates() {
+  void setColor_setsColorAndUpdates() {
     // arrange
     Color newColor = Color.RED;
     assertEquals(Color.WHITE, lightSourceInactiveSpy.getColor());
@@ -414,7 +414,7 @@ public class LightSourceTests {
   }
 
   @Test
-  public void setIntensity_setsIntensityAndUpdates() {
+  void setIntensity_setsIntensityAndUpdates() {
     // arrange
     int newIntensity = 42;
     assertEquals(10, lightSourceActiveSpy.getIntensity());
@@ -429,7 +429,7 @@ public class LightSourceTests {
   }
 
   @Test
-  public void setX_setsXAndUpdates() {
+  void setX_setsXAndUpdates() {
     // arrange
     double newX = 42d;
     assertEquals(0, lightSourceInactiveSpy.getX()); // default
@@ -450,7 +450,7 @@ public class LightSourceTests {
   }
 
   @Test
-  public void setY_setsYAndUpdates() {
+  void setY_setsYAndUpdates() {
     // arrange
     double newY = 42d;
     assertEquals(0, lightSourceInactiveSpy.getY()); // default
@@ -471,7 +471,7 @@ public class LightSourceTests {
   }
 
   @Test
-  public void setHeight_setsHeightAndUpdates() {
+  void setHeight_setsHeightAndUpdates() {
     // arrange
     double newHeight = 42d;
     assertEquals(32, lightSourceInactiveSpy.getHeight()); // default
@@ -491,7 +491,7 @@ public class LightSourceTests {
   }
 
   @Test
-  public void setWidth_setsWidthAndUpdates() {
+  void setWidth_setsWidthAndUpdates() {
     // arrange
     double newWidth = 42d;
     assertEquals(32, lightSourceInactiveSpy.getWidth()); // default
@@ -511,7 +511,7 @@ public class LightSourceTests {
   }
 
   @Test
-  public void setLocation_setsLocationAndUpdates() {
+  void setLocation_setsLocationAndUpdates() {
     // arrange
     Point2D newLocation = new Point2D.Double(5d, 5d);
     assertEquals(new Point2D.Double(0, 0), lightSourceInactiveSpy.getLocation()); // default
@@ -526,7 +526,7 @@ public class LightSourceTests {
   }
 
   @Test
-  public void setSize_setsSize() {
+  void setSize_setsSize() {
     // arrange
     double width = 10d;
     double height = 20d;
@@ -540,7 +540,7 @@ public class LightSourceTests {
   }
 
   @Test
-  public void setSize_setsShorterSideAsRadius() {
+  void setSize_setsShorterSideAsRadius() {
     // arrange
     double firstWidth = 20d;
     double firstHeight = 10d;

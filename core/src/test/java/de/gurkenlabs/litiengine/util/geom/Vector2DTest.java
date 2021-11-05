@@ -5,11 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.awt.geom.Point2D;
 import org.junit.jupiter.api.Test;
 
-public class Vector2DTest {
+class Vector2DTest {
 
   /** Test add-function in Vector2D class */
   @Test
-  public void testVector2D() {
+  void testVector2D() {
     double xValue = 10.0;
     double yValue = 5.0;
     Point2D point1 = new Point2D.Double(0, 0);
@@ -34,7 +34,7 @@ public class Vector2DTest {
 
   /** Test unitVector-function in Vector2D class */
   @Test
-  public void testVector2DUnit() {
+  void testVector2DUnit() {
     double xValue = 0.0;
     double yValue = 5.0;
 
@@ -52,7 +52,7 @@ public class Vector2DTest {
 
   /** Test toString method */
   @Test
-  public void testVector2DToString() {
+  void testVector2DToString() {
     double xValue = 10.0;
     double yValue = 5.0;
     String expected = "Vector2D(10.0, 5.0)";
@@ -64,7 +64,7 @@ public class Vector2DTest {
 
   /** Test normal vector */
   @Test
-  public void testVector2DNormal() {
+  void testVector2DNormal() {
     double xValue = 5.0;
     double yValue = 0.0;
     double expectedX = 0.0;
@@ -79,7 +79,7 @@ public class Vector2DTest {
 
   /** Test scale vector */
   @Test
-  public void testVector2DScale() {
+  void testVector2DScale() {
     double xValue = 5.0;
     double yValue = 0.0;
     double scalefactor = 3.0;
@@ -94,7 +94,7 @@ public class Vector2DTest {
 
   /** Test dot product */
   @Test
-  public void testVector2DDot() {
+  void testVector2DDot() {
     double xValue1 = 5.0;
     double yValue1 = 10.0;
     double xValue2 = 3.0;
@@ -109,7 +109,7 @@ public class Vector2DTest {
 
   /** Test sub */
   @Test
-  public void testVector2DSub() {
+  void testVector2DSub() {
     double xValue1 = 5.0;
     double yValue1 = 10.0;
     double xValue2 = 3.0;

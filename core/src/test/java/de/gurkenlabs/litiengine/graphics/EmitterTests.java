@@ -18,10 +18,10 @@ import java.awt.Color;
 import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 
-public class EmitterTests {
+class EmitterTests {
 
   @Test
-  public void testInitializationByAnnotation() {
+  void testInitializationByAnnotation() {
     TestEmitter testEmitter = new TestEmitter();
 
     assertEquals(false, testEmitter.isActivateOnInit());
@@ -47,7 +47,7 @@ public class EmitterTests {
   }
 
   @Test
-  public void testRandomValueGeneration() {
+  void testRandomValueGeneration() {
     TestEmitter testEmitter = new TestEmitter();
 
     Color[] colors = new Color[] {Color.RED, Color.ORANGE, Color.YELLOW};
@@ -59,7 +59,7 @@ public class EmitterTests {
   }
 
   @Test
-  public void testGetMin() {
+  void testGetMin() {
     ParticleParameter particleParameter = new ParticleParameter();
     particleParameter.setMaxValue(1);
     particleParameter.setMinValue(10);
@@ -70,7 +70,7 @@ public class EmitterTests {
   }
 
   @Test
-  public void testGetMax() {
+  void testGetMax() {
     ParticleParameter particleParameter = new ParticleParameter();
     particleParameter.setMaxValue(10);
     particleParameter.setMinValue(1);

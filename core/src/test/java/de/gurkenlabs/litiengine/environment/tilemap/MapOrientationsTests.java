@@ -7,11 +7,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class MapOrientationsTests {
+class MapOrientationsTests {
 
   @ParameterizedTest
   @MethodSource("getForNameParameters")
-  public void testForName(String orientationName, IMapOrientation expectedOrientation) {
+  void testForName(String orientationName, IMapOrientation expectedOrientation) {
     // act
     IMapOrientation actualOrientation = MapOrientations.forName(orientationName);
 

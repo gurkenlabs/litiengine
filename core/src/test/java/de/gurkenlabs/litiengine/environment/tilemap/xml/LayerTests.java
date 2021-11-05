@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-public class LayerTests {
+class LayerTests {
 
   private Layer layer;
 
@@ -18,7 +18,7 @@ public class LayerTests {
   }
 
   @Test
-  public void testResetOffsetX_isReset() {
+  void testResetOffsetX_isReset() {
     // act
     layer.resetOffsetX();
 
@@ -27,7 +27,7 @@ public class LayerTests {
   }
 
   @Test
-  public void testResetOffsetY_isReset() {
+  void testResetOffsetY_isReset() {
     // act
     layer.resetOffsetY();
 
@@ -37,7 +37,7 @@ public class LayerTests {
 
   @ParameterizedTest(name = "testResetWidth_{0}, initialWidth={1}, expectedWidth={2}")
   @CsvSource({"'not-reset', 29, 29", "'reset', 0, 0"})
-  public void testResetWidth(String caption, int initialWidth, int expectedWidth) {
+  void testResetWidth(String caption, int initialWidth, int expectedWidth) {
     // arrange
     layer.setWidth(initialWidth);
 
@@ -50,7 +50,7 @@ public class LayerTests {
 
   @ParameterizedTest(name = "testResetHeight_{0}, initialHeight={1}, expectedHeight={2}")
   @CsvSource({"'not-reset', 42, 42", "'reset', 0, 0"})
-  public void testResetHeight(String caption, int initialHeight, int expectedHeight) {
+  void testResetHeight(String caption, int initialHeight, int expectedHeight) {
     // arrange
     layer.setHeight(initialHeight);
 
@@ -63,7 +63,7 @@ public class LayerTests {
 
   @ParameterizedTest(name = "testResetOpacity_{0}, initialOpacity={1}, expectedOpacity={2}")
   @CsvSource({"'not-reset', 42, 42", "'reset', 1.0f, 1.0f"})
-  public void testResetOpacity(String caption, float initialOpacity, float expectedOpacity) {
+  void testResetOpacity(String caption, float initialOpacity, float expectedOpacity) {
     // arrange
     layer.setOpacity(initialOpacity);
 
@@ -76,7 +76,7 @@ public class LayerTests {
 
   @ParameterizedTest(name = "testIsResettable_Integer, value={0}, expected={1}")
   @CsvSource({"42, false", ", false", "0, true"})
-  public void testIsResettable_Integer(Integer value, boolean expected) {
+  void testIsResettable_Integer(Integer value, boolean expected) {
     // act
     boolean isResettable = layer.isResettable(value);
 
@@ -86,7 +86,7 @@ public class LayerTests {
 
   @ParameterizedTest(name = "testIsResettable_Float, value={0}, expected={1}")
   @CsvSource({"42.0f, false", ", false", "1.0f, true"})
-  public void testIsResettable_Float(Float value, boolean expected) {
+  void testIsResettable_Float(Float value, boolean expected) {
     // act
     boolean isResettable = layer.isResettable(value);
 

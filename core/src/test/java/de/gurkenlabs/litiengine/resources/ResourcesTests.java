@@ -15,10 +15,10 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.Test;
 
-public class ResourcesTests {
+class ResourcesTests {
 
   @Test
-  public void testInitialization() {
+  void testInitialization() {
     assertNotNull(Resources.fonts());
     assertNotNull(Resources.images());
     assertNotNull(Resources.maps());
@@ -28,7 +28,7 @@ public class ResourcesTests {
   }
 
   @Test
-  public void testResourceContainer() {
+  void testResourceContainer() {
     Resources.images().clear();
 
     final String imageName = "my-test.jpg";
@@ -49,7 +49,7 @@ public class ResourcesTests {
   }
 
   @Test
-  public void testMapResourcesAlias() {
+  void testMapResourcesAlias() {
     IMap map =
         Resources.maps().get("de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
 
@@ -57,7 +57,7 @@ public class ResourcesTests {
   }
 
   @Test
-  public void testResourceFromWeb() throws IOException {
+  void testResourceFromWeb() throws IOException {
     try (InputStream stream =
         Resources.get(
             "https://github.com/gurkenlabs/litiengine/blob/1ab49e67edf67242f1e1e6a67b54f36dd9b09c7e/resources/litiengine-banner.png?raw=true")) {
@@ -66,7 +66,7 @@ public class ResourcesTests {
   }
 
   @Test
-  public void testSoundResources() {
+  void testSoundResources() {
     Sound sound = Resources.sounds().get("de/gurkenlabs/litiengine/resources/bip.ogg");
     Sound nonExisting = Resources.sounds().get("randomname.mp3");
 
@@ -76,14 +76,14 @@ public class ResourcesTests {
   }
 
   @Test
-  public void testReadStringResources() {
+  void testReadStringResources() {
     String fileContent =
         Resources.read("de/gurkenlabs/litiengine/resources/stringfile-utf8.txt");
     assertEquals("my utf8 èncöded strîng!!1$", fileContent);
   }
 
   @Test
-  public void testReadStringCharsetResources() {
+  void testReadStringCharsetResources() {
     String fileContent =
         Resources.read(
             "de/gurkenlabs/litiengine/resources/stringfile-iso8859-1.txt",
@@ -92,7 +92,7 @@ public class ResourcesTests {
   }
 
   @Test
-  public void testStringList() {
+  void testStringList() {
     String[] strings =
         Resources.strings().getList("de/gurkenlabs/litiengine/resources/test.txt");
 
@@ -105,7 +105,7 @@ public class ResourcesTests {
   }
 
   @Test
-  public void testLocalizableString() {
+  void testLocalizableString() {
     final String bundleName = "de/gurkenlabs/litiengine/resources/custom-strings";
     String myString = Resources.strings().getFrom(bundleName, "mystring");
     String myOtherString = Resources.strings().getFrom(bundleName, "myOtherString");
@@ -117,7 +117,7 @@ public class ResourcesTests {
   }
 
   @Test
-  public void testLocalizedString() {
+  void testLocalizedString() {
     final String bundleName = "de/gurkenlabs/litiengine/resources/custom-strings";
 
     String oldLang = Game.config().client().getLanguage();
@@ -137,7 +137,7 @@ public class ResourcesTests {
   }
 
   @Test
-  public void testStringsWithNoArgs() {
+  void testStringsWithNoArgs() {
     final String bundleName = "de/gurkenlabs/litiengine/resources/custom-strings";
 
     String result = Resources.strings().getFrom(bundleName, "mystring", new Object[1]);

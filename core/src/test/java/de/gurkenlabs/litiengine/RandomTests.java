@@ -14,12 +14,13 @@ import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-public class RandomTests {
+// TODO: merge with GameRandomTests
+class RandomTests {
 
   private static final String SEED = "myseed";
 
   @Test
-  public void testRandomInRange() {
+  void testRandomInRange() {
     for (int i = 0; i < 100; i++) {
       double rnd = Game.random().nextDouble(0.0, 10);
       int rndInt = Game.random().nextInt(0, 10);
@@ -30,7 +31,7 @@ public class RandomTests {
   }
 
   @Test
-  public void testRandomSign() {
+  void testRandomSign() {
     for (int i = 0; i < 100; i++) {
       int rnd = Game.random().nextSign();
       assertTrue(rnd == 1 || rnd == -1);
@@ -38,7 +39,7 @@ public class RandomTests {
   }
 
   @Test
-  public void testSeed_nextInt() {
+  void testSeed_nextInt() {
     // arrange
     Game.random().setSeed(SEED);
     int expectedValue = Game.random().nextInt();
@@ -52,7 +53,7 @@ public class RandomTests {
   }
 
   @Test
-  public void testSeed_nextChar() {
+  void testSeed_nextChar() {
     // arrange
     Game.random().setSeed(SEED);
     char expectedValue = Game.random().nextChar();
@@ -66,7 +67,7 @@ public class RandomTests {
   }
 
   @Test
-  public void testSeed_nextDouble() {
+  void testSeed_nextDouble() {
     // arrange
     Game.random().setSeed(SEED);
     double expectedValue = Game.random().nextDouble();
@@ -80,7 +81,7 @@ public class RandomTests {
   }
 
   @Test
-  public void testSeed_nextLong() {
+  void testSeed_nextLong() {
     // arrange
     Game.random().setSeed(SEED);
     long expectedValue = Game.random().nextLong();
@@ -94,7 +95,7 @@ public class RandomTests {
   }
 
   @Test
-  public void testSeed_nextFloat() {
+  void testSeed_nextFloat() {
     // arrange
     Game.random().setSeed(SEED);
     float expectedValue = Game.random().nextFloat();
@@ -108,13 +109,13 @@ public class RandomTests {
   }
 
   @Test
-  public void nextDouble_OnPoint() { // ==
+  void nextDouble_OnPoint() { // ==
     // assert
     assertEquals(1.0, Game.random().nextDouble(1.0, 1.0));
   }
 
   @Test
-  public void nextDouble_OffPoint() { // else
+  void nextDouble_OffPoint() { // else
     // arrange
     GameRandom random = mock(GameRandom.class);
     when(random.nextDouble()).thenReturn(0.5);
@@ -125,13 +126,13 @@ public class RandomTests {
   }
 
   @Test
-  public void nextDouble_InPoint() { // greater
+  void nextDouble_InPoint() { // greater
     // assert
     assertThrows(IllegalArgumentException.class, () -> Game.random().nextDouble(1.1, 1.0));
   }
 
   @Test
-  public void nextDouble_OutPoint() { // else
+  void nextDouble_OutPoint() { // else
     // arrange
     GameRandom random = mock(GameRandom.class);
     when(random.nextDouble()).thenReturn(0.5);
@@ -142,14 +143,14 @@ public class RandomTests {
   }
 
   @Test
-  public void testAlphaNumeric() {
+  void testAlphaNumeric() {
     for (int i = 0; i < 10; i++) {
       assertEquals(i, Game.random().nextAlphanumeric(i).length());
     }
   }
 
   @Test
-  public void testAlphabetic() {
+  void testAlphabetic() {
     for (int i = 0; i < 10; i++) {
       assertEquals(i, Game.random().nextAlphabetic(i).length());
       assertEquals(i, Game.random().nextAlphabetic(i, true).length());
@@ -157,14 +158,14 @@ public class RandomTests {
   }
 
   @Test
-  public void testAsciiStrings() {
+  void testAsciiStrings() {
     for (int i = 0; i < 10; i++) {
       assertEquals(i, Game.random().nextAscii(i).length());
     }
   }
 
   @Test
-  public void testArrayChose() {
+  void testArrayChose() {
     int[] testInt = new int[] {1, 2, 3, 4, 5, 6};
     long[] testLong = new long[] {1, 2, 3, 4, 5, 6};
     double[] testDouble = new double[] {1, 2, 3, 4, 5, 6};
@@ -184,7 +185,7 @@ public class RandomTests {
   }
 
   @Test
-  public void testCollectionChose() {
+  void testCollectionChose() {
 
     List<Integer> list = Arrays.asList(1, 2, 3, 4, 5, 6);
 
@@ -193,7 +194,7 @@ public class RandomTests {
   }
 
   @Test
-  public void testArrayShuffle() {
+  void testArrayShuffle() {
     int[] testInt = new int[] {1, 2, 3, 4, 5, 6};
     long[] testLong = new long[] {1, 2, 3, 4, 5, 6};
     double[] testDouble = new double[] {1, 2, 3, 4, 5, 6};
@@ -215,7 +216,7 @@ public class RandomTests {
   }
 
   @Test
-  public void testRandomLocationInCircle() {
+  void testRandomLocationInCircle() {
     Game.random().setSeed(12345);
     Ellipse2D circle = new Ellipse2D.Double(0, 0, 100, 100);
     for (int i = 0; i < 100; i++) {
@@ -229,7 +230,7 @@ public class RandomTests {
   }
 
   @Test
-  public void testGetIndex() {
+  void testGetIndex() {
     double[] probabilities = new double[] {.5, .25, .125, .125};
 
     // set seed to make results reproducible

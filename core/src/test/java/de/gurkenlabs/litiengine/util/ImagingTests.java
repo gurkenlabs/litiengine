@@ -19,10 +19,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class ImagingTests {
+class ImagingTests {
 
   @Test
-  public void testSubImage() {
+  void testSubImage() {
     BufferedImage image =
         Resources.images().get("de/gurkenlabs/litiengine/util/prop-flag.png");
     BufferedImage[][] subImages = Imaging.getSubImages(image, 1, 2);
@@ -35,7 +35,7 @@ public class ImagingTests {
   }
 
   @Test
-  public void testHorizontalFlip() {
+  void testHorizontalFlip() {
     BufferedImage image =
         Resources.images().get("de/gurkenlabs/litiengine/util/prop-flag.png");
     BufferedImage flippedReferenceImage =
@@ -50,7 +50,7 @@ public class ImagingTests {
   }
 
   @Test
-  public void testVerticalFlip() {
+  void testVerticalFlip() {
     BufferedImage image =
         Resources.images().get("de/gurkenlabs/litiengine/util/prop-flag.png");
     BufferedImage flippedReferenceImage =
@@ -66,7 +66,7 @@ public class ImagingTests {
 
   @ParameterizedTest(name = "testRotate rotatedImagePath={0}, rotation={1}")
   @MethodSource("getRotateArguments")
-  public void testRotate(String rotatedImagePath, Rotation rotation) {
+  void testRotate(String rotatedImagePath, Rotation rotation) {
     // precondition check to prevent resource optimism
     String imagePath = "de/gurkenlabs/litiengine/util/prop-flag.png";
 
@@ -94,23 +94,8 @@ public class ImagingTests {
     assertArrayEquals(expectedPixels, actualPixels);
   }
 
-  /**
-   * This method is used for defining the input arguments of the parameterized test {@link
-   * #testRotate(String, Rotation)}
-   *
-   * @return Test arguments
-   */
-  @SuppressWarnings("unused")
-  private static Stream<Arguments> getRotateArguments() {
-    return Stream.of(
-        Arguments.of("de/gurkenlabs/litiengine/util/prop-flag.png", Rotation.NONE),
-        Arguments.of("de/gurkenlabs/litiengine/util/prop-flag-90.png", Rotation.ROTATE_90),
-        Arguments.of("de/gurkenlabs/litiengine/util/prop-flag-180.png", Rotation.ROTATE_180),
-        Arguments.of("de/gurkenlabs/litiengine/util/prop-flag-270.png", Rotation.ROTATE_270));
-  }
-
   @Test
-  public void testScaling() {
+  void testScaling() {
     BufferedImage image =
         Resources.images().get("de/gurkenlabs/litiengine/util/prop-flag.png");
     BufferedImage expectedx2 =
@@ -144,7 +129,7 @@ public class ImagingTests {
   }
 
   @Test
-  public void testOpacity() {
+  void testOpacity() {
     BufferedImage image =
         Resources.images().get("de/gurkenlabs/litiengine/util/prop-flag.png");
     BufferedImage expected25 =
@@ -165,7 +150,7 @@ public class ImagingTests {
   }
 
   @Test
-  public void testFlash() {
+  void testFlash() {
     BufferedImage image =
         Resources.images().get("de/gurkenlabs/litiengine/util/prop-flag.png");
     BufferedImage expectedFlash =
@@ -180,7 +165,7 @@ public class ImagingTests {
   }
 
   @Test
-  public void testAlpha() {
+  void testAlpha() {
     BufferedImage expected =
         Resources.images().get("de/gurkenlabs/litiengine/util/prop-flag.png");
     BufferedImage alpha =
@@ -196,7 +181,7 @@ public class ImagingTests {
   }
 
   @Test
-  public void testBorder() {
+  void testBorder() {
     BufferedImage image =
         Resources.images().get("de/gurkenlabs/litiengine/util/prop-flag.png");
     BufferedImage expectedBorder =
@@ -219,7 +204,7 @@ public class ImagingTests {
   }
 
   @Test
-  public void testEmpty() {
+  void testEmpty() {
     BufferedImage image =
         Resources.images().get("de/gurkenlabs/litiengine/util/prop-flag.png");
     BufferedImage imageEmpty =
@@ -230,7 +215,7 @@ public class ImagingTests {
   }
 
   @Test
-  public void testCopy() {
+  void testCopy() {
     BufferedImage image =
         Resources.images().get("de/gurkenlabs/litiengine/util/prop-flag.png");
     int[] expectedPixels = ((DataBufferInt) image.getData().getDataBuffer()).getData();
@@ -242,7 +227,7 @@ public class ImagingTests {
   }
 
   @Test
-  public void testSpriteFlipHorizontally() {
+  void testSpriteFlipHorizontally() {
     BufferedImage image =
         Resources.images().get("de/gurkenlabs/litiengine/util/prop-flag.png");
     Spritesheet sprite =
@@ -258,7 +243,7 @@ public class ImagingTests {
   }
 
   @Test
-  public void testSpriteFlipVertically() {
+  void testSpriteFlipVertically() {
     BufferedImage image =
         Resources.images().get("de/gurkenlabs/litiengine/util/prop-flag-2rows.png");
     Spritesheet sprite =
@@ -272,5 +257,20 @@ public class ImagingTests {
 
     int[] actualPixels = ((DataBufferInt) flippedVertically.getData().getDataBuffer()).getData();
     assertArrayEquals(expectedPixels, actualPixels);
+  }
+
+  /**
+   * This method is used for defining the input arguments of the parameterized test {@link
+   * #testRotate(String, Rotation)}
+   *
+   * @return Test arguments
+   */
+  @SuppressWarnings("unused")
+  private static Stream<Arguments> getRotateArguments() {
+    return Stream.of(
+            Arguments.of("de/gurkenlabs/litiengine/util/prop-flag.png", Rotation.NONE),
+            Arguments.of("de/gurkenlabs/litiengine/util/prop-flag-90.png", Rotation.ROTATE_90),
+            Arguments.of("de/gurkenlabs/litiengine/util/prop-flag-180.png", Rotation.ROTATE_180),
+            Arguments.of("de/gurkenlabs/litiengine/util/prop-flag-270.png", Rotation.ROTATE_270));
   }
 }

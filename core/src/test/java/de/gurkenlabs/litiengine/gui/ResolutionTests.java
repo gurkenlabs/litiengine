@@ -6,10 +6,10 @@ import de.gurkenlabs.litiengine.gui.screens.Resolution;
 import java.awt.Dimension;
 import org.junit.jupiter.api.Test;
 
-public class ResolutionTests {
+class ResolutionTests {
 
   @Test
-  public void testCustom() {
+  void testCustom() {
     // arrange
     int width = 999;
     int height = 888;
@@ -23,7 +23,7 @@ public class ResolutionTests {
   }
 
   @Test
-  public void testDimensionString() {
+  void testDimensionString() {
     // act
     Resolution res = Resolution.Ratio16x9.RES_1280x720;
 
@@ -33,7 +33,7 @@ public class ResolutionTests {
   }
 
   @Test
-  public void testToString() {
+  void testToString() {
     // arrange
     Resolution resolution = Resolution.Ratio16x10.RES_1920x1200;
 
@@ -45,7 +45,7 @@ public class ResolutionTests {
   }
 
   @Test
-  public void testGetDimension() {
+  void testGetDimension() {
     // arrange
     Resolution resolution = Resolution.Ratio4x3.RES_800x600;
 

@@ -8,10 +8,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-public class MathUtilitiesTests {
+class MathUtilitiesTests {
 
   @Test
-  public void testRound() {
+  void testRound() {
     float value1 = 4.3f;
     float value2 = 10.4f;
     float value3 = 6.6f;
@@ -22,7 +22,7 @@ public class MathUtilitiesTests {
   }
 
   @Test
-  public void testIntClamp() {
+  void testIntClamp() {
     int toLow = 4;
     int toHigh = 11;
     int inRange = 6;
@@ -33,7 +33,7 @@ public class MathUtilitiesTests {
   }
 
   @Test
-  public void testLongClamp() {
+  void testLongClamp() {
     long toLow = 4000000000L;
     long toHigh = 11000000000L;
     long inRange = 6600000000L;
@@ -44,7 +44,7 @@ public class MathUtilitiesTests {
   }
 
   @Test
-  public void testDoubleClamp() {
+  void testDoubleClamp() {
     double toLow = 4.3;
     double toHigh = 10.4;
     double inRange = 6.6;
@@ -55,7 +55,7 @@ public class MathUtilitiesTests {
   }
 
   @Test
-  public void testFloatClamp() {
+  void testFloatClamp() {
     float toLow = 4.3f;
     float toHigh = 10.4f;
     float inRange = 6.6f;
@@ -71,7 +71,7 @@ public class MathUtilitiesTests {
     "'value >= min && value > max',42, 10, 40, 40",
     "'value >= min && value <= max',42, 10, 100, 42"
   })
-  public void testByteClamp(String partition, byte value, byte min, byte max, byte result) {
+  void testByteClamp(String partition, byte value, byte min, byte max, byte result) {
     assertEquals(result, MathUtilities.clamp(value, min, max));
   }
 
@@ -81,12 +81,12 @@ public class MathUtilitiesTests {
     "'value >= min && value > max', 4200, 1200, 3511, 3511",
     "'value >= min && value <= max', 4200, 1337, 28111, 4200"
   })
-  public void testShortClamp(String partition, short value, short min, short max, short result) {
+  void testShortClamp(String partition, short value, short min, short max, short result) {
     assertEquals(result, MathUtilities.clamp(value, min, max));
   }
 
   @Test
-  public void testGetAverageInt() {
+  void testGetAverageInt() {
     int avg = MathUtilities.getAverage(new int[] {2, 2, 1, 1, 1, 2});
     int avg2 = MathUtilities.getAverage(new int[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
 
@@ -95,7 +95,7 @@ public class MathUtilitiesTests {
   }
 
   @Test
-  public void testGetAverageDouble() {
+  void testGetAverageDouble() {
     double avg = MathUtilities.getAverage(new double[] {2, 2, 1, 1, 1, 2});
     double avg2 = MathUtilities.getAverage(new double[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
 
@@ -104,7 +104,7 @@ public class MathUtilitiesTests {
   }
 
   @Test
-  public void testGetAverageFloat() {
+  void testGetAverageFloat() {
     float avg = MathUtilities.getAverage(new float[] {2, 2, 1, 1, 1, 2});
     float avg2 = MathUtilities.getAverage(new float[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
 
@@ -113,7 +113,7 @@ public class MathUtilitiesTests {
   }
 
   @Test
-  public void testGetMaxInt() {
+  void testGetMaxInt() {
     int max = MathUtilities.getMax(new int[] {2, 2, 1, 1, 1, 2});
     int max2 = MathUtilities.getMax(new int[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
 
@@ -122,7 +122,7 @@ public class MathUtilitiesTests {
   }
 
   @Test
-  public void testIsOddNumber() {
+  void testIsOddNumber() {
     int oddNumber = 1;
     int evenNumber = 2;
 
@@ -132,12 +132,12 @@ public class MathUtilitiesTests {
 
   @ParameterizedTest(name = "testGetFullPercent percent={0}, fraction={2}, expectedValue={3}")
   @CsvSource({"4.3d, 2.15d, 50.0d", "0, 2.15d, 0", "0, 2.6d, 0", "10.4, 2.6d, 25.0d"})
-  public void testGetFullPercent(double percent, double fraction, double expectedValue) {
+  void testGetFullPercent(double percent, double fraction, double expectedValue) {
     assertEquals(expectedValue, MathUtilities.getFullPercent(percent, fraction));
   }
 
   @Test
-  public void testGetPercent() {
+  void testGetPercent() {
     double percent1 = 4.3;
     double percent2 = 0.0;
     double percent3 = 0;

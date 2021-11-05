@@ -26,14 +26,14 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class MapTests {
+class MapTests {
   @BeforeEach
   public void clearResources() {
     Resources.maps().clear();
   }
 
   @Test
-  public void testBasicProperties() throws MalformedURLException {
+  void testBasicProperties() throws MalformedURLException {
     IMap map =
         Resources.maps().get("de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
 
@@ -68,7 +68,7 @@ public class MapTests {
 
   @ParameterizedTest
   @MethodSource("getTileCustomProperties")
-  public void testTileCustomProperties(
+  void testTileCustomProperties(
       int tileLayers, int x, int y, String propertyName, String expectedValue) {
     IMap map =
         Resources.maps().get("de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
@@ -80,15 +80,8 @@ public class MapTests {
         map.getTileLayers().get(tileLayers).getTile(x, y).getStringValue(propertyName));
   }
 
-  private static Stream<Arguments> getTileCustomProperties() {
-    return Stream.of(
-        Arguments.of(0, 5, 3, "foo", "bar"),
-        Arguments.of(0, 9, 5, "baz", "bap"),
-        Arguments.of(0, 10, 10, "custom", "multiline\nproperty"));
-  }
-
   @Test
-  public void testSettingProperties() {
+  void testSettingProperties() {
     TmxMap map =
         (TmxMap)
             Resources.maps()
@@ -116,7 +109,7 @@ public class MapTests {
   }
 
   @Test
-  public void testMapObjectLayers() {
+  void testMapObjectLayers() {
     IMap map =
         Resources.maps()
             .get("de/gurkenlabs/litiengine/environment/tilemap/xml/test-mapobject.tmx");
@@ -159,7 +152,7 @@ public class MapTests {
 
   @ParameterizedTest(name = "testDecimalFloatAdapter value={0}, expected={1}")
   @CsvSource({"1f, '1'", "1.0f, '1'", "1.00f, '1'", "1.1f, '1.1'", "1.00003f, '1.00003'"})
-  public void testDecimalFloatAdapter(float value, String expected) throws Exception {
+  void testDecimalFloatAdapter(float value, String expected) throws Exception {
     // arrange
     DecimalFloatAdapter adapter = new DecimalFloatAdapter();
 
@@ -171,7 +164,7 @@ public class MapTests {
   }
 
   @Test
-  public void testInfiniteMap() {
+  void testInfiniteMap() {
     TmxMap map =
         (TmxMap)
             Resources.maps()
@@ -188,7 +181,7 @@ public class MapTests {
   }
 
   @Test
-  public void testURLAdapter() {
+  void testURLAdapter() {
     // this test is only for the marshalling
     // the unmarshalling is covered by other map tests
 
@@ -203,5 +196,12 @@ public class MapTests {
     assertEquals("tile.png", ma.marshal(image1));
     assertEquals("res/external-tileset.tsx", ma.marshal(tileset));
     assertEquals("../tiles-test.png", ta.marshal(image2));
+  }
+
+  private static Stream<Arguments> getTileCustomProperties() {
+    return Stream.of(
+            Arguments.of(0, 5, 3, "foo", "bar"),
+            Arguments.of(0, 9, 5, "baz", "bap"),
+            Arguments.of(0, 10, 10, "custom", "multiline\nproperty"));
   }
 }

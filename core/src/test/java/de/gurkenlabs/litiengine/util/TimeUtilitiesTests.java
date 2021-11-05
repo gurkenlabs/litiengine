@@ -10,10 +10,10 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class TimeUtilitiesTests {
+class TimeUtilitiesTests {
 
   @Test
-  public void testMillisecondCalculations() {
+  void testMillisecondCalculations() {
     long seconds = TimeUtilities.getSeconds(999);
     long minutes = TimeUtilities.getMinutes(59999);
     long hours = TimeUtilities.getHours(3599999);
@@ -35,7 +35,7 @@ public class TimeUtilitiesTests {
 
   @ParameterizedTest(name = "testGetRemainingDays time={0} expectedRemainingDays={1}")
   @CsvSource({"3600123, 0", "999991239, 11", "-100000000, -1", "0, 0"})
-  public void testGetRemainingDays(long time, long expectedRemainingDays) {
+  void testGetRemainingDays(long time, long expectedRemainingDays) {
     // act
     long actualRemainingDays = TimeUtilities.getRemainingDays(time);
 
@@ -45,7 +45,7 @@ public class TimeUtilitiesTests {
 
   @ParameterizedTest(name = "testToTimerFormat duration={0} format={1} expectedTime={2}")
   @MethodSource("getToTimerFormatArguments")
-  public void testToTimerFormat(long duration, TimerFormat format, String expectedTime) {
+  void testToTimerFormat(long duration, TimerFormat format, String expectedTime) {
     // act
     String actualTime = TimeUtilities.toTimerFormat(duration, format);
 

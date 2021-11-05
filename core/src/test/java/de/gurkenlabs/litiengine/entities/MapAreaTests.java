@@ -7,9 +7,9 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import java.awt.geom.Point2D;
 import org.junit.jupiter.api.Test;
 
-public class MapAreaTests {
+class MapAreaTests {
   @Test
-  public void testConstructorDefault() {
+  void testConstructorDefault() {
     // act
     MapArea mapArea = new MapArea();
 
@@ -20,7 +20,7 @@ public class MapAreaTests {
   }
 
   @Test
-  public void testConstructorWithArgs() {
+  void testConstructorWithArgs() {
     // act
     MapArea mapArea = new MapArea(1, 2, 3, 4);
 
@@ -34,7 +34,7 @@ public class MapAreaTests {
   }
 
   @Test
-  public void testConstructorWithId() {
+  void testConstructorWithId() {
     // act
     MapArea mapArea = new MapArea(42, "cool name", 9, 8, 7, 6);
 

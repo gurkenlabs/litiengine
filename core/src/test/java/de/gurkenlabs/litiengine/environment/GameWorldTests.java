@@ -11,7 +11,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class GameWorldTests {
+class GameWorldTests {
 
   @BeforeEach
   public void initGame() {
@@ -25,7 +25,7 @@ public class GameWorldTests {
   }
 
   @Test
-  public void testListeners_loadEnvironment() {
+  void testListeners_loadEnvironment() {
     // arrange
     Status mapInitialized = new Status();
     Status mapLoaded = new Status();
@@ -57,7 +57,7 @@ public class GameWorldTests {
   }
 
   @Test
-  public void testListeners_clearEnvironment() {
+  void testListeners_clearEnvironment() {
     Status mapUnloaded = new Status();
     Status mapCleared = new Status();
 
@@ -87,7 +87,7 @@ public class GameWorldTests {
   }
 
   @Test
-  public void testListeners_loadDifferentEnvironment() {
+  void testListeners_loadDifferentEnvironment() {
     Status mapUnloaded = new Status();
     Status map2Initialized = new Status();
     Status map2Loaded = new Status();
@@ -133,7 +133,7 @@ public class GameWorldTests {
   }
 
   @Test
-  public void testMapSpecificLoadedListeners() {
+  void testMapSpecificLoadedListeners() {
     // arrange
     Status mapLoaded = new Status();
     Game.world().onLoaded("test-map", e -> mapLoaded.wasCalled = true);
@@ -148,7 +148,7 @@ public class GameWorldTests {
   }
 
   @Test
-  public void testMapSpecificUnloadedListeners() {
+  void testMapSpecificUnloadedListeners() {
     // arrange
     Status mapUnloaded = new Status();
     Game.world().onUnloaded("test-map", e -> mapUnloaded.wasCalled = true);

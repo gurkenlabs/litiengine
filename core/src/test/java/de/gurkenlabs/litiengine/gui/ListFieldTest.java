@@ -133,7 +133,7 @@ class ListFieldTest {
   }
 
   @Test
-  public void refresh_selectComponent_selectSingleSelected() {
+  void refresh_selectComponent_selectSingleSelected() {
     // arrange
     ListField actualListField =
         new ListField(
@@ -157,7 +157,7 @@ class ListFieldTest {
   }
 
   @Test
-  public void refresh_selectComponent_selectEntireRowSelected() {
+  void refresh_selectComponent_selectEntireRowSelected() {
     // arrange
     ListField actualListField =
         new ListField(
@@ -182,7 +182,7 @@ class ListFieldTest {
   }
 
   @Test
-  public void refresh_selectComponent_noSelectNull() {
+  void refresh_selectComponent_noSelectNull() {
     // arrange
     ListField actualListField =
         new ListField(0, 0, 100, 50, this.content_2D, content_2D_shownRows, content_2D.length);

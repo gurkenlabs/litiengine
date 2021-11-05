@@ -55,7 +55,7 @@ class PropTests {
   }
 
   @Test
-  public void testToStringNull() {
+  void testToStringNull() {
     // arrange
     Prop prop = new Prop(0, 0, null);
     prop.setMapId(1);
@@ -65,7 +65,7 @@ class PropTests {
   }
 
   @Test
-  public void testToStringEmpty() {
+  void testToStringEmpty() {
     // arrange
     Prop prop = new Prop(0, 0, "");
     prop.setMapId(1);
@@ -75,7 +75,7 @@ class PropTests {
   }
 
   @Test
-  public void testToStringNotNull() {
+  void testToStringNotNull() {
     // arrange
     Prop prop = new Prop(0, 0, "Test");
     prop.setMapId(1);

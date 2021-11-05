@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-public class TrigonometryTests {
+class TrigonometryTests {
 
   @ParameterizedTest(name = "{0}: ({1}, {2}) = {3}")
   @CsvSource({
@@ -19,7 +19,7 @@ public class TrigonometryTests {
     "'Off-point y negative x negative', -0.0000001f, -0.0000001f, -2.3561945f",
     "'x negative, y on-point', 0.0f, -0.5f, 3.1415927f"
   })
-  public void testATan2AtBoundaries(String boundary, float y, float x, float expectedResult) {
+  void testATan2AtBoundaries(String boundary, float y, float x, float expectedResult) {
     // act
     float actualResult = Trigonometry.atan2(y, x);
 
@@ -28,7 +28,7 @@ public class TrigonometryTests {
   }
 
   @Test
-  public void testAtan2Deg() {
+  void testAtan2Deg() {
     // arrange
     float y = 1.0f;
     float x = 1.0f;
@@ -41,7 +41,7 @@ public class TrigonometryTests {
   }
 
   @Test
-  public void testAtan2DegStrict() {
+  void testAtan2DegStrict() {
     // arrange
     float y = 1.2f;
     float x = -0.5f;
@@ -54,7 +54,7 @@ public class TrigonometryTests {
   }
 
   @Test
-  public void testCos() {
+  void testCos() {
     // arrange
     float radians = 4.7874381f;
 
@@ -66,7 +66,7 @@ public class TrigonometryTests {
   }
 
   @Test
-  public void testSin() {
+  void testSin() {
     // arrange
     float radians = 1.04719755f;
 
@@ -78,7 +78,7 @@ public class TrigonometryTests {
   }
 
   @Test
-  public void testSinDeg() {
+  void testSinDeg() {
     // arrange
     float degrees = 271.03f;
 

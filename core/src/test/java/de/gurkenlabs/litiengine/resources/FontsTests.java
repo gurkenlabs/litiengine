@@ -6,9 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import java.awt.Font;
 import org.junit.jupiter.api.Test;
 
-public class FontsTests {
+class FontsTests {
   @Test
-  public void get_SizeStyleNegative() {
+  void get_SizeStyleNegative() {
     // arrange
     Font testFont = new Font("test", Font.BOLD, 1);
     Fonts fonts = new Fonts();
@@ -26,7 +26,7 @@ public class FontsTests {
   }
 
   @Test
-  public void get_StyleZero() {
+  void get_StyleZero() {
     // arrange
     Font testFont = new Font("test", Font.BOLD, 1);
     Fonts fonts = new Fonts();
@@ -41,7 +41,7 @@ public class FontsTests {
   }
 
   @Test
-  public void get_SizeZero() {
+  void get_SizeZero() {
     // arrange
     Font testFont = new Font("test", Font.BOLD, 1);
     Fonts fonts = new Fonts();
@@ -56,7 +56,7 @@ public class FontsTests {
   }
 
   @Test
-  public void get_SizeStylePositive() {
+  void get_SizeStylePositive() {
     // arrange
     Font testFont = new Font("test", Font.PLAIN, 1);
     Fonts fonts = new Fonts();

@@ -7,10 +7,10 @@ import java.awt.geom.Point2D;
 import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 
-public class PointDistanceComparatorTests {
+class PointDistanceComparatorTests {
 
   @Test
-  public void testPointDistanceComparator() {
+  void testPointDistanceComparator() {
 
     final Point2D[] points = new Point2D[4];
 
@@ -37,7 +37,7 @@ public class PointDistanceComparatorTests {
   }
 
   @Test
-  public void testPointDistanceComparatorWithIdenticalPoints() {
+  void testPointDistanceComparatorWithIdenticalPoints() {
     Point2D referencePoint = new Point2D.Double(0d, 0d);
     PointDistanceComparator pointDistanceComparator = new PointDistanceComparator(referencePoint);
 

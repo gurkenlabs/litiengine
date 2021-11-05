@@ -4,15 +4,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-public class MaterialTests {
+class MaterialTests {
 
   @Test
-  public void testEmptyValue() {
+  void testEmptyValue() {
     assertEquals(Material.UNDEFINED, Material.get(""));
   }
 
   @Test
-  public void testNullValue() {
+  void testNullValue() {
     assertEquals(Material.UNDEFINED, Material.get(null));
   }
 }

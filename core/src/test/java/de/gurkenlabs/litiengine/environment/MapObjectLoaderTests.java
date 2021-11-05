@@ -32,6 +32,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.CustomProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
@@ -40,12 +41,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class MapObjectLoaderTests {
+class MapObjectLoaderTests {
   private Environment testEnvironment;
 
   @BeforeAll
@@ -73,7 +75,7 @@ public class MapObjectLoaderTests {
   }
 
   @Test
-  public void testCreatureMapObjectLoader() {
+  void testCreatureMapObjectLoader() {
     CreatureMapObjectLoader loader = new CreatureMapObjectLoader();
     MapObject mapObject = new MapObject();
     mapObject.setType(MapObjectType.CREATURE.name());
@@ -129,7 +131,7 @@ public class MapObjectLoaderTests {
   }
 
   @Test
-  public void testPropMapObjectLoader() {
+  void testPropMapObjectLoader() {
     PropMapObjectLoader loader = new PropMapObjectLoader();
     MapObject mapObject = new MapObject();
     mapObject.setType(MapObjectType.PROP.name());
@@ -175,7 +177,7 @@ public class MapObjectLoaderTests {
   }
 
   @Test
-  public void testColliderMapObjectLoader() {
+  void testColliderMapObjectLoader() {
     CollisionBoxMapObjectLoader loader = new CollisionBoxMapObjectLoader();
     IMapObject mapObject = mock(IMapObject.class);
     when(mapObject.getType()).thenReturn(MapObjectType.COLLISIONBOX.name());
@@ -204,7 +206,7 @@ public class MapObjectLoaderTests {
   }
 
   @Test
-  public void testTriggerMapObjectLoader() {
+  void testTriggerMapObjectLoader() {
     TriggerMapObjectLoader loader = new TriggerMapObjectLoader();
     IMapObject mapObject = mock(IMapObject.class);
     when(mapObject.getType()).thenReturn(MapObjectType.TRIGGER.name());
@@ -215,8 +217,7 @@ public class MapObjectLoaderTests {
     when(mapObject.getHeight()).thenReturn(200f);
 
     when(mapObject.getStringValue(MapObjectProperty.TRIGGER_MESSAGE)).thenReturn("message");
-    when(mapObject.getStringValue(MapObjectProperty.TRIGGER_ACTIVATION))
-        .thenReturn(TriggerActivation.INTERACT.name());
+    when(mapObject.getStringValue(MapObjectProperty.TRIGGER_ACTIVATION)).thenReturn(TriggerActivation.INTERACT.name());
     when(mapObject.getStringValue(MapObjectProperty.TRIGGER_TARGETS)).thenReturn("1,2,3");
     when(mapObject.getStringValue(MapObjectProperty.TRIGGER_ACTIVATORS)).thenReturn("4,5,6");
     when(mapObject.getStringValue(MapObjectProperty.TRIGGER_ONETIME)).thenReturn("false");
@@ -237,14 +238,14 @@ public class MapObjectLoaderTests {
 
     assertFalse(trigger.isOneTimeTrigger());
     assertEquals(TriggerActivation.INTERACT, trigger.getActivationType());
-    assertArrayEquals(new Integer[] {1, 2, 3}, trigger.getTargets().toArray());
-    assertArrayEquals(new Integer[] {4, 5, 6}, trigger.getActivators().toArray());
+    assertArrayEquals(new Integer[]{1, 2, 3}, trigger.getTargets().toArray());
+    assertArrayEquals(new Integer[]{4, 5, 6}, trigger.getActivators().toArray());
     assertEquals(200.0, trigger.getCollisionBoxWidth(), 0.0001);
     assertEquals(200.0, trigger.getCollisionBoxHeight(), 0.0001);
   }
 
   @Test
-  public void testEmitterMapObjectLoader() {
+  void testEmitterMapObjectLoader() {
     EmitterMapObjectLoader loader = new EmitterMapObjectLoader();
     IMapObject mapObject = mock(IMapObject.class);
     when(mapObject.getType()).thenReturn(MapObjectType.EMITTER.name());
@@ -266,7 +267,7 @@ public class MapObjectLoaderTests {
   }
 
   @Test
-  public void testLightSourceMapObjectLoader() {
+  void testLightSourceMapObjectLoader() {
     LightSourceMapObjectLoader loader = new LightSourceMapObjectLoader();
     IMapObject mapObject = mock(IMapObject.class);
     when(mapObject.getType()).thenReturn(MapObjectType.LIGHTSOURCE.name());
@@ -275,11 +276,9 @@ public class MapObjectLoaderTests {
     when(mapObject.getLocation()).thenReturn(new Point(100, 100));
 
     when(mapObject.getIntValue(MapObjectProperty.LIGHT_INTENSITY, 100)).thenReturn(100);
-    when(mapObject.getColorValue(MapObjectProperty.LIGHT_COLOR))
-        .thenReturn(new Color(255, 255, 255, 100));
+    when(mapObject.getColorValue(MapObjectProperty.LIGHT_COLOR)).thenReturn(new Color(255, 255, 255, 100));
     when(mapObject.getBoolValue(MapObjectProperty.LIGHT_ACTIVE, true)).thenReturn(true);
-    when(mapObject.getEnumValue(MapObjectProperty.LIGHT_SHAPE, LightSource.Type.class))
-        .thenReturn(LightSource.Type.ELLIPSE);
+    when(mapObject.getEnumValue(MapObjectProperty.LIGHT_SHAPE, LightSource.Type.class)).thenReturn(LightSource.Type.ELLIPSE);
     when(mapObject.getStringValue(MapObjectProperty.LIGHT_SHAPE)).thenReturn("ellipse");
 
     Collection<IEntity> entities = loader.load(this.testEnvironment, mapObject);
@@ -305,7 +304,7 @@ public class MapObjectLoaderTests {
   }
 
   @Test
-  public void testCustomMapObjectLoader() {
+  void testCustomMapObjectLoader() {
     Environment.registerCustomEntityType(CustomEntity.class);
 
     IMapObject mapObject = mock(IMapObject.class);
@@ -343,7 +342,7 @@ public class MapObjectLoaderTests {
   }
 
   @Test
-  public void customPropertiesShoudBePassedToTheEntity() {
+  void customPropertiesShoudBePassedToTheEntity() {
     Environment.registerCustomEntityType(CustomEntity.class);
 
     IMapObject mapObject = mock(IMapObject.class);
@@ -376,6 +375,15 @@ public class MapObjectLoaderTests {
     assertEquals("33333", customEntity.getProperties().getStringValue("zapp"));
   }
 
+  @Test
+  void testMapObjectType() {
+    String mapObject1 = null;
+    String mapObject2 = "";
+
+    assertNull(MapObjectType.get(mapObject1));
+    assertNull(MapObjectType.get(mapObject2));
+  }
+
   @EntityInfo(customMapObjectType = "customEntity")
   static class CustomEntity extends Entity {
     @TmxProperty(name = "foo")
@@ -393,14 +401,5 @@ public class MapObjectLoaderTests {
     public int getBar() {
       return this.bar;
     }
-  }
-
-  @Test
-  public void testMapObjectType() {
-    String mapObject1 = null;
-    String mapObject2 = "";
-
-    assertNull(MapObjectType.get(mapObject1));
-    assertNull(MapObjectType.get(mapObject2));
   }
 }

@@ -28,12 +28,12 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class GeometricUtilitiesTests {
+class GeometricUtilitiesTests {
 
   @ParameterizedTest(
       name = "testScaleWithRatioWidth width={0}, height={1}, max={2}, expectedValue={3}")
   @CsvSource({"16, 32, 16, 8", "32, 16, 16, 16"})
-  public void testScaleWithRatioWidth(int width, int height, int max, int expectedValue) {
+  void testScaleWithRatioWidth(int width, int height, int max, int expectedValue) {
     Dimension2D newDimension = GeometricUtilities.scaleWithRatio(width, height, max);
     assertEquals(expectedValue, newDimension.getWidth(), 0.0001);
   }
@@ -41,7 +41,7 @@ public class GeometricUtilitiesTests {
   @ParameterizedTest(
       name = "testScaleWithRatioHeight width={0}, height={1}, max={2}, expectedValue={3}")
   @CsvSource({"16, 32, 16, 16", "32, 16, 16, 8"})
-  public void testScaleWithRatioHeight(int width, int height, int max, int expectedValue) {
+  void testScaleWithRatioHeight(int width, int height, int max, int expectedValue) {
     Dimension2D newDimension1 = GeometricUtilities.scaleWithRatio(width, height, max);
     assertEquals(expectedValue, newDimension1.getHeight(), 0.0001);
   }
@@ -57,7 +57,7 @@ public class GeometricUtilitiesTests {
     "1.0d, -1.0d, 135.0f",
     "-1.0d, 1.0d, 315.0f"
   })
-  public void testCalcRotationAngleInDegrees(double x, double y, float expectedAngle) {
+  void testCalcRotationAngleInDegrees(double x, double y, float expectedAngle) {
     // arrange
     Point2D.Double centerPoint = new Point2D.Double(0, 0);
     Point2D.Double targetPoint = new Point2D.Double(x, y);
@@ -70,7 +70,7 @@ public class GeometricUtilitiesTests {
   }
 
   @Test
-  public void testGetCenterPointPoint() {
+  void testGetCenterPointPoint() {
     // arrange
     Point2D point1 = new Point2D.Double(0, 0);
     Point2D point2 = new Point2D.Double(0, 1);
@@ -83,7 +83,7 @@ public class GeometricUtilitiesTests {
   }
 
   @Test
-  public void testGetCenterLine() {
+  void testGetCenterLine() {
     // arrange
     Line2D line = new Line2D.Double(new Point2D.Double(0, 0), new Point2D.Double(0, 1));
 
@@ -95,7 +95,7 @@ public class GeometricUtilitiesTests {
   }
 
   @Test
-  public void testGetCenterDouble() {
+  void testGetCenterDouble() {
     // arrange, act
     Point2D mid = GeometricUtilities.getCenter(0, 0, 1, 1);
 
@@ -105,7 +105,7 @@ public class GeometricUtilitiesTests {
 
   @ParameterizedTest
   @MethodSource("getCenterRectangularShapeArguments")
-  public void testGetCenterRectangularShape(
+  void testGetCenterRectangularShape(
       String name, RectangularShape shape, double expectedX, double expectedY) {
     // act
     Point2D center = GeometricUtilities.getCenter(shape);
@@ -114,27 +114,9 @@ public class GeometricUtilitiesTests {
     assertEquals(new Point2D.Double(expectedX, expectedY), center);
   }
 
-  /**
-   * This method is used to provide arguments for {@link #testGetCenterRectangularShape(String,
-   * RectangularShape, double, double)}
-   *
-   * @return Test arguments
-   */
-  @SuppressWarnings("unused")
-  private static Stream<Arguments> getCenterRectangularShapeArguments() {
-    return Stream.of(
-        Arguments.of("Arc", new Arc2D.Double(0, 0, 1, 1, 1, 1, Arc2D.OPEN), 0.5, 0.5),
-        Arguments.of("Ellipse", new Ellipse2D.Double(0, 0, 1, 1), 0.5, 0.5),
-        Arguments.of(
-            "Circle",
-            GeometricUtilities.getCircle(new Point2D.Double(0.5d, 0.5d), 0.5d),
-            0.5,
-            0.5));
-  }
-
   @ParameterizedTest(name = "testGetCenterRectangle x1={0}, y1={1}, x2={2}, y2={3}")
   @CsvSource({"0, 0, 1, 1, 0.5, 0.5", "5, 5, 10, 10, 10, 10", "-5, -5, 10, 10, 0, 0"})
-  public void testGetCenterRectangle(
+  void testGetCenterRectangle(
       double x1, double y1, double x2, double y2, double expectedX, double expectedY) {
     // arrange
     Rectangle2D rectangle = new Rectangle2D.Double(x1, y1, x2, y2);
@@ -147,7 +129,7 @@ public class GeometricUtilitiesTests {
   }
 
   @Test
-  public void testRaycast() {
+  void testRaycast() {
     final Rectangle2D rect = new Rectangle2D.Double(1, 1, 3, 2);
 
     final Point2D relativePoint = new Point2D.Double(0, 0);
@@ -166,7 +148,7 @@ public class GeometricUtilitiesTests {
 
   @ParameterizedTest(name = "testProjectByAngle_xCoordinate angle={0}, expectedX={1}")
   @CsvSource({"90.0d, 1.0d", "180.0d, 0", "270.0d, -1.0d", "360, 0"})
-  public void testProjectionByAngle_xCoordinate(double angle, double expectedX) {
+  void testProjectionByAngle_xCoordinate(double angle, double expectedX) {
     // arrange
     final Point2D start = new Point2D.Double(0, 0);
 
@@ -180,7 +162,7 @@ public class GeometricUtilitiesTests {
 
   @ParameterizedTest(name = "testProjectByAngle_yCoordinate angle={0}, expectedY={1}")
   @CsvSource({"90.0d, 0d", "180.0d, -1.0d", "270.0d, 0", "360, 1.0d"})
-  public void testProjectionByAngle_yCoordinate(double angle, double expectedY) {
+  void testProjectionByAngle_yCoordinate(double angle, double expectedY) {
     // arrange
     final Point2D start = new Point2D.Double(0, 0);
 
@@ -200,7 +182,7 @@ public class GeometricUtilitiesTests {
     "-10.0d, -10.0d, 3.536d, -2.5d",
     "-10.0d, -10.0d, 14.142d, -10.0d"
   })
-  public void testProjectionByScalar_xCoordinate(
+  void testProjectionByScalar_xCoordinate(
       double x, double y, double scalar, double expectedX) {
     // arrange
     final Point2D start = new Point2D.Double(0, 0);
@@ -222,7 +204,7 @@ public class GeometricUtilitiesTests {
     "-10.0d, -10.0d, 3.536d, -2.5d",
     "-10.0d, -10.0d, 14.142d, -10.0d"
   })
-  public void testProjectionByScalar_yCoordinate(
+  void testProjectionByScalar_yCoordinate(
       double x, double y, double scalar, double expectedY) {
     // arrange
     final Point2D start = new Point2D.Double(0, 0);
@@ -243,7 +225,7 @@ public class GeometricUtilitiesTests {
     "-45, -0.70764893d",
     "360, -7.670362E-4d"
   })
-  public void testDeltaX(double angle, double expectedDeltaX) {
+  void testDeltaX(double angle, double expectedDeltaX) {
     // arrange, act
     double actualDeltaX = GeometricUtilities.getDeltaX(angle);
 
@@ -253,7 +235,7 @@ public class GeometricUtilitiesTests {
 
   @ParameterizedTest(name = "testDeltaY angle={0}, expectedDeltaY={1}")
   @CsvSource({"0, 1.0d", "30, 0.8658d", "360, 1.0d", "-42, 0.7435d"})
-  public void testDeltaY(double angle, double expectedDeltaY) {
+  void testDeltaY(double angle, double expectedDeltaY) {
     // act
     double actualDeltaY = GeometricUtilities.getDeltaY(angle);
 
@@ -263,7 +245,7 @@ public class GeometricUtilitiesTests {
 
   @ParameterizedTest(name = "testContains")
   @MethodSource("getContainsArguments")
-  public void testContains(Rectangle2D rectangle, Point2D point, boolean expectedResult) {
+  void testContains(Rectangle2D rectangle, Point2D point, boolean expectedResult) {
     // act
     boolean contains = GeometricUtilities.contains(rectangle, point);
 
@@ -280,7 +262,7 @@ public class GeometricUtilitiesTests {
     "bottomRight-bottomLeft, 2, 10, 10, 10, 0",
     "bottomLeft-topLeft, 3, 10, 0, 0, 0"
   })
-  public void testGetConstrainingLines(
+  void testGetConstrainingLines(
       String caption,
       int lineNumber,
       double expectedX1,
@@ -311,7 +293,7 @@ public class GeometricUtilitiesTests {
     "-9, -8, 2, 19",
     "0, 0, 1000, 1"
   })
-  public void testGetPointsBetweenPoints(double x1, double y1, double x2, double y2) {
+  void testGetPointsBetweenPoints(double x1, double y1, double x2, double y2) {
     // arrange
     Point2D start = new Point2D.Double(x1, y1);
     Point2D end = new Point2D.Double(x2, y2);
@@ -333,7 +315,7 @@ public class GeometricUtilitiesTests {
     "0.0d, 0.0d, 12.75d, -13.5d, 5.32d, 4.21d", // crooked
     "1.0d, 1.0d, 3.0d, 3.0d, 2.0d, 2.0d" // point on the line
   })
-  public void testGetPerpendicularIntersection(
+  void testGetPerpendicularIntersection(
       double x1, double y1, double x2, double y2, double pointX, double pointY) {
     // arrange
     Point2D point = new Point2D.Double(pointX, pointY);
@@ -364,7 +346,7 @@ public class GeometricUtilitiesTests {
     "0d, 0d, 1.0d, 360d, 1.0d, 0d", // 360 degrees = 0 degrees
     "1.5d, 2.74d, 2.0d, 84.84d, 1.679874d, 4.73189d" // 84.84 degrees, offset center
   })
-  public void testGetPointOnCircle(
+  void testGetPointOnCircle(
       double centerX,
       double centerY,
       double radius,
@@ -383,7 +365,7 @@ public class GeometricUtilitiesTests {
   }
 
   @Test
-  public void testGetAveragePosition() {
+  void testGetAveragePosition() {
     // arrange
     Collection<Point2D> points = new ArrayList<>();
     points.add(new Point2D.Double(2.03d, 4.93d));
@@ -399,7 +381,7 @@ public class GeometricUtilitiesTests {
   }
 
   @Test
-  public void testGetAveragePositionEmpty() {
+  void testGetAveragePositionEmpty() {
     // arrange
     Collection<Point2D> points = new ArrayList<>();
 
@@ -418,7 +400,7 @@ public class GeometricUtilitiesTests {
    */
   @ParameterizedTest(name = "testIntersectsEllipse {0}")
   @MethodSource("getIntersectsEllipseArguments")
-  public void testIntersectsEllipse(
+  void testIntersectsEllipse(
       String caption,
       Ellipse2D baseEllipse,
       Ellipse2D intersectionEllipse,
@@ -431,7 +413,7 @@ public class GeometricUtilitiesTests {
   }
 
   @Test
-  public void testGetPoints() {
+  void testGetPoints() {
     // arrange
     Path2D path = new Path2D.Double();
     List<Point2D> referencePoints = new ArrayList<>();
@@ -454,7 +436,7 @@ public class GeometricUtilitiesTests {
 
   @ParameterizedTest(name = "testDistance point1=({0},{1}), point2=({2},{3})")
   @MethodSource("getDistanceArguments")
-  public void testDistanceCoordinates(
+  void testDistanceCoordinates(
       double x1, double y1, double x2, double y2, double expectedDistance) {
     // act
     double actualDistance = GeometricUtilities.distance(x1, y1, x2, y2);
@@ -465,7 +447,7 @@ public class GeometricUtilitiesTests {
 
   @ParameterizedTest(name = "testDistance point1=({0},{1}), point2=({2},{3})")
   @MethodSource("getDistanceArguments")
-  public void testDistancePoints(
+  void testDistancePoints(
       double x1, double y1, double x2, double y2, double expectedDistance) {
     // arrange
     Point2D point1 = new Point2D.Double(x1, y1);
@@ -480,7 +462,7 @@ public class GeometricUtilitiesTests {
 
   @ParameterizedTest(name = "testDistanceRectanglePoint point=({0},{1})")
   @CsvSource({"-9.53d, 15.23d, 29.9870105d", "23.95d, -8.23d, 19.5528105d", "20.15d, 10.95d, 0d"})
-  public void testDistanceRectanglePoint(double px, double py, double expectedDistance) {
+  void testDistanceRectanglePoint(double px, double py, double expectedDistance) {
     // arrange
     Rectangle2D rectangle = new Rectangle2D.Double(20.15d, 10.95d, 10, 20);
     Point2D point = new Point2D.Double(px, py);
@@ -494,14 +476,14 @@ public class GeometricUtilitiesTests {
 
   @ParameterizedTest(name="testShapeIntersects no intersection {0} -> {1} ({2})")
   @MethodSource("shapeIntersectsNoIntersectionArguments")
-  public void testShapeIntersects_NoIntersection(String typeShape1, String typeShape2, String typeUnits, Shape shape1, Shape shape2) {
+  void testShapeIntersects_NoIntersection(String typeShape1, String typeShape2, String typeUnits, Shape shape1, Shape shape2) {
     // act, assert
     assertFalse(GeometricUtilities.shapeIntersects(shape1, shape2));
   }
 
   @ParameterizedTest(name="testShapeIntersects intersecting {0} -> {1} ({2})")
   @MethodSource("shapeIntersectsIntersectingArguments")
-  public void testShapeIntersects_Intersecting(String typeShape1, String typeShape2, String typeUnits, Shape shape1, Shape shape2) {
+  void testShapeIntersects_Intersecting(String typeShape1, String typeShape2, String typeUnits, Shape shape1, Shape shape2) {
     // act, assert
     assertTrue(GeometricUtilities.shapeIntersects(shape1, shape2));
   }
@@ -732,6 +714,24 @@ public class GeometricUtilitiesTests {
                     new Line2D.Float(99.94f, 101.2f, 456.78f, 987.65f),
                     new Line2D.Float(666f, 666f, 42f, 42.42f))
     );
+  }
+
+  /**
+   * This method is used to provide arguments for {@link #testGetCenterRectangularShape(String,
+   * RectangularShape, double, double)}
+   *
+   * @return Test arguments
+   */
+  @SuppressWarnings("unused")
+  private static Stream<Arguments> getCenterRectangularShapeArguments() {
+    return Stream.of(
+            Arguments.of("Arc", new Arc2D.Double(0, 0, 1, 1, 1, 1, Arc2D.OPEN), 0.5, 0.5),
+            Arguments.of("Ellipse", new Ellipse2D.Double(0, 0, 1, 1), 0.5, 0.5),
+            Arguments.of(
+                    "Circle",
+                    GeometricUtilities.getCircle(new Point2D.Double(0.5d, 0.5d), 0.5d),
+                    0.5,
+                    0.5));
   }
 
   /**

@@ -15,7 +15,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class KeyboardEntityControllerTests {
+class KeyboardEntityControllerTests {
   @BeforeAll
   public static void initializeKeyboard() {
     // init required Game environment
@@ -28,7 +28,7 @@ public class KeyboardEntityControllerTests {
 
   @ParameterizedTest(name = "handleKeyPressed: {0}")
   @MethodSource("supplyHandleKeyPressedParameters")
-  public void testHandleKeyPressed(
+  void testHandleKeyPressed(
       String key, int keyCode, char keyChar, int dX, int dY, int resX, int resY) {
     // arrange
     Component source = new TestComponent();
@@ -49,7 +49,7 @@ public class KeyboardEntityControllerTests {
   }
 
   @Test
-  public void addUpKeyAdded() {
+  void addUpKeyAdded() {
     // arrange
     int keyCode = KeyEvent.VK_P;
 
@@ -65,7 +65,7 @@ public class KeyboardEntityControllerTests {
   }
 
   @Test
-  public void addUpKeyContained() {
+  void addUpKeyContained() {
     // arrange
     int keyCode = KeyEvent.VK_W;
 
@@ -84,7 +84,7 @@ public class KeyboardEntityControllerTests {
   }
 
   @Test
-  public void addDownKeyAdded() {
+  void addDownKeyAdded() {
     // arrange
     int keyCode = KeyEvent.VK_P;
 
@@ -100,7 +100,7 @@ public class KeyboardEntityControllerTests {
   }
 
   @Test
-  public void addDownKeyContained() {
+  void addDownKeyContained() {
     // arrange
     int keyCode = KeyEvent.VK_S;
 
@@ -119,7 +119,7 @@ public class KeyboardEntityControllerTests {
   }
 
   @Test
-  public void addLeftKeyAdded() {
+  void addLeftKeyAdded() {
     // arrange
     int keyCode = KeyEvent.VK_P;
 
@@ -135,7 +135,7 @@ public class KeyboardEntityControllerTests {
   }
 
   @Test
-  public void addLeftKeyContained() {
+  void addLeftKeyContained() {
     // arrange
     int keyCode = KeyEvent.VK_A;
 
@@ -154,7 +154,7 @@ public class KeyboardEntityControllerTests {
   }
 
   @Test
-  public void addRightKeyAdded() {
+  void addRightKeyAdded() {
     // arrange
     int keyCode = KeyEvent.VK_P;
 
@@ -170,7 +170,7 @@ public class KeyboardEntityControllerTests {
   }
 
   @Test
-  public void addRightKeyContained() {
+  void addRightKeyContained() {
     // arrange
     int keyCode = KeyEvent.VK_D;
 

@@ -32,7 +32,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.MockedStatic;
 
-public class ParticleTests {
+class ParticleTests {
 
   private Particle particle;
 
@@ -53,7 +53,7 @@ public class ParticleTests {
   }
 
   @Test
-  public void initializeParticleTypes() {
+  void initializeParticleTypes() {
     assertDoesNotThrow(() -> new RectangleParticle(10, 10));
     assertDoesNotThrow(() -> new LineParticle(10, 10));
     assertDoesNotThrow(() -> new TextParticle(null));
@@ -61,7 +61,7 @@ public class ParticleTests {
   }
 
   @Test
-  public void testUpdate_hasCollision() {
+  void testUpdate_hasCollision() {
     // arrange
     Particle testParticle = spy(particle);
 
@@ -75,7 +75,7 @@ public class ParticleTests {
   }
 
   @Test
-  public void testUpdate_ttlExpired() {
+  void testUpdate_ttlExpired() {
     // arrange
     Particle testParticle = spy(particle);
     when(testParticle.getAliveTime()).thenReturn(100000L);
@@ -91,7 +91,7 @@ public class ParticleTests {
   }
 
   @Test
-  public void testUpdate_hasNoCollision() {
+  void testUpdate_hasNoCollision() {
     // arrange
     Particle testParticle = spy(particle);
     testParticle.setX(10);
@@ -109,7 +109,7 @@ public class ParticleTests {
   }
 
   @Test
-  public void testUpdate_colliding() {
+  void testUpdate_colliding() {
     // arrange
     Particle testParticle = spy(particle);
     PhysicsEngine physicsEngine = mock(PhysicsEngine.class);
@@ -137,7 +137,7 @@ public class ParticleTests {
   }
 
   @Test
-  public void testApplyUpdateRatioToMember() {
+  void testApplyUpdateRatioToMember() {
     // act
     particle.applyUpdateRatioToMember(particle::getWidth, particle::setWidth, 1.2f, 1.0f);
 
@@ -146,7 +146,7 @@ public class ParticleTests {
   }
 
   @Test
-  public void testHasRayCastCollision_hasHit() {
+  void testHasRayCastCollision_hasHit() {
     // arrange
     particle.setX(1);
     particle.setY(1);
@@ -159,7 +159,7 @@ public class ParticleTests {
   }
 
   @Test
-  public void testHasRayCastCollision_hasCollision() {
+  void testHasRayCastCollision_hasCollision() {
     // arrange
     PhysicsEngine physicsEngine = mock(PhysicsEngine.class);
     when(physicsEngine.collides(any(Line2D.class), any(Collision.class))).thenReturn(true);
@@ -183,7 +183,7 @@ public class ParticleTests {
 
   @ParameterizedTest(name = "testHasRayCastCollision_hasNoCollision velocityX={0}, velocityY={1}")
   @CsvSource({"5, 5", "0, 5", "5, 0"})
-  public void testHasRayCastCollision_hasNoCollision(float velocityX, float velocityY) {
+  void testHasRayCastCollision_hasNoCollision(float velocityX, float velocityY) {
     // arrange
     particle.setX(10);
     particle.setY(42);
@@ -198,7 +198,7 @@ public class ParticleTests {
   }
 
   @Test
-  public void testDeltaSize() {
+  void testDeltaSize() {
     RectangleParticle part = new RectangleParticle(10, 10);
     part.setCollisionType(Collision.NONE);
     part.setDeltaHeight(0.1f);
@@ -211,7 +211,7 @@ public class ParticleTests {
   }
 
   @Test
-  public void testDeltaLocation() {
+  void testDeltaLocation() {
     RectangleParticle part = new RectangleParticle(10, 10);
     part.setCollisionType(Collision.NONE);
     part.setVelocityX(0.1f);

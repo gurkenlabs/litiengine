@@ -37,7 +37,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SwingTestSuite.class)
-public class GuiComponentTests {
+class GuiComponentTests {
 
   @BeforeEach
   public void assertOnSwingThread() {
@@ -55,7 +55,7 @@ public class GuiComponentTests {
   }
 
   @Test
-  public void testInitializaion() {
+  void testInitializaion() {
     TestComponent component = new TestComponent(10, 20, 100, 50);
 
     assertNotNull(component);
@@ -72,7 +72,7 @@ public class GuiComponentTests {
   }
 
   @Test
-  public void ensureThatDefaultAppearanceIsSet() {
+  void ensureThatDefaultAppearanceIsSet() {
     TestComponent component = new TestComponent(10, 20, 100, 50);
 
     assertNotNull(component);
@@ -86,7 +86,7 @@ public class GuiComponentTests {
   }
 
   @Test
-  public void testEventRegistration() {
+  void testEventRegistration() {
     TestComponent component = new TestComponent(0, 0, 100, 50);
 
     final Object pressed = new Object();
@@ -187,21 +187,21 @@ public class GuiComponentTests {
   }
 
   @Test
-  public void testTweenPOSITION_X() {
+  void testTweenPOSITION_X() {
     TestComponent component = new TestComponent(0, 0, 100, 50);
     component.setTweenValues(TweenType.POSITION_X, new float[] {2, 2, 1, 1, 1, 2});
     assertEquals(2, component.getX());
   }
 
   @Test
-  public void testTweenPOSITION_Y() {
+  void testTweenPOSITION_Y() {
     TestComponent component = new TestComponent(0, 0, 100, 50);
     component.setTweenValues(TweenType.POSITION_Y, new float[] {2, 2, 1, 1, 1, 2});
     assertEquals(2, component.getY());
   }
 
   @Test
-  public void testTweenPOSITION_XY() {
+  void testTweenPOSITION_XY() {
     TestComponent component = new TestComponent(10, 20, 100, 50);
     component.setTweenValues(TweenType.POSITION_XY, new float[] {2, 0, 1, 1, 1, 2});
     assertEquals(2, component.getX());
@@ -209,21 +209,21 @@ public class GuiComponentTests {
   }
 
   @Test
-  public void testTweenSIZE_WIDTH() {
+  void testTweenSIZE_WIDTH() {
     TestComponent component = new TestComponent(10, 20, 100, 50);
     component.setTweenValues(TweenType.SIZE_WIDTH, new float[] {10, 20, 50, 100});
     assertEquals(10, component.getWidth());
   }
 
   @Test
-  public void testTweenSIZE_HEIGHT() {
+  void testTweenSIZE_HEIGHT() {
     TestComponent component = new TestComponent(10, 20, 100, 50);
     component.setTweenValues(TweenType.SIZE_HEIGHT, new float[] {10, 20, 50, 100});
     assertEquals(10, component.getHeight());
   }
 
   @Test
-  public void testTweenSIZE_BOTH() {
+  void testTweenSIZE_BOTH() {
     TestComponent component = new TestComponent(10, 20, 100, 50);
     component.setTweenValues(TweenType.SIZE_BOTH, new float[] {10, 20, 50, 100});
     assertEquals(10, component.getWidth());
@@ -231,14 +231,14 @@ public class GuiComponentTests {
   }
 
   @Test
-  public void testTweenDANGLE() {
+  void testTweenDANGLE() {
     TestComponent component = new TestComponent(10, 20, 100, 50);
     component.setTweenValues(TweenType.ANGLE, new float[] {10.123f, 20.987f});
     assertEquals(10, component.getTextAngle());
   }
 
   @Test
-  public void testTweenFONTSIZE() {
+  void testTweenFONTSIZE() {
     TestComponent component = new TestComponent(10, 20, 100, 50);
     component.setFont(new Font("Times", Font.PLAIN, 12));
     component.setTweenValues(TweenType.FONTSIZE, new float[] {8, 9, 10});
@@ -246,7 +246,7 @@ public class GuiComponentTests {
   }
 
   @Test
-  public void testTweenDefault() {
+  void testTweenDefault() {
     TestComponent component = new TestComponent(0, 0, 100, 50);
     component.setTweenValues(TweenType.UNDEFINED, new float[] {});
   }
@@ -422,7 +422,6 @@ public class GuiComponentTests {
   }
 
   private class TestComponent extends GuiComponent {
-
     protected TestComponent(double x, double y, double width, double height) {
       super(x, y, width, height);
     }

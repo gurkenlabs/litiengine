@@ -8,11 +8,11 @@ import java.awt.Font;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-public class FontUtilitiesTests {
+class FontUtilitiesTests {
 
   @ParameterizedTest(name = "testGetFallbackFontIfNecessary text={0} expectedFont={1}")
   @CsvSource({"\uF061\uF072, Wingdings", "ထ, Arial"})
-  public void testGetFallbackFontIfNecessary(String text, String expectedFont) {
+  void testGetFallbackFontIfNecessary(String text, String expectedFont) {
     // arrange
     float textSize = 20.0f;
     Font primaryFont = new Font("Wingdings", Font.BOLD, 12);

@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
-public class MovementControllerTests {
+class MovementControllerTests {
 
   private MovementController<IMobileEntity> controller;
   private IMobileEntity mobileEntity;
@@ -42,7 +42,7 @@ public class MovementControllerTests {
   }
 
   @Test
-  public void testHandleMovement_dx() {
+  void testHandleMovement_dx() {
     // act
     controller.handleMovement();
 
@@ -51,7 +51,7 @@ public class MovementControllerTests {
   }
 
   @Test
-  public void testHandleMovement_dy() {
+  void testHandleMovement_dy() {
     // act
     controller.handleMovement();
 
@@ -60,7 +60,7 @@ public class MovementControllerTests {
   }
 
   @Test
-  public void testHandleMovement_notAllowed() {
+  void testHandleMovement_notAllowed() {
     // arrange
     controller.onMovementCheck(entity -> false);
 
@@ -72,7 +72,7 @@ public class MovementControllerTests {
   }
 
   @Test
-  public void testHandleMovement_velocity() {
+  void testHandleMovement_velocity() {
     // arrange
     try (MockedStatic<Game> gameMockedStatic = mockStatic(Game.class)) {
       IGameLoop mockGameLoop = mock(IGameLoop.class);
@@ -95,7 +95,7 @@ public class MovementControllerTests {
   }
 
   @Test
-  public void handleForces_disablesAndResetsTurnOnMove() {
+  void handleForces_disablesAndResetsTurnOnMove() {
     // arrange
     mobileEntity.setTurnOnMove(true);
     assertTrue(mobileEntity.turnOnMove());
@@ -118,7 +118,7 @@ public class MovementControllerTests {
   }
 
   @Test
-  public void moveEntityByActiveForces_movesEntityToCorrectTarget() {
+  void moveEntityByActiveForces_movesEntityToCorrectTarget() {
     // arrange
     // Game environment
     PhysicsEngine physicsEngineMock = mock(PhysicsEngine.class);
@@ -158,7 +158,7 @@ public class MovementControllerTests {
   }
 
   @Test
-  public void moveEntityByActiveForces_endsForcesOnFailure() {
+  void moveEntityByActiveForces_endsForcesOnFailure() {
     // arrange
     // Game environment
     PhysicsEngine physicsEngineMock = mock(PhysicsEngine.class);

@@ -8,7 +8,7 @@ import de.gurkenlabs.litiengine.input.Input;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-public class SliderTests {
+class SliderTests {
 
   /*
       public SliderTests(double x, double y, double width, double height, float minValue, float maxValue, float stepSize) {
@@ -26,7 +26,7 @@ public class SliderTests {
   }
 
   @Test
-  public void testSetCurrentValue() {
+  void testSetCurrentValue() {
     HorizontalSlider slider = new HorizontalSlider(0, 0, 150, 300, 0f, 100f, 2f);
     float minValue = slider.getMinValue();
     float maxValue = slider.getMaxValue();

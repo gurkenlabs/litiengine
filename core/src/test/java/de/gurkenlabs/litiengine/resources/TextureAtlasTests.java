@@ -12,10 +12,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class TextureAtlasTests {
+class TextureAtlasTests {
 
   @Test
-  public void testReadTextureAtlasFromFile() {
+  void testReadTextureAtlasFromFile() {
     TextureAtlas atlas =
         TextureAtlas.read("de/gurkenlabs/litiengine/resources/gurk-nukem-atlas.xml");
 
@@ -43,7 +43,7 @@ public class TextureAtlasTests {
 
   @ParameterizedTest
   @MethodSource("getTextureAtlasLoadResourceName")
-  public void testTextureAtlasLoad(String resourceName) {
+  void testTextureAtlasLoad(String resourceName) {
     TextureAtlas atlas =
         TextureAtlas.read("de/gurkenlabs/litiengine/resources/gurk-nukem-atlas.xml");
 
@@ -58,25 +58,9 @@ public class TextureAtlasTests {
     assertNotNull(img);
   }
 
-  private static Stream<Arguments> getTextureAtlasLoadResourceName() {
-    return Stream.of(
-        Arguments.of("Dean-idle-left.png"),
-        Arguments.of("Dean-walk-left.png"),
-        Arguments.of("gurknukem-idle-left.png"),
-        Arguments.of("gurknukem-walk-left.png"),
-        Arguments.of("icon.png"),
-        Arguments.of("Jorge-idle-left.png"),
-        Arguments.of("Jorge-walk-left.png"),
-        Arguments.of("prop-barrel-damaged.png"),
-        Arguments.of("prop-barrel-destroyed.png"),
-        Arguments.of("prop-barrel-intact.png"),
-        Arguments.of("prop-bunker.png"),
-        Arguments.of("prop-flag.png"));
-  }
-
   @ParameterizedTest
   @MethodSource("getTextureAtlasLoadWidthHeight")
-  public void testTextureAtlasLoadWidth(
+  void testTextureAtlasLoadWidth(
       String resourceName, int expectedWidth, int expectedHeight) {
     TextureAtlas atlas =
         TextureAtlas.read("de/gurkenlabs/litiengine/resources/gurk-nukem-atlas.xml");
@@ -94,7 +78,7 @@ public class TextureAtlasTests {
 
   @ParameterizedTest
   @MethodSource("getTextureAtlasLoadWidthHeight")
-  public void testTextureAtlasLoadHeight(
+  void testTextureAtlasLoadHeight(
       String resourceName, int expectedWidth, int expectedHeight) {
     TextureAtlas atlas =
         TextureAtlas.read("de/gurkenlabs/litiengine/resources/gurk-nukem-atlas.xml");
@@ -119,5 +103,21 @@ public class TextureAtlasTests {
         Arguments.of("icon.png", 64, 64),
         Arguments.of("prop-barrel-damaged.png", 10, 12),
         Arguments.of("prop-bunker.png", 104, 41));
+  }
+
+  private static Stream<Arguments> getTextureAtlasLoadResourceName() {
+    return Stream.of(
+            Arguments.of("Dean-idle-left.png"),
+            Arguments.of("Dean-walk-left.png"),
+            Arguments.of("gurknukem-idle-left.png"),
+            Arguments.of("gurknukem-walk-left.png"),
+            Arguments.of("icon.png"),
+            Arguments.of("Jorge-idle-left.png"),
+            Arguments.of("Jorge-walk-left.png"),
+            Arguments.of("prop-barrel-damaged.png"),
+            Arguments.of("prop-barrel-destroyed.png"),
+            Arguments.of("prop-barrel-intact.png"),
+            Arguments.of("prop-bunker.png"),
+            Arguments.of("prop-flag.png"));
   }
 }

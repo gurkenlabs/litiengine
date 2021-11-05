@@ -11,9 +11,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class ReflectionUtilitiesTests {
+class ReflectionUtilitiesTests {
   @Test
-  public void testGetField() {
+  void testGetField() {
     assertNotNull(ReflectionUtilities.getField(TestImpl.class, "integerField"));
     assertNotNull(ReflectionUtilities.getField(ChildImpl.class, "integerField"));
     assertNull(ReflectionUtilities.getField(TestImpl.class, "nananananan"));
@@ -21,7 +21,7 @@ public class ReflectionUtilitiesTests {
 
   @ParameterizedTest
   @MethodSource("getWrapperParameters")
-  public void testIsWrapperTypeTrue(Class<?> primitive, Class<?> wrapper) {
+  void testIsWrapperTypeTrue(Class<?> primitive, Class<?> wrapper) {
     // act
     boolean isWrapper = ReflectionUtilities.isWrapperType(primitive, wrapper);
 
@@ -31,7 +31,7 @@ public class ReflectionUtilitiesTests {
 
   @ParameterizedTest
   @MethodSource("getNonWrapperParameters")
-  public void testIsWrapperTypeFalse(Class<?> primitive, Class<?> wrapper) {
+  void testIsWrapperTypeFalse(Class<?> primitive, Class<?> wrapper) {
     // act
     boolean isWrapper = ReflectionUtilities.isWrapperType(primitive, wrapper);
 

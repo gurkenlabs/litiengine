@@ -47,7 +47,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
-public class EnvironmentTests {
+class EnvironmentTests {
   private Environment testEnvironment;
 
   @BeforeAll
@@ -71,7 +71,7 @@ public class EnvironmentTests {
   }
 
   @Test
-  public void testInitialization() {
+  void testInitialization() {
     IMap map = mock(IMap.class);
     when(map.getSizeInPixels()).thenReturn(new Dimension(100, 100));
     when(map.getSizeInTiles()).thenReturn(new Dimension(10, 10));
@@ -81,7 +81,7 @@ public class EnvironmentTests {
   }
 
   @Test
-  public void testCombatEntity() {
+  void testCombatEntity() {
     ICombatEntity combatEntity = mock(ICombatEntity.class);
     when(combatEntity.getMapId()).thenReturn(123);
     when(combatEntity.getName()).thenReturn("test");
@@ -107,7 +107,7 @@ public class EnvironmentTests {
   }
 
   @Test
-  public void testCreatureEntity() {
+  void testCreatureEntity() {
     IEntity creature = mock(Creature.class);
     when(creature.getMapId()).thenReturn(1);
     when(creature.getName()).thenReturn("testCreature");
@@ -133,7 +133,7 @@ public class EnvironmentTests {
   }
 
   @Test
-  public void testSoundSourceEntity() {
+  void testSoundSourceEntity() {
     IEntity soundSource = mock(SoundSource.class);
     when(soundSource.getMapId()).thenReturn(1);
     when(soundSource.getName()).thenReturn("testSoundSource");
@@ -159,7 +159,7 @@ public class EnvironmentTests {
   }
 
   @Test
-  public void testRemoveEntityByName() {
+  void testRemoveEntityByName() {
     ICombatEntity testEntity = mock(ICombatEntity.class);
     when(testEntity.getMapId()).thenReturn(1);
     when(testEntity.getName()).thenReturn("testEntity");
@@ -181,7 +181,7 @@ public class EnvironmentTests {
   }
 
   @Test
-  public void testAddRenderable() {
+  void testAddRenderable() {
     LightSource testLightSource = mock(LightSource.class);
     this.testEnvironment.add(testLightSource, RenderType.NORMAL);
     Collection<IRenderable> testRenderables =
@@ -192,7 +192,7 @@ public class EnvironmentTests {
   }
 
   @Test
-  public void testGetByName() {
+  void testGetByName() {
     ICombatEntity combatEntity = mock(ICombatEntity.class);
     when(combatEntity.getMapId()).thenReturn(1);
     when(combatEntity.getName()).thenReturn("test");
@@ -209,7 +209,7 @@ public class EnvironmentTests {
   }
 
   @Test
-  public void testGetById() {
+  void testGetById() {
     // arrange
     ICombatEntity combatEntity = mock(ICombatEntity.class);
     when(combatEntity.getMapId()).thenReturn(1);
@@ -226,7 +226,7 @@ public class EnvironmentTests {
   }
 
   @Test
-  public void testGetByIdArray_NotContained() {
+  void testGetByIdArray_NotContained() {
     // arrange
     ICombatEntity combatEntity = mock(ICombatEntity.class);
     when(combatEntity.getMapId()).thenReturn(1);
@@ -246,7 +246,7 @@ public class EnvironmentTests {
   }
 
   @Test
-  public void testGetByIdArray_NegativeIndex() {
+  void testGetByIdArray_NegativeIndex() {
     // arrange
     ICombatEntity combatEntity = mock(ICombatEntity.class);
     when(combatEntity.getMapId()).thenReturn(1);
@@ -266,7 +266,7 @@ public class EnvironmentTests {
   }
 
   @Test
-  public void testGetByIdArray_ValidArray() {
+  void testGetByIdArray_ValidArray() {
     // arrange
     ICombatEntity combatEntity = mock(ICombatEntity.class);
     when(combatEntity.getMapId()).thenReturn(1);
@@ -288,7 +288,7 @@ public class EnvironmentTests {
   }
 
   @Test
-  public void testGetByIdArray_NullArray() {
+  void testGetByIdArray_NullArray() {
     // arrange
     ICombatEntity combatEntity = mock(ICombatEntity.class);
     when(combatEntity.getMapId()).thenReturn(1);
@@ -308,7 +308,7 @@ public class EnvironmentTests {
   }
 
   @Test
-  public void testGetByTag() {
+  void testGetByTag() {
     ICombatEntity combatEntity = mock(ICombatEntity.class);
     when(combatEntity.getMapId()).thenReturn(1);
     when(combatEntity.getRenderType()).thenReturn(RenderType.NORMAL);
@@ -341,7 +341,7 @@ public class EnvironmentTests {
   }
 
   @Test
-  public void testMobileEntity() {
+  void testMobileEntity() {
     IMobileEntity mobileEntity = mock(IMobileEntity.class);
     when(mobileEntity.getMapId()).thenReturn(456);
     when(mobileEntity.getName()).thenReturn("test");
@@ -369,7 +369,7 @@ public class EnvironmentTests {
   }
 
   @Test
-  public void testTrigger() {
+  void testTrigger() {
     Trigger testTrigger = new Trigger(TriggerActivation.COLLISION, "test", "testmessage");
     testTrigger.setMapId(1);
 
@@ -394,7 +394,7 @@ public class EnvironmentTests {
   }
 
   @Test
-  public void testLightSource() {
+  void testLightSource() {
     LightSource testLight =
         new LightSource(100, new Color(255, 255, 255, 100), LightSource.Type.ELLIPSE, true);
     testLight.setMapId(999);
@@ -416,7 +416,7 @@ public class EnvironmentTests {
   }
 
   @Test
-  public void testCollisionBox() {
+  void testCollisionBox() {
     CollisionBox testCollider = new CollisionBox(true);
     testCollider.setMapId(1);
     testCollider.setName("test");
@@ -437,7 +437,7 @@ public class EnvironmentTests {
   }
 
   @Test
-  public void testEmitter() {
+  void testEmitter() {
     Emitter testEmitter =
         new Emitter(1, 1) {
           @Override
@@ -465,7 +465,7 @@ public class EnvironmentTests {
   }
 
   @Test
-  public void testProp() {
+  void testProp() {
     Prop testProp = new Prop(0, 0, null);
     testProp.setMapId(1);
     testProp.setName("test");
@@ -486,7 +486,7 @@ public class EnvironmentTests {
   }
 
   @Test
-  public void testStaticShadow() {
+  void testStaticShadow() {
     StaticShadow testShadow = new StaticShadow(0, 0, 1, 1, StaticShadowType.NONE);
     testShadow.setMapId(1);
     testShadow.setName("test");
@@ -507,7 +507,7 @@ public class EnvironmentTests {
   }
 
   @Test
-  public void testMapArea() {
+  void testMapArea() {
     MapArea testArea = new MapArea(0, 0, 1, 1);
     testArea.setMapId(1);
     testArea.setName("test");
@@ -528,7 +528,7 @@ public class EnvironmentTests {
   }
 
   @Test
-  public void testRemoveById() {
+  void testRemoveById() {
     MapArea testArea = new MapArea(0, 0, 1, 1);
     testArea.setMapId(1);
     testArea.setName("test");
@@ -544,7 +544,7 @@ public class EnvironmentTests {
   }
 
   @Test
-  public void testSpawnPoint() {
+  void testSpawnPoint() {
     Spawnpoint testSpawn = new Spawnpoint(1, 0, 0);
     testSpawn.setName("test");
 
@@ -564,7 +564,7 @@ public class EnvironmentTests {
   }
 
   @Test
-  public void testGetNonExistingEntities() {
+  void testGetNonExistingEntities() {
     this.testEnvironment.add(null);
     this.testEnvironment.remove((IEntity) null);
     this.testEnvironment.removeAll((Collection<IEntity>) null);
@@ -578,7 +578,7 @@ public class EnvironmentTests {
 
   @ParameterizedTest
   @EnumSource(RenderType.class)
-  public void testEntityByRenderType(RenderType renderType) {
+  void testEntityByRenderType(RenderType renderType) {
     ICombatEntity entity = mock(ICombatEntity.class);
     when(entity.getMapId()).thenReturn(123);
     when(entity.getName()).thenReturn("test");
@@ -599,7 +599,7 @@ public class EnvironmentTests {
   }
 
   @Test
-  public void testEntitiesByTag() {
+  void testEntitiesByTag() {
     IMobileEntity entityWithTags = mock(IMobileEntity.class);
     when(entityWithTags.getMapId()).thenReturn(456);
     when(entityWithTags.getRenderType()).thenReturn(RenderType.NORMAL);
@@ -631,7 +631,7 @@ public class EnvironmentTests {
   }
 
   @Test
-  public void testThatLocalMapIdIsAssigned() {
+  void testThatLocalMapIdIsAssigned() {
     MapArea entity1 = new MapArea(0, 0, 0, 0);
     MapArea entity2 = new MapArea(0, 0, 0, 0);
     MapArea entity3 = new MapArea(0, 0, 0, 0);
@@ -646,7 +646,7 @@ public class EnvironmentTests {
   }
 
   @Test
-  public void testFindEntitiesInShape() {
+  void testFindEntitiesInShape() {
     MapArea entity = new MapArea(0, 0, 10, 10);
     MapArea entity2 = new MapArea(10, 10, 10, 10);
 
@@ -664,7 +664,7 @@ public class EnvironmentTests {
   }
 
   @Test
-  public void testFindCombatEntitiesInShape() {
+  void testFindCombatEntitiesInShape() {
     ICombatEntity combatEntity = mock(ICombatEntity.class);
     when(combatEntity.getMapId()).thenReturn(123);
     when(combatEntity.getRenderType()).thenReturn(RenderType.NORMAL);
@@ -692,7 +692,7 @@ public class EnvironmentTests {
   }
 
   @Test
-  public void testLoading() {
+  void testLoading() {
     CollisionBox testCollider = new CollisionBox(true);
     testCollider.setMapId(1);
     testCollider.setName("test");
@@ -731,7 +731,7 @@ public class EnvironmentTests {
   }
 
   @Test
-  public void testCollectionGettersNeedToBeUnmodifiable() {
+  void testCollectionGettersNeedToBeUnmodifiable() {
     // entities need to be added/removed with the provided methods of the environment. Adding them
     // to an internal collection can have unforeseen consequences
     assertThrows(

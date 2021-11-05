@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class EntityActionTests {
+class EntityActionTests {
 
   private EntityAction entityAction;
   private boolean hasBeenPerformed;
@@ -19,7 +19,7 @@ public class EntityActionTests {
   }
 
   @Test
-  public void testGetDescription() {
+  void testGetDescription() {
     // arrange
     String description = "Sets hasBeenPerformed to true if it has executed successfully.";
     entityAction.setDescription(description);
@@ -32,7 +32,7 @@ public class EntityActionTests {
   }
 
   @Test
-  public void testGetName() {
+  void testGetName() {
     // act
     String actualName = entityAction.getName();
 
@@ -41,7 +41,7 @@ public class EntityActionTests {
   }
 
   @Test
-  public void testPerform() {
+  void testPerform() {
     // act
     entityAction.perform();
 

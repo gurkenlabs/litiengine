@@ -8,10 +8,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class TweenFunctionTests {
+class TweenFunctionTests {
 
   @Test
-  public void testGetEquation() {
+  void testGetEquation() {
     // act
     TweenEquation result = TweenFunction.BACK_IN.getEquation();
 
@@ -21,7 +21,7 @@ public class TweenFunctionTests {
 
   @ParameterizedTest(name = "testTween function={0} input={1} expectedResult={2}")
   @MethodSource("getTweenParameters")
-  public void testTween(TweenFunction function, float input, float expectedResult) {
+  void testTween(TweenFunction function, float input, float expectedResult) {
     // act
     float actualResult = function.compute(input);
 

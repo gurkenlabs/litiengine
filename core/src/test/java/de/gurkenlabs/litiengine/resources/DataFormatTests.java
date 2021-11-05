@@ -11,11 +11,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class DataFormatTests {
+class DataFormatTests {
 
   @ParameterizedTest
   @MethodSource("getImageFormat")
-  public void testImageFormat(String fileName, boolean assertValue) {
+  void testImageFormat(String fileName, boolean assertValue) {
 
     assertEquals(ImageFormat.isSupported(fileName), assertValue);
 
@@ -26,18 +26,8 @@ public class DataFormatTests {
     }
   }
 
-  private static Stream<Arguments> getImageFormat() {
-    return Stream.of(
-        Arguments.of("test.gif", true),
-        Arguments.of("test.png", true),
-        Arguments.of("test.jpg", true),
-        Arguments.of("test.bmp", true),
-        Arguments.of("test.test", false),
-        Arguments.of("test.undefined", false));
-  }
-
   @Test
-  public void testAudioFormat() {
+  void testAudioFormat() {
     assertTrue(SoundFormat.isSupported("test.ogg"));
     assertTrue(SoundFormat.isSupported("test.mp3"));
     assertTrue(SoundFormat.isSupported("test.wav"));
@@ -50,5 +40,15 @@ public class DataFormatTests {
     for (String actual : SoundFormat.getAllExtensions()) {
       assertTrue(Arrays.stream(expected).anyMatch(actual::equals));
     }
+  }
+
+  private static Stream<Arguments> getImageFormat() {
+    return Stream.of(
+            Arguments.of("test.gif", true),
+            Arguments.of("test.png", true),
+            Arguments.of("test.jpg", true),
+            Arguments.of("test.bmp", true),
+            Arguments.of("test.test", false),
+            Arguments.of("test.undefined", false));
   }
 }

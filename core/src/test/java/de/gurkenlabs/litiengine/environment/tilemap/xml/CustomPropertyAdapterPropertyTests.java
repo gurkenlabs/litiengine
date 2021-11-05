@@ -6,11 +6,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-public class CustomPropertyAdapterPropertyTests {
+class CustomPropertyAdapterPropertyTests {
 
   @ParameterizedTest(name = "testPropertyInitialization type={0}, expectedType={1}")
   @CsvSource({"'invalid', 'string'", "null, 'string'", "'int', 'int'"})
-  public void testPropertyInitialization(String type, String expectedType) {
+  void testPropertyInitialization(String type, String expectedType) {
     // arrange
     String name = "test";
 
@@ -22,7 +22,7 @@ public class CustomPropertyAdapterPropertyTests {
   }
 
   @Test
-  public void testCompareTo() {
+  void testCompareTo() {
     // arrange
     CustomPropertyAdapter.Property propertyWithNameA =
         new CustomPropertyAdapter.Property("PropertyA", "float");
@@ -41,7 +41,7 @@ public class CustomPropertyAdapterPropertyTests {
   }
 
   @Test
-  public void testCompareToNull() {
+  void testCompareToNull() {
     // arrange
     CustomPropertyAdapter.Property propertyWithName =
         new CustomPropertyAdapter.Property("PropertyA", "float");

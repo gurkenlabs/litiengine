@@ -9,7 +9,7 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class CustomPropertyProviderTests {
+class CustomPropertyProviderTests {
 
   private CustomPropertyProvider provider;
 
@@ -19,7 +19,7 @@ public class CustomPropertyProviderTests {
   }
 
   @Test
-  public void testSetProperty() {
+  void testSetProperty() {
     // arrange
     String value = "value";
 
@@ -31,7 +31,7 @@ public class CustomPropertyProviderTests {
   }
 
   @Test
-  public void testHasCustomProperty() {
+  void testHasCustomProperty() {
     // arrange
     provider.setValue("test1", "value");
 
@@ -43,7 +43,7 @@ public class CustomPropertyProviderTests {
   }
 
   @Test
-  public void testGetProperties() {
+  void testGetProperties() {
     // arrange
     provider.setValue("test1", "value1");
     provider.setValue("test2", "value2");
@@ -56,7 +56,7 @@ public class CustomPropertyProviderTests {
   }
 
   @Test
-  public void testSetProperties() {
+  void testSetProperties() {
     // arrange
     Map<String, ICustomProperty> props = new Hashtable<>(2);
     props.put("test1", new CustomProperty("value1"));
@@ -69,7 +69,7 @@ public class CustomPropertyProviderTests {
   }
 
   @Test
-  public void testSetPropertiesNull() {
+  void testSetPropertiesNull() {
     // arrange
     Map<String, ICustomProperty> props = new Hashtable<>(2);
     props.put("test42", new CustomProperty("value42"));

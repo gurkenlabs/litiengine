@@ -7,10 +7,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-public class GameTimeTests {
+class GameTimeTests {
   @ParameterizedTest(name = "toMilliseconds_Positive ticks={0}, updateRate={1}, expected={2}")
   @CsvSource({"100, 50, 2000", "450, 33, 13636", "33, 100, 330"})
-  public void toMilliseconds_Positive(long ticks, int updateRate, long expected) {
+  void toMilliseconds_Positive(long ticks, int updateRate, long expected) {
     // arrange
     GameTime time = new GameTime();
 
@@ -19,7 +19,7 @@ public class GameTimeTests {
   }
 
   @Test
-  public void toMilliseconds_Negative() {
+  void toMilliseconds_Negative() {
     // arrange
     GameTime time = new GameTime();
 
@@ -31,7 +31,7 @@ public class GameTimeTests {
   }
 
   @Test
-  public void toMilliseconds_ZeroTicks() {
+  void toMilliseconds_ZeroTicks() {
     // arrange
     GameTime time = new GameTime();
 
@@ -40,7 +40,7 @@ public class GameTimeTests {
   }
 
   @Test
-  public void toMilliseconds_ZeroUpdateRateThrows() {
+  void toMilliseconds_ZeroUpdateRateThrows() {
     // arrange
     GameTime time = new GameTime();
 

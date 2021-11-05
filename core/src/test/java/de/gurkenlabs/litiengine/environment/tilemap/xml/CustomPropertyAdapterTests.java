@@ -13,7 +13,7 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class CustomPropertyAdapterTests {
+class CustomPropertyAdapterTests {
 
   private CustomPropertyAdapter adapter;
 
@@ -23,7 +23,7 @@ public class CustomPropertyAdapterTests {
   }
 
   @Test
-  public void testUnmarshal() {
+  void testUnmarshal() {
     // arrange
     CustomPropertyAdapter.Property property =
         new CustomPropertyAdapter.Property("PropertyA", "float");
@@ -39,7 +39,7 @@ public class CustomPropertyAdapterTests {
   }
 
   @Test
-  public void testUnmarshalLocation() throws MalformedURLException {
+  void testUnmarshalLocation() throws MalformedURLException {
     // arrange
     CustomPropertyAdapter.Property property =
         new CustomPropertyAdapter.Property("PropertyA", "float");
@@ -56,7 +56,7 @@ public class CustomPropertyAdapterTests {
   }
 
   @Test
-  public void testMarshal() {
+  void testMarshal() {
     // arrange
     Map<String, ICustomProperty> properties = new HashMap<>();
     CustomProperty customProperty = new CustomProperty("string", "value");
@@ -70,7 +70,7 @@ public class CustomPropertyAdapterTests {
   }
 
   @Test
-  public void testMarshalWithLinebreakInValue() {
+  void testMarshalWithLinebreakInValue() {
     // arrange
     Map<String, ICustomProperty> properties = new HashMap<>();
     CustomProperty customProperty = new CustomProperty("string", "value\n");
@@ -85,7 +85,7 @@ public class CustomPropertyAdapterTests {
   }
 
   @Test
-  public void testMarshalSort() {
+  void testMarshalSort() {
     // arrange
     Map<String, ICustomProperty> properties = new HashMap<>();
     CustomProperty customProperty1 = new CustomProperty("string", "value1");
