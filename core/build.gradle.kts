@@ -6,7 +6,6 @@ plugins {
   jacoco
   signing
   `maven-publish`
-  id("com.stehno.natives")
   id("org.sonarqube")
 }
 
@@ -15,8 +14,11 @@ description = """
     It provides a comprehensive Java library and a dedicated map editor to create tile-based 2D games.
 """.trimIndent()
 
+val native: Configuration by configurations.creating
+
 dependencies {
-  implementation(libs.bundles.jinput)
+  implementation(libs.jinput.core)
+  native(group=libs.jinput.core.get().module.group, name = libs.jinput.core.get().module.name, version = libs.jinput.core.get().versionConstraint.requiredVersion, classifier = "natives-all")
   implementation(libs.bundles.soundlibs)
   implementation(libs.steamworks)
   implementation(libs.javax.activation)
@@ -26,11 +28,17 @@ dependencies {
   testImplementation(projects.litiengineShared)
 }
 
-natives {
-  configurations = listOf("runtimeClasspath")
-  outputDir = "libs"
+tasks.register<Copy>("natives") {
+  for(dep in configurations.runtimeClasspath.get().files + native.files) {
+    from(zipTree(dep).files)
+    include("**/*.dll", "**/*.so", "**/*.jnilib", "**/*.dylib")
+    into(File(buildDir, "libs"))
+  }
 }
 
+tasks.named("jar") {
+  dependsOn("natives")
+}
 tasks {
   test {
     workingDir = buildDir.resolve("test")

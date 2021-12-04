@@ -5,7 +5,6 @@ rootProject.name = "litiengine"
 pluginManagement {
   plugins {
     fun idv(id: String, key: String = id) = id(id) version extra["$key.version"].toString()
-    idv("com.stehno.natives")
     idv("org.sonarqube")
     idv("org.beryx.runtime")
     idv("com.github.vlsi.crlf", "com.github.vlsi.vlsi-release-plugins")
@@ -34,12 +33,6 @@ dependencyResolutionManagement {
 
       alias("jinput-core").to("net.java.jinput", "jinput")
         .versionRef("jinput")
-      alias("jinput-natives").to("net.java.jinput", "jinput")
-        .version("${extra["jinput.version"]}:natives-all")
-      bundle(
-        "jinput",
-        listOf("jinput-core", "jinput-natives")
-      )
 
       alias("soundlibs-jorbis").to("com.googlecode.soundlibs", "jorbis")
         .versionRef("soundlibs.jorbis")
