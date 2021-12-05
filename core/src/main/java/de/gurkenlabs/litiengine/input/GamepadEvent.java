@@ -8,6 +8,7 @@ public class GamepadEvent extends EventObject {
 
   private final transient Gamepad gamepad;
   private final String component;
+  private final String componentName;
   private final float value;
   private final boolean relative;
   private final boolean analog;
@@ -15,19 +16,11 @@ public class GamepadEvent extends EventObject {
   GamepadEvent(Gamepad source, Component component) {
     super(source);
     this.gamepad = source;
-    this.component = component.getName();
+    this.component = component.getIdentifier().getName();
+    this.componentName = component.getName();
     this.value = component.getPollData();
     this.relative = component.isRelative();
     this.analog = component.isAnalog();
-  }
-
-  GamepadEvent(Gamepad source, String component, float value) {
-    super(source);
-    this.gamepad = source;
-    this.component = component;
-    this.value = value;
-    this.relative = false;
-    this.analog = false;
   }
 
   /**
@@ -44,10 +37,19 @@ public class GamepadEvent extends EventObject {
   /**
    * Gets the identifier of the component that caused this event.
    *
+   * @return The identifier of the component.
+   */
+  public String getComponentId() {
+    return this.component;
+  }
+
+  /**
+   * Gets the name of the component that caused this event.
+   *
    * @return The human-readable name of the component.
    */
-  public String getComponent() {
-    return this.component;
+  public String getComponentName() {
+    return this.componentName;
   }
 
   /**
