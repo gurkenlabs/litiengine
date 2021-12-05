@@ -9,6 +9,7 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.swing.Icons;
 import de.gurkenlabs.utiliti.swing.LabelListCellRenderer;
 import java.awt.LayoutManager;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
 import javax.swing.DefaultComboBoxModel;
@@ -18,11 +19,14 @@ import javax.swing.JLabel;
 
 @SuppressWarnings("serial")
 public class CreaturePanel extends PropertyPanel {
+
   private final JComboBox<JLabel> comboBoxSpriteSheets;
   private final JComboBox<Direction> comboBoxDirection;
   private final JCheckBox checkBoxScale;
 
-  /** Create the panel. */
+  /**
+   * Create the panel.
+   */
   public CreaturePanel() {
     super("panel_creature", Icons.CREATURE);
 
@@ -31,31 +35,17 @@ public class CreaturePanel extends PropertyPanel {
 
     this.comboBoxDirection = new JComboBox<>();
     this.comboBoxDirection.setModel(new DefaultComboBoxModel<>(Direction.values()));
-    this.checkBoxScale = new JCheckBox(Resources.strings().get("panel_stretch_spripte"));
+    this.checkBoxScale = new JCheckBox(Resources.strings().get("panel_stretch_sprite"));
 
     setLayout(this.createLayout());
     this.setupChangedListeners();
   }
 
   public static String getCreatureSpriteName(String name) {
-    for (CreatureAnimationState state : CreatureAnimationState.values()) {
-      if (name.endsWith(state.spriteString())) {
-        return name.substring(0, name.length() - state.spriteString().length());
-      }
+    if (Arrays.stream(CreatureAnimationState.values())
+      .anyMatch(state -> name.contains(state.spriteString()))) {
+      return name.split("-")[0];
     }
-
-    for (Direction dir : Direction.values()) {
-      String idle = CreatureAnimationState.IDLE.spriteString() + "-" + dir.toString().toLowerCase();
-      if (name.endsWith(idle)) {
-        return name.substring(0, name.length() - idle.length());
-      }
-
-      String walk = CreatureAnimationState.WALK.spriteString() + "-" + dir.toString().toLowerCase();
-      if (name.endsWith(walk)) {
-        return name.substring(0, name.length() - walk.length());
-      }
-    }
-
     return null;
   }
 
@@ -82,8 +72,8 @@ public class CreaturePanel extends PropertyPanel {
   protected void setControlValues(IMapObject mapObject) {
     selectSpriteSheet(this.comboBoxSpriteSheets, mapObject);
     this.comboBoxDirection.setSelectedItem(
-        mapObject.getEnumValue(
-            MapObjectProperty.SPAWN_DIRECTION, Direction.class, Direction.UNDEFINED));
+      mapObject.getEnumValue(
+        MapObjectProperty.SPAWN_DIRECTION, Direction.class, Direction.UNDEFINED));
     this.checkBoxScale.setSelected(mapObject.getBoolValue(MapObjectProperty.SCALE_SPRITE));
   }
 
@@ -107,10 +97,10 @@ public class CreaturePanel extends PropertyPanel {
 
   private LayoutManager createLayout() {
     LayoutItem[] layoutItems =
-        new LayoutItem[] {
-          new LayoutItem("panel_sprite", this.comboBoxSpriteSheets),
-          new LayoutItem("panel_direction", this.comboBoxDirection),
-        };
+      new LayoutItem[]{
+        new LayoutItem("panel_sprite", this.comboBoxSpriteSheets),
+        new LayoutItem("panel_direction", this.comboBoxDirection),
+      };
 
     return this.createLayout(layoutItems, this.checkBoxScale);
   }
