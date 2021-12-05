@@ -18,7 +18,12 @@ val native: Configuration by configurations.creating
 
 dependencies {
   implementation(libs.jinput.core)
-  native(group=libs.jinput.core.get().module.group, name = libs.jinput.core.get().module.name, version = libs.jinput.core.get().versionConstraint.requiredVersion, classifier = "natives-all")
+  native(libs.jinput.core) {
+    artifact {
+      classifier = "natives-all"
+    }
+  }
+
   implementation(libs.bundles.soundlibs)
   implementation(libs.steamworks)
   implementation(libs.javax.activation)
