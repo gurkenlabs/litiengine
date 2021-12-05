@@ -72,13 +72,14 @@ public class GamepadEntityController<T extends IMobileEntity> extends MovementCo
   }
 
   private void retrieveGamepadValues() {
+    final Gamepad gamepad = Input.gamepads().getById(this.gamepadId);
     if (this.gamepadId == -1
-        || this.gamepadId != -1 && Input.gamepads().getById(this.gamepadId) == null) {
+        || this.gamepadId != -1 && gamepad == null) {
       return;
     }
 
-    final float x = Input.gamepads().get(this.gamepadId).getPollData(Gamepad.Axis.X);
-    final float y = Input.gamepads().get(this.gamepadId).getPollData(Gamepad.Axis.Y);
+    final float x = gamepad.getPollData(Gamepad.Axis.X);
+    final float y = gamepad.getPollData(Gamepad.Axis.Y);
 
     if (Math.abs(x) > this.gamepadDeadzone) {
       this.setDx(x);
@@ -89,8 +90,8 @@ public class GamepadEntityController<T extends IMobileEntity> extends MovementCo
     }
 
     if (this.isRotateWithRightStick()) {
-      final float rightX = Input.gamepads().get(this.gamepadId).getPollData(Gamepad.Axis.RX);
-      final float rightY = Input.gamepads().get(this.gamepadId).getPollData(Gamepad.Axis.RY);
+      final float rightX = gamepad.getPollData(Gamepad.Axis.RX);
+      final float rightY = gamepad.getPollData(Gamepad.Axis.RY);
       float targetX = 0;
       float targetY = 0;
       if (Math.abs(rightX) > this.gamepadRightStick) {
