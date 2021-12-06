@@ -40,10 +40,8 @@ public class Trigger extends CollisionEntity implements IUpdateable {
 
   private final Collection<IEntity> collisionActivated = ConcurrentHashMap.newKeySet();
 
-  @TmxProperty(name = MapObjectProperty.TRIGGER_ACTIVATORS)
   private final List<Integer> activators = new CopyOnWriteArrayList<>();
 
-  @TmxProperty(name = MapObjectProperty.TRIGGER_TARGETS)
   private final List<Integer> targets = new CopyOnWriteArrayList<>();
 
   @TmxProperty(name = MapObjectProperty.TRIGGER_ACTIVATION)

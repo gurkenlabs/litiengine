@@ -2,17 +2,24 @@ package de.gurkenlabs.litiengine.environment;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Valign;
-import de.gurkenlabs.litiengine.entities.Material;
-import de.gurkenlabs.litiengine.entities.Prop;
-import de.gurkenlabs.litiengine.entities.Rotation;
+import de.gurkenlabs.litiengine.entities.*;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
+import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
 import de.gurkenlabs.litiengine.physics.Collision;
+import de.gurkenlabs.litiengine.util.ReflectionUtilities;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.stream.Stream;
+
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -135,18 +142,49 @@ class MapObjectSerializerTests {
     assertEquals(expectedValue, mapObject.getStringValue(propertyName));
   }
 
+  @ParameterizedTest
+  @MethodSource("getDefaultEntityTypes")
+  void testTmxPropertiesMustNotBeFinal(Class<?> defaultEntityType){
+    for (final Field field : ReflectionUtilities.getAllFields(new ArrayList<Field>(), defaultEntityType)) {
+      TmxProperty property = field.getAnnotation(TmxProperty.class);
+
+      if (property == null) {
+        continue;
+      }
+
+      assertFalse(Modifier.isFinal(field.getModifiers()), "Fields annotated with TmxProperty must not be final: " + defaultEntityType.getName() + "." + field.getName());
+    }
+  }
+
   private static Stream<Arguments> getTmxPropertyAnnotationString() {
     return Stream.of(
-        Arguments.of("testString", "test"),
-        Arguments.of("testBoolArr", "false,false"),
-        Arguments.of("testIntArr", "0"),
-        Arguments.of("testShortArr", "0,0"),
-        Arguments.of("testLongArr", "0,0,0"),
-        Arguments.of("testByteArr", "0,0,0,0"),
-        Arguments.of("testDoubleArr", "0.0,0.0"),
-        Arguments.of("testByteArr", "0,0,0,0"),
-        Arguments.of("testFloatArr", "0.0,0.0"),
-        Arguments.of("testStringArr", "null,null"));
+            Arguments.of("testString", "test"),
+            Arguments.of("testBoolArr", "false,false"),
+            Arguments.of("testIntArr", "0"),
+            Arguments.of("testShortArr", "0,0"),
+            Arguments.of("testLongArr", "0,0,0"),
+            Arguments.of("testByteArr", "0,0,0,0"),
+            Arguments.of("testDoubleArr", "0.0,0.0"),
+            Arguments.of("testByteArr", "0,0,0,0"),
+            Arguments.of("testFloatArr", "0.0,0.0"),
+            Arguments.of("testStringArr", "null,null"));
+  }
+
+  private static Stream<Arguments> getDefaultEntityTypes() {
+    return Stream.of(
+        Arguments.of(Entity.class),
+        Arguments.of(Trigger.class),
+        Arguments.of(CollisionEntity.class),
+        Arguments.of(CollisionBox.class),
+        Arguments.of(CombatEntity.class),
+        Arguments.of(Prop.class),
+        Arguments.of(Creature.class),
+        Arguments.of(Emitter.class),
+        Arguments.of(Spawnpoint.class),
+        Arguments.of(SoundSource.class),
+        Arguments.of(LightSource.class),
+        Arguments.of(MapArea.class),
+        Arguments.of(StaticShadow.class));
   }
 
   private class TestProp extends Prop {
