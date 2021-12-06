@@ -47,10 +47,10 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   private final List<Integer> targets = new CopyOnWriteArrayList<>();
 
   @TmxProperty(name = MapObjectProperty.TRIGGER_ACTIVATION)
-  private final TriggerActivation activationType;
+  private TriggerActivation activationType;
 
   @TmxProperty(name = MapObjectProperty.TRIGGER_ONETIME)
-  private final boolean isOneTimeTrigger;
+  private boolean isOneTimeTrigger;
 
   @TmxProperty(name = MapObjectProperty.TRIGGER_MESSAGE)
   private String message;
