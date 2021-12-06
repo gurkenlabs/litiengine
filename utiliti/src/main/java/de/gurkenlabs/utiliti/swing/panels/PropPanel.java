@@ -47,7 +47,7 @@ public class PropPanel extends PropertyPanel {
     this.chckbxShadow = new JCheckBox(Resources.strings().get("panel_prop_shadow"));
     this.checkBoxHorizontalFlip = new JCheckBox(Resources.strings().get("panel_flip_horizontal"));
     this.checkBoxVerticalFlip = new JCheckBox(Resources.strings().get("panel_flip_vertical"));
-    this.checkBoxScale = new JCheckBox(Resources.strings().get("panel_stretch_spripte"));
+    this.checkBoxScale = new JCheckBox(Resources.strings().get("panel_stretch_sprite"));
 
     setLayout(this.createLayout());
     this.setupChangedListeners();
