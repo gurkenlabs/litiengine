@@ -177,6 +177,11 @@ public final class UI {
 
       @Override
       public void unloaded(Environment environment) {
+        // prevent this event handler from blocking the UI thread while the game is shutting down
+        if (!Game.hasStarted()) {
+          return;
+        }
+        
         horizontalScroll.setVisible(false);
         verticalScroll.setVisible(false);
       }
