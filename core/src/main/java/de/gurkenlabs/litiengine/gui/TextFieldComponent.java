@@ -43,8 +43,8 @@ public class TextFieldComponent extends ImageComponent {
     Input.mouse()
       .onClicked(
         e -> {
-          if (!getBoundingBox().contains(Input.mouse().getLocation())) {
-            setSelected(false);
+          if (isSelected() && !getBoundingBox().contains(Input.mouse().getLocation())) {
+            acceptInput();
           }
         });
 
