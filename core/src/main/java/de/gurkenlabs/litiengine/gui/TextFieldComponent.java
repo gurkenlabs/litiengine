@@ -36,7 +36,7 @@ public class TextFieldComponent extends ImageComponent {
     onClicked(
       e -> {
         if (!isSelected()) {
-          toggleSelection();
+          setSelected(true);
         }
       });
 
@@ -48,7 +48,8 @@ public class TextFieldComponent extends ImageComponent {
           }
         });
 
-    this.setTextAlign(Align.LEFT);
+    setTextAlign(Align.LEFT);
+    setAutomaticLineBreaks(true);
   }
 
   public String getFormat() {
@@ -88,19 +89,23 @@ public class TextFieldComponent extends ImageComponent {
   @Override
   public String getTextToRender(Graphics2D g) {
     return isSelected() && cursorVisible ? super.getTextToRender(g) + getCursor()
-      : super.getTextToRender(g);
+      : super.getTextToRender(g) + "  ";
   }
 
   public void handleTypedKey(final KeyEvent event) {
-    if (isSuspended() || !isSelected() || !isVisible() || !isEnabled()) {
+    if (!canHandleInput()) {
       return;
     }
-
     switch (event.getKeyCode()) {
       case KeyEvent.VK_BACK_SPACE -> handleBackSpace();
       case KeyEvent.VK_ESCAPE, KeyEvent.VK_ENTER -> acceptInput();
       default -> handleNormalTyping(event);
     }
+  }
+
+
+  public boolean canHandleInput() {
+    return !isSuspended() && isSelected() && isVisible() && isEnabled();
   }
 
   public void onChangeConfirmed(final Consumer<String> cons) {
@@ -110,7 +115,7 @@ public class TextFieldComponent extends ImageComponent {
   @Override
   public void render(final Graphics2D g) {
     super.render(g);
-    if (isSelected() && Game.time().since(lastToggled) > flickerDelay) {
+    if (isSelected() && Game.time().since(lastToggled) >= flickerDelay) {
       this.cursorVisible = !this.cursorVisible;
       this.lastToggled = Game.time().now();
     }
@@ -121,7 +126,7 @@ public class TextFieldComponent extends ImageComponent {
   }
 
   private void acceptInput() {
-    toggleSelection();
+    setSelected(false);
     changeConfirmedConsumers.forEach(c -> c.accept(getText()));
     log.log(
       Level.INFO,
