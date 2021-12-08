@@ -3,10 +3,8 @@ package de.gurkenlabs.litiengine.gui;
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.input.Input;
-import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
-import java.awt.geom.Rectangle2D;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
@@ -22,9 +20,9 @@ public class TextFieldComponent extends ImageComponent {
   private static final Logger log = Logger.getLogger(TextFieldComponent.class.getName());
   private final List<Consumer<String>> changeConfirmedConsumers;
   private boolean cursorVisible;
-  private int flickerDelay = 100;
+  private int flickerDelay = 300;
   private String format;
-
+  private String cursor = "_";
   private String fullText;
   private long lastToggled;
   private int maxLength = 0;
@@ -57,13 +55,40 @@ public class TextFieldComponent extends ImageComponent {
     return format;
   }
 
+  public void setFormat(final String format) {
+    this.format = format;
+  }
+
+  public String getCursor() {
+    return cursor;
+  }
+
+  public void setCursor(String newCursor) {
+    this.cursor = newCursor;
+  }
+
   public int getMaxLength() {
     return maxLength;
+  }
+
+  public void setMaxLength(final int maxLength) {
+    this.maxLength = maxLength;
   }
 
   @Override
   public String getText() {
     return fullText;
+  }
+
+  @Override
+  public void setText(final String text) {
+    this.fullText = text;
+  }
+
+  @Override
+  public String getTextToRender(Graphics2D g) {
+    return isSelected() && cursorVisible ? super.getTextToRender(g) + getCursor()
+      : super.getTextToRender(g);
   }
 
   public void handleTypedKey(final KeyEvent event) {
@@ -85,50 +110,19 @@ public class TextFieldComponent extends ImageComponent {
   @Override
   public void render(final Graphics2D g) {
     super.render(g);
-    g.setFont(getFont());
-    final FontMetrics fm = g.getFontMetrics();
-    if (this.isSelected() && Game.time().since(lastToggled) > flickerDelay) {
+    if (isSelected() && Game.time().since(lastToggled) > flickerDelay) {
       this.cursorVisible = !this.cursorVisible;
       this.lastToggled = Game.time().now();
     }
-    if (isSelected() && cursorVisible) {
-      double textWidth = fm.stringWidth(this.getTextToRender(g));
-      double textHeight = (double) fm.getAscent() + fm.getDescent();
-
-      double xCoord =
-        getTextAlign() != null ? getX() + getTextAlign().getLocation(getWidth(), textWidth)
-          : getTextX();
-      double yCoord =
-        getTextValign() != null ? getY() + getTextValign().getLocation(getHeight(), textHeight)
-          : getTextY();
-      final Rectangle2D cursor = new Rectangle2D.Double(xCoord + fm.stringWidth(getTextToRender(g)),
-        yCoord, getFont().getSize2D() * 1 / 5, getFont().getSize2D());
-      g.setColor(getAppearance().getForeColor());
-      g.fill(cursor);
-    }
-  }
-
-  public void setFormat(final String format) {
-    this.format = format;
-  }
-
-  public void setMaxLength(final int maxLength) {
-    this.maxLength = maxLength;
   }
 
   public void setFlickerDelay(int flickerDelayMillis) {
     this.flickerDelay = flickerDelayMillis;
   }
 
-  @Override
-  public void setText(final String text) {
-    this.fullText = text;
-  }
-
   private void acceptInput() {
     toggleSelection();
     changeConfirmedConsumers.forEach(c -> c.accept(getText()));
-
     log.log(
       Level.INFO,
       "{0} typed into TextField with ComponentID {1}",
