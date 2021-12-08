@@ -16,12 +16,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TextFieldComponent extends ImageComponent {
+
   public static final String DOUBLE_FORMAT = "[-+]?[0-9]*\\.?[0-9]*([eE][-+]?[0-9]*)?";
   public static final String INTEGER_FORMAT = "[0-9]{1,10}";
   private static final Logger log = Logger.getLogger(TextFieldComponent.class.getName());
   private final List<Consumer<String>> changeConfirmedConsumers;
   private boolean cursorVisible;
-  private final int flickerDelay;
+  private int flickerDelay = 100;
   private String format;
 
   private String fullText;
@@ -29,94 +30,80 @@ public class TextFieldComponent extends ImageComponent {
   private int maxLength = 0;
 
   public TextFieldComponent(
-      final double x, final double y, final double width, final double height, final String text) {
+    final double x, final double y, final double width, final double height, final String text) {
     super(x, y, width, height, text);
     this.changeConfirmedConsumers = new CopyOnWriteArrayList<>();
-    this.setText(text);
-    this.flickerDelay = 100;
+    setText(text);
     Input.keyboard().onKeyTyped(this::handleTypedKey);
-    this.onClicked(
-        e -> {
-          if (!this.isSelected()) {
-            this.toggleSelection();
-          }
-        });
+    onClicked(
+      e -> {
+        if (!isSelected()) {
+          toggleSelection();
+        }
+      });
 
     Input.mouse()
-        .onClicked(
-            e -> {
-              if (!this.getBoundingBox().contains(Input.mouse().getLocation())) {
-                this.setSelected(false);
-              }
-            });
+      .onClicked(
+        e -> {
+          if (!getBoundingBox().contains(Input.mouse().getLocation())) {
+            setSelected(false);
+          }
+        });
 
     this.setTextAlign(Align.LEFT);
   }
 
   public String getFormat() {
-    return this.format;
+    return format;
   }
 
   public int getMaxLength() {
-    return this.maxLength;
+    return maxLength;
   }
 
   @Override
   public String getText() {
-    return this.fullText;
+    return fullText;
   }
 
   public void handleTypedKey(final KeyEvent event) {
-    if (this.isSuspended() || !this.isSelected() || !this.isVisible() || !this.isEnabled()) {
+    if (isSuspended() || !isSelected() || !isVisible() || !isEnabled()) {
       return;
     }
 
     switch (event.getKeyCode()) {
-      case KeyEvent.VK_BACK_SPACE:
-        this.handleBackSpace();
-        break;
-      case KeyEvent.VK_SPACE:
-        if (!this.getText().equals("")) {
-          this.setText(this.getText() + " ");
-        }
-        break;
-      case KeyEvent.VK_ENTER:
-        this.toggleSelection();
-        this.changeConfirmedConsumers.forEach(c -> c.accept(this.getText()));
-
-        log.log(
-            Level.INFO,
-            "{0} typed into TextField with ComponentID {1}",
-            new Object[] {this.getText(), this.getComponentId()});
-        break;
-      default:
-        this.handleNormalTyping(event);
-        break;
+      case KeyEvent.VK_BACK_SPACE -> handleBackSpace();
+      case KeyEvent.VK_ESCAPE, KeyEvent.VK_ENTER -> acceptInput();
+      default -> handleNormalTyping(event);
     }
   }
 
   public void onChangeConfirmed(final Consumer<String> cons) {
-    this.changeConfirmedConsumers.add(cons);
+    changeConfirmedConsumers.add(cons);
   }
 
   @Override
   public void render(final Graphics2D g) {
     super.render(g);
-    g.setFont(this.getFont());
+    g.setFont(getFont());
     final FontMetrics fm = g.getFontMetrics();
-
-    if (this.isSelected() && Game.time().since(this.lastToggled) > this.flickerDelay) {
+    if (this.isSelected() && Game.time().since(lastToggled) > flickerDelay) {
       this.cursorVisible = !this.cursorVisible;
       this.lastToggled = Game.time().now();
     }
-    if (this.isSelected() && this.cursorVisible) {
-      final Rectangle2D cursor =
-          new Rectangle2D.Double(
-              this.getX() + this.getTextX() + fm.stringWidth(this.getTextToRender(g)),
-              this.getY() + this.getTextY(),
-              this.getFont().getSize2D() * 3 / 5,
-              this.getFont().getSize2D() * 1 / 5);
-      g.setColor(this.getAppearance().getForeColor());
+    if (isSelected() && cursorVisible) {
+      double textWidth = fm.stringWidth(this.getTextToRender(g));
+      double textHeight = (double) fm.getAscent() + fm.getDescent();
+
+      double xCoord =
+        getTextAlign() != null ? getX() + getTextAlign().getLocation(getWidth(), textWidth)
+          : getTextX();
+      double yCoord =
+        getTextValign() != null ? getY() + getTextValign().getLocation(getHeight(), textHeight)
+          : getTextY();
+      final Rectangle2D cursor = new Rectangle2D.Double(xCoord + fm.stringWidth(getTextToRender(g)),
+        yCoord, getFont().getSize2D() * 1 / 5, getFont().getSize2D());
+      g.setColor(getAppearance().getForeColor());
       g.fill(cursor);
     }
   }
@@ -129,33 +116,47 @@ public class TextFieldComponent extends ImageComponent {
     this.maxLength = maxLength;
   }
 
+  public void setFlickerDelay(int flickerDelayMillis) {
+    this.flickerDelay = flickerDelayMillis;
+  }
+
   @Override
   public void setText(final String text) {
     this.fullText = text;
   }
 
+  private void acceptInput() {
+    toggleSelection();
+    changeConfirmedConsumers.forEach(c -> c.accept(getText()));
+
+    log.log(
+      Level.INFO,
+      "{0} typed into TextField with ComponentID {1}",
+      new Object[]{getText(), getComponentId()});
+  }
+
   private void handleBackSpace() {
     if (Input.keyboard().isPressed(KeyEvent.VK_SHIFT)) {
-      while (this.getText().length() >= 1
-          && this.getText().charAt(this.getText().length() - 1) == ' ') {
-        this.setText(this.getText().substring(0, this.getText().length() - 1));
+      while (getText().length() >= 1
+        && getText().charAt(getText().length() - 1) == ' ') {
+        setText(getText().substring(0, getText().length() - 1));
       }
 
-      while (this.getText().length() >= 1
-          && this.getText().charAt(this.getText().length() - 1) != ' ') {
-        this.setText(this.getText().substring(0, this.getText().length() - 1));
+      while (getText().length() >= 1
+        && getText().charAt(getText().length() - 1) != ' ') {
+        setText(getText().substring(0, getText().length() - 1));
       }
-    } else if (this.getText().length() >= 1) {
-      this.setText(this.getText().substring(0, this.getText().length() - 1));
+    } else if (getText().length() >= 1) {
+      setText(getText().substring(0, getText().length() - 1));
     }
 
-    if (this.isKnownNumericFormat() && (this.getText() == null || this.getText().isEmpty())) {
-      this.setText("0");
+    if (isKnownNumericFormat() && (getText() == null || getText().isEmpty())) {
+      setText("0");
     }
   }
 
   private void handleNormalTyping(KeyEvent event) {
-    if (this.getMaxLength() > 0 && this.getText().length() >= this.getMaxLength()) {
+    if (getMaxLength() > 0 && getText().length() >= getMaxLength()) {
       return;
     }
 
@@ -165,23 +166,23 @@ public class TextFieldComponent extends ImageComponent {
     }
 
     // regex check to ensure certain formats
-    if (this.getFormat() != null && !this.getFormat().isEmpty()) {
-      final Pattern pat = Pattern.compile(this.getFormat());
-      final Matcher mat = pat.matcher(this.getText() + text);
+    if (getFormat() != null && !getFormat().isEmpty()) {
+      final Pattern pat = Pattern.compile(getFormat());
+      final Matcher mat = pat.matcher(getText() + text);
       if (!mat.matches()) {
         return;
       }
     }
 
-    if (this.isKnownNumericFormat() && this.getText().equals("0")) {
-      this.setText("");
+    if (isKnownNumericFormat() && getText().equals("0")) {
+      setText("");
     }
 
-    this.setText(this.getText() + text);
+    setText(getText() + text);
   }
 
   private boolean isKnownNumericFormat() {
-    return this.getFormat() != null
-        && (this.getFormat().equals(INTEGER_FORMAT) || this.getFormat().equals(DOUBLE_FORMAT));
+    return getFormat() != null
+      && (getFormat().equals(INTEGER_FORMAT) || getFormat().equals(DOUBLE_FORMAT));
   }
 }
