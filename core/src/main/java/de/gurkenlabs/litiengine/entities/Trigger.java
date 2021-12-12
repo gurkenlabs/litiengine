@@ -375,7 +375,7 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   private List<IEntity> getEntitiesInCollisionBox() {
     final List<IEntity> collEntities = new CopyOnWriteArrayList<>();
     for (final ICollisionEntity coll : Game.physics().getCollisionEntities()) {
-      if (coll == this
+      if (coll == this || !coll.canCollideWith(this)
           || !this.activators.isEmpty() && !this.activators.contains(coll.getMapId())) {
         continue;
       }
