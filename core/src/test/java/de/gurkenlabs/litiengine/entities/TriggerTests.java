@@ -212,6 +212,7 @@ class TriggerTests {
     when(entity.getCollisionBox()).thenReturn(new Rectangle2D.Double(x, y, 8, 8));
     when(entity.hasCollision()).thenReturn(true);
     when(entity.getCollisionType()).thenReturn(Collision.DYNAMIC);
+    when(entity.canCollideWith(any(ICollisionEntity.class))).thenReturn(true);
 
     this.testEnvironment.add(entity);
 
