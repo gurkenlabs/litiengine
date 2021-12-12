@@ -28,7 +28,9 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
 import java.awt.geom.RoundRectangle2D;
+import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
@@ -58,6 +60,9 @@ public abstract class GuiComponent
   private final List<Consumer<ComponentMouseWheelEvent>> mouseWheelConsumer;
   private final List<Consumer<ComponentMouseEvent>> hoverConsumer;
   private final List<Consumer<String>> textChangedConsumer;
+
+  private final Collection<ComponentRenderListener> renderListeners = ConcurrentHashMap.newKeySet();
+  private final Collection<ComponentRenderedListener> renderedListeners = ConcurrentHashMap.newKeySet();
 
   private final int componentId;
   private final Appearance appearance;
@@ -110,9 +115,9 @@ public abstract class GuiComponent
   /**
    * Instantiates a new gui component at the point (x,y) with the dimension (width,height).
    *
-   * @param x the x
-   * @param y the y
-   * @param width the width
+   * @param x      the x
+   * @param y      the y
+   * @param width  the width
    * @param height the height
    */
   protected GuiComponent(final double x, final double y, final double width, final double height) {
@@ -705,6 +710,22 @@ public abstract class GuiComponent
     this.textChangedConsumer.add(cons);
   }
 
+  public void addRenderListener(final ComponentRenderListener listener) {
+    this.renderListeners.add(listener);
+  }
+
+  public void removeListener(final ComponentRenderListener listener) {
+    this.renderListeners.remove(listener);
+  }
+
+  public void addRenderedListener(final ComponentRenderedListener listener) {
+    this.renderedListeners.add(listener);
+  }
+
+  public void removeListener(final ComponentRenderedListener listener) {
+    this.renderedListeners.remove(listener);
+  }
+
   /**
    * Prepare the GuiComponent and all its child Components (Makes the GuiComponent visible and adds
    * mouse listeners.). This is, for example, done right before switching to a new screen.
@@ -728,6 +749,17 @@ public abstract class GuiComponent
   public void render(final Graphics2D g) {
     if (this.isSuspended() || !this.isVisible()) {
       return;
+    }
+
+    for (ComponentRenderListener listener : this.renderListeners) {
+      if (!listener.canRender(this)) {
+        return;
+      }
+    }
+
+    final ComponentRenderEvent event = new ComponentRenderEvent(g, this);
+    for (ComponentRenderListener listener : this.renderListeners) {
+      listener.rendering(event);
     }
 
     Shape clip = g.getClip();
@@ -760,6 +792,14 @@ public abstract class GuiComponent
       component.render(g);
     }
 
+    for (ComponentRenderListener listener : this.renderListeners) {
+      listener.rendered(event);
+    }
+
+    for (ComponentRenderedListener listener : this.renderedListeners) {
+      listener.rendered(event);
+    }
+
     if (Game.config().debug().renderGuiComponentBoundingBoxes()) {
       g.setColor(Color.RED);
       ShapeRenderer.renderOutline(g, this.getBoundingBox());
@@ -770,33 +810,33 @@ public abstract class GuiComponent
   public float[] getTweenValues(TweenType tweenType) {
     switch (tweenType) {
       case POSITION_X:
-        return new float[] {(float) this.getX()};
+        return new float[]{(float) this.getX()};
       case POSITION_Y:
-        return new float[] {(float) this.getY()};
+        return new float[]{(float) this.getY()};
       case POSITION_XY:
-        return new float[] {(float) this.getX(), (float) this.getY()};
+        return new float[]{(float) this.getX(), (float) this.getY()};
       case SIZE_WIDTH:
-        return new float[] {(float) this.getWidth()};
+        return new float[]{(float) this.getWidth()};
       case SIZE_HEIGHT:
-        return new float[] {(float) this.getHeight()};
+        return new float[]{(float) this.getHeight()};
       case SIZE_BOTH:
-        return new float[] {(float) this.getWidth(), (float) this.getHeight()};
+        return new float[]{(float) this.getWidth(), (float) this.getHeight()};
       case ANGLE:
-        return new float[] {(float) this.getTextAngle()};
+        return new float[]{(float) this.getTextAngle()};
       case FONTSIZE:
-        return new float[] {this.getFont().getSize2D()};
+        return new float[]{this.getFont().getSize2D()};
       case OPACITY:
         Color bg1 = this.getCurrentAppearance().getBackgroundColor1();
         Color bg2 = this.getCurrentAppearance().getBackgroundColor2();
         Color fore = this.getCurrentAppearance().getForeColor();
         Color shadow = this.getTextShadowColor();
         Color border = this.getCurrentAppearance().getBorderColor();
-        return new float[] {
-          (float) (bg1 == null ? 0 : bg1.getAlpha()),
-          (float) (bg2 == null ? 0 : bg2.getAlpha()),
-          (float) (fore == null ? 0 : fore.getAlpha()),
-          (float) (shadow == null ? 0 : shadow.getAlpha()),
-          (float) (border == null ? 0 : border.getAlpha())
+        return new float[]{
+            (float) (bg1 == null ? 0 : bg1.getAlpha()),
+            (float) (bg2 == null ? 0 : bg2.getAlpha()),
+            (float) (fore == null ? 0 : fore.getAlpha()),
+            (float) (shadow == null ? 0 : shadow.getAlpha()),
+            (float) (border == null ? 0 : border.getAlpha())
         };
       default:
         return Tweenable.super.getTweenValues(tweenType);
@@ -879,7 +919,7 @@ public abstract class GuiComponent
   /**
    * Sets the width and height of this GuiComponent.
    *
-   * @param width the width
+   * @param width  the width
    * @param height the height
    */
   public void setDimension(final double width, final double height) {
@@ -1019,7 +1059,7 @@ public abstract class GuiComponent
    * Sets the {@link RenderingHints#KEY_TEXT_ANTIALIASING} settings for the rendered text.
    *
    * @param antialiasing Either {@link RenderingHints#VALUE_TEXT_ANTIALIAS_ON} or {@link
-   *     RenderingHints#VALUE_TEXT_ANTIALIAS_OFF}
+   *                     RenderingHints#VALUE_TEXT_ANTIALIAS_OFF}
    */
   public void setTextAntialiasing(boolean antialiasing) {
     this.textAntialiasing = antialiasing;
@@ -1149,7 +1189,9 @@ public abstract class GuiComponent
     }
   }
 
-  /** Toggle this GuiComponent's selection. */
+  /**
+   * Toggle this GuiComponent's selection.
+   */
   public void toggleSelection() {
     this.setSelected(!this.isSelected);
   }
@@ -1254,7 +1296,9 @@ public abstract class GuiComponent
     return this.mouseWheelConsumer;
   }
 
-  /** Initialize child components. */
+  /**
+   * Initialize child components.
+   */
   protected void initializeComponents() {
     // nothing to do in the base class
   }
