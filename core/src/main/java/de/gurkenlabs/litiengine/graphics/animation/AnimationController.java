@@ -28,7 +28,9 @@ public class AnimationController implements IAnimationController {
   private final List<ImageEffect> imageEffects;
   private final List<AnimationListener> listeners;
 
-  /** Initializes a new instance of the {@code AnimationController} class. */
+  /**
+   * Initializes a new instance of the {@code AnimationController} class.
+   */
   public AnimationController() {
     this.animations = new ConcurrentHashMap<>();
     this.imageEffects = new CopyOnWriteArrayList<>();
@@ -201,9 +203,14 @@ public class AnimationController implements IAnimationController {
 
     BufferedImage sprite =
         current.getSpritesheet().getSprite(current.getCurrentKeyFrame().getSpriteIndex());
+    if (sprite == null) {
+      return null;
+    }
     for (final ImageEffect effect : this.getImageEffects()) {
       sprite = effect.apply(sprite);
     }
+
+    Resources.images().add(cacheKey, sprite);
 
     return sprite;
   }
