@@ -17,6 +17,8 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public abstract class Particle implements ITimeToLive {
+
+  private static final Color DEFAULT_COLOR = Color.BLACK;
   private long aliveTick;
   private long aliveTime;
   private float angle;
@@ -102,7 +104,7 @@ public abstract class Particle implements ITimeToLive {
   }
 
   public Color getColor() {
-    return this.color;
+    return this.color == null ? DEFAULT_COLOR : this.color;
   }
 
   public float getDeltaHeight() {

@@ -128,16 +128,28 @@ public class EmitterColorPanel extends PropertyPanel {
 
   private void setupChangedListeners() {
     btnAdd.addActionListener(
-        a -> model.addRow(new Object[] {ColorHelper.encode(EmitterData.DEFAULT_COLOR.brighter())}));
+        a -> model.addRow(new Object[]{ColorHelper.encode(EmitterData.DEFAULT_COLOR.brighter())}));
     btnRemove.addActionListener(a -> model.removeRow(table.getSelectedRow()));
     btnEdit.addActionListener(
         a -> {
-          Color previousColor =
-              ColorHelper.decode(
-                  table.getValueAt(table.getSelectedRow(), table.getSelectedColumn()).toString());
+          if (table.getSelectedRow() == -1 || table.getSelectedColumn() == -1) {
+            // setting a color requires a cell selection
+            return;
+          }
+
+          Color previousColor = null;
+          Object value = table.getValueAt(table.getSelectedRow(), table.getSelectedColumn());
+          if (value != null) {
+            previousColor = ColorHelper.decode(value.toString());
+          }
+
           final Color result =
               JColorChooser.showDialog(
                   null, Resources.strings().get("particle_editcolor"), previousColor);
+          if (result == null) {
+            return;
+          }
+
           table.setValueAt(
               ColorHelper.encode(result), table.getSelectedRow(), table.getSelectedColumn());
         });
