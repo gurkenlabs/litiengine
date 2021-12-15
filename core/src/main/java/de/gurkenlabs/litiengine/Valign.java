@@ -12,7 +12,7 @@ import de.gurkenlabs.litiengine.util.MathUtilities;
 public enum Valign {
   @XmlEnumValue("bottom")
   DOWN(1f),
-  @XmlEnumValue("center")
+  @XmlEnumValue("middle")
   MIDDLE(0.5f),
   @XmlEnumValue("top")
   TOP(0f),
