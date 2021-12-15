@@ -47,8 +47,6 @@ public class TileLayer extends Layer implements ITileLayer {
 
   @Override
   public ITile getTile(int x, int y) {
-    this.getTiles();
-
     if (this.tiles == null || this.tiles.length == 0) {
       return null;
     }
