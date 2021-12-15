@@ -28,28 +28,38 @@ public abstract class Particle implements ITimeToLive {
   private Color color;
   private float deltaHeight;
   private float deltaWidth;
-  /** The horizontal velocity (horizontal movement per update) for this particle. */
+  /**
+   * The horizontal velocity (horizontal movement per update) for this particle.
+   */
   private float velocityX;
-  /** The vertical velocity (vertical movement per update) for this particle. */
+  /**
+   * The vertical velocity (vertical movement per update) for this particle.
+   */
   private float velocityY;
-
   private boolean outlineOnly;
   private boolean antiAliasing;
 
-  /** The horizontal acceleration (increase / decrease in velocity over time) for this particle. */
+  /**
+   * The horizontal acceleration (increase / decrease in velocity over time) for this particle.
+   */
   private float accelerationX;
 
-  /** The vertical acceleration (increase / decrease in velocity over time) for this particle. */
+  /**
+   * The vertical acceleration (increase / decrease in velocity over time) for this particle.
+   */
   private float accelerationY;
-
   private float height;
   private int timeToLive;
   private float width;
 
-  /** The current location of the particle on the X-axis. */
+  /**
+   * The current location of the particle on the X-axis.
+   */
   private float x;
 
-  /** The current location of the particle on the Y-axis. */
+  /**
+   * The current location of the particle on the Y-axis.
+   */
   private float y;
 
   private RenderType customRenderType = RenderType.NONE;
@@ -68,7 +78,7 @@ public abstract class Particle implements ITimeToLive {
   /**
    * Constructs a new particle.
    *
-   * @param width the particle width in pixels
+   * @param width  the particle width in pixels
    * @param height the particle height in pixels
    */
   public Particle(final float width, final float height) {
@@ -92,11 +102,8 @@ public abstract class Particle implements ITimeToLive {
    * @return The Rectangular particle bounding box.
    */
   public Rectangle2D getBoundingBox(final Point2D origin) {
-    return new Rectangle2D.Double(
-        origin.getX() + this.getX(),
-        origin.getY() + this.getY(),
-        this.getWidth(),
-        this.getHeight());
+    return new Rectangle2D.Double(origin.getX() + this.getX(), origin.getY() + this.getY(),
+        this.getWidth(), this.getHeight());
   }
 
   public Collision getCollisionType() {
@@ -104,7 +111,7 @@ public abstract class Particle implements ITimeToLive {
   }
 
   public Color getColor() {
-    return this.color == null ? DEFAULT_COLOR : this.color;
+    return this.color;
   }
 
   public float getDeltaHeight() {
@@ -154,8 +161,7 @@ public abstract class Particle implements ITimeToLive {
   public float getOpacity() {
     if (this.isFading() && this.getTimeToLive() > 0) {
       return MathUtilities.clamp(
-          this.getColor().getAlpha() / 255f - (float) this.getAliveTime() / this.getTimeToLive(),
-          0,
+          this.getColor().getAlpha() / 255f - (float) this.getAliveTime() / this.getTimeToLive(), 0,
           1);
     }
     return 1;
@@ -171,8 +177,7 @@ public abstract class Particle implements ITimeToLive {
     // if we have a camera, we need to render the particle relative to the
     // viewport
     Point2D newEffectLocation =
-        Game.screens() != null
-            ? Game.world().camera().getViewportLocation(effectLocation)
+        Game.screens() != null ? Game.world().camera().getViewportLocation(effectLocation)
             : effectLocation;
     return this.getAbsoluteLocation(newEffectLocation);
   }
@@ -226,7 +231,7 @@ public abstract class Particle implements ITimeToLive {
    * a small amount of particles.
    *
    * @param ccd If set to true, the collision will be checked continuously by a ray-cast
-   *     approximation.
+   *            approximation.
    * @return This particle instance.
    */
   public Particle setContinuousCollision(boolean ccd) {
@@ -374,7 +379,7 @@ public abstract class Particle implements ITimeToLive {
    * color.
    *
    * @param emitterOrigin The current {@link Emitter} origin
-   * @param updateRatio The update ratio for this particle.
+   * @param updateRatio   The update ratio for this particle.
    */
   public void update(final Point2D emitterOrigin, final float updateRatio) {
     if (this.aliveTick == 0) {
@@ -390,25 +395,37 @@ public abstract class Particle implements ITimeToLive {
       return;
     }
 
-    applyUpdateRatioToMember(this::getWidth, this::setWidth, this.getDeltaWidth(), updateRatio);
-    applyUpdateRatioToMember(this::getHeight, this::setHeight, this.getDeltaHeight(), updateRatio);
-    applyUpdateRatioToMember(this::getAngle, this::setAngle, this.getDeltaAngle(), updateRatio);
+    if (this.getDeltaWidth() != 0) {
+      this.width += this.getDeltaWidth() * updateRatio;
+    }
+
+    if (this.getDeltaHeight() != 0) {
+      this.height += this.getDeltaHeight() * updateRatio;
+    }
+
+    if (this.getDeltaAngle() != 0) {
+      this.angle += this.getDeltaAngle() * updateRatio;
+    }
 
     if (hasRayCastCollision(emitterOrigin, updateRatio)) {
       return;
     }
 
-    applyUpdateRatioToMember(
-        this::getVelocityX, this::setVelocityX, this.getAccelerationX(), updateRatio);
-    applyUpdateRatioToMember(
-        this::getVelocityY, this::setVelocityY, this.getAccelerationY(), updateRatio);
+    if (this.getAccelerationX() != 0) {
+      this.velocityX += this.getAccelerationX() * updateRatio;
+    }
+
+    if (this.getAccelerationY() != 0) {
+      this.velocityY += this.getAccelerationY() * updateRatio;
+    }
   }
+
 
   /**
    * Test for ray cast collisions
    *
    * @param emitterOrigin The current {@link Emitter} origin
-   * @param updateRatio The update ratio for this particle.
+   * @param updateRatio   The update ratio for this particle.
    * @return True if ray cast collision occurs
    */
   protected boolean hasRayCastCollision(final Point2D emitterOrigin, final float updateRatio) {
@@ -434,24 +451,6 @@ public abstract class Particle implements ITimeToLive {
     return false;
   }
 
-  /**
-   * Updates the specified member considering the current delta value and update ratio.
-   *
-   * @param valueGetter Accessor to get the intended member
-   * @param valueSetter Accessor to set the intended member
-   * @param deltaValue Current delta value
-   * @param updateRatio Current update ratio
-   */
-  protected void applyUpdateRatioToMember(
-      Supplier<Float> valueGetter,
-      Consumer<Float> valueSetter,
-      final float deltaValue,
-      final float updateRatio) {
-    if (deltaValue != 0) {
-      valueSetter.accept(valueGetter.get() + (deltaValue * updateRatio));
-    }
-  }
-
   private boolean checkForCollision(final Point2D emitterOrigin, float targetX, float targetY) {
     if (this.isStoppingOnCollision() && this.colliding) {
       return true;
@@ -462,16 +461,13 @@ public abstract class Particle implements ITimeToLive {
       double endX = emitterOrigin.getX() + targetX;
       double endY = emitterOrigin.getY() + targetY;
       Line2D ray = new Line2D.Double(start.getX(), start.getY(), endX, endY);
-      if (this.getCollisionType() != Collision.NONE
-          && Game.physics() != null
-          && Game.physics().collides(ray, this.getCollisionType())) {
+      if (this.getCollisionType() != Collision.NONE && Game.physics() != null && Game.physics()
+          .collides(ray, this.getCollisionType())) {
         collide();
         return true;
       }
-    } else if (this.getCollisionType() != Collision.NONE
-        && Game.physics() != null
-        && Game.physics()
-            .collides(this.getBoundingBox(emitterOrigin).getBounds2D(), this.getCollisionType())) {
+    } else if (this.getCollisionType() != Collision.NONE && Game.physics() != null && Game.physics()
+        .collides(this.getBoundingBox(emitterOrigin).getBounds2D(), this.getCollisionType())) {
       collide();
       return true;
     }

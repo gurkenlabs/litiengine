@@ -51,8 +51,7 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
   /**
    * Copy Constructor for copying instances of Layers.
    *
-   * @param layerToBeCopied
-   *          the layer we want to copy
+   * @param layerToBeCopied the layer we want to copy
    */
   public Layer(Layer layerToBeCopied) {
     super(layerToBeCopied);
@@ -130,7 +129,8 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
       return this.renderType;
     }
 
-    this.renderType = this.getEnumValue(LayerProperty.LAYER_RENDER_TYPE, RenderType.class, RenderType.GROUND);
+    this.renderType = this.getEnumValue(LayerProperty.LAYER_RENDER_TYPE, RenderType.class,
+        RenderType.GROUND);
     this.renderTypeLoaded = true;
     return this.renderType;
   }
@@ -217,73 +217,24 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
       this.parentMap = (TmxMap) parent;
     }
 
-    resetOffsetX();
-    resetOffsetY();
-    resetWidth();
-    resetHeight();
-    resetOpacity();
-  }
-
-  /**
-   * Resets offsetx if it is resettable
-   */
-  protected void resetOffsetX(){
-    if (isResettable(this.offsetx)) {
+    if (this.offsetx != null && this.offsetx.intValue() == 0) {
       this.offsetx = null;
     }
-  }
 
-  /**
-   * Resets offsety if it is resettable
-   */
-  protected void resetOffsetY(){
-    if (isResettable(this.offsety)) {
+    if (this.offsety != null && this.offsety.intValue() == 0) {
       this.offsety = null;
     }
-  }
 
-  /**
-   * Resets width if it is resettable
-   */
-  protected void resetWidth(){
-    if (isResettable(this.width)) {
+    if (this.width != null && this.width.intValue() == 0) {
       this.width = null;
     }
-  }
 
-  /**
-   * Resets height if it is resettable
-   */
-  protected void resetHeight(){
-    if (isResettable(this.height)) {
+    if (this.height != null && this.height.intValue() == 0) {
       this.height = null;
     }
-  }
 
-  /**
-   * Resets opacity if it is resettable
-   */
-  protected void resetOpacity(){
-    if (isResettable(this.opacity)) {
+    if (this.opacity != null && this.opacity.floatValue() == 1.0f) {
       this.opacity = null;
     }
-  }
-
-  /**
-   * Decides if a value satisfies the criteria for being set to null
-   * @param value Integer value to be checked
-   * @return True if the value satisfies the reset criteria
-   */
-  protected boolean isResettable(Integer value){
-    return value != null && value.intValue() == 0;
-  }
-
-  /**
-   * Decides if a value satisfies the criteria for being set to null
-   * @param value Float value to be checked
-   * @return True if the value satisfies the reset criteria
-   */
-  protected boolean isResettable(Float value){
-    return value != null && value.floatValue() == 1.0f;
   }
 }
