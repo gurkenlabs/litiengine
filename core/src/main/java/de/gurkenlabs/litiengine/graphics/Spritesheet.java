@@ -17,13 +17,12 @@ import java.util.logging.Logger;
 public final class Spritesheet implements Comparable<Spritesheet> {
   private static final Logger log = Logger.getLogger(Spritesheet.class.getName());
 
-  private final List<Integer> emptySprites = new CopyOnWriteArrayList<>();
-
   private final BufferedImage image;
   private final String name;
   private final ImageFormat imageFormat;
 
   private BufferedImage[] sprites;
+  private boolean[] emptySprites;
   private int columns;
   private int rows;
   private int spriteHeight;
@@ -52,6 +51,7 @@ public final class Spritesheet implements Comparable<Spritesheet> {
     this.imageFormat = ImageFormat.get(FileUtilities.getExtension(path));
 
     this.updateRowsAndCols();
+    this.emptySprites = new boolean[this.getTotalNumberOfSprites()];
     this.sprites = new BufferedImage[this.getTotalNumberOfSprites()];
 
     Resources.spritesheets().add(this.name, this);
@@ -59,7 +59,7 @@ public final class Spritesheet implements Comparable<Spritesheet> {
     Resources.images()
         .addClearedListener(
             () -> {
-              this.emptySprites.clear();
+              this.emptySprites = new boolean[this.getTotalNumberOfSprites()];
               this.sprites = new BufferedImage[this.getTotalNumberOfSprites()];
             });
   }
@@ -130,7 +130,7 @@ public final class Spritesheet implements Comparable<Spritesheet> {
   }
 
   public BufferedImage getSprite(final int index, final int margin, final int spacing) {
-    if (this.emptySprites.contains(index) || this.sprites.length == 0) {
+    if (index < 0 || index >= this.sprites.length || this.emptySprites[index] || this.sprites.length == 0) {
       return null;
     }
 
@@ -148,7 +148,7 @@ public final class Spritesheet implements Comparable<Spritesheet> {
       final BufferedImage sprite =
           this.getImage().getSubimage(position.x, position.y, this.spriteWidth, this.spriteHeight);
       if (Imaging.isEmpty(sprite)) {
-        emptySprites.add(index);
+        emptySprites[index] = true;
         return null;
       }
 
