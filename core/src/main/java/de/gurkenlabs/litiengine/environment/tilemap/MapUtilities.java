@@ -168,10 +168,12 @@ public final class MapUtilities {
     final Point tileLocation = point;
 
     ITile tile = null;
-    for (final ITileLayer layer : map.getTileLayers()) {
-      ITile tileOfLayer = layer.getTile(tileLocation.x, tileLocation.y);
+
+    for (int i = map.getTileLayers().size() - 1; i >= 0; i--) {
+      ITile tileOfLayer =  map.getTileLayers().get(i).getTile(tileLocation.x, tileLocation.y);
       if (tileOfLayer != null && tileOfLayer.getGridId() != 0) {
         tile = tileOfLayer;
+        break;
       }
     }
 

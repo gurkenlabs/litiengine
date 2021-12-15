@@ -54,6 +54,7 @@ public class Emitter extends Entity implements IUpdateable, ITimeToLive, IRender
   private long lastSpawn;
 
   private Map<RenderType, IRenderable> renderables;
+  private Point2D origin;
 
   public Emitter() {
     this.finishedListeners = ConcurrentHashMap.newKeySet();
@@ -185,7 +186,11 @@ public class Emitter extends Entity implements IUpdateable, ITimeToLive, IRender
   }
 
   public Point2D getOrigin() {
-    return new Point2D.Double(
+    return this.origin;
+  }
+
+  protected void updateOrigin(){
+    this.origin = new Point2D.Double(
         this.getX() + this.data().getOriginAlign().getValue(this.getWidth()),
         this.getY() + this.data().getOriginValign().getValue(this.getHeight()));
   }
@@ -310,6 +315,8 @@ public class Emitter extends Entity implements IUpdateable, ITimeToLive, IRender
       this.delete();
       return;
     }
+
+    this.updateOrigin();
 
     final float updateRatio = (float) this.data().getUpdateRate() / Game.loop().getTickRate();
     for (final Particle p : this.getParticles().stream().collect(Collectors.toList())) {
