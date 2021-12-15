@@ -87,8 +87,6 @@ public class Emitter extends Entity implements IUpdateable, ITimeToLive, IRender
       this.emitterData.setOriginValign(info.originValign());
       this.activateOnInit = info.activateOnInit();
     }
-
-    this.updateOrigin();
   }
 
   public Emitter(EmitterData emitterData) {
@@ -147,7 +145,6 @@ public class Emitter extends Entity implements IUpdateable, ITimeToLive, IRender
     this.particles.add(particle);
   }
 
-  /** Deactivate. */
   public void deactivate() {
     if (!this.activated) {
       return;
@@ -170,6 +167,7 @@ public class Emitter extends Entity implements IUpdateable, ITimeToLive, IRender
 
   @FunctionalInterface
   public interface EmitterFinishedListener extends EventListener {
+
     void finished(Emitter emitter);
   }
 
@@ -188,10 +186,14 @@ public class Emitter extends Entity implements IUpdateable, ITimeToLive, IRender
   }
 
   public Point2D getOrigin() {
+    if (this.origin == null) {
+      this.updateOrigin();
+
+    }
     return this.origin;
   }
 
-  protected void updateOrigin(){
+  protected void updateOrigin() {
     this.origin = new Point2D.Double(
         this.getX() + this.data().getOriginAlign().getValue(this.getWidth()),
         this.getY() + this.data().getOriginValign().getValue(this.getHeight()));
@@ -303,6 +305,11 @@ public class Emitter extends Entity implements IUpdateable, ITimeToLive, IRender
   }
 
   @Override
+  public int getTimeToLive() {
+    return this.data().getEmitterDuration();
+  }
+  
+  @Override
   public void update() {
     if (this.isPaused()) {
       return;
@@ -410,15 +417,7 @@ public class Emitter extends Entity implements IUpdateable, ITimeToLive, IRender
     return particle.timeToLiveReached();
   }
 
-  /**
-   * Render particles of this effect. The particles are always rendered relatively to this effects
-   * render location. A particle doesn't have an own map location. It is always relative to the
-   * effect it is assigned to.
-   *
-   * @param g the g
-   * @param p the p
-   */
-  /** Spawn particle. */
+
   protected void spawnParticle() {
     for (short i = 0; i < this.data().getSpawnAmount(); i++) {
       if (!this.canTakeNewParticles()) {
@@ -432,6 +431,14 @@ public class Emitter extends Entity implements IUpdateable, ITimeToLive, IRender
     }
   }
 
+  /**
+   * Render particles of this effect. The particles are always rendered relatively to this effects
+   * render location. A particle doesn't have an own map location. It is always relative to the
+   * effect it is assigned to.
+   *
+   * @param g The graphics object to draw on.
+   * @param renderType The render type.
+   */
   private void renderParticles(final Graphics2D g, final RenderType renderType) {
     if (Game.config().graphics().getGraphicQuality().getValue()
         < this.data().getRequiredQuality().getValue()) {
@@ -445,16 +452,11 @@ public class Emitter extends Entity implements IUpdateable, ITimeToLive, IRender
             : null;
     for (Particle particle : this.particles) {
       if (((!particle.usesCustomRenderType() && renderType == RenderType.NONE)
-              || (particle.usesCustomRenderType() && particle.getCustomRenderType() == renderType))
+          || (particle.usesCustomRenderType() && particle.getCustomRenderType() == renderType))
           && viewport != null
           && viewport.intersects(particle.getBoundingBox(origin))) {
         particle.render(g, origin);
       }
     }
-  }
-
-  @Override
-  public int getTimeToLive() {
-    return this.data().getEmitterDuration();
   }
 }
