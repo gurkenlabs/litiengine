@@ -5,24 +5,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.atMost;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameTest;
-import de.gurkenlabs.litiengine.GameTime;
 import de.gurkenlabs.litiengine.physics.Collision;
 import de.gurkenlabs.litiengine.physics.PhysicsEngine;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -58,91 +50,6 @@ class ParticleTests {
     assertDoesNotThrow(() -> new LineParticle(10, 10));
     assertDoesNotThrow(() -> new TextParticle(null));
     assertDoesNotThrow(() -> new TextParticle("test"));
-  }
-
-  @Test
-  void testUpdate_hasCollision() {
-    // arrange
-    Particle testParticle = spy(particle);
-
-    // act
-    testParticle.update(new Point2D.Double(1, 1), 1.2f);
-
-    // assert
-    verify(testParticle, atLeast(3))
-        .applyUpdateRatioToMember(
-            any(Supplier.class), any(Consumer.class), any(float.class), any(float.class));
-  }
-
-  @Test
-  void testUpdate_ttlExpired() {
-    // arrange
-    Particle testParticle = spy(particle);
-    when(testParticle.getAliveTime()).thenReturn(100000L);
-    when(testParticle.getTimeToLive()).thenReturn(10);
-
-    // act
-    testParticle.update(new Point2D.Double(1, 1), 1.2f);
-
-    // assert
-    verify(testParticle, never())
-        .applyUpdateRatioToMember(
-            any(Supplier.class), any(Consumer.class), any(float.class), any(float.class));
-  }
-
-  @Test
-  void testUpdate_hasNoCollision() {
-    // arrange
-    Particle testParticle = spy(particle);
-    testParticle.setX(10);
-    testParticle.setY(42);
-    testParticle.setVelocityX(5);
-    testParticle.setVelocityY(10);
-
-    // act
-    testParticle.update(new Point2D.Double(1, 1), 1.2f);
-
-    // assert
-    verify(testParticle, atLeast(5))
-        .applyUpdateRatioToMember(
-            any(Supplier.class), any(Consumer.class), any(float.class), any(float.class));
-  }
-
-  @Test
-  void testUpdate_colliding() {
-    // arrange
-    Particle testParticle = spy(particle);
-    PhysicsEngine physicsEngine = mock(PhysicsEngine.class);
-    GameTime gameTime = mock(GameTime.class);
-    when(physicsEngine.collides(any(Line2D.class), any(Collision.class))).thenReturn(true);
-    when(gameTime.now()).thenReturn(100000L);
-
-    try (MockedStatic<Game> gameMockedStatic = mockStatic(Game.class)) {
-      gameMockedStatic.when(Game::physics).thenReturn(physicsEngine);
-      gameMockedStatic.when(Game::time).thenReturn(gameTime);
-      testParticle.setVelocityX(5);
-      testParticle.setVelocityY(5);
-      testParticle.setContinuousCollision(true);
-      testParticle.setCollisionType(Collision.ANY);
-
-      // act
-      testParticle.update(new Point2D.Double(1, 1), 1.2f);
-      testParticle.update(new Point2D.Double(1, 1), 1.2f);
-
-      // assert
-      verify(testParticle, atMost(5))
-          .applyUpdateRatioToMember(
-              any(Supplier.class), any(Consumer.class), any(float.class), any(float.class));
-    }
-  }
-
-  @Test
-  void testApplyUpdateRatioToMember() {
-    // act
-    particle.applyUpdateRatioToMember(particle::getWidth, particle::setWidth, 1.2f, 1.0f);
-
-    // assert
-    assertEquals(2.2f, particle.getWidth());
   }
 
   @Test

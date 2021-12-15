@@ -87,6 +87,8 @@ public class Emitter extends Entity implements IUpdateable, ITimeToLive, IRender
       this.emitterData.setOriginValign(info.originValign());
       this.activateOnInit = info.activateOnInit();
     }
+
+    this.updateOrigin();
   }
 
   public Emitter(EmitterData emitterData) {
