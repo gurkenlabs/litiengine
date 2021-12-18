@@ -275,7 +275,10 @@ public final class Gamepad extends GamepadEvents implements IUpdateable {
   }
 
   private float getDeadZone(final Identifier ident) {
-    if (ident.getName().equals(Axis.X) || ident.getName().equals(Axis.Y)) {
+    if (ident.getName().equals(Axis.X)
+        || ident.getName().equals(Axis.Y)
+        || ident.getName().equals(Axis.RX)
+        || ident.getName().equals(Axis.RY)) {
       return this.getAxisDeadzone();
     }
 
@@ -322,8 +325,7 @@ public final class Gamepad extends GamepadEvents implements IUpdateable {
       listener.released(event);
     }
 
-    final Collection<GamepadReleasedListener> listeners =
-        this.componentReleasedListeners.get(comp.getIdentifier().getName());
+    final Collection<GamepadReleasedListener> listeners = this.componentReleasedListeners.get(comp.getIdentifier().getName());
     if (listeners != null) {
       for (final GamepadReleasedListener listener : listeners) {
         listener.released(event);
