@@ -191,13 +191,129 @@ public final class GamepadManager extends GamepadEvents implements ILaunchable {
     return current != null && current.isPressed(gamepadComponent);
   }
 
-  /** DON'T CALL THIS EXPLICITLY! THE LITIENGINE WILL MANAGE THE LIFECYCLE OF THIS INSTANCE. */
+  @Override
+  public void onPoll(GamepadPollListener listener) {
+    super.onPoll(listener);
+    if (this.current() != null) {
+      this.current().onPoll(listener);
+    }
+  }
+
+  @Override
+  public void onPressed(GamepadPressedListener listener) {
+    super.onPressed(listener);
+    if (this.current() != null) {
+      this.current().onPressed(listener);
+    }
+  }
+
+  @Override
+  public void onReleased(GamepadReleasedListener listener) {
+    super.onReleased(listener);
+    if (this.current() != null) {
+      this.current().onReleased(listener);
+    }
+  }
+
+  @Override
+  public void onPoll(String identifier, GamepadPollListener listener) {
+    super.onPoll(identifier, listener);
+    if (this.current() != null) {
+      this.current().onPoll(identifier, listener);
+    }
+  }
+
+  @Override
+  public void onPressed(String identifier, GamepadPressedListener listener) {
+    super.onPressed(identifier, listener);
+
+    if (this.current() != null) {
+      this.current().onPressed(identifier, listener);
+    }
+  }
+
+  @Override
+  public void onReleased(String identifier, GamepadReleasedListener listener) {
+    super.onReleased(identifier, listener);
+    if (this.current() != null) {
+      this.current().onReleased(identifier, listener);
+    }
+  }
+
+  @Override
+  public void clearEventListeners() {
+    super.clearEventListeners();
+
+    if (this.current() != null) {
+      this.current().clearEventListeners();
+    }
+  }
+
+  @Override
+  public void removePollListener(String identifier, GamepadPollListener listener) {
+    super.removePollListener(identifier, listener);
+
+    if (this.current() != null) {
+      this.current().removePollListener(identifier, listener);
+    }
+  }
+
+  @Override
+  public void removePressedListener(String identifier, GamepadPressedListener listener) {
+    super.removePressedListener(identifier, listener);
+
+    if (this.current() != null) {
+      this.current().removePressedListener(identifier, listener);
+    }
+  }
+
+  @Override
+  public void removeReleasedListener(String identifier, GamepadReleasedListener listener) {
+    super.removeReleasedListener(identifier, listener);
+
+    if (this.current() != null) {
+      this.current().removeReleasedListener(identifier, listener);
+    }
+  }
+
+  @Override
+  public void removePollListener(GamepadPollListener listener) {
+    super.removePollListener(listener);
+
+    if (this.current() != null) {
+      this.current().removePollListener(listener);
+    }
+  }
+
+  @Override
+  public void removePressedListener(GamepadPressedListener listener) {
+    super.removePressedListener(listener);
+
+    if (this.current() != null) {
+      this.current().removePressedListener(listener);
+    }
+  }
+
+  @Override
+  public void removeReleasedListener(GamepadReleasedListener listener) {
+    super.removeReleasedListener(listener);
+
+    if (this.current() != null) {
+      this.current().removeReleasedListener(listener);
+    }
+  }
+
+  /**
+   * DON'T CALL THIS EXPLICITLY! THE LITIENGINE WILL MANAGE THE LIFECYCLE OF THIS INSTANCE.
+   */
   @Override
   public void start() {
     this.hotPlugThread.start();
   }
 
-  /** DON'T CALL THIS EXPLICITLY! THE LITIENGINE WILL MANAGE THE LIFECYCLE OF THIS INSTANCE. */
+  /**
+   * DON'T CALL THIS EXPLICITLY! THE LITIENGINE WILL MANAGE THE LIFECYCLE OF THIS INSTANCE.
+   */
   @Override
   public void terminate() {
     int totalWait = 0;
@@ -213,7 +329,9 @@ public final class GamepadManager extends GamepadEvents implements ILaunchable {
     this.hotPlugThread.interrupt();
   }
 
-  /** DON'T CALL THIS EXPLICITLY! THE LITIENGINE WILL MANAGE THE LIFECYCLE OF GAMEPADS. */
+  /**
+   * DON'T CALL THIS EXPLICITLY! THE LITIENGINE WILL MANAGE THE LIFECYCLE OF GAMEPADS.
+   */
   void remove(final Gamepad gamepad) {
     if (gamepad == null) {
       return;
@@ -263,22 +381,19 @@ public final class GamepadManager extends GamepadEvents implements ILaunchable {
   }
 
   private void hookupToGamepad(final Gamepad pad) {
-    for (final Map.Entry<String, Collection<GamepadPollListener>> entry :
-        this.componentPollListeners.entrySet()) {
+    for (final Map.Entry<String, Collection<GamepadPollListener>> entry : this.componentPollListeners.entrySet()) {
       for (final GamepadPollListener listener : entry.getValue()) {
         pad.onPoll(entry.getKey(), listener);
       }
     }
 
-    for (final Map.Entry<String, Collection<GamepadPressedListener>> entry :
-        this.componentPressedListeners.entrySet()) {
+    for (final Map.Entry<String, Collection<GamepadPressedListener>> entry : this.componentPressedListeners.entrySet()) {
       for (final GamepadPressedListener listener : entry.getValue()) {
         pad.onPressed(entry.getKey(), listener);
       }
     }
 
-    for (final Map.Entry<String, Collection<GamepadReleasedListener>> entry :
-        this.componentReleasedListeners.entrySet()) {
+    for (final Map.Entry<String, Collection<GamepadReleasedListener>> entry : this.componentReleasedListeners.entrySet()) {
       for (final GamepadReleasedListener listener : entry.getValue()) {
         pad.onReleased(entry.getKey(), listener);
       }
@@ -302,11 +417,8 @@ public final class GamepadManager extends GamepadEvents implements ILaunchable {
     try {
       hackTheShitOutOfJInput();
       // update plugged in gamepads
-      for (int i = 0;
-          i < ControllerEnvironment.getDefaultEnvironment().getControllers().length;
-          i++) {
-        final Controller controller =
-            ControllerEnvironment.getDefaultEnvironment().getControllers()[i];
+      for (int i = 0; i < ControllerEnvironment.getDefaultEnvironment().getControllers().length; i++) {
+        final Controller controller = ControllerEnvironment.getDefaultEnvironment().getControllers()[i];
         final Type type = controller.getType();
 
         if (type.equals(Type.KEYBOARD) || type.equals(Type.MOUSE) || type.equals(Type.UNKNOWN)) {
