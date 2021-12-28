@@ -298,6 +298,8 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     setup(renderType, MapObjectProperty.RENDERTYPE);
 
     this.transform.addSpinnerListeners(
+        m -> m.getX() != getSpinnerValue(this.transform.getSpinner1()),
+        m -> m.getY() != getSpinnerValue(this.transform.getSpinner2()),
         m -> {
           m.setX(getSpinnerValue(this.transform.getSpinner1()));
           Transform.updateAnchors();
@@ -308,6 +310,8 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
         });
 
     this.scale.addSpinnerListeners(
+        m -> m.getWidth() != getSpinnerValue(this.scale.getSpinner1()),
+        m -> m.getHeight() != getSpinnerValue(this.scale.getSpinner2()),
         m -> {
           m.setWidth(getSpinnerValue(this.scale.getSpinner1()));
           Transform.updateAnchors();
@@ -321,10 +325,13 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
         new MapObjectPropteryFocusListener(m -> m.setName(textFieldName.getText())));
 
     this.textFieldName.addActionListener(
-        new MapObjectPropertyActionListener(m -> m.setName(textFieldName.getText())));
+        new MapObjectPropertyActionListener(
+            m -> m.getName() == null || !m.getName().equals(textFieldName.getText()),
+            m -> m.setName(textFieldName.getText())));
 
     this.tagPanel.addActionListener(
         new MapObjectPropertyActionListener(
+            m -> !m.hasCustomProperty(MapObjectProperty.TAGS) || !m.getStringValue(MapObjectProperty.TAGS).equals(this.tagPanel.getTagsString()),
             m -> m.setValue(MapObjectProperty.TAGS, this.tagPanel.getTagsString())));
   }
 }

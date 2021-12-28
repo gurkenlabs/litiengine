@@ -2,6 +2,7 @@ package de.gurkenlabs.utiliti.swing.panels;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import javax.swing.GroupLayout;
 import javax.swing.JLabel;
 import javax.swing.JSpinner;
@@ -113,10 +114,10 @@ public class DualSpinner extends PropertyPanel {
     return this.spnDim2;
   }
 
-  public void addSpinnerListeners(
+  public void addSpinnerListeners(Function<IMapObject, Boolean> newValueCheck1, Function<IMapObject, Boolean> newValueCheck2,
       Consumer<IMapObject> spinner1Action, Consumer<IMapObject> spinner2Action) {
-    spnDim1.addChangeListener(new MapObjectPropertyChangeListener(spinner1Action));
-    spnDim2.addChangeListener(new MapObjectPropertyChangeListener(spinner2Action));
+    spnDim1.addChangeListener(new MapObjectPropertyChangeListener(newValueCheck1, spinner1Action));
+    spnDim2.addChangeListener(new MapObjectPropertyChangeListener(newValueCheck2, spinner2Action));
   }
 
   public void setValues(float v1, float v2) {

@@ -1,6 +1,7 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
@@ -24,6 +25,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.GroupLayout.ParallelGroup;
@@ -49,6 +51,7 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
 public abstract class PropertyPanel extends JPanel {
+
   public static final int LABEL_WIDTH = (int) (35 * Editor.preferences().getUiScale());
   public static final int CONTROL_MIN_WIDTH = (int) (80 * Editor.preferences().getUiScale());
   public static final int CONTROL_WIDTH = (int) (160 * Editor.preferences().getUiScale());
@@ -171,7 +174,9 @@ public abstract class PropertyPanel extends JPanel {
       return;
     }
     toggle.addActionListener(
-        new MapObjectPropertyActionListener(m -> m.setValue(property, toggle.isSelected())));
+        new MapObjectPropertyActionListener(
+            m -> !m.hasCustomProperty(property) || m.getBoolValue(property) != toggle.isSelected(),
+            m -> m.setValue(property, toggle.isSelected())));
   }
 
   protected void setup(JCheckBox checkbox, String property) {
@@ -179,7 +184,9 @@ public abstract class PropertyPanel extends JPanel {
       return;
     }
     checkbox.addActionListener(
-        new MapObjectPropertyActionListener(m -> m.setValue(property, checkbox.isSelected())));
+        new MapObjectPropertyActionListener(
+            m -> !m.hasCustomProperty(property) || m.getBoolValue(property) != checkbox.isSelected(),
+            m -> m.setValue(property, checkbox.isSelected())));
   }
 
   protected <T> void setup(JComboBox<T> comboBox, String property) {
@@ -189,8 +196,16 @@ public abstract class PropertyPanel extends JPanel {
     comboBox.addActionListener(
         new MapObjectPropertyActionListener(
             m -> {
+              if(!m.hasCustomProperty(property) || m.getStringValue(property) == null){
+               return true;
+              }
+
               T value = comboBox.getModel().getElementAt(comboBox.getSelectedIndex());
-              m.setValue(property, value.toString());
+              return m.getStringValue(property).equals(value != null ? value.toString() : null);
+            },
+            m -> {
+              T value = comboBox.getModel().getElementAt(comboBox.getSelectedIndex());
+              m.setValue(property, value != null ? value.toString() : null);
             }));
   }
 
@@ -201,8 +216,16 @@ public abstract class PropertyPanel extends JPanel {
     comboBox.addActionListener(
         new MapObjectPropertyActionListener(
             m -> {
+              if(!m.hasCustomProperty(property) || m.getStringValue(property) == null){
+                return true;
+              }
+
               JLabel value = comboBox.getModel().getElementAt(comboBox.getSelectedIndex());
-              m.setValue(property, value != null ? value.getText(): null);
+              return m.getStringValue(property).equals(value != null ? value.getText() : null);
+            },
+            m -> {
+              JLabel value = comboBox.getModel().getElementAt(comboBox.getSelectedIndex());
+              m.setValue(property, value != null ? value.getText() : null);
             }));
   }
 
@@ -234,7 +257,9 @@ public abstract class PropertyPanel extends JPanel {
     textField.addFocusListener(
         new MapObjectPropteryFocusListener(m -> m.setValue(property, textField.getText())));
     textField.addActionListener(
-        new MapObjectPropertyActionListener(m -> m.setValue(property, textField.getText())));
+        new MapObjectPropertyActionListener(
+            m -> !m.hasCustomProperty(property) || m.getStringValue(property) == null || !m.getStringValue(property).equals(textField.getText()),
+            m -> m.setValue(property, textField.getText())));
   }
 
   protected void setup(TextList textList, String property) {
@@ -242,7 +267,9 @@ public abstract class PropertyPanel extends JPanel {
       return;
     }
     textList.addActionListener(
-        new MapObjectPropertyActionListener(m -> m.setValue(property, textList.getJoinedString())));
+        new MapObjectPropertyActionListener(
+            m -> !m.hasCustomProperty(property) || m.getStringValue(property) == null || !m.getStringValue(property).equals(textList.getJoinedString()),
+            m -> m.setValue(property, textList.getJoinedString())));
   }
 
   protected void setup(JTable table, String... properties) {
@@ -273,14 +300,17 @@ public abstract class PropertyPanel extends JPanel {
   protected class MapObjectPropertyActionListener implements ActionListener {
 
     private final Consumer<IMapObject> updateAction;
+    private final Function<IMapObject, Boolean> newValueCheck;
 
-    MapObjectPropertyActionListener(Consumer<IMapObject> updateAction) {
+    MapObjectPropertyActionListener(Function<IMapObject, Boolean> newValueCheck, Consumer<IMapObject> updateAction) {
       this.updateAction = updateAction;
+      this.newValueCheck = newValueCheck;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-      if (getDataSource() == null || Editor.instance().getMapComponent().isFocussing()) {
+      if (getDataSource() == null || Editor.instance().getMapComponent().isFocussing() || !this.newValueCheck.apply(
+          getDataSource())) {
         return;
       }
 
@@ -308,14 +338,17 @@ public abstract class PropertyPanel extends JPanel {
   protected class MapObjectPropertyChangeListener implements ChangeListener {
 
     private final Consumer<IMapObject> updateAction;
+    private final Function<IMapObject, Boolean> newValueCheck;
 
-    MapObjectPropertyChangeListener(Consumer<IMapObject> updateAction) {
+    MapObjectPropertyChangeListener(Function<IMapObject, Boolean> newValueCheck, Consumer<IMapObject> updateAction) {
       this.updateAction = updateAction;
+      this.newValueCheck = newValueCheck;
     }
 
     @Override
     public void stateChanged(ChangeEvent e) {
-      if (getDataSource() == null || Editor.instance().getMapComponent().isFocussing()) {
+      if (getDataSource() == null || Editor.instance().getMapComponent().isFocussing() || !this.newValueCheck.apply(
+          getDataSource())) {
         return;
       }
 
@@ -326,18 +359,24 @@ public abstract class PropertyPanel extends JPanel {
   protected class SpinnerListener extends MapObjectPropertyChangeListener {
 
     SpinnerListener(String mapObjectProperty, JSpinner spinner) {
-      super(m -> m.setValue(mapObjectProperty, spinner.getValue().toString()));
+      super(
+          m -> m.hasCustomProperty(mapObjectProperty) || !m.getStringValue(mapObjectProperty).equals(spinner.getValue().toString()),
+          m -> m.setValue(mapObjectProperty, spinner.getValue().toString()));
     }
   }
 
   protected class SliderListener extends MapObjectPropertyChangeListener {
 
     SliderListener(String mapObjectProperty, JSlider slider) {
-      super(m -> m.setValue(mapObjectProperty, slider.getValue()));
+      super(
+          m -> m.hasCustomProperty(mapObjectProperty) || m.getIntValue(mapObjectProperty) != slider.getValue(),
+          m -> m.setValue(mapObjectProperty, slider.getValue()));
     }
 
     SliderListener(String mapObjectProperty, JSlider slider, float factor) {
-      super(m -> m.setValue(mapObjectProperty, slider.getValue() * factor));
+      super(
+          m -> m.hasCustomProperty(mapObjectProperty) || m.getFloatValue(mapObjectProperty) != slider.getValue() * factor,
+          m -> m.setValue(mapObjectProperty, slider.getValue() * factor));
     }
   }
 

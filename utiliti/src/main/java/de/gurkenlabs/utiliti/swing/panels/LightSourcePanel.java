@@ -84,14 +84,20 @@ public class LightSourcePanel extends PropertyPanel {
     this.colorControl.addActionListener(
         new MapObjectPropertyActionListener(
             m -> {
-              if (getDataSource() != null) {
-                getDataSource()
-                    .setValue(MapObjectProperty.LIGHT_COLOR, this.colorControl.getHexColor());
-                getDataSource()
-                    .setValue(
-                        MapObjectProperty.LIGHT_INTENSITY, (int) this.spinnerIntensity.getValue());
-                Game.world().environment().updateLighting(getDataSource().getBoundingBox());
+              if(!m.hasCustomProperty(MapObjectProperty.LIGHT_COLOR) || m.getStringValue(MapObjectProperty.LIGHT_COLOR) == null){
+                return true;
               }
+
+              if(!m.hasCustomProperty(MapObjectProperty.LIGHT_INTENSITY)){
+                return true;
+              }
+
+              return !m.getStringValue(MapObjectProperty.LIGHT_COLOR).equals(this.colorControl.getHexColor()) || m.getIntValue(MapObjectProperty.LIGHT_INTENSITY) != (int) this.spinnerIntensity.getValue();
+            },
+            m -> {
+                m.setValue(MapObjectProperty.LIGHT_COLOR, this.colorControl.getHexColor());
+                m.setValue(MapObjectProperty.LIGHT_INTENSITY, (int) this.spinnerIntensity.getValue());
+                Game.world().environment().updateLighting(getDataSource().getBoundingBox());
             }));
     this.setup(this.spinnerIntensity, MapObjectProperty.LIGHT_INTENSITY);
     this.spinnerIntensity.addChangeListener(m -> this.updateLighting());

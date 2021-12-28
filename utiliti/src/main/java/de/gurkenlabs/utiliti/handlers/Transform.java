@@ -191,8 +191,7 @@ public final class Transform {
    * group that doesn't change its internal positioning.
    */
   public static void move() {
-    final List<IMapObject> selectedMapObjects =
-        Editor.instance().getMapComponent().getSelectedMapObjects();
+    final List<IMapObject> selectedMapObjects = Editor.instance().getMapComponent().getSelectedMapObjects();
     if (selectedMapObjects.isEmpty()
         || (!Input.keyboard().isPressed(KeyEvent.VK_CONTROL)
             && Editor.instance().getMapComponent().getEditMode() != MapComponent.EDITMODE_MOVE)) {
@@ -251,21 +250,27 @@ public final class Transform {
 
   public static void moveEntities(List<IMapObject> selectedMapObjects, float deltaX, float deltaY) {
 
+    boolean updated = false;
     for (IMapObject selected : selectedMapObjects) {
-      double newX = drag.originalBounds.get(selected).getX() + deltaX;
-      double newY = drag.originalBounds.get(selected).getY() + deltaY;
+      float newX = (float)drag.originalBounds.get(selected).getX() + deltaX;
+      float newY = (float)drag.originalBounds.get(selected).getY() + deltaY;
 
-      selected.setX((float) newX);
-      selected.setY((float) newY);
+      if (selected.getX() != newX || selected.getY() != newY) {
+        updated = true;
+        selected.setX(newX);
+        selected.setY(newY);
 
-      updateEntityTransform(selected);
+        updateEntityTransform(selected);
 
-      if (selected.equals(Editor.instance().getMapComponent().getFocusedMapObject())) {
-        UI.getInspector().bind(selected);
+        if (selected.equals(Editor.instance().getMapComponent().getFocusedMapObject())) {
+          UI.getInspector().bind(selected);
+        }
       }
     }
 
-    Transform.updateAnchors();
+    if (updated) {
+      Transform.updateAnchors();
+    }
   }
 
   /***
