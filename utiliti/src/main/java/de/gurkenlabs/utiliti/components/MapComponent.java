@@ -670,6 +670,10 @@ public class MapComponent extends GuiComponent {
     }
   }
 
+  public boolean isFocussing() {
+    return this.isFocussing;
+  }
+
   public void setSelection(IMapObject mapObject, boolean clearSelection) {
     this.setSelection(
         mapObject == null ? null : Collections.singletonList(mapObject), clearSelection);

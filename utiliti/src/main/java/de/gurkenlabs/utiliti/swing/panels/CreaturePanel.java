@@ -51,13 +51,12 @@ public class CreaturePanel extends PropertyPanel {
 
   @Override
   public void bind(IMapObject mapObject) {
-    this.isFocussing = true;
+
     this.loadAvailableCreatureSprites();
     if (mapObject != null) {
       this.setControlValues(mapObject);
     }
 
-    this.isFocussing = false;
     super.bind(mapObject);
   }
 

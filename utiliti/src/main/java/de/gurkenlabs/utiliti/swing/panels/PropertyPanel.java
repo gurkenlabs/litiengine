@@ -72,7 +72,6 @@ public abstract class PropertyPanel extends JPanel {
   public static final float STEP_FINE = .05f;
   public static final float STEP_FINEST = .01f;
 
-  protected boolean isFocussing;
   protected transient IMapObject dataSource;
   private String identifier;
   private transient Icon icon;
@@ -121,15 +120,12 @@ public abstract class PropertyPanel extends JPanel {
   public void bind(IMapObject mapObject) {
     this.dataSource = mapObject;
 
-    this.isFocussing = true;
-
     if (this.dataSource == null) {
       this.clearControls();
       return;
     }
 
     this.setControlValues(mapObject);
-    this.isFocussing = false;
   }
 
   protected static void populateComboBoxWithSprites(
@@ -157,8 +153,8 @@ public abstract class PropertyPanel extends JPanel {
         JLabel label = comboBox.getModel().getElementAt(i);
         if (label != null
             && label
-                .getText()
-                .equals(mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME))) {
+            .getText()
+            .equals(mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME))) {
           comboBox.setSelectedItem(label);
           break;
         }
@@ -257,6 +253,7 @@ public abstract class PropertyPanel extends JPanel {
   }
 
   protected class MapObjectPropertyItemListener implements ItemListener {
+
     private final Consumer<IMapObject> updateAction;
 
     MapObjectPropertyItemListener(Consumer<IMapObject> updateAction) {
@@ -265,7 +262,7 @@ public abstract class PropertyPanel extends JPanel {
 
     @Override
     public void itemStateChanged(ItemEvent arg0) {
-      if (getDataSource() == null || isFocussing) {
+      if (getDataSource() == null || Editor.instance().getMapComponent().isFocussing()) {
         return;
       }
 
@@ -274,6 +271,7 @@ public abstract class PropertyPanel extends JPanel {
   }
 
   protected class MapObjectPropertyActionListener implements ActionListener {
+
     private final Consumer<IMapObject> updateAction;
 
     MapObjectPropertyActionListener(Consumer<IMapObject> updateAction) {
@@ -282,7 +280,7 @@ public abstract class PropertyPanel extends JPanel {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-      if (getDataSource() == null || isFocussing) {
+      if (getDataSource() == null || Editor.instance().getMapComponent().isFocussing()) {
         return;
       }
 
@@ -291,6 +289,7 @@ public abstract class PropertyPanel extends JPanel {
   }
 
   protected class MabObjectPropertyTableModelListener implements TableModelListener {
+
     private final Consumer<IMapObject> updateAction;
 
     MabObjectPropertyTableModelListener(Consumer<IMapObject> updateAction) {
@@ -299,7 +298,7 @@ public abstract class PropertyPanel extends JPanel {
 
     @Override
     public void tableChanged(TableModelEvent e) {
-      if (getDataSource() == null || isFocussing) {
+      if (getDataSource() == null || Editor.instance().getMapComponent().isFocussing()) {
         return;
       }
       applyChanges(this.updateAction);
@@ -307,6 +306,7 @@ public abstract class PropertyPanel extends JPanel {
   }
 
   protected class MapObjectPropertyChangeListener implements ChangeListener {
+
     private final Consumer<IMapObject> updateAction;
 
     MapObjectPropertyChangeListener(Consumer<IMapObject> updateAction) {
@@ -315,7 +315,7 @@ public abstract class PropertyPanel extends JPanel {
 
     @Override
     public void stateChanged(ChangeEvent e) {
-      if (getDataSource() == null || isFocussing) {
+      if (getDataSource() == null || Editor.instance().getMapComponent().isFocussing()) {
         return;
       }
 
@@ -324,12 +324,14 @@ public abstract class PropertyPanel extends JPanel {
   }
 
   protected class SpinnerListener extends MapObjectPropertyChangeListener {
+
     SpinnerListener(String mapObjectProperty, JSpinner spinner) {
       super(m -> m.setValue(mapObjectProperty, spinner.getValue().toString()));
     }
   }
 
   protected class SliderListener extends MapObjectPropertyChangeListener {
+
     SliderListener(String mapObjectProperty, JSlider slider) {
       super(m -> m.setValue(mapObjectProperty, slider.getValue()));
     }
@@ -340,6 +342,7 @@ public abstract class PropertyPanel extends JPanel {
   }
 
   protected class TableListener extends MabObjectPropertyTableModelListener {
+
     TableListener(JTable table, String... mapObjectProperties) {
       super(
           m -> {
@@ -357,6 +360,7 @@ public abstract class PropertyPanel extends JPanel {
   }
 
   protected class MapObjectPropteryFocusListener extends FocusAdapter {
+
     private final Consumer<IMapObject> updateAction;
 
     MapObjectPropteryFocusListener(Consumer<IMapObject> updateAction) {
@@ -365,7 +369,7 @@ public abstract class PropertyPanel extends JPanel {
 
     @Override
     public void focusLost(FocusEvent e) {
-      if (getDataSource() == null || isFocussing) {
+      if (getDataSource() == null || Editor.instance().getMapComponent().isFocussing()) {
         return;
       }
 
@@ -461,6 +465,7 @@ public abstract class PropertyPanel extends JPanel {
   }
 
   protected static class LayoutItem {
+
     private final String caption;
     private final Component component;
     private final JLabel label;

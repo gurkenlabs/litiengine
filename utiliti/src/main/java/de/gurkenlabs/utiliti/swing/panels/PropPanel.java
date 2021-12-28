@@ -68,12 +68,10 @@ public class PropPanel extends PropertyPanel {
 
   @Override
   public void bind(IMapObject mapObject) {
-    this.isFocussing = true;
     this.loadAvailableProps();
     if (mapObject != null) {
       this.setControlValues(mapObject);
     }
-    this.isFocussing = false;
     super.bind(mapObject);
   }
 

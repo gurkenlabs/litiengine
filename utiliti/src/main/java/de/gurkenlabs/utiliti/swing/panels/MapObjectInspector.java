@@ -128,7 +128,6 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
   @Override
   public void bind(IMapObject mapObject) {
-    this.isFocussing = true;
     super.bind(mapObject);
 
     if (mapObject != null) {
@@ -153,7 +152,6 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     }
 
     this.customPanel.bind(this.getDataSource());
-    this.isFocussing = false;
   }
 
   private LayoutManager createLayout() {

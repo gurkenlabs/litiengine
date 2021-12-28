@@ -4,6 +4,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.LightSource;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.swing.ColorComponent;
 import de.gurkenlabs.utiliti.swing.Icons;
 import java.awt.LayoutManager;
@@ -109,7 +110,7 @@ public class LightSourcePanel extends PropertyPanel {
   }
 
   private void updateLighting() {
-    if (this.isFocussing) {
+    if (Editor.instance().getMapComponent().isFocussing()) {
       return;
     }
 

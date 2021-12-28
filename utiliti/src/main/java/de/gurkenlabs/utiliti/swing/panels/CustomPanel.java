@@ -165,7 +165,7 @@ public class CustomPanel extends PropertyPanel {
   }
 
   private void updateCustomProperties() {
-    if (getDataSource() == null || isFocussing) {
+    if (getDataSource() == null || Editor.instance().getMapComponent().isFocussing()) {
       return;
     }
 
