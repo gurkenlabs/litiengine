@@ -33,7 +33,7 @@ If applicable, add screenshots to help explain your problem.
 
 **Your System:**
  - OS: [e.g. iOS]
- - LITIENGINE version: [e.g. 0.5.1-beta]
+ - LITIENGINE version: [e.g. 0.5.2-beta]
  - Java JDK/JRE version: [e.g. jdk1.8.0_201] 
  - Screen resolution: [e.g. 1920x1080]
 
