@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.gui;
 
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Valign;
+
 import java.awt.Color;
 import java.awt.Font;
 
@@ -23,8 +24,10 @@ public class GuiProperties {
   private static boolean defaultTextShadow = false;
   private static Color defaultTextShadowColor;
   private static float defaultTextShadowRadius = 2f;
+  private static int defaultSpeechBubbleDisplayTime = 2000;
 
-  private GuiProperties() {}
+  private GuiProperties() {
+  }
 
   public static Appearance getDefaultAppearance() {
     return defaultAppearance;
@@ -104,5 +107,13 @@ public class GuiProperties {
 
   public static void setDefaultTextValign(Valign newDefault) {
     defaultTextValign = newDefault;
+  }
+
+  public static int getDefaultSpeechBubbleDisplayTime() {
+    return defaultSpeechBubbleDisplayTime;
+  }
+
+  public static void setDefaultSpeechBubbleDisplayTime(int newDefault) {
+    defaultSpeechBubbleDisplayTime = newDefault;
   }
 }
