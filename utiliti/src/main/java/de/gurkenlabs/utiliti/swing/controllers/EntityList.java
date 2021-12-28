@@ -249,6 +249,38 @@ public final class EntityList extends JPanel implements EntityController {
   }
 
   @Override
+  public void refresh(int mapId) {
+    for (DefaultMutableTreeNode parent : this.entityNodes) {
+      if (parent.getChildCount() == 0) {
+        continue;
+      }
+
+      Enumeration<?> en = parent.depthFirstEnumeration();
+      while (en.hasMoreElements()) {
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) en.nextElement();
+        IEntity ent = null;
+        if (node.getUserObject() instanceof IconTreeListItem) {
+          IconTreeListItem iconItem = (IconTreeListItem) node.getUserObject();
+          if (iconItem.getUserObject() instanceof IEntity) {
+            ent = (IEntity) iconItem.getUserObject();
+          }
+        } else if (node.getUserObject() instanceof IEntity) {
+          ent = (IEntity) node.getUserObject();
+        }
+
+        if (ent == null) {
+          continue;
+        }
+
+        if (ent.getMapId() == mapId) {
+          node.setUserObject(new IconTreeListItem(Game.world().environment().get(mapId)));
+          entitiesTreeModel.reload(node);
+        }
+      }
+    }
+  }
+
+  @Override
   public void refresh() {
     this.nodeRoot.setUserObject(
         new IconTreeListItem(
@@ -424,16 +456,13 @@ public final class EntityList extends JPanel implements EntityController {
     return false;
   }
 
-  private <T extends Entity> void addEntitiesToTreeNode(
-      Collection<T> entities, DefaultMutableTreeNode entityNode, String nodeName, Icon nodeIcon) {
+  private <T extends Entity> void addEntitiesToTreeNode(Collection<T> entities, DefaultMutableTreeNode entityNode,
+      String nodeName, Icon nodeIcon) {
     entityNode.setUserObject(
-        new IconTreeListItem(
-            (Game.world().environment() == null ? 0 : entities.size()) + " " + nodeName, nodeIcon));
+        new IconTreeListItem((Game.world().environment() == null ? 0 : entities.size()) + " " + nodeName, nodeIcon));
 
-    for (T entity :
-        entities.stream()
-            .sorted((p1, p2) -> Integer.compare(p1.getMapId(), p2.getMapId()))
-            .collect(Collectors.toList())) {
+    for (T entity : entities.stream().sorted((p1, p2) -> Integer.compare(p1.getMapId(), p2.getMapId()))
+        .collect(Collectors.toList())) {
       DefaultMutableTreeNode node = new DefaultMutableTreeNode(new IconTreeListItem(entity));
       entityNode.add(node);
     }
