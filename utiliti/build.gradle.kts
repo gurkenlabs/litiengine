@@ -59,7 +59,7 @@ runtime {
         "--copyright", "2020-${Calendar.getInstance().get(Calendar.YEAR)} gurkenlabs.de",
         "--vendor", "gurkenlabs.de",
         "--java-options", "-Xms256m",
-        "--java-options", "-Xmx1024m",
+        "--java-options", "-Xmx2048m",
       )
     )
   }
