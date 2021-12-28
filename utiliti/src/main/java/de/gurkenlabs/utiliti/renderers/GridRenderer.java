@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class GridRenderer implements IEditorRenderer {
+
   private final Map<String, GridImages> gridCache = new ConcurrentHashMap<>();
 
   @Override
@@ -57,12 +58,18 @@ public class GridRenderer implements IEditorRenderer {
               : camera.getRenderScale() > GridImages.RENDERSCALE_MID
                   ? images.getMidImage()
                   : images.getSmallImage();
-      ImageRenderer.renderScaled(
-          g,
-          image,
-          viewPortLocation.getX() * camera.getRenderScale(),
-          viewPortLocation.getY() * Game.world().camera().getRenderScale(),
-          camera.getRenderScale() / scale);
+
+      for (int x = 0; x < map.getWidth(); x++) {
+        for (int y = 0; y < map.getHeight(); y++) {
+          ImageRenderer.renderScaled(
+              g,
+              image,
+              (viewPortLocation.getX() + (x * map.getTileWidth())) * camera.getRenderScale(),
+              (viewPortLocation.getY() + (y * map.getTileHeight())) * Game.world().camera().getRenderScale(),
+              camera.getRenderScale() / scale);
+        }
+      }
+
     }
   }
 
@@ -71,6 +78,7 @@ public class GridRenderer implements IEditorRenderer {
   }
 
   private static class GridImages {
+
     private static final float RENDERSCALE_LARGE = 6;
     private static final float RENDERSCALE_MID = 1.5f;
 
@@ -102,20 +110,15 @@ public class GridRenderer implements IEditorRenderer {
     private static BufferedImage createImage(IMap map, float scale) {
       BufferedImage image =
           Imaging.getCompatibleImage(
-              (int) (map.getSizeInPixels().width * scale) + 1,
-              (int) (map.getSizeInPixels().height * scale) + 1);
+              (int) (map.getTileWidth() * scale) + 1,
+              (int) (map.getTileHeight() * scale) + 1);
       Graphics2D graphics = (Graphics2D) image.getGraphics();
 
       final float lineSize = Editor.preferences().getGridLineWidth() / scale;
       final Stroke stroke = new BasicStroke(lineSize);
       graphics.setColor(Editor.preferences().getGridColor());
-      for (int x = 0; x < map.getWidth(); x++) {
-        for (int y = 0; y < map.getHeight(); y++) {
-          Shape tile = map.getOrientation().getShape(x, y, map);
-          ShapeRenderer.renderOutlineTransformed(
-              graphics, tile, AffineTransform.getScaleInstance(scale, scale), stroke);
-        }
-      }
+      Shape tile = map.getOrientation().getShape(0, 0, map);
+      ShapeRenderer.renderOutlineTransformed(graphics, tile, AffineTransform.getScaleInstance(scale, scale), stroke);
 
       graphics.dispose();
 
