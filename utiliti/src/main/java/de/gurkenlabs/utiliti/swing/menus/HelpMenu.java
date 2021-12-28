@@ -4,6 +4,8 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.UriUtilities;
 import java.net.URI;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -66,7 +68,7 @@ public final class HelpMenu extends JMenu {
         String.format(
             "%s%n%n%s%n%nJava: %s",
             Resources.strings().get("menu_help_abouttext"),
-            Resources.strings().get("copyright", "2020"),
+            Resources.strings().get("copyright", new SimpleDateFormat("yyyy").format(new Date())),
             javaVersion);
     String aboutTitle =
         String.format(
