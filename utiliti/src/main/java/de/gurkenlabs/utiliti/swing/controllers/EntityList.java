@@ -14,8 +14,8 @@ import de.gurkenlabs.utiliti.components.EntityController;
 import de.gurkenlabs.utiliti.swing.IconTreeListItem;
 import de.gurkenlabs.utiliti.swing.IconTreeListRenderer;
 import de.gurkenlabs.utiliti.swing.Icons;
+import de.gurkenlabs.utiliti.swing.ParentIconTreeListItem;
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
@@ -250,7 +250,12 @@ public final class EntityList extends JPanel implements EntityController {
 
   @Override
   public void refresh(int mapId) {
+    boolean updated = false;
     for (DefaultMutableTreeNode parent : this.entityNodes) {
+      if (updated){
+        break;
+      }
+
       if (parent.getChildCount() == 0) {
         continue;
       }
@@ -275,6 +280,51 @@ public final class EntityList extends JPanel implements EntityController {
         if (ent.getMapId() == mapId) {
           node.setUserObject(new IconTreeListItem(Game.world().environment().get(mapId)));
           entitiesTreeModel.reload(node);
+          updated = true;
+          break;
+        }
+      }
+    }
+
+    if (!updated){
+      this.refresh();
+    }
+  }
+
+  @Override
+  public void remove(IMapObject mapObject) {
+    boolean removed = false;
+    for (DefaultMutableTreeNode parent : this.entityNodes) {
+      if (removed){
+        break;
+      }
+
+      if (parent.getChildCount() == 0) {
+        continue;
+      }
+
+      Enumeration<?> en = parent.depthFirstEnumeration();
+      while (en.hasMoreElements()) {
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) en.nextElement();
+        IEntity ent = null;
+        if (node.getUserObject() instanceof IconTreeListItem) {
+          IconTreeListItem iconItem = (IconTreeListItem) node.getUserObject();
+          if (iconItem.getUserObject() instanceof IEntity) {
+            ent = (IEntity) iconItem.getUserObject();
+          }
+        } else if (node.getUserObject() instanceof IEntity) {
+          ent = (IEntity) node.getUserObject();
+        }
+
+        if (ent == null) {
+          continue;
+        }
+
+        if (ent.getMapId() == mapObject.getId()) {
+          parent.remove(node);
+          entitiesTreeModel.reload(parent);
+          removed = true;
+          break;
         }
       }
     }
@@ -458,14 +508,15 @@ public final class EntityList extends JPanel implements EntityController {
 
   private <T extends Entity> void addEntitiesToTreeNode(Collection<T> entities, DefaultMutableTreeNode entityNode,
       String nodeName, Icon nodeIcon) {
-    entityNode.setUserObject(
-        new IconTreeListItem((Game.world().environment() == null ? 0 : entities.size()) + " " + nodeName, nodeIcon));
 
     for (T entity : entities.stream().sorted((p1, p2) -> Integer.compare(p1.getMapId(), p2.getMapId()))
         .collect(Collectors.toList())) {
       DefaultMutableTreeNode node = new DefaultMutableTreeNode(new IconTreeListItem(entity));
       entityNode.add(node);
     }
+
+    entityNode.setUserObject(
+        new ParentIconTreeListItem(nodeName, nodeIcon, () -> entityNode.getChildCount()));
 
     if (entities.isEmpty()) {
       entityNode.removeFromParent();

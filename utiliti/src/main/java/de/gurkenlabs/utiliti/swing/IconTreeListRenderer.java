@@ -47,7 +47,7 @@ public class IconTreeListRenderer implements TreeCellRenderer {
       DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
       if (node.getUserObject() instanceof IconTreeListItem) {
         IconTreeListItem iconItem = (IconTreeListItem) node.getUserObject();
-        this.label.setText(iconItem.getUserObject().toString());
+        this.label.setText(iconItem.toString());
         if (iconItem.getIcon() != null) {
           this.label.setIcon(iconItem.getIcon());
         } else if (iconItem.getUserObject() instanceof Prop) {

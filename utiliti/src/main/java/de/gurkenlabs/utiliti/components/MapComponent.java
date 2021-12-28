@@ -507,7 +507,7 @@ public class MapComponent extends GuiComponent {
       }
     } finally {
       UndoManager.instance().endOperation();
-      UI.getEntityController().refresh();
+
     }
   }
 
@@ -534,11 +534,11 @@ public class MapComponent extends GuiComponent {
     if (mapObject == null) {
       return;
     }
-    UI.getLayerController().refresh();
 
     Game.world().environment().getMap().removeMapObject(mapObject.getId());
     Game.world().environment().remove(mapObject.getId());
     UI.getLayerController().refresh();
+    UI.getEntityController().remove(mapObject);
 
     if (mapObject.equals(this.getFocusedMapObject())) {
       this.setFocus(null, true);

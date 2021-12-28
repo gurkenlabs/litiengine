@@ -6,4 +6,6 @@ public interface EntityController extends Controller {
   void select(IMapObject mapObject);
 
   void refresh(int mapId);
+
+  void remove(IMapObject mapObject);
 }
