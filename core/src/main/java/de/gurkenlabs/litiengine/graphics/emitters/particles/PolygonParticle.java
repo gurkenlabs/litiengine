@@ -1,8 +1,8 @@
 package de.gurkenlabs.litiengine.graphics.emitters.particles;
 
-import java.awt.Polygon;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 
 public class PolygonParticle extends ShapeParticle {
@@ -15,20 +15,22 @@ public class PolygonParticle extends ShapeParticle {
 
   @Override
   protected Shape getShape(Point2D emitterOrigin) {
-    Polygon p = new Polygon();
-    float x = this.getAbsoluteX(emitterOrigin) + this.getWidth() / 2;
-    float y = this.getAbsoluteY(emitterOrigin) + this.getHeight() / 2;
-    float theta = (float) (2 * Math.PI / this.sides);
+    Path2D path = new Path2D.Double();
+    double x = this.getAbsoluteX(emitterOrigin) + this.getWidth() / 2;
+    double y = this.getAbsoluteY(emitterOrigin) + this.getHeight() / 2;
+    double theta = 2 * Math.PI / this.sides;
+    path.moveTo(x + this.getWidth(), y + 0);
     for (int i = 0; i < this.sides; i++) {
-      p.addPoint(
-          (int) (x + this.getWidth() * Math.cos(theta * i)),
-          (int) (y + this.getHeight() * Math.sin(theta * i)));
+      path.lineTo(
+          x + this.getWidth() * Math.cos(theta * i),
+          y + this.getHeight() * Math.sin(theta * i));
     }
+    path.closePath();
     final AffineTransform rotate =
         AffineTransform.getRotateInstance(
             Math.toRadians(this.getAngle()),
             this.getAbsoluteX(emitterOrigin) + this.getWidth() * 0.5,
             this.getAbsoluteY(emitterOrigin) + this.getHeight() * 0.5);
-    return rotate.createTransformedShape(p);
+    return rotate.createTransformedShape(path);
   }
 }
