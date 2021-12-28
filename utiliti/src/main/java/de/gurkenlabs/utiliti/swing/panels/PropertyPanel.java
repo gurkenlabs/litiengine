@@ -202,7 +202,7 @@ public abstract class PropertyPanel extends JPanel {
         new MapObjectPropertyActionListener(
             m -> {
               JLabel value = comboBox.getModel().getElementAt(comboBox.getSelectedIndex());
-              m.setValue(property, value.getText());
+              m.setValue(property, value != null ? value.getText(): null);
             }));
   }
 
