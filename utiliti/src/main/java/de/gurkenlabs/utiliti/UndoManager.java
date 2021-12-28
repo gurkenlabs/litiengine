@@ -78,7 +78,6 @@ public class UndoManager {
     }
 
     final int currentOperation = this.undoStack[this.currentIndex].getOperation();
-    UndoState state = null;
 
     int stepsUndone = 0;
     this.executing = true;
@@ -86,8 +85,10 @@ public class UndoManager {
       List<IMapObject> affectedTargets = new ArrayList<>();
       do {
         stepsUndone++;
-        state = this.undoStack[this.currentIndex];
-        affectedTargets.add(state.target);
+        final UndoState state = this.undoStack[this.currentIndex];
+        if (affectedTargets.stream().noneMatch(m -> m.getId() == state.target.getId())) {
+          affectedTargets.add(state.target);
+        }
 
         switch (state.operationType) {
           case ADD:
@@ -127,7 +128,7 @@ public class UndoManager {
     }
 
     final int currentOperation = this.undoStack[this.currentIndex + 1].getOperation();
-    UndoState state = null;
+
     int stepsRedone = 0;
     this.executing = true;
     try {
@@ -135,8 +136,11 @@ public class UndoManager {
       do {
         ++stepsRedone;
         ++this.currentIndex;
-        state = this.undoStack[this.currentIndex];
-        affectedTargets.add(state.target);
+
+        final UndoState state = this.undoStack[this.currentIndex];
+        if (affectedTargets.stream().noneMatch(m -> m.getId() == state.target.getId())) {
+          affectedTargets.add(state.target);
+        }
 
         switch (state.operationType) {
           case ADD:
