@@ -225,7 +225,7 @@ public class Editor extends Screen {
     JFileChooser chooser;
     try {
       chooser = new JFileChooser(new File(".").getCanonicalPath());
-      chooser.setDialogTitle(Resources.strings().get("input_select_project_folder"));
+      chooser.setDialogTitle(Resources.strings().get("input_create_new_project"));
       chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
       if (chooser.showOpenDialog(Game.window().getHostControl()) != JFileChooser.APPROVE_OPTION) {
         return;
@@ -262,6 +262,7 @@ public class Editor extends Screen {
       }
 
       this.gamefileLoaded();
+      this.save(true);
     } catch (IOException e) {
       log.log(Level.SEVERE, e.getLocalizedMessage(), e);
     }
