@@ -127,6 +127,8 @@ public class MapList extends JScrollPane implements MapController {
       }
     }
     this.refresh();
+    UI.getEntityController().refresh();
+    UI.getLayerController().refresh();
   }
 
   @Override
@@ -145,8 +147,5 @@ public class MapList extends JScrollPane implements MapController {
   public void refresh() {
     list.revalidate();
     list.repaint();
-
-    UI.getEntityController().refresh();
-    UI.getLayerController().refresh();
   }
 }

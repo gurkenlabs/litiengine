@@ -44,6 +44,10 @@ public class LayerTable extends JTable {
 
   public void bind(IMap map) {
     this.map = map;
+    if (this.map == null){
+      ((DefaultTableModel) this.getModel()).setRowCount(0);
+      return;
+    }
     Object[][] data = new Object[this.getMap().getMapObjectLayers().size()][columns.length];
     for (int row = 0; row < this.getMap().getMapObjectLayers().size(); row++) {
       boolean visible = this.getMap().getMapObjectLayers().get(row).isVisible();

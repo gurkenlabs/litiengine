@@ -295,6 +295,7 @@ public class MapComponent extends GuiComponent {
 
   public void loadEnvironment(TmxMap map) {
     if (map == null) {
+      UI.getMapController().setSelection(null);
       return;
     }
     this.loading = true;
@@ -483,6 +484,8 @@ public class MapComponent extends GuiComponent {
     this.selectedObjects.clear();
     this.cameraFocus.clear();
     this.environments.clear();
+    UI.getEntityController().refresh();
+    UI.getLayerController().refresh();
   }
 
   public void delete() {
@@ -733,7 +736,9 @@ public class MapComponent extends GuiComponent {
     if (!this.maps.isEmpty()) {
       this.loadEnvironment(this.maps.get(0));
     } else {
-      this.loadEnvironment(null);
+      Game.world().unloadEnvironment();
+      UndoManager.clearAll();
+      this.clearAll();
     }
 
     Editor.instance().updateGameFileMaps();
