@@ -6,6 +6,7 @@ import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 import de.gurkenlabs.litiengine.util.MathUtilities;
+
 import java.awt.Dimension;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -48,7 +49,9 @@ public class Camera implements ICamera {
   private Align align = Align.LEFT;
   private Valign valign = Valign.TOP;
 
-  /** Instantiates a new {@code Camera} instance. */
+  /**
+   * Instantiates a new {@code Camera} instance.
+   */
   public Camera() {
     this.focus = new Point2D.Double();
     this.viewport = new Rectangle2D.Double();
@@ -88,8 +91,7 @@ public class Camera implements ICamera {
 
     final IAnimationController animationController = entity.animations();
     if (animationController == null || animationController.getCurrent() == null) {
-      return new Point2D.Double(
-          viewPortLocation.getX() + entity.getWidth() * 0.5,
+      return new Point2D.Double(viewPortLocation.getX() + entity.getWidth() * 0.5,
           viewPortLocation.getY() + entity.getHeight() * 0.5);
     }
 
@@ -98,8 +100,7 @@ public class Camera implements ICamera {
       return viewPortLocation;
     }
 
-    return new Point2D.Double(
-        viewPortLocation.getX() + spriteSheet.getSpriteWidth() * 0.5,
+    return new Point2D.Double(viewPortLocation.getX() + spriteSheet.getSpriteWidth() * 0.5,
         viewPortLocation.getY() + spriteSheet.getSpriteHeight() * 0.5);
   }
 
