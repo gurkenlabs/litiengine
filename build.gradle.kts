@@ -110,7 +110,7 @@ allprojects {
           header = "<b>${project.name.capitalize()}</b>"
           addBooleanOption("Xdoclint:none", true)
           addBooleanOption("html5", true)
-          links("https://docs.oracle.com/javase/9/docs/api/")
+          links("https://docs.oracle.com/en/java/javase/16/docs/api/")
         }
       }
     }
