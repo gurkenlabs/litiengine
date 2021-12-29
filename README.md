@@ -25,25 +25,27 @@
 The library is distributed over the [Maven Central Repository](https://search.maven.org/artifact/de.gurkenlabs/litiengine) and you can grab the necessary .jar-file(s) from there by using your favorite build automation tool or manually download the library.
 
 ### Gradle
+Our library is primarily hosted by the Maven Central Repository:
 ```groovy
 repositories {
   mavenCentral()
 }
+```
 
+#### Gradle (Groovy)
+```groovy
 dependencies {
   implementation 'de.gurkenlabs:litiengine:0.5.2'
 }
 ```
 
-### Maven
-```xml
-<dependency>
-  <groupId>de.gurkenlabs</groupId>
-  <artifactId>litiengine</artifactId>
-  <version>0.5.2</version>
-</dependency>
+#### Gradle (Kotlin)
+```kotlin
+dependencies {
+  implementation("de.gurkenlabs:litiengine")
+}
 ```
-[More Installation Instructions](https://litiengine.com/download/)
+[More Installation Instructions](https://litiengine.com/docs/getting-started/get-litiengine/)
 ## :rocket: Getting Started
 
 1. [Setup the Game Project](https://litiengine.com/docs/getting-started/)
