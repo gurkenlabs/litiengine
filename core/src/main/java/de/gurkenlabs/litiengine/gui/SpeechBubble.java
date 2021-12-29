@@ -45,10 +45,11 @@ public class SpeechBubble extends GuiComponent implements IUpdateable {
   /**
    * Instantiates a new Speech bubble.
    *
-   * @param entity the entity to which the Speech bubble will be pinned
-   * @param width  the width of the text box
-   * @param height the height of the text box
-   * @param text   the text which will appear in the speech bubble
+   * @param entity      the entity to which the Speech bubble will be pinned
+   * @param width       the width of the text box
+   * @param height      the height of the text box
+   * @param displayTime the display time in milliseconds
+   * @param text        the text which will appear in the speech bubble
    */
   public SpeechBubble(IEntity entity, double width, double height, int displayTime, String text) {
     super(Game.world().camera().getViewportDimensionCenter(entity).getX() * Game.world().camera().getRenderScale() - width / 2d,
@@ -94,6 +95,7 @@ public class SpeechBubble extends GuiComponent implements IUpdateable {
   /**
    * Start the speech bubble.
    * This will add it to the current Screen's components, make it visible and register it for updates in the Game loop.
+   * After the display time has elapsed, the speech bubble will be stopped automatically.
    */
   public void start() {
     startedTick = Game.time().now();
@@ -238,12 +240,12 @@ public class SpeechBubble extends GuiComponent implements IUpdateable {
    */
   private void type() {
     // display new text
-    if (textIndex < totalText.length() && Game.time().since(lastTypeTick) > typeDelay) {
+    if (textIndex < totalText.length() && Game.time().since(lastTypeTick) > getTypeDelay()) {
       this.textIndex++;
       setText(totalText.substring(0, textIndex));
       this.lastTypeTick = Game.time().now();
-      if (typeSound != null) {
-        Game.audio().playSound(typeSound, getEntity());
+      if (getTypeSound() != null) {
+        Game.audio().playSound(getTypeSound(), getEntity());
       }
     }
   }
@@ -282,5 +284,14 @@ public class SpeechBubble extends GuiComponent implements IUpdateable {
    */
   public void setTypeSound(Sound typeSound) {
     this.typeSound = typeSound;
+  }
+
+  /**
+   * Gets the total text that this Speech bubble will display.
+   *
+   * @return the total text
+   */
+  public String getTotalText() {
+    return totalText;
   }
 }
