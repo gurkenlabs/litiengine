@@ -42,7 +42,7 @@ dependencies {
 #### Gradle (Kotlin)
 ```kotlin
 dependencies {
-  implementation("de.gurkenlabs:litiengine")
+  implementation("de.gurkenlabs:litiengine:0.5.2")
 }
 ```
 [More Installation Instructions](https://litiengine.com/docs/getting-started/get-litiengine/)
