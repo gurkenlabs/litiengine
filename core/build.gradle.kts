@@ -32,17 +32,26 @@ dependencies {
   testImplementation(projects.litiengineShared)
 }
 
+java.sourceSets["main"].resources {
+  srcDir(File(buildDir, "natives"))
+}
+
 tasks.register<Copy>("natives") {
-  for(dep in configurations.runtimeClasspath.get().files + native.files) {
+  for (dep in configurations.runtimeClasspath.get().files + native.files) {
     from(zipTree(dep).files)
     include("**/*.dll", "**/*.so", "**/*.jnilib", "**/*.dylib")
-    into(File(buildDir, "libs"))
+    into(File(buildDir, "natives"))
   }
 }
 
-tasks.named("jar") {
+tasks.named("processResources") {
   dependsOn("natives")
 }
+
+tasks.named("sourcesJar") {
+  dependsOn("natives")
+}
+
 tasks {
   test {
     workingDir = buildDir.resolve("test")

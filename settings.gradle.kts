@@ -1,6 +1,6 @@
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 enableFeaturePreview("VERSION_CATALOGS")
-rootProject.name = "litiengine"
+rootProject.name = "litiengine-sdk"
 
 pluginManagement {
   plugins {
@@ -95,8 +95,11 @@ include(
 
 for (p in rootProject.children) {
   if (p.children.isEmpty()) {
-    // Rename leaf projects only
-    p.name = "${rootProject.name}-${p.name}"
+    if(p.name == "core"){
+      p.name = "litiengine"
+    } else{
+      p.name = "litiengine-${p.name}"
+    }
   }
 }
 
