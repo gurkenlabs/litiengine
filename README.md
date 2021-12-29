@@ -22,7 +22,7 @@
 * Entity Framework
 
 ## :gear: Installation
-The library is distributed over the [Maven Central Repository](https://search.maven.org/artifact/de.gurkenlabs/LITIENGINE/) and you can grab the necessary .jar-file(s) from there by using your favorite build automation tool or manually download the library.
+The library is distributed over the [Maven Central Repository](https://search.maven.org/artifact/de.gurkenlabs/litiengine) and you can grab the necessary .jar-file(s) from there by using your favorite build automation tool or manually download the library.
 
 ### Gradle
 ```groovy
