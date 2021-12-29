@@ -11,7 +11,7 @@
 
 
 
-## Main Features
+## :video_game: Main Features
 
 * Basic Game Infrastructure (GameLoop, Configuration, Resource Management, Logging, ...)
 * 2D Render Engine (GUI Components, Spritesheet Animations, Ambient Lighting, Particle System, ...)
@@ -21,7 +21,7 @@
 * Player Input via Gamepad/Keyboard/Mouse
 * Entity Framework
 
-## Installation
+## :gear: Installation
 The library is distributed over the [Maven Central Repository](https://search.maven.org/artifact/de.gurkenlabs/LITIENGINE/) and you can grab the necessary .jar-file(s) from there by using your favorite build automation tool or manually download the library.
 
 ### Gradle
@@ -44,44 +44,49 @@ dependencies {
 </dependency>
 ```
 [More Installation Instructions](https://litiengine.com/download/)
-## Getting Started
+## :rocket: Getting Started
 
 1. [Setup the Game Project](https://litiengine.com/docs/getting-started/)
 2. [Running the Game](https://litiengine.com/docs/getting-started/run-the-game/)
 3. [Configuring the Game](https://litiengine.com/docs/configuration/)
 4. [Loading a .tmx Map](https://youtu.be/RR3QxOhV8hM)
 
-## Documentation
-The [LITIENGINE documentation pages](https://litiengine.com/docs/) containing in-depth guides for LITIengine are currently in deployment. We're looking forward to your contributions!
+## :books: Documentation
+The [LITIENGINE documentation pages](https://litiengine.com/docs/) contain in-depth guides and explanations for general concepts of the engine.
 
-> :warning: We are aware that there is currently a **lack of documentation**, but we're planning to document the most important parts of the library and use-cases with the first beta release to ensure that features don't get deprecated before they're even used.
+> :warning: We are aware that some parts of the engine are **lacking documentation**. Feel free to join our [Discord](https://discord.gg/rRB9cKD) and discuss any open questions. Our great community is always very helpful.
+> 
+> :pencil2: If you like writing and explaining: We're looking for further contributors to enhance the official documentation. Just file an issue or create a PR on the [Documentation Github Repository](https://github.com/gurkenlabs/litiengine-docs).
+
 
 If you are searching for a particular method or class within the API or just want to further explore the engine's possiblities, the Javadocs are a good place to start. 
 
 [![Javadocs](http://www.javadoc.io/badge/de.gurkenlabs/litiengine.svg)](https://litiengine.com/api/) 
-## Questions?
+### Questions?
 Visit the official [LITIENGINE forum](https://forum.litiengine.com/) for troubleshooting or to learn about the LITIENGINE community. If you encounter bugs or want to request fancy new features, you can also open an issue in our [Issue Tracker](https://github.com/gurkenlabs/litiengine/issues).
 
-## Libraries Used
+## :package: Libraries Used
 
 * [JInput](https://github.com/jinput/jinput) for Gamepad support
-* [MP3 SPI](http://www.javazoom.net/mp3spi/mp3spi.html) for .mp3 support
-* [Ogg Vorbis SPI](http://www.javazoom.net/vorbisspi/vorbisspi.html) for .ogg support
-* [Steamworks4j](https://github.com/code-disaster/steamworks4j) for supporting the steamworks SDK
+* [MP3 SPI](https://mvnrepository.com/artifact/com.googlecode.soundlibs/mp3spi/1.9.5.4) for .mp3 support
+* [Ogg Vorbis SPI](https://mvnrepository.com/artifact/com.googlecode.soundlibs/vorbisspi/1.0.3.3) for .ogg support
 
 ### utiLITI 
 * [Darklaf](https://github.com/weisJ/darklaf) for theming support
 
-## Contributing
+### Other Recommended Libraries
+* [Steamworks4j](https://github.com/code-disaster/steamworks4j) for supporting the steamworks SDK
+
+## :handshake: Contributing
 * Agree to our [Code of Conduct](https://github.com/gurkenlabs/litiengine/blob/master/CODE_OF_CONDUCT.md)
 * View our [Contribution guidelines](https://github.com/gurkenlabs/litiengine/blob/master/CONTRIBUTING.md)
 
-## Citations
+## :mortar_board: Citations
 If you want to cite parts of the LITIengie in your academic work, you can use the following Digital Object Identifier:
 
 [![DOI](https://zenodo.org/badge/87944612.svg)](https://zenodo.org/badge/latestdoi/87944612)
 
-## Contacts 
+## :speech_balloon: Contact
 * Website [litiengine.com](https://litiengine.com)
 * Twitter [@gurkenlabs](https://twitter.com/gurkenlabs)
 * Facebook [gurkenlabsofficial](https://www.facebook.com/gurkenlabsofficial/)
@@ -97,6 +102,6 @@ If you want to cite parts of the LITIengie in your academic work, you can use th
 * Steffen Wilke ([steffen-wilke](https://github.com/steffen-wilke))
 * Matthias Wilke ([nightm4re94](https://github.com/nightm4re94))
 
-## Support the devs
+## Sponsors and supporters
 
 [![](https://opencollective.com/litiengine/individuals.svg)](https://opencollective.com/litiengine#support)
