@@ -96,9 +96,9 @@ include(
 
 for (p in rootProject.children) {
   if (p.children.isEmpty()) {
-    if(p.name == "core"){
+    if (p.name == "core") {
       p.name = "litiengine"
-    } else{
+    } else {
       p.name = "litiengine-${p.name}"
     }
   }

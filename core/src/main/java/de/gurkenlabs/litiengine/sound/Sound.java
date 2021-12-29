@@ -9,8 +9,8 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 /**
- * This class implements all required functionality to load sounds from the file system and provide
- * a stream that can later on be used for the sound playback.
+ * This class implements all required functionality to load sounds from the file system and provide a stream that can
+ * later on be used for the sound playback.
  */
 public final class Sound {
 
@@ -25,16 +25,21 @@ public final class Sound {
   private byte[] data;
 
   /**
-   * Creates a new Sound instance by the specified file path. Loads the sound data into a byte array
-   * and also retrieves information about the format of the sound file.
+   * Creates a new Sound instance by the specified file path. Loads the sound data into a byte array and also retrieves
+   * information about the format of the sound file.
    *
-   * <p>Note that the constructor is private. In order to load files use the static {@code
+   * <p>
+   * Note that the constructor is private. In order to load files use the static {@code
    * Resources.sounds().get(String)} method.
    *
-   * @param is The input stream to load the sound from.
-   * @param name The name of this sound file.
-   * @throws IOException If something went wrong loading the file
-   * @throws UnsupportedAudioFileException If the audio format is not supported
+   * @param is
+   *          The input stream to load the sound from.
+   * @param name
+   *          The name of this sound file.
+   * @throws IOException
+   *           If something went wrong loading the file
+   * @throws UnsupportedAudioFileException
+   *           If the audio format is not supported
    */
   public Sound(InputStream is, String name) throws IOException, UnsupportedAudioFileException {
     this.name = name;
@@ -74,7 +79,8 @@ public final class Sound {
   /**
    * Gets the raw data of this sound as byte array.
    *
-   * <p>This is used during resource serialization.
+   * <p>
+   * This is used during resource serialization.
    *
    * @return The raw data of this sound as byte array.
    */

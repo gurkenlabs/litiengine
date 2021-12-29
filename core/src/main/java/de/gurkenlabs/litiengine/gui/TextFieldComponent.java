@@ -28,25 +28,25 @@ public class TextFieldComponent extends ImageComponent {
   private int maxLength = 0;
 
   public TextFieldComponent(
-    final double x, final double y, final double width, final double height, final String text) {
+      final double x, final double y, final double width, final double height, final String text) {
     super(x, y, width, height, text);
     this.changeConfirmedConsumers = new CopyOnWriteArrayList<>();
     setText(text);
     Input.keyboard().onKeyTyped(this::handleTypedKey);
     onClicked(
-      e -> {
-        if (!isSelected()) {
-          setSelected(true);
-        }
-      });
-
-    Input.mouse()
-      .onClicked(
         e -> {
-          if (isSelected() && !getBoundingBox().contains(Input.mouse().getLocation())) {
-            acceptInput();
+          if (!isSelected()) {
+            setSelected(true);
           }
         });
+
+    Input.mouse()
+        .onClicked(
+            e -> {
+              if (isSelected() && !getBoundingBox().contains(Input.mouse().getLocation())) {
+                acceptInput();
+              }
+            });
 
     setTextAlign(Align.LEFT);
     setAutomaticLineBreaks(true);
@@ -89,7 +89,7 @@ public class TextFieldComponent extends ImageComponent {
   @Override
   public String getTextToRender(Graphics2D g) {
     return isSelected() && cursorVisible ? super.getTextToRender(g) + getCursor()
-      : super.getTextToRender(g) + "  ";
+        : super.getTextToRender(g) + "  ";
   }
 
   public void handleTypedKey(final KeyEvent event) {
@@ -129,20 +129,20 @@ public class TextFieldComponent extends ImageComponent {
     setSelected(false);
     changeConfirmedConsumers.forEach(c -> c.accept(getText()));
     log.log(
-      Level.INFO,
-      "{0} typed into TextField with ComponentID {1}",
-      new Object[]{getText(), getComponentId()});
+        Level.INFO,
+        "{0} typed into TextField with ComponentID {1}",
+        new Object[] {getText(), getComponentId()});
   }
 
   private void handleBackSpace() {
     if (Input.keyboard().isPressed(KeyEvent.VK_SHIFT)) {
       while (getText().length() >= 1
-        && getText().charAt(getText().length() - 1) == ' ') {
+          && getText().charAt(getText().length() - 1) == ' ') {
         setText(getText().substring(0, getText().length() - 1));
       }
 
       while (getText().length() >= 1
-        && getText().charAt(getText().length() - 1) != ' ') {
+          && getText().charAt(getText().length() - 1) != ' ') {
         setText(getText().substring(0, getText().length() - 1));
       }
     } else if (getText().length() >= 1) {
@@ -182,6 +182,6 @@ public class TextFieldComponent extends ImageComponent {
 
   private boolean isKnownNumericFormat() {
     return getFormat() != null
-      && (getFormat().equals(INTEGER_FORMAT) || getFormat().equals(DOUBLE_FORMAT));
+        && (getFormat().equals(INTEGER_FORMAT) || getFormat().equals(DOUBLE_FORMAT));
   }
 }

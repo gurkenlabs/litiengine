@@ -15,7 +15,6 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.io.URLAdapter;
 import java.awt.Color;
 import java.awt.geom.Rectangle2D;
-import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.stream.Stream;
@@ -83,9 +82,8 @@ class MapTests {
   @Test
   void testSettingProperties() {
     TmxMap map =
-        (TmxMap)
-            Resources.maps()
-                .get("de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
+        (TmxMap) Resources.maps()
+            .get("de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
     map.setOrientation(MapOrientations.ISOMETRIC_STAGGERED);
     map.setTiledVersion("0.0.0");
     map.setVersion(2.0);
@@ -166,10 +164,9 @@ class MapTests {
   @Test
   void testInfiniteMap() {
     TmxMap map =
-        (TmxMap)
-            Resources.maps()
-                .get(
-                    "de/gurkenlabs/litiengine/environment/tilemap/xml/test-infinite-map.tmx");
+        (TmxMap) Resources.maps()
+            .get(
+                "de/gurkenlabs/litiengine/environment/tilemap/xml/test-infinite-map.tmx");
 
     assertTrue(map.isInfinite());
     assertEquals(64, map.getWidth());
@@ -200,8 +197,8 @@ class MapTests {
 
   private static Stream<Arguments> getTileCustomProperties() {
     return Stream.of(
-            Arguments.of(0, 5, 3, "foo", "bar"),
-            Arguments.of(0, 9, 5, "baz", "bap"),
-            Arguments.of(0, 10, 10, "custom", "multiline\nproperty"));
+        Arguments.of(0, 5, 3, "foo", "bar"),
+        Arguments.of(0, 9, 5, "baz", "bap"),
+        Arguments.of(0, 10, 10, "custom", "multiline\nproperty"));
   }
 }

@@ -41,7 +41,8 @@ public abstract class Ability implements IRenderable {
   /**
    * Initializes a new instance of the {@code Ability} class.
    *
-   * @param executor The executing entity
+   * @param executor
+   *          The executing entity
    */
   protected Ability(final Creature executor) {
     this.abilityCastListeners = ConcurrentHashMap.newKeySet();
@@ -103,17 +104,14 @@ public abstract class Ability implements IRenderable {
   public boolean isOnCooldown() {
     return (this.getCurrentExecution() != null
         && this.getCurrentExecution().getExecutionTicks() > 0
-        && Game.time().since(this.getCurrentExecution().getExecutionTicks())
-            < this.getAttributes().cooldown().get());
+        && Game.time().since(this.getCurrentExecution().getExecutionTicks()) < this.getAttributes().cooldown().get());
   }
 
   /**
-   * Casts the ability by the temporal conditions of the specified game loop and the spatial
-   * circumstances of the specified environment. An ability execution will be taken out that start
-   * applying all the effects of this ability.
+   * Casts the ability by the temporal conditions of the specified game loop and the spatial circumstances of the
+   * specified environment. An ability execution will be taken out that start applying all the effects of this ability.
    *
-   * @return An {@link AbilityExecution} object that wraps all information about this execution of
-   *     the ability.
+   * @return An {@link AbilityExecution} object that wraps all information about this execution of the ability.
    */
   public AbilityExecution cast() {
     if (!this.canCast()) {
@@ -168,18 +166,16 @@ public abstract class Ability implements IRenderable {
     }
 
     // calculate cooldown in seconds
-    return (float)
-        (!this.canCast()
-            ? (this.getAttributes().cooldown().get()
-                    - Game.time().since(this.getCurrentExecution().getExecutionTicks()))
-                * 0.001
-            : 0);
+    return (float) (!this.canCast()
+        ? (this.getAttributes().cooldown().get()
+            - Game.time().since(this.getCurrentExecution().getExecutionTicks()))
+            * 0.001
+        : 0);
   }
 
   public boolean isActive() {
     return this.getCurrentExecution() != null
-        && Game.time().since(this.getCurrentExecution().getExecutionTicks())
-            < this.getAttributes().duration().get();
+        && Game.time().since(this.getCurrentExecution().getExecutionTicks()) < this.getAttributes().duration().get();
   }
 
   public boolean isMultiTarget() {

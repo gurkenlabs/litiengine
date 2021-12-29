@@ -54,8 +54,8 @@ class TimeUtilitiesTests {
   }
 
   /**
-   * Used for @see{@link de.gurkenlabs.litiengine.util.TimeUtilities::testToTimerFormat} Suppression
-   * of unused warning is added because usage through MethodSource is not detected
+   * Used for @see{@link de.gurkenlabs.litiengine.util.TimeUtilities::testToTimerFormat} Suppression of unused warning is
+   * added because usage through MethodSource is not detected
    *
    * @return Input arguments for the unit test
    */

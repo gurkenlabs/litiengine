@@ -12,8 +12,10 @@ public class ComponentMouseWheelEvent {
   /**
    * Instantiates a new component mouse event.
    *
-   * @param event the event
-   * @param sender the sender
+   * @param event
+   *          the event
+   * @param sender
+   *          the sender
    */
   public ComponentMouseWheelEvent(final MouseWheelEvent event, final GuiComponent sender) {
     this.event = event;

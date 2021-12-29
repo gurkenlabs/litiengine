@@ -13,9 +13,8 @@ import java.util.logging.Logger;
 import de.gurkenlabs.litiengine.util.ReflectionUtilities;
 
 /**
- * This class contains some basic functionality for all setting groups. It gets
- * the SettingsGroupInfo annotation and reads out the prefix that is used when
- * reading/ writing the settings into a property file.
+ * This class contains some basic functionality for all setting groups. It gets the SettingsGroupInfo annotation and
+ * reads out the prefix that is used when reading/ writing the settings into a property file.
  * 
  */
 @ConfigurationGroupInfo
@@ -91,9 +90,8 @@ public abstract class ConfigurationGroup {
   }
 
   /**
-   * Store properties. By default, it is supported to store the following types:
-   * boolean, int, double, float, String and enum values. If you need to store
-   * any other object, you should overwrite this method as well as the
+   * Store properties. By default, it is supported to store the following types: boolean, int, double, float, String and
+   * enum values. If you need to store any other object, you should overwrite this method as well as the
    * initializeProperty method and implement a custom approach.
    *
    *
@@ -150,7 +148,8 @@ public abstract class ConfigurationGroup {
   }
 
   /**
-   * Use this method to set configuration properties if you want to support {@code configurationChanged} for your property.
+   * Use this method to set configuration properties if you want to support {@code configurationChanged} for your
+   * property.
    * 
    * @param <T>
    *          The type of the value to set.
@@ -189,8 +188,8 @@ public abstract class ConfigurationGroup {
   @FunctionalInterface
   public interface ConfigurationChangedListener extends EventListener {
     /**
-     * Invoked when a a property of the configuration has been changed using the {@link ConfigurationGroup#set(String, Object)} method to support this
-     * event.
+     * Invoked when a a property of the configuration has been changed using the
+     * {@link ConfigurationGroup#set(String, Object)} method to support this event.
      * 
      * @param event
      *          The property changed event.

@@ -298,15 +298,15 @@ class ArrayUtilitiesTests {
   void testTwoDimensionalArrayToList(List<Integer> expectedValue) {
     Integer[][] arr =
         new Integer[][] {
-          {
-            0, 0, 0,
-          },
-          {
-            1, 1, 1,
-          },
-          {
-            2, 2, 2,
-          },
+            {
+                0, 0, 0,
+            },
+            {
+                1, 1, 1,
+            },
+            {
+                2, 2, 2,
+            },
         };
 
     List<Integer> list = ArrayUtilities.toList(arr);

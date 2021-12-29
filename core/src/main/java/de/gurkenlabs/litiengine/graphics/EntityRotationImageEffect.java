@@ -8,7 +8,8 @@ public class EntityRotationImageEffect extends RotationImageEffect {
   /**
    * Initializes a new instance of the {@code EntityRotationImageEffect}.
    *
-   * @param entity The entity to which this affect will be applied.
+   * @param entity
+   *          The entity to which this affect will be applied.
    */
   public EntityRotationImageEffect(final IEntity entity) {
     super(-1, 0);

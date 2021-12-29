@@ -21,10 +21,11 @@ import de.gurkenlabs.litiengine.Game;
 
 public final class Strings {
   public static final String DEFAULT_BUNDLE = "strings";
-  
+
   private static final Logger log = Logger.getLogger(Strings.class.getName());
 
-  // default encoding for properties is ISO_8859_1 see: https://docs.oracle.com/javase/7/docs/api/java/util/Properties.html
+  // default encoding for properties is ISO_8859_1 see:
+  // https://docs.oracle.com/javase/7/docs/api/java/util/Properties.html
   private Charset charset = StandardCharsets.ISO_8859_1;
 
   Strings() {
@@ -61,7 +62,8 @@ public final class Strings {
 
       String value = defaultBundle.getString(key);
 
-      String decodedValue = this.charset.equals(StandardCharsets.ISO_8859_1) ? value : new String(value.getBytes(StandardCharsets.ISO_8859_1), this.charset);
+      String decodedValue =
+          this.charset.equals(StandardCharsets.ISO_8859_1) ? value : new String(value.getBytes(StandardCharsets.ISO_8859_1), this.charset);
       if (args.length > 0) {
         return MessageFormat.format(decodedValue, args);
       }
@@ -78,10 +80,9 @@ public final class Strings {
   }
 
   /**
-   * Get a list of strings from the specified raw text files. Strings are
-   * separated by a new line. <br>
-   * <b>This method is not cached. Ever call will open up a new
-   * {@link InputStream} to read the strings from the text file.</b>
+   * Get a list of strings from the specified raw text files. Strings are separated by a new line. <br>
+   * <b>This method is not cached. Ever call will open up a new {@link InputStream} to read the strings from the text
+   * file.</b>
    * 
    * @param textFile
    *          The text file that will be retrieved.

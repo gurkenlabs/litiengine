@@ -12,9 +12,9 @@ import de.gurkenlabs.litiengine.configuration.ClientConfiguration;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 
 /**
- * The class {@code GameMetrics} provides meta information about the game's metrics. This allows the developer to
- * get a feeling about the performance of different aspects (e.g. memory consumption, potential fps, network traffic, ...) and to identify potential
- * issues.
+ * The class {@code GameMetrics} provides meta information about the game's metrics. This allows the developer to get a
+ * feeling about the performance of different aspects (e.g. memory consumption, potential fps, network traffic, ...) and
+ * to identify potential issues.
  * 
  * <p>
  * This information can be rendered as debug information if configured to get live data during a gameplay session.
@@ -46,7 +46,8 @@ public final class GameMetrics implements IRenderable {
   GameMetrics() {
     this.renderMetrics = new CopyOnWriteArrayList<>();
     this.runtime = Runtime.getRuntime();
-    this.javaVersion = System.getProperty("java.version") + " (VM: " + System.getProperty("java.vm.name") + ", VENDOR: " + System.getProperty("java.vendor") + ")";
+    this.javaVersion =
+        System.getProperty("java.version") + " (VM: " + System.getProperty("java.vm.name") + ", VENDOR: " + System.getProperty("java.vendor") + ")";
   }
 
   public int getFramesPerSecond() {

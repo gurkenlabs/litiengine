@@ -25,8 +25,7 @@ public final class XmlImportDialog {
     }
 
     sb.append(" - " + name + " XML");
-    if (EditorFileChooser.showFileDialog(sb.toString(), "Import " + name + " XML", true, extensions)
-        == JFileChooser.APPROVE_OPTION) {
+    if (EditorFileChooser.showFileDialog(sb.toString(), "Import " + name + " XML", true, extensions) == JFileChooser.APPROVE_OPTION) {
       for (File file : EditorFileChooser.instance().getSelectedFiles()) {
         consumer.accept(file);
       }

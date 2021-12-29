@@ -71,8 +71,7 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   /**
    * Instantiates a new {@code MapObject} instance.
    */
-  public MapObject() {
-  }
+  public MapObject() {}
 
   /**
    * Instantiates a new {@code MapObject} instance.
@@ -113,7 +112,8 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   /**
    * Instantiates a new {@code MapObject} instance by copying the specified original instance.
    * <p>
-   * This variant of the constructor lets you decide if the copy instance will get the same ID as the old MapObject or get a new ID.
+   * This variant of the constructor lets you decide if the copy instance will get the same ID as the old MapObject or get
+   * a new ID.
    * </p>
    *
    * @param original
@@ -391,7 +391,8 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
 
   @SuppressWarnings("unused")
   private void afterUnmarshal(Unmarshaller u, Object parent) {
-    // MapObjects don't necessarily have to be children of a layer. E.g. they can also be children of a Blueprint.
+    // MapObjects don't necessarily have to be children of a layer. E.g. they can also be children of a
+    // Blueprint.
     if (parent instanceof MapObjectLayer) {
       this.setLayer((MapObjectLayer) parent);
     }
@@ -422,6 +423,7 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   }
 
   private boolean isInfiniteMap() {
-    return this.getLayer() != null && this.getLayer().getMap() != null && this.getLayer().getMap().isInfinite() && this.getLayer().getMap() instanceof TmxMap;
+    return this.getLayer() != null && this.getLayer().getMap() != null && this.getLayer().getMap().isInfinite()
+        && this.getLayer().getMap() instanceof TmxMap;
   }
 }

@@ -7,8 +7,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * The {@code GamepadEvents} class is the engine's implementation for receiving gamepad input
- * events.
+ * The {@code GamepadEvents} class is the engine's implementation for receiving gamepad input events.
  */
 public abstract class GamepadEvents {
   protected final Map<String, Collection<GamepadPollListener>> componentPollListeners;
@@ -26,12 +25,15 @@ public abstract class GamepadEvents {
     this.pressedListeners = ConcurrentHashMap.newKeySet();
     this.releasedListeners = ConcurrentHashMap.newKeySet();
   }
+
   /**
-   * Adds the specified gamepad poll listener to receive events when the component with the defined
-   * identifier has been polled.
+   * Adds the specified gamepad poll listener to receive events when the component with the defined identifier has been
+   * polled.
    *
-   * @param identifier The component identifier for which to add the listener.
-   * @param listener The listener to add.
+   * @param identifier
+   *          The component identifier for which to add the listener.
+   * @param listener
+   *          The listener to add.
    */
   public void onPoll(String identifier, GamepadPollListener listener) {
     addComponentListener(this.componentPollListeners, identifier, listener);
@@ -40,39 +42,48 @@ public abstract class GamepadEvents {
   /**
    * Unregister the specified poll listener from gamepad events.
    *
-   * @param identifier The component identifier for which to remove the listener.
-   * @param listener The listener to remove.
+   * @param identifier
+   *          The component identifier for which to remove the listener.
+   * @param listener
+   *          The listener to remove.
    */
   public void removePollListener(String identifier, GamepadPollListener listener) {
     removeComponentListener(this.componentPollListeners, identifier, listener);
   }
 
   /**
-   * Adds the specified gamepad pressed listener to receive events when the component with the
-   * defined identifier has been pressed.
+   * Adds the specified gamepad pressed listener to receive events when the component with the defined identifier has been
+   * pressed.
    *
-   * @param identifier The component identifier for which to add the listener.
-   * @param listener The listener to add.
+   * @param identifier
+   *          The component identifier for which to add the listener.
+   * @param listener
+   *          The listener to add.
    */
   public void onPressed(String identifier, GamepadPressedListener listener) {
     addComponentListener(this.componentPressedListeners, identifier, listener);
   }
+
   /**
    * Unregister the specified pressed listener from gamepad events.
    *
-   * @param identifier The component identifier for which to remove the listener.
-   * @param listener The listener to remove.
+   * @param identifier
+   *          The component identifier for which to remove the listener.
+   * @param listener
+   *          The listener to remove.
    */
   public void removePressedListener(String identifier, GamepadPressedListener listener) {
     removeComponentListener(this.componentPressedListeners, identifier, listener);
   }
 
   /**
-   * Adds the specified gamepad released listener to receive events when the component with the
-   * defined identifier has been released.
+   * Adds the specified gamepad released listener to receive events when the component with the defined identifier has
+   * been released.
    *
-   * @param identifier The component identifier for which to add the listener.
-   * @param listener The listener to add.
+   * @param identifier
+   *          The component identifier for which to add the listener.
+   * @param listener
+   *          The listener to add.
    */
   public void onReleased(String identifier, GamepadReleasedListener listener) {
     addComponentListener(this.componentReleasedListeners, identifier, listener);
@@ -81,16 +92,20 @@ public abstract class GamepadEvents {
   /**
    * Unregister the specified released listener from gamepad events.
    *
-   * @param identifier The component identifier for which to remove the listener.
-   * @param listener The listener to remove.
+   * @param identifier
+   *          The component identifier for which to remove the listener.
+   * @param listener
+   *          The listener to remove.
    */
   public void removeReleasedListener(String identifier, GamepadReleasedListener listener) {
     removeComponentListener(this.componentReleasedListeners, identifier, listener);
   }
+
   /**
    * Adds the specified gamepad poll listener to receive events when any component has been polled.
    *
-   * @param listener The listener to add.
+   * @param listener
+   *          The listener to add.
    */
   public void onPoll(GamepadPollListener listener) {
     this.pollListeners.add(listener);
@@ -99,17 +114,18 @@ public abstract class GamepadEvents {
   /**
    * Unregister the specified poll listener from gamepad events.
    *
-   * @param listener The listener to remove.
+   * @param listener
+   *          The listener to remove.
    */
   public void removePollListener(GamepadPollListener listener) {
     this.pollListeners.remove(listener);
   }
 
   /**
-   * Adds the specified gamepad pressed listener to receive events when any component has been
-   * pressed.
+   * Adds the specified gamepad pressed listener to receive events when any component has been pressed.
    *
-   * @param listener The listener to add.
+   * @param listener
+   *          The listener to add.
    */
   public void onPressed(GamepadPressedListener listener) {
     this.pressedListeners.add(listener);
@@ -118,17 +134,18 @@ public abstract class GamepadEvents {
   /**
    * Unregister the specified pressed listener from gamepad events.
    *
-   * @param listener The listener to remove.
+   * @param listener
+   *          The listener to remove.
    */
   public void removePressedListener(GamepadPressedListener listener) {
     this.pressedListeners.remove(listener);
   }
 
   /**
-   * Adds the specified gamepad released listener to receive events when any component has been
-   * released.
+   * Adds the specified gamepad released listener to receive events when any component has been released.
    *
-   * @param listener The listener to add.
+   * @param listener
+   *          The listener to add.
    */
   public void onReleased(GamepadReleasedListener listener) {
     this.releasedListeners.add(listener);
@@ -137,7 +154,8 @@ public abstract class GamepadEvents {
   /**
    * Unregister the specified released listener from gamepad events.
    *
-   * @param listener The listener to remove.
+   * @param listener
+   *          The listener to remove.
    */
   public void removeReleasedListener(GamepadReleasedListener listener) {
     this.releasedListeners.remove(listener);
@@ -155,10 +173,10 @@ public abstract class GamepadEvents {
   }
 
   /**
-   * Determines whether the specified Gamepad component is currently pressed. This is useful for
-   * button type components.
+   * Determines whether the specified Gamepad component is currently pressed. This is useful for button type components.
    *
-   * @param gamepadComponent The component to check against.
+   * @param gamepadComponent
+   *          The component to check against.
    * @return True if the component is pressed, otherwise false.
    * @see Gamepad.Buttons
    * @see Gamepad.Xbox
@@ -194,7 +212,8 @@ public abstract class GamepadEvents {
     /**
      * Invoked when a gamepad component is being polled
      *
-     * @param event The gamepad event.
+     * @param event
+     *          The gamepad event.
      */
     void polled(GamepadEvent event);
   }
@@ -210,7 +229,8 @@ public abstract class GamepadEvents {
     /**
      * Invoked when a gamepad component has been pressed.
      *
-     * @param event The gamepad event.
+     * @param event
+     *          The gamepad event.
      */
     void pressed(GamepadEvent event);
   }
@@ -226,7 +246,8 @@ public abstract class GamepadEvents {
     /**
      * Invoked when a gamepad component has been released.
      *
-     * @param event The gamepad event.
+     * @param event
+     *          The gamepad event.
      */
     void released(GamepadEvent event);
   }

@@ -64,7 +64,8 @@ public final class Scroll {
         .onScrolled(
             handler -> {
               IMap map = Game.world().environment().getMap();
-              if (map == null) return;
+              if (map == null)
+                return;
               final double y = getScrollValue(handler, map.getSizeInPixels().height);
 
               scroll(Game.world().camera().getFocus().getX(), y);
@@ -74,7 +75,8 @@ public final class Scroll {
         .onScrolled(
             handler -> {
               IMap map = Game.world().environment().getMap();
-              if (map == null) return;
+              if (map == null)
+                return;
               final double x = getScrollValue(handler, map.getSizeInPixels().width);
 
               scroll(x, Game.world().camera().getFocus().getY());
@@ -96,7 +98,8 @@ public final class Scroll {
 
     try {
       IMap map = Game.world().environment().getMap();
-      if (map == null) return;
+      if (map == null)
+        return;
       double relativeX =
           Game.world().camera().getFocus().getX() / map.getSizeInPixels().width;
       double relativeY =

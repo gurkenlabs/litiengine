@@ -29,10 +29,10 @@ class ListFieldTest {
 
   private final String[][] content_2D =
       new String[][] {
-        {"A", "B", "C", "D", "E", "F", "G"},
-        {"H", "I", "J", "K", "L", "M", "N", "O"},
-        {"P", "Q", "R", "S", "T", "U", "V"},
-        {"W", "X", "Y", "Z"}
+          {"A", "B", "C", "D", "E", "F", "G"},
+          {"H", "I", "J", "K", "L", "M", "N", "O"},
+          {"P", "Q", "R", "S", "T", "U", "V"},
+          {"W", "X", "Y", "Z"}
       };
   private final int content_2D_shownRows = 7;
   private final int content_2D_shownColumns = 3;

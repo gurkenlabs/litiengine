@@ -27,8 +27,8 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * The {@code DebugRenderer} class implements default debug rendering and exposes extension points
- * to reder your own debug information via callbacks.
+ * The {@code DebugRenderer} class implements default debug rendering and exposes extension points to reder your own
+ * debug information via callbacks.
  */
 public final class DebugRenderer {
   private static List<MapRenderedListener> mapDebugListener;
@@ -44,10 +44,11 @@ public final class DebugRenderer {
   }
 
   /**
-   * Add the specified entity rendered listener to attach custom debug rendering after the default
-   * debug information for an entity has been rendered.
+   * Add the specified entity rendered listener to attach custom debug rendering after the default debug information for
+   * an entity has been rendered.
    *
-   * @param listener The listener to add.
+   * @param listener
+   *          The listener to add.
    */
   public static void addEntityDebugListener(EntityRenderedListener listener) {
     entityDebugListeners.add(listener);
@@ -56,17 +57,19 @@ public final class DebugRenderer {
   /**
    * Removes the specified entity rendered listener.
    *
-   * @param listener The listener to remove.
+   * @param listener
+   *          The listener to remove.
    */
   public static void removeEntityDebugListener(EntityRenderedListener listener) {
     entityDebugListeners.remove(listener);
   }
 
   /**
-   * Add the specified map rendered listener to attach custom debug rendering after layers of the
-   * type {@code GROUND} have beend rendered.
+   * Add the specified map rendered listener to attach custom debug rendering after layers of the type {@code GROUND} have
+   * beend rendered.
    *
-   * @param listener The listener to add.
+   * @param listener
+   *          The listener to add.
    * @see RenderType#GROUND
    * @see Environment#render(Graphics2D)
    */
@@ -77,7 +80,8 @@ public final class DebugRenderer {
   /**
    * Removes the specified map rendered listener.
    *
-   * @param listener The listener to remove.
+   * @param listener
+   *          The listener to remove.
    */
   public static void removeMapRenderedListener(MapRenderedListener listener) {
     mapDebugListener.remove(listener);

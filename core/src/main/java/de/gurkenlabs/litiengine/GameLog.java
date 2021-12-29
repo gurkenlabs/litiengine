@@ -9,8 +9,8 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 /**
- * The {@code GameLog} class provides a general purpose logger for games.
- * It prevents the necessity to create custom logger instances and provides a simplified way to quickly log events.
+ * The {@code GameLog} class provides a general purpose logger for games. It prevents the necessity to create custom
+ * logger instances and provides a simplified way to quickly log events.
  *
  * @see Game#log()
  */
@@ -18,8 +18,7 @@ final class GameLog {
   private static final String LOGGING_CONFIG_FILE = "logging.properties";
   private static final Logger log = Logger.getLogger(GameLog.class.getName());
 
-  GameLog() {
-  }
+  GameLog() {}
 
   Logger log() {
     return log;

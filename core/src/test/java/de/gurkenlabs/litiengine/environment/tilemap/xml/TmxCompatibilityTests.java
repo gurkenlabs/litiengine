@@ -9,8 +9,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 @Disabled(
-    value =
-        "Disabled for now due to Windows/Linux incompatiblities on serialization of the line endings.")
+    value = "Disabled for now due to Windows/Linux incompatiblities on serialization of the line endings.")
 public class TmxCompatibilityTests {
   @Test
   public void infiniteMapNeedsToBeCompatibleToDefaultTmxFormat() {

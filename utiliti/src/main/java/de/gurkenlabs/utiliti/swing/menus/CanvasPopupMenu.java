@@ -69,7 +69,6 @@ public final class CanvasPopupMenu extends JPopupMenu {
     Editor.instance()
         .getMapComponent()
         .onEditModeChanged(
-            mode ->
-                paste.setEnabled(Editor.instance().getMapComponent().getCopiedBlueprint() != null));
+            mode -> paste.setEnabled(Editor.instance().getMapComponent().getCopiedBlueprint() != null));
   }
 }

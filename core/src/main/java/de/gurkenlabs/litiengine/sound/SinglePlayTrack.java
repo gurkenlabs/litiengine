@@ -30,7 +30,8 @@ public class SinglePlayTrack implements Track {
   /**
    * Initializes a new {@code SinglePlayTrack} for the specified sound.
    *
-   * @param soundName The name of the sound to be played by this track.
+   * @param soundName
+   *          The name of the sound to be played by this track.
    */
   public SinglePlayTrack(String soundName) {
     this(Resources.sounds().get(soundName));
@@ -39,7 +40,8 @@ public class SinglePlayTrack implements Track {
   /**
    * Initializes a new {@code SinglePlayTrack} for the specified sound.
    *
-   * @param sound The sound to be played by this track.
+   * @param sound
+   *          The sound to be played by this track.
    */
   public SinglePlayTrack(Sound sound) {
     this.sound = sound;

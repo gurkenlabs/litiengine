@@ -11,7 +11,6 @@ import javax.sound.sampled.spi.AudioFileReader;
 import javax.sound.sampled.spi.FormatConversionProvider;
 import java.util.List;
 import java.util.ServiceLoader;
-import java.util.stream.Collectors;
 
 class SoundServiceTests {
 
@@ -24,7 +23,8 @@ class SoundServiceTests {
 
   @Test
   void testAudioFormatConversionProviderServicesPresent() {
-    List<FormatConversionProvider> formatConversionProviders = ServiceLoader.load(FormatConversionProvider.class).stream().map(ServiceLoader.Provider::get).toList();
+    List<FormatConversionProvider> formatConversionProviders =
+        ServiceLoader.load(FormatConversionProvider.class).stream().map(ServiceLoader.Provider::get).toList();
     Assertions.assertTrue(containsOfType(formatConversionProviders, MpegFormatConversionProvider.class));
     Assertions.assertTrue(containsOfType(formatConversionProviders, VorbisFormatConversionProvider.class));
   }

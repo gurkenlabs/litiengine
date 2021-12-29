@@ -16,9 +16,12 @@ public class Force {
   /**
    * Instantiates a new force.
    *
-   * @param location The location where the force is originating from
-   * @param strength The strength/intensity of this force instance
-   * @param size The size of this force (used to determine if/when an entity has reached the force)
+   * @param location
+   *          The location where the force is originating from
+   * @param strength
+   *          The strength/intensity of this force instance
+   * @param size
+   *          The size of this force (used to determine if/when an entity has reached the force)
    */
   public Force(final Point2D location, final float strength, final float size) {
     this.location = location;
@@ -78,11 +81,11 @@ public class Force {
 
   public boolean hasReached(final ICollisionEntity entity) {
     return new Ellipse2D.Double(
-            this.getLocation().getX() - this.size * 0.5,
-            this.getLocation().getY() - this.size * 0.5,
-            this.size,
-            this.size)
-        .intersects(entity.getCollisionBox());
+        this.getLocation().getX() - this.size * 0.5,
+        this.getLocation().getY() - this.size * 0.5,
+        this.size,
+        this.size)
+            .intersects(entity.getCollisionBox());
   }
 
   public void setCancelOnCollision(final boolean cancelOnCollision) {

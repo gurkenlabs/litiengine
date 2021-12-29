@@ -19,8 +19,8 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameListener;
 
 /**
- * An abstract implementation for all classes that provide a certain type of resources.
- * Basically, it's an in-memory cache of the resources and provides access to manage the resources.
+ * An abstract implementation for all classes that provide a certain type of resources. Basically, it's an in-memory
+ * cache of the resources and provides access to manage the resources.
  *
  * @param <T>
  *          The type of the resource that is contained by this instance.
@@ -28,7 +28,8 @@ import de.gurkenlabs.litiengine.GameListener;
  * @see ResourcesContainerListener
  */
 public abstract class ResourcesContainer<T> {
-  // use a work-stealing pool to maximize resource load speed while minimizing the number of resources in use
+  // use a work-stealing pool to maximize resource load speed while minimizing the number of resources
+  // in use
   private static final ExecutorService ASYNC_POOL = Executors.newWorkStealingPool();
 
   private final Map<String, T> resources = new ConcurrentHashMap<>();
@@ -46,8 +47,8 @@ public abstract class ResourcesContainer<T> {
   }
 
   /**
-   * Add a new container listener to this instance in order to observe resource life cycles.
-   * The listener will get notified whenever a resource was added to or removed from this container.
+   * Add a new container listener to this instance in order to observe resource life cycles. The listener will get
+   * notified whenever a resource was added to or removed from this container.
    * 
    * @param listener
    *          The container listener instance that will receive call backs from this container.
@@ -196,7 +197,8 @@ public abstract class ResourcesContainer<T> {
    * This is the most common (and preferred) way to fetch resources from a container.
    * </p>
    * <p>
-   * If not previously loaded, this method attempts to load the resource on the fly otherwise it will be retrieved from the cache.
+   * If not previously loaded, this method attempts to load the resource on the fly otherwise it will be retrieved from
+   * the cache.
    * </p>
    * 
    * @param resourceName
@@ -214,8 +216,8 @@ public abstract class ResourcesContainer<T> {
   /**
    * Gets the resource with the specified name.<br>
    * <p>
-   * If no such resource is currently present on the container, it will be loaded with the specified {@code loadCallback} and added to this
-   * container.
+   * If no such resource is currently present on the container, it will be loaded with the specified {@code loadCallback}
+   * and added to this container.
    * </p>
    * 
    * @param resourceName
@@ -246,7 +248,8 @@ public abstract class ResourcesContainer<T> {
   /**
    * Gets the resource with the specified name.
    * <p>
-   * If not previously loaded, this method attempts to load the resource on the fly otherwise it will be retrieved from the cache.
+   * If not previously loaded, this method attempts to load the resource on the fly otherwise it will be retrieved from
+   * the cache.
    * </p>
    * 
    * @param resourceName
@@ -279,8 +282,8 @@ public abstract class ResourcesContainer<T> {
   }
 
   /**
-   * Eventually gets the resource with the specified location. The resource is loaded asynchronously and can be retrieved from the returned
-   * {@code Future} object returned by this method once loaded.
+   * Eventually gets the resource with the specified location. The resource is loaded asynchronously and can be retrieved
+   * from the returned {@code Future} object returned by this method once loaded.
    * 
    * @param location
    *          The location of the resource
@@ -291,8 +294,8 @@ public abstract class ResourcesContainer<T> {
   }
 
   /**
-   * Eventually gets the resource with the specified location. The resource is loaded asynchronously and can be retrieved from the returned
-   * {@code Future} object returned by this method once loaded.
+   * Eventually gets the resource with the specified location. The resource is loaded asynchronously and can be retrieved
+   * from the returned {@code Future} object returned by this method once loaded.
    * 
    * @param name
    *          The name or location of the resource
@@ -339,8 +342,8 @@ public abstract class ResourcesContainer<T> {
    * Tries to get a resource with the specified name from this container.
    * <p>
    * This method should be used, if it's not clear whether the resource is present on this container.<br>
-   * It is basically a combination of {@code get(String)} and {@code contains(String)} and allows
-   * to check whether a resource is present while also fetching it from the container.
+   * It is basically a combination of {@code get(String)} and {@code contains(String)} and allows to check whether a
+   * resource is present while also fetching it from the container.
    * </p>
    * 
    * @param resourceName
@@ -367,7 +370,8 @@ public abstract class ResourcesContainer<T> {
   protected abstract T load(URL resourceName) throws Exception;
 
   /**
-   * Gets an alias for the specified resourceName. Note that the process of providing an alias is up to the ResourceContainer implementation.
+   * Gets an alias for the specified resourceName. Note that the process of providing an alias is up to the
+   * ResourceContainer implementation.
    * 
    * @param resourceName
    *          The original name of the resource.

@@ -32,11 +32,12 @@ package de.gurkenlabs.litiengine.util;
 import java.util.Comparator;
 
 /**
- * This is an updated version with enhancements made by Daniel Migowski, Andre Bogus, and David
- * Koelle. Updated by David Koelle in 2017.
+ * This is an updated version with enhancements made by Daniel Migowski, Andre Bogus, and David Koelle. Updated by David
+ * Koelle in 2017.
  *
- * <p>To use this class: Use the static "sort" method from the java.util.Collections class:
- * Collections.sort(your list, new AlphanumComparator());
+ * <p>
+ * To use this class: Use the static "sort" method from the java.util.Collections class: Collections.sort(your list, new
+ * AlphanumComparator());
  */
 public class AlphanumComparator implements Comparator<String> {
   private static boolean isDigit(char ch) {
@@ -52,14 +53,16 @@ public class AlphanumComparator implements Comparator<String> {
     if (isDigit(c)) {
       while (marker < slength) {
         c = s.charAt(marker);
-        if (!isDigit(c)) break;
+        if (!isDigit(c))
+          break;
         chunk.append(c);
         marker++;
       }
     } else {
       while (marker < slength) {
         c = s.charAt(marker);
-        if (isDigit(c)) break;
+        if (isDigit(c))
+          break;
         chunk.append(c);
         marker++;
       }
@@ -107,7 +110,8 @@ public class AlphanumComparator implements Comparator<String> {
         result = thisChunk.compareTo(thatChunk);
       }
 
-      if (result != 0) return result;
+      if (result != 0)
+        return result;
     }
 
     return s1Length - s2Length;

@@ -7,9 +7,8 @@ import java.awt.geom.Rectangle2D;
 import de.gurkenlabs.litiengine.resources.Resource;
 
 /**
- * This interface represents an instance on a map that can define various things
- * for an engine. e.g. it can be used to define static collision boxes or other
- * special regions on the map.
+ * This interface represents an instance on a map that can define various things for an engine. e.g. it can be used to
+ * define static collision boxes or other special regions on the map.
  */
 public interface IMapObject extends ICustomPropertyProvider, Resource {
 

@@ -46,9 +46,11 @@ public class AbilityExecution implements IUpdateable {
   }
 
   /**
-   * 1. Apply all ability effects after their delay.
-   * 2. Unregister this instance after all effects were applied.
-   * 3. Effects will apply their follow up effects on their own.
+   * <ol>
+   * <li>Apply all ability effects after their delay.</li>
+   * <li>Unregister this instance after all effects were applies.</li>
+   * <li>Effects will apply their follow up effects on their own.</li>
+   * </ol>
    */
   @Override
   public void update() {
@@ -68,6 +70,6 @@ public class AbilityExecution implements IUpdateable {
         .forEach(effect -> {
           effect.apply(this.getExecutionImpactArea());
           this.getAppliedEffects().add(effect);
-    });
+        });
   }
 }

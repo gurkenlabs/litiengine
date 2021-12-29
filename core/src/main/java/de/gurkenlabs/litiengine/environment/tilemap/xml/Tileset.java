@@ -378,7 +378,8 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
         }
       }
       if (iter.hasNext()) {
-        log.log(Level.WARNING, "tileset \"{0}\" had a tilecount attribute of {1} but had tile IDs going beyond that", new Object[] { this.name, this.getTileCount() });
+        log.log(Level.WARNING, "tileset \"{0}\" had a tilecount attribute of {1} but had tile IDs going beyond that",
+            new Object[] {this.name, this.getTileCount()});
         while (iter.hasNext()) {
           int nextId = iter.next().getId();
           iter.previous();

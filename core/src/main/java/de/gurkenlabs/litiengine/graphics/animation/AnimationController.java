@@ -39,10 +39,10 @@ public class AnimationController implements IAnimationController {
   }
 
   /**
-   * Initializes a new instance of the {@code AnimationController} class with the specified default
-   * animation.
+   * Initializes a new instance of the {@code AnimationController} class with the specified default animation.
    *
-   * @param defaultAnimation The default animation for this controller.
+   * @param defaultAnimation
+   *          The default animation for this controller.
    * @see #getDefault()
    */
   public AnimationController(final Animation defaultAnimation) {
@@ -51,11 +51,12 @@ public class AnimationController implements IAnimationController {
   }
 
   /**
-   * Initializes a new instance of the {@code AnimationController} class with the specified default
-   * animation.
+   * Initializes a new instance of the {@code AnimationController} class with the specified default animation.
    *
-   * @param defaultAnimation The default animation for this controller.
-   * @param animations Additional animations that are managed by this controller instance.
+   * @param defaultAnimation
+   *          The default animation for this controller.
+   * @param animations
+   *          Additional animations that are managed by this controller instance.
    * @see #getDefault()
    * @see #getAll()
    */
@@ -72,22 +73,22 @@ public class AnimationController implements IAnimationController {
   }
 
   /**
-   * Initializes a new instance of the {@code AnimationController} class with the specified default
-   * animation.
+   * Initializes a new instance of the {@code AnimationController} class with the specified default animation.
    *
-   * @param sprite The sprite sheet used by the default animation of this controller.
+   * @param sprite
+   *          The sprite sheet used by the default animation of this controller.
    */
   public AnimationController(final Spritesheet sprite) {
     this(sprite, true);
   }
 
   /**
-   * Initializes a new instance of the {@code AnimationController} class with the specified default
-   * animation.
+   * Initializes a new instance of the {@code AnimationController} class with the specified default animation.
    *
-   * @param sprite The sprite sheet used by the default animation of this controller.
-   * @param loop A flag indicating whether the default animation should be looped or only played
-   *     once.
+   * @param sprite
+   *          The sprite sheet used by the default animation of this controller.
+   * @param loop
+   *          A flag indicating whether the default animation should be looped or only played once.
    */
   public AnimationController(final Spritesheet sprite, final boolean loop) {
     this(new Animation(sprite, loop, Resources.spritesheets().getCustomKeyFrameDurations(sprite)));
@@ -149,8 +150,7 @@ public class AnimationController implements IAnimationController {
   }
 
   /**
-   * Detach the {@code AnimationController}, as well as all its {@code Animation}s from the Game
-   * loop.
+   * Detach the {@code AnimationController}, as well as all its {@code Animation}s from the Game loop.
    *
    * @see ILoop
    */
@@ -377,9 +377,8 @@ public class AnimationController implements IAnimationController {
   }
 
   /**
-   * Build a unique cache key for the current frame. The spritesheet's {@code hashCode}, the current
-   * keyframe's sprite index, as well as all applied {@code ImageEffect}s' names, are considered
-   * when determining the current cache key.
+   * Build a unique cache key for the current frame. The spritesheet's {@code hashCode}, the current keyframe's sprite
+   * index, as well as all applied {@code ImageEffect}s' names, are considered when determining the current cache key.
    *
    * @return the unique cache key for the current key frame
    */

@@ -65,8 +65,10 @@ public final class ReflectionUtilities {
   /**
    * Recursively gets all fields of the specified type, respecting parent classes.
    *
-   * @param fields The list containing all fields.
-   * @param type The type to retrieve the fields from.
+   * @param fields
+   *          The list containing all fields.
+   * @param type
+   *          The type to retrieve the fields from.
    * @return All fields of the specified type, including the fields of the parent classes.
    */
   public static List<Field> getAllFields(List<Field> fields, Class<?> type) {
@@ -80,12 +82,15 @@ public final class ReflectionUtilities {
   }
 
   /**
-   * Recursively gets a method by the the specified name respecting the parent classes and the
-   * parameters of the declaration.
+   * Recursively gets a method by the the specified name respecting the parent classes and the parameters of the
+   * declaration.
    *
-   * @param name The name of the method.
-   * @param type The type on which to search for the method.
-   * @param parameterTypes The types of the parameters defined by the method declaration.
+   * @param name
+   *          The name of the method.
+   * @param type
+   *          The type on which to search for the method.
+   * @param parameterTypes
+   *          The types of the parameters defined by the method declaration.
    * @return The found method or null if no such method exists.
    */
   public static Method getMethod(String name, Class<?> type, Class<?>... parameterTypes) {
@@ -262,7 +267,7 @@ public final class ReflectionUtilities {
         return setValue(cls, instance, fieldName, ArrayUtilities.splitInt(value, ","));
       } else if (field.getType().equals(double[].class)) {
         return setValue(cls, instance, fieldName, ArrayUtilities.splitDouble(value, ","));
-      }else if (field.getType() instanceof Class && field.getType().isEnum()) {
+      } else if (field.getType() instanceof Class && field.getType().isEnum()) {
         return setEnumPropertyValue(cls, instance, field, fieldName, value);
       } else if (field.getType().equals(Material.class)) {
         return setValue(cls, instance, fieldName, Material.get(value));
@@ -279,10 +284,8 @@ public final class ReflectionUtilities {
       final Class<?> type, final Class<? extends Annotation> annotation) {
     final List<Method> methods = new ArrayList<>();
     Class<?> clazz = type;
-    while (clazz
-        != Object
-            .class) { // need to iterated thought hierarchy in order to retrieve methods from above
-                      // the current instance
+    while (clazz != Object.class) { // need to iterated thought hierarchy in order to retrieve methods from above
+                                    // the current instance
       // iterate though the list of methods declared in the class represented by class variable, and
       // add those annotated with the specified annotation
       final List<Method> allMethods = new ArrayList<>(Arrays.asList(clazz.getDeclaredMethods()));
@@ -300,11 +303,12 @@ public final class ReflectionUtilities {
   /**
    * Gets the events for the specified type.
    *
-   * <p>This will search for all methods that have a parameter of type {@code EventListener} and
-   * match the LITIENGINE's naming conventions for event subscription (i.e. the method name starts
-   * with one of the prefixes "add" or "on".
+   * <p>
+   * This will search for all methods that have a parameter of type {@code EventListener} and match the LITIENGINE's
+   * naming conventions for event subscription (i.e. the method name starts with one of the prefixes "add" or "on".
    *
-   * @param type The type to inspect the events on.
+   * @param type
+   *          The type to inspect the events on.
    * @return All methods on the specified type that are considered to be events.
    * @see EventListener
    */
@@ -314,10 +318,8 @@ public final class ReflectionUtilities {
 
     final List<Method> events = new ArrayList<>();
     Class<?> clazz = type;
-    while (clazz
-        != Object
-            .class) { // need to iterated thought hierarchy in order to retrieve methods from above
-                      // the current instance
+    while (clazz != Object.class) { // need to iterated thought hierarchy in order to retrieve methods from above
+                                    // the current instance
       // iterate though the list of methods declared in the class represented by class variable, and
       // add those annotated with the specified annotation
       final List<Method> allMethods = new ArrayList<>(Arrays.asList(clazz.getDeclaredMethods()));

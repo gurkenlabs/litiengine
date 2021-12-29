@@ -25,7 +25,9 @@ public class TriggerMapObjectLoader extends MapObjectLoader {
     }
 
     final String message = mapObject.getStringValue(MapObjectProperty.TRIGGER_MESSAGE);
-    final TriggerActivation act = mapObject.getStringValue(MapObjectProperty.TRIGGER_ACTIVATION) != null ? TriggerActivation.valueOf(mapObject.getStringValue(MapObjectProperty.TRIGGER_ACTIVATION)) : TriggerActivation.COLLISION;
+    final TriggerActivation act = mapObject.getStringValue(MapObjectProperty.TRIGGER_ACTIVATION) != null
+        ? TriggerActivation.valueOf(mapObject.getStringValue(MapObjectProperty.TRIGGER_ACTIVATION))
+        : TriggerActivation.COLLISION;
     final boolean oneTime = mapObject.getBoolValue(MapObjectProperty.TRIGGER_ONETIME);
     final int coolDown = mapObject.getIntValue(MapObjectProperty.TRIGGER_COOLDOWN);
 

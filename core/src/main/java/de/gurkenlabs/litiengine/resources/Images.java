@@ -10,8 +10,7 @@ import de.gurkenlabs.litiengine.entities.Rotation;
 import de.gurkenlabs.litiengine.util.Imaging;
 
 public final class Images extends ResourcesContainer<BufferedImage> {
-  Images() {
-  }
+  Images() {}
 
   /**
    * Loads all images from the specified texture atlas.
@@ -36,8 +35,8 @@ public final class Images extends ResourcesContainer<BufferedImage> {
   }
 
   /**
-   * Loads the image by the specified resourceName. This method supports both
-   * loading images from a folder and loading them from the resources.
+   * Loads the image by the specified resourceName. This method supports both loading images from a folder and loading
+   * them from the resources.
    *
    * @param resourceName
    *          The path to the image.

@@ -21,7 +21,8 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
   /**
    * Initializes a new instance of the {@code EntityAnimationController} class.
    *
-   * @param entity The entity related to this animation controller.
+   * @param entity
+   *          The entity related to this animation controller.
    * @see #getEntity()
    */
   public EntityAnimationController(final T entity) {
@@ -36,9 +37,12 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
   /**
    * Initializes a new instance of the {@code EntityAnimationController} class.
    *
-   * @param entity The entity related to this animation controller.
-   * @param defaultAnimation The default animation for this controller.
-   * @param animations Additional animations that are managed by this controller instance.
+   * @param entity
+   *          The entity related to this animation controller.
+   * @param defaultAnimation
+   *          The default animation for this controller.
+   * @param animations
+   *          Additional animations that are managed by this controller instance.
    * @see #getEntity()
    * @see #getDefault()
    * @see #getAll()
@@ -54,8 +58,10 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
   /**
    * Initializes a new instance of the {@code EntityAnimationController} class.
    *
-   * @param entity The entity related to this animation controller.
-   * @param sprite The sprite sheet used by the default animation of this controller.
+   * @param entity
+   *          The entity related to this animation controller.
+   * @param sprite
+   *          The sprite sheet used by the default animation of this controller.
    */
   public EntityAnimationController(final T entity, final Spritesheet sprite) {
     this(entity, sprite, true);
@@ -64,10 +70,12 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
   /**
    * Initializes a new instance of the {@code EntityAnimationController} class.
    *
-   * @param entity The entity related to this animation controller.
-   * @param sprite The sprite sheet used by the default animation of this controller.
-   * @param loop A flag indicating whether the default animation should be looped or only played
-   *     once.
+   * @param entity
+   *          The entity related to this animation controller.
+   * @param sprite
+   *          The sprite sheet used by the default animation of this controller.
+   * @param loop
+   *          A flag indicating whether the default animation should be looped or only played once.
    */
   public EntityAnimationController(final T entity, final Spritesheet sprite, boolean loop) {
     this(

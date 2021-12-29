@@ -272,8 +272,7 @@ public class Editor extends Screen {
 
   public void load() {
     if (EditorFileChooser.showFileDialog(
-            ResourceBundle.FILE_EXTENSION, GAME_FILE_NAME, false, ResourceBundle.FILE_EXTENSION)
-        == JFileChooser.APPROVE_OPTION) {
+        ResourceBundle.FILE_EXTENSION, GAME_FILE_NAME, false, ResourceBundle.FILE_EXTENSION) == JFileChooser.APPROVE_OPTION) {
       this.load(EditorFileChooser.instance().getSelectedFile(), false);
     }
   }
@@ -411,11 +410,10 @@ public class Editor extends Screen {
   public void importSpriteFile() {
 
     if (EditorFileChooser.showFileDialog(
-            SPRITE_FILE_NAME,
-            Resources.strings().get(IMPORT_DIALOGUE, SPRITE_FILE_NAME),
-            false,
-            SpritesheetResource.PLAIN_TEXT_FILE_EXTENSION)
-        == JFileChooser.APPROVE_OPTION) {
+        SPRITE_FILE_NAME,
+        Resources.strings().get(IMPORT_DIALOGUE, SPRITE_FILE_NAME),
+        false,
+        SpritesheetResource.PLAIN_TEXT_FILE_EXTENSION) == JFileChooser.APPROVE_OPTION) {
       File spriteFile = EditorFileChooser.instance().getSelectedFile();
       if (spriteFile == null) {
         return;
@@ -436,22 +434,20 @@ public class Editor extends Screen {
 
   public void importSpriteSheets() {
     if (EditorFileChooser.showFileDialog(
-            SPRITESHEET_FILE_NAME,
-            Resources.strings().get(IMPORT_DIALOGUE, SPRITE_FILE_NAME),
-            true,
-            ImageFormat.getAllExtensions())
-        == JFileChooser.APPROVE_OPTION) {
+        SPRITESHEET_FILE_NAME,
+        Resources.strings().get(IMPORT_DIALOGUE, SPRITE_FILE_NAME),
+        true,
+        ImageFormat.getAllExtensions()) == JFileChooser.APPROVE_OPTION) {
       this.importSpriteSheets(EditorFileChooser.instance().getSelectedFiles());
     }
   }
 
   public void importSounds() {
     if (EditorFileChooser.showFileDialog(
-            AUDIO_FILE_NAME,
-            Resources.strings().get(IMPORT_DIALOGUE, AUDIO_FILE_NAME),
-            true,
-            SoundFormat.getAllExtensions())
-        == JFileChooser.APPROVE_OPTION) {
+        AUDIO_FILE_NAME,
+        Resources.strings().get(IMPORT_DIALOGUE, AUDIO_FILE_NAME),
+        true,
+        SoundFormat.getAllExtensions()) == JFileChooser.APPROVE_OPTION) {
       this.importSounds(EditorFileChooser.instance().getSelectedFiles());
     }
   }
@@ -483,7 +479,7 @@ public class Editor extends Screen {
     // get all spritesheets
     List<Spritesheet> allSpriteSheets = new ArrayList<>(Resources.spritesheets().getAll());
     Collections.sort(allSpriteSheets);
-    try (BufferedWriter writer = new BufferedWriter(new FileWriter(chooser.getSelectedFile())); ) {
+    try (BufferedWriter writer = new BufferedWriter(new FileWriter(chooser.getSelectedFile()));) {
       // print the spritesheet information to the info file
       for (Spritesheet spritesheet : allSpriteSheets) {
         // check for keyframes
@@ -517,11 +513,10 @@ public class Editor extends Screen {
 
   public void importTextureAtlas() {
     if (EditorFileChooser.showFileDialog(
-            TEXTUREATLAS_FILE_NAME,
-            Resources.strings().get(IMPORT_DIALOGUE, TEXTUREATLAS_FILE_NAME),
-            false,
-            "xml")
-        == JFileChooser.APPROVE_OPTION) {
+        TEXTUREATLAS_FILE_NAME,
+        Resources.strings().get(IMPORT_DIALOGUE, TEXTUREATLAS_FILE_NAME),
+        false,
+        "xml") == JFileChooser.APPROVE_OPTION) {
       TextureAtlas atlas =
           TextureAtlas.read(EditorFileChooser.instance().getSelectedFile().getAbsolutePath());
       if (atlas == null) {
@@ -635,7 +630,7 @@ public class Editor extends Screen {
           }
 
           if (this.gameFile.getBluePrints().stream()
-                  .anyMatch(x -> x.getName().equals(blueprint.getName()))
+              .anyMatch(x -> x.getName().equals(blueprint.getName()))
               && !ConfirmDialog.show(
                   Resources.strings().get("import_blueprint_title"),
                   Resources.strings().get("import_blueprint_question", blueprint.getName()))) {
@@ -667,7 +662,7 @@ public class Editor extends Screen {
           }
 
           if (this.gameFile.getTilesets().stream()
-                  .anyMatch(x -> x.getName().equals(tileset.getName()))
+              .anyMatch(x -> x.getName().equals(tileset.getName()))
               && !ConfirmDialog.show(
                   Resources.strings().get("import_tileset_title"),
                   Resources.strings().get("import_tileset_title", tileset.getName()))) {
@@ -833,13 +828,13 @@ public class Editor extends Screen {
         Level.INFO,
         "saved {0} maps, {1} spritesheets, {2} tilesets, {3} emitters, {4} blueprints, {5} sounds to {6}",
         new Object[] {
-          this.getGameFile().getMaps().size(),
-          this.getGameFile().getSpriteSheets().size(),
-          this.getGameFile().getTilesets().size(),
-          this.getGameFile().getEmitters().size(),
-          this.getGameFile().getBluePrints().size(),
-          this.getGameFile().getSounds().size(),
-          this.currentResourceFile
+            this.getGameFile().getMaps().size(),
+            this.getGameFile().getSpriteSheets().size(),
+            this.getGameFile().getTilesets().size(),
+            this.getGameFile().getEmitters().size(),
+            this.getGameFile().getBluePrints().size(),
+            this.getGameFile().getSounds().size(),
+            this.currentResourceFile
         });
     this.setCurrentStatus(Resources.strings().get("status_gamefile_saved"));
 
@@ -852,11 +847,10 @@ public class Editor extends Screen {
       UndoManager.save(map);
 
       if (preferences().syncMaps()) {
-        for (String file :
-            FileUtilities.findFilesByExtension(
-                new ArrayList<>(),
-                Paths.get(FileUtilities.combine(this.getProjectPath(), "maps")),
-                map.getName() + "." + TmxMap.FILE_EXTENSION)) {
+        for (String file : FileUtilities.findFilesByExtension(
+            new ArrayList<>(),
+            Paths.get(FileUtilities.combine(this.getProjectPath(), "maps")),
+            map.getName() + "." + TmxMap.FILE_EXTENSION)) {
           File newFile = XmlUtilities.save(map, file, TmxMap.FILE_EXTENSION);
           log.log(Level.INFO, "synchronized map {0}", new Object[] {newFile});
         }

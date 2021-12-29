@@ -37,7 +37,8 @@ public class EntityEmitter extends Emitter {
   /**
    * Instantiates a new entity emitter.
    *
-   * @param entity the entity
+   * @param entity
+   *          the entity
    */
   public EntityEmitter(final IEntity entity) {
     this(entity, false);
@@ -46,9 +47,11 @@ public class EntityEmitter extends Emitter {
   /**
    * Instantiates a new entity emitter.
    *
-   * @param entity the entity
-   * @param dynamicLocation if true, move the Emitter along with its Entity once it moves. If false,
-   *     always keep the original Location of the Emitter
+   * @param entity
+   *          the entity
+   * @param dynamicLocation
+   *          if true, move the Emitter along with its Entity once it moves. If false, always keep the original Location
+   *          of the Emitter
    */
   public EntityEmitter(final IEntity entity, boolean dynamicLocation) {
     super(entity.getX(), entity.getY());

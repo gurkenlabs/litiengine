@@ -17,7 +17,8 @@ public class SwingHelpers {
   /**
    * Update color text field background to the decoded color value.
    *
-   * @param textField the text field
+   * @param textField
+   *          the text field
    */
   public static void updateColorTextField(final JTextComponent textField, Color color) {
     if (color == null) {
@@ -33,7 +34,8 @@ public class SwingHelpers {
   /**
    * Update color text field background to the decoded color value.
    *
-   * @param label the text field
+   * @param label
+   *          the text field
    */
   public static void updateColorLabel(final JLabel label, Color color) {
     if (color == null) {
@@ -49,7 +51,8 @@ public class SwingHelpers {
                 cacheKey,
                 () -> {
                   BufferedImage img = Imaging.getCompatibleImage(10, 10);
-                  if (img == null) return null;
+                  if (img == null)
+                    return null;
                   Graphics2D g = (Graphics2D) img.getGraphics();
                   g.setColor(color);
                   g.fillRect(0, 0, PropertyPanel.CONTROL_HEIGHT, PropertyPanel.CONTROL_HEIGHT);

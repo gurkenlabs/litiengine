@@ -67,8 +67,8 @@ public class AStarTests {
   }
 
   /**
-   * This method is used to fill in the arguments of the parametrized test {@link
-   * #testGetCostsSimpleDirections(String, AStarNode, double)}
+   * This method is used to fill in the arguments of the parametrized test
+   * {@link #testGetCostsSimpleDirections(String, AStarNode, double)}
    *
    * @return Test arguments
    */
@@ -95,8 +95,8 @@ public class AStarTests {
   }
 
   /**
-   * This method is used to fill in the arguments of the parametrized test {@link
-   * #testGetCostsAdvancedDirections(String, AStarNode)}
+   * This method is used to fill in the arguments of the parametrized test
+   * {@link #testGetCostsAdvancedDirections(String, AStarNode)}
    *
    * @return Test arguments
    */

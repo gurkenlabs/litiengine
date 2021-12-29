@@ -1,7 +1,6 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
@@ -156,8 +155,8 @@ public abstract class PropertyPanel extends JPanel {
         JLabel label = comboBox.getModel().getElementAt(i);
         if (label != null
             && label
-            .getText()
-            .equals(mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME))) {
+                .getText()
+                .equals(mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME))) {
           comboBox.setSelectedItem(label);
           break;
         }
@@ -196,8 +195,8 @@ public abstract class PropertyPanel extends JPanel {
     comboBox.addActionListener(
         new MapObjectPropertyActionListener(
             m -> {
-              if(!m.hasCustomProperty(property) || m.getStringValue(property) == null){
-               return true;
+              if (!m.hasCustomProperty(property) || m.getStringValue(property) == null) {
+                return true;
               }
 
               T value = comboBox.getModel().getElementAt(comboBox.getSelectedIndex());
@@ -216,7 +215,7 @@ public abstract class PropertyPanel extends JPanel {
     comboBox.addActionListener(
         new MapObjectPropertyActionListener(
             m -> {
-              if(!m.hasCustomProperty(property) || m.getStringValue(property) == null){
+              if (!m.hasCustomProperty(property) || m.getStringValue(property) == null) {
                 return true;
               }
 
@@ -268,7 +267,8 @@ public abstract class PropertyPanel extends JPanel {
     }
     textList.addActionListener(
         new MapObjectPropertyActionListener(
-            m -> !m.hasCustomProperty(property) || m.getStringValue(property) == null || !m.getStringValue(property).equals(textList.getJoinedString()),
+            m -> !m.hasCustomProperty(property) || m.getStringValue(property) == null
+                || !m.getStringValue(property).equals(textList.getJoinedString()),
             m -> m.setValue(property, textList.getJoinedString())));
   }
 

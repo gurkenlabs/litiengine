@@ -69,9 +69,9 @@ class ResolutionRatioTests {
   private static Stream<Arguments> getRatioParameters() {
     // arrange, act
     return Stream.of(
-            Arguments.of(Resolution.Ratio16x9.getAll(), "16:9"),
-            Arguments.of(Resolution.Ratio16x10.getAll(), "16:10"),
-            Arguments.of(Resolution.Ratio4x3.getAll(), "4:3"),
-            Arguments.of(Resolution.Ratio5x4.getAll(), "5:4"));
+        Arguments.of(Resolution.Ratio16x9.getAll(), "16:9"),
+        Arguments.of(Resolution.Ratio16x10.getAll(), "16:10"),
+        Arguments.of(Resolution.Ratio4x3.getAll(), "4:3"),
+        Arguments.of(Resolution.Ratio5x4.getAll(), "5:4"));
   }
 }

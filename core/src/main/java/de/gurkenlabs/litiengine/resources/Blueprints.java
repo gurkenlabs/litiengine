@@ -11,12 +11,12 @@ import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 
 public class Blueprints extends ResourcesContainer<Blueprint> {
 
-  Blueprints() {
-  }
+  Blueprints() {}
 
   public static boolean isSupported(String fileName) {
     String extension = FileUtilities.getExtension(fileName);
-    return extension != null && !extension.isEmpty() && (extension.equalsIgnoreCase(Blueprint.BLUEPRINT_FILE_EXTENSION) || extension.equalsIgnoreCase(Blueprint.TEMPLATE_FILE_EXTENSION));
+    return extension != null && !extension.isEmpty()
+        && (extension.equalsIgnoreCase(Blueprint.BLUEPRINT_FILE_EXTENSION) || extension.equalsIgnoreCase(Blueprint.TEMPLATE_FILE_EXTENSION));
   }
 
   @Override

@@ -16,8 +16,7 @@ public final class MapProperty {
   public static final String MAP_TITLE = "MAP_TITLE";
   public static final String GRAVITY = "GRAVITY";
 
-  private MapProperty() {
-  }
+  private MapProperty() {}
 
   private static List<String> availableProperties = new ArrayList<>();
 

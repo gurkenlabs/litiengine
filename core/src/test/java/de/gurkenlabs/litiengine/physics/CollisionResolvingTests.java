@@ -107,7 +107,7 @@ class CollisionResolvingTests {
     // "slide" along the rectangle to the bottom left
     // TODO: target collision box wrongfully detects an intersection with blocking collision box due
     // to floating point precision miscalculation
-    //  within method GeometricUtilities.intersects - intersection is marginally positive in case of
+    // within method GeometricUtilities.intersects - intersection is marginally positive in case of
     // left movement, but marginally negative in right movement
     // Game.physics().move(ent, 315, MOVE_10X10Y_DISTANCE);
     Game.physics().move(ent, 315, MOVE_10X10Y_DISTANCE - (1e-14));
@@ -174,9 +174,9 @@ class CollisionResolvingTests {
     Game.physics().update();
 
     // TODO: technically, should the square block the entity from moving into it?
-    //  When removing the right rectangle (which collides in movement step 3), the entity moves to
+    // When removing the right rectangle (which collides in movement step 3), the entity moves to
     // (10,15) and
-    //  overlaps with the square instead of being blocked. This is only avoided by the right
+    // overlaps with the square instead of being blocked. This is only avoided by the right
     // rectangle...
 
     // act, assert
@@ -197,8 +197,8 @@ class CollisionResolvingTests {
   @ParameterizedTest(
       name = "testCollisionWithMapBounds_xCoordinate angle={0}, distance={1}, expectedX={2}")
   @CsvSource({
-    "270.0d, 20.0d, -10.0d",
-    "90.0d, 50.0d, 30.0d",
+      "270.0d, 20.0d, -10.0d",
+      "90.0d, 50.0d, 30.0d",
   })
   void testCollisionWithMapBounds_xCoordinate(double angle, double distance, double expectedX) {
     Creature ent = getNewCreature();
@@ -217,8 +217,8 @@ class CollisionResolvingTests {
   @ParameterizedTest(
       name = "testCollisionWithMapBounds_yCoordinate angle={0}, distance={1}, expectedY={2}")
   @CsvSource({
-    "180.0d, 20.0d, -10.0d",
-    "0, 50.0d, 30.0d",
+      "180.0d, 20.0d, -10.0d",
+      "0, 50.0d, 30.0d",
   })
   void testCollisionWithMapBounds_yCoordinate(double angle, double distance, double expectedY) {
     Creature ent = getNewCreature();

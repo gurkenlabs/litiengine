@@ -62,8 +62,10 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   /**
    * Instantiates a new {@code Trigger} entity.
    *
-   * @param activation The activation method for this trigger.
-   * @param message The message that gets sent by this trigger upon activation.
+   * @param activation
+   *          The activation method for this trigger.
+   * @param message
+   *          The message that gets sent by this trigger upon activation.
    */
   public Trigger(final TriggerActivation activation, final String message) {
     this(activation, null, message);
@@ -72,9 +74,12 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   /**
    * Instantiates a new {@code Trigger} entity.
    *
-   * @param activation The activation method for this trigger.
-   * @param name The name of this trigger.
-   * @param message The message that gets sent by this trigger upon activation.
+   * @param activation
+   *          The activation method for this trigger.
+   * @param name
+   *          The name of this trigger.
+   * @param message
+   *          The message that gets sent by this trigger upon activation.
    */
   public Trigger(final TriggerActivation activation, final String name, final String message) {
     this(activation, name, message, false);
@@ -83,9 +88,12 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   /**
    * Instantiates a new {@code Trigger} entity.
    *
-   * @param activation The activation method for this trigger.
-   * @param message The message that gets sent by this trigger upon activation.
-   * @param isOneTime A flag, indicating whether this instance can only be triggered once.
+   * @param activation
+   *          The activation method for this trigger.
+   * @param message
+   *          The message that gets sent by this trigger upon activation.
+   * @param isOneTime
+   *          A flag, indicating whether this instance can only be triggered once.
    */
   public Trigger(
       final TriggerActivation activation, final String message, final boolean isOneTime) {
@@ -99,10 +107,14 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   /**
    * Instantiates a new {@code Trigger} entity.
    *
-   * @param activation The activation method for this trigger.
-   * @param name The name of this trigger.
-   * @param message The message that gets sent by this trigger upon activation.
-   * @param isOneTime A flag, indicating whether this instance can only be triggered once.
+   * @param activation
+   *          The activation method for this trigger.
+   * @param name
+   *          The name of this trigger.
+   * @param message
+   *          The message that gets sent by this trigger upon activation.
+   * @param isOneTime
+   *          A flag, indicating whether this instance can only be triggered once.
    */
   public Trigger(
       final TriggerActivation activation,
@@ -116,10 +128,14 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   /**
    * Initializes a new instance of the {@code Trigger} class.
    *
-   * @param activation The activation method for this trigger.
-   * @param message The message that gets sent by this trigger upon activation.
-   * @param isOneTime A flag, indicating whether this instance can only be triggered once.
-   * @param cooldown The cooldown that needs to be respected between two activation events.
+   * @param activation
+   *          The activation method for this trigger.
+   * @param message
+   *          The message that gets sent by this trigger upon activation.
+   * @param isOneTime
+   *          A flag, indicating whether this instance can only be triggered once.
+   * @param cooldown
+   *          The cooldown that needs to be respected between two activation events.
    */
   public Trigger(
       final TriggerActivation activation,
@@ -205,7 +221,8 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   /**
    * Checks whether the specified entity can interact with this trigger.
    *
-   * @param entity The entity.
+   * @param entity
+   *          The entity.
    * @return True if the entity can interact with the trigger; otherwise false.
    */
   public boolean canTrigger(ICollisionEntity entity) {

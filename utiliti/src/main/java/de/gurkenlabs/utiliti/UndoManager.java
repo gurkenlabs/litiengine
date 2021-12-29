@@ -259,8 +259,8 @@ public class UndoManager {
   }
 
   /**
-   * This method is used to mark the current map as changed/unsaved which is mainly useful when
-   * something other than a {@code MapObject} changed (e.g. a layer).
+   * This method is used to mark the current map as changed/unsaved which is mainly useful when something other than a
+   * {@code MapObject} changed (e.g. a layer).
    */
   public void recordChanges() {
     fireUndoStackChangedEvent(this);

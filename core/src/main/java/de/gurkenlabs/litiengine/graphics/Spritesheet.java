@@ -9,9 +9,7 @@ import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.awt.image.RasterFormatException;
-import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 
 public final class Spritesheet implements Comparable<Spritesheet> {
@@ -29,14 +27,17 @@ public final class Spritesheet implements Comparable<Spritesheet> {
   private int spriteWidth;
 
   /**
-   * Instantiates a new {@code Spritesheet} instance. Depending on the given {@code spriteWidth} and
-   * {@code spriteHeight}, the sub-images will be cropped from the spritesheet image when accessing
-   * individual sprites.
+   * Instantiates a new {@code Spritesheet} instance. Depending on the given {@code spriteWidth} and {@code spriteHeight},
+   * the sub-images will be cropped from the spritesheet image when accessing individual sprites.
    *
-   * @param image the spritesheet image
-   * @param path the path (or name) of the spritesheet image
-   * @param spriteWidth the width in pixels of each sprite in the spritesheet.
-   * @param spriteHeight the height in pixels of each sprite in the spritesheet.
+   * @param image
+   *          the spritesheet image
+   * @param path
+   *          the path (or name) of the spritesheet image
+   * @param spriteWidth
+   *          the width in pixels of each sprite in the spritesheet.
+   * @param spriteHeight
+   *          the height in pixels of each sprite in the spritesheet.
    */
   public Spritesheet(
       final BufferedImage image, final String path, final int spriteWidth, final int spriteHeight) {
@@ -108,8 +109,7 @@ public final class Spritesheet implements Comparable<Spritesheet> {
   }
 
   /**
-   * The unique name of this spritesheet. A spritesheet can always be identified by this name within
-   * a game project.
+   * The unique name of this spritesheet. A spritesheet can always be identified by this name within a game project.
    *
    * @return The name of the spritesheet.
    */

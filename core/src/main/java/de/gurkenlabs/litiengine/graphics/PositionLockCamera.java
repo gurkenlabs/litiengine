@@ -10,7 +10,8 @@ public class PositionLockCamera extends Camera {
   /**
    * Initializes a new instance of the {@code PositionLockCamera}.
    *
-   * @param entity The entity to which the focus will be locked.
+   * @param entity
+   *          The entity to which the focus will be locked.
    */
   public PositionLockCamera(final IEntity entity) {
     super();

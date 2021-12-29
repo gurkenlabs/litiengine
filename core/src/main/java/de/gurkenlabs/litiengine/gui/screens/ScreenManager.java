@@ -11,12 +11,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * The {@code ScreenManager} holds instances of all available screens and handles whenever a
- * different {@code Screen} should be shown to the player. It provides the currently active Screen
- * for the Game’s {@code RenderComponent} which calls the {@code Screen.render(Graphics2D)} method
- * on every tick of the {@code RenderLoop}. Overwriting this method provides the ability to define a
- * customized render pipeline that suits the need of a particular Screen implementation. With the
- * GameScreen, the LITIENGINE provides a simple default Screen implementation that renders the
+ * The {@code ScreenManager} holds instances of all available screens and handles whenever a different {@code Screen}
+ * should be shown to the player. It provides the currently active Screen for the Game’s {@code RenderComponent} which
+ * calls the {@code Screen.render(Graphics2D)} method on every tick of the {@code RenderLoop}. Overwriting this method
+ * provides the ability to define a customized render pipeline that suits the need of a particular Screen
+ * implementation. With the GameScreen, the LITIENGINE provides a simple default Screen implementation that renders the
  * current {@code Environment} and all its {@code GuiComponents}.
  *
  * @see Screen
@@ -53,10 +52,10 @@ public final class ScreenManager {
   }
 
   /**
-   * Adds the specified screen changed listener to receive events when the current screen was
-   * changed.
+   * Adds the specified screen changed listener to receive events when the current screen was changed.
    *
-   * @param listener The listener to add.
+   * @param listener
+   *          The listener to add.
    */
   public void addScreenChangedListener(ScreenChangedListener listener) {
     this.screenChangedListeners.add(listener);
@@ -65,7 +64,8 @@ public final class ScreenManager {
   /**
    * Removes the specified screen changed listener.
    *
-   * @param listener The listener to remove.
+   * @param listener
+   *          The listener to remove.
    */
   public void removeScreenChangedListener(ScreenChangedListener listener) {
     this.screenChangedListeners.remove(listener);
@@ -74,7 +74,8 @@ public final class ScreenManager {
   /**
    * Adds the specified screen instance to the manager.
    *
-   * @param screen The screen to add.
+   * @param screen
+   *          The screen to add.
    */
   public void add(final Screen screen) {
     screen.setWidth(Game.window().getWidth());
@@ -89,7 +90,8 @@ public final class ScreenManager {
   /**
    * Removes the specified screen instance from the manager.
    *
-   * @param screen The screen to remove.
+   * @param screen
+   *          The screen to remove.
    */
   public void remove(Screen screen) {
     this.screens.remove(screen);
@@ -105,7 +107,8 @@ public final class ScreenManager {
   /**
    * Displays the specified screen by setting
    *
-   * @param screen The screen to be displayed.
+   * @param screen
+   *          The screen to be displayed.
    */
   public void display(final Screen screen) {
     if (Game.hasStarted() && Game.time().since(this.lastScreenChange) < this.getChangeCooldown()) {
@@ -141,7 +144,8 @@ public final class ScreenManager {
   /**
    * Displays the {@code Screen} with the specified name.
    *
-   * @param screenName The name of the screen to be displayed.
+   * @param screenName
+   *          The name of the screen to be displayed.
    */
   public void display(final String screenName) {
     if (this.current() != null && this.current().getName().equalsIgnoreCase(screenName)) {
@@ -172,7 +176,8 @@ public final class ScreenManager {
   /**
    * Gets the screen by its name.
    *
-   * @param screenName The name of the screen.
+   * @param screenName
+   *          The name of the screen.
    * @return The
    */
   public Screen get(String screenName) {
@@ -205,8 +210,8 @@ public final class ScreenManager {
   }
 
   /**
-   * Gets the screen change cooldown which is used to ensure that screens cannot be switched too
-   * quickly while the game is running.
+   * Gets the screen change cooldown which is used to ensure that screens cannot be switched too quickly while the game is
+   * running.
    *
    * @return The current change timeout for screens.
    * @see #DEFAULT_CHANGE_COOLDOWN
@@ -219,7 +224,8 @@ public final class ScreenManager {
   /**
    * Sets the cooldown for changing screens.
    *
-   * @param changeCooldown The cooldown for changing screens.
+   * @param changeCooldown
+   *          The cooldown for changing screens.
    */
   public void setChangeCooldown(int changeCooldown) {
     this.changeCooldown = changeCooldown;

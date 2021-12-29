@@ -167,6 +167,7 @@ public class AssetPanelItem extends JPanel {
               e.consume();
             }
           }
+
           @Override
           public void mouseReleased(MouseEvent e) {
             requestFocus();
@@ -187,6 +188,7 @@ public class AssetPanelItem extends JPanel {
           public void mouseClicked(MouseEvent e) {
             requestFocus();
           }
+
           @Override
           public void mouseReleased(MouseEvent e) {
             requestFocus();

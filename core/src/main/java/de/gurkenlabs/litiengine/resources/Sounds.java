@@ -16,8 +16,7 @@ import de.gurkenlabs.litiengine.util.io.FileUtilities;
 public final class Sounds extends ResourcesContainer<Sound> {
   private static final Logger log = Logger.getLogger(Sounds.class.getName());
 
-  Sounds() {
-  }
+  Sounds() {}
 
   /**
    * Loads a sound from the specified XML resource.
@@ -38,7 +37,7 @@ public final class Sounds extends ResourcesContainer<Sound> {
       this.add(resource.getName(), sound);
       return sound;
     } catch (IOException | UnsupportedAudioFileException e) {
-      log.log(Level.SEVERE, "The audio file {0} could not be loaded.", new Object[] { resource.getName() });
+      log.log(Level.SEVERE, "The audio file {0} could not be loaded.", new Object[] {resource.getName()});
     }
 
     return null;
@@ -55,7 +54,7 @@ public final class Sounds extends ResourcesContainer<Sound> {
   protected Sound load(URL resourceName) throws Exception {
     try (final InputStream is = Resources.get(resourceName)) {
       if (is == null) {
-        log.log(Level.SEVERE, "The audio file {0} could not be loaded.", new Object[] { resourceName });
+        log.log(Level.SEVERE, "The audio file {0} could not be loaded.", new Object[] {resourceName});
         return null;
       }
       return new Sound(is, FileUtilities.getFileName(resourceName));

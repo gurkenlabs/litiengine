@@ -12,7 +12,6 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
-import java.io.File;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -260,17 +259,16 @@ class ImagingTests {
   }
 
   /**
-   * This method is used for defining the input arguments of the parameterized test {@link
-   * #testRotate(String, Rotation)}
+   * This method is used for defining the input arguments of the parameterized test {@link #testRotate(String, Rotation)}
    *
    * @return Test arguments
    */
   @SuppressWarnings("unused")
   private static Stream<Arguments> getRotateArguments() {
     return Stream.of(
-            Arguments.of("de/gurkenlabs/litiengine/util/prop-flag.png", Rotation.NONE),
-            Arguments.of("de/gurkenlabs/litiengine/util/prop-flag-90.png", Rotation.ROTATE_90),
-            Arguments.of("de/gurkenlabs/litiengine/util/prop-flag-180.png", Rotation.ROTATE_180),
-            Arguments.of("de/gurkenlabs/litiengine/util/prop-flag-270.png", Rotation.ROTATE_270));
+        Arguments.of("de/gurkenlabs/litiengine/util/prop-flag.png", Rotation.NONE),
+        Arguments.of("de/gurkenlabs/litiengine/util/prop-flag-90.png", Rotation.ROTATE_90),
+        Arguments.of("de/gurkenlabs/litiengine/util/prop-flag-180.png", Rotation.ROTATE_180),
+        Arguments.of("de/gurkenlabs/litiengine/util/prop-flag-270.png", Rotation.ROTATE_270));
   }
 }

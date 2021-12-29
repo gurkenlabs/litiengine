@@ -10,22 +10,24 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import java.util.Optional;
 
 /**
- * This {@link AnimationController} implementation provides animation rules that use naming
- * conventions to provide {@link Animation}s for {@link Creature} implementations.
+ * This {@link AnimationController} implementation provides animation rules that use naming conventions to provide
+ * {@link Animation}s for {@link Creature} implementations.
  *
- * <p>The spritesheet images need to be named according to the following conventions in order to be
- * automatically used by this controller:
+ * <p>
+ * The spritesheet images need to be named according to the following conventions in order to be automatically used by
+ * this controller:
  *
  * <ul>
- *   <li>{@link #getSpritePrefix()}-idle-{DIRECTION}.{EXTENSION}
- *   <li>{@link #getSpritePrefix()}-walk-{DIRECTION}.{EXTENSION}
+ * <li>{@link #getSpritePrefix()}-idle-{DIRECTION}.{EXTENSION}
+ * <li>{@link #getSpritePrefix()}-walk-{DIRECTION}.{EXTENSION}
  * </ul>
  *
- * Where {DIRECTION} refers to a value of the {@link Direction} enum and {@link #getSpritePrefix()}
- * refers to the current sprite prefix of the entity. {EXTENSION} refers to a value of the {@link
- * de.gurkenlabs.litiengine.resources.ImageFormat} enum.
+ * Where {DIRECTION} refers to a value of the {@link Direction} enum and {@link #getSpritePrefix()} refers to the
+ * current sprite prefix of the entity. {EXTENSION} refers to a value of the
+ * {@link de.gurkenlabs.litiengine.resources.ImageFormat} enum.
  *
- * @param <T> The type of the creature for which animations are managed by this controller.
+ * @param <T>
+ *          The type of the creature for which animations are managed by this controller.
  * @see de.gurkenlabs.litiengine.entities.Creature
  * @see de.gurkenlabs.litiengine.Direction
  * @see de.gurkenlabs.litiengine.entities.IEntity#getName()
@@ -37,10 +39,11 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
   /**
    * Initializes a new instance of the {@code CreatureAnimationController} class.
    *
-   * @param creature The creature related to this controller.
-   * @param useFlippedSpritesAsFallback A flag indicating whether this controller should flip the
-   *     provided spritesheet horizontally to provide a fallback animation for left or right
-   *     directions.
+   * @param creature
+   *          The creature related to this controller.
+   * @param useFlippedSpritesAsFallback
+   *          A flag indicating whether this controller should flip the provided spritesheet horizontally to provide a
+   *          fallback animation for left or right directions.
    * @see #getEntity()
    */
   public CreatureAnimationController(T creature, boolean useFlippedSpritesAsFallback) {
@@ -51,8 +54,10 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
   /**
    * Initializes a new instance of the {@code CreatureAnimationController} class.
    *
-   * @param creature The creature related to this controller.
-   * @param defaultAnimation The default animation for this controller.
+   * @param creature
+   *          The creature related to this controller.
+   * @param defaultAnimation
+   *          The default animation for this controller.
    * @see #getEntity()
    * @see #getDefault()
    */
@@ -63,12 +68,15 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
   /**
    * Initializes a new instance of the {@code CreatureAnimationController} class.
    *
-   * @param creature The creature related to this controller.
-   * @param useFlippedSpritesAsFallback A flag indicating whether this controller should flip the
-   *     provided spritesheet horizontally to provide a fallback animation for left or right
-   *     directions.
-   * @param defaultAnimation The default animation for this controller.
-   * @param animations Additional animations that are managed by this controller instance.
+   * @param creature
+   *          The creature related to this controller.
+   * @param useFlippedSpritesAsFallback
+   *          A flag indicating whether this controller should flip the provided spritesheet horizontally to provide a
+   *          fallback animation for left or right directions.
+   * @param defaultAnimation
+   *          The default animation for this controller.
+   * @param animations
+   *          Additional animations that are managed by this controller instance.
    * @see #getEntity()
    * @see #getDefault()
    * @see #getAll()
@@ -85,10 +93,11 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
   /**
    * Gets the sprite name for the specified creature and animation state.
    *
-   * @param creature The creature to retrieve the sprite name for.
-   * @param state The current animation state.
-   * @return A string representing the sprite name for the specified creature in the defined
-   *     animation state.
+   * @param creature
+   *          The creature to retrieve the sprite name for.
+   * @param state
+   *          The current animation state.
+   * @return A string representing the sprite name for the specified creature in the defined animation state.
    * @see Creature#getSpritesheetName()
    */
   public static String getSpriteName(Creature creature, CreatureAnimationState state) {
@@ -98,11 +107,13 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
   /**
    * Gets the sprite name for the specified creature, animation state.and direction.
    *
-   * @param creature The creature to retrieve the sprite name for.
-   * @param state The current animation state.
-   * @param direction The direction in which the creature is facing.
-   * @return A string representing the sprite name for the specified creature, animation state and
-   *     facing direction.
+   * @param creature
+   *          The creature to retrieve the sprite name for.
+   * @param state
+   *          The current animation state.
+   * @param direction
+   *          The direction in which the creature is facing.
+   * @return A string representing the sprite name for the specified creature, animation state and facing direction.
    * @see Creature#getSpritesheetName()
    */
   public static String getSpriteName(
@@ -121,8 +132,8 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
   }
 
   /**
-   * This method evaluates the current animation name that depends on certain properties of the
-   * {@link #getEntity()}. Overwriting this method allows to specify more sophisticated animations.
+   * This method evaluates the current animation name that depends on certain properties of the {@link #getEntity()}.
+   * Overwriting this method allows to specify more sophisticated animations.
    *
    * @return The name of the current animation that should be played
    */

@@ -18,7 +18,8 @@ public interface IMovementController extends IEntityController {
   /**
    * Gets the delta x for each horizontal movement.
    *
-   * @param dx the new dx
+   * @param dx
+   *          the new dx
    */
   void setDx(float dx);
 
@@ -32,7 +33,8 @@ public interface IMovementController extends IEntityController {
   /**
    * Sets the delta y for each vertical movement.
    *
-   * @param dy the new dy
+   * @param dy
+   *          the new dy
    */
   void setDy(float dy);
 
@@ -46,14 +48,16 @@ public interface IMovementController extends IEntityController {
   /**
    * Sets the current velocity.
    *
-   * @param velocity The velocity to set.
+   * @param velocity
+   *          The velocity to set.
    */
   void setVelocity(double velocity);
 
   /**
    * Apply the force to the entity.
    *
-   * @param force the force being applied to the entity
+   * @param force
+   *          the force being applied to the entity
    */
   void apply(Force force);
 
@@ -71,8 +75,8 @@ public interface IMovementController extends IEntityController {
   /**
    * Checks given conditions before moving.
    *
-   * @param predicate the conditions that need to apply before moving. If they don't apply, the
-   *     entity won't be moved.
+   * @param predicate
+   *          the conditions that need to apply before moving. If they don't apply, the entity won't be moved.
    */
   void onMovementCheck(Predicate<IMobileEntity> predicate);
 }

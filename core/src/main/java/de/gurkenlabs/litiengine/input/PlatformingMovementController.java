@@ -11,16 +11,17 @@ import java.util.List;
 /**
  * A movement controller that supports keyboard input for horizontal entity movement.
  *
- * @param <T> The type of the controlled entity.
+ * @param <T>
+ *          The type of the controlled entity.
  */
 public class PlatformingMovementController<T extends IMobileEntity>
     extends KeyboardEntityController<T> {
   /**
-   * The identifier that is used by this controller to execute the jumping {@code EntityAction} on
-   * the related entity.
+   * The identifier that is used by this controller to execute the jumping {@code EntityAction} on the related entity.
    *
-   * <p><i>Note that the entity needs to either specify a method with an {@code Action} annotation
-   * that corresponds to this identifier or it needs to explicitly register an {@code
+   * <p>
+   * <i>Note that the entity needs to either specify a method with an {@code Action} annotation that corresponds to this
+   * identifier or it needs to explicitly register an {@code
    * EntityAction}.</i>
    *
    * @see IEntity#register(String, Runnable)
@@ -34,7 +35,8 @@ public class PlatformingMovementController<T extends IMobileEntity>
   /**
    * Instantiates a new platforming movement controller.
    *
-   * @param entity the entity
+   * @param entity
+   *          the entity
    */
   public PlatformingMovementController(final T entity) {
     this(entity, KeyEvent.VK_SPACE);
@@ -43,8 +45,10 @@ public class PlatformingMovementController<T extends IMobileEntity>
   /**
    * Instantiates a new platforming movement controller.
    *
-   * @param entity the entity
-   * @param jump the jump
+   * @param entity
+   *          the entity
+   * @param jump
+   *          the jump
    */
   public PlatformingMovementController(T entity, final int jump) {
     super(entity);
@@ -66,7 +70,8 @@ public class PlatformingMovementController<T extends IMobileEntity>
   /**
    * Adds a jump key.
    *
-   * @param keyCode the key code for the newly added jump key
+   * @param keyCode
+   *          the key code for the newly added jump key
    */
   public void addJumpKey(int keyCode) {
     if (this.jump.contains(keyCode)) {
@@ -88,7 +93,8 @@ public class PlatformingMovementController<T extends IMobileEntity>
   /**
    * Initializes the jump keys with a given array of key codes.
    *
-   * @param jump the new jump keys
+   * @param jump
+   *          the new jump keys
    */
   public void setJumpKeys(int... jump) {
     this.setUpKeys(ListUtilities.getIntList(jump));

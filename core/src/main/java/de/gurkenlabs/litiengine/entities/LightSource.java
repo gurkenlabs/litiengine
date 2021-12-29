@@ -63,10 +63,14 @@ public class LightSource extends Entity implements IRenderable {
   /**
    * Instantiates a new {@code LightSource} entity.
    *
-   * @param intensity The intensity of this instance.
-   * @param lightColor The color of this instance.
-   * @param shapeType The shape type of this instance.
-   * @param activated A flag indicating whether this light is activated by default.
+   * @param intensity
+   *          The intensity of this instance.
+   * @param lightColor
+   *          The color of this instance.
+   * @param shapeType
+   *          The shape type of this instance.
+   * @param activated
+   *          A flag indicating whether this light is activated by default.
    */
   public LightSource(
       final int intensity, final Color lightColor, final Type shapeType, boolean activated) {
@@ -268,7 +272,8 @@ public class LightSource extends Entity implements IRenderable {
    *     render with RadialGradientPaint to give it a "fade-out" appearance
    * </pre>
    *
-   * @param graphic the graphics to use for rendering
+   * @param graphic
+   *          the graphics to use for rendering
    */
   private void renderShadows(final Graphics2D graphic) {
     if (!Game.world().environment().getCombatEntities().stream()
@@ -306,9 +311,8 @@ public class LightSource extends Entity implements IRenderable {
   }
 
   private static Predicate<? super IEntity> isInRange(final Point2D center, final float radius) {
-    return mob ->
-        new Ellipse2D.Double(center.getX() - radius, center.getY() - radius, radius * 2, radius * 2)
-            .contains(mob.getCenter());
+    return mob -> new Ellipse2D.Double(center.getX() - radius, center.getY() - radius, radius * 2, radius * 2)
+        .contains(mob.getCenter());
   }
 
   private static Area getObstructedVisionArea(final IEntity mob, final Point2D center) {

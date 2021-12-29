@@ -44,7 +44,7 @@ public class LayerTable extends JTable {
 
   public void bind(IMap map) {
     this.map = map;
-    if (this.map == null){
+    if (this.map == null) {
       ((DefaultTableModel) this.getModel()).setRowCount(0);
       return;
     }
@@ -124,8 +124,7 @@ public class LayerTable extends JTable {
     }
     boolean layersChanged = false;
     for (int row = 0; row < this.getMap().getMapObjectLayers().size(); row++) {
-      if (this.getMap().getMapObjectLayers().get(row).isVisible()
-              != (boolean) this.getModel().getValueAt(row, 0)
+      if (this.getMap().getMapObjectLayers().get(row).isVisible() != (boolean) this.getModel().getValueAt(row, 0)
           || !this.getMap()
               .getMapObjectLayers()
               .get(row)

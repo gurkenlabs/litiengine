@@ -32,8 +32,7 @@ import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 public final class Maps extends ResourcesContainer<IMap> {
   private static final Logger log = Logger.getLogger(Maps.class.getName());
 
-  Maps() {
-  }
+  Maps() {}
 
   public static boolean isSupported(String fileName) {
     String extension = FileUtilities.getExtension(fileName);
@@ -209,7 +208,8 @@ public final class Maps extends ResourcesContainer<IMap> {
      * </p>
      *
      * @param entity
-     *          The entity to be converted to a map object and added to the first {@code MapObjectLayer} of the generated map.
+     *          The entity to be converted to a map object and added to the first {@code MapObjectLayer} of the generated
+     *          map.
      * @return The created map object.
      */
     public IMapObject add(IEntity entity) {
@@ -270,8 +270,8 @@ public final class Maps extends ResourcesContainer<IMap> {
     /**
      * <b>It is crucial to call this before using the generated map of this instance.</b><br>
      * <p>
-     * This will call the {@code finish} method on the map instance and make sure that the generated map is available
-     * over the resources API.
+     * This will call the {@code finish} method on the map instance and make sure that the generated map is available over
+     * the resources API.
      * </p>
      *
      * @see TmxMap#finish(URL)

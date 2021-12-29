@@ -8,8 +8,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 /**
- * This is an updated version with enhancements made by Daniel Migowski, Andre Bogus, and David
- * Koelle. Updated by David Koelle in 2017.
+ * This is an updated version with enhancements made by Daniel Migowski, Andre Bogus, and David Koelle. Updated by David
+ * Koelle in 2017.
  */
 class AlphanumComparatorTests implements Comparator<String> {
 

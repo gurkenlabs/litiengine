@@ -3,8 +3,7 @@ package de.gurkenlabs.litiengine.graphics;
 import de.gurkenlabs.litiengine.environment.Environment;
 
 /**
- * The RenderType defines how and when something is being rendered by the rendering pipeline of the
- * {@code Environment}.
+ * The RenderType defines how and when something is being rendered by the rendering pipeline of the {@code Environment}.
  *
  * @see Environment#render(java.awt.Graphics2D)
  */

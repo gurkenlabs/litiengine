@@ -21,7 +21,8 @@ public class Material extends CustomPropertyProvider {
   /**
    * Initializes a new instance of the {@code Material} class.
    *
-   * @param name The name of the material.
+   * @param name
+   *          The name of the material.
    */
   public Material(String name) {
     this.name = name;

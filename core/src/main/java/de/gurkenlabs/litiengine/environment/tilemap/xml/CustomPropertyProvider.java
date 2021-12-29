@@ -35,7 +35,8 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
    *          the PropertyProvider we want to copy
    */
   public CustomPropertyProvider(ICustomPropertyProvider propertyProviderToBeCopied) {
-    this.properties = propertyProviderToBeCopied.getProperties().entrySet().stream().collect(Collectors.toMap(Entry::getKey, e -> new CustomProperty((e.getValue()))));
+    this.properties = propertyProviderToBeCopied.getProperties().entrySet().stream()
+        .collect(Collectors.toMap(Entry::getKey, e -> new CustomProperty((e.getValue()))));
   }
 
   @Override

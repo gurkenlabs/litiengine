@@ -94,7 +94,8 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
   /**
    * Gets the collision box.
    *
-   * @param location the location
+   * @param location
+   *          the location
    * @return the collision box
    */
   @Override
@@ -153,7 +154,7 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
         return new float[] {(float) this.getCollisionBoxHeight()};
       case COLLISION_BOTH:
         return new float[] {
-          (float) this.getCollisionBoxWidth(), (float) this.getCollisionBoxHeight()
+            (float) this.getCollisionBoxWidth(), (float) this.getCollisionBoxHeight()
         };
       default:
         return super.getTweenValues(tweenType);
@@ -191,7 +192,8 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
   /**
    * Sets the collision.
    *
-   * @param collision the new collision
+   * @param collision
+   *          the new collision
    */
   @Override
   public void setCollision(final boolean collision) {

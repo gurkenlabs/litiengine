@@ -12,12 +12,12 @@ import jakarta.xml.bind.annotation.XmlTransient;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.CustomPropertyProvider;
 
 /**
- * The {@code GameInfo} class contains basic information about a LITIENGINE game.
- * The information can be accessed via {@code Game.getInfo()} and the infrastructure also internally uses this information
- * e.g. to setup the main window of the Game by providing an appropriate title.
+ * The {@code GameInfo} class contains basic information about a LITIENGINE game. The information can be accessed via
+ * {@code Game.getInfo()} and the infrastructure also internally uses this information e.g. to setup the main window of
+ * the Game by providing an appropriate title.
  * <p>
- * It should be the first thing that you do in you application entry point to setup or load this information.
- * Note that it's possible to keep this information in an XML file and load it up by calling {@code Game.setInfo(String)}.
+ * It should be the first thing that you do in you application entry point to setup or load this information. Note that
+ * it's possible to keep this information in an XML file and load it up by calling {@code Game.setInfo(String)}.
  * </p>
  *
  * @see Game#info()
@@ -59,7 +59,7 @@ public class GameInfo extends CustomPropertyProvider {
     this.name = "LITIENGINE Game";
     this.subtitle = "The pure 2D java game engine";
     this.description = "A game, created with the allmighty LITIENGINE.";
-    this.developers = new String[] { "Steffen Wilke", "Matthias Wilke" };
+    this.developers = new String[] {"Steffen Wilke", "Matthias Wilke"};
     this.version = "v1.0";
     this.website = "https://litiengine.com";
   }
@@ -95,8 +95,8 @@ public class GameInfo extends CustomPropertyProvider {
   }
 
   /**
-   * Gets the {@link #getWebsite()} as an {@code URL} object that can be used to further process the information.
-   * (e.g. the web site can be opened in the browser).
+   * Gets the {@link #getWebsite()} as an {@code URL} object that can be used to further process the information. (e.g.
+   * the web site can be opened in the browser).
    *
    * @return The game's web site as {@code URL}
    *
@@ -183,7 +183,8 @@ public class GameInfo extends CustomPropertyProvider {
    * @see #getVersion()
    */
   public String getTitle() {
-    return this.getSubTitle() != null && !this.getSubTitle().isEmpty() ? this.getName() + " " + this.getVersion() + " - " + this.getSubTitle() : this.getName() + " " + this.getVersion();
+    return this.getSubTitle() != null && !this.getSubTitle().isEmpty() ? this.getName() + " " + this.getVersion() + " - " + this.getSubTitle()
+        : this.getName() + " " + this.getVersion();
   }
 
   /**
@@ -197,7 +198,8 @@ public class GameInfo extends CustomPropertyProvider {
   }
 
   /**
-   * Sets the game's description. This can be seen as additional information about the game and will not be part of the game's title.
+   * Sets the game's description. This can be seen as additional information about the game and will not be part of the
+   * game's title.
    *
    * @param description
    *          The game's description.
@@ -219,8 +221,7 @@ public class GameInfo extends CustomPropertyProvider {
   }
 
   /**
-   * Sets the game's name.
-   * <br>
+   * Sets the game's name. <br>
    * This is the most basic information about a game and will be part of the game's title.
    *
    * @param name
@@ -233,8 +234,7 @@ public class GameInfo extends CustomPropertyProvider {
   }
 
   /**
-   * Sets the game's sub title.
-   * <br>
+   * Sets the game's sub title. <br>
    * This is basically an addendum to the game's name and will also be part of the game's title.
    *
    * @param subTitle
@@ -248,8 +248,7 @@ public class GameInfo extends CustomPropertyProvider {
   }
 
   /**
-   * Sets the game's version.
-   * <br>
+   * Sets the game's version. <br>
    * This is a textual representation of the game's version and will also be part of the game's title.<br>
    * Examples for good semantic version strings:
    * <ul>

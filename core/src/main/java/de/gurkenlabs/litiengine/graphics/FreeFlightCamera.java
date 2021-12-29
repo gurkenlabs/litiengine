@@ -20,8 +20,10 @@ public class FreeFlightCamera extends Camera implements IUpdateable {
   /**
    * Initializes a new instance of the {@code FreeFlightCamera} with the specified initial focus.
    *
-   * @param x The x-coordinate of the initial focus of this instance.
-   * @param y The y-coordinate of the initial focus of this instance.
+   * @param x
+   *          The x-coordinate of the initial focus of this instance.
+   * @param y
+   *          The y-coordinate of the initial focus of this instance.
    */
   public FreeFlightCamera(double x, double y) {
     this(new Point2D.Double(x, y));
@@ -30,7 +32,8 @@ public class FreeFlightCamera extends Camera implements IUpdateable {
   /**
    * Initializes a new instance of the {@code FreeFlightCamera} with the specified initial focus.
    *
-   * @param focus The initial focus of this instance.
+   * @param focus
+   *          The initial focus of this instance.
    */
   public FreeFlightCamera(final Point2D focus) {
     this.setFocus(focus);
@@ -80,16 +83,14 @@ public class FreeFlightCamera extends Camera implements IUpdateable {
     double deltaX = 0;
     if (mouseLocation.getX() < this.getScrollPadding()) {
       deltaX -= scrollSpeed;
-    } else if (Game.window().getResolution().getWidth() - mouseLocation.getX()
-        < this.getScrollPadding()) {
+    } else if (Game.window().getResolution().getWidth() - mouseLocation.getX() < this.getScrollPadding()) {
       deltaX += scrollSpeed;
     }
 
     double deltaY = 0;
     if (mouseLocation.getY() < this.getScrollPadding()) {
       deltaY -= scrollSpeed;
-    } else if (Game.window().getResolution().getHeight() - mouseLocation.getY()
-        < this.getScrollPadding()) {
+    } else if (Game.window().getResolution().getHeight() - mouseLocation.getY() < this.getScrollPadding()) {
       deltaY += scrollSpeed;
     }
 

@@ -3,7 +3,8 @@ package de.gurkenlabs.litiengine;
 import java.util.EventListener;
 
 /**
- * This listener interface is used for receiving events about the general life-cycle of the {@code Game} (e.g. started/terminated).
+ * This listener interface is used for receiving events about the general life-cycle of the {@code Game} (e.g.
+ * started/terminated).
  */
 public interface GameListener extends EventListener {
 
@@ -24,8 +25,8 @@ public interface GameListener extends EventListener {
   default void initialized(String... args) {}
 
   /**
-   * This method gets called before the {@code Game} is about to be terminated.
-   * Returning false prevents the terminate event to continue.
+   * This method gets called before the {@code Game} is about to be terminated. Returning false prevents the terminate
+   * event to continue.
    *
    * @return Return false to interrupt the termination process.
    */

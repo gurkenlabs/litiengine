@@ -43,7 +43,7 @@ public class CreaturePanel extends PropertyPanel {
 
   public static String getCreatureSpriteName(String name) {
     if (Arrays.stream(CreatureAnimationState.values())
-      .anyMatch(state -> name.contains(state.spriteString()))) {
+        .anyMatch(state -> name.contains(state.spriteString()))) {
       return name.split("-")[0];
     }
     return null;
@@ -71,8 +71,8 @@ public class CreaturePanel extends PropertyPanel {
   protected void setControlValues(IMapObject mapObject) {
     selectSpriteSheet(this.comboBoxSpriteSheets, mapObject);
     this.comboBoxDirection.setSelectedItem(
-      mapObject.getEnumValue(
-        MapObjectProperty.SPAWN_DIRECTION, Direction.class, Direction.UNDEFINED));
+        mapObject.getEnumValue(
+            MapObjectProperty.SPAWN_DIRECTION, Direction.class, Direction.UNDEFINED));
     this.checkBoxScale.setSelected(mapObject.getBoolValue(MapObjectProperty.SCALE_SPRITE));
   }
 
@@ -96,10 +96,10 @@ public class CreaturePanel extends PropertyPanel {
 
   private LayoutManager createLayout() {
     LayoutItem[] layoutItems =
-      new LayoutItem[]{
-        new LayoutItem("panel_sprite", this.comboBoxSpriteSheets),
-        new LayoutItem("panel_direction", this.comboBoxDirection),
-      };
+        new LayoutItem[] {
+            new LayoutItem("panel_sprite", this.comboBoxSpriteSheets),
+            new LayoutItem("panel_direction", this.comboBoxDirection),
+        };
 
     return this.createLayout(layoutItems, this.checkBoxScale);
   }

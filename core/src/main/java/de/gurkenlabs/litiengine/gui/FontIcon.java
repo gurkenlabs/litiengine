@@ -16,8 +16,10 @@ public class FontIcon {
   /**
    * Instantiates a new icon.
    *
-   * @param font the font
-   * @param text the text
+   * @param font
+   *          the font
+   * @param text
+   *          the text
    */
   public FontIcon(final Font font, final char text) {
     this.font = font;
@@ -50,12 +52,18 @@ public class FontIcon {
   /**
    * Render.
    *
-   * @param g the g
-   * @param color the color
-   * @param fontSize the font size
-   * @param x the x
-   * @param y the y
-   * @param bold the bold
+   * @param g
+   *          the g
+   * @param color
+   *          the color
+   * @param fontSize
+   *          the font size
+   * @param x
+   *          the x
+   * @param y
+   *          the y
+   * @param bold
+   *          the bold
    */
   public void render(
       final Graphics2D g,

@@ -19,8 +19,7 @@ public class DebugCrasher extends KeyAdapter {
   }
 
   private void debugCrash() {
-    if (((GameLoop) Game.loop()).getUncaughtExceptionHandler()
-        instanceof DefaultUncaughtExceptionHandler) {
+    if (((GameLoop) Game.loop()).getUncaughtExceptionHandler() instanceof DefaultUncaughtExceptionHandler) {
       ((DefaultUncaughtExceptionHandler) ((GameLoop) Game.loop()).getUncaughtExceptionHandler())
           .dumpThreads(true);
     }

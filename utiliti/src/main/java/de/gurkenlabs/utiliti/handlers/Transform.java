@@ -181,14 +181,13 @@ public final class Transform {
   }
 
   /**
-   * Moves the currently selected map objects by the distance the mouse passed since starting to
-   * drag.
+   * Moves the currently selected map objects by the distance the mouse passed since starting to drag.
    *
-   * <p>Map objects are moved relative to the corners of the most left and most top objects, i.e.
-   * the snapping will only be applied to the objects on the border and all the other objects keep
-   * their relative distances. <br>
-   * In a way this means that we're not moving the objects individually but instead move them as a
-   * group that doesn't change its internal positioning.
+   * <p>
+   * Map objects are moved relative to the corners of the most left and most top objects, i.e. the snapping will only be
+   * applied to the objects on the border and all the other objects keep their relative distances. <br>
+   * In a way this means that we're not moving the objects individually but instead move them as a group that doesn't
+   * change its internal positioning.
    */
   public static void move() {
     final List<IMapObject> selectedMapObjects = Editor.instance().getMapComponent().getSelectedMapObjects();
@@ -252,8 +251,8 @@ public final class Transform {
 
     boolean updated = false;
     for (IMapObject selected : selectedMapObjects) {
-      float newX = (float)drag.originalBounds.get(selected).getX() + deltaX;
-      float newY = (float)drag.originalBounds.get(selected).getY() + deltaY;
+      float newX = (float) drag.originalBounds.get(selected).getX() + deltaX;
+      float newY = (float) drag.originalBounds.get(selected).getY() + deltaY;
 
       if (selected.getX() != newX || selected.getY() != newY) {
         updated = true;
@@ -274,9 +273,8 @@ public final class Transform {
   }
 
   /***
-   * Updates the currently applicable transform by evaluating the focused resize
-   * anchor from the current mouse location or whether the mouse is currently
-   * hovered over any selected map object to allow a move transformation.
+   * Updates the currently applicable transform by evaluating the focused resize anchor from the current mouse location or
+   * whether the mouse is currently hovered over any selected map object to allow a move transformation.
    * <p>
    * This method also ensures that an adequate mouse cursor is set.
    * </p>

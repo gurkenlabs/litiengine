@@ -10,8 +10,9 @@ import de.gurkenlabs.litiengine.input.Keyboard;
 import de.gurkenlabs.litiengine.input.Mouse;
 
 /**
- * The main update loop that executes the game logic by calling the update functions on all registered {@code IUpdatable} instances.
- * Subsequently, it performs the rendering of the current frame and tracks some performance metrics on the process.
+ * The main update loop that executes the game logic by calling the update functions on all registered
+ * {@code IUpdatable} instances. Subsequently, it performs the rendering of the current frame and tracks some
+ * performance metrics on the process.
  *
  * @see IUpdateable#update()
  * @see Game#loop()
@@ -75,8 +76,8 @@ public final class GameLoop extends UpdateLoop implements IGameLoop {
   }
 
   /**
-   * In addition to the normal base implementation, the {@code GameLoop} performs registered action at the required
-   * time and tracks some detailed metrics.
+   * In addition to the normal base implementation, the {@code GameLoop} performs registered action at the required time
+   * and tracks some detailed metrics.
    */
   @Override
   protected void process() {

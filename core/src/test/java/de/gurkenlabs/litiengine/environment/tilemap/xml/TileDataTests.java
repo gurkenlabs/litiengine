@@ -118,12 +118,12 @@ class TileDataTests {
     // arrange
     Tile[] tiles =
         new Tile[] {
-          new Tile(1), new Tile(1), new Tile(1), new Tile(0), new Tile(0), new Tile(0), new Tile(1),
-              new Tile(1), new Tile(1),
-          new Tile(1), new Tile(1), new Tile(1), new Tile(0), new Tile(2), new Tile(0), new Tile(1),
-              new Tile(1), new Tile(1),
-          new Tile(1), new Tile(1), new Tile(1), new Tile(0), new Tile(1), new Tile(0), new Tile(1),
-              new Tile(1), new Tile(1),
+            new Tile(1), new Tile(1), new Tile(1), new Tile(0), new Tile(0), new Tile(0), new Tile(1),
+            new Tile(1), new Tile(1),
+            new Tile(1), new Tile(1), new Tile(1), new Tile(0), new Tile(2), new Tile(0), new Tile(1),
+            new Tile(1), new Tile(1),
+            new Tile(1), new Tile(1), new Tile(1), new Tile(0), new Tile(1), new Tile(0), new Tile(1),
+            new Tile(1), new Tile(1),
         };
 
     TileData data = new TileData(Arrays.asList(tiles), 9, 3, encoding, compression);
@@ -136,8 +136,7 @@ class TileDataTests {
   }
 
   /**
-   * Supplies the arguments for the parameterized test {@link #testEncode(String, String, String,
-   * String)}
+   * Supplies the arguments for the parameterized test {@link #testEncode(String, String, String, String)}
    *
    * @return Test arguments
    */

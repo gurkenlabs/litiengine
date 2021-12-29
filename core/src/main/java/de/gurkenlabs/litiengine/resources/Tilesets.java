@@ -12,8 +12,7 @@ import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 
 public class Tilesets extends ResourcesContainer<Tileset> {
 
-  Tilesets() {
-  }
+  Tilesets() {}
 
   @Override
   protected Tileset load(URL resourceName) throws IOException, URISyntaxException {

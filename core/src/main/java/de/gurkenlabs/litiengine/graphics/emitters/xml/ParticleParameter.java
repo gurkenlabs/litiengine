@@ -10,9 +10,11 @@ import jakarta.xml.bind.annotation.XmlTransient;
 public class ParticleParameter implements Serializable {
   private static final long serialVersionUID = 4893417265998349179L;
 
-  @XmlAttribute private double maxValue;
+  @XmlAttribute
+  private double maxValue;
 
-  @XmlAttribute private double minValue;
+  @XmlAttribute
+  private double minValue;
 
   public ParticleParameter() {}
 

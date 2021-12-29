@@ -294,7 +294,7 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
       log.log(
           Level.INFO,
           "Entity \"{0}\" could not perform the action \"{1}\". \nMaybe you need to register the action or provide an appropriate Action annotation on the method you want to call.",
-          new Object[] { this, actionName });
+          new Object[] {this, actionName});
       return;
     }
 
@@ -329,7 +329,8 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
   /**
    * Sets the map location.
    *
-   * @param location the new map location
+   * @param location
+   *          the new map location
    */
   @Override
   public void setLocation(final Point2D location) {
@@ -419,13 +420,13 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
   @Override
   public float[] getTweenValues(TweenType tweenType) {
     return switch (tweenType) {
-      case POSITION_X -> new float[] { (float) this.getX() };
-      case POSITION_Y -> new float[] { (float) this.getY() };
-      case POSITION_XY -> new float[] { (float) this.getX(), (float) this.getY() };
-      case SIZE_WIDTH -> new float[] { (float) this.getWidth() };
-      case SIZE_HEIGHT -> new float[] { (float) this.getHeight() };
-      case SIZE_BOTH -> new float[] { (float) this.getWidth(), (float) this.getHeight() };
-      case ANGLE -> new float[] { (float) this.getAngle() };
+      case POSITION_X -> new float[] {(float) this.getX()};
+      case POSITION_Y -> new float[] {(float) this.getY()};
+      case POSITION_XY -> new float[] {(float) this.getX(), (float) this.getY()};
+      case SIZE_WIDTH -> new float[] {(float) this.getWidth()};
+      case SIZE_HEIGHT -> new float[] {(float) this.getHeight()};
+      case SIZE_BOTH -> new float[] {(float) this.getWidth(), (float) this.getHeight()};
+      case ANGLE -> new float[] {(float) this.getAngle()};
       default -> Tweenable.super.getTweenValues(tweenType);
     };
   }
@@ -433,20 +434,20 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
   @Override
   public void setTweenValues(TweenType tweenType, float[] newValues) {
     switch (tweenType) {
-    case POSITION_X -> this.setX(newValues[0]);
-    case POSITION_Y -> this.setY(newValues[0]);
-    case POSITION_XY -> {
-      this.setX(newValues[0]);
-      this.setY(newValues[1]);
-    }
-    case SIZE_WIDTH -> this.setWidth(newValues[0]);
-    case SIZE_HEIGHT -> this.setHeight(newValues[0]);
-    case SIZE_BOTH -> {
-      this.setWidth(newValues[0]);
-      this.setHeight(newValues[1]);
-    }
-    case ANGLE -> this.setAngle(newValues[0]);
-    default -> Tweenable.super.setTweenValues(tweenType, newValues);
+      case POSITION_X -> this.setX(newValues[0]);
+      case POSITION_Y -> this.setY(newValues[0]);
+      case POSITION_XY -> {
+        this.setX(newValues[0]);
+        this.setY(newValues[1]);
+      }
+      case SIZE_WIDTH -> this.setWidth(newValues[0]);
+      case SIZE_HEIGHT -> this.setHeight(newValues[0]);
+      case SIZE_BOTH -> {
+        this.setWidth(newValues[0]);
+        this.setHeight(newValues[1]);
+      }
+      case ANGLE -> this.setAngle(newValues[0]);
+      default -> Tweenable.super.setTweenValues(tweenType, newValues);
     }
   }
 
@@ -601,7 +602,7 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
         log.log(
             Level.INFO,
             "\"{0}\" is not a valid entity action. Either make it public and parameterless or remove the Action annotation.",
-            new Object[] { method });
+            new Object[] {method});
         continue;
       }
 

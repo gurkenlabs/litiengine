@@ -50,8 +50,8 @@ public class MapList extends JScrollPane implements MapController {
                       .filter(m -> m == list.getSelectedValue())
                       .findFirst();
               if ((map.isPresent()
-                      && Game.world().environment() != null
-                      && Game.world().environment().getMap() == map.get())
+                  && Game.world().environment() != null
+                  && Game.world().environment().getMap() == map.get())
                   || !map.isPresent()) {
                 return;
               }

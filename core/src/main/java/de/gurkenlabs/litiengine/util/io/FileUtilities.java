@@ -164,11 +164,13 @@ public final class FileUtilities {
   }
 
   /**
-   * This method combines the specified basepath with the parts provided as arguments. The output
-   * will use the path separator of the current system;
+   * This method combines the specified basepath with the parts provided as arguments. The output will use the path
+   * separator of the current system;
    *
-   * @param basePath The base path for the combined path.
-   * @param paths The parts of the path to be constructed.
+   * @param basePath
+   *          The base path for the combined path.
+   * @param paths
+   *          The parts of the path to be constructed.
    * @return The combined path.
    */
   public static String combine(String basePath, final String... paths) {
@@ -210,7 +212,8 @@ public final class FileUtilities {
 
   public static String humanReadableByteCount(long bytes, boolean decimal) {
     int unit = decimal ? 1000 : 1024;
-    if (bytes < unit) return bytes + " bytes";
+    if (bytes < unit)
+      return bytes + " bytes";
     int exp = (int) (Math.log(bytes) / Math.log(unit));
     String pre = new String[] {"K", "M", "G", "T", "P", "E"}[exp - 1];
     pre = decimal ? pre : pre + "i";

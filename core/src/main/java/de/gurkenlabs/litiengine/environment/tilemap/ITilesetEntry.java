@@ -12,18 +12,21 @@ public interface ITilesetEntry extends ICustomPropertyProvider {
 
   /**
    * Gets the current image for this tileset entry.
+   * 
    * @return The current image for this tileset entry, accounting for animation.
    */
   public BufferedImage getImage();
 
   /**
    * Gets the "standard" image for this tileset entry, without applying any animations.
+   * 
    * @return The standard image for this tileset entry
    */
   public BufferedImage getBasicImage();
 
   /**
    * Gets the tileset that this entry belongs to.
+   * 
    * @return The tileset for this entry
    */
   public ITileset getTileset();

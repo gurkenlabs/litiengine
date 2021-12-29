@@ -200,7 +200,8 @@ public final class Keyboard implements KeyEventDispatcher, IKeyboard, IUpdateabl
   /**
    * Adds the pressed key.
    *
-   * @param keyCode the key code
+   * @param keyCode
+   *          the key code
    */
   private void addPressedKey(final KeyEvent keyCode) {
     if (this.pressedKeys.stream().anyMatch(key -> key.getKeyCode() == keyCode.getKeyCode())) {
@@ -213,7 +214,8 @@ public final class Keyboard implements KeyEventDispatcher, IKeyboard, IUpdateabl
   /**
    * Adds the released key.
    *
-   * @param keyCode the key code
+   * @param keyCode
+   *          the key code
    */
   private void addReleasedKey(final KeyEvent keyCode) {
     if (this.releasedKeys.stream().anyMatch(key -> key.getKeyCode() == keyCode.getKeyCode())) {
@@ -226,7 +228,8 @@ public final class Keyboard implements KeyEventDispatcher, IKeyboard, IUpdateabl
   /**
    * Adds the typed key.
    *
-   * @param keyCode the key code
+   * @param keyCode
+   *          the key code
    */
   private void addTypedKey(final KeyEvent keyCode) {
     if (this.typedKeys.stream().anyMatch(key -> key.getKeyCode() == keyCode.getKeyCode())) {
@@ -283,7 +286,8 @@ public final class Keyboard implements KeyEventDispatcher, IKeyboard, IUpdateabl
   /**
    * Removes the pressed key.
    *
-   * @param keyCode the key code
+   * @param keyCode
+   *          the key code
    */
   private void removePressedKey(final KeyEvent keyCode) {
     for (final KeyEvent removeKey : this.pressedKeys) {

@@ -3,8 +3,8 @@ package de.gurkenlabs.litiengine.entities;
 import java.util.Comparator;
 
 /**
- * This {@code Comparator} implementation sorts entities by the max y-coordinate of their collision
- * box (if its a {@code ICollisionEntity}) or of their bounding box.
+ * This {@code Comparator} implementation sorts entities by the max y-coordinate of their collision box (if its a
+ * {@code ICollisionEntity}) or of their bounding box.
  *
  * @see ICollisionEntity#getCollisionBox()
  * @see IEntity#getBoundingBox()

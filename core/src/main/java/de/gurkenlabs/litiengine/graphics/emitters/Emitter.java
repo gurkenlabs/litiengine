@@ -136,7 +136,8 @@ public class Emitter extends Entity implements IUpdateable, ITimeToLive, IRender
   /**
    * Adds a particle to this Emitter's list of Particles.
    *
-   * @param particle the particle
+   * @param particle
+   *          the particle
    */
   public void addParticle(final Particle particle) {
     if (this.isStopped()) {
@@ -262,7 +263,8 @@ public class Emitter extends Entity implements IUpdateable, ITimeToLive, IRender
   /**
    * Sets the paused.
    *
-   * @param paused the new paused
+   * @param paused
+   *          the new paused
    */
   public void setPaused(final boolean paused) {
     this.paused = paused;
@@ -308,7 +310,7 @@ public class Emitter extends Entity implements IUpdateable, ITimeToLive, IRender
   public int getTimeToLive() {
     return this.data().getEmitterDuration();
   }
-  
+
   @Override
   public void update() {
     if (this.isPaused()) {
@@ -410,7 +412,8 @@ public class Emitter extends Entity implements IUpdateable, ITimeToLive, IRender
   /**
    * Particle can be removed.
    *
-   * @param particle the particle
+   * @param particle
+   *          the particle
    * @return true, if successful
    */
   protected boolean particleCanBeRemoved(final Particle particle) {
@@ -432,16 +435,16 @@ public class Emitter extends Entity implements IUpdateable, ITimeToLive, IRender
   }
 
   /**
-   * Render particles of this effect. The particles are always rendered relatively to this effects
-   * render location. A particle doesn't have an own map location. It is always relative to the
-   * effect it is assigned to.
+   * Render particles of this effect. The particles are always rendered relatively to this effects render location. A
+   * particle doesn't have an own map location. It is always relative to the effect it is assigned to.
    *
-   * @param g The graphics object to draw on.
-   * @param renderType The render type.
+   * @param g
+   *          The graphics object to draw on.
+   * @param renderType
+   *          The render type.
    */
   private void renderParticles(final Graphics2D g, final RenderType renderType) {
-    if (Game.config().graphics().getGraphicQuality().getValue()
-        < this.data().getRequiredQuality().getValue()) {
+    if (Game.config().graphics().getGraphicQuality().getValue() < this.data().getRequiredQuality().getValue()) {
       return;
     }
 

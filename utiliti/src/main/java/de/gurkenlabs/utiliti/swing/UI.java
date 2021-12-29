@@ -67,10 +67,11 @@ public final class UI {
   private UI() {}
 
   /**
-   * Adds an orphan component to the UI to ensure updating when switching themes even though the
-   * elements might not be part of the currently active UI.
+   * Adds an orphan component to the UI to ensure updating when switching themes even though the elements might not be
+   * part of the currently active UI.
    *
-   * @param component The orphan component to add.
+   * @param component
+   *          The orphan component to add.
    */
   public static void addOrphanComponent(JComponent component) {
     orphanComponents.add(component);
@@ -181,7 +182,7 @@ public final class UI {
         if (!Game.hasStarted()) {
           return;
         }
-        
+
         horizontalScroll.setVisible(false);
         verticalScroll.setVisible(false);
       }

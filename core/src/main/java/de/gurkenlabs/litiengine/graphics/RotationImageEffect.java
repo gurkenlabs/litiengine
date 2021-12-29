@@ -11,8 +11,10 @@ public class RotationImageEffect extends ImageEffect {
   /**
    * Initializes a new instance of the {@code RotationImageEffect}.
    *
-   * @param ttl The time to live of this effect.
-   * @param angle The angle by which this effect rotates the base image.
+   * @param ttl
+   *          The time to live of this effect.
+   * @param angle
+   *          The angle by which this effect rotates the base image.
    */
   public RotationImageEffect(final int ttl, final float angle) {
     super(ttl, "RotationImageEffect");

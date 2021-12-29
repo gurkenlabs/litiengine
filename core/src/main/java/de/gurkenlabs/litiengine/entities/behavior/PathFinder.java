@@ -19,8 +19,10 @@ public abstract class PathFinder {
   /**
    * Gets the path.
    *
-   * @param start the start
-   * @param target the goal
+   * @param start
+   *          the start
+   * @param target
+   *          the goal
    * @return the path
    */
   public abstract Path findPath(IMobileEntity start, Point2D target);

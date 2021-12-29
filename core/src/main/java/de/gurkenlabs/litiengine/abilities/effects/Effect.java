@@ -18,8 +18,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 /**
- * The Class Effect seeks for affected entities in the game's current environment to apply certain
- * effects to them defined by the overwritten implementation of apply/cease.
+ * The Class Effect seeks for affected entities in the game's current environment to apply certain effects to them
+ * defined by the overwritten implementation of apply/cease.
  */
 public abstract class Effect implements IUpdateable {
   private final Ability ability;
@@ -69,7 +69,8 @@ public abstract class Effect implements IUpdateable {
   /**
    * Applies the effect in the specified impact area on the specified environment.
    *
-   * @param impactArea The impact area
+   * @param impactArea
+   *          The impact area
    */
   public void apply(final Shape impactArea) {
     final List<ICombatEntity> affected = this.lookForAffectedEntities(impactArea);
@@ -146,14 +147,13 @@ public abstract class Effect implements IUpdateable {
   }
 
   /**
-   * 1. Cease the effect after its duration. 2. apply all follow up effects 3. remove appliance 4.
-   * unregister from loop if all appliances are done
+   * 1. Cease the effect after its duration. 2. apply all follow up effects 3. remove appliance 4. unregister from loop if
+   * all appliances are done
    */
   @Override
   public void update() {
 
-    for (final Iterator<EffectApplication> iterator = this.getActiveAppliances().iterator();
-        iterator.hasNext(); ) {
+    for (final Iterator<EffectApplication> iterator = this.getActiveAppliances().iterator(); iterator.hasNext();) {
       final EffectApplication appliance = iterator.next();
       // if the effect duration is reached
       if (this.hasEnded(appliance)) {
@@ -255,11 +255,12 @@ public abstract class Effect implements IUpdateable {
   }
 
   /**
-   * Overwrite this method to implement a custom target predicate that determines whether an entity
-   * can be affected by this effect. The targets of this effect need to include the {@code CUSTOM}
-   * value in order for this function to be evaluated.
+   * Overwrite this method to implement a custom target predicate that determines whether an entity can be affected by
+   * this effect. The targets of this effect need to include the {@code CUSTOM} value in order for this function to be
+   * evaluated.
    *
-   * @param entity The entity to check against the custom target predicate.
+   * @param entity
+   *          The entity to check against the custom target predicate.
    * @return True if the entity can be affected by this effect; otherwise false.
    * @see EffectTarget#CUSTOM
    */

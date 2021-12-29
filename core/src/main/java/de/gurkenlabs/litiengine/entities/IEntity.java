@@ -31,29 +31,32 @@ public interface IEntity {
   /**
    * Adds the specified entity rendered listener to receive events when entities were rendered.
    *
-   * @param listener The listener to add.
+   * @param listener
+   *          The listener to add.
    */
   void onRendered(final EntityRenderedListener listener);
 
   /**
    * Removes the specified entity rendered listener.
    *
-   * @param listener The listener to remove.
+   * @param listener
+   *          The listener to remove.
    */
   void removeListener(final EntityRenderedListener listener);
 
   /**
-   * Adds the specified entity render listener to receive events and callbacks about the rendering
-   * process of entities.
+   * Adds the specified entity render listener to receive events and callbacks about the rendering process of entities.
    *
-   * @param listener The listener to add.
+   * @param listener
+   *          The listener to add.
    */
   void addEntityRenderListener(final EntityRenderListener listener);
 
   /**
    * Removes the specified entity render listener.
    *
-   * @param listener The listener to remove.
+   * @param listener
+   *          The listener to remove.
    */
   void removeListener(final EntityRenderListener listener);
 
@@ -62,7 +65,8 @@ public interface IEntity {
   /**
    * Sets the angle (in degrees) in which the entity is directed.
    *
-   * @param angle the new angle in degrees
+   * @param angle
+   *          the new angle in degrees
    */
   void setAngle(double angle);
 
@@ -98,23 +102,26 @@ public interface IEntity {
   /**
    * Performs an {@code EntityAction} that was previously registered for this entity.
    *
-   * <p><i>Does nothing in case no action has been registered for the specified {@code
+   * <p>
+   * <i>Does nothing in case no action has been registered for the specified {@code
    * actionName}.</i>
    *
-   * @param actionName The name of the action to be performed.
+   * @param actionName
+   *          The name of the action to be performed.
    * @see IEntity#actions()
    * @see IEntity#register(String, Runnable)
    */
   void perform(String actionName);
 
   /**
-   * Registers an {@code EntityAction} with the specified name. It's later possible to execute these
-   * actions on the entity by using the {@code Entity.perform(String actionName)} method.
+   * Registers an {@code EntityAction} with the specified name. It's later possible to execute these actions on the entity
+   * by using the {@code Entity.perform(String actionName)} method.
    *
-   * @param name The name of the action to be registered.
-   * @param action The action to be performed by the entity.
-   * @return The created EntityAction instance; or null if the name or action parameter were
-   *     invalid.
+   * @param name
+   *          The name of the action to be registered.
+   * @param action
+   *          The action to be performed by the entity.
+   * @return The created EntityAction instance; or null if the name or action parameter were invalid.
    * @see IEntity#perform(String)
    * @see IEntity#actions()
    */
@@ -144,15 +151,14 @@ public interface IEntity {
   RenderType getRenderType();
 
   /**
-   * Determines whether this entity is being rendered with the layer it's originating from. This
-   * ignores the specified {@code RenderType} and makes the entity dependent upon the visibility of
-   * it's layer.
+   * Determines whether this entity is being rendered with the layer it's originating from. This ignores the specified
+   * {@code RenderType} and makes the entity dependent upon the visibility of it's layer.
    *
-   * <p>This can only be used, of course, if the entity is related to a {@code MapObject}. <br>
+   * <p>
+   * This can only be used, of course, if the entity is related to a {@code MapObject}. <br>
    * This defaults to {@code false} if not explicitly set on the {@code MapObject}.
    *
-   * @return True if the entity should be rendered with the layer of the corresponding map object;
-   *     otherwise false.
+   * @return True if the entity should be rendered with the layer of the corresponding map object; otherwise false.
    * @see ILayer#isVisible()
    * @see IMapObjectLayer#getMapObjects()
    * @see Environment#getEntitiesByLayer(int)
@@ -183,14 +189,16 @@ public interface IEntity {
   /**
    * Sets the map location.
    *
-   * @param location the new map location
+   * @param location
+   *          the new map location
    */
   void setLocation(Point2D location);
 
   /**
    * Sets an id which should only be filled when an entity gets added due to map information.
    *
-   * @param mapId The unique map ID for this {@link IEntity}
+   * @param mapId
+   *          The unique map ID for this {@link IEntity}
    */
   void setMapId(int mapId);
 
@@ -218,19 +226,19 @@ public interface IEntity {
   Environment getEnvironment();
 
   /**
-   * This method provides the possibility to implement behavior whenever this entity was added to
-   * the environment.
+   * This method provides the possibility to implement behavior whenever this entity was added to the environment.
    *
-   * @param environment The environment that the entity was added to
+   * @param environment
+   *          The environment that the entity was added to
    * @see IEntity#addListener(EntityListener)
    */
   void loaded(Environment environment);
 
   /**
-   * This method provides the possibility to implement behavior whenever this entity was removed
-   * from the environment.
+   * This method provides the possibility to implement behavior whenever this entity was removed from the environment.
    *
-   * @param environment The environment that the entity was removed from
+   * @param environment
+   *          The environment that the entity was removed from
    * @see IEntity#addListener(EntityListener)
    */
   void removed(Environment environment);
@@ -238,8 +246,7 @@ public interface IEntity {
   /**
    * Indicates whether this entity is loaded on the currently active environment.
    *
-   * @return True if the entity is loaded on the game's currently active environment; otherwise
-   *     false.
+   * @return True if the entity is loaded on the game's currently active environment; otherwise false.
    * @see GameWorld#environment()
    * @see IEntity#loaded(Environment)
    * @see IEntity#removed(Environment)
