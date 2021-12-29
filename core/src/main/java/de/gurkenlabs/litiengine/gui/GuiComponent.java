@@ -12,13 +12,8 @@ import de.gurkenlabs.litiengine.sound.Sound;
 import de.gurkenlabs.litiengine.tweening.TweenType;
 import de.gurkenlabs.litiengine.tweening.Tweenable;
 import de.gurkenlabs.litiengine.util.ColorHelper;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.Shape;
-import java.awt.Stroke;
+
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -74,6 +69,7 @@ public abstract class GuiComponent
   private boolean enabled;
   private Font font;
   private boolean forwardMouseEvents = true;
+  private double width;
   private double height;
 
   private Sound hoverSound;
@@ -98,9 +94,8 @@ public abstract class GuiComponent
   private double textX;
   private double textY;
   private boolean visible;
-  private double width;
-  private double x;
-  private double y;
+  private Point2D location;
+  private Rectangle2D boundingBox;
 
   /**
    * Instantiates a new gui component with the dimension (0,0) at the given location.
@@ -160,22 +155,22 @@ public abstract class GuiComponent
           }
         });
 
-    this.setTextAlign(GuiProperties.getDefaultTextAlign());
-    this.setTextValign(GuiProperties.getDefaultTextValign());
+    setTextAlign(GuiProperties.getDefaultTextAlign());
+    setTextValign(GuiProperties.getDefaultTextValign());
 
-    this.setTextAntialiasing(GuiProperties.getDefaultTextAntialiasing());
-    this.setTextShadow(GuiProperties.getDefaultTextShadow());
-    this.setTextShadowColor(GuiProperties.getDefaultTextShadowColor());
-    this.setTextShadowRadius(GuiProperties.getDefaultTextShadowRadius());
+    setTextAntialiasing(GuiProperties.getDefaultTextAntialiasing());
+    setTextShadow(GuiProperties.getDefaultTextShadow());
+    setTextShadowColor(GuiProperties.getDefaultTextShadowColor());
+    setTextShadowRadius(GuiProperties.getDefaultTextShadowRadius());
 
     this.componentId = ++id;
 
-    this.setLocation(x, y);
-    this.setDimension(width, height);
-    this.setFont(GuiProperties.getDefaultFont());
-    this.setSelected(false);
-    this.setEnabled(true);
-    this.initializeComponents();
+    setLocation(x, y);
+    setDimension(width, height);
+    setFont(GuiProperties.getDefaultFont());
+    setSelected(false);
+    setEnabled(true);
+    initializeComponents();
   }
 
   /**
@@ -211,7 +206,12 @@ public abstract class GuiComponent
    * @return the bounding box
    */
   public Rectangle2D getBoundingBox() {
-    return new Rectangle2D.Double(this.x, this.y, this.width, this.height);
+    if (boundingBox != null) {
+      return boundingBox;
+    }
+
+    this.boundingBox = new Rectangle2D.Double(getX(), getY(), getWidth(), getHeight());
+    return boundingBox;
   }
 
   /**
@@ -265,7 +265,7 @@ public abstract class GuiComponent
    * @return the screen location
    */
   public Point2D getLocation() {
-    return new Point2D.Double(this.getX(), this.getY());
+    return location;
   }
 
   /**
@@ -372,13 +372,13 @@ public abstract class GuiComponent
   public String getTextToRender(final Graphics2D g) {
     if (this.getText() == null) {
       return "";
-    } else if (this.hasAutomaticLineBreaks()) {
-      return this.getText();
+    } else if (hasAutomaticLineBreaks()) {
+      return getText();
     }
     final FontMetrics fm = g.getFontMetrics();
-    String newText = this.getText();
+    String newText = getText();
 
-    while (newText.length() > 1 && fm.stringWidth(newText) >= this.getWidth()) {
+    while (newText.length() > 1 && fm.stringWidth(newText) >= getWidth()) {
       newText = newText.substring(1);
     }
     return newText;
@@ -390,7 +390,7 @@ public abstract class GuiComponent
    * @return the text X
    */
   public double getTextX() {
-    return this.textX;
+    return textX;
   }
 
   /**
@@ -399,7 +399,7 @@ public abstract class GuiComponent
    * @return the text Y
    */
   public double getTextY() {
-    return this.textY;
+    return textY;
   }
 
   /**
@@ -408,7 +408,7 @@ public abstract class GuiComponent
    * @return the width
    */
   public double getWidth() {
-    return this.width;
+    return width;
   }
 
   /**
@@ -417,7 +417,7 @@ public abstract class GuiComponent
    * @return the x coordinate
    */
   public double getX() {
-    return this.x;
+    return getLocation().getX();
   }
 
   /**
@@ -426,7 +426,7 @@ public abstract class GuiComponent
    * @return the y coordinate
    */
   public double getY() {
-    return this.y;
+    return getLocation().getY();
   }
 
   /**
@@ -435,7 +435,7 @@ public abstract class GuiComponent
    * @return true, if is enabled
    */
   public boolean isEnabled() {
-    return this.enabled;
+    return enabled;
   }
 
   /**
@@ -444,7 +444,7 @@ public abstract class GuiComponent
    * @return true, the GuiComponent forwards mouse events
    */
   public boolean isForwardMouseEvents() {
-    return this.forwardMouseEvents;
+    return forwardMouseEvents;
   }
 
   /**
@@ -453,7 +453,7 @@ public abstract class GuiComponent
    * @return true, if the GuiComponent is hovered
    */
   public boolean isHovered() {
-    return this.isHovered;
+    return isHovered;
   }
 
   /**
@@ -462,7 +462,7 @@ public abstract class GuiComponent
    * @return true, if the mouse is currently pressed on the GuiComponent
    */
   public boolean isPressed() {
-    return this.isPressed;
+    return isPressed;
   }
 
   /**
@@ -471,7 +471,7 @@ public abstract class GuiComponent
    * @return true, if the GuiComponent is selected
    */
   public boolean isSelected() {
-    return this.isSelected;
+    return isSelected;
   }
 
   /**
@@ -480,7 +480,7 @@ public abstract class GuiComponent
    * @return true, if the GuiComponent is suspended
    */
   public boolean isSuspended() {
-    return this.suspended;
+    return suspended;
   }
 
   /**
@@ -489,7 +489,7 @@ public abstract class GuiComponent
    * @return true, if the GuiComponent is visible
    */
   public boolean isVisible() {
-    return this.visible;
+    return visible;
   }
 
   @Override
@@ -517,20 +517,20 @@ public abstract class GuiComponent
 
   @Override
   public void mouseEntered(final MouseEvent e) {
-    if (!this.isForwardMouseEvents()) {
+    if (!isForwardMouseEvents()) {
       return;
     }
 
-    if (!this.mouseEventShouldBeForwarded(e)) {
+    if (!mouseEventShouldBeForwarded(e)) {
       this.isHovered = false;
       return;
     }
 
     this.isHovered = true;
     final ComponentMouseEvent event = new ComponentMouseEvent(e, this);
-    this.getHoverConsumer().forEach(consumer -> consumer.accept(event));
-    if (this.getHoverSound() != null) {
-      Game.audio().playSound(this.getHoverSound());
+    getHoverConsumer().forEach(consumer -> consumer.accept(event));
+    if (getHoverSound() != null) {
+      Game.audio().playSound(getHoverSound());
     }
 
     this.getMouseEnterConsumer().forEach(consumer -> consumer.accept(event));
@@ -538,47 +538,47 @@ public abstract class GuiComponent
 
   @Override
   public void mouseExited(final MouseEvent e) {
-    if (!this.isForwardMouseEvents()) {
+    if (!isForwardMouseEvents()) {
       return;
     }
 
     this.isHovered = false;
     this.isPressed = false;
     final ComponentMouseEvent event = new ComponentMouseEvent(e, this);
-    this.getMouseLeaveConsumer().forEach(consumer -> consumer.accept(event));
+    getMouseLeaveConsumer().forEach(consumer -> consumer.accept(event));
   }
 
   @Override
   public void mouseMoved(final MouseEvent e) {
-    if (!this.mouseEventShouldBeForwarded(e) && this.isHovered()) {
-      this.mouseExited(e);
+    if (!mouseEventShouldBeForwarded(e) && isHovered()) {
+      mouseExited(e);
       return;
     }
 
     // also throw enter event if the mouse did not hover the component
     // before
-    if (!this.isHovered()) {
-      this.mouseEntered(e);
+    if (!isHovered()) {
+      mouseEntered(e);
     }
 
     final ComponentMouseEvent event = new ComponentMouseEvent(e, this);
-    this.getMouseMovedConsumer().forEach(consumer -> consumer.accept(event));
+    getMouseMovedConsumer().forEach(consumer -> consumer.accept(event));
   }
 
   @Override
   public void mousePressed(final MouseEvent e) {
-    if (!this.mouseEventShouldBeForwarded(e)) {
+    if (!mouseEventShouldBeForwarded(e)) {
       return;
     }
 
     this.isPressed = true;
     final ComponentMouseEvent event = new ComponentMouseEvent(e, this);
-    this.getMousePressedConsumer().forEach(consumer -> consumer.accept(event));
+    getMousePressedConsumer().forEach(consumer -> consumer.accept(event));
   }
 
   @Override
   public void mouseReleased(final MouseEvent e) {
-    if (!this.mouseEventShouldBeForwarded(e)) {
+    if (!mouseEventShouldBeForwarded(e)) {
       return;
     }
 
@@ -587,14 +587,13 @@ public abstract class GuiComponent
     final ComponentMouseEvent event = new ComponentMouseEvent(e, this);
 
     // TODO: check if this should really call the clicked consumers...
-    this.getClickConsumer().forEach(consumer -> consumer.accept(event));
-    this.getMouseReleasedConsumer().forEach(consumer -> consumer.accept(event));
+    getClickConsumer().forEach(consumer -> consumer.accept(event));
+    getMouseReleasedConsumer().forEach(consumer -> consumer.accept(event));
   }
 
   @Override
   public void mouseWheelMoved(final MouseWheelEvent e) {
-    this.getMouseWheelConsumer()
-        .forEach(consumer -> consumer.accept(new ComponentMouseWheelEvent(e, this)));
+    getMouseWheelConsumer().forEach(consumer -> consumer.accept(new ComponentMouseWheelEvent(e, this)));
   }
 
   /**
@@ -603,8 +602,8 @@ public abstract class GuiComponent
    * @param callback the callback
    */
   public void onClicked(final Consumer<ComponentMouseEvent> callback) {
-    if (!this.getClickConsumer().contains(callback)) {
-      this.getClickConsumer().add(callback);
+    if (!getClickConsumer().contains(callback)) {
+      getClickConsumer().add(callback);
     }
   }
 
@@ -614,8 +613,8 @@ public abstract class GuiComponent
    * @param callback the callback
    */
   public void onHovered(final Consumer<ComponentMouseEvent> callback) {
-    if (!this.getHoverConsumer().contains(callback)) {
-      this.getHoverConsumer().add(callback);
+    if (!getHoverConsumer().contains(callback)) {
+      getHoverConsumer().add(callback);
     }
   }
 
@@ -626,8 +625,8 @@ public abstract class GuiComponent
    * @param callback the callback
    */
   public void onMouseDragged(final Consumer<ComponentMouseEvent> callback) {
-    if (!this.getMouseDraggedConsumer().contains(callback)) {
-      this.getMouseDraggedConsumer().add(callback);
+    if (!getMouseDraggedConsumer().contains(callback)) {
+      getMouseDraggedConsumer().add(callback);
     }
   }
 
@@ -648,8 +647,8 @@ public abstract class GuiComponent
    * @param callback the callback
    */
   public void onMouseLeave(final Consumer<ComponentMouseEvent> callback) {
-    if (!this.getMouseLeaveConsumer().contains(callback)) {
-      this.getMouseLeaveConsumer().add(callback);
+    if (!getMouseLeaveConsumer().contains(callback)) {
+      getMouseLeaveConsumer().add(callback);
     }
   }
 
@@ -660,8 +659,8 @@ public abstract class GuiComponent
    * @param callback the callback
    */
   public void onMouseMoved(final Consumer<ComponentMouseEvent> callback) {
-    if (!this.getMouseMovedConsumer().contains(callback)) {
-      this.getMouseMovedConsumer().add(callback);
+    if (!getMouseMovedConsumer().contains(callback)) {
+      getMouseMovedConsumer().add(callback);
     }
   }
 
@@ -672,8 +671,8 @@ public abstract class GuiComponent
    * @param callback the callback
    */
   public void onMousePressed(final Consumer<ComponentMouseEvent> callback) {
-    if (!this.getMousePressedConsumer().contains(callback)) {
-      this.getMousePressedConsumer().add(callback);
+    if (!getMousePressedConsumer().contains(callback)) {
+      getMousePressedConsumer().add(callback);
     }
   }
 
@@ -684,8 +683,8 @@ public abstract class GuiComponent
    * @param callback the callback
    */
   public void onMouseReleased(final Consumer<ComponentMouseEvent> callback) {
-    if (!this.getMouseReleasedConsumer().contains(callback)) {
-      this.getMouseReleasedConsumer().add(callback);
+    if (!getMouseReleasedConsumer().contains(callback)) {
+      getMouseReleasedConsumer().add(callback);
     }
   }
 
@@ -696,8 +695,8 @@ public abstract class GuiComponent
    * @param callback the callback
    */
   public void onMouseWheelScrolled(final Consumer<ComponentMouseWheelEvent> callback) {
-    if (!this.getMouseWheelConsumer().contains(callback)) {
-      this.getMouseWheelConsumer().add(callback);
+    if (!getMouseWheelConsumer().contains(callback)) {
+      getMouseWheelConsumer().add(callback);
     }
   }
 
@@ -767,7 +766,7 @@ public abstract class GuiComponent
 
     if (!getCurrentAppearance().isTransparentBackground()) {
       g.setPaint(getCurrentAppearance().getBackgroundPaint(this.getWidth(), this.getHeight()));
-      g.fill(this.getBoundingBox());
+      ShapeRenderer.render(g, getBoundingBox());
     }
 
     g.setColor(getCurrentAppearance().getForeColor());
@@ -778,11 +777,8 @@ public abstract class GuiComponent
     g.setClip(clip);
     if (getCurrentAppearance().getBorderColor() != null
         && getCurrentAppearance().getBorderStyle() != null) {
-      Stroke s = g.getStroke();
-      g.setStroke(getCurrentAppearance().getBorderStyle());
       g.setColor(getCurrentAppearance().getBorderColor());
-      g.draw(this.getShape());
-      g.setStroke(s);
+      ShapeRenderer.renderOutline(g, getBoundingBox(), getCurrentAppearance().getBorderStyle());
     }
     for (final GuiComponent component : this.getComponents()) {
       if (!component.isVisible() || component.isSuspended()) {
@@ -802,103 +798,89 @@ public abstract class GuiComponent
 
     if (Game.config().debug().renderGuiComponentBoundingBoxes()) {
       g.setColor(Color.RED);
-      ShapeRenderer.renderOutline(g, this.getBoundingBox());
+      ShapeRenderer.renderOutline(g, getBoundingBox());
     }
   }
 
   @Override
   public float[] getTweenValues(TweenType tweenType) {
     switch (tweenType) {
-      case POSITION_X:
-        return new float[]{(float) this.getX()};
-      case POSITION_Y:
-        return new float[]{(float) this.getY()};
-      case POSITION_XY:
-        return new float[]{(float) this.getX(), (float) this.getY()};
-      case SIZE_WIDTH:
-        return new float[]{(float) this.getWidth()};
-      case SIZE_HEIGHT:
-        return new float[]{(float) this.getHeight()};
-      case SIZE_BOTH:
-        return new float[]{(float) this.getWidth(), (float) this.getHeight()};
-      case ANGLE:
-        return new float[]{(float) this.getTextAngle()};
-      case FONTSIZE:
-        return new float[]{this.getFont().getSize2D()};
-      case OPACITY:
-        Color bg1 = this.getCurrentAppearance().getBackgroundColor1();
-        Color bg2 = this.getCurrentAppearance().getBackgroundColor2();
-        Color fore = this.getCurrentAppearance().getForeColor();
-        Color shadow = this.getTextShadowColor();
-        Color border = this.getCurrentAppearance().getBorderColor();
-        return new float[]{
-            (float) (bg1 == null ? 0 : bg1.getAlpha()),
-            (float) (bg2 == null ? 0 : bg2.getAlpha()),
-            (float) (fore == null ? 0 : fore.getAlpha()),
-            (float) (shadow == null ? 0 : shadow.getAlpha()),
-            (float) (border == null ? 0 : border.getAlpha())
-        };
-      default:
-        return Tweenable.super.getTweenValues(tweenType);
+    case POSITION_X:
+      return new float[] { (float) this.getX() };
+    case POSITION_Y:
+      return new float[] { (float) this.getY() };
+    case POSITION_XY:
+      return new float[] { (float) this.getX(), (float) this.getY() };
+    case SIZE_WIDTH:
+      return new float[] { (float) this.getWidth() };
+    case SIZE_HEIGHT:
+      return new float[] { (float) this.getHeight() };
+    case SIZE_BOTH:
+      return new float[] { (float) this.getWidth(), (float) this.getHeight() };
+    case ANGLE:
+      return new float[] { this.getTextAngle() };
+    case FONTSIZE:
+      return new float[] { this.getFont().getSize2D() };
+    case OPACITY:
+      Color bg1 = this.getCurrentAppearance().getBackgroundColor1();
+      Color bg2 = this.getCurrentAppearance().getBackgroundColor2();
+      Color fore = this.getCurrentAppearance().getForeColor();
+      Color shadow = this.getTextShadowColor();
+      Color border = this.getCurrentAppearance().getBorderColor();
+      return new float[] {
+          bg1 == null ? 0 : bg1.getAlpha(),
+          bg2 == null ? 0 : bg2.getAlpha(),
+          fore == null ? 0 : fore.getAlpha(),
+          shadow == null ? 0 : shadow.getAlpha(),
+          border == null ? 0 : border.getAlpha()
+      };
+    default:
+      return Tweenable.super.getTweenValues(tweenType);
     }
   }
 
   @Override
   public void setTweenValues(TweenType tweenType, float[] newValues) {
     switch (tweenType) {
-      case POSITION_X:
-        this.setX(newValues[0]);
-        break;
-      case POSITION_Y:
-        this.setY(newValues[0]);
-        break;
-      case POSITION_XY:
-        this.setX(newValues[0]);
-        this.setY(newValues[1]);
-        break;
-      case SIZE_WIDTH:
-        this.setWidth(newValues[0]);
-        break;
-      case SIZE_HEIGHT:
-        this.setHeight(newValues[0]);
-        break;
-      case SIZE_BOTH:
-        this.setWidth(newValues[0]);
-        this.setHeight(newValues[1]);
-        break;
-      case ANGLE:
-        this.setTextAngle(Math.round(newValues[0]));
-        break;
-      case FONTSIZE:
-        this.setFontSize(newValues[0]);
-        break;
-      case OPACITY:
-        Color bg1 = this.getCurrentAppearance().getBackgroundColor1();
-        Color bg2 = this.getCurrentAppearance().getBackgroundColor2();
-        Color fore = this.getCurrentAppearance().getForeColor();
-        Color border = this.getCurrentAppearance().getBorderColor();
-        getCurrentAppearance()
-            .setBackgroundColor1(
-                bg1 == null ? null : ColorHelper.getTransparentVariant(bg1, (int) newValues[0]));
-        getCurrentAppearance()
-            .setBackgroundColor2(
-                bg2 == null ? null : ColorHelper.getTransparentVariant(bg2, (int) newValues[1]));
-        getCurrentAppearance()
-            .setForeColor(
-                fore == null ? null : ColorHelper.getTransparentVariant(fore, (int) newValues[2]));
-        setTextShadowColor(
-            getTextShadowColor() == null
-                ? null
-                : ColorHelper.getTransparentVariant(getTextShadowColor(), (int) newValues[3]));
-        getCurrentAppearance()
-            .setBorderColor(
-                border == null
-                    ? null
-                    : ColorHelper.getTransparentVariant(border, (int) newValues[4]));
-        break;
-      default:
-        Tweenable.super.setTweenValues(tweenType, newValues);
-        break;
+    case POSITION_X -> this.setX(newValues[0]);
+    case POSITION_Y -> this.setY(newValues[0]);
+    case POSITION_XY -> {
+      this.setX(newValues[0]);
+      this.setY(newValues[1]);
+    }
+    case SIZE_WIDTH -> this.setWidth(newValues[0]);
+    case SIZE_HEIGHT -> this.setHeight(newValues[0]);
+    case SIZE_BOTH -> {
+      this.setWidth(newValues[0]);
+      this.setHeight(newValues[1]);
+    }
+    case ANGLE -> this.setTextAngle(Math.round(newValues[0]));
+    case FONTSIZE -> this.setFontSize(newValues[0]);
+    case OPACITY -> {
+      Color bg1 = this.getCurrentAppearance().getBackgroundColor1();
+      Color bg2 = this.getCurrentAppearance().getBackgroundColor2();
+      Color fore = this.getCurrentAppearance().getForeColor();
+      Color border = this.getCurrentAppearance().getBorderColor();
+      getCurrentAppearance()
+          .setBackgroundColor1(
+              bg1 == null ? null : ColorHelper.getTransparentVariant(bg1, (int) newValues[0]));
+      getCurrentAppearance()
+          .setBackgroundColor2(
+              bg2 == null ? null : ColorHelper.getTransparentVariant(bg2, (int) newValues[1]));
+      getCurrentAppearance()
+          .setForeColor(
+              fore == null ? null : ColorHelper.getTransparentVariant(fore, (int) newValues[2]));
+      setTextShadowColor(
+          getTextShadowColor() == null
+              ? null
+              : ColorHelper.getTransparentVariant(getTextShadowColor(), (int) newValues[3]));
+      getCurrentAppearance()
+          .setBorderColor(
+              border == null
+                  ? null
+                  : ColorHelper.getTransparentVariant(border, (int) newValues[4]));
+    }
+    default -> Tweenable.super.setTweenValues(tweenType, newValues);
     }
   }
 
@@ -923,8 +905,8 @@ public abstract class GuiComponent
    * @param height the height
    */
   public void setDimension(final double width, final double height) {
-    this.width = width;
-    this.height = height;
+    setWidth(width);
+    setHeight(height);
   }
 
   /**
@@ -976,6 +958,7 @@ public abstract class GuiComponent
    */
   public void setHeight(final double height) {
     this.height = height;
+    this.boundingBox = null; // trigger recreation in next boundingBox getter call
   }
 
   /**
@@ -1003,8 +986,7 @@ public abstract class GuiComponent
    * @param y the new y coordinate
    */
   public void setLocation(final double x, final double y) {
-    this.setX(x);
-    this.setY(y);
+    setLocation(new Point2D.Double(x, y));
   }
 
   /**
@@ -1013,7 +995,8 @@ public abstract class GuiComponent
    * @param location the new location
    */
   public void setLocation(final Point2D location) {
-    this.setLocation(location.getX(), location.getY());
+    this.location = location;
+    this.boundingBox = null; // trigger recreation in next boundingBox getter call
   }
 
   /**
@@ -1145,6 +1128,7 @@ public abstract class GuiComponent
    */
   public void setWidth(final double width) {
     this.width = width;
+    this.boundingBox = null; // trigger recreation in next boundingBox getter call
   }
 
   /**
@@ -1153,10 +1137,10 @@ public abstract class GuiComponent
    * @param x the new x coordinate
    */
   public void setX(final double x) {
-    final double delta = x - this.x;
-    this.x = x;
+    final double delta = x - getX();
+    setLocation(x, getY());
 
-    for (final GuiComponent component : this.getComponents()) {
+    for (final GuiComponent component : getComponents()) {
       component.setX(component.getX() + delta);
     }
   }
@@ -1167,9 +1151,9 @@ public abstract class GuiComponent
    * @param y the new y coordinate
    */
   public void setY(final double y) {
-    final double delta = y - this.y;
-    this.y = y;
-    for (final GuiComponent component : this.getComponents()) {
+    final double delta = y - getY();
+    setLocation(getX(), y);
+    for (final GuiComponent component : getComponents()) {
       component.setY(component.getY() + delta);
     }
   }

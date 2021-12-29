@@ -1,79 +1,177 @@
 package de.gurkenlabs.litiengine.gui;
 
+import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.CombatEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.Environment;
 
+import de.gurkenlabs.litiengine.gui.screens.Screen;
+import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.sound.Sound;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import javax.sound.sampled.UnsupportedAudioFileException;
 import java.awt.Font;
+import java.io.IOException;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 class SpeechBubbleTests {
 
-    private IEntity entity;
+  private IEntity entity;
+  private Screen screen;
 
-    @BeforeEach
-    void setUp(){
-        Game.init(Game.COMMANDLINE_ARG_NOGUI);
-        entity = spy(new CombatEntity());
-        Environment envMock = mock(Environment.class);
-        when(entity.getEnvironment()).thenReturn(envMock);
-    }
+  @BeforeEach
+  void setUp() {
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
+    entity = spy(new CombatEntity());
+    Environment envMock = mock(Environment.class);
+    when(entity.getEnvironment()).thenReturn(envMock);
+    screen = mock(Screen.class);
+    Game.screens().add(screen);
+  }
 
-    @Test
-    void testCreateEntityText(){
-        // act
-        SpeechBubble bubble = SpeechBubble.create(entity, "test");
+  @Test
+  void testCreateEntityText() {
+    // act
+    SpeechBubble bubble = new SpeechBubble(entity, "test");
 
-        // assert
-        assertEquals(entity, bubble.getEntity());
-    }
+    // assert
+    assertEquals(entity, bubble.getEntity());
+  }
 
-    @Test
-    void testCreateEntityTextAppreanceFont(){
-        // arrange
-        Font font = new Font("Times", 10, 10);
-        SpeechBubbleAppearance appearance = new SpeechBubbleAppearance();
+  @Test
+  void testStartSpeechBubble() {
+    // act
+    SpeechBubble bubble = new SpeechBubble(entity, "test");
+    bubble.start();
 
-        // act
-        SpeechBubble bubble = SpeechBubble.create(entity, "test", appearance, font);
+    // assert
+    assertTrue(bubble.isVisible());
+    assertFalse(bubble.isSuspended());
+  }
 
-        // assert
-        assertEquals(entity, bubble.getEntity(), "IEntity must match with the supplied instance");
-        assertEquals(appearance, bubble.getAppearance(), "Appearance must match with the supplied instance");
-        assertEquals(font, bubble.getFont(), "Font must match with the supplied Font");
-    }
+  @Test
+  void testStopSpeechBubble() {
+    // act
+    SpeechBubble bubble = new SpeechBubble(entity, "test");
+    bubble.start();
+    bubble.stop();
 
-    @ParameterizedTest
-    @MethodSource("getCreateNullArguments")
-    void testCreateNullArguments(SpeechBubbleAppearance appearance, Font font, SpeechBubbleAppearance expectedAppearance, Font expectedFont){
-        // act
-        SpeechBubble bubble = SpeechBubble.create(entity, "test", appearance, font);
+    // assert
+    assertFalse(bubble.isVisible());
+    assertTrue(bubble.isSuspended());
+    assertFalse(screen.getComponents().contains(bubble));
+  }
 
-        // assert
-        assertEquals(expectedAppearance, bubble.getAppearance());
-        assertEquals(expectedFont, bubble.getFont());
-    }
+  @ParameterizedTest
+  @MethodSource("getAlignArguments")
+  void testSetBoxAlign(Align align) {
+    // act
+    SpeechBubble bubble = new SpeechBubble(entity, "test");
+    bubble.setBoxAlign(align);
 
-    @SuppressWarnings("unused")
-    private static Stream<Arguments> getCreateNullArguments(){
-        Font font = new Font("Times", 10, 10);
-        SpeechBubbleAppearance appearance = new SpeechBubbleAppearance();
+    // assert
+    assertEquals(bubble.getBoxAlign(), align);
+  }
 
-        return Stream.of(
-                Arguments.of(null, font, SpeechBubble.DEFAULT_APPEARANCE, font),
-                Arguments.of(appearance, null, appearance, null)
-        );
-    }
+  @Test
+  void testShowTriangle() {
+    // act
+    SpeechBubble bubble = new SpeechBubble(entity, "test");
+    // assert
+    assertTrue(bubble.isRenderingTriangle());
+
+    // act
+    bubble.setRenderTriangle(false);
+    // assert
+    assertFalse(bubble.isRenderingTriangle());
+  }
+
+  @Test
+  void testSetTriangleSize() {
+    // act
+    SpeechBubble bubble = new SpeechBubble(entity, "test");
+    // assert
+    assertEquals(bubble.getWidth() * 1 / 10d, bubble.getTriangleSize());
+
+    // act
+    bubble.setTriangleSize(50);
+    // assert
+    assertEquals(50, bubble.getTriangleSize());
+  }
+
+  @Test
+  void testSetTypeDelay() {
+    // act
+    SpeechBubble bubble = new SpeechBubble(entity, "test");
+    // assert
+    assertEquals((int) (bubble.getDisplayTime() * 0.5 / bubble.getTotalText().length()), bubble.getTypeDelay());
+
+    // act
+    bubble.setTypeDelay(400);
+    // assert
+    assertEquals(400, bubble.getTypeDelay());
+  }
+
+  @Test
+  void testSetTypeSound() {
+    Sound s1 = Resources.sounds().get("de/gurkenlabs/litiengine/resources/bip.ogg");
+    Sound s2 = Resources.sounds().get("de/gurkenlabs/litiengine/resources/bop.ogg");
+    // act
+    SpeechBubble bubble = new SpeechBubble(entity, "test");
+    bubble.setTypeSound(s1);
+    // assert
+    assertEquals(s1, bubble.getTypeSound());
+    // act
+    bubble.setTypeSound(s2);
+    // assert
+    assertEquals(s2, bubble.getTypeSound());
+    assertNotEquals(s1, s2);
+  }
+
+  @Test
+  void testCreateEntityTextWithFont() {
+    // arrange
+    Font font = new Font("Times", Font.BOLD, 10);
+
+    // act
+    SpeechBubble bubble = new SpeechBubble(entity, "test");
+    bubble.setFont(font);
+
+    // assert
+    assertEquals(entity, bubble.getEntity(), "IEntity must match with the supplied instance");
+    assertEquals(font, bubble.getFont(), "Font must match with the supplied Font");
+  }
+
+  @ParameterizedTest
+  @MethodSource("getCreateNullArguments")
+  void testCreateNullArguments(Font font, Font expectedFont) {
+    // act
+    SpeechBubble bubble = new SpeechBubble(entity, "test");
+    bubble.setFont(font);
+
+    // assert
+    assertEquals(expectedFont, bubble.getFont());
+  }
+
+  @SuppressWarnings("unused")
+  private static Stream<Arguments> getCreateNullArguments() {
+    Font font = new Font("Times", Font.BOLD, 10);
+    return Stream.of(Arguments.of(font, font));
+  }
+
+  @SuppressWarnings("unused")
+  private static Stream<Arguments> getAlignArguments() {
+    return Stream.of(Arguments.of((Object[]) Align.values()));
+  }
 }
