@@ -6,14 +6,14 @@ import java.awt.Insets;
 
 public class RowLimitedTextArea extends JTextArea {
 
-    public RowLimitedTextArea(int rows, int columns) {
-        super(rows, columns);
-    }
+  public RowLimitedTextArea(int rows, int columns) {
+    super(rows, columns);
+  }
 
-    public Dimension getPreferredSize() {
-        Insets insets = getInsets();
-        return new Dimension(
-                getColumns() * getColumnWidth() + insets.left + insets.right,
-                getRows() * getRowHeight() + insets.top + insets.bottom);
-    }
+  public Dimension getPreferredSize() {
+    Insets insets = getInsets();
+    return new Dimension(
+        getColumns() * getColumnWidth() + insets.left + insets.right,
+        getRows() * getRowHeight() + insets.top + insets.bottom);
+  }
 }

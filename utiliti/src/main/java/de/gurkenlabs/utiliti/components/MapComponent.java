@@ -77,7 +77,8 @@ public class MapComponent extends GuiComponent {
   public static final int EDITMODE_EDIT = 1;
 
   /** @deprecated Will be replaced by {@link TransformType#MOVE} */
-  @Deprecated() public static final int EDITMODE_MOVE = 2;
+  @Deprecated()
+  public static final int EDITMODE_MOVE = 2;
 
   private static final Logger log = Logger.getLogger(MapComponent.class.getName());
 
@@ -101,36 +102,33 @@ public class MapComponent extends GuiComponent {
   private Blueprint copiedBlueprint;
 
   /**
-   * This flag is used to control the undo behavior of a <b>move transformation</b>. It ensures that
-   * the UndoManager tracks the "changing" event in the beginning of the operation (when the key
-   * event is recorded for the first time) and also triggers the "changed" event upon key release.
+   * This flag is used to control the undo behavior of a <b>move transformation</b>. It ensures that the UndoManager
+   * tracks the "changing" event in the beginning of the operation (when the key event is recorded for the first time) and
+   * also triggers the "changed" event upon key release.
    */
   private boolean isMoving;
 
   /**
-   * This flag is used to control the undo behavior of a <b>resize transformation</b>. It ensures
-   * that the UndoManager tracks the "changing" event in the beginning of the operation (when the
-   * key event is recorded for the first time) and also triggers the "changed" event upon key
-   * release.
+   * This flag is used to control the undo behavior of a <b>resize transformation</b>. It ensures that the UndoManager
+   * tracks the "changing" event in the beginning of the operation (when the key event is recorded for the first time) and
+   * also triggers the "changed" event upon key release.
    */
   private boolean isResizing;
 
   /**
-   * This flag is used to bundle a move operation over several key events until the arrow keys are
-   * released. This allows for the UndoManager to revert the keyboard move operation once instead of
-   * having to revert for each individual key stroke.
+   * This flag is used to bundle a move operation over several key events until the arrow keys are released. This allows
+   * for the UndoManager to revert the keyboard move operation once instead of having to revert for each individual key
+   * stroke.
    */
   private boolean isMovingWithKeyboard;
 
   /**
-   * This flag prevents circular focusing approaches while this instance is already performing a
-   * focus process.
+   * This flag prevents circular focusing approaches while this instance is already performing a focus process.
    */
   private boolean isFocussing;
 
   /**
-   * This flag prevents certain UI operations from executing while the editor is loading an
-   * environment.
+   * This flag prevents certain UI operations from executing while the editor is loading an environment.
    */
   private boolean loading;
 

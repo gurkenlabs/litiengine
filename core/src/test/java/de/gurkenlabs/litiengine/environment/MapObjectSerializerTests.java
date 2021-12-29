@@ -144,7 +144,7 @@ class MapObjectSerializerTests {
 
   @ParameterizedTest
   @MethodSource("getDefaultEntityTypes")
-  void testTmxPropertiesMustNotBeFinal(Class<?> defaultEntityType){
+  void testTmxPropertiesMustNotBeFinal(Class<?> defaultEntityType) {
     for (final Field field : ReflectionUtilities.getAllFields(new ArrayList<Field>(), defaultEntityType)) {
       TmxProperty property = field.getAnnotation(TmxProperty.class);
 
@@ -152,22 +152,23 @@ class MapObjectSerializerTests {
         continue;
       }
 
-      assertFalse(Modifier.isFinal(field.getModifiers()), "Fields annotated with TmxProperty must not be final: " + defaultEntityType.getName() + "." + field.getName());
+      assertFalse(Modifier.isFinal(field.getModifiers()),
+          "Fields annotated with TmxProperty must not be final: " + defaultEntityType.getName() + "." + field.getName());
     }
   }
 
   private static Stream<Arguments> getTmxPropertyAnnotationString() {
     return Stream.of(
-            Arguments.of("testString", "test"),
-            Arguments.of("testBoolArr", "false,false"),
-            Arguments.of("testIntArr", "0"),
-            Arguments.of("testShortArr", "0,0"),
-            Arguments.of("testLongArr", "0,0,0"),
-            Arguments.of("testByteArr", "0,0,0,0"),
-            Arguments.of("testDoubleArr", "0.0,0.0"),
-            Arguments.of("testByteArr", "0,0,0,0"),
-            Arguments.of("testFloatArr", "0.0,0.0"),
-            Arguments.of("testStringArr", "null,null"));
+        Arguments.of("testString", "test"),
+        Arguments.of("testBoolArr", "false,false"),
+        Arguments.of("testIntArr", "0"),
+        Arguments.of("testShortArr", "0,0"),
+        Arguments.of("testLongArr", "0,0,0"),
+        Arguments.of("testByteArr", "0,0,0,0"),
+        Arguments.of("testDoubleArr", "0.0,0.0"),
+        Arguments.of("testByteArr", "0,0,0,0"),
+        Arguments.of("testFloatArr", "0.0,0.0"),
+        Arguments.of("testStringArr", "null,null"));
   }
 
   private static Stream<Arguments> getDefaultEntityTypes() {

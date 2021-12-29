@@ -7,9 +7,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * The static {@code Input} class is the LITIENGINE's access point to devices that capture physical
- * player input. It manages input from different devices, i.e. keyboard, mouse or gamepad, and
- * provides a unified API to access this information.
+ * The static {@code Input} class is the LITIENGINE's access point to devices that capture physical player input. It
+ * manages input from different devices, i.e. keyboard, mouse or gamepad, and provides a unified API to access this
+ * information.
  *
  * @see #mouse()
  * @see #keyboard()
@@ -29,12 +29,13 @@ public final class Input {
   /**
    * Gets the manager for all gamepad input devices.
    *
-   * <p>The manager provides easy access to the default controller as well as access by gamepad
-   * index for mulitplayer games. Gamepads don't need to be added explicitly, the manager supports
-   * hot-plugging at runtime and will auto-detect any added/removed gamepads.
+   * <p>
+   * The manager provides easy access to the default controller as well as access by gamepad index for mulitplayer games.
+   * Gamepads don't need to be added explicitly, the manager supports hot-plugging at runtime and will auto-detect any
+   * added/removed gamepads.
    *
-   * <p><b>This returns null if {@code Game.config().input().isGamepadSupport()} is set to
-   * false.</b>
+   * <p>
+   * <b>This returns null if {@code Game.config().input().isGamepadSupport()} is set to false.</b>
    *
    * @return The gamepad manager.
    * @see GamepadManager#current()

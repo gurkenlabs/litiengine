@@ -10,7 +10,6 @@ import de.gurkenlabs.utiliti.renderers.GridRenderer;
 import de.gurkenlabs.utiliti.renderers.Renderers;
 import de.gurkenlabs.utiliti.swing.UI;
 import de.gurkenlabs.utiliti.swing.dialogs.GridEditPanel;
-import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.ButtonGroup;

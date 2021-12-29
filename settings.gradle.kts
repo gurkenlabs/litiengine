@@ -10,6 +10,7 @@ pluginManagement {
     idv("com.github.vlsi.crlf", "com.github.vlsi.vlsi-release-plugins")
     idv("com.github.vlsi.gradle-extensions", "com.github.vlsi.vlsi-release-plugins")
     idv("com.github.vlsi.license-gather", "com.github.vlsi.vlsi-release-plugins")
+    idv("com.diffplug.spotless")
   }
 }
 
@@ -95,9 +96,9 @@ include(
 
 for (p in rootProject.children) {
   if (p.children.isEmpty()) {
-    if(p.name == "core"){
+    if (p.name == "core") {
       p.name = "litiengine"
-    } else{
+    } else {
       p.name = "litiengine-${p.name}"
     }
   }

@@ -55,14 +55,14 @@ jobs:
       - name: Gradle Build
         uses: GabrielBB/xvfb-action@v1
         with:
-          run: ./gradlew build jacocoTestReport
+          run: ./gradlew build jacocoTestReport -PskipSpotless
 
       - name: Gradle SonarQube Scan
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         if: ${{!github.event.pull_request.head.repo.fork}}
-        run: ./gradlew sonarqube --info
+        run: ./gradlew sonarqube -PskipSpotless --info
 
 
 

@@ -7,8 +7,7 @@ import java.awt.Color;
 import java.awt.Font;
 
 /**
- * This class contains globally used properties for all the {@link GuiComponent}s that might be
- * added to the game.
+ * This class contains globally used properties for all the {@link GuiComponent}s that might be added to the game.
  */
 public class GuiProperties {
   private static Appearance defaultAppearance = new Appearance(new Color(255, 255, 255));
@@ -26,8 +25,7 @@ public class GuiProperties {
   private static float defaultTextShadowRadius = 2f;
   private static int defaultSpeechBubbleDisplayTime = 2000;
 
-  private GuiProperties() {
-  }
+  private GuiProperties() {}
 
   public static Appearance getDefaultAppearance() {
     return defaultAppearance;

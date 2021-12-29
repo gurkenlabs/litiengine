@@ -26,20 +26,18 @@ public class ConsoleActionPanel extends JPanel {
     JButton buttonClearConsole =
         createButton(
             Icons.CLEAR_CONSOLE,
-            (actionEvent ->
-                Arrays.stream(Logger.getLogger("").getHandlers())
-                    .filter(handler -> handler instanceof LogHandler)
-                    .findFirst()
-                    .ifPresent(Handler::flush)));
+            (actionEvent -> Arrays.stream(Logger.getLogger("").getHandlers())
+                .filter(handler -> handler instanceof LogHandler)
+                .findFirst()
+                .ifPresent(Handler::flush)));
 
     JButton buttonScrollConsole =
         createButton(
             Icons.SCROLL_DOWN,
-            (actionEvent ->
-                Arrays.stream(Logger.getLogger("").getHandlers())
-                    .filter(handler -> handler instanceof LogHandler)
-                    .findFirst()
-                    .ifPresent(handler -> ((LogHandler) handler).scrollToLast())));
+            (actionEvent -> Arrays.stream(Logger.getLogger("").getHandlers())
+                .filter(handler -> handler instanceof LogHandler)
+                .findFirst()
+                .ifPresent(handler -> ((LogHandler) handler).scrollToLast())));
 
     this.add(buttonClearConsole);
     this.add(buttonScrollConsole);

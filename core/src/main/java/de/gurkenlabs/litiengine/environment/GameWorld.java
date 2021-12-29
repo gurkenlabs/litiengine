@@ -17,17 +17,16 @@ import de.gurkenlabs.litiengine.graphics.ICamera;
 import de.gurkenlabs.litiengine.resources.Resources;
 
 /**
- * The {@code GameWorld} class is a global environment manager that contains all {@code Environments}
- * and provides the currently active {@code Environment} and {@code Camera}.<br>
+ * The {@code GameWorld} class is a global environment manager that contains all {@code Environments} and provides the
+ * currently active {@code Environment} and {@code Camera}.<br>
  * <p>
  * The {@code GameWorld} returns the same instance for a particular map/mapName until the
  * {@code GameWorld.reset(String)} method is called.
  * </p>
  * 
- * Moreover, it provides the possibility to attach game logic via {@code EnvironmentListeners} to different events of the
- * {@code Envrionment's} life cycle (e.g. loaded, initialized, ...).<br>
- * <i>This is typically used to provide some per-level logic or to trigger
- * general loading behavior.</i>
+ * Moreover, it provides the possibility to attach game logic via {@code EnvironmentListeners} to different events of
+ * the {@code Envrionment's} life cycle (e.g. loaded, initialized, ...).<br>
+ * <i>This is typically used to provide some per-level logic or to trigger general loading behavior.</i>
  * 
  * @see Environment
  * @see Camera
@@ -83,8 +82,8 @@ public final class GameWorld implements IUpdateable {
   }
 
   /**
-   * Adds the specified environment listener to receive events about the basic life-cycle of environments. This is a global event that gets called for
-   * any map.
+   * Adds the specified environment listener to receive events about the basic life-cycle of environments. This is a
+   * global event that gets called for any map.
    * 
    * @param listener
    *          The listener to add.
@@ -104,8 +103,8 @@ public final class GameWorld implements IUpdateable {
   }
 
   /**
-   * Adds the specified environment loaded listener to receive events for when an environment gets loaded. This is a global event that gets called for
-   * any map.
+   * Adds the specified environment loaded listener to receive events for when an environment gets loaded. This is a
+   * global event that gets called for any map.
    * 
    * @param listener
    *          The listener to add.
@@ -125,8 +124,8 @@ public final class GameWorld implements IUpdateable {
   }
 
   /**
-   * Adds the specified environment unloaded listener to receive events for when an environment gets unloaded. This is a global event that gets called
-   * for any map.
+   * Adds the specified environment unloaded listener to receive events for when an environment gets unloaded. This is a
+   * global event that gets called for any map.
    * 
    * @param listener
    *          The listener to add.
@@ -146,7 +145,8 @@ public final class GameWorld implements IUpdateable {
   }
 
   /**
-   * Adds the specified environment loaded listener to receive events for when an environment with the specified map name gets loaded.
+   * Adds the specified environment loaded listener to receive events for when an environment with the specified map name
+   * gets loaded.
    * 
    * @param mapName
    *          The name of the map for which to add the listener.
@@ -170,7 +170,8 @@ public final class GameWorld implements IUpdateable {
   }
 
   /**
-   * Adds the specified environment unloaded listener to receive events for when an environment with the specified map name gets unloaded.
+   * Adds the specified environment unloaded listener to receive events for when an environment with the specified map
+   * name gets unloaded.
    * 
    * @param mapName
    *          The name of the map for which to add the listener.
@@ -194,7 +195,8 @@ public final class GameWorld implements IUpdateable {
   }
 
   /**
-   * Adds the specified environment listener to receive events about the basic life-cycle of environments with the specified map name.
+   * Adds the specified environment listener to receive events about the basic life-cycle of environments with the
+   * specified map name.
    * 
    * @param mapName
    *          The name of the map for which to add the listener.
@@ -218,7 +220,8 @@ public final class GameWorld implements IUpdateable {
   }
 
   /**
-   * Attaches the specified updatable instance that only gets updated when an environment with the specified map name is currently loaded.
+   * Attaches the specified updatable instance that only gets updated when an environment with the specified map name is
+   * currently loaded.
    * 
    * @param mapName
    *          The name of the map for which to attach the updatable instance.
@@ -273,8 +276,8 @@ public final class GameWorld implements IUpdateable {
   }
 
   /**
-   * Clears the currently active camera and environment, removes all previously loaded environments
-   * and clears all listener lists.
+   * Clears the currently active camera and environment, removes all previously loaded environments and clears all
+   * listener lists.
    */
   public void clear() {
     this.unloadEnvironment();
@@ -353,8 +356,8 @@ public final class GameWorld implements IUpdateable {
   }
 
   /**
-   * Loads the specified {@code Environment} and sets it as current environment of the game.
-   * This implicitly unloads the previously loaded environment (if present).
+   * Loads the specified {@code Environment} and sets it as current environment of the game. This implicitly unloads the
+   * previously loaded environment (if present).
    * 
    * <p>
    * <i>The loaded environment can then be accessed via {@code GameWorld#environment()}.</i>
@@ -403,8 +406,8 @@ public final class GameWorld implements IUpdateable {
   }
 
   /**
-   * Loads the {@code Environment} that is identified by the specified map name and sets it as current environment of the game.
-   * This implicitly unloads the previously loaded environment (if present).
+   * Loads the {@code Environment} that is identified by the specified map name and sets it as current environment of the
+   * game. This implicitly unloads the previously loaded environment (if present).
    * 
    * <p>
    * <i>The loaded environment can then be accessed via {@code GameWorld#environment()}.</i>
@@ -468,11 +471,12 @@ public final class GameWorld implements IUpdateable {
   }
 
   /**
-   * Resets the previously loaded {@code Environment} for the specified map name so that it can be re-initiated upon the next access.
+   * Resets the previously loaded {@code Environment} for the specified map name so that it can be re-initiated upon the
+   * next access.
    * 
    * <p>
-   * <i>This can be used if one wants to completely reset the state of a level to its initial state. It'll just throw away the current environment
-   * instance and reload a new one upon the next access.</i>
+   * <i>This can be used if one wants to completely reset the state of a level to its initial state. It'll just throw away
+   * the current environment instance and reload a new one upon the next access.</i>
    * </p>
    * 
    * @param mapName
@@ -491,11 +495,12 @@ public final class GameWorld implements IUpdateable {
   }
 
   /**
-   * Resets the previously loaded {@code Environment} for the specified map so that it can be re-initiated upon the next access.
+   * Resets the previously loaded {@code Environment} for the specified map so that it can be re-initiated upon the next
+   * access.
    * 
    * <p>
-   * <i>This can be used if one wants to completely reset the state of a level to its initial state. It'll just throw away the current environment
-   * instance and reload a new one upon the next access.</i>
+   * <i>This can be used if one wants to completely reset the state of a level to its initial state. It'll just throw away
+   * the current environment instance and reload a new one upon the next access.</i>
    * </p>
    * 
    * @param map
@@ -552,8 +557,8 @@ public final class GameWorld implements IUpdateable {
   }
 
   /**
-   * Specify the general gravity that will be used as default value for all environments that are loaded.
-   * The value's unit of measure is pixel/second (similar to the velocity of a {@code IMobileEntity}.
+   * Specify the general gravity that will be used as default value for all environments that are loaded. The value's unit
+   * of measure is pixel/second (similar to the velocity of a {@code IMobileEntity}.
    * 
    * @param gravity
    *          The default gravity for all environments.

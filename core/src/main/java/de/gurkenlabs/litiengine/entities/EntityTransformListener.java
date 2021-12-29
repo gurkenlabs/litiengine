@@ -8,7 +8,8 @@ public interface EntityTransformListener extends EventListener {
   /**
    * This method is called whenever the location of an {@code IEntity} was changed.
    *
-   * @param entity The entity that changed its location.
+   * @param entity
+   *          The entity that changed its location.
    * @see IEntity#setLocation(java.awt.geom.Point2D)
    * @see IEntity#setLocation(double, double)
    * @see IEntity#setX(double)
@@ -19,7 +20,8 @@ public interface EntityTransformListener extends EventListener {
   /**
    * This method is called whenever the size of an {@code IEntity} was changed.
    *
-   * @param entity The entity that changed its size.
+   * @param entity
+   *          The entity that changed its size.
    * @see IEntity#setSize(double, double)
    * @see IEntity#setHeight(double)
    * @see IEntity#setWidth(double)

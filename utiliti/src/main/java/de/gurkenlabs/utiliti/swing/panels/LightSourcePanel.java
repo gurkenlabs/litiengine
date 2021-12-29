@@ -69,35 +69,34 @@ public class LightSourcePanel extends PropertyPanel {
     this.comboBoxLightShape.setSelectedItem(shape);
     this.checkBoxIsActive.setSelected(isActive);
     this.offsetX.setValue(
-        (int)
-            Math.max(
-                Math.min(100 * mapObject.getDoubleValue(MapObjectProperty.LIGHT_FOCUSOFFSETX), 100),
-                -100));
+        (int) Math.max(
+            Math.min(100 * mapObject.getDoubleValue(MapObjectProperty.LIGHT_FOCUSOFFSETX), 100),
+            -100));
     this.offsetY.setValue(
-        (int)
-            Math.max(
-                Math.min(100 * mapObject.getDoubleValue(MapObjectProperty.LIGHT_FOCUSOFFSETY), 100),
-                -100));
+        (int) Math.max(
+            Math.min(100 * mapObject.getDoubleValue(MapObjectProperty.LIGHT_FOCUSOFFSETY), 100),
+            -100));
   }
 
   private void setupChangedListeners() {
     this.colorControl.addActionListener(
         new MapObjectPropertyActionListener(
             m -> {
-              if(!m.hasCustomProperty(MapObjectProperty.LIGHT_COLOR) || m.getStringValue(MapObjectProperty.LIGHT_COLOR) == null){
+              if (!m.hasCustomProperty(MapObjectProperty.LIGHT_COLOR) || m.getStringValue(MapObjectProperty.LIGHT_COLOR) == null) {
                 return true;
               }
 
-              if(!m.hasCustomProperty(MapObjectProperty.LIGHT_INTENSITY)){
+              if (!m.hasCustomProperty(MapObjectProperty.LIGHT_INTENSITY)) {
                 return true;
               }
 
-              return !m.getStringValue(MapObjectProperty.LIGHT_COLOR).equals(this.colorControl.getHexColor()) || m.getIntValue(MapObjectProperty.LIGHT_INTENSITY) != (int) this.spinnerIntensity.getValue();
+              return !m.getStringValue(MapObjectProperty.LIGHT_COLOR).equals(this.colorControl.getHexColor())
+                  || m.getIntValue(MapObjectProperty.LIGHT_INTENSITY) != (int) this.spinnerIntensity.getValue();
             },
             m -> {
-                m.setValue(MapObjectProperty.LIGHT_COLOR, this.colorControl.getHexColor());
-                m.setValue(MapObjectProperty.LIGHT_INTENSITY, (int) this.spinnerIntensity.getValue());
-                Game.world().environment().updateLighting(getDataSource().getBoundingBox());
+              m.setValue(MapObjectProperty.LIGHT_COLOR, this.colorControl.getHexColor());
+              m.setValue(MapObjectProperty.LIGHT_INTENSITY, (int) this.spinnerIntensity.getValue());
+              Game.world().environment().updateLighting(getDataSource().getBoundingBox());
             }));
     this.setup(this.spinnerIntensity, MapObjectProperty.LIGHT_INTENSITY);
     this.spinnerIntensity.addChangeListener(m -> this.updateLighting());

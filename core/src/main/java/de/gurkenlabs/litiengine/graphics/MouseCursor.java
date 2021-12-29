@@ -18,8 +18,7 @@ import java.awt.image.BufferedImage;
 
 /**
  * The visual representation of the {@code Mouse} in the LITIENGINE.<br>
- * It controls the appearance of the rendered cursor and allows to specify offsets from the actual
- * mouse location.
+ * It controls the appearance of the rendered cursor and allows to specify offsets from the actual mouse location.
  *
  * @see Mouse
  */
@@ -89,8 +88,8 @@ public final class MouseCursor implements IRenderable {
   }
 
   /**
-   * Determines whether the cursor is currently visible (and will thereby be rendered), by checking
-   * the {@code visible} flag and whether the specified cursor image is null.
+   * Determines whether the cursor is currently visible (and will thereby be rendered), by checking the {@code visible}
+   * flag and whether the specified cursor image is null.
    *
    * @return True if the cursor is currently visible; otherwise false.
    */

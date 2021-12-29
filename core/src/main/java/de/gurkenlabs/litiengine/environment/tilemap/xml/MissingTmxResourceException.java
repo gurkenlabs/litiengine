@@ -7,8 +7,7 @@ public class MissingTmxResourceException extends TmxException {
 
   private static final long serialVersionUID = 2649018991304386841L;
 
-  protected MissingTmxResourceException() {
-  }
+  protected MissingTmxResourceException() {}
 
   protected MissingTmxResourceException(String message) {
     super(message);

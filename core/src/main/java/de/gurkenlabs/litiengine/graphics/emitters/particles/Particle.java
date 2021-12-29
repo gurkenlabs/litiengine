@@ -13,8 +13,6 @@ import java.awt.Graphics2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public abstract class Particle implements ITimeToLive {
 
@@ -78,8 +76,10 @@ public abstract class Particle implements ITimeToLive {
   /**
    * Constructs a new particle.
    *
-   * @param width  the particle width in pixels
-   * @param height the particle height in pixels
+   * @param width
+   *          the particle width in pixels
+   * @param height
+   *          the particle height in pixels
    */
   public Particle(final float width, final float height) {
     this.setWidth(width);
@@ -98,7 +98,8 @@ public abstract class Particle implements ITimeToLive {
   /**
    * Gets the current bounding box of the particle, depending on its spawn location.
    *
-   * @param origin the spawn location of this particle
+   * @param origin
+   *          the spawn location of this particle
    * @return The Rectangular particle bounding box.
    */
   public Rectangle2D getBoundingBox(final Point2D origin) {
@@ -170,7 +171,8 @@ public abstract class Particle implements ITimeToLive {
   /**
    * Gets the location relative to the specified effect location.
    *
-   * @param effectLocation the effect position
+   * @param effectLocation
+   *          the effect position
    * @return the location
    */
   public Point2D getRenderLocation(Point2D effectLocation) {
@@ -227,11 +229,11 @@ public abstract class Particle implements ITimeToLive {
   }
 
   /**
-   * Enabling this check can be very performance hungry and should be used with caution and only for
-   * a small amount of particles.
+   * Enabling this check can be very performance hungry and should be used with caution and only for a small amount of
+   * particles.
    *
-   * @param ccd If set to true, the collision will be checked continuously by a ray-cast
-   *            approximation.
+   * @param ccd
+   *          If set to true, the collision will be checked continuously by a ray-cast approximation.
    * @return This particle instance.
    */
   public Particle setContinuousCollision(boolean ccd) {
@@ -375,11 +377,12 @@ public abstract class Particle implements ITimeToLive {
   }
 
   /**
-   * Updates the effect's position, change in xCurrent, change in yCurrent, remaining lifetime, and
-   * color.
+   * Updates the effect's position, change in xCurrent, change in yCurrent, remaining lifetime, and color.
    *
-   * @param emitterOrigin The current {@link Emitter} origin
-   * @param updateRatio   The update ratio for this particle.
+   * @param emitterOrigin
+   *          The current {@link Emitter} origin
+   * @param updateRatio
+   *          The update ratio for this particle.
    */
   public void update(final Point2D emitterOrigin, final float updateRatio) {
     if (this.aliveTick == 0) {
@@ -424,8 +427,10 @@ public abstract class Particle implements ITimeToLive {
   /**
    * Test for ray cast collisions
    *
-   * @param emitterOrigin The current {@link Emitter} origin
-   * @param updateRatio   The update ratio for this particle.
+   * @param emitterOrigin
+   *          The current {@link Emitter} origin
+   * @param updateRatio
+   *          The update ratio for this particle.
    * @return True if ray cast collision occurs
    */
   protected boolean hasRayCastCollision(final Point2D emitterOrigin, final float updateRatio) {

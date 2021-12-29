@@ -159,9 +159,8 @@ public class DropdownListField extends GuiComponent {
 
     this.getContentList()
         .onChange(
-            c ->
-                this.getChangeConsumer()
-                    .forEach(consumer -> consumer.accept(this.getSelectedIndex())));
+            c -> this.getChangeConsumer()
+                .forEach(consumer -> consumer.accept(this.getSelectedIndex())));
   }
 
   public void setArrowKeyNavigation(final boolean arrowKeyNavigation) {

@@ -14,8 +14,10 @@ public class StaticShadowLayer extends ColorLayer {
   /**
    * Instantiates a new {@code StaticShadowLayer} instance.
    *
-   * @param environment The environment to which this instance is assigned.
-   * @param color The color of this instance.
+   * @param environment
+   *          The environment to which this instance is assigned.
+   * @param color
+   *          The color of this instance.
    */
   public StaticShadowLayer(Environment environment, Color color) {
     super(environment, color);

@@ -118,9 +118,8 @@ public class Configuration {
   }
 
   /**
-   * Tries to load the configuration from file in the application folder. If none
-   * exists, it tries to load the file from any resource folder. If none exists,
-   * it creates a new configuration file in the application folder.
+   * Tries to load the configuration from file in the application folder. If none exists, it tries to load the file from
+   * any resource folder. If none exists, it creates a new configuration file in the application folder.
    */
   public void load() {
     final File settingsFile = new File(this.getFileName());
@@ -156,7 +155,8 @@ public class Configuration {
   }
 
   /**
-   * Saves this configuration to a file with the specified name of this instance (config.properties is the engines default config file).
+   * Saves this configuration to a file with the specified name of this instance (config.properties is the engines default
+   * config file).
    * 
    * @see #getFileName()
    * @see Configuration#DEFAULT_CONFIGURATION_FILE_NAME

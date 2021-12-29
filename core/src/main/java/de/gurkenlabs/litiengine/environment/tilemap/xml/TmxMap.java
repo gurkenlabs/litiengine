@@ -561,7 +561,8 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
 
   private void checkVersion() throws UnsupportedMapVersionException {
     if (this.tiledversion == null || this.tiledversion.isEmpty()) {
-      log.log(Level.WARNING, "Tiled version not defined for map \"{0}\". Could not evaluate whether the map format is supported by the engine.", new Object[] { this.getName() });
+      log.log(Level.WARNING, "Tiled version not defined for map \"{0}\". Could not evaluate whether the map format is supported by the engine.",
+          new Object[] {this.getName()});
       return;
     }
 
@@ -583,7 +584,8 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
     }
 
     if (minor > MAX_MINOR) {
-      log.log(Level.WARNING, "Tiled version {0} of map \"{1}\" is greater than the supported version {2}.{3}.x. Some features may not work.", new Object[] { this.tiledversion, this.getName(), MAX_MAJOR, MAX_MINOR });
+      log.log(Level.WARNING, "Tiled version {0} of map \"{1}\" is greater than the supported version {2}.{3}.x. Some features may not work.",
+          new Object[] {this.tiledversion, this.getName(), MAX_MAJOR, MAX_MINOR});
     }
   }
 
@@ -613,8 +615,10 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
       }
     }
 
-    // update all tile layer data with the information about the layer based on which they'll position themselves in the grid
-    // they need this information because they have to create an appropriately sized grid before locating their chunks in it
+    // update all tile layer data with the information about the layer based on which they'll position
+    // themselves in the grid
+    // they need this information because they have to create an appropriately sized grid before
+    // locating their chunks in it
     for (ITileLayer tileLayer : this.tileLayers) {
       if (!(tileLayer instanceof TileLayer)) {
         continue;

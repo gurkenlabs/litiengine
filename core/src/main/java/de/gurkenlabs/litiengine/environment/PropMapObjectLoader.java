@@ -32,27 +32,23 @@ public class PropMapObjectLoader extends MapObjectLoader {
 
   /**
    * <p>
-   * Registers a custom {@link Prop} implementation that can be automatically
-   * provided by this {@link MapObjectLoader}.
+   * Registers a custom {@link Prop} implementation that can be automatically provided by this {@link MapObjectLoader}.
    * </p>
    * 
    * <p>
-   * <b>This should only be used if the particular implementation doesn't
-   * require any additional map object properties to be initialized.</b>
+   * <b>This should only be used if the particular implementation doesn't require any additional map object properties to
+   * be initialized.</b>
    * </p>
    * 
    * Make sure that the implementation has the following present:
    * <ol>
-   * <li>An {@link AnimationInfo} annotation with one or more sprite prefixes
-   * defined</li>
-   * <li>Either an empty constructor or a constructor that takes in the sprite
-   * prefix from the loader.</li>
+   * <li>An {@link AnimationInfo} annotation with one or more sprite prefixes defined</li>
+   * <li>Either an empty constructor or a constructor that takes in the sprite prefix from the loader.</li>
    * </ol>
    * 
    * <p>
-   * The latter is particularly useful for classes that can have different
-   * sprite sheets, i.e. share the same logic but might have a different
-   * appearance.
+   * The latter is particularly useful for classes that can have different sprite sheets, i.e. share the same logic but
+   * might have a different appearance.
    * </p>
    * 
    * @param <T>
@@ -74,7 +70,7 @@ public class PropMapObjectLoader extends MapObjectLoader {
 
     final Prop prop = this.createNewProp(mapObject, mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME));
     loadDefaultProperties(prop, mapObject);
-    
+
     prop.setMaterial(Material.get(mapObject.getStringValue(MapObjectProperty.PROP_MATERIAL)));
 
     entities.add(prop);
@@ -99,13 +95,16 @@ public class PropMapObjectLoader extends MapObjectLoader {
   private static Prop createCustomProp(Class<? extends Prop> customProp, String spriteSheet) {
     try {
       return customProp.getConstructor(String.class).newInstance(spriteSheet);
-    } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+    } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
+        | SecurityException e) {
       try {
         Prop creature = customProp.getConstructor().newInstance();
         creature.setSpritesheetName(spriteSheet);
         return creature;
-      } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException ex) {
-        log.log(Level.SEVERE, "Could not automatically create prop of type {0} because a matching constructor is missing.", new Object[] { customProp });
+      } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
+          | SecurityException ex) {
+        log.log(Level.SEVERE, "Could not automatically create prop of type {0} because a matching constructor is missing.",
+            new Object[] {customProp});
         log.log(Level.SEVERE, ex.getMessage(), ex);
       }
     }

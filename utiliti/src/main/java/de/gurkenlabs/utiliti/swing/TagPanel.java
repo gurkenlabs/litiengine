@@ -226,10 +226,9 @@ public class TagPanel extends JPanel {
     Optional<String> found =
         Game.world().environment().getUsedTags().stream()
             .filter(
-                x ->
-                    x != null
-                        && !this.getTagStrings().contains(x)
-                        && x.startsWith(currentText.toLowerCase()))
+                x -> x != null
+                    && !this.getTagStrings().contains(x)
+                    && x.startsWith(currentText.toLowerCase()))
             .findFirst();
     return found.isPresent() ? found.get() : null;
   }

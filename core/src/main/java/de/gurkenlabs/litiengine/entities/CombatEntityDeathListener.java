@@ -13,7 +13,8 @@ public interface CombatEntityDeathListener extends EventListener {
   /**
    * This method is called whenever a {@code ICombatEntity} dies.
    *
-   * @param entity The combat entity that died.
+   * @param entity
+   *          The combat entity that died.
    */
   void death(ICombatEntity entity);
 }

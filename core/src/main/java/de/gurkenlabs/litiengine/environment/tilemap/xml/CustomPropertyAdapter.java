@@ -31,7 +31,7 @@ public class CustomPropertyAdapter extends XmlAdapter<CustomPropertyAdapter.Prop
     private static final String COLOR = "color";
 
     private static String[] values() {
-      return new String[] { STRING, FLOAT, INT, BOOL, FILE, COLOR };
+      return new String[] {STRING, FLOAT, INT, BOOL, FILE, COLOR};
     }
 
     private static boolean isValid(String type) {
@@ -58,8 +58,7 @@ public class CustomPropertyAdapter extends XmlAdapter<CustomPropertyAdapter.Prop
     @XmlTransient
     URL location;
 
-    Property() {
-    }
+    Property() {}
 
     Property(String name, String type) {
       this.name = name;
@@ -109,8 +108,7 @@ public class CustomPropertyAdapter extends XmlAdapter<CustomPropertyAdapter.Prop
     @XmlElement(name = "property")
     List<Property> properties;
 
-    PropertyList() {
-    }
+    PropertyList() {}
 
     PropertyList(List<Property> properties) {
       this.properties = properties;

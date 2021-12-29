@@ -31,8 +31,10 @@ public class EntityNavigator implements IUpdateable, IRenderable {
   /**
    * Instantiates a new entity navigator.
    *
-   * @param entity The entity that will be navigated by this instance
-   * @param pathFinder The pathfinder that is used to navigate the entity
+   * @param entity
+   *          The entity that will be navigated by this instance
+   * @param pathFinder
+   *          The pathfinder that is used to navigate the entity
    */
   public EntityNavigator(final IMobileEntity entity, final PathFinder pathFinder) {
     this.cancelNavigationConditions = new CopyOnWriteArrayList<>();
@@ -46,7 +48,8 @@ public class EntityNavigator implements IUpdateable, IRenderable {
   /**
    * Instantiates a new entity navigator without a pre-initialized PathFinder.
    *
-   * @param entity The entity that will be navigated by this instance
+   * @param entity
+   *          The entity that will be navigated by this instance
    */
   public EntityNavigator(final IMobileEntity entity) {
     this(entity, null);

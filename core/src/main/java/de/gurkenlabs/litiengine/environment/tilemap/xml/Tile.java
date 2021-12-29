@@ -40,14 +40,13 @@ public class Tile extends CustomPropertyProvider implements ITile {
   /**
    * Instantiates a new {@code Tile} instance.
    */
-  public Tile() {
-  }
+  public Tile() {}
 
   /**
    * Instantiates a new {@code Tile} instance with the same attributes as a given {@code Tile}.
    *
    * @param original
-   *         The original tile from which the values will be copied to this new instance.
+   *          The original tile from which the values will be copied to this new instance.
    */
   public Tile(Tile original) {
     this.flipped = original.isFlipped();
@@ -63,7 +62,7 @@ public class Tile extends CustomPropertyProvider implements ITile {
    * Instantiates a new {@code Tile} instance.
    *
    * @param gidBitmask
-   *         The grid ID bitmask used to identify flags of this instance.
+   *          The grid ID bitmask used to identify flags of this instance.
    *
    * @see Tile#FLIPPED_HORIZONTALLY_FLAG
    * @see Tile#FLIPPED_DIAGONALLY_FLAG
@@ -172,7 +171,8 @@ public class Tile extends CustomPropertyProvider implements ITile {
       return false;
     }
     ITile other = (ITile) anObject;
-    return this.getGridId() == other.getGridId() && this.isFlippedDiagonally() == other.isFlippedDiagonally() && this.isFlippedHorizontally() == other.isFlippedHorizontally() && this.isFlippedVertically() == other.isFlippedVertically();
+    return this.getGridId() == other.getGridId() && this.isFlippedDiagonally() == other.isFlippedDiagonally()
+        && this.isFlippedHorizontally() == other.isFlippedHorizontally() && this.isFlippedVertically() == other.isFlippedVertically();
   }
 
   @Override
@@ -209,7 +209,7 @@ public class Tile extends CustomPropertyProvider implements ITile {
    * Sets the tile coordinate.
    *
    * @param tileCoordinate
-   *         the new tile coordinate
+   *          the new tile coordinate
    */
   void setTileCoordinate(final Point tileCoordinate) {
     this.tileCoordinate = tileCoordinate;

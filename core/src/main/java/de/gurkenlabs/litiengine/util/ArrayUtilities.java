@@ -21,8 +21,10 @@ public final class ArrayUtilities {
   /**
    * Concatenates the two specified byte arrays to a new array.
    *
-   * @param first The first array.
-   * @param second The second array.
+   * @param first
+   *          The first array.
+   * @param second
+   *          The second array.
    * @return A new array with both specified arrays in sequence.
    */
   public static byte[] concat(byte[] first, byte[] second) {
@@ -34,8 +36,10 @@ public final class ArrayUtilities {
   /**
    * Concatenates the two specified int arrays to a new array.
    *
-   * @param first The first array.
-   * @param second The second array.
+   * @param first
+   *          The first array.
+   * @param second
+   *          The second array.
    * @return A new array with both specified arrays in sequence.
    */
   public static int[] concat(int[] first, int[] second) {
@@ -47,8 +51,10 @@ public final class ArrayUtilities {
   /**
    * Concatenates the two specified long arrays to a new array.
    *
-   * @param first The first array.
-   * @param second The second array.
+   * @param first
+   *          The first array.
+   * @param second
+   *          The second array.
    * @return A new array with both specified arrays in sequence.
    */
   public static long[] concat(long[] first, long[] second) {
@@ -60,8 +66,10 @@ public final class ArrayUtilities {
   /**
    * Concatenates the two specified double arrays to a new array.
    *
-   * @param first The first array.
-   * @param second The second array.
+   * @param first
+   *          The first array.
+   * @param second
+   *          The second array.
    * @return A new array with both specified arrays in sequence.
    */
   public static double[] concat(double[] first, double[] second) {
@@ -73,9 +81,12 @@ public final class ArrayUtilities {
   /**
    * Concatenates the two specified double arrays to a new array.
    *
-   * @param <T> The type of the array elements.
-   * @param first The first array.
-   * @param second The second array.
+   * @param <T>
+   *          The type of the array elements.
+   * @param first
+   *          The first array.
+   * @param second
+   *          The second array.
    * @return A new array with both specified arrays in sequence.
    */
   public static <T> T[] concat(T[] first, T[] second) {
@@ -87,7 +98,8 @@ public final class ArrayUtilities {
   /**
    * Splits the specified string by the {@link #DEFAULT_STRING_DELIMITER} into an int array.
    *
-   * @param delimiterSeparatedString The string to split.
+   * @param delimiterSeparatedString
+   *          The string to split.
    * @return An int array with all separated elements of the specified string.
    */
   public static int[] splitInt(String delimiterSeparatedString) {
@@ -97,8 +109,10 @@ public final class ArrayUtilities {
   /**
    * Splits the specified string by the defined delimiter into an int array.
    *
-   * @param delimiterSeparatedString The string to split.
-   * @param delimiter The delimiter by which to split the elements.
+   * @param delimiterSeparatedString
+   *          The string to split.
+   * @param delimiter
+   *          The delimiter by which to split the elements.
    * @return An int array with all separated elements of the specified string.
    */
   public static int[] splitInt(String delimiterSeparatedString, String delimiter) {
@@ -130,7 +144,8 @@ public final class ArrayUtilities {
   /**
    * Splits the specified string by the {@link #DEFAULT_STRING_DELIMITER} into a double array.
    *
-   * @param delimiterSeparatedString The string to split.
+   * @param delimiterSeparatedString
+   *          The string to split.
    * @return An double array with all separated elements of the specified string.
    */
   public static double[] splitDouble(String delimiterSeparatedString) {
@@ -140,8 +155,10 @@ public final class ArrayUtilities {
   /**
    * Splits the specified string by the defined delimiter into a double array.
    *
-   * @param delimiterSeparatedString The string to split.
-   * @param delimiter The delimiter by which to split the elements.
+   * @param delimiterSeparatedString
+   *          The string to split.
+   * @param delimiter
+   *          The delimiter by which to split the elements.
    * @return An double array with all separated elements of the specified string.
    */
   public static double[] splitDouble(String delimiterSeparatedString, String delimiter) {
@@ -173,7 +190,8 @@ public final class ArrayUtilities {
   /**
    * Joins the specified array with the {@link #DEFAULT_STRING_DELIMITER}.
    *
-   * @param arr The array that provides the elements to be joined.
+   * @param arr
+   *          The array that provides the elements to be joined.
    * @return A string with all joined elements, separated by the delimiter.
    */
   public static String join(boolean[] arr) {
@@ -183,8 +201,10 @@ public final class ArrayUtilities {
   /**
    * Joins the specified array with the defined delimiter.
    *
-   * @param arr The array that provides the elements to be joined.
-   * @param delimiter The delimiter used to separate the elements with.
+   * @param arr
+   *          The array that provides the elements to be joined.
+   * @param delimiter
+   *          The delimiter used to separate the elements with.
    * @return A string with all joined elements, separated by the delimiter.
    */
   public static String join(boolean[] arr, String delimiter) {
@@ -194,7 +214,8 @@ public final class ArrayUtilities {
   /**
    * Joins the specified array with the {@link #DEFAULT_STRING_DELIMITER}.
    *
-   * @param arr The array that provides the elements to be joined.
+   * @param arr
+   *          The array that provides the elements to be joined.
    * @return A string with all joined elements, separated by the delimiter.
    */
   public static String join(int[] arr) {
@@ -204,8 +225,10 @@ public final class ArrayUtilities {
   /**
    * Joins the specified array with the defined delimiter.
    *
-   * @param arr The array that provides the elements to be joined.
-   * @param delimiter The delimiter used to separate the elements with.
+   * @param arr
+   *          The array that provides the elements to be joined.
+   * @param delimiter
+   *          The delimiter used to separate the elements with.
    * @return A string with all joined elements, separated by the delimiter.
    */
   public static String join(int[] arr, String delimiter) {
@@ -215,7 +238,8 @@ public final class ArrayUtilities {
   /**
    * Joins the specified array with the {@link #DEFAULT_STRING_DELIMITER}.
    *
-   * @param arr The array that provides the elements to be joined.
+   * @param arr
+   *          The array that provides the elements to be joined.
    * @return A string with all joined elements, separated by the delimiter.
    */
   public static String join(double[] arr) {
@@ -225,8 +249,10 @@ public final class ArrayUtilities {
   /**
    * Joins the specified array with the defined delimiter.
    *
-   * @param arr The array that provides the elements to be joined.
-   * @param delimiter The delimiter used to separate the elements with.
+   * @param arr
+   *          The array that provides the elements to be joined.
+   * @param delimiter
+   *          The delimiter used to separate the elements with.
    * @return A string with all joined elements, separated by the delimiter.
    */
   public static String join(double[] arr, String delimiter) {
@@ -236,7 +262,8 @@ public final class ArrayUtilities {
   /**
    * Joins the specified array with the {@link #DEFAULT_STRING_DELIMITER}.
    *
-   * @param arr The array that provides the elements to be joined.
+   * @param arr
+   *          The array that provides the elements to be joined.
    * @return A string with all joined elements, separated by the delimiter.
    */
   public static String join(float[] arr) {
@@ -246,8 +273,10 @@ public final class ArrayUtilities {
   /**
    * Joins the specified array with the defined delimiter.
    *
-   * @param arr The array that provides the elements to be joined.
-   * @param delimiter The delimiter used to separate the elements with.
+   * @param arr
+   *          The array that provides the elements to be joined.
+   * @param delimiter
+   *          The delimiter used to separate the elements with.
    * @return A string with all joined elements, separated by the delimiter.
    */
   public static String join(float[] arr, String delimiter) {
@@ -257,7 +286,8 @@ public final class ArrayUtilities {
   /**
    * Joins the specified array with the {@link #DEFAULT_STRING_DELIMITER}.
    *
-   * @param arr The array that provides the elements to be joined.
+   * @param arr
+   *          The array that provides the elements to be joined.
    * @return A string with all joined elements, separated by the delimiter.
    */
   public static String join(short[] arr) {
@@ -271,7 +301,8 @@ public final class ArrayUtilities {
   /**
    * Joins the specified array with the {@link #DEFAULT_STRING_DELIMITER}.
    *
-   * @param arr The array that provides the elements to be joined.
+   * @param arr
+   *          The array that provides the elements to be joined.
    * @return A string with all joined elements, separated by the delimiter.
    */
   public static String join(long[] arr) {
@@ -281,8 +312,10 @@ public final class ArrayUtilities {
   /**
    * Joins the specified array with the defined delimiter.
    *
-   * @param arr The array that provides the elements to be joined.
-   * @param delimiter The delimiter used to separate the elements with.
+   * @param arr
+   *          The array that provides the elements to be joined.
+   * @param delimiter
+   *          The delimiter used to separate the elements with.
    * @return A string with all joined elements, separated by the delimiter.
    */
   public static String join(long[] arr, String delimiter) {
@@ -292,7 +325,8 @@ public final class ArrayUtilities {
   /**
    * Joins the specified array with the {@link #DEFAULT_STRING_DELIMITER}.
    *
-   * @param arr The array that provides the elements to be joined.
+   * @param arr
+   *          The array that provides the elements to be joined.
    * @return A string with all joined elements, separated by the delimiter.
    */
   public static String join(byte[] arr) {
@@ -302,8 +336,10 @@ public final class ArrayUtilities {
   /**
    * Joins the specified array with the defined delimiter.
    *
-   * @param arr The array that provides the elements to be joined.
-   * @param delimiter The delimiter used to separate the elements with.
+   * @param arr
+   *          The array that provides the elements to be joined.
+   * @param delimiter
+   *          The delimiter used to separate the elements with.
    * @return A string with all joined elements, separated by the delimiter.
    */
   public static String join(byte[] arr, String delimiter) {
@@ -313,7 +349,8 @@ public final class ArrayUtilities {
   /**
    * Joins the specified list with the {@link #DEFAULT_STRING_DELIMITER}.
    *
-   * @param collection The list that provides the elements to be joined.
+   * @param collection
+   *          The list that provides the elements to be joined.
    * @return A string with all joined elements, separated by the delimiter.
    */
   public static String join(Collection<?> collection) {
@@ -323,8 +360,10 @@ public final class ArrayUtilities {
   /**
    * Joins the specified collection with the defined delimiter.
    *
-   * @param collection The list that provides the elements to be joined.
-   * @param delimiter The delimiter used to separate the elements with.
+   * @param collection
+   *          The list that provides the elements to be joined.
+   * @param delimiter
+   *          The delimiter used to separate the elements with.
    * @return A string with all joined elements, separated by the delimiter.
    */
   public static String join(Collection<?> collection, String delimiter) {
@@ -334,7 +373,8 @@ public final class ArrayUtilities {
   /**
    * Joins the specified array with the {@link #DEFAULT_STRING_DELIMITER}.
    *
-   * @param arr The array that provides the elements to be joined.
+   * @param arr
+   *          The array that provides the elements to be joined.
    * @return A string with all joined elements, separated by the delimiter.
    */
   public static String join(Object[] arr) {
@@ -344,8 +384,10 @@ public final class ArrayUtilities {
   /**
    * Joins the specified array with the defined delimiter.
    *
-   * @param arr The array that provides the elements to be joined.
-   * @param delimiter The delimiter used to separate the elements with.
+   * @param arr
+   *          The array that provides the elements to be joined.
+   * @param delimiter
+   *          The delimiter used to separate the elements with.
    * @return A string with all joined elements, separated by the delimiter.
    */
   public static String join(Object[] arr, String delimiter) {
@@ -364,8 +406,10 @@ public final class ArrayUtilities {
   /**
    * Return true if the array contains the specified value.
    *
-   * @param arr The array that is tested for the existence of the element.
-   * @param value The element to check for in the array.
+   * @param arr
+   *          The array that is tested for the existence of the element.
+   * @param value
+   *          The element to check for in the array.
    * @return True if the specified element is in the array; otherwise false.
    */
   public static boolean contains(Object[] arr, Object value) {
@@ -385,10 +429,12 @@ public final class ArrayUtilities {
   /**
    * Return true if the array contains the specified string argument.
    *
-   * @param arr The array that is tested for the existence of the argument.
-   * @param argument The argument to check for in the array.
-   * @param ignoreCase A flag indicating whether the case should be ignored when checking for
-   *     equality.
+   * @param arr
+   *          The array that is tested for the existence of the argument.
+   * @param argument
+   *          The argument to check for in the array.
+   * @param ignoreCase
+   *          A flag indicating whether the case should be ignored when checking for equality.
    * @return True if the specified argument is in the array; otherwise false.
    */
   public static boolean contains(String[] arr, String argument, boolean ignoreCase) {
@@ -409,12 +455,15 @@ public final class ArrayUtilities {
   }
 
   /**
-   * Removes the specified deleteItem from the input array and returns a trimmed new array instance
-   * without null entries. The resulting array will have a length -1;
+   * Removes the specified deleteItem from the input array and returns a trimmed new array instance without null entries.
+   * The resulting array will have a length -1;
    *
-   * @param <T> The element type of the array.
-   * @param input The original array
-   * @param deleteItem The item to delete
+   * @param <T>
+   *          The element type of the array.
+   * @param input
+   *          The original array
+   * @param deleteItem
+   *          The item to delete
    * @return A new array with the length input.length - 1.
    */
   @SuppressWarnings("unchecked")
@@ -433,12 +482,14 @@ public final class ArrayUtilities {
   }
 
   /**
-   * Adds the specified item to the input array and returns a new array instance with the length of
-   * the input array +1.
+   * Adds the specified item to the input array and returns a new array instance with the length of the input array +1.
    *
-   * @param <T> The element type of the array.
-   * @param input The original array.
-   * @param addItem The item to add.
+   * @param <T>
+   *          The element type of the array.
+   * @param input
+   *          The original array.
+   * @param addItem
+   *          The item to add.
    * @return A new array with the item to add appended at the end.
    */
   @SuppressWarnings("unchecked")
@@ -453,9 +504,12 @@ public final class ArrayUtilities {
   /**
    * Combines the two specified arrays by only keeping distinct values.
    *
-   * @param <T> The element type of the array.
-   * @param first The first array.
-   * @param second The second array.
+   * @param <T>
+   *          The element type of the array.
+   * @param first
+   *          The first array.
+   * @param second
+   *          The second array.
    * @return A new array with every distinct value of the specified arrays.
    */
   @SuppressWarnings("unchecked")

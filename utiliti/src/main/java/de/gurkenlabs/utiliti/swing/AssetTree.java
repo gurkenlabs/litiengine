@@ -118,26 +118,23 @@ public class AssetTree extends JTree {
       this.assetPanel.loadSprites(
           gameFile.getSpriteSheets().stream()
               .filter(
-                  x ->
-                      x.getName() != null
-                          && x.getName().contains(PropAnimationController.PROP_IDENTIFIER))
+                  x -> x.getName() != null
+                      && x.getName().contains(PropAnimationController.PROP_IDENTIFIER))
               .collect(Collectors.toList()));
     } else if (this.getSelectionPath().equals(creaturePath)) {
       this.assetPanel.loadSprites(
           gameFile.getSpriteSheets().stream()
               .filter(
-                  x ->
-                      x.getName() != null
-                          && CreaturePanel.getCreatureSpriteName(x.getName()) != null)
+                  x -> x.getName() != null
+                      && CreaturePanel.getCreatureSpriteName(x.getName()) != null)
               .collect(Collectors.toList()));
     } else if (selectedPath.equals(miscPath)) {
       this.assetPanel.loadSprites(
           gameFile.getSpriteSheets().stream()
               .filter(
-                  x ->
-                      x.getName() != null
-                          && !x.getName().contains(PropAnimationController.PROP_IDENTIFIER)
-                          && CreaturePanel.getCreatureSpriteName(x.getName()) == null)
+                  x -> x.getName() != null
+                      && !x.getName().contains(PropAnimationController.PROP_IDENTIFIER)
+                      && CreaturePanel.getCreatureSpriteName(x.getName()) == null)
               .collect(Collectors.toList()));
     } else if (selectedPath.equals(tilesetPath)) {
       ArrayList<Tileset> allTilesets = new ArrayList<>();

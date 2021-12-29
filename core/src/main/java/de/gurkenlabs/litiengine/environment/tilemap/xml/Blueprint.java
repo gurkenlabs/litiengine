@@ -88,11 +88,11 @@ public class Blueprint extends MapObject {
   }
 
   /**
-   * Gets a value that indicates whether the IDs if this blueprint's map-objects
-   * should be kept. This is currently used when objects are cut and pasted
-   * afterwards.
+   * Gets a value that indicates whether the IDs if this blueprint's map-objects should be kept. This is currently used
+   * when objects are cut and pasted afterwards.
    *
-   * @return True if the ids for all {@link IMapObject}s of this {@link Blueprint} should be re-applied after building new instances.
+   * @return True if the ids for all {@link IMapObject}s of this {@link Blueprint} should be re-applied after building new
+   *         instances.
    */
   public boolean keepIds() {
     return this.keepIds;

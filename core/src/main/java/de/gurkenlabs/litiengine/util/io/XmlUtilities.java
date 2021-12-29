@@ -38,13 +38,15 @@ public final class XmlUtilities {
   }
 
   /**
-   * Saves the XML, contained by the specified input with the custom indentation. If the input is
-   * the result of jaxb marshalling, make sure to set Marshaller.JAXB_FORMATTED_OUTPUT to false in
-   * order for this method to work properly.
+   * Saves the XML, contained by the specified input with the custom indentation. If the input is the result of jaxb
+   * marshalling, make sure to set Marshaller.JAXB_FORMATTED_OUTPUT to false in order for this method to work properly.
    *
-   * @param input The input stream that contains the original XML.
-   * @param fos The output stream that is used to save the XML.
-   * @param indentation The indentation with which the XML should be saved.
+   * @param input
+   *          The input stream that contains the original XML.
+   * @param fos
+   *          The output stream that is used to save the XML.
+   * @param indentation
+   *          The indentation with which the XML should be saved.
    */
   public static void saveWithCustomIndentation(
       ByteArrayInputStream input, FileOutputStream fos, int indentation) {

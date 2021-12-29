@@ -14,8 +14,8 @@ import net.java.games.input.Controller;
 import net.java.games.input.Event;
 
 /**
- * The {@code Gamepad} class is designed as a wrapper implementation for any gamepad input that
- * provides events and information about player input via gamepad.
+ * The {@code Gamepad} class is designed as a wrapper implementation for any gamepad input that provides events and
+ * information about player input via gamepad.
  *
  * @see Controller
  */
@@ -71,13 +71,14 @@ public final class Gamepad extends GamepadEvents implements IUpdateable {
   /**
    * Gets the poll data for the specified component on this gamepad.
    *
-   * <p>Returns the data from the last time the control has been polled.If this axis is a button,
-   * the value returned will be either 0.0f or 1.0f.If this axis is normalized, the value returned
-   * will be between -1.0f and1.0f.
+   * <p>
+   * Returns the data from the last time the control has been polled.If this axis is a button, the value returned will be
+   * either 0.0f or 1.0f.If this axis is normalized, the value returned will be between -1.0f and1.0f.
    *
-   * @param component The component to retrieve the poll data for.
-   * @return The data from the last time the specified component has been polled; 0 if this gamepad
-   *     doesn't provide the requested component.
+   * @param component
+   *          The component to retrieve the poll data for.
+   * @return The data from the last time the specified component has been polled; 0 if this gamepad doesn't provide the
+   *         requested component.
    */
   public float getPollData(final String component) {
     if (components.containsKey(component)) {
@@ -95,8 +96,9 @@ public final class Gamepad extends GamepadEvents implements IUpdateable {
   /**
    * Gets the deadzone for any axis components on this gamepad.
    *
-   * <p>A deadzone defines the poll value at which the events of this gamepad are not being
-   * triggered. This is useful to smooth out controller input and not react to idle noise.
+   * <p>
+   * A deadzone defines the poll value at which the events of this gamepad are not being triggered. This is useful to
+   * smooth out controller input and not react to idle noise.
    *
    * @return The axis deadzone for this component.
    * @see #setAxisDeadzone(float)
@@ -108,8 +110,9 @@ public final class Gamepad extends GamepadEvents implements IUpdateable {
   /**
    * Gets the deadzone for any trigger components on this gamepad.
    *
-   * <p>A deadzone defines the poll value at which the events of this gamepad are not being
-   * triggered. This is useful to smooth out controller input and not react to idle noise.
+   * <p>
+   * A deadzone defines the poll value at which the events of this gamepad are not being triggered. This is useful to
+   * smooth out controller input and not react to idle noise.
    *
    * @return The trigger deadzone for this gamepad.
    * @see #setTriggerDeadzone(float)
@@ -140,7 +143,8 @@ public final class Gamepad extends GamepadEvents implements IUpdateable {
   /**
    * Sets the deadzone for any axis components on this gamepad.
    *
-   * @param axisDeadzone The axis deadzone for this gamepad.
+   * @param axisDeadzone
+   *          The axis deadzone for this gamepad.
    * @see #getAxisDeadzone()
    */
   public void setAxisDeadzone(float axisDeadzone) {
@@ -150,7 +154,8 @@ public final class Gamepad extends GamepadEvents implements IUpdateable {
   /**
    * Sets the deadzone for any trigger components on this gamepad.
    *
-   * @param triggerDeadzone The trigger deadzone for this gamepad.
+   * @param triggerDeadzone
+   *          The trigger deadzone for this gamepad.
    * @see #getTriggerDeadzone()
    */
   public void setTriggerDeadzone(float triggerDeadzone) {
@@ -193,15 +198,15 @@ public final class Gamepad extends GamepadEvents implements IUpdateable {
   }
 
   /**
-   * If you are about to read through this code: Prepare yourself for an epic experience in software
-   * development!
+   * If you are about to read through this code: Prepare yourself for an epic experience in software development!
    *
-   * <p>Jokes aside: Detecting the type of a gamepad is not a trivial task because any gamepad can
-   * potentially simulate any type of gamepad by providing the same components and the same name.
-   * There is nothing like a unique identifier or a fixed rule, that the name of a controller must
-   * be set properly.
+   * <p>
+   * Jokes aside: Detecting the type of a gamepad is not a trivial task because any gamepad can potentially simulate any
+   * type of gamepad by providing the same components and the same name. There is nothing like a unique identifier or a
+   * fixed rule, that the name of a controller must be set properly.
    *
-   * @param gamepad The gamepad to guess the type for.
+   * @param gamepad
+   *          The gamepad to guess the type for.
    * @return The type name of the gamepad evaluated by a best guess.s
    */
   private static String guessGamepadType(Gamepad gamepad) {
@@ -488,23 +493,23 @@ public final class Gamepad extends GamepadEvents implements IUpdateable {
     public static final String Y = Buttons.BUTTON_3;
 
     protected static final String[] ALL_COMPONENTS = {
-      A,
-      B,
-      DPAD,
-      LB,
-      LEFT_STICK_PRESS,
-      LEFT_STICK_X,
-      LEFT_STICK_Y,
-      LT,
-      RB,
-      RIGHT_STICK_PRESS,
-      RIGHT_STICK_X,
-      RIGHT_STICK_Y,
-      RT,
-      SELECT,
-      START,
-      X,
-      Y
+        A,
+        B,
+        DPAD,
+        LB,
+        LEFT_STICK_PRESS,
+        LEFT_STICK_X,
+        LEFT_STICK_Y,
+        LT,
+        RB,
+        RIGHT_STICK_PRESS,
+        RIGHT_STICK_X,
+        RIGHT_STICK_Y,
+        RT,
+        SELECT,
+        START,
+        X,
+        Y
     };
     public static final String GAMEPAD_TYPE = "Xbox";
 
@@ -537,27 +542,27 @@ public final class Gamepad extends GamepadEvents implements IUpdateable {
     public static final String L2_TRIGGER = Axis.RX;
 
     protected static final String[] ALL_COMPONENTS = {
-      SQUARE,
-      CROSS,
-      CIRCLE,
-      TRIANGLE,
-      L1,
-      R1,
-      L2,
-      R2,
-      SHARE,
-      OPTIONS,
-      LEFT_STICK_PRESS,
-      RIGHT_STICK_PRESS,
-      PS_BUTTON,
-      TOUCHPAD,
-      DPAD,
-      LEFT_STICK_X,
-      LEFT_STICK_Y,
-      RIGHT_STICK_X,
-      RIGHT_STICK_Y,
-      R2_TRIGGER,
-      L2_TRIGGER
+        SQUARE,
+        CROSS,
+        CIRCLE,
+        TRIANGLE,
+        L1,
+        R1,
+        L2,
+        R2,
+        SHARE,
+        OPTIONS,
+        LEFT_STICK_PRESS,
+        RIGHT_STICK_PRESS,
+        PS_BUTTON,
+        TOUCHPAD,
+        DPAD,
+        LEFT_STICK_X,
+        LEFT_STICK_Y,
+        RIGHT_STICK_X,
+        RIGHT_STICK_Y,
+        R2_TRIGGER,
+        L2_TRIGGER
     };
     public static final String GAMEPAD_TYPE = "DualShock4";
 

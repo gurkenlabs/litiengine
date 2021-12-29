@@ -17,8 +17,8 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
 /**
- * The {@code SoundPlayback} class is a wrapper {@code SourceDataLine} on which a {@code Sound}
- * playback can be carried out.
+ * The {@code SoundPlayback} class is a wrapper {@code SourceDataLine} on which a {@code Sound} playback can be carried
+ * out.
  *
  * @see #play(Sound)
  */
@@ -50,7 +50,8 @@ public abstract class SoundPlayback implements Runnable {
   /**
    * Starts playing the audio.
    *
-   * @throws IllegalStateException if the audio has already been started
+   * @throws IllegalStateException
+   *           if the audio has already been started
    */
   public synchronized void start() {
     if (this.started) {
@@ -63,7 +64,8 @@ public abstract class SoundPlayback implements Runnable {
   /**
    * Adds a {@code SoundPlaybackListener} to this instance.
    *
-   * @param listener The {@code SoundPlaybackListener} to be added.
+   * @param listener
+   *          The {@code SoundPlaybackListener} to be added.
    */
   public void addSoundPlaybackListener(SoundPlaybackListener listener) {
     this.listeners.add(listener);
@@ -72,7 +74,8 @@ public abstract class SoundPlayback implements Runnable {
   /**
    * Removes a {@code SoundPlaybackListener} from this instance.
    *
-   * @param listener The {@code SoundPlaybackListener} to be removed.
+   * @param listener
+   *          The {@code SoundPlaybackListener} to be removed.
    */
   public void removeSoundPlaybackListener(SoundPlaybackListener listener) {
     this.listeners.remove(listener);
@@ -81,7 +84,8 @@ public abstract class SoundPlayback implements Runnable {
   /**
    * Sets the paused state of this playback to the provided value.
    *
-   * @param paused Whether to pause or resume this playback
+   * @param paused
+   *          Whether to pause or resume this playback
    */
   public void setPaused(boolean paused) {
     if (paused) {
@@ -108,7 +112,8 @@ public abstract class SoundPlayback implements Runnable {
   /**
    * Fades this playback's volume to 0 over the given duration.
    *
-   * @param duration the fade duration in milliseconds.
+   * @param duration
+   *          the fade duration in milliseconds.
    */
   public void fade(int duration) {
     this.fade(duration, 0f, TweenFunction.LINEAR);
@@ -118,9 +123,12 @@ public abstract class SoundPlayback implements Runnable {
    * Fades this playback's volume to the target value over the given duration using the given {@code
    * TweenFunction}.
    *
-   * @param duration the fade duration in milliseconds.
-   * @param target the target volume at the end of the fade
-   * @param easingType the TweenFunction determining the falloff curve of this fade.
+   * @param duration
+   *          the fade duration in milliseconds.
+   * @param target
+   *          the target volume at the end of the fade
+   * @param easingType
+   *          the TweenFunction determining the falloff curve of this fade.
    */
   public void fade(int duration, float target, TweenFunction easingType) {
     for (VolumeControl v : this.getVolumeControls()) {
@@ -138,9 +146,8 @@ public abstract class SoundPlayback implements Runnable {
   }
 
   /**
-   * Determines if this playback has sound to play. If it is paused but still in the middle of
-   * playback, it will return {@code true}, but it will return {@code false} if it has finished or
-   * it has been cancelled.
+   * Determines if this playback has sound to play. If it is paused but still in the middle of playback, it will return
+   * {@code true}, but it will return {@code false} if it has finished or it has been cancelled.
    *
    * @return Whether this playback has sound to play
    */
@@ -149,8 +156,7 @@ public abstract class SoundPlayback implements Runnable {
   }
 
   /**
-   * Attempts to cancel the playback of this audio. If the playback was successfully cancelled, it
-   * will notify listeners.
+   * Attempts to cancel the playback of this audio. If the playback was successfully cancelled, it will notify listeners.
    */
   public synchronized void cancel() {
     if (!this.started) {
@@ -169,8 +175,7 @@ public abstract class SoundPlayback implements Runnable {
   }
 
   /**
-   * Gets the current volume of this playback, considering all {@code VolumeControl} objects created
-   * for it.
+   * Gets the current volume of this playback, considering all {@code VolumeControl} objects created for it.
    *
    * @return The current volume.
    */
@@ -182,8 +187,8 @@ public abstract class SoundPlayback implements Runnable {
   }
 
   /**
-   * Gets the current master volume of this playback. This will be approximately equal to the value
-   * set by a previous call to {@code setVolume}, though rounding errors may occur.
+   * Gets the current master volume of this playback. This will be approximately equal to the value set by a previous call
+   * to {@code setVolume}, though rounding errors may occur.
    *
    * @return The settable volume.
    */
@@ -194,7 +199,8 @@ public abstract class SoundPlayback implements Runnable {
   /**
    * Sets the master volume of this playback.
    *
-   * @param volume The new volume.
+   * @param volume
+   *          The new volume.
    */
   public void setVolume(float volume) {
     this.masterVolume.set(volume);
@@ -217,7 +223,8 @@ public abstract class SoundPlayback implements Runnable {
   /**
    * Plays a sound to this object's data line.
    *
-   * @param sound The sound to play
+   * @param sound
+   *          The sound to play
    * @return Whether the sound was cancelled while playing
    */
   boolean play(Sound sound) {
@@ -226,9 +233,7 @@ public abstract class SoundPlayback implements Runnable {
     // math hacks here: we're getting just over half the buffer size, but it needs to be an integral
     // number of sample frames
     len = (this.line.getBufferSize() / len / 2 + 1) * len;
-    for (int i = 0;
-        i < data.length;
-        i += this.line.write(data, i, Math.min(len, data.length - i))) {
+    for (int i = 0; i < data.length; i += this.line.write(data, i, Math.min(len, data.length - i))) {
       if (this.cancelled) {
         return true;
       }
@@ -237,8 +242,7 @@ public abstract class SoundPlayback implements Runnable {
   }
 
   /**
-   * Finishes the playback. If this playback was not cancelled in the process, it will notify
-   * listeners.
+   * Finishes the playback. If this playback was not cancelled in the process, it will notify listeners.
    */
   void finish() {
     this.line.drain();
@@ -279,8 +283,8 @@ public abstract class SoundPlayback implements Runnable {
   }
 
   /**
-   * An object for controlling the volume of a {@code SoundPlayback}. Each distinct instance
-   * represents an independent factor contributing to its volume.
+   * An object for controlling the volume of a {@code SoundPlayback}. Each distinct instance represents an independent
+   * factor contributing to its volume.
    *
    * @see SoundPlayback#createVolumeControl()
    */
@@ -301,7 +305,8 @@ public abstract class SoundPlayback implements Runnable {
     /**
      * Sets the value of this volume control.
      *
-     * @param value The value to be set.
+     * @param value
+     *          The value to be set.
      */
     public void set(float value) {
       if (value < 0f) {

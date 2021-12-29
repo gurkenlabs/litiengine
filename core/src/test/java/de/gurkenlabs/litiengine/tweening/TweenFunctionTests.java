@@ -86,6 +86,6 @@ class TweenFunctionTests {
         Arguments.of(TweenFunction.ELASTIC_INOUT, -1.262f, 0f), // partition
         Arguments.of(TweenFunction.ELASTIC_INOUT, 0.5f, 0.5f), // boundary
         Arguments.of(TweenFunction.ELASTIC_INOUT, 0.256f, 0.014645687f) // partition
-        );
+    );
   }
 }

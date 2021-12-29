@@ -22,7 +22,8 @@ public class CollisionBox extends CollisionEntity {
   /**
    * Instantiates a new {@code CollisionBox} entity.
    *
-   * @param obstructingLight A flag indicating whether this instance should obstruct lights.
+   * @param obstructingLight
+   *          A flag indicating whether this instance should obstruct lights.
    */
   public CollisionBox(final boolean obstructingLight) {
     this.obstructingLight = obstructingLight;
@@ -31,8 +32,10 @@ public class CollisionBox extends CollisionEntity {
   /**
    * Instantiates a new {@code CollisionBox} entity.
    *
-   * @param width The width of this instance.
-   * @param height The height of this instance.
+   * @param width
+   *          The width of this instance.
+   * @param height
+   *          The height of this instance.
    */
   public CollisionBox(double width, double height) {
     this.setWidth(width);
@@ -44,10 +47,14 @@ public class CollisionBox extends CollisionEntity {
   /**
    * Instantiates a new {@code CollisionBox} entity.
    *
-   * @param x The x-coordinate of this instance.
-   * @param y The y-coordinate of this instance.
-   * @param width The width of this instance.
-   * @param height The height of this instance.
+   * @param x
+   *          The x-coordinate of this instance.
+   * @param y
+   *          The y-coordinate of this instance.
+   * @param width
+   *          The width of this instance.
+   * @param height
+   *          The height of this instance.
    */
   public CollisionBox(double x, double y, double width, double height) {
     this(width, height);
@@ -58,7 +65,8 @@ public class CollisionBox extends CollisionEntity {
   /**
    * Instantiates a new {@code CollisionBox} entity.
    *
-   * @param box The rectangle defining the location and dimension of this instnace.
+   * @param box
+   *          The rectangle defining the location and dimension of this instnace.
    */
   public CollisionBox(Rectangle2D box) {
     this(box.getX(), box.getY(), box.getWidth(), box.getHeight());

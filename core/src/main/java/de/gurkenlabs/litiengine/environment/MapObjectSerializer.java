@@ -17,8 +17,7 @@ import de.gurkenlabs.litiengine.util.ArrayUtilities;
 public final class MapObjectSerializer {
   private static final Logger log = Logger.getLogger(MapObjectSerializer.class.getName());
 
-  private MapObjectSerializer() {
-  }
+  private MapObjectSerializer() {}
 
   public static MapObject serialize(IEntity entity) {
     MapObject obj = new MapObject();

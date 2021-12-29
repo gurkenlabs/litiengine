@@ -19,7 +19,8 @@ public interface IGameLoop extends ILoop {
   int perform(int delay, Runnable action);
 
   /**
-   * Alters the execution time of the timed action with the specified index to the defined tick. This overwrites the originally specified delay.
+   * Alters the execution time of the timed action with the specified index to the defined tick. This overwrites the
+   * originally specified delay.
    * 
    * @param id
    *          The id of the {@code TimedAction}.

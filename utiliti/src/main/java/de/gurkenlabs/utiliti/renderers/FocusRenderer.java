@@ -28,9 +28,8 @@ public class FocusRenderer implements IEditorRenderer {
       final float strokeSize =
           (float) Math.max(1, Math.log(Game.world().camera().getRenderScale()) * 4);
       final float dashPhaseBlack =
-          (float)
-              ((Game.time().now() / 15f)
-                  * Math.max(1, Math.sqrt(Game.world().camera().getRenderScale())));
+          (float) ((Game.time().now() / 15f)
+              * Math.max(1, Math.sqrt(Game.world().camera().getRenderScale())));
       final float dashPhaseWhite = dashPhaseBlack + strokeSize;
       Stroke stroke =
           new BasicStroke(

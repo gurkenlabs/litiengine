@@ -137,9 +137,9 @@ public interface ILayerList extends ICustomPropertyProvider {
   }
 
   /**
-   * Gets all map objects in the layer list using the map IDs passed as a parameter. Please note that map IDs are intended to be unique identifiers
-   * for {@code IMapObject}s (and their corresponding {@code Entity}). This method is just a way of checking for non-unique IDs and
-   * re-assigning them before adding entities.
+   * Gets all map objects in the layer list using the map IDs passed as a parameter. Please note that map IDs are intended
+   * to be unique identifiers for {@code IMapObject}s (and their corresponding {@code Entity}). This method is just a way
+   * of checking for non-unique IDs and re-assigning them before adding entities.
    * 
    * @param mapIDs
    *          an array of mapIDs for which the layer list is searched

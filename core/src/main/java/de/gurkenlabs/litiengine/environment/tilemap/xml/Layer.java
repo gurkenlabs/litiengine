@@ -51,7 +51,8 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
   /**
    * Copy Constructor for copying instances of Layers.
    *
-   * @param layerToBeCopied the layer we want to copy
+   * @param layerToBeCopied
+   *          the layer we want to copy
    */
   public Layer(Layer layerToBeCopied) {
     super(layerToBeCopied);

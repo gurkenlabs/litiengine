@@ -17,8 +17,8 @@ public @interface Action {
   /**
    * The name of the {@code EntityAction}.
    *
-   * <p><i> If null or empty, the framework will use the name of the methods that this annotation
-   * was declared on. </i>
+   * <p>
+   * <i> If null or empty, the framework will use the name of the methods that this annotation was declared on. </i>
    *
    * @return The name of the EntityAction.
    */

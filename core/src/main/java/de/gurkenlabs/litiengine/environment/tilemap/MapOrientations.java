@@ -17,8 +17,8 @@ public class MapOrientations {
    * An {@code IMapOrientation} for orthogonal maps, consistent with the behavior of Tiled.
    *
    * <p>
-   * With this orientation, tiles are treated as rectangles with dimensions equal to the tile size, layed out in rows and columns starting with the
-   * origin.
+   * With this orientation, tiles are treated as rectangles with dimensions equal to the tile size, layed out in rows and
+   * columns starting with the origin.
    */
   public static final IMapOrientation ORTHOGONAL = new Orthogonal();
 
@@ -28,12 +28,12 @@ public class MapOrientations {
    *
    * <p>
    * With this orientation, the shapes of tiles are transformed into an isometric coordinate system via the transformation
-   * {@code (x, y) -> ((x-y)/2, (x+y)/2)}. Rectangles within this coordinate system are rendered as diamond shapes. Points are also translated such
-   * that every tile in a map fits in the first quadrant.
+   * {@code (x, y) -> ((x-y)/2, (x+y)/2)}. Rectangles within this coordinate system are rendered as diamond shapes. Points
+   * are also translated such that every tile in a map fits in the first quadrant.
    *
    * <p>
-   * This orientation does <em>not</em> transform map objects into its coordinate system. Maps with an odd-numbered tile width or height will throw
-   * {@code IllegalArgumentException}s when using this orientation.
+   * This orientation does <em>not</em> transform map objects into its coordinate system. Maps with an odd-numbered tile
+   * width or height will throw {@code IllegalArgumentException}s when using this orientation.
    */
   public static final IMapOrientation ISOMETRIC = new Isometric();
 
@@ -42,14 +42,14 @@ public class MapOrientations {
    * A staggered isometric {@code IMapOrientation}, consistent with the behavior of Tiled.
    *
    * <p>
-   * This orientation is similar to the isometric orientation, but the tile coordinates are changed to be arranged in a rectangular area. The
-   * locations of tiles are positioned using rectangular coordinates, with tiles with parity on the stagger axis matching the stagger index filling
-   * the gaps between the other tiles.
+   * This orientation is similar to the isometric orientation, but the tile coordinates are changed to be arranged in a
+   * rectangular area. The locations of tiles are positioned using rectangular coordinates, with tiles with parity on the
+   * stagger axis matching the stagger index filling the gaps between the other tiles.
    *
    * <p>
-   * This orientation requires that a stagger axis and stagger index be set. If either are missing, an {@code IllegalArgumentException} will be
-   * thrown. Like the standard isometric orientation, this orientation will also throw an {@code IllegalArgumentException} when used with a map with
-   * an odd-numbered tile width or height.
+   * This orientation requires that a stagger axis and stagger index be set. If either are missing, an
+   * {@code IllegalArgumentException} will be thrown. Like the standard isometric orientation, this orientation will also
+   * throw an {@code IllegalArgumentException} when used with a map with an odd-numbered tile width or height.
    */
   public static final IMapOrientation ISOMETRIC_STAGGERED = new StaggeredIsometric();
 
@@ -58,18 +58,19 @@ public class MapOrientations {
    * A hexagonal {@code IMapOrientation}, consistent with the behavior of Tiled.
    *
    * <p>
-   * Tiles are arranged in the same manner as the staggered isometric orientation (the staggered isometric orientation can be viewed as a special case
-   * of this orientation with a hex side length of 0), with extra space between tiles (the hex side length) added on the stagger axis to allow for a
-   * hexagonal shape.
+   * Tiles are arranged in the same manner as the staggered isometric orientation (the staggered isometric orientation can
+   * be viewed as a special case of this orientation with a hex side length of 0), with extra space between tiles (the hex
+   * side length) added on the stagger axis to allow for a hexagonal shape.
    *
    * <p>
-   * This orientation has the same requirements as staggered isometric, with the additional restriction that the hex side length must be an even
-   * number.
+   * This orientation has the same requirements as staggered isometric, with the additional restriction that the hex side
+   * length must be an even number.
    */
   public static final IMapOrientation HEXAGONAL = new Hexagonal();
 
   /**
-   * Determines the appropriate {@code IMapOrientation} instance for the given name. If no such orientation exists, this method returns {@code null}.
+   * Determines the appropriate {@code IMapOrientation} instance for the given name. If no such orientation exists, this
+   * method returns {@code null}.
    *
    * @param name
    *          The name of the orientation, as stored in the TMX file
@@ -197,7 +198,8 @@ public class MapOrientations {
     public Shape getShape(int x, int y, IMap map) {
       Point loc = this.getLocation(x, y, map);
       Dimension tileSize = map.getTileSize();
-      Polygon pg = new Polygon(new int[] { 0, tileSize.width / 2, tileSize.width, tileSize.width / 2 }, new int[] { tileSize.height / -2, -tileSize.height, tileSize.height / -2, 0 }, 4);
+      Polygon pg = new Polygon(new int[] {0, tileSize.width / 2, tileSize.width, tileSize.width / 2},
+          new int[] {tileSize.height / -2, -tileSize.height, tileSize.height / -2, 0}, 4);
       pg.translate(loc.x, loc.y);
       return pg;
     }
@@ -210,7 +212,8 @@ public class MapOrientations {
       x /= map.getTileWidth();
       y /= map.getTileHeight();
       x -= 0.5 * map.getHeight();
-      // this uses ceil(y)-1 instead of floor(y) to be consistent with getShape; see the definition of "insideness" in the Shape class
+      // this uses ceil(y)-1 instead of floor(y) to be consistent with getShape; see the definition of
+      // "insideness" in the Shape class
       return new Point((int) Math.floor(y + x), (int) Math.ceil(y - x) - 1);
     }
 
@@ -275,7 +278,8 @@ public class MapOrientations {
     public Shape getShape(int x, int y, IMap map) {
       Point loc = this.getLocation(x, y, map);
       Dimension tileSize = map.getTileSize();
-      Polygon pg = new Polygon(new int[] { 0, tileSize.width / 2, tileSize.width, tileSize.width / 2 }, new int[] { tileSize.height / -2, -tileSize.height, tileSize.height / -2, 0 }, 4);
+      Polygon pg = new Polygon(new int[] {0, tileSize.width / 2, tileSize.width, tileSize.width / 2},
+          new int[] {tileSize.height / -2, -tileSize.height, tileSize.height / -2, 0}, 4);
       pg.translate(loc.x, loc.y);
       return pg;
     }
@@ -374,12 +378,12 @@ public class MapOrientations {
       int[] yp;
       if (map.getStaggerAxis() == StaggerAxis.X) {
         int off = (tileSize.width - hexSide) / 2;
-        xp = new int[] { 0, off, tileSize.width - off, tileSize.width, tileSize.width - off, off };
-        yp = new int[] { tileSize.height / -2, -tileSize.height, -tileSize.height, tileSize.height / -2, 0, 0 };
+        xp = new int[] {0, off, tileSize.width - off, tileSize.width, tileSize.width - off, off};
+        yp = new int[] {tileSize.height / -2, -tileSize.height, -tileSize.height, tileSize.height / -2, 0, 0};
       } else {
         int off = (tileSize.height - hexSide) / 2;
-        xp = new int[] { tileSize.width / 2, tileSize.width, tileSize.width, tileSize.width / 2, 0, 0 };
-        yp = new int[] { 0, -off, off - tileSize.height, -tileSize.height, off - tileSize.height, -off };
+        xp = new int[] {tileSize.width / 2, tileSize.width, tileSize.width, tileSize.width / 2, 0, 0};
+        yp = new int[] {0, -off, off - tileSize.height, -tileSize.height, off - tileSize.height, -off};
       }
       Polygon pg = new Polygon(xp, yp, 6);
       pg.translate(loc.x, loc.y);

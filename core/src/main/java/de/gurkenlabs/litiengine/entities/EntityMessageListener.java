@@ -7,10 +7,10 @@ import java.util.EventListener;
 public interface EntityMessageListener extends EventListener {
 
   /**
-   * This method is called whenever a message is received by {@link IEntity#sendMessage(Object,
-   * String)}.
+   * This method is called whenever a message is received by {@link IEntity#sendMessage(Object, String)}.
    *
-   * @param event The event data that contains information about the received message and sender.
+   * @param event
+   *          The event data that contains information about the received message and sender.
    */
   void messageReceived(EntityMessageEvent event);
 }

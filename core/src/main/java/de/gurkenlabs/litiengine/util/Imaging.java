@@ -44,15 +44,18 @@ public final class Imaging {
   }
 
   /**
-   * Adds a shadow effect by executing the following steps: 1. Transform visible pixels to a
-   * semi-transparent black 2. Flip the image vertically 3. Scale it down 4. Render original image
-   * and shadow on a buffered image
+   * Adds a shadow effect by executing the following steps: 1. Transform visible pixels to a semi-transparent black 2.
+   * Flip the image vertically 3. Scale it down 4. Render original image and shadow on a buffered image
    *
-   * <p>TODO: Add support for different shadow types. Add an ellipse shadow, etc..
+   * <p>
+   * TODO: Add support for different shadow types. Add an ellipse shadow, etc..
    *
-   * @param image the image
-   * @param xOffset the x offset
-   * @param yOffset the y offset
+   * @param image
+   *          the image
+   * @param xOffset
+   *          the x offset
+   * @param yOffset
+   *          the y offset
    * @return the buffered image
    */
   public static BufferedImage addShadow(
@@ -97,8 +100,10 @@ public final class Imaging {
   /**
    * All pixels that have the specified color are rendered transparent.
    *
-   * @param img the img
-   * @param color the color
+   * @param img
+   *          the img
+   * @param color
+   *          the color
    * @return the image
    */
   public static BufferedImage applyAlphaChannel(final BufferedImage img, final Color color) {
@@ -197,25 +202,29 @@ public final class Imaging {
   /**
    * Crops a sub image from the specified image.
    *
-   * @param image The image to crop the sub-image from.
-   * @param cropAlignment use the following consts: <br>
-   *     <ul>
-   *       <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_ALIGN_CENTER CROP_ALIGN_CENTER}
-   *       <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_ALIGN_LEFT CROP_ALIGN_LEFT}
-   *       <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_ALIGN_RIGHT CROP_ALIGN_RIGHT}
-   *     </ul>
+   * @param image
+   *          The image to crop the sub-image from.
+   * @param cropAlignment
+   *          use the following consts: <br>
+   *          <ul>
+   *          <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_ALIGN_CENTER CROP_ALIGN_CENTER}
+   *          <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_ALIGN_LEFT CROP_ALIGN_LEFT}
+   *          <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_ALIGN_RIGHT CROP_ALIGN_RIGHT}
+   *          </ul>
    *
-   * @param cropVerticlaAlignment use the following consts: <br>
-   *     <ul>
-   *       <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_VALIGN_CENTER CROP_VALIGN_CENTER}
-   *       <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_VALIGN_TOP CROP_VALIGN_TOP}
-   *       <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_VALIGN_TOPCENTER
-   *           CROP_VALIGN_TOPCENTER}
-   *       <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_VALIGN_BOTTOM CROP_VALIGN_BOTTOM}
-   *     </ul>
+   * @param cropVerticlaAlignment
+   *          use the following consts: <br>
+   *          <ul>
+   *          <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_VALIGN_CENTER CROP_VALIGN_CENTER}
+   *          <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_VALIGN_TOP CROP_VALIGN_TOP}
+   *          <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_VALIGN_TOPCENTER CROP_VALIGN_TOPCENTER}
+   *          <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_VALIGN_BOTTOM CROP_VALIGN_BOTTOM}
+   *          </ul>
    *
-   * @param width The width to crop.
-   * @param height The height to crop.
+   * @param width
+   *          The width to crop.
+   * @param height
+   *          The height to crop.
    * @return The cropped image or the original image if it is smaller than the specified dimensions.
    */
   public static BufferedImage crop(
@@ -265,8 +274,10 @@ public final class Imaging {
   /**
    * All pixels that are not transparent are replaced by a pixel of the specified flashColor.
    *
-   * @param image the image
-   * @param flashColor the flash color
+   * @param image
+   *          the image
+   * @param flashColor
+   *          the flash color
    * @return the buffered image
    */
   public static BufferedImage flashVisiblePixels(final Image image, final Color flashColor) {
@@ -303,7 +314,8 @@ public final class Imaging {
   /**
    * Creates a new {@code BufferedImage} instance from the specified image.
    *
-   * @param image The image to be copied.
+   * @param image
+   *          The image to be copied.
    * @return A copy of the specified image.
    */
   public static BufferedImage copy(BufferedImage image) {
@@ -328,12 +340,15 @@ public final class Imaging {
   }
 
   /**
-   * Gets a two dimensional grid that contains parts of the specified image. Splits up the specified
-   * image into a grid with the defined number of rows and columns.
+   * Gets a two dimensional grid that contains parts of the specified image. Splits up the specified image into a grid
+   * with the defined number of rows and columns.
    *
-   * @param image The base image that will be split up.
-   * @param rows The number of rows.
-   * @param columns The number or columns.
+   * @param image
+   *          The base image that will be split up.
+   * @param rows
+   *          The number of rows.
+   * @param columns
+   *          The number or columns.
    * @return A two dimensional array with all the sub-images.
    */
   public static BufferedImage[][] getSubImages(
@@ -356,7 +371,8 @@ public final class Imaging {
   /**
    * Flips the specified image horizontally.
    *
-   * @param img The image to be flipped.
+   * @param img
+   *          The image to be flipped.
    * @return The flipped image.
    */
   public static BufferedImage horizontalFlip(final BufferedImage img) {
@@ -376,7 +392,8 @@ public final class Imaging {
   /**
    * Flips the specified image vertically.
    *
-   * @param img The image to be flipped.
+   * @param img
+   *          The image to be flipped.
    * @return The flipped image.
    */
   public static BufferedImage verticalFlip(final BufferedImage img) {
@@ -394,13 +411,13 @@ public final class Imaging {
   }
 
   /**
-   * Replace colors in an image according to a Map containing source colors and target colors, then
-   * return the result.
+   * Replace colors in an image according to a Map containing source colors and target colors, then return the result.
    *
-   * @param bufferedImage the original image
-   * @param colorMappings a Map with source colors as keys and target colors as values
-   * @return a new version of the original image, where the source colors are replaced with the
-   *     target colors.
+   * @param bufferedImage
+   *          the original image
+   * @param colorMappings
+   *          a Map with source colors as keys and target colors as values
+   * @return a new version of the original image, where the source colors are replaced with the target colors.
    */
   public static BufferedImage replaceColors(
       final BufferedImage bufferedImage, Map<Color, Color> colorMappings) {
@@ -473,12 +490,15 @@ public final class Imaging {
   }
 
   /**
-   * The specified image is scaled to a new dimension with the specified width and height. This
-   * method doesn't use anti aliasing for this process to keep the indy look.
+   * The specified image is scaled to a new dimension with the specified width and height. This method doesn't use anti
+   * aliasing for this process to keep the indy look.
    *
-   * @param image the image
-   * @param width the width
-   * @param height the height
+   * @param image
+   *          the image
+   * @param width
+   *          the width
+   * @param height
+   *          the height
    * @return the buffered image
    */
   public static BufferedImage scale(final BufferedImage image, final int width, final int height) {
@@ -544,7 +564,8 @@ public final class Imaging {
   }
 
   public static BufferedImage setOpacity(final Image img, final float opacity) {
-    if (img == null) return null;
+    if (img == null)
+      return null;
     final BufferedImage bimage = getCompatibleImage(img.getWidth(null), img.getHeight(null));
     if (bimage == null) {
       return null;

@@ -52,9 +52,9 @@ public class Creature extends CombatEntity implements IMobileEntity {
   /**
    * Instantiates a new {@code Creature} entity.
    *
-   * @param spritesheetName The spritesheet name that identifies the sprites bound to this instance.
-   * @see CreatureAnimationController#getSpriteName(Creature,
-   *     de.gurkenlabs.litiengine.graphics.CreatureAnimationState)
+   * @param spritesheetName
+   *          The spritesheet name that identifies the sprites bound to this instance.
+   * @see CreatureAnimationController#getSpriteName(Creature, de.gurkenlabs.litiengine.graphics.CreatureAnimationState)
    */
   public Creature(String spritesheetName) {
     super();
@@ -123,12 +123,12 @@ public class Creature extends CombatEntity implements IMobileEntity {
   }
 
   /**
-   * Gets the current spritesheet name of this instance. Overwriting this allows for a more
-   * sophisticated logic that determines the sprite to be used; e.g. This method could append
-   * certain properties of the creature (state, weapon, ...) to the default string. <br>
+   * Gets the current spritesheet name of this instance. Overwriting this allows for a more sophisticated logic that
+   * determines the sprite to be used; e.g. This method could append certain properties of the creature (state, weapon,
+   * ...) to the default string. <br>
    * <br>
-   * The value of this method will be used e.g. by the {@link CreatureAnimationController} to
-   * determine the animation that it should play.
+   * The value of this method will be used e.g. by the {@link CreatureAnimationController} to determine the animation that
+   * it should play.
    *
    * @return The current spritesheet name of this instance.
    */

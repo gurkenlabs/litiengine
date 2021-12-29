@@ -18,24 +18,24 @@ import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 /**
- * A random number generator instance that provides enhanced functionalities for the java default {@code Random} implementation.
+ * A random number generator instance that provides enhanced functionalities for the java default {@code Random}
+ * implementation.
  */
 @SuppressWarnings("serial")
 public final class GameRandom extends java.util.Random {
   private static final String INVALID_BOUNDS_ERROR = "min value is > than max value";
   private static final String ARRAY_MUST_NOT_BE_EMPTY = "array to chose an element from must not be null or empty.";
-  private static final String INVALID_AMOUNT_FOR_SAMPLING_WITHOUT_REPLACEMENT = "amount must be <= the specified array length for sampling without replacement.";
+  private static final String INVALID_AMOUNT_FOR_SAMPLING_WITHOUT_REPLACEMENT =
+      "amount must be <= the specified array length for sampling without replacement.";
 
-  GameRandom() {
-  }
+  GameRandom() {}
 
   /**
-   * Sets the seed of this random number generator using a
-   * {@code String} seed.
+   * Sets the seed of this random number generator using a {@code String} seed.
    *
    * @param seed
    *          The initial seed.
-   * 
+   *
    * @see #setSeed(long)
    */
   public void setSeed(String seed) {
@@ -47,7 +47,8 @@ public final class GameRandom extends java.util.Random {
       throw new IllegalArgumentException(INVALID_AMOUNT_FOR_SAMPLING_WITHOUT_REPLACEMENT);
     }
 
-    //declare array, cast to (T[]) that was determined using reflection, use java.lang.reflect to create a new instance of an Array(of arrayType variable, and the same length as the original
+    // declare array, cast to (T[]) that was determined using reflection, use java.lang.reflect to
+    // create a new instance of an Array(of arrayType variable, and the same length as the original
     @SuppressWarnings("unchecked")
     T[] sampled = (T[]) java.lang.reflect.Array.newInstance(array.getClass().getComponentType(), amount);
 
@@ -55,7 +56,7 @@ public final class GameRandom extends java.util.Random {
       T[] copiedArray = ArrayUtilities.arrayCopy(array);
       this.shuffle(copiedArray);
 
-      //Use System and arraycopy to copy the array
+      // Use System and arraycopy to copy the array
       System.arraycopy(copiedArray, 0, sampled, 0, amount);
 
       return sampled;
@@ -91,7 +92,7 @@ public final class GameRandom extends java.util.Random {
 
   /**
    * Chooses a pseudo-random element from the specified array.
-   * 
+   *
    * @param <T>
    *          The type of the elements in the array.
    * @param array
@@ -108,11 +109,11 @@ public final class GameRandom extends java.util.Random {
 
   /**
    * Chooses a pseudo-random element from the specified array.
-   * 
+   *
    * @param array
    *          The array to choose from.
    * @return A pseudo-random element from the array.
-   * 
+   *
    * @throws IllegalArgumentException
    *           When the specified array is null or empty.
    */
@@ -126,11 +127,11 @@ public final class GameRandom extends java.util.Random {
 
   /**
    * Chooses a pseudo-random element from the specified array.
-   * 
+   *
    * @param array
    *          The array to choose from.
    * @return A pseudo-random element from the array.
-   * 
+   *
    * @throws IllegalArgumentException
    *           When the specified array is null or empty.
    */
@@ -144,11 +145,11 @@ public final class GameRandom extends java.util.Random {
 
   /**
    * Chooses a pseudo-random element from the specified array.
-   * 
+   *
    * @param array
    *          The array to choose from.
    * @return A pseudo-random element from the array.
-   * 
+   *
    * @throws IllegalArgumentException
    *           When the specified array is null or empty.
    */
@@ -162,11 +163,11 @@ public final class GameRandom extends java.util.Random {
 
   /**
    * Chooses a pseudo-random element from the specified array.
-   * 
+   *
    * @param array
    *          The array to choose from.
    * @return A pseudo-random element from the array.
-   * 
+   *
    * @throws IllegalArgumentException
    *           When the specified array is null or empty.
    */
@@ -180,7 +181,7 @@ public final class GameRandom extends java.util.Random {
 
   /**
    * Chooses a pseudo-random element from the specified collection.
-   * 
+   *
    * @param <T>
    *          The type of the elements in the collection.
    * @param coll
@@ -204,7 +205,7 @@ public final class GameRandom extends java.util.Random {
 
   /**
    * Shuffles the elements in the specified array.
-   * 
+   *
    * @param <T>
    *          The type of the elements in the collection.
    * @param array
@@ -221,7 +222,7 @@ public final class GameRandom extends java.util.Random {
 
   /**
    * Shuffles the elements in the specified array.
-   * 
+   *
    * @param array
    *          The array to be shuffled.
    */
@@ -236,7 +237,7 @@ public final class GameRandom extends java.util.Random {
 
   /**
    * Shuffles the elements in the specified array.
-   * 
+   *
    * @param array
    *          The array to be shuffled.
    */
@@ -251,7 +252,7 @@ public final class GameRandom extends java.util.Random {
 
   /**
    * Shuffles the elements in the specified array.
-   * 
+   *
    * @param array
    *          The array to be shuffled.
    */
@@ -266,7 +267,7 @@ public final class GameRandom extends java.util.Random {
 
   /**
    * Shuffles the elements in the specified collection.
-   * 
+   *
    * @param <T>
    *          The type of the elements in the collection.
    * @param coll
@@ -278,11 +279,11 @@ public final class GameRandom extends java.util.Random {
 
   /**
    * Gets a random algebraic sign that can be used to multiply values with it.
-   * 
+   *
    * <p>
    * This either returns 1 or -1 depending on the random outcome.
    * </p>
-   * 
+   *
    * @return A random sign for algebraic operations.
    */
   public int nextSign() {
@@ -291,12 +292,12 @@ public final class GameRandom extends java.util.Random {
 
   /**
    * Shuffles the algebraic sign of the specified int value.
-   * 
+   *
    * @param value
    *          The value to shuffle.
-   * 
+   *
    * @return Either the specified value; or its negative equivalent (multiplied by -1).
-   * 
+   *
    * @see #nextSign()
    */
   public int shuffleSign(int value) {
@@ -305,12 +306,12 @@ public final class GameRandom extends java.util.Random {
 
   /**
    * Shuffles the algebraic sign of the specified float value.
-   * 
+   *
    * @param value
    *          The value to shuffle.
-   * 
+   *
    * @return Either the specified value; or its negative equivalent (multiplied by -1).
-   * 
+   *
    * @see #nextSign()
    */
   public float shuffleSign(float value) {
@@ -319,12 +320,12 @@ public final class GameRandom extends java.util.Random {
 
   /**
    * Shuffles the algebraic sign of the specified long value.
-   * 
+   *
    * @param value
    *          The value to shuffle.
-   * 
+   *
    * @return Either the specified value; or its negative equivalent (multiplied by -1).
-   * 
+   *
    * @see #nextSign()
    */
   public long shuffleSign(long value) {
@@ -333,12 +334,12 @@ public final class GameRandom extends java.util.Random {
 
   /**
    * Shuffles the algebraic sign of the specified double value.
-   * 
+   *
    * @param value
    *          The value to shuffle.
-   * 
+   *
    * @return Either the specified value; or its negative equivalent (multiplied by -1).
-   * 
+   *
    * @see #nextSign()
    */
   public double shuffleSign(double value) {
@@ -346,13 +347,11 @@ public final class GameRandom extends java.util.Random {
   }
 
   /**
-   * Returns a pseudo-random {@code long} value between zero (inclusive)
-   * and the specified bound (exclusive).
+   * Returns a pseudo-random {@code long} value between zero (inclusive) and the specified bound (exclusive).
    *
    * @param bound
    *          the upper bound (exclusive). Must be positive.
-   * @return a pseudo-random {@code long} value between zero
-   *         (inclusive) and the bound (exclusive)
+   * @return a pseudo-random {@code long} value between zero (inclusive) and the bound (exclusive)
    * @throws IllegalArgumentException
    *           if {@code bound} is not positive
    */
@@ -361,15 +360,14 @@ public final class GameRandom extends java.util.Random {
   }
 
   /**
-   * Returns a pseudo-random {@code long} value between the specified
-   * origin (inclusive) and the specified bound (exclusive).
+   * Returns a pseudo-random {@code long} value between the specified origin (inclusive) and the specified bound
+   * (exclusive).
    *
    * @param min
    *          the least value returned
    * @param bound
    *          the upper bound (exclusive)
-   * @return a pseudo-random {@code long} value between the origin
-   *         (inclusive) and the bound (exclusive)
+   * @return a pseudo-random {@code long} value between the origin (inclusive) and the bound (exclusive)
    * @throws IllegalArgumentException
    *           if {@code origin} is greater than {@code bound}
    */
@@ -386,13 +384,11 @@ public final class GameRandom extends java.util.Random {
   }
 
   /**
-   * Returns a pseudo-random {@code double} value between zero (inclusive)
-   * and the specified bound (exclusive).
+   * Returns a pseudo-random {@code double} value between zero (inclusive) and the specified bound (exclusive).
    *
    * @param bound
    *          the upper bound (exclusive). Must be positive.
-   * @return a pseudo-random {@code double} value between zero
-   *         (inclusive) and the bound (exclusive)
+   * @return a pseudo-random {@code double} value between zero (inclusive) and the bound (exclusive)
    * @throws IllegalArgumentException
    *           if {@code bound} is not positive
    */
@@ -401,15 +397,14 @@ public final class GameRandom extends java.util.Random {
   }
 
   /**
-   * Returns a pseudo-random {@code double} value between the specified
-   * origin (inclusive) and the specified bound (exclusive).
+   * Returns a pseudo-random {@code double} value between the specified origin (inclusive) and the specified bound
+   * (exclusive).
    *
    * @param min
    *          the least value returned
    * @param bound
    *          the upper bound (exclusive)
-   * @return a pseudo-random {@code double} value between the origin
-   *         (inclusive) and the bound (exclusive)
+   * @return a pseudo-random {@code double} value between the origin (inclusive) and the bound (exclusive)
    * @throws IllegalArgumentException
    *           if {@code origin} is greater than {@code bound}
    */
@@ -426,13 +421,11 @@ public final class GameRandom extends java.util.Random {
   }
 
   /**
-   * Returns a pseudo-random {@code float} value between zero (inclusive)
-   * and the specified bound (exclusive).
+   * Returns a pseudo-random {@code float} value between zero (inclusive) and the specified bound (exclusive).
    *
    * @param bound
    *          the upper bound (exclusive). Must be positive.
-   * @return a pseudo-random {@code float} value between zero
-   *         (inclusive) and the bound (exclusive)
+   * @return a pseudo-random {@code float} value between zero (inclusive) and the bound (exclusive)
    * @throws IllegalArgumentException
    *           if {@code bound} is not positive
    */
@@ -441,15 +434,14 @@ public final class GameRandom extends java.util.Random {
   }
 
   /**
-   * Returns a pseudo-random {@code float} value between the specified
-   * origin (inclusive) and the specified bound (exclusive).
+   * Returns a pseudo-random {@code float} value between the specified origin (inclusive) and the specified bound
+   * (exclusive).
    *
    * @param min
    *          the least value returned
    * @param bound
    *          the upper bound (exclusive)
-   * @return a pseudo-random {@code float} value between the origin
-   *         (inclusive) and the bound (exclusive)
+   * @return a pseudo-random {@code float} value between the origin (inclusive) and the bound (exclusive)
    * @throws IllegalArgumentException
    *           if {@code origin} is greater than {@code bound}
    */
@@ -466,15 +458,14 @@ public final class GameRandom extends java.util.Random {
   }
 
   /**
-   * Returns a pseudo-random {@code int} value between the specified
-   * origin (inclusive) and the specified bound (exclusive).
+   * Returns a pseudo-random {@code int} value between the specified origin (inclusive) and the specified bound
+   * (exclusive).
    *
    * @param min
    *          the least value returned
    * @param bound
    *          the upper bound (exclusive)
-   * @return a pseudo-random {@code int} value between the origin
-   *         (inclusive) and the bound (exclusive)
+   * @return a pseudo-random {@code int} value between the origin (inclusive) and the bound (exclusive)
    * @throws IllegalArgumentException
    *           if {@code origin} is greater than {@code bound}
    */
@@ -497,12 +488,12 @@ public final class GameRandom extends java.util.Random {
 
   /**
    * Probes a pseudo-random value between 0.0 and 1.0 and checks whether it matches the specified probability.
-   * 
+   *
    * <p>
    * Example: if the specified probability is 0.5, the sampled value needs to be less than or equal to the specified value
    * in order for this method to return true.
    * </p>
-   * 
+   *
    * @param probability
    *          The probability to check.
    * @return True if the sampled value matches the probability; otherwise false.
@@ -513,8 +504,8 @@ public final class GameRandom extends java.util.Random {
   }
 
   /**
-   * Returns a pseudo-random index that is distributed by the weights of the defined probability array.
-   * The index probabilities must sum up to 1;
+   * Returns a pseudo-random index that is distributed by the weights of the defined probability array. The index
+   * probabilities must sum up to 1;
    *
    * @param indexProbabilities
    *          The index with the probabilities for the related index.
@@ -537,7 +528,7 @@ public final class GameRandom extends java.util.Random {
 
   /**
    * Gets a pseudo-random location within the specified boundaries.
-   * 
+   *
    * @param x
    *          The min-x coordinate of the boundaries.
    * @param y
@@ -557,7 +548,7 @@ public final class GameRandom extends java.util.Random {
 
   /**
    * Gets a pseudo-random location within the specified boundaries.
-   * 
+   *
    * @param rect
    *          The rectangle that defines the boundaries.
    * @return A pseudo-random location within the specified bounds.
@@ -568,11 +559,11 @@ public final class GameRandom extends java.util.Random {
 
   /**
    * Gets a pseudo-random location within the specified entity boundaries.
-   * 
+   *
    * @param entity
    *          The entity that defines the boundaries.
    * @return A pseudo-random location within the specified bounds.
-   * 
+   *
    * @see IEntity#getBoundingBox()
    */
   public Point2D getLocation(final IEntity entity) {
@@ -581,11 +572,11 @@ public final class GameRandom extends java.util.Random {
 
   /**
    * Gets a pseudo-random location within the specified map boundaries.
-   * 
+   *
    * @param map
    *          The map that defines the boundaries.
    * @return A pseudo-random location within the specified bounds.
-   * 
+   *
    * @see IMap#getBounds()
    */
   public Point2D getLocation(final IMap map) {
@@ -594,7 +585,7 @@ public final class GameRandom extends java.util.Random {
 
   /**
    * Gets a pseudo-random location in the specified circle.
-   * 
+   *
    * @param circle
    *          The circle that defines the boundaries.
    * @return A pseudo-random location on the specified circle.
@@ -612,11 +603,11 @@ public final class GameRandom extends java.util.Random {
 
   /**
    * Gets a pseudo-random location on the specified line.
-   * 
+   *
    * @param line
    *          The line that defines the boundaries.
    * @return A pseudo-random location on the specified line.
-   * 
+   *
    * @see Line2D#getP1()
    * @see Line2D#getP2()
    */
@@ -626,7 +617,7 @@ public final class GameRandom extends java.util.Random {
 
   /**
    * Gets a pseudo-random location on the line connecting the two specified points.
-   * 
+   *
    * @param start
    *          The start point.
    * @param end
@@ -640,7 +631,7 @@ public final class GameRandom extends java.util.Random {
 
   /**
    * Gets a pseudo-random char value.
-   * 
+   *
    * @return A pseudo-random character.
    */
   public char nextChar() {
@@ -651,7 +642,7 @@ public final class GameRandom extends java.util.Random {
 
   /**
    * Gets a pseudo-random char value from the specified alphabet.
-   * 
+   *
    * @param alphabet
    *          The alphabet to chose the character from.
    * @return A pseudo-random character from the specified alphabet.
@@ -662,7 +653,7 @@ public final class GameRandom extends java.util.Random {
 
   /**
    * Gets a pseudo-random char value.
-   * 
+   *
    * @return A pseudo-random character.
    */
   public char nextAscii() {
@@ -671,11 +662,11 @@ public final class GameRandom extends java.util.Random {
 
   /**
    * Gets a pseudo-random String of the specified length.
-   * 
+   *
    * <p>
    * Characters will be chosen from the set of characters whose ASCII value is between 32 and 126 (inclusive)
    * </p>
-   * 
+   *
    * @param length
    *          The length of the String.
    * @return A pseudo-random ASCII String.
@@ -691,7 +682,7 @@ public final class GameRandom extends java.util.Random {
 
   /**
    * Gets a pseudo-random alphanumeric String of the specified length.
-   * 
+   *
    * @param length
    *          The length of the String.
    * @return A pseudo-random alphanumeric String.
@@ -702,7 +693,7 @@ public final class GameRandom extends java.util.Random {
 
   /**
    * Gets a pseudo-random alphanumeric String of the specified length.
-   * 
+   *
    * @param length
    *          The length of the String.
    * @param lowerCase
@@ -715,7 +706,7 @@ public final class GameRandom extends java.util.Random {
 
   /**
    * Gets a pseudo-random alphanumeric String of the specified length.
-   * 
+   *
    * @param length
    *          The length of the String.
    * @param digit
@@ -748,7 +739,7 @@ public final class GameRandom extends java.util.Random {
 
   /**
    * Gets a pseudo-random alphabetic String of the specified length.
-   * 
+   *
    * @param length
    *          The length of the String.
    * @return A pseudo-random alphabetic String.
@@ -759,7 +750,7 @@ public final class GameRandom extends java.util.Random {
 
   /**
    * Gets a pseudo-random alphabetic String of the specified length.
-   * 
+   *
    * @param length
    *          The length of the String.
    * @param lowerCase
@@ -772,23 +763,29 @@ public final class GameRandom extends java.util.Random {
 
   /**
    * Returns a randomized variant of a given color.
-   * 
+   *
    * @param originalColor
    *          The original color to be modified.
    * @param colorVariance
-   *          The float value between 0 and 1 defining how strong the new Color's RGB values will deviate from the original Color.
+   *          The float value between 0 and 1 defining how strong the new Color's RGB values will deviate from the
+   *          original Color.
    * @param alphaVariance
-   *          The float value between 0 and 1 defining how strong the new Color's Alpha will deviate from the original Color.
+   *          The float value between 0 and 1 defining how strong the new Color's Alpha will deviate from the original
+   *          Color.
    * @return A pseudo-randomized variant of the original Color.
    */
   public Color nextColor(Color originalColor, float colorVariance, float alphaVariance) {
     if (originalColor == null) {
       return null;
     }
-    int red = MathUtilities.clamp((int) (originalColor.getRed() + (originalColor.getRed() * this.nextFloat(colorVariance) * this.nextSign())), 0, 255);
-    int green = MathUtilities.clamp((int) (originalColor.getGreen() + (originalColor.getGreen() * this.nextFloat(colorVariance) * this.nextSign())), 0, 255);
-    int blue = MathUtilities.clamp((int) (originalColor.getBlue() + (originalColor.getBlue() * this.nextFloat(colorVariance) * this.nextSign())), 0, 255);
-    int alpha = MathUtilities.clamp((int) (originalColor.getAlpha() + (originalColor.getAlpha() * this.nextFloat(alphaVariance) * this.nextSign())), 0, 255);
+    int red = MathUtilities.clamp(
+        (int) (originalColor.getRed() + (originalColor.getRed() * this.nextFloat(colorVariance) * this.nextSign())), 0, 255);
+    int green = MathUtilities.clamp(
+        (int) (originalColor.getGreen() + (originalColor.getGreen() * this.nextFloat(colorVariance) * this.nextSign())), 0, 255);
+    int blue = MathUtilities.clamp(
+        (int) (originalColor.getBlue() + (originalColor.getBlue() * this.nextFloat(colorVariance) * this.nextSign())), 0, 255);
+    int alpha = MathUtilities.clamp(
+        (int) (originalColor.getAlpha() + (originalColor.getAlpha() * this.nextFloat(alphaVariance) * this.nextSign())), 0, 255);
     return new Color(red, green, blue, alpha);
 
   }

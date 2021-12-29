@@ -107,17 +107,17 @@ class TextureAtlasTests {
 
   private static Stream<Arguments> getTextureAtlasLoadResourceName() {
     return Stream.of(
-            Arguments.of("Dean-idle-left.png"),
-            Arguments.of("Dean-walk-left.png"),
-            Arguments.of("gurknukem-idle-left.png"),
-            Arguments.of("gurknukem-walk-left.png"),
-            Arguments.of("icon.png"),
-            Arguments.of("Jorge-idle-left.png"),
-            Arguments.of("Jorge-walk-left.png"),
-            Arguments.of("prop-barrel-damaged.png"),
-            Arguments.of("prop-barrel-destroyed.png"),
-            Arguments.of("prop-barrel-intact.png"),
-            Arguments.of("prop-bunker.png"),
-            Arguments.of("prop-flag.png"));
+        Arguments.of("Dean-idle-left.png"),
+        Arguments.of("Dean-walk-left.png"),
+        Arguments.of("gurknukem-idle-left.png"),
+        Arguments.of("gurknukem-walk-left.png"),
+        Arguments.of("icon.png"),
+        Arguments.of("Jorge-idle-left.png"),
+        Arguments.of("Jorge-walk-left.png"),
+        Arguments.of("prop-barrel-damaged.png"),
+        Arguments.of("prop-barrel-destroyed.png"),
+        Arguments.of("prop-barrel-intact.png"),
+        Arguments.of("prop-bunker.png"),
+        Arguments.of("prop-flag.png"));
   }
 }

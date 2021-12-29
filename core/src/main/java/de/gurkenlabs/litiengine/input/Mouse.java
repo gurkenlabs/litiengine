@@ -59,7 +59,8 @@ public final class Mouse
   /**
    * Instantiates a new mouse.
    *
-   * @throws AWTException In case the {@link Robot} class could not be initialized.
+   * @throws AWTException
+   *           In case the {@link Robot} class could not be initialized.
    */
   Mouse() throws AWTException {
     try {
@@ -411,10 +412,11 @@ public final class Mouse
   }
 
   /**
-   * Calculates the location of the ingame mouse by the position diff and locks the original mouse
-   * to the center of the screen.
+   * Calculates the location of the ingame mouse by the position diff and locks the original mouse to the center of the
+   * screen.
    *
-   * @param e The event containing information about the original mouse.
+   * @param e
+   *          The event containing information about the original mouse.
    */
   private void setLocation(final MouseEvent e) {
     if (this.grabMouse && !Game.window().isFocusOwner()) {
@@ -456,7 +458,8 @@ public final class Mouse
   /**
    * Sets the pressed.
    *
-   * @param pressed the new pressed
+   * @param pressed
+   *          the new pressed
    */
   private void setPressed(final boolean pressed) {
     this.pressed = pressed;

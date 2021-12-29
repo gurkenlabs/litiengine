@@ -26,7 +26,8 @@ public interface ICollisionEntity extends IEntity {
   /**
    * Gets the collision box.
    *
-   * @param location the location
+   * @param location
+   *          the location
    * @return the collision box
    */
   Rectangle2D getCollisionBox(Point2D location);
@@ -58,7 +59,8 @@ public interface ICollisionEntity extends IEntity {
   /**
    * Sets the collision.
    *
-   * @param collision the new collision
+   * @param collision
+   *          the new collision
    */
   void setCollision(boolean collision);
 

@@ -40,7 +40,7 @@ public class PolylineAdapter extends XmlAdapter<String, List<Point2D>> {
 
   private static String save(double d) {
     if (d % 1.0 == 0.0 && d >= Long.MIN_VALUE && d <= Long.MAX_VALUE) {
-      return Long.toString((long)d);
+      return Long.toString((long) d);
     } else {
       return Double.toString(d);
     }

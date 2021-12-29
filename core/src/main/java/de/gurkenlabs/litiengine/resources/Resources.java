@@ -27,9 +27,9 @@ import de.gurkenlabs.litiengine.sound.Sound;
 import de.gurkenlabs.litiengine.util.TimeUtilities;
 
 /**
- * This class is the engines entry point for accessing any kind of resources. A resource is any non-executable data that is deployed with your game.
- * The {@code Resources} class provides access to types of {@code ResourcesContainers} and is used by different (loading) mechanisms to make
- * resources available during runtime.
+ * This class is the engines entry point for accessing any kind of resources. A resource is any non-executable data that
+ * is deployed with your game. The {@code Resources} class provides access to types of {@code ResourcesContainers} and
+ * is used by different (loading) mechanisms to make resources available during runtime.
  * <p>
  * The LITIENGINE supports a variety of different resource types, including:
  * </p>
@@ -95,8 +95,8 @@ public final class Resources {
 
   /**
    * Gets the container that manages {@code Tileset} resources.<br>
-   * This implementation uses raw {@code Tileset}s, to avoid problems with
-   * {@code Tileset} methods that aren't in the {@code ITileset} interface.
+   * This implementation uses raw {@code Tileset}s, to avoid problems with {@code Tileset} methods that aren't in the
+   * {@code ITileset} interface.
    * 
    * @return The Tileset resource container.
    * 
@@ -150,8 +150,8 @@ public final class Resources {
   }
 
   /**
-   * Load {@code Spritesheets}, {@code Tilesets} and {@code Maps} from a game resource file created with the utiLITI editor.
-   * After loading, these resources can be accessed via this API (e.g. {@code Resources.maps().get("mapname")}.
+   * Load {@code Spritesheets}, {@code Tilesets} and {@code Maps} from a game resource file created with the utiLITI
+   * editor. After loading, these resources can be accessed via this API (e.g. {@code Resources.maps().get("mapname")}.
    * 
    * @param gameResourceFile
    *          The file name of the game resource file
@@ -161,8 +161,8 @@ public final class Resources {
   }
 
   /**
-   * Load {@code Spritesheets}, {@code Tilesets} and {@code Maps} from a game resource file created with the utiLITI editor.
-   * After loading, these resources can be accessed via this API (e.g. {@code Resources.maps().get("mapname")}.
+   * Load {@code Spritesheets}, {@code Tilesets} and {@code Maps} from a game resource file created with the utiLITI
+   * editor. After loading, these resources can be accessed via this API (e.g. {@code Resources.maps().get("mapname")}.
    * 
    * @param gameResourceFile
    *          The URL to the game resource file
@@ -177,11 +177,11 @@ public final class Resources {
 
     file.getMaps().parallelStream().forEach(m -> Resources.maps().add(m.getName(), m));
 
-    log.log(Level.INFO, "{0} maps loaded from {1}", new Object[] { file.getMaps().size(), gameResourceFile });
+    log.log(Level.INFO, "{0} maps loaded from {1}", new Object[] {file.getMaps().size(), gameResourceFile});
 
     file.getBluePrints().parallelStream().forEach(m -> Resources.blueprints().add(m.getName(), m));
 
-    log.log(Level.INFO, "{0} blueprints loaded from {1}", new Object[] { file.getBluePrints().size(), gameResourceFile });
+    log.log(Level.INFO, "{0} blueprints loaded from {1}", new Object[] {file.getBluePrints().size(), gameResourceFile});
 
     int tileCnt = 0;
     for (final Tileset tileset : file.getTilesets()) {
@@ -193,7 +193,7 @@ public final class Resources {
       tileCnt++;
     }
 
-    log.log(Level.INFO, "{0} tilesets loaded from {1}", new Object[] { tileCnt, gameResourceFile });
+    log.log(Level.INFO, "{0} tilesets loaded from {1}", new Object[] {tileCnt, gameResourceFile});
 
     final List<Spritesheet> loadedSprites = Collections.synchronizedList(new ArrayList<>());
     file.getSpriteSheets().parallelStream().forEach(spriteSheetInfo -> {
@@ -201,7 +201,7 @@ public final class Resources {
       loadedSprites.add(sprite);
     });
 
-    log.log(Level.INFO, "{0} spritesheets loaded from {1}", new Object[] { loadedSprites.size(), gameResourceFile });
+    log.log(Level.INFO, "{0} spritesheets loaded from {1}", new Object[] {loadedSprites.size(), gameResourceFile});
 
     final List<Sound> loadedSounds = Collections.synchronizedList(new ArrayList<>());
     file.getSounds().parallelStream().forEach(soundResource -> {
@@ -209,7 +209,7 @@ public final class Resources {
       loadedSounds.add(sound);
     });
 
-    log.log(Level.INFO, "{0} sounds loaded from {1}", new Object[] { loadedSounds.size(), gameResourceFile });
+    log.log(Level.INFO, "{0} sounds loaded from {1}", new Object[] {loadedSounds.size(), gameResourceFile});
 
     int spriteload = 0;
     for (final Spritesheet s : loadedSprites) {
@@ -221,7 +221,7 @@ public final class Resources {
       }
     }
 
-    log.log(Level.INFO, "{0} sprites loaded to memory", new Object[] { spriteload });
+    log.log(Level.INFO, "{0} sprites loaded to memory", new Object[] {spriteload});
 
     for (final EmitterData emitter : file.getEmitters()) {
       EmitterLoader.load(emitter);
@@ -229,7 +229,7 @@ public final class Resources {
 
     final double loadTime = TimeUtilities.nanoToMs(System.nanoTime() - loadStart);
 
-    log.log(Level.INFO, "loading game resources from {0} took {1} ms", new Object[] { gameResourceFile, loadTime });
+    log.log(Level.INFO, "loading game resources from {0} took {1} ms", new Object[] {gameResourceFile, loadTime});
   }
 
   /**

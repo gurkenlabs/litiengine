@@ -9,8 +9,10 @@ import com.github.vlsi.gradle.publishing.dsl.versionFromResolution
 plugins {
   id("com.github.vlsi.crlf")
   id("com.github.vlsi.gradle-extensions")
+  id("com.diffplug.spotless")
 }
 
+val skipSpotless by props(false)
 val skipJavadoc by props()
 val enableMavenLocal by props(false)
 val enableGradleMetadata by props()
@@ -37,6 +39,21 @@ allprojects {
 
   configurations.all {
     resolutionStrategy.cacheChangingModulesFor(0, "seconds")
+  }
+
+  if (!skipSpotless) {
+    apply(plugin = "com.diffplug.spotless")
+    spotless {
+      kotlinGradle {
+        ktlint("ktlint".v).userData(mapOf("indent_size" to "2"))
+      }
+      plugins.withType<JavaPlugin>().configureEach {
+        java {
+          removeUnusedImports()
+          eclipse().configFile("${project.rootDir}/config/gurkenlabs.eclipseformat.xml")
+        }
+      }
+    }
   }
 
   tasks.withType<AbstractArchiveTask>().configureEach {
@@ -110,7 +127,7 @@ allprojects {
           header = "<b>${project.name.capitalize()}</b>"
           addBooleanOption("Xdoclint:none", true)
           addBooleanOption("html5", true)
-          links("https://docs.oracle.com/en/java/javase/16/docs/api/")
+          links("https://docs.oracle.com/javase/16/docs/api/")
         }
       }
     }

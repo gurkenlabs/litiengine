@@ -140,8 +140,7 @@ public final class LayerList extends JPanel implements LayerController {
               null,
               Resources.strings().get("panel_confirmDeleteLayer"),
               "",
-              JOptionPane.YES_NO_OPTION)
-              != 0) {
+              JOptionPane.YES_NO_OPTION) != 0) {
             return;
           }
 

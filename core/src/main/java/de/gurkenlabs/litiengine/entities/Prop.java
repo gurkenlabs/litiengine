@@ -37,7 +37,8 @@ public class Prop extends CombatEntity {
   /**
    * Instantiates a new {@code Prop} entity.
    *
-   * @param spritesheetName The spritesheet name of this prop.
+   * @param spritesheetName
+   *          The spritesheet name of this prop.
    */
   public Prop(final String spritesheetName) {
     this(0, 0, spritesheetName);
@@ -46,9 +47,12 @@ public class Prop extends CombatEntity {
   /**
    * Instantiates a new {@code Prop} entity.
    *
-   * @param x The x-coordinate of this prop.
-   * @param y The y-coordinate of this prop.
-   * @param spritesheetName The spritesheet name of this prop.
+   * @param x
+   *          The x-coordinate of this prop.
+   * @param y
+   *          The y-coordinate of this prop.
+   * @param spritesheetName
+   *          The spritesheet name of this prop.
    */
   public Prop(double x, double y, final String spritesheetName) {
     this(x, y, spritesheetName, Material.UNDEFINED);
@@ -57,10 +61,14 @@ public class Prop extends CombatEntity {
   /**
    * Instantiates a new {@code Prop} entity.
    *
-   * @param x The x-coordinate of this prop.
-   * @param y The y-coordinate of this prop.
-   * @param spritesheetName The spritesheet name of this prop.
-   * @param material The material of this prop.
+   * @param x
+   *          The x-coordinate of this prop.
+   * @param y
+   *          The y-coordinate of this prop.
+   * @param spritesheetName
+   *          The spritesheet name of this prop.
+   * @param material
+   *          The material of this prop.
    */
   public Prop(double x, double y, final String spritesheetName, final Material material) {
     this(new Point2D.Double(x, y), spritesheetName, material);
@@ -69,8 +77,10 @@ public class Prop extends CombatEntity {
   /**
    * Instantiates a new {@code Prop} entity.
    *
-   * @param location The location of this prop.
-   * @param spritesheetName The spritesheet name of this prop.
+   * @param location
+   *          The location of this prop.
+   * @param spritesheetName
+   *          The spritesheet name of this prop.
    */
   public Prop(final Point2D location, final String spritesheetName) {
     this(location, spritesheetName, Material.UNDEFINED);
@@ -79,9 +89,12 @@ public class Prop extends CombatEntity {
   /**
    * Instantiates a new {@code Prop} entity.
    *
-   * @param location The location of this prop.
-   * @param spritesheetName The spritesheet name of this prop.
-   * @param material The material of this prop.
+   * @param location
+   *          The location of this prop.
+   * @param spritesheetName
+   *          The spritesheet name of this prop.
+   * @param material
+   *          The material of this prop.
    */
   public Prop(final Point2D location, final String spritesheetName, final Material material) {
     super();

@@ -44,11 +44,11 @@ class DataFormatTests {
 
   private static Stream<Arguments> getImageFormat() {
     return Stream.of(
-            Arguments.of("test.gif", true),
-            Arguments.of("test.png", true),
-            Arguments.of("test.jpg", true),
-            Arguments.of("test.bmp", true),
-            Arguments.of("test.test", false),
-            Arguments.of("test.undefined", false));
+        Arguments.of("test.gif", true),
+        Arguments.of("test.png", true),
+        Arguments.of("test.jpg", true),
+        Arguments.of("test.bmp", true),
+        Arguments.of("test.test", false),
+        Arguments.of("test.undefined", false));
   }
 }

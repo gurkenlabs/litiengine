@@ -253,7 +253,7 @@ class GuiComponentTests {
 
   @ParameterizedTest
   @MethodSource("getTweenValuesArguments")
-  void testGetTweenValues(TweenType tweenType, float[] expectedValues){
+  void testGetTweenValues(TweenType tweenType, float[] expectedValues) {
     // arrange
     TestComponent component = new TestComponent(10, 15, 50, 75);
     component.setFont(new Font("Times", 10, 10));
@@ -267,7 +267,7 @@ class GuiComponentTests {
 
   @ParameterizedTest
   @MethodSource("getTweenValuesOpacityArguments")
-  void testGetTweenValuesOpacity(Color bg1, Color bg2, Color fg, Color border, Color shadow, float[] expectedValues){
+  void testGetTweenValuesOpacity(Color bg1, Color bg2, Color fg, Color border, Color shadow, float[] expectedValues) {
     // arrange
     TestComponent component = new TestComponent(10, 15, 50, 75);
     component.getCurrentAppearance().setBackgroundColor1(bg1);
@@ -284,7 +284,7 @@ class GuiComponentTests {
   }
 
   @Test
-  void testSetTweenValuesOpacity(){
+  void testSetTweenValuesOpacity() {
     // arrange
     TestComponent component = new TestComponent(10, 15, 50, 75);
     component.getCurrentAppearance().setBackgroundColor1(Color.RED);
@@ -307,7 +307,7 @@ class GuiComponentTests {
   }
 
   @Test
-  void testSetTweenValuesOpacityNull(){
+  void testSetTweenValuesOpacityNull() {
     // arrange
     TestComponent component = new TestComponent(10, 15, 50, 75);
     component.getCurrentAppearance().setBackgroundColor1(null);
@@ -331,7 +331,7 @@ class GuiComponentTests {
 
   @ParameterizedTest
   @MethodSource("getTextToRenderArguments")
-  void testGetTextToRender(int stringWidth, boolean autoLineBreaks, String initialText, String expectedText){
+  void testGetTextToRender(int stringWidth, boolean autoLineBreaks, String initialText, String expectedText) {
     // arrange
     TestComponent component = new TestComponent(10, 15, 50, 75);
     component.setText(initialText);
@@ -350,7 +350,7 @@ class GuiComponentTests {
   }
 
   @Test
-  void testGetShape(){
+  void testGetShape() {
     // arrange
     TestComponent component = new TestComponent(10, 15, 50, 75);
 
@@ -365,13 +365,13 @@ class GuiComponentTests {
   }
 
   @Test
-  void testGetShapeRadius(){
+  void testGetShapeRadius() {
     // arrange
     TestComponent component = new TestComponent(10, 15, 50, 75);
     component.getCurrentAppearance().setBorderRadius(5f);
 
     // act
-    RoundRectangle2D shape = (RoundRectangle2D)component.getShape();
+    RoundRectangle2D shape = (RoundRectangle2D) component.getShape();
 
     // assert
     assertEquals(10, shape.getX());
@@ -385,36 +385,33 @@ class GuiComponentTests {
   @SuppressWarnings("unused")
   private static Stream<Arguments> getTextToRenderArguments() {
     return Stream.of(
-            Arguments.of(90, false, null, ""),
-            Arguments.of(90, false, "", ""),
-            Arguments.of(90, false, "test", "t"),
-            Arguments.of(20, false, "test", "test"),
-            Arguments.of(120, true, "test", "test")
-    );
+        Arguments.of(90, false, null, ""),
+        Arguments.of(90, false, "", ""),
+        Arguments.of(90, false, "test", "t"),
+        Arguments.of(20, false, "test", "test"),
+        Arguments.of(120, true, "test", "test"));
   }
 
   @SuppressWarnings("unused")
-  private static Stream<Arguments> getTweenValuesArguments(){
+  private static Stream<Arguments> getTweenValuesArguments() {
     return Stream.of(
-            Arguments.of(TweenType.POSITION_X, new float[] {10f}),
-            Arguments.of(TweenType.POSITION_Y, new float[] {15f}),
-            Arguments.of(TweenType.POSITION_XY, new float[] {10f, 15f}),
-            Arguments.of(TweenType.SIZE_WIDTH, new float[] {50f}),
-            Arguments.of(TweenType.SIZE_HEIGHT, new float[] {75f}),
-            Arguments.of(TweenType.SIZE_BOTH, new float[] {50f, 75f}),
-            Arguments.of(TweenType.ANGLE, new float[] {0f}),
-            Arguments.of(TweenType.FONTSIZE, new float[] {10f}),
-            Arguments.of(TweenType.OPACITY, new float[] {0f, 0f, 255f, 0f, 0f}),
-            Arguments.of(TweenType.UNDEFINED, new float[] {})
-    );
+        Arguments.of(TweenType.POSITION_X, new float[] {10f}),
+        Arguments.of(TweenType.POSITION_Y, new float[] {15f}),
+        Arguments.of(TweenType.POSITION_XY, new float[] {10f, 15f}),
+        Arguments.of(TweenType.SIZE_WIDTH, new float[] {50f}),
+        Arguments.of(TweenType.SIZE_HEIGHT, new float[] {75f}),
+        Arguments.of(TweenType.SIZE_BOTH, new float[] {50f, 75f}),
+        Arguments.of(TweenType.ANGLE, new float[] {0f}),
+        Arguments.of(TweenType.FONTSIZE, new float[] {10f}),
+        Arguments.of(TweenType.OPACITY, new float[] {0f, 0f, 255f, 0f, 0f}),
+        Arguments.of(TweenType.UNDEFINED, new float[] {}));
   }
 
   @SuppressWarnings("unused")
-  private static Stream<Arguments> getTweenValuesOpacityArguments(){
+  private static Stream<Arguments> getTweenValuesOpacityArguments() {
     return Stream.of(
-            Arguments.of(null, null, null, null, null, new float[] {0f, 0f, 0f, 0f, 0f}),
-            Arguments.of(Color.RED, Color.GREEN, Color.BLUE, Color.PINK, Color.YELLOW, new float[] {255f, 255f, 255f, 255f, 255f})
-    );
+        Arguments.of(null, null, null, null, null, new float[] {0f, 0f, 0f, 0f, 0f}),
+        Arguments.of(Color.RED, Color.GREEN, Color.BLUE, Color.PINK, Color.YELLOW, new float[] {255f, 255f, 255f, 255f, 255f}));
   }
 
   private static MouseEvent createTestEvent(int x, int y) {

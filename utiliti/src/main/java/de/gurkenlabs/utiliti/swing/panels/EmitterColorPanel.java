@@ -128,7 +128,7 @@ public class EmitterColorPanel extends PropertyPanel {
 
   private void setupChangedListeners() {
     btnAdd.addActionListener(
-        a -> model.addRow(new Object[]{ColorHelper.encode(EmitterData.DEFAULT_COLOR.brighter())}));
+        a -> model.addRow(new Object[] {ColorHelper.encode(EmitterData.DEFAULT_COLOR.brighter())}));
     btnRemove.addActionListener(a -> model.removeRow(table.getSelectedRow()));
     btnEdit.addActionListener(
         a -> {

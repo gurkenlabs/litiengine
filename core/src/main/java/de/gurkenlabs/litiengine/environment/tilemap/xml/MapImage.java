@@ -144,9 +144,8 @@ public class MapImage extends CustomPropertyProvider implements IMapImage {
   }
 
   /**
-   * Computes a hash code for this map image. The hash code for
-   * a map image is equal to the hash code of its absolute source
-   * path xor the hash code of its transparent color.
+   * Computes a hash code for this map image. The hash code for a map image is equal to the hash code of its absolute
+   * source path xor the hash code of its transparent color.
    *
    * @return The hash code for this map image
    */

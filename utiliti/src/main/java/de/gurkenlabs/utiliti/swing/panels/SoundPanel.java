@@ -38,13 +38,12 @@ public class SoundPanel extends PropertyPanel {
     this.soundResource = new JComboBox<>();
     this.play = new JButton(Resources.strings().get("panel_play_sound"), Icons.PLAY);
     this.play.addActionListener(
-        l ->
-            Game.audio()
-                .playSound(
-                    (Sound) this.soundResource.getSelectedItem(),
-                    false,
-                    (int) this.range.getValue(),
-                    this.volume.getValue() / 50f));
+        l -> Game.audio()
+            .playSound(
+                (Sound) this.soundResource.getSelectedItem(),
+                false,
+                (int) this.range.getValue(),
+                this.volume.getValue() / 50f));
     setLayout(this.createLayout());
     this.setupChangedListeners();
   }
@@ -61,9 +60,8 @@ public class SoundPanel extends PropertyPanel {
   @Override
   protected void setControlValues(IMapObject mapObject) {
     this.volume.setValue(
-        (int)
-            MathUtilities.clamp(
-                mapObject.getFloatValue(MapObjectProperty.SOUND_VOLUME) * 50, 0, 100));
+        (int) MathUtilities.clamp(
+            mapObject.getFloatValue(MapObjectProperty.SOUND_VOLUME) * 50, 0, 100));
     this.range.setValue(mapObject.getIntValue(MapObjectProperty.SOUND_RANGE));
     this.loop.setSelected(mapObject.getBoolValue(MapObjectProperty.SOUND_LOOP));
     updateModel();

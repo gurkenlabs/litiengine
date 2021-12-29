@@ -85,7 +85,7 @@ public class MapPropertyPanel extends JPanel {
         new DefaultTableModel(
             new Object[][] {},
             new String[] {
-              Resources.strings().get("panel_name"), Resources.strings().get("panel_value")
+                Resources.strings().get("panel_name"), Resources.strings().get("panel_value")
             }));
 
     this.model = (DefaultTableModel) this.tableCustomProperties.getModel();

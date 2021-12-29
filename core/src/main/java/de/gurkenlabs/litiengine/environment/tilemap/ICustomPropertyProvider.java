@@ -41,7 +41,8 @@ public interface ICustomPropertyProvider {
   public String getStringValue(String propertyName);
 
   /**
-   * Gets the string value of the custom property with the provided name. If the value is null, the provided default value is used as a fallback.
+   * Gets the string value of the custom property with the provided name. If the value is null, the provided default value
+   * is used as a fallback.
    *
    * @param propertyName
    *          the name of the custom property
@@ -58,7 +59,8 @@ public interface ICustomPropertyProvider {
    *          the name of the custom property
    * @param defaultValue
    *          the fallback value in case the property value is null.
-   * @return the list of comma-separated strings in the custom property, if present. Otherwise, the provided default value is returned.
+   * @return the list of comma-separated strings in the custom property, if present. Otherwise, the provided default value
+   *         is returned.
    */
   public List<String> getCommaSeparatedStringValues(String propertyName, String defaultValue);
 
@@ -76,7 +78,8 @@ public interface ICustomPropertyProvider {
   public int getIntValue(String propertyName);
 
   /**
-   * Gets the int value of the custom property with the provided name. If the value is null, the provided default value is used as a fallback.
+   * Gets the int value of the custom property with the provided name. If the value is null, the provided default value is
+   * used as a fallback.
    *
    * @param propertyName
    *          the name of the custom property
@@ -106,7 +109,8 @@ public interface ICustomPropertyProvider {
   }
 
   /**
-   * Gets the long value of the custom property with the provided name. If the value is null, the provided default value is used as a fallback.
+   * Gets the long value of the custom property with the provided name. If the value is null, the provided default value
+   * is used as a fallback.
    *
    * @param propertyName
    *          the name of the custom property
@@ -130,7 +134,8 @@ public interface ICustomPropertyProvider {
   public short getShortValue(String propertyName);
 
   /**
-   * Gets the short value of the custom property with the provided name. If the value is null, the provided default value is used as a fallback.
+   * Gets the short value of the custom property with the provided name. If the value is null, the provided default value
+   * is used as a fallback.
    *
    * @param propertyName
    *          the name of the custom property
@@ -154,7 +159,8 @@ public interface ICustomPropertyProvider {
   public byte getByteValue(String propertyName);
 
   /**
-   * Gets the byte value of the custom property with the provided name. If the value is null, the provided default value is used as a fallback.
+   * Gets the byte value of the custom property with the provided name. If the value is null, the provided default value
+   * is used as a fallback.
    *
    * @param propertyName
    *          the name of the custom property
@@ -178,7 +184,8 @@ public interface ICustomPropertyProvider {
   public boolean getBoolValue(String propertyName);
 
   /**
-   * Gets the boolean value of the custom property with the provided name. If the value is null, the provided default value is used as a fallback.
+   * Gets the boolean value of the custom property with the provided name. If the value is null, the provided default
+   * value is used as a fallback.
    *
    * @param propertyName
    *          the name of the custom property
@@ -202,7 +209,8 @@ public interface ICustomPropertyProvider {
   public float getFloatValue(String propertyName);
 
   /**
-   * Gets the float value of the custom property with the provided name. If the value is null, the provided default value is used as a fallback.
+   * Gets the float value of the custom property with the provided name. If the value is null, the provided default value
+   * is used as a fallback.
    *
    * @param propertyName
    *          the name of the custom property
@@ -226,7 +234,8 @@ public interface ICustomPropertyProvider {
   public double getDoubleValue(String propertyName);
 
   /**
-   * Gets the double value of the custom property with the provided name. If the value is null, the provided default value is used as a fallback.
+   * Gets the double value of the custom property with the provided name. If the value is null, the provided default value
+   * is used as a fallback.
    *
    * @param propertyName
    *          the name of the custom property
@@ -248,7 +257,8 @@ public interface ICustomPropertyProvider {
   public Color getColorValue(String propertyName);
 
   /**
-   * Gets the color value of the custom property with the provided name. If the value is null, the provided default value is used as a fallback.
+   * Gets the color value of the custom property with the provided name. If the value is null, the provided default value
+   * is used as a fallback.
    *
    * @param propertyName
    *          the name of the custom property
@@ -274,7 +284,8 @@ public interface ICustomPropertyProvider {
   public <T extends Enum<T>> T getEnumValue(String propertyName, Class<T> enumType);
 
   /**
-   * Gets the enum value of the custom property with the provided name. If the value is null, the provided default value is used as a fallback.
+   * Gets the enum value of the custom property with the provided name. If the value is null, the provided default value
+   * is used as a fallback.
    *
    * @param propertyName
    *          the name of the custom property
@@ -289,7 +300,8 @@ public interface ICustomPropertyProvider {
   public <T extends Enum<T>> T getEnumValue(String propertyName, Class<T> enumType, T defaultValue);
 
   /**
-   * Gets the file value of the custom property with the provided name. If the property is not a file, {@code null} is returned instead.
+   * Gets the file value of the custom property with the provided name. If the property is not a file, {@code null} is
+   * returned instead.
    *
    * @param propertyName
    *          the name of the custom property
@@ -298,8 +310,8 @@ public interface ICustomPropertyProvider {
   public URL getFileValue(String propertyName);
 
   /**
-   * Gets the file value of the custom property with the provided name. If the value is null or the property is not a file, the provided default value
-   * is used as a fallback.
+   * Gets the file value of the custom property with the provided name. If the value is null or the property is not a
+   * file, the provided default value is used as a fallback.
    *
    * @param propertyName
    *          the name of the custom property
@@ -427,9 +439,8 @@ public interface ICustomPropertyProvider {
   public Map<String, ICustomProperty> getProperties();
 
   /**
-   * Sets all of the custom properties on this object to the provided values. Properties are added
-   * when they only exist in the provided properties, and deleted when they only exist in the current
-   * properties.
+   * Sets all of the custom properties on this object to the provided values. Properties are added when they only exist in
+   * the provided properties, and deleted when they only exist in the current properties.
    *
    * @param props
    *          the new list of properties

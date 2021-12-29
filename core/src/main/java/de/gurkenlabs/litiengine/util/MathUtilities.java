@@ -27,12 +27,14 @@ public class MathUtilities {
   }
 
   /**
-   * Modifies the value (if necessary) such that it lies within the boundaries of the specified
-   * minimum and maximum.
+   * Modifies the value (if necessary) such that it lies within the boundaries of the specified minimum and maximum.
    *
-   * @param value The value to be clamped.
-   * @param min The minimum value to be accepted.
-   * @param max The maximum value to be accepted.
+   * @param value
+   *          The value to be clamped.
+   * @param min
+   *          The minimum value to be accepted.
+   * @param max
+   *          The maximum value to be accepted.
    * @return A value clamped to the specified boundaries.
    */
   public static double clamp(final double value, final double min, final double max) {
@@ -40,12 +42,14 @@ public class MathUtilities {
   }
 
   /**
-   * Modifies the value (if necessary) such that it lies within the boundaries of the specified
-   * minimum and maximum.
+   * Modifies the value (if necessary) such that it lies within the boundaries of the specified minimum and maximum.
    *
-   * @param value The value to be clamped.
-   * @param min The minimum value to be accepted.
-   * @param max The maximum value to be accepted.
+   * @param value
+   *          The value to be clamped.
+   * @param min
+   *          The minimum value to be accepted.
+   * @param max
+   *          The maximum value to be accepted.
    * @return A value clamped to the specified boundaries.
    */
   public static float clamp(final float value, final float min, final float max) {
@@ -53,12 +57,14 @@ public class MathUtilities {
   }
 
   /**
-   * Modifies the value (if necessary) such that it lies within the boundaries of the specified
-   * minimum and maximum.
+   * Modifies the value (if necessary) such that it lies within the boundaries of the specified minimum and maximum.
    *
-   * @param value The value to be clamped.
-   * @param min The minimum value to be accepted.
-   * @param max The maximum value to be accepted.
+   * @param value
+   *          The value to be clamped.
+   * @param min
+   *          The minimum value to be accepted.
+   * @param max
+   *          The maximum value to be accepted.
    * @return A value clamped to the specified boundaries.
    */
   public static byte clamp(final byte value, final byte min, final byte max) {
@@ -74,12 +80,14 @@ public class MathUtilities {
   }
 
   /**
-   * Modifies the value (if necessary) such that it lies within the boundaries of the specified
-   * minimum and maximum.
+   * Modifies the value (if necessary) such that it lies within the boundaries of the specified minimum and maximum.
    *
-   * @param value The value to be clamped.
-   * @param min The minimum value to be accepted.
-   * @param max The maximum value to be accepted.
+   * @param value
+   *          The value to be clamped.
+   * @param min
+   *          The minimum value to be accepted.
+   * @param max
+   *          The maximum value to be accepted.
    * @return A value clamped to the specified boundaries.
    */
   public static short clamp(final short value, final short min, final short max) {
@@ -96,12 +104,14 @@ public class MathUtilities {
   }
 
   /**
-   * Modifies the value (if necessary) such that it lies within the boundaries of the specified
-   * minimum and maximum.
+   * Modifies the value (if necessary) such that it lies within the boundaries of the specified minimum and maximum.
    *
-   * @param value The value to be clamped.
-   * @param min The minimum value to be accepted.
-   * @param max The maximum value to be accepted.
+   * @param value
+   *          The value to be clamped.
+   * @param min
+   *          The minimum value to be accepted.
+   * @param max
+   *          The maximum value to be accepted.
    * @return A value clamped to the specified boundaries.
    */
   public static int clamp(final int value, final int min, final int max) {
@@ -117,12 +127,14 @@ public class MathUtilities {
   }
 
   /**
-   * Modifies the value (if necessary) such that it lies within the boundaries of the specified
-   * minimum and maximum.
+   * Modifies the value (if necessary) such that it lies within the boundaries of the specified minimum and maximum.
    *
-   * @param value The value to be clamped.
-   * @param min The minimum value to be accepted.
-   * @param max The maximum value to be accepted.
+   * @param value
+   *          The value to be clamped.
+   * @param min
+   *          The minimum value to be accepted.
+   * @param max
+   *          The maximum value to be accepted.
    * @return A value clamped to the specified boundaries.
    */
   public static long clamp(final long value, final long min, final long max) {

@@ -104,17 +104,19 @@ public class AStarPathFinder extends PathFinder {
   }
 
   /**
-   * Updates the costs and the predecessor of all neighbors of the specified {@code currentNode}.
-   * <br>
+   * Updates the costs and the predecessor of all neighbors of the specified {@code currentNode}. <br>
    * If a neighbor was previously not part of the {@code opened} list it will be added to it.<br>
    * If a neighbor is already closed, it will be ignored.<br>
-   * If the {@link AStarNode#isWalkable()} method of a neighbor returns {@code false} it will also
-   * not be considered.
+   * If the {@link AStarNode#isWalkable()} method of a neighbor returns {@code false} it will also not be considered.
    *
-   * @param currentNode The node for which the neighbors will be searched for.
-   * @param targetNode The target node of the path-finding operation.
-   * @param opened The list of all the opened nodes of the path-finding operation.
-   * @param closed The list of all the closed nodes of the path-finding operation.
+   * @param currentNode
+   *          The node for which the neighbors will be searched for.
+   * @param targetNode
+   *          The target node of the path-finding operation.
+   * @param opened
+   *          The list of all the opened nodes of the path-finding operation.
+   * @param closed
+   *          The list of all the closed nodes of the path-finding operation.
    */
   private void updateAndOpenNeighborNodes(
       AStarNode currentNode, AStarNode targetNode, List<AStarNode> opened, List<AStarNode> closed) {
@@ -160,19 +162,21 @@ public class AStarPathFinder extends PathFinder {
   }
 
   /**
-   * Retraces the found path from the targetNode back to the startNode by making use of the {@link
-   * AStarNode#getPredecessor()}.
+   * Retraces the found path from the targetNode back to the startNode by making use of the
+   * {@link AStarNode#getPredecessor()}.
    *
    * <ol>
-   *   <li>Adds all predecessors to a list of nodes that will be visited by the path.
-   *   <li>Invert the list.
-   *   <li>Create a new {@link Path2D} by iterating all nodes in the list.
-   *   <li>Wrap the {@link Path2D} object into a {@link Path} to provide information about the
-   *       start, target and points of the path.
+   * <li>Adds all predecessors to a list of nodes that will be visited by the path.
+   * <li>Invert the list.
+   * <li>Create a new {@link Path2D} by iterating all nodes in the list.
+   * <li>Wrap the {@link Path2D} object into a {@link Path} to provide information about the start, target and points of
+   * the path.
    * </ol>
    *
-   * @param startNode The start node for the path.
-   * @param targetNode The target node for the path.
+   * @param startNode
+   *          The start node for the path.
+   * @param targetNode
+   *          The target node for the path.
    * @return The found {@link Path}
    */
   private static Path retracePath(final AStarNode startNode, final AStarNode targetNode) {

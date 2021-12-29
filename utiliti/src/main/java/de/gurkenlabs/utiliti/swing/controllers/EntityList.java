@@ -177,15 +177,15 @@ public final class EntityList extends JPanel implements EntityController {
 
     this.entityNodes =
         new DefaultMutableTreeNode[] {
-          this.nodeProps,
-          this.nodeCreatures,
-          this.nodeLights,
-          this.nodeTriggers,
-          this.nodeSpawnpoints,
-          this.nodeCollisionBoxes,
-          this.nodeMapAreas,
-          this.nodeStaticShadows,
-          this.nodeEmitter,
+            this.nodeProps,
+            this.nodeCreatures,
+            this.nodeLights,
+            this.nodeTriggers,
+            this.nodeSpawnpoints,
+            this.nodeCollisionBoxes,
+            this.nodeMapAreas,
+            this.nodeStaticShadows,
+            this.nodeEmitter,
         };
     MouseListener ml =
         new MouseAdapter() {
@@ -252,7 +252,7 @@ public final class EntityList extends JPanel implements EntityController {
   public void refresh(int mapId) {
     boolean updated = false;
     for (DefaultMutableTreeNode parent : this.entityNodes) {
-      if (updated){
+      if (updated) {
         break;
       }
 
@@ -286,7 +286,7 @@ public final class EntityList extends JPanel implements EntityController {
       }
     }
 
-    if (!updated){
+    if (!updated) {
       this.refresh();
     }
   }
@@ -295,7 +295,7 @@ public final class EntityList extends JPanel implements EntityController {
   public void remove(IMapObject mapObject) {
     boolean removed = false;
     for (DefaultMutableTreeNode parent : this.entityNodes) {
-      if (removed){
+      if (removed) {
         break;
       }
 
@@ -335,8 +335,8 @@ public final class EntityList extends JPanel implements EntityController {
     this.nodeRoot.setUserObject(
         new IconTreeListItem(
             (Game.world().environment() == null
-                    ? 0
-                    : Game.world().environment().getEntities().size())
+                ? 0
+                : Game.world().environment().getEntities().size())
                 + " "
                 + Resources.strings().get("panel_mapselection_entities"),
             Icons.FOLDER));

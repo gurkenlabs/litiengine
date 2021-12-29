@@ -221,7 +221,8 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   /**
    * Checks if is friendly.
    *
-   * @param entity the entity
+   * @param entity
+   *          the entity
    * @return true, if is friendly
    */
   @Override
@@ -278,7 +279,8 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   /**
    * Sets the team.
    *
-   * @param team the new team
+   * @param team
+   *          the new team
    */
   @Override
   public void setTeam(final int team) {

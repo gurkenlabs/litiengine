@@ -337,7 +337,8 @@ public class Camera implements ICamera {
   /**
    * Apply shake effect.
    *
-   * @param cameraLocation the camera location
+   * @param cameraLocation
+   *          the camera location
    * @return the point2 d
    */
   private Point2D applyShakeEffect(final Point2D cameraLocation) {

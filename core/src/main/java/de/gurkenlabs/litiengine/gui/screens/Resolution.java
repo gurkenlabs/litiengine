@@ -10,17 +10,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Represents the resolution of the game window consisting of the width and height and information
- * about the ratio.
+ * Represents the resolution of the game window consisting of the width and height and information about the ratio.
  *
- * <p>This class also provides access to predefined known resolutions of the different aspect ratios
- * which can be used to set the resolution of the {@code GameWindow}.
+ * <p>
+ * This class also provides access to predefined known resolutions of the different aspect ratios which can be used to
+ * set the resolution of the {@code GameWindow}.
  *
  * <ul>
- *   <li>{@link Ratio4x3}
- *   <li>{@link Ratio5x4}
- *   <li>{@link Ratio16x9}
- *   <li>{@link Ratio16x10}
+ * <li>{@link Ratio4x3}
+ * <li>{@link Ratio5x4}
+ * <li>{@link Ratio16x9}
+ * <li>{@link Ratio16x10}
  * </ul>
  *
  * @see GameWindow#setResolution(Resolution)

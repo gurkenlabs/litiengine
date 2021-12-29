@@ -24,9 +24,8 @@ public class GamepadEvent extends EventObject {
   }
 
   /**
-   * Gets the data from the last time the component has been polled. If this axis is a button, the
-   * value returned will be either 0.0f or 1.0f. If this axis is normalized, the value returned will
-   * be between -1.0f and 1.0f.
+   * Gets the data from the last time the component has been polled. If this axis is a button, the value returned will be
+   * either 0.0f or 1.0f. If this axis is normalized, the value returned will be between -1.0f and 1.0f.
    *
    * @return The last poll value of the component of this event.
    */

@@ -26,16 +26,17 @@ public class AmbientLight extends ColorLayer {
   /**
    * Instantiates a new {@code AmbientLight} instance.
    *
-   * @param environment The environment to which this instance is assigned.
-   * @param ambientColor The color of this instance.
+   * @param environment
+   *          The environment to which this instance is assigned.
+   * @param ambientColor
+   *          The color of this instance.
    */
   public AmbientLight(final Environment environment, final Color ambientColor) {
     super(environment, ambientColor);
   }
 
   /**
-   * @see <a href="https://docs.oracle.com/javase/tutorial/2d/advanced/compositing.html">Compositing
-   *     Graphics</a>
+   * @see <a href="https://docs.oracle.com/javase/tutorial/2d/advanced/compositing.html">Compositing Graphics</a>
    */
   @Override
   protected void renderSection(Graphics2D g, Rectangle2D section) {
@@ -140,8 +141,8 @@ public class AmbientLight extends ColorLayer {
         final Vector2D lightVector = new Vector2D(lightFocus, line.getP1());
 
         if (light.getCenter().getY() < line.getY1()
-                && light.getCenter().getY() < line.getY2()
-                && col.getBoundingBox().contains(light.getCenter())
+            && light.getCenter().getY() < line.getY2()
+            && col.getBoundingBox().contains(light.getCenter())
             || lineVector.normalVector().dotProduct(lightVector) >= 0) {
           continue;
         }
@@ -181,9 +182,9 @@ public class AmbientLight extends ColorLayer {
             : lightShape.getBounds2D().getHeight();
     final Color[] transColors =
         new Color[] {
-          light.getColor(),
-          new Color(
-              light.getColor().getRed(), light.getColor().getGreen(), light.getColor().getBlue(), 0)
+            light.getColor(),
+            new Color(
+                light.getColor().getRed(), light.getColor().getGreen(), light.getColor().getBlue(), 0)
         };
     final Point2D center =
         new Point2D.Double(

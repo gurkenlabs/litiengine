@@ -1,7 +1,5 @@
 package de.gurkenlabs.utiliti.swing;
 
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.utiliti.handlers.Scroll;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;

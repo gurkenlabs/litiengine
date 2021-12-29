@@ -1,8 +1,7 @@
 package de.gurkenlabs.litiengine.attributes;
 
 /**
- * An attribute modifier allows to modify attributes by the
- * specified Modification and modify value.
+ * An attribute modifier allows to modify attributes by the specified Modification and modify value.
  *
  * @param <T>
  *          the generic type
@@ -77,23 +76,23 @@ public class AttributeModifier<T extends Number> implements Comparable<Attribute
     }
 
     switch (this.getModification()) {
-    case ADD:
-      return this.ensureType(Double.valueOf(modvalue.doubleValue() + this.getModifyValue()), modvalue);
-    case SUBTRACT:
-      return this.ensureType(Double.valueOf(modvalue.doubleValue() - this.getModifyValue()), modvalue);
-    case MULTIPLY:
-      return this.ensureType(Double.valueOf(modvalue.doubleValue() * this.getModifyValue()), modvalue);
-    case DIVIDE:
-      return this.ensureType(Double.valueOf(modvalue.doubleValue() / this.getModifyValue()), modvalue);
-    case ADDPERCENT:
-      return this.ensureType(Double.valueOf(modvalue.doubleValue() + modvalue.doubleValue() / 100 * this.getModifyValue()), modvalue);
-    case SUBTRACTPERCENT:
-      return this.ensureType(Double.valueOf(modvalue.doubleValue() - modvalue.doubleValue() / 100 * this.getModifyValue()), modvalue);
-    case SET:
-      return this.ensureType(Double.valueOf(this.getModifyValue()), modvalue);
-    case UNKNOWN:
-    default:
-      return modvalue;
+      case ADD:
+        return this.ensureType(Double.valueOf(modvalue.doubleValue() + this.getModifyValue()), modvalue);
+      case SUBTRACT:
+        return this.ensureType(Double.valueOf(modvalue.doubleValue() - this.getModifyValue()), modvalue);
+      case MULTIPLY:
+        return this.ensureType(Double.valueOf(modvalue.doubleValue() * this.getModifyValue()), modvalue);
+      case DIVIDE:
+        return this.ensureType(Double.valueOf(modvalue.doubleValue() / this.getModifyValue()), modvalue);
+      case ADDPERCENT:
+        return this.ensureType(Double.valueOf(modvalue.doubleValue() + modvalue.doubleValue() / 100 * this.getModifyValue()), modvalue);
+      case SUBTRACTPERCENT:
+        return this.ensureType(Double.valueOf(modvalue.doubleValue() - modvalue.doubleValue() / 100 * this.getModifyValue()), modvalue);
+      case SET:
+        return this.ensureType(Double.valueOf(this.getModifyValue()), modvalue);
+      case UNKNOWN:
+      default:
+        return modvalue;
     }
   }
 

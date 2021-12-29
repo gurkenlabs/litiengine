@@ -7,15 +7,14 @@ import java.util.List;
 /**
  * An attribute is a numerical representation of a property that can be adjusted using {@link AttributeModifier}s.
  * <p>
- * It typically doesn't adjust the raw base value (unless explicitly requested) and instead adjusts the value by registered
- * modifications. This is e.g. useful when a property might only be changed for a certain period of time or we need to know the original
- * value of a property.
+ * It typically doesn't adjust the raw base value (unless explicitly requested) and instead adjusts the value by
+ * registered modifications. This is e.g. useful when a property might only be changed for a certain period of time or
+ * we need to know the original value of a property.
  * </p>
  * 
  * <p>
- * <i>
- * An example use-case are player stats that might be affected throughout the game (e.g. via certain skills, upgrades or level-ups).
- * </i>
+ * <i> An example use-case are player stats that might be affected throughout the game (e.g. via certain skills,
+ * upgrades or level-ups). </i>
  * </p>
  *
  * @param <T>

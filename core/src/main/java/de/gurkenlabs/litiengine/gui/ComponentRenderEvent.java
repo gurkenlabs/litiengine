@@ -11,8 +11,10 @@ public class ComponentRenderEvent extends EventObject {
   /**
    * Constructs a prototypical Event.
    *
-   * @param source the object on which the Event initially occurred
-   * @throws IllegalArgumentException if source is null
+   * @param source
+   *          the object on which the Event initially occurred
+   * @throws IllegalArgumentException
+   *           if source is null
    */
   public ComponentRenderEvent(final Graphics2D graphics, final GuiComponent source) {
     super(source);

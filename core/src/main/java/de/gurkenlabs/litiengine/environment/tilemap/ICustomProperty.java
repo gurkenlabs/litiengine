@@ -20,7 +20,8 @@ public interface ICustomProperty {
 
   public void setValue(double value);
 
-  // no methods for setting to byte, short, int, or float because they will already be accepted as a long or double
+  // no methods for setting to byte, short, int, or float because they will already be accepted as a
+  // long or double
 
   public void setValue(boolean value);
 
@@ -55,21 +56,18 @@ public interface ICustomProperty {
   public void setType(String type);
 
   /**
-   * Tests for equality between two custom properties. Two custom
-   * properties are <i>equal</i> if they both have the same type
-   * and string value.
+   * Tests for equality between two custom properties. Two custom properties are <i>equal</i> if they both have the same
+   * type and string value.
    * 
    * @param anObject
    *          The custom property to test equality for
-   * @return Whether the two custom properties are equal, or false
-   *         if {@code anObject} is not a custom property
+   * @return Whether the two custom properties are equal, or false if {@code anObject} is not a custom property
    */
   public boolean equals(Object anObject);
 
   /**
-   * Returns the hash code for this custom property. The hash code
-   * for a custom property is equal to its type's hash code times 31
-   * plus its value's hash code.
+   * Returns the hash code for this custom property. The hash code for a custom property is equal to its type's hash code
+   * times 31 plus its value's hash code.
    * 
    * @return The hash code for this custom property
    */

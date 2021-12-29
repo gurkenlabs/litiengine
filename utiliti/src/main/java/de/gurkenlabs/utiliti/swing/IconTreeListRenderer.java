@@ -1,6 +1,5 @@
 package de.gurkenlabs.utiliti.swing;
 
-import com.github.weisj.darklaf.components.border.DarkBorders;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.entities.LightSource;
@@ -120,21 +119,20 @@ public class IconTreeListRenderer implements TreeCellRenderer {
                   Collection<Spritesheet> sprites =
                       Resources.spritesheets()
                           .get(
-                              s ->
-                                  s.getName()
-                                          .equals(
-                                              CreatureAnimationController.getSpriteName(
-                                                  creature, CreatureAnimationState.IDLE))
-                                      || s.getName()
-                                          .equals(
-                                              CreatureAnimationController.getSpriteName(
-                                                  creature, CreatureAnimationState.WALK))
-                                      || s.getName()
-                                          .equals(
-                                              CreatureAnimationController.getSpriteName(
-                                                  creature, CreatureAnimationState.DEAD))
-                                      || s.getName()
-                                          .startsWith(creature.getSpritesheetName() + "-"));
+                              s -> s.getName()
+                                  .equals(
+                                      CreatureAnimationController.getSpriteName(
+                                          creature, CreatureAnimationState.IDLE))
+                                  || s.getName()
+                                      .equals(
+                                          CreatureAnimationController.getSpriteName(
+                                              creature, CreatureAnimationState.WALK))
+                                  || s.getName()
+                                      .equals(
+                                          CreatureAnimationController.getSpriteName(
+                                              creature, CreatureAnimationState.DEAD))
+                                  || s.getName()
+                                      .startsWith(creature.getSpritesheetName() + "-"));
                   if (sprites.isEmpty()) {
                     return null;
                   }

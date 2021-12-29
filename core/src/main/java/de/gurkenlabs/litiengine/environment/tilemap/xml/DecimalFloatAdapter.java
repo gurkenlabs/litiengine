@@ -3,8 +3,8 @@ package de.gurkenlabs.litiengine.environment.tilemap.xml;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
 /**
- * This adapter implementation ensures that the float value is serialized
- * like an integer when it has no digits behind the decimal point.
+ * This adapter implementation ensures that the float value is serialized like an integer when it has no digits behind
+ * the decimal point.
  */
 public class DecimalFloatAdapter extends XmlAdapter<String, Float> {
 

@@ -52,16 +52,17 @@ public class GeometricUtilities {
   }
 
   /**
-   * Calculates the angle from centerPt to targetPt in degrees. The return should range from
-   * [0,360), rotating CLOCKWISE, 0 and 360 degrees represents NORTH, 90 degrees represents EAST,
-   * etc...
+   * Calculates the angle from centerPt to targetPt in degrees. The return should range from [0,360), rotating CLOCKWISE,
+   * 0 and 360 degrees represents NORTH, 90 degrees represents EAST, etc...
    *
-   * <p>Assumes all points are in the same coordinate space. If they are not, you will need to call
-   * SwingUtilities.convertPointToScreen or equivalent on all arguments before passing them to this
-   * function.
+   * <p>
+   * Assumes all points are in the same coordinate space. If they are not, you will need to call
+   * SwingUtilities.convertPointToScreen or equivalent on all arguments before passing them to this function.
    *
-   * @param centerPt Point we are rotating around.
-   * @param targetPt Point we want to calcuate the angle to.
+   * @param centerPt
+   *          Point we are rotating around.
+   * @param targetPt
+   *          Point we want to calcuate the angle to.
    * @return angle in degrees. This is the angle from centerPt to targetPt.
    */
   public static double calcRotationAngleInDegrees(final Point2D centerPt, final Point2D targetPt) {
@@ -72,8 +73,10 @@ public class GeometricUtilities {
   /**
    * Contains.
    *
-   * @param rectangle the rectangle
-   * @param p the p
+   * @param rectangle
+   *          the rectangle
+   * @param p
+   *          the p
    * @return true, if successful
    */
   public static boolean contains(final Rectangle2D rectangle, final Point2D p) {
@@ -97,8 +100,10 @@ public class GeometricUtilities {
   /**
    * Distance.
    *
-   * @param rect the rect
-   * @param p the p
+   * @param rect
+   *          the rect
+   * @param p
+   *          the p
    * @return the double
    */
   public static double distance(final Rectangle2D rect, final Point2D p) {
@@ -209,8 +214,10 @@ public class GeometricUtilities {
   /**
    * Gets the intersection point.
    *
-   * @param lineA the line a
-   * @param lineB the line b
+   * @param lineA
+   *          the line a
+   * @param lineB
+   *          the line b
    * @return the intersection point
    */
   public static Point2D getIntersectionPoint(final Line2D lineA, final Line2D lineB) {
@@ -246,8 +253,10 @@ public class GeometricUtilities {
   /**
    * Intersects.
    *
-   * @param line the line
-   * @param rectangle the rectangle
+   * @param line
+   *          the line
+   * @param rectangle
+   *          the rectangle
    * @return the point2 d
    */
   public static Point2D getIntersectionPoint(final Line2D line, final Rectangle2D rectangle) {
@@ -263,8 +272,10 @@ public class GeometricUtilities {
   /**
    * Gets the intersection points.
    *
-   * @param line the line
-   * @param rectangle the rectangle
+   * @param line
+   *          the line
+   * @param rectangle
+   *          the rectangle
    * @return the intersection points
    */
   public static List<Point2D> getIntersectionPoints(
@@ -315,7 +326,8 @@ public class GeometricUtilities {
   /**
    * Gets the lines.
    *
-   * @param rectangle the rectangle
+   * @param rectangle
+   *          the rectangle
    * @return the lines
    */
   public static Line2D[] getLines(final Rectangle2D rectangle) {
@@ -359,7 +371,8 @@ public class GeometricUtilities {
   /**
    * Returns the center of a shape whose geometry is defined by a rectangular frame.
    *
-   * <p>Works for any subclass of RectuangularShape, including:<br>
+   * <p>
+   * Works for any subclass of RectuangularShape, including:<br>
    * <br>
    * Arc2D<br>
    * Ellipse2D<br>
@@ -367,7 +380,8 @@ public class GeometricUtilities {
    * RoundRectangle2D<br>
    * <br>
    *
-   * @param shape the shape to retrieve the center of
+   * @param shape
+   *          the shape to retrieve the center of
    * @return a Point2D representing the center of the shape
    * @see java.awt.geom.RectangularShape
    */
@@ -404,8 +418,10 @@ public class GeometricUtilities {
   /**
    * Gets the perpendicular intersection.
    *
-   * @param point the point
-   * @param line the line
+   * @param point
+   *          the point
+   * @param line
+   *          the line
    * @return the perpendicular intersection
    */
   public static Point2D getPerpendicularIntersection(final Point2D point, final Line2D line) {
@@ -452,7 +468,8 @@ public class GeometricUtilities {
   /**
    * Gets the points.
    *
-   * @param rectangle the rectangle
+   * @param rectangle
+   *          the rectangle
    * @return the points
    */
   public static List<Point2D> getPoints(final Rectangle2D rectangle) {
@@ -468,8 +485,10 @@ public class GeometricUtilities {
   /**
    * Gets the points between the specified points using the Bresenham algorithm.
    *
-   * @param point1 the point1
-   * @param point2 the point2
+   * @param point1
+   *          the point1
+   * @param point2
+   *          the point2
    * @return the points between points
    */
   public static List<Point2D> getPointsBetweenPoints(final Point2D point1, final Point2D point2) {
@@ -528,12 +547,14 @@ public class GeometricUtilities {
   }
 
   /**
-   * Project a line from a point with a given length and angle, return the point where the line
-   * ends.
+   * Project a line from a point with a given length and angle, return the point where the line ends.
    *
-   * @param start The starting point of the projection.
-   * @param angle The angle of the projection in degrees.
-   * @param delta The distance between starting point and end point.
+   * @param start
+   *          The starting point of the projection.
+   * @param angle
+   *          The angle of the projection in degrees.
+   * @param delta
+   *          The distance between starting point and end point.
    * @return The {@code Point2D} where the projection ends.
    */
   public static Point2D project(final Point2D start, final double angle, final double delta) {
@@ -552,9 +573,12 @@ public class GeometricUtilities {
   /**
    * Projects a point from end along the vector (end - start) by the given scalar amount.
    *
-   * @param start the start
-   * @param end the end
-   * @param scalar the scalar
+   * @param start
+   *          the start
+   * @param end
+   *          the end
+   * @param scalar
+   *          the scalar
    * @return the point2 d. double
    */
   public static Point2D project(final Point2D start, final Point2D end, final double scalar) {
@@ -585,10 +609,9 @@ public class GeometricUtilities {
       // Thus, the rectangle point at index i will not be added to the result.
       if (intersectionPoints.stream()
           .anyMatch(
-              intersectionPoint ->
-                  rectPoints.stream()
-                      .noneMatch(
-                          rectPoint -> equals(rectPoint, intersectionPoint, RAYCAST_EPSILON)))) {
+              intersectionPoint -> rectPoints.stream()
+                  .noneMatch(
+                      rectPoint -> equals(rectPoint, intersectionPoint, RAYCAST_EPSILON)))) {
         continue;
       }
 
@@ -642,11 +665,12 @@ public class GeometricUtilities {
   }
 
   /**
-   * Shape intersects. WARNING: USE THIS METHOD WITH CAUTION BECAUSE IT IS A VERY SLOW WAY OF
-   * CALCULATING INTERSECTIONS.
+   * Shape intersects. WARNING: USE THIS METHOD WITH CAUTION BECAUSE IT IS A VERY SLOW WAY OF CALCULATING INTERSECTIONS.
    *
-   * @param shapeA the shape a
-   * @param shapeB the shape b
+   * @param shapeA
+   *          the shape a
+   * @param shapeB
+   *          the shape b
    * @return true, if successful
    */
   public static boolean shapeIntersects(final Shape shapeA, final Shape shapeB) {
@@ -656,7 +680,7 @@ public class GeometricUtilities {
     }
 
     if (shapeA instanceof Rectangle2D && shapeB instanceof Rectangle2D) {
-      return intersects((Rectangle2D) shapeA, (Rectangle2D) shapeB) ;
+      return intersects((Rectangle2D) shapeA, (Rectangle2D) shapeB);
     }
 
     if (shapeA instanceof Line2D) {
@@ -684,7 +708,8 @@ public class GeometricUtilities {
   /**
    * Normalizes the specified angle to the range between 0-360 degree.
    *
-   * @param angle The angle that will be normalized.
+   * @param angle
+   *          The angle that will be normalized.
    * @return The normalized angle.
    */
   public static double normalizeAngle(final double angle) {

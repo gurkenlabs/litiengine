@@ -6,8 +6,8 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * This class holds all controllers for the entities in the game. It is used as a single hub to
- * access and manage all the controllers.
+ * This class holds all controllers for the entities in the game. It is used as a single hub to access and manage all
+ * the controllers.
  */
 public final class EntityControllers {
   private Map<Class<? extends IEntityController>, IEntityController> controllers;

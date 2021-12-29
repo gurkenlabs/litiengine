@@ -103,8 +103,8 @@ class GameRandomTests {
 
   @ParameterizedTest(name = "testNextLong partition={0} min={1} bound={2} expectedValue={3}")
   @CsvSource({
-    "minEqualsBound, 128643212354, 128643212354, 128643212354",
-    "minSmallerThanBound, 128643212354, 297536421382, -1716035126107589342"
+      "minEqualsBound, 128643212354, 128643212354, 128643212354",
+      "minSmallerThanBound, 128643212354, 297536421382, -1716035126107589342"
   })
   void testNextLong_partitions(String caption, long min, long bound, long expectedValue) {
     // arrange

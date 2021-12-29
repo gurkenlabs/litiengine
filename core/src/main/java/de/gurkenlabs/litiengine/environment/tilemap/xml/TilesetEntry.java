@@ -41,14 +41,13 @@ public class TilesetEntry extends CustomPropertyProvider implements ITilesetEntr
   @XmlAttribute
   private String type;
 
-  @XmlElement(name="objectgroup")
+  @XmlElement(name = "objectgroup")
   private MapObjectLayer collisionData;
 
   /**
    * Instantiates a new {@code TilesetEntry}.
    */
-  public TilesetEntry() {
-  }
+  public TilesetEntry() {}
 
   /**
    * Instantiates a new {@code TilesetEntry} from the specified tileset.
@@ -118,7 +117,7 @@ public class TilesetEntry extends CustomPropertyProvider implements ITilesetEntr
   }
 
   protected int[] getTerrainIds() {
-    int[] terrainIds = new int[] { Terrain.NONE, Terrain.NONE, Terrain.NONE, Terrain.NONE };
+    int[] terrainIds = new int[] {Terrain.NONE, Terrain.NONE, Terrain.NONE, Terrain.NONE};
     if (this.terrain == null || this.terrain.isEmpty()) {
       return terrainIds;
     }

@@ -14,8 +14,10 @@ public class SoundEffect extends Effect {
   /**
    * Initializes a new instance of the {@code SoundEffect} class.
    *
-   * @param ability The ability that performs the effect.
-   * @param sounds The sounds to chose from when applying the effect.
+   * @param ability
+   *          The ability that performs the effect.
+   * @param sounds
+   *          The sounds to chose from when applying the effect.
    */
   public SoundEffect(final Ability ability, final Sound... sounds) {
     super(ability, EffectTarget.EXECUTINGENTITY);

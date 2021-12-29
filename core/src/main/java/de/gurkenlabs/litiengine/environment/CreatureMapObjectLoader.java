@@ -31,27 +31,24 @@ public class CreatureMapObjectLoader extends MapObjectLoader {
 
   /**
    * <p>
-   * Registers a custom {@link Creature} implementation that can be
-   * automatically provided by this {@link MapObjectLoader}.
+   * Registers a custom {@link Creature} implementation that can be automatically provided by this
+   * {@link MapObjectLoader}.
    * </p>
    * 
    * <p>
-   * <b>This should only be used if the particular implementation doesn't
-   * require any additional map object properties to be initialized.</b>
+   * <b>This should only be used if the particular implementation doesn't require any additional map object properties to
+   * be initialized.</b>
    * </p>
    * 
    * Make sure that the implementation has the following present:
    * <ol>
-   * <li>An {@link AnimationInfo} annotation with one or more sprite prefixes
-   * defined</li>
-   * <li>Either an empty constructor or a constructor that takes in the sprite
-   * prefix from the loader.</li>
+   * <li>An {@link AnimationInfo} annotation with one or more sprite prefixes defined</li>
+   * <li>Either an empty constructor or a constructor that takes in the sprite prefix from the loader.</li>
    * </ol>
    * 
    * <p>
-   * The latter is particularly useful for classes that can have different
-   * sprite sheets, i.e. share the same logic but might have a different
-   * appearance.
+   * The latter is particularly useful for classes that can have different sprite sheets, i.e. share the same logic but
+   * might have a different appearance.
    * </p>
    * 
    * @param <T>
@@ -99,20 +96,24 @@ public class CreatureMapObjectLoader extends MapObjectLoader {
       }
     }
 
-    // if no custom creature type war registered for the spriteSheet, we just create a new Creature instance
+    // if no custom creature type war registered for the spriteSheet, we just create a new Creature
+    // instance
     return new Creature(spriteSheet);
   }
 
   private static Creature createCustomCreature(Class<? extends Creature> customCreature, String spriteSheet) {
     try {
       return customCreature.getConstructor(String.class).newInstance(spriteSheet);
-    } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+    } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
+        | SecurityException e) {
       try {
         Creature creature = customCreature.getConstructor().newInstance();
         creature.setSpritesheetName(spriteSheet);
         return creature;
-      } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException ex) {
-        log.log(Level.WARNING, "Could not automatically create creature of type {0} because a matching constructor is missing.", new Object[] { customCreature });
+      } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
+          | SecurityException ex) {
+        log.log(Level.WARNING, "Could not automatically create creature of type {0} because a matching constructor is missing.",
+            new Object[] {customCreature});
         log.log(Level.SEVERE, ex.getMessage(), ex);
       }
     }

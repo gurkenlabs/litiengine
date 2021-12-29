@@ -12,7 +12,8 @@ public interface CombatEntityResurrectListener extends EventListener {
   /**
    * This method is called whenever a {@code ICombatEntity} was resurrected.
    *
-   * @param entity The combat entity that was resurrected.
+   * @param entity
+   *          The combat entity that was resurrected.
    */
   void resurrect(ICombatEntity entity);
 }

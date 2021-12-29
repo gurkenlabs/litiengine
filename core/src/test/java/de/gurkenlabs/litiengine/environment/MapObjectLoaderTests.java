@@ -238,8 +238,8 @@ class MapObjectLoaderTests {
 
     assertFalse(trigger.isOneTimeTrigger());
     assertEquals(TriggerActivation.INTERACT, trigger.getActivationType());
-    assertArrayEquals(new Integer[]{1, 2, 3}, trigger.getTargets().toArray());
-    assertArrayEquals(new Integer[]{4, 5, 6}, trigger.getActivators().toArray());
+    assertArrayEquals(new Integer[] {1, 2, 3}, trigger.getTargets().toArray());
+    assertArrayEquals(new Integer[] {4, 5, 6}, trigger.getActivators().toArray());
     assertEquals(200.0, trigger.getCollisionBoxWidth(), 0.0001);
     assertEquals(200.0, trigger.getCollisionBoxHeight(), 0.0001);
   }

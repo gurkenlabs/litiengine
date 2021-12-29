@@ -39,8 +39,9 @@ public class DefaultUncaughtExceptionHandler implements UncaughtExceptionHandler
   /**
    * Initializes a new instance of the {@code DefaultUncaughtExceptionHandler} class.
    *
-   * @param exitOnException A flag indicating whether the game should exit when an unexpected exception occurs.
-   *                        The game will still exit if it encounters an Error.
+   * @param exitOnException
+   *          A flag indicating whether the game should exit when an unexpected exception occurs. The game will still exit
+   *          if it encounters an Error.
    */
   public DefaultUncaughtExceptionHandler(boolean exitOnException) {
     this(exitOnException, false);
@@ -49,9 +50,11 @@ public class DefaultUncaughtExceptionHandler implements UncaughtExceptionHandler
   /**
    * Initializes a new instance of the {@code DefaultUncaughtExceptionHandler} class.
    *
-   * @param exitOnException A flag indicating whether the game should exit when an unexpected exception occurs.
-   *                        The game will still exit if it encounters an Error
-   * @param dumpThreads     A flag indicating whether the crash report should contain an additional thread dump.
+   * @param exitOnException
+   *          A flag indicating whether the game should exit when an unexpected exception occurs. The game will still exit
+   *          if it encounters an Error
+   * @param dumpThreads
+   *          A flag indicating whether the crash report should contain an additional thread dump.
    */
   public DefaultUncaughtExceptionHandler(boolean exitOnException, boolean dumpThreads) {
     this.exitOnException = exitOnException;
@@ -104,7 +107,8 @@ public class DefaultUncaughtExceptionHandler implements UncaughtExceptionHandler
   /**
    * Set whether the game will exit upon an unhandled exception.
    *
-   * @param exit The flag that defines whether the game will exit upon an unhandled exception.
+   * @param exit
+   *          The flag that defines whether the game will exit upon an unhandled exception.
    */
   public void setExitOnException(boolean exit) {
     this.exitOnException = exit;
@@ -113,7 +117,8 @@ public class DefaultUncaughtExceptionHandler implements UncaughtExceptionHandler
   /**
    * Set whether the generated crash report will contain an additional thread dump
    *
-   * @param dumpThreads The flag that defines whether crash report will contain a thread dump.
+   * @param dumpThreads
+   *          The flag that defines whether crash report will contain a thread dump.
    */
   public void dumpThreads(boolean dumpThreads) {
     this.dumpThreads = dumpThreads;

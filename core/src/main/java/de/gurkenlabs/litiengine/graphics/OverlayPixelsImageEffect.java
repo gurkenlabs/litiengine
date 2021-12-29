@@ -11,8 +11,10 @@ public class OverlayPixelsImageEffect extends ImageEffect {
   /**
    * Initializes a new instance of the {@code OverlayPixelsImageEffect}.
    *
-   * @param ttl The time to live of this effect.
-   * @param color The color of this effect.
+   * @param ttl
+   *          The time to live of this effect.
+   * @param color
+   *          The color of this effect.
    */
   public OverlayPixelsImageEffect(final int ttl, final Color color) {
     super(ttl, "OverlayPixels" + color.getRed() + "" + color.getGreen() + "" + color.getBlue());

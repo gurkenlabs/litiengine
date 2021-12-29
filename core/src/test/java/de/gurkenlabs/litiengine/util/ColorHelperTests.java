@@ -138,11 +138,11 @@ class ColorHelperTests {
 
   @ParameterizedTest(name = "testRgbBounds {0}, colorValue={1}, expectedRgb={2}")
   @CsvSource({
-    "Negative, -10, 0",
-    "Zero, 0, 0",
-    "InRange, 158, 158",
-    "Max, 255, 255",
-    "OutOfRange, 300, 255"
+      "Negative, -10, 0",
+      "Zero, 0, 0",
+      "InRange, 158, 158",
+      "Max, 255, 255",
+      "OutOfRange, 300, 255"
   })
   void testRgbBounds(String rgbBound, int colorValue, int expectedRgb) {
     // arrange, act

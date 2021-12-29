@@ -11,7 +11,8 @@ public class LoopedTrack implements Track, Iterator<Sound> {
   /**
    * Initializes a new {@code LoopedTrack} for the specified sound.
    *
-   * @param soundName The name of the sound to be played by this track.
+   * @param soundName
+   *          The name of the sound to be played by this track.
    */
   public LoopedTrack(String soundName) {
     this(Resources.sounds().get(soundName));
@@ -20,7 +21,8 @@ public class LoopedTrack implements Track, Iterator<Sound> {
   /**
    * Initializes a new {@code LoopedTrack} for the specified sound.
    *
-   * @param sound The sound to be played by this track.
+   * @param sound
+   *          The sound to be played by this track.
    */
   public LoopedTrack(Sound sound) {
     this.track = Objects.requireNonNull(sound);

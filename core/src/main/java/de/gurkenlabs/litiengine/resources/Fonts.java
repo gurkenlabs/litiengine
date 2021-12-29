@@ -11,8 +11,7 @@ import java.util.logging.Logger;
 public final class Fonts extends ResourcesContainer<Font> {
   private static final Logger log = Logger.getLogger(Fonts.class.getName());
 
-  Fonts() {
-  }
+  Fonts() {}
 
   public Font get(String name, float size) {
     Font font = this.get(name);
@@ -42,8 +41,8 @@ public final class Fonts extends ResourcesContainer<Font> {
   }
 
   /***
-   * Loads a custom font with the specified name from game's resources.
-   * As a fallback, when no font could be found by the specified {@code fontName}, it tries to get the font from the environment by calling.
+   * Loads a custom font with the specified name from game's resources. As a fallback, when no font could be found by the
+   * specified {@code fontName}, it tries to get the font from the environment by calling.
    *
    * @param resourceName
    *          The name of the font

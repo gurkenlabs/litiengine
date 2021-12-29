@@ -1,8 +1,8 @@
 package de.gurkenlabs.litiengine.configuration;
 
 /**
- * This class contains all default {@code ConfigurationGroups} that are provided by the LITIENGINE.
- * Additionally, it can be used to register and manage custom settings that are specific to your game.
+ * This class contains all default {@code ConfigurationGroups} that are provided by the LITIENGINE. Additionally, it can
+ * be used to register and manage custom settings that are specific to your game.
  *
  * @see ConfigurationGroup
  * @see Configuration#add(ConfigurationGroup)
@@ -48,8 +48,8 @@ public final class GameConfiguration extends Configuration {
   }
 
   /**
-   * Gets the configuration group with all default graphics settings.
-   * Elements in this group will allow you to adjust the game's rendering behavior.
+   * Gets the configuration group with all default graphics settings. Elements in this group will allow you to adjust the
+   * game's rendering behavior.
    * 
    * @return The graphics configuration.
    */

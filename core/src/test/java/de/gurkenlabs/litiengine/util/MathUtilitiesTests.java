@@ -67,9 +67,9 @@ class MathUtilitiesTests {
 
   @ParameterizedTest(name = "{0}: (value={1}, min={2}, max={3}) = {4}")
   @CsvSource({
-    "'value < min',42, 64, 100, 64",
-    "'value >= min && value > max',42, 10, 40, 40",
-    "'value >= min && value <= max',42, 10, 100, 42"
+      "'value < min',42, 64, 100, 64",
+      "'value >= min && value > max',42, 10, 40, 40",
+      "'value >= min && value <= max',42, 10, 100, 42"
   })
   void testByteClamp(String partition, byte value, byte min, byte max, byte result) {
     assertEquals(result, MathUtilities.clamp(value, min, max));
@@ -77,9 +77,9 @@ class MathUtilitiesTests {
 
   @ParameterizedTest(name = "{0}: (value={1}, min={2}, max={3}) = {4}")
   @CsvSource({
-    "'value < min', 4200, 7344, 12567, 7344",
-    "'value >= min && value > max', 4200, 1200, 3511, 3511",
-    "'value >= min && value <= max', 4200, 1337, 28111, 4200"
+      "'value < min', 4200, 7344, 12567, 7344",
+      "'value >= min && value > max', 4200, 1200, 3511, 3511",
+      "'value >= min && value <= max', 4200, 1337, 28111, 4200"
   })
   void testShortClamp(String partition, short value, short min, short max, short result) {
     assertEquals(result, MathUtilities.clamp(value, min, max));

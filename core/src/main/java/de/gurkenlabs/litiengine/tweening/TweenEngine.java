@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * The TweenEngine is the central manager for Tweens. It tracks all current Tween instances and
- * applies their {@code TweenEquation} with every {@code GameLoop} update.
+ * The TweenEngine is the central manager for Tweens. It tracks all current Tween instances and applies their
+ * {@code TweenEquation} with every {@code GameLoop} update.
  */
 public class TweenEngine implements IUpdateable, ILaunchable {
   private final Map<Tweenable, Map<TweenType, Tween>> tweens;
@@ -19,13 +19,15 @@ public class TweenEngine implements IUpdateable, ILaunchable {
   }
 
   /**
-   * Begins a new Tween. If a Tween is already registered for the {@code Tweenable} with the given
-   * {@code TweenType}, it is restarted with the given duration.
+   * Begins a new Tween. If a Tween is already registered for the {@code Tweenable} with the given {@code TweenType}, it
+   * is restarted with the given duration.
    *
-   * @param target the {@code Tweenable} target object
-   * @param type the {@code TweenType} determining which values of the target object will be
-   *     modified.
-   * @param duration the duration of the Tween in milliseconds.
+   * @param target
+   *          the {@code Tweenable} target object
+   * @param type
+   *          the {@code TweenType} determining which values of the target object will be modified.
+   * @param duration
+   *          the duration of the Tween in milliseconds.
    * @return the Tween instance
    */
   public Tween begin(final Tweenable target, final TweenType type, final int duration) {
@@ -43,9 +45,10 @@ public class TweenEngine implements IUpdateable, ILaunchable {
   /**
    * Attempts to get a previously registered {@code Tween} or registers a new one.
    *
-   * @param target the {@code Tweenable} target object
-   * @param type the {@code TweenType} determining which values of the target object will be
-   *     modified.
+   * @param target
+   *          the {@code Tweenable} target object
+   * @param type
+   *          the {@code TweenType} determining which values of the target object will be modified.
    * @return the Tween instance
    */
   public Tween getTween(final Tweenable target, final TweenType type) {
@@ -66,12 +69,13 @@ public class TweenEngine implements IUpdateable, ILaunchable {
   }
 
   /**
-   * Looks for a registered Tween instance with the given target and type. Attempts to stop the
-   * Tween and reset the {@code Tweenable} values to the start values.
+   * Looks for a registered Tween instance with the given target and type. Attempts to stop the Tween and reset the
+   * {@code Tweenable} values to the start values.
    *
-   * @param target the {@code Tweenable} target object
-   * @param type the {@code TweenType} determining which values of the target object will be
-   *     modified.
+   * @param target
+   *          the {@code Tweenable} target object
+   * @param type
+   *          the {@code TweenType} determining which values of the target object will be modified.
    * @return the Tween instance
    */
   public Tween reset(final Tweenable target, final TweenType type) {
@@ -84,12 +88,12 @@ public class TweenEngine implements IUpdateable, ILaunchable {
   }
 
   /**
-   * Looks for a registered Tween instance with the given target and type. Attempts to resume the
-   * Tween if it was stopped.
+   * Looks for a registered Tween instance with the given target and type. Attempts to resume the Tween if it was stopped.
    *
-   * @param target the {@code Tweenable} target object
-   * @param type the {@code TweenType} determining which values of the target object will be
-   *     modified.
+   * @param target
+   *          the {@code Tweenable} target object
+   * @param type
+   *          the {@code TweenType} determining which values of the target object will be modified.
    * @return the Tween instance
    */
   public Tween resume(final Tweenable target, final TweenType type) {
@@ -107,12 +111,13 @@ public class TweenEngine implements IUpdateable, ILaunchable {
   }
 
   /**
-   * Looks for a registered Tween instance with the given target and type. Attempts to remove the
-   * Tween from the TweenEngine.
+   * Looks for a registered Tween instance with the given target and type. Attempts to remove the Tween from the
+   * TweenEngine.
    *
-   * @param target the {@code Tweenable} target object
-   * @param type the {@code TweenType} determining which values of the target object will be
-   *     modified.
+   * @param target
+   *          the {@code Tweenable} target object
+   * @param type
+   *          the {@code TweenType} determining which values of the target object will be modified.
    */
   public void remove(final Tweenable target, final TweenType type) {
     final Tween tween = this.getTween(target, type);
@@ -122,12 +127,12 @@ public class TweenEngine implements IUpdateable, ILaunchable {
   }
 
   /**
-   * Looks for a registered Tween instance with the given target and type. Attempts to stop the
-   * Tween.
+   * Looks for a registered Tween instance with the given target and type. Attempts to stop the Tween.
    *
-   * @param target the {@code Tweenable} target object
-   * @param type the {@code TweenType} determining which values of the target object will be
-   *     modified.
+   * @param target
+   *          the {@code Tweenable} target object
+   * @param type
+   *          the {@code TweenType} determining which values of the target object will be modified.
    * @return the Tween instance
    */
   public Tween stop(final Tweenable target, final TweenType type) {

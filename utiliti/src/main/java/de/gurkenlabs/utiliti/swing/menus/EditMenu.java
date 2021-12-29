@@ -86,8 +86,7 @@ public final class EditMenu extends JMenu {
     Editor.instance()
         .getMapComponent()
         .onEditModeChanged(
-            mode ->
-                paste.setEnabled(Editor.instance().getMapComponent().getCopiedBlueprint() != null));
+            mode -> paste.setEnabled(Editor.instance().getMapComponent().getCopiedBlueprint() != null));
 
     UndoManager.onUndoStackChanged(
         manager -> {
@@ -98,8 +97,7 @@ public final class EditMenu extends JMenu {
     Editor.instance()
         .getMapComponent()
         .onEditModeChanged(
-            mode ->
-                paste.setEnabled(Editor.instance().getMapComponent().getCopiedBlueprint() != null));
+            mode -> paste.setEnabled(Editor.instance().getMapComponent().getCopiedBlueprint() != null));
 
     this.add(addMenu);
     this.addSeparator();
