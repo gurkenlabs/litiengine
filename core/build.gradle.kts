@@ -25,7 +25,6 @@ dependencies {
   }
 
   implementation(libs.bundles.soundlibs)
-  implementation(libs.steamworks)
   implementation(libs.javax.activation)
   // This needs to be api to make the annotations on the class visible to the compiler.
   api(libs.xml.api)

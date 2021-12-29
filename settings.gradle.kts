@@ -24,7 +24,6 @@ dependencyResolutionManagement {
       versionId("soundlibs.tritonus")
       versionId("soundlibs.vorbisspi")
       versionId("soundlibs.mp3spi")
-      versionId("steamworks")
       versionId("javax.activation")
       versionId("jakarta.xml")
 
@@ -51,9 +50,6 @@ dependencyResolutionManagement {
           "soundlibs-mp3spi"
         )
       )
-
-      alias("steamworks").to("com.code-disaster.steamworks4j", "steamworks4j")
-        .versionRef("steamworks")
 
       alias("javax-activation").to("javax.activation", "javax.activation-api")
         .versionRef("javax.activation")
