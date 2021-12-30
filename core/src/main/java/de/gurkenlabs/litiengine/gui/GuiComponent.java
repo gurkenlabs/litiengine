@@ -1024,13 +1024,14 @@ public abstract class GuiComponent
    *          the new location
    */
   public void setLocation(final Point2D location) {
+    this.location = location;
+    this.boundingBox = null; // trigger recreation in next boundingBox getter call
+
     final double deltaX = location.getX() - getX();
     final double deltaY = location.getY() - getY();
 
-    this.location = location;
-    this.boundingBox = null; // trigger recreation in next boundingBox getter call
     for (final GuiComponent component : getComponents()) {
-      component.setLocation(new Point2D.Double(component.getX() + deltaX,component.getY() + deltaY));
+      component.setLocation(new Point2D.Double(component.getX() + deltaX, component.getY() + deltaY));
     }
   }
 
