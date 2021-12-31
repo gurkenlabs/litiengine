@@ -98,7 +98,7 @@ public abstract class GuiComponent
   private double textX;
   private double textY;
   private boolean visible;
-  private Point2D location;
+  private Point2D location = new Point2D.Double();
   private Rectangle2D boundingBox;
 
   /**
