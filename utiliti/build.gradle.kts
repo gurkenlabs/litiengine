@@ -6,8 +6,9 @@ plugins {
   id("org.beryx.runtime")
 }
 
+val applicationName = "utiLITI"
 description = """
-    utiLITI is the official project / asset manager and map editor for the open source Java 2D Game Engine LITIENGINE.
+    $applicationName is the official project / asset manager and map editor for the open source Java 2D Game Engine LITIENGINE.
 """.trimIndent()
 
 sourceSets {
@@ -69,5 +70,18 @@ runtime {
         "--java-options", "-Xmx2048m",
       )
     )
+    when {
+      currentOs.isLinux -> imageOptions.addAll(
+        listOf(
+          "--linux-package-name", applicationName
+        )
+      )
+      currentOs.isMacOsX -> imageOptions.addAll(
+        listOf(
+          "--mac-package-identifier", "de.gurkenlabs.litiengine.utiliti",
+          "--mac-package-name", applicationName, // Name appearing in Menu Bar.
+        )
+      )
+    }
   }
 }
