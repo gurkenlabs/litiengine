@@ -81,11 +81,6 @@ runtime {
     )
 
     when {
-      currentOs.isLinux -> imageOptions.addAll(
-        listOf(
-          "--linux-package-name", applicationName
-        )
-      )
       currentOs.isMacOsX -> imageOptions.addAll(
         listOf(
           "--mac-package-identifier", "de.gurkenlabs.litiengine.utiliti",
