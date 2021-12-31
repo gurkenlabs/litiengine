@@ -57,6 +57,9 @@ jobs:
         with:
           run: ./gradlew build jacocoTestReport -PskipSpotless
 
+      - name: Package
+        run: ./gradlew jpackage
+
       - name: Gradle SonarQube Scan
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
