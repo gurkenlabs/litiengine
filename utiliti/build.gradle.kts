@@ -60,8 +60,17 @@ runtime {
       currentOs.isMacOsX -> "icns"
       else -> "png"
     }
+
+    var versionStr = project.version.toString()
+    val illegalIndex = versionStr.indexOf('-')
+    if (illegalIndex >= 0) versionStr = versionStr.substring(0, versionStr.indexOf('-'))
+    check(versionStr.all { it.isDigit() || it == '.' }) { "Illegal version '$versionStr'" }
+    if (versionStr[0] == '0') versionStr = "1.0.0"
+    val sanitizedVersion = versionStr
+
     imageOptions.addAll(
       listOf(
+        "--app-version", sanitizedVersion,
         "--icon", project.file("src/dist/pixel-icon-utiliti.$iconFileType").path,
         "--description", project.description,
         "--copyright", "2020-${Calendar.getInstance().get(Calendar.YEAR)} gurkenlabs.de",
@@ -70,6 +79,7 @@ runtime {
         "--java-options", "-Xmx2048m",
       )
     )
+
     when {
       currentOs.isLinux -> imageOptions.addAll(
         listOf(
