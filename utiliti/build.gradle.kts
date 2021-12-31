@@ -1,3 +1,4 @@
+import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 import java.util.Calendar
 
 plugins {
@@ -52,9 +53,15 @@ runtime {
       } else this
     }
     skipInstaller = true
+    val currentOs: OperatingSystem = DefaultNativePlatform.getCurrentOperatingSystem()
+    val iconFileType = when {
+      currentOs.isWindows -> "ico"
+      currentOs.isMacOsX -> "icns"
+      else -> "png"
+    }
     imageOptions.addAll(
       listOf(
-        "--icon", project.file("src/dist/pixel-icon-utiliti.ico").path,
+        "--icon", project.file("src/dist/pixel-icon-utiliti.$iconFileType").path,
         "--description", project.description,
         "--copyright", "2020-${Calendar.getInstance().get(Calendar.YEAR)} gurkenlabs.de",
         "--vendor", "gurkenlabs.de",
