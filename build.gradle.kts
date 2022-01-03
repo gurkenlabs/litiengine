@@ -10,6 +10,7 @@ plugins {
   id("com.github.vlsi.crlf")
   id("com.github.vlsi.gradle-extensions")
   id("com.diffplug.spotless")
+  id("com.github.vlsi.stage-vote-release")
 }
 
 val skipSpotless by props(false)
@@ -19,7 +20,34 @@ val enableGradleMetadata by props()
 val isRelease = project.stringProperty("release").toBool()
 
 val String.v: String get() = rootProject.extra["$this.version"] as String
-val buildVersion = "litiengine".v + if (isRelease) "" else "-SNAPSHOT"
+val projectVersion = "litiengine".v
+
+releaseParams {
+  tlp.set("litiengine")
+  organizationName.set("de.gurkenlabs")
+  componentName.set("litiengine")
+  prefixForProperties.set("gh")
+  svnDistEnabled.set(false)
+  sitePreviewEnabled.set(false)
+  release.set(isRelease)
+  if (!isRelease) {
+    rcTag.set("v$projectVersion$snapshotSuffix")
+  }
+  nexus {
+    mavenCentral()
+  }
+  voteText.set {
+    """
+    ${it.componentName} v${it.version}-rc${it.rc} is ready for preview.
+    Git SHA: ${it.gitSha}
+    Staging repository: ${it.nexusRepositoryUri}
+    """.trimIndent()
+  }
+}
+
+tasks.closeRepository.configure { enabled = isRelease }
+
+val buildVersion = "$projectVersion${releaseParams.snapshotSuffix}"
 
 allprojects {
   group = "de.gurkenlabs"
@@ -139,19 +167,15 @@ allprojects {
       return@apply
     }
 
-    configure<SigningExtension> {
-      sign(publications.findByName("mavenJava"))
-    }
+    val useInMemoryKey by props()
+    if (useInMemoryKey) {
+      apply(plugin = "signing")
 
-    repositories {
-      maven {
-        val releasesRepoUrl = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
-        val snapshotRepoUrl = uri("https://oss.sonatype.org/content/repositories/snapshots/")
-        url = if (isRelease) releasesRepoUrl else snapshotRepoUrl
-        credentials {
-          username = project.stringProperty("ossrhUsername") ?: ""
-          password = project.stringProperty("ossrhPassword") ?: ""
-        }
+      configure<SigningExtension> {
+        useInMemoryPgpKeys(
+          project.stringProperty("signing.inMemoryKey"),
+          project.stringProperty("signing.password")
+        )
       }
     }
 

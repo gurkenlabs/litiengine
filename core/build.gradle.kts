@@ -1,4 +1,3 @@
-import com.github.vlsi.gradle.properties.dsl.props
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
@@ -90,23 +89,6 @@ publishing {
       artifactId = project.name
       version = project.version.toString()
       from(components["java"])
-      signing {
-        sign(this@create)
-      }
-    }
-  }
-
-  repositories {
-    maven {
-      val releasesRepoUrl = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
-      val snapshotRepoUrl = uri("https://oss.sonatype.org/content/repositories/snapshots/")
-      val ossrhUsername by props("")
-      val ossrhPassword by props("")
-      url = if (version.toString().endsWith("SNAPSHOT")) snapshotRepoUrl else releasesRepoUrl
-      credentials {
-        username = ossrhUsername
-        password = ossrhPassword
-      }
     }
   }
 }
