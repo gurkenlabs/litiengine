@@ -31,7 +31,7 @@ jobs:
           restore-keys: ${{ runner.os }}-gradle
 
       - name: Run jpackage
-        run: ./gradlew jpackage
+        run: ./gradlew jpackage -Prelease=true
 
       - name: Upload package
         uses: actions/upload-artifact@v1
