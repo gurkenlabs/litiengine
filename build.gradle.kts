@@ -161,68 +161,70 @@ allprojects {
     }
   }
 
-  extensions.findByType(PublishingExtension::class)?.apply {
-    if (project.path == ":") {
-      // Skip the root project
-      return@apply
-    }
-
-    val useInMemoryKey by props()
-    if (useInMemoryKey) {
-      apply(plugin = "signing")
-
-      configure<SigningExtension> {
-        useInMemoryPgpKeys(
-          project.stringProperty("signing.inMemoryKey"),
-          project.stringProperty("signing.password")
-        )
+  plugins.withType<MavenPublishPlugin>().configureEach {
+    configure<PublishingExtension> {
+      if (project.path == ":") {
+        // Skip the root project
+        return@configure
       }
-    }
 
-    publications {
-      withType<MavenPublication> {
-        // Use the resolved versions in pom.xml
-        // Gradle might have different resolution rules, so we set the versions
-        // that were used in Gradle build/test.
-        versionFromResolution()
-        pom {
-          simplifyXml()
-          description.set(project.description!!)
-          name.set(
-            (project.findProperty("artifact.name") as? String)
-              ?: project.name.capitalize().replace("-", " ")
+      val useInMemoryKey by props()
+      if (useInMemoryKey) {
+        apply(plugin = "signing")
+
+        configure<SigningExtension> {
+          useInMemoryPgpKeys(
+            project.stringProperty("signing.inMemoryKey"),
+            project.stringProperty("signing.password")
           )
-          url.set("https://litiengine.com")
-          organization {
-            name.set("Gurkenlabs")
-            url.set("https://gurkenlabs.de/")
-          }
-          issueManagement {
-            system.set("GitHub")
-            url.set("https://github.com/gurkenlabs/litiengine/issues")
-          }
-          licenses {
-            license {
-              name.set("MIT")
-              url.set("https://github.com/gurkenlabs/litiengine/blob/master/LICENSE")
-              distribution.set("repo")
+        }
+      }
+
+      publications {
+        withType<MavenPublication> {
+          // Use the resolved versions in pom.xml
+          // Gradle might have different resolution rules, so we set the versions
+          // that were used in Gradle build/test.
+          versionFromResolution()
+          pom {
+            simplifyXml()
+            description.set(project.description!!)
+            name.set(
+              (project.findProperty("artifact.name") as? String)
+                ?: project.name.capitalize().replace("-", " ")
+            )
+            url.set("https://litiengine.com")
+            organization {
+              name.set("Gurkenlabs")
+              url.set("https://gurkenlabs.de/")
             }
-          }
-          scm {
-            url.set("'https://github.com/gurkenlabs/litiengine/")
-            connection.set("scm:git:git://github.com/gurkenlabs/litiengine.git")
-            developerConnection.set("scm:git:git@github.com:gurkenlabs/litiengine.git")
-          }
-          developers {
-            developer {
-              id.set("steffen")
-              name.set("Steffen Wilke")
-              email.set("steffen@gurkenlabs.de")
+            issueManagement {
+              system.set("GitHub")
+              url.set("https://github.com/gurkenlabs/litiengine/issues")
             }
-            developer {
-              id.set("matthias")
-              name.set("Matthias Wilke")
-              email.set("matthias@gurkenlabs.de")
+            licenses {
+              license {
+                name.set("MIT")
+                url.set("https://github.com/gurkenlabs/litiengine/blob/master/LICENSE")
+                distribution.set("repo")
+              }
+            }
+            scm {
+              url.set("'https://github.com/gurkenlabs/litiengine/")
+              connection.set("scm:git:git://github.com/gurkenlabs/litiengine.git")
+              developerConnection.set("scm:git:git@github.com:gurkenlabs/litiengine.git")
+            }
+            developers {
+              developer {
+                id.set("steffen")
+                name.set("Steffen Wilke")
+                email.set("steffen@gurkenlabs.de")
+              }
+              developer {
+                id.set("matthias")
+                name.set("Matthias Wilke")
+                email.set("matthias@gurkenlabs.de")
+              }
             }
           }
         }
