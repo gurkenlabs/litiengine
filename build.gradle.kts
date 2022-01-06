@@ -24,7 +24,7 @@ val projectVersion = "litiengine".v
 
 releaseParams {
   tlp.set("litiengine")
-  organizationName.set("de.gurkenlabs")
+  organizationName.set("gurkenlabs")
   componentName.set("litiengine")
   prefixForProperties.set("gh")
   svnDistEnabled.set(false)
