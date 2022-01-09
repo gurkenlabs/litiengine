@@ -9,6 +9,8 @@
 [![Discord chat](https://img.shields.io/discord/326074836508213258?style=flat&logo=discord)](https://discord.gg/rRB9cKD)
 [![Supporters](https://img.shields.io/opencollective/all/litiengine?label=supporters&style=flat)](https://opencollective.com/litiengine)
 
+[![DOI](https://zenodo.org/badge/87944612.svg)](https://zenodo.org/badge/latestdoi/87944612)
+
 
 
 ## :video_game: Main Features
@@ -22,50 +24,44 @@
 * Entity Framework
 
 ## :gear: Installation
-The library is distributed over the [Maven Central Repository](https://search.maven.org/artifact/de.gurkenlabs/litiengine) and you can grab the necessary .jar-file(s) from there by using your favorite build automation tool or manually download the library.
 
-### Gradle
-Our library is primarily hosted by the Maven Central Repository:
+### :elephant: Gradle
+The LITIENGINE Java library is hosted on the [Maven Central Repository](https://search.maven.org/artifact/de.gurkenlabs/litiengine), i.e. fetching it with Gradle is as simple as configuring your source repository and defining the dependency as shown below.
+#### Groovy syntax:
 ```groovy
 repositories {
-  mavenCentral()
+    mavenCentral()
 }
-```
 
-#### Gradle (Groovy)
-```groovy
 dependencies {
   implementation 'de.gurkenlabs:litiengine:0.5.2'
 }
 ```
 
-#### Gradle (Kotlin)
+#### Kotlin Syntax:
 ```kotlin
+repositories {
+    mavenCentral()
+}
+
 dependencies {
   implementation("de.gurkenlabs:litiengine:0.5.2")
 }
 ```
-[More Installation Instructions](https://litiengine.com/docs/getting-started/get-litiengine/)
-## :rocket: Getting Started
-
-1. [Setup the Game Project](https://litiengine.com/docs/getting-started/)
-2. [Running the Game](https://litiengine.com/docs/getting-started/run-the-game/)
-3. [Configuring the Game](https://litiengine.com/docs/configuration/)
-4. [Loading a .tmx Map](https://youtu.be/RR3QxOhV8hM)
+### Other ways of installing and using LITIENGINE
+For alternative ways of downloading and applying LITIENGINE to your project, visit our [Getting Started Guide](https://litiengine.com/docs/getting-started/).
 
 ## :books: Documentation
-The [LITIENGINE documentation pages](https://litiengine.com/docs/) contain in-depth guides and explanations for general concepts of the engine.
-
-> :warning: We are aware that some parts of the engine are **lacking documentation**. Feel free to join our [Discord](https://discord.gg/rRB9cKD) and discuss any open questions. Our great community is always very helpful.
-> 
-> :pencil2: If you like writing and explaining: We're looking for further contributors to enhance the official documentation. Just file an issue or create a PR on the [Documentation Github Repository](https://github.com/gurkenlabs/litiengine-docs).
-
-
-If you are searching for a particular method or class within the API or just want to further explore the engine's possiblities, the Javadocs are a good place to start. 
-
+The [LITIENGINE documentation](https://litiengine.com/docs/) contains in-depth explanations, guides, and tutorials for general concepts of the engine.
+### Javadocs
+If you are searching for a particular method or class within the API or just want to further explore the engine's capabilities and structure, the Javadocs are a good place to start:
 [![Javadocs](http://www.javadoc.io/badge/de.gurkenlabs/litiengine.svg)](https://litiengine.com/api/) 
-### Questions?
-Visit the official [LITIENGINE forum](https://forum.litiengine.com/) for troubleshooting or to learn about the LITIENGINE community. If you encounter bugs or want to request fancy new features, you can also open an issue in our [Issue Tracker](https://github.com/gurkenlabs/litiengine/issues).
+### Questions
+You've found yourself trying to work out a feature of the engine that is not yet documented?
+Join our community in the official [LITIENGINE forum](https://forum.litiengine.com/) or on [Discord](https://discord.gg/rRB9cKD) for troubleshooting.
+
+### Bugs and Issues
+You've encountered an obvious issue or bug with LITIENGINE or want to request enhancements and features? File an issue in our [Issue Tracker](https://github.com/gurkenlabs/litiengine/issues).
 
 ## :package: Libraries Used
 
@@ -80,30 +76,31 @@ Visit the official [LITIENGINE forum](https://forum.litiengine.com/) for trouble
 * [Steamworks4j](https://github.com/code-disaster/steamworks4j) for supporting the steamworks SDK
 
 ## :handshake: Contributing
+If you've decided to help out with LITIENGINE's development - you're awesome!
+And here's what you need to to:
 * Agree to our [Code of Conduct](https://github.com/gurkenlabs/litiengine/blob/master/CODE_OF_CONDUCT.md)
 * View our [Contribution guidelines](https://github.com/gurkenlabs/litiengine/blob/master/CONTRIBUTING.md)
 
-## :mortar_board: Citations
-If you want to cite parts of the LITIengie in your academic work, you can use the following Digital Object Identifier:
+## Contact
 
-[![DOI](https://zenodo.org/badge/87944612.svg)](https://zenodo.org/badge/latestdoi/87944612)
+LITIENGINE is created by two Bavarian brothers known as [gurkenlabs](https://gurkenlabs.de/):
 
-## :speech_balloon: Contact
-* Website [litiengine.com](https://litiengine.com)
-* Twitter [@gurkenlabs](https://twitter.com/gurkenlabs)
-* Facebook [gurkenlabsofficial](https://www.facebook.com/gurkenlabsofficial/)
-* YouTube [Gurkenlabs](https://www.youtube.com/channel/UCN7-9zYTxip_Hl1LvCQ8RBA)
-* Bug Reports [Issue Tracker](https://github.com/gurkenlabs/litiengine/issues)
-* E-Mail info@litiengine.com
-* Forum [forum.litiengine.com](https://forum.litiengine.com/)
+| ![](https://avatars.githubusercontent.com/u/7015370?s=64) | ![](https://avatars.githubusercontent.com/u/26114385?s=64) |
+| :-----------: | :------------: |
+| Steffen Wilke | Matthias Wilke |
+| [steffen-wilke](https://github.com/steffen-wilke) | [nightm4re94](https://github.com/nightm4re94) |
 
-## Authors
-![Gurkenlabs](https://gurkenlabs.de/wp-content/uploads/2018/12/logo-banner-website.png "Gurkenlabs")
+### :speech_balloon: Links and Social Media
+[![](https://img.shields.io/badge/website-litiengine.com-00a5bc)](https://litiengine.com)
+[![](https://img.shields.io/badge/forum-forum.litiengine.com-00a5bc)](https://forum.litiengine.com)
+[![](https://img.shields.io/badge/mail-info%40litiengine.com-00a5bc)](mailto:info@litiengine.com?subject=[LITIENGINE])
 
-**Gurkenlabs** is an indie game development project by two brothers from Bavaria:
-* Steffen Wilke ([steffen-wilke](https://github.com/steffen-wilke))
-* Matthias Wilke ([nightm4re94](https://github.com/nightm4re94))
+[![](https://img.shields.io/badge/twitter-%40gurkenlabs-51963a?style=social&logo=twitter)](https://twitter.com/gurkenlabs)
+[![](https://img.shields.io/badge/instagram-%40gurkenlabs-51963a?style=social&logo=instagram)](https://www.instagram.com/gurkenlabs)
+[![](https://img.shields.io/badge/facebook-gurkenlabsofficial-51963a?style=social&logo=facebook)](https://www.facebook.com/gurkenlabsofficial)
+[![](https://img.shields.io/badge/youtube-gurkenlabs-51963a?style=social&logo=youtube)](https://www.youtube.com/channel/UCN7-9zYTxip_Hl1LvCQ8RBA)
 
 ## Sponsors and supporters
+[![Individuals](https://opencollective.com/litiengine/individuals.svg?button=false) ![Organizations](https://opencollective.com/litiengine/organizations.svg) ](https://opencollective.com/litiengine#support)
 
-[![](https://opencollective.com/litiengine/individuals.svg)](https://opencollective.com/litiengine#support)
+![JProfiler](https://litiengine.com/wp-content/uploads/2022/01/xjprofiler_large.png.pagespeed.ic.uajXHJCvPb.webp)

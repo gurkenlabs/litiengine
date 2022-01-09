@@ -23,7 +23,7 @@ jobs:
           name: v${{ steps.tag_version.outputs.release_version }}
           draft: true
           body: |
-            Downloade the utiLITI editor from https://litiengine.com/download/.
+            Download the LITIENGINE SDK from https://litiengine.com/download/.
             LITIENGINE is available through [Maven Central](https://search.maven.org/artifact/de.gurkenlabs/litiengine):
             <details>
               <summary>Gradle (Groovy)</summary>
