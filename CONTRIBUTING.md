@@ -71,10 +71,9 @@ You can do so by sponsoring [LITIENGINE on OpenCollective](https://opencollectiv
   
 
 ### Style Guide
-Code in the LITIENGINE repository needs to be formatted in compliance with the  [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html). The tool [google-java-format](https://github.com/google/google-java-format) will provide automatic formatting for that purpose. It is available as a plugin for all popular Java IDEs. Note that the IntelliJ plugin doesn't come with automatic import reordering, which is handled by [this external style file](https://raw.githubusercontent.com/google/styleguide/gh-pages/intellij-java-google-style.xml)  you need to integrate via 
-```
-File → Settings → Editor → Code Style
-```
+Code in the LITIENGINE repository needs to be formatted in compliance with the **gurkenlabs Java code style**. You can use the configuration file provided in [`config/gurkenlabs.eclipseformat.xml`](config/gurkenlabs.eclipseformat.xml).
+The configuration can be imported for automatic formatting in Eclipse (`Window -> Preferences -> Java -> Code Style -> Formatter`) and IntelliJ (`File → Settings → Editor → Code Style`).
+To ensure compliance with our code style when raising Pull Requests, use the provided Gradle tasks `spotlessCheck`, `spotlessApply`, and `spotlessDiagnose`.
 
 ## What else can I do?
 >  If you want to help in other ways we have not mentioned above, just contact us at info@LITIENGINE.com to specify the details.
