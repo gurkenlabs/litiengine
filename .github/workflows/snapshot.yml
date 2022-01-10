@@ -1,6 +1,7 @@
 name: Build nightly SNAPSHOT
 
 on:
+  workflow_dispatch:
   schedule:
     # Midnight every day
     - cron: "0 0 * * *"
