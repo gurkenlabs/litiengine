@@ -1184,12 +1184,7 @@ public abstract class GuiComponent
    *          the new x coordinate
    */
   public void setX(final double x) {
-    final double delta = x - getX();
     setLocation(x, getY());
-
-    for (final GuiComponent component : getComponents()) {
-      component.setX(component.getX() + delta);
-    }
   }
 
   /**
@@ -1199,11 +1194,7 @@ public abstract class GuiComponent
    *          the new y coordinate
    */
   public void setY(final double y) {
-    final double delta = y - getY();
     setLocation(getX(), y);
-    for (final GuiComponent component : getComponents()) {
-      component.setY(component.getY() + delta);
-    }
   }
 
   /**
