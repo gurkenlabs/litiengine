@@ -14,7 +14,7 @@ on:
 
 jobs:
   gradle:
-    if: github.repository_owner == 'gurklenlabs'
+    if: github.repository_owner == 'gurkenlabs'
     name: Publish nightly snapshot
     runs-on: ubuntu-latest
     permissions:
