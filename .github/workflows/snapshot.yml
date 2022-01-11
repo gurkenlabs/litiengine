@@ -1,6 +1,7 @@
 name: Build nightly SNAPSHOT
 
 on:
+  workflow_dispatch:
   schedule:
     # Midnight every day
     - cron: "0 0 * * *"
@@ -13,7 +14,7 @@ on:
 
 jobs:
   gradle:
-    if: github.repository_owner = 'gurklenlabs'
+    if: github.repository_owner == 'gurkenlabs'
     name: Publish nightly snapshot
     runs-on: ubuntu-latest
     permissions:
