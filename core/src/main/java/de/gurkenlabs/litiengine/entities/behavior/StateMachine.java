@@ -33,7 +33,7 @@ public class StateMachine implements IUpdateable {
     Collections.sort(transitions);
 
     for (final Transition transition : transitions) {
-      if (transition.conditionsFullfilled()) {
+      if (transition.conditionsFulfilled()) {
         this.currentState.exit();
         this.currentState = transition.getNextState();
         this.currentState.enter();

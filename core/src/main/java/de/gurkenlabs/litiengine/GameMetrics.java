@@ -185,7 +185,7 @@ public final class GameMetrics implements IRenderable {
     }
   }
 
-  public class RenderInfo {
+  public static class RenderInfo {
     private final String name;
     private final Object value;
 
