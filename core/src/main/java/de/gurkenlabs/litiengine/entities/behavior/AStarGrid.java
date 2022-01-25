@@ -175,7 +175,7 @@ public class AStarGrid implements IRenderable {
       return;
     }
 
-    // by default we calculate a penalty for props that cannot be destroyed
+    // by default, we calculate a penalty for props that cannot be destroyed
     int penalty = 0;
     for (Prop prop : Game.world().environment().getProps()) {
       if (!prop.hasCollision()

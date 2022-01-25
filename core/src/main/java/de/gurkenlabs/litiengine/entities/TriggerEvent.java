@@ -1,9 +1,11 @@
 package de.gurkenlabs.litiengine.entities;
 
+import java.io.Serial;
 import java.util.EventObject;
 import java.util.List;
 
 public class TriggerEvent extends EventObject {
+  @Serial
   private static final long serialVersionUID = 3624707673365488289L;
 
   private final transient IEntity entity;

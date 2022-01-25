@@ -33,9 +33,9 @@ public interface ICollisionEntity extends IEntity {
   Rectangle2D getCollisionBox(Point2D location);
 
   /**
-   * Gets the center {@link Point2D} of the entities collision box.
+   * Gets the center {@link Point2D} of the entity's collision box.
    *
-   * @return The center {@link Point2D} of the entities collision box
+   * @return The center {@link Point2D} of the entity's collision box
    */
   Point2D getCollisionBoxCenter();
 

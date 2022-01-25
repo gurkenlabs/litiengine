@@ -65,10 +65,9 @@ public class PolyShape implements IPolyShape {
     if (this == anObject) {
       return true;
     }
-    if (!(anObject instanceof IPolyShape)) {
+    if (!( anObject instanceof IPolyShape other )) {
       return false;
     }
-    IPolyShape other = (IPolyShape) anObject;
     return this.getPoints().equals(other.getPoints());
   }
 

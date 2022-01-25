@@ -19,7 +19,7 @@ public class DecimalFloatAdapter extends XmlAdapter<String, Float> {
       return null;
     }
 
-    if (v.floatValue() % 1 == 0) {
+    if ( v % 1 == 0) {
       return Integer.toString(v.intValue());
     }
 

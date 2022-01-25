@@ -1,10 +1,13 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
+import java.io.Serial;
+
 /**
  * Thrown to indicate that an external resource for a TMX file could not be found or loaded.
  */
 public class MissingTmxResourceException extends TmxException {
 
+  @Serial
   private static final long serialVersionUID = 2649018991304386841L;
 
   protected MissingTmxResourceException() {}

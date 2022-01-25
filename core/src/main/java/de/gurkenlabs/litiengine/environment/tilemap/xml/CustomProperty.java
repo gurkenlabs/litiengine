@@ -15,7 +15,7 @@ public class CustomProperty implements ICustomProperty {
 
   /**
    * Instantiates a new {@code CustomProperty} instance.
-   * 
+   *
    * <p>
    * The default type for a custom property is {@code string} if not explicitly specified.
    * </p>
@@ -38,7 +38,7 @@ public class CustomProperty implements ICustomProperty {
 
   /**
    * Instantiates a new {@code CustomProperty} instance.
-   * 
+   *
    * @param type
    *          The type of this custom property.
    * @param value
@@ -51,7 +51,7 @@ public class CustomProperty implements ICustomProperty {
 
   /**
    * Instantiates a new {@code CustomProperty} instance.
-   * 
+   *
    * @param location
    *          The location of the file represented by this custom property.
    */
@@ -207,10 +207,9 @@ public class CustomProperty implements ICustomProperty {
     if (this == anObject) {
       return true;
     }
-    if (!(anObject instanceof ICustomProperty)) {
+    if (!( anObject instanceof ICustomProperty other )) {
       return false;
     }
-    ICustomProperty other = (ICustomProperty) anObject;
     return this.getType().equals(other.getType()) && this.getAsString().equals(other.getAsString());
   }
 

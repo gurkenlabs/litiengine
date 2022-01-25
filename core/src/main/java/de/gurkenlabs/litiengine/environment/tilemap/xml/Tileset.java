@@ -4,7 +4,6 @@ import java.awt.Dimension;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -413,12 +412,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
       this.columns = null;
     } else {
       this.tiles = new ArrayList<>(this.allTiles);
-      Iterator<TilesetEntry> iter = this.tiles.iterator();
-      while (iter.hasNext()) {
-        if (!iter.next().shouldBeSaved()) {
-          iter.remove();
-        }
-      }
+      this.tiles.removeIf( tilesetEntry -> !tilesetEntry.shouldBeSaved() );
     }
 
     if (this.margin != null && this.margin == 0) {

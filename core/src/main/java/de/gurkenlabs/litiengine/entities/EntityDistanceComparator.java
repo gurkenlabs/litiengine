@@ -20,13 +20,7 @@ public class EntityDistanceComparator extends RelativeEntityComparator {
 
     final double distance1 = entity1.getLocation().distance(this.getRelativeEntity().getLocation());
     final double distance2 = entity2.getLocation().distance(this.getRelativeEntity().getLocation());
-    if (distance1 < distance2) {
-      return -1;
-    }
-    if (distance1 > distance2) {
-      return 1;
-    }
+    return Double.compare( distance1, distance2 );
 
-    return 0;
   }
 }

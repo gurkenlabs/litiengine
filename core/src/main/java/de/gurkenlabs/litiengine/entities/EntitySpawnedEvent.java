@@ -1,9 +1,11 @@
 package de.gurkenlabs.litiengine.entities;
 
+import java.io.Serial;
 import java.util.EventObject;
 
 public class EntitySpawnedEvent extends EventObject {
 
+  @Serial
   private static final long serialVersionUID = 3168131857377255247L;
   private final transient Spawnpoint spawnpoint;
   private final transient IEntity spawnedEntity;

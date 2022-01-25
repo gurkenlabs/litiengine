@@ -66,7 +66,7 @@ public class CollisionBox extends CollisionEntity {
    * Instantiates a new {@code CollisionBox} entity.
    *
    * @param box
-   *          The rectangle defining the location and dimension of this instnace.
+   *          The rectangle defining the location and dimension of this instance.
    */
   public CollisionBox(Rectangle2D box) {
     this(box.getX(), box.getY(), box.getWidth(), box.getHeight());

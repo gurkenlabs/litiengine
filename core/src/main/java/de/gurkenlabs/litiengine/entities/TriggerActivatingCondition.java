@@ -10,9 +10,9 @@ import java.util.EventListener;
 public interface TriggerActivatingCondition extends EventListener {
 
   /**
-   * Allows to register functions that contain additional checks for the trigger activation. The return value of the
+   * Allows registering functions that contain additional checks for the trigger activation. The return value of the
    * function is considered the reason why the trigger cannot be activated. If the function returns anything else than
-   * null, the activation is cancelled and the result of the function is send to the activator entity.
+   * null, the activation is cancelled and the result of the function is sent to the activator entity.
    *
    * @param event
    *          The event data that contains information about the trigger.

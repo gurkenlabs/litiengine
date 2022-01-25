@@ -7,7 +7,7 @@ public enum PropState {
 
   private final String str;
 
-  private PropState() {
+  PropState() {
     this.str = this.name().toLowerCase();
   }
 

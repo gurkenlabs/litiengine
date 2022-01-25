@@ -167,10 +167,9 @@ public class Tile extends CustomPropertyProvider implements ITile {
     if (this == anObject) {
       return true;
     }
-    if (!(anObject instanceof ITile)) {
+    if (!( anObject instanceof ITile other )) {
       return false;
     }
-    ITile other = (ITile) anObject;
     return this.getGridId() == other.getGridId() && this.isFlippedDiagonally() == other.isFlippedDiagonally()
         && this.isFlippedHorizontally() == other.isFlippedHorizontally() && this.isFlippedVertically() == other.isFlippedVertically();
   }

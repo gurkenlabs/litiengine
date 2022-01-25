@@ -30,10 +30,9 @@ public class TileOffset implements ITileOffset {
     if (this == obj) {
       return true;
     }
-    if (!(obj instanceof ITileOffset)) {
+    if (!( obj instanceof ITileOffset other )) {
       return false;
     }
-    ITileOffset other = (ITileOffset) obj;
     return this.getX() == other.getX() && this.getY() == other.getY();
   }
 

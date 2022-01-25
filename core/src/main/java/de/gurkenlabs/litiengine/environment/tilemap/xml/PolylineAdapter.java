@@ -12,12 +12,12 @@ public class PolylineAdapter extends XmlAdapter<String, List<Point2D>> {
   public List<Point2D> unmarshal(String v) {
     String[] rawPoints = v.split(" ");
     List<Point2D> points = new ArrayList<>(rawPoints.length);
-    for (int i = 0; i < rawPoints.length; i++) {
-      String[] coord = rawPoints[i].split(",", 2);
-      if (coord.length < 2) {
-        throw new IllegalArgumentException("invalid coordinate pair: " + rawPoints[i]);
+    for ( final String rawPoint : rawPoints ) {
+      String[] coord = rawPoint.split( ",", 2 );
+      if ( coord.length < 2 ) {
+        throw new IllegalArgumentException( "invalid coordinate pair: " + rawPoint );
       }
-      points.add(new Point2D.Float(Float.parseFloat(coord[0]), Float.parseFloat(coord[1])));
+      points.add( new Point2D.Float( Float.parseFloat( coord[0] ), Float.parseFloat( coord[1] ) ) );
     }
     return points;
   }
@@ -30,10 +30,10 @@ public class PolylineAdapter extends XmlAdapter<String, List<Point2D>> {
     }
     StringBuilder sb = new StringBuilder();
     Point2D p = iter.next();
-    sb.append(save(p.getX()) + "," + save(p.getY()));
+    sb.append( save( p.getX() ) ).append( "," ).append( save( p.getY() ) );
     while (iter.hasNext()) {
       p = iter.next();
-      sb.append(" " + save(p.getX()) + ',' + save(p.getY()));
+      sb.append( " " ).append( save( p.getX() ) ).append( ',' ).append( save( p.getY() ) );
     }
     return sb.toString();
   }

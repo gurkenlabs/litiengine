@@ -253,12 +253,12 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
     if (type == Collision.ANY) {
       log.log(
           Level.WARNING,
-          "CollistionType.ALL is not allowed to be assigned to an entity. It may only be used for filtering in the PhysicsEngine.");
+          "CollisionType.ALL is not allowed to be assigned to an entity. It may only be used for filtering in the PhysicsEngine.");
       return;
     }
 
     if (this.getEnvironment() != null && this.getEnvironment().isLoaded()) {
-      // re-add the entity to the physics engine so it will be treated with the updated collision
+      // re-add the entity to the physics engine, so that it will be treated with the updated collision
       // type
       Game.physics().remove(this);
       this.collisionType = type;

@@ -1,8 +1,10 @@
 package de.gurkenlabs.litiengine.entities;
 
+import java.io.Serial;
 import java.util.EventObject;
 
 public class EntityMovedEvent extends EventObject {
+  @Serial
   private static final long serialVersionUID = 2931711179495514204L;
   private final transient IMobileEntity entity;
   private final double deltaX;

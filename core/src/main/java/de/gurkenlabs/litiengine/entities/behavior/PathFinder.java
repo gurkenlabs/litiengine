@@ -62,7 +62,7 @@ public abstract class PathFinder {
         continue;
       }
 
-      // apply a margin for the path calculation in order to take the entities
+      // apply a margin for the path calculation in order to take the entity
       // collision box into consideration
       final Rectangle2D rectangleWithMargin = this.applyPathMargin(entity, collisionBox);
 

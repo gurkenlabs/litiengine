@@ -2,9 +2,12 @@ package de.gurkenlabs.litiengine.entities;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.abilities.Ability;
+
+import java.io.Serial;
 import java.util.EventObject;
 
 public class EntityHitEvent extends EventObject {
+  @Serial
   private static final long serialVersionUID = 1582822545149624579L;
   private final int damage;
 

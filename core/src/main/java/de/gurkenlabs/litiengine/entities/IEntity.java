@@ -71,9 +71,9 @@ public interface IEntity {
   void setAngle(double angle);
 
   /**
-   * Gets the entities animation controller.
+   * Gets the entity's animation controller.
    *
-   * @return The entities animation controller or null if none was registered.
+   * @return The entity's animation controller or null if none was registered.
    * @see RenderEngine#renderEntity(java.awt.Graphics2D, IEntity)
    */
   IEntityAnimationController<?> animations();
@@ -152,7 +152,7 @@ public interface IEntity {
 
   /**
    * Determines whether this entity is being rendered with the layer it's originating from. This ignores the specified
-   * {@code RenderType} and makes the entity dependent upon the visibility of it's layer.
+   * {@code RenderType} and makes the entity dependent upon the visibility of its layer.
    *
    * <p>
    * This can only be used, of course, if the entity is related to a {@code MapObject}. <br>

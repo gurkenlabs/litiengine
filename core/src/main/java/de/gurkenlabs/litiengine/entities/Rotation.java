@@ -7,21 +7,12 @@ public enum Rotation {
   ROTATE_270;
 
   public double getRadians() {
-    int value;
-    switch (this) {
-      case ROTATE_90:
-        value = 90;
-        break;
-      case ROTATE_180:
-        value = 180;
-        break;
-      case ROTATE_270:
-        value = 270;
-        break;
-      default:
-        value = 0;
-        break;
-    }
+    int value = switch ( this ) {
+      case ROTATE_90 -> 90;
+      case ROTATE_180 -> 180;
+      case ROTATE_270 -> 270;
+      default -> 0;
+    };
 
     return Math.toRadians(value);
   }

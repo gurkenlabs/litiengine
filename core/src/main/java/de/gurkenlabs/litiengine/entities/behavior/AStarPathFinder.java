@@ -79,7 +79,7 @@ public class AStarPathFinder extends PathFinder {
     opened.add(startNode);
 
     while (!opened.isEmpty()) {
-      // after the first iteration, this will also contained the newly found neighbors that were
+      // after the first iteration, this will also be contained the newly found neighbors that were
       // added in the last iteration
       AStarNode currentNode = findNodeWithLowestCost(opened);
 
@@ -141,7 +141,7 @@ public class AStarPathFinder extends PathFinder {
 
   private static AStarNode findNodeWithLowestCost(List<AStarNode> openedNodes) {
     AStarNode lowestCostNode = openedNodes.get(0);
-    // find node with lowest cost
+    // find node with the lowest cost
     // F-cost (aka. total costs) are considered first. If they are equal, the H-cost is checked
     // subsequently
     for (int i = 1; i < openedNodes.size(); i++) {
@@ -193,11 +193,10 @@ public class AStarPathFinder extends PathFinder {
     path2D.moveTo(startNode.getLocation().x, startNode.getLocation().y);
 
     final List<Point2D> pointsOfPath = new ArrayList<>();
-    for (int i = 0; i < path.size(); i++) {
-      final AStarNode current = path.get(i);
-      final Point currentPoint = new Point(current.getLocation().x, current.getLocation().y);
-      pointsOfPath.add(currentPoint);
-      path2D.lineTo(currentPoint.x, currentPoint.y);
+    for ( final AStarNode current : path ) {
+      final Point currentPoint = new Point( current.getLocation().x, current.getLocation().y );
+      pointsOfPath.add( currentPoint );
+      path2D.lineTo( currentPoint.x, currentPoint.y );
     }
 
     path2D.lineTo(targetNode.getLocation().x, targetNode.getLocation().y);

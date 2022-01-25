@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.entities;
 
+import java.io.Serial;
 import java.util.EventObject;
 
 /**
@@ -8,6 +9,7 @@ import java.util.EventObject;
  * @see IEntity#sendMessage(Object, String)
  */
 public class EntityMessageEvent extends EventObject {
+  @Serial
   private static final long serialVersionUID = 5131621546037429725L;
   private final transient IEntity entity;
   private final String message;

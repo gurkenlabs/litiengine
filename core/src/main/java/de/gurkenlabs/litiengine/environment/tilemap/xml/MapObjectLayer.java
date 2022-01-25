@@ -98,8 +98,7 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
   public void addMapObject(IMapObject mapObject) {
     loadMapObjects();
     this.mapObjects.add(mapObject);
-    if (mapObject instanceof MapObject) {
-      MapObject obj = (MapObject) mapObject;
+    if ( mapObject instanceof MapObject obj ) {
       if (obj.getLayer() != null && !obj.getLayer().equals(this)) {
         obj.getLayer().removeMapObject(obj);
       }

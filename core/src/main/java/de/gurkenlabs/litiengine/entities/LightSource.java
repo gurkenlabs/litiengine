@@ -276,8 +276,8 @@ public class LightSource extends Entity implements IRenderable {
    *          the graphics to use for rendering
    */
   private void renderShadows(final Graphics2D graphic) {
-    if (!Game.world().environment().getCombatEntities().stream()
-        .anyMatch(isInRange(this.getCenter(), SHADOW_GRADIENT_SIZE))) {
+    if ( Game.world().environment().getCombatEntities().stream()
+        .noneMatch(isInRange(this.getCenter(), SHADOW_GRADIENT_SIZE)) ) {
       return;
     }
 

@@ -26,5 +26,5 @@ public abstract class Transition implements Comparable<Transition> {
     return this.priority;
   }
 
-  protected abstract boolean conditionsFullfilled();
+  protected abstract boolean conditionsFulfilled();
 }
