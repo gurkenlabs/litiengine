@@ -27,7 +27,7 @@ public class SoundEffect extends Effect {
   public SoundEffect(final Ability ability, final String... sounds) {
     super(ability, EffectTarget.EXECUTINGENTITY);
     this.sounds =
-        Arrays.asList(sounds).stream()
+        Arrays.stream(sounds)
             .map(x -> Resources.sounds().get(x))
             .collect(Collectors.toList())
             .toArray(new Sound[sounds.length]);

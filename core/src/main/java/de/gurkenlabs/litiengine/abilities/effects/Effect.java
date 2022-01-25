@@ -147,7 +147,7 @@ public abstract class Effect implements IUpdateable {
   }
 
   /**
-   * 1. Cease the effect after its duration. 2. apply all follow up effects 3. remove appliance 4. unregister from loop if
+   * 1. Cease the effect after its duration. 2. apply all follow-up effects 3. remove appliance 4. unregister from loop if
    * all appliances are done
    */
   @Override
@@ -183,7 +183,7 @@ public abstract class Effect implements IUpdateable {
       this.cease(entity);
     }
 
-    // 2. apply follow up effects
+    // 2. apply follow-up effects
     this.getFollowUpEffects().forEach(followUp -> followUp.apply(appliance.getImpactArea()));
   }
 

@@ -15,7 +15,7 @@ import de.gurkenlabs.litiengine.graphics.IRenderable;
  * The class {@code GameMetrics} provides meta information about the game's metrics. This allows the developer to get a
  * feeling about the performance of different aspects (e.g. memory consumption, potential fps, network traffic, ...) and
  * to identify potential issues.
- * 
+ *
  * <p>
  * This information can be rendered as debug information if configured to get live data during a gameplay session.
  * </p>
@@ -63,7 +63,7 @@ public final class GameMetrics implements IRenderable {
   }
 
   public void trackRenderTime(String name, double renderTime, RenderInfo... infos) {
-    this.renderMetrics.add(new RenderMetrics(name, renderTime, infos));
+    this.renderMetrics.add( new RenderMetrics( name, renderTime, infos ) );
   }
 
   @Override
@@ -114,10 +114,10 @@ public final class GameMetrics implements IRenderable {
 
   /**
    * Sets the color that is used when rendering the metrics if {@code cl_showGameMetrics = true}.
-   * 
+   *
    * @param color
    *          The color for rendering the metrics.
-   * 
+   *
    * @see ClientConfiguration#showGameMetrics()
    * @see GameMetrics#render(Graphics2D)
    */
@@ -142,7 +142,7 @@ public final class GameMetrics implements IRenderable {
     this.currentOffsetY += OFFSET_Y;
   }
 
-  public class RenderMetrics {
+  public static class RenderMetrics {
     private final List<RenderInfo> renderInfo;
 
     private final String renderName;
@@ -185,7 +185,7 @@ public final class GameMetrics implements IRenderable {
     }
   }
 
-  public static class RenderInfo {
+  public class RenderInfo {
     private final String name;
     private final Object value;
 

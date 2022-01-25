@@ -69,14 +69,14 @@ public abstract class Ability implements IRenderable {
 
   public void onEffectApplied(final EffectAppliedListener listener) {
     for (final Effect effect : this.getEffects()) {
-      // registers to all effects and their follow up effects recursively
+      // registers to all effects and their follow-up effects recursively
       this.onEffectApplied(effect, listener);
     }
   }
 
   public void onEffectCeased(final EffectCeasedListener listener) {
     for (final Effect effect : this.getEffects()) {
-      // registers to all effects and their follow up effects recursively
+      // registers to all effects and their follow-up effects recursively
       this.onEffectCeased(effect, listener);
     }
   }

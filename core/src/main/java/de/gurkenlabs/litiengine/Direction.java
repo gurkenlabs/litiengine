@@ -12,7 +12,7 @@ import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
  * The directions also specify a flag that can be used to exchange the information in an size-optimized manner (e.g. for
  * network communication).
  * </p>
- * 
+ *
  * @see #toFlagValue()
  */
 public enum Direction {
@@ -32,17 +32,17 @@ public enum Direction {
 
   /**
    * Gets a direction corresponding to the specified angle. Every direction translates to 1/4th (90°) of a full circle.
-   * 
+   *
    * <pre>
        o 180 o        DOWN = [0-45[ &amp; [315-360]
-     o         o      
+     o         o
     o           o     RIGHT = [45-135[
-   270          90    
+   270          90
     o           o     UP = [135-225[
      o         o
        o  0  o        LEFT = [225-315[
    * </pre>
-   * 
+   *
    * @param angle
    *          The angle by which the direction will be determined.
    * @return The direction that corresponds to the specified angle.
@@ -72,7 +72,7 @@ public enum Direction {
 
   /**
    * Get a value of this enumeration that corresponds to the specified flagValue.
-   * 
+   *
    * @param flagValue
    *          The flag value to convert to a direction.
    * @return A direction that corresponds to the specified flag value or {@code UNDEFINED}.
@@ -89,36 +89,31 @@ public enum Direction {
 
   /**
    * Get the opposite value of this direction.
-   * 
+   *
    * <pre>
    * UP - DOWN
    * LEFT - RIGHT
    * </pre>
-   * 
+   *
    * @return The opposite direction.
    */
   public Direction getOpposite() {
-    switch (this) {
-      case RIGHT:
-        return LEFT;
-      case UP:
-        return DOWN;
-      case LEFT:
-        return RIGHT;
-      case DOWN:
-        return UP;
-      default:
-        return this;
-    }
+    return switch ( this ) {
+      case RIGHT -> LEFT;
+      case UP -> DOWN;
+      case LEFT -> RIGHT;
+      case DOWN -> UP;
+      default -> this;
+    };
   }
 
   /**
    * Converts this direction to the median angle of the range that is described by this direction.
-   * 
+   *
    * <pre>
    * e.g. UP 180
    * </pre>
-   * 
+   *
    * @return The mean angle of this direction.
    */
   public float toAngle() {
@@ -126,9 +121,9 @@ public enum Direction {
   }
 
   /**
-   * Gets a flag value that can be used to exchange the information of this enum value in an size-optimized manner (e.g.
+   * Gets a flag value that can be used to exchange the information of this enum value in a size-optimized manner (e.g.
    * for network communication).
-   * 
+   *
    * @return The immutable flag value that is assigned to this direction.
    */
   public byte toFlagValue() {

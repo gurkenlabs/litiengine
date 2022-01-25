@@ -143,7 +143,7 @@ public final class Game {
    * This flag indicates whether the game should display the {@code GameWindow} or not. This can only be set before the
    * game has been initialized with the {@code Game.init(String...)} method. Afterwards it doesn't have an effect anymore.
    * If enabled, the {@code ScreenManager#setVisible(boolean)} method won't be set to true and the {@code RenderLoop}
-   * won't be started. Also the {@code Camera} won't be updated.
+   * won't be started. Also, the {@code Camera} won't be updated.
    *
    * @param noGui
    *          If set to true, the GUI will be hidden.
@@ -189,7 +189,7 @@ public final class Game {
 
   /**
    * Gets the static meta information about this game.<br>
-   * This can be used to define meta information about your game, like it's name, version or web site.<br>
+   * This can be used to define meta information about your game, like its name, version or website.<br>
    * <br>
    * <i>It's also possible to provide additional custom information using the method group <br>
    * {@code Game.getInfo().setValue("CUSTOM_STRING", "my-value")}.</i>
@@ -405,7 +405,7 @@ public final class Game {
    * </p>
    * <p>
    * Moreover, it provides the possibility to attach game logic via {@code EnvironmentListeners} to different events of
-   * the {@code Envrionment's} life cycle (e.g. loaded, initialized, ...).<br>
+   * the {@code Environment's} life cycle (e.g. loaded, initialized, ...).<br>
    * <i>This is typically used to provide some per-level logic or to trigger general loading behavior.</i>
    *
    * @return The game's environment manager.
@@ -446,7 +446,7 @@ public final class Game {
    * </ul>
    *
    * @param args
-   *          The arguments passed to the programs entry point.
+   *          The arguments passed to the programs' entry point.
    */
   public static synchronized void init(String... args) {
     if (initialized) {

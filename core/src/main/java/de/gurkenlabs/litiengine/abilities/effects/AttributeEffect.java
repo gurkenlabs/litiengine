@@ -7,7 +7,7 @@ import de.gurkenlabs.litiengine.attributes.Modification;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 
 /**
- * An attribute effect appies an attribute modifier to the affected entity when applied and removes it when ceased.
+ * An attribute effect applies an attribute modifier to the affected entity when applied and removes it when ceased.
  *
  * @param <T>
  *          the generic type

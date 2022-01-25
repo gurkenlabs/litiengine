@@ -1,7 +1,7 @@
 package de.gurkenlabs.litiengine.attributes;
 
 /**
- * An attribute modifier allows to modify attributes by the specified Modification and modify value.
+ * An attribute modifier than allows modifying attributes by the specified Modification and modify value.
  *
  * @param <T>
  *          the generic type
@@ -35,8 +35,7 @@ public class AttributeModifier<T extends Number> implements Comparable<Attribute
 
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof AttributeModifier<?>) {
-      AttributeModifier<?> attr = (AttributeModifier<?>) obj;
+    if ( obj instanceof AttributeModifier<?> attr ) {
       return this.isActive() == attr.isActive() && this.getModification() == attr.getModification() && this.getModifyValue() == attr.getModifyValue();
     }
 
@@ -50,7 +49,7 @@ public class AttributeModifier<T extends Number> implements Comparable<Attribute
 
   /**
    * Gets the modification type applied by this modifier.
-   * 
+   *
    * @return The modification type applied by this modifier.
    */
   public Modification getModification() {
@@ -59,7 +58,7 @@ public class AttributeModifier<T extends Number> implements Comparable<Attribute
 
   /**
    * Gets the value that is used to modify an attribute.
-   * 
+   *
    * @return The value that is used to modify an attribute.
    */
   public double getModifyValue() {

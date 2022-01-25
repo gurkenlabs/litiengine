@@ -21,7 +21,6 @@ import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
  * A random number generator instance that provides enhanced functionalities for the java default {@code Random}
  * implementation.
  */
-@SuppressWarnings("serial")
 public final class GameRandom extends java.util.Random {
   private static final String INVALID_BOUNDS_ERROR = "min value is > than max value";
   private static final String ARRAY_MUST_NOT_BE_EMPTY = "array to chose an element from must not be null or empty.";
@@ -644,7 +643,7 @@ public final class GameRandom extends java.util.Random {
    * Gets a pseudo-random char value from the specified alphabet.
    *
    * @param alphabet
-   *          The alphabet to chose the character from.
+   *          The alphabet to choose the character from.
    * @return A pseudo-random character from the specified alphabet.
    */
   public char nextChar(final String alphabet) {

@@ -54,7 +54,7 @@ public class AbilityExecution implements IUpdateable {
    */
   @Override
   public void update() {
-    // if there a no effects to apply -> unregister this instance and we're done
+    // if there are no effects to apply -> unregister this instance, and we're done
     if (this.getAbility().getEffects().isEmpty() || this.getAbility().getEffects().size() == this.getAppliedEffects().size()) {
       Game.loop().detach(this);
       return;

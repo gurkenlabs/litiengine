@@ -13,7 +13,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.CustomPropertyProvider;
 
 /**
  * The {@code GameInfo} class contains basic information about a LITIENGINE game. The information can be accessed via
- * {@code Game.getInfo()} and the infrastructure also internally uses this information e.g. to setup the main window of
+ * {@code Game.getInfo()} and the infrastructure also internally uses this information e.g. to set up the main window of
  * the Game by providing an appropriate title.
  * <p>
  * It should be the first thing that you do in you application entry point to setup or load this information. Note that
@@ -58,7 +58,7 @@ public class GameInfo extends CustomPropertyProvider {
     this.company = "gurkenlabs";
     this.name = "LITIENGINE Game";
     this.subtitle = "The pure 2D java game engine";
-    this.description = "A game, created with the allmighty LITIENGINE.";
+    this.description = "A game, created with the all mighty LITIENGINE.";
     this.developers = new String[] {"Steffen Wilke", "Matthias Wilke"};
     this.version = "v1.0";
     this.website = "https://litiengine.com";
@@ -148,9 +148,9 @@ public class GameInfo extends CustomPropertyProvider {
   }
 
   /**
-   * Gets the sub title of the game. It is basically an addendum to the {@link #getName()}.
+   * Gets the subtitle of the game. It is basically an addendum to the {@link #getName()}.
    *
-   * @return The game's sub title.
+   * @return The game's subtitle.
    */
   @XmlTransient
   public String getSubTitle() {
@@ -234,11 +234,11 @@ public class GameInfo extends CustomPropertyProvider {
   }
 
   /**
-   * Sets the game's sub title. <br>
+   * Sets the game's subtitle. <br>
    * This is basically an addendum to the game's name and will also be part of the game's title.
    *
    * @param subTitle
-   *          The game's sub title.
+   *          The game's subtitle.
    *
    * @see #getName()
    * @see #getTitle()

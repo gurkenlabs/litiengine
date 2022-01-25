@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * The {@code DebugRenderer} class implements default debug rendering and exposes extension points to reder your own
+ * The {@code DebugRenderer} class implements default debug rendering and exposes extension points to render your own
  * debug information via callbacks.
  */
 public final class DebugRenderer {
@@ -66,7 +66,7 @@ public final class DebugRenderer {
 
   /**
    * Add the specified map rendered listener to attach custom debug rendering after layers of the type {@code GROUND} have
-   * beend rendered.
+   * been rendered.
    *
    * @param listener
    *          The listener to add.
@@ -122,8 +122,7 @@ public final class DebugRenderer {
       }
     }
 
-    if (Game.config().debug().renderCollisionBoxes() && entity instanceof ICollisionEntity) {
-      final ICollisionEntity collisionEntity = (ICollisionEntity) entity;
+    if (Game.config().debug().renderCollisionBoxes() && entity instanceof final ICollisionEntity collisionEntity ) {
       g.setColor(collisionEntity.hasCollision() ? Color.RED : Color.ORANGE);
       Game.graphics().renderOutline(g, collisionEntity.getCollisionBox());
     }

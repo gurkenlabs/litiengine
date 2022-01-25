@@ -9,7 +9,7 @@ public enum Quality {
 
   private final int value;
 
-  private Quality(int value) {
+  Quality(int value) {
     this.value = value;
   }
 

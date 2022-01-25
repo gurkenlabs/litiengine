@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -38,7 +39,7 @@ public class Configuration {
    *
    * @param fileName
    *          The name of the file from which to load the settings.
-   * 
+   *
    * @param configurationGroups
    *          The configuration groups managed by this instance.
    */
@@ -46,15 +47,13 @@ public class Configuration {
     this.fileName = fileName;
     this.configurationGroups = new ArrayList<>();
     if (configurationGroups != null && configurationGroups.length > 0) {
-      for (final ConfigurationGroup group : configurationGroups) {
-        this.configurationGroups.add(group);
-      }
+      this.configurationGroups.addAll( Arrays.asList( configurationGroups ) );
     }
   }
 
   /**
    * Gets the strongly typed configuration group if it was previously added to the configuration.
-   * 
+   *
    * @param <T>
    *          The type of the config group.
    * @param groupClass
@@ -89,7 +88,7 @@ public class Configuration {
 
   /**
    * Gets all {@code ConfigurationGroups} from the configuration.
-   * 
+   *
    * @return All config groups.
    */
   public List<ConfigurationGroup> getConfigurationGroups() {
@@ -98,7 +97,7 @@ public class Configuration {
 
   /**
    * Adds the specified configuration group to the configuration.
-   * 
+   *
    * @param group
    *          The group to add.
    */
@@ -108,9 +107,9 @@ public class Configuration {
 
   /**
    * Gets the name of the file to which this configuration is saved.
-   * 
+   *
    * @return The name of the configuration file.
-   * 
+   *
    * @see #save()
    */
   public String getFileName() {
@@ -157,7 +156,7 @@ public class Configuration {
   /**
    * Saves this configuration to a file with the specified name of this instance (config.properties is the engines default
    * config file).
-   * 
+   *
    * @see #getFileName()
    * @see Configuration#DEFAULT_CONFIGURATION_FILE_NAME
    */

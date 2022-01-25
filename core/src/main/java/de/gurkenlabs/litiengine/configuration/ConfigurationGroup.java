@@ -15,7 +15,7 @@ import de.gurkenlabs.litiengine.util.ReflectionUtilities;
 /**
  * This class contains some basic functionality for all setting groups. It gets the SettingsGroupInfo annotation and
  * reads out the prefix that is used when reading/ writing the settings into a property file.
- * 
+ *
  */
 @ConfigurationGroupInfo
 public abstract class ConfigurationGroup {
@@ -37,18 +37,18 @@ public abstract class ConfigurationGroup {
 
   /**
    * Adds the specified configuration changed listener to receive events about any configuration property that changed.
-   * 
+   *
    * <p>
    * The event is supported for any property that uses the {@link #set(String, Object)} method to set the field value.
    * </p>
-   * 
+   *
    * <p>
    * The event will provide you with the fieldName of the called setter (e.g. "debug" for the "setDebug" call).
    * </p>
-   * 
+   *
    * @param listener
    *          The listener to add.
-   * 
+   *
    * @see ConfigurationGroup#set(String, Object)
    */
   public void onChanged(ConfigurationChangedListener listener) {
@@ -150,7 +150,7 @@ public abstract class ConfigurationGroup {
   /**
    * Use this method to set configuration properties if you want to support {@code configurationChanged} for your
    * property.
-   * 
+   *
    * @param <T>
    *          The type of the value to set.
    * @param fieldName
@@ -182,15 +182,15 @@ public abstract class ConfigurationGroup {
 
   /**
    * This listener interface receives events when any property of the configuration changed.
-   * 
+   *
    * @see ConfigurationGroup#onChanged(ConfigurationChangedListener)
    */
   @FunctionalInterface
   public interface ConfigurationChangedListener extends EventListener {
     /**
-     * Invoked when a a property of the configuration has been changed using the
+     * Invoked when a property of the configuration has been changed using the
      * {@link ConfigurationGroup#set(String, Object)} method to support this event.
-     * 
+     *
      * @param event
      *          The property changed event.
      */

@@ -3,12 +3,14 @@ package de.gurkenlabs.litiengine.configuration;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Serial;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Properties;
 import java.util.TreeSet;
 
 class CleanProperties extends Properties {
+  @Serial
   private static final long serialVersionUID = 7567765340218227372L;
 
   @Override
@@ -22,7 +24,7 @@ class CleanProperties extends Properties {
   }
 
   private static class StripFirstLineStream extends FilterOutputStream {
-    private boolean firstlineseen = false;
+    private boolean firstLineSeen = false;
 
     public StripFirstLineStream(final OutputStream out) {
       super(out);
@@ -30,18 +32,18 @@ class CleanProperties extends Properties {
 
     @Override
     public void write(final int b) throws IOException {
-      if (firstlineseen) {
+      if ( firstLineSeen ) {
         out.write(b);
       } else if (b == '\n') {
-        firstlineseen = true;
+        firstLineSeen = true;
       }
     }
 
     @Override
-    public void write(byte[] b, int off, int len) throws IOException {
-      while (!firstlineseen) {
+    public void write( byte[] b, int off, int len) throws IOException {
+      while (!firstLineSeen ) {
         if (b[off++] == '\n') {
-          firstlineseen = true;
+          firstLineSeen = true;
         }
         if (--len == 0) {
           return;
