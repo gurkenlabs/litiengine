@@ -1,15 +1,15 @@
 package de.gurkenlabs.litiengine.entities.behavior;
 
-import de.gurkenlabs.litiengine.entities.IMobileEntity;
-import de.gurkenlabs.litiengine.environment.tilemap.IMap;
-import java.awt.Dimension;
-import java.awt.Point;
+import java.awt.*;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import de.gurkenlabs.litiengine.entities.IMobileEntity;
+import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 
 public class AStarPathFinder extends PathFinder {
 
@@ -42,6 +42,9 @@ public class AStarPathFinder extends PathFinder {
 
     final AStarNode startNode = this.getGrid().getNode(startLocation);
     AStarNode targetNode = this.getGrid().getNode(target);
+    if ( targetNode == null ) {
+      return null;
+    }
     if (startNode.equals(targetNode)) {
       return null;
     }
