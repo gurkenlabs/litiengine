@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 public @interface AnimationInfo {
-  String[] spritePrefix();
+  String[] spritePrefix() default {};
 
   String[] deathAnimations() default {};
 }
