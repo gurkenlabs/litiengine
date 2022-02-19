@@ -1,5 +1,16 @@
 package de.gurkenlabs.litiengine.graphics;
 
+import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
+
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.EntityRenderEvent;
 import de.gurkenlabs.litiengine.entities.EntityRenderListener;
@@ -10,22 +21,6 @@ import de.gurkenlabs.litiengine.environment.GameWorld;
 import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
 import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.RenderingHints;
-import java.awt.Shape;
-import java.awt.Stroke;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collectors;
 
 /**
  * The 2D Render Engine is used to render texts, shapes and entities at their location in the {@code
@@ -515,6 +510,9 @@ public final class RenderEngine {
     if (animationController != null) {
       final BufferedImage img = animationController.getCurrentImage();
       if (img != null) {
+        g.setComposite(
+          AlphaComposite.getInstance( AlphaComposite.SRC_OVER, entity.getOpacity() ) );
+
         if (animationController.isAutoScaling()) {
           final double ratioX = entity.getWidth() / img.getWidth();
           final double ratioY = entity.getHeight() / img.getHeight();

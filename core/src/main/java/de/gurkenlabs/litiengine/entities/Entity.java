@@ -68,6 +68,8 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
   @TmxProperty(name = MapObjectProperty.RENDERTYPE)
   private RenderType renderType;
 
+  private float opacity = 1f;
+
   protected Entity() {
     this.mapLocation = new Point2D.Double(0, 0);
     final EntityInfo info = this.getClass().getAnnotation(EntityInfo.class);
@@ -504,6 +506,16 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
   @Override
   public boolean renderWithLayer() {
     return this.renderWithLayer;
+  }
+
+  @Override
+  public float getOpacity() {
+    return opacity;
+  }
+
+  @Override
+  public void setOpacity( final float opacity ) {
+    this.opacity = opacity;
   }
 
   @Override

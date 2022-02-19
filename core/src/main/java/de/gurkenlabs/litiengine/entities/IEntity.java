@@ -1,5 +1,9 @@
 package de.gurkenlabs.litiengine.entities;
 
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.util.List;
+
 import de.gurkenlabs.litiengine.entities.behavior.IBehaviorController;
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.GameWorld;
@@ -9,66 +13,58 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.util.List;
 
 public interface IEntity {
-  void onMessage(EntityMessageListener listener);
+  void onMessage( EntityMessageListener listener );
 
-  void onMessage(String message, EntityMessageListener listener);
+  void onMessage( String message, EntityMessageListener listener );
 
-  void addTransformListener(EntityTransformListener listener);
+  void addTransformListener( EntityTransformListener listener );
 
-  void addListener(EntityListener listener);
+  void addListener( EntityListener listener );
 
-  void removeListener(EntityMessageListener listener);
+  void removeListener( EntityMessageListener listener );
 
-  void removeListener(EntityTransformListener listener);
+  void removeListener( EntityTransformListener listener );
 
-  void removeListener(EntityListener listener);
+  void removeListener( EntityListener listener );
 
   /**
    * Adds the specified entity rendered listener to receive events when entities were rendered.
    *
-   * @param listener
-   *          The listener to add.
+   * @param listener The listener to add.
    */
-  void onRendered(final EntityRenderedListener listener);
+  void onRendered( final EntityRenderedListener listener );
 
   /**
    * Removes the specified entity rendered listener.
    *
-   * @param listener
-   *          The listener to remove.
+   * @param listener The listener to remove.
    */
-  void removeListener(final EntityRenderedListener listener);
+  void removeListener( final EntityRenderedListener listener );
 
   /**
    * Adds the specified entity render listener to receive events and callbacks about the rendering process of entities.
    *
-   * @param listener
-   *          The listener to add.
+   * @param listener The listener to add.
    */
-  void addEntityRenderListener(final EntityRenderListener listener);
+  void addEntityRenderListener( final EntityRenderListener listener );
 
   /**
    * Removes the specified entity render listener.
    *
-   * @param listener
-   *          The listener to remove.
+   * @param listener The listener to remove.
    */
-  void removeListener(final EntityRenderListener listener);
+  void removeListener( final EntityRenderListener listener );
 
   double getAngle();
 
   /**
    * Sets the angle (in degrees) in which the entity is directed.
    *
-   * @param angle
-   *          the new angle in degrees
+   * @param angle the new angle in degrees
    */
-  void setAngle(double angle);
+  void setAngle( double angle );
 
   /**
    * Gets the entity's animation controller.
@@ -80,15 +76,15 @@ public interface IEntity {
 
   boolean isVisible();
 
-  void setVisible(boolean visible);
+  void setVisible( boolean visible );
 
   IBehaviorController behavior();
 
-  void addController(IEntityController controller);
+  void addController( IEntityController controller );
 
-  <T extends IEntityController> void setController(Class<T> clss, T controller);
+  <T extends IEntityController> void setController( Class<T> clss, T controller );
 
-  <T extends IEntityController> T getController(Class<T> clss);
+  <T extends IEntityController> T getController( Class<T> clss );
 
   /**
    * All registered actions of this entity.
@@ -106,26 +102,23 @@ public interface IEntity {
    * <i>Does nothing in case no action has been registered for the specified {@code
    * actionName}.</i>
    *
-   * @param actionName
-   *          The name of the action to be performed.
+   * @param actionName The name of the action to be performed.
    * @see IEntity#actions()
    * @see IEntity#register(String, Runnable)
    */
-  void perform(String actionName);
+  void perform( String actionName );
 
   /**
    * Registers an {@code EntityAction} with the specified name. It's later possible to execute these actions on the entity
    * by using the {@code Entity.perform(String actionName)} method.
    *
-   * @param name
-   *          The name of the action to be registered.
-   * @param action
-   *          The action to be performed by the entity.
+   * @param name   The name of the action to be registered.
+   * @param action The action to be performed by the entity.
    * @return The created EntityAction instance; or null if the name or action parameter were invalid.
    * @see IEntity#perform(String)
    * @see IEntity#actions()
    */
-  EntityAction register(String name, Runnable action);
+  EntityAction register( String name, Runnable action );
 
   void detachControllers();
 
@@ -172,49 +165,47 @@ public interface IEntity {
 
   double getY();
 
-  String sendMessage(Object sender, String message);
+  String sendMessage( Object sender, String message );
 
-  void setHeight(double height);
+  void setHeight( double height );
 
-  void setLocation(double x, double y);
+  void setLocation( double x, double y );
 
-  boolean hasTag(String tag);
+  boolean hasTag( String tag );
 
   List<String> getTags();
 
-  void addTag(String tag);
+  void addTag( String tag );
 
-  void removeTag(String tag);
+  void removeTag( String tag );
 
   /**
    * Sets the map location.
    *
-   * @param location
-   *          the new map location
+   * @param location the new map location
    */
-  void setLocation(Point2D location);
+  void setLocation( Point2D location );
 
   /**
    * Sets an id which should only be filled when an entity gets added due to map information.
    *
-   * @param mapId
-   *          The unique map ID for this {@link IEntity}
+   * @param mapId The unique map ID for this {@link IEntity}
    */
-  void setMapId(int mapId);
+  void setMapId( int mapId );
 
-  void setName(String name);
+  void setName( String name );
 
-  void setRenderType(RenderType renderType);
+  void setRenderType( RenderType renderType );
 
-  void setRenderWithLayer(boolean renderWithLayer);
+  void setRenderWithLayer( boolean renderWithLayer );
 
-  void setSize(double width, double height);
+  void setSize( double width, double height );
 
-  void setWidth(double width);
+  void setWidth( double width );
 
-  void setX(double x);
+  void setX( double x );
 
-  void setY(double y);
+  void setY( double y );
 
   ICustomPropertyProvider getProperties();
 
@@ -228,20 +219,18 @@ public interface IEntity {
   /**
    * This method provides the possibility to implement behavior whenever this entity was added to the environment.
    *
-   * @param environment
-   *          The environment that the entity was added to
+   * @param environment The environment that the entity was added to
    * @see IEntity#addListener(EntityListener)
    */
-  void loaded(Environment environment);
+  void loaded( Environment environment );
 
   /**
    * This method provides the possibility to implement behavior whenever this entity was removed from the environment.
    *
-   * @param environment
-   *          The environment that the entity was removed from
+   * @param environment The environment that the entity was removed from
    * @see IEntity#addListener(EntityListener)
    */
-  void removed(Environment environment);
+  void removed( Environment environment );
 
   /**
    * Indicates whether this entity is loaded on the currently active environment.
@@ -252,4 +241,9 @@ public interface IEntity {
    * @see IEntity#removed(Environment)
    */
   boolean isLoaded();
+
+  float getOpacity();
+
+  void setOpacity( float opacity );
+
 }
