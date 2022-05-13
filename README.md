@@ -9,10 +9,6 @@
 [![Discord chat](https://img.shields.io/discord/326074836508213258?style=flat&logo=discord)](https://discord.gg/rRB9cKD)
 [![Supporters](https://img.shields.io/opencollective/all/litiengine?label=supporters&style=flat)](https://opencollective.com/litiengine)
 
-[![DOI](https://zenodo.org/badge/87944612.svg)](https://zenodo.org/badge/latestdoi/87944612)
-
-
-
 ## :video_game: Main Features
 
 * Basic Game Infrastructure (GameLoop, Configuration, Resource Management, Logging, ...)
