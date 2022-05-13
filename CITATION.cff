@@ -1,0 +1,44 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: LITIENGINE
+message: Please cite LITIENGINE using the following metadata.
+type: software
+authors:
+  - given-names: Steffen
+    family-names: Wilke
+    email: steffen@gurkenlabs.de
+  - given-names: Matthias
+    family-names: Wilke
+    email: matthias@gurkenlabs.de
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.5825831
+repository-code: 'https://github.com/gurkenlabs/litiengine'
+url: 'https://litiengine.com/'
+repository-artifact: >-
+  https://search.maven.org/artifact/de.gurkenlabs/litiengine
+abstract: >-
+  LITIENGINE is a free, open-source, and simple Java
+  2D Game Engine created by two Bavarian brothers.
+  The engine consists of two components: A
+  lightweight Java library that provides basic game
+  infrastructure and rendering based on AWT, as well
+  as the dedicated project management tool and map
+  editor utiLITI.
+keywords:
+  - 2D
+  - entity-framework
+  - AWT
+  - Game engine
+  - java
+  - LITIENGINE
+  - particles
+  - physics-engine
+  - Tilemap
+  - ui-framework
+  - utiLITI
+license: MIT
+version: 0.5.2
+date-released: '2022-01-06'
