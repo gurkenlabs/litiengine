@@ -77,6 +77,10 @@ And here's what you need to to:
 * Agree to our [Code of Conduct](https://github.com/gurkenlabs/litiengine/blob/master/CODE_OF_CONDUCT.md)
 * View our [Contribution guidelines](https://github.com/gurkenlabs/litiengine/blob/master/CONTRIBUTING.md)
 
+## Star History (Compared with other 2D java game libraries / frameworks / engines)
+
+[![Star History Chart](https://api.star-history.com/svg?repos=gurkenlabs/litiengine,AlmasB/FXGL,magefree/mage,b3dgs/lionengine,fastjengine/FastJ,cping/LGame,LWJGL/lwjgl3,playn/playn,mini2Dx/mini2Dx&type=Timeline)](https://star-history.com/#gurkenlabs/litiengine&AlmasB/FXGL&magefree/mage&b3dgs/lionengine&fastjengine/FastJ&cping/LGame&LWJGL/lwjgl3&playn/playn&mini2Dx/mini2Dx&Timeline)
+
 ## Contact
 
 LITIENGINE is created by two Bavarian brothers known as [gurkenlabs](https://gurkenlabs.de/):
