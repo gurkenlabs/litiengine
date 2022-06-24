@@ -94,9 +94,9 @@ public abstract class PropertyPanel extends JPanel {
   }
 
   public static float getSpinnerValue(JSpinner spinner) {
-    if (spinner.getValue() instanceof Integer integer) {
+    if (spinner.getValue()instanceof Integer integer) {
       return integer.floatValue();
-    } else if (spinner.getValue() instanceof Double dbl) {
+    } else if (spinner.getValue()instanceof Double dbl) {
       return dbl.floatValue();
     } else {
       return (float) spinner.getValue();
@@ -184,8 +184,7 @@ public abstract class PropertyPanel extends JPanel {
     }
     checkbox.addActionListener(
         new MapObjectPropertyActionListener(
-            m ->
-                !m.hasCustomProperty(property) || m.getBoolValue(property) != checkbox.isSelected(),
+            m -> !m.hasCustomProperty(property) || m.getBoolValue(property) != checkbox.isSelected(),
             m -> m.setValue(property, checkbox.isSelected())));
   }
 
@@ -258,10 +257,9 @@ public abstract class PropertyPanel extends JPanel {
         new MapObjectPropteryFocusListener(m -> m.setValue(property, textField.getText())));
     textField.addActionListener(
         new MapObjectPropertyActionListener(
-            m ->
-                !m.hasCustomProperty(property)
-                    || m.getStringValue(property) == null
-                    || !m.getStringValue(property).equals(textField.getText()),
+            m -> !m.hasCustomProperty(property)
+                || m.getStringValue(property) == null
+                || !m.getStringValue(property).equals(textField.getText()),
             m -> m.setValue(property, textField.getText())));
   }
 
@@ -271,10 +269,9 @@ public abstract class PropertyPanel extends JPanel {
     }
     textList.addActionListener(
         new MapObjectPropertyActionListener(
-            m ->
-                !m.hasCustomProperty(property)
-                    || m.getStringValue(property) == null
-                    || !m.getStringValue(property).equals(textList.getJoinedString()),
+            m -> !m.hasCustomProperty(property)
+                || m.getStringValue(property) == null
+                || !m.getStringValue(property).equals(textList.getJoinedString()),
             m -> m.setValue(property, textList.getJoinedString())));
   }
 
@@ -370,9 +367,8 @@ public abstract class PropertyPanel extends JPanel {
 
     SpinnerListener(String mapObjectProperty, JSpinner spinner) {
       super(
-          m ->
-              m.hasCustomProperty(mapObjectProperty)
-                  || !m.getStringValue(mapObjectProperty).equals(spinner.getValue().toString()),
+          m -> m.hasCustomProperty(mapObjectProperty)
+              || !m.getStringValue(mapObjectProperty).equals(spinner.getValue().toString()),
           m -> m.setValue(mapObjectProperty, spinner.getValue().toString()));
     }
   }
@@ -381,17 +377,15 @@ public abstract class PropertyPanel extends JPanel {
 
     SliderListener(String mapObjectProperty, JSlider slider) {
       super(
-          m ->
-              m.hasCustomProperty(mapObjectProperty)
-                  || m.getIntValue(mapObjectProperty) != slider.getValue(),
+          m -> m.hasCustomProperty(mapObjectProperty)
+              || m.getIntValue(mapObjectProperty) != slider.getValue(),
           m -> m.setValue(mapObjectProperty, slider.getValue()));
     }
 
     SliderListener(String mapObjectProperty, JSlider slider, float factor) {
       super(
-          m ->
-              m.hasCustomProperty(mapObjectProperty)
-                  || m.getFloatValue(mapObjectProperty) != slider.getValue() * factor,
+          m -> m.hasCustomProperty(mapObjectProperty)
+              || m.getFloatValue(mapObjectProperty) != slider.getValue() * factor,
           m -> m.setValue(mapObjectProperty, slider.getValue() * factor));
     }
   }

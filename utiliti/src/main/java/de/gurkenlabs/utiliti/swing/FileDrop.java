@@ -345,7 +345,7 @@ public class FileDrop {
             File file = new File(new URI(line));
             list.add(file);
           } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error with {0}: {1}", new String[]{line, ex.getMessage()});
+            LOG.log(Level.SEVERE, "Error with {0}: {1}", new String[] {line, ex.getMessage()});
           }
         }
 
@@ -387,7 +387,8 @@ public class FileDrop {
    * @version 1.2
    */
   public static class Event extends EventObject {
-    @Serial private static final long serialVersionUID = 885026812546045019L;
+    @Serial
+    private static final long serialVersionUID = 885026812546045019L;
     private final File[] files;
 
     /**

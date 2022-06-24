@@ -281,7 +281,7 @@ public class AssetPanelItem extends JPanel {
   }
 
   private void deleteAsset() {
-    if (getOrigin() instanceof SpritesheetResource spritesheetResource) {
+    if (getOrigin()instanceof SpritesheetResource spritesheetResource) {
       int n = getDeleteDialog("spritesheet", spritesheetResource.getName());
 
       if (n == JOptionPane.OK_OPTION) {
@@ -291,7 +291,7 @@ public class AssetPanelItem extends JPanel {
         Editor.instance().getMapComponent().reloadEnvironment();
         UI.getAssetController().refresh();
       }
-    } else if (getOrigin() instanceof EmitterData emitterData) {
+    } else if (getOrigin()instanceof EmitterData emitterData) {
       int n = getDeleteDialog("emitter", emitterData.getName());
 
       if (n == JOptionPane.OK_OPTION) {
@@ -299,14 +299,14 @@ public class AssetPanelItem extends JPanel {
         Editor.instance().getMapComponent().reloadEnvironment();
         UI.getAssetController().refresh();
       }
-    } else if (getOrigin() instanceof Blueprint blueprint) {
+    } else if (getOrigin()instanceof Blueprint blueprint) {
       int n = getDeleteDialog("blueprint", blueprint.getName());
 
       if (n == JOptionPane.OK_OPTION) {
         Editor.instance().getGameFile().getBluePrints().remove(getOrigin());
         UI.getAssetController().refresh();
       }
-    } else if (getOrigin() instanceof SoundResource soundResource) {
+    } else if (getOrigin()instanceof SoundResource soundResource) {
       int n = getDeleteDialog("sound", soundResource.getName());
 
       if (n == JOptionPane.OK_OPTION) {
@@ -321,7 +321,7 @@ public class AssetPanelItem extends JPanel {
       return false;
     }
 
-    if (this.getOrigin() instanceof SpritesheetResource spritesheetResource) {
+    if (this.getOrigin()instanceof SpritesheetResource spritesheetResource) {
       MapObject mo = new MapObject();
       String propName = PropPanel.getIdentifierBySpriteName(spritesheetResource.getName());
       String creatureName = CreaturePanel.getCreatureSpriteName(spritesheetResource.getName());
@@ -356,7 +356,7 @@ public class AssetPanelItem extends JPanel {
       newEmitter.setY((int) (Game.world().camera().getFocus().getY() - newEmitter.getHeight()));
       newEmitter.setId(Game.world().environment().getNextMapId());
       Editor.instance().getMapComponent().add(newEmitter);
-    } else if (this.getOrigin() instanceof Blueprint blueprint) {
+    } else if (this.getOrigin()instanceof Blueprint blueprint) {
       UndoManager.instance().beginOperation();
       try {
         List<IMapObject> newObjects =
@@ -440,7 +440,7 @@ public class AssetPanelItem extends JPanel {
   }
 
   private void exportSpritesheet() {
-    if (this.getOrigin() instanceof SpritesheetResource spritesheetResource) {
+    if (this.getOrigin()instanceof SpritesheetResource spritesheetResource) {
       Spritesheet sprite = Resources.spritesheets().get(spritesheetResource.getName());
       if (sprite == null) {
         return;
@@ -495,28 +495,28 @@ public class AssetPanelItem extends JPanel {
   }
 
   private void exportTileset() {
-    if (!(this.getOrigin() instanceof Tileset tileset)) {
+    if (!(this.getOrigin()instanceof Tileset tileset)) {
       return;
     }
     XmlExportDialog.export(tileset, "Tileset", tileset.getName(), Tileset.FILE_EXTENSION);
   }
 
   private void exportEmitter() {
-    if (!(this.getOrigin() instanceof EmitterData emitter)) {
+    if (!(this.getOrigin()instanceof EmitterData emitter)) {
       return;
     }
     XmlExportDialog.export(emitter, "Emitter", emitter.getName());
   }
 
   private void exportBlueprint() {
-    if (!(this.getOrigin() instanceof Blueprint mapObject)) {
+    if (!(this.getOrigin()instanceof Blueprint mapObject)) {
       return;
     }
     XmlExportDialog.export(mapObject, "Blueprint", mapObject.getName(), Blueprint.BLUEPRINT_FILE_EXTENSION);
   }
 
   private void exportSound() {
-    if (!(this.getOrigin() instanceof SoundResource sound)) {
+    if (!(this.getOrigin()instanceof SoundResource sound)) {
       return;
     }
     SoundFormat format = sound.getFormat();
@@ -553,7 +553,7 @@ public class AssetPanelItem extends JPanel {
   }
 
   private boolean canAdd() {
-    if (this.getOrigin() instanceof SpritesheetResource spritesheetResource) {
+    if (this.getOrigin()instanceof SpritesheetResource spritesheetResource) {
       String propName = PropPanel.getIdentifierBySpriteName(spritesheetResource.getName());
       return propName != null && !propName.isEmpty()
           || CreaturePanel.getCreatureSpriteName(spritesheetResource.getName()) != null;

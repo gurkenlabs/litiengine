@@ -111,7 +111,7 @@ public class CustomPanel extends PropertyPanel {
         new DefaultTableModel(
             new Object[][] {},
             new String[] {
-              Resources.strings().get("panel_name"), Resources.strings().get("panel_value")
+                Resources.strings().get("panel_name"), Resources.strings().get("panel_value")
             }) {
           final Class<?>[] columnTypes = new Class<?>[] {String.class, String.class};
           final boolean[] columnEditables = new boolean[] {true, true};

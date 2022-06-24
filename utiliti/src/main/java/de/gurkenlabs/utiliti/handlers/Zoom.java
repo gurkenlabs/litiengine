@@ -66,7 +66,8 @@ public record Zoom(float value) implements Comparable<Zoom> {
    * <p>
    * For example: 1.111f would be converted to the preset 1.0f zoom level.
    *
-   * @param preference The preferred zoom.
+   * @param preference
+   *          The preferred zoom.
    * @return The index of the matched zoom provided by this class.
    */
   public static int match(float preference) {

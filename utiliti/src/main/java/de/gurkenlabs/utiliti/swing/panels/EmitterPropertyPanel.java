@@ -105,12 +105,12 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
     protected LayoutManager createLayout() {
       LayoutItem[] layoutItems =
           new LayoutItem[] {
-            new LayoutItem("emitter_spawnrate", spawnRateSpinner),
-            new LayoutItem("emitter_spawnamount", spawnAmountSpinner),
-            new LayoutItem("emitter_updateDelay", updateDelaySpinner),
-            new LayoutItem("emitter_duration", durationSpinner),
-            new LayoutItem("emitter_maxparticles", maxParticlesSpinner),
-            new LayoutItem("emitter_particleTTL", ttl)
+              new LayoutItem("emitter_spawnrate", spawnRateSpinner),
+              new LayoutItem("emitter_spawnamount", spawnAmountSpinner),
+              new LayoutItem("emitter_updateDelay", updateDelaySpinner),
+              new LayoutItem("emitter_duration", durationSpinner),
+              new LayoutItem("emitter_maxparticles", maxParticlesSpinner),
+              new LayoutItem("emitter_particleTTL", ttl)
           };
       return createLayout(layoutItems, btnPause);
     }
@@ -226,10 +226,10 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
     protected LayoutManager createLayout() {
       LayoutItem[] layoutItems =
           new LayoutItem[] {
-            new LayoutItem("emitter_particleType", comboBoxParticleType),
-            new LayoutItem("particle_fade", fade),
-            new LayoutItem("particle_outlineonly", outlineOnly),
-            new LayoutItem("particle_antiAliasing", antiAliasing)
+              new LayoutItem("emitter_particleType", comboBoxParticleType),
+              new LayoutItem("particle_fade", fade),
+              new LayoutItem("particle_outlineonly", outlineOnly),
+              new LayoutItem("particle_antiAliasing", antiAliasing)
           };
       return this.createLayout(layoutItems, styleTabs);
     }
@@ -338,10 +338,10 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
     protected LayoutManager createLayout() {
       LayoutItem[] layoutItems =
           new LayoutItem[] {
-            new LayoutItem("emitter_startWidth", startWidth),
-            new LayoutItem("emitter_startHeight", startHeight),
-            new LayoutItem("emitter_deltaWidth", deltaWidth),
-            new LayoutItem("emitter_deltaHeight", deltaHeight)
+              new LayoutItem("emitter_startWidth", startWidth),
+              new LayoutItem("emitter_startHeight", startHeight),
+              new LayoutItem("emitter_deltaWidth", deltaWidth),
+              new LayoutItem("emitter_deltaHeight", deltaHeight)
           };
       return this.createLayout(layoutItems);
     }
@@ -417,10 +417,10 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
     protected LayoutManager createLayout() {
       LayoutItem[] layoutItems =
           new LayoutItem[] {
-            new LayoutItem("emitter_originAlign", comboBoxAlign),
-            new LayoutItem("emitter_originValign", comboBoxValign),
-            new LayoutItem("offsetX", offsetX),
-            new LayoutItem("offsetY", offsetY)
+              new LayoutItem("emitter_originAlign", comboBoxAlign),
+              new LayoutItem("emitter_originValign", comboBoxValign),
+              new LayoutItem("offsetX", offsetX),
+              new LayoutItem("offsetY", offsetY)
           };
       return this.createLayout(layoutItems);
     }
@@ -482,8 +482,8 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
     protected LayoutManager createLayout() {
       LayoutItem[] layoutItems =
           new LayoutItem[] {
-            new LayoutItem("particle_startAngle", startAngle),
-            new LayoutItem("particle_deltaAngle", deltaAngle)
+              new LayoutItem("particle_startAngle", startAngle),
+              new LayoutItem("particle_deltaAngle", deltaAngle)
           };
       return this.createLayout(layoutItems);
     }
@@ -565,10 +565,10 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
     protected LayoutManager createLayout() {
       LayoutItem[] layoutItems =
           new LayoutItem[] {
-            new LayoutItem("emitter_velocityX", velocityX),
-            new LayoutItem("emitter_velocityY", velocityY),
-            new LayoutItem("emitter_accelerationX", accelerationX),
-            new LayoutItem("emitter_accelerationY", accelerationY)
+              new LayoutItem("emitter_velocityX", velocityX),
+              new LayoutItem("emitter_velocityY", velocityY),
+              new LayoutItem("emitter_accelerationX", accelerationX),
+              new LayoutItem("emitter_accelerationY", accelerationY)
           };
       return this.createLayout(layoutItems);
     }
@@ -613,8 +613,8 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
     protected LayoutManager createLayout() {
       LayoutItem[] layoutItems =
           new LayoutItem[] {
-            new LayoutItem("collisionType", collisionType),
-            new LayoutItem("particle_fadeOnCollision", fadeOnCollision)
+              new LayoutItem("collisionType", collisionType),
+              new LayoutItem("particle_fadeOnCollision", fadeOnCollision)
           };
       return this.createLayout(layoutItems);
     }

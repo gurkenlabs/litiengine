@@ -43,18 +43,19 @@ public class IconTreeListRenderer implements TreeCellRenderer {
       boolean hasFocus) {
     this.label.setIcon(Icons.DEFAULT_NODE);
     this.label.setText(value.toString());
-    if (value instanceof DefaultMutableTreeNode defaultMutableTreeNode && defaultMutableTreeNode.getUserObject() instanceof IconTreeListItem iconTreeListItem) {
-        this.label.setText(iconTreeListItem.toString());
-        if (iconTreeListItem.getIcon() != null) {
-          this.label.setIcon(iconTreeListItem.getIcon());
-        } else if (iconTreeListItem.getUserObject() instanceof Prop prop) {
-          label.setIcon(getIcon(prop));
-        } else if (iconTreeListItem.getUserObject() instanceof Creature creature) {
-          label.setIcon(getIcon(creature));
-        } else if (iconTreeListItem.getUserObject() instanceof LightSource lightSource) {
-          label.setIcon(getIcon(lightSource));
-        }
+    if (value instanceof DefaultMutableTreeNode defaultMutableTreeNode
+        && defaultMutableTreeNode.getUserObject()instanceof IconTreeListItem iconTreeListItem) {
+      this.label.setText(iconTreeListItem.toString());
+      if (iconTreeListItem.getIcon() != null) {
+        this.label.setIcon(iconTreeListItem.getIcon());
+      } else if (iconTreeListItem.getUserObject()instanceof Prop prop) {
+        label.setIcon(getIcon(prop));
+      } else if (iconTreeListItem.getUserObject()instanceof Creature creature) {
+        label.setIcon(getIcon(creature));
+      } else if (iconTreeListItem.getUserObject()instanceof LightSource lightSource) {
+        label.setIcon(getIcon(lightSource));
       }
+    }
     return label;
   }
 
