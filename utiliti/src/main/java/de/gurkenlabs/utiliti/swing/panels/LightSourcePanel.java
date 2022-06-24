@@ -14,13 +14,12 @@ import javax.swing.JComboBox;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
-@SuppressWarnings("serial")
 public class LightSourcePanel extends PropertyPanel {
   private final JComboBox<String> comboBoxLightShape;
-  private JSpinner spinnerIntensity;
-  private JCheckBox checkBoxIsActive;
-  private JSpinner offsetX;
-  private JSpinner offsetY;
+  private final JSpinner spinnerIntensity;
+  private final JCheckBox checkBoxIsActive;
+  private final JSpinner offsetX;
+  private final JSpinner offsetY;
   private final ColorComponent colorControl;
 
   public LightSourcePanel() {

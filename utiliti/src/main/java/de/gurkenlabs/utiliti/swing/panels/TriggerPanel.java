@@ -13,15 +13,13 @@ import javax.swing.JComboBox;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 
-@SuppressWarnings("serial")
 public class TriggerPanel extends PropertyPanel {
-  private JTextField textFieldMessage;
-  private JComboBox<TriggerActivation> comboBoxActivationType;
-  private JSpinner spinnerCooldown;
-
-  private JCheckBox chckbxOneTimeOnly;
-  private TextList textListActivators;
-  private TextList textListTargets;
+  private final JTextField textFieldMessage;
+  private final JComboBox<TriggerActivation> comboBoxActivationType;
+  private final JSpinner spinnerCooldown;
+  private final JCheckBox chckbxOneTimeOnly;
+  private final TextList textListActivators;
+  private final TextList textListTargets;
 
   public TriggerPanel() {
     super("panel_trigger", Icons.TRIGGER);

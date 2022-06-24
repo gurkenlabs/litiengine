@@ -61,6 +61,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -77,8 +78,7 @@ public class MapComponent extends GuiComponent {
   public static final int EDITMODE_EDIT = 1;
 
   /** @deprecated Will be replaced by {@link TransformType#MOVE} */
-  @Deprecated()
-  public static final int EDITMODE_MOVE = 2;
+  @Deprecated() public static final int EDITMODE_MOVE = 2;
 
   private static final Logger log = Logger.getLogger(MapComponent.class.getName());
 
@@ -102,33 +102,36 @@ public class MapComponent extends GuiComponent {
   private Blueprint copiedBlueprint;
 
   /**
-   * This flag is used to control the undo behavior of a <b>move transformation</b>. It ensures that the UndoManager
-   * tracks the "changing" event in the beginning of the operation (when the key event is recorded for the first time) and
-   * also triggers the "changed" event upon key release.
+   * This flag is used to control the undo behavior of a <b>move transformation</b>. It ensures that
+   * the UndoManager tracks the "changing" event in the beginning of the operation (when the key
+   * event is recorded for the first time) and also triggers the "changed" event upon key release.
    */
   private boolean isMoving;
 
   /**
-   * This flag is used to control the undo behavior of a <b>resize transformation</b>. It ensures that the UndoManager
-   * tracks the "changing" event in the beginning of the operation (when the key event is recorded for the first time) and
-   * also triggers the "changed" event upon key release.
+   * This flag is used to control the undo behavior of a <b>resize transformation</b>. It ensures
+   * that the UndoManager tracks the "changing" event in the beginning of the operation (when the
+   * key event is recorded for the first time) and also triggers the "changed" event upon key
+   * release.
    */
   private boolean isResizing;
 
   /**
-   * This flag is used to bundle a move operation over several key events until the arrow keys are released. This allows
-   * for the UndoManager to revert the keyboard move operation once instead of having to revert for each individual key
-   * stroke.
+   * This flag is used to bundle a move operation over several key events until the arrow keys are
+   * released. This allows for the UndoManager to revert the keyboard move operation once instead of
+   * having to revert for each individual key stroke.
    */
   private boolean isMovingWithKeyboard;
 
   /**
-   * This flag prevents circular focusing approaches while this instance is already performing a focus process.
+   * This flag prevents circular focusing approaches while this instance is already performing a
+   * focus process.
    */
   private boolean isFocussing;
 
   /**
-   * This flag prevents certain UI operations from executing while the editor is loading an environment.
+   * This flag prevents certain UI operations from executing while the editor is loading an
+   * environment.
    */
   private boolean loading;
 
@@ -263,12 +266,7 @@ public class MapComponent extends GuiComponent {
 
   @Override
   public void prepare() {
-    Game.world()
-        .camera()
-        .onZoom(
-            event -> {
-              Transform.updateAnchors();
-            });
+    Game.world().camera().onZoom(event -> Transform.updateAnchors());
 
     Zoom.applyPreference();
 
@@ -505,7 +503,6 @@ public class MapComponent extends GuiComponent {
       }
     } finally {
       UndoManager.instance().endOperation();
-
     }
   }
 
@@ -610,19 +607,15 @@ public class MapComponent extends GuiComponent {
     }
 
     switch (editMode) {
-      case EDITMODE_CREATE:
+      case EDITMODE_CREATE -> {
         this.setFocus(null, true);
         UI.getInspector().bind(null);
         Game.window().cursor().set(Cursors.ADD, 0, 0);
-        break;
-      case EDITMODE_EDIT:
-        Game.window().cursor().set(Cursors.DEFAULT, 0, 0);
-        break;
-      case EDITMODE_MOVE:
-        Game.window().cursor().set(Cursors.MOVE, 0, 0);
-        break;
-      default:
-        break;
+      }
+      case EDITMODE_EDIT -> Game.window().cursor().set(Cursors.DEFAULT, 0, 0);
+      case EDITMODE_MOVE -> Game.window().cursor().set(Cursors.MOVE, 0, 0);
+      default -> {
+      }
     }
 
     this.editMode = editMode;
@@ -639,7 +632,7 @@ public class MapComponent extends GuiComponent {
     this.isFocussing = true;
     try {
       final IMapObject currentFocus = this.getFocusedMapObject();
-      if (mapObject != null && currentFocus != null && mapObject.equals(currentFocus)
+      if (mapObject != null && mapObject.equals(currentFocus)
           || mapObject == null && currentFocus == null) {
         return;
       }
@@ -740,7 +733,7 @@ public class MapComponent extends GuiComponent {
     }
 
     Editor.instance().updateGameFileMaps();
-    Renderers.get(GridRenderer.class).clearCache();
+    Objects.requireNonNull(Renderers.get(GridRenderer.class)).clearCache();
   }
 
   public void importMap() {
@@ -808,10 +801,8 @@ public class MapComponent extends GuiComponent {
 
           Editor.instance().updateGameFileMaps();
           Resources.images().clear();
-          Renderers.get(GridRenderer.class).clearCache();
-          if (this.environments.containsKey(map.getName())) {
-            this.environments.remove(map.getName());
-          }
+          Objects.requireNonNull(Renderers.get(GridRenderer.class)).clearCache();
+          this.environments.remove(map.getName());
 
           UI.getMapController().bind(this.getMaps(), true);
           this.loadEnvironment(map);
@@ -1156,8 +1147,7 @@ public class MapComponent extends GuiComponent {
     }
 
     switch (this.editMode) {
-      case EDITMODE_CREATE:
-      case EDITMODE_MOVE:
+      case EDITMODE_CREATE, EDITMODE_MOVE:
         if (SwingUtilities.isLeftMouseButton(e.getEvent())) {
           this.startPoint = Input.mouse().getMapLocation();
         }
@@ -1169,8 +1159,7 @@ public class MapComponent extends GuiComponent {
           return;
         }
 
-        final Point2D mouse = Input.mouse().getMapLocation();
-        this.startPoint = mouse;
+        this.startPoint = Input.mouse().getMapLocation();
         break;
       default:
         break;

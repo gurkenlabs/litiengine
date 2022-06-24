@@ -8,7 +8,6 @@ import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 import javax.swing.border.EmptyBorder;
 
-@SuppressWarnings("serial")
 public class MapListCellRenderer extends JLabel implements ListCellRenderer<IMap> {
   public MapListCellRenderer() {
     setOpaque(true);

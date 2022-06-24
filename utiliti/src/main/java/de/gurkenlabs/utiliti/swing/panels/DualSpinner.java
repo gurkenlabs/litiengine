@@ -8,23 +8,22 @@ import javax.swing.JLabel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
-@SuppressWarnings("serial")
 public class DualSpinner extends PropertyPanel {
-  private JSpinner spnDim1;
-  private JLabel lblDim1;
-  private JSpinner spnDim2;
-  private JLabel lblDim2;
+  private final JSpinner spnDim1;
+  private final JLabel lblDim1;
+  private final JSpinner spnDim2;
+  private final JLabel lblDim2;
 
-  private String dim1Name;
-  private String dim2Name;
-  private float dim1Default;
-  private float dim2Default;
+  private final String dim1Name;
+  private final String dim2Name;
+  private final float dim1Default;
+  private final float dim2Default;
 
-  private float lowerBound;
-  private float upperBound;
-  private float step;
+  private final float lowerBound;
+  private final float upperBound;
+  private final float step;
 
-  private boolean exclusiveBounds;
+  private final boolean exclusiveBounds;
 
   public DualSpinner(
       String dim1Name,
@@ -114,8 +113,11 @@ public class DualSpinner extends PropertyPanel {
     return this.spnDim2;
   }
 
-  public void addSpinnerListeners(Function<IMapObject, Boolean> newValueCheck1, Function<IMapObject, Boolean> newValueCheck2,
-      Consumer<IMapObject> spinner1Action, Consumer<IMapObject> spinner2Action) {
+  public void addSpinnerListeners(
+      Function<IMapObject, Boolean> newValueCheck1,
+      Function<IMapObject, Boolean> newValueCheck2,
+      Consumer<IMapObject> spinner1Action,
+      Consumer<IMapObject> spinner2Action) {
     spnDim1.addChangeListener(new MapObjectPropertyChangeListener(newValueCheck1, spinner1Action));
     spnDim2.addChangeListener(new MapObjectPropertyChangeListener(newValueCheck2, spinner2Action));
   }

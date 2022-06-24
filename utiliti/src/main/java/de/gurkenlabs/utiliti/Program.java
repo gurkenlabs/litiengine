@@ -41,9 +41,9 @@ public class Program {
             UI.init();
             Game.start();
             Input.keyboard().addKeyListener(new DebugCrasher());
-          } catch (Throwable t) {
+          } catch (Throwable e) {
             throw new UtiLITIInitializationError(
-                "UtiLITI failed to initialize, see the stacktrace below for more information", t);
+                "UtiLITI failed to initialize, see the stacktrace below for more information", e);
           }
 
           // configure input settings

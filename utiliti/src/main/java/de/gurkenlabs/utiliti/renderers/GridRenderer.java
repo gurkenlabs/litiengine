@@ -15,6 +15,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class GridRenderer implements IEditorRenderer {
@@ -112,7 +113,7 @@ public class GridRenderer implements IEditorRenderer {
           Imaging.getCompatibleImage(
               (int) (map.getTileWidth() * scale) + 1,
               (int) (map.getTileHeight() * scale) + 1);
-      Graphics2D graphics = (Graphics2D) image.getGraphics();
+      Graphics2D graphics = (Graphics2D) Objects.requireNonNull(image).getGraphics();
 
       final float lineSize = Editor.preferences().getGridLineWidth() / scale;
       final Stroke stroke = new BasicStroke(lineSize);

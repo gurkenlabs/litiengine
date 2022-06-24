@@ -9,7 +9,6 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
 /** FlowLayout subclass that fully supports wrapping of components. */
-@SuppressWarnings("serial")
 public class WrapLayout extends FlowLayout {
   /**
    * Constructs a new {@code WrapLayout} with a left alignment and a default 5-unit horizontal and vertical gap.

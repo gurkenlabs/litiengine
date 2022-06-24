@@ -12,7 +12,6 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
-@SuppressWarnings("serial")
 public class SpawnpointPanel extends PropertyPanel {
   private final JTextField textFieldInfo;
   private final JSpinner spinnerOffsetX;
@@ -29,11 +28,11 @@ public class SpawnpointPanel extends PropertyPanel {
     this.spinnerOffsetY = new JSpinner(new SpinnerNumberModel(0.0, 0.0, 100.0, 0.1));
 
     this.comboBoxDirection = new JComboBox<>();
-    this.comboBoxDirection.setModel(new DefaultComboBoxModel<Direction>(Direction.values()));
+    this.comboBoxDirection.setModel(new DefaultComboBoxModel<>(Direction.values()));
 
     this.comboBoxPivot = new JComboBox<>();
     this.comboBoxPivot.setModel(
-        new DefaultComboBoxModel<EntityPivotType>(EntityPivotType.values()));
+        new DefaultComboBoxModel<>(EntityPivotType.values()));
 
     setLayout(this.createLayout());
     this.setupChangedListeners();

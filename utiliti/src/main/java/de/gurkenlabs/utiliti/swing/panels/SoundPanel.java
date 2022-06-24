@@ -17,7 +17,6 @@ import javax.swing.JSpinner;
 import javax.swing.JToggleButton;
 import javax.swing.SpinnerNumberModel;
 
-@SuppressWarnings("serial")
 public class SoundPanel extends PropertyPanel {
   private final VolumeSlider volume;
   private final JSpinner range;

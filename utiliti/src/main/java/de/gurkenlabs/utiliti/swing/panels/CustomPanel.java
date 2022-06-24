@@ -19,10 +19,9 @@ import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 
-@SuppressWarnings("serial")
 public class CustomPanel extends PropertyPanel {
   private JTable tableCustomProperties;
-  private JScrollPane scrollPane;
+  private final JScrollPane scrollPane;
   private DefaultTableModel model;
 
   public CustomPanel() {
@@ -112,10 +111,10 @@ public class CustomPanel extends PropertyPanel {
         new DefaultTableModel(
             new Object[][] {},
             new String[] {
-                Resources.strings().get("panel_name"), Resources.strings().get("panel_value")
+              Resources.strings().get("panel_name"), Resources.strings().get("panel_value")
             }) {
-          Class<?>[] columnTypes = new Class<?>[] {String.class, String.class};
-          boolean[] columnEditables = new boolean[] {true, true};
+          final Class<?>[] columnTypes = new Class<?>[] {String.class, String.class};
+          final boolean[] columnEditables = new boolean[] {true, true};
 
           @Override
           public Class<?> getColumnClass(int columnIndex) {

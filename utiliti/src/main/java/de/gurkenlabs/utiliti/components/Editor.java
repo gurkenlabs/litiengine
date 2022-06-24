@@ -33,6 +33,7 @@ import de.gurkenlabs.utiliti.swing.dialogs.ConfirmDialog;
 import de.gurkenlabs.utiliti.swing.dialogs.EditorFileChooser;
 import de.gurkenlabs.utiliti.swing.dialogs.SpritesheetImportPanel;
 import de.gurkenlabs.utiliti.swing.dialogs.XmlImportDialog;
+import jakarta.xml.bind.JAXBException;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -47,21 +48,19 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import jakarta.xml.bind.JAXBException;
 
 public class Editor extends Screen {
   private static final Logger log = Logger.getLogger(Editor.class.getName());
@@ -82,7 +81,7 @@ public class Editor extends Screen {
 
   private final List<Runnable> loadedCallbacks;
 
-  private MapComponent mapComponent;
+  private final MapComponent mapComponent;
   private ResourceBundle gameFile = new ResourceBundle();
   private String projectPath;
   private String currentResourceFile;
@@ -175,10 +174,7 @@ public class Editor extends Screen {
         true);
 
     if (Game.time().now() % 4 == 0) {
-      SwingUtilities.invokeLater(
-          () -> {
-            StatusBar.update();
-          });
+      SwingUtilities.invokeLater(StatusBar::update);
     }
 
     // render status
@@ -272,7 +268,8 @@ public class Editor extends Screen {
 
   public void load() {
     if (EditorFileChooser.showFileDialog(
-        ResourceBundle.FILE_EXTENSION, GAME_FILE_NAME, false, ResourceBundle.FILE_EXTENSION) == JFileChooser.APPROVE_OPTION) {
+            ResourceBundle.FILE_EXTENSION, GAME_FILE_NAME, false, ResourceBundle.FILE_EXTENSION)
+        == JFileChooser.APPROVE_OPTION) {
       this.load(EditorFileChooser.instance().getSelectedFile(), false);
     }
   }
@@ -291,7 +288,7 @@ public class Editor extends Screen {
     this.currentResourceFile = null;
     this.gameFile = null;
     this.setProjectPath(null);
-    this.mapComponent.loadMaps(Arrays.asList(), true);
+    this.mapComponent.loadMaps(List.of(), true);
     Resources.clearAll();
     UI.getAssetController().refresh();
     this.gamefileLoaded();
@@ -410,10 +407,11 @@ public class Editor extends Screen {
   public void importSpriteFile() {
 
     if (EditorFileChooser.showFileDialog(
-        SPRITE_FILE_NAME,
-        Resources.strings().get(IMPORT_DIALOGUE, SPRITE_FILE_NAME),
-        false,
-        SpritesheetResource.PLAIN_TEXT_FILE_EXTENSION) == JFileChooser.APPROVE_OPTION) {
+            SPRITE_FILE_NAME,
+            Resources.strings().get(IMPORT_DIALOGUE, SPRITE_FILE_NAME),
+            false,
+            SpritesheetResource.PLAIN_TEXT_FILE_EXTENSION)
+        == JFileChooser.APPROVE_OPTION) {
       File spriteFile = EditorFileChooser.instance().getSelectedFile();
       if (spriteFile == null) {
         return;
@@ -434,20 +432,22 @@ public class Editor extends Screen {
 
   public void importSpriteSheets() {
     if (EditorFileChooser.showFileDialog(
-        SPRITESHEET_FILE_NAME,
-        Resources.strings().get(IMPORT_DIALOGUE, SPRITE_FILE_NAME),
-        true,
-        ImageFormat.getAllExtensions()) == JFileChooser.APPROVE_OPTION) {
+            SPRITESHEET_FILE_NAME,
+            Resources.strings().get(IMPORT_DIALOGUE, SPRITE_FILE_NAME),
+            true,
+            ImageFormat.getAllExtensions())
+        == JFileChooser.APPROVE_OPTION) {
       this.importSpriteSheets(EditorFileChooser.instance().getSelectedFiles());
     }
   }
 
   public void importSounds() {
     if (EditorFileChooser.showFileDialog(
-        AUDIO_FILE_NAME,
-        Resources.strings().get(IMPORT_DIALOGUE, AUDIO_FILE_NAME),
-        true,
-        SoundFormat.getAllExtensions()) == JFileChooser.APPROVE_OPTION) {
+            AUDIO_FILE_NAME,
+            Resources.strings().get(IMPORT_DIALOGUE, AUDIO_FILE_NAME),
+            true,
+            SoundFormat.getAllExtensions())
+        == JFileChooser.APPROVE_OPTION) {
       this.importSounds(EditorFileChooser.instance().getSelectedFiles());
     }
   }
@@ -479,7 +479,7 @@ public class Editor extends Screen {
     // get all spritesheets
     List<Spritesheet> allSpriteSheets = new ArrayList<>(Resources.spritesheets().getAll());
     Collections.sort(allSpriteSheets);
-    try (BufferedWriter writer = new BufferedWriter(new FileWriter(chooser.getSelectedFile()));) {
+    try (BufferedWriter writer = new BufferedWriter(new FileWriter(chooser.getSelectedFile()))) {
       // print the spritesheet information to the info file
       for (Spritesheet spritesheet : allSpriteSheets) {
         // check for keyframes
@@ -513,10 +513,11 @@ public class Editor extends Screen {
 
   public void importTextureAtlas() {
     if (EditorFileChooser.showFileDialog(
-        TEXTUREATLAS_FILE_NAME,
-        Resources.strings().get(IMPORT_DIALOGUE, TEXTUREATLAS_FILE_NAME),
-        false,
-        "xml") == JFileChooser.APPROVE_OPTION) {
+            TEXTUREATLAS_FILE_NAME,
+            Resources.strings().get(IMPORT_DIALOGUE, TEXTUREATLAS_FILE_NAME),
+            false,
+            "xml")
+        == JFileChooser.APPROVE_OPTION) {
       TextureAtlas atlas =
           TextureAtlas.read(EditorFileChooser.instance().getSelectedFile().getAbsolutePath());
       if (atlas == null) {
@@ -594,7 +595,7 @@ public class Editor extends Screen {
           }
 
           if (this.gameFile.getEmitters().stream()
-              .anyMatch(x -> x.getName().equals(emitter.getName()))) {
+              .anyMatch(x -> x.getName().equals(Objects.requireNonNull(emitter).getName()))) {
             if (!ConfirmDialog.show(
                 Resources.strings().get("import_emitter_title"),
                 Resources.strings().get("import_emitter_question", emitter.getName()))) {
@@ -606,7 +607,9 @@ public class Editor extends Screen {
 
           this.gameFile.getEmitters().add(emitter);
           log.log(
-              Level.INFO, "imported emitter {0} from {1}", new Object[] {emitter.getName(), file});
+              Level.INFO,
+              "imported emitter {0} from {1}",
+              new Object[] {Objects.requireNonNull(emitter).getName(), file});
         });
   }
 
@@ -630,7 +633,7 @@ public class Editor extends Screen {
           }
 
           if (this.gameFile.getBluePrints().stream()
-              .anyMatch(x -> x.getName().equals(blueprint.getName()))
+                  .anyMatch(x -> x.getName().equals(blueprint.getName()))
               && !ConfirmDialog.show(
                   Resources.strings().get("import_blueprint_title"),
                   Resources.strings().get("import_blueprint_question", blueprint.getName()))) {
@@ -655,14 +658,14 @@ public class Editor extends Screen {
           try {
             URL path = file.toURI().toURL();
             tileset = XmlUtilities.read(Tileset.class, path);
-            tileset.finish(path);
+            Objects.requireNonNull(tileset).finish(path);
           } catch (IOException | JAXBException e) {
             log.log(Level.SEVERE, String.format("could not load tileset from %s", file), e);
             return;
           }
 
           if (this.gameFile.getTilesets().stream()
-              .anyMatch(x -> x.getName().equals(tileset.getName()))
+                  .anyMatch(x -> x.getName().equals(tileset.getName()))
               && !ConfirmDialog.show(
                   Resources.strings().get("import_tileset_title"),
                   Resources.strings().get("import_tileset_title", tileset.getName()))) {
@@ -720,7 +723,7 @@ public class Editor extends Screen {
     SpritesheetResource info = new SpritesheetResource(newSprite);
     getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(info.getName()));
     getGameFile().getSpriteSheets().add(info);
-    loadSpriteSheets(Arrays.asList(info), true);
+    loadSpriteSheets(List.of(info), true);
     if (!embedded) {
       getGameFile().getTilesets().removeIf(x -> x.getName().equals(tileset.getName()));
       getGameFile().getTilesets().add((Tileset) tileset);
@@ -797,7 +800,7 @@ public class Editor extends Screen {
     return this.getMapComponent().getMaps().stream()
         .filter(UndoManager::hasChanges)
         .distinct()
-        .collect(Collectors.toList());
+        .toList();
   }
 
   public void setCurrentStatus(String currentStatus) {
@@ -828,13 +831,13 @@ public class Editor extends Screen {
         Level.INFO,
         "saved {0} maps, {1} spritesheets, {2} tilesets, {3} emitters, {4} blueprints, {5} sounds to {6}",
         new Object[] {
-            this.getGameFile().getMaps().size(),
-            this.getGameFile().getSpriteSheets().size(),
-            this.getGameFile().getTilesets().size(),
-            this.getGameFile().getEmitters().size(),
-            this.getGameFile().getBluePrints().size(),
-            this.getGameFile().getSounds().size(),
-            this.currentResourceFile
+          this.getGameFile().getMaps().size(),
+          this.getGameFile().getSpriteSheets().size(),
+          this.getGameFile().getTilesets().size(),
+          this.getGameFile().getEmitters().size(),
+          this.getGameFile().getBluePrints().size(),
+          this.getGameFile().getSounds().size(),
+          this.currentResourceFile
         });
     this.setCurrentStatus(Resources.strings().get("status_gamefile_saved"));
 
@@ -847,10 +850,11 @@ public class Editor extends Screen {
       UndoManager.save(map);
 
       if (preferences().syncMaps()) {
-        for (String file : FileUtilities.findFilesByExtension(
-            new ArrayList<>(),
-            Paths.get(FileUtilities.combine(this.getProjectPath(), "maps")),
-            map.getName() + "." + TmxMap.FILE_EXTENSION)) {
+        for (String file :
+            FileUtilities.findFilesByExtension(
+                new ArrayList<>(),
+                Paths.get(FileUtilities.combine(this.getProjectPath(), "maps")),
+                map.getName() + "." + TmxMap.FILE_EXTENSION)) {
           File newFile = XmlUtilities.save(map, file, TmxMap.FILE_EXTENSION);
           log.log(Level.INFO, "synchronized map {0}", new Object[] {newFile});
         }
@@ -873,7 +877,7 @@ public class Editor extends Screen {
       }
 
       Spritesheet opt = Resources.spritesheets().get(tileSet.getImage().getSource());
-      Spritesheet sprite = null;
+      Spritesheet sprite;
       if (opt == null) {
         sprite = Resources.spritesheets().load(tileSet);
         if (sprite == null) {
@@ -889,7 +893,7 @@ public class Editor extends Screen {
 
     for (IImageLayer imageLayer : map.getImageLayers()) {
       Spritesheet opt = Resources.spritesheets().get(imageLayer.getImage().getSource());
-      Spritesheet sprite = null;
+      Spritesheet sprite;
       if (opt == null) {
         BufferedImage img =
             Resources.images().get(imageLayer.getImage().getAbsoluteSourcePath(), true);
@@ -900,9 +904,6 @@ public class Editor extends Screen {
         sprite =
             Resources.spritesheets()
                 .load(img, imageLayer.getImage().getSource(), img.getWidth(), img.getHeight());
-        if (sprite == null) {
-          continue;
-        }
       } else {
         sprite = opt;
       }

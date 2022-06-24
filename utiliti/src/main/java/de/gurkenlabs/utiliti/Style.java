@@ -4,6 +4,7 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.components.Editor;
 import java.awt.Color;
 import java.awt.Font;
+import java.util.Objects;
 
 public final class Style {
   public enum Theme {
@@ -55,7 +56,7 @@ public final class Style {
   public static Font getDefaultFont() {
     if (scaledDefaultFont == null) {
       scaledDefaultFont =
-          FONT_DEFAULT.deriveFont(FONT_DEFAULT_SIZE * Editor.preferences().getUiScale());
+          Objects.requireNonNull(FONT_DEFAULT).deriveFont(FONT_DEFAULT_SIZE * Editor.preferences().getUiScale());
     }
 
     return scaledDefaultFont;
@@ -64,7 +65,7 @@ public final class Style {
   public static Font getHeaderFont() {
     if (scaledHeaderFont == null) {
       scaledHeaderFont =
-          FONT_HEADER.deriveFont(FONT_HEADER_SIZE * Editor.preferences().getUiScale());
+          Objects.requireNonNull(FONT_HEADER).deriveFont(FONT_HEADER_SIZE * Editor.preferences().getUiScale());
     }
 
     return scaledHeaderFont;

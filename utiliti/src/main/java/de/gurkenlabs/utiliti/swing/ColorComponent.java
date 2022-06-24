@@ -20,11 +20,10 @@ import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SpinnerNumberModel;
 
-@SuppressWarnings("serial")
 public class ColorComponent extends JPanel {
   private final JButton btnSelectColor;
   private final JTextField textFieldColor;
-  private JSpinner spinnerAlpha;
+  private final JSpinner spinnerAlpha;
 
   private final transient List<ActionListener> listeners;
   private static final String DEFAULT_COLOR = "#FFFFFFFF";

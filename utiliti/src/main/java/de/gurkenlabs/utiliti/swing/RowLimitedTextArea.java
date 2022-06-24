@@ -1,8 +1,8 @@
 package de.gurkenlabs.utiliti.swing;
 
-import javax.swing.JTextArea;
 import java.awt.Dimension;
 import java.awt.Insets;
+import javax.swing.JTextArea;
 
 public class RowLimitedTextArea extends JTextArea {
 
@@ -10,6 +10,7 @@ public class RowLimitedTextArea extends JTextArea {
     super(rows, columns);
   }
 
+  @Override
   public Dimension getPreferredSize() {
     Insets insets = getInsets();
     return new Dimension(

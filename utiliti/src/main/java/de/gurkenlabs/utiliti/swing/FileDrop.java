@@ -15,6 +15,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.Serial;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.EventObject;
@@ -137,12 +138,9 @@ public class FileDrop {
     if (c.getParent() != null)
       new DropTarget(c, dropListener);
 
-    if (recursive && (c instanceof Container)) {
-      // Get the container
-      Container cont = (Container) c;
-
+    if (recursive && (c instanceof Container container)) {
       // Get it's components
-      Component[] comps = cont.getComponents();
+      Component[] comps = container.getComponents();
 
       // Set it's components as listeners also
       for (Component comp : comps) {
@@ -184,8 +182,8 @@ public class FileDrop {
 
     LOG.log(Level.FINE, "FileDrop: Removing drag-and-drop hooks.");
     c.setDropTarget(null);
-    if (recursive && (c instanceof Container)) {
-      Component[] comps = ((Container) c).getComponents();
+    if (recursive && (c instanceof Container container)) {
+      Component[] comps = container.getComponents();
       for (Component comp : comps) {
         remove(comp, true);
       }
@@ -245,11 +243,10 @@ public class FileDrop {
           // Convert list to array
           File[] filesTemp = new File[fileList.size()];
           fileList.toArray(filesTemp);
-          final File[] files = filesTemp;
 
           // Alert listener to drop.
           if (listener != null)
-            listener.filesDropped(files);
+            listener.filesDropped(filesTemp);
 
           // Mark that drop is completed.
           evt.getDropTargetContext().dropComplete(true);
@@ -348,7 +345,7 @@ public class FileDrop {
             File file = new File(new URI(line));
             list.add(file);
           } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error with " + line + ": " + ex.getMessage());
+            LOG.log(Level.SEVERE, "Error with {0}: {1}", new String[]{line, ex.getMessage()});
           }
         }
 
@@ -390,7 +387,7 @@ public class FileDrop {
    * @version 1.2
    */
   public static class Event extends EventObject {
-    private static final long serialVersionUID = 885026812546045019L;
+    @Serial private static final long serialVersionUID = 885026812546045019L;
     private final File[] files;
 
     /**

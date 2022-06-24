@@ -17,15 +17,14 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 
-@SuppressWarnings("serial")
 public class PropPanel extends PropertyPanel {
-  private JComboBox<JLabel> comboBoxSpriteSheets;
-  private JComboBox<Material> comboBoxMaterial;
-  private JCheckBox chckbxShadow;
-  private JComboBox<Rotation> comboBoxRotation;
-  private JCheckBox checkBoxHorizontalFlip;
-  private JCheckBox checkBoxVerticalFlip;
-  private JCheckBox checkBoxScale;
+  private final JComboBox<JLabel> comboBoxSpriteSheets;
+  private final JComboBox<Material> comboBoxMaterial;
+  private final JCheckBox chckbxShadow;
+  private final JComboBox<Rotation> comboBoxRotation;
+  private final JCheckBox checkBoxHorizontalFlip;
+  private final JCheckBox checkBoxVerticalFlip;
+  private final JCheckBox checkBoxScale;
 
   private boolean propsLoaded;
 

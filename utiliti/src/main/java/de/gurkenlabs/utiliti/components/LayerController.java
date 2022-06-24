@@ -9,5 +9,5 @@ public interface LayerController extends Controller {
 
   void clear();
 
-  public void onLayersChanged(Consumer<IMap> consumer);
+  void onLayersChanged(Consumer<IMap> consumer);
 }

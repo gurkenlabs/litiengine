@@ -13,7 +13,6 @@ import javax.swing.JTable;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.table.DefaultTableModel;
 
-@SuppressWarnings("serial")
 public class TextList extends JPanel {
   private final transient List<ActionListener> listeners;
 
@@ -26,7 +25,7 @@ public class TextList extends JPanel {
     this.table.getTableHeader().setReorderingAllowed(false);
     this.table.setModel(
         new DefaultTableModel(new Object[][] {}, new String[] {columnName}) {
-          Class<?>[] columnTypes = new Class<?>[] {Integer.class};
+          final Class<?>[] columnTypes = new Class<?>[] {Integer.class};
 
           @Override
           public Class<?> getColumnClass(int columnIndex) {

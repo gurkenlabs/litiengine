@@ -14,12 +14,10 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-@SuppressWarnings("serial")
 public class Tag extends JPanel {
 
-  private JPanel panel;
-  private JLabel lblText;
-  private JButton btnDelete;
+  private final JLabel lblText;
+  private final JButton btnDelete;
 
   private boolean deleteHovered;
 
@@ -31,16 +29,16 @@ public class Tag extends JPanel {
   public Tag() {
     setBorder(null);
 
-    this.panel = new InternalTagPanel();
-    this.panel.setBackground(Style.COLOR_DEFAULT_TAG);
-    this.panel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 2));
-    add(this.panel);
+    JPanel panel = new InternalTagPanel();
+    panel.setBackground(Style.COLOR_DEFAULT_TAG);
+    panel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 2));
+    add(panel);
 
     this.lblText = new JLabel("New label");
     this.lblText.setForeground(Color.WHITE);
     this.lblText.setFont(
         this.lblText.getFont().deriveFont(Style.getDefaultFont().getSize() * 0.75f));
-    this.panel.add(this.lblText);
+    panel.add(this.lblText);
 
     this.btnDelete = new JButton();
     this.btnDelete.addActionListener(
@@ -64,7 +62,6 @@ public class Tag extends JPanel {
             if (!btnDelete.hasFocus()) {
               btnDelete.setIcon(Icons.DELETE_X7_DISABLED);
             }
-
             deleteHovered = false;
           }
         });
@@ -89,7 +86,7 @@ public class Tag extends JPanel {
     this.btnDelete.setBorder(null);
     this.btnDelete.setPreferredSize(new Dimension(9, 9));
     this.btnDelete.setIcon(Icons.DELETE_X7_DISABLED);
-    this.panel.add(this.btnDelete);
+    panel.add(this.btnDelete);
   }
 
   @Override
@@ -105,7 +102,7 @@ public class Tag extends JPanel {
     return this.lblText.getText();
   }
 
-  private class InternalTagPanel extends JPanel {
+  private static class InternalTagPanel extends JPanel {
     @Override
     public Dimension getPreferredSize() {
       return new Dimension(super.getMinimumSize().width, 17);

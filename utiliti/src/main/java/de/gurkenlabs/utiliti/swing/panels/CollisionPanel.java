@@ -13,7 +13,6 @@ import javax.swing.JComboBox;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
-@SuppressWarnings("serial")
 public class CollisionPanel extends PropertyPanel {
   private final JCheckBox chckbxHasCollision;
   private final JSpinner spinnerWidth;

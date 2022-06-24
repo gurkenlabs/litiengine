@@ -8,7 +8,6 @@ import java.awt.Graphics;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
-@SuppressWarnings("serial")
 public class AmbientLightPreviewPanel extends JPanel {
 
   private Color ambientColor = ColorHelper.decode("#ffffffff");
