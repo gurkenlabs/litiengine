@@ -16,6 +16,7 @@ import java.awt.Component;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
+import java.util.Objects;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -42,23 +43,17 @@ public class IconTreeListRenderer implements TreeCellRenderer {
       boolean hasFocus) {
     this.label.setIcon(Icons.DEFAULT_NODE);
     this.label.setText(value.toString());
-    if (value instanceof DefaultMutableTreeNode) {
-      DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
-      if (node.getUserObject() instanceof IconTreeListItem) {
-        IconTreeListItem iconItem = (IconTreeListItem) node.getUserObject();
-        this.label.setText(iconItem.toString());
-        if (iconItem.getIcon() != null) {
-          this.label.setIcon(iconItem.getIcon());
-        } else if (iconItem.getUserObject() instanceof Prop) {
-          Prop prop = (Prop) iconItem.getUserObject();
-          label.setIcon(getIcon(prop));
-        } else if (iconItem.getUserObject() instanceof Creature) {
-          Creature creature = (Creature) iconItem.getUserObject();
-          label.setIcon(getIcon(creature));
-        } else if (iconItem.getUserObject() instanceof LightSource) {
-          LightSource creature = (LightSource) iconItem.getUserObject();
-          label.setIcon(getIcon(creature));
-        }
+    if (value instanceof DefaultMutableTreeNode defaultMutableTreeNode
+        && defaultMutableTreeNode.getUserObject()instanceof IconTreeListItem iconTreeListItem) {
+      this.label.setText(iconTreeListItem.toString());
+      if (iconTreeListItem.getIcon() != null) {
+        this.label.setIcon(iconTreeListItem.getIcon());
+      } else if (iconTreeListItem.getUserObject()instanceof Prop prop) {
+        label.setIcon(getIcon(prop));
+      } else if (iconTreeListItem.getUserObject()instanceof Creature creature) {
+        label.setIcon(getIcon(creature));
+      } else if (iconTreeListItem.getUserObject()instanceof LightSource lightSource) {
+        label.setIcon(getIcon(lightSource));
       }
     }
     return label;
@@ -161,7 +156,7 @@ public class IconTreeListRenderer implements TreeCellRenderer {
                   cacheKey,
                   () -> {
                     BufferedImage img = Imaging.getCompatibleImage(10, 10);
-                    Graphics2D g = (Graphics2D) img.getGraphics();
+                    Graphics2D g = (Graphics2D) Objects.requireNonNull(img).getGraphics();
                     g.setColor(lightColor);
                     g.fillRect(0, 0, 9, 9);
                     g.setColor(Color.BLACK);

@@ -10,7 +10,6 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JSpinner;
 
-@SuppressWarnings("serial")
 public class StaticShadowPanel extends PropertyPanel {
   private final JComboBox<StaticShadowType> comboBoxShadowType;
   private final JSpinner spinnerOffset;
@@ -20,7 +19,7 @@ public class StaticShadowPanel extends PropertyPanel {
 
     this.comboBoxShadowType = new JComboBox<>();
     this.comboBoxShadowType.setModel(
-        new DefaultComboBoxModel<StaticShadowType>(StaticShadowType.values()));
+        new DefaultComboBoxModel<>(StaticShadowType.values()));
 
     this.spinnerOffset = new JSpinner();
 

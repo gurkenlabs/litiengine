@@ -10,10 +10,9 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 
-@SuppressWarnings("serial")
 public class CollisionBoxPanel extends PropertyPanel {
-  private JComboBox<Collision> comboBoxColl;
-  private JCheckBox chckbxIsObstructingLights;
+  private final JComboBox<Collision> comboBoxColl;
+  private final JCheckBox chckbxIsObstructingLights;
 
   public CollisionBoxPanel() {
     super("panel_collisionBox", Icons.COLLISIONBOX);

@@ -301,7 +301,7 @@ public class MapObjectsRenderer implements IEditorRenderer {
 
   private static String truncateName(String value) {
 
-    if (value == null || value.isEmpty() || value.length() < 4) {
+    if (value == null || value.length() < 4) {
       return value;
     }
 

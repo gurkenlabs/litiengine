@@ -21,7 +21,7 @@ public final class Snap {
     return x(x, gridSize, Editor.preferences().snapToGrid(), Editor.preferences().snapToPixels());
   }
 
-  protected static float x(double x, int gridSize, boolean snapToGrid, boolean snapToPixel) {
+  public static float x(double x, int gridSize, boolean snapToGrid, boolean snapToPixel) {
     return snap(x, gridSize, snapToGrid, snapToPixel);
   }
 
@@ -35,7 +35,7 @@ public final class Snap {
     return y(y, gridSize, Editor.preferences().snapToGrid(), Editor.preferences().snapToPixels());
   }
 
-  protected static float y(double y, int gridSize, boolean snapToGrid, boolean snapToPixel) {
+  public static float y(double y, int gridSize, boolean snapToGrid, boolean snapToPixel) {
     return snap(y, gridSize, snapToGrid, snapToPixel);
   }
 

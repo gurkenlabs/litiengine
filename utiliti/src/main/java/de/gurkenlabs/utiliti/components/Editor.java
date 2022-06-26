@@ -33,6 +33,7 @@ import de.gurkenlabs.utiliti.swing.dialogs.ConfirmDialog;
 import de.gurkenlabs.utiliti.swing.dialogs.EditorFileChooser;
 import de.gurkenlabs.utiliti.swing.dialogs.SpritesheetImportPanel;
 import de.gurkenlabs.utiliti.swing.dialogs.XmlImportDialog;
+import jakarta.xml.bind.JAXBException;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -47,21 +48,19 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import jakarta.xml.bind.JAXBException;
 
 public class Editor extends Screen {
   private static final Logger log = Logger.getLogger(Editor.class.getName());
@@ -82,7 +81,7 @@ public class Editor extends Screen {
 
   private final List<Runnable> loadedCallbacks;
 
-  private MapComponent mapComponent;
+  private final MapComponent mapComponent;
   private ResourceBundle gameFile = new ResourceBundle();
   private String projectPath;
   private String currentResourceFile;
@@ -175,10 +174,7 @@ public class Editor extends Screen {
         true);
 
     if (Game.time().now() % 4 == 0) {
-      SwingUtilities.invokeLater(
-          () -> {
-            StatusBar.update();
-          });
+      SwingUtilities.invokeLater(StatusBar::update);
     }
 
     // render status
@@ -291,7 +287,7 @@ public class Editor extends Screen {
     this.currentResourceFile = null;
     this.gameFile = null;
     this.setProjectPath(null);
-    this.mapComponent.loadMaps(Arrays.asList(), true);
+    this.mapComponent.loadMaps(List.of(), true);
     Resources.clearAll();
     UI.getAssetController().refresh();
     this.gamefileLoaded();
@@ -479,7 +475,7 @@ public class Editor extends Screen {
     // get all spritesheets
     List<Spritesheet> allSpriteSheets = new ArrayList<>(Resources.spritesheets().getAll());
     Collections.sort(allSpriteSheets);
-    try (BufferedWriter writer = new BufferedWriter(new FileWriter(chooser.getSelectedFile()));) {
+    try (BufferedWriter writer = new BufferedWriter(new FileWriter(chooser.getSelectedFile()))) {
       // print the spritesheet information to the info file
       for (Spritesheet spritesheet : allSpriteSheets) {
         // check for keyframes
@@ -594,7 +590,7 @@ public class Editor extends Screen {
           }
 
           if (this.gameFile.getEmitters().stream()
-              .anyMatch(x -> x.getName().equals(emitter.getName()))) {
+              .anyMatch(x -> x.getName().equals(Objects.requireNonNull(emitter).getName()))) {
             if (!ConfirmDialog.show(
                 Resources.strings().get("import_emitter_title"),
                 Resources.strings().get("import_emitter_question", emitter.getName()))) {
@@ -606,7 +602,9 @@ public class Editor extends Screen {
 
           this.gameFile.getEmitters().add(emitter);
           log.log(
-              Level.INFO, "imported emitter {0} from {1}", new Object[] {emitter.getName(), file});
+              Level.INFO,
+              "imported emitter {0} from {1}",
+              new Object[] {Objects.requireNonNull(emitter).getName(), file});
         });
   }
 
@@ -655,7 +653,7 @@ public class Editor extends Screen {
           try {
             URL path = file.toURI().toURL();
             tileset = XmlUtilities.read(Tileset.class, path);
-            tileset.finish(path);
+            Objects.requireNonNull(tileset).finish(path);
           } catch (IOException | JAXBException e) {
             log.log(Level.SEVERE, String.format("could not load tileset from %s", file), e);
             return;
@@ -720,7 +718,7 @@ public class Editor extends Screen {
     SpritesheetResource info = new SpritesheetResource(newSprite);
     getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(info.getName()));
     getGameFile().getSpriteSheets().add(info);
-    loadSpriteSheets(Arrays.asList(info), true);
+    loadSpriteSheets(List.of(info), true);
     if (!embedded) {
       getGameFile().getTilesets().removeIf(x -> x.getName().equals(tileset.getName()));
       getGameFile().getTilesets().add((Tileset) tileset);
@@ -797,7 +795,7 @@ public class Editor extends Screen {
     return this.getMapComponent().getMaps().stream()
         .filter(UndoManager::hasChanges)
         .distinct()
-        .collect(Collectors.toList());
+        .toList();
   }
 
   public void setCurrentStatus(String currentStatus) {
@@ -873,7 +871,7 @@ public class Editor extends Screen {
       }
 
       Spritesheet opt = Resources.spritesheets().get(tileSet.getImage().getSource());
-      Spritesheet sprite = null;
+      Spritesheet sprite;
       if (opt == null) {
         sprite = Resources.spritesheets().load(tileSet);
         if (sprite == null) {
@@ -889,7 +887,7 @@ public class Editor extends Screen {
 
     for (IImageLayer imageLayer : map.getImageLayers()) {
       Spritesheet opt = Resources.spritesheets().get(imageLayer.getImage().getSource());
-      Spritesheet sprite = null;
+      Spritesheet sprite;
       if (opt == null) {
         BufferedImage img =
             Resources.images().get(imageLayer.getImage().getAbsoluteSourcePath(), true);
@@ -900,9 +898,6 @@ public class Editor extends Screen {
         sprite =
             Resources.spritesheets()
                 .load(img, imageLayer.getImage().getSource(), img.getWidth(), img.getHeight());
-        if (sprite == null) {
-          continue;
-        }
       } else {
         sprite = opt;
       }

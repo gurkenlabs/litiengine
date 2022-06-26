@@ -19,9 +19,8 @@ public class DebugCrasher extends KeyAdapter {
   }
 
   private void debugCrash() {
-    if (((GameLoop) Game.loop()).getUncaughtExceptionHandler() instanceof DefaultUncaughtExceptionHandler) {
-      ((DefaultUncaughtExceptionHandler) ((GameLoop) Game.loop()).getUncaughtExceptionHandler())
-          .dumpThreads(true);
+    if (((GameLoop) Game.loop()).getUncaughtExceptionHandler()instanceof DefaultUncaughtExceptionHandler defaultUncaughtExceptionHandler) {
+      defaultUncaughtExceptionHandler.dumpThreads(true);
     }
     throw new ManualDebugError("Pressed CTRL + SHIFT + ALT + C for manual debug crash.");
   }

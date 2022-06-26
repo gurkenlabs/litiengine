@@ -10,13 +10,12 @@ import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.swing.panels.CreaturePanel;
 import java.awt.Dimension;
 import java.util.ArrayList;
-import java.util.stream.Collectors;
+import java.util.Objects;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
-@SuppressWarnings("serial")
 public class AssetTree extends JTree {
   private final AssetPanel assetPanel;
   private final DefaultTreeModel entitiesTreeModel;
@@ -113,21 +112,21 @@ public class AssetTree extends JTree {
     }
 
     if (selectedPath.equals(spritePath)) {
-      this.assetPanel.loadSprites(gameFile.getSpriteSheets().stream().collect(Collectors.toList()));
-    } else if (this.getSelectionPath().equals(propPath)) {
+      this.assetPanel.loadSprites(new ArrayList<>(gameFile.getSpriteSheets()));
+    } else if (Objects.equals(this.getSelectionPath(), propPath)) {
       this.assetPanel.loadSprites(
           gameFile.getSpriteSheets().stream()
               .filter(
                   x -> x.getName() != null
                       && x.getName().contains(PropAnimationController.PROP_IDENTIFIER))
-              .collect(Collectors.toList()));
-    } else if (this.getSelectionPath().equals(creaturePath)) {
+              .toList());
+    } else if (Objects.equals(this.getSelectionPath(), creaturePath)) {
       this.assetPanel.loadSprites(
           gameFile.getSpriteSheets().stream()
               .filter(
                   x -> x.getName() != null
                       && CreaturePanel.getCreatureSpriteName(x.getName()) != null)
-              .collect(Collectors.toList()));
+              .toList());
     } else if (selectedPath.equals(miscPath)) {
       this.assetPanel.loadSprites(
           gameFile.getSpriteSheets().stream()
@@ -135,13 +134,11 @@ public class AssetTree extends JTree {
                   x -> x.getName() != null
                       && !x.getName().contains(PropAnimationController.PROP_IDENTIFIER)
                       && CreaturePanel.getCreatureSpriteName(x.getName()) == null)
-              .collect(Collectors.toList()));
+              .toList());
     } else if (selectedPath.equals(tilesetPath)) {
-      ArrayList<Tileset> allTilesets = new ArrayList<>();
-      allTilesets.addAll(
-          gameFile.getTilesets().stream()
-              .filter(x -> x.getName() != null)
-              .collect(Collectors.toList()));
+      ArrayList<Tileset> allTilesets =
+          new ArrayList<>(
+              gameFile.getTilesets().stream().filter(x -> x.getName() != null).toList());
 
       for (TmxMap map : gameFile.getMaps()) {
         for (ITileset tileset : map.getTilesets()) {

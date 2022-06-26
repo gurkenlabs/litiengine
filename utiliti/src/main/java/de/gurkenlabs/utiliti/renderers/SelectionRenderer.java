@@ -11,6 +11,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.geom.Point2D;
+import java.util.Objects;
 
 public class SelectionRenderer implements IEditorRenderer {
   private Color colorSelectionBorder;
@@ -63,7 +64,7 @@ public class SelectionRenderer implements IEditorRenderer {
 
     Font previousFont = Style.FONT_BOLD;
     Font idFont =
-        previousFont.deriveFont(
+        Objects.requireNonNull(previousFont).deriveFont(
             Math.max(8f, (float) (10 * Math.sqrt(Game.world().camera().getRenderScale())))
                 * Editor.preferences().getUiScale());
 

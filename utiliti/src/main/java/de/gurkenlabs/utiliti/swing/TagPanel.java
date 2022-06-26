@@ -15,14 +15,12 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-@SuppressWarnings("serial")
 public class TagPanel extends JPanel {
   private static final int MAX_TAG_LENGTH = 15;
-  private JTextField textFieldInput;
+  private final JTextField textFieldInput;
 
   public TagPanel() {
     setBorder(null);
@@ -58,7 +56,7 @@ public class TagPanel extends JPanel {
           }
 
           final String tag =
-              this.textFieldInput.getText().trim().replaceAll("[^A-Za-z0-9\\-\\_]", "");
+              this.textFieldInput.getText().trim().replaceAll("[^A-Za-z0-9\\-_]", "");
           if (this.containsTag(tag)) {
             this.textFieldInput.setText(null);
             return;
@@ -127,8 +125,8 @@ public class TagPanel extends JPanel {
     List<Tag> tags = new ArrayList<>();
 
     for (Component comp : this.getComponents()) {
-      if (comp instanceof Tag) {
-        tags.add((Tag) comp);
+      if (comp instanceof Tag tag) {
+        tags.add(tag);
       }
     }
 
@@ -136,7 +134,7 @@ public class TagPanel extends JPanel {
   }
 
   public List<String> getTagStrings() {
-    return this.getTags().stream().map(Tag::getTag).collect(Collectors.toList());
+    return this.getTags().stream().map(Tag::getTag).toList();
   }
 
   public String getTagsString() {
@@ -162,7 +160,7 @@ public class TagPanel extends JPanel {
     String[] rawTags = tagString.split(",");
     List<String> tags = new ArrayList<>();
     for (String rawTag : rawTags) {
-      final String tag = rawTag.trim().replaceAll("[^A-Za-z0-9\\-\\_]", "");
+      final String tag = rawTag.trim().replaceAll("[^A-Za-z0-9\\-_]", "");
       tags.add(tag);
       if (this.containsTag(tag)) {
         continue;
@@ -230,6 +228,6 @@ public class TagPanel extends JPanel {
                     && !this.getTagStrings().contains(x)
                     && x.startsWith(currentText.toLowerCase()))
             .findFirst();
-    return found.isPresent() ? found.get() : null;
+    return found.orElse(null);
   }
 }

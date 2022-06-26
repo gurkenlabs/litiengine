@@ -4,7 +4,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.utiliti.components.Editor;
 import java.util.Arrays;
 
-public final class Zoom implements Comparable<Zoom> {
+public record Zoom(float value) implements Comparable<Zoom> {
   private static final Zoom[] zooms =
       new Zoom[] {
           new Zoom(0.1f),
@@ -29,12 +29,6 @@ public final class Zoom implements Comparable<Zoom> {
       };
   private static final int DEFAULT_ZOOM_INDEX = 3;
   private static int currentZoomIndex = DEFAULT_ZOOM_INDEX;
-
-  private final float value;
-
-  private Zoom(float value) {
-    this.value = value;
-  }
 
   public float getValue() {
     return value;

@@ -26,25 +26,24 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
-@SuppressWarnings("serial")
 public class MapObjectInspector extends PropertyPanel implements PropertyInspector {
   private final Map<MapObjectType, PropertyPanel> panels;
   private MapObjectType type;
   private PropertyPanel currentPanel;
-  private JTabbedPane tabbedPanel;
+  private final JTabbedPane tabbedPanel;
   private final CollisionPanel collisionPanel;
   private final CombatPanel combatPanel;
   private final MovementPanel movementPanel;
   private final CustomPanel customPanel;
   private final JTextField textFieldName;
-  private JComboBox<RenderType> renderType;
+  private final JComboBox<RenderType> renderType;
 
   private final JLabel labelEntityID;
-  private TagPanel tagPanel;
-  private JLabel lblLayer;
-  private JPanel infoPanel;
-  private DualSpinner transform;
-  private DualSpinner scale;
+  private final TagPanel tagPanel;
+  private final JLabel lblLayer;
+  private final JPanel infoPanel;
+  private final DualSpinner transform;
+  private final DualSpinner scale;
 
   public MapObjectInspector() {
     super();
@@ -132,7 +131,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
     if (mapObject != null) {
       MapObjectType t = MapObjectType.get(mapObject.getType());
-      this.setMapObjectType(t != null ? t : null);
+      this.setMapObjectType(t);
     } else {
       this.setMapObjectType(null);
     }

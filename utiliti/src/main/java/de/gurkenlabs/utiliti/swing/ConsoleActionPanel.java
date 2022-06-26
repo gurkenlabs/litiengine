@@ -27,7 +27,7 @@ public class ConsoleActionPanel extends JPanel {
         createButton(
             Icons.CLEAR_CONSOLE,
             (actionEvent -> Arrays.stream(Logger.getLogger("").getHandlers())
-                .filter(handler -> handler instanceof LogHandler)
+                .filter(LogHandler.class::isInstance)
                 .findFirst()
                 .ifPresent(Handler::flush)));
 
@@ -35,7 +35,7 @@ public class ConsoleActionPanel extends JPanel {
         createButton(
             Icons.SCROLL_DOWN,
             (actionEvent -> Arrays.stream(Logger.getLogger("").getHandlers())
-                .filter(handler -> handler instanceof LogHandler)
+                .filter(LogHandler.class::isInstance)
                 .findFirst()
                 .ifPresent(handler -> ((LogHandler) handler).scrollToLast())));
 

@@ -28,7 +28,6 @@ import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
-@SuppressWarnings("serial")
 public class EmitterColorPanel extends PropertyPanel {
   private final DefaultTableModel model;
   private final JTable table;
@@ -38,8 +37,8 @@ public class EmitterColorPanel extends PropertyPanel {
   private final JButton btnEdit;
   private final JScrollPane scrollPanel;
   private final JPanel colorControls;
-  private JSpinner colorVariance;
-  private JSpinner alphaVariance;
+  private final JSpinner colorVariance;
+  private final JSpinner alphaVariance;
 
   public EmitterColorPanel() {
     super();
@@ -158,8 +157,8 @@ public class EmitterColorPanel extends PropertyPanel {
     setup(alphaVariance, MapObjectProperty.Emitter.ALPHAVARIANCE);
   }
 
-  private class ColorListCellRenderer extends JTextField implements TableCellRenderer {
-    private transient Border focusBorder = DarkBorders.createLineBorder(1, 1, 1, 1);
+  private static class ColorListCellRenderer extends JTextField implements TableCellRenderer {
+    private final transient Border focusBorder = DarkBorders.createLineBorder(1, 1, 1, 1);
 
     @Override
     public Component getTableCellRendererComponent(

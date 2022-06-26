@@ -8,7 +8,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
-@SuppressWarnings("serial")
 public class MovementPanel extends PropertyPanel {
   private final JCheckBox chckbxTurnOnMove;
   private final JSpinner spinnerAcceleration;

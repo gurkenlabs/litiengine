@@ -13,7 +13,6 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JToggleButton;
 
-@SuppressWarnings("serial")
 public class EmitterSpritePanel extends PropertyPanel {
   private final JComboBox<JLabel> spritesheet;
   private final JToggleButton animateSprite;

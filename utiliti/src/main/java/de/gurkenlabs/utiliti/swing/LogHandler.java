@@ -22,33 +22,33 @@ public class LogHandler extends java.util.logging.Handler {
   }
 
   @Override
-  public void publish(final LogRecord record) {
+  public void publish(final LogRecord rec) {
     StyledDocument doc = textPane.getStyledDocument();
     SimpleAttributeSet keyWord = new SimpleAttributeSet();
-    StyleConstants.setForeground(keyWord, getColor(record.getLevel()));
+    StyleConstants.setForeground(keyWord, getColor(rec.getLevel()));
     StyleConstants.setBold(keyWord, true);
     StyleConstants.setFontSize(keyWord, 12);
     StyleConstants.setFontFamily(keyWord, Style.FONTNAME_CONSOLE);
 
     SimpleAttributeSet text = new SimpleAttributeSet();
-    StyleConstants.setForeground(text, getColor(record.getLevel()));
+    StyleConstants.setForeground(text, getColor(rec.getLevel()));
     StyleConstants.setFontFamily(text, Style.FONTNAME_CONSOLE);
 
     String message;
-    if (record.getParameters() != null) {
-      message = MessageFormat.format(record.getMessage(), record.getParameters());
+    if (rec.getParameters() != null) {
+      message = MessageFormat.format(rec.getMessage(), rec.getParameters());
     } else {
-      message = record.getMessage();
+      message = rec.getMessage();
     }
 
-    if (record.getLevel() == Level.SEVERE && record.getThrown() != null) {
+    if (rec.getLevel() == Level.SEVERE && rec.getThrown() != null) {
       StringWriter writer = new StringWriter();
-      record.getThrown().printStackTrace(new PrintWriter(writer));
+      rec.getThrown().printStackTrace(new PrintWriter(writer));
       message = writer.toString();
     }
 
     try {
-      doc.insertString(doc.getLength(), String.format("%1$-10s", record.getLevel()), keyWord);
+      doc.insertString(doc.getLength(), String.format("%1$-10s", rec.getLevel()), keyWord);
       doc.insertString(doc.getLength(), message, text);
       doc.insertString(doc.getLength(), "\n", text);
     } catch (BadLocationException e) {
@@ -79,7 +79,7 @@ public class LogHandler extends java.util.logging.Handler {
     StyledDocument doc = textPane.getStyledDocument();
     Rectangle2D bounds;
     try {
-      bounds = textPane.modelToView(textPane.getCaretPosition());
+      bounds = textPane.modelToView2D(textPane.getCaretPosition());
       textPane.scrollRectToVisible(bounds.getBounds());
     } catch (BadLocationException e) {
       // if an exception occurs while logging, just ignore it

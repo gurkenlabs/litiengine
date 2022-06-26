@@ -17,7 +17,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 
-@SuppressWarnings("serial")
 public class CreaturePanel extends PropertyPanel {
 
   private final JComboBox<JLabel> comboBoxSpriteSheets;

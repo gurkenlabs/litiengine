@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
+import java.io.Serial;
 import java.util.EventObject;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JOptionPane;
@@ -13,6 +14,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 public class SpinnerCellEditor extends DefaultCellEditor {
+  @Serial
   private static final long serialVersionUID = 9136956833481466003L;
 
   private final JSpinner spinner;
@@ -55,9 +57,8 @@ public class SpinnerCellEditor extends DefaultCellEditor {
 
   @Override
   public boolean isCellEditable(EventObject eo) {
-    if (eo instanceof KeyEvent) {
-      KeyEvent ke = (KeyEvent) eo;
-      textField.setText(String.valueOf(ke.getKeyChar()));
+    if (eo instanceof KeyEvent keyEvent) {
+      textField.setText(String.valueOf(keyEvent.getKeyChar()));
       valueSet = true;
     } else {
       valueSet = false;

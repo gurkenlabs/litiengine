@@ -371,14 +371,8 @@ public final class UI {
     loadingTheme = true;
 
     switch (theme) {
-      case DARK:
-        LafManager.install(new OneDarkTheme());
-        break;
-      case LIGHT:
-        LafManager.install(new IntelliJTheme());
-        break;
-      default:
-        break;
+      case DARK -> LafManager.install(new OneDarkTheme());
+      case LIGHT -> LafManager.install(new IntelliJTheme());
     }
 
     if (Game.window() != null && Game.window().getRenderComponent() != null) {

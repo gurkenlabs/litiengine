@@ -14,6 +14,7 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.swing.Icons;
 import de.gurkenlabs.utiliti.swing.panels.EmitterPanel.EmitterPropertyGroup;
 import java.awt.LayoutManager;
+import java.util.Objects;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JSpinner;
@@ -21,7 +22,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
 import javax.swing.SpinnerNumberModel;
 
-@SuppressWarnings("serial")
 public abstract class EmitterPropertyPanel extends PropertyPanel {
 
   protected transient Emitter emitter;
@@ -32,24 +32,15 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
   }
 
   public static EmitterPropertyPanel getEmitterPropertyPanel(EmitterPropertyGroup category) {
-    switch (category) {
-      case COLLISION:
-        return new ParticleCollisionPanel();
-      case EMISSION:
-        return new EmissionPanel();
-      case ORIGIN:
-        return new ParticleOriginPanel();
-      case ROTATION:
-        return new ParticleRotationPanel();
-      case SIZE:
-        return new ParticleSizePanel();
-      case STYLE:
-        return new ParticleStylePanel();
-      case MOTION:
-        return new ParticleMotionPanel();
-      default:
-        return null;
-    }
+    return switch (category) {
+      case COLLISION -> new ParticleCollisionPanel();
+      case EMISSION -> new EmissionPanel();
+      case ORIGIN -> new ParticleOriginPanel();
+      case ROTATION -> new ParticleRotationPanel();
+      case SIZE -> new ParticleSizePanel();
+      case STYLE -> new ParticleStylePanel();
+      case MOTION -> new ParticleMotionPanel();
+    };
   }
 
   protected abstract LayoutManager createLayout();
@@ -57,13 +48,13 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
   protected abstract void setupChangedListeners();
 
   private static class EmissionPanel extends EmitterPropertyPanel {
-    private JSpinner spawnRateSpinner;
-    private JSpinner spawnAmountSpinner;
-    private JSpinner updateDelaySpinner;
-    private JSpinner durationSpinner;
-    private JSpinner maxParticlesSpinner;
-    private DualSpinner ttl;
-    private JToggleButton btnPause;
+    private final JSpinner spawnRateSpinner;
+    private final JSpinner spawnAmountSpinner;
+    private final JSpinner updateDelaySpinner;
+    private final JSpinner durationSpinner;
+    private final JSpinner maxParticlesSpinner;
+    private final DualSpinner ttl;
+    private final JToggleButton btnPause;
 
     private EmissionPanel() {
       super();
@@ -163,19 +154,18 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
   }
 
   private static class ParticleStylePanel extends EmitterPropertyPanel {
-    private JComboBox<ParticleType> comboBoxParticleType;
-    private JToggleButton fade;
-    private JToggleButton outlineOnly;
-    private JToggleButton antiAliasing;
+    private final JComboBox<ParticleType> comboBoxParticleType;
+    private final JToggleButton fade;
+    private final JToggleButton outlineOnly;
+    private final JToggleButton antiAliasing;
     private final EmitterColorPanel colorPanel;
     private final EmitterTextPanel textPanel;
     private final EmitterSpritePanel spritePanel;
-    private JTabbedPane styleTabs;
+    private final JTabbedPane styleTabs;
 
     private ParticleStylePanel() {
       super();
-      comboBoxParticleType =
-          new JComboBox<>(new DefaultComboBoxModel<ParticleType>(ParticleType.values()));
+      comboBoxParticleType = new JComboBox<>(new DefaultComboBoxModel<>(ParticleType.values()));
       fade = new JToggleButton();
       fade.putClientProperty(
           ToggleButtonConstants.KEY_VARIANT, ToggleButtonConstants.VARIANT_SLIDER);
@@ -254,34 +244,34 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
     }
 
     private void updateTabSelection() {
-      switch ((ParticleType) comboBoxParticleType.getSelectedItem()) {
-        case SPRITE:
+      switch ((ParticleType) Objects.requireNonNull(comboBoxParticleType.getSelectedItem())) {
+        case SPRITE -> {
           styleTabs.setEnabledAt(0, false);
           styleTabs.setEnabledAt(1, false);
           styleTabs.setEnabledAt(2, true);
           styleTabs.setSelectedIndex(2);
-          break;
-        case TEXT:
+        }
+        case TEXT -> {
           styleTabs.setEnabledAt(0, true);
           styleTabs.setEnabledAt(1, true);
           styleTabs.setEnabledAt(2, false);
           styleTabs.setSelectedIndex(1);
-          break;
-        default:
+        }
+        default -> {
           styleTabs.setEnabledAt(0, true);
           styleTabs.setEnabledAt(1, false);
           styleTabs.setEnabledAt(2, false);
           styleTabs.setSelectedIndex(0);
-          break;
+        }
       }
     }
   }
 
   private static class ParticleSizePanel extends EmitterPropertyPanel {
-    private DualSpinner startWidth;
-    private DualSpinner startHeight;
-    private DualSpinner deltaWidth;
-    private DualSpinner deltaHeight;
+    private final DualSpinner startWidth;
+    private final DualSpinner startHeight;
+    private final DualSpinner deltaWidth;
+    private final DualSpinner deltaHeight;
 
     private ParticleSizePanel() {
       super();
@@ -363,15 +353,15 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
   }
 
   private static class ParticleOriginPanel extends EmitterPropertyPanel {
-    private JComboBox<Align> comboBoxAlign;
-    private JComboBox<Valign> comboBoxValign;
-    private DualSpinner offsetX;
-    private DualSpinner offsetY;
+    private final JComboBox<Align> comboBoxAlign;
+    private final JComboBox<Valign> comboBoxValign;
+    private final DualSpinner offsetX;
+    private final DualSpinner offsetY;
 
     private ParticleOriginPanel() {
       super();
-      comboBoxAlign = new JComboBox<>(new DefaultComboBoxModel<Align>(Align.values()));
-      comboBoxValign = new JComboBox<>(new DefaultComboBoxModel<Valign>(Valign.values()));
+      comboBoxAlign = new JComboBox<>(new DefaultComboBoxModel<>(Align.values()));
+      comboBoxValign = new JComboBox<>(new DefaultComboBoxModel<>(Valign.values()));
       offsetX =
           new DualSpinner(
               MapObjectProperty.Particle.OFFSET_X_MIN,
@@ -443,8 +433,8 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
   }
 
   private static class ParticleRotationPanel extends EmitterPropertyPanel {
-    private DualSpinner startAngle;
-    private DualSpinner deltaAngle;
+    private final DualSpinner startAngle;
+    private final DualSpinner deltaAngle;
 
     private ParticleRotationPanel() {
       super();
@@ -505,10 +495,10 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
   }
 
   private static class ParticleMotionPanel extends EmitterPropertyPanel {
-    private DualSpinner velocityX;
-    private DualSpinner velocityY;
-    private DualSpinner accelerationX;
-    private DualSpinner accelerationY;
+    private final DualSpinner velocityX;
+    private final DualSpinner velocityY;
+    private final DualSpinner accelerationX;
+    private final DualSpinner accelerationY;
 
     private ParticleMotionPanel() {
       super();

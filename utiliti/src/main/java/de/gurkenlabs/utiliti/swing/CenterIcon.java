@@ -1,19 +1,11 @@
 package de.gurkenlabs.utiliti.swing;
 
-import javax.swing.Icon;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import javax.swing.Icon;
 
-public class CenterIcon implements Icon {
-
-  private final Icon icon;
-  private final Dimension size;
-
-  public CenterIcon(final Icon icon, final Dimension size) {
-    this.icon = icon;
-    this.size = size;
-  }
+public record CenterIcon(Icon icon, Dimension size) implements Icon {
 
   @Override
   public void paintIcon(final Component c, final Graphics g, final int x, final int y) {

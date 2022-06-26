@@ -8,7 +8,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingConstants;
 
-@SuppressWarnings("serial")
 public class EmitterPanel extends PropertyPanel {
 
   public enum EmitterPropertyGroup {

@@ -9,12 +9,12 @@ import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ItemEvent;
+import java.util.Objects;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public final class StatusBar {
-  private static JPanel panel;
   private static JLabel statusLabel;
   private static JComboBox<Zoom> zoomComboBox;
 
@@ -23,7 +23,7 @@ public final class StatusBar {
   private StatusBar() {}
 
   public static Container create() {
-    panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+    JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
     statusLabel = new JLabel("");
     statusLabel.setFont(
@@ -37,7 +37,7 @@ public final class StatusBar {
             return;
           }
 
-          Zoom.set(((Zoom) zoomComboBox.getSelectedItem()).getValue());
+          Zoom.set(((Zoom) Objects.requireNonNull(zoomComboBox.getSelectedItem())).getValue());
         });
 
     panel.add(zoomComboBox);

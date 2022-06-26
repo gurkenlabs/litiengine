@@ -11,12 +11,12 @@ public final class ControlBehavior {
   private ControlBehavior() {}
 
   public static <T extends Component> T apply(T component) {
-    if (component instanceof JTextField) {
+    if (component instanceof JTextField jTextField) {
       component.addFocusListener(
           new FocusAdapter() {
             @Override
             public void focusGained(final FocusEvent e) {
-              ((JTextField) component).selectAll();
+              jTextField.selectAll();
             }
           });
     }

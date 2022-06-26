@@ -9,11 +9,10 @@ import javax.swing.JCheckBox;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
-@SuppressWarnings("serial")
 public class CombatPanel extends PropertyPanel {
-  private JCheckBox chckbxIndestructible;
-  private JSpinner spinnerHitpoints;
-  private JSpinner spinnerTeam;
+  private final JCheckBox chckbxIndestructible;
+  private final JSpinner spinnerHitpoints;
+  private final JSpinner spinnerTeam;
 
   /** Create the panel. */
   public CombatPanel() {

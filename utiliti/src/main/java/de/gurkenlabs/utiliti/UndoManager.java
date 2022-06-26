@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
@@ -22,18 +23,18 @@ public class UndoManager {
   private static final Logger log = Logger.getLogger(UndoManager.class.getName());
   private static final int MAX_STACK_SIZE = 10000;
   private int nextOperation = 1;
-  private UndoState[] undoStack;
-  private List<IMapObject> changing;
+  private final UndoState[] undoStack;
+  private final List<IMapObject> changing;
   private int currentIndex = -1;
   private final String mapName;
   private int operation = 0;
   private boolean saved = true;
   private boolean executing;
 
-  private static HashMap<String, UndoManager> instance;
-  private static List<Consumer<UndoManager>> undoStackChangedConsumers;
-  private static List<Consumer<UndoManager>> mapObjectAdded;
-  private static List<Consumer<UndoManager>> mapObjectRemoved;
+  private static final HashMap<String, UndoManager> instance;
+  private static final List<Consumer<UndoManager>> undoStackChangedConsumers;
+  private static final List<Consumer<UndoManager>> mapObjectAdded;
+  private static final List<Consumer<UndoManager>> mapObjectRemoved;
 
   private UndoManager(String mapName) {
     this.changing = new CopyOnWriteArrayList<>();
@@ -91,15 +92,9 @@ public class UndoManager {
         }
 
         switch (state.operationType) {
-          case ADD:
-            Editor.instance().getMapComponent().delete(state.target);
-            break;
-          case CHANGE:
-            restoreState(state.target, state.oldMapObject);
-            break;
-          case DELETE:
-            Editor.instance().getMapComponent().add(state.target, state.layer);
-            break;
+          case ADD -> Editor.instance().getMapComponent().delete(state.target);
+          case CHANGE -> restoreState(state.target, Objects.requireNonNull(state.oldMapObject));
+          case DELETE -> Editor.instance().getMapComponent().add(state.target, state.layer);
         }
 
         this.currentIndex--;
@@ -143,15 +138,9 @@ public class UndoManager {
         }
 
         switch (state.operationType) {
-          case ADD:
-            Editor.instance().getMapComponent().add(state.target, state.layer);
-            break;
-          case CHANGE:
-            restoreState(state.target, state.newMapObject);
-            break;
-          case DELETE:
-            Editor.instance().getMapComponent().delete(state.target);
-            break;
+          case ADD -> Editor.instance().getMapComponent().add(state.target, state.layer);
+          case CHANGE -> restoreState(state.target, Objects.requireNonNull(state.newMapObject));
+          case DELETE -> Editor.instance().getMapComponent().delete(state.target);
         }
       } while (currentOperation != 0
           && this.currentIndex < MAX_STACK_SIZE
@@ -209,7 +198,7 @@ public class UndoManager {
 
     Optional<IMapObject> trackedMapObject =
         this.changing.stream().filter(x -> x.getId() == previousMapId).findFirst();
-    if (!trackedMapObject.isPresent()) {
+    if (trackedMapObject.isEmpty()) {
       // didn't track the changing event and therefore cannot provide an undo
       return;
     }
@@ -293,12 +282,12 @@ public class UndoManager {
     }
   }
 
-  private static final void fireUndoStackChangedEvent(UndoManager undoManager) {
+  private static void fireUndoStackChangedEvent(UndoManager undoManager) {
     undoManager.saved = false;
     fireUndoManagerEvent(undoStackChangedConsumers, undoManager);
   }
 
-  private static final void fireUndoManagerEvent(
+  private static void fireUndoManagerEvent(
       List<Consumer<UndoManager>> consumers, UndoManager undoManager) {
     for (Consumer<UndoManager> cons : consumers) {
       cons.accept(undoManager);
