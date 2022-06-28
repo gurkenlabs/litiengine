@@ -538,7 +538,7 @@ public class MapComponent extends GuiComponent {
     }
   }
 
-  public void defineBlueprint() {
+  public void saveEmitter() {
     if (this.getFocusedMapObject() == null) {
       return;
     }
@@ -547,7 +547,7 @@ public class MapComponent extends GuiComponent {
         JOptionPane.showInputDialog(
             Game.window().getRenderComponent(),
             Resources.strings().get("input_prompt_name"),
-            Resources.strings().get("input_prompt_name_title"),
+            Resources.strings().get("input_prompt_emitter_name_title"),
             JOptionPane.PLAIN_MESSAGE,
             null,
             null,
@@ -566,12 +566,30 @@ public class MapComponent extends GuiComponent {
           .removeIf(x -> x.getName().equals(data.getName()));
       Editor.instance().getGameFile().getEmitters().add(data);
     }
+  }
+
+  public void defineBlueprint() {
+    if (this.getFocusedMapObject() == null) {
+      return;
+    }
+
+    Object name =
+        JOptionPane.showInputDialog(
+            Game.window().getRenderComponent(),
+            Resources.strings().get("input_prompt_name"),
+            Resources.strings().get("input_prompt_blueprint_name_title"),
+            JOptionPane.PLAIN_MESSAGE,
+            null,
+            null,
+            this.getFocusedMapObject().getName());
+    if (name == null) {
+      return;
+    }
 
     Blueprint blueprint =
         new Blueprint(
             name.toString(),
-            this.getSelectedMapObjects()
-                .toArray(new MapObject[this.getSelectedMapObjects().size()]));
+            this.getSelectedMapObjects().toArray(new MapObject[this.getSelectedMapObjects().size()]));
     Editor.instance().getGameFile().getBluePrints().add(blueprint);
   }
 

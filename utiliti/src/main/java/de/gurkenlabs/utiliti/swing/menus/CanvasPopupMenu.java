@@ -1,5 +1,6 @@
 package de.gurkenlabs.utiliti.swing.menus;
 
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.swing.Icons;
@@ -38,22 +39,27 @@ public final class CanvasPopupMenu extends JPopupMenu {
     blueprint.addActionListener(e -> Editor.instance().getMapComponent().defineBlueprint());
     blueprint.setEnabled(false);
 
+    JMenuItem emitter = new JMenuItem(Resources.strings().get("menu_save_emitter"), Icons.EMITTER);
+    emitter.addActionListener(e -> Editor.instance().getMapComponent().saveEmitter());
+    emitter.setEnabled(false);
+
     JMenu layerMenu = new LayerMenu();
     layerMenu.setEnabled(false);
 
     JMenu renderMenu = new RenderMenu();
     renderMenu.setEnabled(false);
 
-    this.add(new AddMenu());
-    this.add(paste);
-    this.addSeparator();
-    this.add(copy);
-    this.add(cut);
-    this.add(delete);
-    this.addSeparator();
-    this.add(layerMenu);
-    this.add(renderMenu);
-    this.add(blueprint);
+    add(new AddMenu());
+    add(paste);
+    addSeparator();
+    add(copy);
+    add(cut);
+    add(delete);
+    addSeparator();
+    add(layerMenu);
+    add(renderMenu);
+    add(blueprint);
+    add(emitter);
 
     Editor.instance()
         .getMapComponent()
@@ -63,12 +69,14 @@ public final class CanvasPopupMenu extends JPopupMenu {
               cut.setEnabled(mo != null);
               delete.setEnabled(mo != null);
               blueprint.setEnabled(mo != null);
+              emitter.setEnabled(mo != null && mo.getType().equals(MapObjectType.EMITTER.name()));
               paste.setEnabled(Editor.instance().getMapComponent().getCopiedBlueprint() != null);
             });
 
     Editor.instance()
         .getMapComponent()
         .onEditModeChanged(
-            mode -> paste.setEnabled(Editor.instance().getMapComponent().getCopiedBlueprint() != null));
+            mode ->
+                paste.setEnabled(Editor.instance().getMapComponent().getCopiedBlueprint() != null));
   }
 }
