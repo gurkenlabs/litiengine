@@ -94,11 +94,8 @@ public class MapComponent extends GuiComponent {
   private final Map<String, IMapObject> focusedObjects;
   private final Map<String, List<IMapObject>> selectedObjects;
   private final Map<String, Environment> environments;
-
-  private int editMode = EDITMODE_EDIT;
-
   private final List<TmxMap> maps;
-
+  private int editMode = EDITMODE_EDIT;
   private Point2D startPoint;
   private Blueprint copiedBlueprint;
 
@@ -538,6 +535,36 @@ public class MapComponent extends GuiComponent {
     }
   }
 
+  public void saveEmitter() {
+    if (this.getFocusedMapObject() == null) {
+      return;
+    }
+
+    Object name =
+        JOptionPane.showInputDialog(
+            Game.window().getRenderComponent(),
+            Resources.strings().get("input_prompt_name"),
+            Resources.strings().get("input_prompt_emitter_name_title"),
+            JOptionPane.PLAIN_MESSAGE,
+            null,
+            null,
+            this.getFocusedMapObject().getName());
+    if (name == null) {
+      return;
+    }
+    if (this.getFocusedMapObject().getType().equals(MapObjectType.EMITTER.toString())) {
+      Emitter emitter = Game.world().environment().getEmitter(this.getFocusedMapObject().getId());
+      final EmitterData data = emitter.data();
+      data.setName(name.toString());
+
+      Editor.instance()
+          .getGameFile()
+          .getEmitters()
+          .removeIf(x -> x.getName().equals(data.getName()));
+      Editor.instance().getGameFile().getEmitters().add(data);
+    }
+  }
+
   public void defineBlueprint() {
     if (this.getFocusedMapObject() == null) {
       return;
@@ -547,7 +574,7 @@ public class MapComponent extends GuiComponent {
         JOptionPane.showInputDialog(
             Game.window().getRenderComponent(),
             Resources.strings().get("input_prompt_name"),
-            Resources.strings().get("input_prompt_name_title"),
+            Resources.strings().get("input_prompt_blueprint_name_title"),
             JOptionPane.PLAIN_MESSAGE,
             null,
             null,
@@ -555,21 +582,10 @@ public class MapComponent extends GuiComponent {
     if (name == null) {
       return;
     }
-    if (getFocusedMapObject().getType().equals(MapObjectType.EMITTER.toString())) {
-      final EmitterData data = EmitterMapObjectLoader.createEmitterData(getFocusedMapObject());
-      data.setName(name.toString());
-      Editor.instance()
-          .getGameFile()
-          .getEmitters()
-          .removeIf(x -> x.getName().equals(data.getName()));
-      Editor.instance().getGameFile().getEmitters().add(data);
-    }
-
     Blueprint blueprint =
         new Blueprint(
             name.toString(),
-            this.getSelectedMapObjects()
-                .toArray(new MapObject[this.getSelectedMapObjects().size()]));
+            this.getSelectedMapObjects().toArray(new MapObject[this.getSelectedMapObjects().size()]));
     Editor.instance().getGameFile().getBluePrints().add(blueprint);
   }
 

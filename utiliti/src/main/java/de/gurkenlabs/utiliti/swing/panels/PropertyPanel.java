@@ -103,33 +103,6 @@ public abstract class PropertyPanel extends JPanel {
     }
   }
 
-  protected IMapObject getDataSource() {
-    return this.dataSource;
-  }
-
-  public String getIdentifier() {
-    return this.identifier;
-  }
-
-  public Icon getIcon() {
-    return this.icon;
-  }
-
-  public void setIcon(Icon icon) {
-    this.icon = icon;
-  }
-
-  public void bind(IMapObject mapObject) {
-    this.dataSource = mapObject;
-
-    if (this.dataSource == null) {
-      this.clearControls();
-      return;
-    }
-
-    this.setControlValues(mapObject);
-  }
-
   protected static void populateComboBoxWithSprites(
       JComboBox<JLabel> comboBox, Map<String, String> m) {
     comboBox.removeAllItems();
@@ -162,6 +135,33 @@ public abstract class PropertyPanel extends JPanel {
         }
       }
     }
+  }
+
+  protected IMapObject getDataSource() {
+    return this.dataSource;
+  }
+
+  public String getIdentifier() {
+    return this.identifier;
+  }
+
+  public Icon getIcon() {
+    return this.icon;
+  }
+
+  public void setIcon(Icon icon) {
+    this.icon = icon;
+  }
+
+  public void bind(IMapObject mapObject) {
+    this.dataSource = mapObject;
+
+    if (this.dataSource == null) {
+      this.clearControls();
+      return;
+    }
+
+    this.setControlValues(mapObject);
   }
 
   protected abstract void clearControls();
@@ -280,150 +280,6 @@ public abstract class PropertyPanel extends JPanel {
       return;
     }
     table.getModel().addTableModelListener(new TableListener(table, properties));
-  }
-
-  protected class MapObjectPropertyItemListener implements ItemListener {
-
-    private final Consumer<IMapObject> updateAction;
-
-    MapObjectPropertyItemListener(Consumer<IMapObject> updateAction) {
-      this.updateAction = updateAction;
-    }
-
-    @Override
-    public void itemStateChanged(ItemEvent arg0) {
-      if (getDataSource() == null || Editor.instance().getMapComponent().isFocussing()) {
-        return;
-      }
-
-      applyChanges(this.updateAction);
-    }
-  }
-
-  protected class MapObjectPropertyActionListener implements ActionListener {
-
-    private final Consumer<IMapObject> updateAction;
-    private final Function<IMapObject, Boolean> newValueCheck;
-
-    MapObjectPropertyActionListener(
-        Function<IMapObject, Boolean> newValueCheck, Consumer<IMapObject> updateAction) {
-      this.updateAction = updateAction;
-      this.newValueCheck = newValueCheck;
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-      if (getDataSource() == null
-          || Editor.instance().getMapComponent().isFocussing()
-          || Boolean.FALSE.equals(this.newValueCheck.apply(getDataSource()))) {
-        return;
-      }
-
-      applyChanges(this.updateAction);
-    }
-  }
-
-  protected class MabObjectPropertyTableModelListener implements TableModelListener {
-
-    private final Consumer<IMapObject> updateAction;
-
-    MabObjectPropertyTableModelListener(Consumer<IMapObject> updateAction) {
-      this.updateAction = updateAction;
-    }
-
-    @Override
-    public void tableChanged(TableModelEvent e) {
-      if (getDataSource() == null || Editor.instance().getMapComponent().isFocussing()) {
-        return;
-      }
-      applyChanges(this.updateAction);
-    }
-  }
-
-  protected class MapObjectPropertyChangeListener implements ChangeListener {
-
-    private final Consumer<IMapObject> updateAction;
-    private final Function<IMapObject, Boolean> newValueCheck;
-
-    MapObjectPropertyChangeListener(
-        Function<IMapObject, Boolean> newValueCheck, Consumer<IMapObject> updateAction) {
-      this.updateAction = updateAction;
-      this.newValueCheck = newValueCheck;
-    }
-
-    @Override
-    public void stateChanged(ChangeEvent e) {
-      if (getDataSource() == null
-          || Editor.instance().getMapComponent().isFocussing()
-          || Boolean.FALSE.equals(this.newValueCheck.apply(getDataSource()))) {
-        return;
-      }
-
-      applyChanges(this.updateAction);
-    }
-  }
-
-  protected class SpinnerListener extends MapObjectPropertyChangeListener {
-
-    SpinnerListener(String mapObjectProperty, JSpinner spinner) {
-      super(
-          m -> m.hasCustomProperty(mapObjectProperty)
-              || !m.getStringValue(mapObjectProperty).equals(spinner.getValue().toString()),
-          m -> m.setValue(mapObjectProperty, spinner.getValue().toString()));
-    }
-  }
-
-  protected class SliderListener extends MapObjectPropertyChangeListener {
-
-    SliderListener(String mapObjectProperty, JSlider slider) {
-      super(
-          m -> m.hasCustomProperty(mapObjectProperty)
-              || m.getIntValue(mapObjectProperty) != slider.getValue(),
-          m -> m.setValue(mapObjectProperty, slider.getValue()));
-    }
-
-    SliderListener(String mapObjectProperty, JSlider slider, float factor) {
-      super(
-          m -> m.hasCustomProperty(mapObjectProperty)
-              || m.getFloatValue(mapObjectProperty) != slider.getValue() * factor,
-          m -> m.setValue(mapObjectProperty, slider.getValue() * factor));
-    }
-  }
-
-  protected class TableListener extends MabObjectPropertyTableModelListener {
-
-    TableListener(JTable table, String... mapObjectProperties) {
-      super(
-          m -> {
-            int column = 0;
-            for (String prop : mapObjectProperties) {
-              ArrayList<Object> values = new ArrayList<>();
-              for (int i = 0; i < table.getRowCount(); i++) {
-                values.add(table.getValueAt(i, column));
-              }
-              m.setValue(prop, ArrayUtilities.join(values, ","));
-              column++;
-            }
-          });
-    }
-  }
-
-  protected class MapObjectPropteryFocusListener extends FocusAdapter {
-
-    private final Consumer<IMapObject> updateAction;
-
-    MapObjectPropteryFocusListener(Consumer<IMapObject> updateAction) {
-      this.updateAction = updateAction;
-    }
-
-    @Override
-    public void focusLost(FocusEvent e) {
-      if (getDataSource() == null || Editor.instance().getMapComponent().isFocussing()) {
-        return;
-      }
-
-      applyChanges(this.updateAction);
-    }
   }
 
   protected void updateEnvironment() {
@@ -566,6 +422,151 @@ public abstract class PropertyPanel extends JPanel {
 
     private void setMinHeight(int minHeight) {
       this.minHeight = minHeight;
+    }
+  }
+
+  protected class MapObjectPropertyItemListener implements ItemListener {
+
+    private final Consumer<IMapObject> updateAction;
+
+    MapObjectPropertyItemListener(Consumer<IMapObject> updateAction) {
+      this.updateAction = updateAction;
+    }
+
+    @Override
+    public void itemStateChanged(ItemEvent arg0) {
+      if (getDataSource() == null || Editor.instance().getMapComponent().isFocussing()) {
+        return;
+      }
+
+      applyChanges(this.updateAction);
+    }
+  }
+
+  protected class MapObjectPropertyActionListener implements ActionListener {
+
+    private final Consumer<IMapObject> updateAction;
+    private final Function<IMapObject, Boolean> newValueCheck;
+
+    MapObjectPropertyActionListener(
+        Function<IMapObject, Boolean> newValueCheck, Consumer<IMapObject> updateAction) {
+      this.updateAction = updateAction;
+      this.newValueCheck = newValueCheck;
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      if (getDataSource() == null
+          || Editor.instance().getMapComponent().isFocussing()
+          || Boolean.FALSE.equals(this.newValueCheck.apply(getDataSource()))) {
+        return;
+      }
+
+      applyChanges(this.updateAction);
+    }
+  }
+
+  protected class MabObjectPropertyTableModelListener implements TableModelListener {
+
+    private final Consumer<IMapObject> updateAction;
+
+    MabObjectPropertyTableModelListener(Consumer<IMapObject> updateAction) {
+      this.updateAction = updateAction;
+    }
+
+    @Override
+    public void tableChanged(TableModelEvent e) {
+      if (getDataSource() == null || Editor.instance().getMapComponent().isFocussing()) {
+        return;
+      }
+      applyChanges(this.updateAction);
+    }
+  }
+
+  protected class MapObjectPropertyChangeListener implements ChangeListener {
+
+    private final Consumer<IMapObject> updateAction;
+    private final Function<IMapObject, Boolean> newValueCheck;
+
+    MapObjectPropertyChangeListener(
+        Function<IMapObject, Boolean> newValueCheck, Consumer<IMapObject> updateAction) {
+      this.updateAction = updateAction;
+      this.newValueCheck = newValueCheck;
+    }
+
+    @Override
+    public void stateChanged(ChangeEvent e) {
+      if (getDataSource() == null
+          || Editor.instance().getMapComponent().isFocussing()
+          || Boolean.FALSE.equals(this.newValueCheck.apply(getDataSource()))) {
+        return;
+      }
+
+      applyChanges(this.updateAction);
+    }
+  }
+
+  protected class SpinnerListener extends MapObjectPropertyChangeListener {
+
+    SpinnerListener(String mapObjectProperty, JSpinner spinner) {
+      super(
+          m -> m.hasCustomProperty(mapObjectProperty)
+              || m.getStringValue(mapObjectProperty) == null
+              || !m.getStringValue(mapObjectProperty).equals(spinner.getValue().toString()),
+          m -> m.setValue(mapObjectProperty, spinner.getValue().toString()));
+    }
+  }
+
+  protected class SliderListener extends MapObjectPropertyChangeListener {
+
+    SliderListener(String mapObjectProperty, JSlider slider) {
+      super(
+          m -> m.hasCustomProperty(mapObjectProperty)
+              || m.getIntValue(mapObjectProperty) != slider.getValue(),
+          m -> m.setValue(mapObjectProperty, slider.getValue()));
+    }
+
+    SliderListener(String mapObjectProperty, JSlider slider, float factor) {
+      super(
+          m -> m.hasCustomProperty(mapObjectProperty)
+              || m.getFloatValue(mapObjectProperty) != slider.getValue() * factor,
+          m -> m.setValue(mapObjectProperty, slider.getValue() * factor));
+    }
+  }
+
+  protected class TableListener extends MabObjectPropertyTableModelListener {
+
+    TableListener(JTable table, String... mapObjectProperties) {
+      super(
+          m -> {
+            int column = 0;
+            for (String prop : mapObjectProperties) {
+              ArrayList<Object> values = new ArrayList<>();
+              for (int i = 0; i < table.getRowCount(); i++) {
+                values.add(table.getValueAt(i, column));
+              }
+              m.setValue(prop, ArrayUtilities.join(values, ","));
+              column++;
+            }
+          });
+    }
+  }
+
+  protected class MapObjectPropteryFocusListener extends FocusAdapter {
+
+    private final Consumer<IMapObject> updateAction;
+
+    MapObjectPropteryFocusListener(Consumer<IMapObject> updateAction) {
+      this.updateAction = updateAction;
+    }
+
+    @Override
+    public void focusLost(FocusEvent e) {
+      if (getDataSource() == null || Editor.instance().getMapComponent().isFocussing()) {
+        return;
+      }
+
+      applyChanges(this.updateAction);
     }
   }
 }
