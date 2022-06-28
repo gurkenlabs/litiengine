@@ -555,11 +555,9 @@ public class MapComponent extends GuiComponent {
     if (name == null) {
       return;
     }
-    if (this.getFocusedMapObject().getType().equals(MapObjectType.EMITTER.toString())) {
-      Emitter emitter = Game.world().environment().getEmitter(this.getFocusedMapObject().getId());
-      final EmitterData data = emitter.data();
+    if (getFocusedMapObject().getType().equals(MapObjectType.EMITTER.toString())) {
+      final EmitterData data = EmitterMapObjectLoader.createEmitterData(getFocusedMapObject());
       data.setName(name.toString());
-
       Editor.instance()
           .getGameFile()
           .getEmitters()

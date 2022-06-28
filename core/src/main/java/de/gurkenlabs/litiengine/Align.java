@@ -1,22 +1,21 @@
 package de.gurkenlabs.litiengine;
 
 import de.gurkenlabs.litiengine.util.MathUtilities;
-
 import jakarta.xml.bind.annotation.XmlEnum;
 import jakarta.xml.bind.annotation.XmlEnumValue;
 
-/**
- * The enum {@code Align} defines a range of horizontal alignments.
- */
+/** The enum {@code Align} defines a range of horizontal alignments. */
 @XmlEnum
 public enum Align {
-  @XmlEnumValue("center")
+  @XmlEnumValue("CENTER")
   CENTER(0.5f),
-  @XmlEnumValue("left")
+  @XmlEnumValue("LEFT")
   LEFT(0f),
-  @XmlEnumValue("right")
+  @XmlEnumValue("RIGHT")
   RIGHT(1f),
+  @XmlEnumValue("CENTER_LEFT")
   CENTER_LEFT(0.25f),
+  @XmlEnumValue("CENTER_RIGHT")
   CENTER_RIGHT(0.75f);
 
   private final float portion;
@@ -28,10 +27,9 @@ public enum Align {
   /**
    * Gets the align enumeration value for the specified string.
    *
-   * @param alignString
-   *          The string representing the enum value.
-   * @return The enum value represented by the specified string or {@link Align#CENTER} if the specified string is
-   *         invalid.
+   * @param alignString The string representing the enum value.
+   * @return The enum value represented by the specified string or {@link Align#CENTER} if the
+   *     specified string is invalid.
    */
   public static Align get(final String alignString) {
     if (alignString == null || alignString.isEmpty()) {
@@ -48,8 +46,7 @@ public enum Align {
   /**
    * Gets the proportional value of this instance.
    *
-   * @param width
-   *          The width to calculate the relative value from.
+   * @param width The width to calculate the relative value from.
    * @return The proportional value for the specified height.
    */
   public float getValue(float width) {
@@ -59,8 +56,7 @@ public enum Align {
   /**
    * Gets the proportional value of this instance.
    *
-   * @param width
-   *          The width to calculate the relative value from.
+   * @param width The width to calculate the relative value from.
    * @return The proportional value for the specified height.
    */
   public double getValue(double width) {
@@ -70,8 +66,7 @@ public enum Align {
   /**
    * Gets the proportional value of this instance.
    *
-   * @param width
-   *          The width to calculate the relative value from.
+   * @param width The width to calculate the relative value from.
    * @return The proportional value for the specified height.
    */
   public int getValue(int width) {
@@ -79,13 +74,12 @@ public enum Align {
   }
 
   /**
-   * Gets the location for the specified object height to be horizontally aligned within the bounds of the specified
-   * width.
+   * Gets the location for the specified object height to be horizontally aligned within the bounds
+   * of the specified width.
    *
-   * @param width
-   *          The width, limiting the horizontal alignment.
-   * @param objectWidth
-   *          The width of the object for which to calculate the horizontally aligned location.
+   * @param width The width, limiting the horizontal alignment.
+   * @param objectWidth The width of the object for which to calculate the horizontally aligned
+   *     location.
    * @return The x-coordinate for the location of the object with the specified width.
    */
   public double getLocation(final double width, final double objectWidth) {

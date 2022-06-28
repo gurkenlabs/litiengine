@@ -87,7 +87,7 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     data.setParticleTTL(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.TTL_MIN),
         mapObject.getFloatValue(MapObjectProperty.Particle.TTL_MAX)));
 
-    data.setCollisionType(mapObject.getEnumValue(MapObjectProperty.COLLISION_TYPE, Collision.class, EmitterData.DEFAULT_COLLISION));
+    data.setCollision(mapObject.getEnumValue(MapObjectProperty.COLLISION_TYPE, Collision.class, EmitterData.DEFAULT_COLLISION));
     data.setRequiredQuality(mapObject.getEnumValue(MapObjectProperty.REQUIRED_QUALITY, Quality.class, EmitterData.DEFAULT_REQUIRED_QUALITY));
 
     data.setTexts(mapObject.getCommaSeparatedStringValues(MapObjectProperty.Particle.TEXTS, EmitterData.DEFAULT_TEXT));
@@ -151,7 +151,7 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     mo.setValue(MapObjectProperty.Particle.DELTA_ANGLE_MAX, emitterData.getDeltaAngle().getMaxValue());
     mo.setValue(MapObjectProperty.Particle.TTL_MAX, emitterData.getParticleTTL().getMaxValue());
 
-    mo.setValue(MapObjectProperty.COLLISION_TYPE, emitterData.getCollisionType());
+    mo.setValue(MapObjectProperty.COLLISION_TYPE, emitterData.getCollision());
     mo.setValue(MapObjectProperty.REQUIRED_QUALITY, emitterData.getRequiredQuality());
     String commaSeperatedTexts = ArrayUtilities.join(emitterData.getTexts());
     mo.setValue(MapObjectProperty.Particle.TEXTS, commaSeperatedTexts);

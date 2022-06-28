@@ -4,5 +4,5 @@ public enum Collision {
   NONE,
   DYNAMIC,
   STATIC,
-  ANY;
+  ANY
 }
