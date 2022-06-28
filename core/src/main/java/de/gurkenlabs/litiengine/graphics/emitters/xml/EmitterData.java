@@ -76,84 +76,120 @@ public class EmitterData implements Serializable, Resource {
   public static final float DEFAULT_MAX_WIDTH = 6f;
   public static final float DEFAULT_MIN_HEIGHT = 2f;
   public static final float DEFAULT_MAX_HEIGHT = 6f;
-  @Serial private static final long serialVersionUID = 50238884097993529L;
-  @XmlElement private float alphaVariance;
+  @Serial
+  private static final long serialVersionUID = 50238884097993529L;
+  @XmlElement
+  private float alphaVariance;
 
-  @XmlElement private boolean animateSprite;
+  @XmlElement
+  private boolean animateSprite;
 
-  @XmlElement private boolean loopSprite;
+  @XmlElement
+  private boolean loopSprite;
 
-  @XmlElement private Collision collision;
+  @XmlElement
+  private Collision collision;
 
-  @XmlElement private Quality requiredQuality;
+  @XmlElement
+  private Quality requiredQuality;
 
-  @XmlElement private float colorVariance;
+  @XmlElement
+  private float colorVariance;
 
   @XmlElementWrapper
   @XmlElement(name = "color")
   private List<String> colors;
 
-  @XmlElement private ParticleParameter deltaHeight;
+  @XmlElement
+  private ParticleParameter deltaHeight;
 
-  @XmlElement private ParticleParameter deltaWidth;
+  @XmlElement
+  private ParticleParameter deltaWidth;
 
-  @XmlElement private ParticleParameter velocityX;
+  @XmlElement
+  private ParticleParameter velocityX;
 
-  @XmlElement private ParticleParameter velocityY;
+  @XmlElement
+  private ParticleParameter velocityY;
 
-  @XmlAttribute private int emitterDuration;
+  @XmlAttribute
+  private int emitterDuration;
 
-  @XmlElement private boolean fade;
+  @XmlElement
+  private boolean fade;
 
-  @XmlElement private boolean fadeOnCollision;
+  @XmlElement
+  private boolean fadeOnCollision;
 
-  @XmlElement private boolean outlineOnly;
+  @XmlElement
+  private boolean outlineOnly;
 
-  @XmlElement private boolean antiAliasing;
+  @XmlElement
+  private boolean antiAliasing;
 
-  @XmlElement private ParticleParameter accelerationX;
+  @XmlElement
+  private ParticleParameter accelerationX;
 
-  @XmlElement private ParticleParameter accelerationY;
+  @XmlElement
+  private ParticleParameter accelerationY;
 
-  @XmlElement private ParticleParameter angle;
+  @XmlElement
+  private ParticleParameter angle;
 
-  @XmlElement private ParticleParameter deltaAngle;
+  @XmlElement
+  private ParticleParameter deltaAngle;
 
-  @XmlAttribute private float height;
+  @XmlAttribute
+  private float height;
 
-  @XmlAttribute private int maxParticles;
+  @XmlAttribute
+  private int maxParticles;
 
-  @XmlAttribute private String name;
+  @XmlAttribute
+  private String name;
 
-  @XmlElement private Align originAlign;
+  @XmlElement
+  private Align originAlign;
 
-  @XmlElement private Valign originValign;
+  @XmlElement
+  private Valign originValign;
 
-  @XmlElement private ParticleParameter particleHeight;
+  @XmlElement
+  private ParticleParameter particleHeight;
 
-  @XmlElement private ParticleParameter particleTTL;
+  @XmlElement
+  private ParticleParameter particleTTL;
 
   @XmlElementWrapper
   @XmlElement(name = "text")
   private List<String> texts;
 
-  @XmlAttribute private ParticleType particleType;
+  @XmlAttribute
+  private ParticleType particleType;
 
-  @XmlElement private ParticleParameter particleWidth;
+  @XmlElement
+  private ParticleParameter particleWidth;
 
-  @XmlAttribute private int spawnAmount;
+  @XmlAttribute
+  private int spawnAmount;
 
-  @XmlAttribute private int spawnRate;
+  @XmlAttribute
+  private int spawnRate;
 
-  @XmlElement private String spritesheet;
+  @XmlElement
+  private String spritesheet;
 
-  @XmlAttribute private int updateRate;
+  @XmlAttribute
+  private int updateRate;
 
-  @XmlAttribute private float width;
+  @XmlAttribute
+  private float width;
 
-  @XmlElement private ParticleParameter offsetX;
+  @XmlElement
+  private ParticleParameter offsetX;
 
-  @XmlElement private ParticleParameter offsetY;
+  @XmlElement
+  private ParticleParameter offsetY;
 
   public EmitterData() {
     // initialize fields required for rendering and updating properly.
