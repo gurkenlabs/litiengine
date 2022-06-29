@@ -1,5 +1,4 @@
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
-enableFeaturePreview("VERSION_CATALOGS")
 rootProject.name = "litiengine-sdk"
 
 pluginManagement {
@@ -29,20 +28,12 @@ dependencyResolutionManagement {
       versionId("javax.activation")
       versionId("jakarta.xml")
 
-      alias("darklaf-core").to("com.github.weisj", "darklaf-core")
-        .versionRef("darklaf")
-
-      alias("jinput-core").to("net.java.jinput", "jinput")
-        .versionRef("jinput")
-
-      alias("soundlibs-jorbis").to("com.googlecode.soundlibs", "jorbis")
-        .versionRef("soundlibs.jorbis")
-      alias("soundlibs-tritonus").to("com.googlecode.soundlibs", "tritonus-share")
-        .versionRef("soundlibs.tritonus")
-      alias("soundlibs-vorbisspi").to("com.googlecode.soundlibs", "vorbisspi")
-        .versionRef("soundlibs.vorbisspi")
-      alias("soundlibs-mp3spi").to("com.googlecode.soundlibs", "mp3spi")
-        .versionRef("soundlibs.mp3spi")
+      library("darklaf-core", "com.github.weisj", "darklaf-core").versionRef("darklaf")
+      library("jinput-core", "net.java.jinput", "jinput").versionRef("jinput")
+      library("soundlibs-jorbis", "com.googlecode.soundlibs", "jorbis").versionRef("soundlibs.jorbis")
+      library("soundlibs-tritonus", "com.googlecode.soundlibs", "tritonus-share").versionRef("soundlibs.tritonus")
+      library("soundlibs-vorbisspi", "com.googlecode.soundlibs", "vorbisspi").versionRef("soundlibs.vorbisspi")
+      library("soundlibs-mp3spi", "com.googlecode.soundlibs", "mp3spi").versionRef("soundlibs.mp3spi")
       bundle(
         "soundlibs",
         listOf(
@@ -53,14 +44,10 @@ dependencyResolutionManagement {
         )
       )
 
-      alias("javax-activation").to("javax.activation", "javax.activation-api")
-        .versionRef("javax.activation")
-      alias("xml-api").to("jakarta.xml.bind", "jakarta.xml.bind-api")
-        .versionRef("jakarta.xml")
-      alias("xml-runtime-core").to("com.sun.xml.bind", "jaxb-core")
-        .versionRef("jakarta.xml")
-      alias("xml-runtime-impl").to("com.sun.xml.bind", "jaxb-impl")
-        .versionRef("jakarta.xml")
+      library("javax-activation", "javax.activation", "javax.activation-api").versionRef("javax.activation")
+      library("xml-api", "jakarta.xml.bind", "jakarta.xml.bind-api").versionRef("jakarta.xml")
+      library("xml-runtime-core", "com.sun.xml.bind", "jaxb-core").versionRef("jakarta.xml")
+      library("xml-runtime-impl", "com.sun.xml.bind", "jaxb-impl").versionRef("jakarta.xml")
       bundle(
         "xml-runtime",
         listOf("xml-runtime-core", "xml-runtime-impl")
@@ -70,17 +57,12 @@ dependencyResolutionManagement {
       versionId("junit")
       versionId("mockito")
 
-      alias("junit-api").to("org.junit.jupiter", "junit-jupiter-api")
-        .versionRef("junit")
-      alias("junit-params").to("org.junit.jupiter", "junit-jupiter-params")
-        .versionRef("junit")
-      alias("junit-engine").to("org.junit.jupiter", "junit-jupiter-engine")
-        .versionRef("junit")
+      library("junit-api", "org.junit.jupiter", "junit-jupiter-api").versionRef("junit")
+      library("junit-params", "org.junit.jupiter", "junit-jupiter-params").versionRef("junit")
+      library("junit-engine", "org.junit.jupiter", "junit-jupiter-engine").versionRef("junit")
 
-      alias("mockito-core").to("org.mockito", "mockito-core")
-        .versionRef("mockito")
-      alias("mockito-inline").to("org.mockito", "mockito-inline")
-        .versionRef("mockito")
+      library("mockito-core", "org.mockito", "mockito-core").versionRef("mockito")
+      library("mockito-inline", "org.mockito", "mockito-inline").versionRef("mockito")
       bundle(
         "mockito",
         listOf("mockito-core", "mockito-inline")
