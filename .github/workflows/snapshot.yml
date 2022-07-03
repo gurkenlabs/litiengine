@@ -31,7 +31,7 @@ jobs:
       - name: Publish
         env:
           PROPS_RELEASE: "-Prc=1 -Pgh -Prelease=false -PskipJavadoc -PskipSpotless"
-          PROPS_GIT: "-PghGitSourceUsername=gurkenlabs -PghGitSourcePassword='${{ secrets.GITHUB_TOKEN }}'"
-          PROPS_NEXUS: "-PghNexusUsername='${{ secrets.OSSRH_USERNAME }}' -PghNexusPassword='${{ secrets.OSSRH_PASSWORD }}'"
-          PROPS_SIGNING: "-PuseInMemoryKey=true -Psigning.inMemoryKey='${{ secrets.OSSRH_GPG_SECRET_KEY }}' -Psigning.password='${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}'"
+          PROPS_GIT: "-PghGitSourceUsername=gurkenlabs -PghGitSourcePassword=${{ secrets.GITHUB_TOKEN }}"
+          PROPS_NEXUS: "-PghNexusUsername=${{ secrets.OSSRH_USERNAME }} -PghNexusPassword=${{ secrets.OSSRH_PASSWORD }}"
+          PROPS_SIGNING: "-PuseInMemoryKey=true -Psigning.inMemoryKey=${{ secrets.OSSRH_GPG_SECRET_KEY }} -Psigning.password=${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}"
         run: ./gradlew prepareVote $(echo $PROPS_RELEASE $PROPS_GIT $PROPS_NEXUS $PROPS_SIGNING) --info -x test
