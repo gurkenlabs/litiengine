@@ -51,4 +51,4 @@ jobs:
             -PghNexusPassword=$NEXUS_PASSWORD
             -PuseInMemoryKey=true
             -Psigning.inMemoryKey=$GPG_SIGNING_KEY
-            -Psigning.signingInMemoryKeyPassword=$GPG_PASSPHRASE
+            -Psigning.password=$GPG_PASSPHRASE
