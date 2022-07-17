@@ -174,7 +174,7 @@ allprojects {
 
         configure<SigningExtension> {
           useInMemoryPgpKeys(
-            project.stringProperty("signing.inMemoryKey"),
+            project.stringProperty("signing.inMemoryKey")?.replace("#", "\n"),
             project.stringProperty("signing.password")
           )
         }
