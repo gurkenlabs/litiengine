@@ -33,7 +33,7 @@ jobs:
         uses: gradle/gradle-build-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_SIGNING_KEY }}
+          GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
           NEXUS_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           NEXUS_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
@@ -50,5 +50,5 @@ jobs:
             -PghNexusUsername=$NEXUS_USERNAME
             -PghNexusPassword=$NEXUS_PASSWORD
             -PuseInMemoryKey=true
-            -Psigning.inMemoryKey=$GPG_PRIVATE_KEY
-            -Psigning.signingInMemoryKeyPassword=$GPG_PASSPHRASE
+            -Psigning.key=$GPG_SIGNING_KEY
+            -Psigning.password=$GPG_PASSPHRASE
