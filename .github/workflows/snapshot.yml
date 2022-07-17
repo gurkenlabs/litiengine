@@ -40,8 +40,6 @@ jobs:
         with:
           arguments: |
             prepareVote
-            --info
-            -x test
             -Prc=1
             -Pgh
             -Prelease=false
