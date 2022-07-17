@@ -50,6 +50,7 @@ jobs:
           arguments: |
             build
             --scan
+            -x test
             -PskipSpotless
 
       - name: Test
