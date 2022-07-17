@@ -3,7 +3,7 @@ name: Spotless
 on: [ push, pull_request ]
 
 jobs:
-  autostlye:
+  autostyle:
     name: "Spotless"
     runs-on: ubuntu-latest
     steps:
