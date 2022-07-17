@@ -41,7 +41,7 @@ jobs:
           arguments: |
             prepareVote
             --info
-            -x
+            -x test
             -Prc=1
             -Pgh
             -Prelease=false
