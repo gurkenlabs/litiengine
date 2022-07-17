@@ -20,28 +20,31 @@ jobs:
 
     name: Java 17 build
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - uses: gradle/wrapper-validation-action@v1
 
-      - name: Set up JDK 17
+      - name: Gradle Wrapper Validation
+        uses: gradle/wrapper-validation-action@v1
+
+      - name: JDK 17 Setup
         uses: actions/setup-java@v3
         with:
           distribution: temurin
           java-version: 17
 
-      - name: Cache SonarCloud packages
+      - name: SonarCloud Caching
         uses: actions/cache@v1
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
 
-      - name: Install D-BUS AT-SPI core
+      - name: D-BUS AT-SPI Installation
         run: sudo apt-get -y install at-spi2-core
 
-      - name: Grant execute permission for gradlew
+      - name: Gradle Permission Fixing
         run: chmod +x gradlew
 
       - name: Build
@@ -57,12 +60,12 @@ jobs:
         with:
           run: ./gradlew jacocoTestReport -PskipSpotless
 
-      - name: Package
+      - name: Package Creation
         uses: gradle/gradle-build-action@v2
         with:
           arguments: jpackage
 
-      - name: Gradle SonarQube Scan
+      - name: Static Analysis
         uses: gradle/gradle-build-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -72,3 +75,8 @@ jobs:
           arguments: |
             sonarqube
             -PskipSpotless
+
+      - name: Code Style Validation
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: spotlessCheck
