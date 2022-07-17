@@ -23,12 +23,13 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
+      - uses: gradle/wrapper-validation-action@v1
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
-          distribution: 'adopt'
-          java-version: '17'
+          distribution: temurin
+          java-version: 17
 
       - name: Cache SonarCloud packages
         uses: actions/cache@v1
@@ -37,36 +38,37 @@ jobs:
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
 
-      - name: Cache Gradle packages
-        uses: actions/cache@v1
-        with:
-          path:
-            ~/.gradle/caches/
-            ~/.gradle/wrapper/
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-          restore-keys: ${{ runner.os }}-gradle
-
       - name: Install D-BUS AT-SPI core
         run: sudo apt-get -y install at-spi2-core
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Gradle Build
+      - name: Build
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: |
+            build
+            --scan
+            -PskipSpotless
+
+      - name: Test
         uses: GabrielBB/xvfb-action@v1
         with:
-          run: ./gradlew build jacocoTestReport -PskipSpotless
+          run: ./gradlew jacocoTestReport -PskipSpotless
 
       - name: Package
-        run: ./gradlew jpackage
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: jpackage
 
       - name: Gradle SonarQube Scan
+        uses: gradle/gradle-build-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         if: ${{!github.event.pull_request.head.repo.fork}}
-        run: ./gradlew sonarqube -PskipSpotless --info
-
-
-
-
+        with:
+          arguments: |
+            sonarqube
+            -PskipSpotless

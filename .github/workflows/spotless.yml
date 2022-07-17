@@ -1,17 +1,17 @@
 name: Spotless
 
-on: [push, pull_request]
+on: [ push, pull_request ]
 
 jobs:
   autostlye:
     name: "Spotless"
     runs-on: ubuntu-latest
     steps:
-      - name: Set up JDK 16
-        uses: actions/setup-java@v2
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
         with:
-          distribution: 'adopt'
-          java-version: '16'
+          distribution: temurin
+          java-version: 17
       - uses: actions/checkout@v2
       - uses: gradle/gradle-build-action@v2
         with:
