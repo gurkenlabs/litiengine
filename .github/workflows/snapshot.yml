@@ -29,27 +29,27 @@ jobs:
         with:
           java-version: 17
       - name: Publish
-          uses: gradle/gradle-build-action@v2
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            GPG_PRIVATE_KEY: ${{ secrets.GPG_SIGNING_KEY }}
-            GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-            NEXUS_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-            NEXUS_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
-          with:
-            arguments: |
-              prepareVote
-              --info
-              -x
-              -Prc=1
-              -Pgh
-              -Prelease=false
-              -PskipJavadoc
-              -PskipSpotless
-              -PghGitSourceUsername=gurkenlabs
-              -PghGitSourcePassword=$GITHUB_TOKEN
-              -PghNexusUsername=$NEXUS_USERNAME
-              -PghNexusPassword=$NEXUS_PASSWORD
-              -PuseInMemoryKey=true
-              -Psigning.inMemoryKey=$GPG_PRIVATE_KEY
-              -Psigning.password=$GPG_PASSPHRASE
+        uses: gradle/gradle-build-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_SIGNING_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          NEXUS_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          NEXUS_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+        with:
+          arguments: |
+            prepareVote
+            --info
+            -x
+            -Prc=1
+            -Pgh
+            -Prelease=false
+            -PskipJavadoc
+            -PskipSpotless
+            -PghGitSourceUsername=gurkenlabs
+            -PghGitSourcePassword=$GITHUB_TOKEN
+            -PghNexusUsername=$NEXUS_USERNAME
+            -PghNexusPassword=$NEXUS_PASSWORD
+            -PuseInMemoryKey=true
+            -Psigning.inMemoryKey=$GPG_PRIVATE_KEY
+            -Psigning.password=$GPG_PASSPHRASE
