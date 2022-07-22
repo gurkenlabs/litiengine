@@ -1,12 +1,11 @@
 package de.gurkenlabs.litiengine.environment.tilemap;
 
+import de.gurkenlabs.litiengine.util.AlphanumComparator;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.geom.Rectangle2D;
 import java.net.URL;
 import java.util.List;
-
-import de.gurkenlabs.litiengine.util.AlphanumComparator;
 
 public interface IMap extends ILayerList, Comparable<IMap> {
 
@@ -15,127 +14,126 @@ public interface IMap extends ILayerList, Comparable<IMap> {
    *
    * @return the tilesets
    */
-  public List<ITileset> getTilesets();
+  List<ITileset> getTilesets();
 
-  public ITilesetEntry getTilesetEntry(int gid);
+  ITilesetEntry getTilesetEntry(int gid);
 
   /**
    * Gets the orientation.
    *
    * @return the orientation
    */
-  public IMapOrientation getOrientation();
+  IMapOrientation getOrientation();
 
-  public URL getPath();
+  URL getPath();
 
   /**
    * Gets the renderorder.
    *
    * @return the renderorder
    */
-  public RenderOrder getRenderOrder();
+  RenderOrder getRenderOrder();
 
   /**
    * Gets the size in pixels.
    *
    * @return the size in pixels
    */
-  public Dimension getSizeInPixels();
+  Dimension getSizeInPixels();
 
   /**
    * Gets the map width in tiles.
    *
    * @return the width in tiles
    */
-  public int getWidth();
+  int getWidth();
 
   /**
    * Gets the map height in tiles.
    *
    * @return the height in tiles
    */
-  public int getHeight();
+  int getHeight();
 
   /**
    * Gets the sizein tiles.
    *
    * @return the sizein tiles
    */
-  public Dimension getSizeInTiles();
+  Dimension getSizeInTiles();
 
-  public Rectangle2D getBounds();
+  Rectangle2D getBounds();
 
   /**
    * Gets the tile size.
    *
    * @return the tile size
    */
-  public Dimension getTileSize();
+  Dimension getTileSize();
 
   /**
    * Gets the horizontal tile size.
    *
    * @return the horizontal tile size
    */
-  public int getTileWidth();
+  int getTileWidth();
 
   /**
    * Gets the vertical tile size.
    *
    * @return the vertical tile size
    */
-  public int getTileHeight();
+  int getTileHeight();
 
   /**
    * Gets the straight edges' length for hexagonal maps.
    *
    * @return the hex side length
    */
-  public int getHexSideLength();
+  int getHexSideLength();
 
   /**
    * Gets the staggering axis
    *
    * @return the tile size
    */
-  public StaggerAxis getStaggerAxis();
+  StaggerAxis getStaggerAxis();
 
   /**
    * Gets the tile size.
    *
    * @return the tile size
    */
-  public StaggerIndex getStaggerIndex();
+  StaggerIndex getStaggerIndex();
 
   /**
    * Gets the version.
    *
    * @return the version
    */
-  public double getVersion();
+  double getVersion();
 
-  public String getTiledVersion();
+  String getTiledVersion();
+
+  String getName();
 
   /**
    * Sets the name.
    *
-   * @param name
-   *          the new name
+   * @param name the new name
    */
-  public void setName(String name);
+  void setName(String name);
 
-  public String getName();
+  int getNextObjectId();
 
-  public int getNextObjectId();
+  int getNextLayerId();
 
-  public int getNextLayerId();
+  Color getBackgroundColor();
 
-  public Color getBackgroundColor();
-
-  public boolean isInfinite();
+  boolean isInfinite();
 
   @Override
-  public default int compareTo(IMap map) {
+  default int compareTo(IMap map) {
     return AlphanumComparator.compareTo(this.getName(), map.getName());
   }
 }

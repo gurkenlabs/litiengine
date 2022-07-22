@@ -1,45 +1,43 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
 import com.github.weisj.darklaf.ui.table.renderer.DarkTableCellEditor;
-import com.github.weisj.darklaf.ui.table.renderer.DarkTableCellRenderer;
-import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.utiliti.UndoManager;
 import java.awt.Component;
+import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 
 public class LayerTable extends JTable {
-  protected static final String[] columns = new String[] {"visible", "name", "objects"};
+
+  protected static final String[] columns = new String[]{"visible", "name", "objects", "color"};
 
   private static final TableCellEditor visibilityEditor =
-      new DarkTableCellEditor(new JToggleButton());
+    new DarkTableCellEditor(new JToggleButton());
   private static final TableCellEditor nameEditor = new DarkTableCellEditor(new JTextField());
   private int lastSelection = 0;
   private IMap map;
 
   public LayerTable() {
     super();
-    this.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    this.setRowSelectionAllowed(true);
-    this.setColumnSelectionAllowed(false);
-    this.setModel(new DefaultTableModel(columns, 0));
-    this.getModel().addTableModelListener(e -> this.updateLayers());
-    this.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-    this.getColumnModel().getColumn(0).setMaxWidth(50);
-    this.getColumnModel().getColumn(0).setMinWidth(50);
-    this.getColumnModel().getColumn(0).setPreferredWidth(50);
-    this.doLayout();
-    this.resizeAndRepaint();
+    setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    setRowSelectionAllowed(true);
+    setColumnSelectionAllowed(false);
+    setFocusable(false);
+    setShowGrid(false);
+    setModel(new DefaultTableModel(columns, 0));
+    getModel().addTableModelListener(e -> this.updateLayers());
+    resizeAndRepaint();
   }
 
   public void select(int selectedLayer) {
-    this.changeSelection(selectedLayer, 0, false, false);
+    changeSelection(selectedLayer, 0, false, false);
   }
 
   public void bind(IMap map) {
@@ -48,15 +46,12 @@ public class LayerTable extends JTable {
       ((DefaultTableModel) this.getModel()).setRowCount(0);
       return;
     }
-    Object[][] data = new Object[this.getMap().getMapObjectLayers().size()][columns.length];
-    for (int row = 0; row < this.getMap().getMapObjectLayers().size(); row++) {
-      boolean visible = this.getMap().getMapObjectLayers().get(row).isVisible();
-      String name = this.getMap().getMapObjectLayers().get(row).getName();
-      int objects = this.getMap().getMapObjectLayers().get(row).getMapObjects().size();
-
-      data[row][0] = visible;
-      data[row][1] = name;
-      data[row][2] = objects;
+    Object[][] data = new Object[getMap().getMapObjectLayers().size()][columns.length];
+    for (int row = 0; row < getMap().getMapObjectLayers().size(); row++) {
+      data[row][0] = getMap().getMapObjectLayers().get(row).isVisible();
+      data[row][1] = getMap().getMapObjectLayers().get(row).getName();
+      data[row][2] = getMap().getMapObjectLayers().get(row).getMapObjects().size();
+      data[row][3] = getMap().getMapObjectLayers().get(row).getColor();
     }
     ((DefaultTableModel) this.getModel()).setDataVector(data, columns);
   }
@@ -73,12 +68,21 @@ public class LayerTable extends JTable {
   @Override
   public void setValueAt(Object aValue, int row, int column) {
     super.setValueAt(aValue, row, column);
-    this.updateLayers();
+    updateLayers();
   }
 
   @Override
   public boolean isCellEditable(final int row, final int column) {
     return (column == 0 || column == 1) && super.isCellEditable(row, column);
+  }
+
+  @Override
+  public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
+    Component comp = super.prepareRenderer(renderer, row, column);
+    if (column == 2) {
+      ((JLabel) comp).setHorizontalAlignment(SwingConstants.CENTER);
+    }
+    return comp;
   }
 
   @Override
@@ -92,28 +96,6 @@ public class LayerTable extends JTable {
     }
   }
 
-  @Override
-  public TableCellRenderer getCellRenderer(final int row, final int column) {
-    return new DarkTableCellRenderer() {
-      @Override
-      public Component getTableCellRendererComponent(
-          JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        Component c =
-            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-        if (Game.world().environment() == null
-            || Game.world().environment().getMap() == null
-            || Game.world().environment().getMap().getMapObjectLayers().get(row) == null) {
-          return c;
-        }
-        if (column == 0) {
-          c.setBackground(
-              Game.world().environment().getMap().getMapObjectLayers().get(row).getColor());
-        }
-        return c;
-      }
-    };
-  }
-
   public IMap getMap() {
     return this.map;
   }
@@ -123,26 +105,28 @@ public class LayerTable extends JTable {
       return;
     }
     boolean layersChanged = false;
-    for (int row = 0; row < this.getMap().getMapObjectLayers().size(); row++) {
-      if (this.getMap().getMapObjectLayers().get(row).isVisible() != (boolean) this.getModel().getValueAt(row, 0)
-          || !this.getMap()
-              .getMapObjectLayers()
-              .get(row)
-              .getName()
-              .equals(this.getModel().getValueAt(row, 1).toString())) {
+    for (int row = 0; row < getMap().getMapObjectLayers().size(); row++) {
+      if (getMap().getMapObjectLayers().get(row).isVisible() != (boolean) this.getModel()
+        .getValueAt(row, 0)
+        || !this.getMap()
+        .getMapObjectLayers()
+        .get(row)
+        .getName()
+        .equals(this.getModel().getValueAt(row, 1).toString())) {
         layersChanged = true;
       }
-      this.getMap()
-          .getMapObjectLayers()
-          .get(row)
-          .setVisible((boolean) this.getModel().getValueAt(row, 0));
-      this.getMap()
-          .getMapObjectLayers()
-          .get(row)
-          .setName(this.getModel().getValueAt(row, 1).toString());
+      getMap()
+        .getMapObjectLayers()
+        .get(row)
+        .setVisible((boolean) getModel().getValueAt(row, 0));
+      getMap()
+        .getMapObjectLayers()
+        .get(row)
+        .setName(getModel().getValueAt(row, 1).toString());
     }
     if (layersChanged) {
       UndoManager.instance().recordChanges();
     }
   }
+
 }

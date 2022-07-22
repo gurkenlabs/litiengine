@@ -1,80 +1,79 @@
 package de.gurkenlabs.litiengine.environment.tilemap;
 
+import de.gurkenlabs.litiengine.graphics.RenderType;
 import java.awt.Dimension;
 import java.awt.Point;
 
-import de.gurkenlabs.litiengine.graphics.RenderType;
-
 public interface ILayer extends ICustomPropertyProvider {
 
-  public int getId();
+  int getId();
 
   /**
    * Gets the name.
    *
    * @return the name
    */
-  public String getName();
+  String getName();
+
+  void setName(String name);
 
   /**
    * Gets the opacity.
    *
    * @return the opacity
    */
-  public float getOpacity();
+  float getOpacity();
+
+  void setOpacity(float opacity);
 
   /**
    * Gets both the X and the Y offset of the layer.
    *
    * @return a {@link Point} representing the offset
    */
-  public Point getOffset();
+  Point getOffset();
 
   /**
    * Gets the horizontal offset of the layer.
    *
    * @return the x offset
    */
-  public int getOffsetX();
+  int getOffsetX();
 
   /**
    * Gets the vertical offset of the layer.
    *
    * @return the y offset
    */
-  public int getOffsetY();
+  int getOffsetY();
 
   /**
    * Gets the size in tiles.
    *
    * @return the size in tiles
    */
-  public Dimension getSizeInTiles();
+  Dimension getSizeInTiles();
 
-  public IMap getMap();
+  IMap getMap();
 
   /**
    * Checks if is visible.
    *
    * @return true, if is visible
    */
-  public boolean isVisible();
+  boolean isVisible();
 
-  public void setVisible(boolean visible);
+  void setVisible(boolean visible);
 
-  public void setName(String name);
+  RenderType getRenderType();
 
-  public RenderType getRenderType();
+  void setRenderType(RenderType renderType);
 
-  public int getWidth();
+  int getWidth();
 
-  public int getHeight();
+  void setWidth(int newWidth);
 
-  public void setWidth(int newWidth);
+  int getHeight();
 
-  public void setHeight(int newWidth);
-
-  public void setOpacity(float opacity);
-
-  public void setRenderType(RenderType renderType);
+  void setHeight(int newWidth);
 }
