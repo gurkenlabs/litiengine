@@ -241,8 +241,9 @@ public abstract class Particle implements ITimeToLive {
     return this;
   }
 
-  public void setStopOnCollision(boolean stopOnCollision) {
+  public Particle setStopOnCollision(boolean stopOnCollision) {
     this.stopOnCollision = stopOnCollision;
+    return this;
   }
 
   public Particle setColor(final Color color) {

@@ -11,6 +11,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
 public class SpriteParticle extends Particle {
+
   private AnimationController animation;
   private boolean animateSprite;
   private boolean loopSprite;
@@ -23,8 +24,8 @@ public class SpriteParticle extends Particle {
     if (spritesheet == null) {
       return;
     }
-    this.setWidth(spritesheet.getSpriteWidth());
-    this.setHeight(spritesheet.getSpriteHeight());
+    setWidth(spritesheet.getSpriteWidth());
+    setHeight(spritesheet.getSpriteHeight());
     this.animation = new AnimationController(this.spritesheet);
   }
 
@@ -53,29 +54,31 @@ public class SpriteParticle extends Particle {
   @Override
   public Rectangle2D getBoundingBox(final Point2D origin) {
     return new Rectangle2D.Double(
-        origin.getX() + this.getX() - this.getWidth() / 2,
-        origin.getY() + this.getY() - this.getHeight() / 2,
-        this.getWidth(),
-        this.getHeight());
+      origin.getX() + getX() - getWidth() / 2,
+      origin.getY() + getY() - getHeight() / 2,
+      getWidth(),
+      getHeight());
   }
 
   public boolean isAnimatingSprite() {
     return animateSprite;
   }
 
-  public void setAnimateSprite(boolean animateSprite) {
+  public SpriteParticle setAnimateSprite(boolean animateSprite) {
     this.animateSprite = animateSprite;
     if (!this.animateSprite) {
       this.currentImage = spritesheet.getRandomSprite();
     }
+    return this;
   }
 
   public boolean isLoopingSprite() {
     return loopSprite;
   }
 
-  public void setLoopSprite(boolean loopSprite) {
+  public SpriteParticle setLoopSprite(boolean loopSprite) {
     this.loopSprite = loopSprite;
     this.animation.getDefault().setLooping(loopSprite);
+    return this;
   }
 }

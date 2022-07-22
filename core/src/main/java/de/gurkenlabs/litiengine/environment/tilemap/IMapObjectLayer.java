@@ -11,19 +11,19 @@ public interface IMapObjectLayer extends ILayer {
    *
    * @return the shapes
    */
-  public List<IMapObject> getMapObjects();
+  List<IMapObject> getMapObjects();
 
-  public void addMapObject(IMapObject mapObject);
+  void addMapObject(IMapObject mapObject);
 
-  public void removeMapObject(IMapObject mapObject);
+  void removeMapObject(IMapObject mapObject);
 
-  public Color getColor();
+  Color getColor();
 
-  public String getColorHexString();
+  void setColor(String colorHexString);
 
-  public void setColor(String colorHexString);
+  String getColorHexString();
 
-  public Collection<IMapObject> getMapObjects(String... type);
+  Collection<IMapObject> getMapObjects(String... type);
 
-  public Collection<IMapObject> getMapObjects(int... mapIDs);
+  Collection<IMapObject> getMapObjects(int... mapIDs);
 }

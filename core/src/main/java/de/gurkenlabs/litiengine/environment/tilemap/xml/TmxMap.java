@@ -1,29 +1,4 @@
-
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
-
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import jakarta.xml.bind.Marshaller;
-import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlAttribute;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlElements;
-import jakarta.xml.bind.annotation.XmlRootElement;
-import jakarta.xml.bind.annotation.XmlTransient;
-import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IGroupLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
@@ -39,91 +14,99 @@ import de.gurkenlabs.litiengine.environment.tilemap.RenderOrder;
 import de.gurkenlabs.litiengine.environment.tilemap.StaggerAxis;
 import de.gurkenlabs.litiengine.environment.tilemap.StaggerIndex;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElements;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlTransient;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @XmlRootElement(name = "map")
 @XmlAccessorType(XmlAccessType.FIELD)
 public final class TmxMap extends CustomPropertyProvider implements IMap {
-  public static final String FILE_EXTENSION = "tmx";
 
-  private static final Logger log = Logger.getLogger(TmxMap.class.getName());
+  public static final String FILE_EXTENSION = "tmx";
   public static final int MAX_MAJOR = 1;
   public static final int MAX_MINOR = 2;
-
+  private static final Logger log = Logger.getLogger(TmxMap.class.getName());
+  private final transient List<ITileLayer> rawTileLayers = new CopyOnWriteArrayList<>();
+  private final transient List<IMapObjectLayer> rawMapObjectLayers = new CopyOnWriteArrayList<>();
+  private final transient List<IImageLayer> rawImageLayers = new CopyOnWriteArrayList<>();
+  private final transient List<IGroupLayer> rawGroupLayers = new CopyOnWriteArrayList<>();
+  private final transient List<ITileLayer> tileLayers = Collections.unmodifiableList(
+    this.rawTileLayers);
+  private final transient List<IMapObjectLayer> mapObjectLayers = Collections.unmodifiableList(
+    this.rawMapObjectLayers);
+  private final transient List<IImageLayer> imageLayers = Collections.unmodifiableList(
+    this.rawImageLayers);
+  private final transient List<IGroupLayer> groupLayers = Collections.unmodifiableList(
+    this.rawGroupLayers);
   @XmlAttribute
   private double version;
-
   @XmlAttribute
   private String tiledversion;
-
   @XmlAttribute
   private String orientation;
-
   @XmlTransient
   private IMapOrientation mapOrientation;
-
   @XmlAttribute
   private RenderOrder renderorder;
-
   @XmlAttribute
   private int width;
-
   @XmlAttribute
   private int height;
-
   @XmlAttribute
   private int tilewidth;
-
   @XmlAttribute
   private int tileheight;
-
   @XmlAttribute
   private int infinite;
-
   @XmlAttribute
   private Integer hexsidelength;
-
   @XmlAttribute
   private StaggerAxis staggeraxis;
-
   @XmlAttribute
   private StaggerIndex staggerindex;
-
   @XmlAttribute
   @XmlJavaTypeAdapter(ColorAdapter.class)
   private Color backgroundcolor;
-
   @XmlAttribute(name = "nextlayerid")
   private Integer nextLayerId;
-
   @XmlAttribute(name = "nextobjectid")
   private Integer nextObjectId;
-
   @XmlAttribute
   private String name;
-
   @XmlElement(name = "tileset", type = Tileset.class)
   private List<ITileset> tilesets;
-
   @XmlElements({
-      @XmlElement(name = "imagelayer", type = ImageLayer.class),
-      @XmlElement(name = "layer", type = TileLayer.class),
-      @XmlElement(name = "objectgroup", type = MapObjectLayer.class),
-      @XmlElement(name = "group", type = GroupLayer.class)
+    @XmlElement(name = "imagelayer", type = ImageLayer.class),
+    @XmlElement(name = "layer", type = TileLayer.class),
+    @XmlElement(name = "objectgroup", type = MapObjectLayer.class),
+    @XmlElement(name = "group", type = GroupLayer.class)
   })
   private List<ILayer> layers;
-
   @XmlTransient
   private URL path;
-
-  private transient List<ITileLayer> rawTileLayers = new CopyOnWriteArrayList<>();
-  private transient List<IMapObjectLayer> rawMapObjectLayers = new CopyOnWriteArrayList<>();
-  private transient List<IImageLayer> rawImageLayers = new CopyOnWriteArrayList<>();
-  private transient List<IGroupLayer> rawGroupLayers = new CopyOnWriteArrayList<>();
-
-  private transient List<ITileLayer> tileLayers = Collections.unmodifiableList(this.rawTileLayers);
-  private transient List<IMapObjectLayer> mapObjectLayers = Collections.unmodifiableList(this.rawMapObjectLayers);
-  private transient List<IImageLayer> imageLayers = Collections.unmodifiableList(this.rawImageLayers);
-  private transient List<IGroupLayer> groupLayers = Collections.unmodifiableList(this.rawGroupLayers);
+  @XmlTransient
+  private int chunkOffsetX;
+  @XmlTransient
+  private int chunkOffsetY;
 
   public TmxMap() {
     // keep for serialization
@@ -134,12 +117,6 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
     this.renderorder = RenderOrder.RIGHT_DOWN;
     this.setTiledVersion(MAX_MAJOR + "." + MAX_MINOR + ".0");
   }
-
-  @XmlTransient
-  private int chunkOffsetX;
-
-  @XmlTransient
-  private int chunkOffsetY;
 
   @Override
   public List<IImageLayer> getImageLayers() {
@@ -169,15 +146,29 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
     return this.mapOrientation;
   }
 
+  @XmlTransient
+  public void setOrientation(IMapOrientation orientation) {
+    this.mapOrientation = Objects.requireNonNull(orientation);
+  }
+
   @Override
   @XmlTransient
   public URL getPath() {
     return this.path;
   }
 
+  public void setPath(final URL path) {
+    this.path = path;
+  }
+
   @Override
   public RenderOrder getRenderOrder() {
     return this.renderorder;
+  }
+
+  @XmlTransient
+  public void setRenderOrder(RenderOrder renderorder) {
+    this.renderorder = renderorder;
   }
 
   @Override
@@ -235,9 +226,19 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
     return this.tilewidth;
   }
 
+  @XmlTransient
+  public void setTileWidth(int tilewidth) {
+    this.tilewidth = tilewidth;
+  }
+
   @Override
   public int getTileHeight() {
     return this.tileheight;
+  }
+
+  @XmlTransient
+  public void setTileHeight(int tileheight) {
+    this.tileheight = tileheight;
   }
 
   @Override
@@ -245,9 +246,19 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
     return this.version;
   }
 
+  @XmlTransient
+  public void setVersion(double version) {
+    this.version = version;
+  }
+
   @Override
   public String getTiledVersion() {
     return this.tiledversion;
+  }
+
+  @XmlTransient
+  public void setTiledVersion(String tiledversion) {
+    this.tiledversion = tiledversion;
   }
 
   @Override
@@ -270,9 +281,19 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
     return this.width;
   }
 
+  @XmlTransient
+  public void setWidth(int width) {
+    this.width = width;
+  }
+
   @Override
   public int getHeight() {
     return this.height;
+  }
+
+  @XmlTransient
+  public void setHeight(int height) {
+    this.height = height;
   }
 
   @Override
@@ -280,9 +301,19 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
     return this.hexsidelength;
   }
 
+  @XmlTransient
+  public void setHexSideLength(int hexSideLength) {
+    this.hexsidelength = hexSideLength;
+  }
+
   @Override
   public StaggerAxis getStaggerAxis() {
     return this.staggeraxis;
+  }
+
+  @XmlTransient
+  public void setStaggerAxis(StaggerAxis staggerAxis) {
+    this.staggeraxis = staggerAxis;
   }
 
   @Override
@@ -290,8 +321,9 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
     return this.staggerindex;
   }
 
-  public void setPath(final URL path) {
-    this.path = path;
+  @XmlTransient
+  public void setStaggerIndex(StaggerIndex staggerIndex) {
+    this.staggerindex = staggerIndex;
   }
 
   @Override
@@ -303,13 +335,13 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
     this.path = location;
     // tilesets must be post-processed before layers; otherwise external tilesets may not be loaded
     for (ITileset tileset : this.tilesets) {
-      if (tileset instanceof Tileset) {
-        ((Tileset) tileset).finish(location);
+      if (tileset instanceof Tileset tilesetImpl) {
+        tilesetImpl.finish(location);
       }
     }
     for (ILayer layer : this.layers) {
-      if (layer instanceof Layer) {
-        ((Layer) layer).finish(location);
+      if (layer instanceof Layer layerImpl) {
+        layerImpl.finish(location);
       }
     }
   }
@@ -318,8 +350,8 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
   public void addLayer(ILayer layer) {
     this.getRenderLayers().add(layer);
     this.layerAdded(layer);
-    if (layer instanceof Layer) {
-      ((Layer) layer).setMap(this);
+    if (layer instanceof Layer layerImpl) {
+      layerImpl.setMap(this);
     }
   }
 
@@ -327,8 +359,8 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
   public void addLayer(int index, ILayer layer) {
     this.getRenderLayers().add(index, layer);
     this.addRawLayer(index, layer);
-    if (layer instanceof Layer) {
-      ((Layer) layer).setMap(this);
+    if (layer instanceof Layer layerImpl) {
+      layerImpl.setMap(this);
     }
   }
 
@@ -336,8 +368,8 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
   public void removeLayer(ILayer layer) {
     this.layers.remove(layer);
     this.removeRawLayer(layer);
-    if (layer instanceof Layer) {
-      ((Layer) layer).setMap(null);
+    if (layer instanceof Layer layerImpl) {
+      layerImpl.setMap(null);
     }
   }
 
@@ -345,8 +377,8 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
   public void removeLayer(int index) {
     ILayer removed = this.layers.remove(index);
     this.removeRawLayer(removed);
-    if (removed instanceof Layer) {
-      ((Layer) removed).setMap(null);
+    if (removed instanceof Layer layerImpl) {
+      layerImpl.setMap(null);
     }
   }
 
@@ -363,61 +395,6 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
     if (layer instanceof IGroupLayer) {
       this.rawGroupLayers.remove(layer);
     }
-  }
-
-  @XmlTransient
-  public void setHeight(int height) {
-    this.height = height;
-  }
-
-  @XmlTransient
-  public void setOrientation(IMapOrientation orientation) {
-    this.mapOrientation = Objects.requireNonNull(orientation);
-  }
-
-  @XmlTransient
-  public void setRenderOrder(RenderOrder renderorder) {
-    this.renderorder = renderorder;
-  }
-
-  @XmlTransient
-  public void setTiledVersion(String tiledversion) {
-    this.tiledversion = tiledversion;
-  }
-
-  @XmlTransient
-  public void setTileHeight(int tileheight) {
-    this.tileheight = tileheight;
-  }
-
-  @XmlTransient
-  public void setTileWidth(int tilewidth) {
-    this.tilewidth = tilewidth;
-  }
-
-  @XmlTransient
-  public void setHexSideLength(int hexSideLength) {
-    this.hexsidelength = hexSideLength;
-  }
-
-  @XmlTransient
-  public void setStaggerAxis(StaggerAxis staggerAxis) {
-    this.staggeraxis = staggerAxis;
-  }
-
-  @XmlTransient
-  public void setStaggerIndex(StaggerIndex staggerIndex) {
-    this.staggerindex = staggerIndex;
-  }
-
-  @XmlTransient
-  public void setVersion(double version) {
-    this.version = version;
-  }
-
-  @XmlTransient
-  public void setWidth(int width) {
-    this.width = width;
   }
 
   @Override
@@ -453,8 +430,8 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
   public List<Tileset> getExternalTilesets() {
     List<Tileset> externalTilesets = new ArrayList<>();
     for (ITileset set : this.getTilesets()) {
-      if (set instanceof Tileset && ((Tileset) set).sourceTileset != null) {
-        externalTilesets.add(((Tileset) set).sourceTileset);
+      if (set instanceof Tileset tilesetImpl && tilesetImpl.sourceTileset != null) {
+        externalTilesets.add(tilesetImpl.sourceTileset);
       }
     }
 
@@ -514,32 +491,32 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
   }
 
   private void layerAdded(ILayer layer) {
-    if (layer instanceof ITileLayer) {
-      this.rawTileLayers.add((ITileLayer) layer);
+    if (layer instanceof ITileLayer layerImpl) {
+      this.rawTileLayers.add(layerImpl);
     }
-    if (layer instanceof IMapObjectLayer) {
-      this.rawMapObjectLayers.add((IMapObjectLayer) layer);
+    if (layer instanceof IMapObjectLayer layerImpl) {
+      this.rawMapObjectLayers.add(layerImpl);
     }
-    if (layer instanceof IImageLayer) {
-      this.rawImageLayers.add((IImageLayer) layer);
+    if (layer instanceof IImageLayer layerImpl) {
+      this.rawImageLayers.add(layerImpl);
     }
-    if (layer instanceof IGroupLayer) {
-      this.rawGroupLayers.add((IGroupLayer) layer);
+    if (layer instanceof IGroupLayer layerImpl) {
+      this.rawGroupLayers.add(layerImpl);
     }
   }
 
   private void addRawLayer(int index, ILayer layer) {
-    if (layer instanceof ITileLayer) {
-      this.rawTileLayers.add(this.getRawIndex(index, ITileLayer.class), (ITileLayer) layer);
+    if (layer instanceof ITileLayer layerImpl) {
+      this.rawTileLayers.add(this.getRawIndex(index, ITileLayer.class), layerImpl);
     }
-    if (layer instanceof IMapObjectLayer) {
-      this.rawMapObjectLayers.add(this.getRawIndex(index, IMapObjectLayer.class), (IMapObjectLayer) layer);
+    if (layer instanceof IMapObjectLayer layerImpl) {
+      this.rawMapObjectLayers.add(this.getRawIndex(index, IMapObjectLayer.class), layerImpl);
     }
-    if (layer instanceof IImageLayer) {
-      this.rawImageLayers.add(this.getRawIndex(index, IImageLayer.class), (IImageLayer) layer);
+    if (layer instanceof IImageLayer layerImpl) {
+      this.rawImageLayers.add(this.getRawIndex(index, IImageLayer.class), layerImpl);
     }
-    if (layer instanceof IGroupLayer) {
-      this.rawGroupLayers.add(this.getRawIndex(index, IGroupLayer.class), (IGroupLayer) layer);
+    if (layer instanceof IGroupLayer layerImpl) {
+      this.rawGroupLayers.add(this.getRawIndex(index, IGroupLayer.class), layerImpl);
     }
   }
 
@@ -561,8 +538,9 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
 
   private void checkVersion() throws UnsupportedMapVersionException {
     if (this.tiledversion == null || this.tiledversion.isEmpty()) {
-      log.log(Level.WARNING, "Tiled version not defined for map \"{0}\". Could not evaluate whether the map format is supported by the engine.",
-          new Object[] {this.getName()});
+      log.log(Level.WARNING,
+        "Tiled version not defined for map \"{0}\". Could not evaluate whether the map format is supported by the engine.",
+        new Object[]{this.getName()});
       return;
     }
 
@@ -584,8 +562,9 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
     }
 
     if (minor > MAX_MINOR) {
-      log.log(Level.WARNING, "Tiled version {0} of map \"{1}\" is greater than the supported version {2}.{3}.x. Some features may not work.",
-          new Object[] {this.tiledversion, this.getName(), MAX_MAJOR, MAX_MINOR});
+      log.log(Level.WARNING,
+        "Tiled version {0} of map \"{1}\" is greater than the supported version {2}.{3}.x. Some features may not work.",
+        new Object[]{this.tiledversion, this.getName(), MAX_MAJOR, MAX_MINOR});
     }
   }
 
@@ -601,10 +580,9 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
     int h = 0;
 
     for (ITileLayer tileLayer : this.tileLayers) {
-      if (!(tileLayer instanceof TileLayer)) {
+      if (!(tileLayer instanceof TileLayer layer)) {
         continue;
       }
-      TileLayer layer = (TileLayer) tileLayer;
 
       if (layer.getRawTileData() != null && layer.getRawTileData().getOffsetX() < minChunkOffsetX) {
         minChunkOffsetX = layer.getRawTileData().getOffsetX();
@@ -620,10 +598,9 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
     // they need this information because they have to create an appropriately sized grid before
     // locating their chunks in it
     for (ITileLayer tileLayer : this.tileLayers) {
-      if (!(tileLayer instanceof TileLayer)) {
+      if (!(tileLayer instanceof TileLayer layer)) {
         continue;
       }
-      TileLayer layer = (TileLayer) tileLayer;
 
       if (layer.getRawTileData() != null) {
         layer.getRawTileData().setMinChunkOffsets(minChunkOffsetX, minChunkOffsetY);
