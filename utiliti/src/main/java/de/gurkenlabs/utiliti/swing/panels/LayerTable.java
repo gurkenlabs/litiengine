@@ -16,10 +16,10 @@ import javax.swing.table.TableCellRenderer;
 
 public class LayerTable extends JTable {
 
-  protected static final String[] columns = new String[]{"visible", "name", "objects", "color"};
+  protected static final String[] columns = new String[] {"visible", "name", "objects", "color"};
 
   private static final TableCellEditor visibilityEditor =
-    new DarkTableCellEditor(new JToggleButton());
+      new DarkTableCellEditor(new JToggleButton());
   private static final TableCellEditor nameEditor = new DarkTableCellEditor(new JTextField());
   private int lastSelection = 0;
   private IMap map;
@@ -107,22 +107,22 @@ public class LayerTable extends JTable {
     boolean layersChanged = false;
     for (int row = 0; row < getMap().getMapObjectLayers().size(); row++) {
       if (getMap().getMapObjectLayers().get(row).isVisible() != (boolean) this.getModel()
-        .getValueAt(row, 0)
-        || !this.getMap()
-        .getMapObjectLayers()
-        .get(row)
-        .getName()
-        .equals(this.getModel().getValueAt(row, 1).toString())) {
+          .getValueAt(row, 0)
+          || !this.getMap()
+              .getMapObjectLayers()
+              .get(row)
+              .getName()
+              .equals(this.getModel().getValueAt(row, 1).toString())) {
         layersChanged = true;
       }
       getMap()
-        .getMapObjectLayers()
-        .get(row)
-        .setVisible((boolean) getModel().getValueAt(row, 0));
+          .getMapObjectLayers()
+          .get(row)
+          .setVisible((boolean) getModel().getValueAt(row, 0));
       getMap()
-        .getMapObjectLayers()
-        .get(row)
-        .setName(getModel().getValueAt(row, 1).toString());
+          .getMapObjectLayers()
+          .get(row)
+          .setName(getModel().getValueAt(row, 1).toString());
     }
     if (layersChanged) {
       UndoManager.instance().recordChanges();

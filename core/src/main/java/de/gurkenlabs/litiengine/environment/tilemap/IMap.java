@@ -120,7 +120,8 @@ public interface IMap extends ILayerList, Comparable<IMap> {
   /**
    * Sets the name.
    *
-   * @param name the new name
+   * @param name
+   *          the new name
    */
   void setName(String name);
 

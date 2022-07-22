@@ -50,13 +50,13 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
   private final transient List<IImageLayer> rawImageLayers = new CopyOnWriteArrayList<>();
   private final transient List<IGroupLayer> rawGroupLayers = new CopyOnWriteArrayList<>();
   private final transient List<ITileLayer> tileLayers = Collections.unmodifiableList(
-    this.rawTileLayers);
+      this.rawTileLayers);
   private final transient List<IMapObjectLayer> mapObjectLayers = Collections.unmodifiableList(
-    this.rawMapObjectLayers);
+      this.rawMapObjectLayers);
   private final transient List<IImageLayer> imageLayers = Collections.unmodifiableList(
-    this.rawImageLayers);
+      this.rawImageLayers);
   private final transient List<IGroupLayer> groupLayers = Collections.unmodifiableList(
-    this.rawGroupLayers);
+      this.rawGroupLayers);
   @XmlAttribute
   private double version;
   @XmlAttribute
@@ -95,10 +95,10 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
   @XmlElement(name = "tileset", type = Tileset.class)
   private List<ITileset> tilesets;
   @XmlElements({
-    @XmlElement(name = "imagelayer", type = ImageLayer.class),
-    @XmlElement(name = "layer", type = TileLayer.class),
-    @XmlElement(name = "objectgroup", type = MapObjectLayer.class),
-    @XmlElement(name = "group", type = GroupLayer.class)
+      @XmlElement(name = "imagelayer", type = ImageLayer.class),
+      @XmlElement(name = "layer", type = TileLayer.class),
+      @XmlElement(name = "objectgroup", type = MapObjectLayer.class),
+      @XmlElement(name = "group", type = GroupLayer.class)
   })
   private List<ILayer> layers;
   @XmlTransient
@@ -539,8 +539,8 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
   private void checkVersion() throws UnsupportedMapVersionException {
     if (this.tiledversion == null || this.tiledversion.isEmpty()) {
       log.log(Level.WARNING,
-        "Tiled version not defined for map \"{0}\". Could not evaluate whether the map format is supported by the engine.",
-        new Object[]{this.getName()});
+          "Tiled version not defined for map \"{0}\". Could not evaluate whether the map format is supported by the engine.",
+          new Object[] {this.getName()});
       return;
     }
 
@@ -563,8 +563,8 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
 
     if (minor > MAX_MINOR) {
       log.log(Level.WARNING,
-        "Tiled version {0} of map \"{1}\" is greater than the supported version {2}.{3}.x. Some features may not work.",
-        new Object[]{this.tiledversion, this.getName(), MAX_MAJOR, MAX_MINOR});
+          "Tiled version {0} of map \"{1}\" is greater than the supported version {2}.{3}.x. Some features may not work.",
+          new Object[] {this.tiledversion, this.getName(), MAX_MAJOR, MAX_MINOR});
     }
   }
 

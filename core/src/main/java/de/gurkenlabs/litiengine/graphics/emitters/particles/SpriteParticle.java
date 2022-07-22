@@ -54,10 +54,10 @@ public class SpriteParticle extends Particle {
   @Override
   public Rectangle2D getBoundingBox(final Point2D origin) {
     return new Rectangle2D.Double(
-      origin.getX() + getX() - getWidth() / 2,
-      origin.getY() + getY() - getHeight() / 2,
-      getWidth(),
-      getHeight());
+        origin.getX() + getX() - getWidth() / 2,
+        origin.getY() + getY() - getHeight() / 2,
+        getWidth(),
+        getHeight());
   }
 
   public boolean isAnimatingSprite() {
