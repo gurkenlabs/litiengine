@@ -72,11 +72,8 @@ allprojects {
   if (!skipSpotless) {
     apply(plugin = "com.diffplug.spotless")
     spotless {
-      kotlinGradle {
-        ktlint("ktlint".v).userData(mapOf("indent_size" to "2"))
-      }
       plugins.withType<JavaPlugin>().configureEach {
-        java {
+          java {
           removeUnusedImports()
           eclipse().configFile("${project.rootDir}/config/gurkenlabs.eclipseformat.xml")
         }
