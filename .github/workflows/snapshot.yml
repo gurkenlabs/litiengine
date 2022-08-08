@@ -46,9 +46,9 @@ jobs:
             -PskipJavadoc
             -PskipSpotless
             -PghGitSourceUsername=gurkenlabs
-            -PghGitSourcePassword=$(echo $GITHUB_TOKEN)
-            -PghNexusUsername=$(echo $NEXUS_USERNAME)
-            -PghNexusPassword=$(echo $NEXUS_PASSWORD)
+            -PghGitSourcePassword='${{ env.GITHUB_TOKEN }}'
+            -PghNexusUsername='${{ env.NEXUS_USERNAME }}'
+            -PghNexusPassword='${{ env.NEXUS_PASSWORD }}'
             -PuseInMemoryKey=true
-            -Psigning.inMemoryKey=$(echo $GPG_SIGNING_KEY)
-            -Psigning.password=$(echo $GPG_PASSPHRASE)
+            -Psigning.inMemoryKey='${{ env.GPG_SIGNING_KEY }}'
+            -Psigning.password='${{ env.GPG_PASSPHRASE }}'
