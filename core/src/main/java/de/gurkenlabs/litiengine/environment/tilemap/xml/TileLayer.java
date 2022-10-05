@@ -1,17 +1,14 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
+import de.gurkenlabs.litiengine.environment.tilemap.ITile;
+import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
+import de.gurkenlabs.litiengine.environment.tilemap.ITilesetEntry;
+import jakarta.xml.bind.annotation.XmlElement;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.net.URL;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import jakarta.xml.bind.annotation.XmlElement;
-
-import de.gurkenlabs.litiengine.environment.tilemap.ITile;
-import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
-import de.gurkenlabs.litiengine.environment.tilemap.ITilesetEntry;
 
 public class TileLayer extends Layer implements ITileLayer {
 
@@ -20,7 +17,6 @@ public class TileLayer extends Layer implements ITileLayer {
 
   private transient List<ITile> tileList;
 
-  private transient Tile[][] tiles;
 
   /**
    * Instantiates a new {@code TileLayer} instance.
@@ -32,8 +28,7 @@ public class TileLayer extends Layer implements ITileLayer {
   /**
    * Instantiates a new {@code TileLayer} instance with the specified data.
    *
-   * @param data
-   *          The tile data of this instance.
+   * @param data The tile data of this instance.
    */
   public TileLayer(TileData data) {
     this.data = data;
@@ -41,21 +36,12 @@ public class TileLayer extends Layer implements ITileLayer {
 
   @Override
   public ITile getTileByLocation(final Point2D location) {
-    final Optional<ITile> tile = this.getTiles().stream().filter(x -> x.getTileCoordinate().equals(location)).findFirst();
-    return tile.isPresent() ? tile.get() : null;
+    return getTiles().stream().filter(x -> x.getTileCoordinate().equals(location)).findFirst().orElse(null);
   }
 
   @Override
   public ITile getTile(int x, int y) {
-    if (this.tiles == null || this.tiles.length == 0) {
-      return null;
-    }
-
-    if (x < 0 || y < 0 || y >= this.tiles.length || x >= this.tiles[y].length) {
-      return null;
-    }
-
-    return this.tiles[y][x];
+    return getTiles().stream().filter(t -> t.getTileCoordinate().x == x && t.getTileCoordinate().y == y).findFirst().orElse(null);
   }
 
   @Override
@@ -65,19 +51,18 @@ public class TileLayer extends Layer implements ITileLayer {
 
   @Override
   public void setTile(int x, int y, int gid) {
-    if (this.getRawTileData() == null) {
+    if (getRawTileData() == null) {
       return;
     }
 
-    Tile tile = this.getRawTileData().getTiles().get(x + y * this.getWidth());
+    Tile tile = getRawTileData().getTiles().get(x + y * getWidth());
     if (tile == null) {
       return;
     }
 
     tile.setGridId(gid);
-
-    if (this.getMap() != null) {
-      ITilesetEntry entry = this.getMap().getTilesetEntry(gid);
+    if (getMap() != null) {
+      ITilesetEntry entry = getMap().getTilesetEntry(gid);
       if (entry != null) {
         tile.setTilesetEntry(entry);
       }
@@ -86,13 +71,13 @@ public class TileLayer extends Layer implements ITileLayer {
 
   @Override
   public List<ITile> getTiles() {
-    return this.tileList;
+    return tileList;
   }
 
   @Override
   public int getWidth() {
-    if (this.data != null && this.data.isInfinite()) {
-      return this.data.getWidth();
+    if (data != null && data.isInfinite()) {
+      return data.getWidth();
     }
 
     return super.getWidth();
@@ -100,37 +85,32 @@ public class TileLayer extends Layer implements ITileLayer {
 
   @Override
   public int getHeight() {
-    if (this.data != null && this.data.isInfinite()) {
-      return this.data.getHeight();
+    if (data != null && data.isInfinite()) {
+      return data.getHeight();
     }
 
     return super.getHeight();
   }
 
   protected List<Tile> getData() {
-    return this.data.getTiles();
+    return data.getTiles();
   }
 
   protected TileData getRawTileData() {
-    return this.data;
+    return data;
   }
 
   @Override
   void finish(URL location) throws TmxException {
     super.finish(location);
-    this.tileList = new CopyOnWriteArrayList<>(this.getData());
-    this.tiles = new Tile[this.getHeight()][this.getWidth()];
-    for (int i = 0; i < this.getData().size(); i++) {
-      final int x = i % this.getWidth();
-      final int y = i / this.getWidth();
+    this.tileList = new CopyOnWriteArrayList<>(getData());
+    for (int i = 0; i < getData().size(); i++) {
+      final int x = i % getWidth();
+      final int y = i / getWidth();
 
-      final Tile tile = this.getData().get(i);
+      final Tile tile = getData().get(i);
       tile.setTileCoordinate(new Point(x, y));
-      this.tileList.add(tile);
-      this.tiles[y][x] = tile;
-    }
-    for (Tile tile : getData()) {
-      tile.setTilesetEntry(this.getMap().getTilesetEntry(tile.getGridId()));
+      tile.setTilesetEntry(getMap().getTilesetEntry(tile.getGridId()));
     }
   }
 }
