@@ -29,7 +29,7 @@ public class CombatPanel extends PropertyPanel {
   @Override
   protected void clearControls() {
     this.chckbxIndestructible.setSelected(false);
-    this.spinnerHitpoints.setValue(0.0);
+    this.spinnerHitpoints.setValue(0);
     this.spinnerTeam.setValue(0);
   }
 

@@ -148,7 +148,7 @@ public final class ColorHelper {
 
   public static Color getTransparentVariant(Color color, int newAlpha) {
     return new Color(
-        color.getRed(), color.getGreen(), color.getRed(), ensureColorValueRange(newAlpha));
+        color.getRed(), color.getGreen(), color.getBlue(), ensureColorValueRange(newAlpha));
   }
 
   private static Color decodeWellformedHexString(String hexString) {

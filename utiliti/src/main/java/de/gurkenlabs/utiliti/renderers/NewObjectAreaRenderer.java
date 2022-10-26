@@ -41,12 +41,14 @@ public class NewObjectAreaRenderer extends MouseSelectAreaRenderer {
             g,
             width,
             rect.getX() + rect.getWidth() / 2.0 - fm.stringWidth(width) / 2.0,
-            rect.getY() - 5,true);
+            rect.getY() - 5,
+            true);
     Game.graphics()
         .renderText(
             g,
             height,
             rect.getX() - (fm.stringWidth(height) + 3),
-            rect.getY() + rect.getHeight() / 2,true);
+            rect.getY() + rect.getHeight() / 2,
+            true);
   }
 }

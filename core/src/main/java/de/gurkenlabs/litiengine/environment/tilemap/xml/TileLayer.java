@@ -28,7 +28,8 @@ public class TileLayer extends Layer implements ITileLayer {
   /**
    * Instantiates a new {@code TileLayer} instance with the specified data.
    *
-   * @param data The tile data of this instance.
+   * @param data
+   *          The tile data of this instance.
    */
   public TileLayer(TileData data) {
     this.data = data;

@@ -90,18 +90,18 @@ public class EmitterColorPanel extends PropertyPanel {
   protected void clearControls() {
     model.setRowCount(0);
     table.clearSelection();
-    colorVariance.setValue(EmitterData.DEFAULT_COLOR_VARIANCE);
-    alphaVariance.setValue(EmitterData.DEFAULT_ALPHA_VARIANCE);
+    colorVariance.setValue((double) EmitterData.DEFAULT_COLOR_VARIANCE);
+    alphaVariance.setValue((double) EmitterData.DEFAULT_ALPHA_VARIANCE);
   }
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
     setColors(mapObject.getStringValue(MapObjectProperty.Emitter.COLORS));
     colorVariance.setValue(
-        mapObject.getFloatValue(
+        mapObject.getDoubleValue(
             MapObjectProperty.Emitter.COLORVARIANCE, EmitterData.DEFAULT_COLOR_VARIANCE));
     alphaVariance.setValue(
-        mapObject.getFloatValue(
+        mapObject.getDoubleValue(
             MapObjectProperty.Emitter.ALPHAVARIANCE, EmitterData.DEFAULT_ALPHA_VARIANCE));
   }
 

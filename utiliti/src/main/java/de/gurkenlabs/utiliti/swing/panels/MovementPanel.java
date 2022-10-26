@@ -20,7 +20,7 @@ public class MovementPanel extends PropertyPanel {
 
     this.spinnerAcceleration = new JSpinner(new SpinnerNumberModel(0.0, 0.0, 100.0, 0.1));
     this.spinnerDeceleration = new JSpinner(new SpinnerNumberModel(0.0, 0.0, 100.0, 0.1));
-    this.spinnerVelocity = new JSpinner(new SpinnerNumberModel(0, 0, 10000, 1));
+    this.spinnerVelocity = new JSpinner(new SpinnerNumberModel(0.0, 0.0, 10000.0, 1.0));
     this.chckbxTurnOnMove = new JCheckBox(Resources.strings().get("panel_turnOnMove"));
 
     setLayout(this.createLayout());
@@ -39,7 +39,7 @@ public class MovementPanel extends PropertyPanel {
     this.chckbxTurnOnMove.setSelected(false);
     this.spinnerAcceleration.setValue(0.0);
     this.spinnerDeceleration.setValue(0.0);
-    this.spinnerVelocity.setValue(0);
+    this.spinnerVelocity.setValue(0.0);
   }
 
   @Override
