@@ -143,7 +143,7 @@ public final class Spritesheet implements Comparable<Spritesheet> {
       return null;
     }
 
-    final Point position = this.getLocation(index, margin, spacing);
+    final Point position = this.getPosition(index, margin, spacing);
     try {
       final BufferedImage sprite =
           this.getImage().getSubimage(position.x, position.y, this.spriteWidth, this.spriteHeight);
@@ -266,7 +266,7 @@ public final class Spritesheet implements Comparable<Spritesheet> {
     }
   }
 
-  private Point getLocation(final int index, final int margin, final int spacing) {
+  private Point getPosition(final int index, final int margin, final int spacing) {
     final int row = index / this.getColumns();
     final int column = index % this.getColumns();
 

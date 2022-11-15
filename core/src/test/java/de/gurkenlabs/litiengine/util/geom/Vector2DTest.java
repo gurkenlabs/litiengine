@@ -7,7 +7,9 @@ import org.junit.jupiter.api.Test;
 
 class Vector2DTest {
 
-  /** Test add-function in Vector2D class */
+  /**
+   * Test add-function in Vector2D class
+   */
   @Test
   void testVector2D() {
     double xValue = 10.0;
@@ -32,7 +34,9 @@ class Vector2DTest {
     assertEquals(vectorResult1.dY, vectorResult1.getY());
   }
 
-  /** Test unitVector-function in Vector2D class */
+  /**
+   * Test unitVector-function in Vector2D class
+   */
   @Test
   void testVector2DUnit() {
     double xValue = 0.0;
@@ -40,17 +44,19 @@ class Vector2DTest {
 
     Vector2D vectorDouble = new Vector2D(xValue, yValue);
     Vector2D unitVector = vectorDouble.unitVector();
-    assertEquals(unitVector.getY(), 1.0);
-    assertEquals(unitVector.getX(), 0.0);
+    assertEquals(1.0, unitVector.getY());
+    assertEquals(0.0, unitVector.getX());
 
     yValue = 0.0;
     Vector2D zeroLengthVector = new Vector2D(xValue, yValue);
     unitVector = zeroLengthVector.unitVector();
-    assertEquals(unitVector.getX(), 0.0);
-    assertEquals(unitVector.getY(), 0.0);
+    assertEquals(0.0, unitVector.getX());
+    assertEquals(0.0, unitVector.getY());
   }
 
-  /** Test toString method */
+  /**
+   * Test toString method
+   */
   @Test
   void testVector2DToString() {
     double xValue = 10.0;
@@ -62,7 +68,9 @@ class Vector2DTest {
     assertEquals(expected, vectorDouble.toString());
   }
 
-  /** Test normal vector */
+  /**
+   * Test normal vector
+   */
   @Test
   void testVector2DNormal() {
     double xValue = 5.0;
@@ -77,7 +85,9 @@ class Vector2DTest {
     assertEquals(result.getY(), expectedY);
   }
 
-  /** Test scale vector */
+  /**
+   * Test scale vector
+   */
   @Test
   void testVector2DScale() {
     double xValue = 5.0;
@@ -92,7 +102,9 @@ class Vector2DTest {
     assertEquals(result.getY(), expectedY);
   }
 
-  /** Test dot product */
+  /**
+   * Test dot product
+   */
   @Test
   void testVector2DDot() {
     double xValue1 = 5.0;
@@ -107,7 +119,9 @@ class Vector2DTest {
     assertEquals(result, expected);
   }
 
-  /** Test sub */
+  /**
+   * Test sub
+   */
   @Test
   void testVector2DSub() {
     double xValue1 = 5.0;

@@ -179,13 +179,13 @@ public class Creature extends CombatEntity implements IMobileEntity {
   }
 
   @Override
-  public void setLocation(final Point2D position) {
-    if (this.isDead() || position == null) {
+  public void setLocation(final Point2D location) {
+    if (this.isDead() || location == null) {
       return;
     }
 
     final Point2D oldLocation = this.getLocation();
-    super.setLocation(position);
+    super.setLocation(location);
 
     if (Game.hasStarted() && this.isLoaded()) {
       this.lastMoved = Game.time().now();

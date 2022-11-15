@@ -189,9 +189,9 @@ public interface ICamera extends IUpdateable {
    * such as clamping to the map. Event listeners attached to this camera are notified when the pan completes.
    *
    * @param x
-   *          the new X position for the camera once the panning is complete
+   *          the new X coordinate for the camera once the panning is complete
    * @param y
-   *          the new Y position for the camera once the panning is complete
+   *          the new Y coordinate for the camera once the panning is complete
    * @param duration
    *          the number of frames between this call and when the pan completes
    */

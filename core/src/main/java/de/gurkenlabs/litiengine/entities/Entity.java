@@ -420,9 +420,9 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
   @Override
   public float[] getTweenValues(TweenType tweenType) {
     return switch (tweenType) {
-      case POSITION_X -> new float[] {(float) this.getX()};
-      case POSITION_Y -> new float[] {(float) this.getY()};
-      case POSITION_XY -> new float[] {(float) this.getX(), (float) this.getY()};
+      case LOCATION_X -> new float[] {(float) this.getX()};
+      case LOCATION_Y -> new float[] {(float) this.getY()};
+      case LOCATION_XY -> new float[] {(float) this.getX(), (float) this.getY()};
       case SIZE_WIDTH -> new float[] {(float) this.getWidth()};
       case SIZE_HEIGHT -> new float[] {(float) this.getHeight()};
       case SIZE_BOTH -> new float[] {(float) this.getWidth(), (float) this.getHeight()};
@@ -434,9 +434,9 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
   @Override
   public void setTweenValues(TweenType tweenType, float[] newValues) {
     switch (tweenType) {
-      case POSITION_X -> this.setX(newValues[0]);
-      case POSITION_Y -> this.setY(newValues[0]);
-      case POSITION_XY -> {
+      case LOCATION_X -> this.setX(newValues[0]);
+      case LOCATION_Y -> this.setY(newValues[0]);
+      case LOCATION_XY -> {
         this.setX(newValues[0]);
         this.setY(newValues[1]);
       }

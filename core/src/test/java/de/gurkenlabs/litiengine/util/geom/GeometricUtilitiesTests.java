@@ -362,7 +362,7 @@ class GeometricUtilitiesTests {
   }
 
   @Test
-  void testGetAveragePosition() {
+  void testGetAverageLocation() {
     // arrange
     Collection<Point2D> points = new ArrayList<>();
     points.add(new Point2D.Double(2.03d, 4.93d));
@@ -370,23 +370,23 @@ class GeometricUtilitiesTests {
     points.add(new Point2D.Double(1.053d, 0d));
 
     // act
-    Point2D avgPosition = GeometricUtilities.getAveragePosition(points);
+    Point2D avgLocation = GeometricUtilities.getAverageLocation(points);
 
     // assert
-    assertEquals(0.4343d, avgPosition.getX(), 0.0001d);
-    assertEquals(2.6833d, avgPosition.getY(), 0.0001d);
+    assertEquals(0.4343d, avgLocation.getX(), 0.0001d);
+    assertEquals(2.6833d, avgLocation.getY(), 0.0001d);
   }
 
   @Test
-  void testGetAveragePositionEmpty() {
+  void testGetAverageLocationEmpty() {
     // arrange
     Collection<Point2D> points = new ArrayList<>();
 
     // act
-    Point2D avgPosition = GeometricUtilities.getAveragePosition(points);
+    Point2D avgLocation = GeometricUtilities.getAverageLocation(points);
 
     // assert
-    assertNull(avgPosition);
+    assertNull(avgLocation);
   }
 
   /**

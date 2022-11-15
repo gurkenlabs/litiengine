@@ -587,13 +587,13 @@ public class ListField extends GuiComponent {
             getVerticalSlider().setCurrentValue(getVerticalLowerBound());
             getVerticalSlider()
                 .getSliderComponent()
-                .setLocation(getVerticalSlider().getRelativeSliderPosition());
+                .setLocation(getVerticalSlider().getRelativeSliderLocation());
           }
           if (getHorizontalSlider() != null) {
             getHorizontalSlider().setCurrentValue(getHorizontalLowerBound());
             getHorizontalSlider()
                 .getSliderComponent()
-                .setLocation(getHorizontalSlider().getRelativeSliderPosition());
+                .setLocation(getHorizontalSlider().getRelativeSliderLocation());
           }
         });
     if (getVerticalSlider() != null) {
@@ -603,7 +603,7 @@ public class ListField extends GuiComponent {
                 setVerticalLowerBound(sliderValue.intValue());
                 getVerticalSlider()
                     .getSliderComponent()
-                    .setLocation(getVerticalSlider().getRelativeSliderPosition());
+                    .setLocation(getVerticalSlider().getRelativeSliderLocation());
                 refresh();
               });
     }
@@ -614,7 +614,7 @@ public class ListField extends GuiComponent {
                 setHorizontalLowerBound(sliderValue.intValue());
                 getHorizontalSlider()
                     .getSliderComponent()
-                    .setLocation(getHorizontalSlider().getRelativeSliderPosition());
+                    .setLocation(getHorizontalSlider().getRelativeSliderLocation());
                 refresh();
               });
     }

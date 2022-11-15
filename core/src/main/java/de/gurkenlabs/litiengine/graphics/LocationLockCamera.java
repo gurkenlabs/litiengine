@@ -4,16 +4,16 @@ import de.gurkenlabs.litiengine.entities.IEntity;
 import java.awt.geom.Point2D;
 
 /** The Class LocalPlayerCamera. */
-public class PositionLockCamera extends Camera {
+public class LocationLockCamera extends Camera {
   private final IEntity entity;
 
   /**
-   * Initializes a new instance of the {@code PositionLockCamera}.
+   * Initializes a new instance of the {@code LocationLockCamera}.
    *
    * @param entity
    *          The entity to which the focus will be locked.
    */
-  public PositionLockCamera(final IEntity entity) {
+  public LocationLockCamera(final IEntity entity) {
     super();
     this.entity = entity;
     this.updateFocus();

@@ -25,7 +25,7 @@ public class HorizontalSlider extends Slider {
 
 
   @Override
-  public Point2D getRelativeSliderPosition() {
+  public Point2D getRelativeSliderLocation() {
     try {
       float frac = MathUtilities.clamp(
           (getCurrentValue() - getMinValue()) / (getMaxValue() - getMinValue()), 0, 1);
@@ -72,8 +72,8 @@ public class HorizontalSlider extends Slider {
     getButton2().setFont(ARROW_RIGHT.getFont());
     setSliderComponent(
         new ImageComponent(
-            getRelativeSliderPosition().getX(),
-            getRelativeSliderPosition().getY(),
+            getRelativeSliderLocation().getX(),
+            getRelativeSliderLocation().getY(),
             getHeight() * 2,
             getHeight(),
             getSliderSpritesheet(),

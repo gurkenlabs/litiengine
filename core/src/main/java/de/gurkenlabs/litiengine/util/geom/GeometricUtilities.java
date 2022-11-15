@@ -394,11 +394,11 @@ public class GeometricUtilities {
         center.getX() - radius, center.getY() - radius, radius * 2, radius * 2);
   }
 
-  public static Point2D getAveragePosition(Collection<Point2D> points) {
-    return getAveragePosition(points.toArray(new Point2D[points.size()]));
+  public static Point2D getAverageLocation(Collection<Point2D> points) {
+    return getAverageLocation(points.toArray(new Point2D[points.size()]));
   }
 
-  public static Point2D getAveragePosition(Point2D... points) {
+  public static Point2D getAverageLocation(Point2D... points) {
     if (points.length == 0) {
       return null;
     }
@@ -679,13 +679,13 @@ public class GeometricUtilities {
       return false;
     }
 
-    if (shapeA instanceof Rectangle2D && shapeB instanceof Rectangle2D) {
-      return intersects((Rectangle2D) shapeA, (Rectangle2D) shapeB);
+    if (shapeA instanceof Rectangle2D rectangleA && shapeB instanceof Rectangle2D rectangleB) {
+      return intersects(rectangleA, rectangleB);
     }
 
-    if (shapeA instanceof Line2D) {
-      if (shapeB instanceof Line2D) {
-        return ((Line2D) shapeA).intersectsLine((Line2D) shapeB); // intersectsLine() not defined on Shape thus casting
+    if (shapeA instanceof Line2D lineA) {
+      if (shapeB instanceof Line2D lineB) {
+        return (lineA.intersectsLine(lineB)); // intersectsLine() not defined on Shape thus casting
       }
       return shapeA.intersects(shapeB.getBounds2D());
     } else if (shapeB instanceof Line2D) {

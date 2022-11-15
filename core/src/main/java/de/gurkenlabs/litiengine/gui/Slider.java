@@ -45,15 +45,15 @@ public abstract class Slider extends GuiComponent {
 
     getSliderComponent().getAppearance().setTransparentBackground(false);
     getSliderComponent().getAppearanceHovered().setTransparentBackground(false);
-    onChange(e -> getSliderComponent().setLocation(getRelativeSliderPosition()));
+    onChange(e -> getSliderComponent().setLocation(getRelativeSliderLocation()));
     onClicked(e -> {
-      inferValueFromMousePosition();
-      getSliderComponent().setLocation(getRelativeSliderPosition());
+      inferValueFromMouseLocation();
+      getSliderComponent().setLocation(getRelativeSliderLocation());
     });
 
     onMouseDragged(e -> {
-      inferValueFromMousePosition();
-      getSliderComponent().setLocation(getRelativeSliderPosition());
+      inferValueFromMouseLocation();
+      getSliderComponent().setLocation(getRelativeSliderLocation());
     });
 
   }
@@ -138,7 +138,7 @@ public abstract class Slider extends GuiComponent {
 
   }
 
-  public abstract Point2D getRelativeSliderPosition();
+  public abstract Point2D getRelativeSliderLocation();
 
   protected abstract float getRelativeMouseValue();
 
@@ -200,7 +200,7 @@ public abstract class Slider extends GuiComponent {
     this.getChangeConsumer().add(c);
   }
 
-  protected void inferValueFromMousePosition() {
+  protected void inferValueFromMouseLocation() {
     float frac = (getMinValue() + getRelativeMouseValue() * getSteps()) / getSteps();
     int currentStep = (int) (frac * getSteps());
     setCurrentValue(currentStep * getStepSize());
@@ -209,6 +209,6 @@ public abstract class Slider extends GuiComponent {
   @Override
   public void prepare() {
     super.prepare();
-    getSliderComponent().setLocation(getRelativeSliderPosition());
+    getSliderComponent().setLocation(getRelativeSliderLocation());
   }
 }

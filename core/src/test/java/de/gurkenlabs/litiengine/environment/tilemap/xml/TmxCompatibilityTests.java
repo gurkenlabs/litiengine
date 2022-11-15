@@ -9,10 +9,11 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 @Disabled(
-    value = "Disabled for now due to Windows/Linux incompatiblities on serialization of the line endings.")
-public class TmxCompatibilityTests {
+  value = "Disabled for now due to Windows/Linux incompatiblities on serialization of the line endings.")
+class TmxCompatibilityTests {
+
   @Test
-  public void infiniteMapNeedsToBeCompatibleToDefaultTmxFormat() {
+  void infiniteMapNeedsToBeCompatibleToDefaultTmxFormat() {
 
     String source = "de/gurkenlabs/litiengine/environment/tilemap/xml/test-infinite-map.tmx";
     String target = "de/gurkenlabs/litiengine/environment/tilemap/xml/test-map-out.tmx";
@@ -26,7 +27,7 @@ public class TmxCompatibilityTests {
   }
 
   @Test
-  public void mapObjectMapNeedsToBeCompatibleToDefaultTmxFormat() {
+  void mapObjectMapNeedsToBeCompatibleToDefaultTmxFormat() {
 
     String source = "de/gurkenlabs/litiengine/environment/tilemap/xml/test-mapobject.tmx";
     String target = "de/gurkenlabs/litiengine/environment/tilemap/xml/test-map-out.tmx";

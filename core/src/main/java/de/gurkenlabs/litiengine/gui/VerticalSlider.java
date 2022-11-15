@@ -24,7 +24,7 @@ public class VerticalSlider extends Slider {
   }
 
   @Override
-  public Point2D getRelativeSliderPosition() {
+  public Point2D getRelativeSliderLocation() {
     try {
       float frac = MathUtilities.clamp(
           (getCurrentValue() - getMinValue()) / (getMaxValue() - getMinValue()), 0, 1);
@@ -91,8 +91,8 @@ public class VerticalSlider extends Slider {
     getButton2().setFont(ARROW_DOWN.getFont());
     setSliderComponent(
         new ImageComponent(
-            getRelativeSliderPosition().getX(),
-            getRelativeSliderPosition().getY(),
+            getRelativeSliderLocation().getX(),
+            getRelativeSliderLocation().getY(),
             getWidth(),
             getWidth() * 2,
             getSliderSpritesheet(),
