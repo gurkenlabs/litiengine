@@ -70,7 +70,7 @@ public class EntityNavigator implements IUpdateable, IRenderable {
   }
 
   public IMobileEntity getEntity() {
-    return this.entity;
+    return entity;
   }
 
   public Path getPath() {
@@ -86,20 +86,20 @@ public class EntityNavigator implements IUpdateable, IRenderable {
   }
 
   public boolean isNavigating() {
-    return this.path != null;
+    return getPath() != null;
   }
 
   public boolean navigate(final Path2D path) {
     this.path = new Path(path);
-    return this.path != null;
+    return getPath() != null;
   }
 
   public boolean navigate(final Point2D target) {
     if (this.getPathFinder() != null) {
-      this.path = this.getPathFinder().findPath(this.entity, target);
+      this.path = getPathFinder().findPath(getEntity(), target);
     }
 
-    return this.path != null;
+    return getPath() != null;
   }
 
   @Override
@@ -109,17 +109,17 @@ public class EntityNavigator implements IUpdateable, IRenderable {
     }
 
     g.setColor(Color.MAGENTA);
-    Game.graphics().renderOutline(g, this.getPath().getPath());
+    Game.graphics().renderOutline(g, getPath().getPath());
   }
 
   public void rotateTowards(final Point2D target) {
     final double angle =
         GeometricUtilities.calcRotationAngleInDegrees(
-            this.entity.getCollisionBox().getCenterX(),
-            this.entity.getCollisionBox().getCenterY(),
+            getEntity().getCollisionBox().getCenterX(),
+            getEntity().getCollisionBox().getCenterY(),
             target.getX(),
             target.getY());
-    this.entity.setAngle((float) angle);
+    getEntity().setAngle((float) angle);
   }
 
   public void setAcceptableError(float acceptableError) {
@@ -141,20 +141,20 @@ public class EntityNavigator implements IUpdateable, IRenderable {
       return;
     }
 
-    if (this.path == null) {
+    if (getPath() == null) {
       return;
     }
 
     for (final Predicate<IMobileEntity> pred : this.cancelNavigationConditions) {
-      if (pred.test(this.getEntity())) {
-        this.stop();
+      if (pred.test(getEntity())) {
+        stop();
         return;
       }
     }
 
-    final PathIterator pi = this.path.getPath().getPathIterator(null);
+    final PathIterator pi = getPath().getPath().getPathIterator(null);
     if (pi.isDone()) {
-      this.stop();
+      stop();
       return;
     }
 
@@ -165,7 +165,7 @@ public class EntityNavigator implements IUpdateable, IRenderable {
     final double[] coordinates = new double[22];
     for (int i = 0; i <= this.currentSegment; i++) {
       if (pi.isDone()) {
-        this.stop();
+        stop();
         return;
       }
 
@@ -174,7 +174,7 @@ public class EntityNavigator implements IUpdateable, IRenderable {
     }
 
     if (pi.isDone()) {
-      this.stop();
+      stop();
       return;
     }
 
@@ -182,25 +182,25 @@ public class EntityNavigator implements IUpdateable, IRenderable {
 
     final double distance =
         GeometricUtilities.distance(
-            this.entity.getCollisionBox().getCenterX(),
-            this.entity.getCollisionBox().getCenterY(),
+            getEntity().getCollisionBox().getCenterX(),
+            getEntity().getCollisionBox().getCenterY(),
             coordinates[0],
             coordinates[1]);
-    if (distance < this.getAcceptableError()) {
+    if (distance < getAcceptableError()) {
       ++this.currentSegment;
       return;
     }
 
     final double angle =
         GeometricUtilities.calcRotationAngleInDegrees(
-            this.entity.getCollisionBox().getCenterX(),
-            this.entity.getCollisionBox().getCenterY(),
+            getEntity().getCollisionBox().getCenterX(),
+            getEntity().getCollisionBox().getCenterY(),
             coordinates[0],
             coordinates[1]);
-    final float pixelsPerTick = this.entity.getTickVelocity();
+    final float pixelsPerTick = getEntity().getTickVelocity();
     Game.physics()
         .move(
-            this.entity,
+            getEntity(),
             (float) angle,
             (float) (distance < pixelsPerTick ? distance : pixelsPerTick));
   }

@@ -606,7 +606,7 @@ public final class PhysicsEngine implements IUpdateable {
    */
   public boolean move(final IMobileEntity entity, final double angle, final double distance) {
     final Point2D newLocation = GeometricUtilities.project(entity.getLocation(), angle, distance);
-    return this.move(entity, newLocation);
+    return move(entity, newLocation);
   }
 
   /**
@@ -622,7 +622,7 @@ public final class PhysicsEngine implements IUpdateable {
    * @see Direction
    */
   public boolean move(IMobileEntity entity, Direction direction, double distance) {
-    return this.move(entity, direction.toAngle(), distance);
+    return move(entity, direction.toAngle(), distance);
   }
 
   /**
@@ -640,7 +640,7 @@ public final class PhysicsEngine implements IUpdateable {
    */
   public boolean move(
       final IMobileEntity entity, final double x, final double y, final float distance) {
-    return this.move(entity, new Point2D.Double(x, y), distance);
+    return move(entity, new Point2D.Double(x, y), distance);
   }
 
   /**
@@ -654,7 +654,7 @@ public final class PhysicsEngine implements IUpdateable {
    * @see Direction
    */
   public boolean move(final IMobileEntity entity, final float distance) {
-    return this.move(entity, entity.getAngle(), distance);
+    return move(entity, entity.getAngle(), distance);
   }
 
   /**
@@ -685,14 +685,18 @@ public final class PhysicsEngine implements IUpdateable {
     }
 
     // check if there is any collision to resolve on the new location
-    if (this.resolveCollisionForNewLocation(entity, target)) {
+    if (resolveCollisionForNewLocation(entity, target)) {
       return false;
     }
 
     // This method provides a simplified approach for a multi-sampling algorithm
     // to prevent glitching through collision boxes that are smaller than the
     // movement step size
-    if (this.resolveCollisionForRaycastToNewLocation(entity, target)) {
+    if (resolveCollisionForRaycastToNewLocation(entity, target)) {
+      return false;
+    }
+
+    if (entity.getLocation().equals(target)) {
       return false;
     }
 
@@ -716,7 +720,7 @@ public final class PhysicsEngine implements IUpdateable {
    */
   public boolean move(final IMobileEntity entity, final Point2D target, final float distance) {
     final Point2D newLocation = GeometricUtilities.project(entity.getLocation(), target, distance);
-    return this.move(entity, newLocation);
+    return move(entity, newLocation);
   }
 
   /**

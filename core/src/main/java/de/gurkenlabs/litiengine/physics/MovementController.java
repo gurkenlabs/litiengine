@@ -93,24 +93,24 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
 
     final double deltaTime = Game.loop().getDeltaTime() * Game.loop().getTimeScale();
 
-    final double acceleration = this.getEntity().getAcceleration(deltaTime);
-    final double deceleration = this.getEntity().getDeceleration(deltaTime, getVelocity());
+    final double acceleration = getEntity().getAcceleration(deltaTime);
+    final double deceleration = getEntity().getDeceleration(deltaTime, getVelocity());
 
-    double dx = this.getDx();
-    double dy = this.getDy();
+    double dxTemp = getDx();
+    double dyTemp = getDy();
     this.setDx(0);
     this.setDy(0);
 
     final double deltaVelocity =
-        Math.min(Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2)), acceleration);
+        Math.min(Math.sqrt(Math.pow(dxTemp, 2) + Math.pow(dyTemp, 2)), acceleration);
     if (deltaVelocity != 0) {
       double newVelocity = this.getVelocity() + deltaVelocity;
       this.setVelocity(newVelocity);
     } else {
       final double newVelocity = Math.max(0, this.getVelocity() - deceleration);
       this.setVelocity(newVelocity);
-      dx = GeometricUtilities.getDeltaX(this.moveAngle);
-      dy = GeometricUtilities.getDeltaY(this.moveAngle);
+      dxTemp = GeometricUtilities.getDeltaX(this.moveAngle);
+      dyTemp = GeometricUtilities.getDeltaY(this.moveAngle);
     }
 
     if (this.getVelocity() == 0) {
@@ -119,7 +119,7 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
     }
 
     // actually move entity
-    this.moveEntity(dx, dy);
+    this.moveEntity(dxTemp, dyTemp);
   }
 
   @Override
@@ -141,7 +141,7 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
 
   @Override
   public void setVelocity(double velocity) {
-    final double maxVelocity = this.getEntity().getTickVelocity();
+    final double maxVelocity = getEntity().getTickVelocity();
     this.velocity = MathUtilities.clamp(velocity, -maxVelocity, maxVelocity);
   }
 
@@ -152,12 +152,12 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
 
   protected void moveEntity(double deltaX, double deltaY) {
     this.moveAngle = Math.toDegrees(Math.atan2(deltaX, deltaY));
-    Game.physics().move(this.getEntity(), this.moveAngle, this.getVelocity());
+    Game.physics().move(getEntity(), this.moveAngle, this.getVelocity());
   }
 
   protected boolean isMovementAllowed() {
     for (final Predicate<IMobileEntity> predicate : this.movementPredicates) {
-      if (!predicate.test(this.getEntity())) {
+      if (!predicate.test(getEntity())) {
         return false;
       }
     }
@@ -173,12 +173,12 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
     this.activeForces.stream().filter(Force::hasEnded).forEach(this.activeForces::remove);
 
     // ensure turn-on-move is disabled for force handling
-    boolean turn = this.getEntity().turnOnMove();
-    this.getEntity().setTurnOnMove(false);
+    boolean turn = getEntity().turnOnMove();
+    getEntity().setTurnOnMove(false);
     try {
       this.moveEntityByActiveForces();
     } finally {
-      this.getEntity().setTurnOnMove(turn);
+      getEntity().setTurnOnMove(turn);
     }
   }
 
@@ -186,10 +186,10 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
     final Point2D combinedForcesVector = this.combineActiveForces();
     final Point2D target =
         new Point2D.Double(
-            this.getEntity().getX() + combinedForcesVector.getX(),
-            this.getEntity().getY() + combinedForcesVector.getY());
+            getEntity().getX() + combinedForcesVector.getX(),
+            getEntity().getY() + combinedForcesVector.getY());
 
-    final boolean success = Game.physics().move(this.getEntity(), target);
+    final boolean success = Game.physics().move(getEntity(), target);
     if (!success) {
       for (final Force force : this.activeForces) {
         if (force.cancelOnCollision()) {
@@ -203,12 +203,12 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
     double deltaX = 0;
     double deltaY = 0;
     for (final Force force : this.activeForces) {
-      if (force.cancelOnReached() && force.hasReached(this.getEntity())) {
+      if (force.cancelOnReached() && force.hasReached(getEntity())) {
         force.end();
         continue;
       }
 
-      final Point2D collisionBoxCenter = this.getEntity().getCollisionBoxCenter();
+      final Point2D collisionBoxCenter = getEntity().getCollisionBoxCenter();
       final double angle =
           GeometricUtilities.calcRotationAngleInDegrees(collisionBoxCenter, force.getLocation());
       final double strength =

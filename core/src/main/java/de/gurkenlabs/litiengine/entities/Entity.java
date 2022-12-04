@@ -334,6 +334,9 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
    */
   @Override
   public void setLocation(final Point2D location) {
+    if (location.equals(getLocation())) {
+      return;
+    }
     this.mapLocation = location;
     this.boundingBox = null; // trigger recreation in next boundingBox getter call
     fireLocationChangedEvent();

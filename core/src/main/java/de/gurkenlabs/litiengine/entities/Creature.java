@@ -58,7 +58,7 @@ public class Creature extends CombatEntity implements IMobileEntity {
    */
   public Creature(String spritesheetName) {
     super();
-    final MovementInfo movementInfo = this.getClass().getAnnotation(MovementInfo.class);
+    final MovementInfo movementInfo = getClass().getAnnotation(MovementInfo.class);
     if (movementInfo != null) {
       this.velocity = new Attribute<>(movementInfo.velocity());
       this.acceleration = movementInfo.acceleration();
@@ -72,7 +72,7 @@ public class Creature extends CombatEntity implements IMobileEntity {
     } else {
       this.setSpritesheetName(
           Game.random()
-              .choose(EntityAnimationController.getDefaultSpritePrefixes(this.getClass())));
+              .choose(EntityAnimationController.getDefaultSpritePrefixes(getClass())));
     }
   }
 
@@ -89,7 +89,7 @@ public class Creature extends CombatEntity implements IMobileEntity {
   @Override
   public float[] getTweenValues(TweenType tweenType) {
     if (tweenType == TweenType.VELOCITY) {
-      return new float[] {this.getVelocity().get()};
+      return new float[] {getVelocity().get()};
     }
     return super.getTweenValues(tweenType);
   }
@@ -97,7 +97,7 @@ public class Creature extends CombatEntity implements IMobileEntity {
   @Override
   public void setTweenValues(TweenType tweenType, float[] newValues) {
     if (tweenType == TweenType.VELOCITY) {
-      this.getVelocity().setBaseValue(newValues[0]);
+      getVelocity().setBaseValue(newValues[0]);
     } else {
       super.setTweenValues(tweenType, newValues);
     }
@@ -114,12 +114,12 @@ public class Creature extends CombatEntity implements IMobileEntity {
   }
 
   public Direction getFacingDirection() {
-    return Direction.fromAngle(this.getAngle());
+    return Direction.fromAngle(getAngle());
   }
 
   @Override
   public IMovementController movement() {
-    return this.getController(IMovementController.class);
+    return getController(IMovementController.class);
   }
 
   /**
@@ -142,7 +142,7 @@ public class Creature extends CombatEntity implements IMobileEntity {
     // ensure that entities don't travel too far in case of lag
     return Math.min(Game.loop().getDeltaTime(), GameLoop.TICK_DELTATIME_LAG)
         * 0.001F
-        * this.getVelocity().get()
+        * getVelocity().get()
         * Game.loop().getTimeScale();
   }
 
@@ -180,18 +180,18 @@ public class Creature extends CombatEntity implements IMobileEntity {
 
   @Override
   public void setLocation(final Point2D location) {
-    if (this.isDead() || location == null) {
+    if (isDead() || location == null) {
       return;
     }
 
-    final Point2D oldLocation = this.getLocation();
+    final Point2D oldLocation = getLocation();
     super.setLocation(location);
 
     if (Game.hasStarted() && this.isLoaded()) {
       this.lastMoved = Game.time().now();
       this.fireMovedEvent(
           new EntityMovedEvent(
-              this, this.getX() - oldLocation.getX(), this.getY() - oldLocation.getY()));
+              this, getX() - oldLocation.getX(), getY() - oldLocation.getY()));
     }
   }
 
@@ -215,7 +215,7 @@ public class Creature extends CombatEntity implements IMobileEntity {
 
   @Override
   public void setVelocity(float velocity) {
-    this.getVelocity().setBaseValue(velocity);
+    getVelocity().setBaseValue(velocity);
   }
 
   @Override
@@ -226,20 +226,20 @@ public class Creature extends CombatEntity implements IMobileEntity {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("#" + this.getMapId() + ": ");
-    if (this.getName() != null && !this.getName().isEmpty()) {
-      sb.append(this.getName());
+    sb.append("#" + getMapId() + ": ");
+    if (getName() != null && !getName().isEmpty()) {
+      sb.append(getName());
     } else {
       sb.append(Creature.class.getSimpleName());
     }
-    sb.append(" (" + this.getSpritesheetName() + ")");
+    sb.append(" (" + getSpritesheetName() + ")");
 
     return sb.toString();
   }
 
   protected void updateAnimationController() {
     IEntityAnimationController<?> controller = this.createAnimationController();
-    this.getControllers().addController(controller);
+    getControllers().addController(controller);
     if (Game.world().environment() != null && Game.world().environment().isLoaded()) {
       Game.loop().attach(controller);
     }

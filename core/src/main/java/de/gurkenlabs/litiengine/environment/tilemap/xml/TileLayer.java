@@ -1,14 +1,17 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
-import de.gurkenlabs.litiengine.environment.tilemap.ITile;
-import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
-import de.gurkenlabs.litiengine.environment.tilemap.ITilesetEntry;
-import jakarta.xml.bind.annotation.XmlElement;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import jakarta.xml.bind.annotation.XmlElement;
+
+import de.gurkenlabs.litiengine.environment.tilemap.ITile;
+import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
+import de.gurkenlabs.litiengine.environment.tilemap.ITilesetEntry;
 
 public class TileLayer extends Layer implements ITileLayer {
 
@@ -17,6 +20,7 @@ public class TileLayer extends Layer implements ITileLayer {
 
   private transient List<ITile> tileList;
 
+  private transient Tile[][] tiles;
 
   /**
    * Instantiates a new {@code TileLayer} instance.
@@ -37,12 +41,21 @@ public class TileLayer extends Layer implements ITileLayer {
 
   @Override
   public ITile getTileByLocation(final Point2D location) {
-    return getTiles().stream().filter(x -> x.getTileCoordinate().equals(location)).findFirst().orElse(null);
+    final Optional<ITile> tile = getTiles().stream().filter(x -> x.getTileCoordinate().equals(location)).findFirst();
+    return tile.orElse(null);
   }
 
   @Override
   public ITile getTile(int x, int y) {
-    return getTiles().stream().filter(t -> t.getTileCoordinate().x == x && t.getTileCoordinate().y == y).findFirst().orElse(null);
+    if (tiles == null || tiles.length == 0) {
+      return null;
+    }
+
+    if (x < 0 || y < 0 || y >= tiles.length || x >= tiles[y].length) {
+      return null;
+    }
+
+    return tiles[y][x];
   }
 
   @Override
@@ -62,6 +75,7 @@ public class TileLayer extends Layer implements ITileLayer {
     }
 
     tile.setGridId(gid);
+
     if (getMap() != null) {
       ITilesetEntry entry = getMap().getTilesetEntry(gid);
       if (entry != null) {
@@ -72,7 +86,7 @@ public class TileLayer extends Layer implements ITileLayer {
 
   @Override
   public List<ITile> getTiles() {
-    return tileList;
+    return this.tileList;
   }
 
   @Override
@@ -104,14 +118,16 @@ public class TileLayer extends Layer implements ITileLayer {
   @Override
   void finish(URL location) throws TmxException {
     super.finish(location);
-    this.tileList = new CopyOnWriteArrayList<>(getData());
+    this.tileList = new CopyOnWriteArrayList<>();
+    this.tiles = new Tile[getHeight()][getWidth()];
     for (int i = 0; i < getData().size(); i++) {
       final int x = i % getWidth();
       final int y = i / getWidth();
-
       final Tile tile = getData().get(i);
       tile.setTileCoordinate(new Point(x, y));
-      tile.setTilesetEntry(getMap().getTilesetEntry(tile.getGridId()));
+      this.tileList.add(tile);
+      this.tiles[y][x] = tile;
+      getData().get(i).setTilesetEntry(getMap().getTilesetEntry(tile.getGridId()));
     }
   }
 }
