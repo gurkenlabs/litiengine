@@ -13,7 +13,11 @@ public final class AWTInterpolation extends Interpolation {
 
   private final int interpolationType;
 
-  AWTInterpolation(final int interpolationType) {
+  /*
+   * Internal constructor, do not use.
+   */
+  @Deprecated
+  public AWTInterpolation(final int interpolationType) {
     super(getName(interpolationType));
     switch (interpolationType) {
       case TYPE_NEAREST_NEIGHBOR:

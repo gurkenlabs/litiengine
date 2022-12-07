@@ -54,10 +54,10 @@ public final class Interpolations {
 
   /**
    * @param interpolation
-   * @return
+   * @return an int representing the interpolation type
    */
   @SuppressWarnings("null")
-  private static final int registerTransformer(Interpolation interpolation) {
+  public static final int registerInterpolation(Interpolation interpolation) {
     if (INTERPOLATIONS.contains(interpolation)) {
       throw new IllegalStateException("Interpolation transformer already registered");
     }
@@ -69,10 +69,14 @@ public final class Interpolations {
     return INTERPOLATIONS.indexOf(interpolation);
   }
 
-  private static final void registerDefaultInterpolations() {
+@SuppressWarnings("deprecation")
+private static final void registerDefaultInterpolations() {
     if (INTERPOLATIONS.size() > 0) {
       throw new AssertionError(new IllegalStateException("Default interpolations already registered!"));
     }
+    registerInterpolation(new AWTInterpolation(TYPE_NEAREST_NEIGHBOR));
+    registerInterpolation(new AWTInterpolation(TYPE_BILINEAR));
+    registerInterpolation(new AWTInterpolation(TYPE_BICUBIC));
   }
 
 }
