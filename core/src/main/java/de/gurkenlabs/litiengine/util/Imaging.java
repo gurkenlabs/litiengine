@@ -2,6 +2,9 @@ package de.gurkenlabs.litiengine.util;
 
 import de.gurkenlabs.litiengine.entities.Rotation;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.graphics.interpolation.AffineTransformOperation;
+import de.gurkenlabs.litiengine.graphics.interpolation.Interpolation;
+import de.gurkenlabs.litiengine.graphics.interpolation.Interpolations;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -15,7 +18,6 @@ import java.awt.Toolkit;
 import java.awt.Transparency;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Dimension2D;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.FilteredImageSource;
@@ -37,10 +39,16 @@ public final class Imaging {
   public static final int CROP_VALIGN_TOP = 1;
   public static final int CROP_VALIGN_TOPCENTER = 2;
 
+  public static final Interpolation DEFAULT_INTERPOLATION = Interpolations.NEAREST_NEIGHBOR;
+
   private static GraphicsConfiguration graphicsConfig;
 
   private Imaging() {
     throw new UnsupportedOperationException();
+  }
+
+  public static BufferedImage addShadow(final BufferedImage image, final int xOffset, final int yOffset) {
+    return addShadow(image, xOffset, yOffset, DEFAULT_INTERPOLATION);
   }
 
   /**
@@ -59,7 +67,7 @@ public final class Imaging {
    * @return the buffered image
    */
   public static BufferedImage addShadow(
-      final BufferedImage image, final int xOffset, final int yOffset) {
+      final BufferedImage image, final int xOffset, final int yOffset, Interpolation interpolation) {
     if (image == null) {
       return image;
     }
@@ -81,7 +89,7 @@ public final class Imaging {
     // Flip the image vertically
     tx.concatenate(AffineTransform.getScaleInstance(1, -0.15));
     tx.concatenate(AffineTransform.getTranslateInstance(0, -shadowImage.getHeight()));
-    final AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+    final AffineTransformOperation op = interpolation.of(tx);
     final BufferedImage rotatedImage = op.filter(shadowImage, null);
 
     final BufferedImage shadow = getCompatibleImage(width, height + rotatedImage.getHeight() * 2);
@@ -325,6 +333,10 @@ public final class Imaging {
     return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
   }
 
+  public static BufferedImage getCompatibleImage(final BufferedImage image) {
+    return getCompatibleImage(image.getWidth(), image.getHeight());
+  }
+
   public static BufferedImage getCompatibleImage(final int width, final int height) {
     if (width == 0 || height == 0) {
       return null;
@@ -465,17 +477,30 @@ public final class Imaging {
   }
 
   public static BufferedImage scale(final BufferedImage image, final int max) {
+    return scale(image, max, DEFAULT_INTERPOLATION);
+  }
+
+  public static BufferedImage scale(final BufferedImage image, final int max, final Interpolation interpolation) {
     Dimension2D newDimension =
         GeometricUtilities.scaleWithRatio(image.getWidth(), image.getHeight(), max);
-    return scale(image, (int) newDimension.getWidth(), (int) newDimension.getHeight());
+    return scale(image, (int) newDimension.getWidth(), (int) newDimension.getHeight(), interpolation);
   }
 
   public static BufferedImage scale(final BufferedImage image, final double factor) {
-    return scale(image, factor, false);
+    return scale(image, factor, DEFAULT_INTERPOLATION);
+  }
+
+  public static BufferedImage scale(final BufferedImage image, final double factor, final Interpolation interpolation) {
+    return scale(image, factor, false, interpolation);
   }
 
   public static BufferedImage scale(
       final BufferedImage image, final double factor, boolean keepRatio) {
+    return scale(image, factor, keepRatio, DEFAULT_INTERPOLATION);
+  }
+
+  public static BufferedImage scale(
+      final BufferedImage image, final double factor, boolean keepRatio, final Interpolation interpolation) {
     if (image == null) {
       return null;
     }
@@ -486,7 +511,7 @@ public final class Imaging {
         image,
         (int) Math.max(1, Math.round(width * factor)),
         (int) Math.max(1, Math.round(height * factor)),
-        keepRatio);
+        keepRatio, DEFAULT_INTERPOLATION);
   }
 
   /**
@@ -502,12 +527,21 @@ public final class Imaging {
    * @return the buffered image
    */
   public static BufferedImage scale(final BufferedImage image, final int width, final int height) {
-    return scale(image, width, height, false);
+    return scale(image, width, height, false, DEFAULT_INTERPOLATION);
+  }
+
+  public static BufferedImage scale(final BufferedImage image, final int width, final int height, final Interpolation interpolation) {
+    return scale(image, width, height, false, interpolation);
   }
 
   public static BufferedImage scale(
       final BufferedImage image, final int width, final int height, final boolean keepRatio) {
-    return scale(image, width, height, keepRatio, true);
+    return scale(image, width, height, keepRatio, true, DEFAULT_INTERPOLATION);
+  }
+
+  public static BufferedImage scale(
+      final BufferedImage image, final int width, final int height, final boolean keepRatio, final Interpolation interpolation) {
+    return scale(image, width, height, keepRatio, true, interpolation);
   }
 
   public static BufferedImage scale(
@@ -515,7 +549,8 @@ public final class Imaging {
       final int width,
       final int height,
       final boolean keepRatio,
-      final boolean fill) {
+      final boolean fill,
+      final Interpolation interpolation) {
     if (width == 0 || height == 0 || image == null) {
       return null;
     }
@@ -538,8 +573,8 @@ public final class Imaging {
     final double scaleX = newWidth / imageWidth;
     final double scaleY = newHeight / imageHeight;
     final AffineTransform scaleTransform = AffineTransform.getScaleInstance(scaleX, scaleY);
-    final AffineTransformOp bilinearScaleOp =
-        new AffineTransformOp(scaleTransform, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+    final AffineTransformOperation bilinearScaleOp =
+        interpolation.of(scaleTransform);
     final BufferedImage scaled =
         bilinearScaleOp.filter(image, getCompatibleImage((int) newWidth, (int) newHeight));
     final BufferedImage newImg = getCompatibleImage((int) newWidth, (int) newHeight);
@@ -641,4 +676,5 @@ public final class Imaging {
     g.dispose();
     return flippedSprite;
   }
+
 }
