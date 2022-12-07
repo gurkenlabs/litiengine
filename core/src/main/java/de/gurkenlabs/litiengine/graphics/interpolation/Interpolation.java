@@ -10,7 +10,7 @@ public abstract class Interpolation {
     this.name = name;
   }
 
-  public abstract AffineTransformOperation of(AffineTransform tx);
+  public abstract AffineTransformOperation<? extends Interpolation> of(AffineTransform tx);
 
   public final String name() {
     return name;
