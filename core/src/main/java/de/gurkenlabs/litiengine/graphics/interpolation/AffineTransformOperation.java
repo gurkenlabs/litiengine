@@ -13,10 +13,6 @@ public abstract class AffineTransformOperation<T extends Interpolation> implemen
     this.interpolation = (T) interpolation;
   }
 
-  public final int getInterpolationType() {
-    return interpolation.getInterpolationType();
-  }
-
   public final T getInterpolation() {
     return interpolation;
   }

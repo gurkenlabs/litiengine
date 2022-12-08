@@ -11,19 +11,14 @@ import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 
 import de.gurkenlabs.litiengine.graphics.interpolation.AffineTransformOperation;
-import de.gurkenlabs.litiengine.graphics.interpolation.Interpolations;
 
 public class AWTTransformOperation extends AffineTransformOperation<AWTInterpolation> {
 
   private final AffineTransformOp parent;
 
-  public AWTTransformOperation(AffineTransform tx, AWTInterpolation interpolation) {
-    super(tx, interpolation);
-    this.parent = new AffineTransformOp(tx, interpolation.getInterpolationType());
-  }
-
-  public AWTTransformOperation(AffineTransform tx, int interpolation) {
-    this(tx, Interpolations.getInterpolation(interpolation, AWTInterpolation.class));
+  AWTTransformOperation(AffineTransform tx, AWTInterpolation interpolation) {
+	super(tx, interpolation);
+    this.parent = new AffineTransformOp(tx, interpolation.getType());
   }
 
   @Override

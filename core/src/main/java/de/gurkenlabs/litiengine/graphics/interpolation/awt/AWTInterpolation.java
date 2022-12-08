@@ -9,43 +9,23 @@ import static java.awt.image.AffineTransformOp.TYPE_NEAREST_NEIGHBOR;
 import static java.awt.image.AffineTransformOp.TYPE_BILINEAR;
 import static java.awt.image.AffineTransformOp.TYPE_BICUBIC;
 
-public final class AWTInterpolation extends Interpolation {
+public enum AWTInterpolation implements Interpolation {
+	NEAREST_NEIGHBOR(TYPE_NEAREST_NEIGHBOR),
+	BILINEAR(TYPE_BILINEAR),
+	BICUBIC(TYPE_BICUBIC);
 
-  private final int interpolationType;
+	private final int type ; 
+	
+	private AWTInterpolation(int type) {
+		this.type = type;
+	}
+	
+	public int getType() {
+		return type;
+	}
 
-  /*
-   * Internal constructor, do not use.
-   */
-  @Deprecated
-  public AWTInterpolation(final int interpolationType) {
-    super(getName(interpolationType));
-    switch (interpolationType) {
-      case TYPE_NEAREST_NEIGHBOR:
-      case TYPE_BILINEAR:
-      case TYPE_BICUBIC:
-        this.interpolationType = interpolationType;
-        break;
-      default:
-        throw new AssertionError("Unknown AWT interpolation type: " + interpolationType);
-    }
-  }
-
-  @Override
-  public AffineTransformOperation<AWTInterpolation> of(AffineTransform tx) {
-    return new AWTTransformOperation(tx, this);
-  }
-
-  private static final String getName(int interpolationType) {
-    switch (interpolationType) {
-      case TYPE_NEAREST_NEIGHBOR:
-        return "NEAREST_NEIGBOR";
-      case TYPE_BILINEAR:
-        return "BILINIAR";
-      case TYPE_BICUBIC:
-        return "BICUBIC";
-      default:
-        throw new AssertionError("Unknown AWT interpolation type: " + interpolationType);
-    }
-  }
-
+	@Override
+	public AffineTransformOperation<? extends Interpolation> of(AffineTransform tx) {
+		return new AWTTransformOperation(tx, this);
+	}
 }

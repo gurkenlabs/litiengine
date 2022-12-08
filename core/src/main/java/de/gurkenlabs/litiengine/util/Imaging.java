@@ -4,7 +4,7 @@ import de.gurkenlabs.litiengine.entities.Rotation;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.interpolation.AffineTransformOperation;
 import de.gurkenlabs.litiengine.graphics.interpolation.Interpolation;
-import de.gurkenlabs.litiengine.graphics.interpolation.Interpolations;
+import de.gurkenlabs.litiengine.graphics.interpolation.awt.AWTInterpolation;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -39,7 +39,7 @@ public final class Imaging {
   public static final int CROP_VALIGN_TOP = 1;
   public static final int CROP_VALIGN_TOPCENTER = 2;
 
-  public static final Interpolation DEFAULT_INTERPOLATION = Interpolations.NEAREST_NEIGHBOR;
+  public static final Interpolation DEFAULT_INTERPOLATION = AWTInterpolation.NEAREST_NEIGHBOR;
 
   private static GraphicsConfiguration graphicsConfig;
 
