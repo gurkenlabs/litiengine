@@ -17,7 +17,7 @@ public class AWTTransformOperation extends AffineTransformOperation<AWTInterpola
   private final AffineTransformOp parent;
 
   AWTTransformOperation(AffineTransform tx, AWTInterpolation interpolation) {
-	super(tx, interpolation);
+    super(tx, interpolation);
     this.parent = new AffineTransformOp(tx, interpolation.getType());
   }
 
