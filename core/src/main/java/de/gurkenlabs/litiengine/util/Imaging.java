@@ -545,14 +545,14 @@ public final class Imaging {
   }
 
   public static BufferedImage scale(
-	      final BufferedImage image,
-	      final int width,
-	      final int height,
-	      final boolean keepRatio,
-	      final boolean fill) {
-	  return scale(image, width, height, keepRatio, fill, DEFAULT_INTERPOLATION);
+      final BufferedImage image,
+      final int width,
+      final int height,
+      final boolean keepRatio,
+      final boolean fill) {
+    return scale(image, width, height, keepRatio, fill, DEFAULT_INTERPOLATION);
   }
-  
+
   public static BufferedImage scale(
       final BufferedImage image,
       final int width,

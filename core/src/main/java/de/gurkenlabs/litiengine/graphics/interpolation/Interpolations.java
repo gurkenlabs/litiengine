@@ -69,8 +69,8 @@ public final class Interpolations {
     return INTERPOLATIONS.indexOf(interpolation);
   }
 
-@SuppressWarnings("deprecation")
-private static final void registerDefaultInterpolations() {
+  @SuppressWarnings("deprecation")
+  private static final void registerDefaultInterpolations() {
     if (INTERPOLATIONS.size() > 0) {
       throw new AssertionError(new IllegalStateException("Default interpolations already registered!"));
     }
