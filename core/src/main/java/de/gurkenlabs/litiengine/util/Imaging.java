@@ -64,6 +64,8 @@ public final class Imaging {
    *          the x offset
    * @param yOffset
    *          the y offset
+   * @param interpolation
+   *          the interpolation to use
    * @return the buffered image
    */
   public static BufferedImage addShadow(
