@@ -16,9 +16,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /**
  * This class is used to hold all collision aware instances and static collision boxes. It is responsible for resolving
@@ -31,8 +33,7 @@ public final class PhysicsEngine implements IUpdateable {
 
   private Rectangle2D environmentBounds;
 
-  private final Map<Collision, List<ICollisionEntity>> collisionEntities =
-      new ConcurrentHashMap<>();
+  private final Map<Collision, List<ICollisionEntity>> collisionEntities = new ConcurrentHashMap<>();
   private final Map<Collision, List<Rectangle2D>> collisionBoxes = new ConcurrentHashMap<>();
 
   /**
@@ -46,13 +47,11 @@ public final class PhysicsEngine implements IUpdateable {
           "Never initialize a PhysicsEngine manually. Use Game.physics() instead.");
     }
 
-    this.collisionEntities.put(Collision.DYNAMIC, new CopyOnWriteArrayList<>());
-    this.collisionEntities.put(Collision.STATIC, new CopyOnWriteArrayList<>());
-    this.collisionEntities.put(Collision.ANY, new CopyOnWriteArrayList<>());
+    collisionEntities.put(Collision.DYNAMIC, new CopyOnWriteArrayList<>());
+    collisionEntities.put(Collision.STATIC, new CopyOnWriteArrayList<>());
 
-    this.collisionBoxes.put(Collision.DYNAMIC, new CopyOnWriteArrayList<>());
-    this.collisionBoxes.put(Collision.STATIC, new CopyOnWriteArrayList<>());
-    this.collisionBoxes.put(Collision.ANY, new CopyOnWriteArrayList<>());
+    collisionBoxes.put(Collision.DYNAMIC, new CopyOnWriteArrayList<>());
+    collisionBoxes.put(Collision.STATIC, new CopyOnWriteArrayList<>());
   }
 
   /**
@@ -72,18 +71,7 @@ public final class PhysicsEngine implements IUpdateable {
     if (entity.getCollisionType() == null) {
       return;
     }
-
-    switch (entity.getCollisionType()) {
-      case DYNAMIC:
-        break;
-      case STATIC:
-        this.collisionEntities.get(entity.getCollisionType()).add(entity);
-        break;
-      default:
-        return;
-    }
-
-    this.collisionEntities.get(Collision.ANY).add(entity);
+    collisionEntities.get(entity.getCollisionType()).add(entity);
   }
 
   /**
@@ -98,17 +86,7 @@ public final class PhysicsEngine implements IUpdateable {
       return;
     }
 
-    switch (entity.getCollisionType()) {
-      case DYNAMIC:
-        break;
-      case STATIC:
-        this.collisionEntities.get(entity.getCollisionType()).remove(entity);
-        break;
-      default:
-        return;
-    }
-
-    this.collisionEntities.get(Collision.ANY).remove(entity);
+    collisionEntities.get(entity.getCollisionType()).remove(entity);
   }
 
   /**
@@ -117,15 +95,13 @@ public final class PhysicsEngine implements IUpdateable {
    */
   public void clear() {
     for (Collision type : Collision.values()) {
-      if (type == Collision.NONE) {
+      if (type == Collision.NONE || type == Collision.ANY) {
         continue;
       }
-
-      this.collisionEntities.get(type).clear();
-      this.collisionBoxes.get(type).clear();
+      collisionEntities.get(type).clear();
+      collisionBoxes.get(type).clear();
     }
-
-    this.setBounds(null);
+    setBounds(null);
   }
 
   /**
@@ -134,7 +110,7 @@ public final class PhysicsEngine implements IUpdateable {
    * @return A {@code Collection} of all {@code CollisionBox}es registered on the {@code PhysicsEngine}.
    */
   public Collection<Rectangle2D> getCollisionBoxes() {
-    return this.getCollisionBoxes(Collision.ANY);
+    return getCollisionBoxes(Collision.ANY);
   }
 
   /**
@@ -146,11 +122,18 @@ public final class PhysicsEngine implements IUpdateable {
    *         {@code CollisionBoxes} registered on the {@code PhysicsEngine} that have the given {@code Collision} type.
    */
   public Collection<Rectangle2D> getCollisionBoxes(Collision type) {
-    if (type == Collision.NONE) {
-      return Collections.emptySet();
+    switch (type) {
+      case NONE -> {
+        return Collections.emptySet();
+      }
+      case DYNAMIC, STATIC -> {
+        return Collections.unmodifiableCollection(collisionBoxes.get(type));
+      }
+      case ANY -> {
+        return Stream.concat(collisionBoxes.get(Collision.DYNAMIC).stream(), collisionBoxes.get(Collision.STATIC).stream()).toList();
+      }
+      default -> throw new IllegalStateException("Unexpected collision value: " + type);
     }
-
-    return Collections.unmodifiableCollection(this.collisionBoxes.get(type));
   }
 
   /**
@@ -159,7 +142,7 @@ public final class PhysicsEngine implements IUpdateable {
    * @return A {@code Collection} of all {@code ICollisionEntities} registered on the {@code PhysicsEngine}.
    */
   public Collection<ICollisionEntity> getCollisionEntities() {
-    return this.getCollisionEntities(Collision.ANY);
+    return getCollisionEntities(Collision.ANY);
   }
 
   /**
@@ -172,11 +155,18 @@ public final class PhysicsEngine implements IUpdateable {
    *         type.
    */
   public Collection<ICollisionEntity> getCollisionEntities(Collision type) {
-    if (type == Collision.NONE) {
-      return Collections.emptySet();
+    switch (type) {
+      case NONE -> {
+        return Collections.emptySet();
+      }
+      case DYNAMIC, STATIC -> {
+        return Collections.unmodifiableCollection(collisionEntities.get(type));
+      }
+      case ANY -> {
+        return Stream.concat(collisionEntities.get(Collision.DYNAMIC).stream(), collisionEntities.get(Collision.STATIC).stream()).toList();
+      }
+      default -> throw new IllegalStateException("Unexpected collision value: " + type);
     }
-
-    return Collections.unmodifiableCollection(this.collisionEntities.get(type));
   }
 
   /**
@@ -568,8 +558,8 @@ public final class PhysicsEngine implements IUpdateable {
   public RaycastHit raycast(Line2D line, Collision collision, ICollisionEntity entity) {
     final Point2D rayCastSource = new Point2D.Double(line.getX1(), line.getY1());
 
-    for (final ICollisionEntity collisionEntity : this.collisionEntities.get(collision)) {
-      if (!canCollide(entity, collisionEntity)) {
+    for (final ICollisionEntity collisionEntity : getCollisionEntities(collision)) {
+      if (!canCollide(entity, collisionEntity) || collisionEntity == entity) {
         continue;
       }
 
@@ -731,16 +721,11 @@ public final class PhysicsEngine implements IUpdateable {
   public void update() {
     // retrieve all collision box rectangles once per update
     for (Collision type : Collision.values()) {
-      if (type == Collision.NONE) {
+      if (type == Collision.NONE || type == Collision.ANY) {
         continue;
       }
-
-      this.collisionBoxes.get(type).clear();
-      this.collisionBoxes
-          .get(type)
-          .addAll(
-              this.collisionEntities.get(type).stream()
-                  .map(ICollisionEntity::getCollisionBox).toList());
+      collisionBoxes.get(type).clear();
+      collisionBoxes.get(type).addAll(collisionEntities.get(type).stream().map(ICollisionEntity::getCollisionBox).toList());
     }
   }
 
@@ -784,7 +769,7 @@ public final class PhysicsEngine implements IUpdateable {
    */
   private Intersection getIntersection(final ICollisionEntity entity, final Rectangle2D rect) {
     Intersection result = null;
-    for (final ICollisionEntity otherEntity : this.getCollisionEntities()) {
+    for (final ICollisionEntity otherEntity : getCollisionEntities()) {
       if (!canCollide(entity, otherEntity)) {
         continue;
       }
@@ -805,10 +790,9 @@ public final class PhysicsEngine implements IUpdateable {
     return result;
   }
 
-  private boolean collides(
-      final ICollisionEntity entity, Collision type, Predicate<ICollisionEntity> check) {
-    for (final ICollisionEntity otherEntity : this.getCollisionEntities(type)) {
-      if (!canCollide(entity, otherEntity)) {
+  private boolean collides(final ICollisionEntity entity, Collision type, Predicate<ICollisionEntity> check) {
+    for (final ICollisionEntity otherEntity : getCollisionEntities(type)) {
+      if (!canCollide(entity, otherEntity) || entity == otherEntity) {
         continue;
       }
 
@@ -828,11 +812,11 @@ public final class PhysicsEngine implements IUpdateable {
    * @return true, if is in map
    */
   private boolean isInMap(final Shape collisionBox) {
-    if (this.environmentBounds == null) {
+    if (environmentBounds == null) {
       return true;
     }
 
-    return this.environmentBounds.contains(collisionBox.getBounds());
+    return environmentBounds.contains(collisionBox.getBounds());
   }
 
   /**
@@ -957,7 +941,7 @@ public final class PhysicsEngine implements IUpdateable {
 
     // 2. fire collision event on the involved entities with the collider entity
     CollisionEvent colliderEvent = new CollisionEvent(collider);
-    for (ICollisionEntity involved : involvedEntities) {
+    for (ICollisionEntity involved : Objects.requireNonNull(involvedEntities)) {
       involved.fireCollisionEvent(colliderEvent);
     }
   }
@@ -966,7 +950,7 @@ public final class PhysicsEngine implements IUpdateable {
    * A helper class that contains the intersection of a collision event and the involved entities. This is basically just
    * a {@link Rectangle2D} with some additional information.
    */
-  private class Intersection extends Rectangle2D.Double {
+  private static class Intersection extends Rectangle2D.Double {
 
     private final transient ICollisionEntity[] involvedEntities;
 

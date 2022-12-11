@@ -19,14 +19,13 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 public class AssetPanel extends JPanel {
-  private final WrapLayout layout;
 
   public AssetPanel() {
-    this.layout = new WrapLayout();
-    this.layout.setVgap(5);
-    this.layout.setHgap(5);
-    this.layout.setAlignment(LEFT);
-    this.setLayout(this.layout);
+    WrapLayout layout = new WrapLayout();
+    layout.setVgap(5);
+    layout.setHgap(5);
+    layout.setAlignment(LEFT);
+    this.setLayout(layout);
 
     this.setBorder(new EmptyBorder(5, 5, 5, 5));
   }
@@ -34,8 +33,7 @@ public class AssetPanel extends JPanel {
   public void loadSprites(List<SpritesheetResource> infos) {
     this.load(
         () -> {
-          Collections.sort(infos);
-          for (SpritesheetResource info : infos) {
+          for (SpritesheetResource info : infos.stream().sorted().toList()) {
             Icon icon;
             Spritesheet opt = Resources.spritesheets().get(info.getName());
 
