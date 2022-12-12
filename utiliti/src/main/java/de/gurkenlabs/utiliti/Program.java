@@ -11,53 +11,65 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
-import javax.swing.SwingUtilities;
 
 public class Program {
 
   public static void main(String[] args) {
-    SwingUtilities.invokeLater(
-        () -> {
-          try {
-            // setup basic settings
-            Game.info().setName("utiLITI");
-            Game.info().setSubTitle("LITIENGINE Creation Kit");
-            Game.info().setVersion("v0.5.2-beta");
-            Resources.strings().setEncoding(StandardCharsets.UTF_8);
+    try {
+      // setup basic settings
 
-            // hook up configuration and initialize the game
-            Game.config().add(Editor.preferences());
 
-            Game.config().load();
+        Game.init(
+        	      () -> { //preInitialization
+        	      	
+        	          Game.info().setName("utiLITI");
+        	          Game.info().setSubTitle("LITIENGINE Creation Kit");
+        	          Game.info().setVersion("v0.5.2-beta");
+        	          Resources.strings().setEncoding(StandardCharsets.UTF_8);
 
-            UI.initLookAndFeel();
-            Game.init(args);
-            forceBasicEditorConfiguration();
-            Game.world()
-                .camera()
-                .onZoom(event -> Editor.preferences().setZoom((float) event.getZoom()));
+        	          // hook up configuration and initialize the game
+        	          Game.config().add(Editor.preferences());
 
-            // prepare UI and start the game
-            UI.init();
-            Game.start();
-            Input.keyboard().addKeyListener(new DebugCrasher());
-          } catch (Throwable e) {
-            throw new UtiLITIInitializationError(
-                "UtiLITI failed to initialize, see the stacktrace below for more information", e);
-          }
+        	          Game.config().load();
+        	          
+        	          UI.initLookAndFeel();
+        	          
+        	          // prepare UI and start the game
 
-          // configure input settings
-          Input.mouse().setGrabMouse(false);
-          Input.keyboard().consumeAlt(true);
+        	      },
+        	      () -> { //postInitialization
+        	          UI.init();
+        	          forceBasicEditorConfiguration();
+        	          Game.world()
+        	          .camera()
+        	          .onZoom(event -> Editor.preferences().setZoom((float) event.getZoom()));
 
-          // load up previously opened project file or the one that is specified in
-          // the command line arguments
-          handleArgs(args);
-          String gameFile = Editor.preferences().getLastGameFile();
-          if (!Editor.instance().fileLoaded() && gameFile != null && !gameFile.isEmpty()) {
-            Editor.instance().load(new File(gameFile.trim()), false);
-          }
-        });
+
+        	          
+        	          Game.start();
+
+        	          Input.keyboard().addKeyListener(new DebugCrasher());
+        	      },
+        	      args
+        	    );
+
+
+    } catch (Throwable e) {
+      throw new UtiLITIInitializationError(
+          "UtiLITI failed to initialize, see the stacktrace below for more information", e);
+    }
+    
+    // configure input settings
+    Input.mouse().setGrabMouse(false);
+    Input.keyboard().consumeAlt(true);
+
+    // load up previously opened project file or the one that is specified in
+    // the command line arguments
+    handleArgs(args);
+    String gameFile = Editor.preferences().getLastGameFile();
+    if (!Editor.instance().fileLoaded() && gameFile != null && !gameFile.isEmpty()) {
+      Editor.instance().load(new File(gameFile.trim()), false);
+    }
   }
 
   private static void forceBasicEditorConfiguration() {
