@@ -22,7 +22,7 @@ import javax.sound.sampled.SourceDataLine;
  *
  * @see #play(Sound)
  */
-public abstract class SoundPlayback implements Runnable {
+public abstract class SoundPlayback implements Runnable, AutoCloseable {
   protected final SourceDataLine line;
   private FloatControl gainControl;
   private BooleanControl muteControl;
@@ -39,12 +39,18 @@ public abstract class SoundPlayback implements Runnable {
 
   SoundPlayback(AudioFormat format) throws LineUnavailableException {
     // acquire resources in the constructor so that they can be used before the task is started
-    this.line = AudioSystem.getSourceDataLine(format);
-    this.line.open();
-    this.line.start();
-    this.gainControl = (FloatControl) this.line.getControl(FloatControl.Type.MASTER_GAIN);
-    this.muteControl = (BooleanControl) this.line.getControl(BooleanControl.Type.MUTE);
-    this.masterVolume = this.createVolumeControl();
+    try {
+        this.line = AudioSystem.getSourceDataLine(format);
+	    this.line.open();
+	    this.line.start();
+	    this.gainControl = (FloatControl) this.line.getControl(FloatControl.Type.MASTER_GAIN);
+	    this.muteControl = (BooleanControl) this.line.getControl(BooleanControl.Type.MUTE);
+	    this.masterVolume = this.createVolumeControl();
+    }
+    catch(Throwable t) {
+    	close();
+    	throw t;
+    }
   }
 
   /**
@@ -166,7 +172,7 @@ public abstract class SoundPlayback implements Runnable {
       this.line.stop();
       this.cancelled = true;
       this.line.flush();
-      this.line.close();
+      close();
       SoundEvent event = new SoundEvent(this, null);
       for (SoundPlaybackListener listener : this.listeners) {
         listener.cancelled(event);
@@ -247,7 +253,7 @@ public abstract class SoundPlayback implements Runnable {
   void finish() {
     this.line.drain();
     synchronized (this) {
-      this.line.close();
+      close();
       if (!this.cancelled) {
         SoundEvent event = new SoundEvent(this, null);
         for (SoundPlaybackListener listener : this.listeners) {
@@ -273,12 +279,21 @@ public abstract class SoundPlayback implements Runnable {
     }
   }
 
-  @Override
+  /**
+   * Use {@link #cancel()}
+   */
   @Deprecated
-  protected void finalize() {
-    // resources will not be released if the start method is never called
+  public void close() {
     if (this.line != null && this.line.isOpen()) {
-      this.line.close();
+      try {
+    	  this.line.close();
+      }
+      catch(Throwable t) {
+    	  t.printStackTrace(); //not much else we can do
+      }
+    }
+    for(VolumeControl vc : volumeControls) {
+    	vc.close();
     }
   }
 
@@ -288,7 +303,7 @@ public abstract class SoundPlayback implements Runnable {
    *
    * @see SoundPlayback#createVolumeControl()
    */
-  public class VolumeControl implements Tweenable {
+  public class VolumeControl implements Tweenable, AutoCloseable {
     private volatile float value = 1f;
 
     private VolumeControl() {}
@@ -318,7 +333,7 @@ public abstract class SoundPlayback implements Runnable {
 
     @Override
     @Deprecated
-    protected void finalize() {
+    public void close() {
       // clean up the instance without affecting the volume
       SoundPlayback.this.miscVolume.accumulateAndGet(
           Float.floatToRawIntBits(this.value),
