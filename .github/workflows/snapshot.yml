@@ -24,11 +24,11 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 10
-      - name: Set up JDK 17
+      - name: Set up JDK 19
         uses: actions/setup-java@v3
         with:
           distribution: temurin
-          java-version: 17
+          java-version: 19
       - name: Publish
         uses: gradle/gradle-build-action@v2
         env:
