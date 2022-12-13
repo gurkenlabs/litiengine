@@ -435,14 +435,19 @@ public final class Game {
 
   /**
    * 
-   * @param preInitialization a runnable used to prepare the game for initialization. This runnable will be started in the Swing Event Dispatch Thread.
-   * @param postInitialization a runnable used to setup the game directly after initialization. This runnable will be started in the Swing Event Dispatch Thread.
-   * @param args The arguments passed to the program's entry point.
+   * @param preInitialization
+   *          a runnable used to prepare the game for initialization. This runnable will be started in the Swing Event
+   *          Dispatch Thread.
+   * @param postInitialization
+   *          a runnable used to setup the game directly after initialization. This runnable will be started in the Swing
+   *          Event Dispatch Thread.
+   * @param args
+   *          The arguments passed to the program's entry point.
    */
   public static void init(Runnable preInitialization, Runnable postInitialization, String... args) {
     try {
-      if(SwingUtilities.isEventDispatchThread()) {
-    	  throw new AWTError("Cannot call init(Runnable, Runnable, String...) from the event dispatcher thread!");
+      if (SwingUtilities.isEventDispatchThread()) {
+        throw new AWTError("Cannot call init(Runnable, Runnable, String...) from the event dispatcher thread!");
       }
       log().log(Level.INFO, "PreInitialization started");
       SwingUtilities.invokeAndWait(preInitialization);
@@ -476,89 +481,89 @@ public final class Game {
    *          The arguments passed to the programs entry point.
    */
   public static void init(String... args) {
-      init(true, args);
+    init(true, args);
   }
-  
-  private static Runnable initImpl(String...args) {
-	  return () -> {
-		  log().log(Level.INFO, "Initialization started");
-		  if(!SwingUtilities.isEventDispatchThread()) {
-			  throw new AWTError("Game must be initialized inside the Swing Dispatch Thread!");
-		  }
-		  if (initialized) {
-	          log().log(Level.INFO, "The game has already been initialized.");
-	          return;
-	        }
 
-	        log.init();
-	        handleCommandLineArguments(args);
+  private static Runnable initImpl(String... args) {
+    return () -> {
+      log().log(Level.INFO, "Initialization started");
+      if (!SwingUtilities.isEventDispatchThread()) {
+        throw new AWTError("Game must be initialized inside the Swing Dispatch Thread!");
+      }
+      if (initialized) {
+        log().log(Level.INFO, "The game has already been initialized.");
+        return;
+      }
 
-	        config().load();
-	        Locale.setDefault(new Locale(config().client().getCountry(), config().client().getLanguage()));
+      log.init();
+      handleCommandLineArguments(args);
 
-	        gameLoop = new GameLoop("Main Update Loop", config().client().getMaxFps());
-	        loop().attach(physics());
-	        loop().attach(world());
+      config().load();
+      Locale.setDefault(new Locale(config().client().getCountry(), config().client().getLanguage()));
 
-	        // setup default exception handling for render and update loop
-	        setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(config().client().exitOnError()));
+      gameLoop = new GameLoop("Main Update Loop", config().client().getMaxFps());
+      loop().attach(physics());
+      loop().attach(world());
 
-	        screenManager = new ScreenManager();
-	        gameWindow = new GameWindow();
+      // setup default exception handling for render and update loop
+      setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(config().client().exitOnError()));
 
-	        // initialize the game window
-	        window().init();
-	        world.setCamera(new Camera());
+      screenManager = new ScreenManager();
+      gameWindow = new GameWindow();
 
-	        for (GameListener listener : gameListeners) {
-	          listener.initialized(args);
-	        }
+      // initialize the game window
+      window().init();
+      world.setCamera(new Camera());
 
-	        if (!isInNoGUIMode()) {
-	          window().getRenderComponent().onRendered(g -> metrics().render(g));
+      for (GameListener listener : gameListeners) {
+        listener.initialized(args);
+      }
 
-	          graphics().addEntityRenderedListener(e -> DebugRenderer.renderEntityDebugInfo(e.getGraphics(), e.getEntity()));
+      if (!isInNoGUIMode()) {
+        window().getRenderComponent().onRendered(g -> metrics().render(g));
 
-	          window().getRenderComponent().onFpsChanged(fps -> metrics().setFramesPerSecond(fps));
-	          window().setIcons(Arrays.asList(Resources.images().get("liti-logo-x16.png"), Resources.images().get("liti-logo-x20.png"),
-	              Resources.images().get("liti-logo-x32.png"), Resources.images().get("liti-logo-x48.png")));
+        graphics().addEntityRenderedListener(e -> DebugRenderer.renderEntityDebugInfo(e.getGraphics(), e.getEntity()));
 
-	          Input.keyboard().onKeyTyped(KeyEvent.VK_PRINTSCREEN, key -> {
-	            // don't take a screenshot if a modifier is active
-	            if (key.getModifiers() != 0) {
-	              return;
-	            }
+        window().getRenderComponent().onFpsChanged(fps -> metrics().setFramesPerSecond(fps));
+        window().setIcons(Arrays.asList(Resources.images().get("liti-logo-x16.png"), Resources.images().get("liti-logo-x20.png"),
+            Resources.images().get("liti-logo-x32.png"), Resources.images().get("liti-logo-x48.png")));
 
-	            window().getRenderComponent().takeScreenshot();
-	          });
-	        }
+        Input.keyboard().onKeyTyped(KeyEvent.VK_PRINTSCREEN, key -> {
+          // don't take a screenshot if a modifier is active
+          if (key.getModifiers() != 0) {
+            return;
+          }
 
-	        Runtime.getRuntime().addShutdownHook(new Thread(Game::terminate, "Shutdown"));
+          window().getRenderComponent().takeScreenshot();
+        });
+      }
 
-	        initialized = true;
-	        log().log(Level.INFO, "Initialization complete");
-	      };
+      Runtime.getRuntime().addShutdownHook(new Thread(Game::terminate, "Shutdown"));
+
+      initialized = true;
+      log().log(Level.INFO, "Initialization complete");
+    };
   }
-  
+
   /**
    * Initializes the infrastructure of the LITIENGINE game.
    * 
    * @see #init(String...)
-   * @param initInSwingThread used to determine if the game should be launched in the swing worker thread. This should be true in most
-   * circumstances, unless you're already in the swing worker thread, in which case you MUST supply false.
+   * @param initInSwingThread
+   *          used to determine if the game should be launched in the swing worker thread. This should be true in most
+   *          circumstances, unless you're already in the swing worker thread, in which case you MUST supply false.
    * @param args
    */
   public static void init(boolean initInSwingThread, String... args) {
-	  if(initInSwingThread) {
-		  try {
-			SwingUtilities.invokeAndWait(initImpl());
-		} catch (InvocationTargetException | InterruptedException e) {
-			throw new Error(e);
-		}
-	  }
-	  else {
-		  initImpl(args).run();
-	  }
+    if (initInSwingThread) {
+      try {
+        SwingUtilities.invokeAndWait(initImpl());
+      } catch (InvocationTargetException | InterruptedException e) {
+        throw new Error(e);
+      }
+    } else {
+      initImpl(args).run();
+    }
   }
 
   /**
@@ -591,34 +596,33 @@ public final class Game {
    */
   public static void start() {
     Runnable r = () -> {
-		if(!SwingUtilities.isEventDispatchThread()) {
-		  throw new AssertionError("Game wasn't started inside the Swing Dispatch Thread?! This should be impossible!");
-		}
-        if (!initialized) {
-          throw new IllegalStateException("The game cannot be started without being first initialized. Call Game.init(...) before Game.start().");
-        }
-
-        gameLoop.start();
-        tweenEngine.start();
-        soundEngine.start();
-
-        for (final GameListener listener : gameListeners) {
-          listener.started();
-        }
-
-        hasStarted = true;
-      };
-      
-      if(SwingUtilities.isEventDispatchThread()) {
-    	  r.run();
+      if (!SwingUtilities.isEventDispatchThread()) {
+        throw new AssertionError("Game wasn't started inside the Swing Dispatch Thread?! This should be impossible!");
       }
-      else {
-    	  try {
-			SwingUtilities.invokeAndWait(r);
-		} catch (InvocationTargetException | InterruptedException e) {
-			throw new Error(e);
-		}
+      if (!initialized) {
+        throw new IllegalStateException("The game cannot be started without being first initialized. Call Game.init(...) before Game.start().");
       }
+
+      gameLoop.start();
+      tweenEngine.start();
+      soundEngine.start();
+
+      for (final GameListener listener : gameListeners) {
+        listener.started();
+      }
+
+      hasStarted = true;
+    };
+
+    if (SwingUtilities.isEventDispatchThread()) {
+      r.run();
+    } else {
+      try {
+        SwingUtilities.invokeAndWait(r);
+      } catch (InvocationTargetException | InterruptedException e) {
+        throw new Error(e);
+      }
+    }
   }
 
   public static void exit() {

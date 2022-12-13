@@ -19,46 +19,44 @@ public class Program {
       // setup basic settings
 
 
-        Game.init(
-        	      () -> { //preInitialization
-        	      	
-        	          Game.info().setName("utiLITI");
-        	          Game.info().setSubTitle("LITIENGINE Creation Kit");
-        	          Game.info().setVersion("v0.5.2-beta");
-        	          Resources.strings().setEncoding(StandardCharsets.UTF_8);
+      Game.init(
+          () -> { // preInitialization
 
-        	          // hook up configuration and initialize the game
-        	          Game.config().add(Editor.preferences());
+            Game.info().setName("utiLITI");
+            Game.info().setSubTitle("LITIENGINE Creation Kit");
+            Game.info().setVersion("v0.5.2-beta");
+            Resources.strings().setEncoding(StandardCharsets.UTF_8);
 
-        	          Game.config().load();
-        	          
-        	          UI.initLookAndFeel();
-        	          
-        	          // prepare UI and start the game
+            // hook up configuration and initialize the game
+            Game.config().add(Editor.preferences());
 
-        	      },
-        	      () -> { //postInitialization
-        	          UI.init();
-        	          forceBasicEditorConfiguration();
-        	          Game.world()
-        	          .camera()
-        	          .onZoom(event -> Editor.preferences().setZoom((float) event.getZoom()));
+            Game.config().load();
+
+            UI.initLookAndFeel();
+
+            // prepare UI and start the game
+
+          },
+          () -> { // postInitialization
+            UI.init();
+            forceBasicEditorConfiguration();
+            Game.world()
+                .camera()
+                .onZoom(event -> Editor.preferences().setZoom((float) event.getZoom()));
 
 
-        	          
-        	          Game.start();
+            Game.start();
 
-        	          Input.keyboard().addKeyListener(new DebugCrasher());
-        	      },
-        	      args
-        	    );
+            Input.keyboard().addKeyListener(new DebugCrasher());
+          },
+          args);
 
 
     } catch (Throwable e) {
       throw new UtiLITIInitializationError(
           "UtiLITI failed to initialize, see the stacktrace below for more information", e);
     }
-    
+
     // configure input settings
     Input.mouse().setGrabMouse(false);
     Input.keyboard().consumeAlt(true);
