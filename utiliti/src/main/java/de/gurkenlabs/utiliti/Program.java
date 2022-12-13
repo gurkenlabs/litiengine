@@ -16,28 +16,26 @@ public class Program {
 
   public static void main(String[] args) {
     try {
-      // setup basic settings
-
-
       Game.init(
           () -> { // preInitialization
 
+            // setup basic settings
             Game.info().setName("utiLITI");
             Game.info().setSubTitle("LITIENGINE Creation Kit");
             Game.info().setVersion("v0.5.2-beta");
             Resources.strings().setEncoding(StandardCharsets.UTF_8);
 
-            // hook up configuration and initialize the game
+            // hook up configuration
             Game.config().add(Editor.preferences());
 
             Game.config().load();
 
             UI.initLookAndFeel();
 
-            // prepare UI and start the game
-
           },
           () -> { // postInitialization
+
+            // prepare UI and start the game
             UI.init();
             forceBasicEditorConfiguration();
             Game.world()
