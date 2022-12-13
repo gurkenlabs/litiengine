@@ -444,7 +444,7 @@ public final class Game {
    * @param args
    *          The arguments passed to the program's entry point.
    * @throws AWTError
-   *          if this method is called on the Swing Event Dispatcher thread
+   *           if this method is called on the Swing Event Dispatcher thread
    */
   public static void init(Runnable preInitialization, Runnable postInitialization, String... args) {
     try {
