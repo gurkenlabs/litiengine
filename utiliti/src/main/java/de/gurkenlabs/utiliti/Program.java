@@ -46,25 +46,23 @@ public class Program {
             Game.start();
 
             Input.keyboard().addKeyListener(new DebugCrasher());
+
+            // configure input settings
+            Input.mouse().setGrabMouse(false);
+            Input.keyboard().consumeAlt(true);
+
+            // load up previously opened project file or the one that is specified in
+            // the command line arguments
+            handleArgs(args);
+            String gameFile = Editor.preferences().getLastGameFile();
+            if (!Editor.instance().fileLoaded() && gameFile != null && !gameFile.isEmpty()) {
+              Editor.instance().load(new File(gameFile.trim()), false);
+            }
           },
           args);
-
-
     } catch (Throwable e) {
       throw new UtiLITIInitializationError(
           "UtiLITI failed to initialize, see the stacktrace below for more information", e);
-    }
-
-    // configure input settings
-    Input.mouse().setGrabMouse(false);
-    Input.keyboard().consumeAlt(true);
-
-    // load up previously opened project file or the one that is specified in
-    // the command line arguments
-    handleArgs(args);
-    String gameFile = Editor.preferences().getLastGameFile();
-    if (!Editor.instance().fileLoaded() && gameFile != null && !gameFile.isEmpty()) {
-      Editor.instance().load(new File(gameFile.trim()), false);
     }
   }
 
