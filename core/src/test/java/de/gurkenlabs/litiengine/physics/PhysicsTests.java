@@ -15,7 +15,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class PhysicsTests {
+class PhysicsTests {
   @BeforeEach
   public void init() {
     Game.init(Game.COMMANDLINE_ARG_NOGUI);
@@ -28,7 +28,7 @@ public class PhysicsTests {
   }
 
   @Test
-  public void testBasicCollisionDetection() {
+  void testBasicCollisionDetection() {
     Creature ent = new Creature();
     ent.setSize(16, 16);
     ent.setCollision(true);
@@ -58,7 +58,7 @@ public class PhysicsTests {
   }
 
   @Test
-  public void testPointCollides() {
+  void testPointCollides() {
     IMobileEntity ent = mock(IMobileEntity.class);
     when(ent.getCollisionBox()).thenReturn(new Rectangle2D.Double(0, 0, 10, 10));
     when(ent.hasCollision()).thenReturn(true);
@@ -80,7 +80,7 @@ public class PhysicsTests {
   }
 
   @Test
-  public void testRaycastCollides() {
+  void testRaycastCollides() {
     IMobileEntity ent = mock(IMobileEntity.class);
     when(ent.getCollisionBox()).thenReturn(new Rectangle2D.Double(0, 0, 10, 10));
     when(ent.hasCollision()).thenReturn(true);
@@ -96,7 +96,7 @@ public class PhysicsTests {
   }
 
   @Test
-  public void testRectangleCollides() {
+  void testRectangleCollides() {
     IMobileEntity ent = mock(IMobileEntity.class);
     when(ent.getCollisionBox()).thenReturn(new Rectangle2D.Double(0, 0, 10, 10));
     when(ent.hasCollision()).thenReturn(true);

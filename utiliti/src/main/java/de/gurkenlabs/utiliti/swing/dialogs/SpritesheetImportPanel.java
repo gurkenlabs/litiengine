@@ -24,6 +24,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListCellRenderer;
@@ -43,24 +44,23 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
 
-@SuppressWarnings("serial")
 public class SpritesheetImportPanel extends JPanel implements IUpdateable {
   private static final int PREVIEW_SIZE = 128;
   private static final int SPINNER_WIDTH = 100;
 
   private JTextField textField;
-  private JTable tableKeyFrames;
-  private JLabel labelAnimationPreview;
-  private JList<SpriteFileWrapper> fileList;
-  private DefaultListModel<SpriteFileWrapper> fileListModel;
-  private DefaultTableModel treeModel;
+  private final JTable tableKeyFrames;
+  private final JLabel labelAnimationPreview;
+  private final JList<SpriteFileWrapper> fileList;
+  private final DefaultListModel<SpriteFileWrapper> fileListModel;
+  private final DefaultTableModel treeModel;
   private JLabel labelImage;
   private JLabel labelWidth;
   private JLabel labelHeight;
   private JSpinner spinnerWidth;
   private JSpinner spinnerHeight;
   private boolean isUpdating;
-  private transient AnimationController controller;
+  private final transient AnimationController controller;
 
   private static final Logger log = Logger.getLogger(SpritesheetImportPanel.class.getName());
 
@@ -128,6 +128,7 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
                     new SpinnerNumberModel(file.getSpriteHeight(), 1, file.getHeight(), 1));
 
                 this.updateKeyframeTable(file);
+                textField = new JTextField();
                 textField.setText(file.getName());
 
                 this.updatePreview(file);
@@ -413,7 +414,7 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
     scrollPane1.setViewportView(tableKeyFrames);
     treeModel =
         new DefaultTableModel(new Object[][] {}, new String[] {"sprite", "duration"}) {
-          Class<?>[] columnTypes = new Class<?>[] {Integer.class, Integer.class};
+          final Class<?>[] columnTypes = new Class<?>[] {Integer.class, Integer.class};
 
           @Override
           public Class<?> getColumnClass(int columnIndex) {
@@ -504,7 +505,7 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
       double factor =
           (double) PREVIEW_SIZE / Math.max(file.getSpriteWidth(), file.getSpriteHeight());
 
-      BufferedImage img = Imaging.scale(file.getImage(), factor, true);
+      BufferedImage img = Imaging.scale(file.getImage(), factor);
 
       Spritesheet sprite =
           new Spritesheet(
@@ -526,7 +527,7 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
     }
   }
 
-  private class SpriteFileWrapper {
+  private static class SpriteFileWrapper {
     private static final int MAX_WIDTH_ICON = 280;
     private static final int MAX_HEIGHT_ICON = 128;
     private final BufferedImage image;
@@ -633,16 +634,15 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
     }
 
     private void updateGridImage() {
-      BufferedImage scaled =
-          Imaging.scale(this.image, MAX_WIDTH_ICON, MAX_HEIGHT_ICON, true, false);
-      BufferedImage img = Imaging.getCompatibleImage(scaled.getWidth() + 1, scaled.getHeight() + 1);
+      BufferedImage scaled = Imaging.scale(this.image, MAX_WIDTH_ICON, MAX_HEIGHT_ICON, true);
+      BufferedImage img = Imaging.getCompatibleImage(Objects.requireNonNull(scaled).getWidth() + 1, scaled.getHeight() + 1);
       int cols = this.getWidth() / this.getSpriteWidth();
       int rows = this.getHeight() / this.getSpriteHeight();
 
       int scaledWidth = scaled.getWidth() / cols;
       int scaledHeight = scaled.getHeight() / rows;
 
-      Graphics2D g = (Graphics2D) img.getGraphics();
+      Graphics2D g = (Graphics2D) Objects.requireNonNull(img).getGraphics();
       g.drawImage(scaled, 0, 0, null);
       g.setColor(Style.COLOR_COLLISION_BORDER);
       for (int i = 1; i < cols; i++) {

@@ -253,7 +253,7 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
     if (type == Collision.ANY) {
       log.log(
           Level.WARNING,
-          "CollistionType.ALL is not allowed to be assigned to an entity. It may only be used for filtering in the PhysicsEngine.");
+          "Collision.ANY is not allowed to be assigned to an entity. It may only be used for filtering in the PhysicsEngine.");
       return;
     }
 
