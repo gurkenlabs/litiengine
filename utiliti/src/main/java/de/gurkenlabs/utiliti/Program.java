@@ -11,53 +11,59 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
-import javax.swing.SwingUtilities;
 
 public class Program {
 
   public static void main(String[] args) {
-    SwingUtilities.invokeLater(
-        () -> {
-          try {
+    try {
+      Game.init(
+          () -> { // preInitialization
+
             // setup basic settings
             Game.info().setName("utiLITI");
             Game.info().setSubTitle("LITIENGINE Creation Kit");
             Game.info().setVersion("v0.5.2-beta");
             Resources.strings().setEncoding(StandardCharsets.UTF_8);
 
-            // hook up configuration and initialize the game
+            // hook up configuration
             Game.config().add(Editor.preferences());
 
             Game.config().load();
 
             UI.initLookAndFeel();
-            Game.init(args);
+
+          },
+          () -> { // postInitialization
+
+            // prepare UI and start the game
+            UI.init();
             forceBasicEditorConfiguration();
             Game.world()
                 .camera()
                 .onZoom(event -> Editor.preferences().setZoom((float) event.getZoom()));
 
-            // prepare UI and start the game
-            UI.init();
+
             Game.start();
+
             Input.keyboard().addKeyListener(new DebugCrasher());
-          } catch (Throwable e) {
-            throw new UtiLITIInitializationError(
-                "UtiLITI failed to initialize, see the stacktrace below for more information", e);
-          }
 
-          // configure input settings
-          Input.mouse().setGrabMouse(false);
-          Input.keyboard().consumeAlt(true);
+            // configure input settings
+            Input.mouse().setGrabMouse(false);
+            Input.keyboard().consumeAlt(true);
 
-          // load up previously opened project file or the one that is specified in
-          // the command line arguments
-          handleArgs(args);
-          String gameFile = Editor.preferences().getLastGameFile();
-          if (!Editor.instance().fileLoaded() && gameFile != null && !gameFile.isEmpty()) {
-            Editor.instance().load(new File(gameFile.trim()), false);
-          }
-        });
+            // load up previously opened project file or the one that is specified in
+            // the command line arguments
+            handleArgs(args);
+            String gameFile = Editor.preferences().getLastGameFile();
+            if (!Editor.instance().fileLoaded() && gameFile != null && !gameFile.isEmpty()) {
+              Editor.instance().load(new File(gameFile.trim()), false);
+            }
+          },
+          args);
+    } catch (Throwable e) {
+      throw new UtiLITIInitializationError(
+          "UtiLITI failed to initialize, see the stacktrace below for more information", e);
+    }
   }
 
   private static void forceBasicEditorConfiguration() {
