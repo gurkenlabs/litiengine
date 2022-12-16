@@ -15,6 +15,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.test.SwingTestSuite;
 import de.gurkenlabs.litiengine.tweening.TweenType;
+import de.gurkenlabs.litiengine.util.ColorHelper;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -286,23 +287,35 @@ class GuiComponentTests {
   void testSetTweenValuesOpacity() {
     // arrange
     TestComponent component = new TestComponent(10, 15, 50, 75);
-    component.getCurrentAppearance().setBackgroundColor1(Color.RED);
-    component.getCurrentAppearance().setBackgroundColor2(Color.GREEN);
-    component.getCurrentAppearance().setForeColor(Color.BLUE);
-    component.getCurrentAppearance().setBorderColor(Color.YELLOW);
-    component.setTextShadowColor(Color.PINK);
+    Appearance appearance = component.getCurrentAppearance();
+
+    Color newBG1 = Color.RED;
+    Color newBG2 = Color.GREEN;
+    Color newFore = Color.BLUE;
+    Color newBorder = Color.YELLOW;
+    Color newTextShadow = Color.PINK;
+
+    appearance.setBackgroundColor1(newBG1);
+    appearance.setBackgroundColor2(newBG2);
+    appearance.setForeColor(newFore);
+    appearance.setBorderColor(newBorder);
+    component.setTextShadowColor(newTextShadow);
 
     // act
     component.setTweenValues(TweenType.OPACITY, new float[] {128f, 128f, 128f, 128f, 128f});
 
+    Color compBG1 = ColorHelper.getTransparentVariant(newBG1, 128);
+    Color compBG2 = ColorHelper.getTransparentVariant(newBG2, 128);
+    Color compFore = ColorHelper.getTransparentVariant(newFore, 128);
+    Color compBorder = ColorHelper.getTransparentVariant(newBorder, 128);
+    Color compTextShadow = ColorHelper.getTransparentVariant(newTextShadow, 128);
     // assert
-    Appearance appearance = component.getCurrentAppearance();
 
-    assertEquals(new Color(255, 0, 255, 128), appearance.getBackgroundColor1());
-    assertEquals(new Color(0, 255, 0, 128), appearance.getBackgroundColor2());
-    assertEquals(new Color(0, 0, 0, 128), appearance.getForeColor());
-    assertEquals(new Color(255, 255, 255, 128), appearance.getBorderColor());
-    assertEquals(new Color(255, 175, 255, 128), component.getTextShadowColor());
+    assertEquals(compBG1, appearance.getBackgroundColor1());
+    assertEquals(compBG2, appearance.getBackgroundColor2());
+    assertEquals(compFore, appearance.getForeColor());
+    assertEquals(compBorder, appearance.getBorderColor());
+    assertEquals(compTextShadow, component.getTextShadowColor());
   }
 
   @Test

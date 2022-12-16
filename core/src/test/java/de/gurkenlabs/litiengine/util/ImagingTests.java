@@ -112,7 +112,7 @@ class ImagingTests {
     BufferedImage scaledx2 = Imaging.scale(image, 2.0);
     BufferedImage scaledMaxDouble = Imaging.scale(image, 60);
     BufferedImage stretched = Imaging.scale(image, 30, 32, false);
-    BufferedImage stretchedRatio = Imaging.scale(image, 30, 32, true);
+    BufferedImage stretchedRatio = Imaging.scale(image, 30, 32, true, true);
 
     int[] actualPixelsx2 = ((DataBufferInt) scaledx2.getData().getDataBuffer()).getData();
     int[] actualPixelsMaxDouble =
@@ -138,8 +138,8 @@ class ImagingTests {
     int[] expectedPixels25 = ((DataBufferInt) expected25.getData().getDataBuffer()).getData();
     int[] expectedPixels50 = ((DataBufferInt) expected50.getData().getDataBuffer()).getData();
 
-    BufferedImage opacity25 = Imaging.setOpacity(image, .25f);
-    BufferedImage opacity50 = Imaging.setOpacity(image, .5f);
+    BufferedImage opacity25 = Imaging.setAlpha(image, .25f);
+    BufferedImage opacity50 = Imaging.setAlpha(image, .5f);
 
     int[] actualPixels25 = ((DataBufferInt) opacity25.getData().getDataBuffer()).getData();
     int[] actualPixels50 = ((DataBufferInt) opacity50.getData().getDataBuffer()).getData();
