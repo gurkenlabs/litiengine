@@ -155,8 +155,8 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
     if (!restart && music != null && music.isPlaying() && music.getTrack().equals(track)) {
       return music;
     }
-    
-    try(MusicPlayback playback = new MusicPlayback(track)) {
+
+    try (MusicPlayback playback = new MusicPlayback(track)) {
       if (config != null) {
         config.accept(playback);
       }
@@ -605,8 +605,7 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    */
   public SFXPlayback createSound(Sound sound, Supplier<Point2D> supplier, boolean loop, int range, float volume) {
     try (
-      SFXPlayback playback = new SFXPlayback(sound, supplier, loop, range, volume);
-    ) {
+        SFXPlayback playback = new SFXPlayback(sound, supplier, loop, range, volume);) {
       return playback;
     } catch (LineUnavailableException | IllegalArgumentException e) {
       resourceFailure(e);
