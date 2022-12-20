@@ -12,6 +12,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.physics.Collision;
+import de.gurkenlabs.litiengine.test.GameTestSuite;
+
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
@@ -19,10 +21,12 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.EnumSource.Mode;
 
+@ExtendWith(GameTestSuite.class)
 public class EnvironmentEventTests {
   private Environment testEnvironment;
 

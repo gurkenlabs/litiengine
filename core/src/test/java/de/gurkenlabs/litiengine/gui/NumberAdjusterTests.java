@@ -5,10 +5,14 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.input.Input;
+import de.gurkenlabs.litiengine.test.GameTestSuite;
+
 import java.math.BigDecimal;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+@ExtendWith(GameTestSuite.class)
 public class NumberAdjusterTests {
 
   @BeforeAll

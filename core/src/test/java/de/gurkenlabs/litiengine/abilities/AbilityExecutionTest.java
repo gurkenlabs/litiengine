@@ -19,13 +19,17 @@ import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.abilities.effects.Effect;
 import de.gurkenlabs.litiengine.abilities.effects.EffectTarget;
 import de.gurkenlabs.litiengine.entities.Creature;
+import de.gurkenlabs.litiengine.test.GameTestSuite;
+
 import java.awt.Shape;
 import java.util.Objects;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 
+@ExtendWith(GameTestSuite.class)
 class AbilityExecutionTest {
 
   private TestAbility ability;

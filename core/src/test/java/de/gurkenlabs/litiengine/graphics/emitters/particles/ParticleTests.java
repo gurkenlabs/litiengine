@@ -13,6 +13,8 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameTest;
 import de.gurkenlabs.litiengine.physics.Collision;
 import de.gurkenlabs.litiengine.physics.PhysicsEngine;
+import de.gurkenlabs.litiengine.test.GameTestSuite;
+
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 
@@ -20,10 +22,12 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.MockedStatic;
 
+@ExtendWith(GameTestSuite.class)
 class ParticleTests {
 
   private Particle particle;

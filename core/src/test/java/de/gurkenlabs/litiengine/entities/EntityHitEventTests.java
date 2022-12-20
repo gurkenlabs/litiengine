@@ -7,9 +7,13 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.abilities.Ability;
 import de.gurkenlabs.litiengine.abilities.AbilityInfo;
 import de.gurkenlabs.litiengine.abilities.CastType;
+import de.gurkenlabs.litiengine.test.GameTestSuite;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+@ExtendWith(GameTestSuite.class)
 class EntityHitEventTests {
 
   @BeforeAll

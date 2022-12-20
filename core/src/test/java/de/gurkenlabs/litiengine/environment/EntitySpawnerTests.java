@@ -10,12 +10,16 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameTest;
 import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.entities.Spawnpoint;
+import de.gurkenlabs.litiengine.test.GameTestSuite;
+
 import java.util.Collections;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+@ExtendWith(GameTestSuite.class)
 class EntitySpawnerTests {
   private Environment testEnvironment;
   private Spawnpoint spawnPoint;

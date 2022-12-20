@@ -14,6 +14,8 @@ import de.gurkenlabs.litiengine.entities.behavior.AStarNode;
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
+import de.gurkenlabs.litiengine.test.GameTestSuite;
+
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
@@ -24,10 +26,12 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+@ExtendWith(GameTestSuite.class)
 public class AStarTests {
   @BeforeAll
   public static void initGame() {

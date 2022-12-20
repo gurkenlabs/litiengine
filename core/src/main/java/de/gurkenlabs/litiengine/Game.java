@@ -483,7 +483,7 @@ public final class Game {
    *          The arguments passed to the programs entry point.
    */
   public static void init(String... args) {
-    init(true, args);
+    init(!SwingUtilities.isEventDispatchThread(), args);
   }
 
   private static Runnable initImpl(String... args) {

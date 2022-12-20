@@ -7,10 +7,14 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameTest;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.test.GameTestSuite;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+@ExtendWith(GameTestSuite.class)
 class GameWorldTests {
 
   @BeforeEach

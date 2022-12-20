@@ -11,12 +11,16 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameTest;
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
+import de.gurkenlabs.litiengine.test.GameTestSuite;
+
 import java.awt.Dimension;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+@ExtendWith(GameTestSuite.class)
 class SpawnpointTests {
   private Environment testEnvironment;
   private boolean eventCalled;

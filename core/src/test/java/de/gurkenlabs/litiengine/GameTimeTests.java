@@ -4,9 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+import de.gurkenlabs.litiengine.test.GameTestSuite;
+
+@ExtendWith(GameTestSuite.class)
 class GameTimeTests {
   @ParameterizedTest(name = "toMilliseconds_Positive ticks={0}, updateRate={1}, expected={2}")
   @CsvSource({"100, 50, 2000", "450, 33, 13636", "33, 100, 330"})

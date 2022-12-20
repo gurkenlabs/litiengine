@@ -15,13 +15,13 @@ import static org.mockito.Mockito.when;
 import de.gurkenlabs.litiengine.Game;
 import javax.swing.SwingUtilities;
 
-import de.gurkenlabs.litiengine.test.SwingTestSuite;
+import de.gurkenlabs.litiengine.test.GameTestSuite;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-@ExtendWith(SwingTestSuite.class)
+@ExtendWith(GameTestSuite.class)
 class ListFieldTest {
 
   private final String[] content_1D = new String[] {"A", "B", "C", "D", "E", "F", "G"};

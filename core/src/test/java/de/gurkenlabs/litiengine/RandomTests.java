@@ -13,8 +13,12 @@ import java.awt.geom.Point2D;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import de.gurkenlabs.litiengine.test.GameTestSuite;
 
 // TODO: merge with GameRandomTests
+@ExtendWith(GameTestSuite.class)
 class RandomTests {
 
   private static final String SEED = "myseed";

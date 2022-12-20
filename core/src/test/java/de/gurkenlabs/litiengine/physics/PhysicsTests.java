@@ -9,12 +9,16 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.CollisionBox;
 import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
+import de.gurkenlabs.litiengine.test.GameTestSuite;
+
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+@ExtendWith(GameTestSuite.class)
 class PhysicsTests {
   @BeforeEach
   public void init() {

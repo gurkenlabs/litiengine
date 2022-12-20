@@ -8,11 +8,15 @@ import static org.mockito.Mockito.verify;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.abilities.Ability;
 import de.gurkenlabs.litiengine.entities.Creature;
+import de.gurkenlabs.litiengine.test.GameTestSuite;
+
 import java.awt.Shape;
 import java.util.Arrays;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+@ExtendWith(GameTestSuite.class)
 class EffectTests {
 
   private Creature creature;

@@ -7,16 +7,20 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.entities.CollisionBox;
 import de.gurkenlabs.litiengine.entities.Creature;
+import de.gurkenlabs.litiengine.test.GameTestSuite;
+
 import java.awt.geom.Rectangle2D;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
+@ExtendWith(GameTestSuite.class)
 class CollisionResolvingTests {
   final double EPSILON = 1e-6;
   final double MOVE_10X10Y_DISTANCE = 14.14213562373095; // = root of 200 because 10² + 10² = 200
