@@ -2,11 +2,14 @@ package de.gurkenlabs.litiengine;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gurkenlabs.litiengine.test.GameTestSuite;
 
+import java.awt.AWTError;
 import java.io.File;
+
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -74,6 +77,16 @@ public class GameTest {
 
     Game.start();
     assertTrue(started.wasCalled);
+  }
+
+  @Test
+  public void testSwingThreadAssertionsInsideSwing() {
+    assertThrows(AWTError.class, () -> {
+      Game.init(
+          () -> {},
+          () -> {},
+          Game.COMMANDLINE_ARG_NOGUI);
+    });
   }
 
 }
