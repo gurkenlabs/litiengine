@@ -9,7 +9,7 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 
 public class GameTestSuite extends SwingTestSuite implements BeforeAllCallback, AfterAllCallback {
 
-  private static final Lock GameLock = new ReentrantLock();
+  public static final Lock GameLock = new ReentrantLock();
 
   @Override
   public void beforeAll(ExtensionContext context) throws Exception {
