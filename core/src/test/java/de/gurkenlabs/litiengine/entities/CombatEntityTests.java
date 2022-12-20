@@ -17,13 +17,16 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameTime;
 import de.gurkenlabs.litiengine.abilities.Ability;
 import de.gurkenlabs.litiengine.attributes.RangeAttribute;
+import de.gurkenlabs.litiengine.test.GameTestSuite;
 import de.gurkenlabs.litiengine.tweening.TweenType;
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 
+@ExtendWith(GameTestSuite.class)
 class CombatEntityTests {
 
   private CombatEntity combatEntitySpy;

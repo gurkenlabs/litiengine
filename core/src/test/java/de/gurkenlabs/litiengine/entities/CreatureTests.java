@@ -6,12 +6,16 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.test.GameTestSuite;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+@ExtendWith(GameTestSuite.class)
 public class CreatureTests {
 
   private Creature creature;

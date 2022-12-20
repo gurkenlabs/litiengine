@@ -13,7 +13,7 @@ import static org.mockito.Mockito.when;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.input.Input;
-import de.gurkenlabs.litiengine.test.SwingTestSuite;
+import de.gurkenlabs.litiengine.test.GameTestSuite;
 import de.gurkenlabs.litiengine.tweening.TweenType;
 import de.gurkenlabs.litiengine.util.ColorHelper;
 import java.awt.Color;
@@ -35,7 +35,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-@ExtendWith(SwingTestSuite.class)
+@ExtendWith(GameTestSuite.class)
 class GuiComponentTests {
 
   @BeforeEach

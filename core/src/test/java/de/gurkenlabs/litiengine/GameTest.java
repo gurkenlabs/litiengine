@@ -6,13 +6,17 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.AWTError;
+import de.gurkenlabs.litiengine.test.GameTestSuite;
+
 import java.io.File;
 
 import javax.swing.SwingUtilities;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+@ExtendWith(GameTestSuite.class)
 public class GameTest {
   // test-only helper method to call the package-private Game.terminate()
   public static void terminateGame() {
