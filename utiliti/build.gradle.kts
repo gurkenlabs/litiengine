@@ -3,7 +3,7 @@ import java.util.Calendar
 
 plugins {
   `java-library`
-  id("org.beryx.runtime")
+  alias(libs.plugins.beryxRuntime)
 }
 
 val applicationName = "utiLITI"

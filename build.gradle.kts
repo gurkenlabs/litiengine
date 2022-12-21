@@ -7,10 +7,11 @@ import com.github.vlsi.gradle.publishing.dsl.simplifyXml
 import com.github.vlsi.gradle.publishing.dsl.versionFromResolution
 
 plugins {
-  id("com.github.vlsi.crlf")
-  id("com.github.vlsi.gradle-extensions")
-  id("com.diffplug.spotless")
-  id("com.github.vlsi.stage-vote-release")
+  alias(libs.plugins.spotless)
+  alias(libs.plugins.vlsi.crlf)
+  alias(libs.plugins.vlsi.gradleExtensions)
+  alias(libs.plugins.vlsi.stageVoteRelease)
+  alias(libs.plugins.versions)
 }
 
 val skipSpotless by props(false)
@@ -60,9 +61,7 @@ allprojects {
     if (!isRelease) {
       maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots/") }
     }
-    maven { url = uri("https://plugins.gradle.org/m2/") }
     mavenCentral()
-    gradlePluginPortal()
   }
 
   configurations.all {
@@ -73,7 +72,7 @@ allprojects {
     apply(plugin = "com.diffplug.spotless")
     spotless {
       plugins.withType<JavaPlugin>().configureEach {
-          java {
+        java {
           removeUnusedImports()
           eclipse().configFile("${project.rootDir}/config/gurkenlabs.eclipseformat.xml")
         }

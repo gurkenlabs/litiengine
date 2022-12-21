@@ -6,7 +6,7 @@ plugins {
   jacoco
   signing
   `maven-publish`
-  id("org.sonarqube")
+  alias(libs.plugins.sonarQube)
 }
 
 description = """
@@ -17,8 +17,8 @@ description = """
 val native: Configuration by configurations.creating
 
 dependencies {
-  implementation(libs.jinput.core)
-  native(libs.jinput.core) {
+  implementation(libs.jinput)
+  native(libs.jinput) {
     artifact {
       classifier = "natives-all"
     }
