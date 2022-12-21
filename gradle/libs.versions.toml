@@ -1,0 +1,59 @@
+[versions]
+darklaf = "3.0.2"
+jinput = "2.0.9"
+jorbis = "0.0.17.4"
+tritonus = "0.3.7.4"
+vorbisspi = "1.0.3.3"
+mp3spi = "1.9.5.4"
+jakartaActivation = "2.1.0"
+jakartaXml = "4.0.0"
+jaxb = "4.0.1"
+
+# Test dependencies
+mockito = "4.10.0"
+junit = "5.9.1"
+
+# Plugins
+sonarQube = "3.5.0.2730"
+vlsiRelease = "1.84"
+beryxRuntime = "1.12.7"
+spotless = "6.12.0"
+versions = "0.44.0"
+
+[libraries]
+darklaf_core = { module = "com.github.weisj:darklaf-core", version.ref = "darklaf" }
+jinput = { module = "net.java.jinput:jinput", version.ref = "jinput" }
+soundlibs_jorbis = { module = "com.googlecode.soundlibs:jorbis", version.ref = "jorbis" }
+soundlibs_tritonus = { module = "com.googlecode.soundlibs:tritonus-share", version.ref = "tritonus" }
+soundlibs_vorbisspi = { module = "com.googlecode.soundlibs:vorbisspi", version.ref = "vorbisspi" }
+soundlibs_mp3spi = { module = "com.googlecode.soundlibs:mp3spi", version.ref = "mp3spi" }
+javax_activation = { module = "jakarta.activation:jakarta.activation-api", version.ref = "jakartaActivation" }
+xml_api = { module = "jakarta.xml.bind:jakarta.xml.bind-api", version.ref = "jakartaXml" }
+xml_runtime_core = { module = "com.sun.xml.bind:jaxb-core", version.ref = "jaxb" }
+xml_runtime_impl = { module = "com.sun.xml.bind:jaxb-impl", version.ref = "jaxb" }
+
+# Test dependencies
+mockito_core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
+mockito_inline = { module = "org.mockito:mockito-inline", version.ref = "mockito" }
+junit_api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
+junit_params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
+junit_engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
+
+
+[bundles]
+soundlibs = ["soundlibs-jorbis", "soundlibs-tritonus", "soundlibs-vorbisspi", "soundlibs-mp3spi"]
+xml_runtime = ["xml-runtime-core", "xml-runtime-impl"]
+
+# Test dependencies
+mockito = ["mockito-core", "mockito-inline"]
+junit = ["junit-api", "junit-params", "junit-engine"]
+
+[plugins]
+sonarQube = { id = "org.sonarqube", version.ref = "sonarQube" }
+beryxRuntime = { id = "org.beryx.runtime", version.ref = "beryxRuntime" }
+vlsi_crlf = { id = "com.github.vlsi.crlf", version.ref = "vlsiRelease" }
+vlsi_gradleExtensions = { id = "com.github.vlsi.gradle-extensions", version.ref = "vlsiRelease" }
+vlsi_licenseGather = { id = "com.github.vlsi.license-gather", version.ref = "vlsiRelease" }
+vlsi_stageVoteRelease = { id = "com.github.vlsi.stage-vote-release", version.ref = "vlsiRelease" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
+versions = { id = "com.github.ben-manes.versions", version.ref = "versions" }

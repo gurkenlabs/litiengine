@@ -3,8 +3,8 @@ plugins {
 }
 
 dependencies {
-  api(testLibs.bundles.mockito)
-  api(testLibs.junit.api)
-  api(testLibs.junit.params)
-  runtimeOnly(testLibs.junit.engine)
+  api(libs.bundles.mockito)
+  api(libs.junit.api)
+  api(libs.junit.params)
+  runtimeOnly(libs.junit.engine)
 }
