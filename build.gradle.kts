@@ -54,16 +54,6 @@ allprojects {
   group = "de.gurkenlabs"
   version = buildVersion
 
-  repositories {
-    if (enableMavenLocal) {
-      mavenLocal()
-    }
-    if (!isRelease) {
-      maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots/") }
-    }
-    mavenCentral()
-  }
-
   configurations.all {
     resolutionStrategy.cacheChangingModulesFor(0, "seconds")
   }
