@@ -64,7 +64,6 @@ spotless {
 tasks.closeRepository.configure { enabled = isRelease }
 
 val buildVersion = "$litiengineVersion$buildNumber${releaseParams.snapshotSuffix}"
-println(buildVersion)
 allprojects {
   group = "de.gurkenlabs"
   version = buildVersion

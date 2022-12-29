@@ -1,3 +1,4 @@
+import com.github.vlsi.gradle.properties.dsl.stringProperty
 import com.github.vlsi.gradle.publishing.dsl.simplifyXml
 import com.github.vlsi.gradle.publishing.dsl.versionFromResolution
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
@@ -136,8 +137,9 @@ publishing {
   }
 }
 signing {
-  val signingKey: String? by project
-  val signingPassword: String? by project
-  useInMemoryPgpKeys(signingKey, signingPassword)
+  useInMemoryPgpKeys(
+    project.stringProperty("signing.inMemoryKey"),
+    project.stringProperty("signing.password")
+  )
   sign(publishing.publications[project.name])
 }
