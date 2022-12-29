@@ -1,11 +1,13 @@
+import com.github.vlsi.gradle.publishing.dsl.simplifyXml
+import com.github.vlsi.gradle.publishing.dsl.versionFromResolution
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
   `java-library`
+  `maven-publish`
   jacoco
   signing
-  `maven-publish`
   alias(libs.plugins.sonarQube)
 }
 
@@ -26,8 +28,7 @@ dependencies {
 
   implementation(libs.bundles.soundlibs)
   implementation(libs.javax.activation)
-  // This needs to be api to make the annotations on the class visible to the compiler.
-  api(libs.xml.api)
+  implementation(libs.xml.api)
   runtimeOnly(libs.bundles.xml.runtime)
   testImplementation(projects.litiengineShared)
 }
@@ -87,8 +88,56 @@ publishing {
   publications {
     create<MavenPublication>(project.name) {
       artifactId = project.name
-      version = project.version.toString()
+      versionFromResolution()
       from(components["java"])
+
+      pom {
+        simplifyXml()
+        description.set(project.description!!)
+        name.set(
+          (project.findProperty("artifact.name") as? String) ?: project.name.capitalize()
+            .replace("-", " ")
+        )
+        url.set("https://litiengine.com")
+        organization {
+          name.set("Gurkenlabs")
+          url.set("https://gurkenlabs.de/")
+        }
+        issueManagement {
+          system.set("GitHub")
+          url.set("https://github.com/gurkenlabs/litiengine/issues")
+        }
+        licenses {
+          license {
+            name.set("MIT")
+            url.set("https://github.com/gurkenlabs/litiengine/blob/master/LICENSE")
+            distribution.set("repo")
+          }
+        }
+        scm {
+          url.set("'https://github.com/gurkenlabs/litiengine/")
+          connection.set("scm:git:git://github.com/gurkenlabs/litiengine.git")
+          developerConnection.set("scm:git:git@github.com:gurkenlabs/litiengine.git")
+        }
+        developers {
+          developer {
+            id.set("steffen")
+            name.set("Steffen Wilke")
+            email.set("steffen@gurkenlabs.de")
+          }
+          developer {
+            id.set("matthias")
+            name.set("Matthias Wilke")
+            email.set("matthias@gurkenlabs.de")
+          }
+        }
+      }
     }
   }
+}
+signing {
+  val signingKey: String? by project
+  val signingPassword: String? by project
+  useInMemoryPgpKeys(signingKey, signingPassword)
+  sign(publishing.publications[project.name])
 }

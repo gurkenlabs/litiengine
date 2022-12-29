@@ -48,8 +48,5 @@ jobs:
             -PskipSpotless
             -PghGitSourceUsername=gurkenlabs
             -PghGitSourcePassword=$GITHUB_TOKEN
-            -PghNexusUsername=$NEXUS_USERNAME
-            -PghNexusPassword=$NEXUS_PASSWORD
-            -PuseInMemoryKey=true
             -Psigning.inMemoryKey=$GPG_SIGNING_KEY
             -Psigning.password=$GPG_PASSPHRASE

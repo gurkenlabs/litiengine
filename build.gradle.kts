@@ -3,10 +3,9 @@ import com.github.vlsi.gradle.crlf.LineEndings
 import com.github.vlsi.gradle.properties.dsl.props
 import com.github.vlsi.gradle.properties.dsl.stringProperty
 import com.github.vlsi.gradle.properties.dsl.toBool
-import com.github.vlsi.gradle.publishing.dsl.simplifyXml
-import com.github.vlsi.gradle.publishing.dsl.versionFromResolution
 
 plugins {
+  java
   alias(libs.plugins.spotless)
   alias(libs.plugins.vlsi.crlf)
   alias(libs.plugins.vlsi.gradleExtensions)
@@ -20,8 +19,10 @@ val enableMavenLocal by props(false)
 val enableGradleMetadata by props()
 val isRelease = project.stringProperty("release").toBool()
 
-val String.v: String get() = rootProject.extra["$this.version"] as String
-val projectVersion = "litiengine".v
+val litiengineVersion = project.stringProperty("litiengine.version")
+val buildNumber: String =
+  if (System.getenv("GITHUB_RUN_NUMBER") != null) "-${System.getenv("GITHUB_RUN_NUMBER")}" else ""
+
 
 releaseParams {
   tlp.set("litiengine")
@@ -32,11 +33,18 @@ releaseParams {
   sitePreviewEnabled.set(false)
   release.set(isRelease)
   if (!isRelease) {
-    rcTag.set("v$projectVersion$snapshotSuffix")
+    rcTag.set("v$litiengineVersion$buildNumber$snapshotSuffix")
   }
   nexus {
-    mavenCentral()
+    credentials {
+      username.set(System.getenv("NEXUS_USERNAME"))
+      password.set(System.getenv("NEXUS_PASSWORD"))
+    }
+    val releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+    val snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+    prodUrl.set(uri(if (isRelease) releasesRepoUrl else snapshotsRepoUrl))
   }
+
   voteText.set {
     """
     ${it.componentName} v${it.version}-rc${it.rc} is ready for preview.
@@ -46,28 +54,23 @@ releaseParams {
   }
 }
 
+spotless {
+  java {
+    removeUnusedImports()
+    eclipse().configFile("${project.rootDir}/config/gurkenlabs.eclipseformat.xml")
+  }
+}
+
 tasks.closeRepository.configure { enabled = isRelease }
 
-val buildVersion = "$projectVersion${releaseParams.snapshotSuffix}"
-
+val buildVersion = "$litiengineVersion$buildNumber${releaseParams.snapshotSuffix}"
+println(buildVersion)
 allprojects {
   group = "de.gurkenlabs"
   version = buildVersion
 
   configurations.all {
     resolutionStrategy.cacheChangingModulesFor(0, "seconds")
-  }
-
-  if (!skipSpotless) {
-    apply(plugin = "com.diffplug.spotless")
-    spotless {
-      plugins.withType<JavaPlugin>().configureEach {
-        java {
-          removeUnusedImports()
-          eclipse().configFile("${project.rootDir}/config/gurkenlabs.eclipseformat.xml")
-        }
-      }
-    }
   }
 
   tasks.withType<AbstractArchiveTask>().configureEach {
@@ -142,77 +145,6 @@ allprojects {
           addBooleanOption("Xdoclint:none", true)
           addBooleanOption("html5", true)
           links("https://docs.oracle.com/en/java/javase/17/docs/api/")
-        }
-      }
-    }
-  }
-
-  plugins.withType<MavenPublishPlugin>().configureEach {
-    configure<PublishingExtension> {
-      if (project.path == ":") {
-        // Skip the root project
-        return@configure
-      }
-
-      val useInMemoryKey by props()
-      if (useInMemoryKey) {
-        apply(plugin = "signing")
-
-        configure<SigningExtension> {
-          useInMemoryPgpKeys(
-            project.stringProperty("signing.inMemoryKey"),
-            project.stringProperty("signing.password")
-          )
-        }
-      }
-
-      publications {
-        withType<MavenPublication> {
-          // Use the resolved versions in pom.xml
-          // Gradle might have different resolution rules, so we set the versions
-          // that were used in Gradle build/test.
-          versionFromResolution()
-          pom {
-            simplifyXml()
-            description.set(project.description!!)
-            name.set(
-              (project.findProperty("artifact.name") as? String)
-                ?: project.name.capitalize().replace("-", " ")
-            )
-            url.set("https://litiengine.com")
-            organization {
-              name.set("Gurkenlabs")
-              url.set("https://gurkenlabs.de/")
-            }
-            issueManagement {
-              system.set("GitHub")
-              url.set("https://github.com/gurkenlabs/litiengine/issues")
-            }
-            licenses {
-              license {
-                name.set("MIT")
-                url.set("https://github.com/gurkenlabs/litiengine/blob/master/LICENSE")
-                distribution.set("repo")
-              }
-            }
-            scm {
-              url.set("'https://github.com/gurkenlabs/litiengine/")
-              connection.set("scm:git:git://github.com/gurkenlabs/litiengine.git")
-              developerConnection.set("scm:git:git@github.com:gurkenlabs/litiengine.git")
-            }
-            developers {
-              developer {
-                id.set("steffen")
-                name.set("Steffen Wilke")
-                email.set("steffen@gurkenlabs.de")
-              }
-              developer {
-                id.set("matthias")
-                name.set("Matthias Wilke")
-                email.set("matthias@gurkenlabs.de")
-              }
-            }
-          }
         }
       }
     }
