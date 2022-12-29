@@ -21,8 +21,8 @@ public final class EditorFileChooser extends JFileChooser {
   public static int showFileDialog(
       String description, String title, boolean multiselect, String... extensions) {
     FileFilter filter = new FileNameExtensionFilter(description, extensions);
+    instance().resetChoosableFileFilters();
     instance().setFileFilter(filter);
-    instance().addChoosableFileFilter(filter);
     instance().setFileSelectionMode(JFileChooser.FILES_ONLY);
     instance().setMultiSelectionEnabled(multiselect);
     instance().setDialogTitle(title);
