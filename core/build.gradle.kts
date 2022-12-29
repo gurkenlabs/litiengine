@@ -105,16 +105,17 @@ publishing {
       name = "GitHubPackages"
       url = uri("https://maven.pkg.github.com/gurkenlabs/litiengine")
       credentials {
-        username = "gurkenlabs"
+        username = System.getenv("GITHUB_ACTOR")
         password = System.getenv("GITHUB_TOKEN")
       }
     }
   }
   publications {
     create<MavenPublication>(project.name) {
-      artifactId = project.name
-      versionFromResolution()
       from(components["java"])
+      group = "de.gurkenlabs"
+      artifactId = "litiengine"
+      version = version
 
       pom {
         simplifyXml()
