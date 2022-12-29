@@ -518,6 +518,8 @@ public class Editor extends Screen {
         log.log(Level.SEVERE, e.getMessage(), e);
       }
     }
+
+    UI.getAssetController().refresh();
   }
 
   public void importSpriteSheets(TextureAtlas atlas) {
@@ -576,10 +578,8 @@ public class Editor extends Screen {
           }
 
           this.gameFile.getEmitters().add(emitter);
-          log.log(
-              Level.INFO,
-              "imported emitter {0} from {1}",
-              new Object[] {Objects.requireNonNull(emitter).getName(), file});
+          UI.getAssetController().refresh();
+          log.log(Level.INFO, "imported emitter {0} from {1}", new Object[] {Objects.requireNonNull(emitter).getName(), file});
         });
   }
 
@@ -611,10 +611,9 @@ public class Editor extends Screen {
           }
 
           this.gameFile.getBluePrints().add(blueprint);
-          log.log(
-              Level.INFO,
-              "imported blueprint {0} from {1}",
-              new Object[] {blueprint.getName(), file});
+          UI.getAssetController().refresh();
+
+          log.log(Level.INFO, "imported blueprint {0} from {1}", new Object[] {blueprint.getName(), file});
         },
         Blueprint.BLUEPRINT_FILE_EXTENSION,
         Blueprint.TEMPLATE_FILE_EXTENSION);
@@ -643,9 +642,7 @@ public class Editor extends Screen {
           }
 
           loadTileset(tileset, false);
-
-          log.log(
-              Level.INFO, "imported tileset {0} from {1}", new Object[] {tileset.getName(), file});
+          log.log(Level.INFO, "imported tileset {0} from {1}", new Object[] {tileset.getName(), file});
         },
         Tileset.FILE_EXTENSION);
   }
@@ -654,8 +651,7 @@ public class Editor extends Screen {
     return this.loading;
   }
 
-  public void loadSpriteSheets(
-      Collection<SpritesheetResource> infos, boolean forceAssetTreeUpdate) {
+  public void loadSpriteSheets(Collection<SpritesheetResource> infos, boolean forceAssetTreeUpdate) {
     infos.parallelStream()
         .forEach(
             info -> {
