@@ -73,7 +73,7 @@ jobs:
         if: ${{!github.event.pull_request.head.repo.fork}}
         with:
           arguments: |
-            sonarqube
+            sonar
             -PskipSpotless
 
       - name: Code Style Validation
