@@ -9,7 +9,6 @@ plugins {
   alias(libs.plugins.spotless)
   alias(libs.plugins.vlsi.crlf)
   alias(libs.plugins.vlsi.gradleExtensions)
-  alias(libs.plugins.vlsi.stageVoteRelease)
   alias(libs.plugins.versions)
 }
 
@@ -20,39 +19,41 @@ val enableGradleMetadata by props()
 val isRelease = project.stringProperty("release").toBool()
 
 val litiengineVersion = project.stringProperty("litiengine.version")
-val buildNumber: String =
-  if (System.getenv("GITHUB_RUN_NUMBER") != null) "-${System.getenv("GITHUB_RUN_NUMBER")}" else ""
+val buildNumber: String = if (System.getenv("GITHUB_RUN_NUMBER") != null) "-${System.getenv("GITHUB_RUN_NUMBER")}" else ""
+val snapshotSuffix: String = if (isRelease) "-SNAPSHOT" else ""
 
 
-releaseParams {
-  tlp.set("litiengine")
-  organizationName.set("gurkenlabs")
-  componentName.set("litiengine")
-  prefixForProperties.set("gh")
-  svnDistEnabled.set(false)
-  sitePreviewEnabled.set(false)
-  release.set(isRelease)
-  if (!isRelease) {
-    rcTag.set("v$litiengineVersion$buildNumber$snapshotSuffix")
-  }
-  nexus {
-    credentials {
-      username.set(System.getenv("NEXUS_USERNAME"))
-      password.set(System.getenv("NEXUS_PASSWORD"))
-    }
-    val releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-    val snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
-    prodUrl.set(uri(if (isRelease) releasesRepoUrl else snapshotsRepoUrl))
-  }
+//releaseParams {
+//  tlp.set("litiengine")
+//  organizationName.set("gurkenlabs")
+//  componentName.set("litiengine")
+//  prefixForProperties.set("gh")
+//  svnDistEnabled.set(false)
+//  sitePreviewEnabled.set(false)
+//  release.set(isRelease)
+//  if (!isRelease) {
+//    rcTag.set("v$litiengineVersion$buildNumber$snapshotSuffix")
+//  }
+//  nexus {
+//    credentials {
+//      username.set(System.getenv("NEXUS_USERNAME"))
+//      password.set(System.getenv("NEXUS_PASSWORD"))
+//    }
+//    val releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+//    val snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+//    prodUrl.set(uri(if (isRelease) releasesRepoUrl else snapshotsRepoUrl))
+//  }
+//
+//  voteText.set {
+//    """
+//    ${it.componentName} v${it.version}-rc${it.rc} is ready for preview.
+//    Git SHA: ${it.gitSha}
+//    Staging repository: ${it.nexusRepositoryUri}
+//    """.trimIndent()
+//  }
+//}
 
-  voteText.set {
-    """
-    ${it.componentName} v${it.version}-rc${it.rc} is ready for preview.
-    Git SHA: ${it.gitSha}
-    Staging repository: ${it.nexusRepositoryUri}
-    """.trimIndent()
-  }
-}
+//tasks.closeRepository.configure { enabled = isRelease }
 
 spotless {
   java {
@@ -61,9 +62,8 @@ spotless {
   }
 }
 
-tasks.closeRepository.configure { enabled = isRelease }
 
-val buildVersion = "$litiengineVersion$buildNumber${releaseParams.snapshotSuffix}"
+val buildVersion = "$litiengineVersion$buildNumber$snapshotSuffix"
 allprojects {
   group = "de.gurkenlabs"
   version = buildVersion

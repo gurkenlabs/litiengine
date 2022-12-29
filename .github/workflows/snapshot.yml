@@ -39,8 +39,9 @@ jobs:
           NEXUS_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           NEXUS_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
         with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
           arguments: |
-            prepareVote
+            publish
             -Prc=1
             -Pgh
             -Prelease=false
