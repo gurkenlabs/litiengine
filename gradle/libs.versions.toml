@@ -19,6 +19,7 @@ vlsiRelease = "1.84"
 beryxRuntime = "1.12.7"
 spotless = "6.12.0"
 versions = "0.44.0"
+dependencyCheck = "7.4.3"
 
 [libraries]
 darklaf_core = { module = "com.github.weisj:darklaf-core", version.ref = "darklaf" }
@@ -57,3 +58,4 @@ vlsi_licenseGather = { id = "com.github.vlsi.license-gather", version.ref = "vls
 vlsi_stageVoteRelease = { id = "com.github.vlsi.stage-vote-release", version.ref = "vlsiRelease" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 versions = { id = "com.github.ben-manes.versions", version.ref = "versions" }
+dependencyCheck = { id = "org.owasp.dependencycheck", version.ref = "dependencyCheck" }
