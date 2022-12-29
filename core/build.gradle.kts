@@ -141,5 +141,4 @@ signing {
     project.stringProperty("signing.inMemoryKey"),
     project.stringProperty("signing.password")
   )
-  sign(publishing.publications[project.name])
 }
