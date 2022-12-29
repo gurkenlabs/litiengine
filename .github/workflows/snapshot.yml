@@ -9,6 +9,7 @@ on:
     # Rerun if workflow changes
     branches:
       - 'master'
+      - 'snapshot-test'
     paths:
       - '**/snapshot.yml'
 
