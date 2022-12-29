@@ -1,15 +1,9 @@
 package de.gurkenlabs.litiengine.resources;
 
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.io.*;
+import java.nio.file.Paths;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.logging.Level;
@@ -18,8 +12,10 @@ import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.io.Codec;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
+import de.gurkenlabs.litiengine.util.io.ImageSerializer;
 
 public final class Spritesheets {
   private final Map<String, int[]> customKeyFrameDurations = new ConcurrentHashMap<>();
@@ -52,7 +48,7 @@ public final class Spritesheets {
 
   /**
    * Finds Spritesheets that were previously loaded by any load method or by the sprites.info file.
-   * 
+   *
    * @param path
    *          The path of the spritesheet.
    * @return The {@link Spritesheet} associated with the path or null if not loaded yet
@@ -163,6 +159,50 @@ public final class Spritesheets {
     }
 
     return sprites;
+  }
+
+  public boolean saveTo(final String spriteInfoFile, boolean metadataOnly) {
+    // get all spritesheets
+    List<Spritesheet> allSpriteSheets = new ArrayList<>(getAll());
+    Collections.sort(allSpriteSheets);
+    try (BufferedWriter writer = new BufferedWriter(new FileWriter(spriteInfoFile))) {
+      // print the spritesheet information to the info file
+      for (Spritesheet spritesheet : allSpriteSheets) {
+        // check for keyframes
+        int[] keyFrames = Resources.spritesheets().getCustomKeyFrameDurations(spritesheet);
+
+        String fileExtension = spritesheet.getImageFormat() == ImageFormat.UNSUPPORTED ? "" : spritesheet.getImageFormat().toFileExtension();
+
+        writer.write(String.format(
+            "%s%s,%d,%d",
+            spritesheet.getName(),
+            fileExtension,
+            spritesheet.getSpriteWidth(),
+            spritesheet.getSpriteHeight()));
+
+        // print keyframes (if they exist)
+        if (keyFrames.length > 0) {
+          writer.write(";");
+          writer.write(ArrayUtilities.join(keyFrames));
+        }
+
+        writer.write("\n");
+
+        if (!metadataOnly) {
+          ImageSerializer.saveImage(Paths.get(new File(spriteInfoFile).getParentFile().getAbsolutePath(),
+              spritesheet.getName() + spritesheet.getImageFormat().toFileExtension()).toString(), spritesheet.getImage(),
+              spritesheet.getImageFormat());
+        }
+      }
+
+      var msg = metadataOnly ? "Exported Spritesheet metadata to {0}" : "Exported sprites and metadata to {0}";
+      log.log(Level.INFO, msg, new Object[] {spriteInfoFile});
+
+      return true;
+    } catch (IOException e2) {
+      log.log(Level.SEVERE, e2.getLocalizedMessage(), e2);
+      return false;
+    }
   }
 
   public Spritesheet load(final String path, final int spriteWidth, final int spriteHeight) {

@@ -18,7 +18,6 @@ import de.gurkenlabs.litiengine.resources.SoundFormat;
 import de.gurkenlabs.litiengine.resources.SoundResource;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.litiengine.resources.TextureAtlas;
-import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
@@ -34,22 +33,20 @@ import de.gurkenlabs.utiliti.swing.dialogs.EditorFileChooser;
 import de.gurkenlabs.utiliti.swing.dialogs.SpritesheetImportPanel;
 import de.gurkenlabs.utiliti.swing.dialogs.XmlImportDialog;
 import jakarta.xml.bind.JAXBException;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -431,7 +428,7 @@ public class Editor extends Screen {
   public void importSpriteSheets() {
     if (EditorFileChooser.showFileDialog(
         SPRITESHEET_FILE_NAME,
-        Resources.strings().get(IMPORT_DIALOGUE, SPRITE_FILE_NAME),
+        Resources.strings().get(IMPORT_DIALOGUE, SPRITESHEET_FILE_NAME),
         true,
         ImageFormat.getAllExtensions()) == JFileChooser.APPROVE_OPTION) {
       this.importSpriteSheets(EditorFileChooser.instance().getSelectedFiles());
@@ -448,10 +445,11 @@ public class Editor extends Screen {
     }
   }
 
-  public void exportSpriteSheets() {
+  public void exportSpriteFile() {
     if (Resources.spritesheets().getAll().isEmpty()) {
       return;
     }
+
     final String source = this.getProjectPath();
     JFileChooser chooser = null;
     int result = -1;
@@ -469,42 +467,19 @@ public class Editor extends Screen {
     } catch (IOException e1) {
       log.log(Level.SEVERE, e1.getLocalizedMessage(), e1);
     }
+
     if (chooser == null || result != JFileChooser.APPROVE_OPTION) {
       return;
     }
-    // get all spritesheets
-    List<Spritesheet> allSpriteSheets = new ArrayList<>(Resources.spritesheets().getAll());
-    Collections.sort(allSpriteSheets);
-    try (BufferedWriter writer = new BufferedWriter(new FileWriter(chooser.getSelectedFile()))) {
-      // print the spritesheet information to the info file
-      for (Spritesheet spritesheet : allSpriteSheets) {
-        // check for keyframes
-        int[] keyFrames = Resources.spritesheets().getCustomKeyFrameDurations(spritesheet);
-        String fileExtension =
-            spritesheet.getImageFormat() == ImageFormat.UNSUPPORTED
-                ? ""
-                : spritesheet.getImageFormat().toFileExtension();
-        writer.write(
-            String.format(
-                "%s%s,%d,%d",
-                spritesheet.getName(),
-                fileExtension,
-                spritesheet.getSpriteWidth(),
-                spritesheet.getSpriteHeight()));
-        // print keyframes (if they exist)
-        if (keyFrames.length > 0) {
-          writer.write(";");
-          writer.write(ArrayUtilities.join(keyFrames));
-        }
-        writer.write("\n");
-      }
-      log.log(
-          Level.INFO,
-          "Exported Spritesheet metadata to {0}",
-          new Object[] {chooser.getSelectedFile().getCanonicalPath()});
-    } catch (IOException e2) {
-      log.log(Level.SEVERE, e2.getLocalizedMessage(), e2);
-    }
+
+    int res = JOptionPane.showConfirmDialog(
+        Game.window().getRenderComponent(),
+        Resources.strings().get("menu_export_spriteSheets_withResources"),
+        Resources.strings().get("menu_export_spriteSheets_withResources"),
+        JOptionPane.YES_NO_OPTION,
+        JOptionPane.QUESTION_MESSAGE);
+
+    Resources.spritesheets().saveTo(chooser.getSelectedFile().getAbsolutePath(), res == JOptionPane.NO_OPTION);
   }
 
   public void importTextureAtlas() {
