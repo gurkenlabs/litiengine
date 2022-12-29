@@ -138,7 +138,7 @@ publishing {
 }
 signing {
   useInMemoryPgpKeys(
-    project.stringProperty("signing.inMemoryKey"),
-    project.stringProperty("signing.password")
+    System.getenv("GPG_SIGNING_KEY"),
+    System.getenv("GPG_PASSPHRASE")
   )
 }
