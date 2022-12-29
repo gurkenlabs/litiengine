@@ -14,17 +14,17 @@ public class GameTestNoSwing {
 
 
   @BeforeAll
-  private void onTestStart() {
+  public static void onTestStart() {
     GameTestSuite.GameLock.lock();
   }
 
   @AfterAll
-  private void onTestEnd() {
+  public static void onTestEnd() {
     GameTestSuite.GameLock.unlock();
   }
 
   @Test
-  public void testSwingThreadAssertionsOutsideSwing() {
+  void testSwingThreadAssertionsOutsideSwing() {
     Game.init(
         () -> {
           assertTrue(SwingUtilities.isEventDispatchThread());
