@@ -46,5 +46,3 @@ jobs:
             -Prelease=false
             -PskipJavadoc
             -PskipSpotless
-            -PghGitSourceUsername=gurkenlabs
-            -PghGitSourcePassword=$GITHUB_TOKEN
