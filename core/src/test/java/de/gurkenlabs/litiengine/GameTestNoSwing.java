@@ -18,7 +18,8 @@ public class GameTestNoSwing {
     GameTestSuite.GameLock.lock();
   }
 
-  @AfterAll public static void onTestEnd() {
+  @AfterAll
+  public static void onTestEnd() {
     GameTestSuite.GameLock.unlock();
   }
 
