@@ -513,6 +513,7 @@ public class Editor extends Screen {
                 new BufferedInputStream(stream), FileUtilities.getFileName(file.getName()), format);
         this.getGameFile().getSounds().removeIf(x -> x.getName().equals(resource.getName()));
         this.getGameFile().getSounds().add(resource);
+        Resources.sounds().load(resource);
         log.log(Level.INFO, "imported sound {0}", new Object[] {resource.getName()});
       } catch (IOException | UnsupportedAudioFileException e) {
         log.log(Level.SEVERE, e.getMessage(), e);
@@ -611,6 +612,7 @@ public class Editor extends Screen {
           }
 
           this.gameFile.getBluePrints().add(blueprint);
+          Resources.blueprints().add(blueprint.getName(), blueprint);
           UI.getAssetController().refresh();
 
           log.log(Level.INFO, "imported blueprint {0} from {1}", new Object[] {blueprint.getName(), file});

@@ -6,9 +6,11 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.resources.ResourcesContainerListener;
 import de.gurkenlabs.litiengine.sound.Sound;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.utiliti.swing.Icons;
+
 import java.awt.LayoutManager;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -45,6 +47,23 @@ public class SoundPanel extends PropertyPanel {
                 this.volume.getValue() / 50f));
     setLayout(this.createLayout());
     this.setupChangedListeners();
+
+    Resources.sounds().addContainerListener(new ResourcesContainerListener<>() {
+      @Override
+      public void added(String resourceName, Sound resource) {
+        updateModel();
+      }
+
+      @Override
+      public void removed(String resourceName, Sound resource) {
+        updateModel();
+      }
+
+      @Override
+      public void cleared() {
+        updateModel();
+      }
+    });
   }
 
   @Override

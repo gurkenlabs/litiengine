@@ -37,8 +37,7 @@ public class AssetList extends JSplitPane implements Controller {
           }
 
           if (!droppedImages.isEmpty()) {
-            Editor.instance()
-                .importSpriteSheets(droppedImages.toArray(new File[droppedImages.size()]));
+            Editor.instance().importSpriteSheets(droppedImages.toArray(new File[droppedImages.size()]));
           }
         });
 

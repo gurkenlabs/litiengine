@@ -304,6 +304,7 @@ public class AssetPanelItem extends JPanel {
 
       if (n == JOptionPane.OK_OPTION) {
         Editor.instance().getGameFile().getBluePrints().remove(getOrigin());
+        Resources.blueprints().remove(blueprint.getName());
         UI.getAssetController().refresh();
       }
     } else if (getOrigin()instanceof SoundResource soundResource) {
@@ -311,6 +312,7 @@ public class AssetPanelItem extends JPanel {
 
       if (n == JOptionPane.OK_OPTION) {
         Editor.instance().getGameFile().getSounds().remove(getOrigin());
+        Resources.sounds().remove(soundResource.getName());
         UI.getAssetController().refresh();
       }
     }
