@@ -361,7 +361,7 @@ public abstract class Particle implements ITimeToLive {
     this.setDeltaAngle((float) data.getDeltaAngle().get());
 
     this.setTimeToLive((int) data.getParticleTTL().get());
-    this.setColor(ColorHelper.decode(Game.random().choose(data.getColors())));
+    this.setColor(Game.random().choose(data.getDecodedColors()));
 
     this.setCollisionType(data.getCollision());
     this.setOutlineOnly(data.isOutlineOnly());

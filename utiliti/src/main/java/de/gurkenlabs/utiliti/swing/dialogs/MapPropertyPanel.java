@@ -4,12 +4,10 @@ import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
 import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.utiliti.Style;
 import de.gurkenlabs.utiliti.swing.ColorComponent;
 import de.gurkenlabs.utiliti.swing.ControlBehavior;
 import de.gurkenlabs.utiliti.swing.panels.AmbientLightPreviewPanel;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
@@ -415,13 +413,11 @@ public class MapPropertyPanel extends JPanel {
     this.textFieldName.setText(map.getName());
     if (map.getStringValue(MapProperty.AMBIENTCOLOR) != null) {
       final String hexColor = map.getStringValue(MapProperty.AMBIENTCOLOR);
-      final Color decodedColor = ColorHelper.decode(hexColor);
-      this.ambientColorComponent.setColor(decodedColor);
+      this.ambientColorComponent.setHexColor(hexColor);
     }
     if (map.getStringValue(MapProperty.SHADOWCOLOR) != null) {
       final String hexColor = map.getStringValue(MapProperty.SHADOWCOLOR);
-      final Color decodedColor = ColorHelper.decode(hexColor);
-      this.shadowColorComponent.setColor(decodedColor);
+      this.shadowColorComponent.setHexColor(hexColor);
     }
 
     this.spinnerGravity.setValue(map.getIntValue(MapProperty.GRAVITY));

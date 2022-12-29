@@ -4,6 +4,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.util.Imaging;
 import de.gurkenlabs.litiengine.util.MathUtilities;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
@@ -47,6 +48,10 @@ public abstract class ColorLayer implements IRenderable {
   }
 
   public void setColor(final Color color) {
+    if (color == null) {
+      return;
+    }
+
     this.color = color;
     this.updateSection(this.environment.getMap().getBounds());
   }

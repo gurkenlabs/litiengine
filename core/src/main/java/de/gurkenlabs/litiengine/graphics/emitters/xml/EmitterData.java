@@ -16,6 +16,7 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlTransient;
+
 import java.awt.Color;
 import java.io.Serial;
 import java.io.Serializable;
@@ -99,6 +100,9 @@ public class EmitterData implements Serializable, Resource {
   @XmlElementWrapper
   @XmlElement(name = "color")
   private List<String> colors;
+
+  @XmlTransient
+  private List<Color> decodedColors;
 
   @XmlElement
   private ParticleParameter deltaHeight;
@@ -255,8 +259,24 @@ public class EmitterData implements Serializable, Resource {
     return this.colors;
   }
 
+  public List<Color> getDecodedColors() {
+    if (this.decodedColors != null) {
+      return this.decodedColors;
+    }
+
+    List<Color> decodedColors = new ArrayList<>();
+    for (var color : this.getColors()) {
+      Color decoded = ColorHelper.decode(color);
+      decodedColors.add(decoded != null ? decoded : DEFAULT_COLOR);
+    }
+
+    this.decodedColors = decodedColors;
+    return this.decodedColors;
+  }
+
   public void setColors(final List<String> colors) {
     this.colors = colors;
+    this.decodedColors = null;
   }
 
   public void setColors(final Color... colors) {

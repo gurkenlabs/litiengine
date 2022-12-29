@@ -77,8 +77,7 @@ public class LightSource extends Entity implements IRenderable {
    * @param activated
    *          A flag indicating whether this light is activated by default.
    */
-  public LightSource(
-      final int intensity, final Color lightColor, final Type shapeType, boolean activated) {
+  public LightSource(final int intensity, final Color lightColor, final Type shapeType, boolean activated) {
     super();
     this.color = lightColor;
     this.intensity = intensity;

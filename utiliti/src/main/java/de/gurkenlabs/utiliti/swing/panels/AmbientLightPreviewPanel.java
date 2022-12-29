@@ -1,7 +1,9 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
+import de.gurkenlabs.litiengine.entities.StaticShadow;
+import de.gurkenlabs.litiengine.graphics.AmbientLight;
 import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.litiengine.util.ColorHelper;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -9,9 +11,8 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
 public class AmbientLightPreviewPanel extends JPanel {
-
-  private Color ambientColor = ColorHelper.decode("#ffffffff");
-  private Color staticShadowColor = ColorHelper.decode("#5a000000");
+  private Color ambientColor = AmbientLight.DEFAULT_COLOR;
+  private Color staticShadowColor = StaticShadow.DEFAULT_COLOR;
 
   public AmbientLightPreviewPanel() {
 
@@ -21,12 +22,34 @@ public class AmbientLightPreviewPanel extends JPanel {
     this.setBorder(BorderFactory.createLineBorder(Color.black));
   }
 
+  /**
+   * Sets the ambient color of this panel.<br>
+   * A null argument is silently ignored.
+   *
+   * @param color
+   *          The color to set as ambient color.
+   */
   public void setAmbientColor(Color color) {
+    if (color == null) {
+      return;
+    }
+
     this.ambientColor = color;
     this.repaint();
   }
 
+  /**
+   * Sets the ambient color of this panel.<br>
+   * A null argument is silently ignored.
+   *
+   * @param color
+   *          The color to set as ambient color.
+   */
   public void setStaticShadowColor(Color color) {
+    if (color == null) {
+      return;
+    }
+
     this.staticShadowColor = color;
     this.repaint();
   }

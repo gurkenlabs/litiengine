@@ -49,6 +49,9 @@ public final class ColorHelper {
 
   /**
    * Decodes the specified color string to an actual {@code Color} instance. The accepted format is:
+   * <p>
+   * <i>Note: This returns null if the format of the provided color string is invalid.</i>
+   * </p>
    *
    * <ul>
    * <li>#RRGGBB - For colors without alpha

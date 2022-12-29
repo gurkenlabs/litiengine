@@ -43,10 +43,7 @@ public class ColorComponent extends JPanel {
     this.btnSelectColor.addActionListener(
         a -> {
           final Color result =
-              JColorChooser.showDialog(
-                  null,
-                  Resources.strings().get("panel_selectAmbientColor"),
-                  ColorHelper.decode(this.textFieldColor.getText()));
+              JColorChooser.showDialog(null, Resources.strings().get("panel_selectAmbientColor"), this.getColor());
           this.setColor(result);
         });
 
@@ -57,7 +54,7 @@ public class ColorComponent extends JPanel {
     this.spinnerAlpha.setModel(new SpinnerNumberModel(0, 0, 255, 5));
     this.spinnerAlpha.addChangeListener(
         a -> {
-          final Color oldColor = ColorHelper.decode(this.textFieldColor.getText());
+          final Color oldColor = this.getColor();
           if (oldColor == null) {
             return;
           }
@@ -145,13 +142,13 @@ public class ColorComponent extends JPanel {
     return ColorHelper.decode(this.textFieldColor.getText());
   }
 
-  public void setHexColor(String color) {
-    Color c = ColorHelper.decode(color);
-    if (c == null) {
+  public void setHexColor(String colorHexString) {
+    Color color = ColorHelper.decode(colorHexString);
+    if (color == null) {
       return;
     }
-    SwingHelpers.updateColorTextField(this.textFieldColor, ColorHelper.decode(color));
-    this.spinnerAlpha.setValue(c.getAlpha());
+    SwingHelpers.updateColorTextField(this.textFieldColor, color);
+    this.spinnerAlpha.setValue(color.getAlpha());
     for (ActionListener listener : this.listeners) {
       listener.actionPerformed(null);
     }
