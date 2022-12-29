@@ -105,7 +105,7 @@ publishing {
       name = "GitHubPackages"
       url = uri("https://maven.pkg.github.com/gurkenlabs/litiengine")
       credentials {
-        username = System.getenv("GITHUB_ACTOR")
+        username = "gurkenlabs"
         password = System.getenv("GITHUB_TOKEN")
       }
     }
