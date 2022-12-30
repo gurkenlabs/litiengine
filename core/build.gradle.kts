@@ -90,7 +90,6 @@ tasks {
 
 publishing {
   repositories {
-    mavenLocal()
     maven {
       val releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
       val snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
@@ -99,14 +98,6 @@ publishing {
       credentials {
         username = System.getenv("NEXUS_USERNAME")
         password = System.getenv("NEXUS_PASSWORD")
-      }
-    }
-    maven {
-      name = "GitHubPackages"
-      url = uri("https://maven.pkg.github.com/gurkenlabs/litiengine")
-      credentials {
-        username = System.getenv("GITHUB_ACTOR")
-        password = System.getenv("GITHUB_TOKEN")
       }
     }
   }
@@ -161,6 +152,7 @@ publishing {
     }
   }
 }
+
 signing {
   useInMemoryPgpKeys(
     System.getenv("GPG_SIGNING_KEY"),

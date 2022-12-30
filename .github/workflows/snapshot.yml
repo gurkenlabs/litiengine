@@ -33,7 +33,6 @@ jobs:
       - name: Publish
         uses: gradle/gradle-build-action@v2
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
           NEXUS_USERNAME: ${{ secrets.OSSRH_USERNAME }}

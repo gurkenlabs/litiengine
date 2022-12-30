@@ -3,9 +3,11 @@ import com.github.vlsi.gradle.crlf.LineEndings
 import com.github.vlsi.gradle.properties.dsl.props
 import com.github.vlsi.gradle.properties.dsl.stringProperty
 import com.github.vlsi.gradle.properties.dsl.toBool
+import com.github.vlsi.gradle.publishing.dsl.simplifyXml
 
 plugins {
   java
+  `maven-publish`
   alias(libs.plugins.spotless)
   alias(libs.plugins.vlsi.crlf)
   alias(libs.plugins.vlsi.gradleExtensions)
