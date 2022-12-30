@@ -139,29 +139,29 @@ public abstract class GuiComponent
     this.textChangedConsumer = new CopyOnWriteArrayList<>();
 
     this.appearance = new Appearance();
-    this.appearance.update(GuiProperties.getDefaultAppearance());
-    this.appearance.onChange(
+    appearance.update(GuiProperties.getDefaultAppearance());
+    appearance.onChange(
         app -> {
-          for (final GuiComponent child : this.getComponents()) {
-            child.getAppearance().update(this.getAppearance());
+          for (final GuiComponent child : getComponents()) {
+            child.getAppearance().update(getAppearance());
           }
         });
 
     this.hoveredAppearance = new Appearance();
-    this.hoveredAppearance.update(GuiProperties.getDefaultAppearanceHovered());
-    this.hoveredAppearance.onChange(
+    hoveredAppearance.update(GuiProperties.getDefaultAppearanceHovered());
+    hoveredAppearance.onChange(
         app -> {
-          for (final GuiComponent child : this.getComponents()) {
-            child.getAppearanceHovered().update(this.getAppearanceHovered());
+          for (final GuiComponent child : getComponents()) {
+            child.getAppearanceHovered().update(getAppearanceHovered());
           }
         });
 
     this.disabledAppearance = new Appearance();
-    this.disabledAppearance.update(GuiProperties.getDefaultAppearanceDisabled());
-    this.disabledAppearance.onChange(
+    disabledAppearance.update(GuiProperties.getDefaultAppearanceDisabled());
+    disabledAppearance.onChange(
         app -> {
-          for (final GuiComponent child : this.getComponents()) {
-            child.getAppearanceDisabled().update(this.getAppearanceDisabled());
+          for (final GuiComponent child : getComponents()) {
+            child.getAppearanceDisabled().update(getAppearanceDisabled());
           }
         });
 
@@ -188,7 +188,7 @@ public abstract class GuiComponent
    * @return the appearance
    */
   public Appearance getAppearance() {
-    return this.appearance;
+    return appearance;
   }
 
   /**
@@ -197,7 +197,7 @@ public abstract class GuiComponent
    * @return the appearance disabled
    */
   public Appearance getAppearanceDisabled() {
-    return this.disabledAppearance;
+    return disabledAppearance;
   }
 
   /**
@@ -206,7 +206,7 @@ public abstract class GuiComponent
    * @return the hovered appearance
    */
   public Appearance getAppearanceHovered() {
-    return this.hoveredAppearance;
+    return hoveredAppearance;
   }
 
   /**
@@ -229,7 +229,7 @@ public abstract class GuiComponent
    * @return the component id
    */
   public int getComponentId() {
-    return this.componentId;
+    return componentId;
   }
 
   /**
@@ -238,7 +238,7 @@ public abstract class GuiComponent
    * @return the child components
    */
   public List<GuiComponent> getComponents() {
-    return this.components;
+    return components;
   }
 
   /**
@@ -247,7 +247,7 @@ public abstract class GuiComponent
    * @return the GuiComponent's font
    */
   public Font getFont() {
-    return this.font;
+    return font;
   }
 
   /**
@@ -256,7 +256,7 @@ public abstract class GuiComponent
    * @return the height
    */
   public double getHeight() {
-    return this.height;
+    return height;
   }
 
   /**
@@ -265,7 +265,7 @@ public abstract class GuiComponent
    * @return the hover sound
    */
   public Sound getHoverSound() {
-    return this.hoverSound;
+    return hoverSound;
   }
 
   /**
@@ -283,7 +283,7 @@ public abstract class GuiComponent
    * @return the name
    */
   public String getName() {
-    return this.name;
+    return name;
   }
 
   /**
@@ -292,7 +292,7 @@ public abstract class GuiComponent
    * @return the tag
    */
   public Object getTag() {
-    return this.tag;
+    return tag;
   }
 
   /**
@@ -302,7 +302,7 @@ public abstract class GuiComponent
    * @return the entire text on this GuiComponent
    */
   public String getText() {
-    return this.text;
+    return text;
   }
 
   /**
@@ -311,7 +311,7 @@ public abstract class GuiComponent
    * @return the horizontal text alignment
    */
   public Align getTextAlign() {
-    return this.textAlign;
+    return textAlign;
   }
 
   /**
@@ -320,7 +320,7 @@ public abstract class GuiComponent
    * @return the vertical text alignment
    */
   public Valign getTextValign() {
-    return this.textValign;
+    return textValign;
   }
 
   /**
@@ -329,7 +329,7 @@ public abstract class GuiComponent
    * @return the text angle
    */
   public int getTextAngle() {
-    return this.textAngle;
+    return textAngle;
   }
 
   /**
@@ -338,7 +338,7 @@ public abstract class GuiComponent
    * @return true, if this GuiComponent is currently configured to draw its text with antialiasing.
    */
   public boolean hasTextAntialiasing() {
-    return this.textAntialiasing;
+    return textAntialiasing;
   }
 
   /**
@@ -347,7 +347,7 @@ public abstract class GuiComponent
    * @return true, if this GuiComponent is currently configured to draw a shadow below its text.
    */
   public boolean hasTextShadow() {
-    return this.textShadow;
+    return textShadow;
   }
 
   public Color getTextShadowColor() {
@@ -367,7 +367,7 @@ public abstract class GuiComponent
   }
 
   public boolean hasAutomaticLineBreaks() {
-    return this.automaticLineBreaks;
+    return automaticLineBreaks;
   }
 
   /**
@@ -379,7 +379,7 @@ public abstract class GuiComponent
    * @return the text to render
    */
   public String getTextToRender(final Graphics2D g) {
-    if (this.getText() == null) {
+    if (getText() == null) {
       return "";
     } else if (hasAutomaticLineBreaks()) {
       return getText();
@@ -503,25 +503,25 @@ public abstract class GuiComponent
 
   @Override
   public void mouseClicked(final MouseEvent e) {
-    if (!this.mouseEventShouldBeForwarded(e)) {
+    if (!mouseEventShouldBeForwarded(e)) {
       return;
     }
 
-    if (this.isPressed) {
+    if (isPressed()) {
       final ComponentMouseEvent event = new ComponentMouseEvent(e, this);
-      this.getClickConsumer().forEach(consumer -> consumer.accept(event));
+      getClickConsumer().forEach(consumer -> consumer.accept(event));
       this.isPressed = false;
     }
   }
 
   @Override
   public void mouseDragged(final MouseEvent e) {
-    if (!this.mouseEventShouldBeForwarded(e)) {
+    if (!mouseEventShouldBeForwarded(e)) {
       return;
     }
 
     final ComponentMouseEvent event = new ComponentMouseEvent(e, this);
-    this.getMouseDraggedConsumer().forEach(consumer -> consumer.accept(event));
+    getMouseDraggedConsumer().forEach(consumer -> consumer.accept(event));
   }
 
   @Override
@@ -542,7 +542,7 @@ public abstract class GuiComponent
       Game.audio().playSound(getHoverSound());
     }
 
-    this.getMouseEnterConsumer().forEach(consumer -> consumer.accept(event));
+    getMouseEnterConsumer().forEach(consumer -> consumer.accept(event));
   }
 
   @Override
@@ -649,8 +649,8 @@ public abstract class GuiComponent
    *          the callback
    */
   public void onMouseEnter(final Consumer<ComponentMouseEvent> callback) {
-    if (!this.getMouseEnterConsumer().contains(callback)) {
-      this.getMouseEnterConsumer().add(callback);
+    if (!getMouseEnterConsumer().contains(callback)) {
+      getMouseEnterConsumer().add(callback);
     }
   }
 
@@ -751,7 +751,7 @@ public abstract class GuiComponent
     Input.mouse().addMouseListener(this);
     Input.mouse().onWheelMoved(this);
     Input.mouse().addMouseMotionListener(this);
-    for (final GuiComponent component : this.getComponents()) {
+    for (final GuiComponent component : getComponents()) {
       component.prepare();
     }
   }
@@ -761,11 +761,11 @@ public abstract class GuiComponent
    */
   @Override
   public void render(final Graphics2D g) {
-    if (this.isSuspended() || !this.isVisible()) {
+    if (isSuspended() || !isVisible()) {
       return;
     }
 
-    for (ComponentRenderListener listener : this.renderListeners) {
+    for (ComponentRenderListener listener : renderListeners) {
       if (!listener.canRender(this)) {
         return;
       }
@@ -777,17 +777,17 @@ public abstract class GuiComponent
     }
 
     Shape clip = g.getClip();
-    g.clip(this.getShape());
+    g.clip(getShape());
 
     if (!getCurrentAppearance().isTransparentBackground()) {
-      g.setPaint(getCurrentAppearance().getBackgroundPaint(this.getWidth(), this.getHeight()));
+      g.setPaint(getCurrentAppearance().getBackgroundPaint(getWidth(), getHeight()));
       ShapeRenderer.render(g, getBoundingBox());
     }
 
     g.setColor(getCurrentAppearance().getForeColor());
-    g.setFont(this.getFont());
+    g.setFont(getFont());
 
-    this.renderText(g);
+    renderText(g);
 
     g.setClip(clip);
     if (getCurrentAppearance().getBorderColor() != null
@@ -795,7 +795,7 @@ public abstract class GuiComponent
       g.setColor(getCurrentAppearance().getBorderColor());
       ShapeRenderer.renderOutline(g, getBoundingBox(), getCurrentAppearance().getBorderStyle());
     }
-    for (final GuiComponent component : this.getComponents()) {
+    for (final GuiComponent component : getComponents()) {
       if (!component.isVisible() || component.isSuspended()) {
         continue;
       }
@@ -821,27 +821,27 @@ public abstract class GuiComponent
   public float[] getTweenValues(TweenType tweenType) {
     switch (tweenType) {
       case LOCATION_X:
-        return new float[] {(float) this.getX()};
+        return new float[] {(float) getX()};
       case LOCATION_Y:
-        return new float[] {(float) this.getY()};
+        return new float[] {(float) getY()};
       case LOCATION_XY:
-        return new float[] {(float) this.getX(), (float) this.getY()};
+        return new float[] {(float) getX(), (float) getY()};
       case SIZE_WIDTH:
-        return new float[] {(float) this.getWidth()};
+        return new float[] {(float) getWidth()};
       case SIZE_HEIGHT:
-        return new float[] {(float) this.getHeight()};
+        return new float[] {(float) getHeight()};
       case SIZE_BOTH:
-        return new float[] {(float) this.getWidth(), (float) this.getHeight()};
+        return new float[] {(float) getWidth(), (float) getHeight()};
       case ANGLE:
-        return new float[] {this.getTextAngle()};
+        return new float[] {getTextAngle()};
       case FONTSIZE:
-        return new float[] {this.getFont().getSize2D()};
+        return new float[] {getFont().getSize2D()};
       case OPACITY:
-        Color bg1 = this.getCurrentAppearance().getBackgroundColor1();
-        Color bg2 = this.getCurrentAppearance().getBackgroundColor2();
-        Color fore = this.getCurrentAppearance().getForeColor();
-        Color shadow = this.getTextShadowColor();
-        Color border = this.getCurrentAppearance().getBorderColor();
+        Color bg1 = getCurrentAppearance().getBackgroundColor1();
+        Color bg2 = getCurrentAppearance().getBackgroundColor2();
+        Color fore = getCurrentAppearance().getForeColor();
+        Color shadow = getTextShadowColor();
+        Color border = getCurrentAppearance().getBorderColor();
         return new float[] {
             bg1 == null ? 0 : bg1.getAlpha(),
             bg2 == null ? 0 : bg2.getAlpha(),
@@ -857,25 +857,25 @@ public abstract class GuiComponent
   @Override
   public void setTweenValues(TweenType tweenType, float[] newValues) {
     switch (tweenType) {
-      case LOCATION_X -> this.setX(newValues[0]);
-      case LOCATION_Y -> this.setY(newValues[0]);
+      case LOCATION_X -> setX(newValues[0]);
+      case LOCATION_Y -> setY(newValues[0]);
       case LOCATION_XY -> {
-        this.setX(newValues[0]);
-        this.setY(newValues[1]);
+        setX(newValues[0]);
+        setY(newValues[1]);
       }
-      case SIZE_WIDTH -> this.setWidth(newValues[0]);
-      case SIZE_HEIGHT -> this.setHeight(newValues[0]);
+      case SIZE_WIDTH -> setWidth(newValues[0]);
+      case SIZE_HEIGHT -> setHeight(newValues[0]);
       case SIZE_BOTH -> {
-        this.setWidth(newValues[0]);
-        this.setHeight(newValues[1]);
+        setWidth(newValues[0]);
+        setHeight(newValues[1]);
       }
-      case ANGLE -> this.setTextAngle(Math.round(newValues[0]));
-      case FONTSIZE -> this.setFontSize(newValues[0]);
+      case ANGLE -> setTextAngle(Math.round(newValues[0]));
+      case FONTSIZE -> setFontSize(newValues[0]);
       case OPACITY -> {
-        Color bg1 = this.getCurrentAppearance().getBackgroundColor1();
-        Color bg2 = this.getCurrentAppearance().getBackgroundColor2();
-        Color fore = this.getCurrentAppearance().getForeColor();
-        Color border = this.getCurrentAppearance().getBorderColor();
+        Color bg1 = getCurrentAppearance().getBackgroundColor1();
+        Color bg2 = getCurrentAppearance().getBackgroundColor2();
+        Color fore = getCurrentAppearance().getForeColor();
+        Color border = getCurrentAppearance().getBorderColor();
         getCurrentAppearance()
             .setBackgroundColor1(
                 bg1 == null ? null : ColorHelper.getTransparentVariant(bg1, (int) newValues[0]));
@@ -900,17 +900,17 @@ public abstract class GuiComponent
   }
 
   public RectangularShape getShape() {
-    float radius = this.getCurrentAppearance().getBorderRadius();
+    float radius = getCurrentAppearance().getBorderRadius();
     if (radius == 0f) {
-      return this.getBoundingBox();
+      return getBoundingBox();
     }
     return new RoundRectangle2D.Double(
-        this.getX(),
-        this.getY(),
-        this.getWidth(),
-        this.getHeight(),
-        this.getCurrentAppearance().getBorderRadius(),
-        this.getCurrentAppearance().getBorderRadius());
+        getX(),
+        getY(),
+        getWidth(),
+        getHeight(),
+        getCurrentAppearance().getBorderRadius(),
+        getCurrentAppearance().getBorderRadius());
   }
 
   /**
@@ -934,8 +934,8 @@ public abstract class GuiComponent
    */
   public void setEnabled(final boolean enabled) {
     this.enabled = enabled;
-    for (final GuiComponent comp : this.getComponents()) {
-      comp.setEnabled(this.isEnabled());
+    for (final GuiComponent comp : getComponents()) {
+      comp.setEnabled(isEnabled());
     }
   }
 
@@ -959,7 +959,7 @@ public abstract class GuiComponent
     if (this.font == null) {
       return;
     }
-    this.font = this.font.deriveFont(size);
+    this.font = getFont().deriveFont(size);
   }
 
   /**
@@ -1071,7 +1071,7 @@ public abstract class GuiComponent
   public void setText(final String text) {
     this.text = text;
     for (final Consumer<String> cons : this.textChangedConsumer) {
-      cons.accept(this.getText());
+      cons.accept(getText());
     }
   }
 
@@ -1127,7 +1127,7 @@ public abstract class GuiComponent
    */
   public void setTextShadow(final boolean drawTextShadow) {
     this.textShadow = drawTextShadow;
-    for (final GuiComponent comp : this.getComponents()) {
+    for (final GuiComponent comp : getComponents()) {
       comp.setTextShadow(drawTextShadow);
     }
   }
@@ -1160,7 +1160,7 @@ public abstract class GuiComponent
    */
   public void setVisible(final boolean visible) {
     this.visible = visible;
-    for (final GuiComponent component : this.getComponents()) {
+    for (final GuiComponent component : getComponents()) {
       component.setVisible(visible);
     }
   }
@@ -1206,7 +1206,7 @@ public abstract class GuiComponent
     Input.mouse().removeMouseMotionListener(this);
     this.suspended = true;
     this.visible = false;
-    for (final GuiComponent childComp : this.getComponents()) {
+    for (final GuiComponent childComp : getComponents()) {
       childComp.suspend();
     }
   }
@@ -1215,25 +1215,25 @@ public abstract class GuiComponent
    * Toggle this GuiComponent's selection.
    */
   public void toggleSelection() {
-    this.setSelected(!this.isSelected);
+    setSelected(!isSelected());
   }
 
   /**
    * Toggle this GuiComponent's suspension state. If it's suspended, prepare it. If it's prepared, suspend it.
    */
   public void toggleSuspension() {
-    if (!this.isSuspended()) {
-      this.suspend();
+    if (!isSuspended()) {
+      suspend();
     } else {
-      this.prepare();
+      prepare();
     }
   }
 
   public Appearance getCurrentAppearance() {
-    if (!this.isEnabled()) {
-      return this.getAppearanceDisabled();
+    if (!isEnabled()) {
+      return getAppearanceDisabled();
     }
-    return this.isHovered() ? this.getAppearanceHovered() : this.getAppearance();
+    return isHovered() ? getAppearanceHovered() : getAppearance();
   }
 
   /**
@@ -1242,7 +1242,7 @@ public abstract class GuiComponent
    * @return the click consumer list
    */
   protected List<Consumer<ComponentMouseEvent>> getClickConsumer() {
-    return this.clickConsumer;
+    return clickConsumer;
   }
 
   /**
@@ -1251,7 +1251,7 @@ public abstract class GuiComponent
    * @return the hover consumer list
    */
   protected List<Consumer<ComponentMouseEvent>> getHoverConsumer() {
-    return this.hoverConsumer;
+    return hoverConsumer;
   }
 
   /**
@@ -1260,7 +1260,7 @@ public abstract class GuiComponent
    * @return the mouse dragged consumer list
    */
   protected List<Consumer<ComponentMouseEvent>> getMouseDraggedConsumer() {
-    return this.mouseDraggedConsumer;
+    return mouseDraggedConsumer;
   }
 
   /**
@@ -1269,7 +1269,7 @@ public abstract class GuiComponent
    * @return the mouse enter consumer list
    */
   protected List<Consumer<ComponentMouseEvent>> getMouseEnterConsumer() {
-    return this.mouseEnterConsumer;
+    return mouseEnterConsumer;
   }
 
   /**
@@ -1278,7 +1278,7 @@ public abstract class GuiComponent
    * @return the mouse leave consumer list
    */
   protected List<Consumer<ComponentMouseEvent>> getMouseLeaveConsumer() {
-    return this.mouseLeaveConsumer;
+    return mouseLeaveConsumer;
   }
 
   /**
@@ -1287,7 +1287,7 @@ public abstract class GuiComponent
    * @return the mouse moved consumer list
    */
   protected List<Consumer<ComponentMouseEvent>> getMouseMovedConsumer() {
-    return this.mouseMovedConsumer;
+    return mouseMovedConsumer;
   }
 
   /**
@@ -1296,7 +1296,7 @@ public abstract class GuiComponent
    * @return the mouse pressed consumer list
    */
   protected List<Consumer<ComponentMouseEvent>> getMousePressedConsumer() {
-    return this.mousePressedConsumer;
+    return mousePressedConsumer;
   }
 
   /**
@@ -1305,7 +1305,7 @@ public abstract class GuiComponent
    * @return the mouse released consumer list
    */
   protected List<Consumer<ComponentMouseEvent>> getMouseReleasedConsumer() {
-    return this.mouseReleasedConsumer;
+    return mouseReleasedConsumer;
   }
 
   /**
@@ -1314,7 +1314,7 @@ public abstract class GuiComponent
    * @return the mouse wheel consumer list
    */
   protected List<Consumer<ComponentMouseWheelEvent>> getMouseWheelConsumer() {
-    return this.mouseWheelConsumer;
+    return mouseWheelConsumer;
   }
 
   /**
@@ -1332,12 +1332,12 @@ public abstract class GuiComponent
    * @return true, if the Mouse event should be forwarded
    */
   protected boolean mouseEventShouldBeForwarded(final MouseEvent e) {
-    return this.isForwardMouseEvents()
-        && this.isVisible()
-        && this.isEnabled()
-        && !this.isSuspended()
+    return isForwardMouseEvents()
+        && isVisible()
+        && isEnabled()
+        && !isSuspended()
         && e != null
-        && this.getBoundingBox().contains(e.getPoint());
+        && getBoundingBox().contains(e.getPoint());
   }
 
   /**
@@ -1347,65 +1347,65 @@ public abstract class GuiComponent
    *          the {@code Graphics2D} object used for drawing
    */
   private void renderText(final Graphics2D g) {
-    if (this.getText() == null || this.getText().isEmpty()) {
+    if (getText() == null || getText().isEmpty()) {
       return;
     }
 
     final FontMetrics fm = g.getFontMetrics();
 
-    double textWidth = fm.stringWidth(this.getTextToRender(g));
+    double textWidth = fm.stringWidth(getTextToRender(g));
     double textHeight = (double) fm.getAscent() + fm.getDescent();
 
     double xCoord =
-        this.getTextAlign() != null
-            ? this.getX() + this.getTextAlign().getLocation(this.getWidth(), textWidth)
-            : this.getTextX();
+        getTextAlign() != null
+            ? getX() + getTextAlign().getLocation(getWidth(), textWidth)
+            : getTextX();
     double yCoord =
-        this.getTextValign() != null
-            ? this.getY() + this.getTextValign().getLocation(this.getHeight(), textHeight)
-            : this.getTextY();
-    if (this.getTextAngle() == 0) {
-      if (this.hasTextShadow()) {
+        getTextValign() != null
+            ? getY() + getTextValign().getLocation(getHeight(), textHeight)
+            : getTextY();
+    if (getTextAngle() == 0) {
+      if (hasTextShadow()) {
         TextRenderer.renderWithOutline(
             g,
-            this.getTextToRender(g),
-            this.getX(),
-            this.getY(),
-            this.getWidth(),
-            this.getHeight(),
-            this.getTextShadowColor(),
-            this.getTextShadowRadius(),
-            this.getTextAlign(),
-            this.getTextValign(),
-            this.hasTextAntialiasing());
+            getTextToRender(g),
+            getX(),
+            getY(),
+            getWidth(),
+            getHeight(),
+            getTextShadowColor(),
+            getTextShadowRadius(),
+            getTextAlign(),
+            getTextValign(),
+            hasTextAntialiasing());
       } else {
         TextRenderer.renderWithLinebreaks(
             g,
-            this.getTextToRender(g),
-            this.getTextAlign(),
-            this.getTextValign(),
-            this.getX(),
-            this.getY(),
-            this.getWidth(),
-            this.getHeight(),
-            this.hasTextAntialiasing());
+            getTextToRender(g),
+            getTextAlign(),
+            getTextValign(),
+            getX(),
+            getY(),
+            getWidth(),
+            getHeight(),
+            hasTextAntialiasing());
       }
-    } else if (this.getTextAngle() == 90) {
+    } else if (getTextAngle() == 90) {
       TextRenderer.renderRotated(
           g,
-          this.getTextToRender(g),
+          getTextToRender(g),
           xCoord,
-          yCoord - fm.stringWidth(this.getTextToRender(g)),
-          this.getTextAngle(),
-          this.hasTextAntialiasing());
+          yCoord - fm.stringWidth(getTextToRender(g)),
+          getTextAngle(),
+          hasTextAntialiasing());
     } else {
       TextRenderer.renderRotated(
           g,
-          this.getTextToRender(g),
+          getTextToRender(g),
           xCoord,
           yCoord,
-          this.getTextAngle(),
-          this.hasTextAntialiasing());
+          getTextAngle(),
+          hasTextAntialiasing());
     }
   }
 }
