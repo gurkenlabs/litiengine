@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 
 @EntityInfo
 public abstract class Entity implements IEntity, EntityRenderListener, Tweenable {
+
   private static final Logger log = Logger.getLogger(Entity.class.getName());
   public static final String ANY_MESSAGE = "";
   private final Collection<EntityTransformListener> transformListeners =
@@ -443,11 +444,11 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
         this.setX(newValues[0]);
         this.setY(newValues[1]);
       }
-      case SIZE_WIDTH -> this.setWidth(newValues[0]);
-      case SIZE_HEIGHT -> this.setHeight(newValues[0]);
+      case SIZE_WIDTH -> setWidth(newValues[0]);
+      case SIZE_HEIGHT -> setHeight(newValues[0]);
       case SIZE_BOTH -> {
-        this.setWidth(newValues[0]);
-        this.setHeight(newValues[1]);
+        setWidth(newValues[0]);
+        setHeight(newValues[1]);
       }
       case ANGLE -> this.setAngle(newValues[0]);
       default -> Tweenable.super.setTweenValues(tweenType, newValues);

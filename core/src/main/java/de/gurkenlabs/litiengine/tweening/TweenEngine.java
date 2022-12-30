@@ -13,7 +13,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class TweenEngine implements IUpdateable, ILaunchable {
   private final Map<Tweenable, Map<TweenType, Tween>> tweens;
 
-  /** Instantiates a new {@code TweenEngine}. */
+  /**
+   * Instantiates a new {@code TweenEngine}.
+   */
   public TweenEngine() {
     this.tweens = new ConcurrentHashMap<>();
   }
@@ -104,7 +106,9 @@ public class TweenEngine implements IUpdateable, ILaunchable {
     return tween;
   }
 
-  /** Start. */
+  /**
+   * Start.
+   */
   @Override
   public void start() {
     Game.loop().attach(this);
@@ -143,13 +147,17 @@ public class TweenEngine implements IUpdateable, ILaunchable {
     return tween;
   }
 
-  /** Terminate. */
+  /**
+   * Terminate.
+   */
   @Override
   public void terminate() {
     Game.loop().detach(this);
   }
 
-  /** Updates all registered Tweens by applying the {@code TweenEquation}. */
+  /**
+   * Updates all registered Tweens by applying the {@code TweenEquation}.
+   */
   @Override
   public void update() {
     for (final Tweenable target : this.getTweens().keySet()) {

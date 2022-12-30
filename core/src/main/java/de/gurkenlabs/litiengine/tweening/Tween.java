@@ -75,7 +75,7 @@ public class Tween {
    *
    * @return the duration of the Tween in milliseconds
    */
-  public long getDuration() {
+  public int getDuration() {
     return this.duration;
   }
 
@@ -89,9 +89,9 @@ public class Tween {
   }
 
   /**
-   * Gets the start time of the Tween.
+   * Gets the start tick of the Tween.
    *
-   * @return the start time in milliseconds
+   * @return the start time in ticks
    */
   public long getStartTime() {
     return this.started;
