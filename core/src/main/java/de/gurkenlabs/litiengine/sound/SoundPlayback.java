@@ -239,7 +239,7 @@ public abstract class SoundPlayback implements Runnable, AutoCloseable {
     // number of sample frames
     len = (this.line.getBufferSize() / len / 2 + 1) * len;
     for (int i = 0; i < data.length; i += this.line.write(data, i, Math.min(len, data.length - i))) {
-      if (this.cancelled) {
+      if (this.cancelled || !line.isOpen()) {
         return true;
       }
     }
