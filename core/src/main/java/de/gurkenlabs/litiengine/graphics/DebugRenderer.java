@@ -118,7 +118,8 @@ public final class DebugRenderer {
                     entity.getBoundingBox().getCenterY() - range,
                     range * 2d,
                     range * 2d),
-                dashed);
+                dashed,
+                true);
       }
     }
 

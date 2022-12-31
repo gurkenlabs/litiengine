@@ -194,7 +194,8 @@ public class MapObjectsRenderer implements IEditorRenderer {
       Game.graphics().renderOutline(g,
           new Ellipse2D.Double(mapObject.getBoundingBox().getCenterX() - range, mapObject.getBoundingBox().getCenterY() - range, range * 2d,
               range * 2d),
-          dashed);
+          dashed,
+          true);
     }
 
     if (Editor.preferences().renderNames()) {
