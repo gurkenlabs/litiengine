@@ -243,6 +243,7 @@ public abstract class SoundPlayback implements Runnable, AutoCloseable {
         return true;
       }
     }
+    close();
     return this.cancelled;
   }
 
