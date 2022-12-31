@@ -18,6 +18,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Path2D;
@@ -57,7 +58,13 @@ public class MapObjectsRenderer implements IEditorRenderer {
         }
 
         MapObjectType type = MapObjectType.get(mapObject.getType());
-        final BasicStroke shapeStroke = new BasicStroke(1f / Game.world().camera().getRenderScale());
+        final float stroke;
+        if (mapObject.isPolyline()) {
+          stroke = 1f;
+        } else {
+          stroke = 0.5f;
+        }
+        final BasicStroke shapeStroke = new BasicStroke(stroke * Game.world().camera().getRenderScale());
         if (type == null) {
           if (Editor.preferences().renderCustomMapObjects()) {
             renderUnsupportedMapObject(g, mapObject, shapeStroke);
@@ -76,7 +83,7 @@ public class MapObjectsRenderer implements IEditorRenderer {
         if (type != MapObjectType.COLLISIONBOX) {
           Color colorBoundingBoxFill;
           if (layer.getColor() != null) {
-            colorBoundingBoxFill = new Color(layer.getColor().getRed(), layer.getColor().getGreen(), layer.getColor().getBlue(), 15);
+            colorBoundingBoxFill = new Color(layer.getColor().getRed(), layer.getColor().getGreen(), layer.getColor().getBlue(), 25);
           } else {
             colorBoundingBoxFill = Style.COLOR_DEFAULT_BOUNDING_BOX_FILL;
           }
@@ -105,7 +112,6 @@ public class MapObjectsRenderer implements IEditorRenderer {
     Game.graphics().renderShape(g, new Ellipse2D.Double(start.getX() - 1, start.getY() - 1, 3, 3));
 
     if (mapObject.isPolyline()) {
-
       if (mapObject.getPolyline() == null || mapObject.getPolyline().getPoints().isEmpty()) {
         return;
       }
@@ -158,15 +164,6 @@ public class MapObjectsRenderer implements IEditorRenderer {
       fillColor = Style.COLOR_SHADOW_FILL;
     }
 
-    // render bounding boxes
-    g.setColor(fillColor);
-
-    // don't fill rect for lightsource because it is important to judge
-    // the color
-    if (type != MapObjectType.LIGHTSOURCE) {
-      Game.graphics().renderShape(g, mapObject.getBoundingBox());
-    }
-
     Color borderColor = colorBoundingBoxFill;
     if (type == MapObjectType.TRIGGER) {
       borderColor = Style.COLOR_TRIGGER_BORDER;
@@ -185,8 +182,24 @@ public class MapObjectsRenderer implements IEditorRenderer {
     }
 
     g.setColor(borderColor);
+    Shape bounds = mapObject.getBoundingBox();
+    if (mapObject.isEllipse()) {
+      bounds = mapObject.getEllipse();
+    } else if (mapObject.isPolyline() || mapObject.isPolygon()) {
+      bounds = MapUtilities.convertPolyshapeToPath(mapObject);
+    }
+    Game.graphics().renderOutline(g, bounds, shapeStroke, true);
 
-    Game.graphics().renderOutline(g, mapObject.getBoundingBox(), shapeStroke);
+    // render bounding boxes
+    g.setColor(fillColor);
+
+    // don't fill rect for lightsource because it is important to judge
+    // the color
+    if (type != MapObjectType.LIGHTSOURCE && !mapObject.isPolyline()) {
+      Game.graphics().renderShape(g, bounds, true);
+    }
+
+
     if (type == MapObjectType.SOUNDSOURCE) {
       final int range = mapObject.getIntValue(MapObjectProperty.SOUND_RANGE);
       final float[] dash1 = {10.0f};

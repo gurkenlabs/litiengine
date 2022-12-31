@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.environment;
 
+import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -21,14 +22,19 @@ public class MapAreaMapObjectLoader extends MapObjectLoader {
       return entities;
     }
 
-    MapArea mapArea = this.createMapArea(mapObject);
+    MapArea mapArea = new MapArea();
     loadDefaultProperties(mapArea, mapObject);
+    initShape(mapArea, mapObject);
 
     entities.add(mapArea);
     return entities;
   }
 
-  protected MapArea createMapArea(IMapObject mapObject) {
-    return new MapArea();
+  private static void initShape(MapArea area, IMapObject mapObject) {
+    if (mapObject.isPolygon() || mapObject.isPolyline()) {
+      area.setShape(MapUtilities.convertPolyshapeToPath(mapObject));
+    } else if (mapObject.isEllipse()) {
+      area.setShape(mapObject.getEllipse());
+    }
   }
 }
