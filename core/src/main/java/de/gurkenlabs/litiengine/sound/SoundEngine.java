@@ -604,8 +604,8 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    * @return An {@code SFXPlayback} object that can be configured prior to starting, but will need to be manually started.
    */
   public SFXPlayback createSound(Sound sound, Supplier<Point2D> supplier, boolean loop, int range, float volume) {
-    try (
-        SFXPlayback playback = new SFXPlayback(sound, supplier, loop, range, volume);) {
+    try {
+      SFXPlayback playback = new SFXPlayback(sound, supplier, loop, range, volume);
       return playback;
     } catch (LineUnavailableException | IllegalArgumentException e) {
       resourceFailure(e);
