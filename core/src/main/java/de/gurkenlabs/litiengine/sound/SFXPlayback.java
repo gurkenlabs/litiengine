@@ -33,12 +33,17 @@ public class SFXPlayback extends SoundPlayback {
 
   @Override
   public void run() {
-    do {
-      if (this.play(this.sound)) {
-        return;
-      }
-    } while (this.loop);
-    this.finish();
+    try {
+      do {
+        if (this.play(this.sound)) {
+          return;
+        }
+      } while (this.loop);
+    } catch (Throwable t) {
+      t.printStackTrace();
+    } finally {
+      this.finish();
+    }
   }
 
   void updateLocation(Point2D listenerLocation) {

@@ -23,7 +23,7 @@ import javax.sound.sampled.SourceDataLine;
  * @see #play(Sound)
  */
 public abstract class SoundPlayback implements Runnable, AutoCloseable {
-  protected final SourceDataLine line;
+  protected SourceDataLine line;
   private FloatControl gainControl;
   private BooleanControl muteControl;
 
@@ -38,18 +38,12 @@ public abstract class SoundPlayback implements Runnable, AutoCloseable {
   private AtomicInteger miscVolume = new AtomicInteger(0x3f800000); // floatToIntBits(1f)
 
   SoundPlayback(AudioFormat format) throws LineUnavailableException {
-    // acquire resources in the constructor so that they can be used before the task is started
-    try {
-      this.line = AudioSystem.getSourceDataLine(format);
-      this.line.open();
-      this.line.start();
-      this.gainControl = (FloatControl) this.line.getControl(FloatControl.Type.MASTER_GAIN);
-      this.muteControl = (BooleanControl) this.line.getControl(BooleanControl.Type.MUTE);
-      this.masterVolume = this.createVolumeControl();
-    } catch (Throwable t) {
-      close();
-      throw t;
-    }
+    this.line = AudioSystem.getSourceDataLine(format);
+    line.open();
+    line.start();
+    this.gainControl = (FloatControl) this.line.getControl(FloatControl.Type.MASTER_GAIN);
+    this.muteControl = (BooleanControl) this.line.getControl(BooleanControl.Type.MUTE);
+    this.masterVolume = this.createVolumeControl();
   }
 
   /**
@@ -171,7 +165,6 @@ public abstract class SoundPlayback implements Runnable, AutoCloseable {
       this.line.stop();
       this.cancelled = true;
       this.line.flush();
-      close();
       SoundEvent event = new SoundEvent(this, null);
       for (SoundPlaybackListener listener : this.listeners) {
         listener.cancelled(event);
@@ -231,8 +224,11 @@ public abstract class SoundPlayback implements Runnable, AutoCloseable {
    * @param sound
    *          The sound to play
    * @return Whether the sound was cancelled while playing
+   * @throws LineUnavailableException
    */
-  boolean play(Sound sound) {
+  boolean play(Sound sound) throws LineUnavailableException {
+    this.line.open();
+    this.line.start();
     byte[] data = sound.getStreamData();
     int len = this.line.getFormat().getFrameSize();
     // math hacks here: we're getting just over half the buffer size, but it needs to be an integral
@@ -243,7 +239,6 @@ public abstract class SoundPlayback implements Runnable, AutoCloseable {
         return true;
       }
     }
-    close();
     return this.cancelled;
   }
 

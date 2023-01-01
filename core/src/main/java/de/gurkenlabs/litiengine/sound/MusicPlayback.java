@@ -17,12 +17,17 @@ public class MusicPlayback extends SoundPlayback {
 
   @Override
   public void run() {
-    for (Sound sound : this.track) {
-      if (this.play(sound)) {
-        return;
+    try {
+      for (Sound sound : this.track) {
+        if (this.play(sound)) {
+          return;
+        }
       }
+    } catch (Throwable t) {
+      t.printStackTrace();
+    } finally {
+      this.finish();
     }
-    this.finish();
   }
 
   public Track getTrack() {
