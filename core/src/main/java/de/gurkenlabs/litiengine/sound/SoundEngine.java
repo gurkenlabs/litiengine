@@ -156,7 +156,8 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
       return music;
     }
 
-    try (MusicPlayback playback = new MusicPlayback(track)) {
+    try {
+      MusicPlayback playback = new MusicPlayback(track);
       if (config != null) {
         config.accept(playback);
       }
