@@ -23,7 +23,7 @@ import javax.sound.sampled.SourceDataLine;
  * @see #play(Sound)
  */
 public abstract class SoundPlayback implements Runnable, AutoCloseable {
-  protected SourceDataLine line;
+  protected final SourceDataLine line;
   private FloatControl gainControl;
   private BooleanControl muteControl;
 
@@ -38,9 +38,10 @@ public abstract class SoundPlayback implements Runnable, AutoCloseable {
   private AtomicInteger miscVolume = new AtomicInteger(0x3f800000); // floatToIntBits(1f)
 
   SoundPlayback(AudioFormat format) throws LineUnavailableException {
+    // acquire resources in the constructor so that they can be used before the task is started
     this.line = AudioSystem.getSourceDataLine(format);
-    line.open();
-    line.start();
+    this.line.open();
+    this.line.start();
     this.gainControl = (FloatControl) this.line.getControl(FloatControl.Type.MASTER_GAIN);
     this.muteControl = (BooleanControl) this.line.getControl(BooleanControl.Type.MUTE);
     this.masterVolume = this.createVolumeControl();
@@ -224,7 +225,6 @@ public abstract class SoundPlayback implements Runnable, AutoCloseable {
    * @param sound
    *          The sound to play
    * @return Whether the sound was cancelled while playing
-   * @throws LineUnavailableException
    */
   boolean play(Sound sound) throws LineUnavailableException {
     this.line.open();
