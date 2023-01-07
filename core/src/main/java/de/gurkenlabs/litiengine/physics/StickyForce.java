@@ -7,7 +7,7 @@ import java.awt.geom.Point2D;
 public class StickyForce extends Force {
 
   /** The force entiy. */
-  private final IEntity forceEntiy;
+  private final IEntity forceEntity;
 
   /***
    * Instantiates a new sticky force.
@@ -21,28 +21,34 @@ public class StickyForce extends Force {
    */
   public StickyForce(final IEntity forceEntity, final float strength, final float size) {
     super(forceEntity.getCenter(), strength, size);
-    this.forceEntiy = forceEntity;
+    this.forceEntity = forceEntity;
   }
 
   public StickyForce(final Point2D center, final float strength, final float size) {
     super(center, strength, size);
-    this.forceEntiy = null;
+    this.forceEntity = null;
   }
 
   /**
-   * Gets the force entiy.
+   * Gets the force entity.
    *
-   * @return the force entiy
+   * @return the force entity
    */
-  public IEntity getForceEntiy() {
-    return this.forceEntiy;
+  public IEntity getForceEntity() {
+    return this.forceEntity;
   }
 
   @Override
   public Point2D getLocation() {
-    if (this.getForceEntiy() != null) {
-      return this.getForceEntiy().getCenter();
+    if (this.getForceEntity() != null) {
+      return this.getForceEntity().getCenter();
     }
     return super.getLocation();
+  }
+
+  @Override
+  public boolean cancelOnReached() {
+    // always return false because this type of force sticks to the entity by design and can therefore never "reach" the entity
+    return false;
   }
 }
