@@ -123,7 +123,7 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
 
   @Override
   public boolean isAutoScaling() {
-    return this.getEntity().isScaling();
+    return this.getEntity().isScaling() || super.isAutoScaling();
   }
 
   @Override
