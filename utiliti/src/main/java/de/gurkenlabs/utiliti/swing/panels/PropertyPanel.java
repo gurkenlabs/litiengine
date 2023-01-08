@@ -64,7 +64,7 @@ public abstract class PropertyPanel extends JPanel {
   public static final Dimension BUTTON_SIZE = new Dimension(CONTROL_HEIGHT, CONTROL_HEIGHT);
   public static final Dimension SPINNER_SIZE = new Dimension(SPINNER_WIDTH, CONTROL_HEIGHT);
   public static final Dimension SMALL_CONTROL_SIZE =
-      new Dimension(CONTROL_MIN_WIDTH, CONTROL_HEIGHT);
+    new Dimension(CONTROL_MIN_WIDTH, CONTROL_HEIGHT);
   public static final Dimension LARGE_CONTROL_SIZE = new Dimension(CONTROL_WIDTH, CONTROL_HEIGHT);
   public static final Border STANDARDBORDER = new EmptyBorder(0, 4, 0, 4);
 
@@ -94,9 +94,9 @@ public abstract class PropertyPanel extends JPanel {
   }
 
   public static float getSpinnerValue(JSpinner spinner) {
-    if (spinner.getValue()instanceof Integer integer) {
+    if (spinner.getValue() instanceof Integer integer) {
       return integer.floatValue();
-    } else if (spinner.getValue()instanceof Double dbl) {
+    } else if (spinner.getValue() instanceof Double dbl) {
       return dbl.floatValue();
     } else {
       return (float) spinner.getValue();
@@ -104,7 +104,7 @@ public abstract class PropertyPanel extends JPanel {
   }
 
   protected static void populateComboBoxWithSprites(
-      JComboBox<JLabel> comboBox, Map<String, String> m) {
+    JComboBox<JLabel> comboBox, Map<String, String> m) {
     comboBox.removeAllItems();
 
     for (Map.Entry<String, String> entry : m.entrySet()) {
@@ -127,9 +127,9 @@ public abstract class PropertyPanel extends JPanel {
       for (int i = 0; i < comboBox.getModel().getSize(); i++) {
         JLabel label = comboBox.getModel().getElementAt(i);
         if (label != null
-            && label
-                .getText()
-                .equals(mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME))) {
+          && label
+          .getText()
+          .equals(mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME))) {
           comboBox.setSelectedItem(label);
           break;
         }
@@ -173,9 +173,9 @@ public abstract class PropertyPanel extends JPanel {
       return;
     }
     toggle.addActionListener(
-        new MapObjectPropertyActionListener(
-            m -> !m.hasCustomProperty(property) || m.getBoolValue(property) != toggle.isSelected(),
-            m -> m.setValue(property, toggle.isSelected())));
+      new MapObjectPropertyActionListener(
+        m -> !m.hasCustomProperty(property) || m.getBoolValue(property) != toggle.isSelected(),
+        m -> m.setValue(property, toggle.isSelected())));
   }
 
   protected void setup(JCheckBox checkbox, String property) {
@@ -183,9 +183,9 @@ public abstract class PropertyPanel extends JPanel {
       return;
     }
     checkbox.addActionListener(
-        new MapObjectPropertyActionListener(
-            m -> !m.hasCustomProperty(property) || m.getBoolValue(property) != checkbox.isSelected(),
-            m -> m.setValue(property, checkbox.isSelected())));
+      new MapObjectPropertyActionListener(
+        m -> !m.hasCustomProperty(property) || m.getBoolValue(property) != checkbox.isSelected(),
+        m -> m.setValue(property, checkbox.isSelected())));
   }
 
   protected <T> void setup(JComboBox<T> comboBox, String property) {
@@ -193,19 +193,19 @@ public abstract class PropertyPanel extends JPanel {
       return;
     }
     comboBox.addActionListener(
-        new MapObjectPropertyActionListener(
-            m -> {
-              if (!m.hasCustomProperty(property) || m.getStringValue(property) == null) {
-                return true;
-              }
+      new MapObjectPropertyActionListener(
+        m -> {
+          if (!m.hasCustomProperty(property) || m.getStringValue(property) == null) {
+            return true;
+          }
 
-              T value = comboBox.getModel().getElementAt(comboBox.getSelectedIndex());
-              return !m.getStringValue(property).equals(value.toString());
-            },
-            m -> {
-              T value = comboBox.getModel().getElementAt(comboBox.getSelectedIndex());
-              m.setValue(property, value != null ? value.toString() : null);
-            }));
+          T value = comboBox.getModel().getElementAt(comboBox.getSelectedIndex());
+          return !m.getStringValue(property).equals(value.toString());
+        },
+        m -> {
+          T value = comboBox.getModel().getElementAt(comboBox.getSelectedIndex());
+          m.setValue(property, value != null ? value.toString() : null);
+        }));
   }
 
   protected void setupL(JComboBox<JLabel> comboBox, String property) {
@@ -213,19 +213,19 @@ public abstract class PropertyPanel extends JPanel {
       return;
     }
     comboBox.addActionListener(
-        new MapObjectPropertyActionListener(
-            m -> {
-              if (!m.hasCustomProperty(property) || m.getStringValue(property) == null) {
-                return true;
-              }
+      new MapObjectPropertyActionListener(
+        m -> {
+          if (!m.hasCustomProperty(property) || m.getStringValue(property) == null) {
+            return true;
+          }
 
-              JLabel value = comboBox.getModel().getElementAt(comboBox.getSelectedIndex());
-              return m.getStringValue(property).equals(value != null ? value.getText() : null);
-            },
-            m -> {
-              JLabel value = comboBox.getModel().getElementAt(comboBox.getSelectedIndex());
-              m.setValue(property, value != null ? value.getText() : null);
-            }));
+          JLabel value = comboBox.getModel().getElementAt(comboBox.getSelectedIndex());
+          return value != null && !m.getStringValue(property).equals(value.getText());
+        },
+        m -> {
+          JLabel value = comboBox.getModel().getElementAt(comboBox.getSelectedIndex());
+          m.setValue(property, value != null ? value.getText() : null);
+        }));
   }
 
   protected void setup(JSlider slider, String property) {
@@ -254,13 +254,13 @@ public abstract class PropertyPanel extends JPanel {
       return;
     }
     textField.addFocusListener(
-        new MapObjectPropteryFocusListener(m -> m.setValue(property, textField.getText())));
+      new MapObjectPropteryFocusListener(m -> m.setValue(property, textField.getText())));
     textField.addActionListener(
-        new MapObjectPropertyActionListener(
-            m -> !m.hasCustomProperty(property)
-                || m.getStringValue(property) == null
-                || !m.getStringValue(property).equals(textField.getText()),
-            m -> m.setValue(property, textField.getText())));
+      new MapObjectPropertyActionListener(
+        m -> !m.hasCustomProperty(property)
+          || m.getStringValue(property) == null
+          || !m.getStringValue(property).equals(textField.getText()),
+        m -> m.setValue(property, textField.getText())));
   }
 
   protected void setup(TextList textList, String property) {
@@ -268,11 +268,11 @@ public abstract class PropertyPanel extends JPanel {
       return;
     }
     textList.addActionListener(
-        new MapObjectPropertyActionListener(
-            m -> !m.hasCustomProperty(property)
-                || m.getStringValue(property) == null
-                || !m.getStringValue(property).equals(textList.getJoinedString()),
-            m -> m.setValue(property, textList.getJoinedString())));
+      new MapObjectPropertyActionListener(
+        m -> !m.hasCustomProperty(property)
+          || m.getStringValue(property) == null
+          || !m.getStringValue(property).equals(textList.getJoinedString()),
+        m -> m.setValue(property, textList.getJoinedString())));
   }
 
   protected void setup(JTable table, String... properties) {
@@ -291,7 +291,7 @@ public abstract class PropertyPanel extends JPanel {
   }
 
   protected LayoutManager createLayout(
-      LayoutItem[] layoutItems, Component... additionalComponents) {
+    LayoutItem[] layoutItems, Component... additionalComponents) {
     GroupLayout groupLayout = new GroupLayout(this);
 
     // prepare the parallel group for the labels
@@ -299,16 +299,16 @@ public abstract class PropertyPanel extends JPanel {
     ParallelGroup parallel = groupLayout.createParallelGroup(Alignment.TRAILING);
     for (Component component : additionalComponents) {
       parallel.addComponent(
-          component, Alignment.LEADING, CONTROL_MIN_WIDTH, CONTROL_WIDTH, Short.MAX_VALUE);
+        component, Alignment.LEADING, CONTROL_MIN_WIDTH, CONTROL_WIDTH, Short.MAX_VALUE);
     }
 
     for (LayoutItem item : layoutItems) {
       SequentialGroup horGrp = groupLayout.createSequentialGroup();
       if (item.getLabel() != null) {
         horGrp
-            .addComponent(item.getLabel(), LABEL_WIDTH, LABEL_WIDTH, Short.MAX_VALUE)
-            .addPreferredGap(ComponentPlacement.UNRELATED)
-            .addComponent(item.getComponent(), CONTROL_MIN_WIDTH, CONTROL_WIDTH, Short.MAX_VALUE);
+          .addComponent(item.getLabel(), LABEL_WIDTH, LABEL_WIDTH, Short.MAX_VALUE)
+          .addPreferredGap(ComponentPlacement.UNRELATED)
+          .addComponent(item.getComponent(), CONTROL_MIN_WIDTH, CONTROL_WIDTH, Short.MAX_VALUE);
       } else {
         horGrp.addComponent(item.getComponent(), CONTROL_MIN_WIDTH, CONTROL_WIDTH, Short.MAX_VALUE);
       }
@@ -318,9 +318,9 @@ public abstract class PropertyPanel extends JPanel {
     // initialize the horizontal layout group with the parallel groups for
     // labels and components and some additional gaps
     groupLayout.setHorizontalGroup(
-        groupLayout
-            .createParallelGroup(Alignment.LEADING)
-            .addGroup(groupLayout.createSequentialGroup().addGroup(parallel)));
+      groupLayout
+        .createParallelGroup(Alignment.LEADING)
+        .addGroup(groupLayout.createSequentialGroup().addGroup(parallel)));
 
     // now prepare the vertical groups
     SequentialGroup seq = groupLayout.createSequentialGroup();
@@ -330,17 +330,17 @@ public abstract class PropertyPanel extends JPanel {
       ParallelGroup verGrp = groupLayout.createParallelGroup(Alignment.LEADING);
       if (item.getLabel() != null) {
         verGrp
-            .addComponent(
-                item.getComponent(), item.getMinHeight(), item.getMinHeight(), item.getMinHeight())
-            .addComponent(
-                item.getLabel(),
-                GroupLayout.PREFERRED_SIZE,
-                item.getMinHeight(),
-                item.getMinHeight())
-            .addGap(CONTROL_MARGIN);
+          .addComponent(
+            item.getComponent(), item.getMinHeight(), item.getMinHeight(), item.getMinHeight())
+          .addComponent(
+            item.getLabel(),
+            GroupLayout.PREFERRED_SIZE,
+            item.getMinHeight(),
+            item.getMinHeight())
+          .addGap(CONTROL_MARGIN);
       } else {
         verGrp.addComponent(
-            item.getComponent(), item.getMinHeight(), item.getMinHeight(), item.getMinHeight());
+          item.getComponent(), item.getMinHeight(), item.getMinHeight(), item.getMinHeight());
       }
 
       current = current.addGroup(verGrp);
@@ -349,13 +349,13 @@ public abstract class PropertyPanel extends JPanel {
     current.addPreferredGap(ComponentPlacement.UNRELATED);
     for (Component component : additionalComponents) {
       current =
-          current
-              .addComponent(
-                  component,
-                  GroupLayout.PREFERRED_SIZE,
-                  GroupLayout.PREFERRED_SIZE,
-                  GroupLayout.PREFERRED_SIZE)
-              .addGap(CONTROL_MARGIN);
+        current
+          .addComponent(
+            component,
+            GroupLayout.PREFERRED_SIZE,
+            GroupLayout.PREFERRED_SIZE,
+            GroupLayout.PREFERRED_SIZE)
+          .addGap(CONTROL_MARGIN);
     }
 
     groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addGroup(seq));
@@ -449,7 +449,7 @@ public abstract class PropertyPanel extends JPanel {
     private final Function<IMapObject, Boolean> newValueCheck;
 
     MapObjectPropertyActionListener(
-        Function<IMapObject, Boolean> newValueCheck, Consumer<IMapObject> updateAction) {
+      Function<IMapObject, Boolean> newValueCheck, Consumer<IMapObject> updateAction) {
       this.updateAction = updateAction;
       this.newValueCheck = newValueCheck;
     }
@@ -457,8 +457,8 @@ public abstract class PropertyPanel extends JPanel {
     @Override
     public void actionPerformed(ActionEvent e) {
       if (getDataSource() == null
-          || Editor.instance().getMapComponent().isFocussing()
-          || Boolean.FALSE.equals(this.newValueCheck.apply(getDataSource()))) {
+        || Editor.instance().getMapComponent().isFocussing()
+        || Boolean.FALSE.equals(this.newValueCheck.apply(getDataSource()))) {
         return;
       }
 
@@ -489,7 +489,7 @@ public abstract class PropertyPanel extends JPanel {
     private final Function<IMapObject, Boolean> newValueCheck;
 
     MapObjectPropertyChangeListener(
-        Function<IMapObject, Boolean> newValueCheck, Consumer<IMapObject> updateAction) {
+      Function<IMapObject, Boolean> newValueCheck, Consumer<IMapObject> updateAction) {
       this.updateAction = updateAction;
       this.newValueCheck = newValueCheck;
     }
@@ -497,8 +497,8 @@ public abstract class PropertyPanel extends JPanel {
     @Override
     public void stateChanged(ChangeEvent e) {
       if (getDataSource() == null
-          || Editor.instance().getMapComponent().isFocussing()
-          || Boolean.FALSE.equals(this.newValueCheck.apply(getDataSource()))) {
+        || Editor.instance().getMapComponent().isFocussing()
+        || Boolean.FALSE.equals(this.newValueCheck.apply(getDataSource()))) {
         return;
       }
 
@@ -510,10 +510,10 @@ public abstract class PropertyPanel extends JPanel {
 
     SpinnerListener(String mapObjectProperty, JSpinner spinner) {
       super(
-          m -> m.hasCustomProperty(mapObjectProperty)
-              || m.getStringValue(mapObjectProperty) == null
-              || !m.getStringValue(mapObjectProperty).equals(spinner.getValue().toString()),
-          m -> m.setValue(mapObjectProperty, spinner.getValue().toString()));
+        m -> m.hasCustomProperty(mapObjectProperty)
+          || m.getStringValue(mapObjectProperty) == null
+          || !m.getStringValue(mapObjectProperty).equals(spinner.getValue().toString()),
+        m -> m.setValue(mapObjectProperty, spinner.getValue().toString()));
     }
   }
 
@@ -521,16 +521,16 @@ public abstract class PropertyPanel extends JPanel {
 
     SliderListener(String mapObjectProperty, JSlider slider) {
       super(
-          m -> m.hasCustomProperty(mapObjectProperty)
-              || m.getIntValue(mapObjectProperty) != slider.getValue(),
-          m -> m.setValue(mapObjectProperty, slider.getValue()));
+        m -> m.hasCustomProperty(mapObjectProperty)
+          || m.getIntValue(mapObjectProperty) != slider.getValue(),
+        m -> m.setValue(mapObjectProperty, slider.getValue()));
     }
 
     SliderListener(String mapObjectProperty, JSlider slider, float factor) {
       super(
-          m -> m.hasCustomProperty(mapObjectProperty)
-              || m.getFloatValue(mapObjectProperty) != slider.getValue() * factor,
-          m -> m.setValue(mapObjectProperty, slider.getValue() * factor));
+        m -> m.hasCustomProperty(mapObjectProperty)
+          || m.getFloatValue(mapObjectProperty) != slider.getValue() * factor,
+        m -> m.setValue(mapObjectProperty, slider.getValue() * factor));
     }
   }
 
@@ -538,17 +538,17 @@ public abstract class PropertyPanel extends JPanel {
 
     TableListener(JTable table, String... mapObjectProperties) {
       super(
-          m -> {
-            int column = 0;
-            for (String prop : mapObjectProperties) {
-              ArrayList<Object> values = new ArrayList<>();
-              for (int i = 0; i < table.getRowCount(); i++) {
-                values.add(table.getValueAt(i, column));
-              }
-              m.setValue(prop, ArrayUtilities.join(values, ","));
-              column++;
+        m -> {
+          int column = 0;
+          for (String prop : mapObjectProperties) {
+            ArrayList<Object> values = new ArrayList<>();
+            for (int i = 0; i < table.getRowCount(); i++) {
+              values.add(table.getValueAt(i, column));
             }
-          });
+            m.setValue(prop, ArrayUtilities.join(values, ","));
+            column++;
+          }
+        });
     }
   }
 
