@@ -196,7 +196,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
     this.lastHit = Game.time().now();
   }
 
-  private void fireDeathEvent() {
+  protected void fireDeathEvent() {
     this.setCollision(false);
 
     for (final CombatEntityListener listener : this.listeners) {
