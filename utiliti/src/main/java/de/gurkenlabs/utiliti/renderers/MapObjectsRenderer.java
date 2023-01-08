@@ -154,7 +154,8 @@ public class MapObjectsRenderer implements IEditorRenderer {
       Game.graphics().renderOutline(g, mapObject.getBoundingBox(), shapeStroke);
     }
   }
-// TODO rename to renderShape, support points and draw polygon points too.
+
+  // TODO rename to renderShape, support points and draw polygon points too.
   private static void renderBoundingBox(Graphics2D g, IMapObject mapObject, Color colorBoundingBoxFill, BasicStroke shapeStroke) {
     MapObjectType type = MapObjectType.get(mapObject.getType());
     Color fillColor = colorBoundingBoxFill;

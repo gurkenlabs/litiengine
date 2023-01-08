@@ -48,7 +48,8 @@ public class StickyForce extends Force {
 
   @Override
   public boolean cancelOnReached() {
-    // always return false because this type of force sticks to the entity by design and can therefore never "reach" the entity
+    // always return false because this type of force sticks to the entity by design and can therefore never "reach" the
+    // entity
     return false;
   }
 }

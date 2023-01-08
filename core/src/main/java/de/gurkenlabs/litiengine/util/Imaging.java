@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.util;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.Rotation;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
@@ -27,6 +28,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.function.UnaryOperator;
+import java.util.logging.Level;
 
 /**
  * The type Imaging.
@@ -743,7 +745,8 @@ public final class Imaging {
         bilinearScaleOp.filter(image, getCompatibleImage((int) newWidth, (int) newHeight));
     final BufferedImage newImg = getCompatibleImage((int) newWidth, (int) newHeight);
     if (newImg == null) {
-      return image;
+      Game.log().log(Level.WARNING, "Image could not be scaled to {0} * {1}: {2}", new Object[] {newWidth, newHeight, image.toString()});
+      return null;
     }
 
     final Graphics2D g = (Graphics2D) newImg.getGraphics();

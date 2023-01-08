@@ -88,9 +88,8 @@ public final class Spritesheet implements Comparable<Spritesheet> {
     if (opt.isPresent()) {
       scaled = opt.get();
     } else {
-      if (img != null) {
-        scaled = Imaging.scale(img, dimension, dimension, true);
-      } else {
+      scaled = Imaging.scale(img, dimension, dimension, true);
+      if (scaled == null) {
         scaled = Imaging.getCompatibleImage(dimension, dimension);
       }
 
