@@ -90,7 +90,7 @@ allprojects {
 
     configure<JavaPluginExtension> {
       toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
+        languageVersion.set(JavaLanguageVersion.of(19))
       }
       withSourcesJar()
       if (!skipJavadoc && isRelease) {
@@ -141,7 +141,7 @@ allprojects {
           header = "<b>${project.name.capitalize()}</b>"
           addBooleanOption("Xdoclint:none", true)
           addBooleanOption("html5", true)
-          links("https://docs.oracle.com/en/java/javase/17/docs/api/")
+          links("https://docs.oracle.com/en/java/javase/19/docs/api/")
         }
       }
     }

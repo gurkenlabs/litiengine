@@ -18,7 +18,7 @@ jobs:
   fullbuild:
     runs-on: ubuntu-latest
 
-    name: Java 17 build
+    name: Java 19 build
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -28,11 +28,11 @@ jobs:
       - name: Gradle Wrapper Validation
         uses: gradle/wrapper-validation-action@v1
 
-      - name: JDK 17 Setup
+      - name: JDK 19 Setup
         uses: actions/setup-java@v3
         with:
           distribution: temurin
-          java-version: 17
+          java-version: 19
 
       - name: SonarCloud Caching
         uses: actions/cache@v1

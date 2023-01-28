@@ -155,23 +155,23 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
     if (!restart && music != null && music.isPlaying() && music.getTrack().equals(track)) {
       return music;
     }
-    MusicPlayback playback;
+
     try {
-      playback = new MusicPlayback(track);
+      MusicPlayback playback = new MusicPlayback(track);
+      if (config != null) {
+        config.accept(playback);
+      }
+      if (stop) {
+        stopMusic();
+      }
+      allMusic.add(playback);
+      playback.start();
+      music = playback;
+      return playback;
     } catch (LineUnavailableException | IllegalArgumentException e) {
       resourceFailure(e);
       return null;
     }
-    if (config != null) {
-      config.accept(playback);
-    }
-    if (stop) {
-      stopMusic();
-    }
-    allMusic.add(playback);
-    playback.start();
-    music = playback;
-    return playback;
   }
 
   /**
@@ -604,10 +604,10 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    *          The volume modifier for the sound playback instance.
    * @return An {@code SFXPlayback} object that can be configured prior to starting, but will need to be manually started.
    */
-  public SFXPlayback createSound(
-      Sound sound, Supplier<Point2D> supplier, boolean loop, int range, float volume) {
+  public SFXPlayback createSound(Sound sound, Supplier<Point2D> supplier, boolean loop, int range, float volume) {
     try {
-      return new SFXPlayback(sound, supplier, loop, range, volume);
+      SFXPlayback playback = new SFXPlayback(sound, supplier, loop, range, volume);
+      return playback;
     } catch (LineUnavailableException | IllegalArgumentException e) {
       resourceFailure(e);
       return null;
