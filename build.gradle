@@ -1,0 +1,16 @@
+plugins {
+  alias libs.plugins.spotless
+  alias libs.plugins.versions
+  alias libs.plugins.dependencyCheck
+  alias libs.plugins.grgit
+  alias libs.plugins.semanticVersioning
+  id "java"
+}
+
+subprojects {
+  compileJava.options.encoding = "UTF-8"
+  compileTestJava.options.encoding = "UTF-8"
+  javadoc.options.encoding = "UTF-8"
+}
+
+

@@ -1,0 +1,32 @@
+plugins {
+  id "java"
+  id "application"
+}
+
+
+sourceSets {
+  main {
+    resources {
+      srcDir("src/main/localization")
+    }
+  }
+}
+
+application {
+  mainClass.set("de.gurkenlabs.utiliti.Program")
+  applicationDistribution.into(executableDir) {
+    from("src/dist")
+  }
+}
+
+dependencies {
+  implementation project(":litiengine")
+  implementation libs.darklaf.core
+  testImplementation project(":shared")
+}
+
+tasks {
+  test {
+    useJUnitPlatform()
+  }
+}

@@ -1,0 +1,25 @@
+plugins {
+  id "java-library"
+  id "jacoco"
+  id "signing"
+  id "maven-publish"
+  alias libs.plugins.sonarQube
+}
+
+
+dependencies {
+  implementation libs.jinput
+  implementation libs.bundles.soundlibs
+  implementation libs.javax.activation
+  api libs.xml.api
+  runtimeOnly libs.bundles.xml.runtime
+  testImplementation project(":shared")
+}
+tasks {
+  jacocoTestReport {
+    reports {
+      xml.required=true
+      html.required=true
+    }
+  }
+}

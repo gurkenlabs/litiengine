@@ -1,0 +1,22 @@
+
+pluginManagement {
+  repositories {
+    gradlePluginPortal()
+  }
+}
+
+dependencyResolutionManagement {
+  repositories {
+    mavenLocal()
+    maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots/") }
+    mavenCentral()
+  }
+}
+
+include(
+  "litiengine",
+  "utiliti",
+  "shared"
+)
+
+rootProject.name = "litiengine-sdk"
