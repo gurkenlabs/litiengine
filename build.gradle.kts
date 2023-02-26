@@ -12,6 +12,7 @@ plugins {
   alias(libs.plugins.vlsi.gradleExtensions)
   alias(libs.plugins.vlsi.stageVoteRelease)
   alias(libs.plugins.versions)
+  alias(libs.plugins.dependencyCheck)
 }
 
 val skipSpotless by props(false)

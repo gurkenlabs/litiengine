@@ -1,35 +1,20 @@
 [versions]
-darklaf = "3.0.2"
-jinput = "2.0.9"
-jorbis = "0.0.17.4"
-tritonus = "0.3.7.4"
-vorbisspi = "1.0.3.3"
-mp3spi = "1.9.5.4"
-jakartaActivation = "2.1.0"
-jakartaXml = "4.0.0"
-jaxb = "4.0.1"
-
-# Test dependencies
-mockito = "4.10.0"
-junit = "5.9.1"
+jaxb = "4.0.2"
+mockito = "5.1.1"
+junit = "5.9.2"
 
 # Plugins
-sonarQube = "3.5.0.2730"
-vlsiRelease = "1.84"
-beryxRuntime = "1.12.7"
-spotless = "6.12.0"
-versions = "0.44.0"
-dependencyCheck = "7.4.3"
+vlsiRelease = "1.86"
 
 [libraries]
-darklaf_core = { module = "com.github.weisj:darklaf-core", version.ref = "darklaf" }
-jinput = { module = "net.java.jinput:jinput", version.ref = "jinput" }
-soundlibs_jorbis = { module = "com.googlecode.soundlibs:jorbis", version.ref = "jorbis" }
-soundlibs_tritonus = { module = "com.googlecode.soundlibs:tritonus-share", version.ref = "tritonus" }
-soundlibs_vorbisspi = { module = "com.googlecode.soundlibs:vorbisspi", version.ref = "vorbisspi" }
-soundlibs_mp3spi = { module = "com.googlecode.soundlibs:mp3spi", version.ref = "mp3spi" }
-javax_activation = { module = "jakarta.activation:jakarta.activation-api", version.ref = "jakartaActivation" }
-xml_api = { module = "jakarta.xml.bind:jakarta.xml.bind-api", version.ref = "jakartaXml" }
+darklaf_core = { module = "com.github.weisj:darklaf-core", version = "3.0.2" }
+jinput = { module = "net.java.jinput:jinput", version= "2.0.9" }
+soundlibs_jorbis = { module = "com.googlecode.soundlibs:jorbis", version = "0.0.17.4" }
+soundlibs_tritonus = { module = "com.googlecode.soundlibs:tritonus-share", version = "0.3.7.4" }
+soundlibs_vorbisspi = { module = "com.googlecode.soundlibs:vorbisspi", version= "1.0.3.3" }
+soundlibs_mp3spi = { module = "com.googlecode.soundlibs:mp3spi", version = "1.9.5.4" }
+javax_activation = { module = "jakarta.activation:jakarta.activation-api", version = "2.1.1" }
+xml_api = { module = "jakarta.xml.bind:jakarta.xml.bind-api", version = "4.0.0" }
 xml_runtime_core = { module = "com.sun.xml.bind:jaxb-core", version.ref = "jaxb" }
 xml_runtime_impl = { module = "com.sun.xml.bind:jaxb-impl", version.ref = "jaxb" }
 
@@ -50,12 +35,12 @@ mockito = ["mockito-core", "mockito-inline"]
 junit = ["junit-api", "junit-params", "junit-engine"]
 
 [plugins]
-sonarQube = { id = "org.sonarqube", version.ref = "sonarQube" }
-beryxRuntime = { id = "org.beryx.runtime", version.ref = "beryxRuntime" }
+sonarQube = { id = "org.sonarqube", version = "4.0.0.2929" }
+beryxRuntime = { id = "org.beryx.runtime", version = "1.13.0" }
+spotless = { id = "com.diffplug.spotless", version = "6.15.0" }
+versions = { id = "com.github.ben-manes.versions", version = "0.46.0" }
+dependencyCheck = { id = "org.owasp.dependencycheck", version = "8.1.0" }
 vlsi_crlf = { id = "com.github.vlsi.crlf", version.ref = "vlsiRelease" }
 vlsi_gradleExtensions = { id = "com.github.vlsi.gradle-extensions", version.ref = "vlsiRelease" }
 vlsi_licenseGather = { id = "com.github.vlsi.license-gather", version.ref = "vlsiRelease" }
 vlsi_stageVoteRelease = { id = "com.github.vlsi.stage-vote-release", version.ref = "vlsiRelease" }
-spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
-versions = { id = "com.github.ben-manes.versions", version.ref = "versions" }
-dependencyCheck = { id = "org.owasp.dependencycheck", version.ref = "dependencyCheck" }
