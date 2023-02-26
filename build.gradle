@@ -13,4 +13,6 @@ subprojects {
   javadoc.options.encoding = "UTF-8"
 }
 
+apply from: "gradle/versioning.gradle"
+
 

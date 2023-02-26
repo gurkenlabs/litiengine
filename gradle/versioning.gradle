@@ -1,0 +1,13 @@
+tasks.register('incrementPatchVersion') {
+  group = "versioning"
+  doLast {
+    var allTags = grgit.tag.list()
+    println grgit.tag.list().last().name
+  }
+}
+
+gitSemVer {
+  developmentIdentifier.set("dev")
+  noTagIdentifier.set("noTag")
+  enforceSemanticVersioning.set(true)
+}
