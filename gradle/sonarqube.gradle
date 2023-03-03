@@ -1,0 +1,13 @@
+afterEvaluate {
+  sonar {
+    properties {
+      property "sonar.host.url", "https://sonarcloud.io"
+      property "sonar.organization", "gurkenlabs"
+      property "sonar.projectKey", "de.gurkenlabs.litiengine"
+      property "sonar.projectName", "LITIENGINE"
+      property "sonar.projectVersion", project.version
+      property "sonar.sourceEncoding", "UTF-8"
+    }
+  }
+}
+

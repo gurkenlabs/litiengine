@@ -6,7 +6,6 @@ plugins {
   alias libs.plugins.sonarQube
 }
 
-
 dependencies {
   implementation libs.jinput
   implementation libs.bundles.soundlibs
@@ -15,11 +14,14 @@ dependencies {
   runtimeOnly libs.bundles.xml.runtime
   testImplementation project(":shared")
 }
+
+apply from: "$rootDir/gradle/sonarqube.gradle"
+
 tasks {
   jacocoTestReport {
     reports {
-      xml.required=true
-      html.required=true
+      xml.required = true
+      html.required = true
     }
   }
 }
