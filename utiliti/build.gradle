@@ -1,9 +1,10 @@
+import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
+
 plugins {
   id "java"
   id "application"
   alias libs.plugins.beryxRuntime
 }
-
 
 sourceSets {
   main {
@@ -28,3 +29,37 @@ dependencies {
 
 apply from: "$rootDir/gradle/encoding.gradle"
 apply from: "$rootDir/gradle/testing.gradle"
+
+
+runtime {
+  options.set(["--strip-debug", "--compress", "2", "--no-header-files", "--no-man-pages"])
+  modules.set(["java.desktop", "java.logging", "java.datatransfer", "java.management", "java.xml"])
+
+  launcher {
+    noConsole = false
+  }
+
+  jpackage {
+    appVersion = project.version
+    skipInstaller = true
+    var currentOs = DefaultNativePlatform.currentOperatingSystem
+    var iconFileType = currentOs.isWindows() ? "ico" : currentOs.isMacOsX() ? "icns" : "png"
+
+    imageOptions.addAll([
+      "--app-version", appVersion,
+      "--icon", project.file("src/dist/pixel-icon-utiliti.$iconFileType").path,
+      "--description", project.description,
+      "--copyright", "2020-${Calendar.getInstance().get(Calendar.YEAR)} gurkenlabs.de",
+      "--vendor", "gurkenlabs.de",
+      "--java-options", "-Xms256m",
+      "--java-options", "-Xmx2048m"])
+
+    if (currentOs.isMacOsX()) {
+      imageOptions.addAll(
+        ["--mac-package-identifier", "de.gurkenlabs.litiengine.utiliti",
+         "--mac-package-name", applicationName // Name appearing in Menu Bar.
+        ]
+      )
+    }
+  }
+}
