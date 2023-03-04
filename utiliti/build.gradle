@@ -6,6 +6,10 @@ plugins {
   alias libs.plugins.beryxRuntime
 }
 
+apply from: "$rootDir/gradle/encoding.gradle"
+apply from: "$rootDir/gradle/licensing.gradle"
+apply from: "$rootDir/gradle/testing.gradle"
+
 sourceSets {
   main {
     resources {
@@ -15,7 +19,9 @@ sourceSets {
 }
 
 application {
-  mainClass.set("de.gurkenlabs.utiliti.Program")
+  mainClass = "de.gurkenlabs.utiliti.Program"
+  applicationName = utiLITI_name
+  description = utiLITI_description
   applicationDistribution.into(executableDir) {
     from("src/dist")
   }
@@ -27,10 +33,6 @@ dependencies {
   testImplementation project(":shared")
 }
 
-apply from: "$rootDir/gradle/encoding.gradle"
-apply from: "$rootDir/gradle/testing.gradle"
-
-
 runtime {
   options.set(["--strip-debug", "--compress", "2", "--no-header-files", "--no-man-pages"])
   modules.set(["java.desktop", "java.logging", "java.datatransfer", "java.management", "java.xml"])
@@ -40,19 +42,19 @@ runtime {
   }
 
   jpackage {
-    appVersion = rootProject.version.split("-")[0]
+    appVersion = project.version.toString().tokenize("-")[0]
     skipInstaller = true
     var currentOs = DefaultNativePlatform.currentOperatingSystem
     var iconFileType = currentOs.isWindows() ? "ico" : currentOs.isMacOsX() ? "icns" : "png"
 
     imageOptions.addAll([
-      "--app-version", "$appVersion",
+      "--app-version", appVersion,
       "--icon", "${project.file("src/dist/pixel-icon-utiliti.$iconFileType").path}",
-      "--description", "$project.description",
-      "--copyright", "2020-${Calendar.getInstance().get(Calendar.YEAR)} gurkenlabs.de",
+      "--description", description,
+      "--copyright", copyright,
       "--vendor", "gurkenlabs.de",
       "--java-options", "-Xms256m",
-      "--java-options", "-Xmx2048m"])
+      "--java-options", "-Xmx2048m"] as Collection<? extends String>)
 
     if (currentOs.isMacOsX()) {
       imageOptions.addAll(

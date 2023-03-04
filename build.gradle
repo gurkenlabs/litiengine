@@ -8,3 +8,7 @@ plugins {
 }
 
 apply from: "$rootDir/gradle/versioning.gradle"
+
+subprojects {
+  project.version = rootProject.version
+}

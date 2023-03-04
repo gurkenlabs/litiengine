@@ -95,4 +95,6 @@ gitSemVer {
   developmentIdentifier = "dev"
   noTagIdentifier = "noTag"
   enforceSemanticVersioning = true
+  //  ensure that other tasks can already access the computed SemVer during evaluation
+  assignGitSemanticVersion()
 }

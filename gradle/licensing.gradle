@@ -1,0 +1,25 @@
+ext.LITIENGINE_name = "LITIENGINE"
+ext.LITIENGINE_description = "The FOSS 2D Java game engine."
+ext.utiLITI_name = "utiLITI"
+ext.utiLITI_description = "$utiLITI_name is the official project / asset manager and map editor for $LITIENGINE_name."
+ext.gurkenlabs_name = "gurkenlabs"
+ext.gurkenlabs_description = "Two Bavarian brothers, one goal: Create the purest, most comprehensible Java 2D game engine out there."
+ext.gurkenlabs_url = "https://gurkenlabs.de/"
+ext.copyright = "2014-${Calendar.getInstance().get(Calendar.YEAR)} $gurkenlabs_name"
+
+tasks.register("createLicenseProperties") {
+  dependsOn processResources
+  doLast {
+    new File("$buildDir/resources/main/licensing.properties").withWriter { w ->
+      Properties p = new Properties()
+      p['copyright'] = copyright.toString()
+      p['website'] = gurkenlabs_url
+      p['version'] = version
+      p.store w, null
+    }
+  }
+}
+classes {
+  dependsOn createLicenseProperties
+}
+
