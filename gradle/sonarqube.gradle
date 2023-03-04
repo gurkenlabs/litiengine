@@ -6,6 +6,7 @@ afterEvaluate {
       property "sonar.projectKey", "de.gurkenlabs.litiengine"
       property "sonar.projectName", "LITIENGINE"
       property "sonar.projectVersion", project.version
+      property "sonar.branch.name", grgit.branch.current().getName()
       property "sonar.sourceEncoding", "UTF-8"
     }
   }

@@ -1,0 +1,13 @@
+apply plugin: "jacoco"
+
+test {
+  finalizedBy jacocoTestReport
+  useJUnitPlatform()
+}
+
+jacocoTestReport {
+  dependsOn test
+  reports {
+    xml.required = true
+  }
+}

@@ -1,6 +1,5 @@
 plugins {
   id "java-library"
-  id "jacoco"
   id "signing"
   id "maven-publish"
   alias libs.plugins.sonarQube
@@ -15,13 +14,6 @@ dependencies {
   testImplementation project(":shared")
 }
 
+apply from: "$rootDir/gradle/encoding.gradle"
+apply from: "$rootDir/gradle/testing.gradle"
 apply from: "$rootDir/gradle/sonarqube.gradle"
-
-tasks {
-  jacocoTestReport {
-    reports {
-      xml.required = true
-      html.required = true
-    }
-  }
-}
