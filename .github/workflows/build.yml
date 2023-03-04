@@ -34,13 +34,6 @@ jobs:
           distribution: temurin
           java-version: 19
 
-      - name: SonarCloud Caching
-        uses: actions/cache@v1
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
-
       - name: D-BUS AT-SPI Installation
         run: sudo apt-get -y install at-spi2-core
 
@@ -53,7 +46,7 @@ jobs:
             -PskipSpotless
 
       - name: Test
-        uses: GabrielBB/xvfb-action@v1
+        uses: coactions/setup-xvfb@v1
         with:
           run: ./gradlew jacocoTestReport -PskipSpotless
 
