@@ -4,13 +4,13 @@ on:
   push:
     paths:
       - "**.gradle"
-      - "**.kts"
       - "**.properties"
       - "**.java"
+      - "**.toml"
       - "**.xml"
       - ".github/workflows/*.yml"
     branches:
-      - master
+      - "**"
   pull_request:
     branches:
       - master
@@ -43,9 +43,6 @@ jobs:
 
       - name: D-BUS AT-SPI Installation
         run: sudo apt-get -y install at-spi2-core
-
-      - name: Gradle Permission Fixing
-        run: chmod +x gradlew
 
       - name: Build
         uses: gradle/gradle-build-action@v2
