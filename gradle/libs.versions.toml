@@ -35,6 +35,7 @@ mockito = ["mockito-core", "mockito-inline"]
 junit = ["junit-api", "junit-params", "junit-engine"]
 
 [plugins]
+beryxRuntime = "org.beryx.runtime:1.13.0"
 sonarQube = "org.sonarqube:4.0.0.2929"
 spotless = "com.diffplug.spotless:6.17.0"
 versions = "com.github.ben-manes.versions:0.46.0"
