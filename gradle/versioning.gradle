@@ -9,7 +9,7 @@ tasks.register("incrementMajorVersion") {
   doLast {
     String newTag
     if (grgit.tag.list().isEmpty()) {
-      newTag = "0.0.1"
+      newTag = "1.0.0"
     } else {
       def versions = getVersions(getLatestTag())
       // Increment major version
@@ -34,7 +34,7 @@ tasks.register("incrementMinorVersion") {
   doLast {
     String newTag
     if (grgit.tag.list().isEmpty()) {
-      newTag = "0.0.1"
+      newTag = "0.1.0"
     } else {
       def versions = getVersions(getLatestTag())
       // Increment minor version
@@ -84,11 +84,15 @@ def getSortedGitTags() {
 }
 
 def getVersions(var tag) {
-  return tag.tokenize('.')*.asType(Integer)
+  tag.tokenize('.')*.asType(Integer)
 }
 
 def getLatestTag() {
-  return getSortedGitTags().last().name
+  getSortedGitTags().last().name
+}
+
+def isSnapshotVersion() {
+  project.version.toString().contains("dev") || project.version.toString().contains("noTag")
 }
 
 gitSemVer {
