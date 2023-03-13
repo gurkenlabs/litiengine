@@ -1,6 +1,6 @@
 [versions]
 jaxb = "4.0.2"
-mockito = "5.1.1"
+mockito = "5.2.0"
 junit = "5.9.2"
 
 # Plugins
