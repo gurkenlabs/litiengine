@@ -39,7 +39,7 @@ sonarQube = { id = "org.sonarqube", version = "4.0.0.2929" }
 beryxRuntime = { id = "org.beryx.runtime", version = "1.13.0" }
 spotless = { id = "com.diffplug.spotless", version = "6.15.0" }
 versions = { id = "com.github.ben-manes.versions", version = "0.46.0" }
-dependencyCheck = { id = "org.owasp.dependencycheck", version = "8.1.0" }
+dependencyCheck = { id = "org.owasp.dependencycheck", version = "8.1.2" }
 vlsi_crlf = { id = "com.github.vlsi.crlf", version.ref = "vlsiRelease" }
 vlsi_gradleExtensions = { id = "com.github.vlsi.gradle-extensions", version.ref = "vlsiRelease" }
 vlsi_licenseGather = { id = "com.github.vlsi.license-gather", version.ref = "vlsiRelease" }
