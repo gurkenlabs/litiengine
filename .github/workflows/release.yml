@@ -9,10 +9,10 @@ on:
         required: true
         default: 'none'
         options:
-          - none
-          - patch
-          - minor
-          - major
+          - NO
+          - PATCH
+          - MINOR
+          - MAJOR
   schedule:
     # Midnight every day
     - cron: "0 0 * * *"
@@ -22,12 +22,18 @@ jobs:
     name: Release build
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       packages: read
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
+          token:  ${{ secrets.ACTIONS_GITHUB_TOKEN }}
+      - uses: EndBug/add-and-commit@v9
+        with:
+          message: Show GitHub Actions logo
+          committer_name: GitHub Actions
+          committer_email: actions@github.com
       - name: Set up JDK 19
         uses: actions/setup-java@v3
         with:
@@ -38,17 +44,17 @@ jobs:
         with:
           arguments: printGitSemVer
       - name: Increment patch version
-        if: inputs.incrementVersion == 'patch'
+        if: inputs.incrementVersion == 'PATCH'
         uses: gradle/gradle-build-action@v2
         with:
           arguments: incrementPatchVersion
       - name: Increment minor version
-        if: inputs.incrementVersion == 'minor'
+        if: inputs.incrementVersion == 'MINOR'
         uses: gradle/gradle-build-action@v2
         with:
           arguments: incrementMinorVersion
       - name: Increment major version
-        if: inputs.incrementVersion == 'major'
+        if: inputs.incrementVersion == 'MAJOR'
         uses: gradle/gradle-build-action@v2
         with:
           arguments: incrementMajorVersion
