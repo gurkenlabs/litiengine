@@ -1,7 +1,21 @@
 name: Release LITIENGINE
 
 on:
-  workflow_dispatch
+  workflow_dispatch:
+    inputs:
+      incrementVersion:
+        type: choice
+        description: "increment version?"
+        required: true
+        default: 'none'
+        options:
+          - none
+          - patch
+          - minor
+          - major
+  schedule:
+    # Midnight every day
+    - cron: "0 0 * * *"
 
 jobs:
   gradle:
@@ -13,36 +27,38 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          fetch-depth: 10
+          fetch-depth: 0
       - name: Set up JDK 19
         uses: actions/setup-java@v3
         with:
           distribution: temurin
           java-version: 19
-
-      - name: Prepare & publish release
+      - name: Print project version
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: printGitSemVer
+      - name: Increment patch version
+        if: inputs.incrementVersion == 'patch'
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: incrementPatchVersion
+      - name: Increment minor version
+        if: inputs.incrementVersion == 'minor'
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: incrementMinorVersion
+      - name: Increment major version
+        if: inputs.incrementVersion == 'major'
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: incrementMajorVersion
+      - name: Publish
         uses: gradle/gradle-build-action@v2
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
-          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-          NEXUS_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          NEXUS_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+          ORG_GRADLE_PROJECT_sonatypeUsername: ${{ secrets.OSSRH_USERNAME }}
+          ORG_GRADLE_PROJECT_sonatypePassword: ${{ secrets.OSSRH_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.PGP_SECRET }}
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PGP_PASSPHRASE }}
         with:
           arguments: |
-            prepareVote
-            publishRelease
-            --info
-            -x test
-            -Prc=1
-            -Pgh
-            -Prelease=true
-            -PskipJavadoc
-            -PskipSpotless
-            -PghGitSourceUsername=gurkenlabs
-            -PghGitSourcePassword=$GITHUB_TOKEN
-            -PghNexusUsername=$NEXUS_USERNAME
-            -PghNexusPassword=$NEXUS_PASSWORD
-            -PuseInMemoryKey=true
-            -Psigning.inMemoryKey=$GPG_SIGNING_KEY
-            -Psigning.password=$GPG_PASSPHRASE
+            publishToSonatype closeSonatypeStagingRepository

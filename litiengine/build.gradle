@@ -1,7 +1,5 @@
 plugins {
   id "java-library"
-  id "signing"
-  id "maven-publish"
   alias libs.plugins.sonarQube
 }
 
@@ -15,5 +13,6 @@ dependencies {
 }
 
 apply from: "$rootDir/gradle/encoding.gradle"
-apply from: "$rootDir/gradle/testing.gradle"
+apply from: "$rootDir/gradle/publishing.gradle"
 apply from: "$rootDir/gradle/sonarqube.gradle"
+apply from: "$rootDir/gradle/testing.gradle"

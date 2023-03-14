@@ -7,7 +7,6 @@ plugins {
 }
 
 apply from: "$rootDir/gradle/encoding.gradle"
-apply from: "$rootDir/gradle/licensing.gradle"
 apply from: "$rootDir/gradle/testing.gradle"
 
 sourceSets {
@@ -64,4 +63,20 @@ runtime {
       )
     }
   }
+}
+
+tasks.register("createLicenseProperties") {
+  dependsOn processResources
+  doLast {
+    new File("$buildDir/resources/main/licensing.properties").withWriter { w ->
+      Properties p = new Properties()
+      p['copyright'] = copyright.toString()
+      p['website'] = gurkenlabs_url
+      p['version'] = version
+      p.store w, null
+    }
+  }
+}
+classes {
+  dependsOn createLicenseProperties
 }

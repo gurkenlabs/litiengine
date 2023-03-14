@@ -91,7 +91,7 @@ def getLatestTag() {
   getSortedGitTags().last().name
 }
 
-def isSnapshotVersion() {
+ext.isSnapshotVersion = { ->
   project.version.toString().contains("dev") || project.version.toString().contains("noTag")
 }
 
