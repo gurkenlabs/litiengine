@@ -25,7 +25,6 @@ tasks.register("incrementMajorVersion") {
       message = "Release of $newTag"
     }
     println("Tagged version $newTag")
-    grgit.push { tags = true }
   }
 }
 
@@ -48,7 +47,6 @@ tasks.register("incrementMinorVersion") {
       message = "Release of $newTag"
     }
     println("Tagged version $newTag")
-    grgit.push { tags = true }
   }
 }
 
@@ -69,6 +67,12 @@ tasks.register("incrementPatchVersion") {
       message = "Release of $newTag"
     }
     println("Tagged version $newTag")
+  }
+}
+
+tasks.register("pushTags") {
+  group = "versioning"
+  doLast {
     grgit.push { tags = true }
   }
 }

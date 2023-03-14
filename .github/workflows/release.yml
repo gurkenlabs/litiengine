@@ -1,6 +1,9 @@
 name: Release LITIENGINE
 
 on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
   workflow_dispatch:
     inputs:
       incrementVersion:
@@ -28,36 +31,44 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          token:  ${{ secrets.ACTIONS_GITHUB_TOKEN }}
-      - uses: EndBug/add-and-commit@v9
-        with:
-          message: Show GitHub Actions logo
-          committer_name: GitHub Actions
-          committer_email: actions@github.com
+
       - name: Set up JDK 19
         uses: actions/setup-java@v3
         with:
           distribution: temurin
           java-version: 19
+
       - name: Print project version
         uses: gradle/gradle-build-action@v2
         with:
           arguments: printGitSemVer
+
       - name: Increment patch version
         if: inputs.incrementVersion == 'PATCH'
         uses: gradle/gradle-build-action@v2
         with:
           arguments: incrementPatchVersion
+
       - name: Increment minor version
         if: inputs.incrementVersion == 'MINOR'
         uses: gradle/gradle-build-action@v2
         with:
           arguments: incrementMinorVersion
+
       - name: Increment major version
         if: inputs.incrementVersion == 'MAJOR'
         uses: gradle/gradle-build-action@v2
         with:
           arguments: incrementMajorVersion
+
+      - name: Push tags
+        if: inputs.incrementVersion != 'NO'
+        uses: gradle/gradle-build-action@v2
+        env:
+          GRGIT_USER: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          arguments: pushTags
+
       - name: Publish
         uses: gradle/gradle-build-action@v2
         env:
