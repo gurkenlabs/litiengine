@@ -1,0 +1,82 @@
+import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
+
+plugins {
+  id "java"
+  id "application"
+  alias libs.plugins.beryxRuntime
+}
+
+apply from: "$rootDir/gradle/encoding.gradle"
+apply from: "$rootDir/gradle/testing.gradle"
+
+sourceSets {
+  main {
+    resources {
+      srcDir("src/main/localization")
+    }
+  }
+}
+
+application {
+  mainClass = "de.gurkenlabs.utiliti.Program"
+  applicationName = utiLITI_name
+  description = utiLITI_description
+  applicationDistribution.into(executableDir) {
+    from("src/dist")
+  }
+}
+
+dependencies {
+  implementation project(":litiengine")
+  implementation libs.darklaf.core
+  testImplementation project(":shared")
+}
+
+runtime {
+  options.set(["--strip-debug", "--compress", "2", "--no-header-files", "--no-man-pages"])
+  modules.set(["java.desktop", "java.logging", "java.datatransfer", "java.management", "java.xml"])
+
+  launcher {
+    noConsole = false
+  }
+
+  jpackage {
+    appVersion = project.version.toString().tokenize("-")[0]
+    skipInstaller = true
+    var currentOs = DefaultNativePlatform.currentOperatingSystem
+    var iconFileType = currentOs.isWindows() ? "ico" : currentOs.isMacOsX() ? "icns" : "png"
+
+    imageOptions.addAll([
+      "--app-version", appVersion,
+      "--icon", "${project.file("src/dist/pixel-icon-utiliti.$iconFileType").path}",
+      "--description", description,
+      "--copyright", copyright,
+      "--vendor", "gurkenlabs.de",
+      "--java-options", "-Xms256m",
+      "--java-options", "-Xmx2048m"] as Collection<? extends String>)
+
+    if (currentOs.isMacOsX()) {
+      imageOptions.addAll(
+        ["--mac-package-identifier", "de.gurkenlabs.litiengine.utiliti",
+         "--mac-package-name", applicationName // Name appearing in Menu Bar.
+        ]
+      )
+    }
+  }
+}
+
+tasks.register("createLicenseProperties") {
+  dependsOn processResources
+  doLast {
+    new File("$buildDir/resources/main/licensing.properties").withWriter { w ->
+      Properties p = new Properties()
+      p['copyright'] = copyright.toString()
+      p['website'] = gurkenlabs_url
+      p['version'] = version
+      p.store w, null
+    }
+  }
+}
+classes {
+  dependsOn createLicenseProperties
+}

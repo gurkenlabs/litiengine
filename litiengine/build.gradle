@@ -1,0 +1,18 @@
+plugins {
+  id "java-library"
+  alias libs.plugins.sonarQube
+}
+
+dependencies {
+  implementation libs.jinput
+  implementation libs.bundles.soundlibs
+  implementation libs.javax.activation
+  api libs.xml.api
+  runtimeOnly libs.bundles.xml.runtime
+  testImplementation project(":shared")
+}
+
+apply from: "$rootDir/gradle/encoding.gradle"
+apply from: "$rootDir/gradle/publishing.gradle"
+apply from: "$rootDir/gradle/sonarqube.gradle"
+apply from: "$rootDir/gradle/testing.gradle"

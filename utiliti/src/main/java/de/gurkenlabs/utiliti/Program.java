@@ -22,7 +22,7 @@ public class Program {
             // setup basic settings
             Game.info().setName("utiLITI");
             Game.info().setSubTitle("LITIENGINE Creation Kit");
-            Game.info().setVersion("v0.5.2-beta");
+            Game.info().setVersion(Resources.strings().getFrom("licensing","version"));
             Resources.strings().setEncoding(StandardCharsets.UTF_8);
 
             // hook up configuration

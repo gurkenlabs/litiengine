@@ -8,10 +8,10 @@ vlsiRelease = "1.86"
 
 [libraries]
 darklaf_core = { module = "com.github.weisj:darklaf-core", version = "3.0.2" }
-jinput = { module = "net.java.jinput:jinput", version= "2.0.9" }
+jinput = { module = "net.java.jinput:jinput", version = "2.0.9" }
 soundlibs_jorbis = { module = "com.googlecode.soundlibs:jorbis", version = "0.0.17.4" }
 soundlibs_tritonus = { module = "com.googlecode.soundlibs:tritonus-share", version = "0.3.7.4" }
-soundlibs_vorbisspi = { module = "com.googlecode.soundlibs:vorbisspi", version= "1.0.3.3" }
+soundlibs_vorbisspi = { module = "com.googlecode.soundlibs:vorbisspi", version = "1.0.3.3" }
 soundlibs_mp3spi = { module = "com.googlecode.soundlibs:mp3spi", version = "1.9.5.4" }
 javax_activation = { module = "jakarta.activation:jakarta.activation-api", version = "2.1.1" }
 xml_api = { module = "jakarta.xml.bind:jakarta.xml.bind-api", version = "4.0.0" }
@@ -35,12 +35,11 @@ mockito = ["mockito-core", "mockito-inline"]
 junit = ["junit-api", "junit-params", "junit-engine"]
 
 [plugins]
-sonarQube = { id = "org.sonarqube", version = "4.0.0.2929" }
-beryxRuntime = { id = "org.beryx.runtime", version = "1.13.0" }
-spotless = { id = "com.diffplug.spotless", version = "6.17.0" }
-versions = { id = "com.github.ben-manes.versions", version = "0.46.0" }
-dependencyCheck = { id = "org.owasp.dependencycheck", version = "8.1.2" }
-vlsi_crlf = { id = "com.github.vlsi.crlf", version.ref = "vlsiRelease" }
-vlsi_gradleExtensions = { id = "com.github.vlsi.gradle-extensions", version.ref = "vlsiRelease" }
-vlsi_licenseGather = { id = "com.github.vlsi.license-gather", version.ref = "vlsiRelease" }
-vlsi_stageVoteRelease = { id = "com.github.vlsi.stage-vote-release", version.ref = "vlsiRelease" }
+beryxRuntime = "org.beryx.runtime:1.13.0"
+nexusPublish = "io.github.gradle-nexus.publish-plugin:1.3.0"
+sonarQube = "org.sonarqube:4.0.0.2929"
+spotless = "com.diffplug.spotless:6.17.0"
+versions = "com.github.ben-manes.versions:0.46.0"
+dependencyCheck = "org.owasp.dependencycheck:8.1.2"
+grgit = "org.ajoberstar.grgit:5.0.0"
+semanticVersioning = "org.danilopianini.git-sensitive-semantic-versioning:1.1.2"

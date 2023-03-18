@@ -1,0 +1,28 @@
+plugins {
+  id "java"
+  alias libs.plugins.spotless
+  alias libs.plugins.versions
+  alias libs.plugins.dependencyCheck
+  alias libs.plugins.grgit
+  alias libs.plugins.semanticVersioning
+  alias libs.plugins.nexusPublish
+}
+
+apply from: "$rootDir/gradle/licensing.gradle"
+apply from: "$rootDir/gradle/versioning.gradle"
+
+subprojects {
+  project.version = rootProject.version
+}
+
+group = gurkenlabs_group
+
+nexusPublishing {
+  useStaging.set(!isSnapshotVersion())
+  repositories {
+    sonatype {
+      username = project.findProperty('sonatypeUsername') ?: project.findProperty('OSSRH_USERNAME') ?: ''
+      password = project.findProperty('sonatypePassword') ?: project.findProperty('OSSRH_PASSWORD') ?: ''
+    }
+  }
+}
