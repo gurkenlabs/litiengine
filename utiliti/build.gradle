@@ -53,7 +53,9 @@ runtime {
       "--copyright", copyright,
       "--vendor", "gurkenlabs.de",
       "--java-options", "-Xms256m",
-      "--java-options", "-Xmx2048m"] as Collection<? extends String>)
+      "--java-options", "-Xmx2048m",
+      "--java-options", "--add-exports java.desktop/sun.awt=ALL-UNNAMED"
+    ] as Collection<? extends String>)
 
     if (currentOs.isMacOsX()) {
       imageOptions.addAll(

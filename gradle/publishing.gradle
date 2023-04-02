@@ -11,7 +11,7 @@ publishing {
     mavenJava(MavenPublication) {
       groupId = gurkenlabs_group
       artifactId = LITIENGINE_artifact
-      version = project.version
+      version = isSnapshotVersion ? project.version + "-SNAPSHOT" : project.version
       from components.java
       pom {
         name.set(LITIENGINE_name)

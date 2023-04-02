@@ -3,70 +3,24 @@ tasks.named("printGitSemVer") {
   description = "Prints the Gradle project version resolved from git tags."
 }
 
-
 tasks.register("incrementMajorVersion") {
   group = "versioning"
   doLast {
-    String newTag
-    if (grgit.tag.list().isEmpty()) {
-      newTag = "1.0.0"
-    } else {
-      def versions = getVersions(getLatestTag())
-      // Increment major version
-      versions[0] += 1
-      // Increment minor version
-      versions[1] = 0
-      // Increment patch version
-      versions[2] = 0
-      newTag = versions.join(".")
-    }
-    grgit.tag.add {
-      name = newTag
-      message = "Release of $newTag"
-    }
-    println("Tagged version $newTag")
+    tag(getNextMajorVersion())
   }
 }
 
 tasks.register("incrementMinorVersion") {
   group = "versioning"
   doLast {
-    String newTag
-    if (grgit.tag.list().isEmpty()) {
-      newTag = "0.1.0"
-    } else {
-      def versions = getVersions(getLatestTag())
-      // Increment minor version
-      versions[1] += 1
-      // Increment patch version
-      versions[2] = 0
-      newTag = versions.join(".")
-    }
-    grgit.tag.add {
-      name = newTag
-      message = "Release of $newTag"
-    }
-    println("Tagged version $newTag")
+    tag(getNextMinorVersion())
   }
 }
 
 tasks.register("incrementPatchVersion") {
   group = "versioning"
   doLast {
-    String newTag
-    if (grgit.tag.list().isEmpty()) {
-      newTag = "0.0.1"
-    } else {
-      def versions = getVersions(getLatestTag())
-      // Increment patch version
-      versions[2] += 1
-      newTag = versions.join(".")
-    }
-    grgit.tag.add {
-      name = newTag
-      message = "Release of $newTag"
-    }
-    println("Tagged version $newTag")
+    tag(getNextPatchVersion())
   }
 }
 
@@ -74,6 +28,53 @@ tasks.register("pushTags") {
   group = "versioning"
   doLast {
     grgit.push { tags = true }
+  }
+}
+
+def tag(String version) {
+  grgit.tag.add {
+    name = version
+    message = "Release of $version"
+  }
+  println("Tagged version $version")
+}
+
+def getNextMajorVersion() {
+  if (grgit.tag.list().isEmpty()) {
+    return "1.0.0"
+  } else {
+    def versions = getVersions(getLatestTag())
+    // Increment major version
+    versions[0] += 1
+    // Increment minor version
+    versions[1] = 0
+    // Increment patch version
+    versions[2] = 0
+    return versions.join(".")
+  }
+}
+
+def getNextMinorVersion() {
+  if (grgit.tag.list().isEmpty()) {
+    return "0.1.0"
+  } else {
+    def versions = getVersions(getLatestTag())
+    // Increment minor version
+    versions[1] += 1
+    // Increment patch version
+    versions[2] = 0
+    return versions.join(".")
+  }
+}
+
+def getNextPatchVersion() {
+  if (grgit.tag.list().isEmpty()) {
+    return "0.0.1"
+  } else {
+    def versions = getVersions(getLatestTag())
+    // Increment patch version
+    versions[2] += 1
+    return versions.join(".")
   }
 }
 
