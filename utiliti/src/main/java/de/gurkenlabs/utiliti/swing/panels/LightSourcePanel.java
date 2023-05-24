@@ -5,6 +5,7 @@ import de.gurkenlabs.litiengine.entities.LightSource;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.utiliti.components.Editor;
+import de.gurkenlabs.utiliti.listeners.MapObjectPropertyActionListener;
 import de.gurkenlabs.utiliti.swing.ColorComponent;
 import de.gurkenlabs.utiliti.swing.Icons;
 import java.awt.LayoutManager;
@@ -15,6 +16,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
 public class LightSourcePanel extends PropertyPanel {
+
   private final JComboBox<String> comboBoxLightShape;
   private final JSpinner spinnerIntensity;
   private final JCheckBox checkBoxIsActive;
@@ -29,7 +31,7 @@ public class LightSourcePanel extends PropertyPanel {
 
     this.comboBoxLightShape = new JComboBox<>();
     this.comboBoxLightShape.setModel(
-        new DefaultComboBoxModel<>(new String[] {"ellipse", "rectangle"}));
+      new DefaultComboBoxModel<>(new String[]{"ellipse", "rectangle"}));
 
     this.spinnerIntensity = new JSpinner(new SpinnerNumberModel(0, 0, 255, 5));
     this.checkBoxIsActive = new JCheckBox("is active");
@@ -63,40 +65,43 @@ public class LightSourcePanel extends PropertyPanel {
 
     boolean isActive = active == null || active.isEmpty() || Boolean.parseBoolean(active);
     this.spinnerIntensity.setValue(
-        mapObject.getIntValue(MapObjectProperty.LIGHT_INTENSITY, LightSource.DEFAULT_INTENSITY));
+      mapObject.getIntValue(MapObjectProperty.LIGHT_INTENSITY, LightSource.DEFAULT_INTENSITY));
     this.colorControl.setHexColor(color);
     this.comboBoxLightShape.setSelectedItem(shape);
     this.checkBoxIsActive.setSelected(isActive);
     this.offsetX.setValue(
-        (int) Math.max(
-            Math.min(100 * mapObject.getDoubleValue(MapObjectProperty.LIGHT_FOCUSOFFSETX), 100),
-            -100));
+      (int) Math.max(
+        Math.min(100 * mapObject.getDoubleValue(MapObjectProperty.LIGHT_FOCUSOFFSETX), 100),
+        -100));
     this.offsetY.setValue(
-        (int) Math.max(
-            Math.min(100 * mapObject.getDoubleValue(MapObjectProperty.LIGHT_FOCUSOFFSETY), 100),
-            -100));
+      (int) Math.max(
+        Math.min(100 * mapObject.getDoubleValue(MapObjectProperty.LIGHT_FOCUSOFFSETY), 100),
+        -100));
   }
 
   private void setupChangedListeners() {
     this.colorControl.addActionListener(
-        new MapObjectPropertyActionListener(
-            m -> {
-              if (!m.hasCustomProperty(MapObjectProperty.LIGHT_COLOR) || m.getStringValue(MapObjectProperty.LIGHT_COLOR) == null) {
-                return true;
-              }
+      new MapObjectPropertyActionListener(getMapObject(),
+        m -> {
+          if (!m.hasCustomProperty(MapObjectProperty.LIGHT_COLOR)
+            || m.getStringValue(MapObjectProperty.LIGHT_COLOR) == null) {
+            return true;
+          }
 
-              if (!m.hasCustomProperty(MapObjectProperty.LIGHT_INTENSITY)) {
-                return true;
-              }
+          if (!m.hasCustomProperty(MapObjectProperty.LIGHT_INTENSITY)) {
+            return true;
+          }
 
-              return !m.getStringValue(MapObjectProperty.LIGHT_COLOR).equals(this.colorControl.getHexColor())
-                  || m.getIntValue(MapObjectProperty.LIGHT_INTENSITY) != (int) this.spinnerIntensity.getValue();
-            },
-            m -> {
-              m.setValue(MapObjectProperty.LIGHT_COLOR, this.colorControl.getHexColor());
-              m.setValue(MapObjectProperty.LIGHT_INTENSITY, (int) this.spinnerIntensity.getValue());
-              Game.world().environment().updateLighting(getDataSource().getBoundingBox());
-            }));
+          return
+            !m.getStringValue(MapObjectProperty.LIGHT_COLOR).equals(this.colorControl.getHexColor())
+              || m.getIntValue(MapObjectProperty.LIGHT_INTENSITY)
+              != (int) this.spinnerIntensity.getValue();
+        },
+        m -> {
+          m.setValue(MapObjectProperty.LIGHT_COLOR, this.colorControl.getHexColor());
+          m.setValue(MapObjectProperty.LIGHT_INTENSITY, (int) this.spinnerIntensity.getValue());
+          Game.world().environment().updateLighting(getMapObject().getBoundingBox());
+        }));
     this.setup(this.spinnerIntensity, MapObjectProperty.LIGHT_INTENSITY);
     this.spinnerIntensity.addChangeListener(m -> this.updateLighting());
 
@@ -118,25 +123,25 @@ public class LightSourcePanel extends PropertyPanel {
       return;
     }
 
-    final IMapObject datasource = getDataSource();
+    final IMapObject datasource = getMapObject();
     if (datasource == null) {
       return;
     }
 
-    Game.world().environment().updateLighting(getDataSource().getBoundingBox());
+    Game.world().environment().updateLighting(getMapObject().getBoundingBox());
   }
 
   private LayoutManager createLayout() {
 
     LayoutItem[] layoutItems =
-        new LayoutItem[] {
-            new LayoutItem("panel_shape", this.comboBoxLightShape),
-            new LayoutItem(
-                "panel_color", this.colorControl, this.colorControl.getPreferredSize().height),
-            new LayoutItem("panel_intensity", this.spinnerIntensity),
-            new LayoutItem("offsetX", this.offsetX),
-            new LayoutItem("offsetY", this.offsetY),
-        };
+      new LayoutItem[]{
+        new LayoutItem("panel_shape", this.comboBoxLightShape),
+        new LayoutItem(
+          "panel_color", this.colorControl, this.colorControl.getPreferredSize().height),
+        new LayoutItem("panel_intensity", this.spinnerIntensity),
+        new LayoutItem("offsetX", this.offsetX),
+        new LayoutItem("offsetY", this.offsetY),
+      };
 
     return this.createLayout(layoutItems, this.checkBoxIsActive);
   }

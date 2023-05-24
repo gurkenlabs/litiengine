@@ -8,9 +8,12 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.Style;
 import de.gurkenlabs.utiliti.components.PropertyInspector;
 import de.gurkenlabs.utiliti.handlers.Transform;
+import de.gurkenlabs.utiliti.listeners.MapObjectPropertyActionListener;
+import de.gurkenlabs.utiliti.listeners.MapObjectPropertyFocusListener;
 import de.gurkenlabs.utiliti.swing.ControlBehavior;
 import de.gurkenlabs.utiliti.swing.TagPanel;
 import de.gurkenlabs.utiliti.swing.UI;
+import de.gurkenlabs.utiliti.swing.panels.emission.EmitterPanel;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.LayoutManager;
@@ -24,9 +27,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 
 public class MapObjectInspector extends PropertyPanel implements PropertyInspector {
+
   private final Map<MapObjectType, PropertyPanel> panels;
   private MapObjectType type;
   private PropertyPanel currentPanel;
@@ -89,30 +94,29 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.lblLayer.setHorizontalAlignment(SwingConstants.TRAILING);
     this.lblLayer.setForeground(Color.LIGHT_GRAY);
     this.lblLayer.setFont(
-        this.lblLayer.getFont().deriveFont(Style.getDefaultFont().getSize() * 0.75f));
+      this.lblLayer.getFont().deriveFont(Style.getDefaultFont().getSize() * 0.75f));
 
     this.infoPanel.add(lblEntityId);
     this.infoPanel.add(Box.createHorizontalStrut(47));
     this.infoPanel.add(labelEntityID);
     this.infoPanel.add(Box.createGlue());
     this.infoPanel.add(lblLayer);
-
+    SpinnerNumberModel xModel = new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1);
+    SpinnerNumberModel yModel = new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1);
     this.transform =
-        new DualSpinner(
-            Resources.strings().get("panel_x"),
-            Resources.strings().get("panel_y"),
-            0,
-            Short.MAX_VALUE);
+      new DualSpinner(xModel, yModel,
+        Resources.strings().get("panel_x"),
+        Resources.strings().get("panel_y"));
+    SpinnerNumberModel widthModel = new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1);
+    SpinnerNumberModel heightModel = new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1);
     this.scale =
-        new DualSpinner(
-            Resources.strings().get("panel_width"),
-            Resources.strings().get("panel_height"),
-            0,
-            Short.MAX_VALUE);
+      new DualSpinner(widthModel, heightModel,
+        Resources.strings().get("panel_width"),
+        Resources.strings().get("panel_height"));
 
     setLayout(createLayout());
     this.setupChangedListeners();
-    UI.getLayerController().onLayersChanged(map -> this.bind(this.getDataSource()));
+    UI.getLayerController().onLayersChanged(map -> this.bind(this.getMapObject()));
   }
 
   @Override
@@ -128,7 +132,8 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
   @Override
   public void bind(IMapObject mapObject) {
     super.bind(mapObject);
-
+    this.transform.bind(mapObject);
+    this.scale.bind(mapObject);
     if (mapObject != null) {
       MapObjectType t = MapObjectType.get(mapObject.getType());
       this.setMapObjectType(t);
@@ -137,33 +142,33 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     }
 
     if (this.currentPanel != null) {
-      this.currentPanel.bind(this.getDataSource());
+      this.currentPanel.bind(this.getMapObject());
     }
 
     if (this.collisionPanel != null) {
-      this.collisionPanel.bind(this.getDataSource());
+      this.collisionPanel.bind(this.getMapObject());
     }
     if (this.combatPanel != null) {
-      this.combatPanel.bind(this.getDataSource());
+      this.combatPanel.bind(this.getMapObject());
     }
     if (this.movementPanel != null) {
-      this.movementPanel.bind(this.getDataSource());
+      this.movementPanel.bind(this.getMapObject());
     }
 
-    this.customPanel.bind(this.getDataSource());
+    this.customPanel.bind(this.getMapObject());
   }
 
   private LayoutManager createLayout() {
     LayoutItem[] layoutItems =
-        new LayoutItem[] {
-            new LayoutItem(infoPanel),
-            new LayoutItem("panel_rendertype", renderType),
-            new LayoutItem("panel_transform", transform),
-            new LayoutItem("panel_scale", scale),
-            new LayoutItem("panel_name", textFieldName),
-            new LayoutItem("panel_tags", tagPanel),
-            new LayoutItem(tabbedPanel, GroupLayout.PREFERRED_SIZE)
-        };
+      new LayoutItem[]{
+        new LayoutItem(infoPanel),
+        new LayoutItem("panel_rendertype", renderType),
+        new LayoutItem("panel_transform", transform),
+        new LayoutItem("panel_scale", scale),
+        new LayoutItem("panel_name", textFieldName),
+        new LayoutItem("panel_tags", tagPanel),
+        new LayoutItem(tabbedPanel, GroupLayout.PREFERRED_SIZE)
+      };
     return this.createLayout(layoutItems);
   }
 
@@ -193,9 +198,9 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     // add/remove collision panel
     if (currentType == MapObjectType.PROP || currentType == MapObjectType.CREATURE) {
       tabbedPanel.addTab(
-          Resources.strings().get(this.collisionPanel.getIdentifier()),
-          this.collisionPanel.getIcon(),
-          this.collisionPanel);
+        Resources.strings().get(this.collisionPanel.getIdentifier()),
+        this.collisionPanel.getIcon(),
+        this.collisionPanel);
     } else {
       this.tabbedPanel.remove(this.collisionPanel);
     }
@@ -203,7 +208,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     // add/remove combat panel
     if (currentType == MapObjectType.PROP || currentType == MapObjectType.CREATURE) {
       tabbedPanel.addTab(
-          Resources.strings().get(this.combatPanel.getIdentifier()), this.combatPanel);
+        Resources.strings().get(this.combatPanel.getIdentifier()), this.combatPanel);
     } else {
       this.tabbedPanel.remove(this.combatPanel);
     }
@@ -211,18 +216,18 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     // add/remove movement panel
     if (currentType == MapObjectType.CREATURE) {
       tabbedPanel.addTab(
-          Resources.strings().get(this.movementPanel.getIdentifier()),
-          this.movementPanel.getIcon(),
-          this.movementPanel);
+        Resources.strings().get(this.movementPanel.getIdentifier()),
+        this.movementPanel.getIcon(),
+        this.movementPanel);
     } else {
       this.tabbedPanel.remove(this.movementPanel);
     }
 
     // always add custom panel
     tabbedPanel.addTab(
-        Resources.strings().get(this.customPanel.getIdentifier()),
-        this.customPanel.getIcon(),
-        this.customPanel);
+      Resources.strings().get(this.customPanel.getIdentifier()),
+      this.customPanel.getIcon(),
+      this.customPanel);
 
     this.currentPanel = panel != null ? panel : this.customPanel;
     this.tabbedPanel.revalidate();
@@ -261,8 +266,8 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.renderType.setSelectedIndex(0);
     this.renderType.setEnabled(false);
     this.tagPanel.clear();
-    this.transform.bind(null);
-    this.scale.bind(null);
+    this.transform.clearControls();
+    this.scale.clearControls();
   }
 
   @Override
@@ -272,8 +277,6 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     }
     this.type = MapObjectType.get(mapObject.getType());
     this.textFieldName.setText(mapObject.getName());
-    this.transform.bind(mapObject);
-    this.scale.bind(mapObject);
     this.transform.setValues(mapObject.getX(), mapObject.getY());
     this.scale.setValues(mapObject.getWidth(), mapObject.getHeight());
     this.tagPanel.bind(mapObject.getStringValue(MapObjectProperty.TAGS));
@@ -283,9 +286,9 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
     RenderType rt = mapObject.getEnumValue(MapObjectProperty.RENDERTYPE, RenderType.class);
     boolean showRenderTypeControls =
-        MapObjectType.get(mapObject.getType()) == MapObjectType.CREATURE
-            || MapObjectType.get(mapObject.getType()) == MapObjectType.EMITTER
-            || MapObjectType.get(mapObject.getType()) == MapObjectType.PROP;
+      MapObjectType.get(mapObject.getType()) == MapObjectType.CREATURE
+        || MapObjectType.get(mapObject.getType()) == MapObjectType.EMITTER
+        || MapObjectType.get(mapObject.getType()) == MapObjectType.PROP;
     this.renderType.setEnabled(showRenderTypeControls);
 
     if (rt != null) {
@@ -297,40 +300,46 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     setup(renderType, MapObjectProperty.RENDERTYPE);
 
     this.transform.addSpinnerListeners(
-        m -> m.getX() != getSpinnerValue(this.transform.getSpinner1()),
-        m -> m.getY() != getSpinnerValue(this.transform.getSpinner2()),
-        m -> {
-          m.setX(getSpinnerValue(this.transform.getSpinner1()));
-          Transform.updateAnchors();
-        },
-        m -> {
-          m.setY(getSpinnerValue(this.transform.getSpinner2()));
-          Transform.updateAnchors();
-        });
+      m -> m.getX() != ((SpinnerNumberModel) transform.getSpinner1().getModel()).getNumber()
+        .floatValue(),
+      m -> m.getY() != ((SpinnerNumberModel) transform.getSpinner2().getModel()).getNumber()
+        .floatValue(),
+      m -> {
+        m.setX(((SpinnerNumberModel) transform.getSpinner1().getModel()).getNumber().floatValue());
+        Transform.updateAnchors();
+      },
+      m -> {
+        m.setY(((SpinnerNumberModel) transform.getSpinner2().getModel()).getNumber().floatValue());
+        Transform.updateAnchors();
+      });
 
     this.scale.addSpinnerListeners(
-        m -> m.getWidth() != getSpinnerValue(this.scale.getSpinner1()),
-        m -> m.getHeight() != getSpinnerValue(this.scale.getSpinner2()),
-        m -> {
-          m.setWidth(getSpinnerValue(this.scale.getSpinner1()));
-          Transform.updateAnchors();
-        },
-        m -> {
-          m.setHeight(getSpinnerValue(this.scale.getSpinner2()));
-          Transform.updateAnchors();
-        });
+      m -> m.getWidth() != ((SpinnerNumberModel) scale.getSpinner1().getModel()).getNumber()
+        .floatValue(),
+      m -> m.getHeight() != ((SpinnerNumberModel) scale.getSpinner2().getModel()).getNumber()
+        .floatValue(),
+      m -> {
+        m.setWidth(((SpinnerNumberModel) scale.getSpinner1().getModel()).getNumber().floatValue());
+        Transform.updateAnchors();
+      },
+      m -> {
+        m.setHeight(((SpinnerNumberModel) scale.getSpinner2().getModel()).getNumber().floatValue());
+        Transform.updateAnchors();
+      });
 
     this.textFieldName.addFocusListener(
-        new MapObjectPropteryFocusListener(m -> m.setName(textFieldName.getText())));
+      new MapObjectPropertyFocusListener(getMapObject(), m -> true,
+        m -> m.setName(textFieldName.getText())));
 
     this.textFieldName.addActionListener(
-        new MapObjectPropertyActionListener(
-            m -> m.getName() == null || !m.getName().equals(textFieldName.getText()),
-            m -> m.setName(textFieldName.getText())));
+      new MapObjectPropertyActionListener(getMapObject(),
+        m -> m.getName() == null || !m.getName().equals(textFieldName.getText()),
+        m -> m.setName(textFieldName.getText())));
 
     this.tagPanel.addActionListener(
-        new MapObjectPropertyActionListener(
-            m -> !m.hasCustomProperty(MapObjectProperty.TAGS) || !m.getStringValue(MapObjectProperty.TAGS).equals(this.tagPanel.getTagsString()),
-            m -> m.setValue(MapObjectProperty.TAGS, this.tagPanel.getTagsString())));
+      new MapObjectPropertyActionListener(getMapObject(),
+        m -> !m.hasCustomProperty(MapObjectProperty.TAGS) || !m.getStringValue(
+          MapObjectProperty.TAGS).equals(this.tagPanel.getTagsString()),
+        m -> m.setValue(MapObjectProperty.TAGS, this.tagPanel.getTagsString())));
   }
 }

@@ -1,4 +1,4 @@
-package de.gurkenlabs.utiliti.swing.panels;
+package de.gurkenlabs.utiliti.swing.panels.emission;
 
 import com.github.weisj.darklaf.ui.togglebutton.ToggleButtonConstants;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
@@ -7,6 +7,7 @@ import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.swing.LabelListCellRenderer;
+import de.gurkenlabs.utiliti.swing.panels.PropertyPanel;
 import java.awt.LayoutManager;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;

@@ -23,9 +23,9 @@ public @interface EmitterInfo {
 
   int maxParticles() default EmitterData.DEFAULT_MAXPARTICLES;
 
-  int particleMaxTTL() default EmitterData.DEFAULT_MAX_PARTICLE_TTL;
+  long particleMaxTTL() default EmitterData.DEFAULT_MAX_PARTICLE_TTL;
 
-  int particleMinTTL() default EmitterData.DEFAULT_MIN_PARTICLE_TTL;
+  long particleMinTTL() default EmitterData.DEFAULT_MIN_PARTICLE_TTL;
 
   int particleUpdateRate() default EmitterData.DEFAULT_UPDATERATE;
 

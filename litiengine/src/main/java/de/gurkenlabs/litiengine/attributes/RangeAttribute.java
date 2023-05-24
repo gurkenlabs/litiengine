@@ -1,33 +1,45 @@
 package de.gurkenlabs.litiengine.attributes;
 
+import de.gurkenlabs.litiengine.environment.tilemap.xml.NumberAdapter;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElementWrapper;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class RangeAttribute<T extends Number> extends Attribute<T> {
-  private final List<AttributeModifier<T>> minModifiers;
-  private final List<AttributeModifier<T>> maxModifiers;
-  private T minBaseValue;
+public class RangeAttribute<T extends Number> extends Attribute<T> implements Serializable {
 
-  private T maxBaseValue;
+  @XmlElementWrapper
+  private final List<AttributeModifier<T>> minModifiers;
+  @XmlElementWrapper
+  private final List<AttributeModifier<T>> maxModifiers;
+  @XmlAttribute
+  @XmlJavaTypeAdapter(NumberAdapter.class)
+  private T minValue;
+  @XmlAttribute
+  @XmlJavaTypeAdapter(NumberAdapter.class)
+  private T maxValue;
 
   /**
    * Initializes a new instance of the {@code RangeAttribute} class.
    *
-   * @param maxValue
-   *          The max value of this attribute.
-   * @param minValue
-   *          The min value of this attribute
-   * @param baseValue
-   *          The base (initial) value of this attribute
+   * @param maxValue  The max value of this attribute.
+   * @param minValue  The min value of this attribute
+   * @param baseValue The base (initial) value of this attribute
    */
   public RangeAttribute(final T maxValue, final T minValue, final T baseValue) {
     super(baseValue);
-
     this.minModifiers = new CopyOnWriteArrayList<>();
     this.maxModifiers = new CopyOnWriteArrayList<>();
-    this.maxBaseValue = maxValue;
-    this.minBaseValue = minValue;
+    this.maxValue = maxValue;
+    this.minValue = minValue;
+  }
+
+  public RangeAttribute() {
+    this.minModifiers = new CopyOnWriteArrayList<>();
+    this.maxModifiers = new CopyOnWriteArrayList<>();
   }
 
   public void addMinModifier(final AttributeModifier<T> modifier) {
@@ -55,11 +67,11 @@ public class RangeAttribute<T extends Number> extends Attribute<T> {
   }
 
   public T getMin() {
-    return this.applyMinModifiers(this.minBaseValue);
+    return this.applyMinModifiers(this.minValue);
   }
 
   public T getMax() {
-    return this.applyMaxModifiers(this.maxBaseValue);
+    return this.applyMaxModifiers(this.maxValue);
   }
 
   public float getRelativeCurrentValue() {
@@ -72,7 +84,7 @@ public class RangeAttribute<T extends Number> extends Attribute<T> {
   }
 
   public void modifyMaxBaseValue(final AttributeModifier<T> modifier) {
-    this.maxBaseValue = modifier.modify(this.maxBaseValue);
+    this.maxValue = modifier.modify(this.maxValue);
   }
 
   public void setToMin() {
@@ -83,12 +95,12 @@ public class RangeAttribute<T extends Number> extends Attribute<T> {
     this.setBaseValue(this.getMax());
   }
 
-  public void setMaxBaseValue(final T maxValue) {
-    this.maxBaseValue = maxValue;
+  public void setMaxValue(final T maxValue) {
+    this.maxValue = maxValue;
   }
 
-  public void setMinBaseValue(final T minValue) {
-    this.minBaseValue = minValue;
+  public void setMinValue(final T minValue) {
+    this.minValue = minValue;
   }
 
   protected List<AttributeModifier<T>> getMinModifiers() {
@@ -118,8 +130,8 @@ public class RangeAttribute<T extends Number> extends Attribute<T> {
   }
 
   private T valueInRange(final T value) {
-    if (value.doubleValue() < this.minBaseValue.doubleValue()) {
-      return this.minBaseValue;
+    if (value.doubleValue() < this.minValue.doubleValue()) {
+      return this.minValue;
     } else if (value.doubleValue() > this.getMax().doubleValue()) {
       return this.getMax();
     }

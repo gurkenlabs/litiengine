@@ -226,7 +226,7 @@ class RangeAttributeTest {
 
     assertEquals((byte) 10, testRangeAttributeByte.getMax().byteValue());
 
-    testRangeAttributeByte.setMaxBaseValue((byte) 20);
+    testRangeAttributeByte.setMaxValue((byte) 20);
     assertEquals((byte) 20, testRangeAttributeByte.getMax().byteValue());
   }
 
@@ -237,7 +237,7 @@ class RangeAttributeTest {
 
     assertEquals((byte) 10, testRangeAttributeByte.getMin().byteValue());
 
-    testRangeAttributeByte.setMinBaseValue((byte) 5);
+    testRangeAttributeByte.setMinValue((byte) 5);
     assertEquals((byte) 5, testRangeAttributeByte.getMin().byteValue());
   }
 

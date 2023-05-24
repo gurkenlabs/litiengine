@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine.graphics.emitters;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.ITimeToLive;
 import de.gurkenlabs.litiengine.IUpdateable;
+import de.gurkenlabs.litiengine.attributes.RangeAttribute;
 import de.gurkenlabs.litiengine.entities.CollisionInfo;
 import de.gurkenlabs.litiengine.entities.EmitterInfo;
 import de.gurkenlabs.litiengine.entities.Entity;
@@ -20,7 +21,6 @@ import de.gurkenlabs.litiengine.graphics.emitters.particles.SpriteParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.TextParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterLoader;
-import de.gurkenlabs.litiengine.graphics.emitters.xml.ParticleParameter;
 import de.gurkenlabs.litiengine.resources.Resources;
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
@@ -79,7 +79,8 @@ public class Emitter extends Entity implements IUpdateable, ITimeToLive, IRender
       this.emitterData.setSpawnRate(info.spawnRate());
       this.emitterData.setEmitterDuration(info.duration());
       this.emitterData.setParticleTTL(
-          new ParticleParameter(info.particleMinTTL(), info.particleMaxTTL()));
+        new RangeAttribute<>(info.particleMaxTTL(), info.particleMinTTL(),
+          info.particleMinTTL()));
       this.emitterData.setUpdateRate(info.particleUpdateRate());
       this.emitterData.setOriginAlign(info.originAlign());
       this.emitterData.setOriginValign(info.originValign());
@@ -134,8 +135,7 @@ public class Emitter extends Entity implements IUpdateable, ITimeToLive, IRender
   /**
    * Adds a particle to this Emitter's list of Particles.
    *
-   * @param particle
-   *          the particle
+   * @param particle the particle
    */
   public void addParticle(final Particle particle) {
     if (this.isStopped()) {
@@ -188,7 +188,7 @@ public class Emitter extends Entity implements IUpdateable, ITimeToLive, IRender
 
   protected void updateOrigin() {
     this.origin = new Point2D.Double(getX() + data().getOriginAlign().getValue(getWidth()),
-        getY() + data().getOriginValign().getValue(getHeight()));
+      getY() + data().getOriginValign().getValue(getHeight()));
   }
 
   public IRenderable getRenderable(RenderType type) {
@@ -237,8 +237,7 @@ public class Emitter extends Entity implements IUpdateable, ITimeToLive, IRender
   /**
    * Sets the paused.
    *
-   * @param paused
-   *          the new paused
+   * @param paused the new paused
    */
   public void setPaused(final boolean paused) {
     this.paused = paused;
@@ -285,8 +284,8 @@ public class Emitter extends Entity implements IUpdateable, ITimeToLive, IRender
   @Override
   public boolean timeToLiveReached() {
     return this.activated
-        && this.getTimeToLive() > 0
-        && this.getAliveTime() >= this.getTimeToLive();
+      && this.getTimeToLive() > 0
+      && this.getAliveTime() >= this.getTimeToLive();
   }
 
   public void togglePaused() {
@@ -333,7 +332,7 @@ public class Emitter extends Entity implements IUpdateable, ITimeToLive, IRender
 
     this.aliveTime = Game.time().since(this.activationTick);
     if ((this.data().getSpawnRate() == 0
-        || Game.time().since(this.lastSpawn) >= this.data().getSpawnRate())) {
+      || Game.time().since(this.lastSpawn) >= this.data().getSpawnRate())) {
       this.lastSpawn = Game.time().now();
       this.spawnParticle();
     }
@@ -355,8 +354,8 @@ public class Emitter extends Entity implements IUpdateable, ITimeToLive, IRender
    */
   protected Particle createNewParticle() {
 
-    float width = (float) data().getParticleWidth().get();
-    float height = (float) data().getParticleHeight().get();
+    float width = data().getParticleWidth().get();
+    float height = data().getParticleHeight().get();
 
     switch (data().getParticleType()) {
       case ELLIPSE -> {
@@ -373,7 +372,7 @@ public class Emitter extends Entity implements IUpdateable, ITimeToLive, IRender
       }
       case TEXT -> {
         String text = data().getTexts().isEmpty() ? EmitterData.DEFAULT_TEXT
-            : Game.random().choose(data().getTexts());
+          : Game.random().choose(data().getTexts());
         return new TextParticle(text).init(data());
       }
       case SPRITE -> {
@@ -382,7 +381,7 @@ public class Emitter extends Entity implements IUpdateable, ITimeToLive, IRender
           return null;
         }
         return new SpriteParticle(sprite).setAnimateSprite(data().isAnimatingSprite())
-            .setLoopSprite(data().isLoopingSprite()).init(data());
+          .setLoopSprite(data().isLoopingSprite()).init(data());
       }
       default -> {
         return new RectangleParticle(width, height).init(data());
@@ -393,8 +392,7 @@ public class Emitter extends Entity implements IUpdateable, ITimeToLive, IRender
   /**
    * Particle can be removed.
    *
-   * @param particle
-   *          the particle
+   * @param particle the particle
    * @return true, if successful
    */
   protected boolean particleCanBeRemoved(final Particle particle) {
@@ -415,29 +413,28 @@ public class Emitter extends Entity implements IUpdateable, ITimeToLive, IRender
   }
 
   /**
-   * Render particles of this effect. The particles are always rendered relatively to this effects render location. A
-   * particle doesn't have an own map location. It is always relative to the effect it is assigned to.
+   * Render particles of this effect. The particles are always rendered relatively to this effects
+   * render location. A particle doesn't have an own map location. It is always relative to the
+   * effect it is assigned to.
    *
-   * @param g
-   *          The graphics object to draw on.
-   * @param renderType
-   *          The render type.
+   * @param g          The graphics object to draw on.
+   * @param renderType The render type.
    */
   private void renderParticles(final Graphics2D g, final RenderType renderType) {
     if (Game.config().graphics().getGraphicQuality().getValue() < this.data().getRequiredQuality()
-        .getValue()) {
+      .getValue()) {
       return;
     }
 
     final Rectangle2D viewport =
-        Game.screens() != null && Game.world().camera() != null
-            ? Game.world().camera().getViewport()
-            : null;
+      Game.screens() != null && Game.world().camera() != null
+        ? Game.world().camera().getViewport()
+        : null;
     for (Particle particle : this.particles) {
       if (((!particle.usesCustomRenderType() && renderType == RenderType.NONE)
-          || (particle.usesCustomRenderType() && particle.getCustomRenderType() == renderType))
-          && viewport != null
-          && viewport.intersects(particle.getBoundingBox(getOrigin()))) {
+        || (particle.usesCustomRenderType() && particle.getCustomRenderType() == renderType))
+        && viewport != null
+        && viewport.intersects(particle.getBoundingBox(getOrigin()))) {
         particle.render(g, getOrigin());
       }
     }

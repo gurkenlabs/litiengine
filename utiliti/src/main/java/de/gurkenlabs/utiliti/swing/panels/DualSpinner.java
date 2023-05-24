@@ -1,107 +1,82 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
+import de.gurkenlabs.utiliti.listeners.MapObjectPropertyChangeListener;
 import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.function.Predicate;
 import javax.swing.GroupLayout;
 import javax.swing.JLabel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
 public class DualSpinner extends PropertyPanel {
+
   private final JSpinner spnDim1;
-  private final JLabel lblDim1;
   private final JSpinner spnDim2;
-  private final JLabel lblDim2;
 
   private final String dim1Name;
   private final String dim2Name;
-  private final float dim1Default;
-  private final float dim2Default;
-
-  private final float lowerBound;
-  private final float upperBound;
-  private final float step;
-
+  private final Number dim1Default;
+  private final Number dim2Default;
   private final boolean exclusiveBounds;
 
+
   public DualSpinner(
-      String dim1Name,
-      String dim2Name,
-      float lowerBound,
-      float upperBound,
-      float dim1Default,
-      float dim2Default,
-      float step) {
-    this(
-        dim1Name,
-        "min",
-        dim2Name,
-        "max",
-        lowerBound,
-        upperBound,
-        dim1Default,
-        dim2Default,
-        step,
-        true);
+    SpinnerNumberModel model1,
+    SpinnerNumberModel model2,
+    String label1,
+    String label2) {
+    this(null, null, model1, model2, label1, label2, false);
   }
 
-  public DualSpinner(String dim1Lbl, String dim2Lbl, float lowerBound, float upperBound) {
-    this(null, dim1Lbl, null, dim2Lbl, lowerBound, upperBound, 0, 0, 1, false);
+  public DualSpinner(String name1,
+    String name2,
+    SpinnerNumberModel model1,
+    SpinnerNumberModel model2) {
+    this(name1, name2, model1, model2, "min", "max", true);
   }
 
   public DualSpinner(
-      String dim1Name,
-      String dim1Lbl,
-      String dim2Name,
-      String dim2Lbl,
-      float lowerBound,
-      float upperBound,
-      float dim1Default,
-      float dim2Default,
-      float step,
-      boolean exclusiveBounds) {
-    this.dim1Name = dim1Name;
-    this.dim2Name = dim2Name;
-    this.lowerBound = lowerBound;
-    this.upperBound = upperBound;
-    this.step = step;
-    this.dim1Default = dim1Default;
-    this.dim2Default = dim2Default;
+    String name1,
+    String name2,
+    SpinnerNumberModel model1,
+    SpinnerNumberModel model2,
+    String label1,
+    String label2,
+    boolean exclusiveBounds) {
+    this.dim1Name = name1;
+    this.dim2Name = name2;
+    JLabel lblDim1 = new JLabel(label1);
+    lblDim1.setMinimumSize(LABEL_SIZE);
+    this.dim1Default = model1.getNumber();
+    this.dim2Default = model2.getNumber();
     this.exclusiveBounds = exclusiveBounds;
-
-    this.lblDim1 = new JLabel(dim1Lbl);
-    this.lblDim1.setMinimumSize(LABEL_SIZE);
-    this.spnDim1 =
-        new JSpinner(
-            new SpinnerNumberModel(this.dim1Default, this.lowerBound, this.upperBound, this.step));
+    this.spnDim1 = new JSpinner(model1);
     this.spnDim1.setMinimumSize(SPINNER_SIZE);
-    this.lblDim2 = new JLabel(dim2Lbl);
-    this.lblDim2.setMinimumSize(LABEL_SIZE);
-    this.spnDim2 =
-        new JSpinner(
-            new SpinnerNumberModel(this.dim2Default, this.lowerBound, this.upperBound, this.step));
+    JLabel lblDim2 = new JLabel(label2);
+    lblDim2.setMinimumSize(LABEL_SIZE);
+    this.spnDim2 = new JSpinner(model2);
     this.spnDim2.setMinimumSize(SPINNER_SIZE);
 
     GroupLayout grplayout = new GroupLayout(this);
     grplayout.setAutoCreateGaps(true);
     grplayout.setHorizontalGroup(
-        grplayout
-            .createSequentialGroup()
-            .addContainerGap()
-            .addComponent(lblDim1)
-            .addComponent(spnDim1)
-            .addComponent(lblDim2)
-            .addComponent(spnDim2)
-            .addContainerGap());
+      grplayout
+        .createSequentialGroup()
+        .addContainerGap()
+        .addComponent(lblDim1)
+        .addComponent(spnDim1)
+        .addComponent(lblDim2)
+        .addComponent(spnDim2)
+        .addContainerGap());
     grplayout.setVerticalGroup(
-        grplayout
-            .createParallelGroup()
-            .addComponent(lblDim1, GroupLayout.Alignment.CENTER)
-            .addComponent(spnDim1)
-            .addComponent(lblDim2, GroupLayout.Alignment.CENTER)
-            .addComponent(spnDim2));
-    this.setLayout(grplayout);
+      grplayout
+        .createParallelGroup()
+        .addComponent(lblDim1, GroupLayout.Alignment.CENTER)
+        .addComponent(spnDim1)
+        .addComponent(lblDim2, GroupLayout.Alignment.CENTER)
+        .addComponent(spnDim2));
+    setLayout(grplayout);
     setupChangedListeners();
   }
 
@@ -114,61 +89,87 @@ public class DualSpinner extends PropertyPanel {
   }
 
   public void addSpinnerListeners(
-      Function<IMapObject, Boolean> newValueCheck1,
-      Function<IMapObject, Boolean> newValueCheck2,
-      Consumer<IMapObject> spinner1Action,
-      Consumer<IMapObject> spinner2Action) {
-    spnDim1.addChangeListener(new MapObjectPropertyChangeListener(newValueCheck1, spinner1Action));
-    spnDim2.addChangeListener(new MapObjectPropertyChangeListener(newValueCheck2, spinner2Action));
+    Predicate<IMapObject> newValueCheck1,
+    Predicate<IMapObject> newValueCheck2,
+    Consumer<IMapObject> spinner1Action,
+    Consumer<IMapObject> spinner2Action) {
+    spnDim1.addChangeListener(
+      new MapObjectPropertyChangeListener(getMapObject(), newValueCheck1, spinner1Action));
+    spnDim2.addChangeListener(
+      new MapObjectPropertyChangeListener(getMapObject(), newValueCheck2, spinner2Action));
   }
 
-  public void setValues(float v1, float v2) {
-    spnDim1.setValue((double) v1);
-    spnDim2.setValue((double) v2);
-  }
+  public void setValues(Number v1, Number v2) {
+    SpinnerNumberModel model1 = (SpinnerNumberModel) spnDim1.getModel();
+    SpinnerNumberModel model2 = (SpinnerNumberModel) spnDim2.getModel();
+    if (v1.getClass() == model1.getValue().getClass()) {
+      spnDim1.getModel().setValue(v1);
+    } else if (v1 instanceof Float || v1 instanceof Double) {
+      spnDim1.setModel(
+        new SpinnerNumberModel(v1.doubleValue(), ((Number) model1.getMinimum()).doubleValue(),
+          ((Number) model1.getMaximum()).doubleValue(), model1.getStepSize().doubleValue()));
+    } else if (v1 instanceof Byte || v1 instanceof Short || v1 instanceof Integer) {
+      spnDim1.setModel(
+        new SpinnerNumberModel(v1.intValue(), ((Number) model1.getMinimum()).intValue(),
+          ((Number) model1.getMaximum()).intValue(), model1.getStepSize().intValue()));
+    } else if (v1 instanceof Long) {
+      spnDim1.setModel(
+        new SpinnerNumberModel(v1.longValue(), ((Number) model1.getMinimum()).longValue(),
+          ((Number) model1.getMaximum()).longValue(), model1.getStepSize().longValue()));
+    }
 
-  public void setValues(double v1, double v2) {
-    spnDim1.setValue(v1);
-    spnDim2.setValue(v2);
+    if (v2.getClass() == model2.getValue().getClass()) {
+      spnDim2.getModel().setValue(v2);
+    } else if (v2 instanceof Float || v2 instanceof Double) {
+      spnDim2.setModel(
+        new SpinnerNumberModel(v2.doubleValue(), ((Number) model2.getMinimum()).doubleValue(),
+          ((Number) model2.getMaximum()).doubleValue(), model2.getStepSize().doubleValue()));
+    } else if (v2 instanceof Byte || v2 instanceof Short || v2 instanceof Integer) {
+      spnDim2.setModel(
+        new SpinnerNumberModel(v2.intValue(), ((Number) model2.getMinimum()).intValue(),
+          ((Number) model2.getMaximum()).intValue(), model2.getStepSize().intValue()));
+    } else if (v2 instanceof Long) {
+      spnDim2.setModel(
+        new SpinnerNumberModel(v2.longValue(), ((Number) model2.getMinimum()).longValue(),
+          ((Number) model2.getMaximum()).longValue(), model2.getStepSize().longValue()));
+    }
   }
 
   @Override
   protected void clearControls() {
-    setValues(this.dim1Default, this.dim2Default);
+    setValues(dim1Default, dim2Default);
   }
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    if (this.dim1Name != null && this.dim2Name != null) {
+    if (dim1Name != null && dim2Name != null) {
       setValues(
-          mapObject.getFloatValue(this.dim1Name, this.dim1Default),
-          mapObject.getFloatValue(this.dim2Name, this.dim2Default));
+        mapObject.getNumber(dim1Name, dim1Default),
+        mapObject.getNumber(dim2Name, dim2Default));
     }
   }
 
   protected void setupChangedListeners() {
-    if (this.dim1Name != null && this.dim2Name != null) {
-      setup(spnDim1, this.dim1Name);
-      setup(spnDim2, this.dim2Name);
+    if (dim1Name != null && dim2Name != null) {
+      setup((SpinnerNumberModel) spnDim1.getModel(), dim1Name);
+      setup((SpinnerNumberModel) spnDim2.getModel(), dim2Name);
     }
     if (!this.exclusiveBounds) {
       return;
     }
     spnDim1.addChangeListener(
-        e -> {
-          double minV = (double) spnDim1.getValue();
-          double maxV = (double) spnDim2.getValue();
-          if (minV > maxV) {
-            spnDim2.setValue(spnDim1.getValue());
-          }
-        });
+      e -> {
+        if (((SpinnerNumberModel) spnDim1.getModel()).getNumber().floatValue()
+          > ((SpinnerNumberModel) spnDim2.getModel()).getNumber().floatValue()) {
+          spnDim2.setValue(spnDim1.getValue());
+        }
+      });
     spnDim2.addChangeListener(
-        e -> {
-          double minV = (double) spnDim1.getValue();
-          double maxV = (double) spnDim2.getValue();
-          if (maxV < minV) {
-            spnDim1.setValue(spnDim2.getValue());
-          }
-        });
+      e -> {
+        if (((SpinnerNumberModel) spnDim1.getModel()).getNumber().floatValue()
+          > ((SpinnerNumberModel) spnDim2.getModel()).getNumber().floatValue()) {
+          spnDim1.setValue(spnDim2.getValue());
+        }
+      });
   }
 }

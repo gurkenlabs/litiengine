@@ -159,7 +159,7 @@ public abstract class Particle implements ITimeToLive {
     if (isFading() && getTimeToLive() > 0) {
       float maxAlpha = getColor().getAlpha() / 255f;
       float progress = (float) getAliveTime() / getTimeToLive();
-      return MathUtilities.clamp(maxAlpha - progress * maxAlpha, 0, 1);
+       return MathUtilities.clamp(maxAlpha - progress * maxAlpha, 0, 1);
     }
     return 1;
   }
@@ -340,22 +340,22 @@ public abstract class Particle implements ITimeToLive {
   }
 
   public Particle init(final EmitterData data) {
-    this.setX((float) data.getParticleOffsetX().get());
-    this.setY((float) data.getParticleOffsetY().get());
+    this.setX(data.getParticleOffsetX().get());
+    this.setY(data.getParticleOffsetY().get());
 
-    this.setAccelerationX((float) data.getAccelerationX().get());
-    this.setAccelerationY((float) data.getAccelerationY().get());
+    this.setAccelerationX(data.getAccelerationX().get());
+    this.setAccelerationY(data.getAccelerationY().get());
 
-    this.setVelocityX((float) data.getVelocityX().get());
-    this.setVelocityY((float) data.getVelocityY().get());
+    this.setVelocityX(data.getVelocityX().get());
+    this.setVelocityY(data.getVelocityY().get());
 
-    this.setDeltaWidth((float) data.getDeltaWidth().get());
-    this.setDeltaHeight((float) data.getDeltaHeight().get());
+    this.setDeltaWidth(data.getDeltaWidth().get());
+    this.setDeltaHeight(data.getDeltaHeight().get());
 
-    this.setAngle((float) data.getAngle().get());
-    this.setDeltaAngle((float) data.getDeltaAngle().get());
+    this.setAngle(data.getAngle().get());
+    this.setDeltaAngle(data.getDeltaAngle().get());
 
-    this.setTimeToLive((int) data.getParticleTTL().get());
+    this.setTimeToLive(Math.round(data.getParticleTTL().get()));
     this.setColor(Game.random().choose(data.getDecodedColors()));
 
     this.setCollisionType(data.getCollision());

@@ -1,30 +1,24 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
-import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.litiengine.util.ArrayUtilities;
-import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.components.Editor;
+import de.gurkenlabs.utiliti.listeners.MapObjectPropertyActionListener;
+import de.gurkenlabs.utiliti.listeners.MapObjectPropertyFocusListener;
+import de.gurkenlabs.utiliti.listeners.NumberModelListener;
+import de.gurkenlabs.utiliti.listeners.SliderListener;
+import de.gurkenlabs.utiliti.listeners.SpinnerListener;
+import de.gurkenlabs.utiliti.listeners.TableListener;
 import de.gurkenlabs.utiliti.swing.ControlBehavior;
 import de.gurkenlabs.utiliti.swing.TextList;
 import de.gurkenlabs.utiliti.swing.UI;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.LayoutManager;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.Map;
-import java.util.function.Consumer;
-import java.util.function.Function;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.GroupLayout.ParallelGroup;
@@ -41,13 +35,10 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 
 public abstract class PropertyPanel extends JPanel {
 
@@ -64,7 +55,7 @@ public abstract class PropertyPanel extends JPanel {
   public static final Dimension BUTTON_SIZE = new Dimension(CONTROL_HEIGHT, CONTROL_HEIGHT);
   public static final Dimension SPINNER_SIZE = new Dimension(SPINNER_WIDTH, CONTROL_HEIGHT);
   public static final Dimension SMALL_CONTROL_SIZE =
-      new Dimension(CONTROL_MIN_WIDTH, CONTROL_HEIGHT);
+    new Dimension(CONTROL_MIN_WIDTH, CONTROL_HEIGHT);
   public static final Dimension LARGE_CONTROL_SIZE = new Dimension(CONTROL_WIDTH, CONTROL_HEIGHT);
   public static final Border STANDARDBORDER = new EmptyBorder(0, 4, 0, 4);
 
@@ -74,7 +65,7 @@ public abstract class PropertyPanel extends JPanel {
   public static final float STEP_FINE = .05f;
   public static final float STEP_FINEST = .01f;
 
-  protected transient IMapObject dataSource;
+  protected transient IMapObject mapObject;
   private String identifier;
   private transient Icon icon;
 
@@ -93,18 +84,8 @@ public abstract class PropertyPanel extends JPanel {
     UI.addOrphanComponent(this);
   }
 
-  public static float getSpinnerValue(JSpinner spinner) {
-    if (spinner.getValue()instanceof Integer integer) {
-      return integer.floatValue();
-    } else if (spinner.getValue()instanceof Double dbl) {
-      return dbl.floatValue();
-    } else {
-      return (float) spinner.getValue();
-    }
-  }
-
   protected static void populateComboBoxWithSprites(
-      JComboBox<JLabel> comboBox, Map<String, String> m) {
+    JComboBox<JLabel> comboBox, Map<String, String> m) {
     comboBox.removeAllItems();
 
     for (Map.Entry<String, String> entry : m.entrySet()) {
@@ -127,9 +108,9 @@ public abstract class PropertyPanel extends JPanel {
       for (int i = 0; i < comboBox.getModel().getSize(); i++) {
         JLabel label = comboBox.getModel().getElementAt(i);
         if (label != null
-            && label
-                .getText()
-                .equals(mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME))) {
+          && label
+          .getText()
+          .equals(mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME))) {
           comboBox.setSelectedItem(label);
           break;
         }
@@ -137,8 +118,8 @@ public abstract class PropertyPanel extends JPanel {
     }
   }
 
-  protected IMapObject getDataSource() {
-    return this.dataSource;
+  protected IMapObject getMapObject() {
+    return this.mapObject;
   }
 
   public String getIdentifier() {
@@ -154,9 +135,9 @@ public abstract class PropertyPanel extends JPanel {
   }
 
   public void bind(IMapObject mapObject) {
-    this.dataSource = mapObject;
+    this.mapObject = mapObject;
 
-    if (this.dataSource == null) {
+    if (this.mapObject == null) {
       this.clearControls();
       return;
     }
@@ -173,9 +154,9 @@ public abstract class PropertyPanel extends JPanel {
       return;
     }
     toggle.addActionListener(
-        new MapObjectPropertyActionListener(
-            m -> !m.hasCustomProperty(property) || m.getBoolValue(property) != toggle.isSelected(),
-            m -> m.setValue(property, toggle.isSelected())));
+      new MapObjectPropertyActionListener(getMapObject(),
+        m -> m.hasCustomProperty(property) && m.getBoolValue(property) != toggle.isSelected(),
+        m -> m.setValue(property, toggle.isSelected())));
   }
 
   protected void setup(JCheckBox checkbox, String property) {
@@ -183,9 +164,9 @@ public abstract class PropertyPanel extends JPanel {
       return;
     }
     checkbox.addActionListener(
-        new MapObjectPropertyActionListener(
-            m -> !m.hasCustomProperty(property) || m.getBoolValue(property) != checkbox.isSelected(),
-            m -> m.setValue(property, checkbox.isSelected())));
+      new MapObjectPropertyActionListener(getMapObject(),
+        m -> !m.hasCustomProperty(property) || m.getBoolValue(property) != checkbox.isSelected(),
+        m -> m.setValue(property, checkbox.isSelected())));
   }
 
   protected <T> void setup(JComboBox<T> comboBox, String property) {
@@ -193,19 +174,19 @@ public abstract class PropertyPanel extends JPanel {
       return;
     }
     comboBox.addActionListener(
-        new MapObjectPropertyActionListener(
-            m -> {
-              if (!m.hasCustomProperty(property) || m.getStringValue(property) == null) {
-                return true;
-              }
+      new MapObjectPropertyActionListener(getMapObject(),
+        m -> {
+          if (!m.hasCustomProperty(property) || m.getStringValue(property) == null) {
+            return true;
+          }
 
-              T value = comboBox.getModel().getElementAt(comboBox.getSelectedIndex());
-              return !m.getStringValue(property).equals(value.toString());
-            },
-            m -> {
-              T value = comboBox.getModel().getElementAt(comboBox.getSelectedIndex());
-              m.setValue(property, value != null ? value.toString() : null);
-            }));
+          T value = comboBox.getModel().getElementAt(comboBox.getSelectedIndex());
+          return !m.getStringValue(property).equals(value.toString());
+        },
+        m -> {
+          T value = comboBox.getModel().getElementAt(comboBox.getSelectedIndex());
+          m.setValue(property, value != null ? value.toString() : null);
+        }));
   }
 
   protected void setupL(JComboBox<JLabel> comboBox, String property) {
@@ -213,40 +194,47 @@ public abstract class PropertyPanel extends JPanel {
       return;
     }
     comboBox.addActionListener(
-        new MapObjectPropertyActionListener(
-            m -> {
-              if (!m.hasCustomProperty(property) || m.getStringValue(property) == null) {
-                return true;
-              }
+      new MapObjectPropertyActionListener(getMapObject(),
+        m -> {
+          if (!m.hasCustomProperty(property) || m.getStringValue(property) == null) {
+            return true;
+          }
 
-              JLabel value = comboBox.getModel().getElementAt(comboBox.getSelectedIndex());
-              return value != null && !m.getStringValue(property).equals(value.getText());
-            },
-            m -> {
-              JLabel value = comboBox.getModel().getElementAt(comboBox.getSelectedIndex());
-              m.setValue(property, value != null ? value.getText() : null);
-            }));
+          JLabel value = comboBox.getModel().getElementAt(comboBox.getSelectedIndex());
+          return value != null && !m.getStringValue(property).equals(value.getText());
+        },
+        m -> {
+          JLabel value = comboBox.getModel().getElementAt(comboBox.getSelectedIndex());
+          m.setValue(property, value != null ? value.getText() : null);
+        }));
   }
 
   protected void setup(JSlider slider, String property) {
     if (property == null || property.isEmpty()) {
       return;
     }
-    slider.addChangeListener(new SliderListener(property, slider));
+    slider.addChangeListener(new SliderListener(getMapObject(), property, slider));
   }
 
   protected void setup(JSlider slider, String property, float factor) {
     if (property == null || property.isEmpty()) {
       return;
     }
-    slider.addChangeListener(new SliderListener(property, slider, factor));
+    slider.addChangeListener(new SliderListener(getMapObject(), property, slider, factor));
   }
 
   protected void setup(JSpinner spinner, String property) {
     if (property == null || property.isEmpty()) {
       return;
     }
-    spinner.addChangeListener(new SpinnerListener(property, spinner));
+    spinner.addChangeListener(new SpinnerListener(getMapObject(), property, spinner));
+  }
+
+  protected void setup(SpinnerNumberModel numberModel, String property) {
+    if (property == null || property.isEmpty()) {
+      return;
+    }
+    numberModel.addChangeListener(new NumberModelListener(getMapObject(), property, numberModel));
   }
 
   protected void setup(JTextField textField, String property) {
@@ -254,13 +242,14 @@ public abstract class PropertyPanel extends JPanel {
       return;
     }
     textField.addFocusListener(
-        new MapObjectPropteryFocusListener(m -> m.setValue(property, textField.getText())));
+      new MapObjectPropertyFocusListener(getMapObject(), m -> true,
+        m -> m.setValue(property, textField.getText())));
     textField.addActionListener(
-        new MapObjectPropertyActionListener(
-            m -> !m.hasCustomProperty(property)
-                || m.getStringValue(property) == null
-                || !m.getStringValue(property).equals(textField.getText()),
-            m -> m.setValue(property, textField.getText())));
+      new MapObjectPropertyActionListener(getMapObject(),
+        m -> !m.hasCustomProperty(property)
+          || m.getStringValue(property) == null
+          || !m.getStringValue(property).equals(textField.getText()),
+        m -> m.setValue(property, textField.getText())));
   }
 
   protected void setup(TextList textList, String property) {
@@ -268,30 +257,24 @@ public abstract class PropertyPanel extends JPanel {
       return;
     }
     textList.addActionListener(
-        new MapObjectPropertyActionListener(
-            m -> !m.hasCustomProperty(property)
-                || m.getStringValue(property) == null
-                || !m.getStringValue(property).equals(textList.getJoinedString()),
-            m -> m.setValue(property, textList.getJoinedString())));
+      new MapObjectPropertyActionListener(getMapObject(),
+        m -> !m.hasCustomProperty(property)
+          || m.getStringValue(property) == null
+          || !m.getStringValue(property).equals(textList.getJoinedString()),
+        m -> m.setValue(property, textList.getJoinedString())));
   }
 
   protected void setup(JTable table, String... properties) {
     if (properties == null || properties.length == 0) {
       return;
     }
-    table.getModel().addTableModelListener(new TableListener(table, properties));
+    table.getModel()
+      .addTableModelListener(new TableListener(getMapObject(), table, m -> true, properties));
   }
 
-  protected void updateEnvironment() {
-    if (getDataSource() != null) {
-      IMapObject obj = getDataSource();
-      Game.world().environment().reloadFromMap(obj.getId());
-      UI.getEntityController().refresh(obj.getId());
-    }
-  }
 
   protected LayoutManager createLayout(
-      LayoutItem[] layoutItems, Component... additionalComponents) {
+    LayoutItem[] layoutItems, Component... additionalComponents) {
     GroupLayout groupLayout = new GroupLayout(this);
 
     // prepare the parallel group for the labels
@@ -299,16 +282,16 @@ public abstract class PropertyPanel extends JPanel {
     ParallelGroup parallel = groupLayout.createParallelGroup(Alignment.TRAILING);
     for (Component component : additionalComponents) {
       parallel.addComponent(
-          component, Alignment.LEADING, CONTROL_MIN_WIDTH, CONTROL_WIDTH, Short.MAX_VALUE);
+        component, Alignment.LEADING, CONTROL_MIN_WIDTH, CONTROL_WIDTH, Short.MAX_VALUE);
     }
 
     for (LayoutItem item : layoutItems) {
       SequentialGroup horGrp = groupLayout.createSequentialGroup();
       if (item.getLabel() != null) {
         horGrp
-            .addComponent(item.getLabel(), LABEL_WIDTH, LABEL_WIDTH, Short.MAX_VALUE)
-            .addPreferredGap(ComponentPlacement.UNRELATED)
-            .addComponent(item.getComponent(), CONTROL_MIN_WIDTH, CONTROL_WIDTH, Short.MAX_VALUE);
+          .addComponent(item.getLabel(), LABEL_WIDTH, LABEL_WIDTH, Short.MAX_VALUE)
+          .addPreferredGap(ComponentPlacement.UNRELATED)
+          .addComponent(item.getComponent(), CONTROL_MIN_WIDTH, CONTROL_WIDTH, Short.MAX_VALUE);
       } else {
         horGrp.addComponent(item.getComponent(), CONTROL_MIN_WIDTH, CONTROL_WIDTH, Short.MAX_VALUE);
       }
@@ -318,9 +301,9 @@ public abstract class PropertyPanel extends JPanel {
     // initialize the horizontal layout group with the parallel groups for
     // labels and components and some additional gaps
     groupLayout.setHorizontalGroup(
-        groupLayout
-            .createParallelGroup(Alignment.LEADING)
-            .addGroup(groupLayout.createSequentialGroup().addGroup(parallel)));
+      groupLayout
+        .createParallelGroup(Alignment.LEADING)
+        .addGroup(groupLayout.createSequentialGroup().addGroup(parallel)));
 
     // now prepare the vertical groups
     SequentialGroup seq = groupLayout.createSequentialGroup();
@@ -330,17 +313,17 @@ public abstract class PropertyPanel extends JPanel {
       ParallelGroup verGrp = groupLayout.createParallelGroup(Alignment.LEADING);
       if (item.getLabel() != null) {
         verGrp
-            .addComponent(
-                item.getComponent(), item.getMinHeight(), item.getMinHeight(), item.getMinHeight())
-            .addComponent(
-                item.getLabel(),
-                GroupLayout.PREFERRED_SIZE,
-                item.getMinHeight(),
-                item.getMinHeight())
-            .addGap(CONTROL_MARGIN);
+          .addComponent(
+            item.getComponent(), item.getMinHeight(), item.getMinHeight(), item.getMinHeight())
+          .addComponent(
+            item.getLabel(),
+            GroupLayout.PREFERRED_SIZE,
+            item.getMinHeight(),
+            item.getMinHeight())
+          .addGap(CONTROL_MARGIN);
       } else {
         verGrp.addComponent(
-            item.getComponent(), item.getMinHeight(), item.getMinHeight(), item.getMinHeight());
+          item.getComponent(), item.getMinHeight(), item.getMinHeight(), item.getMinHeight());
       }
 
       current = current.addGroup(verGrp);
@@ -349,24 +332,17 @@ public abstract class PropertyPanel extends JPanel {
     current.addPreferredGap(ComponentPlacement.UNRELATED);
     for (Component component : additionalComponents) {
       current =
-          current
-              .addComponent(
-                  component,
-                  GroupLayout.PREFERRED_SIZE,
-                  GroupLayout.PREFERRED_SIZE,
-                  GroupLayout.PREFERRED_SIZE)
-              .addGap(CONTROL_MARGIN);
+        current
+          .addComponent(
+            component,
+            GroupLayout.PREFERRED_SIZE,
+            GroupLayout.PREFERRED_SIZE,
+            GroupLayout.PREFERRED_SIZE)
+          .addGap(CONTROL_MARGIN);
     }
 
     groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addGroup(seq));
     return groupLayout;
-  }
-
-  private void applyChanges(Consumer<IMapObject> updateAction) {
-    UndoManager.instance().mapObjectChanging(getDataSource());
-    updateAction.accept(getDataSource());
-    UndoManager.instance().mapObjectChanged(getDataSource());
-    updateEnvironment();
   }
 
   protected static class LayoutItem {
@@ -422,151 +398,6 @@ public abstract class PropertyPanel extends JPanel {
 
     private void setMinHeight(int minHeight) {
       this.minHeight = minHeight;
-    }
-  }
-
-  protected class MapObjectPropertyItemListener implements ItemListener {
-
-    private final Consumer<IMapObject> updateAction;
-
-    MapObjectPropertyItemListener(Consumer<IMapObject> updateAction) {
-      this.updateAction = updateAction;
-    }
-
-    @Override
-    public void itemStateChanged(ItemEvent arg0) {
-      if (getDataSource() == null || Editor.instance().getMapComponent().isFocussing()) {
-        return;
-      }
-
-      applyChanges(this.updateAction);
-    }
-  }
-
-  protected class MapObjectPropertyActionListener implements ActionListener {
-
-    private final Consumer<IMapObject> updateAction;
-    private final Function<IMapObject, Boolean> newValueCheck;
-
-    MapObjectPropertyActionListener(
-        Function<IMapObject, Boolean> newValueCheck, Consumer<IMapObject> updateAction) {
-      this.updateAction = updateAction;
-      this.newValueCheck = newValueCheck;
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-      if (getDataSource() == null
-          || Editor.instance().getMapComponent().isFocussing()
-          || Boolean.FALSE.equals(this.newValueCheck.apply(getDataSource()))) {
-        return;
-      }
-
-      applyChanges(this.updateAction);
-    }
-  }
-
-  protected class MabObjectPropertyTableModelListener implements TableModelListener {
-
-    private final Consumer<IMapObject> updateAction;
-
-    MabObjectPropertyTableModelListener(Consumer<IMapObject> updateAction) {
-      this.updateAction = updateAction;
-    }
-
-    @Override
-    public void tableChanged(TableModelEvent e) {
-      if (getDataSource() == null || Editor.instance().getMapComponent().isFocussing()) {
-        return;
-      }
-      applyChanges(this.updateAction);
-    }
-  }
-
-  protected class MapObjectPropertyChangeListener implements ChangeListener {
-
-    private final Consumer<IMapObject> updateAction;
-    private final Function<IMapObject, Boolean> newValueCheck;
-
-    MapObjectPropertyChangeListener(
-        Function<IMapObject, Boolean> newValueCheck, Consumer<IMapObject> updateAction) {
-      this.updateAction = updateAction;
-      this.newValueCheck = newValueCheck;
-    }
-
-    @Override
-    public void stateChanged(ChangeEvent e) {
-      if (getDataSource() == null
-          || Editor.instance().getMapComponent().isFocussing()
-          || Boolean.FALSE.equals(this.newValueCheck.apply(getDataSource()))) {
-        return;
-      }
-
-      applyChanges(this.updateAction);
-    }
-  }
-
-  protected class SpinnerListener extends MapObjectPropertyChangeListener {
-
-    SpinnerListener(String mapObjectProperty, JSpinner spinner) {
-      super(
-          m -> m.hasCustomProperty(mapObjectProperty)
-              || m.getStringValue(mapObjectProperty) == null
-              || !m.getStringValue(mapObjectProperty).equals(spinner.getValue().toString()),
-          m -> m.setValue(mapObjectProperty, spinner.getValue().toString()));
-    }
-  }
-
-  protected class SliderListener extends MapObjectPropertyChangeListener {
-
-    SliderListener(String mapObjectProperty, JSlider slider) {
-      super(
-          m -> m.hasCustomProperty(mapObjectProperty)
-              || m.getIntValue(mapObjectProperty) != slider.getValue(),
-          m -> m.setValue(mapObjectProperty, slider.getValue()));
-    }
-
-    SliderListener(String mapObjectProperty, JSlider slider, float factor) {
-      super(
-          m -> m.hasCustomProperty(mapObjectProperty)
-              || m.getFloatValue(mapObjectProperty) != slider.getValue() * factor,
-          m -> m.setValue(mapObjectProperty, slider.getValue() * factor));
-    }
-  }
-
-  protected class TableListener extends MabObjectPropertyTableModelListener {
-
-    TableListener(JTable table, String... mapObjectProperties) {
-      super(
-          m -> {
-            int column = 0;
-            for (String prop : mapObjectProperties) {
-              ArrayList<Object> values = new ArrayList<>();
-              for (int i = 0; i < table.getRowCount(); i++) {
-                values.add(table.getValueAt(i, column));
-              }
-              m.setValue(prop, ArrayUtilities.join(values, ","));
-              column++;
-            }
-          });
-    }
-  }
-
-  protected class MapObjectPropteryFocusListener extends FocusAdapter {
-
-    private final Consumer<IMapObject> updateAction;
-
-    MapObjectPropteryFocusListener(Consumer<IMapObject> updateAction) {
-      this.updateAction = updateAction;
-    }
-
-    @Override
-    public void focusLost(FocusEvent e) {
-      if (getDataSource() == null || Editor.instance().getMapComponent().isFocussing()) {
-        return;
-      }
-
-      applyChanges(this.updateAction);
     }
   }
 }

@@ -2,6 +2,8 @@ package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.awt.Color;
 import java.net.URL;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.Objects;
 
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
@@ -15,7 +17,7 @@ public class CustomProperty implements ICustomProperty {
 
   /**
    * Instantiates a new {@code CustomProperty} instance.
-   * 
+   *
    * <p>
    * The default type for a custom property is {@code string} if not explicitly specified.
    * </p>
@@ -38,7 +40,7 @@ public class CustomProperty implements ICustomProperty {
 
   /**
    * Instantiates a new {@code CustomProperty} instance.
-   * 
+   *
    * @param type
    *          The type of this custom property.
    * @param value
@@ -51,7 +53,7 @@ public class CustomProperty implements ICustomProperty {
 
   /**
    * Instantiates a new {@code CustomProperty} instance.
-   * 
+   *
    * @param location
    *          The location of the file represented by this custom property.
    */
@@ -98,14 +100,8 @@ public class CustomProperty implements ICustomProperty {
   }
 
   @Override
-  public void setValue(long value) {
-    this.value = Long.toString(value);
-    this.location = null;
-  }
-
-  @Override
-  public void setValue(double value) {
-    this.value = Double.toString(value);
+  public void setValue(Number value) {
+    this.value = value.toString();
     this.location = null;
   }
 
@@ -149,6 +145,11 @@ public class CustomProperty implements ICustomProperty {
   @Override
   public double getAsDouble() {
     return Double.parseDouble(this.value);
+  }
+
+  @Override
+  public Number getAsNumber() throws ParseException {
+    return NumberFormat.getInstance().parse(this.value);
   }
 
   @Override

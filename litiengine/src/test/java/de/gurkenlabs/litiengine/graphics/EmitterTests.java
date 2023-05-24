@@ -1,7 +1,7 @@
 package de.gurkenlabs.litiengine.graphics;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gurkenlabs.litiengine.Align;
@@ -12,7 +12,6 @@ import de.gurkenlabs.litiengine.entities.EmitterInfo;
 import de.gurkenlabs.litiengine.entities.EntityInfo;
 import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.Particle;
-import de.gurkenlabs.litiengine.graphics.emitters.xml.ParticleParameter;
 import de.gurkenlabs.litiengine.util.ColorHelper;
 import java.awt.Color;
 import java.util.Arrays;
@@ -24,14 +23,14 @@ class EmitterTests {
   void testInitializationByAnnotation() {
     TestEmitter testEmitter = new TestEmitter();
 
-    assertEquals(false, testEmitter.isActivateOnInit());
-    assertEquals(false, testEmitter.isActivated());
-    assertEquals(false, testEmitter.isPaused());
+    assertFalse(testEmitter.isActivateOnInit());
+    assertFalse(testEmitter.isActivated());
+    assertFalse(testEmitter.isPaused());
 
     assertEquals(2500, testEmitter.getTimeToLive());
     assertEquals(500, testEmitter.data().getMaxParticles());
-    assertEquals(1000, testEmitter.data().getParticleTTL().getMaxValue());
-    assertEquals(100, testEmitter.data().getParticleTTL().getMinValue());
+    assertEquals(1000, testEmitter.data().getParticleTTL().getMax());
+    assertEquals(100, testEmitter.data().getParticleTTL().getMin());
 
     assertEquals(10, testEmitter.data().getUpdateRate());
     assertEquals(Quality.HIGH, testEmitter.data().getRequiredQuality());
@@ -50,50 +49,28 @@ class EmitterTests {
   void testRandomValueGeneration() {
     TestEmitter testEmitter = new TestEmitter();
 
-    Color[] colors = new Color[] {Color.RED, Color.ORANGE, Color.YELLOW};
+    Color[] colors = new Color[]{Color.RED, Color.ORANGE, Color.YELLOW};
     testEmitter.data().setColors(colors);
 
     assertTrue(
-        Arrays.asList(colors)
-            .contains(ColorHelper.decode(Game.random().choose(testEmitter.data().getColors()))));
-  }
-
-  @Test
-  void testGetMin() {
-    ParticleParameter particleParameter = new ParticleParameter();
-    particleParameter.setMaxValue(1);
-    particleParameter.setMinValue(10);
-
-    double minValue = particleParameter.getMinValue();
-
-    assertEquals(minValue, particleParameter.get());
-  }
-
-  @Test
-  void testGetMax() {
-    ParticleParameter particleParameter = new ParticleParameter();
-    particleParameter.setMaxValue(10);
-    particleParameter.setMinValue(1);
-
-    double minValue = particleParameter.getMinValue();
-
-    assertNotEquals(minValue, particleParameter.get());
+      Arrays.asList(colors)
+        .contains(ColorHelper.decode(Game.random().choose(testEmitter.data().getColors()))));
   }
 
   @EmitterInfo(
-      activateOnInit = false,
-      duration = 2500,
-      maxParticles = 500,
-      originAlign = Align.CENTER,
-      originValign = Valign.MIDDLE,
-      particleMaxTTL = 1000,
-      particleMinTTL = 100,
-      particleUpdateRate = 10,
-      requiredQuality = Quality.HIGH,
-      spawnAmount = 15,
-      spawnRate = 20)
+    activateOnInit = false,
+    duration = 2500,
+    maxParticles = 500,
+    originAlign = Align.CENTER,
+    originValign = Valign.MIDDLE,
+    particleMaxTTL = 1000,
+    particleMinTTL = 100,
+    particleUpdateRate = 10,
+    requiredQuality = Quality.HIGH,
+    spawnAmount = 15,
+    spawnRate = 20)
   @EntityInfo(width = 50, height = 50)
-  class TestEmitter extends Emitter {
+  static class TestEmitter extends Emitter {
 
     @Override
     protected Particle createNewParticle() {

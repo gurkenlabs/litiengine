@@ -1,10 +1,11 @@
-package de.gurkenlabs.utiliti.swing.panels;
+package de.gurkenlabs.utiliti.swing.panels.emission;
 
 import com.github.weisj.darklaf.components.border.DarkBorders;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.utiliti.swing.Icons;
+import de.gurkenlabs.utiliti.swing.panels.PropertyPanel;
 import java.awt.Dimension;
 import java.awt.LayoutManager;
 import javax.swing.Box;

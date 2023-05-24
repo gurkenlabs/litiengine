@@ -164,25 +164,25 @@ public class CustomPanel extends PropertyPanel {
   }
 
   private void updateCustomProperties() {
-    if (getDataSource() == null || Editor.instance().getMapComponent().isFocussing()) {
+    if (getMapObject() == null || Editor.instance().getMapComponent().isFocussing()) {
       return;
     }
 
-    UndoManager.instance().mapObjectChanging(getDataSource());
+    UndoManager.instance().mapObjectChanging(getMapObject());
     List<String> setProperties = new ArrayList<>();
     for (int row = 0; row < model.getRowCount(); row++) {
       String name = (String) model.getValueAt(row, 0);
       String value = (String) model.getValueAt(row, 1);
       if (name != null && !name.isEmpty()) {
         setProperties.add(name);
-        getDataSource().setValue(name, value);
+        getMapObject().setValue(name, value);
       }
     }
 
-    getDataSource()
+    getMapObject()
         .getProperties()
         .keySet()
         .removeIf(p -> MapObjectProperty.isCustom(p) && !setProperties.contains(p));
-    UndoManager.instance().mapObjectChanged(getDataSource());
+    UndoManager.instance().mapObjectChanged(getMapObject());
   }
 }

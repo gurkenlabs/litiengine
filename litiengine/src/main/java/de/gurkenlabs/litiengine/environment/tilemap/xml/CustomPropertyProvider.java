@@ -1,25 +1,29 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
-import java.awt.Color;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
-
+import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
 import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
-import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
-import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
+import java.awt.Color;
+import java.net.URL;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 public class CustomPropertyProvider implements ICustomPropertyProvider {
+
+  private static final Logger log = Logger.getLogger(CustomPropertyProvider.class.getName());
+
   @XmlElement
   @XmlJavaTypeAdapter(CustomPropertyAdapter.class)
   private Map<String, ICustomProperty> properties;
@@ -31,12 +35,11 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
   /**
    * Copy Constructor for copying instances of CustomPropertyProviders.
    *
-   * @param propertyProviderToBeCopied
-   *          the PropertyProvider we want to copy
+   * @param propertyProviderToBeCopied the PropertyProvider we want to copy
    */
   public CustomPropertyProvider(ICustomPropertyProvider propertyProviderToBeCopied) {
     this.properties = propertyProviderToBeCopied.getProperties().entrySet().stream()
-        .collect(Collectors.toMap(Entry::getKey, e -> new CustomProperty((e.getValue()))));
+      .collect(Collectors.toMap(Entry::getKey, e -> new CustomProperty((e.getValue()))));
   }
 
   @Override
@@ -184,6 +187,26 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
   }
 
   @Override
+  public Number getNumber(String propertyName) {
+    return getNumber(propertyName, 0);
+  }
+
+  @Override
+  public Number getNumber(String propertyName, Number defaultValue) {
+    ICustomProperty property = this.getProperty(propertyName);
+    if (property == null) {
+      return defaultValue;
+    }
+    try {
+      return property.getAsNumber();
+    } catch (ParseException e) {
+      log.log(Level.WARNING, "Could not parse custom property as Number!", e);
+      return defaultValue;
+    }
+  }
+
+
+  @Override
   public Color getColorValue(String propertyName) {
     return this.getColorValue(propertyName, null);
   }
@@ -209,7 +232,8 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
   }
 
   @Override
-  public <T extends Enum<T>> T getEnumValue(String propertyName, Class<T> enumType, T defaultValue) {
+  public <T extends Enum<T>> T getEnumValue(String propertyName, Class<T> enumType,
+    T defaultValue) {
     ICustomProperty property = this.getProperty(propertyName);
     if (property == null) {
       return defaultValue;
@@ -272,45 +296,11 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
     property.setValue(value);
   }
 
-  @Override
-  public void setValue(String propertyName, byte value) {
-    ICustomProperty property = createPropertyIfAbsent(propertyName);
-    property.setType("int");
-    property.setValue(value);
-  }
 
   @Override
-  public void setValue(String propertyName, short value) {
+  public void setValue(String propertyName, Number value) {
     ICustomProperty property = createPropertyIfAbsent(propertyName);
-    property.setType("int");
-    property.setValue(value);
-  }
-
-  @Override
-  public void setValue(String propertyName, int value) {
-    ICustomProperty property = createPropertyIfAbsent(propertyName);
-    property.setType("int");
-    property.setValue(value);
-  }
-
-  @Override
-  public void setValue(String propertyName, long value) {
-    ICustomProperty property = createPropertyIfAbsent(propertyName);
-    property.setType("int");
-    property.setValue(value);
-  }
-
-  @Override
-  public void setValue(String propertyName, float value) {
-    ICustomProperty property = createPropertyIfAbsent(propertyName);
-    property.setType("float");
-    property.setValue(value);
-  }
-
-  @Override
-  public void setValue(String propertyName, double value) {
-    ICustomProperty property = createPropertyIfAbsent(propertyName);
-    property.setType("float");
+    property.setType(value.getClass().getSimpleName());
     property.setValue(value);
   }
 
@@ -357,10 +347,11 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
     List<String> values = new ArrayList<>();
     String valuesStr = this.getStringValue(propertyName, defaultValue);
     if (valuesStr != null && !valuesStr.isEmpty()) {
-      for (String value : valuesStr.split(","))
+      for (String value : valuesStr.split(",")) {
         if (value != null) {
           values.add(value);
         }
+      }
     }
     return values;
   }
