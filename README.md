@@ -7,7 +7,7 @@
 [![Maven Central](https://img.shields.io/maven-central/v/de.gurkenlabs/litiengine.svg?style=flat)](https://maven-badges.herokuapp.com/maven-central/de.gurkenlabs/litiengine)
 [![MIT License](https://img.shields.io/github/license/gurkenlabs/litiengine?style=flat)](https://github.com/gurkenlabs/litiengine/blob/master/LICENSE)
 [![Discord chat](https://img.shields.io/discord/326074836508213258?style=flat&logo=discord)](https://discord.gg/rRB9cKD)
-[![Supporters](https://img.shields.io/opencollective/all/litiengine?label=supporters&style=flat)](https://opencollective.com/litiengine)
+[![Financial Supporters](https://img.shields.io/opencollective/all/litiengine?label=supporters&style=flat)](https://opencollective.com/litiengine)
 
 ## :video_game: Main Features
 
