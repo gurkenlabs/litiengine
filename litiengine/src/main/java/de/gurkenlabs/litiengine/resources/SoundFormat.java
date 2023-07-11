@@ -15,9 +15,8 @@ public enum SoundFormat {
 
   /**
    * Gets the {@code SoundFormat} of the specified format string.
-   * 
-   * @param format
-   *          The format string from which to extract the format.
+   *
+   * @param format The format string from which to extract the format.
    * @return The format of the specified string or {@code UNDEFINED} if not supported.
    */
   public static SoundFormat get(String format) {
@@ -26,22 +25,18 @@ public enum SoundFormat {
 
   /**
    * Determines whether the extension of the specified file is supported by the engine.
-   * 
-   * @param file
-   *          The file to check for.
-   * 
+   *
+   * @param file The file to check for.
    * @return True if the extension is part of this enum; otherwise false.
    */
   public static boolean isSupported(File file) {
-    return isSupported(file);
+    return isSupported(file.getName());
   }
 
   /**
    * Determines whether the extension of the specified file is supported by the engine.
-   * 
-   * @param fileName
-   *          The file name to check for.
-   * 
+   *
+   * @param fileName The file name to check for.
    * @return True if the extension is part of this enum; otherwise false.
    */
   public static boolean isSupported(String fileName) {
@@ -53,9 +48,9 @@ public enum SoundFormat {
   }
 
   /**
-   * Converts this format instance to a file format string that can be used as an extension (e.g. .ogg).<br>
-   * It adds a leading '.' to the lower-case string representation of this instance.
-   * 
+   * Converts this format instance to a file format string that can be used as an extension (e.g.
+   * .ogg).<br> It adds a leading '.' to the lower-case string representation of this instance.
+   *
    * @return The file extension string for this instance.
    */
   public String toFileExtension() {

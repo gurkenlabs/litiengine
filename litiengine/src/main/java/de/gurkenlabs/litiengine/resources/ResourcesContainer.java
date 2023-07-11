@@ -1,5 +1,7 @@
 package de.gurkenlabs.litiengine.resources;
 
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.GameListener;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,21 +15,16 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
-
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.GameListener;
 
 /**
- * An abstract implementation for all classes that provide a certain type of resources. Basically, it's an in-memory
- * cache of the resources and provides access to manage the resources.
+ * An abstract implementation for all classes that provide a certain type of resources. Basically,
+ * it's an in-memory cache of the resources and provides access to manage the resources.
  *
- * @param <T>
- *          The type of the resource that is contained by this instance.
- * 
+ * @param <T> The type of the resource that is contained by this instance.
  * @see ResourcesContainerListener
  */
 public abstract class ResourcesContainer<T> {
+
   // use a work-stealing pool to maximize resource load speed while minimizing the number of resources
   // in use
   private static final ExecutorService ASYNC_POOL = Executors.newWorkStealingPool();
@@ -47,12 +44,11 @@ public abstract class ResourcesContainer<T> {
   }
 
   /**
-   * Add a new container listener to this instance in order to observe resource life cycles. The listener will get
-   * notified whenever a resource was added to or removed from this container.
-   * 
-   * @param listener
-   *          The container listener instance that will receive call backs from this container.
-   * 
+   * Add a new container listener to this instance in order to observe resource life cycles. The
+   * listener will get notified whenever a resource was added to or removed from this container.
+   *
+   * @param listener The container listener instance that will receive call backs from this
+   *                 container.
    * @see #removeContainerListener(ResourcesContainerListener)
    */
   public void addContainerListener(ResourcesContainerListener<? super T> listener) {
@@ -61,10 +57,8 @@ public abstract class ResourcesContainer<T> {
 
   /**
    * Remove the specified listener from this container.
-   * 
-   * @param listener
-   *          The listener instance that was previously added to this container.
-   * 
+   *
+   * @param listener The listener instance that was previously added to this container.
    * @see #addContainerListener(ResourcesContainerListener)
    */
   public void removeContainerListener(ResourcesContainerListener<T> listener) {
@@ -73,10 +67,8 @@ public abstract class ResourcesContainer<T> {
 
   /**
    * Add a new container listener to this instance that observes whenever this instance is cleared.
-   * 
-   * @param listener
-   *          The container listener instance.
-   * 
+   *
+   * @param listener The container listener instance.
    * @see #removeClearedListener(ResourcesContainerClearedListener)
    */
   public void addClearedListener(ResourcesContainerClearedListener listener) {
@@ -85,10 +77,8 @@ public abstract class ResourcesContainer<T> {
 
   /**
    * Remove the specified listener from this container.
-   * 
-   * @param listener
-   *          The listener instance that was previously added to this container.
-   * 
+   *
+   * @param listener The listener instance that was previously added to this container.
    * @see #addClearedListener(ResourcesContainerClearedListener)
    */
   public void removeClearedListener(ResourcesContainerClearedListener listener) {
@@ -96,17 +86,14 @@ public abstract class ResourcesContainer<T> {
   }
 
   /**
-   * Add the specified resource to this container.<br>
-   * The added element can later be retrieved from this container by calling {@code get(resourceName)}.
+   * Add the specified resource to this container.<br> The added element can later be retrieved from
+   * this container by calling {@code get(resourceName)}.
    * <p>
    * Use this method to make a resource accessible over this container during runtime.
    * </p>
    *
-   * @param resourceName
-   *          The name that the resource is managed by.
-   * @param resource
-   *          The resource instance.
-   * 
+   * @param resourceName The name that the resource is managed by.
+   * @param resource     The resource instance.
    * @see #get(Predicate)
    * @see #get(String)
    * @see #get(String, boolean)
@@ -141,11 +128,9 @@ public abstract class ResourcesContainer<T> {
    * <p>
    * Note that the name is <b>not case-sensitive</b>.
    * </p>
-   * 
-   * @param resourceName
-   *          The resource's name.
+   *
+   * @param resourceName The resource's name.
    * @return True if this container contains a resource with the specified name; otherwise false.
-   * 
    * @see ResourcesContainer#contains(Object)
    */
   public boolean contains(String resourceName) {
@@ -158,9 +143,8 @@ public abstract class ResourcesContainer<T> {
 
   /**
    * Checks if the specified resource is contained by this instance.
-   * 
-   * @param resource
-   *          The resource.
+   *
+   * @param resource The resource.
    * @return True if this instance contains the specified resource instance; otherwise false.
    */
   public boolean contains(T resource) {
@@ -169,7 +153,7 @@ public abstract class ResourcesContainer<T> {
 
   /**
    * Gets the amount of resources that this container holds.
-   * 
+   *
    * @return The amount of resources in this container.
    */
   public int count() {
@@ -178,9 +162,8 @@ public abstract class ResourcesContainer<T> {
 
   /**
    * Gets all resources that match the specified condition.
-   * 
-   * @param pred
-   *          The condition that a resource must fulfill in order to be returned.
+   *
+   * @param pred The condition that a resource must fulfill in order to be returned.
    * @return All resources that match the specified condition.
    */
   public Collection<T> get(Predicate<? super T> pred) {
@@ -188,7 +171,7 @@ public abstract class ResourcesContainer<T> {
       return new ArrayList<>();
     }
 
-    return this.resources.values().stream().filter(pred).collect(Collectors.toList());
+    return this.resources.values().stream().filter(pred).toList();
   }
 
   /**
@@ -197,12 +180,11 @@ public abstract class ResourcesContainer<T> {
    * This is the most common (and preferred) way to fetch resources from a container.
    * </p>
    * <p>
-   * If not previously loaded, this method attempts to load the resource on the fly otherwise it will be retrieved from
-   * the cache.
+   * If not previously loaded, this method attempts to load the resource on the fly otherwise it
+   * will be retrieved from the cache.
    * </p>
-   * 
-   * @param resourceName
-   *          The resource's name.
+   *
+   * @param resourceName The resource's name.
    * @return The resource with the specified name or null if not found.
    */
   public T get(String resourceName) {
@@ -216,14 +198,13 @@ public abstract class ResourcesContainer<T> {
   /**
    * Gets the resource with the specified name.<br>
    * <p>
-   * If no such resource is currently present on the container, it will be loaded with the specified {@code loadCallback}
-   * and added to this container.
+   * If no such resource is currently present on the container, it will be loaded with the specified
+   * {@code loadCallback} and added to this container.
    * </p>
-   * 
-   * @param resourceName
-   *          The resource's name.
-   * @param loadCallback
-   *          The callback that is used to load the resource on-demand if it's not present on this container.
+   *
+   * @param resourceName The resource's name.
+   * @param loadCallback The callback that is used to load the resource on-demand if it's not
+   *                     present on this container.
    * @return T The resource with the specified name.
    */
   public T get(String resourceName, Supplier<? extends T> loadCallback) {
@@ -248,14 +229,13 @@ public abstract class ResourcesContainer<T> {
   /**
    * Gets the resource with the specified name.
    * <p>
-   * If not previously loaded, this method attempts to load the resource on the fly otherwise it will be retrieved from
-   * the cache.
+   * If not previously loaded, this method attempts to load the resource on the fly otherwise it
+   * will be retrieved from the cache.
    * </p>
-   * 
-   * @param resourceName
-   *          The name of the game resource.
-   * @param forceLoad
-   *          If set to true, cached resource (if existing) will be discarded and the resource will be freshly loaded.
+   *
+   * @param resourceName The name of the game resource.
+   * @param forceLoad    If set to true, cached resource (if existing) will be discarded and the
+   *                     resource will be freshly loaded.
    * @return The game resource or null if not found.
    */
   public T get(String resourceName, boolean forceLoad) {
@@ -282,24 +262,26 @@ public abstract class ResourcesContainer<T> {
   }
 
   /**
-   * Eventually gets the resource with the specified location. The resource is loaded asynchronously and can be retrieved
-   * from the returned {@code Future} object returned by this method once loaded.
-   * 
-   * @param location
-   *          The location of the resource
-   * @return A {@code Future} object that can be used to retrieve the resource once it is finished loading
+   * Eventually gets the resource with the specified location. The resource is loaded asynchronously
+   * and can be retrieved from the returned {@code Future} object returned by this method once
+   * loaded.
+   *
+   * @param location The location of the resource
+   * @return A {@code Future} object that can be used to retrieve the resource once it is finished
+   * loading
    */
   public Future<T> getAsync(URL location) {
     return ASYNC_POOL.submit(() -> this.get(location));
   }
 
   /**
-   * Eventually gets the resource with the specified location. The resource is loaded asynchronously and can be retrieved
-   * from the returned {@code Future} object returned by this method once loaded.
-   * 
-   * @param name
-   *          The name or location of the resource
-   * @return A {@code Future} object that can be used to retrieve the resource once it is finished loading
+   * Eventually gets the resource with the specified location. The resource is loaded asynchronously
+   * and can be retrieved from the returned {@code Future} object returned by this method once
+   * loaded.
+   *
+   * @param name The name or location of the resource
+   * @return A {@code Future} object that can be used to retrieve the resource once it is finished
+   * loading
    */
   public Future<T> getAsync(String name) {
     return this.getAsync(Resources.getLocation(this.getIdentifier(name)));
@@ -307,7 +289,7 @@ public abstract class ResourcesContainer<T> {
 
   /**
    * Gets all loaded resources from this container.
-   * 
+   *
    * @return All loaded resources.
    */
   public Collection<T> getAll() {
@@ -316,9 +298,8 @@ public abstract class ResourcesContainer<T> {
 
   /**
    * Removes the resource with the specified name from this container.
-   * 
-   * @param resourceName
-   *          The name of the resource that should be removed.
+   *
+   * @param resourceName The name of the resource that should be removed.
    * @return The removed resource.
    */
   public T remove(String resourceName) {
@@ -341,16 +322,14 @@ public abstract class ResourcesContainer<T> {
   /**
    * Tries to get a resource with the specified name from this container.
    * <p>
-   * This method should be used, if it's not clear whether the resource is present on this container.<br>
-   * It is basically a combination of {@code get(String)} and {@code contains(String)} and allows to check whether a
-   * resource is present while also fetching it from the container.
+   * This method should be used, if it's not clear whether the resource is present on this
+   * container.<br> It is basically a combination of {@code get(String)} and
+   * {@code contains(String)} and allows to check whether a resource is present while also fetching
+   * it from the container.
    * </p>
-   * 
-   * @param resourceName
-   *          The name of the resource.
-   * 
+   *
+   * @param resourceName The name of the resource.
    * @return An Optional instance that holds the resource instance, if present on this container.
-   * 
    * @see Optional
    * @see #contains(String)
    * @see #get(String)
@@ -364,19 +343,17 @@ public abstract class ResourcesContainer<T> {
   }
 
   public Optional<T> tryGet(URL resourceName) {
-    return this.tryGet(resourceName);
+    return this.tryGet(resourceName.getPath());
   }
 
   protected abstract T load(URL resourceName) throws Exception;
 
   /**
-   * Gets an alias for the specified resourceName. Note that the process of providing an alias is up to the
-   * ResourceContainer implementation.
-   * 
-   * @param resourceName
-   *          The original name of the resource.
-   * @param resource
-   *          The resource.
+   * Gets an alias for the specified resourceName. Note that the process of providing an alias is up
+   * to the ResourceContainer implementation.
+   *
+   * @param resourceName The original name of the resource.
+   * @param resource     The resource.
    * @return An alias for the specified resource.
    */
   protected String getAlias(String resourceName, T resource) {
