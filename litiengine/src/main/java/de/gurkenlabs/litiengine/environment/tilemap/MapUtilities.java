@@ -1,5 +1,7 @@
 package de.gurkenlabs.litiengine.environment.tilemap;
 
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.util.MathUtilities;
 import java.awt.Point;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
@@ -7,10 +9,8 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.util.MathUtilities;
-
 public final class MapUtilities {
+
   private MapUtilities() {
     throw new UnsupportedOperationException();
   }
@@ -57,40 +57,45 @@ public final class MapUtilities {
   }
 
   public static Rectangle2D getTileBoundingBox(final IMap map, final Rectangle2D box) {
-    final int minX = (int) MathUtilities.clamp(box.getX(), 0, map.getSizeInPixels().width - 1);
-    final int minY = (int) MathUtilities.clamp(box.getY(), 0, map.getSizeInPixels().height - 1);
-    final int maxX = (int) MathUtilities.clamp(box.getMaxX(), 0, map.getSizeInPixels().width - 1);
-    final int maxY = (int) MathUtilities.clamp(box.getMaxY(), 0, map.getSizeInPixels().height - 1);
+    final int minX = (int) MathUtilities.clamp(box.getX(), 0, map.getSizeInPixels().getWidth() - 1);
+    final int minY = (int) MathUtilities.clamp(box.getY(), 0,
+      map.getSizeInPixels().getHeight() - 1);
+    final int maxX = (int) MathUtilities.clamp(box.getMaxX(), 0,
+      map.getSizeInPixels().getWidth() - 1);
+    final int maxY = (int) MathUtilities.clamp(box.getMaxY(), 0,
+      map.getSizeInPixels().getHeight() - 1);
     final Point minTilePoint = map.getOrientation().getTile(minX, minY, map);
     final Point maxTilePoint = map.getOrientation().getTile(maxX, maxY, map);
     int minTileX = map.getOrientation().getName().equals(MapOrientations.ISOMETRIC.getName())
-        ? minTilePoint.x
-        : MathUtilities.clamp(minTilePoint.x, 0, map.getWidth() - 1);
+      ? minTilePoint.x
+      : MathUtilities.clamp(minTilePoint.x, 0, map.getWidth() - 1);
     int minTileY = map.getOrientation().getName().equals(MapOrientations.ISOMETRIC.getName())
-        ? minTilePoint.y
-        : MathUtilities.clamp(minTilePoint.y, 0, map.getHeight() - 1);
+      ? minTilePoint.y
+      : MathUtilities.clamp(minTilePoint.y, 0, map.getHeight() - 1);
     int maxTileX = map.getOrientation().getName().equals(MapOrientations.ISOMETRIC.getName())
-        ? maxTilePoint.x
-        : MathUtilities.clamp(maxTilePoint.x, 0, map.getWidth() - 1);
+      ? maxTilePoint.x
+      : MathUtilities.clamp(maxTilePoint.x, 0, map.getWidth() - 1);
     int maxTileY = map.getOrientation().getName().equals(MapOrientations.ISOMETRIC.getName())
-        ? maxTilePoint.y
-        : MathUtilities.clamp(maxTilePoint.y, 0, map.getWidth() - 1);
+      ? maxTilePoint.y
+      : MathUtilities.clamp(maxTilePoint.y, 0, map.getWidth() - 1);
     final Rectangle2D minTileBounds = map.getOrientation().getBounds(
-        new Point(MathUtilities.clamp(minTileX, 0, map.getWidth() - 1), MathUtilities.clamp(minTileY, 0, map.getHeight() - 1)), map);
+      new Point(MathUtilities.clamp(minTileX, 0, map.getWidth() - 1),
+        MathUtilities.clamp(minTileY, 0, map.getHeight() - 1)), map);
     final Rectangle2D maxTileBounds = map.getOrientation().getBounds(
-        new Point(MathUtilities.clamp(maxTileX, 0, map.getWidth() - 1), MathUtilities.clamp(maxTileY, 0, map.getHeight() - 1)), map);
+      new Point(MathUtilities.clamp(maxTileX, 0, map.getWidth() - 1),
+        MathUtilities.clamp(maxTileY, 0, map.getHeight() - 1)), map);
 
     return new Rectangle2D.Double(
-        minTileBounds.getX(), minTileBounds.getY(),
-        maxTileBounds.getMaxX() - minTileBounds.getX(), maxTileBounds.getMaxY() - minTileBounds.getY());
+      minTileBounds.getX(), minTileBounds.getY(),
+      maxTileBounds.getMaxX() - minTileBounds.getX(),
+      maxTileBounds.getMaxY() - minTileBounds.getY());
   }
 
   /**
-   * Get the corresponding tile for a given pixel map location. This is an overload taking the Map from the current
-   * environment to calculate a tile location.
+   * Get the corresponding tile for a given pixel map location. This is an overload taking the Map
+   * from the current environment to calculate a tile location.
    *
-   * @param mapLocation
-   *          the pixel map location.
+   * @param mapLocation the pixel map location.
    * @return The x / y tile coordinate for the given location.
    * @see MapUtilities#getTile(IMap, Point2D)
    */
@@ -104,10 +109,8 @@ public final class MapUtilities {
   /**
    * Get the corresponding tile for a given pixel map location.
    *
-   * @param map
-   *          The map on which to calculate the tile location.
-   * @param mapLocation
-   *          the pixel map location.
+   * @param map         The map on which to calculate the tile location.
+   * @param mapLocation the pixel map location.
    * @return The x / y tile coordinate for the given mapLocation.
    */
   public static Point getTile(IMap map, final Point2D mapLocation) {
@@ -120,20 +123,20 @@ public final class MapUtilities {
   /**
    * Check if the row or column with the given index is staggered.
    *
-   * @param staggerIndex
-   *          the staggerIndex property of the map. Every second row (or column, depending on the {@link StaggerAxis} of
-   *          the map is staggered half a tile.
-   * @param index
-   *          the index of the current row or column for which we want to determine if it's staggered or not.
+   * @param staggerIndex the staggerIndex property of the map. Every second row (or column,
+   *                     depending on the {@link StaggerAxis} of the map is staggered half a tile.
+   * @param index        the index of the current row or column for which we want to determine if
+   *                     it's staggered or not.
    * @return a boolean representing if the row or column with the given index is staggered.
    */
   public static boolean isStaggeredRowOrColumn(StaggerIndex staggerIndex, int index) {
     return (staggerIndex == StaggerIndex.ODD && MathUtilities.isOddNumber(index))
-        || (staggerIndex == StaggerIndex.EVEN && !MathUtilities.isOddNumber(index));
+      || (staggerIndex == StaggerIndex.EVEN && !MathUtilities.isOddNumber(index));
   }
 
   public static Point2D getMapLocation(final IMap map, final Point tileLocation) {
-    return new Point2D.Double(tileLocation.x * map.getTileSize().getWidth(), tileLocation.y * map.getTileSize().getHeight());
+    return new Point2D.Double(tileLocation.x * map.getTileSize().getWidth(),
+      tileLocation.y * map.getTileSize().getHeight());
   }
 
   public static List<ITile> getTilesByPixelLocation(final IMap map, final Point2D location) {
@@ -196,10 +199,8 @@ public final class MapUtilities {
   /**
    * Searches for the tile set that contains the specified tile, identified by the grid id.
    *
-   * @param map
-   *          the map
-   * @param tile
-   *          the tile
+   * @param map  the map
+   * @param tile the tile
    * @return the tileset
    */
   public static ITileset findTileSet(final IMap map, final ITile tile) {
@@ -224,7 +225,8 @@ public final class MapUtilities {
       return null;
     }
 
-    List<Point2D> points = mapObject.getPolyline() != null ? mapObject.getPolyline().getPoints() : mapObject.getPolygon().getPoints();
+    List<Point2D> points = mapObject.getPolyline() != null ? mapObject.getPolyline().getPoints()
+      : mapObject.getPolygon().getPoints();
     if (points.isEmpty()) {
       return null;
     }
@@ -233,7 +235,8 @@ public final class MapUtilities {
     path.moveTo(mapObject.getLocation().getX(), mapObject.getLocation().getY());
     for (int i = 1; i < points.size(); i++) {
       Point2D point = points.get(i);
-      path.lineTo(mapObject.getLocation().getX() + point.getX(), mapObject.getLocation().getY() + point.getY());
+      path.lineTo(mapObject.getLocation().getX() + point.getX(),
+        mapObject.getLocation().getY() + point.getY());
     }
 
     if (mapObject.isPolygon()) {
