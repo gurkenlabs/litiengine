@@ -1,6 +1,7 @@
 package de.gurkenlabs.utiliti.listeners;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
+import de.gurkenlabs.utiliti.swing.panels.PropertyPanel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.function.Consumer;
@@ -10,10 +11,11 @@ public class MapObjectPropertyActionListener extends MapObjectPropertyListener i
   ActionListener {
 
 
-  public MapObjectPropertyActionListener(IMapObject mapObject,
+  public MapObjectPropertyActionListener(
+    PropertyPanel propertyPanel,
     Predicate<IMapObject> mapObjectStateCheck,
     Consumer<IMapObject> updateAction) {
-    super(mapObject, mapObjectStateCheck, updateAction);
+    super(propertyPanel, mapObjectStateCheck, updateAction);
   }
 
   @Override

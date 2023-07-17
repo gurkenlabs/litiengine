@@ -94,9 +94,9 @@ public class DualSpinner extends PropertyPanel {
     Consumer<IMapObject> spinner1Action,
     Consumer<IMapObject> spinner2Action) {
     spnDim1.addChangeListener(
-      new MapObjectPropertyChangeListener(getMapObject(), newValueCheck1, spinner1Action));
+      new MapObjectPropertyChangeListener(this, newValueCheck1, spinner1Action));
     spnDim2.addChangeListener(
-      new MapObjectPropertyChangeListener(getMapObject(), newValueCheck2, spinner2Action));
+      new MapObjectPropertyChangeListener(this, newValueCheck2, spinner2Action));
   }
 
   public void setValues(Number v1, Number v2) {

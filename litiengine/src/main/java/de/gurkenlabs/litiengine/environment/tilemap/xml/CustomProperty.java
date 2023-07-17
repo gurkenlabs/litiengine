@@ -1,13 +1,10 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
-import java.awt.Color;
-import java.net.URL;
-import java.text.NumberFormat;
-import java.text.ParseException;
-import java.util.Objects;
-
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
 import de.gurkenlabs.litiengine.util.ColorHelper;
+import java.awt.Color;
+import java.net.URL;
+import java.util.Objects;
 
 public class CustomProperty implements ICustomProperty {
 
@@ -30,8 +27,7 @@ public class CustomProperty implements ICustomProperty {
   /**
    * Instantiates a new {@code CustomProperty} instance.
    *
-   * @param value
-   *          The value of this custom property.
+   * @param value The value of this custom property.
    */
   public CustomProperty(String value) {
     this.type = "string";
@@ -41,10 +37,8 @@ public class CustomProperty implements ICustomProperty {
   /**
    * Instantiates a new {@code CustomProperty} instance.
    *
-   * @param type
-   *          The type of this custom property.
-   * @param value
-   *          The value of this custom property.
+   * @param type  The type of this custom property.
+   * @param value The value of this custom property.
    */
   public CustomProperty(String type, String value) {
     this.type = Objects.requireNonNull(type);
@@ -54,8 +48,7 @@ public class CustomProperty implements ICustomProperty {
   /**
    * Instantiates a new {@code CustomProperty} instance.
    *
-   * @param location
-   *          The location of the file represented by this custom property.
+   * @param location The location of the file represented by this custom property.
    */
   public CustomProperty(URL location) {
     this.type = "file";
@@ -66,8 +59,7 @@ public class CustomProperty implements ICustomProperty {
   /**
    * Instantiates a new {@code CustomProperty} instance by copying from the specified instance.
    *
-   * @param propertyToBeCopied
-   *          The property to be copied.
+   * @param propertyToBeCopied The property to be copied.
    */
   public CustomProperty(ICustomProperty propertyToBeCopied) {
     this.type = propertyToBeCopied.getType();
@@ -124,7 +116,8 @@ public class CustomProperty implements ICustomProperty {
 
   @Override
   public char getAsChar() {
-    return this.value.charAt(0); // TODO Is this enough? Should it check if it's the right length and throw an exception if it's not?
+    return this.value.charAt(
+      0); // TODO Is this enough? Should it check if it's the right length and throw an exception if it's not?
   }
 
   @Override
@@ -148,9 +141,26 @@ public class CustomProperty implements ICustomProperty {
   }
 
   @Override
-  public Number getAsNumber() throws ParseException {
-    return NumberFormat.getInstance().parse(this.value);
+  public Number getAsNumber() {
+    try {
+      return getAsInt();
+    } catch (NumberFormatException fe3) {
+      try {
+        return getAsLong();
+      } catch (NumberFormatException fe4) {
+        try {
+          return getAsFloat();
+        } catch (NumberFormatException fe5) {
+          try {
+            return getAsDouble();
+          } catch (NumberFormatException fe6) {
+            return null;
+          }
+        }
+      }
+    }
   }
+
 
   @Override
   public byte getAsByte() {

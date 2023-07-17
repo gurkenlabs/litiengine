@@ -118,7 +118,7 @@ public abstract class PropertyPanel extends JPanel {
     }
   }
 
-  protected IMapObject getMapObject() {
+  public IMapObject getMapObject() {
     return this.mapObject;
   }
 
@@ -154,7 +154,8 @@ public abstract class PropertyPanel extends JPanel {
       return;
     }
     toggle.addActionListener(
-      new MapObjectPropertyActionListener(getMapObject(),
+      new MapObjectPropertyActionListener(
+        this,
         m -> m.hasCustomProperty(property) && m.getBoolValue(property) != toggle.isSelected(),
         m -> m.setValue(property, toggle.isSelected())));
   }
@@ -164,7 +165,8 @@ public abstract class PropertyPanel extends JPanel {
       return;
     }
     checkbox.addActionListener(
-      new MapObjectPropertyActionListener(getMapObject(),
+      new MapObjectPropertyActionListener(
+        this,
         m -> !m.hasCustomProperty(property) || m.getBoolValue(property) != checkbox.isSelected(),
         m -> m.setValue(property, checkbox.isSelected())));
   }
@@ -174,7 +176,8 @@ public abstract class PropertyPanel extends JPanel {
       return;
     }
     comboBox.addActionListener(
-      new MapObjectPropertyActionListener(getMapObject(),
+      new MapObjectPropertyActionListener(
+        this,
         m -> {
           if (!m.hasCustomProperty(property) || m.getStringValue(property) == null) {
             return true;
@@ -194,7 +197,8 @@ public abstract class PropertyPanel extends JPanel {
       return;
     }
     comboBox.addActionListener(
-      new MapObjectPropertyActionListener(getMapObject(),
+      new MapObjectPropertyActionListener(
+        this,
         m -> {
           if (!m.hasCustomProperty(property) || m.getStringValue(property) == null) {
             return true;
@@ -213,28 +217,28 @@ public abstract class PropertyPanel extends JPanel {
     if (property == null || property.isEmpty()) {
       return;
     }
-    slider.addChangeListener(new SliderListener(getMapObject(), property, slider));
+    slider.addChangeListener(new SliderListener(this, property, slider));
   }
 
   protected void setup(JSlider slider, String property, float factor) {
     if (property == null || property.isEmpty()) {
       return;
     }
-    slider.addChangeListener(new SliderListener(getMapObject(), property, slider, factor));
+    slider.addChangeListener(new SliderListener(this, property, slider, factor));
   }
 
   protected void setup(JSpinner spinner, String property) {
     if (property == null || property.isEmpty()) {
       return;
     }
-    spinner.addChangeListener(new SpinnerListener(getMapObject(), property, spinner));
+    spinner.addChangeListener(new SpinnerListener(this, property, spinner));
   }
 
   protected void setup(SpinnerNumberModel numberModel, String property) {
     if (property == null || property.isEmpty()) {
       return;
     }
-    numberModel.addChangeListener(new NumberModelListener(getMapObject(), property, numberModel));
+    numberModel.addChangeListener(new NumberModelListener(this, property, numberModel));
   }
 
   protected void setup(JTextField textField, String property) {
@@ -242,10 +246,10 @@ public abstract class PropertyPanel extends JPanel {
       return;
     }
     textField.addFocusListener(
-      new MapObjectPropertyFocusListener(getMapObject(), m -> true,
+      new MapObjectPropertyFocusListener(this, m -> true,
         m -> m.setValue(property, textField.getText())));
     textField.addActionListener(
-      new MapObjectPropertyActionListener(getMapObject(),
+      new MapObjectPropertyActionListener(this,
         m -> !m.hasCustomProperty(property)
           || m.getStringValue(property) == null
           || !m.getStringValue(property).equals(textField.getText()),
@@ -257,7 +261,7 @@ public abstract class PropertyPanel extends JPanel {
       return;
     }
     textList.addActionListener(
-      new MapObjectPropertyActionListener(getMapObject(),
+      new MapObjectPropertyActionListener(this,
         m -> !m.hasCustomProperty(property)
           || m.getStringValue(property) == null
           || !m.getStringValue(property).equals(textList.getJoinedString()),
@@ -269,7 +273,7 @@ public abstract class PropertyPanel extends JPanel {
       return;
     }
     table.getModel()
-      .addTableModelListener(new TableListener(getMapObject(), table, m -> true, properties));
+      .addTableModelListener(new TableListener(this, table, m -> true, properties));
   }
 
 

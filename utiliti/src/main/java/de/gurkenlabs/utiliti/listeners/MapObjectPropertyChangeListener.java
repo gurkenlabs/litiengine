@@ -1,7 +1,7 @@
 package de.gurkenlabs.utiliti.listeners;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
-import de.gurkenlabs.utiliti.components.Editor;
+import de.gurkenlabs.utiliti.swing.panels.PropertyPanel;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import javax.swing.event.ChangeEvent;
@@ -11,10 +11,11 @@ public class MapObjectPropertyChangeListener extends MapObjectPropertyListener i
   ChangeListener {
 
 
-  public MapObjectPropertyChangeListener(IMapObject mapObject,
+  public MapObjectPropertyChangeListener(
+    PropertyPanel propertyPanel,
     Predicate<IMapObject> mapObjectStateCheck,
     Consumer<IMapObject> updateAction) {
-    super(mapObject, mapObjectStateCheck, updateAction);
+    super(propertyPanel, mapObjectStateCheck, updateAction);
   }
 
   @Override

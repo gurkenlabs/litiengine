@@ -9,13 +9,11 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.awt.Color;
 import java.net.URL;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -197,12 +195,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
     if (property == null) {
       return defaultValue;
     }
-    try {
-      return property.getAsNumber();
-    } catch (ParseException e) {
-      log.log(Level.WARNING, "Could not parse custom property as Number!", e);
-      return defaultValue;
-    }
+    return property.getAsNumber();
   }
 
 

@@ -1,18 +1,24 @@
 package de.gurkenlabs.utiliti.listeners;
 
-import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
+import de.gurkenlabs.utiliti.swing.panels.PropertyPanel;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.SpinnerNumberModel;
 
 public class NumberModelListener extends MapObjectPropertyChangeListener {
 
-  public NumberModelListener(IMapObject mapObject, String mapObjectPropertyName,
+  private static final Logger log = Logger.getLogger(NumberModelListener.class.getName());
+
+  public NumberModelListener(PropertyPanel propertyPanel, String mapObjectPropertyName,
     SpinnerNumberModel model) {
-    super(mapObject, m -> {
-      System.out.printf("Has custom property %s: %b", mapObjectPropertyName,
-        m.hasCustomProperty(mapObjectPropertyName));
-      System.out.printf("Property %f equals model value %f: %b", m.getNumber(mapObjectPropertyName),
-        model.getNumber(), Objects.equals(m.getNumber(mapObjectPropertyName), model.getNumber()));
+    super(propertyPanel, m -> {
+      log.log(Level.INFO, "Has custom property {0}: {1}", new Object[]{mapObjectPropertyName,
+        m.hasCustomProperty(mapObjectPropertyName)});
+      log.log(Level.INFO, "Property {0} equals model value {1}: {2}",
+        new Object[]{m.getNumber(mapObjectPropertyName),
+          model.getNumber(),
+          Objects.equals(m.getNumber(mapObjectPropertyName), model.getNumber())});
 
       return m.hasCustomProperty(mapObjectPropertyName) || !Objects.equals(
         m.getNumber(mapObjectPropertyName), model.getNumber());

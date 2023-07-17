@@ -38,7 +38,7 @@ public interface ICustomProperty {
 
   public double getAsDouble();
 
-  public Number getAsNumber() throws ParseException;
+  public Number getAsNumber();
 
   public byte getAsByte();
 
