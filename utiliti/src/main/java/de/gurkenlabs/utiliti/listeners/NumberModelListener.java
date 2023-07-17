@@ -10,9 +10,9 @@ public class NumberModelListener extends MapObjectPropertyChangeListener {
 
   private static final Logger log = Logger.getLogger(NumberModelListener.class.getName());
 
-  public NumberModelListener(PropertyPanel propertyPanel, String mapObjectPropertyName,
+  public NumberModelListener(String mapObjectPropertyName,
     SpinnerNumberModel model) {
-    super(propertyPanel, m -> {
+    super(m -> {
       log.log(Level.INFO, "Has custom property {0}: {1}", new Object[]{mapObjectPropertyName,
         m.hasCustomProperty(mapObjectPropertyName)});
       log.log(Level.INFO, "Property {0} equals model value {1}: {2}",

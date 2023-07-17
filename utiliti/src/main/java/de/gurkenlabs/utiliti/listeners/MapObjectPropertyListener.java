@@ -5,30 +5,22 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.swing.UI;
-import de.gurkenlabs.utiliti.swing.panels.PropertyPanel;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.logging.Logger;
 
 public class MapObjectPropertyListener {
 
-  private final PropertyPanel propertyPanel;
   private final Predicate<IMapObject> mapObjectStateCheck;
   private final Consumer<IMapObject> updateAction;
 
 
   protected MapObjectPropertyListener(
-    PropertyPanel propertyPanel,
     Predicate<IMapObject> mapObjectStateCheck,
     Consumer<IMapObject> updateAction) {
-    this.propertyPanel = propertyPanel;
     this.mapObjectStateCheck = mapObjectStateCheck;
     this.updateAction = updateAction;
   }
 
-  public PropertyPanel getPropertyPanel() {
-    return propertyPanel;
-  }
 
   public Predicate<IMapObject> getMapObjectStateCheck() {
     return mapObjectStateCheck;
@@ -40,20 +32,22 @@ public class MapObjectPropertyListener {
 
   protected void applyChanges() {
     if (Game.world().environment() == null
-      || getPropertyPanel().getMapObject() == null
-      || !getMapObjectStateCheck().test(getPropertyPanel().getMapObject())
-      || !Editor.instance().getMapComponent().isFocussing()) {
+      || Editor.instance().getMapComponent().getFocusedMapObject() == null
+      || !getMapObjectStateCheck().test(Editor.instance().getMapComponent().getFocusedMapObject())
+    ) {
       return;
     }
-    UndoManager.instance().mapObjectChanging(getPropertyPanel().getMapObject());
-    getUpdateAction().accept(getPropertyPanel().getMapObject());
-    UndoManager.instance().mapObjectChanged(getPropertyPanel().getMapObject());
+    UndoManager.instance()
+      .mapObjectChanging(Editor.instance().getMapComponent().getFocusedMapObject());
+    getUpdateAction().accept(Editor.instance().getMapComponent().getFocusedMapObject());
+    UndoManager.instance()
+      .mapObjectChanged(Editor.instance().getMapComponent().getFocusedMapObject());
     updateEnvironment();
   }
 
   private void updateEnvironment() {
-    if (getPropertyPanel().getMapObject() != null) {
-      IMapObject obj = getPropertyPanel().getMapObject();
+    if (Editor.instance().getMapComponent().getFocusedMapObject() != null) {
+      IMapObject obj = Editor.instance().getMapComponent().getFocusedMapObject();
       Game.world().environment().reloadFromMap(obj.getId());
       UI.getEntityController().refresh(obj.getId());
     }

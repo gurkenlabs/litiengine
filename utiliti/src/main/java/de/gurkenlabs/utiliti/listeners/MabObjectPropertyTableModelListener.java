@@ -11,10 +11,9 @@ public class MabObjectPropertyTableModelListener extends MapObjectPropertyListen
   TableModelListener {
 
 
-  public MabObjectPropertyTableModelListener(PropertyPanel propertyPanel,
-    Predicate<IMapObject> mapObjectStateCheck,
+  public MabObjectPropertyTableModelListener(Predicate<IMapObject> mapObjectStateCheck,
     Consumer<IMapObject> updateAction) {
-    super(propertyPanel, mapObjectStateCheck, updateAction);
+    super(mapObjectStateCheck, updateAction);
   }
 
 

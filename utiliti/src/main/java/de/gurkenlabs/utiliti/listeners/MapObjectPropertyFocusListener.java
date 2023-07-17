@@ -10,11 +10,9 @@ import java.util.function.Predicate;
 public class MapObjectPropertyFocusListener extends MapObjectPropertyListener implements
   FocusListener {
 
-  public MapObjectPropertyFocusListener(
-    PropertyPanel propertyPanel,
-    Predicate<IMapObject> mapObjectStateCheck,
+  public MapObjectPropertyFocusListener(Predicate<IMapObject> mapObjectStateCheck,
     Consumer<IMapObject> updateAction) {
-    super(propertyPanel, mapObjectStateCheck, updateAction);
+    super(mapObjectStateCheck, updateAction);
   }
 
   @Override

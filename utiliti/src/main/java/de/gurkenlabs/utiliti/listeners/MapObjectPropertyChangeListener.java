@@ -11,11 +11,9 @@ public class MapObjectPropertyChangeListener extends MapObjectPropertyListener i
   ChangeListener {
 
 
-  public MapObjectPropertyChangeListener(
-    PropertyPanel propertyPanel,
-    Predicate<IMapObject> mapObjectStateCheck,
+  public MapObjectPropertyChangeListener(Predicate<IMapObject> mapObjectStateCheck,
     Consumer<IMapObject> updateAction) {
-    super(propertyPanel, mapObjectStateCheck, updateAction);
+    super(mapObjectStateCheck, updateAction);
   }
 
   @Override
