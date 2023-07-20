@@ -328,16 +328,16 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
       });
 
     this.textFieldName.addFocusListener(
-      new MapObjectPropertyFocusListener(this, m -> true,
+      new MapObjectPropertyFocusListener(m -> true,
         m -> m.setName(textFieldName.getText())));
 
     this.textFieldName.addActionListener(
-      new MapObjectPropertyActionListener(this,
+      new MapObjectPropertyActionListener(
         m -> m.getName() == null || !m.getName().equals(textFieldName.getText()),
         m -> m.setName(textFieldName.getText())));
 
     this.tagPanel.addActionListener(
-      new MapObjectPropertyActionListener(this,
+      new MapObjectPropertyActionListener(
         m -> !m.hasCustomProperty(MapObjectProperty.TAGS) || !m.getStringValue(
           MapObjectProperty.TAGS).equals(this.tagPanel.getTagsString()),
         m -> m.setValue(MapObjectProperty.TAGS, this.tagPanel.getTagsString())));

@@ -81,7 +81,7 @@ public class LightSourcePanel extends PropertyPanel {
 
   private void setupChangedListeners() {
     this.colorControl.addActionListener(
-      new MapObjectPropertyActionListener(this,
+      new MapObjectPropertyActionListener(
         m -> {
           if (!m.hasCustomProperty(MapObjectProperty.LIGHT_COLOR)
             || m.getStringValue(MapObjectProperty.LIGHT_COLOR) == null) {
