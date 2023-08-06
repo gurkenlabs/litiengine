@@ -5,6 +5,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public final class ColorHelper {
+
   private static final Logger log = Logger.getLogger(ColorHelper.class.getName());
   private static final int HEX_STRING_LENGTH = 7;
   private static final int HEX_STRING_LENGTH_ALPHA = 9;
@@ -21,13 +22,12 @@ public final class ColorHelper {
    * <li>#RRGGBB - For colors without alpha
    * <li>#AARRGGBB - For colors with alpha
    * </ul>
-   *
+   * <p>
    * Examples: <br>
    * {@code Color.RED} = "#ff0000"<br>
    * {@code new Color(255, 0, 0, 200)} = "#c8ff0000"
    *
-   * @param color
-   *          The color that is encoded.
+   * @param color The color that is encoded.
    * @return An hexadecimal string representation of the specified color.
    * @see ColorHelper#decode(String)
    * @see Color
@@ -48,7 +48,8 @@ public final class ColorHelper {
   }
 
   /**
-   * Decodes the specified color string to an actual {@code Color} instance. The accepted format is:
+   * Decodes the specified color string to an actual {@code Color} instance. The accepted format
+   * is:
    * <p>
    * <i>Note: This returns null if the format of the provided color string is invalid.</i>
    * </p>
@@ -57,13 +58,12 @@ public final class ColorHelper {
    * <li>#RRGGBB - For colors without alpha
    * <li>#AARRGGBB - For colors with alpha
    * </ul>
-   *
+   * <p>
    * Examples: <br>
    * "#ff0000" = {@code Color.RED}<br>
    * "#c8ff0000" = {@code new Color(255, 0, 0, 200)}
    *
-   * @param colorHexString
-   *          The hexadecimal encodes color string representation.
+   * @param colorHexString The hexadecimal encodes color string representation.
    * @return The decoded color.
    * @see ColorHelper#encode(Color)
    * @see Color
@@ -81,13 +81,13 @@ public final class ColorHelper {
 
     if (!colorHexString.startsWith("#")) {
       if (colorHexString.length() == HEX_STRING_LENGTH - 1
-          || colorHexString.length() == HEX_STRING_LENGTH_ALPHA - 1) {
+        || colorHexString.length() == HEX_STRING_LENGTH_ALPHA - 1) {
         colorHexString = "#" + colorHexString;
       } else {
         log.log(
-            Level.SEVERE,
-            "Could not parse color string \"{0}\". A color string needs to start with a \"#\" character.",
-            colorHexString);
+          Level.SEVERE,
+          "Could not parse color string \"{0}\". A color string needs to start with a \"#\" character.",
+          colorHexString);
         return null;
       }
     }
@@ -99,21 +99,20 @@ public final class ColorHelper {
         return decodeHexStringWithAlpha(colorHexString, solid);
       default:
         log.log(
-            Level.SEVERE,
-            "Could not parse color string \"{0}\". Invalid string length \"{1}\"!\nAccepted lengths:\n\t{2} for Colors without Alpha (#ff0000)\n\t{3} for Colors with Alpha (#c8ff0000)",
-            new Object[] {
-                colorHexString, colorHexString.length(), HEX_STRING_LENGTH, HEX_STRING_LENGTH_ALPHA
-            });
+          Level.SEVERE,
+          "Could not parse color string \"{0}\". Invalid string length \"{1}\"!\nAccepted lengths:\n\t{2} for Colors without Alpha (#ff0000)\n\t{3} for Colors with Alpha (#c8ff0000)",
+          new Object[]{
+            colorHexString, colorHexString.length(), HEX_STRING_LENGTH, HEX_STRING_LENGTH_ALPHA
+          });
         return null;
     }
   }
 
   /**
-   * Ensures that the specified value lies within the accepted range for Color values (0-255). Smaller values will be
-   * forced to be 0 and larger values will result in 255.
+   * Ensures that the specified value lies within the accepted range for Color values (0-255).
+   * Smaller values will be forced to be 0 and larger values will result in 255.
    *
-   * @param value
-   *          The value to check for.
+   * @param value The value to check for.
    * @return An integer value that fits the color value restrictions.
    */
   public static int ensureColorValueRange(float value) {
@@ -121,11 +120,10 @@ public final class ColorHelper {
   }
 
   /**
-   * Ensures that the specified value lies within the accepted range for Color values (0-255). Smaller values will be
-   * forced to be 0 and larger values will result in 255.
+   * Ensures that the specified value lies within the accepted range for Color values (0-255).
+   * Smaller values will be forced to be 0 and larger values will result in 255.
    *
-   * @param value
-   *          The value to check for.
+   * @param value The value to check for.
    * @return An integer value that fits the color value restrictions.
    */
   public static int ensureColorValueRange(int value) {
@@ -135,8 +133,7 @@ public final class ColorHelper {
   /**
    * Premultiplies the alpha on the given color.
    *
-   * @param color
-   *          The color to premultiply
+   * @param color The color to premultiply
    * @return The color given, with alpha replaced with a black background.
    */
   public static Color premultiply(Color color) {
@@ -144,14 +141,25 @@ public final class ColorHelper {
       return color;
     }
     return new Color(
-        premultiply(color.getRed(), color.getAlpha()),
-        premultiply(color.getGreen(), color.getAlpha()),
-        premultiply(color.getBlue(), color.getAlpha()));
+      premultiply(color.getRed(), color.getAlpha()),
+      premultiply(color.getGreen(), color.getAlpha()),
+      premultiply(color.getBlue(), color.getAlpha()));
+  }
+
+  public static Color interpolate(Color color1, Color color2, double factor) {
+    factor = MathUtilities.clamp(factor, 0, 1);
+
+    int r = (int) (color1.getRed() * (1 - factor) + color2.getRed() * factor);
+    int g = (int) (color1.getGreen() * (1 - factor) + color2.getGreen() * factor);
+    int b = (int) (color1.getBlue() * (1 - factor) + color2.getBlue() * factor);
+    int a = (int) (color1.getAlpha() * (1 - factor) + color2.getAlpha() * factor);
+
+    return new Color(r, g, b, a);
   }
 
   public static Color getTransparentVariant(Color color, int newAlpha) {
     return new Color(
-        color.getRed(), color.getGreen(), color.getBlue(), ensureColorValueRange(newAlpha));
+      color.getRed(), color.getGreen(), color.getBlue(), ensureColorValueRange(newAlpha));
   }
 
   private static Color decodeWellformedHexString(String hexString) {
