@@ -15,6 +15,7 @@ import java.util.Optional;
 import javax.swing.JLabel;
 
 public class ImageComponent extends GuiComponent {
+
   public static final int BACKGROUND_INDEX = 0;
   public static final int BACKGROUND_HOVER_INDEX = 1;
   public static final int BACKGROUND_PRESSED_INDEX = 2;
@@ -26,6 +27,8 @@ public class ImageComponent extends GuiComponent {
   private Spritesheet spritesheet;
 
   private ImageScaleMode imageScaleMode = ImageScaleMode.NORMAL;
+  private ImageScaleMode spritesheetScaleMode = ImageScaleMode.NORMAL;
+  private float spritesheetScaleFactor = 1f;
   private Align imageAlign = Align.CENTER;
   private Valign imageValign = Valign.MIDDLE;
 
@@ -39,7 +42,7 @@ public class ImageComponent extends GuiComponent {
   }
 
   public ImageComponent(
-      final double x, final double y, final double width, final double height, final String text) {
+    final double x, final double y, final double width, final double height, final String text) {
     super(x, y, width, height);
     Font defFont = new JLabel().getFont().deriveFont((float) (this.getHeight() * 3 / 6f));
     if (this.getFont() == null) {
@@ -49,19 +52,19 @@ public class ImageComponent extends GuiComponent {
   }
 
   public ImageComponent(
-      final double x, final double y, final double width, final double height, final Image image) {
+    final double x, final double y, final double width, final double height, final Image image) {
     super(x, y, width, height);
     this.setImage(image);
   }
 
   public ImageComponent(
-      final double x,
-      final double y,
-      final double width,
-      final double height,
-      final Spritesheet spritesheet,
-      final String text,
-      final Image image) {
+    final double x,
+    final double y,
+    final double width,
+    final double height,
+    final Spritesheet spritesheet,
+    final String text,
+    final Image image) {
     this(x, y, width, height, text);
     this.spritesheet = spritesheet;
     this.setImageAlign(Align.LEFT);
@@ -77,43 +80,49 @@ public class ImageComponent extends GuiComponent {
     }
 
     final String cacheKey =
-        this.getSpritesheet().getName().hashCode()
-            + "_"
-            + this.isHovered()
-            + "_"
-            + this.isPressed()
-            + "_"
-            + this.isEnabled()
-            + "_"
-            + this.getWidth()
-            + "x"
-            + this.getHeight();
+      getSpritesheet().getName().hashCode()
+        + "_"
+        + isHovered()
+        + "_"
+        + isPressed()
+        + "_"
+        + isEnabled()
+        + "_"
+        + getWidth()
+        + "_"
+        + getSpritesheetScaleMode().name().toLowerCase()
+        + "x"
+        + getHeight();
     Optional<BufferedImage> opt = Resources.images().tryGet(cacheKey);
     if (opt.isPresent()) {
       return opt.get();
     }
-
-    int spriteIndex = BACKGROUND_INDEX;
-    if (!this.isEnabled()
+    BufferedImage img;
+    if (getSpritesheetScaleMode() == ImageScaleMode.SLICE) {
+      img = Imaging.nineSlice(getSpritesheet(), (int) getWidth(), (int) getHeight(),
+        getSpritesheetScaleFactor());
+    } else {
+      int spriteIndex = BACKGROUND_INDEX;
+      if (!this.isEnabled()
         && this.getSpritesheet().getTotalNumberOfSprites() > BACKGROUND_DISABLED_INDEX) {
-      spriteIndex = BACKGROUND_DISABLED_INDEX;
-    } else if (this.isPressed()
+        spriteIndex = BACKGROUND_DISABLED_INDEX;
+      } else if (this.isPressed()
         && this.getSpritesheet().getTotalNumberOfSprites() > BACKGROUND_PRESSED_INDEX) {
-      spriteIndex = BACKGROUND_PRESSED_INDEX;
-    } else if (this.isHovered()
+        spriteIndex = BACKGROUND_PRESSED_INDEX;
+      } else if (this.isHovered()
         && this.getSpritesheet().getTotalNumberOfSprites() > BACKGROUND_HOVER_INDEX) {
-      spriteIndex = BACKGROUND_HOVER_INDEX;
-    }
+        spriteIndex = BACKGROUND_HOVER_INDEX;
+      }
 
-    BufferedImage img =
+      img =
         Imaging.scale(
-            this.getSpritesheet().getSprite(spriteIndex),
-            (int) this.getWidth(),
-            (int) this.getHeight());
+          this.getSpritesheet().getSprite(spriteIndex),
+          (int) this.getWidth(),
+          (int) this.getHeight());
+    }
     if (img != null) {
       Resources.images().add(cacheKey, img);
     }
-
     return img;
   }
 
@@ -126,18 +135,15 @@ public class ImageComponent extends GuiComponent {
     boolean keepRatio;
 
     switch (this.getImageScaleMode()) {
-      case STRETCH:
-        keepRatio = false;
-        break;
-      case FIT:
-        keepRatio = true;
-        break;
-      default:
+      case STRETCH -> keepRatio = false;
+      case FIT -> keepRatio = true;
+      default -> {
         return;
+      }
     }
 
     final String cacheKey =
-        String.format("%s_%dx%d_%b", this.baseImage.hashCode(), imageWidth, imageHeight, keepRatio);
+      String.format("%s_%dx%d_%b", this.baseImage.hashCode(), imageWidth, imageHeight, keepRatio);
 
     Optional<BufferedImage> opt = Resources.images().tryGet(cacheKey);
     if (opt.isPresent()) {
@@ -161,7 +167,15 @@ public class ImageComponent extends GuiComponent {
   }
 
   public ImageScaleMode getImageScaleMode() {
-    return this.imageScaleMode;
+    return imageScaleMode;
+  }
+
+  public ImageScaleMode getSpritesheetScaleMode() {
+    return spritesheetScaleMode;
+  }
+
+  public float getSpritesheetScaleFactor() {
+    return spritesheetScaleFactor;
   }
 
   public Valign getImageValign() {
@@ -196,8 +210,27 @@ public class ImageComponent extends GuiComponent {
     this.rescaleImage();
   }
 
-  public void setSpriteSheet(final Spritesheet spr) {
+  public void setSpritesheetScaleMode(ImageScaleMode spritesheetScaleMode) {
+    this.spritesheetScaleMode = spritesheetScaleMode;
+    this.rescaleImage();
+  }
+
+  public void setSpritesheetScaleFactor(float spritesheetScaleFactor) {
+    this.spritesheetScaleFactor = spritesheetScaleFactor;
+  }
+
+  public void setSpritesheet(final Spritesheet spr) {
     this.spritesheet = spr;
+  }
+
+  public void setSpritesheet(final Spritesheet spr, ImageScaleMode scaleMode) {
+    setSpritesheet(spr);
+    setSpritesheetScaleMode(scaleMode);
+  }
+
+  public void setSpritesheet(final Spritesheet spr, ImageScaleMode scaleMode, float scaleFactor) {
+    setSpritesheet(spr, scaleMode);
+    setSpritesheetScaleFactor(scaleFactor);
   }
 
   public void setImageAlign(Align imageAlign) {

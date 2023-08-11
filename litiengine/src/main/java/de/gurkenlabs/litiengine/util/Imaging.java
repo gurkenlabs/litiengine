@@ -34,6 +34,7 @@ import java.util.logging.Level;
  * The type Imaging.
  */
 public final class Imaging {
+
   public static final int CROP_ALIGN_CENTER = 0;
   public static final int CROP_ALIGN_LEFT = 1;
   public static final int CROP_ALIGN_RIGHT = 2;
@@ -50,19 +51,17 @@ public final class Imaging {
   }
 
   /**
-   * Adds a shadow effect by executing the following steps: 1. Transform visible pixels to a semi-transparent black 2.
-   * Flip the image vertically 3. Scale it down 4. Render original image and shadow on a buffered image
+   * Adds a shadow effect by executing the following steps: 1. Transform visible pixels to a
+   * semi-transparent black 2. Flip the image vertically 3. Scale it down 4. Render original image
+   * and shadow on a buffered image
    *
-   * @param image
-   *          the image
-   * @param xOffset
-   *          the x offset
-   * @param yOffset
-   *          the y offset
+   * @param image   the image
+   * @param xOffset the x offset
+   * @param yOffset the y offset
    * @return the buffered image
    */
-  public static BufferedImage addShadow(
-      final BufferedImage image, final int xOffset, final int yOffset) {
+  public static BufferedImage addShadow(final BufferedImage image, final int xOffset,
+    final int yOffset) {
     if (image == null) {
       return null;
     }
@@ -103,10 +102,8 @@ public final class Imaging {
   /**
    * All pixels that have the specified color are rendered transparent.
    *
-   * @param img
-   *          the img
-   * @param color
-   *          the color
+   * @param img   the img
+   * @param color the color
    * @return the image
    */
   public static BufferedImage applyAlphaChannel(final BufferedImage img, final Color color) {
@@ -114,23 +111,22 @@ public final class Imaging {
       return img;
     }
 
-    final ImageFilter filter =
-        new RGBImageFilter() {
+    final ImageFilter filter = new RGBImageFilter() {
 
-          // the color we are looking for... Alpha bits are set to opaque
-          public final int markerRGB = color.getRGB() | 0xFF000000;
+      // the color we are looking for... Alpha bits are set to opaque
+      public final int markerRGB = color.getRGB() | 0xFF000000;
 
-          @Override
-          public int filterRGB(final int x, final int y, final int rgb) {
-            if ((rgb | 0xFF000000) == this.markerRGB) {
-              // Mark the alpha bits as zero - transparent
-              return 0x00FFFFFF & rgb;
-            } else {
-              // nothing to do
-              return rgb;
-            }
-          }
-        };
+      @Override
+      public int filterRGB(final int x, final int y, final int rgb) {
+        if ((rgb | 0xFF000000) == this.markerRGB) {
+          // Mark the alpha bits as zero - transparent
+          return 0x00FFFFFF & rgb;
+        } else {
+          // nothing to do
+          return rgb;
+        }
+      }
+    };
 
     final ImageProducer ip = new FilteredImageSource(img.getSource(), filter);
     return toBufferedImage(Toolkit.getDefaultToolkit().createImage(ip));
@@ -139,18 +135,15 @@ public final class Imaging {
   /**
    * Draw a stroke around an image in the given color.
    *
-   * @param image
-   *          the input image
-   * @param strokeColor
-   *          the stroke color
-   * @param borderOnly
-   *          decide whether only the border of the given image will be drawn
+   * @param image       the input image
+   * @param strokeColor the stroke color
+   * @param borderOnly  decide whether only the border of the given image will be drawn
    * @return the buffered image with a border drawn around it
    */
-  public static BufferedImage borderAlpha(
-      final BufferedImage image, final Color strokeColor, boolean borderOnly) {
-    final BufferedImage bimage =
-        getCompatibleImage(image.getWidth(null) + 2, image.getHeight(null) + 2);
+  public static BufferedImage borderAlpha(final BufferedImage image, final Color strokeColor,
+    boolean borderOnly) {
+    final BufferedImage bimage = getCompatibleImage(image.getWidth(null) + 2,
+      image.getHeight(null) + 2);
     if (bimage == null) {
       return image;
     }
@@ -187,8 +180,7 @@ public final class Imaging {
   /**
    * Checks whether a given BufferedImage only has transparent pixels.
    *
-   * @param image
-   *          the image
+   * @param image the image
    * @return true if there are no coloured pixels in the image.
    */
   public static boolean isEmpty(final BufferedImage image) {
@@ -207,10 +199,8 @@ public final class Imaging {
   /**
    * Checks whether two BufferedImages are equal.
    *
-   * @param image1
-   *          the image 1
-   * @param image2
-   *          the image 2
+   * @param image1 the image 1
+   * @param image2 the image 2
    * @return true if the images are equal
    */
   public static boolean areEqual(final BufferedImage image1, final BufferedImage image2) {
@@ -232,35 +222,26 @@ public final class Imaging {
   /**
    * Crops a sub image from the specified image.
    *
-   * @param image
-   *          The image to crop the sub-image from.
-   * @param cropAlignment
-   *          use the following consts: <br>
-   *          <ul>
-   *          <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_ALIGN_CENTER CROP_ALIGN_CENTER}
-   *          <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_ALIGN_LEFT CROP_ALIGN_LEFT}
-   *          <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_ALIGN_RIGHT CROP_ALIGN_RIGHT}
-   *          </ul>
-   * @param cropVerticlaAlignment
-   *          use the following consts: <br>
-   *          <ul>
-   *          <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_VALIGN_CENTER CROP_VALIGN_CENTER}
-   *          <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_VALIGN_TOP CROP_VALIGN_TOP}
-   *          <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_VALIGN_TOPCENTER CROP_VALIGN_TOPCENTER}
-   *          <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_VALIGN_BOTTOM CROP_VALIGN_BOTTOM}
-   *          </ul>
-   * @param width
-   *          The width to crop.
-   * @param height
-   *          The height to crop.
+   * @param image                 The image to crop the sub-image from.
+   * @param cropAlignment         use the following consts: <br>
+   *                              <ul>
+   *                              <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_ALIGN_CENTER CROP_ALIGN_CENTER}
+   *                              <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_ALIGN_LEFT CROP_ALIGN_LEFT}
+   *                              <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_ALIGN_RIGHT CROP_ALIGN_RIGHT}
+   *                              </ul>
+   * @param cropVerticlaAlignment use the following consts: <br>
+   *                              <ul>
+   *                              <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_VALIGN_CENTER CROP_VALIGN_CENTER}
+   *                              <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_VALIGN_TOP CROP_VALIGN_TOP}
+   *                              <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_VALIGN_TOPCENTER CROP_VALIGN_TOPCENTER}
+   *                              <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_VALIGN_BOTTOM CROP_VALIGN_BOTTOM}
+   *                              </ul>
+   * @param width                 The width to crop.
+   * @param height                The height to crop.
    * @return The cropped image or the original image if it is smaller than the specified dimensions.
    */
-  public static BufferedImage crop(
-      final BufferedImage image,
-      final int cropAlignment,
-      final int cropVerticlaAlignment,
-      final int width,
-      final int height) {
+  public static BufferedImage crop(final BufferedImage image, final int cropAlignment,
+    final int cropVerticlaAlignment, final int width, final int height) {
     if (width > image.getWidth() || height > image.getHeight()) {
       return image;
     }
@@ -284,10 +265,8 @@ public final class Imaging {
   /**
    * All pixels that are not transparent are replaced by a pixel of the specified flashColor.
    *
-   * @param image
-   *          the image
-   * @param flashColor
-   *          the flash color
+   * @param image      the image
+   * @param flashColor the flash color
    * @return the buffered image
    */
   public static BufferedImage flashVisiblePixels(final Image image, final Color flashColor) {
@@ -314,11 +293,10 @@ public final class Imaging {
   }
 
   /**
-   * Flip the individual sprites in a {@link Spritesheet} horizontally and return an image from which a new
-   * {@link Spritesheet} can be created.
+   * Flip the individual sprites in a {@link Spritesheet} horizontally and return an image from
+   * which a new {@link Spritesheet} can be created.
    *
-   * @param sprite
-   *          the spritesheet
+   * @param sprite the spritesheet
    * @return a {@link BufferedImage} containing the horizontally flipped sprites
    */
   public static BufferedImage flipSpritesHorizontally(final Spritesheet sprite) {
@@ -326,11 +304,10 @@ public final class Imaging {
   }
 
   /**
-   * Flip the individual sprites in a {@link Spritesheet} vertically and return an image from which a new
-   * {@link Spritesheet} can be created.
+   * Flip the individual sprites in a {@link Spritesheet} vertically and return an image from which
+   * a new {@link Spritesheet} can be created.
    *
-   * @param sprite
-   *          the spritesheet
+   * @param sprite the spritesheet
    * @return a {@link BufferedImage} containing the vertically flipped sprites
    */
   public static BufferedImage flipSpritesVertically(final Spritesheet sprite) {
@@ -338,10 +315,82 @@ public final class Imaging {
   }
 
   /**
+   * Generates a 9-slice scaled image from a given image in the given dimensions.
+   *
+   * @param image        the input image used for slicing. Will be sliced into 3 rows and 3 columns
+   *                     (@see <a href="https://en.wikipedia.org/wiki/9-slice_scaling">9-slice
+   *                     scaling</a>).
+   * @param sliceWidth   the slice width of the input image
+   * @param sliceHeight  the slice width of the input image
+   * @param targetWidth  the target width of the output image
+   * @param targetHeight the target height of the output image
+   * @param scaleFactor  the factor by which the individual slices will be resized
+   * @return a new BufferedImage with the scaled slices put together
+   */
+  public static BufferedImage nineSlice(final BufferedImage image, int sliceWidth, int sliceHeight,
+    int targetWidth, int targetHeight, float scaleFactor) {
+    int targetSliceWidth = (int) (sliceWidth * scaleFactor);
+    int targetSliceHeight = (int) (sliceHeight * scaleFactor);
+
+    BufferedImage img = Imaging.getCompatibleImage(targetWidth, targetHeight);
+    Graphics2D g = img.createGraphics();
+    var slices = Imaging.getSubImages(image, 3, 3);
+
+    // draw corners
+    g.drawImage(slices[0][0], 0, 0, targetSliceWidth, targetSliceHeight, null); // top left
+    g.drawImage(slices[0][2], targetWidth - targetSliceWidth, 0, targetSliceWidth,
+      targetSliceHeight,
+      null); // top right
+    g.drawImage(slices[2][0], 0, targetHeight - targetSliceHeight, targetSliceWidth,
+      targetSliceHeight,
+      null); // bottom left
+    g.drawImage(slices[2][2], targetWidth - targetSliceWidth, targetHeight - targetSliceHeight,
+      targetSliceWidth,
+      targetSliceHeight, null); // bottom right
+
+//      draw edges
+    g.drawImage(slices[0][1], targetSliceWidth, 0, targetWidth - 2 * targetSliceWidth,
+      targetSliceHeight,
+      null); // top
+    g.drawImage(slices[2][1], targetSliceWidth, targetHeight - targetSliceHeight,
+      targetWidth - 2 * targetSliceWidth,
+      targetSliceHeight, null); // bottom
+    g.drawImage(slices[1][0], 0, targetSliceHeight, targetSliceWidth,
+      targetHeight - 2 * targetSliceHeight,
+      null); // left
+    g.drawImage(slices[1][2], targetWidth - targetSliceWidth, targetSliceHeight, targetSliceWidth,
+      targetHeight - 2 * targetSliceHeight, null); // right
+
+//      draw center
+    g.drawImage(slices[1][1], targetSliceWidth, targetSliceHeight,
+      targetWidth - 2 * targetSliceWidth,
+      targetHeight - 2 * targetSliceHeight, null); // top left
+
+    g.dispose();
+    return img;
+  }
+
+  /**
+   * Generates a 9-slice scaled image from a given spritesheet in the given dimensions.
+   *
+   * @param spritesheet  the spritesheet used for slicing. Will be sliced into 3 rows and 3 columns
+   *                     (@see <a href="https://en.wikipedia.org/wiki/9-slice_scaling">9-slice
+   *                     scaling</a>).
+   * @param targetWidth  the target width of the output image
+   * @param targetHeight the target height of the output image
+   * @param scaleFactor  the factor by which the individual slices will be resized
+   * @return a new BufferedImage with the scaled slices put together
+   */
+  public static BufferedImage nineSlice(final Spritesheet spritesheet, int targetWidth,
+    int targetHeight, float scaleFactor) {
+    return nineSlice(spritesheet.getImage(), spritesheet.getSpriteWidth(),
+      spritesheet.getSpriteHeight(), targetWidth, targetHeight, scaleFactor);
+  }
+
+  /**
    * Creates a new {@code BufferedImage} instance from the specified image.
    *
-   * @param image
-   *          The image to be copied.
+   * @param image The image to be copied.
    * @return A {@link BufferedImage} that is a copy of the input image.
    */
   public static BufferedImage copy(BufferedImage image) {
@@ -354,10 +403,8 @@ public final class Imaging {
   /**
    * Gets an empty {@link BufferedImage} with the given size.
    *
-   * @param width
-   *          the width
-   * @param height
-   *          the height
+   * @param width  the width
+   * @param height the height
    * @return an empty {@link BufferedImage} with the given size
    */
   public static BufferedImage getCompatibleImage(final int width, final int height) {
@@ -375,19 +422,16 @@ public final class Imaging {
   }
 
   /**
-   * Gets a two dimensional grid that contains parts of the specified image. Splits up the specified image into a grid
-   * with the defined number of rows and columns.
+   * Gets a two dimensional grid that contains parts of the specified image. Splits up the specified
+   * image into a grid with the defined number of rows and columns.
    *
-   * @param image
-   *          The base image that will be split up.
-   * @param rows
-   *          The number of rows.
-   * @param columns
-   *          The number or columns.
+   * @param image   The base image that will be split up.
+   * @param rows    The number of rows.
+   * @param columns The number or columns.
    * @return A two dimensional array with all the sub-images.
    */
-  public static BufferedImage[][] getSubImages(
-      final BufferedImage image, final int rows, final int columns) {
+  public static BufferedImage[][] getSubImages(final BufferedImage image, final int rows,
+    final int columns) {
     final BufferedImage[][] smallImages = new BufferedImage[rows][columns];
     final int smallWidth = image.getWidth() / columns;
     final int smallHeight = image.getHeight() / rows;
@@ -406,8 +450,7 @@ public final class Imaging {
   /**
    * Flips the specified image horizontally.
    *
-   * @param img
-   *          The image to be flipped.
+   * @param img The image to be flipped.
    * @return The horizontally flipped image.
    */
   public static BufferedImage horizontalFlip(final BufferedImage img) {
@@ -427,8 +470,7 @@ public final class Imaging {
   /**
    * Flips the specified image vertically.
    *
-   * @param img
-   *          The image to be flipped.
+   * @param img The image to be flipped.
    * @return The vertically flipped image.
    */
   public static BufferedImage verticalFlip(final BufferedImage img) {
@@ -446,16 +488,16 @@ public final class Imaging {
   }
 
   /**
-   * Replace colors in an image according to a Map containing source colors and target colors, then return the result.
+   * Replace colors in an image according to a Map containing source colors and target colors, then
+   * return the result.
    *
-   * @param bufferedImage
-   *          the original image
-   * @param colorMappings
-   *          a Map with source colors as keys and target colors as values
-   * @return a new version of the original image, where the source colors are replaced with the target colors.
+   * @param bufferedImage the original image
+   * @param colorMappings a Map with source colors as keys and target colors as values
+   * @return a new version of the original image, where the source colors are replaced with the
+   * target colors.
    */
-  public static BufferedImage replaceColors(
-      final BufferedImage bufferedImage, Map<Color, Color> colorMappings) {
+  public static BufferedImage replaceColors(final BufferedImage bufferedImage,
+    Map<Color, Color> colorMappings) {
     BufferedImage recoloredImage = copy(bufferedImage);
     for (Entry<Color, Color> c : colorMappings.entrySet()) {
       for (int y = 0; y < recoloredImage.getHeight(); y++) {
@@ -473,10 +515,8 @@ public final class Imaging {
   /**
    * Rotate a given {@link BufferedImage} by a given {@link Rotation}.
    *
-   * @param bufferedImage
-   *          the input image
-   * @param rotation
-   *          the amount of {@link Rotation}
+   * @param bufferedImage the input image
+   * @param rotation      the amount of {@link Rotation}
    * @return the rotated {@link BufferedImage}
    */
   public static BufferedImage rotate(final BufferedImage bufferedImage, final Rotation rotation) {
@@ -486,10 +526,8 @@ public final class Imaging {
   /**
    * Rotate a {@link BufferedImage} by a given rotation.
    *
-   * @param bufferedImage
-   *          the input image
-   * @param radians
-   *          the amount of rotation in radians.
+   * @param bufferedImage the input image
+   * @param radians       the amount of rotation in radians.
    * @return the rotated {@link BufferedImage}
    */
   public static BufferedImage rotate(final BufferedImage bufferedImage, final double radians) {
@@ -520,26 +558,24 @@ public final class Imaging {
   /**
    * Scale buffered image so that the longer edge of the image will be set to a given maximum.
    *
-   * @param image
-   *          the input {@link BufferedImage} to be scaled
-   * @param max
-   *          the maximum length of the longer image edge
+   * @param image the input {@link BufferedImage} to be scaled
+   * @param max   the maximum length of the longer image edge
    * @return the scaled {@link BufferedImage}.
    */
   public static BufferedImage scale(final BufferedImage image, final int max) {
-    Dimension2D newDimension = GeometricUtilities.scaleWithRatio(image.getWidth(), image.getHeight(), max);
-    return scale(image, (int) Objects.requireNonNull(newDimension).getWidth(), (int) Objects.requireNonNull(newDimension).getHeight());
+    Dimension2D newDimension = GeometricUtilities.scaleWithRatio(image.getWidth(),
+      image.getHeight(), max);
+    return scale(image, (int) Objects.requireNonNull(newDimension).getWidth(),
+      (int) Objects.requireNonNull(newDimension).getHeight());
   }
 
   /**
    * Scale buffered image by multiplying its width and height with a given factor. By default,
-   * {@link AffineTransformOp#TYPE_NEAREST_NEIGHBOR} is used for scaling. If you want smooth interpolation, use one of the
-   * method overloads with a custom interpolation parameter.
+   * {@link AffineTransformOp#TYPE_NEAREST_NEIGHBOR} is used for scaling. If you want smooth
+   * interpolation, use one of the method overloads with a custom interpolation parameter.
    *
-   * @param image
-   *          the input {@link BufferedImage} to be scaled
-   * @param factor
-   *          the factor by which the image width and height will be multiplied
+   * @param image  the input {@link BufferedImage} to be scaled
+   * @param factor the factor by which the image width and height will be multiplied
    * @return the scaled {@link BufferedImage}.
    */
   public static BufferedImage scale(final BufferedImage image, final double factor) {
@@ -547,40 +583,36 @@ public final class Imaging {
   }
 
   /**
-   * Scale buffered image by multiplying its width and height with a given factor. This default overload will not generate
-   * white space around the scaled image to match the full target dimensions.
+   * Scale buffered image by multiplying its width and height with a given factor. This default
+   * overload will not generate white space around the scaled image to match the full target
+   * dimensions.
    *
-   * @param image
-   *          the input {@link BufferedImage} to be scaled
-   * @param factor
-   *          the factor by which the image width and height will be multiplied
-   * @param interpolation
-   *          the interpolation mode used for scaling. Choose one of the following:
-   *          <ul>
-   *          <li>{@link AffineTransformOp#TYPE_NEAREST_NEIGHBOR}
-   *          <li>{@link AffineTransformOp#TYPE_BILINEAR}
-   *          <li>{@link AffineTransformOp#TYPE_BICUBIC}
-   *          </ul>
+   * @param image         the input {@link BufferedImage} to be scaled
+   * @param factor        the factor by which the image width and height will be multiplied
+   * @param interpolation the interpolation mode used for scaling. Choose one of the following:
+   *                      <ul>
+   *                      <li>{@link AffineTransformOp#TYPE_NEAREST_NEIGHBOR}
+   *                      <li>{@link AffineTransformOp#TYPE_BILINEAR}
+   *                      <li>{@link AffineTransformOp#TYPE_BICUBIC}
+   *                      </ul>
    * @return the scaled {@link BufferedImage}.
    */
-  public static BufferedImage scale(final BufferedImage image, final double factor, final int interpolation) {
-    return image == null
-        ? null
-        : scale(image, (int) Math.ceil(image.getWidth() * factor), (int) Math.ceil(image.getHeight() * factor), interpolation);
+  public static BufferedImage scale(final BufferedImage image, final double factor,
+    final int interpolation) {
+    return image == null ? null : scale(image, (int) Math.ceil(image.getWidth() * factor),
+      (int) Math.ceil(image.getHeight() * factor), interpolation);
   }
 
   /**
    * Scale buffered image. The original image ratio will be kept. By default,
-   * {@link AffineTransformOp#TYPE_NEAREST_NEIGHBOR} is used for scaling. If you want smooth interpolation, use one of the
-   * method overloads with a custom interpolation parameter. This default overload will not generate white space around
-   * the scaled image to match the full target dimensions.
+   * {@link AffineTransformOp#TYPE_NEAREST_NEIGHBOR} is used for scaling. If you want smooth
+   * interpolation, use one of the method overloads with a custom interpolation parameter. This
+   * default overload will not generate white space around the scaled image to match the full target
+   * dimensions.
    *
-   * @param image
-   *          the input {@link BufferedImage} to be scaled
-   * @param width
-   *          the width of the scaled image in pixels
-   * @param height
-   *          the height of the scaled image in pixels
+   * @param image  the input {@link BufferedImage} to be scaled
+   * @param width  the width of the scaled image in pixels
+   * @param height the height of the scaled image in pixels
    * @return the scaled {@link BufferedImage}.
    */
   public static BufferedImage scale(final BufferedImage image, final int width, final int height) {
@@ -589,134 +621,100 @@ public final class Imaging {
 
 
   /**
-   * Scale buffered image. By default, {@link AffineTransformOp#TYPE_NEAREST_NEIGHBOR} is used for scaling. If you want
-   * smooth interpolation, use one of the method overloads with a custom interpolation parameter. This default overload
-   * will not generate white space around the scaled image to match the full target dimensions.
+   * Scale buffered image. By default, {@link AffineTransformOp#TYPE_NEAREST_NEIGHBOR} is used for
+   * scaling. If you want smooth interpolation, use one of the method overloads with a custom
+   * interpolation parameter. This default overload will not generate white space around the scaled
+   * image to match the full target dimensions.
    *
-   * @param image
-   *          the input {@link BufferedImage} to be scaled
-   * @param width
-   *          the width of the scaled image in pixels
-   * @param height
-   *          the height of the scaled image in pixels
-   * @param keepRatio
-   *          determines whether the original image ratio should be kept while scaling.
+   * @param image     the input {@link BufferedImage} to be scaled
+   * @param width     the width of the scaled image in pixels
+   * @param height    the height of the scaled image in pixels
+   * @param keepRatio determines whether the original image ratio should be kept while scaling.
    * @return the scaled {@link BufferedImage}.
    */
-  public static BufferedImage scale(
-      final BufferedImage image, final int width, final int height, final boolean keepRatio) {
+  public static BufferedImage scale(final BufferedImage image, final int width, final int height,
+    final boolean keepRatio) {
     return scale(image, width, height, AffineTransformOp.TYPE_NEAREST_NEIGHBOR, keepRatio, false);
   }
 
   /**
-   * Scale buffered image. By default, {@link AffineTransformOp#TYPE_NEAREST_NEIGHBOR} is used for scaling. If you want
-   * smooth interpolation, use one of the method overloads with a custom interpolation parameter.
+   * Scale buffered image. By default, {@link AffineTransformOp#TYPE_NEAREST_NEIGHBOR} is used for
+   * scaling. If you want smooth interpolation, use one of the method overloads with a custom
+   * interpolation parameter.
    *
-   * @param image
-   *          the input {@link BufferedImage} to be scaled
-   * @param width
-   *          the width of the scaled image in pixels
-   * @param height
-   *          the height of the scaled image in pixels
-   * @param keepRatio
-   *          determines whether the original image ratio should be kept while scaling.
-   * @param fill
-   *          determines whether the target image should contain the transparent space around the scaled image to fill the
-   *          full target dimensions.
+   * @param image     the input {@link BufferedImage} to be scaled
+   * @param width     the width of the scaled image in pixels
+   * @param height    the height of the scaled image in pixels
+   * @param keepRatio determines whether the original image ratio should be kept while scaling.
+   * @param fill      determines whether the target image should contain the transparent space
+   *                  around the scaled image to fill the full target dimensions.
    * @return the scaled {@link BufferedImage}.
    */
-  public static BufferedImage scale(
-      final BufferedImage image, final int width, final int height, final boolean keepRatio, final boolean fill) {
+  public static BufferedImage scale(final BufferedImage image, final int width, final int height,
+    final boolean keepRatio, final boolean fill) {
     return scale(image, width, height, AffineTransformOp.TYPE_NEAREST_NEIGHBOR, keepRatio, fill);
   }
 
   /**
-   * Scale buffered image. This default overload will not generate white space around the scaled image to match the full
-   * target dimensions.
+   * Scale buffered image. This default overload will not generate white space around the scaled
+   * image to match the full target dimensions.
    *
-   * @param image
-   *          the input {@link BufferedImage} to be scaled
-   * @param width
-   *          the width of the scaled image in pixels
-   * @param height
-   *          the height of the scaled image in pixels
-   * @param interpolation
-   *          the interpolation mode used for scaling. Choose one of the following:
-   *          <ul>
-   *          <li>{@link AffineTransformOp#TYPE_NEAREST_NEIGHBOR}
-   *          <li>{@link AffineTransformOp#TYPE_BILINEAR}
-   *          <li>{@link AffineTransformOp#TYPE_BICUBIC}
-   *          </ul>
-   * @param keepRatio
-   *          determines whether the original image ratio should be kept while scaling.
+   * @param image         the input {@link BufferedImage} to be scaled
+   * @param width         the width of the scaled image in pixels
+   * @param height        the height of the scaled image in pixels
+   * @param interpolation the interpolation mode used for scaling. Choose one of the following:
+   *                      <ul>
+   *                      <li>{@link AffineTransformOp#TYPE_NEAREST_NEIGHBOR}
+   *                      <li>{@link AffineTransformOp#TYPE_BILINEAR}
+   *                      <li>{@link AffineTransformOp#TYPE_BICUBIC}
+   *                      </ul>
+   * @param keepRatio     determines whether the original image ratio should be kept while scaling.
    * @return the scaled {@link BufferedImage}.
    */
-  public static BufferedImage scale(
-      final BufferedImage image,
-      final int width,
-      final int height,
-      final int interpolation,
-      final boolean keepRatio) {
+  public static BufferedImage scale(final BufferedImage image, final int width, final int height,
+    final int interpolation, final boolean keepRatio) {
     return scale(image, width, height, interpolation, keepRatio, false);
   }
 
   /**
-   * Scale buffered image. This default overload will keep the original image ratio and not generate white space around
-   * the scaled image to match the full target dimensions.
+   * Scale buffered image. This default overload will keep the original image ratio and not generate
+   * white space around the scaled image to match the full target dimensions.
    *
-   * @param image
-   *          the input {@link BufferedImage} to be scaled
-   * @param width
-   *          the width of the scaled image in pixels
-   * @param height
-   *          the height of the scaled image in pixels
-   * @param interpolation
-   *          the interpolation mode used for scaling. Choose one of the following:
-   *          <ul>
-   *          <li>{@link AffineTransformOp#TYPE_NEAREST_NEIGHBOR}
-   *          <li>{@link AffineTransformOp#TYPE_BILINEAR}
-   *          <li>{@link AffineTransformOp#TYPE_BICUBIC}
-   *          </ul>
+   * @param image         the input {@link BufferedImage} to be scaled
+   * @param width         the width of the scaled image in pixels
+   * @param height        the height of the scaled image in pixels
+   * @param interpolation the interpolation mode used for scaling. Choose one of the following:
+   *                      <ul>
+   *                      <li>{@link AffineTransformOp#TYPE_NEAREST_NEIGHBOR}
+   *                      <li>{@link AffineTransformOp#TYPE_BILINEAR}
+   *                      <li>{@link AffineTransformOp#TYPE_BICUBIC}
+   *                      </ul>
    * @return the scaled {@link BufferedImage}.
    */
-  public static BufferedImage scale(
-      final BufferedImage image,
-      final int width,
-      final int height,
-      final int interpolation) {
+  public static BufferedImage scale(final BufferedImage image, final int width, final int height,
+    final int interpolation) {
     return scale(image, width, height, interpolation, true, false);
   }
 
   /**
    * Scale buffered image.
    *
-   * @param image
-   *          the input {@link BufferedImage} to be scaled
-   * @param width
-   *          the width of the scaled image in pixels
-   * @param height
-   *          the height of the scaled image in pixels
-   * @param interpolation
-   *          the interpolation mode used for scaling. Choose one of the following:
-   *          <ul>
-   *          <li>{@link AffineTransformOp#TYPE_NEAREST_NEIGHBOR}
-   *          <li>{@link AffineTransformOp#TYPE_BILINEAR}
-   *          <li>{@link AffineTransformOp#TYPE_BICUBIC}
-   *          </ul>
-   * @param keepRatio
-   *          determines whether the original image ratio should be kept while scaling.
-   * @param fill
-   *          determines whether the target image should contain the transparent space around the scaled image to fill the
-   *          full target dimensions.
+   * @param image         the input {@link BufferedImage} to be scaled
+   * @param width         the width of the scaled image in pixels
+   * @param height        the height of the scaled image in pixels
+   * @param interpolation the interpolation mode used for scaling. Choose one of the following:
+   *                      <ul>
+   *                      <li>{@link AffineTransformOp#TYPE_NEAREST_NEIGHBOR}
+   *                      <li>{@link AffineTransformOp#TYPE_BILINEAR}
+   *                      <li>{@link AffineTransformOp#TYPE_BICUBIC}
+   *                      </ul>
+   * @param keepRatio     determines whether the original image ratio should be kept while scaling.
+   * @param fill          determines whether the target image should contain the transparent space
+   *                      around the scaled image to fill the full target dimensions.
    * @return the scaled {@link BufferedImage}.
    */
-  public static BufferedImage scale(
-      final BufferedImage image,
-      final int width,
-      final int height,
-      final int interpolation,
-      final boolean keepRatio,
-      final boolean fill) {
+  public static BufferedImage scale(final BufferedImage image, final int width, final int height,
+    final int interpolation, final boolean keepRatio, final boolean fill) {
     if (width == 0 || height == 0 || image == null) {
       return null;
     }
@@ -739,13 +737,13 @@ public final class Imaging {
     final double scaleX = newWidth / imageWidth;
     final double scaleY = newHeight / imageHeight;
     final AffineTransform scaleTransform = AffineTransform.getScaleInstance(scaleX, scaleY);
-    final AffineTransformOp bilinearScaleOp =
-        new AffineTransformOp(scaleTransform, interpolation);
-    final BufferedImage scaled =
-        bilinearScaleOp.filter(image, getCompatibleImage((int) newWidth, (int) newHeight));
+    final AffineTransformOp bilinearScaleOp = new AffineTransformOp(scaleTransform, interpolation);
+    final BufferedImage scaled = bilinearScaleOp.filter(image,
+      getCompatibleImage((int) newWidth, (int) newHeight));
     final BufferedImage newImg = getCompatibleImage((int) newWidth, (int) newHeight);
     if (newImg == null) {
-      Game.log().log(Level.WARNING, "Image could not be scaled to {0} * {1}: {2}", new Object[] {newWidth, newHeight, image.toString()});
+      Game.log().log(Level.WARNING, "Image could not be scaled to {0} * {1}: {2}",
+        new Object[]{newWidth, newHeight, image.toString()});
       return null;
     }
 
@@ -756,8 +754,8 @@ public final class Imaging {
     if (fill && (newWidth != width || newHeight != height)) {
       final BufferedImage wrapperImage = getCompatibleImage(width, height);
       final Graphics2D g2 = (Graphics2D) Objects.requireNonNull(wrapperImage).getGraphics();
-      g2.drawImage(
-          newImg, (int) ((width - newWidth) / 2.0), (int) ((height - newHeight) / 2.0), null);
+      g2.drawImage(newImg, (int) ((width - newWidth) / 2.0), (int) ((height - newHeight) / 2.0),
+        null);
       g2.dispose();
       return wrapperImage;
     }
@@ -768,11 +766,9 @@ public final class Imaging {
   /**
    * Sets the opacity of a given image.
    *
-   * @param img
-   *          the original {@link Image}
-   * @param alpha
-   *          the constant alpha to be multiplied with the alpha of the source. alpha must be a floating point number in
-   *          the inclusive range [0.0, 1.0].
+   * @param img   the original {@link Image}
+   * @param alpha the constant alpha to be multiplied with the alpha of the source. alpha must be a
+   *              floating point number in the inclusive range [0.0, 1.0].
    * @return the {@link BufferedImage} produced by applying the given alpha on the source image
    */
   public static BufferedImage setAlpha(final Image img, final float alpha) {
@@ -796,8 +792,7 @@ public final class Imaging {
   /**
    * Converts a given {@link Image} instance to a {@link BufferedImage}.
    *
-   * @param img
-   *          the original {@link Image}
+   * @param img the original {@link Image}
    * @return the {@link BufferedImage} produced from the original {@link Image}
    */
   public static BufferedImage toBufferedImage(final Image img) {
@@ -824,8 +819,7 @@ public final class Imaging {
   /**
    * Creates a compatible buffered image that contains the source image.
    *
-   * @param image
-   *          the source image
+   * @param image the source image
    * @return the compatible buffered image
    */
   public static BufferedImage toCompatibleImage(final BufferedImage image) {
@@ -842,12 +836,10 @@ public final class Imaging {
     return compatibleImg;
   }
 
-  private static BufferedImage flipSprites(
-      final Spritesheet sprite, UnaryOperator<BufferedImage> flipFunction) {
-    final BufferedImage flippedSprite =
-        Imaging.getCompatibleImage(
-            sprite.getSpriteWidth() * sprite.getColumns(),
-            sprite.getSpriteHeight() * sprite.getRows());
+  private static BufferedImage flipSprites(final Spritesheet sprite,
+    UnaryOperator<BufferedImage> flipFunction) {
+    final BufferedImage flippedSprite = Imaging.getCompatibleImage(
+      sprite.getSpriteWidth() * sprite.getColumns(), sprite.getSpriteHeight() * sprite.getRows());
     if (flippedSprite == null) {
       return null;
     }
@@ -856,11 +848,8 @@ public final class Imaging {
     int index = 0;
     for (int column = 0; column < sprite.getColumns(); column++) {
       for (int row = 0; row < sprite.getRows(); row++) {
-        g.drawImage(
-            flipFunction.apply(sprite.getSprite(index)),
-            column * sprite.getSpriteWidth(),
-            row * sprite.getSpriteHeight(),
-            null);
+        g.drawImage(flipFunction.apply(sprite.getSprite(index)), column * sprite.getSpriteWidth(),
+          row * sprite.getSpriteHeight(), null);
         index++;
       }
     }
