@@ -1,9 +1,10 @@
 package de.gurkenlabs.litiengine.entities.behavior;
 
 import de.gurkenlabs.litiengine.entities.Entity;
+import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.Environment;
 
-public abstract class EntityState<T extends Entity> extends State {
+public abstract class EntityState<T extends IEntity> extends State {
   private final T entity;
   private final Environment environment;
 

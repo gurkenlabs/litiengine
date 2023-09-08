@@ -4,39 +4,51 @@ import de.gurkenlabs.litiengine.IUpdateable;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * A StateMachine manages states and transition to model conditional behaviour.
+ */
 public class StateMachine implements IUpdateable {
+
   private State currentState;
 
-  protected StateMachine() {}
-
+  /**
+   * Get the current state of the StateMachine.
+   *
+   * @return The current state.
+   */
   public State getCurrentState() {
-    return this.currentState;
+    return currentState;
   }
 
-  public void setState(final State newState) {
-    if (this.currentState != null) {
-      this.currentState.exit();
+  /**
+   * Set the new state for the StateMachine.
+   *
+   * @param newState The new state to set.
+   */
+  public void setState(State newState) {
+    if (currentState != null) {
+      currentState.exit();
     }
 
-    this.currentState = newState;
-    this.currentState.enter();
+    currentState = newState;
+    currentState.enter();
   }
 
   @Override
   public void update() {
-    if (this.currentState == null) {
+    if (currentState == null) {
       return;
     }
 
-    this.currentState.perform();
-    final List<Transition> transitions = this.currentState.getTransitions();
+    currentState.perform();
+    List<Transition> transitions = currentState.getTransitions();
     Collections.sort(transitions);
 
-    for (final Transition transition : transitions) {
+    for (Transition transition : transitions) {
       if (transition.conditionsFullfilled()) {
-        this.currentState.exit();
-        this.currentState = transition.getNextState();
-        this.currentState.enter();
+        currentState.exit();
+        currentState = transition.getNextState();
+        currentState.enter();
         return;
       }
     }

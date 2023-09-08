@@ -2,15 +2,15 @@ package de.gurkenlabs.litiengine.entities.behavior;
 
 public abstract class Transition implements Comparable<Transition> {
   private final int priority;
-  private State state;
+  private State targetState;
 
   protected Transition(final int priority) {
     this.priority = priority;
   }
 
-  protected Transition(final int priority, final State state) {
+  protected Transition(final int priority, final State targetState) {
     this(priority);
-    this.state = state;
+    this.targetState = targetState;
   }
 
   @Override
@@ -19,7 +19,7 @@ public abstract class Transition implements Comparable<Transition> {
   }
 
   public State getNextState() {
-    return this.state;
+    return this.targetState;
   }
 
   public int getPriority() {

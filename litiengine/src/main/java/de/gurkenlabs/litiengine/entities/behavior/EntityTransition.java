@@ -1,9 +1,15 @@
 package de.gurkenlabs.litiengine.entities.behavior;
 
-import de.gurkenlabs.litiengine.entities.Entity;
+import de.gurkenlabs.litiengine.entities.IEntity;
 
-public abstract class EntityTransition<T extends Entity> extends Transition {
+public abstract class EntityTransition<T extends IEntity> extends Transition {
+
   private final T entity;
+
+  protected EntityTransition(final T entity, final int priority, final State state) {
+    super(priority, state);
+    this.entity = entity;
+  }
 
   protected EntityTransition(final T entity, final int priority) {
     super(priority);
