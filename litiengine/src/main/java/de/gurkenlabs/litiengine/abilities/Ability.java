@@ -24,6 +24,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 @AbilityInfo
 public abstract class Ability implements IRenderable {
+
   private final Collection<AbilityCastListener> abilityCastListeners;
   private final AbilityAttributes attributes;
 
@@ -41,8 +42,7 @@ public abstract class Ability implements IRenderable {
   /**
    * Initializes a new instance of the {@code Ability} class.
    *
-   * @param executor
-   *          The executing entity
+   * @param executor The executing entity
    */
   protected Ability(final Creature executor) {
     this.abilityCastListeners = ConcurrentHashMap.newKeySet();
@@ -56,140 +56,144 @@ public abstract class Ability implements IRenderable {
     this.description = info.description();
     this.castType = info.castType();
     this.entityPivot =
-        new EntityPivot(executor, info.origin(), info.pivotOffsetX(), info.pivotOffsetY());
+      new EntityPivot(executor, info.origin(), info.pivotOffsetX(), info.pivotOffsetY());
   }
 
   public void onCast(final AbilityCastListener listener) {
-    this.abilityCastListeners.add(listener);
+    abilityCastListeners.add(listener);
   }
 
   public void removeAbilityCastListener(AbilityCastListener listener) {
-    this.abilityCastListeners.remove(listener);
+    abilityCastListeners.remove(listener);
   }
 
   public void onEffectApplied(final EffectAppliedListener listener) {
-    for (final Effect effect : this.getEffects()) {
+    for (final Effect effect : getEffects()) {
       // registers to all effects and their follow up effects recursively
-      this.onEffectApplied(effect, listener);
+      onEffectApplied(effect, listener);
     }
   }
 
   public void onEffectCeased(final EffectCeasedListener listener) {
-    for (final Effect effect : this.getEffects()) {
+    for (final Effect effect : getEffects()) {
       // registers to all effects and their follow up effects recursively
-      this.onEffectCeased(effect, listener);
+      onEffectCeased(effect, listener);
     }
   }
 
   public void addEffect(final Effect effect) {
-    this.getEffects().add(effect);
+    getEffects().add(effect);
   }
 
   public Shape calculateImpactArea() {
-    return this.internalCalculateImpactArea(this.getExecutor().getAngle());
+    return internalCalculateImpactArea(getExecutor().getAngle());
   }
 
   public Ellipse2D calculatePotentialImpactArea() {
-    final int range = this.getAttributes().impact().get();
-    final double arcX = this.getExecutor().getCollisionBox().getCenterX() - range * 0.5;
-    final double arcY = this.getExecutor().getCollisionBox().getCenterY() - range * 0.5;
+    final int range = getAttributes().impact().get();
+    final double arcX = getPivot().getPoint().getX() - range * 0.5;
+    final double arcY = getPivot().getPoint().getY() - range * 0.5;
 
     return new Ellipse2D.Double(arcX, arcY, range, range);
   }
 
   public boolean canCast() {
-    return !this.getExecutor().isDead() && !this.isOnCooldown();
+    return !getExecutor().isDead() && !isOnCooldown();
   }
 
   public boolean isOnCooldown() {
-    return (this.getCurrentExecution() != null
-        && this.getCurrentExecution().getExecutionTicks() > 0
-        && Game.time().since(this.getCurrentExecution().getExecutionTicks()) < this.getAttributes().cooldown().get());
+    return (getCurrentExecution() != null
+      && getCurrentExecution().getExecutionTicks() > 0
+      && Game.time().since(getCurrentExecution().getExecutionTicks()) < getAttributes()
+      .cooldown().get());
   }
 
   /**
-   * Casts the ability by the temporal conditions of the specified game loop and the spatial circumstances of the
-   * specified environment. An ability execution will be taken out that start applying all the effects of this ability.
+   * Casts the ability by the temporal conditions of the specified game loop and the spatial
+   * circumstances of the specified environment. An ability execution will be taken out that start
+   * applying all the effects of this ability.
    *
-   * @return An {@link AbilityExecution} object that wraps all information about this execution of the ability.
+   * @return An {@link AbilityExecution} object that wraps all information about this execution of
+   * the ability.
    */
   public AbilityExecution cast() {
-    if (!this.canCast()) {
+    if (!canCast()) {
       return null;
     }
     this.currentExecution = new AbilityExecution(this);
 
-    for (final AbilityCastListener listener : this.abilityCastListeners) {
-      listener.abilityCast(this.currentExecution);
+    for (final AbilityCastListener listener : abilityCastListeners) {
+      listener.abilityCast(currentExecution);
     }
 
-    return this.getCurrentExecution();
+    return getCurrentExecution();
   }
 
   public AbilityAttributes getAttributes() {
-    return this.attributes;
+    return attributes;
   }
 
   public CastType getCastType() {
-    return this.castType;
+    return castType;
   }
 
   public float getCooldownInSeconds() {
-    return (float) (this.getAttributes().cooldown().get() * 0.001);
+    return (float) (getAttributes().cooldown().get() * 0.001);
   }
 
   public AbilityExecution getCurrentExecution() {
-    return this.currentExecution;
+    return currentExecution;
   }
 
   public String getDescription() {
-    return this.description;
+    return description;
   }
 
   public Creature getExecutor() {
-    return this.executor;
+    return executor;
   }
 
   public String getName() {
-    return this.name;
+    return name;
   }
 
   public EntityPivot getPivot() {
-    return this.entityPivot;
+    return entityPivot;
   }
 
   public float getRemainingCooldownInSeconds() {
-    if (this.getCurrentExecution() == null
-        || this.getExecutor() == null
-        || this.getExecutor().isDead()) {
+    if (getCurrentExecution() == null
+      || getExecutor() == null
+      || getExecutor().isDead()) {
       return 0;
     }
 
     // calculate cooldown in seconds
-    return (float) (!this.canCast()
-        ? (this.getAttributes().cooldown().get()
-            - Game.time().since(this.getCurrentExecution().getExecutionTicks()))
-            * 0.001
-        : 0);
+    return (float) (!canCast()
+      ? (getAttributes().cooldown().get()
+      - Game.time().since(getCurrentExecution().getExecutionTicks()))
+      * 0.001
+      : 0);
   }
 
   public boolean isActive() {
-    return this.getCurrentExecution() != null
-        && Game.time().since(this.getCurrentExecution().getExecutionTicks()) < this.getAttributes().duration().get();
+    return getCurrentExecution() != null
+      && Game.time().since(getCurrentExecution().getExecutionTicks()) < getAttributes()
+      .duration().get();
   }
 
   public boolean isMultiTarget() {
-    return this.multiTarget;
+    return multiTarget;
   }
 
   @Override
   public void render(final Graphics2D g) {
-    g.setColor(new Color(255, 255, 0, 100));
-    Game.graphics().renderShape(g, this.calculateImpactArea());
+    g.setColor(new Color(255, 255, 0, 25));
+    Game.graphics().renderShape(g, calculateImpactArea(),true);
     final Stroke oldStroke = g.getStroke();
     g.setStroke(new BasicStroke(2f));
-    g.setColor(new Color(255, 255, 0, 200));
-    Game.graphics().renderOutline(g, this.calculateImpactArea());
+    g.setColor(new Color(255, 255, 0, 50));
+    Game.graphics().renderOutline(g, calculateImpactArea(), true);
     g.setStroke(oldStroke);
   }
 
@@ -214,33 +218,33 @@ public abstract class Ability implements IRenderable {
   }
 
   public List<Effect> getEffects() {
-    return this.effects;
+    return effects;
   }
 
   protected Shape internalCalculateImpactArea(final double angle) {
-    final int impact = this.getAttributes().impact().get();
-    final int impactAngle = this.getAttributes().impactAngle().get();
-    final double arcX = this.getPivot().getPoint().getX() - impact * 0.5;
-    final double arcY = this.getPivot().getPoint().getY() - impact * 0.5;
+    final int impact = getAttributes().impact().get();
+    final int impactAngle = getAttributes().impactAngle().get();
+    final double arcX = getPivot().getPoint().getX() - impact;
+    final double arcY = getPivot().getPoint().getY() - impact;
 
     // project
     final Point2D appliedRange =
-        GeometricUtilities.project(
-            new Point2D.Double(arcX, arcY), angle, this.getAttributes().range().get() * 0.5);
+      GeometricUtilities.project(
+        new Point2D.Double(arcX, arcY), angle, getAttributes().range().get() * 0.5);
     final double start = angle - 90 - (impactAngle / 2.0);
     if (impactAngle % 360 == 0) {
-      return new Ellipse2D.Double(appliedRange.getX(), appliedRange.getY(), impact, impact);
+      return new Ellipse2D.Double(appliedRange.getX(), appliedRange.getY(), impact*2, impact*2);
     }
 
     return new Arc2D.Double(
-        appliedRange.getX(), appliedRange.getY(), impact, impact, start, impactAngle, Arc2D.PIE);
+      appliedRange.getX(), appliedRange.getY(), impact*2, impact*2, start, impactAngle, Arc2D.PIE);
   }
 
   private void onEffectApplied(final Effect effect, final EffectAppliedListener listener) {
     effect.onEffectApplied(listener);
 
     for (final Effect followUp : effect.getFollowUpEffects()) {
-      this.onEffectApplied(followUp, listener);
+      onEffectApplied(followUp, listener);
     }
   }
 
@@ -248,12 +252,13 @@ public abstract class Ability implements IRenderable {
     effect.onEffectCeased(listener);
 
     for (final Effect followUp : effect.getFollowUpEffects()) {
-      this.onEffectCeased(followUp, listener);
+      onEffectCeased(followUp, listener);
     }
   }
 
   @FunctionalInterface
   public interface AbilityCastListener extends EventListener {
+
     void abilityCast(AbilityExecution execution);
   }
 }
