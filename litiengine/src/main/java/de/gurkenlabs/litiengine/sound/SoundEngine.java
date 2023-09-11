@@ -148,7 +148,8 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
       return music;
     }
 
-    try (MusicPlayback playback = new MusicPlayback(track)) {
+    try {
+      MusicPlayback playback = new MusicPlayback(track);
       if (config != null) {
         config.accept(playback);
       }
@@ -601,23 +602,21 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
 
     Iterator<SFXPlayback> iter = sounds.iterator();
     while (iter.hasNext()) {
-      try (SFXPlayback s = iter.next()) {
-        if (s.isPlaying()) {
-          s.updateLocation(listenerLocation);
-        } else {
-          iter.remove();
-        }
+      SFXPlayback s = iter.next();
+      if (s.isPlaying()) {
+        s.updateLocation(listenerLocation);
+      } else {
+        iter.remove();
       }
     }
 
     Iterator<MusicPlayback> iter2 = allMusic.iterator();
     while (iter.hasNext()) {
-      try (MusicPlayback s = iter2.next()) {
-        if (s.isPlaying()) {
-          s.setMusicVolume(Game.config().sound().getMusicVolume());
-        } else {
-          iter.remove();
-        }
+      MusicPlayback s = iter2.next();
+      if (s.isPlaying()) {
+        s.setMusicVolume(Game.config().sound().getMusicVolume());
+      } else {
+        iter.remove();
       }
     }
 

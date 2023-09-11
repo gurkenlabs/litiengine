@@ -5,8 +5,8 @@ import javax.sound.sampled.LineUnavailableException;
 
 /** A {@code SoundPlayback} implementation for the playback music. */
 public class MusicPlayback extends SoundPlayback {
-  private Track track;
-  private VolumeControl musicVolume;
+  private final Track track;
+  private final VolumeControl musicVolume;
 
   MusicPlayback(Track track) throws LineUnavailableException {
     super(track.getFormat());

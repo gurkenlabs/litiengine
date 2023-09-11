@@ -8,13 +8,13 @@ import javax.sound.sampled.LineUnavailableException;
 
 /** A {@code SoundPlayback} implementation for the playback of sound effects. */
 public class SFXPlayback extends SoundPlayback {
-  private Sound sound;
-  private FloatControl panControl;
-  private Supplier<Point2D> source;
-  private int range;
-  private float volumeModifier;
-  private VolumeControl volume;
-  private boolean loop;
+  private final Sound sound;
+  private final FloatControl panControl;
+  private final Supplier<Point2D> source;
+  private final int range;
+  private final float volumeModifier;
+  private final VolumeControl volume;
+  private final boolean loop;
 
   SFXPlayback(Sound sound, Supplier<Point2D> source, boolean loop, int range, float volumeModifier)
       throws LineUnavailableException {
@@ -39,8 +39,8 @@ public class SFXPlayback extends SoundPlayback {
           return;
         }
       } while (this.loop);
-    } catch (Throwable t) {
-      t.printStackTrace();
+    } catch (LineUnavailableException e) {
+      e.printStackTrace();
     } finally {
       this.finish();
     }
