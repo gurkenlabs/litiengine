@@ -10,6 +10,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
 
 public class MovementController<T extends IMobileEntity> implements IMovementController {
+
   private final List<Force> activeForces;
   private final T mobileEntity;
   private final List<Predicate<IMobileEntity>> movementPredicates;
@@ -81,8 +82,8 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
 
   @Override
   public void update() {
-    this.handleForces();
-    this.handleMovement();
+    handleForces();
+    handleMovement();
   }
 
   public void handleMovement() {
@@ -102,7 +103,7 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
     this.setDy(0);
 
     final double deltaVelocity =
-        Math.min(Math.sqrt(Math.pow(dxTemp, 2) + Math.pow(dyTemp, 2)), acceleration);
+      Math.min(Math.sqrt(Math.pow(dxTemp, 2) + Math.pow(dyTemp, 2)), acceleration);
     if (deltaVelocity != 0) {
       double newVelocity = this.getVelocity() + deltaVelocity;
       this.setVelocity(newVelocity);
@@ -129,9 +130,9 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
     }
 
     return this.getActiveForces().stream()
-        .filter(x -> x.getIdentifier() != null && x.getIdentifier().equals(identifier))
-        .findFirst()
-        .orElse(null);
+      .filter(x -> x.getIdentifier() != null && x.getIdentifier().equals(identifier))
+      .findFirst()
+      .orElse(null);
   }
 
   @Override
@@ -156,13 +157,7 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
   }
 
   protected boolean isMovementAllowed() {
-    for (final Predicate<IMobileEntity> predicate : this.movementPredicates) {
-      if (!predicate.test(getEntity())) {
-        return false;
-      }
-    }
-
-    return true;
+    return movementPredicates.stream().allMatch(p -> p.test(getEntity()));
   }
 
   private void handleForces() {
@@ -170,32 +165,20 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
     if (this.activeForces.isEmpty()) {
       return;
     }
-    this.activeForces.stream().filter(Force::hasEnded).forEach(this.activeForces::remove);
-
-    // ensure turn-on-move is disabled for force handling
-    boolean turn = getEntity().turnOnMove();
-    getEntity().setTurnOnMove(false);
-    try {
-      this.moveEntityByActiveForces();
-    } finally {
-      getEntity().setTurnOnMove(turn);
-    }
+    this.activeForces.removeIf(Force::hasEnded);
+    moveEntityByActiveForces();
   }
 
   private void moveEntityByActiveForces() {
-    final Point2D combinedForcesVector = this.combineActiveForces();
+    final Point2D combinedForcesVector = combineActiveForces();
     final Point2D target =
-        new Point2D.Double(
-            getEntity().getX() + combinedForcesVector.getX(),
-            getEntity().getY() + combinedForcesVector.getY());
+      new Point2D.Double(
+        getEntity().getX() + combinedForcesVector.getX(),
+        getEntity().getY() + combinedForcesVector.getY());
 
-    final boolean success = Game.physics().move(getEntity(), target);
+    final boolean success = Game.physics().move(getEntity(), target, false);
     if (!success) {
-      for (final Force force : this.activeForces) {
-        if (force.cancelOnCollision()) {
-          force.end();
-        }
-      }
+      activeForces.stream().filter(Force::cancelOnCollision).forEach(Force::end);
     }
   }
 
@@ -208,11 +191,11 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
         continue;
       }
 
-      final Point2D collisionBoxCenter = getEntity().getCollisionBoxCenter();
       final double angle =
-          GeometricUtilities.calcRotationAngleInDegrees(collisionBoxCenter, force.getLocation());
+        GeometricUtilities.calcRotationAngleInDegrees(getEntity().getCollisionBoxCenter(),
+          force.getLocation());
       final double strength =
-          Game.loop().getDeltaTime() * 0.001f * force.getStrength() * Game.loop().getTimeScale();
+        Game.loop().getDeltaTime() * 0.001f * force.getStrength() * Game.loop().getTimeScale();
       deltaX += GeometricUtilities.getDeltaX(angle, strength);
       deltaY += GeometricUtilities.getDeltaY(angle, strength);
     }

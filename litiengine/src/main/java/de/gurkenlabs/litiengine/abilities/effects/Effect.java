@@ -18,10 +18,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 /**
- * The Class Effect seeks for affected entities in the game's current environment to apply certain effects to them
- * defined by the overwritten implementation of apply/cease.
+ * The Class Effect seeks for affected entities in the game's current environment to apply certain
+ * effects to them defined by the overwritten implementation of apply/cease.
  */
 public abstract class Effect implements IUpdateable {
+
   private final Ability ability;
   private final List<EffectApplication> appliances;
   private final Collection<EffectAppliedListener> appliedListeners;
@@ -44,7 +45,7 @@ public abstract class Effect implements IUpdateable {
 
     this.duration = ability.getAttributes().duration().get();
     if (targets == null || targets.length == 0) {
-      this.effectTargets = new EffectTarget[] {EffectTarget.NONE};
+      this.effectTargets = new EffectTarget[]{EffectTarget.NONE};
     } else {
       this.effectTargets = targets;
     }
@@ -69,8 +70,7 @@ public abstract class Effect implements IUpdateable {
   /**
    * Applies the effect in the specified impact area on the specified environment.
    *
-   * @param impactArea
-   *          The impact area
+   * @param impactArea The impact area
    */
   public void apply(final Shape impactArea) {
     final List<ICombatEntity> affected = this.lookForAffectedEntities(impactArea);
@@ -123,15 +123,8 @@ public abstract class Effect implements IUpdateable {
   }
 
   public boolean isActive(final ICombatEntity entity) {
-    for (final EffectApplication app : this.getActiveAppliances()) {
-      for (final ICombatEntity affected : app.getAffectedEntities()) {
-        if (affected.equals(entity)) {
-          return true;
-        }
-      }
-    }
-
-    return false;
+    return getActiveAppliances().stream()
+      .anyMatch(a -> a.getAffectedEntities().stream().anyMatch(e -> e.equals(entity)));
   }
 
   public void setDelay(final int delay) {
@@ -147,13 +140,14 @@ public abstract class Effect implements IUpdateable {
   }
 
   /**
-   * 1. Cease the effect after its duration. 2. apply all follow up effects 3. remove appliance 4. unregister from loop if
-   * all appliances are done
+   * 1. Cease the effect after its duration. 2. apply all follow-up effects 3. remove appliance 4.
+   * unregister from loop if all appliances are done
    */
   @Override
   public void update() {
 
-    for (final Iterator<EffectApplication> iterator = this.getActiveAppliances().iterator(); iterator.hasNext();) {
+    for (final Iterator<EffectApplication> iterator = this.getActiveAppliances().iterator();
+      iterator.hasNext(); ) {
       final EffectApplication appliance = iterator.next();
       // if the effect duration is reached
       if (this.hasEnded(appliance)) {
@@ -183,7 +177,7 @@ public abstract class Effect implements IUpdateable {
       this.cease(entity);
     }
 
-    // 2. apply follow up effects
+    // 2. apply follow-up effects
     this.getFollowUpEffects().forEach(followUp -> followUp.apply(appliance.getImpactArea()));
   }
 
@@ -205,35 +199,37 @@ public abstract class Effect implements IUpdateable {
 
     for (final EffectTarget target : this.effectTargets) {
       switch (target) {
-        case EXECUTINGENTITY:
+        case EXECUTINGENTITY -> {
           affectedEntities.add(this.getAbility().getExecutor());
           return affectedEntities;
-        case ENEMY:
+        }
+        case ENEMY -> {
           affectedEntities.addAll(this.getEntitiesInImpactArea(impactArea));
           affectedEntities =
-              affectedEntities.stream().filter(this::canAttackEntity).collect(Collectors.toList());
-          break;
-        case FRIENDLY:
+            affectedEntities.stream().filter(this::canAffectEntity).collect(Collectors.toList());
+        }
+        case FRIENDLY -> {
           affectedEntities.addAll(this.getEntitiesInImpactArea(impactArea));
           affectedEntities =
-              affectedEntities.stream()
-                  .filter(this::isAliveFriendlyEntity)
-                  .collect(Collectors.toList());
-          break;
-        case FRIENDLYDEAD:
+            affectedEntities.stream()
+              .filter(this::isAliveFriendlyEntity)
+              .collect(Collectors.toList());
+        }
+        case FRIENDLYDEAD -> {
           affectedEntities.addAll(this.getEntitiesInImpactArea(impactArea));
           affectedEntities =
-              affectedEntities.stream()
-                  .filter(this::isDeadFriendlyEntity)
-                  .collect(Collectors.toList());
-          break;
-        case CUSTOM:
+            affectedEntities.stream()
+              .filter(this::isDeadFriendlyEntity)
+              .collect(Collectors.toList());
+        }
+        case CUSTOM -> {
           affectedEntities.addAll(this.getEntitiesInImpactArea(impactArea));
           affectedEntities =
-              affectedEntities.stream().filter(this::customTarget).collect(Collectors.toList());
-          break;
-        default:
-          break;
+            affectedEntities.stream().filter(this::customTarget).collect(Collectors.toList());
+        }
+        case NONE -> {
+        }
+        default -> throw new IllegalStateException("Unexpected value: " + target);
       }
     }
 
@@ -255,12 +251,11 @@ public abstract class Effect implements IUpdateable {
   }
 
   /**
-   * Overwrite this method to implement a custom target predicate that determines whether an entity can be affected by
-   * this effect. The targets of this effect need to include the {@code CUSTOM} value in order for this function to be
-   * evaluated.
+   * Overwrite this method to implement a custom target predicate that determines whether an entity
+   * can be affected by this effect. The targets of this effect need to include the {@code CUSTOM}
+   * value in order for this function to be evaluated.
    *
-   * @param entity
-   *          The entity to check against the custom target predicate.
+   * @param entity The entity to check against the custom target predicate.
    * @return True if the entity can be affected by this effect; otherwise false.
    * @see EffectTarget#CUSTOM
    */
@@ -268,31 +263,33 @@ public abstract class Effect implements IUpdateable {
     return entity != null;
   }
 
-  protected boolean canAttackEntity(ICombatEntity entity) {
+  protected boolean canAffectEntity(ICombatEntity entity) {
     return !entity.equals(this.getAbility().getExecutor())
-        && !entity.isFriendly(this.getAbility().getExecutor())
-        && !entity.isDead();
+      && !entity.isFriendly(this.getAbility().getExecutor())
+      && !entity.isDead();
   }
 
   protected boolean isAliveFriendlyEntity(ICombatEntity entity) {
     return !entity.equals(this.getAbility().getExecutor())
-        && entity.isFriendly(this.getAbility().getExecutor())
-        && !entity.isDead();
+      && entity.isFriendly(this.getAbility().getExecutor())
+      && !entity.isDead();
   }
 
   protected boolean isDeadFriendlyEntity(ICombatEntity entity) {
     return !entity.equals(this.getAbility().getExecutor())
-        && entity.isFriendly(this.getAbility().getExecutor())
-        && entity.isDead();
+      && entity.isFriendly(this.getAbility().getExecutor())
+      && entity.isDead();
   }
 
   @FunctionalInterface
   public interface EffectAppliedListener extends EventListener {
+
     void applied(EffectEvent event);
   }
 
   @FunctionalInterface
   public interface EffectCeasedListener extends EventListener {
+
     void ceased(EffectEvent event);
   }
 }
