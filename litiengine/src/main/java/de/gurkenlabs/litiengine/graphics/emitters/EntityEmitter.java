@@ -12,33 +12,70 @@ import java.awt.geom.Point2D;
 public class EntityEmitter extends Emitter {
 
   private final IEntity entity;
+
   private boolean dynamicLocation;
 
+  /**
+   * Constructs a new EntityEmitter from a given emitter resource that follows an entity's
+   * location.
+   *
+   * @param entity              The IEntity to which this emitter is bound.
+   * @param emitterResourceName The name of the configuration for this emitter. If the Emitter has
+   *                            been added to the game resource file, it is loaded from there by
+   *                            name. Otherwise, the EmitterLoader will search the Resource folders
+   *                            for a file with the emitterResourceName.
+   * @param dynamicLocation     If true, the emitter follows the entity's location; if false, it
+   *                            remains at the location where it has been created.
+   */
   public EntityEmitter(
-      final IEntity entity, final String emitterXml, final boolean dynamicLocation) {
+    final IEntity entity, final String emitterResourceName, final boolean dynamicLocation) {
     this(entity, dynamicLocation);
-    setEmitterData(emitterXml);
+    setEmitterData(emitterResourceName);
   }
 
-  public EntityEmitter(final IEntity entity, final String emitterXml) {
-    this(entity, emitterXml, false);
+  /**
+   * Constructs a new EntityEmitter from a given emitter resource that remains at the location where
+   * it has been created.
+   *
+   * @param entity              The IEntity to which this emitter is bound.
+   * @param emitterResourceName The name of the configuration for this emitter. If the Emitter has
+   *                            been added to the game resource file, it is loaded from there by
+   *                            name. Otherwise, the EmitterLoader will search the Resource folders
+   *                            for a file with the emitterResourceName.
+   */
+  public EntityEmitter(final IEntity entity, final String emitterResourceName) {
+    this(entity, emitterResourceName, false);
   }
 
+  /**
+   * Constructs a new EntityEmitter with EmitterData that follows an entity's location.
+   *
+   * @param entity          The IEntity to which this emitter is bound.
+   * @param emitterData     The EmitterData object defining the emitter's behavior.
+   * @param dynamicLocation If true, the emitter follows the entity's location; if false, it remains
+   *                        at the location where it has been created.
+   */
   public EntityEmitter(
-      final IEntity entity, final EmitterData emitterData, final boolean dynamicLocation) {
+    final IEntity entity, final EmitterData emitterData, final boolean dynamicLocation) {
     this(entity, dynamicLocation);
     setEmitterData(emitterData);
   }
 
+  /**
+   * Constructs a new EntityEmitter with EmitterData that remains at the location where it has been
+   * created.
+   *
+   * @param entity      The IEntity to which this emitter is bound.
+   * @param emitterData The EmitterData object defining the emitter's behavior.
+   */
   public EntityEmitter(final IEntity entity, final EmitterData emitterData) {
     this(entity, emitterData, false);
   }
 
   /**
-   * Instantiates a new entity emitter.
+   * Instantiates a new entity emitter that remains at the location where it has been created.
    *
-   * @param entity
-   *          the entity
+   * @param entity The IEntity to which this emitter is bound.
    */
   public EntityEmitter(final IEntity entity) {
     this(entity, false);
@@ -47,32 +84,68 @@ public class EntityEmitter extends Emitter {
   /**
    * Instantiates a new entity emitter.
    *
-   * @param entity
-   *          the entity
-   * @param dynamicLocation
-   *          if true, move the Emitter along with its Entity once it moves. If false, always keep the original Location
-   *          of the Emitter
+   * @param entity          The IEntity to which this emitter is bound.
+   * @param dynamicLocation If true, the emitter follows the entity's location; if false, it remains
+   *                        at the location where it has been created.
    */
   public EntityEmitter(final IEntity entity, boolean dynamicLocation) {
-    super(entity.getX(), entity.getY());
+    super();
     this.entity = entity;
-    this.setSize(this.getEntity().getWidth(), this.getEntity().getHeight());
     this.dynamicLocation = dynamicLocation;
   }
 
+  /**
+   * Get the IEntity to which this emitter is bound.
+   *
+   * @return The IEntity to which this emitter is bound.
+   */
   public IEntity getEntity() {
     return this.entity;
   }
 
+  /**
+   * Check if the emitter has dynamic location tracking enabled. This determines whether this
+   * Emitter's location is updated along its entity's location.
+   *
+   * @return True if dynamic location is enabled, false otherwise.
+   */
   public boolean hasDynamicLocation() {
     return this.dynamicLocation;
   }
 
+  /**
+   * Toggle dynamic location updates.
+   *
+   * @param dynamicLocation If true, the emitter follows its entity's location; if false, it remains
+   *                        at the location where it has been created.
+   */
+  public void setDynamicLocation(boolean dynamicLocation) {
+    this.dynamicLocation = dynamicLocation;
+  }
+
+  @Override
+  public double getWidth() {
+    return getEntity() != null ? getEntity().getWidth() : super.getWidth();
+  }
+
+  @Override
+  public double getHeight() {
+    return getEntity() != null ? getEntity().getHeight() : super.getHeight();
+  }
+
+  @Override
+  public double getX() {
+    return getEntity() != null && hasDynamicLocation() ? getEntity().getX() : super.getX();
+  }
+
+  @Override
+  public double getY() {
+    return getEntity() != null && hasDynamicLocation() ? getEntity().getY() : super.getY();
+  }
+
   @Override
   public Point2D getLocation() {
-    if (this.getEntity() == null) {
-      return null;
-    }
-    return this.hasDynamicLocation() ? this.getEntity().getLocation() : super.getLocation();
+    return getEntity() != null && hasDynamicLocation() ? getEntity().getLocation()
+      : super.getLocation();
   }
 }
