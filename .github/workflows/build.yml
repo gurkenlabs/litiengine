@@ -18,27 +18,27 @@ jobs:
   fullbuild:
     runs-on: ubuntu-latest
 
-    name: Java 19 build
+    name: Java 20 build
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4.1.0
         with:
           fetch-depth: 0
 
       - name: Gradle Wrapper Validation
         uses: gradle/wrapper-validation-action@v1
 
-      - name: JDK 19 Setup
-        uses: actions/setup-java@v3
+      - name: JDK Setup
+        uses: actions/setup-java@v3.13.0
         with:
           distribution: temurin
-          java-version: 19
+          java-version: 20
 
       - name: D-BUS AT-SPI Installation
         run: sudo apt-get -y install at-spi2-core
 
       - name: Build
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v2.9.0
         with:
           arguments: |
             build
@@ -46,17 +46,17 @@ jobs:
             -PskipSpotless
 
       - name: Test
-        uses: coactions/setup-xvfb@v1
+        uses: coactions/setup-xvfb@v1.0.1
         with:
           run: ./gradlew jacocoTestReport -PskipSpotless
 
       - name: Package Creation
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v2.9.0
         with:
           arguments: jpackage
 
       - name: Static Analysis
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v2.9.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -67,6 +67,6 @@ jobs:
             -PskipSpotless
 
       - name: Code Style Validation
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v2.9.0
         with:
           arguments: spotlessCheck
