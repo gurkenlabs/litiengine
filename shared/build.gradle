@@ -1,5 +1,8 @@
 plugins {
   id "java-library"
+
+  id "encoding-defaults"
+  id "testing-defaults"
 }
 
 dependencies {
@@ -8,6 +11,3 @@ dependencies {
   api libs.junit.params
   runtimeOnly libs.junit.engine
 }
-
-apply from: "$rootDir/gradle/encoding.gradle"
-apply from: "$rootDir/gradle/testing.gradle"

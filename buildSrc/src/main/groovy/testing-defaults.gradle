@@ -1,4 +1,6 @@
-apply plugin: "jacoco"
+plugins {
+  id "jacoco"
+}
 
 test {
   finalizedBy jacocoTestReport

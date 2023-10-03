@@ -1,6 +1,9 @@
 plugins {
   id "java-library"
-  alias libs.plugins.sonarQube
+
+  id "encoding-defaults"
+  id "publishing-defaults"
+  id "testing-defaults"
 }
 
 dependencies {
@@ -11,8 +14,3 @@ dependencies {
   runtimeOnly libs.bundles.xml.runtime
   testImplementation project(":shared")
 }
-
-apply from: "$rootDir/gradle/encoding.gradle"
-apply from: "$rootDir/gradle/publishing.gradle"
-apply from: "$rootDir/gradle/sonarqube.gradle"
-apply from: "$rootDir/gradle/testing.gradle"

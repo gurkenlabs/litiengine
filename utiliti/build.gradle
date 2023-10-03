@@ -3,11 +3,12 @@ import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 plugins {
   id "java"
   id "application"
-  alias libs.plugins.beryxRuntime
-}
 
-apply from: "$rootDir/gradle/encoding.gradle"
-apply from: "$rootDir/gradle/testing.gradle"
+  alias libs.plugins.beryxRuntime
+
+  id "encoding-defaults"
+  id "testing-defaults"
+}
 
 sourceSets {
   main {

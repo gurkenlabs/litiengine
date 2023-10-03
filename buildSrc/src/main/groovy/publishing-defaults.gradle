@@ -1,5 +1,7 @@
-apply plugin: "maven-publish"
-apply plugin: "signing"
+plugins {
+  id "maven-publish"
+  id "signing"
+}
 
 java {
   withSourcesJar()

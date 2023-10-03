@@ -1,15 +1,18 @@
 plugins {
   id "java"
+
   alias libs.plugins.spotless
   alias libs.plugins.versions
   alias libs.plugins.dependencyCheck
   alias libs.plugins.grgit
   alias libs.plugins.semanticVersioning
   alias libs.plugins.nexusPublish
-}
+  alias libs.plugins.sonarQube
 
-apply from: "$rootDir/gradle/licensing.gradle"
-apply from: "$rootDir/gradle/versioning.gradle"
+  id "licensing-defaults"
+  id "versioning-defaults"
+  id "sonarqube-defaults"
+}
 
 subprojects {
   project.version = rootProject.version
