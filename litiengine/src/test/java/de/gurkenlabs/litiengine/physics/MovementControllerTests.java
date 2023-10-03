@@ -1,7 +1,6 @@
 package de.gurkenlabs.litiengine.physics;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyDouble;
 import static org.mockito.Mockito.mock;
@@ -19,12 +18,9 @@ import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.test.GameTestSuite;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import java.awt.geom.Point2D;
-import java.util.Arrays;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 @ExtendWith(GameTestSuite.class)
@@ -98,29 +94,6 @@ class MovementControllerTests {
   }
 
   @Test
-  void handleForces_disablesAndResetsTurnOnMove() {
-    // arrange
-    mobileEntity.setTurnOnMove(true);
-    assertTrue(mobileEntity.turnOnMove());
-    ArgumentCaptor<Boolean> turnOnMoveCaptor = ArgumentCaptor.forClass(Boolean.class);
-
-    Force activeForce = spy(new Force(new Point2D.Double(0, 0), 1, 1));
-    controller.apply(activeForce);
-    assertEquals(1, controller.getActiveForces().size());
-
-    // act
-    controller.update();
-
-    // assert
-    verify(mobileEntity, times(3)).setTurnOnMove(turnOnMoveCaptor.capture());
-    List<Boolean> turnOnMoveCallArguments = turnOnMoveCaptor.getAllValues();
-    assertEquals(
-        Arrays.asList(true, false, true), turnOnMoveCallArguments); // first "true" for setup
-
-    assertTrue(mobileEntity.turnOnMove());
-  }
-
-  @Test
   void moveEntityByActiveForces_movesEntityToCorrectTarget() {
     // arrange
     // Game environment
@@ -129,35 +102,34 @@ class MovementControllerTests {
 
     GameLoop loopMock = mock(GameLoop.class);
 
-    MockedStatic<Game> gameMockedStatic = mockStatic(Game.class);
-    gameMockedStatic.when(Game::physics).thenReturn(physicsEngineMock);
-    gameMockedStatic.when(Game::loop).thenReturn(loopMock);
+    try (var gameMockedStatic = mockStatic(Game.class);
+         var geomUtilsMockedStatic = mockStatic(GeometricUtilities.class)) {
+      gameMockedStatic.when(Game::physics).thenReturn(physicsEngineMock);
+      gameMockedStatic.when(Game::loop).thenReturn(loopMock);
 
-    // private method return: combineActiveForces()
-    MockedStatic<GeometricUtilities> geomUtilsMockedStatic = mockStatic(GeometricUtilities.class);
-    when(GeometricUtilities.getDeltaX(anyDouble(), anyDouble())).thenReturn(4d);
-    when(GeometricUtilities.getDeltaY(anyDouble(), anyDouble())).thenReturn(3d);
+      // private method return: combineActiveForces()
 
-    // test-entity properties
-    Force activeForce = spy(new Force(new Point2D.Double(0, 0), 1, 1));
-    controller.apply(activeForce);
-    assertEquals(1, controller.getActiveForces().size());
+      when(GeometricUtilities.getDeltaX(anyDouble(), anyDouble())).thenReturn(4d);
+      when(GeometricUtilities.getDeltaY(anyDouble(), anyDouble())).thenReturn(3d);
 
-    when(mobileEntity.getX()).thenReturn(1d);
-    when(mobileEntity.getY()).thenReturn(2d);
+      // test-entity properties
+      Force activeForce = spy(new Force(new Point2D.Double(0, 0), 1, 1));
+      activeForce.setCancelOnCollision(false);
+      controller.apply(activeForce);
+      assertEquals(1, controller.getActiveForces().size());
 
-    Point2D targetPoint = new Point2D.Double(5, 5);
+      when(mobileEntity.getX()).thenReturn(1d);
+      when(mobileEntity.getY()).thenReturn(2d);
 
-    // act
-    controller.update();
+      Point2D targetPoint = new Point2D.Double(5, 5);
 
-    // assert
-    verify(physicsEngineMock, times(1)).move(mobileEntity, targetPoint);
-    verify(activeForce, times(0)).end();
+      // act
+      controller.update();
 
-    // cleanup
-    gameMockedStatic.close();
-    geomUtilsMockedStatic.close();
+      // assert
+      verify(physicsEngineMock, times(1)).move(mobileEntity, targetPoint, false);
+      verify(activeForce, times(0)).end();
+    }
   }
 
   @Test
@@ -169,30 +141,26 @@ class MovementControllerTests {
 
     GameLoop loopMock = mock(GameLoop.class);
 
-    MockedStatic<Game> gameMockedStatic = mockStatic(Game.class);
-    gameMockedStatic.when(Game::physics).thenReturn(physicsEngineMock);
-    gameMockedStatic.when(Game::loop).thenReturn(loopMock);
+    try (var gameMockedStatic = mockStatic(Game.class);
+         var geomUtilsMockedStatic = mockStatic(GeometricUtilities.class)) {
+      gameMockedStatic.when(Game::physics).thenReturn(physicsEngineMock);
+      gameMockedStatic.when(Game::loop).thenReturn(loopMock);
 
-    // private method combineActiveForces()
-    MockedStatic<GeometricUtilities> geomUtilsMockedStatic = mockStatic(GeometricUtilities.class);
 
-    // test-entity properties
-    Force forcePenetrateOnCollision = spy(new Force(new Point2D.Double(0, 0), 3, 1));
-    forcePenetrateOnCollision.setCancelOnCollision(false);
-    Force forceCancelOnCollision = spy(new Force(new Point2D.Double(0, 0), 1, 1));
-    controller.apply(forcePenetrateOnCollision);
-    controller.apply(forceCancelOnCollision);
-    assertEquals(2, controller.getActiveForces().size());
+      // test-entity properties
+      Force forcePenetrateOnCollision = spy(new Force(new Point2D.Double(0, 0), 3, 1));
+      forcePenetrateOnCollision.setCancelOnCollision(false);
+      Force forceCancelOnCollision = spy(new Force(new Point2D.Double(0, 0), 1, 1));
+      controller.apply(forcePenetrateOnCollision);
+      controller.apply(forceCancelOnCollision);
+      assertEquals(2, controller.getActiveForces().size());
 
-    // act
-    controller.update();
+      // act
+      controller.update();
 
-    // assert
-    verify(forcePenetrateOnCollision, times(0)).end();
-    verify(forceCancelOnCollision, times(1)).end();
-
-    // cleanup
-    gameMockedStatic.close();
-    geomUtilsMockedStatic.close();
+      // assert
+      verify(forcePenetrateOnCollision, times(0)).end();
+      verify(forceCancelOnCollision, times(1)).end();
+    }
   }
 }

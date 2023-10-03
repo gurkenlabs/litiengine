@@ -27,7 +27,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.MockedStatic;
 
 @ExtendWith(GameTestSuite.class)
 class AbilityExecutionTest {
@@ -112,26 +111,24 @@ class AbilityExecutionTest {
     GameTime timeMock = mock(GameTime.class);
     when(timeMock.since(anyLong())).thenReturn(1L);
 
-    MockedStatic<Game> gameMockedStatic = mockStatic(Game.class);
-    gameMockedStatic.when(Game::time).thenReturn(timeMock);
-    gameMockedStatic
+    try (var gameMockedStatic = mockStatic(Game.class)) {
+      gameMockedStatic.when(Game::time).thenReturn(timeMock);
+      gameMockedStatic
         .when(Game::loop)
         .thenCallRealMethod(); // otherwise Game.loop() returns null because of the mock
 
-    AbilityExecution abilityExecution = new AbilityExecution(ability);
-    assertEquals(3, Game.loop().getUpdatableCount());
+      AbilityExecution abilityExecution = new AbilityExecution(ability);
+      assertEquals(3, Game.loop().getUpdatableCount());
 
-    // act
-    abilityExecution.update();
+      // act
+      abilityExecution.update();
 
-    // assert
-    assertEquals(4, Game.loop().getUpdatableCount());
-    assertTrue(abilityExecution.getAppliedEffects().contains(effectSpy));
-    verify(effectSpy, times(1)).apply(any(Shape.class));
-    verify(delayedEffectSpy, times(0)).apply(any(Shape.class));
-
-    // cleanup
-    gameMockedStatic.close();
+      // assert
+      assertEquals(4, Game.loop().getUpdatableCount());
+      assertTrue(abilityExecution.getAppliedEffects().contains(effectSpy));
+      verify(effectSpy, times(1)).apply(any(Shape.class));
+      verify(delayedEffectSpy, times(0)).apply(any(Shape.class));
+    }
   }
 
   @Test
@@ -141,57 +138,53 @@ class AbilityExecutionTest {
     TestAbility ability = new TestAbility(creature); // create ability without any effects
 
     IGameLoop loopSpy = spy(Game.loop());
-    MockedStatic<Game> gameMockedStatic = mockStatic(Game.class);
-    gameMockedStatic
+    try (var gameMockedStatic = mockStatic(Game.class)) {
+      gameMockedStatic
         .when(Game::time)
         .thenCallRealMethod(); // otherwise Game.time() returns null because of the mock
-    gameMockedStatic.when(Game::loop).thenReturn(loopSpy);
+      gameMockedStatic.when(Game::loop).thenReturn(loopSpy);
 
-    AbilityExecution abilityExecution = new AbilityExecution(ability);
-    assertEquals(3, Game.loop().getUpdatableCount());
-    assertTrue(abilityExecution.getAppliedEffects().isEmpty());
+      AbilityExecution abilityExecution = new AbilityExecution(ability);
+      assertEquals(3, Game.loop().getUpdatableCount());
+      assertTrue(abilityExecution.getAppliedEffects().isEmpty());
 
-    // act
-    abilityExecution.update();
+      // act
+      abilityExecution.update();
 
-    // assert
-    assertEquals(2, Game.loop().getUpdatableCount());
-    verify(loopSpy, times(1)).detach(abilityExecution);
-
-    // cleanup
-    gameMockedStatic.close();
+      // assert
+      assertEquals(2, Game.loop().getUpdatableCount());
+      verify(loopSpy, times(1)).detach(abilityExecution);
+    }
   }
 
   @Test
   void update_allEffectsApplied() {
     // arrange
     IGameLoop loopSpy = spy(Game.loop());
-    MockedStatic<Game> gameMockedStatic = mockStatic(Game.class);
-    gameMockedStatic
+    try (var gameMockedStatic = mockStatic(Game.class)) {
+      gameMockedStatic
         .when(Game::time)
         .thenCallRealMethod(); // otherwise Game.time() returns null because of the mock
-    gameMockedStatic.when(Game::loop).thenReturn(loopSpy);
+      gameMockedStatic.when(Game::loop).thenReturn(loopSpy);
 
-    TestEffect otherEffectSpy = spy(new TestEffect(ability));
-    ability.addEffect(otherEffectSpy);
+      TestEffect otherEffectSpy = spy(new TestEffect(ability));
+      ability.addEffect(otherEffectSpy);
 
-    AbilityExecution testAbilityExecution = new AbilityExecution(ability);
-    testAbilityExecution.getAppliedEffects().add(effectSpy);
-    testAbilityExecution.getAppliedEffects().add(otherEffectSpy);
+      AbilityExecution testAbilityExecution = new AbilityExecution(ability);
+      testAbilityExecution.getAppliedEffects().add(effectSpy);
+      testAbilityExecution.getAppliedEffects().add(otherEffectSpy);
 
-    assertEquals(3, Game.loop().getUpdatableCount());
-    assertTrue(testAbilityExecution.getAppliedEffects().contains(effectSpy));
-    assertTrue(testAbilityExecution.getAppliedEffects().contains(otherEffectSpy));
+      assertEquals(3, Game.loop().getUpdatableCount());
+      assertTrue(testAbilityExecution.getAppliedEffects().contains(effectSpy));
+      assertTrue(testAbilityExecution.getAppliedEffects().contains(otherEffectSpy));
 
-    // act
-    testAbilityExecution.update();
+      // act
+      testAbilityExecution.update();
 
-    // assert
-    assertEquals(2, Game.loop().getUpdatableCount());
-    verify(loopSpy, times(1)).detach(testAbilityExecution);
-
-    // cleanup
-    gameMockedStatic.close();
+      // assert
+      assertEquals(2, Game.loop().getUpdatableCount());
+      verify(loopSpy, times(1)).detach(testAbilityExecution);
+    }
   }
 
   private class TestAbility extends Ability {

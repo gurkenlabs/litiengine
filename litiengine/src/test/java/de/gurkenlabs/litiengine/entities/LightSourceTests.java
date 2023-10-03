@@ -71,7 +71,7 @@ class LightSourceTests {
     // assert
     assertTrue(lightSourceInactiveSpy.isActive());
     verify(lightSourceInactiveSpy, times(1))
-        .isLoaded(); // entry point of private method updateAmbientLayers()
+      .isLoaded(); // entry point of private method updateAmbientLayers()
   }
 
   @Test
@@ -85,7 +85,7 @@ class LightSourceTests {
     // assert
     assertTrue(lightSourceActiveSpy.isActive());
     verify(lightSourceActiveSpy, times(0))
-        .isLoaded(); // entry point of private method updateAmbientLayers()
+      .isLoaded(); // entry point of private method updateAmbientLayers()
   }
 
   @Test
@@ -99,7 +99,7 @@ class LightSourceTests {
     // assert
     assertFalse(lightSourceActiveSpy.isActive());
     verify(lightSourceActiveSpy, times(1))
-        .isLoaded(); // entry point of private method updateAmbientLayers()
+      .isLoaded(); // entry point of private method updateAmbientLayers()
   }
 
   @Test
@@ -113,7 +113,7 @@ class LightSourceTests {
     // assert
     assertFalse(lightSourceInactiveSpy.isActive());
     verify(lightSourceInactiveSpy, times(0))
-        .isLoaded(); // entry point of private method updateAmbientLayers()
+      .isLoaded(); // entry point of private method updateAmbientLayers()
   }
 
   @Test
@@ -121,56 +121,52 @@ class LightSourceTests {
     // arrange
     GameConfiguration actualGameConfigSpy = spy(Game.config());
     GraphicConfiguration actualGraphicsConfigSpy = spy(actualGameConfigSpy.graphics());
-    MockedStatic<Game> gameMockedStatic = mockStatic(Game.class);
-    gameMockedStatic
+    try (var gameMockedStatic = mockStatic(Game.class)) {
+      gameMockedStatic
         .when(Game::config)
         .thenReturn(actualGameConfigSpy); // otherwise it is null because of the mock
-    when(actualGameConfigSpy.graphics()).thenReturn(actualGraphicsConfigSpy);
-    when(actualGraphicsConfigSpy.renderDynamicShadows()).thenReturn(true);
+      when(actualGameConfigSpy.graphics()).thenReturn(actualGraphicsConfigSpy);
+      when(actualGraphicsConfigSpy.renderDynamicShadows()).thenReturn(true);
 
-    Environment mockedEnv = mock(Environment.class);
-    GameWorld mockedWorld = mock(GameWorld.class);
-    when(mockedWorld.environment()).thenReturn(mockedEnv);
-    gameMockedStatic.when(Game::world).thenReturn(mockedWorld);
+      Environment mockedEnv = mock(Environment.class);
+      GameWorld mockedWorld = mock(GameWorld.class);
+      when(mockedWorld.environment()).thenReturn(mockedEnv);
+      gameMockedStatic.when(Game::world).thenReturn(mockedWorld);
 
-    Graphics2D graphicMock = mock(Graphics2D.class);
+      Graphics2D graphicMock = mock(Graphics2D.class);
 
-    assertTrue(Game.config().graphics().renderDynamicShadows());
+      assertTrue(Game.config().graphics().renderDynamicShadows());
 
-    // act
-    lightSourceInactiveSpy.render(graphicMock);
+      // act
+      lightSourceInactiveSpy.render(graphicMock);
 
-    // assert
-    verify(mockedWorld, times(1))
+      // assert
+      verify(mockedWorld, times(1))
         .environment(); // world.environment() is entry point of private method renderShadows()
-
-    // cleanup
-    gameMockedStatic.close();
+    }
   }
 
   @Test
   void render_noDynamicShadows() {
     // arrange
     GameWorld mockedWorld = mock(GameWorld.class);
-    MockedStatic<Game> gameMockedStatic = mockStatic(Game.class);
-    gameMockedStatic.when(Game::world).thenReturn(mockedWorld);
-    gameMockedStatic
+    try (var gameMockedStatic = mockStatic(Game.class)) {
+      gameMockedStatic.when(Game::world).thenReturn(mockedWorld);
+      gameMockedStatic
         .when(Game::config)
         .thenCallRealMethod(); // otherwise it is null because of the mock
 
-    Graphics2D graphicMock = mock(Graphics2D.class);
+      Graphics2D graphicMock = mock(Graphics2D.class);
 
-    assertFalse(Game.config().graphics().renderDynamicShadows()); // is default
+      assertFalse(Game.config().graphics().renderDynamicShadows()); // is default
 
-    // act
-    lightSourceInactiveSpy.render(graphicMock);
+      // act
+      lightSourceInactiveSpy.render(graphicMock);
 
-    // assert
-    verify(mockedWorld, times(0))
+      // assert
+      verify(mockedWorld, times(0))
         .environment(); // world.environment() is entry point of private method renderShadows()
-
-    // cleanup
-    gameMockedStatic.close();
+    }
   }
 
   @Test
@@ -179,61 +175,57 @@ class LightSourceTests {
     when(lightSourceInactiveSpy.isLoaded()).thenReturn(true);
 
     GameWorld actualWorld = spy(Game.world());
-    MockedStatic<Game> gameMockedStatic = mockStatic(Game.class);
-    gameMockedStatic
+    try (var gameMockedStatic = mockStatic(Game.class)) {
+      gameMockedStatic
         .when(Game::world)
         .thenReturn(actualWorld); // otherwise it is null because of the mock
-    Environment environmentMock = mock(Environment.class);
-    when(actualWorld.environment()).thenReturn(environmentMock);
+      Environment environmentMock = mock(Environment.class);
+      when(actualWorld.environment()).thenReturn(environmentMock);
 
-    AmbientLight ambientLightMock = mock(AmbientLight.class);
-    when(environmentMock.getAmbientLight()).thenReturn(ambientLightMock);
-    StaticShadowLayer staticShadowLayerMock = mock(StaticShadowLayer.class);
-    when(environmentMock.getStaticShadowLayer()).thenReturn(staticShadowLayerMock);
+      AmbientLight ambientLightMock = mock(AmbientLight.class);
+      when(environmentMock.getAmbientLight()).thenReturn(ambientLightMock);
+      StaticShadowLayer staticShadowLayerMock = mock(StaticShadowLayer.class);
+      when(environmentMock.getStaticShadowLayer()).thenReturn(staticShadowLayerMock);
 
-    // act
-    lightSourceInactiveSpy.setColor(Color.GREEN); // means to trigger private method within
+      // act
+      lightSourceInactiveSpy.setColor(Color.GREEN); // means to trigger private method within
 
-    // assert
-    verify(lightSourceInactiveSpy, times(1))
+      // assert
+      verify(lightSourceInactiveSpy, times(1))
         .isLoaded(); // entry point of private method updateAmbientLayers()
-    verify(ambientLightMock, times(1)).updateSection(any(Rectangle2D.class));
-    verify(staticShadowLayerMock, times(1)).updateSection(any(Rectangle2D.class));
-
-    // cleanup
-    gameMockedStatic.close();
+      verify(ambientLightMock, times(1)).updateSection(any(Rectangle2D.class));
+      verify(staticShadowLayerMock, times(1)).updateSection(any(Rectangle2D.class));
+    }
   }
 
   @Test
   void updateAmbientLayers_doesNothingWhenNotLoaded() {
     // arrange
     when(lightSourceInactiveSpy.isLoaded())
-        .thenReturn(false); // should be default, just making sure
+      .thenReturn(false); // should be default, just making sure
 
     GameWorld actualWorld = spy(Game.world());
-    MockedStatic<Game> gameMockedStatic = mockStatic(Game.class);
-    gameMockedStatic
+    try (var gameMockedStatic = mockStatic(Game.class)) {
+      gameMockedStatic
         .when(Game::world)
         .thenReturn(actualWorld); // otherwise it is null because of the mock
-    Environment environmentMock = mock(Environment.class);
-    when(actualWorld.environment()).thenReturn(environmentMock);
+      Environment environmentMock = mock(Environment.class);
+      when(actualWorld.environment()).thenReturn(environmentMock);
 
-    AmbientLight ambientLightMock = mock(AmbientLight.class);
-    when(environmentMock.getAmbientLight()).thenReturn(ambientLightMock);
-    StaticShadowLayer staticShadowLayerMock = mock(StaticShadowLayer.class);
-    when(environmentMock.getStaticShadowLayer()).thenReturn(staticShadowLayerMock);
+      AmbientLight ambientLightMock = mock(AmbientLight.class);
+      when(environmentMock.getAmbientLight()).thenReturn(ambientLightMock);
+      StaticShadowLayer staticShadowLayerMock = mock(StaticShadowLayer.class);
+      when(environmentMock.getStaticShadowLayer()).thenReturn(staticShadowLayerMock);
 
-    // act
-    lightSourceInactiveSpy.setColor(Color.GREEN); // means to trigger private method within
+      // act
+      lightSourceInactiveSpy.setColor(Color.GREEN); // means to trigger private method within
 
-    // assert
-    verify(lightSourceInactiveSpy, times(1))
+      // assert
+      verify(lightSourceInactiveSpy, times(1))
         .isLoaded(); // entry point of private method updateAmbientLayers()
-    verify(ambientLightMock, times(0)).updateSection(any(Rectangle2D.class));
-    verify(staticShadowLayerMock, times(0)).updateSection(any(Rectangle2D.class));
-
-    // cleanup
-    gameMockedStatic.close();
+      verify(ambientLightMock, times(0)).updateSection(any(Rectangle2D.class));
+      verify(staticShadowLayerMock, times(0)).updateSection(any(Rectangle2D.class));
+    }
   }
 
   @Test
@@ -244,8 +236,8 @@ class LightSourceTests {
     GameWorld actualWorld = spy(Game.world());
     MockedStatic<Game> gameMockedStatic = mockStatic(Game.class);
     gameMockedStatic
-        .when(Game::world)
-        .thenReturn(actualWorld); // otherwise it is null because of the mock
+      .when(Game::world)
+      .thenReturn(actualWorld); // otherwise it is null because of the mock
     Environment environmentMock = mock(Environment.class);
     when(actualWorld.environment()).thenReturn(null);
 
@@ -259,7 +251,7 @@ class LightSourceTests {
 
     // assert
     verify(lightSourceInactiveSpy, times(1))
-        .isLoaded(); // entry point of private method updateAmbientLayers()
+      .isLoaded(); // entry point of private method updateAmbientLayers()
     verify(actualWorld, times(2)).environment();
     verify(ambientLightMock, times(0)).updateSection(any(Rectangle2D.class));
     verify(staticShadowLayerMock, times(0)).updateSection(any(Rectangle2D.class));
@@ -276,8 +268,8 @@ class LightSourceTests {
     GameWorld actualWorld = spy(Game.world());
     MockedStatic<Game> gameMockedStatic = mockStatic(Game.class);
     gameMockedStatic
-        .when(Game::world)
-        .thenReturn(actualWorld); // otherwise it is null because of the mock
+      .when(Game::world)
+      .thenReturn(actualWorld); // otherwise it is null because of the mock
     Environment environmentMock = mock(Environment.class);
     when(actualWorld.environment()).thenReturn(environmentMock);
 
@@ -291,7 +283,7 @@ class LightSourceTests {
 
     // assert
     verify(lightSourceInactiveSpy, times(1))
-        .isLoaded(); // entry point of private method updateAmbientLayers()
+      .isLoaded(); // entry point of private method updateAmbientLayers()
     verify(ambientLightMock, times(0)).updateSection(any(Rectangle2D.class));
     verify(staticShadowLayerMock, times(0)).updateSection(any(Rectangle2D.class));
 
@@ -306,7 +298,7 @@ class LightSourceTests {
     assertTrue(lightSourceActiveSpy.isActive());
 
     when(lightSourceInactiveSpy.isLoaded())
-        .thenReturn(false); // prevent further actions in private methods
+      .thenReturn(false); // prevent further actions in private methods
 
     // act
     lightSourceInactiveSpy.toggle();
@@ -316,9 +308,9 @@ class LightSourceTests {
     assertTrue(lightSourceInactiveSpy.isActive());
     assertFalse(lightSourceActiveSpy.isActive());
     verify(lightSourceInactiveSpy, times(1))
-        .isLoaded(); // entry point of private method updateAmbientLayers()
+      .isLoaded(); // entry point of private method updateAmbientLayers()
     verify(lightSourceActiveSpy, times(1))
-        .isLoaded(); // entry point of private method updateAmbientLayers()
+      .isLoaded(); // entry point of private method updateAmbientLayers()
   }
 
   @Test
@@ -338,13 +330,13 @@ class LightSourceTests {
   void sendMessage_togglesOnValidMessage() {
     // arrange
     when(lightSourceInactiveSpy.isLoaded())
-        .thenReturn(false); // prevent further actions in private methods
+      .thenReturn(false); // prevent further actions in private methods
     assertFalse(lightSourceInactiveSpy.isActive());
 
     // act, assert
     assertEquals(
-        "true",
-        lightSourceInactiveSpy.sendMessage(lightSourceInactiveSpy, LightSource.TOGGLE_MESSAGE));
+      "true",
+      lightSourceInactiveSpy.sendMessage(lightSourceInactiveSpy, LightSource.TOGGLE_MESSAGE));
     verify(lightSourceInactiveSpy, times(1)).toggle();
   }
 
@@ -353,8 +345,8 @@ class LightSourceTests {
     // arrange
     Point2D newShapeLocation = new Point2D.Double(42, 42);
     Rectangle2D newShape =
-        new Rectangle2D.Double(
-            newShapeLocation.getX(), newShapeLocation.getY(), 32, 32); // 32 is default
+      new Rectangle2D.Double(
+        newShapeLocation.getX(), newShapeLocation.getY(), 32, 32); // 32 is default
 
     lightSourceInactiveSpy.setLightShapeType(LightSource.Type.RECTANGLE);
     assertEquals(LightSource.Type.RECTANGLE, lightSourceInactiveSpy.getLightShapeType());
@@ -371,8 +363,8 @@ class LightSourceTests {
     // arrange
     Point2D newShapeLocation = new Point2D.Double(42, 42);
     Ellipse2D newShape =
-        new Ellipse2D.Double(
-            newShapeLocation.getX(), newShapeLocation.getY(), 32, 32); // 32 is default
+      new Ellipse2D.Double(
+        newShapeLocation.getX(), newShapeLocation.getY(), 32, 32); // 32 is default
 
     lightSourceInactiveSpy.setLightShapeType(LightSource.Type.ELLIPSE);
     assertEquals(LightSource.Type.ELLIPSE, lightSourceInactiveSpy.getLightShapeType());
@@ -410,7 +402,7 @@ class LightSourceTests {
     // assert
     assertEquals(newColor, lightSourceInactiveSpy.getColor());
     verify(lightSourceInactiveSpy, times(1))
-        .isLoaded(); // entry point of private method updateAmbientLayers()
+      .isLoaded(); // entry point of private method updateAmbientLayers()
   }
 
   @Test
@@ -425,7 +417,7 @@ class LightSourceTests {
     // assert
     assertEquals(newIntensity, lightSourceActiveSpy.getIntensity());
     verify(lightSourceActiveSpy, times(1))
-        .isLoaded(); // entry point of private method updateAmbientLayers()
+      .isLoaded(); // entry point of private method updateAmbientLayers()
   }
 
   @Test
@@ -435,7 +427,7 @@ class LightSourceTests {
     assertEquals(0, lightSourceInactiveSpy.getX()); // default
 
     when(lightSourceInactiveSpy.isLoaded())
-        .thenReturn(false); // prevent further actions in private methods
+      .thenReturn(false); // prevent further actions in private methods
     doNothing().when(lightSourceInactiveSpy).setLocation(anyDouble(), anyDouble());
 
     // act
@@ -444,9 +436,9 @@ class LightSourceTests {
     // assert
     verify(lightSourceInactiveSpy, times(1)).setLocation(newX, 0);
     verify(lightSourceInactiveSpy, times(1))
-        .getLightShapeType(); // entry point of private method updateShape()
+      .getLightShapeType(); // entry point of private method updateShape()
     verify(lightSourceInactiveSpy, times(1))
-        .isLoaded(); // entry point of private method updateAmbientLayers()
+      .isLoaded(); // entry point of private method updateAmbientLayers()
   }
 
   @Test
@@ -456,7 +448,7 @@ class LightSourceTests {
     assertEquals(0, lightSourceInactiveSpy.getY()); // default
 
     when(lightSourceInactiveSpy.isLoaded())
-        .thenReturn(false); // prevent further actions in private methods
+      .thenReturn(false); // prevent further actions in private methods
     doNothing().when(lightSourceInactiveSpy).setLocation(anyDouble(), anyDouble());
 
     // act
@@ -465,9 +457,9 @@ class LightSourceTests {
     // assert
     verify(lightSourceInactiveSpy, times(1)).setLocation(0, newY);
     verify(lightSourceInactiveSpy, times(1))
-        .getLightShapeType(); // entry point of private method updateShape()
+      .getLightShapeType(); // entry point of private method updateShape()
     verify(lightSourceInactiveSpy, times(1))
-        .isLoaded(); // entry point of private method updateAmbientLayers()
+      .isLoaded(); // entry point of private method updateAmbientLayers()
   }
 
   @Test
@@ -477,7 +469,7 @@ class LightSourceTests {
     assertEquals(32, lightSourceInactiveSpy.getHeight()); // default
 
     when(lightSourceInactiveSpy.isLoaded())
-        .thenReturn(false); // prevent further actions in private methods
+      .thenReturn(false); // prevent further actions in private methods
 
     // act
     lightSourceInactiveSpy.setHeight(newHeight);
@@ -485,9 +477,9 @@ class LightSourceTests {
     // assert
     assertEquals(newHeight, lightSourceInactiveSpy.getHeight());
     verify(lightSourceInactiveSpy, times(1))
-        .getLightShapeType(); // entry point of private method updateShape()
+      .getLightShapeType(); // entry point of private method updateShape()
     verify(lightSourceInactiveSpy, times(1))
-        .isLoaded(); // entry point of private method updateAmbientLayers()
+      .isLoaded(); // entry point of private method updateAmbientLayers()
   }
 
   @Test
@@ -497,7 +489,7 @@ class LightSourceTests {
     assertEquals(32, lightSourceInactiveSpy.getWidth()); // default
 
     when(lightSourceInactiveSpy.isLoaded())
-        .thenReturn(false); // prevent further actions in private methods
+      .thenReturn(false); // prevent further actions in private methods
 
     // act
     lightSourceInactiveSpy.setWidth(newWidth);
@@ -505,9 +497,9 @@ class LightSourceTests {
     // assert
     assertEquals(newWidth, lightSourceInactiveSpy.getWidth());
     verify(lightSourceInactiveSpy, times(1))
-        .getLightShapeType(); // entry point of private method updateShape()
+      .getLightShapeType(); // entry point of private method updateShape()
     verify(lightSourceInactiveSpy, times(1))
-        .isLoaded(); // entry point of private method updateAmbientLayers()
+      .isLoaded(); // entry point of private method updateAmbientLayers()
   }
 
   @Test
@@ -522,7 +514,7 @@ class LightSourceTests {
     // assert
     assertEquals(newLocation, lightSourceInactiveSpy.getLocation());
     verify(lightSourceInactiveSpy, times(1))
-        .getLightShapeType(); // entry point of private method updateShape()
+      .getLightShapeType(); // entry point of private method updateShape()
   }
 
   @Test
@@ -550,9 +542,9 @@ class LightSourceTests {
     int secondRadius = 1;
 
     LightSource firstLightSourceSpy =
-        spy(new LightSource(10, Color.WHITE, LightSource.Type.ELLIPSE, false));
+      spy(new LightSource(10, Color.WHITE, LightSource.Type.ELLIPSE, false));
     LightSource secondLightSourceSpy =
-        spy(new LightSource(10, Color.WHITE, LightSource.Type.ELLIPSE, false));
+      spy(new LightSource(10, Color.WHITE, LightSource.Type.ELLIPSE, false));
     assertEquals(0, firstLightSourceSpy.getRadius());
     assertEquals(0, secondLightSourceSpy.getRadius());
 

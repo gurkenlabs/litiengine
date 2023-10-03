@@ -29,7 +29,6 @@ import java.awt.geom.Rectangle2D;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.MockedStatic;
 
 @ExtendWith(GameTestSuite.class)
 class AbilityTests {
@@ -353,7 +352,7 @@ class AbilityTests {
     Graphics2D graphics = mock(Graphics2D.class);
     RenderEngine renderEngine = mock(RenderEngine.class);
 
-    try (MockedStatic<Game> gameMockedStatic = mockStatic(Game.class)) {
+    try (var gameMockedStatic = mockStatic(Game.class)) {
       gameMockedStatic.when(Game::graphics).thenReturn(renderEngine);
 
       // act

@@ -19,12 +19,13 @@ import de.gurkenlabs.litiengine.abilities.Ability;
 import de.gurkenlabs.litiengine.attributes.RangeAttribute;
 import de.gurkenlabs.litiengine.test.GameTestSuite;
 import de.gurkenlabs.litiengine.tweening.TweenType;
+
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.MockedStatic;
 
 @ExtendWith(GameTestSuite.class)
 class CombatEntityTests {
@@ -294,14 +295,12 @@ class CombatEntityTests {
     // arrange
     GameTime timeMock = mock(GameTime.class);
     when(timeMock.since(anyLong())).thenReturn(500L);
-    MockedStatic<Game> gameMockedStatic = mockStatic(Game.class);
-    gameMockedStatic.when(Game::time).thenReturn(timeMock);
+    try (var gameMockedStatic = mockStatic(Game.class)) {
+      gameMockedStatic.when(Game::time).thenReturn(timeMock);
 
-    // act, assert
-    assertTrue(combatEntitySpy.wasHit(800));
-
-    // cleanup
-    gameMockedStatic.close();
+      // act, assert
+      assertTrue(combatEntitySpy.wasHit(800));
+    }
   }
 
   @Test
@@ -309,14 +308,12 @@ class CombatEntityTests {
     // arrange
     GameTime timeMock = mock(GameTime.class);
     when(timeMock.since(anyLong())).thenReturn(500L);
-    MockedStatic<Game> gameMockedStatic = mockStatic(Game.class);
-    gameMockedStatic.when(Game::time).thenReturn(timeMock);
+    try (var gameMockedStatic = mockStatic(Game.class)) {
+      gameMockedStatic.when(Game::time).thenReturn(timeMock);
 
-    // act, assert
-    assertFalse(combatEntitySpy.wasHit(500));
-
-    // cleanup
-    gameMockedStatic.close();
+      // act, assert
+      assertFalse(combatEntitySpy.wasHit(500));
+    }
   }
 
   @Test
@@ -324,13 +321,11 @@ class CombatEntityTests {
     // arrange
     GameTime timeMock = mock(GameTime.class);
     when(timeMock.since(anyLong())).thenReturn(500L);
-    MockedStatic<Game> gameMockedStatic = mockStatic(Game.class);
-    gameMockedStatic.when(Game::time).thenReturn(timeMock);
+    try (var gameMockedStatic = mockStatic(Game.class)) {
+      gameMockedStatic.when(Game::time).thenReturn(timeMock);
 
-    // act, assert
-    assertFalse(combatEntitySpy.wasHit(300));
-
-    // cleanup
-    gameMockedStatic.close();
+      // act, assert
+      assertFalse(combatEntitySpy.wasHit(300));
+    }
   }
 }

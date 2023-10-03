@@ -20,6 +20,7 @@ import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.GameWorld;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
+
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,11 +29,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.MockedStatic;
 
 class EntityTests {
 
@@ -143,20 +144,19 @@ class EntityTests {
     TestEntity entitySpy = spy(new TestEntity());
     when(entitySpy.getTags()).thenReturn(tagListSpy);
 
-    MockedStatic<Game> gameMockedStatic = mockStatic(Game.class);
-    GameWorld gameWorldMock = mock(GameWorld.class);
-    when(gameWorldMock.environment()).thenReturn(null);
-    gameMockedStatic.when(Game::world).thenReturn(gameWorldMock);
+    try (var gameMockedStatic = mockStatic(Game.class)) {
+      GameWorld gameWorldMock = mock(GameWorld.class);
+      when(gameWorldMock.environment()).thenReturn(null);
+      gameMockedStatic.when(Game::world).thenReturn(gameWorldMock);
 
-    // act
-    entitySpy.removeTag(tag);
+      // act
+      entitySpy.removeTag(tag);
 
-    // assert
-    verify(tagListSpy, times(1)).remove(tag);
-    verify(entitySpy, times(0)).getEnvironment();
+      // assert
+      verify(tagListSpy, times(1)).remove(tag);
+      verify(entitySpy, times(0)).getEnvironment();
 
-    // cleanup
-    gameMockedStatic.close();
+    }
   }
 
   @Test
@@ -176,28 +176,26 @@ class EntityTests {
     when(environmentMock.getEntitiesByTag()).thenReturn(entities);
     when(entitySpy.getEnvironment()).thenReturn(environmentMock);
 
-    MockedStatic<Game> gameMockedStatic = mockStatic(Game.class);
-    GameWorld gameWorldMock = mock(GameWorld.class);
-    when(gameWorldMock.environment()).thenReturn(mock(Environment.class));
-    gameMockedStatic.when(Game::world).thenReturn(gameWorldMock);
+    try (var gameMockedStatic = mockStatic(Game.class)) {
+      GameWorld gameWorldMock = mock(GameWorld.class);
+      when(gameWorldMock.environment()).thenReturn(mock(Environment.class));
+      gameMockedStatic.when(Game::world).thenReturn(gameWorldMock);
 
-    assertEquals(1, entities.size());
+      assertEquals(1, entities.size());
 
-    // act
-    entitySpy.removeTag(tag);
+      // act
+      entitySpy.removeTag(tag);
 
-    // assert
-    verify(tagListSpy, times(1)).remove(tag);
-    assertEquals(0, entities.size());
-
-    // cleanup
-    gameMockedStatic.close();
+      // assert
+      verify(tagListSpy, times(1)).remove(tag);
+      assertEquals(0, entities.size());
+    }
   }
 
   @ParameterizedTest(name = "testToString name is {0}")
   @MethodSource("getToStringParameters")
   void testToString(
-      String testName, int mapId, String name, int getNameInvocations, String expectedName) {
+    String testName, int mapId, String name, int getNameInvocations, String expectedName) {
     // arrange
     TestEntity entitySpy = spy(new TestEntity());
     when(entitySpy.getMapId()).thenReturn(mapId);
@@ -480,10 +478,10 @@ class EntityTests {
 
   private static Stream<Arguments> getToStringParameters() {
     return Stream.of(
-        Arguments.of(
-            "null", 5, null, 1, "#5: TestEntity"), // second in if is dropped when first is false
-        Arguments.of("empty", 5, "", 2, "#5: TestEntity"),
-        Arguments.of("valid", 5, "test name", 3, "#5: test name"));
+      Arguments.of(
+        "null", 5, null, 1, "#5: TestEntity"), // second in if is dropped when first is false
+      Arguments.of("empty", 5, "", 2, "#5: TestEntity"),
+      Arguments.of("valid", 5, "test name", 3, "#5: test name"));
   }
 
   @Tag("some tag")
@@ -504,12 +502,15 @@ class EntityTests {
     }
 
     @SuppressWarnings("unused")
-    public void imNotAnAction() {}
+    public void imNotAnAction() {
+    }
 
     @Action
-    public void imNotParameterless(int something) {}
+    public void imNotParameterless(int something) {
+    }
 
     @Action
-    private void privateAction() {}
+    private void privateAction() {
+    }
   }
 }
