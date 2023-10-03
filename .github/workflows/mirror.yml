@@ -1,7 +1,7 @@
 name: Mirror To Codeberg
 on:
   push:
-    branches: ["master"]
+    branches: ["main"]
   workflow_dispatch: # Manual dispatch
   schedule:
     - cron: "0 6 * * *"

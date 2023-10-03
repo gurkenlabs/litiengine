@@ -2,7 +2,7 @@
 You are awesome! Thank you for considering contributing to LITIENGINE.
 Before you start, we would like to share a few guidelines for contributions to LITIENGINE with you.
 
-In order to contribute to our project, we expect you to have fully read and agreed to our [Code of Conduct](https://github.com/gurkenlabs/LITIENGINE/blob/master/CODE_OF_CONDUCT.md). 
+In order to contribute to our project, we expect you to have fully read and agreed to our [Code of Conduct](https://github.com/gurkenlabs/LITIENGINE/blob/main/CODE_OF_CONDUCT.md). 
 
 ## How can I help?
 You can not only support the development of LITIENGINE by contributing code!
@@ -75,7 +75,7 @@ You can do so by sponsoring [LITIENGINE on OpenCollective](https://opencollectiv
   * Clean up your code following our style guide below.
 * File a Pull Request
   * We try to review pull requests as often as possible, but don't be mad if it takes us some days before reviewing yours.
-  * As soon as your changes were reviewed and approved, we will merge them into the master branch.
+  * As soon as your changes were reviewed and approved, we will merge them into the main branch.
   * Due to questionable design decisions, violations of our code of conduct, or bugs, we may reject pull requests and ask for changes. Again, this is nothing to be mad about: After you've revised the defective portions of your pull request, we'll happily review it once more.
   * Changes resulting in build and test pipeline failures that cannot be resolved within two days will be reverted.
 

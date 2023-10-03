@@ -5,7 +5,7 @@
 [![Build](https://github.com/gurkenlabs/litiengine/actions/workflows/build.yml/badge.svg)](https://github.com/gurkenlabs/litiengine/actions/workflows/build.yml)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=de.gurkenlabs.litiengine&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=de.gurkenlabs.litiengine)
 [![Maven Central](https://img.shields.io/maven-central/v/de.gurkenlabs/litiengine.svg?style=flat)](https://maven-badges.herokuapp.com/maven-central/de.gurkenlabs/litiengine)
-[![MIT License](https://img.shields.io/github/license/gurkenlabs/litiengine?style=flat)](https://github.com/gurkenlabs/litiengine/blob/master/LICENSE)
+[![MIT License](https://img.shields.io/github/license/gurkenlabs/litiengine?style=flat)](https://github.com/gurkenlabs/litiengine/blob/main/LICENSE)
 [![Discord chat](https://img.shields.io/discord/326074836508213258?style=flat&logo=discord)](https://discord.gg/rRB9cKD)
 [![Financial Supporters](https://img.shields.io/opencollective/all/litiengine?label=financial%20supporters&style=flat)](https://opencollective.com/litiengine)
 
@@ -74,8 +74,8 @@ You've encountered an obvious issue or bug with LITIENGINE or want to request en
 ## :handshake: Contributing
 If you've decided to help out with LITIENGINE's development - you're awesome!
 And here's what you need to to:
-* Agree to our [Code of Conduct](https://github.com/gurkenlabs/litiengine/blob/master/CODE_OF_CONDUCT.md)
-* View our [Contribution guidelines](https://github.com/gurkenlabs/litiengine/blob/master/CONTRIBUTING.md)
+* Agree to our [Code of Conduct](https://github.com/gurkenlabs/litiengine/blob/main/CODE_OF_CONDUCT.md)
+* View our [Contribution guidelines](https://github.com/gurkenlabs/litiengine/blob/main/CONTRIBUTING.md)
 
 ## Star History (Compared with other 2D java game libraries / frameworks / engines)
 
