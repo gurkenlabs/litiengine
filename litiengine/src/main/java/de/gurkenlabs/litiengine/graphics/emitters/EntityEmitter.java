@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.graphics.emitters;
 
+import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import java.awt.geom.Point2D;
@@ -92,6 +93,8 @@ public class EntityEmitter extends Emitter {
     super();
     this.entity = entity;
     this.dynamicLocation = dynamicLocation;
+    setX(entity.getCenter().getX() - getWidth() / 2d);
+    setY(entity.getCenter().getY() - getHeight() / 2d);
   }
 
   /**

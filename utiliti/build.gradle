@@ -75,7 +75,7 @@ tasks.register("createLicenseProperties") {
       Properties p = new Properties()
       p['copyright'] = copyright.toString()
       p['website'] = gurkenlabs_url
-      p['version'] = version
+      p['version'] = version.toString()
       p.store w, null
     }
   }

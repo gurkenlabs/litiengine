@@ -5,23 +5,23 @@ plugins {
   alias libs.plugins.versions
   alias libs.plugins.dependencyCheck
   alias libs.plugins.grgit
-  alias libs.plugins.semanticVersioning
   alias libs.plugins.nexusPublish
   alias libs.plugins.sonarQube
+  alias libs.plugins.semverguru
 
   id "licensing-defaults"
-  id "versioning-defaults"
   id "sonarqube-defaults"
-}
-
-subprojects {
-  project.version = rootProject.version
 }
 
 group = gurkenlabs_group
 
+allprojects {
+  project.version += isTaggedRevision(project.version) ? "" : "-SNAPSHOT"
+  project.getLogger().lifecycle("Set project '{}' version to '{}'.", project.name, project.version)
+}
+
 nexusPublishing {
-  useStaging.set(!isSnapshotVersion())
+  useStaging.set(isTaggedRevision(project.version))
   repositories {
     sonatype {
       username = project.findProperty('sonatypeUsername') ?: project.findProperty('OSSRH_USERNAME') ?: ''
@@ -29,3 +29,4 @@ nexusPublishing {
     }
   }
 }
+

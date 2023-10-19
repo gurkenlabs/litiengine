@@ -25,25 +25,23 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Gradle Wrapper Validation
-        uses: gradle/wrapper-validation-action@v1
-
       - name: JDK Setup
         uses: actions/setup-java@v3.13.0
         with:
           distribution: temurin
-          java-version: 20
+          java-version: 21
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+
+      - name: Gradle Wrapper Validation
+        uses: gradle/wrapper-validation-action@v1
 
       - name: D-BUS AT-SPI Installation
         run: sudo apt-get -y install at-spi2-core
 
       - name: Build
-        uses: gradle/gradle-build-action@v2.9.0
-        with:
-          arguments: |
-            build
-            -x test
-            -PskipSpotless
+        run: ./gradlew build -x test -PskipSpotless
 
       - name: Test
         uses: coactions/setup-xvfb@v1.0.1
@@ -51,22 +49,14 @@ jobs:
           run: ./gradlew jacocoTestReport -PskipSpotless
 
       - name: Package Creation
-        uses: gradle/gradle-build-action@v2.9.0
-        with:
-          arguments: jpackage
+        run: ./gradlew jpackage
 
       - name: Static Analysis
-        uses: gradle/gradle-build-action@v2.9.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         if: ${{!github.event.pull_request.head.repo.fork}}
-        with:
-          arguments: |
-            sonar
-            -PskipSpotless
+        run: ./gradlew sonar -PskipSpotless
 
       - name: Code Style Validation
-        uses: gradle/gradle-build-action@v2.9.0
-        with:
-          arguments: spotlessCheck
+        run: ./gradlew spotlessCheck

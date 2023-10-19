@@ -10,12 +10,12 @@ on:
         type: choice
         description: "increment version?"
         required: true
-        default: 'none'
+        default: 'no'
         options:
-          - NO
-          - PATCH
-          - MINOR
-          - MAJOR
+          - no
+          - patch
+          - minor
+          - major
   schedule:
     # Midnight every day
     - cron: "0 0 * * *"
@@ -28,54 +28,33 @@ jobs:
       contents: write
       packages: read
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4.1.0
         with:
           fetch-depth: 0
 
-      - name: Set up JDK 19
-        uses: actions/setup-java@v3
+      - name: JDK Setup
+        uses: actions/setup-java@v3.13.0
         with:
           distribution: temurin
-          java-version: 19
+          java-version: 21
 
-      - name: Print project version
+      - name: Gradle Setup
         uses: gradle/gradle-build-action@v2
-        with:
-          arguments: printGitSemVer
 
       - name: Increment patch version
-        if: inputs.incrementVersion == 'PATCH'
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: incrementPatchVersion
-
-      - name: Increment minor version
-        if: inputs.incrementVersion == 'MINOR'
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: incrementMinorVersion
-
-      - name: Increment major version
-        if: inputs.incrementVersion == 'MAJOR'
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: incrementMajorVersion
-
-      - name: Push tags
-        if: inputs.incrementVersion != 'NO'
-        uses: gradle/gradle-build-action@v2
-        env:
-          GRGIT_USER: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          arguments: pushTags
+        if: inputs.incrementVersion != 'no'
+        run: ./gradlew incrementVersion --increment=${{inputs.incrementVersion}}
 
       - name: Publish
-        uses: gradle/gradle-build-action@v2
         env:
           ORG_GRADLE_PROJECT_sonatypeUsername: ${{ secrets.OSSRH_USERNAME }}
           ORG_GRADLE_PROJECT_sonatypePassword: ${{ secrets.OSSRH_PASSWORD }}
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.PGP_SECRET }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PGP_PASSPHRASE }}
-        with:
-          arguments: |
-            publishToSonatype closeSonatypeStagingRepository
+        run: ./gradlew publishToSonatype closeSonatypeStagingRepository
+
+      - name: Push tags
+        if: inputs.incrementVersion != 'no'
+        env:
+          GRGIT_USER: ${{ secrets.GITHUB_TOKEN }}
+        run: ./gradlew pushTags
