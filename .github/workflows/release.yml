@@ -41,7 +41,7 @@ jobs:
       - name: Gradle Setup
         uses: gradle/gradle-build-action@v2
 
-      - name: Increment patch version
+      - name: Increment version
         if: inputs.incrementVersion != 'none'
         run: ./gradlew incrementVersion --increment=${{inputs.incrementVersion}}
 
