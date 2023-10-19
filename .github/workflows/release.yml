@@ -10,9 +10,9 @@ on:
         type: choice
         description: "increment version?"
         required: true
-        default: 'no'
+        default: 'none'
         options:
-          - no
+          - none
           - patch
           - minor
           - major
@@ -42,7 +42,7 @@ jobs:
         uses: gradle/gradle-build-action@v2
 
       - name: Increment patch version
-        if: inputs.incrementVersion != 'no'
+        if: inputs.incrementVersion != 'none'
         run: ./gradlew incrementVersion --increment=${{inputs.incrementVersion}}
 
       - name: Publish
