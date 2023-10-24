@@ -18,7 +18,7 @@ jobs:
   fullbuild:
     runs-on: ubuntu-latest
 
-    name: Java 20 build
+    name: Build and Verify
     steps:
       - name: Checkout
         uses: actions/checkout@v4.1.0
@@ -48,7 +48,7 @@ jobs:
         with:
           run: ./gradlew jacocoTestReport -PskipSpotless
 
-      - name: Package Creation
+      - name: Create Packages
         run: ./gradlew jpackage
 
       - name: Static Analysis
