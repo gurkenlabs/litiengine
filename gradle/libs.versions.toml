@@ -41,4 +41,4 @@ spotless = { id = "com.diffplug.spotless", version = "6.22.0" }
 versions = { id = "com.github.ben-manes.versions", version = "0.48.0" }
 dependencyCheck = { id = "org.owasp.dependencycheck", version = "8.4.0" }
 grgit = { id = "org.ajoberstar.grgit", version = "5.2.0" }
-semverguru = { id = "de.gurkenlabs.semverguru", version = "1.1" }
+semverguru = { id = "de.gurkenlabs.semverguru", version = "1.2" }
