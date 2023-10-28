@@ -3,7 +3,7 @@ name: Create release
 on:
   push:
     tags:
-      - "v[0-9]+.[0-9]+.[0-9]+-rc[0-9]+"
+      - "[0-9]+.[0-9]+.[0-9]+"
 
 jobs:
   create_release:
@@ -16,11 +16,11 @@ jobs:
         id: tag_version
         shell: bash
         run: |
-          echo ::set-output name=release_version::$(echo ${{github.ref_name}} | sed "s/^.*v\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\)-.*$/\1/")
+          echo ::set-output name=release_version::$(echo ${{github.ref_name}} | sed "s/^.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\)")
       - name: Add release message
         uses: softprops/action-gh-release@v1
         with:
-          name: v${{ steps.tag_version.outputs.release_version }}
+          name: ${{ steps.tag_version.outputs.release_version }}
           draft: true
           body: |
             Download the LITIENGINE SDK from https://litiengine.com/download/.
