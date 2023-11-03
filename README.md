@@ -30,7 +30,7 @@ repositories {
 }
 
 dependencies {
-  implementation 'de.gurkenlabs:litiengine:0.5.2'
+  implementation 'de.gurkenlabs:litiengine:0.6.0'
 }
 ```
 
@@ -41,7 +41,7 @@ repositories {
 }
 
 dependencies {
-  implementation("de.gurkenlabs:litiengine:0.5.2")
+  implementation("de.gurkenlabs:litiengine:0.6.0")
 }
 ```
 ### Other ways of installing and using LITIENGINE

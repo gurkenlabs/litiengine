@@ -21,7 +21,7 @@ on:
     - cron: "0 0 * * *"
 
 jobs:
-  gradle:
+  release:
     name: Release build
     runs-on: ubuntu-latest
     permissions:
@@ -45,7 +45,17 @@ jobs:
         if: inputs.incrementVersion != 'none' && inputs.incrementVersion != ''
         run: ./gradlew incrementVersion --increment=${{inputs.incrementVersion}}
 
-      - name: Publish
+      - name: Publish Snapshot
+        if: inputs.incrementVersion == 'none' || inputs.incrementVersion == ''
+        env:
+          ORG_GRADLE_PROJECT_sonatypeUsername: ${{ secrets.OSSRH_USERNAME }}
+          ORG_GRADLE_PROJECT_sonatypePassword: ${{ secrets.OSSRH_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.PGP_SECRET }}
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PGP_PASSPHRASE }}
+        run: ./gradlew publishToSonatype closeSonatypeStagingRepository
+
+      - name: Publish Stable
+        if: inputs.incrementVersion != 'none' && inputs.incrementVersion != ''
         env:
           ORG_GRADLE_PROJECT_sonatypeUsername: ${{ secrets.OSSRH_USERNAME }}
           ORG_GRADLE_PROJECT_sonatypePassword: ${{ secrets.OSSRH_PASSWORD }}
@@ -58,3 +68,83 @@ jobs:
         env:
           GRGIT_USER: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew pushTags
+
+  package:
+    name: Package distribution
+    if: inputs.incrementVersion != 'none' && inputs.incrementVersion != ''
+    needs: release
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+
+      - name: Package
+        run: ./gradlew jpackage -Prelease=true
+
+      - name: Upload package
+        uses: actions/upload-artifact@v3
+        with:
+          name: utiLITI-${{ runner.os }}
+          path: build/litiengine-utiliti/jpackage
+
+  create_release:
+    name: Create GitHub release
+    if: inputs.incrementVersion != 'none' && inputs.incrementVersion != ''
+    needs: package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Extract version number
+        id: tag_version
+        shell: bash
+        run: |
+          echo ::set-output name=release_version::$(echo ${{github.ref_name}} | sed "s/^.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\)")
+      - name: Add release message
+        uses: softprops/action-gh-release@v1
+        with:
+          name: ${{ steps.tag_version.outputs.release_version }}
+          draft: true
+          body: |
+            Download the LITIENGINE SDK from https://litiengine.com/download/.
+            LITIENGINE is available through [Maven Central](https://search.maven.org/artifact/de.gurkenlabs/litiengine):
+            <details>
+              <summary>Gradle (Groovy)</summary>
+
+              ````groovy
+              implementation 'de.gurkenlabs:litiengine:${{ steps.tag_version.outputs.release_version }}'
+              ````
+            </details>
+
+            <details>
+              <summary>Gradle (Kotlin)</summary>
+
+              ````kotlin
+              implementation("de.gurkenlabs:litiengine:${{ steps.tag_version.outputs.release_version }}")
+              ````
+            </details>
+
+            <details>
+              <summary>Maven</summary>
+
+              ````xml
+              <dependency>
+                <groupId>de.gurkenlabs</groupId>
+                <artifactId>litiengine</artifactId>
+                <version>${{ steps.tag_version.outputs.release_version }}</version>
+              </dependency>
+              ````
+            </details>
