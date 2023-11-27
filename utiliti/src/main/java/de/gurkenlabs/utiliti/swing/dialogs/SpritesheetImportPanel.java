@@ -55,8 +55,8 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
   private final DefaultListModel<SpriteFileWrapper> fileListModel;
   private final DefaultTableModel treeModel;
   private JLabel labelImage;
-  private JLabel labelWidth;
-  private JLabel labelHeight;
+  private JLabel labelImageSize;
+  private JLabel labelFrameSize;
   private JSpinner spinnerColumns;
   private JSpinner spinnerRows;
   private boolean isUpdating;
@@ -120,8 +120,8 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
               try {
                 SpriteFileWrapper file = fileList.getSelectedValue();
                 labelImage.setIcon(file.getIcon());
-                labelWidth.setText(file.getWidth() + "px");
-                labelHeight.setText(file.getHeight() + "px");
+                labelImageSize.setText(file.getWidth() + " x " + file.getHeight() + " px");
+                labelFrameSize.setText(file.getWidth() / (int)spinnerColumns.getValue() + " x " + file.getHeight() / (int)spinnerRows.getValue() + " px");
                 spinnerColumns.setModel(
                     new SpinnerNumberModel(file.getSpriteWidth(), 1, file.getWidth(), 1));
                 spinnerRows.setModel(
@@ -168,13 +168,13 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
     spinnerRows.setModel(new SpinnerNumberModel(1, 1, Integer.MAX_VALUE, 1));
     spinnerRows.addChangeListener(e -> updateGrid());
 
-    JLabel lblNewLabel = new JLabel("width:");
+    JLabel lblNewLabel = new JLabel("Image Size:");
 
-    labelWidth = new JLabel("XXX");
+    labelImageSize = new JLabel("XXX");
 
-    labelHeight = new JLabel("XXX");
+    labelFrameSize = new JLabel("XXX");
 
-    JLabel lblHeightText = new JLabel("height:");
+    JLabel lblHeightText = new JLabel("Frame Size:");
 
     JLabel lblName = new JLabel("name:");
 
@@ -256,7 +256,7 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
                                                             .createParallelGroup(
                                                                 Alignment.TRAILING, false)
                                                             .addComponent(
-                                                                labelWidth,
+                                                                labelImageSize,
                                                                 GroupLayout.DEFAULT_SIZE,
                                                                 GroupLayout.DEFAULT_SIZE,
                                                                 Short.MAX_VALUE)
@@ -288,7 +288,7 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
                                                             .createParallelGroup(
                                                                 Alignment.LEADING, false)
                                                             .addComponent(
-                                                                labelHeight,
+                                                                labelFrameSize,
                                                                 GroupLayout.DEFAULT_SIZE,
                                                                 GroupLayout.DEFAULT_SIZE,
                                                                 Short.MAX_VALUE)
@@ -319,7 +319,7 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
                                 glPanel
                                     .createParallelGroup(Alignment.BASELINE)
                                     .addComponent(
-                                        labelWidth,
+                                        labelImageSize,
                                         GroupLayout.PREFERRED_SIZE,
                                         19,
                                         GroupLayout.PREFERRED_SIZE)
@@ -333,7 +333,7 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
                                         19,
                                         GroupLayout.PREFERRED_SIZE)
                                     .addComponent(
-                                        labelHeight,
+                                        labelFrameSize,
                                         GroupLayout.PREFERRED_SIZE,
                                         19,
                                         GroupLayout.PREFERRED_SIZE)))
@@ -473,6 +473,9 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
   }
 
   private void updateGrid() {
+    SpriteFileWrapper file = fileList.getSelectedValue();
+    labelFrameSize.setText(file.getWidth() / (int)spinnerColumns.getValue() + " x " + file.getHeight() / (int)spinnerRows.getValue() + " px");
+
     if (this.isUpdating) {
         return;
     }
