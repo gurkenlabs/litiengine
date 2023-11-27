@@ -154,14 +154,14 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
     panel.setBorder(null);
     add(panel, BorderLayout.CENTER);
 
-    JLabel lblSpritewidth = new JLabel("spriteColumns:");
+    JLabel lblSpritecolumns = new JLabel("spriteColumns:");
 
     spinnerColumns = new JSpinner();
     spinnerColumns.setPreferredSize(new Dimension(SPINNER_WIDTH, spinnerColumns.getPreferredSize().height));
     spinnerColumns.setModel(new SpinnerNumberModel(1, 1, Integer.MAX_VALUE, 1));
     spinnerColumns.addChangeListener(e -> updateGrid());
 
-    JLabel lblSpriteheight = new JLabel("spriteRows:");
+    JLabel lblSpriterows = new JLabel("spriteRows:");
 
     spinnerRows = new JSpinner();
     spinnerRows.setPreferredSize(new Dimension(SPINNER_WIDTH, spinnerRows.getPreferredSize().height));
@@ -239,7 +239,7 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
                                                 74,
                                                 Short.MAX_VALUE)
                                             .addComponent(
-                                                lblSpritewidth,
+                                                lblSpritecolumns,
                                                 GroupLayout.DEFAULT_SIZE,
                                                 74,
                                                 Short.MAX_VALUE))
@@ -277,7 +277,7 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
                                                                 GroupLayout.DEFAULT_SIZE,
                                                                 Short.MAX_VALUE)
                                                             .addComponent(
-                                                                lblSpriteheight,
+                                                                lblSpriterows,
                                                                 Alignment.TRAILING,
                                                                 GroupLayout.DEFAULT_SIZE,
                                                                 GroupLayout.DEFAULT_SIZE,
@@ -341,8 +341,8 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
                     .addGroup(
                         glPanel
                             .createParallelGroup(Alignment.BASELINE)
-                            .addComponent(lblSpriteheight)
-                            .addComponent(lblSpritewidth)
+                            .addComponent(lblSpriterows)
+                            .addComponent(lblSpritecolumns)
                             .addComponent(
                                 spinnerColumns,
                                 GroupLayout.PREFERRED_SIZE,
