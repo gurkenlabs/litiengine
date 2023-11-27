@@ -55,10 +55,10 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
   private final DefaultListModel<SpriteFileWrapper> fileListModel;
   private final DefaultTableModel treeModel;
   private JLabel labelImage;
-  private JLabel labelWidth;
-  private JLabel labelHeight;
-  private JSpinner spinnerWidth;
-  private JSpinner spinnerHeight;
+  private JLabel labelImageSize;
+  private JLabel labelFrameSize;
+  private JSpinner spinnerColumns;
+  private JSpinner spinnerRows;
   private boolean isUpdating;
   private final transient AnimationController controller;
 
@@ -120,12 +120,12 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
               try {
                 SpriteFileWrapper file = fileList.getSelectedValue();
                 labelImage.setIcon(file.getIcon());
-                labelWidth.setText(file.getWidth() + "px");
-                labelHeight.setText(file.getHeight() + "px");
-                spinnerWidth.setModel(
+                labelImageSize.setText(file.getWidth() + " x " + file.getHeight() + " px");
+                labelFrameSize.setText(file.getWidth() / (int)spinnerColumns.getValue() + " x " + file.getHeight() / (int)spinnerRows.getValue() + " px");
+                spinnerColumns.setModel(
                     new SpinnerNumberModel(file.getSpriteWidth(), 1, file.getWidth(), 1));
-                spinnerHeight.setModel(
-                    new SpinnerNumberModel(file.getSpriteHeight(), 1, file.getHeight(), 1));
+                spinnerRows.setModel(
+                    new SpinnerNumberModel(1, 1, file.getHeight(), 1));
 
                 this.updateKeyframeTable(file);
                 textField = new JTextField();
@@ -154,55 +154,27 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
     panel.setBorder(null);
     add(panel, BorderLayout.CENTER);
 
-    JLabel lblSpritewidth = new JLabel("spritewidth:");
+    JLabel lblSpritecolumns = new JLabel("spriteColumns:");
 
-    spinnerWidth = new JSpinner();
-    spinnerWidth.setPreferredSize(
-        new Dimension(SPINNER_WIDTH, spinnerWidth.getPreferredSize().height));
-    spinnerWidth.setMinimumSize(
-        new Dimension(SPINNER_WIDTH, spinnerWidth.getPreferredSize().height));
-    spinnerWidth.setMaximumSize(
-        new Dimension(SPINNER_WIDTH, spinnerWidth.getPreferredSize().height));
-    spinnerWidth.setModel(new SpinnerNumberModel(1, 1, null, 1));
-    spinnerWidth.addChangeListener(
-        e -> {
-          if (this.isUpdating) {
-            return;
-          }
+    spinnerColumns = new JSpinner();
+    spinnerColumns.setPreferredSize(new Dimension(SPINNER_WIDTH, spinnerColumns.getPreferredSize().height));
+    spinnerColumns.setModel(new SpinnerNumberModel(1, 1, Integer.MAX_VALUE, 1));
+    spinnerColumns.addChangeListener(e -> updateGrid());
 
-          fileList.getSelectedValue().setSpriteWidth((int) this.spinnerWidth.getValue());
-          this.updateKeyframeTable(fileList.getSelectedValue());
-          this.updatePreview(fileList.getSelectedValue());
-        });
+    JLabel lblSpriterows = new JLabel("spriteRows:");
 
-    JLabel lblSpriteheight = new JLabel("spriteheight:");
+    spinnerRows = new JSpinner();
+    spinnerRows.setPreferredSize(new Dimension(SPINNER_WIDTH, spinnerRows.getPreferredSize().height));
+    spinnerRows.setModel(new SpinnerNumberModel(1, 1, Integer.MAX_VALUE, 1));
+    spinnerRows.addChangeListener(e -> updateGrid());
 
-    spinnerHeight = new JSpinner();
-    spinnerHeight.setPreferredSize(
-        new Dimension(SPINNER_WIDTH, spinnerHeight.getPreferredSize().height));
-    spinnerHeight.setMinimumSize(
-        new Dimension(SPINNER_WIDTH, spinnerHeight.getPreferredSize().height));
-    spinnerHeight.setMaximumSize(
-        new Dimension(SPINNER_WIDTH, spinnerHeight.getPreferredSize().height));
-    spinnerHeight.setModel(new SpinnerNumberModel(1, 1, null, 1));
-    spinnerHeight.addChangeListener(
-        e -> {
-          if (this.isUpdating) {
-            return;
-          }
+    JLabel lblNewLabel = new JLabel("Image Size:");
 
-          fileList.getSelectedValue().setSpriteHeight((int) this.spinnerHeight.getValue());
-          this.updateKeyframeTable(fileList.getSelectedValue());
-          this.updatePreview(fileList.getSelectedValue());
-        });
+    labelImageSize = new JLabel("XXX");
 
-    JLabel lblNewLabel = new JLabel("width:");
+    labelFrameSize = new JLabel("XXX");
 
-    labelWidth = new JLabel("XXX");
-
-    labelHeight = new JLabel("XXX");
-
-    JLabel lblHeightText = new JLabel("height:");
+    JLabel lblHeightText = new JLabel("Frame Size:");
 
     JLabel lblName = new JLabel("name:");
 
@@ -267,7 +239,7 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
                                                 74,
                                                 Short.MAX_VALUE)
                                             .addComponent(
-                                                lblSpritewidth,
+                                                lblSpritecolumns,
                                                 GroupLayout.DEFAULT_SIZE,
                                                 74,
                                                 Short.MAX_VALUE))
@@ -284,12 +256,12 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
                                                             .createParallelGroup(
                                                                 Alignment.TRAILING, false)
                                                             .addComponent(
-                                                                labelWidth,
+                                                                labelImageSize,
                                                                 GroupLayout.DEFAULT_SIZE,
                                                                 GroupLayout.DEFAULT_SIZE,
                                                                 Short.MAX_VALUE)
                                                             .addComponent(
-                                                                spinnerWidth,
+                                                                spinnerColumns,
                                                                 GroupLayout.DEFAULT_SIZE,
                                                                 50,
                                                                 Short.MAX_VALUE))
@@ -305,7 +277,7 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
                                                                 GroupLayout.DEFAULT_SIZE,
                                                                 Short.MAX_VALUE)
                                                             .addComponent(
-                                                                lblSpriteheight,
+                                                                lblSpriterows,
                                                                 Alignment.TRAILING,
                                                                 GroupLayout.DEFAULT_SIZE,
                                                                 GroupLayout.DEFAULT_SIZE,
@@ -316,12 +288,12 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
                                                             .createParallelGroup(
                                                                 Alignment.LEADING, false)
                                                             .addComponent(
-                                                                labelHeight,
+                                                                labelFrameSize,
                                                                 GroupLayout.DEFAULT_SIZE,
                                                                 GroupLayout.DEFAULT_SIZE,
                                                                 Short.MAX_VALUE)
                                                             .addComponent(
-                                                                spinnerHeight,
+                                                                spinnerRows,
                                                                 GroupLayout.DEFAULT_SIZE,
                                                                 50,
                                                                 Short.MAX_VALUE)))
@@ -347,7 +319,7 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
                                 glPanel
                                     .createParallelGroup(Alignment.BASELINE)
                                     .addComponent(
-                                        labelWidth,
+                                        labelImageSize,
                                         GroupLayout.PREFERRED_SIZE,
                                         19,
                                         GroupLayout.PREFERRED_SIZE)
@@ -361,7 +333,7 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
                                         19,
                                         GroupLayout.PREFERRED_SIZE)
                                     .addComponent(
-                                        labelHeight,
+                                        labelFrameSize,
                                         GroupLayout.PREFERRED_SIZE,
                                         19,
                                         GroupLayout.PREFERRED_SIZE)))
@@ -369,15 +341,15 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
                     .addGroup(
                         glPanel
                             .createParallelGroup(Alignment.BASELINE)
-                            .addComponent(lblSpriteheight)
-                            .addComponent(lblSpritewidth)
+                            .addComponent(lblSpriterows)
+                            .addComponent(lblSpritecolumns)
                             .addComponent(
-                                spinnerWidth,
+                                spinnerColumns,
                                 GroupLayout.PREFERRED_SIZE,
                                 GroupLayout.DEFAULT_SIZE,
                                 GroupLayout.PREFERRED_SIZE)
                             .addComponent(
-                                spinnerHeight,
+                                spinnerRows,
                                 GroupLayout.PREFERRED_SIZE,
                                 GroupLayout.DEFAULT_SIZE,
                                 GroupLayout.PREFERRED_SIZE))
@@ -492,7 +464,34 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
     this.fileList.setModel(this.fileListModel);
 
     if (this.fileListModel.size() > 0) {
-      this.fileList.setSelectedIndex(0);
+      SpriteFileWrapper selectedValue = this.fileListModel.getElementAt(0);
+      this.fileList.setSelectedValue(selectedValue, true);
+
+      spinnerColumns.setValue(selectedValue.getWidth() / selectedValue.getSpriteWidth());
+      spinnerRows.setValue(selectedValue.getHeight() / selectedValue.getSpriteHeight());
+    }
+  }
+
+  private void updateGrid() {
+    SpriteFileWrapper file = fileList.getSelectedValue();
+    labelFrameSize.setText(file.getWidth() / (int)spinnerColumns.getValue() + " x " + file.getHeight() / (int)spinnerRows.getValue() + " px");
+
+    if (this.isUpdating) {
+        return;
+    }
+
+    try {
+        int columns = (int) spinnerColumns.getValue();
+        int rows = (int) spinnerRows.getValue();
+
+        fileList.getSelectedValue().setSpriteWidth(fileList.getSelectedValue().getWidth() / columns);
+        fileList.getSelectedValue().setSpriteHeight(fileList.getSelectedValue().getHeight() / rows);
+
+        this.updateKeyframeTable(fileList.getSelectedValue());
+        this.updatePreview(fileList.getSelectedValue());
+    } catch (NumberFormatException e) {
+        // Gérer l'exception si l'utilisateur entre une valeur non numérique
+        e.printStackTrace();
     }
   }
 
