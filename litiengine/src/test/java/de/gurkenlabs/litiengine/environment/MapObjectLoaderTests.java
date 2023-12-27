@@ -1,11 +1,6 @@
 package de.gurkenlabs.litiengine.environment;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -338,7 +333,7 @@ class MapObjectLoaderTests {
     assertEquals(1, loaded.size());
 
     IEntity ent = loaded.iterator().next();
-    assertTrue(ent instanceof CustomEntity);
+    assertInstanceOf(CustomEntity.class, ent);
 
     CustomEntity customEntity = (CustomEntity) ent;
     assertEquals("foovalue", customEntity.getFoo());
@@ -372,7 +367,7 @@ class MapObjectLoaderTests {
     assertEquals(1, loaded.size());
 
     IEntity ent = loaded.iterator().next();
-    assertTrue(ent instanceof CustomEntity);
+    assertInstanceOf(CustomEntity.class, ent);
 
     CustomEntity customEntity = (CustomEntity) ent;
     assertEquals("11111", customEntity.getProperties().getStringValue("wasdd"));

@@ -81,7 +81,7 @@ public class PropMapObjectLoader extends MapObjectLoader {
     if(spriteSheet != null) {
       for (Class<? extends Prop> customProp : customPropType) {
         for (String prefix : EntityAnimationController.getDefaultSpritePrefixes(customProp)) {
-          if (prefix != null && (PropAnimationController.PROP_IDENTIFIER + spriteSheet).equalsIgnoreCase(prefix)) {
+          if ((PropAnimationController.PROP_IDENTIFIER + spriteSheet).equalsIgnoreCase(prefix)) {
             Prop created = createCustomProp(customProp, spriteSheet);
             if (created != null) {
               return created;

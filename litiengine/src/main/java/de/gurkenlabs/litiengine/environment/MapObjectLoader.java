@@ -59,10 +59,10 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
     }
 
     var tags = mapObject.getCommaSeparatedStringValues(MapObjectProperty.TAGS, null);
-    if (tags != null && tags.size() > 0)  {
+    if (tags != null && !tags.isEmpty())  {
       for (String rawTag : tags) {
-        String tag = rawTag.trim().replaceAll("[^A-Za-z0-9\\-\\_]", "");
-        if (tag == null || tag.isEmpty()) {
+        String tag = rawTag.trim().replaceAll("[^A-Za-z0-9\\-_]", "");
+        if (tag.isEmpty()) {
           continue;
         }
 
