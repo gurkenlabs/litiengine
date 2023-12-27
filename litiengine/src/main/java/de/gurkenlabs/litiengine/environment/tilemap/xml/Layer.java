@@ -1,7 +1,7 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
-import java.awt.Dimension;
-import java.awt.Point;
+import java.awt.*;
+import java.awt.geom.Point2D;
 
 import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.XmlAttribute;
@@ -21,6 +21,9 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
   @XmlAttribute
   private String name;
 
+  @XmlAttribute(name = "class")
+  private String layerClass;
+
   @XmlAttribute
   private Integer width;
 
@@ -35,10 +38,20 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
   private Boolean visible;
 
   @XmlAttribute
-  private Integer offsetx;
+  private Double offsetx;
 
   @XmlAttribute
-  private Integer offsety;
+  private Double offsety;
+
+  @XmlAttribute
+  private Double parallaxx;
+
+  @XmlAttribute
+  private Double parallaxy;
+
+  @XmlAttribute
+  @XmlJavaTypeAdapter(ColorAdapter.class)
+  private Color tintcolor;
 
   private transient TmxMap parentMap;
   private transient RenderType renderType;
@@ -61,6 +74,8 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
     this.setName(layerToBeCopied.getName());
     this.offsetx = layerToBeCopied.offsetx;
     this.offsety = layerToBeCopied.offsety;
+    this.parallaxx = layerToBeCopied.parallaxx;
+    this.parallaxy = layerToBeCopied.parallaxy;
     this.setOpacity(layerToBeCopied.getOpacity());
     this.setVisible(layerToBeCopied.isVisible());
   }
@@ -102,12 +117,12 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
   }
 
   @Override
-  public Point getOffset() {
-    return new Point(this.getOffsetX(), this.getOffsetY());
+  public Point2D getOffset() {
+    return new Point2D.Double(this.getOffsetX(), this.getOffsetY());
   }
 
   @Override
-  public int getOffsetX() {
+  public double getOffsetX() {
     if (this.offsetx == null) {
       return 0;
     }
@@ -116,12 +131,40 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
   }
 
   @Override
-  public int getOffsetY() {
+  public double getOffsetY() {
     if (this.offsety == null) {
       return 0;
     }
 
     return offsety;
+  }
+
+  @Override
+  public double getHorizontalParallaxFactor(){
+    if (this.parallaxx == null) {
+      return 1.0;
+    }
+
+    return parallaxx;
+  }
+
+  @Override
+  public double getVerticalParallaxFactor(){
+    if (this.parallaxy == null) {
+      return 1.0;
+    }
+
+    return parallaxy;
+  }
+
+  @Override
+  public Color getTintColor() {
+    return tintcolor;
+  }
+
+  @Override
+  public void setTintColor(Color tintColor) {
+    this.tintcolor = tintColor;
   }
 
   @Override
