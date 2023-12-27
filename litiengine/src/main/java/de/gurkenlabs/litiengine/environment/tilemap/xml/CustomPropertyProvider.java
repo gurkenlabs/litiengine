@@ -1,12 +1,5 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
-import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
-import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
-import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.awt.Color;
 import java.net.URL;
 import java.util.ArrayList;
@@ -15,6 +8,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
+
+import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+
+import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
+
 
 @XmlAccessorType(XmlAccessType.FIELD)
 public class CustomPropertyProvider implements ICustomPropertyProvider {
@@ -44,20 +48,6 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
   @Override
   public boolean hasCustomProperty(String propertyName) {
     return this.getProperties().containsKey(propertyName);
-  }
-
-  @Override
-  public String getTypeOfProperty(String propertyName) {
-    ICustomProperty property = this.getProperty(propertyName);
-    if (property == null) {
-      return null;
-    }
-    return property.getType();
-  }
-
-  @Override
-  public void setTypeOfProperty(String propertyName, String type) {
-    this.getProperty(propertyName).setType(type);
   }
 
   @Override
@@ -240,6 +230,16 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
     return value;
   }
 
+  @Override
+  public int getMapObjectId(String propertyName) {
+    ICustomProperty property = this.getProperty(propertyName);
+    if (property == null) {
+      return 0;
+    }
+
+    return property.getMapObjectId();
+  }
+
   private ICustomProperty createPropertyIfAbsent(String propertyName) {
     return this.getProperties().computeIfAbsent(propertyName, n -> new CustomProperty());
   }
@@ -247,7 +247,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
   @Override
   public void setValue(String propertyName, URL value) {
     ICustomProperty property = createPropertyIfAbsent(propertyName);
-    property.setType("file");
+    property.setType(CustomPropertyType.FILE);
     property.setValue(value);
   }
 
@@ -255,7 +255,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
   public void setValue(String propertyName, String value) {
     if (value != null) {
       ICustomProperty property = createPropertyIfAbsent(propertyName);
-      property.setType("string");
+      property.setType(CustomPropertyType.STRING);
       property.setValue(value);
     } else {
       this.getProperties().remove(propertyName);
@@ -265,64 +265,71 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
   @Override
   public void setValue(String propertyName, boolean value) {
     ICustomProperty property = createPropertyIfAbsent(propertyName);
-    property.setType("bool");
+    property.setType(CustomPropertyType.BOOL);
     property.setValue(value);
   }
 
   @Override
   public void setValue(String propertyName, byte value) {
     ICustomProperty property = createPropertyIfAbsent(propertyName);
-    property.setType("int");
+    property.setType(CustomPropertyType.INT);
     property.setValue(value);
   }
 
   @Override
   public void setValue(String propertyName, short value) {
     ICustomProperty property = createPropertyIfAbsent(propertyName);
-    property.setType("int");
+    property.setType(CustomPropertyType.INT);
     property.setValue(value);
   }
 
   @Override
   public void setValue(String propertyName, int value) {
     ICustomProperty property = createPropertyIfAbsent(propertyName);
-    property.setType("int");
+    property.setType(CustomPropertyType.INT);
     property.setValue(value);
   }
 
   @Override
   public void setValue(String propertyName, long value) {
     ICustomProperty property = createPropertyIfAbsent(propertyName);
-    property.setType("int");
+    property.setType(CustomPropertyType.INT);
     property.setValue(value);
   }
 
   @Override
   public void setValue(String propertyName, float value) {
     ICustomProperty property = createPropertyIfAbsent(propertyName);
-    property.setType("float");
+    property.setType(CustomPropertyType.FLOAT);
     property.setValue(value);
   }
 
   @Override
   public void setValue(String propertyName, double value) {
     ICustomProperty property = createPropertyIfAbsent(propertyName);
-    property.setType("float");
+    property.setType(CustomPropertyType.FLOAT);
     property.setValue(value);
   }
 
   @Override
   public void setValue(String propertyName, Color value) {
     ICustomProperty property = createPropertyIfAbsent(propertyName);
-    property.setType("color");
+    property.setType(CustomPropertyType.COLOR);
     property.setValue(value);
   }
 
   @Override
   public void setValue(String propertyName, Enum<?> value) {
     ICustomProperty property = createPropertyIfAbsent(propertyName);
-    property.setType("string");
+    property.setType(CustomPropertyType.STRING);
     property.setValue(value);
+  }
+
+  @Override
+  public void setValue(String propertyName, IMapObject value) {
+    ICustomProperty property = createPropertyIfAbsent(propertyName);
+    property.setType(CustomPropertyType.OBJECT);
+    property.setValue(value.getId());
   }
 
   @Override

@@ -8,68 +8,70 @@ import java.net.URL;
  */
 public interface ICustomProperty {
 
-  public void setValue(URL value);
+  void setValue(URL value);
 
-  public void setValue(String value);
+  void setValue(String value);
 
-  public void setValue(char value);
+  void setValue(char value);
 
-  public void setValue(Enum<?> value);
+  void setValue(Enum<?> value);
 
-  public void setValue(long value);
+  void setValue(long value);
 
-  public void setValue(double value);
+  void setValue(double value);
 
   // no methods for setting to byte, short, int, or float because they will already be accepted as a
   // long or double
 
-  public void setValue(boolean value);
+  void setValue(boolean value);
 
-  public void setValue(Color value);
+  void setValue(Color value);
 
-  public String getAsString();
+  String getAsString();
 
-  public char getAsChar();
+  char getAsChar();
 
-  public boolean getAsBool();
+  boolean getAsBool();
 
-  public Color getAsColor();
+  Color getAsColor();
 
-  public float getAsFloat();
+  float getAsFloat();
 
-  public double getAsDouble();
+  double getAsDouble();
 
-  public byte getAsByte();
+  byte getAsByte();
 
-  public short getAsShort();
+  short getAsShort();
 
-  public int getAsInt();
+  int getAsInt();
 
-  public long getAsLong();
+  long getAsLong();
 
-  public <T extends Enum<T>> T getAsEnum(Class<T> enumType);
+  <T extends Enum<T>> T getAsEnum(Class<T> enumType);
 
-  public URL getAsFile();
+  URL getAsFile();
 
-  public String getType();
+  int getMapObjectId();
 
-  public void setType(String type);
+  String getType();
+
+  void setType(String type);
 
   /**
    * Tests for equality between two custom properties. Two custom properties are <i>equal</i> if they both have the same
    * type and string value.
-   * 
+   *
    * @param anObject
    *          The custom property to test equality for
    * @return Whether the two custom properties are equal, or false if {@code anObject} is not a custom property
    */
-  public boolean equals(Object anObject);
+  boolean equals(Object anObject);
 
   /**
    * Returns the hash code for this custom property. The hash code for a custom property is equal to its type's hash code
    * times 31 plus its value's hash code.
-   * 
+   *
    * @return The hash code for this custom property
    */
-  public int hashCode();
+  int hashCode();
 }

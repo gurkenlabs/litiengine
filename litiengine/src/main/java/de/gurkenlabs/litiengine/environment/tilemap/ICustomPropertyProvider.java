@@ -17,17 +17,17 @@ public interface ICustomPropertyProvider {
    *          the name of the custom property
    * @return true if a custom property with the given name is present. False otherwise.
    */
-  public boolean hasCustomProperty(String propertyName);
+  boolean hasCustomProperty(String propertyName);
 
-  public String getTypeOfProperty(String propertyName);
+  String getTypeOfProperty(String propertyName);
 
-  public void setTypeOfProperty(String propertyName, String type);
+  void setTypeOfProperty(String propertyName, String type);
 
-  public ICustomProperty getProperty(String propertyName);
+  ICustomProperty getProperty(String propertyName);
 
-  public void setValue(String propertyName, ICustomProperty value);
+  void setValue(String propertyName, ICustomProperty value);
 
-  public void removeProperty(String propertyName);
+  void removeProperty(String propertyName);
 
   /**
    * Gets the string value of the custom property with the provided name.
@@ -38,7 +38,7 @@ public interface ICustomPropertyProvider {
    * @throws NoSuchElementException
    *           if the custom property does not exist
    */
-  public String getStringValue(String propertyName);
+  String getStringValue(String propertyName);
 
   /**
    * Gets the string value of the custom property with the provided name. If the value is null, the provided default value
@@ -50,7 +50,7 @@ public interface ICustomPropertyProvider {
    *          the fallback value in case the property value is null.
    * @return the string value of the custom property, if present. Otherwise, the provided default value is returned.
    */
-  public String getStringValue(String propertyName, String defaultValue);
+  String getStringValue(String propertyName, String defaultValue);
 
   /**
    * Gets a list of strings stored in a single comma-separated property.
@@ -62,7 +62,7 @@ public interface ICustomPropertyProvider {
    * @return the list of comma-separated strings in the custom property, if present. Otherwise, the provided default value
    *         is returned.
    */
-  public List<String> getCommaSeparatedStringValues(String propertyName, String defaultValue);
+  List<String> getCommaSeparatedStringValues(String propertyName, String defaultValue);
 
   /**
    * Gets the int value of the custom property with the provided name.
@@ -75,7 +75,7 @@ public interface ICustomPropertyProvider {
    * @throws NumberFormatException
    *           if the custom property is not an integer or is not in range for an {@code int}
    */
-  public int getIntValue(String propertyName);
+  int getIntValue(String propertyName);
 
   /**
    * Gets the int value of the custom property with the provided name. If the value is null, the provided default value is
@@ -87,7 +87,7 @@ public interface ICustomPropertyProvider {
    *          the fallback value in case the property value is null.
    * @return the int value of the custom property, if present. Otherwise, the provided default value is returned.
    */
-  public int getIntValue(String propertyName, int defaultValue);
+  int getIntValue(String propertyName, int defaultValue);
 
   /**
    * Gets the long value of the custom property with the provided name.
@@ -100,7 +100,7 @@ public interface ICustomPropertyProvider {
    * @throws NumberFormatException
    *           if the custom property is not an integer or is not in range for a {@code long}
    */
-  public default long getLongValue(String propertyName) {
+  default long getLongValue(String propertyName) {
     ICustomProperty property = this.getProperty(propertyName);
     if (property == null) {
       throw new NoSuchElementException(propertyName);
@@ -118,7 +118,7 @@ public interface ICustomPropertyProvider {
    *          the fallback value in case the property value is null.
    * @return the long value of the custom property, if present. Otherwise, the provided default value is returned.
    */
-  public long getLongValue(String propertyName, long defaultValue);
+  long getLongValue(String propertyName, long defaultValue);
 
   /**
    * Gets the short value of the custom property with the provided name.
@@ -131,7 +131,7 @@ public interface ICustomPropertyProvider {
    * @throws NumberFormatException
    *           if the custom property is not an integer or is out of range for a {@code short}
    */
-  public short getShortValue(String propertyName);
+  short getShortValue(String propertyName);
 
   /**
    * Gets the short value of the custom property with the provided name. If the value is null, the provided default value
@@ -143,7 +143,7 @@ public interface ICustomPropertyProvider {
    *          the fallback value in case the property value is null.
    * @return the short value of the custom property, if present. Otherwise, the provided default value is returned.
    */
-  public short getShortValue(String propertyName, short defaultValue);
+  short getShortValue(String propertyName, short defaultValue);
 
   /**
    * Gets the byte value of the custom property with the provided name.
@@ -156,7 +156,7 @@ public interface ICustomPropertyProvider {
    * @throws NumberFormatException
    *           if the custom property is not an integer or is out of range for a {@code byte}
    */
-  public byte getByteValue(String propertyName);
+  byte getByteValue(String propertyName);
 
   /**
    * Gets the byte value of the custom property with the provided name. If the value is null, the provided default value
@@ -168,7 +168,7 @@ public interface ICustomPropertyProvider {
    *          the fallback value in case the property value is null.
    * @return the byte value of the custom property, if present. Otherwise, the provided default value is returned.
    */
-  public byte getByteValue(String propertyName, byte defaultValue);
+  byte getByteValue(String propertyName, byte defaultValue);
 
   /**
    * Gets the boolean value of the custom property with the provided name.
@@ -181,7 +181,7 @@ public interface ICustomPropertyProvider {
    * @throws NumberFormatException
    *           if the custom property is not a {@code boolean} value
    */
-  public boolean getBoolValue(String propertyName);
+  boolean getBoolValue(String propertyName);
 
   /**
    * Gets the boolean value of the custom property with the provided name. If the value is null, the provided default
@@ -193,7 +193,7 @@ public interface ICustomPropertyProvider {
    *          the fallback value in case the property value is null.
    * @return the boolean value of the custom property, if present. Otherwise, the provided default value is returned.
    */
-  public boolean getBoolValue(String propertyName, boolean defaultValue);
+  boolean getBoolValue(String propertyName, boolean defaultValue);
 
   /**
    * Gets the float value of the custom property with the provided name.
@@ -206,7 +206,7 @@ public interface ICustomPropertyProvider {
    * @throws NumberFormatException
    *           if the custom property is not a number
    */
-  public float getFloatValue(String propertyName);
+  float getFloatValue(String propertyName);
 
   /**
    * Gets the float value of the custom property with the provided name. If the value is null, the provided default value
@@ -218,7 +218,7 @@ public interface ICustomPropertyProvider {
    *          the fallback value in case the property value is null.
    * @return the float value of the custom property, if present. Otherwise, the provided default value is returned.
    */
-  public float getFloatValue(String propertyName, float defaultValue);
+  float getFloatValue(String propertyName, float defaultValue);
 
   /**
    * Gets the double value of the custom property with the provided name.
@@ -231,7 +231,7 @@ public interface ICustomPropertyProvider {
    * @throws NumberFormatException
    *           if the custom property is not a number
    */
-  public double getDoubleValue(String propertyName);
+  double getDoubleValue(String propertyName);
 
   /**
    * Gets the double value of the custom property with the provided name. If the value is null, the provided default value
@@ -243,7 +243,7 @@ public interface ICustomPropertyProvider {
    *          the fallback value in case the property value is null.
    * @return the double value of the custom property, if present. Otherwise, the provided default value is returned.
    */
-  public double getDoubleValue(String propertyName, double defaultValue);
+  double getDoubleValue(String propertyName, double defaultValue);
 
   /**
    * Gets the color value of the custom property with the provided name.
@@ -254,7 +254,7 @@ public interface ICustomPropertyProvider {
    * @throws NoSuchElementException
    *           if the custom property does not exist
    */
-  public Color getColorValue(String propertyName);
+  Color getColorValue(String propertyName);
 
   /**
    * Gets the color value of the custom property with the provided name. If the value is null, the provided default value
@@ -266,7 +266,7 @@ public interface ICustomPropertyProvider {
    *          the fallback value in case the property value is null.
    * @return the color value of the custom property, if present. Otherwise, the provided default value is returned.
    */
-  public Color getColorValue(String propertyName, Color defaultValue);
+  Color getColorValue(String propertyName, Color defaultValue);
 
   /**
    * Gets the enum value of the custom property with the provided name.
@@ -281,7 +281,7 @@ public interface ICustomPropertyProvider {
    * @throws NoSuchElementException
    *           if the custom property does not exist
    */
-  public <T extends Enum<T>> T getEnumValue(String propertyName, Class<T> enumType);
+  <T extends Enum<T>> T getEnumValue(String propertyName, Class<T> enumType);
 
   /**
    * Gets the enum value of the custom property with the provided name. If the value is null, the provided default value
@@ -297,7 +297,7 @@ public interface ICustomPropertyProvider {
    *          the enum type to use
    * @return the enum value of the custom property, if present. Otherwise, the provided default value is returned.
    */
-  public <T extends Enum<T>> T getEnumValue(String propertyName, Class<T> enumType, T defaultValue);
+  <T extends Enum<T>> T getEnumValue(String propertyName, Class<T> enumType, T defaultValue);
 
   /**
    * Gets the file value of the custom property with the provided name. If the property is not a file, {@code null} is
@@ -307,7 +307,7 @@ public interface ICustomPropertyProvider {
    *          the name of the custom property
    * @return the file value of the custom property, if present.
    */
-  public URL getFileValue(String propertyName);
+  URL getFileValue(String propertyName);
 
   /**
    * Gets the file value of the custom property with the provided name. If the value is null or the property is not a
@@ -319,7 +319,9 @@ public interface ICustomPropertyProvider {
    *          the fallback value in case the property value is null.
    * @return the file value of the custom property, if present. Otherwise, the provided default value is returned.
    */
-  public URL getFileValue(String propertyName, URL defaultValue);
+  URL getFileValue(String propertyName, URL defaultValue);
+
+  int getMapObjectId(String propertyName);
 
   /**
    * Sets the value for the custom property with the given name to the given file.
@@ -329,7 +331,7 @@ public interface ICustomPropertyProvider {
    * @param value
    *          the new value
    */
-  public void setValue(String propertyName, URL value);
+  void setValue(String propertyName, URL value);
 
   /**
    * Sets the value for the custom property with the given name to the given string.
@@ -339,7 +341,7 @@ public interface ICustomPropertyProvider {
    * @param value
    *          the new value
    */
-  public void setValue(String propertyName, String value);
+  void setValue(String propertyName, String value);
 
   /**
    * Sets the value for the custom property with the given name to the given boolean.
@@ -349,7 +351,7 @@ public interface ICustomPropertyProvider {
    * @param value
    *          the new value
    */
-  public void setValue(String propertyName, boolean value);
+  void setValue(String propertyName, boolean value);
 
   /**
    * Sets the value for the custom property with the given name to the given byte.
@@ -359,7 +361,7 @@ public interface ICustomPropertyProvider {
    * @param value
    *          the new value
    */
-  public void setValue(String propertyName, byte value);
+  void setValue(String propertyName, byte value);
 
   /**
    * Sets the value for the custom property with the given name to the given short.
@@ -369,7 +371,7 @@ public interface ICustomPropertyProvider {
    * @param value
    *          the new value
    */
-  public void setValue(String propertyName, short value);
+  void setValue(String propertyName, short value);
 
   /**
    * Sets the value for the custom property with the given name to the given int.
@@ -379,7 +381,7 @@ public interface ICustomPropertyProvider {
    * @param value
    *          the new value
    */
-  public void setValue(String propertyName, int value);
+  void setValue(String propertyName, int value);
 
   /**
    * Sets the value for the custom property with the given name to the given long.
@@ -389,7 +391,7 @@ public interface ICustomPropertyProvider {
    * @param value
    *          the new value
    */
-  public void setValue(String propertyName, long value);
+  void setValue(String propertyName, long value);
 
   /**
    * Sets the value for the custom property with the given name to the given float.
@@ -399,7 +401,7 @@ public interface ICustomPropertyProvider {
    * @param value
    *          the new value
    */
-  public void setValue(String propertyName, float value);
+  void setValue(String propertyName, float value);
 
   /**
    * Sets the value for the custom property with the given name to the given double.
@@ -409,7 +411,7 @@ public interface ICustomPropertyProvider {
    * @param value
    *          the new value
    */
-  public void setValue(String propertyName, double value);
+  void setValue(String propertyName, double value);
 
   /**
    * Sets the value for the custom property with the given name to the given color.
@@ -419,7 +421,7 @@ public interface ICustomPropertyProvider {
    * @param value
    *          the new value
    */
-  public void setValue(String propertyName, Color value);
+  void setValue(String propertyName, Color value);
 
   /**
    * Sets the value for the custom property with the given name to the given enum.
@@ -429,21 +431,31 @@ public interface ICustomPropertyProvider {
    * @param value
    *          the new value
    */
-  public void setValue(String propertyName, Enum<?> value);
+  void setValue(String propertyName, Enum<?> value);
+
+  /**
+   * Sets the value for the custom property with the ID of the given map object.
+   *
+   * @param propertyName
+   *          the name of the custom property
+   * @param value
+   *          the new value
+   */
+  void setValue(String propertyName, IMapObject value);
 
   /**
    * Returns a {@code Map} view of the custom properties for this {@code ICustomPropertyProvider}.
    *
    * @return a {@code Map} view of the custom properties for this {@code ICustomPropertyProvider}
    */
-  public Map<String, ICustomProperty> getProperties();
+  Map<String, ICustomProperty> getProperties();
 
   /**
-   * Sets all of the custom properties on this object to the provided values. Properties are added when they only exist in
+   * Sets all the custom properties on this object to the provided values. Properties are added when they only exist in
    * the provided properties, and deleted when they only exist in the current properties.
    *
    * @param props
    *          the new list of properties
    */
-  public void setProperties(Map<String, ICustomProperty> props);
+  void setProperties(Map<String, ICustomProperty> props);
 }

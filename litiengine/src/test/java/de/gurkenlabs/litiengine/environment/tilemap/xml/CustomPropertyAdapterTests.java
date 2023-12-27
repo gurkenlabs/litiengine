@@ -59,7 +59,7 @@ class CustomPropertyAdapterTests {
   void testMarshal() {
     // arrange
     Map<String, ICustomProperty> properties = new HashMap<>();
-    CustomProperty customProperty = new CustomProperty("string", "value");
+    CustomProperty customProperty = new CustomProperty(CustomPropertyType.STRING, "value");
     properties.putIfAbsent("PropertyA", customProperty);
 
     // act
@@ -73,7 +73,7 @@ class CustomPropertyAdapterTests {
   void testMarshalWithLinebreakInValue() {
     // arrange
     Map<String, ICustomProperty> properties = new HashMap<>();
-    CustomProperty customProperty = new CustomProperty("string", "value\n");
+    CustomProperty customProperty = new CustomProperty(CustomPropertyType.STRING, "value\n");
     properties.putIfAbsent("PropertyA", customProperty);
 
     // act
@@ -88,9 +88,9 @@ class CustomPropertyAdapterTests {
   void testMarshalSort() {
     // arrange
     Map<String, ICustomProperty> properties = new HashMap<>();
-    CustomProperty customProperty1 = new CustomProperty("string", "value1");
-    CustomProperty customProperty2 = new CustomProperty("string", "value2");
-    CustomProperty customProperty3 = new CustomProperty("string", "value3");
+    CustomProperty customProperty1 = new CustomProperty(CustomPropertyType.STRING, "value1");
+    CustomProperty customProperty2 = new CustomProperty(CustomPropertyType.STRING, "value2");
+    CustomProperty customProperty3 = new CustomProperty(CustomPropertyType.STRING, "value3");
     properties.putIfAbsent("PropertyB", customProperty2);
     properties.putIfAbsent("PropertyA", customProperty1);
     properties.putIfAbsent("PropertyC", customProperty3);
