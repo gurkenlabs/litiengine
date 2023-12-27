@@ -12,6 +12,12 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapImage;
 
 public class ImageLayer extends Layer implements IImageLayer {
 
+  @XmlAttribute
+  private boolean repeatx;
+
+  @XmlAttribute
+  private boolean repeaty;
+
   @XmlElement
   private MapImage image;
 
@@ -30,7 +36,17 @@ public class ImageLayer extends Layer implements IImageLayer {
   }
 
   @Override
-  public int getOffsetX() {
+  public boolean repeatHorizontally() {
+    return this.repeatx;
+  }
+
+  @Override
+  public boolean repeatVertically() {
+    return this.repeaty;
+  }
+
+  @Override
+  public double getOffsetX() {
     if (this.isInfiniteMap()) {
       TmxMap map = (TmxMap) this.getMap();
       return super.getOffsetX() - map.getChunkOffsetX() * map.getTileWidth();
@@ -40,7 +56,7 @@ public class ImageLayer extends Layer implements IImageLayer {
   }
 
   @Override
-  public int getOffsetY() {
+  public double getOffsetY() {
     if (this.isInfiniteMap()) {
       TmxMap map = (TmxMap) this.getMap();
       return super.getOffsetX() - map.getChunkOffsetY() * map.getTileHeight();
