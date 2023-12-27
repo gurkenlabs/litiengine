@@ -13,7 +13,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.physics.Collision;
 import de.gurkenlabs.litiengine.test.GameTestSuite;
-
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
@@ -55,7 +54,7 @@ public class EnvironmentEventTests {
   }
 
   @Test
-  public void testOnInitialized() {
+  void testOnInitialized() {
     EnvironmentListener environmentListener = mock(EnvironmentListener.class);
     this.testEnvironment.addListener(environmentListener);
 
@@ -65,7 +64,7 @@ public class EnvironmentEventTests {
   }
 
   @Test
-  public void testOnLoaded() {
+  void testOnLoaded() {
     EnvironmentListener environmentListener = mock(EnvironmentListener.class);
     this.testEnvironment.addListener(environmentListener);
 
@@ -75,7 +74,7 @@ public class EnvironmentEventTests {
   }
 
   @Test
-  public void testOnAdded() {
+  void testOnAdded() {
     ICombatEntity combatEntity = mock(ICombatEntity.class);
     when(combatEntity.getMapId()).thenReturn(123);
     when(combatEntity.getRenderType()).thenReturn(RenderType.NORMAL);
@@ -89,7 +88,7 @@ public class EnvironmentEventTests {
   }
 
   @Test
-  public void testOnRemoved() {
+  void testOnRemoved() {
     ICombatEntity combatEntity = mock(ICombatEntity.class);
     when(combatEntity.getMapId()).thenReturn(123);
     when(combatEntity.getRenderType()).thenReturn(RenderType.NORMAL);
@@ -107,7 +106,7 @@ public class EnvironmentEventTests {
 
   @ParameterizedTest
   @EnumSource(value = RenderType.class, mode = Mode.EXCLUDE, names = "NONE")
-  public void testRenderListener(RenderType renderType) {
+  void testRenderListener(RenderType renderType) {
     EnvironmentRenderedListener listener = mock(EnvironmentRenderedListener.class);
     Graphics2D g = mock(Graphics2D.class);
     this.testEnvironment.onRendered(renderType, listener);

@@ -1,21 +1,30 @@
 package de.gurkenlabs.litiengine.resources;
 
-import java.awt.image.BufferedImage;
-import java.io.*;
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Predicate;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.io.Codec;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import de.gurkenlabs.litiengine.util.io.ImageSerializer;
+import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public final class Spritesheets {
   private final Map<String, int[]> customKeyFrameDurations = new ConcurrentHashMap<>();
@@ -68,7 +77,7 @@ public final class Spritesheets {
       return new ArrayList<>();
     }
 
-    return this.loadedSpritesheets.values().stream().filter(pred).collect(Collectors.toList());
+    return this.loadedSpritesheets.values().stream().filter(pred).toList();
   }
 
   public Collection<Spritesheet> getAll() {
@@ -101,7 +110,7 @@ public final class Spritesheets {
   }
 
   public Spritesheet load(final SpritesheetResource info) {
-    Spritesheet sprite = null;
+    Spritesheet sprite;
     if (info.getImage() == null || info.getImage().isEmpty()) {
       log.log(Level.SEVERE, "Sprite {0} could not be loaded because no image is defined.", new Object[] {info.getName()});
       return null;

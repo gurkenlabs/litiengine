@@ -22,9 +22,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -34,7 +34,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
-@SuppressWarnings("serial")
 public final class EntityList extends JPanel implements EntityController {
   private final JPanel searchPanel;
 
@@ -101,102 +100,99 @@ public final class EntityList extends JPanel implements EntityController {
     this.tree.setRowHeight((int) (this.tree.getRowHeight() * Editor.preferences().getUiScale()));
 
     this.tree.addTreeSelectionListener(
-        e -> {
-          final Environment env = Game.world().environment();
-          if (env == null) {
+      e -> {
+        final Environment env = Game.world().environment();
+        if (env == null) {
+          return;
+        }
+
+        this.isFocussing = true;
+        try {
+
+          final TreePath path = e.getNewLeadSelectionPath();
+          if (path == null) {
             return;
           }
-
-          this.isFocussing = true;
-          try {
-
-            final TreePath path = e.getNewLeadSelectionPath();
-            if (path == null) {
-              return;
-            }
-            if (path.getLastPathComponent() instanceof DefaultMutableTreeNode) {
-              DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
-              if (node.getUserObject() instanceof IconTreeListItem) {
-                IconTreeListItem item = (IconTreeListItem) node.getUserObject();
-                if (item.getUserObject() instanceof IEntity) {
-                  IMapObject obj =
-                      env.getMap().getMapObject(((IEntity) item.getUserObject()).getMapId());
-                  if (obj != null) {
-                    Editor.instance().getMapComponent().setFocus(obj, true);
-                  }
-                }
-              }
+          if (path.getLastPathComponent() instanceof DefaultMutableTreeNode dmtn
+            && (dmtn.getUserObject() instanceof IconTreeListItem itli
+            && (itli.getUserObject() instanceof IEntity ie))) {
+            IMapObject obj = env.getMap().getMapObject(ie.getMapId());
+            if (obj != null) {
+              Editor.instance().getMapComponent().setFocus(obj, true);
             }
 
-          } finally {
-            this.isFocussing = false;
+
           }
-        });
+
+        } finally {
+          this.isFocussing = false;
+        }
+      });
 
     this.nodeRoot =
-        new DefaultMutableTreeNode(
-            new IconTreeListItem(
-                Resources.strings().get("panel_mapselection_entities"), Icons.FOLDER));
+      new DefaultMutableTreeNode(
+        new IconTreeListItem(
+          Resources.strings().get("panel_mapselection_entities"), Icons.FOLDER));
     this.nodeProps =
-        new DefaultMutableTreeNode(
-            new IconTreeListItem(Resources.strings().get("panel_mapselection_props"), Icons.PROP));
+      new DefaultMutableTreeNode(
+        new IconTreeListItem(Resources.strings().get("panel_mapselection_props"), Icons.PROP));
     this.nodeCreatures =
-        new DefaultMutableTreeNode(
-            new IconTreeListItem(
-                Resources.strings().get("panel_mapselection_creatures"), Icons.CREATURE));
+      new DefaultMutableTreeNode(
+        new IconTreeListItem(
+          Resources.strings().get("panel_mapselection_creatures"), Icons.CREATURE));
     this.nodeLights =
-        new DefaultMutableTreeNode(
-            new IconTreeListItem(
-                Resources.strings().get("panel_mapselection_lights"), Icons.LIGHT));
+      new DefaultMutableTreeNode(
+        new IconTreeListItem(
+          Resources.strings().get("panel_mapselection_lights"), Icons.LIGHT));
     this.nodeTriggers =
-        new DefaultMutableTreeNode(
-            new IconTreeListItem(
-                Resources.strings().get("panel_mapselection_triggers"), Icons.TRIGGER));
+      new DefaultMutableTreeNode(
+        new IconTreeListItem(
+          Resources.strings().get("panel_mapselection_triggers"), Icons.TRIGGER));
     this.nodeSpawnpoints =
-        new DefaultMutableTreeNode(
-            new IconTreeListItem(
-                Resources.strings().get("panel_mapselection_spawnpoints"), Icons.SPAWNPOINT));
+      new DefaultMutableTreeNode(
+        new IconTreeListItem(
+          Resources.strings().get("panel_mapselection_spawnpoints"), Icons.SPAWNPOINT));
     this.nodeCollisionBoxes =
-        new DefaultMutableTreeNode(
-            new IconTreeListItem(
-                Resources.strings().get("panel_mapselection_collboxes"), Icons.COLLISIONBOX));
+      new DefaultMutableTreeNode(
+        new IconTreeListItem(
+          Resources.strings().get("panel_mapselection_collboxes"), Icons.COLLISIONBOX));
     this.nodeMapAreas =
-        new DefaultMutableTreeNode(
-            new IconTreeListItem(
-                Resources.strings().get("panel_mapselection_areas"), Icons.MAPAREA));
+      new DefaultMutableTreeNode(
+        new IconTreeListItem(
+          Resources.strings().get("panel_mapselection_areas"), Icons.MAPAREA));
     this.nodeStaticShadows =
-        new DefaultMutableTreeNode(
-            new IconTreeListItem(
-                Resources.strings().get("panel_mapselection_shadow"), Icons.SHADOWBOX));
+      new DefaultMutableTreeNode(
+        new IconTreeListItem(
+          Resources.strings().get("panel_mapselection_shadow"), Icons.SHADOWBOX));
     this.nodeEmitter =
-        new DefaultMutableTreeNode(
-            new IconTreeListItem(
-                Resources.strings().get("panel_mapselection_emitter"), Icons.EMITTER));
+      new DefaultMutableTreeNode(
+        new IconTreeListItem(
+          Resources.strings().get("panel_mapselection_emitter"), Icons.EMITTER));
 
     this.entitiesTreeModel = new DefaultTreeModel(this.nodeRoot);
 
     this.entityNodes =
-        new DefaultMutableTreeNode[] {
-            this.nodeProps,
-            this.nodeCreatures,
-            this.nodeLights,
-            this.nodeTriggers,
-            this.nodeSpawnpoints,
-            this.nodeCollisionBoxes,
-            this.nodeMapAreas,
-            this.nodeStaticShadows,
-            this.nodeEmitter,
-        };
+      new DefaultMutableTreeNode[] {
+        this.nodeProps,
+        this.nodeCreatures,
+        this.nodeLights,
+        this.nodeTriggers,
+        this.nodeSpawnpoints,
+        this.nodeCollisionBoxes,
+        this.nodeMapAreas,
+        this.nodeStaticShadows,
+        this.nodeEmitter,
+      };
     MouseListener ml =
-        new MouseAdapter() {
-          @Override
-          public void mouseClicked(MouseEvent e) {
-            int selRow = tree.getRowForLocation(e.getX(), e.getY());
-            if (selRow != -1 && e.getClickCount() == 2) {
-              Editor.instance().getMapComponent().centerCameraOnFocus();
-            }
+      new MouseAdapter() {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+          int selRow = tree.getRowForLocation(e.getX(), e.getY());
+          if (selRow != -1 && e.getClickCount() == 2) {
+            Editor.instance().getMapComponent().centerCameraOnFocus();
           }
-        };
+        }
+      };
     tree.setModel(this.entitiesTreeModel);
     tree.addMouseListener(ml);
 
@@ -264,13 +260,11 @@ public final class EntityList extends JPanel implements EntityController {
       while (en.hasMoreElements()) {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) en.nextElement();
         IEntity ent = null;
-        if (node.getUserObject() instanceof IconTreeListItem) {
-          IconTreeListItem iconItem = (IconTreeListItem) node.getUserObject();
-          if (iconItem.getUserObject() instanceof IEntity) {
-            ent = (IEntity) iconItem.getUserObject();
-          }
-        } else if (node.getUserObject() instanceof IEntity) {
-          ent = (IEntity) node.getUserObject();
+        if (node.getUserObject() instanceof IconTreeListItem itli
+          && itli.getUserObject() instanceof IEntity ie) {
+          ent = ie;
+        } else if (node.getUserObject() instanceof IEntity ie2) {
+          ent = ie2;
         }
 
         if (ent == null) {
@@ -307,13 +301,11 @@ public final class EntityList extends JPanel implements EntityController {
       while (en.hasMoreElements()) {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) en.nextElement();
         IEntity ent = null;
-        if (node.getUserObject() instanceof IconTreeListItem) {
-          IconTreeListItem iconItem = (IconTreeListItem) node.getUserObject();
-          if (iconItem.getUserObject() instanceof IEntity) {
-            ent = (IEntity) iconItem.getUserObject();
-          }
-        } else if (node.getUserObject() instanceof IEntity) {
-          ent = (IEntity) node.getUserObject();
+        if (node.getUserObject() instanceof IconTreeListItem itli
+          && itli.getUserObject() instanceof IEntity ie) {
+          ent = ie;
+        } else if (node.getUserObject() instanceof IEntity ie2) {
+          ent = ie2;
         }
 
         if (ent == null) {
@@ -333,63 +325,63 @@ public final class EntityList extends JPanel implements EntityController {
   @Override
   public void refresh() {
     this.nodeRoot.setUserObject(
-        new IconTreeListItem(
-            (Game.world().environment() == null
-                ? 0
-                : Game.world().environment().getEntities().size())
-                + " "
-                + Resources.strings().get("panel_mapselection_entities"),
-            Icons.FOLDER));
+      new IconTreeListItem(
+        (Game.world().environment() == null
+          ? 0
+          : Game.world().environment().getEntities().size())
+          + " "
+          + Resources.strings().get("panel_mapselection_entities"),
+        Icons.FOLDER));
     for (DefaultMutableTreeNode node : this.entityNodes) {
       node.removeAllChildren();
     }
 
     if (Game.world().environment() != null) {
       addEntitiesToTreeNode(
-          Game.world().environment().getProps(),
-          this.nodeProps,
-          Resources.strings().get("panel_mapselection_props"),
-          Icons.PROP);
+        Game.world().environment().getProps(),
+        this.nodeProps,
+        Resources.strings().get("panel_mapselection_props"),
+        Icons.PROP);
       addEntitiesToTreeNode(
-          Game.world().environment().getCreatures(),
-          this.nodeCreatures,
-          Resources.strings().get("panel_mapselection_creatures"),
-          Icons.CREATURE);
+        Game.world().environment().getCreatures(),
+        this.nodeCreatures,
+        Resources.strings().get("panel_mapselection_creatures"),
+        Icons.CREATURE);
       addEntitiesToTreeNode(
-          Game.world().environment().getCollisionBoxes(),
-          this.nodeCollisionBoxes,
-          Resources.strings().get("panel_mapselection_collboxes"),
-          Icons.COLLISIONBOX);
+        Game.world().environment().getCollisionBoxes(),
+        this.nodeCollisionBoxes,
+        Resources.strings().get("panel_mapselection_collboxes"),
+        Icons.COLLISIONBOX);
       addEntitiesToTreeNode(
-          Game.world().environment().getTriggers(),
-          this.nodeTriggers,
-          Resources.strings().get("panel_mapselection_triggers"),
-          Icons.TRIGGER);
+        Game.world().environment().getTriggers(),
+        this.nodeTriggers,
+        Resources.strings().get("panel_mapselection_triggers"),
+        Icons.TRIGGER);
       addEntitiesToTreeNode(
-          Game.world().environment().getSpawnpoints(),
-          this.nodeSpawnpoints,
-          Resources.strings().get("panel_mapselection_spawnpoints"),
-          Icons.SPAWNPOINT);
+        Game.world().environment().getSpawnpoints(),
+        this.nodeSpawnpoints,
+        Resources.strings().get("panel_mapselection_spawnpoints"),
+        Icons.SPAWNPOINT);
       addEntitiesToTreeNode(
-          Game.world().environment().getAreas(),
-          this.nodeMapAreas,
-          Resources.strings().get("panel_mapselection_areas"),
-          Icons.MAPAREA);
+        Game.world().environment().getAreas(),
+        this.nodeMapAreas,
+        Resources.strings().get("panel_mapselection_areas"),
+        Icons.MAPAREA);
       addEntitiesToTreeNode(
-          Game.world().environment().getLightSources(),
-          this.nodeLights,
-          Resources.strings().get("panel_mapselection_lights"),
-          Icons.LIGHT);
+        Game.world().environment().getLightSources(),
+        this.nodeLights,
+        Resources.strings().get("panel_mapselection_lights"),
+        Icons.LIGHT);
       addEntitiesToTreeNode(
-          Game.world().environment().getStaticShadows(),
-          this.nodeStaticShadows,
-          Resources.strings().get("panel_mapselection_shadow"),
-          Icons.SHADOWBOX);
+        Game.world().environment().getStaticShadows(),
+        this.nodeStaticShadows,
+        Resources.strings().get("panel_mapselection_shadow"),
+        Icons.SHADOWBOX);
       addEntitiesToTreeNode(
-          Game.world().environment().getEmitters(),
-          this.nodeEmitter,
-          Resources.strings().get("panel_mapselection_emitter"),
-          Icons.EMITTER);
+        Game.world().environment().getEmitters(),
+        this.nodeEmitter,
+        Resources.strings().get("panel_mapselection_emitter"),
+        Icons.EMITTER);
     } else {
       this.nodeRoot.removeAllChildren();
     }
@@ -453,8 +445,8 @@ public final class EntityList extends JPanel implements EntityController {
     }
 
     return this.select(
-        parent,
-        e -> e.getName() != null && (e.getName().contains(name) || e.getName().matches(name)));
+      parent,
+      e -> e.getName() != null && (e.getName().contains(name) || e.getName().matches(name)));
   }
 
   private boolean select(DefaultMutableTreeNode parent, Predicate<IEntity> selectionPredicate) {
@@ -466,13 +458,11 @@ public final class EntityList extends JPanel implements EntityController {
     while (en.hasMoreElements()) {
       DefaultMutableTreeNode node = (DefaultMutableTreeNode) en.nextElement();
       IEntity ent = null;
-      if (node.getUserObject() instanceof IconTreeListItem) {
-        IconTreeListItem iconItem = (IconTreeListItem) node.getUserObject();
-        if (iconItem.getUserObject() instanceof IEntity) {
-          ent = (IEntity) iconItem.getUserObject();
-        }
-      } else if (node.getUserObject() instanceof IEntity) {
-        ent = (IEntity) node.getUserObject();
+      if (node.getUserObject() instanceof IconTreeListItem itli
+        && itli.getUserObject() instanceof IEntity ie) {
+        ent = ie;
+      } else if (node.getUserObject() instanceof IEntity ie2) {
+        ent = ie2;
       }
 
       if (ent == null) {
@@ -482,7 +472,7 @@ public final class EntityList extends JPanel implements EntityController {
       if (selectionPredicate.test(ent)) {
         final TreePath newSelection = new TreePath(node.getPath());
         if (this.tree.getSelectionPath() != null
-            && this.tree.getSelectionPath().equals(newSelection)) {
+          && this.tree.getSelectionPath().equals(newSelection)) {
           continue;
         }
 
@@ -507,16 +497,16 @@ public final class EntityList extends JPanel implements EntityController {
   }
 
   private <T extends Entity> void addEntitiesToTreeNode(Collection<T> entities, DefaultMutableTreeNode entityNode,
-      String nodeName, Icon nodeIcon) {
+    String nodeName, Icon nodeIcon) {
 
-    for (T entity : entities.stream().sorted((p1, p2) -> Integer.compare(p1.getMapId(), p2.getMapId()))
-        .collect(Collectors.toList())) {
+    for (T entity : entities.stream().sorted(Comparator.comparingInt(Entity::getMapId))
+      .toList()) {
       DefaultMutableTreeNode node = new DefaultMutableTreeNode(new IconTreeListItem(entity));
       entityNode.add(node);
     }
 
     entityNode.setUserObject(
-        new ParentIconTreeListItem(nodeName, nodeIcon, () -> entityNode.getChildCount()));
+      new ParentIconTreeListItem(nodeName, nodeIcon, entityNode::getChildCount));
 
     if (entities.isEmpty()) {
       entityNode.removeFromParent();

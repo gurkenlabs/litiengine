@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-public class EntityActionMapTests {
+class EntityActionMapTests {
 
   private EntityAction entityAction;
   private EntityActionMap actionMap;
@@ -18,14 +18,15 @@ public class EntityActionMapTests {
 
   @BeforeEach
   public void setUp() {
-    entityAction = new EntityAction(ACTION_NAME, () -> {});
+    entityAction = new EntityAction(ACTION_NAME, () -> {
+    });
     actionMap = new EntityActionMap();
     actionMap.register(entityAction);
   }
 
   @ParameterizedTest(name = "testExists actionName={0}, expectedResult={1}")
   @CsvSource({"Action1, true", "Action2, false"})
-  public void testExists(String actionName, boolean expectedResult) {
+  void testExists(String actionName, boolean expectedResult) {
     // act
     boolean exists = actionMap.exists(actionName);
 
@@ -34,7 +35,7 @@ public class EntityActionMapTests {
   }
 
   @Test
-  public void testGet() {
+  void testGet() {
     // act
     EntityAction action = actionMap.get(ACTION_NAME);
 
@@ -43,9 +44,10 @@ public class EntityActionMapTests {
   }
 
   @Test
-  public void testGetActions() {
+  void testGetActions() {
     // arrange
-    actionMap.register(new EntityAction("Action2", () -> {}));
+    actionMap.register(new EntityAction("Action2", () -> {
+    }));
 
     // act
     Collection<EntityAction> actions = actionMap.getActions();
@@ -55,9 +57,10 @@ public class EntityActionMapTests {
   }
 
   @Test
-  public void testRegister() {
+  void testRegister() {
     // arrange
-    EntityAction action = new EntityAction("Action2", () -> {});
+    EntityAction action = new EntityAction("Action2", () -> {
+    });
 
     // act
     actionMap.register(action);
@@ -67,7 +70,7 @@ public class EntityActionMapTests {
   }
 
   @Test
-  public void testUnregister() {
+  void testUnregister() {
     // act
     actionMap.unregister(ACTION_NAME);
 

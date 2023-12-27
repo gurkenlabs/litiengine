@@ -16,7 +16,6 @@ import java.util.List;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
-@SuppressWarnings("serial")
 public final class LayerMenu extends JMenu {
 
   public LayerMenu() {
@@ -31,10 +30,8 @@ public final class LayerMenu extends JMenu {
     this.setEnabled(!mapObjects.isEmpty());
 
     for (Component item : this.getMenuComponents()) {
-      if (item instanceof JMenuItem) {
-        JMenuItem menuItem = (JMenuItem) item;
-        menuItem.setEnabled(
-            mapObjects.stream().anyMatch(x -> !x.getLayer().getName().equals(menuItem.getText())));
+      if (item instanceof JMenuItem jmi) {
+        jmi.setEnabled(mapObjects.stream().anyMatch(x -> !x.getLayer().getName().equals(jmi.getText())));
       }
     }
   }

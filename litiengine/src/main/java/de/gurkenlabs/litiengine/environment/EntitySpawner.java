@@ -21,18 +21,18 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
   private List<Spawnpoint> spawnpoints;
   private Function<IEntitySpawner<T>, List<Spawnpoint>> customSpawnpoints;
 
-  public EntitySpawner(final int interval, final int amount) {
+  protected EntitySpawner(final int interval, final int amount) {
     this.spawnDelay = 1000;
     this.interval = interval;
     this.amount = amount;
     this.spawnMode = SpawnMode.CUSTOMSPAWNPOINTS;
   }
 
-  public EntitySpawner(final List<Spawnpoint> spawnpoints, final int interval, final int amount) {
+  protected EntitySpawner(final List<Spawnpoint> spawnpoints, final int interval, final int amount) {
     this(spawnpoints, interval, amount, SpawnMode.ALLSPAWNPOINTS);
   }
 
-  public EntitySpawner(final List<Spawnpoint> spawnpoints, final int amount, SpawnMode spawnMode) {
+  protected EntitySpawner(final List<Spawnpoint> spawnpoints, final int amount, SpawnMode spawnMode) {
     this.spawnDelay = 1000;
     this.amount = amount;
     this.spawnpoints = spawnpoints;
@@ -44,16 +44,16 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
    *
    * @param spawnpoints
    *          The spawnpoints from which this instance will choose from when spawning entities.
-   * 
+   *
    * @param interval
    *          The interval in which entities will be spawned.
-   * 
+   *
    * @param amount
    *          The amount of entities to spawn on every spawn event.
    * @param spawnMode
    *          the spawning behaviour
    */
-  public EntitySpawner(final List<Spawnpoint> spawnpoints, final int interval, final int amount, SpawnMode spawnMode) {
+  protected EntitySpawner(final List<Spawnpoint> spawnpoints, final int interval, final int amount, SpawnMode spawnMode) {
     this.interval = interval;
     this.spawnDelay = 1000;
     this.amount = amount;
@@ -61,17 +61,17 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
     this.spawnMode = spawnMode;
   }
 
-  public EntitySpawner(final int amount, Function<IEntitySpawner<T>, List<Spawnpoint>> spawnpointCallback) {
-    Objects.nonNull(spawnpointCallback);
+  protected EntitySpawner(final int amount, Function<IEntitySpawner<T>, List<Spawnpoint>> spawnpointCallback) {
+    Objects.requireNonNull(spawnpointCallback);
 
     this.amount = amount;
     this.customSpawnpoints = spawnpointCallback;
     this.spawnMode = SpawnMode.CUSTOMSPAWNPOINTS;
   }
 
-  public EntitySpawner(final int interval, final int amount, Function<IEntitySpawner<T>, List<Spawnpoint>> spawnpointCallback) {
-    this(new ArrayList<Spawnpoint>(), interval, amount);
-    Objects.nonNull(spawnpointCallback);
+  protected EntitySpawner(final int interval, final int amount, Function<IEntitySpawner<T>, List<Spawnpoint>> spawnpointCallback) {
+    this(new ArrayList<>(), interval, amount);
+    Objects.requireNonNull(spawnpointCallback);
 
     this.customSpawnpoints = spawnpointCallback;
     this.spawnMode = SpawnMode.CUSTOMSPAWNPOINTS;
@@ -143,7 +143,7 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
   /**
    * Spawn new entities, depending on the {@code SpawnMode}, spawnAmount, spawnDelay, and spawnInterval of an
    * {@code EntitySpawner}.
-   * 
+   *
    * @see SpawnMode
    */
   protected void spawnNewEntities() {

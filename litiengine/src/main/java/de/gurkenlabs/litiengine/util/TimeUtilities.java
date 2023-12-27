@@ -78,29 +78,16 @@ public final class TimeUtilities {
     long s = getRemainingSeconds(duration);
     long ms = getRemainingMilliSeconds(duration);
 
-    switch (format) {
-      case HH_MM_SS:
-        return String.format(format.getFormatString(), h, m, s);
-      case HH_MM_SS_000:
-        return String.format(format.getFormatString(), h, m, s, ms);
-      case HH_MM_SS_0:
-        return String.format(format.getFormatString(), h, m, s, ms / 100);
-      case MM_SS_000:
-        return String.format(format.getFormatString(), m, s, ms);
-      case MM_SS_0:
-        return String.format(format.getFormatString(), m, s, ms / 100);
-      case SS_000:
-      case S_000:
-        return String.format(format.getFormatString(), s, ms);
-      case SS_00:
-      case S_00:
-        return String.format(format.getFormatString(), s, ms / 10);
-      case SS_0:
-      case S_0:
-        return String.format(format.getFormatString(), s, ms / 100);
-      case UNDEFINED:
-      default:
-        return Long.toString(ms);
-    }
+    return switch (format) {
+      case HH_MM_SS -> String.format(format.getFormatString(), h, m, s);
+      case HH_MM_SS_000 -> String.format(format.getFormatString(), h, m, s, ms);
+      case HH_MM_SS_0 -> String.format(format.getFormatString(), h, m, s, ms / 100);
+      case MM_SS_000 -> String.format(format.getFormatString(), m, s, ms);
+      case MM_SS_0 -> String.format(format.getFormatString(), m, s, ms / 100);
+      case SS_000, S_000 -> String.format(format.getFormatString(), s, ms);
+      case SS_00, S_00 -> String.format(format.getFormatString(), s, ms / 10);
+      case SS_0, S_0 -> String.format(format.getFormatString(), s, ms / 100);
+      default -> Long.toString(ms);
+    };
   }
 }

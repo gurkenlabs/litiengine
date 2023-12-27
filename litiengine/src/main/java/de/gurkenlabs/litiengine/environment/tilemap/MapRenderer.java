@@ -1,5 +1,12 @@
 package de.gurkenlabs.litiengine.environment.tilemap;
 
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.environment.Environment;
+import de.gurkenlabs.litiengine.graphics.ImageRenderer;
+import de.gurkenlabs.litiengine.graphics.RenderType;
+import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.resources.Resources;
 import java.awt.AlphaComposite;
 import java.awt.Composite;
 import java.awt.Graphics2D;
@@ -11,17 +18,9 @@ import java.util.EventListener;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.entities.IEntity;
-import de.gurkenlabs.litiengine.environment.Environment;
-import de.gurkenlabs.litiengine.graphics.ImageRenderer;
-import de.gurkenlabs.litiengine.graphics.RenderType;
-import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.litiengine.resources.Resources;
-
 public class MapRenderer {
-  private static Collection<LayerRenderedListener> layerRenderedListeners = ConcurrentHashMap.newKeySet();
-  private static Collection<LayerRenderCondition> layerRenderConditions = ConcurrentHashMap.newKeySet();
+  private static final Collection<LayerRenderedListener> layerRenderedListeners = ConcurrentHashMap.newKeySet();
+  private static final Collection<LayerRenderCondition> layerRenderConditions = ConcurrentHashMap.newKeySet();
 
   private MapRenderer() {
     throw new UnsupportedOperationException();
@@ -29,9 +28,8 @@ public class MapRenderer {
 
   /**
    * Adds the specified layer rendered listener to receive events when a layer has been rendered.
-   * 
-   * @param listener
-   *          The listener to add.
+   *
+   * @param listener The listener to add.
    */
   public static void onLayerRendered(LayerRenderedListener listener) {
     layerRenderedListeners.add(listener);
@@ -39,9 +37,8 @@ public class MapRenderer {
 
   /**
    * Removes the specified layer rendered listener..
-   * 
-   * @param listener
-   *          The listener to remove.
+   *
+   * @param listener The listener to remove.
    */
   public static void removeLayerRenderedListener(LayerRenderedListener listener) {
     layerRenderedListeners.remove(listener);
@@ -49,9 +46,8 @@ public class MapRenderer {
 
   /**
    * Adds the specified layer render condition to control whether layers should be rendered.
-   * 
-   * @param condition
-   *          The condition to add.
+   *
+   * @param condition The condition to add.
    */
   public static void addLayerRenderCondition(LayerRenderCondition condition) {
     layerRenderConditions.add(condition);
@@ -59,9 +55,8 @@ public class MapRenderer {
 
   /**
    * Removes the specified layer render condition.
-   * 
-   * @param condition
-   *          The condition to remove.
+   *
+   * @param condition The condition to remove.
    */
   public static void removeLayerRenderCondition(LayerRenderCondition condition) {
     layerRenderConditions.remove(condition);
@@ -76,7 +71,7 @@ public class MapRenderer {
   }
 
   private static void renderLayers(final Graphics2D g, final IMap map, ILayerList layers, final Rectangle2D viewport, Environment env,
-      RenderType[] renderTypes, float opacity) {
+    RenderType[] renderTypes, float opacity) {
     final List<ILayer> renderLayers = layers.getRenderLayers();
     for (final ILayer layer : renderLayers) {
       if (layer == null || !shouldBeRendered(g, map, layer, renderTypes)) {
@@ -85,30 +80,29 @@ public class MapRenderer {
 
       float layerOpacity = layer.getOpacity() * opacity;
 
-      if (layer instanceof ITileLayer) {
-        renderTileLayer(g, (ITileLayer) layer, map, viewport, layerOpacity);
+      if (layer instanceof ITileLayer itl) {
+        renderTileLayer(g, itl, map, viewport, layerOpacity);
       }
 
-      if (env != null && layer instanceof IMapObjectLayer) {
-        Collection<IEntity> entities = env.getEntities((IMapObjectLayer) layer);
+      if (env != null && layer instanceof IMapObjectLayer imol) {
+        Collection<IEntity> entities = env.getEntities(imol);
         if (entities != null) {
           Game.graphics().renderEntities(g, entities, layer.getRenderType() == RenderType.NORMAL);
         }
       }
 
-      if (layer instanceof IImageLayer) {
-        renderImageLayer(g, (IImageLayer) layer, map, viewport, layerOpacity);
+      if (layer instanceof IImageLayer iil) {
+        renderImageLayer(g, iil, map, viewport, layerOpacity);
       }
 
-      if (layer instanceof IGroupLayer) {
-        renderLayers(g, map, (IGroupLayer) layer, viewport, env, renderTypes, layerOpacity);
+      if (layer instanceof IGroupLayer igl) {
+        renderLayers(g, map, igl, viewport, env, renderTypes, layerOpacity);
       }
     }
   }
 
   private static void renderTileLayer(final Graphics2D g, final ITileLayer layer, final IMap map, final Rectangle2D viewport, float opacity) {
-    // TODO: possibly implement the same render order that Tiled uses for staggered maps: undo the
-    // staggering, and then render it right-down
+    // TODO: possibly implement the same render order that Tiled uses for staggered maps: undo the staggering, and then render it right-down
     g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
     if (map.getRenderOrder().btt) {
       for (int y = map.getHeight() - 1; y >= 0; y--) {
@@ -213,33 +207,30 @@ public class MapRenderer {
 
   /**
    * This listener interface receives events when a layer was rendered.
-   * 
+   *
    * @see MapRenderer#onLayerRendered(LayerRenderedListener)
    */
   @FunctionalInterface
   public interface LayerRenderedListener extends EventListener {
     /**
      * Invoked when a layer has been rendered.
-     * 
-     * @param event
-     *          The layer render event.
+     *
+     * @param event The layer render event.
      */
     void rendered(LayerRenderEvent event);
   }
 
   /**
    * This listener interface provides a condition callback to contol whether a layer should be rendered.
-   * 
+   *
    * @see MapRenderer#addLayerRenderCondition(LayerRenderCondition)
    */
   @FunctionalInterface
   public interface LayerRenderCondition extends EventListener {
     /**
      * Invoked before the rendering of a layer to determine if it should be rendered.
-     * 
-     * @param event
-     *          The layer render event.
-     * 
+     *
+     * @param event The layer render event.
      * @return Return true if the layer should be rendered; otherwise false.
      */
     boolean canRender(LayerRenderEvent event);

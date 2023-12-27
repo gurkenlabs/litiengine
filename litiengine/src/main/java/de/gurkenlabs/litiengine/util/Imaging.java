@@ -333,7 +333,7 @@ public final class Imaging {
     int targetSliceHeight = (int) (sliceHeight * scaleFactor);
 
     BufferedImage img = Imaging.getCompatibleImage(targetWidth, targetHeight);
-    Graphics2D g = img.createGraphics();
+    Graphics2D g = Objects.requireNonNull(img).createGraphics();
     var slices = Imaging.getSubImages(image, 3, 3);
 
     // draw corners
@@ -743,7 +743,7 @@ public final class Imaging {
     final BufferedImage newImg = getCompatibleImage((int) newWidth, (int) newHeight);
     if (newImg == null) {
       Game.log().log(Level.WARNING, "Image could not be scaled to {0} * {1}: {2}",
-        new Object[]{newWidth, newHeight, image.toString()});
+        new Object[]{newWidth, newHeight, image});
       return null;
     }
 
@@ -800,8 +800,8 @@ public final class Imaging {
       return null;
     }
 
-    if (img instanceof BufferedImage) {
-      return (BufferedImage) img;
+    if (img instanceof BufferedImage bi) {
+      return bi;
     }
 
     final BufferedImage bimage = getCompatibleImage(img.getWidth(null), img.getHeight(null));

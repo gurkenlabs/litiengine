@@ -12,9 +12,9 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import org.junit.jupiter.api.Test;
 
-public class OrientationTests {
+class OrientationTests {
   @Test
-  public void testOrthogonalMaps() {
+  void testOrthogonalMaps() {
     IMap map = mock(IMap.class);
     when(map.getOrientation()).thenReturn(MapOrientations.ORTHOGONAL);
     when(map.getTileWidth()).thenReturn(9);
@@ -30,7 +30,7 @@ public class OrientationTests {
   }
 
   @Test
-  public void testIsometricMaps() {
+  void testIsometricMaps() {
     IMap map = mock(IMap.class);
     when(map.getOrientation()).thenReturn(MapOrientations.ISOMETRIC);
     when(map.getTileWidth()).thenReturn(10);
@@ -46,7 +46,7 @@ public class OrientationTests {
   }
 
   @Test
-  public void testStaggeredMaps() {
+  void testStaggeredMaps() {
     // test for all combinations of stagger axis+index
     IMap map = mock(IMap.class);
     when(map.getOrientation()).thenReturn(MapOrientations.ISOMETRIC_STAGGERED);
@@ -110,7 +110,7 @@ public class OrientationTests {
   }
 
   @Test
-  public void testHexagonalMaps() {
+  void testHexagonalMaps() {
     // test for all combinations of stagger axis+index
     IMap map = mock(IMap.class);
     when(map.getOrientation()).thenReturn(MapOrientations.HEXAGONAL);

@@ -1,5 +1,13 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
+import de.gurkenlabs.litiengine.util.ArrayUtilities;
+import de.gurkenlabs.litiengine.util.io.Codec;
+import jakarta.xml.bind.DatatypeConverter;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElementRef;
+import jakarta.xml.bind.annotation.XmlMixed;
+import jakarta.xml.bind.annotation.XmlTransient;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -16,16 +24,6 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.InflaterInputStream;
 
-import jakarta.xml.bind.DatatypeConverter;
-import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.XmlAttribute;
-import jakarta.xml.bind.annotation.XmlElementRef;
-import jakarta.xml.bind.annotation.XmlMixed;
-import jakarta.xml.bind.annotation.XmlTransient;
-
-import de.gurkenlabs.litiengine.util.ArrayUtilities;
-import de.gurkenlabs.litiengine.util.io.Codec;
-
 public class TileData {
   private static final Logger log = Logger.getLogger(TileData.class.getName());
 
@@ -33,7 +31,8 @@ public class TileData {
     public static final String BASE64 = "base64";
     public static final String CSV = "csv";
 
-    private Encoding() {}
+    private Encoding() {
+    }
 
     public static boolean isValid(String encoding) {
       return encoding != null && !encoding.isEmpty() && (encoding.equals(BASE64) || encoding.equals(CSV));
@@ -45,7 +44,8 @@ public class TileData {
     public static final String ZLIB = "zlib";
     public static final String NONE = null;
 
-    private Compression() {}
+    private Compression() {
+    }
 
     public static boolean isValid(String compression) {
       // null equals no compression which is an accepted value
@@ -100,12 +100,12 @@ public class TileData {
   public TileData(List<Tile> tiles, int width, int height, String encoding, String compression) throws TmxException {
     if (!Encoding.isValid(encoding)) {
       throw new TmxException(
-          "Invalid tile data encoding '" + encoding + "'. Supported encodings are " + Encoding.CSV + " and " + Encoding.BASE64 + ".");
+        "Invalid tile data encoding '" + encoding + "'. Supported encodings are " + Encoding.CSV + " and " + Encoding.BASE64 + ".");
     }
 
     if (!Compression.isValid(compression)) {
       throw new TmxException(
-          "Invalid tile data compression '" + compression + "'. Supported compressions are " + Compression.GZIP + " and " + Compression.ZLIB + ".");
+        "Invalid tile data compression '" + compression + "'. Supported compressions are " + Compression.GZIP + " and " + Compression.ZLIB + ".");
     }
 
     this.tiles = tiles;
@@ -371,8 +371,8 @@ public class TileData {
   }
 
   /**
-   * This method processes the {@link XmlMixed} contents that were unmarshalled and extract either the string value
-   * containing the information about the layer of a set of {@link TileChunk}s if the map is infinite.
+   * This method processes the {@link XmlMixed} contents that were unmarshalled and extract either the string value containing the information about
+   * the layer of a set of {@link TileChunk}s if the map is infinite.
    */
   private void processMixedData() {
     if (this.rawValue == null || this.rawValue.isEmpty()) {
@@ -382,15 +382,15 @@ public class TileData {
     List<TileChunk> rawChunks = new ArrayList<>();
     String v = null;
     for (Object val : this.rawValue) {
-      if (val instanceof String) {
-        String trimmedValue = ((String) val).trim();
+      if (val instanceof String s) {
+        String trimmedValue = s.trim();
         if (!trimmedValue.isEmpty()) {
           v = trimmedValue;
         }
       }
 
-      if (val instanceof TileChunk) {
-        rawChunks.add((TileChunk) val);
+      if (val instanceof TileChunk tc) {
+        rawChunks.add(tc);
       }
     }
 

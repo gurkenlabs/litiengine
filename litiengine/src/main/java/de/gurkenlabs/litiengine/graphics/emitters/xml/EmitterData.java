@@ -264,13 +264,13 @@ public class EmitterData implements Serializable, Resource {
       return this.decodedColors;
     }
 
-    List<Color> decodedColors = new ArrayList<>();
+    List<Color> newColors = new ArrayList<>();
     for (var color : this.getColors()) {
       Color decoded = ColorHelper.decode(color);
-      decodedColors.add(decoded != null ? decoded : DEFAULT_COLOR);
+      newColors.add(decoded != null ? decoded : DEFAULT_COLOR);
     }
 
-    this.decodedColors = decodedColors;
+    this.decodedColors = newColors;
     return this.decodedColors;
   }
 

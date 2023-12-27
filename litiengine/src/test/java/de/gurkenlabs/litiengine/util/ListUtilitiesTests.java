@@ -8,9 +8,9 @@ import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-public class ListUtilitiesTests {
+class ListUtilitiesTests {
   @Test
-  public void testContainsInstance() {
+  void testContainsInstance() {
     List<Object> list = Arrays.asList("foo", 5L, 4.2);
     assertTrue(ListUtilities.containsInstance(list, String.class));
     assertTrue(ListUtilities.containsInstance(list, Long.class));
@@ -23,7 +23,7 @@ public class ListUtilitiesTests {
   }
 
   @Test
-  public void testIntList() {
+  void testIntList() {
     List<Integer> list = ListUtilities.getIntList(5, 87, 23, 0, -54);
     assertEquals(Arrays.asList(5, 87, 23, 0, -54), list);
   }

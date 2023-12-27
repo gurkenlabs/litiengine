@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.function.Predicate;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class CommandManagerTest {
 
@@ -21,8 +23,8 @@ class CommandManagerTest {
 
     // assert
     assertTrue(
-        commandManager.executeCommand(
-            "command predicate")); // only means to access private commandConsumers
+      commandManager.executeCommand(
+        "command predicate")); // only means to access private commandConsumers
   }
 
   @Test
@@ -36,8 +38,18 @@ class CommandManagerTest {
 
     // act, assert
     assertThrows(
-        IllegalArgumentException.class,
-        () -> commandManager.bind("command", predicate)); // add again
+      IllegalArgumentException.class,
+      () -> commandManager.bind("command", predicate)); // add again
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {"", " ", "test", "banana testing command"})
+  void executeCommand(String command) {
+    // arrange
+    CommandManager commandManager = new CommandManager();
+
+    // act, assert
+    assertFalse(commandManager.executeCommand(command));
   }
 
   @Test
@@ -47,42 +59,6 @@ class CommandManagerTest {
 
     // act, assert
     assertFalse(commandManager.executeCommand(null));
-  }
-
-  @Test
-  void executeCommandEmpty() {
-    // arrange
-    CommandManager commandManager = new CommandManager();
-
-    // act, assert
-    assertFalse(commandManager.executeCommand(""));
-  }
-
-  @Test
-  void executeCommandBlankSpace() {
-    // arrange
-    CommandManager commandManager = new CommandManager();
-
-    // act, assert
-    assertFalse(commandManager.executeCommand(" "));
-  }
-
-  @Test
-  void executeCommandSingleWord() {
-    // arrange
-    CommandManager commandManager = new CommandManager();
-
-    // act, assert
-    assertFalse(commandManager.executeCommand("test"));
-  }
-
-  @Test
-  void executeCommandMultiWordNotContained() {
-    // arrange
-    CommandManager commandManager = new CommandManager();
-
-    // act, assert
-    assertFalse(commandManager.executeCommand("banana testing command"));
   }
 
   @Test

@@ -74,7 +74,7 @@ public class FreeFlightCamera extends Camera implements IUpdateable {
 
     final double scrollSpeed =
         this.getVelocity()
-            / (double) Game.loop().getTickRate()
+            / Game.loop().getTickRate()
             * Game.config().input().getMouseSensitivity();
 
     double x = this.getFocus().getX();

@@ -4,10 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-public class GamepadTests {
+class GamepadTests {
 
   @Test
-  public void testButtons() {
+  void testButtons() {
     String a = Gamepad.Xbox.A;
     float off = Gamepad.DPad.OFF;
 
