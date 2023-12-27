@@ -120,8 +120,8 @@ class MapTests {
     assertEquals(-12000, layer.getOffset().getY());
     assertEquals(1.3, layer.getHorizontalParallaxFactor());
     assertEquals(1.2, layer.getVerticalParallaxFactor());
-    assertEquals(true, layer.repeatHorizontally());
-    assertEquals(true, layer.repeatVertically());
+    assertTrue(layer.repeatHorizontally());
+    assertTrue(layer.repeatVertically());
 
     assertEquals("blue_pixeled.png", layer.getImage().getSource());
     assertEquals(672, layer.getImage().getWidth());
