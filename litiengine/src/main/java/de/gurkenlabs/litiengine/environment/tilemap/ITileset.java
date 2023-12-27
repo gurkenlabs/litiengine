@@ -52,10 +52,6 @@ public interface ITileset extends ICustomPropertyProvider, Resource {
 
   public ITilesetEntry getTile(int id);
 
-  public List<ITerrain> getTerrainTypes();
-
-  public ITerrain[] getTerrain(int tileId);
-
   public boolean containsTile(ITile tile);
 
   public boolean containsTile(ITilesetEntry entry);

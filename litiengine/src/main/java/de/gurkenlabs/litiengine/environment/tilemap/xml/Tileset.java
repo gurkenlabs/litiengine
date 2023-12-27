@@ -17,13 +17,11 @@ import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlTransient;
 
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapImage;
-import de.gurkenlabs.litiengine.environment.tilemap.ITerrain;
 import de.gurkenlabs.litiengine.environment.tilemap.ITile;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileOffset;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
@@ -71,10 +69,6 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
 
   @XmlAttribute
   private String source;
-
-  @XmlElementWrapper(name = "terraintypes")
-  @XmlElement(name = "terrain")
-  private List<Terrain> terrainTypes = null;
 
   @XmlElement(name = "tile")
   private List<TilesetEntry> tiles = null;
@@ -200,53 +194,6 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   }
 
   @Override
-  public List<ITerrain> getTerrainTypes() {
-    if (this.sourceTileset != null) {
-      return this.sourceTileset.getTerrainTypes();
-    }
-
-    List<ITerrain> types = new ArrayList<>();
-    if (this.terrainTypes == null) {
-      return types;
-    }
-
-    for (int i = 0; i < this.terrainTypes.size(); i++) {
-      types.add(i, this.terrainTypes.get(i));
-    }
-
-    return types;
-  }
-
-  @Override
-  public ITerrain[] getTerrain(int tileId) {
-    if (this.sourceTileset != null) {
-      return this.sourceTileset.getTerrain(tileId);
-    }
-
-    ITerrain[] terrains = new ITerrain[4];
-    if (!this.containsTile(tileId)) {
-      return terrains;
-    }
-
-    TilesetEntry tile = this.allTiles.get(tileId);
-    int[] tileTerrains = tile.getTerrainIds();
-    for (int i = 0; i < 4; i++) {
-      if (tileTerrains[i] < 0 || tileTerrains[i] >= this.getTerrainTypes().size()) {
-        continue;
-      }
-
-      ITerrain terrain = this.getTerrainTypes().get(tileTerrains[i]);
-      if (terrain == null) {
-        continue;
-      }
-
-      terrains[i] = terrain;
-    }
-
-    return terrains;
-  }
-
-  @Override
   public int getColumns() {
     return this.sourceTileset != null ? this.sourceTileset.getColumns() : this.columns;
   }
@@ -323,11 +270,6 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
       if (this.image != null) {
         this.image.finish(location);
       }
-      if (this.terrainTypes != null) {
-        for (Terrain terrain : this.terrainTypes) {
-          terrain.finish(location);
-        }
-      }
       if (this.tiles != null) {
         // unsaved tiles don't need any post-processing
         for (TilesetEntry entry : this.tiles) {
@@ -389,7 +331,6 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
         }
         this.tilecount = this.allTiles.size();
       }
-      this.updateTileTerrain();
     }
   }
 
@@ -431,15 +372,6 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
 
     if (this.getProperties() != null && this.getProperties().isEmpty()) {
       this.setProperties(null);
-    }
-  }
-
-  private void updateTileTerrain() {
-    if (this.sourceTileset == null && this.tiles != null) {
-      // only go through saved tiles because unsaved tiles can't have terrains
-      for (TilesetEntry entry : this.tiles) {
-        entry.setTerrains(this.getTerrain(entry.getId()));
-      }
     }
   }
 }
