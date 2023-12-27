@@ -29,7 +29,7 @@ public class MapRenderer {
 
   /**
    * Adds the specified layer rendered listener to receive events when a layer has been rendered.
-   * 
+   *
    * @param listener
    *          The listener to add.
    */
@@ -39,7 +39,7 @@ public class MapRenderer {
 
   /**
    * Removes the specified layer rendered listener..
-   * 
+   *
    * @param listener
    *          The listener to remove.
    */
@@ -49,7 +49,7 @@ public class MapRenderer {
 
   /**
    * Adds the specified layer render condition to control whether layers should be rendered.
-   * 
+   *
    * @param condition
    *          The condition to add.
    */
@@ -59,7 +59,7 @@ public class MapRenderer {
 
   /**
    * Removes the specified layer render condition.
-   * 
+   *
    * @param condition
    *          The condition to remove.
    */
@@ -199,8 +199,8 @@ public class MapRenderer {
     final AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity);
     g.setComposite(ac);
 
-    final double viewportOffsetX = layer.getOffset().x - viewport.getX();
-    final double viewportOffsetY = layer.getOffset().y - viewport.getY();
+    final double viewportOffsetX = layer.getOffset().getX() - viewport.getX();
+    final double viewportOffsetY = layer.getOffset().getY() - viewport.getY();
 
     ImageRenderer.render(g, img, viewportOffsetX, viewportOffsetY);
     g.setComposite(oldComp);
@@ -213,14 +213,14 @@ public class MapRenderer {
 
   /**
    * This listener interface receives events when a layer was rendered.
-   * 
+   *
    * @see MapRenderer#onLayerRendered(LayerRenderedListener)
    */
   @FunctionalInterface
   public interface LayerRenderedListener extends EventListener {
     /**
      * Invoked when a layer has been rendered.
-     * 
+     *
      * @param event
      *          The layer render event.
      */
@@ -229,17 +229,17 @@ public class MapRenderer {
 
   /**
    * This listener interface provides a condition callback to contol whether a layer should be rendered.
-   * 
+   *
    * @see MapRenderer#addLayerRenderCondition(LayerRenderCondition)
    */
   @FunctionalInterface
   public interface LayerRenderCondition extends EventListener {
     /**
      * Invoked before the rendering of a layer to determine if it should be rendered.
-     * 
+     *
      * @param event
      *          The layer render event.
-     * 
+     *
      * @return Return true if the layer should be rendered; otherwise false.
      */
     boolean canRender(LayerRenderEvent event);

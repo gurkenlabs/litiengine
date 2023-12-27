@@ -1,8 +1,9 @@
 package de.gurkenlabs.litiengine.environment.tilemap;
 
 import de.gurkenlabs.litiengine.graphics.RenderType;
-import java.awt.Dimension;
-import java.awt.Point;
+
+import java.awt.*;
+import java.awt.geom.Point2D;
 
 public interface ILayer extends ICustomPropertyProvider {
 
@@ -29,23 +30,51 @@ public interface ILayer extends ICustomPropertyProvider {
   /**
    * Gets both the X and the Y offset of the layer.
    *
-   * @return a {@link Point} representing the offset
+   * @return a {@link Point2D} representing the offset
    */
-  Point getOffset();
+  Point2D getOffset();
 
   /**
    * Gets the horizontal offset of the layer.
    *
    * @return the x offset
    */
-  int getOffsetX();
+  double getOffsetX();
 
   /**
    * Gets the vertical offset of the layer.
    *
    * @return the y offset
    */
-  int getOffsetY();
+  double getOffsetY();
+
+  /**
+   * Gets the horizontal parallax scrolling factor of the layer. Defaults to 1.0.
+   *
+   * @return The horizontal parallax scrolling factor.
+   */
+  double getHorizontalParallaxFactor();
+
+  /**
+   * Gets the vertical parallax scrolling factor of the layer. Defaults to 1.0.
+   *
+   * @return The vertical parallax scrolling factor.
+   */
+  double getVerticalParallaxFactor();
+
+  /**
+   * Gets a tint color that affects the way contents of this layer are rendered.
+   *
+   * @return A color that is used to tint the visible contents of this layer.
+   */
+  Color getTintColor();
+
+  /**
+   * Sets the tint color of this layer.
+   *
+   * @param tintcolor The tint color of this layer.
+   */
+  void setTintColor(Color tintcolor);
 
   /**
    * Gets the size in tiles.

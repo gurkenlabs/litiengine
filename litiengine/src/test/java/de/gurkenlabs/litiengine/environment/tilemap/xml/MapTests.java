@@ -6,11 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 
-import de.gurkenlabs.litiengine.environment.tilemap.IMap;
-import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
-import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
-import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
-import de.gurkenlabs.litiengine.environment.tilemap.RenderOrder;
+import de.gurkenlabs.litiengine.environment.tilemap.*;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.io.URLAdapter;
 import java.awt.Color;
@@ -110,6 +106,29 @@ class MapTests {
   }
 
   @Test
+  void testImageLayers(){
+    IMap map =
+      Resources.maps()
+        .get("de/gurkenlabs/litiengine/environment/tilemap/xml/test-imagelayer.tmx");
+    assertEquals(1, map.getImageLayers().size());
+
+    IImageLayer layer = map.getImageLayers().getFirst();
+    assertEquals("blue_galaxy", layer.getName());
+    assertEquals(-32, layer.getOffsetX());
+    assertEquals(-32, layer.getOffset().getX());
+    assertEquals(-12000, layer.getOffsetY());
+    assertEquals(-12000, layer.getOffset().getY());
+    assertEquals(1.3, layer.getHorizontalParallaxFactor());
+    assertEquals(1.2, layer.getVerticalParallaxFactor());
+    assertEquals(true, layer.repeatHorizontally());
+    assertEquals(true, layer.repeatVertically());
+
+    assertEquals("blue_pixeled.png", layer.getImage().getSource());
+    assertEquals(672, layer.getImage().getWidth());
+    assertEquals(24000, layer.getImage().getHeight());
+  }
+
+  @Test
   void testMapObjectLayers() {
     IMap map =
         Resources.maps()
@@ -120,6 +139,7 @@ class MapTests {
     assertEquals("test", layer.getName());
     assertEquals(4, layer.getMapObjects().size());
     assertEquals(16, layer.getSizeInTiles().width);
+    assertEquals(new Color(195, 65, 0, 200), layer.getTintColor());
 
     IMapObject object = map.getMapObject(1);
 
