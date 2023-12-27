@@ -36,8 +36,8 @@ class MapTests {
     IMap map =
         Resources.maps().get("de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
 
-    assertEquals(1.0, map.getVersion());
-    assertEquals("1.1.4", map.getTiledVersion());
+    assertEquals(1.1, map.getVersion());
+    assertEquals("1.10.2", map.getTiledVersion());
     assertEquals(MapOrientations.ORTHOGONAL, map.getOrientation());
     assertEquals(RenderOrder.RIGHT_DOWN, map.getRenderOrder());
     assertEquals(256, map.getSizeInPixels().width);
@@ -46,6 +46,10 @@ class MapTests {
     assertEquals(16, map.getTileSize().height);
     assertEquals(16, map.getSizeInTiles().width);
     assertEquals(16, map.getSizeInTiles().height);
+    assertEquals(1.11, map.getParallaxOrigin().getX());
+    assertEquals(2, map.getParallaxOrigin().getY());
+
+    assertEquals(10, map.getNextLayerId());
     assertEquals(1, map.getNextObjectId());
 
     assertEquals("test-map", map.getName());
@@ -56,8 +60,8 @@ class MapTests {
     assertEquals(1, ((TmxMap) map).getExternalTilesets().size());
     assertEquals("external-tileset", map.getTilesets().get(1).getName());
     assertEquals(1, map.getTileLayers().size());
-    assertEquals(16, map.getTileLayers().get(0).getSizeInTiles().width);
-    assertEquals(16, map.getTileLayers().get(0).getSizeInTiles().height);
+    assertEquals(16, map.getTileLayers().getFirst().getSizeInTiles().width);
+    assertEquals(16, map.getTileLayers().getFirst().getSizeInTiles().height);
     assertEquals(0, map.getImageLayers().size());
     assertEquals(1, map.getRenderLayers().size());
     assertEquals(0, map.getMapObjectLayers().size());
@@ -113,7 +117,7 @@ class MapTests {
             .get("de/gurkenlabs/litiengine/environment/tilemap/xml/test-mapobject.tmx");
     assertEquals(1, map.getMapObjectLayers().size());
 
-    IMapObjectLayer layer = map.getMapObjectLayers().get(0);
+    IMapObjectLayer layer = map.getMapObjectLayers().getFirst();
     assertEquals("test", layer.getName());
     assertEquals(4, layer.getMapObjects().size());
     assertEquals(16, layer.getSizeInTiles().width);
@@ -174,7 +178,7 @@ class MapTests {
     assertEquals(2, map.getTileLayers().size());
     assertEquals(2, map.getTileLayers().size());
 
-    assertEquals(1, map.getTileLayers().get(0).getTile(15, 24).getGridId());
+    assertEquals(1, map.getTileLayers().getFirst().getTile(15, 24).getGridId());
   }
 
   @Test
