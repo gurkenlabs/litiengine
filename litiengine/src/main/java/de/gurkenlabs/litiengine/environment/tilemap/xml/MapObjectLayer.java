@@ -84,6 +84,11 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
   }
 
   @Override
+  public Dimension getSizeInTiles() {
+    return new Dimension(this.getWidth(), this.getHeight());
+  }
+
+  @Override
   public String toString() {
     return this.getName();
   }

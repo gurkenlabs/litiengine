@@ -73,6 +73,8 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
     this.setName(layerToBeCopied.getName());
     this.offsetx = layerToBeCopied.offsetx;
     this.offsety = layerToBeCopied.offsety;
+    this.parallaxx = layerToBeCopied.parallaxx;
+    this.parallaxy = layerToBeCopied.parallaxy;
     this.setOpacity(layerToBeCopied.getOpacity());
     this.setVisible(layerToBeCopied.isVisible());
     this.layerClass = layerToBeCopied.layerClass;
