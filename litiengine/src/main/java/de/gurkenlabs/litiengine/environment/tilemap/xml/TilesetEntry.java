@@ -42,7 +42,9 @@ public class TilesetEntry extends CustomPropertyProvider implements ITilesetEntr
   /**
    * Instantiates a new {@code TilesetEntry}.
    */
-  public TilesetEntry() {}
+  public TilesetEntry() {
+    // keep for serialization
+  }
 
   /**
    * Instantiates a new {@code TilesetEntry} from the specified tileset.

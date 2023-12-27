@@ -1,7 +1,6 @@
 package de.gurkenlabs.litiengine.environment.tilemap;
 
 import java.awt.Dimension;
-import java.util.List;
 
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resource;
@@ -13,48 +12,48 @@ public interface ITileset extends ICustomPropertyProvider, Resource {
    *
    * @return the first grid id
    */
-  public int getFirstGridId();
+  int getFirstGridId();
 
   /**
    * Gets the image.
    *
    * @return the image
    */
-  public IMapImage getImage();
+  IMapImage getImage();
 
-  public Spritesheet getSpritesheet();
+  Spritesheet getSpritesheet();
 
-  public int getMargin();
+  int getMargin();
 
-  public int getSpacing();
+  int getSpacing();
 
   /**
    * Gets the tile dimension.
    *
    * @return the tile dimension
    */
-  public Dimension getTileDimension();
+  Dimension getTileDimension();
 
-  public int getColumns();
+  int getColumns();
 
-  public ITileOffset getTileOffset();
+  ITileOffset getTileOffset();
 
-  public int getTileHeight();
+  int getTileHeight();
 
   /**
    * Gets the tile width.
    *
    * @return the tile width
    */
-  public int getTileWidth();
+  int getTileWidth();
 
-  public int getTileCount();
+  int getTileCount();
 
-  public ITilesetEntry getTile(int id);
+  ITilesetEntry getTile(int id);
 
-  public boolean containsTile(ITile tile);
+  boolean containsTile(ITile tile);
 
-  public boolean containsTile(ITilesetEntry entry);
+  boolean containsTile(ITilesetEntry entry);
 
-  public boolean containsTile(int tileId);
+  boolean containsTile(int tileId);
 }

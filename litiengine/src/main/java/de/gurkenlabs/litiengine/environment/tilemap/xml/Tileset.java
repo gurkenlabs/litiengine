@@ -354,12 +354,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
       this.columns = null;
     } else {
       this.tiles = new ArrayList<>(this.allTiles);
-      Iterator<TilesetEntry> iter = this.tiles.iterator();
-      while (iter.hasNext()) {
-        if (!iter.next().shouldBeSaved()) {
-          iter.remove();
-        }
-      }
+      this.tiles.removeIf(tilesetEntry -> !tilesetEntry.shouldBeSaved());
     }
 
     if (this.margin != null && this.margin == 0) {
