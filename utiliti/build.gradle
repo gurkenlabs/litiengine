@@ -34,7 +34,7 @@ dependencies {
 }
 
 runtime {
-  options.set(["--strip-debug", "--compress", "2", "--no-header-files", "--no-man-pages"])
+  options.set(["--strip-debug", "--no-header-files", "--no-man-pages"])
   modules.set(["java.desktop", "java.logging", "java.datatransfer", "java.management", "java.xml"])
 
   launcher {
@@ -48,7 +48,6 @@ runtime {
     var iconFileType = currentOs.isWindows() ? "ico" : currentOs.isMacOsX() ? "icns" : "png"
 
     imageOptions.addAll([
-      "--app-version", appVersion,
       "--icon", "${project.file("src/dist/pixel-icon-utiliti.$iconFileType").path}",
       "--description", description,
       "--copyright", copyright,
@@ -59,6 +58,10 @@ runtime {
     ] as Collection<? extends String>)
 
     if (currentOs.isMacOsX()) {
+//      TODO: Once we are above version 1.0.0, we should be able to use the project version directly for Mac builds.
+      def tmpAppVersion = project.version.toString().tokenize("-")[0].tokenize(".")
+      tmpAppVersion[0] = "1337"
+      appVersion = tmpAppVersion.join('.')
       imageOptions.addAll(
         ["--mac-package-identifier", "de.gurkenlabs.litiengine.utiliti",
          "--mac-package-name", applicationName // Name appearing in Menu Bar.
@@ -68,18 +71,15 @@ runtime {
   }
 }
 
-tasks.register("createLicenseProperties") {
+tasks.register("createLicenseProperties", WriteProperties) {
   dependsOn processResources
-  doLast {
-    new File("$buildDir/resources/main/licensing.properties").withWriter { w ->
-      Properties p = new Properties()
-      p['copyright'] = copyright.toString()
-      p['website'] = gurkenlabs_url
-      p['version'] = version.toString()
-      p.store w, null
-    }
-  }
+  destinationFile = file("${layout.buildDirectory.get()}/resources/main/licensing.properties")
+  encoding = "UTF-8"
+  property('copyright', copyright.toString())
+  property('website', gurkenlabs_url)
+  property('version', version.toString())
 }
+
 classes {
   dependsOn createLicenseProperties
 }
