@@ -139,6 +139,7 @@ class MapTests {
     assertEquals("test", layer.getName());
     assertEquals(4, layer.getMapObjects().size());
     assertEquals(16, layer.getSizeInTiles().width);
+    assertEquals(new Color(195, 65, 0, 200), layer.getTintColor());
 
     IMapObject object = map.getMapObject(1);
 
