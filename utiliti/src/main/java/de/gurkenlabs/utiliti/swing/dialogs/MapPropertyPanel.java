@@ -27,28 +27,20 @@ import javax.swing.ListSelectionModel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
-@SuppressWarnings("serial")
 public class MapPropertyPanel extends JPanel {
-
-  private AmbientLightPreviewPanel ambientlightPreview;
+  private final AmbientLightPreviewPanel ambientlightPreview;
+  private final JScrollPane scrollPane;
+  private final JSpinner spinnerGravity;
+  private final ColorComponent ambientColorComponent;
+  private final JEditorPane textFieldDesc;
+  private final JTextField textFieldName;
+  private final ColorComponent shadowColorComponent;
 
   private transient IMap dataSource;
 
   private DefaultTableModel model;
 
-  private JScrollPane scrollPane;
-
-  private final JSpinner spinnerGravity;
-
   private JTable tableCustomProperties;
-
-  private ColorComponent ambientColorComponent;
-
-  private final JEditorPane textFieldDesc;
-
-  private JTextField textFieldName;
-
-  private ColorComponent shadowColorComponent;
 
   private final JTextField textFieldTitle;
 

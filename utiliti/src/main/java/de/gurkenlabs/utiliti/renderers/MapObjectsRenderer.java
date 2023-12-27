@@ -177,8 +177,7 @@ public class MapObjectsRenderer implements IEditorRenderer {
     } else if (type == MapObjectType.LIGHTSOURCE) {
       final Color mapObjectColor = mapObject.getColorValue(MapObjectProperty.LIGHT_COLOR);
       if (mapObjectColor != null) {
-        borderColor = mapObjectColor != null ? new Color(mapObjectColor.getRed(), mapObjectColor.getGreen(),
-          mapObjectColor.getBlue(), 255) : Style.COLOR_LIGHT;
+        borderColor = new Color(mapObjectColor.getRed(), mapObjectColor.getGreen(), mapObjectColor.getBlue(), 255);
       }
     } else if (type == MapObjectType.STATICSHADOW) {
       borderColor = Style.COLOR_SHADOW_BORDER;
