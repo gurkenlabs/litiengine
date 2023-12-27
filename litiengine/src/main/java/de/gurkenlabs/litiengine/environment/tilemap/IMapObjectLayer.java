@@ -19,9 +19,7 @@ public interface IMapObjectLayer extends ILayer {
 
   Color getColor();
 
-  void setColor(String colorHexString);
-
-  String getColorHexString();
+  void setColor(Color color);
 
   Collection<IMapObject> getMapObjects(String... type);
 
