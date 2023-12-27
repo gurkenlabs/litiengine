@@ -22,19 +22,17 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 /**
- * The 2D Render Engine is used to render texts, shapes and entities at their location in the
- * {@code Environment} and with respect to the {@code Camera} location and zoom.
+ * The 2D Render Engine is used to render texts, shapes and entities at their location in the {@code Environment} and with respect to the
+ * {@code Camera} location and zoom.
  *
  * <p>
  * <i>Internally, it uses the static renderer implementations to actually execute the rendering
- * process. This class basically prepares the specified render subject and passed them to a renderer
- * with the current correct context.</i>
+ * process. This class basically prepares the specified render subject and passed them to a renderer with the current correct context.</i>
  *
  * @see GameWorld#environment()
  * @see GameWorld#camera()
@@ -88,8 +86,7 @@ public final class RenderEngine {
   }
 
   /**
-   * Adds the specified entity render listener to receive events and callbacks about the rendering
-   * process of entities.
+   * Adds the specified entity render listener to receive events and callbacks about the rendering process of entities.
    *
    * <p>
    * This is the global equivalent to {@code IEntity.addEntityRenderListener}
@@ -266,8 +263,7 @@ public final class RenderEngine {
   }
 
   /**
-   * Renders the outline with the defined {@code Stroke} of the specified shape to the translated
-   * location in the game world.
+   * Renders the outline with the defined {@code Stroke} of the specified shape to the translated location in the game world.
    *
    * @param g      The graphics object to render on.
    * @param shape  The shape to be rendered.
@@ -279,8 +275,7 @@ public final class RenderEngine {
   }
 
   /**
-   * Renders the outline with the defined {@code Stroke} of the specified shape to the translated
-   * location in the game world.
+   * Renders the outline with the defined {@code Stroke} of the specified shape to the translated location in the game world.
    *
    * @param g            The graphics object to render on.
    * @param shape        The shape to be rendered.
@@ -294,8 +289,7 @@ public final class RenderEngine {
   }
 
   /**
-   * Renders the outline with the defined {@code Stroke} of the specified shape to the translated
-   * location in the game world.
+   * Renders the outline with the defined {@code Stroke} of the specified shape to the translated location in the game world.
    *
    * @param g            The graphics object to render on.
    * @param shape        The shape to be rendered.
@@ -318,6 +312,13 @@ public final class RenderEngine {
     g.setRenderingHint(
       RenderingHints.KEY_ANTIALIASING,
       antialiasing ? RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF);
+    final AffineTransform t = getAffineTransform(shape, angle);
+
+    ShapeRenderer.renderOutlineTransformed(g, shape, t, stroke);
+    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, hint);
+  }
+
+  private static AffineTransform getAffineTransform(Shape shape, double angle) {
     final AffineTransform t = new AffineTransform();
 
     if (Game.world().environment() == null || !Game.world().environment().isRendering()) {
@@ -329,9 +330,7 @@ public final class RenderEngine {
       Math.toRadians(angle),
       shape.getBounds().getX() + shape.getBounds().getWidth() * 0.5,
       shape.getBounds().getY() + shape.getBounds().getHeight() * 0.5);
-
-    ShapeRenderer.renderOutlineTransformed(g, shape, t, stroke);
-    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, hint);
+    return t;
   }
 
   /**
@@ -376,25 +375,22 @@ public final class RenderEngine {
    * Renders the specified entities at their current location in the environment.
    *
    * <p>
-   * This method sorts the specified entities by their y-coordinate unless the {@code sort}
-   * parameter is set to false.
+   * This method sorts the specified entities by their y-coordinate unless the {@code sort} parameter is set to false.
    *
    * @param g        The graphics object to render on.
    * @param entities The entities to be rendered.
-   * @param sort     Defines whether the entities should be sorted by the {@code EntityYComparator}
-   *                 to simulate 2.5D graphics.
+   * @param sort     Defines whether the entities should be sorted by the {@code EntityYComparator} to simulate 2.5D graphics.
    * @see EntityYComparator
    */
   public void renderEntities(
     final Graphics2D g, final Collection<? extends IEntity> entities, final boolean sort) {
-    // filter out entities that are outside of the viewport and always include emitters which have
+    // filter out entities that are outside the viewport and always include emitters which have
     // an internal mechanism do determine on a per-particle basis whether it should be rendered
     final List<? extends IEntity> entitiesToRender =
       entities.stream()
         .filter(
           x -> Game.world().camera().getViewport().intersects(x.getBoundingBox())
-            || x instanceof Emitter)
-        .collect(Collectors.toList());
+            || x instanceof Emitter).collect(Collectors.toList());
 
     // in order to render the entities in a 2.5D manner, we sort them by their max Y Coordinate
     if (sort) {
@@ -402,7 +398,7 @@ public final class RenderEngine {
       // BETTER DATASTRUCTURE FOR THE (HEAP)
       // AND UPDATE THE HEAP WHENEVER AN ENTITY MOVES.
       try {
-        Collections.sort(entitiesToRender, this.entityComparator);
+        entitiesToRender.sort(this.entityComparator);
       } catch (final IllegalArgumentException e) {
         for (final IEntity entity : entities) {
           this.renderEntity(g, entity);
@@ -421,13 +417,11 @@ public final class RenderEngine {
    * Renders the specified entity at its current location in the environment.
    *
    * <p>
-   * This method uses the {@code IEntityAnimationController} to render the appropriate
-   * {@code Animation}.<br> If the entity implements the {@code IRenderable} interface, its render
-   * method is being called afterwards.
+   * This method uses the {@code IEntityAnimationController} to render the appropriate {@code Animation}.<br> If the entity implements the
+   * {@code IRenderable} interface, its render method is being called afterwards.
    *
    * <p>
-   * To listen to events about this process, you can add a {@code EntityRenderListener} or
-   * {@code EntityRenderedListener} to the render engine.
+   * To listen to events about this process, you can add a {@code EntityRenderListener} or {@code EntityRenderedListener} to the render engine.
    *
    * @param g      The graphics object to render on.
    * @param entity The entity to be rendered.
@@ -449,8 +443,8 @@ public final class RenderEngine {
 
     final EntityRenderEvent renderEvent = new EntityRenderEvent(g, entity);
 
-    if (entity instanceof EntityRenderListener) {
-      ((EntityRenderListener) entity).rendering(renderEvent);
+    if (entity instanceof EntityRenderListener erl) {
+      erl.rendering(renderEvent);
     }
 
     for (final EntityRenderListener listener : this.entityRenderListener) {
@@ -508,12 +502,12 @@ public final class RenderEngine {
       }
     }
 
-    if (entity instanceof IRenderable) {
-      ((IRenderable) entity).render(g);
+    if (entity instanceof IRenderable ir) {
+      ir.render(g);
     }
 
-    if (entity instanceof EntityRenderListener) {
-      ((EntityRenderListener) entity).rendered(renderEvent);
+    if (entity instanceof EntityRenderListener erl) {
+      erl.rendered(renderEvent);
     }
 
     for (final EntityRenderListener listener : this.entityRenderListener) {
@@ -526,12 +520,11 @@ public final class RenderEngine {
   }
 
   /**
-   * Determines whether the specified entity can be rendered by evaluating the callbacks to all
-   * registered {@code EntityRenderListeners}.
+   * Determines whether the specified entity can be rendered by evaluating the callbacks to all registered {@code EntityRenderListeners}.
    *
    * <p>
-   * If the {@code RenderType} of the specified entity is set to {@code NONE} or there are any
-   * callbacks that prevent the entity from being rendered, this method will return false.
+   * If the {@code RenderType} of the specified entity is set to {@code NONE} or there are any callbacks that prevent the entity from being rendered,
+   * this method will return false.
    *
    * @param entity The entity to check whether it can be rendered or not.
    * @return True if the entity can be rendered; otherwise false.
@@ -544,8 +537,7 @@ public final class RenderEngine {
       return false;
     }
 
-    if (entity instanceof EntityRenderListener
-      && !((EntityRenderListener) entity).canRender(entity)) {
+    if (entity instanceof EntityRenderListener erl && !erl.canRender(entity)) {
       return false;
     }
 

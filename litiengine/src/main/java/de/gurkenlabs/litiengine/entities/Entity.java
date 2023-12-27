@@ -12,7 +12,6 @@ import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
 import de.gurkenlabs.litiengine.tweening.TweenType;
 import de.gurkenlabs.litiengine.tweening.Tweenable;
 import de.gurkenlabs.litiengine.util.ReflectionUtilities;
-
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.lang.reflect.InvocationTargetException;
@@ -32,13 +31,13 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
   private static final Logger log = Logger.getLogger(Entity.class.getName());
   public static final String ANY_MESSAGE = "";
   private final Collection<EntityTransformListener> transformListeners =
-      ConcurrentHashMap.newKeySet();
+    ConcurrentHashMap.newKeySet();
   private final Collection<EntityListener> listeners = ConcurrentHashMap.newKeySet();
   private final Collection<EntityRenderListener> renderListeners = ConcurrentHashMap.newKeySet();
   private final Collection<EntityRenderedListener> renderedListeners =
-      ConcurrentHashMap.newKeySet();
+    ConcurrentHashMap.newKeySet();
   private final Map<String, Collection<EntityMessageListener>> messageListeners =
-      new ConcurrentHashMap<>();
+    new ConcurrentHashMap<>();
 
   private final EntityControllers controllers = new EntityControllers();
   private final EntityActionMap actions = new EntityActionMap();
@@ -293,9 +292,9 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
 
     if (!this.actions.exists(actionName)) {
       log.log(
-          Level.INFO,
-          "Entity \"{0}\" could not perform the action \"{1}\". \nMaybe you need to register the action or provide an appropriate Action annotation on the method you want to call.",
-          new Object[] {this, actionName});
+        Level.INFO,
+        "Entity \"{0}\" could not perform the action \"{1}\". \nMaybe you need to register the action or provide an appropriate Action annotation on the method you want to call.",
+        new Object[] {this, actionName});
       return;
     }
 
@@ -330,8 +329,7 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
   /**
    * Sets the map location.
    *
-   * @param location
-   *          the new map location
+   * @param location the new map location
    */
   @Override
   public void setLocation(final Point2D location) {
@@ -358,6 +356,9 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
 
   @Override
   public void setRenderType(final RenderType renderType) {
+    if (isLoaded()) {
+      Game.world().environment().assignRenderType(this, renderType);
+    }
     this.renderType = renderType;
   }
 
@@ -403,9 +404,9 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
     }
     if (this.getEnvironment() != null) {
       this.getEnvironment()
-          .getEntitiesByTag()
-          .computeIfAbsent(tag, t -> new CopyOnWriteArrayList<>())
-          .add(this);
+        .getEntitiesByTag()
+        .computeIfAbsent(tag, t -> new CopyOnWriteArrayList<>())
+        .add(this);
     }
   }
 
@@ -573,13 +574,13 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
   }
 
   private EntityMessageEvent fireMessageReceived(
-      Object sender, String listenerMessage, String message, EntityMessageEvent event) {
+    Object sender, String listenerMessage, String message, EntityMessageEvent event) {
     if (message == null) {
       return event;
     }
 
     if (this.messageListeners.containsKey(listenerMessage)
-        && this.messageListeners.get(listenerMessage) != null) {
+      && this.messageListeners.get(listenerMessage) != null) {
       EntityMessageEvent receivedEvent = event;
       for (EntityMessageListener listener : this.messageListeners.get(listenerMessage)) {
         if (receivedEvent == null) {
@@ -598,15 +599,15 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
    */
   private void registerActions() {
     List<Method> methods =
-        ReflectionUtilities.getMethodsAnnotatedWith(this.getClass(), Action.class);
+      ReflectionUtilities.getMethodsAnnotatedWith(this.getClass(), Action.class);
 
     // iterate over all methods that have the EntityActionInfo annotation and register them
     for (Method method : methods) {
       if (!Modifier.isPublic(method.getModifiers()) || method.getParameterCount() > 0) {
         log.log(
-            Level.INFO,
-            "\"{0}\" is not a valid entity action. Either make it public and parameterless or remove the Action annotation.",
-            new Object[] {method});
+          Level.INFO,
+          "\"{0}\" is not a valid entity action. Either make it public and parameterless or remove the Action annotation.",
+          new Object[] {method});
         continue;
       }
 
@@ -616,22 +617,22 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
       }
 
       final String actionName =
-          info.name() == null || info.name().isEmpty() ? method.getName() : info.name();
+        info.name() == null || info.name().isEmpty() ? method.getName() : info.name();
       EntityAction action =
-          this.register(
-              actionName,
-              () -> {
-                try {
-                  method.invoke(this);
-                } catch (IllegalAccessException
-                    | IllegalArgumentException
-                    | InvocationTargetException e) {
-                  log.log(
-                      Level.SEVERE,
-                      String.format("Could not perform the entity action %s", actionName),
-                      e);
-                }
-              });
+        this.register(
+          actionName,
+          () -> {
+            try {
+              method.invoke(this);
+            } catch (IllegalAccessException
+                     | IllegalArgumentException
+                     | InvocationTargetException e) {
+              log.log(
+                Level.SEVERE,
+                String.format("Could not perform the entity action %s", actionName),
+                e);
+            }
+          });
 
       if (action != null) {
         action.setDescription(info.description());
