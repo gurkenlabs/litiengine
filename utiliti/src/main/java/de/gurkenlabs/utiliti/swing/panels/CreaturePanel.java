@@ -85,7 +85,9 @@ public class CreaturePanel extends PropertyPanel {
     Map<String, String> m = new TreeMap<>();
     for (Spritesheet s : Resources.spritesheets().getAll()) {
       String creatureSpriteName = getCreatureSpriteName(s.getName());
-      m.putIfAbsent(creatureSpriteName, s.getName());
+      if (creatureSpriteName != null) {
+        m.putIfAbsent(creatureSpriteName, s.getName());
+      }
     }
 
     populateComboBoxWithSprites(this.comboBoxSpriteSheets, m);
