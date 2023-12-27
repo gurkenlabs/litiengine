@@ -6,7 +6,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer;
 import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.components.LayerController;
@@ -200,7 +199,7 @@ public final class LayerList extends JPanel implements LayerController {
           if (newColor == null) {
             return;
           }
-          selectedLayer.setColor(ColorHelper.encode(newColor));
+          selectedLayer.setColor(newColor);
         });
   }
 

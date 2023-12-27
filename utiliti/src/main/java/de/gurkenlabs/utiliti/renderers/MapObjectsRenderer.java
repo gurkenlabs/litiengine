@@ -9,7 +9,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
-import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.utiliti.Style;
 import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.components.MapComponent;
@@ -176,11 +175,10 @@ public class MapObjectsRenderer implements IEditorRenderer {
     if (type == MapObjectType.TRIGGER) {
       borderColor = Style.COLOR_TRIGGER_BORDER;
     } else if (type == MapObjectType.LIGHTSOURCE) {
-      final String mapObjectColor = mapObject.getStringValue(MapObjectProperty.LIGHT_COLOR);
-      if (mapObjectColor != null && !mapObjectColor.isEmpty()) {
-        Color lightColor = ColorHelper.decode(mapObjectColor);
-        borderColor = lightColor != null ? new Color(lightColor.getRed(), lightColor.getGreen(),
-          lightColor.getBlue(), 255) : Style.COLOR_LIGHT;
+      final Color mapObjectColor = mapObject.getColorValue(MapObjectProperty.LIGHT_COLOR);
+      if (mapObjectColor != null) {
+        borderColor = mapObjectColor != null ? new Color(mapObjectColor.getRed(), mapObjectColor.getGreen(),
+          mapObjectColor.getBlue(), 255) : Style.COLOR_LIGHT;
       }
     } else if (type == MapObjectType.STATICSHADOW) {
       borderColor = Style.COLOR_SHADOW_BORDER;

@@ -27,7 +27,7 @@ import java.util.List;
 @XmlRootElement(name = "emitter")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class EmitterData implements Serializable, Resource {
-  public static final Color DEFAULT_COLOR = ColorHelper.decode("#CC00a5bc");
+  public static final Color DEFAULT_COLOR = new Color(0, 165, 188, 204);
   public static final String DEFAULT_SPRITESHEET = "";
   public static final String DEFAULT_NAME = "Custom Emitter";
   public static final String DEFAULT_TEXT = "LITI";

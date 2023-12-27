@@ -36,7 +36,7 @@ public class ColorComponent extends JPanel {
     this.textFieldColor = ControlBehavior.apply(new JTextField());
     this.textFieldColor.setEditable(true);
     this.textFieldColor.setColumns(9);
-    this.textFieldColor.addActionListener(a -> this.setHexColor(this.textFieldColor.getText()));
+    this.textFieldColor.addActionListener(a -> this.setColor(ColorHelper.decode(this.textFieldColor.getText())));
 
     this.btnSelectColor = new JButton();
     this.btnSelectColor.setIcon(Icons.COLOR);
@@ -142,8 +142,7 @@ public class ColorComponent extends JPanel {
     return ColorHelper.decode(this.textFieldColor.getText());
   }
 
-  public void setHexColor(String colorHexString) {
-    Color color = ColorHelper.decode(colorHexString);
+  public void setColor(Color color) {
     if (color == null) {
       return;
     }
@@ -152,10 +151,6 @@ public class ColorComponent extends JPanel {
     for (ActionListener listener : this.listeners) {
       listener.actionPerformed(null);
     }
-  }
-
-  public void setColor(final Color color) {
-    setHexColor(ColorHelper.encode(color));
   }
 
   public void clear() {

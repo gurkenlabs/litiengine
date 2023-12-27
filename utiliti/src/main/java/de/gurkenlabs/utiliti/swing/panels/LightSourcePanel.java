@@ -57,14 +57,13 @@ public class LightSourcePanel extends PropertyPanel {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    final String color = mapObject.getStringValue(MapObjectProperty.LIGHT_COLOR);
     final String shape = mapObject.getStringValue(MapObjectProperty.LIGHT_SHAPE);
     final String active = mapObject.getStringValue(MapObjectProperty.LIGHT_ACTIVE);
 
     boolean isActive = active == null || active.isEmpty() || Boolean.parseBoolean(active);
     this.spinnerIntensity.setValue(
         mapObject.getIntValue(MapObjectProperty.LIGHT_INTENSITY, LightSource.DEFAULT_INTENSITY));
-    this.colorControl.setHexColor(color);
+    this.colorControl.setColor(mapObject.getColorValue(MapObjectProperty.LIGHT_COLOR));
     this.comboBoxLightShape.setSelectedItem(shape);
     this.checkBoxIsActive.setSelected(isActive);
     this.offsetX.setValue(
