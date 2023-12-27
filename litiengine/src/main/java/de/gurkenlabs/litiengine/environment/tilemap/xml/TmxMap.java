@@ -27,6 +27,7 @@ import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.net.URL;
 import java.util.ArrayList;
@@ -61,6 +62,10 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
   private double version;
   @XmlAttribute
   private String tiledversion;
+
+  @XmlAttribute(name = "class")
+  private String mapClass;
+
   @XmlAttribute
   private String orientation;
   @XmlTransient
@@ -83,6 +88,10 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
   private StaggerAxis staggeraxis;
   @XmlAttribute
   private StaggerIndex staggerindex;
+  @XmlAttribute
+  private double parallaxoriginx;
+  @XmlAttribute
+  private double parallaxoriginy;
   @XmlAttribute
   @XmlJavaTypeAdapter(ColorAdapter.class)
   private Color backgroundcolor;
@@ -219,6 +228,11 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
   @Override
   public Dimension getTileSize() {
     return new Dimension(this.tilewidth, this.tileheight);
+  }
+
+  @Override
+  public Point2D getParallaxOrigin() {
+    return new Point2D.Double(this.parallaxoriginx, this.parallaxoriginy);
   }
 
   @Override
@@ -448,11 +462,11 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
     return this.infinite == 1;
   }
 
-  protected int getChunkOffsetX() {
+  int getChunkOffsetX() {
     return this.chunkOffsetX;
   }
 
-  protected int getChunkOffsetY() {
+  int getChunkOffsetY() {
     return this.chunkOffsetY;
   }
 
