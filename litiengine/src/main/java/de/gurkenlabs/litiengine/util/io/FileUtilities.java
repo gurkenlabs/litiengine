@@ -9,6 +9,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -133,11 +134,11 @@ public final class FileUtilities {
 
     final int lastBackslash = name.lastIndexOf(FILE_SEPARATOR);
     if (lastBackslash != -1) {
-      name = name.substring(lastBackslash + 1, name.length());
+      name = name.substring(lastBackslash + 1);
     } else {
       final int lastForwardSlash = name.lastIndexOf(FILE_SEPARATOR_WIN);
       if (lastForwardSlash != -1) {
-        name = name.substring(lastForwardSlash + 1, name.length());
+        name = name.substring(lastForwardSlash + 1);
       }
     }
 
@@ -217,6 +218,6 @@ public final class FileUtilities {
     int exp = (int) (Math.log(bytes) / Math.log(unit));
     String pre = new String[] {"K", "M", "G", "T", "P", "E"}[exp - 1];
     pre = decimal ? pre : pre + "i";
-    return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
+    return String.format(Locale.ROOT, "%.1f %sB", bytes / Math.pow(unit, exp), pre);
   }
 }

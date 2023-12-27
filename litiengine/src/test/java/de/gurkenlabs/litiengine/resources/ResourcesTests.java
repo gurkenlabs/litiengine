@@ -9,10 +9,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.sound.Sound;
+
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Locale;
+
 import org.junit.jupiter.api.Test;
 
 class ResourcesTests {
@@ -51,7 +54,7 @@ class ResourcesTests {
   @Test
   void testMapResourcesAlias() {
     IMap map =
-        Resources.maps().get("de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
+      Resources.maps().get("de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
 
     assertEquals(map, Resources.maps().get("test-map"));
   }
@@ -59,8 +62,8 @@ class ResourcesTests {
   @Test
   void testResourceFromWeb() throws IOException {
     try (InputStream stream =
-        Resources.get(
-            "https://github.com/gurkenlabs/litiengine/blob/1ab49e67edf67242f1e1e6a67b54f36dd9b09c7e/resources/litiengine-banner.png?raw=true")) {
+           Resources.get(
+             "https://github.com/gurkenlabs/litiengine/blob/1ab49e67edf67242f1e1e6a67b54f36dd9b09c7e/resources/litiengine-banner.png?raw=true")) {
       assertNotNull(stream);
     }
   }
@@ -78,23 +81,23 @@ class ResourcesTests {
   @Test
   void testReadStringResources() {
     String fileContent =
-        Resources.read("de/gurkenlabs/litiengine/resources/stringfile-utf8.txt");
+      Resources.read("de/gurkenlabs/litiengine/resources/stringfile-utf8.txt");
     assertEquals("my utf8 èncöded strîng!!1$", fileContent);
   }
 
   @Test
   void testReadStringCharsetResources() {
     String fileContent =
-        Resources.read(
-            "de/gurkenlabs/litiengine/resources/stringfile-iso8859-1.txt",
-            StandardCharsets.ISO_8859_1);
+      Resources.read(
+        "de/gurkenlabs/litiengine/resources/stringfile-iso8859-1.txt",
+        StandardCharsets.ISO_8859_1);
     assertEquals("my iso8859 èncöded strîng!!1$", fileContent);
   }
 
   @Test
   void testStringList() {
     String[] strings =
-        Resources.strings().getList("de/gurkenlabs/litiengine/resources/test.txt");
+      Resources.strings().getList("de/gurkenlabs/litiengine/resources/test.txt");
 
     assertEquals(4, strings.length);
 
@@ -107,13 +110,23 @@ class ResourcesTests {
   @Test
   void testLocalizableString() {
     final String bundleName = "de/gurkenlabs/litiengine/resources/custom-strings";
-    String myString = Resources.strings().getFrom(bundleName, "mystring");
-    String myOtherString = Resources.strings().getFrom(bundleName, "myOtherString");
-    String lowerCase = Resources.strings().getFrom(bundleName, "myotherstring");
+    String oldLang = Game.config().client().getLanguage();
+    String oldCountry = Game.config().client().getCountry();
+    Game.config().client().setLanguage(Locale.ROOT.getLanguage());
+    Game.config().client().setCountry(Locale.ROOT.getCountry());
+    try {
+      String myString = Resources.strings().getFrom(bundleName, "mystring");
+      String myOtherString = Resources.strings().getFrom(bundleName, "myOtherString");
+      String lowerCase = Resources.strings().getFrom(bundleName, "myotherstring");
 
-    assertEquals("test me once", myString);
-    assertEquals("test me twice", myOtherString);
-    assertEquals("i'm lower case", lowerCase);
+
+      assertEquals("test me once", myString);
+      assertEquals("test me twice", myOtherString);
+      assertEquals("i'm lower case", lowerCase);
+    } finally {
+      Game.config().client().setLanguage(oldLang);
+      Game.config().client().setCountry(oldCountry);
+    }
   }
 
   @Test
@@ -136,12 +149,20 @@ class ResourcesTests {
     }
   }
 
-  @Test
+  @Test()
   void testStringsWithNoArgs() {
     final String bundleName = "de/gurkenlabs/litiengine/resources/custom-strings";
+    String oldLang = Game.config().client().getLanguage();
+    String oldCountry = Game.config().client().getCountry();
+    Game.config().client().setLanguage(Locale.ROOT.getLanguage());
+    Game.config().client().setCountry(Locale.ROOT.getCountry());
+    try {
+      String result = Resources.strings().getFrom(bundleName, "mystring", new Object[1]);
 
-    String result = Resources.strings().getFrom(bundleName, "mystring", new Object[1]);
-
-    assertEquals("test me once", result);
+      assertEquals("test me once", result);
+    } finally {
+      Game.config().client().setLanguage(oldLang);
+      Game.config().client().setCountry(oldCountry);
+    }
   }
 }
