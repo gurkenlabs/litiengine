@@ -129,11 +129,11 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
     @Override
     protected void setControlValues(IMapObject mapObject) {
       emitter = Game.world().environment().getEmitter(mapObject.getId());
-      spawnRateSpinner.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.SPAWNRATE));
-      spawnAmountSpinner.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.SPAWNAMOUNT));
-      updateDelaySpinner.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.UPDATERATE));
-      durationSpinner.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.DURATION));
-      maxParticlesSpinner.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.MAXPARTICLES));
+      spawnRateSpinner.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.SPAWNRATE, 0));
+      spawnAmountSpinner.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.SPAWNAMOUNT, 0));
+      updateDelaySpinner.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.UPDATERATE, 0));
+      durationSpinner.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.DURATION, 0));
+      maxParticlesSpinner.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.MAXPARTICLES, 0));
       btnPause.setSelected(emitter == null || emitter.isPaused());
     }
 

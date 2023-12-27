@@ -68,7 +68,7 @@ public class EmitterTextPanel extends PropertyPanel {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    setTexts(mapObject.getStringValue(MapObjectProperty.Particle.TEXTS));
+    setTexts(mapObject.getStringValue(MapObjectProperty.Particle.TEXTS, null));
   }
 
   protected LayoutManager createLayout() {

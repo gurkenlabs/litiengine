@@ -103,10 +103,8 @@ public final class MapMenu extends JMenu {
 
     if (option == JOptionPane.OK_OPTION) {
       panel.saveChanges();
-      final String colorProp = Game.world().environment().getMap().getStringValue(MapProperty.AMBIENTCOLOR);
-      if (colorProp != null && !colorProp.isEmpty()) {
-        Color ambientColor = ColorHelper.decode(colorProp);
-        Game.world().environment().getAmbientLight().setColor(ambientColor);
+      if (Game.world().environment().getMap().hasCustomProperty(MapProperty.AMBIENTCOLOR)) {
+        Game.world().environment().getAmbientLight().setColor(Game.world().environment().getMap().getColorValue(MapProperty.AMBIENTCOLOR));
       }
 
       UndoManager.instance().recordChanges();

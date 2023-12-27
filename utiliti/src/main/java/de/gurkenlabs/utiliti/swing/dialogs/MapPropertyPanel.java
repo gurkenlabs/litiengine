@@ -400,17 +400,17 @@ public class MapPropertyPanel extends JPanel {
   }
 
   private void setControlValues(final IMap map) {
-    this.textFieldDesc.setText(map.getStringValue(MapProperty.MAP_DESCRIPTION));
-    this.textFieldTitle.setText(map.getStringValue(MapProperty.MAP_TITLE));
+    this.textFieldDesc.setText(map.getStringValue(MapProperty.MAP_DESCRIPTION, null));
+    this.textFieldTitle.setText(map.getStringValue(MapProperty.MAP_TITLE, null));
     this.textFieldName.setText(map.getName());
-    if (map.getStringValue(MapProperty.AMBIENTCOLOR) != null) {
+    if (map.hasCustomProperty(MapProperty.AMBIENTCOLOR)) {
       this.ambientColorComponent.setColor(map.getColorValue(MapProperty.AMBIENTCOLOR));
     }
-    if (map.getStringValue(MapProperty.SHADOWCOLOR) != null) {
+    if (map.hasCustomProperty(MapProperty.SHADOWCOLOR)) {
       this.shadowColorComponent.setColor(map.getColorValue(MapProperty.SHADOWCOLOR));
     }
 
-    this.spinnerGravity.setValue(map.getIntValue(MapProperty.GRAVITY));
+    this.spinnerGravity.setValue(map.getIntValue(MapProperty.GRAVITY, 0));
 
     for (Map.Entry<String, ICustomProperty> prop : map.getProperties().entrySet()) {
       if (prop.getKey().equals(MapProperty.AMBIENTCOLOR)

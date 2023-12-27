@@ -24,12 +24,10 @@ public class TriggerMapObjectLoader extends MapObjectLoader {
       return entities;
     }
 
-    final String message = mapObject.getStringValue(MapObjectProperty.TRIGGER_MESSAGE);
-    final TriggerActivation act = mapObject.getStringValue(MapObjectProperty.TRIGGER_ACTIVATION) != null
-        ? TriggerActivation.valueOf(mapObject.getStringValue(MapObjectProperty.TRIGGER_ACTIVATION))
-        : TriggerActivation.COLLISION;
-    final boolean oneTime = mapObject.getBoolValue(MapObjectProperty.TRIGGER_ONETIME);
-    final int coolDown = mapObject.getIntValue(MapObjectProperty.TRIGGER_COOLDOWN);
+    final String message = mapObject.getStringValue(MapObjectProperty.TRIGGER_MESSAGE, null);
+    final TriggerActivation act = mapObject.getEnumValue(MapObjectProperty.TRIGGER_ACTIVATION, TriggerActivation.class, TriggerActivation.COLLISION);
+    final boolean oneTime = mapObject.getBoolValue(MapObjectProperty.TRIGGER_ONETIME, false);
+    final int coolDown = mapObject.getIntValue(MapObjectProperty.TRIGGER_COOLDOWN, 0);
 
     final Trigger trigger = this.createTrigger(mapObject, act, message, oneTime, coolDown);
     loadDefaultProperties(trigger, mapObject);
@@ -45,7 +43,10 @@ public class TriggerMapObjectLoader extends MapObjectLoader {
   }
 
   protected void loadTargets(IMapObject mapObject, Trigger trigger) {
-    final String targets = mapObject.getStringValue(MapObjectProperty.TRIGGER_TARGETS);
+    final String targets = mapObject.getStringValue(MapObjectProperty.TRIGGER_TARGETS, null);
+    if (targets == null) {
+      return;
+    }
 
     for (final int target : ArrayUtilities.splitInt(targets)) {
       if (target != 0) {
@@ -55,7 +56,10 @@ public class TriggerMapObjectLoader extends MapObjectLoader {
   }
 
   protected void loadActivators(IMapObject mapObject, Trigger trigger) {
-    final String activators = mapObject.getStringValue(MapObjectProperty.TRIGGER_ACTIVATORS);
+    final String activators = mapObject.getStringValue(MapObjectProperty.TRIGGER_ACTIVATORS, null);
+    if (activators == null) {
+      return;
+    }
 
     for (final int activator : ArrayUtilities.splitInt(activators)) {
       if (activator != 0) {

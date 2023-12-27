@@ -123,13 +123,13 @@ public abstract class PropertyPanel extends JPanel {
   }
 
   protected static void selectSpriteSheet(JComboBox<JLabel> comboBox, IMapObject mapObject) {
-    if (mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME) != null) {
+    if (mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME, null) != null) {
       for (int i = 0; i < comboBox.getModel().getSize(); i++) {
         JLabel label = comboBox.getModel().getElementAt(i);
         if (label != null
             && label
                 .getText()
-                .equals(mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME))) {
+                .equals(mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME, null))) {
           comboBox.setSelectedItem(label);
           break;
         }
@@ -195,12 +195,12 @@ public abstract class PropertyPanel extends JPanel {
     comboBox.addActionListener(
         new MapObjectPropertyActionListener(
             m -> {
-              if (!m.hasCustomProperty(property) || m.getStringValue(property) == null) {
+              if (!m.hasCustomProperty(property) || m.getStringValue(property, null) == null) {
                 return true;
               }
 
               T value = comboBox.getModel().getElementAt(comboBox.getSelectedIndex());
-              return !m.getStringValue(property).equals(value.toString());
+              return !m.getStringValue(property, null).equals(value.toString());
             },
             m -> {
               T value = comboBox.getModel().getElementAt(comboBox.getSelectedIndex());
@@ -215,12 +215,12 @@ public abstract class PropertyPanel extends JPanel {
     comboBox.addActionListener(
         new MapObjectPropertyActionListener(
             m -> {
-              if (!m.hasCustomProperty(property) || m.getStringValue(property) == null) {
+              if (!m.hasCustomProperty(property) || m.getStringValue(property, null) == null) {
                 return true;
               }
 
               JLabel value = comboBox.getModel().getElementAt(comboBox.getSelectedIndex());
-              return value != null && !m.getStringValue(property).equals(value.getText());
+              return value != null && !m.getStringValue(property, null).equals(value.getText());
             },
             m -> {
               JLabel value = comboBox.getModel().getElementAt(comboBox.getSelectedIndex());
@@ -258,8 +258,8 @@ public abstract class PropertyPanel extends JPanel {
     textField.addActionListener(
         new MapObjectPropertyActionListener(
             m -> !m.hasCustomProperty(property)
-                || m.getStringValue(property) == null
-                || !m.getStringValue(property).equals(textField.getText()),
+                || m.getStringValue(property, null) == null
+                || !m.getStringValue(property, null).equals(textField.getText()),
             m -> m.setValue(property, textField.getText())));
   }
 
@@ -270,8 +270,8 @@ public abstract class PropertyPanel extends JPanel {
     textList.addActionListener(
         new MapObjectPropertyActionListener(
             m -> !m.hasCustomProperty(property)
-                || m.getStringValue(property) == null
-                || !m.getStringValue(property).equals(textList.getJoinedString()),
+                || m.getStringValue(property, null) == null
+                || !m.getStringValue(property, null).equals(textList.getJoinedString()),
             m -> m.setValue(property, textList.getJoinedString())));
   }
 
@@ -511,8 +511,8 @@ public abstract class PropertyPanel extends JPanel {
     SpinnerListener(String mapObjectProperty, JSpinner spinner) {
       super(
           m -> m.hasCustomProperty(mapObjectProperty)
-              || m.getStringValue(mapObjectProperty) == null
-              || !m.getStringValue(mapObjectProperty).equals(spinner.getValue().toString()),
+              || m.getStringValue(mapObjectProperty, null) == null
+              || !m.getStringValue(mapObjectProperty, null).equals(spinner.getValue().toString()),
           m -> m.setValue(mapObjectProperty, spinner.getValue().toString()));
     }
   }
@@ -522,7 +522,7 @@ public abstract class PropertyPanel extends JPanel {
     SliderListener(String mapObjectProperty, JSlider slider) {
       super(
           m -> m.hasCustomProperty(mapObjectProperty)
-              || m.getIntValue(mapObjectProperty) != slider.getValue(),
+              || m.getIntValue(mapObjectProperty, 0) != slider.getValue(),
           m -> m.setValue(mapObjectProperty, slider.getValue()));
     }
 

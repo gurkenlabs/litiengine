@@ -57,22 +57,20 @@ public class LightSourcePanel extends PropertyPanel {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    final String shape = mapObject.getStringValue(MapObjectProperty.LIGHT_SHAPE);
-    final String active = mapObject.getStringValue(MapObjectProperty.LIGHT_ACTIVE);
+    final String shape = mapObject.getStringValue(MapObjectProperty.LIGHT_SHAPE, null);
+    final boolean isActive = mapObject.getBoolValue(MapObjectProperty.LIGHT_ACTIVE, false);
 
-    boolean isActive = active == null || active.isEmpty() || Boolean.parseBoolean(active);
-    this.spinnerIntensity.setValue(
-        mapObject.getIntValue(MapObjectProperty.LIGHT_INTENSITY, LightSource.DEFAULT_INTENSITY));
+    this.spinnerIntensity.setValue(mapObject.getIntValue(MapObjectProperty.LIGHT_INTENSITY, LightSource.DEFAULT_INTENSITY));
     this.colorControl.setColor(mapObject.getColorValue(MapObjectProperty.LIGHT_COLOR));
     this.comboBoxLightShape.setSelectedItem(shape);
     this.checkBoxIsActive.setSelected(isActive);
     this.offsetX.setValue(
         (int) Math.max(
-            Math.min(100 * mapObject.getDoubleValue(MapObjectProperty.LIGHT_FOCUSOFFSETX), 100),
+            Math.min(100 * mapObject.getDoubleValue(MapObjectProperty.LIGHT_FOCUSOFFSETX, 0), 100),
             -100));
     this.offsetY.setValue(
         (int) Math.max(
-            Math.min(100 * mapObject.getDoubleValue(MapObjectProperty.LIGHT_FOCUSOFFSETY), 100),
+            Math.min(100 * mapObject.getDoubleValue(MapObjectProperty.LIGHT_FOCUSOFFSETY, 0), 100),
             -100));
   }
 
@@ -80,7 +78,7 @@ public class LightSourcePanel extends PropertyPanel {
     this.colorControl.addActionListener(
         new MapObjectPropertyActionListener(
             m -> {
-              if (!m.hasCustomProperty(MapObjectProperty.LIGHT_COLOR) || m.getStringValue(MapObjectProperty.LIGHT_COLOR) == null) {
+              if (!m.hasCustomProperty(MapObjectProperty.LIGHT_COLOR) || m.getStringValue(MapObjectProperty.LIGHT_COLOR, null) == null) {
                 return true;
               }
 
@@ -88,8 +86,8 @@ public class LightSourcePanel extends PropertyPanel {
                 return true;
               }
 
-              return !m.getStringValue(MapObjectProperty.LIGHT_COLOR).equals(this.colorControl.getHexColor())
-                  || m.getIntValue(MapObjectProperty.LIGHT_INTENSITY) != (int) this.spinnerIntensity.getValue();
+              return !m.getStringValue(MapObjectProperty.LIGHT_COLOR, null).equals(this.colorControl.getHexColor())
+                  || m.getIntValue(MapObjectProperty.LIGHT_INTENSITY, 0) != (int) this.spinnerIntensity.getValue();
             },
             m -> {
               m.setValue(MapObjectProperty.LIGHT_COLOR, this.colorControl.getHexColor());

@@ -60,44 +60,44 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     data.setColors(mapObject.getCommaSeparatedStringValues(MapObjectProperty.Emitter.COLORS, ColorHelper.encode(EmitterData.DEFAULT_COLOR)));
 
     // particle
-    data.setParticleOffsetX(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.OFFSET_X_MIN),
-        mapObject.getFloatValue(MapObjectProperty.Particle.OFFSET_X_MAX)));
-    data.setParticleOffsetY(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.OFFSET_Y_MIN),
-        mapObject.getFloatValue(MapObjectProperty.Particle.OFFSET_Y_MAX)));
-    data.setParticleWidth(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.STARTWIDTH_MIN),
-        mapObject.getFloatValue(MapObjectProperty.Particle.STARTWIDTH_MAX)));
-    data.setParticleHeight(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.STARTHEIGHT_MIN),
-        mapObject.getFloatValue(MapObjectProperty.Particle.STARTHEIGHT_MAX)));
-    data.setVelocityX(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.VELOCITY_X_MIN),
-        mapObject.getFloatValue(MapObjectProperty.Particle.VELOCITY_X_MAX)));
-    data.setVelocityY(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.VELOCITY_Y_MIN),
-        mapObject.getFloatValue(MapObjectProperty.Particle.VELOCITY_Y_MAX)));
-    data.setAccelerationX(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.ACCELERATION_X_MIN),
-        mapObject.getFloatValue(MapObjectProperty.Particle.ACCELERATION_X_MAX)));
-    data.setAccelerationY(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.ACCELERATION_Y_MIN),
-        mapObject.getFloatValue(MapObjectProperty.Particle.ACCELERATION_Y_MAX)));
-    data.setDeltaWidth(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.DELTAWIDTH_MIN),
-        mapObject.getFloatValue(MapObjectProperty.Particle.DELTAWIDTH_MAX)));
-    data.setDeltaHeight(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.DELTAHEIGHT_MIN),
-        mapObject.getFloatValue(MapObjectProperty.Particle.DELTAHEIGHT_MAX)));
-    data.setAngle(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.ANGLE_MIN),
-        mapObject.getFloatValue(MapObjectProperty.Particle.ANGLE_MAX)));
-    data.setDeltaRotation(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.DELTA_ANGLE_MIN),
-        mapObject.getFloatValue(MapObjectProperty.Particle.DELTA_ANGLE_MAX)));
-    data.setParticleTTL(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.TTL_MIN),
-        mapObject.getFloatValue(MapObjectProperty.Particle.TTL_MAX)));
+    data.setParticleOffsetX(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.OFFSET_X_MIN, 0),
+        mapObject.getFloatValue(MapObjectProperty.Particle.OFFSET_X_MAX, 0)));
+    data.setParticleOffsetY(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.OFFSET_Y_MIN, 0),
+        mapObject.getFloatValue(MapObjectProperty.Particle.OFFSET_Y_MAX, 0)));
+    data.setParticleWidth(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.STARTWIDTH_MIN, 0),
+        mapObject.getFloatValue(MapObjectProperty.Particle.STARTWIDTH_MAX, 0)));
+    data.setParticleHeight(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.STARTHEIGHT_MIN, 0),
+        mapObject.getFloatValue(MapObjectProperty.Particle.STARTHEIGHT_MAX, 0)));
+    data.setVelocityX(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.VELOCITY_X_MIN, 0),
+        mapObject.getFloatValue(MapObjectProperty.Particle.VELOCITY_X_MAX, 0)));
+    data.setVelocityY(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.VELOCITY_Y_MIN, 0),
+        mapObject.getFloatValue(MapObjectProperty.Particle.VELOCITY_Y_MAX, 0)));
+    data.setAccelerationX(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.ACCELERATION_X_MIN, 0),
+        mapObject.getFloatValue(MapObjectProperty.Particle.ACCELERATION_X_MAX, 0)));
+    data.setAccelerationY(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.ACCELERATION_Y_MIN, 0),
+        mapObject.getFloatValue(MapObjectProperty.Particle.ACCELERATION_Y_MAX, 0)));
+    data.setDeltaWidth(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.DELTAWIDTH_MIN, 0),
+        mapObject.getFloatValue(MapObjectProperty.Particle.DELTAWIDTH_MAX, 0)));
+    data.setDeltaHeight(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.DELTAHEIGHT_MIN, 0),
+        mapObject.getFloatValue(MapObjectProperty.Particle.DELTAHEIGHT_MAX, 0)));
+    data.setAngle(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.ANGLE_MIN, 0),
+        mapObject.getFloatValue(MapObjectProperty.Particle.ANGLE_MAX, 0)));
+    data.setDeltaRotation(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.DELTA_ANGLE_MIN, 0),
+        mapObject.getFloatValue(MapObjectProperty.Particle.DELTA_ANGLE_MAX, 0)));
+    data.setParticleTTL(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.TTL_MIN, 0),
+        mapObject.getFloatValue(MapObjectProperty.Particle.TTL_MAX, 0)));
 
     data.setCollision(mapObject.getEnumValue(MapObjectProperty.COLLISION_TYPE, Collision.class, EmitterData.DEFAULT_COLLISION));
     data.setRequiredQuality(mapObject.getEnumValue(MapObjectProperty.REQUIRED_QUALITY, Quality.class, EmitterData.DEFAULT_REQUIRED_QUALITY));
 
     data.setTexts(mapObject.getCommaSeparatedStringValues(MapObjectProperty.Particle.TEXTS, EmitterData.DEFAULT_TEXT));
-    data.setSpritesheet(mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME));
-    data.setAnimateSprite(mapObject.getBoolValue(MapObjectProperty.Particle.ANIMATESPRITE));
-    data.setLoopSprite(mapObject.getBoolValue(MapObjectProperty.Particle.LOOPSPRITE));
-    data.setFade(mapObject.getBoolValue(MapObjectProperty.Particle.FADE));
-    data.setFadeOnCollision(mapObject.getBoolValue(MapObjectProperty.Particle.FADEONCOLLISION));
-    data.setOutlineOnly(mapObject.getBoolValue(MapObjectProperty.Particle.OUTLINEONLY));
-    data.setAntiAliasing(mapObject.getBoolValue(MapObjectProperty.Particle.ANTIALIASING));
+    data.setSpritesheet(mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME, null));
+    data.setAnimateSprite(mapObject.getBoolValue(MapObjectProperty.Particle.ANIMATESPRITE, false));
+    data.setLoopSprite(mapObject.getBoolValue(MapObjectProperty.Particle.LOOPSPRITE, false));
+    data.setFade(mapObject.getBoolValue(MapObjectProperty.Particle.FADE, false));
+    data.setFadeOnCollision(mapObject.getBoolValue(MapObjectProperty.Particle.FADEONCOLLISION, false));
+    data.setOutlineOnly(mapObject.getBoolValue(MapObjectProperty.Particle.OUTLINEONLY, false));
+    data.setAntiAliasing(mapObject.getBoolValue(MapObjectProperty.Particle.ANTIALIASING, false));
     return data;
   }
 

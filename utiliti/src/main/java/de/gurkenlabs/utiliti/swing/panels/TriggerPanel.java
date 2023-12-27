@@ -50,21 +50,15 @@ public class TriggerPanel extends PropertyPanel {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    this.textFieldMessage.setText(mapObject.getStringValue(MapObjectProperty.TRIGGER_MESSAGE));
+    this.textFieldMessage.setText(mapObject.getStringValue(MapObjectProperty.TRIGGER_MESSAGE, null));
 
-    this.textListTargets.setJoinedString(
-        mapObject.getStringValue(MapObjectProperty.TRIGGER_TARGETS));
-    this.textListActivators.setJoinedString(
-        mapObject.getStringValue(MapObjectProperty.TRIGGER_ACTIVATORS));
+    this.textListTargets.setJoinedString(mapObject.getStringValue(MapObjectProperty.TRIGGER_TARGETS, null));
+    this.textListActivators.setJoinedString(mapObject.getStringValue(MapObjectProperty.TRIGGER_ACTIVATORS, null));
 
-    this.chckbxOneTimeOnly.setSelected(mapObject.getBoolValue(MapObjectProperty.TRIGGER_ONETIME));
-    final TriggerActivation act =
-        mapObject.getStringValue(MapObjectProperty.TRIGGER_ACTIVATION) == null
-            ? TriggerActivation.COLLISION
-            : TriggerActivation.valueOf(
-                mapObject.getStringValue(MapObjectProperty.TRIGGER_ACTIVATION));
+    this.chckbxOneTimeOnly.setSelected(mapObject.getBoolValue(MapObjectProperty.TRIGGER_ONETIME, false));
+    final TriggerActivation act =  mapObject.getEnumValue(MapObjectProperty.TRIGGER_ACTIVATION, TriggerActivation.class, TriggerActivation.COLLISION);
     this.comboBoxActivationType.setSelectedItem(act);
-    this.spinnerCooldown.setValue(mapObject.getIntValue(MapObjectProperty.TRIGGER_COOLDOWN));
+    this.spinnerCooldown.setValue(mapObject.getIntValue(MapObjectProperty.TRIGGER_COOLDOWN, 0));
   }
 
   private void setupChangedListeners() {

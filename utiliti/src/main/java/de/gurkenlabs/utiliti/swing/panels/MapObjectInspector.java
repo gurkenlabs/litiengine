@@ -276,12 +276,12 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.scale.bind(mapObject);
     this.transform.setValues(mapObject.getX(), mapObject.getY());
     this.scale.setValues(mapObject.getWidth(), mapObject.getHeight());
-    this.tagPanel.bind(mapObject.getStringValue(MapObjectProperty.TAGS));
+    this.tagPanel.bind(mapObject.getStringValue(MapObjectProperty.TAGS, null));
 
     this.labelEntityID.setText(Integer.toString(mapObject.getId()));
     this.lblLayer.setText("Layer: " + mapObject.getLayer());
 
-    RenderType rt = mapObject.getEnumValue(MapObjectProperty.RENDERTYPE, RenderType.class);
+    RenderType rt = mapObject.getEnumValue(MapObjectProperty.RENDERTYPE, RenderType.class, RenderType.NORMAL);
     boolean showRenderTypeControls =
         MapObjectType.get(mapObject.getType()) == MapObjectType.CREATURE
             || MapObjectType.get(mapObject.getType()) == MapObjectType.EMITTER
@@ -330,7 +330,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
     this.tagPanel.addActionListener(
         new MapObjectPropertyActionListener(
-            m -> !m.hasCustomProperty(MapObjectProperty.TAGS) || !m.getStringValue(MapObjectProperty.TAGS).equals(this.tagPanel.getTagsString()),
+            m -> !m.hasCustomProperty(MapObjectProperty.TAGS) || !m.getStringValue(MapObjectProperty.TAGS, null).equals(this.tagPanel.getTagsString()),
             m -> m.setValue(MapObjectProperty.TAGS, this.tagPanel.getTagsString())));
   }
 }

@@ -96,7 +96,7 @@ public class EmitterColorPanel extends PropertyPanel {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    setColors(mapObject.getStringValue(MapObjectProperty.Emitter.COLORS));
+    setColors(mapObject.getStringValue(MapObjectProperty.Emitter.COLORS, null));
     colorVariance.setValue(
         mapObject.getDoubleValue(
             MapObjectProperty.Emitter.COLORVARIANCE, EmitterData.DEFAULT_COLOR_VARIANCE));

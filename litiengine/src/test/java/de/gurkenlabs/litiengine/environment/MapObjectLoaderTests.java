@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -220,9 +222,9 @@ class MapObjectLoaderTests {
     when(mapObject.getHeight()).thenReturn(200f);
 
     when(mapObject.getStringValue(MapObjectProperty.TRIGGER_MESSAGE)).thenReturn("message");
-    when(mapObject.getStringValue(MapObjectProperty.TRIGGER_ACTIVATION)).thenReturn(TriggerActivation.INTERACT.name());
-    when(mapObject.getStringValue(MapObjectProperty.TRIGGER_TARGETS)).thenReturn("1,2,3");
-    when(mapObject.getStringValue(MapObjectProperty.TRIGGER_ACTIVATORS)).thenReturn("4,5,6");
+    when(mapObject.getEnumValue(eq(MapObjectProperty.TRIGGER_ACTIVATION), any(Class.class), any(TriggerActivation.class))).thenReturn(TriggerActivation.INTERACT);
+    when(mapObject.getStringValue(MapObjectProperty.TRIGGER_TARGETS, null)).thenReturn("1,2,3");
+    when(mapObject.getStringValue(MapObjectProperty.TRIGGER_ACTIVATORS, null)).thenReturn("4,5,6");
     when(mapObject.getStringValue(MapObjectProperty.TRIGGER_ONETIME)).thenReturn("false");
 
     Collection<IEntity> entities = loader.load(this.testEnvironment, mapObject);
@@ -281,8 +283,7 @@ class MapObjectLoaderTests {
     when(mapObject.getIntValue(MapObjectProperty.LIGHT_INTENSITY, 100)).thenReturn(100);
     when(mapObject.getColorValue(MapObjectProperty.LIGHT_COLOR)).thenReturn(new Color(255, 255, 255, 100));
     when(mapObject.getBoolValue(MapObjectProperty.LIGHT_ACTIVE, true)).thenReturn(true);
-    when(mapObject.getEnumValue(MapObjectProperty.LIGHT_SHAPE, LightSource.Type.class)).thenReturn(LightSource.Type.ELLIPSE);
-    when(mapObject.getStringValue(MapObjectProperty.LIGHT_SHAPE)).thenReturn("ellipse");
+    when(mapObject.getEnumValue(eq(MapObjectProperty.LIGHT_SHAPE), eq(LightSource.Type.class), any(LightSource.Type.class))).thenReturn(LightSource.Type.ELLIPSE);
 
     Collection<IEntity> entities = loader.load(this.testEnvironment, mapObject);
     Optional<IEntity> opt = entities.stream().findFirst();

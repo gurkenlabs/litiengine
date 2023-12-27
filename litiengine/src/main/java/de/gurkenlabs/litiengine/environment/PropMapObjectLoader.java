@@ -34,23 +34,23 @@ public class PropMapObjectLoader extends MapObjectLoader {
    * <p>
    * Registers a custom {@link Prop} implementation that can be automatically provided by this {@link MapObjectLoader}.
    * </p>
-   * 
+   *
    * <p>
    * <b>This should only be used if the particular implementation doesn't require any additional map object properties to
    * be initialized.</b>
    * </p>
-   * 
+   *
    * Make sure that the implementation has the following present:
    * <ol>
    * <li>An {@link AnimationInfo} annotation with one or more sprite prefixes defined</li>
    * <li>Either an empty constructor or a constructor that takes in the sprite prefix from the loader.</li>
    * </ol>
-   * 
+   *
    * <p>
    * The latter is particularly useful for classes that can have different sprite sheets, i.e. share the same logic but
    * might have a different appearance.
    * </p>
-   * 
+   *
    * @param <T>
    *          The type of the custom creature implementation.
    * @param propType
@@ -68,22 +68,24 @@ public class PropMapObjectLoader extends MapObjectLoader {
     }
 
 
-    final Prop prop = this.createNewProp(mapObject, mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME));
+    final Prop prop = this.createNewProp(mapObject, mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME, null));
     loadDefaultProperties(prop, mapObject);
 
-    prop.setMaterial(Material.get(mapObject.getStringValue(MapObjectProperty.PROP_MATERIAL)));
+    prop.setMaterial(Material.get(mapObject.getStringValue(MapObjectProperty.PROP_MATERIAL, null)));
 
     entities.add(prop);
     return entities;
   }
 
   protected Prop createNewProp(IMapObject mapObject, String spriteSheet) {
-    for (Class<? extends Prop> customProp : customPropType) {
-      for (String prefix : EntityAnimationController.getDefaultSpritePrefixes(customProp)) {
-        if (prefix != null && (PropAnimationController.PROP_IDENTIFIER + spriteSheet).equalsIgnoreCase(prefix)) {
-          Prop created = createCustomProp(customProp, spriteSheet);
-          if (created != null) {
-            return created;
+    if(spriteSheet != null) {
+      for (Class<? extends Prop> customProp : customPropType) {
+        for (String prefix : EntityAnimationController.getDefaultSpritePrefixes(customProp)) {
+          if (prefix != null && (PropAnimationController.PROP_IDENTIFIER + spriteSheet).equalsIgnoreCase(prefix)) {
+            Prop created = createCustomProp(customProp, spriteSheet);
+            if (created != null) {
+              return created;
+            }
           }
         }
       }

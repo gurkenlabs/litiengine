@@ -2,10 +2,7 @@ package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.awt.Color;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
@@ -64,7 +61,11 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
 
   @Override
   public String getStringValue(String propertyName) {
-    return this.getStringValue(propertyName, null);
+    ICustomProperty property = this.getProperty(propertyName);
+    if (property == null) {
+      throw new NoSuchElementException(propertyName);
+    }
+    return property.getAsString();
   }
 
   @Override
@@ -79,7 +80,11 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
 
   @Override
   public char getCharValue(String propertyName) {
-    return this.getCharValue(propertyName, (char)0);
+    ICustomProperty property = this.getProperty(propertyName);
+    if (property == null) {
+      throw new NoSuchElementException(propertyName);
+    }
+    return property.getAsChar();
   }
 
   @Override
@@ -93,7 +98,11 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
 
   @Override
   public int getIntValue(String propertyName) {
-    return this.getIntValue(propertyName, 0);
+    ICustomProperty property = this.getProperty(propertyName);
+    if (property == null) {
+      throw new NoSuchElementException(propertyName);
+    }
+    return property.getAsInt();
   }
 
   @Override
@@ -103,6 +112,15 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
       return defaultValue;
     }
     return property.getAsInt();
+  }
+
+  @Override
+  public long getLongValue(String propertyName) {
+    ICustomProperty property = this.getProperty(propertyName);
+    if (property == null) {
+      throw new NoSuchElementException(propertyName);
+    }
+    return property.getAsLong();
   }
 
   @Override
@@ -116,7 +134,11 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
 
   @Override
   public short getShortValue(String propertyName) {
-    return this.getShortValue(propertyName, (short) 0);
+    ICustomProperty property = this.getProperty(propertyName);
+    if (property == null) {
+      throw new NoSuchElementException(propertyName);
+    }
+    return property.getAsShort();
   }
 
   @Override
@@ -130,7 +152,11 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
 
   @Override
   public byte getByteValue(String propertyName) {
-    return this.getByteValue(propertyName, (byte) 0);
+    ICustomProperty property = this.getProperty(propertyName);
+    if (property == null) {
+      throw new NoSuchElementException(propertyName);
+    }
+    return property.getAsByte();
   }
 
   @Override
@@ -144,7 +170,11 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
 
   @Override
   public boolean getBoolValue(String propertyName) {
-    return this.getBoolValue(propertyName, false);
+    ICustomProperty property = this.getProperty(propertyName);
+    if (property == null) {
+      throw new NoSuchElementException(propertyName);
+    }
+    return property.getAsBool();
   }
 
   @Override
@@ -158,7 +188,11 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
 
   @Override
   public float getFloatValue(String propertyName) {
-    return this.getFloatValue(propertyName, 0f);
+    ICustomProperty property = this.getProperty(propertyName);
+    if (property == null) {
+      throw new NoSuchElementException(propertyName);
+    }
+    return property.getAsFloat();
   }
 
   @Override
@@ -172,7 +206,12 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
 
   @Override
   public double getDoubleValue(String propertyName) {
-    return this.getDoubleValue(propertyName, 0.0);
+    ICustomProperty property = this.getProperty(propertyName);
+    if (property == null) {
+      throw new NoSuchElementException(propertyName);
+    }
+
+    return property.getAsDouble();
   }
 
   @Override
@@ -187,7 +226,12 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
 
   @Override
   public Color getColorValue(String propertyName) {
-    return this.getColorValue(propertyName, null);
+    ICustomProperty property = this.getProperty(propertyName);
+    if (property == null) {
+      throw new NoSuchElementException(propertyName);
+    }
+
+    return property.getAsColor();
   }
 
   @Override
@@ -207,7 +251,12 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
 
   @Override
   public <T extends Enum<T>> T getEnumValue(String propertyName, Class<T> enumType) {
-    return this.getEnumValue(propertyName, enumType, null);
+    ICustomProperty property = this.getProperty(propertyName);
+    if (property == null) {
+      throw new NoSuchElementException(propertyName);
+    }
+
+    return property.getAsEnum(enumType);
   }
 
   @Override
@@ -227,7 +276,12 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
 
   @Override
   public URL getFileValue(String propertyName) {
-    return this.getFileValue(propertyName, null);
+    ICustomProperty property = this.getProperty(propertyName);
+    if (property == null) {
+      throw new NoSuchElementException(propertyName);
+    }
+
+    return property.getAsFile();
   }
 
   @Override
@@ -249,7 +303,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
   public int getMapObjectId(String propertyName) {
     ICustomProperty property = this.getProperty(propertyName);
     if (property == null) {
-      return 0;
+      throw new NoSuchElementException(propertyName);
     }
 
     return property.getMapObjectId();

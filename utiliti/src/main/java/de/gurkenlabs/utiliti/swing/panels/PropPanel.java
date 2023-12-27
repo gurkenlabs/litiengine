@@ -89,21 +89,22 @@ public class PropPanel extends PropertyPanel {
   protected void setControlValues(IMapObject mapObject) {
     selectSpriteSheet(this.comboBoxSpriteSheets, mapObject);
 
-    final Material material =
-      mapObject.getStringValue(MapObjectProperty.PROP_MATERIAL) == null
-        ? Material.UNDEFINED
-        : Material.get(mapObject.getStringValue(MapObjectProperty.PROP_MATERIAL));
+    var material = Material.UNDEFINED;
+    if(mapObject.hasCustomProperty(MapObjectProperty.PROP_MATERIAL)){
+      material = Material.get(mapObject.getStringValue(MapObjectProperty.PROP_MATERIAL));
+    }
+
     this.comboBoxMaterial.setSelectedItem(material);
 
     this.comboBoxRotation.setSelectedItem(
       mapObject.getEnumValue(MapObjectProperty.PROP_ROTATION, Rotation.class, Rotation.NONE));
 
-    this.chckbxShadow.setSelected(mapObject.getBoolValue(MapObjectProperty.PROP_ADDSHADOW));
+    this.chckbxShadow.setSelected(mapObject.getBoolValue(MapObjectProperty.PROP_ADDSHADOW, false));
     this.checkBoxHorizontalFlip.setSelected(
-      mapObject.getBoolValue(MapObjectProperty.PROP_FLIPHORIZONTALLY));
+        mapObject.getBoolValue(MapObjectProperty.PROP_FLIPHORIZONTALLY, false));
     this.checkBoxVerticalFlip.setSelected(
-      mapObject.getBoolValue(MapObjectProperty.PROP_FLIPVERTICALLY));
-    this.checkBoxScale.setSelected(mapObject.getBoolValue(MapObjectProperty.SCALE_SPRITE));
+        mapObject.getBoolValue(MapObjectProperty.PROP_FLIPVERTICALLY, false));
+    this.checkBoxScale.setSelected(mapObject.getBoolValue(MapObjectProperty.SCALE_SPRITE, false));
   }
 
   private void setupChangedListeners() {

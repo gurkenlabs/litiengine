@@ -121,13 +121,7 @@ public interface ICustomPropertyProvider {
    * @throws NumberFormatException
    *           if the custom property is not an integer or is not in range for a {@code long}
    */
-  default long getLongValue(String propertyName) {
-    ICustomProperty property = this.getProperty(propertyName);
-    if (property == null) {
-      throw new NoSuchElementException(propertyName);
-    }
-    return property.getAsLong();
-  }
+  long getLongValue(String propertyName);
 
   /**
    * Gets the long value of the custom property with the provided name. If the value is null, the provided default value

@@ -70,9 +70,9 @@ public class CreaturePanel extends PropertyPanel {
   protected void setControlValues(IMapObject mapObject) {
     selectSpriteSheet(this.comboBoxSpriteSheets, mapObject);
     this.comboBoxDirection.setSelectedItem(
-      mapObject.getEnumValue(
-        MapObjectProperty.SPAWN_DIRECTION, Direction.class, Direction.UNDEFINED));
-    this.checkBoxScale.setSelected(mapObject.getBoolValue(MapObjectProperty.SCALE_SPRITE));
+        mapObject.getEnumValue(
+            MapObjectProperty.SPAWN_DIRECTION, Direction.class, Direction.UNDEFINED));
+    this.checkBoxScale.setSelected(mapObject.getBoolValue(MapObjectProperty.SCALE_SPRITE, false));
   }
 
   private void setupChangedListeners() {
