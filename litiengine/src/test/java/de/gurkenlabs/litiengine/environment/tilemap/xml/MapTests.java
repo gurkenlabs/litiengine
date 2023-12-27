@@ -15,7 +15,6 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.io.URLAdapter;
 import java.awt.Color;
 import java.awt.geom.Rectangle2D;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,7 +31,7 @@ class MapTests {
   }
 
   @Test
-  void testBasicProperties() throws MalformedURLException {
+  void testBasicProperties() {
     IMap map =
         Resources.maps().get("de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
 
