@@ -76,6 +76,21 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
     return property.getAsString();
   }
 
+
+  @Override
+  public char getCharValue(String propertyName) {
+    return this.getCharValue(propertyName, (char)0);
+  }
+
+  @Override
+  public char getCharValue(String propertyName, char defaultValue) {
+    ICustomProperty property = this.getProperty(propertyName);
+    if (property == null) {
+      return defaultValue;
+    }
+    return property.getAsChar();
+  }
+
   @Override
   public int getIntValue(String propertyName) {
     return this.getIntValue(propertyName, 0);
@@ -278,9 +293,12 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
 
   @Override
   public void setValue(String propertyName, short value) {
-    ICustomProperty property = createPropertyIfAbsent(propertyName);
-    property.setType(CustomPropertyType.INT);
-    property.setValue(value);
+    setValue(propertyName, (int) value);
+  }
+
+  @Override
+  public void setValue(String propertyName, char value) {
+    setValue(propertyName, String.valueOf(value));
   }
 
   @Override

@@ -19,10 +19,6 @@ public interface ICustomPropertyProvider {
    */
   boolean hasCustomProperty(String propertyName);
 
-  String getTypeOfProperty(String propertyName);
-
-  void setTypeOfProperty(String propertyName, String type);
-
   ICustomProperty getProperty(String propertyName);
 
   void setValue(String propertyName, ICustomProperty value);
@@ -63,6 +59,31 @@ public interface ICustomPropertyProvider {
    *         is returned.
    */
   List<String> getCommaSeparatedStringValues(String propertyName, String defaultValue);
+
+  /**
+   * Gets the char value of the custom property with the provided name.
+   *
+   * @param propertyName
+   *          the name of the custom property
+   * @return the char value of the custom property
+   * @throws NoSuchElementException
+   *           if the custom property does not exist
+   * @throws NumberFormatException
+   *           if the custom property is not a char or is not in range for a {@code char}
+   */
+  char getCharValue(String propertyName);
+
+  /**
+   * Gets the char value of the custom property with the provided name. If the value is null, the provided default value is
+   * used as a fallback.
+   *
+   * @param propertyName
+   *          the name of the custom property
+   * @param defaultValue
+   *          the fallback value in case the property value is null.
+   * @return the char value of the custom property, if present. Otherwise, the provided default value is returned.
+   */
+  char getCharValue(String propertyName, char defaultValue);
 
   /**
    * Gets the int value of the custom property with the provided name.
@@ -372,6 +393,16 @@ public interface ICustomPropertyProvider {
    *          the new value
    */
   void setValue(String propertyName, short value);
+
+  /**
+   * Sets the value for the custom property with the given name to the given char.
+   *
+   * @param propertyName
+   *          the name of the custom property
+   * @param value
+   *          the new value
+   */
+  void setValue(String propertyName, char value);
 
   /**
    * Sets the value for the custom property with the given name to the given int.

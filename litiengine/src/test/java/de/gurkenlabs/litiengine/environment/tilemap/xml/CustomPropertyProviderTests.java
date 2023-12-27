@@ -90,6 +90,7 @@ class CustomPropertyProviderTests {
   @Test
   void testCustomPropertyTypes() {
     provider.setValue("mybool", true);
+    provider.setValue("mychar", 'o');
     provider.setValue("myint", 111);
     provider.setValue("mybyte", (byte)111);
     provider.setValue("myshort", (short)111);
@@ -103,6 +104,7 @@ class CustomPropertyProviderTests {
     provider.setValue("myobject", mapObjectMock);
 
     assertTrue(provider.getBoolValue("mybool"));
+    assertEquals('o', provider.getCharValue("mychar"));
     assertEquals(111, provider.getIntValue("myint"));
     assertEquals((byte)111, provider.getByteValue("mybyte"));
     assertEquals((short)111, provider.getShortValue("myshort"));

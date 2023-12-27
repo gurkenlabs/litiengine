@@ -123,7 +123,7 @@ public class CustomProperty implements ICustomProperty {
 
   @Override
   public char getAsChar() {
-    return this.value.charAt(0); // TODO Is this enough? Should it check if it's the right length and throw an exception if it's not?
+    return this.value == null || this.value.isBlank() ? (char) 0 : this.value.charAt(0);
   }
 
   @Override
