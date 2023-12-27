@@ -9,7 +9,7 @@ public interface IImageLayer extends ICustomPropertyProvider, ILayer {
    *
    * @return the image
    */
-  IMapImage getImage();
+  public IMapImage getImage();
 
   /**
    * Gets the transparent color.
