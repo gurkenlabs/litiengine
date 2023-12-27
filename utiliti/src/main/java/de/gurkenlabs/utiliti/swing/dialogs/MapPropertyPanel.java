@@ -412,12 +412,10 @@ public class MapPropertyPanel extends JPanel {
     this.textFieldTitle.setText(map.getStringValue(MapProperty.MAP_TITLE));
     this.textFieldName.setText(map.getName());
     if (map.getStringValue(MapProperty.AMBIENTCOLOR) != null) {
-      final String hexColor = map.getStringValue(MapProperty.AMBIENTCOLOR);
-      this.ambientColorComponent.setHexColor(hexColor);
+      this.ambientColorComponent.setColor(map.getColorValue(MapProperty.AMBIENTCOLOR));
     }
     if (map.getStringValue(MapProperty.SHADOWCOLOR) != null) {
-      final String hexColor = map.getStringValue(MapProperty.SHADOWCOLOR);
-      this.shadowColorComponent.setHexColor(hexColor);
+      this.shadowColorComponent.setColor(map.getColorValue(MapProperty.SHADOWCOLOR));
     }
 
     this.spinnerGravity.setValue(map.getIntValue(MapProperty.GRAVITY));
