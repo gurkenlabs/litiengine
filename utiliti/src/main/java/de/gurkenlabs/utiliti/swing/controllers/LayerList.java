@@ -275,7 +275,7 @@ public final class LayerList extends JPanel implements LayerController {
     if (focus != null && focus.getLayer() != null) {
       return focus.getLayer();
     } else if (this.layerTable.getSelectedRow() < 0) {
-      return Game.world().environment().getMap().getMapObjectLayers().get(0);
+      return Game.world().environment().getMap().getMapObjectLayers().getFirst();
     }
     return Game.world()
         .environment()
