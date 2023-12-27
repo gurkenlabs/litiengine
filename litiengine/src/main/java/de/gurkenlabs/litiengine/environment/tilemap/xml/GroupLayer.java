@@ -1,39 +1,37 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlElements;
-
 import de.gurkenlabs.litiengine.environment.tilemap.IGroupLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ILayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElements;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class GroupLayer extends Layer implements IGroupLayer {
 
   @XmlElements({
-      @XmlElement(name = "imagelayer", type = ImageLayer.class),
-      @XmlElement(name = "layer", type = TileLayer.class),
-      @XmlElement(name = "objectgroup", type = MapObjectLayer.class),
-      @XmlElement(name = "group", type = GroupLayer.class)
+    @XmlElement(name = "imagelayer", type = ImageLayer.class),
+    @XmlElement(name = "layer", type = TileLayer.class),
+    @XmlElement(name = "objectgroup", type = MapObjectLayer.class),
+    @XmlElement(name = "group", type = GroupLayer.class)
   })
   private List<ILayer> layers;
 
-  private transient List<ITileLayer> rawTileLayers = new ArrayList<>();
-  private transient List<IMapObjectLayer> rawMapObjectLayers = new ArrayList<>();
-  private transient List<IImageLayer> rawImageLayers = new ArrayList<>();
-  private transient List<IGroupLayer> rawGroupLayers = new ArrayList<>();
+  private final transient List<ITileLayer> rawTileLayers = new ArrayList<>();
+  private final transient List<IMapObjectLayer> rawMapObjectLayers = new ArrayList<>();
+  private final transient List<IImageLayer> rawImageLayers = new ArrayList<>();
+  private final transient List<IGroupLayer> rawGroupLayers = new ArrayList<>();
 
-  private transient List<ITileLayer> tileLayers = Collections.unmodifiableList(this.rawTileLayers);
-  private transient List<IMapObjectLayer> mapObjectLayers = Collections.unmodifiableList(this.rawMapObjectLayers);
-  private transient List<IImageLayer> imageLayers = Collections.unmodifiableList(this.rawImageLayers);
-  private transient List<IGroupLayer> groupLayers = Collections.unmodifiableList(this.rawGroupLayers);
+  private final transient List<ITileLayer> tileLayers = Collections.unmodifiableList(this.rawTileLayers);
+  private final transient List<IMapObjectLayer> mapObjectLayers = Collections.unmodifiableList(this.rawMapObjectLayers);
+  private final transient List<IImageLayer> imageLayers = Collections.unmodifiableList(this.rawImageLayers);
+  private final transient List<IGroupLayer> groupLayers = Collections.unmodifiableList(this.rawGroupLayers);
 
   @Override
   public List<ILayer> getRenderLayers() {
@@ -49,8 +47,8 @@ public class GroupLayer extends Layer implements IGroupLayer {
   public void addLayer(ILayer layer) {
     this.layers.add(layer);
     this.layerAdded(layer);
-    if (layer instanceof Layer) {
-      ((Layer) layer).setMap((TmxMap) this.getMap());
+    if (layer instanceof Layer l) {
+      l.setMap((TmxMap) this.getMap());
     }
   }
 
@@ -58,8 +56,8 @@ public class GroupLayer extends Layer implements IGroupLayer {
   public void addLayer(int index, ILayer layer) {
     this.layers.add(index, layer);
     this.layerAdded(layer);
-    if (layer instanceof Layer) {
-      ((Layer) layer).setMap((TmxMap) this.getMap());
+    if (layer instanceof Layer l) {
+      l.setMap((TmxMap) this.getMap());
     }
   }
 
@@ -67,8 +65,8 @@ public class GroupLayer extends Layer implements IGroupLayer {
   public void removeLayer(ILayer layer) {
     this.layers.remove(layer);
     this.layerRemoved(layer);
-    if (layer instanceof Layer) {
-      ((Layer) layer).setMap(null);
+    if (layer instanceof Layer l) {
+      l.setMap(null);
     }
   }
 
@@ -76,8 +74,8 @@ public class GroupLayer extends Layer implements IGroupLayer {
   public void removeLayer(int index) {
     ILayer removed = this.layers.remove(index);
     this.layerRemoved(removed);
-    if (removed instanceof Layer) {
-      ((Layer) removed).setMap(null);
+    if (removed instanceof Layer l) {
+      l.setMap(null);
     }
   }
 
@@ -97,17 +95,17 @@ public class GroupLayer extends Layer implements IGroupLayer {
   }
 
   private void layerAdded(ILayer layer) {
-    if (layer instanceof ITileLayer) {
-      this.rawTileLayers.add((ITileLayer) layer);
+    if (layer instanceof ITileLayer itl) {
+      this.rawTileLayers.add(itl);
     }
-    if (layer instanceof IMapObjectLayer) {
-      this.rawMapObjectLayers.add((IMapObjectLayer) layer);
+    if (layer instanceof IMapObjectLayer imol) {
+      this.rawMapObjectLayers.add(imol);
     }
-    if (layer instanceof IImageLayer) {
-      this.rawImageLayers.add((IImageLayer) layer);
+    if (layer instanceof IImageLayer iil) {
+      this.rawImageLayers.add(iil);
     }
-    if (layer instanceof IGroupLayer) {
-      this.rawGroupLayers.add((IGroupLayer) layer);
+    if (layer instanceof IGroupLayer igl) {
+      this.rawGroupLayers.add(igl);
     }
   }
 
@@ -140,8 +138,8 @@ public class GroupLayer extends Layer implements IGroupLayer {
   void finish(URL location) throws TmxException {
     super.finish(location);
     for (ILayer layer : this.layers) {
-      if (layer instanceof Layer) {
-        ((Layer) layer).finish(location);
+      if (layer instanceof Layer l) {
+        l.finish(location);
       }
     }
   }

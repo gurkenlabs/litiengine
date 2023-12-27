@@ -1,11 +1,27 @@
 package de.gurkenlabs.litiengine.resources;
 
+import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
+import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
+import de.gurkenlabs.litiengine.util.io.XmlUtilities;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElementWrapper;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlTransient;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serial;
 import java.io.Serializable;
 import java.net.URL;
 import java.nio.file.Files;
@@ -18,37 +34,20 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipException;
 
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Marshaller;
-import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.XmlAttribute;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlElementWrapper;
-import jakarta.xml.bind.annotation.XmlRootElement;
-import jakarta.xml.bind.annotation.XmlTransient;
-
-import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
-import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
-import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
-import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
-import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
-import de.gurkenlabs.litiengine.util.io.XmlUtilities;
-
 @XmlRootElement(name = "litidata")
 public class ResourceBundle implements Serializable {
   private static final Logger log = Logger.getLogger(ResourceBundle.class.getName());
   public static final String FILE_EXTENSION = "litidata";
   public static final float CURRENT_VERSION = 1.0f;
 
-  private static final long serialVersionUID = -2101786184799276518L;
+  @Serial private static final long serialVersionUID = -2101786184799276518L;
 
   @XmlAttribute(name = "version")
   private float version;
 
   @XmlElementWrapper(name = "maps")
   @XmlElement(name = "map")
-  private List<TmxMap> maps;
+  private final List<TmxMap> maps;
 
   @XmlElementWrapper(name = "spriteSheets")
   @XmlElement(name = "sprite")
@@ -60,15 +59,15 @@ public class ResourceBundle implements Serializable {
 
   @XmlElementWrapper(name = "emitters")
   @XmlElement(name = "emitter")
-  private List<EmitterData> emitters;
+  private final List<EmitterData> emitters;
 
   @XmlElementWrapper(name = "blueprints")
   @XmlElement(name = "blueprint")
-  private List<Blueprint> blueprints;
+  private final List<Blueprint> blueprints;
 
   @XmlElementWrapper(name = "sounds")
   @XmlElement(name = "sound")
-  private List<SoundResource> sounds;
+  private final List<SoundResource> sounds;
 
   public ResourceBundle() {
     this.spriteSheets = new ArrayList<>();
@@ -96,8 +95,8 @@ public class ResourceBundle implements Serializable {
 
       for (TmxMap map : gameFile.getMaps()) {
         for (final ITileset tileset : map.getTilesets()) {
-          if (tileset instanceof Tileset) {
-            ((Tileset) tileset).load(gameFile.getTilesets());
+          if (tileset instanceof Tileset ts) {
+            ts.load(gameFile.getTilesets());
           }
         }
         map.finish(file);
@@ -105,7 +104,7 @@ public class ResourceBundle implements Serializable {
 
       return gameFile;
     } catch (final JAXBException | IOException e) {
-      log.log(Level.SEVERE, file + " - " + e.getMessage(), e);
+      log.log(Level.SEVERE, "{} - {}", new Object[] {file, e.getMessage()});
     }
 
     return null;

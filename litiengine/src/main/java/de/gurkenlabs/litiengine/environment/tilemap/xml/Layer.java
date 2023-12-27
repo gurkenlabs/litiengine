@@ -1,17 +1,15 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
-import java.awt.Dimension;
-import java.awt.Point;
-
-import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.XmlAttribute;
-import jakarta.xml.bind.annotation.XmlTransient;
-import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
 import de.gurkenlabs.litiengine.environment.tilemap.ILayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.LayerProperty;
 import de.gurkenlabs.litiengine.graphics.RenderType;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlTransient;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.awt.Dimension;
+import java.awt.Point;
 
 public abstract class Layer extends CustomPropertyProvider implements ILayer {
 
@@ -40,21 +38,20 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
   @XmlAttribute
   private Integer offsety;
 
-  private transient TmxMap parentMap;
-  private transient RenderType renderType;
-  private transient boolean renderTypeLoaded;
+  private TmxMap parentMap;
+  private RenderType renderType;
+  private boolean renderTypeLoaded;
 
-  public Layer() {
+  protected Layer() {
     super();
   }
 
   /**
    * Copy Constructor for copying instances of Layers.
    *
-   * @param layerToBeCopied
-   *          the layer we want to copy
+   * @param layerToBeCopied the layer we want to copy
    */
-  public Layer(Layer layerToBeCopied) {
+  protected Layer(Layer layerToBeCopied) {
     super(layerToBeCopied);
     this.setWidth(layerToBeCopied.getWidth());
     this.setHeight(layerToBeCopied.getHeight());
@@ -131,7 +128,7 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
     }
 
     this.renderType = this.getEnumValue(LayerProperty.LAYER_RENDER_TYPE, RenderType.class,
-        RenderType.GROUND);
+      RenderType.GROUND);
     this.renderTypeLoaded = true;
     return this.renderType;
   }
@@ -214,27 +211,27 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
   }
 
   protected void afterUnmarshal(Unmarshaller u, Object parent) {
-    if (parent instanceof TmxMap) {
-      this.parentMap = (TmxMap) parent;
+    if (parent instanceof TmxMap tmxMap) {
+      this.parentMap = tmxMap;
     }
 
-    if (this.offsetx != null && this.offsetx.intValue() == 0) {
+    if (this.offsetx != null && this.offsetx == 0) {
       this.offsetx = null;
     }
 
-    if (this.offsety != null && this.offsety.intValue() == 0) {
+    if (this.offsety != null && this.offsety == 0) {
       this.offsety = null;
     }
 
-    if (this.width != null && this.width.intValue() == 0) {
+    if (this.width != null && this.width == 0) {
       this.width = null;
     }
 
-    if (this.height != null && this.height.intValue() == 0) {
+    if (this.height != null && this.height == 0) {
       this.height = null;
     }
 
-    if (this.opacity != null && this.opacity.floatValue() == 1.0f) {
+    if (this.opacity != null && this.opacity == 1.0f) {
       this.opacity = null;
     }
   }

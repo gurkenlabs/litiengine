@@ -79,8 +79,8 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
     this.mapObjects.remove(mapObject);
     this.objects.remove(mapObject);
 
-    if (mapObject instanceof MapObject) {
-      ((MapObject) mapObject).setLayer(null);
+    if (mapObject instanceof MapObject mo) {
+      mo.setLayer(null);
     }
   }
 
@@ -98,14 +98,13 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
   public void addMapObject(IMapObject mapObject) {
     loadMapObjects();
     this.mapObjects.add(mapObject);
-    if (mapObject instanceof MapObject) {
-      MapObject obj = (MapObject) mapObject;
-      if (obj.getLayer() != null && !obj.getLayer().equals(this)) {
-        obj.getLayer().removeMapObject(obj);
+    if (mapObject instanceof MapObject mo) {
+      if (mo.getLayer() != null && !mo.getLayer().equals(this)) {
+        mo.getLayer().removeMapObject(mo);
       }
 
-      this.objects.add(obj);
-      obj.setLayer(this);
+      this.objects.add(mo);
+      mo.setLayer(this);
     }
   }
 

@@ -109,12 +109,10 @@ public abstract class Ability implements IRenderable {
   }
 
   /**
-   * Casts the ability by the temporal conditions of the specified game loop and the spatial
-   * circumstances of the specified environment. An ability execution will be taken out that start
-   * applying all the effects of this ability.
+   * Casts the ability by the temporal conditions of the specified game loop and the spatial circumstances of the specified environment. An ability
+   * execution will be taken out that start applying all the effects of this ability.
    *
-   * @return An {@link AbilityExecution} object that wraps all information about this execution of
-   * the ability.
+   * @return An {@link AbilityExecution} object that wraps all information about this execution of the ability.
    */
   public AbilityExecution cast() {
     if (!canCast()) {
@@ -189,7 +187,7 @@ public abstract class Ability implements IRenderable {
   @Override
   public void render(final Graphics2D g) {
     g.setColor(new Color(255, 255, 0, 25));
-    Game.graphics().renderShape(g, calculateImpactArea(),true);
+    Game.graphics().renderShape(g, calculateImpactArea(), true);
     final Stroke oldStroke = g.getStroke();
     g.setStroke(new BasicStroke(2f));
     g.setColor(new Color(255, 255, 0, 50));
@@ -233,11 +231,11 @@ public abstract class Ability implements IRenderable {
         new Point2D.Double(arcX, arcY), angle, getAttributes().range().get() * 0.5);
     final double start = angle - 90 - (impactAngle / 2.0);
     if (impactAngle % 360 == 0) {
-      return new Ellipse2D.Double(appliedRange.getX(), appliedRange.getY(), impact*2, impact*2);
+      return new Ellipse2D.Double(appliedRange.getX(), appliedRange.getY(), impact * 2d, impact * 2d);
     }
 
     return new Arc2D.Double(
-      appliedRange.getX(), appliedRange.getY(), impact*2, impact*2, start, impactAngle, Arc2D.PIE);
+      appliedRange.getX(), appliedRange.getY(), impact * 2d, impact * 2d, start, impactAngle, Arc2D.PIE);
   }
 
   private void onEffectApplied(final Effect effect, final EffectAppliedListener listener) {

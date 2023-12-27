@@ -4,11 +4,9 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.utiliti.components.Editor;
 import java.io.File;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-@SuppressWarnings("serial")
 public final class EditorFileChooser extends JFileChooser {
   private static EditorFileChooser instance;
 
@@ -26,7 +24,7 @@ public final class EditorFileChooser extends JFileChooser {
     instance().setFileSelectionMode(JFileChooser.FILES_ONLY);
     instance().setMultiSelectionEnabled(multiselect);
     instance().setDialogTitle(title);
-    return instance().showOpenDialog((JFrame) Game.window().getHostControl());
+    return instance().showOpenDialog(Game.window().getHostControl());
   }
 
   public static int showFileDialog(String description, boolean multiselect, String... extensions) {

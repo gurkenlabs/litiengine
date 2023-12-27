@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.litiengine.test.GameTestSuite;
 
-public class GameTestNoSwing {
+public class GameNoSwingTest {
 
 
   @BeforeAll
@@ -26,12 +26,8 @@ public class GameTestNoSwing {
   @Test
   void testSwingThreadAssertionsOutsideSwing() {
     Game.init(
-        () -> {
-          assertTrue(SwingUtilities.isEventDispatchThread());
-        },
-        () -> {
-          assertTrue(SwingUtilities.isEventDispatchThread());
-        },
+        () -> assertTrue(SwingUtilities.isEventDispatchThread()),
+        () -> assertTrue(SwingUtilities.isEventDispatchThread()),
         Game.COMMANDLINE_ARG_NOGUI);
   }
 

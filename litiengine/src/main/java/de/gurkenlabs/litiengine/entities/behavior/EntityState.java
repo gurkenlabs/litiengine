@@ -1,6 +1,5 @@
 package de.gurkenlabs.litiengine.entities.behavior;
 
-import de.gurkenlabs.litiengine.entities.Entity;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.Environment;
 

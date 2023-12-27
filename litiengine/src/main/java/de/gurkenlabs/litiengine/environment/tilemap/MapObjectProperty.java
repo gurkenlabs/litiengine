@@ -81,7 +81,7 @@ public final class MapObjectProperty {
   public static final String TRIGGER_TARGETS = "triggerTarget";
   public static final String TRIGGER_COOLDOWN = "triggerCooldown";
 
-  private static List<String> availableProperties = new ArrayList<>();
+  private static final List<String> availableProperties = new ArrayList<>();
 
   public static final class Emitter {
     public static final String COLORS = "emitterColors";
@@ -97,7 +97,8 @@ public final class MapObjectProperty {
     public static final String ORIGIN_ALIGN = "emitterOriginAlign";
     public static final String ORIGIN_VALIGN = "emitterOriginValign";
 
-    private Emitter() {}
+    private Emitter() {
+    }
   }
 
   public static final class Particle {
@@ -134,9 +135,14 @@ public final class MapObjectProperty {
     public static final String FADEONCOLLISION = "particleFadeOnCollision";
     public static final String OUTLINEONLY = "particleOutlineOnly";
     public static final String ANTIALIASING = "particleAntiAliasing";
+
+    private Particle() {
+
+    }
   }
 
-  private MapObjectProperty() {}
+  private MapObjectProperty() {
+  }
 
   public static List<String> getAvailableProperties() {
     if (availableProperties.isEmpty()) {

@@ -6,6 +6,7 @@ import de.gurkenlabs.litiengine.tweening.TweenType;
 import de.gurkenlabs.litiengine.tweening.Tweenable;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -328,9 +329,10 @@ public abstract class SoundPlayback implements Runnable {
 
     @Override
     public void setTweenValues(TweenType tweenType, float[] newValues) {
-      switch (tweenType) {
-        case VOLUME -> this.set(newValues[0]);
-        default -> Tweenable.super.setTweenValues(tweenType, newValues);
+      if (Objects.requireNonNull(tweenType) == TweenType.VOLUME) {
+        this.set(newValues[0]);
+      } else {
+        Tweenable.super.setTweenValues(tweenType, newValues);
       }
     }
   }

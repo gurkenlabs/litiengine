@@ -1,5 +1,12 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
+import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.awt.Color;
 import java.net.URL;
 import java.util.ArrayList;
@@ -8,15 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
-
-import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
-import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
-import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 public class CustomPropertyProvider implements ICustomPropertyProvider {
@@ -31,12 +29,11 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
   /**
    * Copy Constructor for copying instances of CustomPropertyProviders.
    *
-   * @param propertyProviderToBeCopied
-   *          the PropertyProvider we want to copy
+   * @param propertyProviderToBeCopied the PropertyProvider we want to copy
    */
   public CustomPropertyProvider(ICustomPropertyProvider propertyProviderToBeCopied) {
     this.properties = propertyProviderToBeCopied.getProperties().entrySet().stream()
-        .collect(Collectors.toMap(Entry::getKey, e -> new CustomProperty((e.getValue()))));
+      .collect(Collectors.toMap(Entry::getKey, e -> new CustomProperty((e.getValue()))));
   }
 
   @Override
@@ -357,10 +354,11 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
     List<String> values = new ArrayList<>();
     String valuesStr = this.getStringValue(propertyName, defaultValue);
     if (valuesStr != null && !valuesStr.isEmpty()) {
-      for (String value : valuesStr.split(","))
+      for (String value : valuesStr.split(",")) {
         if (value != null) {
           values.add(value);
         }
+      }
     }
     return values;
   }

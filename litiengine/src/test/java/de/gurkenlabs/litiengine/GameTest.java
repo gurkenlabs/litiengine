@@ -32,12 +32,12 @@ public class GameTest {
     terminateGame();
   }
 
-  private class Status {
+  private static class Status {
     boolean wasCalled = false;
   }
 
   @Test
-  public void testStartup() {
+  void testStartup() {
     final Status initialized = new Status();
     final Status started = new Status();
 
@@ -80,13 +80,11 @@ public class GameTest {
   }
 
   @Test
-  public void testSwingThreadAssertionsInsideSwing() {
-    assertThrows(AWTError.class, () -> {
-      Game.init(
-          () -> {},
-          () -> {},
-          Game.COMMANDLINE_ARG_NOGUI);
-    });
+  void testSwingThreadAssertionsInsideSwing() {
+    assertThrows(AWTError.class, () -> Game.init(
+        () -> {},
+        () -> {},
+        Game.COMMANDLINE_ARG_NOGUI));
   }
 
 }

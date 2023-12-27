@@ -306,7 +306,7 @@ public class MapComponent extends GuiComponent {
                 : null);
       }
 
-      Point2D newFocus = null;
+      Point2D newFocus;
 
       if (this.cameraFocus.containsKey(map.getName())) {
         newFocus = this.cameraFocus.get(map.getName());
@@ -695,9 +695,7 @@ public class MapComponent extends GuiComponent {
     }
 
     final String map = Game.world().environment().getMap().getName();
-    if (!this.selectedObjects.containsKey(map)) {
-      this.selectedObjects.put(map, new CopyOnWriteArrayList<>());
-    }
+    this.selectedObjects.putIfAbsent(map, new CopyOnWriteArrayList<>());
 
     if (clearSelection) {
       this.getSelectedMapObjects().clear();

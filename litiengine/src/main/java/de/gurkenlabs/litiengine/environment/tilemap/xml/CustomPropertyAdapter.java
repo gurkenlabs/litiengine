@@ -117,7 +117,7 @@ public class CustomPropertyAdapter extends XmlAdapter<CustomPropertyAdapter.Prop
 
   @Override
   public Map<String, ICustomProperty> unmarshal(PropertyList v) {
-    Map<String, ICustomProperty> map = new HashMap<>(v.properties.size()); // use hashtable to reject null keys/values
+    Map<String, ICustomProperty> map = HashMap.newHashMap(v.properties.size()); // use hashtable to reject null keys/values
     for (Property property : v.properties) {
       CustomProperty prop = new CustomProperty(property.type, property.value != null ? property.value : property.contents);
       if (property.location != null) {

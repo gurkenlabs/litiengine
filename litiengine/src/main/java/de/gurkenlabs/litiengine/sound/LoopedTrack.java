@@ -6,7 +6,7 @@ import java.util.Objects;
 import javax.sound.sampled.AudioFormat;
 
 public class LoopedTrack implements Track, Iterator<Sound> {
-  private Sound track;
+  private final Sound track;
 
   /**
    * Initializes a new {@code LoopedTrack} for the specified sound.
@@ -53,7 +53,7 @@ public class LoopedTrack implements Track, Iterator<Sound> {
   @Override
   public boolean equals(Object anObject) {
     return this == anObject
-        || anObject instanceof LoopedTrack && ((LoopedTrack) anObject).track.equals(this.track);
+        || anObject instanceof LoopedTrack lt && lt.track.equals(this.track);
   }
 
   @Override

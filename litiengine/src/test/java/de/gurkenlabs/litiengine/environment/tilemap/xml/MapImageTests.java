@@ -10,9 +10,11 @@ import org.junit.jupiter.api.Test;
 
 public class MapImageTests {
 
-  /** Tests the copy constructor and verifies that there are no side effects. */
+  /**
+   * Tests the copy constructor and verifies that there are no side effects.
+   */
   @Test
-  public void testCopyConstructor() throws MalformedURLException {
+  void testCopyConstructor() throws MalformedURLException {
     MapImage original = new MapImage();
     MapImage copy = new MapImage(original);
 
@@ -41,7 +43,9 @@ public class MapImageTests {
     assertEquals(10, original.getHeight());
   }
 
-  /** Helper method to verify that a newly created map image is valid. */
+  /**
+   * Helper method to verify that a newly created map image is valid.
+   */
   public static void verifyUnmodified(MapImage image) {
     assertNull(image.getSource());
     assertNull(image.getAbsoluteSourcePath());

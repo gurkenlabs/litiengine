@@ -1,14 +1,13 @@
 package de.gurkenlabs.litiengine.environment;
 
+import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import de.gurkenlabs.litiengine.entities.IEntity;
-import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 
 public final class CustomMapObjectLoader extends MapObjectLoader {
   private static final Logger log = Logger.getLogger(CustomMapObjectLoader.class.getName());
@@ -67,7 +66,7 @@ public final class CustomMapObjectLoader extends MapObjectLoader {
     try {
       entity = invoke.invoke(environment, mapObject);
     } catch (ReflectiveOperationException e) {
-      log.log(Level.SEVERE, "map object " + mapObject.getId() + " failed to load", e);
+      log.log(Level.SEVERE, "map object {} failed to load", mapObject.getId());
       return entities;
     }
 

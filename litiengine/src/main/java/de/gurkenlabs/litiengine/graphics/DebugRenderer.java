@@ -96,17 +96,17 @@ public final class DebugRenderer {
       drawMapId(g, entity);
     }
 
-    if (Game.config().debug().renderHitBoxes() && entity instanceof ICombatEntity) {
+    if (Game.config().debug().renderHitBoxes() && entity instanceof ICombatEntity ico) {
       g.setColor(Color.RED);
-      Game.graphics().renderOutline(g, ((ICombatEntity) entity).getHitBox());
+      Game.graphics().renderOutline(g, ico.getHitBox());
     }
 
     if (Game.config().debug().renderBoundingBoxes()) {
       g.setColor(Color.RED);
       Game.graphics().renderOutline(g, entity.getBoundingBox());
 
-      if (entity instanceof SoundSource) {
-        final int range = ((SoundSource) entity).getRange();
+      if (entity instanceof SoundSource ss) {
+        final int range = ss.getRange();
         final float[] dash1 = {10f};
         final BasicStroke dashed =
             new BasicStroke(.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, dash1, 0.0f);
@@ -123,10 +123,9 @@ public final class DebugRenderer {
       }
     }
 
-    if (Game.config().debug().renderCollisionBoxes() && entity instanceof ICollisionEntity) {
-      final ICollisionEntity collisionEntity = (ICollisionEntity) entity;
-      g.setColor(collisionEntity.hasCollision() ? Color.RED : Color.ORANGE);
-      Game.graphics().renderOutline(g, collisionEntity.getCollisionBox());
+    if (Game.config().debug().renderCollisionBoxes() && entity instanceof ICollisionEntity ice) {
+      g.setColor(ice.hasCollision() ? Color.RED : Color.ORANGE);
+      Game.graphics().renderOutline(g, ice.getCollisionBox());
     }
 
     final EntityRenderEvent event = new EntityRenderEvent(g, entity);

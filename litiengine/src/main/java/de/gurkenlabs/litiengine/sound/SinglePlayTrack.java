@@ -5,7 +5,9 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import javax.sound.sampled.AudioFormat;
 
-/** A {@code Track} that plays a sound once and then stops. */
+/**
+ * A {@code Track} that plays a sound once and then stops.
+ */
 public class SinglePlayTrack implements Track {
   private Sound sound;
 
@@ -30,8 +32,7 @@ public class SinglePlayTrack implements Track {
   /**
    * Initializes a new {@code SinglePlayTrack} for the specified sound.
    *
-   * @param soundName
-   *          The name of the sound to be played by this track.
+   * @param soundName The name of the sound to be played by this track.
    */
   public SinglePlayTrack(String soundName) {
     this(Resources.sounds().get(soundName));
@@ -40,8 +41,7 @@ public class SinglePlayTrack implements Track {
   /**
    * Initializes a new {@code SinglePlayTrack} for the specified sound.
    *
-   * @param sound
-   *          The sound to be played by this track.
+   * @param sound The sound to be played by this track.
    */
   public SinglePlayTrack(Sound sound) {
     this.sound = sound;
@@ -59,7 +59,7 @@ public class SinglePlayTrack implements Track {
 
   @Override
   public boolean equals(Object obj) {
-    return obj instanceof SinglePlayTrack && this.sound == ((SinglePlayTrack) obj).sound;
+    return obj instanceof SinglePlayTrack spt && this.sound == spt.sound;
   }
 
   @Override

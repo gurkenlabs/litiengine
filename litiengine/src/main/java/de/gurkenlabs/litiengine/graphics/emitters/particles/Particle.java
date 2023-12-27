@@ -78,7 +78,7 @@ public abstract class Particle implements ITimeToLive {
    * @param width  the particle width in pixels
    * @param height the particle height in pixels
    */
-  public Particle(final float width, final float height) {
+  protected Particle(final float width, final float height) {
     this.setWidth(width);
     this.setHeight(height);
     this.collisionType = Collision.NONE;

@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.test.GameTestSuite;
-
 import java.math.BigDecimal;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -26,7 +25,7 @@ public class NumberAdjusterTests {
   }
 
   @Test
-  public void testSetCurrentValue() {
+  void testSetCurrentValue() {
     NumberAdjuster number = new NumberAdjuster(0, 0, 150, 300, 0, 400, 1, 4);
 
     BigDecimal newValue = new BigDecimal("123456.0");
@@ -43,7 +42,7 @@ public class NumberAdjusterTests {
   }
 
   @Test
-  public void testSetLowerBound() {
+  void testSetLowerBound() {
     // arrange
     NumberAdjuster number = new NumberAdjuster(0, 0, 150, 300, 0, 400, 1, 4);
     BigDecimal currentValue1 = new BigDecimal("-456.0");
@@ -62,7 +61,7 @@ public class NumberAdjusterTests {
   }
 
   @Test
-  public void testSetUpperBound() {
+  void testSetUpperBound() {
     // arrange
     NumberAdjuster number = new NumberAdjuster(0, 0, 150, 300, 0, 400, 1, 4);
     BigDecimal currentValue1 = new BigDecimal("456.0");

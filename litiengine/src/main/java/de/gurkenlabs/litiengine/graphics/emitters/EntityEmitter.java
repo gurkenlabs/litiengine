@@ -1,6 +1,5 @@
 package de.gurkenlabs.litiengine.graphics.emitters;
 
-import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import java.awt.geom.Point2D;
@@ -17,16 +16,13 @@ public class EntityEmitter extends Emitter {
   private boolean dynamicLocation;
 
   /**
-   * Constructs a new EntityEmitter from a given emitter resource that follows an entity's
-   * location.
+   * Constructs a new EntityEmitter from a given emitter resource that follows an entity's location.
    *
    * @param entity              The IEntity to which this emitter is bound.
-   * @param emitterResourceName The name of the configuration for this emitter. If the Emitter has
-   *                            been added to the game resource file, it is loaded from there by
-   *                            name. Otherwise, the EmitterLoader will search the Resource folders
-   *                            for a file with the emitterResourceName.
-   * @param dynamicLocation     If true, the emitter follows the entity's location; if false, it
-   *                            remains at the location where it has been created.
+   * @param emitterResourceName The name of the configuration for this emitter. If the Emitter has been added to the game resource file, it is loaded
+   *                            from there by name. Otherwise, the EmitterLoader will search the Resource folders for a file with the
+   *                            emitterResourceName.
+   * @param dynamicLocation     If true, the emitter follows the entity's location; if false, it remains at the location where it has been created.
    */
   public EntityEmitter(
     final IEntity entity, final String emitterResourceName, final boolean dynamicLocation) {
@@ -35,14 +31,12 @@ public class EntityEmitter extends Emitter {
   }
 
   /**
-   * Constructs a new EntityEmitter from a given emitter resource that remains at the location where
-   * it has been created.
+   * Constructs a new EntityEmitter from a given emitter resource that remains at the location where it has been created.
    *
    * @param entity              The IEntity to which this emitter is bound.
-   * @param emitterResourceName The name of the configuration for this emitter. If the Emitter has
-   *                            been added to the game resource file, it is loaded from there by
-   *                            name. Otherwise, the EmitterLoader will search the Resource folders
-   *                            for a file with the emitterResourceName.
+   * @param emitterResourceName The name of the configuration for this emitter. If the Emitter has been added to the game resource file, it is loaded
+   *                            from there by name. Otherwise, the EmitterLoader will search the Resource folders for a file with the
+   *                            emitterResourceName.
    */
   public EntityEmitter(final IEntity entity, final String emitterResourceName) {
     this(entity, emitterResourceName, false);
@@ -53,8 +47,7 @@ public class EntityEmitter extends Emitter {
    *
    * @param entity          The IEntity to which this emitter is bound.
    * @param emitterData     The EmitterData object defining the emitter's behavior.
-   * @param dynamicLocation If true, the emitter follows the entity's location; if false, it remains
-   *                        at the location where it has been created.
+   * @param dynamicLocation If true, the emitter follows the entity's location; if false, it remains at the location where it has been created.
    */
   public EntityEmitter(
     final IEntity entity, final EmitterData emitterData, final boolean dynamicLocation) {
@@ -63,8 +56,7 @@ public class EntityEmitter extends Emitter {
   }
 
   /**
-   * Constructs a new EntityEmitter with EmitterData that remains at the location where it has been
-   * created.
+   * Constructs a new EntityEmitter with EmitterData that remains at the location where it has been created.
    *
    * @param entity      The IEntity to which this emitter is bound.
    * @param emitterData The EmitterData object defining the emitter's behavior.
@@ -86,8 +78,7 @@ public class EntityEmitter extends Emitter {
    * Instantiates a new entity emitter.
    *
    * @param entity          The IEntity to which this emitter is bound.
-   * @param dynamicLocation If true, the emitter follows the entity's location; if false, it remains
-   *                        at the location where it has been created.
+   * @param dynamicLocation If true, the emitter follows the entity's location; if false, it remains at the location where it has been created.
    */
   public EntityEmitter(final IEntity entity, boolean dynamicLocation) {
     super();
@@ -107,8 +98,8 @@ public class EntityEmitter extends Emitter {
   }
 
   /**
-   * Check if the emitter has dynamic location tracking enabled. This determines whether this
-   * Emitter's location is updated along its entity's location.
+   * Check if the emitter has dynamic location tracking enabled. This determines whether this Emitter's location is updated along its entity's
+   * location.
    *
    * @return True if dynamic location is enabled, false otherwise.
    */
@@ -119,8 +110,7 @@ public class EntityEmitter extends Emitter {
   /**
    * Toggle dynamic location updates.
    *
-   * @param dynamicLocation If true, the emitter follows its entity's location; if false, it remains
-   *                        at the location where it has been created.
+   * @param dynamicLocation If true, the emitter follows its entity's location; if false, it remains at the location where it has been created.
    */
   public void setDynamicLocation(boolean dynamicLocation) {
     this.dynamicLocation = dynamicLocation;

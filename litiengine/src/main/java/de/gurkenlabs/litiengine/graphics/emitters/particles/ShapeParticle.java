@@ -10,7 +10,7 @@ import java.awt.geom.Rectangle2D;
 
 public abstract class ShapeParticle extends Particle {
 
-  public ShapeParticle(float width, float height) {
+  protected ShapeParticle(float width, float height) {
     super(width, height);
   }
 
