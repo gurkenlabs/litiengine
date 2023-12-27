@@ -28,7 +28,7 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
   @XmlJavaTypeAdapter(ColorAdapter.class)
   private Color color;
 
-  private transient List<IMapObject> mapObjects = new CopyOnWriteArrayList<>();
+  private transient final List<IMapObject> mapObjects = new CopyOnWriteArrayList<>();
 
   private transient boolean added;
 
@@ -81,11 +81,6 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
     if (mapObject instanceof MapObject mo) {
       mo.setLayer(null);
     }
-  }
-
-  @Override
-  public Dimension getSizeInTiles() {
-    return new Dimension(this.getWidth(), this.getHeight());
   }
 
   @Override
