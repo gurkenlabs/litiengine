@@ -112,5 +112,7 @@ class CustomPropertyProviderTests {
     assertEquals(111.0f, provider.getFloatValue("myfloat"));
     assertEquals(111.0, provider.getDoubleValue("mydouble"));
     assertEquals(Color.BLACK, provider.getColorValue("mycolor"));
+
+    assertEquals(123, provider.getMapObjectId("myobject"));
   }
 }

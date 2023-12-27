@@ -36,7 +36,9 @@ public class CustomPropertyAdapter extends XmlAdapter<CustomPropertyAdapter.Prop
     @XmlTransient
     URL location;
 
-    Property() {}
+    Property() {
+      // keep for serialization
+    }
 
     Property(String name, String type) {
       this.name = name;
@@ -86,7 +88,9 @@ public class CustomPropertyAdapter extends XmlAdapter<CustomPropertyAdapter.Prop
     @XmlElement(name = "property")
     List<Property> properties;
 
-    PropertyList() {}
+    PropertyList() {
+      // keep for serialization
+    }
 
     PropertyList(List<Property> properties) {
       this.properties = properties;

@@ -66,7 +66,7 @@ class CustomPropertyAdapterTests {
     CustomPropertyAdapter.PropertyList marshal = adapter.marshal(properties);
 
     // assert
-    assertEquals("value", marshal.properties.get(0).value);
+    assertEquals("value", marshal.properties.getFirst().value);
   }
 
   @Test
@@ -80,8 +80,8 @@ class CustomPropertyAdapterTests {
     CustomPropertyAdapter.PropertyList marshal = adapter.marshal(properties);
 
     // assert
-    assertEquals("value\n", marshal.properties.get(0).contents);
-    assertNull(marshal.properties.get(0).value);
+    assertEquals("value\n", marshal.properties.getFirst().contents);
+    assertNull(marshal.properties.getFirst().value);
   }
 
   @Test
