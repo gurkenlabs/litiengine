@@ -44,7 +44,7 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
 
   public static final String FILE_EXTENSION = "tmx";
   public static final int MAX_MAJOR = 1;
-  public static final int MAX_MINOR = 2;
+  public static final int MAX_MINOR = 10;
   private static final Logger log = Logger.getLogger(TmxMap.class.getName());
   private final transient List<ITileLayer> rawTileLayers = new CopyOnWriteArrayList<>();
   private final transient List<IMapObjectLayer> rawMapObjectLayers = new CopyOnWriteArrayList<>();
