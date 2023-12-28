@@ -9,6 +9,8 @@ class CustomPropertyType {
   static final String COLOR = "color";
   static final String OBJECT = "object";
 
+  private CustomPropertyType(){}
+
   static boolean isValid(String type) {
     for (String valid : values()) {
       if (valid.equalsIgnoreCase(type)) {

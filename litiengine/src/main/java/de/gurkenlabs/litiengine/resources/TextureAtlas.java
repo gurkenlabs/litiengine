@@ -49,7 +49,7 @@ public class TextureAtlas {
       atlas.absoluteImagePath = FileUtilities.combine(directory, atlas.rawImagePath);
       return atlas;
     } catch (JAXBException e) {
-      log.log(Level.SEVERE, "TextureAtlas " + textureAtlasFile + " could not be read.", e);
+      log.log(Level.SEVERE, String.format("TextureAtlas %s could not be read.", textureAtlasFile), e);
       return null;
     }
   }

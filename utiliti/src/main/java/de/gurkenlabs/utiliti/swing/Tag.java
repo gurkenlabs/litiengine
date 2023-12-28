@@ -19,8 +19,6 @@ public class Tag extends JPanel {
   private final JLabel lblText;
   private final JButton btnDelete;
 
-  private boolean deleteHovered;
-
   public Tag(String text) {
     this();
     this.setTag(text);
@@ -53,8 +51,6 @@ public class Tag extends JPanel {
           @Override
           public void mouseEntered(final MouseEvent e) {
             btnDelete.setIcon(Icons.DELETE_X7);
-
-            deleteHovered = true;
           }
 
           @Override
@@ -62,7 +58,6 @@ public class Tag extends JPanel {
             if (!btnDelete.hasFocus()) {
               btnDelete.setIcon(Icons.DELETE_X7_DISABLED);
             }
-            deleteHovered = false;
           }
         });
 
