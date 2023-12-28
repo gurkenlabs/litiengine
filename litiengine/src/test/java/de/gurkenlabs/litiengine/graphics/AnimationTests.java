@@ -5,13 +5,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.animation.Animation;
 import de.gurkenlabs.litiengine.graphics.animation.KeyFrame;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 class AnimationTests {
   private static final String SPRITE_SHEET_NAME = "spritesheet.png";
@@ -21,10 +22,10 @@ class AnimationTests {
   @BeforeEach
   public void setUp() {
     Game.init();
-    Spritesheet spritesheet = Mockito.mock(Spritesheet.class);
-    Mockito.when(spritesheet.getName()).thenReturn(SPRITE_SHEET_NAME);
-    Mockito.when(spritesheet.getTotalNumberOfSprites()).thenReturn(3);
-    Mockito.when(spritesheet.isLoaded()).thenReturn(true);
+    Spritesheet spritesheet = mock(Spritesheet.class);
+    when(spritesheet.getName()).thenReturn(SPRITE_SHEET_NAME);
+    when(spritesheet.getTotalNumberOfSprites()).thenReturn(3);
+    when(spritesheet.isLoaded()).thenReturn(true);
 
     animation = new Animation(spritesheet, true, false, 100, 150, 200);
   }

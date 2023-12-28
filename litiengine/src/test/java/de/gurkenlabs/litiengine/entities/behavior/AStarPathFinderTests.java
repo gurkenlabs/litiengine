@@ -10,7 +10,8 @@ import java.awt.Dimension;
 import java.awt.geom.Point2D;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class AStarPathFinderTests {
   private AStarPathFinder pathFinder;
@@ -18,8 +19,8 @@ class AStarPathFinderTests {
   @BeforeEach
   public void setUp() {
     // Create a mock AStarGrid for testing
-    AStarGrid grid = Mockito.mock(AStarGrid.class);
-    Mockito.when(grid.getSize()).thenReturn(new Dimension(10, 10));
+    AStarGrid grid = mock(AStarGrid.class);
+    when(grid.getSize()).thenReturn(new Dimension(10, 10));
 
     pathFinder = new AStarPathFinder(grid);
   }
@@ -39,9 +40,9 @@ class AStarPathFinderTests {
 
   @Test
   void testConstructorWithIMapAndGridNodeSize() {
-    IMap map = Mockito.mock(IMap.class);
-    Mockito.when(map.getSizeInPixels()).thenReturn(new Dimension(640, 480));
-    Mockito.when(map.getTileSize()).thenReturn(new Dimension(32, 32));
+    IMap map = mock(IMap.class);
+    when(map.getSizeInPixels()).thenReturn(new Dimension(640, 480));
+    when(map.getTileSize()).thenReturn(new Dimension(32, 32));
 
     AStarPathFinder pathFinder = new AStarPathFinder(map, 32);
     assertNotNull(pathFinder);
@@ -50,9 +51,9 @@ class AStarPathFinderTests {
 
   @Test
   void testConstructorWithIMap() {
-    IMap map = Mockito.mock(IMap.class);
-    Mockito.when(map.getSizeInPixels()).thenReturn(new Dimension(640, 480));
-    Mockito.when(map.getTileSize()).thenReturn(new Dimension(32, 32));
+    IMap map = mock(IMap.class);
+    when(map.getSizeInPixels()).thenReturn(new Dimension(640, 480));
+    when(map.getTileSize()).thenReturn(new Dimension(32, 32));
 
     AStarPathFinder pathFinder = new AStarPathFinder(map);
     assertNotNull(pathFinder);
@@ -61,8 +62,8 @@ class AStarPathFinderTests {
 
   @Test
   void testFindPathWithDirectPath() {
-    IMobileEntity entity = Mockito.mock(IMobileEntity.class);
-    Mockito.when(entity.getCollisionBoxCenter()).thenReturn(new Point2D.Double(10, 10));
+    IMobileEntity entity = mock(IMobileEntity.class);
+    when(entity.getCollisionBoxCenter()).thenReturn(new Point2D.Double(10, 10));
 
     Path path = pathFinder.findPath(entity, new Point2D.Double(50, 50));
 
@@ -74,8 +75,8 @@ class AStarPathFinderTests {
 
   @Test
   void testFindPathWithAStarPath() {
-    IMobileEntity entity = Mockito.mock(IMobileEntity.class);
-    Mockito.when(entity.getCollisionBoxCenter()).thenReturn(new Point2D.Double(10, 10));
+    IMobileEntity entity = mock(IMobileEntity.class);
+    when(entity.getCollisionBoxCenter()).thenReturn(new Point2D.Double(10, 10));
 
     Path path = pathFinder.findPath(entity, new Point2D.Double(90, 90));
 
