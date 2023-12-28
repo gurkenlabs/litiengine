@@ -134,7 +134,7 @@ public final class Environment implements IRenderable {
     this.map = map;
     if (this.getMap() != null) {
       Game.physics().setBounds(this.getMap().getBounds());
-      this.setGravity(this.getMap().getIntValue(MapProperty.GRAVITY));
+      this.setGravity(this.getMap().getIntValue(MapProperty.GRAVITY, 0));
     }
     for (RenderType renderType : RenderType.values()) {
       this.miscEntities.put(renderType, new ConcurrentHashMap<>());

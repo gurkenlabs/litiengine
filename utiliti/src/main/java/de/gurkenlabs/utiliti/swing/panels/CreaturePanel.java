@@ -70,9 +70,9 @@ public class CreaturePanel extends PropertyPanel {
   protected void setControlValues(IMapObject mapObject) {
     selectSpriteSheet(this.comboBoxSpriteSheets, mapObject);
     this.comboBoxDirection.setSelectedItem(
-      mapObject.getEnumValue(
-        MapObjectProperty.SPAWN_DIRECTION, Direction.class, Direction.UNDEFINED));
-    this.checkBoxScale.setSelected(mapObject.getBoolValue(MapObjectProperty.SCALE_SPRITE));
+        mapObject.getEnumValue(
+            MapObjectProperty.SPAWN_DIRECTION, Direction.class, Direction.UNDEFINED));
+    this.checkBoxScale.setSelected(mapObject.getBoolValue(MapObjectProperty.SCALE_SPRITE, false));
   }
 
   private void setupChangedListeners() {
@@ -85,7 +85,9 @@ public class CreaturePanel extends PropertyPanel {
     Map<String, String> m = new TreeMap<>();
     for (Spritesheet s : Resources.spritesheets().getAll()) {
       String creatureSpriteName = getCreatureSpriteName(s.getName());
-      m.putIfAbsent(creatureSpriteName, s.getName());
+      if (creatureSpriteName != null) {
+        m.putIfAbsent(creatureSpriteName, s.getName());
+      }
     }
 
     populateComboBoxWithSprites(this.comboBoxSpriteSheets, m);

@@ -49,9 +49,9 @@ public class SpawnpointPanel extends PropertyPanel {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    this.textFieldInfo.setText(mapObject.getStringValue(MapObjectProperty.SPAWN_INFO));
-    this.spinnerOffsetX.setValue(mapObject.getDoubleValue(MapObjectProperty.SPAWN_PIVOT_OFFSETX));
-    this.spinnerOffsetY.setValue(mapObject.getDoubleValue(MapObjectProperty.SPAWN_PIVOT_OFFSETY));
+    this.textFieldInfo.setText(mapObject.getStringValue(MapObjectProperty.SPAWN_INFO, null));
+    this.spinnerOffsetX.setValue(mapObject.getDoubleValue(MapObjectProperty.SPAWN_PIVOT_OFFSETX, 0));
+    this.spinnerOffsetY.setValue(mapObject.getDoubleValue(MapObjectProperty.SPAWN_PIVOT_OFFSETY, 0));
     this.comboBoxDirection.setSelectedItem(
         mapObject.getEnumValue(MapObjectProperty.SPAWN_DIRECTION, Direction.class, Direction.DOWN));
     this.comboBoxPivot.setSelectedItem(

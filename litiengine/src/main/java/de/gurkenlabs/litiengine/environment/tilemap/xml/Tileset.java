@@ -4,30 +4,17 @@ import java.awt.Dimension;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import de.gurkenlabs.litiengine.environment.tilemap.*;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlAttribute;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlElementWrapper;
-import jakarta.xml.bind.annotation.XmlRootElement;
-import jakarta.xml.bind.annotation.XmlTransient;
+import jakarta.xml.bind.annotation.*;
 
-import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
-import de.gurkenlabs.litiengine.environment.tilemap.IMapImage;
-import de.gurkenlabs.litiengine.environment.tilemap.ITerrain;
-import de.gurkenlabs.litiengine.environment.tilemap.ITile;
-import de.gurkenlabs.litiengine.environment.tilemap.ITileOffset;
-import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
-import de.gurkenlabs.litiengine.environment.tilemap.ITilesetEntry;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
@@ -51,6 +38,9 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   @XmlAttribute
   private String name;
 
+  @XmlAttribute(name = "class")
+  private String tilesetClass;
+
   @XmlAttribute
   private Integer tilewidth;
 
@@ -72,12 +62,24 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   @XmlAttribute
   private String source;
 
-  @XmlElementWrapper(name = "terraintypes")
-  @XmlElement(name = "terrain")
-  private List<Terrain> terrainTypes = null;
+  @XmlAttribute
+  private String objectalignment;
+
+  @XmlAttribute
+  private String tilerendersize;
+
+  @XmlAttribute
+  private String fillmode;
 
   @XmlElement(name = "tile")
   private List<TilesetEntry> tiles = null;
+
+  @XmlElement(name = "wangset", type = WangSet.class)
+  @XmlElementWrapper(name = "wangsets")
+  private List<ITerrainSet> wangsets;
+
+  @XmlElement
+  private TileTransformations transformations;
 
   @XmlTransient
   private List<TilesetEntry> allTiles;
@@ -200,53 +202,6 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   }
 
   @Override
-  public List<ITerrain> getTerrainTypes() {
-    if (this.sourceTileset != null) {
-      return this.sourceTileset.getTerrainTypes();
-    }
-
-    List<ITerrain> types = new ArrayList<>();
-    if (this.terrainTypes == null) {
-      return types;
-    }
-
-    for (int i = 0; i < this.terrainTypes.size(); i++) {
-      types.add(i, this.terrainTypes.get(i));
-    }
-
-    return types;
-  }
-
-  @Override
-  public ITerrain[] getTerrain(int tileId) {
-    if (this.sourceTileset != null) {
-      return this.sourceTileset.getTerrain(tileId);
-    }
-
-    ITerrain[] terrains = new ITerrain[4];
-    if (!this.containsTile(tileId)) {
-      return terrains;
-    }
-
-    TilesetEntry tile = this.allTiles.get(tileId);
-    int[] tileTerrains = tile.getTerrainIds();
-    for (int i = 0; i < 4; i++) {
-      if (tileTerrains[i] < 0 || tileTerrains[i] >= this.getTerrainTypes().size()) {
-        continue;
-      }
-
-      ITerrain terrain = this.getTerrainTypes().get(tileTerrains[i]);
-      if (terrain == null) {
-        continue;
-      }
-
-      terrains[i] = terrain;
-    }
-
-    return terrains;
-  }
-
-  @Override
   public int getColumns() {
     return this.sourceTileset != null ? this.sourceTileset.getColumns() : this.columns;
   }
@@ -278,6 +233,26 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     return this.allTiles.get(id);
   }
 
+  public TileTransformations getTransformations() {
+    return this.transformations;
+  }
+
+  public String getTilesetClass() {
+    return this.tilesetClass;
+  }
+
+  public String getObjectalignment() {
+    return this.objectalignment;
+  }
+
+  public String getTilerendersize() {
+    return this.tilerendersize;
+  }
+
+  public String getFillmode() {
+    return this.fillmode;
+  }
+
   @Override
   public boolean containsTile(ITile tile) {
     ITilesetEntry entry = tile.getTilesetEntry();
@@ -287,6 +262,11 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   @Override
   public boolean containsTile(int tileId) {
     return tileId >= this.firstgid && tileId < this.firstgid + this.getTileCount();
+  }
+
+  @Override
+  public List<ITerrainSet> getTerrainSets() {
+    return this.wangsets;
   }
 
   @Override
@@ -322,11 +302,6 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
       super.finish(location);
       if (this.image != null) {
         this.image.finish(location);
-      }
-      if (this.terrainTypes != null) {
-        for (Terrain terrain : this.terrainTypes) {
-          terrain.finish(location);
-        }
       }
       if (this.tiles != null) {
         // unsaved tiles don't need any post-processing
@@ -389,7 +364,6 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
         }
         this.tilecount = this.allTiles.size();
       }
-      this.updateTileTerrain();
     }
   }
 
@@ -413,12 +387,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
       this.columns = null;
     } else {
       this.tiles = new ArrayList<>(this.allTiles);
-      Iterator<TilesetEntry> iter = this.tiles.iterator();
-      while (iter.hasNext()) {
-        if (!iter.next().shouldBeSaved()) {
-          iter.remove();
-        }
-      }
+      this.tiles.removeIf(tilesetEntry -> !tilesetEntry.shouldBeSaved());
     }
 
     if (this.margin != null && this.margin == 0) {
@@ -431,15 +400,6 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
 
     if (this.getProperties() != null && this.getProperties().isEmpty()) {
       this.setProperties(null);
-    }
-  }
-
-  private void updateTileTerrain() {
-    if (this.sourceTileset == null && this.tiles != null) {
-      // only go through saved tiles because unsaved tiles can't have terrains
-      for (TilesetEntry entry : this.tiles) {
-        entry.setTerrains(this.getTerrain(entry.getId()));
-      }
     }
   }
 }

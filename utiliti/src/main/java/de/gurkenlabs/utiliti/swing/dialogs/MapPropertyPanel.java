@@ -27,28 +27,20 @@ import javax.swing.ListSelectionModel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
-@SuppressWarnings("serial")
 public class MapPropertyPanel extends JPanel {
-
-  private AmbientLightPreviewPanel ambientlightPreview;
+  private final AmbientLightPreviewPanel ambientlightPreview;
+  private final JScrollPane scrollPane;
+  private final JSpinner spinnerGravity;
+  private final ColorComponent ambientColorComponent;
+  private final JEditorPane textFieldDesc;
+  private final JTextField textFieldName;
+  private final ColorComponent shadowColorComponent;
 
   private transient IMap dataSource;
 
   private DefaultTableModel model;
 
-  private JScrollPane scrollPane;
-
-  private final JSpinner spinnerGravity;
-
   private JTable tableCustomProperties;
-
-  private ColorComponent ambientColorComponent;
-
-  private final JEditorPane textFieldDesc;
-
-  private JTextField textFieldName;
-
-  private ColorComponent shadowColorComponent;
 
   private final JTextField textFieldTitle;
 
@@ -408,19 +400,17 @@ public class MapPropertyPanel extends JPanel {
   }
 
   private void setControlValues(final IMap map) {
-    this.textFieldDesc.setText(map.getStringValue(MapProperty.MAP_DESCRIPTION));
-    this.textFieldTitle.setText(map.getStringValue(MapProperty.MAP_TITLE));
+    this.textFieldDesc.setText(map.getStringValue(MapProperty.MAP_DESCRIPTION, null));
+    this.textFieldTitle.setText(map.getStringValue(MapProperty.MAP_TITLE, null));
     this.textFieldName.setText(map.getName());
-    if (map.getStringValue(MapProperty.AMBIENTCOLOR) != null) {
-      final String hexColor = map.getStringValue(MapProperty.AMBIENTCOLOR);
-      this.ambientColorComponent.setHexColor(hexColor);
+    if (map.hasCustomProperty(MapProperty.AMBIENTCOLOR)) {
+      this.ambientColorComponent.setColor(map.getColorValue(MapProperty.AMBIENTCOLOR));
     }
-    if (map.getStringValue(MapProperty.SHADOWCOLOR) != null) {
-      final String hexColor = map.getStringValue(MapProperty.SHADOWCOLOR);
-      this.shadowColorComponent.setHexColor(hexColor);
+    if (map.hasCustomProperty(MapProperty.SHADOWCOLOR)) {
+      this.shadowColorComponent.setColor(map.getColorValue(MapProperty.SHADOWCOLOR));
     }
 
-    this.spinnerGravity.setValue(map.getIntValue(MapProperty.GRAVITY));
+    this.spinnerGravity.setValue(map.getIntValue(MapProperty.GRAVITY, 0));
 
     for (Map.Entry<String, ICustomProperty> prop : map.getProperties().entrySet()) {
       if (prop.getKey().equals(MapProperty.AMBIENTCOLOR)

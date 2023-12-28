@@ -58,13 +58,11 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
       entity.setRenderWithLayer(mapObject.getBoolValue(MapObjectProperty.RENDERWITHLAYER));
     }
 
-    String tagsString = mapObject.getStringValue(MapObjectProperty.TAGS);
-    if (tagsString != null && tagsString.trim().length() > 0) {
-      String[] tags = tagsString.split(",");
-
+    var tags = mapObject.getCommaSeparatedStringValues(MapObjectProperty.TAGS, null);
+    if (tags != null && !tags.isEmpty())  {
       for (String rawTag : tags) {
-        String tag = rawTag.trim().replaceAll("[^A-Za-z0-9\\-\\_]", "");
-        if (tag == null || tag.isEmpty()) {
+        String tag = rawTag.trim().replaceAll("[^A-Za-z0-9\\-_]", "");
+        if (tag.isEmpty()) {
           continue;
         }
 
@@ -72,9 +70,8 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
       }
     }
 
-    RenderType renderType = mapObject.getEnumValue(MapObjectProperty.RENDERTYPE, RenderType.class);
-    if (renderType != null) {
-      entity.setRenderType(renderType);
+    if (mapObject.hasCustomProperty(MapObjectProperty.RENDERTYPE)) {
+      entity.setRenderType(mapObject.getEnumValue(MapObjectProperty.RENDERTYPE, RenderType.class));
     }
 
     loadCustomMapObjectProperties(entity, mapObject);

@@ -59,38 +59,38 @@ class CustomPropertyAdapterTests {
   void testMarshal() {
     // arrange
     Map<String, ICustomProperty> properties = new HashMap<>();
-    CustomProperty customProperty = new CustomProperty("string", "value");
+    CustomProperty customProperty = new CustomProperty(CustomPropertyType.STRING, "value");
     properties.putIfAbsent("PropertyA", customProperty);
 
     // act
     CustomPropertyAdapter.PropertyList marshal = adapter.marshal(properties);
 
     // assert
-    assertEquals("value", marshal.properties.get(0).value);
+    assertEquals("value", marshal.properties.getFirst().value);
   }
 
   @Test
   void testMarshalWithLinebreakInValue() {
     // arrange
     Map<String, ICustomProperty> properties = new HashMap<>();
-    CustomProperty customProperty = new CustomProperty("string", "value\n");
+    CustomProperty customProperty = new CustomProperty(CustomPropertyType.STRING, "value\n");
     properties.putIfAbsent("PropertyA", customProperty);
 
     // act
     CustomPropertyAdapter.PropertyList marshal = adapter.marshal(properties);
 
     // assert
-    assertEquals("value\n", marshal.properties.get(0).contents);
-    assertNull(marshal.properties.get(0).value);
+    assertEquals("value\n", marshal.properties.getFirst().contents);
+    assertNull(marshal.properties.getFirst().value);
   }
 
   @Test
   void testMarshalSort() {
     // arrange
     Map<String, ICustomProperty> properties = new HashMap<>();
-    CustomProperty customProperty1 = new CustomProperty("string", "value1");
-    CustomProperty customProperty2 = new CustomProperty("string", "value2");
-    CustomProperty customProperty3 = new CustomProperty("string", "value3");
+    CustomProperty customProperty1 = new CustomProperty(CustomPropertyType.STRING, "value1");
+    CustomProperty customProperty2 = new CustomProperty(CustomPropertyType.STRING, "value2");
+    CustomProperty customProperty3 = new CustomProperty(CustomPropertyType.STRING, "value3");
     properties.putIfAbsent("PropertyB", customProperty2);
     properties.putIfAbsent("PropertyA", customProperty1);
     properties.putIfAbsent("PropertyC", customProperty3);

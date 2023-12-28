@@ -9,10 +9,10 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
-import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.utiliti.Style;
 import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.components.MapComponent;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.FontMetrics;
@@ -163,7 +163,7 @@ public class MapObjectsRenderer implements IEditorRenderer {
 
   // TODO rename to renderShape, support points and draw polygon points too.
   private static void renderBoundingBox(Graphics2D g, IMapObject mapObject,
-    Color colorBoundingBoxFill, BasicStroke shapeStroke) {
+                                        Color colorBoundingBoxFill, BasicStroke shapeStroke) {
     MapObjectType type = MapObjectType.get(mapObject.getType());
     Color fillColor = colorBoundingBoxFill;
     if (type == MapObjectType.TRIGGER) {
@@ -176,11 +176,11 @@ public class MapObjectsRenderer implements IEditorRenderer {
     if (type == MapObjectType.TRIGGER) {
       borderColor = Style.COLOR_TRIGGER_BORDER;
     } else if (type == MapObjectType.LIGHTSOURCE) {
-      final String mapObjectColor = mapObject.getStringValue(MapObjectProperty.LIGHT_COLOR);
-      if (mapObjectColor != null && !mapObjectColor.isEmpty()) {
-        Color lightColor = ColorHelper.decode(mapObjectColor);
-        borderColor = lightColor != null ? new Color(lightColor.getRed(), lightColor.getGreen(),
-          lightColor.getBlue(), 255) : Style.COLOR_LIGHT;
+      if (mapObject.hasCustomProperty(MapObjectProperty.LIGHT_COLOR)) {
+        final Color mapObjectColor = mapObject.getColorValue(MapObjectProperty.LIGHT_COLOR);
+        if (mapObjectColor != null) {
+          borderColor = new Color(mapObjectColor.getRed(), mapObjectColor.getGreen(), mapObjectColor.getBlue(), 255);
+        }
       }
     } else if (type == MapObjectType.STATICSHADOW) {
       borderColor = Style.COLOR_SHADOW_BORDER;
@@ -210,7 +210,7 @@ public class MapObjectsRenderer implements IEditorRenderer {
     }
 
     if (type == MapObjectType.SOUNDSOURCE) {
-      final int range = mapObject.getIntValue(MapObjectProperty.SOUND_RANGE);
+      final int range = mapObject.getIntValue(MapObjectProperty.SOUND_RANGE, 0);
       final float[] dash1 = {10.0f};
       final BasicStroke dashed = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER,
         10.0f, dash1, 0.0f);
@@ -228,13 +228,13 @@ public class MapObjectsRenderer implements IEditorRenderer {
   }
 
   private static void renderCollisionBox(Graphics2D g, IMapObject mapObject,
-    BasicStroke shapeStroke) {
+                                         BasicStroke shapeStroke) {
     // render collision boxes
     boolean collision = mapObject.getBoolValue(MapObjectProperty.COLLISION, false);
     float collisionBoxWidth = mapObject.getFloatValue(MapObjectProperty.COLLISIONBOX_WIDTH, -1);
     float collisionBoxHeight = mapObject.getFloatValue(MapObjectProperty.COLLISIONBOX_HEIGHT, -1);
-    final Align align = Align.get(mapObject.getStringValue(MapObjectProperty.COLLISION_ALIGN));
-    final Valign valign = Valign.get(mapObject.getStringValue(MapObjectProperty.COLLISION_VALIGN));
+    final Align align = mapObject.getEnumValue(MapObjectProperty.COLLISION_ALIGN, Align.class, Align.CENTER);
+    final Valign valign = mapObject.getEnumValue(MapObjectProperty.COLLISION_ALIGN, Valign.class, Valign.DOWN);
 
     if (MapObjectType.get(mapObject.getType()) == MapObjectType.COLLISIONBOX) {
       collisionBoxWidth = mapObject.getWidth();
@@ -255,7 +255,7 @@ public class MapObjectsRenderer implements IEditorRenderer {
 
       Stroke collisionStroke = collision ? shapeStroke
         : new BasicStroke(1 / Game.world().camera().getRenderScale(), BasicStroke.CAP_ROUND,
-          BasicStroke.JOIN_BEVEL, 0, new float[]{1f}, 0);
+        BasicStroke.JOIN_BEVEL, 0, new float[]{1f}, 0);
       Game.graphics().renderOutline(g, collisionBox, collisionStroke);
     }
   }

@@ -1,20 +1,21 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
-import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
-import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
+import java.awt.Color;
+import java.net.URL;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+
+import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import java.awt.Color;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
+
+import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
+
 
 @XmlAccessorType(XmlAccessType.FIELD)
 public class CustomPropertyProvider implements ICustomPropertyProvider {
@@ -47,20 +48,6 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
   }
 
   @Override
-  public String getTypeOfProperty(String propertyName) {
-    ICustomProperty property = this.getProperty(propertyName);
-    if (property == null) {
-      return null;
-    }
-    return property.getType();
-  }
-
-  @Override
-  public void setTypeOfProperty(String propertyName, String type) {
-    this.getProperty(propertyName).setType(type);
-  }
-
-  @Override
   public ICustomProperty getProperty(String propertyName) {
     return this.getProperties().get(propertyName);
   }
@@ -74,7 +61,11 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
 
   @Override
   public String getStringValue(String propertyName) {
-    return this.getStringValue(propertyName, null);
+    ICustomProperty property = this.getProperty(propertyName);
+    if (property == null) {
+      throw new NoSuchElementException(propertyName);
+    }
+    return property.getAsString();
   }
 
   @Override
@@ -86,9 +77,32 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
     return property.getAsString();
   }
 
+
+  @Override
+  public char getCharValue(String propertyName) {
+    ICustomProperty property = this.getProperty(propertyName);
+    if (property == null) {
+      throw new NoSuchElementException(propertyName);
+    }
+    return property.getAsChar();
+  }
+
+  @Override
+  public char getCharValue(String propertyName, char defaultValue) {
+    ICustomProperty property = this.getProperty(propertyName);
+    if (property == null) {
+      return defaultValue;
+    }
+    return property.getAsChar();
+  }
+
   @Override
   public int getIntValue(String propertyName) {
-    return this.getIntValue(propertyName, 0);
+    ICustomProperty property = this.getProperty(propertyName);
+    if (property == null) {
+      throw new NoSuchElementException(propertyName);
+    }
+    return property.getAsInt();
   }
 
   @Override
@@ -98,6 +112,15 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
       return defaultValue;
     }
     return property.getAsInt();
+  }
+
+  @Override
+  public long getLongValue(String propertyName) {
+    ICustomProperty property = this.getProperty(propertyName);
+    if (property == null) {
+      throw new NoSuchElementException(propertyName);
+    }
+    return property.getAsLong();
   }
 
   @Override
@@ -111,7 +134,11 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
 
   @Override
   public short getShortValue(String propertyName) {
-    return this.getShortValue(propertyName, (short) 0);
+    ICustomProperty property = this.getProperty(propertyName);
+    if (property == null) {
+      throw new NoSuchElementException(propertyName);
+    }
+    return property.getAsShort();
   }
 
   @Override
@@ -125,7 +152,11 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
 
   @Override
   public byte getByteValue(String propertyName) {
-    return this.getByteValue(propertyName, (byte) 0);
+    ICustomProperty property = this.getProperty(propertyName);
+    if (property == null) {
+      throw new NoSuchElementException(propertyName);
+    }
+    return property.getAsByte();
   }
 
   @Override
@@ -139,7 +170,11 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
 
   @Override
   public boolean getBoolValue(String propertyName) {
-    return this.getBoolValue(propertyName, false);
+    ICustomProperty property = this.getProperty(propertyName);
+    if (property == null) {
+      throw new NoSuchElementException(propertyName);
+    }
+    return property.getAsBool();
   }
 
   @Override
@@ -153,7 +188,11 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
 
   @Override
   public float getFloatValue(String propertyName) {
-    return this.getFloatValue(propertyName, 0f);
+    ICustomProperty property = this.getProperty(propertyName);
+    if (property == null) {
+      throw new NoSuchElementException(propertyName);
+    }
+    return property.getAsFloat();
   }
 
   @Override
@@ -167,7 +206,12 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
 
   @Override
   public double getDoubleValue(String propertyName) {
-    return this.getDoubleValue(propertyName, 0.0);
+    ICustomProperty property = this.getProperty(propertyName);
+    if (property == null) {
+      throw new NoSuchElementException(propertyName);
+    }
+
+    return property.getAsDouble();
   }
 
   @Override
@@ -182,7 +226,12 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
 
   @Override
   public Color getColorValue(String propertyName) {
-    return this.getColorValue(propertyName, null);
+    ICustomProperty property = this.getProperty(propertyName);
+    if (property == null) {
+      throw new NoSuchElementException(propertyName);
+    }
+
+    return property.getAsColor();
   }
 
   @Override
@@ -202,7 +251,12 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
 
   @Override
   public <T extends Enum<T>> T getEnumValue(String propertyName, Class<T> enumType) {
-    return this.getEnumValue(propertyName, enumType, null);
+    ICustomProperty property = this.getProperty(propertyName);
+    if (property == null) {
+      throw new NoSuchElementException(propertyName);
+    }
+
+    return property.getAsEnum(enumType);
   }
 
   @Override
@@ -222,7 +276,12 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
 
   @Override
   public URL getFileValue(String propertyName) {
-    return this.getFileValue(propertyName, null);
+    ICustomProperty property = this.getProperty(propertyName);
+    if (property == null) {
+      throw new NoSuchElementException(propertyName);
+    }
+
+    return property.getAsFile();
   }
 
   @Override
@@ -240,6 +299,16 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
     return value;
   }
 
+  @Override
+  public int getMapObjectId(String propertyName) {
+    ICustomProperty property = this.getProperty(propertyName);
+    if (property == null) {
+      throw new NoSuchElementException(propertyName);
+    }
+
+    return property.getMapObjectId();
+  }
+
   private ICustomProperty createPropertyIfAbsent(String propertyName) {
     return this.getProperties().computeIfAbsent(propertyName, n -> new CustomProperty());
   }
@@ -247,7 +316,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
   @Override
   public void setValue(String propertyName, URL value) {
     ICustomProperty property = createPropertyIfAbsent(propertyName);
-    property.setType("file");
+    property.setType(CustomPropertyType.FILE);
     property.setValue(value);
   }
 
@@ -255,7 +324,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
   public void setValue(String propertyName, String value) {
     if (value != null) {
       ICustomProperty property = createPropertyIfAbsent(propertyName);
-      property.setType("string");
+      property.setType(CustomPropertyType.STRING);
       property.setValue(value);
     } else {
       this.getProperties().remove(propertyName);
@@ -265,64 +334,74 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
   @Override
   public void setValue(String propertyName, boolean value) {
     ICustomProperty property = createPropertyIfAbsent(propertyName);
-    property.setType("bool");
+    property.setType(CustomPropertyType.BOOL);
     property.setValue(value);
   }
 
   @Override
   public void setValue(String propertyName, byte value) {
     ICustomProperty property = createPropertyIfAbsent(propertyName);
-    property.setType("int");
+    property.setType(CustomPropertyType.INT);
     property.setValue(value);
   }
 
   @Override
   public void setValue(String propertyName, short value) {
-    ICustomProperty property = createPropertyIfAbsent(propertyName);
-    property.setType("int");
-    property.setValue(value);
+    setValue(propertyName, (int) value);
+  }
+
+  @Override
+  public void setValue(String propertyName, char value) {
+    setValue(propertyName, String.valueOf(value));
   }
 
   @Override
   public void setValue(String propertyName, int value) {
     ICustomProperty property = createPropertyIfAbsent(propertyName);
-    property.setType("int");
+    property.setType(CustomPropertyType.INT);
     property.setValue(value);
   }
 
   @Override
   public void setValue(String propertyName, long value) {
     ICustomProperty property = createPropertyIfAbsent(propertyName);
-    property.setType("int");
+    property.setType(CustomPropertyType.INT);
     property.setValue(value);
   }
 
   @Override
   public void setValue(String propertyName, float value) {
     ICustomProperty property = createPropertyIfAbsent(propertyName);
-    property.setType("float");
+    property.setType(CustomPropertyType.FLOAT);
     property.setValue(value);
   }
 
   @Override
   public void setValue(String propertyName, double value) {
     ICustomProperty property = createPropertyIfAbsent(propertyName);
-    property.setType("float");
+    property.setType(CustomPropertyType.FLOAT);
     property.setValue(value);
   }
 
   @Override
   public void setValue(String propertyName, Color value) {
     ICustomProperty property = createPropertyIfAbsent(propertyName);
-    property.setType("color");
+    property.setType(CustomPropertyType.COLOR);
     property.setValue(value);
   }
 
   @Override
   public void setValue(String propertyName, Enum<?> value) {
     ICustomProperty property = createPropertyIfAbsent(propertyName);
-    property.setType("string");
+    property.setType(CustomPropertyType.STRING);
     property.setValue(value);
+  }
+
+  @Override
+  public void setValue(String propertyName, IMapObject value) {
+    ICustomProperty property = createPropertyIfAbsent(propertyName);
+    property.setType(CustomPropertyType.OBJECT);
+    property.setValue(value.getId());
   }
 
   @Override

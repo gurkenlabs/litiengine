@@ -1,12 +1,5 @@
 package de.gurkenlabs.litiengine.environment.tilemap;
 
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.entities.IEntity;
-import de.gurkenlabs.litiengine.environment.Environment;
-import de.gurkenlabs.litiengine.graphics.ImageRenderer;
-import de.gurkenlabs.litiengine.graphics.RenderType;
-import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.litiengine.resources.Resources;
 import java.awt.AlphaComposite;
 import java.awt.Composite;
 import java.awt.Graphics2D;
@@ -17,6 +10,14 @@ import java.util.Collection;
 import java.util.EventListener;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.environment.Environment;
+import de.gurkenlabs.litiengine.graphics.ImageRenderer;
+import de.gurkenlabs.litiengine.graphics.RenderType;
+import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.resources.Resources;
 
 public class MapRenderer {
   private static final Collection<LayerRenderedListener> layerRenderedListeners = ConcurrentHashMap.newKeySet();
@@ -193,8 +194,8 @@ public class MapRenderer {
     final AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity);
     g.setComposite(ac);
 
-    final double viewportOffsetX = layer.getOffset().x - viewport.getX();
-    final double viewportOffsetY = layer.getOffset().y - viewport.getY();
+    final double viewportOffsetX = layer.getOffset().getX() - viewport.getX();
+    final double viewportOffsetY = layer.getOffset().getY() - viewport.getY();
 
     ImageRenderer.render(g, img, viewportOffsetX, viewportOffsetY);
     g.setComposite(oldComp);

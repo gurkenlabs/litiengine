@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine.environment.tilemap;
 import de.gurkenlabs.litiengine.util.AlphanumComparator;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.net.URL;
 import java.util.List;
@@ -72,6 +73,13 @@ public interface IMap extends ILayerList, Comparable<IMap> {
   Dimension getTileSize();
 
   /**
+   * Gets the coordinates of the parallax origin in pixels.
+   *
+   * @return The parallax origin.
+   */
+  Point2D getParallaxOrigin();
+
+  /**
    * Gets the horizontal tile size.
    *
    * @return the horizontal tile size
@@ -120,8 +128,7 @@ public interface IMap extends ILayerList, Comparable<IMap> {
   /**
    * Sets the name.
    *
-   * @param name
-   *          the new name
+   * @param name the new name
    */
   void setName(String name);
 

@@ -36,10 +36,10 @@ public class CombatPanel extends PropertyPanel {
   @Override
   protected void setControlValues(IMapObject mapObject) {
     this.chckbxIndestructible.setSelected(
-        mapObject.getBoolValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE));
+        mapObject.getBoolValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE, false));
     this.spinnerHitpoints.setValue(
         mapObject.getIntValue(MapObjectProperty.COMBAT_HITPOINTS, CombatEntity.DEFAULT_HITPOINTS));
-    this.spinnerTeam.setValue(mapObject.getIntValue(MapObjectProperty.COMBAT_TEAM));
+    this.spinnerTeam.setValue(mapObject.getIntValue(MapObjectProperty.COMBAT_TEAM, 0));
   }
 
   private void setupChangedListeners() {

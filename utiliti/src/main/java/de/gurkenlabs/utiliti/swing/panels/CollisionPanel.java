@@ -52,16 +52,12 @@ public class CollisionPanel extends PropertyPanel {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    this.chckbxHasCollision.setSelected(mapObject.getBoolValue(MapObjectProperty.COLLISION));
-    this.spinnerWidth.setValue(mapObject.getDoubleValue(MapObjectProperty.COLLISIONBOX_WIDTH));
-    this.spinnerHeight.setValue(mapObject.getDoubleValue(MapObjectProperty.COLLISIONBOX_HEIGHT));
-    this.comboBoxAlign.setSelectedItem(
-        Align.get(mapObject.getStringValue(MapObjectProperty.COLLISION_ALIGN)));
-    this.comboBoxValign.setSelectedItem(
-        Valign.get(mapObject.getStringValue(MapObjectProperty.COLLISION_VALIGN)));
-    this.comboBoxColl.setSelectedItem(
-        mapObject.getEnumValue(
-            MapObjectProperty.COLLISION_TYPE, Collision.class, Collision.DYNAMIC));
+    this.chckbxHasCollision.setSelected(mapObject.getBoolValue(MapObjectProperty.COLLISION, false));
+    this.spinnerWidth.setValue(mapObject.getDoubleValue(MapObjectProperty.COLLISIONBOX_WIDTH, mapObject.getWidth()));
+    this.spinnerHeight.setValue(mapObject.getDoubleValue(MapObjectProperty.COLLISIONBOX_HEIGHT, mapObject.getHeight()));
+    this.comboBoxAlign.setSelectedItem(mapObject.getEnumValue(MapObjectProperty.COLLISION_ALIGN, Align.class, Align.CENTER));
+    this.comboBoxValign.setSelectedItem(mapObject.getEnumValue(MapObjectProperty.COLLISION_VALIGN, Valign.class, Valign.MIDDLE));
+    this.comboBoxColl.setSelectedItem(mapObject.getEnumValue(MapObjectProperty.COLLISION_TYPE, Collision.class, Collision.DYNAMIC));
   }
 
   private void setupChangedListeners() {

@@ -27,6 +27,7 @@ import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.net.URL;
 import java.util.ArrayList;
@@ -43,7 +44,12 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
 
   public static final String FILE_EXTENSION = "tmx";
   public static final int MAX_MAJOR = 1;
-  public static final int MAX_MINOR = 2;
+  public static final int MAX_MINOR = 10;
+
+  public static final int MIN_MAJOR = 1;
+
+  public static final int MIN_MINOR = 5;
+
   private static final Logger log = Logger.getLogger(TmxMap.class.getName());
   private final transient List<ITileLayer> rawTileLayers = new CopyOnWriteArrayList<>();
   private final transient List<IMapObjectLayer> rawMapObjectLayers = new CopyOnWriteArrayList<>();
@@ -61,6 +67,10 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
   private double version;
   @XmlAttribute
   private String tiledversion;
+
+  @XmlAttribute(name = "class")
+  private String mapClass;
+
   @XmlAttribute
   private String orientation;
   @XmlTransient
@@ -83,6 +93,10 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
   private StaggerAxis staggeraxis;
   @XmlAttribute
   private StaggerIndex staggerindex;
+  @XmlAttribute
+  private double parallaxoriginx;
+  @XmlAttribute
+  private double parallaxoriginy;
   @XmlAttribute
   @XmlJavaTypeAdapter(ColorAdapter.class)
   private Color backgroundcolor;
@@ -219,6 +233,11 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
   @Override
   public Dimension getTileSize() {
     return new Dimension(this.tilewidth, this.tileheight);
+  }
+
+  @Override
+  public Point2D getParallaxOrigin() {
+    return new Point2D.Double(this.parallaxoriginx, this.parallaxoriginy);
   }
 
   @Override
@@ -448,11 +467,11 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
     return this.infinite == 1;
   }
 
-  protected int getChunkOffsetX() {
+  int getChunkOffsetX() {
     return this.chunkOffsetX;
   }
 
-  protected int getChunkOffsetY() {
+  int getChunkOffsetY() {
     return this.chunkOffsetY;
   }
 
@@ -536,7 +555,7 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
     return rawIndex;
   }
 
-  private void checkVersion() throws UnsupportedMapVersionException {
+  private void checkVersion()  {
     if (this.tiledversion == null || this.tiledversion.isEmpty()) {
       log.log(Level.WARNING,
           "Tiled version not defined for map \"{0}\". Could not evaluate whether the map format is supported by the engine.",
@@ -553,12 +572,31 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
       minor = Integer.parseInt(ver[1]);
       // we don't need to care about the patch version
     } catch (NumberFormatException e) {
-      throw new UnsupportedMapVersionException(this.tiledversion);
+      log.log(Level.WARNING,
+        "The defined tiled version for map \"{0}\" has an invalid format. Could not evaluate whether the map format is supported by the engine.",
+        new Object[] {this.getName()});
+      return;
+    }
+
+    if (major < MIN_MAJOR) {
+      log.log(Level.WARNING,
+        "Tiled version {0} of map \"{1}\" is less than the supported version {2}.{3}.x. Some features may not work.",
+        new Object[] {this.tiledversion, this.getName(), MIN_MAJOR, MIN_MINOR});
+      return;
     }
 
     if (major > MAX_MAJOR) {
-      // incompatible API changes
-      throw new UnsupportedMapVersionException(this.tiledversion);
+      log.log(Level.WARNING,
+        "Tiled version {0} of map \"{1}\" is greater than the supported version {2}.{3}.x. Some features may not work.",
+        new Object[] {this.tiledversion, this.getName(), MAX_MAJOR, MAX_MINOR});
+      return;
+    }
+
+    if (minor < MIN_MINOR) {
+      log.log(Level.WARNING,
+        "Tiled version {0} of map \"{1}\" is less than the supported version {2}.{3}.x. Some features may not work.",
+        new Object[] {this.tiledversion, this.getName(), MIN_MAJOR, MIN_MINOR});
+      return;
     }
 
     if (minor > MAX_MINOR) {

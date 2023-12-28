@@ -45,12 +45,12 @@ public class MovementPanel extends PropertyPanel {
   @Override
   protected void setControlValues(IMapObject mapObject) {
     this.chckbxTurnOnMove.setSelected(
-        mapObject.getBoolValue(MapObjectProperty.MOVEMENT_TURNONMOVE));
+        mapObject.getBoolValue(MapObjectProperty.MOVEMENT_TURNONMOVE, false));
     this.spinnerAcceleration.setValue(
-        mapObject.getDoubleValue(MapObjectProperty.MOVEMENT_ACCELERATION));
+        mapObject.getDoubleValue(MapObjectProperty.MOVEMENT_ACCELERATION, 0));
     this.spinnerDeceleration.setValue(
-        mapObject.getDoubleValue(MapObjectProperty.MOVEMENT_DECELERATION));
-    this.spinnerVelocity.setValue(mapObject.getDoubleValue(MapObjectProperty.MOVEMENT_VELOCITY));
+        mapObject.getDoubleValue(MapObjectProperty.MOVEMENT_DECELERATION, 0));
+    this.spinnerVelocity.setValue(mapObject.getDoubleValue(MapObjectProperty.MOVEMENT_VELOCITY, 0));
   }
 
   private LayoutManager createLayout() {

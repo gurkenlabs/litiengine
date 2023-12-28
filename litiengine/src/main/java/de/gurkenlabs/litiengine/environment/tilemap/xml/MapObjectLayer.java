@@ -16,7 +16,7 @@ import jakarta.xml.bind.annotation.XmlElement;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
-import de.gurkenlabs.litiengine.util.ColorHelper;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 public class MapObjectLayer extends Layer implements IMapObjectLayer {
   public static final String DEFAULT_MAPOBJECTLAYER_NAME = "default";
@@ -24,12 +24,11 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
   @XmlElement(name = "object")
   private ArrayList<MapObject> objects = new ArrayList<>();
 
-  @XmlAttribute
-  private String color;
+  @XmlAttribute(name = "color")
+  @XmlJavaTypeAdapter(ColorAdapter.class)
+  private Color color;
 
-  private transient Color decodedColor;
-
-  private transient List<IMapObject> mapObjects = new CopyOnWriteArrayList<>();
+  private transient final List<IMapObject> mapObjects = new CopyOnWriteArrayList<>();
 
   private transient boolean added;
 
@@ -54,7 +53,7 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
       mapId++;
     }
     if (original.getColor() != null) {
-      this.setColor(original.getColorHexString());
+      this.setColor(original.getColor());
     }
   }
 
@@ -85,11 +84,6 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
   }
 
   @Override
-  public Dimension getSizeInTiles() {
-    return new Dimension(this.getWidth(), this.getHeight());
-  }
-
-  @Override
   public String toString() {
     return this.getName();
   }
@@ -110,27 +104,12 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
 
   @Override
   public Color getColor() {
-    if (this.color == null || this.color.isEmpty()) {
-      return null;
-    }
-
-    if (this.decodedColor != null) {
-      return this.decodedColor;
-    }
-
-    this.decodedColor = ColorHelper.decode(this.color);
-    return this.decodedColor;
-  }
-
-  @Override
-  public String getColorHexString() {
     return this.color;
   }
 
   @Override
-  public void setColor(String color) {
+  public void setColor(Color color) {
     this.color = color;
-    this.decodedColor = null;
   }
 
   @Override

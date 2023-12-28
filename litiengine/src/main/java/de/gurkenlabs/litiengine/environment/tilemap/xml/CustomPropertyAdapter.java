@@ -22,28 +22,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
 import de.gurkenlabs.litiengine.util.io.URLAdapter;
 
 public class CustomPropertyAdapter extends XmlAdapter<CustomPropertyAdapter.PropertyList, Map<String, ICustomProperty>> {
-  private static class PropertyType {
-    private static final String STRING = "string";
-    private static final String FLOAT = "float";
-    private static final String INT = "int";
-    private static final String BOOL = "bool";
-    private static final String FILE = "file";
-    private static final String COLOR = "color";
-
-    private static String[] values() {
-      return new String[] {STRING, FLOAT, INT, BOOL, FILE, COLOR};
-    }
-
-    private static boolean isValid(String type) {
-      for (String valid : values()) {
-        if (valid.equalsIgnoreCase(type)) {
-          return true;
-        }
-      }
-
-      return false;
-    }
-  }
 
   @XmlAccessorType(XmlAccessType.FIELD)
   static class Property implements Comparable<Property> {
@@ -58,26 +36,28 @@ public class CustomPropertyAdapter extends XmlAdapter<CustomPropertyAdapter.Prop
     @XmlTransient
     URL location;
 
-    Property() {}
+    Property() {
+      // keep for serialization
+    }
 
     Property(String name, String type) {
       this.name = name;
-      this.type = type == null || !PropertyType.isValid(type) ? PropertyType.STRING : type;
+      this.type = type == null || !CustomPropertyType.isValid(type) ? CustomPropertyType.STRING : type;
     }
 
     @SuppressWarnings("unused")
     private void afterUnmarshal(Unmarshaller u, Object parent) throws MalformedURLException {
       if (this.type == null) {
-        this.type = PropertyType.STRING;
+        this.type = CustomPropertyType.STRING;
       }
-      if (this.type.equals(PropertyType.FILE)) {
+      if (this.type.equals(CustomPropertyType.FILE)) {
         this.location = u.getAdapter(URLAdapter.class).unmarshal(this.value);
       }
     }
 
     @SuppressWarnings("unused")
     private void beforeMarshal(Marshaller m) throws URISyntaxException {
-      if (this.type.equals(PropertyType.STRING)) {
+      if (this.type.equals(CustomPropertyType.STRING)) {
         this.type = null;
       }
       if (this.location != null) {
@@ -108,7 +88,9 @@ public class CustomPropertyAdapter extends XmlAdapter<CustomPropertyAdapter.Prop
     @XmlElement(name = "property")
     List<Property> properties;
 
-    PropertyList() {}
+    PropertyList() {
+      // keep for serialization
+    }
 
     PropertyList(List<Property> properties) {
       this.properties = properties;

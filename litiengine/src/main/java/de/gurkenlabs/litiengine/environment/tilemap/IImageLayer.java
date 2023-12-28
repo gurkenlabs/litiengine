@@ -9,12 +9,27 @@ public interface IImageLayer extends ICustomPropertyProvider, ILayer {
    *
    * @return the image
    */
-  public IMapImage getImage();
+  IMapImage getImage();
 
   /**
    * Gets the transparent color.
    *
    * @return the transparent color
    */
-  public Color getTransparentColor();
+  Color getTransparentColor();
+
+  /**
+   * Gets a value indicating whether the image should be rendered repeatedly horizontally.
+   *
+   * @return True if the image should be repeated horizontally; Otherwise false.
+   */
+  boolean repeatHorizontally();
+
+
+  /**
+   * Gets a value indicating whether the image should be rendered repeatedly vertically.
+   *
+   * @return True if the image should be repeated vertically; Otherwise false.
+   */
+  boolean repeatVertically();
 }

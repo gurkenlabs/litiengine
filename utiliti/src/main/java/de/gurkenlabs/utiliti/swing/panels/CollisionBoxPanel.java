@@ -40,7 +40,7 @@ public class CollisionBoxPanel extends PropertyPanel {
         mapObject.getEnumValue(
             MapObjectProperty.COLLISION_TYPE, Collision.class, Collision.STATIC));
     this.chckbxIsObstructingLights.setSelected(
-        mapObject.getBoolValue(MapObjectProperty.COLLISIONBOX_OBSTRUCTINGLIGHTS));
+        mapObject.getBoolValue(MapObjectProperty.COLLISIONBOX_OBSTRUCTINGLIGHTS, false));
   }
 
   private void setupChangedListeners() {

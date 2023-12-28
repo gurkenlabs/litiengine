@@ -31,20 +31,20 @@ public class SoundPanel extends PropertyPanel {
     this.volume = new VolumeSlider();
     this.volume.setShowVolumeIcon(true);
     this.range =
-        new JSpinner(
-            new SpinnerNumberModel(Game.audio().getMaxDistance(), 0, Integer.MAX_VALUE, 2));
+      new JSpinner(
+        new SpinnerNumberModel(Game.audio().getMaxDistance(), 0, Integer.MAX_VALUE, 2));
     this.loop = new JToggleButton();
     this.loop.putClientProperty(
-        ToggleButtonConstants.KEY_VARIANT, ToggleButtonConstants.VARIANT_SLIDER);
+      ToggleButtonConstants.KEY_VARIANT, ToggleButtonConstants.VARIANT_SLIDER);
     this.soundResource = new JComboBox<>();
     this.play = new JButton(Resources.strings().get("panel_play_sound"), Icons.PLAY);
     this.play.addActionListener(
-        l -> Game.audio()
-            .playSound(
-                (Sound) this.soundResource.getSelectedItem(),
-                false,
-                (int) this.range.getValue(),
-                this.volume.getValue() / 50f));
+      l -> Game.audio()
+        .playSound(
+          (Sound) this.soundResource.getSelectedItem(),
+          false,
+          (int) this.range.getValue(),
+          this.volume.getValue() / 50f));
     setLayout(this.createLayout());
     this.setupChangedListeners();
 
@@ -69,7 +69,7 @@ public class SoundPanel extends PropertyPanel {
   @Override
   protected void clearControls() {
     this.volume.setValue(
-        (int) MathUtilities.clamp(Game.config().sound().getSoundVolume() * 50, 0, 100));
+      (int) MathUtilities.clamp(Game.config().sound().getSoundVolume() * 50, 0, 100));
     this.range.setValue(Game.audio().getMaxDistance());
     this.loop.setSelected(false);
     updateModel();
@@ -78,22 +78,26 @@ public class SoundPanel extends PropertyPanel {
   @Override
   protected void setControlValues(IMapObject mapObject) {
     this.volume.setValue(
-        (int) MathUtilities.clamp(
-            mapObject.getFloatValue(MapObjectProperty.SOUND_VOLUME) * 50, 0, 100));
-    this.range.setValue(mapObject.getIntValue(MapObjectProperty.SOUND_RANGE));
-    this.loop.setSelected(mapObject.getBoolValue(MapObjectProperty.SOUND_LOOP));
+      (int) MathUtilities.clamp(
+        mapObject.getFloatValue(MapObjectProperty.SOUND_VOLUME, 0) * 50, 0, 100));
+    this.range.setValue(mapObject.getIntValue(MapObjectProperty.SOUND_RANGE, 0));
+    this.loop.setSelected(mapObject.getBoolValue(MapObjectProperty.SOUND_LOOP, false));
     updateModel();
-    if (mapObject.getStringValue(MapObjectProperty.SOUND_NAME) == null
-        || !Resources.sounds().contains(mapObject.getStringValue(MapObjectProperty.SOUND_NAME))) {
+    if (!mapObject.hasCustomProperty(MapObjectProperty.SOUND_NAME)) {
       return;
     }
-    this.soundResource.setSelectedItem(
-        Resources.sounds().get(mapObject.getStringValue(MapObjectProperty.SOUND_NAME)));
+
+    var sound = mapObject.getStringValue(MapObjectProperty.SOUND_NAME);
+    if (!Resources.sounds().contains(sound)) {
+      return;
+    }
+
+    this.soundResource.setSelectedItem(Resources.sounds().get(sound));
   }
 
   public void updateModel() {
     this.soundResource.setModel(
-        new DefaultComboBoxModel<>(Resources.sounds().getAll().toArray(new Sound[0])));
+      new DefaultComboBoxModel<>(Resources.sounds().getAll().toArray(new Sound[0])));
   }
 
   private void setupChangedListeners() {

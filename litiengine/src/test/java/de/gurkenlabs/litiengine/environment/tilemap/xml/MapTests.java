@@ -6,16 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 
-import de.gurkenlabs.litiengine.environment.tilemap.IMap;
-import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
-import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
-import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
-import de.gurkenlabs.litiengine.environment.tilemap.RenderOrder;
+import de.gurkenlabs.litiengine.environment.tilemap.*;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.io.URLAdapter;
 import java.awt.Color;
 import java.awt.geom.Rectangle2D;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,12 +27,12 @@ class MapTests {
   }
 
   @Test
-  void testBasicProperties() throws MalformedURLException {
+  void testBasicProperties() {
     IMap map =
         Resources.maps().get("de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
 
-    assertEquals(1.0, map.getVersion());
-    assertEquals("1.1.4", map.getTiledVersion());
+    assertEquals(1.1, map.getVersion());
+    assertEquals("1.10.2", map.getTiledVersion());
     assertEquals(MapOrientations.ORTHOGONAL, map.getOrientation());
     assertEquals(RenderOrder.RIGHT_DOWN, map.getRenderOrder());
     assertEquals(256, map.getSizeInPixels().width);
@@ -46,6 +41,10 @@ class MapTests {
     assertEquals(16, map.getTileSize().height);
     assertEquals(16, map.getSizeInTiles().width);
     assertEquals(16, map.getSizeInTiles().height);
+    assertEquals(1.11, map.getParallaxOrigin().getX());
+    assertEquals(2, map.getParallaxOrigin().getY());
+
+    assertEquals(10, map.getNextLayerId());
     assertEquals(1, map.getNextObjectId());
 
     assertEquals("test-map", map.getName());
@@ -56,8 +55,8 @@ class MapTests {
     assertEquals(1, ((TmxMap) map).getExternalTilesets().size());
     assertEquals("external-tileset", map.getTilesets().get(1).getName());
     assertEquals(1, map.getTileLayers().size());
-    assertEquals(16, map.getTileLayers().get(0).getSizeInTiles().width);
-    assertEquals(16, map.getTileLayers().get(0).getSizeInTiles().height);
+    assertEquals(16, map.getTileLayers().getFirst().getSizeInTiles().width);
+    assertEquals(16, map.getTileLayers().getFirst().getSizeInTiles().height);
     assertEquals(0, map.getImageLayers().size());
     assertEquals(1, map.getRenderLayers().size());
     assertEquals(0, map.getMapObjectLayers().size());
@@ -107,16 +106,40 @@ class MapTests {
   }
 
   @Test
+  void testImageLayers(){
+    IMap map =
+      Resources.maps()
+        .get("de/gurkenlabs/litiengine/environment/tilemap/xml/test-imagelayer.tmx");
+    assertEquals(1, map.getImageLayers().size());
+
+    IImageLayer layer = map.getImageLayers().getFirst();
+    assertEquals("blue_galaxy", layer.getName());
+    assertEquals(-32, layer.getOffsetX());
+    assertEquals(-32, layer.getOffset().getX());
+    assertEquals(-12000, layer.getOffsetY());
+    assertEquals(-12000, layer.getOffset().getY());
+    assertEquals(1.3, layer.getHorizontalParallaxFactor());
+    assertEquals(1.2, layer.getVerticalParallaxFactor());
+    assertTrue(layer.repeatHorizontally());
+    assertTrue(layer.repeatVertically());
+
+    assertEquals("blue_pixeled.png", layer.getImage().getSource());
+    assertEquals(672, layer.getImage().getWidth());
+    assertEquals(24000, layer.getImage().getHeight());
+  }
+
+  @Test
   void testMapObjectLayers() {
     IMap map =
         Resources.maps()
             .get("de/gurkenlabs/litiengine/environment/tilemap/xml/test-mapobject.tmx");
     assertEquals(1, map.getMapObjectLayers().size());
 
-    IMapObjectLayer layer = map.getMapObjectLayers().get(0);
+    IMapObjectLayer layer = map.getMapObjectLayers().getFirst();
     assertEquals("test", layer.getName());
     assertEquals(4, layer.getMapObjects().size());
     assertEquals(16, layer.getSizeInTiles().width);
+    assertEquals(new Color(195, 65, 0, 200), layer.getTintColor());
 
     IMapObject object = map.getMapObject(1);
 
@@ -174,7 +197,7 @@ class MapTests {
     assertEquals(2, map.getTileLayers().size());
     assertEquals(2, map.getTileLayers().size());
 
-    assertEquals(1, map.getTileLayers().get(0).getTile(15, 24).getGridId());
+    assertEquals(1, map.getTileLayers().getFirst().getTile(15, 24).getGridId());
   }
 
   @Test
