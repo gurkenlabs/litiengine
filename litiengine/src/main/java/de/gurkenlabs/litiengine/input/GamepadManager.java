@@ -201,32 +201,36 @@ public final class GamepadManager extends GamepadEvents implements ILaunchable {
   @Override
   public void onPoll(GamepadPollListener listener) {
     super.onPoll(listener);
-    if (this.current() != null) {
-      this.current().onPoll(listener);
+    final var current = this.current();
+    if (current != null) {
+      current.onPoll(listener);
     }
   }
 
   @Override
   public void onPressed(GamepadPressedListener listener) {
     super.onPressed(listener);
-    if (this.current() != null) {
-      this.current().onPressed(listener);
+    final var current = this.current();
+    if (current != null) {
+      current.onPressed(listener);
     }
   }
 
   @Override
   public void onReleased(GamepadReleasedListener listener) {
     super.onReleased(listener);
-    if (this.current() != null) {
-      this.current().onReleased(listener);
+    final var current = this.current();
+    if (current != null) {
+      current.onReleased(listener);
     }
   }
 
   @Override
   public void onPoll(String identifier, GamepadPollListener listener) {
     super.onPoll(identifier, listener);
-    if (this.current() != null) {
-      this.current().onPoll(identifier, listener);
+    final var current = this.current();
+    if (current != null) {
+      current.onPoll(identifier, listener);
     }
   }
 
@@ -234,16 +238,18 @@ public final class GamepadManager extends GamepadEvents implements ILaunchable {
   public void onPressed(String identifier, GamepadPressedListener listener) {
     super.onPressed(identifier, listener);
 
-    if (this.current() != null) {
-      this.current().onPressed(identifier, listener);
+    final var current = this.current();
+    if (current != null) {
+      current.onPressed(identifier, listener);
     }
   }
 
   @Override
   public void onReleased(String identifier, GamepadReleasedListener listener) {
     super.onReleased(identifier, listener);
-    if (this.current() != null) {
-      this.current().onReleased(identifier, listener);
+    final var current = this.current();
+    if (current != null) {
+      current.onReleased(identifier, listener);
     }
   }
 
@@ -251,8 +257,9 @@ public final class GamepadManager extends GamepadEvents implements ILaunchable {
   public void clearEventListeners() {
     super.clearEventListeners();
 
-    if (this.current() != null) {
-      this.current().clearEventListeners();
+    final var current = this.current();
+    if (current != null) {
+      current.clearEventListeners();
     }
   }
 
@@ -260,8 +267,9 @@ public final class GamepadManager extends GamepadEvents implements ILaunchable {
   public void removePollListener(String identifier, GamepadPollListener listener) {
     super.removePollListener(identifier, listener);
 
-    if (this.current() != null) {
-      this.current().removePollListener(identifier, listener);
+    final var current = this.current();
+    if (current != null) {
+      current.removePollListener(identifier, listener);
     }
   }
 
@@ -269,8 +277,9 @@ public final class GamepadManager extends GamepadEvents implements ILaunchable {
   public void removePressedListener(String identifier, GamepadPressedListener listener) {
     super.removePressedListener(identifier, listener);
 
-    if (this.current() != null) {
-      this.current().removePressedListener(identifier, listener);
+    final var current = this.current();
+    if (current != null) {
+      current.removePressedListener(identifier, listener);
     }
   }
 
@@ -278,8 +287,9 @@ public final class GamepadManager extends GamepadEvents implements ILaunchable {
   public void removeReleasedListener(String identifier, GamepadReleasedListener listener) {
     super.removeReleasedListener(identifier, listener);
 
-    if (this.current() != null) {
-      this.current().removeReleasedListener(identifier, listener);
+    final var current = this.current();
+    if (current != null) {
+      current.removeReleasedListener(identifier, listener);
     }
   }
 
@@ -287,8 +297,9 @@ public final class GamepadManager extends GamepadEvents implements ILaunchable {
   public void removePollListener(GamepadPollListener listener) {
     super.removePollListener(listener);
 
-    if (this.current() != null) {
-      this.current().removePollListener(listener);
+    final var current = this.current();
+    if (current != null) {
+      current.removePollListener(listener);
     }
   }
 
@@ -296,8 +307,9 @@ public final class GamepadManager extends GamepadEvents implements ILaunchable {
   public void removePressedListener(GamepadPressedListener listener) {
     super.removePressedListener(listener);
 
-    if (this.current() != null) {
-      this.current().removePressedListener(listener);
+    final var current = this.current();
+    if (current != null) {
+      current.removePressedListener(listener);
     }
   }
 
@@ -305,8 +317,9 @@ public final class GamepadManager extends GamepadEvents implements ILaunchable {
   public void removeReleasedListener(GamepadReleasedListener listener) {
     super.removeReleasedListener(listener);
 
-    if (this.current() != null) {
-      this.current().removeReleasedListener(listener);
+    final var current = this.current();
+    if (current != null) {
+      current.removeReleasedListener(listener);
     }
   }
 
