@@ -45,6 +45,11 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
   public static final String FILE_EXTENSION = "tmx";
   public static final int MAX_MAJOR = 1;
   public static final int MAX_MINOR = 10;
+
+  public static final int MIN_MAJOR = 1;
+
+  public static final int MIN_MINOR = 5;
+
   private static final Logger log = Logger.getLogger(TmxMap.class.getName());
   private final transient List<ITileLayer> rawTileLayers = new CopyOnWriteArrayList<>();
   private final transient List<IMapObjectLayer> rawMapObjectLayers = new CopyOnWriteArrayList<>();
@@ -570,9 +575,15 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
       throw new UnsupportedMapVersionException(this.tiledversion);
     }
 
-    if (major > MAX_MAJOR) {
+    if (major < MIN_MAJOR || major > MAX_MAJOR) {
       // incompatible API changes
       throw new UnsupportedMapVersionException(this.tiledversion);
+    }
+
+    if (minor < MIN_MINOR) {
+      log.log(Level.WARNING,
+        "Tiled version {0} of map \"{1}\" is less than the supported version {2}.{3}.x. Some features may not work.",
+        new Object[] {this.tiledversion, this.getName(), MIN_MAJOR, MIN_MINOR});
     }
 
     if (minor > MAX_MINOR) {

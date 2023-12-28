@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.environment.tilemap;
 
 import java.awt.Dimension;
+import java.util.List;
 
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resource;
@@ -56,4 +57,11 @@ public interface ITileset extends ICustomPropertyProvider, Resource {
   boolean containsTile(ITilesetEntry entry);
 
   boolean containsTile(int tileId);
+
+  /**
+   * Gets the terrain sets defined by this tile set.
+   *
+   * @return The terrain sets of this instance.
+   */
+  List<ITerrainSet> getTerrainSets();
 }

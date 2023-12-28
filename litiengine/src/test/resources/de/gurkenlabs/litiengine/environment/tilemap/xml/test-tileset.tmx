@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.10.2" class="wurst" orientation="orthogonal" renderorder="right-down" width="40" height="750" tilewidth="16" tileheight="16" infinite="0" parallaxoriginx="1" parallaxoriginy="2" nextlayerid="10" nextobjectid="13">
+ <tileset firstgid="1" name="tileset" tilewidth="16" tileheight="16" tilecount="64" columns="8">
+  <transformations hflip="1" vflip="1" rotate="1" preferuntransformed="1"/>
+  <image source="tileset.png" width="128" height="128"/>
+  <tile id="4">
+   <objectgroup draworder="index" id="2">
+    <object id="1" x="7.23684" y="10.9211" width="10" height="10"/>
+   </objectgroup>
+  </tile>
+  <wangsets>
+     <wangset name="wang1" class="klasse, hammer" type="mixed" tile="-1">
+      <wangcolor name="name me" color="#ff0000" tile="-1" probability="1"/>
+      <wangcolor name="second" class="super, klasse" color="#00ff00" tile="-1" probability="1"/>
+      <wangtile tileid="47" wangid="0,0,2,0,2,2,0,0"/>
+      <wangtile tileid="49" wangid="0,1,0,1,0,0,0,0"/>
+      <wangtile tileid="50" wangid="0,0,0,1,0,1,0,0"/>
+      <wangtile tileid="51" wangid="0,1,0,0,0,0,0,1"/>
+      <wangtile tileid="52" wangid="0,1,0,1,0,0,0,1"/>
+      <wangtile tileid="53" wangid="0,1,0,1,0,1,0,1"/>
+      <wangtile tileid="54" wangid="0,0,0,1,0,1,0,1"/>
+      <wangtile tileid="55" wangid="0,1,0,1,0,1,0,0"/>
+      <properties>
+       <property name="tell me whyyyy" value="because wang!"/>
+      </properties>
+     </wangset>
+     <wangset name="yet another wang" type="edge" tile="-1">
+      <wangcolor name="" color="#ff0000" tile="-1" probability="1"/>
+     </wangset>
+    </wangsets>
+ </tileset>
+</map>

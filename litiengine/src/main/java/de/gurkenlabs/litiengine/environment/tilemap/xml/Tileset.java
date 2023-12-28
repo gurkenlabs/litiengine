@@ -11,21 +11,11 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import de.gurkenlabs.litiengine.environment.tilemap.*;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlAttribute;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlRootElement;
-import jakarta.xml.bind.annotation.XmlTransient;
+import jakarta.xml.bind.annotation.*;
 
-import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
-import de.gurkenlabs.litiengine.environment.tilemap.IMapImage;
-import de.gurkenlabs.litiengine.environment.tilemap.ITile;
-import de.gurkenlabs.litiengine.environment.tilemap.ITileOffset;
-import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
-import de.gurkenlabs.litiengine.environment.tilemap.ITilesetEntry;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
@@ -49,6 +39,9 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   @XmlAttribute
   private String name;
 
+  @XmlAttribute(name = "class")
+  private String tilesetClass;
+
   @XmlAttribute
   private Integer tilewidth;
 
@@ -70,8 +63,24 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   @XmlAttribute
   private String source;
 
+  @XmlAttribute
+  private String objectalignment;
+
+  @XmlAttribute
+  private String tilerendersize;
+
+  @XmlAttribute
+  private String fillmode;
+
   @XmlElement(name = "tile")
   private List<TilesetEntry> tiles = null;
+
+  @XmlElement(name = "wangset", type = WangSet.class)
+  @XmlElementWrapper(name = "wangsets")
+  private List<ITerrainSet> wangsets;
+
+  @XmlElement
+  private TileTransformations transformations;
 
   @XmlTransient
   private List<TilesetEntry> allTiles;
@@ -225,6 +234,26 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     return this.allTiles.get(id);
   }
 
+  public TileTransformations getTransformations() {
+    return this.transformations;
+  }
+
+  public String getTilesetClass() {
+    return this.tilesetClass;
+  }
+
+  public String getObjectalignment() {
+    return this.objectalignment;
+  }
+
+  public String getTilerendersize() {
+    return this.tilerendersize;
+  }
+
+  public String getFillmode() {
+    return this.fillmode;
+  }
+
   @Override
   public boolean containsTile(ITile tile) {
     ITilesetEntry entry = tile.getTilesetEntry();
@@ -234,6 +263,11 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   @Override
   public boolean containsTile(int tileId) {
     return tileId >= this.firstgid && tileId < this.firstgid + this.getTileCount();
+  }
+
+  @Override
+  public List<ITerrainSet> getTerrainSets() {
+    return this.wangsets;
   }
 
   @Override
