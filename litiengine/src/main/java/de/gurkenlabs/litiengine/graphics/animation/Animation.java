@@ -310,7 +310,6 @@ public class Animation implements IUpdateable, ILaunchable {
     if (this.getKeyframes().isEmpty()) {
       return;
     }
-
     this.restart();
   }
 
@@ -357,11 +356,11 @@ public class Animation implements IUpdateable, ILaunchable {
     this.lastFrameUpdate = Game.loop().getTicks();
   }
 
-  KeyFrame getCurrentKeyFrame() {
+  public KeyFrame getCurrentKeyFrame() {
     return this.currentFrame;
   }
 
-  List<KeyFrame> getKeyframes() {
+  public List<KeyFrame> getKeyframes() {
     return this.keyframes;
   }
 
@@ -403,11 +402,11 @@ public class Animation implements IUpdateable, ILaunchable {
     }
 
     if (!this.keyframes.isEmpty()) {
-      this.firstFrame = this.getKeyframes().get(0);
+      this.firstFrame = getKeyframes().get(0);
     }
   }
 
-  private boolean isLastKeyFrame() {
-    return this.getKeyframes().indexOf(this.currentFrame) == this.getKeyframes().size() - 1;
+  public boolean isLastKeyFrame() {
+    return getKeyframes().indexOf(currentFrame) == getKeyframes().size() - 1;
   }
 }
