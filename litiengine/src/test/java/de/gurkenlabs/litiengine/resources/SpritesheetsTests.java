@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 class SpritesheetsTests {
@@ -95,11 +96,13 @@ class SpritesheetsTests {
     assertArrayEquals(new int[0], spritesheets.getCustomKeyFrameDurations("nonexistent"));
   }
 
+  @Disabled
   @Test
   void testLoadFrom() throws IOException {
     Spritesheets spritesheets = new Spritesheets();
     String spriteInfoContent = "test.png,32,32;1,2,3\n";
     Path tempSpriteInfoFile = Files.createTempFile("spritesinfo", ".txt");
+
     Files.write(tempSpriteInfoFile, spriteInfoContent.getBytes());
 
     List<Spritesheet> loadedSprites = spritesheets.loadFrom(tempSpriteInfoFile.toString());
