@@ -24,8 +24,8 @@ public final class MapUtilities {
       final Rectangle2D bounds = object.getBoundingBox();
       x = Math.min(bounds.getX(), x);
       y = Math.min(bounds.getY(), y);
-      maxX = Math.max(bounds.getX(), maxX);
-      maxY = Math.max(bounds.getY(), maxY);
+      maxX = Math.max(bounds.getX() + bounds.getWidth(), maxX);
+      maxY = Math.max(bounds.getY() + bounds.getHeight(), maxY);
     }
 
     return new Rectangle2D.Double(x, y, maxX - x, maxY - y);
@@ -58,12 +58,9 @@ public final class MapUtilities {
 
   public static Rectangle2D getTileBoundingBox(final IMap map, final Rectangle2D box) {
     final int minX = (int) MathUtilities.clamp(box.getX(), 0, map.getSizeInPixels().getWidth() - 1);
-    final int minY = (int) MathUtilities.clamp(box.getY(), 0,
-      map.getSizeInPixels().getHeight() - 1);
-    final int maxX = (int) MathUtilities.clamp(box.getMaxX(), 0,
-      map.getSizeInPixels().getWidth() - 1);
-    final int maxY = (int) MathUtilities.clamp(box.getMaxY(), 0,
-      map.getSizeInPixels().getHeight() - 1);
+    final int minY = (int) MathUtilities.clamp(box.getY(), 0, map.getSizeInPixels().getHeight() - 1);
+    final int maxX = (int) MathUtilities.clamp(box.getMaxX(), 0, map.getSizeInPixels().getWidth() - 1);
+    final int maxY = (int) MathUtilities.clamp(box.getMaxY(), 0, map.getSizeInPixels().getHeight() - 1);
     final Point minTilePoint = map.getOrientation().getTile(minX, minY, map);
     final Point maxTilePoint = map.getOrientation().getTile(maxX, maxY, map);
     int minTileX = map.getOrientation().getName().equals(MapOrientations.ISOMETRIC.getName())
@@ -92,8 +89,8 @@ public final class MapUtilities {
   }
 
   /**
-   * Get the corresponding tile for a given pixel map location. This is an overload taking the Map
-   * from the current environment to calculate a tile location.
+   * Get the corresponding tile for a given pixel map location. This is an overload taking the Map from the current environment to calculate a tile
+   * location.
    *
    * @param mapLocation the pixel map location.
    * @return The x / y tile coordinate for the given location.
@@ -123,10 +120,9 @@ public final class MapUtilities {
   /**
    * Check if the row or column with the given index is staggered.
    *
-   * @param staggerIndex the staggerIndex property of the map. Every second row (or column,
-   *                     depending on the {@link StaggerAxis} of the map is staggered half a tile.
-   * @param index        the index of the current row or column for which we want to determine if
-   *                     it's staggered or not.
+   * @param staggerIndex the staggerIndex property of the map. Every second row (or column, depending on the {@link StaggerAxis} of the map is
+   *                     staggered half a tile.
+   * @param index        the index of the current row or column for which we want to determine if it's staggered or not.
    * @return a boolean representing if the row or column with the given index is staggered.
    */
   public static boolean isStaggeredRowOrColumn(StaggerIndex staggerIndex, int index) {
