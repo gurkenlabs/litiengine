@@ -1,6 +1,9 @@
 name: Release LITIENGINE
 
 on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
   workflow_dispatch:
     inputs:
       incrementVersion:
@@ -16,6 +19,8 @@ on:
   schedule:
     # Midnight every day
     - cron: "0 0 * * *"
+permissions:
+  contents: write
 
 jobs:
   release:
@@ -40,8 +45,11 @@ jobs:
 
       - name: Increment version
         if: inputs.incrementVersion != 'none' && inputs.incrementVersion != ''
+        env:
+          GRGIT_USER: ${{ secrets.GITHUB_TOKEN }}
         run: |
           ./gradlew incrementVersion --increment=${{inputs.incrementVersion}}
+          ./gradlew pushTags
           latest_tag=$(git describe --tags --abbrev=0)
           echo "RELEASE_VERSION=$latest_tag" >> "$GITHUB_ENV"
 
@@ -63,11 +71,26 @@ jobs:
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PGP_PASSPHRASE }}
         run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
 
-      - name: Push tags
+      - name: Create release notes
         if: inputs.incrementVersion != 'none' && inputs.incrementVersion != ''
         env:
-          GRGIT_USER: ${{ secrets.GITHUB_TOKEN }}
-        run: ./gradlew pushTags
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.ref_name }}
+        run: |
+          gh release create "$RELEASE_VERSION" \
+              --repo="$GITHUB_REPOSITORY" \
+              --title="$RELEASE_VERSION" \
+              --generate-notes \
+              --draft
+
+      - name: Announce release
+        if: inputs.incrementVersion != 'none' && inputs.incrementVersion != ''
+        run: |
+          curl -X POST -H "Authorization: Bearer ${{ secrets.MASTODON_ACCESS_TOKEN }}" \
+          -F "status=#LITIENGINE version ${{ env.RELEASE_VERSION }} has just been released!
+          #GameDev #indiedev #videogames #IndieGameDev
+          ${{ github.server_url }}/${{ github.repository }}/releases/tag/$RELEASE_VERSION" \
+          https://fosstodon.org/api/v1/statuses
 
   package:
     name: Package distribution
@@ -97,6 +120,6 @@ jobs:
       - name: Upload package
         uses: actions/upload-artifact@v4
         with:
-          name: utiLITI-${{ runner.os }}-$RELEASE_VERSION
+          name: utiLITI-${{ runner.os }}
           path: utiliti/build/jpackage
       # TODO consider uploading the artifacts to itch.io automatically with butler, https://github.com/jdno/setup-butler
