@@ -111,6 +111,9 @@ public final class ReflectionUtilities {
     try {
       final Method method = getSetter(cls, fieldName);
       if (method != null) {
+        if(!method.canAccess(instance)){
+          method.setAccessible(true);
+        }
         // set the new value with the setter
         method.invoke(instance, value);
         return true;
@@ -121,7 +124,7 @@ public final class ReflectionUtilities {
               && (field.getType() == value.getClass()
                   || isWrapperType(field.getType(), value.getClass())
                   || isWrapperType(value.getClass(), field.getType()))) {
-            if (!field.isAccessible()) {
+            if (!field.canAccess(instance)) {
               field.setAccessible(true);
             }
 
@@ -171,14 +174,6 @@ public final class ReflectionUtilities {
       // method must start with "set" and have only one parameter, matching the
       // specified fieldType
       if (method.getName().toLowerCase().startsWith("set") && method.getParameters().length == 1) {
-        if (!method.isAccessible()) {
-          try {
-            method.setAccessible(true);
-          } catch (SecurityException e) {
-            continue;
-          }
-        }
-
         methods.add(method);
       }
     }

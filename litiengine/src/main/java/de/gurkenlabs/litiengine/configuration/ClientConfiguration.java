@@ -41,9 +41,9 @@ public class ClientConfiguration extends ConfigurationGroup {
 
   public Locale getLocale() {
     if (this.getCountry() == null || this.getCountry().isEmpty()) {
-      return new Locale(this.getLanguage());
+      return Locale.of(this.getLanguage());
     }
-    return new Locale(this.getLanguage(), this.getCountry());
+    return Locale.of(this.getLanguage(), this.getCountry());
   }
 
   /**

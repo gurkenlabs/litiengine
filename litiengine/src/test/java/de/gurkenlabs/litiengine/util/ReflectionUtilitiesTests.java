@@ -1,15 +1,12 @@
 package de.gurkenlabs.litiengine.util;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class ReflectionUtilitiesTests {
   @Test
@@ -17,6 +14,13 @@ class ReflectionUtilitiesTests {
     assertNotNull(ReflectionUtilities.getField(TestImpl.class, "integerField"));
     assertNotNull(ReflectionUtilities.getField(ChildImpl.class, "integerField"));
     assertNull(ReflectionUtilities.getField(TestImpl.class, "nananananan"));
+  }
+
+  @Test
+  void testSetValue(){
+    var test = new TestImpl();
+    assertDoesNotThrow(() -> ReflectionUtilities.setValue(TestImpl.class, test, "integerField", 12));
+    assertEquals(12, test.integerField);
   }
 
   @ParameterizedTest

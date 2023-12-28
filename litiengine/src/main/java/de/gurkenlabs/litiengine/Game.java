@@ -434,7 +434,7 @@ public final class Game {
   }
 
   /**
-   * 
+   *
    * @param preInitialization
    *          a runnable used to prepare the game for initialization. This runnable will be started in the Swing Event
    *          Dispatch Thread.
@@ -501,7 +501,7 @@ public final class Game {
       handleCommandLineArguments(args);
 
       config().load();
-      Locale.setDefault(new Locale(config().client().getCountry(), config().client().getLanguage()));
+      Locale.setDefault(Locale.of(config().client().getCountry(), config().client().getLanguage()));
 
       gameLoop = new GameLoop("Main Update Loop", config().client().getMaxFps());
       loop().attach(physics());
@@ -549,7 +549,7 @@ public final class Game {
 
   /**
    * Initializes the infrastructure of the LITIENGINE game.
-   * 
+   *
    * @see #init(String...)
    * @param initInSwingThread
    *          used to determine if the game should be launched in the swing worker thread. This should be true in most

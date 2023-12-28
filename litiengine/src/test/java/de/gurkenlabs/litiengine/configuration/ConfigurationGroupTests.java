@@ -71,8 +71,8 @@ class ConfigurationGroupTests {
     config.setGraphicQuality(Quality.VERYLOW);
     config.setResolutionHeight(123);
 
-    assertEquals(true, config.antiAlising());
-    assertEquals(true, config.colorInterpolation());
+    assertTrue(config.antiAlising());
+    assertTrue(config.colorInterpolation());
     assertEquals(DisplayMode.FULLSCREEN, config.getDisplayMode());
     assertEquals(Quality.VERYLOW, config.getGraphicQuality());
     assertEquals(123, config.getResolutionHeight());

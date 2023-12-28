@@ -6,7 +6,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import javax.swing.JScrollBar;
 
 public class ScrollHandlerBar extends JScrollBar implements Scroll.ScrollHandler {
-  private final List<Scroll.ScrollHandlerEventListener> listeners;
+  private final transient List<Scroll.ScrollHandlerEventListener> listeners;
 
   public ScrollHandlerBar(int orientation) {
     super(orientation);

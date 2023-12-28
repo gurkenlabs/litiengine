@@ -22,7 +22,7 @@ public class LayerTable extends JTable {
       new DarkTableCellEditor(new JToggleButton());
   private static final TableCellEditor nameEditor = new DarkTableCellEditor(new JTextField());
   private int lastSelection = 0;
-  private IMap map;
+  private transient IMap map;
 
   public LayerTable() {
     super();

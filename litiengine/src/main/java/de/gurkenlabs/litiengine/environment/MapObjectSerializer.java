@@ -63,7 +63,7 @@ public final class MapObjectSerializer {
 
     Object value;
     try {
-      if (!field.isAccessible()) {
+      if (!field.canAccess(entity)) {
         field.setAccessible(true);
       }
 

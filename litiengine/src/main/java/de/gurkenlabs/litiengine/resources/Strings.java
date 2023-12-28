@@ -29,7 +29,7 @@ public final class Strings {
   private Charset charset = StandardCharsets.ISO_8859_1;
 
   Strings() {
-    Locale.setDefault(new Locale("en", "US"));
+    Locale.setDefault(Locale.of("en", "US"));
   }
 
   public void setEncoding(Charset charset) {
@@ -83,7 +83,7 @@ public final class Strings {
    * Get a list of strings from the specified raw text files. Strings are separated by a new line. <br>
    * <b>This method is not cached. Ever call will open up a new {@link InputStream} to read the strings from the text
    * file.</b>
-   * 
+   *
    * @param textFile
    *          The text file that will be retrieved.
    * @return A list with all strings that are contained by the text file.

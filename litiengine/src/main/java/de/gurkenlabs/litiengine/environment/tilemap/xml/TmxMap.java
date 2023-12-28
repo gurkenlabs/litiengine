@@ -476,7 +476,7 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
   }
 
   @SuppressWarnings("unused")
-  private void afterUnmarshal(Unmarshaller u, Object parent) throws TmxException {
+  private void afterUnmarshal(Unmarshaller u, Object parent) {
     this.checkVersion();
 
     if (this.orientation != null) {
