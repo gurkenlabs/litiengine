@@ -25,7 +25,7 @@ public interface ITerrain {
 
   /**
    * Gets the probability value associated with the terrain.
-   *
+   * <p>
    * The probability value is used in automatic mapping processes to indicate the likelihood or preference of using
    * this terrain in specific contexts. Higher probability values may suggest a higher preference for automatic mapping.
    *

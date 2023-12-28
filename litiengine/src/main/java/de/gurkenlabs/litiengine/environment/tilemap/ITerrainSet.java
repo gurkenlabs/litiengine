@@ -15,7 +15,7 @@ public interface ITerrainSet extends ICustomPropertyProvider {
 
   /**
    * Gets the type of terrain represented by this instance.
-   *
+   * <p>
    * This method returns the specific type of terrain as an element of the {@link TerrainType} enumeration.
    * The {@link TerrainType} enum defines different types of terrain, including "corner," "edge," and "mixed."
    * The return value indicates the classification of the terrain associated with the current instance.
