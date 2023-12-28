@@ -555,7 +555,7 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
     return rawIndex;
   }
 
-  private void checkVersion() throws UnsupportedMapVersionException {
+  private void checkVersion()  {
     if (this.tiledversion == null || this.tiledversion.isEmpty()) {
       log.log(Level.WARNING,
           "Tiled version not defined for map \"{0}\". Could not evaluate whether the map format is supported by the engine.",
@@ -572,18 +572,31 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
       minor = Integer.parseInt(ver[1]);
       // we don't need to care about the patch version
     } catch (NumberFormatException e) {
-      throw new UnsupportedMapVersionException(this.tiledversion);
+      log.log(Level.WARNING,
+        "The defined tiled version for map \"{0}\" has an invalid format. Could not evaluate whether the map format is supported by the engine.",
+        new Object[] {this.getName()});
+      return;
     }
 
-    if (major < MIN_MAJOR || major > MAX_MAJOR) {
-      // incompatible API changes
-      throw new UnsupportedMapVersionException(this.tiledversion);
+    if (major < MIN_MAJOR) {
+      log.log(Level.WARNING,
+        "Tiled version {0} of map \"{1}\" is less than the supported version {2}.{3}.x. Some features may not work.",
+        new Object[] {this.tiledversion, this.getName(), MIN_MAJOR, MIN_MINOR});
+      return;
+    }
+
+    if (major > MAX_MAJOR) {
+      log.log(Level.WARNING,
+        "Tiled version {0} of map \"{1}\" is greater than the supported version {2}.{3}.x. Some features may not work.",
+        new Object[] {this.tiledversion, this.getName(), MAX_MAJOR, MAX_MINOR});
+      return;
     }
 
     if (minor < MIN_MINOR) {
       log.log(Level.WARNING,
         "Tiled version {0} of map \"{1}\" is less than the supported version {2}.{3}.x. Some features may not work.",
         new Object[] {this.tiledversion, this.getName(), MIN_MAJOR, MIN_MINOR});
+      return;
     }
 
     if (minor > MAX_MINOR) {
