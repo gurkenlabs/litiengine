@@ -11,9 +11,9 @@ import java.awt.*;
 import static junit.framework.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
-public class TilesetTests {
+class TilesetTests {
   @Test
-  public void testTransformations() {
+  void testTransformations() {
     IMap map = Resources.maps().get("de/gurkenlabs/litiengine/environment/tilemap/xml/test-tileset.tmx");
 
     assertFalse(map.getTilesets().isEmpty());
@@ -27,7 +27,7 @@ public class TilesetTests {
   }
 
   @Test
-  public void testTileCollision() {
+  void testTileCollision() {
     IMap map = Resources.maps().get("de/gurkenlabs/litiengine/environment/tilemap/xml/test-tileset.tmx");
 
     assertFalse(map.getTilesets().isEmpty());
@@ -46,14 +46,14 @@ public class TilesetTests {
   }
 
   @Test
-  public void testWangSets() {
+  void testWangSets() {
     IMap map = Resources.maps().get("de/gurkenlabs/litiengine/environment/tilemap/xml/test-tileset.tmx");
 
     assertFalse(map.getTilesets().isEmpty());
 
     var terrainSet = map.getTilesets().getFirst().getTerrainSets().getFirst();
     assertEquals("wang1", terrainSet.getName());
-    assertEquals(TerrainType.Mixed, terrainSet.getType());
+    assertEquals(TerrainType.MIXED, terrainSet.getType());
 
     var terrain1 = terrainSet.getTerrains().getFirst();
     var terrain2 = terrainSet.getTerrains().get(1);

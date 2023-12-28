@@ -23,9 +23,9 @@ public interface ITerrainSet extends ICustomPropertyProvider {
    * @return The {@link TerrainType} representing the type of terrain.
    *
    * @see TerrainType
-   * @see TerrainType#Corner
-   * @see TerrainType#Edge
-   * @see TerrainType#Mixed
+   * @see TerrainType#CORNER
+   * @see TerrainType#EDGE
+   * @see TerrainType#MIXED
    */
   TerrainType getType();
 

@@ -6,11 +6,11 @@ import jakarta.xml.bind.annotation.XmlEnumValue;
 @XmlEnum
 public enum TerrainType {
   @XmlEnumValue("corner")
-  Corner,
+  CORNER,
 
   @XmlEnumValue("edge")
-  Edge,
+  EDGE,
 
   @XmlEnumValue("mixed")
-  Mixed
+  MIXED
 }
