@@ -33,7 +33,8 @@ public final class Spritesheets {
   private static final Logger log = Logger.getLogger(Spritesheets.class.getName());
   private static final String SPRITE_INFO_COMMENT_CHAR = "#";
 
-  Spritesheets() {}
+  Spritesheets() {
+  }
 
   public void add(String name, Spritesheet spritesheet) {
     this.loadedSpritesheets.put(name, spritesheet);
@@ -49,6 +50,7 @@ public final class Spritesheets {
 
   public void clear() {
     this.loadedSpritesheets.clear();
+    listeners.forEach(ResourcesContainerClearedListener::cleared);
   }
 
   public boolean contains(String name) {
@@ -58,8 +60,7 @@ public final class Spritesheets {
   /**
    * Finds Spritesheets that were previously loaded by any load method or by the sprites.info file.
    *
-   * @param path
-   *          The path of the spritesheet.
+   * @param path The path of the spritesheet.
    * @return The {@link Spritesheet} associated with the path or null if not loaded yet
    */
   public Spritesheet get(final String path) {
@@ -106,7 +107,7 @@ public final class Spritesheets {
     }
 
     return new Spritesheet(Resources.images().get(tileset.getImage().getAbsoluteSourcePath(), true), tileset.getImage().getSource(),
-        tileset.getTileDimension().width, tileset.getTileDimension().height);
+      tileset.getTileDimension().width, tileset.getTileDimension().height);
   }
 
   public Spritesheet load(final SpritesheetResource info) {
@@ -129,8 +130,7 @@ public final class Spritesheets {
   /**
    * The sprite info file must be located under the GameInfo#getSpritesDirectory() directory.
    *
-   * @param spriteInfoFile
-   *          The path to the sprite info file.
+   * @param spriteInfoFile The path to the sprite info file.
    * @return A list of spritesheets that were loaded from the info file.
    */
   public List<Spritesheet> loadFrom(final String spriteInfoFile) {
@@ -183,11 +183,11 @@ public final class Spritesheets {
         String fileExtension = spritesheet.getImageFormat() == ImageFormat.UNSUPPORTED ? "" : spritesheet.getImageFormat().toFileExtension();
 
         writer.write(String.format(
-            "%s%s,%d,%d",
-            spritesheet.getName(),
-            fileExtension,
-            spritesheet.getSpriteWidth(),
-            spritesheet.getSpriteHeight()));
+          "%s%s,%d,%d",
+          spritesheet.getName(),
+          fileExtension,
+          spritesheet.getSpriteWidth(),
+          spritesheet.getSpriteHeight()));
 
         // print keyframes (if they exist)
         if (keyFrames.length > 0) {
@@ -200,7 +200,7 @@ public final class Spritesheets {
         if (!metadataOnly) {
           ImageSerializer.saveImage(Paths.get(new File(spriteInfoFile).getParentFile().getAbsolutePath(),
               spritesheet.getName() + spritesheet.getImageFormat().toFileExtension()).toString(), spritesheet.getImage(),
-              spritesheet.getImageFormat());
+            spritesheet.getImageFormat());
         }
       }
 
@@ -224,23 +224,21 @@ public final class Spritesheets {
     return spriteToRemove;
   }
 
-  public void update(final SpritesheetResource info) {
+  public Spritesheet update(final SpritesheetResource info) {
     if (info == null || info.getName() == null) {
-      return;
+      return null;
     }
 
-    final String spriteName = info.getName();
-
-    Spritesheet spriteToRemove = this.remove(spriteName);
+    Spritesheet spriteToRemove = remove(info.getName());
 
     if (spriteToRemove != null) {
-      customKeyFrameDurations.remove(spriteName);
+      customKeyFrameDurations.remove(info.getName());
       if (info.getHeight() == 0 && info.getWidth() == 0) {
-        return;
+        return null;
       }
-
-      load(info);
+      return load(info);
     }
+    return null;
   }
 
   private void getSpriteSheetFromSpriteInfoLine(String baseDirectory, ArrayList<Spritesheet> sprites, List<String> items, String[] parts) {
@@ -254,15 +252,7 @@ public final class Spritesheets {
       sprites.add(sprite);
       if (parts.length >= 2) {
         final List<String> keyFrameStrings = Arrays.asList(parts[1].split("\\s*,\\s*"));
-        if (!keyFrameStrings.isEmpty()) {
-          final int[] keyFrames = new int[keyFrameStrings.size()];
-          for (int i = 0; i < keyFrameStrings.size(); i++) {
-            final int keyFrame = Integer.parseInt(keyFrameStrings.get(i));
-            keyFrames[i] = keyFrame;
-          }
-
-          customKeyFrameDurations.put(sprite.getName(), keyFrames);
-        }
+        customKeyFrameDurations.put(sprite.getName(), keyFrameStrings.stream().mapToInt(Integer::parseInt).toArray());
       }
     } catch (final NumberFormatException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
