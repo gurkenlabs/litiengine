@@ -48,8 +48,12 @@ jobs:
         with:
           run: ./gradlew jacocoTestReport -PskipSpotless
 
-      - name: Create Packages
-        run: ./gradlew jpackage
+      - name: Publish Test Results
+        uses: dorny/test-reporter@v1
+        with:
+          name: JUnit test results
+          reporter: java-junit
+          path: '**/test-results/**/*.xml'
 
       - name: Static Analysis
         env:
