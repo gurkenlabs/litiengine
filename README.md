@@ -30,7 +30,7 @@ repositories {
 }
 
 dependencies {
-  implementation 'de.gurkenlabs:litiengine:0.6.0'
+  implementation 'de.gurkenlabs:litiengine:0.8.0'
 }
 ```
 
@@ -41,7 +41,7 @@ repositories {
 }
 
 dependencies {
-  implementation("de.gurkenlabs:litiengine:0.6.0")
+  implementation("de.gurkenlabs:litiengine:0.8.0")
 }
 ```
 ### Other ways of installing and using LITIENGINE
@@ -97,7 +97,6 @@ LITIENGINE is created by two Bavarian brothers known as [gurkenlabs](https://gur
 
 [![](https://img.shields.io/badge/twitter-%40gurkenlabs-51963a?style=social&logo=twitter)](https://twitter.com/gurkenlabs)
 [![](https://img.shields.io/badge/instagram-%40gurkenlabs-51963a?style=social&logo=instagram)](https://www.instagram.com/gurkenlabs)
-[![](https://img.shields.io/badge/facebook-gurkenlabsofficial-51963a?style=social&logo=facebook)](https://www.facebook.com/gurkenlabsofficial)
 [![](https://img.shields.io/badge/youtube-gurkenlabs-51963a?style=social&logo=youtube)](https://www.youtube.com/channel/UCN7-9zYTxip_Hl1LvCQ8RBA)
 
 ## Sponsors and supporters
