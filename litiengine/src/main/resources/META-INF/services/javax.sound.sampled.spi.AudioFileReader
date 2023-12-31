@@ -1,2 +1,2 @@
-de.gurkenlabs.litiengine.sound.spi.MpegAudioFileReader
+de.gurkenlabs.litiengine.sound.spi.mp3.Mp3FileReader
 # de.gurkenlabs.litiengine.sound.spi.VorbisAudioFileReader
