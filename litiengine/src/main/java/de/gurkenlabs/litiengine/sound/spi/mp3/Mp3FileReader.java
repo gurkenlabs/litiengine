@@ -36,7 +36,7 @@ public class Mp3FileReader extends AudioFileReader {
 
     var frames = new ArrayList<MpegFrame>();
     while (offset < byteBuffer.limit() - MINIMUM_BUFFER_LENGTH) {
-      if (!Mpeg.isStart(byteBuffer, offset)) {
+      if (!Mpeg.isStart(byteBuffer.get(offset), byteBuffer.get(offset + 1))) {
         offset++;
         continue;
       }
@@ -70,7 +70,7 @@ public class Mp3FileReader extends AudioFileReader {
     return new AudioFileFormat(MP3, audioFormat, frames.size());
   }
 
-  private boolean canHandleAudioFormat(ByteBuffer buffer) throws UnsupportedAudioFileException {
+  private boolean canHandleAudioFormat(ByteBuffer buffer) {
     // Check for WAV, AU, and AIFF, Ogg Vorbis, Flac, MAC, Shoutcast and OGG formats.
     if ((buffer.get(0) == 'R') && (buffer.get(1) == 'I') && (buffer.get(2) == 'F') && (buffer.get(3) == 'F') && (buffer.get(8) == 'W') && (buffer.get(9) == 'A') && (buffer.get(10) == 'V') && (buffer.get(11) == 'E')) {
       int isPCM = ((buffer.get(21) << 8) & 0x0000FF00) | ((buffer.get(20)) & 0x00000FF);
