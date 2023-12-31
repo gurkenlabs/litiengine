@@ -6,33 +6,6 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 class MpegFrame {
-  private static final int FRAME_SYNC = 0x7FF;
-  private static final long BITMASK_FRAME_SYNC = 0xFFE00000L;
-  private static final long BITMASK_VERSION = 0x180000L;
-  private static final long BITMASK_LAYER = 0x60000L;
-  private static final long BITMASK_PROTECTION = 0x10000L;
-  private static final long BITMASK_BITRATE = 0xF000L;
-  private static final long BITMASK_SAMPLE_RATE = 0xC00L;
-  private static final long BITMASK_PADDING = 0x200L;
-  private static final long BITMASK_PRIVATE = 0x100L;
-  private static final long BITMASK_CHANNEL_MODE = 0xC0L;
-  private static final long BITMASK_MODE_EXTENSION = 0x30L;
-  private static final long BITMASK_COPYRIGHT = 0x8L;
-  private static final long BITMASK_ORIGINAL = 0x4L;
-  private static final long BITMASK_EMPHASIS = 0x3L;
-
-  private final String version;
-  private final int layer;
-  private final int bitRate;
-  private final int sampleRate;
-  private final boolean padding;
-  private final boolean protection;
-  private final boolean privat;
-  private final boolean copyright;
-  private final boolean original;
-  private final String channelMode;
-  private final String modeExtension;
-  private final String emphasis;
 
   /**
    *
@@ -51,26 +24,56 @@ class MpegFrame {
    * If error_protection flag is set to 1, header is followed by a two byte CRC.
    *
    */
-  public MpegFrame(byte frameData1, byte frameData2, byte frameData3, byte frameData4) throws UnsupportedAudioFileException {
-    long frameHeader = Codec.decodeInteger(frameData1, frameData2, frameData3, frameData4);
+  private static final long[] BITMASKS = new long[]{
+    Long.parseLong("11111111111", 2), // FRAME_SYNC
+    Long.parseLong("11111111111000000000000000000000", 2), // BITMASK_FRAME_SYNC
+    Long.parseLong("00000000000110000000000000000000", 2), // BITMASK_VERSION
+    Long.parseLong("00000000000001100000000000000000", 2), // BITMASK_LAYER
+    Long.parseLong("00000000000000010000000000000000", 2), // BITMASK_PROTECTION
+    Long.parseLong("00000000000000001111000000000000", 2), // BITMASK_BITRATE
+    Long.parseLong("00000000000000000000110000000000", 2), // BITMASK_SAMPLE_RATE
+    Long.parseLong("00000000000000000000001000000000", 2), // BITMASK_PADDING
+    Long.parseLong("00000000000000000000000100000000", 2), // BITMASK_PRIVATE
+    Long.parseLong("00000000000000000000000011000000", 2), // BITMASK_CHANNEL_MODE
+    Long.parseLong("00000000000000000000000000110000", 2), // BITMASK_MODE_EXTENSION
+    Long.parseLong("00000000000000000000000000001000", 2), // BITMASK_COPYRIGHT
+    Long.parseLong("00000000000000000000000000000100", 2), // BITMASK_ORIGINAL
+    Long.parseLong("00000000000000000000000000000011", 2), // BITMASK_EMPHASIS
+  };
 
-    var frameSync = extractField(frameHeader, BITMASK_FRAME_SYNC);
-    if (frameSync != FRAME_SYNC) {
+  private final String version;
+  private final int layer;
+  private final int bitRate;
+  private final int sampleRate;
+  private final boolean padding;
+  private final boolean protection;
+  private final boolean privat;
+  private final boolean copyright;
+  private final boolean original;
+  private final String channelMode;
+  private final String modeExtension;
+  private final String emphasis;
+
+  public MpegFrame(byte frameData1, byte frameData2, byte frameData3, byte frameData4) throws UnsupportedAudioFileException {
+    int frameHeader = Codec.decodeInteger(frameData1, frameData2, frameData3, frameData4);
+
+    var frameSync = extractField(frameHeader, BITMASKS[1]);
+    if (frameSync != BITMASKS[0]) {
       throw new UnsupportedAudioFileException("Frame sync missing");
     }
 
-    this.version = Mpeg.getVersion(extractField(frameHeader, BITMASK_VERSION));
-    this.layer = Mpeg.getLayer(extractField(frameHeader, BITMASK_LAYER));
-    this.bitRate = Mpeg.getBitRate(extractField(frameHeader, BITMASK_BITRATE), this.version, this.layer);
-    this.sampleRate = Mpeg.getSampleRate(extractField(frameHeader, BITMASK_SAMPLE_RATE), this.version);
-    this.channelMode = Mpeg.getChannelMode(extractField(frameHeader, BITMASK_CHANNEL_MODE));
-    this.modeExtension = Mpeg.getModeExtension(extractField(frameHeader, BITMASK_MODE_EXTENSION), this.layer, this.channelMode);
-    this.emphasis = Mpeg.getEmphasis(extractField(frameHeader, BITMASK_EMPHASIS));
-    this.protection = extractField(frameHeader, BITMASK_PROTECTION) == 1;
-    this.padding = extractField(frameHeader, BITMASK_PADDING) == 1;
-    this.privat = extractField(frameHeader, BITMASK_PRIVATE) == 1;
-    this.copyright = extractField(frameHeader, BITMASK_COPYRIGHT) == 1;
-    this.original = extractField(frameHeader, BITMASK_ORIGINAL) == 1;
+    this.version = Mpeg.getVersion(extractField(frameHeader, BITMASKS[2]));
+    this.layer = Mpeg.getLayer(extractField(frameHeader, BITMASKS[3]));
+    this.protection = extractField(frameHeader, BITMASKS[4]) == 1;
+    this.bitRate = Mpeg.getBitRate(extractField(frameHeader, BITMASKS[5]), this.version, this.layer);
+    this.sampleRate = Mpeg.getSampleRate(extractField(frameHeader, BITMASKS[6]), this.version);
+    this.padding = extractField(frameHeader, BITMASKS[7]) == 1;
+    this.privat = extractField(frameHeader, BITMASKS[8]) == 1;
+    this.channelMode = Mpeg.getChannelMode(extractField(frameHeader, BITMASKS[9]));
+    this.modeExtension = Mpeg.getModeExtension(extractField(frameHeader, BITMASKS[10]), this.layer, this.channelMode);
+    this.copyright = extractField(frameHeader, BITMASKS[11]) == 1;
+    this.original = extractField(frameHeader, BITMASKS[12]) == 1;
+    this.emphasis = Mpeg.getEmphasis(extractField(frameHeader, BITMASKS[13]));
   }
 
   public int getBitRate() {
@@ -145,7 +148,7 @@ class MpegFrame {
   }
 
 
-  private static int extractField(long frameHeader, long bitMask) {
+  private static int extractField(int frameHeader, long bitMask) {
     int shiftBy = 0;
     for (int i = 0; i <= 31; i++) {
       if (((bitMask >> i) & 1) != 0) {

@@ -70,7 +70,7 @@ final class Mpeg {
   public static final Map<Integer, Integer[]> BITRATES_VERSION_1_0 = Map.of(
     LAYER_1, new Integer[]{32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448},
     LAYER_2, new Integer[]{32, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 384},
-    3, new Integer[]{32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320});
+    LAYER_3, new Integer[]{32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320});
 
   public static final Map<Integer, Integer[]> BITRATES_VERSION_2_X = Map.of(
     LAYER_1, new Integer[]{32, 48, 56, 64, 80, 96, 112, 128, 144, 160, 176, 192, 224, 256},
@@ -204,7 +204,8 @@ final class Mpeg {
     return true;
   }
 
-  static boolean isStart(ByteBuffer buffer, int offset) {
-    return buffer.get(offset) == (byte) 0xFF && (buffer.get(offset + 1) & (byte) 0xE0) == (byte) 0xE0;
+  static boolean isStart(byte b1, byte b2) {
+    // check for FRAME_SYNC bytes (11111111 11100000)
+    return b1 == (byte) 0xFF && (b2 & (byte) 0xE0) == (byte) 0xE0;
   }
 }
