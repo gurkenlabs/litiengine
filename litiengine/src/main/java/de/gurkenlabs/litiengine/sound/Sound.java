@@ -3,10 +3,7 @@ package de.gurkenlabs.litiengine.sound;
 import de.gurkenlabs.litiengine.util.io.StreamUtilities;
 import java.io.IOException;
 import java.io.InputStream;
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.sound.sampled.*;
 
 /**
  * This class implements all required functionality to load sounds from the file system and provide a stream that can
@@ -14,15 +11,13 @@ import javax.sound.sampled.UnsupportedAudioFileException;
  */
 public final class Sound {
 
-  private AudioFormat format;
+  private final AudioFormat format;
 
   private final String name;
 
-  private AudioInputStream stream;
+  private final byte[] streamData;
 
-  private byte[] streamData;
-
-  private byte[] data;
+  private final byte[] data;
 
   /**
    * Creates a new Sound instance by the specified file path. Loads the sound data into a byte array and also retrieves
@@ -47,15 +42,14 @@ public final class Sound {
     this.data = StreamUtilities.getBytes(is);
 
     AudioInputStream in = AudioSystem.getAudioInputStream(is);
-    if (in != null) {
-      final AudioFormat baseFormat = in.getFormat();
-      final AudioFormat decodedFormat = getOutFormat(baseFormat);
-      // Get AudioInputStream that will be decoded by underlying VorbisSPI
-      in = AudioSystem.getAudioInputStream(decodedFormat, in);
-      this.stream = in;
-      this.streamData = StreamUtilities.getBytes(this.stream);
-      this.format = this.stream.getFormat();
+
+    if (!AudioSystem.isLineSupported(new DataLine.Info(SourceDataLine.class, in.getFormat()))) {
+      // we need to convert because the default MixerProviders of Java (e.g. DirectAudioMixerProvider) don't support all formats
+      in = AudioSystem.getAudioInputStream(targetAudioFormat(in.getFormat()), in);
     }
+
+    this.streamData = StreamUtilities.getBytes(in);
+    this.format = in.getFormat();
   }
 
   /**
@@ -96,10 +90,8 @@ public final class Sound {
     return this.streamData.clone();
   }
 
-  private static AudioFormat getOutFormat(final AudioFormat inFormat) {
-    final int ch = inFormat.getChannels();
-    final float rate = inFormat.getSampleRate();
-    return new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, rate, 16, ch, ch * 2, rate, false);
+  private static AudioFormat targetAudioFormat(final AudioFormat sourceFormat) {
+    return new AudioFormat(sourceFormat.getSampleRate(), 16, sourceFormat.getChannels(), true, sourceFormat.isBigEndian());
   }
 
   @Override
