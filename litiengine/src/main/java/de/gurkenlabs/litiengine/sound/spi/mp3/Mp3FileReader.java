@@ -71,27 +71,28 @@ public class Mp3FileReader extends AudioFileReader {
   }
 
   private boolean canHandleAudioFormat(ByteBuffer buffer) {
-    // Check for WAV, AU, and AIFF, Ogg Vorbis, Flac, MAC, Shoutcast and OGG formats.
-    if ((buffer.get(0) == 'R') && (buffer.get(1) == 'I') && (buffer.get(2) == 'F') && (buffer.get(3) == 'F') && (buffer.get(8) == 'W') && (buffer.get(9) == 'A') && (buffer.get(10) == 'V') && (buffer.get(11) == 'E')) {
+    var headerArray = new byte[12];
+    buffer.get(headerArray);
+    var audioHeader = new String(headerArray).toUpperCase();
+
+    if (audioHeader.startsWith(Mpeg.ID3V2_TAG)) {
+      return true;
+    }
+
+    if (audioHeader.startsWith("RIFF") && audioHeader.contains("WAVE")) {
       int isPCM = ((buffer.get(21) << 8) & 0x0000FF00) | ((buffer.get(20)) & 0x00000FF);
       return isPCM != 1;
-    } else if ((buffer.get(0) == '.') && (buffer.get(1) == 's') && (buffer.get(2) == 'n') && (buffer.get(3) == 'd')) {
-      // AU stream found
+    } else if (audioHeader.startsWith(".SND")) { // AU stream found
       return false;
-    } else if ((buffer.get(0) == 'F') && (buffer.get(1) == 'O') && (buffer.get(2) == 'R') && (buffer.get(3) == 'M') && (buffer.get(8) == 'A') && (buffer.get(9) == 'I') && (buffer.get(10) == 'F') && (buffer.get(11) == 'F')) {
-      // AIFF stream found
+    } else if (audioHeader.startsWith("FORM") && audioHeader.contains("AIFF")) {
       return false;
-    } else if (((buffer.get(0) == 'M') | (buffer.get(0) == 'm')) && ((buffer.get(1) == 'A') | (buffer.get(1) == 'a')) && ((buffer.get(2) == 'C') | (buffer.get(2) == 'c'))) {
-      // APE stream found
+    } else if (audioHeader.startsWith("MAC")) { // APE
       return false;
-    } else if (((buffer.get(0) == 'F') | (buffer.get(0) == 'f')) && ((buffer.get(1) == 'L') | (buffer.get(1) == 'l')) && ((buffer.get(2) == 'A') | (buffer.get(2) == 'a')) && ((buffer.get(3) == 'C') | (buffer.get(3) == 'c'))) {
-      // FLAC stream found
+    } else if (audioHeader.startsWith("FLAC")) {
       return false;
-    } else if (((buffer.get(0) == 'I') | (buffer.get(0) == 'i')) && ((buffer.get(1) == 'C') | (buffer.get(1) == 'c')) && ((buffer.get(2) == 'Y') | (buffer.get(2) == 'y'))) {
-      // Shoutcast stream found
+    } else if (audioHeader.startsWith("ICY")) { // Shoutcast stream found
       return false;
-    } else if (((buffer.get(0) == 'O') | (buffer.get(0) == 'o')) && ((buffer.get(1) == 'G') | (buffer.get(1) == 'g')) && ((buffer.get(2) == 'G') | (buffer.get(2) == 'g'))) {
-      // Ogg stream found
+    } else if (audioHeader.startsWith("OGG")) {
       return false;
     }
 
