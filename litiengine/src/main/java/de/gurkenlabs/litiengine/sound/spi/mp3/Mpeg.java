@@ -84,7 +84,10 @@ final class Mpeg {
     LAYER_3, 1152f);
 
   static final String ID3V2_TAG = "ID3";
-  static final int ID3V2_TAG_HEADER_LENGTH = 10;
+
+  private static final int ID3V2_TAG_HEADER_LENGTH = 10;
+
+  static final int ID3V2_TAG_DATA_OFFSET_OFFSET = 6;
   static final int ID3V2_TAG_MAJOR_VERSION_OFFSET = 3;
   static final int ID3V2_TAG_MINOR_VERSION_OFFSET = 4;
 
@@ -175,33 +178,7 @@ final class Mpeg {
 
 
   static int getDataOffset(ByteBuffer byteBuffer) throws UnsupportedAudioFileException {
-    var id3v2Header = new byte[ID3V2_TAG_HEADER_LENGTH];
-    byteBuffer.get(id3v2Header);
-
-    if (!checkID3v2Tag(id3v2Header)) {
-      return 0;
-    }
-
-    return ID3V2_TAG_HEADER_LENGTH + Codec.decodeInteger(id3v2Header[6], id3v2Header[7], id3v2Header[8], id3v2Header[9]);
-  }
-
-  static boolean checkID3v2Tag(byte[] bytes) throws UnsupportedAudioFileException {
-    if (bytes.length < ID3V2_TAG_HEADER_LENGTH) {
-      throw new UnsupportedAudioFileException("Data buffer too short");
-    }
-
-    var tag = new String(bytes, 0, ID3V2_TAG.length());
-    if (!tag.equals(ID3V2_TAG)) {
-      throw new UnsupportedAudioFileException();
-    }
-
-    int majorVersion = bytes[ID3V2_TAG_MAJOR_VERSION_OFFSET];
-    if (majorVersion != 2 && majorVersion != 3 && majorVersion != 4) {
-      int minorVersion = bytes[ID3V2_TAG_MINOR_VERSION_OFFSET];
-      throw new UnsupportedAudioFileException("Unsupported version 2." + majorVersion + "." + minorVersion);
-    }
-
-    return true;
+    return ID3V2_TAG_HEADER_LENGTH + byteBuffer.getInt(ID3V2_TAG_DATA_OFFSET_OFFSET);
   }
 
   static boolean isStart(byte b1, byte b2) {

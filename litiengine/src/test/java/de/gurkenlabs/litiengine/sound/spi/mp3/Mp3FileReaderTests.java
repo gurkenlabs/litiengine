@@ -1,4 +1,4 @@
-package de.gurkenlabs.litiengine.sound;
+package de.gurkenlabs.litiengine.sound.spi.mp3;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.resources.Resources;
