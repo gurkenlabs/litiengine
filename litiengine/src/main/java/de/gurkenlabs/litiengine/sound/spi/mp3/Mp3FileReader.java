@@ -14,6 +14,7 @@ public class Mp3FileReader extends AudioFileReader {
   public static final AudioFileFormat.Type MP3 = new AudioFileFormat.Type("MP3", "mp3");
 
   private static final int MINIMUM_BUFFER_LENGTH = 40;
+  private static final int FILE_HEADER_LENGTH = 12;
 
   public Mp3FileReader() {
     super(128000 * 32 + 1);
@@ -22,18 +23,24 @@ public class Mp3FileReader extends AudioFileReader {
   @Override
   protected AudioFileFormat getAudioFileFormat(InputStream stream, long fileLength) throws UnsupportedAudioFileException, IOException {
     var byteBuffer = ByteBuffer.wrap(stream.readAllBytes());
+    if (byteBuffer.limit() < FILE_HEADER_LENGTH) {
+      throw new UnsupportedAudioFileException("Invalid audio stream");
+    }
+
+    var fileHeader = new byte[FILE_HEADER_LENGTH];
+    byteBuffer.get(fileHeader);
+    byteBuffer.clear();
 
     // The AudioSystem calls this and expects an UnsupportedAudioFileException if a FileReader cannot handle a file
-    if (!canHandleAudioFormat(byteBuffer)) {
+    if (!canHandleAudioFormat(fileHeader)) {
       throw new UnsupportedAudioFileException("No mpeg audio format found");
     }
 
-    return getFormatFromMpegFrames(byteBuffer);
+    var offset = Mpeg.getDataOffset(byteBuffer);
+    return getFormatFromMpegFrames(byteBuffer, offset);
   }
 
-  private AudioFileFormat getFormatFromMpegFrames(ByteBuffer byteBuffer) throws UnsupportedAudioFileException {
-    var offset = Mpeg.getDataOffset(byteBuffer);
-
+  private AudioFileFormat getFormatFromMpegFrames(ByteBuffer byteBuffer, int offset) throws UnsupportedAudioFileException {
     var frames = new ArrayList<MpegFrame>();
     while (offset < byteBuffer.limit() - MINIMUM_BUFFER_LENGTH) {
       if (!Mpeg.isStart(byteBuffer.get(offset), byteBuffer.get(offset + 1))) {
@@ -41,7 +48,7 @@ public class Mp3FileReader extends AudioFileReader {
         continue;
       }
 
-      var frame = new MpegFrame(byteBuffer.get(offset), byteBuffer.get(offset + 1), byteBuffer.get(offset + 2), byteBuffer.get(offset + 3));
+      var frame = new MpegFrame(byteBuffer, offset);
       if (offset + frame.getLengthInBytes() > byteBuffer.limit()) {
         throw new UnsupportedAudioFileException("Frame length exceeds end of file");
       }
@@ -70,32 +77,8 @@ public class Mp3FileReader extends AudioFileReader {
     return new AudioFileFormat(MP3, audioFormat, frames.size());
   }
 
-  private boolean canHandleAudioFormat(ByteBuffer buffer) {
-    var headerArray = new byte[12];
-    buffer.get(headerArray);
-    var audioHeader = new String(headerArray).toUpperCase();
-
-    if (audioHeader.startsWith(Mpeg.ID3V2_TAG)) {
-      return true;
-    }
-
-    if (audioHeader.startsWith("RIFF") && audioHeader.contains("WAVE")) {
-      int isPCM = ((buffer.get(21) << 8) & 0x0000FF00) | ((buffer.get(20)) & 0x00000FF);
-      return isPCM != 1;
-    } else if (audioHeader.startsWith(".SND")) { // AU stream found
-      return false;
-    } else if (audioHeader.startsWith("FORM") && audioHeader.contains("AIFF")) {
-      return false;
-    } else if (audioHeader.startsWith("MAC")) { // APE
-      return false;
-    } else if (audioHeader.startsWith("FLAC")) {
-      return false;
-    } else if (audioHeader.startsWith("ICY")) { // Shoutcast stream found
-      return false;
-    } else if (audioHeader.startsWith("OGG")) {
-      return false;
-    }
-
-    return true;
+  private boolean canHandleAudioFormat(byte[] fileHeader) {
+    var audioHeader = new String(fileHeader).toUpperCase();
+    return audioHeader.startsWith(Mpeg.ID3V2_TAG);
   }
 }

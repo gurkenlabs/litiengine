@@ -160,22 +160,4 @@ public final class Codec {
   public static byte[] decode(String base64) {
     return Base64.getDecoder().decode(base64);
   }
-
-  public static int decodeInteger(byte b1, byte b2, byte b3, byte b4) {
-    int value = b4 & 0xff;
-    value += shiftByte(b3, -8);
-    value += shiftByte(b2, -16);
-    value += shiftByte(b1, -24);
-    return value;
-  }
-
-  public static int shiftByte(byte c, int places) {
-    int i = c & 0xff;
-    if (places < 0) {
-      return i << -places;
-    } else if (places > 0) {
-      return i >> places;
-    }
-    return i;
-  }
 }
