@@ -24,13 +24,7 @@ public class Mp3FormatConversionProvider extends FormatConversionProvider {
 
   @Override
   public AudioFormat.Encoding[] getSourceEncodings() {
-    var sourceEncodings = new ArrayList<AudioFormat.Encoding>();
-    for (var encodings : Mpeg.ENCODINGS.values()) {
-      sourceEncodings.addAll(Arrays.asList(encodings));
-    }
-
-    var result = new AudioFormat.Encoding[sourceEncodings.size()];
-    return sourceEncodings.toArray(result);
+    return new AudioFormat.Encoding[]{Mpeg.getEncoding(Mpeg.VERSION_1_0, Mpeg.LAYER_3)};
   }
 
   @Override

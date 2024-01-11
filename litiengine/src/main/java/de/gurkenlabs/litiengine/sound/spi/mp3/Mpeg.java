@@ -1,7 +1,5 @@
 package de.gurkenlabs.litiengine.sound.spi.mp3;
 
-import de.gurkenlabs.litiengine.util.io.Codec;
-
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.nio.ByteBuffer;
@@ -11,37 +9,13 @@ final class Mpeg {
   public static final String VERSION_1_0 = "1.0";
   public static final String VERSION_2_0 = "2.0";
   public static final String VERSION_2_5 = "2.5";
-
-  public static final Map<Integer, String> VERSIONS = Map.of(
-    3, VERSION_1_0,
-    2, VERSION_2_0,
-    0, VERSION_2_5);
-
-  public static final int LAYER_1 = 1;
-  public static final int LAYER_2 = 2;
-  public static final int LAYER_3 = 3;
-  public static final String[] LAYERS = {null, "I", "II", "III"};
-  public static final AudioFormat.Encoding MPEG1L1 = new AudioFormat.Encoding("MPEG1L1");
-  public static final AudioFormat.Encoding MPEG1L2 = new AudioFormat.Encoding("MPEG1L2");
-  public static final AudioFormat.Encoding MPEG1L3 = new AudioFormat.Encoding("MPEG1L3");
-  public static final AudioFormat.Encoding MPEG2L1 = new AudioFormat.Encoding("MPEG2L1");
-  public static final AudioFormat.Encoding MPEG2L2 = new AudioFormat.Encoding("MPEG2L2");
-  public static final AudioFormat.Encoding MPEG2L3 = new AudioFormat.Encoding("MPEG2L3");
-
-  public static final AudioFormat.Encoding MPEG2DOT5L1 = new AudioFormat.Encoding("MPEG2DOT5L1");
-  public static final AudioFormat.Encoding MPEG2DOT5L2 = new AudioFormat.Encoding("MPEG2DOT5L2");
-  public static final AudioFormat.Encoding MPEG2DOT5L3 = new AudioFormat.Encoding("MPEG2DOT5L3");
-  public static final Map<String, AudioFormat.Encoding[]> ENCODINGS = Map.of(
-    VERSION_1_0, new AudioFormat.Encoding[]{MPEG1L1, MPEG1L2, MPEG1L3},
-    VERSION_2_0, new AudioFormat.Encoding[]{MPEG2L1, MPEG2L2, MPEG2L3},
-    VERSION_2_5, new AudioFormat.Encoding[]{MPEG2DOT5L1, MPEG2DOT5L2, MPEG2DOT5L3});
-
+  public static final String LAYER_1 = "I";
+  public static final String LAYER_2 = "II";
+  public static final String LAYER_3 = "III";
   public static final String CHANNEL_MODE_MONO = "Mono";
   public static final String CHANNEL_MODE_DUAL_MONO = "Dual mono";
   public static final String CHANNEL_MODE_JOINT_STEREO = "Joint stereo";
   public static final String CHANNEL_MODE_STEREO = "Stereo";
-  public static final String[] CHANNEL_MODES = new String[]{CHANNEL_MODE_STEREO, CHANNEL_MODE_JOINT_STEREO, CHANNEL_MODE_DUAL_MONO, CHANNEL_MODE_MONO};
-
   public static final String MODE_EXTENSION_BANDS_4_31 = "Bands 4-31";
   public static final String MODE_EXTENSION_BANDS_8_31 = "Bands 8-31";
   public static final String MODE_EXTENSION_BANDS_12_31 = "Bands 12-31";
@@ -52,7 +26,7 @@ final class Mpeg {
   public static final String MODE_EXTENSION_INTENSITY_M_S_STEREO = "Intensity & M/S stereo";
   public static final String MODE_EXTENSION_NA = "n/a";
 
-  public static final Map<Integer, String[]> MODE_EXTENSIONS = Map.of(
+  public static final Map<String, String[]> MODE_EXTENSIONS = Map.of(
     LAYER_1, new String[]{MODE_EXTENSION_BANDS_4_31, MODE_EXTENSION_BANDS_8_31, MODE_EXTENSION_BANDS_12_31, MODE_EXTENSION_BANDS_16_31},
     LAYER_2, new String[]{MODE_EXTENSION_BANDS_4_31, MODE_EXTENSION_BANDS_8_31, MODE_EXTENSION_BANDS_12_31, MODE_EXTENSION_BANDS_16_31},
     LAYER_3, new String[]{MODE_EXTENSION_NONE, MODE_EXTENSION_INTENSITY_STEREO, MODE_EXTENSION_M_S_STEREO, MODE_EXTENSION_INTENSITY_M_S_STEREO});
@@ -67,18 +41,17 @@ final class Mpeg {
     VERSION_2_0, new Integer[]{22050, 24000, 16000},
     VERSION_2_5, new Integer[]{11025, 12000, 8000});
 
-  public static final Map<Integer, Integer[]> BITRATES_VERSION_1_0 = Map.of(
+  public static final Map<String, Integer[]> BITRATES_VERSION_1_0 = Map.of(
     LAYER_1, new Integer[]{32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448},
     LAYER_2, new Integer[]{32, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 384},
     LAYER_3, new Integer[]{32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320});
 
-  public static final Map<Integer, Integer[]> BITRATES_VERSION_2_X = Map.of(
+  public static final Map<String, Integer[]> BITRATES_VERSION_2_X = Map.of(
     LAYER_1, new Integer[]{32, 48, 56, 64, 80, 96, 112, 128, 144, 160, 176, 192, 224, 256},
     LAYER_2, new Integer[]{8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160},
     LAYER_3, new Integer[]{8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160});
 
-
-  public static final Map<Integer, Float> TIME_PER_FRAME = Map.of(
+  public static final Map<String, Float> TIME_PER_FRAME = Map.of(
     LAYER_1, 384f,
     LAYER_2, 1152f,
     LAYER_3, 1152f);
@@ -88,35 +61,33 @@ final class Mpeg {
   private static final int ID3V2_TAG_HEADER_LENGTH = 10;
 
   static final int ID3V2_TAG_DATA_OFFSET_OFFSET = 6;
-  static final int ID3V2_TAG_MAJOR_VERSION_OFFSET = 3;
-  static final int ID3V2_TAG_MINOR_VERSION_OFFSET = 4;
 
   private Mpeg() {
   }
 
   static String getVersion(int versionRaw) throws UnsupportedAudioFileException {
-    var version = VERSIONS.getOrDefault(versionRaw, null);
-    if (version == null) {
-      throw new UnsupportedAudioFileException("Invalid mpeg audio version in frame header");
-    }
-
-    return version;
+    return switch (versionRaw) {
+      case 3 -> VERSION_1_0;
+      case 2 -> VERSION_2_0;
+      case 0 -> VERSION_2_5;
+      default -> throw new UnsupportedAudioFileException("Invalid mpeg audio version in frame header");
+    };
   }
 
-  static int getLayer(int layerRaw) throws UnsupportedAudioFileException {
+  static String getLayer(int layerRaw) throws UnsupportedAudioFileException {
     return switch (layerRaw) {
-      case 1 -> 3;
-      case 2 -> 2;
-      case 3 -> 1;
+      case 1 -> LAYER_3;
+      case 2 -> LAYER_2;
+      case 3 -> LAYER_1;
       default -> throw new UnsupportedAudioFileException("Invalid mpeg layer description in frame header");
     };
   }
 
-  static AudioFormat.Encoding getEncoding(String version, int layer) {
-    return ENCODINGS.get(version)[layer - 1];
+  static AudioFormat.Encoding getEncoding(String version, String layer) {
+    return new AudioFormat.Encoding("MPEG" + version + "L" + layer);
   }
 
-  static int getBitRate(int bitRateRaw, String version, int layer) throws UnsupportedAudioFileException {
+  static int getBitRate(int bitRateRaw, String version, String layer) throws UnsupportedAudioFileException {
     if (bitRateRaw < 0 || bitRateRaw > BITRATES_VERSION_1_0.get(LAYER_1).length) {
       throw new UnsupportedAudioFileException("Invalid bitrate in frame header");
     }
@@ -138,7 +109,7 @@ final class Mpeg {
     return sampleRates[sampleRateRaw];
   }
 
-  static float getFrameRate(String version, int layer, int sampleRate) {
+  static float getFrameRate(String version, String layer, int sampleRate) {
     var tpf = TIME_PER_FRAME.get(layer) / sampleRate;
     if ((version.equals(VERSION_2_0) || (version.equals(VERSION_2_5)))) {
       tpf /= 2;
@@ -148,14 +119,17 @@ final class Mpeg {
   }
 
   static String getChannelMode(int channelModeRaw) throws UnsupportedAudioFileException {
-    if (channelModeRaw < 0 || channelModeRaw > CHANNEL_MODES.length - 1) {
-      throw new UnsupportedAudioFileException("Invalid channel mode in frame header");
-    }
 
-    return CHANNEL_MODES[channelModeRaw];
+    return switch (channelModeRaw) {
+      case 0 -> CHANNEL_MODE_STEREO;
+      case 1 -> CHANNEL_MODE_JOINT_STEREO;
+      case 2 -> CHANNEL_MODE_DUAL_MONO;
+      case 3 -> CHANNEL_MODE_MONO;
+      default -> throw new UnsupportedAudioFileException("Invalid channel mode in frame header");
+    };
   }
 
-  static String getModeExtension(int modeExtensionRaw, int layer, String channelMode) throws UnsupportedAudioFileException {
+  static String getModeExtension(int modeExtensionRaw, String layer, String channelMode) throws UnsupportedAudioFileException {
     if (!CHANNEL_MODE_JOINT_STEREO.equals(channelMode)) {
       return MODE_EXTENSION_NA;
     }
@@ -177,12 +151,12 @@ final class Mpeg {
   }
 
 
-  static int getDataOffset(ByteBuffer byteBuffer) throws UnsupportedAudioFileException {
+  static int getDataOffset(ByteBuffer byteBuffer) {
     return ID3V2_TAG_HEADER_LENGTH + byteBuffer.getInt(ID3V2_TAG_DATA_OFFSET_OFFSET);
   }
 
   static boolean isStart(byte b1, byte b2) {
     // check for FRAME_SYNC bytes (11111111 11100000)
-    return b1 == (byte) 0xFF && (b2 & (byte) 0xE0) == (byte) 0xE0;
+    return b1 == (byte) 0b11111111 && (b2 & (byte) 0xE0) == (byte) 0xE0;
   }
 }
