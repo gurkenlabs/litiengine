@@ -1,17 +1,23 @@
 package de.gurkenlabs.litiengine.sound.spi.mp3;
 
+import de.gurkenlabs.litiengine.sound.spi.BitReader;
 import org.junit.jupiter.api.Test;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.nio.ByteBuffer;
 
 import static junit.framework.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 class MpegFrameTests {
 
+  private static final byte[] EXAMPLE_HEADER = new byte[]{(byte)0b11111111, (byte)0b11111011, (byte)0b00111000, (byte)0b11000100};
+
+  private static final byte[] EXAMPLE_SIDE_INFO = new byte[]{-52, -123, 71, 78, 13, 36, 81, 1, -127, 36, -87, -127, -84, 12, 112, -92, -57};
+
   @Test
   void testBitReader(){
-    var reader = new BitReader((byte)0b11111111, (byte)0b11111011, (byte)0b00111000, (byte)0b11000100);
+    var reader = new BitReader(EXAMPLE_HEADER);
     var syncRoot = reader.get(11);
     var version = reader.get(2);
     var layer = reader.get(2);
@@ -42,9 +48,7 @@ class MpegFrameTests {
   }
   @Test
   void testHeaderDecoding() throws UnsupportedAudioFileException {
-    var bytes = ByteBuffer.allocate(216).putInt((int)Long.parseLong("11111111111110110011100011000100", 2));
-    // bytes.putShort(4, (short)4811); attempt for CRC (not supported yet)
-    var frame = new MpegFrame(bytes, 0);
+    var frame = new MpegFrame(exampleMpegData(), 0);
 
     assertEquals(Mpeg.VERSION_1_0, frame.getVersion());
     assertEquals(Mpeg.LAYER_3, frame.getLayer());
@@ -58,5 +62,37 @@ class MpegFrameTests {
     assertFalse(frame.isPrivate());
     assertFalse(frame.isCopyright());
     assertTrue(frame.isOriginal());
+  }
+
+  @Test
+  void testSideInfoDecoding() throws UnsupportedAudioFileException{
+    var frame = new MpegFrame(exampleMpegData(), 0);
+
+    assertEquals(409, frame.getSideInfo().mainDataBegin);
+    assertEquals(1, frame.getSideInfo().privateBits);
+    assertArrayEquals(new boolean[]{false, true, false, true}, frame.getSideInfo().channels[0].scfsi);
+    assertEquals(467, frame.getSideInfo().channels[0].granules[0].part2_3_length);
+    assertEquals(262, frame.getSideInfo().channels[0].granules[0].big_values);
+    assertEquals(146, frame.getSideInfo().channels[0].granules[0].global_gain);
+    assertEquals(2, frame.getSideInfo().channels[0].granules[0].scalefac_compress);
+    assertEquals(0, frame.getSideInfo().channels[0].granules[0].block_type);
+    assertEquals(0, frame.getSideInfo().channels[0].granules[0].region0_count);
+    assertEquals(0, frame.getSideInfo().channels[0].granules[0].region1_count);
+    assertArrayEquals(new int[]{16, 3, 0}, frame.getSideInfo().channels[0].granules[0].table_select);
+    assertArrayEquals(new int[]{0, 0, 4}, frame.getSideInfo().channels[0].granules[0].subblock_gain);
+    assertTrue(frame.getSideInfo().channels[0].granules[0].window_switching_flag);
+    assertFalse(frame.getSideInfo().channels[0].granules[0].mixed_block_flag);
+    assertFalse(frame.getSideInfo().channels[0].granules[0].preflag);
+    assertFalse(frame.getSideInfo().channels[0].granules[0].scalefac_scale);
+    assertFalse(frame.getSideInfo().channels[0].granules[0].count1table_select);
+  }
+
+  ByteBuffer exampleMpegData(){
+    var bytes = ByteBuffer.allocate(216);
+    bytes.put(EXAMPLE_HEADER);
+    bytes.put((byte)0); // TODO: write CRC (not supported yet)
+    bytes.put((byte)0);
+    bytes.put(EXAMPLE_SIDE_INFO);
+    return bytes;
   }
 }
