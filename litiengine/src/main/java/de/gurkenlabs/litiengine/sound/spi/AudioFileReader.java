@@ -47,25 +47,25 @@ public abstract class AudioFileReader extends javax.sound.sampled.spi.AudioFileR
   @Override
   @Deprecated
   public AudioFileFormat getAudioFileFormat(URL url) {
-    throw new UnsupportedOperationException("URL is deprecated");
+    throw new UnsupportedOperationException("URL is not supported");
   }
 
   @Override
   @Deprecated
   public AudioInputStream getAudioInputStream(URL url) {
-    throw new UnsupportedOperationException("URL is deprecated");
+    throw new UnsupportedOperationException("URL is not supported");
   }
 
   protected abstract AudioFileFormat getAudioFileFormat(InputStream stream, long fileLength)
     throws UnsupportedAudioFileException, IOException;
 
-  protected AudioInputStream getAudioInputStream(InputStream stream, long fileLength)  throws UnsupportedAudioFileException, IOException {
+  protected AudioInputStream getAudioInputStream(InputStream stream, long fileLength) throws UnsupportedAudioFileException, IOException {
 
     var inputStream = stream.markSupported() ? stream : new BufferedInputStream(stream, this.markLimit);
     inputStream.mark(this.markLimit);
     var audioFileFormat = getAudioFileFormat(inputStream, fileLength);
     inputStream.reset();
 
-    return new AudioInputStream(inputStream,  audioFileFormat.getFormat(), audioFileFormat.getFrameLength());
+    return new AudioInputStream(inputStream, audioFileFormat.getFormat(), audioFileFormat.getFrameLength());
   }
 }
