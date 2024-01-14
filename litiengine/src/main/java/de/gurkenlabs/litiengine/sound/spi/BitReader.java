@@ -12,7 +12,11 @@ public class BitReader {
   private int current;
 
   public BitReader(byte... data) {
-    this(ByteBuffer.wrap(data), 0);
+    this(data, 0);
+  }
+
+  public BitReader(byte[] data, int start) {
+    this(ByteBuffer.wrap(data), start);
   }
 
   public BitReader(ByteBuffer data, int start) {
