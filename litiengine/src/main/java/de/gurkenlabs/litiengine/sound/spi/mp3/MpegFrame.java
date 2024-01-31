@@ -25,7 +25,7 @@ class MpegFrame {
 
   private final SideInfo sideInfo;
 
-  private byte[] samples;
+  private final MainData mainData;
 
   public MpegFrame(ByteBuffer byteBuffer, int frameOffset) throws UnsupportedAudioFileException {
 
@@ -41,7 +41,7 @@ class MpegFrame {
     this.sideInfo = new SideInfo(byteBuffer, frameOffset, this.isProtected(), this.getChannels());
 
     // 4. decode main data
-    this.samples = null;//TODO: this.decodeMainData(byteBuffer, frameOffset);
+    this.mainData = new MainData(byteBuffer, frameOffset, this);
   }
 
   public int getBitRate() {
@@ -122,129 +122,6 @@ class MpegFrame {
   }
 
   /**
-   * The main data does not follow the side information in the bitstream.
-   * The main data ends at a location in the bitstream preceding the frame header of the frame at an offset
-   * given by the value of main_data_start.
-   * <p/>
-   * <p>
-   * The main data is organized like this:
-   * <pre>
-   *   +---------------+---------------------------+----------------+
-   *   | SCALE FACTORS | HUFFMAN CODED RAW SAMPLES | ANCILLARY INFO |
-   *   +---------------+---------------------------+----------------+
-   * </pre>
-   *
-   * @return The decoded samples.
-   */
-  private byte[] decodeMainData(ByteBuffer byteBuffer, int frameOffset) {
-
-    var mainDataOffset = 0;
-
-    var headerAndSizeInfoSize = HEADER_SIZE_IN_BYTES + (this.isProtected() ? CRC_SIZE_IN_BYTES : 0) +
-      Mpeg.getSideInfoLength(this.getChannels());
-
-    // If the value is 0, then the main data follows immediately the side information
-    if (this.getSideInfo().mainDataBegin == 0) {
-      mainDataOffset = headerAndSizeInfoSize;
-    } else {
-      mainDataOffset = -this.getSideInfo().mainDataBegin;
-    }
-
-    var mainDataSize = this.getLengthInBytes() - headerAndSizeInfoSize;
-
-    var mainData = new byte[mainDataSize];
-    byteBuffer.get(frameOffset + mainDataOffset, mainData);
-
-    var bits = new BitReader(mainData);
-
-    final ScaleFactors[][] scaleFactors = {
-      {new ScaleFactors(), new ScaleFactors()},
-      {new ScaleFactors(), new ScaleFactors()}
-    };
-
-    for (var gr = 0; gr < 2; gr++) {
-      for (var ch = 0; ch < this.getChannels(); ch++) {
-        // 1. decode scale factors
-        // From the bitstream only the scale factor indices are found but not the scale factors
-
-        decodeScaleFactors(bits, scaleFactors, gr, ch);
-
-        // 2. decode huffman data
-        decodeHuffmanBits(bits, gr, ch);
-
-        // 3. dequantize sample
-      }
-    }
-    return new byte[0]; // TODO
-  }
-
-  private void decodeHuffmanBits(BitReader bits, int gr, int ch) {
-
-  }
-
-  private void decodeScaleFactors(BitReader bits, ScaleFactors[][] scaleFactors, int gr, int ch) {
-    final int SHORT_SWITCH_POINT = 6;
-    final int LONG_SWITCH_POINT = 12;
-    final var granule = this.getSideInfo().channels[ch].granules[gr];
-    final var slen1 = granule.slen1(); // slen1 is for bands 3-5
-    final var slen2 = granule.slen2(); // slen2 is for bands 6-11
-
-    if (granule.window_switching_flag && granule.block_type == SideInfo.Granule.BLOCK_TYPE_3_SHORT_WINDOWS) {
-      if (granule.mixed_block_flag) {
-        for (var sfb = 0; sfb < 8; sfb++) {
-          scaleFactors[ch][gr].l[sfb] = bits.get(slen1);
-        }
-      }
-
-      for (var sfb = 0; sfb < 12; sfb++) {
-        // for MIXED, there are no short values for the first 3 scale factor bands
-        if (granule.mixed_block_flag && sfb < 3) {
-          continue;
-        }
-
-        final var bitsToRead = sfb < SHORT_SWITCH_POINT ? slen1 : slen2;
-        for (var window = 0; window < 3; window++) {
-          scaleFactors[ch][gr].s[window][sfb] = bits.get(bitsToRead);
-        }
-      }
-    } else {  // LONG types 0,1,3
-      for (var sfb = 0; sfb < 20; sfb++) {
-        final var bitsToRead = sfb < LONG_SWITCH_POINT ? slen1 : slen2;
-        var scaleFactor = reuseScaleFactor(gr, ch, sfb) ? scaleFactors[ch][0].l[sfb] : bits.get(bitsToRead);
-        scaleFactors[ch][gr].l[sfb] = scaleFactor;
-      }
-    }
-  }
-
-  boolean reuseScaleFactor(int granule, int channel, int scaleFactorBand) {
-    if (granule == 0) {
-      return false;
-    }
-
-    // Scale factor bands 0-5
-    if (scaleFactorBand < 6) {
-      return this.getSideInfo().channels[channel].scfsi[0];
-    }
-
-    // Scale factor bands 6-10
-    if (scaleFactorBand < 11) {
-      return this.getSideInfo().channels[channel].scfsi[1];
-    }
-
-    // Scale factor bands 11-15
-    if (scaleFactorBand < 16) {
-      return this.getSideInfo().channels[channel].scfsi[2];
-    }
-
-    // Scale factor bands 16-20
-    if (scaleFactorBand < 21) {
-      return this.getSideInfo().channels[channel].scfsi[3];
-    }
-
-    return false;
-  }
-
-  /**
    * The frame header is organized like this:
    *
    * <pre>
@@ -278,7 +155,7 @@ class MpegFrame {
     final String emphasis;
 
     Header(ByteBuffer byteBuffer, int frameOffset) throws UnsupportedAudioFileException {
-      var bits = new BitReader(byteBuffer, frameOffset);
+      var bits = new BitReader(byteBuffer, frameOffset, 0);
       var frameSync = bits.get(11);
       if (frameSync != FRAME_SYNC) {
         throw new UnsupportedAudioFileException("Frame sync missing");
@@ -303,6 +180,14 @@ class MpegFrame {
     }
   }
 
+  /**
+   * The side information is organized like this:
+   * <pre>
+   *   +-----------------+--------------+-------+-------------------------+-------------------------+
+   *   | MAIN_DATA_BEGIN | PRIVATE_BITS | SCFSI | SIDE_INFO_FOR_GRANULE_1 | SIDE_INFO_FOR_GRANULE_2 |
+   *   +-----------------+--------------+-------+-------------------------+-------------------------+
+   * </pre>
+   */
   static class SideInfo {
     /**
      * A pointer that points to the beginning of the main data. The variable has
@@ -323,14 +208,10 @@ class MpegFrame {
 
     /**
      * Reads the side info from the bytebuffer.
-     * The side information is organized like this:
-     * <pre>
-     *   +-----------------+--------------+-------+-------------------------+-------------------------+
-     *   | MAIN_DATA_BEGIN | PRIVATE_BITS | SCFSI | SIDE_INFO_FOR_GRANULE_1 | SIDE_INFO_FOR_GRANULE_2 |
-     *   +-----------------+--------------+-------+-------------------------+-------------------------+
-     * </pre>
-     *
-     * @return The decoded side information from the provided payload.
+     * @param byteBuffer The buffer to read the info from.
+     * @param frameOffset The offset of the frame within the buffer.
+     * @param isProtected A flag indicating whether the MPEG frame is protected.
+     * @param channels The number of channels of the MPEG frame.
      */
     SideInfo(ByteBuffer byteBuffer, int frameOffset, boolean isProtected, int channels) {
       var payloadOffset = HEADER_SIZE_IN_BYTES + (isProtected ? CRC_SIZE_IN_BYTES : 0);
@@ -400,6 +281,34 @@ class MpegFrame {
       }
     }
 
+    boolean reuseScaleFactor(int granule, int channel, int scaleFactorBand) {
+      if (granule == 0) {
+        return false;
+      }
+
+      // Scale factor bands 0-5
+      if (scaleFactorBand < 6) {
+        return this.channels[channel].scfsi[0];
+      }
+
+      // Scale factor bands 6-10
+      if (scaleFactorBand < 11) {
+        return this.channels[channel].scfsi[1];
+      }
+
+      // Scale factor bands 11-15
+      if (scaleFactorBand < 16) {
+        return this.channels[channel].scfsi[2];
+      }
+
+      // Scale factor bands 16-20
+      if (scaleFactorBand < 21) {
+        return this.channels[channel].scfsi[3];
+      }
+
+      return false;
+    }
+
     static class Channel {
 
       /**
@@ -459,9 +368,108 @@ class MpegFrame {
     }
   }
 
+  /**
+   * The main data does not follow the side information in the bitstream.
+   * The main data ends at a location in the bitstream preceding the frame header of the frame at an offset
+   * given by the value of main_data_start.
+   * <p/>
+   * <p>
+   * The main data is organized like this:
+   * <pre>
+   *   +---------------+---------------------------+----------------+
+   *   | SCALE FACTORS | HUFFMAN CODED RAW SAMPLES | ANCILLARY INFO |
+   *   +---------------+---------------------------+----------------+
+   * </pre>
+   *
+   * @return The decoded samples.
+   */
+  static class MainData{
+    private byte[] samples;
 
-  static class ScaleFactors {
-    final int[] l = new int[23];         /* [cb] */
-    final int[][] s = new int[3][13];         /* [window][cb] */
+   MainData(ByteBuffer byteBuffer, int frameOffset, MpegFrame frame) {
+
+      var mainDataOffset = 0;
+
+      var headerAndSizeInfoSize = HEADER_SIZE_IN_BYTES + (frame.isProtected() ? CRC_SIZE_IN_BYTES : 0) +
+        Mpeg.getSideInfoLength(frame.getChannels());
+
+      // If the value is 0, then the main data follows immediately the side information
+      if (frame.getSideInfo().mainDataBegin == 0) {
+        mainDataOffset = headerAndSizeInfoSize;
+      } else {
+        mainDataOffset = -frame.getSideInfo().mainDataBegin;
+      }
+
+      // TODO: if sync header is found skip header + side info bits and then continue reading main data
+      // this is because the main data can span a bit stream area that overlaps the frame header/side info (see Appendix A.7 - Layer III bitstream organization)
+      var mainDataSize = frame.getLengthInBytes() - headerAndSizeInfoSize;
+
+      var mainData = new byte[mainDataSize];
+      byteBuffer.get(frameOffset + mainDataOffset, mainData);
+
+      var bits = new BitReader(mainData);
+
+      final ScaleFactors[][] scaleFactors = {
+        {new ScaleFactors(), new ScaleFactors()},
+        {new ScaleFactors(), new ScaleFactors()}
+      };
+
+      for (var gr = 0; gr < 2; gr++) {
+        for (var ch = 0; ch < frame.getChannels(); ch++) {
+          // 1. decode scale factors
+          // From the bitstream only the scale factor indices are found but not the scale factors
+
+          decodeScaleFactors(bits, scaleFactors, gr, ch, frame.getSideInfo());
+
+          // 2. decode huffman data
+          decodeHuffmanBits(bits, gr, ch);
+
+          // 3. dequantize sample
+        }
+      }
+    }
+
+    private void decodeHuffmanBits(BitReader bits, int gr, int ch) {
+
+    }
+
+    private void decodeScaleFactors(BitReader bits, ScaleFactors[][] scaleFactors, int gr, int ch, SideInfo sideInfo) {
+      final int SHORT_SWITCH_POINT = 6;
+      final int LONG_SWITCH_POINT = 12;
+      final var granule = sideInfo.channels[ch].granules[gr];
+      final var slen1 = granule.slen1(); // slen1 is for bands 3-5
+      final var slen2 = granule.slen2(); // slen2 is for bands 6-11
+
+      if (granule.window_switching_flag && granule.block_type == SideInfo.Granule.BLOCK_TYPE_3_SHORT_WINDOWS) {
+        if (granule.mixed_block_flag) {
+          for (var sfb = 0; sfb < 8; sfb++) {
+            scaleFactors[ch][gr].l[sfb] = bits.get(slen1);
+          }
+        }
+
+        for (var sfb = 0; sfb < 12; sfb++) {
+          // for MIXED, there are no short values for the first 3 scale factor bands
+          if (granule.mixed_block_flag && sfb < 3) {
+            continue;
+          }
+
+          final var bitsToRead = sfb < SHORT_SWITCH_POINT ? slen1 : slen2;
+          for (var window = 0; window < 3; window++) {
+            scaleFactors[ch][gr].s[window][sfb] = bits.get(bitsToRead);
+          }
+        }
+      } else {  // LONG types 0,1,3
+        for (var sfb = 0; sfb < 20; sfb++) {
+          final var bitsToRead = sfb < LONG_SWITCH_POINT ? slen1 : slen2;
+          var scaleFactor = sideInfo.reuseScaleFactor(gr, ch, sfb) ? scaleFactors[ch][0].l[sfb] : bits.get(bitsToRead);
+          scaleFactors[ch][gr].l[sfb] = scaleFactor;
+        }
+      }
+    }
+
+    static class ScaleFactors {
+      final int[] l = new int[23];         /* [cb] */
+      final int[][] s = new int[3][13];         /* [window][cb] */
+    }
   }
 }
