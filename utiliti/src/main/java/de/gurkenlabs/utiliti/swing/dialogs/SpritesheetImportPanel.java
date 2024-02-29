@@ -129,8 +129,6 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
               new SpinnerNumberModel(1, 1, file.getHeight(), 1));
 
             this.updateKeyframeTable(file);
-            textField = new JTextField();
-            textField.setText(file.getName());
 
             this.updatePreview(file);
 
@@ -182,7 +180,7 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
     textField = new JTextField();
     ControlBehavior.apply(textField);
     textField.setColumns(10);
-    textField.addActionListener(e -> fileList.getSelectedValue().setName(textField.getText()));
+    fileList.addListSelectionListener(e -> textField.setText(fileList.getSelectedValue().getName()));
 
     textField.addFocusListener(
       new FocusAdapter() {
