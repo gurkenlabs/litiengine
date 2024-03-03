@@ -40,11 +40,27 @@ public class HuffmanCodeTableTests {
   }
 
   @Test
-  void ensureCodeTablesArePresent() {
-
+  void ensureCodeTablesAreValid() {
     for (int i = 0; i < 31; i++) {
       var table = HuffmanCode.getTable(i);
-      assertNotNull(table);
+
+      // table 4 and 14 are not used and therefore no code table is present
+      if (i == 4 || i == 14) {
+        assertNull(table);
+        continue;
+      } else {
+        assertNotNull("table " + i + " should not be null", table);
+      }
+
+      for (var nodes : table.getNodes()) {
+        var uniqueValues = new ArrayList<Integer>();
+        for (var node : nodes) {
+          var val = node.hcod() << node.hlen();
+          assertFalse("table " + i  + "; node {" + node.x()  + ", " + node.y() + "}: value not unique in table", uniqueValues.contains(val));
+
+          uniqueValues.add(val);
+        }
+      }
     }
   }
 }
