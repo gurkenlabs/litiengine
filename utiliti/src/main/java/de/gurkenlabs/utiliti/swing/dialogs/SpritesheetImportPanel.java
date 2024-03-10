@@ -1,19 +1,5 @@
 package de.gurkenlabs.utiliti.swing.dialogs;
 
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.IUpdateable;
-import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.litiengine.graphics.animation.Animation;
-import de.gurkenlabs.litiengine.graphics.animation.AnimationController;
-import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.litiengine.resources.SpritesheetResource;
-import de.gurkenlabs.litiengine.resources.TextureAtlas;
-import de.gurkenlabs.litiengine.util.Imaging;
-import de.gurkenlabs.litiengine.util.MathUtilities;
-import de.gurkenlabs.litiengine.util.io.Codec;
-import de.gurkenlabs.litiengine.util.io.FileUtilities;
-import de.gurkenlabs.utiliti.Style;
-import de.gurkenlabs.utiliti.swing.ControlBehavior;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -27,6 +13,7 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
@@ -45,6 +32,21 @@ import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
+
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.IUpdateable;
+import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.graphics.animation.Animation;
+import de.gurkenlabs.litiengine.graphics.animation.AnimationController;
+import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.resources.SpritesheetResource;
+import de.gurkenlabs.litiengine.resources.TextureAtlas;
+import de.gurkenlabs.litiengine.util.Imaging;
+import de.gurkenlabs.litiengine.util.MathUtilities;
+import de.gurkenlabs.litiengine.util.io.Codec;
+import de.gurkenlabs.litiengine.util.io.FileUtilities;
+import de.gurkenlabs.utiliti.Style;
+import de.gurkenlabs.utiliti.swing.ControlBehavior;
 
 public class SpritesheetImportPanel extends JPanel implements IUpdateable {
   private static final int PREVIEW_SIZE = 128;
@@ -126,7 +128,7 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
             labelFrameSize.setText(
               file.getWidth() / (int) spinnerColumns.getValue() + " x " + file.getHeight() / (int) spinnerRows.getValue() + " px");
             spinnerColumns.setModel(
-              new SpinnerNumberModel(file.getSpriteWidth(), 1, file.getWidth(), 1));
+              new SpinnerNumberModel(1, 1, file.getWidth(), 1));
             spinnerRows.setModel(
               new SpinnerNumberModel(1, 1, file.getHeight(), 1));
 
@@ -475,8 +477,19 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
       SpriteFileWrapper selectedValue = this.fileListModel.getElementAt(0);
       this.fileList.setSelectedValue(selectedValue, true);
 
-      spinnerColumns.setValue(selectedValue.getWidth() / selectedValue.getSpriteWidth());
-      spinnerRows.setValue(selectedValue.getHeight() / selectedValue.getSpriteHeight());
+      if (selectedValue.wasLoadedFromResource()) {
+        // Use sprite width/height if loaded from a SpritesheetResource.
+        spinnerColumns.setValue(selectedValue.getWidth() / selectedValue.getSpriteWidth());
+        spinnerRows.setValue(selectedValue.getHeight() / selectedValue.getSpriteHeight());
+      } else if (selectedValue.getWidth() % selectedValue.getHeight() == 0) {
+        // If the height is divisible by the width, assume one row of square sprites.
+        spinnerColumns.setValue(selectedValue.getWidth() / selectedValue.getHeight());
+        spinnerRows.setValue(1);
+      } else {
+        // Otherwise, default to one column and one row.
+        spinnerColumns.setValue(1);
+        spinnerRows.setValue(1);
+      }
     }
   }
 
@@ -551,6 +564,7 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
     private final int height;
     private int spriteWidth;
     private int spriteHeight;
+    private boolean wasLoadedFromResource;
 
     private String name;
 
@@ -574,6 +588,7 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
       this(Codec.decodeImage(info.getImage()), info.getName());
       this.spriteWidth = info.getWidth();
       this.spriteHeight = info.getHeight();
+      this.wasLoadedFromResource = true;
 
       if (info.getKeyframes() != null && info.getKeyframes().length > 0) {
         this.keyFrames = info.getKeyframes();
@@ -620,6 +635,10 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
 
     public int getHeight() {
       return height;
+    }
+
+    public boolean wasLoadedFromResource() {
+      return wasLoadedFromResource;
     }
 
     public void setSpriteWidth(int spriteWidth) {
