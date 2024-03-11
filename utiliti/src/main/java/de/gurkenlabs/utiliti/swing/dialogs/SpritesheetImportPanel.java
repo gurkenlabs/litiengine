@@ -42,6 +42,8 @@ import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 
 public class SpritesheetImportPanel extends JPanel implements IUpdateable {
@@ -182,13 +184,20 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
     textField.setColumns(10);
     fileList.addListSelectionListener(e -> textField.setText(fileList.getSelectedValue().getName()));
 
-    textField.addFocusListener(
-      new FocusAdapter() {
-        @Override
-        public void focusLost(FocusEvent e) {
-          fileList.getSelectedValue().setName(textField.getText());
-        }
-      });
+    textField.getDocument().addDocumentListener(new DocumentListener() {
+      @Override
+      public void insertUpdate(DocumentEvent e) {
+        updateSelectedFile();
+      }
+      @Override
+      public void removeUpdate(DocumentEvent e) {
+        updateSelectedFile();
+      }
+      @Override
+      public void changedUpdate(DocumentEvent e) {
+        updateSelectedFile();
+      }
+    });
 
     JLabel lblKeyframes = new JLabel("keyframes:");
 
@@ -521,6 +530,14 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
         file.name);
     } finally {
       this.isUpdating = false;
+    }
+  }
+  private void updateSelectedFile() {
+    int selectedIndex = fileList.getSelectedIndex();
+    if (selectedIndex != -1) {
+      SpriteFileWrapper selectedFile = fileListModel.getElementAt(selectedIndex);
+      selectedFile.setName(textField.getText());
+      fileList.repaint();
     }
   }
 
