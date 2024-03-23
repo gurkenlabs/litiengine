@@ -5,18 +5,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class AlignTests {
-  private Align alignObject;
+class ValignTests {
+  private Valign valignObject;
 
   @BeforeEach
   public void initAlign() {
-    alignObject = Align.get("right"); // portion = 1
+    valignObject = Valign.get("down"); // portion = 1
   }
 
   @Test
   void getLocation_OnPoint() {
     // act
-    double onPointLocation = alignObject.getLocation(1.0, 1.0);
+    double onPointLocation = valignObject.getLocation(1.0, 1.0);
 
     // assert
     assertEquals(0.0, onPointLocation, 0.001); // clamp(0.5, 0, 0)
@@ -25,7 +25,7 @@ class AlignTests {
   @Test
   void getLocation_OffPoint() {
     // act
-    double offPointLocation = alignObject.getLocation(1.0, 1.1);
+    double offPointLocation = valignObject.getLocation(1.0, 1.1);
 
     // assert
     assertEquals(0.45, offPointLocation, 0.001); // 1.0 - 1.1 / 2.0
@@ -34,7 +34,7 @@ class AlignTests {
   @Test
   void getLocation_InPoint() {
     // act
-    double inPointLocation = alignObject.getLocation(1.0, 5.0);
+    double inPointLocation = valignObject.getLocation(1.0, 5.0);
 
     // assert
     assertEquals(-1.5, inPointLocation, 0.001); // 1.0 - 5.0 / 2.0
@@ -43,7 +43,7 @@ class AlignTests {
   @Test
   void getLocation_OutPoint() {
     // act
-    double outPointLocation = alignObject.getLocation(1.0, 0.5);
+    double outPointLocation = valignObject.getLocation(1.0, 0.5);
 
     // assert
     assertEquals(0.5, outPointLocation, 0.001); // clamp(0.75, 0, 0.5)
@@ -52,7 +52,7 @@ class AlignTests {
   @Test
   void getClampedLocation_OnPoint() {
     // act
-    double onPointLocation = alignObject.getLocation(1.0, 1.0, true);
+    double onPointLocation = valignObject.getLocation(1.0, 1.0, true);
 
     // assert
     assertEquals(0.0, onPointLocation, 0.001); // clamp(0.5, 0, 0)
@@ -61,7 +61,7 @@ class AlignTests {
   @Test
   void getClampedLocation_OffPoint() {
     // act
-    double offPointLocation = alignObject.getLocation(1.0, 1.1, true);
+    double offPointLocation = valignObject.getLocation(1.0, 1.1, true);
 
     // assert
     assertEquals(0.0, offPointLocation, 0.001); // clamp(0.45, 0, -0.1)
@@ -70,7 +70,7 @@ class AlignTests {
   @Test
   void getClampedLocation_InPoint() {
     // act
-    double inPointLocation = alignObject.getLocation(1.0, 5.0, true);
+    double inPointLocation = valignObject.getLocation(1.0, 5.0, true);
 
     // assert
     assertEquals(0.0, inPointLocation, 0.001); // clamp(-1.5, 0, -4.0)
@@ -79,7 +79,7 @@ class AlignTests {
   @Test
   void getClampedLocation_OutPoint() {
     // act
-    double outPointLocation = alignObject.getLocation(1.0, 0.5, true);
+    double outPointLocation = valignObject.getLocation(1.0, 0.5, true);
 
     // assert
     assertEquals(0.5, outPointLocation, 0.001); // clamp(0.75, 0, 0.5)
