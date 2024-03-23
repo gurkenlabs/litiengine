@@ -1350,11 +1350,11 @@ public abstract class GuiComponent
 
     double xCoord =
       getTextAlign() != null
-        ? getX() + getTextAlign().getLocation(getWidth(), textWidth)
+        ? getX() + getTextAlign().getLocation(getWidth(), textWidth, true)
         : getTextX();
     double yCoord =
       getTextValign() != null
-        ? getY() + getTextValign().getLocation(getHeight(), textHeight)
+        ? getY() + getTextValign().getLocation(getHeight(), textHeight, true)
         : getTextY();
     if (getTextAngle() == 0) {
       if (hasTextShadow()) {

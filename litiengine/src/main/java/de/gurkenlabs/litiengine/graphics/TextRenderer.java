@@ -132,11 +132,11 @@ public final class TextRenderer {
     }
     double locationX =
         bounds.getX()
-            + align.getLocation(bounds.getWidth(), g.getFontMetrics().stringWidth(text))
+            + align.getLocation(bounds.getWidth(), g.getFontMetrics().stringWidth(text), true)
             + offsetX;
     double locationY =
         bounds.getY()
-            + valign.getLocation(bounds.getHeight(), getHeight(g, text))
+            + valign.getLocation(bounds.getHeight(), getHeight(g, text), true)
             + g.getFontMetrics().getAscent()
             + offsetY;
     render(g, text, locationX, locationY);
@@ -337,10 +337,10 @@ public final class TextRenderer {
         textHeight += nextLayout.getLeading();
       }
     }
-    float textY = (float) (y + valign.getLocation(height, textHeight));
+    float textY = (float) (y + valign.getLocation(height, textHeight, true));
     for (TextLayout layout : lines) {
       textY += layout.getAscent();
-      layout.draw(g, (float) (x + align.getLocation(width, layout.getAdvance())), textY);
+      layout.draw(g, (float) (x + align.getLocation(width, layout.getAdvance(), true)), textY);
       textY += layout.getDescent() + layout.getLeading();
     }
     g.setRenderingHints(originalHints);
@@ -488,8 +488,8 @@ public final class TextRenderer {
     // get the shape object
     AffineTransform at = new AffineTransform();
     at.translate(
-        x + align.getLocation(width, bounds.getWidth()),
-        y + valign.getLocation(height, bounds.getHeight()) + bounds.getHeight());
+        x + align.getLocation(width, bounds.getWidth(), true),
+        y + valign.getLocation(height, bounds.getHeight(), true) + bounds.getHeight());
     Shape textShape = at.createTransformedShape(glyphVector.getOutline());
 
     // activate anti aliasing for text rendering (if you want it to look nice)
