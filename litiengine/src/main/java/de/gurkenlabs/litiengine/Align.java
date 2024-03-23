@@ -78,8 +78,12 @@ public enum Align {
   }
 
   /**
-   * Gets the location for the specified object height to be horizontally aligned within the bounds of the specified
-   * width.
+   * Gets the location for the specified object width to be horizontally aligned relatively to the bounds of the specified
+   * width.<br>
+   * Suitable for <b>entity</b> alignment. The return value might be negative or exceed the right boundary which is
+   * <i>{@code width} - {@code objectWidth}</i>. <br>
+   * For <b>text</b> alignment {@link #getLocation(double, double, boolean)} should be used with
+   * <i>{@code preventOverflow}</i> set to {@code true}.
    *
    * @param width
    *          The width, limiting the horizontal alignment.
@@ -88,9 +92,32 @@ public enum Align {
    * @return The x-coordinate for the location of the object with the specified width.
    */
   public double getLocation(final double width, final double objectWidth) {
+    return getLocation(width, objectWidth, false);
+  }
+
+  /**
+   * Gets the location for the specified object width to be horizontally aligned relatively to the bounds of the specified
+   * width. An overflow behavior (whenever <i>{@code objectWidth} > {@code width}</i>) can be controlled using
+   * <b>{@code preventOverflow}</b> parameter:
+   * <ul>
+   * <li><i>false</i>: the return value might be negative or exceed the right boundary which is <i>{@code width} -
+   * {@code objectWidth}</i> (good for <b>entity</b> alignment).</li>
+   * <li><i>true</i>: the return value will always be clamped within the bounds (good for <b>text</b> alignment).</li>
+   * </ul>
+   *
+   * @param width
+   *          The width, limiting the horizontal alignment.
+   * @param objectWidth
+   *          The width of the object for which to calculate the horizontally aligned location.
+   * @param preventOverflow
+   *          A flag indicating whether the return value should be clamped to keep it within the bounds (prevent values
+   *          that are negative or beyond the right boundary).
+   * @return The x-coordinate for the location of the object with the specified width.
+   */
+  public double getLocation(final double width, final double objectWidth, final boolean preventOverflow) {
     double value = this.getValue(width);
     double location = value - objectWidth / 2.0;
-    if (objectWidth > width) {
+    if (objectWidth > width && !preventOverflow) {
       return location;
     }
 

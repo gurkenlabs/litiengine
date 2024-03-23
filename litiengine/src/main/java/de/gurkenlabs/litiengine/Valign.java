@@ -77,7 +77,12 @@ public enum Valign {
   }
 
   /**
-   * Gets the location for the specified object height to be vertically aligned within the bounds of the specified height.
+   * Gets the location for the specified object height to be vertically aligned relatively to the bounds of the specified
+   * height.<br>
+   * Suitable for <b>entity</b> alignment. The return value might be negative or exceed the bottom boundary which is
+   * <i>{@code height} - {@code objectHeight}</i>. <br>
+   * For <b>text</b> alignment {@link #getLocation(double, double, boolean)} should be used with
+   * <i>{@code preventOverflow}</i> set to {@code true}.
    *
    * @param height
    *          The height, limiting the vertical alignment.
@@ -86,10 +91,33 @@ public enum Valign {
    * @return The y-coordinate for the location of the object with the specified height.
    */
   public double getLocation(final double height, final double objectHeight) {
+    return getLocation(height, objectHeight, false);
+  }
+
+  /**
+   * Gets the location for the specified object height to be vertically aligned relatively to the bounds of the specified
+   * height. An overflow behavior (whenever <i>{@code objectHeight} > {@code height}</i>) can be controlled using
+   * <b>{@code preventOverflow}</b> parameter:
+   * <ul>
+   * <li><i>false</i>: the return value might be negative or exceed the bottom boundary which is <i>{@code height} -
+   * {@code objectHeight}</i> (good for <b>entity</b> alignment).</li>
+   * <li><i>true</i>: the return value will always be clamped within the bounds (good for <b>text</b> alignment).</li>
+   * </ul>
+   *
+   * @param height
+   *          The height, limiting the vertical alignment.
+   * @param objectHeight
+   *          The height of the object for which to calculate the vertically aligned location.
+   * @param preventOverflow
+   *          A flag indicating whether the return value should be clamped to keep it within the bounds (prevent values
+   *          that are negative or beyond the bottom boundary).
+   * @return The y-coordinate for the location of the object with the specified height.
+   */
+  public double getLocation(final double height, final double objectHeight, final boolean preventOverflow) {
     double value = this.getValue(height);
     double location = value - objectHeight / 2.0;
 
-    if (objectHeight > height) {
+    if (objectHeight > height && !preventOverflow) {
       return location;
     }
 
