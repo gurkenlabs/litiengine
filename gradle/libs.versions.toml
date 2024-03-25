@@ -1,24 +1,21 @@
 [versions]
-jaxb = "4.0.3"
-junit = "5.10.0"
-
-# Plugins
-vlsiRelease = "1.86"
+jaxb = "4.0.5"
+junit = "5.10.2"
 
 [libraries]
 darklaf_core = { module = "com.github.weisj:darklaf-core", version = "3.0.2" }
-jinput = { module = "net.java.jinput:jinput", version = "2.0.9" }
+jinput = { module = "net.java.jinput:jinput", version = "2.0.10" }
 soundlibs_jorbis = { module = "com.googlecode.soundlibs:jorbis", version = "0.0.17.4" }
 soundlibs_tritonus = { module = "com.googlecode.soundlibs:tritonus-share", version = "0.3.7.4" }
 soundlibs_vorbisspi = { module = "com.googlecode.soundlibs:vorbisspi", version = "1.0.3.3" }
 soundlibs_mp3spi = { module = "com.googlecode.soundlibs:mp3spi", version = "1.9.5.4" }
-javax_activation = { module = "jakarta.activation:jakarta.activation-api", version = "2.1.2" }
-xml_api = { module = "jakarta.xml.bind:jakarta.xml.bind-api", version = "4.0.1" }
+javax_activation = { module = "jakarta.activation:jakarta.activation-api", version = "2.1.3" }
+xml_api = { module = "jakarta.xml.bind:jakarta.xml.bind-api", version = "4.0.2" }
 xml_runtime_core = { module = "com.sun.xml.bind:jaxb-core", version.ref = "jaxb" }
 xml_runtime_impl = { module = "com.sun.xml.bind:jaxb-impl", version.ref = "jaxb" }
 
 # Test dependencies
-mockito_core = { module = "org.mockito:mockito-core", version = "5.5.0" }
+mockito_core = { module = "org.mockito:mockito-core", version = "5.11.0" }
 mockito_inline = { module = "org.mockito:mockito-inline", version = "5.2.0" }
 junit_api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
 junit_params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
@@ -34,11 +31,11 @@ mockito = ["mockito-core", "mockito-inline"]
 junit = ["junit-api", "junit-params", "junit-engine"]
 
 [plugins]
-beryxRuntime = { id = "org.beryx.runtime", version = "1.13.0" }
+beryxRuntime = { id = "org.beryx.runtime", version = "1.13.1" }
 nexusPublish = { id = "io.github.gradle-nexus.publish-plugin", version = "2.0.0-rc-1" }
-sonarQube = { id = "org.sonarqube", version = "4.4.0.3356" }
-spotless = { id = "com.diffplug.spotless", version = "6.22.0" }
-versions = { id = "com.github.ben-manes.versions", version = "0.48.0" }
-dependencyCheck = { id = "org.owasp.dependencycheck", version = "8.4.0" }
-grgit = { id = "org.ajoberstar.grgit", version = "5.2.0" }
+sonarQube = { id = "org.sonarqube", version = "4.4.1.3373" }
+spotless = { id = "com.diffplug.spotless", version = "6.25.0" }
+versions = { id = "com.github.ben-manes.versions", version = "0.51.0" }
+dependencyCheck = { id = "org.owasp.dependencycheck", version = "9.0.10" }
+grgit = { id = "org.ajoberstar.grgit", version = "5.2.2" }
 semverguru = { id = "de.gurkenlabs.semverguru", version = "1.4" }
