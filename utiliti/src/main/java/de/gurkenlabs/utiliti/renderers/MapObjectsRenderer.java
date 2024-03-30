@@ -12,7 +12,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
 import de.gurkenlabs.utiliti.Style;
 import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.components.MapComponent;
-
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.FontMetrics;
@@ -93,8 +92,9 @@ public class MapObjectsRenderer implements IEditorRenderer {
 
           renderBoundingBox(g, mapObject, colorBoundingBoxFill, shapeStroke);
         }
-
-        renderCollisionBox(g, mapObject, shapeStroke);
+        if (type == MapObjectType.PROP || type == MapObjectType.COLLISIONBOX || type == MapObjectType.CREATURE) {
+          renderCollisionBox(g, mapObject, shapeStroke);
+        }
       }
     }
   }
@@ -163,7 +163,7 @@ public class MapObjectsRenderer implements IEditorRenderer {
 
   // TODO rename to renderShape, support points and draw polygon points too.
   private static void renderBoundingBox(Graphics2D g, IMapObject mapObject,
-                                        Color colorBoundingBoxFill, BasicStroke shapeStroke) {
+    Color colorBoundingBoxFill, BasicStroke shapeStroke) {
     MapObjectType type = MapObjectType.get(mapObject.getType());
     Color fillColor = colorBoundingBoxFill;
     if (type == MapObjectType.TRIGGER) {
@@ -228,7 +228,7 @@ public class MapObjectsRenderer implements IEditorRenderer {
   }
 
   private static void renderCollisionBox(Graphics2D g, IMapObject mapObject,
-                                         BasicStroke shapeStroke) {
+    BasicStroke shapeStroke) {
     // render collision boxes
     boolean collision = mapObject.getBoolValue(MapObjectProperty.COLLISION, false);
     float collisionBoxWidth = mapObject.getFloatValue(MapObjectProperty.COLLISIONBOX_WIDTH, -1);
@@ -255,7 +255,7 @@ public class MapObjectsRenderer implements IEditorRenderer {
 
       Stroke collisionStroke = collision ? shapeStroke
         : new BasicStroke(1 / Game.world().camera().getRenderScale(), BasicStroke.CAP_ROUND,
-        BasicStroke.JOIN_BEVEL, 0, new float[]{1f}, 0);
+          BasicStroke.JOIN_BEVEL, 0, new float[] {1f}, 0);
       Game.graphics().renderOutline(g, collisionBox, collisionStroke);
     }
   }

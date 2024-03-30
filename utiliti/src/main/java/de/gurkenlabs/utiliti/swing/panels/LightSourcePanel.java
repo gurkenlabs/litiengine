@@ -4,6 +4,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.LightSource;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.swing.ColorComponent;
 import de.gurkenlabs.utiliti.swing.Icons;
@@ -64,14 +65,8 @@ public class LightSourcePanel extends PropertyPanel {
     this.colorControl.setColor(mapObject.getColorValue(MapObjectProperty.LIGHT_COLOR));
     this.comboBoxLightShape.setSelectedItem(shape);
     this.checkBoxIsActive.setSelected(isActive);
-    this.offsetX.setValue(
-        (int) Math.max(
-            Math.min(100 * mapObject.getDoubleValue(MapObjectProperty.LIGHT_FOCUSOFFSETX, 0), 100),
-            -100));
-    this.offsetY.setValue(
-        (int) Math.max(
-            Math.min(100 * mapObject.getDoubleValue(MapObjectProperty.LIGHT_FOCUSOFFSETY, 0), 100),
-            -100));
+    this.offsetX.setValue(MathUtilities.clamp(mapObject.getDoubleValue(MapObjectProperty.LIGHT_FOCUSOFFSETX, 0), -100, 100));
+    this.offsetY.setValue(MathUtilities.clamp(mapObject.getDoubleValue(MapObjectProperty.LIGHT_FOCUSOFFSETY, 0), -100, 100));
   }
 
   private void setupChangedListeners() {
