@@ -363,12 +363,12 @@ public final class Environment implements IRenderable {
    * @see ColorLayer#updateSection(Rectangle2D)
    */
   public void updateLighting(Rectangle2D section) {
-    if (this.staticShadowLayer != null) {
-      this.staticShadowLayer.updateSection(section);
+    if (getStaticShadowLayer() != null) {
+      getStaticShadowLayer().updateSection(section);
     }
 
-    if (this.ambientLight != null) {
-      this.ambientLight.updateSection(section);
+    if (getAmbientLight() != null) {
+      getAmbientLight().updateSection(section);
     }
   }
 

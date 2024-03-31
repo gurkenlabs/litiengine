@@ -91,7 +91,7 @@ public class AmbientLight extends ColorLayer {
   private void renderLightSource(final Graphics2D g, final LightSource light, Rectangle2D section) {
     final double mapWidth = this.getEnvironment().getMap().getSizeInPixels().width;
     final double mapHeight = this.getEnvironment().getMap().getSizeInPixels().height;
-    double longerDimension = mapWidth < mapHeight ? mapHeight : mapWidth;
+    double longerDimension = Math.max(mapWidth, mapHeight);
 
     final Point2D lightCenter = light.getCenter();
     final Point2D lightFocus =
@@ -177,9 +177,7 @@ public class AmbientLight extends ColorLayer {
     final Shape lightShape = light.getLightShape();
 
     final double radius =
-        lightShape.getBounds2D().getWidth() > lightShape.getBounds2D().getHeight()
-            ? lightShape.getBounds2D().getWidth()
-            : lightShape.getBounds2D().getHeight();
+        Math.max(lightShape.getBounds2D().getWidth(), lightShape.getBounds2D().getHeight());
     final Color[] transColors =
         new Color[] {
             light.getColor(),
