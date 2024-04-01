@@ -134,7 +134,6 @@ public class LightSource extends Entity implements IRenderable {
     return lightShapeType;
   }
 
-
   public boolean isActive() {
     return activated;
   }
