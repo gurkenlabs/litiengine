@@ -11,6 +11,7 @@ import de.gurkenlabs.litiengine.graphics.ShapeRenderer;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.MultipleGradientPaint.CycleMethod;
 import java.awt.Paint;
 import java.awt.Point;
 import java.awt.Polygon;
@@ -22,10 +23,16 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.function.Predicate;
 
+/**
+ * This class represents a light source in an environment. It extends the Entity class and implements IRenderable interface. It provides methods to
+ * render light sources and shadows.
+ */
 @EntityInfo(renderType = RenderType.OVERLAY)
 @TmxType(MapObjectType.LIGHTSOURCE)
 public class LightSource extends Entity implements IRenderable {
-
+  /**
+   * Enum representing the type of light source.
+   */
   public enum Type {
     ELLIPSE,
     RECTANGLE
@@ -44,7 +51,7 @@ public class LightSource extends Entity implements IRenderable {
    * The colors for our shadow, going from opaque black to transparent black.
    */
   private static final Color[] SHADOW_GRADIENT_COLORS =
-      new Color[] {new Color(0, 0, 0, .3f), new Color(0f, 0f, 0f, 0f)};
+    new Color[] {new Color(0, 0, 0, .3f), new Color(0f, 0f, 0f, 0f)};
 
   @TmxProperty(name = MapObjectProperty.LIGHT_ACTIVE)
   private boolean activated;
@@ -55,27 +62,16 @@ public class LightSource extends Entity implements IRenderable {
   @TmxProperty(name = MapObjectProperty.LIGHT_SHAPE)
   private Type lightShapeType;
 
-  @TmxProperty(name = MapObjectProperty.LIGHT_FOCUSOFFSETX)
-  private double focusOffsetX;
-
-  @TmxProperty(name = MapObjectProperty.LIGHT_FOCUSOFFSETY)
-  private double focusOffsetY;
-
   private Color color;
   private Shape lightShape;
-  private int radius;
 
   /**
-   * Instantiates a new {@code LightSource} entity.
+   * Constructor for the LightSource class.
    *
-   * @param intensity
-   *          The intensity of this instance.
-   * @param lightColor
-   *          The color of this instance.
-   * @param shapeType
-   *          The shape type of this instance.
-   * @param activated
-   *          A flag indicating whether this light is activated by default.
+   * @param intensity  The intensity of this instance.
+   * @param lightColor The color of this instance.
+   * @param shapeType  The shape type of this instance.
+   * @param activated  A flag indicating whether this light is activated by default.
    */
   public LightSource(final int intensity, final Color lightColor, final Type shapeType, boolean activated) {
     super();
@@ -86,120 +82,97 @@ public class LightSource extends Entity implements IRenderable {
     this.activated = activated;
   }
 
+  /**
+   * Activates the light source.
+   */
   public void activate() {
-    if (this.activated) {
+    if (isActive()) {
       return;
     }
     this.activated = true;
-    this.updateAmbientLayers();
+    updateAmbientLayers();
   }
 
+  /**
+   * Deactivates the light source.
+   */
   public void deactivate() {
-    if (!this.activated) {
+    if (!isActive()) {
       return;
     }
 
     this.activated = false;
-    this.updateAmbientLayers();
+    updateAmbientLayers();
   }
 
   public Color getColor() {
-    return this.color;
+    return color;
   }
 
-  public double getFocusOffsetX() {
-    return this.focusOffsetX;
+  public RadialGradientPaint getGradientPaint() {
+    final Color[] transColors =
+      new Color[] {
+        getColor().brighter(),
+        getColor(),
+        new Color(
+          getColor().getRed(), getColor().getGreen(), getColor().getBlue(), 0)
+      };
+    float[] colorFractions = new float[] {0.0f, 0.3f, 1.0f};
+    return new RadialGradientPaint(getLightShape().getBounds2D(), colorFractions, transColors, CycleMethod.NO_CYCLE);
   }
 
-  public double getFocusOffsetY() {
-    return this.focusOffsetY;
-  }
 
   public int getIntensity() {
-    return this.activated ? this.intensity : 0;
+    return isActive() ? intensity : 0;
   }
 
   public Shape getLightShape() {
-    return this.lightShape;
+    return lightShape;
   }
 
   public Type getLightShapeType() {
-    return this.lightShapeType;
+    return lightShapeType;
   }
 
-  public int getRadius() {
-    return this.radius;
-  }
 
   public boolean isActive() {
-    return this.activated;
-  }
-
-  public void setFocusOffsetX(double focusOffsetX) {
-    this.focusOffsetX = focusOffsetX;
-  }
-
-  public void setFocusOffsetY(double focusOffsetY) {
-    this.focusOffsetY = focusOffsetY;
+    return activated;
   }
 
   public void setColor(final Color color) {
     this.color = color;
-    this.updateAmbientLayers();
+    updateAmbientLayers();
   }
 
   public void setIntensity(final int intensity) {
     this.intensity = intensity;
-    this.updateAmbientLayers();
+    updateAmbientLayers();
   }
 
   public void setLightShapeType(final Type shapeType) {
     this.lightShapeType = shapeType;
   }
 
-  @Override
-  public void setX(double x) {
-    super.setX(x);
-    this.updateShape();
-    this.updateAmbientLayers();
-  }
 
-  @Override
-  public void setY(double y) {
-    super.setY(y);
-    this.updateShape();
-    this.updateAmbientLayers();
-  }
-
-  @Override
-  public void setWidth(double width) {
-    super.setWidth(width);
-    this.updateShape();
-    this.updateAmbientLayers();
-  }
-
-  @Override
-  public void setHeight(double height) {
-    super.setHeight(height);
-    this.updateShape();
-    this.updateAmbientLayers();
+  @Override public void setSize(double width, double height) {
+    super.setSize(width, height);
+    updateShape();
+    updateAmbientLayers();
   }
 
   @Override
   public void setLocation(final Point2D location) {
     super.setLocation(location);
-    this.updateShape();
+    updateShape();
+    updateAmbientLayers();
   }
 
-  @Override
-  public void setSize(final double width, final double height) {
-    super.setSize(width, height);
-    this.setRadius((int) Math.min(width, height) / 2);
-  }
-
+  /**
+   * Toggles the light source between active and inactive states.
+   */
   public void toggle() {
     this.activated = !this.activated;
-    this.updateAmbientLayers();
+    updateAmbientLayers();
   }
 
   @Override
@@ -209,8 +182,8 @@ public class LightSource extends Entity implements IRenderable {
     }
 
     if (message.equals(TOGGLE_MESSAGE)) {
-      this.toggle();
-      return Boolean.toString(this.activated);
+      toggle();
+      return Boolean.toString(isActive());
     }
 
     return null;
@@ -219,37 +192,40 @@ public class LightSource extends Entity implements IRenderable {
   @Override
   public void render(final Graphics2D graphic) {
     if (Game.config().graphics().renderDynamicShadows()) {
-      this.renderShadows(graphic);
+      renderShadows(graphic);
     }
   }
 
-  private void setRadius(final int radius) {
-    this.radius = radius;
-  }
 
+  /**
+   * Updates the ambient layers of the environment.
+   */
   private void updateAmbientLayers() {
-    if (!this.isLoaded()) {
+    if (!isLoaded()) {
       return;
     }
 
     if (Game.world().environment() != null
-        && Game.world().environment().getAmbientLight() != null) {
-      Game.world().environment().getAmbientLight().updateSection(this.getBoundingBox());
+      && Game.world().environment().getAmbientLight() != null) {
+      Game.world().environment().getAmbientLight().updateSection(getBoundingBox());
     }
 
     if (Game.world().environment() != null
-        && Game.world().environment().getStaticShadowLayer() != null) {
-      Game.world().environment().getStaticShadowLayer().updateSection(this.getBoundingBox());
+      && Game.world().environment().getStaticShadowLayer() != null) {
+      Game.world().environment().getStaticShadowLayer().updateSection(getBoundingBox());
     }
   }
 
+  /**
+   * Updates the shape of the light source based on its type.
+   */
   private void updateShape() {
-    if (this.getLightShapeType() == Type.RECTANGLE) {
+    if (getLightShapeType() == Type.RECTANGLE) {
       this.lightShape =
-          new Rectangle2D.Double(this.getX(), this.getY(), this.getWidth(), this.getHeight());
+        new Rectangle2D.Double(getX(), getY(), getWidth(), getHeight());
     } else {
       this.lightShape =
-          new Ellipse2D.Double(this.getX(), this.getY(), this.getWidth(), this.getHeight());
+        new Ellipse2D.Double(getX(), getY(), getWidth(), getHeight());
     }
   }
 
@@ -276,22 +252,21 @@ public class LightSource extends Entity implements IRenderable {
    *     render with RadialGradientPaint to give it a "fade-out" appearance
    * </pre>
    *
-   * @param graphic
-   *          the graphics to use for rendering
+   * @param graphic the graphics to use for rendering
    */
   private void renderShadows(final Graphics2D graphic) {
     if (Game.world().environment().getCombatEntities().stream()
-        .noneMatch(isInRange(this.getCenter(), SHADOW_GRADIENT_SIZE))) {
+      .noneMatch(isInRange(getCenter()))) {
       return;
     }
 
     // we'll use a radial gradient
     final Paint gradientPaint =
-        new RadialGradientPaint(
-            Game.world().camera().getViewportDimensionCenter(this),
-            SHADOW_GRADIENT_SIZE,
-            SHADOW_GRADIENT_FRACTIONS,
-            SHADOW_GRADIENT_COLORS);
+      new RadialGradientPaint(
+        Game.world().camera().getViewportDimensionCenter(this),
+        SHADOW_GRADIENT_SIZE,
+        SHADOW_GRADIENT_FRACTIONS,
+        SHADOW_GRADIENT_COLORS);
 
     // old Paint object for resetting it later
     final Paint oldPaint = graphic.getPaint();
@@ -299,12 +274,12 @@ public class LightSource extends Entity implements IRenderable {
 
     // for each entity
     for (final ICombatEntity mob : Game.world().environment().getCombatEntities()) {
-      if (mob.isDead() || !isInRange(this.getCenter(), SHADOW_GRADIENT_SIZE).test(mob)) {
+      if (mob.isDead() || !isInRange(getCenter()).test(mob)) {
         continue;
       }
 
       final Shape obstructedVision =
-          getObstructedVisionArea(mob, Game.world().camera().getViewportDimensionCenter(this));
+        getObstructedVisionArea(mob, Game.world().camera().getViewportDimensionCenter(this));
       // fill the polygon with the gradient paint
 
       ShapeRenderer.render(graphic, obstructedVision);
@@ -314,16 +289,25 @@ public class LightSource extends Entity implements IRenderable {
     graphic.setPaint(oldPaint);
   }
 
-  private static Predicate<? super IEntity> isInRange(final Point2D center, final float radius) {
-    return mob -> new Ellipse2D.Double(center.getX() - radius, center.getY() - radius, radius * 2,
-        radius * 2)
-            .contains(mob.getCenter());
+  private static Predicate<? super IEntity> isInRange(final Point2D center) {
+    return mob -> new Ellipse2D.Double(center.getX() - LightSource.SHADOW_GRADIENT_SIZE, center.getY() - LightSource.SHADOW_GRADIENT_SIZE,
+      LightSource.SHADOW_GRADIENT_SIZE
+        * 2,
+      LightSource.SHADOW_GRADIENT_SIZE * 2)
+      .contains(mob.getCenter());
   }
 
-  private static Area getObstructedVisionArea(final IEntity mob, final Point2D center) {
+  /**
+   * Gets the area of obstructed vision for a given entity.
+   *
+   * @param entity The entity for which to get the obstructed vision area.
+   * @param center The center point of the light source.
+   * @return The area of obstructed vision.
+   */
+  private static Area getObstructedVisionArea(final IEntity entity, final Point2D center) {
     final Polygon shadowPolygon = new Polygon();
 
-    final Ellipse2D shadowEllipse = getShadowEllipse(mob);
+    final Ellipse2D shadowEllipse = getShadowEllipse(entity);
 
     final Rectangle2D bounds = shadowEllipse.getBounds2D();
 
@@ -333,9 +317,9 @@ public class LightSource extends Entity implements IRenderable {
 
     // get relative center of entity
     final Point2D relativeCenter =
-        Game.world()
-            .camera()
-            .getViewportLocation(new Point((int) (bounds.getX() + r), (int) (bounds.getY() + ry)));
+      Game.world()
+        .camera()
+        .getViewportLocation(new Point((int) (bounds.getX() + r), (int) (bounds.getY() + ry)));
     final double cx = relativeCenter.getX();
     final double cy = relativeCenter.getY();
 
@@ -343,7 +327,7 @@ public class LightSource extends Entity implements IRenderable {
     final double dx = cx - center.getX();
     final double dy = cy - center.getY();
 
-    // get euclidean distance from entity to center
+    // get Euclidean distance from entity to center
     final double distSq = dx * dx + dy * dy; // avoid sqrt for performance
 
     // normalize the direction to a unit vector
@@ -375,15 +359,15 @@ public class LightSource extends Entity implements IRenderable {
     shadowPolygon.addPoint((int) pointC.getX(), (int) pointC.getY());
 
     final Point2D shadowRenderLocation =
-        Game.world()
-            .camera()
-            .getViewportLocation(new Point2D.Double(shadowEllipse.getX(), shadowEllipse.getY()));
+      Game.world()
+        .camera()
+        .getViewportLocation(new Point2D.Double(shadowEllipse.getX(), shadowEllipse.getY()));
     final Ellipse2D relativeEllipse =
-        new Ellipse2D.Double(
-            shadowRenderLocation.getX(),
-            shadowRenderLocation.getY(),
-            shadowEllipse.getWidth(),
-            shadowEllipse.getHeight());
+      new Ellipse2D.Double(
+        shadowRenderLocation.getX(),
+        shadowRenderLocation.getY(),
+        shadowEllipse.getWidth(),
+        shadowEllipse.getHeight());
 
     final Area ellipseArea = new Area(relativeEllipse);
     final Area shadowArea = new Area(shadowPolygon);

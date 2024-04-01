@@ -9,213 +9,191 @@ import de.gurkenlabs.litiengine.util.geom.Vector2D;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.MultipleGradientPaint.CycleMethod;
 import java.awt.Paint;
-import java.awt.RadialGradientPaint;
-import java.awt.Shape;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
+/**
+ * This class represents the ambient light in an environment. It extends the ColorLayer class and provides methods to render light sources and
+ * shadows.
+ */
 public class AmbientLight extends ColorLayer {
+  /**
+   * The default color for the ambient light.
+   */
   public static final Color DEFAULT_COLOR = new Color(0, 0, 0, 0);
 
   /**
-   * Instantiates a new {@code AmbientLight} instance.
+   * Constructor for the AmbientLight class.
    *
-   * @param environment
-   *          The environment to which this instance is assigned.
-   * @param ambientColor
-   *          The color of this instance.
+   * @param environment  The environment to which this instance is assigned.
+   * @param ambientColor The color of this instance.
    */
   public AmbientLight(final Environment environment, final Color ambientColor) {
     super(environment, ambientColor);
   }
 
   /**
-   * @see <a href="https://docs.oracle.com/javase/tutorial/2d/advanced/compositing.html">Compositing Graphics</a>
+   * Renders a section of the environment with the ambient light and light sources.
+   *
+   * @param g       The Graphics2D object to render on.
+   * @param section The section of the environment to render.
    */
   @Override
   protected void renderSection(Graphics2D g, Rectangle2D section) {
-    this.renderAmbient(g, section);
+    renderAmbient(g, section);
 
-    // carve out the lights that will be added
     g.setComposite(AlphaComposite.getInstance(AlphaComposite.DST_OUT, 1));
-    for (final LightSource light : this.getEnvironment().getLightSources()) {
-      if (!light.getBoundingBox().intersects(section) || !light.isActive()) {
-        continue;
-      }
+    getEnvironment().getLightSources().forEach(light -> carveOutLight(g, light, section));
 
-      this.renderLightSource(g, light, section);
-    }
-
-    // render the actual lights, depending on their intensity
-    for (final LightSource light : this.getEnvironment().getLightSources()) {
-      if (!light.getBoundingBox().intersects(section)
-          || !light.isActive()
-          || light.getIntensity() <= 0) {
-        continue;
-      }
-
-      final float intensity = MathUtilities.clamp((float) light.getIntensity() / 255, 0, 1);
-      g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, intensity));
-      this.renderLightSource(g, light, section);
-    }
+    getEnvironment().getLightSources().forEach(light -> renderActualLight(g, light, section));
   }
 
+  /**
+   * Clears a section of the environment.
+   *
+   * @param g       The Graphics2D object to clear on.
+   * @param section The section of the environment to clear.
+   */
   @Override
   protected void clearSection(Graphics2D g, Rectangle2D section) {
     g.setColor(new Color(0, 0, 0, 0));
     g.clearRect(
-        (int) section.getX(),
-        (int) section.getY(),
-        (int) section.getWidth(),
-        (int) section.getHeight());
+      (int) section.getX(),
+      (int) section.getY(),
+      (int) section.getWidth(),
+      (int) section.getHeight());
   }
 
-  private void renderAmbient(Graphics2D g, Rectangle2D section) {
-    // create large rectangle and crop lights from it
-    final double width = section.getWidth();
-    final double height = section.getHeight();
-
-    // render the basic am
-    final Area ambientArea = new Area(new Rectangle2D.Double(0, 0, width, height));
-    g.setColor(this.getColor());
-    g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_IN, 1));
-    g.fill(ambientArea);
+  /**
+   * Carves out a light source from the ambient light.
+   *
+   * @param g       The Graphics2D object to carve on.
+   * @param light   The light source to carve out.
+   * @param section The section of the environment to carve from.
+   */
+  private void carveOutLight(Graphics2D g, LightSource light, Rectangle2D section) {
+    if (!light.getBoundingBox().intersects(section) || !light.isActive()) {
+      return;
+    }
+    renderLightSource(g, light, section);
   }
 
-  private void renderLightSource(final Graphics2D g, final LightSource light, Rectangle2D section) {
-    final double mapWidth = this.getEnvironment().getMap().getSizeInPixels().width;
-    final double mapHeight = this.getEnvironment().getMap().getSizeInPixels().height;
-    double longerDimension = Math.max(mapWidth, mapHeight);
-
-    final Point2D lightCenter = light.getCenter();
-    final Point2D lightFocus =
-        new Point2D.Double(
-            lightCenter.getX() + light.getBoundingBox().getWidth() * light.getFocusOffsetX(),
-            lightCenter.getY() + light.getBoundingBox().getHeight() * light.getFocusOffsetY());
-    Shape fillShape;
-
-    Area lightArea = null;
-    if (light.getLightShapeType() == LightSource.Type.RECTANGLE) {
-      g.setColor(
-          new Color(
-              light.getColor().getRed(),
-              light.getColor().getGreen(),
-              light.getColor().getBlue(),
-              light.getColor().getAlpha()));
-      fillShape =
-          new Rectangle2D.Double(
-              light.getBoundingBox().getX() - section.getX(),
-              light.getBoundingBox().getY() - section.getY(),
-              light.getBoundingBox().getWidth(),
-              light.getBoundingBox().getHeight());
-      g.fill(fillShape);
+  /**
+   * Renders an actual light source on the environment.
+   *
+   * @param g       The Graphics2D object to render on.
+   * @param light   The light source to render.
+   * @param section The section of the environment to render on.
+   */
+  private void renderActualLight(Graphics2D g, LightSource light, Rectangle2D section) {
+    if (!light.getBoundingBox().intersects(section)
+      || !light.isActive()
+      || light.getIntensity() <= 0) {
       return;
     }
 
-    // cut the light area where shadow Boxes are (this simulates light falling
-    // into and out of rooms)
-    for (final StaticShadow col : this.getEnvironment().getStaticShadows()) {
-      if (!light.getBoundingBox().intersects(col.getBoundingBox())) {
-        continue;
-      }
+    final float intensity = MathUtilities.clamp((float) light.getIntensity() / 255, 0, 1);
+    g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, intensity));
+    renderLightSource(g, light, section);
+  }
 
-      if (lightArea == null) {
-        lightArea = new Area(light.getLightShape());
-      }
+  /**
+   * Renders the ambient light on the environment.
+   *
+   * @param g       The Graphics2D object to render on.
+   * @param section The section of the environment to render.
+   */
+  private void renderAmbient(Graphics2D g, Rectangle2D section) {
+    g.setColor(getColor());
+    g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_IN, 1));
+    ShapeRenderer.render(g, section);
+  }
 
-      if (!lightArea.intersects(col.getBoundingBox())) {
-        continue;
-      }
-
-      final Area boxInLight = new Area(col.getBoundingBox());
-
-      final Line2D[] bounds = GeometricUtilities.getLines(col.getBoundingBox());
-      for (final Line2D line : bounds) {
-        final Vector2D lineVector = new Vector2D(line.getP1(), line.getP2());
-        final Vector2D lightVector = new Vector2D(lightFocus, line.getP1());
-
-        if (light.getCenter().getY() < line.getY1()
-            && light.getCenter().getY() < line.getY2()
-            && col.getBoundingBox().contains(light.getCenter())
-            || lineVector.normalVector().dotProduct(lightVector) >= 0) {
-          continue;
-        }
-
-        final Path2D shadowParallelogram = new Path2D.Double();
-        final Point2D shadowPoint1 =
-            GeometricUtilities.project(lightFocus, line.getP1(), longerDimension);
-        final Point2D shadowPoint2 =
-            GeometricUtilities.project(lightFocus, line.getP2(), longerDimension);
-
-        // construct a shape from our points
-        shadowParallelogram.moveTo(line.getP1().getX(), line.getP1().getY());
-        shadowParallelogram.lineTo(shadowPoint1.getX(), shadowPoint1.getY());
-        shadowParallelogram.lineTo(shadowPoint2.getX(), shadowPoint2.getY());
-        shadowParallelogram.lineTo(line.getP2().getX(), line.getP2().getY());
-        shadowParallelogram.closePath();
-
-        final Area shadowArea = new Area(shadowParallelogram);
-        if (light.getCenter().getY() < col.getBoundingBox().getMaxY()
-            && !col.getBoundingBox().contains(light.getCenter())) {
-          shadowArea.add(boxInLight);
-        }
-        shadowArea.intersect(lightArea);
-        lightArea.subtract(shadowArea);
-      }
+  /**
+   * Subtracts a shadow from a light area.
+   *
+   * @param lightArea The light area to subtract from.
+   * @param shadow    The shadow to subtract.
+   */
+  private void subtractShadow(Area lightArea, StaticShadow shadow) {
+    if (!lightArea.intersects(shadow.getBoundingBox())) {
+      return;
     }
+
+    final double mapWidth = getEnvironment().getMap().getSizeInPixels().width;
+    final double mapHeight = getEnvironment().getMap().getSizeInPixels().height;
+    double longerDimension = Math.max(mapWidth, mapHeight);
+    Point2D center = new Point2D.Double(lightArea.getBounds2D().getCenterX(), lightArea.getBounds2D().getCenterY());
+
+
+    final Area boxInLight = new Area(shadow.getBoundingBox());
+
+    final Line2D[] bounds = GeometricUtilities.getLines(shadow.getBoundingBox());
+    for (final Line2D line : bounds) {
+      final Vector2D lineVector = new Vector2D(line.getP1(), line.getP2());
+      final Vector2D lightVector = new Vector2D(center, line.getP1());
+
+      if (center.getY() < line.getY1()
+        && center.getY() < line.getY2()
+        && shadow.getBoundingBox().contains(center)
+        || lineVector.normalVector().dotProduct(lightVector) >= 0) {
+        continue;
+      }
+
+      final Path2D shadowParallelogram = new Path2D.Double();
+      final Point2D shadowPoint1 =
+        GeometricUtilities.project(center, line.getP1(), longerDimension);
+      final Point2D shadowPoint2 =
+        GeometricUtilities.project(center, line.getP2(), longerDimension);
+
+      // construct a shape from our points
+      shadowParallelogram.moveTo(line.getP1().getX(), line.getP1().getY());
+      shadowParallelogram.lineTo(shadowPoint1.getX(), shadowPoint1.getY());
+      shadowParallelogram.lineTo(shadowPoint2.getX(), shadowPoint2.getY());
+      shadowParallelogram.lineTo(line.getP2().getX(), line.getP2().getY());
+      shadowParallelogram.closePath();
+
+      final Area shadowArea = new Area(shadowParallelogram);
+      if (center.getY() < shadow.getBoundingBox().getMaxY()
+        && !shadow.getBoundingBox().contains(center)) {
+        shadowArea.add(boxInLight);
+      }
+      shadowArea.intersect(lightArea);
+      lightArea.subtract(shadowArea);
+    }
+  }
+
+  /**
+   * Renders a light source on the environment.
+   *
+   * @param g       The Graphics2D object to render on.
+   * @param light   The light source to render.
+   * @param section The section of the environment to render on.
+   */
+  private void renderLightSource(final Graphics2D g, final LightSource light, Rectangle2D section) {
+
+    Area lightArea = new Area(light.getLightShape());
+    if (light.getLightShapeType() == LightSource.Type.RECTANGLE) {
+      g.setColor(light.getColor());
+      ShapeRenderer.render(g, new Rectangle2D.Double(
+        light.getBoundingBox().getX() - section.getX(),
+        light.getBoundingBox().getY() - section.getY(),
+        light.getBoundingBox().getWidth(),
+        light.getBoundingBox().getHeight()));
+      return;
+    }
+
+    // cut the light area where shadow Boxes are (this simulates light falling into and out of rooms)
+    getEnvironment().getStaticShadows().forEach(shadow -> subtractShadow(lightArea, shadow));
 
     final Paint oldPaint = g.getPaint();
 
-    // render parts that lie within the shadow with a gradient from the light
-    // color to transparent
-    final Shape lightShape = light.getLightShape();
-
-    final double radius =
-        Math.max(lightShape.getBounds2D().getWidth(), lightShape.getBounds2D().getHeight());
-    final Color[] transColors =
-        new Color[] {
-            light.getColor(),
-            new Color(
-                light.getColor().getRed(), light.getColor().getGreen(), light.getColor().getBlue(), 0)
-        };
-    final Point2D center =
-        new Point2D.Double(
-            lightShape.getBounds2D().getCenterX() - section.getX(),
-            lightShape.getBounds2D().getCenterY() - section.getY());
-    final Point2D focus =
-        new Point2D.Double(
-            center.getX() + lightShape.getBounds2D().getWidth() * light.getFocusOffsetX(),
-            center.getY() + lightShape.getBounds2D().getHeight() * light.getFocusOffsetY());
-    RadialGradientPaint paint =
-        new RadialGradientPaint(
-            center,
-            (float) (radius / 2d),
-            focus,
-            new float[] {0.0f, 1.00f},
-            transColors,
-            CycleMethod.NO_CYCLE);
-
-    g.setPaint(paint);
-
-    if (lightArea != null) {
-      lightArea.transform(AffineTransform.getTranslateInstance(-section.getX(), -section.getY()));
-      fillShape = lightArea;
-    } else {
-      fillShape =
-          new Rectangle2D.Double(
-              light.getBoundingBox().getX() - section.getX(),
-              light.getBoundingBox().getY() - section.getY(),
-              light.getBoundingBox().getWidth(),
-              light.getBoundingBox().getHeight());
-    }
-
-    g.fill(fillShape);
+    g.setPaint(light.getGradientPaint());
+    ShapeRenderer.render(g, lightArea);
     g.setPaint(oldPaint);
   }
 }

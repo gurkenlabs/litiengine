@@ -14,10 +14,8 @@ public class StaticShadowLayer extends ColorLayer {
   /**
    * Instantiates a new {@code StaticShadowLayer} instance.
    *
-   * @param environment
-   *          The environment to which this instance is assigned.
-   * @param color
-   *          The color of this instance.
+   * @param environment The environment to which this instance is assigned.
+   * @param color       The color of this instance.
    */
   public StaticShadowLayer(Environment environment, Color color) {
     super(environment, color);
@@ -28,13 +26,9 @@ public class StaticShadowLayer extends ColorLayer {
     final Color color = this.getColor();
     g.setColor(color);
 
-    // check if the collision boxes have shadows. if so, determine which
-    // shadow is needed, create the shape and add it to the
-    // list of static shadows.
     final Area ar = new Area();
     for (final StaticShadow staticShadow : this.getEnvironment().getStaticShadows()) {
-      if (!staticShadow.getBoundingBox().intersects(section)
-          || staticShadow.getShadowType() == StaticShadowType.NONE) {
+      if (staticShadow.getArea()==null || !staticShadow.getArea().intersects(section)) {
         continue;
       }
 
@@ -42,8 +36,7 @@ public class StaticShadowLayer extends ColorLayer {
       ar.add(staticShadowArea);
     }
 
-    ar.transform(AffineTransform.getTranslateInstance(-section.getX(), -section.getY()));
-    g.fill(ar);
+    ShapeRenderer.render(g, ar);
   }
 
   @Override

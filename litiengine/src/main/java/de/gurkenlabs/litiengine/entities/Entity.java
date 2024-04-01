@@ -316,9 +316,7 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
 
   @Override
   public void setHeight(final double height) {
-    this.height = height;
-    this.boundingBox = null; // trigger recreation in next boundingBox getter call
-    this.fireSizeChangedEvent();
+    setSize(getWidth(), height);
   }
 
   @Override
@@ -372,9 +370,7 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
 
   @Override
   public void setWidth(final double width) {
-    this.width = width;
-    this.boundingBox = null; // trigger recreation in next boundingBox getter call
-    this.fireSizeChangedEvent();
+    setSize(width, getHeight());
   }
 
   @Override

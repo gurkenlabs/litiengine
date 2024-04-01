@@ -531,29 +531,4 @@ class LightSourceTests {
     assertEquals(height, lightSourceInactiveSpy.getHeight());
   }
 
-  @Test
-  void setSize_setsShorterSideAsRadius() {
-    // arrange
-    double firstWidth = 20d;
-    double firstHeight = 10d;
-    int firstRadius = 5;
-    double secondWidth = 2d;
-    double secondHeight = 10d;
-    int secondRadius = 1;
-
-    LightSource firstLightSourceSpy =
-      spy(new LightSource(10, Color.WHITE, LightSource.Type.ELLIPSE, false));
-    LightSource secondLightSourceSpy =
-      spy(new LightSource(10, Color.WHITE, LightSource.Type.ELLIPSE, false));
-    assertEquals(0, firstLightSourceSpy.getRadius());
-    assertEquals(0, secondLightSourceSpy.getRadius());
-
-    // act
-    firstLightSourceSpy.setSize(firstWidth, firstHeight);
-    secondLightSourceSpy.setSize(secondWidth, secondHeight);
-
-    // assert
-    assertEquals(firstRadius, firstLightSourceSpy.getRadius());
-    assertEquals(secondRadius, secondLightSourceSpy.getRadius());
-  }
 }

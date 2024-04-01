@@ -60,18 +60,11 @@ public abstract class ColorLayer implements IRenderable {
     if (this.getColor() == null) {
       return;
     }
-
-    int minX = (int) Math.floor(section.getX());
-    int minY = (int) Math.floor(section.getY());
-    int maxX = (int) Math.ceil(section.getMaxX());
-    int maxY = (int) Math.ceil(section.getMaxY());
-    Rectangle aligned = new Rectangle(minX, minY, maxX - minX, maxY - minY);
-
-    final Graphics2D g = this.layer.createGraphics();
-    this.clearSection(g, aligned);
-    g.setClip(aligned.x, aligned.y, aligned.width, aligned.height);
-    g.translate(aligned.x, aligned.y);
-    this.renderSection(g, aligned);
+    final Graphics2D g = layer.createGraphics();
+    clearSection(g, section);
+    g.setClip(section);
+//    g.translate(section.getX(),section.getY());
+    renderSection(g, section);
     g.dispose();
   }
 

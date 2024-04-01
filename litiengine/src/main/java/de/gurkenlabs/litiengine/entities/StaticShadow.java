@@ -192,28 +192,19 @@ public class StaticShadow extends MapArea {
     return "[" + this.getOrigin().toString() + "] -> " + super.toString();
   }
 
-  @Override
-  public Rectangle2D getBoundingBox() {
-    if (this.getArea() == null) {
-      return super.getBoundingBox();
-    }
-
-    return this.getArea().getBounds2D();
-  }
-
   public Area getArea() {
-    if (this.getShadowType() == StaticShadowType.NONE) {
+    if (getShadowType() == StaticShadowType.NONE) {
       return null;
     }
 
-    if (this.area == null) {
-      this.createArea();
+    if (area == null) {
+      createArea();
     }
-    return this.area;
+    return area;
   }
 
   private void createArea() {
-    if (this.getShadowType() == StaticShadowType.NONE) {
+    if (getShadowType() == StaticShadowType.NONE) {
       return;
     }
 

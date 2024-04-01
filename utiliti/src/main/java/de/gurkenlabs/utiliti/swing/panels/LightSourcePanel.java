@@ -19,8 +19,6 @@ public class LightSourcePanel extends PropertyPanel {
   private final JComboBox<String> comboBoxLightShape;
   private final JSpinner spinnerIntensity;
   private final JCheckBox checkBoxIsActive;
-  private final JSpinner offsetX;
-  private final JSpinner offsetY;
   private final ColorComponent colorControl;
 
   public LightSourcePanel() {
@@ -35,9 +33,6 @@ public class LightSourcePanel extends PropertyPanel {
     this.spinnerIntensity = new JSpinner(new SpinnerNumberModel(0, 0, 255, 5));
     this.checkBoxIsActive = new JCheckBox("is active");
     this.checkBoxIsActive.setSelected(true);
-
-    this.offsetX = new JSpinner(new SpinnerNumberModel(0.0, -0.5, 0.5, 0.1));
-    this.offsetY = new JSpinner(new SpinnerNumberModel(0.0, -0.5, 0.5, 0.1));
 
     setLayout(this.createLayout());
     this.setupChangedListeners();
@@ -65,9 +60,7 @@ public class LightSourcePanel extends PropertyPanel {
     this.colorControl.setColor(mapObject.getColorValue(MapObjectProperty.LIGHT_COLOR));
     this.comboBoxLightShape.setSelectedItem(shape);
     this.checkBoxIsActive.setSelected(isActive);
-    this.offsetX.setValue(MathUtilities.clamp(mapObject.getDoubleValue(MapObjectProperty.LIGHT_FOCUSOFFSETX, 0), -100, 100));
-    this.offsetY.setValue(MathUtilities.clamp(mapObject.getDoubleValue(MapObjectProperty.LIGHT_FOCUSOFFSETY, 0), -100, 100));
-  }
+}
 
   private void setupChangedListeners() {
     this.colorControl.addActionListener(
@@ -97,12 +90,6 @@ public class LightSourcePanel extends PropertyPanel {
 
     this.setup(this.checkBoxIsActive, MapObjectProperty.LIGHT_ACTIVE);
     this.checkBoxIsActive.addActionListener(m -> this.updateLighting());
-
-    this.setup(this.offsetX, MapObjectProperty.LIGHT_FOCUSOFFSETX);
-    this.offsetX.addChangeListener(m -> this.updateLighting());
-
-    this.setup(this.offsetY, MapObjectProperty.LIGHT_FOCUSOFFSETY);
-    this.offsetY.addChangeListener(m -> this.updateLighting());
   }
 
   private void updateLighting() {
@@ -126,8 +113,6 @@ public class LightSourcePanel extends PropertyPanel {
             new LayoutItem(
                 "panel_color", this.colorControl, this.colorControl.getPreferredSize().height),
             new LayoutItem("panel_intensity", this.spinnerIntensity),
-            new LayoutItem("offsetX", this.offsetX),
-            new LayoutItem("offsetY", this.offsetY),
         };
 
     return this.createLayout(layoutItems, this.checkBoxIsActive);
