@@ -141,7 +141,7 @@ public class RenderComponent extends Canvas {
           consumer.accept(g);
         }
 
-        if (this.currentAlpha != Float.NaN) {
+        if (!Float.isNaN(this.currentAlpha)) {
           final int visibleAlpha =
               MathUtilities.clamp(Math.round(255 * (1 - this.currentAlpha)), 0, 255);
           g.setColor(

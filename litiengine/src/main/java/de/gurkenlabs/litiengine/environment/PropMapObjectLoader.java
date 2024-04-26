@@ -100,9 +100,9 @@ public class PropMapObjectLoader extends MapObjectLoader {
     } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
         | SecurityException e) {
       try {
-        Prop creature = customProp.getConstructor().newInstance();
-        creature.setSpritesheetName(spriteSheet);
-        return creature;
+        Prop prop = customProp.getConstructor().newInstance();
+        prop.setSpritesheetName(spriteSheet);
+        return prop;
       } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
           | SecurityException ex) {
         log.log(Level.SEVERE, "Could not automatically create prop of type {0} because a matching constructor is missing.",

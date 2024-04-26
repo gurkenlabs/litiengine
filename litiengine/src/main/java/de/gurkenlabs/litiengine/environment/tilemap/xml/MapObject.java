@@ -393,8 +393,8 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   private void afterUnmarshal(Unmarshaller u, Object parent) {
     // MapObjects don't necessarily have to be children of a layer. E.g. they can also be children of a
     // Blueprint.
-    if (parent instanceof MapObjectLayer) {
-      this.setLayer((MapObjectLayer) parent);
+    if (parent instanceof MapObjectLayer mapObjectLayer) {
+      this.setLayer(mapObjectLayer);
     }
 
     if (this.gid != null && this.gid == 0) {

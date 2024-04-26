@@ -320,9 +320,9 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   }
 
   private boolean activate(final IEntity activator, final int tar) {
-    if (!this.isLoaded()
-        || this.isOneTimeTrigger && this.isActivated
-        || this.getActivationType() == TriggerActivation.COLLISION
+    if (!isLoaded()
+        || isOneTimeTrigger() && isActivated()
+        || getActivationType() == TriggerActivation.COLLISION
             && activator != null
             && this.collisionActivated.contains(activator)) {
       return false;
