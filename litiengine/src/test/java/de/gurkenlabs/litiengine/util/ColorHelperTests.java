@@ -44,11 +44,11 @@ class ColorHelperTests {
   @Nested
   class DecodeTest
   {
-      String red200 = "#c8ff0000";
+      String red200 = "#c8ffddee";
 
       Color redDecoded = ColorHelper.decode(red200);
 
-      Color alphaRed = new Color(255, 0, 0, 200);
+      Color alphaRed = new Color(0xff, 0xdd, 0xee, 0xc8);
 
       @Test
       void testRedFromAlphaHexString() {
