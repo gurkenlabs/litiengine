@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import java.awt.Color;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -40,44 +41,34 @@ class ColorHelperTests {
         Arguments.of("#0000ff", Color.BLUE));
   }
 
-  @Test
-  void testRedFromAlphaHexString() {
-    String red200 = "#c8ff0000";
+  @Nested
+  class DecodeTest
+  {
+      String colorLiteral = "#c8ffddee";
 
-    Color redDecoded = ColorHelper.decode(red200);
+      Color colorDecoded = ColorHelper.decode(colorLiteral);
 
-    Color alphaRed = new Color(255, 0, 0, 200);
-    assertEquals(alphaRed.getRed(), redDecoded.getRed());
-  }
+      Color color = new Color(0xff, 0xdd, 0xee, 0xc8);
 
-  @Test
-  void testGreenFromAlphaHexString() {
-    String red200 = "#c8ff0000";
+      @Test
+      void testRedFromAlphaHexString() {
+        assertEquals(color.getRed(), colorDecoded.getRed());
+      }
 
-    Color redDecoded = ColorHelper.decode(red200);
+      @Test
+      void testGreenFromAlphaHexString() {
+        assertEquals(color.getGreen(), colorDecoded.getGreen());
+      }
 
-    Color alphaRed = new Color(255, 0, 0, 200);
-    assertEquals(alphaRed.getGreen(), redDecoded.getGreen());
-  }
+      @Test
+      void testBlueFromAlphaHexString() {
+        assertEquals(color.getBlue(), colorDecoded.getBlue());
+      }
 
-  @Test
-  void testBlueFromAlphaHexString() {
-    String red200 = "#c8ff0000";
-
-    Color redDecoded = ColorHelper.decode(red200);
-
-    Color alphaRed = new Color(255, 0, 0, 200);
-    assertEquals(alphaRed.getBlue(), redDecoded.getBlue());
-  }
-
-  @Test
-  void testAlphaFromAlphaHexString() {
-    String red200 = "#c8ff0000";
-
-    Color redDecoded = ColorHelper.decode(red200);
-
-    Color alphaRed = new Color(255, 0, 0, 200);
-    assertEquals(alphaRed.getAlpha(), redDecoded.getAlpha());
+      @Test
+      void testAlphaFromAlphaHexString() {
+        assertEquals(color.getAlpha(), colorDecoded.getAlpha());
+      }
   }
 
   @ParameterizedTest
