@@ -44,30 +44,30 @@ class ColorHelperTests {
   @Nested
   class DecodeTest
   {
-      String red200 = "#c8ffddee";
+      String colorLiteral = "#c8ffddee";
 
-      Color redDecoded = ColorHelper.decode(red200);
+      Color colorDecoded = ColorHelper.decode(colorLiteral);
 
-      Color alphaRed = new Color(0xff, 0xdd, 0xee, 0xc8);
+      Color color = new Color(0xff, 0xdd, 0xee, 0xc8);
 
       @Test
       void testRedFromAlphaHexString() {
-        assertEquals(alphaRed.getRed(), redDecoded.getRed());
+        assertEquals(color.getRed(), colorDecoded.getRed());
       }
 
       @Test
       void testGreenFromAlphaHexString() {
-        assertEquals(alphaRed.getGreen(), redDecoded.getGreen());
+        assertEquals(color.getGreen(), colorDecoded.getGreen());
       }
 
       @Test
       void testBlueFromAlphaHexString() {
-        assertEquals(alphaRed.getBlue(), redDecoded.getBlue());
+        assertEquals(color.getBlue(), colorDecoded.getBlue());
       }
 
       @Test
       void testAlphaFromAlphaHexString() {
-        assertEquals(alphaRed.getAlpha(), redDecoded.getAlpha());
+        assertEquals(color.getAlpha(), colorDecoded.getAlpha());
       }
   }
 
