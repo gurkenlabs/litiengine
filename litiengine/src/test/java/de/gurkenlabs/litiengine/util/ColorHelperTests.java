@@ -46,7 +46,7 @@ class ColorHelperTests {
   {
       String red200 = "#c8ff0000";
 
-      Color redDecoded = ColorUtil.decode(red200);
+      Color redDecoded = ColorHelper.decode(red200);
 
       Color alphaRed = new Color(255, 0, 0, 200);
 
