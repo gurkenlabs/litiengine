@@ -51,10 +51,10 @@ For alternative ways of downloading and applying LITIENGINE to your project, vis
 The [LITIENGINE documentation](https://litiengine.com/docs/) contains in-depth explanations, guides, and tutorials for general concepts of the engine.
 ### Javadocs
 If you are searching for a particular method or class within the API or just want to further explore the engine's capabilities and structure, the Javadocs are a good place to start:
-[![Javadocs](http://www.javadoc.io/badge/de.gurkenlabs/litiengine.svg)](https://litiengine.com/api/) 
+[![Javadocs](http://www.javadoc.io/badge/de.gurkenlabs/litiengine.svg)](https://litiengine.com/api/)
 ### Questions
 You've found yourself trying to work out a feature of the engine that is not yet documented?
-Join our community in the official [LITIENGINE forum](https://forum.litiengine.com/) or on [Discord](https://discord.gg/rRB9cKD) for troubleshooting.
+Join our community in the [LITIENGINE forum](https://github.com/gurkenlabs/litiengine/discussions) hosted on Github or on [Discord](https://discord.gg/rRB9cKD) for troubleshooting.
 
 ### Bugs and Issues
 You've encountered an obvious issue or bug with LITIENGINE or want to request enhancements and features? File an issue in our [Issue Tracker](https://github.com/gurkenlabs/litiengine/issues).
@@ -65,7 +65,7 @@ You've encountered an obvious issue or bug with LITIENGINE or want to request en
 * [MP3 SPI](https://mvnrepository.com/artifact/com.googlecode.soundlibs/mp3spi/1.9.5.4) for .mp3 support
 * [Ogg Vorbis SPI](https://mvnrepository.com/artifact/com.googlecode.soundlibs/vorbisspi/1.0.3.3) for .ogg support
 
-### utiLITI 
+### utiLITI
 * [Darklaf](https://github.com/weisJ/darklaf) for theming support
 
 ### Other Recommended Libraries
