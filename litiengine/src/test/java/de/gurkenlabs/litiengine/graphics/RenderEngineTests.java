@@ -1,31 +1,24 @@
 package de.gurkenlabs.litiengine.graphics;
 
-import static java.lang.System.lineSeparator;
-import static java.util.stream.Collectors.joining;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyFloat;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.util.Imaging;
-import java.awt.Graphics2D;
-import java.awt.Image;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+
+import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.List;
-import java.util.stream.Collectors;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
+
+import static java.lang.System.lineSeparator;
+import static java.util.stream.Collectors.joining;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 public class RenderEngineTests {
 
@@ -63,10 +56,10 @@ public class RenderEngineTests {
     assertEquals(vectors.size(), text.size());
     assertEquals(yPoints.size(), text.size());
     for (int i = 0; i < text.size(); i++) {
-      assertEquals(vectors.get(i).getNumGlyphs(), i+1);
+      assertEquals(vectors.get(i).getNumGlyphs(), i + 1);
 
       if (i > 0) {
-        assertTrue(yPoints.get(i) > yPoints.get(i-1));
+        assertTrue(yPoints.get(i) > yPoints.get(i - 1));
       }
     }
   }
