@@ -1,17 +1,24 @@
 package de.gurkenlabs.litiengine.graphics;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-
+import de.gurkenlabs.litiengine.Align;
+import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.util.Imaging;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+
+import java.awt.*;
+import java.awt.font.FontRenderContext;
+import java.awt.font.GlyphVector;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
+import java.util.List;
+
+import static java.lang.System.lineSeparator;
+import static java.util.stream.Collectors.joining;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 public class RenderEngineTests {
 
@@ -21,6 +28,40 @@ public class RenderEngineTests {
 
     TextRenderer.render(graphics, "abc", 50.0, 100.0);
     verify(graphics).drawString("abc", 50f, 100f);
+  }
+
+  @Test
+  public void testDrawTextWithLinebreaks() {
+    Graphics2D graphics = mock(Graphics2D.class);
+
+    when(graphics.getFontRenderContext())
+      .thenReturn(new FontRenderContext(new AffineTransform(), true, true));
+    ArgumentCaptor<GlyphVector> glyphVectorArgumentCaptor = ArgumentCaptor.forClass(GlyphVector.class);
+    ArgumentCaptor<Float> yPointArgumentCaptor = ArgumentCaptor.forClass(Float.class);
+    doNothing().when(graphics).drawGlyphVector(glyphVectorArgumentCaptor.capture(), anyFloat(), yPointArgumentCaptor.capture());
+
+    List<String> text = List.of("a", "bc", "def");
+    TextRenderer.renderWithLinebreaks(
+      graphics,
+      text.stream().collect(joining(lineSeparator())),
+      Align.LEFT, Valign.TOP,
+      10.0, 20.0, 100.0, 200.0,
+      true);
+
+    verify(graphics, times(text.size())).drawGlyphVector(any(), eq(10f), anyFloat());
+
+    List<GlyphVector> vectors = glyphVectorArgumentCaptor.getAllValues();
+    List<Float> yPoints = yPointArgumentCaptor.getAllValues();
+
+    assertEquals(vectors.size(), text.size());
+    assertEquals(yPoints.size(), text.size());
+    for (int i = 0; i < text.size(); i++) {
+      assertEquals(vectors.get(i).getNumGlyphs(), i + 1);
+
+      if (i > 0) {
+        assertTrue(yPoints.get(i) > yPoints.get(i - 1));
+      }
+    }
   }
 
   @Test

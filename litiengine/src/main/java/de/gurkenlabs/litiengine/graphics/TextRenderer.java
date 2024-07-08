@@ -331,7 +331,7 @@ public final class TextRenderer {
         TextLayout nextLayout = measurer.nextLayout((float) width);
         lines.add(nextLayout);
         textHeight += nextLayout.getAscent() + nextLayout.getDescent();
-        if (measurer.getPosition() >= text.length()) {
+        if (measurer.getPosition() >= s.length()) {
           break;
         }
         textHeight += nextLayout.getLeading();
