@@ -15,9 +15,6 @@ import static org.mockito.Mockito.when;
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.util.Imaging;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.font.FontRenderContext;
@@ -25,6 +22,8 @@ import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.List;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 public class RenderEngineTests {
 
