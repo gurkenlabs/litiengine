@@ -194,7 +194,7 @@ class AbilityTests {
     assertEquals(ability, effect.getAbility());
     assertEquals(0, effect.getFollowUpEffects().size());
     assertFalse(effect.isActive(entity));
-    assertArrayEquals(new EffectTarget[]{EffectTarget.ENEMY}, effect.getEffectTargets());
+    assertArrayEquals(new EffectTarget[] {EffectTarget.ENEMY}, effect.getEffectTargets());
   }
 
   @AbilityInfo(
@@ -316,7 +316,7 @@ class AbilityTests {
 
     // assert
     assertEquals(entity, abilityLocation.getPivot().getEntity());
-    assertEquals(EntityPivotType.OFFSET, abilityLocation.getPivot().getType());
+    assertEquals(EntityPivotType.LOCATION, abilityLocation.getPivot().getType());
   }
 
   @Test
@@ -411,7 +411,7 @@ class AbilityTests {
     }
   }
 
-  @AbilityInfo(origin = EntityPivotType.OFFSET)
+  @AbilityInfo(origin = EntityPivotType.LOCATION)
   private static class TestOriginCustom extends Ability {
 
     protected TestOriginCustom(Creature executor) {
@@ -436,12 +436,10 @@ class AbilityTests {
   }
 
   /**
-   * Test getPotentialCollisionBox when the collision box of the entity is the zero rectangle and
-   * the impact of the of the ability is zero.
+   * Test getPotentialCollisionBox when the collision box of the entity is the zero rectangle and the impact of the of the ability is zero.
    *
    * <p>
-   * Expected: potentialImpactArea() is an ellipse with a center in the origin and a zero width and
-   * height.
+   * Expected: potentialImpactArea() is an ellipse with a center in the origin and a zero width and height.
    */
   @Test
   void testGetPotentialCollisionZeroBoxZeroImpact() {
@@ -456,12 +454,10 @@ class AbilityTests {
   }
 
   /**
-   * Test getPotentialCollisionBox when the collision box of the entity is non-zero and the impact
-   * of the of the ability is zero.
+   * Test getPotentialCollisionBox when the collision box of the entity is non-zero and the impact of the of the ability is zero.
    *
    * <p>
-   * Expected: potentialImpactArea() is an ellipse with a center corresponding to the collisionbox
-   * and a zero width and height.
+   * Expected: potentialImpactArea() is an ellipse with a center corresponding to the collisionbox and a zero width and height.
    */
   @Test
   void testGetPotentialCollisionBoxNonZeroBoxZeroImpact() {
@@ -477,12 +473,11 @@ class AbilityTests {
   }
 
   /**
-   * Test getPotentialCollisionBox when the collision box of the entity is the zero rectangle, and
-   * the impact of the of the ability is non-zero.
+   * Test getPotentialCollisionBox when the collision box of the entity is the zero rectangle, and the impact of the of the ability is non-zero.
    *
    * <p>
-   * Expected: potentialImpactArea() is an ellipse with a center shifted by half of the negative
-   * impact from the origin, and a width and height corresponding to the impact.
+   * Expected: potentialImpactArea() is an ellipse with a center shifted by half of the negative impact from the origin, and a width and height
+   * corresponding to the impact.
    */
   @Test
   void testGetPotentialCollisionBoxZeroBoxNonZeroImpact() {
@@ -497,12 +492,11 @@ class AbilityTests {
   }
 
   /**
-   * Test getPotentialCollisionBox when the collision box of the entity is non-zero, and the impact
-   * of the of the ability is non-zero.
+   * Test getPotentialCollisionBox when the collision box of the entity is non-zero, and the impact of the of the ability is non-zero.
    *
    * <p>
-   * Expected: potentialImpactArea() is an ellipse with a center corresponding to the collisionbox
-   * shifted by half of the negative impact, and a width and height corresponding to the impact.
+   * Expected: potentialImpactArea() is an ellipse with a center corresponding to the collisionbox shifted by half of the negative impact, and a width
+   * and height corresponding to the impact.
    */
   @Test
   void testGetPotentialCollisionBoxNonZeroBoxNonZeroImpact() {
@@ -531,8 +525,7 @@ class AbilityTests {
   }
 
   /**
-   * If the executor is alive and the ability has no current execution, it is possible to cast.
-   * Expected: canCast() is true.
+   * If the executor is alive and the ability has no current execution, it is possible to cast. Expected: canCast() is true.
    */
   @Test
   void testCanCastWhenNoExecution() {
@@ -549,8 +542,7 @@ class AbilityTests {
   }
 
   /**
-   * If the executor is alive and the execution has no execution ticks left, it is possible to cast.
-   * Expected: canCast() is true.
+   * If the executor is alive and the execution has no execution ticks left, it is possible to cast. Expected: canCast() is true.
    */
   @Test
   void testCanCastWhenNoExecutionticks() {

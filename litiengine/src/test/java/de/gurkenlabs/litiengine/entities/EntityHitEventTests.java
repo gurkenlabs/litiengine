@@ -31,7 +31,7 @@ class EntityHitEventTests {
       impact = 111,
       impactAngle = 99,
       multiTarget = true,
-      origin = EntityPivotType.OFFSET,
+      origin = EntityPivotType.LOCATION,
       range = 444,
       value = 999)
   private static class TestAbility extends Ability {
