@@ -3,9 +3,9 @@ package de.gurkenlabs.litiengine.entities;
 import static de.gurkenlabs.litiengine.entities.EntityPivotType.COLLISIONBOX_CENTER;
 
 import de.gurkenlabs.litiengine.Align;
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Valign;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 
 /**
  * The {@code EntityPivot} class represents a pivot point for an entity, which can be used to determine the entity's position relative to a specific
@@ -40,6 +40,19 @@ public class EntityPivot {
   }
 
   /**
+   * Constructs a new {@code EntityPivot} with a specified entity and alignment/vertical alignment, but without specific offsets. This constructor is
+   * a convenience method that defaults the offsets to 0, effectively placing the pivot point directly at the specified alignment within the entity.
+   * It delegates to the primary constructor with offset parameters set to 0.
+   *
+   * @param entity The entity to which this pivot is associated.
+   * @param align  The horizontal alignment for the pivot, determining its horizontal position relative to the entity.
+   * @param valign The vertical alignment for the pivot, determining its vertical position relative to the entity.
+   */
+  public EntityPivot(IEntity entity, Align align, Valign valign) {
+    this(entity, align, valign, 0, 0);
+  }
+
+  /**
    * Constructs a new {@code EntityPivot} with a specified entity and alignment/vertical alignment. This constructor is a convenience method that
    * allows for the creation of a pivot based on alignment parameters, which are then converted into offset values.
    *
@@ -47,20 +60,8 @@ public class EntityPivot {
    * @param align  The horizontal alignment for the pivot.
    * @param valign The vertical alignment for the pivot.
    */
-  public EntityPivot(IEntity entity, Align align, Valign valign) {
-    this(entity, align.getValue(entity.getWidth()), valign.getValue(entity.getHeight()));
-  }
-
-  /**
-   * Constructs a new {@code EntityPivot} with a specified entity and offsets. This constructor directly sets the pivot type to OFFSET and applies the
-   * given offsets, allowing for custom positioning relative to the entity's current location.
-   *
-   * @param entity  The entity to which this pivot is associated.
-   * @param offsetX The horizontal offset from the entity's position.
-   * @param offsetY The vertical offset from the entity's position.
-   */
-  public EntityPivot(IEntity entity, double offsetX, double offsetY) {
-    this(entity, EntityPivotType.OFFSET, offsetX, offsetY);
+  public EntityPivot(IEntity entity, Align align, Valign valign, double offsetX, double offsetY) {
+    this(entity, EntityPivotType.LOCATION, align.getValue(entity.getWidth()) + offsetX, valign.getValue(entity.getHeight()) + offsetY);
   }
 
   /**
@@ -107,18 +108,15 @@ public class EntityPivot {
    */
   public Point2D getPoint() {
     EntityPivotType pivot = getType();
-    switch (pivot) {
-      case COLLISIONBOX_CENTER -> {
-        Rectangle2D collisionBox = ((ICollisionEntity) getEntity()).getCollisionBox();
-        return new Point2D.Double(collisionBox.getCenterX() + getOffsetX(), collisionBox.getCenterY() + getOffsetY());
-      }
-      case DIMENSION_CENTER -> {
-        return new Point2D.Double(getEntity().getCenter().getX() + getOffsetX(), getEntity().getCenter().getY() + getOffsetY());
-      }
-      default -> {
-        return new Point2D.Double(getEntity().getX() + getOffsetX(), getEntity().getY() + getOffsetY());
-      }
-    }
+    return switch (pivot) {
+      case COLLISIONBOX_CENTER -> new Point2D.Double(((ICollisionEntity) getEntity()).getCollisionBox().getCenterX() + getOffsetX(),
+        ((ICollisionEntity) getEntity()).getCollisionBox().getCenterY() + getOffsetY());
+      case DIMENSION_CENTER -> new Point2D.Double(getEntity().getCenter().getX() + getOffsetX(), getEntity().getCenter().getY() + getOffsetY());
+      case SPREAD -> new Point2D.Double(getEntity().getX() + Game.random().nextDouble(getEntity().getWidth()) + getOffsetX(),
+        getEntity().getY() + Game.random().nextDouble(getEntity().getHeight()) + getOffsetY());
+
+      default -> new Point2D.Double(getEntity().getX() + getOffsetX(), getEntity().getY() + getOffsetY());
+    };
   }
 
   /**

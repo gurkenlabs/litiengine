@@ -22,7 +22,7 @@ class EntityPivotTests {
   }
 
   @Test
-  void getPoint_typeLOCATION_specific() {
+  void getPoint_typeLOCATION_noOffset() {
     // arrange
     Creature executor = mock(Creature.class);
     when(executor.getX()).thenReturn(1d);
@@ -37,28 +37,13 @@ class EntityPivotTests {
   }
 
   @Test
-  void getPoint_typeOFFSET_specific() {
-    // arrange
-    Creature executor = mock(Creature.class);
-    when(executor.getX()).thenReturn(-1d);
-    when(executor.getY()).thenReturn(-1d);
-
-    EntityPivot pivot = new EntityPivot(executor, EntityPivotType.OFFSET, 0d, 0d);
-
-    Point2D point11 = new Point2D.Double(-1, -1);
-
-    // act, assert
-    assertEquals(point11, pivot.getPoint());
-  }
-
-  @Test
-  void getPoint_typeOFFSET_withOffset() {
+  void getPoint_typeLOCATION_withOffset() {
     // arrange
     Creature executor = mock(Creature.class);
     when(executor.getX()).thenReturn(1d);
     when(executor.getY()).thenReturn(1d);
 
-    EntityPivot pivot = new EntityPivot(executor, EntityPivotType.OFFSET, 1d, 1d);
+    EntityPivot pivot = new EntityPivot(executor, EntityPivotType.LOCATION, 1d, 1d);
 
     Point2D offPoint = new Point2D.Double(2, 2);
 
