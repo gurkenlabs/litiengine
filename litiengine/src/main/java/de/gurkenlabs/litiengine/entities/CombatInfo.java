@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.entities;
 
+import de.gurkenlabs.litiengine.Align;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
@@ -23,6 +24,7 @@ import java.lang.annotation.Target;
 public @interface CombatInfo {
   /**
    * The initial hitpoints of the combat entity.
+   *  Defaults to {@link CombatEntity#DEFAULT_HITPOINTS}.
    *
    * @return the initial hitpoints
    */
@@ -30,6 +32,7 @@ public @interface CombatInfo {
 
   /**
    * The team number of the combat entity.
+   * Defaults to 0.
    *
    * @return the team number
    */
@@ -37,6 +40,7 @@ public @interface CombatInfo {
 
   /**
    * Indicates whether the combat entity is indestructible.
+   * Defaults to false.
    *
    * @return true if the entity is indestructible, false otherwise
    */

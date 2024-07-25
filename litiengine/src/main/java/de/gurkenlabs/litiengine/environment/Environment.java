@@ -304,7 +304,7 @@ public final class Environment implements IRenderable {
       return;
     }
     this.addEntity(entity);
-    assignRenderType(entity,entity.getRenderType());
+    assignRenderType(entity, entity.getRenderType());
     this.fireEntityEvent(l -> l.entityAdded(entity));
   }
 
@@ -2236,8 +2236,9 @@ public final class Environment implements IRenderable {
     long renderStart = System.nanoTime();
 
     // 1. Render map layers
-    if (this.getMap() != null) {
-      MapRenderer.render(g, this.getMap(), Game.world().camera().getViewport(), this, renderType);
+    IMap map = this.getMap();
+    if (map != null) {
+      MapRenderer.render(g, map, Game.world().camera().getViewport(), this, renderType);
     }
 
     // 2. Render renderables
@@ -2246,26 +2247,22 @@ public final class Environment implements IRenderable {
     }
 
     // 3. Render entities
-    Game.graphics().renderEntities(g, this.miscEntities.get(renderType).values(),
-      renderType == RenderType.NORMAL);
+    Game.graphics().renderEntities(g, this.miscEntities.get(renderType).values(), renderType == RenderType.NORMAL);
 
     // 4. fire event
     this.fireRenderEvent(g, renderType);
 
     if (Game.config().debug().trackRenderTimes()) {
-      final double renderTime = TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
+      double renderTime = TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
       Game.metrics().trackRenderTime(renderType.toString().toLowerCase(), renderTime,
-        new GameMetrics.RenderInfo("layers",
-          this.getMap().getRenderLayers().stream().filter(m -> m.getRenderType() == renderType)
-            .count()),
+        new GameMetrics.RenderInfo("layers", map.getRenderLayers().stream().filter(m -> m.getRenderType() == renderType).count()),
         new GameMetrics.RenderInfo("renderables", this.getRenderables(renderType).size()),
         new GameMetrics.RenderInfo("entities", this.miscEntities.get(renderType).size()));
     }
   }
 
   private void addAmbientLight() {
-    final Color ambientColor = this.getMap()
-      .getColorValue(MapProperty.AMBIENTCOLOR, AmbientLight.DEFAULT_COLOR);
+    final Color ambientColor = this.getMap().getColorValue(MapProperty.AMBIENTCOLOR, AmbientLight.DEFAULT_COLOR);
     this.ambientLight = new AmbientLight(this, ambientColor);
   }
 

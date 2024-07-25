@@ -141,42 +141,92 @@ import java.util.concurrent.ConcurrentHashMap;
     this.spawnedListeners.remove(listener);
   }
 
+  /**
+   * Gets the direction in which entities will be spawned by this instance.
+   *
+   * @return the spawn direction
+   */
   public Direction getDirection() {
     return direction;
   }
 
+  /**
+   * Sets the direction in which entities will be spawned by this instance.
+   *
+   * @param direction the new spawn direction
+   */
   public void setDirection(Direction direction) {
     this.direction = direction;
   }
 
+  /**
+   * Gets the spawn information for this instance.
+   *
+   * @return the spawn information
+   */
   public String getSpawnInfo() {
     return spawnInfo;
   }
 
+  /**
+   * Sets the spawn information for this instance.
+   *
+   * @param spawnInfo the new spawn information
+   */
   public void setSpawnInfo(String spawnInfo) {
     this.spawnInfo = spawnInfo;
   }
 
+  /**
+   * Gets the spawn pivot type for this instance.
+   *
+   * @return the spawn pivot type
+   */
   public EntityPivotType getSpawnPivotType() {
     return spawnPivotType;
   }
 
+  /**
+   * Sets the spawn pivot type for this instance.
+   *
+   * @param spawnPivotType the new spawn pivot type
+   */
   public void setSpawnPivotType(EntityPivotType spawnPivotType) {
     this.spawnPivotType = spawnPivotType;
   }
 
+  /**
+   * Gets the spawn offset on the X-axis for this instance.
+   *
+   * @return the spawn offset on the X-axis
+   */
   public double getSpawnOffsetX() {
     return spawnOffsetX;
   }
 
+  /**
+   * Sets the spawn offset on the X-axis for this instance.
+   *
+   * @param spawnOffsetX the new spawn offset on the X-axis
+   */
   public void setSpawnOffsetX(double spawnOffsetX) {
     this.spawnOffsetX = spawnOffsetX;
   }
 
+  /**
+   * Gets the spawn offset on the Y-axis for this instance.
+   *
+   * @return the spawn offset on the Y-axis
+   */
   public double getSpawnOffsetY() {
     return spawnOffsetY;
   }
 
+  /**
+   * Sets the spawn offset on the Y-axis for this instance.
+   *
+   * @param spawnOffsetY the new spawn offset on the Y-axis
+   */
   public void setSpawnOffsetY(double spawnOffsetY) {
     this.spawnOffsetY = spawnOffsetY;
   }
@@ -216,6 +266,12 @@ import java.util.concurrent.ConcurrentHashMap;
     return true;
   }
 
+  /**
+   * Gets the location of the entity based on the spawn pivot type.
+   *
+   * @param entity The entity for which to get the location.
+   * @return The location of the entity based on the spawn pivot type.
+   */
   private Point2D getEntityLocationByPivot(IEntity entity) {
     if (getSpawnPivotType() == null || getSpawnPivotType() == EntityPivotType.LOCATION) {
       return getLocation();
@@ -226,7 +282,16 @@ import java.util.concurrent.ConcurrentHashMap;
     return pivot.getPoint();
   }
 
-  @FunctionalInterface public interface EntitySpawnedListener extends EventListener {
+  /**
+   * Functional interface for listening to entity spawned events.
+   */
+  @FunctionalInterface
+  public interface EntitySpawnedListener extends EventListener {
+    /**
+     * Invoked when an entity is spawned.
+     *
+     * @param event The event that contains information about the spawned entity.
+     */
     void spawned(EntitySpawnedEvent event);
   }
 }

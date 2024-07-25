@@ -145,10 +145,8 @@ public class AmbientLight extends ColorLayer {
       }
 
       final Path2D shadowParallelogram = new Path2D.Double();
-      final Point2D shadowPoint1 =
-        GeometricUtilities.project(center, line.getP1(), longerDimension);
-      final Point2D shadowPoint2 =
-        GeometricUtilities.project(center, line.getP2(), longerDimension);
+      final Point2D shadowPoint1 = GeometricUtilities.project(center, line.getP1(), longerDimension);
+      final Point2D shadowPoint2 = GeometricUtilities.project(center, line.getP2(), longerDimension);
 
       // construct a shape from our points
       shadowParallelogram.moveTo(line.getP1().getX(), line.getP1().getY());
@@ -158,8 +156,7 @@ public class AmbientLight extends ColorLayer {
       shadowParallelogram.closePath();
 
       final Area shadowArea = new Area(shadowParallelogram);
-      if (center.getY() < shadow.getBoundingBox().getMaxY()
-        && !shadow.getBoundingBox().contains(center)) {
+      if (center.getY() < shadow.getBoundingBox().getMaxY() && !shadow.getBoundingBox().contains(center)) {
         shadowArea.add(boxInLight);
       }
       shadowArea.intersect(lightArea);

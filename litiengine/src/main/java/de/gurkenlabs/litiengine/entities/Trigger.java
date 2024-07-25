@@ -32,11 +32,11 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   private static final Logger log = Logger.getLogger(Trigger.class.getName());
 
   private final Collection<TriggerActivatedListener> activatedListeners =
-      ConcurrentHashMap.newKeySet();
+    ConcurrentHashMap.newKeySet();
   private final Collection<TriggerDeactivatedListener> deactivatedListeners =
-      ConcurrentHashMap.newKeySet();
+    ConcurrentHashMap.newKeySet();
   private final Collection<TriggerActivatingCondition> activatingConditions =
-      ConcurrentHashMap.newKeySet();
+    ConcurrentHashMap.newKeySet();
 
   private final Collection<IEntity> collisionActivated = ConcurrentHashMap.newKeySet();
 
@@ -62,10 +62,8 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   /**
    * Instantiates a new {@code Trigger} entity.
    *
-   * @param activation
-   *          The activation method for this trigger.
-   * @param message
-   *          The message that gets sent by this trigger upon activation.
+   * @param activation The activation method for this trigger.
+   * @param message    The message that gets sent by this trigger upon activation.
    */
   public Trigger(final TriggerActivation activation, final String message) {
     this(activation, null, message);
@@ -74,12 +72,9 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   /**
    * Instantiates a new {@code Trigger} entity.
    *
-   * @param activation
-   *          The activation method for this trigger.
-   * @param name
-   *          The name of this trigger.
-   * @param message
-   *          The message that gets sent by this trigger upon activation.
+   * @param activation The activation method for this trigger.
+   * @param name       The name of this trigger.
+   * @param message    The message that gets sent by this trigger upon activation.
    */
   public Trigger(final TriggerActivation activation, final String name, final String message) {
     this(activation, name, message, false);
@@ -88,15 +83,12 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   /**
    * Instantiates a new {@code Trigger} entity.
    *
-   * @param activation
-   *          The activation method for this trigger.
-   * @param message
-   *          The message that gets sent by this trigger upon activation.
-   * @param isOneTime
-   *          A flag, indicating whether this instance can only be triggered once.
+   * @param activation The activation method for this trigger.
+   * @param message    The message that gets sent by this trigger upon activation.
+   * @param isOneTime  A flag, indicating whether this instance can only be triggered once.
    */
   public Trigger(
-      final TriggerActivation activation, final String message, final boolean isOneTime) {
+    final TriggerActivation activation, final String message, final boolean isOneTime) {
     this.message = message;
     this.isOneTimeTrigger = isOneTime;
     this.activationType = activation;
@@ -107,20 +99,16 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   /**
    * Instantiates a new {@code Trigger} entity.
    *
-   * @param activation
-   *          The activation method for this trigger.
-   * @param name
-   *          The name of this trigger.
-   * @param message
-   *          The message that gets sent by this trigger upon activation.
-   * @param isOneTime
-   *          A flag, indicating whether this instance can only be triggered once.
+   * @param activation The activation method for this trigger.
+   * @param name       The name of this trigger.
+   * @param message    The message that gets sent by this trigger upon activation.
+   * @param isOneTime  A flag, indicating whether this instance can only be triggered once.
    */
   public Trigger(
-      final TriggerActivation activation,
-      final String name,
-      final String message,
-      final boolean isOneTime) {
+    final TriggerActivation activation,
+    final String name,
+    final String message,
+    final boolean isOneTime) {
     this(activation, message, isOneTime);
     this.setName(name);
   }
@@ -128,92 +116,173 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   /**
    * Initializes a new instance of the {@code Trigger} class.
    *
-   * @param activation
-   *          The activation method for this trigger.
-   * @param message
-   *          The message that gets sent by this trigger upon activation.
-   * @param isOneTime
-   *          A flag, indicating whether this instance can only be triggered once.
-   * @param cooldown
-   *          The cooldown that needs to be respected between two activation events.
+   * @param activation The activation method for this trigger.
+   * @param message    The message that gets sent by this trigger upon activation.
+   * @param isOneTime  A flag, indicating whether this instance can only be triggered once.
+   * @param cooldown   The cooldown that needs to be respected between two activation events.
    */
   public Trigger(
-      final TriggerActivation activation,
-      final String message,
-      final boolean isOneTime,
-      final int cooldown) {
+    final TriggerActivation activation,
+    final String message,
+    final boolean isOneTime,
+    final int cooldown) {
     this(activation, message, isOneTime);
     this.setCooldown(cooldown);
   }
 
+  /**
+   * Adds a {@link TriggerListener} to this trigger.
+   *
+   * @param listener the {@link TriggerListener} to add
+   */
   public void addTriggerListener(TriggerListener listener) {
     this.activatedListeners.add(listener);
     this.activatingConditions.add(listener);
     this.deactivatedListeners.add(listener);
   }
 
+  /**
+   * Removes a {@link TriggerListener} from this trigger.
+   *
+   * @param listener the {@link TriggerListener} to remove
+   */
   public void removeTriggerListener(TriggerListener listener) {
     this.activatedListeners.remove(listener);
     this.activatingConditions.remove(listener);
     this.deactivatedListeners.remove(listener);
   }
 
+  /**
+   * Adds a {@link TriggerActivatedListener} to this trigger.
+   *
+   * @param listener the {@link TriggerActivatedListener} to add
+   */
   public void addActivatedListener(TriggerActivatedListener listener) {
     this.activatedListeners.add(listener);
   }
 
+  /**
+   * Removes a {@link TriggerActivatedListener} from this trigger.
+   *
+   * @param listener the {@link TriggerActivatedListener} to remove
+   */
   public void removeActivatedListener(TriggerActivatedListener listener) {
     this.activatedListeners.remove(listener);
   }
 
+  /**
+   * Adds a {@link TriggerActivatingCondition} to this trigger.
+   *
+   * @param condition the {@link TriggerActivatingCondition} to add
+   */
   public void addActivatingCondition(TriggerActivatingCondition condition) {
     this.activatingConditions.add(condition);
   }
 
+  /**
+   * Removes a {@link TriggerActivatingCondition} from this trigger.
+   *
+   * @param condition the {@link TriggerActivatingCondition} to remove
+   */
   public void removeActivatingCondition(TriggerActivatingCondition condition) {
     this.activatingConditions.remove(condition);
   }
 
+  /**
+   * Adds a {@link TriggerDeactivatedListener} to this trigger.
+   *
+   * @param listener the {@link TriggerDeactivatedListener} to add
+   */
   public void addDeactivatedListener(TriggerDeactivatedListener listener) {
     this.deactivatedListeners.add(listener);
   }
 
+  /**
+   * Removes a {@link TriggerDeactivatedListener} from this trigger.
+   *
+   * @param listener the {@link TriggerDeactivatedListener} to remove
+   */
   public void removeDeactivatedListener(TriggerDeactivatedListener listener) {
     this.deactivatedListeners.remove(listener);
   }
 
+  /**
+   * Adds an activator by map ID.
+   *
+   * @param mapId the map ID of the activator to add
+   */
   public void addActivator(final int mapId) {
     this.activators.add(mapId);
   }
 
+  /**
+   * Adds an activator entity.
+   *
+   * @param activator the activator entity to add
+   */
   public void addActivator(final IEntity activator) {
     this.activators.add(activator.getMapId());
   }
 
+  /**
+   * Adds a target by map ID.
+   *
+   * @param mapId the map ID of the target to add
+   */
   public void addTarget(final int mapId) {
     this.targets.add(mapId);
   }
 
+  /**
+   * Adds a target entity.
+   *
+   * @param target the target entity to add
+   */
   public void addTarget(final IEntity target) {
     this.targets.add(target.getMapId());
   }
 
+  /**
+   * Gets the activation type of this trigger.
+   *
+   * @return the activation type
+   */
   public TriggerActivation getActivationType() {
     return this.activationType;
   }
 
+  /**
+   * Gets the list of activators.
+   *
+   * @return the list of activators
+   */
   public List<Integer> getActivators() {
     return this.activators;
   }
 
+  /**
+   * Gets the message sent by this trigger upon activation.
+   *
+   * @return the message
+   */
   public String getMessage() {
     return this.message;
   }
 
+  /**
+   * Gets the list of targets.
+   *
+   * @return the list of targets
+   */
   public List<Integer> getTargets() {
     return this.targets;
   }
 
+  /**
+   * Gets the cooldown time between activations.
+   *
+   * @return the cooldown time
+   */
   public int getCooldown() {
     return this.cooldown;
   }
@@ -221,23 +290,40 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   /**
    * Checks whether the specified entity can interact with this trigger.
    *
-   * @param entity
-   *          The entity.
+   * @param entity The entity.
    * @return True if the entity can interact with the trigger; otherwise false.
    */
   public boolean canTrigger(ICollisionEntity entity) {
     return entity.canCollideWith(this)
-        && GeometricUtilities.intersects(this.getCollisionBox(), entity.getCollisionBox());
+      && GeometricUtilities.intersects(this.getCollisionBox(), entity.getCollisionBox());
   }
 
+  /**
+   * Checks if this trigger can only be activated once.
+   *
+   * @return true if this is a one-time trigger, false otherwise.
+   */
   public boolean isOneTimeTrigger() {
     return this.isOneTimeTrigger;
   }
 
+  /**
+   * Checks if this trigger is currently activated.
+   *
+   * @return true if the trigger is activated, false otherwise.
+   */
   public boolean isActivated() {
     return this.isActivated;
   }
 
+  /**
+   * Interacts with this trigger using the specified sender entity. If the activation type is COLLISION or the sender is null, the interaction will
+   * not proceed. If the activators list is empty or contains the sender's map ID, the trigger will be activated. Otherwise, a log message will be
+   * generated indicating that the sender was not allowed to activate the trigger.
+   *
+   * @param sender the entity attempting to interact with the trigger
+   * @return true if the trigger was successfully activated, false otherwise
+   */
   public boolean interact(final IEntity sender) {
     if (this.activationType == TriggerActivation.COLLISION || sender == null) {
       return false;
@@ -247,13 +333,18 @@ public class Trigger extends CollisionEntity implements IUpdateable {
       return this.activate(sender, sender.getMapId());
     } else {
       log.log(
-          Level.FINE,
-          "[{1}] tried to activate trigger [{0}] but was not allowed so because it was not on the list of activators",
-          new Object[] {this, sender.getMapId()});
+        Level.FINE,
+        "[{1}] tried to activate trigger [{0}] but was not allowed so because it was not on the list of activators",
+        new Object[] {this, sender.getMapId()});
       return false;
     }
   }
 
+  /**
+   * Sets the message that gets sent by this trigger upon activation.
+   *
+   * @param message the message to set
+   */
   public void setMessage(final String message) {
     this.message = message;
   }
@@ -277,6 +368,11 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     super.setSize(width, height);
   }
 
+  /**
+   * Sets the cooldown time between activations.
+   *
+   * @param cooldown the cooldown time to set
+   */
   public void setCooldown(int cooldown) {
     this.cooldown = cooldown;
   }
@@ -284,8 +380,8 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   @Override
   public void update() {
     if (Game.world().environment() == null
-        || !this.isLoaded()
-        || this.activationType != TriggerActivation.COLLISION) {
+      || !this.isLoaded()
+      || this.activationType != TriggerActivation.COLLISION) {
       return;
     }
 
@@ -319,12 +415,19 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     }
   }
 
+  /**
+   * Activates the trigger with the specified activator entity and target ID.
+   *
+   * @param activator the entity that activates the trigger
+   * @param tar       the target ID
+   * @return true if the trigger was successfully activated, false otherwise
+   */
   private boolean activate(final IEntity activator, final int tar) {
     if (!isLoaded()
-        || isOneTimeTrigger() && isActivated()
-        || getActivationType() == TriggerActivation.COLLISION
-            && activator != null
-            && this.collisionActivated.contains(activator)) {
+      || isOneTimeTrigger() && isActivated()
+      || getActivationType() == TriggerActivation.COLLISION
+      && activator != null
+      && this.collisionActivated.contains(activator)) {
       return false;
     }
 
@@ -350,9 +453,9 @@ public class Trigger extends CollisionEntity implements IUpdateable {
       final IEntity entity = this.getEnvironment().get(target);
       if (entity == null) {
         log.log(
-            Level.WARNING,
-            "trigger [{0}] was activated, but the trigger target [{1}] could not be found on the environment",
-            new Object[] {this, target});
+          Level.WARNING,
+          "trigger [{0}] was activated, but the trigger target [{1}] could not be found on the environment",
+          new Object[] {this, target});
         continue;
       }
 
@@ -372,6 +475,12 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     return true;
   }
 
+  /**
+   * Checks if the trigger is allowed to be activated based on the provided trigger event.
+   *
+   * @param te the trigger event to check
+   * @return true if the trigger can be activated, false otherwise
+   */
   private boolean checkActivationPredicates(TriggerEvent te) {
     // check if the trigger is allowed to be activated
     for (TriggerActivatingCondition condition : this.activatingConditions) {
@@ -379,9 +488,9 @@ public class Trigger extends CollisionEntity implements IUpdateable {
       if (result != null && !result.isEmpty()) {
         te.getEntity().sendMessage(this, result);
         log.log(
-            Level.FINE,
-            "trigger [{0}] was not activated. Reason: [{1}])",
-            new Object[] {this, result});
+          Level.FINE,
+          "trigger [{0}] was not activated. Reason: [{1}])",
+          new Object[] {this, result});
         return false;
       }
     }
@@ -389,15 +498,17 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     return true;
   }
 
+  /**
+   * Retrieves a list of entities that are in collision with this entity's collision box.
+   *
+   * @return a list of entities that intersect with this trigger's collision box
+   */
   private List<IEntity> getEntitiesInCollisionBox() {
     final List<IEntity> collEntities = new CopyOnWriteArrayList<>();
     for (final ICollisionEntity coll : Game.physics().getCollisionEntities()) {
-      if (coll == this || !coll.canCollideWith(this)
-          || !this.activators.isEmpty() && !this.activators.contains(coll.getMapId())) {
-        continue;
-      }
-
-      if (coll.getCollisionBox().intersects(this.getCollisionBox())) {
+      if (coll != this && coll.canCollideWith(this) &&
+        (activators.isEmpty() || activators.contains(coll.getMapId())) &&
+        coll.getCollisionBox().intersects(getCollisionBox())) {
         collEntities.add(coll);
       }
     }
@@ -405,18 +516,17 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     return collEntities;
   }
 
+  /**
+   * Retrieves a list of target IDs for this trigger. If there are no local targets, it will use the optional target provided.
+   *
+   * @param optionalTarget an optional target ID to use if no local targets are available
+   * @return a list of target IDs
+   */
   private List<Integer> getTargets(int optionalTarget) {
-    // always take local targets if there are any
-    List<Integer> localTargets = this.getTargets();
-    if (localTargets.isEmpty()) {
-
-      // as a fall back send the message to the tar
-      localTargets = new ArrayList<>();
-      if (optionalTarget > 0) {
-        localTargets.add(optionalTarget);
-      }
+    List<Integer> localTargets = getTargets();
+    if (optionalTarget > 0) {
+      localTargets.add(optionalTarget);
     }
-
     return localTargets;
   }
 }
