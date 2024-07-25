@@ -1,5 +1,7 @@
 package de.gurkenlabs.litiengine.util;
 
+import static java.lang.Thread.sleep;
+
 import de.gurkenlabs.litiengine.ILaunchable;
 import java.util.Map;
 import java.util.Scanner;
@@ -21,7 +23,7 @@ public class CommandManager implements ILaunchable {
   public void bind(final String command, final Predicate<String[]> commandConsumer) {
     if (this.commandConsumers.containsKey(command)) {
       throw new IllegalArgumentException(
-          "Cannot bind command " + command + " because it is already bound.");
+        "Cannot bind command " + command + " because it is already bound.");
     }
 
     this.commandConsumers.put(command, commandConsumer);
@@ -56,15 +58,20 @@ public class CommandManager implements ILaunchable {
     this.commandListener.terminate();
   }
 
-  private class ConsoleCommandProcessor extends Thread implements ILaunchable {
+  private class ConsoleCommandProcessor {
+    private Thread virtualThread;
+
     ConsoleCommandProcessor() {
-      this.setDaemon(true);
+
     }
 
-    @Override
+    public void start() {
+      virtualThread = Thread.ofVirtual().start(this::run);
+    }
+
     public void run() {
       final Scanner scanner = new Scanner(System.in);
-      while (!interrupted()) {
+      while (!Thread.currentThread().isInterrupted()) {
         String s;
         s = scanner.nextLine();
 
@@ -73,16 +80,17 @@ public class CommandManager implements ILaunchable {
         try {
           sleep(10);
         } catch (InterruptedException e) {
-          interrupt();
+          Thread.currentThread().interrupt();
           break;
         }
       }
       scanner.close();
     }
 
-    @Override
     public void terminate() {
-      interrupt();
+      if (virtualThread != null) {
+        virtualThread.interrupt();
+      }
     }
   }
 }

@@ -1,6 +1,5 @@
 package de.gurkenlabs.litiengine.entities;
 
-import de.gurkenlabs.litiengine.Align;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;

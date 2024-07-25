@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.sound;
 
 import de.gurkenlabs.litiengine.resources.Resources;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import javax.sound.sampled.AudioFormat;
 
@@ -11,8 +12,7 @@ public class LoopedTrack implements Track, Iterator<Sound> {
   /**
    * Initializes a new {@code LoopedTrack} for the specified sound.
    *
-   * @param soundName
-   *          The name of the sound to be played by this track.
+   * @param soundName The name of the sound to be played by this track.
    */
   public LoopedTrack(String soundName) {
     this(Resources.sounds().get(soundName));
@@ -21,8 +21,7 @@ public class LoopedTrack implements Track, Iterator<Sound> {
   /**
    * Initializes a new {@code LoopedTrack} for the specified sound.
    *
-   * @param sound
-   *          The sound to be played by this track.
+   * @param sound The sound to be played by this track.
    */
   public LoopedTrack(Sound sound) {
     this.track = Objects.requireNonNull(sound);
@@ -47,13 +46,16 @@ public class LoopedTrack implements Track, Iterator<Sound> {
 
   @Override
   public Sound next() {
+    if (!hasNext()) {
+      throw new NoSuchElementException("No more elements in the looped track.");
+    }
     return this.track;
   }
 
   @Override
   public boolean equals(Object anObject) {
     return this == anObject
-        || anObject instanceof LoopedTrack lt && lt.track.equals(this.track);
+      || anObject instanceof LoopedTrack lt && lt.track.equals(this.track);
   }
 
   @Override

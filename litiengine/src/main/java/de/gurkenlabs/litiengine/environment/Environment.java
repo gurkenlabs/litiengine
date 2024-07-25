@@ -2236,9 +2236,8 @@ public final class Environment implements IRenderable {
     long renderStart = System.nanoTime();
 
     // 1. Render map layers
-    IMap map = this.getMap();
-    if (map != null) {
-      MapRenderer.render(g, map, Game.world().camera().getViewport(), this, renderType);
+    if (getMap() != null) {
+      MapRenderer.render(g, getMap(), Game.world().camera().getViewport(), this, renderType);
     }
 
     // 2. Render renderables
@@ -2252,10 +2251,10 @@ public final class Environment implements IRenderable {
     // 4. fire event
     this.fireRenderEvent(g, renderType);
 
-    if (Game.config().debug().trackRenderTimes()) {
+    if (Game.config().debug().trackRenderTimes() && getMap() != null) {
       double renderTime = TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
       Game.metrics().trackRenderTime(renderType.toString().toLowerCase(), renderTime,
-        new GameMetrics.RenderInfo("layers", map.getRenderLayers().stream().filter(m -> m.getRenderType() == renderType).count()),
+        new GameMetrics.RenderInfo("layers", getMap().getRenderLayers().stream().filter(l -> l.getRenderType() == renderType).count()),
         new GameMetrics.RenderInfo("renderables", this.getRenderables(renderType).size()),
         new GameMetrics.RenderInfo("entities", this.miscEntities.get(renderType).size()));
     }
