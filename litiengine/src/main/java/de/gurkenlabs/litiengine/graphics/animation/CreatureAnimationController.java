@@ -7,27 +7,27 @@ import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.graphics.CreatureAnimationState;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 /**
- * This {@link AnimationController} implementation provides animation rules that use naming conventions to provide
- * {@link Animation}s for {@link Creature} implementations.
+ * This {@link AnimationController} implementation provides animation rules that use naming conventions to provide {@link Animation}s for
+ * {@link Creature} implementations.
  *
  * <p>
- * The spritesheet images need to be named according to the following conventions in order to be automatically used by
- * this controller:
+ * The spritesheet images need to be named according to the following conventions in order to be automatically used by this controller:
  *
  * <ul>
  * <li>{@link #getSpritePrefix()}-idle-{DIRECTION}.{EXTENSION}
  * <li>{@link #getSpritePrefix()}-walk-{DIRECTION}.{EXTENSION}
  * </ul>
- *
+ * <p>
  * Where {DIRECTION} refers to a value of the {@link Direction} enum and {@link #getSpritePrefix()} refers to the
  * current sprite prefix of the entity. {EXTENSION} refers to a value of the
  * {@link de.gurkenlabs.litiengine.resources.ImageFormat} enum.
  *
- * @param <T>
- *          The type of the creature for which animations are managed by this controller.
+ * @param <T> The type of the creature for which animations are managed by this controller.
  * @see de.gurkenlabs.litiengine.entities.Creature
  * @see de.gurkenlabs.litiengine.Direction
  * @see de.gurkenlabs.litiengine.entities.IEntity#getName()
@@ -39,11 +39,9 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
   /**
    * Initializes a new instance of the {@code CreatureAnimationController} class.
    *
-   * @param creature
-   *          The creature related to this controller.
-   * @param useFlippedSpritesAsFallback
-   *          A flag indicating whether this controller should flip the provided spritesheet horizontally to provide a
-   *          fallback animation for left or right directions.
+   * @param creature                    The creature related to this controller.
+   * @param useFlippedSpritesAsFallback A flag indicating whether this controller should flip the provided spritesheet horizontally to provide a
+   *                                    fallback animation for left or right directions.
    * @see #getEntity()
    */
   public CreatureAnimationController(T creature, boolean useFlippedSpritesAsFallback) {
@@ -54,10 +52,8 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
   /**
    * Initializes a new instance of the {@code CreatureAnimationController} class.
    *
-   * @param creature
-   *          The creature related to this controller.
-   * @param defaultAnimation
-   *          The default animation for this controller.
+   * @param creature         The creature related to this controller.
+   * @param defaultAnimation The default animation for this controller.
    * @see #getEntity()
    * @see #getDefault()
    */
@@ -68,24 +64,16 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
   /**
    * Initializes a new instance of the {@code CreatureAnimationController} class.
    *
-   * @param creature
-   *          The creature related to this controller.
-   * @param useFlippedSpritesAsFallback
-   *          A flag indicating whether this controller should flip the provided spritesheet horizontally to provide a
-   *          fallback animation for left or right directions.
-   * @param defaultAnimation
-   *          The default animation for this controller.
-   * @param animations
-   *          Additional animations that are managed by this controller instance.
+   * @param creature                    The creature related to this controller.
+   * @param useFlippedSpritesAsFallback A flag indicating whether this controller should flip the provided spritesheet horizontally to provide a
+   *                                    fallback animation for left or right directions.
+   * @param defaultAnimation            The default animation for this controller.
+   * @param animations                  Additional animations that are managed by this controller instance.
    * @see #getEntity()
    * @see #getDefault()
    * @see #getAll()
    */
-  public CreatureAnimationController(
-      T creature,
-      boolean useFlippedSpritesAsFallback,
-      Animation defaultAnimation,
-      final Animation... animations) {
+  public CreatureAnimationController(T creature, boolean useFlippedSpritesAsFallback, Animation defaultAnimation, final Animation... animations) {
     super(creature, defaultAnimation, animations);
     this.init(useFlippedSpritesAsFallback);
   }
@@ -93,10 +81,8 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
   /**
    * Gets the sprite name for the specified creature and animation state.
    *
-   * @param creature
-   *          The creature to retrieve the sprite name for.
-   * @param state
-   *          The current animation state.
+   * @param creature The creature to retrieve the sprite name for.
+   * @param state    The current animation state.
    * @return A string representing the sprite name for the specified creature in the defined animation state.
    * @see Creature#getSpritesheetName()
    */
@@ -107,148 +93,110 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
   /**
    * Gets the sprite name for the specified creature, animation state.and direction.
    *
-   * @param creature
-   *          The creature to retrieve the sprite name for.
-   * @param state
-   *          The current animation state.
-   * @param direction
-   *          The direction in which the creature is facing.
+   * @param creature  The creature to retrieve the sprite name for.
+   * @param state     The current animation state.
+   * @param direction The direction in which the creature is facing.
    * @return A string representing the sprite name for the specified creature, animation state and facing direction.
    * @see Creature#getSpritesheetName()
    */
-  public static String getSpriteName(
-      Creature creature, CreatureAnimationState state, Direction direction) {
+  public static String getSpriteName(Creature creature, CreatureAnimationState state, Direction direction) {
     return getSpriteName(creature, state) + "-" + direction.name().toLowerCase();
   }
 
-  @Override
-  public boolean isAutoScaling() {
+  @Override public boolean isAutoScaling() {
     return this.getEntity().isScaling() || super.isAutoScaling();
   }
 
-  @Override
-  protected String getSpritePrefix() {
+  @Override protected String getSpritePrefix() {
     return this.getEntity().getSpritesheetName();
   }
 
   /**
-   * This method evaluates the current animation name that depends on certain properties of the {@link #getEntity()}.
-   * Overwriting this method allows to specify more sophisticated animations.
+   * This method evaluates the current animation name that depends on certain properties of the {@link #getEntity()}. Overwriting this method allows
+   * to specify more sophisticated animations.
    *
    * @return The name of the current animation that should be played
    */
   protected String getCurrentAnimationName() {
-    if (this.getEntity().isDead()) {
-      return this.getDeathAnimationName();
+    Creature entity = getEntity();
+    Direction direction = entity.getFacingDirection();
+
+    if (getEntity().isDead()) {
+      String deadName = getDeadSpriteName(direction);
+      return hasAnimation(deadName) ? deadName : chooseRandomDeathAnimation();
+    } else if (entity.isIdle()) {
+      String idleName = getIdleSpriteName(direction);
+      return hasAnimation(idleName) ? idleName : getWalkSpriteName(direction);
+    } else {
+      String walkName = getWalkSpriteName(direction);
+      return hasAnimation(walkName) ? walkName : getIdleSpriteName(direction);
     }
-
-    if (this.getEntity().isIdle()) {
-      String idleName = this.getIdleSpriteName(this.getEntity().getFacingDirection());
-      if (this.hasAnimation(idleName)) {
-        return idleName;
-      }
-
-      return this.getWalkSpriteName(this.getEntity().getFacingDirection());
-    }
-
-    String walkName = this.getWalkSpriteName(this.getEntity().getFacingDirection());
-    if (this.hasAnimation(walkName)) {
-      return walkName;
-    }
-
-    return this.getIdleSpriteName(this.getEntity().getFacingDirection());
   }
 
-  private String getDeathAnimationName() {
-    if (this.customDeathAnimations.length > 0) {
-      if (this.randomDeathSprite != null) {
-        return this.randomDeathSprite;
-      }
-
-      String randomDeathAnim = Game.random().choose(this.customDeathAnimations);
-      if (randomDeathAnim != null && !randomDeathAnim.isEmpty()) {
-        String randomDeathAnmimation = this.getSpritePrefix() + "-" + randomDeathAnim;
-        if (this.hasAnimation(randomDeathAnmimation)) {
-          this.randomDeathSprite = randomDeathAnmimation;
-          return this.randomDeathSprite;
-        }
-      }
+  /**
+   * Chooses a random death animation from the available custom death animations.
+   *
+   * @return The name of the chosen random death animation, or null if no custom death animations are available.
+   */
+  private String chooseRandomDeathAnimation() {
+    if (customDeathAnimations.length == 0) {
+      return null;
     }
 
-    String deadName = this.getSpriteName(CreatureAnimationState.DEAD);
-    if (this.hasAnimation(deadName)) {
-      return deadName;
+    String randomDeathAnimation = Game.random().choose(customDeathAnimations);
+    String prefixedDeathAnimation = getSpritePrefix() + "-" + randomDeathAnimation;
+    if (randomDeathSprite == null && randomDeathAnimation != null && !randomDeathAnimation.isEmpty() && hasAnimation(prefixedDeathAnimation)) {
+      this.randomDeathSprite = prefixedDeathAnimation;
     }
-
-    return null;
+    return randomDeathSprite;
   }
+
+  /**
+   * Initializes the available animations for the creature. This method sets up walking, idle, and dead animations for all directions.
+   */
 
   private void initializeAvailableAnimations() {
-    for (Direction dir : Direction.values()) {
-      // initialize walking animations
-      Spritesheet walkSprite =
-          Resources.spritesheets().get(this.getSpriteName(CreatureAnimationState.WALK, dir));
-      if (walkSprite != null) {
-        this.add(new Animation(walkSprite, true));
+    for (CreatureAnimationState state : CreatureAnimationState.values()) {
+      initializeBaseAnimation(state, null);
+      for (Direction dir : Direction.values()) {
+        initializeBaseAnimation(state, dir);
       }
-
-      // initialize idle animations
-      Spritesheet idleSprite =
-          Resources.spritesheets().get(this.getSpriteName(CreatureAnimationState.IDLE, dir));
-      if (idleSprite != null) {
-        this.add(new Animation(idleSprite, true));
-      }
-    }
-
-    Spritesheet deadSprite =
-        Resources.spritesheets().get(this.getSpriteName(CreatureAnimationState.DEAD));
-    if (deadSprite != null) {
-      this.add(new Animation(deadSprite, true));
-    }
-
-    Spritesheet baseIdle =
-        Resources.spritesheets().get(this.getSpriteName(CreatureAnimationState.IDLE));
-    if (baseIdle != null) {
-      this.add(new Animation(baseIdle, true));
-    }
-
-    Spritesheet baseWalk =
-        Resources.spritesheets().get(this.getSpriteName(CreatureAnimationState.WALK));
-    if (baseWalk != null) {
-      this.add(new Animation(baseWalk, true));
     }
   }
 
+  private void initializeBaseAnimation(CreatureAnimationState state, Direction dir) {
+    Spritesheet sprite = Resources.spritesheets().get(dir == null ? getSpriteName(state) : getSpriteName(state, dir));
+    if (sprite != null) {
+      add(new Animation(sprite, true));
+    }
+  }
+
+  /**
+   * Initializes flipped animations for the creature. This method creates a map of animations for the left and right directions, and if an animation
+   * is missing for one direction, it uses the flipped version of the animation from the opposite direction.
+   */
   private void initializeFlippedAnimations() {
-    String leftIdle = this.getSpriteName(CreatureAnimationState.IDLE, Direction.LEFT);
-    String leftWalk = this.getSpriteName(CreatureAnimationState.WALK, Direction.LEFT);
-    Optional<Animation> leftIdleAnimation =
-        this.getAll().stream().filter(x -> x.getName().equals(leftIdle)).findFirst();
-    Optional<Animation> leftWalkAnimation =
-        this.getAll().stream().filter(x -> x.getName().equals(leftWalk)).findFirst();
+    Map<String, Optional<Animation>> animations = new HashMap<>();
 
-    String rightIdle = this.getSpriteName(CreatureAnimationState.IDLE, Direction.RIGHT);
-    String rightWalk = this.getSpriteName(CreatureAnimationState.WALK, Direction.RIGHT);
-    Optional<Animation> rightIdleAnimation =
-        this.getAll().stream().filter(x -> x.getName().equals(rightIdle)).findFirst();
-    Optional<Animation> rightWalkAnimation =
-        this.getAll().stream().filter(x -> x.getName().equals(rightWalk)).findFirst();
-
-    if (!leftIdleAnimation.isPresent() && rightIdleAnimation.isPresent()) {
-      this.add(flipAnimation(rightIdleAnimation.get(), leftIdle));
+    for (Direction direction : new Direction[] {Direction.LEFT, Direction.RIGHT}) {
+      for (CreatureAnimationState state : CreatureAnimationState.values()) {
+        String spriteName = getSpriteName(state, direction);
+        animations.put(spriteName, getAll().stream().filter(x -> x.getName().equals(spriteName)).findFirst());
+      }
     }
 
-    if (!leftWalkAnimation.isPresent() && rightWalkAnimation.isPresent()) {
-      this.add(flipAnimation(rightWalkAnimation.get(), leftWalk));
-    }
+    animations.forEach((spriteName, animation) -> {
+      String oppositeSpriteName = spriteName.endsWith("left") ? spriteName.replace("left", "right") : spriteName.replace("right", "left");
+      Optional<Animation> oppositeAnimation = animations.get(oppositeSpriteName);
 
-    if (!rightIdleAnimation.isPresent() && leftIdleAnimation.isPresent()) {
-      this.add(flipAnimation(leftIdleAnimation.get(), rightIdle));
-    }
+      if (animation.isEmpty() && oppositeAnimation.isPresent()) {
+        add(flippedAnimation(oppositeAnimation.get(), spriteName, false));
+      }
+    });
+  }
 
-    if (!rightWalkAnimation.isPresent() && leftWalkAnimation.isPresent()) {
-      this.add(flipAnimation(leftWalkAnimation.get(), rightWalk));
-    }
+  private String getDeadSpriteName(Direction dir) {
+    return this.getSpriteNameWithDirection(CreatureAnimationState.DEAD, dir);
   }
 
   private String getIdleSpriteName(Direction dir) {
@@ -309,10 +257,10 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
     this.initializeAvailableAnimations();
 
     if (useFlippedSpritesAsFallback) {
-      this.initializeFlippedAnimations();
+      initializeFlippedAnimations();
     }
 
-    this.addRule(e -> true, e -> this.getCurrentAnimationName());
+    addRule(e -> true, e -> getCurrentAnimationName());
 
     AnimationInfo info = this.getEntity().getClass().getAnnotation(AnimationInfo.class);
     if (info != null) {

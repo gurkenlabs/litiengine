@@ -493,6 +493,8 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
       listener.removed(this, this.getEnvironment());
     }
 
+    Game.tweens().remove(this);
+
     // set to null after informing the listeners so they can still access the environment instance
     this.environment = null;
   }

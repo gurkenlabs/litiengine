@@ -41,8 +41,7 @@ public class AnimationController implements IAnimationController {
   /**
    * Initializes a new instance of the {@code AnimationController} class with the specified default animation.
    *
-   * @param defaultAnimation
-   *          The default animation for this controller.
+   * @param defaultAnimation The default animation for this controller.
    * @see #getDefault()
    */
   public AnimationController(final Animation defaultAnimation) {
@@ -53,10 +52,8 @@ public class AnimationController implements IAnimationController {
   /**
    * Initializes a new instance of the {@code AnimationController} class with the specified default animation.
    *
-   * @param defaultAnimation
-   *          The default animation for this controller.
-   * @param animations
-   *          Additional animations that are managed by this controller instance.
+   * @param defaultAnimation The default animation for this controller.
+   * @param animations       Additional animations that are managed by this controller instance.
    * @see #getDefault()
    * @see #getAll()
    */
@@ -75,8 +72,7 @@ public class AnimationController implements IAnimationController {
   /**
    * Initializes a new instance of the {@code AnimationController} class with the specified default animation.
    *
-   * @param sprite
-   *          The sprite sheet used by the default animation of this controller.
+   * @param sprite The sprite sheet used by the default animation of this controller.
    */
   public AnimationController(final Spritesheet sprite) {
     this(sprite, true);
@@ -85,30 +81,31 @@ public class AnimationController implements IAnimationController {
   /**
    * Initializes a new instance of the {@code AnimationController} class with the specified default animation.
    *
-   * @param sprite
-   *          The sprite sheet used by the default animation of this controller.
-   * @param loop
-   *          A flag indicating whether the default animation should be looped or only played once.
+   * @param sprite The sprite sheet used by the default animation of this controller.
+   * @param loop   A flag indicating whether the default animation should be looped or only played once.
    */
   public AnimationController(final Spritesheet sprite, final boolean loop) {
     this(new Animation(sprite, loop, Resources.spritesheets().getCustomKeyFrameDurations(sprite)));
   }
 
-  public static Animation flipAnimation(Animation anim, String newSpriteName) {
-    final BufferedImage flippedImage = Imaging.flipSpritesHorizontally(anim.getSpritesheet());
+  /**
+   * Creates a new animation with the sprites flipped either vertically or horizontally.
+   *
+   * @param anim          The original animation to be flipped.
+   * @param newSpriteName The name for the new flipped spritesheet.
+   * @param vertical      A boolean flag indicating whether to flip the sprites vertically. If false, the sprites will be flipped horizontally.
+   * @return A new Animation object with the flipped sprites.
+   */
+  public static Animation flippedAnimation(Animation anim, String newSpriteName, boolean vertical) {
+    final BufferedImage flippedImage =
+      vertical ? Imaging.flipSpritesVertically(anim.getSpritesheet()) : Imaging.flipSpritesHorizontally(anim.getSpritesheet());
     Spritesheet flippedSpritesheet =
-        Resources.spritesheets()
-            .load(
-                flippedImage,
-                newSpriteName,
-                anim.getSpritesheet().getSpriteWidth(),
-                anim.getSpritesheet().getSpriteHeight());
+      Resources.spritesheets().load(flippedImage, newSpriteName, anim.getSpritesheet().getSpriteWidth(), anim.getSpritesheet().getSpriteHeight());
     return new Animation(flippedSpritesheet, anim.isLooping(), anim.getKeyFrameDurations());
   }
 
-  @Override
-  public void add(final Animation animation) {
-    if (animation == null) {
+  @Override public void add(final Animation animation) {
+    if (animation == null || hasAnimation(animation.getName())) {
       return;
     }
 
@@ -120,8 +117,7 @@ public class AnimationController implements IAnimationController {
     this.animations.put(animation.getName(), animation);
   }
 
-  @Override
-  public void add(final ImageEffect effect) {
+  @Override public void add(final ImageEffect effect) {
     if (this.getImageEffects().size() >= MAX_IMAGE_EFFECTS) {
       return;
     }
@@ -130,8 +126,7 @@ public class AnimationController implements IAnimationController {
     Collections.sort(this.getImageEffects());
   }
 
-  @Override
-  public void addListener(final AnimationListener listener) {
+  @Override public void addListener(final AnimationListener listener) {
     this.listeners.add(listener);
   }
 
@@ -144,8 +139,7 @@ public class AnimationController implements IAnimationController {
     Game.loop().attach(this);
   }
 
-  @Override
-  public void clear() {
+  @Override public void clear() {
     this.animations.clear();
   }
 
@@ -158,8 +152,7 @@ public class AnimationController implements IAnimationController {
     Game.loop().detach(this);
   }
 
-  @Override
-  public Animation get(final String animationName) {
+  @Override public Animation get(final String animationName) {
     if (animationName == null || animationName.isEmpty()) {
       return null;
     }
@@ -167,31 +160,25 @@ public class AnimationController implements IAnimationController {
     return this.animations.getOrDefault(animationName, null);
   }
 
-  @Override
-  public AffineTransform getAffineTransform() {
+  @Override public AffineTransform getAffineTransform() {
     return this.affineTransform;
   }
 
-  @Override
-  public Collection<Animation> getAll() {
+  @Override public Collection<Animation> getAll() {
     return this.animations.values();
   }
 
-  @Override
-  public Animation getCurrent() {
+  @Override public Animation getCurrent() {
     return this.currentAnimation;
   }
 
-  @Override
-  public BufferedImage getCurrentImage() {
+  @Override public BufferedImage getCurrentImage() {
     if (!this.isEnabled()) {
       return null;
     }
 
     final Animation current = this.getCurrent();
-    if (current == null
-        || current.getSpritesheet() == null
-        || current.getCurrentKeyFrame() == null) {
+    if (current == null || current.getSpritesheet() == null || current.getCurrentKeyFrame() == null) {
       return null;
     }
 
@@ -201,8 +188,7 @@ public class AnimationController implements IAnimationController {
       return opt.get();
     }
 
-    BufferedImage sprite =
-        current.getSpritesheet().getSprite(current.getCurrentKeyFrame().getSpriteIndex());
+    BufferedImage sprite = current.getSpritesheet().getSprite(current.getCurrentKeyFrame().getSpriteIndex());
     if (sprite == null) {
       return null;
     }
@@ -215,8 +201,7 @@ public class AnimationController implements IAnimationController {
     return sprite;
   }
 
-  @Override
-  public BufferedImage getCurrentImage(final int width, final int height) {
+  @Override public BufferedImage getCurrentImage(final int width, final int height) {
     if (this.getCurrentImage() == null) {
       return null;
     }
@@ -230,8 +215,7 @@ public class AnimationController implements IAnimationController {
     return Imaging.scale(this.getCurrentImage(), width, height);
   }
 
-  @Override
-  public Animation getDefault() {
+  @Override public Animation getDefault() {
     if (this.defaultAnimation != null) {
       return this.defaultAnimation;
     }
@@ -243,14 +227,12 @@ public class AnimationController implements IAnimationController {
     return this.getAll().stream().findFirst().orElse(null);
   }
 
-  @Override
-  public List<ImageEffect> getImageEffects() {
+  @Override public List<ImageEffect> getImageEffects() {
     this.removeFinishedImageEffects();
     return this.imageEffects;
   }
 
-  @Override
-  public boolean hasAnimation(final String animationName) {
+  @Override public boolean hasAnimation(final String animationName) {
     if (animationName == null || animationName.isEmpty()) {
       return false;
     }
@@ -258,20 +240,15 @@ public class AnimationController implements IAnimationController {
     return this.animations.containsKey(animationName);
   }
 
-  @Override
-  public boolean isEnabled() {
+  @Override public boolean isEnabled() {
     return this.enabled;
   }
 
-  @Override
-  public boolean isPlaying(final String animationName) {
-    return this.getCurrent() != null
-        && this.getCurrent().getName() != null
-        && this.getCurrent().getName().equalsIgnoreCase(animationName);
+  @Override public boolean isPlaying(final String animationName) {
+    return this.getCurrent() != null && this.getCurrent().getName() != null && this.getCurrent().getName().equalsIgnoreCase(animationName);
   }
 
-  @Override
-  public void play(final String animationName) {
+  @Override public void play(final String animationName) {
     // if we have no animation with the name or it is already playing, do nothing
     if (this.isPlaying(animationName) || !this.hasAnimation(animationName)) {
       return;
@@ -295,8 +272,7 @@ public class AnimationController implements IAnimationController {
     }
   }
 
-  @Override
-  public void remove(final Animation animation) {
+  @Override public void remove(final Animation animation) {
     if (animation == null) {
       return;
     }
@@ -311,8 +287,7 @@ public class AnimationController implements IAnimationController {
     }
   }
 
-  @Override
-  public void remove(final ImageEffect effect) {
+  @Override public void remove(final ImageEffect effect) {
     if (effect == null) {
       return;
     }
@@ -320,18 +295,15 @@ public class AnimationController implements IAnimationController {
     this.imageEffects.remove(effect);
   }
 
-  @Override
-  public void removeListener(final AnimationListener listener) {
+  @Override public void removeListener(final AnimationListener listener) {
     this.listeners.remove(listener);
   }
 
-  @Override
-  public void setAffineTransform(final AffineTransform affineTransform) {
+  @Override public void setAffineTransform(final AffineTransform affineTransform) {
     this.affineTransform = affineTransform;
   }
 
-  @Override
-  public void setDefault(final Animation defaultAnimation) {
+  @Override public void setDefault(final Animation defaultAnimation) {
     if (this.defaultAnimation != null) {
       this.animations.remove(this.defaultAnimation.getName());
       if (this.currentAnimation != null && this.currentAnimation.equals(this.defaultAnimation)) {
@@ -345,13 +317,11 @@ public class AnimationController implements IAnimationController {
     }
   }
 
-  @Override
-  public void setEnabled(final boolean enabled) {
+  @Override public void setEnabled(final boolean enabled) {
     this.enabled = enabled;
   }
 
-  @Override
-  public void update() {
+  @Override public void update() {
     for (final Animation animation : this.getAll()) {
       animation.update();
     }
@@ -377,15 +347,13 @@ public class AnimationController implements IAnimationController {
   }
 
   /**
-   * Build a unique cache key for the current frame. The spritesheet's {@code hashCode}, the current keyframe's sprite
-   * index, as well as all applied {@code ImageEffect}s' names, are considered when determining the current cache key.
+   * Build a unique cache key for the current frame. The spritesheet's {@code hashCode}, the current keyframe's sprite index, as well as all applied
+   * {@code ImageEffect}s' names, are considered when determining the current cache key.
    *
    * @return the unique cache key for the current key frame
    */
   protected String buildCurrentCacheKey() {
-    if (this.getCurrent() == null
-        || this.getCurrent().getCurrentKeyFrame() == null
-        || this.getCurrent().getSpritesheet() == null) {
+    if (this.getCurrent() == null || this.getCurrent().getCurrentKeyFrame() == null || this.getCurrent().getSpritesheet() == null) {
       return null;
     }
     final StringBuilder cacheKey = new StringBuilder();
