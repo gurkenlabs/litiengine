@@ -41,7 +41,7 @@ jobs:
           java-version: 21
 
       - name: Gradle Setup
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
 
       - name: Increment version
         if: inputs.incrementVersion != 'none' && inputs.incrementVersion != ''
@@ -112,7 +112,7 @@ jobs:
           java-version: 21
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
 
       - name: Package
         run: ./gradlew jpackage -Prelease=true
