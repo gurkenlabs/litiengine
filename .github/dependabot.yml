@@ -13,4 +13,5 @@ updates:
           interval: "weekly"
       rebase-strategy: "disabled"
       reviewers:
-          - "gurkenlabs"
+          - "nightm4re94"
+          - "steffen-wilke"
