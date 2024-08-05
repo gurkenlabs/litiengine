@@ -3,7 +3,6 @@ plugins {
 
   alias libs.plugins.spotless
   alias libs.plugins.versions
-  alias libs.plugins.dependencyCheck
   alias libs.plugins.grgit
   alias libs.plugins.nexusPublish
   alias libs.plugins.sonarQube
