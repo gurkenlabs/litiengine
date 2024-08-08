@@ -19,13 +19,27 @@ public class AbilityAttributes {
    *
    * @param info The information of the ability
    */
-  AbilityAttributes(final AbilityInfo info) {
-    this.cooldown = new Attribute<>(info.cooldown());
-    this.range = new Attribute<>(info.range());
-    this.impact = new Attribute<>(info.impact());
-    this.duration = new Attribute<>(info.duration());
-    this.value = new Attribute<>(info.value());
-    this.impactAngle = new Attribute<>(info.impactAngle());
+  public AbilityAttributes(final AbilityInfo info) {
+    this(info.cooldown(), info.duration(), info.range(), info.impact(), info.impactAngle(), info.value());
+  }
+
+  /**
+   * Initializes a new instance of the {@code AbilityAttributes} class with the specified attribute values.
+   *
+   * @param cooldown    The cooldown value of the ability
+   * @param duration    The duration value of the ability
+   * @param range       The range value of the ability
+   * @param impact      The impact value of the ability
+   * @param impactAngle The impact angle value of the ability
+   * @param value       The value of the ability
+   */
+  public AbilityAttributes(int cooldown, int duration, int range, int impact, int impactAngle, int value) {
+    this.cooldown = new Attribute<>(cooldown);
+    this.duration = new Attribute<>(duration);
+    this.range = new Attribute<>(range);
+    this.impact = new Attribute<>(impact);
+    this.impactAngle = new Attribute<>(impactAngle);
+    this.value = new Attribute<>(value);
   }
 
   /**
