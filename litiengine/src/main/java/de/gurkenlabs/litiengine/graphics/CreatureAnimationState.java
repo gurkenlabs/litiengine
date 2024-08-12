@@ -8,11 +8,11 @@ public enum CreatureAnimationState {
   private final String spriteString;
 
   private CreatureAnimationState() {
-    this.spriteString = this.name().toLowerCase();
+    this.spriteString = name().toLowerCase();
   }
 
   public String spriteString() {
-    return this.spriteString;
+    return spriteString;
   }
 
   public CreatureAnimationState getOpposite() {

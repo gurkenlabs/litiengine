@@ -103,8 +103,6 @@ public class AttributeModifier<T extends Number> implements Comparable<Attribute
       case SUBTRACT -> ensureType(modvalue.doubleValue() - getModifyValue(), modvalue);
       case MULTIPLY -> ensureType(modvalue.doubleValue() * getModifyValue(), modvalue);
       case DIVIDE -> ensureType(modvalue.doubleValue() / getModifyValue(), modvalue);
-      case ADDPERCENT -> ensureType(modvalue.doubleValue() + modvalue.doubleValue() / 100 * getModifyValue(), modvalue);
-      case SUBTRACTPERCENT -> ensureType(modvalue.doubleValue() - modvalue.doubleValue() / 100 * getModifyValue(), modvalue);
       case SET -> ensureType(getModifyValue(), modvalue);
       default -> modvalue;
     };

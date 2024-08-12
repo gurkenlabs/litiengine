@@ -196,11 +196,11 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
   }
 
   private String getDeadSpriteName(Direction dir) {
-    return this.getSpriteNameWithDirection(CreatureAnimationState.DEAD, dir);
+    return getSpriteNameWithDirection(CreatureAnimationState.DEAD, dir);
   }
 
   private String getIdleSpriteName(Direction dir) {
-    return this.getSpriteNameWithDirection(CreatureAnimationState.IDLE, dir);
+    return getSpriteNameWithDirection(CreatureAnimationState.IDLE, dir);
   }
 
   private String getWalkSpriteName(Direction dir) {
@@ -208,8 +208,8 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
   }
 
   private String getSpriteNameWithDirection(CreatureAnimationState state, Direction dir) {
-    String name = this.getSpriteName(state, dir);
-    if (this.hasAnimation(name)) {
+    String name = getSpriteName(state, dir);
+    if (hasAnimation(name)) {
       return name;
     }
 
@@ -217,32 +217,33 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
   }
 
   private String getFallbackSpriteName(CreatureAnimationState state, Direction dir) {
-    String fallbackStateName = this.getSpriteName(state.getOpposite(), dir);
-    if (this.hasAnimation(fallbackStateName)) {
-      return fallbackStateName;
+    //    Try the nondirectional sprite as fallback if there isn't an animation for the specified state and direction
+    String animName = getSpriteName(state);
+    if (hasAnimation(animName)) {
+      return animName;
     }
-
-    String baseName = this.getSpriteName(state);
-    if (this.hasAnimation(baseName)) {
-      return baseName;
+    //   Try the opposite CreatureAnimationState as fallback if there isn't an animation for the specified state and direction
+    animName = getSpriteName(state.getOpposite(), dir);
+    if (hasAnimation(animName)) {
+      return animName;
     }
 
     // search for any animation for the specified state with dir information
     for (Direction d : Direction.values()) {
-      final String name = this.getSpriteName(state, d);
-      if (this.hasAnimation(name)) {
-        return name;
+      getSpriteName(state, d);
+      if (hasAnimation(animName)) {
+        return animName;
       }
     }
 
     for (Direction d : Direction.values()) {
-      final String name = this.getSpriteName(state.getOpposite(), d);
-      if (this.hasAnimation(name)) {
-        return name;
+      animName = getSpriteName(state.getOpposite(), d);
+      if (hasAnimation(animName)) {
+        return animName;
       }
     }
 
-    return this.getDefault() != null ? this.getDefault().getName() : null;
+    return getDefault() != null ? getDefault().getName() : null;
   }
 
   private String getSpriteName(CreatureAnimationState state) {
