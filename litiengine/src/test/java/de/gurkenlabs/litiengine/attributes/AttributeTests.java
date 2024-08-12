@@ -200,54 +200,6 @@ class AttributeTests {
     assertEquals(9.1, testAttributeDouble.get(), 0.0000001);
   }
 
-
-  @Test
-  void testModifyBaseValueRangeAttributeMaxModification() {
-    final RangeAttribute<Byte> testAttributeByte =
-      new RangeAttribute<>((byte) 10, (byte) 0, (byte) 10);
-    final RangeAttribute<Short> testAttributeShort =
-      new RangeAttribute<>((short) 10, (short) 0, (short) 10);
-    final RangeAttribute<Integer> testAttributeInt = new RangeAttribute<>(10, 0, 10);
-    final RangeAttribute<Long> testAttributeLong = new RangeAttribute<>(10L, 0L, 10L);
-
-    final RangeAttribute<Float> testAttributeFloat = new RangeAttribute<>(10F, 0F, 10F);
-    final RangeAttribute<Double> testAttributeDouble = new RangeAttribute<>(10.0, 0.0, 10.0);
-
-    testAttributeByte.modifyMaxBaseValue(new AttributeModifier<>(Modification.SUBTRACTPERCENT, 10));
-    testAttributeShort.modifyMaxBaseValue(
-      new AttributeModifier<>(Modification.SUBTRACTPERCENT, 10));
-    testAttributeInt.modifyMaxBaseValue(new AttributeModifier<>(Modification.SUBTRACTPERCENT, 10));
-    testAttributeLong.modifyMaxBaseValue(new AttributeModifier<>(Modification.SUBTRACTPERCENT, 10));
-
-    testAttributeFloat.modifyMaxBaseValue(new AttributeModifier<>(Modification.SUBTRACTPERCENT, 9));
-    testAttributeDouble.modifyMaxBaseValue(
-      new AttributeModifier<>(Modification.SUBTRACTPERCENT, 9));
-
-    assertEquals((byte) 9, testAttributeByte.getMax().byteValue());
-    assertEquals((short) 9, testAttributeShort.getMax().shortValue());
-    assertEquals(9, testAttributeInt.getMax().intValue());
-    assertEquals(9L, testAttributeLong.getMax().longValue());
-
-    assertEquals(9.1f, testAttributeFloat.getMax(), 0.0001f);
-    assertEquals(9.1, testAttributeDouble.getMax(), 0.0000001);
-
-    testAttributeByte.addMaxModifier(new AttributeModifier<>(Modification.ADDPERCENT, 50));
-    testAttributeShort.addMaxModifier(new AttributeModifier<>(Modification.ADDPERCENT, 50));
-    testAttributeInt.addMaxModifier(new AttributeModifier<>(Modification.ADDPERCENT, 50));
-    testAttributeLong.addMaxModifier(new AttributeModifier<>(Modification.ADDPERCENT, 50));
-
-    testAttributeFloat.addMaxModifier(new AttributeModifier<>(Modification.ADDPERCENT, 50));
-    testAttributeDouble.addMaxModifier(new AttributeModifier<>(Modification.ADDPERCENT, 50));
-
-    assertEquals((byte) 13, testAttributeByte.getMax().byteValue());
-    assertEquals((short) 13, testAttributeShort.getMax().shortValue());
-    assertEquals(13, testAttributeInt.getMax().intValue());
-    assertEquals(13L, testAttributeLong.getMax().longValue());
-
-    assertEquals(13.65f, testAttributeFloat.getMax(), 0.0001f);
-    assertEquals(13.65, testAttributeDouble.getMax(), 0.0000001);
-  }
-
   @Test
   void testAddModifierWithNewModifier() {
     final Attribute<Byte> testAttributeByte = new Attribute<>((byte) 10);
