@@ -230,7 +230,7 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
 
     // search for any animation for the specified state with dir information
     for (Direction d : Direction.values()) {
-      getSpriteName(state, d);
+      animName = getSpriteName(state, d);
       if (hasAnimation(animName)) {
         return animName;
       }
