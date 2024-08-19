@@ -1,6 +1,6 @@
 [versions]
 jaxb = "4.0.5"
-junit = "5.10.3"
+junit = "5.11.0"
 
 [libraries]
 darklaf_core = { module = "com.github.weisj:darklaf-core", version = "3.0.2" }
