@@ -690,13 +690,13 @@ public final class GameRandom extends java.util.Random {
     if (originalColor == null) {
       return null;
     }
-    int red = MathUtilities.clamp(
+    int red = Math.clamp(
       (int) (originalColor.getRed() + (originalColor.getRed() * this.nextFloat(colorVariance) * this.nextSign())), 0, 255);
-    int green = MathUtilities.clamp(
+    int green = Math.clamp(
       (int) (originalColor.getGreen() + (originalColor.getGreen() * this.nextFloat(colorVariance) * this.nextSign())), 0, 255);
-    int blue = MathUtilities.clamp(
+    int blue = Math.clamp(
       (int) (originalColor.getBlue() + (originalColor.getBlue() * this.nextFloat(colorVariance) * this.nextSign())), 0, 255);
-    int alpha = MathUtilities.clamp(
+    int alpha = Math.clamp(
       (int) (originalColor.getAlpha() + (originalColor.getAlpha() * this.nextFloat(alphaVariance) * this.nextSign())), 0, 255);
     return new Color(red, green, blue, alpha);
 

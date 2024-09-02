@@ -191,7 +191,7 @@ public class Editor extends Screen {
                 Style.COLOR_STATUS.getRed(),
                 Style.COLOR_STATUS.getGreen(),
                 Style.COLOR_STATUS.getBlue(),
-                MathUtilities.clamp(alpha, 0, 255)));
+                Math.clamp(alpha, 0, 255)));
       }
 
       Font old = g.getFont();

@@ -143,7 +143,7 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
   @Override
   public void setVelocity(double velocity) {
     final double maxVelocity = getEntity().getTickVelocity();
-    this.velocity = MathUtilities.clamp(velocity, -maxVelocity, maxVelocity);
+    this.velocity = Math.clamp(velocity, -maxVelocity, maxVelocity);
   }
 
   @Override

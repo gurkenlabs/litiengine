@@ -642,12 +642,12 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
     }
 
     public void setSpriteWidth(int spriteWidth) {
-      this.spriteWidth = MathUtilities.clamp(spriteWidth, 1, this.getWidth());
+      this.spriteWidth = Math.clamp(spriteWidth, 1, this.getWidth());
       this.updateSprite();
     }
 
     public void setSpriteHeight(int spriteHeight) {
-      this.spriteHeight = MathUtilities.clamp(spriteHeight, 1, this.getHeight());
+      this.spriteHeight = Math.clamp(spriteHeight, 1, this.getHeight());
       this.updateSprite();
     }
 

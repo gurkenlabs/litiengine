@@ -3,7 +3,6 @@ package de.gurkenlabs.utiliti;
 import de.gurkenlabs.litiengine.configuration.ConfigurationGroup;
 import de.gurkenlabs.litiengine.configuration.ConfigurationGroupInfo;
 import de.gurkenlabs.litiengine.util.ColorHelper;
-import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.utiliti.Style.Theme;
 import java.awt.Color;
 import java.util.ArrayList;
@@ -84,7 +83,7 @@ public class UserPreferences extends ConfigurationGroup {
     }
 
     // add the new element
-    newFiles.add(0, str);
+    newFiles.addFirst(str);
     newFiles.removeAll(Collections.singleton(null));
     // clear array
     this.lastOpenedFiles = new String[10];
@@ -296,7 +295,7 @@ public class UserPreferences extends ConfigurationGroup {
   }
 
   public void setUiScale(float uiScale) {
-    this.uiScale = MathUtilities.clamp(uiScale, UI_SCALE_MIN, UI_SCALE_MAX);
+    this.uiScale = Math.clamp(uiScale, UI_SCALE_MIN, UI_SCALE_MAX);
   }
 
   public Theme getTheme() {

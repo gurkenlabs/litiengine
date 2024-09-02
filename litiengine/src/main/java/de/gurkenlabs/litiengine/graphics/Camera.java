@@ -313,11 +313,11 @@ public class Camera implements ICamera {
     double x =
         maxX < minX
             ? maxX + this.align.getValue(minX - maxX - mapSize.getWidth())
-            : MathUtilities.clamp(focus.getX(), minX, maxX);
+            : Math.clamp(focus.getX(), minX, maxX);
     double y =
         maxY < minY
             ? maxY + this.valign.getValue(minY - maxY - mapSize.getHeight())
-            : MathUtilities.clamp(focus.getY(), minY, maxY);
+            : Math.clamp(focus.getY(), minY, maxY);
 
     return new Point2D.Double(x, y);
   }

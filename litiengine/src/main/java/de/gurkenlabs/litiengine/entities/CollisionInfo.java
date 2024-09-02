@@ -38,7 +38,7 @@ public @interface CollisionInfo {
    *
    * @return the height of the collision box
    */
-  float collisionBoxHeight() default 0;
+  float collisionBoxHeight() default -1;
 
   /**
    * Specifies the width of the entity's collision box.
@@ -46,7 +46,7 @@ public @interface CollisionInfo {
    *
    * @return the width of the collision box
    */
-  float collisionBoxWidth() default 0;
+  float collisionBoxWidth() default -1;
 
   /**
    * Specifies the vertical alignment of the entity's collision box.

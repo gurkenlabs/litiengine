@@ -56,7 +56,7 @@ public class CollisionPanel extends PropertyPanel {
     this.spinnerWidth.setValue(mapObject.getDoubleValue(MapObjectProperty.COLLISIONBOX_WIDTH, mapObject.getWidth()));
     this.spinnerHeight.setValue(mapObject.getDoubleValue(MapObjectProperty.COLLISIONBOX_HEIGHT, mapObject.getHeight()));
     this.comboBoxAlign.setSelectedItem(mapObject.getEnumValue(MapObjectProperty.COLLISION_ALIGN, Align.class, Align.CENTER));
-    this.comboBoxValign.setSelectedItem(mapObject.getEnumValue(MapObjectProperty.COLLISION_VALIGN, Valign.class, Valign.MIDDLE));
+    this.comboBoxValign.setSelectedItem(mapObject.getEnumValue(MapObjectProperty.COLLISION_VALIGN, Valign.class, Valign.DOWN));
     this.comboBoxColl.setSelectedItem(mapObject.getEnumValue(MapObjectProperty.COLLISION_TYPE, Collision.class, Collision.DYNAMIC));
   }
 

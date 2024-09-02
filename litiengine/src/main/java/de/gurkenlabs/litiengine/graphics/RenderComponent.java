@@ -225,7 +225,7 @@ public class RenderComponent extends Canvas {
    */
   private void applyFadeOverlay(Graphics2D g) {
     if (!Float.isNaN(currentAlpha)) {
-      int visibleAlpha = MathUtilities.clamp(Math.round(255 * (1 - currentAlpha)), 0, 255);
+      int visibleAlpha = Math.clamp(Math.round(255 * (1 - currentAlpha)), 0, 255);
       g.setColor(new Color(getBackground().getRGB() & 0xFFFFFF | (visibleAlpha << 24), true));
       g.fill(new Rectangle(0, 0, getWidth(), getHeight()));
     }
@@ -277,7 +277,7 @@ public class RenderComponent extends Canvas {
    */
   private void updateAlpha(long startTime, int duration, boolean fadeIn) {
     long timePassed = Game.time().since(startTime);
-    currentAlpha = MathUtilities.clamp((fadeIn ? timePassed : duration - timePassed) / (float) duration, 0, 1);
+    currentAlpha = Math.clamp((fadeIn ? timePassed : duration - timePassed) / (float) duration, 0, 1);
   }
 
   /**

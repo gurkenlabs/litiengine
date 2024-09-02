@@ -449,8 +449,8 @@ public final class Mouse
     // set new mouse location
     double newX = this.getLocation().getX() + diffX * this.sensitivity;
     double newY = this.getLocation().getY() + diffY * this.sensitivity;
-    newX = MathUtilities.clamp(newX, 0, Game.window().getResolution().getWidth());
-    newY = MathUtilities.clamp(newY, 0, Game.window().getResolution().getHeight());
+    newX = Math.clamp(newX, 0, Game.window().getResolution().getWidth());
+    newY = Math.clamp(newY, 0, Game.window().getResolution().getHeight());
 
     this.location = new Point2D.Double(newX, newY);
   }

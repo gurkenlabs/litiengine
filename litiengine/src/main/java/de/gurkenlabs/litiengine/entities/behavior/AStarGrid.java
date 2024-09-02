@@ -220,11 +220,11 @@ public class AStarGrid implements IRenderable {
   }
 
   private int clampX(int x) {
-    return MathUtilities.clamp(x, 0, this.getGrid().length - 1);
+    return Math.clamp(x, 0, this.getGrid().length - 1);
   }
 
   private int clampY(int y) {
-    return MathUtilities.clamp(y, 0, this.getGrid()[0].length - 1);
+    return Math.clamp(y, 0, this.getGrid()[0].length - 1);
   }
 
   private AStarNode getNode(final int x, final int y) {

@@ -1,7 +1,6 @@
 package de.gurkenlabs.litiengine.gui;
 
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.litiengine.util.MathUtilities;
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.util.List;
@@ -27,14 +26,8 @@ public abstract class Slider extends GuiComponent {
   private float tickSize;
 
 
-  protected Slider(
-      final double x,
-      final double y,
-      final double width,
-      final double height,
-      final float minValue,
-      final float maxValue,
-      final float stepSize) {
+  protected Slider(final double x, final double y, final double width, final double height, final float minValue, final float maxValue,
+    final float stepSize) {
     super(x, y, width, height);
     setMinValue(minValue);
     setCurrentValue(getMinValue());
@@ -64,11 +57,10 @@ public abstract class Slider extends GuiComponent {
 
   protected void setButton1(final ImageComponent button1) {
     this.button1 = button1;
-    this.button1.onClicked(
-        e -> {
-          this.setCurrentValue(getCurrentValue() - getStepSize());
-          getChangeConsumer().forEach(consumer -> consumer.accept(getCurrentValue()));
-        });
+    this.button1.onClicked(e -> {
+      this.setCurrentValue(getCurrentValue() - getStepSize());
+      getChangeConsumer().forEach(consumer -> consumer.accept(getCurrentValue()));
+    });
     this.getComponents().add(this.getButton1());
   }
 
@@ -78,11 +70,10 @@ public abstract class Slider extends GuiComponent {
 
   protected void setButton2(final ImageComponent button2) {
     this.button2 = button2;
-    this.button2.onClicked(
-        e -> {
-          this.setCurrentValue(getCurrentValue() + getStepSize());
-          getChangeConsumer().forEach(consumer -> consumer.accept(getCurrentValue()));
-        });
+    this.button2.onClicked(e -> {
+      this.setCurrentValue(getCurrentValue() + getStepSize());
+      getChangeConsumer().forEach(consumer -> consumer.accept(getCurrentValue()));
+    });
     getComponents().add(getButton2());
   }
 
@@ -103,7 +94,7 @@ public abstract class Slider extends GuiComponent {
   }
 
   public void setCurrentValue(final float newValue) {
-    this.currentValue = MathUtilities.clamp(newValue, getMinValue(), getMaxValue());
+    this.currentValue = Math.clamp(newValue, getMinValue(), getMaxValue());
     getChangeConsumer().forEach(consumer -> consumer.accept(getCurrentValue()));
   }
 
@@ -153,8 +144,7 @@ public abstract class Slider extends GuiComponent {
 
   protected abstract void updateSliderDimensions();
 
-  @Override
-  public void render(Graphics2D g) {
+  @Override public void render(Graphics2D g) {
     g.setColor(getAppearance().getBackgroundColor2());
     renderBar(g);
     if (isShowingTicks()) {
@@ -206,8 +196,7 @@ public abstract class Slider extends GuiComponent {
     setCurrentValue(currentStep * getStepSize());
   }
 
-  @Override
-  public void prepare() {
+  @Override public void prepare() {
     super.prepare();
     getSliderComponent().setLocation(getRelativeSliderLocation());
   }

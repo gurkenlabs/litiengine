@@ -57,30 +57,30 @@ public final class MapUtilities {
   }
 
   public static Rectangle2D getTileBoundingBox(final IMap map, final Rectangle2D box) {
-    final int minX = (int) MathUtilities.clamp(box.getX(), 0, map.getSizeInPixels().getWidth() - 1);
-    final int minY = (int) MathUtilities.clamp(box.getY(), 0, map.getSizeInPixels().getHeight() - 1);
-    final int maxX = (int) MathUtilities.clamp(box.getMaxX(), 0, map.getSizeInPixels().getWidth() - 1);
-    final int maxY = (int) MathUtilities.clamp(box.getMaxY(), 0, map.getSizeInPixels().getHeight() - 1);
+    final int minX = (int) Math.clamp(box.getX(), 0, map.getSizeInPixels().getWidth() - 1);
+    final int minY = (int) Math.clamp(box.getY(), 0, map.getSizeInPixels().getHeight() - 1);
+    final int maxX = (int) Math.clamp(box.getMaxX(), 0, map.getSizeInPixels().getWidth() - 1);
+    final int maxY = (int) Math.clamp(box.getMaxY(), 0, map.getSizeInPixels().getHeight() - 1);
     final Point minTilePoint = map.getOrientation().getTile(minX, minY, map);
     final Point maxTilePoint = map.getOrientation().getTile(maxX, maxY, map);
     int minTileX = map.getOrientation().getName().equals(MapOrientations.ISOMETRIC.getName())
       ? minTilePoint.x
-      : MathUtilities.clamp(minTilePoint.x, 0, map.getWidth() - 1);
+      : Math.clamp(minTilePoint.x, 0, map.getWidth() - 1);
     int minTileY = map.getOrientation().getName().equals(MapOrientations.ISOMETRIC.getName())
       ? minTilePoint.y
-      : MathUtilities.clamp(minTilePoint.y, 0, map.getHeight() - 1);
+      : Math.clamp(minTilePoint.y, 0, map.getHeight() - 1);
     int maxTileX = map.getOrientation().getName().equals(MapOrientations.ISOMETRIC.getName())
       ? maxTilePoint.x
-      : MathUtilities.clamp(maxTilePoint.x, 0, map.getWidth() - 1);
+      : Math.clamp(maxTilePoint.x, 0, map.getWidth() - 1);
     int maxTileY = map.getOrientation().getName().equals(MapOrientations.ISOMETRIC.getName())
       ? maxTilePoint.y
-      : MathUtilities.clamp(maxTilePoint.y, 0, map.getWidth() - 1);
+      : Math.clamp(maxTilePoint.y, 0, map.getWidth() - 1);
     final Rectangle2D minTileBounds = map.getOrientation().getBounds(
-      new Point(MathUtilities.clamp(minTileX, 0, map.getWidth() - 1),
-        MathUtilities.clamp(minTileY, 0, map.getHeight() - 1)), map);
+      new Point(Math.clamp(minTileX, 0, map.getWidth() - 1),
+        Math.clamp(minTileY, 0, map.getHeight() - 1)), map);
     final Rectangle2D maxTileBounds = map.getOrientation().getBounds(
-      new Point(MathUtilities.clamp(maxTileX, 0, map.getWidth() - 1),
-        MathUtilities.clamp(maxTileY, 0, map.getHeight() - 1)), map);
+      new Point(Math.clamp(maxTileX, 0, map.getWidth() - 1),
+        Math.clamp(maxTileY, 0, map.getHeight() - 1)), map);
 
     return new Rectangle2D.Double(
       minTileBounds.getX(), minTileBounds.getY(),

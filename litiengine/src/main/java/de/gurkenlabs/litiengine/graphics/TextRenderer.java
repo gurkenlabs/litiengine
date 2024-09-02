@@ -392,7 +392,7 @@ public final class TextRenderer {
       final Color outlineColor,
       final boolean antiAliasing) {
     float stroke =
-        (float) MathUtilities.clamp(
+        (float) Math.clamp(
             (g.getFont().getSize2D() * 1 / 5f)
                 * Math.log(Game.world().camera().getRenderScale()),
             1,

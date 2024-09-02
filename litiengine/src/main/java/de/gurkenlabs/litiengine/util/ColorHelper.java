@@ -142,7 +142,7 @@ public final class ColorHelper {
    * @return An integer value that fits the color value restrictions.
    */
   public static int ensureColorValueRange(int value) {
-    return MathUtilities.clamp(value, 0, MAX_RGB_VALUE);
+    return Math.clamp(value, 0, MAX_RGB_VALUE);
   }
 
   /**
@@ -169,7 +169,7 @@ public final class ColorHelper {
    * @return A new {@code Color} object that is the result of interpolating between the two colors.
    */
   public static Color interpolate(Color color1, Color color2, double factor) {
-    factor = MathUtilities.clamp(factor, 0, 1);
+    factor = Math.clamp(factor, 0, 1);
 
     int r = (int) (color1.getRed() * (1 - factor) + color2.getRed() * factor);
     int g = (int) (color1.getGreen() * (1 - factor) + color2.getGreen() * factor);

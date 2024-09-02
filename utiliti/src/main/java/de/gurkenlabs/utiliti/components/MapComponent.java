@@ -925,10 +925,10 @@ public class MapComponent extends GuiComponent {
 
     final TmxMap map = (TmxMap) Game.world().environment().getMap();
     if (map != null && Editor.preferences().clampToMap()) {
-      minX = MathUtilities.clamp(minX, 0, map.getSizeInPixels().width);
-      maxX = MathUtilities.clamp(maxX, 0, map.getSizeInPixels().width);
-      minY = MathUtilities.clamp(minY, 0, map.getSizeInPixels().height);
-      maxY = MathUtilities.clamp(maxY, 0, map.getSizeInPixels().height);
+      minX = Math.clamp(minX, 0, map.getSizeInPixels().width);
+      maxX = Math.clamp(maxX, 0, map.getSizeInPixels().width);
+      minY = Math.clamp(minY, 0, map.getSizeInPixels().height);
+      maxY = Math.clamp(maxY, 0, map.getSizeInPixels().height);
     }
 
     double width = Math.abs(minX - maxX);

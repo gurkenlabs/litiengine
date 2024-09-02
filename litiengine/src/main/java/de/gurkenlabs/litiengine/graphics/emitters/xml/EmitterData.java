@@ -224,7 +224,7 @@ public class EmitterData implements Serializable, Resource {
   }
 
   public void setAlphaVariance(final float alphaVariance) {
-    this.alphaVariance = MathUtilities.clamp(alphaVariance, 0, 1);
+    this.alphaVariance = Math.clamp(alphaVariance, 0, 1);
   }
 
   @XmlTransient
@@ -251,7 +251,7 @@ public class EmitterData implements Serializable, Resource {
   }
 
   public void setColorVariance(final float colorVariance) {
-    this.colorVariance = MathUtilities.clamp(colorVariance, 0, 1);
+    this.colorVariance = Math.clamp(colorVariance, 0, 1);
   }
 
   @XmlTransient

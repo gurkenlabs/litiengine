@@ -159,7 +159,7 @@ public abstract class Particle implements ITimeToLive {
     if (isFading() && getTimeToLive() > 0) {
       float maxAlpha = getColor().getAlpha() / 255f;
       float progress = (float) getAliveTime() / getTimeToLive();
-      return MathUtilities.clamp(maxAlpha - progress * maxAlpha, 0, 1);
+      return Math.clamp(maxAlpha - progress * maxAlpha, 0, 1);
     }
     return 1;
   }

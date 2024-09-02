@@ -853,9 +853,9 @@ public final class PhysicsEngine implements IUpdateable {
     double buttomBoundY = this.getBounds().getMaxY() - entity.getHeight() + deltaY;
 
     // right and left border minus the collision box width
-    double x = MathUtilities.clamp(newLocation.getX(), leftBoundX, rightBoundX);
+    double x = Math.clamp(newLocation.getX(), leftBoundX, rightBoundX);
     // bottom and top border minus the collision box height
-    double y = MathUtilities.clamp(newLocation.getY(), topBoundY, buttomBoundY);
+    double y = Math.clamp(newLocation.getY(), topBoundY, buttomBoundY);
     return new Point2D.Double(x, y);
   }
 

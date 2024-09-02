@@ -1,10 +1,11 @@
 package de.gurkenlabs.litiengine;
 
-import de.gurkenlabs.litiengine.util.MathUtilities;
 import jakarta.xml.bind.annotation.XmlEnum;
 import jakarta.xml.bind.annotation.XmlEnumValue;
 
-/** The enum {@code Align} defines a range of horizontal alignments. */
+/**
+ * The enum {@code Align} defines a range of horizontal alignments.
+ */
 @XmlEnum
 public enum Align {
   @XmlEnumValue("CENTER")
@@ -27,10 +28,8 @@ public enum Align {
   /**
    * Gets the align enumeration value for the specified string.
    *
-   * @param alignString
-   *          The string representing the enum value.
-   * @return The enum value represented by the specified string or {@link Align#CENTER} if the specified string is
-   *         invalid.
+   * @param alignString The string representing the enum value.
+   * @return The enum value represented by the specified string or {@link Align#CENTER} if the specified string is invalid.
    */
   public static Align get(final String alignString) {
     if (alignString == null || alignString.isEmpty()) {
@@ -47,8 +46,7 @@ public enum Align {
   /**
    * Gets the proportional value of this instance.
    *
-   * @param width
-   *          The width to calculate the relative value from.
+   * @param width The width to calculate the relative value from.
    * @return The proportional value for the specified height.
    */
   public float getValue(float width) {
@@ -58,8 +56,7 @@ public enum Align {
   /**
    * Gets the proportional value of this instance.
    *
-   * @param width
-   *          The width to calculate the relative value from.
+   * @param width The width to calculate the relative value from.
    * @return The proportional value for the specified height.
    */
   public double getValue(double width) {
@@ -69,8 +66,7 @@ public enum Align {
   /**
    * Gets the proportional value of this instance.
    *
-   * @param width
-   *          The width to calculate the relative value from.
+   * @param width The width to calculate the relative value from.
    * @return The proportional value for the specified height.
    */
   public int getValue(int width) {
@@ -78,17 +74,14 @@ public enum Align {
   }
 
   /**
-   * Gets the location for the specified object width to be horizontally aligned relatively to the bounds of the specified
-   * width.<br>
-   * Suitable for <b>entity</b> alignment. The return value might be negative or exceed the right boundary which is
+   * Gets the location for the specified object width to be horizontally aligned relatively to the bounds of the specified width.<br> Suitable for
+   * <b>entity</b> alignment. The return value might be negative or exceed the right boundary which is
    * <i>{@code width} - {@code objectWidth}</i>. <br>
    * For <b>text</b> alignment {@link #getLocation(double, double, boolean)} should be used with
    * <i>{@code preventOverflow}</i> set to {@code true}.
    *
-   * @param width
-   *          The width, limiting the horizontal alignment.
-   * @param objectWidth
-   *          The width of the object for which to calculate the horizontally aligned location.
+   * @param width       The width, limiting the horizontal alignment.
+   * @param objectWidth The width of the object for which to calculate the horizontally aligned location.
    * @return The x-coordinate for the location of the object with the specified width.
    */
   public double getLocation(final double width, final double objectWidth) {
@@ -96,8 +89,8 @@ public enum Align {
   }
 
   /**
-   * Gets the location for the specified object width to be horizontally aligned relatively to the bounds of the specified
-   * width. An overflow behavior (whenever <i>{@code objectWidth} > {@code width}</i>) can be controlled using
+   * Gets the location for the specified object width to be horizontally aligned relatively to the bounds of the specified width. An overflow behavior
+   * (whenever <i>{@code objectWidth} > {@code width}</i>) can be controlled using
    * <b>{@code preventOverflow}</b> parameter:
    * <ul>
    * <li><i>false</i>: the return value might be negative or exceed the right boundary which is <i>{@code width} -
@@ -105,13 +98,10 @@ public enum Align {
    * <li><i>true</i>: the return value will always be clamped within the bounds (good for <b>text</b> alignment).</li>
    * </ul>
    *
-   * @param width
-   *          The width, limiting the horizontal alignment.
-   * @param objectWidth
-   *          The width of the object for which to calculate the horizontally aligned location.
-   * @param preventOverflow
-   *          A flag indicating whether the return value should be clamped to keep it within the bounds (prevent values
-   *          that are negative or beyond the right boundary).
+   * @param width           The width, limiting the horizontal alignment.
+   * @param objectWidth     The width of the object for which to calculate the horizontally aligned location.
+   * @param preventOverflow A flag indicating whether the return value should be clamped to keep it within the bounds (prevent values that are
+   *                        negative or beyond the right boundary).
    * @return The x-coordinate for the location of the object with the specified width.
    */
   public double getLocation(final double width, final double objectWidth, final boolean preventOverflow) {
@@ -121,6 +111,6 @@ public enum Align {
       return location;
     }
 
-    return MathUtilities.clamp(location, 0d, width - objectWidth);
+    return Math.max(0, Math.min(width - objectWidth, location));
   }
 }

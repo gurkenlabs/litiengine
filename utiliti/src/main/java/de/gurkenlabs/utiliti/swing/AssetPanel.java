@@ -10,7 +10,6 @@ import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.resources.SoundResource;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
-import de.gurkenlabs.litiengine.util.Imaging;
 import java.util.Collections;
 import java.util.List;
 import javax.swing.Icon;
@@ -32,74 +31,73 @@ public class AssetPanel extends JPanel {
 
   public void loadSprites(List<SpritesheetResource> infos) {
     this.load(
-        () -> {
-          for (SpritesheetResource info : infos.stream().sorted().toList()) {
-            Icon icon;
-            Spritesheet opt = Resources.spritesheets().get(info.getName());
+      () -> {
+        for (SpritesheetResource info : infos.stream().sorted().toList()) {
+          Icon icon;
+          Spritesheet opt = Resources.spritesheets().get(info.getName());
 
-            if (opt != null && opt.getSprite(0) != null) {
-              icon = new ImageIcon(Imaging.scale(opt.getSprite(0), 64, 64, true));
-            } else {
-              icon = null;
-            }
-
-            AssetPanelItem panelItem =
-                new AssetPanelItem(icon, getResourceNameWithoutPrefix(info), info);
-            this.add(panelItem);
-            panelItem.validate();
+          if (opt != null && opt.getSprite(0) != null) {
+            icon = new ImageIcon(opt.getPreview(64));
+          } else {
+            icon = null;
           }
-        });
+
+          AssetPanelItem panelItem = new AssetPanelItem(icon, getResourceNameWithoutPrefix(info), info);
+          this.add(panelItem);
+          panelItem.validate();
+        }
+      });
   }
 
   public void loadTilesets(List<Tileset> tilesets) {
     this.load(
-        () -> {
-          Collections.sort(tilesets);
-          for (Tileset tileset : tilesets) {
-            AssetPanelItem panelItem =
-                new AssetPanelItem(Icons.DOC_TILESET, tileset.getName(), tileset);
-            this.add(panelItem);
-            panelItem.validate();
-          }
-        });
+      () -> {
+        Collections.sort(tilesets);
+        for (Tileset tileset : tilesets) {
+          AssetPanelItem panelItem =
+            new AssetPanelItem(Icons.DOC_TILESET, tileset.getName(), tileset);
+          this.add(panelItem);
+          panelItem.validate();
+        }
+      });
   }
 
   public void loadEmitters(List<EmitterData> emitters) {
     this.load(
-        () -> {
-          Collections.sort(emitters);
-          for (EmitterData emitter : emitters) {
-            AssetPanelItem panelItem =
-                new AssetPanelItem(Icons.DOC_EMITTER, emitter.getName(), emitter);
-            this.add(panelItem);
-            panelItem.validate();
-          }
-        });
+      () -> {
+        Collections.sort(emitters);
+        for (EmitterData emitter : emitters) {
+          AssetPanelItem panelItem =
+            new AssetPanelItem(Icons.DOC_EMITTER, emitter.getName(), emitter);
+          this.add(panelItem);
+          panelItem.validate();
+        }
+      });
   }
 
   public void loadBlueprints(List<Blueprint> blueprints) {
     this.load(
-        () -> {
-          Collections.sort(blueprints);
-          for (MapObject blueprint : blueprints) {
-            AssetPanelItem panelItem =
-                new AssetPanelItem(Icons.DOC_BLUEPRINT, blueprint.getName(), blueprint);
-            this.add(panelItem);
-            panelItem.validate();
-          }
-        });
+      () -> {
+        Collections.sort(blueprints);
+        for (MapObject blueprint : blueprints) {
+          AssetPanelItem panelItem =
+            new AssetPanelItem(Icons.DOC_BLUEPRINT, blueprint.getName(), blueprint);
+          this.add(panelItem);
+          panelItem.validate();
+        }
+      });
   }
 
   public void loadSounds(List<SoundResource> sounds) {
     this.load(
-        () -> {
-          Collections.sort(sounds);
-          for (SoundResource sound : sounds) {
-            AssetPanelItem panelItem = new AssetPanelItem(Icons.DOC_SOUND, sound.getName(), sound);
-            this.add(panelItem);
-            panelItem.validate();
-          }
-        });
+      () -> {
+        Collections.sort(sounds);
+        for (SoundResource sound : sounds) {
+          AssetPanelItem panelItem = new AssetPanelItem(Icons.DOC_SOUND, sound.getName(), sound);
+          this.add(panelItem);
+          panelItem.validate();
+        }
+      });
   }
 
   public void load(Runnable runnable) {
@@ -110,7 +108,7 @@ public class AssetPanel extends JPanel {
 
   private static String getResourceNameWithoutPrefix(SpritesheetResource info) {
     return info.getName().startsWith("prop-")
-        ? info.getName().replace("prop-", "")
-        : info.getName();
+      ? info.getName().replace("prop-", "")
+      : info.getName();
   }
 }

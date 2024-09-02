@@ -43,7 +43,7 @@ public abstract class ColorLayer implements IRenderable {
             this.getColor().getRed(),
             this.getColor().getGreen(),
             this.getColor().getBlue(),
-            MathUtilities.clamp(ambientAlpha, 0, 255)));
+            Math.clamp(ambientAlpha, 0, 255)));
     this.updateSection(this.environment.getMap().getBounds());
   }
 
