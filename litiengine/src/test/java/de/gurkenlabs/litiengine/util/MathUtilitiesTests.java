@@ -87,11 +87,11 @@ class MathUtilitiesTests {
 
   @Test
   void testGetAverageInt() {
-    int avg = MathUtilities.getAverage(new int[] {2, 2, 1, 1, 1, 2});
-    int avg2 = MathUtilities.getAverage(new int[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
+    double avg = MathUtilities.getAverage(new int[] {2, 2, 1, 1, 1, 2});
+    double avg2 = MathUtilities.getAverage(new int[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
 
-    assertEquals(1, avg);
-    assertEquals(5, avg2);
+    assertEquals(1.5, avg);
+    assertEquals(5.5, avg2);
   }
 
   @Test

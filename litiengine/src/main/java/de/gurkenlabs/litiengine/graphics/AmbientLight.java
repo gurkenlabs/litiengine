@@ -96,7 +96,7 @@ public class AmbientLight extends ColorLayer {
       return;
     }
 
-    final float intensity = MathUtilities.clamp((float) light.getIntensity() / 255, 0, 1);
+    final float intensity = MathUtilities.clamp((float) light.getIntensity() / 255, 0f, 1f);
     g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, intensity));
     renderLightSource(g, light, section);
   }

@@ -121,6 +121,6 @@ public enum Valign {
       return location;
     }
 
-    return MathUtilities.clamp(location, 0, height - objectHeight);
+    return MathUtilities.clamp(location, 0d, height - objectHeight);
   }
 }

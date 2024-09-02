@@ -48,8 +48,7 @@ public final class ColorHelper {
   }
 
   /**
-   * Decodes the specified color string to an actual {@code Color} instance. The accepted format
-   * is:
+   * Decodes the specified color string to an actual {@code Color} instance. The accepted format is:
    * <p>
    * <i>Note: This returns null if the format of the provided color string is invalid.</i>
    * </p>
@@ -74,43 +73,59 @@ public final class ColorHelper {
     return decode(colorHexString, false);
   }
 
+  /**
+   * Decodes the specified color string to an actual {@code Color} instance, with an option to create a darker version of the base color. The accepted
+   * format is:
+   * <ul>
+   * <li>#RRGGBB - For colors without alpha
+   * <li>#AARRGGBB - For colors with alpha
+   * </ul>
+   * <p>
+   * If the `solid` parameter is true, the color alpha will create a darker version of the base color.
+   * </p>
+   * <p>
+   * Examples: <br>
+   * "#ff0000" = {@code Color.RED}<br>
+   * "#c8ff0000" = {@code new Color(255, 0, 0, 200)}
+   * </p>
+   *
+   * @param colorHexString The hexadecimal encoded color string representation.
+   * @param solid          If true, the color alpha will create a darker version of the base color.
+   * @return The decoded {@code Color} object, or {@code null} if the input string is invalid.
+   * @see ColorHelper#encode(Color)
+   * @see Color
+   * @see Color#decode(String)
+   * @see Integer#decode(String)
+   */
   public static Color decode(String colorHexString, boolean solid) {
     if (colorHexString == null || colorHexString.isEmpty()) {
       return null;
     }
 
     if (!colorHexString.startsWith("#")) {
-      if (colorHexString.length() == HEX_STRING_LENGTH - 1
-        || colorHexString.length() == HEX_STRING_LENGTH_ALPHA - 1) {
+      if (colorHexString.length() == HEX_STRING_LENGTH - 1 || colorHexString.length() == HEX_STRING_LENGTH_ALPHA - 1) {
         colorHexString = "#" + colorHexString;
       } else {
-        log.log(
-          Level.SEVERE,
-          "Could not parse color string \"{0}\". A color string needs to start with a \"#\" character.",
-          colorHexString);
+        log.log(Level.SEVERE, "Could not parse color string \"{0}\". A color string needs to start with a \"#\" character.", colorHexString);
         return null;
       }
     }
 
-    switch (colorHexString.length()) {
-      case HEX_STRING_LENGTH:
-        return decodeWellformedHexString(colorHexString);
-      case HEX_STRING_LENGTH_ALPHA:
-        return decodeHexStringWithAlpha(colorHexString, solid);
-      default:
-        log.log(
-          Level.SEVERE,
+    return switch (colorHexString.length()) {
+      case HEX_STRING_LENGTH -> decodeWellformedHexString(colorHexString);
+      case HEX_STRING_LENGTH_ALPHA -> decodeHexStringWithAlpha(colorHexString, solid);
+      default -> {
+        log.log(Level.SEVERE,
           "Could not parse color string \"{0}\". Invalid string length \"{1}\"!\nAccepted lengths:\n\t{2} for Colors without Alpha (#ff0000)\n\t{3} for Colors with Alpha (#c8ff0000)",
-          new Object[]{
-            colorHexString, colorHexString.length(), HEX_STRING_LENGTH, HEX_STRING_LENGTH_ALPHA
-          });
-        return null;
-    }
+          new Object[] {colorHexString, colorHexString.length(), HEX_STRING_LENGTH, HEX_STRING_LENGTH_ALPHA});
+        yield null;
+      }
+    };
   }
 
   /**
-   * Ensures that the specified value lies within the accepted range for Color values (0-255).
-   * Smaller values will be forced to be 0 and larger values will result in 255.
+   * Ensures that the specified value lies within the accepted range for Color values (0-255). Smaller values will be forced to be 0 and larger values
+   * will result in 255.
    *
    * @param value The value to check for.
    * @return An integer value that fits the color value restrictions.
@@ -120,8 +135,8 @@ public final class ColorHelper {
   }
 
   /**
-   * Ensures that the specified value lies within the accepted range for Color values (0-255).
-   * Smaller values will be forced to be 0 and larger values will result in 255.
+   * Ensures that the specified value lies within the accepted range for Color values (0-255). Smaller values will be forced to be 0 and larger values
+   * will result in 255.
    *
    * @param value The value to check for.
    * @return An integer value that fits the color value restrictions.
@@ -140,12 +155,19 @@ public final class ColorHelper {
     if (color.getAlpha() == 255) {
       return color;
     }
-    return new Color(
-      premultiply(color.getRed(), color.getAlpha()),
-      premultiply(color.getGreen(), color.getAlpha()),
+    return new Color(premultiply(color.getRed(), color.getAlpha()), premultiply(color.getGreen(), color.getAlpha()),
       premultiply(color.getBlue(), color.getAlpha()));
   }
 
+  /**
+   * Interpolates between two colors based on the given factor. The factor determines the weight of each color in the interpolation. A factor of 0.0
+   * will return the first color, and a factor of 1.0 will return the second color. Intermediate values will return a blend of the two colors.
+   *
+   * @param color1 The first color.
+   * @param color2 The second color.
+   * @param factor The interpolation factor, ranging from 0.0 to 1.0.
+   * @return A new {@code Color} object that is the result of interpolating between the two colors.
+   */
   public static Color interpolate(Color color1, Color color2, double factor) {
     factor = MathUtilities.clamp(factor, 0, 1);
 
@@ -157,11 +179,30 @@ public final class ColorHelper {
     return new Color(r, g, b, a);
   }
 
+  /**
+   * Returns a transparent variant of the specified color with the given alpha value. The red, green, and blue components of the color remain
+   * unchanged.
+   *
+   * @param color    The original color.
+   * @param newAlpha The new alpha value to be applied to the color.
+   * @return A new {@code Color} object with the specified alpha value.
+   */
   public static Color getTransparentVariant(Color color, int newAlpha) {
-    return new Color(
-      color.getRed(), color.getGreen(), color.getBlue(), ensureColorValueRange(newAlpha));
+    return new Color(color.getRed(), color.getGreen(), color.getBlue(), ensureColorValueRange(newAlpha));
   }
 
+  /**
+   * Decodes a well-formed hexadecimal color string to a {@code Color} object. This method expects the input string to be in the format:
+   * <ul>
+   * <li>#RRGGBB - For colors without alpha
+   * </ul>
+   * <p>
+   * If the input string is not well-formed, this method logs a {@code SEVERE} level message and returns {@code null}.
+   * </p>
+   *
+   * @param hexString The well-formed hexadecimal color string representation.
+   * @return The decoded {@code Color} object, or {@code null} if the input string is invalid.
+   */
   private static Color decodeWellformedHexString(String hexString) {
     try {
       return Color.decode(hexString);
@@ -171,11 +212,35 @@ public final class ColorHelper {
     return null;
   }
 
+  /**
+   * Premultiplies the given color value with the specified alpha value. This method accounts for gamma correction.
+   *
+   * @param value The color value to be premultiplied.
+   * @param alpha The alpha value to premultiply with.
+   * @return The premultiplied color value.
+   */
   private static int premultiply(int value, int alpha) {
     // account for gamma
     return (int) Math.round(value * Math.pow(alpha / 255.0, 1 / 2.2));
   }
 
+  /**
+   * Decodes a hexadecimal color string with an alpha component to a {@code Color} object. The accepted format is:
+   * <ul>
+   * <li>#AARRGGBB - For colors with alpha
+   * </ul>
+   * <p>
+   * If the `solid` parameter is true, the color alpha will create a darker version of the base color.
+   * </p>
+   * <p>
+   * Examples: <br>
+   * "#c8ff0000" = {@code new Color(255, 0, 0, 200)}
+   * </p>
+   *
+   * @param hexString The hexadecimal encoded color string representation with alpha.
+   * @param solid     If true, the color alpha will create a darker version of the base color.
+   * @return The decoded {@code Color} object, or null if the input string is invalid.
+   */
   private static Color decodeHexStringWithAlpha(String hexString, boolean solid) {
     String alpha = hexString.substring(1, 3);
 

@@ -121,6 +121,6 @@ public enum Align {
       return location;
     }
 
-    return MathUtilities.clamp(location, 0, width - objectWidth);
+    return MathUtilities.clamp(location, 0d, width - objectWidth);
   }
 }
