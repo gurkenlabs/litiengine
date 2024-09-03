@@ -321,7 +321,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
         });
 
     this.textFieldName.addFocusListener(
-        new MapObjectPropteryFocusListener(m -> m.setName(textFieldName.getText())));
+        new MapObjectPropertyFocusListener(m -> m.setName(textFieldName.getText())));
 
     this.textFieldName.addActionListener(
         new MapObjectPropertyActionListener(

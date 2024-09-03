@@ -61,12 +61,12 @@ public class CollisionPanel extends PropertyPanel {
   }
 
   private void setupChangedListeners() {
-    this.setup(this.chckbxHasCollision, MapObjectProperty.COLLISION);
-    this.setup(this.spinnerWidth, MapObjectProperty.COLLISIONBOX_WIDTH);
-    this.setup(this.spinnerHeight, MapObjectProperty.COLLISIONBOX_HEIGHT);
-    this.setup(this.comboBoxAlign, MapObjectProperty.COLLISION_ALIGN);
-    this.setup(this.comboBoxValign, MapObjectProperty.COLLISION_VALIGN);
-    this.setup(this.comboBoxColl, MapObjectProperty.COLLISION_TYPE);
+    setup(chckbxHasCollision, MapObjectProperty.COLLISION);
+    setup(spinnerWidth, MapObjectProperty.COLLISIONBOX_WIDTH);
+    setup(spinnerHeight, MapObjectProperty.COLLISIONBOX_HEIGHT);
+    setup(comboBoxAlign, MapObjectProperty.COLLISION_ALIGN);
+    setup(comboBoxValign, MapObjectProperty.COLLISION_VALIGN);
+    setup(comboBoxColl, MapObjectProperty.COLLISION_TYPE);
   }
 
   private LayoutManager createLayout() {

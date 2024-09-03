@@ -234,7 +234,7 @@ public class MapObjectsRenderer implements IEditorRenderer {
     float collisionBoxWidth = mapObject.getFloatValue(MapObjectProperty.COLLISIONBOX_WIDTH, -1);
     float collisionBoxHeight = mapObject.getFloatValue(MapObjectProperty.COLLISIONBOX_HEIGHT, -1);
     final Align align = mapObject.getEnumValue(MapObjectProperty.COLLISION_ALIGN, Align.class, Align.CENTER);
-    final Valign valign = mapObject.getEnumValue(MapObjectProperty.COLLISION_ALIGN, Valign.class, Valign.DOWN);
+    final Valign valign = mapObject.getEnumValue(MapObjectProperty.COLLISION_VALIGN, Valign.class, Valign.DOWN);
 
     if (MapObjectType.get(mapObject.getType()) == MapObjectType.COLLISIONBOX) {
       collisionBoxWidth = mapObject.getWidth();
@@ -246,8 +246,7 @@ public class MapObjectsRenderer implements IEditorRenderer {
 
       g.setColor(Style.COLOR_COLLISION_FILL);
       Rectangle2D collisionBox =
-        CollisionEntity.getCollisionBox(mapObject.getLocation(), mapObject.getWidth(),
-          mapObject.getHeight(), collisionBoxWidth, collisionBoxHeight,
+        CollisionEntity.getCollisionBox(mapObject.getLocation(), mapObject.getWidth(), mapObject.getHeight(), collisionBoxWidth, collisionBoxHeight,
           align, valign);
 
       Game.graphics().renderShape(g, collisionBox);
