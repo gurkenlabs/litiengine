@@ -133,7 +133,7 @@ public final class RenderEngine {
    * @param text      The text to be rendered
    * @param x         The x-coordinate of the text.
    * @param y         The y-coordinate of the text
-   * @param antialias Configure whether or not to render the text with antialiasing.
+   * @param antialias Configure whether to render the text with antialiasing.
    */
   public void renderText(
     final Graphics2D g, final String text, final double x, final double y, boolean antialias) {
@@ -168,7 +168,7 @@ public final class RenderEngine {
    * @param g         The graphics object to render on.
    * @param text      The text to be rendered.
    * @param location  The location on the map.
-   * @param antialias Configure whether or not to render the text with antialiasing.
+   * @param antialias Configure whether to render the text with antialiasing.
    */
   public void renderText(
     final Graphics2D g, final String text, final Point2D location, boolean antialias) {
@@ -201,7 +201,7 @@ public final class RenderEngine {
    *
    * @param g            The graphics object to render on.
    * @param shape        The shape to be rendered.
-   * @param antialiasing Configure whether or not to render the shape with antialiasing.
+   * @param antialiasing Configure whether to render the shape with antialiasing.
    */
   public void renderShape(final Graphics2D g, final Shape shape, boolean antialiasing) {
     renderShape(g, shape, antialiasing, 0);
@@ -212,7 +212,7 @@ public final class RenderEngine {
    *
    * @param g            The graphics object to render on.
    * @param shape        The shape to be rendered.
-   * @param antialiasing Configure whether or not to render the shape with antialiasing.
+   * @param antialiasing Configure whether to render the shape with antialiasing.
    * @param angle        The angle by which the shape will be rotated.
    */
   public void renderShape(
@@ -255,7 +255,7 @@ public final class RenderEngine {
    *
    * @param g            The graphics object to render on.
    * @param shape        The shape to be rendered.
-   * @param antialiasing Configure whether or not to render the shape with antialiasing.
+   * @param antialiasing Configure whether to render the shape with antialiasing.
    */
   public void renderOutline(final Graphics2D g, final Shape shape, boolean antialiasing) {
     renderOutline(
@@ -280,7 +280,7 @@ public final class RenderEngine {
    * @param g            The graphics object to render on.
    * @param shape        The shape to be rendered.
    * @param stroke       The stroke that is used to render the shape.
-   * @param antialiasing Configure whether or not to render the shape with antialiasing.
+   * @param antialiasing Configure whether to render the shape with antialiasing.
    * @see Stroke
    */
   public void renderOutline(
@@ -294,7 +294,7 @@ public final class RenderEngine {
    * @param g            The graphics object to render on.
    * @param shape        The shape to be rendered.
    * @param stroke       The stroke that is used to render the shape.
-   * @param antialiasing Configure whether or not to render the shape with antialiasing.
+   * @param antialiasing Configure whether to render the shape with antialiasing.
    * @param angle        The angle by which the shape will be rotated.
    * @see Stroke
    */
