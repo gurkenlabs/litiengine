@@ -1,14 +1,12 @@
 package de.gurkenlabs.litiengine.environment;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.configuration.Quality;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty.Particle;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
@@ -18,6 +16,8 @@ import de.gurkenlabs.litiengine.graphics.emitters.xml.ParticleParameter;
 import de.gurkenlabs.litiengine.physics.Collision;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.ColorHelper;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class EmitterMapObjectLoader extends MapObjectLoader {
 
@@ -25,8 +25,7 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     super(MapObjectType.EMITTER);
   }
 
-  @Override
-  public Collection<IEntity> load(Environment environment, IMapObject mapObject) {
+  @Override public Collection<IEntity> load(Environment environment, IMapObject mapObject) {
     Collection<IEntity> entities = new ArrayList<>();
     if (!this.isMatchingType(mapObject)) {
       return entities;
@@ -86,6 +85,8 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
       mapObject.getFloatValue(MapObjectProperty.Particle.DELTA_ANGLE_MAX, 0)));
     data.setParticleTTL(new ParticleParameter(mapObject.getFloatValue(MapObjectProperty.Particle.TTL_MIN, 0),
       mapObject.getFloatValue(MapObjectProperty.Particle.TTL_MAX, 0)));
+    data.setOutlineThickness(new ParticleParameter(mapObject.getFloatValue(Particle.OUTLINETHICKNESS_MIN, 1f),
+      mapObject.getFloatValue(MapObjectProperty.Particle.OUTLINETHICKNESS_MAX, 1f)));
 
     data.setCollision(mapObject.getEnumValue(MapObjectProperty.COLLISION_TYPE, Collision.class, EmitterData.DEFAULT_COLLISION));
     data.setRequiredQuality(mapObject.getEnumValue(MapObjectProperty.REQUIRED_QUALITY, Quality.class, EmitterData.DEFAULT_REQUIRED_QUALITY));
@@ -122,34 +123,34 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     String commaSeperatedColors = ArrayUtilities.join(emitterData.getColors());
     mo.setValue(MapObjectProperty.Emitter.COLORS, commaSeperatedColors);
 
-    // Particle parameters, min bounds
-    mo.setValue(MapObjectProperty.Particle.OFFSET_X_MIN, emitterData.getParticleOffsetX().getMinValue());
-    mo.setValue(MapObjectProperty.Particle.OFFSET_Y_MIN, emitterData.getParticleOffsetY().getMinValue());
-    mo.setValue(MapObjectProperty.Particle.STARTWIDTH_MIN, emitterData.getParticleWidth().getMinValue());
-    mo.setValue(MapObjectProperty.Particle.STARTHEIGHT_MIN, emitterData.getParticleHeight().getMinValue());
-    mo.setValue(MapObjectProperty.Particle.VELOCITY_X_MIN, emitterData.getVelocityX().getMinValue());
-    mo.setValue(MapObjectProperty.Particle.VELOCITY_Y_MIN, emitterData.getVelocityY().getMinValue());
-    mo.setValue(MapObjectProperty.Particle.ACCELERATION_X_MIN, emitterData.getAccelerationX().getMinValue());
-    mo.setValue(MapObjectProperty.Particle.ACCELERATION_Y_MIN, emitterData.getAccelerationY().getMinValue());
-    mo.setValue(MapObjectProperty.Particle.DELTAWIDTH_MIN, emitterData.getDeltaWidth().getMinValue());
-    mo.setValue(MapObjectProperty.Particle.DELTAHEIGHT_MIN, emitterData.getDeltaHeight().getMinValue());
-    mo.setValue(MapObjectProperty.Particle.ANGLE_MIN, emitterData.getAngle().getMinValue());
-    mo.setValue(MapObjectProperty.Particle.DELTA_ANGLE_MIN, emitterData.getDeltaAngle().getMinValue());
-    mo.setValue(MapObjectProperty.Particle.TTL_MIN, emitterData.getParticleTTL().getMinValue());
-    // Particle parameters, max bounds
-    mo.setValue(MapObjectProperty.Particle.OFFSET_X_MAX, emitterData.getParticleOffsetX().getMaxValue());
-    mo.setValue(MapObjectProperty.Particle.OFFSET_Y_MAX, emitterData.getParticleOffsetY().getMaxValue());
-    mo.setValue(MapObjectProperty.Particle.STARTWIDTH_MAX, emitterData.getParticleWidth().getMaxValue());
-    mo.setValue(MapObjectProperty.Particle.STARTHEIGHT_MAX, emitterData.getParticleHeight().getMaxValue());
-    mo.setValue(MapObjectProperty.Particle.VELOCITY_X_MAX, emitterData.getVelocityX().getMaxValue());
-    mo.setValue(MapObjectProperty.Particle.VELOCITY_Y_MAX, emitterData.getVelocityY().getMaxValue());
     mo.setValue(MapObjectProperty.Particle.ACCELERATION_X_MAX, emitterData.getAccelerationX().getMaxValue());
+    mo.setValue(MapObjectProperty.Particle.ACCELERATION_X_MIN, emitterData.getAccelerationX().getMinValue());
     mo.setValue(MapObjectProperty.Particle.ACCELERATION_Y_MAX, emitterData.getAccelerationY().getMaxValue());
-    mo.setValue(MapObjectProperty.Particle.DELTAWIDTH_MAX, emitterData.getDeltaWidth().getMaxValue());
-    mo.setValue(MapObjectProperty.Particle.DELTAHEIGHT_MAX, emitterData.getDeltaHeight().getMaxValue());
+    mo.setValue(MapObjectProperty.Particle.ACCELERATION_Y_MIN, emitterData.getAccelerationY().getMinValue());
     mo.setValue(MapObjectProperty.Particle.ANGLE_MAX, emitterData.getAngle().getMaxValue());
+    mo.setValue(MapObjectProperty.Particle.ANGLE_MIN, emitterData.getAngle().getMinValue());
     mo.setValue(MapObjectProperty.Particle.DELTA_ANGLE_MAX, emitterData.getDeltaAngle().getMaxValue());
+    mo.setValue(MapObjectProperty.Particle.DELTA_ANGLE_MIN, emitterData.getDeltaAngle().getMinValue());
+    mo.setValue(MapObjectProperty.Particle.DELTAHEIGHT_MAX, emitterData.getDeltaHeight().getMaxValue());
+    mo.setValue(MapObjectProperty.Particle.DELTAHEIGHT_MIN, emitterData.getDeltaHeight().getMinValue());
+    mo.setValue(MapObjectProperty.Particle.DELTAWIDTH_MAX, emitterData.getDeltaWidth().getMaxValue());
+    mo.setValue(MapObjectProperty.Particle.DELTAWIDTH_MIN, emitterData.getDeltaWidth().getMinValue());
+    mo.setValue(MapObjectProperty.Particle.OFFSET_X_MAX, emitterData.getParticleOffsetX().getMaxValue());
+    mo.setValue(MapObjectProperty.Particle.OFFSET_X_MIN, emitterData.getParticleOffsetX().getMinValue());
+    mo.setValue(MapObjectProperty.Particle.OFFSET_Y_MAX, emitterData.getParticleOffsetY().getMaxValue());
+    mo.setValue(MapObjectProperty.Particle.OFFSET_Y_MIN, emitterData.getParticleOffsetY().getMinValue());
+    mo.setValue(MapObjectProperty.Particle.OUTLINETHICKNESS_MAX, emitterData.getOutlineThickness().getMaxValue());
+    mo.setValue(MapObjectProperty.Particle.OUTLINETHICKNESS_MIN, emitterData.getOutlineThickness().getMinValue());
+    mo.setValue(MapObjectProperty.Particle.STARTHEIGHT_MAX, emitterData.getParticleHeight().getMaxValue());
+    mo.setValue(MapObjectProperty.Particle.STARTHEIGHT_MIN, emitterData.getParticleHeight().getMinValue());
+    mo.setValue(MapObjectProperty.Particle.STARTWIDTH_MAX, emitterData.getParticleWidth().getMaxValue());
+    mo.setValue(MapObjectProperty.Particle.STARTWIDTH_MIN, emitterData.getParticleWidth().getMinValue());
     mo.setValue(MapObjectProperty.Particle.TTL_MAX, emitterData.getParticleTTL().getMaxValue());
+    mo.setValue(MapObjectProperty.Particle.TTL_MIN, emitterData.getParticleTTL().getMinValue());
+    mo.setValue(MapObjectProperty.Particle.VELOCITY_X_MAX, emitterData.getVelocityX().getMaxValue());
+    mo.setValue(MapObjectProperty.Particle.VELOCITY_X_MIN, emitterData.getVelocityX().getMinValue());
+    mo.setValue(MapObjectProperty.Particle.VELOCITY_Y_MAX, emitterData.getVelocityY().getMaxValue());
+    mo.setValue(MapObjectProperty.Particle.VELOCITY_Y_MIN, emitterData.getVelocityY().getMinValue());
 
     mo.setValue(MapObjectProperty.COLLISION_TYPE, emitterData.getCollision());
     mo.setValue(MapObjectProperty.REQUIRED_QUALITY, emitterData.getRequiredQuality());

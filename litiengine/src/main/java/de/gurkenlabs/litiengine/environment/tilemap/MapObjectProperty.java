@@ -132,6 +132,8 @@ public final class MapObjectProperty {
     public static final String FADE = "particleFade";
     public static final String FADEONCOLLISION = "particleFadeOnCollision";
     public static final String OUTLINEONLY = "particleOutlineOnly";
+    public static final String OUTLINETHICKNESS_MIN = "particleMinOutlineThickness";
+    public static final String OUTLINETHICKNESS_MAX = "particleMaxOutlineThickness";
     public static final String ANTIALIASING = "particleAntiAliasing";
 
     private Particle() {

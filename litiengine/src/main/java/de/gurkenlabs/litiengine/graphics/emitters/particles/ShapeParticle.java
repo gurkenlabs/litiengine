@@ -18,27 +18,23 @@ public abstract class ShapeParticle extends Particle {
 
   @Override
   public Rectangle2D getBoundingBox(Point2D origin) {
-    return this.getShape(origin).getBounds2D();
+    return getShape(origin).getBounds2D();
   }
 
   @Override
   public void render(final Graphics2D g, final Point2D emitterOrigin) {
     g.setColor(
-        new Color(
-            this.getColor().getRed() / 255f,
-            this.getColor().getGreen() / 255f,
-            this.getColor().getBlue() / 255f,
-            this.getOpacity()));
+      new Color(
+        getColor().getRed() / 255f,
+        getColor().getGreen() / 255f,
+        getColor().getBlue() / 255f,
+        getOpacity()));
 
-    if (this.isOutlineOnly() || this instanceof LineParticle) {
+    if (isOutlineOnly() || this instanceof LineParticle) {
       Game.graphics()
-          .renderOutline(
-              g,
-              this.getShape(emitterOrigin),
-              new BasicStroke(1.0f / Game.graphics().getBaseRenderScale()),
-              this.isAntiAliased());
+        .renderOutline(g, getShape(emitterOrigin), new BasicStroke(getOutlineThickness() / Game.graphics().getBaseRenderScale()), isAntiAliased());
     } else {
-      Game.graphics().renderShape(g, this.getShape(emitterOrigin), this.isAntiAliased());
+      Game.graphics().renderShape(g, getShape(emitterOrigin), isAntiAliased());
     }
   }
 }

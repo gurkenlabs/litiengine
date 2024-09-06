@@ -8,7 +8,6 @@ import de.gurkenlabs.litiengine.graphics.emitters.particles.ParticleType;
 import de.gurkenlabs.litiengine.physics.Collision;
 import de.gurkenlabs.litiengine.resources.Resource;
 import de.gurkenlabs.litiengine.util.ColorHelper;
-import de.gurkenlabs.litiengine.util.MathUtilities;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlAttribute;
@@ -16,7 +15,6 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlTransient;
-
 import java.awt.Color;
 import java.io.Serial;
 import java.io.Serializable;
@@ -73,6 +71,8 @@ public class EmitterData implements Serializable, Resource {
   public static final float DEFAULT_MAX_VELOCITY_X = .1f;
   public static final float DEFAULT_MIN_VELOCITY_Y = -.1f;
   public static final float DEFAULT_MAX_VELOCITY_Y = .1f;
+  public static final float DEFAULT_MIN_OUTLINETHICKNESS = 1f;
+  public static final float DEFAULT_MAX_OUTLINETHICKNESS = 1f;
   public static final float DEFAULT_MIN_WIDTH = 2f;
   public static final float DEFAULT_MAX_WIDTH = 6f;
   public static final float DEFAULT_MIN_HEIGHT = 2f;
@@ -143,6 +143,9 @@ public class EmitterData implements Serializable, Resource {
   @XmlElement
   private ParticleParameter deltaAngle;
 
+  @XmlElement
+  private ParticleParameter outlineThickness;
+
   @XmlAttribute
   private float height;
 
@@ -208,6 +211,7 @@ public class EmitterData implements Serializable, Resource {
     this.velocityY = new ParticleParameter();
     this.accelerationX = new ParticleParameter();
     this.accelerationY = new ParticleParameter();
+    this.outlineThickness = new ParticleParameter();
     this.particleWidth = new ParticleParameter();
     this.particleHeight = new ParticleParameter();
     this.particleTTL = new ParticleParameter();
@@ -358,6 +362,15 @@ public class EmitterData implements Serializable, Resource {
 
   public void setAccelerationY(final ParticleParameter accelerationY) {
     this.accelerationY = accelerationY;
+  }
+
+  @XmlTransient
+  public ParticleParameter getOutlineThickness() {
+    return this.outlineThickness;
+  }
+
+  public void setOutlineThickness(final ParticleParameter outlineThickness) {
+    this.outlineThickness = outlineThickness;
   }
 
   @XmlTransient
@@ -586,6 +599,8 @@ public class EmitterData implements Serializable, Resource {
     this.velocityX.setMaxValue(DEFAULT_MAX_VELOCITY_X);
     this.velocityY.setMinValue(DEFAULT_MIN_VELOCITY_Y);
     this.velocityY.setMaxValue(DEFAULT_MAX_VELOCITY_Y);
+    this.velocityY.setMinValue(DEFAULT_MAX_OUTLINETHICKNESS);
+    this.velocityY.setMaxValue(DEFAULT_MAX_OUTLINETHICKNESS);
     this.accelerationX.setMinValue(DEFAULT_MIN_ACCELERATION_X);
     this.accelerationX.setMaxValue(DEFAULT_MAX_ACCELERATION_X);
     this.accelerationY.setMinValue(DEFAULT_MIN_ACCELERATION_Y);

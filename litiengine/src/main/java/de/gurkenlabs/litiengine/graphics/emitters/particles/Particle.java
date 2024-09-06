@@ -6,7 +6,6 @@ import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.litiengine.physics.Collision;
-import de.gurkenlabs.litiengine.util.MathUtilities;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Line2D;
@@ -33,6 +32,7 @@ public abstract class Particle implements ITimeToLive {
    * The vertical velocity (vertical movement per update) for this particle.
    */
   private float velocityY;
+  private float outlineThickness;
   private boolean outlineOnly;
   private boolean antiAliasing;
 
@@ -89,7 +89,7 @@ public abstract class Particle implements ITimeToLive {
 
   @Override
   public long getAliveTime() {
-    return this.aliveTime;
+    return aliveTime;
   }
 
   /**
@@ -104,55 +104,59 @@ public abstract class Particle implements ITimeToLive {
   }
 
   public Collision getCollisionType() {
-    return this.collisionType;
+    return collisionType;
   }
 
   public Color getColor() {
-    return this.color;
+    return color;
   }
 
   public float getDeltaHeight() {
-    return this.deltaHeight;
+    return deltaHeight;
   }
 
   public float getDeltaWidth() {
-    return this.deltaWidth;
+    return deltaWidth;
   }
 
   public float getVelocityX() {
-    return this.velocityX;
+    return velocityX;
   }
 
   public float getVelocityY() {
-    return this.velocityY;
+    return velocityY;
   }
 
   public float getAccelerationX() {
-    return this.accelerationX;
+    return accelerationX;
   }
 
   public float getAccelerationY() {
-    return this.accelerationY;
+    return accelerationY;
   }
 
   public float getAngle() {
-    return this.angle;
+    return angle;
   }
 
   public float getDeltaAngle() {
-    return this.deltaAngle;
+    return deltaAngle;
   }
 
   public float getHeight() {
-    return this.height;
+    return height;
+  }
+
+  public float getOutlineThickness() {
+    return outlineThickness;
   }
 
   public boolean isOutlineOnly() {
-    return this.outlineOnly;
+    return outlineOnly;
   }
 
   public boolean isAntiAliased() {
-    return this.antiAliasing;
+    return antiAliasing;
   }
 
   public float getOpacity() {
@@ -176,44 +180,44 @@ public abstract class Particle implements ITimeToLive {
     Point2D newEffectLocation =
       Game.screens() != null ? Game.world().camera().getViewportLocation(effectLocation)
         : effectLocation;
-    return this.getAbsoluteLocation(newEffectLocation);
+    return getAbsoluteLocation(newEffectLocation);
   }
 
   public RenderType getCustomRenderType() {
-    return this.customRenderType;
+    return customRenderType;
   }
 
   @Override
   public int getTimeToLive() {
-    return this.timeToLive;
+    return timeToLive;
   }
 
   public float getWidth() {
-    return this.width;
+    return width;
   }
 
   public float getX() {
-    return this.x;
+    return x;
   }
 
   public float getY() {
-    return this.y;
+    return y;
   }
 
   public boolean isFading() {
-    return this.fade;
+    return fade;
   }
 
   public boolean isFadingOnCollision() {
-    return this.fadeOnCollision;
+    return fadeOnCollision;
   }
 
   public boolean isContinuousCollisionEnabled() {
-    return this.continuousCollision;
+    return continuousCollision;
   }
 
   public boolean isStoppingOnCollision() {
-    return this.stopOnCollision;
+    return stopOnCollision;
   }
 
   public abstract void render(final Graphics2D g, final Point2D emitterOrigin);
@@ -224,11 +228,9 @@ public abstract class Particle implements ITimeToLive {
   }
 
   /**
-   * Enabling this check can be very performance hungry and should be used with caution and only for
-   * a small amount of particles.
+   * Enabling this check can be very performance hungry and should be used with caution and only for a small amount of particles.
    *
-   * @param ccd If set to true, the collision will be checked continuously by a ray-cast
-   *            approximation.
+   * @param ccd If set to true, the collision will be checked continuously by a ray-cast approximation.
    * @return This particle instance.
    */
   public Particle setContinuousCollision(boolean ccd) {
@@ -303,6 +305,11 @@ public abstract class Particle implements ITimeToLive {
     return this;
   }
 
+  public Particle setOutlineThickness(final float outlineThickness) {
+    this.outlineThickness = outlineThickness;
+    return this;
+  }
+
   public Particle setOutlineOnly(final boolean outlineOnly) {
     this.outlineOnly = outlineOnly;
     return this;
@@ -358,6 +365,8 @@ public abstract class Particle implements ITimeToLive {
     this.setTimeToLive((int) data.getParticleTTL().get());
     this.setColor(Game.random().choose(data.getDecodedColors()));
 
+    this.setOutlineThickness((float) data.getOutlineThickness().get());
+
     this.setCollisionType(data.getCollision());
     this.setOutlineOnly(data.isOutlineOnly());
     this.setAntiAliasing(data.isAntiAliased());
@@ -369,12 +378,11 @@ public abstract class Particle implements ITimeToLive {
 
   @Override
   public boolean timeToLiveReached() {
-    return this.getTimeToLive() > 0 && this.getAliveTime() >= this.getTimeToLive();
+    return getTimeToLive() > 0 && this.getAliveTime() >= this.getTimeToLive();
   }
 
   /**
-   * Updates the effect's position, change in xCurrent, change in yCurrent, remaining lifetime, and
-   * color.
+   * Updates the effect's position, change in xCurrent, change in yCurrent, remaining lifetime, and color.
    *
    * @param emitterOrigin The current {@link Emitter} origin
    * @param updateRatio   The update ratio for this particle.
@@ -495,6 +503,6 @@ public abstract class Particle implements ITimeToLive {
   }
 
   public boolean usesCustomRenderType() {
-    return this.useCustomRenderType;
+    return useCustomRenderType;
   }
 }
