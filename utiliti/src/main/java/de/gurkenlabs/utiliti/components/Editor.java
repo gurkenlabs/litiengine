@@ -820,7 +820,7 @@ public class Editor extends Screen {
       if (preferences().syncMaps()) {
         for (String file : FileUtilities.findFilesByExtension(
             new ArrayList<>(),
-            Paths.get(FileUtilities.combine(this.getProjectPath(), "maps")),
+            Paths.get(Resources.getLocation("maps").getPath()),
             map.getName() + "." + TmxMap.FILE_EXTENSION)) {
           File newFile = XmlUtilities.save(map, file, TmxMap.FILE_EXTENSION);
           log.log(Level.INFO, "synchronized map {0}", new Object[] {newFile});
