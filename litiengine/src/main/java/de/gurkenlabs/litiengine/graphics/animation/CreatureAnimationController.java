@@ -20,7 +20,7 @@ import java.util.Optional;
  *
  * <ul>
  * <li>{@link #getSpritePrefix()}-idle-{DIRECTION}.{EXTENSION}
- * <li>{@link #getSpritePrefix()}-walk-{DIRECTION}.{EXTENSION}
+ * <li>{@link #getSpritePrefix()}-move-{DIRECTION}.{EXTENSION}
  * </ul>
  * <p>
  * Where {DIRECTION} refers to a value of the {@link Direction} enum and {@link #getSpritePrefix()} refers to the
@@ -126,10 +126,10 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
       return hasAnimation(deadName) ? deadName : chooseRandomDeathAnimation();
     } else if (entity.isIdle()) {
       String idleName = getIdleSpriteName(direction);
-      return hasAnimation(idleName) ? idleName : getWalkSpriteName(direction);
+      return hasAnimation(idleName) ? idleName : getMoveSpriteName(direction);
     } else {
-      String walkName = getWalkSpriteName(direction);
-      return hasAnimation(walkName) ? walkName : getIdleSpriteName(direction);
+      String moveName = getMoveSpriteName(direction);
+      return hasAnimation(moveName) ? moveName : getIdleSpriteName(direction);
     }
   }
 
@@ -152,7 +152,7 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
   }
 
   /**
-   * Initializes the available animations for the creature. This method sets up walking, idle, and dead animations for all directions.
+   * Initializes the available animations for the creature. This method sets up moving, idle, and dead animations for all directions.
    */
 
   private void initializeAvailableAnimations() {
@@ -203,8 +203,8 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
     return getSpriteNameWithDirection(CreatureAnimationState.IDLE, dir);
   }
 
-  private String getWalkSpriteName(Direction dir) {
-    return getSpriteNameWithDirection(CreatureAnimationState.WALK, dir);
+  private String getMoveSpriteName(Direction dir) {
+    return getSpriteNameWithDirection(CreatureAnimationState.MOVE, dir);
   }
 
   private String getSpriteNameWithDirection(CreatureAnimationState state, Direction dir) {

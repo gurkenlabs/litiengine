@@ -2,7 +2,7 @@ package de.gurkenlabs.litiengine.graphics;
 
 public enum CreatureAnimationState {
   IDLE,
-  WALK,
+  MOVE,
   DEAD;
 
   private final String spriteString;
@@ -16,6 +16,6 @@ public enum CreatureAnimationState {
   }
 
   public CreatureAnimationState getOpposite() {
-    return this == CreatureAnimationState.IDLE ? WALK : IDLE;
+    return this == CreatureAnimationState.IDLE ? MOVE : IDLE;
   }
 }

@@ -121,7 +121,7 @@ public class IconTreeListRenderer implements TreeCellRenderer {
                                   || s.getName()
                                       .equals(
                                           CreatureAnimationController.getSpriteName(
-                                              creature, CreatureAnimationState.WALK))
+                                              creature, CreatureAnimationState.MOVE))
                                   || s.getName()
                                       .equals(
                                           CreatureAnimationController.getSpriteName(
