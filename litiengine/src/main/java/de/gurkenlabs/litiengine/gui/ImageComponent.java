@@ -10,6 +10,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.geom.Point2D;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.util.Optional;
 import javax.swing.JLabel;
@@ -142,15 +143,14 @@ public class ImageComponent extends GuiComponent {
       }
     }
 
-    final String cacheKey =
-      String.format("%s_%dx%d_%b", this.baseImage.hashCode(), imageWidth, imageHeight, keepRatio);
+    final String cacheKey = String.format("%s_%dx%d_%b", this.baseImage.hashCode(), imageWidth, imageHeight, keepRatio);
 
     Optional<BufferedImage> opt = Resources.images().tryGet(cacheKey);
     if (opt.isPresent()) {
       this.scaledImage = opt.get();
       return;
     } else {
-      this.scaledImage = Imaging.scale(this.baseImage, imageWidth, imageHeight, keepRatio);
+      this.scaledImage = Imaging.scale(this.baseImage, imageWidth, imageHeight, AffineTransformOp.TYPE_BICUBIC, keepRatio);
     }
     Resources.images().add(cacheKey, this.scaledImage);
   }
