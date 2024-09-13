@@ -44,7 +44,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -820,7 +820,7 @@ public class Editor extends Screen {
       if (preferences().syncMaps()) {
         for (String file : FileUtilities.findFilesByExtension(
             new ArrayList<>(),
-            Paths.get(Resources.getLocation("maps").getPath()),
+            Path.of(Resources.getLocation("maps").getPath()),
             map.getName() + "." + TmxMap.FILE_EXTENSION)) {
           File newFile = XmlUtilities.save(map, file, TmxMap.FILE_EXTENSION);
           log.log(Level.INFO, "synchronized map {0}", new Object[] {newFile});
