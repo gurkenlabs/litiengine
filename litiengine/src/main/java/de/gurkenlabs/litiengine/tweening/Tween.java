@@ -4,8 +4,8 @@ import de.gurkenlabs.litiengine.Game;
 import java.util.Arrays;
 
 /**
- * A Tween is an interpolation between start values and target values over a given time period. It modifies the start
- * values by applying an easing function ({@code TweenEquation}) each tick.
+ * A Tween is an interpolation between start values and target values over a given time period. It modifies the start values by applying an easing
+ * function ({@code TweenEquation}) each tick.
  */
 public class Tween {
   private int duration;
@@ -20,12 +20,9 @@ public class Tween {
   /**
    * Instantiates a new tween.
    *
-   * @param target
-   *          the {@code Tweenable} target object
-   * @param type
-   *          the {@code TweenType} determining which values of the target object will be modified.
-   * @param duration
-   *          the duration of the Tween in milliseconds.
+   * @param target   the {@code Tweenable} target object
+   * @param type     the {@code TweenType} determining which values of the target object will be modified.
+   * @param duration the duration of the Tween in milliseconds.
    */
   public Tween(final Tweenable target, final TweenType type, final int duration) {
     this.target = target;
@@ -47,10 +44,18 @@ public class Tween {
   }
 
   /**
+   * Checks if the Tween is currently running.
+   *
+   * @return true if the Tween is running, false otherwise.
+   */
+  public boolean isRunning() {
+    return !stopped && Game.time().since(started) < duration;
+  }
+
+  /**
    * Sets a custom easing function for this Tween.
    *
-   * @param easeEquation
-   *          the {@code TweenEquation} applied to the tween values.
+   * @param easeEquation the {@code TweenEquation} applied to the tween values.
    * @return the Tween instance.
    */
   public Tween ease(final TweenEquation easeEquation) {
@@ -61,8 +66,7 @@ public class Tween {
   /**
    * Sets a predefined easing function for this Tween.
    *
-   * @param easingFunction
-   *          the {@code TweenFunction} applied to the tween values.
+   * @param easingFunction the {@code TweenFunction} applied to the tween values.
    * @return the Tween instance.
    */
   public Tween ease(final TweenFunction easingFunction) {
@@ -165,8 +169,7 @@ public class Tween {
   /**
    * Sets the Tween duration.
    *
-   * @param duration
-   *          the new duration in milliseconds
+   * @param duration the new duration in milliseconds
    */
   public void setDuration(final int duration) {
     this.duration = duration;
@@ -185,8 +188,7 @@ public class Tween {
   /**
    * Sets the target values absolutely.
    *
-   * @param targetValues
-   *          the absolute target values
+   * @param targetValues the absolute target values
    * @return the Tween instance
    */
   public Tween target(final float... targetValues) {
@@ -200,8 +202,7 @@ public class Tween {
   /**
    * Sets the target values relatively to the start values.
    *
-   * @param targetValues
-   *          the relative target values with respect to the start values
+   * @param targetValues the relative target values with respect to the start values
    * @return the Tween instance
    */
   public Tween targetRelative(final float... targetValues) {

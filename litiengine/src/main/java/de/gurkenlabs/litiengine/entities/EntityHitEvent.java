@@ -14,8 +14,7 @@ public class EntityHitEvent extends EventObject {
   private final transient Ability ability;
   private final long time;
 
-  EntityHitEvent(
-      final ICombatEntity hitEntity, final Ability ability, final int damage, final boolean kill) {
+  EntityHitEvent(final ICombatEntity hitEntity, final Ability ability, final int damage, final boolean kill) {
     super(hitEntity);
     this.executor = ability != null ? ability.getExecutor() : null;
     this.hitEntity = hitEntity;

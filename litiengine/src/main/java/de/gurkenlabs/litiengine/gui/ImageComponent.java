@@ -9,7 +9,6 @@ import de.gurkenlabs.litiengine.util.Imaging;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.geom.Point2D;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import javax.swing.JLabel;
@@ -37,6 +36,9 @@ public class ImageComponent extends GuiComponent {
   private float spritesheetScaleFactor = 1f;
   private Align imageAlign = Align.CENTER;
   private Valign imageValign = Valign.MIDDLE;
+
+  private double horizontalImagePadding;
+  private double verticalImagePadding;
 
   /**
    * Constructs an ImageComponent with the specified position and image.
@@ -161,10 +163,11 @@ public class ImageComponent extends GuiComponent {
    */
   public void rescaleImage() {
     if (baseImage == null) {
+      this.scaledImage = null;
       return;
     }
-    int imageWidth = (int) this.getWidth();
-    int imageHeight = (int) this.getHeight();
+    int imageWidth = (int) (2 * getHorizontalImagePadding() > getWidth() ? getWidth() : getWidth() - 2 * getHorizontalImagePadding());
+    int imageHeight = (int) (2 * getVerticalImagePadding() > getHeight() ? getHeight() : getHeight() - 2 * getVerticalImagePadding());
     boolean keepRatio;
 
     switch (getImageScaleMode()) {
@@ -232,6 +235,44 @@ public class ImageComponent extends GuiComponent {
   }
 
   /**
+   * Gets the horizontal padding for the image.
+   *
+   * @return The horizontal padding for the image.
+   */
+  public double getHorizontalImagePadding() {
+    return horizontalImagePadding;
+  }
+
+  /**
+   * Sets the horizontal padding for the image.
+   *
+   * @param horizontalImagePadding The horizontal padding to set.
+   */
+  public void setHorizontalImagePadding(double horizontalImagePadding) {
+    this.horizontalImagePadding = horizontalImagePadding;
+    rescaleImage();
+  }
+
+  /**
+   * Gets the vertical padding for the image.
+   *
+   * @return The vertical padding for the image.
+   */
+  public double getVerticalImagePadding() {
+    return verticalImagePadding;
+  }
+
+  /**
+   * Sets the vertical padding for the image.
+   *
+   * @param verticalImagePadding The vertical padding to set.
+   */
+  public void setVerticalImagePadding(double verticalImagePadding) {
+    this.verticalImagePadding = verticalImagePadding;
+    rescaleImage();
+  }
+
+  /**
    * Gets the vertical alignment of the image within the component.
    *
    * @return The vertical alignment of the image.
@@ -259,7 +300,9 @@ public class ImageComponent extends GuiComponent {
 
     final BufferedImage img = getImage();
     if (img != null) {
-      ImageRenderer.render(g, img, getImageLocation(img));
+      double imageX = getImageAlign().getLocation(getWidth(), img.getWidth(), true);
+      double imageY = getImageValign().getLocation(getHeight(), img.getHeight(), true);
+      ImageRenderer.render(g, img, getX() + imageX, getY() + imageY);
     }
     super.render(g);
   }
@@ -434,34 +477,5 @@ public class ImageComponent extends GuiComponent {
    */
   protected Spritesheet getSpritesheet() {
     return spritesheet;
-  }
-
-  /**
-   * Calculates the location of the image within the component based on the alignment and scaling mode.
-   *
-   * @param img The image for which the location is to be calculated.
-   * @return A {@code Point2D} object representing the location of the image.
-   */
-
-  private Point2D getImageLocation(final Image img) {
-    double x = getX();
-    double y = getY();
-    if (getImageScaleMode() == ImageScaleMode.STRETCH) {
-      return new Point2D.Double(x, y);
-    }
-
-    if (getImageAlign() == Align.RIGHT) {
-      x += getWidth() - img.getWidth(null);
-    } else if (getImageAlign() == Align.CENTER) {
-      x += (getWidth() - img.getWidth(null)) / 2.0;
-    }
-
-    if (getImageValign() == Valign.DOWN) {
-      y += getHeight() - img.getHeight(null);
-    } else if (getImageValign() == Valign.MIDDLE) {
-      y += (getHeight() - img.getHeight(null)) / 2.0;
-    }
-
-    return new Point2D.Double(x, y);
   }
 }

@@ -113,4 +113,13 @@ public enum Align {
 
     return Math.max(0, Math.min(width - objectWidth, location));
   }
+
+  /**
+   * Gets the portion value of the alignment.
+   *
+   * @return The portion value of the alignment.
+   */
+  public float getPortion() {
+    return portion;
+  }
 }
