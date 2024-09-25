@@ -120,28 +120,13 @@ public class DefaultUncaughtExceptionHandler implements UncaughtExceptionHandler
   }
 
   protected static String dump() {
-    StringBuilder text = new StringBuilder();
-    ThreadMXBean threads = ManagementFactory.getThreadMXBean();
-    ThreadInfo[] dumps = threads.getThreadInfo(threads.getAllThreadIds(), 255);
-    text.append("====THREAD DUMP====\n\n");
-    for (ThreadInfo dump : dumps) {
-      text.append("\"").append(dump.getThreadName()).append("\"\n");
-      Thread.State state = dump.getThreadState();
-      text.append("\tState: ").append(state);
-      String blockedBy = dump.getLockOwnerName();
-      if (blockedBy != null) {
-        text.append(" on ").append(blockedBy);
-      }
-      text.append("\n");
-      StackTraceElement[] elements = dump.getStackTrace();
-      for (StackTraceElement element : elements) {
-        text.append("\t\tat ");
-        text.append(element);
-        text.append("\n");
-      }
-      text.append("\n\n");
-    }
-    return text.toString();
+		StringBuilder text = new StringBuilder();
+		ThreadMXBean threads = ManagementFactory.getThreadMXBean();
+		text.append("---- THREAD DUMP ----\n\n");
+		for (ThreadInfo dump : threads.dumpAllThreads(true, true)) {
+			text.append(dump.toString());
+		}
+		return text.toString();
   }
 
   protected static String getSystemInfo() {
