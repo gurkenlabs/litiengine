@@ -1101,12 +1101,12 @@ public class MapComponent extends GuiComponent {
   }
 
   private void handleMouseWheelScrolled(ComponentMouseWheelEvent e) {
-    if (!this.hasFocus() || mapIsNull()) {
+    if (!this.hasFocus() || mapIsNull() || e.getEvent().getWheelRotation() == 0) {
       return;
     }
 
     // horizontal scrolling
-    if (Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
+    if (Input.keyboard().isPressed(KeyEvent.VK_SHIFT) || e.getEvent().isShiftDown()) {
       if (e.getEvent().getWheelRotation() < 0) {
         Scroll.left();
       } else {
