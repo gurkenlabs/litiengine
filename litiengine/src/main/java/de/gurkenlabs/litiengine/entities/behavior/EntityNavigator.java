@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
 
+/**
+ * The EntityNavigator class is responsible for navigating an entity along a path. It implements the IUpdateable and IRenderable interfaces.
+ */
 public class EntityNavigator implements IUpdateable, IRenderable {
 
   private static final float DEFAULT_ACCEPTABLE_ERROR = 0.3f;
@@ -29,12 +32,10 @@ public class EntityNavigator implements IUpdateable, IRenderable {
   private float acceptableError;
 
   /**
-   * Instantiates a new entity navigator.
+   * Constructs an EntityNavigator with a specified entity and path finder.
    *
-   * @param entity
-   *          The entity that will be navigated by this instance
-   * @param pathFinder
-   *          The pathfinder that is used to navigate the entity
+   * @param entity     the entity that will be navigated by this instance
+   * @param pathFinder the path finder used to find paths for navigation
    */
   public EntityNavigator(final IMobileEntity entity, final PathFinder pathFinder) {
     this.cancelNavigationConditions = new CopyOnWriteArrayList<>();
@@ -48,52 +49,103 @@ public class EntityNavigator implements IUpdateable, IRenderable {
   /**
    * Instantiates a new entity navigator without a pre-initialized PathFinder.
    *
-   * @param entity
-   *          The entity that will be navigated by this instance
+   * @param entity The entity that will be navigated by this instance
    */
   public EntityNavigator(final IMobileEntity entity) {
     this(entity, null);
   }
 
+  /**
+   * Adds a navigation listener to this EntityNavigator.
+   *
+   * @param listener the NavigationListener to be added
+   */
   public void addNavigationListener(NavigationListener listener) {
     this.listeners.add(listener);
   }
 
+  /**
+   * Removes a navigation listener from this EntityNavigator.
+   *
+   * @param listener the NavigationListener to be removed
+   */
   public void removeNavigationListener(NavigationListener listener) {
     this.listeners.remove(listener);
   }
 
+  /**
+   * Adds a condition to cancel the navigation if the specified predicate evaluates to true.
+   *
+   * @param predicate the condition to evaluate for canceling the navigation
+   */
   public void cancelNavigation(final Predicate<IMobileEntity> predicate) {
     if (!this.cancelNavigationConditions.contains(predicate)) {
       this.cancelNavigationConditions.add(predicate);
     }
   }
 
+  /**
+   * Gets the entity being navigated.
+   *
+   * @return the entity being navigated
+   */
   public IMobileEntity getEntity() {
     return entity;
   }
 
+  /**
+   * Gets the current path for navigation.
+   *
+   * @return the current path, or null if no path is set
+   */
   public Path getPath() {
     return this.path;
   }
 
+  /**
+   * Gets the path finder used for navigation.
+   *
+   * @return the path finder, or null if no path finder is set
+   */
   public PathFinder getPathFinder() {
     return this.pathFinder;
   }
 
+  /**
+   * Gets the acceptable error for navigation.
+   *
+   * @return the acceptable error
+   */
   public float getAcceptableError() {
     return this.acceptableError;
   }
 
+  /**
+   * Checks if the entity is currently navigating.
+   *
+   * @return true if the entity is navigating, false otherwise
+   */
   public boolean isNavigating() {
     return getPath() != null;
   }
 
+  /**
+   * Sets the current path for navigation.
+   *
+   * @param path the path to be navigated
+   * @return true if the path is set successfully, false otherwise
+   */
   public boolean navigate(final Path2D path) {
     this.path = new Path(path);
     return getPath() != null;
   }
 
+  /**
+   * Finds and sets a path to the specified target point.
+   *
+   * @param target the target point to navigate to
+   * @return true if the path is found and set successfully, false otherwise
+   */
   public boolean navigate(final Point2D target) {
     if (this.getPathFinder() != null) {
       this.path = getPathFinder().findPath(getEntity(), target);
@@ -112,20 +164,33 @@ public class EntityNavigator implements IUpdateable, IRenderable {
     Game.graphics().renderOutline(g, getPath().getPath());
   }
 
+  /**
+   * Rotates the entity towards the specified target point.
+   *
+   * @param target the target point to rotate towards
+   */
   public void rotateTowards(final Point2D target) {
     final double angle =
-        GeometricUtilities.calcRotationAngleInDegrees(
-            getEntity().getCollisionBox().getCenterX(),
-            getEntity().getCollisionBox().getCenterY(),
-            target.getX(),
-            target.getY());
+      GeometricUtilities.calcRotationAngleInDegrees(
+        getEntity().getCollisionBox().getCenterX(),
+        getEntity().getCollisionBox().getCenterY(),
+        target.getX(),
+        target.getY());
     getEntity().setAngle((float) angle);
   }
 
+  /**
+   * Sets the acceptable error for navigation.
+   *
+   * @param acceptableError the acceptable error to set
+   */
   public void setAcceptableError(float acceptableError) {
     this.acceptableError = acceptableError;
   }
 
+  /**
+   * Stops the navigation and resets the current segment and path.
+   */
   public void stop() {
     this.currentSegment = 0;
     this.path = null;
@@ -181,27 +246,27 @@ public class EntityNavigator implements IUpdateable, IRenderable {
     pi.currentSegment(coordinates);
 
     final double distance =
-        GeometricUtilities.distance(
-            getEntity().getCollisionBox().getCenterX(),
-            getEntity().getCollisionBox().getCenterY(),
-            coordinates[0],
-            coordinates[1]);
+      GeometricUtilities.distance(
+        getEntity().getCollisionBox().getCenterX(),
+        getEntity().getCollisionBox().getCenterY(),
+        coordinates[0],
+        coordinates[1]);
     if (distance < getAcceptableError()) {
       ++this.currentSegment;
       return;
     }
 
     final double angle =
-        GeometricUtilities.calcRotationAngleInDegrees(
-            getEntity().getCollisionBox().getCenterX(),
-            getEntity().getCollisionBox().getCenterY(),
-            coordinates[0],
-            coordinates[1]);
+      GeometricUtilities.calcRotationAngleInDegrees(
+        getEntity().getCollisionBox().getCenterX(),
+        getEntity().getCollisionBox().getCenterY(),
+        coordinates[0],
+        coordinates[1]);
     final float pixelsPerTick = getEntity().getTickVelocity();
     Game.physics()
-        .move(
-            getEntity(),
-            (float) angle,
-            (float) (distance < pixelsPerTick ? distance : pixelsPerTick));
+      .move(
+        getEntity(),
+        (float) angle,
+        (float) (distance < pixelsPerTick ? distance : pixelsPerTick));
   }
 }
