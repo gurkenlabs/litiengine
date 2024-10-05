@@ -70,9 +70,7 @@ public class Creature extends CombatEntity implements IMobileEntity {
     if (spritesheetName != null) {
       this.setSpritesheetName(spritesheetName);
     } else {
-      this.setSpritesheetName(
-          Game.random()
-              .choose(EntityAnimationController.getDefaultSpritePrefixes(getClass())));
+      this.setSpritesheetName(Game.random().choose(EntityAnimationController.getDefaultSpritePrefixes(getClass())));
     }
   }
 

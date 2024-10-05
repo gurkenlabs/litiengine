@@ -95,4 +95,18 @@ public class AbilityAttributes {
   public Attribute<Integer> value() {
     return this.value;
   }
+
+  /**
+   * Copies the values from another `AbilityAttributes` instance to this instance.
+   *
+   * @param otherAttributes the `AbilityAttributes` instance from which to copy values
+   */
+  public void copyValues(AbilityAttributes otherAttributes) {
+    cooldown().setBaseValue(otherAttributes.cooldown().getBase());
+    duration().setBaseValue(otherAttributes.duration().getBase());
+    impact().setBaseValue(otherAttributes.impact().getBase());
+    impactAngle().setBaseValue(otherAttributes.impactAngle().getBase());
+    range().setBaseValue(otherAttributes.range().getBase());
+    value().setBaseValue(otherAttributes.value().getBase());
+  }
 }
