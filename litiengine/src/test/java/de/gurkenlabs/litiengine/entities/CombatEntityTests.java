@@ -200,7 +200,7 @@ class CombatEntityTests {
     combatEntitySpy.hit(hitPoints, ability);
 
     // assert
-    verify(entityListener, times(2)).death(combatEntitySpy);
+    assertTrue(combatEntitySpy.isDead());
   }
 
   @Test

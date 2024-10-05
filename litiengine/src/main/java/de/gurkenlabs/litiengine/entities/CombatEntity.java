@@ -109,7 +109,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
     }
 
     this.getHitPoints().modifyBaseValue(new AttributeModifier<>(Modification.SET, 0));
-    this.fireDeathEvent();
+    this.fireDeathEvent(null);
   }
 
   @Override
@@ -190,21 +190,21 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
     }
 
     if (this.isDead()) {
-      this.fireDeathEvent();
+      this.fireDeathEvent(event);
     }
 
     this.lastHit = Game.time().now();
   }
 
-  protected void fireDeathEvent() {
+  protected void fireDeathEvent(EntityHitEvent entityHitEvent) {
     this.setCollision(false);
 
     for (final CombatEntityListener listener : this.listeners) {
-      listener.death(this);
+      listener.death(this, entityHitEvent);
     }
 
     for (final CombatEntityDeathListener listener : this.deathListeners) {
-      listener.death(this);
+      listener.death(this, entityHitEvent);
     }
   }
 
