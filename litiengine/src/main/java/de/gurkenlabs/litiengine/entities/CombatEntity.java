@@ -227,7 +227,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
    */
   @Override
   public boolean isFriendly(final ICombatEntity entity) {
-    return this.getTeam() == entity.getTeam();
+    return entity != null && this.getTeam() == entity.getTeam();
   }
 
   /**

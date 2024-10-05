@@ -1,13 +1,13 @@
 package de.gurkenlabs.litiengine.abilities.effects;
 
-import de.gurkenlabs.litiengine.abilities.Ability;
+import de.gurkenlabs.litiengine.abilities.targeting.TargetingStrategy;
 import de.gurkenlabs.litiengine.attributes.Attribute;
 import de.gurkenlabs.litiengine.attributes.AttributeModifier;
 import de.gurkenlabs.litiengine.attributes.Modification;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 
 /**
- * An attribute effect appies an attribute modifier to the affected entity when applied and removes it when ceased.
+ * An attribute effect applies an attribute modifier to the affected entity when applied and removes it when ceased.
  *
  * @param <T>
  *          the generic type
@@ -17,12 +17,17 @@ public abstract class AttributeEffect<T extends Number> extends Effect {
   /** The modifier. */
   private final AttributeModifier<T> modifier;
 
-  protected AttributeEffect(
-      final Ability ability,
+  protected AttributeEffect(final TargetingStrategy targetingStrategy,
+                            final Modification modification,
+                            final double delta) {
+    this(targetingStrategy, null, modification, delta);
+  }
+
+  protected AttributeEffect(final TargetingStrategy targetingStrategy,
+      final ICombatEntity executingEntity,
       final Modification modification,
-      final double delta,
-      final EffectTarget... targets) {
-    super(ability, targets);
+      final double delta) {
+    super(targetingStrategy, executingEntity);
     this.modifier = new AttributeModifier<>(modification, delta);
   }
 

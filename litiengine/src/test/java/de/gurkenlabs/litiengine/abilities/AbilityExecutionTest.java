@@ -17,7 +17,7 @@ import de.gurkenlabs.litiengine.GameTest;
 import de.gurkenlabs.litiengine.GameTime;
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.abilities.effects.Effect;
-import de.gurkenlabs.litiengine.abilities.effects.EffectTarget;
+import de.gurkenlabs.litiengine.abilities.targeting.TargetingStrategy;
 import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.test.GameTestSuite;
 
@@ -40,7 +40,7 @@ class AbilityExecutionTest {
 
     Creature testCreature = new Creature();
     ability = new TestAbility(testCreature);
-    effectSpy = spy(new TestEffect(ability));
+    effectSpy = spy(new TestEffect());
     ability.addEffect(effectSpy);
   }
 
@@ -82,7 +82,7 @@ class AbilityExecutionTest {
   @Test
   void update_alreadyAppliedEffect() {
     // arrange
-    TestEffect appliedEffectSpy = spy(new TestEffect(ability));
+    TestEffect appliedEffectSpy = spy(new TestEffect());
     ability.addEffect(appliedEffectSpy);
 
     AbilityExecution abilityExecution = new AbilityExecution(ability);
@@ -104,7 +104,7 @@ class AbilityExecutionTest {
   @Test
   void update_delayedEffect() {
     // arrange
-    TestEffect delayedEffectSpy = spy(new TestEffect(ability));
+    TestEffect delayedEffectSpy = spy(new TestEffect());
     delayedEffectSpy.setDelay(5);
     ability.addEffect(delayedEffectSpy);
 
@@ -167,7 +167,7 @@ class AbilityExecutionTest {
         .thenCallRealMethod(); // otherwise Game.time() returns null because of the mock
       gameMockedStatic.when(Game::loop).thenReturn(loopSpy);
 
-      TestEffect otherEffectSpy = spy(new TestEffect(ability));
+      TestEffect otherEffectSpy = spy(new TestEffect());
       ability.addEffect(otherEffectSpy);
 
       AbilityExecution testAbilityExecution = new AbilityExecution(ability);
@@ -187,15 +187,15 @@ class AbilityExecutionTest {
     }
   }
 
-  private class TestAbility extends Ability {
+  private static class TestAbility extends Ability {
     protected TestAbility(Creature executor) {
       super(executor);
     }
   }
 
-  private class TestEffect extends Effect {
-    protected TestEffect(Ability ability, EffectTarget... targets) {
-      super(ability, targets);
+  private static class TestEffect extends Effect {
+    protected TestEffect() {
+      super(TargetingStrategy.none());
     }
   }
 }

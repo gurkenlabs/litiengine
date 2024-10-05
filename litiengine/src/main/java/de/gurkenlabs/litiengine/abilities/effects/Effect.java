@@ -2,55 +2,80 @@ package de.gurkenlabs.litiengine.abilities.effects;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
-import de.gurkenlabs.litiengine.abilities.Ability;
-import de.gurkenlabs.litiengine.entities.EntityDistanceComparator;
+import de.gurkenlabs.litiengine.abilities.targeting.TargetingStrategy;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
-import de.gurkenlabs.litiengine.entities.RelativeEntityComparator;
+
 import java.awt.Shape;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.EventListener;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collectors;
 
 /**
- * The Class Effect seeks for affected entities in the game's current environment to apply certain
- * effects to them defined by the overwritten implementation of apply/cease.
+ * The `Effect` class represents an abstract base class for applying effects to combat entities.
+ * Effects are applied based on a `TargetingStrategy` and may affect multiple entities within
+ * a defined impact area. Effects are applied for a set duration and may have follow-up effects.
+ * <p>
+ * This class handles effect application, event listeners for when effects are applied or ceased,
+ * and the management of active appliances (ongoing effect instances).
  */
 public abstract class Effect implements IUpdateable {
 
-  private final Ability ability;
   private final List<EffectApplication> appliances;
   private final Collection<EffectAppliedListener> appliedListeners;
   private final Collection<EffectCeasedListener> ceasedListeners;
-  private final EffectTarget[] effectTargets;
   private final List<Effect> followUpEffects;
 
+  private final TargetingStrategy targetingStrategy;
+  private final ICombatEntity executor;
   private int delay;
   private int duration;
-  private RelativeEntityComparator targetPriorityComparator;
 
-  protected Effect(final Ability ability, final EffectTarget... targets) {
+  /**
+   * Constructs a new `Effect` with the specified targeting strategy.
+   *
+   * @param targetingStrategy The strategy used to target entities for this effect.
+   */
+  protected Effect(final TargetingStrategy targetingStrategy) {
+    this(targetingStrategy, null);
+  }
+
+  /**
+   * Constructs a new `Effect` with the specified targeting strategy and executor.
+   *
+   * @param targetingStrategy The strategy used to target entities for this effect.
+   * @param executor          The entity applying the effect, or null if none.
+   */
+  protected Effect(final TargetingStrategy targetingStrategy, final ICombatEntity executor) {
+    this(targetingStrategy, executor, 0);
+  }
+
+  /**
+   * Constructs a new `Effect` with the specified targeting strategy, executor, and duration.
+   *
+   * @param targetingStrategy The strategy used to target entities for this effect.
+   * @param executor          The entity applying the effect, or null if none.
+   * @param duration          The duration the effect will last.
+   */
+  protected Effect(final TargetingStrategy targetingStrategy, final ICombatEntity executor, int duration) {
     this.appliedListeners = ConcurrentHashMap.newKeySet();
     this.ceasedListeners = ConcurrentHashMap.newKeySet();
     this.appliances = new ArrayList<>();
     this.followUpEffects = new CopyOnWriteArrayList<>();
 
-    this.ability = ability;
-    this.targetPriorityComparator = new EntityDistanceComparator(this.getAbility().getExecutor());
-
-    this.duration = ability.getAttributes().duration().get();
-    if (targets == null || targets.length == 0) {
-      this.effectTargets = new EffectTarget[]{EffectTarget.NONE};
-    } else {
-      this.effectTargets = targets;
-    }
+    this.executor = executor;
+    this.duration = duration;
+    this.targetingStrategy = targetingStrategy;
   }
 
+  /**
+   * Registers a listener for when the effect is applied.
+   *
+   * @param listener The listener to register.
+   */
   public void onEffectApplied(final EffectAppliedListener listener) {
     this.appliedListeners.add(listener);
   }
@@ -59,6 +84,11 @@ public abstract class Effect implements IUpdateable {
     this.appliedListeners.remove(listener);
   }
 
+  /**
+   * Registers a listener for when the effect ceases.
+   *
+   * @param listener The listener to register.
+   */
   public void onEffectCeased(final EffectCeasedListener listener) {
     this.ceasedListeners.add(listener);
   }
@@ -68,24 +98,29 @@ public abstract class Effect implements IUpdateable {
   }
 
   /**
-   * Applies the effect in the specified impact area on the specified environment.
+   * Applies the effect to all entities within the specified impact area.
    *
-   * @param impactArea The impact area
+   * @param impactArea The area where the effect is applied.
    */
   public void apply(final Shape impactArea) {
-    final List<ICombatEntity> affected = this.lookForAffectedEntities(impactArea);
+    final var affected = this.targetingStrategy.findTargets(impactArea, this.getExecutingEntity());
     for (final ICombatEntity affectedEntity : affected) {
       this.apply(affectedEntity);
     }
 
     this.appliances.add(new EffectApplication(affected, impactArea));
 
-    // if it is the first appliance -> register for update
+    // Register for updates if this is the first application
     if (this.appliances.size() == 1) {
       Game.loop().attach(this);
     }
   }
 
+  /**
+   * Ceases the effect for the specified entity.
+   *
+   * @param entity The entity for which the effect will cease.
+   */
   public void cease(final ICombatEntity entity) {
     entity.getAppliedEffects().remove(this);
     final EffectEvent event = new EffectEvent(this, entity);
@@ -94,34 +129,66 @@ public abstract class Effect implements IUpdateable {
     }
   }
 
-  public Ability getAbility() {
-    return this.ability;
+  /**
+   * Returns the entity that is executing this effect.
+   *
+   * @return The executor of this effect.
+   */
+  public ICombatEntity getExecutingEntity() {
+    return this.executor;
   }
 
+  /**
+   * Returns the list of active effect applications.
+   *
+   * @return The list of active effect applications.
+   */
   public List<EffectApplication> getActiveAppliances() {
     return this.appliances;
   }
 
+  /**
+   * Returns the delay before this effect is applied.
+   *
+   * @return The delay in ticks.
+   */
   public int getDelay() {
     return this.delay;
   }
 
+  /**
+   * Returns the duration this effect lasts once applied.
+   *
+   * @return The effect duration in ticks.
+   */
   public int getDuration() {
     return this.duration;
   }
 
-  public EffectTarget[] getEffectTargets() {
-    return this.effectTargets;
+  /**
+   * Returns the targeting strategy used by this effect.
+   *
+   * @return The targeting strategy.
+   */
+  public TargetingStrategy getTargetingStrategy() {
+    return this.targetingStrategy;
   }
 
+  /**
+   * Returns the list of follow-up effects that are applied after the main effect ends.
+   *
+   * @return The list of follow-up effects.
+   */
   public List<Effect> getFollowUpEffects() {
     return this.followUpEffects;
   }
 
-  public RelativeEntityComparator getTargetPriorityComparator() {
-    return this.targetPriorityComparator;
-  }
-
+  /**
+   * Checks if the effect is active on the specified entity.
+   *
+   * @param entity The entity to check.
+   * @return True if the effect is active on the entity, false otherwise.
+   */
   public boolean isActive(final ICombatEntity entity) {
     return getActiveAppliances().stream()
       .anyMatch(a -> a.getAffectedEntities().stream().anyMatch(e -> e.equals(entity)));
@@ -135,19 +202,16 @@ public abstract class Effect implements IUpdateable {
     this.duration = duration;
   }
 
-  public void setTargetPriorityComparator(final RelativeEntityComparator targetPriorityComparator) {
-    this.targetPriorityComparator = targetPriorityComparator;
-  }
-
   /**
-   * 1. Cease the effect after its duration. 2. apply all follow-up effects 3. remove appliance 4.
-   * unregister from loop if all appliances are done
+   * Updates the effect, checking for appliances that have reached their duration and applying
+   * follow-up effects if needed. Removes appliances that have ended and detaches the effect
+   * from the game loop if no active appliances remain.
    */
   @Override
   public void update() {
 
     for (final Iterator<EffectApplication> iterator = this.getActiveAppliances().iterator();
-      iterator.hasNext(); ) {
+         iterator.hasNext(); ) {
       final EffectApplication appliance = iterator.next();
       // if the effect duration is reached
       if (this.hasEnded(appliance)) {
@@ -171,114 +235,37 @@ public abstract class Effect implements IUpdateable {
     }
   }
 
+  /**
+   * Ceases the effect for the specified application and applies follow-up effects.
+   *
+   * @param appliance The application to cease.
+   */
   protected void cease(final EffectApplication appliance) {
-    // 1. cease the effect for all affected entities
     for (final ICombatEntity entity : appliance.getAffectedEntities()) {
       this.cease(entity);
     }
 
-    // 2. apply follow-up effects
     this.getFollowUpEffects().forEach(followUp -> followUp.apply(appliance.getImpactArea()));
   }
 
-  protected Collection<ICombatEntity> getEntitiesInImpactArea(final Shape impactArea) {
-    return Game.world().environment().findCombatEntities(impactArea);
-  }
-
+  /**
+   * Returns the total duration of the effect, including the delay.
+   *
+   * @return The total effect duration.
+   */
   protected long getTotalDuration() {
     return this.getDuration() + (long) this.getDelay();
   }
 
+  /**
+   * Checks if the specified effect application has ended.
+   *
+   * @param appliance The application to check.
+   * @return True if the effect duration has passed, false otherwise.
+   */
   protected boolean hasEnded(final EffectApplication appliance) {
     final long effectDuration = Game.time().since(appliance.getAppliedTicks());
     return effectDuration > this.getDuration();
-  }
-
-  protected List<ICombatEntity> lookForAffectedEntities(final Shape impactArea) {
-    List<ICombatEntity> affectedEntities = new ArrayList<>();
-
-    for (final EffectTarget target : this.effectTargets) {
-      switch (target) {
-        case EXECUTINGENTITY -> {
-          affectedEntities.add(this.getAbility().getExecutor());
-          return affectedEntities;
-        }
-        case ENEMY -> {
-          affectedEntities.addAll(this.getEntitiesInImpactArea(impactArea));
-          affectedEntities =
-            affectedEntities.stream().filter(this::canAffectEntity).collect(Collectors.toList());
-        }
-        case FRIENDLY -> {
-          affectedEntities.addAll(this.getEntitiesInImpactArea(impactArea));
-          affectedEntities =
-            affectedEntities.stream()
-              .filter(this::isAliveFriendlyEntity)
-              .collect(Collectors.toList());
-        }
-        case FRIENDLYDEAD -> {
-          affectedEntities.addAll(this.getEntitiesInImpactArea(impactArea));
-          affectedEntities =
-            affectedEntities.stream()
-              .filter(this::isDeadFriendlyEntity)
-              .collect(Collectors.toList());
-        }
-        case CUSTOM -> {
-          affectedEntities.addAll(this.getEntitiesInImpactArea(impactArea));
-          affectedEntities =
-            affectedEntities.stream().filter(this::customTarget).collect(Collectors.toList());
-        }
-        case NONE -> {
-        }
-        default -> throw new IllegalStateException("Unexpected value: " + target);
-      }
-    }
-
-    affectedEntities.removeAll(Collections.singleton(null));
-    affectedEntities.sort(this.targetPriorityComparator);
-
-    if (!this.getAbility().isMultiTarget() && !affectedEntities.isEmpty()) {
-      final ICombatEntity target;
-      if (this.getAbility().getExecutor().getTarget() != null) {
-        target = this.getAbility().getExecutor().getTarget();
-      } else {
-        target = affectedEntities.get(0);
-      }
-      affectedEntities = new ArrayList<>();
-      affectedEntities.add(target);
-    }
-
-    return affectedEntities;
-  }
-
-  /**
-   * Overwrite this method to implement a custom target predicate that determines whether an entity
-   * can be affected by this effect. The targets of this effect need to include the {@code CUSTOM}
-   * value in order for this function to be evaluated.
-   *
-   * @param entity The entity to check against the custom target predicate.
-   * @return True if the entity can be affected by this effect; otherwise false.
-   * @see EffectTarget#CUSTOM
-   */
-  protected boolean customTarget(ICombatEntity entity) {
-    return entity != null;
-  }
-
-  protected boolean canAffectEntity(ICombatEntity entity) {
-    return !entity.equals(this.getAbility().getExecutor())
-      && !entity.isFriendly(this.getAbility().getExecutor())
-      && !entity.isDead();
-  }
-
-  protected boolean isAliveFriendlyEntity(ICombatEntity entity) {
-    return !entity.equals(this.getAbility().getExecutor())
-      && entity.isFriendly(this.getAbility().getExecutor())
-      && !entity.isDead();
-  }
-
-  protected boolean isDeadFriendlyEntity(ICombatEntity entity) {
-    return !entity.equals(this.getAbility().getExecutor())
-      && entity.isFriendly(this.getAbility().getExecutor())
-      && entity.isDead();
   }
 
   @FunctionalInterface

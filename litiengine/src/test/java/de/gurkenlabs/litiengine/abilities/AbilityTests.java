@@ -1,6 +1,5 @@
 package de.gurkenlabs.litiengine.abilities;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -16,9 +15,10 @@ import static org.mockito.Mockito.when;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.abilities.effects.Effect;
-import de.gurkenlabs.litiengine.abilities.effects.EffectTarget;
+import de.gurkenlabs.litiengine.abilities.targeting.TargetingStrategy;
 import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.entities.EntityPivotType;
+import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.test.GameTestSuite;
 import java.awt.Graphics2D;
@@ -187,14 +187,13 @@ class AbilityTests {
   @Test
   void testEffectInitialization() {
     Creature entity = new Creature();
-    TestAbility ability = new TestAbility(new Creature());
+    TestAbility ability = new TestAbility(entity);
 
-    Effect effect = new TestEffect(ability, EffectTarget.ENEMY);
+    Effect effect = new TestEffect(TargetingStrategy.enemies(), ability.getExecutor(), ability.getAttributes().duration().get());
     assertEquals(ability.getAttributes().duration().get().intValue(), effect.getDuration());
-    assertEquals(ability, effect.getAbility());
+    assertEquals(entity, effect.getExecutingEntity());
     assertEquals(0, effect.getFollowUpEffects().size());
     assertFalse(effect.isActive(entity));
-    assertArrayEquals(new EffectTarget[] {EffectTarget.ENEMY}, effect.getEffectTargets());
   }
 
   @AbilityInfo(
@@ -398,8 +397,8 @@ class AbilityTests {
 
   private static class TestEffect extends Effect {
 
-    protected TestEffect(Ability ability, EffectTarget... targets) {
-      super(ability, targets);
+    protected TestEffect(TargetingStrategy targetingStrategy, ICombatEntity executingEntity, int duration) {
+      super(targetingStrategy, executingEntity, duration);
     }
   }
 

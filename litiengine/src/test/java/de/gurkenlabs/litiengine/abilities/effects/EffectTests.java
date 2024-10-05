@@ -6,7 +6,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.abilities.Ability;
+import de.gurkenlabs.litiengine.abilities.targeting.TargetingStrategy;
 import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.test.GameTestSuite;
 
@@ -28,8 +28,7 @@ class EffectTests {
     // arrange
     Game.init(Game.COMMANDLINE_ARG_NOGUI);
     creature = new Creature();
-    TestAbility ability = new TestAbility(creature);
-    testEffect = new TestEffect(ability);
+    testEffect = new TestEffect();
     listener = mock(Effect.EffectCeasedListener.class);
     testEffect.onEffectCeased(listener);
   }
@@ -59,16 +58,9 @@ class EffectTests {
   }
 
   /** Same as in the AbilityExecutionTests */
-  private static class TestAbility extends Ability {
-    protected TestAbility(Creature executor) {
-      super(executor);
-    }
-  }
-
-  /** Same as in the AbilityExecutionTests */
   private static class TestEffect extends Effect {
-    protected TestEffect(Ability ability, EffectTarget... targets) {
-      super(ability, targets);
+    protected TestEffect() {
+      super(TargetingStrategy.none());
     }
   }
 }
