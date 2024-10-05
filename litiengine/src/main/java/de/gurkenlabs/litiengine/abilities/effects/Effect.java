@@ -4,7 +4,6 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.abilities.targeting.TargetingStrategy;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
-
 import java.awt.Shape;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,12 +14,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * The `Effect` class represents an abstract base class for applying effects to combat entities.
- * Effects are applied based on a `TargetingStrategy` and may affect multiple entities within
- * a defined impact area. Effects are applied for a set duration and may have follow-up effects.
+ * The `Effect` class represents an abstract base class for applying effects to combat entities. Effects are applied based on a `TargetingStrategy`
+ * and may affect multiple entities within a defined impact area. Effects are applied for a set duration and may have follow-up effects.
  * <p>
- * This class handles effect application, event listeners for when effects are applied or ceased,
- * and the management of active appliances (ongoing effect instances).
+ * This class handles effect application, event listeners for when effects are applied or ceased, and the management of active appliances (ongoing
+ * effect instances).
  */
 public abstract class Effect implements IUpdateable {
 
@@ -194,24 +192,33 @@ public abstract class Effect implements IUpdateable {
       .anyMatch(a -> a.getAffectedEntities().stream().anyMatch(e -> e.equals(entity)));
   }
 
+  /**
+   * Sets the delay before this effect is applied.
+   *
+   * @param delay the delay in ticks
+   */
   public void setDelay(final int delay) {
     this.delay = delay;
   }
 
+  /**
+   * Sets the duration this effect lasts once applied.
+   *
+   * @param duration the effect duration in ticks
+   */
   public void setDuration(final int duration) {
     this.duration = duration;
   }
 
   /**
-   * Updates the effect, checking for appliances that have reached their duration and applying
-   * follow-up effects if needed. Removes appliances that have ended and detaches the effect
-   * from the game loop if no active appliances remain.
+   * Updates the effect, checking for appliances that have reached their duration and applying follow-up effects if needed. Removes appliances that
+   * have ended and detaches the effect from the game loop if no active appliances remain.
    */
   @Override
   public void update() {
 
     for (final Iterator<EffectApplication> iterator = this.getActiveAppliances().iterator();
-         iterator.hasNext(); ) {
+      iterator.hasNext(); ) {
       final EffectApplication appliance = iterator.next();
       // if the effect duration is reached
       if (this.hasEnded(appliance)) {
@@ -227,6 +234,12 @@ public abstract class Effect implements IUpdateable {
     }
   }
 
+  /**
+   * Applies the effect to the specified entity, adding this effect to the entity's list of applied effects and notifying all registered listeners
+   * that the effect has been applied.
+   *
+   * @param entity the entity to which the effect is applied
+   */
   protected void apply(final ICombatEntity entity) {
     entity.getAppliedEffects().add(this);
     final EffectEvent event = new EffectEvent(this, entity);
@@ -268,15 +281,31 @@ public abstract class Effect implements IUpdateable {
     return effectDuration > this.getDuration();
   }
 
+  /**
+   * Listener interface for receiving notifications when an effect is applied.
+   */
   @FunctionalInterface
   public interface EffectAppliedListener extends EventListener {
 
+    /**
+     * Invoked when an effect is applied.
+     *
+     * @param event the event containing information about the applied effect
+     */
     void applied(EffectEvent event);
   }
 
+  /**
+   * Listener interface for receiving notifications when an effect ceases.
+   */
   @FunctionalInterface
   public interface EffectCeasedListener extends EventListener {
 
+    /**
+     * Invoked when an effect ceases.
+     *
+     * @param event the event containing information about the ceased effect
+     */
     void ceased(EffectEvent event);
   }
 }
