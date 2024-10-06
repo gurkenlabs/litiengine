@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine.entities.behavior;
 import de.gurkenlabs.litiengine.IUpdateable;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Represents a state machine that manages the states and transitions of an entity.
@@ -46,14 +47,11 @@ public class StateMachine implements IUpdateable {
     currentState.perform();
     List<Transition> transitions = currentState.getTransitions();
     Collections.sort(transitions);
-
-    for (Transition transition : transitions) {
-      if (transition.conditionsFullfilled()) {
-        currentState.exit();
-        currentState = transition.getNextState();
-        currentState.enter();
-        return;
-      }
+    Optional<Transition> transition = transitions.stream().filter(Transition::conditionsFullfilled).findFirst();
+    if (transition.isPresent()) {
+      currentState.exit();
+      setState(transition.get().getNextState());
+      currentState.enter();
     }
   }
 }
