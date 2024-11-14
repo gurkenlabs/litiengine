@@ -55,11 +55,11 @@ You can do so by sponsoring [LITIENGINE on OpenCollective](https://opencollectiv
 
 ## Code contributions
 ### Setting up your development environment
-* [Install JDK 21](https://litiengine.com/docs/getting-started/install-jdk/)
+* [Install JDK 23](https://litiengine.com/docs/getting-started/install-jdk/)
 * [Clone the LITIENGINE repository](https://github.com/gurkenlabs/litiengine.git)
 * Open the LITIENGINE project in [your IDE of choice](https://litiengine.com/docs/getting-started/development-environment/)
 * Make sure that the project is imported as a Gradle project
-* Make sure that the project is compiled with JDK 21 and that JDK 21 is also set as your Gradle runtime
+* Make sure that the project is compiled with JDK 23 and that JDK 23 is also set as your Gradle runtime
 * Use Gradle to build the project. You can do this via the UI, or open a terminal in the project's root folder and type `./gradlew build`.
 * If the build was successful, you have now completed all steps required for contributing to LITIENGINE development. Continue with the next section.
 * Having any trouble? Ask for help in the [GitHub discussions](https://github.com/gurkenlabs/litiengine/discussions) or on our [Discord server](https://discord.com/invite/rRB9cKD).
