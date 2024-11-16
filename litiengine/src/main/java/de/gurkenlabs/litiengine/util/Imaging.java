@@ -31,7 +31,7 @@ import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 
 /**
- * The type Imaging.
+ * Utility class for various image processing operations. This class only provides static helper methods and cannot be instantiated.
  */
 public final class Imaging {
 

@@ -3,27 +3,35 @@ package de.gurkenlabs.litiengine.physics;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import java.awt.geom.Point2D;
 
-/** The Force implementation sticks to an entity in terms of its location. */
+/**
+ * The Force implementation sticks to an entity in terms of its location.
+ */
 public class StickyForce extends Force {
 
-  /** The force entiy. */
+  /**
+   * The force entiy.
+   */
   private final IEntity forceEntity;
 
-  /***
+  /**
    * Instantiates a new sticky force.
    *
-   * @param forceEntity
-   *          The entity to who's location this force will be bound
-   * @param strength
-   *          The strength/intensity of this force
-   * @param size
-   *          The size of this force
+   * @param forceEntity The entity to which this force will be bound
+   * @param strength    The strength/intensity of this force
+   * @param size        The size of this force
    */
   public StickyForce(final IEntity forceEntity, final float strength, final float size) {
     super(forceEntity.getCenter(), strength, size);
     this.forceEntity = forceEntity;
   }
 
+  /**
+   * Instantiates a new sticky force.
+   *
+   * @param center   The center point to which this force will be bound
+   * @param strength The strength/intensity of this force
+   * @param size     The size of this force
+   */
   public StickyForce(final Point2D center, final float strength, final float size) {
     super(center, strength, size);
     this.forceEntity = null;

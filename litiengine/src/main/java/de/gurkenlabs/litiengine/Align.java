@@ -8,14 +8,33 @@ import jakarta.xml.bind.annotation.XmlEnumValue;
  */
 @XmlEnum
 public enum Align {
+  /**
+   * Center alignment with a portion value of 0.5.
+   */
   @XmlEnumValue("CENTER")
   CENTER(0.5f),
+
+  /**
+   * Left alignment with a portion value of 0.0.
+   */
   @XmlEnumValue("LEFT")
   LEFT(0f),
+
+  /**
+   * Right alignment with a portion value of 1.0.
+   */
   @XmlEnumValue("RIGHT")
   RIGHT(1f),
+
+  /**
+   * Center-left alignment with a portion value of 0.25.
+   */
   @XmlEnumValue("CENTER_LEFT")
   CENTER_LEFT(0.25f),
+
+  /**
+   * Center-right alignment with a portion value of 0.75.
+   */
   @XmlEnumValue("CENTER_RIGHT")
   CENTER_RIGHT(0.75f);
 

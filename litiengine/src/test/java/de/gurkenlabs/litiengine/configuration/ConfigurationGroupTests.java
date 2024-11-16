@@ -45,7 +45,7 @@ class ConfigurationGroupTests {
 
     config.onChanged(listener);
 
-    boolean old = config.antiAlising();
+    boolean old = config.antiAliasing();
     config.setAntiAliasing(true);
 
     assertEquals("antiAliasing", listener.name);
@@ -71,7 +71,7 @@ class ConfigurationGroupTests {
     config.setGraphicQuality(Quality.VERYLOW);
     config.setResolutionHeight(123);
 
-    assertTrue(config.antiAlising());
+    assertTrue(config.antiAliasing());
     assertTrue(config.colorInterpolation());
     assertEquals(DisplayMode.FULLSCREEN, config.getDisplayMode());
     assertEquals(Quality.VERYLOW, config.getGraphicQuality());

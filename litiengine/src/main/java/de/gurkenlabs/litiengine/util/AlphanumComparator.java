@@ -32,19 +32,19 @@ package de.gurkenlabs.litiengine.util;
 import java.util.Comparator;
 
 /**
- * This is an updated version with enhancements made by Daniel Migowski, Andre Bogus, and David Koelle. Updated by David
- * Koelle in 2017.
+ * This is an updated version with enhancements made by Daniel Migowski, Andre Bogus, and David Koelle. Updated by David Koelle in 2017.
  *
  * <p>
- * To use this class: Use the static "sort" method from the java.util.Collections class: Collections.sort(your list, new
- * AlphanumComparator());
+ * To use this class: Use the static "sort" method from the java.util.Collections class: Collections.sort(your list, new AlphanumComparator());
  */
 public class AlphanumComparator implements Comparator<String> {
   private static boolean isDigit(char ch) {
     return ((ch >= 48) && (ch <= 57));
   }
 
-  /** Length of string is passed in for improved efficiency (only need to calculate it once) * */
+  /**
+   * Length of string is passed in for improved efficiency (only need to calculate it once) *
+   */
   private static String getChunk(String s, int slength, int marker) {
     StringBuilder chunk = new StringBuilder();
     char c = s.charAt(marker);
@@ -53,16 +53,18 @@ public class AlphanumComparator implements Comparator<String> {
     if (isDigit(c)) {
       while (marker < slength) {
         c = s.charAt(marker);
-        if (!isDigit(c))
+        if (!isDigit(c)) {
           break;
+        }
         chunk.append(c);
         marker++;
       }
     } else {
       while (marker < slength) {
         c = s.charAt(marker);
-        if (isDigit(c))
+        if (isDigit(c)) {
           break;
+        }
         chunk.append(c);
         marker++;
       }
@@ -70,11 +72,27 @@ public class AlphanumComparator implements Comparator<String> {
     return chunk.toString();
   }
 
+  /**
+   * Compares two strings using the Alphanum algorithm. This method compares two strings by breaking them into chunks of numeric and non-numeric
+   * characters and comparing these chunks numerically and lexicographically.
+   *
+   * @param s1 the first string to compare
+   * @param s2 the second string to compare
+   * @return a negative integer, zero, or a positive integer as the first string is less than, equal to, or greater than the second string
+   */
   @Override
   public int compare(String s1, String s2) {
     return compareTo(s1, s2);
   }
 
+  /**
+   * Compares two strings using the Alphanum algorithm. This method compares two strings by breaking them into chunks of numeric and non-numeric
+   * characters and comparing these chunks numerically and lexicographically.
+   *
+   * @param s1 the first string to compare
+   * @param s2 the second string to compare
+   * @return a negative integer, zero, or a positive integer as the first string is less than, equal to, or greater than the second string
+   */
   public static int compareTo(String s1, String s2) {
     if ((s1 == null) || (s2 == null)) {
       return 0;
@@ -110,8 +128,9 @@ public class AlphanumComparator implements Comparator<String> {
         result = thisChunk.compareTo(thatChunk);
       }
 
-      if (result != 0)
+      if (result != 0) {
         return result;
+      }
     }
 
     return s1Length - s2Length;

@@ -57,8 +57,8 @@ class PhysicsEngineTests {
 
     // assert
     assertNotNull(hit);
-    assertEquals(expectedHitX, hit.getPoint().getX());
-    assertEquals(expectedHitY, hit.getPoint().getY());
+    assertEquals(expectedHitX, hit.point().getX());
+    assertEquals(expectedHitY, hit.point().getY());
   }
 
   @Test
@@ -114,8 +114,8 @@ class PhysicsEngineTests {
     RaycastHit hit = Game.physics().raycast(line);
 
     // assert
-    assertEquals(3, hit.getPoint().getX());
-    assertEquals(3, hit.getPoint().getY());
+    assertEquals(3, hit.point().getX());
+    assertEquals(3, hit.point().getY());
   }
 
   @Test
@@ -143,8 +143,8 @@ class PhysicsEngineTests {
     RaycastHit hit = Game.physics().raycast(point1, point2);
 
     // assert
-    assertEquals(3, hit.getPoint().getX());
-    assertEquals(3, hit.getPoint().getY());
+    assertEquals(3, hit.point().getX());
+    assertEquals(3, hit.point().getY());
   }
 
   @Test
@@ -159,8 +159,8 @@ class PhysicsEngineTests {
     RaycastHit hit = Game.physics().raycast(source, 135);
 
     // assert
-    assertEquals(2, hit.getPoint().getX(), 0.0001d);
-    assertEquals(8, hit.getPoint().getY(), 0.0001d);
+    assertEquals(2, hit.point().getX(), 0.0001d);
+    assertEquals(8, hit.point().getY(), 0.0001d);
   }
 
   @Test
@@ -189,8 +189,8 @@ class PhysicsEngineTests {
     RaycastHit hit = Game.physics().raycast(line, Collision.ANY);
 
     // assert
-    assertEquals(3, hit.getPoint().getX());
-    assertEquals(3, hit.getPoint().getY());
+    assertEquals(3, hit.point().getX());
+    assertEquals(3, hit.point().getY());
   }
 
   @Test
@@ -219,8 +219,8 @@ class PhysicsEngineTests {
     RaycastHit hit = Game.physics().raycast(line, sourceEntity);
 
     // assert
-    assertEquals(8, hit.getPoint().getX());
-    assertEquals(2, hit.getPoint().getY());
+    assertEquals(8, hit.point().getX());
+    assertEquals(2, hit.point().getY());
   }
 
   @Test

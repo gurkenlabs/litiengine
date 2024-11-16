@@ -68,8 +68,19 @@ public interface IMovementController extends IEntityController {
    */
   List<Force> getActiveForces();
 
+  /**
+   * Gets the force with the specified identifier.
+   *
+   * @param identifier the identifier of the force to retrieve
+   * @return the force with the specified identifier
+   */
   Force getForce(String identifier);
 
+  /**
+   * Gets the angle of movement.
+   *
+   * @return the angle of movement
+   */
   double getMoveAngle();
 
   /**

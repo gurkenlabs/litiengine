@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(GameTestSuite.class)
-public class NumberAdjusterTests {
+public class SpinnerTests {
 
   @BeforeAll
   public static void initialize() {
@@ -26,7 +26,7 @@ public class NumberAdjusterTests {
 
   @Test
   void testSetCurrentValue() {
-    NumberAdjuster number = new NumberAdjuster(0, 0, 150, 300, 0, 400, 1, 4);
+    Spinner number = new Spinner(0, 0, 150, 300, 0, 400, 1, 4);
 
     BigDecimal newValue = new BigDecimal("123456.0");
     BigDecimal newValueNeg = new BigDecimal("-123456.0");
@@ -44,7 +44,7 @@ public class NumberAdjusterTests {
   @Test
   void testSetLowerBound() {
     // arrange
-    NumberAdjuster number = new NumberAdjuster(0, 0, 150, 300, 0, 400, 1, 4);
+    Spinner number = new Spinner(0, 0, 150, 300, 0, 400, 1, 4);
     BigDecimal currentValue1 = new BigDecimal("-456.0");
     BigDecimal currentValue2 = new BigDecimal("0");
     BigDecimal currentValue3 = new BigDecimal("456.0");
@@ -63,7 +63,7 @@ public class NumberAdjusterTests {
   @Test
   void testSetUpperBound() {
     // arrange
-    NumberAdjuster number = new NumberAdjuster(0, 0, 150, 300, 0, 400, 1, 4);
+    Spinner number = new Spinner(0, 0, 150, 300, 0, 400, 1, 4);
     BigDecimal currentValue1 = new BigDecimal("456.0");
     BigDecimal currentValue2 = new BigDecimal("0");
     BigDecimal currentValue3 = new BigDecimal("-456.0");

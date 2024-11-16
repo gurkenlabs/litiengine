@@ -7,17 +7,17 @@ import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class NumberAdjuster extends TextFieldComponent {
+public class Spinner extends TextFieldComponent {
   public static final FontIcon ARROW_DOWN = new FontIcon(ICON_FONT, "\uE84A");
   public static final FontIcon ARROW_UP = new FontIcon(ICON_FONT, "\uE84B");
-  private static final Logger log = Logger.getLogger(NumberAdjuster.class.getName());
+  private static final Logger log = Logger.getLogger(Spinner.class.getName());
   private BigDecimal step;
   private BigDecimal lowerBound;
   private BigDecimal upperBound;
   private BigDecimal currentValue;
   private final List<Consumer<BigDecimal>> valueChangeConsumers;
 
-  public NumberAdjuster(
+  public Spinner(
       final double x,
       final double y,
       final double width,

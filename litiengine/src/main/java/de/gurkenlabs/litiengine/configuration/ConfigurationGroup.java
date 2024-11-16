@@ -55,34 +55,47 @@ public abstract class ConfigurationGroup {
     this.listeners.add(listener);
   }
 
+  /**
+   * Removes the specified configuration changed listener.
+   *
+   * @param listener The listener to remove.
+   */
   public void removeListener(ConfigurationChangedListener listener) {
     this.listeners.remove(listener);
   }
 
   /**
-   * Gets the prefix.
+   * Gets the prefix for the configuration group.
    *
-   * @return the prefix
+   * @return The prefix for the configuration group, or an empty string if the prefix is null.
    */
   public String getPrefix() {
     return this.prefix != null ? this.prefix : "";
   }
 
+  /**
+   * Checks if debug mode is enabled.
+   *
+   * @return true if debug mode is enabled, false otherwise.
+   */
   public boolean isDebug() {
     return debug;
   }
 
+  /**
+   * Sets the debug mode.
+   *
+   * @param debug true to enable debug mode, false to disable.
+   */
   public void setDebug(boolean debug) {
     this.set("debug", debug);
   }
 
   /**
-   * Initialize by property.
+   * Initializes a property by its key and value.
    *
-   * @param key
-   *          the key
-   * @param value
-   *          the value
+   * @param key   The key of the property.
+   * @param value The value of the property.
    */
   protected void initializeByProperty(final String key, final String value) {
     final String propertyName = key.substring(this.getPrefix().length());

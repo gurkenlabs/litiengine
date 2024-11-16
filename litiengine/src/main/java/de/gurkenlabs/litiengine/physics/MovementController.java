@@ -2,7 +2,6 @@ package de.gurkenlabs.litiengine.physics;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
-import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import java.awt.geom.Point2D;
 import java.util.List;
@@ -86,8 +85,12 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
     handleMovement();
   }
 
+  /**
+   * Handles the movement of the entity. This method calculates the new velocity and direction of the entity based on the current forces and movement
+   * predicates. It also updates the entity's position accordingly.
+   */
   public void handleMovement() {
-    if (!this.isMovementAllowed()) {
+    if (!isMovementAllowed()) {
       this.velocity = 0;
       return;
     }
@@ -105,16 +108,16 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
     final double deltaVelocity =
       Math.min(Math.sqrt(Math.pow(dxTemp, 2) + Math.pow(dyTemp, 2)), acceleration);
     if (deltaVelocity != 0) {
-      double newVelocity = this.getVelocity() + deltaVelocity;
+      double newVelocity = getVelocity() + deltaVelocity;
       this.setVelocity(newVelocity);
     } else {
-      final double newVelocity = Math.max(0, this.getVelocity() - deceleration);
+      final double newVelocity = Math.max(0, getVelocity() - deceleration);
       this.setVelocity(newVelocity);
       dxTemp = GeometricUtilities.getDeltaX(this.moveAngle);
       dyTemp = GeometricUtilities.getDeltaY(this.moveAngle);
     }
 
-    if (this.getVelocity() == 0) {
+    if (getVelocity() == 0) {
       this.moveAngle = 0;
       return;
     }
@@ -129,7 +132,7 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
       return null;
     }
 
-    return this.getActiveForces().stream()
+    return getActiveForces().stream()
       .filter(x -> x.getIdentifier() != null && x.getIdentifier().equals(identifier))
       .findFirst()
       .orElse(null);
@@ -153,9 +156,14 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
 
   protected void moveEntity(double deltaX, double deltaY) {
     this.moveAngle = Math.toDegrees(Math.atan2(deltaX, deltaY));
-    Game.physics().move(getEntity(), this.moveAngle, this.getVelocity());
+    Game.physics().move(getEntity(), this.moveAngle, getVelocity());
   }
 
+  /**
+   * Checks if the movement is allowed based on the movement predicates.
+   *
+   * @return true if all movement predicates allow movement, false otherwise
+   */
   protected boolean isMovementAllowed() {
     return movementPredicates.stream().allMatch(p -> p.test(getEntity()));
   }

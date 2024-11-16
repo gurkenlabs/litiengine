@@ -1,6 +1,6 @@
 package de.gurkenlabs.litiengine.tweening;
 
-/** Easing equations based on Robert Penner's work: http://robertpenner.com/easing/ */
+/** Easing equations based on Robert Penner's work: <a href="http://robertpenner.com/easing/">...</a> */
 public enum TweenFunction {
   LINEAR(time -> time),
 

@@ -1,5 +1,7 @@
 package de.gurkenlabs.litiengine.configuration;
 
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.resources.Resources;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,9 +15,9 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.resources.Resources;
-
+/**
+ * Configuration class that manages multiple configuration groups and handles loading and saving settings.
+ */
 public class Configuration {
   private static final Logger log = Logger.getLogger(Configuration.class.getName());
   private static final String DEFAULT_CONFIGURATION_FILE_NAME = "config.properties";
@@ -26,8 +28,7 @@ public class Configuration {
   /**
    * Initializes a new instance of the {@code Configuration} class.
    *
-   * @param configurationGroups
-   *          The configuration groups managed by this instance.
+   * @param configurationGroups The configuration groups managed by this instance.
    */
   public Configuration(final ConfigurationGroup... configurationGroups) {
     this(DEFAULT_CONFIGURATION_FILE_NAME, configurationGroups);
@@ -36,11 +37,8 @@ public class Configuration {
   /**
    * Initializes a new instance of the {@code Configuration} class.
    *
-   * @param fileName
-   *          The name of the file from which to load the settings.
-   * 
-   * @param configurationGroups
-   *          The configuration groups managed by this instance.
+   * @param fileName            The name of the file from which to load the settings.
+   * @param configurationGroups The configuration groups managed by this instance.
    */
   public Configuration(final String fileName, final ConfigurationGroup... configurationGroups) {
     this.fileName = fileName;
@@ -54,11 +52,9 @@ public class Configuration {
 
   /**
    * Gets the strongly typed configuration group if it was previously added to the configuration.
-   * 
-   * @param <T>
-   *          The type of the config group.
-   * @param groupClass
-   *          The class that provides the generic type for this method.
+   *
+   * @param <T>        The type of the config group.
+   * @param groupClass The class that provides the generic type for this method.
    * @return The configuration group of the specified type or null if none can be found.
    */
   public <T extends ConfigurationGroup> T getConfigurationGroup(final Class<T> groupClass) {
@@ -71,6 +67,12 @@ public class Configuration {
     return null;
   }
 
+  /**
+   * Gets the configuration group with the specified prefix.
+   *
+   * @param prefix The prefix of the configuration group to retrieve.
+   * @return The configuration group with the specified prefix, or null if none can be found.
+   */
   public ConfigurationGroup getConfigurationGroup(final String prefix) {
     for (final ConfigurationGroup group : this.getConfigurationGroups()) {
 
@@ -89,7 +91,7 @@ public class Configuration {
 
   /**
    * Gets all {@code ConfigurationGroups} from the configuration.
-   * 
+   *
    * @return All config groups.
    */
   public List<ConfigurationGroup> getConfigurationGroups() {
@@ -98,9 +100,8 @@ public class Configuration {
 
   /**
    * Adds the specified configuration group to the configuration.
-   * 
-   * @param group
-   *          The group to add.
+   *
+   * @param group The group to add.
    */
   public void add(ConfigurationGroup group) {
     this.getConfigurationGroups().add(group);
@@ -108,9 +109,8 @@ public class Configuration {
 
   /**
    * Gets the name of the file to which this configuration is saved.
-   * 
+   *
    * @return The name of the configuration file.
-   * 
    * @see #save()
    */
   public String getFileName() {
@@ -118,8 +118,8 @@ public class Configuration {
   }
 
   /**
-   * Tries to load the configuration from file in the application folder. If none exists, it tries to load the file from
-   * any resource folder. If none exists, it creates a new configuration file in the application folder.
+   * Tries to load the configuration from file in the application folder. If none exists, it tries to load the file from any resource folder. If none
+   * exists, it creates a new configuration file in the application folder.
    */
   public void load() {
     final File settingsFile = new File(this.getFileName());
@@ -155,9 +155,8 @@ public class Configuration {
   }
 
   /**
-   * Saves this configuration to a file with the specified name of this instance (config.properties is the engines default
-   * config file).
-   * 
+   * Saves this configuration to a file with the specified name of this instance (config.properties is the engines default config file).
+   *
    * @see #getFileName()
    * @see Configuration#DEFAULT_CONFIGURATION_FILE_NAME
    */

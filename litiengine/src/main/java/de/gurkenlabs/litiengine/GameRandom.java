@@ -3,7 +3,6 @@ package de.gurkenlabs.litiengine;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
-import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import java.awt.Color;
 import java.awt.geom.Ellipse2D;
@@ -64,6 +63,16 @@ public final class GameRandom extends java.util.Random {
     return sampled;
   }
 
+  /**
+   * Samples a specified amount of elements from the given collection.
+   *
+   * @param <T>         The type of the elements in the collection.
+   * @param collection  The collection to sample from.
+   * @param amount      The number of elements to sample.
+   * @param replacement Indicates whether sampling is with replacement.
+   * @return A collection containing the sampled elements.
+   * @throws IllegalArgumentException if the amount is greater than the collection size when sampling without replacement.
+   */
   public <T> Collection<T> sample(final Collection<T> collection, int amount, boolean replacement) {
     if (!replacement && collection.size() < amount) {
       throw new IllegalArgumentException(INVALID_AMOUNT_FOR_SAMPLING_WITHOUT_REPLACEMENT);
@@ -426,6 +435,13 @@ public final class GameRandom extends java.util.Random {
     return this.nextInt(bound - min) + min;
   }
 
+  /**
+   * Returns a pseudo-random enum constant of the specified enum class.
+   *
+   * @param <T>   The type of the enum.
+   * @param clazz The class of the enum.
+   * @return A pseudo-random enum constant of the specified enum class.
+   */
   public <T extends Enum<?>> T next(Class<T> clazz) {
     int x = this.nextInt(clazz.getEnumConstants().length);
     return clazz.getEnumConstants()[x];
