@@ -599,24 +599,27 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
   @Override
   public void update() {
     listenerLocation = listenerLocationCallback.apply(listenerLocation);
-
-    Iterator<SFXPlayback> iter = sounds.iterator();
-    while (iter.hasNext()) {
-      SFXPlayback s = iter.next();
-      if (s.isPlaying()) {
-        s.updateLocation(listenerLocation);
-      } else {
-        iter.remove();
+    {
+      Iterator<SFXPlayback> iter = sounds.iterator();
+      while (iter.hasNext()) {
+        SFXPlayback s = iter.next();
+        if (s.isPlaying()) {
+          s.updateLocation(listenerLocation);
+        } else {
+          iter.remove();
+        }
       }
     }
 
-    Iterator<MusicPlayback> iter2 = allMusic.iterator();
-    while (iter.hasNext()) {
-      MusicPlayback s = iter2.next();
-      if (s.isPlaying()) {
-        s.setMusicVolume(Game.config().sound().getMusicVolume());
-      } else {
-        iter.remove();
+    {
+      Iterator<MusicPlayback> iter2 = allMusic.iterator();
+      while (iter2.hasNext()) {
+        MusicPlayback s = iter2.next();
+        if (s.isPlaying()) {
+          s.setMusicVolume(Game.config().sound().getMusicVolume());
+        } else {
+          iter2.remove();
+        }
       }
     }
 
