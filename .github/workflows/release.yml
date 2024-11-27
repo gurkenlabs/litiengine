@@ -122,4 +122,9 @@ jobs:
         with:
           name: utiLITI-${{ runner.os }}
           path: utiliti/build/jpackage
-      # TODO consider uploading the artifacts to itch.io automatically with butler, https://github.com/jdno/setup-butler
+
+      - name: Set up Butler
+        uses: jdno/setup-butler@v1
+
+      - name: Upload to itch.io
+        run: butler push utiliti/build/jpackage gurkenlabs/litiengine:${{ runner.os }} --userversion ${{ env.RELEASE_VERSION }}
