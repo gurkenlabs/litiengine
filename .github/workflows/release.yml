@@ -115,7 +115,10 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Package
-        run: ./gradlew jpackage -Prelease=true
+        run: |
+          latest_tag=$(git describe --tags --abbrev=0)
+          echo "RELEASE_VERSION=$latest_tag" >> "$GITHUB_ENV"
+          ./gradlew jpackage -Prelease=true
 
       - name: Upload package
         uses: actions/upload-artifact@v4
@@ -132,6 +135,4 @@ jobs:
         env:
           BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
         run: |
-          latest_tag=$(git describe --tags --abbrev=0)
-          echo "RELEASE_VERSION=$latest_tag" >> "$GITHUB_ENV"
-          butler push utiliti/build/jpackage gurkenlabs/litiengine:${{ runner.os }} --userversion $RELEASE_VERSION
+          butler push utiliti/build/jpackage gurkenlabs/litiengine:${{ runner.os }} --userversion ${{ env.RELEASE_VERSION }}
