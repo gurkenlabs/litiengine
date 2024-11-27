@@ -133,4 +133,5 @@ jobs:
           BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
         run: |
           latest_tag=$(git describe --tags --abbrev=0)
-          butler push utiliti/build/jpackage gurkenlabs/litiengine:${{ runner.os }} --userversion $latest_tag
+          echo "RELEASE_VERSION=$latest_tag" >> "$GITHUB_ENV"
+          butler push utiliti/build/jpackage gurkenlabs/litiengine:${{ runner.os }} --userversion $RELEASE_VERSION
