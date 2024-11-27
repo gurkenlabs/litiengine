@@ -127,4 +127,8 @@ jobs:
         uses: jdno/setup-butler@v1
 
       - name: Upload to itch.io
-        run: butler push utiliti/build/jpackage gurkenlabs/litiengine:${{ runner.os }} --userversion ${{ env.RELEASE_VERSION }}
+        env:
+          BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+        run: |
+          latest_tag=$(git describe --tags --abbrev=0)
+          butler push utiliti/build/jpackage gurkenlabs/litiengine:${{ runner.os }} --userversion $latest_tag
