@@ -115,6 +115,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Package
+        shell: bash
         run: |
           latest_tag=$(git describe --tags --abbrev=0)
           echo "RELEASE_VERSION=$latest_tag" >> "$GITHUB_ENV"
