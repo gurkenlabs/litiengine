@@ -6,6 +6,10 @@ import java.awt.Color;
 import java.awt.Font;
 import java.util.Objects;
 
+/**
+ * The Style class provides various constants and methods related to the visual style of the application. It includes color definitions, font
+ * settings, and methods to retrieve scaled fonts.
+ */
 public final class Style {
   public enum Theme {
     LIGHT,
@@ -39,11 +43,11 @@ public final class Style {
   public static final float FONT_HEADER_SIZE = 14;
   public static final String FONTNAME_CONSOLE = "Consolas";
   public static final Font FONT_BOLD =
-      Resources.fonts().get("Roboto-Black.ttf", Font.BOLD, FONT_HEADER_SIZE);
+    Resources.fonts().get("Roboto-Black.ttf", Font.BOLD, FONT_HEADER_SIZE);
   private static final Font FONT_DEFAULT =
-      Resources.fonts().get("Roboto-Regular.ttf", Font.PLAIN, FONT_DEFAULT_SIZE);
+    Resources.fonts().get("Roboto-Regular.ttf", Font.PLAIN, FONT_DEFAULT_SIZE);
   private static final Font FONT_HEADER =
-      Resources.fonts().get("Roboto-Regular.ttf", Font.PLAIN, FONT_HEADER_SIZE);
+    Resources.fonts().get("Roboto-Regular.ttf", Font.PLAIN, FONT_HEADER_SIZE);
 
   private static Font scaledDefaultFont;
   private static Font scaledHeaderFont;
@@ -52,19 +56,29 @@ public final class Style {
     throw new UnsupportedOperationException();
   }
 
+  /**
+   * Retrieves the default font, scaled according to the user's UI scale preference.
+   *
+   * @return The scaled default font.
+   */
   public static Font getDefaultFont() {
     if (scaledDefaultFont == null) {
       scaledDefaultFont =
-          Objects.requireNonNull(FONT_DEFAULT).deriveFont(FONT_DEFAULT_SIZE * Editor.preferences().getUiScale());
+        Objects.requireNonNull(FONT_DEFAULT).deriveFont(FONT_DEFAULT_SIZE * Editor.preferences().getUiScale());
     }
 
     return scaledDefaultFont;
   }
 
+  /**
+   * Retrieves the header font, scaled according to the user's UI scale preference.
+   *
+   * @return The scaled header font.
+   */
   public static Font getHeaderFont() {
     if (scaledHeaderFont == null) {
       scaledHeaderFont =
-          Objects.requireNonNull(FONT_HEADER).deriveFont(FONT_HEADER_SIZE * Editor.preferences().getUiScale());
+        Objects.requireNonNull(FONT_HEADER).deriveFont(FONT_HEADER_SIZE * Editor.preferences().getUiScale());
     }
 
     return scaledHeaderFont;

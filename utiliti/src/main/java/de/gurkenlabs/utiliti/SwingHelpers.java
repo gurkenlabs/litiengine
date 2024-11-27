@@ -11,14 +11,19 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.text.JTextComponent;
 
+/**
+ * A utility class that provides helper methods for Swing components.
+ */
 public class SwingHelpers {
-  private SwingHelpers() {}
+  private SwingHelpers() {
+  }
 
   /**
-   * Update color text field background to the decoded color value.
+   * Updates the text field with the encoded color value and sets the background and foreground colors. If the color is null, the method returns
+   * without making any changes.
    *
-   * @param textField
-   *          the text field
+   * @param textField the JTextComponent to be updated
+   * @param color     the Color to be encoded and set on the text field
    */
   public static void updateColorTextField(final JTextComponent textField, Color color) {
     if (color == null) {
@@ -32,10 +37,10 @@ public class SwingHelpers {
   }
 
   /**
-   * Update color text field background to the decoded color value.
+   * Updates the label with the encoded color value and sets an icon representing the color.
    *
-   * @param label
-   *          the text field
+   * @param label the JLabel to be updated
+   * @param color the Color to be encoded and set on the label
    */
   public static void updateColorLabel(final JLabel label, Color color) {
     if (color == null) {
@@ -46,19 +51,20 @@ public class SwingHelpers {
     final String cacheKey = ColorHelper.encode(color);
 
     BufferedImage newIconImage =
-        Resources.images()
-            .get(
-                cacheKey,
-                () -> {
-                  BufferedImage img = Imaging.getCompatibleImage(10, 10);
-                  if (img == null)
-                    return null;
-                  Graphics2D g = (Graphics2D) img.getGraphics();
-                  g.setColor(color);
-                  g.fillRect(0, 0, PropertyPanel.CONTROL_HEIGHT, PropertyPanel.CONTROL_HEIGHT);
-                  g.dispose();
-                  return img;
-                });
+      Resources.images()
+        .get(
+          cacheKey,
+          () -> {
+            BufferedImage img = Imaging.getCompatibleImage(10, 10);
+            if (img == null) {
+              return null;
+            }
+            Graphics2D g = (Graphics2D) img.getGraphics();
+            g.setColor(color);
+            g.fillRect(0, 0, PropertyPanel.CONTROL_HEIGHT, PropertyPanel.CONTROL_HEIGHT);
+            g.dispose();
+            return img;
+          });
 
     label.setIcon(new ImageIcon(newIconImage));
   }

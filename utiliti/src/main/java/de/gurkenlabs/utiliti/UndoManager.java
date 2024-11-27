@@ -19,6 +19,10 @@ import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Manages undo and redo operations for map objects. This class provides functionality to track changes to map objects and allows undoing and redoing
+ * those changes.
+ */
 public class UndoManager {
   private static final Logger log = Logger.getLogger(UndoManager.class.getName());
   private static final int MAX_STACK_SIZE = 10000;
@@ -49,6 +53,11 @@ public class UndoManager {
     mapObjectRemoved = new CopyOnWriteArrayList<>();
   }
 
+  /**
+   * Gets the instance of the UndoManager for the current map. If an instance does not exist for the current map, a new one is created.
+   *
+   * @return The UndoManager instance for the current map.
+   */
   public static UndoManager instance() {
     if (instance.containsKey(Game.world().environment().getMap().getName())) {
       return instance.get(Game.world().environment().getMap().getName());
@@ -60,19 +69,31 @@ public class UndoManager {
     return newUndoManager;
   }
 
+  /**
+   * Clears all instances of the UndoManager.
+   */
   public static void clearAll() {
     instance.clear();
   }
 
+  /**
+   * Begins a new operation by setting the current operation to the next operation identifier.
+   */
   public void beginOperation() {
     this.operation = nextOperation;
   }
 
+  /**
+   * Ends the current operation by incrementing the next operation identifier and resetting the current operation.
+   */
   public void endOperation() {
     ++nextOperation;
     this.operation = 0;
   }
 
+  /**
+   * Undoes the last operation. If there are no operations to undo or if an operation is currently being executed, this method returns immediately.
+   */
   public void undo() {
     if (this.executing || this.currentIndex < 0) {
       return;
@@ -99,8 +120,8 @@ public class UndoManager {
 
         this.currentIndex--;
       } while (currentOperation != 0
-          && this.currentIndex >= 0
-          && this.undoStack[this.currentIndex].getOperation() == currentOperation);
+        && this.currentIndex >= 0
+        && this.undoStack[this.currentIndex].getOperation() == currentOperation);
 
       log.log(Level.FINE, "{0} steps undone.", stepsUndone);
       refreshAffectedTargets(affectedTargets);
@@ -110,10 +131,14 @@ public class UndoManager {
     }
   }
 
+  /**
+   * Redoes the last undone operation. If there are no operations to redo or if an operation is currently being executed, this method returns
+   * immediately.
+   */
   public void redo() {
     if (this.executing
-        || this.undoStack.length - 1 == this.currentIndex
-        || this.undoStack[this.currentIndex + 1] == null) {
+      || this.undoStack.length - 1 == this.currentIndex
+      || this.undoStack[this.currentIndex + 1] == null) {
       return;
     }
 
@@ -143,9 +168,9 @@ public class UndoManager {
           case DELETE -> Editor.instance().getMapComponent().delete(state.target);
         }
       } while (currentOperation != 0
-          && this.currentIndex < MAX_STACK_SIZE
-          && this.undoStack[this.currentIndex + 1] != null
-          && this.undoStack[this.currentIndex + 1].getOperation() == currentOperation);
+        && this.currentIndex < MAX_STACK_SIZE
+        && this.undoStack[this.currentIndex + 1] != null
+        && this.undoStack[this.currentIndex + 1].getOperation() == currentOperation);
 
       log.log(Level.FINE, "{0} steps redone.", stepsRedone);
 
@@ -156,18 +181,38 @@ public class UndoManager {
     }
   }
 
+  /**
+   * Checks if an undo operation can be performed.
+   *
+   * @return True if an undo operation can be performed, false otherwise.
+   */
   public boolean canUndo() {
     return this.currentIndex >= 0;
   }
 
+  /**
+   * Checks if a redo operation can be performed.
+   *
+   * @return True if a redo operation can be performed, false otherwise.
+   */
   public boolean canRedo() {
     return this.currentIndex < MAX_STACK_SIZE - 1 && this.undoStack[this.currentIndex + 1] != null;
   }
 
+  /**
+   * Gets the undo stack.
+   *
+   * @return An array of UndoState objects representing the undo stack.
+   */
   public UndoState[] getUndoStack() {
     return this.undoStack;
   }
 
+  /**
+   * Tracks the state of a map object before it is changed.
+   *
+   * @param mapObject The map object that is about to be changed.
+   */
   public void mapObjectChanging(IMapObject mapObject) {
     if (executing || mapObject == null) {
       return;
@@ -183,6 +228,11 @@ public class UndoManager {
     this.changing.add(new MapObject((MapObject) mapObject, true));
   }
 
+  /**
+   * Updates the state of a map object after it has been changed.
+   *
+   * @param mapObject The map object that has been changed.
+   */
   public void mapObjectChanged(IMapObject mapObject) {
     if (mapObject == null) {
       return;
@@ -191,13 +241,19 @@ public class UndoManager {
     this.mapObjectChanged(mapObject, mapObject.getId());
   }
 
+  /**
+   * Updates the state of a map object after it has been changed.
+   *
+   * @param mapObject     The map object that has been changed.
+   * @param previousMapId The previous ID of the map object before the change.
+   */
   public void mapObjectChanged(IMapObject mapObject, int previousMapId) {
     if (executing || mapObject == null) {
       return;
     }
 
     Optional<IMapObject> trackedMapObject =
-        this.changing.stream().filter(x -> x.getId() == previousMapId).findFirst();
+      this.changing.stream().filter(x -> x.getId() == previousMapId).findFirst();
     if (trackedMapObject.isEmpty()) {
       // didn't track the changing event and therefore cannot provide an undo
       return;
@@ -209,15 +265,20 @@ public class UndoManager {
     this.clearRedoSteps();
 
     this.undoStack[this.currentIndex] =
-        new UndoState(
-            mapObject,
-            this.changing.remove(this.changing.indexOf(trackedMapObject.get())),
-            new MapObject((MapObject) mapObject, true),
-            OperationType.CHANGE,
-            this.operation);
+      new UndoState(
+        mapObject,
+        this.changing.remove(this.changing.indexOf(trackedMapObject.get())),
+        new MapObject((MapObject) mapObject, true),
+        OperationType.CHANGE,
+        this.operation);
     fireUndoStackChangedEvent(this);
   }
 
+  /**
+   * Deletes the specified map object and records the deletion in the undo stack.
+   *
+   * @param mapObject The map object to be deleted.
+   */
   public void mapObjectDeleted(IMapObject mapObject) {
     if (executing || mapObject == null) {
       return;
@@ -228,11 +289,16 @@ public class UndoManager {
     this.clearRedoSteps();
 
     this.undoStack[this.currentIndex] =
-        new UndoState(mapObject, OperationType.DELETE, this.operation);
+      new UndoState(mapObject, OperationType.DELETE, this.operation);
     fireUndoStackChangedEvent(this);
     fireUndoManagerEvent(mapObjectRemoved, this);
   }
 
+  /**
+   * Adds the specified map object and records the addition in the undo stack.
+   *
+   * @param mapObject The map object to be added.
+   */
   public void mapObjectAdded(IMapObject mapObject) {
     if (executing || mapObject == null) {
       return;
@@ -248,25 +314,46 @@ public class UndoManager {
   }
 
   /**
-   * This method is used to mark the current map as changed/unsaved which is mainly useful when something other than a
-   * {@code MapObject} changed (e.g. a layer).
+   * This method is used to mark the current map as changed/unsaved which is mainly useful when something other than a {@code MapObject} changed (e.g.
+   * a layer).
    */
   public void recordChanges() {
     fireUndoStackChangedEvent(this);
   }
 
+  /**
+   * Registers a consumer to be called whenever the undo stack changes.
+   *
+   * @param cons The consumer to be called on undo stack change.
+   */
   public static void onUndoStackChanged(Consumer<UndoManager> cons) {
     undoStackChangedConsumers.add(cons);
   }
 
+  /**
+   * Registers a consumer to be called whenever a map object is added.
+   *
+   * @param cons The consumer to be called on map object addition.
+   */
   public static void onMapObjectAdded(Consumer<UndoManager> cons) {
     mapObjectAdded.add(cons);
   }
 
+  /**
+   * Registers a consumer to be called whenever a map object is removed.
+   *
+   * @param cons The consumer to be called on map object removal.
+   */
   public static void onMapObjectRemoved(Consumer<UndoManager> cons) {
     mapObjectRemoved.add(cons);
   }
 
+  /**
+   * Checks if the specified map has unsaved changes.
+   *
+   * @param map The map to check for unsaved changes.
+   * @return True if the map has unsaved changes, false otherwise.
+   */
   public static boolean hasChanges(IMap map) {
     if (instance.containsKey(map.getName())) {
       return !instance.get(map.getName()).saved;
@@ -275,6 +362,11 @@ public class UndoManager {
     return false;
   }
 
+  /**
+   * Marks the specified map as saved and refreshes the map controller UI.
+   *
+   * @param map The map to be marked as saved.
+   */
   public static void save(IMap map) {
     if (instance.containsKey(map.getName())) {
       instance.get(map.getName()).saved = true;
@@ -288,7 +380,7 @@ public class UndoManager {
   }
 
   private static void fireUndoManagerEvent(
-      List<Consumer<UndoManager>> consumers, UndoManager undoManager) {
+    List<Consumer<UndoManager>> consumers, UndoManager undoManager) {
     for (Consumer<UndoManager> cons : consumers) {
       cons.accept(undoManager);
     }
@@ -308,56 +400,67 @@ public class UndoManager {
     }
   }
 
+  /**
+   * Refreshes the affected targets by reloading them from the map and updating the UI components.
+   *
+   * @param affectedTargets The list of map objects that were affected by the undo or redo operation.
+   */
   private static void refreshAffectedTargets(List<IMapObject> affectedTargets) {
     for (IMapObject target : affectedTargets) {
       Game.world().environment().reloadFromMap(target.getId());
 
       if (Editor.instance().getMapComponent().getFocusedMapObject() != null
-          && Editor.instance().getMapComponent().getFocusedMapObject().getId() == target.getId()) {
+        && Editor.instance().getMapComponent().getFocusedMapObject().getId() == target.getId()) {
         UI.getInspector().bind(target);
         UI.getEntityController().select(target);
       }
     }
   }
 
+  /**
+   * Ensures that the undo stack does not exceed the maximum stack size. If the stack is full, it shifts all elements to the left by one index,
+   * effectively removing the oldest undo state to make room for a new one.
+   */
   private void ensureStackSize() {
     // move undo states by one index
     if (this.currentIndex == MAX_STACK_SIZE - 1) {
-      for (int i = 0; i < MAX_STACK_SIZE; i++) {
-        if (i == MAX_STACK_SIZE - 1) {
-          this.undoStack[i] = null;
-          break;
-        }
-
-        this.undoStack[i] = this.undoStack[i + 1];
-      }
+      System.arraycopy(this.undoStack, 1, this.undoStack, 0, MAX_STACK_SIZE - 1);
+      this.undoStack[MAX_STACK_SIZE - 1] = null;
       this.currentIndex--;
     }
   }
 
+  /**
+   * Clears all redo steps from the undo stack. This method is called whenever a new UndoState is added while in the middle of the current stack,
+   * ensuring that all future redo steps are removed because the new state will now be the last element.
+   */
   private void clearRedoSteps() {
-    // whenever a new UndoState gets added, while we're in the middle of the
-    // current
-    // stack, we need to remove all future redo steps because the new state will
-    // now
-    // be the last element
-    int index = this.currentIndex + 1;
-    while (this.undoStack[index] != null && index < MAX_STACK_SIZE) {
+    for (int index = this.currentIndex + 1; index < MAX_STACK_SIZE && this.undoStack[index] != null; index++) {
       this.undoStack[index] = null;
-      index++;
     }
   }
 
+  /**
+   * Gets the name of the map associated with this UndoManager.
+   *
+   * @return The name of the map.
+   */
   public String getMapName() {
     return mapName;
   }
 
+  /**
+   * Represents the type of operation that can be performed in the undo manager.
+   */
   private enum OperationType {
     CHANGE,
     ADD,
     DELETE
   }
 
+  /**
+   * Represents the state of an undoable operation.
+   */
   public static class UndoState {
     private final IMapObject target;
     private final IMapObject oldMapObject;
@@ -366,6 +469,13 @@ public class UndoManager {
     private final OperationType operationType;
     private final int operation;
 
+    /**
+     * Constructs an UndoState with the specified parameters.
+     *
+     * @param target        The target map object associated with this undo state.
+     * @param operationType The type of operation (ADD, CHANGE, DELETE).
+     * @param operation     The operation identifier.
+     */
     public UndoState(IMapObject target, OperationType operationType, int operation) {
       this.operation = operation;
       this.target = target;
@@ -375,12 +485,21 @@ public class UndoManager {
       this.operationType = operationType;
     }
 
+    /**
+     * Constructs an UndoState with the specified parameters.
+     *
+     * @param target        The target map object associated with this undo state.
+     * @param oldMapObject  The old state of the map object before the change.
+     * @param newMapObject  The new state of the map object after the change.
+     * @param operationType The type of operation (ADD, CHANGE, DELETE).
+     * @param operation     The operation identifier.
+     */
     public UndoState(
-        IMapObject target,
-        IMapObject oldMapObject,
-        IMapObject newMapObject,
-        OperationType operationType,
-        int operation) {
+      IMapObject target,
+      IMapObject oldMapObject,
+      IMapObject newMapObject,
+      OperationType operationType,
+      int operation) {
       this.operation = operation;
       this.target = target;
       this.oldMapObject = operationType != OperationType.ADD ? oldMapObject : null;
@@ -390,11 +509,21 @@ public class UndoManager {
       this.layer = Game.world().environment().getMap().getMapObjectLayer(target);
     }
 
+    /**
+     * Returns a string representation of the UndoState.
+     *
+     * @return A string in the format "name(id) operationType".
+     */
     @Override
     public String toString() {
       return target.getName() + "(" + target.getId() + ") " + this.operationType.toString();
     }
 
+    /**
+     * Gets the operation identifier for this UndoState.
+     *
+     * @return The operation identifier.
+     */
     public int getOperation() {
       return this.operation;
     }
