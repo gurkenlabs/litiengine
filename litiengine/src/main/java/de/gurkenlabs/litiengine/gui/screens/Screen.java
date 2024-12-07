@@ -14,12 +14,23 @@ public abstract class Screen extends GuiComponent {
     super(0, 0);
     this.setName(screenName);
   }
-
+  /**
+   * Overrides the setX method from GuiComponent to prevent changing the x-coordinate.
+   * This method does nothing because screens always start at the coordinates (0, 0).
+   *
+   * @param x The new x-coordinate, which will be ignored.
+   */
   @Override
   public void setX(final double x) {
     // do nothing because screens always start at 0/0
   }
 
+  /**
+   * Overrides the setY method from GuiComponent to prevent changing the y-coordinate.
+   * This method does nothing because screens always start at the coordinates (0, 0).
+   *
+   * @param y The new y-coordinate, which will be ignored.
+   */
   @Override
   public void setY(final double y) {
     // do nothing because screens always start at 0/0
