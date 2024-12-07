@@ -28,8 +28,8 @@ public abstract class ForceEffect extends Effect {
    * @param targetingStrategy The strategy used to select which entities will be affected by the effect.
    * @param strength          The strength of the applied force.
    */
-  protected ForceEffect(final TargetingStrategy targetingStrategy, final float strength) {
-    this(targetingStrategy, null, strength);
+  protected ForceEffect(final TargetingStrategy targetingStrategy, final float strength, final int duration) {
+    this(targetingStrategy, null, strength, duration);
   }
 
   /**
@@ -39,8 +39,8 @@ public abstract class ForceEffect extends Effect {
    * @param executingEntity   The entity executing the effect (e.g., a player or NPC).
    * @param strength          The strength of the applied force.
    */
-  protected ForceEffect(final TargetingStrategy targetingStrategy, final ICombatEntity executingEntity, final float strength) {
-    super(targetingStrategy, executingEntity);
+  protected ForceEffect(final TargetingStrategy targetingStrategy, final ICombatEntity executingEntity, final float strength, final int duration) {
+    super(targetingStrategy, executingEntity, duration);
     this.strength = strength;
     this.appliedForces = new ConcurrentHashMap<>();
   }
