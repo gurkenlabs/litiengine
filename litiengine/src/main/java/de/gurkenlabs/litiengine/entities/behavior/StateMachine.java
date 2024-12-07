@@ -48,10 +48,6 @@ public class StateMachine implements IUpdateable {
     List<Transition> transitions = currentState.getTransitions();
     Collections.sort(transitions);
     Optional<Transition> transition = transitions.stream().filter(Transition::conditionsFullfilled).findFirst();
-    if (transition.isPresent()) {
-      currentState.exit();
-      setState(transition.get().getNextState());
-      currentState.enter();
-    }
+    transition.ifPresent(value -> setState(value.getNextState()));
   }
 }
