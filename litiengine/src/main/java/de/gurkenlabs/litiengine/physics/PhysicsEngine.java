@@ -82,7 +82,7 @@ public final class PhysicsEngine implements IUpdateable {
    * @param entity The entity that is about to be removed.
    */
   public void remove(final ICollisionEntity entity) {
-    if (entity.getCollisionType() == null) {
+    if (entity.getCollisionType() == null || !collisionEntities.containsKey(entity.getCollisionType())) {
       return;
     }
 
