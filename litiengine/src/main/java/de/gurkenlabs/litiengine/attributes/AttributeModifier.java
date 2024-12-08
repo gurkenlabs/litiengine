@@ -7,7 +7,8 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * An attribute modifier allows to modify attributes by the specified Modification and modify value.
  *
- * @param <T> the generic type
+ * @param <T>
+ *   the generic type
  * @see Attribute#addModifier(AttributeModifier)
  * @see Attribute#modifyBaseValue(AttributeModifier)
  */
@@ -20,8 +21,10 @@ public class AttributeModifier<T extends Number> implements Comparable<Attribute
   /**
    * Initializes a new instance of the {@code AttributeModifier} class.
    *
-   * @param mod         The modification type.
-   * @param modifyValue The modification value to be applied by this instance.
+   * @param mod
+   *   The modification type.
+   * @param modifyValue
+   *   The modification value to be applied by this instance.
    */
   public AttributeModifier(final Modification mod, final double modifyValue) {
     this.modification = mod;
@@ -32,7 +35,8 @@ public class AttributeModifier<T extends Number> implements Comparable<Attribute
   /**
    * Compares this attribute modifier to another based on the apply order of their modifications.
    *
-   * @param otherModifier The other attribute modifier to compare.
+   * @param otherModifier
+   *   The other attribute modifier to compare.
    * @return An integer representing the comparison result.
    */
   @Override
@@ -43,7 +47,8 @@ public class AttributeModifier<T extends Number> implements Comparable<Attribute
   /**
    * Checks if this attribute modifier is equal to another object.
    *
-   * @param obj The object to compare with.
+   * @param obj
+   *   The object to compare with.
    * @return True if the objects are equal, false otherwise.
    */
   @Override
@@ -55,10 +60,22 @@ public class AttributeModifier<T extends Number> implements Comparable<Attribute
     return super.equals(obj);
   }
 
+  /**
+   * Adds a listener that will be notified when the attribute modifier changes.
+   *
+   * @param listener
+   *   The listener to be added.
+   */
   public void onChanged(AttributeModifierListener listener) {
     this.listeners.add(listener);
   }
 
+  /**
+   * Removes a listener so that it will no longer be notified when the attribute modifier changes.
+   *
+   * @param listener
+   *   The listener to be removed.
+   */
   public void removeListener(AttributeModifierListener listener) {
     this.listeners.add(listener);
   }
@@ -93,7 +110,8 @@ public class AttributeModifier<T extends Number> implements Comparable<Attribute
   /**
    * Modifies the provided value based on the modification type and modify value of this attribute modifier.
    *
-   * @param modvalue The original value to be modified.
+   * @param modvalue
+   *   The original value to be modified.
    * @return The modified value.
    */
   public T modify(final T modvalue) {
@@ -114,7 +132,8 @@ public class AttributeModifier<T extends Number> implements Comparable<Attribute
   /**
    * Sets the modify value for this attribute modifier.
    *
-   * @param value The new modify value.
+   * @param value
+   *   The new modify value.
    */
   public void setModifyValue(double value) {
     var previous = this.modifyValue;
@@ -128,7 +147,8 @@ public class AttributeModifier<T extends Number> implements Comparable<Attribute
   /**
    * Sets the active status of this attribute modifier.
    *
-   * @param active True to activate, false to deactivate.
+   * @param active
+   *   True to activate, false to deactivate.
    */
   public void setActive(boolean active) {
     var previous = this.active;

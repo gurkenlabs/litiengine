@@ -145,6 +145,10 @@ public class Attribute<T extends Number> {
     this.evaluateValue();
   }
 
+  /**
+   * Evaluates the current value of the attribute by applying all registered modifiers to the base value.
+   * If the new value differs from the previous value, it triggers the value changed event.
+   */
   protected void evaluateValue() {
     final T previousValue = this.value;
     this.value = this.applyModifiers(this.getBase());
@@ -155,10 +159,10 @@ public class Attribute<T extends Number> {
   }
 
   /**
-   * Apply modifiers.
+   * Applies all registered modifiers to the given base value.
    *
-   * @param baseValue the base value
-   * @return the t
+   * @param baseValue The base value to which the modifiers will be applied.
+   * @return The modified value after applying all modifiers.
    */
   protected T applyModifiers(final T baseValue) {
     T currentValue = baseValue;
@@ -169,6 +173,9 @@ public class Attribute<T extends Number> {
     return currentValue;
   }
 
+  /**
+   * Fires the value changed event to all registered listeners.
+   */
   private void fireValueChangedEvent() {
     for (var listener : this.listeners) {
       listener.valueChanged();

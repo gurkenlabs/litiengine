@@ -4,6 +4,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
 import de.gurkenlabs.litiengine.util.MathUtilities;
+
 import java.awt.AWTException;
 import java.awt.Point;
 import java.awt.Robot;
@@ -21,24 +22,24 @@ import javax.swing.SwingUtilities;
 
 /** This implementation provides information about the mouse input in the LITIENGINE. */
 public final class Mouse
-    implements MouseListener, MouseMotionListener, MouseWheelListener, IMouse, IUpdateable {
+  implements MouseListener, MouseMotionListener, MouseWheelListener, IMouse, IUpdateable {
   private static final Logger log = Logger.getLogger(Mouse.class.getName());
 
   private final Collection<MouseClickedListener> mouseClickedListeners =
-      ConcurrentHashMap.newKeySet();
+    ConcurrentHashMap.newKeySet();
   private final Collection<MouseDraggedListener> mouseDraggedListeners =
-      ConcurrentHashMap.newKeySet();
+    ConcurrentHashMap.newKeySet();
   private final Collection<MouseMovedListener> mouseMovedListeners = ConcurrentHashMap.newKeySet();
   private final Collection<MousePressedListener> mousePressedListeners =
-      ConcurrentHashMap.newKeySet();
+    ConcurrentHashMap.newKeySet();
   private final Collection<MousePressingListener> mousePressingListeners =
-      ConcurrentHashMap.newKeySet();
+    ConcurrentHashMap.newKeySet();
   private final Collection<MouseReleasedListener> mouseReleasedListeners =
-      ConcurrentHashMap.newKeySet();
+    ConcurrentHashMap.newKeySet();
 
   private final Collection<MouseListener> mouseListeners = ConcurrentHashMap.newKeySet();
   private final Collection<MouseMotionListener> mouseMotionListeners =
-      ConcurrentHashMap.newKeySet();
+    ConcurrentHashMap.newKeySet();
   private final Collection<MouseWheelListener> mouseWheelListeners = ConcurrentHashMap.newKeySet();
 
   private final Robot robot;
@@ -60,7 +61,7 @@ public final class Mouse
    * Instantiates a new mouse.
    *
    * @throws AWTException
-   *           In case the {@link Robot} class could not be initialized.
+   *   In case the {@link Robot} class could not be initialized.
    */
   Mouse() throws AWTException {
     try {
@@ -72,9 +73,9 @@ public final class Mouse
     }
 
     this.location =
-        new Point2D.Double(
-            Game.world().camera().getViewport().getCenterX(),
-            Game.world().camera().getViewport().getCenterY());
+      new Point2D.Double(
+        Game.world().camera().getViewport().getCenterX(),
+        Game.world().camera().getViewport().getCenterY());
     this.lastLocation = this.location;
     this.sensitivity = Game.config().input().getMouseSensitivity();
     this.grabMouse = false;
@@ -105,12 +106,15 @@ public final class Mouse
 
   @Override
   public Point2D getMapLocation() {
+    if (Game.world().camera() == null) {
+      return null;
+    }
     return Game.world()
-        .camera()
-        .getMapLocation(
-            new Point2D.Double(
-                this.getLocation().getX() / Game.world().camera().getRenderScale(),
-                this.getLocation().getY() / Game.world().camera().getRenderScale()));
+      .camera()
+      .getMapLocation(
+        new Point2D.Double(
+          this.getLocation().getX() / Game.world().camera().getRenderScale(),
+          this.getLocation().getY() / Game.world().camera().getRenderScale()));
   }
 
   @Override
@@ -375,16 +379,16 @@ public final class Mouse
     this.lastLocation = adjustMouse;
 
     final MouseEvent mouseEvent =
-        new MouseEvent(
-            Game.window().getRenderComponent(),
-            MouseEvent.MOUSE_MOVED,
-            0,
-            0,
-            (int) this.getLocation().getX(),
-            (int) this.getLocation().getY(),
-            0,
-            false,
-            MouseEvent.NOBUTTON);
+      new MouseEvent(
+        Game.window().getRenderComponent(),
+        MouseEvent.MOUSE_MOVED,
+        0,
+        0,
+        (int) this.getLocation().getX(),
+        (int) this.getLocation().getY(),
+        0,
+        false,
+        MouseEvent.NOBUTTON);
     final MouseEvent wrappedEvent = this.createEvent(mouseEvent);
     for (final MouseMovedListener listener : this.mouseMovedListeners) {
       listener.mouseMoved(wrappedEvent);
@@ -398,25 +402,24 @@ public final class Mouse
 
   private MouseEvent createEvent(final MouseEvent original) {
     return new MouseEvent(
-        original.getComponent(),
-        original.getID(),
-        original.getWhen(),
-        original.getModifiers(),
-        (int) this.getLocation().getX(),
-        (int) this.getLocation().getY(),
-        original.getXOnScreen(),
-        original.getYOnScreen(),
-        original.getClickCount(),
-        original.isPopupTrigger(),
-        original.getButton());
+      original.getComponent(),
+      original.getID(),
+      original.getWhen(),
+      original.getModifiers(),
+      (int) this.getLocation().getX(),
+      (int) this.getLocation().getY(),
+      original.getXOnScreen(),
+      original.getYOnScreen(),
+      original.getClickCount(),
+      original.isPopupTrigger(),
+      original.getButton());
   }
 
   /**
-   * Calculates the location of the ingame mouse by the position diff and locks the original mouse to the center of the
-   * screen.
+   * Calculates the location of the ingame mouse by the position diff and locks the original mouse to the center of the screen.
    *
    * @param e
-   *          The event containing information about the original mouse.
+   *   The event containing information about the original mouse.
    */
   private void setLocation(final MouseEvent e) {
     if (this.grabMouse && !Game.window().isFocusOwner()) {
@@ -459,7 +462,7 @@ public final class Mouse
    * Sets the pressed.
    *
    * @param pressed
-   *          the new pressed
+   *   the new pressed
    */
   private void setPressed(final boolean pressed) {
     this.pressed = pressed;
