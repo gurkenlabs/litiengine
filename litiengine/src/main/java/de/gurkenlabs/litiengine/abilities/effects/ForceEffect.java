@@ -56,6 +56,10 @@ public abstract class ForceEffect extends Effect {
     super.apply(affectedEntity);
     if (affectedEntity instanceof IMobileEntity mobileEntity) {
       Force force = createForce(mobileEntity);
+      if (force == null) {
+        return;
+      }
+
       appliedForces.put(mobileEntity, force);
       mobileEntity.movement().apply(force);
     }
