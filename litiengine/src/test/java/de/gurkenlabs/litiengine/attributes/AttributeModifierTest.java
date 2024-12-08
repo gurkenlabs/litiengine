@@ -28,4 +28,20 @@ class AttributeModifierTest {
     assertEquals(7, testAttributeModifierActive.modify(2));
     assertEquals(2, testAttributeModifierInactive.modify(2));
   }
+
+  @Test
+  void testAttributeModifierListener(){
+    final AttributeModifier<Integer> attributeModifier =
+      new AttributeModifier<>(Modification.ADD, 5);
+
+    final int[] eventFired = {0};
+    attributeModifier.onChanged(() -> eventFired[0]++);
+
+    attributeModifier.setModifyValue(123);
+    assertEquals(1, eventFired[0]);
+
+    attributeModifier.setActive(false);
+
+    assertEquals(2, eventFired[0]);
+  }
 }

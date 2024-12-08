@@ -1,5 +1,9 @@
 package de.gurkenlabs.litiengine.attributes;
 
+
+import java.util.Collection;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * An attribute modifier allows to modify attributes by the specified Modification and modify value.
  *
@@ -8,6 +12,7 @@ package de.gurkenlabs.litiengine.attributes;
  * @see Attribute#modifyBaseValue(AttributeModifier)
  */
 public class AttributeModifier<T extends Number> implements Comparable<AttributeModifier<T>> {
+  private final Collection<AttributeModifierListener> listeners = ConcurrentHashMap.newKeySet();
   private final Modification modification;
   private double modifyValue;
   private boolean active;
@@ -50,14 +55,12 @@ public class AttributeModifier<T extends Number> implements Comparable<Attribute
     return super.equals(obj);
   }
 
-  /**
-   * Generates a hash code for this attribute modifier.
-   *
-   * @return The hash code.
-   */
-  @Override
-  public int hashCode() {
-    return super.hashCode();
+  public void onChanged(AttributeModifierListener listener) {
+    this.listeners.add(listener);
+  }
+
+  public void removeListener(AttributeModifierListener listener) {
+    this.listeners.add(listener);
   }
 
   /**
@@ -114,7 +117,12 @@ public class AttributeModifier<T extends Number> implements Comparable<Attribute
    * @param value The new modify value.
    */
   public void setModifyValue(double value) {
+    var previous = this.modifyValue;
     this.modifyValue = value;
+
+    if (previous != this.modifyValue) {
+      this.fireChangedEvent();
+    }
   }
 
   /**
@@ -123,7 +131,12 @@ public class AttributeModifier<T extends Number> implements Comparable<Attribute
    * @param active True to activate, false to deactivate.
    */
   public void setActive(boolean active) {
+    var previous = this.active;
     this.active = active;
+
+    if (previous != this.active) {
+      this.fireChangedEvent();
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -143,5 +156,11 @@ public class AttributeModifier<T extends Number> implements Comparable<Attribute
     }
 
     return null;
+  }
+
+  private void fireChangedEvent() {
+    for (var listener : this.listeners) {
+      listener.modifierChanged();
+    }
   }
 }

@@ -8,8 +8,9 @@ public class RangeAttribute<T extends Number> extends Attribute<T> {
   private final List<AttributeModifier<T>> minModifiers;
   private final List<AttributeModifier<T>> maxModifiers;
   private T minBaseValue;
-
   private T maxBaseValue;
+  private T minValue;
+  private T maxValue;
 
   /**
    * Initializes a new instance of the {@code RangeAttribute} class.
@@ -28,6 +29,7 @@ public class RangeAttribute<T extends Number> extends Attribute<T> {
     this.maxModifiers = new CopyOnWriteArrayList<>();
     this.maxBaseValue = maxValue;
     this.minBaseValue = minValue;
+    this.evaluateValue();
   }
 
   public void addMinModifier(final AttributeModifier<T> modifier) {
@@ -37,6 +39,7 @@ public class RangeAttribute<T extends Number> extends Attribute<T> {
 
     this.getMinModifiers().add(modifier);
     Collections.sort(this.getMinModifiers());
+    this.evaluateValue();
   }
 
   public void addMaxModifier(final AttributeModifier<T> modifier) {
@@ -46,20 +49,20 @@ public class RangeAttribute<T extends Number> extends Attribute<T> {
 
     this.getMaxModifiers().add(modifier);
     Collections.sort(this.getMaxModifiers());
+    this.evaluateValue();
   }
 
   @Override
   public T get() {
-    final T current = this.applyModifiers(this.getBase());
-    return this.valueInRange(current);
+    return this.valueInRange(super.get());
   }
 
   public T getMin() {
-    return this.applyMinModifiers(this.minBaseValue);
+    return this.minValue;
   }
 
   public T getMax() {
-    return this.applyMaxModifiers(this.maxBaseValue);
+    return this.maxValue;
   }
 
   public float getRelativeCurrentValue() {
@@ -69,10 +72,12 @@ public class RangeAttribute<T extends Number> extends Attribute<T> {
   @Override
   public void modifyBaseValue(final AttributeModifier<T> modifier) {
     this.setBaseValue(this.valueInRange(modifier.modify(this.getBase())));
+    this.evaluateValue();
   }
 
   public void modifyMaxBaseValue(final AttributeModifier<T> modifier) {
     this.maxBaseValue = modifier.modify(this.maxBaseValue);
+    this.evaluateValue();
   }
 
   public void setToMin() {
@@ -85,10 +90,12 @@ public class RangeAttribute<T extends Number> extends Attribute<T> {
 
   public void setMaxBaseValue(final T maxValue) {
     this.maxBaseValue = maxValue;
+    this.evaluateValue();
   }
 
   public void setMinBaseValue(final T minValue) {
     this.minBaseValue = minValue;
+    this.evaluateValue();
   }
 
   protected List<AttributeModifier<T>> getMinModifiers() {
@@ -117,9 +124,16 @@ public class RangeAttribute<T extends Number> extends Attribute<T> {
     return currentValue;
   }
 
+  @Override
+  protected void evaluateValue() {
+    super.evaluateValue();
+    this.minValue = this.applyMinModifiers(this.minBaseValue);
+    this.maxValue = this.applyMaxModifiers(this.maxBaseValue);
+  }
+
   private T valueInRange(final T value) {
-    if (value.doubleValue() < this.minBaseValue.doubleValue()) {
-      return this.minBaseValue;
+    if (value.doubleValue() < this.getMin().doubleValue()) {
+      return this.getMin();
     } else if (value.doubleValue() > this.getMax().doubleValue()) {
       return this.getMax();
     }
