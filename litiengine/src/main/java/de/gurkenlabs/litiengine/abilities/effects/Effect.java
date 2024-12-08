@@ -277,6 +277,10 @@ public abstract class Effect implements IUpdateable {
    * @return True if the effect duration has passed, false otherwise.
    */
   protected boolean hasEnded(final EffectApplication appliance) {
+    if (this.getDuration() <= 0) {
+      return false;
+    }
+
     final long effectDuration = Game.time().since(appliance.getAppliedTicks());
     return effectDuration > this.getDuration();
   }

@@ -19,28 +19,58 @@ public abstract class AttributeEffect<T extends Number> extends Effect {
    * Constructs an AttributeEffect with the specified targeting strategy, modification, and delta.
    *
    * @param targetingStrategy the strategy to determine the targets of the effect
-   * @param modification the type of modification to apply to the attribute
-   * @param delta the value to modify the attribute by
+   * @param modification      the type of modification to apply to the attribute
+   * @param delta             the value to modify the attribute by
    */
   protected AttributeEffect(final TargetingStrategy targetingStrategy,
-    final Modification modification,
-    final double delta) {
-    this(targetingStrategy, null, modification, delta);
+                            final Modification modification,
+                            final double delta) {
+    this(targetingStrategy, modification, delta, 0);
+  }
+
+  /**
+   * Constructs an AttributeEffect with the specified targeting strategy, modification, and delta.
+   *
+   * @param targetingStrategy the strategy to determine the targets of the effect
+   * @param modification      the type of modification to apply to the attribute
+   * @param delta             the value to modify the attribute by
+   */
+  protected AttributeEffect(final TargetingStrategy targetingStrategy,
+                            final Modification modification,
+                            final double delta,
+                            final int duration) {
+    this(targetingStrategy, null, modification, delta, duration);
   }
 
   /**
    * Constructs an AttributeEffect with the specified targeting strategy, executing entity, modification, and delta.
    *
    * @param targetingStrategy the strategy to determine the targets of the effect
-   * @param executingEntity the entity executing the effect
-   * @param modification the type of modification to apply to the attribute
-   * @param delta the value to modify the attribute by
+   * @param executingEntity   the entity executing the effect
+   * @param modification      the type of modification to apply to the attribute
+   * @param delta             the value to modify the attribute by
    */
   protected AttributeEffect(final TargetingStrategy targetingStrategy,
-    final ICombatEntity executingEntity,
-    final Modification modification,
-    final double delta) {
-    super(targetingStrategy, executingEntity);
+                            final ICombatEntity executingEntity,
+                            final Modification modification,
+                            final double delta) {
+    this(targetingStrategy, executingEntity, modification, delta, 0);
+  }
+
+  /**
+   * Constructs an AttributeEffect with the specified targeting strategy, executing entity, modification, and delta.
+   *
+   * @param targetingStrategy the strategy to determine the targets of the effect
+   * @param executingEntity   the entity executing the effect
+   * @param modification      the type of modification to apply to the attribute
+   * @param delta             the value to modify the attribute by
+   */
+  protected AttributeEffect(final TargetingStrategy targetingStrategy,
+                            final ICombatEntity executingEntity,
+                            final Modification modification,
+                            final double delta,
+                            final int duration) {
+    super(targetingStrategy, executingEntity, duration);
     this.modifier = new AttributeModifier<>(modification, delta);
   }
 

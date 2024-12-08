@@ -170,6 +170,16 @@ public abstract class TargetingStrategy {
   }
 
   /**
+   * Returns a strategy for a fixed list of target entities.
+   *
+   * @param fixedTargets An array of target entities to always include as the targets.
+   * @return An instance of `StaticTargetingStrategy` initialized with the given entities.
+   */
+  public static TargetingStrategy fixed(ICombatEntity... fixedTargets) {
+    return new FixedTargetingStrategy(fixedTargets);
+  }
+
+  /**
    * Returns a strategy that targets no entities.
    *
    * @return A `TargetingStrategy` that selects no entities.
