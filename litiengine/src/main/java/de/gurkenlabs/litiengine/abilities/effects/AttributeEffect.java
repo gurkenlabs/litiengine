@@ -72,7 +72,10 @@ public abstract class AttributeEffect<T extends Number> extends Effect {
   @Override
   protected void apply(final ICombatEntity affectedEntity) {
     super.apply(affectedEntity);
-    this.getAttribute(affectedEntity).addModifier(this.getModifier());
+    if(getAttribute(affectedEntity) == null) {
+      return;
+    }
+    getAttribute(affectedEntity).addModifier(getModifier());
   }
 
   /**
