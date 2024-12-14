@@ -327,9 +327,13 @@ public final class Resources {
       return fromClass;
     }
     try {
-      return (new File(name)).toURI().toURL();
+      return new URL(name);
     } catch (MalformedURLException e) {
-      return null;
+      try {
+        return (new File(name)).toURI().toURL();
+      } catch (MalformedURLException e1) {
+        return null;
+      }
     }
   }
 
