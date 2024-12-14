@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.resources;
 
+import de.gurkenlabs.litiengine.Game;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,8 +18,10 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.gurkenlabs.litiengine.Game;
-
+/**
+ * This class provides methods to manage and retrieve localized strings from resource bundles. It supports different encodings and allows fetching
+ * strings with or without formatting arguments.
+ */
 public final class Strings {
   public static final String DEFAULT_BUNDLE = "strings";
 
@@ -32,10 +35,21 @@ public final class Strings {
     Locale.setDefault(Locale.of("en", "US"));
   }
 
+  /**
+   * Sets the character encoding to be used for reading resource bundles.
+   *
+   * @param charset The character encoding to set.
+   */
   public void setEncoding(Charset charset) {
     this.charset = charset;
   }
 
+  /**
+   * Retrieves the localized string for the specified key from the default resource bundle.
+   *
+   * @param key The key for the desired string.
+   * @return The localized string corresponding to the specified key, or null if the key is null.
+   */
   public String get(final String key) {
     if (key == null) {
       return null;
@@ -44,6 +58,13 @@ public final class Strings {
     return this.getFrom(DEFAULT_BUNDLE, key);
   }
 
+  /**
+   * Retrieves the localized string for the specified key from the default resource bundle, with optional formatting arguments.
+   *
+   * @param key  The key for the desired string.
+   * @param args The arguments to format the string with.
+   * @return The localized string corresponding to the specified key, formatted with the provided arguments, or null if the key is null.
+   */
   public String get(final String key, Object... args) {
     if (key == null) {
       return null;
@@ -52,6 +73,15 @@ public final class Strings {
     return this.getFrom(DEFAULT_BUNDLE, key, args);
   }
 
+  /**
+   * Retrieves the localized string for the specified key from the specified resource bundle, with optional formatting arguments.
+   *
+   * @param bundleName The name of the resource bundle to retrieve the string from.
+   * @param key        The key for the desired string.
+   * @param args       The arguments to format the string with.
+   * @return The localized string corresponding to the specified key, formatted with the provided arguments, or the key itself if the resource is not
+   * found.
+   */
   public String getFrom(final String bundleName, final String key, Object... args) {
     if (bundleName == null || key == null) {
       return null;
@@ -63,7 +93,7 @@ public final class Strings {
       String value = defaultBundle.getString(key);
 
       String decodedValue =
-          this.charset.equals(StandardCharsets.ISO_8859_1) ? value : new String(value.getBytes(StandardCharsets.ISO_8859_1), this.charset);
+        this.charset.equals(StandardCharsets.ISO_8859_1) ? value : new String(value.getBytes(StandardCharsets.ISO_8859_1), this.charset);
       if (args.length > 0) {
         return MessageFormat.format(decodedValue, args);
       }
@@ -84,8 +114,7 @@ public final class Strings {
    * <b>This method is not cached. Ever call will open up a new {@link InputStream} to read the strings from the text
    * file.</b>
    *
-   * @param textFile
-   *          The text file that will be retrieved.
+   * @param textFile The text file that will be retrieved.
    * @return A list with all strings that are contained by the text file.
    */
   public String[] getList(String textFile) {
@@ -117,10 +146,23 @@ public final class Strings {
     return new String[0];
   }
 
+  /**
+   * Checks if the default resource bundle contains the specified key.
+   *
+   * @param key The key to check for.
+   * @return True if the key is found in the default resource bundle, false otherwise.
+   */
   public boolean contains(final String key) {
     return contains(DEFAULT_BUNDLE, key);
   }
 
+  /**
+   * Checks if the specified resource bundle contains the specified key.
+   *
+   * @param bundleName The name of the resource bundle to check.
+   * @param key        The key to check for.
+   * @return True if the key is found in the specified resource bundle, false otherwise.
+   */
   public boolean contains(final String bundleName, final String key) {
     try {
       final ResourceBundle defaultBundle = ResourceBundle.getBundle(bundleName, Game.config().client().getLocale());

@@ -43,13 +43,18 @@ public enum SoundFormat {
     return DataFormat.isSupported(fileName, values(), UNSUPPORTED);
   }
 
+  /**
+   * Gets all the file extensions supported by the engine.
+   *
+   * @return An array of strings representing all supported file extensions.
+   */
   public static String[] getAllExtensions() {
     return DataFormat.getAllExtensions(values(), UNSUPPORTED);
   }
 
   /**
-   * Converts this format instance to a file format string that can be used as an extension (e.g.
-   * .ogg).<br> It adds a leading '.' to the lower-case string representation of this instance.
+   * Converts this format instance to a file format string that can be used as an extension (e.g. .ogg).<br> It adds a leading '.' to the lower-case
+   * string representation of this instance.
    *
    * @return The file extension string for this instance.
    */

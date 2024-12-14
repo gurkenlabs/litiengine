@@ -1,5 +1,13 @@
 package de.gurkenlabs.litiengine.resources;
 
+import de.gurkenlabs.litiengine.environment.tilemap.IMap;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
+import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
+import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterLoader;
+import de.gurkenlabs.litiengine.sound.Sound;
+import de.gurkenlabs.litiengine.util.TimeUtilities;
 import java.awt.Font;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
@@ -17,23 +25,14 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.gurkenlabs.litiengine.environment.tilemap.IMap;
-import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
-import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
-import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
-import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterLoader;
-import de.gurkenlabs.litiengine.sound.Sound;
-import de.gurkenlabs.litiengine.util.TimeUtilities;
-
 /**
- * This class is the engines entry point for accessing any kind of resources. A resource is any non-executable data that
- * is deployed with your game. The {@code Resources} class provides access to types of {@code ResourcesContainers} and
- * is used by different (loading) mechanisms to make resources available during runtime.
+ * This class is the engines entry point for accessing any kind of resources. A resource is any non-executable data that is deployed with your game.
+ * The {@code Resources} class provides access to types of {@code ResourcesContainers} and is used by different (loading) mechanisms to make resources
+ * available during runtime.
  * <p>
  * The LITIENGINE supports a variety of different resource types, including:
  * </p>
- * 
+ *
  * <ul>
  * <li>images</li>
  * <li>fonts</li>
@@ -42,7 +41,7 @@ import de.gurkenlabs.litiengine.util.TimeUtilities;
  * <li>spritesheets</li>
  * <li>sounds</li>
  * </ul>
- * 
+ *
  * @see ResourcesContainer
  */
 public final class Resources {
@@ -62,9 +61,8 @@ public final class Resources {
 
   /**
    * Gets the container that manages {@code Font} resources.
-   * 
+   *
    * @return The Font resource container.
-   * 
    * @see Font
    */
   public static Fonts fonts() {
@@ -73,9 +71,8 @@ public final class Resources {
 
   /**
    * Gets the container that manages {@code Sound} resources.
-   * 
+   *
    * @return The Sound resource container.
-   * 
    * @see Sound
    */
   public static Sounds sounds() {
@@ -84,9 +81,8 @@ public final class Resources {
 
   /**
    * Gets the container that manages {@code IMap} resources.
-   * 
+   *
    * @return The IMap resource container.
-   * 
    * @see IMap
    */
   public static Maps maps() {
@@ -94,12 +90,10 @@ public final class Resources {
   }
 
   /**
-   * Gets the container that manages {@code Tileset} resources.<br>
-   * This implementation uses raw {@code Tileset}s, to avoid problems with {@code Tileset} methods that aren't in the
-   * {@code ITileset} interface.
-   * 
+   * Gets the container that manages {@code Tileset} resources.<br> This implementation uses raw {@code Tileset}s, to avoid problems with
+   * {@code Tileset} methods that aren't in the {@code ITileset} interface.
+   *
    * @return The Tileset resource container.
-   * 
    * @see Tileset
    */
   public static Tilesets tilesets() {
@@ -107,9 +101,8 @@ public final class Resources {
   }
 
   /**
-   * Gets a container that manages {@code String} resources.<br>
-   * This instance can be used to access localizable string from a ".properties" file.
-   * 
+   * Gets a container that manages {@code String} resources.<br> This instance can be used to access localizable string from a ".properties" file.
+   *
    * @return The String resource container.
    */
   public static Strings strings() {
@@ -118,9 +111,8 @@ public final class Resources {
 
   /**
    * Gets the container that manages {@code BufferedImage} resources.
-   * 
+   *
    * @return The BufferedImage resource container.
-   * 
    * @see BufferedImage
    */
   public static Images images() {
@@ -129,9 +121,8 @@ public final class Resources {
 
   /**
    * Gets the container that manages {@code Spritesheet} resources.
-   * 
+   *
    * @return The Spritesheet resource container.
-   * 
    * @see Spritesheet
    */
   public static Spritesheets spritesheets() {
@@ -140,9 +131,8 @@ public final class Resources {
 
   /**
    * Gets the container that manages {@code Blueprint} resources.
-   * 
+   *
    * @return The Blueprint resource container.
-   * 
    * @see Blueprint
    */
   public static Blueprints blueprints() {
@@ -150,22 +140,20 @@ public final class Resources {
   }
 
   /**
-   * Load {@code Spritesheets}, {@code Tilesets} and {@code Maps} from a game resource file created with the utiLITI
-   * editor. After loading, these resources can be accessed via this API (e.g. {@code Resources.maps().get("mapname")}.
-   * 
-   * @param gameResourceFile
-   *          The file name of the game resource file
+   * Load {@code Spritesheets}, {@code Tilesets} and {@code Maps} from a game resource file created with the utiLITI editor. After loading, these
+   * resources can be accessed via this API (e.g. {@code Resources.maps().get("mapname")}.
+   *
+   * @param gameResourceFile The file name of the game resource file
    */
   public static void load(final String gameResourceFile) {
     load(getLocation(gameResourceFile));
   }
 
   /**
-   * Load {@code Spritesheets}, {@code Tilesets} and {@code Maps} from a game resource file created with the utiLITI
-   * editor. After loading, these resources can be accessed via this API (e.g. {@code Resources.maps().get("mapname")}.
-   * 
-   * @param gameResourceFile
-   *          The URL to the game resource file
+   * Load {@code Spritesheets}, {@code Tilesets} and {@code Maps} from a game resource file created with the utiLITI editor. After loading, these
+   * resources can be accessed via this API (e.g. {@code Resources.maps().get("mapname")}.
+   *
+   * @param gameResourceFile The URL to the game resource file
    */
   public static void load(final URL gameResourceFile) {
     final long loadStart = System.nanoTime();
@@ -234,9 +222,8 @@ public final class Resources {
 
   /**
    * Gets the specified file as InputStream from either a resource folder or the file system.
-   * 
-   * @param file
-   *          The path to the file.
+   *
+   * @param file The path to the file.
    * @return The contents of the specified file as {@code InputStream}.
    * @see Resources
    */
@@ -246,9 +233,8 @@ public final class Resources {
 
   /**
    * Gets the specified file as InputStream from either a resource folder or the file system.
-   * 
-   * @param file
-   *          The path to the file.
+   *
+   * @param file The path to the file.
    * @return The contents of the specified file as {@code InputStream}.
    * @see Resources
    */
@@ -262,11 +248,10 @@ public final class Resources {
   }
 
   /**
-   * Reads the specified file as String from either a resource folder or the file system.<br>
-   * Since no {@code Charset} is specified with this overload, the implementation uses UTF-8 by default.
-   * 
-   * @param file
-   *          The path to the file.
+   * Reads the specified file as String from either a resource folder or the file system.<br> Since no {@code Charset} is specified with this
+   * overload, the implementation uses UTF-8 by default.
+   *
+   * @param file The path to the file.
    * @return The contents of the specified file as {@code String}
    */
   public static String read(String file) {
@@ -275,11 +260,9 @@ public final class Resources {
 
   /**
    * Reads the specified file as String from either a resource folder or the file system.<br>
-   * 
-   * @param file
-   *          The path to the file.
-   * @param charset
-   *          The charset that is used to read the String from the file.
+   *
+   * @param file    The path to the file.
+   * @param charset The charset that is used to read the String from the file.
    * @return The contents of the specified file as {@code String}
    */
   public static String read(String file, Charset charset) {
@@ -292,11 +275,10 @@ public final class Resources {
   }
 
   /**
-   * Reads the specified file as String from either a resource folder or the file system.<br>
-   * Since no {@code Charset} is specified with this overload, the implementation uses UTF-8 by default.
-   * 
-   * @param file
-   *          The path to the file.
+   * Reads the specified file as String from either a resource folder or the file system.<br> Since no {@code Charset} is specified with this
+   * overload, the implementation uses UTF-8 by default.
+   *
+   * @param file The path to the file.
    * @return The contents of the specified file as {@code String}
    */
   public static String read(URL file) {
@@ -305,15 +287,13 @@ public final class Resources {
 
   /**
    * Reads the specified file as String from either a resource folder or the file system.<br>
-   * 
-   * @param file
-   *          The path to the file.
-   * @param charset
-   *          The charset that is used to read the String from the file.
+   *
+   * @param file    The path to the file.
+   * @param charset The charset that is used to read the String from the file.
    * @return The contents of the specified file as {@code String}
    */
   public static String read(URL file, Charset charset) {
-    try (Scanner scanner = new Scanner(file.openStream(), charset.toString())) {
+    try (Scanner scanner = new Scanner(file.openStream(), charset)) {
       scanner.useDelimiter("\\A");
       return scanner.hasNext() ? scanner.next() : null;
     } catch (IOException e) {
@@ -334,22 +314,31 @@ public final class Resources {
     spritesheets().clear();
   }
 
+  /**
+   * Gets the location of the specified resource. This method attempts to find the resource using the system class loader first. If the resource is
+   * not found, it tries to locate it as a file in the file system.
+   *
+   * @param name The name of the resource.
+   * @return The URL of the resource, or null if the resource could not be found.
+   */
   public static URL getLocation(String name) {
     URL fromClass = ClassLoader.getSystemResource(name);
     if (fromClass != null) {
       return fromClass;
     }
     try {
-      return new URL(name);
+      return (new File(name)).toURI().toURL();
     } catch (MalformedURLException e) {
-      try {
-        return (new File(name)).toURI().toURL();
-      } catch (MalformedURLException e1) {
-        return null;
-      }
+      return null;
     }
   }
 
+  /**
+   * Retrieves an InputStream for the specified URL. This method attempts to open a stream to the resource located at the given URL.
+   *
+   * @param file The URL of the resource to be accessed.
+   * @return An InputStream to the resource, or null if an I/O error occurs.
+   */
   private static InputStream getResource(final URL file) {
     try {
       return file.openStream();

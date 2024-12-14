@@ -1,22 +1,23 @@
 package de.gurkenlabs.litiengine.resources;
 
+import de.gurkenlabs.litiengine.entities.Rotation;
+import de.gurkenlabs.litiengine.util.Imaging;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
-
 import javax.imageio.ImageIO;
 
-import de.gurkenlabs.litiengine.entities.Rotation;
-import de.gurkenlabs.litiengine.util.Imaging;
-
+/**
+ * A container class for managing image resources. This class extends the ResourcesContainer class, specifically for BufferedImage objects.
+ */
 public final class Images extends ResourcesContainer<BufferedImage> {
-  Images() {}
+  Images() {
+  }
 
   /**
    * Loads all images from the specified texture atlas.
-   * 
-   * @param textureAtlas
-   *          The texture atlas that contains all the images.
+   *
+   * @param textureAtlas The texture atlas that contains all the images.
    */
   public void load(TextureAtlas textureAtlas) {
     BufferedImage atlasImage = Resources.images().get(textureAtlas.getAbsoluteImagePath());
@@ -35,12 +36,9 @@ public final class Images extends ResourcesContainer<BufferedImage> {
   }
 
   /**
-   * Loads the image by the specified resourceName. This method supports both loading images from a folder and loading
-   * them from the resources.
+   * Loads the image by the specified resourceName. This method supports both loading images from a folder and loading them from the resources.
    *
-   * @param resourceName
-   *          The path to the image.
-   * 
+   * @param resourceName The path to the image.
    * @return the image
    */
   @Override

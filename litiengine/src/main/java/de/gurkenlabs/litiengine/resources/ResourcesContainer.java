@@ -17,8 +17,8 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 /**
- * An abstract implementation for all classes that provide a certain type of resources. Basically,
- * it's an in-memory cache of the resources and provides access to manage the resources.
+ * An abstract implementation for all classes that provide a certain type of resources. Basically, it's an in-memory cache of the resources and
+ * provides access to manage the resources.
  *
  * @param <T> The type of the resource that is contained by this instance.
  * @see ResourcesContainerListener
@@ -44,11 +44,10 @@ public abstract class ResourcesContainer<T> {
   }
 
   /**
-   * Add a new container listener to this instance in order to observe resource life cycles. The
-   * listener will get notified whenever a resource was added to or removed from this container.
+   * Add a new container listener to this instance in order to observe resource life cycles. The listener will get notified whenever a resource was
+   * added to or removed from this container.
    *
-   * @param listener The container listener instance that will receive call backs from this
-   *                 container.
+   * @param listener The container listener instance that will receive call backs from this container.
    * @see #removeContainerListener(ResourcesContainerListener)
    */
   public void addContainerListener(ResourcesContainerListener<? super T> listener) {
@@ -86,8 +85,8 @@ public abstract class ResourcesContainer<T> {
   }
 
   /**
-   * Add the specified resource to this container.<br> The added element can later be retrieved from
-   * this container by calling {@code get(resourceName)}.
+   * Add the specified resource to this container.<br> The added element can later be retrieved from this container by calling
+   * {@code get(resourceName)}.
    * <p>
    * Use this method to make a resource accessible over this container during runtime.
    * </p>
@@ -108,6 +107,13 @@ public abstract class ResourcesContainer<T> {
     }
   }
 
+  /**
+   * Adds the specified resource to this container using the given URL as the resource name. The added element can later be retrieved from this
+   * container by calling {@code get(resourceName)}.
+   *
+   * @param resourceName The URL of the resource to be added.
+   * @param resource     The resource instance to be added.
+   */
   public void add(URL resourceName, T resource) {
     this.add(resourceName.toString(), resource);
   }
@@ -137,6 +143,12 @@ public abstract class ResourcesContainer<T> {
     return this.resources.containsKey(this.getIdentifier(resourceName));
   }
 
+  /**
+   * Checks if this instance contains a resource with the specified URL.
+   *
+   * @param resourceName The URL of the resource.
+   * @return True if this container contains a resource with the specified URL; otherwise false.
+   */
   public boolean contains(URL resourceName) {
     return this.contains(resourceName.toString());
   }
@@ -180,8 +192,7 @@ public abstract class ResourcesContainer<T> {
    * This is the most common (and preferred) way to fetch resources from a container.
    * </p>
    * <p>
-   * If not previously loaded, this method attempts to load the resource on the fly otherwise it
-   * will be retrieved from the cache.
+   * If not previously loaded, this method attempts to load the resource on the fly otherwise it will be retrieved from the cache.
    * </p>
    *
    * @param resourceName The resource's name.
@@ -191,6 +202,15 @@ public abstract class ResourcesContainer<T> {
     return this.get(this.getIdentifier(resourceName), false);
   }
 
+  /**
+   * Gets the resource with the specified URL.
+   * <p>
+   * If not previously loaded, this method attempts to load the resource on the fly; otherwise, it will be retrieved from the cache.
+   * </p>
+   *
+   * @param resourceName The URL of the resource.
+   * @return The resource with the specified URL or null if not found.
+   */
   public T get(URL resourceName) {
     return this.get(resourceName, false);
   }
@@ -198,13 +218,12 @@ public abstract class ResourcesContainer<T> {
   /**
    * Gets the resource with the specified name.<br>
    * <p>
-   * If no such resource is currently present on the container, it will be loaded with the specified
-   * {@code loadCallback} and added to this container.
+   * If no such resource is currently present on the container, it will be loaded with the specified {@code loadCallback} and added to this
+   * container.
    * </p>
    *
    * @param resourceName The resource's name.
-   * @param loadCallback The callback that is used to load the resource on-demand if it's not
-   *                     present on this container.
+   * @param loadCallback The callback that is used to load the resource on-demand if it's not present on this container.
    * @return T The resource with the specified name.
    */
   public T get(String resourceName, Supplier<? extends T> loadCallback) {
@@ -222,6 +241,17 @@ public abstract class ResourcesContainer<T> {
 
   }
 
+  /**
+   * Gets the resource with the specified URL.
+   * <p>
+   * If no such resource is currently present in the container, it will be loaded with the specified {@code loadCallback} and added to this
+   * container.
+   * </p>
+   *
+   * @param resourceName The URL of the resource.
+   * @param loadCallback The callback that is used to load the resource on-demand if it's not present in this container.
+   * @return The resource with the specified URL.
+   */
   public T get(URL resourceName, Supplier<? extends T> loadCallback) {
     return this.get(resourceName.toString(), loadCallback);
   }
@@ -229,13 +259,11 @@ public abstract class ResourcesContainer<T> {
   /**
    * Gets the resource with the specified name.
    * <p>
-   * If not previously loaded, this method attempts to load the resource on the fly otherwise it
-   * will be retrieved from the cache.
+   * If not previously loaded, this method attempts to load the resource on the fly otherwise it will be retrieved from the cache.
    * </p>
    *
    * @param resourceName The name of the game resource.
-   * @param forceLoad    If set to true, cached resource (if existing) will be discarded and the
-   *                     resource will be freshly loaded.
+   * @param forceLoad    If set to true, cached resource (if existing) will be discarded and the resource will be freshly loaded.
    * @return The game resource or null if not found.
    */
   public T get(String resourceName, boolean forceLoad) {
@@ -257,31 +285,37 @@ public abstract class ResourcesContainer<T> {
     }
   }
 
+  /**
+   * Gets the resource with the specified URL.
+   * <p>
+   * If not previously loaded, this method attempts to load the resource on the fly; otherwise, it will be retrieved from the cache.
+   * </p>
+   *
+   * @param resourceName The URL of the resource.
+   * @param forceLoad    If set to true, cached resource (if existing) will be discarded and the resource will be freshly loaded.
+   * @return The resource with the specified URL or null if not found.
+   */
   public T get(URL resourceName, boolean forceLoad) {
     return this.get(resourceName.toString(), forceLoad);
   }
 
   /**
-   * Eventually gets the resource with the specified location. The resource is loaded asynchronously
-   * and can be retrieved from the returned {@code Future} object returned by this method once
-   * loaded.
+   * Eventually gets the resource with the specified location. The resource is loaded asynchronously and can be retrieved from the returned
+   * {@code Future} object returned by this method once loaded.
    *
    * @param location The location of the resource
-   * @return A {@code Future} object that can be used to retrieve the resource once it is finished
-   * loading
+   * @return A {@code Future} object that can be used to retrieve the resource once it is finished loading
    */
   public Future<T> getAsync(URL location) {
     return ASYNC_POOL.submit(() -> this.get(location));
   }
 
   /**
-   * Eventually gets the resource with the specified location. The resource is loaded asynchronously
-   * and can be retrieved from the returned {@code Future} object returned by this method once
-   * loaded.
+   * Eventually gets the resource with the specified location. The resource is loaded asynchronously and can be retrieved from the returned
+   * {@code Future} object returned by this method once loaded.
    *
    * @param name The name or location of the resource
-   * @return A {@code Future} object that can be used to retrieve the resource once it is finished
-   * loading
+   * @return A {@code Future} object that can be used to retrieve the resource once it is finished loading
    */
   public Future<T> getAsync(String name) {
     return this.getAsync(Resources.getLocation(this.getIdentifier(name)));
@@ -315,6 +349,12 @@ public abstract class ResourcesContainer<T> {
 
   }
 
+  /**
+   * Removes the resource with the specified URL from this container.
+   *
+   * @param resourceName The URL of the resource that should be removed.
+   * @return The removed resource.
+   */
   public T remove(URL resourceName) {
     return this.remove(resourceName.toString());
   }
@@ -322,10 +362,8 @@ public abstract class ResourcesContainer<T> {
   /**
    * Tries to get a resource with the specified name from this container.
    * <p>
-   * This method should be used, if it's not clear whether the resource is present on this
-   * container.<br> It is basically a combination of {@code get(String)} and
-   * {@code contains(String)} and allows to check whether a resource is present while also fetching
-   * it from the container.
+   * This method should be used, if it's not clear whether the resource is present on this container.<br> It is basically a combination of
+   * {@code get(String)} and {@code contains(String)} and allows to check whether a resource is present while also fetching it from the container.
    * </p>
    *
    * @param resourceName The name of the resource.
@@ -342,15 +380,34 @@ public abstract class ResourcesContainer<T> {
     return Optional.empty();
   }
 
+  /**
+   * Tries to get a resource with the specified URL from this container.
+   * <p>
+   * This method should be used if it's not clear whether the resource is present in this container. It is basically a combination of {@code get(URL)}
+   * and {@code contains(URL)} and allows checking whether a resource is present while also fetching it from the container.
+   * </p>
+   *
+   * @param resourceName The URL of the resource.
+   * @return An Optional instance that holds the resource instance, if present in this container.
+   */
   public Optional<T> tryGet(URL resourceName) {
     return this.tryGet(resourceName.getPath());
   }
 
+  /**
+   * Loads the resource with the specified URL.
+   * <p>
+   * This method must be implemented by subclasses to define how a resource is loaded from the given URL.
+   * </p>
+   *
+   * @param resourceName The URL of the resource to be loaded.
+   * @return The loaded resource.
+   * @throws Exception If an error occurs while loading the resource.
+   */
   protected abstract T load(URL resourceName) throws Exception;
 
   /**
-   * Gets an alias for the specified resourceName. Note that the process of providing an alias is up
-   * to the ResourceContainer implementation.
+   * Gets an alias for the specified resourceName. Note that the process of providing an alias is up to the ResourceContainer implementation.
    *
    * @param resourceName The original name of the resource.
    * @param resource     The resource.
@@ -360,10 +417,26 @@ public abstract class ResourcesContainer<T> {
     return null;
   }
 
+  /**
+   * Gets the map of resources contained in this container.
+   *
+   * @return A map where the keys are resource names and the values are the resources.
+   */
   protected Map<String, T> getResources() {
     return this.resources;
   }
 
+  /**
+   * Loads the resource with the specified identifier.
+   * <p>
+   * This method attempts to load the resource using the provided identifier. If the resource is successfully loaded, it notifies all registered
+   * listeners and updates the alias map if an alias is provided.
+   * </p>
+   *
+   * @param identifier The identifier of the resource to be loaded.
+   * @return The loaded resource.
+   * @throws ResourceLoadException If an error occurs while loading the resource.
+   */
   private T loadResource(String identifier) {
     T newResource;
     try {
@@ -384,6 +457,15 @@ public abstract class ResourcesContainer<T> {
     return newResource;
   }
 
+  /**
+   * Gets the identifier for the specified resource name.
+   * <p>
+   * This method checks if there is an alias for the given resource name and returns it. If no alias is found, it returns the original resource name.
+   * </p>
+   *
+   * @param resourceName The name of the resource.
+   * @return The identifier for the resource, which may be an alias or the original resource name.
+   */
   private String getIdentifier(String resourceName) {
     return this.aliases.getOrDefault(resourceName, resourceName);
   }
