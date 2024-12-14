@@ -1,11 +1,11 @@
 package de.gurkenlabs.litiengine.graphics.emitters.xml;
 
+import de.gurkenlabs.litiengine.Game;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlTransient;
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Represents a parameter for a particle with a minimum and maximum value.
@@ -87,8 +87,8 @@ public class ParticleParameter implements Serializable {
    * @return A random number.
    */
   @XmlTransient
-  public float getRandomNumber() {
-    return (float) ThreadLocalRandom.current().nextDouble(this.getMinValue(), this.getMaxValue());
+  public double getRandomNumber() {
+    return Game.random().nextDouble(this.getMinValue(), this.getMaxValue());
   }
 
   /**

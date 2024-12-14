@@ -503,14 +503,17 @@ class EntityTests {
 
     @SuppressWarnings("unused")
     public void imNotAnAction() {
+      // no implementation needed, just a test
     }
 
     @Action
     public void imNotParameterless(int something) {
+      // no implementation needed, just a test
     }
 
     @Action
     private void privateAction() {
+      // no implementation needed, just a test
     }
   }
 }
