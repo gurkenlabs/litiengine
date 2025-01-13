@@ -34,7 +34,7 @@ junit = ["junit-api", "junit-params", "junit-engine"]
 beryxRuntime = { id = "org.beryx.runtime", version = "1.13.1" }
 nexusPublish = { id = "io.github.gradle-nexus.publish-plugin", version = "2.0.0" }
 sonarQube = { id = "org.sonarqube", version = "6.0.1.5171" }
-spotless = { id = "com.diffplug.spotless", version = "6.25.0" }
+spotless = { id = "com.diffplug.spotless", version = "7.0.1" }
 versions = { id = "com.github.ben-manes.versions", version = "0.51.0" }
 grgit = { id = "org.ajoberstar.grgit", version = "5.3.0" }
 semverguru = { id = "de.gurkenlabs.semverguru", version = "1.4" }
