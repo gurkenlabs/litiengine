@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.input;
 
+import de.gurkenlabs.input4j.components.Axis;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.physics.MovementController;
@@ -7,7 +8,7 @@ import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import java.awt.geom.Point2D;
 
 public class GamepadEntityController<T extends IMobileEntity> extends MovementController<T> {
-  private int gamepadId = -1;
+  private String gamepadId = null;
   private double gamepadDeadzone = Game.config().input().getGamepadStickDeadzone();
   private double gamepadRightStick = Game.config().input().getGamepadStickDeadzone();
   private boolean rotateWithRightStick = false;
@@ -22,7 +23,7 @@ public class GamepadEntityController<T extends IMobileEntity> extends MovementCo
     Input.gamepads()
         .onAdded(
             pad -> {
-              if (this.gamepadId == -1) {
+              if (this.gamepadId == null) {
                 this.gamepadId = pad.getId();
               }
             });
@@ -30,8 +31,8 @@ public class GamepadEntityController<T extends IMobileEntity> extends MovementCo
     Input.gamepads()
         .onRemoved(
             pad -> {
-              if (this.gamepadId == pad.getId()) {
-                this.gamepadId = -1;
+              if (this.gamepadId.equals(pad.getId())) {
+                this.gamepadId = null;
                 final Gamepad newGamePad = Input.gamepads().current();
                 if (newGamePad != null) {
                   this.gamepadId = newGamePad.getId();
@@ -73,13 +74,12 @@ public class GamepadEntityController<T extends IMobileEntity> extends MovementCo
 
   private void retrieveGamepadValues() {
     final Gamepad gamepad = Input.gamepads().getById(this.gamepadId);
-    if (this.gamepadId == -1
-        || this.gamepadId != -1 && gamepad == null) {
+    if (this.gamepadId == null || gamepad == null) {
       return;
     }
 
-    final float x = gamepad.getPollData(Gamepad.Axis.X);
-    final float y = gamepad.getPollData(Gamepad.Axis.Y);
+    final float x = gamepad.getPollData(Axis.AXIS_X);
+    final float y = gamepad.getPollData(Axis.AXIS_Y);
 
     if (Math.abs(x) > this.gamepadDeadzone) {
       this.setDx(x);
@@ -90,8 +90,8 @@ public class GamepadEntityController<T extends IMobileEntity> extends MovementCo
     }
 
     if (this.isRotateWithRightStick()) {
-      final float rightX = gamepad.getPollData(Gamepad.Axis.RX);
-      final float rightY = gamepad.getPollData(Gamepad.Axis.RY);
+      final float rightX = gamepad.getPollData(Axis.AXIS_RX);
+      final float rightY = gamepad.getPollData(Axis.AXIS_RY);
       float targetX = 0;
       float targetY = 0;
       if (Math.abs(rightX) > this.gamepadRightStick) {

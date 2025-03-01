@@ -71,22 +71,8 @@ public final class Input {
 
   public static final class InputGameAdapter implements GameListener {
     @Override
-    public void terminated() {
-      if (gamePadManager != null) {
-        gamePadManager.terminate();
-      }
-    }
-
-    @Override
     public void initialized(String... args) {
       init();
-    }
-
-    @Override
-    public void started() {
-      if (gamePadManager != null) {
-        gamePadManager.start();
-      }
     }
 
     private static void init() {

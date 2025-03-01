@@ -1,7 +1,8 @@
 package de.gurkenlabs.litiengine.input;
 
+import de.gurkenlabs.input4j.InputComponent;
+
 import java.util.EventObject;
-import net.java.games.input.Component;
 
 public class GamepadEvent extends EventObject {
   private static final long serialVersionUID = -6174813700465768116L;
@@ -11,16 +12,14 @@ public class GamepadEvent extends EventObject {
   private final String componentName;
   private final float value;
   private final boolean relative;
-  private final boolean analog;
 
-  GamepadEvent(Gamepad source, Component component) {
+  GamepadEvent(Gamepad source, InputComponent component) {
     super(source);
     this.gamepad = source;
-    this.component = component.getIdentifier().getName();
-    this.componentName = component.getName();
-    this.value = component.getPollData();
+    this.component = component.getType() + " " + component.getId().id;
+    this.componentName = component.getId().name;
+    this.value = component.getData();
     this.relative = component.isRelative();
-    this.analog = component.isAnalog();
   }
 
   /**
@@ -68,14 +67,5 @@ public class GamepadEvent extends EventObject {
    */
   public boolean isRelative() {
     return this.relative;
-  }
-
-  /**
-   * Returns whether or not the axis is analog, or false if it is digital.
-   *
-   * @return True if the component is analog; otherwise false.
-   */
-  public boolean isAnalog() {
-    return this.analog;
   }
 }

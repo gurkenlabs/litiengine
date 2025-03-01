@@ -1,22 +1,15 @@
 package de.gurkenlabs.litiengine.input;
 
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.GameListener;
-import de.gurkenlabs.litiengine.ILaunchable;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
+import de.gurkenlabs.input4j.InputComponent;
+import de.gurkenlabs.input4j.InputDevice;
+import de.gurkenlabs.input4j.InputDevicePlugin;
+import de.gurkenlabs.input4j.InputDevices;
+
 import java.util.Collection;
 import java.util.EventListener;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import net.java.games.input.Controller;
-import net.java.games.input.Controller.Type;
-import net.java.games.input.ControllerEnvironment;
 
 /**
  * The {@code GamepadManager} provides access to all gamepad input devices.
@@ -28,76 +21,67 @@ import net.java.games.input.ControllerEnvironment;
  * @see #current()
  * @see #get(int)
  */
-public final class GamepadManager extends GamepadEvents implements ILaunchable {
-  private static final Logger log = Logger.getLogger(GamepadManager.class.getName());
-
+public final class GamepadManager extends GamepadEvents {
   private final Collection<GamepadAddedListener> gamepadAddedConsumer;
   private final Collection<GamepadRemovedListener> gamepadRemovedConsumer;
-
+  private final InputDevicePlugin devicePlugin;
   private final List<Gamepad> gamePads;
 
-  private final Thread hotPlugThread;
-
-  private int defaultgamepadId = -1;
-  private boolean handleHotPluggedControllers;
+  private String defaultgamepadId = null;
 
   GamepadManager() {
     this.gamepadRemovedConsumer = ConcurrentHashMap.newKeySet();
     this.gamepadAddedConsumer = ConcurrentHashMap.newKeySet();
 
     this.gamePads = new CopyOnWriteArrayList<>();
+    this.devicePlugin = InputDevices.init();
 
-    this.hotPlugThread =
-        new Thread(
-            () -> {
-              while (!Thread.interrupted()) {
-                this.updateGamepads();
+    // initially add all gamepads before subscribing the events
+    this.devicePlugin.getAll().forEach(this::addNewGamepad);
 
-                try {
-                  Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                  Thread.currentThread().interrupt();
-                  break;
-                }
-              }
-            });
+    // add new gamepads as they are connected
+    this.devicePlugin.onDeviceConnected(device ->
+    {
+      final var gamepad = this.getById(device.getID());
+      if (gamepad != null) {
+        // already added
+        return;
+      }
 
-    Game.addGameListener(
-        new GameListener() {
-          @Override
-          public void terminated() {
-            hotPlugThread.interrupt();
-          }
-        });
+      this.addNewGamepad(device);
+    });
 
-    this.onAdded(
-        pad -> {
-          if (this.defaultgamepadId == -1) {
-            this.defaultgamepadId = pad.getId();
-            this.hookupToGamepad(pad);
-          }
-        });
+    // remove gamepads as they are disconnected
+    this.devicePlugin.onDeviceDisconnected(device ->
+    {
+      final var gamepad = this.getById(device.getID());
+      if (gamepad == null) {
+        // gamepad was not added before, nothing to do
+        return;
+      }
 
-    this.onRemoved(
-        pad -> {
-          if (this.defaultgamepadId == pad.getId()) {
-            this.defaultgamepadId = -1;
-            final Gamepad newGamePad = current();
-            if (newGamePad != null) {
-              this.defaultgamepadId = newGamePad.getId();
-              this.hookupToGamepad(newGamePad);
-            }
-          }
-        });
+      this.removeGamepad(gamepad);
+    });
+  }
 
-    updateGamepads();
+  private void addNewGamepad(InputDevice device) {
+    // add new gamepads
+    final Gamepad newGamepad = new Gamepad(device);
+    this.gamePads.add(newGamepad);
+    if (this.defaultgamepadId == null) {
+      this.defaultgamepadId = newGamepad.getId();
+      this.hookupToGamepad(newGamepad);
+    }
+
+    for (final GamepadAddedListener listener : this.gamepadAddedConsumer) {
+      listener.added(newGamepad);
+    }
   }
 
   /**
    * Adds the specified gamepad added listener to receive events when gamepads are added.
    *
-   * @param listener
-   *          The listener to add.
+   * @param listener The listener to add.
    */
   public void onAdded(final GamepadAddedListener listener) {
     this.gamepadAddedConsumer.add(listener);
@@ -106,8 +90,7 @@ public final class GamepadManager extends GamepadEvents implements ILaunchable {
   /**
    * Unregister the specified added listener from this instance.
    *
-   * @param listener
-   *          The listener to remove.
+   * @param listener The listener to remove.
    */
   public void removeAddedListener(GamepadAddedListener listener) {
     this.gamepadAddedConsumer.remove(listener);
@@ -116,8 +99,7 @@ public final class GamepadManager extends GamepadEvents implements ILaunchable {
   /**
    * Adds the specified gamepad removed listener to receive events when gamepads are removed.
    *
-   * @param listener
-   *          The listener to add.
+   * @param listener The listener to add.
    */
   public void onRemoved(final GamepadRemovedListener listener) {
     this.gamepadRemovedConsumer.add(listener);
@@ -126,8 +108,7 @@ public final class GamepadManager extends GamepadEvents implements ILaunchable {
   /**
    * Unregister the specified removed listener from this instance.
    *
-   * @param listener
-   *          The listener to remove.
+   * @param listener The listener to remove.
    */
   public void removeRemovedListener(GamepadRemovedListener listener) {
     this.gamepadRemovedConsumer.remove(listener);
@@ -158,8 +139,7 @@ public final class GamepadManager extends GamepadEvents implements ILaunchable {
   /**
    * Gets the gamepad by the index within the gamepad list.
    *
-   * @param index
-   *          The index of the {@link Gamepad}.
+   * @param index The index of the {@link Gamepad}.
    * @return The {@link Gamepad} with the specified index.
    * @see #getAll()
    * @see #current()
@@ -176,15 +156,14 @@ public final class GamepadManager extends GamepadEvents implements ILaunchable {
    * Gets the gamepad with the specified id if it is still plugged in. After re-plugging a controller while the game is
    * running, its id might change.
    *
-   * @param id
-   *          The id of the {@link Gamepad}.
+   * @param id The id of the {@link Gamepad}.
    * @return The {@link Gamepad} with the specified index.
    * @see #getAll()
    * @see #current()
    */
-  public Gamepad getById(final int id) {
+  public Gamepad getById(final String id) {
     for (final Gamepad gamepad : this.gamePads) {
-      if (gamepad.getId() == id) {
+      if (gamepad.getId().equals(id)) {
         return gamepad;
       }
     }
@@ -193,63 +172,57 @@ public final class GamepadManager extends GamepadEvents implements ILaunchable {
   }
 
   @Override
-  public boolean isPressed(String gamepadComponent) {
-    final Gamepad current = this.current();
-    return current != null && current.isPressed(gamepadComponent);
-  }
-
-  @Override
-  public void onPoll(GamepadPollListener listener) {
-    super.onPoll(listener);
+  public void onValueChanged(GamepadValueChangedListener listener) {
+    super.onValueChanged(listener);
     final var current = this.current();
     if (current != null) {
-      current.onPoll(listener);
+      current.onValueChanged(listener);
     }
   }
 
   @Override
-  public void onPressed(GamepadPressedListener listener) {
-    super.onPressed(listener);
+  public void onButtonPressed(GamepadButtonPressedListener listener) {
+    super.onButtonPressed(listener);
     final var current = this.current();
     if (current != null) {
-      current.onPressed(listener);
+      current.onButtonPressed(listener);
     }
   }
 
   @Override
-  public void onReleased(GamepadReleasedListener listener) {
-    super.onReleased(listener);
+  public void onButtonReleased(GamepadButtonReleasedListener listener) {
+    super.onButtonReleased(listener);
     final var current = this.current();
     if (current != null) {
-      current.onReleased(listener);
+      current.onButtonReleased(listener);
     }
   }
 
   @Override
-  public void onPoll(String identifier, GamepadPollListener listener) {
-    super.onPoll(identifier, listener);
+  public void onValueChanged(InputComponent.ID identifier, GamepadValueChangedListener listener) {
+    super.onValueChanged(identifier, listener);
     final var current = this.current();
     if (current != null) {
-      current.onPoll(identifier, listener);
+      current.onValueChanged(identifier, listener);
     }
   }
 
   @Override
-  public void onPressed(String identifier, GamepadPressedListener listener) {
-    super.onPressed(identifier, listener);
+  public void onButtonPressed(InputComponent.ID identifier, GamepadButtonPressedListener listener) {
+    super.onButtonPressed(identifier, listener);
 
     final var current = this.current();
     if (current != null) {
-      current.onPressed(identifier, listener);
+      current.onButtonPressed(identifier, listener);
     }
   }
 
   @Override
-  public void onReleased(String identifier, GamepadReleasedListener listener) {
-    super.onReleased(identifier, listener);
+  public void onButtonReleased(InputComponent.ID identifier, GamepadButtonReleasedListener listener) {
+    super.onButtonReleased(identifier, listener);
     final var current = this.current();
     if (current != null) {
-      current.onReleased(identifier, listener);
+      current.onButtonReleased(identifier, listener);
     }
   }
 
@@ -264,7 +237,18 @@ public final class GamepadManager extends GamepadEvents implements ILaunchable {
   }
 
   @Override
-  public void removePollListener(String identifier, GamepadPollListener listener) {
+  public boolean isButtonPressed(InputComponent.ID buttonId) {
+    final Gamepad current = this.current();
+    return current != null && current.isButtonPressed(buttonId);
+  }
+
+  @Override
+  public boolean isButtonPressed(int buttonId) {
+    return this.isButtonPressed(InputComponent.ID.getButton(buttonId));
+  }
+
+  @Override
+  public void removePollListener(InputComponent.ID identifier, GamepadValueChangedListener listener) {
     super.removePollListener(identifier, listener);
 
     final var current = this.current();
@@ -274,27 +258,27 @@ public final class GamepadManager extends GamepadEvents implements ILaunchable {
   }
 
   @Override
-  public void removePressedListener(String identifier, GamepadPressedListener listener) {
-    super.removePressedListener(identifier, listener);
+  public void removeButtonPressedListener(InputComponent.ID identifier, GamepadButtonPressedListener listener) {
+    super.removeButtonPressedListener(identifier, listener);
 
     final var current = this.current();
     if (current != null) {
-      current.removePressedListener(identifier, listener);
+      current.removeButtonPressedListener(identifier, listener);
     }
   }
 
   @Override
-  public void removeReleasedListener(String identifier, GamepadReleasedListener listener) {
-    super.removeReleasedListener(identifier, listener);
+  public void removeButtonReleasedListener(InputComponent.ID identifier, GamepadButtonReleasedListener listener) {
+    super.removeButtonReleasedListener(identifier, listener);
 
     final var current = this.current();
     if (current != null) {
-      current.removeReleasedListener(identifier, listener);
+      current.removeButtonReleasedListener(identifier, listener);
     }
   }
 
   @Override
-  public void removePollListener(GamepadPollListener listener) {
+  public void removePollListener(GamepadValueChangedListener listener) {
     super.removePollListener(listener);
 
     final var current = this.current();
@@ -304,164 +288,77 @@ public final class GamepadManager extends GamepadEvents implements ILaunchable {
   }
 
   @Override
-  public void removePressedListener(GamepadPressedListener listener) {
-    super.removePressedListener(listener);
+  public void removeButtonPressedListener(GamepadButtonPressedListener listener) {
+    super.removeButtonPressedListener(listener);
 
     final var current = this.current();
     if (current != null) {
-      current.removePressedListener(listener);
+      current.removeButtonPressedListener(listener);
     }
   }
 
   @Override
-  public void removeReleasedListener(GamepadReleasedListener listener) {
-    super.removeReleasedListener(listener);
+  public void removeButtonReleasedListener(GamepadButtonReleasedListener listener) {
+    super.removeButtonReleasedListener(listener);
 
     final var current = this.current();
     if (current != null) {
-      current.removeReleasedListener(listener);
+      current.removeButtonReleasedListener(listener);
     }
   }
 
-  /**
-   * DON'T CALL THIS EXPLICITLY! THE LITIENGINE WILL MANAGE THE LIFECYCLE OF THIS INSTANCE.
-   */
-  @Override
-  public void start() {
-    this.hotPlugThread.start();
-  }
-
-  /**
-   * DON'T CALL THIS EXPLICITLY! THE LITIENGINE WILL MANAGE THE LIFECYCLE OF THIS INSTANCE.
-   */
-  @Override
-  public void terminate() {
-    int totalWait = 0;
-    while (handleHotPluggedControllers && totalWait <= 40) {
-      try {
-        Thread.sleep(50);
-      } catch (Exception e) {
-        break;
-      }
-      totalWait++;
-    }
-
-    this.hotPlugThread.interrupt();
-  }
-
-  /**
-   * DON'T CALL THIS EXPLICITLY! THE LITIENGINE WILL MANAGE THE LIFECYCLE OF GAMEPADS.
-   */
-  void remove(final Gamepad gamepad) {
+  private void removeGamepad(final Gamepad gamepad) {
     if (gamepad == null) {
       return;
     }
 
-    this.getAll().remove(gamepad);
-    for (final GamepadRemovedListener listener : this.gamepadRemovedConsumer) {
+    gamepad.clearEventListeners();
+
+    // reset default gamepad in case the removed one is the default
+    if (this.defaultgamepadId.equals(gamepad.getId())) {
+      this.defaultgamepadId = null;
+      final var newGamePad = current();
+      if (newGamePad != null) {
+        this.defaultgamepadId = newGamePad.getId();
+        this.hookupToGamepad(newGamePad);
+      }
+    }
+
+    this.gamePads.remove(gamepad);
+    for (final var listener : this.gamepadRemovedConsumer) {
       listener.removed(gamepad);
     }
   }
 
-  /**
-   * In JInput it is not possible to get newly added controllers or detached controllers because it will never update its
-   * controllers. If you would restart the application it would work... so we just reset the environment via reflection
-   * and it'll do it ;).
-   */
-  private static void hackTheShitOutOfJInput() {
-    try {
-      final Field env = ControllerEnvironment.class.getDeclaredField("defaultEnvironment");
-      env.setAccessible(true);
-      final Class<?> clazz = Class.forName("net.java.games.input.DefaultControllerEnvironment");
-
-      // kill threads that might still be running.
-      // otherwise we would spawn a new thread every time this method is called
-      // without killing the last one
-      final Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
-      for (final Thread thread : threadSet) {
-        final String name = thread.getClass().getName();
-        if (name.equals("net.java.games.input.RawInputEventQueue$QueueThread")) {
-          thread.interrupt();
-
-          try {
-            thread.join();
-          } catch (InterruptedException e) {
-            log.log(Level.FINE, e.getMessage(), e);
-            Thread.currentThread().interrupt();
-          }
-        }
-      }
-
-      final Constructor<?> ctor = clazz.getConstructor();
-      ctor.setAccessible(true);
-      env.set(null, ctor.newInstance());
-    } catch (ReflectiveOperationException e) {
-      log.log(Level.SEVERE, e.getMessage(), e);
-    }
-  }
-
   private void hookupToGamepad(final Gamepad pad) {
-    for (final Map.Entry<String, Collection<GamepadPollListener>> entry : this.componentPollListeners.entrySet()) {
-      for (final GamepadPollListener listener : entry.getValue()) {
-        pad.onPoll(entry.getKey(), listener);
+    for (final var entry : this.componentPollListeners.entrySet()) {
+      for (final GamepadValueChangedListener listener : entry.getValue()) {
+        pad.onValueChanged(entry.getKey(), listener);
       }
     }
 
-    for (final Map.Entry<String, Collection<GamepadPressedListener>> entry : this.componentPressedListeners.entrySet()) {
-      for (final GamepadPressedListener listener : entry.getValue()) {
-        pad.onPressed(entry.getKey(), listener);
+    for (final var entry : this.componentPressedListeners.entrySet()) {
+      for (final GamepadButtonPressedListener listener : entry.getValue()) {
+        pad.onButtonPressed(entry.getKey(), listener);
       }
     }
 
-    for (final Map.Entry<String, Collection<GamepadReleasedListener>> entry : this.componentReleasedListeners.entrySet()) {
-      for (final GamepadReleasedListener listener : entry.getValue()) {
-        pad.onReleased(entry.getKey(), listener);
+    for (final var entry : this.componentReleasedListeners.entrySet()) {
+      for (final GamepadButtonReleasedListener listener : entry.getValue()) {
+        pad.onButtonReleased(entry.getKey(), listener);
       }
     }
 
-    for (final GamepadPollListener listener : this.pollListeners) {
-      pad.onPoll(listener);
+    for (final GamepadValueChangedListener listener : this.pollListeners) {
+      pad.onValueChanged(listener);
     }
 
-    for (final GamepadPressedListener listener : this.pressedListeners) {
-      pad.onPressed(listener);
+    for (final GamepadButtonPressedListener listener : this.pressedListeners) {
+      pad.onButtonPressed(listener);
     }
 
-    for (final GamepadReleasedListener listener : this.releasedListeners) {
-      pad.onReleased(listener);
-    }
-  }
-
-  private void updateGamepads() {
-    this.handleHotPluggedControllers = true;
-    try {
-      hackTheShitOutOfJInput();
-      // update plugged in gamepads
-      for (int i = 0; i < ControllerEnvironment.getDefaultEnvironment().getControllers().length; i++) {
-        final Controller controller = ControllerEnvironment.getDefaultEnvironment().getControllers()[i];
-        final Type type = controller.getType();
-
-        if (type.equals(Type.KEYBOARD) || type.equals(Type.MOUSE) || type.equals(Type.UNKNOWN)) {
-          continue;
-        }
-
-        final Gamepad existing = this.getById(i);
-        if (existing != null && existing.getName().equals(controller.getName())) {
-          // already added
-          continue;
-        }
-
-        // add new gamepads
-        final Gamepad newGamepad = new Gamepad(i, controller);
-        this.getAll().add(newGamepad);
-        for (final GamepadAddedListener listener : this.gamepadAddedConsumer) {
-          listener.added(newGamepad);
-        }
-      }
-    } catch (IllegalStateException e) {
-      this.hotPlugThread.interrupt();
-    } finally {
-      this.handleHotPluggedControllers = false;
+    for (final GamepadButtonReleasedListener listener : this.releasedListeners) {
+      pad.onButtonReleased(listener);
     }
   }
 
@@ -475,8 +372,7 @@ public final class GamepadManager extends GamepadEvents implements ILaunchable {
     /**
      * Invoked when a gamepad was added.
      *
-     * @param gamepad
-     *          The added gamepad.
+     * @param gamepad The added gamepad.
      */
     void added(Gamepad gamepad);
   }
@@ -491,8 +387,7 @@ public final class GamepadManager extends GamepadEvents implements ILaunchable {
     /**
      * Invoked when a gamepad was removed.
      *
-     * @param gamepad
-     *          The removed gamepad.
+     * @param gamepad The removed gamepad.
      */
     void removed(Gamepad gamepad);
   }
