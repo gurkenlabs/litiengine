@@ -9,7 +9,7 @@ plugins {
 }
 
 dependencies {
-  implementation libs.jinput
+  implementation libs.input4j
   implementation libs.bundles.soundlibs
   implementation libs.javax.activation
   api libs.xml.api

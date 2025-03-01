@@ -61,7 +61,7 @@ You've encountered an obvious issue or bug with LITIENGINE or want to request en
 
 ## :package: Libraries Used
 
-* [JInput](https://github.com/jinput/jinput) for Gamepad support
+* [Input4J](https://github.com/gurkenlabs/input4j) for Gamepad support
 * [MP3 SPI](https://mvnrepository.com/artifact/com.googlecode.soundlibs/mp3spi/1.9.5.4) for .mp3 support
 * [Ogg Vorbis SPI](https://mvnrepository.com/artifact/com.googlecode.soundlibs/vorbisspi/1.0.3.3) for .ogg support
 

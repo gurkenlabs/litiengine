@@ -87,14 +87,14 @@ class GamepadManagerTests {
     Gamepad gamepad1 = mock(Gamepad.class);
     Gamepad gamepad2 = mock(Gamepad.class);
 
-    when(gamepad1.getId()).thenReturn(1);
-    when(gamepad2.getId()).thenReturn(2);
+    when(gamepad1.getId()).thenReturn("1");
+    when(gamepad2.getId()).thenReturn("2");
 
     gamepadManager.getAll().add(gamepad1);
     gamepadManager.getAll().add(gamepad2);
 
-    assertEquals(gamepad1, gamepadManager.getById(1));
-    assertEquals(gamepad2, gamepadManager.getById(2));
-    assertNull(gamepadManager.getById(3));
+    assertEquals(gamepad1, gamepadManager.getById("1"));
+    assertEquals(gamepad2, gamepadManager.getById("2"));
+    assertNull(gamepadManager.getById("3"));
   }
 }
