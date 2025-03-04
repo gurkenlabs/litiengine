@@ -16,19 +16,16 @@ xml_runtime_impl = { module = "com.sun.xml.bind:jaxb-impl", version.ref = "jaxb"
 
 # Test dependencies
 mockito_core = { module = "org.mockito:mockito-core", version = "5.16.0" }
-mockito_inline = { module = "org.mockito:mockito-inline", version = "5.2.0" }
-junit_api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
-junit_params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
-junit_engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
+junit_jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
+junit_jupiter_api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
+junit_jupiter_params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
+junit_jupiter_engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
 
 
 [bundles]
 soundlibs = ["soundlibs-jorbis", "soundlibs-tritonus", "soundlibs-vorbisspi", "soundlibs-mp3spi"]
 xml_runtime = ["xml-runtime-core", "xml-runtime-impl"]
 
-# Test dependencies
-mockito = ["mockito-core", "mockito-inline"]
-junit = ["junit-api", "junit-params", "junit-engine"]
 
 [plugins]
 beryxRuntime = { id = "org.beryx.runtime", version = "1.13.1" }

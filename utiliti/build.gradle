@@ -31,6 +31,8 @@ dependencies {
   implementation project(":litiengine")
   implementation libs.darklaf.core
   testImplementation project(":shared")
+  testImplementation libs.junit.jupiter
+  testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 }
 
 runtime {

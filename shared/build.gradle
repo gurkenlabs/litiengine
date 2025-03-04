@@ -6,8 +6,8 @@ plugins {
 }
 
 dependencies {
-  api libs.bundles.mockito
-  api libs.junit.api
-  api libs.junit.params
-  runtimeOnly libs.junit.engine
+  api libs.mockito.core
+  api libs.junit.jupiter.api
+  api libs.junit.jupiter.params
+  runtimeOnly libs.junit.jupiter.engine
 }
