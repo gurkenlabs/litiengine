@@ -3,12 +3,9 @@ package de.gurkenlabs.litiengine.graphics;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.util.Imaging;
-import de.gurkenlabs.litiengine.util.MathUtilities;
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 

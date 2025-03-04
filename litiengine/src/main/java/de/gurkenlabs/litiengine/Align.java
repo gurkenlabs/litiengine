@@ -130,7 +130,7 @@ public enum Align {
       return location;
     }
 
-    return Math.max(0, Math.min(width - objectWidth, location));
+    return Math.clamp(location, 0, width - objectWidth);
   }
 
   /**

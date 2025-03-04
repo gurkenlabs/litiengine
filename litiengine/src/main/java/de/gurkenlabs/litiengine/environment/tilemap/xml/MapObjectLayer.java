@@ -1,22 +1,19 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
+import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.XmlAttribute;
-import jakarta.xml.bind.annotation.XmlElement;
-
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
-import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
-import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 public class MapObjectLayer extends Layer implements IMapObjectLayer {
   public static final String DEFAULT_MAPOBJECTLAYER_NAME = "default";
@@ -28,7 +25,7 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
   @XmlJavaTypeAdapter(ColorAdapter.class)
   private Color color;
 
-  private transient final List<IMapObject> mapObjects = new CopyOnWriteArrayList<>();
+  private final transient List<IMapObject> mapObjects = new CopyOnWriteArrayList<>();
 
   private transient boolean added;
 

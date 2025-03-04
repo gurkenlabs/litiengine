@@ -3,8 +3,6 @@ package de.gurkenlabs.litiengine.input;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
-import de.gurkenlabs.litiengine.util.MathUtilities;
-
 import java.awt.AWTException;
 import java.awt.Point;
 import java.awt.Robot;
@@ -405,7 +403,7 @@ public final class Mouse
       original.getComponent(),
       original.getID(),
       original.getWhen(),
-      original.getModifiers(),
+      original.getModifiersEx(),
       (int) this.getLocation().getX(),
       (int) this.getLocation().getY(),
       original.getXOnScreen(),

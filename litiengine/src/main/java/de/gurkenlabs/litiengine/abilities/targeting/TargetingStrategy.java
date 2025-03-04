@@ -3,13 +3,11 @@ package de.gurkenlabs.litiengine.abilities.targeting;
 import de.gurkenlabs.litiengine.entities.EntityDistanceComparator;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
-
-import java.awt.*;
+import java.awt.Shape;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.BiPredicate;
-import java.util.stream.Collectors;
 
 /**
  * The abstract class `TargetingStrategy` defines the logic for selecting targets
@@ -51,7 +49,7 @@ public abstract class TargetingStrategy {
 
     // Apply additional custom condition if set
     if (additionalCondition != null) {
-      entities = entities.stream().filter(e -> additionalCondition.test(executor, e)).collect(Collectors.toList());
+      entities = entities.stream().filter(e -> additionalCondition.test(executor, e)).toList();
     }
 
     // Return if no entities match
@@ -69,8 +67,7 @@ public abstract class TargetingStrategy {
       }
 
       if (comparator != null) {
-        var list = entities.stream().sorted(comparator).collect(Collectors.toList());
-        entities = list;
+        entities = entities.stream().sorted(comparator).toList();
       }
     }
 
