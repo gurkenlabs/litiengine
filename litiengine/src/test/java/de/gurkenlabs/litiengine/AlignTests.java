@@ -9,7 +9,7 @@ class AlignTests {
   private Align alignObject;
 
   @BeforeEach
-  public void initAlign() {
+  void initAlign() {
     alignObject = Align.get("right"); // portion = 1
   }
 

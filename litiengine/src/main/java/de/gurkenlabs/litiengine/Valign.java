@@ -112,7 +112,7 @@ public enum Valign {
       return location;
     }
 
-    return Math.clamp(location, 0, height - objectHeight);
+    return Math.max(0, Math.min(height - objectHeight, location));
   }
 
   /**
