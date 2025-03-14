@@ -1,10 +1,5 @@
 package de.gurkenlabs.litiengine.environment;
 
-import java.lang.reflect.Field;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
@@ -13,6 +8,10 @@ import de.gurkenlabs.litiengine.environment.tilemap.TmxType;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.DecimalFloatAdapter;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public final class MapObjectSerializer {
   private static final Logger log = Logger.getLogger(MapObjectSerializer.class.getName());

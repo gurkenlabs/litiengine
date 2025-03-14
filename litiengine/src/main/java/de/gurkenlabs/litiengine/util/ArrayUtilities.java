@@ -10,6 +10,13 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Utility class for array operations.
+ *
+ * <p>This class provides various static methods for manipulating arrays, such as concatenation, splitting, joining, and more.</p>
+ *
+ * <p>Note: This class cannot be instantiated.</p>
+ */
 public final class ArrayUtilities {
   public static final String DEFAULT_STRING_DELIMITER = ",";
   private static final Logger log = Logger.getLogger(ArrayUtilities.class.getName());

@@ -1,16 +1,20 @@
 package de.gurkenlabs.litiengine.environment;
 
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.entities.Spawnpoint;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.entities.IEntity;
-import de.gurkenlabs.litiengine.entities.Spawnpoint;
+// TODO: Implement spawn event/listener
+// TODO: Implement additional constructors to enhance the API
 
 /**
- * TODO: Implement spawn event/listener TODO: Implement additional constructors to enhance the API
+ * Represents an abstract entity spawner. This class implements the {@link IEntitySpawner} interface.
+ *
+ * @param <T> The type of entity to be spawned, which must extend {@link IEntity}.
  */
 public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner<T> {
   private int amount;
@@ -42,16 +46,10 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
   /**
    * Initializes a new instance of the {@code EntitySpawner} class.
    *
-   * @param spawnpoints
-   *          The spawnpoints from which this instance will choose from when spawning entities.
-   *
-   * @param interval
-   *          The interval in which entities will be spawned.
-   *
-   * @param amount
-   *          The amount of entities to spawn on every spawn event.
-   * @param spawnMode
-   *          the spawning behaviour
+   * @param spawnpoints The spawnpoints from which this instance will choose from when spawning entities.
+   * @param interval    The interval in which entities will be spawned.
+   * @param amount      The amount of entities to spawn on every spawn event.
+   * @param spawnMode   the spawning behaviour
    */
   protected EntitySpawner(final List<Spawnpoint> spawnpoints, final int interval, final int amount, SpawnMode spawnMode) {
     this.interval = interval;
@@ -141,8 +139,7 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
   }
 
   /**
-   * Spawn new entities, depending on the {@code SpawnMode}, spawnAmount, spawnDelay, and spawnInterval of an
-   * {@code EntitySpawner}.
+   * Spawn new entities, depending on the {@code SpawnMode}, spawnAmount, spawnDelay, and spawnInterval of an {@code EntitySpawner}.
    *
    * @see SpawnMode
    */
@@ -156,7 +153,7 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
         for (int i = 0; i < this.getSpawnPoints().size(); i++) {
           final int index = i;
           Game.loop().perform(this.getSpawnDelay() + this.getSpawnDelay() * i,
-              () -> this.spawn(this.getSpawnPoints().get(index), this.getSpawnAmount()));
+            () -> this.spawn(this.getSpawnPoints().get(index), this.getSpawnAmount()));
         }
         break;
       case ONERANDOMSPAWNPOINT:

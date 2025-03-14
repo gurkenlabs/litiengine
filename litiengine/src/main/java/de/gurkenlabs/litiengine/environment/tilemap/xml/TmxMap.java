@@ -132,6 +132,61 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
     this.setTiledVersion(MAX_MAJOR + "." + MAX_MINOR + ".0");
   }
 
+  /**
+   * Copy constructor for the {@code TmxMap} class. Creates a new instance of the {@code TmxMap} class by copying the properties from the provided
+   * {@code TmxMap} object.
+   *
+   * @param original The original {@code TmxMap} object to copy from.
+   */
+  public TmxMap(TmxMap original) {
+    super(original);
+    this.version = original.getVersion();
+    this.tiledversion = original.getTiledVersion();
+    this.mapClass = original.mapClass;
+    this.orientation = original.orientation;
+    this.mapOrientation = original.getOrientation();
+    this.renderorder = original.getRenderOrder();
+    this.width = original.getWidth();
+    this.height = original.getHeight();
+    this.tilewidth = original.getTileWidth();
+    this.tileheight = original.getTileHeight();
+    this.infinite = original.infinite;
+    this.hexsidelength = original.getHexSideLength();
+    this.staggeraxis = original.getStaggerAxis();
+    this.staggerindex = original.getStaggerIndex();
+    this.parallaxoriginx = original.getParallaxOrigin().getX();
+    this.parallaxoriginy = original.getParallaxOrigin().getY();
+    this.backgroundcolor = original.getBackgroundColor();
+    this.nextLayerId = original.getNextLayerId();
+    this.nextObjectId = original.getNextObjectId();
+    this.name = original.getName();
+    this.path = original.getPath();
+    this.chunkOffsetX = original.getChunkOffsetX();
+    this.chunkOffsetY = original.getChunkOffsetY();
+
+    if (original.getTilesets() != null) {
+      this.tilesets = new ArrayList<>();
+      for (ITileset tileset : original.getTilesets()) {
+        this.tilesets.add(new Tileset((Tileset) tileset));
+      }
+    }
+
+    if (original.layers != null) {
+      this.layers = new ArrayList<>(original.layers.size());
+      for (ILayer layer : original.layers) {
+        if (layer instanceof TileLayer tl) {
+          this.layers.add(new TileLayer(tl));
+        } else if (layer instanceof MapObjectLayer mol) {
+          this.layers.add(new MapObjectLayer(mol));
+        } else if (layer instanceof ImageLayer il) {
+          this.layers.add(new ImageLayer(il));
+        } else if (layer instanceof GroupLayer gl) {
+          this.layers.add(new GroupLayer(gl));
+        }
+      }
+    }
+  }
+
   @Override
   public List<IImageLayer> getImageLayers() {
     return this.imageLayers;

@@ -4,12 +4,11 @@ import de.gurkenlabs.litiengine.abilities.Ability;
 import de.gurkenlabs.litiengine.abilities.targeting.TargetingStrategy;
 
 /**
- * The `AbilityEffect` class is an abstract class that represents an effect
- * associated with a specific ability. It extends the `Effect` class and is
+ * The `AbilityEffect` class is an abstract class that represents an effect associated with a specific ability. It extends the `Effect` class and is
  * used to apply effects that are tied to a particular ability.
  * <p>
- * This class provides a way to manage and access the ability that triggers the effect,
- * allowing for the integration of ability-specific attributes such as the executor and duration.
+ * This class provides a way to manage and access the ability that triggers the effect, allowing for the integration of ability-specific attributes
+ * such as the executor and duration.
  */
 public abstract class AbilityEffect extends Effect {
   private final Ability ability;
@@ -27,6 +26,11 @@ public abstract class AbilityEffect extends Effect {
     this.ability = ability;
   }
 
+  /**
+   * Gets the ability associated with this effect.
+   *
+   * @return The ability associated with this effect.
+   */
   public Ability getAbility() {
     return ability;
   }

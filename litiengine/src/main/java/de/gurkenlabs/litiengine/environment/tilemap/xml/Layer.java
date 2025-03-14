@@ -1,18 +1,21 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
-import java.awt.*;
-import java.awt.geom.Point2D;
-
-import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.XmlAttribute;
-import jakarta.xml.bind.annotation.XmlTransient;
-import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
 import de.gurkenlabs.litiengine.environment.tilemap.ILayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.LayerProperty;
 import de.gurkenlabs.litiengine.graphics.RenderType;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlTransient;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.geom.Point2D;
 
+/**
+ * Represents an abstract layer in a tile map. This class extends the {@link CustomPropertyProvider} class and implements the {@link ILayer}
+ * interface.
+ */
 public abstract class Layer extends CustomPropertyProvider implements ILayer {
 
   @XmlAttribute
@@ -57,14 +60,18 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
   private transient RenderType renderType;
   private transient boolean renderTypeLoaded;
 
+  /**
+   * Default constructor for the {@link Layer} class. Initializes a new instance of the {@link Layer} class with default values.
+   */
   protected Layer() {
     super();
   }
 
   /**
-   * Copy Constructor for copying instances of Layers.
+   * Copy constructor for the {@link Layer} class. Creates a new instance of the {@link Layer} class by copying the properties from the provided
+   * {@link Layer} object.
    *
-   * @param layerToBeCopied the layer we want to copy
+   * @param layerToBeCopied The {@link Layer} object to copy from.
    */
   protected Layer(Layer layerToBeCopied) {
     super(layerToBeCopied);
@@ -141,7 +148,7 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
   }
 
   @Override
-  public double getHorizontalParallaxFactor(){
+  public double getHorizontalParallaxFactor() {
     if (this.parallaxx == null) {
       return 1.0;
     }
@@ -150,7 +157,7 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
   }
 
   @Override
-  public double getVerticalParallaxFactor(){
+  public double getVerticalParallaxFactor() {
     if (this.parallaxy == null) {
       return 1.0;
     }

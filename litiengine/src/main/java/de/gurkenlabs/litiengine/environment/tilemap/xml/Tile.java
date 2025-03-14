@@ -1,20 +1,18 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
+import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.ITile;
+import de.gurkenlabs.litiengine.environment.tilemap.ITilesetEntry;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
 import java.awt.Point;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.util.Collections;
 import java.util.Objects;
-
-import jakarta.xml.bind.Marshaller;
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlAttribute;
-
-import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
-import de.gurkenlabs.litiengine.environment.tilemap.ITile;
-import de.gurkenlabs.litiengine.environment.tilemap.ITilesetEntry;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Tile extends CustomPropertyProvider implements ITile {
@@ -40,13 +38,13 @@ public class Tile extends CustomPropertyProvider implements ITile {
   /**
    * Instantiates a new {@code Tile} instance.
    */
-  public Tile() {}
+  public Tile() {
+  }
 
   /**
    * Instantiates a new {@code Tile} instance with the same attributes as a given {@code Tile}.
    *
-   * @param original
-   *          The original tile from which the values will be copied to this new instance.
+   * @param original The original tile from which the values will be copied to this new instance.
    */
   public Tile(Tile original) {
     this.flipped = original.isFlipped();
@@ -61,9 +59,7 @@ public class Tile extends CustomPropertyProvider implements ITile {
   /**
    * Instantiates a new {@code Tile} instance.
    *
-   * @param gidBitmask
-   *          The grid ID bitmask used to identify flags of this instance.
-   *
+   * @param gidBitmask The grid ID bitmask used to identify flags of this instance.
    * @see Tile#FLIPPED_HORIZONTALLY_FLAG
    * @see Tile#FLIPPED_DIAGONALLY_FLAG
    * @see Tile#FLIPPED_VERTICALLY_FLAG
@@ -167,12 +163,11 @@ public class Tile extends CustomPropertyProvider implements ITile {
     if (this == anObject) {
       return true;
     }
-    if (!(anObject instanceof ITile)) {
+    if (!(anObject instanceof ITile other)) {
       return false;
     }
-    ITile other = (ITile) anObject;
     return this.getGridId() == other.getGridId() && this.isFlippedDiagonally() == other.isFlippedDiagonally()
-        && this.isFlippedHorizontally() == other.isFlippedHorizontally() && this.isFlippedVertically() == other.isFlippedVertically();
+      && this.isFlippedHorizontally() == other.isFlippedHorizontally() && this.isFlippedVertically() == other.isFlippedVertically();
   }
 
   @Override
@@ -197,10 +192,20 @@ public class Tile extends CustomPropertyProvider implements ITile {
     return this.getGridId() + String.valueOf(this.getTilesetEntry());
   }
 
+  /**
+   * Sets the tileset entry for this tile.
+   *
+   * @param entry The tileset entry to set.
+   */
   void setTilesetEntry(ITilesetEntry entry) {
     this.tilesetEntry = entry;
   }
 
+  /**
+   * Sets the grid ID for this tile.
+   *
+   * @param gid The grid ID to set.
+   */
   void setGridId(int gid) {
     this.gid = gid;
   }
@@ -208,8 +213,7 @@ public class Tile extends CustomPropertyProvider implements ITile {
   /**
    * Sets the tile coordinate.
    *
-   * @param tileCoordinate
-   *          the new tile coordinate
+   * @param tileCoordinate the new tile coordinate
    */
   void setTileCoordinate(final Point tileCoordinate) {
     this.tileCoordinate = tileCoordinate;

@@ -1,5 +1,25 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
+import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.IMapImage;
+import de.gurkenlabs.litiengine.environment.tilemap.ITerrainSet;
+import de.gurkenlabs.litiengine.environment.tilemap.ITile;
+import de.gurkenlabs.litiengine.environment.tilemap.ITileOffset;
+import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
+import de.gurkenlabs.litiengine.environment.tilemap.ITilesetEntry;
+import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.util.io.FileUtilities;
+import de.gurkenlabs.litiengine.util.io.XmlUtilities;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElementWrapper;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlTransient;
 import java.awt.Dimension;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -10,16 +30,10 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.gurkenlabs.litiengine.environment.tilemap.*;
-import jakarta.xml.bind.Marshaller;
-import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.*;
-
-import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.litiengine.util.io.FileUtilities;
-import de.gurkenlabs.litiengine.util.io.XmlUtilities;
-
+/**
+ * The {@code Tileset} class represents a collection of tiles used in a tile-based map. It extends the {@code CustomPropertyProvider} class and
+ * implements the {@code ITileset} interface. This class provides various properties and methods to manage and access tileset information.
+ */
 @XmlRootElement(name = "tileset")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Tileset extends CustomPropertyProvider implements ITileset {
@@ -89,14 +103,44 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
 
   private transient Spritesheet spriteSheet;
 
+  /**
+   * Default constructor for the {@code Tileset} class. Initializes a new instance of the {@code Tileset} class and sets up a listener to clear the
+   * sprite sheet when images are cleared.
+   */
   public Tileset() {
     Resources.images().addClearedListener(() -> this.spriteSheet = null);
   }
 
-  public Tileset(Tileset source) {
-    this.source = source.getName() + "." + FILE_EXTENSION;
-    this.sourceTileset = source;
-    this.firstgid = 1;
+  /**
+   * Copy constructor for the {@code Tileset} class. Creates a new instance of the {@code Tileset} class by copying the properties from the provided
+   * {@code Tileset} object.
+   *
+   * @param original The original {@code Tileset} object to copy from.
+   */
+  public Tileset(Tileset original) {
+    super(original);
+
+    this.firstgid = original.getFirstGridId();
+    this.image = new MapImage((MapImage) original.getImage());
+    this.margin = original.getMargin();
+    this.name = original.getName();
+    this.tilesetClass = original.getTilesetClass();
+    this.tilewidth = original.getTileWidth();
+    this.tileheight = original.getTileHeight();
+    this.tileoffset = (TileOffset) original.getTileOffset();
+    this.tilecount = original.getTileCount();
+    this.columns = original.getColumns();
+    this.spacing = original.getSpacing();
+    this.source = original.getName() + "." + FILE_EXTENSION;
+    this.objectalignment = original.getObjectalignment();
+    this.tilerendersize = original.getTilerendersize();
+    this.fillmode = original.getFillmode();
+    this.tiles = original.tiles != null ? new ArrayList<>(original.tiles) : null;
+    this.wangsets = original.wangsets != null ? new ArrayList<>(original.wangsets) : null;
+    this.transformations = new TileTransformations(original.getTransformations());
+    this.allTiles = original.allTiles != null ? new ArrayList<>(original.allTiles) : null;
+    this.sourceTileset = original.sourceTileset;
+    this.spriteSheet = original.getSpritesheet();
   }
 
   @Override
@@ -233,22 +277,47 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     return this.allTiles.get(id);
   }
 
+  /**
+   * Gets the tile transformations.
+   *
+   * @return the tile transformations
+   */
   public TileTransformations getTransformations() {
     return this.transformations;
   }
 
+  /**
+   * Gets the tileset class.
+   *
+   * @return the tileset class
+   */
   public String getTilesetClass() {
     return this.tilesetClass;
   }
 
+  /**
+   * Gets the object alignment.
+   *
+   * @return the object alignment
+   */
   public String getObjectalignment() {
     return this.objectalignment;
   }
 
+  /**
+   * Gets the tile render size.
+   *
+   * @return the tile render size
+   */
   public String getTilerendersize() {
     return this.tilerendersize;
   }
 
+  /**
+   * Gets the fill mode.
+   *
+   * @return the fill mode
+   */
   public String getFillmode() {
     return this.fillmode;
   }
@@ -312,6 +381,11 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     }
   }
 
+  /**
+   * Saves the source tileset to the specified base path.
+   *
+   * @param basePath The base path where the source tileset should be saved.
+   */
   public void saveSource(String basePath) {
     if (this.sourceTileset == null) {
       return;
@@ -320,10 +394,20 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     XmlUtilities.save(this.sourceTileset, FileUtilities.combine(basePath, this.source), FILE_EXTENSION);
   }
 
+  /**
+   * Checks if the tileset is external.
+   *
+   * @return true if the tileset is external, false otherwise.
+   */
   public boolean isExternal() {
     return this.source != null;
   }
 
+  /**
+   * Loads the source tileset from the provided list of raw tilesets.
+   *
+   * @param rawTilesets The list of raw tilesets to load the source tileset from.
+   */
   public void load(List<Tileset> rawTilesets) {
     if (this.source == null) {
       return;
@@ -354,7 +438,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
       }
       if (iter.hasNext()) {
         log.log(Level.WARNING, "tileset \"{0}\" had a tilecount attribute of {1} but had tile IDs going beyond that",
-            new Object[] {this.name, this.getTileCount()});
+          new Object[] {this.name, this.getTileCount()});
         while (iter.hasNext()) {
           int nextId = iter.next().getId();
           iter.previous();
