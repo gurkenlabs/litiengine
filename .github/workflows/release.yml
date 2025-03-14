@@ -53,6 +53,22 @@ jobs:
           latest_tag=$(git describe --tags --abbrev=0)
           echo "RELEASE_VERSION=$latest_tag" >> "$GITHUB_ENV"
 
+      - name: Update CITATION.cff
+        if: inputs.incrementVersion != 'none' && inputs.incrementVersion != ''
+        run: |
+          release_date=$(date +'%Y-%m-%d')
+          sed -i "s/^version: .*/version: $RELEASE_VERSION/" CITATION.cff
+          sed -i "s/^date-released: .*/date-released: '$release_date'/" CITATION.cff
+
+      - name: Commit CITATION.cff
+        if: inputs.incrementVersion != 'none' && inputs.incrementVersion != ''
+        uses: EndBug/add-and-commit@v9
+        with:
+          message: "Update CITATION.cff for release $RELEASE_VERSION"
+          committer_name: GitHub Actions
+          committer_email: actions@github.com
+          add: 'CITATION.cff'
+
       - name: Publish Snapshot
         if: inputs.incrementVersion == 'none' || inputs.incrementVersion == ''
         env:
