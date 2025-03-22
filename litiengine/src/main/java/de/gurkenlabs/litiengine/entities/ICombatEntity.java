@@ -2,7 +2,7 @@ package de.gurkenlabs.litiengine.entities;
 
 import de.gurkenlabs.litiengine.abilities.Ability;
 import de.gurkenlabs.litiengine.abilities.effects.Effect;
-import de.gurkenlabs.litiengine.attributes.RangeAttribute;
+import de.gurkenlabs.litiengine.attributes.RangedAttribute;
 import java.awt.Shape;
 import java.util.List;
 
@@ -81,9 +81,9 @@ public interface ICombatEntity extends ICollisionEntity {
   /**
    * Gets the hit points of this entity.
    *
-   * @return the hit points as a RangeAttribute
+   * @return the hit points as a RangedObservableProperty
    */
-  RangeAttribute<Integer> getHitPoints();
+  RangedAttribute<Integer> getHitPoints();
 
   /**
    * Gets the hit box of this entity.

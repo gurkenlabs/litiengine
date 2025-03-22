@@ -2,8 +2,8 @@ package de.gurkenlabs.litiengine.abilities.effects;
 
 import de.gurkenlabs.litiengine.abilities.targeting.TargetingStrategy;
 import de.gurkenlabs.litiengine.attributes.Attribute;
-import de.gurkenlabs.litiengine.attributes.AttributeModifier;
 import de.gurkenlabs.litiengine.attributes.Modification;
+import de.gurkenlabs.litiengine.attributes.PropertyModifier;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 
 /**
@@ -11,67 +11,58 @@ import de.gurkenlabs.litiengine.entities.ICombatEntity;
  *
  * @param <T> the type of the attribute value
  */
-public abstract class AttributeEffect<T extends Number> extends Effect {
+public abstract class ObservablePropertyEffect<T extends Number> extends Effect {
 
-  private final AttributeModifier<T> modifier;
+  private final PropertyModifier<T> modifier;
 
   /**
-   * Constructs an AttributeEffect with the specified targeting strategy, modification, and delta.
+   * Constructs an ObservablePropertyEffect with the specified targeting strategy, modification, and delta.
    *
    * @param targetingStrategy the strategy to determine the targets of the effect
    * @param modification      the type of modification to apply to the attribute
    * @param delta             the value to modify the attribute by
    */
-  protected AttributeEffect(final TargetingStrategy targetingStrategy,
-                            final Modification modification,
-                            final double delta) {
+  protected ObservablePropertyEffect(final TargetingStrategy targetingStrategy, final Modification modification, final double delta) {
     this(targetingStrategy, modification, delta, 0);
   }
 
   /**
-   * Constructs an AttributeEffect with the specified targeting strategy, modification, and delta.
+   * Constructs an ObservablePropertyEffect with the specified targeting strategy, modification, and delta.
    *
    * @param targetingStrategy the strategy to determine the targets of the effect
    * @param modification      the type of modification to apply to the attribute
    * @param delta             the value to modify the attribute by
    */
-  protected AttributeEffect(final TargetingStrategy targetingStrategy,
-                            final Modification modification,
-                            final double delta,
-                            final int duration) {
+  protected ObservablePropertyEffect(final TargetingStrategy targetingStrategy, final Modification modification, final double delta,
+    final int duration) {
     this(targetingStrategy, null, modification, delta, duration);
   }
 
   /**
-   * Constructs an AttributeEffect with the specified targeting strategy, executing entity, modification, and delta.
+   * Constructs an ObservablePropertyEffect with the specified targeting strategy, executing entity, modification, and delta.
    *
    * @param targetingStrategy the strategy to determine the targets of the effect
    * @param executingEntity   the entity executing the effect
    * @param modification      the type of modification to apply to the attribute
    * @param delta             the value to modify the attribute by
    */
-  protected AttributeEffect(final TargetingStrategy targetingStrategy,
-                            final ICombatEntity executingEntity,
-                            final Modification modification,
-                            final double delta) {
+  protected ObservablePropertyEffect(final TargetingStrategy targetingStrategy, final ICombatEntity executingEntity, final Modification modification,
+    final double delta) {
     this(targetingStrategy, executingEntity, modification, delta, 0);
   }
 
   /**
-   * Constructs an AttributeEffect with the specified targeting strategy, executing entity, modification, and delta.
+   * Constructs an ObservablePropertyEffect with the specified targeting strategy, executing entity, modification, and delta.
    *
    * @param targetingStrategy the strategy to determine the targets of the effect
    * @param executingEntity   the entity executing the effect
    * @param modification      the type of modification to apply to the attribute
    * @param delta             the value to modify the attribute by
    */
-  protected AttributeEffect(final TargetingStrategy targetingStrategy,
-                            final ICombatEntity executingEntity,
-                            final Modification modification,
-                            final double delta,
-                            final int duration) {
+  protected ObservablePropertyEffect(final TargetingStrategy targetingStrategy, final ICombatEntity executingEntity, final Modification modification,
+    final double delta, final int duration) {
     super(targetingStrategy, executingEntity, duration);
-    this.modifier = new AttributeModifier<>(modification, delta);
+    this.modifier = new PropertyModifier<>(modification, delta);
   }
 
   /**
@@ -79,10 +70,9 @@ public abstract class AttributeEffect<T extends Number> extends Effect {
    *
    * @param affectedEntity the entity affected by the effect
    */
-  @Override
-  public void cease(final ICombatEntity affectedEntity) {
+  @Override public void cease(final ICombatEntity affectedEntity) {
     super.cease(affectedEntity);
-    this.getAttribute(affectedEntity).removeModifier(this.getModifier());
+    this.getObservableProperty(affectedEntity).removeModifier(this.getModifier());
   }
 
   /**
@@ -90,7 +80,7 @@ public abstract class AttributeEffect<T extends Number> extends Effect {
    *
    * @return the attribute modifier
    */
-  public AttributeModifier<T> getModifier() {
+  public PropertyModifier<T> getModifier() {
     return this.modifier;
   }
 
@@ -99,13 +89,12 @@ public abstract class AttributeEffect<T extends Number> extends Effect {
    *
    * @param affectedEntity the entity affected by the effect
    */
-  @Override
-  protected void apply(final ICombatEntity affectedEntity) {
+  @Override protected void apply(final ICombatEntity affectedEntity) {
     super.apply(affectedEntity);
-    if(getAttribute(affectedEntity) == null) {
+    if (getObservableProperty(affectedEntity) == null) {
       return;
     }
-    getAttribute(affectedEntity).addModifier(getModifier());
+    getObservableProperty(affectedEntity).addModifier(getModifier());
   }
 
   /**
@@ -114,5 +103,5 @@ public abstract class AttributeEffect<T extends Number> extends Effect {
    * @param entity the entity whose attribute is to be modified
    * @return the attribute to be modified
    */
-  protected abstract Attribute<T> getAttribute(final ICombatEntity entity);
+  protected abstract Attribute<T> getObservableProperty(final ICombatEntity entity);
 }

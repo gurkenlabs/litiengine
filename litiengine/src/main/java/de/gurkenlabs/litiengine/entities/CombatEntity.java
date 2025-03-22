@@ -3,9 +3,9 @@ package de.gurkenlabs.litiengine.entities;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.abilities.Ability;
 import de.gurkenlabs.litiengine.abilities.effects.Effect;
-import de.gurkenlabs.litiengine.attributes.AttributeModifier;
 import de.gurkenlabs.litiengine.attributes.Modification;
-import de.gurkenlabs.litiengine.attributes.RangeAttribute;
+import de.gurkenlabs.litiengine.attributes.PropertyModifier;
+import de.gurkenlabs.litiengine.attributes.RangedAttribute;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.tweening.TweenType;
@@ -27,7 +27,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   private final Collection<CombatEntityHitListener> hitListeners;
 
   private final List<Effect> appliedEffects;
-  private final RangeAttribute<Integer> hitPoints;
+  private final RangedAttribute<Integer> hitPoints;
 
   @TmxProperty(name = MapObjectProperty.COMBAT_INDESTRUCTIBLE)
   private boolean isIndestructible;
@@ -41,7 +41,9 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   private ICombatEntity target;
   private long lastHit;
 
-  /** Instantiates a new {@code CombatEntity}. */
+  /**
+   * Instantiates a new {@code CombatEntity}.
+   */
   public CombatEntity() {
     super();
     this.listeners = ConcurrentHashMap.newKeySet();
@@ -55,7 +57,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
     this.setTeam(info.team());
     this.setIndestructible(info.isIndestructible());
 
-    this.hitPoints = new RangeAttribute<>(this.initialHitpoints, 0, this.initialHitpoints);
+    this.hitPoints = new RangedAttribute<>(this.initialHitpoints, 0, this.initialHitpoints);
   }
 
   @Override
@@ -108,7 +110,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
       return;
     }
 
-    this.getHitPoints().modifyBaseValue(new AttributeModifier<>(Modification.SET, 0));
+    this.getHitPoints().modify(new PropertyModifier<>(Modification.SET, 0));
     this.fireDeathEvent(null);
   }
 
@@ -123,7 +125,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
    * @return the attributes
    */
   @Override
-  public RangeAttribute<Integer> getHitPoints() {
+  public RangedAttribute<Integer> getHitPoints() {
     return this.hitPoints;
   }
 
@@ -150,7 +152,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   @Override
   public float[] getTweenValues(TweenType tweenType) {
     if (tweenType == TweenType.HITPOINTS) {
-      return new float[] {getHitPoints().get()};
+      return new float[] {getHitPoints().getCurrent()};
     }
     return super.getTweenValues(tweenType);
   }
@@ -158,7 +160,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   @Override
   public void setTweenValues(TweenType tweenType, float[] newValues) {
     if (tweenType == TweenType.HITPOINTS) {
-      getHitPoints().setBaseValue(Math.round(newValues[0]));
+      getHitPoints().set(Math.round(newValues[0]));
     } else {
       super.setTweenValues(tweenType, newValues);
     }
@@ -176,7 +178,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
     }
 
     if (!this.isIndestructible()) {
-      this.getHitPoints().modifyBaseValue(new AttributeModifier<>(Modification.SUBTRACT, damage));
+      this.getHitPoints().modify(new PropertyModifier<>(Modification.SUBTRACT, damage));
     }
 
     final EntityHitEvent event = new EntityHitEvent(this, ability, damage, this.isDead());
@@ -215,14 +217,13 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
    */
   @Override
   public boolean isDead() {
-    return !this.isIndestructible() && this.getHitPoints().get() <= 0;
+    return !this.isIndestructible() && this.getHitPoints().getCurrent() <= 0;
   }
 
   /**
    * Checks if is friendly.
    *
-   * @param entity
-   *          the entity
+   * @param entity the entity
    * @return true, if is friendly
    */
   @Override
@@ -245,15 +246,16 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
     return this.getTeam() == 0;
   }
 
-  /** Resurrect. */
+  /**
+   * Resurrect.
+   */
   @Override
   public void resurrect() {
     if (!this.isDead()) {
       return;
     }
 
-    this.getHitPoints()
-        .modifyBaseValue(new AttributeModifier<>(Modification.SET, this.getHitPoints().getMax()));
+    this.getHitPoints().modify(new PropertyModifier<>(Modification.SET, this.getHitPoints().getMax()));
 
     for (final CombatEntityListener listener : this.listeners) {
       listener.resurrect(this);
@@ -279,8 +281,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   /**
    * Sets the team.
    *
-   * @param team
-   *          the new team
+   * @param team the new team
    */
   @Override
   public void setTeam(final int team) {

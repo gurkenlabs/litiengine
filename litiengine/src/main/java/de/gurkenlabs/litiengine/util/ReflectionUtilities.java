@@ -267,7 +267,7 @@ public final class ReflectionUtilities {
       } else if (field.getType().equals(Material.class)) {
         return setValue(cls, instance, fieldName, Material.get(value));
       }
-      // TODO: implement support for Attribute and RangeAttribute fields
+      // TODO: implement support for ObservableProperty and RangedObservableProperty fields
     } catch (final NumberFormatException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
     }

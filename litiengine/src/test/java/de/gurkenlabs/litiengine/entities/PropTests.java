@@ -4,8 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.gurkenlabs.litiengine.attributes.AttributeModifier;
 import de.gurkenlabs.litiengine.attributes.Modification;
+import de.gurkenlabs.litiengine.attributes.PropertyModifier;
 import org.junit.jupiter.api.Test;
 
 class PropTests {
@@ -29,7 +29,7 @@ class PropTests {
     // arrange
     Prop prop = new Prop(0, 0, null);
     prop.setIndestructible(false);
-    prop.getHitPoints().modifyBaseValue(new AttributeModifier<>(Modification.SUBTRACT, 60));
+    prop.getHitPoints().modify(new PropertyModifier<>(Modification.SUBTRACT, 60));
 
     // act
     PropState propState = prop.getState();
@@ -44,7 +44,7 @@ class PropTests {
     // arrange
     Prop prop = new Prop(0, 0, null);
     prop.setIndestructible(false);
-    prop.getHitPoints().modifyBaseValue(new AttributeModifier<>(Modification.SUBTRACT, 150));
+    prop.getHitPoints().modify(new PropertyModifier<>(Modification.SUBTRACT, 150));
 
     // act
     PropState propState = prop.getState();

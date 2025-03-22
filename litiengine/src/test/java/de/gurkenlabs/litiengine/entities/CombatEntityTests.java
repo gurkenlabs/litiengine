@@ -16,13 +16,11 @@ import static org.mockito.Mockito.when;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameTime;
 import de.gurkenlabs.litiengine.abilities.Ability;
-import de.gurkenlabs.litiengine.attributes.RangeAttribute;
+import de.gurkenlabs.litiengine.attributes.RangedAttribute;
 import de.gurkenlabs.litiengine.test.GameTestSuite;
 import de.gurkenlabs.litiengine.tweening.TweenType;
-
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -119,7 +117,7 @@ class CombatEntityTests {
   void testSetTweenValuesHitPoints() {
     // arrange
     float[] newValues = {42.3f, 1f, 99f};
-    RangeAttribute<Integer> hitPointsMock = mock(RangeAttribute.class);
+    RangedAttribute<Integer> hitPointsMock = mock(RangedAttribute.class);
     when(combatEntitySpy.getHitPoints()).thenReturn(hitPointsMock);
 
     // act
@@ -127,7 +125,7 @@ class CombatEntityTests {
 
     // assert
     verify(combatEntitySpy, times(1)).getHitPoints();
-    verify(hitPointsMock, times(1)).setBaseValue(42);
+    verify(hitPointsMock, times(1)).set(42);
   }
 
   @Test
@@ -188,7 +186,7 @@ class CombatEntityTests {
     combatEntitySpy.hit(hitPoints, ability);
 
     // assert
-    assertEquals(100, combatEntitySpy.getHitPoints().get());
+    assertEquals(100, combatEntitySpy.getHitPoints().getCurrent());
   }
 
   @Test

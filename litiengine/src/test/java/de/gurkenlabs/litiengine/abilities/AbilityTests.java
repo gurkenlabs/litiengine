@@ -75,7 +75,7 @@ class AbilityTests {
 
     AbilityExecution abExec = mock(AbilityExecution.class);
     when(abExec.getExecutionTicks())
-      .thenReturn(Game.time().now() - (ability.getAttributes().cooldown().get() + 1));
+      .thenReturn(Game.time().now() - (ability.getAttributes().cooldown().getCurrent() + 1));
     ability.setCurrentExecution(abExec);
 
     // act
@@ -176,12 +176,12 @@ class AbilityTests {
     assertEquals(CastType.ONCONFIRM, ability.getCastType());
     assertTrue(ability.isMultiTarget());
 
-    assertEquals(333, ability.getAttributes().cooldown().get().intValue());
-    assertEquals(222, ability.getAttributes().duration().get().intValue());
-    assertEquals(111, ability.getAttributes().impact().get().intValue());
-    assertEquals(99, ability.getAttributes().impactAngle().get().intValue());
-    assertEquals(444, ability.getAttributes().range().get().intValue());
-    assertEquals(999, ability.getAttributes().value().get().intValue());
+    assertEquals(333, ability.getAttributes().cooldown().getCurrent().intValue());
+    assertEquals(222, ability.getAttributes().duration().getCurrent().intValue());
+    assertEquals(111, ability.getAttributes().impact().getCurrent().intValue());
+    assertEquals(99, ability.getAttributes().impactAngle().getCurrent().intValue());
+    assertEquals(444, ability.getAttributes().range().getCurrent().intValue());
+    assertEquals(999, ability.getAttributes().value().getCurrent().intValue());
   }
 
   @Test
@@ -189,8 +189,8 @@ class AbilityTests {
     Creature entity = new Creature();
     TestAbility ability = new TestAbility(entity);
 
-    Effect effect = new TestEffect(TargetingStrategy.enemies(), ability.getExecutor(), ability.getAttributes().duration().get());
-    assertEquals(ability.getAttributes().duration().get().intValue(), effect.getDuration());
+    Effect effect = new TestEffect(TargetingStrategy.enemies(), ability.getExecutor(), ability.getAttributes().duration().getCurrent());
+    assertEquals(ability.getAttributes().duration().getCurrent().intValue(), effect.getDuration());
     assertEquals(entity, effect.getExecutingEntity());
     assertEquals(0, effect.getFollowUpEffects().size());
     assertFalse(effect.isActive(entity));
