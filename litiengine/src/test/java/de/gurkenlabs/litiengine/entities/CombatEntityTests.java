@@ -19,10 +19,8 @@ import de.gurkenlabs.litiengine.abilities.Ability;
 import de.gurkenlabs.litiengine.attributes.RangeAttribute;
 import de.gurkenlabs.litiengine.test.GameTestSuite;
 import de.gurkenlabs.litiengine.tweening.TweenType;
-
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -127,7 +125,7 @@ class CombatEntityTests {
 
     // assert
     verify(combatEntitySpy, times(1)).getHitPoints();
-    verify(hitPointsMock, times(1)).setBaseValue(42);
+    verify(hitPointsMock, times(1)).setValue(42);
   }
 
   @Test
@@ -188,7 +186,7 @@ class CombatEntityTests {
     combatEntitySpy.hit(hitPoints, ability);
 
     // assert
-    assertEquals(100, combatEntitySpy.getHitPoints().get());
+    assertEquals(100, combatEntitySpy.getHitPoints().getModifiedValue());
   }
 
   @Test

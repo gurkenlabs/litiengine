@@ -22,7 +22,7 @@ public abstract class AbilityEffect extends Effect {
    * @param ability           The ability associated with this effect, providing information such as the executor and duration.
    */
   protected AbilityEffect(TargetingStrategy targetingStrategy, Ability ability) {
-    super(targetingStrategy, ability.getExecutor(), ability.getAttributes().duration().get());
+    super(targetingStrategy, ability.getExecutor(), ability.getAttributes().duration().getModifiedValue());
     this.ability = ability;
   }
 

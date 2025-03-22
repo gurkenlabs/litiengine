@@ -5,12 +5,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
-class AttributeModifierTest {
+class AttributeModifierTests {
 
   @Test
   void testInitAttributeModifier() {
     final AttributeModifier<Integer> testAttributeModifier =
-        new AttributeModifier<>(Modification.ADD, 5);
+      new AttributeModifier<>(Modification.ADD, 5);
     assertEquals(Modification.ADD, testAttributeModifier.getModification());
     assertEquals(5.0, testAttributeModifier.getModifyValue());
     assertTrue(testAttributeModifier.isActive());
@@ -19,9 +19,9 @@ class AttributeModifierTest {
   @Test
   void testModifyValueWithInactiveAttributeModifier() {
     final AttributeModifier<Integer> testAttributeModifierActive =
-        new AttributeModifier<>(Modification.ADD, 5);
+      new AttributeModifier<>(Modification.ADD, 5);
     final AttributeModifier<Integer> testAttributeModifierInactive =
-        new AttributeModifier<>(Modification.ADD, 5);
+      new AttributeModifier<>(Modification.ADD, 5);
     testAttributeModifierActive.setActive(true);
     testAttributeModifierInactive.setActive(false);
 
@@ -35,7 +35,7 @@ class AttributeModifierTest {
       new AttributeModifier<>(Modification.ADD, 5);
 
     final int[] eventFired = {0};
-    attributeModifier.onChanged(() -> eventFired[0]++);
+    attributeModifier.addListener(_ -> eventFired[0]++);
 
     attributeModifier.setModifyValue(123);
     assertEquals(1, eventFired[0]);

@@ -29,7 +29,7 @@ class PropTests {
     // arrange
     Prop prop = new Prop(0, 0, null);
     prop.setIndestructible(false);
-    prop.getHitPoints().modifyBaseValue(new AttributeModifier<>(Modification.SUBTRACT, 60));
+    prop.getHitPoints().modify(new AttributeModifier<>(Modification.SUBTRACT, 60));
 
     // act
     PropState propState = prop.getState();
@@ -44,7 +44,7 @@ class PropTests {
     // arrange
     Prop prop = new Prop(0, 0, null);
     prop.setIndestructible(false);
-    prop.getHitPoints().modifyBaseValue(new AttributeModifier<>(Modification.SUBTRACT, 150));
+    prop.getHitPoints().modify(new AttributeModifier<>(Modification.SUBTRACT, 150));
 
     // act
     PropState propState = prop.getState();

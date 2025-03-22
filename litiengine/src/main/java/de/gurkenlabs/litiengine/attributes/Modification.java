@@ -1,9 +1,7 @@
 package de.gurkenlabs.litiengine.attributes;
 
 /**
- * The different modification types that can be applied to an {@code Attribute}.
- *
- * @see AttributeModifier#getModification()
+ * Represents the types of modifications that can be applied. Each modification type has an associated apply order.
  */
 public enum Modification {
   ADD(1),
@@ -15,10 +13,15 @@ public enum Modification {
 
   private final int applyOrder;
 
-  private Modification(final int value) {
-    this.applyOrder = value;
+  Modification(final int order) {
+    this.applyOrder = order;
   }
 
+  /**
+   * Gets the apply order of this modification type.
+   *
+   * @return the apply order
+   */
   public int getApplyOrder() {
     return this.applyOrder;
   }

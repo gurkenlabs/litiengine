@@ -22,9 +22,7 @@ public abstract class AttributeEffect<T extends Number> extends Effect {
    * @param modification      the type of modification to apply to the attribute
    * @param delta             the value to modify the attribute by
    */
-  protected AttributeEffect(final TargetingStrategy targetingStrategy,
-                            final Modification modification,
-                            final double delta) {
+  protected AttributeEffect(final TargetingStrategy targetingStrategy, final Modification modification, final double delta) {
     this(targetingStrategy, modification, delta, 0);
   }
 
@@ -35,10 +33,8 @@ public abstract class AttributeEffect<T extends Number> extends Effect {
    * @param modification      the type of modification to apply to the attribute
    * @param delta             the value to modify the attribute by
    */
-  protected AttributeEffect(final TargetingStrategy targetingStrategy,
-                            final Modification modification,
-                            final double delta,
-                            final int duration) {
+  protected AttributeEffect(final TargetingStrategy targetingStrategy, final Modification modification, final double delta,
+    final int duration) {
     this(targetingStrategy, null, modification, delta, duration);
   }
 
@@ -50,10 +46,8 @@ public abstract class AttributeEffect<T extends Number> extends Effect {
    * @param modification      the type of modification to apply to the attribute
    * @param delta             the value to modify the attribute by
    */
-  protected AttributeEffect(final TargetingStrategy targetingStrategy,
-                            final ICombatEntity executingEntity,
-                            final Modification modification,
-                            final double delta) {
+  protected AttributeEffect(final TargetingStrategy targetingStrategy, final ICombatEntity executingEntity, final Modification modification,
+    final double delta) {
     this(targetingStrategy, executingEntity, modification, delta, 0);
   }
 
@@ -65,11 +59,8 @@ public abstract class AttributeEffect<T extends Number> extends Effect {
    * @param modification      the type of modification to apply to the attribute
    * @param delta             the value to modify the attribute by
    */
-  protected AttributeEffect(final TargetingStrategy targetingStrategy,
-                            final ICombatEntity executingEntity,
-                            final Modification modification,
-                            final double delta,
-                            final int duration) {
+  protected AttributeEffect(final TargetingStrategy targetingStrategy, final ICombatEntity executingEntity, final Modification modification,
+    final double delta, final int duration) {
     super(targetingStrategy, executingEntity, duration);
     this.modifier = new AttributeModifier<>(modification, delta);
   }
@@ -79,8 +70,7 @@ public abstract class AttributeEffect<T extends Number> extends Effect {
    *
    * @param affectedEntity the entity affected by the effect
    */
-  @Override
-  public void cease(final ICombatEntity affectedEntity) {
+  @Override public void cease(final ICombatEntity affectedEntity) {
     super.cease(affectedEntity);
     this.getAttribute(affectedEntity).removeModifier(this.getModifier());
   }
@@ -99,10 +89,9 @@ public abstract class AttributeEffect<T extends Number> extends Effect {
    *
    * @param affectedEntity the entity affected by the effect
    */
-  @Override
-  protected void apply(final ICombatEntity affectedEntity) {
+  @Override protected void apply(final ICombatEntity affectedEntity) {
     super.apply(affectedEntity);
-    if(getAttribute(affectedEntity) == null) {
+    if (getAttribute(affectedEntity) == null) {
       return;
     }
     getAttribute(affectedEntity).addModifier(getModifier());

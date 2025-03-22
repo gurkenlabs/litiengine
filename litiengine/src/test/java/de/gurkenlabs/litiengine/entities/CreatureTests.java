@@ -32,7 +32,7 @@ public class CreatureTests {
   @Test
   void testInitializationByAnnotation_velocity() {
     // act
-    int actualVelocity = creature.getVelocity().get().intValue();
+    int actualVelocity = creature.getVelocity().getModifiedValue().intValue();
 
     // assert
     assertEquals(111, actualVelocity);

@@ -18,7 +18,9 @@ import java.awt.geom.Point2D;
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 
-/** TODO: Add idle event */
+/**
+ * TODO: Add idle event
+ */
 @MovementInfo
 @TmxType(MapObjectType.CREATURE)
 public class Creature extends CombatEntity implements IMobileEntity {
@@ -52,8 +54,7 @@ public class Creature extends CombatEntity implements IMobileEntity {
   /**
    * Instantiates a new {@code Creature} entity.
    *
-   * @param spritesheetName
-   *          The spritesheet name that identifies the sprites bound to this instance.
+   * @param spritesheetName The spritesheet name that identifies the sprites bound to this instance.
    * @see CreatureAnimationController#getSpriteName(Creature, de.gurkenlabs.litiengine.graphics.CreatureAnimationState)
    */
   public Creature(String spritesheetName) {
@@ -87,7 +88,7 @@ public class Creature extends CombatEntity implements IMobileEntity {
   @Override
   public float[] getTweenValues(TweenType tweenType) {
     if (tweenType == TweenType.VELOCITY) {
-      return new float[] {getVelocity().get()};
+      return new float[] {getVelocity().getModifiedValue()};
     }
     return super.getTweenValues(tweenType);
   }
@@ -95,7 +96,7 @@ public class Creature extends CombatEntity implements IMobileEntity {
   @Override
   public void setTweenValues(TweenType tweenType, float[] newValues) {
     if (tweenType == TweenType.VELOCITY) {
-      getVelocity().setBaseValue(newValues[0]);
+      getVelocity().setValue(newValues[0]);
     } else {
       super.setTweenValues(tweenType, newValues);
     }
@@ -121,12 +122,10 @@ public class Creature extends CombatEntity implements IMobileEntity {
   }
 
   /**
-   * Gets the current spritesheet name of this instance. Overwriting this allows for a more sophisticated logic that
-   * determines the sprite to be used; e.g. This method could append certain properties of the creature (state, weapon,
-   * ...) to the default string. <br>
+   * Gets the current spritesheet name of this instance. Overwriting this allows for a more sophisticated logic that determines the sprite to be used;
+   * e.g. This method could append certain properties of the creature (state, weapon, ...) to the default string. <br>
    * <br>
-   * The value of this method will be used e.g. by the {@link CreatureAnimationController} to determine the animation that
-   * it should play.
+   * The value of this method will be used e.g. by the {@link CreatureAnimationController} to determine the animation that it should play.
    *
    * @return The current spritesheet name of this instance.
    */
@@ -139,9 +138,9 @@ public class Creature extends CombatEntity implements IMobileEntity {
     // pixels per ms multiplied by the passed ms
     // ensure that entities don't travel too far in case of lag
     return Math.min(Game.loop().getDeltaTime(), GameLoop.TICK_DELTATIME_LAG)
-        * 0.001F
-        * getVelocity().get()
-        * Game.loop().getTimeScale();
+      * 0.001F
+      * getVelocity().getModifiedValue()
+      * Game.loop().getTimeScale();
   }
 
   @Override
@@ -188,8 +187,8 @@ public class Creature extends CombatEntity implements IMobileEntity {
     if (Game.hasStarted() && this.isLoaded()) {
       this.lastMoved = Game.time().now();
       this.fireMovedEvent(
-          new EntityMovedEvent(
-              this, getX() - oldLocation.getX(), getY() - oldLocation.getY()));
+        new EntityMovedEvent(
+          this, getX() - oldLocation.getX(), getY() - oldLocation.getY()));
     }
   }
 
@@ -213,7 +212,7 @@ public class Creature extends CombatEntity implements IMobileEntity {
 
   @Override
   public void setVelocity(float velocity) {
-    getVelocity().setBaseValue(velocity);
+    getVelocity().setValue(velocity);
   }
 
   @Override
@@ -224,13 +223,13 @@ public class Creature extends CombatEntity implements IMobileEntity {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("#" + getMapId() + ": ");
+    sb.append("#").append(getMapId()).append(": ");
     if (getName() != null && !getName().isEmpty()) {
       sb.append(getName());
     } else {
       sb.append(Creature.class.getSimpleName());
     }
-    sb.append(" (" + getSpritesheetName() + ")");
+    sb.append(" (").append(getSpritesheetName()).append(")");
 
     return sb.toString();
   }
