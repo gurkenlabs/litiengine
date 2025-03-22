@@ -1,6 +1,12 @@
 package de.gurkenlabs.litiengine.environment;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -30,7 +36,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.CustomProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.test.GameTestSuite;
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
@@ -39,7 +44,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -120,11 +124,11 @@ class MapObjectLoaderTests {
     assertEquals(Valign.MIDDLE, creature.getCollisionBoxValign());
 
     assertTrue(creature.isIndestructible());
-    assertEquals(100, creature.getHitPoints().getMax().intValue());
-    assertEquals(100, creature.getHitPoints().get().intValue());
+    assertEquals(100, creature.getHitPoints().getModifiedMax().intValue());
+    assertEquals(100, creature.getHitPoints().getModifiedValue().intValue());
     assertEquals(1, creature.getTeam());
 
-    assertEquals(200f, creature.getVelocity().get().floatValue());
+    assertEquals(200f, creature.getVelocity().getModifiedValue().floatValue());
     assertEquals(150f, creature.getAcceleration());
     assertEquals(160f, creature.getDeceleration());
     assertTrue(creature.turnOnMove());
@@ -171,8 +175,8 @@ class MapObjectLoaderTests {
     assertEquals(Valign.MIDDLE, prop.getCollisionBoxValign());
 
     assertTrue(prop.isIndestructible());
-    assertEquals(100, prop.getHitPoints().getMax().intValue());
-    assertEquals(100, prop.getHitPoints().get().intValue());
+    assertEquals(100, prop.getHitPoints().getModifiedMax().intValue());
+    assertEquals(100, prop.getHitPoints().getModifiedValue().intValue());
     assertEquals(1, prop.getTeam());
   }
 

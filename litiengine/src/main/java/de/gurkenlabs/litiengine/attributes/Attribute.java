@@ -1,189 +1,175 @@
 package de.gurkenlabs.litiengine.attributes;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * An attribute is a numerical representation of a property that can be adjusted using {@link AttributeModifier}s.
- * <p>
- * It typically doesn't adjust the raw base value (unless explicitly requested) and instead adjusts the value by
- * registered modifications. This is e.g. useful when a property might only be changed for a certain period of time or
- * we need to know the original value of a property.
- * </p>
+ * Represents an attribute with a base value and a list of modifiers. The attribute value can be modified by adding or removing modifiers.
  *
- * <p>
- * <i> An example use-case are player stats that might be affected throughout the game (e.g. via certain skills,
- * upgrades or level-ups). </i>
- * </p>
- *
- * @param <T> The type of the attribute value.
+ * @param <T> the type of the attribute value, which must be a Number
  */
-public class Attribute<T extends Number> {
-  private final List<AttributeModifier<T>> modifiers;
-  private final Collection<AttributeValueListener> listeners = ConcurrentHashMap.newKeySet();
-  private final AttributeModifierListener attributeModifierListener = this::evaluateValue;
-
-  private T baseValue;
-
-  private T value;
+public class Attribute<T extends Number> implements IAttribute<T>, Serializable {
+  private static final String VALUE_PROPERTY = "value";
+  protected final PropertyChangeSupport support;
+  private final transient PropertyChangeListener modifierListener;
+  private final List<AttributeModifier<T>> modifiers = new ArrayList<>();
+  protected T value;
 
   /**
-   * Initializes a new instance of the {@code Attribute} class.
-   *
-   * @param initialValue The initial value
+   * Default no-argument constructor.
    */
-  public Attribute(final T initialValue) {
-    this.modifiers = new ArrayList<>();
-    this.baseValue = initialValue;
-    this.value = this.applyModifiers(this.getBase());
+  public Attribute() {
+    this(null);
   }
 
   /**
-   * Adds the specified modifier to this attribute.
+   * Constructs a new Attribute with the specified initial value.
    *
-   * @param modifier The modifier to be added to this instance.
+   * @param initialValue the initial value of the attribute
    */
-  public void addModifier(final AttributeModifier<T> modifier) {
-    if (this.getModifiers().contains(modifier)) {
-      return;
-    }
-
-    this.getModifiers().add(modifier);
-    modifier.onChanged(attributeModifierListener);
-    Collections.sort(this.getModifiers());
-    this.evaluateValue();
-  }
-
-  public void onValueChanged(AttributeValueListener listener) {
-    this.listeners.add(listener);
-  }
-
-  public void removeListener(AttributeValueListener listener) {
-    this.listeners.add(listener);
+  public Attribute(T initialValue) {
+    this.value = initialValue;
+    this.support = new PropertyChangeSupport(this);
+    this.modifierListener = evt -> support.firePropertyChange(VALUE_PROPERTY, evt.getOldValue(), evt.getNewValue());
   }
 
   /**
-   * Removes the specified modifier from this attribute.
+   * Gets the base value of the attribute.
    *
-   * @param modifier The modifier to be removed from this instance.
+   * @return the base value of the attribute
    */
-  public void removeModifier(final AttributeModifier<T> modifier) {
-    this.getModifiers().remove(modifier);
-    modifier.removeListener(attributeModifierListener);
-    Collections.sort(this.getModifiers());
-    this.evaluateValue();
-  }
-
-  /**
-   * Gets the current value of this attribute, respecting all the registered {@code AttributeModifier}s.
-   *
-   * @return The current value of this attribute.
-   */
-  public T get() {
+  public T getValue() {
     return this.value;
   }
 
   /**
-   * Gets the raw base value of this attribute without applying any modifications.
+   * Gets the current value of the attribute, computed by applying all active modifications to the base value.
    *
-   * @return The raw base value of this attribute.
+   * @return the current value
    */
-  public T getBase() {
-    return this.baseValue;
+  @Override
+  public T getModifiedValue() {
+    T modifiedValue = value;
+    for (AttributeModifier<T> modifier : modifiers) {
+      if (modifier.isActive()) {
+        modifiedValue = modifier.modify(modifiedValue);
+      }
+    }
+    return modifiedValue;
   }
 
   /**
-   * Gets all modifiers added to this instance.
+   * Sets the base value of the attribute and fires a property change event.
    *
-   * @return All modifiers added to this instance.
+   * @param newValue the new base value of the attribute
+   */
+  @Override
+  public void setValue(T newValue) {
+    T oldValue = getModifiedValue();
+    this.value = newValue;
+    T newModifiedValue = getModifiedValue();
+    getModifiers().clear();
+    support.firePropertyChange("baseValue", oldValue, newModifiedValue);
+  }
+
+  /**
+   * Adds a property change listener to the attribute.
+   *
+   * @param listener the property change listener to be added
+   */
+  @Override
+  public void addListener(PropertyChangeListener listener) {
+    support.addPropertyChangeListener(listener);
+  }
+
+  /**
+   * Removes a property change listener from the attribute.
+   *
+   * @param listener the property change listener to be removed
+   */
+  @Override
+  public void removeListener(PropertyChangeListener listener) {
+    support.removePropertyChangeListener(listener);
+  }
+
+  /**
+   * Adds a modifier to the attribute and fires a property change event. If the modifier is already present, it will not be added again.
+   *
+   * @param modifier the property modifier to be added
+   */
+  @Override
+  public void addModifier(AttributeModifier<T> modifier) {
+    if (modifiers.contains(modifier)) {
+      return;
+    }
+    T oldValue = getModifiedValue();
+    modifiers.add(modifier);
+    Collections.sort(getModifiers());
+    modifier.addListener(modifierListener);
+    T newValue = getModifiedValue();
+    support.firePropertyChange(VALUE_PROPERTY, oldValue, newValue);
+  }
+
+  /**
+   * Removes a modifier from the attribute and fires a property change event. If the modifier is not present, no action is taken.
+   *
+   * @param modifier the property modifier to be removed
+   */
+  @Override
+  public void removeModifier(AttributeModifier<T> modifier) {
+    if (!modifiers.contains(modifier)) {
+      return;
+    }
+    T oldValue = getModifiedValue();
+    modifiers.remove(modifier);
+    Collections.sort(getModifiers());
+    modifier.removeListener(modifierListener);
+    T newValue = getModifiedValue();
+    support.firePropertyChange(VALUE_PROPERTY, oldValue, newValue);
+  }
+
+  /**
+   * Gets the list of all property modifiers applied to the attribute.
+   *
+   * @return the list of property modifiers
    */
   public List<AttributeModifier<T>> getModifiers() {
-    return this.modifiers;
+    return modifiers;
   }
 
   /**
-   * Determines whether the specified modifier instance is added to this attribute instance.
+   * Modifies the current value of the attribute using the specified property modifier.
    *
-   * @param modifier The modifier to check for.
-   * @return True if the modifier was added to this attribute instance; otherwise false.
+   * @param modifier the property modifier to apply
    */
-  public boolean isModifierApplied(final AttributeModifier<T> modifier) {
-    return this.getModifiers().contains(modifier);
+  @Override
+  public void modify(AttributeModifier<T> modifier) {
+    this.setValue(modifier.modify(this.getModifiedValue()));
   }
 
   /**
-   * Adjusts the base value of this attribute once with the specified modifier.
+   * Modifies the current value of the attribute using a new property modifier created with the specified modification and value.
    *
-   * @param modifier The modifier used to adjust this attribute's base value.
-   * @see #getBase()
-   * @see #setBaseValue(Number)
+   * @param modification the type of modification to apply
+   * @param value        the value to use for the modification
    */
-  public void modifyBaseValue(final AttributeModifier<T> modifier) {
-    this.setBaseValue(modifier.modify(this.getBase()));
+  @Override
+  public void modify(Modification modification, double value) {
+    this.modify(new AttributeModifier<>(modification, value));
   }
 
   /**
-   * Adjusts the base value of this attribute once with the specified modifier.
+   * Returns a string representation of the current value of the attribute.
    *
-   * @param modification The modification type.
-   * @param value        The modification value to be applied.
+   * @return the string representation of the current value
    */
-  public void modifyBaseValue(final Modification modification, double value) {
-    this.modifyBaseValue(new AttributeModifier<>(modification, value));
-  }
-
-  /**
-   * Sets the base value of this attribute.
-   *
-   * @param baseValue The base value to be set.
-   */
-  public void setBaseValue(final T baseValue) {
-    this.baseValue = baseValue;
-    this.evaluateValue();
-  }
-
-  /**
-   * Evaluates the current value of the attribute by applying all registered modifiers to the base value.
-   * If the new value differs from the previous value, it triggers the value changed event.
-   */
-  protected void evaluateValue() {
-    final T previousValue = this.value;
-    this.value = this.applyModifiers(this.getBase());
-
-    if (previousValue != null && !previousValue.equals(this.value)) {
-      this.fireValueChangedEvent();
-    }
-  }
-
-  /**
-   * Applies all registered modifiers to the given base value.
-   *
-   * @param baseValue The base value to which the modifiers will be applied.
-   * @return The modified value after applying all modifiers.
-   */
-  protected T applyModifiers(final T baseValue) {
-    T currentValue = baseValue;
-    for (final AttributeModifier<T> modifier : this.getModifiers()) {
-      currentValue = modifier.modify(currentValue);
-    }
-
-    return currentValue;
-  }
-
-  /**
-   * Fires the value changed event to all registered listeners.
-   */
-  private void fireValueChangedEvent() {
-    for (var listener : this.listeners) {
-      listener.valueChanged();
-    }
-  }
-
   @Override
   public String toString() {
-    return this.get() == null ? null : this.get().toString();
+    return getModifiedValue().toString();
   }
 }
+

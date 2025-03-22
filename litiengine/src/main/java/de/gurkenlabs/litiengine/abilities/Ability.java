@@ -129,7 +129,7 @@ public abstract class Ability implements IRenderable {
    * @return The ellipse representing the potential area of impact
    */
   public Ellipse2D calculatePotentialImpactArea() {
-    final int range = getAttributes().impact().get();
+    final int range = getAttributes().impact().getModifiedValue();
     final double arcX = getPivot().getPoint().getX() - range * 0.5;
     final double arcY = getPivot().getPoint().getY() - range * 0.5;
 
@@ -154,7 +154,7 @@ public abstract class Ability implements IRenderable {
     return (getCurrentExecution() != null
       && getCurrentExecution().getExecutionTicks() > 0
       && Game.time().since(getCurrentExecution().getExecutionTicks()) < getAttributes()
-      .cooldown().get());
+      .cooldown().getModifiedValue());
   }
 
   /**
@@ -200,7 +200,7 @@ public abstract class Ability implements IRenderable {
    * @return The cooldown of this ability in seconds
    */
   public float getCooldownInSeconds() {
-    return (float) (getAttributes().cooldown().get() * 0.001);
+    return (float) (getAttributes().cooldown().getModifiedValue() * 0.001);
   }
 
   /**
@@ -262,7 +262,7 @@ public abstract class Ability implements IRenderable {
 
     // calculate cooldown in seconds
     return (float) (!canCast()
-      ? (getAttributes().cooldown().get()
+      ? (getAttributes().cooldown().getModifiedValue()
       - Game.time().since(getCurrentExecution().getExecutionTicks()))
       * 0.001
       : 0);
@@ -276,7 +276,7 @@ public abstract class Ability implements IRenderable {
   public boolean isActive() {
     return getCurrentExecution() != null
       && Game.time().since(getCurrentExecution().getExecutionTicks()) < getAttributes()
-      .duration().get();
+      .duration().getModifiedValue();
   }
 
   /**
@@ -365,15 +365,15 @@ public abstract class Ability implements IRenderable {
    * @return The shape representing the impact area
    */
   protected Shape internalCalculateImpactArea(final double angle) {
-    final int impact = getAttributes().impact().get();
-    final int impactAngle = getAttributes().impactAngle().get();
+    final int impact = getAttributes().impact().getModifiedValue();
+    final int impactAngle = getAttributes().impactAngle().getModifiedValue();
     final double arcX = getPivot().getPoint().getX() - impact;
     final double arcY = getPivot().getPoint().getY() - impact;
 
     // project
     final Point2D appliedRange =
       GeometricUtilities.project(
-        new Point2D.Double(arcX, arcY), angle, getAttributes().range().get() * 0.5);
+        new Point2D.Double(arcX, arcY), angle, getAttributes().range().getModifiedValue() * 0.5);
     final double start = angle - 90 - (impactAngle / 2.0);
     if (impactAngle % 360 == 0) {
       return new Ellipse2D.Double(appliedRange.getX(), appliedRange.getY(), impact * 2d, impact * 2d);

@@ -119,10 +119,10 @@ public class Prop extends CombatEntity {
    * @return the state
    */
   public PropState getState() {
-    if (!this.isIndestructible() && this.getHitPoints().get() <= 0) {
+    if (!this.isIndestructible() && this.getHitPoints().getModifiedValue() <= 0) {
       return PropState.DESTROYED;
     } else if (!this.isIndestructible()
-        && this.getHitPoints().get() <= this.getHitPoints().getMax() * 0.5) {
+      && this.getHitPoints().getModifiedValue() <= this.getHitPoints().getModifiedMax() * 0.5) {
       return PropState.DAMAGED;
     } else {
       return PropState.INTACT;
@@ -171,7 +171,7 @@ public class Prop extends CombatEntity {
     if (this.isIndestructible()) {
       return false;
     }
-    return this.getHitPoints().get() <= 0;
+    return this.getHitPoints().getModifiedValue() <= 0;
   }
 
   public void setSpriteRotation(Rotation spriteRotation) {

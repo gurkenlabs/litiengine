@@ -20,7 +20,6 @@ import de.gurkenlabs.litiengine.abilities.effects.Effect;
 import de.gurkenlabs.litiengine.abilities.targeting.TargetingStrategy;
 import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.test.GameTestSuite;
-
 import java.awt.Shape;
 import java.util.Objects;
 import org.junit.jupiter.api.AfterEach;
@@ -29,7 +28,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(GameTestSuite.class)
-class AbilityExecutionTest {
+class AbilityExecutionTests {
 
   private TestAbility ability;
   private TestEffect effectSpy;

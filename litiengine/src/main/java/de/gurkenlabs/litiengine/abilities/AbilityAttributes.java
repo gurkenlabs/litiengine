@@ -102,11 +102,11 @@ public class AbilityAttributes {
    * @param otherAttributes the `AbilityAttributes` instance from which to copy values
    */
   public void copyValues(AbilityAttributes otherAttributes) {
-    cooldown().setBaseValue(otherAttributes.cooldown().getBase());
-    duration().setBaseValue(otherAttributes.duration().getBase());
-    impact().setBaseValue(otherAttributes.impact().getBase());
-    impactAngle().setBaseValue(otherAttributes.impactAngle().getBase());
-    range().setBaseValue(otherAttributes.range().getBase());
-    value().setBaseValue(otherAttributes.value().getBase());
+    cooldown().setValue(otherAttributes.cooldown().getModifiedValue());
+    duration().setValue(otherAttributes.duration().getModifiedValue());
+    impact().setValue(otherAttributes.impact().getModifiedValue());
+    impactAngle().setValue(otherAttributes.impactAngle().getModifiedValue());
+    range().setValue(otherAttributes.range().getModifiedValue());
+    value().setValue(otherAttributes.value().getModifiedValue());
   }
 }

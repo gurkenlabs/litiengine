@@ -1,43 +1,41 @@
 package de.gurkenlabs.litiengine.attributes;
 
-
-import java.util.Collection;
-import java.util.concurrent.ConcurrentHashMap;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 
 /**
- * An attribute modifier allows to modify attributes by the specified Modification and modify value.
+ * The PropertyModifier class represents a modifier that can be applied to a property. It supports various types of modifications such as addition,
+ * subtraction, multiplication, division, and setting a value. The class implements the Comparable interface to allow comparison based on the
+ * modification's apply order.
  *
- * @param <T>
- *   the generic type
- * @see Attribute#addModifier(AttributeModifier)
- * @see Attribute#modifyBaseValue(AttributeModifier)
+ * @param <T> the type of the number that this modifier can modify
  */
 public class AttributeModifier<T extends Number> implements Comparable<AttributeModifier<T>> {
-  private final Collection<AttributeModifierListener> listeners = ConcurrentHashMap.newKeySet();
+  private final PropertyChangeSupport support;
   private final Modification modification;
   private double modifyValue;
   private boolean active;
 
   /**
-   * Initializes a new instance of the {@code AttributeModifier} class.
+   * Constructs a new PropertyModifier with the specified modification type and value.
    *
-   * @param mod
-   *   The modification type.
-   * @param modifyValue
-   *   The modification value to be applied by this instance.
+   * @param mod         the type of modification to be applied
+   * @param modifyValue the value to be used for the modification
    */
   public AttributeModifier(final Modification mod, final double modifyValue) {
     this.modification = mod;
     this.modifyValue = modifyValue;
     this.active = true;
+    this.support = new PropertyChangeSupport(this);
   }
 
   /**
-   * Compares this attribute modifier to another based on the apply order of their modifications.
+   * Compares this PropertyModifier with the specified PropertyModifier for order. Returns a negative integer, zero, or a positive integer as this
+   * PropertyModifier's apply order is less than, equal to, or greater than the specified PropertyModifier's apply order.
    *
-   * @param otherModifier
-   *   The other attribute modifier to compare.
-   * @return An integer representing the comparison result.
+   * @param otherModifier the PropertyModifier to be compared
+   * @return a negative integer, zero, or a positive integer as this PropertyModifier is less than, equal to, or greater than the specified
+   * PropertyModifier
    */
   @Override
   public int compareTo(final AttributeModifier<T> otherModifier) {
@@ -45,120 +43,124 @@ public class AttributeModifier<T extends Number> implements Comparable<Attribute
   }
 
   /**
-   * Checks if this attribute modifier is equal to another object.
+   * Checks if this PropertyModifier is equal to the specified object. Two PropertyModifiers are considered equal if they have the same active state,
+   * modification type, and modification value.
    *
-   * @param obj
-   *   The object to compare with.
-   * @return True if the objects are equal, false otherwise.
+   * @param obj the object to compare with
+   * @return true if the specified object is equal to this PropertyModifier, false otherwise
    */
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof AttributeModifier<?> am) {
-      return isActive() == am.isActive() && getModification() == am.getModification() && getModifyValue() == am.getModifyValue();
+      return isActive() == am.isActive() &&
+        getModification() == am.getModification() &&
+        getModifyValue() == am.getModifyValue();
     }
-
     return super.equals(obj);
   }
 
   /**
-   * Adds a listener that will be notified when the attribute modifier changes.
+   * Adds a PropertyChangeListener to the listener list.
    *
-   * @param listener
-   *   The listener to be added.
+   * @param listener the PropertyChangeListener to be added
    */
-  public void onChanged(AttributeModifierListener listener) {
-    this.listeners.add(listener);
+  public void addListener(PropertyChangeListener listener) {
+    support.addPropertyChangeListener(listener);
   }
 
   /**
-   * Removes a listener so that it will no longer be notified when the attribute modifier changes.
+   * Removes a PropertyChangeListener from the listener list.
    *
-   * @param listener
-   *   The listener to be removed.
+   * @param listener the PropertyChangeListener to be removed
    */
-  public void removeListener(AttributeModifierListener listener) {
-    this.listeners.add(listener);
+  public void removeListener(PropertyChangeListener listener) {
+    support.removePropertyChangeListener(listener);
   }
 
   /**
-   * Gets the modification type applied by this modifier.
+   * Gets the type of modification to be applied.
    *
-   * @return The modification type applied by this modifier.
+   * @return the modification type
    */
   public Modification getModification() {
     return this.modification;
   }
 
   /**
-   * Gets the value that is used to modify an attribute.
+   * Gets the value to be used for the modification.
    *
-   * @return The value that is used to modify an attribute.
+   * @return the modification value
    */
   public double getModifyValue() {
     return modifyValue;
   }
 
   /**
-   * Checks if this attribute modifier is active.
+   * Sets the modification value for this PropertyModifier and fires a property change event if the value changes.
    *
-   * @return True if active, false otherwise.
+   * @param value the new modification value
+   */
+  public void setModifyValue(double value) {
+    double oldValue = this.modifyValue;
+    this.modifyValue = value;
+
+    if (oldValue != this.modifyValue) {
+      support.firePropertyChange("modifyValue", oldValue, this.modifyValue);
+    }
+  }
+
+  /**
+   * Checks if this PropertyModifier is currently active.
+   *
+   * @return true if this PropertyModifier is active, false otherwise
    */
   public boolean isActive() {
     return active;
   }
 
   /**
-   * Modifies the provided value based on the modification type and modify value of this attribute modifier.
+   * Sets the active state of this PropertyModifier and fires a property change event if the state changes.
    *
-   * @param modvalue
-   *   The original value to be modified.
-   * @return The modified value.
+   * @param active the new active state
    */
-  public T modify(final T modvalue) {
+  public void setActive(boolean active) {
+    boolean oldActive = this.active;
+    this.active = active;
+
+    if (oldActive != this.active) {
+      support.firePropertyChange("active", oldActive, this.active);
+    }
+  }
+
+  /**
+   * Modifies the given value based on the modification type and value of this PropertyModifier. If the PropertyModifier is not active, the original
+   * value is returned.
+   *
+   * @param modValue the value to be modified
+   * @return the modified value
+   */
+  public T modify(final T modValue) {
     if (!this.isActive()) {
-      return modvalue;
+      return modValue;
     }
 
     return switch (getModification()) {
-      case ADD -> ensureType(modvalue.doubleValue() + getModifyValue(), modvalue);
-      case SUBTRACT -> ensureType(modvalue.doubleValue() - getModifyValue(), modvalue);
-      case MULTIPLY -> ensureType(modvalue.doubleValue() * getModifyValue(), modvalue);
-      case DIVIDE -> ensureType(modvalue.doubleValue() / getModifyValue(), modvalue);
-      case SET -> ensureType(getModifyValue(), modvalue);
-      default -> modvalue;
+      case ADD -> ensureType(modValue.doubleValue() + getModifyValue(), modValue);
+      case SUBTRACT -> ensureType(modValue.doubleValue() - getModifyValue(), modValue);
+      case MULTIPLY -> ensureType(modValue.doubleValue() * getModifyValue(), modValue);
+      case DIVIDE -> ensureType(modValue.doubleValue() / getModifyValue(), modValue);
+      case SET -> ensureType(getModifyValue(), modValue);
+      default -> modValue;
     };
   }
 
   /**
-   * Sets the modify value for this attribute modifier.
+   * Ensures that the modified value is of the same type as the original value.
    *
-   * @param value
-   *   The new modify value.
+   * @param modValue      the modified value as a Double
+   * @param originalValue the original value to determine the type
+   * @return the modified value cast to the type of the original value, or null if the type is not supported
    */
-  public void setModifyValue(double value) {
-    var previous = this.modifyValue;
-    this.modifyValue = value;
-
-    if (previous != this.modifyValue) {
-      this.fireChangedEvent();
-    }
-  }
-
-  /**
-   * Sets the active status of this attribute modifier.
-   *
-   * @param active
-   *   True to activate, false to deactivate.
-   */
-  public void setActive(boolean active) {
-    var previous = this.active;
-    this.active = active;
-
-    if (previous != this.active) {
-      this.fireChangedEvent();
-    }
-  }
-
   @SuppressWarnings("unchecked")
   private T ensureType(final Double modValue, final T originalValue) {
     if (originalValue instanceof Double) {
@@ -174,13 +176,6 @@ public class AttributeModifier<T extends Number> implements Comparable<Attribute
     } else if (originalValue instanceof Integer) {
       return (T) Integer.valueOf(modValue.intValue());
     }
-
     return null;
-  }
-
-  private void fireChangedEvent() {
-    for (var listener : this.listeners) {
-      listener.modifierChanged();
-    }
   }
 }
