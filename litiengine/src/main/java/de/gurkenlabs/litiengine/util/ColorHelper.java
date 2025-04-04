@@ -4,6 +4,9 @@ import java.awt.Color;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Utility class for color-related helper methods. This class cannot be instantiated.
+ */
 public final class ColorHelper {
 
   private static final Logger log = Logger.getLogger(ColorHelper.class.getName());

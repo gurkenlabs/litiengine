@@ -16,6 +16,9 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+/**
+ * Represents a combat entity in the game. This class extends {@link CollisionEntity} and implements {@link ICombatEntity}.
+ */
 @CombatInfo
 @CollisionInfo(collision = true)
 public class CombatEntity extends CollisionEntity implements ICombatEntity {
@@ -42,7 +45,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   private long lastHit;
 
   /**
-   * Instantiates a new {@code CombatEntity}.
+   * Represents a combat entity in the game. This class extends {@link CollisionEntity} and implements {@link ICombatEntity}.
    */
   public CombatEntity() {
     super();
@@ -198,6 +201,11 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
     this.lastHit = Game.time().now();
   }
 
+  /**
+   * Fires a death event for the combat entity.
+   *
+   * @param entityHitEvent the event that triggered the death
+   */
   protected void fireDeathEvent(EntityHitEvent entityHitEvent) {
     this.setCollision(false);
 

@@ -17,6 +17,10 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+/**
+ * The {@code AnimationController} class implements the {@code IAnimationController} interface. It manages animations and image effects, allowing for
+ * the control and playback of animations.
+ */
 public class AnimationController implements IAnimationController {
   private static final int MAX_IMAGE_EFFECTS = 20;
   private AffineTransform affineTransform;
@@ -60,7 +64,7 @@ public class AnimationController implements IAnimationController {
   public AnimationController(final Animation defaultAnimation, final Animation... animations) {
     this(defaultAnimation);
 
-    if (animations != null && animations.length > 0) {
+    if (animations != null) {
       for (final Animation anim : animations) {
         if (anim != null) {
           this.animations.put(anim.getName(), anim);
@@ -208,11 +212,7 @@ public class AnimationController implements IAnimationController {
 
     final String cacheKey = this.buildCurrentCacheKey() + "_" + width + "_" + height;
     final Optional<BufferedImage> opt = Resources.images().tryGet(cacheKey);
-    if (opt.isPresent()) {
-      return opt.get();
-    }
-
-    return Imaging.scale(this.getCurrentImage(), width, height);
+    return opt.orElseGet(() -> Imaging.scale(this.getCurrentImage(), width, height));
   }
 
   @Override public Animation getDefault() {

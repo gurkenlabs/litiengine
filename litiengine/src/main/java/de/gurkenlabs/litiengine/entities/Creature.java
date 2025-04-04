@@ -19,7 +19,8 @@ import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * TODO: Add idle event
+ * The {@code Creature} class extends the {@code CombatEntity} class and implements the {@code IMobileEntity} interface. It represents a creature
+ * entity in the game with movement and combat capabilities.
  */
 @MovementInfo
 @TmxType(MapObjectType.CREATURE)
@@ -47,6 +48,9 @@ public class Creature extends CombatEntity implements IMobileEntity {
 
   private long lastMoved;
 
+  /**
+   * Instantiates a new {@code Creature} entity with default settings.
+   */
   public Creature() {
     this(null);
   }
@@ -112,6 +116,11 @@ public class Creature extends CombatEntity implements IMobileEntity {
     return this.deceleration;
   }
 
+  /**
+   * Gets the facing direction of the creature based on its current angle.
+   *
+   * @return The direction the creature is facing.
+   */
   public Direction getFacingDirection() {
     return Direction.fromAngle(getAngle());
   }
@@ -148,14 +157,19 @@ public class Creature extends CombatEntity implements IMobileEntity {
     return this.velocity;
   }
 
+  /**
+   * Checks if the creature's sprite is being scaled with the entity dimensions.
+   *
+   * @return true if the sprite is being scaled, false otherwise.
+   */
   public boolean isScaling() {
     return this.scaling;
   }
 
   /**
-   * Checks if is idle.
+   * Checks if the creature is idle.
    *
-   * @return true, if is idle
+   * @return true if the creature has not moved for a duration longer than the idle delay, false otherwise.
    */
   public boolean isIdle() {
     return Game.time().since(this.lastMoved) > IDLE_DELAY;
@@ -171,6 +185,11 @@ public class Creature extends CombatEntity implements IMobileEntity {
     this.deceleration = deceleration;
   }
 
+  /**
+   * Sets the facing direction of the creature.
+   *
+   * @param facingDirection The direction to set the creature's facing angle to.
+   */
   public void setFacingDirection(final Direction facingDirection) {
     this.setAngle(facingDirection.toAngle());
   }
@@ -197,6 +216,11 @@ public class Creature extends CombatEntity implements IMobileEntity {
     this.turnOnMove = turn;
   }
 
+  /**
+   * Sets the spritesheet name for this creature.
+   *
+   * @param spritesheetName The name of the spritesheet to set.
+   */
   public void setSpritesheetName(String spritesheetName) {
     if (this.spritesheetName != null && this.spritesheetName.equals(spritesheetName)) {
       return;
@@ -206,6 +230,11 @@ public class Creature extends CombatEntity implements IMobileEntity {
     this.updateAnimationController();
   }
 
+  /**
+   * Sets whether the creature's sprite should be scaled with the entity dimensions.
+   *
+   * @param scaling true to scale the sprite, false otherwise.
+   */
   public void setScaling(boolean scaling) {
     this.scaling = scaling;
   }
@@ -234,18 +263,32 @@ public class Creature extends CombatEntity implements IMobileEntity {
     return sb.toString();
   }
 
+  /**
+   * Updates the animation controller for the creature. This method creates a new animation controller and adds it to the creature's controllers. If
+   * the game world environment is loaded, the new controller is attached to the game loop.
+   */
   protected void updateAnimationController() {
-    IEntityAnimationController<?> controller = this.createAnimationController();
+    IEntityAnimationController<Creature> controller = this.createAnimationController();
     getControllers().addController(controller);
     if (Game.world().environment() != null && Game.world().environment().isLoaded()) {
       Game.loop().attach(controller);
     }
   }
 
-  protected IEntityAnimationController<?> createAnimationController() {
+  /**
+   * Creates a new animation controller for the creature.
+   *
+   * @return A new instance of {@link IEntityAnimationController} for the creature.
+   */
+  protected IEntityAnimationController<Creature> createAnimationController() {
     return new CreatureAnimationController<>(this, true);
   }
 
+  /**
+   * Creates a new movement controller for the creature.
+   *
+   * @return A new instance of {@link IMovementController} for the creature.
+   */
   protected IMovementController createMovementController() {
     return new MovementController<>(this);
   }

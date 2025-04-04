@@ -18,6 +18,7 @@ publishing {
       pom {
         name.set(LITIENGINE_name)
         description.set(LITIENGINE_description)
+        inceptionYear.set(LITIENGINE_inception)
         url.set(LITIENGINE_url)
         licenses {
           license {
