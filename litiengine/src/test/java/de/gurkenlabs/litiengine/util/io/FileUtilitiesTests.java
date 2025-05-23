@@ -63,7 +63,7 @@ class FileUtilitiesTests {
 
   @Test
   void testDeleteExistingDirNoChildren() {
-    assertFalse(FileUtilities.deleteDir(new File("")));
+    assertFalse(FileUtilities.deleteDir(Paths.get("")));
   }
 
   @Test

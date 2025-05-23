@@ -1,11 +1,14 @@
 package de.gurkenlabs.litiengine.util.io;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.*;
+import java.nio.file.DirectoryStream;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -46,28 +49,6 @@ public final class FileUtilities {
       return false;
     }
   }
-
-  public static boolean deleteDir(final File dir) {
-    if (dir.isDirectory()) {
-      final String[] children = dir.list();
-      for (int i = 0; i < children.length; i++) {
-        final boolean success = deleteDir(new File(dir, children[i]));
-        if (!success) {
-          return false;
-        }
-      }
-    }
-
-    try {
-      Files.delete(dir.toPath().toAbsolutePath());
-    } catch (IOException e) {
-      log.log(Level.SEVERE, e.getMessage(), e);
-      return false;
-    }
-
-    return true;
-  }
-
 
   public static List<String> findFilesByExtension(
       final List<String> fileNames, final Path dir, final String extension) {
