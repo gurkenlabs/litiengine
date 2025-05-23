@@ -1,11 +1,10 @@
 package de.gurkenlabs.litiengine.util.io;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -49,7 +48,7 @@ public final class XmlUtilities {
    *          The indentation with which the XML should be saved.
    */
   public static void saveWithCustomIndentation(
-      ByteArrayInputStream input, FileOutputStream fos, int indentation) {
+      ByteArrayInputStream input, OutputStream fos, int indentation) {
     try {
       TransformerFactory transformerFactory = TransformerFactory.newInstance();
       transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, ""); // Compliant
@@ -98,14 +97,14 @@ public final class XmlUtilities {
     return cls.cast(um.unmarshal(path));
   }
 
-  public static File save(Object object, String fileName) {
+  public static Path save(Object object, String fileName) {
     if (fileName == null || fileName.isEmpty()) {
       return null;
     }
 
-    File newFile = new File(fileName);
+    Path newFile = Paths.get(fileName);
 
-    try (FileOutputStream fileOut = new FileOutputStream(newFile)) {
+    try (OutputStream fileOut = Files.newOutputStream(newFile)) {
       JAXBContext jaxbContext = getContext(object.getClass());
       if (jaxbContext == null) {
         return null;
@@ -132,7 +131,7 @@ public final class XmlUtilities {
     return newFile;
   }
 
-  public static File save(Object object, String fileName, String extension) {
+  public static Path save(Object object, String fileName, String extension) {
     String fileNameWithExtension = fileName;
     if (!fileNameWithExtension.endsWith("." + extension)) {
       fileNameWithExtension += "." + extension;

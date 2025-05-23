@@ -5,13 +5,13 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.*;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 public final class FileUtilities {
   private static final Logger log = Logger.getLogger(FileUtilities.class.getName());
@@ -21,6 +21,30 @@ public final class FileUtilities {
 
   private FileUtilities() {
     throw new UnsupportedOperationException();
+  }
+
+  public static boolean deleteDir(final Path dir) {
+    //Support existing behavior for Paths.get("");
+    if(dir.toString().isBlank()){
+      try {
+        Files.delete(dir.toAbsolutePath());
+        return true;
+      } catch (IOException e) {
+        log.log(Level.SEVERE, e.getMessage(), e);
+        return false;
+      }
+    }
+
+    try (Stream<Path> paths = Files.walk(dir)) {
+      List<Path> toDelete = paths.sorted(Comparator.reverseOrder()).toList();
+      for(Path p : toDelete) {
+        Files.delete(p);
+      }
+      return true;
+    }catch (IOException e) {
+      log.log(Level.SEVERE, e.getMessage(), e);
+      return false;
+    }
   }
 
   public static boolean deleteDir(final File dir) {
@@ -44,11 +68,12 @@ public final class FileUtilities {
     return true;
   }
 
+
   public static List<String> findFilesByExtension(
       final List<String> fileNames, final Path dir, final String extension) {
     try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
       for (final Path path : stream) {
-        if (path.toFile().isDirectory()) {
+        if (Files.isDirectory(path)) {
           if (isBlackListedDirectory(path)) {
             continue;
           }
@@ -69,7 +94,7 @@ public final class FileUtilities {
       final List<String> fileNames, final Path dir, final String... files) {
     try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
       for (final Path path : stream) {
-        if (path.toFile().isDirectory()) {
+        if (Files.isDirectory(path)) {
           if (isBlackListedDirectory(path)) {
             continue;
           }
@@ -91,8 +116,8 @@ public final class FileUtilities {
     return fileNames;
   }
 
-  public static String getExtension(final File file) {
-    return getExtension(file.getAbsolutePath());
+  public static String getExtension(final Path file) {
+    return getExtension(file.toAbsolutePath().toString());
   }
 
   public static String getExtension(final String path) {
@@ -153,8 +178,8 @@ public final class FileUtilities {
     try {
       return getParentDirPath(new URI(uri));
     } catch (URISyntaxException e) {
-      String parent = new File(uri).getParent();
-      parent += File.separator;
+      String parent = Paths.get(uri).getParent().toAbsolutePath().toString();
+      parent += FileSystems.getDefault().getSeparator();
       return parent;
     }
   }

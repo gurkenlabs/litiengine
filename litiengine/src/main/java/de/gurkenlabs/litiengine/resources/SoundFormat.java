@@ -1,6 +1,6 @@
 package de.gurkenlabs.litiengine.resources;
 
-import java.io.File;
+import java.nio.file.Path;
 
 /**
  * Contains all known audio file-formats supported by the engine.
@@ -29,8 +29,8 @@ public enum SoundFormat {
    * @param file The file to check for.
    * @return True if the extension is part of this enum; otherwise false.
    */
-  public static boolean isSupported(File file) {
-    return isSupported(file.getName());
+  public static boolean isSupported(Path file) {
+    return isSupported(file.getFileName().toString());
   }
 
   /**

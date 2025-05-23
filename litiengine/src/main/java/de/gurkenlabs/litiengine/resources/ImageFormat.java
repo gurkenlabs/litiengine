@@ -1,10 +1,10 @@
 package de.gurkenlabs.litiengine.resources;
 
-import java.io.File;
+import java.nio.file.Path;
 
 /**
  * Contains all known image file-formats supported by the engine.
- * 
+ *
  * @see SoundFormat
  */
 public enum ImageFormat {
@@ -16,7 +16,7 @@ public enum ImageFormat {
 
   /**
    * Gets the {@code ImageFormat} of the specified format string.
-   * 
+   *
    * @param imageFormat
    *          The format string from which to extract the format.
    * @return The format of the specified string or {@code UNDEFINED} if not supported.
@@ -27,22 +27,22 @@ public enum ImageFormat {
 
   /**
    * Determines whether the extension of the specified file is supported by the engine.
-   * 
+   *
    * @param file
    *          The file to check for.
-   * 
+   *
    * @return True if the extension is part of this enum; otherwise false.
    */
-  public static boolean isSupported(File file) {
+  public static boolean isSupported(Path file) {
     return isSupported(file.toString());
   }
 
   /**
    * Determines whether the extension of the specified file is supported by the engine.
-   * 
+   *
    * @param fileName
    *          The name of the file to check for.
-   * 
+   *
    * @return True if the extension is part of this enum; otherwise false.
    */
   public static boolean isSupported(String fileName) {
@@ -56,7 +56,7 @@ public enum ImageFormat {
   /**
    * Converts this format instance to a file format string that can be used as an extension (e.g. .png).<br>
    * It adds a leading '.' to the lower-case string representation of this instance.
-   * 
+   *
    * @return The file extension string for this instance.
    */
   public String toFileExtension() {

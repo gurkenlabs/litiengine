@@ -1,12 +1,11 @@
 package de.gurkenlabs.litiengine.util.io;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -17,16 +16,12 @@ public final class StreamUtilities {
     throw new UnsupportedOperationException();
   }
 
-  public static void copy(final File file, final OutputStream out) throws IOException {
-    try (InputStream in = new FileInputStream(file)) {
-      copy(in, out);
-    }
+  public static void copy(final Path file, final OutputStream out) throws IOException {
+    Files.copy(file, out);
   }
 
-  public static void copy(final InputStream in, final File file) throws IOException {
-    try (OutputStream out = new FileOutputStream(file)) {
-      copy(in, out);
-    }
+  public static void copy(final InputStream in, final Path file) throws IOException {
+    Files.copy(in, file);
   }
 
   public static void copy(final InputStream in, final OutputStream out) throws IOException {

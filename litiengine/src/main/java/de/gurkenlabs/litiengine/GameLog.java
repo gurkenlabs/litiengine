@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
@@ -26,7 +27,7 @@ final class GameLog {
 
   void init() {
     LogManager.getLogManager().reset();
-    if (new File(LOGGING_CONFIG_FILE).exists()) {
+    if (Files.exists(Paths.get(LOGGING_CONFIG_FILE))) {
       System.setProperty("java.util.logging.config.file", LOGGING_CONFIG_FILE);
 
       try {

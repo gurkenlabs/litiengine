@@ -2,13 +2,12 @@ package de.gurkenlabs.litiengine.configuration;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.resources.Resources;
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -122,10 +121,10 @@ public class Configuration {
    * exists, it creates a new configuration file in the application folder.
    */
   public void load() {
-    final File settingsFile = new File(this.getFileName());
+    final Path settingsFile = Paths.get(this.getFileName());
     try (InputStream settingsStream = Resources.get(this.getFileName())) {
-      if (!settingsFile.exists() && settingsStream == null || !settingsFile.isFile()) {
-        try (OutputStream out = new FileOutputStream(settingsFile)) {
+      if (!Files.exists(settingsFile) && settingsStream == null || !Files.isRegularFile(settingsFile)) {
+        try (OutputStream out = Files.newOutputStream(settingsFile)) {
           this.createDefaultSettingsFile(out);
         }
 
@@ -136,8 +135,8 @@ public class Configuration {
       log.log(Level.SEVERE, e.getMessage(), e);
     }
 
-    if (settingsFile.exists()) {
-      try (InputStream settingsStream = new FileInputStream(settingsFile)) {
+    if (Files.exists(settingsFile)) {
+      try (InputStream settingsStream = Files.newInputStream(settingsFile)) {
 
         final Properties properties = new Properties();
         BufferedInputStream stream;
@@ -161,8 +160,8 @@ public class Configuration {
    * @see Configuration#DEFAULT_CONFIGURATION_FILE_NAME
    */
   public void save() {
-    final File settingsFile = new File(this.getFileName());
-    try (OutputStream out = new FileOutputStream(settingsFile, false)) {
+    final Path settingsFile = Paths.get(this.getFileName());
+    try (OutputStream out = Files.newOutputStream(settingsFile, StandardOpenOption.CREATE_NEW)) {
       for (final ConfigurationGroup group : this.getConfigurationGroups()) {
         if (!Game.isDebug() && group.isDebug()) {
           continue;

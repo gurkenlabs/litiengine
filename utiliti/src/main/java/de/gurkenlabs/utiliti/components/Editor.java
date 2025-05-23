@@ -44,7 +44,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -52,6 +54,7 @@ import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -266,7 +269,7 @@ public class Editor extends Screen {
   public void load() {
     if (EditorFileChooser.showFileDialog(
         ResourceBundle.FILE_EXTENSION, GAME_FILE_NAME, false, ResourceBundle.FILE_EXTENSION) == JFileChooser.APPROVE_OPTION) {
-      this.load(EditorFileChooser.instance().getSelectedFile(), false);
+      this.load(EditorFileChooser.instance().getSelectedFile().toPath(), false);
     }
   }
 
@@ -291,7 +294,7 @@ public class Editor extends Screen {
     this.setCurrentStatus(Resources.strings().get("status_gamefile_closed"));
   }
 
-  public void load(File gameFile, boolean force) {
+  public void load(Path gameFile, boolean force) {
     if (!force) {
       boolean proceedLoading = UI.notifyPendingChanges();
       if (!proceedLoading) {
@@ -299,7 +302,7 @@ public class Editor extends Screen {
       }
     }
 
-    if (!gameFile.exists()) {
+    if (!Files.exists(gameFile)) {
       log.log(Level.SEVERE, "gameFile {0} does not exist", gameFile);
       return;
     }
@@ -322,13 +325,13 @@ public class Editor extends Screen {
       UndoManager.clearAll();
 
       // set up project settings
-      this.currentResourceFile = gameFile.getPath();
-      this.gameFile = ResourceBundle.load(gameFile.getPath());
+      this.currentResourceFile = gameFile.toString();
+      this.gameFile = ResourceBundle.load(gameFile.toString());
       if (this.gameFile == null) {
         throw new IllegalArgumentException("The game file " + gameFile + " could not be loaded!");
       }
 
-      this.setProjectPath(gameFile.getPath());
+      this.setProjectPath(gameFile.toString());
 
       // load maps from game file
       this.mapComponent.loadMaps(this.getGameFile().getMaps(), true);
@@ -431,7 +434,7 @@ public class Editor extends Screen {
         Resources.strings().get(IMPORT_DIALOGUE, SPRITESHEET_FILE_NAME),
         true,
         ImageFormat.getAllExtensions()) == JFileChooser.APPROVE_OPTION) {
-      this.importSpriteSheets(EditorFileChooser.instance().getSelectedFiles());
+      this.importSpriteSheets(Stream.of(EditorFileChooser.instance().getSelectedFiles()).map(File::toPath).toArray(Path[]::new));
     }
   }
 
@@ -441,7 +444,7 @@ public class Editor extends Screen {
         Resources.strings().get(IMPORT_DIALOGUE, AUDIO_FILE_NAME),
         true,
         SoundFormat.getAllExtensions()) == JFileChooser.APPROVE_OPTION) {
-      this.importSounds(EditorFileChooser.instance().getSelectedFiles());
+      this.importSounds(Stream.of(EditorFileChooser.instance().getSelectedFiles()).map(File::toPath).toArray(Path[]::new));
     }
   }
 
@@ -499,18 +502,18 @@ public class Editor extends Screen {
     }
   }
 
-  public void importSpriteSheets(File... files) {
+  public void importSpriteSheets(Path... files) {
     SpritesheetImportPanel spritePanel = new SpritesheetImportPanel(files);
     this.processSpritesheets(spritePanel);
   }
 
-  private void importSounds(File... selectedFiles) {
-    for (File file : selectedFiles) {
-      try (InputStream stream = new FileInputStream(file.getAbsolutePath())) {
+  private void importSounds(Path... selectedFiles) {
+    for (Path file : selectedFiles) {
+      try (InputStream stream = Files.newInputStream(file)) {
         SoundFormat format = SoundFormat.get(FileUtilities.getExtension(file));
         SoundResource resource =
             new SoundResource(
-                new BufferedInputStream(stream), FileUtilities.getFileName(file.getName()), format);
+                new BufferedInputStream(stream), FileUtilities.getFileName(file.getFileName().toString()), format);
         this.getGameFile().getSounds().removeIf(x -> x.getName().equals(resource.getName()));
         this.getGameFile().getSounds().add(resource);
         Resources.sounds().load(resource);
@@ -740,7 +743,7 @@ public class Editor extends Screen {
       return;
     }
 
-    File currentFile = new File(this.currentResourceFile);
+    Path currentFile = Paths.get(this.currentResourceFile);
     TmxMap currentMapSelection = null;
     if (UI.getMapController().getCurrentMap() != null) {
       currentMapSelection = UI.getMapController().getCurrentMap();
