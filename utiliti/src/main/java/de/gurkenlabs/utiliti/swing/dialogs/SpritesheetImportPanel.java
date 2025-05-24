@@ -8,6 +8,7 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
@@ -76,9 +77,9 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
     this.initModel();
   }
 
-  public SpritesheetImportPanel(File... files) {
+  public SpritesheetImportPanel(Path... files) {
     this();
-    for (File file : files) {
+    for (Path file : files) {
       fileListModel.addElement(new SpriteFileWrapper(file));
     }
 
@@ -575,10 +576,10 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
       this.updateSprite();
     }
 
-    public SpriteFileWrapper(File file) {
+    public SpriteFileWrapper(Path file) {
       this(
-        Resources.images().get(file.getAbsolutePath()),
-        FileUtilities.getFileName(file.getName()));
+        Resources.images().get(file.toAbsolutePath().toString()),
+        FileUtilities.getFileName(file.getFileName().toString()));
       this.spriteWidth = this.width;
       this.spriteHeight = this.height;
       this.updateSprite();

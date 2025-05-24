@@ -8,7 +8,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import de.gurkenlabs.litiengine.test.GameTestSuite;
 
 import java.awt.AWTError;
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 
 import org.junit.jupiter.api.AfterEach;
@@ -23,11 +26,11 @@ public class GameTest {
   }
 
   @AfterEach
-  public void cleanup() {
-    final File configFile = new File(Game.config().getFileName());
-    if (configFile.exists()) {
-      configFile.delete();
-    }
+  public void cleanup() throws IOException {
+    final Path configFile = Paths.get(Game.config().getFileName());
+
+    Files.deleteIfExists(configFile);
+
 
     terminateGame();
   }

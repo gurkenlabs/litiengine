@@ -6,6 +6,7 @@ import de.gurkenlabs.utiliti.components.Editor;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JMenu;
@@ -74,7 +75,7 @@ public final class FileMenu extends JMenu {
         fileButton.addActionListener(
             a -> {
               log.log(Level.INFO, "load {0}", fileButton.getText());
-              Editor.instance().load(new File(fileButton.getText()), false);
+              Editor.instance().load(Paths.get(fileButton.getText()), false);
             });
 
         recentFiles.add(fileButton);

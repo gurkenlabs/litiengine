@@ -6,6 +6,7 @@ import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 import de.gurkenlabs.utiliti.components.Editor;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,8 +44,8 @@ public final class XmlExportDialog {
 
       int result = chooser.showSaveDialog(Game.window().getRenderComponent());
       if (result == JFileChooser.APPROVE_OPTION) {
-        File newFile = XmlUtilities.save(object, chooser.getSelectedFile().toString(), extension);
-        String dir = FileUtilities.getParentDirPath(newFile.getAbsolutePath());
+        Path newFile = XmlUtilities.save(object, chooser.getSelectedFile().toString(), extension);
+        String dir = FileUtilities.getParentDirPath(newFile.toAbsolutePath().toString());
         consumer.accept(dir);
         log.log(Level.INFO, "Exported {0} {1} to {2}", new Object[] {name, filename, newFile});
       }

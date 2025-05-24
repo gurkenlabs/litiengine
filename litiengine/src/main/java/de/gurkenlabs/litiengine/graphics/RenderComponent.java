@@ -5,6 +5,7 @@ import de.gurkenlabs.litiengine.gui.screens.Screen;
 import de.gurkenlabs.litiengine.resources.ImageFormat;
 import de.gurkenlabs.litiengine.util.TimeUtilities;
 import de.gurkenlabs.litiengine.util.io.ImageSerializer;
+
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -15,19 +16,25 @@ import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The {@code RenderComponent} class extends {@link Canvas} and handles the rendering of the game screen, including managing fade effects, capturing
  * screenshots, and rendering the game cursor.
  */
 public class RenderComponent extends Canvas {
+  private static final Logger log = Logger.getLogger(RenderComponent.class.getName());
   /**
    * The default background color for the rendering component.
    */
@@ -287,13 +294,15 @@ public class RenderComponent extends Canvas {
   private void saveScreenshot(BufferedImage img) {
     try {
       String timeStamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
-      File folder = new File("./screenshots/");
-      if (!folder.exists()) {
-        folder.mkdirs();
+      Path folder = Paths.get("./screenshots/");
+      if (!Files.exists(folder)) {
+        Files.createDirectories(folder);
       }
       String path = "./screenshots/" + timeStamp + ImageFormat.PNG.toFileExtension();
       ImageSerializer.saveImage(path, img);
-    } finally {
+    } catch (final IOException e) {
+      log.log(Level.SEVERE, e.getMessage(), e);
+    } finally{
       takeScreenShot = false;
     }
   }

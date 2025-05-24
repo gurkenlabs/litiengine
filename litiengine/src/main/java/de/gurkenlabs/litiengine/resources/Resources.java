@@ -11,13 +11,13 @@ import de.gurkenlabs.litiengine.util.TimeUtilities;
 import java.awt.Font;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -330,7 +330,7 @@ public final class Resources {
       return new URL(name);
     } catch (MalformedURLException e) {
       try {
-        return (new File(name)).toURI().toURL();
+        return (Paths.get(name).toUri().toURL());
       } catch (MalformedURLException e1) {
         return null;
       }
