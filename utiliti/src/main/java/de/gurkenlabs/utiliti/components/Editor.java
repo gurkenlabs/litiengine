@@ -564,7 +564,7 @@ public class Editor extends Screen {
         file -> {
           EmitterData emitter;
           try {
-            emitter = XmlUtilities.read(EmitterData.class, file.toURI().toURL());
+            emitter = XmlUtilities.read(EmitterData.class, file.toUri().toURL());
           } catch (IOException | JAXBException e) {
             log.log(Level.SEVERE, String.format("could not load emitter data from %s", file), e);
             return;
@@ -593,7 +593,7 @@ public class Editor extends Screen {
         file -> {
           Blueprint blueprint;
           try {
-            blueprint = XmlUtilities.read(Blueprint.class, file.toURI().toURL());
+            blueprint = XmlUtilities.read(Blueprint.class, file.toUri().toURL());
           } catch (IOException | JAXBException e) {
             log.log(Level.SEVERE, String.format("could not load blueprint from %s", file), e);
             return;
@@ -603,7 +603,7 @@ public class Editor extends Screen {
           }
 
           if (blueprint.getName() == null || blueprint.getName().isEmpty()) {
-            blueprint.setName(FileUtilities.getFileName(file.getPath()));
+            blueprint.setName(FileUtilities.getFileName(file.getFileName().toString()));
           }
 
           if (this.gameFile.getBluePrints().stream()
@@ -630,7 +630,7 @@ public class Editor extends Screen {
         file -> {
           Tileset tileset;
           try {
-            URL path = file.toURI().toURL();
+            URL path = file.toUri().toURL();
             tileset = XmlUtilities.read(Tileset.class, path);
             Objects.requireNonNull(tileset).finish(path);
           } catch (IOException | JAXBException e) {
@@ -825,7 +825,7 @@ public class Editor extends Screen {
             new ArrayList<>(),
             Path.of(Resources.getLocation("maps").getPath()),
             map.getName() + "." + TmxMap.FILE_EXTENSION)) {
-          File newFile = XmlUtilities.save(map, file, TmxMap.FILE_EXTENSION);
+          Path newFile = XmlUtilities.save(map, file, TmxMap.FILE_EXTENSION);
           log.log(Level.INFO, "synchronized map {0}", new Object[] {newFile});
         }
       }

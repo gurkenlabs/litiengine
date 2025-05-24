@@ -578,8 +578,8 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
 
     public SpriteFileWrapper(Path file) {
       this(
-        Resources.images().get(file),
-        FileUtilities.getFileName(file.getName()));
+        Resources.images().get(file.toAbsolutePath().toString()),
+        FileUtilities.getFileName(file.getFileName().toString()));
       this.spriteWidth = this.width;
       this.spriteHeight = this.height;
       this.updateSprite();

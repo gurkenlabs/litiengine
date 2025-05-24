@@ -754,7 +754,7 @@ public class MapComponent extends GuiComponent {
     XmlImportDialog.importXml(
         "Tilemap",
         file -> {
-          String mapPath = file.toURI().toString();
+          String mapPath = file.toUri().toString();
           Resources.maps().clear();
           TmxMap map = (TmxMap) Resources.maps().get(mapPath);
           if (map == null) {
