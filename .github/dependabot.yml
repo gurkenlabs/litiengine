@@ -4,15 +4,8 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-    reviewers:
-      - "nightm4re94"
-      - "steffen-wilke"
 
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
-    rebase-strategy: "disabled"
-    reviewers:
-      - "nightm4re94"
-      - "steffen-wilke"
