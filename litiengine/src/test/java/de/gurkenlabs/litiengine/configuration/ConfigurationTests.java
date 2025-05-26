@@ -5,7 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.UUID;
 import java.util.logging.Logger;
 import org.junit.jupiter.api.AfterEach;
@@ -23,12 +26,10 @@ class ConfigurationTests {
   }
 
   @AfterEach
-  public void deleteConfigFile() {
+  public void deleteConfigFile() throws IOException {
     if (config != null) {
-      final File configFile = new File(config.getFileName());
-      if (configFile.exists()) {
-        assertTrue(configFile.delete());
-      }
+      final Path configFile = Paths.get(config.getFileName());
+      Files.deleteIfExists(configFile);
     }
   }
 
@@ -54,7 +55,7 @@ class ConfigurationTests {
     config.load();
 
     // act, assert
-    assertTrue(new File(config.getFileName()).exists());
+    assertTrue(Files.exists(Paths.get(config.getFileName())));
   }
 
   @Test
@@ -67,7 +68,7 @@ class ConfigurationTests {
     config.load();
 
     // assert
-    assertTrue(new File(testFileName).exists());
+    assertTrue(Files.exists(Paths.get(testFileName)));
   }
 
   @Test

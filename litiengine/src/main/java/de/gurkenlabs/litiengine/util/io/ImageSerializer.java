@@ -3,8 +3,11 @@ package de.gurkenlabs.litiengine.util.io;
 import de.gurkenlabs.litiengine.resources.ImageFormat;
 import de.gurkenlabs.litiengine.util.Imaging;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,14 +25,14 @@ public final class ImageSerializer {
   }
 
   public static BufferedImage loadImage(final String fileName) {
-    final File file = new File(fileName);
-    if (!file.exists()) {
+    final Path file = Paths.get(fileName);
+    if (!Files.exists(file)) {
       return null;
     }
 
     BufferedImage img;
-    try {
-      img = ImageIO.read(file);
+    try(InputStream is = Files.newInputStream(file)) {
+      img = ImageIO.read(is);
       if (img == null) {
         return null;
       }
@@ -53,7 +56,7 @@ public final class ImageSerializer {
   public static void saveImage(
       final String fileName, final BufferedImage image, ImageFormat imageFormat) {
     try {
-      final File file = new File(fileName);
+      final Path file = Paths.get(fileName);
       final String extension = FileUtilities.getExtension(fileName);
       Iterator<ImageWriter> iter = null;
       if (canWriteFormat(extension)) {
@@ -65,8 +68,8 @@ public final class ImageSerializer {
       final ImageWriter writer = iter.next();
       final ImageWriteParam iwp = writer.getDefaultWriteParam();
 
-      file.getParentFile().mkdirs();
-      try (final FileImageOutputStream output = new FileImageOutputStream(file.getAbsoluteFile())) {
+      Files.createDirectories(file.getParent());
+      try (final FileImageOutputStream output = new FileImageOutputStream(file.toAbsolutePath().toFile())) {
         writer.setOutput(output);
         final IIOImage outimage = new IIOImage(image, null, null);
         writer.write(null, outimage, iwp);

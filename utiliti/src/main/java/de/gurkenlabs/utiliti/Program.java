@@ -7,9 +7,9 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.handlers.DebugCrasher;
 import de.gurkenlabs.utiliti.swing.UI;
-import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class Program {
@@ -56,7 +56,7 @@ public class Program {
             handleArgs(args);
             String gameFile = Editor.preferences().getLastGameFile();
             if (!Editor.instance().fileLoaded() && gameFile != null && !gameFile.isEmpty()) {
-              Editor.instance().load(new File(gameFile.trim()), false);
+              Editor.instance().load(Paths.get(gameFile.trim()), false);
             }
           },
           args);
@@ -92,7 +92,7 @@ public class Program {
       return;
     }
 
-    File f = new File(gameFile);
+    Path f = Paths.get(gameFile);
     Editor.instance().load(f, false);
   }
 }

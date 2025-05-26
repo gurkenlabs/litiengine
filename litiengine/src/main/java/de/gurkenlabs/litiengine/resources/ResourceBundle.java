@@ -17,14 +17,16 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlTransient;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Serial;
 import java.io.Serializable;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -202,10 +204,10 @@ public class ResourceBundle implements Serializable {
       fileNameWithExtension += "." + FILE_EXTENSION;
     }
 
-    final File newFile = new File(fileNameWithExtension);
-    if (newFile.exists()) {
+    final Path newFile = Paths.get(fileNameWithExtension);
+    if (!Files.exists(newFile)) {
       try {
-        Files.delete(newFile.toPath().toAbsolutePath());
+        Files.delete(newFile);
       } catch (IOException e) {
         log.log(Level.WARNING, e.getMessage(), e);
       }
@@ -218,7 +220,7 @@ public class ResourceBundle implements Serializable {
     Collections.sort(this.getBluePrints());
     Collections.sort(this.getSounds());
 
-    try (FileOutputStream fileOut = new FileOutputStream(newFile, false)) {
+    try (OutputStream fileOut = Files.newOutputStream(newFile, StandardOpenOption.CREATE_NEW)) {
       final JAXBContext jaxbContext = XmlUtilities.getContext(ResourceBundle.class);
       final Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
       // output pretty printed

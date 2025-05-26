@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Serial;
 import java.net.URI;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.List;
@@ -241,7 +243,7 @@ public class FileDrop {
           List<File> fileList = (List<File>) tr.getTransferData(DataFlavor.javaFileListFlavor);
 
           // Convert list to array
-          File[] filesTemp = new File[fileList.size()];
+          Path[] filesTemp = new Path[fileList.size()];
           fileList.toArray(filesTemp);
 
           // Alert listener to drop.
@@ -333,27 +335,27 @@ public class FileDrop {
       return ok;
     }
 
-    private static File[] createFileArray(BufferedReader bReader) {
+    private static Path[] createFileArray(BufferedReader bReader) {
       try {
-        List<File> list = new ArrayList<>();
+        List<Path> list = new ArrayList<>();
         String line;
         while ((line = bReader.readLine()) != null) {
           try {
             // kde seems to append a 0 char to the end of the reader
             if (ZERO_CHAR_STRING.equals(line))
               continue;
-            File file = new File(new URI(line));
+            Path file = Paths.get(new URI(line));
             list.add(file);
           } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error with {0}: {1}", new String[] {line, ex.getMessage()});
           }
         }
 
-        return list.toArray(new File[list.size()]);
+        return list.toArray(new Path[list.size()]);
       } catch (IOException ex) {
         LOG.log(Level.SEVERE, "FileDrop: IOException");
       }
-      return new File[0];
+      return new Path[0];
     }
   }
 
@@ -373,7 +375,7 @@ public class FileDrop {
      *          An array of {@code File}s that were dropped.
      * @since 1.0
      */
-    void filesDropped(File[] files);
+    void filesDropped(Path[] files);
   }
 
   /**

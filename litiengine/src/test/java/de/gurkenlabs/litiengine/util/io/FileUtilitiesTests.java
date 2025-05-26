@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,14 +24,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class FileUtilitiesTests {
 
   @TempDir
-  File tempDir;
+  Path tempDir;
 
   @TempDir
   Path tempPath;
 
   @Test
   void testDeleteNoneDir() {
-    File dir = new File("/test/test2/");
+    Path dir = Paths.get("/test/test2/");
     assertFalse(FileUtilities.deleteDir(dir));
   }
 
@@ -41,20 +42,20 @@ class FileUtilitiesTests {
 
   @Test
   void testDeleteExistingDir() throws IOException {
-    File file1 = new File(tempDir, "file1.txt");
-    file1.createNewFile();
+    Path file1 = tempDir.resolve("file1.txt");
+    Files.createFile(file1);
     assertTrue(FileUtilities.deleteDir(tempDir));
   }
 
   @Test
   void testDeleteExistingDirNewFiles() throws IOException {
     // arrange
-    File file1 = new File(tempDir, "file1.txt");
-    File file2 = new File(tempDir, "file2.txt");
+    Path file1 = tempDir.resolve("file1.txt");
+    Path file2 = tempDir.resolve("file2.txt");
 
     // act
-    file1.createNewFile();
-    file2.createNewFile();
+    Files.createFile(file1);
+    Files.createFile(file2);
 
     // assert
     assertTrue(FileUtilities.deleteDir(tempDir));
@@ -62,7 +63,7 @@ class FileUtilitiesTests {
 
   @Test
   void testDeleteExistingDirNoChildren() {
-    assertFalse(FileUtilities.deleteDir(new File("")));
+    assertFalse(FileUtilities.deleteDir(Paths.get("")));
   }
 
   @Test

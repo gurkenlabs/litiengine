@@ -9,11 +9,11 @@ import de.gurkenlabs.litiengine.util.io.ImageSerializer;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -281,8 +281,10 @@ public final class Spritesheets {
         writer.write("\n");
 
         if (!metadataOnly) {
-          ImageSerializer.saveImage(Paths.get(new File(spriteInfoFile).getParentFile().getAbsolutePath(),
-              spritesheet.getName() + spritesheet.getImageFormat().toFileExtension()).toString(), spritesheet.getImage(),
+          Path spriteInfoPath = Paths.get(spriteInfoFile);
+          ImageSerializer.saveImage(
+            spriteInfoPath.resolveSibling(spritesheet.getName() + spritesheet.getImageFormat().toFileExtension()).toString(),
+            spritesheet.getImage(),
             spritesheet.getImageFormat());
         }
       }
