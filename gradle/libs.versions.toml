@@ -15,7 +15,7 @@ xml_runtime_core = { module = "com.sun.xml.bind:jaxb-core", version.ref = "jaxb"
 xml_runtime_impl = { module = "com.sun.xml.bind:jaxb-impl", version.ref = "jaxb" }
 
 # Test dependencies
-mockito_core = { module = "org.mockito:mockito-core", version = "5.17.0" }
+mockito_core = { module = "org.mockito:mockito-core", version = "5.18.0" }
 junit_jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
 junit_jupiter_api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
 junit_jupiter_params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
