@@ -1,13 +1,7 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
+import de.gurkenlabs.litiengine.util.io.URLAdapter;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.XmlAccessType;
@@ -17,36 +11,53 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlTransient;
 import jakarta.xml.bind.annotation.XmlValue;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
-import de.gurkenlabs.litiengine.util.io.URLAdapter;
-
+/**
+ * The {@code CustomPropertyAdapter} class is an implementation of the {@link XmlAdapter} that facilitates the conversion between a
+ * {@link PropertyList} and a {@link Map} of custom properties.
+ *
+ * <p>This adapter is used for XML serialization and deserialization of custom properties,
+ * ensuring proper handling of property types, values, and locations.
+ */
 public class CustomPropertyAdapter extends XmlAdapter<CustomPropertyAdapter.PropertyList, Map<String, ICustomProperty>> {
-
-  @XmlAccessorType(XmlAccessType.FIELD)
-  static class Property implements Comparable<Property> {
-    @XmlAttribute
-    String name;
-    @XmlAttribute
-    String type;
-    @XmlAttribute
-    String value;
-    @XmlValue
-    String contents;
-    @XmlTransient
-    URL location;
+  /**
+   * Represents a custom property with attributes for name, type, value, and location.
+   *
+   * <p>This class is used for XML serialization and deserialization of individual properties.
+   * It implements the {@link Comparable} interface to allow sorting by property name.
+   */
+  @XmlAccessorType(XmlAccessType.FIELD) static class Property implements Comparable<Property> {
+    @XmlAttribute String name;
+    @XmlAttribute String type;
+    @XmlAttribute String value;
+    @XmlValue String contents;
+    @XmlTransient URL location;
 
     Property() {
       // keep for serialization
     }
 
+    /**
+     * Constructs a new {@code Property} instance with the specified name and type.
+     *
+     * <p>If the provided type is {@code null} or invalid, it defaults to {@code CustomPropertyType.STRING}.
+     *
+     * @param name the name of the property
+     * @param type the type of the property, which must be a valid {@code CustomPropertyType}
+     */
     Property(String name, String type) {
       this.name = name;
       this.type = type == null || !CustomPropertyType.isValid(type) ? CustomPropertyType.STRING : type;
     }
 
-    @SuppressWarnings("unused")
-    private void afterUnmarshal(Unmarshaller u, Object parent) throws MalformedURLException {
+    @SuppressWarnings("unused") private void afterUnmarshal(Unmarshaller u, Object parent) throws MalformedURLException {
       if (this.type == null) {
         this.type = CustomPropertyType.STRING;
       }
@@ -55,8 +66,7 @@ public class CustomPropertyAdapter extends XmlAdapter<CustomPropertyAdapter.Prop
       }
     }
 
-    @SuppressWarnings("unused")
-    private void beforeMarshal(Marshaller m) throws URISyntaxException {
+    @SuppressWarnings("unused") private void beforeMarshal(Marshaller m) throws URISyntaxException {
       if (this.type.equals(CustomPropertyType.STRING)) {
         this.type = null;
       }
@@ -65,8 +75,7 @@ public class CustomPropertyAdapter extends XmlAdapter<CustomPropertyAdapter.Prop
       }
     }
 
-    @Override
-    public int compareTo(Property o) {
+    @Override public int compareTo(Property o) {
       if (o == null) {
         return 1;
       }
@@ -83,10 +92,8 @@ public class CustomPropertyAdapter extends XmlAdapter<CustomPropertyAdapter.Prop
     }
   }
 
-  @XmlAccessorType(XmlAccessType.FIELD)
-  static class PropertyList {
-    @XmlElement(name = "property")
-    List<Property> properties;
+  @XmlAccessorType(XmlAccessType.FIELD) static class PropertyList {
+    @XmlElement(name = "property") List<Property> properties;
 
     PropertyList() {
       // keep for serialization
@@ -97,8 +104,7 @@ public class CustomPropertyAdapter extends XmlAdapter<CustomPropertyAdapter.Prop
     }
   }
 
-  @Override
-  public Map<String, ICustomProperty> unmarshal(PropertyList v) {
+  @Override public Map<String, ICustomProperty> unmarshal(PropertyList v) {
     Map<String, ICustomProperty> map = HashMap.newHashMap(v.properties.size()); // use hashtable to reject null keys/values
     for (Property property : v.properties) {
       CustomProperty prop = new CustomProperty(property.type, property.value != null ? property.value : property.contents);
@@ -110,8 +116,7 @@ public class CustomPropertyAdapter extends XmlAdapter<CustomPropertyAdapter.Prop
     return map;
   }
 
-  @Override
-  public PropertyList marshal(Map<String, ICustomProperty> v) {
+  @Override public PropertyList marshal(Map<String, ICustomProperty> v) {
     if (v.isEmpty()) {
       return null;
     }

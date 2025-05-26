@@ -19,6 +19,12 @@ allprojects {
   project.getLogger().lifecycle("Set project '{}' version to '{}'.", project.name, project.version)
 }
 
+java {
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(24)
+  }
+}
+
 nexusPublishing {
   useStaging.set(isTaggedRevision(project.version))
   repositories {

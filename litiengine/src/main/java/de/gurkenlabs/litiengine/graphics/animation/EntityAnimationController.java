@@ -12,7 +12,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class EntityAnimationController<T extends IEntity> extends AnimationController
-    implements IEntityAnimationController<T> {
+  implements IEntityAnimationController<T> {
   private final List<AnimationRule<T>> animationRules = new CopyOnWriteArrayList<>();
   private final T entity;
   private String spritePrefix;
@@ -21,8 +21,7 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
   /**
    * Initializes a new instance of the {@code EntityAnimationController} class.
    *
-   * @param entity
-   *          The entity related to this animation controller.
+   * @param entity The entity related to this animation controller.
    * @see #getEntity()
    */
   public EntityAnimationController(final T entity) {
@@ -37,18 +36,15 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
   /**
    * Initializes a new instance of the {@code EntityAnimationController} class.
    *
-   * @param entity
-   *          The entity related to this animation controller.
-   * @param defaultAnimation
-   *          The default animation for this controller.
-   * @param animations
-   *          Additional animations that are managed by this controller instance.
+   * @param entity           The entity related to this animation controller.
+   * @param defaultAnimation The default animation for this controller.
+   * @param animations       Additional animations that are managed by this controller instance.
    * @see #getEntity()
    * @see #getDefault()
    * @see #getAll()
    */
   public EntityAnimationController(
-      final T entity, final Animation defaultAnimation, final Animation... animations) {
+    final T entity, final Animation defaultAnimation, final Animation... animations) {
     super(defaultAnimation, animations);
     this.entity = entity;
 
@@ -58,10 +54,8 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
   /**
    * Initializes a new instance of the {@code EntityAnimationController} class.
    *
-   * @param entity
-   *          The entity related to this animation controller.
-   * @param sprite
-   *          The sprite sheet used by the default animation of this controller.
+   * @param entity The entity related to this animation controller.
+   * @param sprite The sprite sheet used by the default animation of this controller.
    */
   public EntityAnimationController(final T entity, final Spritesheet sprite) {
     this(entity, sprite, true);
@@ -70,17 +64,14 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
   /**
    * Initializes a new instance of the {@code EntityAnimationController} class.
    *
-   * @param entity
-   *          The entity related to this animation controller.
-   * @param sprite
-   *          The sprite sheet used by the default animation of this controller.
-   * @param loop
-   *          A flag indicating whether the default animation should be looped or only played once.
+   * @param entity The entity related to this animation controller.
+   * @param sprite The sprite sheet used by the default animation of this controller.
+   * @param loop   A flag indicating whether the default animation should be looped or only played once.
    */
   public EntityAnimationController(final T entity, final Spritesheet sprite, boolean loop) {
     this(
-        entity,
-        new Animation(sprite, loop, Resources.spritesheets().getCustomKeyFrameDurations(sprite)));
+      entity,
+      new Animation(sprite, loop, Resources.spritesheets().getCustomKeyFrameDurations(sprite)));
   }
 
   public static String[] getDefaultSpritePrefixes(Class<?> cls) {
@@ -94,7 +85,7 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
 
   @Override
   public synchronized void addRule(
-      Predicate<? super T> rule, Function<? super T, String> animationName, int priority) {
+    Predicate<? super T> rule, Function<? super T, String> animationName, int priority) {
     // binary search the list for the appropriate index
     int min = 0;
     int max = this.animationRules.size();
@@ -129,8 +120,8 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
     }
 
     if (this.getCurrent() != null
-        && !this.getCurrent().isLooping()
-        && this.getCurrent().isPlaying()) {
+      && !this.getCurrent().isLooping()
+      && this.getCurrent().isPlaying()) {
       return;
     }
 
@@ -142,9 +133,9 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
       if (animationRule.getCondition().test(this.getEntity())) {
         final String animationName = animationRule.getAnimationName().apply(this.getEntity());
         if (this.getCurrent() == null
-            || animationName != null
-                && !animationName.isEmpty()
-                && !this.getCurrent().getName().equalsIgnoreCase(animationName)) {
+          || animationName != null
+          && !animationName.isEmpty()
+          && !this.getCurrent().getName().equalsIgnoreCase(animationName)) {
           this.play(animationName);
         }
 
@@ -153,10 +144,26 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
     }
   }
 
+  /**
+   * Retrieves the sprite prefix associated with this animation controller.
+   *
+   * <p>The sprite prefix is used to determine the default sprite for the entity
+   * managed by this animation controller.
+   *
+   * @return the sprite prefix as a {@code String}
+   */
   protected String getSpritePrefix() {
     return this.spritePrefix;
   }
 
+  /**
+   * Sets the sprite prefix for this animation controller.
+   *
+   * <p>The sprite prefix is used to determine the default sprite for the entity
+   * managed by this animation controller.
+   *
+   * @param prefix the new sprite prefix to set
+   */
   protected void setSpritePrefix(String prefix) {
     this.spritePrefix = prefix;
   }
@@ -190,7 +197,7 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
     private int priority;
 
     public AnimationRule(
-        Predicate<? super T> condition, Function<? super T, String> animationName, int priority) {
+      Predicate<? super T> condition, Function<? super T, String> animationName, int priority) {
       this.condition = condition;
       this.animationName = animationName;
       this.priority = priority;

@@ -1,12 +1,17 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
+import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
+import de.gurkenlabs.litiengine.util.ColorHelper;
 import java.awt.Color;
 import java.net.URL;
 import java.util.Objects;
 
-import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
-import de.gurkenlabs.litiengine.util.ColorHelper;
-
+/**
+ * The {@code CustomProperty} class is an implementation of the {@link ICustomProperty} interface.
+ *
+ * <p>This class provides functionality for managing custom properties with various data types,
+ * including methods for setting and retrieving property values, handling property types, and supporting XML serialization and deserialization.
+ */
 public class CustomProperty implements ICustomProperty {
 
   private String type;
@@ -170,7 +175,7 @@ public class CustomProperty implements ICustomProperty {
   public <T extends Enum<T>> T getAsEnum(Class<T> enumType) {
     try {
       return Enum.valueOf(enumType, this.value);
-    } catch (IllegalArgumentException e) {
+    } catch (IllegalArgumentException _) {
       // try to ignore case to retrieve the enum value as a fallback
       for (T enumValue : enumType.getEnumConstants()) {
         if (enumValue.name().compareToIgnoreCase(this.value) == 0) {
@@ -207,10 +212,9 @@ public class CustomProperty implements ICustomProperty {
     if (this == anObject) {
       return true;
     }
-    if (!(anObject instanceof ICustomProperty)) {
+    if (!(anObject instanceof ICustomProperty other)) {
       return false;
     }
-    ICustomProperty other = (ICustomProperty) anObject;
     return this.getType().equals(other.getType()) && this.getAsString().equals(other.getAsString());
   }
 

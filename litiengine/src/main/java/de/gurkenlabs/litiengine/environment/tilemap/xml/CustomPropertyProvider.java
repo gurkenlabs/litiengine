@@ -1,28 +1,39 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
-import java.awt.Color;
-import java.net.URL;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
-
+import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.awt.Color;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
-import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
-import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
+/**
+ * The {@code CustomPropertyProvider} class provides an implementation of the {@link ICustomPropertyProvider} interface.
+ *
+ * <p>This class manages custom properties using a map, allowing for the storage,
+ * retrieval, and manipulation of various property types. It supports operations such as setting, getting, and removing properties, as well as
+ * handling default values and type conversions.
+ */
+@XmlAccessorType(XmlAccessType.FIELD) public class CustomPropertyProvider implements ICustomPropertyProvider {
+  @XmlElement @XmlJavaTypeAdapter(CustomPropertyAdapter.class) private Map<String, ICustomProperty> properties;
 
-
-@XmlAccessorType(XmlAccessType.FIELD)
-public class CustomPropertyProvider implements ICustomPropertyProvider {
-  @XmlElement
-  @XmlJavaTypeAdapter(CustomPropertyAdapter.class)
-  private Map<String, ICustomProperty> properties;
-
+  /**
+   * Default constructor for the {@code CustomPropertyProvider} class.
+   *
+   * <p>Initializes the properties map as a {@link Hashtable} to ensure
+   * that null keys and null values are not allowed.
+   */
   public CustomPropertyProvider() {
     this.properties = new Hashtable<>(); // use Hashtable because it rejects null keys and null values
   }
@@ -37,30 +48,25 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
       .collect(Collectors.toMap(Entry::getKey, e -> new CustomProperty((e.getValue()))));
   }
 
-  @Override
-  public Map<String, ICustomProperty> getProperties() {
+  @Override public Map<String, ICustomProperty> getProperties() {
     return this.properties;
   }
 
-  @Override
-  public boolean hasCustomProperty(String propertyName) {
+  @Override public boolean hasCustomProperty(String propertyName) {
     return this.getProperties().containsKey(propertyName);
   }
 
-  @Override
-  public ICustomProperty getProperty(String propertyName) {
+  @Override public ICustomProperty getProperty(String propertyName) {
     return this.getProperties().get(propertyName);
   }
 
-  @Override
-  public void setValue(String propertyName, ICustomProperty value) {
+  @Override public void setValue(String propertyName, ICustomProperty value) {
     if (value != null) {
       this.getProperties().put(propertyName, value);
     }
   }
 
-  @Override
-  public String getStringValue(String propertyName) {
+  @Override public String getStringValue(String propertyName) {
     ICustomProperty property = this.getProperty(propertyName);
     if (property == null) {
       throw new NoSuchElementException(propertyName);
@@ -68,8 +74,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
     return property.getAsString();
   }
 
-  @Override
-  public String getStringValue(String propertyName, String defaultValue) {
+  @Override public String getStringValue(String propertyName, String defaultValue) {
     ICustomProperty property = this.getProperty(propertyName);
     if (property == null) {
       return defaultValue;
@@ -78,8 +83,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
   }
 
 
-  @Override
-  public char getCharValue(String propertyName) {
+  @Override public char getCharValue(String propertyName) {
     ICustomProperty property = this.getProperty(propertyName);
     if (property == null) {
       throw new NoSuchElementException(propertyName);
@@ -87,8 +91,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
     return property.getAsChar();
   }
 
-  @Override
-  public char getCharValue(String propertyName, char defaultValue) {
+  @Override public char getCharValue(String propertyName, char defaultValue) {
     ICustomProperty property = this.getProperty(propertyName);
     if (property == null) {
       return defaultValue;
@@ -96,8 +99,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
     return property.getAsChar();
   }
 
-  @Override
-  public int getIntValue(String propertyName) {
+  @Override public int getIntValue(String propertyName) {
     ICustomProperty property = this.getProperty(propertyName);
     if (property == null) {
       throw new NoSuchElementException(propertyName);
@@ -105,8 +107,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
     return property.getAsInt();
   }
 
-  @Override
-  public int getIntValue(String propertyName, int defaultValue) {
+  @Override public int getIntValue(String propertyName, int defaultValue) {
     ICustomProperty property = this.getProperty(propertyName);
     if (property == null) {
       return defaultValue;
@@ -114,8 +115,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
     return property.getAsInt();
   }
 
-  @Override
-  public long getLongValue(String propertyName) {
+  @Override public long getLongValue(String propertyName) {
     ICustomProperty property = this.getProperty(propertyName);
     if (property == null) {
       throw new NoSuchElementException(propertyName);
@@ -123,8 +123,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
     return property.getAsLong();
   }
 
-  @Override
-  public long getLongValue(String propertyName, long defaultValue) {
+  @Override public long getLongValue(String propertyName, long defaultValue) {
     ICustomProperty property = this.getProperty(propertyName);
     if (property == null) {
       return defaultValue;
@@ -132,8 +131,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
     return property.getAsLong();
   }
 
-  @Override
-  public short getShortValue(String propertyName) {
+  @Override public short getShortValue(String propertyName) {
     ICustomProperty property = this.getProperty(propertyName);
     if (property == null) {
       throw new NoSuchElementException(propertyName);
@@ -141,8 +139,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
     return property.getAsShort();
   }
 
-  @Override
-  public short getShortValue(String propertyName, short defaultValue) {
+  @Override public short getShortValue(String propertyName, short defaultValue) {
     ICustomProperty property = this.getProperty(propertyName);
     if (property == null) {
       return defaultValue;
@@ -150,8 +147,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
     return property.getAsShort();
   }
 
-  @Override
-  public byte getByteValue(String propertyName) {
+  @Override public byte getByteValue(String propertyName) {
     ICustomProperty property = this.getProperty(propertyName);
     if (property == null) {
       throw new NoSuchElementException(propertyName);
@@ -159,8 +155,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
     return property.getAsByte();
   }
 
-  @Override
-  public byte getByteValue(String propertyName, byte defaultValue) {
+  @Override public byte getByteValue(String propertyName, byte defaultValue) {
     ICustomProperty property = this.getProperty(propertyName);
     if (property == null) {
       return defaultValue;
@@ -168,8 +163,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
     return property.getAsByte();
   }
 
-  @Override
-  public boolean getBoolValue(String propertyName) {
+  @Override public boolean getBoolValue(String propertyName) {
     ICustomProperty property = this.getProperty(propertyName);
     if (property == null) {
       throw new NoSuchElementException(propertyName);
@@ -177,8 +171,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
     return property.getAsBool();
   }
 
-  @Override
-  public boolean getBoolValue(String propertyName, boolean defaultValue) {
+  @Override public boolean getBoolValue(String propertyName, boolean defaultValue) {
     ICustomProperty property = this.getProperty(propertyName);
     if (property == null) {
       return defaultValue;
@@ -186,8 +179,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
     return property.getAsBool();
   }
 
-  @Override
-  public float getFloatValue(String propertyName) {
+  @Override public float getFloatValue(String propertyName) {
     ICustomProperty property = this.getProperty(propertyName);
     if (property == null) {
       throw new NoSuchElementException(propertyName);
@@ -195,8 +187,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
     return property.getAsFloat();
   }
 
-  @Override
-  public float getFloatValue(String propertyName, float defaultValue) {
+  @Override public float getFloatValue(String propertyName, float defaultValue) {
     ICustomProperty property = this.getProperty(propertyName);
     if (property == null) {
       return defaultValue;
@@ -204,8 +195,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
     return property.getAsFloat();
   }
 
-  @Override
-  public double getDoubleValue(String propertyName) {
+  @Override public double getDoubleValue(String propertyName) {
     ICustomProperty property = this.getProperty(propertyName);
     if (property == null) {
       throw new NoSuchElementException(propertyName);
@@ -214,8 +204,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
     return property.getAsDouble();
   }
 
-  @Override
-  public double getDoubleValue(String propertyName, double defaultValue) {
+  @Override public double getDoubleValue(String propertyName, double defaultValue) {
     ICustomProperty property = this.getProperty(propertyName);
     if (property == null) {
       return defaultValue;
@@ -224,8 +213,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
     return property.getAsDouble();
   }
 
-  @Override
-  public Color getColorValue(String propertyName) {
+  @Override public Color getColorValue(String propertyName) {
     ICustomProperty property = this.getProperty(propertyName);
     if (property == null) {
       throw new NoSuchElementException(propertyName);
@@ -234,8 +222,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
     return property.getAsColor();
   }
 
-  @Override
-  public Color getColorValue(String propertyName, Color defaultValue) {
+  @Override public Color getColorValue(String propertyName, Color defaultValue) {
     ICustomProperty property = this.getProperty(propertyName);
     if (property == null) {
       return defaultValue;
@@ -249,8 +236,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
     return value;
   }
 
-  @Override
-  public <T extends Enum<T>> T getEnumValue(String propertyName, Class<T> enumType) {
+  @Override public <T extends Enum<T>> T getEnumValue(String propertyName, Class<T> enumType) {
     ICustomProperty property = this.getProperty(propertyName);
     if (property == null) {
       throw new NoSuchElementException(propertyName);
@@ -259,8 +245,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
     return property.getAsEnum(enumType);
   }
 
-  @Override
-  public <T extends Enum<T>> T getEnumValue(String propertyName, Class<T> enumType, T defaultValue) {
+  @Override public <T extends Enum<T>> T getEnumValue(String propertyName, Class<T> enumType, T defaultValue) {
     ICustomProperty property = this.getProperty(propertyName);
     if (property == null) {
       return defaultValue;
@@ -274,8 +259,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
     return value;
   }
 
-  @Override
-  public URL getFileValue(String propertyName) {
+  @Override public URL getFileValue(String propertyName) {
     ICustomProperty property = this.getProperty(propertyName);
     if (property == null) {
       throw new NoSuchElementException(propertyName);
@@ -284,8 +268,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
     return property.getAsFile();
   }
 
-  @Override
-  public URL getFileValue(String propertyName, URL defaultValue) {
+  @Override public URL getFileValue(String propertyName, URL defaultValue) {
     ICustomProperty property = this.getProperty(propertyName);
     if (property == null) {
       return defaultValue;
@@ -299,8 +282,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
     return value;
   }
 
-  @Override
-  public int getMapObjectId(String propertyName) {
+  @Override public int getMapObjectId(String propertyName) {
     ICustomProperty property = this.getProperty(propertyName);
     if (property == null) {
       throw new NoSuchElementException(propertyName);
@@ -313,15 +295,13 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
     return this.getProperties().computeIfAbsent(propertyName, n -> new CustomProperty());
   }
 
-  @Override
-  public void setValue(String propertyName, URL value) {
+  @Override public void setValue(String propertyName, URL value) {
     ICustomProperty property = createPropertyIfAbsent(propertyName);
     property.setType(CustomPropertyType.FILE);
     property.setValue(value);
   }
 
-  @Override
-  public void setValue(String propertyName, String value) {
+  @Override public void setValue(String propertyName, String value) {
     if (value != null) {
       ICustomProperty property = createPropertyIfAbsent(propertyName);
       property.setType(CustomPropertyType.STRING);
@@ -331,94 +311,80 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
     }
   }
 
-  @Override
-  public void setValue(String propertyName, boolean value) {
+  @Override public void setValue(String propertyName, boolean value) {
     ICustomProperty property = createPropertyIfAbsent(propertyName);
     property.setType(CustomPropertyType.BOOL);
     property.setValue(value);
   }
 
-  @Override
-  public void setValue(String propertyName, byte value) {
+  @Override public void setValue(String propertyName, byte value) {
     ICustomProperty property = createPropertyIfAbsent(propertyName);
     property.setType(CustomPropertyType.INT);
     property.setValue(value);
   }
 
-  @Override
-  public void setValue(String propertyName, short value) {
+  @Override public void setValue(String propertyName, short value) {
     setValue(propertyName, (int) value);
   }
 
-  @Override
-  public void setValue(String propertyName, char value) {
+  @Override public void setValue(String propertyName, char value) {
     setValue(propertyName, String.valueOf(value));
   }
 
-  @Override
-  public void setValue(String propertyName, int value) {
+  @Override public void setValue(String propertyName, int value) {
     ICustomProperty property = createPropertyIfAbsent(propertyName);
     property.setType(CustomPropertyType.INT);
     property.setValue(value);
   }
 
-  @Override
-  public void setValue(String propertyName, long value) {
+  @Override public void setValue(String propertyName, long value) {
     ICustomProperty property = createPropertyIfAbsent(propertyName);
     property.setType(CustomPropertyType.INT);
     property.setValue(value);
   }
 
-  @Override
-  public void setValue(String propertyName, float value) {
+  @Override public void setValue(String propertyName, float value) {
     ICustomProperty property = createPropertyIfAbsent(propertyName);
     property.setType(CustomPropertyType.FLOAT);
     property.setValue(value);
   }
 
-  @Override
-  public void setValue(String propertyName, double value) {
+  @Override public void setValue(String propertyName, double value) {
     ICustomProperty property = createPropertyIfAbsent(propertyName);
     property.setType(CustomPropertyType.FLOAT);
     property.setValue(value);
   }
 
-  @Override
-  public void setValue(String propertyName, Color value) {
+  @Override public void setValue(String propertyName, Color value) {
     ICustomProperty property = createPropertyIfAbsent(propertyName);
     property.setType(CustomPropertyType.COLOR);
     property.setValue(value);
   }
 
-  @Override
-  public void setValue(String propertyName, Enum<?> value) {
+  @Override public void setValue(String propertyName, Enum<?> value) {
     ICustomProperty property = createPropertyIfAbsent(propertyName);
     property.setType(CustomPropertyType.STRING);
     property.setValue(value);
   }
 
-  @Override
-  public void setValue(String propertyName, IMapObject value) {
+  @Override public void setValue(String propertyName, IMapObject value) {
     ICustomProperty property = createPropertyIfAbsent(propertyName);
     property.setType(CustomPropertyType.OBJECT);
     property.setValue(value.getId());
   }
 
-  @Override
-  public void setProperties(Map<String, ICustomProperty> props) {
+  @Override public void setProperties(Map<String, ICustomProperty> props) {
     this.getProperties().clear();
     if (props != null) {
       this.getProperties().putAll(props);
     }
   }
 
-  @Override
-  public void removeProperty(String propertyName) {
+  @Override public void removeProperty(String propertyName) {
     this.getProperties().remove(propertyName);
   }
 
-  @SuppressWarnings("unused")
-  private void afterUnmarshal(Unmarshaller u, Object parent) {
+  @SuppressWarnings("unused") private void afterUnmarshal(Unmarshaller u, Object parent) {
     if (this.properties == null) {
       this.properties = new Hashtable<>();
     }
@@ -428,8 +394,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
     // blank base case
   }
 
-  @Override
-  public List<String> getCommaSeparatedStringValues(String propertyName, String defaultValue) {
+  @Override public List<String> getCommaSeparatedStringValues(String propertyName, String defaultValue) {
     List<String> values = new ArrayList<>();
     String valuesStr = this.getStringValue(propertyName, defaultValue);
     if (valuesStr != null && !valuesStr.isEmpty()) {
