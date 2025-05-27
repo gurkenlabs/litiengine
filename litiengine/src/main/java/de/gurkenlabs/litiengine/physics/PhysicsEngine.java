@@ -5,17 +5,12 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
-import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import java.awt.Shape;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
@@ -742,10 +737,9 @@ public final class PhysicsEngine implements IUpdateable {
       if (GeometricUtilities.intersects(otherEntity.getCollisionBox(), rect)) {
         Rectangle2D intersection = otherEntity.getCollisionBox().createIntersection(rect);
         if (result != null) {
-          result =
-            new Intersection(
-              intersection.createUnion(result),
-              ArrayUtilities.append(result.involvedEntities, otherEntity));
+          ICollisionEntity[] appended = Arrays.copyOf(result.involvedEntities, result.involvedEntities.length + 1);
+          appended[appended.length - 1] = otherEntity;
+          result = new Intersection(intersection.createUnion(result), appended);
         } else {
           result = new Intersection(intersection, otherEntity);
         }
@@ -895,8 +889,9 @@ public final class PhysicsEngine implements IUpdateable {
         involvedEntities = inter.involvedEntities;
         continue;
       }
-
-      involvedEntities = ArrayUtilities.distinct(involvedEntities, inter.involvedEntities);
+      Set<ICollisionEntity> distinctInvolved = new HashSet<>(Arrays.asList(involvedEntities));
+      distinctInvolved.addAll(Arrays.asList(inter.involvedEntities));
+      involvedEntities = distinctInvolved.toArray(new ICollisionEntity[0]);
     }
 
     // 1. fire collision event on the collider with all the involved entities
