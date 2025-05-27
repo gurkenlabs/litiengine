@@ -13,11 +13,19 @@ import java.util.List;
  * @param <T> the type of the attribute value, which must be a Number
  */
 public class Attribute<T extends Number> implements IAttribute<T>, Serializable {
-  private static final String VALUE_PROPERTY = "value";
+  /**
+   * The support object used to manage and notify property change listeners. It allows other components to listen for changes to the properties of
+   * this object.
+   */
   protected final PropertyChangeSupport support;
+  /**
+   * The base value of the attribute. This value represents the unmodified state of the attribute before any modifiers are applied.
+   */
+  protected T value;
+  private static final String VALUE_PROPERTY = "value";
   private final transient PropertyChangeListener modifierListener;
   private final List<AttributeModifier<T>> modifiers = new ArrayList<>();
-  protected T value;
+
 
   /**
    * Default no-argument constructor.

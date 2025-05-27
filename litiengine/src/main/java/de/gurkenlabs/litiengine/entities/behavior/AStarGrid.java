@@ -20,8 +20,15 @@ import java.util.List;
  * managing and rendering a grid of A* nodes. It supports diagonal movement and allows updating the walkable state of nodes based on collisions.</p>
  */
 public class AStarGrid implements IRenderable {
+  /**
+   * The penalty value assigned to nodes that intersect with static, indestructible props.
+   */
   public static final double PENALTY_STATIC_PROP = 5;
+  /**
+   * The penalty value assigned to nodes that have non-walkable neighboring nodes.
+   */
   public static final double PENALTY_NOT_WALKABLE_NEIGHBOR = 4;
+
   private final AStarNode[][] grid;
   private final int nodeSize;
   private final Dimension size;

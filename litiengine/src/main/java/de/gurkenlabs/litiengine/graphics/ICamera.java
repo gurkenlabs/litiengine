@@ -222,10 +222,26 @@ public interface ICamera extends IUpdateable {
    */
   void setClampToMap(final boolean clampToMap);
 
+  /**
+   * Sets the alignment for clamping the camera to the map boundaries.
+   *
+   * @param align  The horizontal alignment (e.g., left, center, or right).
+   * @param valign The vertical alignment (e.g., top, middle, or bottom).
+   */
   void setClampAlign(Align align, Valign valign);
 
+  /**
+   * Gets the current horizontal alignment used for clamping the camera to the map boundaries.
+   *
+   * @return The horizontal alignment.
+   */
   Align getClampAlign();
 
+  /**
+   * Gets the current vertical alignment used for clamping the camera to the map boundaries.
+   *
+   * @return The vertical alignment.
+   */
   Valign getClampValign();
 
   /**

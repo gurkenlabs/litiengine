@@ -32,6 +32,7 @@ public abstract class AttributeEffect<T extends Number> extends Effect {
    * @param targetingStrategy the strategy to determine the targets of the effect
    * @param modification      the type of modification to apply to the attribute
    * @param delta             the value to modify the attribute by
+   * @param duration          the duration of the effect in milliseconds
    */
   protected AttributeEffect(final TargetingStrategy targetingStrategy, final Modification modification, final double delta,
     final int duration) {
@@ -58,6 +59,7 @@ public abstract class AttributeEffect<T extends Number> extends Effect {
    * @param executingEntity   the entity executing the effect
    * @param modification      the type of modification to apply to the attribute
    * @param delta             the value to modify the attribute by
+   * @param duration          the duration of the effect in milliseconds
    */
   protected AttributeEffect(final TargetingStrategy targetingStrategy, final ICombatEntity executingEntity, final Modification modification,
     final double delta, final int duration) {

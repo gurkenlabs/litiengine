@@ -22,6 +22,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Represents the data structure for a particle emitter.
+ * <p>
+ * This class is used to serialize and configure emitter properties such as color, particle movement, rendering options, and particle life cycle. It
+ * supports XML binding for persistent configurations.
+ * </p>
+ */
 @XmlRootElement(name = "emitter")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class EmitterData implements Serializable, Resource {

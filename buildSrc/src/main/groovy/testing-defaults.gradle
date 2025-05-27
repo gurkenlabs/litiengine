@@ -13,3 +13,20 @@ jacocoTestReport {
     xml.required = true
   }
 }
+
+configurations {
+  mockitoAgent
+}
+
+dependencies {
+  testImplementation(libs.mockito.core)
+  mockitoAgent(libs.mockito.core) {
+    transitive = false
+  }
+}
+
+tasks {
+  test {
+    jvmArgs += "-javaagent:${configurations.mockitoAgent.asPath}"
+  }
+}

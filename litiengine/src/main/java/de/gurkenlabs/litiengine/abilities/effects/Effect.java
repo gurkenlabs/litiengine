@@ -78,6 +78,11 @@ public abstract class Effect implements IUpdateable {
     this.appliedListeners.add(listener);
   }
 
+  /**
+   * Removes a listener that was previously registered to be notified when the effect is applied.
+   *
+   * @param listener The listener to remove.
+   */
   public void removeEffectAppliedListener(final EffectAppliedListener listener) {
     this.appliedListeners.remove(listener);
   }
@@ -91,6 +96,11 @@ public abstract class Effect implements IUpdateable {
     this.ceasedListeners.add(listener);
   }
 
+  /**
+   * Removes a listener that was previously registered to be notified when the effect ceases.
+   *
+   * @param listener The listener to remove.
+   */
   public void removeEffectCeasedListener(final EffectCeasedListener listener) {
     this.ceasedListeners.remove(listener);
   }

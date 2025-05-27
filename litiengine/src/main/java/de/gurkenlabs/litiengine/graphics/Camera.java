@@ -6,19 +6,20 @@ import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 import de.gurkenlabs.litiengine.util.MathUtilities;
-
 import java.awt.Dimension;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * Represents the camera used for rendering the game world. The camera handles focus, zoom, shake effects, and viewport calculations.
+ */
 public class Camera implements ICamera {
   private final Collection<ZoomChangedListener> zoomListeners = ConcurrentHashMap.newKeySet();
   private final Collection<FocusChangedListener> focusChangedListeners =
-      ConcurrentHashMap.newKeySet();
+    ConcurrentHashMap.newKeySet();
 
   private Point2D focus;
   private long lastShake;
@@ -32,7 +33,7 @@ public class Camera implements ICamera {
   private double shakeOffsetY;
 
   private long shakeTick;
-  private Rectangle2D viewport;
+  private final Rectangle2D viewport;
 
   private float zoom;
   private float targetZoom;
@@ -92,7 +93,7 @@ public class Camera implements ICamera {
     final IAnimationController animationController = entity.animations();
     if (animationController == null || animationController.getCurrent() == null) {
       return new Point2D.Double(viewPortLocation.getX() + entity.getWidth() * 0.5,
-          viewPortLocation.getY() + entity.getHeight() * 0.5);
+        viewPortLocation.getY() + entity.getHeight() * 0.5);
     }
 
     final Spritesheet spriteSheet = animationController.getCurrent().getSpritesheet();
@@ -101,7 +102,7 @@ public class Camera implements ICamera {
     }
 
     return new Point2D.Double(viewPortLocation.getX() + spriteSheet.getSpriteWidth() * 0.5,
-        viewPortLocation.getY() + spriteSheet.getSpriteHeight() * 0.5);
+      viewPortLocation.getY() + spriteSheet.getSpriteHeight() * 0.5);
   }
 
   @Override
@@ -227,9 +228,9 @@ public class Camera implements ICamera {
       } else {
         double diff = this.panTime / (this.panTime + 1.0);
         this.focus =
-            new Point2D.Double(
-                this.focus.getX() * diff + this.targetFocus.getX() * (1.0 - diff),
-                this.focus.getY() * diff + this.targetFocus.getY() * (1.0 - diff));
+          new Point2D.Double(
+            this.focus.getX() * diff + this.targetFocus.getX() * (1.0 - diff),
+            this.focus.getY() * diff + this.targetFocus.getY() * (1.0 - diff));
       }
     }
 
@@ -240,8 +241,8 @@ public class Camera implements ICamera {
     }
 
     if (Game.time().since(this.lastShake) > this.shakeDelay) {
-      this.shakeOffsetX = this.getShakeIntensity() * ThreadLocalRandom.current().nextGaussian();
-      this.shakeOffsetY = this.getShakeIntensity() * ThreadLocalRandom.current().nextGaussian();
+      this.shakeOffsetX = this.getShakeIntensity() * Game.random().nextGaussian();
+      this.shakeOffsetY = this.getShakeIntensity() * Game.random().nextGaussian();
       this.lastShake = Game.time().now();
     }
   }
@@ -292,12 +293,22 @@ public class Camera implements ICamera {
     this.pan(new Point2D.Double(x, y), duration);
   }
 
-  // TODO: write a unit test for this
+  /**
+   * Clamps a given focus point to ensure it remains within the visible bounds of the current map.
+   * <p>
+   * This method ensures that the camera's focus point does not move outside the boundaries of the map. It centers the camera around the focus point,
+   * but only to the extent that the map dimensions allow. If the viewport is larger than the map in either dimension, the Camera's Align and VAlign
+   * is applied to determine how to handle the excess space.
+   * </p>
+   *
+   * @param focus the desired focus point in map coordinates.
+   * @return a new {@link Point2D} representing the clamped focus point, adjusted to remain within the bounds of the map view.
+   */
   protected Point2D clampToMap(Point2D focus) {
 
     if (Game.world().environment() == null
-        || Game.world().environment().getMap() == null
-        || !this.isClampToMap()) {
+      || Game.world().environment().getMap() == null
+      || !this.isClampToMap()) {
       return new Point2D.Double(focus.getX(), focus.getY());
     }
 
@@ -311,25 +322,44 @@ public class Camera implements ICamera {
     // implementation note: inside the "true" sections, min and max are effectively swapped and
     // become max and min for alignment
     double x =
-        maxX < minX
-            ? maxX + this.align.getValue(minX - maxX - mapSize.getWidth())
-            : Math.clamp(focus.getX(), minX, maxX);
+      maxX < minX
+        ? maxX + this.align.getValue(minX - maxX - mapSize.getWidth())
+        : Math.clamp(focus.getX(), minX, maxX);
     double y =
-        maxY < minY
-            ? maxY + this.valign.getValue(minY - maxY - mapSize.getHeight())
-            : Math.clamp(focus.getY(), minY, maxY);
+      maxY < minY
+        ? maxY + this.valign.getValue(minY - maxY - mapSize.getHeight())
+        : Math.clamp(focus.getY(), minY, maxY);
 
     return new Point2D.Double(x, y);
   }
 
+  /**
+   * Gets the remaining pan time for the camera.
+   *
+   * @return The remaining time (in ticks) for the camera to complete its pan operation.
+   */
   protected int panTime() {
     return this.panTime;
   }
 
+  /**
+   * Calculates the width of the camera's viewport in world units.
+   * <p>
+   * The viewport width is determined by dividing the game window's resolution width by the current render scale.
+   *
+   * @return The width of the viewport in world units.
+   */
   protected double getViewportWidth() {
     return Game.window().getResolution().getWidth() / this.getRenderScale();
   }
 
+  /**
+   * Calculates the height of the camera's viewport in world units.
+   * <p>
+   * The viewport height is determined by dividing the game window's resolution height by the current render scale.
+   *
+   * @return The height of the viewport in world units.
+   */
   protected double getViewportHeight() {
     return Game.window().getResolution().getHeight() / this.getRenderScale();
   }
@@ -337,14 +367,13 @@ public class Camera implements ICamera {
   /**
    * Apply shake effect.
    *
-   * @param cameraLocation
-   *          the camera location
+   * @param cameraLocation the camera location
    * @return the point2 d
    */
   private Point2D applyShakeEffect(final Point2D cameraLocation) {
     if (this.isShakeEffectActive()) {
       return new Point2D.Double(
-          cameraLocation.getX() + this.shakeOffsetX, cameraLocation.getY() + this.shakeOffsetY);
+        cameraLocation.getX() + this.shakeOffsetX, cameraLocation.getY() + this.shakeOffsetY);
     }
 
     return cameraLocation;
@@ -377,16 +406,33 @@ public class Camera implements ICamera {
     return this.shakeTick;
   }
 
+  /**
+   * Calculates the horizontal center of the viewport in world units.
+   *
+   * @return The X-coordinate of the viewport's center.
+   */
   private double getViewPortCenterX() {
     return this.getViewportWidth() * 0.5;
   }
 
+  /**
+   * Calculates the vertical center of the viewport in world units.
+   *
+   * @return The Y-coordinate of the viewport's center.
+   */
   private double getViewPortCenterY() {
     return this.getViewportHeight() * 0.5;
   }
 
+  /**
+   * Checks if the camera's shake effect is currently active.
+   * <p>
+   * The shake effect is considered active if the shake tick is non-zero and the time since the shake tick is less than the shake duration.
+   *
+   * @return {@code true} if the shake effect is active; {@code false} otherwise.
+   */
   private boolean isShakeEffectActive() {
     return this.getShakeTick() != 0
-        && Game.time().since(this.getShakeTick()) < this.getShakeDuration();
+      && Game.time().since(this.getShakeTick()) < this.getShakeDuration();
   }
 }
