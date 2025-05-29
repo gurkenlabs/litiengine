@@ -53,9 +53,9 @@ public class Program {
           // load up previously opened project file or the one that is specified in
           // the command line arguments
           handleArgs(args);
-          String gameFile = Editor.preferences().getLastGameFile();
-          if (!Editor.instance().fileLoaded() && gameFile != null && !gameFile.isEmpty()) {
-            Editor.instance().load(Path.of(gameFile.trim()), false);
+          Path gameFile = Editor.preferences().getLastGameFile();
+          if (!Editor.instance().fileLoaded() && gameFile != null) {
+            Editor.instance().load(gameFile.toFile(), false);
           }
         },
         args);

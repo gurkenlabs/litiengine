@@ -3,6 +3,7 @@ package de.gurkenlabs.utiliti.swing.dialogs;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.utiliti.components.Editor;
 import java.io.File;
+import java.nio.file.Path;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -11,8 +12,8 @@ public final class EditorFileChooser extends JFileChooser {
   private static EditorFileChooser instance;
 
   private EditorFileChooser() {
-    String source = Editor.instance().getProjectPath();
-    this.setCurrentDirectory(source != null ? new File(source) : new File("."));
+    Path source = Editor.instance().getProjectPath();
+    this.setCurrentDirectory(source == null ? new File(".") : source.toFile());
     this.setDialogType(JFileChooser.OPEN_DIALOG);
   }
 
