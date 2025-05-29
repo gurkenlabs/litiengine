@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -281,7 +280,7 @@ public final class Spritesheets {
         writer.write("\n");
 
         if (!metadataOnly) {
-          Path spriteInfoPath = Paths.get(spriteInfoFile);
+          Path spriteInfoPath = Path.of(spriteInfoFile);
           ImageSerializer.saveImage(
             spriteInfoPath.resolveSibling(spritesheet.getName() + spritesheet.getImageFormat().toFileExtension()).toString(),
             spritesheet.getImage(),

@@ -5,7 +5,6 @@ import de.gurkenlabs.litiengine.gui.screens.Screen;
 import de.gurkenlabs.litiengine.resources.ImageFormat;
 import de.gurkenlabs.litiengine.util.TimeUtilities;
 import de.gurkenlabs.litiengine.util.io.ImageSerializer;
-
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -19,7 +18,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -294,7 +292,7 @@ public class RenderComponent extends Canvas {
   private void saveScreenshot(BufferedImage img) {
     try {
       String timeStamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
-      Path folder = Paths.get("./screenshots/");
+      Path folder = Path.of("./screenshots/");
       if (!Files.exists(folder)) {
         Files.createDirectories(folder);
       }

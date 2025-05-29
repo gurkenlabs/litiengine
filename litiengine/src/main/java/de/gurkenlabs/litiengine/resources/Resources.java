@@ -17,7 +17,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -330,7 +330,7 @@ public final class Resources {
       return new URL(name);
     } catch (MalformedURLException e) {
       try {
-        return (Paths.get(name).toUri().toURL());
+        return (Path.of(name).toUri().toURL());
       } catch (MalformedURLException e1) {
         return null;
       }

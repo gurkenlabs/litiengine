@@ -6,14 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gurkenlabs.litiengine.test.GameTestSuite;
-
 import java.awt.AWTError;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,7 +23,7 @@ public class GameTest {
 
   @AfterEach
   public void cleanup() throws IOException {
-    final Path configFile = Paths.get(Game.config().getFileName());
+    final Path configFile = Path.of(Game.config().getFileName());
 
     Files.deleteIfExists(configFile);
 
@@ -45,17 +41,17 @@ public class GameTest {
     final Status started = new Status();
 
     Game.addGameListener(
-        new GameListener() {
-          @Override
-          public void initialized(String... args) {
-            initialized.wasCalled = true;
-          }
+      new GameListener() {
+        @Override
+        public void initialized(String... args) {
+          initialized.wasCalled = true;
+        }
 
-          @Override
-          public void started() {
-            started.wasCalled = true;
-          }
-        });
+        @Override
+        public void started() {
+          started.wasCalled = true;
+        }
+      });
 
     assertFalse(initialized.wasCalled);
 
@@ -85,9 +81,11 @@ public class GameTest {
   @Test
   void testSwingThreadAssertionsInsideSwing() {
     assertThrows(AWTError.class, () -> Game.init(
-        () -> {},
-        () -> {},
-        Game.COMMANDLINE_ARG_NOGUI));
+      () -> {
+      },
+      () -> {
+      },
+      Game.COMMANDLINE_ARG_NOGUI));
   }
 
 }

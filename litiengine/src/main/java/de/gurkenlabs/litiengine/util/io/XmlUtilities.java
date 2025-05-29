@@ -1,19 +1,21 @@
 package de.gurkenlabs.litiengine.util.io;
 
-import java.io.*;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.XMLConstants;
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Marshaller;
-import jakarta.xml.bind.Unmarshaller;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -37,18 +39,15 @@ public final class XmlUtilities {
   }
 
   /**
-   * Saves the XML, contained by the specified input with the custom indentation. If the input is the result of jaxb
-   * marshalling, make sure to set Marshaller.JAXB_FORMATTED_OUTPUT to false in order for this method to work properly.
+   * Saves the XML, contained by the specified input with the custom indentation. If the input is the result of jaxb marshalling, make sure to set
+   * Marshaller.JAXB_FORMATTED_OUTPUT to false in order for this method to work properly.
    *
-   * @param input
-   *          The input stream that contains the original XML.
-   * @param fos
-   *          The output stream that is used to save the XML.
-   * @param indentation
-   *          The indentation with which the XML should be saved.
+   * @param input       The input stream that contains the original XML.
+   * @param fos         The output stream that is used to save the XML.
+   * @param indentation The indentation with which the XML should be saved.
    */
   public static void saveWithCustomIndentation(
-      ByteArrayInputStream input, OutputStream fos, int indentation) {
+    ByteArrayInputStream input, OutputStream fos, int indentation) {
     try {
       TransformerFactory transformerFactory = TransformerFactory.newInstance();
       transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, ""); // Compliant
@@ -57,7 +56,7 @@ public final class XmlUtilities {
       transformer.setOutputProperty(OutputKeys.DOCTYPE_PUBLIC, "yes");
       transformer.setOutputProperty(OutputKeys.INDENT, "yes");
       transformer.setOutputProperty(
-          "{http://xml.apache.org/xslt}indent-amount", String.valueOf(indentation));
+        "{http://xml.apache.org/xslt}indent-amount", String.valueOf(indentation));
       Source xmlSource = new SAXSource(new org.xml.sax.InputSource(input));
       StreamResult res = new StreamResult(fos);
       transformer.transform(xmlSource, res);
@@ -102,7 +101,7 @@ public final class XmlUtilities {
       return null;
     }
 
-    Path newFile = Paths.get(fileName);
+    Path newFile = Path.of(fileName);
 
     try (OutputStream fileOut = Files.newOutputStream(newFile)) {
       JAXBContext jaxbContext = getContext(object.getClass());
@@ -120,7 +119,7 @@ public final class XmlUtilities {
 
       // second: postprocess xml and then write it to the file
       XmlUtilities.saveWithCustomIndentation(
-          new ByteArrayInputStream(out.toByteArray()), fileOut, 1);
+        new ByteArrayInputStream(out.toByteArray()), fileOut, 1);
       out.close();
 
       jaxbMarshaller.marshal(object, out);
