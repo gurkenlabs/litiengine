@@ -42,7 +42,6 @@ import de.gurkenlabs.litiengine.sound.Sound;
 import de.gurkenlabs.litiengine.sound.SoundEngine;
 import de.gurkenlabs.litiengine.sound.SoundPlayback;
 import de.gurkenlabs.litiengine.tweening.TweenEngine;
-import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 
 /***
@@ -723,11 +722,11 @@ public final class Game {
       return;
     }
 
-    if (ArrayUtilities.contains(args, COMMANDLINE_ARG_RELEASE, true)) {
+    if (Arrays.stream(args).anyMatch(COMMANDLINE_ARG_RELEASE::equalsIgnoreCase)) {
       allowDebug(false);
     }
 
-    if (ArrayUtilities.contains(args, COMMANDLINE_ARG_NOGUI, true)) {
+    if (Arrays.stream(args).anyMatch(COMMANDLINE_ARG_NOGUI::equalsIgnoreCase)) {
       hideGUI(true);
     }
   }

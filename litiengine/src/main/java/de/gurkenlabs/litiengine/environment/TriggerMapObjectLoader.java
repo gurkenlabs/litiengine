@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.environment;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 import de.gurkenlabs.litiengine.entities.IEntity;
@@ -9,7 +10,6 @@ import de.gurkenlabs.litiengine.entities.Trigger.TriggerActivation;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
-import de.gurkenlabs.litiengine.util.ArrayUtilities;
 
 public class TriggerMapObjectLoader extends MapObjectLoader {
 
@@ -47,12 +47,10 @@ public class TriggerMapObjectLoader extends MapObjectLoader {
     if (targets == null) {
       return;
     }
-
-    for (final int target : ArrayUtilities.splitInt(targets)) {
-      if (target != 0) {
-        trigger.addTarget(target);
-      }
-    }
+    Arrays.stream(targets.split(","))
+      .mapToInt(Integer::parseInt)
+      .filter(target -> target != 0)
+      .forEach(trigger::addTarget);
   }
 
   protected void loadActivators(IMapObject mapObject, Trigger trigger) {
@@ -61,10 +59,9 @@ public class TriggerMapObjectLoader extends MapObjectLoader {
       return;
     }
 
-    for (final int activator : ArrayUtilities.splitInt(activators)) {
-      if (activator != 0) {
-        trigger.addActivator(activator);
-      }
-    }
+    Arrays.stream(activators.split(","))
+      .mapToInt(Integer::parseInt)
+      .filter(activator -> activator != 0)
+      .forEach(trigger::addActivator);
   }
 }

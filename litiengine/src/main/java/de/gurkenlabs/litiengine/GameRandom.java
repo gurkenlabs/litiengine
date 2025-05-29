@@ -2,7 +2,6 @@ package de.gurkenlabs.litiengine;
 
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
-import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import java.awt.Color;
 import java.awt.geom.Ellipse2D;
@@ -47,7 +46,7 @@ public final class GameRandom extends java.util.Random {
     T[] sampled = (T[]) java.lang.reflect.Array.newInstance(array.getClass().getComponentType(), amount);
 
     if (!replacement) {
-      T[] copiedArray = ArrayUtilities.arrayCopy(array);
+      T[] copiedArray = array.clone();
       this.shuffle(copiedArray);
 
       // Use System and arraycopy to copy the array

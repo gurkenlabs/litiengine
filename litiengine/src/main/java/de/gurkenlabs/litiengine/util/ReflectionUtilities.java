@@ -259,9 +259,13 @@ public final class ReflectionUtilities {
       } else if (field.getType().equals(String[].class)) {
         return setValue(cls, instance, fieldName, value.split(","));
       } else if (field.getType().equals(int[].class)) {
-        return setValue(cls, instance, fieldName, ArrayUtilities.splitInt(value, ","));
+        int[] values = Arrays.stream(value.split(",")).filter(i -> !i.isBlank())
+          .mapToInt(Integer::parseInt).toArray();
+        return setValue(cls, instance, fieldName, values);
       } else if (field.getType().equals(double[].class)) {
-        return setValue(cls, instance, fieldName, ArrayUtilities.splitDouble(value, ","));
+        double[] values = Arrays.stream(value.split(",")).filter(i -> !i.isBlank())
+          .mapToDouble(Double::parseDouble).toArray();
+        return setValue(cls, instance, fieldName, values);
       } else if (field.getType().isEnum()) {
         return setEnumPropertyValue(cls, instance, field, fieldName, value);
       } else if (field.getType().equals(Material.class)) {

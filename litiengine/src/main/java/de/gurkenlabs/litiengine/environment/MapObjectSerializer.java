@@ -7,11 +7,13 @@ import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxType;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.DecimalFloatAdapter;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
-import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public final class MapObjectSerializer {
   private static final Logger log = Logger.getLogger(MapObjectSerializer.class.getName());
@@ -35,7 +37,7 @@ public final class MapObjectSerializer {
     serialize(entity.getClass(), entity, obj);
 
     if (!entity.getTags().isEmpty()) {
-      obj.setValue(MapObjectProperty.TAGS, ArrayUtilities.join(entity.getTags()));
+      obj.setValue(MapObjectProperty.TAGS, String.join(",", entity.getTags()));
     }
 
     return obj;
@@ -94,30 +96,35 @@ public final class MapObjectSerializer {
       return Long.toString((long) value);
     }
 
-    if (value instanceof List<?>) {
-      return ArrayUtilities.join((List<?>) value);
+    if (value instanceof List<?> valueList) {
+      return valueList.stream().map(Object::toString).collect(Collectors.joining(","));
       // special handling
     }
 
     if (value.getClass().isArray()) {
       if (field.getType().getComponentType() == int.class) {
-        return ArrayUtilities.join((int[]) value);
+        return Arrays.stream((int[]) value).mapToObj(String::valueOf).collect(Collectors.joining(","));
       } else if (field.getType().getComponentType() == double.class) {
-        return ArrayUtilities.join((double[]) value);
+        return Arrays.stream((double[]) value).mapToObj(String::valueOf).collect(Collectors.joining(","));
       } else if (field.getType().getComponentType() == float.class) {
-        return ArrayUtilities.join((float[]) value);
+        float[] values = (float[]) value;
+        return IntStream.range(0,values.length).mapToObj(i -> String.valueOf(values[i])).collect(Collectors.joining(","));
       } else if (field.getType().getComponentType() == short.class) {
-        return ArrayUtilities.join((short[]) value);
+        short[] values = (short[]) value;
+        return IntStream.range(0,values.length).mapToObj(i -> String.valueOf(values[i])).collect(Collectors.joining(","));
       } else if (field.getType().getComponentType() == byte.class) {
-        return ArrayUtilities.join((byte[]) value);
+        byte[] values = (byte[]) value;
+        return IntStream.range(0,values.length).mapToObj(i -> String.valueOf(values[i])).collect(Collectors.joining(","));
       } else if (field.getType().getComponentType() == long.class) {
-        return ArrayUtilities.join((long[]) value);
+        return Arrays.stream((long[]) value).mapToObj(String::valueOf).collect(Collectors.joining(","));
       } else if (field.getType().getComponentType() == String.class) {
-        return ArrayUtilities.join((String[]) value);
+        return String.join(",",(String[]) value);
       } else if (field.getType().getComponentType() == boolean.class) {
-        return ArrayUtilities.join((boolean[]) value);
+        boolean[] values = (boolean[]) value;
+        return IntStream.range(0, values.length).mapToObj(i -> values[i] ? "true" : "false").collect(Collectors.joining(","));
       } else {
-        return ArrayUtilities.join((Object[]) value);
+        Object[] values = (Object[]) value;
+        return Arrays.stream(values).map(Object::toString).collect(Collectors.joining(","));
       }
     }
 

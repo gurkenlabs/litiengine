@@ -5,7 +5,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.swing.ControlBehavior;
@@ -895,11 +894,11 @@ public abstract class PropertyPanel extends JPanel {
         m -> {
           int column = 0;
           for (String prop : mapObjectProperties) {
-            ArrayList<Object> values = new ArrayList<>();
+            ArrayList<String> values = new ArrayList<>();
             for (int i = 0; i < table.getRowCount(); i++) {
-              values.add(table.getValueAt(i, column));
+              values.add(table.getValueAt(i, column).toString());
             }
-            m.setValue(prop, ArrayUtilities.join(values, ","));
+            m.setValue(prop, String.join(",", values));
             column++;
           }
         });
