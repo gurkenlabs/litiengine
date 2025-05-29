@@ -8,7 +8,6 @@ import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.UUID;
 import java.util.logging.Logger;
 import org.junit.jupiter.api.AfterEach;
@@ -20,15 +19,15 @@ class ConfigurationTests {
   private Configuration config;
 
   @BeforeEach
-  public void setup() {
+  void setup() {
     Logger.getLogger(FileUtilities.class.getName()).setUseParentHandlers(false);
     Logger.getLogger(Configuration.class.getName()).setUseParentHandlers(false);
   }
 
   @AfterEach
-  public void deleteConfigFile() throws IOException {
+  void deleteConfigFile() throws IOException {
     if (config != null) {
-      final Path configFile = Paths.get(config.getFileName());
+      final Path configFile = Path.of(config.getFileName());
       Files.deleteIfExists(configFile);
     }
   }
@@ -55,7 +54,7 @@ class ConfigurationTests {
     config.load();
 
     // act, assert
-    assertTrue(Files.exists(Paths.get(config.getFileName())));
+    assertTrue(Files.exists(Path.of(config.getFileName())));
   }
 
   @Test
@@ -68,7 +67,7 @@ class ConfigurationTests {
     config.load();
 
     // assert
-    assertTrue(Files.exists(Paths.get(testFileName)));
+    assertTrue(Files.exists(Path.of(testFileName)));
   }
 
   @Test
@@ -80,7 +79,7 @@ class ConfigurationTests {
     // act
     config.load();
     final TestConfigurationGroup configGroup =
-        config.getConfigurationGroup(TestConfigurationGroup.class);
+      config.getConfigurationGroup(TestConfigurationGroup.class);
 
     // assert
     assertEquals(100, configGroup.getTestInt());

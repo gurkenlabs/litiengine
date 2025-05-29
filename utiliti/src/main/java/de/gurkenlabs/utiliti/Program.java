@@ -10,59 +10,58 @@ import de.gurkenlabs.utiliti.swing.UI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class Program {
 
   public static void main(String[] args) {
     try {
       Game.init(
-          () -> { // preInitialization
+        () -> { // preInitialization
 
-            // setup basic settings
-            Game.info().setName("utiLITI");
-            Game.info().setSubTitle("LITIENGINE Creation Kit");
-            Game.info().setVersion(Resources.strings().getFrom("licensing","version"));
-            Resources.strings().setEncoding(StandardCharsets.UTF_8);
+          // setup basic settings
+          Game.info().setName("utiLITI");
+          Game.info().setSubTitle("LITIENGINE Creation Kit");
+          Game.info().setVersion(Resources.strings().getFrom("licensing", "version"));
+          Resources.strings().setEncoding(StandardCharsets.UTF_8);
 
-            // hook up configuration
-            Game.config().add(Editor.preferences());
+          // hook up configuration
+          Game.config().add(Editor.preferences());
 
-            Game.config().load();
+          Game.config().load();
 
-            UI.initLookAndFeel();
+          UI.initLookAndFeel();
 
-          },
-          () -> { // postInitialization
+        },
+        () -> { // postInitialization
 
-            // prepare UI and start the game
-            UI.init();
-            forceBasicEditorConfiguration();
-            Game.world()
-                .camera()
-                .onZoom(event -> Editor.preferences().setZoom((float) event.getZoom()));
+          // prepare UI and start the game
+          UI.init();
+          forceBasicEditorConfiguration();
+          Game.world()
+            .camera()
+            .onZoom(event -> Editor.preferences().setZoom((float) event.getZoom()));
 
 
-            Game.start();
+          Game.start();
 
-            Input.keyboard().addKeyListener(new DebugCrasher());
+          Input.keyboard().addKeyListener(new DebugCrasher());
 
-            // configure input settings
-            Input.mouse().setGrabMouse(false);
-            Input.keyboard().consumeAlt(true);
+          // configure input settings
+          Input.mouse().setGrabMouse(false);
+          Input.keyboard().consumeAlt(true);
 
-            // load up previously opened project file or the one that is specified in
-            // the command line arguments
-            handleArgs(args);
-            String gameFile = Editor.preferences().getLastGameFile();
-            if (!Editor.instance().fileLoaded() && gameFile != null && !gameFile.isEmpty()) {
-              Editor.instance().load(Paths.get(gameFile.trim()), false);
-            }
-          },
-          args);
+          // load up previously opened project file or the one that is specified in
+          // the command line arguments
+          handleArgs(args);
+          String gameFile = Editor.preferences().getLastGameFile();
+          if (!Editor.instance().fileLoaded() && gameFile != null && !gameFile.isEmpty()) {
+            Editor.instance().load(Path.of(gameFile.trim()), false);
+          }
+        },
+        args);
     } catch (Throwable e) {
       throw new UtiLITIInitializationError(
-          "UtiLITI failed to initialize, see the stacktrace below for more information", e);
+        "UtiLITI failed to initialize, see the stacktrace below for more information", e);
     }
   }
 
@@ -87,12 +86,12 @@ public class Program {
 
     // handle file loading
     try {
-      Paths.get(gameFile);
-    } catch (InvalidPathException e) {
+      Path.of(gameFile);
+    } catch (InvalidPathException _) {
       return;
     }
 
-    Path f = Paths.get(gameFile);
+    Path f = Path.of(gameFile);
     Editor.instance().load(f, false);
   }
 }

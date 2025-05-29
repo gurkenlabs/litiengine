@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,28 +16,40 @@ import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.FileImageOutputStream;
 
+/**
+ * Utility class for serializing and deserializing images. Provides methods to load and save images in various formats.
+ */
 public final class ImageSerializer {
   private static final Logger log = Logger.getLogger(ImageSerializer.class.getName());
 
+  /**
+   * Private constructor to prevent instantiation of this utility class.
+   */
   private ImageSerializer() {
     throw new UnsupportedOperationException();
   }
 
+  /**
+   * Loads an image from the specified file path.
+   *
+   * @param fileName The path to the image file.
+   * @return A {@code BufferedImage} object if the image is successfully loaded, or {@code null} if the file does not exist or an error occurs.
+   */
   public static BufferedImage loadImage(final String fileName) {
-    final Path file = Paths.get(fileName);
+    final Path file = Path.of(fileName);
     if (!Files.exists(file)) {
       return null;
     }
 
     BufferedImage img;
-    try(InputStream is = Files.newInputStream(file)) {
+    try (InputStream is = Files.newInputStream(file)) {
       img = ImageIO.read(is);
       if (img == null) {
         return null;
       }
 
       final BufferedImage compatibleImg =
-          Imaging.getCompatibleImage(img.getWidth(), img.getHeight());
+        Imaging.getCompatibleImage(img.getWidth(), img.getHeight());
       compatibleImg.createGraphics().drawImage(img, 0, 0, null);
       compatibleImg.createGraphics().dispose();
 
@@ -49,14 +60,27 @@ public final class ImageSerializer {
     }
   }
 
+  /**
+   * Saves an image to the specified file path in PNG format.
+   *
+   * @param fileName The path to save the image file.
+   * @param image    The {@code BufferedImage} to save.
+   */
   public static void saveImage(final String fileName, final BufferedImage image) {
     saveImage(fileName, image, ImageFormat.PNG);
   }
 
+  /**
+   * Saves an image to the specified file path in the given format.
+   *
+   * @param fileName    The path to save the image file.
+   * @param image       The {@code BufferedImage} to save.
+   * @param imageFormat The format in which to save the image.
+   */
   public static void saveImage(
-      final String fileName, final BufferedImage image, ImageFormat imageFormat) {
+    final String fileName, final BufferedImage image, ImageFormat imageFormat) {
     try {
-      final Path file = Paths.get(fileName);
+      final Path file = Path.of(fileName);
       final String extension = FileUtilities.getExtension(fileName);
       Iterator<ImageWriter> iter = null;
       if (canWriteFormat(extension)) {
@@ -80,6 +104,12 @@ public final class ImageSerializer {
     }
   }
 
+  /**
+   * Checks if the specified image format can be written by the system.
+   *
+   * @param formatName The name of the image format to check.
+   * @return {@code true} if the format can be written, {@code false} otherwise.
+   */
   private static boolean canWriteFormat(final String formatName) {
     final Iterator<ImageWriter> iter = ImageIO.getImageWritersByFormatName(formatName);
     return iter.hasNext();

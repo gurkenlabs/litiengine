@@ -25,7 +25,6 @@ import java.io.Serializable;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -204,7 +203,7 @@ public class ResourceBundle implements Serializable {
       fileNameWithExtension += "." + FILE_EXTENSION;
     }
 
-    final Path newFile = Paths.get(fileNameWithExtension);
+    final Path newFile = Path.of(fileNameWithExtension);
     if (!Files.exists(newFile)) {
       try {
         Files.delete(newFile);

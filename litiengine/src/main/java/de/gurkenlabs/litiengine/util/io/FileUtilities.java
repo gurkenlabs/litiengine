@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.util.io;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -8,7 +9,6 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -27,31 +27,20 @@ public final class FileUtilities {
   }
 
   public static boolean deleteDir(final Path dir) {
-    //Support existing behavior for Paths.get("");
-    if(dir.toString().isBlank()){
-      try {
-        Files.delete(dir.toAbsolutePath());
-        return true;
-      } catch (IOException e) {
-        log.log(Level.SEVERE, e.getMessage(), e);
-        return false;
-      }
-    }
-
     try (Stream<Path> paths = Files.walk(dir)) {
-      List<Path> toDelete = paths.sorted(Comparator.reverseOrder()).toList();
-      for(Path p : toDelete) {
-        Files.delete(p);
-      }
-      return true;
-    }catch (IOException e) {
+      return paths
+        .sorted(Comparator.reverseOrder())
+        .map(Path::toFile)
+        .map(File::delete)
+        .reduce(true, (a, b) -> a && b);
+    } catch (IOException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
-      return false;
+      throw new RuntimeException(e);
     }
   }
 
   public static List<String> findFilesByExtension(
-      final List<String> fileNames, final Path dir, final String extension) {
+    final List<String> fileNames, final Path dir, final String extension) {
     try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
       for (final Path path : stream) {
         if (Files.isDirectory(path)) {
@@ -72,7 +61,7 @@ public final class FileUtilities {
   }
 
   public static List<String> findFiles(
-      final List<String> fileNames, final Path dir, final String... files) {
+    final List<String> fileNames, final Path dir, final String... files) {
     try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
       for (final Path path : stream) {
         if (Files.isDirectory(path)) {
@@ -123,9 +112,9 @@ public final class FileUtilities {
 
   public static String getFileName(final String path, boolean extension) {
     if (path == null
-        || path.isEmpty()
-        || path.endsWith(FILE_SEPARATOR_WIN)
-        || path.endsWith(FILE_SEPARATOR)) {
+      || path.isEmpty()
+      || path.endsWith(FILE_SEPARATOR_WIN)
+      || path.endsWith(FILE_SEPARATOR)) {
       return "";
     }
 
@@ -159,7 +148,7 @@ public final class FileUtilities {
     try {
       return getParentDirPath(new URI(uri));
     } catch (URISyntaxException e) {
-      String parent = Paths.get(uri).getParent().toAbsolutePath().toString();
+      String parent = Path.of(uri).getParent().toAbsolutePath().toString();
       parent += FileSystems.getDefault().getSeparator();
       return parent;
     }
@@ -171,13 +160,10 @@ public final class FileUtilities {
   }
 
   /**
-   * This method combines the specified basepath with the parts provided as arguments. The output will use the path
-   * separator of the current system;
+   * This method combines the specified basepath with the parts provided as arguments. The output will use the path separator of the current system;
    *
-   * @param basePath
-   *          The base path for the combined path.
-   * @param paths
-   *          The parts of the path to be constructed.
+   * @param basePath The base path for the combined path.
+   * @param paths    The parts of the path to be constructed.
    * @return The combined path.
    */
   public static String combine(String basePath, final String... paths) {
@@ -219,8 +205,9 @@ public final class FileUtilities {
 
   public static String humanReadableByteCount(long bytes, boolean decimal) {
     int unit = decimal ? 1000 : 1024;
-    if (bytes < unit)
+    if (bytes < unit) {
       return bytes + " bytes";
+    }
     int exp = (int) (Math.log(bytes) / Math.log(unit));
     String pre = new String[] {"K", "M", "G", "T", "P", "E"}[exp - 1];
     pre = decimal ? pre : pre + "i";

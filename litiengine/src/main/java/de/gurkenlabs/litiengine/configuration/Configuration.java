@@ -2,16 +2,15 @@ package de.gurkenlabs.litiengine.configuration;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.resources.Resources;
-
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -46,9 +45,7 @@ public class Configuration {
     this.fileName = fileName;
     this.configurationGroups = new ArrayList<>();
     if (configurationGroups != null && configurationGroups.length > 0) {
-      for (final ConfigurationGroup group : configurationGroups) {
-        this.configurationGroups.add(group);
-      }
+      Collections.addAll(this.configurationGroups, configurationGroups);
     }
   }
 
@@ -124,7 +121,7 @@ public class Configuration {
    * exists, it creates a new configuration file in the application folder.
    */
   public void load() {
-    final Path settingsFile = Paths.get(this.getFileName());
+    final Path settingsFile = Path.of(this.getFileName());
     try (InputStream settingsStream = Resources.get(this.getFileName())) {
       if (!Files.exists(settingsFile) && settingsStream == null || !Files.isRegularFile(settingsFile)) {
         try (OutputStream out = Files.newOutputStream(settingsFile)) {
@@ -163,7 +160,7 @@ public class Configuration {
    * @see Configuration#DEFAULT_CONFIGURATION_FILE_NAME
    */
   public void save() {
-    final Path settingsFile = Paths.get(this.getFileName());
+    final Path settingsFile = Path.of(this.getFileName());
     try (OutputStream out = Files.newOutputStream(settingsFile, StandardOpenOption.CREATE_NEW)) {
       for (final ConfigurationGroup group : this.getConfigurationGroups()) {
         if (!Game.isDebug() && group.isDebug()) {
