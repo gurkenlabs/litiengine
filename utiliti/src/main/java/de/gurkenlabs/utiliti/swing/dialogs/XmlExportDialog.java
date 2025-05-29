@@ -1,11 +1,9 @@
 package de.gurkenlabs.utiliti.swing.dialogs;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 import de.gurkenlabs.utiliti.components.Editor;
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.function.Consumer;
 import java.util.logging.Level;
@@ -17,40 +15,37 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 public final class XmlExportDialog {
   private static final Logger log = Logger.getLogger(XmlExportDialog.class.getName());
 
-  private XmlExportDialog() {}
+  private XmlExportDialog() {
+  }
 
   public static <T> void export(T object, String name, String filename) {
     export(object, name, filename, "xml");
   }
 
   public static <T> void export(T object, String name, String filename, String extension) {
-    export(object, name, filename, extension, d -> {});
+    export(object, name, filename, extension, d -> {
+    });
   }
 
   public static <T> void export(
-      T object, String name, String filename, String extension, Consumer<String> consumer) {
+    T object, String name, String filename, String extension, Consumer<String> consumer) {
     JFileChooser chooser;
-    try {
-      String source = Editor.instance().getProjectPath();
-      chooser = new JFileChooser(source != null ? source : new File(".").getCanonicalPath());
-      chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-      chooser.setDialogType(JFileChooser.SAVE_DIALOG);
-      chooser.setDialogTitle("Export " + name);
-      FileFilter filter =
-          new FileNameExtensionFilter("." + extension + " - " + name + " XML", extension);
-      chooser.setFileFilter(filter);
-      chooser.addChoosableFileFilter(filter);
-      chooser.setSelectedFile(new File(filename + "." + extension));
+    Path source = Editor.instance().getProjectPath();
+    chooser = new JFileChooser(source.toFile());
+    chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+    chooser.setDialogType(JFileChooser.SAVE_DIALOG);
+    chooser.setDialogTitle("Export " + name);
+    FileFilter filter =
+      new FileNameExtensionFilter("." + extension + " - " + name + " XML", extension);
+    chooser.setFileFilter(filter);
+    chooser.addChoosableFileFilter(filter);
+    chooser.setSelectedFile(new File(filename + "." + extension));
 
-      int result = chooser.showSaveDialog(Game.window().getRenderComponent());
-      if (result == JFileChooser.APPROVE_OPTION) {
-        Path newFile = XmlUtilities.save(object, chooser.getSelectedFile().toString(), extension);
-        String dir = FileUtilities.getParentDirPath(newFile.toAbsolutePath().toString());
-        consumer.accept(dir);
-        log.log(Level.INFO, "Exported {0} {1} to {2}", new Object[] {name, filename, newFile});
-      }
-    } catch (IOException e) {
-      log.log(Level.SEVERE, e.getMessage(), e);
+    int result = chooser.showSaveDialog(Game.window().getRenderComponent());
+    if (result == JFileChooser.APPROVE_OPTION) {
+      Path newFile = XmlUtilities.save(object, chooser.getSelectedFile().toPath(), extension);
+      consumer.accept(newFile.getParent().toString());
+      log.log(Level.INFO, "Exported {0} {1} to {2}", new Object[] {name, filename, newFile});
     }
   }
 }

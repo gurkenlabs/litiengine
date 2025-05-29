@@ -5,11 +5,9 @@ import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -46,8 +44,7 @@ public final class XmlUtilities {
    * @param fos         The output stream that is used to save the XML.
    * @param indentation The indentation with which the XML should be saved.
    */
-  public static void saveWithCustomIndentation(
-    ByteArrayInputStream input, OutputStream fos, int indentation) {
+  public static void saveWithCustomIndentation(ByteArrayInputStream input, OutputStream fos, int indentation) {
     try {
       TransformerFactory transformerFactory = TransformerFactory.newInstance();
       transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, ""); // Compliant
@@ -55,8 +52,7 @@ public final class XmlUtilities {
       Transformer transformer = transformerFactory.newTransformer();
       transformer.setOutputProperty(OutputKeys.DOCTYPE_PUBLIC, "yes");
       transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-      transformer.setOutputProperty(
-        "{http://xml.apache.org/xslt}indent-amount", String.valueOf(indentation));
+      transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", String.valueOf(indentation));
       Source xmlSource = new SAXSource(new org.xml.sax.InputSource(input));
       StreamResult res = new StreamResult(fos);
       transformer.transform(xmlSource, res);
@@ -96,46 +92,30 @@ public final class XmlUtilities {
     return cls.cast(um.unmarshal(path));
   }
 
-  public static Path save(Object object, String fileName) {
-    if (fileName == null || fileName.isEmpty()) {
+  public static Path save(Object object, Path filePath) {
+    if (filePath == null) {
       return null;
     }
-
-    Path newFile = Path.of(fileName);
-
-    try (OutputStream fileOut = Files.newOutputStream(newFile)) {
-      JAXBContext jaxbContext = getContext(object.getClass());
-      if (jaxbContext == null) {
-        return null;
-      }
-
+    JAXBContext jaxbContext = getContext(object.getClass());
+    if (jaxbContext == null) {
+      return null;
+    }
+    try {
       Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-      jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, false);
-
-      final ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-      // first: marshal to byte array
-      jaxbMarshaller.marshal(object, out);
-
-      // second: postprocess xml and then write it to the file
-      XmlUtilities.saveWithCustomIndentation(
-        new ByteArrayInputStream(out.toByteArray()), fileOut, 1);
-      out.close();
-
-      jaxbMarshaller.marshal(object, out);
-    } catch (JAXBException | IOException e) {
+      jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+      jaxbMarshaller.marshal(object, filePath.toFile());
+    } catch (JAXBException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
     }
-
-    return newFile;
+    return filePath;
   }
 
-  public static Path save(Object object, String fileName, String extension) {
-    String fileNameWithExtension = fileName;
-    if (!fileNameWithExtension.endsWith("." + extension)) {
-      fileNameWithExtension += "." + extension;
+  public static Path save(Object object, Path path, String extension) {
+    String fullExtension = extension.startsWith(".") ? extension : "." + extension;
+    Path fullPath = path;
+    if (!fullPath.endsWith(fullExtension)) {
+      fullPath = path.resolveSibling(path.getFileName().toString() + fullExtension);
     }
-
-    return save(object, fileNameWithExtension);
+    return save(object, fullPath);
   }
 }

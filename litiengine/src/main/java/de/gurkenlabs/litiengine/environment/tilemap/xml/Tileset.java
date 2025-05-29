@@ -23,6 +23,7 @@ import jakarta.xml.bind.annotation.XmlTransient;
 import java.awt.Dimension;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
@@ -384,14 +385,14 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   /**
    * Saves the source tileset to the specified base path.
    *
-   * @param basePath The base path where the source tileset should be saved.
+   * @param path The base path where the source tileset should be saved.
    */
-  public void saveSource(String basePath) {
+  public void saveSource(Path path) {
     if (this.sourceTileset == null) {
       return;
     }
 
-    XmlUtilities.save(this.sourceTileset, FileUtilities.combine(basePath, this.source), FILE_EXTENSION);
+    XmlUtilities.save(this.sourceTileset, path.resolve(source), FILE_EXTENSION);
   }
 
   /**

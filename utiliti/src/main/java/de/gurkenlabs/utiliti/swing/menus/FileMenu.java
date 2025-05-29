@@ -5,7 +5,6 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.components.Editor;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -13,7 +12,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 
-@SuppressWarnings("serial")
 public final class FileMenu extends JMenu {
   private static final Logger log = Logger.getLogger(FileMenu.class.getName());
   private final JMenu recentFiles;
@@ -69,9 +67,9 @@ public final class FileMenu extends JMenu {
   public void loadRecentFiles() {
     recentFiles.removeAll();
     int added = 0;
-    for (String recent : Editor.preferences().getLastOpenedFiles()) {
-      if (recent != null && !recent.isEmpty() && Files.exists(Path.of(recent))) {
-        JMenuItem fileButton = new JMenuItem(recent);
+    for (Path recent : Editor.preferences().getLastOpenedFiles()) {
+      if (recent != null && recent.toFile().exists()) {
+        JMenuItem fileButton = new JMenuItem(recent.toString());
         fileButton.addActionListener(
           a -> {
             log.log(Level.INFO, "load {0}", fileButton.getText());

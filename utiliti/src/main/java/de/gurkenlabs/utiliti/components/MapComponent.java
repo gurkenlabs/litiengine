@@ -52,7 +52,7 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -68,6 +68,7 @@ import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
@@ -190,20 +191,23 @@ public class MapComponent extends GuiComponent {
     super.render(g);
   }
 
-  public void loadMaps(String projectPath) {
-    final List<String> files =
-      FileUtilities.findFilesByExtension(new ArrayList<>(), Path.of(projectPath), "tmx");
-    log.log(Level.INFO, "{0} maps found in folder {1}", new Object[] {files.size(), projectPath});
+  public void loadMaps(Path projectPath) {
     final List<TmxMap> loadedMaps = new ArrayList<>();
-    for (final String mapFile : files) {
-      TmxMap map = (TmxMap) Resources.maps().get(mapFile);
-      if (map != null) { // if an error occurred or it's not in the expected
-        // format
-        loadedMaps.add(map);
-        log.log(Level.INFO, "map found: {0}", new Object[] {map.getName()});
-      }
-    }
 
+    try (Stream<Path> paths = Files.walk(projectPath)) {
+      paths.filter(Files::isRegularFile)
+        .filter(p -> p.toString().endsWith(TmxMap.FILE_EXTENSION))
+        .forEach(p -> {
+            TmxMap map = (TmxMap) Resources.maps().get(p.toString());
+            if (map != null) {
+              loadedMaps.add(map);
+            }
+            log.log(Level.INFO, "map found: {0}", new Object[] {p.toString()});
+          }
+        );
+    } catch (Exception e) {
+      log.log(Level.WARNING, "Error loading maps from project path: " + projectPath, e);
+    }
     this.loadMaps(loadedMaps, true);
   }
 
@@ -836,12 +840,15 @@ public class MapComponent extends GuiComponent {
       "Map",
       map.getName(),
       TmxMap.FILE_EXTENSION,
-      dir -> {
+      dirStr -> {
+        Path dir = Path.of(dirStr);
         for (ITileset tileSet : map.getTilesets()) {
+          String source = tileSet.getImage().getSource();
           ImageFormat format =
             ImageFormat.get(FileUtilities.getExtension(tileSet.getImage().getSource()));
+          Path imagePath = dir.resolve(source);
           ImageSerializer.saveImage(
-            Path.of(dir, tileSet.getImage().getSource()).toString(),
+            imagePath,
             Resources.spritesheets().get(tileSet.getImage().getSource()).getImage(),
             format);
 
@@ -891,14 +898,15 @@ public class MapComponent extends GuiComponent {
     MapRenderer.render(img.createGraphics(), currentMap, currentMap.getBounds());
 
     try {
-      final String timeStamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
-      final File folder = new File("./screenshots/");
-      if (!folder.exists()) {
-        folder.mkdirs();
+      Path screenshotsDir = Path.of("screenshots");
+      if (Files.notExists(screenshotsDir)) {
+        Files.createDirectories(screenshotsDir);
       }
-      File snapshot = new File("./screenshots/" + timeStamp + ImageFormat.PNG.toFileExtension());
-      ImageSerializer.saveImage(snapshot.toString(), img);
-      log.log(Level.INFO, "Saved map snapshot to {0}", new Object[] {snapshot.getCanonicalPath()});
+      final String timeStamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
+      Path filePath = screenshotsDir.resolve(timeStamp + ImageFormat.PNG.toFileExtension());
+
+      ImageSerializer.saveImage(filePath, img);
+      log.log(Level.INFO, "Saved map snapshot to {0}", new Object[] {filePath});
     } catch (Exception e) {
       log.log(Level.SEVERE, e.getLocalizedMessage(), e);
     }
