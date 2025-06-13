@@ -4,7 +4,6 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.gui.screens.Screen;
 import de.gurkenlabs.litiengine.resources.ImageFormat;
 import de.gurkenlabs.litiengine.util.TimeUtilities;
-import de.gurkenlabs.litiengine.util.io.ImageSerializer;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -26,6 +25,7 @@ import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 
 /**
  * The {@code RenderComponent} class extends {@link Canvas} and handles the rendering of the game screen, including managing fade effects, capturing
@@ -296,11 +296,10 @@ public class RenderComponent extends Canvas {
       if (!Files.exists(folder)) {
         Files.createDirectories(folder);
       }
-      String path = "./screenshots/" + timeStamp + ImageFormat.PNG.toFileExtension();
-      ImageSerializer.saveImage(path, img);
+      ImageIO.write(img, ImageFormat.PNG.toFileExtension(), Path.of("screenshots", timeStamp + ImageFormat.PNG.toFileExtension()).toFile());
     } catch (final IOException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
-    } finally{
+    } finally {
       takeScreenShot = false;
     }
   }

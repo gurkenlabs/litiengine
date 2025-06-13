@@ -55,7 +55,7 @@ public class Program {
           handleArgs(args);
           Path gameFile = Editor.preferences().getLastGameFile();
           if (!Editor.instance().fileLoaded() && gameFile != null) {
-            Editor.instance().load(gameFile.toFile(), false);
+            Editor.instance().load(gameFile.toFile().toPath(), false);
           }
         },
         args);

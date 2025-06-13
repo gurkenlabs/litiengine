@@ -5,7 +5,6 @@ import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.io.Codec;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
-import de.gurkenlabs.litiengine.util.io.ImageSerializer;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -24,6 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 
 /**
  * Manages the loading, storing, and retrieval of spritesheets.
@@ -281,10 +281,8 @@ public final class Spritesheets {
 
         if (!metadataOnly) {
           Path spriteInfoPath = Path.of(spriteInfoFile);
-          ImageSerializer.saveImage(
-            spriteInfoPath.resolveSibling(spritesheet.getName() + spritesheet.getImageFormat().toFileExtension()).toString(),
-            spritesheet.getImage(),
-            spritesheet.getImageFormat());
+          Path outputPath = spriteInfoPath.resolveSibling(spritesheet.getName() + spritesheet.getImageFormat().toFileExtension());
+          ImageIO.write(spritesheet.getImage(), spritesheet.getImageFormat().toFileExtension(), outputPath.toFile());
         }
       }
 
