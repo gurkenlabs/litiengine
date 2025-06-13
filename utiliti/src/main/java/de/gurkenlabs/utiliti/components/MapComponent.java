@@ -28,7 +28,6 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
-import de.gurkenlabs.litiengine.util.io.ImageSerializer;
 import de.gurkenlabs.utiliti.Cursors;
 import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.handlers.Scroll;
@@ -52,6 +51,7 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
@@ -69,6 +69,7 @@ import java.util.function.IntConsumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
+import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
@@ -739,7 +740,7 @@ public class MapComponent extends GuiComponent {
     // by any other map.
     UI.getMapController().bind(this.getMaps());
     if (!this.maps.isEmpty()) {
-      this.loadEnvironment(this.maps.get(0));
+      this.loadEnvironment(this.maps.getFirst());
     } else {
       Game.world().unloadEnvironment();
       UndoManager.clearAll();
@@ -847,10 +848,11 @@ public class MapComponent extends GuiComponent {
           ImageFormat format =
             ImageFormat.get(FileUtilities.getExtension(tileSet.getImage().getSource()));
           Path imagePath = dir.resolve(source);
-          ImageSerializer.saveImage(
-            imagePath,
-            Resources.spritesheets().get(tileSet.getImage().getSource()).getImage(),
-            format);
+          try {
+            ImageIO.write(Resources.spritesheets().get(tileSet.getImage().getSource()).getImage(), format.toFileExtension(), imagePath.toFile());
+          } catch (IOException e) {
+            log.log(Level.SEVERE, e.getLocalizedMessage(), e);
+          }
 
           Tileset tile = (Tileset) tileSet;
           if (tile.isExternal()) {
@@ -904,8 +906,7 @@ public class MapComponent extends GuiComponent {
       }
       final String timeStamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
       Path filePath = screenshotsDir.resolve(timeStamp + ImageFormat.PNG.toFileExtension());
-
-      ImageSerializer.saveImage(filePath, img);
+      ImageIO.write(img, ImageFormat.PNG.toFileExtension(), filePath.toFile());
       log.log(Level.INFO, "Saved map snapshot to {0}", new Object[] {filePath});
     } catch (Exception e) {
       log.log(Level.SEVERE, e.getLocalizedMessage(), e);

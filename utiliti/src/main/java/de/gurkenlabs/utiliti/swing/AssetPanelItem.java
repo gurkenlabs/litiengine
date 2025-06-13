@@ -17,7 +17,6 @@ import de.gurkenlabs.litiengine.resources.SoundFormat;
 import de.gurkenlabs.litiengine.resources.SoundResource;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.litiengine.util.io.Codec;
-import de.gurkenlabs.litiengine.util.io.ImageSerializer;
 import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.components.Editor;
 import de.gurkenlabs.utiliti.swing.dialogs.SpritesheetImportPanel;
@@ -44,6 +43,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -431,12 +431,15 @@ public class AssetPanelItem extends JPanel {
         chooser.addChoosableFileFilter(filter);
         chooser.setSelectedFile(new File(spritesheetResource.getName() + format.toFileExtension()));
 
-          int result = chooser.showSaveDialog(Game.window().getRenderComponent());
-          if (result == JFileChooser.APPROVE_OPTION) {
-            ImageSerializer.saveImage(chooser.getSelectedFile().toPath(), sprite.getImage(), format);
-            log.log(Level.INFO, "exported spritesheet {0} to {1}", new Object[] {spritesheetResource.getName(), chooser.getSelectedFile()});
-
+        int result = chooser.showSaveDialog(Game.window().getRenderComponent());
+        if (result == JFileChooser.APPROVE_OPTION) {
+          try {
+            ImageIO.write(sprite.getImage(), format.toFileExtension(), chooser.getSelectedFile());
+          } catch (IOException e) {
+            log.log(Level.SEVERE, e.getLocalizedMessage(), e);
           }
+          log.log(Level.INFO, "exported spritesheet {0} to {1}", new Object[] {spritesheetResource.getName(), chooser.getSelectedFile()});
+        }
       }
     }
   }
