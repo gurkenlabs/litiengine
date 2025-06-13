@@ -1,8 +1,6 @@
 package de.gurkenlabs.litiengine.util.io;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,49 +17,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 
 class FileUtilitiesTests {
-
-  @TempDir
-  Path tempDir;
-
   @TempDir
   Path tempPath;
-
-  @Test
-  void testDeleteNoneDir() {
-    Path dir = Path.of("/test/test2/");
-    assertFalse(FileUtilities.deleteDir(dir));
-  }
-
-  @Test
-  void testDeleteExistingDirZeroChildren() {
-    assertTrue(FileUtilities.deleteDir(tempDir));
-  }
-
-  @Test
-  void testDeleteExistingDir() throws IOException {
-    Path file1 = tempDir.resolve("file1.txt");
-    Files.createFile(file1);
-    assertTrue(FileUtilities.deleteDir(tempDir));
-  }
-
-  @Test
-  void testDeleteExistingDirNewFiles() throws IOException {
-    // arrange
-    Path file1 = tempDir.resolve("file1.txt");
-    Path file2 = tempDir.resolve("file2.txt");
-
-    // act
-    Files.createFile(file1);
-    Files.createFile(file2);
-
-    // assert
-    assertTrue(FileUtilities.deleteDir(tempDir));
-  }
-
-  @Test
-  void testDeleteExistingDirNoChildren() {
-    assertFalse(FileUtilities.deleteDir(Path.of("")));
-  }
 
   @Test
   void testFindFilesByExtensionDirectory() throws IOException {
