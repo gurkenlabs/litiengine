@@ -676,23 +676,35 @@ public class Editor extends Screen {
     return this.getCurrentResourceFile() == null && this.getProjectPath() != null;
   }
 
-  private String saveGameFile(Path target) {
-    String saveFile = this.getGameFile().save(target.toString(), preferences().compressFile());
-    this.currentResourceFile = target;
-    preferences().setLastGameFile(target);
-    preferences().addOpenedFile(target);
-    this.gamefileLoaded();
-    log.log(Level.INFO, "saved {0} maps, {1} spritesheets, {2} tilesets, {3} emitters, {4} blueprints, {5} sounds to {6}",
-      new Object[] {getGameFile().getMaps().size(), getGameFile().getSpriteSheets().size(), getGameFile().getTilesets().size(),
-        getGameFile().getEmitters().size(), getGameFile().getBluePrints().size(), getGameFile().getSounds().size(), getCurrentResourceFile()});
-    this.setCurrentStatus(Resources.strings().get("status_gamefile_saved"));
+  private void saveGameFile(Path target) {
+    try {
+      Files.deleteIfExists(target);
 
-    this.saveMaps();
-    return saveFile;
+      getGameFile().save(target.toString(), preferences().compressFile());
+      this.currentResourceFile = target;
+      preferences().setLastGameFile(target);
+      preferences().addOpenedFile(target);
+      gamefileLoaded();
+      log.log(Level.INFO, "saved {0} maps, {1} spritesheets, {2} tilesets, {3} emitters, {4} blueprints, {5} sounds to {6}",
+        new Object[] {
+          getGameFile().getMaps().size(),
+          getGameFile().getSpriteSheets().size(),
+          getGameFile().getTilesets().size(),
+          getGameFile().getEmitters().size(),
+          getGameFile().getBluePrints().size(),
+          getGameFile().getSounds().size(),
+          getCurrentResourceFile()
+        });
+      this.setCurrentStatus(Resources.strings().get("status_gamefile_saved"));
+
+      this.saveMaps();
+    } catch (IOException e) {
+      log.log(Level.SEVERE, "Failed to save game file: " + e.getMessage(), e);
+      this.setCurrentStatus("Error saving game file: " + e.getMessage());
+    }
   }
 
   private void saveMaps() {
-    System.out.println("wtf.");
     getChangedMaps().forEach(m -> {
       UndoManager.save(m);
       String fileName = String.format("%s.%s", m.getName(), TmxMap.FILE_EXTENSION);
