@@ -1,6 +1,5 @@
 package de.gurkenlabs.litiengine.util.io;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -9,12 +8,10 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Stream;
 
 public final class FileUtilities {
   private static final Logger log = Logger.getLogger(FileUtilities.class.getName());
@@ -24,19 +21,6 @@ public final class FileUtilities {
 
   private FileUtilities() {
     throw new UnsupportedOperationException();
-  }
-
-  public static boolean deleteDir(final Path dir) {
-    try (Stream<Path> paths = Files.walk(dir)) {
-      return paths
-        .sorted(Comparator.reverseOrder())
-        .map(Path::toFile)
-        .map(File::delete)
-        .reduce(true, (a, b) -> a && b);
-    } catch (IOException e) {
-      log.log(Level.SEVERE, e.getMessage(), e);
-      throw new RuntimeException(e);
-    }
   }
 
   public static List<String> findFilesByExtension(
