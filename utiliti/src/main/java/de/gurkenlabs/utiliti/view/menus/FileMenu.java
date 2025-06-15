@@ -5,6 +5,7 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.Editor;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -68,7 +69,7 @@ public final class FileMenu extends JMenu {
     recentFiles.removeAll();
     int added = 0;
     for (Path recent : Editor.preferences().getLastOpenedFiles()) {
-      if (recent != null && recent.toFile().exists()) {
+      if (recent != null && Files.exists(recent)) {
         JMenuItem fileButton = new JMenuItem(recent.toString());
         fileButton.addActionListener(
           a -> {
@@ -91,7 +92,6 @@ public final class FileMenu extends JMenu {
       a -> {
         recentFiles.removeAll();
         Editor.preferences().clearOpenedFiles();
-        Editor.preferences().setLastGameFile(null);
         recentFiles.setEnabled(false);
       });
 

@@ -1,5 +1,14 @@
 package de.gurkenlabs.utiliti.controller;
 
+import static de.gurkenlabs.utiliti.model.constants.EditorConstants.AUDIO_FILE_NAME;
+import static de.gurkenlabs.utiliti.model.constants.EditorConstants.GAME_FILE_NAME;
+import static de.gurkenlabs.utiliti.model.constants.EditorConstants.IMPORT_DIALOGUE;
+import static de.gurkenlabs.utiliti.model.constants.EditorConstants.NEW_GAME_STRING;
+import static de.gurkenlabs.utiliti.model.constants.EditorConstants.SPRITESHEET_FILE_NAME;
+import static de.gurkenlabs.utiliti.model.constants.EditorConstants.SPRITE_FILE_NAME;
+import static de.gurkenlabs.utiliti.model.constants.EditorConstants.STATUS_DURATION;
+import static de.gurkenlabs.utiliti.model.constants.EditorConstants.TEXTUREATLAS_FILE_NAME;
+
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
@@ -29,6 +38,7 @@ import de.gurkenlabs.utiliti.view.components.Tray;
 import de.gurkenlabs.utiliti.view.components.UI;
 import de.gurkenlabs.utiliti.view.dialogs.ConfirmDialog;
 import de.gurkenlabs.utiliti.view.dialogs.EditorFileChooser;
+import de.gurkenlabs.utiliti.view.dialogs.EditorFileSaver;
 import de.gurkenlabs.utiliti.view.dialogs.XmlImportDialog;
 import jakarta.xml.bind.JAXBException;
 import java.awt.Color;
@@ -59,17 +69,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class Editor extends Screen {
   private static final Logger log = Logger.getLogger(Editor.class.getName());
-  private static final int STATUS_DURATION = 5000;
-  private static final String DEFAULT_GAME_NAME = "game";
-  private static final String NEW_GAME_STRING = "NEW GAME *";
 
-  private static final String GAME_FILE_NAME = "Game Resource File";
-  private static final String SPRITE_FILE_NAME = "Sprite Info File";
-  private static final String AUDIO_FILE_NAME = "Audio File";
-  private static final String SPRITESHEET_FILE_NAME = "Spritesheet Image";
-  private static final String TEXTUREATLAS_FILE_NAME = "Texture Atlas XML (generic)";
-
-  private static final String IMPORT_DIALOGUE = "import_something";
 
   private static Editor instance;
   private static UserPreferences preferences;
@@ -259,7 +259,6 @@ public class Editor extends Screen {
     this.mapComponent.loadMaps(List.of(), true);
     Resources.clearAll();
     UI.getAssetController().refresh();
-    this.gamefileLoaded();
     this.setCurrentStatus(Resources.strings().get("status_gamefile_closed"));
   }
 
@@ -595,29 +594,22 @@ public class Editor extends Screen {
   }
 
   public void save(boolean selectFile) {
-    this.updateGameFileMaps();
+    updateGameFileMaps();
 
-    if (this.getGameFile() == null) {
+    if (getGameFile() == null || getProjectPath() == null) {
       return;
     }
 
     if (this.currentResourceFile == null || selectFile) {
-      final Path source = getProjectPath();
-      JFileChooser chooser = new JFileChooser(source.toFile());
-      chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-      chooser.setDialogType(JFileChooser.SAVE_DIALOG);
-      FileFilter filter = new FileNameExtensionFilter(GAME_FILE_NAME, ResourceBundle.FILE_EXTENSION);
-      chooser.setFileFilter(filter);
-      chooser.addChoosableFileFilter(filter);
-      chooser.setSelectedFile(new File(DEFAULT_GAME_NAME + "." + ResourceBundle.FILE_EXTENSION));
-
+      JFileChooser chooser = new EditorFileSaver(getProjectPath());
       int result = chooser.showSaveDialog(Game.window().getHostControl());
       if (result == JFileChooser.APPROVE_OPTION) {
-        this.saveGameFile(chooser.getSelectedFile().toPath());
+        saveGameFile(chooser.getSelectedFile().toPath());
       }
     } else {
-      this.saveGameFile(this.currentResourceFile);
+      saveGameFile(this.currentResourceFile);
     }
+    Game.config().save();
   }
 
   public void revert() {
@@ -681,7 +673,6 @@ public class Editor extends Screen {
 
       getGameFile().save(target.toString(), preferences().compressFile());
       this.currentResourceFile = target;
-      preferences().setLastGameFile(target);
       preferences().addOpenedFile(target);
       gamefileLoaded();
       log.log(Level.INFO, "saved {0} maps, {1} spritesheets, {2} tilesets, {3} emitters, {4} blueprints, {5} sounds to {6}",
@@ -790,7 +781,6 @@ public class Editor extends Screen {
   }
 
   private void gamefileLoaded() {
-    preferences().setLastGameFile(this.currentResourceFile);
     preferences().addOpenedFile(this.currentResourceFile);
     for (Runnable callback : this.loadedCallbacks) {
       callback.run();

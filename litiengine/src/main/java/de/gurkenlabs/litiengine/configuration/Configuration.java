@@ -24,7 +24,7 @@ public class Configuration {
   private static final String DEFAULT_CONFIGURATION_FILE_NAME = "config.properties";
 
   private final List<ConfigurationGroup> configurationGroups;
-  private final String fileName;
+  private final Path path;
 
   /**
    * Initializes a new instance of the {@code Configuration} class.
@@ -36,13 +36,24 @@ public class Configuration {
   }
 
   /**
-   * Initializes a new instance of the {@code Configuration} class.
+   * Constructs a new instance of the {@code Configuration} class using the specified file name. This constructor converts the provided file name
+   * string into a {@code Path} object and delegates the initialization to another constructor.
    *
-   * @param fileName            The name of the file from which to load the settings.
+   * @param path                The path of the file from which to load the settings.
    * @param configurationGroups The configuration groups managed by this instance.
    */
-  public Configuration(final String fileName, final ConfigurationGroup... configurationGroups) {
-    this.fileName = fileName;
+  public Configuration(final String path, final ConfigurationGroup... configurationGroups) {
+    this(Path.of(path), configurationGroups);
+  }
+
+  /**
+   * Initializes a new instance of the {@code Configuration} class.
+   *
+   * @param path                The path of the file from which to load the settings.
+   * @param configurationGroups The configuration groups managed by this instance.
+   */
+  public Configuration(final Path path, final ConfigurationGroup... configurationGroups) {
+    this.path = path;
     this.configurationGroups = new ArrayList<>();
     if (configurationGroups != null && configurationGroups.length > 0) {
       Collections.addAll(this.configurationGroups, configurationGroups);
@@ -57,7 +68,7 @@ public class Configuration {
    * @return The configuration group of the specified type or null if none can be found.
    */
   public <T extends ConfigurationGroup> T getConfigurationGroup(final Class<T> groupClass) {
-    for (final ConfigurationGroup group : this.getConfigurationGroups()) {
+    for (final ConfigurationGroup group : getConfigurationGroups()) {
       if (group.getClass().equals(groupClass)) {
         return groupClass.cast(group);
       }
@@ -73,7 +84,7 @@ public class Configuration {
    * @return The configuration group with the specified prefix, or null if none can be found.
    */
   public ConfigurationGroup getConfigurationGroup(final String prefix) {
-    for (final ConfigurationGroup group : this.getConfigurationGroups()) {
+    for (final ConfigurationGroup group : getConfigurationGroups()) {
 
       final ConfigurationGroupInfo info = group.getClass().getAnnotation(ConfigurationGroupInfo.class);
       if (info == null) {
@@ -103,17 +114,17 @@ public class Configuration {
    * @param group The group to add.
    */
   public void add(ConfigurationGroup group) {
-    this.getConfigurationGroups().add(group);
+    getConfigurationGroups().add(group);
   }
 
   /**
-   * Gets the name of the file to which this configuration is saved.
+   * Gets the path of the file to which this configuration is saved.
    *
-   * @return The name of the configuration file.
+   * @return The path of the configuration file.
    * @see #save()
    */
-  public String getFileName() {
-    return this.fileName;
+  public Path getPath() {
+    return this.path;
   }
 
   /**
@@ -121,33 +132,27 @@ public class Configuration {
    * exists, it creates a new configuration file in the application folder.
    */
   public void load() {
-    final Path settingsFile = Path.of(this.getFileName());
-    try (InputStream settingsStream = Resources.get(this.getFileName())) {
-      if (!Files.exists(settingsFile) && settingsStream == null || !Files.isRegularFile(settingsFile)) {
-        try (OutputStream out = Files.newOutputStream(settingsFile)) {
-          this.createDefaultSettingsFile(out);
+    try (InputStream settingsStream = Resources.get(getPath().toString())) {
+      if (!Files.exists(getPath()) || !Files.isRegularFile(getPath()) || settingsStream == null) {
+        try (OutputStream out = Files.newOutputStream(getPath())) {
+          createDefaultSettingsFile(out);
         }
-
-        log.log(Level.INFO, "Default configuration {0} created", this.getFileName());
+        log.log(Level.INFO, "Default configuration {0} created", getPath());
         return;
       }
-    } catch (final IOException e) {
+    } catch (IOException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
     }
 
-    if (Files.exists(settingsFile)) {
-      try (InputStream settingsStream = Files.newInputStream(settingsFile)) {
+    if (Files.exists(getPath())) {
+      try (InputStream settingsStream = Files.newInputStream(getPath());
+        BufferedInputStream bufferedStream = new BufferedInputStream(settingsStream)) {
 
-        final Properties properties = new Properties();
-        BufferedInputStream stream;
-
-        stream = new BufferedInputStream(settingsStream);
-        properties.load(stream);
-        stream.close();
-
-        this.initializeSettingsByProperties(properties);
-        log.log(Level.INFO, "Configuration {0} created", this.getFileName());
-      } catch (final IOException e) {
+        Properties properties = new Properties();
+        properties.load(bufferedStream);
+        initializeSettingsByProperties(properties);
+        log.log(Level.INFO, "Configuration {0} created", getPath());
+      } catch (IOException e) {
         log.log(Level.SEVERE, e.getMessage(), e);
       }
     }
@@ -156,22 +161,24 @@ public class Configuration {
   /**
    * Saves this configuration to a file with the specified name of this instance (config.properties is the engines default config file).
    *
-   * @see #getFileName()
+   * @see #getPath()
    * @see Configuration#DEFAULT_CONFIGURATION_FILE_NAME
    */
   public void save() {
-    final Path settingsFile = Path.of(this.getFileName());
-    try (OutputStream out = Files.newOutputStream(settingsFile, StandardOpenOption.CREATE_NEW)) {
-      for (final ConfigurationGroup group : this.getConfigurationGroups()) {
-        if (!Game.isDebug() && group.isDebug()) {
-          continue;
-        }
+    try {
+      Files.deleteIfExists(getPath());
+    } catch (IOException e) {
+      throw new RuntimeException("Failed to delete existing configuration file", e);
+    }
 
-        storeConfigurationGroup(out, group);
-      }
-      log.log(Level.INFO, "Configuration {0} saved", this.getFileName());
-    } catch (final IOException e) {
-      log.log(Level.SEVERE, e.getMessage(), e);
+    try (OutputStream out = Files.newOutputStream(getPath(), StandardOpenOption.CREATE_NEW)) {
+      getConfigurationGroups().stream()
+        .filter(group -> Game.isDebug() || !group.isDebug())
+        .forEach(group -> storeConfigurationGroup(out, group));
+
+      log.log(Level.INFO, "Configuration {0} saved", getPath());
+    } catch (IOException e) {
+      log.log(Level.SEVERE, "Failed to save configuration: " + e.getMessage(), e);
     }
   }
 
@@ -187,14 +194,14 @@ public class Configuration {
   }
 
   private void createDefaultSettingsFile(final OutputStream out) {
-    for (final ConfigurationGroup group : this.getConfigurationGroups()) {
+    for (final ConfigurationGroup group : getConfigurationGroups()) {
       storeConfigurationGroup(out, group);
     }
   }
 
   private void initializeSettingsByProperties(final Properties properties) {
     for (final String key : properties.stringPropertyNames()) {
-      for (final ConfigurationGroup group : this.getConfigurationGroups()) {
+      for (final ConfigurationGroup group : getConfigurationGroups()) {
         if (key.startsWith(group.getPrefix())) {
           group.initializeByProperty(key, properties.getProperty(key));
         }
