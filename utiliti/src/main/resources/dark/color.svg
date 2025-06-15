@@ -1,0 +1,13 @@
+<svg viewBox="0 0 534 534" xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
+  style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1">
+    <path style="fill:none" d="M0 0h533.333v533.333H0z"/>
+  <path d="M506.25 266.667H266.667L436.078 97.256a239.584 239.584 0 0 1 70.172 169.411Z" style="fill:#f7c548"/>
+  <path d="M436.078 97.256 266.667 266.667V27.083a239.584 239.584 0 0 1 169.411 70.173Z" style="fill:#eeebd3"/>
+  <path d="M266.667 27.083v239.584L97.256 97.256a239.58 239.58 0 0 1 169.411-70.173Z" style="fill:#51963a"/>
+  <path d="m97.256 97.256 169.411 169.411H27.083A239.58 239.58 0 0 1 97.256 97.256Z" style="fill:#00a5bc"/>
+  <path d="M27.083 266.667h239.584L97.256 436.078a239.584 239.584 0 0 1-70.173-169.411Z" style="fill:#0e7c7b"/>
+  <path d="m97.256 436.078 169.411-169.411V506.25a239.584 239.584 0 0 1-169.411-70.172Z" style="fill:#4b1d3f"/>
+  <path d="M266.667 506.25V266.667l169.411 169.411a239.587 239.587 0 0 1-169.411 70.172Z" style="fill:#d62246"/>
+  <path d="M436.078 436.078 266.667 266.667H506.25a239.587 239.587 0 0 1-70.172 169.411Z" style="fill:#e25d0e"/>
+  <circle cx="266.667" cy="266.667" r="239.583" style="fill:none;stroke:#1e4847;stroke-width:20.83px;stroke-dasharray:0,1.04,0,0,0,0"/>
+</svg>

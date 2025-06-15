@@ -1,9 +1,11 @@
 [versions]
+darklaf = "3.0.2"
 jaxb = "4.0.5"
 junit = "5.13.1"
 
 [libraries]
-darklaf_core = { module = "com.github.weisj:darklaf-core", version = "3.0.2" }
+darklaf_core = { module = "com.github.weisj:darklaf-core", version.ref = "darklaf" }
+darklaf_propertyLoader = { module = "com.github.weisj:darklaf-property-loader", version.ref = "darklaf" }
 jinput = { module = "net.java.jinput:jinput", version = "2.0.10" }
 soundlibs_jorbis = { module = "com.googlecode.soundlibs:jorbis", version = "0.0.17.4" }
 soundlibs_tritonus = { module = "com.googlecode.soundlibs:tritonus-share", version = "0.3.7.4" }

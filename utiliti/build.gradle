@@ -30,6 +30,7 @@ application {
 dependencies {
   implementation project(":litiengine")
   implementation libs.darklaf.core
+  implementation libs.darklaf.propertyLoader
   testImplementation project(":shared")
   testImplementation libs.junit.jupiter
   testRuntimeOnly "org.junit.platform:junit-platform-launcher"

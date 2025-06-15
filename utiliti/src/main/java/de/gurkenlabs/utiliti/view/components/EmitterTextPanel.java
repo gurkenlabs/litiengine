@@ -36,7 +36,7 @@ public class EmitterTextPanel extends PropertyPanel {
     scrollPanel.setBorder(DarkBorders.createLineBorder(1, 1, 1, 1));
 
     ctrlButtonBox = Box.createVerticalBox();
-    btnAdd = new JButton(Icons.ADD);
+    btnAdd = new JButton(Icons.ADD_16);
     btnAdd.setPreferredSize(BUTTON_SIZE);
     btnAdd.setMinimumSize(BUTTON_SIZE);
     btnAdd.setMaximumSize(BUTTON_SIZE);

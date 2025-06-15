@@ -1,0 +1,8 @@
+<svg viewBox="0 0 534 534" xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
+  style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1">
+    <path style="fill:none" d="M0 0h533.333v533.333H0z"/>
+  <path
+    d="M486.243 165.414 269.107 266.667l217.136 101.252c-39.35 84.386-124.027 138.331-217.136 138.331-132.23 0-239.584-107.354-239.584-239.583 0-132.23 107.354-239.584 239.584-239.584 93.109 0 177.786 53.945 217.136 138.331Z"
+    style="fill:#f7c548;stroke:#1e4847;stroke-width:20.83px;stroke-dasharray:0,1.04,0,0,0,0"/>
+  <circle cx="269.107" cy="137.186" r="39.931" style="fill:#1e4847;stroke:#eeebd3;stroke-width:20.83px;stroke-dasharray:0,1.04,0,0,0,0"/>
+</svg>

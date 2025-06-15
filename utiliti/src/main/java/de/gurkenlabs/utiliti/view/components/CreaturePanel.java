@@ -27,7 +27,7 @@ public class CreaturePanel extends PropertyPanel {
    * Create the panel.
    */
   public CreaturePanel() {
-    super("panel_creature", Icons.CREATURE);
+    super("panel_creature", Icons.CREATURE_16);
 
     this.comboBoxSpriteSheets = new JComboBox<>();
     this.comboBoxSpriteSheets.setRenderer(new LabelListCellRenderer());
