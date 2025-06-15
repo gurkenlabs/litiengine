@@ -33,7 +33,7 @@ public class GridEditPanel extends JPanel {
 
     this.gridColor = strokeColor;
     this.buttonSetColor = new JButton("");
-    this.buttonSetColor.setIcon(Icons.COLOR);
+    this.buttonSetColor.setIcon(Icons.COLOR_16);
     this.buttonSetColor.addActionListener(
         a -> {
           Color newColor =

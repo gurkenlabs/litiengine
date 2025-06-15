@@ -19,7 +19,7 @@ public final class CanvasPopupMenu extends JPopupMenu {
     delete.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
     delete.setEnabled(false);
 
-    JMenuItem copy = new JMenuItem(Resources.strings().get("menu_edit_copy"), Icons.COPY);
+    JMenuItem copy = new JMenuItem(Resources.strings().get("menu_edit_copy"), Icons.COPY_16);
     copy.addActionListener(e -> Editor.instance().getMapComponent().copy());
     copy.setEnabled(false);
     copy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK));
@@ -35,7 +35,7 @@ public final class CanvasPopupMenu extends JPopupMenu {
     paste.setEnabled(false);
 
     JMenuItem blueprint =
-        new JMenuItem(Resources.strings().get("menu_edit_blueprint"), Icons.BLUEPRINT);
+        new JMenuItem(Resources.strings().get("menu_edit_blueprint"), Icons.BLUEPRINT_16);
     blueprint.addActionListener(e -> Editor.instance().getMapComponent().defineBlueprint());
     blueprint.setEnabled(false);
 

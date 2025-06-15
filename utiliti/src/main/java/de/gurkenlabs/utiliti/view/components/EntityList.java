@@ -68,7 +68,7 @@ public final class EntityList extends JPanel implements EntityController {
     this.btnCollape.setOpaque(false);
     this.btnCollape.setMargin(new Insets(2, 2, 2, 2));
     this.btnCollape.addActionListener(e -> collapseAll());
-    this.btnCollape.setIcon(Icons.COLLAPSE);
+    this.btnCollape.setIcon(Icons.COLLAPSE_16);
 
     final String entitySearchDefault = Resources.strings().get("panel_entities_search_default");
 
@@ -137,11 +137,11 @@ public final class EntityList extends JPanel implements EntityController {
     this.nodeCreatures =
       new DefaultMutableTreeNode(
         new IconTreeListItem(
-          Resources.strings().get("panel_mapselection_creatures"), Icons.CREATURE));
+          Resources.strings().get("panel_mapselection_creatures"), Icons.CREATURE_16));
     this.nodeLights =
       new DefaultMutableTreeNode(
         new IconTreeListItem(
-          Resources.strings().get("panel_mapselection_lights"), Icons.LIGHT));
+          Resources.strings().get("panel_mapselection_lights"), Icons.BULB_16));
     this.nodeTriggers =
       new DefaultMutableTreeNode(
         new IconTreeListItem(
@@ -153,7 +153,7 @@ public final class EntityList extends JPanel implements EntityController {
     this.nodeCollisionBoxes =
       new DefaultMutableTreeNode(
         new IconTreeListItem(
-          Resources.strings().get("panel_mapselection_collboxes"), Icons.COLLISIONBOX));
+          Resources.strings().get("panel_mapselection_collboxes"), Icons.COLLISIONBOX_16));
     this.nodeMapAreas =
       new DefaultMutableTreeNode(
         new IconTreeListItem(
@@ -344,12 +344,12 @@ public final class EntityList extends JPanel implements EntityController {
         Game.world().environment().getCreatures(),
         this.nodeCreatures,
         Resources.strings().get("panel_mapselection_creatures"),
-        Icons.CREATURE);
+        Icons.CREATURE_8);
       addEntitiesToTreeNode(
         Game.world().environment().getCollisionBoxes(),
         this.nodeCollisionBoxes,
         Resources.strings().get("panel_mapselection_collboxes"),
-        Icons.COLLISIONBOX);
+        Icons.COLLISIONBOX_16);
       addEntitiesToTreeNode(
         Game.world().environment().getTriggers(),
         this.nodeTriggers,
@@ -369,7 +369,7 @@ public final class EntityList extends JPanel implements EntityController {
         Game.world().environment().getLightSources(),
         this.nodeLights,
         Resources.strings().get("panel_mapselection_lights"),
-        Icons.LIGHT);
+        Icons.BULB_16);
       addEntitiesToTreeNode(
         Game.world().environment().getStaticShadows(),
         this.nodeStaticShadows,

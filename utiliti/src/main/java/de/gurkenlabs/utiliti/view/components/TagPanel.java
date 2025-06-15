@@ -3,7 +3,6 @@ package de.gurkenlabs.utiliti.view.components;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.utiliti.controller.WrapLayout;
-import de.gurkenlabs.utiliti.model.Tag;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;

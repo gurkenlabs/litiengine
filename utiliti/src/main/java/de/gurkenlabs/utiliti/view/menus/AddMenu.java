@@ -17,19 +17,19 @@ public final class AddMenu extends JMenu {
 
   public AddMenu() {
     super(Resources.strings().get("menu_add"));
-    this.setIcon(Icons.ADD);
+    this.setIcon(Icons.ADD_16);
 
     JMenuItem addProp = new JMenuItem(Resources.strings().get("menu_add_prop"), Icons.PROP);
     addProp.addActionListener(a -> setCreateMode(MapObjectType.PROP));
     addProp.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, InputEvent.CTRL_DOWN_MASK));
 
     JMenuItem addCreature =
-        new JMenuItem(Resources.strings().get("menu_add_creature"), Icons.CREATURE);
+      new JMenuItem(Resources.strings().get("menu_add_creature"), Icons.CREATURE_16);
     addCreature.addActionListener(a -> setCreateMode(MapObjectType.CREATURE));
     addCreature.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_2, InputEvent.CTRL_DOWN_MASK));
 
     JMenuItem addCollisionBox =
-        new JMenuItem(Resources.strings().get("menu_add_collisionbox"), Icons.COLLISIONBOX);
+      new JMenuItem(Resources.strings().get("menu_add_collisionbox"), Icons.COLLISIONBOX_16);
     addCollisionBox.addActionListener(a -> setCreateMode(MapObjectType.COLLISIONBOX));
     addCollisionBox.setAccelerator(
         KeyStroke.getKeyStroke(KeyEvent.VK_3, InputEvent.CTRL_DOWN_MASK));
@@ -48,7 +48,7 @@ public final class AddMenu extends JMenu {
     addMapArea.addActionListener(a -> setCreateMode(MapObjectType.AREA));
     addMapArea.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_6, InputEvent.CTRL_DOWN_MASK));
 
-    JMenuItem addLight = new JMenuItem(Resources.strings().get("menu_add_light"), Icons.LIGHT);
+    JMenuItem addLight = new JMenuItem(Resources.strings().get("menu_add_light"), Icons.BULB_16);
     addLight.addActionListener(a -> setCreateMode(MapObjectType.LIGHTSOURCE));
     addLight.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_7, InputEvent.CTRL_DOWN_MASK));
 

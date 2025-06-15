@@ -20,7 +20,7 @@ public class LightSourcePanel extends PropertyPanel {
   private final ColorComponent colorControl;
 
   public LightSourcePanel() {
-    super("panel_lightSource", Icons.LIGHT);
+    super("panel_lightSource", Icons.BULB_24);
 
     this.colorControl = new ColorComponent();
 

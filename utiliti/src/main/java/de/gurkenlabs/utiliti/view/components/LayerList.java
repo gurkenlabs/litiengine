@@ -134,7 +134,7 @@ public final class LayerList extends JPanel implements LayerController {
 
   private JButton createAddLayerButton() {
     return createButton(
-        Icons.ADD,
+      Icons.ADD_16,
         (map, selectedLayer) -> {
           MapObjectLayer layer = new MapObjectLayer();
           layer.setName("new layer");
@@ -177,7 +177,7 @@ public final class LayerList extends JPanel implements LayerController {
 
   private JButton createDuplicateLayerButton() {
     return createButton(
-        Icons.COPY,
+      Icons.COPY_16,
         (map, selectedLayer) -> {
           IMapObjectLayer copiedLayer = new MapObjectLayer((MapObjectLayer) selectedLayer);
           map.addLayer(getAbsoluteIndex(map, this.layerTable.getSelectedRow()), copiedLayer);
@@ -188,7 +188,7 @@ public final class LayerList extends JPanel implements LayerController {
 
   private JButton createSetColorButton() {
     return createButton(
-        Icons.COLOR,
+      Icons.COLOR_16,
         (map, selectedLayer) -> {
           Color newColor =
               JColorChooser.showDialog(

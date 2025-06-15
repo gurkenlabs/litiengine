@@ -63,7 +63,7 @@ public final class EditMenu extends JMenu {
     renderMenu.setEnabled(false);
 
     JMenuItem blueprint =
-        new JMenuItem(Resources.strings().get("menu_edit_blueprint"), Icons.BLUEPRINT);
+      new JMenuItem(Resources.strings().get("menu_edit_blueprint"), Icons.BLUEPRINT_16);
     blueprint.addActionListener(e -> Editor.instance().getMapComponent().defineBlueprint());
     blueprint.setEnabled(false);
 

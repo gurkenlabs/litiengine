@@ -1,5 +1,7 @@
-package de.gurkenlabs.utiliti.model;
+package de.gurkenlabs.utiliti.view.components;
 
+import de.gurkenlabs.utiliti.model.Icons;
+import de.gurkenlabs.utiliti.model.Style;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;

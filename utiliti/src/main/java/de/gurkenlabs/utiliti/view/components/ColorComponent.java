@@ -40,7 +40,7 @@ public class ColorComponent extends JPanel {
     this.textFieldColor.addActionListener(a -> this.setColor(ColorHelper.decode(this.textFieldColor.getText())));
 
     this.btnSelectColor = new JButton();
-    this.btnSelectColor.setIcon(Icons.COLOR);
+    this.btnSelectColor.setIcon(Icons.COLOR_16);
     this.btnSelectColor.addActionListener(
         a -> {
           final Color result =

@@ -15,7 +15,7 @@ public class CollisionBoxPanel extends PropertyPanel {
   private final JCheckBox chckbxIsObstructingLights;
 
   public CollisionBoxPanel() {
-    super("panel_collisionBox", Icons.COLLISIONBOX);
+    super("panel_collisionBox", Icons.COLLISIONBOX_24);
 
     this.comboBoxColl = new JComboBox<>();
     this.comboBoxColl.setModel(

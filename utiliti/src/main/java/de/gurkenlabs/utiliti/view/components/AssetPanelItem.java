@@ -159,7 +159,7 @@ public class AssetPanelItem extends JPanel {
 
     buttonPanel.add(Box.createHorizontalGlue());
     btnAdd = new JButton();
-    initButton(btnAdd, "assetpanel_add", Icons.ADD, e -> this.addEntity());
+    initButton(btnAdd, "assetpanel_add", Icons.ADD_16, e -> this.addEntity());
     btnAdd.setEnabled(canAdd());
     btnEdit = new JButton();
     initButton(btnEdit, "assetpanel_edit", Icons.PENCIL, e -> this.editAsset());

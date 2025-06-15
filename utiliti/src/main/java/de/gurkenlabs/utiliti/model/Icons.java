@@ -1,5 +1,6 @@
 package de.gurkenlabs.utiliti.model;
 
+import com.github.weisj.darklaf.properties.icons.IconLoader;
 import de.gurkenlabs.litiengine.resources.ResourceLoadException;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.Editor;
@@ -7,17 +8,58 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 public final class Icons {
-  public static final Icon ADD = get("add");
-  public static final Icon ASSET = get("asset");
-  public static final Icon BLUEPRINT = get("blueprint");
-  public static final Icon CLEAR_CONSOLE = get("clear_console");
-  public static final Icon COLLAPSE = get("collapse");
-  public static final Icon COLLISIONBOX = get("collisionbox");
-  public static final Icon COLOR = get("color");
-  public static final Icon CONSOLE = get("console");
-  public static final Icon COPY = get("copy");
-  public static final Icon CREATURE = get("creature");
-  public static final Icon CUBE = get("cube");
+  // 8px variants
+  public static final Icon ADD_8 = IconLoader.get().getUIAwareIcon("add.svg", 8, 8);
+  public static final Icon ASSET_8 = IconLoader.get().getUIAwareIcon("asset.svg", 8, 8);
+  public static final Icon BLUEPRINT_8 = IconLoader.get().getUIAwareIcon("blueprint.svg", 8, 8);
+  public static final Icon BULB_8 = IconLoader.get().getUIAwareIcon("bulb.svg", 8, 8);
+  public static final Icon CLEAR_CONSOLE_8 = IconLoader.get().getUIAwareIcon("clear-console.svg", 8, 8);
+  public static final Icon COLLAPSE_8 = IconLoader.get().getUIAwareIcon("collapse.svg", 8, 8);
+  public static final Icon COLLISIONBOX_8 = IconLoader.get().getUIAwareIcon("collisionbox.svg", 8, 8);
+  public static final Icon COLOR_8 = IconLoader.get().getUIAwareIcon("color.svg", 8, 8);
+  public static final Icon CONSOLE_8 = IconLoader.get().getUIAwareIcon("console.svg", 8, 8);
+  public static final Icon COPY_8 = IconLoader.get().getUIAwareIcon("copy.svg", 8, 8);
+  public static final Icon CREATURE_8 = IconLoader.get().getUIAwareIcon("creature.svg", 8, 8);
+
+  // 16px variants
+  public static final Icon ADD_16 = IconLoader.get().getUIAwareIcon("add.svg", 16, 16);
+  public static final Icon ASSET_16 = IconLoader.get().getUIAwareIcon("asset.svg", 16, 16);
+  public static final Icon BLUEPRINT_16 = IconLoader.get().getUIAwareIcon("blueprint.svg", 16, 16);
+  public static final Icon BULB_16 = IconLoader.get().getUIAwareIcon("bulb.svg", 16, 16);
+  public static final Icon CLEAR_CONSOLE_16 = IconLoader.get().getUIAwareIcon("clear-console.svg", 16, 16);
+  public static final Icon COLLAPSE_16 = IconLoader.get().getUIAwareIcon("collapse.svg", 16, 16);
+  public static final Icon COLLISIONBOX_16 = IconLoader.get().getUIAwareIcon("collisionbox.svg", 16, 16);
+  public static final Icon COLOR_16 = IconLoader.get().getUIAwareIcon("color.svg", 16, 16);
+  public static final Icon CONSOLE_16 = IconLoader.get().getUIAwareIcon("console.svg", 16, 16);
+  public static final Icon COPY_16 = IconLoader.get().getUIAwareIcon("copy.svg", 16, 16);
+  public static final Icon CREATURE_16 = IconLoader.get().getUIAwareIcon("creature.svg", 16, 16);
+
+  // 24px variants
+  public static final Icon ADD_24 = IconLoader.get().getUIAwareIcon("add.svg", 24, 24);
+  public static final Icon ASSET_24 = IconLoader.get().getUIAwareIcon("asset.svg", 24, 24);
+  public static final Icon BLUEPRINT_24 = IconLoader.get().getUIAwareIcon("blueprint.svg", 24, 24);
+  public static final Icon BULB_24 = IconLoader.get().getUIAwareIcon("bulb.svg", 24, 24);
+  public static final Icon CLEAR_CONSOLE_24 = IconLoader.get().getUIAwareIcon("clear-console.svg", 24, 24);
+  public static final Icon COLLAPSE_24 = IconLoader.get().getUIAwareIcon("collapse.svg", 24, 24);
+  public static final Icon COLLISIONBOX_24 = IconLoader.get().getUIAwareIcon("collisionbox.svg", 24, 24);
+  public static final Icon COLOR_24 = IconLoader.get().getUIAwareIcon("color.svg", 24, 24);
+  public static final Icon CONSOLE_24 = IconLoader.get().getUIAwareIcon("console.svg", 24, 24);
+  public static final Icon COPY_24 = IconLoader.get().getUIAwareIcon("copy.svg", 24, 24);
+  public static final Icon CREATURE_24 = IconLoader.get().getUIAwareIcon("creature.svg", 24, 24);
+
+  // 32px variants
+  public static final Icon ADD_32 = IconLoader.get().getUIAwareIcon("add.svg", 32, 32);
+  public static final Icon ASSET_32 = IconLoader.get().getUIAwareIcon("asset.svg", 32, 32);
+  public static final Icon BLUEPRINT_32 = IconLoader.get().getUIAwareIcon("blueprint.svg", 32, 32);
+  public static final Icon BULB_32 = IconLoader.get().getUIAwareIcon("bulb.svg", 32, 32);
+  public static final Icon CLEAR_CONSOLE_32 = IconLoader.get().getUIAwareIcon("clear-console.svg", 32, 32);
+  public static final Icon COLLAPSE_32 = IconLoader.get().getUIAwareIcon("collapse.svg", 32, 32);
+  public static final Icon COLLISIONBOX_32 = IconLoader.get().getUIAwareIcon("collisionbox.svg", 32, 32);
+  public static final Icon COLOR_32 = IconLoader.get().getUIAwareIcon("color.svg", 32, 32);
+  public static final Icon CONSOLE_32 = IconLoader.get().getUIAwareIcon("console.svg", 32, 32);
+  public static final Icon COPY_32 = IconLoader.get().getUIAwareIcon("copy.svg", 32, 32);
+  public static final Icon CREATURE_32 = IconLoader.get().getUIAwareIcon("creature.svg", 32, 32);
+
   public static final Icon CUT = get("cut");
   public static final Icon DEFAULT_NODE = get("bullet");
   public static final Icon DELETE = get("delete_x12");
@@ -77,5 +119,6 @@ public final class Icons {
     return ic;
   }
 
-  private Icons() {}
+  private Icons() {
+  }
 }

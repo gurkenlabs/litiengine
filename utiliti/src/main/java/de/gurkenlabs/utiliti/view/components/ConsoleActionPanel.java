@@ -27,7 +27,7 @@ public class ConsoleActionPanel extends JPanel {
 
     JButton buttonClearConsole =
         createButton(
-            Icons.CLEAR_CONSOLE,
+            Icons.CLEAR_CONSOLE_24,
             (actionEvent -> Arrays.stream(Logger.getLogger("").getHandlers())
                 .filter(LogHandler.class::isInstance)
                 .findFirst()
