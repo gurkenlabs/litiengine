@@ -94,7 +94,7 @@ class ConfigurationGroupTests {
     }
   }
 
-  class TestConfigurationChangedListener implements ConfigurationChangedListener {
+  static class TestConfigurationChangedListener implements ConfigurationChangedListener {
     Object newVal;
     Object oldVal;
     Object source;

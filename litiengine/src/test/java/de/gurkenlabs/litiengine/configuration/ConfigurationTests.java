@@ -27,7 +27,7 @@ class ConfigurationTests {
   @AfterEach
   void deleteConfigFile() throws IOException {
     if (config != null) {
-      final Path configFile = Path.of(config.getFileName());
+      final Path configFile = config.getPath();
       Files.deleteIfExists(configFile);
     }
   }
@@ -54,7 +54,7 @@ class ConfigurationTests {
     config.load();
 
     // act, assert
-    assertTrue(Files.exists(Path.of(config.getFileName())));
+    assertTrue(Files.exists(config.getPath()));
   }
 
   @Test

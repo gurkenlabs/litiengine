@@ -29,6 +29,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
@@ -87,30 +88,27 @@ public class ResourceBundle implements Serializable {
   }
 
   /**
-   * Loads a ResourceBundle from a file path.
+   * Loads a ResourceBundle from a Path.
    *
-   * @param file The file path to load the ResourceBundle from.
+   * @param filePath The Path to load the ResourceBundle from.
    * @return The loaded ResourceBundle, or null if loading fails.
    */
-  public static ResourceBundle load(String file) {
-    return load(Resources.getLocation(file));
-  }
+  public static ResourceBundle load(Path filePath) {
+    if (!Files.exists(filePath)) {
+      log.log(Level.WARNING, "File does not exist: {0}", filePath);
+      return null;
+    }
 
-  /**
-   * Loads a ResourceBundle from a URL.
-   *
-   * @param file The URL to load the ResourceBundle from.
-   * @return The loaded ResourceBundle, or null if loading fails.
-   */
-  public static ResourceBundle load(final URL file) {
     try {
-      ResourceBundle gameFile = getResourceBundle(file);
+      ResourceBundle gameFile = getResourceBundle(filePath);
       if (gameFile == null) {
         return null;
       }
 
+      URL fileUrl = filePath.toUri().toURL();
+
       for (Tileset tileset : gameFile.getTilesets()) {
-        tileset.finish(file);
+        tileset.finish(fileUrl);
       }
 
       for (TmxMap map : gameFile.getMaps()) {
@@ -119,12 +117,60 @@ public class ResourceBundle implements Serializable {
             ts.load(gameFile.getTilesets());
           }
         }
-        map.finish(file);
+        map.finish(fileUrl);
       }
 
       return gameFile;
     } catch (final JAXBException | IOException e) {
-      log.log(Level.SEVERE, "{} - {}", new Object[] {file, e.getMessage()});
+      log.log(Level.SEVERE, "Failed to load ResourceBundle from path: {0} - {1}",
+        new Object[] {filePath, e.getMessage()});
+    }
+
+    return null;
+  }
+
+  /**
+   * Loads a ResourceBundle from a string file path (convenience overload).
+   *
+   * @param filePath The file path as a string to load the ResourceBundle from.
+   * @return The loaded ResourceBundle, or null if loading fails.
+   */
+  public static ResourceBundle load(String filePath) {
+    return load(Path.of(filePath));
+  }
+
+
+  /**
+   * Loads a ResourceBundle from a URL (convenience overload). This method uses the Resources utility to resolve the URL and then delegates to the
+   * Path-based method.
+   *
+   * @param fileUrl The URL to load the ResourceBundle from.
+   * @return The loaded ResourceBundle, or null if loading fails.
+   */
+  public static ResourceBundle load(final URL fileUrl) {
+    try {
+      ResourceBundle gameFile = getResourceBundleFromUrl(fileUrl);
+      if (gameFile == null) {
+        return null;
+      }
+
+      for (Tileset tileset : gameFile.getTilesets()) {
+        tileset.finish(fileUrl);
+      }
+
+      for (TmxMap map : gameFile.getMaps()) {
+        for (final ITileset tileset : map.getTilesets()) {
+          if (tileset instanceof Tileset ts) {
+            ts.load(gameFile.getTilesets());
+          }
+        }
+        map.finish(fileUrl);
+      }
+
+      return gameFile;
+    } catch (final JAXBException | IOException e) {
+      log.log(Level.SEVERE, "Failed to load ResourceBundle from URL: {0} - {1}",
+        new Object[] {fileUrl, e.getMessage()});
     }
 
     return null;
@@ -204,24 +250,22 @@ public class ResourceBundle implements Serializable {
     }
 
     final Path newFile = Path.of(fileNameWithExtension);
-    if (!Files.exists(newFile)) {
-      try {
-        Files.delete(newFile);
-      } catch (IOException e) {
-        log.log(Level.WARNING, e.getMessage(), e);
-      }
+    try {
+      Files.deleteIfExists(newFile);
+    } catch (IOException e) {
+      log.log(Level.WARNING, e.getMessage(), e);
     }
 
-    Collections.sort(this.getMaps());
-    Collections.sort(this.getSpriteSheets());
-    Collections.sort(this.getTilesets());
-    Collections.sort(this.getEmitters());
-    Collections.sort(this.getBluePrints());
-    Collections.sort(this.getSounds());
+    Collections.sort(getMaps());
+    Collections.sort(getSpriteSheets());
+    Collections.sort(getTilesets());
+    Collections.sort(getEmitters());
+    Collections.sort(getBluePrints());
+    Collections.sort(getSounds());
 
     try (OutputStream fileOut = Files.newOutputStream(newFile, StandardOpenOption.CREATE_NEW)) {
       final JAXBContext jaxbContext = XmlUtilities.getContext(ResourceBundle.class);
-      final Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+      final Marshaller jaxbMarshaller = Objects.requireNonNull(jaxbContext).createMarshaller();
       // output pretty printed
       jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, false);
 
@@ -284,26 +328,50 @@ public class ResourceBundle implements Serializable {
   }
 
   /**
-   * Retrieves a ResourceBundle from a specified URL. This method attempts to load the ResourceBundle from a compressed GZIP stream first. If that
+   * Retrieves a ResourceBundle from a specified Path. This method attempts to load the ResourceBundle from a compressed GZIP stream first. If that
    * fails, it falls back to loading from plain XML.
    *
-   * @param file The URL of the resource bundle file.
+   * @param filePath The Path of the resource bundle file.
    * @return The loaded ResourceBundle.
    * @throws JAXBException If an error occurs during the unmarshalling process.
    * @throws IOException   If an I/O error occurs.
    */
-  private static ResourceBundle getResourceBundle(URL file) throws JAXBException, IOException {
+  private static ResourceBundle getResourceBundle(Path filePath) throws JAXBException, IOException {
     final JAXBContext jaxbContext = XmlUtilities.getContext(ResourceBundle.class);
-    final Unmarshaller um = jaxbContext.createUnmarshaller();
-    try (InputStream inputStream = Resources.get(file)) {
+    final Unmarshaller um = Objects.requireNonNull(jaxbContext).createUnmarshaller();
 
+    try (InputStream inputStream = Files.newInputStream(filePath)) {
       // try to get compressed game file
-      final GZIPInputStream zipStream = new GZIPInputStream(inputStream);
-      return (ResourceBundle) um.unmarshal(zipStream);
+      try (final GZIPInputStream zipStream = new GZIPInputStream(inputStream)) {
+        return (ResourceBundle) um.unmarshal(zipStream);
+      }
     } catch (final ZipException e) {
-
       // if it fails to load the compressed file, get it from plain XML
-      return XmlUtilities.read(ResourceBundle.class, file);
+      return XmlUtilities.read(ResourceBundle.class, filePath.toUri().toURL());
+    }
+  }
+
+  /**
+   * Retrieves a ResourceBundle from a specified URL. This method attempts to load the ResourceBundle from a compressed GZIP stream first. If that
+   * fails, it falls back to loading from plain XML.
+   *
+   * @param fileUrl The URL of the resource bundle file.
+   * @return The loaded ResourceBundle.
+   * @throws JAXBException If an error occurs during the unmarshalling process.
+   * @throws IOException   If an I/O error occurs.
+   */
+  private static ResourceBundle getResourceBundleFromUrl(URL fileUrl) throws JAXBException, IOException {
+    final JAXBContext jaxbContext = XmlUtilities.getContext(ResourceBundle.class);
+    final Unmarshaller um = Objects.requireNonNull(jaxbContext).createUnmarshaller();
+
+    try (InputStream inputStream = Resources.get(fileUrl)) {
+      // try to get compressed game file
+      try (final GZIPInputStream zipStream = new GZIPInputStream(Objects.requireNonNull(inputStream))) {
+        return (ResourceBundle) um.unmarshal(zipStream);
+      }
+    } catch (final ZipException e) {
+      // if it fails to load the compressed file, get it from plain XML
+      return XmlUtilities.read(ResourceBundle.class, fileUrl);
     }
   }
 }

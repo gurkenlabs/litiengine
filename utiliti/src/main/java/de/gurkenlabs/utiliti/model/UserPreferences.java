@@ -6,9 +6,9 @@ import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.utiliti.model.Style.Theme;
 import java.awt.Color;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.Properties;
 
 /**
  * Represents the user preferences for the UtiLITI application. This class extends the ConfigurationGroup and provides various settings that can be
@@ -43,8 +43,7 @@ public class UserPreferences extends ConfigurationGroup {
   private String gridColor;
   private int snapDivision;
 
-  private Path lastGameFile;
-  private Path[] lastOpenedFiles;
+  private final Deque<Path> lastOpenedFiles;
   private float uiScale;
 
   private Theme theme;
@@ -61,8 +60,7 @@ public class UserPreferences extends ConfigurationGroup {
     this.snapToGrid = true;
     this.renderBoundingBoxes = true;
     this.renderNames = true;
-    this.lastGameFile = Path.of(".");
-    this.lastOpenedFiles = new Path[10];
+    this.lastOpenedFiles = new ArrayDeque<>();
     this.compressFile = false;
     this.gridLineWidth = 1.0f;
     this.gridColor = ColorHelper.encode(Style.COLOR_DEFAULT_GRID);
@@ -74,37 +72,14 @@ public class UserPreferences extends ConfigurationGroup {
   /**
    * Adds a file to the list of last opened files. Ensures that the list contains a maximum of 10 elements and removes duplicates.
    *
-   * @param str the file to be added to the list of last opened files.
+   * @param path the file to be added to the list of last opened files.
    */
-  public void addOpenedFile(Path str) {
-    // ensure max 10 elements
-    List<Path> newFiles = new ArrayList<>();
-    for (int i = 0; i <= this.lastOpenedFiles.length; i++) {
-      newFiles.add(null);
-    }
-
-    // make space for the new element and clear all duplicates
-    for (int i = 1; i < this.lastOpenedFiles.length; i++) {
-      if (this.lastOpenedFiles[i - 1] != null && this.lastOpenedFiles[i - 1].equals(str)) {
-        continue;
+  public void addOpenedFile(Path path) {
+    if (!lastOpenedFiles.contains(path)) {
+      if (lastOpenedFiles.size() >= 10) {
+        lastOpenedFiles.removeFirst();
       }
-
-      if (this.lastOpenedFiles[i - 1] == null) {
-        newFiles.add(i, null);
-      } else {
-        newFiles.add(i, this.lastOpenedFiles[i - 1]);
-      }
-    }
-
-    // add the new element
-    newFiles.addFirst(str);
-    newFiles.removeAll(Collections.singleton(null));
-    // clear array
-    this.lastOpenedFiles = new Path[10];
-
-    // fill array
-    for (int i = 0; i < newFiles.size(); i++) {
-      this.lastOpenedFiles[i] = newFiles.get(i);
+      lastOpenedFiles.add(path);
     }
   }
 
@@ -258,16 +233,7 @@ public class UserPreferences extends ConfigurationGroup {
    * @return the last game file.
    */
   public Path getLastGameFile() {
-    return lastGameFile;
-  }
-
-  /**
-   * Sets the last game file.
-   *
-   * @param lastGameFile the new last game file.
-   */
-  public void setLastGameFile(Path lastGameFile) {
-    this.lastGameFile = lastGameFile;
+    return !lastOpenedFiles.isEmpty() ? lastOpenedFiles.getLast() : null;
   }
 
   /**
@@ -275,7 +241,7 @@ public class UserPreferences extends ConfigurationGroup {
    *
    * @return an array of the last opened files.
    */
-  public Path[] getLastOpenedFiles() {
+  public Deque<Path> getLastOpenedFiles() {
     return lastOpenedFiles;
   }
 
@@ -283,16 +249,7 @@ public class UserPreferences extends ConfigurationGroup {
    * Clears the list of last opened files.
    */
   public void clearOpenedFiles() {
-    this.lastOpenedFiles = new Path[10];
-  }
-
-  /**
-   * Sets the list of last opened files.
-   *
-   * @param lastOpenedFiles an array of the new last opened files.
-   */
-  public void setLastOpenedFiles(Path[] lastOpenedFiles) {
-    this.lastOpenedFiles = lastOpenedFiles;
+    getLastOpenedFiles().clear();
   }
 
   /**
@@ -581,5 +538,43 @@ public class UserPreferences extends ConfigurationGroup {
    */
   public void setTheme(Theme theme) {
     this.theme = theme;
+  }
+
+  @Override protected void storeProperties(Properties properties) {
+    super.storeProperties(properties);
+    if (lastOpenedFiles != null && !lastOpenedFiles.isEmpty()) {
+      StringBuilder pathsString = new StringBuilder();
+      int index = 0;
+      for (Path path : lastOpenedFiles) {
+        if (path != null) {
+          if (index > 0) {
+            pathsString.append(";");
+          }
+          pathsString.append(path);
+          index++;
+        }
+      }
+      properties.setProperty(getPrefix() + "lastOpenedFiles", pathsString.toString());
+    }
+  }
+
+  @Override
+  protected void initializeByProperty(final String key, final String value) {
+    // Handle the lastOpenedFiles property separately
+    if (key.equals(getPrefix() + "lastOpenedFiles")) {
+      if (value != null && !value.isEmpty()) {
+        this.lastOpenedFiles.clear();
+        String[] paths = value.split(";");
+        for (String pathStr : paths) {
+          if (pathStr != null && !pathStr.isEmpty()) {
+            Path path = Path.of(pathStr);
+            this.lastOpenedFiles.add(path);
+          }
+        }
+      }
+    } else {
+      // Use the default behavior for other properties
+      super.initializeByProperty(key, value);
+    }
   }
 }
