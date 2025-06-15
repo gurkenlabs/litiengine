@@ -1,5 +1,5 @@
 [versions]
-darklaf = "3.0.2"
+darklaf = "3.0.3-SNAPSHOT"
 jaxb = "4.0.5"
 junit = "5.13.1"
 
