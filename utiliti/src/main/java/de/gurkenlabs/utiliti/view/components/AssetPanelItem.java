@@ -164,7 +164,7 @@ public class AssetPanelItem extends JPanel {
     btnEdit = new JButton();
     initButton(btnEdit, "assetpanel_edit", Icons.PENCIL, e -> this.editAsset());
     btnDelete = new JButton();
-    initButton(btnDelete, "assetpanel_delete", Icons.DELETE, e -> this.deleteAsset());
+    initButton(btnDelete, "assetpanel_delete", Icons.DELETE_16, e -> this.deleteAsset());
     btnExport = new JButton();
     initButton(btnExport, "assetpanel_export", Icons.EXPORT, e -> this.exportAsset());
     buttonPanel.add(Box.createHorizontalGlue());

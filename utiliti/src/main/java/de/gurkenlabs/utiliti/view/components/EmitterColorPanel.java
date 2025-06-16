@@ -56,7 +56,7 @@ public class EmitterColorPanel extends PropertyPanel {
     btnAdd.setPreferredSize(BUTTON_SIZE);
     btnAdd.setMinimumSize(BUTTON_SIZE);
     btnAdd.setMaximumSize(BUTTON_SIZE);
-    btnRemove = new JButton(Icons.DELETE);
+    btnRemove = new JButton(Icons.DELETE_16);
     btnRemove.setPreferredSize(BUTTON_SIZE);
     btnRemove.setMinimumSize(BUTTON_SIZE);
     btnRemove.setMaximumSize(BUTTON_SIZE);

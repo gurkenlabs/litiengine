@@ -23,7 +23,7 @@ public class EmitterPanel extends PropertyPanel {
   JTabbedPane propertyGrouptabs;
 
   public EmitterPanel() {
-    super("panel_emitter", Icons.EMITTER);
+    super("panel_emitter", Icons.EMITTER_24);
     setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
     this.propertyGrouptabs = new JTabbedPane();
     this.propertyGrouptabs.setAlignmentX(Component.LEFT_ALIGNMENT);

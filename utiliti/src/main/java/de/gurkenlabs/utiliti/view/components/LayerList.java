@@ -153,7 +153,7 @@ public final class LayerList extends JPanel implements LayerController {
 
   private JButton createRemoveLayerButton() {
     return createButton(
-        Icons.DELETE,
+      Icons.DELETE_16,
         (map, selectedLayer) -> {
           // we need at least on mapobject layer to work with LITIENGINE entities.
           if (map.getMapObjectLayers().size() <= 1) {
