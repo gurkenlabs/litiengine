@@ -14,7 +14,7 @@ import javax.swing.KeyStroke;
 @SuppressWarnings("serial")
 public final class CanvasPopupMenu extends JPopupMenu {
   public CanvasPopupMenu() {
-    JMenuItem delete = new JMenuItem(Resources.strings().get("menu_edit_delete"), Icons.DELETE);
+    JMenuItem delete = new JMenuItem(Resources.strings().get("menu_edit_delete"), Icons.DELETE_16);
     delete.addActionListener(e -> Editor.instance().getMapComponent().delete());
     delete.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
     delete.setEnabled(false);
@@ -24,7 +24,7 @@ public final class CanvasPopupMenu extends JPopupMenu {
     copy.setEnabled(false);
     copy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK));
 
-    JMenuItem cut = new JMenuItem(Resources.strings().get("menu_edit_cut"), Icons.CUT);
+    JMenuItem cut = new JMenuItem(Resources.strings().get("menu_edit_cut"), Icons.CUT_16);
     cut.addActionListener(e -> Editor.instance().getMapComponent().cut());
     cut.setEnabled(false);
     cut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK));
@@ -39,7 +39,7 @@ public final class CanvasPopupMenu extends JPopupMenu {
     blueprint.addActionListener(e -> Editor.instance().getMapComponent().defineBlueprint());
     blueprint.setEnabled(false);
 
-    JMenuItem emitter = new JMenuItem(Resources.strings().get("menu_save_emitter"), Icons.EMITTER);
+    JMenuItem emitter = new JMenuItem(Resources.strings().get("menu_save_emitter"), Icons.EMITTER_16);
     emitter.addActionListener(e -> Editor.instance().getMapComponent().saveEmitter());
     emitter.setEnabled(false);
 

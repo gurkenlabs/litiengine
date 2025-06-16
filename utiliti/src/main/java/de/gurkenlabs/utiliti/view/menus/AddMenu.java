@@ -58,7 +58,7 @@ public final class AddMenu extends JMenu {
     addShadow.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_8, InputEvent.CTRL_DOWN_MASK));
 
     JMenuItem addEmitter =
-        new JMenuItem(Resources.strings().get("menu_add_emitter"), Icons.EMITTER);
+      new JMenuItem(Resources.strings().get("menu_add_emitter"), Icons.EMITTER_16);
     addEmitter.addActionListener(a -> setCreateMode(MapObjectType.EMITTER));
     addEmitter.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_9, InputEvent.CTRL_DOWN_MASK));
 

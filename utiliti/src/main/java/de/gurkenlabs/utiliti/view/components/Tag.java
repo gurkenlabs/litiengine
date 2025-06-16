@@ -36,44 +36,46 @@ public class Tag extends JPanel {
     this.lblText = new JLabel("New label");
     this.lblText.setForeground(Color.WHITE);
     this.lblText.setFont(
-        this.lblText.getFont().deriveFont(Style.getDefaultFont().getSize() * 0.75f));
+      this.lblText.getFont().deriveFont(Style.getDefaultFont().getSize() * 0.75f));
     panel.add(this.lblText);
 
     this.btnDelete = new JButton();
     this.btnDelete.addActionListener(
-        e -> {
-          final Container parent = this.getParent();
-          parent.remove(this);
-          parent.revalidate();
-        });
+      e -> {
+        final Container parent = this.getParent();
+        parent.remove(this);
+        parent.revalidate();
+      });
 
     this.btnDelete.addMouseListener(
-        new MouseAdapter() {
-          @Override
-          public void mouseEntered(final MouseEvent e) {
-            btnDelete.setIcon(Icons.DELETE_X7);
-          }
+      new MouseAdapter() {
+        @Override
+        public void mouseEntered(final MouseEvent e) {
+          btnDelete.setIcon(Icons.DELETE_8);
+        }
 
-          @Override
-          public void mouseExited(final MouseEvent e) {
-            if (!btnDelete.hasFocus()) {
-              btnDelete.setIcon(Icons.DELETE_X7_DISABLED);
-            }
+        @Override
+        public void mouseExited(final MouseEvent e) {
+          if (!btnDelete.hasFocus()) {
+            //              TODO: grey out the icon when not focused
+            btnDelete.setIcon(Icons.DELETE_8);
           }
-        });
+        }
+      });
 
     this.btnDelete.addFocusListener(
-        new FocusListener() {
-          @Override
-          public void focusLost(FocusEvent e) {
-            btnDelete.setIcon(Icons.DELETE_X7_DISABLED);
-          }
+      new FocusListener() {
+        @Override
+        public void focusLost(FocusEvent e) {
+          //              TODO: grey out the icon when not focused
+          btnDelete.setIcon(Icons.DELETE_8);
+        }
 
-          @Override
-          public void focusGained(FocusEvent e) {
-            btnDelete.setIcon(Icons.DELETE_X7);
-          }
-        });
+        @Override
+        public void focusGained(FocusEvent e) {
+          btnDelete.setIcon(Icons.DELETE_8);
+        }
+      });
 
     this.btnDelete.setMargin(new Insets(2, 0, 2, 0));
     this.btnDelete.setContentAreaFilled(false);
@@ -81,7 +83,7 @@ public class Tag extends JPanel {
     this.btnDelete.setFocusPainted(false);
     this.btnDelete.setBorder(null);
     this.btnDelete.setPreferredSize(new Dimension(9, 9));
-    this.btnDelete.setIcon(Icons.DELETE_X7_DISABLED);
+    this.btnDelete.setIcon(Icons.DELETE_8);
     panel.add(this.btnDelete);
   }
 

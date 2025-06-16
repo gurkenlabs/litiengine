@@ -20,6 +20,9 @@ public final class Icons {
   public static final Icon CONSOLE_8 = IconLoader.get().getUIAwareIcon("console.svg", 8, 8);
   public static final Icon COPY_8 = IconLoader.get().getUIAwareIcon("copy.svg", 8, 8);
   public static final Icon CREATURE_8 = IconLoader.get().getUIAwareIcon("creature.svg", 8, 8);
+  public static final Icon CUT_8 = IconLoader.get().getUIAwareIcon("cut.svg", 8, 8);
+  public static final Icon DELETE_8 = IconLoader.get().getUIAwareIcon("delete.svg", 8, 8);
+  public static final Icon EMITTER_8 = IconLoader.get().getUIAwareIcon("emitter.svg", 8, 8);
 
   // 16px variants
   public static final Icon ADD_16 = IconLoader.get().getUIAwareIcon("add.svg", 16, 16);
@@ -33,6 +36,9 @@ public final class Icons {
   public static final Icon CONSOLE_16 = IconLoader.get().getUIAwareIcon("console.svg", 16, 16);
   public static final Icon COPY_16 = IconLoader.get().getUIAwareIcon("copy.svg", 16, 16);
   public static final Icon CREATURE_16 = IconLoader.get().getUIAwareIcon("creature.svg", 16, 16);
+  public static final Icon CUT_16 = IconLoader.get().getUIAwareIcon("cut.svg", 16, 16);
+  public static final Icon DELETE_16 = IconLoader.get().getUIAwareIcon("delete.svg", 16, 16);
+  public static final Icon EMITTER_16 = IconLoader.get().getUIAwareIcon("emitter.svg", 16, 16);
 
   // 24px variants
   public static final Icon ADD_24 = IconLoader.get().getUIAwareIcon("add.svg", 24, 24);
@@ -46,6 +52,9 @@ public final class Icons {
   public static final Icon CONSOLE_24 = IconLoader.get().getUIAwareIcon("console.svg", 24, 24);
   public static final Icon COPY_24 = IconLoader.get().getUIAwareIcon("copy.svg", 24, 24);
   public static final Icon CREATURE_24 = IconLoader.get().getUIAwareIcon("creature.svg", 24, 24);
+  public static final Icon CUT_24 = IconLoader.get().getUIAwareIcon("cut.svg", 24, 24);
+  public static final Icon DELETE_24 = IconLoader.get().getUIAwareIcon("delete.svg", 24, 24);
+  public static final Icon EMITTER_24 = IconLoader.get().getUIAwareIcon("emitter.svg", 24, 24);
 
   // 32px variants
   public static final Icon ADD_32 = IconLoader.get().getUIAwareIcon("add.svg", 32, 32);
@@ -59,18 +68,15 @@ public final class Icons {
   public static final Icon CONSOLE_32 = IconLoader.get().getUIAwareIcon("console.svg", 32, 32);
   public static final Icon COPY_32 = IconLoader.get().getUIAwareIcon("copy.svg", 32, 32);
   public static final Icon CREATURE_32 = IconLoader.get().getUIAwareIcon("creature.svg", 32, 32);
+  public static final Icon CUT_32 = IconLoader.get().getUIAwareIcon("cut.svg", 32, 32);
+  public static final Icon DELETE_32 = IconLoader.get().getUIAwareIcon("delete.svg", 32, 32);
+  public static final Icon EMITTER_32 = IconLoader.get().getUIAwareIcon("emitter.svg", 32, 32);
 
-  public static final Icon CUT = get("cut");
   public static final Icon DEFAULT_NODE = get("bullet");
-  public static final Icon DELETE = get("delete_x12");
-  public static final Icon DELETE_X16 = get("delete_x16");
-  public static final Icon DELETE_X7 = get("delete_x7");
-  public static final Icon DELETE_X7_DISABLED = get("delete_x7_disabled");
   public static final Icon DOC_BLUEPRINT = get("document_blueprint");
   public static final Icon DOC_EMITTER = get("document_emitter");
   public static final Icon DOC_SOUND = get("document_sound");
   public static final Icon DOC_TILESET = get("document_tsx");
-  public static final Icon EMITTER = get("emitter");
   public static final Icon EXPORT = get("export");
   public static final Icon FOLDER = get("cube");
   public static final Icon HIDEOTHER = get("hideother");

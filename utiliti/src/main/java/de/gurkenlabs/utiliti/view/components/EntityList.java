@@ -165,7 +165,7 @@ public final class EntityList extends JPanel implements EntityController {
     this.nodeEmitter =
       new DefaultMutableTreeNode(
         new IconTreeListItem(
-          Resources.strings().get("panel_mapselection_emitter"), Icons.EMITTER));
+          Resources.strings().get("panel_mapselection_emitter"), Icons.EMITTER_16));
 
     this.entitiesTreeModel = new DefaultTreeModel(this.nodeRoot);
 
@@ -379,7 +379,7 @@ public final class EntityList extends JPanel implements EntityController {
         Game.world().environment().getEmitters(),
         this.nodeEmitter,
         Resources.strings().get("panel_mapselection_emitter"),
-        Icons.EMITTER);
+        Icons.EMITTER_16);
     } else {
       this.nodeRoot.removeAllChildren();
     }
