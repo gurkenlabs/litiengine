@@ -2,7 +2,7 @@
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg width="100%" height="100%" viewBox="0 0 534 534" version="1.1" xmlns="http://www.w3.org/2000/svg"
   xml:space="preserve"
-  style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1;"><rect id="color-dark" x="0" y="-0" width="533.333" height="533.333" style="fill:none;"/>
+  style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1;"><rect id="color-light" x="0" y="-0" width="533.333" height="533.333" style="fill:none;"/>
   <path d="M506.25,266.667l-239.583,-0l169.411,-169.411c44.93,44.93 70.172,105.869 70.172,169.411Z" style="fill:#f7c548;"/>
   <path d="M436.078,97.256l-169.411,169.411l-0,-239.584c63.541,0 124.48,25.242 169.411,70.173Z" style="fill:#eeebd3;"/>
   <path d="M266.667,27.083l-0,239.584l-169.411,-169.411c44.93,-44.931 105.869,-70.173 169.411,-70.173Z" style="fill:#51963a;"/>
@@ -11,4 +11,4 @@
   <path d="M97.256,436.078l169.411,-169.411l-0,239.583c-63.542,-0 -124.481,-25.242 -169.411,-70.172Z" style="fill:#4b1d3f;"/>
   <path d="M266.667,506.25l-0,-239.583l169.411,169.411c-44.931,44.93 -105.87,70.172 -169.411,70.172Z" style="fill:#d62246;"/>
   <path d="M436.078,436.078l-169.411,-169.411l239.583,-0c-0,63.541 -25.242,124.48 -70.172,169.411Z" style="fill:#e25d0e;"/>
-  <circle cx="266.667" cy="266.667" r="239.583" style="fill:none;stroke:#00a5bc;stroke-width:20.83px;stroke-dasharray:0,1.04,0,0,0,0;"/></svg>
+  <circle cx="266.667" cy="266.667" r="239.583" style="fill:none;stroke:#1e4847;stroke-width:20.83px;stroke-dasharray:0,1.04,0,0,0,0;"/></svg>
