@@ -2,10 +2,10 @@
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg width="100%" height="100%" viewBox="0 0 534 534" version="1.1" xmlns="http://www.w3.org/2000/svg"
   xml:space="preserve"
-  style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1;"><rect id="copy-dark" x="0" y="-0" width="533.333" height="533.333" style="fill:none;"/>
+  style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1;"><rect id="copy-light" x="0" y="-0" width="533.333" height="533.333" style="fill:none;"/>
   <path
     d="M392.708,240.365l0,182.812c0,50.449 -40.957,91.406 -91.406,91.406l-182.812,0c-50.449,0 -91.407,-40.957 -91.407,-91.406l0,-182.812c0,-50.449 40.958,-91.407 91.407,-91.407l182.812,0c50.449,0 91.406,40.958 91.406,91.407Z"
-    style="fill:#d4f4dd;stroke:#00a5bc;stroke-width:20.83px;stroke-dasharray:0,1.04,0,0,0,0;"/>
+    style="fill:#4e8fa6;stroke:#1e4847;stroke-width:20.83px;stroke-dasharray:0,1.04,0,0,0,0;"/>
   <path
     d="M514.583,118.49l0,182.812c0,50.449 -40.957,91.406 -91.406,91.406l-182.812,0c-50.449,0 -91.407,-40.957 -91.407,-91.406l0,-182.812c0,-50.449 40.958,-91.407 91.407,-91.407l182.812,0c50.449,0 91.406,40.958 91.406,91.407Z"
-    style="fill:#d4f4dd;stroke:#00a5bc;stroke-width:20.83px;stroke-dasharray:0,1.04,0,0,0,0;"/></svg>
+    style="fill:#4e8fa6;stroke:#1e4847;stroke-width:20.83px;stroke-dasharray:0,1.04,0,0,0,0;"/></svg>
