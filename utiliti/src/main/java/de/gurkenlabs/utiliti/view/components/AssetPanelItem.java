@@ -1,6 +1,5 @@
 package de.gurkenlabs.utiliti.view.components;
 
-import com.github.weisj.darklaf.components.border.DarkBorders;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.EmitterMapObjectLoader;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
@@ -21,15 +20,23 @@ import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.UndoManager;
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.view.dialogs.XmlExportDialog;
-import java.awt.Component;
+import java.awt.BasicStroke;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.RoundRectangle2D;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -44,8 +51,6 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -53,157 +58,292 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.border.Border;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class AssetPanelItem extends JPanel {
   private static final Logger log = Logger.getLogger(AssetPanelItem.class.getName());
-  private static final Border normalBorder = DarkBorders.createLineBorder(1, 1, 1, 1);
-  private static final Border focusBorder = BorderFactory.createDashedBorder(UIManager.getDefaults().getColor("Tree.selectionBorderColor"));
 
-  private static final Dimension BUTTON_MIN = new Dimension(16, 16);
-  private static final Dimension BUTTON_MAX = new Dimension(64, 64);
-  private static final Dimension BUTTON_PREF = new Dimension(24, 24);
+  // Enhanced visual constants
+  private static final int CORNER_RADIUS = 8;
+  private static final int PADDING = 12;
+  private static final int ICON_SIZE = 48;
+  private static final int BUTTON_SIZE = 32;
+  private static final Color HOVER_COLOR = new Color(255, 255, 255, 20);
+  private static final Color SELECTED_COLOR = new Color(100, 150, 255, 40);
+  private static final BasicStroke FOCUS_STROKE = new BasicStroke(2.0f);
 
-  private final JLabel iconLabel;
-  private final JTextArea textField;
-  private final JPanel buttonPanel;
-  private final JButton btnEdit;
-  private final JButton btnDelete;
-  private final JButton btnAdd;
-  private final JButton btnExport;
+  private static final Dimension PREFERRED_SIZE = new Dimension(140, 160);
+  private static final Dimension BUTTON_SIZE_DIM = new Dimension(BUTTON_SIZE, BUTTON_SIZE);
+
+  private JLabel iconLabel;
+  private JLabel nameLabel;
+  private JPanel buttonPanel;
+  private JButton btnEdit;
+  private JButton btnDelete;
+  private JButton btnAdd;
+  private JButton btnExport;
 
   private final transient Object origin;
+  private boolean isHovered = false;
+  private boolean isSelected = false;
 
   public AssetPanelItem(Object origin) {
-    setPreferredSize(new Dimension(100, 135));
     this.origin = origin;
-    setBorder(normalBorder);
-
-    getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deleteAsset");
-    getActionMap().put("deleteAsset", new AbstractAction() {
-      @Override public void actionPerformed(ActionEvent ae) {
-        deleteAsset();
-      }
-    });
-
-    addFocusListener(new FocusAdapter() {
-      @Override public void focusGained(FocusEvent e) {
-        setBorder(focusBorder);
-        updateButtonVisibility(true);
-      }
-
-      @Override public void focusLost(FocusEvent e) {
-        setBorder(normalBorder);
-        updateButtonVisibility(false);
-      }
-    });
-
-    setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-    setFocusable(true);
-    setRequestFocusEnabled(true);
-    addMouseListener(new MouseAdapter() {
-      @Override public void mouseEntered(MouseEvent e) {
-        super.mouseEntered(e);
-        requestFocus();
-      }
-    });
-
-    iconLabel = new JLabel();
-
-    JPanel iconAlignPanel = new JPanel();
-    iconAlignPanel.setLayout(new BoxLayout(iconAlignPanel, BoxLayout.X_AXIS));
-    iconAlignPanel.add(Box.createHorizontalGlue());
-    iconAlignPanel.add(iconLabel);
-    iconAlignPanel.add(Box.createHorizontalGlue());
-    iconAlignPanel.addMouseListener(new MouseAdapter() {
-      @Override public void mouseClicked(MouseEvent e) {
-        requestFocus();
-        if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e) && addEntity()) {
-          e.consume();
-        }
-      }
-
-      @Override public void mouseReleased(MouseEvent e) {
-        requestFocus();
-        if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e) && addEntity()) {
-          e.consume();
-        }
-      }
-    });
-
-    textField = new RowLimitedTextArea(2, 10);
-    textField.setLineWrap(true);
-    textField.setWrapStyleWord(true);
-    textField.setBorder(null);
-    textField.setEditable(false);
-    textField.addMouseListener(new MouseAdapter() {
-      @Override public void mouseClicked(MouseEvent e) {
-        requestFocus();
-      }
-
-      @Override public void mouseReleased(MouseEvent e) {
-        requestFocus();
-      }
-    });
-
-    buttonPanel = new JPanel();
-    buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-    buttonPanel.setOpaque(false);
-
-    buttonPanel.add(Box.createHorizontalGlue());
-    btnAdd = new JButton();
-    initButton(btnAdd, "assetpanel_add", Icons.ADD_16, e -> this.addEntity());
-    btnAdd.setEnabled(canAdd());
-    btnEdit = new JButton();
-    initButton(btnEdit, "assetpanel_edit", Icons.PENCIL_16, e -> this.editAsset());
-    btnDelete = new JButton();
-    initButton(btnDelete, "assetpanel_delete", Icons.DELETE_16, e -> this.deleteAsset());
-    btnExport = new JButton();
-    initButton(btnExport, "assetpanel_export", Icons.EXPORT_16, e -> this.exportAsset());
-    buttonPanel.add(Box.createHorizontalGlue());
-    buttonPanel.addMouseListener(new MouseAdapter() {
-      @Override public void mouseClicked(MouseEvent e) {
-        requestFocus();
-      }
-    });
-
-    add(iconAlignPanel);
-    add(textField);
-    add(buttonPanel);
+    initializeComponent();
+    setupLayout();
+    setupEventHandlers();
   }
 
   public AssetPanelItem(Icon icon, String text, Object origin) {
     this(origin);
+    setAssetData(icon, text);
+  }
+
+  private void initializeComponent() {
+    setPreferredSize(PREFERRED_SIZE);
+    setMinimumSize(PREFERRED_SIZE);
+    setOpaque(false);
+    setFocusable(true);
+    setRequestFocusEnabled(true);
+    setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+    // Initialize components
+    iconLabel = new JLabel();
     iconLabel.setHorizontalAlignment(SwingConstants.CENTER);
-    iconLabel.setIcon(icon);
-    textField.setText(text);
-    setToolTipText(
-      String.format("%s:\t%s%n%s:\t%s", Resources.strings().get("assetpanel_assetname"), text, Resources.strings().get("assetpanel_assetdetails"),
-        origin));
-    StringBuilder sb = new StringBuilder();
-    sb.append("<html>");
-    sb.append(String.format("<b>%s:</b>\t", Resources.strings().get("assetpanel_assetname")));
-    sb.append(text);
-    for (Map.Entry<String, String> entry : getDetails(origin).entrySet()) {
-      sb.append("<br>");
-      sb.append(entry.getKey());
-      sb.append(":\t");
-      sb.append(entry.getValue());
-    }
-    sb.append("</html>");
-    String tooltip = sb.toString();
-    for (Component component : this.getComponents()) {
-      if (component instanceof JComponent jcomponent) {
-        jcomponent.setToolTipText(tooltip);
+    iconLabel.setVerticalAlignment(SwingConstants.CENTER);
+
+    nameLabel = new JLabel();
+    nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
+    nameLabel.setVerticalAlignment(SwingConstants.TOP);
+    nameLabel.setFont(nameLabel.getFont().deriveFont(Font.PLAIN, 11f));
+
+    buttonPanel = new JPanel();
+    buttonPanel.setOpaque(false);
+    buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 2, 0));
+
+    // Initialize buttons with improved styling
+    btnAdd = createStyledButton(Icons.ADD_16, "assetpanel_add");
+    btnEdit = createStyledButton(Icons.PENCIL_16, "assetpanel_edit");
+    btnDelete = createStyledButton(Icons.DELETE_16, "assetpanel_delete");
+    btnExport = createStyledButton(Icons.EXPORT_16, "assetpanel_export");
+
+    btnAdd.setEnabled(canAdd());
+  }
+
+  private JButton createStyledButton(Icon icon, String tooltipKey) {
+    JButton button = new JButton(icon);
+    button.setToolTipText(Resources.strings().get(tooltipKey));
+    button.setOpaque(false);
+    button.setContentAreaFilled(false);
+    button.setBorderPainted(false);
+    button.setFocusPainted(false);
+    button.setVisible(false);
+
+
+    // Add hover effect
+    button.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseEntered(MouseEvent e) {
+        button.setContentAreaFilled(true);
+        button.setBackground(new Color(255, 255, 255, 30));
       }
+
+      @Override
+      public void mouseExited(MouseEvent e) {
+        button.setContentAreaFilled(false);
+      }
+    });
+
+    buttonPanel.add(button);
+    return button;
+  }
+
+  private void setupLayout() {
+    setLayout(new BorderLayout());
+
+    // Main content panel with padding
+    JPanel contentPanel = new JPanel(new BorderLayout());
+    contentPanel.setOpaque(false);
+    contentPanel.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING / 2, PADDING));
+
+    // Icon panel - centered and with proper sizing
+    JPanel iconPanel = new JPanel(new BorderLayout());
+    iconPanel.setOpaque(false);
+    iconPanel.setPreferredSize(new Dimension(ICON_SIZE + 16, ICON_SIZE + 8));
+    iconPanel.add(iconLabel, BorderLayout.CENTER);
+
+    // Text panel with proper sizing
+    JPanel textPanel = new JPanel(new BorderLayout());
+    textPanel.setOpaque(false);
+    textPanel.setBorder(BorderFactory.createEmptyBorder(4, 0, 8, 0));
+    textPanel.add(nameLabel, BorderLayout.CENTER);
+
+    // Button panel at bottom
+    JPanel bottomPanel = new JPanel(new BorderLayout());
+    bottomPanel.setOpaque(false);
+    buttonPanel.setPreferredSize(new Dimension(getPreferredSize().width, BUTTON_SIZE));
+    bottomPanel.add(buttonPanel, BorderLayout.CENTER);
+
+    contentPanel.add(iconPanel, BorderLayout.NORTH);
+    contentPanel.add(textPanel, BorderLayout.CENTER);
+    contentPanel.add(bottomPanel, BorderLayout.SOUTH);
+
+    add(contentPanel, BorderLayout.CENTER);
+  }
+
+  private void setupEventHandlers() {
+    // Keyboard shortcuts
+    getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deleteAsset");
+    getActionMap().put("deleteAsset", new AbstractAction() {
+      @Override
+      public void actionPerformed(ActionEvent ae) {
+        deleteAsset();
+      }
+    });
+
+    // Focus handling
+    addFocusListener(new FocusAdapter() {
+      @Override
+      public void focusGained(FocusEvent e) {
+        isSelected = true;
+        updateButtonVisibility(true);
+        repaint();
+      }
+
+      @Override
+      public void focusLost(FocusEvent e) {
+        isSelected = false;
+        updateButtonVisibility(false);
+        repaint();
+      }
+    });
+
+    // Mouse handling
+    MouseAdapter mouseHandler = new MouseAdapter() {
+      @Override
+      public void mouseEntered(MouseEvent e) {
+        isHovered = true;
+        requestFocus();
+        repaint();
+      }
+
+      @Override
+      public void mouseExited(MouseEvent e) {
+        isHovered = false;
+        repaint();
+      }
+
+      @Override
+      public void mouseClicked(MouseEvent e) {
+        requestFocus();
+        if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) {
+          if (addEntity()) {
+            e.consume();
+          }
+        }
+      }
+    };
+
+    addMouseListener(mouseHandler);
+    iconLabel.addMouseListener(mouseHandler);
+    nameLabel.addMouseListener(mouseHandler);
+
+    // Button actions
+    btnAdd.addActionListener(e -> addEntity());
+    btnEdit.addActionListener(e -> editAsset());
+    btnDelete.addActionListener(e -> deleteAsset());
+    btnExport.addActionListener(e -> exportAsset());
+  }
+
+  private void setAssetData(Icon icon, String text) {
+    iconLabel.setIcon(icon);
+    nameLabel.setText(wrapText(text, 16));
+
+    // Create detailed tooltip
+    StringBuilder tooltip = new StringBuilder("<html>");
+    tooltip.append(String.format("<b>%s:</b> %s<br>",
+      Resources.strings().get("assetpanel_assetname"), text));
+
+    Map<String, String> details = getDetails(origin);
+    for (Map.Entry<String, String> entry : details.entrySet()) {
+      tooltip.append(String.format("<b>%s:</b> %s<br>", entry.getKey(), entry.getValue()));
     }
+    tooltip.append("</html>");
+
+    String tooltipText = tooltip.toString();
+    setToolTipText(tooltipText);
+    iconLabel.setToolTipText(tooltipText);
+    nameLabel.setToolTipText(tooltipText);
+  }
+
+  private String wrapText(String text, int maxLength) {
+    if (text.length() <= maxLength) {
+      return text;
+    }
+
+    StringBuilder wrapped = new StringBuilder("<html><center>");
+    String[] words = text.split("\\s+");
+    StringBuilder line = new StringBuilder();
+
+    for (String word : words) {
+      if (line.length() + word.length() + 1 > maxLength) {
+        if (line.length() > 0) {
+          wrapped.append(line).append("<br>");
+          line = new StringBuilder();
+        }
+      }
+      if (line.length() > 0) {
+        line.append(" ");
+      }
+      line.append(word);
+    }
+
+    if (line.length() > 0) {
+      wrapped.append(line);
+    }
+
+    wrapped.append("</center></html>");
+    return wrapped.toString();
+  }
+
+  @Override
+  protected void paintComponent(Graphics g) {
+    Graphics2D g2d = (Graphics2D) g.create();
+    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+    int width = getWidth();
+    int height = getHeight();
+
+    // Create rounded rectangle shape
+    RoundRectangle2D roundRect = new RoundRectangle2D.Float(0, 0, width - 1, height - 1,
+      CORNER_RADIUS, CORNER_RADIUS);
+
+    // Background
+    if (isSelected) {
+      g2d.setColor(SELECTED_COLOR);
+      g2d.fill(roundRect);
+    } else if (isHovered) {
+      g2d.setColor(HOVER_COLOR);
+      g2d.fill(roundRect);
+    }
+
+    // Border
+    if (isSelected) {
+      g2d.setColor(UIManager.getColor("Tree.selectionBorderColor"));
+      g2d.setStroke(FOCUS_STROKE);
+    } else {
+      g2d.setColor(UIManager.getColor("Component.borderColor"));
+      g2d.setStroke(new BasicStroke(1.0f));
+    }
+    g2d.draw(roundRect);
+
+    g2d.dispose();
+    super.paintComponent(g);
   }
 
   public Object getOrigin() {
@@ -220,17 +360,8 @@ public class AssetPanelItem extends JPanel {
     return details;
   }
 
-  private void initButton(JButton button, String tooltipStringIdentifier, Icon icon, ActionListener action) {
-    button.setToolTipText(Resources.strings().get(tooltipStringIdentifier));
-    button.setMinimumSize(BUTTON_MIN);
-    button.setMaximumSize(BUTTON_MAX);
-    button.setPreferredSize(BUTTON_PREF);
-    button.setOpaque(false);
-    button.setIcon(icon);
-    button.setVisible(false);
-    button.addActionListener(action);
-    buttonPanel.add(button);
-  }
+  // [Keep all the existing methods: deleteAsset(), addEntity(), editAsset(), exportAsset(), etc.]
+  // [The implementation remains the same as in your original code]
 
   private void deleteAsset() {
     if (getOrigin() instanceof SpritesheetResource spritesheetResource) {
@@ -318,10 +449,6 @@ public class AssetPanelItem extends JPanel {
           Editor.instance().getMapComponent().add(newMapObject);
         }
 
-        // separately select the added objects because this cannot be done in
-        // the
-        // previous loop because it gets overwritten every time a map object
-        // gets added
         for (IMapObject newMapObject : newObjects) {
           Editor.instance().getMapComponent().setSelection(newMapObject, false);
         }
