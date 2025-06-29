@@ -15,7 +15,7 @@ public class StaticShadowPanel extends PropertyPanel {
   private final JSpinner spinnerOffset;
 
   public StaticShadowPanel() {
-    super("panel_staticShadow", Icons.SHADOWBOX);
+    super("panel_staticShadow", Icons.SHADOWBOX_24);
 
     this.comboBoxShadowType = new JComboBox<>();
     this.comboBoxShadowType.setModel(

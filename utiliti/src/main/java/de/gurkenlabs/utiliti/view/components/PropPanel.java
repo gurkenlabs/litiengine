@@ -32,7 +32,7 @@ public class PropPanel extends PropertyPanel {
    * Create the panel.
    */
   public PropPanel() {
-    super("panel_prop", Icons.PROP);
+    super("panel_prop", Icons.ENTITY_24);
     Resources.images().addClearedListener(() -> this.propsLoaded = false);
 
     this.comboBoxSpriteSheets = new JComboBox<>();

@@ -19,7 +19,7 @@ public final class AddMenu extends JMenu {
     super(Resources.strings().get("menu_add"));
     this.setIcon(Icons.ADD_16);
 
-    JMenuItem addProp = new JMenuItem(Resources.strings().get("menu_add_prop"), Icons.PROP);
+    JMenuItem addProp = new JMenuItem(Resources.strings().get("menu_add_prop"), Icons.ENTITY_16);
     addProp.addActionListener(a -> setCreateMode(MapObjectType.PROP));
     addProp.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, InputEvent.CTRL_DOWN_MASK));
 
@@ -35,16 +35,16 @@ public final class AddMenu extends JMenu {
         KeyStroke.getKeyStroke(KeyEvent.VK_3, InputEvent.CTRL_DOWN_MASK));
 
     JMenuItem addTrigger =
-        new JMenuItem(Resources.strings().get("menu_add_trigger"), Icons.TRIGGER);
+      new JMenuItem(Resources.strings().get("menu_add_trigger"), Icons.TRIGGER_16);
     addTrigger.addActionListener(a -> setCreateMode(MapObjectType.TRIGGER));
     addTrigger.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_4, InputEvent.CTRL_DOWN_MASK));
 
     JMenuItem addSpawnpoint =
-        new JMenuItem(Resources.strings().get("menu_add_spawnpoint"), Icons.SPAWNPOINT);
+      new JMenuItem(Resources.strings().get("menu_add_spawnpoint"), Icons.SPAWNPOINT_16);
     addSpawnpoint.addActionListener(a -> setCreateMode(MapObjectType.SPAWNPOINT));
     addSpawnpoint.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_5, InputEvent.CTRL_DOWN_MASK));
 
-    JMenuItem addMapArea = new JMenuItem(Resources.strings().get("menu_add_area"), Icons.MAPAREA);
+    JMenuItem addMapArea = new JMenuItem(Resources.strings().get("menu_add_area"), Icons.MAPAREA_16);
     addMapArea.addActionListener(a -> setCreateMode(MapObjectType.AREA));
     addMapArea.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_6, InputEvent.CTRL_DOWN_MASK));
 
@@ -53,7 +53,7 @@ public final class AddMenu extends JMenu {
     addLight.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_7, InputEvent.CTRL_DOWN_MASK));
 
     JMenuItem addShadow =
-        new JMenuItem(Resources.strings().get("menu_add_shadow"), Icons.SHADOWBOX);
+      new JMenuItem(Resources.strings().get("menu_add_shadow"), Icons.SHADOWBOX_16);
     addShadow.addActionListener(a -> setCreateMode(MapObjectType.STATICSHADOW));
     addShadow.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_8, InputEvent.CTRL_DOWN_MASK));
 
@@ -63,7 +63,7 @@ public final class AddMenu extends JMenu {
     addEmitter.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_9, InputEvent.CTRL_DOWN_MASK));
 
     JMenuItem addSoundSource =
-        new JMenuItem(Resources.strings().get("menu_add_soundsource"), Icons.SOUND);
+      new JMenuItem(Resources.strings().get("menu_add_soundsource"), Icons.SOUND_16);
     addSoundSource.addActionListener(a -> setCreateMode(MapObjectType.SOUNDSOURCE));
     addSoundSource.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_0, InputEvent.CTRL_DOWN_MASK));
 

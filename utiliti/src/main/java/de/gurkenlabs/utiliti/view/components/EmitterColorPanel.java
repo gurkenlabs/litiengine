@@ -13,8 +13,8 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.LayoutManager;
-import javax.swing.Box;
 import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JPanel;
@@ -22,16 +22,19 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.JToolBar;
+import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
 public class EmitterColorPanel extends PropertyPanel {
   private final DefaultTableModel model;
   private final JTable table;
-  private final Box ctrlButtonBox;
+  private final JToolBar ctrlButtonToolbar;
   private final JButton btnAdd;
   private final JButton btnRemove;
   private final JButton btnEdit;
@@ -42,8 +45,6 @@ public class EmitterColorPanel extends PropertyPanel {
 
   public EmitterColorPanel() {
     super();
-    setMinimumSize(new Dimension(PANEL_WIDTH, CONTROL_HEIGHT * 6));
-    setPreferredSize(new Dimension(PANEL_WIDTH, CONTROL_HEIGHT * 6));
     model = new DefaultTableModel(0, 1);
     table = new JTable(model);
     table.getColumnModel().getColumn(0).setCellRenderer(new ColorListCellRenderer());
@@ -51,58 +52,44 @@ public class EmitterColorPanel extends PropertyPanel {
     scrollPanel = new JScrollPane(table);
     scrollPanel.setBorder(DarkBorders.createLineBorder(1, 1, 1, 1));
 
-    ctrlButtonBox = Box.createVerticalBox();
+    ctrlButtonToolbar = new JToolBar(JToolBar.VERTICAL);
+    ctrlButtonToolbar.setFloatable(false);
     btnAdd = new JButton(Icons.ADD_16);
-    btnAdd.setPreferredSize(BUTTON_SIZE);
-    btnAdd.setMinimumSize(BUTTON_SIZE);
-    btnAdd.setMaximumSize(BUTTON_SIZE);
     btnRemove = new JButton(Icons.DELETE_16);
-    btnRemove.setPreferredSize(BUTTON_SIZE);
-    btnRemove.setMinimumSize(BUTTON_SIZE);
-    btnRemove.setMaximumSize(BUTTON_SIZE);
     btnEdit = new JButton(Icons.COLOR_16);
-    btnEdit.setPreferredSize(BUTTON_SIZE);
-    btnEdit.setMinimumSize(BUTTON_SIZE);
-    btnEdit.setMaximumSize(BUTTON_SIZE);
 
-    ctrlButtonBox.add(btnAdd);
-    ctrlButtonBox.add(btnRemove);
-    ctrlButtonBox.add(btnEdit);
+    ctrlButtonToolbar.setMaximumSize(new Dimension(BUTTON_SIZE.width, BUTTON_SIZE.height * 3));
+
+    ctrlButtonToolbar.add(btnAdd);
+    ctrlButtonToolbar.add(btnRemove);
+    ctrlButtonToolbar.add(btnEdit);
 
     colorControls = new JPanel();
     GroupLayout grplayout = new GroupLayout(colorControls);
     grplayout.setHorizontalGroup(
-        grplayout.createSequentialGroup().addComponent(ctrlButtonBox).addComponent(scrollPanel));
-    grplayout.setVerticalGroup(
-        grplayout.createParallelGroup().addComponent(ctrlButtonBox).addComponent(scrollPanel));
+      grplayout.createSequentialGroup().addComponent(ctrlButtonToolbar).addPreferredGap(ComponentPlacement.UNRELATED).addComponent(scrollPanel));
+    grplayout.setVerticalGroup(grplayout.createParallelGroup(Alignment.LEADING).addComponent(ctrlButtonToolbar).addComponent(scrollPanel));
     colorControls.setLayout(grplayout);
+    colorControls.setBorder(new EmptyBorder(CONTROL_MARGIN, 0, CONTROL_MARGIN, 0));
 
-    colorVariance =
-        new JSpinner(new SpinnerNumberModel(EmitterData.DEFAULT_COLOR_VARIANCE, 0d, 1d, STEP_FINE));
-    alphaVariance =
-        new JSpinner(new SpinnerNumberModel(EmitterData.DEFAULT_ALPHA_VARIANCE, 0d, 1d, STEP_FINE));
+    colorVariance = new JSpinner(new SpinnerNumberModel(EmitterData.DEFAULT_COLOR_VARIANCE, 0d, STEP_ONE, STEP_FINE));
+    alphaVariance = new JSpinner(new SpinnerNumberModel(EmitterData.DEFAULT_ALPHA_VARIANCE, 0d, STEP_ONE, STEP_FINE));
 
     setLayout(createLayout());
     setupChangedListeners();
   }
 
-  @Override
-  protected void clearControls() {
+  @Override protected void clearControls() {
     model.setRowCount(0);
     table.clearSelection();
     colorVariance.setValue((double) EmitterData.DEFAULT_COLOR_VARIANCE);
     alphaVariance.setValue((double) EmitterData.DEFAULT_ALPHA_VARIANCE);
   }
 
-  @Override
-  protected void setControlValues(IMapObject mapObject) {
+  @Override protected void setControlValues(IMapObject mapObject) {
     setColors(mapObject.getStringValue(MapObjectProperty.Emitter.COLORS, null));
-    colorVariance.setValue(
-        mapObject.getDoubleValue(
-            MapObjectProperty.Emitter.COLORVARIANCE, EmitterData.DEFAULT_COLOR_VARIANCE));
-    alphaVariance.setValue(
-        mapObject.getDoubleValue(
-            MapObjectProperty.Emitter.ALPHAVARIANCE, EmitterData.DEFAULT_ALPHA_VARIANCE));
+    colorVariance.setValue(mapObject.getDoubleValue(MapObjectProperty.Emitter.COLORVARIANCE, EmitterData.DEFAULT_COLOR_VARIANCE));
+    alphaVariance.setValue(mapObject.getDoubleValue(MapObjectProperty.Emitter.ALPHAVARIANCE, EmitterData.DEFAULT_ALPHA_VARIANCE));
   }
 
   private void setColors(String commaSeparatedHexstrings) {
@@ -117,41 +104,35 @@ public class EmitterColorPanel extends PropertyPanel {
 
   protected LayoutManager createLayout() {
     LayoutItem[] layoutItems =
-        new LayoutItem[] {
-            new LayoutItem(colorControls, CONTROL_HEIGHT * 3),
-            new LayoutItem("emitter_colorVariance", colorVariance, CONTROL_HEIGHT),
-            new LayoutItem("emitter_alphaVariance", alphaVariance, CONTROL_HEIGHT)
-        };
+      new LayoutItem[] {
+        new LayoutItem(colorControls, CONTROL_HEIGHT * 2),
+        new LayoutItem("emitter_colorVariance", colorVariance),
+        new LayoutItem("emitter_alphaVariance", alphaVariance)
+      };
     return this.createLayout(layoutItems);
   }
 
   private void setupChangedListeners() {
-    btnAdd.addActionListener(
-        a -> model.addRow(new Object[] {ColorHelper.encode(EmitterData.DEFAULT_COLOR.brighter())}));
+    btnAdd.addActionListener(a -> model.addRow(new Object[] {ColorHelper.encode(EmitterData.DEFAULT_COLOR.brighter())}));
     btnRemove.addActionListener(a -> model.removeRow(table.getSelectedRow()));
-    btnEdit.addActionListener(
-        a -> {
-          if (table.getSelectedRow() == -1 || table.getSelectedColumn() == -1) {
-            // setting a color requires a cell selection
-            return;
-          }
+    btnEdit.addActionListener(a -> {
+      if (table.getSelectedRow() == -1 || table.getSelectedColumn() == -1) {
+        return;
+      }
 
-          Color previousColor = null;
-          Object value = table.getValueAt(table.getSelectedRow(), table.getSelectedColumn());
-          if (value != null) {
-            previousColor = ColorHelper.decode(value.toString());
-          }
+      Color previousColor = null;
+      Object value = table.getValueAt(table.getSelectedRow(), table.getSelectedColumn());
+      if (value != null) {
+        previousColor = ColorHelper.decode(value.toString());
+      }
 
-          final Color result =
-              JColorChooser.showDialog(
-                  null, Resources.strings().get("particle_editcolor"), previousColor);
-          if (result == null) {
-            return;
-          }
+      final Color result = JColorChooser.showDialog(null, Resources.strings().get("particle_editcolor"), previousColor);
+      if (result == null) {
+        return;
+      }
 
-          table.setValueAt(
-              ColorHelper.encode(result), table.getSelectedRow(), table.getSelectedColumn());
-        });
+      table.setValueAt(ColorHelper.encode(result), table.getSelectedRow(), table.getSelectedColumn());
+    });
     setup(table, MapObjectProperty.Emitter.COLORS);
     setup(colorVariance, MapObjectProperty.Emitter.COLORVARIANCE);
     setup(alphaVariance, MapObjectProperty.Emitter.ALPHAVARIANCE);
@@ -160,9 +141,7 @@ public class EmitterColorPanel extends PropertyPanel {
   private static class ColorListCellRenderer extends JTextField implements TableCellRenderer {
     private final transient Border focusBorder = DarkBorders.createLineBorder(1, 1, 1, 1);
 
-    @Override
-    public Component getTableCellRendererComponent(
-        JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+    @Override public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
       this.setColumns(9);
       this.setHorizontalAlignment(SwingConstants.CENTER);
       SwingHelpers.updateColorTextField(this, ColorHelper.decode((String) value));

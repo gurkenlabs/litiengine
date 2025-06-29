@@ -21,7 +21,7 @@ public class TriggerPanel extends PropertyPanel {
   private final TextList textListTargets;
 
   public TriggerPanel() {
-    super("panel_trigger", Icons.TRIGGER);
+    super("panel_trigger", Icons.TRIGGER_24);
 
     this.textFieldMessage = new JTextField();
     this.textFieldMessage.setColumns(10);

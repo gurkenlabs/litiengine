@@ -1,15 +1,39 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
-  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="100%" height="100%" viewBox="0 0 534 534" version="1.1" xmlns="http://www.w3.org/2000/svg"
-  xml:space="preserve"
-  style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1;"><rect id="collapse-light" x="0" y="-0" width="533.333" height="533.333" style="fill:none;"/>
-  <g><path d="M57.292,240.625l418.75,-0" style="fill:none;stroke:#1e4847;stroke-width:20.83px;"/>
-    <g><path d="M266.667,27.083l-0,182.292" style="fill:none;"/>
-      <path d="M322.917,138.394l-56.25,56.25l-56.25,-56.25"
-        style="fill:none;stroke:#1e4847;stroke-width:20.83px;stroke-linejoin:miter;stroke-miterlimit:10;"/>
-      <path d="M266.667,27.083l-0,167.561" style="fill:none;stroke:#1e4847;stroke-width:20.83px;"/></g>
-    <path d="M57.292,292.708l418.75,0" style="fill:none;stroke:#1e4847;stroke-width:20.83px;"/>
-    <g><path d="M266.667,506.25l-0,-182.292" style="fill:none;"/>
-      <path d="M210.417,394.94l56.25,-56.25l56.25,56.25"
-        style="fill:none;stroke:#1e4847;stroke-width:20.83px;stroke-linejoin:miter;stroke-miterlimit:10;"/>
-      <path d="M266.667,506.25l-0,-167.56" style="fill:none;stroke:#1e4847;stroke-width:20.83px;"/></g></g></svg>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 128 128" version="1.1" xmlns="http://www.w3.org/2000/svg"
+  xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-miterlimit:10;">
+    <g transform="matrix(1,0,0,1,-1400,0)">
+        <g id="collapse-light" transform="matrix(0.248227,0,0,0.312796,1400.45,-0.0274995)">
+            <rect x="-1.829" y="0.088" width="515.658" height="409.212" style="fill:none;"/>
+          <clipPath id="_clip1">
+                <rect x="-1.829" y="0.088" width="515.658" height="409.212"/>
+            </clipPath>
+          <g clip-path="url(#_clip1)">
+                <g transform="matrix(6.53373,5.27973,-5.30141,4.13156,-9059.75,-7822.96)">
+                    <g transform="matrix(0.302709,-0.386833,0.30824,0.379891,1434.89,59.8402)">
+                        <path d="M78.4,22.327L64,36.727L49.6,22.327" style="fill:none;stroke:rgb(214,34,70);stroke-width:8px;"/>
+                      <path d="M64,6.5L64,36.727"
+                        style="fill:none;stroke:rgb(214,34,70);stroke-width:8px;stroke-linejoin:round;stroke-miterlimit:1;"/>
+                    </g>
+                </g>
+            <g transform="matrix(-5.41086,0,0,0.343513,7095.33,146.872)">
+                    <path
+                      d="M1307.33,42.333L1307.33,85.667C1307.33,97.625 1306.56,107.333 1305.6,107.333L1222.4,107.333C1221.44,107.333 1220.67,97.625 1220.67,85.667L1220.67,42.333C1220.67,30.375 1221.44,20.667 1222.4,20.667L1305.6,20.667C1306.56,20.667 1307.33,30.375 1307.33,42.333Z"
+                      style="fill:rgb(0,165,188);stroke:rgb(30,72,71);stroke-width:5.25px;stroke-linejoin:round;stroke-miterlimit:1;stroke-dasharray:0,0.26,0,0,0,0;"/>
+                </g>
+            <g transform="matrix(6.53373,-5.27973,-5.30141,-4.13156,-9059.75,8226.91)">
+                    <g transform="matrix(0.302709,-0.386833,-0.30824,-0.379891,1473.82,107.82)">
+                        <path d="M49.6,103.972L64,89.572L78.4,103.972" style="fill:none;stroke:rgb(214,34,70);stroke-width:8px;"/>
+                      <path d="M64,119.799L64,89.572"
+                        style="fill:none;stroke:rgb(214,34,70);stroke-width:8px;stroke-linejoin:round;stroke-miterlimit:1;"/>
+                    </g>
+                </g>
+            <g transform="matrix(-5.41086,0,0,-0.343513,7095.33,257.079)">
+                    <path
+                      d="M1307.33,42.333L1307.33,85.667C1307.33,97.625 1306.56,107.333 1305.6,107.333L1222.4,107.333C1221.44,107.333 1220.67,97.625 1220.67,85.667L1220.67,42.333C1220.67,30.375 1221.44,20.667 1222.4,20.667L1305.6,20.667C1306.56,20.667 1307.33,30.375 1307.33,42.333Z"
+                      style="fill:rgb(0,165,188);stroke:rgb(30,72,71);stroke-width:5.25px;stroke-linejoin:round;stroke-miterlimit:1;stroke-dasharray:0,0.26,0,0,0,0;"/>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -162,11 +162,11 @@ public class AssetPanelItem extends JPanel {
     initButton(btnAdd, "assetpanel_add", Icons.ADD_16, e -> this.addEntity());
     btnAdd.setEnabled(canAdd());
     btnEdit = new JButton();
-    initButton(btnEdit, "assetpanel_edit", Icons.PENCIL, e -> this.editAsset());
+    initButton(btnEdit, "assetpanel_edit", Icons.PENCIL_16, e -> this.editAsset());
     btnDelete = new JButton();
     initButton(btnDelete, "assetpanel_delete", Icons.DELETE_16, e -> this.deleteAsset());
     btnExport = new JButton();
-    initButton(btnExport, "assetpanel_export", Icons.EXPORT, e -> this.exportAsset());
+    initButton(btnExport, "assetpanel_export", Icons.EXPORT_16, e -> this.exportAsset());
     buttonPanel.add(Box.createHorizontalGlue());
     buttonPanel.addMouseListener(new MouseAdapter() {
       @Override public void mouseClicked(MouseEvent e) {

@@ -35,7 +35,7 @@ public class ConsoleActionPanel extends JPanel {
 
     JButton buttonScrollConsole =
         createButton(
-            Icons.SCROLL_DOWN,
+          Icons.SCROLL_DOWN_24,
             (actionEvent -> Arrays.stream(Logger.getLogger("").getHandlers())
                 .filter(LogHandler.class::isInstance)
                 .findFirst()
@@ -47,9 +47,6 @@ public class ConsoleActionPanel extends JPanel {
 
   private JButton createButton(Icon icon, ActionListener actionListener) {
     JButton button = new JButton("");
-    button.setPreferredSize(BUTTON_SIZE);
-    button.setMinimumSize(BUTTON_SIZE);
-    button.setMaximumSize(BUTTON_SIZE);
     button.setIcon(icon);
     button.addActionListener(actionListener);
 

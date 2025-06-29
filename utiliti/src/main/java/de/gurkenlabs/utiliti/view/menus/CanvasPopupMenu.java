@@ -29,7 +29,7 @@ public final class CanvasPopupMenu extends JPopupMenu {
     cut.setEnabled(false);
     cut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK));
 
-    JMenuItem paste = new JMenuItem(Resources.strings().get("menu_edit_paste"), Icons.PASTE);
+    JMenuItem paste = new JMenuItem(Resources.strings().get("menu_edit_paste"), Icons.PASTE_16);
     paste.addActionListener(e -> Editor.instance().getMapComponent().paste());
     paste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK));
     paste.setEnabled(false);

@@ -89,8 +89,8 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
 
       btnPause = new JToggleButton();
       btnPause.setSelected(true);
-      btnPause.setIcon(Icons.PAUSE);
-      btnPause.setSelectedIcon(Icons.PLAY);
+      btnPause.setIcon(Icons.PAUSE_16);
+      btnPause.setSelectedIcon(Icons.PLAY_16);
 
       setLayout(createLayout());
       setupChangedListeners();

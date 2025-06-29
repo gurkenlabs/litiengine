@@ -9,10 +9,13 @@ import java.awt.Dimension;
 import java.awt.LayoutManager;
 import javax.swing.Box;
 import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 public class EmitterTextPanel extends PropertyPanel {
@@ -26,53 +29,47 @@ public class EmitterTextPanel extends PropertyPanel {
 
   public EmitterTextPanel() {
     super();
-    setMinimumSize(new Dimension(PANEL_WIDTH, CONTROL_HEIGHT * 6));
-    setPreferredSize(new Dimension(PANEL_WIDTH, CONTROL_HEIGHT * 6));
 
     model = new DefaultTableModel(0, 1);
     table = new JTable(model);
     table.setTableHeader(null);
     scrollPanel = new JScrollPane(table);
     scrollPanel.setBorder(DarkBorders.createLineBorder(1, 1, 1, 1));
+    scrollPanel.setPreferredSize(new Dimension(CONTROL_WIDTH * 2, CONTROL_HEIGHT * 3));
 
     ctrlButtonBox = Box.createVerticalBox();
     btnAdd = new JButton(Icons.ADD_16);
-    btnAdd.setPreferredSize(BUTTON_SIZE);
-    btnAdd.setMinimumSize(BUTTON_SIZE);
-    btnAdd.setMaximumSize(BUTTON_SIZE);
     btnRemove = new JButton(Icons.DELETE_16);
-    btnRemove.setPreferredSize(BUTTON_SIZE);
-    btnRemove.setMinimumSize(BUTTON_SIZE);
+    btnAdd.setMaximumSize(BUTTON_SIZE);
     btnRemove.setMaximumSize(BUTTON_SIZE);
 
     ctrlButtonBox.add(btnAdd);
     ctrlButtonBox.add(btnRemove);
+    ctrlButtonBox.add(Box.createVerticalGlue());
 
     textControls = new JPanel();
     GroupLayout grplayout = new GroupLayout(textControls);
     grplayout.setHorizontalGroup(
-        grplayout.createSequentialGroup().addComponent(ctrlButtonBox).addComponent(scrollPanel));
-    grplayout.setVerticalGroup(
-        grplayout.createParallelGroup().addComponent(ctrlButtonBox).addComponent(scrollPanel));
+      grplayout.createSequentialGroup().addComponent(ctrlButtonBox).addPreferredGap(ComponentPlacement.UNRELATED).addComponent(scrollPanel));
+    grplayout.setVerticalGroup(grplayout.createParallelGroup(Alignment.LEADING).addComponent(ctrlButtonBox).addComponent(scrollPanel));
     textControls.setLayout(grplayout);
+    textControls.setBorder(new EmptyBorder(CONTROL_MARGIN, 0, CONTROL_MARGIN, 0));
 
     setLayout(createLayout());
     setupChangedListeners();
   }
 
-  @Override
-  protected void clearControls() {
+  @Override protected void clearControls() {
     model.setRowCount(0);
     table.clearSelection();
   }
 
-  @Override
-  protected void setControlValues(IMapObject mapObject) {
+  @Override protected void setControlValues(IMapObject mapObject) {
     setTexts(mapObject.getStringValue(MapObjectProperty.Particle.TEXTS, null));
   }
 
   protected LayoutManager createLayout() {
-    LayoutItem[] layoutItems = new LayoutItem[] {new LayoutItem(textControls, CONTROL_HEIGHT * 2)};
+    LayoutItem[] layoutItems = new LayoutItem[] {new LayoutItem(textControls, CONTROL_HEIGHT * 3)};
     return this.createLayout(layoutItems);
   }
 
