@@ -10,7 +10,6 @@ import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.LayerController;
 import de.gurkenlabs.utiliti.controller.Transform;
 import de.gurkenlabs.utiliti.controller.UndoManager;
-import de.gurkenlabs.utiliti.model.CenterIcon;
 import de.gurkenlabs.utiliti.model.Icons;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -134,7 +133,7 @@ public final class LayerList extends JPanel implements LayerController {
 
   private JButton createAddLayerButton() {
     return createButton(
-      Icons.ADD_16,
+      Icons.ADD_24,
         (map, selectedLayer) -> {
           MapObjectLayer layer = new MapObjectLayer();
           layer.setName("new layer");
@@ -153,7 +152,7 @@ public final class LayerList extends JPanel implements LayerController {
 
   private JButton createRemoveLayerButton() {
     return createButton(
-      Icons.DELETE_16,
+      Icons.DELETE_24,
         (map, selectedLayer) -> {
           // we need at least on mapobject layer to work with LITIENGINE entities.
           if (map.getMapObjectLayers().size() <= 1) {
@@ -177,7 +176,7 @@ public final class LayerList extends JPanel implements LayerController {
 
   private JButton createDuplicateLayerButton() {
     return createButton(
-      Icons.COPY_16,
+      Icons.COPY_24,
         (map, selectedLayer) -> {
           IMapObjectLayer copiedLayer = new MapObjectLayer((MapObjectLayer) selectedLayer);
           map.addLayer(getAbsoluteIndex(map, this.layerTable.getSelectedRow()), copiedLayer);
@@ -188,7 +187,7 @@ public final class LayerList extends JPanel implements LayerController {
 
   private JButton createSetColorButton() {
     return createButton(
-      Icons.COLOR_16,
+      Icons.COLOR_24,
         (map, selectedLayer) -> {
           Color newColor =
               JColorChooser.showDialog(
@@ -204,7 +203,7 @@ public final class LayerList extends JPanel implements LayerController {
 
   private JButton createRenameLayerButton() {
     return createButton(
-        Icons.RENAME,
+      Icons.RENAME_24,
         (map, selectedLayer) -> {
           String newLayerName =
               JOptionPane.showInputDialog(
@@ -219,7 +218,7 @@ public final class LayerList extends JPanel implements LayerController {
 
   private JButton createHideOtherLayersButton() {
     return createButton(
-        Icons.HIDEOTHER,
+      Icons.HIDEOTHER_24,
         (map, selectedLayer) -> {
           for (int i = 0; i < map.getMapObjectLayers().size(); i++) {
             if (i != this.layerTable.getSelectedRow()) {
@@ -236,7 +235,7 @@ public final class LayerList extends JPanel implements LayerController {
 
   private JButton createMoveLayerUpButton() {
     return createButton(
-        Icons.LIFT,
+      Icons.LIFT_24,
         (map, selectedLayer) -> {
           final int selLayerIndex = this.layerTable.getSelectedRow();
           if (selLayerIndex < 0 || selLayerIndex >= map.getMapObjectLayers().size()) {
@@ -251,7 +250,7 @@ public final class LayerList extends JPanel implements LayerController {
 
   private JButton createMoveLayerDownButton() {
     return createButton(
-        Icons.LOWER,
+      Icons.LOWER_24,
         (map, selectedLayer) -> {
           int selLayerIndex = this.layerTable.getSelectedRow();
           if (selLayerIndex <= 0 || selLayerIndex >= map.getMapObjectLayers().size()) {
@@ -315,7 +314,7 @@ public final class LayerList extends JPanel implements LayerController {
   private JButton createButton(Icon icon, BiConsumer<IMap, IMapObjectLayer> consumer,
       boolean requireLayer) {
     JButton button = new JButton();
-    button.setIcon(new CenterIcon(icon, ICON_SIZE));
+    button.setIcon(icon);
 
     button.addActionListener(
         a -> {

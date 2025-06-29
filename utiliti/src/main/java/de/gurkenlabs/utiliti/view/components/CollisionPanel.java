@@ -6,6 +6,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.physics.Collision;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.utiliti.model.Icons;
 import java.awt.LayoutManager;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
@@ -23,7 +24,7 @@ public class CollisionPanel extends PropertyPanel {
 
   /** Create the panel. */
   public CollisionPanel() {
-    super("panel_collisionEntity");
+    super("panel_collisionEntity", Icons.COLLISIONBOX_24);
 
     this.chckbxHasCollision = new JCheckBox(Resources.strings().get("panel_collision"));
     this.spinnerWidth = new JSpinner(new SpinnerNumberModel(0.0, 0.0, Integer.MAX_VALUE, 0.2));

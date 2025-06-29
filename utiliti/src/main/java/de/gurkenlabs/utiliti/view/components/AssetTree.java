@@ -36,11 +36,11 @@ public class AssetTree extends JTree {
     this.assetPanel = assetPanel;
 
     this.nodeRoot = new DefaultMutableTreeNode(new IconTreeListItem(Resources.strings().get("assettree_assets"), Icons.ASSET_8));
-    this.nodeSpritesheets = new DefaultMutableTreeNode(new IconTreeListItem(Resources.strings().get("assettree_spritesheets"), Icons.SPRITESHEET));
-    this.nodeSpriteProps = new DefaultMutableTreeNode(new IconTreeListItem(Resources.strings().get("assettree_spritesheets_props"), Icons.PROP));
-    this.nodeSpriteMisc = new DefaultMutableTreeNode(new IconTreeListItem(Resources.strings().get("assettree_spritesheets_misc"), Icons.MISC));
-    this.nodeTileSets = new DefaultMutableTreeNode(new IconTreeListItem(Resources.strings().get("assettree_tilesets"), Icons.TILESET));
-    this.nodeSounds = new DefaultMutableTreeNode(new IconTreeListItem(Resources.strings().get("assettree_sounds"), Icons.SOUND));
+    this.nodeSpritesheets = new DefaultMutableTreeNode(new IconTreeListItem(Resources.strings().get("assettree_spritesheets"), Icons.SPRITESHEET_24));
+    this.nodeSpriteProps = new DefaultMutableTreeNode(new IconTreeListItem(Resources.strings().get("assettree_spritesheets_props"), Icons.ENTITY_24));
+    this.nodeSpriteMisc = new DefaultMutableTreeNode(new IconTreeListItem(Resources.strings().get("assettree_spritesheets_misc"), Icons.MISC_24));
+    this.nodeTileSets = new DefaultMutableTreeNode(new IconTreeListItem(Resources.strings().get("assettree_tilesets"), Icons.TILESET_24));
+    this.nodeSounds = new DefaultMutableTreeNode(new IconTreeListItem(Resources.strings().get("assettree_sounds"), Icons.SOUND_24));
     this.nodeEmitters = new DefaultMutableTreeNode(new IconTreeListItem(Resources.strings().get("assettree_emitters"), Icons.EMITTER_24));
     this.nodeBlueprints = new DefaultMutableTreeNode(new IconTreeListItem(Resources.strings().get("assettree_blueprints"), Icons.BLUEPRINT_24));
     this.nodeCreatures = new DefaultMutableTreeNode(new IconTreeListItem(Resources.strings().get("assettree_creatures"), Icons.CREATURE_24));
@@ -60,8 +60,8 @@ public class AssetTree extends JTree {
     this.setModel(this.entitiesTreeModel);
     this.setCellRenderer(new IconTreeListRenderer());
     this.setMaximumSize(new Dimension(0, 250));
-    this.setRowHeight((int) (this.getRowHeight() * Editor.preferences().getUiScale()));
-    for (int i = 0; i < this.getRowCount(); i++) {
+    this.setRowHeight((int) (24 * Editor.preferences().getUiScale()));
+    for (int i = 0; i < getRowCount(); i++) {
       this.expandRow(i);
     }
 
@@ -69,7 +69,7 @@ public class AssetTree extends JTree {
   }
 
   public void forceUpdate() {
-    loadAssetsOfCurrentSelection(this.getSelectionPath());
+    loadAssetsOfCurrentSelection(getSelectionPath());
   }
 
   private void loadAssetsOfCurrentSelection(TreePath selectedPath) {
@@ -93,17 +93,17 @@ public class AssetTree extends JTree {
 
     if (selectedPath.equals(spritePath)) {
       this.assetPanel.loadSprites(new ArrayList<>(gameFile.getSpriteSheets()));
-    } else if (Objects.equals(this.getSelectionPath(), propPath)) {
+    } else if (Objects.equals(getSelectionPath(), propPath)) {
       this.assetPanel.loadSprites(
-          gameFile.getSpriteSheets().stream().filter(x -> x.getName() != null && x.getName().contains(PropAnimationController.PROP_IDENTIFIER))
-              .toList());
-    } else if (Objects.equals(this.getSelectionPath(), creaturePath)) {
+        gameFile.getSpriteSheets().stream().filter(x -> x.getName() != null && x.getName().contains(PropAnimationController.PROP_IDENTIFIER))
+          .toList());
+    } else if (Objects.equals(getSelectionPath(), creaturePath)) {
       this.assetPanel.loadSprites(
-          gameFile.getSpriteSheets().stream().filter(x -> x.getName() != null && CreaturePanel.getCreatureSpriteName(x.getName()) != null).toList());
+        gameFile.getSpriteSheets().stream().filter(x -> x.getName() != null && CreaturePanel.getCreatureSpriteName(x.getName()) != null).toList());
     } else if (selectedPath.equals(miscPath)) {
       this.assetPanel.loadSprites(gameFile.getSpriteSheets().stream().filter(
-          x -> x.getName() != null && !x.getName().contains(PropAnimationController.PROP_IDENTIFIER)
-              && CreaturePanel.getCreatureSpriteName(x.getName()) == null).toList());
+        x -> x.getName() != null && !x.getName().contains(PropAnimationController.PROP_IDENTIFIER)
+          && CreaturePanel.getCreatureSpriteName(x.getName()) == null).toList());
     } else if (selectedPath.equals(tilesetPath)) {
       ArrayList<Tileset> allTilesets = new ArrayList<>(gameFile.getTilesets().stream().filter(x -> x.getName() != null).toList());
 

@@ -11,7 +11,6 @@ import de.gurkenlabs.litiengine.graphics.animation.CreatureAnimationController;
 import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.Imaging;
-import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.view.components.IconTreeListItem;
 import java.awt.Color;
 import java.awt.Component;
@@ -43,7 +42,6 @@ public class IconTreeListRenderer implements TreeCellRenderer {
       boolean leaf,
       int row,
       boolean hasFocus) {
-    this.label.setIcon(Icons.DEFAULT_NODE);
     this.label.setText(value.toString());
     if (value instanceof DefaultMutableTreeNode defaultMutableTreeNode
         && defaultMutableTreeNode.getUserObject()instanceof IconTreeListItem iconTreeListItem) {

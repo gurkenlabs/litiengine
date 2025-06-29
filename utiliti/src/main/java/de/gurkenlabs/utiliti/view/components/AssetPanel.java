@@ -57,7 +57,7 @@ public class AssetPanel extends JPanel {
         Collections.sort(tilesets);
         for (Tileset tileset : tilesets) {
           AssetPanelItem panelItem =
-            new AssetPanelItem(Icons.DOC_TILESET, tileset.getName(), tileset);
+            new AssetPanelItem(Icons.ASSET_TILESET_32, tileset.getName(), tileset);
           this.add(panelItem);
           panelItem.validate();
         }
@@ -70,7 +70,7 @@ public class AssetPanel extends JPanel {
         Collections.sort(emitters);
         for (EmitterData emitter : emitters) {
           AssetPanelItem panelItem =
-            new AssetPanelItem(Icons.DOC_EMITTER, emitter.getName(), emitter);
+            new AssetPanelItem(Icons.ASSET_EMITTER_32, emitter.getName(), emitter);
           this.add(panelItem);
           panelItem.validate();
         }
@@ -83,7 +83,7 @@ public class AssetPanel extends JPanel {
         Collections.sort(blueprints);
         for (MapObject blueprint : blueprints) {
           AssetPanelItem panelItem =
-            new AssetPanelItem(Icons.DOC_BLUEPRINT, blueprint.getName(), blueprint);
+            new AssetPanelItem(Icons.ASSET_BLUEPRINT_32, blueprint.getName(), blueprint);
           this.add(panelItem);
           panelItem.validate();
         }
@@ -95,7 +95,7 @@ public class AssetPanel extends JPanel {
       () -> {
         Collections.sort(sounds);
         for (SoundResource sound : sounds) {
-          AssetPanelItem panelItem = new AssetPanelItem(Icons.DOC_SOUND, sound.getName(), sound);
+          AssetPanelItem panelItem = new AssetPanelItem(Icons.ASSET_SOUND_32, sound.getName(), sound);
           this.add(panelItem);
           panelItem.validate();
         }

@@ -20,7 +20,7 @@ public class SpawnpointPanel extends PropertyPanel {
   private final JComboBox<EntityPivotType> comboBoxPivot;
 
   public SpawnpointPanel() {
-    super("panel_spawnPoint", Icons.SPAWNPOINT);
+    super("panel_spawnPoint", Icons.SPAWNPOINT_24);
 
     this.textFieldInfo = new JTextField();
     this.textFieldInfo.setColumns(10);
