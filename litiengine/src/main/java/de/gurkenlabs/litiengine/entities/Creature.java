@@ -268,7 +268,7 @@ public class Creature extends CombatEntity implements IMobileEntity {
    * the game world environment is loaded, the new controller is attached to the game loop.
    */
   protected void updateAnimationController() {
-    IEntityAnimationController<Creature> controller = this.createAnimationController();
+    IEntityAnimationController<? extends Creature> controller = this.createAnimationController();
     getControllers().addController(controller);
     if (Game.world().environment() != null && Game.world().environment().isLoaded()) {
       Game.loop().attach(controller);
@@ -280,7 +280,7 @@ public class Creature extends CombatEntity implements IMobileEntity {
    *
    * @return A new instance of {@link IEntityAnimationController} for the creature.
    */
-  protected IEntityAnimationController<Creature> createAnimationController() {
+  protected IEntityAnimationController<? extends Creature> createAnimationController() {
     return new CreatureAnimationController<>(this, true);
   }
 
