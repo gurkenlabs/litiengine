@@ -4,7 +4,6 @@ plugins {
   alias libs.plugins.spotless
   alias libs.plugins.versions
   alias libs.plugins.grgit
-  alias libs.plugins.nexusPublish
   alias libs.plugins.sonarQube
   alias libs.plugins.semverguru
 
@@ -22,15 +21,5 @@ allprojects {
 java {
   toolchain {
     languageVersion = JavaLanguageVersion.of(24)
-  }
-}
-
-nexusPublishing {
-  useStaging.set(isTaggedRevision(project.version))
-  repositories {
-    sonatype {
-      username = project.findProperty('sonatypeUsername') ?: project.findProperty('OSSRH_USERNAME') ?: ''
-      password = project.findProperty('sonatypePassword') ?: project.findProperty('OSSRH_PASSWORD') ?: ''
-    }
   }
 }

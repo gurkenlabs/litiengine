@@ -1,6 +1,8 @@
 plugins {
   id "java-library"
 
+  alias libs.plugins.gradle.maven.publish
+
   id "encoding-defaults"
   id "publishing-defaults"
   id "testing-defaults"

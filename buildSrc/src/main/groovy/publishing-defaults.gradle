@@ -1,58 +1,45 @@
-plugins {
-  id "maven-publish"
-  id "signing"
-}
+mavenPublishing {
+  publishToMavenCentral()
+  if (!version.endsWith('SNAPSHOT')) {
+    signAllPublications()
+  }
 
-java {
-  withSourcesJar()
-  withJavadocJar()
-}
+  coordinates(gurkenlabs_group, LITIENGINE_artifact, project.version)
 
-publishing {
-  publications {
-    mavenJava(MavenPublication) {
-      groupId = gurkenlabs_group
-      artifactId = LITIENGINE_artifact
-      version = project.version
-      from components.java
-      pom {
-        name.set(LITIENGINE_name)
-        description.set(LITIENGINE_description)
-        inceptionYear.set(LITIENGINE_inception)
-        url.set(LITIENGINE_url)
-        licenses {
-          license {
-            name.set(MIT_name)
-            url.set(MIT_url)
-          }
-        }
-        developers {
-          developer {
-            id.set(steffen_id)
-            name.set(steffen_name)
-            email.set(steffen_mail)
-          }
-          developer {
-            id.set(matthias_id)
-            name.set(matthias_name)
-            email.set(matthias_mail)
-          }
-        }
-        scm {
-          connection.set(LITIENGINE_scm_con)
-          developerConnection.set(LITIENGINE_scm_devCon)
-          url.set(LITIENGINE_scm_url)
-        }
+  pom {
+    name = LITIENGINE_name
+    description = LITIENGINE_description
+    inceptionYear = LITIENGINE_inception
+    url = LITIENGINE_url
+
+    licenses {
+      license {
+        name = MIT_name
+        url = MIT_url
+        distribution = MIT_url
       }
+    }
+
+    developers {
+      developer {
+        id = steffen_id
+        name = steffen_name
+        url = steffen_url
+        email = steffen_mail
+      }
+      developer {
+        id = matthias_id
+        name = matthias_name
+        url = matthias_url
+        email = matthias_mail
+      }
+    }
+
+    scm {
+      url = LITIENGINE_scm_url
+      connection = LITIENGINE_scm_con
+      developerConnection = LITIENGINE_scm_devCon
     }
   }
 }
 
-signing {
-  if (project.hasProperty("signingKey")) {
-    useInMemoryPgpKeys(findProperty("signingKey"), findProperty("signingPassword"))
-  } else {
-    useGpgCmd()
-  }
-  sign(publishing.publications.mavenJava)
-}
