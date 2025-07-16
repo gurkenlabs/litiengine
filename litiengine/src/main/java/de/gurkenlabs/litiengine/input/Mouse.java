@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine.input;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
+
 import java.awt.AWTException;
 import java.awt.Point;
 import java.awt.Robot;
@@ -111,13 +112,13 @@ public final class Mouse
       .camera()
       .getMapLocation(
         new Point2D.Double(
-          this.getLocation().getX() / Game.world().camera().getRenderScale(),
-          this.getLocation().getY() / Game.world().camera().getRenderScale()));
+          getLocation().getX() / Game.world().camera().getRenderScale(),
+          getLocation().getY() / Game.world().camera().getRenderScale()));
   }
 
   @Override
   public Point getTile() {
-    return MapUtilities.getTile(this.getMapLocation());
+    return MapUtilities.getTile(getMapLocation());
   }
 
   @Override
@@ -382,8 +383,8 @@ public final class Mouse
         MouseEvent.MOUSE_MOVED,
         0,
         0,
-        (int) this.getLocation().getX(),
-        (int) this.getLocation().getY(),
+        (int) getLocation().getX(),
+        (int) getLocation().getY(),
         0,
         false,
         MouseEvent.NOBUTTON);
@@ -404,8 +405,8 @@ public final class Mouse
       original.getID(),
       original.getWhen(),
       original.getModifiersEx(),
-      (int) this.getLocation().getX(),
-      (int) this.getLocation().getY(),
+      (int) getLocation().getX(),
+      (int) getLocation().getY(),
       original.getXOnScreen(),
       original.getYOnScreen(),
       original.getClickCount(),
@@ -448,10 +449,10 @@ public final class Mouse
     }
 
     // set new mouse location
-    double newX = this.getLocation().getX() + diffX * this.sensitivity;
-    double newY = this.getLocation().getY() + diffY * this.sensitivity;
-    newX = Math.clamp(newX, 0, Game.window().getResolution().getWidth());
-    newY = Math.clamp(newY, 0, Game.window().getResolution().getHeight());
+    double newX = getLocation().getX() + diffX * this.sensitivity;
+    double newY = getLocation().getY() + diffY * this.sensitivity;
+    newX = Math.clamp(newX, 0, Math.abs(Game.window().getResolution().getWidth()));
+    newY = Math.clamp(newY, 0, Math.abs(Game.window().getResolution().getHeight()));
 
     this.location = new Point2D.Double(newX, newY);
   }
