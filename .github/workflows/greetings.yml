@@ -15,7 +15,7 @@ jobs:
       issues: write
       pull-requests: write
     steps:
-      - uses: actions/first-interaction@v2
+      - uses: actions/first-interaction@v3
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           issue-message: 'Thank you for your reporting your first LITIENGINE issue! We are looking forward to your further contributions.'
