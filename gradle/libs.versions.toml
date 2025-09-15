@@ -36,4 +36,4 @@ gradle-maven-publish = { id = "com.vanniktech.maven.publish", version = "0.34.0"
 sonarQube = { id = "org.sonarqube", version = "6.3.1.5724" }
 spotless = { id = "com.diffplug.spotless", version = "7.2.1" }
 versions = { id = "com.github.ben-manes.versions", version = "0.52.0" }
-semverguru = { id = "de.gurkenlabs.semverguru", version = "1.5" }
+semverguru = { id = "de.gurkenlabs.semverguru", version = "1.6" }
