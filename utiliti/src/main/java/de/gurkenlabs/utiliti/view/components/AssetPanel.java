@@ -44,7 +44,7 @@ public class AssetPanel extends JPanel {
             icon = null;
           }
 
-          AssetPanelItem panelItem = new AssetPanelItem(icon, getResourceNameWithoutPrefix(info), info);
+          AssetPanelItem panelItem = new AssetPanelItem(icon, getDisplayName(info), info);
           this.add(panelItem);
           panelItem.validate();
         }
@@ -108,9 +108,27 @@ public class AssetPanel extends JPanel {
     this.getRootPane().repaint();
   }
 
-  private static String getResourceNameWithoutPrefix(SpritesheetResource info) {
-    return info.getName().startsWith("prop-")
-      ? info.getName().replace("prop-", "")
-      : info.getName();
+  private static String getDisplayName(SpritesheetResource info) {
+    if (info == null || info.getName() == null) {
+      return "";
+    }
+    String name = info.getName();
+
+    // Prop base name: remove leading 'prop-' and any state suffix (-intact, -broken, etc.) retaining identifier only
+    if (name.startsWith("prop-")) {
+      String identifier = PropPanel.getIdentifierBySpriteName(name);
+      if (identifier != null) {
+        return identifier; // always just the identifier for props
+      }
+    }
+
+    // Creature base name: use base part before first dash if recognized as creature sprite
+    String creatureBase = CreaturePanel.getCreatureSpriteName(name);
+    if (creatureBase != null) {
+      return creatureBase;
+    }
+
+    // default: original name (e.g., misc sprites not following prop/creature conventions)
+    return name;
   }
 }

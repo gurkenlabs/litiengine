@@ -4,8 +4,8 @@ import de.gurkenlabs.litiengine.Direction;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.CreatureAnimationState;
-import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.utiliti.controller.SpriteVariantSelector;
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.view.renderers.LabelListCellRenderer;
 import java.awt.LayoutManager;
@@ -99,15 +99,9 @@ public class CreaturePanel extends PropertyPanel {
       return;
     }
 
-    Map<String, String> m = new TreeMap<>();
-    for (Spritesheet s : Resources.spritesheets().getAll()) {
-      String creatureSpriteName = getCreatureSpriteName(s.getName());
-      if (creatureSpriteName != null) {
-        m.putIfAbsent(creatureSpriteName, s.getName());
-      }
-    }
-
-    populateComboBoxWithSprites(this.comboBoxSpriteSheets, m);
+    // Use reusable selector to get representative sprite per creature base
+    Map<String, String> m = SpriteVariantSelector.selectBaseCreatureSpriteNames(Resources.spritesheets().getAll());
+    populateComboBoxWithSprites(this.comboBoxSpriteSheets, new TreeMap<>(m)); // TreeMap for sorted order
     this.creaturesLoaded = true;
   }
 

@@ -4,9 +4,9 @@ import de.gurkenlabs.litiengine.entities.Material;
 import de.gurkenlabs.litiengine.entities.Rotation;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
-import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.utiliti.controller.SpriteVariantSelector;
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.view.renderers.LabelListCellRenderer;
 import java.awt.LayoutManager;
@@ -122,19 +122,9 @@ public class PropPanel extends PropertyPanel {
     if (this.propsLoaded) {
       return;
     }
-    Map<String, String> m = new TreeMap<>();
-    for (Spritesheet s : Resources.spritesheets().getAll()) {
-      String spriteName = s.getName();
-      String propName = getIdentifierBySpriteName(spriteName);
-
-      if (propName == null) {
-        continue;
-      }
-      m.putIfAbsent(propName, spriteName);
-    }
-
-    populateComboBoxWithSprites(this.comboBoxSpriteSheets, m);
-
+    // Use reusable selector to get representative sprite per prop base identifier
+    Map<String, String> m = SpriteVariantSelector.selectBasePropSpriteNames(Resources.spritesheets().getAll());
+    populateComboBoxWithSprites(this.comboBoxSpriteSheets, new TreeMap<>(m)); // TreeMap for sorted order
     this.propsLoaded = true;
   }
 

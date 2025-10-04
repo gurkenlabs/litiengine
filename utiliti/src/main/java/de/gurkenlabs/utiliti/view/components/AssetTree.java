@@ -6,11 +6,14 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
 import de.gurkenlabs.litiengine.resources.ResourceBundle;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.utiliti.controller.Editor;
+import de.gurkenlabs.utiliti.controller.SpriteVariantSelector;
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.view.renderers.IconTreeListRenderer;
 import java.awt.Dimension;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -77,6 +80,7 @@ public class AssetTree extends JTree {
       return;
     }
 
+    // Precompute TreePaths once
     final TreePath spritePath = new TreePath(this.nodeSpritesheets.getPath());
     final TreePath propPath = new TreePath(this.nodeSpriteProps.getPath());
     final TreePath creaturePath = new TreePath(this.nodeCreatures.getPath());
@@ -92,38 +96,92 @@ public class AssetTree extends JTree {
     }
 
     if (selectedPath.equals(spritePath)) {
-      this.assetPanel.loadSprites(new ArrayList<>(gameFile.getSpriteSheets()));
-    } else if (Objects.equals(getSelectionPath(), propPath)) {
-      this.assetPanel.loadSprites(
-        gameFile.getSpriteSheets().stream().filter(x -> x.getName() != null && x.getName().contains(PropAnimationController.PROP_IDENTIFIER))
-          .toList());
-    } else if (Objects.equals(getSelectionPath(), creaturePath)) {
-      this.assetPanel.loadSprites(
-        gameFile.getSpriteSheets().stream().filter(x -> x.getName() != null && CreaturePanel.getCreatureSpriteName(x.getName()) != null).toList());
-    } else if (selectedPath.equals(miscPath)) {
-      this.assetPanel.loadSprites(gameFile.getSpriteSheets().stream().filter(
-        x -> x.getName() != null && !x.getName().contains(PropAnimationController.PROP_IDENTIFIER)
-          && CreaturePanel.getCreatureSpriteName(x.getName()) == null).toList());
-    } else if (selectedPath.equals(tilesetPath)) {
-      ArrayList<Tileset> allTilesets = new ArrayList<>(gameFile.getTilesets().stream().filter(x -> x.getName() != null).toList());
-
-      for (TmxMap map : gameFile.getMaps()) {
-        for (ITileset tileset : map.getTilesets()) {
-          if (allTilesets.stream().anyMatch(x -> x.getName() != null && x.getName().equals(tileset.getName()))) {
-            continue;
-          }
-
-          allTilesets.add((Tileset) tileset);
-        }
-      }
-
-      this.assetPanel.loadTilesets(allTilesets);
-    } else if (selectedPath.equals(emitterPath)) {
+      this.assetPanel.loadSprites(getAllBaseAndMisc(gameFile));
+      return;
+    }
+    if (selectedPath.equals(propPath)) {
+      this.assetPanel.loadSprites(getBasePropSprites(gameFile));
+      return;
+    }
+    if (selectedPath.equals(creaturePath)) {
+      this.assetPanel.loadSprites(getBaseCreatureSprites(gameFile));
+      return;
+    }
+    if (selectedPath.equals(miscPath)) {
+      this.assetPanel.loadSprites(getMiscSprites(gameFile));
+      return;
+    }
+    if (selectedPath.equals(tilesetPath)) {
+      this.assetPanel.loadTilesets(collectAllTilesets(gameFile));
+      return;
+    }
+    if (selectedPath.equals(emitterPath)) {
       this.assetPanel.loadEmitters(gameFile.getEmitters());
-    } else if (selectedPath.equals(blueprintPath)) {
+      return;
+    }
+    if (selectedPath.equals(blueprintPath)) {
       this.assetPanel.loadBlueprints(gameFile.getBluePrints());
-    } else if (selectedPath.equals(soundPath)) {
+      return;
+    }
+    if (selectedPath.equals(soundPath)) {
       this.assetPanel.loadSounds(gameFile.getSounds());
     }
+  }
+
+  // --- Sprite classification helpers -----------------------------------------------------------
+  private boolean isPropSprite(String name) {
+    return name != null && name.contains(PropAnimationController.PROP_IDENTIFIER);
+  }
+
+  private boolean isCreatureSprite(String name) {
+    return name != null && CreaturePanel.getCreatureSpriteName(name) != null;
+  }
+
+  private List<SpritesheetResource> getBasePropSprites(ResourceBundle gameFile) {
+    return new ArrayList<>(SpriteVariantSelector.selectBasePropResources(gameFile.getSpriteSheets()).values());
+  }
+
+  private List<SpritesheetResource> getBaseCreatureSprites(ResourceBundle gameFile) {
+    return new ArrayList<>(SpriteVariantSelector.selectBaseCreatureResources(gameFile.getSpriteSheets()).values());
+  }
+
+  private List<SpritesheetResource> getMiscSprites(ResourceBundle gameFile) {
+    List<SpritesheetResource> misc = new ArrayList<>();
+    for (SpritesheetResource res : gameFile.getSpriteSheets()) {
+      String name = res.getName();
+      if (name == null) {
+        continue;
+      }
+      if (!isPropSprite(name) && !isCreatureSprite(name)) {
+        misc.add(res);
+      }
+    }
+    return misc;
+  }
+
+  private List<SpritesheetResource> getAllBaseAndMisc(ResourceBundle gameFile) {
+    List<SpritesheetResource> aggregated = new ArrayList<>();
+    aggregated.addAll(getBasePropSprites(gameFile));
+    aggregated.addAll(getBaseCreatureSprites(gameFile));
+    aggregated.addAll(getMiscSprites(gameFile));
+    return aggregated;
+  }
+
+  // --- Tileset aggregation (unchanged logic, grouped for clarity) ------------------------------
+  private List<Tileset> collectAllTilesets(ResourceBundle gameFile) {
+    List<Tileset> all = new ArrayList<>(gameFile.getTilesets().stream().filter(x -> x.getName() != null).toList());
+    for (TmxMap map : gameFile.getMaps()) {
+      for (ITileset tileset : map.getTilesets()) {
+        String name = tileset.getName();
+        if (name == null) {
+          continue;
+        }
+        boolean alreadyPresent = all.stream().anyMatch(x -> Objects.equals(x.getName(), name));
+        if (!alreadyPresent) {
+          all.add((Tileset) tileset);
+        }
+      }
+    }
+    return all;
   }
 }
