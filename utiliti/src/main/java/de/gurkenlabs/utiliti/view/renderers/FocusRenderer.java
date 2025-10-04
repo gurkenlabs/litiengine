@@ -3,8 +3,8 @@ package de.gurkenlabs.utiliti.view.renderers;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.utiliti.controller.Editor;
-import de.gurkenlabs.utiliti.controller.MapComponent;
 import de.gurkenlabs.utiliti.controller.Transform;
+import de.gurkenlabs.utiliti.controller.Transform.TransformMode;
 import de.gurkenlabs.utiliti.model.Style;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -55,8 +55,8 @@ public class FocusRenderer implements IEditorRenderer {
       g.setColor(Color.WHITE);
       Game.graphics().renderOutline(g, focus, whiteStroke);
 
-      // render transform rects
-      if (Editor.instance().getMapComponent().getEditMode() != MapComponent.EDITMODE_MOVE) {
+      // render transform rects (not when in MOVE mode)
+      if (Editor.instance().getMapComponent().getTransformMode() != TransformMode.MOVE) {
         Stroke transStroke = new BasicStroke(1);
         for (Rectangle2D trans : Transform.getAnchors()) {
           g.setColor(Style.COLOR_TRANSFORM_RECT_FILL);

@@ -64,8 +64,11 @@ public final class Transform {
     }
   }
 
-  public enum TransformType {
-    NONE, RESIZE, MOVE
+  public enum TransformMode {
+    NONE,
+    RESIZE,
+    MOVE,
+    CREATE
   }
 
   private static final Map<ResizeAnchor, Rectangle2D> resizeAnchors = new ConcurrentHashMap<>();
@@ -74,7 +77,7 @@ public final class Transform {
 
   private static double transformRectSize = TRANSFORM_RECT_SIZE;
 
-  private static TransformType type;
+  private static TransformMode type;
   private static ResizeAnchor anchor;
 
   private static DragData drag;
@@ -82,7 +85,7 @@ public final class Transform {
   private Transform() {
   }
 
-  public static TransformType type() {
+  public static TransformMode type() {
     return type;
   }
 
@@ -96,7 +99,7 @@ public final class Transform {
 
   public static void resize() {
     final IMapObject transformObject = Editor.instance().getMapComponent().getFocusedMapObject();
-    if (transformObject == null || Editor.instance().getMapComponent().getEditMode() != MapComponent.EDITMODE_EDIT || type() != TransformType.RESIZE
+    if (transformObject == null || Editor.instance().getMapComponent().getTransformMode() != TransformMode.NONE || type() != TransformMode.RESIZE
       || anchor() == null) {
       return;
     }
@@ -167,7 +170,7 @@ public final class Transform {
   public static void move() {
     final List<IMapObject> selectedMapObjects = Editor.instance().getMapComponent().getSelectedMapObjects();
     if (selectedMapObjects.isEmpty() || (!Input.keyboard().isPressed(KeyEvent.VK_CONTROL)
-      && Editor.instance().getMapComponent().getEditMode() != MapComponent.EDITMODE_MOVE)) {
+      && Editor.instance().getMapComponent().getTransformMode() != TransformMode.MOVE)) {
       return;
     }
 
@@ -267,7 +270,7 @@ public final class Transform {
         }
 
         anchor = entry.getKey();
-        type = TransformType.RESIZE;
+        type = TransformMode.RESIZE;
         break;
       }
     }
@@ -277,14 +280,14 @@ public final class Transform {
       for (IMapObject selected : Editor.instance().getMapComponent().getSelectedMapObjects()) {
         if (selected.getBoundingBox().contains(Input.mouse().getMapLocation())) {
           Game.window().cursor().set(Cursors.MOVE, 0, 0);
-          type = TransformType.MOVE;
+          type = TransformMode.MOVE;
           return;
         }
       }
 
       // if no transform can be applied, reset the transform type
       Game.window().cursor().set(Cursors.DEFAULT, 0, 0);
-      type = TransformType.NONE;
+      type = TransformMode.NONE;
     }
   }
 

@@ -12,10 +12,10 @@ import de.gurkenlabs.utiliti.controller.Controller;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.EntityController;
 import de.gurkenlabs.utiliti.controller.LayerController;
-import de.gurkenlabs.utiliti.controller.MapComponent;
 import de.gurkenlabs.utiliti.controller.MapController;
 import de.gurkenlabs.utiliti.controller.PropertyInspector;
 import de.gurkenlabs.utiliti.controller.Scroll;
+import de.gurkenlabs.utiliti.controller.Transform.TransformMode;
 import de.gurkenlabs.utiliti.model.Cursors;
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.Style;
@@ -314,7 +314,7 @@ public final class UI {
     canvas.addMouseListener(new MouseAdapter() {
       @Override public void mouseReleased(MouseEvent e) {
         if (SwingUtilities.isRightMouseButton(e)) {
-          Editor.instance().getMapComponent().setEditMode(MapComponent.EDITMODE_EDIT);
+          Editor.instance().getMapComponent().setTransformMode(TransformMode.NONE);
           canvasPopup.show(canvas, e.getX(), e.getY());
         }
       }

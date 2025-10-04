@@ -3,7 +3,7 @@ package de.gurkenlabs.utiliti.view.menus;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.Editor;
-import de.gurkenlabs.utiliti.controller.MapComponent;
+import de.gurkenlabs.utiliti.controller.Transform.TransformMode;
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.view.components.UI;
 import java.awt.event.InputEvent;
@@ -84,7 +84,7 @@ public final class AddMenu extends JMenu {
   }
 
   private static void setCreateMode(MapObjectType type) {
-    Editor.instance().getMapComponent().setEditMode(MapComponent.EDITMODE_CREATE);
+    Editor.instance().getMapComponent().setTransformMode(TransformMode.CREATE);
     UI.getInspector().setMapObjectType(type);
   }
 }

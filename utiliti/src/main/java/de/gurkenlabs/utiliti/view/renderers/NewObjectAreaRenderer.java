@@ -2,7 +2,7 @@ package de.gurkenlabs.utiliti.view.renderers;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.utiliti.controller.Editor;
-import de.gurkenlabs.utiliti.controller.MapComponent;
+import de.gurkenlabs.utiliti.controller.Transform.TransformMode;
 import de.gurkenlabs.utiliti.model.Style;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -24,7 +24,7 @@ public class NewObjectAreaRenderer extends MouseSelectAreaRenderer {
   public void render(Graphics2D g) {
     final Rectangle2D rect = Editor.instance().getMapComponent().getMouseSelectArea(true);
     if (rect == null
-        || Editor.instance().getMapComponent().getEditMode() != MapComponent.EDITMODE_CREATE) {
+      || Editor.instance().getMapComponent().getTransformMode() != TransformMode.CREATE) {
       return;
     }
 

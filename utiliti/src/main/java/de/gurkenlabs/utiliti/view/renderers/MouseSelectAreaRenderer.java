@@ -2,7 +2,7 @@ package de.gurkenlabs.utiliti.view.renderers;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.utiliti.controller.Editor;
-import de.gurkenlabs.utiliti.controller.MapComponent;
+import de.gurkenlabs.utiliti.controller.Transform.TransformMode;
 import de.gurkenlabs.utiliti.model.Style;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -33,7 +33,7 @@ public class MouseSelectAreaRenderer implements IEditorRenderer {
   public void render(Graphics2D g) {
     final Rectangle2D rect = Editor.instance().getMapComponent().getMouseSelectArea(false);
     if (rect == null
-        || Editor.instance().getMapComponent().getEditMode() != MapComponent.EDITMODE_EDIT) {
+      || Editor.instance().getMapComponent().getTransformMode() != TransformMode.NONE) {
       return;
     }
 
