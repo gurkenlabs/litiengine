@@ -11,6 +11,7 @@ import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.awt.Color;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -292,7 +293,7 @@ import java.util.stream.Collectors;
   }
 
   private ICustomProperty createPropertyIfAbsent(String propertyName) {
-    return this.getProperties().computeIfAbsent(propertyName, n -> new CustomProperty());
+    return this.getProperties().computeIfAbsent(propertyName, _ -> new CustomProperty());
   }
 
   @Override public void setValue(String propertyName, URL value) {
@@ -398,11 +399,7 @@ import java.util.stream.Collectors;
     List<String> values = new ArrayList<>();
     String valuesStr = this.getStringValue(propertyName, defaultValue);
     if (valuesStr != null && !valuesStr.isEmpty()) {
-      for (String value : valuesStr.split(",")) {
-        if (value != null) {
-          values.add(value);
-        }
-      }
+      values.addAll(Arrays.asList(valuesStr.split(",")));
     }
     return values;
   }

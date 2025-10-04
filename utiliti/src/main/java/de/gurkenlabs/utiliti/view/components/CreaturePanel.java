@@ -37,7 +37,7 @@ public class CreaturePanel extends PropertyPanel {
     this.checkBoxScale = new JCheckBox(Resources.strings().get("panel_stretch_sprite"));
 
     setLayout(this.createLayout());
-    this.setupChangedListeners();
+    setupChangedListeners();
   }
 
   public static String getCreatureSpriteName(String name) {
@@ -53,7 +53,7 @@ public class CreaturePanel extends PropertyPanel {
 
     this.loadAvailableCreatureSprites();
     if (mapObject != null) {
-      this.setControlValues(mapObject);
+      setControlValues(mapObject);
     }
 
     super.bind(mapObject);
@@ -76,9 +76,9 @@ public class CreaturePanel extends PropertyPanel {
   }
 
   private void setupChangedListeners() {
-    this.setupL(this.comboBoxSpriteSheets, MapObjectProperty.SPRITESHEETNAME);
-    this.setup(this.comboBoxDirection, MapObjectProperty.SPAWN_DIRECTION);
-    this.setup(this.checkBoxScale, MapObjectProperty.SCALE_SPRITE);
+    setupL(this.comboBoxSpriteSheets, MapObjectProperty.SPRITESHEETNAME);
+    setup(this.comboBoxDirection, MapObjectProperty.SPAWN_DIRECTION);
+    setup(this.checkBoxScale, MapObjectProperty.SCALE_SPRITE);
   }
 
   private void loadAvailableCreatureSprites() {

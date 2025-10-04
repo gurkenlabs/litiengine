@@ -51,7 +51,7 @@ public class PropPanel extends PropertyPanel {
     this.checkBoxScale = new JCheckBox(Resources.strings().get("panel_stretch_sprite"));
 
     setLayout(this.createLayout());
-    this.setupChangedListeners();
+    setupChangedListeners();
   }
 
   public static String getIdentifierBySpriteName(String spriteName) {
@@ -71,7 +71,7 @@ public class PropPanel extends PropertyPanel {
   public void bind(IMapObject mapObject) {
     this.loadAvailableProps();
     if (mapObject != null) {
-      this.setControlValues(mapObject);
+      setControlValues(mapObject);
     }
     super.bind(mapObject);
   }
@@ -108,14 +108,14 @@ public class PropPanel extends PropertyPanel {
   }
 
   private void setupChangedListeners() {
-    this.setup(this.comboBoxMaterial, MapObjectProperty.PROP_MATERIAL);
-    this.setup(this.comboBoxRotation, MapObjectProperty.PROP_ROTATION);
-    this.setupL(this.comboBoxSpriteSheets, MapObjectProperty.SPRITESHEETNAME);
+    setup(this.comboBoxMaterial, MapObjectProperty.PROP_MATERIAL);
+    setup(this.comboBoxRotation, MapObjectProperty.PROP_ROTATION);
+    setupL(this.comboBoxSpriteSheets, MapObjectProperty.SPRITESHEETNAME);
 
-    this.setup(this.chckbxShadow, MapObjectProperty.PROP_ADDSHADOW);
-    this.setup(this.checkBoxHorizontalFlip, MapObjectProperty.PROP_FLIPHORIZONTALLY);
-    this.setup(this.checkBoxVerticalFlip, MapObjectProperty.PROP_FLIPVERTICALLY);
-    this.setup(this.checkBoxScale, MapObjectProperty.SCALE_SPRITE);
+    setup(this.chckbxShadow, MapObjectProperty.PROP_ADDSHADOW);
+    setup(this.checkBoxHorizontalFlip, MapObjectProperty.PROP_FLIPHORIZONTALLY);
+    setup(this.checkBoxVerticalFlip, MapObjectProperty.PROP_FLIPVERTICALLY);
+    setup(this.checkBoxScale, MapObjectProperty.SCALE_SPRITE);
   }
 
   private void loadAvailableProps() {
