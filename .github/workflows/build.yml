@@ -54,13 +54,13 @@ jobs:
           name: JUnit test results
           reporter: java-junit
           path: '**/test-results/**/*.xml'
-
-      - name: Static Analysis
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        if: github.repository == 'gurkenlabs/litiengine'
-        run: ./gradlew sonar -PskipSpotless
+      # TODO: Re-enable SonarCloud analysis once fully compatible with Gradle 9: https://community.sonarsource.com/t/sonar-scanner-gradle-incompatible-with-gradle-9/145563
+      #      - name: Static Analysis
+      #        env:
+      #          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      #        if: github.repository == 'gurkenlabs/litiengine'
+      #        run: ./gradlew sonar -PskipSpotless
 
       - name: Code Style Validation
         run: ./gradlew spotlessCheck
