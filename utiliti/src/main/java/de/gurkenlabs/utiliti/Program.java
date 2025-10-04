@@ -52,7 +52,7 @@ public class Program {
         handleArgs(args);
         Path gameFile = Editor.preferences().getLastGameFile();
         if (!Editor.instance().fileLoaded() && gameFile != null) {
-          Editor.instance().load(gameFile.toFile().toPath(), false);
+          Editor.instance().load(gameFile, false);
         }
       }, args);
     } catch (Throwable e) {
