@@ -2,7 +2,6 @@ plugins {
   id "java"
 
   alias libs.plugins.spotless
-  alias libs.plugins.versions
   alias libs.plugins.grgit
   alias libs.plugins.sonarQube
   alias libs.plugins.semverguru
