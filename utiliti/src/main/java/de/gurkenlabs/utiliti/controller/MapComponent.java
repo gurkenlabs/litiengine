@@ -1145,7 +1145,7 @@ public class MapComponent extends GuiComponent {
       return;
     }
 
-    if (Transform.type() == TransformMode.MOVE) {
+    if (Transform.mode() == TransformMode.MOVE) {
       this.setTransformMode(TransformMode.MOVE);
     }
 
@@ -1157,7 +1157,7 @@ public class MapComponent extends GuiComponent {
       }
       case NONE -> {
         if (isMoving
-          || Transform.type() == TransformMode.RESIZE
+          || Transform.mode() == TransformMode.RESIZE
           || SwingUtilities.isRightMouseButton(e.getEvent())) {
           return;
         }
@@ -1176,7 +1176,7 @@ public class MapComponent extends GuiComponent {
 
     switch (this.transformMode) {
       case NONE -> {
-        if (Transform.type() == TransformMode.RESIZE) {
+        if (Transform.mode() == TransformMode.RESIZE) {
           if (!isResizing) {
             isResizing = true;
 

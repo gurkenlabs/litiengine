@@ -18,17 +18,13 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 
 public class CreaturePanel extends PropertyPanel {
-
   private final JComboBox<JLabel> comboBoxSpriteSheets;
   private final JComboBox<Direction> comboBoxDirection;
   private final JCheckBox checkBoxScale;
+  private boolean creaturesLoaded; // mirrors PropPanel.propsLoaded behavior
 
-  /**
-   * Create the panel.
-   */
   public CreaturePanel() {
     super("panel_creature", Icons.CREATURE_16);
-
     this.comboBoxSpriteSheets = new JComboBox<>();
     this.comboBoxSpriteSheets.setRenderer(new LabelListCellRenderer());
 
@@ -38,11 +34,13 @@ public class CreaturePanel extends PropertyPanel {
 
     setLayout(this.createLayout());
     setupChangedListeners();
+
+    // if images are cleared (e.g. resource reload), repopulate on next bind
+    Resources.images().addClearedListener(() -> this.creaturesLoaded = false);
   }
 
   public static String getCreatureSpriteName(String name) {
-    if (Arrays.stream(CreatureAnimationState.values())
-      .anyMatch(state -> name.contains(state.spriteString()))) {
+    if (Arrays.stream(CreatureAnimationState.values()).anyMatch(state -> name.contains(state.spriteString()))) {
       return name.split("-")[0];
     }
     return null;
@@ -50,12 +48,10 @@ public class CreaturePanel extends PropertyPanel {
 
   @Override
   public void bind(IMapObject mapObject) {
-
     this.loadAvailableCreatureSprites();
     if (mapObject != null) {
       setControlValues(mapObject);
     }
-
     super.bind(mapObject);
   }
 
@@ -68,20 +64,41 @@ public class CreaturePanel extends PropertyPanel {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
+    // first try regular selection by stored property (base name expected)
     selectSpriteSheet(this.comboBoxSpriteSheets, mapObject);
+
+    // fallback: if nothing selected and a full spritesheet name was stored earlier, try its base
+    if (this.comboBoxSpriteSheets.getSelectedItem() == null) {
+      String stored = mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME, null);
+      if (stored != null && stored.contains("-")) {
+        String base = stored.split("-")[0];
+        for (int i = 0; i < this.comboBoxSpriteSheets.getItemCount(); i++) {
+          JLabel lbl = this.comboBoxSpriteSheets.getItemAt(i);
+          if (lbl != null && lbl.getText().equals(base)) {
+            this.comboBoxSpriteSheets.setSelectedItem(lbl);
+            break;
+          }
+        }
+      }
+    }
+
     this.comboBoxDirection.setSelectedItem(
-        mapObject.getEnumValue(
-            MapObjectProperty.SPAWN_DIRECTION, Direction.class, Direction.UNDEFINED));
+      mapObject.getEnumValue(MapObjectProperty.SPAWN_DIRECTION, Direction.class, Direction.UNDEFINED));
     this.checkBoxScale.setSelected(mapObject.getBoolValue(MapObjectProperty.SCALE_SPRITE, false));
   }
 
   private void setupChangedListeners() {
+    // use the standard helper just like PropPanel (stores label text/base creature name)
     setupL(this.comboBoxSpriteSheets, MapObjectProperty.SPRITESHEETNAME);
     setup(this.comboBoxDirection, MapObjectProperty.SPAWN_DIRECTION);
     setup(this.checkBoxScale, MapObjectProperty.SCALE_SPRITE);
   }
 
   private void loadAvailableCreatureSprites() {
+    if (this.creaturesLoaded) {
+      return;
+    }
+
     Map<String, String> m = new TreeMap<>();
     for (Spritesheet s : Resources.spritesheets().getAll()) {
       String creatureSpriteName = getCreatureSpriteName(s.getName());
@@ -91,15 +108,14 @@ public class CreaturePanel extends PropertyPanel {
     }
 
     populateComboBoxWithSprites(this.comboBoxSpriteSheets, m);
+    this.creaturesLoaded = true;
   }
 
   private LayoutManager createLayout() {
-    LayoutItem[] layoutItems =
-      new LayoutItem[] {
-        new LayoutItem("panel_sprite", this.comboBoxSpriteSheets),
-        new LayoutItem("panel_direction", this.comboBoxDirection),
-      };
-
+    LayoutItem[] layoutItems = new LayoutItem[] {
+      new LayoutItem("panel_sprite", this.comboBoxSpriteSheets),
+      new LayoutItem("panel_direction", this.comboBoxDirection),
+    };
     return this.createLayout(layoutItems, this.checkBoxScale);
   }
 }

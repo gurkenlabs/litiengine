@@ -77,7 +77,7 @@ public final class Transform {
 
   private static double transformRectSize = TRANSFORM_RECT_SIZE;
 
-  private static TransformMode type;
+  private static TransformMode mode;
   private static ResizeAnchor anchor;
 
   private static DragData drag;
@@ -85,8 +85,8 @@ public final class Transform {
   private Transform() {
   }
 
-  public static TransformMode type() {
-    return type;
+  public static TransformMode mode() {
+    return mode;
   }
 
   public static ResizeAnchor anchor() {
@@ -99,7 +99,7 @@ public final class Transform {
 
   public static void resize() {
     final IMapObject transformObject = Editor.instance().getMapComponent().getFocusedMapObject();
-    if (transformObject == null || Editor.instance().getMapComponent().getTransformMode() != TransformMode.NONE || type() != TransformMode.RESIZE
+    if (transformObject == null || Editor.instance().getMapComponent().getTransformMode() != TransformMode.NONE || mode() != TransformMode.RESIZE
       || anchor() == null) {
       return;
     }
@@ -270,7 +270,7 @@ public final class Transform {
         }
 
         anchor = entry.getKey();
-        type = TransformMode.RESIZE;
+        mode = TransformMode.RESIZE;
         break;
       }
     }
@@ -280,14 +280,14 @@ public final class Transform {
       for (IMapObject selected : Editor.instance().getMapComponent().getSelectedMapObjects()) {
         if (selected.getBoundingBox().contains(Input.mouse().getMapLocation())) {
           Game.window().cursor().set(Cursors.MOVE, 0, 0);
-          type = TransformMode.MOVE;
+          mode = TransformMode.MOVE;
           return;
         }
       }
 
       // if no transform can be applied, reset the transform type
       Game.window().cursor().set(Cursors.DEFAULT, 0, 0);
-      type = TransformMode.NONE;
+      mode = TransformMode.NONE;
     }
   }
 
