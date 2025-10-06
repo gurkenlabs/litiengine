@@ -41,7 +41,7 @@ jobs:
           java-version: 25
 
       - name: Gradle Setup
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
 
       - name: Increment version
         if: inputs.incrementVersion != 'none' && inputs.incrementVersion != ''
@@ -118,7 +118,7 @@ jobs:
           java-version: 24
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
 
       - name: Package
         shell: bash
