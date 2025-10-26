@@ -1,7 +1,6 @@
 package de.gurkenlabs.utiliti.view.components;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.utiliti.controller.WrapLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -47,9 +46,12 @@ public class TagPanel extends JPanel {
     this.textFieldInput.setColumns(7);
     this.textFieldInput.addActionListener(
         e -> {
+          // reference the event to avoid 'parameter never used' warnings
+          assert e != null;
+
           boolean isEmpty =
               this.textFieldInput.getText() == null
-                  || this.textFieldInput.getText().trim().length() == 0;
+                  || this.textFieldInput.getText().trim().isEmpty();
           if (isEmpty) {
             this.textFieldInput.setText(null);
             return;
@@ -138,7 +140,8 @@ public class TagPanel extends JPanel {
   }
 
   public String getTagsString() {
-    return ArrayUtilities.join(this.getTags());
+    // join the tag string values instead of Tag objects
+    return String.join(",", this.getTagStrings());
   }
 
   public void clear() {
@@ -151,7 +154,7 @@ public class TagPanel extends JPanel {
   }
 
   public void bind(String tagString) {
-    if (tagString == null || tagString.trim().length() == 0) {
+    if (tagString == null || tagString.trim().isEmpty()) {
       this.clear();
       return;
     }
@@ -217,7 +220,7 @@ public class TagPanel extends JPanel {
   }
 
   private String findAutoCompletion(String currentText) {
-    if (currentText == null || currentText.trim().length() == 0) {
+    if (currentText == null || currentText.trim().isEmpty()) {
       return null;
     }
 

@@ -1,7 +1,6 @@
 package de.gurkenlabs.litiengine.resources;
 
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.io.Codec;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.annotation.XmlAttribute;
@@ -10,6 +9,8 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlTransient;
 import java.awt.image.BufferedImage;
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 /**
  * Represents a resource for managing spritesheets.
@@ -146,7 +147,7 @@ public class SpritesheetResource extends NamedResource implements Serializable {
       return new int[0];
     }
 
-    return ArrayUtilities.splitInt(this.keyframes);
+    return Arrays.stream(this.keyframes.split(",")).mapToInt(Integer::parseInt).toArray();
   }
 
   /**
@@ -191,7 +192,7 @@ public class SpritesheetResource extends NamedResource implements Serializable {
    * @param keyframes An array of keyframes to set.
    */
   public void setKeyframes(int[] keyframes) {
-    this.keyframes = ArrayUtilities.join(keyframes);
+    this.keyframes = Arrays.stream(keyframes).mapToObj(String::valueOf).collect(Collectors.joining(","));
   }
 
   /**
