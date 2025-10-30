@@ -1,6 +1,5 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
-import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.io.Codec;
 import jakarta.xml.bind.DatatypeConverter;
 import jakarta.xml.bind.Unmarshaller;
@@ -14,11 +13,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -638,7 +639,7 @@ public class TileData {
       }
     }
 
-    return ArrayUtilities.toList(tileArr);
+    return Arrays.stream(tileArr).flatMap(Arrays::stream).collect(Collectors.toList());
   }
 
   /**
