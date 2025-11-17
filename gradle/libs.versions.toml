@@ -32,7 +32,7 @@ xml_runtime = ["xml-runtime-core", "xml-runtime-impl"]
 [plugins]
 beryxRuntime = { id = "org.beryx.runtime", version = "2.0.1" }
 grgit = { id = "org.ajoberstar.grgit", version = "5.3.3" }
-gradle-maven-publish = { id = "com.vanniktech.maven.publish", version = "0.34.0" }
+gradle-maven-publish = { id = "com.vanniktech.maven.publish", version = "0.35.0" }
 sonarQube = { id = "org.sonarqube", version = "7.0.1.6134" }
 spotless = { id = "com.diffplug.spotless", version = "8.0.0" }
 semverguru = { id = "de.gurkenlabs.semverguru", version = "1.6" }
