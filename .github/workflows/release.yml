@@ -45,11 +45,9 @@ jobs:
 
       - name: Increment version
         if: inputs.incrementVersion != 'none' && inputs.incrementVersion != ''
-        env:
-          GRGIT_USER: ${{ secrets.GITHUB_TOKEN }}
         run: |
           ./gradlew incrementVersion --increment=${{inputs.incrementVersion}}
-          ./gradlew pushTags
+          git push --tags
           latest_tag=$(git describe --tags --abbrev=0)
           echo "RELEASE_VERSION=$latest_tag" >> "$GITHUB_ENV"
 
