@@ -45,7 +45,7 @@ public final class Mouse
 
   private final float sensitivity;
   private boolean grabMouse;
-
+  private boolean justEnabledGrabMouse;
   private boolean pressed;
   private boolean isLeftMouseButtonDown;
   private boolean isRightMouseButtonDown;
@@ -359,12 +359,25 @@ public final class Mouse
 
   @Override
   public void setGrabMouse(final boolean grab) {
+    // Track when we transition from not grabbing to grabbing
+    if (!this.grabMouse && grab) {
+      this.justEnabledGrabMouse = true;
+    }
+
     this.grabMouse = grab;
 
-    if (this.isGrabMouse()) {
+    if (isGrabMouse()) {
       Game.window().cursor().hideDefaultCursor();
-    } else if (!Game.window().cursor().isVisible()) {
-      Game.window().cursor().showDefaultCursor();
+    } else {
+      if (!Game.window().cursor().isVisible()) {
+        Game.window().cursor().showDefaultCursor();
+      }
+      Point2D currentPosition = getLocation();
+      Point2D screenLocation = Game.window().getRenderComponent().getLocationOnScreen();
+      this.robot.mouseMove(
+          (int) (screenLocation.getX() + currentPosition.getX()),
+          (int) (screenLocation.getY() + currentPosition.getY()));
+      this.lastLocation = currentPosition;
     }
   }
 
@@ -429,23 +442,28 @@ public final class Mouse
     double diffY;
     if (!this.grabMouse) {
       // get diff relative from last mouse location
-      diffX = e.getX() - this.lastLocation.getX();
-      diffY = e.getY() - this.lastLocation.getY();
-      this.lastLocation = new Point(e.getX(), e.getY());
+      this.location = new Point(e.getX(), e.getY());
+      this.lastLocation = this.location;
+      return;
     } else {
-      // get diff relative from grabbed position
-      final double screenCenterX = Game.window().getResolution().getWidth() * 0.5;
-      final double screenCenterY = Game.window().getResolution().getHeight() * 0.5;
-      final Point screenLocation = Game.window().getLocationOnScreen();
-      final int grabX = (int) (screenLocation.x + screenCenterX);
-      final int grabY = (int) (screenLocation.y + screenCenterY);
+      // Handle the first mouse event after enabling grab mouse
+      if (this.justEnabledGrabMouse) {
+        // Center the physical mouse but don't change the game mouse position
+        final Point grabPos = getGrabPosition();
+        this.robot.mouseMove(grabPos.x, grabPos.y);
 
-      // lock original mouse back to the center of the screen
-      this.robot.mouseMove(grabX, grabY);
+        // Clear the flag and return without updating the game mouse position
+        this.justEnabledGrabMouse = false;
+        return;
+      }
+
+      // get diff relative from grabbed position
+      final Point grabPos = getGrabPosition();// lock original mouse back to the center of the screen
+      this.robot.mouseMove(grabPos.x, grabPos.y);
 
       // calculate diffs and new location for the ingame mouse
-      diffX = e.getXOnScreen() - (double) grabX;
-      diffY = e.getYOnScreen() - (double) grabY;
+      diffX = e.getXOnScreen() - (double) grabPos.x;
+      diffY = e.getYOnScreen() - (double) grabPos.y;
     }
 
     // set new mouse location
@@ -473,5 +491,19 @@ public final class Mouse
     }
 
     this.updateLocation = mouseEvent;
+  }
+
+  /**
+   * Calculates the center screen position where the mouse should be locked when grab mouse is enabled.
+   *
+   * @return The screen coordinates where the mouse should be centered.
+   */
+  private Point getGrabPosition() {
+    final double screenCenterX = Game.window().getResolution().getWidth() * 0.5;
+    final double screenCenterY = Game.window().getResolution().getHeight() * 0.5;
+    final Point screenLocation = Game.window().getLocationOnScreen();
+    final int grabX = (int) (screenLocation.x + screenCenterX);
+    final int grabY = (int) (screenLocation.y + screenCenterY);
+    return new Point(grabX, grabY);
   }
 }
