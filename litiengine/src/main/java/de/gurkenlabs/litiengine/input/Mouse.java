@@ -45,6 +45,7 @@ public final class Mouse
 
   private final float sensitivity;
   private boolean grabMouse;
+  private boolean justEnabledGrabMouse;
 
   private boolean pressed;
   private boolean isLeftMouseButtonDown;
@@ -359,6 +360,11 @@ public final class Mouse
 
   @Override
   public void setGrabMouse(final boolean grab) {
+    // Track when we transition from not grabbing to grabbing
+    if (!this.grabMouse && grab) {
+      this.justEnabledGrabMouse = true;
+    }
+    
     this.grabMouse = grab;
 
     if (this.isGrabMouse()) {
@@ -433,6 +439,21 @@ public final class Mouse
       diffY = e.getY() - this.lastLocation.getY();
       this.lastLocation = new Point(e.getX(), e.getY());
     } else {
+      // Handle the first mouse event after enabling grab mouse
+      if (this.justEnabledGrabMouse) {
+        // Center the physical mouse but don't change the game mouse position
+        final double screenCenterX = Game.window().getResolution().getWidth() * 0.5;
+        final double screenCenterY = Game.window().getResolution().getHeight() * 0.5;
+        final Point screenLocation = Game.window().getLocationOnScreen();
+        final int grabX = (int) (screenLocation.x + screenCenterX);
+        final int grabY = (int) (screenLocation.y + screenCenterY);
+        this.robot.mouseMove(grabX, grabY);
+        
+        // Clear the flag and return without updating the game mouse position
+        this.justEnabledGrabMouse = false;
+        return;
+      }
+      
       // get diff relative from grabbed position
       final double screenCenterX = Game.window().getResolution().getWidth() * 0.5;
       final double screenCenterY = Game.window().getResolution().getHeight() * 0.5;
