@@ -6,22 +6,20 @@ junit = "6.0.1"
 [libraries]
 darklaf_core = { module = "com.github.weisj:darklaf-core", version.ref = "darklaf" }
 darklaf_propertyLoader = { module = "com.github.weisj:darklaf-property-loader", version.ref = "darklaf" }
-input4j = { module = "com.github.gurkenlabs:input4j", version = "64e7b114f3" }
+input4j = { module = "de.gurkenlabs:input4j", version = "1.0.0" }
+javax_activation = { module = "jakarta.activation:jakarta.activation-api", version = "2.1.4" }
+junit_jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
+junit_jupiter_api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
+junit_jupiter_engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
+junit_jupiter_params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
+mockito_core = { module = "org.mockito:mockito-core", version = "5.20.0" }
 soundlibs_jorbis = { module = "com.googlecode.soundlibs:jorbis", version = "0.0.17.4" }
+soundlibs_mp3spi = { module = "com.googlecode.soundlibs:mp3spi", version = "1.9.5.4" }
 soundlibs_tritonus = { module = "com.googlecode.soundlibs:tritonus-share", version = "0.3.7.4" }
 soundlibs_vorbisspi = { module = "com.googlecode.soundlibs:vorbisspi", version = "1.0.3.3" }
-soundlibs_mp3spi = { module = "com.googlecode.soundlibs:mp3spi", version = "1.9.5.4" }
-javax_activation = { module = "jakarta.activation:jakarta.activation-api", version = "2.1.4" }
 xml_api = { module = "jakarta.xml.bind:jakarta.xml.bind-api", version = "4.0.4" }
 xml_runtime_core = { module = "com.sun.xml.bind:jaxb-core", version.ref = "jaxb" }
 xml_runtime_impl = { module = "com.sun.xml.bind:jaxb-impl", version.ref = "jaxb" }
-
-# Test dependencies
-mockito_core = { module = "org.mockito:mockito-core", version = "5.20.0" }
-junit_jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
-junit_jupiter_api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
-junit_jupiter_params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
-junit_jupiter_engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
 
 
 [bundles]
@@ -31,8 +29,8 @@ xml_runtime = ["xml-runtime-core", "xml-runtime-impl"]
 
 [plugins]
 beryxRuntime = { id = "org.beryx.runtime", version = "2.0.1" }
-grgit = { id = "org.ajoberstar.grgit", version = "5.3.3" }
 gradle-maven-publish = { id = "com.vanniktech.maven.publish", version = "0.35.0" }
+grgit = { id = "org.ajoberstar.grgit", version = "5.3.3" }
+semverguru = { id = "de.gurkenlabs.semverguru", version = "1.6" }
 sonarQube = { id = "org.sonarqube", version = "7.1.0.6387" }
 spotless = { id = "com.diffplug.spotless", version = "8.1.0" }
-semverguru = { id = "de.gurkenlabs.semverguru", version = "1.6" }
