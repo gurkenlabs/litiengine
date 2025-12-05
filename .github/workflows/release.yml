@@ -68,7 +68,7 @@ jobs:
         if: inputs.stage == 'final'
         uses: EndBug/add-and-commit@v9
         with:
-          message: "Update CITATION.cff for release $RELEASE_VERSION"
+          message: 'Update CITATION.cff for release ${{ env.RELEASE_VERSION }}'
           committer_name: GitHub Actions
           committer_email: actions@github.com
           add: 'CITATION.cff'
@@ -96,11 +96,12 @@ jobs:
       - name: Announce release
         if: inputs.stage == 'final'
         run: |
-          curl -X POST -H "Authorization: Bearer ${{ secrets.MASTODON_ACCESS_TOKEN }}" \
-          -F "status=#LITIENGINE version ${{ env.RELEASE_VERSION }} has just been released!
+          curl -X POST "https://fosstodon.org/api/v1/statuses" \
+          -H "Authorization: Bearer ${{ secrets.MASTODON_ACCESS_TOKEN }}" \
+          -d "status=#LITIENGINE version ${{ env.RELEASE_VERSION }} has just been released!
           #GameDev #indiedev #videogames #IndieGameDev
           ${{ github.server_url }}/${{ github.repository }}/releases/tag/$RELEASE_VERSION" \
-          https://fosstodon.org/api/v1/statuses
+
 
   package:
     name: Package distribution
@@ -119,7 +120,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: 24
+          java-version: 25
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
