@@ -8,7 +8,7 @@ on:
     inputs:
       scope:
         type: choice
-        description: "One of major, minor, or patch (defaults to minor), indicating which component of the version should be incremented. If the previous version was 1.2.3, a scope of minor would result in 1.3.0."
+        description: "SCOPE: One of major, minor, or patch (defaults to minor), indicating which component of the version should be incremented. If the previous version was 1.2.3, a scope of minor would result in 1.3.0."
         required: true
         default: 'minor'
         options:
@@ -17,7 +17,7 @@ on:
           - major
       stage:
         type: choice
-        description: "Either snapshot or final, indicating the stage of development."
+        description: "STAGE: Either snapshot or final, indicating the stage of development. A snapshot is a development version, while final marks a stable release."
         required: true
         default: 'snapshot'
         options:
