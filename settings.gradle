@@ -4,6 +4,10 @@ pluginManagement {
   }
 }
 
+plugins {
+  id('org.ajoberstar.reckon.settings') version '1.0.1'
+}
+
 dependencyResolutionManagement {
   repositories {
     mavenCentral()
@@ -19,3 +23,10 @@ include(
 )
 
 rootProject.name = "litiengine-sdk"
+
+reckon {
+  defaultInferredScope = 'minor'
+  snapshots()
+  scopeCalc = calcScopeFromProp().or(calcScopeFromCommitMessages())
+  stageCalc = calcStageFromProp()
+}

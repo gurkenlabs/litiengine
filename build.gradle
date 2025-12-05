@@ -4,18 +4,12 @@ plugins {
   alias libs.plugins.spotless
   alias libs.plugins.grgit
   alias libs.plugins.sonarQube
-  alias libs.plugins.semverguru
 
   id "licensing-defaults"
   id "sonarqube-defaults"
 }
 
 group = gurkenlabs_group
-
-allprojects {
-  project.version += isTaggedRevision(project.version) ? "" : "-SNAPSHOT"
-  project.getLogger().lifecycle("Set project '{}' version to '{}'.", project.name, project.version)
-}
 
 java {
   toolchain {

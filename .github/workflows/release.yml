@@ -6,16 +6,23 @@ on:
       - '[0-9]+.[0-9]+.[0-9]+'
   workflow_dispatch:
     inputs:
-      incrementVersion:
+      scope:
         type: choice
-        description: "increment version?"
+        description: "One of major, minor, or patch (defaults to minor), indicating which component of the version should be incremented. If the previous version was 1.2.3, a scope of minor would result in 1.3.0."
         required: true
-        default: 'none'
+        default: 'minor'
         options:
-          - none
           - patch
           - minor
           - major
+      stage:
+        type: choice
+        description: "Either snapshot or final, indicating the stage of development."
+        required: true
+        default: 'snapshot'
+        options:
+          - snapshot
+          - final
   schedule:
     # Midnight every day
     - cron: "0 0 * * *"
@@ -44,22 +51,21 @@ jobs:
         uses: gradle/actions/setup-gradle@v5
 
       - name: Increment version
-        if: inputs.incrementVersion != 'none' && inputs.incrementVersion != ''
         run: |
-          ./gradlew incrementVersion --increment=${{inputs.incrementVersion}}
+          ./gradlew reckonTagCreate -Preckon.scope=${{inputs.scope}} -Preckon.stage=${{inputs.stage}}
           git push --tags
           latest_tag=$(git describe --tags --abbrev=0)
           echo "RELEASE_VERSION=$latest_tag" >> "$GITHUB_ENV"
 
       - name: Update CITATION.cff
-        if: inputs.incrementVersion != 'none' && inputs.incrementVersion != ''
+        if: inputs.stage == 'final'
         run: |
           release_date=$(date +'%Y-%m-%d')
           sed -i "s/^version: .*/version: $RELEASE_VERSION/" CITATION.cff
           sed -i "s/^date-released: .*/date-released: '$release_date'/" CITATION.cff
 
       - name: Commit CITATION.cff
-        if: inputs.incrementVersion != 'none' && inputs.incrementVersion != ''
+        if: inputs.stage == 'final'
         uses: EndBug/add-and-commit@v9
         with:
           message: "Update CITATION.cff for release $RELEASE_VERSION"
@@ -76,7 +82,7 @@ jobs:
         run: ./gradlew publish
 
       - name: Create release notes
-        if: inputs.incrementVersion != 'none' && inputs.incrementVersion != ''
+        if: inputs.stage == 'final'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ github.ref_name }}
@@ -88,7 +94,7 @@ jobs:
               --draft
 
       - name: Announce release
-        if: inputs.incrementVersion != 'none' && inputs.incrementVersion != ''
+        if: inputs.stage == 'final'
         run: |
           curl -X POST -H "Authorization: Bearer ${{ secrets.MASTODON_ACCESS_TOKEN }}" \
           -F "status=#LITIENGINE version ${{ env.RELEASE_VERSION }} has just been released!
@@ -98,7 +104,7 @@ jobs:
 
   package:
     name: Package distribution
-    if: inputs.incrementVersion != 'none' && inputs.incrementVersion != ''
+    if: inputs.stage == 'final'
     needs: release
     strategy:
       matrix:

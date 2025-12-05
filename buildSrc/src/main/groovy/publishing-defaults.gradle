@@ -1,10 +1,10 @@
 mavenPublishing {
   publishToMavenCentral()
-  if (!version.endsWith('SNAPSHOT')) {
+  if (version.versionProvider.get().isSignificant()) {
     signAllPublications()
   }
 
-  coordinates(gurkenlabs_group, LITIENGINE_artifact, project.version)
+  coordinates(gurkenlabs_group, LITIENGINE_artifact, version.toString())
 
   pom {
     name = LITIENGINE_name
