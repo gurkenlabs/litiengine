@@ -56,7 +56,7 @@ jobs:
           release_date=$(date +'%Y-%m-%d')
           projectVersion=$(./gradlew properties -Preckon.scope=${{inputs.scope}} -Preckon.stage=${{inputs.stage}} | grep '^version:' | awk '{print $2}')
           echo "RELEASE_VERSION=$projectVersion" >> "$GITHUB_ENV"
-          sed -i "s/^version: .*/version: $RELEASE_VERSION/" CITATION.cff
+          sed -i "s/^version: .*/version: $projectVersion/" CITATION.cff
           sed -i "s/^date-released: .*/date-released: '$release_date'/" CITATION.cff
 
       - name: Commit CITATION.cff

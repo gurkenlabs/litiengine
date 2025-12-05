@@ -68,7 +68,7 @@ runtime {
       appVersion = tmpAppVersion.join('.')
       imageOptions.addAll(
         ["--mac-package-identifier", "de.gurkenlabs.litiengine.utiliti",
-         "--mac-package-name", applicationName // Name appearing in Menu Bar.
+         "--mac-package-name", utiLITI_name // Name appearing in Menu Bar.
         ]
       )
     }
