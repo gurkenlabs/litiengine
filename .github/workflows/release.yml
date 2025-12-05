@@ -50,17 +50,12 @@ jobs:
       - name: Gradle Setup
         uses: gradle/actions/setup-gradle@v5
 
-      - name: Increment version
-        run: |
-          ./gradlew reckonTagCreate -Preckon.scope=${{inputs.scope}} -Preckon.stage=${{inputs.stage}}
-          git push --tags
-          latest_tag=$(git describe --tags --abbrev=0)
-          echo "RELEASE_VERSION=$latest_tag" >> "$GITHUB_ENV"
-
       - name: Update CITATION.cff
         if: inputs.stage == 'final'
         run: |
           release_date=$(date +'%Y-%m-%d')
+          projectVersion=$(./gradlew properties -Preckon.scope=${{inputs.scope}} -Preckon.stage=${{inputs.stage}} | grep '^version:' | awk '{print $2}')
+          echo "RELEASE_VERSION=$projectVersion" >> "$GITHUB_ENV"
           sed -i "s/^version: .*/version: $RELEASE_VERSION/" CITATION.cff
           sed -i "s/^date-released: .*/date-released: '$release_date'/" CITATION.cff
 
@@ -72,6 +67,11 @@ jobs:
           committer_name: GitHub Actions
           committer_email: actions@github.com
           add: 'CITATION.cff'
+
+      - name: Increment version
+        run: |
+          ./gradlew reckonTagCreate -Preckon.scope=${{inputs.scope}} -Preckon.stage=${{inputs.stage}}
+          git push --tags
 
       - name: Publish
         env:
@@ -128,8 +128,8 @@ jobs:
       - name: Package
         shell: bash
         run: |
-          latest_tag=$(git describe --tags --abbrev=0)
-          echo "RELEASE_VERSION=$latest_tag" >> "$GITHUB_ENV"
+          projectVersion=$(git describe --tags --abbrev=0)
+          echo "RELEASE_VERSION=$projectVersion" >> "$GITHUB_ENV"
           ./gradlew jpackage -Prelease=true
 
       - name: Upload package
