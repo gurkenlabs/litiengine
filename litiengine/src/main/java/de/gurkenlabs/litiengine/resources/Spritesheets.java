@@ -2,7 +2,7 @@ package de.gurkenlabs.litiengine.resources;
 
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.litiengine.util.ArrayUtilities;
+
 import de.gurkenlabs.litiengine.util.io.Codec;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import java.awt.image.BufferedImage;
@@ -23,6 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 
 /**
@@ -274,7 +275,7 @@ public final class Spritesheets {
         // print keyframes (if they exist)
         if (keyFrames.length > 0) {
           writer.write(";");
-          writer.write(ArrayUtilities.join(keyFrames));
+          writer.write(Arrays.stream(keyFrames).mapToObj(String::valueOf).collect(Collectors.joining(",")));
         }
 
         writer.write("\n");
