@@ -151,7 +151,7 @@ public class Configuration {
         Properties properties = new Properties();
         properties.load(bufferedStream);
         initializeSettingsByProperties(properties);
-        log.log(Level.INFO, "Configuration {0} created", getPath());
+        log.log(Level.INFO, "Configuration loaded from {0}", getPath());
       } catch (IOException e) {
         log.log(Level.SEVERE, e.getMessage(), e);
       }
