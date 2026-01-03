@@ -5,7 +5,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.utiliti.controller.ControlBehavior;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.UndoManager;
@@ -20,9 +19,11 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.GroupLayout.ParallelGroup;
@@ -850,7 +851,9 @@ public abstract class PropertyPanel extends JPanel {
           for (int i = 0; i < table.getRowCount(); i++) {
             values.add(table.getValueAt(i, column));
           }
-          m.setValue(prop, ArrayUtilities.join(values, ","));
+          m.setValue(prop, values.stream()
+            .map(String::valueOf)
+            .collect(Collectors.joining(",")));
           column++;
         }
       });
