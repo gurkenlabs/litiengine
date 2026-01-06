@@ -61,7 +61,7 @@ public final class PhysicsEngine implements IUpdateable {
    *
    * <p>
    * <i>If you add a {@code ICollisionEntiy} to your Environment, it will automatically be added to
-   * the the PhysicsEngine. There is typically no need to call this explicitly.</i>
+   * the PhysicsEngine. There is typically no need to call this explicitly.</i>
    *
    * @param entity The collision entity to be added.
    * @see ICollisionEntity#getCollisionBox()
