@@ -153,4 +153,16 @@ public class MathUtilities {
 
     return (float) fraction * 100 / value;
   }
+
+  /**
+     * Checks if a value is within a specified range (inclusive).
+     * This is a helper for game logic like health points or boundary checks.
+     * * @param value The value to check.
+     * @param min The minimum allowed value.
+     * @param max The maximum allowed value.
+     * @return true if the value is between min and max.
+     */
+    public static boolean isBetween(double value, double min, double max) {
+        return value >= min && value <= max;
+    }
 }
