@@ -17,7 +17,7 @@ soundlibs_jorbis = { module = "com.googlecode.soundlibs:jorbis", version = "0.0.
 soundlibs_mp3spi = { module = "com.googlecode.soundlibs:mp3spi", version = "1.9.5.4" }
 soundlibs_tritonus = { module = "com.googlecode.soundlibs:tritonus-share", version = "0.3.7.4" }
 soundlibs_vorbisspi = { module = "com.googlecode.soundlibs:vorbisspi", version = "1.0.3.3" }
-xml_api = { module = "jakarta.xml.bind:jakarta.xml.bind-api", version = "4.0.4" }
+xml_api = { module = "jakarta.xml.bind:jakarta.xml.bind-api", version = "4.0.5" }
 xml_runtime_core = { module = "com.sun.xml.bind:jaxb-core", version.ref = "jaxb" }
 xml_runtime_impl = { module = "com.sun.xml.bind:jaxb-impl", version.ref = "jaxb" }
 
