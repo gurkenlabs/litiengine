@@ -4,6 +4,7 @@ import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.graphics.ShapeRenderer;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.input.Input;
+
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -14,7 +15,9 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.IntConsumer;
 
-/** The Class ListField. */
+/**
+ * The Class ListField.
+ */
 public class ListField extends GuiComponent {
   private final List<IntConsumer> changeConsumer;
   private final CopyOnWriteArrayList<CopyOnWriteArrayList<ImageComponent>> listEntries;
@@ -47,7 +50,7 @@ public class ListField extends GuiComponent {
    * Examples:
    *
    * <blockquote>
-   *
+   * <p>
    * content[0][0] - ok<br>
    * content[0][1] - ok<br>
    * content[0][8] - ok<br>
@@ -56,28 +59,16 @@ public class ListField extends GuiComponent {
    *
    * </blockquote>
    *
-   * @param x
-   *          The x-coordinate of the ListField.
-   * @param y
-   *          The y-coordinate of the ListField.
-   * @param width
-   *          The width of the ListField.
-   * @param height
-   *          The height of the ListField.
-   * @param content
-   *          The 1 dimension array to show in the ListField.
-   * @param shownRows
-   *          The number of rows/elements to display before the user needs to scroll for more possible rows/elements.
+   * @param x         The x-coordinate of the ListField.
+   * @param y         The y-coordinate of the ListField.
+   * @param width     The width of the ListField.
+   * @param height    The height of the ListField.
+   * @param content   The 1 dimension array to show in the ListField.
+   * @param shownRows The number of rows/elements to display before the user needs to scroll for more possible rows/elements.
    * @see #ListField(double, double, double, double, Object[], int)
    */
-  public ListField(
-      final double x,
-      final double y,
-      final double width,
-      final double height,
-      final Object[] content,
-      final int shownRows) {
-    this(x, y, width, height, new Object[][] {content}, shownRows, 1);
+  public ListField(final double x, final double y, final double width, final double height, final Object[] content, final int shownRows) {
+    this(x, y, width, height, new Object[][]{content}, shownRows, 1);
   }
 
   /**
@@ -87,36 +78,22 @@ public class ListField extends GuiComponent {
    * Examples:
    *
    * <blockquote>
-   *
+   * <p>
    * content[0][0] - column 0, row 0<br>
    * content[0][1] - column 0, row 1<br>
    * content[2][8] - column 2, row 8<br>
    *
    * </blockquote>
    *
-   * @param x
-   *          The x-coordinate of the ListField.
-   * @param y
-   *          The y-coordinate of the ListField.
-   * @param width
-   *          The width of the ListField.
-   * @param height
-   *          The height of the ListField.
-   * @param content
-   *          The 2 dimension array to show in the ListField.
-   * @param shownRows
-   *          The number of rows to display before the user needs to scroll for more possible rows.
-   * @param shownColumns
-   *          The number of columns to display before the user needs to scroll for more possible columns.
+   * @param x            The x-coordinate of the ListField.
+   * @param y            The y-coordinate of the ListField.
+   * @param width        The width of the ListField.
+   * @param height       The height of the ListField.
+   * @param content      The 2 dimension array to show in the ListField.
+   * @param shownRows    The number of rows to display before the user needs to scroll for more possible rows.
+   * @param shownColumns The number of columns to display before the user needs to scroll for more possible columns.
    */
-  public ListField(
-      final double x,
-      final double y,
-      final double width,
-      final double height,
-      final Object[][] content,
-      final int shownRows,
-      final int shownColumns) {
+  public ListField(final double x, final double y, final double width, final double height, final Object[][] content, final int shownRows, final int shownColumns) {
     super(x, y, width, height);
     this.changeConsumer = new CopyOnWriteArrayList<>();
     this.content = content;
@@ -139,40 +116,86 @@ public class ListField extends GuiComponent {
     this.selectedComponent = null;
   }
 
+  /**
+   * Gets the spritesheet used for the button.
+   *
+   * @return The spritesheet for the button.
+   */
   public Spritesheet getButtonSprite() {
     return this.buttonSprite;
   }
 
+  /**
+   * Sets the spritesheet for the button and reinitializes the content list.
+   *
+   * @param buttonSprite The spritesheet to set for the button.
+   */
   public void setButtonSprite(final Spritesheet buttonSprite) {
     this.buttonSprite = buttonSprite;
     initContentList();
   }
 
+  /**
+   * Gets the list of change consumers.
+   * Change consumers are functions that are executed when the selection changes.
+   *
+   * @return A list of IntConsumer objects representing the change consumers.
+   */
   public List<IntConsumer> getChangeConsumer() {
     return this.changeConsumer;
   }
 
+  /**
+   * Gets the content of the list field.
+   *
+   * @return A 2D array of objects representing the content of the list field.
+   */
   public Object[][] getContent() {
     return this.content;
   }
 
+  /**
+   * Gets the spritesheet used for the list entries.
+   *
+   * @return The spritesheet for the list entries.
+   */
   public Spritesheet getEntrySprite() {
     return this.entrySprite;
   }
 
+  /**
+   * Sets the spritesheet for the list entries and reinitializes the content list.
+   *
+   * @param entrySprite The spritesheet to set for the list entries.
+   */
   public void setEntrySprite(final Spritesheet entrySprite) {
     this.entrySprite = entrySprite;
     initContentList();
   }
 
+  /**
+   * Gets the current horizontal lower bound of the list field.
+   *
+   * @return The horizontal lower bound.
+   */
   public int getHorizontalLowerBound() {
     return this.horizontalLowerBound;
   }
 
+  /**
+   * Sets the horizontal lower bound of the list field.
+   *
+   * @param lowerBound The new horizontal lower bound to set.
+   */
   public void setHorizontalLowerBound(final int lowerBound) {
     this.horizontalLowerBound = lowerBound;
   }
 
+  /**
+   * Gets the horizontal slider associated with the list field.
+   *
+   * @return The horizontal slider.
+   */
   public HorizontalSlider getHorizontalSlider() {
     return this.horizontalSlider;
   }
@@ -180,8 +203,7 @@ public class ListField extends GuiComponent {
   /**
    * Returns all list items of a specified column.
    *
-   * @param column
-   *          the column
+   * @param column the column
    * @return a list of items
    */
   public List<ImageComponent> getListEntry(final int column) {
@@ -194,17 +216,12 @@ public class ListField extends GuiComponent {
   /**
    * Returns item at a specified column and row.
    *
-   * @param column
-   *          the column
-   * @param row
-   *          the row
+   * @param column the column
+   * @param row    the row
    * @return ImageComponent at [column,row]
    */
   public ImageComponent getListEntry(final int column, final int row) {
-    if (column < 0
-        || row < 0
-        || column >= this.listEntries.size()
-        || row >= this.listEntries.get(column).size()) {
+    if (column < 0 || row < 0 || column >= this.listEntries.size() || row >= this.listEntries.get(column).size()) {
       return null;
     }
     return this.listEntries.get(column).get(row);
@@ -225,18 +242,38 @@ public class ListField extends GuiComponent {
     return result;
   }
 
+  /**
+   * Gets the number of rows currently shown in the list field.
+   *
+   * @return The number of rows displayed in the list field.
+   */
   public int getNumberOfShownRows() {
     return shownRows;
   }
 
+  /**
+   * Gets the number of columns currently shown in the list field.
+   *
+   * @return The number of columns displayed in the list field.
+   */
   public int getNumberOfShownColumns() {
     return shownColumns;
   }
 
+  /**
+   * Gets the currently selected component in the list field.
+   *
+   * @return The selected ImageComponent, or null if no component is selected.
+   */
   public ImageComponent getSelectedComponent() {
     return selectedComponent;
   }
 
+  /**
+   * Gets the object associated with the currently selected component in the list field.
+   *
+   * @return The object at the selected position, or null if no component is selected.
+   */
   public Object getSelectedObject() {
     if (this.getSelectedComponent() == null) {
       return null;
@@ -265,30 +302,63 @@ public class ListField extends GuiComponent {
     return selectionRow;
   }
 
+  /**
+   * Gets the current vertical lower bound of the list field.
+   *
+   * @return The vertical lower bound.
+   */
   public int getVerticalLowerBound() {
     return verticalLowerBound;
   }
 
+  /**
+   * Sets the vertical lower bound of the list field.
+   *
+   * @param lowerBound The new vertical lower bound to set.
+   */
   public void setVerticalLowerBound(final int lowerBound) {
     this.verticalLowerBound = lowerBound;
   }
 
+  /**
+   * Gets the vertical slider associated with the list field.
+   *
+   * @return The vertical slider.
+   */
   public VerticalSlider getVerticalSlider() {
     return verticalSlider;
   }
 
+  /**
+   * Checks if arrow key navigation is enabled for the list field.
+   *
+   * @return True if arrow key navigation is enabled, false otherwise.
+   */
   public boolean isArrowKeyNavigation() {
     return arrowKeyNavigation;
   }
 
+  /**
+   * Enables or disables arrow key navigation for the list field.
+   *
+   * @param arrowKeyNavigation True to enable arrow key navigation, false to disable it.
+   */
   public void setArrowKeyNavigation(final boolean arrowKeyNavigation) {
     this.arrowKeyNavigation = arrowKeyNavigation;
   }
 
+  /**
+   * Registers a new change consumer to be executed when the selection changes.
+   *
+   * @param c The IntConsumer to be added to the list of change consumers.
+   */
   public void onChange(final IntConsumer c) {
     getChangeConsumer().add(c);
   }
 
+  /**
+   * Refreshes the list field by updating the list entries and selecting the current component.
+   */
   public void refresh() {
     refreshListEntries();
     selectComponent();
@@ -305,9 +375,7 @@ public class ListField extends GuiComponent {
       if (isEntireRowSelected()) {
         borderWidth = getWidth() + 2;
       }
-      if (getVerticalSlider() != null
-          && getVerticalSlider().isVisible()
-          && isSliderInside()) {
+      if (getVerticalSlider() != null && getVerticalSlider().isVisible() && isSliderInside()) {
         borderWidth = borderWidth - getVerticalSlider().getWidth();
       }
 
@@ -315,18 +383,19 @@ public class ListField extends GuiComponent {
         borderHeight = getHeight() + 2;
       }
 
-      border =
-          new Rectangle2D.Double(
-              selectedComponent.getX() - 1,
-              selectedComponent.getY() - 1,
-              borderWidth,
-              borderHeight);
+      border = new Rectangle2D.Double(selectedComponent.getX() - 1, selectedComponent.getY() - 1, borderWidth, borderHeight);
 
       g.setColor(Color.WHITE);
       ShapeRenderer.renderOutline(g, border, 2);
     }
   }
 
+  /**
+   * Sets whether mouse events should be forwarded for all components in the specified column.
+   *
+   * @param column             The column index for which to set the mouse event forwarding.
+   * @param forwardMouseEvents True to enable forwarding of mouse events, false to disable it.
+   */
   public void setForwardMouseEvents(final int column, final boolean forwardMouseEvents) {
     if (column < 0 && column >= nbOfColumns) {
       return;
@@ -337,10 +406,7 @@ public class ListField extends GuiComponent {
   }
 
   public void setSelection(final int column, final int row) {
-    if (column < 0
-        || column >= nbOfColumns
-        || row < 0
-        || row >= getContent()[column].length) {
+    if (column < 0 || column >= nbOfColumns || row < 0 || row >= getContent()[column].length) {
       return;
     }
     this.selectionColumn = column;
@@ -348,14 +414,12 @@ public class ListField extends GuiComponent {
 
     if (selectionRow >= getVerticalLowerBound() + getNumberOfShownRows()) {
       setVerticalLowerBound(getVerticalLowerBound() + 1);
-    } else if (selectionRow < getVerticalLowerBound()
-        && getVerticalLowerBound() > 0) {
+    } else if (selectionRow < getVerticalLowerBound() && getVerticalLowerBound() > 0) {
       setVerticalLowerBound(getVerticalLowerBound() - 1);
     }
     if (selectionColumn >= getHorizontalLowerBound() + getNumberOfShownColumns()) {
       setHorizontalLowerBound(getHorizontalLowerBound() + 1);
-    } else if (selectionColumn < getHorizontalLowerBound()
-        && getHorizontalLowerBound() > 0) {
+    } else if (selectionColumn < getHorizontalLowerBound() && getHorizontalLowerBound() > 0) {
       setHorizontalLowerBound(getHorizontalLowerBound() - 1);
     }
 
@@ -369,8 +433,7 @@ public class ListField extends GuiComponent {
    * <br>
    * Set to <b>false</b> as default.
    *
-   * @param selectEntireColumn
-   *          a boolean
+   * @param selectEntireColumn a boolean
    */
   public void setSelectEntireColumn(boolean selectEntireColumn) {
     this.selectEntireColumn = selectEntireColumn;
@@ -382,8 +445,7 @@ public class ListField extends GuiComponent {
    * <br>
    * Set to <b>false</b> as default.
    *
-   * @param selectEntireRow
-   *          a boolean
+   * @param selectEntireRow a boolean
    */
   public void setSelectEntireRow(boolean selectEntireRow) {
     this.selectEntireRow = selectEntireRow;
@@ -421,15 +483,16 @@ public class ListField extends GuiComponent {
    * example, when a ListField covers an entire screen. <br>
    * Set to <b>false</b> as default.
    *
-   * @param sliderInside
-   *          a boolean
+   * @param sliderInside a boolean
    */
   public void setSliderInside(boolean sliderInside) {
     this.sliderInside = sliderInside;
     initSliders();
   }
 
-  /** Slides the ListField up by one row. */
+  /**
+   * Slides the ListField up by one row.
+   */
   public void slideUp() {
     if (getVerticalLowerBound() <= 0) {
       return;
@@ -439,7 +502,9 @@ public class ListField extends GuiComponent {
     refresh();
   }
 
-  /** Slides the ListField down by one row. */
+  /**
+   * Slides the ListField down by one row.
+   */
   public void slideDown() {
     if (getVerticalLowerBound() >= getMaxRows() - getNumberOfShownRows()) {
       return;
@@ -454,59 +519,46 @@ public class ListField extends GuiComponent {
   }
 
   private void prepareInput() {
-    Input.keyboard()
-        .onKeyTyped(
-            KeyEvent.VK_UP,
-            e -> {
-              if (!canHandleKeyboardEvent()) {
-                return;
-              }
-              setSelection(getHorizontalLowerBound(), selectionRow - 1);
-            });
+    Input.keyboard().onKeyTyped(KeyEvent.VK_UP, e -> {
+      if (!canHandleKeyboardEvent()) {
+        return;
+      }
+      setSelection(getHorizontalLowerBound(), selectionRow - 1);
+    });
 
-    Input.keyboard()
-        .onKeyTyped(
-            KeyEvent.VK_DOWN,
-            e -> {
-              if (!canHandleKeyboardEvent()) {
-                return;
-              }
-              setSelection(getHorizontalLowerBound(), selectionRow + 1);
-            });
+    Input.keyboard().onKeyTyped(KeyEvent.VK_DOWN, e -> {
+      if (!canHandleKeyboardEvent()) {
+        return;
+      }
+      setSelection(getHorizontalLowerBound(), selectionRow + 1);
+    });
 
-    Input.keyboard()
-        .onKeyTyped(
-            KeyEvent.VK_LEFT,
-            e -> {
-              if (!canHandleKeyboardEvent()) {
-                return;
-              }
-              setSelection(getHorizontalLowerBound() - 1, selectionRow);
-            });
+    Input.keyboard().onKeyTyped(KeyEvent.VK_LEFT, e -> {
+      if (!canHandleKeyboardEvent()) {
+        return;
+      }
+      setSelection(getHorizontalLowerBound() - 1, selectionRow);
+    });
 
-    Input.keyboard()
-        .onKeyTyped(
-            KeyEvent.VK_RIGHT,
-            e -> {
-              if (!canHandleKeyboardEvent()) {
-                return;
-              }
-              setSelection(getHorizontalLowerBound() + 1, selectionRow);
-            });
+    Input.keyboard().onKeyTyped(KeyEvent.VK_RIGHT, e -> {
+      if (!canHandleKeyboardEvent()) {
+        return;
+      }
+      setSelection(getHorizontalLowerBound() + 1, selectionRow);
+    });
 
-    this.onMouseWheelScrolled(
-        e -> {
-          if (isSuspended() || !isVisible()) {
-            return;
-          }
-          if (isHovered()) {
-            if (e.getEvent().getWheelRotation() < 0) {
-              slideUp();
-            } else {
-              slideDown();
-            }
-          }
-        });
+    this.onMouseWheelScrolled(e -> {
+      if (isSuspended() || !isVisible()) {
+        return;
+      }
+      if (isHovered()) {
+        if (e.getEvent().getWheelRotation() < 0) {
+          slideUp();
+        } else {
+          slideDown();
+        }
+      }
+    });
   }
 
   private void initContentList() {
@@ -521,47 +573,18 @@ public class ListField extends GuiComponent {
 
         ImageComponent entryComponent;
         if (getContent()[column][row] == null) {
-          entryComponent =
-              new ImageComponent(
-                  getX() + (columnWidth * column),
-                  getY() + (rowHeight * row),
-                  columnWidth,
-                  rowHeight,
-                  entrySprite,
-                  "",
-                  null);
-        } else if (getContent()[column][row]instanceof Image image) {
-          entryComponent =
-              new ImageComponent(
-                  getX() + (columnWidth * column),
-                  getY() + (rowHeight * row),
-                  columnWidth,
-                  rowHeight,
-                  entrySprite,
-                  "",
-                  image);
+          entryComponent = new ImageComponent(getX() + (columnWidth * column), getY() + (rowHeight * row), columnWidth, rowHeight, entrySprite, "", null);
+        } else if (getContent()[column][row] instanceof Image image) {
+          entryComponent = new ImageComponent(getX() + (columnWidth * column), getY() + (rowHeight * row), columnWidth, rowHeight, entrySprite, "", image);
         } else {
-          entryComponent =
-              new ImageComponent(
-                  getX() + (columnWidth * column),
-                  getY() + (rowHeight * row),
-                  columnWidth,
-                  rowHeight,
-                  entrySprite,
-                  getContent()[column][row].toString(),
-                  null);
+          entryComponent = new ImageComponent(getX() + (columnWidth * column), getY() + (rowHeight * row), columnWidth, rowHeight, entrySprite, getContent()[column][row].toString(), null);
         }
         if (isSliderInside() && getVerticalSlider() != null) {
           entryComponent.setX(getX() + ((columnWidth - (getVerticalSlider().getWidth() / getNumberOfShownColumns())) * column));
-          entryComponent.setWidth(
-              entryComponent.getWidth()
-                  - (getVerticalSlider().getWidth() / getNumberOfShownColumns()));
+          entryComponent.setWidth(entryComponent.getWidth() - (getVerticalSlider().getWidth() / getNumberOfShownColumns()));
         }
         if (isSliderInside() && getHorizontalSlider() != null) {
-          entryComponent.setY(
-              getY()
-                  + ((rowHeight
-                      - (getHorizontalSlider().getHeight() / getNumberOfShownRows())) * row));
+          entryComponent.setY(getY() + ((rowHeight - (getHorizontalSlider().getHeight() / getNumberOfShownRows())) * row));
           entryComponent.setHeight(entryComponent.getHeight() - (getHorizontalSlider().getHeight() / getNumberOfShownRows()));
         }
         entryComponent.setTextAlign(Align.LEFT);
@@ -570,53 +593,36 @@ public class ListField extends GuiComponent {
       this.getComponents().addAll(getListEntry(column));
       final int col = column;
       for (final ImageComponent comp : getListEntry(col)) {
-        comp.onClicked(
-            e -> {
-              setSelection(
-                  getHorizontalLowerBound() + col % getNumberOfShownColumns(),
-                  getVerticalLowerBound()
-                      + getListEntry(col).indexOf(comp) % getNumberOfShownRows());
-              refresh();
-            });
+        comp.onClicked(e -> {
+          setSelection(getHorizontalLowerBound() + col % getNumberOfShownColumns(), getVerticalLowerBound() + getListEntry(col).indexOf(comp) % getNumberOfShownRows());
+          refresh();
+        });
       }
     }
 
-    this.onChange(
-        s -> {
-          if (getVerticalSlider() != null) {
-            getVerticalSlider().setCurrentValue(getVerticalLowerBound());
-            getVerticalSlider()
-                .getSliderComponent()
-                .setLocation(getVerticalSlider().getRelativeSliderLocation());
-          }
-          if (getHorizontalSlider() != null) {
-            getHorizontalSlider().setCurrentValue(getHorizontalLowerBound());
-            getHorizontalSlider()
-                .getSliderComponent()
-                .setLocation(getHorizontalSlider().getRelativeSliderLocation());
-          }
-        });
+    this.onChange(s -> {
+      if (getVerticalSlider() != null) {
+        getVerticalSlider().setCurrentValue(getVerticalLowerBound());
+        getVerticalSlider().getSliderComponent().setLocation(getVerticalSlider().getRelativeSliderLocation());
+      }
+      if (getHorizontalSlider() != null) {
+        getHorizontalSlider().setCurrentValue(getHorizontalLowerBound());
+        getHorizontalSlider().getSliderComponent().setLocation(getHorizontalSlider().getRelativeSliderLocation());
+      }
+    });
     if (getVerticalSlider() != null) {
-      getVerticalSlider()
-          .onChange(
-              sliderValue -> {
-                setVerticalLowerBound(sliderValue.intValue());
-                getVerticalSlider()
-                    .getSliderComponent()
-                    .setLocation(getVerticalSlider().getRelativeSliderLocation());
-                refresh();
-              });
+      getVerticalSlider().onChange(sliderValue -> {
+        setVerticalLowerBound(sliderValue.intValue());
+        getVerticalSlider().getSliderComponent().setLocation(getVerticalSlider().getRelativeSliderLocation());
+        refresh();
+      });
     }
     if (getHorizontalSlider() != null) {
-      getHorizontalSlider()
-          .onChange(
-              sliderValue -> {
-                setHorizontalLowerBound(sliderValue.intValue());
-                getHorizontalSlider()
-                    .getSliderComponent()
-                    .setLocation(getHorizontalSlider().getRelativeSliderLocation());
-                refresh();
-              });
+      getHorizontalSlider().onChange(sliderValue -> {
+        setHorizontalLowerBound(sliderValue.intValue());
+        getHorizontalSlider().getSliderComponent().setLocation(getHorizontalSlider().getRelativeSliderLocation());
+        refresh();
+      });
     }
   }
 
@@ -625,25 +631,9 @@ public class ListField extends GuiComponent {
     final int maxNbOfRows = getMaxRows() - getNumberOfShownRows();
     if (this.getNumberOfShownColumns() < getContent().length) {
       if (this.isSliderInside()) {
-        this.horizontalSlider =
-            new HorizontalSlider(
-                getX(),
-                getY() + getHeight() - sliderSize,
-                getWidth() - sliderSize,
-                sliderSize,
-                0,
-                (float) nbOfColumns - getNumberOfShownColumns(),
-                1);
+        this.horizontalSlider = new HorizontalSlider(getX(), getY() + getHeight() - sliderSize, getWidth() - sliderSize, sliderSize, 0, (float) nbOfColumns - getNumberOfShownColumns(), 1);
       } else {
-        this.horizontalSlider =
-            new HorizontalSlider(
-                getX(),
-                getY() + getHeight(),
-                getWidth(),
-                sliderSize,
-                0,
-                (float) nbOfColumns - getNumberOfShownColumns(),
-                1);
+        this.horizontalSlider = new HorizontalSlider(getX(), getY() + getHeight(), getWidth(), sliderSize, 0, (float) nbOfColumns - getNumberOfShownColumns(), 1);
       }
       this.getHorizontalSlider().setCurrentValue(this.getHorizontalLowerBound());
       this.getComponents().add(this.getHorizontalSlider());
@@ -652,36 +642,12 @@ public class ListField extends GuiComponent {
     if (maxNbOfRows > 0) {
       if (isSliderInside()) {
         if (getHorizontalSlider() != null) {
-          this.verticalSlider =
-              new VerticalSlider(
-                  getX() + getWidth() - sliderSize,
-                  getY(),
-                  sliderSize,
-                  getHeight() - sliderSize,
-                  0,
-                  (float) getMaxRows() - getNumberOfShownRows(),
-                  1);
+          this.verticalSlider = new VerticalSlider(getX() + getWidth() - sliderSize, getY(), sliderSize, getHeight() - sliderSize, 0, (float) getMaxRows() - getNumberOfShownRows(), 1);
         } else {
-          this.verticalSlider =
-              new VerticalSlider(
-                  this.getX() + this.getWidth() - sliderSize,
-                  this.getY(),
-                  sliderSize,
-                  this.getHeight(),
-                  0,
-                  (float) this.getMaxRows() - this.getNumberOfShownRows(),
-                  1);
+          this.verticalSlider = new VerticalSlider(this.getX() + this.getWidth() - sliderSize, this.getY(), sliderSize, this.getHeight(), 0, (float) this.getMaxRows() - this.getNumberOfShownRows(), 1);
         }
       } else {
-        this.verticalSlider =
-            new VerticalSlider(
-                this.getX() + this.getWidth(),
-                this.getY(),
-                sliderSize,
-                this.getHeight(),
-                0,
-                (float) this.getMaxRows() - this.getNumberOfShownRows(),
-                1);
+        this.verticalSlider = new VerticalSlider(this.getX() + this.getWidth(), this.getY(), sliderSize, this.getHeight(), 0, (float) this.getMaxRows() - this.getNumberOfShownRows(), 1);
       }
       this.getVerticalSlider().setCurrentValue(this.getVerticalLowerBound());
       this.getComponents().add(this.getVerticalSlider());
@@ -695,15 +661,11 @@ public class ListField extends GuiComponent {
           continue;
         }
 
-        if (row + getVerticalLowerBound() < getContent()[column + getHorizontalLowerBound()].length
-            && getContent()[column + getHorizontalLowerBound()][row + getVerticalLowerBound()] != null) {
-          if (getContent()[column + getHorizontalLowerBound()][row + getVerticalLowerBound()]instanceof Image image) {
+        if (row + getVerticalLowerBound() < getContent()[column + getHorizontalLowerBound()].length && getContent()[column + getHorizontalLowerBound()][row + getVerticalLowerBound()] != null) {
+          if (getContent()[column + getHorizontalLowerBound()][row + getVerticalLowerBound()] instanceof Image image) {
             getListEntry(column, row).setImage(image);
           } else {
-            getListEntry(column, row)
-                .setText(
-                    getContent()[column + getHorizontalLowerBound()][row + getVerticalLowerBound()]
-                        .toString());
+            getListEntry(column, row).setText(getContent()[column + getHorizontalLowerBound()][row + getVerticalLowerBound()].toString());
           }
         } else {
           getListEntry(column, row).setText("");
@@ -713,20 +675,9 @@ public class ListField extends GuiComponent {
   }
 
   private void selectComponent() {
-    if (!isEntireRowSelected()
-        && getSelectionColumn() >= getHorizontalLowerBound()
-        && getSelectionColumn() < getHorizontalLowerBound() + getNumberOfShownColumns()
-        && getSelectionRow() >= getVerticalLowerBound()
-        && getSelectionRow() < getVerticalLowerBound() + getNumberOfShownRows()) {
-      this.selectedComponent =
-          getListEntry(
-              getSelectionColumn() - getHorizontalLowerBound(),
-              getSelectionRow() - getVerticalLowerBound());
-    } else if (isEntireRowSelected()
-        && getSelectionColumn() >= 0
-        && getSelectionColumn() < nbOfColumns
-        && getSelectionRow() >= getVerticalLowerBound()
-        && getSelectionRow() < getVerticalLowerBound() + getNumberOfShownRows()) {
+    if (!isEntireRowSelected() && getSelectionColumn() >= getHorizontalLowerBound() && getSelectionColumn() < getHorizontalLowerBound() + getNumberOfShownColumns() && getSelectionRow() >= getVerticalLowerBound() && getSelectionRow() < getVerticalLowerBound() + getNumberOfShownRows()) {
+      this.selectedComponent = getListEntry(getSelectionColumn() - getHorizontalLowerBound(), getSelectionRow() - getVerticalLowerBound());
+    } else if (isEntireRowSelected() && getSelectionColumn() >= 0 && getSelectionColumn() < nbOfColumns && getSelectionRow() >= getVerticalLowerBound() && getSelectionRow() < getVerticalLowerBound() + getNumberOfShownRows()) {
       this.selectedComponent = getListEntry(0, getSelectionRow() - getVerticalLowerBound());
     } else {
       this.selectedComponent = null;
