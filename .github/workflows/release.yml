@@ -144,11 +144,9 @@ jobs:
           path: utiliti/build/jpackage
 
       - name: Set up Butler
-        if: runner.arch == 'X64'
         uses: jdno/setup-butler@v1
 
       - name: Upload to itch.io
-        if: runner.arch == 'X64'
         env:
           BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
         run: |
