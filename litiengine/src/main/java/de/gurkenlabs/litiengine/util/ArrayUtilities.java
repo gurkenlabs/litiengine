@@ -1,14 +1,10 @@
 package de.gurkenlabs.litiengine.util;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.*;
 
 /**
  * Utility class for array operations.
@@ -46,9 +42,7 @@ public final class ArrayUtilities {
    * @return A new array with both specified arrays in sequence.
    */
   public static int[] concat(int[] first, int[] second) {
-    int[] result = Arrays.copyOf(first, first.length + second.length);
-    System.arraycopy(second, 0, result, first.length, second.length);
-    return result;
+    return IntStream.concat(Arrays.stream(first), Arrays.stream(second)).toArray();
   }
 
   /**
@@ -59,9 +53,7 @@ public final class ArrayUtilities {
    * @return A new array with both specified arrays in sequence.
    */
   public static long[] concat(long[] first, long[] second) {
-    long[] result = Arrays.copyOf(first, first.length + second.length);
-    System.arraycopy(second, 0, result, first.length, second.length);
-    return result;
+    return LongStream.concat(Arrays.stream(first), Arrays.stream(second)).toArray();
   }
 
   /**
@@ -72,9 +64,7 @@ public final class ArrayUtilities {
    * @return A new array with both specified arrays in sequence.
    */
   public static double[] concat(double[] first, double[] second) {
-    double[] result = Arrays.copyOf(first, first.length + second.length);
-    System.arraycopy(second, 0, result, first.length, second.length);
-    return result;
+    return DoubleStream.concat(Arrays.stream(first), Arrays.stream(second)).toArray();
   }
 
   /**
@@ -86,9 +76,7 @@ public final class ArrayUtilities {
    * @return A new array with both specified arrays in sequence.
    */
   public static <T> T[] concat(T[] first, T[] second) {
-    T[] result = Arrays.copyOf(first, first.length + second.length);
-    System.arraycopy(second, 0, result, first.length, second.length);
-    return result;
+    return Stream.concat(Arrays.stream(first), Arrays.stream(second)).toArray(size -> (T[]) Array.newInstance(first.getClass().getComponentType(), size));
   }
 
   /**
@@ -318,13 +306,13 @@ public final class ArrayUtilities {
   }
 
   /**
-   * Joins the specified list with the {@link #DEFAULT_STRING_DELIMITER}.
+   * Joins the specified collection with the {@link #DEFAULT_STRING_DELIMITER}.
    *
-   * @param collection The list that provides the elements to be joined.
+   * @param collection The collection that provides the elements to be joined.
    * @return A string with all joined elements, separated by the delimiter.
    */
   public static String join(Collection<?> collection) {
-    return joinArray(collection.toArray(), DEFAULT_STRING_DELIMITER);
+    return join(collection, DEFAULT_STRING_DELIMITER);
   }
 
   /**
@@ -335,7 +323,7 @@ public final class ArrayUtilities {
    * @return A string with all joined elements, separated by the delimiter.
    */
   public static String join(Collection<?> collection, String delimiter) {
-    return joinArray(collection.toArray(), delimiter);
+    return collection.stream().map(String::valueOf).collect(Collectors.joining(delimiter));
   }
 
   /**
@@ -345,7 +333,7 @@ public final class ArrayUtilities {
    * @return A string with all joined elements, separated by the delimiter.
    */
   public static String join(Object[] arr) {
-    return joinArray(arr, DEFAULT_STRING_DELIMITER);
+    return join(arr, DEFAULT_STRING_DELIMITER);
   }
 
   /**
@@ -356,13 +344,13 @@ public final class ArrayUtilities {
    * @return A string with all joined elements, separated by the delimiter.
    */
   public static String join(Object[] arr, String delimiter) {
-    return joinArray(arr, delimiter);
+    return Arrays.stream(arr).map(String::valueOf).collect(Collectors.joining(delimiter));
   }
 
   public static <T> List<T> toList(T[][] arr) {
     List<T> list = new ArrayList<>();
-    for (T[] rows : arr) {
-      list.addAll(Arrays.asList(rows));
+    for (T[] row : arr) {
+      Collections.addAll(list, row);
     }
 
     return list;
@@ -377,17 +365,13 @@ public final class ArrayUtilities {
    */
   public static boolean contains(Object[] arr, Object value) {
     for (Object v : arr) {
-      if (value == null && v == null) {
-        return true;
-      }
-
-      if (v != null && v.equals(value)) {
+      if (Objects.equals(v, value)) {
         return true;
       }
     }
-
     return false;
   }
+
 
   /**
    * Return true if the array contains the specified string argument.
@@ -403,10 +387,7 @@ public final class ArrayUtilities {
     }
 
     for (String arg : arr) {
-      if (arg != null
-        && !arg.isEmpty()
-        && (ignoreCase && arg.equalsIgnoreCase(argument)
-        || !ignoreCase && arg.equals(argument))) {
+      if (arg != null && (ignoreCase ? arg.equalsIgnoreCase(argument) : arg.equals(argument))) {
         return true;
       }
     }
@@ -483,19 +464,6 @@ public final class ArrayUtilities {
    */
   public static <T> T[] arrayCopy(T[] original) {
     return original.clone();
-  }
-
-  /**
-   * Converts a list of Integer objects to an array of primitive int values.
-   *
-   * @param intList the list of Integer objects to convert
-   * @return an array of primitive int values
-   */
-  public static int[] toIntegerArray(List<Integer> intList) {
-    Integer[] objArray = intList.toArray(new Integer[0]);
-    int[] intArray = new int[objArray.length];
-    System.arraycopy(objArray, 0, intArray, 0, objArray.length);
-    return intArray;
   }
 
   /**
