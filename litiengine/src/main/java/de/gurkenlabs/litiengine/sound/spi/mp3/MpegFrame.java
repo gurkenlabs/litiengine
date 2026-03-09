@@ -112,6 +112,10 @@ class MpegFrame {
     return this.sideInfo;
   }
 
+  public float[][][] getSamples() {
+    return this.mainData.getSamples();
+  }
+
   private static boolean checkCrc(ByteBuffer byteBuffer, int frameOffset) {
     // read 16 bits (short) after the header
     var crcBytes = new byte[CRC_SIZE_IN_BYTES];
@@ -383,54 +387,231 @@ class MpegFrame {
    *
    * @return The decoded samples.
    */
-  static class MainData{
-    private byte[] samples;
+  static class MainData {
+    private final float[][][] samples; // [channel][granule][576]
+    private final MpegFrame frame;
 
-   MainData(ByteBuffer byteBuffer, int frameOffset, MpegFrame frame) {
+    // Scale factor band boundaries for different block types (index 0-6 for different block types)
+    // These are for 44.1kHz - other sample rates scale differently
+    private static final int[] SCALE_FACTOR_BANDS_LONG = {0, 4, 8, 12, 16, 20, 24, 30, 36, 44, 52, 60, 70, 80, 90, 102, 116, 132, 150, 172, 198, 228, 260, 296, 338, 384, 436, 496, 566, 576};
+    private static final int[] SCALE_FACTOR_BANDS_SHORT = {0, 4, 8, 12, 16, 22, 30, 40, 52, 66, 84, 106, 136, 192, 576};
 
-      var mainDataOffset = 0;
+  MainData(ByteBuffer byteBuffer, int frameOffset, MpegFrame frame) {
+    this.frame = frame;
+    this.samples = new float[frame.getChannels()][2][576];
 
-      var headerAndSizeInfoSize = HEADER_SIZE_IN_BYTES + (frame.isProtected() ? CRC_SIZE_IN_BYTES : 0) +
-        Mpeg.getSideInfoLength(frame.getChannels());
+    // Calculate the header and side info size
+    var headerAndSideInfoSize = HEADER_SIZE_IN_BYTES + (frame.isProtected() ? CRC_SIZE_IN_BYTES : 0) +
+      Mpeg.getSideInfoLength(frame.getChannels());
 
-      // If the value is 0, then the main data follows immediately the side information
-      if (frame.getSideInfo().mainDataBegin == 0) {
-        mainDataOffset = headerAndSizeInfoSize;
-      } else {
-        mainDataOffset = -frame.getSideInfo().mainDataBegin;
+    // The mainDataBegin field specifies the offset from the start of the frame to the main data
+    // If it's 0, main data starts right after side info
+    // If it's > 0, main data may be in a previous frame (bit reservoir)
+    var mainDataBegin = frame.getSideInfo().mainDataBegin;
+    
+    // Determine the actual offset where main data starts
+    var mainDataOffset = 0;
+    if (mainDataBegin == 0) {
+      mainDataOffset = headerAndSideInfoSize;
+    } else {
+      // For bit reservoir, we need data from the previous frame
+      // This is complex to handle correctly - for now, skip main data decoding if offset would be negative
+      mainDataOffset = headerAndSideInfoSize - mainDataBegin;
+    }
+    
+    // Check if we have enough data to read main data
+    var frameLength = frame.getLengthInBytes();
+    if (mainDataOffset < 0 || mainDataOffset >= frameLength) {
+      // Cannot read main data - insufficient buffer data
+      // Initialize with zeros
+      return;
+    }
+    
+    var availableMainData = frameLength - mainDataOffset;
+    if (availableMainData <= 0) {
+      return;
+    }
+
+    // TODO: if sync header is found skip header + side info bits and then continue reading main data
+    // this is because the main data can span a bit stream area that overlaps the frame header/side info (see Appendix A.7 - Layer III bitstream organization)
+    var mainDataSize = frameLength - headerAndSideInfoSize;
+
+    var mainData = new byte[mainDataSize];
+    byteBuffer.get(frameOffset + mainDataOffset, mainData);
+
+    var bits = new BitReader(mainData);
+
+    final ScaleFactors[][] scaleFactors = {
+      {new ScaleFactors(), new ScaleFactors()},
+      {new ScaleFactors(), new ScaleFactors()}
+    };
+
+    for (var gr = 0; gr < 2; gr++) {
+      for (var ch = 0; ch < frame.getChannels(); ch++) {
+        // 1. decode scale factors
+        // From the bitstream only the scale factor indices are found but not the scale factors
+
+        decodeScaleFactors(bits, scaleFactors, gr, ch, frame.getSideInfo());
+
+        // 2. decode huffman data
+        decodeHuffmanBits(bits, gr, ch);
+
+        // 3. dequantize sample
+      }
+    }
+  }
+
+    private void decodeHuffmanBits(BitReader bits, int gr, int ch) {
+      var sideInfo = this.frame.getSideInfo();
+      var granule = sideInfo.channels[ch].granules[gr];
+
+      int[] xr = new int[576];
+
+      // Calculate region boundaries based on scale factor bands
+      int region0Start = 0;
+      int region1Start = getRegionStart(granule, 0);
+      int region2Start = getRegionStart(granule, 1);
+      int bigValuesEnd = granule.big_values * 2;
+
+      // Ensure we don't exceed array bounds
+      bigValuesEnd = Math.min(bigValuesEnd, 576);
+
+      // Decode big_values region with up to 3 different Huffman tables
+      // Region 0
+      if (granule.table_select[0] != 0 && region0Start < region1Start) {
+        decodeBigValuesRegion(bits, xr, region0Start, Math.min(region1Start, bigValuesEnd),
+            HuffmanCode.getTable(granule.table_select[0]));
       }
 
-      // TODO: if sync header is found skip header + side info bits and then continue reading main data
-      // this is because the main data can span a bit stream area that overlaps the frame header/side info (see Appendix A.7 - Layer III bitstream organization)
-      var mainDataSize = frame.getLengthInBytes() - headerAndSizeInfoSize;
+      // Region 1
+      if (granule.table_select[1] != 0 && region1Start < region2Start && region1Start < bigValuesEnd) {
+        decodeBigValuesRegion(bits, xr, region1Start, Math.min(region2Start, bigValuesEnd),
+            HuffmanCode.getTable(granule.table_select[1]));
+      }
 
-      var mainData = new byte[mainDataSize];
-      byteBuffer.get(frameOffset + mainDataOffset, mainData);
+      // Region 2
+      if (granule.table_select[2] != 0 && region2Start < bigValuesEnd) {
+        decodeBigValuesRegion(bits, xr, region2Start, bigValuesEnd,
+            HuffmanCode.getTable(granule.table_select[2]));
+      }
 
-      var bits = new BitReader(mainData);
+      // Decode count1 region (quadruples)
+      decodeCount1Region(bits, xr, bigValuesEnd);
 
-      final ScaleFactors[][] scaleFactors = {
-        {new ScaleFactors(), new ScaleFactors()},
-        {new ScaleFactors(), new ScaleFactors()}
-      };
+      // Store in samples array (will be dequantized later)
+      for (int i = 0; i < 576; i++) {
+        this.samples[ch][gr][i] = xr[i];
+      }
+    }
 
-      for (var gr = 0; gr < 2; gr++) {
-        for (var ch = 0; ch < frame.getChannels(); ch++) {
-          // 1. decode scale factors
-          // From the bitstream only the scale factor indices are found but not the scale factors
+    private int getRegionStart(SideInfo.Granule granule, int region) {
+      int bandIndex;
+      if (region == 0) {
+        bandIndex = granule.region0_count;
+      } else {
+        bandIndex = granule.region0_count + granule.region1_count + 2;
+      }
 
-          decodeScaleFactors(bits, scaleFactors, gr, ch, frame.getSideInfo());
+      // Convert scale factor band index to frequency line
+      // Using simplified lookup based on block type
+      int[] bands = getScaleFactorBands(granule.block_type);
+      if (bandIndex >= bands.length) {
+        return 576;
+      }
+      return bands[bandIndex];
+    }
 
-          // 2. decode huffman data
-          decodeHuffmanBits(bits, gr, ch);
+    private int[] getScaleFactorBands(int blockType) {
+      // Block types 0, 1, 3 use long bands; types 2 use short bands
+      // Mixed type (type 2 with mixed_block_flag) uses long for first 8 bands
+      if (blockType == 2) {
+        return SCALE_FACTOR_BANDS_SHORT;
+      }
+      return SCALE_FACTOR_BANDS_LONG;
+    }
 
-          // 3. dequantize sample
+    private void decodeBigValuesRegion(BitReader bits, int[] xr, int start, int end, HuffmanCode.CodeTable table) {
+      if (table == null || start >= end) {
+        return;
+      }
+
+      int i = start;
+      while (i < end) {
+        HuffmanCode.Node node = HuffmanCode.decode(table, bits);
+
+        if (node == null) {
+          break;
+        }
+
+        int x = node.x();
+        int y = node.y();
+
+        // Handle escape sequences: if x or y >= 16, read extra linbits
+        if (table.linbits() > 0) {
+          if (x == 15) {
+            x += bits.get(table.linbits());
+          }
+          if (y == 15) {
+            y += bits.get(table.linbits());
+          }
+        }
+
+        // Sign handling: read 1 sign bit for each non-zero value
+        if (x != 0) {
+          x = bits.getBoolean() ? -x : x;
+        }
+        if (y != 0) {
+          y = bits.getBoolean() ? -y : y;
+        }
+
+        xr[i++] = x;
+        if (i < end) {
+          xr[i++] = y;
         }
       }
     }
 
-    private void decodeHuffmanBits(BitReader bits, int gr, int ch) {
+    private void decodeCount1Region(BitReader bits, int[] xr, int start) {
+      // Count1 region: try to get table 32 (the count1 table), but it may not exist
+      // If it doesn't exist, we skip count1 decoding
+      var table = HuffmanCode.getTable(32);
+      if (table == null) {
+        // Count1 table not available - leave remaining values as 0
+        return;
+      }
 
+      int i = start;
+      while (i < 576) {
+        HuffmanCode.Node node = HuffmanCode.decode(table, bits);
+
+        if (node == null) {
+          break;
+        }
+
+        // Extract v, w, x, y from the encoded values
+        // count1 format: each is 0 or 1 (representing -1, 1 after sign handling)
+        int v = node.x() & 1;
+        int w = (node.x() >> 1) & 1;
+        int x = node.y() & 1;
+        int y = (node.y() >> 1) & 1;
+
+        // Convert to -1, 0, 1 and apply signs
+        int[] values = {
+            v == 0 ? 0 : (bits.getBoolean() ? -1 : 1),
+            w == 0 ? 0 : (bits.getBoolean() ? -1 : 1),
+            x == 0 ? 0 : (bits.getBoolean() ? -1 : 1),
+            y == 0 ? 0 : (bits.getBoolean() ? -1 : 1)
+        };
+
+        xr[i++] = values[0];
+        if (i < 576) xr[i++] = values[1];
+        if (i < 576) xr[i++] = values[2];
+        if (i < 576) xr[i++] = values[3];
+      }
+    }
+
+    public float[][][] getSamples() {
+      return this.samples;
     }
 
     private void decodeScaleFactors(BitReader bits, ScaleFactors[][] scaleFactors, int gr, int ch, SideInfo sideInfo) {

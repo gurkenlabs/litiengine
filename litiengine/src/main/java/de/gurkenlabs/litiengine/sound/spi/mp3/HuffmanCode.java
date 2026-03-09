@@ -1537,6 +1537,9 @@ class HuffmanCode {
   }
 
   static CodeTable getTable(int tableIndex) {
+    if (tableIndex < 0 || tableIndex >= tables.length) {
+      return null;
+    }
     return tables[tableIndex];
   }
 
@@ -1577,6 +1580,10 @@ class HuffmanCode {
 
     public int getLevels() {
       return this.levels;
+    }
+
+    public int linbits() {
+      return this.linbits;
     }
 
     Collection<List<Node>> getNodes(){

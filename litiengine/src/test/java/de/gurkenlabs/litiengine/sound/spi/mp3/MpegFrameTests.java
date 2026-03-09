@@ -87,12 +87,49 @@ class MpegFrameTests {
     assertFalse(frame.getSideInfo().channels[0].granules[0].count1table_select);
   }
 
+  @Test
+  void testMainDataStructureInitialization() throws UnsupportedAudioFileException {
+    var frame = new MpegFrame(exampleMpegDataWithMainData(), 0);
+    var samples = frame.getSamples();
+    
+    assertNotNull(samples);
+    assertEquals(1, samples.length); // mono
+    assertEquals(2, samples[0].length); // 2 granules
+    assertEquals(576, samples[0][0].length); // 576 frequency lines
+  }
+
+  @Test
+  void testGetSamplesNotNull() throws UnsupportedAudioFileException {
+    var frame = new MpegFrame(exampleMpegDataWithMainData(), 0);
+    
+    assertNotNull(frame.getSamples());
+    assertNotNull(frame.getSamples()[0]);
+    assertNotNull(frame.getSamples()[0][0]);
+  }
+
+  ByteBuffer exampleMpegDataWithMainData() {
+    var bytes = ByteBuffer.allocate(600);
+    bytes.put(EXAMPLE_HEADER);
+    bytes.put((byte)0); // CRC
+    bytes.put((byte)0);
+    bytes.put(EXAMPLE_SIDE_INFO);
+    
+    // Add some main data (scale factors and Huffman data placeholder)
+    for (int i = 0; i < 400; i++) {
+      bytes.put((byte)0);
+    }
+    
+    bytes.flip();
+    return bytes;
+  }
+
   ByteBuffer exampleMpegData(){
     var bytes = ByteBuffer.allocate(216);
     bytes.put(EXAMPLE_HEADER);
-    bytes.put((byte)0); // TODO: write CRC (not supported yet)
+    bytes.put((byte)0); // CRC (not supported yet)
     bytes.put((byte)0);
     bytes.put(EXAMPLE_SIDE_INFO);
+    bytes.flip();
     return bytes;
   }
 }
