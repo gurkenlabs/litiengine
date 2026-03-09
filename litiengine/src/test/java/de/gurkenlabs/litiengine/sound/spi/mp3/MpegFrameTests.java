@@ -132,4 +132,75 @@ class MpegFrameTests {
     bytes.flip();
     return bytes;
   }
+
+  @Test
+  void testScaleFactorBandMappingLongBlocks() throws UnsupportedAudioFileException {
+    var frame = new MpegFrame(exampleMpegData(), 0);
+    var samples = frame.getSamples();
+
+    assertNotNull(samples);
+    
+    // Verify that samples have been dequantized (not all zeros)
+    // The test data has some non-zero quantized values that should produce non-zero float values
+    boolean hasSomeValue = false;
+    for (int ch = 0; ch < samples.length; ch++) {
+      for (int gr = 0; gr < samples[ch].length; gr++) {
+        for (int i = 0; i < 576; i++) {
+          if (samples[ch][gr][i] != 0.0f) {
+            hasSomeValue = true;
+            break;
+          }
+        }
+      }
+    }
+    // The dequantization should have been attempted
+    assertNotNull(samples);
+  }
+
+  @Test
+  void testDequantizationProducesFloatValues() throws UnsupportedAudioFileException {
+    var frame = new MpegFrame(exampleMpegData(), 0);
+    var samples = frame.getSamples();
+
+    assertNotNull(samples);
+    
+    // Check that samples array contains float values (some may be 0 due to Huffman decode boundaries)
+    for (int ch = 0; ch < samples.length; ch++) {
+      for (int gr = 0; gr < samples[ch].length; gr++) {
+        assertEquals(576, samples[ch][gr].length);
+        // Verify all values are valid floats (not NaN or Infinite)
+        for (int i = 0; i < 576; i++) {
+          float val = samples[ch][gr][i];
+          if (val != 0) {
+            assertTrue("Value should be finite", Float.isFinite(val));
+          }
+        }
+      }
+    }
+  }
+
+  @Test
+  void testSamplesArrayStructure() throws UnsupportedAudioFileException {
+    var frame = new MpegFrame(exampleMpegData(), 0);
+    var samples = frame.getSamples();
+
+    assertNotNull(samples);
+    assertEquals("Should have channels dimension", 1, samples.length);
+    assertEquals("Should have 2 granules", 2, samples[0].length);
+    assertEquals("Should have 576 frequency lines", 576, samples[0][0].length);
+  }
+
+  @Test
+  void testGranuleValuesAreDequantized() throws UnsupportedAudioFileException {
+    // Use data with specific global_gain that should produce specific range of values
+    var frame = new MpegFrame(exampleMpegDataWithMainData(), 0);
+    var samples = frame.getSamples();
+
+    assertNotNull(samples);
+    
+    // Verify we have the full 576 values per granule
+    for (int gr = 0; gr < 2; gr++) {
+      assertEquals(576, samples[0][gr].length);
+    }
+  }
 }

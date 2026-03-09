@@ -390,15 +390,31 @@ class MpegFrame {
   static class MainData {
     private final float[][][] samples; // [channel][granule][576]
     private final MpegFrame frame;
+    private final ScaleFactors[][] scaleFactors; // [channel][granule] - needed for dequantization
 
     // Scale factor band boundaries for different block types (index 0-6 for different block types)
     // These are for 44.1kHz - other sample rates scale differently
     private static final int[] SCALE_FACTOR_BANDS_LONG = {0, 4, 8, 12, 16, 20, 24, 30, 36, 44, 52, 60, 70, 80, 90, 102, 116, 132, 150, 172, 198, 228, 260, 296, 338, 384, 436, 496, 566, 576};
     private static final int[] SCALE_FACTOR_BANDS_SHORT = {0, 4, 8, 12, 16, 22, 30, 40, 52, 66, 84, 106, 136, 192, 576};
 
+    // Preflag multipliers for high-frequency bands (index is scalefactor band)
+    // These are used when preflag is enabled to amplify high-frequency bands
+    private static final int[] PREFACTORS = {
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3,
+        4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6,
+        7, 7, 7, 7, 8, 8, 8, 8
+    };
+
+    // Number of lines per scale factor band for long blocks (44.1kHz)
+    private static final int[] SCALE_FACTOR_BAND_WIDTHS_LONG = {
+        4, 4, 4, 4, 4, 4, 6, 6, 8, 8, 10, 10, 12, 14, 16, 18, 20, 24, 26, 30, 32, 36, 38, 42, 48, 52, 60, 70, 10
+    };
+
   MainData(ByteBuffer byteBuffer, int frameOffset, MpegFrame frame) {
     this.frame = frame;
     this.samples = new float[frame.getChannels()][2][576];
+    this.scaleFactors = new ScaleFactors[frame.getChannels()][2];
 
     // Calculate the header and side info size
     var headerAndSideInfoSize = HEADER_SIZE_IN_BYTES + (frame.isProtected() ? CRC_SIZE_IN_BYTES : 0) +
@@ -441,22 +457,24 @@ class MpegFrame {
 
     var bits = new BitReader(mainData);
 
-    final ScaleFactors[][] scaleFactors = {
-      {new ScaleFactors(), new ScaleFactors()},
-      {new ScaleFactors(), new ScaleFactors()}
-    };
+    // Initialize scale factors for each channel and granule
+    for (var ch = 0; ch < frame.getChannels(); ch++) {
+      for (var gr = 0; gr < 2; gr++) {
+        this.scaleFactors[ch][gr] = new ScaleFactors();
+      }
+    }
 
     for (var gr = 0; gr < 2; gr++) {
       for (var ch = 0; ch < frame.getChannels(); ch++) {
         // 1. decode scale factors
         // From the bitstream only the scale factor indices are found but not the scale factors
-
-        decodeScaleFactors(bits, scaleFactors, gr, ch, frame.getSideInfo());
+        decodeScaleFactors(bits, this.scaleFactors, gr, ch, frame.getSideInfo());
 
         // 2. decode huffman data
         decodeHuffmanBits(bits, gr, ch);
 
         // 3. dequantize sample
+        dequantize(gr, ch);
       }
     }
   }
@@ -612,6 +630,99 @@ class MpegFrame {
 
     public float[][][] getSamples() {
       return this.samples;
+    }
+
+    /**
+     * Dequantize the Huffman-decoded samples using scale factors and global gain.
+     * This converts the quantized integer values to floating-point frequency coefficients.
+     * Formula: xr[i] = sign(is[i]) * 2^(-0.25 * (|is[i]| + 210) + global_gain - 210 - subblock_gain - 0.5 * scalefac_scale * scalefactor - preflag)
+     */
+    private void dequantize(int gr, int ch) {
+      var sideInfo = this.frame.getSideInfo();
+      var granule = sideInfo.channels[ch].granules[gr];
+      int blockType = granule.block_type;
+      boolean isShortBlock = blockType == SideInfo.Granule.BLOCK_TYPE_3_SHORT_WINDOWS;
+      boolean isMixedBlock = granule.mixed_block_flag;
+
+      for (int i = 0; i < 576; i++) {
+        float is = this.samples[ch][gr][i];
+        if (is == 0) {
+          continue;
+        }
+
+        // Determine scale factor band and window for this frequency line
+        int sfb;
+        int window = 0;
+        if (isShortBlock) {
+          // For short blocks, determine window and sfb
+          sfb = getScaleFactorBandShort(i);
+          if (isMixedBlock) {
+            // Mixed blocks: first 8 lines are long, rest are short
+            if (i < 36) {
+              sfb = getScaleFactorBandLong(i);
+            }
+          }
+          window = getWindowForShortBlock(i);
+        } else {
+          // Long blocks
+          sfb = getScaleFactorBandLong(i);
+        }
+
+        // Get the scale factor value
+        int scalefactor;
+        if (isShortBlock) {
+          scalefactor = this.scaleFactors[ch][gr].s[window][Math.min(sfb, 12)];
+        } else {
+          scalefactor = this.scaleFactors[ch][gr].l[Math.min(sfb, 22)];
+        }
+
+        // Calculate the exponent components
+        double exponent = -0.25 * (Math.abs(is) + 210);
+        exponent += granule.global_gain - 210;
+
+        // Add subblock gain for short blocks
+        if (isShortBlock) {
+          exponent -= granule.subblock_gain[window] * 8;
+        }
+
+        // Add scalefactor contribution
+        double scalefacMultiplier = granule.scalefac_scale ? 2.0 : 1.0;
+        exponent -= 0.5 * scalefacMultiplier * scalefactor;
+
+        // Add preflag for high frequencies (not used for short blocks)
+        if (granule.preflag && !isShortBlock && sfb >= 11 && sfb < PREFACTORS.length) {
+          exponent -= PREFACTORS[sfb];
+        }
+
+        // Apply sign and compute final value
+        float xr = (float) Math.pow(2, exponent);
+        this.samples[ch][gr][i] = (is < 0) ? -xr : xr;
+      }
+    }
+
+    private int getScaleFactorBandLong(int frequencyLine) {
+      for (int i = 0; i < SCALE_FACTOR_BANDS_LONG.length - 1; i++) {
+        if (frequencyLine < SCALE_FACTOR_BANDS_LONG[i + 1]) {
+          return Math.min(i, 21); // Clamp to valid range (0-21 for l[])
+        }
+      }
+      return 21;
+    }
+
+    private int getScaleFactorBandShort(int frequencyLine) {
+      for (int i = 0; i < SCALE_FACTOR_BANDS_SHORT.length - 1; i++) {
+        if (frequencyLine < SCALE_FACTOR_BANDS_SHORT[i + 1]) {
+          return Math.min(i, 12); // Clamp to valid range (0-12 for s[][])
+        }
+      }
+      return 12;
+    }
+
+    private int getWindowForShortBlock(int frequencyLine) {
+      // Short blocks have 3 windows, each with 12 scale factor bands
+      // Each window covers 1/3 of the frequency lines
+      int windowSize = 576 / 3;
+      return Math.min(frequencyLine / windowSize, 2);
     }
 
     private void decodeScaleFactors(BitReader bits, ScaleFactors[][] scaleFactors, int gr, int ch, SideInfo sideInfo) {
