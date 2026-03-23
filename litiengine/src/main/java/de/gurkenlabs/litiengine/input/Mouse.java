@@ -227,7 +227,6 @@ public final class Mouse
   @Override
   public void mouseReleased(final MouseEvent e) {
     this.updateLocation(e);
-    this.setPressed(false);
     final MouseEvent wrappedEvent = this.createEvent(e);
     this.mouseListeners.forEach(listener -> listener.mouseReleased(wrappedEvent));
 
@@ -237,6 +236,10 @@ public final class Mouse
 
     if (SwingUtilities.isRightMouseButton(e)) {
       this.isRightMouseButtonDown = false;
+    }
+
+    if (!this.isLeftMouseButtonDown && !this.isRightMouseButtonDown) {
+      this.setPressed(false);
     }
 
     for (final MouseReleasedListener listener : this.mouseReleasedListeners) {

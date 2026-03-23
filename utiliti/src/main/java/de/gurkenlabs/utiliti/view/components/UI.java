@@ -312,8 +312,15 @@ public final class UI {
     addOrphanComponent(canvasPopup);
 
     canvas.addMouseListener(new MouseAdapter() {
+      @Override public void mousePressed(MouseEvent e) {
+        if (e.isPopupTrigger()) {
+          Editor.instance().getMapComponent().setTransformMode(TransformMode.NONE);
+          canvasPopup.show(canvas, e.getX(), e.getY());
+        }
+      }
+
       @Override public void mouseReleased(MouseEvent e) {
-        if (SwingUtilities.isRightMouseButton(e)) {
+        if (e.isPopupTrigger()) {
           Editor.instance().getMapComponent().setTransformMode(TransformMode.NONE);
           canvasPopup.show(canvas, e.getX(), e.getY());
         }
