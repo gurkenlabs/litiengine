@@ -1213,11 +1213,6 @@ public class MapComponent extends GuiComponent {
 
     switch (this.transformMode) {
       case CREATE -> {
-        if (SwingUtilities.isRightMouseButton(e.getEvent())) {
-          this.setTransformMode(TransformMode.NONE);
-          break;
-        }
-
         IMapObject mo = this.createNewMapObject(UI.getInspector().getObjectType());
 
         this.setFocus(mo, !Input.keyboard().isPressed(KeyEvent.VK_SHIFT));

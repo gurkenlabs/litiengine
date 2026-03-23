@@ -17,7 +17,6 @@ import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
 
 @SuppressWarnings("serial")
 public class MapList extends JScrollPane implements MapController {
@@ -75,8 +74,16 @@ public class MapList extends JScrollPane implements MapController {
     list.addMouseListener(
         new MouseAdapter() {
           @Override
+          public void mousePressed(MouseEvent e) {
+            if (e.isPopupTrigger()) {
+              list.setSelectedIndex(list.locationToIndex(e.getPoint()));
+              mapPopupMenu.show(list, e.getX(), e.getY());
+            }
+          }
+
+          @Override
           public void mouseReleased(MouseEvent e) {
-            if (SwingUtilities.isRightMouseButton(e)) {
+            if (e.isPopupTrigger()) {
               list.setSelectedIndex(list.locationToIndex(e.getPoint()));
               mapPopupMenu.show(list, e.getX(), e.getY());
             }
