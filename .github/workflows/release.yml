@@ -62,7 +62,7 @@ jobs:
 
       - name: Commit CITATION.cff
         if: inputs.stage == 'final'
-        uses: EndBug/add-and-commit@v9
+        uses: EndBug/add-and-commit@v10
         with:
           message: 'Update CITATION.cff for release ${{ env.RELEASE_VERSION }}'
           committer_name: GitHub Actions
