@@ -6,17 +6,16 @@ import org.junit.jupiter.api.Test;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.nio.ByteBuffer;
 
-import static junit.framework.Assert.*;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 class MpegFrameTests {
 
-  private static final byte[] EXAMPLE_HEADER = new byte[]{(byte)0b11111111, (byte)0b11111011, (byte)0b00111000, (byte)0b11000100};
+  private static final byte[] EXAMPLE_HEADER = new byte[]{(byte) 0b11111111, (byte) 0b11111011, (byte) 0b00111000, (byte) 0b11000100};
 
   private static final byte[] EXAMPLE_SIDE_INFO = new byte[]{-52, -123, 71, 78, 13, 36, 81, 1, -127, 36, -87, -127, -84, 12, 112, -92, -57};
 
   @Test
-  void testBitReader(){
+  void testBitReader() {
     var reader = new BitReader(EXAMPLE_HEADER);
     var syncRoot = reader.get(11);
     var version = reader.get(2);
@@ -46,6 +45,7 @@ class MpegFrameTests {
     assertEquals(0b1, original);
     assertEquals(0b00, emphasis);
   }
+
   @Test
   void testHeaderDecoding() throws UnsupportedAudioFileException {
     var frame = new MpegFrame(exampleMpegData(), 0);
@@ -65,7 +65,7 @@ class MpegFrameTests {
   }
 
   @Test
-  void testSideInfoDecoding() throws UnsupportedAudioFileException{
+  void testSideInfoDecoding() throws UnsupportedAudioFileException {
     var frame = new MpegFrame(exampleMpegData(), 0);
 
     assertEquals(409, frame.getSideInfo().mainDataBegin);
@@ -91,7 +91,7 @@ class MpegFrameTests {
   void testMainDataStructureInitialization() throws UnsupportedAudioFileException {
     var frame = new MpegFrame(exampleMpegDataWithMainData(), 0);
     var samples = frame.getSamples();
-    
+
     assertNotNull(samples);
     assertEquals(1, samples.length); // mono
     assertEquals(2, samples[0].length); // 2 granules
@@ -101,7 +101,7 @@ class MpegFrameTests {
   @Test
   void testGetSamplesNotNull() throws UnsupportedAudioFileException {
     var frame = new MpegFrame(exampleMpegDataWithMainData(), 0);
-    
+
     assertNotNull(frame.getSamples());
     assertNotNull(frame.getSamples()[0]);
     assertNotNull(frame.getSamples()[0][0]);
@@ -110,24 +110,24 @@ class MpegFrameTests {
   ByteBuffer exampleMpegDataWithMainData() {
     var bytes = ByteBuffer.allocate(600);
     bytes.put(EXAMPLE_HEADER);
-    bytes.put((byte)0); // CRC
-    bytes.put((byte)0);
+    bytes.put((byte) 0); // CRC
+    bytes.put((byte) 0);
     bytes.put(EXAMPLE_SIDE_INFO);
-    
+
     // Add some main data (scale factors and Huffman data placeholder)
     for (int i = 0; i < 400; i++) {
-      bytes.put((byte)0);
+      bytes.put((byte) 0);
     }
-    
+
     bytes.flip();
     return bytes;
   }
 
-  ByteBuffer exampleMpegData(){
+  ByteBuffer exampleMpegData() {
     var bytes = ByteBuffer.allocate(216);
     bytes.put(EXAMPLE_HEADER);
-    bytes.put((byte)0); // CRC (not supported yet)
-    bytes.put((byte)0);
+    bytes.put((byte) 0); // CRC (not supported yet)
+    bytes.put((byte) 0);
     bytes.put(EXAMPLE_SIDE_INFO);
     bytes.flip();
     return bytes;
@@ -139,7 +139,7 @@ class MpegFrameTests {
     var samples = frame.getSamples();
 
     assertNotNull(samples);
-    
+
     // Verify that samples have been dequantized (not all zeros)
     // The test data has some non-zero quantized values that should produce non-zero float values
     boolean hasSomeValue = false;
@@ -163,7 +163,7 @@ class MpegFrameTests {
     var samples = frame.getSamples();
 
     assertNotNull(samples);
-    
+
     // Check that samples array contains float values (some may be 0 due to Huffman decode boundaries)
     for (int ch = 0; ch < samples.length; ch++) {
       for (int gr = 0; gr < samples[ch].length; gr++) {
@@ -172,7 +172,7 @@ class MpegFrameTests {
         for (int i = 0; i < 576; i++) {
           float val = samples[ch][gr][i];
           if (val != 0) {
-            assertTrue("Value should be finite", Float.isFinite(val));
+            assertTrue(Float.isFinite(val), "Value should be finite");
           }
         }
       }
@@ -185,9 +185,9 @@ class MpegFrameTests {
     var samples = frame.getSamples();
 
     assertNotNull(samples);
-    assertEquals("Should have channels dimension", 1, samples.length);
-    assertEquals("Should have 2 granules", 2, samples[0].length);
-    assertEquals("Should have 576 frequency lines", 576, samples[0][0].length);
+    assertEquals(1, samples.length, "Should have channels dimension");
+    assertEquals(2, samples[0].length, "Should have 2 granules");
+    assertEquals(576, samples[0][0].length, "Should have 576 frequency lines");
   }
 
   @Test
@@ -197,7 +197,7 @@ class MpegFrameTests {
     var samples = frame.getSamples();
 
     assertNotNull(samples);
-    
+
     // Verify we have the full 576 values per granule
     for (int gr = 0; gr < 2; gr++) {
       assertEquals(576, samples[0][gr].length);

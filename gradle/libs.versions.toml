@@ -5,6 +5,7 @@ junit = "6.1.3"
 mcp = "2.0.0"
 slf4j = "2.0.18"
 tomcat = "11.0.24"
+mp3spi = "1.9.5.4"
 
 [libraries]
 darklaf_core = { module = "com.github.weisj:darklaf-core", version.ref = "darklaf" }
@@ -23,8 +24,8 @@ mockito_core = { module = "org.mockito:mockito-core", version = "5.23.0" }
 mcp_bom = { module = "io.modelcontextprotocol.sdk:mcp-bom", version.ref = "mcp" }
 mcp_sdk = { module = "io.modelcontextprotocol.sdk:mcp" }
 slf4j_jdk14 = { module = "org.slf4j:slf4j-jdk14", version.ref = "slf4j" }
+mp3spi = { module = "com.googlecode.soundlibs:mp3spi", version.ref = "mp3spi" }
 soundlibs_jorbis = { module = "com.googlecode.soundlibs:jorbis", version = "0.0.17.4" }
-soundlibs_mp3spi = { module = "com.googlecode.soundlibs:mp3spi", version = "1.9.5.4" }
 soundlibs_tritonus = { module = "com.googlecode.soundlibs:tritonus-share", version = "0.3.7.4" }
 soundlibs_vorbisspi = { module = "com.googlecode.soundlibs:vorbisspi", version = "1.0.3.3" }
 tomcat_embed_core = { module = "org.apache.tomcat.embed:tomcat-embed-core", version.ref = "tomcat" }
@@ -35,7 +36,7 @@ xml_runtime_impl = { module = "com.sun.xml.bind:jaxb-impl", version.ref = "jaxb"
 
 [bundles]
 json_runtime = ["json-runtime-parsson", "json-runtime-yasson"]
-soundlibs = ["soundlibs-jorbis", "soundlibs-tritonus", "soundlibs-vorbisspi", "soundlibs-mp3spi"]
+soundlibs = ["soundlibs-jorbis", "soundlibs-tritonus", "soundlibs-vorbisspi"]
 xml_runtime = ["xml-runtime-core", "xml-runtime-impl"]
 
 

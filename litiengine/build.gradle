@@ -20,5 +20,6 @@ dependencies {
   runtimeOnly libs.bundles.json.runtime
   testImplementation project(":shared")
   testImplementation libs.junit.jupiter
+  testImplementation libs.mp3spi
   testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 }

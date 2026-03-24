@@ -44,6 +44,18 @@ class MpegFrame {
     this.mainData = new MainData(byteBuffer, frameOffset, this);
   }
 
+  /**
+   * Constructor that accepts header+side info and main data separately.
+   */
+  public MpegFrame(ByteBuffer headerAndSideInfo, int frameOffset, byte[] mainData) throws UnsupportedAudioFileException {
+    this.header = new Header(headerAndSideInfo, frameOffset);
+    if (this.isProtected() && !checkCrc(headerAndSideInfo, frameOffset)) {
+      throw new UnsupportedAudioFileException("CRC check failed. Inconsistent header data");
+    }
+    this.sideInfo = new SideInfo(headerAndSideInfo, frameOffset, this.isProtected(), this.getChannels());
+    this.mainData = new MainData(mainData, this);
+  }
+
   public int getBitRate() {
     return this.header.bitRate;
   }
@@ -425,21 +437,17 @@ class MpegFrame {
     // If it's > 0, main data may be in a previous frame (bit reservoir)
     var mainDataBegin = frame.getSideInfo().mainDataBegin;
     
-    // Determine the actual offset where main data starts
-    var mainDataOffset = 0;
-    if (mainDataBegin == 0) {
-      mainDataOffset = headerAndSideInfoSize;
-    } else {
-      // For bit reservoir, we need data from the previous frame
-      // This is complex to handle correctly - for now, skip main data decoding if offset would be negative
-      mainDataOffset = headerAndSideInfoSize - mainDataBegin;
+    // Skip frames where mainDataBegin > 0 (they need data from previous frames)
+    if (mainDataBegin > 0) {
+      return;
     }
+    
+    // Determine the actual offset where main data starts
+    var mainDataOffset = headerAndSideInfoSize;
     
     // Check if we have enough data to read main data
     var frameLength = frame.getLengthInBytes();
-    if (mainDataOffset < 0 || mainDataOffset >= frameLength) {
-      // Cannot read main data - insufficient buffer data
-      // Initialize with zeros
+    if (mainDataOffset >= frameLength) {
       return;
     }
     
@@ -474,6 +482,42 @@ class MpegFrame {
         decodeHuffmanBits(bits, gr, ch);
 
         // 3. dequantize sample
+        dequantize(gr, ch);
+      }
+    }
+  }
+
+  /**
+   * Constructor that accepts main data directly (for bit reservoir support).
+   */
+  MainData(byte[] mainData, MpegFrame frame) {
+    this.frame = frame;
+    this.samples = new float[frame.getChannels()][2][576];
+    this.scaleFactors = new ScaleFactors[frame.getChannels()][2];
+
+    boolean allZeros = true;
+    for (byte b : mainData) {
+      if (b != 0) {
+        allZeros = false;
+        break;
+      }
+    }
+    if (allZeros) {
+      return;
+    }
+
+    var bits = new BitReader(mainData);
+
+    for (var ch = 0; ch < frame.getChannels(); ch++) {
+      for (var gr = 0; gr < 2; gr++) {
+        this.scaleFactors[ch][gr] = new ScaleFactors();
+      }
+    }
+
+    for (var gr = 0; gr < 2; gr++) {
+      for (var ch = 0; ch < frame.getChannels(); ch++) {
+        decodeScaleFactors(bits, this.scaleFactors, gr, ch, frame.getSideInfo());
+        decodeHuffmanBits(bits, gr, ch);
         dequantize(gr, ch);
       }
     }
@@ -634,8 +678,7 @@ class MpegFrame {
 
     /**
      * Dequantize the Huffman-decoded samples using scale factors and global gain.
-     * This converts the quantized integer values to floating-point frequency coefficients.
-     * Formula: xr[i] = sign(is[i]) * 2^(-0.25 * (|is[i]| + 210) + global_gain - 210 - subblock_gain - 0.5 * scalefac_scale * scalefactor - preflag)
+     * Formula: xr[i] = sign(is[i]) * |is[i]|^(4/3) * 2^(0.25 * (global_gain - 210)) * 2^(-scalefactor/4)
      */
     private void dequantize(int gr, int ch) {
       var sideInfo = this.frame.getSideInfo();
@@ -644,59 +687,45 @@ class MpegFrame {
       boolean isShortBlock = blockType == SideInfo.Granule.BLOCK_TYPE_3_SHORT_WINDOWS;
       boolean isMixedBlock = granule.mixed_block_flag;
 
+      double globalGainFactor = Math.pow(2, 0.25 * (granule.global_gain - 210));
+
       for (int i = 0; i < 576; i++) {
         float is = this.samples[ch][gr][i];
         if (is == 0) {
           continue;
         }
 
-        // Determine scale factor band and window for this frequency line
+        double xr = Math.pow(Math.abs(is), 4.0 / 3.0) * globalGainFactor;
+
         int sfb;
         int window = 0;
         if (isShortBlock) {
-          // For short blocks, determine window and sfb
           sfb = getScaleFactorBandShort(i);
-          if (isMixedBlock) {
-            // Mixed blocks: first 8 lines are long, rest are short
-            if (i < 36) {
-              sfb = getScaleFactorBandLong(i);
-            }
+          if (isMixedBlock && i < 36) {
+            sfb = getScaleFactorBandLong(i);
           }
           window = getWindowForShortBlock(i);
         } else {
-          // Long blocks
           sfb = getScaleFactorBandLong(i);
         }
 
-        // Get the scale factor value
         int scalefactor;
         if (isShortBlock) {
           scalefactor = this.scaleFactors[ch][gr].s[window][Math.min(sfb, 12)];
+          scalefactor += granule.subblock_gain[window] * 8;
         } else {
           scalefactor = this.scaleFactors[ch][gr].l[Math.min(sfb, 22)];
+          if (granule.preflag) {
+            scalefactor += PREFACTORS[Math.min(sfb, 21)];
+          }
         }
 
-        // Calculate the exponent components
-        double exponent = -0.25 * (Math.abs(is) + 210);
-        exponent += granule.global_gain - 210;
-
-        // Add subblock gain for short blocks
-        if (isShortBlock) {
-          exponent -= granule.subblock_gain[window] * 8;
+        if (granule.scalefac_scale) {
+          scalefactor *= 2;
         }
 
-        // Add scalefactor contribution
-        double scalefacMultiplier = granule.scalefac_scale ? 2.0 : 1.0;
-        exponent -= 0.5 * scalefacMultiplier * scalefactor;
-
-        // Add preflag for high frequencies (not used for short blocks)
-        if (granule.preflag && !isShortBlock && sfb >= 11 && sfb < PREFACTORS.length) {
-          exponent -= PREFACTORS[sfb];
-        }
-
-        // Apply sign and compute final value
-        float xr = (float) Math.pow(2, exponent);
-        this.samples[ch][gr][i] = (is < 0) ? -xr : xr;
+        xr *= Math.pow(2, -0.25 * scalefactor);
+        this.samples[ch][gr][i] = (is < 0) ? (float) -xr : (float) xr;
       }
     }
 

@@ -30,12 +30,11 @@ public class BitReader {
     int result = 0;
     for (int i = this.current; i < this.current + bits; i++) {
       int byteIndex = i / BITS_PER_BYTE;
-      int bitIndex = 7 - (i % BITS_PER_BYTE); // Little-endian (LSB first)
+      int bitIndex = (BITS_PER_BYTE - 1) - (i % BITS_PER_BYTE);
 
       if(byteIndex > this.data.limit() -1){
         return END_OF_DATA;
       }
-      // Extract the bit from the byte and shift it to the correct position
       int bitValue = (this.data.get(byteIndex) >> bitIndex) & 1;
       result = (result << 1) | bitValue;
     }
