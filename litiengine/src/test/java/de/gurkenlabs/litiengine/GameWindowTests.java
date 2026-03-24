@@ -45,4 +45,40 @@ class GameWindowTests {
 
     frame.dispose();
   }
+
+  @Test
+  void switchingFromBorderlessToWindowedRestoresDecoration() {
+    JFrame frame = new JFrame();
+    GameWindow.prepareHostControl(frame, DisplayMode.BORDERLESS, new Dimension(300, 150));
+    assertTrue(frame.isUndecorated());
+    assertFalse(frame.isResizable());
+
+    // Simulate the runtime switch: BORDERLESS -> WINDOWED
+    frame.dispose();
+    frame.setUndecorated(false);
+    frame.setResizable(true);
+    GameWindow.prepareHostControl(frame, DisplayMode.WINDOWED, new Dimension(300, 150));
+
+    assertFalse(frame.isUndecorated());
+    assertTrue(frame.isResizable());
+
+    frame.dispose();
+  }
+
+  @Test
+  void switchingFromWindowedToBorderlessBecomesUndecoratedAfterDispose() {
+    JFrame frame = new JFrame();
+    GameWindow.prepareHostControl(frame, DisplayMode.WINDOWED, new Dimension(300, 150));
+    assertTrue(frame.isResizable());
+    assertFalse(frame.isUndecorated());
+
+    // Simulate the runtime switch: WINDOWED -> BORDERLESS (dispose first so setUndecorated works)
+    frame.dispose();
+    GameWindow.prepareHostControl(frame, DisplayMode.BORDERLESS, new Dimension(300, 150));
+
+    assertTrue(frame.isUndecorated());
+    assertFalse(frame.isResizable());
+
+    frame.dispose();
+  }
 }
