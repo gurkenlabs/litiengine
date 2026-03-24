@@ -120,7 +120,14 @@ final class Mpeg {
 
 
   static int getDataOffset(ByteBuffer byteBuffer) {
-    return ID3V2_TAG_HEADER_LENGTH + byteBuffer.getInt(ID3V2_TAG_DATA_OFFSET_OFFSET);
+    // ID3v2 tag size is stored as a synchsafe integer (7 bits per byte)
+    byte b6 = byteBuffer.get(ID3V2_TAG_DATA_OFFSET_OFFSET);
+    byte b7 = byteBuffer.get(ID3V2_TAG_DATA_OFFSET_OFFSET + 1);
+    byte b8 = byteBuffer.get(ID3V2_TAG_DATA_OFFSET_OFFSET + 2);
+    byte b9 = byteBuffer.get(ID3V2_TAG_DATA_OFFSET_OFFSET + 3);
+    int id3DataSize = ((b6 & 0x7f) << 21) | ((b7 & 0x7f) << 14) | ((b8 & 0x7f) << 7) | (b9 & 0x7f);
+    int offset = ID3V2_TAG_HEADER_LENGTH + id3DataSize;
+    return offset;
   }
 
   static boolean isStart(byte b1, byte b2) {

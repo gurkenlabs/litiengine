@@ -29,26 +29,42 @@ public class Mp3FormatConversionProvider extends FormatConversionProvider {
 
   @Override
   public AudioFormat.Encoding[] getTargetEncodings() {
-    return new AudioFormat.Encoding[0];
+    return new AudioFormat.Encoding[]{PCM_SIGNED};
   }
 
   @Override
   public AudioFormat.Encoding[] getTargetEncodings(AudioFormat sourceFormat) {
+    if (isMpegFormat(sourceFormat)) {
+      return new AudioFormat.Encoding[]{PCM_SIGNED};
+    }
     return new AudioFormat.Encoding[0];
   }
 
   @Override
   public AudioFormat[] getTargetFormats(AudioFormat.Encoding targetEncoding, AudioFormat sourceFormat) {
+    if (targetEncoding.equals(PCM_SIGNED) && isMpegFormat(sourceFormat)) {
+      return OUTPUT_FORMATS;
+    }
     return new AudioFormat[0];
   }
 
   @Override
   public AudioInputStream getAudioInputStream(AudioFormat.Encoding targetEncoding, AudioInputStream sourceStream) {
+    if (targetEncoding.equals(PCM_SIGNED)) {
+      return new Mp3AudioInputStream(sourceStream, OUTPUT_FORMATS[0]); // Default to first format
+    }
     return null;
   }
 
   @Override
   public AudioInputStream getAudioInputStream(AudioFormat targetFormat, AudioInputStream sourceStream) {
+    if (targetFormat.getEncoding().equals(PCM_SIGNED) && isMpegFormat(sourceStream.getFormat())) {
+      return new Mp3AudioInputStream(sourceStream, targetFormat);
+    }
     return null;
+  }
+  
+  private boolean isMpegFormat(AudioFormat format) {
+    return format.getEncoding().equals(Mpeg.getEncoding(Mpeg.VERSION_1_0, Mpeg.LAYER_3));
   }
 }

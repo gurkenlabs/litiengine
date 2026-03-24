@@ -1,2 +1,1 @@
-# de.gurkenlabs.litiengine.sound.spi.MpegFormatConversionProvider
-# de.gurkenlabs.litiengine.sound.spi.VorbisFormatConversionProvider
+de.gurkenlabs.litiengine.sound.spi.mp3.Mp3FormatConversionProvider

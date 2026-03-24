@@ -1,7 +1,7 @@
 package de.gurkenlabs.litiengine.sound;
 
 import de.gurkenlabs.litiengine.sound.spi.mp3.Mp3FileReader;
-import javazoom.spi.mpeg.sampled.convert.MpegFormatConversionProvider;
+import de.gurkenlabs.litiengine.sound.spi.mp3.Mp3FormatConversionProvider;
 import javazoom.spi.vorbis.sampled.convert.VorbisFormatConversionProvider;
 import javazoom.spi.vorbis.sampled.file.VorbisAudioFileReader;
 import org.junit.jupiter.api.Assertions;
@@ -25,7 +25,7 @@ class SoundServiceTests {
   void testAudioFormatConversionProviderServicesPresent() {
     List<FormatConversionProvider> formatConversionProviders =
         ServiceLoader.load(FormatConversionProvider.class).stream().map(ServiceLoader.Provider::get).toList();
-    Assertions.assertTrue(containsOfType(formatConversionProviders, MpegFormatConversionProvider.class));
+    Assertions.assertTrue(containsOfType(formatConversionProviders, Mp3FormatConversionProvider.class));
     Assertions.assertTrue(containsOfType(formatConversionProviders, VorbisFormatConversionProvider.class));
   }
 

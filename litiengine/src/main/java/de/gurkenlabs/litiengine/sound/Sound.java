@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.sound;
 
 import de.gurkenlabs.litiengine.util.io.StreamUtilities;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.sound.sampled.*;
@@ -41,7 +42,10 @@ public final class Sound {
 
     this.data = StreamUtilities.getBytes(is);
 
-    AudioInputStream in = AudioSystem.getAudioInputStream(is);
+    System.out.println("DEBUG Sound: loading sound from " + name + ", data length=" + this.data.length);
+    // Create AudioInputStream from the data we just read
+    ByteArrayInputStream dataStream = new ByteArrayInputStream(this.data);
+    AudioInputStream in = AudioSystem.getAudioInputStream(dataStream);
 
     if (!AudioSystem.isLineSupported(new DataLine.Info(SourceDataLine.class, in.getFormat()))) {
       // we need to convert because the default MixerProviders of Java (e.g. DirectAudioMixerProvider) don't support all formats
@@ -82,7 +86,7 @@ public final class Sound {
     return this.data;
   }
 
-  byte[] getStreamData() {
+  public byte[] getStreamData() {
     if (this.streamData == null) {
       return new byte[0];
     }

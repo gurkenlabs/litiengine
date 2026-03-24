@@ -4,6 +4,7 @@ import de.gurkenlabs.litiengine.sound.spi.AudioFileReader;
 
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -72,7 +73,8 @@ public class Mp3FileReader extends AudioFileReader {
     var bitRate = (int) frames.stream().mapToDouble(MpegFrame::getBitRate).average().orElse(0);
 
     final var frame = frames.getFirst();
-    var audioFormat = new AudioFormat(frame.getEncoding(), frame.getSampleRate(), bitRate, frame.getChannels(), frame.getLengthInBytes(), frame.getFrameRate(), true);
+    // For compressed formats, use NOT_SPECIFIED for sampleSizeInBits since it's not applicable
+    var audioFormat = new AudioFormat(frame.getEncoding(), frame.getSampleRate(), AudioSystem.NOT_SPECIFIED, frame.getChannels(), frame.getLengthInBytes(), frame.getFrameRate(), true);
 
     return new AudioFileFormat(MP3, audioFormat, frames.size());
   }

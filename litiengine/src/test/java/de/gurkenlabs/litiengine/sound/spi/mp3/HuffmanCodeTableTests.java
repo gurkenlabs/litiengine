@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 
-import static junit.framework.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class HuffmanCodeTableTests {
 
@@ -49,14 +49,14 @@ public class HuffmanCodeTableTests {
         assertNull(table);
         continue;
       } else {
-        assertNotNull("table " + i + " should not be null", table);
+        assertNotNull(table, "table " + i + " should not be null");
       }
 
       for (var nodes : table.getNodes()) {
         var uniqueValues = new ArrayList<Integer>();
         for (var node : nodes) {
           var val = node.hcod() << node.hlen();
-          assertFalse("table " + i  + "; node {" + node.x()  + ", " + node.y() + "}: value not unique in table", uniqueValues.contains(val));
+          assertFalse(uniqueValues.contains(val), "table " + i  + "; node {" + node.x()  + ", " + node.y() + "}: value not unique in table");
 
           uniqueValues.add(val);
         }
