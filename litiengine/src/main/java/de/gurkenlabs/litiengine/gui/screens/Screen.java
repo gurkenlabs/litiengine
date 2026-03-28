@@ -1,10 +1,9 @@
 package de.gurkenlabs.litiengine.gui.screens;
 
 import de.gurkenlabs.litiengine.gui.GuiComponent;
-import java.awt.Dimension;
 
 /**
- * Screens are the containers that allow you to organize the visible contents of your game. They render the game’s
+ * Screens are the containers that allow you to organize the visible contents of your game. They render the game's
  * Environment and are considered the parent of all GUI components you want to display in a particular state of your
  * game. The screen itself inherits from GuiComponent and thereby provides support to define an Appearance and listen to
  * all kinds of Input events (e.g. {@code onMouseMoved(…)}). Everything that should be visible to the player needs to be
@@ -35,24 +34,5 @@ public abstract class Screen extends GuiComponent {
   @Override
   public void setY(final double y) {
     // do nothing because screens always start at 0/0
-  }
-
-  /**
-   * Called when the game window resolution changes, e.g. after switching {@code DisplayMode} at runtime.
-   *
-   * <p>
-   * The default implementation resizes this screen to match the new window dimensions. Override
-   * this method to also re-layout or rescale child GUI components that were originally sized
-   * relative to the window.
-   * </p>
-   *
-   * @param newResolution
-   *          The new window dimensions.
-   * @see ScreenManager#add(Screen)
-   * @see de.gurkenlabs.litiengine.GameWindow#ResolutionChangedListener
-   */
-  public void onResolutionChanged(Dimension newResolution) {
-    setWidth(newResolution.getWidth());
-    setHeight(newResolution.getHeight());
   }
 }

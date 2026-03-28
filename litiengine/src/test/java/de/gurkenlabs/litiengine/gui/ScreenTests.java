@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.gui;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.gui.screens.Screen;
@@ -16,6 +17,36 @@ class ScreenTests {
   @BeforeAll
   static void initialize() {
     Game.init(Game.COMMANDLINE_ARG_NOGUI);
+  }
+
+  @Test
+  void onResolutionChangedUpdatesGuiComponentDimensions() {
+    // arrange
+    TestComponent component = new TestComponent(0, 0, 100, 50);
+    Dimension newResolution = new Dimension(1920, 1080);
+
+    // act
+    component.onResolutionChanged(newResolution);
+
+    // assert
+    assertEquals(1920, component.getWidth(), 0.001);
+    assertEquals(1080, component.getHeight(), 0.001);
+  }
+
+  @Test
+  void onResolutionChangedPropagatesRecursivelyToChildren() {
+    // arrange
+    TestComponent parent = new TestComponent(0, 0, 800, 600);
+    TrackingComponent child = new TrackingComponent(10, 10, 200, 100);
+    parent.getComponents().add(child);
+    Dimension newResolution = new Dimension(1920, 1080);
+
+    // act
+    parent.onResolutionChanged(newResolution);
+
+    // assert - child's onResolutionChanged was invoked via parent
+    assertTrue(child.resolutionChangedCalled);
+    assertEquals(newResolution, child.receivedResolution);
   }
 
   @Test
@@ -46,6 +77,28 @@ class ScreenTests {
     assertEquals(600, screen.getHeight(), 0.001);
     // and the override had a chance to react
     assertEquals(newResolution, screen.lastResolution);
+  }
+
+  private static class TestComponent extends GuiComponent {
+    protected TestComponent(double x, double y, double width, double height) {
+      super(x, y, width, height);
+    }
+  }
+
+  private static class TrackingComponent extends GuiComponent {
+    boolean resolutionChangedCalled;
+    Dimension receivedResolution;
+
+    protected TrackingComponent(double x, double y, double width, double height) {
+      super(x, y, width, height);
+    }
+
+    @Override
+    public void onResolutionChanged(Dimension resolution) {
+      super.onResolutionChanged(resolution);
+      this.resolutionChangedCalled = true;
+      this.receivedResolution = resolution;
+    }
   }
 
   private static class TestScreen extends Screen {

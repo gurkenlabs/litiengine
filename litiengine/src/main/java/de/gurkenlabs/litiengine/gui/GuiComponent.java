@@ -13,6 +13,7 @@ import de.gurkenlabs.litiengine.tweening.TweenType;
 import de.gurkenlabs.litiengine.tweening.Tweenable;
 import de.gurkenlabs.litiengine.util.ColorHelper;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
@@ -940,6 +941,27 @@ public abstract class GuiComponent
   public void setDimension(final double width, final double height) {
     setWidth(width);
     setHeight(height);
+  }
+
+  /**
+   * Called when the game window resolution changes, e.g. after switching {@code DisplayMode} at runtime.
+   *
+   * <p>
+   * The default implementation resizes this component to match the new window dimensions and
+   * recursively notifies all child components. Override this method to re-layout or rescale this
+   * component (and its children) when the window is resized.
+   * </p>
+   *
+   * @param resolution
+   *          The new window dimensions.
+   * @see de.gurkenlabs.litiengine.GameWindow.ResolutionChangedListener
+   */
+  public void onResolutionChanged(Dimension resolution) {
+    setWidth(resolution.getWidth());
+    setHeight(resolution.getHeight());
+    for (final GuiComponent child : getComponents()) {
+      child.onResolutionChanged(resolution);
+    }
   }
 
   /**
