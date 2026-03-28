@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine.gui.screens;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameWindow;
 import de.gurkenlabs.litiengine.graphics.RenderComponent;
+import java.awt.Dimension;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -35,6 +36,7 @@ public final class ScreenManager {
 
   private int changeCooldown = DEFAULT_CHANGE_COOLDOWN;
   private long lastScreenChange = 0;
+  private boolean resolutionListenerRegistered = false;
 
   /**
    * <b>You should never call this manually! Instead use the {@code Game.screens()} instance.</b>
@@ -81,6 +83,11 @@ public final class ScreenManager {
     screen.setWidth(Game.window().getWidth());
     screen.setHeight(Game.window().getHeight());
     this.screens.add(screen);
+
+    if (!this.resolutionListenerRegistered && !Game.isInNoGUIMode()) {
+      Game.window().onResolutionChanged(this::onWindowResolutionChanged);
+      this.resolutionListenerRegistered = true;
+    }
 
     if (this.current() == null) {
       this.display(screen);
@@ -229,5 +236,11 @@ public final class ScreenManager {
    */
   public void setChangeCooldown(int changeCooldown) {
     this.changeCooldown = changeCooldown;
+  }
+
+  private void onWindowResolutionChanged(Dimension newResolution) {
+    for (Screen screen : this.screens) {
+      screen.onResolutionChanged(newResolution);
+    }
   }
 }
