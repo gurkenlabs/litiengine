@@ -277,6 +277,11 @@ public final class GameWindow {
   static void prepareHostControl(JFrame host, DisplayMode displaymode, Dimension resolution) {
     switch (displaymode) {
       case BORDERLESS:
+        // setUndecorated requires the frame to be non-displayable.
+        // This covers both direct BORDERLESS transitions and fallback from unsupported FULLSCREEN.
+        if (host.isDisplayable()) {
+          host.dispose();
+        }
         host.setResizable(false);
         host.setUndecorated(true);
         host.setExtendedState(Frame.MAXIMIZED_BOTH);
@@ -356,6 +361,10 @@ public final class GameWindow {
   }
 
   private void applyDisplayMode(DisplayMode newMode, DisplayMode previousMode) {
+    if (newMode == previousMode) {
+      return;
+    }
+
     // Exit fullscreen exclusive mode before switching to another mode
     if (previousMode == DisplayMode.FULLSCREEN) {
       GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
@@ -364,15 +373,14 @@ public final class GameWindow {
       }
     }
 
-    // setUndecorated can only be called when the window is not displayable.
-    // Switching FROM borderless requires disposal to restore decoration and resizability explicitly.
-    // Switching TO borderless requires disposal so that prepareHostControl can call setUndecorated(true).
-    if (previousMode == DisplayMode.BORDERLESS && newMode != DisplayMode.BORDERLESS) {
-      this.hostControl.dispose();
+    // When leaving BORDERLESS, restore decoration and resizability.
+    // prepareHostControl's WINDOWED/FULLSCREEN paths don't reset these.
+    if (previousMode == DisplayMode.BORDERLESS) {
+      if (this.hostControl.isDisplayable()) {
+        this.hostControl.dispose();
+      }
       this.hostControl.setUndecorated(false);
       this.hostControl.setResizable(true);
-    } else if (previousMode != DisplayMode.BORDERLESS && newMode == DisplayMode.BORDERLESS) {
-      this.hostControl.dispose();
     }
 
     prepareHostControl(this.hostControl, newMode, Game.config().graphics().getResolution());
