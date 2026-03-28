@@ -102,6 +102,12 @@ public abstract class GuiComponent
   private Point2D location;
   private Rectangle2D boundingBox;
 
+  private double relativeX;
+  private double relativeY;
+  private double relativeWidth;
+  private double relativeHeight;
+  private boolean hasRelativeLayout;
+
   /**
    * Instantiates a new gui component with the dimension (0,0) at the given location.
    *
@@ -175,6 +181,7 @@ public abstract class GuiComponent
     setSelected(false);
     setEnabled(true);
     initializeComponents();
+    updateRelativeLayout();
   }
 
   /**
@@ -947,9 +954,14 @@ public abstract class GuiComponent
    * Called when the game window resolution changes, e.g. after switching {@code DisplayMode} at runtime.
    *
    * <p>
-   * The default implementation resizes this component to match the new window dimensions and
-   * recursively notifies all child components. Override this method to re-layout or rescale this
-   * component (and its children) when the window is resized.
+   * If this component was initialized with valid window dimensions, its position and size are stored
+   * as fractions of the window size at construction time. On each resolution change the absolute values
+   * are recalculated from these stored fractions, so every component scales proportionally with the
+   * window. The event is then recursively forwarded to all child components.
+   * </p>
+   *
+   * <p>
+   * Override this method to implement custom re-layout logic that goes beyond proportional scaling.
    * </p>
    *
    * @param resolution
@@ -957,10 +969,64 @@ public abstract class GuiComponent
    * @see de.gurkenlabs.litiengine.GameWindow.ResolutionChangedListener
    */
   public void onResolutionChanged(Dimension resolution) {
-    setWidth(resolution.getWidth());
-    setHeight(resolution.getHeight());
+    if (hasRelativeLayout) {
+      // Recalculate absolute position/size from stored relative values.
+      // Set fields directly to avoid triggering child movement via setLocation.
+      this.location = new Point2D.Double(
+        relativeX * resolution.getWidth(),
+        relativeY * resolution.getHeight()
+      );
+      this.width = relativeWidth * resolution.getWidth();
+      this.height = relativeHeight * resolution.getHeight();
+      this.boundingBox = null;
+    } else {
+      // Fallback for components created before window was available (e.g. in tests):
+      // just resize to the full resolution and set relative layout for future calls.
+      setWidth(resolution.getWidth());
+      setHeight(resolution.getHeight());
+    }
+
     for (final GuiComponent child : getComponents()) {
       child.onResolutionChanged(resolution);
+    }
+  }
+
+  /**
+   * Recomputes the stored relative position and size of this component as fractions of the current
+   * game window dimensions. These values are used by {@link #onResolutionChanged(Dimension)} to
+   * proportionally rescale the component when the window is resized.
+   *
+   * <p>The method is a no-op when the game runs in no-GUI mode or the window has not been
+   * initialized yet (dimensions ≤ 0), so components created before the window is ready will
+   * compute their relative layout lazily on the first setter call that occurs after the window
+   * becomes available.</p>
+   */
+  private void updateRelativeLayout() {
+    if (!Game.isInNoGUIMode() && Game.window() != null
+      && Game.window().getWidth() > 0 && Game.window().getHeight() > 0) {
+      this.relativeX = getX() / Game.window().getWidth();
+      this.relativeY = getY() / Game.window().getHeight();
+      this.relativeWidth = getWidth() / Game.window().getWidth();
+      this.relativeHeight = getHeight() / Game.window().getHeight();
+      this.hasRelativeLayout = true;
+    }
+  }
+
+  /**
+   * Computes and stores the relative position and size of this component as fractions of the given
+   * reference resolution. After this call, {@link #onResolutionChanged(Dimension)} will
+   * proportionally rescale the component based on these stored fractions.
+   *
+   * @param referenceResolution the window dimensions to treat as the 100% baseline
+   */
+  void initRelativeLayout(Dimension referenceResolution) {
+    if (referenceResolution != null
+      && referenceResolution.getWidth() > 0 && referenceResolution.getHeight() > 0) {
+      this.relativeX = getX() / referenceResolution.getWidth();
+      this.relativeY = getY() / referenceResolution.getHeight();
+      this.relativeWidth = getWidth() / referenceResolution.getWidth();
+      this.relativeHeight = getHeight() / referenceResolution.getHeight();
+      this.hasRelativeLayout = true;
     }
   }
 
@@ -1014,6 +1080,7 @@ public abstract class GuiComponent
   public void setHeight(final double height) {
     this.height = height;
     this.boundingBox = null; // trigger recreation in next boundingBox getter call
+    updateRelativeLayout();
   }
 
   /**
@@ -1059,6 +1126,7 @@ public abstract class GuiComponent
       component.setLocation(
         new Point2D.Double(component.getX() + deltaX, component.getY() + deltaY));
     }
+    updateRelativeLayout();
   }
 
   /**
@@ -1191,6 +1259,7 @@ public abstract class GuiComponent
   public void setWidth(final double width) {
     this.width = width;
     this.boundingBox = null; // trigger recreation in next boundingBox getter call
+    updateRelativeLayout();
   }
 
   /**

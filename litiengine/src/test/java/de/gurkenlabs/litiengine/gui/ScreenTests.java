@@ -20,62 +20,111 @@ class ScreenTests {
   }
 
   @Test
-  void onResolutionChangedUpdatesGuiComponentDimensions() {
-    // arrange
+  void onResolutionChangedFallbackSetsFullResolution() {
+    // Components without a reference resolution (e.g. created in no-GUI mode) fall back to
+    // setting their dimensions to the full new resolution.
     TestComponent component = new TestComponent(0, 0, 100, 50);
     Dimension newResolution = new Dimension(1920, 1080);
 
-    // act
     component.onResolutionChanged(newResolution);
 
-    // assert
     assertEquals(1920, component.getWidth(), 0.001);
     assertEquals(1080, component.getHeight(), 0.001);
   }
 
   @Test
+  void onResolutionChangedScalesProportionally() {
+    // Component at (100, 50) with size 200x100 on an 800x600 reference window.
+    TestComponent component = new TestComponent(100, 50, 200, 100);
+    component.initRelativeLayout(new Dimension(800, 600));
+
+    // Window resizes to 1600x1200 (2x).
+    component.onResolutionChanged(new Dimension(1600, 1200));
+
+    assertEquals(200, component.getX(), 0.001);
+    assertEquals(100, component.getY(), 0.001);
+    assertEquals(400, component.getWidth(), 0.001);
+    assertEquals(200, component.getHeight(), 0.001);
+  }
+
+  @Test
+  void onResolutionChangedScalesChildrenProportionally() {
+    // Parent fills an 800x600 window; child is a 200x100 button at (100, 50).
+    TestComponent parent = new TestComponent(0, 0, 800, 600);
+    TestComponent child = new TestComponent(100, 50, 200, 100);
+    parent.getComponents().add(child);
+
+    Dimension ref = new Dimension(800, 600);
+    parent.initRelativeLayout(ref);
+    child.initRelativeLayout(ref);
+
+    // Window doubles.
+    parent.onResolutionChanged(new Dimension(1600, 1200));
+
+    // Parent fills the new window.
+    assertEquals(1600, parent.getWidth(), 0.001);
+    assertEquals(1200, parent.getHeight(), 0.001);
+
+    // Child is proportionally scaled.
+    assertEquals(200, child.getX(), 0.001);
+    assertEquals(100, child.getY(), 0.001);
+    assertEquals(400, child.getWidth(), 0.001);
+    assertEquals(200, child.getHeight(), 0.001);
+  }
+
+  @Test
+  void onResolutionChangedPreservesRelativeValuesAcrossMultipleChanges() {
+    TestComponent component = new TestComponent(400, 300, 200, 100);
+    component.initRelativeLayout(new Dimension(800, 600));
+
+    // First resize to 1600x1200
+    component.onResolutionChanged(new Dimension(1600, 1200));
+    assertEquals(800, component.getX(), 0.001);
+    assertEquals(600, component.getY(), 0.001);
+    assertEquals(400, component.getWidth(), 0.001);
+    assertEquals(200, component.getHeight(), 0.001);
+
+    // Second resize back to 800x600 — should return to original values.
+    component.onResolutionChanged(new Dimension(800, 600));
+    assertEquals(400, component.getX(), 0.001);
+    assertEquals(300, component.getY(), 0.001);
+    assertEquals(200, component.getWidth(), 0.001);
+    assertEquals(100, component.getHeight(), 0.001);
+  }
+
+  @Test
   void onResolutionChangedPropagatesRecursivelyToChildren() {
-    // arrange
     TestComponent parent = new TestComponent(0, 0, 800, 600);
     TrackingComponent child = new TrackingComponent(10, 10, 200, 100);
     parent.getComponents().add(child);
     Dimension newResolution = new Dimension(1920, 1080);
 
-    // act
     parent.onResolutionChanged(newResolution);
 
-    // assert - child's onResolutionChanged was invoked via parent
     assertTrue(child.resolutionChangedCalled);
     assertEquals(newResolution, child.receivedResolution);
   }
 
   @Test
   void onResolutionChangedUpdatesScreenDimensions() {
-    // arrange
     TestScreen screen = new TestScreen("test");
     Dimension newResolution = new Dimension(1920, 1080);
 
-    // act
     screen.onResolutionChanged(newResolution);
 
-    // assert
     assertEquals(1920, screen.getWidth(), 0.001);
     assertEquals(1080, screen.getHeight(), 0.001);
   }
 
   @Test
   void onResolutionChangedCanBeOverriddenToRescaleChildren() {
-    // arrange
     TestScreenWithChild screen = new TestScreenWithChild("test");
     Dimension newResolution = new Dimension(800, 600);
 
-    // act
     screen.onResolutionChanged(newResolution);
 
-    // assert - the screen itself is resized
     assertEquals(800, screen.getWidth(), 0.001);
     assertEquals(600, screen.getHeight(), 0.001);
-    // and the override had a chance to react
     assertEquals(newResolution, screen.lastResolution);
   }
 
