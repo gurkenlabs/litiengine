@@ -277,6 +277,11 @@ public final class GameWindow {
   static void prepareHostControl(JFrame host, DisplayMode displaymode, Dimension resolution) {
     switch (displaymode) {
       case BORDERLESS:
+        // setUndecorated requires the frame to be non-displayable.
+        // This covers both direct BORDERLESS transitions and fallback from unsupported FULLSCREEN.
+        if (host.isDisplayable()) {
+          host.dispose();
+        }
         host.setResizable(false);
         host.setUndecorated(true);
         host.setExtendedState(Frame.MAXIMIZED_BOTH);
@@ -306,6 +311,22 @@ public final class GameWindow {
   }
 
   /**
+   * Sets the display mode for this game window at runtime.
+   *
+   * <p>
+   * This allows switching between windowed, borderless, and fullscreen modes while the game is running.
+   * The change is also persisted to the graphics configuration.
+   * </p>
+   *
+   * @param displayMode
+   *          The new {@code DisplayMode} to apply.
+   * @see DisplayMode
+   */
+  public void setDisplayMode(DisplayMode displayMode) {
+    Game.config().graphics().setDisplayMode(displayMode);
+  }
+
+  /**
    * Initialize the {@code GameWindow}. If the Game is in "No GUI"-mode, the window resolution is set to (0,0) and the
    * hosting JFrame is hidden. Otherwise, the {@code JFrame} is initialized with the {@code DisplayMode} and resolution
    * defined in the Graphics Configuration. After initializing the hosting {@code JFrame}, the {@code RenderComponent} is
@@ -326,6 +347,44 @@ public final class GameWindow {
     prepareHostControl(this.hostControl, Game.config().graphics().getDisplayMode(), Game.config().graphics().getResolution());
 
     this.getRenderComponent().init();
+    this.resolution = this.getRenderComponent().getSize();
+    this.hostControl.requestFocus();
+
+    Game.config().graphics().onChanged(event -> {
+      if ("displayMode".equals(event.getPropertyName())
+          && event.getNewValue() instanceof DisplayMode newMode
+          && event.getOldValue() instanceof DisplayMode oldMode
+          && this.hostControl.isShowing()) {
+        this.applyDisplayMode(newMode, oldMode);
+      }
+    });
+  }
+
+  private void applyDisplayMode(DisplayMode newMode, DisplayMode previousMode) {
+    if (newMode == previousMode) {
+      return;
+    }
+
+    // Exit fullscreen exclusive mode before switching to another mode
+    if (previousMode == DisplayMode.FULLSCREEN) {
+      GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+      if (gd.getFullScreenWindow() == this.hostControl) {
+        gd.setFullScreenWindow(null);
+      }
+    }
+
+    // When leaving BORDERLESS, restore decoration and resizability.
+    // prepareHostControl's WINDOWED/FULLSCREEN paths don't reset these.
+    if (previousMode == DisplayMode.BORDERLESS) {
+      if (this.hostControl.isDisplayable()) {
+        this.hostControl.dispose();
+      }
+      this.hostControl.setUndecorated(false);
+      this.hostControl.setResizable(true);
+    }
+
+    prepareHostControl(this.hostControl, newMode, Game.config().graphics().getResolution());
+
     this.resolution = this.getRenderComponent().getSize();
     this.hostControl.requestFocus();
   }
