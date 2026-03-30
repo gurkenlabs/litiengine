@@ -49,7 +49,7 @@ jobs:
           java-version: 25
 
       - name: Gradle Setup
-        uses: gradle/actions/setup-gradle@v5
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Update CITATION.cff
         if: inputs.stage == 'final'
@@ -128,7 +128,7 @@ jobs:
           java-version: 25
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Package
         shell: bash
