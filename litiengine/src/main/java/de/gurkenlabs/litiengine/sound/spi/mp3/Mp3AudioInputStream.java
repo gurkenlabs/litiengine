@@ -17,6 +17,8 @@ public class Mp3AudioInputStream extends AudioInputStream {
   private final OverlapAdd[][] overlapAdd;
 
   private static final int RESERVOIR_SIZE = 4096;
+  private int framesProcessed = 0;
+  private int framesSkipped = 0;
   private final byte[] reservoir;
   private int reservoirWritePos;
   private int reservoirTotalWritten;
@@ -24,6 +26,8 @@ public class Mp3AudioInputStream extends AudioInputStream {
   public Mp3AudioInputStream(AudioInputStream sourceStream, AudioFormat targetFormat) {
     super(sourceStream, targetFormat, -1);
     this.targetFormat = targetFormat;
+    framesProcessed = 0;
+    framesSkipped = 0;
 
     try {
       this.mp3Data = sourceStream.readAllBytes();
@@ -41,11 +45,12 @@ public class Mp3AudioInputStream extends AudioInputStream {
     this.pcmBuffer = ByteBuffer.allocate(bufferSize);
     this.pcmBuffer.order(targetFormat.isBigEndian() ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN);
 
-    int channels = detectMp3Channels();
+    int channels = targetFormat.getChannels();
 
     this.synthesisFilters = new SynthesisFilter[channels];
     for (int ch = 0; ch < channels; ch++) {
       this.synthesisFilters[ch] = new SynthesisFilter(ch, 32767.0f);
+      this.synthesisFilters[ch].initialize();  // Initialize with dummy pass to fill buffers
     }
 
     this.overlapAdd = new OverlapAdd[channels][32];
@@ -128,13 +133,36 @@ public class Mp3AudioInputStream extends AudioInputStream {
       int searchStart = mp3Position;
       while (searchStart < mp3Data.length - 4) {
         if ((mp3Data[searchStart] & 0xFF) == 0xFF && (mp3Data[searchStart + 1] & 0xE0) == 0xE0) {
-          int ch = detectChannels(mp3Data, searchStart);
-          int sideInfoSize = (ch == 1) ? 17 : 32;
-          int markerOffset = searchStart + 4 + sideInfoSize;
-          if (markerOffset + 4 <= mp3Data.length) {
-            String marker = new String(mp3Data, markerOffset, 4);
-            if ("Xing".equals(marker) || "Info".equals(marker)) {
-              searchStart = markerOffset + 4;
+          // Check for XING/Info header
+          int xingHeader = ((mp3Data[searchStart] & 0xFF) << 24) | ((mp3Data[searchStart + 1] & 0xFF) << 16)
+                         | ((mp3Data[searchStart + 2] & 0xFF) << 8) | (mp3Data[searchStart + 3] & 0xFF);
+          int xingBitrateIndex = (xingHeader >> 12) & 0xF;
+          int xingSampleRateIndex = (xingHeader >> 10) & 0x3;
+          int xingPadding = (xingHeader >> 9) & 0x1;
+          int xingVersion = (xingHeader >> 19) & 0x3;
+
+          int[] xingBitrates = {0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 0};
+          int xingBitrate = xingBitrates[xingBitrateIndex] * 1000;
+          int[][] xingSampleRates = {{11025, 12000, 8000, 0}, {0, 0, 0, 0}, {22050, 24000, 16000, 0}, {44100, 48000, 32000, 0}};
+          int xingSampleRate = xingSampleRates[xingVersion][xingSampleRateIndex];
+
+          if (xingSampleRate > 0 && xingBitrate > 0) {
+            int xingFrameSize = (144 * xingBitrate / xingSampleRate) + xingPadding;
+
+            // Check for XING/Info marker at various offsets
+            boolean foundXing = false;
+            int[] xingOffsets = {36, 32, 27, 23};
+            for (int offset : xingOffsets) {
+              if (searchStart + offset + 4 <= mp3Data.length) {
+                String marker = new String(mp3Data, searchStart + offset, 4);
+                if ("Xing".equals(marker) || "Info".equals(marker)) {
+                  foundXing = true;
+                  break;
+                }
+              }
+            }
+            if (foundXing) {
+              searchStart += xingFrameSize; // Skip entire XING frame
               continue;
             }
           }
@@ -162,39 +190,39 @@ public class Mp3AudioInputStream extends AudioInputStream {
       int[][] sampleRates = {{11025, 12000, 8000, 0}, {0, 0, 0, 0}, {22050, 24000, 16000, 0}, {44100, 48000, 32000, 0}};
       int sampleRate = sampleRates[version][sampleRateIndex];
 
-      int frameSize = (144 * bitrate / sampleRate) + padding;
-      int sideInfoSize = (channels == 1) ? 17 : 32;
-      int headerAndSideInfoSize = 4 + (protection == 1 ? 2 : 0) + sideInfoSize;
+    int frameSize = (144 * bitrate / sampleRate) + padding;
+    int sideInfoSize = (channels == 1) ? 17 : 32;
+    int headerAndSideInfoSize = 4 + (protection == 1 ? 2 : 0) + sideInfoSize;
 
       int sideInfoOffset = mp3Position + 4 + (protection == 1 ? 2 : 0);
       int mainDataBegin = ((mp3Data[sideInfoOffset] & 0xFF) << 1) | ((mp3Data[sideInfoOffset + 1] >> 7) & 1);
       int mainDataSize = frameSize - headerAndSideInfoSize;
 
-      // Skip frame if we don't have enough data in reservoir
-      if (mainDataBegin > reservoirTotalWritten) {
-        if (mainDataSize > 0 && mp3Position + headerAndSideInfoSize + mainDataSize <= mp3Data.length) {
-          writeReservoir(mp3Data, mp3Position + headerAndSideInfoSize, mainDataSize);
-        }
-        mp3Position += frameSize;
-        return true;
-      }
 
       byte[] frameMainData;
       if (mainDataBegin == 0) {
+        // No bit reservoir needed
         frameMainData = new byte[mainDataSize];
         if (mainDataSize > 0 && mp3Position + headerAndSideInfoSize + mainDataSize <= mp3Data.length) {
           System.arraycopy(mp3Data, mp3Position + headerAndSideInfoSize, frameMainData, 0, mainDataSize);
         }
         writeReservoir(mp3Data, mp3Position + headerAndSideInfoSize, mainDataSize);
       } else {
+        // Use bit reservoir
+        // If mainDataBegin > reservoirTotalWritten, readReservoir will pad with zeros
         byte[] fromReservoir = readReservoir(mainDataBegin);
         int bytesFromFrame = mainDataSize - mainDataBegin;
 
         if (bytesFromFrame <= 0) {
+          // All data comes from reservoir (may be padded with zeros)
           frameMainData = new byte[mainDataSize];
           int offset = mainDataBegin - mainDataSize;
-          System.arraycopy(fromReservoir, offset, frameMainData, 0, mainDataSize);
+          if (offset >= 0 && offset < fromReservoir.length) {
+            System.arraycopy(fromReservoir, offset, frameMainData, 0, Math.min(mainDataSize, fromReservoir.length - offset));
+          }
+          // If offset < 0, frameMainData remains all zeros (correct behavior)
         } else {
+          // Mix of reservoir and frame data
           byte[] fromFrame = new byte[bytesFromFrame];
           if (mp3Position + headerAndSideInfoSize + bytesFromFrame <= mp3Data.length) {
             System.arraycopy(mp3Data, mp3Position + headerAndSideInfoSize, fromFrame, 0, bytesFromFrame);
@@ -216,28 +244,35 @@ public class Mp3AudioInputStream extends AudioInputStream {
       MpegFrame frame;
       if (allZeros) {
         ByteBuffer buffer = ByteBuffer.wrap(mp3Data);
-        try { frame = new MpegFrame(buffer, mp3Position); } catch (Exception e) { mp3Position += frameSize; return true; }
+        try { frame = new MpegFrame(buffer, mp3Position); } catch (Exception e) { framesSkipped++; mp3Position += frameSize; return true; }
       } else {
         ByteBuffer headerBuffer = ByteBuffer.wrap(mp3Data);
-        try { frame = new MpegFrame(headerBuffer, mp3Position, frameMainData); } catch (Exception e) { mp3Position += frameSize; return true; }
+        try { frame = new MpegFrame(headerBuffer, mp3Position, frameMainData); } catch (Exception e) { framesSkipped++; mp3Position += frameSize; return true; }
       }
 
       float[][][] samples = frame.getSamples();
-      if (samples == null) { mp3Position += frameSize; return true; }
+      if (samples == null) { framesSkipped++; mp3Position += frameSize; return true; }
 
-      channels = frame.getChannels();
-      for (int ch = 0; ch < channels; ch++) synthesisFilters[ch].resetPcmBufferIndex();
+      framesProcessed++;
+
+      int frameChannels = frame.getChannels();
+      int outputChannels = synthesisFilters.length;
+
+      for (int ch = 0; ch < outputChannels; ch++) synthesisFilters[ch].resetPcmBufferIndex();
 
       int[] pcmTempBuffer = new int[1152 * 2];
       var sideInfo = frame.getSideInfo();
 
-      for (int gr = 0; gr < 2; gr++) {
-        for (int ch = 0; ch < channels; ch++) {
-          float[] freqData = samples[ch][gr];
+      // Process each output channel
+      for (int ch = 0; ch < outputChannels; ch++) {
+        int sourceCh = (frameChannels == 1) ? 0 : ch;
+
+        for (int gr = 0; gr < 2; gr++) {
+          float[] freqData = samples[sourceCh][gr];
           if (freqData == null) continue;
 
-          int blockType = sideInfo.channels[ch].granules[gr].block_type;
-          boolean mixedBlock = sideInfo.channels[ch].granules[gr].mixed_block_flag;
+          int blockType = sideInfo.channels[sourceCh].granules[gr].block_type;
+          boolean mixedBlock = sideInfo.channels[sourceCh].granules[gr].mixed_block_flag;
 
           float[] reordered = Reordering.reorder(freqData, blockType, mixedBlock);
           float[] aliasReduced = AliasReduction.process(reordered, blockType);
@@ -251,7 +286,7 @@ public class Mp3AudioInputStream extends AudioInputStream {
             }
             float[] imdctOut = Imdct.process(subbandFreq, blockType, mixedBlock);
             float[] windowed = Imdct.applyWindow(imdctOut, blockType);
-            float[] overlapResult = overlapAdd[ch][sb].process(windowed);
+            float[] overlapResult = overlapAdd[sourceCh][sb].process(windowed);
             System.arraycopy(overlapResult, 0, subbandTimeData[sb], 0, 18);
           }
 
@@ -265,19 +300,38 @@ public class Mp3AudioInputStream extends AudioInputStream {
       }
 
       int totalPcmSamples = 0;
-      for (int ch = 0; ch < channels; ch++) totalPcmSamples += synthesisFilters[ch].getPcmBufferIndex();
+      for (int ch = 0; ch < outputChannels; ch++) totalPcmSamples += synthesisFilters[ch].getPcmBufferIndex();
 
       int bytesNeeded = totalPcmSamples * 2;
       if (pcmBuffer.remaining() < bytesNeeded) return false;
 
-      for (int i = 0; i < totalPcmSamples; i++) {
-        short pcmSample = (short) pcmTempBuffer[i];
-        if (targetFormat.isBigEndian()) {
-          pcmBuffer.put((byte) (pcmSample >> 8));
-          pcmBuffer.put((byte) pcmSample);
-        } else {
-          pcmBuffer.put((byte) pcmSample);
-          pcmBuffer.put((byte) (pcmSample >> 8));
+      // Write samples with proper interleaving for stereo
+      if (outputChannels == 2) {
+        int samplesPerChannel = totalPcmSamples / 2;
+        for (int i = 0; i < samplesPerChannel; i++) {
+          for (int ch = 0; ch < outputChannels; ch++) {
+            int pcmIdx = ch * samplesPerChannel + i;
+            short pcmSample = (short) pcmTempBuffer[pcmIdx];
+            if (targetFormat.isBigEndian()) {
+              pcmBuffer.put((byte) (pcmSample >> 8));
+              pcmBuffer.put((byte) pcmSample);
+            } else {
+              pcmBuffer.put((byte) pcmSample);
+              pcmBuffer.put((byte) (pcmSample >> 8));
+            }
+          }
+        }
+      } else {
+        // Mono - write directly
+        for (int i = 0; i < totalPcmSamples; i++) {
+          short pcmSample = (short) pcmTempBuffer[i];
+          if (targetFormat.isBigEndian()) {
+            pcmBuffer.put((byte) (pcmSample >> 8));
+            pcmBuffer.put((byte) pcmSample);
+          } else {
+            pcmBuffer.put((byte) pcmSample);
+            pcmBuffer.put((byte) (pcmSample >> 8));
+          }
         }
       }
 

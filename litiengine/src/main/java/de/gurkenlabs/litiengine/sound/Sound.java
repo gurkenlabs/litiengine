@@ -42,8 +42,7 @@ public final class Sound {
 
     this.data = StreamUtilities.getBytes(is);
 
-    System.out.println("DEBUG Sound: loading sound from " + name + ", data length=" + this.data.length);
-    // Create AudioInputStream from the data we just read
+// Create AudioInputStream from the data we just read
     ByteArrayInputStream dataStream = new ByteArrayInputStream(this.data);
     AudioInputStream in = AudioSystem.getAudioInputStream(dataStream);
 

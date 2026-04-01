@@ -12,7 +12,7 @@ class HuffmanCode {
    * The deepest huffman code tree is 19 levels in the MP3 specification.
    */
   private static final int MAX_LEVEL = 19;
-  private static CodeTable[] tables = new CodeTable[32];
+  private static CodeTable[] tables = new CodeTable[34]; // Tables 0-33 (including count1 quad tables)
 
   static {
 
@@ -1510,6 +1510,9 @@ class HuffmanCode {
 
     // Huffman code table 31
     tables[31] = new CodeTable(13, codeTableData24_31);
+
+    // Note: Count1/Quad tables (32 and 33) are not yet implemented
+    // The count1 region will not be decoded
   }
 
   static Node decode(CodeTable table, BitReader bitReader) {
@@ -1520,7 +1523,8 @@ class HuffmanCode {
     var nextBit = bitReader.getNextBit();
     var hcod = 0;
     var level = 1;
-    while (nextBit != BitReader.END_OF_DATA && level <= MAX_LEVEL) {
+    int maxLevels = table.getLevels();
+    while (nextBit != BitReader.END_OF_DATA && level <= maxLevels) {
       hcod = hcod << 1 | nextBit;
 
       var node = table.getNode(level, hcod);

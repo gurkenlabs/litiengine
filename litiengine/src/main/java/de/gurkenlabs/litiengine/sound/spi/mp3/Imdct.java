@@ -36,16 +36,18 @@ public class Imdct {
     }
 
     // IMDCT for 18 frequency lines to 36 time-domain samples
-    // Formula: x[n] = sum_{k=0}^{17} X[k] * cos(pi/72 * (2n + 1 + 18) * (2k + 1))
-    // Simplified: x[n] = sum_{k=0}^{17} X[k] * cos(pi/36 * (n + 9.5) * (2k + 1))
+    // Formula: x[n] = (2/N) * sum_{k=0}^{N/2-1} X[k] * cos(pi/(2N) * (2n + 1 + N) * (2k + 1))
+    // For N=18: x[n] = (2/18) * sum_{k=0}^{17} X[k] * cos(pi/36 * (2n + 19) * (2k + 1))
+    // Note: The (2/N) = 1/9 scaling factor is important!
     for (int n = 0; n < LONG_BLOCK_SIZE; n++) {
       double sum = 0;
       for (int k = 0; k < FREQUENCY_LINES_LONG; k++) {
         if (k >= frequencyData.length) break;
-        double cos = Math.cos(PI / 36.0 * (n + 9.5) * (2 * k + 1));
+        // Correct formula: pi/36 * (2n + 19) * (2k + 1)
+        double cos = Math.cos(PI / 36.0 * (2.0 * n + 19.0) * (2.0 * k + 1.0));
         sum += frequencyData[k] * cos;
       }
-      output[n] = (float) sum;
+      output[n] = (float) (sum * 2.0 / 18.0);  // Apply scaling factor 2/N = 2/18 = 1/9
     }
 
     return output;
@@ -88,14 +90,16 @@ public class Imdct {
     }
 
     // IMDCT for 6 frequency lines to 12 time-domain samples
-    // Formula: x[n] = sum_{k=0}^{5} X[k] * cos(pi/12 * (n + 6.5) * (2k + 1))
+    // Formula: x[n] = (2/N) * sum_{k=0}^{N/2-1} X[k] * cos(pi/(2N) * (2n + 1 + N) * (2k + 1))
+    // For N=12: x[n] = (2/12) * sum_{k=0}^{5} X[k] * cos(pi/24 * (2n + 13) * (2k + 1))
+    // Apply scaling factor 2/N = 2/12 = 1/6
     for (int n = 0; n < SHORT_BLOCK_SIZE; n++) {
       double sum = 0;
       for (int k = 0; k < FREQUENCY_LINES_SHORT; k++) {
-        double cos = Math.cos(PI / 12.0 * (n + 6.5) * (2 * k + 1));
+        double cos = Math.cos(PI / 24.0 * (2.0 * n + 13.0) * (2.0 * k + 1.0));
         sum += frequencyData[k] * cos;
       }
-      output[n] = (float) sum;
+      output[n] = (float) (sum * 2.0 / 12.0);  // Apply scaling factor
     }
 
     return output;

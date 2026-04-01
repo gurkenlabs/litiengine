@@ -41,6 +41,13 @@ class Mp3DecoderComparisonTest {
     System.out.println("\n--- mp3spi (Reference) ---");
     System.out.println("PCM data size: " + referencePcm.length + " bytes");
     printPcmStatistics(referencePcm, "Reference");
+    
+    // Check reference format
+    ByteArrayInputStream bais2 = new ByteArrayInputStream(mp3Data);
+    AudioInputStream mp3StreamRef = AudioSystem.getAudioInputStream(bais2);
+    AudioFormat refFormat = mp3StreamRef.getFormat();
+    System.out.println("Reference format: " + refFormat);
+    mp3StreamRef.close();
 
     // Decode with our implementation
     byte[] ourPcm = decodeWithOurImplementation(mp3Data);
@@ -122,10 +129,63 @@ class Mp3DecoderComparisonTest {
     }
 
     // Save outputs to files for manual inspection
-    saveToWav(referencePcm, "reference_output.wav", 32000, 1, 16);
-    saveToWav(ourPcm, "our_output.wav", 32000, 1, 16);
-    System.out.println("\nSaved outputs to reference_output.wav and our_output.wav");
-
+    Path outputDir = Paths.get(System.getProperty("user.dir"), "build", "test-output");
+    Files.createDirectories(outputDir);
+    saveToWav(referencePcm, outputDir.resolve("reference_output.wav").toString(), 32000, 1, 16);
+    saveToWav(ourPcm, outputDir.resolve("our_output.wav").toString(), 32000, 1, 16);
+    // Print comparison to stdout
+    System.out.println("\n=== DETAILED COMPARISON ===");
+    compareOutputs(referencePcm, ourPcm);
+    
+    // Write results to a file
+    Path resultsFile = Paths.get("litiengine", "build", "mp3-comparison-results.txt");
+    Files.createDirectories(resultsFile.getParent());
+    StringBuilder sb = new StringBuilder();
+    sb.append("=== MP3 Decoder Comparison Results ===\n");
+    sb.append("Reference samples: ").append(referencePcm.length / 2).append("\n");
+    sb.append("Our samples: ").append(ourPcm.length / 2).append("\n");
+    sb.append("Sample diff: ").append((referencePcm.length / 2) - (ourPcm.length / 2)).append("\n");
+    sb.append("\nComparison:\n");
+    
+    // Quick comparison
+    int compSamples = Math.min(referencePcm.length, ourPcm.length) / 2;
+    long totalDiff = 0;
+    int matchingSamples = 0;
+    int firstMismatch = -1;
+    long maxDiff = 0;
+    ByteBuffer refBuf = ByteBuffer.wrap(referencePcm).order(ByteOrder.LITTLE_ENDIAN);
+    ByteBuffer ourBuf = ByteBuffer.wrap(ourPcm).order(ByteOrder.LITTLE_ENDIAN);
+    for (int i = 0; i < compSamples; i++) {
+      long diff = Math.abs((long) refBuf.getShort() - (long) ourBuf.getShort());
+      totalDiff += diff;
+      if (diff == 0) matchingSamples++;
+      if (diff > 0 && firstMismatch == -1) firstMismatch = i;
+      maxDiff = Math.max(maxDiff, diff);
+    }
+    double matchPct = 100.0 * matchingSamples / compSamples;
+    sb.append("Matching: ").append(matchingSamples).append("/").append(compSamples).append(" (").append(String.format("%.2f", matchPct)).append("%)\n");
+    sb.append("Average diff: ").append(String.format("%.2f", (double) totalDiff / compSamples)).append("\n");
+    sb.append("Max diff: ").append(maxDiff).append("\n");
+    sb.append("First mismatch: ").append(firstMismatch).append("\n");
+    
+    // Print to console
+    System.out.println("=== MP3 Decoder Comparison Results ===");
+    System.out.println("Reference samples: " + (referencePcm.length / 2));
+    System.out.println("Our samples: " + (ourPcm.length / 2));
+    System.out.println("Sample diff: " + ((referencePcm.length / 2) - (ourPcm.length / 2)));
+    System.out.println("Matching: " + matchingSamples + "/" + compSamples + " (" + String.format("%.2f", matchPct) + "%)");
+    System.out.println("Average diff: " + String.format("%.2f", (double) totalDiff / compSamples));
+    System.out.println("Max diff: " + maxDiff);
+    System.out.println("First mismatch: " + firstMismatch);
+    
+    Files.writeString(resultsFile, sb.toString());
+    System.out.println("Results written to " + resultsFile.toAbsolutePath());
+    System.out.flush();
+    
+    // Force output
+    System.out.flush();
+    System.err.println("TEST OUTPUT COMPLETE");
+    
     // Basic assertions
     assertTrue(referencePcm.length > 0, "Reference PCM should not be empty");
     assertTrue(ourPcm.length > 0, "Our PCM should not be empty");
@@ -301,6 +361,32 @@ class Mp3DecoderComparisonTest {
             i, refSample, ourSample, Math.abs(refSample - ourSample), marker);
       }
     }
+    
+    // Also show samples at the beginning where reference has audio
+    System.out.println("\nSamples at beginning (0-20):");
+    refBuffer.rewind();
+    ourBuffer.rewind();
+    for (int i = 0; i < 20; i++) {
+      short refSample = refBuffer.getShort();
+      short ourSample = ourBuffer.getShort();
+      if (refSample != 0 || ourSample != 0) {
+        System.out.printf("  Sample %d: ref=%6d, our=%6d%n", i, refSample, ourSample);
+      }
+    }
+    
+    // Show samples around sample 2712 (where reference has first non-zero)
+    System.out.println("\nSamples around 2712 (reference first audio):");
+    refBuffer.rewind();
+    ourBuffer.rewind();
+    for (int i = 0; i < 2712 + 10; i++) {
+      refBuffer.getShort();
+      ourBuffer.getShort();
+    }
+    for (int i = 2712; i < 2712 + 10; i++) {
+      short refSample = refBuffer.getShort();
+      short ourSample = ourBuffer.getShort();
+      System.out.printf("  Sample %d: ref=%6d, our=%6d%n", i, refSample, ourSample);
+    }
 
     // Overall assessment
     System.out.println("\n=== Assessment ===");
@@ -348,7 +434,7 @@ class Mp3DecoderComparisonTest {
     wav.putInt(dataSize);
     wav.put(pcmData);
 
-    Path outputPath = Paths.get("build", filename);
+    Path outputPath = Paths.get(filename);
     Files.createDirectories(outputPath.getParent());
     Files.write(outputPath, wav.array());
     System.out.println("Saved: " + outputPath.toAbsolutePath());

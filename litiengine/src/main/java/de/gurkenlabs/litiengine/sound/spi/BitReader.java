@@ -51,6 +51,24 @@ public class BitReader {
     return getNextBit() == 1;
   }
 
+  /**
+   * Returns the number of bits read since the start position.
+   *
+   * @return bits consumed since construction (or last reset)
+   */
+  public int getPosition() {
+    return this.current - this.startByteIndex * BITS_PER_BYTE;
+  }
+
+  /**
+   * Skips the specified number of bits without returning them.
+   *
+   * @param bits number of bits to skip
+   */
+  public void skip(int bits) {
+    this.current += bits;
+  }
+
   public void reset() {
     this.current = this.startByteIndex * BITS_PER_BYTE;
   }

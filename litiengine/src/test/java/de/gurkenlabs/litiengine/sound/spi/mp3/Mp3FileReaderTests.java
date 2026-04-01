@@ -2,12 +2,8 @@ package de.gurkenlabs.litiengine.sound.spi.mp3;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.litiengine.sound.Sound;
-import de.gurkenlabs.litiengine.sound.spi.mp3.Mp3FileReader;
 import org.junit.jupiter.api.Test;
 
-import javax.sound.sampled.AudioFileFormat;
-import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.IOException;
 
@@ -60,17 +56,17 @@ class Mp3FileReaderTests {
       }
     }
     System.out.println("Non-zero bytes: " + nonZeroCount + " / " + data.length + " (" + zeroCount + " zeros)");
-    
+
     // Print first few values to see what they are
     System.out.println("First 20 bytes: " + java.util.Arrays.toString(java.util.Arrays.copyOf(data, 20)));
-    
+
     // Check the actual sample values (16-bit little-endian)
     // Print first 20 samples
     for (int i = 0; i < Math.min(40, data.length - 1); i += 2) {
       short sample = (short) ((data[i + 1] << 8) | (data[i] & 0xFF));
       System.out.println("Sample " + (i / 2) + ": " + sample);
     }
-    
+
     // Find the first non-zero sample
     int firstNonZero = -1;
     for (int i = 0; i < data.length - 1; i += 2) {
@@ -81,7 +77,7 @@ class Mp3FileReaderTests {
       }
     }
     System.out.println("First non-zero sample at index: " + firstNonZero);
-    
+
     // Print samples around the first non-zero sample
     if (firstNonZero >= 0) {
       int start = Math.max(0, firstNonZero - 10);
@@ -93,7 +89,7 @@ class Mp3FileReaderTests {
         System.out.println("Sample " + i + ": " + sample);
       }
     }
-    
+
     // Print sample distribution (min, max, average of non-zero samples)
     short minSample = Short.MAX_VALUE;
     short maxSample = Short.MIN_VALUE;
@@ -113,7 +109,7 @@ class Mp3FileReaderTests {
       }
     }
     System.out.println("Sample stats: min=" + minSample + ", max=" + maxSample + ", avg=" + (count > 0 ? (double)sum/count : 0) + ", non-zero count=" + count);
-    
+
     // Print histogram summary
     System.out.println("Histogram summary (MSB distribution):");
     for (int i = 0; i < 256; i++) {
@@ -121,7 +117,7 @@ class Mp3FileReaderTests {
         System.out.println("  MSB 0x" + String.format("%02X", i) + ": " + histogram[i] + " samples");
       }
     }
-    
+
     assertTrue(hasNonZero, "Audio data should contain non-zero values");
 
     // just to play around

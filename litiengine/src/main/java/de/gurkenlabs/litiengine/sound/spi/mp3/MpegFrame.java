@@ -232,10 +232,9 @@ class MpegFrame {
     SideInfo(ByteBuffer byteBuffer, int frameOffset, boolean isProtected, int channels) {
       var payloadOffset = HEADER_SIZE_IN_BYTES + (isProtected ? CRC_SIZE_IN_BYTES : 0);
 
-      var payload = new byte[Mpeg.getSideInfoLength(channels)];
-      byteBuffer.get(frameOffset + payloadOffset, payload);
-
-      var bits = new BitReader(payload);
+      // Use BitReader directly with ByteBuffer to read from the correct offset
+      // This avoids copying bytes and ensures we read from the right position
+      var bits = new BitReader(byteBuffer, frameOffset + payloadOffset, 0);
 
       this.mainDataBegin = bits.get(9);
       this.privateBits = bits.get(channels == 1 ? 5 : 3);
@@ -265,6 +264,7 @@ class MpegFrame {
 
             this.channels[ch].granules[gr].table_select[0] = bits.get(5);
             this.channels[ch].granules[gr].table_select[1] = bits.get(5);
+            this.channels[ch].granules[gr].table_select[2] = 0; // Not used for short blocks
 
             this.channels[ch].granules[gr].subblock_gain[0] = bits.get(3);
             this.channels[ch].granules[gr].subblock_gain[1] = bits.get(3);
@@ -409,13 +409,11 @@ class MpegFrame {
     private static final int[] SCALE_FACTOR_BANDS_LONG = {0, 4, 8, 12, 16, 20, 24, 30, 36, 44, 52, 60, 70, 80, 90, 102, 116, 132, 150, 172, 198, 228, 260, 296, 338, 384, 436, 496, 566, 576};
     private static final int[] SCALE_FACTOR_BANDS_SHORT = {0, 4, 8, 12, 16, 22, 30, 40, 52, 66, 84, 106, 136, 192, 576};
 
-    // Preflag multipliers for high-frequency bands (index is scalefactor band)
-    // These are used when preflag is enabled to amplify high-frequency bands
+    // Pretab values per scale factor band for long blocks (ISO 11172-3 Table B.6).
+    // Used when preflag is set by the encoder to amplify high-frequency bands.
+    // Index = scale factor band (sfb), values for sfb 0-21.
     private static final int[] PREFACTORS = {
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3,
-        4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6,
-        7, 7, 7, 7, 8, 8, 8, 8
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 3, 3, 3, 2, 0
     };
 
     // Number of lines per scale factor band for long blocks (44.1kHz)
@@ -436,23 +434,23 @@ class MpegFrame {
     // If it's 0, main data starts right after side info
     // If it's > 0, main data may be in a previous frame (bit reservoir)
     var mainDataBegin = frame.getSideInfo().mainDataBegin;
-    
-    // Skip frames where mainDataBegin > 0 (they need data from previous frames)
-    if (mainDataBegin > 0) {
-      return;
-    }
-    
+
     // Determine the actual offset where main data starts
     var mainDataOffset = headerAndSideInfoSize;
-    
+
     // Check if we have enough data to read main data
     var frameLength = frame.getLengthInBytes();
     if (mainDataOffset >= frameLength) {
       return;
     }
-    
+
     var availableMainData = frameLength - mainDataOffset;
     if (availableMainData <= 0) {
+      return;
+    }
+
+    // Skip frames where mainDataBegin > 0 (they need data from previous frames)
+    if (mainDataBegin > 0) {
       return;
     }
 
@@ -474,6 +472,8 @@ class MpegFrame {
 
     for (var gr = 0; gr < 2; gr++) {
       for (var ch = 0; ch < frame.getChannels(); ch++) {
+        int granuleBitStart = bits.getPosition();
+
         // 1. decode scale factors
         // From the bitstream only the scale factor indices are found but not the scale factors
         decodeScaleFactors(bits, this.scaleFactors, gr, ch, frame.getSideInfo());
@@ -481,7 +481,17 @@ class MpegFrame {
         // 2. decode huffman data
         decodeHuffmanBits(bits, gr, ch);
 
-        // 3. dequantize sample
+        // 3. advance BitReader to the exact end of this granule's data per part2_3_length.
+        // This correctly handles the count1 region and any remaining bits, ensuring the
+        // next granule reads from the right position (bit reservoir alignment).
+        int part2_3_length = frame.getSideInfo().channels[ch].granules[gr].part2_3_length;
+        int bitsConsumed = bits.getPosition() - granuleBitStart;
+        int bitsRemaining = part2_3_length - bitsConsumed;
+        if (bitsRemaining > 0) {
+          bits.skip(bitsRemaining);
+        }
+
+        // 4. dequantize sample
         dequantize(gr, ch);
       }
     }
@@ -495,17 +505,6 @@ class MpegFrame {
     this.samples = new float[frame.getChannels()][2][576];
     this.scaleFactors = new ScaleFactors[frame.getChannels()][2];
 
-    boolean allZeros = true;
-    for (byte b : mainData) {
-      if (b != 0) {
-        allZeros = false;
-        break;
-      }
-    }
-    if (allZeros) {
-      return;
-    }
-
     var bits = new BitReader(mainData);
 
     for (var ch = 0; ch < frame.getChannels(); ch++) {
@@ -516,8 +515,18 @@ class MpegFrame {
 
     for (var gr = 0; gr < 2; gr++) {
       for (var ch = 0; ch < frame.getChannels(); ch++) {
+        int granuleBitStart = bits.getPosition();
+
         decodeScaleFactors(bits, this.scaleFactors, gr, ch, frame.getSideInfo());
         decodeHuffmanBits(bits, gr, ch);
+
+        int part2_3_length = frame.getSideInfo().channels[ch].granules[gr].part2_3_length;
+        int bitsConsumed = bits.getPosition() - granuleBitStart;
+        int bitsRemaining = part2_3_length - bitsConsumed;
+        if (bitsRemaining > 0) {
+          bits.skip(bitsRemaining);
+        }
+
         dequantize(gr, ch);
       }
     }
@@ -529,14 +538,13 @@ class MpegFrame {
 
       int[] xr = new int[576];
 
-      // Calculate region boundaries based on scale factor bands
+      // Calculate region boundaries based on scale factor bands.
+      // Region 0 ends at sfb band (region0_count + 1).
+      // Region 1 ends at sfb band (region0_count + region1_count + 2).
       int region0Start = 0;
       int region1Start = getRegionStart(granule, 0);
       int region2Start = getRegionStart(granule, 1);
-      int bigValuesEnd = granule.big_values * 2;
-
-      // Ensure we don't exceed array bounds
-      bigValuesEnd = Math.min(bigValuesEnd, 576);
+      int bigValuesEnd = Math.min(granule.big_values * 2, 576);
 
       // Decode big_values region with up to 3 different Huffman tables
       // Region 0
@@ -557,8 +565,44 @@ class MpegFrame {
             HuffmanCode.getTable(granule.table_select[2]));
       }
 
-      // Decode count1 region (quadruples)
-      decodeCount1Region(bits, xr, bigValuesEnd);
+      // Decode count1 (quadruples) region using count1table_select.
+      // Table B (select=1): each of v,w,x,y is a single binary flag; simple 4-bit decode.
+      // Table A (select=0): variable-length Huffman codes (ISO 11172-3 Table B.7); bits are
+      // advanced correctly by the granule bit-budget in the caller, so we skip here.
+      if (granule.count1table_select) {
+        int pos = bigValuesEnd;
+        while (pos < 572) {
+          // Read (v, w, x, y) each as 1 bit; a '0' bit signals no more quads
+          int v = bits.getNextBit();
+          if (v == BitReader.END_OF_DATA) {
+            break;
+          }
+          int w = bits.getNextBit();
+          int x = bits.getNextBit();
+          int y = bits.getNextBit();
+          if (w == BitReader.END_OF_DATA || x == BitReader.END_OF_DATA || y == BitReader.END_OF_DATA) {
+            break;
+          }
+          // Apply sign bits for each non-zero value
+          if (v != 0) {
+            v = bits.getBoolean() ? -1 : 1;
+          }
+          if (w != 0) {
+            w = bits.getBoolean() ? -1 : 1;
+          }
+          if (x != 0) {
+            x = bits.getBoolean() ? -1 : 1;
+          }
+          if (y != 0) {
+            y = bits.getBoolean() ? -1 : 1;
+          }
+          xr[pos] = v;
+          xr[pos + 1] = w;
+          xr[pos + 2] = x;
+          xr[pos + 3] = y;
+          pos += 4;
+        }
+      }
 
       // Store in samples array (will be dequantized later)
       for (int i = 0; i < 576; i++) {
@@ -569,13 +613,13 @@ class MpegFrame {
     private int getRegionStart(SideInfo.Granule granule, int region) {
       int bandIndex;
       if (region == 0) {
-        bandIndex = granule.region0_count;
+        // Region 0 ends at scale factor band (region0_count + 1) per ISO 11172-3
+        bandIndex = granule.region0_count + 1;
       } else {
         bandIndex = granule.region0_count + granule.region1_count + 2;
       }
 
       // Convert scale factor band index to frequency line
-      // Using simplified lookup based on block type
       int[] bands = getScaleFactorBands(granule.block_type);
       if (bandIndex >= bands.length) {
         return 576;
@@ -608,7 +652,7 @@ class MpegFrame {
         int x = node.x();
         int y = node.y();
 
-        // Handle escape sequences: if x or y >= 16, read extra linbits
+        // Handle escape sequences (ESC): if x or y == 15, read extra linbits
         if (table.linbits() > 0) {
           if (x == 15) {
             x += bits.get(table.linbits());
@@ -618,7 +662,7 @@ class MpegFrame {
           }
         }
 
-        // Sign handling: read 1 sign bit for each non-zero value
+        // Sign bits: read 1 sign bit for each non-zero value (1 = negative)
         if (x != 0) {
           x = bits.getBoolean() ? -x : x;
         }
@@ -630,45 +674,6 @@ class MpegFrame {
         if (i < end) {
           xr[i++] = y;
         }
-      }
-    }
-
-    private void decodeCount1Region(BitReader bits, int[] xr, int start) {
-      // Count1 region: try to get table 32 (the count1 table), but it may not exist
-      // If it doesn't exist, we skip count1 decoding
-      var table = HuffmanCode.getTable(32);
-      if (table == null) {
-        // Count1 table not available - leave remaining values as 0
-        return;
-      }
-
-      int i = start;
-      while (i < 576) {
-        HuffmanCode.Node node = HuffmanCode.decode(table, bits);
-
-        if (node == null) {
-          break;
-        }
-
-        // Extract v, w, x, y from the encoded values
-        // count1 format: each is 0 or 1 (representing -1, 1 after sign handling)
-        int v = node.x() & 1;
-        int w = (node.x() >> 1) & 1;
-        int x = node.y() & 1;
-        int y = (node.y() >> 1) & 1;
-
-        // Convert to -1, 0, 1 and apply signs
-        int[] values = {
-            v == 0 ? 0 : (bits.getBoolean() ? -1 : 1),
-            w == 0 ? 0 : (bits.getBoolean() ? -1 : 1),
-            x == 0 ? 0 : (bits.getBoolean() ? -1 : 1),
-            y == 0 ? 0 : (bits.getBoolean() ? -1 : 1)
-        };
-
-        xr[i++] = values[0];
-        if (i < 576) xr[i++] = values[1];
-        if (i < 576) xr[i++] = values[2];
-        if (i < 576) xr[i++] = values[3];
       }
     }
 
