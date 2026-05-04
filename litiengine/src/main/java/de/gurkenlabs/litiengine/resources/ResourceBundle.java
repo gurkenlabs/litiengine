@@ -108,16 +108,26 @@ public class ResourceBundle implements Serializable {
       URL fileUrl = filePath.toUri().toURL();
 
       for (Tileset tileset : gameFile.getTilesets()) {
-        tileset.finish(fileUrl);
+        try {
+          tileset.finish(fileUrl);
+        } catch (Exception e) {
+          log.log(Level.WARNING, "Failed to finish tileset: {0} - {1}",
+            new Object[] {tileset.getName(), e.getMessage()});
+        }
       }
 
       for (TmxMap map : gameFile.getMaps()) {
-        for (final ITileset tileset : map.getTilesets()) {
-          if (tileset instanceof Tileset ts) {
-            ts.load(gameFile.getTilesets());
+        try {
+          for (final ITileset tileset : map.getTilesets()) {
+            if (tileset instanceof Tileset ts) {
+              ts.load(gameFile.getTilesets());
+            }
           }
+          map.finish(fileUrl);
+        } catch (Exception e) {
+          log.log(Level.WARNING, "Failed to load map: {0} - {1}",
+            new Object[] {map.getName(), e.getMessage()});
         }
-        map.finish(fileUrl);
       }
 
       return gameFile;
@@ -155,16 +165,26 @@ public class ResourceBundle implements Serializable {
       }
 
       for (Tileset tileset : gameFile.getTilesets()) {
-        tileset.finish(fileUrl);
+        try {
+          tileset.finish(fileUrl);
+        } catch (Exception e) {
+          log.log(Level.WARNING, "Failed to finish tileset: {0} - {1}",
+            new Object[] {tileset.getName(), e.getMessage()});
+        }
       }
 
       for (TmxMap map : gameFile.getMaps()) {
-        for (final ITileset tileset : map.getTilesets()) {
-          if (tileset instanceof Tileset ts) {
-            ts.load(gameFile.getTilesets());
+        try {
+          for (final ITileset tileset : map.getTilesets()) {
+            if (tileset instanceof Tileset ts) {
+              ts.load(gameFile.getTilesets());
+            }
           }
+          map.finish(fileUrl);
+        } catch (Exception e) {
+          log.log(Level.WARNING, "Failed to load map: {0} - {1}",
+            new Object[] {map.getName(), e.getMessage()});
         }
-        map.finish(fileUrl);
       }
 
       return gameFile;

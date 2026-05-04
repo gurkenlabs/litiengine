@@ -163,38 +163,69 @@ public final class Resources {
       return;
     }
 
-    file.getMaps().parallelStream().forEach(m -> Resources.maps().add(m.getName(), m));
+    final List<String> failures = Collections.synchronizedList(new ArrayList<>());
+
+    file.getMaps().parallelStream().forEach(m -> {
+      try {
+        Resources.maps().add(m.getName(), m);
+      } catch (Exception e) {
+        failures.add("Map '%s': %s".formatted(m.getName(), e.getMessage()));
+        log.log(Level.WARNING, "Failed to load map: {0} - {1}", new Object[] {m.getName(), e.getMessage()});
+      }
+    });
 
     log.log(Level.INFO, "{0} maps loaded from {1}", new Object[] {file.getMaps().size(), gameResourceFile});
 
-    file.getBluePrints().parallelStream().forEach(m -> Resources.blueprints().add(m.getName(), m));
+    file.getBluePrints().parallelStream().forEach(m -> {
+      try {
+        Resources.blueprints().add(m.getName(), m);
+      } catch (Exception e) {
+        failures.add("Blueprint '%s': %s".formatted(m.getName(), e.getMessage()));
+        log.log(Level.WARNING, "Failed to load blueprint: {0} - {1}", new Object[] {m.getName(), e.getMessage()});
+      }
+    });
 
     log.log(Level.INFO, "{0} blueprints loaded from {1}", new Object[] {file.getBluePrints().size(), gameResourceFile});
 
     int tileCnt = 0;
     for (final Tileset tileset : file.getTilesets()) {
-      if (Resources.tilesets().contains(tileset.getName())) {
-        continue;
-      }
+      try {
+        if (Resources.tilesets().contains(tileset.getName())) {
+          continue;
+        }
 
-      Resources.tilesets().add(tileset.getName(), tileset);
-      tileCnt++;
+        Resources.tilesets().add(tileset.getName(), tileset);
+        tileCnt++;
+      } catch (Exception e) {
+        failures.add("Tileset '%s': %s".formatted(tileset.getName(), e.getMessage()));
+        log.log(Level.WARNING, "Failed to load tileset: {0} - {1}", new Object[] {tileset.getName(), e.getMessage()});
+      }
     }
 
     log.log(Level.INFO, "{0} tilesets loaded from {1}", new Object[] {tileCnt, gameResourceFile});
 
     final List<Spritesheet> loadedSprites = Collections.synchronizedList(new ArrayList<>());
     file.getSpriteSheets().parallelStream().forEach(spriteSheetInfo -> {
-      final Spritesheet sprite = Resources.spritesheets().load(spriteSheetInfo);
-      loadedSprites.add(sprite);
+      try {
+        final Spritesheet sprite = Resources.spritesheets().load(spriteSheetInfo);
+        loadedSprites.add(sprite);
+      } catch (Exception e) {
+        failures.add("Spritesheet '%s': %s".formatted(spriteSheetInfo.getName(), e.getMessage()));
+        log.log(Level.WARNING, "Failed to load spritesheet: {0} - {1}", new Object[] {spriteSheetInfo.getName(), e.getMessage()});
+      }
     });
 
     log.log(Level.INFO, "{0} spritesheets loaded from {1}", new Object[] {loadedSprites.size(), gameResourceFile});
 
     final List<Sound> loadedSounds = Collections.synchronizedList(new ArrayList<>());
     file.getSounds().parallelStream().forEach(soundResource -> {
-      final Sound sound = Resources.sounds().load(soundResource);
-      loadedSounds.add(sound);
+      try {
+        final Sound sound = Resources.sounds().load(soundResource);
+        loadedSounds.add(sound);
+      } catch (Exception e) {
+        failures.add("Sound '%s': %s".formatted(soundResource.getName(), e.getMessage()));
+        log.log(Level.WARNING, "Failed to load sound: {0} - {1}", new Object[] {soundResource.getName(), e.getMessage()});
+      }
     });
 
     log.log(Level.INFO, "{0} sounds loaded from {1}", new Object[] {loadedSounds.size(), gameResourceFile});
@@ -212,7 +243,17 @@ public final class Resources {
     log.log(Level.INFO, "{0} sprites loaded to memory", new Object[] {spriteload});
 
     for (final EmitterData emitter : file.getEmitters()) {
-      EmitterLoader.load(emitter);
+      try {
+        EmitterLoader.load(emitter);
+      } catch (Exception e) {
+        failures.add("Emitter: %s".formatted(e.getMessage()));
+        log.log(Level.WARNING, "Failed to load emitter: {0}", e.getMessage());
+      }
+    }
+
+    if (!failures.isEmpty()) {
+      log.log(Level.SEVERE, "{0} resource(s) failed to load from {1}:\n{2}",
+        new Object[] {failures.size(), gameResourceFile, String.join("\n", failures)});
     }
 
     final double loadTime = TimeUtilities.nanoToMs(System.nanoTime() - loadStart);
