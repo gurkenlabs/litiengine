@@ -1,6 +1,8 @@
 package de.gurkenlabs.litiengine.gui;
 
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.input.Input;
+import java.awt.event.KeyEvent;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
@@ -37,10 +39,17 @@ public class CheckBox extends ImageComponent {
     final boolean checked) {
     super(x, y, width, height, spritesheet, "", null);
     this.changeConsumer = new CopyOnWriteArrayList<>();
+    this.setFocusable(true);
     this.setFont(CHECK.getFont());
     this.setChecked(checked);
     this.refreshText();
-    this.onClicked(e -> this.toggleChecked());
+    this.onClicked(
+        e -> {
+          this.setSelected(true);
+          this.toggleChecked();
+        });
+    Input.keyboard().onKeyTyped(KeyEvent.VK_ENTER, e -> this.handleTriggerInput());
+    Input.keyboard().onKeyTyped(KeyEvent.VK_SPACE, e -> this.handleTriggerInput());
   }
 
   /**
@@ -97,5 +106,13 @@ public class CheckBox extends ImageComponent {
    */
   private void toggleChecked() {
     this.setChecked(!this.checked);
+  }
+
+  private void handleTriggerInput() {
+    if (isSuspended() || !isVisible() || !isEnabled() || !hasInputFocus()) {
+      return;
+    }
+
+    this.toggleChecked();
   }
 }

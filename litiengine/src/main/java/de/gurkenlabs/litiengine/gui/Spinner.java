@@ -1,6 +1,8 @@
 package de.gurkenlabs.litiengine.gui;
 
+import de.gurkenlabs.litiengine.input.Input;
 import java.math.BigDecimal;
+import java.awt.event.KeyEvent;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
@@ -33,6 +35,8 @@ public class Spinner extends TextFieldComponent {
     this.setCurrentValue(BigDecimal.valueOf(startValue));
     this.step = BigDecimal.valueOf(stepSize);
     this.setFormat(DOUBLE_FORMAT);
+    Input.keyboard().onKeyTyped(KeyEvent.VK_UP, e -> this.handleAdjustmentInput(true));
+    Input.keyboard().onKeyTyped(KeyEvent.VK_DOWN, e -> this.handleAdjustmentInput(false));
   }
 
   public void decrement() {
@@ -85,8 +89,16 @@ public class Spinner extends TextFieldComponent {
     this.getComponents().add(buttonUp);
     this.getComponents().add(buttonDown);
     super.prepare();
-    buttonUp.onClicked(c -> this.increment());
-    buttonDown.onClicked(c -> this.decrement());
+    buttonUp.onClicked(
+        c -> {
+          this.setSelected(true);
+          this.increment();
+        });
+    buttonDown.onClicked(
+        c -> {
+          this.setSelected(true);
+          this.decrement();
+        });
     this.onChangeConfirmed(
         e -> {
           try {
@@ -124,6 +136,18 @@ public class Spinner extends TextFieldComponent {
     this.upperBound = upperBound;
     if (this.getCurrentValue().compareTo(this.getUpperBound()) > 0) {
       this.setCurrentValue(this.getUpperBound());
+    }
+  }
+
+  private void handleAdjustmentInput(final boolean increment) {
+    if (!this.canHandleInput()) {
+      return;
+    }
+
+    if (increment) {
+      this.increment();
+    } else {
+      this.decrement();
     }
   }
 }

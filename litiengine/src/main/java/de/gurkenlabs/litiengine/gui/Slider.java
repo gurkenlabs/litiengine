@@ -1,7 +1,9 @@
 package de.gurkenlabs.litiengine.gui;
 
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.input.Input;
 import java.awt.Graphics2D;
+import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -29,6 +31,7 @@ public abstract class Slider extends GuiComponent {
   protected Slider(final double x, final double y, final double width, final double height, final float minValue, final float maxValue,
     final float stepSize) {
     super(x, y, width, height);
+    setFocusable(true);
     setMinValue(minValue);
     setCurrentValue(getMinValue());
     setMaxValue(maxValue);
@@ -40,6 +43,7 @@ public abstract class Slider extends GuiComponent {
     getSliderComponent().getAppearanceHovered().setTransparentBackground(false);
     onChange(e -> getSliderComponent().setLocation(getRelativeSliderLocation()));
     onClicked(e -> {
+      setSelected(true);
       inferValueFromMouseLocation();
       getSliderComponent().setLocation(getRelativeSliderLocation());
     });
@@ -48,6 +52,8 @@ public abstract class Slider extends GuiComponent {
       inferValueFromMouseLocation();
       getSliderComponent().setLocation(getRelativeSliderLocation());
     });
+
+    Input.keyboard().onKeyTyped(this::handleTypedKey);
 
   }
 
@@ -58,6 +64,7 @@ public abstract class Slider extends GuiComponent {
   protected void setButton1(final ImageComponent button1) {
     this.button1 = button1;
     this.button1.onClicked(e -> {
+      setSelected(true);
       this.setCurrentValue(getCurrentValue() - getStepSize());
       getChangeConsumer().forEach(consumer -> consumer.accept(getCurrentValue()));
     });
@@ -71,6 +78,7 @@ public abstract class Slider extends GuiComponent {
   protected void setButton2(final ImageComponent button2) {
     this.button2 = button2;
     this.button2.onClicked(e -> {
+      setSelected(true);
       this.setCurrentValue(getCurrentValue() + getStepSize());
       getChangeConsumer().forEach(consumer -> consumer.accept(getCurrentValue()));
     });
@@ -157,6 +165,14 @@ public abstract class Slider extends GuiComponent {
 
   protected abstract void renderTicks(Graphics2D g);
 
+  protected boolean shouldIncreaseOnKey(final int keyCode) {
+    return false;
+  }
+
+  protected boolean shouldDecreaseOnKey(final int keyCode) {
+    return false;
+  }
+
   public Spritesheet getSliderSpritesheet() {
     return sliderSprite;
   }
@@ -194,6 +210,25 @@ public abstract class Slider extends GuiComponent {
     float frac = (getMinValue() + getRelativeMouseValue() * getSteps()) / getSteps();
     int currentStep = (int) (frac * getSteps());
     setCurrentValue(currentStep * getStepSize());
+  }
+
+  private boolean canHandleKeyboardInput() {
+    return !isSuspended() && isVisible() && isEnabled() && hasInputFocus();
+  }
+
+  private void handleTypedKey(final KeyEvent event) {
+    if (!canHandleKeyboardInput()) {
+      return;
+    }
+
+    if (shouldDecreaseOnKey(event.getKeyCode())) {
+      setCurrentValue(getCurrentValue() - getStepSize());
+      return;
+    }
+
+    if (shouldIncreaseOnKey(event.getKeyCode())) {
+      setCurrentValue(getCurrentValue() + getStepSize());
+    }
   }
 
   @Override public void prepare() {

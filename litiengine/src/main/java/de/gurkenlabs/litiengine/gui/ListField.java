@@ -101,6 +101,8 @@ public class ListField extends GuiComponent {
     this.listEntries = new CopyOnWriteArrayList<>();
     this.shownRows = shownRows;
     this.shownColumns = shownColumns;
+    this.setFocusable(true);
+    this.onClicked(e -> this.setSelected(true));
     initSliders();
     initContentList();
     prepareInput();
@@ -515,7 +517,7 @@ public class ListField extends GuiComponent {
   }
 
   private boolean canHandleKeyboardEvent() {
-    return !isSuspended() && isVisible() && isArrowKeyNavigation();
+    return !isSuspended() && isVisible() && isEnabled() && hasInputFocus() && isArrowKeyNavigation();
   }
 
   private void prepareInput() {
@@ -594,6 +596,7 @@ public class ListField extends GuiComponent {
       final int col = column;
       for (final ImageComponent comp : getListEntry(col)) {
         comp.onClicked(e -> {
+          setSelected(true);
           setSelection(getHorizontalLowerBound() + col % getNumberOfShownColumns(), getVerticalLowerBound() + getListEntry(col).indexOf(comp) % getNumberOfShownRows());
           refresh();
         });

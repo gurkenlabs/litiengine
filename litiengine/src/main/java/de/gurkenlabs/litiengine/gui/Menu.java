@@ -1,6 +1,8 @@
 package de.gurkenlabs.litiengine.gui;
 
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.input.Input;
+import java.awt.event.KeyEvent;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.IntConsumer;
@@ -82,6 +84,8 @@ public class Menu extends ImageComponentList {
     this.items = items;
     this.selectionChangeConsumers = new CopyOnWriteArrayList<>();
     this.orientation = orientation;
+    this.setFocusable(true);
+    this.prepareInput();
   }
 
   /**
@@ -122,7 +126,10 @@ public class Menu extends ImageComponentList {
       final ImageComponent menuButton = getCellComponents().get(i);
       menuButton.setText(items[i]);
       menuButton.onClicked(
-        c -> setCurrentSelection(getCellComponents().indexOf(menuButton)));
+        c -> {
+          setSelected(true);
+          setCurrentSelection(getCellComponents().indexOf(menuButton));
+        });
     }
   }
 
@@ -132,12 +139,54 @@ public class Menu extends ImageComponentList {
    * @param newSelection The index of the item to be selected.
    */
   public void setCurrentSelection(final int newSelection) {
-    this.currentSelection = newSelection;
+    if (getCellComponents().isEmpty()) {
+      return;
+    }
+
+    this.currentSelection = Math.clamp(newSelection, 0, getCellComponents().size() - 1);
 
     for (int i = 0; i < getCellComponents().size(); i++) {
-      getCellComponents().get(getCurrentSelection()).setSelected(i == getCurrentSelection());
+      getCellComponents().get(i).setSelected(i == getCurrentSelection());
     }
 
     this.selectionChangeConsumers.forEach(c -> c.accept(getCurrentSelection()));
+  }
+
+  private boolean canHandleKeyboardInput() {
+    return !isSuspended() && isVisible() && isEnabled() && hasInputFocus();
+  }
+
+  private void prepareInput() {
+    Input.keyboard().onKeyTyped(KeyEvent.VK_UP, e -> {
+      if (!canHandleKeyboardInput() || getOrientation() != Orientation.VERTICAL) {
+        return;
+      }
+
+      setCurrentSelection(getCurrentSelection() - 1);
+    });
+
+    Input.keyboard().onKeyTyped(KeyEvent.VK_DOWN, e -> {
+      if (!canHandleKeyboardInput() || getOrientation() != Orientation.VERTICAL) {
+        return;
+      }
+
+      setCurrentSelection(getCurrentSelection() + 1);
+    });
+
+    Input.keyboard().onKeyTyped(KeyEvent.VK_LEFT, e -> {
+      if (!canHandleKeyboardInput() || getOrientation() != Orientation.HORIZONTAL) {
+        return;
+      }
+
+      setCurrentSelection(getCurrentSelection() - 1);
+    });
+
+    Input.keyboard().onKeyTyped(KeyEvent.VK_RIGHT, e -> {
+      if (!canHandleKeyboardInput() || getOrientation() != Orientation.HORIZONTAL) {
+        return;
+      }
+
+      setCurrentSelection(getCurrentSelection() + 1);
+    });
   }
 }

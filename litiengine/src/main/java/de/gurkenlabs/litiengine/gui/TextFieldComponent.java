@@ -30,6 +30,7 @@ public class TextFieldComponent extends ImageComponent {
   public TextFieldComponent(
       final double x, final double y, final double width, final double height, final String text) {
     super(x, y, width, height, text);
+    setFocusable(true);
     this.changeConfirmedConsumers = new CopyOnWriteArrayList<>();
     setText(text);
     Input.keyboard().onKeyTyped(this::handleTypedKey);
