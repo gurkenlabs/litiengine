@@ -44,6 +44,7 @@ public abstract class GuiComponent
 
   protected static final Font ICON_FONT;
   private static int id = 0;
+  private static GuiComponent focusedComponent;
 
   static {
     final Font icon = Resources.fonts().get("fontello.ttf");
@@ -80,6 +81,7 @@ public abstract class GuiComponent
   private Sound hoverSound;
   private boolean textAntialiasing;
   private boolean textShadow;
+  private boolean focusable;
 
   private Color textShadowColor;
   private float textShadowRadius;
@@ -233,6 +235,10 @@ public abstract class GuiComponent
    */
   public int getComponentId() {
     return componentId;
+  }
+
+  public static GuiComponent getFocusedComponent() {
+    return focusedComponent;
   }
 
   /**
@@ -493,6 +499,14 @@ public abstract class GuiComponent
    */
   public boolean isForwardMouseEvents() {
     return forwardMouseEvents;
+  }
+
+  public boolean isFocusable() {
+    return focusable;
+  }
+
+  public boolean hasInputFocus() {
+    return isFocusable() && getFocusedComponent() == this;
   }
 
   /**
@@ -1098,6 +1112,13 @@ public abstract class GuiComponent
     this.font = font;
   }
 
+  public void setFocusable(final boolean focusable) {
+    this.focusable = focusable;
+    if (!focusable && hasInputFocus()) {
+      focusedComponent = null;
+    }
+  }
+
   /**
    * Sets the font size for this GuiComponent's text.
    *
@@ -1192,6 +1213,7 @@ public abstract class GuiComponent
    */
   public void setSelected(final boolean bool) {
     this.isSelected = bool;
+    updateFocusState();
   }
 
   /**
@@ -1337,6 +1359,9 @@ public abstract class GuiComponent
     Input.mouse().removeMouseMotionListener(this);
     this.suspended = true;
     this.visible = false;
+    if (hasInputFocus()) {
+      focusedComponent = null;
+    }
     for (final GuiComponent childComp : getComponents()) {
       childComp.suspend();
     }
@@ -1454,6 +1479,27 @@ public abstract class GuiComponent
    */
   protected void initializeComponents() {
     // nothing to do in the base class
+  }
+
+  private void updateFocusState() {
+    if (!isFocusable()) {
+      return;
+    }
+
+    synchronized (GuiComponent.class) {
+      if (!isSelected()) {
+        if (focusedComponent == this) {
+          focusedComponent = null;
+        }
+        return;
+      }
+
+      if (focusedComponent != null && focusedComponent != this) {
+        focusedComponent.isSelected = false;
+      }
+
+      focusedComponent = this;
+    }
   }
 
   /**

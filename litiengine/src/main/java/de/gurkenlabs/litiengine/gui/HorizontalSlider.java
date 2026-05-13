@@ -8,6 +8,7 @@ package de.gurkenlabs.litiengine.gui;
 import de.gurkenlabs.litiengine.graphics.ShapeRenderer;
 import de.gurkenlabs.litiengine.input.Input;
 import java.awt.Graphics2D;
+import java.awt.event.KeyEvent;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 
@@ -109,5 +110,15 @@ public class HorizontalSlider extends Slider {
           getX() + i * getWidth() / getSteps(), getY() + getHeight() / 2d + getTickSize() * getHeight() / 2d),
         (float) (getWidth() / 200f * getTickSize()));
     }
+  }
+
+  @Override
+  protected boolean shouldIncreaseOnKey(final int keyCode) {
+    return keyCode == KeyEvent.VK_RIGHT;
+  }
+
+  @Override
+  protected boolean shouldDecreaseOnKey(final int keyCode) {
+    return keyCode == KeyEvent.VK_LEFT;
   }
 }

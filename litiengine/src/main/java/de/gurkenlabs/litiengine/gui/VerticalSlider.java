@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine.gui;
 import de.gurkenlabs.litiengine.graphics.ShapeRenderer;
 import de.gurkenlabs.litiengine.input.Input;
 import java.awt.Graphics2D;
+import java.awt.event.KeyEvent;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 
@@ -58,5 +59,15 @@ public class VerticalSlider extends Slider {
     setSliderComponent(
       new ImageComponent(getRelativeSliderLocation().getX(), getRelativeSliderLocation().getY(), getWidth(), getWidth() * 2, getSliderSpritesheet(),
         "", null));
+  }
+
+  @Override
+  protected boolean shouldIncreaseOnKey(final int keyCode) {
+    return keyCode == KeyEvent.VK_DOWN;
+  }
+
+  @Override
+  protected boolean shouldDecreaseOnKey(final int keyCode) {
+    return keyCode == KeyEvent.VK_UP;
   }
 }
