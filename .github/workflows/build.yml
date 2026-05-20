@@ -21,21 +21,21 @@ jobs:
     name: Build and Verify
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
 
       - name: JDK Setup
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
         with:
           distribution: temurin
           java-version: 25
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v6
+        uses: gradle/actions/setup-gradle@50e97c2cd7a37755bbfafc9c5b7cafaece252f6e # v6.1.0
 
       - name: Gradle Wrapper Validation
-        uses: gradle/actions/wrapper-validation@v6
+        uses: gradle/actions/wrapper-validation@50e97c2cd7a37755bbfafc9c5b7cafaece252f6e # v6.1.0
 
       - name: D-BUS AT-SPI Installation
         run: sudo apt-get -y install at-spi2-core
@@ -44,12 +44,12 @@ jobs:
         run: ./gradlew build -x test -PskipSpotless
 
       - name: Test
-        uses: coactions/setup-xvfb@v1.0.1
+        uses: coactions/setup-xvfb@b6b4fcfb9f5a895edadc3bc76318fae0ac17c8b3 # v1.0.1
         with:
           run: ./gradlew jacocoTestReport -PskipSpotless
 
       - name: Publish Test Results
-        uses: dorny/test-reporter@v3
+        uses: dorny/test-reporter@a43b3a5f7366b97d083190328d2c652e1a8b6aa2 # v3.0.0
         with:
           name: JUnit test results
           reporter: java-junit
