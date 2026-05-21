@@ -358,7 +358,11 @@ public class AssetPanelItem extends JPanel {
     return details;
   }
 
-  private void deleteAsset() {
+  public Object getOrigin() {
+    return origin;
+  }
+
+  public void deleteAsset() {
     if (origin == null) {
       return;
     }
@@ -413,7 +417,7 @@ public class AssetPanelItem extends JPanel {
     return JOptionPane.OK_OPTION == getDeleteDialog(assetType, assetName);
   }
 
-  private void addEntity() {
+  public void addEntity() {
     if (Game.world().environment() == null || Game.world().camera() == null) {
       return;
     }
@@ -474,7 +478,7 @@ public class AssetPanelItem extends JPanel {
     }
   }
 
-  private void editAsset() {
+  public void editAsset() {
     if (!(origin instanceof SpritesheetResource)) {
       return;
     }
@@ -495,7 +499,7 @@ public class AssetPanelItem extends JPanel {
     Editor.instance().loadSpriteSheets(Editor.instance().getGameFile().getSpriteSheets(), true);
   }
 
-  private void exportAsset() {
+  public void exportAsset() {
     if (origin instanceof Tileset tileset) {
       exportTileset(tileset);
     } else if (origin instanceof SpritesheetResource spritesheetResource) {
@@ -589,7 +593,7 @@ public class AssetPanelItem extends JPanel {
     return chooser;
   }
 
-  private boolean canAdd() {
+  public boolean canAdd() {
     if (origin instanceof SpritesheetResource spritesheetResource) {
       return PropPanel.getIdentifierBySpriteName(spritesheetResource.getName()) != null
         || CreaturePanel.getCreatureSpriteName(spritesheetResource.getName()) != null;
