@@ -21,6 +21,7 @@ import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.UndoManager;
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.view.dialogs.XmlExportDialog;
+import de.gurkenlabs.utiliti.view.menus.AssetPanelItemPopupMenu;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -30,10 +31,12 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -229,6 +232,29 @@ public class AssetPanelItem extends JPanel {
         deleteAsset();
       }
     });
+
+    getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "addAsset");
+    getActionMap().put("addAsset", new AbstractAction() {
+      @Override public void actionPerformed(ActionEvent ae) {
+        if (canAdd()) {
+          addEntity();
+        }
+      }
+    });
+
+    getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0), "editAsset");
+    getActionMap().put("editAsset", new AbstractAction() {
+      @Override public void actionPerformed(ActionEvent ae) {
+        editAsset();
+      }
+    });
+
+    getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK), "exportAsset");
+    getActionMap().put("exportAsset", new AbstractAction() {
+      @Override public void actionPerformed(ActionEvent ae) {
+        exportAsset();
+      }
+    });
   }
 
   private void setupFocusHandling() {
@@ -260,6 +286,15 @@ public class AssetPanelItem extends JPanel {
         repaint();
       }
 
+      @Override public void mousePressed(MouseEvent e) {
+        requestFocus();
+        maybeShowPopup(e);
+      }
+
+      @Override public void mouseReleased(MouseEvent e) {
+        maybeShowPopup(e);
+      }
+
       @Override public void mouseClicked(MouseEvent e) {
         requestFocus();
         if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) {
@@ -271,6 +306,15 @@ public class AssetPanelItem extends JPanel {
     addMouseListener(mouseHandler);
     iconLabel.addMouseListener(mouseHandler);
     nameLabel.addMouseListener(mouseHandler);
+  }
+
+  private void maybeShowPopup(MouseEvent e) {
+    if (!e.isPopupTrigger()) {
+      return;
+    }
+    AssetPanelItemPopupMenu menu = new AssetPanelItemPopupMenu(this);
+    Point p = SwingUtilities.convertPoint(e.getComponent(), e.getPoint(), this);
+    menu.show(this, p.x, p.y);
   }
 
   private void setupButtonActions() {
