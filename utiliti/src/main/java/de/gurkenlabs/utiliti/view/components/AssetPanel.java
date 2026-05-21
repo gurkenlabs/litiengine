@@ -12,6 +12,9 @@ import de.gurkenlabs.litiengine.resources.SoundResource;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.utiliti.controller.WrapLayout;
 import de.gurkenlabs.utiliti.model.Icons;
+import de.gurkenlabs.utiliti.view.menus.AssetPanelPopupMenu;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Collections;
 import java.util.List;
 import javax.swing.Icon;
@@ -21,6 +24,12 @@ import javax.swing.border.EmptyBorder;
 
 public class AssetPanel extends JPanel {
 
+  public enum AssetType {
+    SPRITESHEET, TILESET, EMITTER, BLUEPRINT, SOUND
+  }
+
+  private AssetType currentType;
+
   public AssetPanel() {
     WrapLayout layout = new WrapLayout();
     layout.setVgap(5);
@@ -29,9 +38,32 @@ public class AssetPanel extends JPanel {
     this.setLayout(layout);
 
     this.setBorder(new EmptyBorder(5, 5, 5, 5));
+
+    MouseAdapter popupHandler = new MouseAdapter() {
+      @Override public void mousePressed(MouseEvent e) {
+        maybeShowPopup(e);
+      }
+
+      @Override public void mouseReleased(MouseEvent e) {
+        maybeShowPopup(e);
+      }
+    };
+    this.addMouseListener(popupHandler);
+  }
+
+  public AssetType getCurrentType() {
+    return currentType;
+  }
+
+  private void maybeShowPopup(MouseEvent e) {
+    if (!e.isPopupTrigger()) {
+      return;
+    }
+    new AssetPanelPopupMenu(currentType).show(this, e.getX(), e.getY());
   }
 
   public void loadSprites(List<SpritesheetResource> infos) {
+    this.currentType = AssetType.SPRITESHEET;
     this.load(
       () -> {
         for (SpritesheetResource info : infos.stream().sorted().toList()) {
@@ -52,6 +84,7 @@ public class AssetPanel extends JPanel {
   }
 
   public void loadTilesets(List<Tileset> tilesets) {
+    this.currentType = AssetType.TILESET;
     this.load(
       () -> {
         Collections.sort(tilesets);
@@ -65,6 +98,7 @@ public class AssetPanel extends JPanel {
   }
 
   public void loadEmitters(List<EmitterData> emitters) {
+    this.currentType = AssetType.EMITTER;
     this.load(
       () -> {
         Collections.sort(emitters);
@@ -78,6 +112,7 @@ public class AssetPanel extends JPanel {
   }
 
   public void loadBlueprints(List<Blueprint> blueprints) {
+    this.currentType = AssetType.BLUEPRINT;
     this.load(
       () -> {
         Collections.sort(blueprints);
@@ -91,6 +126,7 @@ public class AssetPanel extends JPanel {
   }
 
   public void loadSounds(List<SoundResource> sounds) {
+    this.currentType = AssetType.SOUND;
     this.load(
       () -> {
         Collections.sort(sounds);
