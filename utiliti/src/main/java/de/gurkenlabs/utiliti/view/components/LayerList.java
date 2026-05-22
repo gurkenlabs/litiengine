@@ -14,6 +14,7 @@ import de.gurkenlabs.utiliti.model.Icons;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Insets;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -33,6 +34,7 @@ import javax.swing.JScrollPane;
 public final class LayerList extends JPanel implements LayerController {
 
   private static final Dimension ICON_SIZE = new Dimension(16, 16);
+  private static final Dimension BUTTON_SIZE = new Dimension(28, 28);
 
   private final Map<String, Integer> selectedLayers;
   private final transient List<Consumer<IMap>> layerChangedListeners;
@@ -44,9 +46,7 @@ public final class LayerList extends JPanel implements LayerController {
   public LayerList() {
     super(new BorderLayout());
     this.setName(Resources.strings().get("panel_mapObjectLayers"));
-    this.setMinimumSize(new Dimension(150, 0));
-    this.setMaximumSize(new Dimension(0, 250));
-    this.setMaximumSize(new Dimension(0, 250));
+    this.setMinimumSize(new Dimension(260, 0));
 
     this.selectedLayers = new ConcurrentHashMap<>();
     this.layerChangedListeners = new CopyOnWriteArrayList<>();
@@ -315,6 +315,11 @@ public final class LayerList extends JPanel implements LayerController {
       boolean requireLayer) {
     JButton button = new JButton();
     button.setIcon(icon);
+    button.setMargin(new Insets(0, 0, 0, 0));
+    button.setPreferredSize(BUTTON_SIZE);
+    button.setMinimumSize(BUTTON_SIZE);
+    button.setMaximumSize(BUTTON_SIZE);
+    button.setFocusable(false);
 
     button.addActionListener(
         a -> {

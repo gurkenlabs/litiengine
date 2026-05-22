@@ -69,13 +69,13 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 public class AssetPanelItem extends JPanel {
   private static final Logger log = Logger.getLogger(AssetPanelItem.class.getName());
   private static final int CORNER_RADIUS = 8;
-  private static final int PADDING = 12;
-  private static final int ICON_SIZE = 48;
-  private static final int BUTTON_SIZE = 32;
+  private static final int PADDING = 8;
+  private static final int ICON_SIZE = 64;
+  private static final int BUTTON_SIZE = 24;
   private static final Color HOVER_COLOR = new Color(255, 255, 255, 20);
   private static final Color SELECTED_COLOR = new Color(100, 150, 255, 40);
   private static final BasicStroke FOCUS_STROKE = new BasicStroke(2.0f);
-  private static final Dimension PREFERRED_SIZE = new Dimension(140, 160);
+  private static final Dimension PREFERRED_SIZE = new Dimension(140, 140);
 
   private final JLabel iconLabel;
   private final JLabel nameLabel;
@@ -96,8 +96,8 @@ public class AssetPanelItem extends JPanel {
 
     this.btnAdd = createStyledButton(Icons.ADD_16, "assetpanel_add");
     this.btnEdit = createStyledButton(Icons.PENCIL_16, "assetpanel_edit");
-    this.btnDelete = createStyledButton(Icons.DELETE_16, "assetpanel_delete");
     this.btnExport = createStyledButton(Icons.EXPORT_16, "assetpanel_export");
+    this.btnDelete = createStyledButton(Icons.DELETE_16, "assetpanel_delete");
 
     initializeComponent();
     setupLayout();
@@ -660,8 +660,7 @@ public class AssetPanelItem extends JPanel {
       btnAdd.setVisible(false);
       btnDelete.setVisible(origin instanceof SoundResource && visible);
     }
-    btnEdit.setVisible(false);
-    btnExport.setVisible(visible);
+    btnEdit.setVisible(visible);
     btnExport.setVisible(visible);
   }
 }
