@@ -26,7 +26,7 @@ public class TweenEngine implements IUpdateable, ILaunchable {
    *
    * @param target   the {@code Tweenable} target object
    * @param type     the {@code TweenType} determining which values of the target object will be modified.
-   * @param duration the duration of the Tween in milliseconds.
+   * @param duration the duration of the Tween in ticks.
    * @return the Tween instance
    */
   public Tween begin(final Tweenable target, final TweenType type, final int duration) {
