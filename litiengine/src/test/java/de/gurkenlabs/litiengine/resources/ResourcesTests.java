@@ -60,6 +60,37 @@ class ResourcesTests {
   }
 
   @Test
+  void testMapResourcesCaseInsensitiveLookup() {
+    // Ensure that resources loaded under one casing can still be retrieved when
+    // requested with a different casing instead of producing misleading errors
+    // (e.g. XML parse failures when accidentally hitting a similarly named directory).
+    IMap map =
+      Resources.maps().get("de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
+
+    assertNotNull(map);
+    assertEquals(map, Resources.maps().get("TEST-MAP"));
+    assertEquals(map, Resources.maps().get("Test-Map"));
+    assertTrue(Resources.maps().contains("TEST-MAP"));
+  }
+
+  @Test
+  void testResourceContainerCaseInsensitiveLookup() {
+    Resources.images().clear();
+    final String imageName = "MyTestImage.jpg";
+    BufferedImage testImage = new BufferedImage(5, 5, BufferedImage.TYPE_INT_ARGB);
+    Resources.images().add(imageName, testImage);
+
+    // exact match still works
+    assertEquals(testImage, Resources.images().get(imageName));
+    // case-insensitive fallback resolves to the same cached resource
+    assertEquals(testImage, Resources.images().get("mytestimage.jpg"));
+    assertEquals(testImage, Resources.images().get("MYTESTIMAGE.JPG"));
+    assertTrue(Resources.images().contains("mytestimage.jpg"));
+
+    Resources.images().clear();
+  }
+
+  @Test
   void testResourceFromWeb() throws IOException {
     try (InputStream stream =
            Resources.get(

@@ -460,13 +460,42 @@ public abstract class ResourcesContainer<T> {
   /**
    * Gets the identifier for the specified resource name.
    * <p>
-   * This method checks if there is an alias for the given resource name and returns it. If no alias is found, it returns the original resource name.
+   * This method first attempts a case-sensitive lookup against the registered aliases and loaded resources. If no exact match is found, it falls back
+   * to a case-insensitive lookup so that already loaded or aliased resources can be retrieved regardless of the casing of the requested name. This
+   * prevents misleading errors (e.g. XML parse failures) when a resource is requested with the wrong capitalization.
    * </p>
    *
    * @param resourceName The name of the resource.
    * @return The identifier for the resource, which may be an alias or the original resource name.
    */
   private String getIdentifier(String resourceName) {
-    return this.aliases.getOrDefault(resourceName, resourceName);
+    if (resourceName == null) {
+      return null;
+    }
+
+    // fast path: exact alias or resource match
+    String alias = this.aliases.get(resourceName);
+    if (alias != null) {
+      return alias;
+    }
+
+    if (this.resources.containsKey(resourceName)) {
+      return resourceName;
+    }
+
+    // fallback: case-insensitive lookup against loaded resources and aliases
+    for (String key : this.resources.keySet()) {
+      if (key.equalsIgnoreCase(resourceName)) {
+        return key;
+      }
+    }
+
+    for (Map.Entry<String, String> entry : this.aliases.entrySet()) {
+      if (entry.getKey().equalsIgnoreCase(resourceName)) {
+        return entry.getValue();
+      }
+    }
+
+    return resourceName;
   }
 }
