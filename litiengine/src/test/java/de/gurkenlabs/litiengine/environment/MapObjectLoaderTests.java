@@ -387,6 +387,158 @@ class MapObjectLoaderTests {
     assertNull(MapObjectType.get(mapObject2));
   }
 
+  @Test
+  void testTriggerMapObjectLoaderCustomTriggerType() {
+    try {
+      TriggerMapObjectLoader.registerCustomTriggerType("customTrigger", CustomTrigger.class);
+
+      TriggerMapObjectLoader loader = new TriggerMapObjectLoader();
+      IMapObject mapObject = mock(IMapObject.class);
+      when(mapObject.getType()).thenReturn(MapObjectType.TRIGGER.name());
+      when(mapObject.getId()).thenReturn(112);
+      when(mapObject.getName()).thenReturn("customTrigger");
+      when(mapObject.getLocation()).thenReturn(new Point(100, 100));
+      when(mapObject.getWidth()).thenReturn(200f);
+      when(mapObject.getHeight()).thenReturn(200f);
+
+      when(mapObject.getStringValue(MapObjectProperty.TRIGGER_MESSAGE)).thenReturn("message");
+      when(mapObject.getEnumValue(eq(MapObjectProperty.TRIGGER_ACTIVATION), any(Class.class), any(TriggerActivation.class))).thenReturn(
+        TriggerActivation.INTERACT);
+
+      Collection<IEntity> entities = loader.load(this.testEnvironment, mapObject);
+      Optional<IEntity> opt = entities.stream().findFirst();
+      assertTrue(opt.isPresent());
+
+      IEntity entity = opt.get();
+      assertInstanceOf(CustomTrigger.class, entity);
+      assertEquals(TriggerActivation.INTERACT, ((Trigger) entity).getActivationType());
+    } finally {
+      TriggerMapObjectLoader.clearCustomTriggerTypes();
+    }
+  }
+
+  @Test
+  void testTriggerMapObjectLoaderCustomTriggerTypeMatchIsCaseInsensitive() {
+    try {
+      TriggerMapObjectLoader.registerCustomTriggerType("CustomTrigger", CustomTrigger.class);
+
+      TriggerMapObjectLoader loader = new TriggerMapObjectLoader();
+      IMapObject mapObject = mock(IMapObject.class);
+      when(mapObject.getType()).thenReturn(MapObjectType.TRIGGER.name());
+      when(mapObject.getId()).thenReturn(113);
+      when(mapObject.getName()).thenReturn("customtrigger");
+      when(mapObject.getLocation()).thenReturn(new Point(0, 0));
+      when(mapObject.getWidth()).thenReturn(10f);
+      when(mapObject.getHeight()).thenReturn(10f);
+
+      when(mapObject.getEnumValue(eq(MapObjectProperty.TRIGGER_ACTIVATION), any(Class.class), any(TriggerActivation.class))).thenReturn(
+        TriggerActivation.COLLISION);
+
+      Collection<IEntity> entities = loader.load(this.testEnvironment, mapObject);
+      Optional<IEntity> opt = entities.stream().findFirst();
+      assertTrue(opt.isPresent());
+      assertInstanceOf(CustomTrigger.class, opt.get());
+    } finally {
+      TriggerMapObjectLoader.clearCustomTriggerTypes();
+    }
+  }
+
+  @Test
+  void testTriggerMapObjectLoaderFallsBackToDefaultTriggerWhenNameUnregistered() {
+    try {
+      TriggerMapObjectLoader.registerCustomTriggerType("customTrigger", CustomTrigger.class);
+
+      TriggerMapObjectLoader loader = new TriggerMapObjectLoader();
+      IMapObject mapObject = mock(IMapObject.class);
+      when(mapObject.getType()).thenReturn(MapObjectType.TRIGGER.name());
+      when(mapObject.getId()).thenReturn(114);
+      when(mapObject.getName()).thenReturn("someOtherName");
+      when(mapObject.getLocation()).thenReturn(new Point(0, 0));
+      when(mapObject.getWidth()).thenReturn(10f);
+      when(mapObject.getHeight()).thenReturn(10f);
+
+      when(mapObject.getEnumValue(eq(MapObjectProperty.TRIGGER_ACTIVATION), any(Class.class), any(TriggerActivation.class))).thenReturn(
+        TriggerActivation.COLLISION);
+
+      Collection<IEntity> entities = loader.load(this.testEnvironment, mapObject);
+      Optional<IEntity> opt = entities.stream().findFirst();
+      assertTrue(opt.isPresent());
+      IEntity entity = opt.get();
+      assertInstanceOf(Trigger.class, entity);
+      assertFalse(entity instanceof CustomTrigger);
+    } finally {
+      TriggerMapObjectLoader.clearCustomTriggerTypes();
+    }
+  }
+
+  @Test
+  void testTriggerMapObjectLoaderCustomTriggerFallbackConstructor() {
+    try {
+      TriggerMapObjectLoader.registerCustomTriggerType("noArgTrigger", NoArgCustomTrigger.class);
+
+      TriggerMapObjectLoader loader = new TriggerMapObjectLoader();
+      IMapObject mapObject = mock(IMapObject.class);
+      when(mapObject.getType()).thenReturn(MapObjectType.TRIGGER.name());
+      when(mapObject.getId()).thenReturn(115);
+      when(mapObject.getName()).thenReturn("noArgTrigger");
+      when(mapObject.getLocation()).thenReturn(new Point(0, 0));
+      when(mapObject.getWidth()).thenReturn(10f);
+      when(mapObject.getHeight()).thenReturn(10f);
+
+      when(mapObject.getEnumValue(eq(MapObjectProperty.TRIGGER_ACTIVATION), any(Class.class), any(TriggerActivation.class))).thenReturn(
+        TriggerActivation.COLLISION);
+
+      Collection<IEntity> entities = loader.load(this.testEnvironment, mapObject);
+      Optional<IEntity> opt = entities.stream().findFirst();
+      assertTrue(opt.isPresent());
+      assertInstanceOf(NoArgCustomTrigger.class, opt.get());
+    } finally {
+      TriggerMapObjectLoader.clearCustomTriggerTypes();
+    }
+  }
+
+  @Test
+  void testTriggerMapObjectLoaderRegisterCustomTriggerTypeIgnoresNullOrEmpty() {
+    try {
+      TriggerMapObjectLoader.registerCustomTriggerType(null, CustomTrigger.class);
+      TriggerMapObjectLoader.registerCustomTriggerType("", CustomTrigger.class);
+      TriggerMapObjectLoader.registerCustomTriggerType("validName", null);
+
+      TriggerMapObjectLoader loader = new TriggerMapObjectLoader();
+      IMapObject mapObject = mock(IMapObject.class);
+      when(mapObject.getType()).thenReturn(MapObjectType.TRIGGER.name());
+      when(mapObject.getId()).thenReturn(116);
+      when(mapObject.getName()).thenReturn("validName");
+      when(mapObject.getLocation()).thenReturn(new Point(0, 0));
+      when(mapObject.getWidth()).thenReturn(10f);
+      when(mapObject.getHeight()).thenReturn(10f);
+
+      when(mapObject.getEnumValue(eq(MapObjectProperty.TRIGGER_ACTIVATION), any(Class.class), any(TriggerActivation.class))).thenReturn(
+        TriggerActivation.COLLISION);
+
+      Collection<IEntity> entities = loader.load(this.testEnvironment, mapObject);
+      Optional<IEntity> opt = entities.stream().findFirst();
+      assertTrue(opt.isPresent());
+      IEntity entity = opt.get();
+      assertInstanceOf(Trigger.class, entity);
+      assertFalse(entity instanceof CustomTrigger);
+    } finally {
+      TriggerMapObjectLoader.clearCustomTriggerTypes();
+    }
+  }
+
+  static class CustomTrigger extends Trigger {
+    public CustomTrigger(TriggerActivation activation, String message, boolean isOneTime, int cooldown) {
+      super(activation, message, isOneTime, cooldown);
+    }
+  }
+
+  static class NoArgCustomTrigger extends Trigger {
+    public NoArgCustomTrigger() {
+      super(TriggerActivation.COLLISION, null);
+    }
+  }
+
   @EntityInfo(customMapObjectType = "customEntity")
   static class CustomEntity extends Entity {
     @TmxProperty(name = "foo")
