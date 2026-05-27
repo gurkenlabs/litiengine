@@ -1,7 +1,12 @@
 package de.gurkenlabs.litiengine.environment;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.Trigger;
@@ -12,9 +17,53 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 
 public class TriggerMapObjectLoader extends MapObjectLoader {
+  private static final Logger log = Logger.getLogger(TriggerMapObjectLoader.class.getName());
+  private static final Map<String, Class<? extends Trigger>> customTriggerTypes = new ConcurrentHashMap<>();
 
   protected TriggerMapObjectLoader() {
     super(MapObjectType.TRIGGER);
+  }
+
+  /**
+   * <p>
+   * Registers a custom {@link Trigger} implementation that can be automatically provided by this
+   * {@link MapObjectLoader}.
+   * </p>
+   *
+   * <p>
+   * Whenever a {@link MapObjectType#TRIGGER TRIGGER} map object with a {@link IMapObject#getName() name} equal to the
+   * specified {@code name} is loaded, an instance of the supplied {@code triggerType} is created instead of the default
+   * {@link Trigger}.
+   * </p>
+   *
+   * <p>
+   * Make sure that the implementation has one of the following constructors present:
+   * <ol>
+   * <li>A constructor that matches the {@link Trigger} default constructor signature
+   * ({@link TriggerActivation}, {@link String}, {@code boolean}, {@code int}).</li>
+   * <li>An empty constructor.</li>
+   * </ol>
+   *
+   * @param <T>         The type of the custom trigger implementation.
+   * @param name        The map object name used to identify trigger instances that should be loaded as the specified
+   *                    {@code triggerType}.
+   * @param triggerType The class of the custom {@link Trigger} implementation.
+   */
+  public static <T extends Trigger> void registerCustomTriggerType(String name, Class<T> triggerType) {
+    if (name == null || name.isEmpty() || triggerType == null) {
+      return;
+    }
+
+    customTriggerTypes.put(name.toLowerCase(), triggerType);
+  }
+
+  /**
+   * Removes all previously registered custom {@link Trigger} types.
+   *
+   * @see #registerCustomTriggerType(String, Class)
+   */
+  public static void clearCustomTriggerTypes() {
+    customTriggerTypes.clear();
   }
 
   @Override
@@ -39,7 +88,37 @@ public class TriggerMapObjectLoader extends MapObjectLoader {
   }
 
   protected Trigger createTrigger(IMapObject mapObject, TriggerActivation act, String message, boolean oneTime, int coolDown) {
+    final String name = mapObject.getName();
+    if (name != null && !name.isEmpty()) {
+      Class<? extends Trigger> customTriggerType = customTriggerTypes.get(name.toLowerCase());
+      if (customTriggerType != null) {
+        Trigger custom = createCustomTrigger(customTriggerType, act, message, oneTime, coolDown);
+        if (custom != null) {
+          return custom;
+        }
+      }
+    }
+
     return new Trigger(act, message, oneTime, coolDown);
+  }
+
+  private static Trigger createCustomTrigger(Class<? extends Trigger> customTrigger, TriggerActivation act, String message, boolean oneTime,
+      int coolDown) {
+    try {
+      return customTrigger.getConstructor(TriggerActivation.class, String.class, boolean.class, int.class)
+          .newInstance(act, message, oneTime, coolDown);
+    } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
+        | SecurityException e) {
+      try {
+        return customTrigger.getConstructor().newInstance();
+      } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
+          | SecurityException ex) {
+        log.log(Level.WARNING, "Could not automatically create trigger of type {0} because a matching constructor is missing.",
+            new Object[] {customTrigger});
+        log.log(Level.SEVERE, ex.getMessage(), ex);
+      }
+    }
+    return null;
   }
 
   protected void loadTargets(IMapObject mapObject, Trigger trigger) {
