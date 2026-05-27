@@ -6,6 +6,8 @@ import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 import de.gurkenlabs.litiengine.util.MathUtilities;
+import de.gurkenlabs.litiengine.tweening.TweenType;
+import de.gurkenlabs.litiengine.tweening.Tweenable;
 import java.awt.Dimension;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -16,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Represents the camera used for rendering the game world. The camera handles focus, zoom, shake effects, and viewport calculations.
  */
-public class Camera implements ICamera {
+public class Camera implements ICamera, Tweenable {
   private final Collection<ZoomChangedListener> zoomListeners = ConcurrentHashMap.newKeySet();
   private final Collection<FocusChangedListener> focusChangedListeners =
     ConcurrentHashMap.newKeySet();
@@ -434,5 +436,35 @@ public class Camera implements ICamera {
   private boolean isShakeEffectActive() {
     return this.getShakeTick() != 0
       && Game.time().since(this.getShakeTick()) < this.getShakeDuration();
+  }
+
+  /**
+   * Provides current tween values for camera-related {@link TweenType}s so that the camera can be animated by the
+   * {@link de.gurkenlabs.litiengine.tweening.TweenEngine}. Supports {@link TweenType#ZOOM}, {@link TweenType#LOCATION_X},
+   * {@link TweenType#LOCATION_Y} and {@link TweenType#LOCATION_XY} for zooming and panning.
+   */
+  @Override
+  public float[] getTweenValues(final TweenType tweenType) {
+    return switch (tweenType) {
+      case ZOOM -> new float[] {this.getZoom()};
+      case LOCATION_X -> new float[] {(float) this.getFocus().getX()};
+      case LOCATION_Y -> new float[] {(float) this.getFocus().getY()};
+      case LOCATION_XY -> new float[] {(float) this.getFocus().getX(), (float) this.getFocus().getY()};
+      default -> Tweenable.super.getTweenValues(tweenType);
+    };
+  }
+
+  /**
+   * Applies interpolated tween values to the camera. See {@link #getTweenValues(TweenType)} for the list of supported tween types.
+   */
+  @Override
+  public void setTweenValues(final TweenType tweenType, final float[] newValues) {
+    switch (tweenType) {
+      case ZOOM -> this.setZoom(newValues[0], 0);
+      case LOCATION_X -> this.setFocus(newValues[0], this.getFocus().getY());
+      case LOCATION_Y -> this.setFocus(this.getFocus().getX(), newValues[0]);
+      case LOCATION_XY -> this.setFocus(newValues[0], newValues[1]);
+      default -> Tweenable.super.setTweenValues(tweenType, newValues);
+    }
   }
 }

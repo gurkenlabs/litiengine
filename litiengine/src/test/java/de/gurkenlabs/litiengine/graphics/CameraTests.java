@@ -11,6 +11,7 @@ import de.gurkenlabs.litiengine.GameWindow;
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.GameWorld;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
+import de.gurkenlabs.litiengine.tweening.TweenType;
 import java.awt.Dimension;
 import java.awt.geom.Point2D;
 import org.junit.jupiter.api.Test;
@@ -106,5 +107,32 @@ class CameraTests {
       assertEquals(80, result.getX(), 0.0001); // maxX = mapWidth - viewportWidth/2
       assertEquals(80, result.getY(), 0.0001);
     }
+  }
+
+  @Test
+  void testCameraTweenValuesForZoom() {
+    Camera cam = new Camera();
+    cam.setZoom(2.5f, 0);
+    float[] values = cam.getTweenValues(TweenType.ZOOM);
+    assertEquals(1, values.length);
+    assertEquals(2.5f, values[0], 0.0001f);
+
+    cam.setTweenValues(TweenType.ZOOM, new float[] {4.0f});
+    assertEquals(4.0f, cam.getZoom(), 0.0001f);
+  }
+
+  @Test
+  void testCameraTweenValuesForLocation() {
+    Camera cam = new Camera();
+    cam.setFocus(new Point2D.Double(10, 20));
+    float[] xy = cam.getTweenValues(TweenType.LOCATION_XY);
+    assertEquals(2, xy.length);
+    assertEquals(10f, xy[0], 0.05f);
+    // setFocus may apply a 0.01 offset to certain Y values; only assert closeness
+    assertEquals(20f, xy[1], 0.05f);
+
+    cam.setTweenValues(TweenType.LOCATION_XY, new float[] {30f, 40f});
+    assertEquals(30f, cam.getFocus().getX(), 0.05f);
+    assertEquals(40f, cam.getFocus().getY(), 0.05f);
   }
 }
