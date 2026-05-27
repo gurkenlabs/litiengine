@@ -22,7 +22,7 @@ public class Tween {
    *
    * @param target   the {@code Tweenable} target object
    * @param type     the {@code TweenType} determining which values of the target object will be modified.
-   * @param duration the duration of the Tween in milliseconds.
+   * @param duration the duration of the Tween in ticks.
    */
   public Tween(final Tweenable target, final TweenType type, final int duration) {
     this.target = target;
@@ -77,7 +77,7 @@ public class Tween {
   /**
    * Gets the duration of the Tween.
    *
-   * @return the duration of the Tween in milliseconds
+   * @return the duration of the Tween in ticks
    */
   public int getDuration() {
     return this.duration;
@@ -169,7 +169,7 @@ public class Tween {
   /**
    * Sets the Tween duration.
    *
-   * @param duration the new duration in milliseconds
+   * @param duration the new duration in ticks
    */
   public void setDuration(final int duration) {
     this.duration = duration;
