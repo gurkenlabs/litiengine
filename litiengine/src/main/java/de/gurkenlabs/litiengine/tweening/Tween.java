@@ -38,11 +38,11 @@ public class Tween {
   }
 
   /**
-   * Begins the Tween by setting its start time to the current game time in ticks.
+   * Starts the Tween by setting its start time to the current game time in ticks.
    *
    * @return the Tween instance
    */
-  public Tween begin() {
+  public Tween start() {
     this.started = Game.time().now();
     this.stopped = false;
     for (final TweenListener listener : this.listeners) {

@@ -130,7 +130,7 @@ public abstract class SoundPlayback implements Runnable {
    */
   public void fade(int duration, float target, TweenFunction easingType) {
     for (VolumeControl v : this.getVolumeControls()) {
-      Game.tweens().begin(v, TweenType.VOLUME, duration).target(target).ease(easingType);
+      Game.tweens().start(v, TweenType.VOLUME, duration).target(target).ease(easingType);
     }
   }
 

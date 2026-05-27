@@ -56,7 +56,7 @@ class TweenEngineTests {
 
       final TestTweenable target = new TestTweenable(0f);
       final TweenEngine engine = new TweenEngine();
-      final Tween tween = engine.begin(target, TweenType.UNDEFINED, 10).ease(TweenFunction.LINEAR).target(100f);
+      final Tween tween = engine.start(target, TweenType.UNDEFINED, 10).ease(TweenFunction.LINEAR).target(100f);
 
       tick.set(5);
       engine.update();
@@ -80,7 +80,7 @@ class TweenEngineTests {
       final TestTweenable target = new TestTweenable(0f);
       final TweenEngine engine = new TweenEngine();
       final Tween tween =
-          engine.begin(target, TweenType.UNDEFINED, 10)
+          engine.start(target, TweenType.UNDEFINED, 10)
               .ease(TweenFunction.LINEAR)
               .target(100f)
               .loop(TweenLoop.LOOP);
@@ -107,7 +107,7 @@ class TweenEngineTests {
       final TestTweenable target = new TestTweenable(0f);
       final TweenEngine engine = new TweenEngine();
       final Tween tween =
-          engine.begin(target, TweenType.UNDEFINED, 10)
+          engine.start(target, TweenType.UNDEFINED, 10)
               .ease(TweenFunction.LINEAR)
               .target(100f)
               .loop(TweenLoop.PINGPONG);
@@ -138,7 +138,7 @@ class TweenEngineTests {
 
       final TestTweenable target = new TestTweenable(0f);
       final TweenEngine engine = new TweenEngine();
-      final Tween tween = engine.begin(target, TweenType.UNDEFINED, 10).ease(TweenFunction.LINEAR).target(100f);
+      final Tween tween = engine.start(target, TweenType.UNDEFINED, 10).ease(TweenFunction.LINEAR).target(100f);
 
       final AtomicReference<Tween> started = new AtomicReference<>();
       final AtomicReference<Tween> stopped = new AtomicReference<>();
@@ -160,8 +160,8 @@ class TweenEngineTests {
         }
       });
 
-      // re-trigger begin so listeners are notified
-      tween.begin();
+      // re-trigger start so listeners are notified
+      tween.start();
       assertNotNull(started.get());
       assertNull(stopped.get());
       assertNull(completed.get());
