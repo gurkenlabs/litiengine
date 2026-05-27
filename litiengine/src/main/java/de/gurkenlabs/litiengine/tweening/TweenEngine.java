@@ -21,7 +21,7 @@ public class TweenEngine implements IUpdateable, ILaunchable {
   }
 
   /**
-   * Begins a new Tween. If a Tween is already registered for the {@code Tweenable} with the given {@code TweenType}, it is restarted with the given
+   * Starts a new Tween. If a Tween is already registered for the {@code Tweenable} with the given {@code TweenType}, it is restarted with the given
    * duration.
    *
    * @param target   the {@code Tweenable} target object
@@ -29,7 +29,7 @@ public class TweenEngine implements IUpdateable, ILaunchable {
    * @param duration the duration of the Tween in ticks.
    * @return the Tween instance
    */
-  public Tween begin(final Tweenable target, final TweenType type, final int duration) {
+  public Tween start(final Tweenable target, final TweenType type, final int duration) {
     Tween tween = this.getTween(target, type);
     if (tween == null) {
       tween = new Tween(target, type, duration).ease(TweenFunction.QUAD_INOUT);
@@ -37,7 +37,7 @@ public class TweenEngine implements IUpdateable, ILaunchable {
     } else {
       tween.setDuration(duration);
     }
-    tween.begin();
+    tween.start();
     return tween;
   }
 
@@ -174,11 +174,11 @@ public class TweenEngine implements IUpdateable, ILaunchable {
           tween.notifyCompleted();
           switch (tween.getLoop()) {
             case LOOP:
-              tween.begin();
+              tween.start();
               break;
             case PINGPONG:
               tween.toggleReversed();
-              tween.begin();
+              tween.start();
               break;
             case NONE:
             default:
