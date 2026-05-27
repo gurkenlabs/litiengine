@@ -2,6 +2,8 @@ package de.gurkenlabs.litiengine.tweening;
 
 import de.gurkenlabs.litiengine.Game;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A Tween is an interpolation between start values and target values over a given time period. It modifies the start values by applying an easing
@@ -16,6 +18,9 @@ public class Tween {
   private final Tweenable target;
   private float[] targetValues;
   private final TweenType type;
+  private TweenLoop loop = TweenLoop.NONE;
+  private boolean reversed;
+  private final Collection<TweenListener> listeners = ConcurrentHashMap.newKeySet();
 
   /**
    * Instantiates a new tween.
@@ -40,6 +45,9 @@ public class Tween {
   public Tween begin() {
     this.started = Game.time().now();
     this.stopped = false;
+    for (final TweenListener listener : this.listeners) {
+      listener.started(this);
+    }
     return this;
   }
 
@@ -181,8 +189,89 @@ public class Tween {
    * @return the Tween instance
    */
   public Tween stop() {
+    if (this.stopped) {
+      return this;
+    }
     this.stopped = true;
+    for (final TweenListener listener : this.listeners) {
+      listener.stopped(this);
+    }
     return this;
+  }
+
+  /**
+   * Gets the configured loop mode for this Tween.
+   *
+   * @return the {@code TweenLoop} mode.
+   */
+  public TweenLoop getLoop() {
+    return this.loop;
+  }
+
+  /**
+   * Sets the loop mode for this Tween. When the Tween completes its duration, it will either stop, restart from the beginning,
+   * or reverse direction depending on the configured loop mode.
+   *
+   * @param loop the desired {@code TweenLoop} mode.
+   * @return the Tween instance.
+   */
+  public Tween loop(final TweenLoop loop) {
+    this.loop = loop == null ? TweenLoop.NONE : loop;
+    return this;
+  }
+
+  /**
+   * Checks whether the Tween is currently running in its reversed direction. This is only relevant for {@link TweenLoop#PINGPONG}
+   * tweens.
+   *
+   * @return {@code true} if the Tween currently interpolates from its target values back to its start values.
+   */
+  public boolean isReversed() {
+    return this.reversed;
+  }
+
+  /**
+   * Toggles the playback direction of the Tween. The next interpolation cycle will swap the role of start and target values.
+   *
+   * @return the Tween instance.
+   */
+  Tween toggleReversed() {
+    this.reversed = !this.reversed;
+    return this;
+  }
+
+  /**
+   * Registers a {@link TweenListener} that gets notified about the Tween's lifecycle events.
+   *
+   * @param listener the listener to add.
+   * @return the Tween instance.
+   */
+  public Tween addListener(final TweenListener listener) {
+    if (listener != null) {
+      this.listeners.add(listener);
+    }
+    return this;
+  }
+
+  /**
+   * Removes a previously registered {@link TweenListener}.
+   *
+   * @param listener the listener to remove.
+   * @return the Tween instance.
+   */
+  public Tween removeListener(final TweenListener listener) {
+    this.listeners.remove(listener);
+    return this;
+  }
+
+  /**
+   * Notifies registered listeners that the Tween completed a duration cycle. This is invoked by the {@link TweenEngine} after each
+   * cycle, before deciding whether to stop or continue the Tween.
+   */
+  void notifyCompleted() {
+    for (final TweenListener listener : this.listeners) {
+      listener.completed(this);
+    }
   }
 
   /**

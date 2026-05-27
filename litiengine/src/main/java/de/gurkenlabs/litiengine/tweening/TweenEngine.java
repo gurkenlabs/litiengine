@@ -165,15 +165,34 @@ public class TweenEngine implements IUpdateable, ILaunchable {
         }
         final long elapsed = Game.time().since(tween.getStartTime());
         if (elapsed >= tween.getDuration()) {
-          tween.stop();
+          // ensure values land exactly on the end of the cycle
+          final float[] endValues = new float[tween.getTargetValues().length];
+          for (int i = 0; i < endValues.length; i++) {
+            endValues[i] = tween.isReversed() ? tween.getStartValues()[i] : tween.getTargetValues()[i];
+          }
+          tween.getTarget().setTweenValues(tween.getType(), endValues);
+          tween.notifyCompleted();
+          switch (tween.getLoop()) {
+            case LOOP:
+              tween.begin();
+              break;
+            case PINGPONG:
+              tween.toggleReversed();
+              tween.begin();
+              break;
+            case NONE:
+            default:
+              tween.stop();
+              break;
+          }
           continue;
         }
+        final float progress = tween.getEquation().compute(elapsed / (float) tween.getDuration());
         final float[] currentValues = new float[tween.getTargetValues().length];
         for (int i = 0; i < tween.getTargetValues().length; i++) {
-          currentValues[i] =
-            tween.getStartValues()[i]
-              + tween.getEquation().compute(elapsed / (float) tween.getDuration())
-              * (tween.getTargetValues()[i] - tween.getStartValues()[i]);
+          final float from = tween.isReversed() ? tween.getTargetValues()[i] : tween.getStartValues()[i];
+          final float to = tween.isReversed() ? tween.getStartValues()[i] : tween.getTargetValues()[i];
+          currentValues[i] = from + progress * (to - from);
         }
         tween.getTarget().setTweenValues(tween.getType(), currentValues);
       }

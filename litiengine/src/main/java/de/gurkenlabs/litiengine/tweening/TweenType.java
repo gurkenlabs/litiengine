@@ -82,5 +82,10 @@ public enum TweenType {
   /**
    * The opacity of the entity.
    */
-  OPACITY
+  OPACITY,
+
+  /**
+   * The zoom level (e.g. of the {@code Camera}).
+   */
+  ZOOM
 }
