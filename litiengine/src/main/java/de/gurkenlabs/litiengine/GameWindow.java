@@ -390,10 +390,22 @@ public final class GameWindow {
   }
 
   private static float setResolution(Container host, Dimension dim) {
-    Dimension insetAwareDimension = new Dimension(dim.width + host.getInsets().left + host.getInsets().right,
-        dim.height + host.getInsets().top + host.getInsets().bottom);
-
-    host.setSize(insetAwareDimension);
+    // For a decorated (windowed) JFrame that is not in native exclusive fullscreen, use pack() so
+    // that the frame is sized via the layout manager.  This avoids a race where toolkit decorations
+    // (e.g. GTK client-side decorations) are applied asynchronously after setVisible(true): pack()
+    // reads the insets atomically and produces a frame size that is always consistent with the
+    // insets returned by getInsets() at the point the call returns.
+    if (host instanceof JFrame jframe
+        && !jframe.isUndecorated()
+        && !GraphicsEnvironment.isHeadless()
+        && GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getFullScreenWindow() != jframe) {
+      jframe.getContentPane().setPreferredSize(dim);
+      jframe.pack();
+    } else {
+      Dimension insetAwareDimension = new Dimension(dim.width + host.getInsets().left + host.getInsets().right,
+          dim.height + host.getInsets().top + host.getInsets().bottom);
+      host.setSize(insetAwareDimension);
+    }
     return getUpdatedResolutionScale(dim);
   }
 
