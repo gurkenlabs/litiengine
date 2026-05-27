@@ -29,7 +29,7 @@ public enum RenderType {
 
   private final int order;
 
-  private RenderType(int order) {
+  RenderType(int order) {
     this.order = order;
   }
 

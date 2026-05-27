@@ -422,7 +422,7 @@ public final class MapUtilities {
     return map.getOrientation().getBounds(tile, map);
   }
 
-  private static final IMap getCurrentMap() {
+  private static IMap getCurrentMap() {
     if (Game.world().environment() == null) {
       return null;
     }

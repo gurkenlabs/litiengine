@@ -55,7 +55,7 @@ public final class Trigonometry {
    * @param x the x component
    * @return the angle, in radians
    */
-  public static final float atan2(float y, float x) {
+  public static float atan2(float y, float x) {
     float add;
     float mul;
 
@@ -97,7 +97,7 @@ public final class Trigonometry {
    * @param x the x component
    * @return the angle, in degrees
    */
-  public static final float atan2Deg(final float y, final float x) {
+  public static float atan2Deg(final float y, final float x) {
     return atan2(y, x) * DEG;
   }
 
@@ -108,7 +108,7 @@ public final class Trigonometry {
    * @param x the x component
    * @return the angle, in degrees
    */
-  public static final float atan2DegStrict(final float y, final float x) {
+  public static float atan2DegStrict(final float y, final float x) {
     return (float) Math.atan2(y, x) * DEG;
   }
 
