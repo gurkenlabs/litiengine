@@ -17,6 +17,12 @@ public interface IMap extends ILayerList, Comparable<IMap> {
    */
   List<ITileset> getTilesets();
 
+  /**
+   * Gets the tileset entry referenced by the supplied global tile id.
+   *
+   * @param gid the global tile id
+   * @return the matching tileset entry, or {@code null} if no tileset contains the id
+   */
   ITilesetEntry getTilesetEntry(int gid);
 
   /**
@@ -26,6 +32,11 @@ public interface IMap extends ILayerList, Comparable<IMap> {
    */
   IMapOrientation getOrientation();
 
+  /**
+   * Gets the source URL the map was loaded from.
+   *
+   * @return the source URL
+   */
   URL getPath();
 
   /**
@@ -63,6 +74,11 @@ public interface IMap extends ILayerList, Comparable<IMap> {
    */
   Dimension getSizeInTiles();
 
+  /**
+   * Gets the bounding rectangle of the map in pixels.
+   *
+   * @return the bounding rectangle
+   */
   Rectangle2D getBounds();
 
   /**
@@ -121,8 +137,18 @@ public interface IMap extends ILayerList, Comparable<IMap> {
    */
   double getVersion();
 
+  /**
+   * Gets the Tiled editor version string the map was saved with.
+   *
+   * @return the Tiled version string
+   */
   String getTiledVersion();
 
+  /**
+   * Gets the display name of this map.
+   *
+   * @return the map name
+   */
   String getName();
 
   /**
@@ -132,12 +158,32 @@ public interface IMap extends ILayerList, Comparable<IMap> {
    */
   void setName(String name);
 
+  /**
+   * Gets the next available object id, used to assign unique ids to newly created map objects.
+   *
+   * @return the next object id
+   */
   int getNextObjectId();
 
+  /**
+   * Gets the next available layer id, used to assign unique ids to newly created layers.
+   *
+   * @return the next layer id
+   */
   int getNextLayerId();
 
+  /**
+   * Gets the background color of the map.
+   *
+   * @return the background color
+   */
   Color getBackgroundColor();
 
+  /**
+   * Returns whether this is an infinite map (i.e. composed of chunks rather than a fixed-size grid).
+   *
+   * @return {@code true} if the map is infinite
+   */
   boolean isInfinite();
 
   @Override

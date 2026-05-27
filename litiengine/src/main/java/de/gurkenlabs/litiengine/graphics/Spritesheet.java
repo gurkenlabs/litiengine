@@ -12,6 +12,10 @@ import java.awt.image.RasterFormatException;
 import java.util.Optional;
 import java.util.logging.Logger;
 
+/**
+ * Represents a single sprite sheet image carved up into individual sprite frames of equal {@linkplain #getSpriteWidth() width} and
+ * {@linkplain #getSpriteHeight() height}. Sprite frames are lazily cached on first access and can be retrieved by index.
+ */
 public final class Spritesheet implements Comparable<Spritesheet> {
   private static final Logger log = Logger.getLogger(Spritesheet.class.getName());
 
@@ -75,6 +79,13 @@ public final class Spritesheet implements Comparable<Spritesheet> {
     return this.columns;
   }
 
+  /**
+   * Returns a square preview image of the first sprite, scaled to the requested dimension. The scaled image is cached in the global image resource
+   * registry so subsequent calls with the same dimension are cheap.
+   *
+   * @param dimension the side length of the preview image, in pixels
+   * @return the preview image
+   */
   public BufferedImage getPreview(int dimension) {
     final BufferedImage img = this.getSprite(0);
     BufferedImage scaled;
@@ -95,10 +106,20 @@ public final class Spritesheet implements Comparable<Spritesheet> {
     return scaled;
   }
 
+  /**
+   * Gets the full underlying spritesheet image.
+   *
+   * @return the spritesheet image
+   */
   public BufferedImage getImage() {
     return this.image;
   }
 
+  /**
+   * Gets the image format the spritesheet was loaded from.
+   *
+   * @return the image format
+   */
   public ImageFormat getImageFormat() {
     return this.imageFormat;
   }
@@ -112,18 +133,42 @@ public final class Spritesheet implements Comparable<Spritesheet> {
     return this.name;
   }
 
+  /**
+   * Gets the number of sprite rows in this spritesheet.
+   *
+   * @return the row count
+   */
   public int getRows() {
     return this.rows;
   }
 
+  /**
+   * Returns a randomly chosen sprite from the cached sprite array.
+   *
+   * @return a random sprite, or {@code null} if no sprites are cached
+   */
   public BufferedImage getRandomSprite() {
     return Game.random().choose(this.sprites);
   }
 
+  /**
+   * Returns the sprite at the supplied index.
+   *
+   * @param index the sprite index
+   * @return the sprite image, or {@code null} if the index is invalid or the sprite is empty
+   */
   public BufferedImage getSprite(final int index) {
     return this.getSprite(index, 0, 0);
   }
 
+  /**
+   * Returns the sprite at the supplied index, accounting for the supplied margin/spacing.
+   *
+   * @param index   the sprite index
+   * @param margin  the outer margin of the spritesheet image, in pixels
+   * @param spacing the spacing between adjacent sprites, in pixels
+   * @return the sprite image, or {@code null} if the index is invalid, the sprite is empty, or the sub-image could not be extracted
+   */
   public BufferedImage getSprite(final int index, final int margin, final int spacing) {
     if (index < 0 || index >= this.sprites.length || this.emptySprites[index]) {
       return null;
@@ -193,11 +238,21 @@ public final class Spritesheet implements Comparable<Spritesheet> {
     return this.getRows() * this.getColumns();
   }
 
+  /**
+   * Returns whether this spritesheet is currently registered with the global spritesheet resources.
+   *
+   * @return {@code true} if loaded
+   */
   public boolean isLoaded() {
     return Resources.spritesheets().contains(this.getName())
       && Resources.spritesheets().get(this.getName()).equals(this);
   }
 
+  /**
+   * Sets the sprite height (in pixels) and rebuilds the row/column counts.
+   *
+   * @param spriteHeight the new sprite height
+   */
   public void setSpriteHeight(final int spriteHeight) {
     this.checkHeight(spriteHeight);
 
@@ -205,6 +260,11 @@ public final class Spritesheet implements Comparable<Spritesheet> {
     this.updateRowsAndCols();
   }
 
+  /**
+   * Sets the sprite width (in pixels) and rebuilds the row/column counts.
+   *
+   * @param spriteWidth the new sprite width
+   */
   public void setSpriteWidth(final int spriteWidth) {
     this.checkWidth(spriteWidth);
 

@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.abilities.effects;
 
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
+import java.io.Serial;
 import java.util.EventObject;
 
 /**
@@ -8,7 +9,7 @@ import java.util.EventObject;
  * it is applied to.
  */
 public class EffectEvent extends EventObject {
-  private static final long serialVersionUID = -6911987630602502891L;
+  @Serial private static final long serialVersionUID = -6911987630602502891L;
 
   /**
    * The combat entity associated with this event. This field is transient to avoid serialization issues.

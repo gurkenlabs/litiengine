@@ -9,6 +9,7 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlTransient;
 import java.awt.image.BufferedImage;
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -21,7 +22,7 @@ import java.io.Serializable;
 @XmlRootElement(name = "sprite")
 public class SpritesheetResource extends NamedResource implements Serializable {
   public static final String PLAIN_TEXT_FILE_EXTENSION = "info";
-  private static final long serialVersionUID = 3864637034834813554L;
+  @Serial private static final long serialVersionUID = 3864637034834813554L;
   @XmlAttribute(name = "width")
   private int width;
 

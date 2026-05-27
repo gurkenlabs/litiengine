@@ -38,16 +38,29 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * JAXB-bound representation of a Tiled (TMX) map. Implements {@link IMap} so the loaded data integrates seamlessly with the engine's map/environment
+ * API and serves as the in-memory model when the engine reads {@code .tmx} files.
+ */
 @XmlRootElement(name = "map")
 @XmlAccessorType(XmlAccessType.FIELD)
 public final class TmxMap extends CustomPropertyProvider implements IMap {
 
+  /**
+   * File extension used by Tiled map files.
+   */
   public static final String FILE_EXTENSION = "tmx";
+  /**
+   * Maximum supported TMX major version.
+   */
   public static final int MAX_MAJOR = 1;
+  /** Maximum supported TMX minor version. */
   public static final int MAX_MINOR = 10;
 
+  /** Minimum supported TMX major version. */
   public static final int MIN_MAJOR = 1;
 
+  /** Minimum supported TMX minor version. */
   public static final int MIN_MINOR = 5;
 
   private static final Logger log = Logger.getLogger(TmxMap.class.getName());
@@ -122,10 +135,19 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
   @XmlTransient
   private int chunkOffsetY;
 
+  /**
+   * Creates a new {@code TmxMap}. Intended for XML deserialization; populated fields will be initialized by JAXB.
+   */
   public TmxMap() {
     // keep for serialization
   }
 
+  /**
+   * Creates a new {@code TmxMap} with the given map orientation, defaulting the render order to right-down and the Tiled version to the maximum
+   * supported value.
+   *
+   * @param orientation the map orientation
+   */
   public TmxMap(IMapOrientation orientation) {
     this.mapOrientation = orientation;
     this.renderorder = RenderOrder.RIGHT_DOWN;
@@ -215,6 +237,11 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
     return this.mapOrientation;
   }
 
+  /**
+   * Sets the map's orientation.
+   *
+   * @param orientation the orientation; must not be {@code null}
+   */
   @XmlTransient
   public void setOrientation(IMapOrientation orientation) {
     this.mapOrientation = Objects.requireNonNull(orientation);
@@ -226,6 +253,11 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
     return this.path;
   }
 
+  /**
+   * Sets the source URL the map was loaded from.
+   *
+   * @param path the source URL
+   */
   public void setPath(final URL path) {
     this.path = path;
   }
@@ -235,6 +267,11 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
     return this.renderorder;
   }
 
+  /**
+   * Sets the render order used when drawing the map's tile layers.
+   *
+   * @param renderorder the render order
+   */
   @XmlTransient
   public void setRenderOrder(RenderOrder renderorder) {
     this.renderorder = renderorder;
@@ -300,6 +337,11 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
     return this.tilewidth;
   }
 
+  /**
+   * Sets the width of a single tile in pixels.
+   *
+   * @param tilewidth the tile width
+   */
   @XmlTransient
   public void setTileWidth(int tilewidth) {
     this.tilewidth = tilewidth;
@@ -310,6 +352,11 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
     return this.tileheight;
   }
 
+  /**
+   * Sets the height of a single tile in pixels.
+   *
+   * @param tileheight the tile height
+   */
   @XmlTransient
   public void setTileHeight(int tileheight) {
     this.tileheight = tileheight;
@@ -320,6 +367,11 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
     return this.version;
   }
 
+  /**
+   * Sets the TMX format version of this map.
+   *
+   * @param version the version
+   */
   @XmlTransient
   public void setVersion(double version) {
     this.version = version;
@@ -330,6 +382,11 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
     return this.tiledversion;
   }
 
+  /**
+   * Sets the Tiled editor version string of this map.
+   *
+   * @param tiledversion the Tiled version string
+   */
   @XmlTransient
   public void setTiledVersion(String tiledversion) {
     this.tiledversion = tiledversion;
@@ -355,6 +412,11 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
     return this.width;
   }
 
+  /**
+   * Sets the map width in tiles.
+   *
+   * @param width the width in tiles
+   */
   @XmlTransient
   public void setWidth(int width) {
     this.width = width;
@@ -365,6 +427,11 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
     return this.height;
   }
 
+  /**
+   * Sets the map height in tiles.
+   *
+   * @param height the height in tiles
+   */
   @XmlTransient
   public void setHeight(int height) {
     this.height = height;
@@ -375,6 +442,11 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
     return this.hexsidelength;
   }
 
+  /**
+   * Sets the hex side length used for hexagonal maps.
+   *
+   * @param hexSideLength the hex side length
+   */
   @XmlTransient
   public void setHexSideLength(int hexSideLength) {
     this.hexsidelength = hexSideLength;
@@ -385,6 +457,11 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
     return this.staggeraxis;
   }
 
+  /**
+   * Sets the stagger axis used for staggered and hexagonal maps.
+   *
+   * @param staggerAxis the stagger axis
+   */
   @XmlTransient
   public void setStaggerAxis(StaggerAxis staggerAxis) {
     this.staggeraxis = staggerAxis;
@@ -395,6 +472,11 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
     return this.staggerindex;
   }
 
+  /**
+   * Sets the stagger index used for staggered and hexagonal maps.
+   *
+   * @param staggerIndex the stagger index
+   */
   @XmlTransient
   public void setStaggerIndex(StaggerIndex staggerIndex) {
     this.staggerindex = staggerIndex;
@@ -501,6 +583,11 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
     return this.layers;
   }
 
+  /**
+   * Returns the list of external tilesets referenced by this map (i.e. tilesets defined in separate {@code .tsx} files).
+   *
+   * @return the list of external tilesets
+   */
   public List<Tileset> getExternalTilesets() {
     List<Tileset> externalTilesets = new ArrayList<>();
     for (ITileset set : this.getTilesets()) {

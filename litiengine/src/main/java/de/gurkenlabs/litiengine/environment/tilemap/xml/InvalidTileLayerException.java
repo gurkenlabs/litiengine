@@ -1,11 +1,13 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
+import java.io.Serial;
+
 /**
  * Thrown when an exception occurs while parsing tile data.
  */
 public class InvalidTileLayerException extends TmxException {
 
-  private static final long serialVersionUID = -863575375538927793L;
+  @Serial private static final long serialVersionUID = -863575375538927793L;
 
   public InvalidTileLayerException() {}
 

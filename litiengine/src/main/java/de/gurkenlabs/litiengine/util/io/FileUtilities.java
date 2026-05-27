@@ -13,6 +13,10 @@ import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Static utility methods for working with file system paths and URIs, including recursive file lookup, extension/name parsing, parent directory
+ * resolution and human-readable byte size formatting.
+ */
 public final class FileUtilities {
   private static final Logger log = Logger.getLogger(FileUtilities.class.getName());
   private static final String[] DIR_BLACKLIST = new String[] {"\\bin", "\\screenshots"};
@@ -23,6 +27,14 @@ public final class FileUtilities {
     throw new UnsupportedOperationException();
   }
 
+  /**
+   * Recursively collects all files under {@code dir} whose absolute path ends with the supplied {@code extension}.
+   *
+   * @param fileNames the (mutable) list that receives the matching file paths
+   * @param dir       the directory to search
+   * @param extension the file extension to look for
+   * @return {@code fileNames} for chaining
+   */
   public static List<String> findFilesByExtension(
     final List<String> fileNames, final Path dir, final String extension) {
     try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
@@ -44,6 +56,14 @@ public final class FileUtilities {
     return fileNames;
   }
 
+  /**
+   * Recursively collects all files under {@code dir} whose absolute path ends with one of the supplied {@code files} names.
+   *
+   * @param fileNames the (mutable) list that receives the matching file paths
+   * @param dir       the directory to search
+   * @param files     the file name suffixes to look for
+   * @return {@code fileNames} for chaining
+   */
   public static List<String> findFiles(
     final List<String> fileNames, final Path dir, final String... files) {
     try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
@@ -70,10 +90,22 @@ public final class FileUtilities {
     return fileNames;
   }
 
+  /**
+   * Returns the extension of the supplied file path (without the leading dot), or an empty string if the path has no extension.
+   *
+   * @param file the file path
+   * @return the extension, or {@code ""}
+   */
   public static String getExtension(final Path file) {
     return getExtension(file.toAbsolutePath().toString());
   }
 
+  /**
+   * Returns the extension of the supplied path string (without the leading dot), or an empty string if the path has no extension.
+   *
+   * @param path the path string
+   * @return the extension, or {@code ""}
+   */
   public static String getExtension(final String path) {
     final String fileName = getFileName(path, true);
     if (!fileName.contains(".")) {
@@ -86,14 +118,33 @@ public final class FileUtilities {
     }
   }
 
+  /**
+   * Returns the file name (without extension) of the supplied URL.
+   *
+   * @param path the URL
+   * @return the file name without extension
+   */
   public static String getFileName(URL path) {
     return getFileName(path.getPath());
   }
 
+  /**
+   * Returns the file name (without extension) of the supplied path string.
+   *
+   * @param path the path string
+   * @return the file name without extension
+   */
   public static String getFileName(final String path) {
     return getFileName(path, false);
   }
 
+  /**
+   * Returns the file name of the supplied path string, optionally including the extension.
+   *
+   * @param path      the path string
+   * @param extension {@code true} to keep the extension; {@code false} to strip it
+   * @return the file name
+   */
   public static String getFileName(final String path, boolean extension) {
     if (path == null
       || path.isEmpty()

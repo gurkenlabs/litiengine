@@ -9,12 +9,22 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Static utility methods for working with TMX-style maps, map objects, tiles and tile coordinates. Most overloads default to the map of the currently
+ * loaded environment.
+ */
 public final class MapUtilities {
 
   private MapUtilities() {
     throw new UnsupportedOperationException();
   }
 
+  /**
+   * Computes the combined axis-aligned bounding box of the supplied map objects.
+   *
+   * @param objects the map objects whose bounding boxes are merged
+   * @return the union bounding box
+   */
   public static Rectangle2D getBounds(IMapObject... objects) {
     double x = Double.MAX_VALUE;
     double y = Double.MAX_VALUE;
@@ -31,6 +41,13 @@ public final class MapUtilities {
     return new Rectangle2D.Double(x, y, maxX - x, maxY - y);
   }
 
+  /**
+   * Returns the maximum {@link IMapObject#getId() id} of any map object on the given map. Returns {@code 0} if the map is {@code null} or contains no
+   * map object layers.
+   *
+   * @param map the map to inspect
+   * @return the maximum map object id
+   */
   public static int getMaxMapId(final IMap map) {
     int maxId = 0;
     if (map == null || map.getMapObjectLayers() == null) {
@@ -56,6 +73,13 @@ public final class MapUtilities {
     return maxId;
   }
 
+  /**
+   * Snaps the given pixel-space rectangle to the bounding box of the tiles it covers on the given map.
+   *
+   * @param map the map providing tile size and orientation
+   * @param box the pixel-space rectangle to snap
+   * @return the bounding box that covers all enclosed tiles
+   */
   public static Rectangle2D getTileBoundingBox(final IMap map, final Rectangle2D box) {
     final int minX = (int) Math.clamp(box.getX(), 0, map.getSizeInPixels().getWidth() - 1);
     final int minY = (int) Math.clamp(box.getY(), 0, map.getSizeInPixels().getHeight() - 1);
@@ -130,11 +154,25 @@ public final class MapUtilities {
       || (staggerIndex == StaggerIndex.EVEN && !MathUtilities.isOddNumber(index));
   }
 
+  /**
+   * Converts a tile coordinate to its pixel-space top-left location on the given map.
+   *
+   * @param map          the map providing tile size
+   * @param tileLocation the tile coordinate
+   * @return the pixel-space location of the tile's top-left corner
+   */
   public static Point2D getMapLocation(final IMap map, final Point tileLocation) {
     return new Point2D.Double(tileLocation.x * map.getTileSize().getWidth(),
       tileLocation.y * map.getTileSize().getHeight());
   }
 
+  /**
+   * Returns all tiles from any tile layer on the given map that contain the supplied pixel-space location.
+   *
+   * @param map      the map to inspect
+   * @param location the pixel-space location
+   * @return the matching tiles, ordered by layer (bottom to top)
+   */
   public static List<ITile> getTilesByPixelLocation(final IMap map, final Point2D location) {
     final List<ITile> tilesAtLocation = new ArrayList<>();
     if (map.getTileLayers() == null || map.getTileLayers().isEmpty()) {
@@ -152,6 +190,12 @@ public final class MapUtilities {
     return tilesAtLocation;
   }
 
+  /**
+   * Returns the top-most non-empty tile at the given pixel-space location on the current environment's map.
+   *
+   * @param location the pixel-space location
+   * @return the top-most tile, or {@code null} if no environment or tile is found
+   */
   public static ITile getTopMostTile(final Point2D location) {
     if (Game.world().environment() == null || Game.world().environment().getMap() == null) {
       return null;
@@ -160,6 +204,13 @@ public final class MapUtilities {
     return getTopMostTile(Game.world().environment().getMap(), location);
   }
 
+  /**
+   * Returns the top-most non-empty tile at the given pixel-space location on the supplied map.
+   *
+   * @param map      the map to inspect
+   * @param location the pixel-space location
+   * @return the top-most tile, or {@code null} if no tile is found
+   */
   public static ITile getTopMostTile(final IMap map, final Point2D location) {
     if (map.getTileLayers() == null || map.getTileLayers().isEmpty()) {
       return null;
@@ -168,6 +219,12 @@ public final class MapUtilities {
     return getTopMostTile(map.getOrientation().getTile(location, map));
   }
 
+  /**
+   * Returns the top-most non-empty tile at the given tile coordinate on the current environment's map.
+   *
+   * @param point the tile coordinate
+   * @return the top-most tile, or {@code null} if no environment or tile is found
+   */
   public static ITile getTopMostTile(final Point point) {
     if (Game.world().environment() == null || Game.world().environment().getMap() == null) {
       return null;
@@ -176,6 +233,13 @@ public final class MapUtilities {
     return getTopMostTile(Game.world().environment().getMap(), point);
   }
 
+  /**
+   * Returns the top-most non-empty tile at the given tile coordinate on the supplied map.
+   *
+   * @param map   the map to inspect
+   * @param point the tile coordinate
+   * @return the top-most tile, or {@code null} if no tile is found
+   */
   public static ITile getTopMostTile(final IMap map, final Point point) {
     final Point tileLocation = point;
 
@@ -216,6 +280,12 @@ public final class MapUtilities {
     return match;
   }
 
+  /**
+   * Converts a polyline or polygon map object to a {@link Path2D} in absolute (map-space) coordinates.
+   *
+   * @param mapObject the polyline or polygon map object
+   * @return the resulting path, or {@code null} if the object is not a polyline/polygon or contains no points
+   */
   public static Path2D convertPolyshapeToPath(final IMapObject mapObject) {
     if (mapObject == null || (!mapObject.isPolygon() && !mapObject.isPolyline())) {
       return null;
@@ -242,6 +312,12 @@ public final class MapUtilities {
     return path;
   }
 
+  /**
+   * Returns the points of a polyline or polygon map object translated to absolute (map-space) coordinates.
+   *
+   * @param mapObject the polyline or polygon map object
+   * @return the absolute points, or an empty list if the object is not a polyline/polygon
+   */
   public static List<Point2D> getAbsolutePolyshapePoints(final IMapObject mapObject) {
     if (mapObject.isPolygon()) {
       return mapObject.getPolygon().getAbsolutePoints(mapObject.getLocation());
@@ -254,6 +330,13 @@ public final class MapUtilities {
     return new ArrayList<>();
   }
 
+  /**
+   * Searches the supplied map for a map object with the given id.
+   *
+   * @param map the map to search
+   * @param id  the id to look up
+   * @return the matching map object, or {@code null} if none exists
+   */
   public static IMapObject findMapObject(final IMap map, final int id) {
     for (IMapObjectLayer layer : map.getMapObjectLayers()) {
       for (IMapObject obj : layer.getMapObjects()) {
@@ -266,10 +349,23 @@ public final class MapUtilities {
     return null;
   }
 
+  /**
+   * Returns the bounding box of the tile that contains the given pixel-space location on the current environment's map.
+   *
+   * @param mapLocation the pixel-space location
+   * @return the enclosing tile's bounding box
+   */
   public static Rectangle2D getTileBoundingBox(final Point2D mapLocation) {
     return getTileBoundingBox(getCurrentMap(), mapLocation);
   }
 
+  /**
+   * Returns the bounding box of the tile that contains the given pixel-space location on the supplied map.
+   *
+   * @param map         the map providing tile size and orientation
+   * @param mapLocation the pixel-space location
+   * @return the enclosing tile's bounding box, or an empty rectangle if {@code map} is {@code null}
+   */
   public static Rectangle2D getTileBoundingBox(final IMap map, final Point2D mapLocation) {
     if (map == null) {
       return new Rectangle2D.Double();
@@ -278,18 +374,46 @@ public final class MapUtilities {
     return map.getOrientation().getEnclosingTileBounds(mapLocation, map);
   }
 
+  /**
+   * Returns the bounding box of the tile at the given tile coordinate on the current environment's map.
+   *
+   * @param x the tile x coordinate
+   * @param y the tile y coordinate
+   * @return the tile's bounding box
+   */
   public static Rectangle2D getTileBoundingBox(final int x, final int y) {
     return getTileBoundingBox(getCurrentMap(), x, y);
   }
 
+  /**
+   * Returns the bounding box of the tile at the given tile coordinate on the supplied map.
+   *
+   * @param map the map providing tile size and orientation
+   * @param x   the tile x coordinate
+   * @param y   the tile y coordinate
+   * @return the tile's bounding box
+   */
   public static Rectangle2D getTileBoundingBox(final IMap map, final int x, final int y) {
     return getTileBoundingBox(map, new Point(x, y));
   }
 
+  /**
+   * Returns the bounding box of the tile at the given tile coordinate on the current environment's map.
+   *
+   * @param tile the tile coordinate
+   * @return the tile's bounding box
+   */
   public static Rectangle2D getTileBoundingBox(final Point tile) {
     return getTileBoundingBox(getCurrentMap(), tile);
   }
 
+  /**
+   * Returns the bounding box of the tile at the given tile coordinate on the supplied map.
+   *
+   * @param map  the map providing tile size and orientation
+   * @param tile the tile coordinate
+   * @return the tile's bounding box, or an empty rectangle if {@code map} is {@code null}
+   */
   public static Rectangle2D getTileBoundingBox(final IMap map, final Point tile) {
     if (map == null) {
       return new Rectangle2D.Double();

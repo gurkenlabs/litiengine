@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.entities;
 
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import java.awt.Graphics2D;
+import java.io.Serial;
 import java.util.EventObject;
 
 /**
@@ -10,7 +11,7 @@ import java.util.EventObject;
  * @see RenderEngine#renderEntity(Graphics2D, IEntity)
  */
 public class EntityRenderEvent extends EventObject {
-  private static final long serialVersionUID = 6397005859146712222L;
+  @Serial private static final long serialVersionUID = 6397005859146712222L;
 
   private final transient Graphics2D graphics;
   private final transient IEntity entity;

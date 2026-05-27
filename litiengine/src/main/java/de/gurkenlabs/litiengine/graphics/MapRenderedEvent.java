@@ -2,10 +2,11 @@ package de.gurkenlabs.litiengine.graphics;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import java.awt.Graphics2D;
+import java.io.Serial;
 import java.util.EventObject;
 
 public class MapRenderedEvent extends EventObject {
-  private static final long serialVersionUID = -562565518335076236L;
+  @Serial private static final long serialVersionUID = -562565518335076236L;
   private final transient IMap map;
   private final transient Graphics2D graphics;
 

@@ -40,6 +40,14 @@ public class Resolution {
     this.ratio = ratio;
   }
 
+  /**
+   * Creates a custom {@code Resolution} with the given dimensions and ratio name.
+   *
+   * @param width          the resolution width in pixels
+   * @param height         the resolution height in pixels
+   * @param resolutionName the display name of the ratio
+   * @return a new custom resolution
+   */
   public static Resolution custom(int width, int height, String resolutionName) {
     return new Resolution(width, height, new Ratio(width, height, resolutionName));
   }
@@ -71,10 +79,21 @@ public class Resolution {
     return this.dimension;
   }
 
+  /**
+   * Returns the resolution dimensions as a string using {@code "x"} as the delimiter (e.g. {@code "1920x1080"}).
+   *
+   * @return the dimension string
+   */
   public String toDimensionString() {
     return this.toDimensionString("x");
   }
 
+  /**
+   * Returns the resolution dimensions as a string using the provided delimiter.
+   *
+   * @param delimiter the delimiter to place between width and height
+   * @return the dimension string
+   */
   public String toDimensionString(String delimiter) {
     return this.getWidth() + delimiter + this.getHeight();
   }
@@ -95,13 +114,25 @@ public class Resolution {
 
   /** Contains predefined {@code Resolutions} with an aspect ratio of 4:3. */
   public static class Ratio4x3 extends Ratio {
+    /**
+     * 4:3 resolution 640x480.
+     */
     public static final Resolution RES_640x480 = new Resolution(640, 480, new Ratio4x3());
+    /**
+     * 4:3 resolution 720x576.
+     */
     public static final Resolution RES_720x576 = new Resolution(720, 576, new Ratio4x3());
+    /** 4:3 resolution 800x600. */
     public static final Resolution RES_800x600 = new Resolution(800, 600, new Ratio4x3());
+    /** 4:3 resolution 1024x768. */
     public static final Resolution RES_1024x768 = new Resolution(1024, 768, new Ratio4x3());
+    /** 4:3 resolution 1152x864. */
     public static final Resolution RES_1152x864 = new Resolution(1152, 864, new Ratio4x3());
+    /** 4:3 resolution 1280x960. */
     public static final Resolution RES_1280x960 = new Resolution(1280, 960, new Ratio4x3());
+    /** 4:3 resolution 1600x1200. */
     public static final Resolution RES_1600x1200 = new Resolution(1600, 1200, new Ratio4x3());
+    /** 4:3 resolution 1920x1440. */
     public static final Resolution RES_1920x1440 = new Resolution(1920, 1440, new Ratio4x3());
 
     private Ratio4x3() {
@@ -120,6 +151,7 @@ public class Resolution {
 
   /** Contains predefined {@code Resolutions} with an aspect ratio of 5:4. */
   public static class Ratio5x4 extends Ratio {
+    /** 5:4 resolution 1280x1024. */
     public static final Resolution RES_1280x1024 = new Resolution(1280, 1024, new Ratio5x4());
 
     private Ratio5x4() {
@@ -138,12 +170,19 @@ public class Resolution {
 
   /** Contains predefined {@code Resolutions} with an aspect ratio of 16:9. */
   public static class Ratio16x9 extends Ratio {
+    /** 16:9 resolution 1280x720 (HD). */
     public static final Resolution RES_1280x720 = new Resolution(1280, 720, new Ratio16x9());
+    /** 16:9 resolution 1360x768. */
     public static final Resolution RES_1360x768 = new Resolution(1360, 768, new Ratio16x9());
+    /** 16:9 resolution 1366x768. */
     public static final Resolution RES_1366x768 = new Resolution(1366, 768, new Ratio16x9());
+    /** 16:9 resolution 1536x864. */
     public static final Resolution RES_1536x864 = new Resolution(1536, 864, new Ratio16x9());
+    /** 16:9 resolution 1600x900. */
     public static final Resolution RES_1600x900 = new Resolution(1600, 900, new Ratio16x9());
+    /** 16:9 resolution 1920x1080 (Full HD). */
     public static final Resolution RES_1920x1080 = new Resolution(1920, 1080, new Ratio16x9());
+    /** 16:9 resolution 2560x1440 (QHD). */
     public static final Resolution RES_2560x1440 = new Resolution(2560, 1440, new Ratio16x9());
 
     private Ratio16x9() {
@@ -162,10 +201,15 @@ public class Resolution {
 
   /** Contains predefined {@code Resolutions} with an aspect ratio of 16:10. */
   public static class Ratio16x10 extends Ratio {
+    /** 16:10 resolution 720x480. */
     public static final Resolution RES_720x480 = new Resolution(720, 480, new Ratio16x10());
+    /** 16:10 resolution 1280x800. */
     public static final Resolution RES_1280x800 = new Resolution(1280, 800, new Ratio16x10());
+    /** 16:10 resolution 1440x900. */
     public static final Resolution RES_1440x900 = new Resolution(1440, 900, new Ratio16x10());
+    /** 16:10 resolution 1680x1050. */
     public static final Resolution RES_1680x1050 = new Resolution(1680, 1050, new Ratio16x10());
+    /** 16:10 resolution 1920x1200. */
     public static final Resolution RES_1920x1200 = new Resolution(1920, 1200, new Ratio16x10());
 
     private Ratio16x10() {
@@ -182,21 +226,43 @@ public class Resolution {
     }
   }
 
+  /**
+   * Describes an aspect ratio used to categorize {@link Resolution} instances. The ratio consists of a name and the {@code x:y} components.
+   */
   public static class Ratio {
     private final String name;
     private final int x;
     private final int y;
 
+    /**
+     * Constructs a new {@code Ratio} with the given components. The name defaults to {@code "x:y"}.
+     *
+     * @param x the x component of the ratio
+     * @param y the y component of the ratio
+     */
     protected Ratio(int x, int y) {
       this(x, y, x + ":" + y);
     }
 
+    /**
+     * Constructs a new {@code Ratio} with the given components and explicit name.
+     *
+     * @param x    the x component of the ratio
+     * @param y    the y component of the ratio
+     * @param name the display name of the ratio
+     */
     protected Ratio(int x, int y, String name) {
       this.x = x;
       this.y = y;
       this.name = name;
     }
 
+    /**
+     * Collects all public static {@link Resolution} fields declared on the supplied class.
+     *
+     * @param clz the class whose declared {@code Resolution} fields will be returned
+     * @return all matching resolutions
+     */
     protected static List<Resolution> getAll(Class<?> clz) {
       List<Resolution> resolutions = new ArrayList<>();
 

@@ -2,10 +2,11 @@ package de.gurkenlabs.litiengine.input;
 
 import de.gurkenlabs.input4j.InputComponent;
 
+import java.io.Serial;
 import java.util.EventObject;
 
 public class GamepadEvent extends EventObject {
-  private static final long serialVersionUID = -6174813700465768116L;
+  @Serial private static final long serialVersionUID = -6174813700465768116L;
 
   private final transient Gamepad gamepad;
   private final String component;

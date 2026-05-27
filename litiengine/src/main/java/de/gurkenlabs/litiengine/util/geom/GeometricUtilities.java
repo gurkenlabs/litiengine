@@ -17,6 +17,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Static utility methods for 2D geometric calculations used throughout the engine, such as distance and angle computations, shape intersection
+ * checks, scaling, and ray casting.
+ */
 public class GeometricUtilities {
   private static final double RAYCAST_EPSILON = 0.01;
   /**
@@ -32,6 +36,16 @@ public class GeometricUtilities {
     throw new UnsupportedOperationException();
   }
 
+  /**
+   * Calculates the clockwise rotation angle in degrees from a center point to a target point. The returned angle is in the range {@code [0, 360)} and
+   * uses the LITIengine coordinate system where {@code 0} degrees points NORTH.
+   *
+   * @param centerX the x coordinate of the center point
+   * @param centerY the y coordinate of the center point
+   * @param targetX the x coordinate of the target point
+   * @param targetY the y coordinate of the target point
+   * @return the clockwise rotation angle in degrees
+   */
   public static double calcRotationAngleInDegrees(
       final double centerX, final double centerY, final double targetX, final double targetY) {
     // calculate the angle theta from the deltaY and deltaX values
@@ -94,11 +108,27 @@ public class GeometricUtilities {
         && rectangle.getY() + rectangle.getHeight() >= p.getY();
   }
 
+  /**
+   * Computes the Euclidean distance between two points.
+   *
+   * @param p1X the x coordinate of the first point
+   * @param p1Y the y coordinate of the first point
+   * @param p2X the x coordinate of the second point
+   * @param p2Y the y coordinate of the second point
+   * @return the Euclidean distance
+   */
   public static double distance(
       final double p1X, final double p1Y, final double p2X, final double p2Y) {
     return Math.sqrt((p1X - p2X) * (p1X - p2X) + (p1Y - p2Y) * (p1Y - p2Y));
   }
 
+  /**
+   * Computes the Euclidean distance between two points.
+   *
+   * @param p1 the first point
+   * @param p2 the second point
+   * @return the Euclidean distance
+   */
   public static double distance(final Point2D p1, final Point2D p2) {
     return Math.sqrt(
         (p1.getX() - p2.getX()) * (p1.getX() - p2.getX())
@@ -120,6 +150,13 @@ public class GeometricUtilities {
     return Math.sqrt(dx * dx + dy * dy);
   }
 
+  /**
+   * Returns a new rectangle with the given extension applied to all sides of the input rectangle.
+   *
+   * @param rect the input rectangle
+   * @param ext  the number of units to add to each side
+   * @return the extruded rectangle
+   */
   public static Rectangle2D extrude(Rectangle2D rect, double ext) {
     return new Rectangle2D.Double(
         rect.getX() - ext,
@@ -128,10 +165,25 @@ public class GeometricUtilities {
         rect.getHeight() + ext * 2);
   }
 
+  /**
+   * Determines whether two points are within the given epsilon distance of each other.
+   *
+   * @param point1  the first point
+   * @param point2  the second point
+   * @param epsilon the maximum allowed distance for the points to be considered equal
+   * @return {@code true} if the distance between the points is less than {@code epsilon}
+   */
   public static boolean equals(final Point2D point1, final Point2D point2, final double epsilon) {
     return point1.distance(point2) < epsilon;
   }
 
+  /**
+   * Returns the line segments that connect the supplied point to each of the supplied rectangle corner points.
+   *
+   * @param point      the starting point
+   * @param rectPoints the corner points to connect to
+   * @return the connecting line segments, one per corner point
+   */
   public static Line2D[] getConnectingLines(final Point2D point, final Point2D[] rectPoints) {
     final Line2D[] lines = new Line2D[rectPoints.length];
 
@@ -143,6 +195,13 @@ public class GeometricUtilities {
     return lines;
   }
 
+  /**
+   * Extracts the constraining line segments of the given {@link Area} by iterating over its path. The returned list contains every
+   * {@link PathIterator#SEG_LINETO} as well as the closing segments of every sub-path.
+   *
+   * @param area the area to inspect
+   * @return the list of line segments that form the area's boundary
+   */
   public static List<Line2D.Double> getConstrainingLines(final Area area) {
     final ArrayList<double[]> areaPoints = new ArrayList<>();
     final ArrayList<Line2D.Double> areaSegments = new ArrayList<>();
@@ -189,6 +248,13 @@ public class GeometricUtilities {
     return areaSegments;
   }
 
+  /**
+   * Computes the unit X displacement (cosine component) for the given angle in degrees, expressed in the LITIengine coordinate system where {@code 0}
+   * degrees points NORTH.
+   *
+   * @param angle the angle in degrees
+   * @return the unit X displacement
+   */
   public static float getDeltaX(double angle) {
     double actualAngle = angle - 90;
 
@@ -200,6 +266,13 @@ public class GeometricUtilities {
     return Trigonometry.cosDeg((float) actualAngle);
   }
 
+  /**
+   * Computes the unit Y displacement (sine component) for the given angle in degrees, expressed in the LITIengine coordinate system where {@code 0}
+   * degrees points NORTH.
+   *
+   * @param angle the angle in degrees
+   * @return the unit Y displacement
+   */
   public static float getDeltaY(double angle) {
     double actualAngle = angle - 90;
 
@@ -211,10 +284,24 @@ public class GeometricUtilities {
     return Trigonometry.sinDeg((float) actualAngle);
   }
 
+  /**
+   * Computes the X displacement for the given angle and delta magnitude.
+   *
+   * @param angle the angle in degrees
+   * @param delta the magnitude
+   * @return the X displacement
+   */
   public static double getDeltaX(final double angle, final double delta) {
     return Math.sin(Math.toRadians(angle)) * delta * 100 / 100.0;
   }
 
+  /**
+   * Computes the Y displacement for the given angle and delta magnitude.
+   *
+   * @param angle the angle in degrees
+   * @param delta the magnitude
+   * @return the Y displacement
+   */
   public static double getDeltaY(final double angle, final double delta) {
     return Math.cos(Math.toRadians(angle)) * delta * 100 / 100.0;
   }
@@ -355,6 +442,12 @@ public class GeometricUtilities {
     return lines;
   }
 
+  /**
+   * Computes the diagonal length of the given rectangle.
+   *
+   * @param rect the rectangle; may be {@code null}
+   * @return the diagonal length, or {@code 0} if {@code rect} is {@code null}
+   */
   public static double getDiagonal(Rectangle2D rect) {
     if (rect == null) {
       return 0;
@@ -363,14 +456,36 @@ public class GeometricUtilities {
     return Math.sqrt(Math.pow(rect.getWidth(), 2) + Math.pow(rect.getHeight(), 2));
   }
 
+  /**
+   * Returns the midpoint of the given line.
+   *
+   * @param line the line
+   * @return the midpoint
+   */
   public static Point2D getCenter(final Line2D line) {
     return getCenter(line.getP1(), line.getP2());
   }
 
+  /**
+   * Returns the midpoint between two points.
+   *
+   * @param p1 the first point
+   * @param p2 the second point
+   * @return the midpoint
+   */
   public static Point2D getCenter(final Point2D p1, final Point2D p2) {
     return getCenter(p1.getX(), p2.getX(), p1.getY(), p2.getY());
   }
 
+  /**
+   * Returns the midpoint of the rectangle defined by the two given coordinate pairs.
+   *
+   * @param x1 the x coordinate of the first point
+   * @param y1 the y coordinate of the first point
+   * @param x2 the x coordinate of the second point
+   * @param y2 the y coordinate of the second point
+   * @return the midpoint
+   */
   public static Point2D getCenter(
       final double x1, final double y1, final double x2, final double y2) {
     return new Point2D.Double((x1 + x2) / 2, (y1 + y2) / 2);
@@ -397,15 +512,34 @@ public class GeometricUtilities {
     return new Point2D.Double(shape.getCenterX(), shape.getCenterY());
   }
 
+  /**
+   * Creates a circle (as an {@link Ellipse2D}) with the given center and radius.
+   *
+   * @param center the center of the circle
+   * @param radius the radius of the circle
+   * @return the resulting ellipse
+   */
   public static Ellipse2D getCircle(Point2D center, double radius) {
     return new Ellipse2D.Double(
         center.getX() - radius, center.getY() - radius, radius * 2, radius * 2);
   }
 
+  /**
+   * Returns the average (centroid) location of the supplied collection of points.
+   *
+   * @param points the points
+   * @return the average location, or {@code null} if {@code points} is empty
+   */
   public static Point2D getAverageLocation(Collection<Point2D> points) {
     return getAverageLocation(points.toArray(new Point2D[points.size()]));
   }
 
+  /**
+   * Returns the average (centroid) location of the supplied points.
+   *
+   * @param points the points
+   * @return the average location, or {@code null} if no points are supplied
+   */
   public static Point2D getAverageLocation(Point2D... points) {
     if (points.length == 0) {
       return null;
@@ -450,6 +584,14 @@ public class GeometricUtilities {
     return new Point2D.Double(x4, y4);
   }
 
+  /**
+   * Returns the point on the circle defined by {@code center} and {@code radius} at the given angle.
+   *
+   * @param center the center of the circle
+   * @param radius the radius of the circle
+   * @param angle  the angle in degrees (clockwise, {@code 0} pointing EAST)
+   * @return the point on the circle
+   */
   public static Point2D getPointOnCircle(
       final Point2D center, final double radius, final double angle) {
     final double x = center.getX() + radius * Math.cos(Math.toRadians(angle));
@@ -458,6 +600,12 @@ public class GeometricUtilities {
     return new Point2D.Double(x, y);
   }
 
+  /**
+   * Extracts the start points of all segments of the supplied path.
+   *
+   * @param path the path to iterate
+   * @return the list of segment start points
+   */
   public static List<Point2D> getPoints(final Path2D path) {
     final PathIterator pi = path.getPathIterator(null);
     final double[] coordinates = new double[22];
@@ -536,6 +684,14 @@ public class GeometricUtilities {
     return line;
   }
 
+  /**
+   * Tests whether two rectangles meaningfully intersect. Touching edges (zero-area overlap) and overlaps below an internal floating-point epsilon are
+   * treated as non-intersecting in order to avoid spurious collisions.
+   *
+   * @param a the first rectangle
+   * @param b the second rectangle
+   * @return {@code true} if the rectangles overlap by more than the internal epsilon
+   */
   public static boolean intersects(final Rectangle2D a, final Rectangle2D b) {
     return a.getWidth() * 0.5 + b.getWidth() * 0.5 - Math.abs(a.getCenterX() - b.getCenterX())
             > INTERSECTION_EPSILON
@@ -543,6 +699,14 @@ public class GeometricUtilities {
             > INTERSECTION_EPSILON;
   }
 
+  /**
+   * Tests whether two ellipses intersect. Uses a circle/circle fast-path when both ellipses are circles; otherwise falls back to a generic shape
+   * intersection test.
+   *
+   * @param a the first ellipse
+   * @param b the second ellipse
+   * @return {@code true} if the ellipses overlap
+   */
   public static boolean intersects(final Ellipse2D a, final Ellipse2D b) {
     if (a.getWidth() != a.getHeight() || b.getWidth() != b.getHeight()) {
       return shapeIntersects(a, b);
@@ -601,6 +765,14 @@ public class GeometricUtilities {
     return new Point2D.Double(start.getX() + dx * scalar / len, start.getY() + dy * scalar / len);
   }
 
+  /**
+   * Performs a ray cast from the given point against the supplied rectangle and returns the visible corner points (i.e. corners that are not occluded
+   * by another corner along the ray).
+   *
+   * @param point     the origin of the ray cast
+   * @param rectangle the rectangle to test against
+   * @return the visible corner points of the rectangle
+   */
   public static Point2D[] rayCastPoints(final Point2D point, final Rectangle2D rectangle) {
     // 1. get all rectangle points
     final List<Point2D> rectPoints = getPoints(rectangle);
@@ -632,6 +804,13 @@ public class GeometricUtilities {
     return resultPoints.toArray(new Point2D[resultPoints.size()]);
   }
 
+  /**
+   * Scales the given rectangle so that its longest side equals {@code max} pixels, preserving its aspect ratio.
+   *
+   * @param shape the rectangle to scale
+   * @param max   the maximum side length in pixels
+   * @return the scaled shape
+   */
   public static Shape scaleRect(final Rectangle2D shape, final int max) {
     Dimension2D newDimension = scaleWithRatio(shape.getWidth(), shape.getHeight(), max);
     if (newDimension == null) {
@@ -643,6 +822,14 @@ public class GeometricUtilities {
     return transform.createTransformedShape(shape);
   }
 
+  /**
+   * Computes a {@link Dimension2D} preserving the aspect ratio of {@code width:height} so that the longest side equals {@code max}.
+   *
+   * @param width  the original width
+   * @param height the original height
+   * @param max    the desired maximum side length
+   * @return the scaled dimension, or {@code null} if {@code width} or {@code height} is {@code 0}
+   */
   public static Dimension2D scaleWithRatio(final double width, final double height, final int max) {
     if (width == 0 || height == 0) {
       return null;
@@ -669,6 +856,13 @@ public class GeometricUtilities {
     return dim;
   }
 
+  /**
+   * Applies a uniform scaling transformation to the given shape.
+   *
+   * @param shape the shape to scale
+   * @param scale the scaling factor applied to both axes
+   * @return the scaled shape
+   */
   public static Shape scaleShape(final Shape shape, final double scale) {
     final AffineTransform transform = AffineTransform.getScaleInstance(scale, scale);
     return transform.createTransformedShape(shape);
@@ -707,6 +901,13 @@ public class GeometricUtilities {
     return !areaA.isEmpty();
   }
 
+  /**
+   * Translates the given shape so that the top-left corner of its bounding box matches the supplied location.
+   *
+   * @param shape       the shape to translate
+   * @param newLocation the new top-left location of the shape's bounding box
+   * @return the translated shape
+   */
   public static Shape translateShape(final Shape shape, final Point2D newLocation) {
     final AffineTransform t = new AffineTransform();
     t.translate(

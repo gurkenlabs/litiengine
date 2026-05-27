@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.entities;
 
+import java.io.Serial;
 import java.util.EventObject;
 import java.util.List;
 
@@ -7,7 +8,7 @@ import java.util.List;
  * Represents an event triggered by a {@link Trigger} in the game.
  */
 public class TriggerEvent extends EventObject {
-  private static final long serialVersionUID = 3624707673365488289L;
+  @Serial private static final long serialVersionUID = 3624707673365488289L;
 
   private final transient IEntity entity;
   private final transient String message;

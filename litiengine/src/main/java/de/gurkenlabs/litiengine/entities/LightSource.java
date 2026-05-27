@@ -34,11 +34,19 @@ public class LightSource extends Entity implements IRenderable {
    * Enum representing the type of light source.
    */
   public enum Type {
+    /**
+     * Ellipse-shaped light source.
+     */
     ELLIPSE,
+    /**
+     * Rectangle-shaped light source.
+     */
     RECTANGLE
   }
 
+  /** Message identifier used to toggle this light source via the engine's messaging system. */
   public static final String TOGGLE_MESSAGE = "toggle";
+  /** Default light intensity used when none is specified. */
   public static final int DEFAULT_INTENSITY = 100;
 
   private static final float OBSTRUCTED_VISION_RADIUS = 200f;
@@ -105,10 +113,20 @@ public class LightSource extends Entity implements IRenderable {
     updateAmbientLayers();
   }
 
+  /**
+   * Gets the color of the light emitted by this source.
+   *
+   * @return the light color
+   */
   public Color getColor() {
     return color;
   }
 
+  /**
+   * Builds the radial gradient paint used to render the light cone, fading from the source color outwards.
+   *
+   * @return the gradient paint
+   */
   public RadialGradientPaint getGradientPaint() {
     final Color[] transColors =
       new Color[] {
@@ -122,32 +140,67 @@ public class LightSource extends Entity implements IRenderable {
   }
 
 
+  /**
+   * Gets the light intensity. Returns {@code 0} when the light source is inactive.
+   *
+   * @return the current intensity
+   */
   public int getIntensity() {
     return isActive() ? intensity : 0;
   }
 
+  /**
+   * Gets the geometric shape representing this light source's emission area.
+   *
+   * @return the light shape
+   */
   public Shape getLightShape() {
     return lightShape;
   }
 
+  /**
+   * Gets the type of shape used by this light source.
+   *
+   * @return the shape type
+   */
   public Type getLightShapeType() {
     return lightShapeType;
   }
 
+  /**
+   * Returns whether the light source is currently active.
+   *
+   * @return {@code true} if active
+   */
   public boolean isActive() {
     return activated;
   }
 
+  /**
+   * Sets the color of the light emitted by this source and refreshes the affected ambient layers.
+   *
+   * @param color the new color
+   */
   public void setColor(final Color color) {
     this.color = color;
     updateAmbientLayers();
   }
 
+  /**
+   * Sets the intensity of the light and refreshes the affected ambient layers.
+   *
+   * @param intensity the new intensity
+   */
   public void setIntensity(final int intensity) {
     this.intensity = intensity;
     updateAmbientLayers();
   }
 
+  /**
+   * Sets the shape type of the light source.
+   *
+   * @param shapeType the new shape type
+   */
   public void setLightShapeType(final Type shapeType) {
     this.lightShapeType = shapeType;
   }

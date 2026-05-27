@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.sound;
 
+import java.io.Serial;
 import java.util.EventObject;
 
 /**
@@ -9,7 +10,7 @@ import java.util.EventObject;
  * @see SoundPlayback#finish()
  */
 public class SoundEvent extends EventObject {
-  private static final long serialVersionUID = -2070316328855430839L;
+  @Serial private static final long serialVersionUID = -2070316328855430839L;
 
   private final transient Sound sound;
 

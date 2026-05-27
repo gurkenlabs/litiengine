@@ -1,12 +1,17 @@
 package de.gurkenlabs.litiengine.environment.tilemap;
 
 import de.gurkenlabs.litiengine.graphics.RenderType;
-
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.geom.Point2D;
 
 public interface ILayer extends ICustomPropertyProvider {
 
+  /**
+   * Gets the unique id of the layer.
+   *
+   * @return the layer id
+   */
   int getId();
 
   /**
@@ -16,6 +21,11 @@ public interface ILayer extends ICustomPropertyProvider {
    */
   String getName();
 
+  /**
+   * Sets the name of the layer.
+   *
+   * @param name the layer name
+   */
   void setName(String name);
 
   /**
@@ -25,6 +35,11 @@ public interface ILayer extends ICustomPropertyProvider {
    */
   float getOpacity();
 
+  /**
+   * Sets the opacity of the layer in the range {@code [0, 1]}.
+   *
+   * @param opacity the opacity to set
+   */
   void setOpacity(float opacity);
 
   /**
@@ -83,6 +98,11 @@ public interface ILayer extends ICustomPropertyProvider {
    */
   Dimension getSizeInTiles();
 
+  /**
+   * Gets the map that owns this layer.
+   *
+   * @return the owning map
+   */
   IMap getMap();
 
   /**
@@ -92,17 +112,52 @@ public interface ILayer extends ICustomPropertyProvider {
    */
   boolean isVisible();
 
+  /**
+   * Sets whether the layer is visible.
+   *
+   * @param visible {@code true} to make the layer visible
+   */
   void setVisible(boolean visible);
 
+  /**
+   * Gets the render type used when drawing this layer.
+   *
+   * @return the render type
+   */
   RenderType getRenderType();
 
+  /**
+   * Sets the render type used when drawing this layer.
+   *
+   * @param renderType the render type
+   */
   void setRenderType(RenderType renderType);
 
+  /**
+   * Gets the width of the layer, in tiles.
+   *
+   * @return the width in tiles
+   */
   int getWidth();
 
+  /**
+   * Sets the width of the layer, in tiles.
+   *
+   * @param newWidth the new width in tiles
+   */
   void setWidth(int newWidth);
 
+  /**
+   * Gets the height of the layer, in tiles.
+   *
+   * @return the height in tiles
+   */
   int getHeight();
 
+  /**
+   * Sets the height of the layer, in tiles.
+   *
+   * @param newWidth the new height in tiles
+   */
   void setHeight(int newWidth);
 }

@@ -12,6 +12,12 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
+/**
+ * Base class for particles spawned by a {@link Emitter}. A particle has a position, velocity, acceleration, lifetime, color and rendering options.
+ * <p>
+ * Subclasses are responsible for implementing {@link #render(Graphics2D, Point2D)} which draws the particle relative to the emitter origin.
+ * </p>
+ */
 public abstract class Particle implements ITimeToLive {
 
   private static final Color DEFAULT_COLOR = Color.BLACK;
@@ -103,62 +109,138 @@ public abstract class Particle implements ITimeToLive {
       this.getWidth(), this.getHeight());
   }
 
+  /**
+   * Gets the collision behavior of this particle.
+   *
+   * @return the collision behavior
+   */
   public Collision getCollisionType() {
     return collisionType;
   }
 
+  /**
+   * Gets the current color of the particle.
+   *
+   * @return the color
+   */
   public Color getColor() {
     return color;
   }
 
+  /**
+   * Gets the per-update height delta applied to the particle.
+   *
+   * @return the height delta
+   */
   public float getDeltaHeight() {
     return deltaHeight;
   }
 
+  /**
+   * Gets the per-update width delta applied to the particle.
+   *
+   * @return the width delta
+   */
   public float getDeltaWidth() {
     return deltaWidth;
   }
 
+  /**
+   * Gets the horizontal velocity of the particle.
+   *
+   * @return the horizontal velocity
+   */
   public float getVelocityX() {
     return velocityX;
   }
 
+  /**
+   * Gets the vertical velocity of the particle.
+   *
+   * @return the vertical velocity
+   */
   public float getVelocityY() {
     return velocityY;
   }
 
+  /**
+   * Gets the horizontal acceleration of the particle.
+   *
+   * @return the horizontal acceleration
+   */
   public float getAccelerationX() {
     return accelerationX;
   }
 
+  /**
+   * Gets the vertical acceleration of the particle.
+   *
+   * @return the vertical acceleration
+   */
   public float getAccelerationY() {
     return accelerationY;
   }
 
+  /**
+   * Gets the current rotation angle of the particle, in degrees.
+   *
+   * @return the current angle
+   */
   public float getAngle() {
     return angle;
   }
 
+  /**
+   * Gets the per-update angle delta applied to the particle, in degrees.
+   *
+   * @return the angle delta
+   */
   public float getDeltaAngle() {
     return deltaAngle;
   }
 
+  /**
+   * Gets the current height of the particle, in pixels.
+   *
+   * @return the particle height
+   */
   public float getHeight() {
     return height;
   }
 
+  /**
+   * Gets the outline thickness used when rendering the particle as an outline.
+   *
+   * @return the outline thickness
+   */
   public float getOutlineThickness() {
     return outlineThickness;
   }
 
+  /**
+   * Returns whether the particle is rendered as an outline only.
+   *
+   * @return {@code true} if outline-only rendering is enabled
+   */
   public boolean isOutlineOnly() {
     return outlineOnly;
   }
 
+  /**
+   * Returns whether the particle is rendered with anti-aliasing.
+   *
+   * @return {@code true} if anti-aliasing is enabled
+   */
   public boolean isAntiAliased() {
     return antiAliasing;
   }
 
+  /**
+   * Computes the current opacity of the particle. If fading is enabled and the particle has a finite time-to-live, the opacity decreases linearly
+   * from the color's initial alpha towards zero as the particle ages.
+   *
+   * @return the opacity in the range {@code [0, 1]}
+   */
   public float getOpacity() {
     if (isFading() && getTimeToLive() > 0) {
       float maxAlpha = getColor().getAlpha() / 255f;
@@ -183,6 +265,11 @@ public abstract class Particle implements ITimeToLive {
     return getAbsoluteLocation(newEffectLocation);
   }
 
+  /**
+   * Gets the custom render type that overrides the emitter's render type, if {@link #usesCustomRenderType()} is {@code true}.
+   *
+   * @return the custom render type
+   */
   public RenderType getCustomRenderType() {
     return customRenderType;
   }
@@ -192,36 +279,83 @@ public abstract class Particle implements ITimeToLive {
     return timeToLive;
   }
 
+  /**
+   * Gets the current width of the particle, in pixels.
+   *
+   * @return the particle width
+   */
   public float getWidth() {
     return width;
   }
 
+  /**
+   * Gets the X position of the particle relative to its emitter origin.
+   *
+   * @return the X position
+   */
   public float getX() {
     return x;
   }
 
+  /**
+   * Gets the Y position of the particle relative to its emitter origin.
+   *
+   * @return the Y position
+   */
   public float getY() {
     return y;
   }
 
+  /**
+   * Returns whether the particle fades out over its lifetime.
+   *
+   * @return {@code true} if fading is enabled
+   */
   public boolean isFading() {
     return fade;
   }
 
+  /**
+   * Returns whether the particle fades upon collision.
+   *
+   * @return {@code true} if fade-on-collision is enabled
+   */
   public boolean isFadingOnCollision() {
     return fadeOnCollision;
   }
 
+  /**
+   * Returns whether continuous (ray-cast) collision detection is enabled for this particle.
+   *
+   * @return {@code true} if continuous collision detection is enabled
+   */
   public boolean isContinuousCollisionEnabled() {
     return continuousCollision;
   }
 
+  /**
+   * Returns whether the particle stops moving once a collision occurs.
+   *
+   * @return {@code true} if the particle stops on collision
+   */
   public boolean isStoppingOnCollision() {
     return stopOnCollision;
   }
 
+  /**
+   * Renders this particle to the given graphics context.
+   *
+   * @param g             the graphics context to draw to
+   * @param emitterOrigin the world location of the owning emitter
+   */
   public abstract void render(final Graphics2D g, final Point2D emitterOrigin);
 
+  /**
+   * Sets the collision behavior of this particle.
+   *
+   * @param collisionType the new collision behavior
+   * @return this particle instance for chaining
+   */
   public Particle setCollisionType(final Collision collisionType) {
     this.collisionType = collisionType;
     return this;
@@ -238,11 +372,23 @@ public abstract class Particle implements ITimeToLive {
     return this;
   }
 
+  /**
+   * Sets whether the particle stops moving when it collides.
+   *
+   * @param stopOnCollision {@code true} to stop the particle on collision
+   * @return this particle instance for chaining
+   */
   public Particle setStopOnCollision(boolean stopOnCollision) {
     this.stopOnCollision = stopOnCollision;
     return this;
   }
 
+  /**
+   * Sets the color of the particle. {@code null} values are ignored.
+   *
+   * @param color the new color
+   * @return this particle instance for chaining
+   */
   public Particle setColor(final Color color) {
     if (color != null) {
       this.color = color;
@@ -250,102 +396,222 @@ public abstract class Particle implements ITimeToLive {
     return this;
   }
 
+  /**
+   * Sets the per-update height delta applied to the particle.
+   *
+   * @param deltaHeight the height delta
+   * @return this particle instance for chaining
+   */
   public Particle setDeltaHeight(final float deltaHeight) {
     this.deltaHeight = deltaHeight;
     return this;
   }
 
+  /**
+   * Sets the horizontal acceleration of the particle.
+   *
+   * @param accelerationX the horizontal acceleration
+   * @return this particle instance for chaining
+   */
   public Particle setAccelerationX(final float accelerationX) {
     this.accelerationX = accelerationX;
     return this;
   }
 
+  /**
+   * Sets the vertical acceleration of the particle.
+   *
+   * @param accelerationY the vertical acceleration
+   * @return this particle instance for chaining
+   */
   public Particle setAccelerationY(final float accelerationY) {
     this.accelerationY = accelerationY;
     return this;
   }
 
+  /**
+   * Sets the current rotation angle of the particle, in degrees.
+   *
+   * @param angle the angle to set
+   * @return this particle instance for chaining
+   */
   public Particle setAngle(final float angle) {
     this.angle = angle;
     return this;
   }
 
+  /**
+   * Sets the per-update angle delta applied to the particle, in degrees.
+   *
+   * @param deltaAngle the angle delta
+   * @return this particle instance for chaining
+   */
   public Particle setDeltaAngle(final float deltaAngle) {
     this.deltaAngle = deltaAngle;
     return this;
   }
 
+  /**
+   * Sets the per-update width delta applied to the particle.
+   *
+   * @param deltaWidth the width delta
+   * @return this particle instance for chaining
+   */
   public Particle setDeltaWidth(final float deltaWidth) {
     this.deltaWidth = deltaWidth;
     return this;
   }
 
+  /**
+   * Sets the horizontal velocity of the particle.
+   *
+   * @param velocityX the horizontal velocity
+   * @return this particle instance for chaining
+   */
   public Particle setVelocityX(final float velocityX) {
     this.velocityX = velocityX;
     return this;
   }
 
+  /**
+   * Sets the vertical velocity of the particle.
+   *
+   * @param velocityY the vertical velocity
+   * @return this particle instance for chaining
+   */
   public Particle setVelocityY(final float velocityY) {
     this.velocityY = velocityY;
     return this;
   }
 
+  /**
+   * Sets whether the particle fades out over its lifetime.
+   *
+   * @param fade {@code true} to enable fading
+   * @return this particle instance for chaining
+   */
   public Particle setFade(boolean fade) {
     this.fade = fade;
     return this;
   }
 
+  /**
+   * Sets whether the particle fades upon collision.
+   *
+   * @param fadeOnCollision {@code true} to enable fade-on-collision
+   * @return this particle instance for chaining
+   */
   public Particle setFadeOnCollision(boolean fadeOnCollision) {
     this.fadeOnCollision = fadeOnCollision;
     return this;
   }
 
+  /**
+   * Sets the height of the particle, in pixels.
+   *
+   * @param height the height to set
+   * @return this particle instance for chaining
+   */
   public Particle setHeight(final float height) {
     this.height = height;
     return this;
   }
 
+  /**
+   * Sets the outline thickness used when rendering the particle as an outline.
+   *
+   * @param outlineThickness the outline thickness
+   * @return this particle instance for chaining
+   */
   public Particle setOutlineThickness(final float outlineThickness) {
     this.outlineThickness = outlineThickness;
     return this;
   }
 
+  /**
+   * Sets whether the particle is rendered as an outline only.
+   *
+   * @param outlineOnly {@code true} to enable outline-only rendering
+   * @return this particle instance for chaining
+   */
   public Particle setOutlineOnly(final boolean outlineOnly) {
     this.outlineOnly = outlineOnly;
     return this;
   }
 
+  /**
+   * Sets whether the particle is rendered with anti-aliasing.
+   *
+   * @param antiAliasing {@code true} to enable anti-aliasing
+   * @return this particle instance for chaining
+   */
   public Particle setAntiAliasing(final boolean antiAliasing) {
     this.antiAliasing = antiAliasing;
     return this;
   }
 
+  /**
+   * Sets a custom render type that overrides the emitter's render type for this particle.
+   *
+   * @param renderType the render type to use
+   * @return this particle instance for chaining
+   */
   public Particle setCustomRenderType(RenderType renderType) {
     this.customRenderType = renderType;
     this.useCustomRenderType = true;
     return this;
   }
 
+  /**
+   * Sets the width of the particle, in pixels.
+   *
+   * @param width the width to set
+   * @return this particle instance for chaining
+   */
   public Particle setWidth(final float width) {
     this.width = width;
     return this;
   }
 
+  /**
+   * Sets the X position of the particle relative to its emitter origin.
+   *
+   * @param x the X position
+   * @return this particle instance for chaining
+   */
   public Particle setX(final float x) {
     this.x = x;
     return this;
   }
 
+  /**
+   * Sets the Y position of the particle relative to its emitter origin.
+   *
+   * @param y the Y position
+   * @return this particle instance for chaining
+   */
   public Particle setY(final float y) {
     this.y = y;
     return this;
   }
 
+  /**
+   * Sets the time-to-live (TTL) of the particle, in milliseconds.
+   *
+   * @param ttl the TTL to set
+   * @return this particle instance for chaining
+   */
   public Particle setTimeToLive(final int ttl) {
     this.timeToLive = ttl;
     return this;
   }
 
+  /**
+   * Initializes this particle's mutable state from the supplied {@link EmitterData}.
+   *
+   * @param data the emitter data providing initial parameter values
+   * @return this particle instance for chaining
+   */
   public Particle init(final EmitterData data) {
     this.setX((float) data.getParticleOffsetX().get());
     this.setY((float) data.getParticleOffsetY().get());
@@ -490,18 +756,41 @@ public abstract class Particle implements ITimeToLive {
     }
   }
 
+  /**
+   * Computes the absolute world location of this particle given an emitter origin.
+   *
+   * @param effectLocation the emitter origin
+   * @return the absolute world location of the particle
+   */
   public Point2D getAbsoluteLocation(final Point2D effectLocation) {
     return new Point2D.Float(getAbsoluteX(effectLocation), getAbsoluteY(effectLocation));
   }
 
+  /**
+   * Computes the absolute world X coordinate of this particle, accounting for the particle's width.
+   *
+   * @param emitterOrigin the emitter origin
+   * @return the absolute X coordinate
+   */
   protected float getAbsoluteX(Point2D emitterOrigin) {
     return (float) (emitterOrigin.getX() + this.getX() - this.getWidth() / 2.0);
   }
 
+  /**
+   * Computes the absolute world Y coordinate of this particle, accounting for the particle's height.
+   *
+   * @param emitterOrigin the emitter origin
+   * @return the absolute Y coordinate
+   */
   protected float getAbsoluteY(Point2D emitterOrigin) {
     return (float) (emitterOrigin.getY() + this.getY() - this.getHeight() / 2.0);
   }
 
+  /**
+   * Returns whether this particle has a custom render type that overrides the emitter's render type.
+   *
+   * @return {@code true} if a custom render type is set
+   */
   public boolean usesCustomRenderType() {
     return useCustomRenderType;
   }

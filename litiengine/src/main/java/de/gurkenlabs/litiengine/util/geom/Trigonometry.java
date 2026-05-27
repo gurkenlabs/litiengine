@@ -1,5 +1,9 @@
 package de.gurkenlabs.litiengine.util.geom;
 
+/**
+ * Provides fast, approximate trigonometric functions backed by precomputed look-up tables. Useful when many calls are made per frame and the slight
+ * approximation error introduced by table look-ups is acceptable.
+ */
 public final class Trigonometry {
   private static final int ATAN2_BITS = 7;
   private static final int ATAN2_BITS2 = ATAN2_BITS << 1;
@@ -44,6 +48,13 @@ public final class Trigonometry {
     throw new UnsupportedOperationException();
   }
 
+  /**
+   * Fast approximation of {@link Math#atan2(double, double)} in radians.
+   *
+   * @param y the y component
+   * @param x the x component
+   * @return the angle, in radians
+   */
   public static final float atan2(float y, float x) {
     float add;
     float mul;
@@ -79,26 +90,64 @@ public final class Trigonometry {
     return (atan2[yi * ATAN2_DIM + xi] + add) * mul;
   }
 
+  /**
+   * Fast approximation of {@link Math#atan2(double, double)} in degrees.
+   *
+   * @param y the y component
+   * @param x the x component
+   * @return the angle, in degrees
+   */
   public static final float atan2Deg(final float y, final float x) {
     return atan2(y, x) * DEG;
   }
 
+  /**
+   * Strict (non-approximated) {@link Math#atan2(double, double)} in degrees.
+   *
+   * @param y the y component
+   * @param x the x component
+   * @return the angle, in degrees
+   */
   public static final float atan2DegStrict(final float y, final float x) {
     return (float) Math.atan2(y, x) * DEG;
   }
 
+  /**
+   * Fast approximation of {@link Math#cos(double)}.
+   *
+   * @param rad the angle, in radians
+   * @return the cosine
+   */
   public static final float cos(final float rad) {
     return cos[(int) (rad * RAD_TO_INDEX) & SIN_MASK];
   }
 
+  /**
+   * Fast approximation of {@link Math#cos(double)} accepting degrees.
+   *
+   * @param deg the angle, in degrees
+   * @return the cosine
+   */
   public static final float cosDeg(final float deg) {
     return cos[(int) (deg * DEG_TO_INDEX) & SIN_MASK];
   }
 
+  /**
+   * Fast approximation of {@link Math#sin(double)}.
+   *
+   * @param rad the angle, in radians
+   * @return the sine
+   */
   public static final float sin(final float rad) {
     return sin[(int) (rad * RAD_TO_INDEX) & SIN_MASK];
   }
 
+  /**
+   * Fast approximation of {@link Math#sin(double)} accepting degrees.
+   *
+   * @param deg the angle, in degrees
+   * @return the sine
+   */
   public static final float sinDeg(final float deg) {
     return sin[(int) (deg * DEG_TO_INDEX) & SIN_MASK];
   }
