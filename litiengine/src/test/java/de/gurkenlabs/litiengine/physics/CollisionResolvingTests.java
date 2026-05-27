@@ -109,12 +109,7 @@ class CollisionResolvingTests {
 
     // act
     // "slide" along the rectangle to the bottom left
-    // TODO: target collision box wrongfully detects an intersection with blocking collision box due
-    // to floating point precision miscalculation
-    // within method GeometricUtilities.intersects - intersection is marginally positive in case of
-    // left movement, but marginally negative in right movement
-    // Game.physics().move(ent, 315, MOVE_10X10Y_DISTANCE);
-    Game.physics().move(ent, 315, MOVE_10X10Y_DISTANCE - (1e-14));
+    Game.physics().move(ent, 315, MOVE_10X10Y_DISTANCE);
 
     // assert
     assertEquals(10, ent.getX(), EPSILON);

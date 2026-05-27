@@ -19,6 +19,14 @@ import java.util.List;
 
 public class GeometricUtilities {
   private static final double RAYCAST_EPSILON = 0.01;
+  /**
+   * Tolerance used by {@link #intersects(Rectangle2D, Rectangle2D)} to ignore overlaps that
+   * are too small to be meaningful and most likely caused by floating-point imprecision (e.g.
+   * after sine/cosine based projections in the physics engine). Without this tolerance, two
+   * rectangles that are supposed to merely touch can be reported as intersecting because of
+   * a sub-femto-unit overlap, which leads to spurious collisions when sliding along walls.
+   */
+  private static final double INTERSECTION_EPSILON = 1e-9;
 
   private GeometricUtilities() {
     throw new UnsupportedOperationException();
@@ -529,8 +537,10 @@ public class GeometricUtilities {
   }
 
   public static boolean intersects(final Rectangle2D a, final Rectangle2D b) {
-    return Math.abs(a.getCenterX() - b.getCenterX()) < a.getWidth() * 0.5 + b.getWidth() * 0.5
-        && Math.abs(a.getCenterY() - b.getCenterY()) < a.getHeight() * 0.5 + b.getHeight() * 0.5;
+    return a.getWidth() * 0.5 + b.getWidth() * 0.5 - Math.abs(a.getCenterX() - b.getCenterX())
+            > INTERSECTION_EPSILON
+        && a.getHeight() * 0.5 + b.getHeight() * 0.5 - Math.abs(a.getCenterY() - b.getCenterY())
+            > INTERSECTION_EPSILON;
   }
 
   public static boolean intersects(final Ellipse2D a, final Ellipse2D b) {
