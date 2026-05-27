@@ -390,15 +390,14 @@ public final class GameWindow {
   }
 
   private static float setResolution(Container host, Dimension dim) {
-    // For a decorated (windowed) JFrame that is not in native exclusive fullscreen, use pack() so
-    // that the frame is sized via the layout manager.  This avoids a race where toolkit decorations
-    // (e.g. GTK client-side decorations) are applied asynchronously after setVisible(true): pack()
-    // reads the insets atomically and produces a frame size that is always consistent with the
-    // insets returned by getInsets() at the point the call returns.
-    if (host instanceof JFrame jframe
-        && !jframe.isUndecorated()
-        && !GraphicsEnvironment.isHeadless()
-        && GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getFullScreenWindow() != jframe) {
+    // For a decorated (windowed) JFrame that is not in native exclusive fullscreen, use pack() to
+    // avoid a race where toolkit decorations (e.g. GTK client-side decorations) are applied
+    // asynchronously after setVisible(true): pack() reads the insets and sizes the frame
+    // atomically, so frame size and getInsets() are always consistent when the call returns.
+    if (host instanceof JFrame jframe       // must be a JFrame to support pack()
+        && !jframe.isUndecorated()          // BORDERLESS has no insets; setSize() is fine there
+        && !GraphicsEnvironment.isHeadless() // guard before accessing the default screen device
+        && GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getFullScreenWindow() != jframe) { // skip native exclusive fullscreen
       jframe.getContentPane().setPreferredSize(dim);
       jframe.pack();
     } else {
