@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Utility that selects a single representative ("base") variant per logical sprite family (props & creatures). The selection logic mirrors what the
+ * Utility that selects a single representative ("base") variant per logical sprite family (props &amp; creatures). The selection logic mirrors what the
  * AssetTree shows:
  * <ul>
  *   <li>Props: prefer explicit intact (prop-id-intact), else plain (prop-id), else first variant.</li>
