@@ -17,6 +17,6 @@ jobs:
     steps:
       - uses: actions/first-interaction@1c4688942c71f71d4f5502a26ea67c331730fa4d # v3.1.0
         with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          issue-message: 'Thank you for your reporting your first LITIENGINE issue! We are looking forward to your further contributions.'
-          pr-message: 'Amazing, your first Pull Request in the LITIENGINE repository! You have earned the rank of "contributor" - let us know your nickname in the Forum and on Discord so we can reward you with the new role :).'
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          issue_message: 'Thank you for your reporting your first LITIENGINE issue! We are looking forward to your further contributions.'
+          pr_message: 'Amazing, your first Pull Request in the LITIENGINE repository! You have earned the rank of "contributor" - let us know your nickname in the Forum and on Discord so we can reward you with the new role :).'
