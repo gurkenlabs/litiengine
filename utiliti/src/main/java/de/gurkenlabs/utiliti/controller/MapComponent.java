@@ -17,7 +17,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
-import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
+import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterAttributes;
 import de.gurkenlabs.litiengine.gui.ComponentMouseEvent;
 import de.gurkenlabs.litiengine.gui.ComponentMouseWheelEvent;
 import de.gurkenlabs.litiengine.gui.GuiComponent;
@@ -544,7 +544,7 @@ public class MapComponent extends GuiComponent {
     }
     if (getFocusedMapObject().getType().equals(MapObjectType.EMITTER.toString())) {
       Emitter emitter = Game.world().environment().getEmitter(getFocusedMapObject().getId());
-      final EmitterData data = emitter.data();
+      final EmitterAttributes data = emitter.data();
       data.setName(name.toString());
 
       Editor.instance()
@@ -947,7 +947,7 @@ public class MapComponent extends GuiComponent {
 
     switch (type) {
       case EMITTER:
-        EmitterData defaultData = new EmitterData();
+        EmitterAttributes defaultData = new EmitterAttributes();
         defaultData.initDefaults();
         defaultData.setWidth(mo.getWidth());
         defaultData.setHeight(mo.getHeight());

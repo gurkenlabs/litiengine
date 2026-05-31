@@ -1,7 +1,7 @@
 package de.gurkenlabs.litiengine.graphics.emitters;
 
 import de.gurkenlabs.litiengine.entities.IEntity;
-import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
+import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterAttributes;
 import java.awt.geom.Point2D;
 
 /**
@@ -43,25 +43,25 @@ public class EntityEmitter extends Emitter {
   }
 
   /**
-   * Constructs a new EntityEmitter with EmitterData that follows an entity's location.
+   * Constructs a new EntityEmitter with EmitterAttributes that follows an entity's location.
    *
    * @param entity          The IEntity to which this emitter is bound.
-   * @param emitterData     The EmitterData object defining the emitter's behavior.
+   * @param emitterData     The EmitterAttributes object defining the emitter's behavior.
    * @param dynamicLocation If true, the emitter follows the entity's location; if false, it remains at the location where it has been created.
    */
   public EntityEmitter(
-    final IEntity entity, final EmitterData emitterData, final boolean dynamicLocation) {
+    final IEntity entity, final EmitterAttributes emitterData, final boolean dynamicLocation) {
     this(entity, dynamicLocation);
     setEmitterData(emitterData);
   }
 
   /**
-   * Constructs a new EntityEmitter with EmitterData that remains at the location where it has been created.
+   * Constructs a new EntityEmitter with EmitterAttributes that remains at the location where it has been created.
    *
    * @param entity      The IEntity to which this emitter is bound.
-   * @param emitterData The EmitterData object defining the emitter's behavior.
+   * @param emitterData The EmitterAttributes object defining the emitter's behavior.
    */
-  public EntityEmitter(final IEntity entity, final EmitterData emitterData) {
+  public EntityEmitter(final IEntity entity, final EmitterAttributes emitterData) {
     this(entity, emitterData, false);
   }
 

@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.graphics.emitters.xml;
 
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Valign;
+import de.gurkenlabs.litiengine.attributes.RangeAttribute;
 import de.gurkenlabs.litiengine.configuration.Quality;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.ParticleType;
@@ -31,7 +32,7 @@ import java.util.List;
  */
 @XmlRootElement(name = "emitter")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class EmitterData implements Serializable, Resource {
+public class EmitterAttributes implements Serializable, Resource {
   /**
    * Default base color used for emitted particles when no colors are configured.
    */
@@ -177,19 +178,19 @@ public class EmitterData implements Serializable, Resource {
 
   /** Per-particle height delta parameter. */
   @XmlElement
-  private ParticleParameter deltaHeight;
+  private RangeAttribute<Float> deltaHeight;
 
   /** Per-particle width delta parameter. */
   @XmlElement
-  private ParticleParameter deltaWidth;
+  private RangeAttribute<Float> deltaWidth;
 
   /** Horizontal velocity parameter of spawned particles. */
   @XmlElement
-  private ParticleParameter velocityX;
+  private RangeAttribute<Float> velocityX;
 
   /** Vertical velocity parameter of spawned particles. */
   @XmlElement
-  private ParticleParameter velocityY;
+  private RangeAttribute<Float> velocityY;
 
   /** Emitter duration in milliseconds; {@code 0} means the emitter runs indefinitely. */
   @XmlAttribute
@@ -213,23 +214,23 @@ public class EmitterData implements Serializable, Resource {
 
   /** Horizontal acceleration parameter of spawned particles. */
   @XmlElement
-  private ParticleParameter accelerationX;
+  private RangeAttribute<Float> accelerationX;
 
   /** Vertical acceleration parameter of spawned particles. */
   @XmlElement
-  private ParticleParameter accelerationY;
+  private RangeAttribute<Float> accelerationY;
 
   /** Starting angle parameter for spawned particles, in degrees. */
   @XmlElement
-  private ParticleParameter angle;
+  private RangeAttribute<Float> angle;
 
   /** Per-particle angle delta parameter, in degrees per update. */
   @XmlElement
-  private ParticleParameter deltaAngle;
+  private RangeAttribute<Float> deltaAngle;
 
   /** Outline thickness parameter applied to outline-rendered particles. */
   @XmlElement
-  private ParticleParameter outlineThickness;
+  private RangeAttribute<Float> outlineThickness;
 
   /** Height of the emitter in pixels. */
   @XmlAttribute
@@ -253,11 +254,11 @@ public class EmitterData implements Serializable, Resource {
 
   /** Per-particle height parameter. */
   @XmlElement
-  private ParticleParameter particleHeight;
+  private RangeAttribute<Float> particleHeight;
 
   /** Particle time-to-live (TTL) parameter in milliseconds. */
   @XmlElement
-  private ParticleParameter particleTTL;
+  private RangeAttribute<Long> particleTTL;
 
   /** List of texts used by text-rendering particles. */
   @XmlElementWrapper
@@ -270,7 +271,7 @@ public class EmitterData implements Serializable, Resource {
 
   /** Per-particle width parameter. */
   @XmlElement
-  private ParticleParameter particleWidth;
+  private RangeAttribute<Float> particleWidth;
 
   /** Number of particles spawned per spawn tick. */
   @XmlAttribute
@@ -294,33 +295,33 @@ public class EmitterData implements Serializable, Resource {
 
   /** Horizontal spawn offset parameter relative to the emitter origin. */
   @XmlElement
-  private ParticleParameter offsetX;
+  private RangeAttribute<Float> offsetX;
 
   /** Vertical spawn offset parameter relative to the emitter origin. */
   @XmlElement
-  private ParticleParameter offsetY;
+  private RangeAttribute<Float> offsetY;
 
   /**
-   * Creates a new {@code EmitterData} instance and initializes all {@link ParticleParameter} fields and other defaults required for the emitter to be
+   * Creates a new {@code EmitterAttributes} instance and initializes all {@link RangeAttribute} fields and other defaults required for the emitter to be
    * rendered and updated correctly.
    */
-  public EmitterData() {
+  public EmitterAttributes() {
     // initialize fields required for rendering and updating properly.
     this.requiredQuality = DEFAULT_REQUIRED_QUALITY;
-    this.offsetX = new ParticleParameter();
-    this.offsetY = new ParticleParameter();
-    this.deltaWidth = new ParticleParameter();
-    this.deltaHeight = new ParticleParameter();
-    this.angle = new ParticleParameter();
-    this.deltaAngle = new ParticleParameter();
-    this.velocityX = new ParticleParameter();
-    this.velocityY = new ParticleParameter();
-    this.accelerationX = new ParticleParameter();
-    this.accelerationY = new ParticleParameter();
-    this.outlineThickness = new ParticleParameter();
-    this.particleWidth = new ParticleParameter();
-    this.particleHeight = new ParticleParameter();
-    this.particleTTL = new ParticleParameter();
+    this.offsetX = new RangeAttribute<>();
+    this.offsetY = new RangeAttribute<>();
+    this.deltaWidth = new RangeAttribute<>();
+    this.deltaHeight = new RangeAttribute<>();
+    this.angle = new RangeAttribute<>();
+    this.deltaAngle = new RangeAttribute<>();
+    this.velocityX = new RangeAttribute<>();
+    this.velocityY = new RangeAttribute<>();
+    this.accelerationX = new RangeAttribute<>();
+    this.accelerationY = new RangeAttribute<>();
+    this.outlineThickness = new RangeAttribute<>();
+    this.particleWidth = new RangeAttribute<>();
+    this.particleHeight = new RangeAttribute<>();
+    this.particleTTL = new RangeAttribute<>();
     this.collision = DEFAULT_COLLISION;
     this.particleType = DEFAULT_PARTICLE_TYPE;
     this.originValign = DEFAULT_ORIGIN_VALIGN;
@@ -456,10 +457,10 @@ public class EmitterData implements Serializable, Resource {
   /**
    * Gets the per-particle height delta parameter.
    *
-   * @return the height delta {@link ParticleParameter}
+   * @return the height delta {@link RangeAttribute}
    */
   @XmlTransient
-  public ParticleParameter getDeltaHeight() {
+  public RangeAttribute<Float> getDeltaHeight() {
     return this.deltaHeight;
   }
 
@@ -468,17 +469,17 @@ public class EmitterData implements Serializable, Resource {
    *
    * @param deltaHeight the height delta parameter to set
    */
-  public void setDeltaHeight(final ParticleParameter deltaHeight) {
+  public void setDeltaHeight(final RangeAttribute<Float> deltaHeight) {
     this.deltaHeight = deltaHeight;
   }
 
   /**
    * Gets the per-particle width delta parameter.
    *
-   * @return the width delta {@link ParticleParameter}
+   * @return the width delta {@link RangeAttribute}
    */
   @XmlTransient
-  public ParticleParameter getDeltaWidth() {
+  public RangeAttribute<Float> getDeltaWidth() {
     return this.deltaWidth;
   }
 
@@ -487,17 +488,17 @@ public class EmitterData implements Serializable, Resource {
    *
    * @param deltaWidth the width delta parameter to set
    */
-  public void setDeltaWidth(final ParticleParameter deltaWidth) {
+  public void setDeltaWidth(final RangeAttribute<Float> deltaWidth) {
     this.deltaWidth = deltaWidth;
   }
 
   /**
    * Gets the starting angle parameter for spawned particles.
    *
-   * @return the angle {@link ParticleParameter}
+   * @return the angle {@link RangeAttribute}
    */
   @XmlTransient
-  public ParticleParameter getAngle() {
+  public RangeAttribute<Float> getAngle() {
     return this.angle;
   }
 
@@ -506,27 +507,27 @@ public class EmitterData implements Serializable, Resource {
    *
    * @param angle the angle parameter to set
    */
-  public void setAngle(final ParticleParameter angle) {
+  public void setAngle(final RangeAttribute<Float> angle) {
     this.angle = angle;
   }
 
   /**
    * Gets the per-particle angle delta parameter.
    *
-   * @return the angle delta {@link ParticleParameter}
+   * @return the angle delta {@link RangeAttribute}
    */
   @XmlTransient
-  public ParticleParameter getDeltaAngle() {
+  public RangeAttribute<Float> getDeltaAngle() {
     return this.deltaAngle;
   }
 
   /**
    * Gets the horizontal velocity parameter of spawned particles.
    *
-   * @return the horizontal velocity {@link ParticleParameter}
+   * @return the horizontal velocity {@link RangeAttribute}
    */
   @XmlTransient
-  public ParticleParameter getVelocityX() {
+  public RangeAttribute<Float> getVelocityX() {
     return this.velocityX;
   }
 
@@ -535,17 +536,17 @@ public class EmitterData implements Serializable, Resource {
    *
    * @param velocityX the horizontal velocity parameter to set
    */
-  public void setVelocityX(final ParticleParameter velocityX) {
+  public void setVelocityX(final RangeAttribute<Float> velocityX) {
     this.velocityX = velocityX;
   }
 
   /**
    * Gets the vertical velocity parameter of spawned particles.
    *
-   * @return the vertical velocity {@link ParticleParameter}
+   * @return the vertical velocity {@link RangeAttribute}
    */
   @XmlTransient
-  public ParticleParameter getVelocityY() {
+  public RangeAttribute<Float> getVelocityY() {
     return this.velocityY;
   }
 
@@ -554,7 +555,7 @@ public class EmitterData implements Serializable, Resource {
    *
    * @param velocityY the vertical velocity parameter to set
    */
-  public void setVelocityY(final ParticleParameter velocityY) {
+  public void setVelocityY(final RangeAttribute<Float> velocityY) {
     this.velocityY = velocityY;
   }
 
@@ -580,10 +581,10 @@ public class EmitterData implements Serializable, Resource {
   /**
    * Gets the horizontal acceleration parameter of spawned particles.
    *
-   * @return the horizontal acceleration {@link ParticleParameter}
+   * @return the horizontal acceleration {@link RangeAttribute}
    */
   @XmlTransient
-  public ParticleParameter getAccelerationX() {
+  public RangeAttribute<Float> getAccelerationX() {
     return this.accelerationX;
   }
 
@@ -592,17 +593,17 @@ public class EmitterData implements Serializable, Resource {
    *
    * @param accelerationX the horizontal acceleration parameter to set
    */
-  public void setAccelerationX(final ParticleParameter accelerationX) {
+  public void setAccelerationX(final RangeAttribute<Float> accelerationX) {
     this.accelerationX = accelerationX;
   }
 
   /**
    * Gets the vertical acceleration parameter of spawned particles.
    *
-   * @return the vertical acceleration {@link ParticleParameter}
+   * @return the vertical acceleration {@link RangeAttribute}
    */
   @XmlTransient
-  public ParticleParameter getAccelerationY() {
+  public RangeAttribute<Float> getAccelerationY() {
     return this.accelerationY;
   }
 
@@ -611,17 +612,17 @@ public class EmitterData implements Serializable, Resource {
    *
    * @param accelerationY the vertical acceleration parameter to set
    */
-  public void setAccelerationY(final ParticleParameter accelerationY) {
+  public void setAccelerationY(final RangeAttribute<Float> accelerationY) {
     this.accelerationY = accelerationY;
   }
 
   /**
    * Gets the outline thickness parameter applied to outline-rendered particles.
    *
-   * @return the outline thickness {@link ParticleParameter}
+   * @return the outline thickness {@link RangeAttribute}
    */
   @XmlTransient
-  public ParticleParameter getOutlineThickness() {
+  public RangeAttribute<Float> getOutlineThickness() {
     return this.outlineThickness;
   }
 
@@ -630,7 +631,7 @@ public class EmitterData implements Serializable, Resource {
    *
    * @param outlineThickness the outline thickness parameter to set
    */
-  public void setOutlineThickness(final ParticleParameter outlineThickness) {
+  public void setOutlineThickness(final RangeAttribute<Float> outlineThickness) {
     this.outlineThickness = outlineThickness;
   }
 
@@ -724,10 +725,10 @@ public class EmitterData implements Serializable, Resource {
   /**
    * Gets the per-particle height parameter.
    *
-   * @return the particle height {@link ParticleParameter}
+   * @return the particle height {@link RangeAttribute}
    */
   @XmlTransient
-  public ParticleParameter getParticleHeight() {
+  public RangeAttribute<Float> getParticleHeight() {
     return this.particleHeight;
   }
 
@@ -736,17 +737,17 @@ public class EmitterData implements Serializable, Resource {
    *
    * @param particleHeight the particle height parameter to set
    */
-  public void setParticleHeight(final ParticleParameter particleHeight) {
+  public void setParticleHeight(final RangeAttribute<Float> particleHeight) {
     this.particleHeight = particleHeight;
   }
 
   /**
    * Gets the particle time-to-live (TTL) parameter, in milliseconds.
    *
-   * @return the particle TTL {@link ParticleParameter}
+   * @return the particle TTL {@link RangeAttribute}
    */
   @XmlTransient
-  public ParticleParameter getParticleTTL() {
+  public RangeAttribute<Long> getParticleTTL() {
     return this.particleTTL;
   }
 
@@ -755,7 +756,7 @@ public class EmitterData implements Serializable, Resource {
    *
    * @param particleTTL the particle TTL parameter to set
    */
-  public void setParticleTTL(final ParticleParameter particleTTL) {
+  public void setParticleTTL(final RangeAttribute<Long> particleTTL) {
     this.particleTTL = particleTTL;
   }
 
@@ -800,10 +801,10 @@ public class EmitterData implements Serializable, Resource {
   /**
    * Gets the per-particle width parameter.
    *
-   * @return the particle width {@link ParticleParameter}
+   * @return the particle width {@link RangeAttribute}
    */
   @XmlTransient
-  public ParticleParameter getParticleWidth() {
+  public RangeAttribute<Float> getParticleWidth() {
     return this.particleWidth;
   }
 
@@ -812,17 +813,17 @@ public class EmitterData implements Serializable, Resource {
    *
    * @param particleWidth the particle width parameter to set
    */
-  public void setParticleWidth(final ParticleParameter particleWidth) {
+  public void setParticleWidth(final RangeAttribute<Float> particleWidth) {
     this.particleWidth = particleWidth;
   }
 
   /**
    * Gets the horizontal spawn offset parameter relative to the emitter origin.
    *
-   * @return the horizontal offset {@link ParticleParameter}
+   * @return the horizontal offset {@link RangeAttribute}
    */
   @XmlTransient
-  public ParticleParameter getParticleOffsetX() {
+  public RangeAttribute<Float> getParticleOffsetX() {
     return this.offsetX;
   }
 
@@ -831,17 +832,17 @@ public class EmitterData implements Serializable, Resource {
    *
    * @param x the horizontal offset parameter to set
    */
-  public void setParticleOffsetX(final ParticleParameter x) {
+  public void setParticleOffsetX(final RangeAttribute<Float> x) {
     this.offsetX = x;
   }
 
   /**
    * Gets the vertical spawn offset parameter relative to the emitter origin.
    *
-   * @return the vertical offset {@link ParticleParameter}
+   * @return the vertical offset {@link RangeAttribute}
    */
   @XmlTransient
-  public ParticleParameter getParticleOffsetY() {
+  public RangeAttribute<Float> getParticleOffsetY() {
     return this.offsetY;
   }
 
@@ -850,7 +851,7 @@ public class EmitterData implements Serializable, Resource {
    *
    * @param y the vertical offset parameter to set
    */
-  public void setParticleOffsetY(final ParticleParameter y) {
+  public void setParticleOffsetY(final RangeAttribute<Float> y) {
     this.offsetY = y;
   }
 
@@ -1062,34 +1063,34 @@ public class EmitterData implements Serializable, Resource {
     this.height = DEFAULT_HEIGHT;
     this.originAlign = DEFAULT_ORIGIN_ALIGN;
     this.originValign = DEFAULT_ORIGIN_VALIGN;
-    this.offsetX.setMinValue(DEFAULT_MIN_OFFSET_X);
-    this.offsetX.setMaxValue(DEFAULT_MAX_OFFSET_X);
-    this.offsetY.setMinValue(DEFAULT_MIN_OFFSET_Y);
-    this.offsetY.setMaxValue(DEFAULT_MAX_OFFSET_Y);
-    this.deltaWidth.setMinValue(DEFAULT_MIN_DELTA_WIDTH);
-    this.deltaWidth.setMaxValue(DEFAULT_MAX_DELTA_WIDTH);
-    this.deltaHeight.setMinValue(DEFAULT_MIN_DELTA_HEIGHT);
-    this.deltaHeight.setMaxValue(DEFAULT_MAX_DELTA_HEIGHT);
-    this.angle.setMinValue(DEFAULT_MIN_ANGLE);
-    this.angle.setMaxValue(DEFAULT_MAX_ROTATION);
-    this.deltaAngle.setMinValue(DEFAULT_MIN_DELTA_ANGLE);
-    this.deltaAngle.setMaxValue(DEFAULT_MAX_DELTA_ANGLE);
-    this.velocityX.setMinValue(DEFAULT_MIN_VELOCITY_X);
-    this.velocityX.setMaxValue(DEFAULT_MAX_VELOCITY_X);
-    this.velocityY.setMinValue(DEFAULT_MIN_VELOCITY_Y);
-    this.velocityY.setMaxValue(DEFAULT_MAX_VELOCITY_Y);
-    this.velocityY.setMinValue(DEFAULT_MAX_OUTLINETHICKNESS);
-    this.velocityY.setMaxValue(DEFAULT_MAX_OUTLINETHICKNESS);
-    this.accelerationX.setMinValue(DEFAULT_MIN_ACCELERATION_X);
-    this.accelerationX.setMaxValue(DEFAULT_MAX_ACCELERATION_X);
-    this.accelerationY.setMinValue(DEFAULT_MIN_ACCELERATION_Y);
-    this.accelerationY.setMaxValue(DEFAULT_MAX_ACCELERATION_Y);
-    this.particleWidth.setMinValue(DEFAULT_MIN_WIDTH);
-    this.particleWidth.setMaxValue(DEFAULT_MAX_WIDTH);
-    this.particleHeight.setMinValue(DEFAULT_MIN_HEIGHT);
-    this.particleHeight.setMaxValue(DEFAULT_MAX_HEIGHT);
-    this.particleTTL.setMinValue(DEFAULT_MIN_PARTICLE_TTL);
-    this.particleTTL.setMaxValue(DEFAULT_MAX_PARTICLE_TTL);
+    this.offsetX.setMin(DEFAULT_MIN_OFFSET_X);
+    this.offsetX.setMax(DEFAULT_MAX_OFFSET_X);
+    this.offsetY.setMin(DEFAULT_MIN_OFFSET_Y);
+    this.offsetY.setMax(DEFAULT_MAX_OFFSET_Y);
+    this.deltaWidth.setMin(DEFAULT_MIN_DELTA_WIDTH);
+    this.deltaWidth.setMax(DEFAULT_MAX_DELTA_WIDTH);
+    this.deltaHeight.setMin(DEFAULT_MIN_DELTA_HEIGHT);
+    this.deltaHeight.setMax(DEFAULT_MAX_DELTA_HEIGHT);
+    this.angle.setMin(DEFAULT_MIN_ANGLE);
+    this.angle.setMax(DEFAULT_MAX_ROTATION);
+    this.deltaAngle.setMin(DEFAULT_MIN_DELTA_ANGLE);
+    this.deltaAngle.setMax(DEFAULT_MAX_DELTA_ANGLE);
+    this.velocityX.setMin(DEFAULT_MIN_VELOCITY_X);
+    this.velocityX.setMax(DEFAULT_MAX_VELOCITY_X);
+    this.velocityY.setMin(DEFAULT_MIN_VELOCITY_Y);
+    this.velocityY.setMax(DEFAULT_MAX_VELOCITY_Y);
+    this.outlineThickness.setMin(DEFAULT_MIN_OUTLINETHICKNESS);
+    this.outlineThickness.setMax(DEFAULT_MAX_OUTLINETHICKNESS);
+    this.accelerationX.setMin(DEFAULT_MIN_ACCELERATION_X);
+    this.accelerationX.setMax(DEFAULT_MAX_ACCELERATION_X);
+    this.accelerationY.setMin(DEFAULT_MIN_ACCELERATION_Y);
+    this.accelerationY.setMax(DEFAULT_MAX_ACCELERATION_Y);
+    this.particleWidth.setMin(DEFAULT_MIN_WIDTH);
+    this.particleWidth.setMax(DEFAULT_MAX_WIDTH);
+    this.particleHeight.setMin(DEFAULT_MIN_HEIGHT);
+    this.particleHeight.setMax(DEFAULT_MAX_HEIGHT);
+    this.particleTTL.setMin((long) DEFAULT_MIN_PARTICLE_TTL);
+    this.particleTTL.setMax((long) DEFAULT_MAX_PARTICLE_TTL);
 
     this.setColor(DEFAULT_COLOR);
     this.emitterDuration = DEFAULT_DURATION;
@@ -1115,7 +1116,7 @@ public class EmitterData implements Serializable, Resource {
    *
    * @param deltaRotation the angle delta parameter to set
    */
-  public void setDeltaRotation(final ParticleParameter deltaRotation) {
+  public void setDeltaRotation(final RangeAttribute<Float> deltaRotation) {
     this.deltaAngle = deltaRotation;
   }
 

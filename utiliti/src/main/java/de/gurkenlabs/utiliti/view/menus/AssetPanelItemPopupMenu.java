@@ -4,7 +4,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.graphics.animation.Animation;
-import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
+import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterAttributes;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.resources.SoundResource;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
@@ -56,7 +56,7 @@ public final class AssetPanelItemPopupMenu extends JPopupMenu {
     if (origin instanceof Tileset) {
       return "tileset";
     }
-    if (origin instanceof EmitterData) {
+    if (origin instanceof EmitterAttributes) {
       return "emitter";
     }
     if (origin instanceof Blueprint || origin instanceof MapObject) {

@@ -11,7 +11,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.animation.Animation;
-import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
+import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterAttributes;
 import de.gurkenlabs.litiengine.resources.ImageFormat;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.resources.SoundFormat;
@@ -425,7 +425,7 @@ public class AssetPanelItem extends JPanel {
           Resources.spritesheets().remove(assetName);
         }
       }
-      case EmitterData emitterData -> {
+      case EmitterAttributes emitterData -> {
         assetType = "emitter";
         assetName = emitterData.getName();
         if (confirmDelete(assetType, assetName)) {
@@ -476,7 +476,7 @@ public class AssetPanelItem extends JPanel {
 
     if (origin instanceof SpritesheetResource spritesheetResource) {
       addSpriteEntity(spritesheetResource);
-    } else if (origin instanceof EmitterData) {
+    } else if (origin instanceof EmitterAttributes) {
       addEmitterEntity();
     } else if (origin instanceof Blueprint blueprint) {
       addBlueprintEntity(blueprint);
@@ -510,7 +510,7 @@ public class AssetPanelItem extends JPanel {
   }
 
   private void addEmitterEntity() {
-    MapObject newEmitter = (MapObject) EmitterMapObjectLoader.createMapObject((EmitterData) origin);
+    MapObject newEmitter = (MapObject) EmitterMapObjectLoader.createMapObject((EmitterAttributes) origin);
     newEmitter.setX((int) (Game.world().camera().getFocus().getX() - newEmitter.getWidth()));
     newEmitter.setY((int) (Game.world().camera().getFocus().getY() - newEmitter.getHeight()));
     newEmitter.setId(Game.world().environment().getNextMapId());
@@ -575,7 +575,7 @@ public class AssetPanelItem extends JPanel {
       exportTileset(tileset);
     } else if (origin instanceof SpritesheetResource spritesheetResource) {
       exportSpritesheet(spritesheetResource);
-    } else if (origin instanceof EmitterData emitterData) {
+    } else if (origin instanceof EmitterAttributes emitterData) {
       exportEmitter(emitterData);
     } else if (origin instanceof Blueprint blueprint) {
       exportBlueprint(blueprint);
@@ -624,7 +624,7 @@ public class AssetPanelItem extends JPanel {
     XmlExportDialog.export(tileset, "Tileset", tileset.getName(), Tileset.FILE_EXTENSION);
   }
 
-  private void exportEmitter(EmitterData emitter) {
+  private void exportEmitter(EmitterAttributes emitter) {
     XmlExportDialog.export(emitter, "Emitter", emitter.getName());
   }
 
@@ -687,7 +687,7 @@ public class AssetPanelItem extends JPanel {
       return PropPanel.getIdentifierBySpriteName(spritesheetResource.getName()) != null
         || CreaturePanel.getCreatureSpriteName(spritesheetResource.getName()) != null;
     }
-    return origin instanceof MapObject || origin instanceof EmitterData;
+    return origin instanceof MapObject || origin instanceof EmitterAttributes;
   }
 
   private static int getDeleteDialog(String assetType, String assetName) {
@@ -698,7 +698,7 @@ public class AssetPanelItem extends JPanel {
   }
 
   private void updateButtonVisibility(boolean visible) {
-    if (origin instanceof SpritesheetResource || origin instanceof EmitterData || origin instanceof MapObject) {
+    if (origin instanceof SpritesheetResource || origin instanceof EmitterAttributes || origin instanceof MapObject) {
       btnAdd.setVisible(visible);
       btnDelete.setVisible(visible);
     } else if (origin instanceof Tileset || origin instanceof SoundResource) {

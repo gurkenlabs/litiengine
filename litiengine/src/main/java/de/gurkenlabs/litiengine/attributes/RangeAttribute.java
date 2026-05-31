@@ -1,5 +1,11 @@
 package de.gurkenlabs.litiengine.attributes;
 
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.NumberAdapter;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
@@ -10,24 +16,38 @@ import java.util.List;
 /**
  * Represents an attribute with a defined range, extending the base Attribute class. The attribute value is constrained between a minimum and maximum
  * value.
+ * <p>
+ * This class is XML-serializable via JAXB. The base value, {@link #getMin() min} and
+ * {@link #getMax() max} are persisted as XML attributes; modifiers and property change support
+ * are runtime-only state and are not serialized.
+ * </p>
  *
  * @param <T> the type of the attribute value, which must be a Number and Comparable
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class RangeAttribute<T extends Number & Comparable<T>> extends Attribute<T> implements Serializable {
   private static final String MIN_PROPERTY = "min";
   private static final String MAX_PROPERTY = "max";
-  private final PropertyChangeSupport minSupport;
-  private final PropertyChangeSupport maxSupport;
+  private final transient PropertyChangeSupport minSupport;
+  private final transient PropertyChangeSupport maxSupport;
   private final transient PropertyChangeListener minModifierListener;
   private final transient PropertyChangeListener maxModifierListener;
 
-  private final List<AttributeModifier<T>> minModifiers = new ArrayList<>();
-  private final List<AttributeModifier<T>> maxModifiers = new ArrayList<>();
+  private final transient List<AttributeModifier<T>> minModifiers = new ArrayList<>();
+  private final transient List<AttributeModifier<T>> maxModifiers = new ArrayList<>();
+  @XmlAttribute(name = "min")
+  @XmlJavaTypeAdapter(NumberAdapter.class)
   private T min;
+  @XmlAttribute(name = "max")
+  @XmlJavaTypeAdapter(NumberAdapter.class)
   private T max;
 
   public RangeAttribute() {
-    this(null, null, null);
+    super();
+    this.minSupport = new PropertyChangeSupport(this);
+    this.maxSupport = new PropertyChangeSupport(this);
+    this.minModifierListener = evt -> minSupport.firePropertyChange(MIN_PROPERTY, evt.getOldValue(), evt.getNewValue());
+    this.maxModifierListener = evt -> maxSupport.firePropertyChange(MAX_PROPERTY, evt.getOldValue(), evt.getNewValue());
   }
 
   /**
@@ -53,6 +73,18 @@ public class RangeAttribute<T extends Number & Comparable<T>> extends Attribute<
   }
 
   /**
+   * Constructs a new {@code RangeAttribute} with the specified minimum and maximum values, using
+   * {@code min} as the initial base value.
+   *
+   * @param min the minimum value of the attribute
+   * @param max the maximum value of the attribute
+   * @throws IllegalArgumentException if the minimum value is greater than the maximum value
+   */
+  public RangeAttribute(T min, T max) {
+    this(min, min, max);
+  }
+
+  /**
    * Gets the current value of the attribute, ensuring it is within the defined range.
    *
    * @return the current value of the attribute
@@ -60,6 +92,52 @@ public class RangeAttribute<T extends Number & Comparable<T>> extends Attribute<
   @Override public T getModifiedValue() {
     return enforceRangeForValue(super.getModifiedValue());
   }
+
+  /**
+   * {@inheritDoc}
+   * <p>
+   * The base value is intentionally <em>not</em> serialized for a {@code RangeAttribute}. Range
+   * attributes describe a value range via {@link #getMin() min} and {@link #getMax() max} (for
+   * example particle emitter parameters); persisting a single base value alongside the range is
+   * not meaningful, since consumers such as the particle system always draw a fresh random sample
+   * between {@code min} and {@code max} (see {@link #getRandomNumber()}). Suppression of the
+   * inherited {@code value} XML attribute is implemented via the JAXB
+   * {@code beforeMarshal} / {@code afterMarshal} callbacks below.
+   * </p>
+   */
+  @Override public T getValue() {
+    return super.getValue();
+  }
+
+  /**
+   * JAXB callback invoked immediately before this instance is marshalled. Clears the inherited
+   * {@link #value} so that it is not written to XML, and stashes it so it can be restored in
+   * {@link #afterMarshal(jakarta.xml.bind.Marshaller)}. This keeps runtime behavior of
+   * {@link #getValue()} unchanged while ensuring the serialized form only contains
+   * {@link #getMin() min} and {@link #getMax() max}.
+   *
+   * @param marshaller the JAXB marshaller invoking this callback (unused)
+   */
+  @SuppressWarnings("unused")
+  private void beforeMarshal(jakarta.xml.bind.Marshaller marshaller) {
+    this.suppressedValue = this.value;
+    this.value = null;
+  }
+
+  /**
+   * JAXB callback invoked immediately after this instance is marshalled. Restores the base
+   * {@link #value} that was temporarily cleared by
+   * {@link #beforeMarshal(jakarta.xml.bind.Marshaller)}.
+   *
+   * @param marshaller the JAXB marshaller invoking this callback (unused)
+   */
+  @SuppressWarnings("unused")
+  private void afterMarshal(jakarta.xml.bind.Marshaller marshaller) {
+    this.value = this.suppressedValue;
+    this.suppressedValue = null;
+  }
+
+  private transient T suppressedValue;
 
   /**
    * Gets the base minimum value of the attribute.
@@ -264,12 +342,38 @@ public class RangeAttribute<T extends Number & Comparable<T>> extends Attribute<
     return getModifiedValue().floatValue() / getModifiedMax().floatValue();
   }
 
+  /**
+   * Returns a uniformly distributed pseudo-random number between this attribute's modified minimum
+   * and modified maximum values.
+   * <p>
+   * This is intended for use-cases that need to draw a random sample from a configured range (e.g.
+   * particle parameters used by an emitter). If {@code modifiedMin >= modifiedMax}, the modified
+   * minimum is returned.
+   * </p>
+   *
+   * @return a {@link Number} between {@link #getModifiedMin()} (inclusive) and
+   * {@link #getModifiedMax()} (exclusive), or {@link #getModifiedMin()} if the range is empty
+   */
+  public Number getRandomNumber() {
+    final T modMin = getModifiedMin();
+    final T modMax = getModifiedMax();
+    if (modMin == null || modMax == null || modMin.doubleValue() >= modMax.doubleValue()) {
+      return modMin;
+    }
+    return Game.random().nextDouble(modMin.doubleValue(), modMax.doubleValue());
+  }
+
 
   private T enforceRangeForValue(T value) {
-    if (value.compareTo(getModifiedMin()) < 0) {
-      return getModifiedMin();
-    } else if (value.compareTo(getModifiedMax()) > 0) {
-      return getModifiedMax();
+    if (value == null) {
+      return value;
+    }
+    T modMin = getModifiedMin();
+    T modMax = getModifiedMax();
+    if (modMin != null && value.compareTo(modMin) < 0) {
+      return modMin;
+    } else if (modMax != null && value.compareTo(modMax) > 0) {
+      return modMax;
     }
     return value;
   }

@@ -3,7 +3,7 @@ package de.gurkenlabs.utiliti.view.components;
 import com.github.weisj.darklaf.components.border.DarkBorders;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
-import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
+import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterAttributes;
 import de.gurkenlabs.utiliti.model.Icons;
 import java.awt.Dimension;
 import java.awt.LayoutManager;
@@ -84,7 +84,7 @@ public class EmitterTextPanel extends PropertyPanel {
   }
 
   private void setupChangedListeners() {
-    btnAdd.addActionListener(a -> model.addRow(new Object[] {EmitterData.DEFAULT_TEXT}));
+    btnAdd.addActionListener(a -> model.addRow(new Object[] {EmitterAttributes.DEFAULT_TEXT}));
     btnRemove.addActionListener(a -> model.removeRow(table.getSelectedRow()));
     setup(table, MapObjectProperty.Particle.TEXTS);
   }

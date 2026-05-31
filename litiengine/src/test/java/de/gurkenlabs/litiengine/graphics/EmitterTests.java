@@ -1,18 +1,18 @@
 package de.gurkenlabs.litiengine.graphics;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Valign;
+import de.gurkenlabs.litiengine.attributes.RangeAttribute;
 import de.gurkenlabs.litiengine.configuration.Quality;
 import de.gurkenlabs.litiengine.entities.EmitterInfo;
 import de.gurkenlabs.litiengine.entities.EntityInfo;
 import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.Particle;
-import de.gurkenlabs.litiengine.graphics.emitters.xml.ParticleParameter;
 import de.gurkenlabs.litiengine.util.ColorHelper;
 import java.awt.Color;
 import java.util.Arrays;
@@ -30,8 +30,8 @@ class EmitterTests {
 
     assertEquals(2500, testEmitter.getTimeToLive());
     assertEquals(500, testEmitter.data().getMaxParticles());
-    assertEquals(1000, testEmitter.data().getParticleTTL().getMaxValue());
-    assertEquals(100, testEmitter.data().getParticleTTL().getMinValue());
+    assertEquals(1000L, testEmitter.data().getParticleTTL().getMax().longValue());
+    assertEquals(100L, testEmitter.data().getParticleTTL().getMin().longValue());
 
     assertEquals(10, testEmitter.data().getUpdateRate());
     assertEquals(Quality.HIGH, testEmitter.data().getRequiredQuality());
@@ -59,25 +59,23 @@ class EmitterTests {
   }
 
   @Test
-  void testGetMin() {
-    ParticleParameter particleParameter = new ParticleParameter();
-    particleParameter.setMaxValue(1);
-    particleParameter.setMinValue(10);
+  void testRangeAttributeGetMin() {
+    // when min > max, getRandomNumber should always return min
+    RangeAttribute<Float> attr = new RangeAttribute<>();
+    attr.setMax(1f);
+    attr.setMin(10f);
 
-    double minValue = particleParameter.getMinValue();
-
-    assertEquals(minValue, particleParameter.get());
+    assertEquals(10f, attr.getRandomNumber().floatValue());
   }
 
   @Test
-  void testGetMax() {
-    ParticleParameter particleParameter = new ParticleParameter();
-    particleParameter.setMaxValue(10);
-    particleParameter.setMinValue(1);
+  void testRangeAttributeGetRandomBetweenMinAndMax() {
+    RangeAttribute<Float> attr = new RangeAttribute<>(1f, 1f, 10f);
 
-    double minValue = particleParameter.getMinValue();
-
-    assertNotEquals(minValue, particleParameter.get());
+    Number random = attr.getRandomNumber();
+    assertNotNull(random);
+    assertTrue(random.doubleValue() >= 1f);
+    assertTrue(random.doubleValue() < 10f);
   }
 
   @EmitterInfo(

@@ -18,9 +18,9 @@ import de.gurkenlabs.litiengine.graphics.emitters.particles.PolygonParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.RectangleParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.SpriteParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.TextParticle;
-import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
+import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterAttributes;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterLoader;
-import de.gurkenlabs.litiengine.graphics.emitters.xml.ParticleParameter;
+import de.gurkenlabs.litiengine.attributes.RangeAttribute;
 import de.gurkenlabs.litiengine.resources.Resources;
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
@@ -46,7 +46,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
   private final Collection<EmitterFinishedListener> finishedListeners;
   private final CopyOnWriteArrayList<Particle> particles;
   private final Map<RenderType, IRenderable> renderables;
-  private EmitterData emitterData;
+  private EmitterAttributes emitterData;
   private boolean activateOnInit;
   private boolean activated;
   private boolean paused;
@@ -76,8 +76,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
       this.renderables.put(type, g -> renderParticles(g, type));
     }
 
-    this.emitterData = new EmitterData();
-    this.emitterData.setRequiredQuality(EmitterData.DEFAULT_REQUIRED_QUALITY);
+    this.emitterData = new EmitterAttributes();
+    this.emitterData.setRequiredQuality(EmitterAttributes.DEFAULT_REQUIRED_QUALITY);
 
     final EmitterInfo info = this.getClass().getAnnotation(EmitterInfo.class);
     if (info != null) {
@@ -87,7 +87,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
       this.emitterData.setSpawnAmount(info.spawnAmount());
       this.emitterData.setSpawnRate(info.spawnRate());
       this.emitterData.setEmitterDuration(info.duration());
-      this.emitterData.setParticleTTL(new ParticleParameter(info.particleMinTTL(), info.particleMaxTTL()));
+      this.emitterData.setParticleTTL(new RangeAttribute<>((long) info.particleMinTTL(), (long) info.particleMinTTL(), (long) info.particleMaxTTL()));
       this.emitterData.setUpdateRate(info.particleUpdateRate());
       this.emitterData.setOriginAlign(info.originAlign());
       this.emitterData.setOriginValign(info.originValign());
@@ -98,12 +98,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
   /**
    * Constructs a new {@code Emitter} instance with the specified emitter data.
    *
-   * <p>Initializes the emitter using the provided {@link EmitterData}, which
+   * <p>Initializes the emitter using the provided {@link EmitterAttributes}, which
    * contains configuration details such as particle type, spawn rate, and emitter duration.
    *
    * @param emitterData the data used to configure this emitter
    */
-  public Emitter(EmitterData emitterData) {
+  public Emitter(EmitterAttributes emitterData) {
     this();
     setEmitterData(emitterData);
   }
@@ -112,12 +112,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
    * Constructs a new {@code Emitter} instance with the specified origin and emitter data.
    *
    * <p>Initializes the emitter at the given origin point and configures it using the provided
-   * {@link EmitterData}, which contains details such as particle type, spawn rate, and emitter duration.
+   * {@link EmitterAttributes}, which contains details such as particle type, spawn rate, and emitter duration.
    *
    * @param origin      the origin point where the emitter is located
    * @param emitterData the data used to configure this emitter
    */
-  public Emitter(final Point2D origin, EmitterData emitterData) {
+  public Emitter(final Point2D origin, EmitterAttributes emitterData) {
     this(origin);
     setEmitterData(emitterData);
   }
@@ -126,13 +126,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
    * Constructs a new {@code Emitter} instance with the specified coordinates and emitter data.
    *
    * <p>Initializes the emitter at the given x and y coordinates and configures it using the provided
-   * {@link EmitterData}, which contains details such as particle type, spawn rate, and emitter duration.
+   * {@link EmitterAttributes}, which contains details such as particle type, spawn rate, and emitter duration.
    *
    * @param x           the x-coordinate of the emitter's origin
    * @param y           the y-coordinate of the emitter's origin
    * @param emitterData the data used to configure this emitter
    */
-  public Emitter(final double x, final double y, EmitterData emitterData) {
+  public Emitter(final double x, final double y, EmitterAttributes emitterData) {
     this(x, y);
     setEmitterData(emitterData);
   }
@@ -275,9 +275,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
    * <p>The emitter data contains configuration details such as particle type,
    * spawn rate, and other properties that define the emitter's behavior.
    *
-   * @return the {@link EmitterData} object for this emitter
+   * @return the {@link EmitterAttributes} object for this emitter
    */
-  public EmitterData data() {
+  public EmitterAttributes data() {
     return this.emitterData;
   }
 
@@ -450,12 +450,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
   /**
    * Sets the emitter data for this emitter.
    *
-   * <p>This method updates the emitter's configuration using the provided {@link EmitterData}.
+   * <p>This method updates the emitter's configuration using the provided {@link EmitterAttributes}.
    * If the provided data is null, the method does nothing.
    *
    * @param emitterData the data used to configure this emitter
    */
-  public void setEmitterData(final EmitterData emitterData) {
+  public void setEmitterData(final EmitterAttributes emitterData) {
     if (emitterData == null) {
       return;
     }
@@ -471,7 +471,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
    * @param emitterXmlPath the path to the XML file containing the emitter data
    */
   public void setEmitterData(final String emitterXmlPath) {
-    EmitterData loaded = EmitterLoader.load(emitterXmlPath);
+    EmitterAttributes loaded = EmitterLoader.load(emitterXmlPath);
     setEmitterData(loaded);
   }
 
@@ -567,8 +567,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
    */
   protected Particle createNewParticle() {
 
-    float width = (float) data().getParticleWidth().get();
-    float height = (float) data().getParticleHeight().get();
+    float width = data().getParticleWidth().getRandomNumber().floatValue();
+    float height = data().getParticleHeight().getRandomNumber().floatValue();
 
     switch (data().getParticleType()) {
       case ELLIPSE -> {
@@ -584,7 +584,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
         return new LineParticle(width, height).init(data());
       }
       case TEXT -> {
-        String text = data().getTexts().isEmpty() ? EmitterData.DEFAULT_TEXT : Game.random().choose(data().getTexts());
+        String text = data().getTexts().isEmpty() ? EmitterAttributes.DEFAULT_TEXT : Game.random().choose(data().getTexts());
         return new TextParticle(text).init(data());
       }
       case SPRITE -> {

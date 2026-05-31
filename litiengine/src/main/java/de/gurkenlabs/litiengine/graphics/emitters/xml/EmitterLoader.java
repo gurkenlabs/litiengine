@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 import jakarta.xml.bind.JAXBException;
 
 public class EmitterLoader {
-  private static final Map<String, EmitterData> loadedEmitters;
+  private static final Map<String, EmitterAttributes> loadedEmitters;
   private static final Logger log = Logger.getLogger(EmitterLoader.class.getName());
 
   private EmitterLoader() {}
@@ -19,7 +19,7 @@ public class EmitterLoader {
     loadedEmitters = new ConcurrentHashMap<>();
   }
 
-  public static EmitterData load(String emitterXml) {
+  public static EmitterAttributes load(String emitterXml) {
     if (loadedEmitters.containsKey(emitterXml)) {
       return loadedEmitters.get(emitterXml);
     }
@@ -27,15 +27,15 @@ public class EmitterLoader {
     return load(Resources.getLocation(emitterXml));
   }
 
-  public static EmitterData load(URL emitterXml) {
+  public static EmitterAttributes load(URL emitterXml) {
     final String name = emitterXml.getFile();
     if (loadedEmitters.containsKey(name)) {
       return loadedEmitters.get(name);
     }
 
-    EmitterData loaded;
+    EmitterAttributes loaded;
     try {
-      loaded = XmlUtilities.read(EmitterData.class, emitterXml);
+      loaded = XmlUtilities.read(EmitterAttributes.class, emitterXml);
     } catch (JAXBException e) {
       log.log(Level.SEVERE, String.format("Failed to load emitter data for %s", emitterXml), e);
       return null;
@@ -44,7 +44,7 @@ public class EmitterLoader {
     return load(loaded);
   }
 
-  public static EmitterData load(EmitterData emitterData) {
+  public static EmitterAttributes load(EmitterAttributes emitterData) {
     if (loadedEmitters.containsKey(emitterData.getName())) {
       return loadedEmitters.get(emitterData.getName());
     }
@@ -53,7 +53,7 @@ public class EmitterLoader {
     return emitterData;
   }
 
-  public static EmitterData get(String name) {
+  public static EmitterAttributes get(String name) {
     if (loadedEmitters.containsKey(name)) {
       return loadedEmitters.get(name);
     }
