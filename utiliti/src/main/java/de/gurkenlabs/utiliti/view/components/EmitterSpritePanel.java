@@ -1,5 +1,6 @@
 package de.gurkenlabs.utiliti.view.components;
 
+import com.github.weisj.darklaf.Customization.ToggleButton;
 import com.github.weisj.darklaf.ui.togglebutton.ToggleButtonConstants;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
@@ -24,10 +25,10 @@ public class EmitterSpritePanel extends PropertyPanel {
     spritesheet.setRenderer(new LabelListCellRenderer());
     animateSprite = new JToggleButton();
     animateSprite.putClientProperty(
-        ToggleButtonConstants.KEY_VARIANT, ToggleButtonConstants.VARIANT_SLIDER);
+      ToggleButton.KEY_VARIANT, ToggleButton.VARIANT_SLIDER);
     loopSprite = new JToggleButton();
     loopSprite.putClientProperty(
-        ToggleButtonConstants.KEY_VARIANT, ToggleButtonConstants.VARIANT_SLIDER);
+      ToggleButton.KEY_VARIANT, ToggleButton.VARIANT_SLIDER);
     setLayout(createLayout());
     setupChangedListeners();
   }

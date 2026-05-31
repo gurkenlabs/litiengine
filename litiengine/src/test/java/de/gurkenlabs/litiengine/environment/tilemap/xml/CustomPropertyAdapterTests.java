@@ -18,7 +18,7 @@ class CustomPropertyAdapterTests {
   private CustomPropertyAdapter adapter;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     adapter = new CustomPropertyAdapter();
   }
 

@@ -32,9 +32,9 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 @ExtendWith(GameTestSuite.class)
-public class AStarTests {
+class AStarTests {
   @BeforeAll
-  public static void initGame() {
+  static void initGame() {
 
     // necessary because the environment need access to the game loop and other
     // stuff
@@ -42,12 +42,12 @@ public class AStarTests {
   }
 
   @AfterAll
-  public static void terminateGame() {
+  static void terminateGame() {
     GameTest.terminateGame();
   }
 
   @BeforeEach
-  public void initEnvironment() {
+  void initEnvironment() {
     IMap map = mock(IMap.class);
     when(map.getSizeInPixels()).thenReturn(new Dimension(100, 100));
     when(map.getSizeInTiles()).thenReturn(new Dimension(10, 10));

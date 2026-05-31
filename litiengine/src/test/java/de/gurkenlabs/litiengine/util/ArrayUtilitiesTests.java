@@ -16,7 +16,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 class ArrayUtilitiesTests {
 
   @BeforeEach
-  public void setup() {
+  void setup() {
     Logger.getLogger(ArrayUtilities.class.getName()).setUseParentHandlers(false);
   }
 

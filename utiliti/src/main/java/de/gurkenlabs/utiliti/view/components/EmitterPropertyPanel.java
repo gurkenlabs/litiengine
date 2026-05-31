@@ -1,5 +1,6 @@
 package de.gurkenlabs.utiliti.view.components;
 
+import com.github.weisj.darklaf.Customization.ToggleButton;
 import com.github.weisj.darklaf.ui.togglebutton.ToggleButtonConstants;
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Game;
@@ -170,10 +171,10 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
       comboBoxParticleType = new JComboBox<>(new DefaultComboBoxModel<>(ParticleType.values()));
       fade = new JToggleButton();
       fade.putClientProperty(
-        ToggleButtonConstants.KEY_VARIANT, ToggleButtonConstants.VARIANT_SLIDER);
+        ToggleButton.KEY_VARIANT, ToggleButton.VARIANT_SLIDER);
       outlineOnly = new JToggleButton();
       outlineOnly.putClientProperty(
-        ToggleButtonConstants.KEY_VARIANT, ToggleButtonConstants.VARIANT_SLIDER);
+        ToggleButton.KEY_VARIANT, ToggleButton.VARIANT_SLIDER);
       outlineThickness =
         new DualSpinner(
           Particle.OUTLINETHICKNESS_MIN,
@@ -185,7 +186,7 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
           STEP_FINE);
       antiAliasing = new JToggleButton();
       antiAliasing.putClientProperty(
-        ToggleButtonConstants.KEY_VARIANT, ToggleButtonConstants.VARIANT_SLIDER);
+        ToggleButton.KEY_VARIANT, ToggleButton.VARIANT_SLIDER);
       colorPanel = new EmitterColorPanel();
       textPanel = new EmitterTextPanel();
       spritePanel = new EmitterSpritePanel();
@@ -601,7 +602,7 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
       collisionType = new JComboBox<>(Collision.values());
       fadeOnCollision = new JToggleButton();
       fadeOnCollision.putClientProperty(
-        ToggleButtonConstants.KEY_VARIANT, ToggleButtonConstants.VARIANT_SLIDER);
+        ToggleButton.KEY_VARIANT, ToggleButton.VARIANT_SLIDER);
       setLayout(createLayout());
       setupChangedListeners();
     }

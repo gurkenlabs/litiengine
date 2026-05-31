@@ -167,11 +167,6 @@ public class AssetPanelItem extends JPanel {
         button.setContentAreaFilled(false);
         button.setFocusPainted(false);
       }
-
-      @Override public void mousePressed(MouseEvent e) {
-        super.mousePressed(e);
-
-      }
     });
 
     return button;
@@ -354,12 +349,11 @@ public class AssetPanelItem extends JPanel {
     StringBuilder line = new StringBuilder();
 
     for (String word : words) {
-      if (line.length() + word.length() + 1 > maxLength) {
-        if (!line.isEmpty()) {
+      if (line.length() + word.length() + 1 > maxLength && !line.isEmpty()) {
           wrapped.append(line).append("<br>");
           line = new StringBuilder();
         }
-      }
+
       if (!line.isEmpty()) {
         line.append(" ");
       }
@@ -377,7 +371,7 @@ public class AssetPanelItem extends JPanel {
     Graphics2D g2d = (Graphics2D) g.create();
     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-    RoundRectangle2D roundRect = new RoundRectangle2D.Float(0, 0, getWidth() - 1, getHeight() - 1, CORNER_RADIUS, CORNER_RADIUS);
+    RoundRectangle2D roundRect = new RoundRectangle2D.Float(0, 0, getWidth() - 1f, getHeight() - 1f, CORNER_RADIUS, CORNER_RADIUS);
 
     if (isSelected) {
       g2d.setColor(SELECTED_COLOR);

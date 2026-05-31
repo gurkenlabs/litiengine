@@ -105,7 +105,7 @@ public class CreatureMapObjectLoader extends MapObjectLoader {
     try {
       return customCreature.getConstructor(String.class).newInstance(spriteSheet);
     } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
-        | SecurityException e) {
+        | SecurityException _) {
       try {
         Creature creature = customCreature.getConstructor().newInstance();
         creature.setSpritesheetName(spriteSheet);

@@ -238,7 +238,7 @@ public final class AsepriteFormat {
       case STRING -> {
         try {
           yield Integer.parseInt(((JsonString) value).getString());
-        } catch (NumberFormatException ignored) {
+        } catch (NumberFormatException _) {
           yield 0;
         }
       }

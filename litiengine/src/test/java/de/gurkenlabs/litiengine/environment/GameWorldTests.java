@@ -18,13 +18,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 class GameWorldTests {
 
   @BeforeEach
-  public void initGame() {
+  void initGame() {
     // necessary because the environment needs access to the game loop and other stuff
     Game.init(Game.COMMANDLINE_ARG_NOGUI);
   }
 
   @AfterEach
-  public void terminateGame() {
+  void terminateGame() {
     GameTest.terminateGame();
   }
 

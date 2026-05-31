@@ -246,7 +246,7 @@ public final class Animations extends ResourcesContainer<Animation> {
         // fall back to classpath lookup if the sibling file does not exist
         URL fromClasspath = Resources.getLocation(image);
         return fromClasspath != null ? fromClasspath : candidate.toUri().toURL();
-      } catch (java.net.URISyntaxException e) {
+      } catch (java.net.URISyntaxException _) {
         throw new MalformedURLException("Invalid base URL: " + baseUrl);
       }
     }

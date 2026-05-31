@@ -28,18 +28,18 @@ class EntitySpawnerTests {
   final int spawnAmount = 10;
 
   @BeforeAll
-  public static void initGame() {
+  static void initGame() {
     // necessary because the environment need access to the game loop and other stuff
     Game.init(Game.COMMANDLINE_ARG_NOGUI);
   }
 
   @AfterAll
-  public static void terminateGame() {
+  static void terminateGame() {
     GameTest.terminateGame();
   }
 
   @BeforeEach
-  public void setup() {
+  void setup() {
     testEnvironment = mock(Environment.class);
     spawnPoint = mock(Spawnpoint.class);
     spawner = new TestCreatureSpawner(spawnPoint, spawnAmount);

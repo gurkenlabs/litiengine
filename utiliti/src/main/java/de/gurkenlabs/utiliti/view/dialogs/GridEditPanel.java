@@ -140,7 +140,7 @@ public class GridEditPanel extends JPanel {
   public float getStrokeWidth() {
     try {
       this.strokeSpinner.commitEdit();
-    } catch (ParseException e) {
+    } catch (ParseException _) {
       log.log(
           Level.WARNING,
           "Your edits in the grid line thickness spinner could not be parsed as Float.");

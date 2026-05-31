@@ -22,7 +22,7 @@ class GameRandomTests {
   private GameRandom gameRandom;
 
   @BeforeEach
-  public void initSeed() {
+  void initSeed() {
     gameRandom = new GameRandom();
     gameRandom.setSeed(1337);
   }

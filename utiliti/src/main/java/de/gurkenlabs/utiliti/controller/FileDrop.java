@@ -99,7 +99,7 @@ public class FileDrop {
       try {
         Class.forName("java.awt.dnd.DnDConstants");
         support = true;
-      } catch (Exception e) {
+      } catch (Exception _) {
         support = false;
       }
       supportsDnD = support;

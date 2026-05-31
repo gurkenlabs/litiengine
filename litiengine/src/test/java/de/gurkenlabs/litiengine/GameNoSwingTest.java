@@ -10,16 +10,16 @@ import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.litiengine.test.GameTestSuite;
 
-public class GameNoSwingTest {
+class GameNoSwingTest {
 
 
   @BeforeAll
-  public static void onTestStart() {
+  static void onTestStart() {
     GameTestSuite.GameLock.lock();
   }
 
   @AfterAll
-  public static void onTestEnd() {
+  static void onTestEnd() {
     GameTestSuite.GameLock.unlock();
   }
 

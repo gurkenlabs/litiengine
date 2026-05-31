@@ -17,7 +17,7 @@ class AStarPathFinderTests {
   private AStarPathFinder pathFinder;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     // Create a mock AStarGrid for testing
     AStarGrid grid = mock(AStarGrid.class);
     when(grid.getSize()).thenReturn(new Dimension(10, 10));

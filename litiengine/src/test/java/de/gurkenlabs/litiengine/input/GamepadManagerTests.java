@@ -16,7 +16,7 @@ class GamepadManagerTests {
   private GamepadManager gamepadManager;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     gamepadManager = new GamepadManager();
   }
 

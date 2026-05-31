@@ -108,7 +108,7 @@ public class CommandManager implements ILaunchable {
 
         try {
           sleep(10);
-        } catch (InterruptedException e) {
+        } catch (InterruptedException _) {
           Thread.currentThread().interrupt();
           break;
         }

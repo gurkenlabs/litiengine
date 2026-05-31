@@ -34,7 +34,7 @@ class AbilityExecutionTests {
   private TestEffect effectSpy;
 
   @BeforeEach
-  public void setup() {
+  void setup() {
     Game.init(Game.COMMANDLINE_ARG_NOGUI);
 
     Creature testCreature = new Creature();

@@ -39,12 +39,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 class GuiComponentTests {
 
   @BeforeEach
-  public void assertOnSwingThread() {
+  void assertOnSwingThread() {
     assertTrue(SwingUtilities.isEventDispatchThread());
   }
 
   @BeforeAll
-  public static void initialize() {
+  static void initialize() {
     // init required Game environment
     Game.init(Game.COMMANDLINE_ARG_NOGUI);
 

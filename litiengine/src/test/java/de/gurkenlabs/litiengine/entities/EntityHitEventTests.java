@@ -17,7 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 class EntityHitEventTests {
 
   @BeforeAll
-  public static void initGame() {
+  static void initGame() {
     // necessary because the environment need access to the current game time
     Game.init(Game.COMMANDLINE_ARG_NOGUI);
   }

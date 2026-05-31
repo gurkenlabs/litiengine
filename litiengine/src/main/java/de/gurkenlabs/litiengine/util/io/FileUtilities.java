@@ -113,7 +113,7 @@ public final class FileUtilities {
     }
     try {
       return fileName.substring(fileName.lastIndexOf('.') + 1);
-    } catch (final Exception e) {
+    } catch (final Exception _) {
       return "";
     }
   }
@@ -182,7 +182,7 @@ public final class FileUtilities {
 
     try {
       return getParentDirPath(new URI(uri));
-    } catch (URISyntaxException e) {
+    } catch (URISyntaxException _) {
       String parent = Path.of(uri).getParent().toAbsolutePath().toString();
       parent += FileSystems.getDefault().getSeparator();
       return parent;

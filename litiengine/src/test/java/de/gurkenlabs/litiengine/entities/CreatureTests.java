@@ -15,17 +15,17 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 @ExtendWith(GameTestSuite.class)
-public class CreatureTests {
+class CreatureTests {
 
   private Creature creature;
 
   @BeforeAll
-  public static void init() {
+  static void init() {
     Game.init(Game.COMMANDLINE_ARG_NOGUI);
   }
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     creature = new TestCreature();
   }
 

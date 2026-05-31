@@ -34,7 +34,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 class AbilityTests {
 
   @BeforeEach
-  public void init() {
+  void init() {
     Game.init(Game.COMMANDLINE_ARG_NOGUI);
   }
 

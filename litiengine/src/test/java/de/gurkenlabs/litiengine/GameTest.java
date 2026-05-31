@@ -22,7 +22,7 @@ public class GameTest {
   }
 
   @AfterEach
-  public void cleanup() throws IOException {
+  void cleanup() throws IOException {
     final Path configFile = Game.config().getPath();
 
     Files.deleteIfExists(configFile);

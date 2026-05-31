@@ -26,11 +26,11 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.EnumSource.Mode;
 
 @ExtendWith(GameTestSuite.class)
-public class EnvironmentEventTests {
+class EnvironmentEventTests {
   private Environment testEnvironment;
 
   @BeforeAll
-  public static void initGame() {
+  static void initGame() {
 
     // necessary because the environment need access to the game loop and other
     // stuff
@@ -38,12 +38,12 @@ public class EnvironmentEventTests {
   }
 
   @AfterAll
-  public static void terminateGame() {
+  static void terminateGame() {
     GameTest.terminateGame();
   }
 
   @BeforeEach
-  public void initEnvironment() {
+  void initEnvironment() {
     IMap map = mock(IMap.class);
     when(map.getSizeInPixels()).thenReturn(new Dimension(100, 100));
     when(map.getSizeInTiles()).thenReturn(new Dimension(10, 10));

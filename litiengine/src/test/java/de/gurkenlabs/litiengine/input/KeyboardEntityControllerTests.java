@@ -21,7 +21,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 @ExtendWith(GameTestSuite.class)
 class KeyboardEntityControllerTests {
   @BeforeAll
-  public static void initializeKeyboard() {
+  static void initializeKeyboard() {
     // init required Game environment
     Game.init(Game.COMMANDLINE_ARG_NOGUI);
 

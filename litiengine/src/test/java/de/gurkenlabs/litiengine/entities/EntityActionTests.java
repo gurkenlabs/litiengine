@@ -13,7 +13,7 @@ class EntityActionTests {
   private final String ACTION_NAME = "actionSetHasBeenPerformed";
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     hasBeenPerformed = false;
     entityAction = new EntityAction(ACTION_NAME, () -> hasBeenPerformed = true);
   }

@@ -57,7 +57,7 @@ public enum Align {
 
     try {
       return Align.valueOf(alignString.toUpperCase());
-    } catch (final IllegalArgumentException iae) {
+    } catch (final IllegalArgumentException _) {
       return Align.CENTER;
     }
   }
@@ -130,7 +130,7 @@ public enum Align {
       return location;
     }
 
-    return Math.max(0, Math.min(width - objectWidth, location));
+    return Math.clamp(location, 0, width - objectWidth);
   }
 
   /**

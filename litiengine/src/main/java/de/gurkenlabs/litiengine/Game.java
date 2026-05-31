@@ -667,7 +667,7 @@ public final class Game {
     GameInfo info;
     try {
       info = XmlUtilities.read(GameInfo.class, gameInfoFile);
-    } catch (Exception e) {
+    } catch (Exception _) {
       log().log(Level.WARNING, "Could not read game info from {0}", new Object[] {gameInfoFile});
       setInfo((GameInfo) null);
       return;

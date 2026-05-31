@@ -53,7 +53,7 @@ public class HorizontalSlider extends Slider {
       float frac = Math.clamp((getCurrentValue() - getMinValue()) / (getMaxValue() - getMinValue()), 0, 1);
       int currentStep = (int) (frac * (getSteps() - 1));
       return new Point2D.Double(getX() + currentStep * getSliderComponent().getWidth(), getY());
-    } catch (Exception e) {
+    } catch (Exception _) {
       return new Point2D.Double(0, 0);
     }
   }

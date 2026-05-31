@@ -17,7 +17,7 @@ class EntityActionMapTests {
   private final String ACTION_NAME = "Action1";
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     entityAction = new EntityAction(ACTION_NAME, () -> {
     });
     actionMap = new EntityActionMap();

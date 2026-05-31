@@ -33,7 +33,7 @@ class CombatEntityTests {
   private Ability ability;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     Game.init(Game.COMMANDLINE_ARG_NOGUI);
 
     combatEntitySpy = spy(new CombatEntity());

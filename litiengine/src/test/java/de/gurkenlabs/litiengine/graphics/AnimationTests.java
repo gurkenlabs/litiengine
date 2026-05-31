@@ -20,7 +20,7 @@ class AnimationTests {
   private Animation animation;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     Game.init();
     Spritesheet spritesheet = mock(Spritesheet.class);
     when(spritesheet.getName()).thenReturn(SPRITE_SHEET_NAME);

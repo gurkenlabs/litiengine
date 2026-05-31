@@ -26,12 +26,12 @@ class CollisionResolvingTests {
   final double MOVE_10X10Y_DISTANCE = 14.14213562373095; // = root of 200 because 10² + 10² = 200
 
   @BeforeEach
-  public void init() {
+  void init() {
     Game.init(Game.COMMANDLINE_ARG_NOGUI);
   }
 
   @AfterEach
-  public void clear() {
+  void clear() {
     Game.physics().clear();
   }
 

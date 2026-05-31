@@ -72,7 +72,7 @@ public class DefaultUncaughtExceptionHandler implements UncaughtExceptionHandler
         stream.println();
         stream.println(dump());
       }
-    } catch (FileNotFoundException e2) {
+    } catch (FileNotFoundException _) {
       log.log(Level.WARNING, "Could not create crash report file.", e);
     }
 

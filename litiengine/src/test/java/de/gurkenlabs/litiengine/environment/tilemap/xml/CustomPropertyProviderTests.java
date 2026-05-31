@@ -20,7 +20,7 @@ class CustomPropertyProviderTests {
   private CustomPropertyProvider provider;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     provider = new CustomPropertyProvider();
   }
 

@@ -277,7 +277,7 @@ public class AnimationEditPanel extends JPanel {
         }
         workingDurations[rowIndex] = value;
         fireTableCellUpdated(rowIndex, columnIndex);
-      } catch (NumberFormatException ignored) {
+      } catch (NumberFormatException _) {
         // ignore invalid input - the cell editor commits on focus loss
       }
     }

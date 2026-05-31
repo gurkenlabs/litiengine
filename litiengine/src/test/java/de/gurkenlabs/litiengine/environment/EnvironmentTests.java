@@ -55,18 +55,18 @@ class EnvironmentTests {
   private Environment testEnvironment;
 
   @BeforeAll
-  public static void initGame() {
+  static void initGame() {
     // necessary because the environment need access to the game loop and other stuff
     Game.init(Game.COMMANDLINE_ARG_NOGUI);
   }
 
   @AfterAll
-  public static void terminateGame() {
+  static void terminateGame() {
     GameTest.terminateGame();
   }
 
   @BeforeEach
-  public void initEnvironment() {
+  void initEnvironment() {
     IMap map = mock(IMap.class);
     when(map.getSizeInPixels()).thenReturn(new Dimension(100, 100));
     when(map.getSizeInTiles()).thenReturn(new Dimension(10, 10));

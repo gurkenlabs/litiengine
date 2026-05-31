@@ -14,7 +14,7 @@ class EntityControllersTests {
   private IEntityController controllerB;
 
   @BeforeEach
-  public void setupWithTwoMockedControllers() {
+  void setupWithTwoMockedControllers() {
     controllers = new EntityControllers();
     controllerA = mock(EntityControllerDummyA.class);
     controllerB = mock(EntityControllerDummyB.class);

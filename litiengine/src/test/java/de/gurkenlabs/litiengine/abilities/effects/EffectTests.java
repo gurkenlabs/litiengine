@@ -24,7 +24,7 @@ class EffectTests {
   private Effect.EffectCeasedListener listener;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     // arrange
     Game.init(Game.COMMANDLINE_ARG_NOGUI);
     creature = new Creature();
