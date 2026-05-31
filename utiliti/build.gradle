@@ -39,7 +39,7 @@ dependencies {
 
 runtime {
   options.set(["--strip-debug", "--no-header-files", "--no-man-pages"])
-  modules.set(["java.desktop", "java.logging", "java.datatransfer", "java.management", "java.xml"])
+  modules.set(["java.desktop", "java.logging", "java.datatransfer", "java.management", "java.xml", "jdk.unsupported.desktop"])
 
   launcher {
     noConsole = false
