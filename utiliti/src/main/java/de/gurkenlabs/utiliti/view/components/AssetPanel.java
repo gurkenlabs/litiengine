@@ -6,6 +6,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.graphics.animation.Animation;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.resources.SoundResource;
@@ -25,7 +26,7 @@ import javax.swing.border.EmptyBorder;
 public class AssetPanel extends JPanel {
 
   public enum AssetType {
-    SPRITESHEET, TILESET, EMITTER, BLUEPRINT, SOUND
+    SPRITESHEET, TILESET, EMITTER, BLUEPRINT, SOUND, ANIMATION
   }
 
   private AssetType currentType;
@@ -132,6 +133,38 @@ public class AssetPanel extends JPanel {
         Collections.sort(sounds);
         for (SoundResource sound : sounds) {
           AssetPanelItem panelItem = new AssetPanelItem(Icons.ASSET_SOUND_32, sound.getName(), sound);
+          this.add(panelItem);
+          panelItem.validate();
+        }
+      });
+  }
+
+  /**
+   * Populates this panel with the given animations.
+   *
+   * <p>
+   * Each animation is rendered using its first sprite as a preview icon (falling back to the
+   * generic animation icon if the sprite sheet is not available).
+   * </p>
+   *
+   * @param animations The animations to display.
+   */
+  public void loadAnimations(List<Animation> animations) {
+    this.currentType = AssetType.ANIMATION;
+    this.load(
+      () -> {
+        animations.sort((a, b) -> {
+          String nameA = a.getName() == null ? "" : a.getName();
+          String nameB = b.getName() == null ? "" : b.getName();
+          return nameA.compareToIgnoreCase(nameB);
+        });
+        for (Animation animation : animations) {
+          Icon icon = Icons.ASSET_ANIMATION_32;
+          Spritesheet sheet = animation.getSpritesheet();
+          if (sheet != null && sheet.getSprite(0) != null) {
+            icon = new ImageIcon(sheet.getPreview(64));
+          }
+          AssetPanelItem panelItem = new AssetPanelItem(icon, animation.getName(), animation);
           this.add(panelItem);
           panelItem.validate();
         }

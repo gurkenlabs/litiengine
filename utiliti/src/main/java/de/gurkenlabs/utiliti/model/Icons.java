@@ -135,6 +135,7 @@ public final class Icons {
   public static final Icon SOUND_24 = IconLoader.get().getUIAwareIcon("sound.svg", 24, 24);
   public static final Icon SPAWNPOINT_24 = IconLoader.get().getUIAwareIcon("spawnpoint.svg", 24, 24);
   public static final Icon SPRITESHEET_24 = IconLoader.get().getUIAwareIcon("spritesheet.svg", 24, 24);
+  public static final Icon ANIMATION_24 = IconLoader.get().getUIAwareIcon("spritesheet.svg", 24, 24);
   public static final Icon TILESET_24 = IconLoader.get().getUIAwareIcon("tileset.svg", 24, 24);
   public static final Icon TRIGGER_24 = IconLoader.get().getUIAwareIcon("trigger.svg", 24, 24);
 
@@ -180,6 +181,7 @@ public final class Icons {
   public static final Icon SOUND_32 = IconLoader.get().getUIAwareIcon("sound.svg", 32, 32);
   public static final Icon SPAWNPOINT_32 = IconLoader.get().getUIAwareIcon("spawnpoint.svg", 32, 32);
   public static final Icon SPRITESHEET_32 = IconLoader.get().getUIAwareIcon("spritesheet.svg", 32, 32);
+  public static final Icon ASSET_ANIMATION_32 = IconLoader.get().getUIAwareIcon("spritesheet.svg", 32, 32);
   public static final Icon TILESET_32 = IconLoader.get().getUIAwareIcon("tileset.svg", 32, 32);
   public static final Icon TRIGGER_32 = IconLoader.get().getUIAwareIcon("trigger.svg", 32, 32);
 

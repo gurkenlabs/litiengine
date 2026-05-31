@@ -3,6 +3,7 @@ package de.gurkenlabs.utiliti.view.menus;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
+import de.gurkenlabs.litiengine.graphics.animation.Animation;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.resources.SoundResource;
@@ -30,7 +31,7 @@ public final class AssetPanelItemPopupMenu extends JPopupMenu {
     JMenuItem edit = new JMenuItem(Resources.strings().get("contextmenu_resource_edit_" + typeKey), Icons.PENCIL_16);
     edit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0));
     edit.addActionListener(e -> item.editAsset());
-    edit.setEnabled(origin instanceof SpritesheetResource);
+    edit.setEnabled(origin instanceof SpritesheetResource || origin instanceof Animation);
 
     JMenuItem export = new JMenuItem(Resources.strings().get("contextmenu_resource_export_" + typeKey), Icons.EXPORT_16);
     export.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK));
@@ -63,6 +64,9 @@ public final class AssetPanelItemPopupMenu extends JPopupMenu {
     }
     if (origin instanceof SoundResource) {
       return "sound";
+    }
+    if (origin instanceof Animation) {
+      return "animation";
     }
     return "asset";
   }

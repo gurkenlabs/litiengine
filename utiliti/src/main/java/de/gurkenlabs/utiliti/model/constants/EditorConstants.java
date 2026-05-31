@@ -14,6 +14,7 @@ public final class EditorConstants {
   public static final String AUDIO_FILE_NAME = "Audio File";
   public static final String SPRITESHEET_FILE_NAME = "Spritesheet Image";
   public static final String TEXTUREATLAS_FILE_NAME = "Texture Atlas XML (generic)";
+  public static final String ANIMATION_FILE_NAME = "Aseprite Animation";
 
   public static final String IMPORT_DIALOGUE = "import_something";
 

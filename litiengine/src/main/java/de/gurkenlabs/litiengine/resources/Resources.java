@@ -4,6 +4,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.graphics.animation.Animation;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterLoader;
 import de.gurkenlabs.litiengine.sound.Sound;
@@ -54,6 +55,7 @@ public final class Resources {
   private static Images images = new Images();
   private static Spritesheets spritesheets = new Spritesheets();
   private static Blueprints blueprints = new Blueprints();
+  private static Animations animations = new Animations();
 
   private Resources() {
     throw new UnsupportedOperationException();
@@ -137,6 +139,21 @@ public final class Resources {
    */
   public static Blueprints blueprints() {
     return blueprints;
+  }
+
+  /**
+   * Gets the container that manages {@code Animation} resources.
+   *
+   * <p>
+   * Animations can be imported from <a href="https://www.aseprite.org/docs/cli/#filename-format">Aseprite</a>
+   * JSON exports and re-exported to the same format via this container.
+   * </p>
+   *
+   * @return The Animation resource container.
+   * @see Animation
+   */
+  public static Animations animations() {
+    return animations;
   }
 
   /**
@@ -353,6 +370,7 @@ public final class Resources {
     tilesets().clear();
     images().clear();
     spritesheets().clear();
+    animations().clear();
   }
 
   /**

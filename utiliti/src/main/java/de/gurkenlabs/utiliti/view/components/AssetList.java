@@ -7,6 +7,7 @@ import de.gurkenlabs.utiliti.controller.FileDrop;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.ScrollPaneConstants;
@@ -26,15 +27,21 @@ public class AssetList extends JSplitPane implements Controller {
       assetPanel,
       files -> {
         List<Path> droppedImages = new ArrayList<>();
+        List<Path> droppedAnimations = new ArrayList<>();
         for (Path file : files) {
-          // handle dropped image
           if (ImageFormat.isSupported(file)) {
             droppedImages.add(file);
+          } else if (file.getFileName() != null
+            && file.getFileName().toString().toLowerCase(Locale.ROOT).endsWith(".json")) {
+            droppedAnimations.add(file);
           }
         }
 
         if (!droppedImages.isEmpty()) {
           Editor.instance().importSpriteSheets(droppedImages.toArray(new Path[0]));
+        }
+        if (!droppedAnimations.isEmpty()) {
+          Editor.instance().importAnimations(droppedAnimations.toArray(new Path[0]));
         }
       });
 

@@ -32,6 +32,7 @@ public class AssetTree extends JTree {
   private final DefaultMutableTreeNode nodeEmitters;
   private final DefaultMutableTreeNode nodeBlueprints;
   private final DefaultMutableTreeNode nodeCreatures;
+  private final DefaultMutableTreeNode nodeAnimations;
 
   public AssetTree(AssetPanel assetPanel) {
     this.setRootVisible(false);
@@ -47,6 +48,7 @@ public class AssetTree extends JTree {
     this.nodeEmitters = new DefaultMutableTreeNode(new IconTreeListItem(Resources.strings().get("assettree_emitters"), Icons.EMITTER_24));
     this.nodeBlueprints = new DefaultMutableTreeNode(new IconTreeListItem(Resources.strings().get("assettree_blueprints"), Icons.BLUEPRINT_24));
     this.nodeCreatures = new DefaultMutableTreeNode(new IconTreeListItem(Resources.strings().get("assettree_creatures"), Icons.CREATURE_24));
+    this.nodeAnimations = new DefaultMutableTreeNode(new IconTreeListItem(Resources.strings().get("assettree_animations"), Icons.ANIMATION_24));
 
     this.nodeSpritesheets.add(this.nodeSpriteProps);
     this.nodeSpritesheets.add(this.nodeCreatures);
@@ -57,6 +59,7 @@ public class AssetTree extends JTree {
     this.nodeRoot.add(this.nodeBlueprints);
     this.nodeRoot.add(this.nodeTileSets);
     this.nodeRoot.add(this.nodeSounds);
+    this.nodeRoot.add(this.nodeAnimations);
 
     this.entitiesTreeModel = new DefaultTreeModel(this.nodeRoot);
 
@@ -89,6 +92,14 @@ public class AssetTree extends JTree {
     final TreePath emitterPath = new TreePath(this.nodeEmitters.getPath());
     final TreePath blueprintPath = new TreePath(this.nodeBlueprints.getPath());
     final TreePath soundPath = new TreePath(this.nodeSounds.getPath());
+    final TreePath animationPath = new TreePath(this.nodeAnimations.getPath());
+
+    // Animations live in the engine's in-memory resource container rather than the resource bundle,
+    // so they can be displayed even when no project (game file) is loaded yet.
+    if (selectedPath.equals(animationPath)) {
+      this.assetPanel.loadAnimations(new ArrayList<>(Resources.animations().getAll()));
+      return;
+    }
 
     final ResourceBundle gameFile = Editor.instance().getGameFile();
     if (gameFile == null) {

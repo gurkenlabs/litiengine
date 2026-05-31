@@ -1,6 +1,7 @@
 package de.gurkenlabs.utiliti.controller;
 
 import static de.gurkenlabs.utiliti.model.constants.EditorConstants.AUDIO_FILE_NAME;
+import static de.gurkenlabs.utiliti.model.constants.EditorConstants.ANIMATION_FILE_NAME;
 import static de.gurkenlabs.utiliti.model.constants.EditorConstants.GAME_FILE_NAME;
 import static de.gurkenlabs.utiliti.model.constants.EditorConstants.IMPORT_DIALOGUE;
 import static de.gurkenlabs.utiliti.model.constants.EditorConstants.NEW_GAME_STRING;
@@ -381,6 +382,39 @@ public class Editor extends Screen {
       SoundFormat.getAllExtensions()) == JFileChooser.APPROVE_OPTION) {
       this.importSounds(Stream.of(EditorFileChooser.instance().getSelectedFiles()).map(File::toPath).toArray(Path[]::new));
     }
+  }
+
+  /**
+   * Opens a file chooser dialog so the user can pick one or more Aseprite-exported JSON files and
+   * imports the animations they describe into the editor.
+   */
+  public void importAnimations() {
+    if (EditorFileChooser.showFileDialog(ANIMATION_FILE_NAME, Resources.strings().get(IMPORT_DIALOGUE, ANIMATION_FILE_NAME), true,
+      "json") == JFileChooser.APPROVE_OPTION) {
+      this.importAnimations(Stream.of(EditorFileChooser.instance().getSelectedFiles()).map(File::toPath).toArray(Path[]::new));
+    }
+  }
+
+  /**
+   * Imports the given Aseprite JSON animation files into the engine's {@link
+   * de.gurkenlabs.litiengine.resources.Animations} resource container and refreshes the asset
+   * panel.
+   *
+   * @param files One or more paths pointing to Aseprite JSON sidecar files.
+   */
+  public void importAnimations(Path... files) {
+    if (files == null || files.length == 0) {
+      return;
+    }
+    for (Path file : files) {
+      try {
+        var animation = Resources.animations().importAseprite(file);
+        log.log(Level.INFO, "imported animation {0} from {1}", new Object[] {animation.getName(), file});
+      } catch (IOException | RuntimeException e) {
+        log.log(Level.SEVERE, "could not import animation from " + file + ": " + e.getMessage(), e);
+      }
+    }
+    UI.getAssetController().refresh();
   }
 
   public void exportSpriteFile() {
