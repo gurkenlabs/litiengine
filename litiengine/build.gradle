@@ -14,7 +14,10 @@ dependencies {
   implementation libs.bundles.soundlibs
   implementation libs.javax.activation
   api libs.xml.api
+  api libs.json.api
+  api libs.json.bind.api
   runtimeOnly libs.bundles.xml.runtime
+  runtimeOnly libs.bundles.json.runtime
   testImplementation project(":shared")
   testImplementation libs.junit.jupiter
   testRuntimeOnly "org.junit.platform:junit-platform-launcher"

@@ -24,6 +24,7 @@ public final class AssetPanelPopupMenu extends JPopupMenu {
         case EMITTER -> addImportItem("menu_assets_importEmitters", Editor.instance()::importEmitters, projectLoaded);
         case BLUEPRINT -> addImportItem("menu_assets_importBlueprints", Editor.instance()::importBlueprints, projectLoaded);
         case SOUND -> addImportItem("menu_assets_importSounds", Editor.instance()::importSounds, projectLoaded);
+        case ANIMATION -> addImportItem("menu_assets_importAnimations", Editor.instance()::importAnimations, true);
       }
       addSeparator();
     }
@@ -34,6 +35,7 @@ public final class AssetPanelPopupMenu extends JPopupMenu {
     addToMenu(importAll, "menu_assets_importSpriteFile", Editor.instance()::importSpriteFile, projectLoaded);
     importAll.addSeparator();
     addToMenu(importAll, "menu_assets_importSounds", Editor.instance()::importSounds, projectLoaded);
+    addToMenu(importAll, "menu_assets_importAnimations", Editor.instance()::importAnimations, true);
     importAll.addSeparator();
     addToMenu(importAll, "menu_assets_importEmitters", Editor.instance()::importEmitters, projectLoaded);
     addToMenu(importAll, "menu_assets_importBlueprints", Editor.instance()::importBlueprints, projectLoaded);

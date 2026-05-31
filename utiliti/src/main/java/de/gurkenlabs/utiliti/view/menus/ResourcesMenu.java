@@ -51,11 +51,17 @@ public final class ResourcesMenu extends JMenu {
     importSounds.addActionListener(a -> Editor.instance().importSounds());
     importSounds.setEnabled(false);
 
+    JMenuItem importAnimations = new JMenuItem(Resources.strings().get("menu_assets_importAnimations"));
+    importAnimations.addActionListener(a -> Editor.instance().importAnimations());
+    // animations live in an in-memory resource container and can be imported without a loaded project
+    importAnimations.setEnabled(true);
+
     importMenu.add(importSprite);
     importMenu.add(importTextureAtlas);
     importMenu.add(importSpriteFile);
     importMenu.addSeparator();
     importMenu.add(importSounds);
+    importMenu.add(importAnimations);
     importMenu.addSeparator();
     importMenu.add(importEmitters);
     importMenu.add(importBlueprints);

@@ -10,6 +10,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.graphics.animation.Animation;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.litiengine.resources.ImageFormat;
 import de.gurkenlabs.litiengine.resources.Resources;
@@ -398,6 +399,12 @@ public class AssetPanelItem extends JPanel {
     Map<String, String> details = new ConcurrentHashMap<>();
     if (origin instanceof SpritesheetResource spritesheetResource) {
       details.put("Size", spritesheetResource.getWidth() + "x" + spritesheetResource.getHeight() + "px");
+    } else if (origin instanceof Animation animation) {
+      details.put("Frames", String.valueOf(animation.getKeyframes().size()));
+      details.put("Duration", animation.getTotalDuration() + "ms");
+      if (animation.getSpritesheet() != null) {
+        details.put("Spritesheet", animation.getSpritesheet().getName());
+      }
     }
     return details;
   }
@@ -445,6 +452,13 @@ public class AssetPanelItem extends JPanel {
         if (confirmDelete(assetType, assetName)) {
           Editor.instance().getGameFile().getSounds().remove(soundResource);
           Resources.sounds().remove(assetName);
+        }
+      }
+      case Animation animation -> {
+        assetType = "animation";
+        assetName = animation.getName();
+        if (confirmDelete(assetType, assetName)) {
+          Resources.animations().remove(assetName);
         }
       }
       default -> {
@@ -523,11 +537,15 @@ public class AssetPanelItem extends JPanel {
   }
 
   public void editAsset() {
-    if (!(origin instanceof SpritesheetResource)) {
-      return;
+    if (origin instanceof SpritesheetResource spritesheetResource) {
+      editSpritesheet(spritesheetResource);
+    } else if (origin instanceof Animation animation) {
+      editAnimation(animation);
     }
+  }
 
-    SpritesheetImportPanel spritePanel = new SpritesheetImportPanel((SpritesheetResource) origin);
+  private void editSpritesheet(SpritesheetResource spritesheetResource) {
+    SpritesheetImportPanel spritePanel = new SpritesheetImportPanel(spritesheetResource);
     int option = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), spritePanel, Resources.strings().get("menu_assets_editSprite"),
       JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
@@ -543,6 +561,21 @@ public class AssetPanelItem extends JPanel {
     Editor.instance().loadSpriteSheets(Editor.instance().getGameFile().getSpriteSheets(), true);
   }
 
+  private void editAnimation(Animation animation) {
+    AnimationEditPanel panel = new AnimationEditPanel(animation);
+    try {
+      int option = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), panel,
+        Resources.strings().get("menu_assets_editAnimation"),
+        JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+      if (option == JOptionPane.OK_OPTION) {
+        panel.applyChanges();
+        UI.getAssetController().refresh();
+      }
+    } finally {
+      panel.dispose();
+    }
+  }
+
   public void exportAsset() {
     if (origin instanceof Tileset tileset) {
       exportTileset(tileset);
@@ -554,6 +587,8 @@ public class AssetPanelItem extends JPanel {
       exportBlueprint(blueprint);
     } else if (origin instanceof SoundResource soundResource) {
       exportSound(soundResource);
+    } else if (origin instanceof Animation animation) {
+      exportAnimation(animation);
     }
   }
 
@@ -624,6 +659,22 @@ public class AssetPanelItem extends JPanel {
     }
   }
 
+  private void exportAnimation(Animation animation) {
+    JFileChooser chooser = createFileChooser("Aseprite JSON", "json", animation.getName() + ".json");
+    chooser.setDialogTitle("Export Aseprite Animation");
+
+    if (chooser.showSaveDialog(Game.window().getRenderComponent()) != JFileChooser.APPROVE_OPTION) {
+      return;
+    }
+
+    java.nio.file.Path destination = chooser.getSelectedFile().toPath();
+    if (Resources.animations().exportAseprite(animation, destination)) {
+      log.log(Level.INFO, "exported animation {0} to {1}", new Object[] {animation.getName(), destination});
+    } else {
+      log.log(Level.WARNING, "failed to export animation {0}", animation.getName());
+    }
+  }
+
   private JFileChooser createFileChooser(String description, String extension, String defaultFileName) {
     JFileChooser chooser = new JFileChooser(Editor.instance().getProjectPath().toFile());
     chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -659,6 +710,9 @@ public class AssetPanelItem extends JPanel {
     } else if (origin instanceof Tileset || origin instanceof SoundResource) {
       btnAdd.setVisible(false);
       btnDelete.setVisible(origin instanceof SoundResource && visible);
+    } else if (origin instanceof Animation) {
+      btnAdd.setVisible(false);
+      btnDelete.setVisible(visible);
     }
     btnEdit.setVisible(visible);
     btnExport.setVisible(visible);
