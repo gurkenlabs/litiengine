@@ -18,6 +18,8 @@ class GamepadManagerTests {
   @BeforeEach
   void setUp() {
     gamepadManager = new GamepadManager();
+    // Ensure a clean state regardless of input devices detected on the host machine.
+    gamepadManager.getAll().clear();
   }
 
   @Test
