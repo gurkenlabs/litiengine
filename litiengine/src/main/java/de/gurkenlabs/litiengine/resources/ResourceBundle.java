@@ -4,7 +4,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
-import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
+import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterAttributes;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
@@ -65,7 +65,7 @@ public class ResourceBundle implements Serializable {
 
   @XmlElementWrapper(name = "emitters")
   @XmlElement(name = "emitter")
-  private final List<EmitterData> emitters;
+  private final List<EmitterAttributes> emitters;
 
   @XmlElementWrapper(name = "blueprints")
   @XmlElement(name = "blueprint")
@@ -232,7 +232,7 @@ public class ResourceBundle implements Serializable {
    * @return The list of emitters.
    */
   @XmlTransient
-  public List<EmitterData> getEmitters() {
+  public List<EmitterAttributes> getEmitters() {
     return this.emitters;
   }
 

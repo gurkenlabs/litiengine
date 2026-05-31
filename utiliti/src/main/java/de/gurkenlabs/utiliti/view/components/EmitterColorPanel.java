@@ -3,7 +3,7 @@ package de.gurkenlabs.utiliti.view.components;
 import com.github.weisj.darklaf.components.border.DarkBorders;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
-import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
+import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterAttributes;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.utiliti.controller.ControlBehavior;
@@ -72,8 +72,8 @@ public class EmitterColorPanel extends PropertyPanel {
     colorControls.setLayout(grplayout);
     colorControls.setBorder(new EmptyBorder(CONTROL_MARGIN, 0, CONTROL_MARGIN, 0));
 
-    colorVariance = new JSpinner(new SpinnerNumberModel(EmitterData.DEFAULT_COLOR_VARIANCE, 0d, STEP_ONE, STEP_FINE));
-    alphaVariance = new JSpinner(new SpinnerNumberModel(EmitterData.DEFAULT_ALPHA_VARIANCE, 0d, STEP_ONE, STEP_FINE));
+    colorVariance = new JSpinner(new SpinnerNumberModel(EmitterAttributes.DEFAULT_COLOR_VARIANCE, 0d, STEP_ONE, STEP_FINE));
+    alphaVariance = new JSpinner(new SpinnerNumberModel(EmitterAttributes.DEFAULT_ALPHA_VARIANCE, 0d, STEP_ONE, STEP_FINE));
 
     setLayout(createLayout());
     setupChangedListeners();
@@ -82,14 +82,14 @@ public class EmitterColorPanel extends PropertyPanel {
   @Override protected void clearControls() {
     model.setRowCount(0);
     table.clearSelection();
-    colorVariance.setValue((double) EmitterData.DEFAULT_COLOR_VARIANCE);
-    alphaVariance.setValue((double) EmitterData.DEFAULT_ALPHA_VARIANCE);
+    colorVariance.setValue((double) EmitterAttributes.DEFAULT_COLOR_VARIANCE);
+    alphaVariance.setValue((double) EmitterAttributes.DEFAULT_ALPHA_VARIANCE);
   }
 
   @Override protected void setControlValues(IMapObject mapObject) {
     setColors(mapObject.getStringValue(MapObjectProperty.Emitter.COLORS, null));
-    colorVariance.setValue(mapObject.getDoubleValue(MapObjectProperty.Emitter.COLORVARIANCE, EmitterData.DEFAULT_COLOR_VARIANCE));
-    alphaVariance.setValue(mapObject.getDoubleValue(MapObjectProperty.Emitter.ALPHAVARIANCE, EmitterData.DEFAULT_ALPHA_VARIANCE));
+    colorVariance.setValue(mapObject.getDoubleValue(MapObjectProperty.Emitter.COLORVARIANCE, EmitterAttributes.DEFAULT_COLOR_VARIANCE));
+    alphaVariance.setValue(mapObject.getDoubleValue(MapObjectProperty.Emitter.ALPHAVARIANCE, EmitterAttributes.DEFAULT_ALPHA_VARIANCE));
   }
 
   private void setColors(String commaSeparatedHexstrings) {
@@ -113,7 +113,7 @@ public class EmitterColorPanel extends PropertyPanel {
   }
 
   private void setupChangedListeners() {
-    btnAdd.addActionListener(a -> model.addRow(new Object[] {ColorHelper.encode(EmitterData.DEFAULT_COLOR.brighter())}));
+    btnAdd.addActionListener(a -> model.addRow(new Object[] {ColorHelper.encode(EmitterAttributes.DEFAULT_COLOR.brighter())}));
     btnRemove.addActionListener(a -> model.removeRow(table.getSelectedRow()));
     btnEdit.addActionListener(a -> {
       if (table.getSelectedRow() == -1 || table.getSelectedColumn() == -1) {

@@ -39,7 +39,7 @@ public final class XmlExportDialog {
       new FileNameExtensionFilter("." + extension + " - " + name + " XML", extension);
     chooser.setFileFilter(filter);
     chooser.addChoosableFileFilter(filter);
-    chooser.setSelectedFile(new File(filename + "." + extension));
+    chooser.setSelectedFile(new File(filename));
 
     int result = chooser.showSaveDialog(Game.window().getRenderComponent());
     if (result == JFileChooser.APPROVE_OPTION) {

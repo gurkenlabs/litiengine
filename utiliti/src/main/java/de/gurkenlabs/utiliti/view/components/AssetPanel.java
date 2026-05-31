@@ -7,7 +7,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.animation.Animation;
-import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
+import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterAttributes;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.resources.SoundResource;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
@@ -98,12 +98,12 @@ public class AssetPanel extends JPanel {
       });
   }
 
-  public void loadEmitters(List<EmitterData> emitters) {
+  public void loadEmitters(List<EmitterAttributes> emitters) {
     this.currentType = AssetType.EMITTER;
     this.load(
       () -> {
         Collections.sort(emitters);
-        for (EmitterData emitter : emitters) {
+        for (EmitterAttributes emitter : emitters) {
           AssetPanelItem panelItem =
             new AssetPanelItem(Icons.ASSET_EMITTER_32, emitter.getName(), emitter);
           this.add(panelItem);

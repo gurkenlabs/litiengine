@@ -4,7 +4,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.ITimeToLive;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
-import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
+import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterAttributes;
 import de.gurkenlabs.litiengine.physics.Collision;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -607,31 +607,31 @@ public abstract class Particle implements ITimeToLive {
   }
 
   /**
-   * Initializes this particle's mutable state from the supplied {@link EmitterData}.
+   * Initializes this particle's mutable state from the supplied {@link EmitterAttributes}.
    *
    * @param data the emitter data providing initial parameter values
    * @return this particle instance for chaining
    */
-  public Particle init(final EmitterData data) {
-    this.setX((float) data.getParticleOffsetX().get());
-    this.setY((float) data.getParticleOffsetY().get());
+  public Particle init(final EmitterAttributes data) {
+    this.setX(data.getParticleOffsetX().getRandomNumber().floatValue());
+    this.setY(data.getParticleOffsetY().getRandomNumber().floatValue());
 
-    this.setAccelerationX((float) data.getAccelerationX().get());
-    this.setAccelerationY((float) data.getAccelerationY().get());
+    this.setAccelerationX(data.getAccelerationX().getRandomNumber().floatValue());
+    this.setAccelerationY(data.getAccelerationY().getRandomNumber().floatValue());
 
-    this.setVelocityX((float) data.getVelocityX().get());
-    this.setVelocityY((float) data.getVelocityY().get());
+    this.setVelocityX(data.getVelocityX().getRandomNumber().floatValue());
+    this.setVelocityY(data.getVelocityY().getRandomNumber().floatValue());
 
-    this.setDeltaWidth((float) data.getDeltaWidth().get());
-    this.setDeltaHeight((float) data.getDeltaHeight().get());
+    this.setDeltaWidth(data.getDeltaWidth().getRandomNumber().floatValue());
+    this.setDeltaHeight(data.getDeltaHeight().getRandomNumber().floatValue());
 
-    this.setAngle((float) data.getAngle().get());
-    this.setDeltaAngle((float) data.getDeltaAngle().get());
+    this.setAngle(data.getAngle().getRandomNumber().floatValue());
+    this.setDeltaAngle(data.getDeltaAngle().getRandomNumber().floatValue());
 
-    this.setTimeToLive((int) data.getParticleTTL().get());
+    this.setTimeToLive(data.getParticleTTL().getRandomNumber().intValue());
     this.setColor(Game.random().choose(data.getDecodedColors()));
 
-    this.setOutlineThickness((float) data.getOutlineThickness().get());
+    this.setOutlineThickness(data.getOutlineThickness().getRandomNumber().floatValue());
 
     this.setCollisionType(data.getCollision());
     this.setOutlineOnly(data.isOutlineOnly());

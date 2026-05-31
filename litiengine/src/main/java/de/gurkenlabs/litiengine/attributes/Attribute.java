@@ -1,5 +1,10 @@
 package de.gurkenlabs.litiengine.attributes;
 
+import de.gurkenlabs.litiengine.environment.tilemap.xml.NumberAdapter;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
@@ -9,22 +14,35 @@ import java.util.List;
 
 /**
  * Represents an attribute with a base value and a list of modifiers. The attribute value can be modified by adding or removing modifiers.
+ * <p>
+ * This class is XML-serializable via JAXB. The base {@link #value} is written as an XML attribute
+ * named {@code value}; runtime-only data (such as registered modifiers and property change support)
+ * is marked transient and is not part of the serialized form.
+ * </p>
  *
  * @param <T> the type of the attribute value, which must be a Number
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Attribute<T extends Number> implements IAttribute<T>, Serializable {
   /**
    * The support object used to manage and notify property change listeners. It allows other components to listen for changes to the properties of
    * this object.
    */
-  protected final PropertyChangeSupport support;
+  protected final transient PropertyChangeSupport support;
   /**
-   * The base value of the attribute. This value represents the unmodified state of the attribute before any modifiers are applied.
+   * The base value of the attribute. This value represents the unmodified state of the attribute
+   * before any modifiers are applied. It is serialized as the {@code value} XML attribute.
+   * <p>
+   * Subclasses such as {@link RangeAttribute} that do not want to persist a base value can suppress
+   * serialization at runtime via JAXB {@code beforeMarshal} / {@code afterMarshal} callbacks.
+   * </p>
    */
+  @XmlAttribute(name = "value")
+  @XmlJavaTypeAdapter(NumberAdapter.class)
   protected T value;
   private static final String VALUE_PROPERTY = "value";
   private final transient PropertyChangeListener modifierListener;
-  private final List<AttributeModifier<T>> modifiers = new ArrayList<>();
+  private final transient List<AttributeModifier<T>> modifiers = new ArrayList<>();
 
 
   /**
@@ -53,6 +71,7 @@ public class Attribute<T extends Number> implements IAttribute<T>, Serializable 
   public T getValue() {
     return this.value;
   }
+
 
   /**
    * Gets the current value of the attribute, computed by applying all active modifications to the base value.
@@ -180,4 +199,3 @@ public class Attribute<T extends Number> implements IAttribute<T>, Serializable 
     return getModifiedValue().toString();
   }
 }
-

@@ -18,7 +18,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.TextRenderer;
-import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
+import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterAttributes;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterLoader;
 import de.gurkenlabs.litiengine.gui.screens.Screen;
 import de.gurkenlabs.litiengine.resources.ImageFormat;
@@ -505,9 +505,9 @@ public class Editor extends Screen {
 
   public void importEmitters() {
     XmlImportDialog.importXml("Emitter", file -> {
-      EmitterData emitter;
+      EmitterAttributes emitter;
       try {
-        emitter = XmlUtilities.read(EmitterData.class, file.toUri().toURL());
+        emitter = XmlUtilities.read(EmitterAttributes.class, file.toUri().toURL());
       } catch (IOException | JAXBException e) {
         log.log(Level.SEVERE, String.format("could not load emitter data from %s", file), e);
         return;
@@ -746,8 +746,8 @@ public class Editor extends Screen {
     });
   }
 
-  private static void loadCustomEmitters(List<EmitterData> emitters) {
-    for (EmitterData emitterData : emitters) {
+  private static void loadCustomEmitters(List<EmitterAttributes> emitters) {
+    for (EmitterAttributes emitterData : emitters) {
       EmitterLoader.load(emitterData);
     }
   }

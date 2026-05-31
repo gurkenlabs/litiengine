@@ -5,7 +5,7 @@ import com.github.weisj.darklaf.ui.togglebutton.ToggleButtonConstants;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
+import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterAttributes;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.view.renderers.LabelListCellRenderer;
 import java.awt.LayoutManager;
@@ -37,8 +37,8 @@ public class EmitterSpritePanel extends PropertyPanel {
   protected void clearControls() {
     spritesheet.removeAllItems();
     spritesheet.setSelectedItem(null);
-    animateSprite.setSelected(EmitterData.DEFAULT_ANIMATE_SPRITE);
-    loopSprite.setSelected(EmitterData.DEFAULT_LOOP_SPRITE);
+    animateSprite.setSelected(EmitterAttributes.DEFAULT_ANIMATE_SPRITE);
+    loopSprite.setSelected(EmitterAttributes.DEFAULT_LOOP_SPRITE);
   }
 
   @Override
@@ -47,10 +47,10 @@ public class EmitterSpritePanel extends PropertyPanel {
     selectSpriteSheet(spritesheet, mapObject);
     animateSprite.setSelected(
         mapObject.getBoolValue(
-            MapObjectProperty.Particle.ANIMATESPRITE, EmitterData.DEFAULT_ANIMATE_SPRITE));
+            MapObjectProperty.Particle.ANIMATESPRITE, EmitterAttributes.DEFAULT_ANIMATE_SPRITE));
     loopSprite.setSelected(
         mapObject.getBoolValue(
-            MapObjectProperty.Particle.LOOPSPRITE, EmitterData.DEFAULT_LOOP_SPRITE));
+            MapObjectProperty.Particle.LOOPSPRITE, EmitterAttributes.DEFAULT_LOOP_SPRITE));
   }
 
   protected LayoutManager createLayout() {
