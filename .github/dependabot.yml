@@ -6,9 +6,11 @@ updates:
       interval: "weekly"
     groups:
       gradle-minor:
-        update-types: "minor"
+        update-types:
+          - "minor"
       gradle-patch:
-        update-types: "patch"
+        update-types:
+          - "patch"
 
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -16,6 +18,8 @@ updates:
       interval: "weekly"
     groups:
       github-actions-minor:
-        update-types: "minor"
+        update-types:
+          - "minor"
       github-actions-patch:
-        update-types: "patch"
+        update-types:
+          - "patch"
