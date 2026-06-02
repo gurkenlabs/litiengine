@@ -4,8 +4,18 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    groups:
+      gradle-minor:
+        update-types: "minor"
+      gradle-patch:
+        update-types: "patch"
 
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
+    groups:
+      github-actions-minor:
+        update-types: "minor"
+      github-actions-patch:
+        update-types: "patch"
