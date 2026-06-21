@@ -37,4 +37,4 @@ beryxRuntime = { id = "org.beryx.runtime", version = "2.0.1" }
 gradle-maven-publish = { id = "com.vanniktech.maven.publish", version = "0.36.0" }
 grgit = { id = "org.ajoberstar.grgit", version = "5.3.3" }
 sonarQube = { id = "org.sonarqube", version = "7.3.1.8318" }
-spotless = { id = "com.diffplug.spotless", version = "8.6.0" }
+spotless = { id = "com.diffplug.spotless", version = "8.7.0" }
