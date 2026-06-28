@@ -1,7 +1,7 @@
 [versions]
 darklaf = "3.1.1"
 jaxb = "4.0.9"
-junit = "6.1.0"
+junit = "6.1.1"
 
 [libraries]
 darklaf_core = { module = "com.github.weisj:darklaf-core", version.ref = "darklaf" }
