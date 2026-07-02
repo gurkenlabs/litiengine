@@ -1,0 +1,45 @@
+# LITIENGINE Rendering Benchmark Results
+Date: 2026-07-02
+Commit: 08cc703c
+
+## Raw Results
+
+| Scene                      | Mean  | Min   | Max   | P99   | GC   | N    |
+|----------------------------|-------|-------|-------|-------|------|------|
+| 4 lights(RECTANGLE) + 0 shadows |   0.12 |   0.06 |   2.79 |   0.37 |    1 |  500 |
+| 1 emitters x 100 particles     |   0.00 |   0.00 |   0.02 |   0.00 |    0 |  500 |
+| 2 emitters x 400 particles     |   0.00 |   0.00 |   0.06 |   0.01 |    0 |  500 |
+| 200 entities                   |   0.08 |   0.05 |   1.66 |   0.25 |    1 |  500 |
+| 500 entities                   |   0.06 |   0.04 |   2.41 |   0.26 |    2 |  500 |
+| 50 entities                    |   0.08 |   0.03 |   2.45 |   0.26 |    1 |  500 |
+| empty scene                    |   0.00 |   0.00 |   0.02 |   0.00 |    0 |  500 |
+| 4 lights(ELLIPSE) + 0 shadows  |   0.06 |   0.03 |   2.89 |   0.18 |    1 |  500 |
+| 4 lights(ELLIPSE) + 50 shadows |   0.06 |   0.03 |   1.79 |   0.16 |    1 |  500 |
+
+## Relative to First Benchmark (Baseline)
+
+| Metric                        | Baseline -> Current | Change |
+|-------------------------------|---------------------|--------|
+| 4 lights(RECTANGLE) + 0 shadows |    0.12 ->    0.12 |   +0.0% |
+| 1 emitters x 100 particles     |    0.12 ->    0.00 |  -99.4% |
+| 2 emitters x 400 particles     |    0.12 ->    0.00 |  -98.7% |
+| 200 entities                   |    0.12 ->    0.08 |  -36.3% |
+| 500 entities                   |    0.12 ->    0.06 |  -46.0% |
+| 50 entities                    |    0.12 ->    0.08 |  -36.3% |
+| empty scene                    |    0.12 ->    0.00 |  -99.9% |
+| 4 lights(ELLIPSE) + 0 shadows  |    0.12 ->    0.06 |  -49.0% |
+| 4 lights(ELLIPSE) + 50 shadows |    0.12 ->    0.06 |  -51.3% |
+
+## Summary
+
+| Scene | Mean (ms) | Max (ms) | P99 (ms) | GC pauses | Samples |
+|-------|-----------|----------|----------|-----------|---------|
+| 4 lights(RECTANGLE) + 0 shadows |     0.12 |     2.79 |     0.37 |         1 |     500 |
+| 1 emitters x 100 particles     |     0.00 |     0.02 |     0.00 |         0 |     500 |
+| 2 emitters x 400 particles     |     0.00 |     0.06 |     0.01 |         0 |     500 |
+| 200 entities                   |     0.08 |     1.66 |     0.25 |         1 |     500 |
+| 500 entities                   |     0.06 |     2.41 |     0.26 |         2 |     500 |
+| 50 entities                    |     0.08 |     2.45 |     0.26 |         1 |     500 |
+| empty scene                    |     0.00 |     0.02 |     0.00 |         0 |     500 |
+| 4 lights(ELLIPSE) + 0 shadows  |     0.06 |     2.89 |     0.18 |         1 |     500 |
+| 4 lights(ELLIPSE) + 50 shadows |     0.06 |     1.79 |     0.16 |         1 |     500 |

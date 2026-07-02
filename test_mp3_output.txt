@@ -1,0 +1,29 @@
+Starting a Gradle Daemon, 2 incompatible and 1 stopped Daemons could not be reused, use --status for details
+> Task :buildSrc:extractPluginRequests UP-TO-DATE
+> Task :buildSrc:generatePluginAdapters UP-TO-DATE
+> Task :buildSrc:compileJava FROM-CACHE
+> Task :buildSrc:compileGroovy NO-SOURCE
+> Task :buildSrc:compileGroovyPlugins FROM-CACHE
+> Task :buildSrc:pluginDescriptors UP-TO-DATE
+> Task :buildSrc:processResources UP-TO-DATE
+> Task :buildSrc:classes UP-TO-DATE
+> Task :buildSrc:jar
+
+> Configure project :litiengine
+Reckoned version: 0.12.0-SNAPSHOT
+
+> Task :shared:compileJava UP-TO-DATE
+> Task :shared:processResources NO-SOURCE
+> Task :shared:classes UP-TO-DATE
+> Task :shared:jar UP-TO-DATE
+> Task :litiengine:compileJava UP-TO-DATE
+> Task :litiengine:processResources UP-TO-DATE
+> Task :litiengine:classes UP-TO-DATE
+> Task :litiengine:compileTestJava UP-TO-DATE
+> Task :litiengine:processTestResources UP-TO-DATE
+> Task :litiengine:testClasses UP-TO-DATE
+> Task :litiengine:test
+> Task :litiengine:jacocoTestReport
+
+BUILD SUCCESSFUL in 18s
+15 actionable tasks: 3 executed, 2 from cache, 10 up-to-date

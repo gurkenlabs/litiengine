@@ -1,0 +1,32 @@
+# LITIENGINE Rendering Benchmark Results
+Date: 2026-07-02
+Commit: 08cc703c
+
+## Raw Results
+
+| Scene                      | Mean  | Min   | Max   | P99   | GC   | N    |
+|----------------------------|-------|-------|-------|-------|------|------|
+| 4 lights(RECTANGLE) + 0 shadows |   0.13 |   0.08 |   2.97 |   0.34 |    1 |  500 |
+| 1 emitters x 100 particles     |   0.00 |   0.00 |   0.01 |   0.00 |    0 |  500 |
+| 2 emitters x 400 particles     |   0.00 |   0.00 |   0.07 |   0.02 |    0 |  500 |
+| 200 entities                   |   0.08 |   0.06 |   1.80 |   0.23 |    1 |  500 |
+| 500 entities                   |   0.06 |   0.04 |   2.67 |   0.25 |    1 |  500 |
+| 50 entities                    |   0.08 |   0.04 |   0.32 |   0.23 |    0 |  500 |
+| empty scene                    |   0.00 |   0.00 |   0.02 |   0.00 |    0 |  500 |
+| 4 lights(ELLIPSE) + 0 shadows  |   0.06 |   0.03 |   0.35 |   0.16 |    0 |  500 |
+| 4 lights(ELLIPSE) + 50 shadows |   0.06 |   0.03 |   0.84 |   0.20 |    0 |  500 |
+
+## Per-Test Results
+
+| Test                           | Mean (ms) | Min (ms) | Max (ms) | P99 (ms) | GC   | N    |
+|--------------------------------|-----------|----------|----------|----------|------|------|
+| 4 lights(RECTANGLE) + 0 shadows |      0.13 |     0.08 |     2.97 |     0.34 |    1 |  500 |
+| 1 emitters x 100 particles     |      0.00 |     0.00 |     0.01 |     0.00 |    0 |  500 |
+| 2 emitters x 400 particles     |      0.00 |     0.00 |     0.07 |     0.02 |    0 |  500 |
+| 200 entities                   |      0.08 |     0.06 |     1.80 |     0.23 |    1 |  500 |
+| 500 entities                   |      0.06 |     0.04 |     2.67 |     0.25 |    1 |  500 |
+| 50 entities                    |      0.08 |     0.04 |     0.32 |     0.23 |    0 |  500 |
+| empty scene                    |      0.00 |     0.00 |     0.02 |     0.00 |    0 |  500 |
+| 4 lights(ELLIPSE) + 0 shadows  |      0.06 |     0.03 |     0.35 |     0.16 |    0 |  500 |
+| 4 lights(ELLIPSE) + 50 shadows |      0.06 |     0.03 |     0.84 |     0.20 |    0 |  500 |
+

@@ -1,0 +1,29 @@
+> Task :buildSrc:extractPluginRequests UP-TO-DATE
+> Task :buildSrc:generatePluginAdapters UP-TO-DATE
+> Task :buildSrc:compileJava UP-TO-DATE
+> Task :buildSrc:compileGroovy NO-SOURCE
+> Task :buildSrc:compileGroovyPlugins UP-TO-DATE
+> Task :buildSrc:pluginDescriptors UP-TO-DATE
+> Task :buildSrc:processResources UP-TO-DATE
+> Task :buildSrc:classes UP-TO-DATE
+> Task :buildSrc:jar UP-TO-DATE
+
+> Configure project :litiengine
+Reckoned version: 0.12.0-SNAPSHOT
+
+> Task :litiengine:compileJava UP-TO-DATE
+> Task :shared:compileJava UP-TO-DATE
+> Task :litiengine:processResources UP-TO-DATE
+> Task :shared:processResources NO-SOURCE
+> Task :litiengine:classes UP-TO-DATE
+> Task :shared:classes UP-TO-DATE
+> Task :shared:jar UP-TO-DATE
+> Task :litiengine:compileTestJava UP-TO-DATE
+> Task :litiengine:processTestResources UP-TO-DATE
+> Task :litiengine:testClasses UP-TO-DATE
+> Task :litiengine:test UP-TO-DATE
+> Task :litiengine:jacocoTestReport UP-TO-DATE
+
+BUILD SUCCESSFUL in 846ms
+15 actionable tasks: 15 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.2.1/userguide/configuration_cache_enabling.html

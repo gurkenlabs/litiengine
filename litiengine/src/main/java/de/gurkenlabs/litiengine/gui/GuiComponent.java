@@ -102,7 +102,8 @@ public abstract class GuiComponent
   private double textY;
   private boolean visible;
   private Point2D location;
-  private Rectangle2D boundingBox;
+  private final Rectangle2D boundingBox = new Rectangle2D.Double();
+  private boolean boundingBoxDirty = true;
 
   private double relativeX;
   private double relativeY;
@@ -220,12 +221,12 @@ public abstract class GuiComponent
    * @return the bounding box
    */
   public Rectangle2D getBoundingBox() {
-    if (boundingBox != null) {
-      return boundingBox;
+    if (this.boundingBoxDirty) {
+      this.boundingBox.setRect(getX(), getY(), getWidth(), getHeight());
+      this.boundingBoxDirty = false;
     }
 
-    this.boundingBox = new Rectangle2D.Double(getX(), getY(), getWidth(), getHeight());
-    return boundingBox;
+    return this.boundingBox;
   }
 
   /**
@@ -1017,7 +1018,7 @@ public abstract class GuiComponent
         );
         this.width = relativeWidth * resolution.getWidth();
         this.height = relativeHeight * resolution.getHeight();
-        this.boundingBox = null;
+        this.boundingBoxDirty = true;
       } else {
         // Fallback for components created before window was available (e.g. in tests):
         // just resize to the full resolution and set relative layout for future calls.
@@ -1147,7 +1148,7 @@ public abstract class GuiComponent
    */
   public void setHeight(final double height) {
     this.height = height;
-    this.boundingBox = null; // trigger recreation in next boundingBox getter call
+    this.boundingBoxDirty = true;
     updateRelativeLayout();
   }
 
@@ -1189,7 +1190,7 @@ public abstract class GuiComponent
     final double deltaY = location.getY() - getY();
 
     this.location = location;
-    this.boundingBox = null; // trigger recreation in next boundingBox getter call
+    this.boundingBoxDirty = true;
     for (final GuiComponent component : getComponents()) {
       component.setLocation(
         new Point2D.Double(component.getX() + deltaX, component.getY() + deltaY));
@@ -1327,7 +1328,7 @@ public abstract class GuiComponent
    */
   public void setWidth(final double width) {
     this.width = width;
-    this.boundingBox = null; // trigger recreation in next boundingBox getter call
+    this.boundingBoxDirty = true;
     updateRelativeLayout();
   }
 
