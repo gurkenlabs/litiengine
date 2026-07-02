@@ -1,37 +1,37 @@
 # LITIENGINE Rendering Benchmark (Real Graphics - Textured)
 Date: 2026-07-02
-Commit: d89fd74d
+Commit: 378173f4
 
 ## Raw Results (ms)
 
 | Scene                      | Mean  | Min   | Max   | P99   | GC   | N    |
 |----------------------------|-------|-------|-------|-------|------|------|
-| 200 textured entities          |   0.07 |   0.05 |   2.81 |   0.22 |    1 | 1000 |
-| 500 textured entities          |   0.04 |   0.03 |   2.71 |   0.11 |    1 | 1000 |
-| 100x100 tilemap                |   0.07 |   0.05 |   0.23 |   0.16 |    0 | 1000 |
-| 50x50 tilemap                  |   0.02 |   0.01 |   0.07 |   0.04 |    0 | 1000 |
-| 50 textured entities           |   0.02 |   0.02 |   0.12 |   0.08 |    0 | 1000 |
-| 100 entities + 50x50 tiles + 4 lights + 20 shadows |   0.02 |   0.02 |   0.09 |   0.06 |    0 | 1000 |
+| 200 textured entities          |   0.02 |   0.02 |   0.09 |   0.04 |    0 | 1000 |
+| 500 textured entities          |   0.03 |   0.02 |  11.46 |   0.08 |    1 | 1000 |
+| 100x100 tilemap                |   0.07 |   0.06 |   0.20 |   0.14 |    0 | 1000 |
+| 50x50 tilemap                  |   0.02 |   0.02 |   0.10 |   0.05 |    0 | 1000 |
+| 50 textured entities           |   0.02 |   0.02 |   0.10 |   0.04 |    0 | 1000 |
+| 100 entities + 50x50 tiles + 4 lights + 20 shadows |   0.02 |   0.02 |   0.08 |   0.02 |    0 | 1000 |
 
 ## Results (nanoseconds)
 
 | Scene                      | Mean (ns) | Min (ns) | Max (ns) | P99 (ns) | GC   | N    |   FPS |
 |----------------------------|-----------|----------|----------|----------|------|------|-------|
-| 200 textured entities          |      71282 |    47200 |  2807000 |   224700 |    1 | 1000 |   14029 |
-| 500 textured entities          |      35998 |    25800 |  2705800 |   112900 |    1 | 1000 |   27780 |
-| 100x100 tilemap                |      69071 |    47500 |   230500 |   157100 |    0 | 1000 |   14478 |
-| 50x50 tilemap                  |      17221 |    14500 |    65900 |    41000 |    0 | 1000 |   58069 |
-| 50 textured entities           |      20747 |    17200 |   124000 |    75500 |    0 | 1000 |   48199 |
-| 100 entities + 50x50 tiles + 4 lights + 20 shadows |      20001 |    17200 |    85900 |    58700 |    0 | 1000 |   49997 |
+| 200 textured entities          |      18615 |    16900 |    93500 |    42000 |    0 | 1000 |   53720 |
+| 500 textured entities          |      32473 |    18200 | 11458600 |    80300 |    1 | 1000 |   30795 |
+| 100x100 tilemap                |      70726 |    57400 |   195300 |   143700 |    0 | 1000 |   14139 |
+| 50x50 tilemap                  |      17895 |    16000 |    97000 |    47700 |    0 | 1000 |   55883 |
+| 50 textured entities           |      17028 |    15900 |   102600 |    38200 |    0 | 1000 |   58728 |
+| 100 entities + 50x50 tiles + 4 lights + 20 shadows |      17259 |    16700 |    76600 |    24800 |    0 | 1000 |   57941 |
 
 ## Change vs Baseline
 
 | Scene                      | Baseline (ns) | Current (ns) | Change  | FPS Δ   |
 |----------------------------|---------------|--------------|---------|---------|
-| 200 textured entities          |      70000 |      71282 | +1.83% |     -2% |
-| 500 textured entities          |      40000 |      35998 | -10.01% |    +11% |
-| 100x100 tilemap                |      90000 |      69071 | -23.25% |    +30% |
-| 50x50 tilemap                  |      20000 |      17221 | -13.90% |    +16% |
-| 50 textured entities           |      20000 |      20747 | +3.74% |     -4% |
-| 100 entities + 50x50 tiles + 4 lights + 20 shadows |      20000 |      20001 | +0.01% |     -0% |
+| 200 textured entities          |      70000 |      18615 | -73.41% |   +276% |
+| 500 textured entities          |      40000 |      32473 | -18.82% |    +23% |
+| 100x100 tilemap                |      90000 |      70726 | -21.42% |    +27% |
+| 50x50 tilemap                  |      20000 |      17895 | -10.53% |    +12% |
+| 50 textured entities           |      20000 |      17028 | -14.86% |    +17% |
+| 100 entities + 50x50 tiles + 4 lights + 20 shadows |      20000 |      17259 | -13.71% |    +16% |
 

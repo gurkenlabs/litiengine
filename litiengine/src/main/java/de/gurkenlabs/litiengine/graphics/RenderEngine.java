@@ -21,10 +21,10 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collectors;
 
 /**
  * The 2D Render Engine is used to render texts, shapes and entities at their location in the {@code Environment} and with respect to the
@@ -382,15 +382,20 @@ public final class RenderEngine {
    * @param sort     Defines whether the entities should be sorted by the {@code EntityYComparator} to simulate 2.5D graphics.
    * @see EntityYComparator
    */
+  private final ArrayList<IEntity> renderCache = new ArrayList<>();
+
   public void renderEntities(
     final Graphics2D g, final Collection<? extends IEntity> entities, final boolean sort) {
     // filter out entities that are outside the viewport and always include emitters which have
     // an internal mechanism do determine on a per-particle basis whether it should be rendered
-    final List<? extends IEntity> entitiesToRender =
-      entities.stream()
-        .filter(
-          x -> Game.world().camera().getViewport().intersects(x.getBoundingBox())
-            || x instanceof Emitter).collect(Collectors.toList());
+    final Rectangle2D viewport = Game.world().camera().getViewport();
+    renderCache.clear();
+    renderCache.ensureCapacity(entities.size());
+    for (IEntity entity : entities) {
+      if (viewport.intersects(entity.getBoundingBox()) || entity instanceof Emitter) {
+        renderCache.add(entity);
+      }
+    }
 
     // in order to render the entities in a 2.5D manner, we sort them by their max Y Coordinate
     if (sort) {
@@ -398,9 +403,9 @@ public final class RenderEngine {
       // BETTER DATASTRUCTURE FOR THE (HEAP)
       // AND UPDATE THE HEAP WHENEVER AN ENTITY MOVES.
       try {
-        entitiesToRender.sort(this.entityComparator);
+        renderCache.sort(this.entityComparator);
       } catch (final IllegalArgumentException e) {
-        for (final IEntity entity : entities) {
+        for (final IEntity entity : renderCache) {
           this.renderEntity(g, entity);
         }
 
@@ -408,8 +413,8 @@ public final class RenderEngine {
       }
     }
 
-    for (final IEntity entity : entitiesToRender) {
-      this.renderEntity(g, entity);
+    for (int i = 0; i < renderCache.size(); i++) {
+      this.renderEntity(g, renderCache.get(i));
     }
   }
 
@@ -458,12 +463,9 @@ public final class RenderEngine {
         if (animationController.isAutoScaling()) {
           final double ratioX = entity.getWidth() / img.getWidth();
           final double ratioY = entity.getHeight() / img.getHeight();
-          ImageRenderer.renderScaled(
-            g,
-            img,
-            Game.world().camera().getViewportLocation(entity.getLocation()),
-            ratioX,
-            ratioY);
+          double vpX = entity.getX() + Game.world().camera().getPixelOffsetX();
+          double vpY = entity.getY() + Game.world().camera().getPixelOffsetY();
+          ImageRenderer.renderScaled(g, img, vpX, vpY, ratioX, ratioY);
         } else {
           // center the image relative to the entity dimensions -> the pivot point for rendering is
           // the center of the entity
@@ -478,12 +480,9 @@ public final class RenderEngine {
             deltaY += (img.getHeight() - (img.getHeight() * transform.getScaleY())) / 2.0;
           }
 
-          Point2D renderLocation =
-            Game.world()
-              .camera()
-              .getViewportLocation(entity.getX() + deltaX, entity.getY() + deltaY);
-          ImageRenderer.renderTransformed(
-            g, img, renderLocation.getX(), renderLocation.getY(), transform);
+          double renderX = entity.getX() + deltaX + Game.world().camera().getPixelOffsetX();
+          double renderY = entity.getY() + deltaY + Game.world().camera().getPixelOffsetY();
+          ImageRenderer.renderTransformed(g, img, renderX, renderY, transform);
 
           if (Game.config().debug().renderBoundingBoxes()) {
             g.setColor(new Color(255, 0, 0, 50));
@@ -494,7 +493,7 @@ public final class RenderEngine {
             ShapeRenderer.renderOutlineTransformed(
               g,
               new Rectangle2D.Double(
-                renderLocation.getX(), renderLocation.getY(), img.getWidth(), img.getWidth()),
+                renderX, renderY, img.getWidth(), img.getWidth()),
               animationController.getAffineTransform(),
               0.25f);
           }

@@ -1,0 +1,32 @@
+# LITIENGINE Rendering Benchmark Results (Real BufferedImage)
+Date: 2026-07-02
+Commit: 378173f4
+
+## Raw Results (ms)
+
+| Scene                      | Mean  | Min   | Max   | P99   | GC   | N    |
+|----------------------------|-------|-------|-------|-------|------|------|
+| 4 lights(RECTANGLE) + 0 shadows |   0.06 |   0.03 |   2.74 |   0.18 |    2 | 1000 |
+| 1 emitters x 100 particles     |   0.00 |   0.00 |   0.05 |   0.00 |    0 | 1000 |
+| 2 emitters x 400 particles     |   0.00 |   0.00 |   0.01 |   0.00 |    0 | 1000 |
+| 200 entities                   |   0.05 |   0.04 |   0.63 |   0.15 |    0 | 1000 |
+| 500 entities                   |   0.05 |   0.02 |   0.23 |   0.14 |    0 | 1000 |
+| 50 entities                    |   0.02 |   0.02 |   0.06 |   0.03 |    0 | 1000 |
+| empty scene                    |   0.00 |   0.00 |   0.00 |   0.00 |    0 | 1000 |
+| 4 lights(ELLIPSE) + 0 shadows  |   0.02 |   0.02 |   0.10 |   0.05 |    0 | 1000 |
+| 4 lights(ELLIPSE) + 50 shadows |   0.02 |   0.02 |   0.11 |   0.05 |    0 | 1000 |
+
+## Results (nanoseconds)
+
+| Scene                      | Mean (ns) | Min (ns) | Max (ns) | P99 (ns) | GC   | N    |   FPS |
+|----------------------------|-----------|----------|----------|----------|------|------|-------|
+| 4 lights(RECTANGLE) + 0 shadows |      59119 |    27600 |  2743400 |   184600 |    2 | 1000 |   16915 |
+| 1 emitters x 100 particles     |        645 |      300 |    49100 |     2600 |    0 | 1000 | 1550388 |
+| 2 emitters x 400 particles     |        122 |        0 |    13100 |      300 |    0 | 1000 | 8223684 |
+| 200 entities                   |      53000 |    42000 |   629600 |   154500 |    0 | 1000 |   18868 |
+| 500 entities                   |      49794 |    22600 |   226800 |   139600 |    0 | 1000 |   20083 |
+| 50 entities                    |      17728 |    16700 |    55200 |    25300 |    0 | 1000 |   56409 |
+| empty scene                    |         69 |        0 |     4200 |      200 |    0 | 1000 | 14409222 |
+| 4 lights(ELLIPSE) + 0 shadows  |      17584 |    15700 |   101600 |    51100 |    0 | 1000 |   56870 |
+| 4 lights(ELLIPSE) + 50 shadows |      22457 |    16400 |   111400 |    53700 |    0 | 1000 |   44530 |
+
