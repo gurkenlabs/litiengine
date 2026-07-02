@@ -31,8 +31,8 @@ public final class BenchmarkScene {
 
   private BenchmarkScene() { throw new UnsupportedOperationException(); }
 
-  private static final int WARMUP = 100;
-  private static final int SAMPLES = 500;
+  private static final int WARMUP = 500;
+  private static final int SAMPLES = 5000;
 
   public static BenchmarkResult measure(String name, Consumer<Graphics2D> renderFn) {
     Graphics2D g = mock(Graphics2D.class);
