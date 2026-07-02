@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
@@ -26,6 +27,8 @@ public class RenderingBenchmarkTests {
   private static final List<BenchmarkResult> RESULTS = new ArrayList<>();
   private static final Path RESULT_FILE = Paths.get(System.getProperty("user.dir"))
     .getParent().resolve("benchmark-results.txt");
+  private static final Path BASELINE_FILE = Paths.get(System.getProperty("user.dir"))
+    .getParent().resolve("benchmark-results-baseline.txt");
 
   @BeforeAll
   static void setup() throws IOException {
@@ -35,31 +38,50 @@ public class RenderingBenchmarkTests {
 
   @AfterAll
   static void tearDown() throws IOException {
+    Map<String, Double> baseline = BenchmarkResult.parseBaseline(BASELINE_FILE);
+
     StringBuilder sb = new StringBuilder();
     sb.append("# LITIENGINE Rendering Benchmark Results\n");
     sb.append("Date: ").append(java.time.LocalDate.now()).append("\n");
     sb.append("Commit: ").append(getGitCommit()).append("\n\n");
 
-    sb.append("## Raw Results\n\n");
+    sb.append("## Raw Results (ms)\n\n");
     sb.append(BenchmarkResult.markdownHeader()).append("\n");
     for (BenchmarkResult r : RESULTS) {
       sb.append(r.toMarkdownRow()).append("\n");
     }
     sb.append("\n");
 
-    if (RESULTS.size() >= 2) {
-      sb.append("## Per-Test Results\n\n");
-      sb.append("| Test                           | Mean (ms) | Min (ms) | Max (ms) | P99 (ms) | GC   | N    |\n");
-      sb.append("|--------------------------------|-----------|----------|----------|----------|------|------|\n");
+    sb.append("## Results (nanoseconds)\n\n");
+    sb.append(BenchmarkResult.markdownNsHeader()).append("\n");
+    for (BenchmarkResult r : RESULTS) {
+      sb.append(r.toMarkdownNsRow()).append("\n");
+    }
+    sb.append("\n");
+
+    if (!baseline.isEmpty()) {
+      sb.append("## Change vs Baseline\n\n");
+      sb.append("| Scene                      | Baseline (ns) | Current (ns) | Change  |\n");
+      sb.append("|----------------------------|---------------|--------------|---------|\n");
       for (BenchmarkResult r : RESULTS) {
-        sb.append(String.format("| %-30s | %9.2f | %8.2f | %8.2f | %8.2f | %4d | %4d |\n",
-          r.name(), r.meanMs(), r.minMs(), r.maxMs(), r.p99Ms(), r.gcPauses(), r.sampleCount()));
+        Double bl = baseline.get(r.name());
+        if (bl == null) {
+          sb.append(String.format("| %-30s | %13s | %12.0f | %7s |\n",
+            r.name(), "N/A", r.meanNs(), "N/A"));
+        } else {
+          sb.append(BenchmarkResult.diffRowNsWithBaseline(r.name(), bl, r)).append("\n");
+        }
       }
       sb.append("\n");
     }
 
     Files.writeString(RESULT_FILE, sb.toString(), StandardOpenOption.APPEND);
     System.out.println("\n=== BENCHMARK RESULTS ===\n" + sb + "=== written to " + RESULT_FILE.toAbsolutePath() + " ===\n");
+
+    BenchmarkResult.printResultsNs(RESULTS);
+    if (!baseline.isEmpty()) {
+      BenchmarkResult.printDiffTable(RESULTS, baseline);
+    }
 
     GameTest.terminateGame();
   }
