@@ -104,6 +104,8 @@ public abstract class GuiComponent
   private Point2D location;
   private final Rectangle2D boundingBox = new Rectangle2D.Double();
   private boolean boundingBoxDirty = true;
+  private final RoundRectangle2D.Double shapeCache = new RoundRectangle2D.Double();
+  private boolean shapeCacheDirty = true;
 
   private double relativeX;
   private double relativeY;
@@ -820,7 +822,9 @@ public abstract class GuiComponent
       }
     }
 
-    final ComponentRenderEvent event = new ComponentRenderEvent(g, this);
+    final boolean hasListeners = !this.renderListeners.isEmpty() || !this.renderedListeners.isEmpty();
+    final ComponentRenderEvent event = hasListeners ? new ComponentRenderEvent(g, this) : null;
+
     for (ComponentRenderListener listener : this.renderListeners) {
       listener.rendering(event);
     }
@@ -963,13 +967,20 @@ public abstract class GuiComponent
     if (radius == 0f) {
       return getBoundingBox();
     }
-    return new RoundRectangle2D.Double(
-      getX(),
-      getY(),
-      getWidth(),
-      getHeight(),
-      getCurrentAppearance().getBorderRadius(),
-      getCurrentAppearance().getBorderRadius());
+
+    if (!this.shapeCacheDirty
+      && this.shapeCache.x == getX()
+      && this.shapeCache.y == getY()
+      && this.shapeCache.width == getWidth()
+      && this.shapeCache.height == getHeight()
+      && this.shapeCache.arcwidth == radius
+      && this.shapeCache.archeight == radius) {
+      return this.shapeCache;
+    }
+
+    this.shapeCache.setRoundRect(getX(), getY(), getWidth(), getHeight(), radius, radius);
+    this.shapeCacheDirty = false;
+    return this.shapeCache;
   }
 
   /**
@@ -1019,6 +1030,7 @@ public abstract class GuiComponent
         this.width = relativeWidth * resolution.getWidth();
         this.height = relativeHeight * resolution.getHeight();
         this.boundingBoxDirty = true;
+        this.shapeCacheDirty = true;
       } else {
         // Fallback for components created before window was available (e.g. in tests):
         // just resize to the full resolution and set relative layout for future calls.
@@ -1149,6 +1161,7 @@ public abstract class GuiComponent
   public void setHeight(final double height) {
     this.height = height;
     this.boundingBoxDirty = true;
+    this.shapeCacheDirty = true;
     updateRelativeLayout();
   }
 
@@ -1191,6 +1204,7 @@ public abstract class GuiComponent
 
     this.location = location;
     this.boundingBoxDirty = true;
+    this.shapeCacheDirty = true;
     for (final GuiComponent component : getComponents()) {
       component.setLocation(
         new Point2D.Double(component.getX() + deltaX, component.getY() + deltaY));
@@ -1329,6 +1343,7 @@ public abstract class GuiComponent
   public void setWidth(final double width) {
     this.width = width;
     this.boundingBoxDirty = true;
+    this.shapeCacheDirty = true;
     updateRelativeLayout();
   }
 
