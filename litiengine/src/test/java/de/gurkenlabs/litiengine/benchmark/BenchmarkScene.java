@@ -21,6 +21,7 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
@@ -33,6 +34,24 @@ public final class BenchmarkScene {
 
   private static final int WARMUP = 500;
   private static final int SAMPLES = 5000;
+  private static final int WARMUP_REAL = 100;
+  private static final int SAMPLES_REAL = 1000;
+
+  private static BufferedImage offscreenImage;
+  private static Graphics2D offscreenGraphics;
+
+  public static BufferedImage getOffscreenImage() {
+    if (offscreenImage == null) {
+      offscreenImage = new BufferedImage(1920, 1080, BufferedImage.TYPE_INT_ARGB);
+      offscreenGraphics = offscreenImage.createGraphics();
+    }
+    return offscreenImage;
+  }
+
+  public static Graphics2D getOffscreenGraphics() {
+    getOffscreenImage();
+    return offscreenGraphics;
+  }
 
   public static BenchmarkResult measure(String name, Consumer<Graphics2D> renderFn) {
     Graphics2D g = mock(Graphics2D.class);
@@ -47,6 +66,25 @@ public final class BenchmarkScene {
     long gcBefore = gcCount();
     double[] samples = new double[SAMPLES];
     for (int i = 0; i < SAMPLES; i++) {
+      long start = System.nanoTime();
+      renderFn.accept(g);
+      samples[i] = (System.nanoTime() - start) / 1_000_000.0;
+    }
+    long gcAfter = gcCount();
+
+    return new BenchmarkResult(name, samples, gcBefore, gcAfter);
+  }
+
+  public static BenchmarkResult measureReal(String name, Consumer<Graphics2D> renderFn) {
+    Graphics2D g = getOffscreenGraphics();
+
+    for (int i = 0; i < WARMUP_REAL; i++) {
+      renderFn.accept(g);
+    }
+
+    long gcBefore = gcCount();
+    double[] samples = new double[SAMPLES_REAL];
+    for (int i = 0; i < SAMPLES_REAL; i++) {
       long start = System.nanoTime();
       renderFn.accept(g);
       samples[i] = (System.nanoTime() - start) / 1_000_000.0;
@@ -73,6 +111,23 @@ public final class BenchmarkScene {
     return measure(entityCount + " entities", g -> env.render(g));
   }
 
+  public static BenchmarkResult measureEntityRenderReal(int entityCount, boolean withEffects) {
+    Environment env = createBaseEnvironment();
+
+    for (int i = 0; i < entityCount; i++) {
+      Creature c = new Creature();
+      c.setName("bench" + i);
+      c.setX(i * 30 % 1800);
+      c.setY(i * 20 % 1800);
+      c.setWidth(16);
+      c.setHeight(16);
+      c.setRenderType(RenderType.NORMAL);
+      env.add(c);
+    }
+
+    return measureReal(entityCount + " entities", g -> env.render(g));
+  }
+
   public static BenchmarkResult measureLightRender(int lightCount, int shadowCount, LightSource.Type type) {
     Environment env = createBaseEnvironment();
 
@@ -92,6 +147,28 @@ public final class BenchmarkScene {
     env.updateLighting();
 
     return measure(lightCount + " lights(" + type + ") + " + shadowCount + " shadows",
+      g -> env.render(g));
+  }
+
+  public static BenchmarkResult measureLightRenderReal(int lightCount, int shadowCount, LightSource.Type type) {
+    Environment env = createBaseEnvironment();
+
+    for (int i = 0; i < shadowCount; i++) {
+      StaticShadow s = new StaticShadow(i * 40, i * 20, 30, 30, StaticShadowType.NONE);
+      env.add(s);
+    }
+
+    for (int i = 0; i < lightCount; i++) {
+      LightSource light = new LightSource(
+        100 + i * 100, new Color(255, 255, 200, 80), type, true);
+      light.setX(i * 150);
+      light.setY(i * 100);
+      env.add(light);
+    }
+
+    env.updateLighting();
+
+    return measureReal(lightCount + " lights(" + type + ") + " + shadowCount + " shadows",
       g -> env.render(g));
   }
 
@@ -117,7 +194,29 @@ public final class BenchmarkScene {
       g -> { for (Emitter em : emitters) em.render(g); });
   }
 
-  private static Environment createBaseEnvironment() {
+  public static BenchmarkResult measureParticleRenderReal(int emitterCount, int particlesPerEmitter) {
+    List<Emitter> emitters = new ArrayList<>();
+    for (int e = 0; e < emitterCount; e++) {
+      var emp = new Emitter() {
+        @Override
+        protected Particle createNewParticle() {
+          Particle p = new RectangleParticle(8, 8);
+          p.setTimeToLive(5000);
+          return p;
+        }
+      };
+      emp.data().setMaxParticles(particlesPerEmitter);
+      emp.data().setSpawnAmount(particlesPerEmitter);
+      emp.setX(400);
+      emp.setY(300);
+      emitters.add(emp);
+    }
+
+    return measureReal(emitterCount + " emitters x " + particlesPerEmitter + " particles",
+      g -> { for (Emitter em : emitters) em.render(g); });
+  }
+
+  static Environment createBaseEnvironment() {
     IMap map = mock(IMap.class);
     when(map.getSizeInPixels()).thenReturn(new Dimension(2000, 2000));
     when(map.getSizeInTiles()).thenReturn(new Dimension(50, 50));
