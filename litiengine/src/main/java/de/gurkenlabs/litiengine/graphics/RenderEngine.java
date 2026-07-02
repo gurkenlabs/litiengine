@@ -48,6 +48,7 @@ public final class RenderEngine {
   private final EntityYComparator entityComparator = new EntityYComparator();
   private final List<EntityRenderedListener> entityRenderedListener = new CopyOnWriteArrayList<>();
   private final List<EntityRenderListener> entityRenderListener = new CopyOnWriteArrayList<>();
+  private final List<IEntity> renderCache = new ArrayList<>();
 
   private float baseRenderScale = DEFAULT_RENDERSCALE;
 
@@ -382,15 +383,12 @@ public final class RenderEngine {
    * @param sort     Defines whether the entities should be sorted by the {@code EntityYComparator} to simulate 2.5D graphics.
    * @see EntityYComparator
    */
-  private final ArrayList<IEntity> renderCache = new ArrayList<>();
-
   public void renderEntities(
     final Graphics2D g, final Collection<? extends IEntity> entities, final boolean sort) {
     // filter out entities that are outside the viewport and always include emitters which have
     // an internal mechanism do determine on a per-particle basis whether it should be rendered
     final Rectangle2D viewport = Game.world().camera().getViewport();
     renderCache.clear();
-    renderCache.ensureCapacity(entities.size());
     for (IEntity entity : entities) {
       if (viewport.intersects(entity.getBoundingBox()) || entity instanceof Emitter) {
         renderCache.add(entity);
@@ -413,8 +411,8 @@ public final class RenderEngine {
       }
     }
 
-    for (int i = 0; i < renderCache.size(); i++) {
-      this.renderEntity(g, renderCache.get(i));
+    for (final IEntity entity : renderCache) {
+      this.renderEntity(g, entity);
     }
   }
 

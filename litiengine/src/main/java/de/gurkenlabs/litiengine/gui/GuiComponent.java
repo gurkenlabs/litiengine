@@ -822,8 +822,7 @@ public abstract class GuiComponent
       }
     }
 
-    final boolean hasListeners = !this.renderListeners.isEmpty() || !this.renderedListeners.isEmpty();
-    final ComponentRenderEvent event = hasListeners ? new ComponentRenderEvent(g, this) : null;
+    final ComponentRenderEvent event = new ComponentRenderEvent(g, this);
 
     for (ComponentRenderListener listener : this.renderListeners) {
       listener.rendering(event);
