@@ -1,46 +1,46 @@
 # LITIENGINE Rendering Benchmark Results
 Date: 2026-07-02
-Commit: df1c5d03
+Commit: 9abdafa3
 
 ## Raw Results (ms)
 
 | Scene                      | Mean  | Min   | Max   | P99   | GC   | N    |
 |----------------------------|-------|-------|-------|-------|------|------|
-| 4 lights(RECTANGLE) + 0 shadows |   0.05 |   0.03 |   4.15 |   0.15 |    6 | 5000 |
-| 1 emitters x 100 particles     |   0.00 |   0.00 |   0.06 |   0.00 |    0 | 5000 |
-| 2 emitters x 400 particles     |   0.00 |   0.00 |   0.04 |   0.00 |    0 | 5000 |
-| 200 entities                   |   0.03 |   0.02 |   9.41 |   0.07 |    1 | 5000 |
-| 500 entities                   |   0.03 |   0.02 |  10.68 |   0.06 |    1 | 5000 |
-| 50 entities                    |   0.03 |   0.02 |   9.93 |   0.05 |    1 | 5000 |
-| empty scene                    |   0.00 |   0.00 |   0.01 |   0.00 |    0 | 5000 |
-| 4 lights(ELLIPSE) + 0 shadows  |   0.03 |   0.02 |  11.06 |   0.04 |    1 | 5000 |
-| 4 lights(ELLIPSE) + 50 shadows |   0.03 |   0.02 |  10.52 |   0.04 |    1 | 5000 |
+| 4 lights(RECTANGLE) + 0 shadows |   0.06 |   0.03 |   0.72 |   0.18 |    0 | 5000 |
+| 1 emitters x 100 particles     |   0.00 |   0.00 |   0.05 |   0.00 |    0 | 5000 |
+| 2 emitters x 400 particles     |   0.00 |   0.00 |   0.03 |   0.00 |    0 | 5000 |
+| 200 entities                   |   0.03 |   0.02 |  11.40 |   0.08 |    1 | 5000 |
+| 500 entities                   |   0.03 |   0.02 |  12.62 |   0.07 |    1 | 5000 |
+| 50 entities                    |   0.03 |   0.02 |  12.55 |   0.05 |    1 | 5000 |
+| empty scene                    |   0.00 |   0.00 |   0.00 |   0.00 |    0 | 5000 |
+| 4 lights(ELLIPSE) + 0 shadows  |   0.03 |   0.02 |   9.81 |   0.03 |    1 | 5000 |
+| 4 lights(ELLIPSE) + 50 shadows |   0.03 |   0.02 |  11.06 |   0.04 |    1 | 5000 |
 
 ## Results (nanoseconds)
 
-| Scene                      | Mean (ns) | Min (ns) | Max (ns) | P99 (ns) | GC   | N    |
-|----------------------------|-----------|----------|----------|----------|------|------|
-| 4 lights(RECTANGLE) + 0 shadows |      52886 |    32700 |  4150200 |   147000 |    6 | 5000 |
-| 1 emitters x 100 particles     |        307 |        0 |    63300 |     1900 |    0 | 5000 |
-| 2 emitters x 400 particles     |        131 |        0 |    44900 |      400 |    0 | 5000 |
-| 200 entities                   |      31751 |    23200 |  9407300 |    72900 |    1 | 5000 |
-| 500 entities                   |      28623 |    24100 | 10678400 |    58800 |    1 | 5000 |
-| 50 entities                    |      25420 |    22000 |  9930100 |    45800 |    1 | 5000 |
-| empty scene                    |         35 |        0 |    11900 |      100 |    0 | 5000 |
-| 4 lights(ELLIPSE) + 0 shadows  |      25359 |    21700 | 11057500 |    41100 |    1 | 5000 |
-| 4 lights(ELLIPSE) + 50 shadows |      26854 |    22500 | 10516500 |    35700 |    1 | 5000 |
+| Scene                      | Mean (ns) | Min (ns) | Max (ns) | P99 (ns) | GC   | N    |   FPS |
+|----------------------------|-----------|----------|----------|----------|------|------|-------|
+| 4 lights(RECTANGLE) + 0 shadows |      55739 |    30600 |   723100 |   178900 |    0 | 5000 |   17941 |
+| 1 emitters x 100 particles     |        324 |        0 |    53000 |      900 |    0 | 5000 | 3088517 |
+| 2 emitters x 400 particles     |        138 |        0 |    27200 |      400 |    0 | 5000 | 7249529 |
+| 200 entities                   |      30829 |    23000 | 11402100 |    83600 |    1 | 5000 |   32437 |
+| 500 entities                   |      30274 |    24300 | 12624600 |    69400 |    1 | 5000 |   33032 |
+| 50 entities                    |      26073 |    22000 | 12550600 |    52600 |    1 | 5000 |   38353 |
+| empty scene                    |         50 |        0 |     3500 |      100 |    0 | 5000 | 19944156 |
+| 4 lights(ELLIPSE) + 0 shadows  |      25334 |    21600 |  9809800 |    31800 |    1 | 5000 |   39472 |
+| 4 lights(ELLIPSE) + 50 shadows |      26059 |    22400 | 11064300 |    35200 |    1 | 5000 |   38374 |
 
 ## Change vs Baseline
 
-| Scene                      | Baseline (ns) | Current (ns) | Change  |
-|----------------------------|---------------|--------------|---------|
-| 4 lights(RECTANGLE) + 0 shadows |     130000 |      52886 | -59.32% |
-| 1 emitters x 100 particles     |          0 |        307 |     N/A |
-| 2 emitters x 400 particles     |          0 |        131 |     N/A |
-| 200 entities                   |      80000 |      31751 | -60.31% |
-| 500 entities                   |      60000 |      28623 | -52.30% |
-| 50 entities                    |      80000 |      25420 | -68.22% |
-| empty scene                    |          0 |         35 |     N/A |
-| 4 lights(ELLIPSE) + 0 shadows  |      60000 |      25359 | -57.74% |
-| 4 lights(ELLIPSE) + 50 shadows |      60000 |      26854 | -55.24% |
+| Scene                      | Baseline (ns) | Current (ns) | Change  | FPS Δ   |
+|----------------------------|---------------|--------------|---------|---------|
+| 4 lights(RECTANGLE) + 0 shadows |      50000 |      55739 | +11.48% |    -10% |
+| 1 emitters x 100 particles     |          0 |        324 |     N/A |     N/A |
+| 2 emitters x 400 particles     |          0 |        138 |     N/A |     N/A |
+| 200 entities                   |      30000 |      30829 | +2.76% |     -3% |
+| 500 entities                   |      30000 |      30274 | +0.91% |     -1% |
+| 50 entities                    |      30000 |      26073 | -13.09% |    +15% |
+| empty scene                    |          0 |         50 |     N/A |     N/A |
+| 4 lights(ELLIPSE) + 0 shadows  |      30000 |      25334 | -15.55% |    +18% |
+| 4 lights(ELLIPSE) + 50 shadows |      30000 |      26059 | -13.14% |    +15% |
 

@@ -69,9 +69,16 @@ public class BenchmarkResult {
       name, meanMs(), minMs(), maxMs(), p99Ms(), gcPauses(), sampleCount());
   }
 
+  public double estimatedFps() {
+    double mean = meanMs();
+    return mean > 0 ? 1000.0 / mean : Double.POSITIVE_INFINITY;
+  }
+
   public String toMarkdownNsRow() {
-    return String.format("| %-30s | %10.0f | %8.0f | %8.0f | %8.0f | %4d | %4d |",
-      name, meanNs(), minMs() * 1_000_000, maxMs() * 1_000_000, p99Ms() * 1_000_000, gcPauses(), sampleCount());
+    double fps = estimatedFps();
+    String fpsStr = Double.isInfinite(fps) ? "inf" : String.format("%7.0f", fps);
+    return String.format("| %-30s | %10.0f | %8.0f | %8.0f | %8.0f | %4d | %4d | %7s |",
+      name, meanNs(), minMs() * 1_000_000, maxMs() * 1_000_000, p99Ms() * 1_000_000, gcPauses(), sampleCount(), fpsStr);
   }
 
   public static String markdownHeader() {
@@ -80,8 +87,8 @@ public class BenchmarkResult {
   }
 
   public static String markdownNsHeader() {
-    return "| Scene                      | Mean (ns) | Min (ns) | Max (ns) | P99 (ns) | GC   | N    |\n"
-         + "|----------------------------|-----------|----------|----------|----------|------|------|";
+    return "| Scene                      | Mean (ns) | Min (ns) | Max (ns) | P99 (ns) | GC   | N    |   FPS |\n"
+         + "|----------------------------|-----------|----------|----------|----------|------|------|-------|";
   }
 
   public static String diffRowMs(String label, BenchmarkResult before, BenchmarkResult after) {
@@ -101,25 +108,44 @@ public class BenchmarkResult {
   public static String diffRowNsWithBaseline(String label, double baselineMeanMs, BenchmarkResult after) {
     double baselineMeanNs = baselineMeanMs * 1_000_000;
     double deltaNs = after.meanNs() - baselineMeanNs;
+    double baseFps = baselineMeanMs > 0 ? 1000.0 / baselineMeanMs : Double.POSITIVE_INFINITY;
+    double curFps = after.estimatedFps();
+    String fpsDelta;
+    if (Double.isInfinite(baseFps) || Double.isInfinite(curFps)) {
+      fpsDelta = "N/A";
+    } else {
+      double fpsPct = ((curFps - baseFps) / baseFps) * 100;
+      fpsDelta = String.format("%+.0f%%", fpsPct);
+    }
     if (baselineMeanMs < 0.001) {
-      return String.format("| %-30s | %10.0f | %10.0f | %7s |",
-        label, baselineMeanNs, after.meanNs(), "N/A");
+      return String.format("| %-30s | %10.0f | %10.0f | %7s | %7s |",
+        label, baselineMeanNs, after.meanNs(), "N/A", fpsDelta);
     }
     double pct = (deltaNs / baselineMeanNs) * 100;
-    return String.format("| %-30s | %10.0f | %10.0f | %+.2f%% |",
-      label, baselineMeanNs, after.meanNs(), pct);
+    return String.format("| %-30s | %10.0f | %10.0f | %+.2f%% | %7s |",
+      label, baselineMeanNs, after.meanNs(), pct, fpsDelta);
   }
 
   public static Map<String, Double> parseBaseline(Path file) throws IOException {
     Map<String, Double> baselines = new HashMap<>();
     if (!Files.exists(file)) return baselines;
     Pattern linePat = Pattern.compile("^\\|\\s+(.+?)\\s+\\|\\s+([\\d.]+)\\s+\\|");
+    boolean inMsTable = false;
     for (String line : Files.readAllLines(file)) {
-      Matcher m = linePat.matcher(line);
-      if (m.find()) {
-        String name = m.group(1).trim();
-        double mean = Double.parseDouble(m.group(2));
-        baselines.put(name, mean);
+      if (line.startsWith("## Raw Results (ms)")) {
+        inMsTable = true;
+        continue;
+      }
+      if (inMsTable && line.startsWith("## ")) {
+        break;
+      }
+      if (inMsTable) {
+        Matcher m = linePat.matcher(line);
+        if (m.find()) {
+          String name = m.group(1).trim();
+          double mean = Double.parseDouble(m.group(2));
+          baselines.put(name, mean);
+        }
       }
     }
     return baselines;
@@ -145,13 +171,13 @@ public class BenchmarkResult {
 
   public static void printDiffTable(List<BenchmarkResult> results, Map<String, Double> baseline) {
     System.out.println("\n=== CHANGE vs BASELINE (nanoseconds) ===");
-    System.out.println("| Scene                      | Baseline (ns) | Current (ns) | Change  |");
-    System.out.println("|----------------------------|---------------|--------------|---------|");
+    System.out.println("| Scene                      | Baseline (ns) | Current (ns) | Change  | FPS Δ   |");
+    System.out.println("|----------------------------|---------------|--------------|---------|---------|");
     for (BenchmarkResult r : results) {
       Double bl = baseline.get(r.name());
       if (bl == null) {
-        System.out.println(String.format("| %-30s | %13s | %12.0f | %7s |",
-          r.name(), "N/A", r.meanNs(), "N/A"));
+        System.out.println(String.format("| %-30s | %13s | %12.0f | %7s | %7s |",
+          r.name(), "N/A", r.meanNs(), "N/A", "N/A"));
       } else {
         System.out.println(diffRowNsWithBaseline(r.name(), bl, r));
       }

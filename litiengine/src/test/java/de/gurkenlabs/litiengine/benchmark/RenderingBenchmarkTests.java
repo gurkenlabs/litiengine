@@ -61,8 +61,8 @@ public class RenderingBenchmarkTests {
 
     if (!baseline.isEmpty()) {
       sb.append("## Change vs Baseline\n\n");
-      sb.append("| Scene                      | Baseline (ns) | Current (ns) | Change  |\n");
-      sb.append("|----------------------------|---------------|--------------|---------|\n");
+      sb.append("| Scene                      | Baseline (ns) | Current (ns) | Change  | FPS Δ   |\n");
+      sb.append("|----------------------------|---------------|--------------|---------|---------|\n");
       for (BenchmarkResult r : RESULTS) {
         Double bl = baseline.get(r.name());
         if (bl == null) {
