@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameTest;
-import de.gurkenlabs.litiengine.entities.LightSource;
 import de.gurkenlabs.litiengine.test.GameTestSuite;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -27,6 +26,8 @@ public class RichRenderingBenchmarkTests {
   private static final List<BenchmarkResult> RESULTS = new ArrayList<>();
   private static final Path RESULT_FILE = Paths.get(System.getProperty("user.dir"))
     .getParent().resolve("benchmark-results-real.txt");
+  private static final Path BASELINE_FILE = Paths.get(System.getProperty("user.dir"))
+    .getParent().resolve("benchmark-results-real-baseline.txt");
 
   @BeforeAll
   static void setup() throws IOException {
@@ -35,7 +36,7 @@ public class RichRenderingBenchmarkTests {
 
   @AfterAll
   static void tearDown() throws IOException {
-    Map<String, Double> baseline = Map.of();
+    Map<String, Double> baseline = BenchmarkResult.parseBaseline(BASELINE_FILE);
 
     StringBuilder sb = new StringBuilder();
     sb.append("# LITIENGINE Rendering Benchmark (Real Graphics - Textured)\n");
@@ -56,12 +57,31 @@ public class RichRenderingBenchmarkTests {
     }
     sb.append("\n");
 
+    if (!baseline.isEmpty()) {
+      sb.append("## Change vs Baseline\n\n");
+      sb.append("| Scene                      | Baseline (ns) | Current (ns) | Change  | FPS \u0394   |\n");
+      sb.append("|----------------------------|---------------|--------------|---------|---------|\n");
+      for (BenchmarkResult r : RESULTS) {
+        Double bl = baseline.get(r.name());
+        if (bl == null) {
+          sb.append(String.format("| %-30s | %13s | %12.0f | %7s | %7s |\n",
+            r.name(), "N/A", r.meanNs(), "N/A", "N/A"));
+        } else {
+          sb.append(BenchmarkResult.diffRowNsWithBaseline(r.name(), bl, r)).append("\n");
+        }
+      }
+      sb.append("\n");
+    }
+
     Files.writeString(RESULT_FILE, sb.toString(),
       StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
     System.out.println("\n=== BENCHMARK RESULTS (Real Textured) ===\n" + sb
       + "=== written to " + RESULT_FILE.toAbsolutePath() + " ===\n");
 
     BenchmarkResult.printResultsNs(RESULTS);
+    if (!baseline.isEmpty()) {
+      BenchmarkResult.printDiffTable(RESULTS, baseline);
+    }
 
     GameTest.terminateGame();
   }

@@ -26,9 +26,9 @@ public class RealGraphicsRenderingBenchmarkTests {
 
   private static final List<BenchmarkResult> RESULTS = new ArrayList<>();
   private static final Path RESULT_FILE = Paths.get(System.getProperty("user.dir"))
-    .getParent().resolve("benchmark-results-real.txt");
+    .getParent().resolve("benchmark-results-real-simple.txt");
   private static final Path BASELINE_FILE = Paths.get(System.getProperty("user.dir"))
-    .getParent().resolve("benchmark-results-real.txt");
+    .getParent().resolve("benchmark-results-real-simple-baseline.txt");
 
   @BeforeAll
   static void setup() throws IOException {
