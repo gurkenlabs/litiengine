@@ -8,15 +8,18 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.Zoom;
 import de.gurkenlabs.utiliti.model.Style;
+import java.awt.BorderLayout;
 import java.awt.Container;
-import java.awt.FlowLayout;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ItemEvent;
 import java.util.Objects;
 import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
 
 public final class StatusBar {
   private static JLabel statusLabel;
@@ -28,30 +31,34 @@ public final class StatusBar {
   private StatusBar() {}
 
   public static Container create() {
-    JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+    JPanel panel = new JPanel();
+    panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+    panel.setBorder(new EmptyBorder(2, 6, 2, 6));
 
-    statusLabel = new JLabel("");
-    statusLabel.setFont(
-        new Font(
-            Style.FONTNAME_CONSOLE, Font.PLAIN, (int) (12 * Editor.preferences().getUiScale())));
-
-    toolLabel = new JLabel("");
-    toolLabel.setFont(
-        new Font(
-            Style.FONTNAME_CONSOLE, Font.PLAIN, (int) (12 * Editor.preferences().getUiScale())));
-    toolLabel.setForeground(Style.COLOR_ACCENT_BLUE);
+    int fs = (int) (11 * Editor.preferences().getUiScale());
 
     zoomComboBox = new JComboBox<>(Zoom.getAll());
+    zoomComboBox.setFont(new Font(Style.FONTNAME_CONSOLE, Font.PLAIN, fs));
+    zoomComboBox.setMaximumSize(new Dimension(80, 24));
+
+    statusLabel = new JLabel("");
+    statusLabel.setFont(new Font(Style.FONTNAME_CONSOLE, Font.PLAIN, fs));
+    statusLabel.setForeground(Style.COLOR_SUBTEXT);
+
+    toolLabel = new JLabel("");
+    toolLabel.setFont(new Font(Style.FONTNAME_CONSOLE, Font.PLAIN, fs));
+    toolLabel.setForeground(Style.COLOR_ACCENT_BLUE);
+
     zoomComboBox.addItemListener(
         e -> {
           if (settingZoom || e.getStateChange() != ItemEvent.SELECTED) {
             return;
           }
-
           Zoom.set(((Zoom) Objects.requireNonNull(zoomComboBox.getSelectedItem())).getValue());
         });
 
     panel.add(zoomComboBox);
+    panel.add(Box.createRigidArea(new Dimension(8, 0)));
     panel.add(statusLabel);
     panel.add(Box.createHorizontalGlue());
     panel.add(toolLabel);
@@ -59,33 +66,28 @@ public final class StatusBar {
   }
 
   public static void update() {
-    String position =
-        String.format(
-            "x/y: %d,%d",
-            (int) Input.mouse().getMapLocation().getX(),
-            (int) Input.mouse().getMapLocation().getY());
-    String tile =
-        String.format("Tile: %d,%d", Input.mouse().getTile().x, Input.mouse().getTile().y);
-    StringBuilder status = new StringBuilder();
-    status.append(String.format("%-14s %-10s", position, tile));
+    String position = String.format("%d, %d",
+        (int) Input.mouse().getMapLocation().getX(),
+        (int) Input.mouse().getMapLocation().getY());
+    String tile = String.format("%d, %d", Input.mouse().getTile().x, Input.mouse().getTile().y);
+    StringBuilder sb = new StringBuilder();
+    sb.append(position);
+    sb.append("  \u00B7  ").append(tile);
 
     int selectionSize = Editor.instance().getMapComponent().getSelectedMapObjects().size();
     if (selectionSize > 0) {
-      status.append("  ").append(Resources.strings().get("status_selected_objects", selectionSize));
+      sb.append("  \u00B7  ").append(Resources.strings().get("status_selected_objects", selectionSize));
     }
 
-    // Show current layer info
     if (Game.world().environment() != null && Game.world().environment().getMap() != null) {
       ILayer currentLayer = getActiveLayer();
       if (currentLayer != null) {
-        String layerType = currentLayer instanceof ITileLayer ? "Tile" : "Objects";
-        status.append("  |  Layer: ").append(currentLayer.getName()).append(" (").append(layerType).append(")");
+        sb.append("  \u00B7  ").append(currentLayer.getName());
       }
     }
 
-    statusLabel.setText(status.toString());
+    statusLabel.setText(sb.toString());
 
-    // Tool name — updates from transform mode
     String toolName = getToolDisplayName();
     toolLabel.setText(toolName);
 
