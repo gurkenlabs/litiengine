@@ -54,9 +54,14 @@ import javax.swing.event.TableModelListener;
 public abstract class PropertyPanel extends JPanel {
 
   /**
-   * The width of the label in pixels, scaled by the UI scale factor.
+   * Fixed label column width (100px at 1x scale).
    */
-  public static final int LABEL_WIDTH = (int) (35 * Editor.preferences().getUiScale());
+  public static final int LABEL_WIDTH = (int) (100 * Editor.preferences().getUiScale());
+
+  /**
+   * Gutter between label column and input column.
+   */
+  public static final int GUTTER_WIDTH = (int) (12 * Editor.preferences().getUiScale());
 
   /**
    * The minimum width of the control in pixels, scaled by the UI scale factor.
@@ -81,7 +86,7 @@ public abstract class PropertyPanel extends JPanel {
   /**
    * The margin between controls in pixels, scaled by the UI scale factor.
    */
-  public static final int CONTROL_MARGIN = (int) (5 * Editor.preferences().getUiScale());
+  public static final int CONTROL_MARGIN = (int) (6 * Editor.preferences().getUiScale());
 
   /**
    * The width of the panel in pixels, calculated based on control and label widths.
@@ -512,7 +517,7 @@ public abstract class PropertyPanel extends JPanel {
     for (LayoutItem item : layoutItems) {
       SequentialGroup horGrp = groupLayout.createSequentialGroup();
       if (item.getLabel() != null) {
-        horGrp.addComponent(item.getLabel(), LABEL_WIDTH, LABEL_WIDTH, Integer.MAX_VALUE).addPreferredGap(ComponentPlacement.UNRELATED)
+        horGrp.addComponent(item.getLabel(), LABEL_WIDTH, LABEL_WIDTH, Integer.MAX_VALUE).addGap(GUTTER_WIDTH)
           .addComponent(item.getComponent(), CONTROL_MIN_WIDTH, CONTROL_WIDTH, Integer.MAX_VALUE);
       } else {
         horGrp.addComponent(item.getComponent(), CONTROL_MIN_WIDTH, CONTROL_WIDTH, Integer.MAX_VALUE);

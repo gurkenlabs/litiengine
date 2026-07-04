@@ -21,8 +21,8 @@ public final class ControlBehavior {
           });
     }
 
-    if (component instanceof JSpinner) {
-      JSpinner.DefaultEditor editor = (JSpinner.DefaultEditor) ((JSpinner) component).getEditor();
+    if (component instanceof JSpinner spinner) {
+      JSpinner.DefaultEditor editor = (JSpinner.DefaultEditor) spinner.getEditor();
       JTextField textField = editor.getTextField();
       textField.addFocusListener(
           new FocusAdapter() {
@@ -35,6 +35,7 @@ public final class ControlBehavior {
                   });
             }
           });
+      spinner.putClientProperty("JSpinner.arrowButton", false);
     }
 
     return component;

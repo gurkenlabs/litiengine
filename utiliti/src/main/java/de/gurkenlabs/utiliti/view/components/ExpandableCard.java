@@ -18,7 +18,7 @@ import javax.swing.JPanel;
 
 public class ExpandableCard extends JPanel {
   private static final int ARC = 6;
-  private static final Color CARD_BG = new Color(28, 28, 33);
+  private static final Color CARD_BG = new Color(30, 31, 34);
   private static final Color HEADER_BG = new Color(30, 30, 34);
 
   private final JPanel contentPanel;
@@ -35,7 +35,7 @@ public class ExpandableCard extends JPanel {
     this.expanded = startExpanded;
     setLayout(new BorderLayout());
     setOpaque(false);
-    setBorder(BorderFactory.createEmptyBorder(0, 0, 3, 0));
+    setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
 
     this.headerPanel = new JPanel(new BorderLayout()) {
       @Override

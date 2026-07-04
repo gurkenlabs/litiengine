@@ -31,9 +31,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 
 public class MapObjectInspector extends PropertyPanel implements PropertyInspector {
-  private static final int SECTION_LABEL_WIDTH = 90;
-  private static final int CARD_LABEL_OFFSET =
-      SECTION_LABEL_WIDTH - PropertyPanel.LABEL_WIDTH;
+  private static final int SECTION_LABEL_WIDTH = 100;
   private static final Color BG = new Color(20, 20, 22);
 
   private final Map<MapObjectType, PropertyPanel> panels;
@@ -176,11 +174,11 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
         new ExpandableCard(
             Resources.strings().get("panel_customProperties"), this.customPanel, true);
 
-    typeCard.setContentInsets(6, CARD_LABEL_OFFSET, 8, 6);
-    collisionCard.setContentInsets(6, CARD_LABEL_OFFSET, 8, 6);
-    combatCard.setContentInsets(6, CARD_LABEL_OFFSET, 8, 6);
-    movementCard.setContentInsets(6, CARD_LABEL_OFFSET, 8, 6);
-    customCard.setContentInsets(6, CARD_LABEL_OFFSET, 8, 6);
+    typeCard.setContentInsets(8, 0, 12, 6);
+    collisionCard.setContentInsets(8, 0, 12, 6);
+    combatCard.setContentInsets(8, 0, 12, 6);
+    movementCard.setContentInsets(8, 0, 12, 6);
+    customCard.setContentInsets(8, 0, 12, 6);
 
     typeCard.setVisible(false);
     collisionCard.setVisible(false);

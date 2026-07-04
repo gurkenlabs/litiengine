@@ -8,6 +8,7 @@ import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.UndoManager;
 import de.gurkenlabs.utiliti.model.Style;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.util.ArrayList;
@@ -16,7 +17,6 @@ import java.util.Map;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -125,6 +125,8 @@ public class CustomPanel extends PropertyPanel {
     this.tableCustomProperties.setFillsViewportHeight(true);
     this.tableCustomProperties.getTableHeader().setReorderingAllowed(false);
     this.tableCustomProperties.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    this.tableCustomProperties.setShowGrid(false);
+    this.tableCustomProperties.setIntercellSpacing(new Dimension(0, 0));
     this.scrollPane.setViewportView(tableCustomProperties);
     this.tableCustomProperties.setModel(
         new DefaultTableModel(

@@ -9,6 +9,7 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.SpriteVariantSelector;
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.view.renderers.LabelListCellRenderer;
+import java.awt.GridLayout;
 import java.awt.LayoutManager;
 import java.util.Map;
 import java.util.TreeMap;
@@ -16,6 +17,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 public class PropPanel extends PropertyPanel {
   private final JComboBox<JLabel> comboBoxSpriteSheets;
@@ -136,11 +138,13 @@ public class PropPanel extends PropertyPanel {
         new LayoutItem("panel_rotation", this.comboBoxRotation),
       };
 
-    return this.createLayout(
-      layoutItems,
-      this.checkBoxScale,
-      this.chckbxShadow,
-      this.checkBoxHorizontalFlip,
-      this.checkBoxVerticalFlip);
+    JPanel checkboxGrid = new JPanel(new GridLayout(2, 2, 4, 4));
+    checkboxGrid.setOpaque(false);
+    checkboxGrid.add(checkBoxScale);
+    checkboxGrid.add(chckbxShadow);
+    checkboxGrid.add(checkBoxHorizontalFlip);
+    checkboxGrid.add(checkBoxVerticalFlip);
+
+    return this.createLayout(layoutItems, checkboxGrid);
   }
 }

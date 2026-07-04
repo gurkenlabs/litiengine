@@ -2,6 +2,7 @@ package de.gurkenlabs.utiliti.view.components;
 
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.Style;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -12,6 +13,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class Tag extends JPanel {
+  private static final int CHIP_HEIGHT = 24;
 
   private final JLabel lblText;
   private final JButton btnDelete;
@@ -23,14 +25,15 @@ public class Tag extends JPanel {
 
   public Tag() {
     setBorder(null);
-    setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
+    setLayout(new BorderLayout());
     setOpaque(false);
 
     JPanel chip = new JPanel();
     chip.setBackground(Style.COLOR_DEFAULT_TAG);
     chip.setLayout(new FlowLayout(FlowLayout.LEFT, 2, 0));
     chip.setOpaque(true);
-    add(chip);
+    chip.setPreferredSize(new Dimension(chip.getPreferredSize().width, CHIP_HEIGHT));
+    add(chip, BorderLayout.CENTER);
 
     this.lblText = new JLabel("New label");
     this.lblText.setForeground(Color.WHITE);
