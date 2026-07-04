@@ -45,18 +45,33 @@ public class IconTreeListRenderer implements TreeCellRenderer {
     this.label.setText(value.toString());
     if (value instanceof DefaultMutableTreeNode defaultMutableTreeNode
         && defaultMutableTreeNode.getUserObject()instanceof IconTreeListItem iconTreeListItem) {
-      this.label.setText(iconTreeListItem.toString());
+      Object userObj = iconTreeListItem.getUserObject();
+      this.label.setText(formatEntityLabel(userObj));
       if (iconTreeListItem.getIcon() != null) {
         this.label.setIcon(iconTreeListItem.getIcon());
-      } else if (iconTreeListItem.getUserObject()instanceof Prop prop) {
+      } else if (userObj instanceof Prop prop) {
         label.setIcon(getIcon(prop));
-      } else if (iconTreeListItem.getUserObject()instanceof Creature creature) {
+      } else if (userObj instanceof Creature creature) {
         label.setIcon(getIcon(creature));
-      } else if (iconTreeListItem.getUserObject()instanceof LightSource lightSource) {
+      } else if (userObj instanceof LightSource lightSource) {
         label.setIcon(getIcon(lightSource));
       }
     }
     return label;
+  }
+
+  private static String formatEntityLabel(Object userObj) {
+    if (userObj instanceof de.gurkenlabs.litiengine.entities.Entity entity) {
+      String name = entity.getName();
+      if (name != null && !name.isEmpty()) {
+        return name;
+      }
+      return entity.getClass().getSimpleName() + " (#" + entity.getMapId() + ")";
+    }
+    if (userObj instanceof IconTreeListItem inner) {
+      return inner.toString();
+    }
+    return userObj.toString();
   }
 
   private static Icon getIcon(Prop prop) {
