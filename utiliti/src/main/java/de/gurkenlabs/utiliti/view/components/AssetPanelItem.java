@@ -20,7 +20,9 @@ import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.litiengine.util.io.Codec;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.UndoManager;
+import de.gurkenlabs.utiliti.controller.tool.AssetTransferable;
 import de.gurkenlabs.utiliti.model.Icons;
+import java.awt.datatransfer.Transferable;
 import de.gurkenlabs.utiliti.view.dialogs.XmlExportDialog;
 import de.gurkenlabs.utiliti.view.menus.AssetPanelItemPopupMenu;
 import java.awt.BasicStroke;
@@ -63,6 +65,7 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -141,6 +144,14 @@ public class AssetPanelItem extends JPanel {
     setFocusable(true);
     setRequestFocusEnabled(true);
     setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+    setTransferHandler(new TransferHandler() {
+      @Override public int getSourceActions(JComponent c) {
+        return COPY;
+      }
+      @Override protected Transferable createTransferable(JComponent c) {
+        return new AssetTransferable(origin);
+      }
+    });
     btnAdd.setEnabled(canAdd());
   }
 

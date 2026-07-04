@@ -18,6 +18,7 @@ import de.gurkenlabs.utiliti.controller.Scroll;
 import de.gurkenlabs.utiliti.controller.Transform.TransformMode;
 import de.gurkenlabs.utiliti.model.Cursors;
 import de.gurkenlabs.utiliti.model.Icons;
+import de.gurkenlabs.utiliti.controller.tool.AssetTransferable;
 import de.gurkenlabs.utiliti.controller.tool.BucketFillTool;
 import de.gurkenlabs.utiliti.controller.tool.EraserTool;
 import de.gurkenlabs.utiliti.controller.tool.PointerTool;
@@ -51,6 +52,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
+import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
 
@@ -201,6 +203,7 @@ public final class UI {
 
     initTools();
     renderPanel.add(new ToolBar(), BorderLayout.NORTH);
+    initDropTarget(renderPanel);
 
     Component leftPanel = initLeftPanel();
     Component renderSplitPanel = initRenderSplitPanel(renderPanel, window);
@@ -316,6 +319,27 @@ public final class UI {
     tm.register(new StampBrushTool());
     tm.register(new EraserTool());
     tm.register(new BucketFillTool());
+  }
+
+  private static void initDropTarget(JPanel renderPanel) {
+    renderPanel.setTransferHandler(new TransferHandler() {
+      @Override public boolean canImport(TransferHandler.TransferSupport support) {
+        return support.isDataFlavorSupported(AssetTransferable.ASSET_FLAVOR);
+      }
+      @Override public boolean importData(TransferHandler.TransferSupport support) {
+        if (!canImport(support)) {
+          return false;
+        }
+        try {
+          Object asset = support.getTransferable().getTransferData(AssetTransferable.ASSET_FLAVOR);
+          java.awt.Point dropPoint = support.getDropLocation().getDropPoint();
+          Editor.instance().getMapComponent().addMapObjectAt(asset, dropPoint);
+          return true;
+        } catch (Exception ex) {
+          return false;
+        }
+      }
+    });
   }
 
   private static JPanel initBottomPanel() {

@@ -154,23 +154,26 @@ public final class LayerList extends JPanel implements LayerController {
     return createButton(
       Icons.DELETE_24,
         (map, selectedLayer) -> {
-          // we need at least on mapobject layer to work with LITIENGINE entities.
           if (map.getMapObjectLayers().size() <= 1) {
             return;
           }
 
-          if (JOptionPane.showConfirmDialog(
-              null,
-              Resources.strings().get("panel_confirmDeleteLayer"),
-              "",
-              JOptionPane.YES_NO_OPTION) != 0) {
-            return;
-          }
+          int index = map.getMapObjectLayers().indexOf(selectedLayer);
+          IMapObjectLayer copy = new MapObjectLayer((MapObjectLayer) selectedLayer);
 
           Editor.instance().getMapComponent().delete(selectedLayer);
           map.removeLayer(selectedLayer);
           this.layerTable.bind(map);
           Transform.updateAnchors();
+
+          Toast.show(
+              this.getRootPane(),
+              Resources.strings().get("panel_layerDeleted"),
+              () -> {
+                map.addLayer(index, copy);
+                this.refresh();
+                Editor.instance().getMapComponent().add(copy);
+              });
         });
   }
 

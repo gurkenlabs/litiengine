@@ -29,11 +29,15 @@ import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import de.gurkenlabs.utiliti.controller.Transform.TransformMode;
+import de.gurkenlabs.utiliti.controller.tool.AssetTransferable;
 import de.gurkenlabs.utiliti.controller.tool.PointerTool;
 import de.gurkenlabs.utiliti.controller.tool.Tool;
 import de.gurkenlabs.utiliti.controller.tool.ToolManager;
 import de.gurkenlabs.utiliti.model.Cursors;
+import de.gurkenlabs.utiliti.view.components.CreaturePanel;
+import de.gurkenlabs.utiliti.view.components.PropPanel;
 import de.gurkenlabs.utiliti.view.components.UI;
+import java.awt.Point;
 import de.gurkenlabs.utiliti.view.dialogs.ConfirmDialog;
 import de.gurkenlabs.utiliti.view.dialogs.XmlExportDialog;
 import de.gurkenlabs.utiliti.view.dialogs.XmlImportDialog;
@@ -373,6 +377,72 @@ public class MapComponent extends GuiComponent {
     Game.window().getRenderComponent().requestFocus();
     this.setFocus(mapObject, false);
     this.setTransformMode(TransformMode.NONE);
+  }
+
+  public void addMapObjectAt(Object asset, Point dropPoint) {
+    if (asset == null || Game.world().environment() == null || Game.world().camera() == null) {
+      return;
+    }
+    Point2D mapLocation = Game.world().camera().getMapLocation(
+        new Point2D.Double(dropPoint.getX(), dropPoint.getY()));
+    addMapObjectFromAsset(asset, mapLocation);
+  }
+
+  private void addMapObjectFromAsset(Object asset, Point2D location) {
+    if (asset instanceof SpritesheetResource spritesheetResource) {
+      addSpriteFromDrop(spritesheetResource, location);
+    } else if (asset instanceof EmitterAttributes emitterData) {
+      addEmitterFromDrop(emitterData, location);
+    } else if (asset instanceof Blueprint blueprint) {
+      addBlueprintFromDrop(blueprint, location);
+    }
+  }
+
+  private void addSpriteFromDrop(SpritesheetResource spritesheetResource, Point2D location) {
+    String propName = PropPanel.getIdentifierBySpriteName(spritesheetResource.getName());
+    String creatureName = CreaturePanel.getCreatureSpriteName(spritesheetResource.getName());
+    if (propName == null && creatureName == null) {
+      return;
+    }
+
+    MapObject mo = new MapObject();
+    mo.setType(propName != null ? MapObjectType.PROP.name() : MapObjectType.CREATURE.name());
+    mo.setValue(MapObjectProperty.SPRITESHEETNAME, propName != null ? propName : creatureName);
+
+    mo.setX((float) (location.getX() - spritesheetResource.getWidth() / 2.0));
+    mo.setY((float) (location.getY() - spritesheetResource.getHeight() / 2.0));
+    mo.setWidth(spritesheetResource.getWidth());
+    mo.setHeight(spritesheetResource.getHeight());
+    mo.setId(Game.world().environment().getNextMapId());
+    mo.setName("");
+    mo.setValue(MapObjectProperty.COLLISIONBOX_WIDTH, spritesheetResource.getWidth() * 0.4);
+    mo.setValue(MapObjectProperty.COLLISIONBOX_HEIGHT, spritesheetResource.getHeight() * 0.4);
+    mo.setValue(MapObjectProperty.COLLISION, true);
+    mo.setValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE, false);
+    mo.setValue(MapObjectProperty.PROP_ADDSHADOW, true);
+
+    this.add(mo);
+  }
+
+  private void addEmitterFromDrop(EmitterAttributes emitterData, Point2D location) {
+    MapObject newEmitter = (MapObject) EmitterMapObjectLoader.createMapObject(emitterData);
+    newEmitter.setX((float) (location.getX() - newEmitter.getWidth()));
+    newEmitter.setY((float) (location.getY() - newEmitter.getHeight()));
+    newEmitter.setId(Game.world().environment().getNextMapId());
+    this.add(newEmitter);
+  }
+
+  private void addBlueprintFromDrop(Blueprint blueprint, Point2D location) {
+    UndoManager.instance().beginOperation();
+    try {
+      List<IMapObject> newObjects = blueprint.build(
+          (int) location.getX() - blueprint.getWidth() / 2,
+          (int) location.getY() - blueprint.getHeight() / 2);
+      newObjects.forEach(obj -> this.add(obj));
+      newObjects.forEach(obj -> this.setSelection(obj, false));
+    } finally {
+      UndoManager.instance().endOperation();
+    }
   }
 
   public void delete(IMapObjectLayer layer) {
