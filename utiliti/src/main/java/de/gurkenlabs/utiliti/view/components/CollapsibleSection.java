@@ -30,7 +30,7 @@ public class CollapsibleSection extends JPanel {
     setOpaque(false);
     setAlignmentX(Component.LEFT_ALIGNMENT);
 
-    this.headerLabel = new JLabel((expanded ? "\u25BC " : "\u25B6 ") + this.title);
+    this.headerLabel = new JLabel(this.title);
     this.headerLabel.setFont(Style.getHeaderFont());
     this.headerLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     this.headerLabel.setBorder(BorderFactory.createEmptyBorder(6, 4, 6, 4));
@@ -58,7 +58,7 @@ public class CollapsibleSection extends JPanel {
   public void toggle() {
     expanded = !expanded;
     contentPanel.setVisible(expanded);
-    headerLabel.setText((expanded ? "\u25BC " : "\u25B6 ") + title);
+    headerLabel.setText(title);
     revalidate();
     repaint();
   }
