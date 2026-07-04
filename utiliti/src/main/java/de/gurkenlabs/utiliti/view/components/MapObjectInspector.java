@@ -166,8 +166,8 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     LayoutItem[] layoutItems =
         new LayoutItem[] {
             new LayoutItem(infoPanel),
-            new LayoutItem(transformSection),
-            new LayoutItem(entitySection),
+            new LayoutItem(transformSection, GroupLayout.PREFERRED_SIZE),
+            new LayoutItem(entitySection, GroupLayout.PREFERRED_SIZE),
             new LayoutItem(tabbedPanel, GroupLayout.PREFERRED_SIZE)
         };
     return this.createLayout(layoutItems);
