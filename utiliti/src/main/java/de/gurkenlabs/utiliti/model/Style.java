@@ -31,6 +31,9 @@ public final class Style {
   public static final Color COLOR_SUBTEXT = new Color(150, 158, 185);
   public static final Color COLOR_COMMENT = new Color(86, 95, 137);
 
+  public static final Color COLOR_SELECTION_INACTIVE = new Color(42, 45, 58);
+  public static final Color COLOR_HEADER_COLLAPSED = new Color(24, 24, 28);
+
   public static final Color COLOR_DEFAULT_BOUNDING_BOX_FILL = new Color(0, 0, 0, 40);
   public static final Color COLOR_DARKBORDER = new Color(30, 30, 35, 220);
   public static final Color COLOR_DEFAULT_GRID = new Color(255, 255, 255, 65);
