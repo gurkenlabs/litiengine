@@ -10,11 +10,14 @@ import de.gurkenlabs.utiliti.controller.PropertyInspector;
 import de.gurkenlabs.utiliti.controller.Transform;
 import de.gurkenlabs.utiliti.controller.UndoManager;
 import de.gurkenlabs.utiliti.model.Style;
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.LayoutManager;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
@@ -97,10 +100,11 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
         this.lblLayer.getFont().deriveFont(Style.getDefaultFont().getSize() * 0.75f));
 
     this.infoPanel.add(lblEntityId);
-    this.infoPanel.add(Box.createHorizontalStrut(47));
+    this.infoPanel.add(Box.createHorizontalStrut(4));
     this.infoPanel.add(labelEntityID);
-    this.infoPanel.add(Box.createGlue());
+    this.infoPanel.add(Box.createHorizontalGlue());
     this.infoPanel.add(lblLayer);
+    this.infoPanel.setBorder(BorderFactory.createEmptyBorder(4, 12, 4, 12));
 
     this.spnX = new JSpinner(new SpinnerNumberModel(0.0, 0.0, (double) Short.MAX_VALUE, 1.0));
     this.spnY = new JSpinner(new SpinnerNumberModel(0.0, 0.0, (double) Short.MAX_VALUE, 1.0));
@@ -156,20 +160,31 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
   }
 
   private LayoutManager createLayout() {
-    JPanel transformGrid = createTransformGrid();
     JPanel entityPanel = createEntityPanel();
-
-    CollapsibleSection transformSection = new CollapsibleSection("panel_transform", transformGrid);
-    CollapsibleSection entitySection = new CollapsibleSection("panel_entity", entityPanel);
+    JPanel transformGrid = createTransformGrid();
 
     LayoutItem[] layoutItems =
         new LayoutItem[] {
-            new LayoutItem(tabbedPanel, GroupLayout.PREFERRED_SIZE),
             new LayoutItem(infoPanel),
-            new LayoutItem(transformSection, GroupLayout.PREFERRED_SIZE),
-            new LayoutItem(entitySection, GroupLayout.PREFERRED_SIZE)
+            new LayoutItem(createSectionSeparator("properties"), GroupLayout.PREFERRED_SIZE),
+            new LayoutItem(entityPanel),
+            new LayoutItem(createSectionSeparator("transform"), GroupLayout.PREFERRED_SIZE),
+            new LayoutItem(transformGrid),
+            new LayoutItem(tabbedPanel, GroupLayout.PREFERRED_SIZE)
         };
     return this.createLayout(layoutItems);
+  }
+
+  private Component createSectionSeparator(String title) {
+    JPanel panel = new JPanel(new BorderLayout());
+    panel.setOpaque(false);
+    JLabel label = new JLabel("  " + Resources.strings().get("panel_" + title).toUpperCase());
+    label.setFont(label.getFont().deriveFont(10f));
+    label.setForeground(new Color(120, 120, 140));
+    label.setBorder(BorderFactory.createEmptyBorder(8, 0, 4, 0));
+    panel.add(label, BorderLayout.CENTER);
+    panel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(50, 50, 60)));
+    return panel;
   }
 
   private JPanel createTransformGrid() {
