@@ -215,7 +215,7 @@ public final class UI {
     Component renderSplitPanel = initRenderSplitPanel(renderPanel, winH);
 
     mapObjectPanel = new MapObjectInspector();
-    mapObjectPanel.setMinimumSize(new Dimension(360, 0));
+    mapObjectPanel.setMinimumSize(new Dimension(260, 0));
 
     int prefInspectorW = Math.max(280, (int) (winW * 0.20));
     JSplitPane centerRightSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, renderSplitPanel, mapObjectPanel);

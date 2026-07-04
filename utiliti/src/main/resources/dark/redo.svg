@@ -1,15 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="100%" height="100%" viewBox="0 0 128 128" version="1.1" xmlns="http://www.w3.org/2000/svg"
-  xml:space="preserve"
-  style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1;">
-  <g transform="matrix(1,0,0,1,-2300,-200)">
-    <g transform="matrix(0.248227,0,0,0.312796,2300.45,199.973)">
-      <rect x="-1.829" y="0.088" width="515.658" height="409.212" style="fill:none;"/>
-      <path d="M 150,280 C 150,120 350,120 350,280"
-        style="fill:none;stroke:rgb(238,235,211);stroke-width:28px;stroke-linecap:round;"/>
-      <path d="M 400,240 L 350,200 L 350,280 Z"
-        style="fill:rgb(238,235,211);stroke:rgb(0,165,188);stroke-width:6px;stroke-linejoin:round;"/>
-    </g>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#C9C9D1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <polyline points="15 14 20 9 15 4"></polyline>
+  <path d="M4 20v-7a4 4 0 0 1 4-4h12"></path>
 </svg>

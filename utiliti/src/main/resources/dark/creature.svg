@@ -1,20 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="100%" height="100%" viewBox="0 0 128 128" version="1.1" xmlns="http://www.w3.org/2000/svg"
-  xml:space="preserve"
-  style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1;">
-    <g transform="matrix(1,0,0,1,-2400,-200)">
-        <g id="creature-dark" transform="matrix(0.248227,0,0,0.312796,2400.45,199.973)">
-            <rect x="-1.829" y="0.088" width="515.658" height="409.212" style="fill:none;"/>
-          <g transform="matrix(5.14763,0,0,4.08502,-12425.4,-56.7471)">
-                <path
-                  d="M2504.78,44.982L2464,64L2504.78,83.018C2497.39,98.868 2481.49,109 2464,109C2439.16,109 2419,88.836 2419,64C2419,39.164 2439.16,19 2464,19C2481.49,19 2497.39,29.132 2504.78,44.982Z"
-                  style="fill:rgb(247,197,72);stroke:rgb(0,165,188);stroke-width:3.91px;stroke-dasharray:0,0.2,0,0,0,0;"/>
-            </g>
-          <g transform="matrix(5.3769,0,0,4.26696,-12990.3,-31.9646)">
-                <circle cx="2464" cy="32.18" r="7.18"
-                  style="fill:rgb(30,72,71);stroke:rgb(238,235,211);stroke-width:3.75px;stroke-dasharray:0,0.19,0,0,0,0;"/>
-            </g>
-        </g>
-    </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#C9C9D1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+  <circle cx="12" cy="7" r="4"></circle>
 </svg>

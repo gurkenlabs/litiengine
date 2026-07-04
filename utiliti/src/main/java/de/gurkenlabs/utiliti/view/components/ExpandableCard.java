@@ -75,7 +75,8 @@ public class ExpandableCard extends JPanel {
     });
 
     this.contentPanel = new JPanel(new BorderLayout());
-    contentPanel.setOpaque(false);
+    contentPanel.setOpaque(true);
+    contentPanel.setBackground(CARD_BG);
     contentPanel.setBorder(BorderFactory.createEmptyBorder(4, 0, 8, 0));
     contentPanel.setVisible(expanded);
     if (content != null) {
@@ -95,12 +96,10 @@ public class ExpandableCard extends JPanel {
 
   @Override
   protected void paintComponent(Graphics g) {
-    if (expanded) {
-      Graphics2D g2 = (Graphics2D) g.create();
+    if (expanded && g instanceof Graphics2D g2) {
       g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
       g2.setColor(CARD_BG);
-      g2.fillRoundRect(0, 0, getWidth(), getHeight(), ARC, ARC);
-      g2.dispose();
+      g2.fillRect(0, 0, getWidth(), getHeight());
     }
     super.paintComponent(g);
   }

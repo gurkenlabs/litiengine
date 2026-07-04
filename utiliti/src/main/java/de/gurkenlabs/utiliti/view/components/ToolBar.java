@@ -6,7 +6,11 @@ import de.gurkenlabs.utiliti.controller.tool.Tool;
 import de.gurkenlabs.utiliti.controller.tool.ToolManager;
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.Style;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Insets;
+import java.awt.RenderingHints;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JPopupMenu;
@@ -14,10 +18,14 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 
 public class ToolBar extends JToolBar {
+  private static final int ARC = 8;
+  private static final Color DOCK_BG = new Color(30, 31, 34, 230);
+
   public ToolBar() {
     super("Tools");
     setFloatable(false);
-    setMargin(new Insets(2, 4, 2, 4));
+    setOpaque(false);
+    setMargin(new Insets(4, 8, 4, 8));
     setFont(Style.getDefaultFont());
 
     ButtonGroup group = new ButtonGroup();
@@ -67,6 +75,16 @@ public class ToolBar extends JToolBar {
       popup.show(addBtn, 0, addBtn.getHeight());
     });
     add(addBtn);
+  }
+
+  @Override
+  protected void paintComponent(Graphics g) {
+    if (g instanceof Graphics2D g2) {
+      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+      g2.setColor(DOCK_BG);
+      g2.fillRoundRect(0, 0, getWidth(), getHeight(), ARC, ARC);
+    }
+    super.paintComponent(g);
   }
 
   private void updateButtonSelection() {
