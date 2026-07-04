@@ -33,4 +33,9 @@ public class StampBrushTool implements Tool {
   @Override
   public void mouseReleased(ComponentMouseEvent event) {
   }
+
+  @Override
+  public boolean showInToolbar() {
+    return false;
+  }
 }

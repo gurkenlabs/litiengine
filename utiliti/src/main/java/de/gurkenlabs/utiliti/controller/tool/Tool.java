@@ -30,4 +30,8 @@ public interface Tool {
 
   default void mouseMoved(ComponentMouseEvent event) {
   }
+
+  default boolean showInToolbar() {
+    return true;
+  }
 }

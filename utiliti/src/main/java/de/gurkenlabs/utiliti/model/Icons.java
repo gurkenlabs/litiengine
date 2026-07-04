@@ -128,6 +128,8 @@ public final class Icons {
   public static final Icon PLAY_24 = IconLoader.get().getUIAwareIcon("play.svg", 24, 24);
   public static final Icon RENAME_24 = IconLoader.get().getUIAwareIcon("rename.svg", 24, 24);
   public static final Icon REWIND_24 = IconLoader.get().getUIAwareIcon("rewind.svg", 24, 24);
+  public static final Icon UNDO_24 = IconLoader.get().getUIAwareIcon("undo.svg", 24, 24);
+  public static final Icon REDO_24 = IconLoader.get().getUIAwareIcon("redo.svg", 24, 24);
   public static final Icon SCROLL_DOWN_24 = IconLoader.get().getUIAwareIcon("scroll_down.svg", 24, 24);
   public static final Icon SEARCH_24 = IconLoader.get().getUIAwareIcon("search.svg", 24, 24);
   public static final Icon SHADOWBOX_24 = IconLoader.get().getUIAwareIcon("shadowbox.svg", 24, 24);

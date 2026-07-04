@@ -9,6 +9,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
+import de.gurkenlabs.litiengine.graphics.TextRenderer;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.MapComponent;
 import de.gurkenlabs.utiliti.model.Style;
@@ -261,29 +262,37 @@ public class MapObjectsRenderer implements IEditorRenderer {
 
   private static void renderName(Graphics2D g, IMapObject mapObject) {
     String objectName = mapObject.getName();
-    if (objectName != null && !objectName.isEmpty()) {
-      objectName = truncateName(objectName);
-      g.setFont(Style.getDefaultFont().deriveFont(4f));
-      FontMetrics fm = g.getFontMetrics();
-      final double PADDING = fm.getHeight() / 3d;
-
-      double textWidth = fm.stringWidth(objectName);
-      double textX = mapObject.getBoundingBox().getCenterX() - textWidth / 2d;
-      double textY =
-        mapObject.getBoundingBox().getMaxY() + PADDING + fm.getHeight() / 2d + fm.getAscent();
-
-      double boxX = textX - PADDING;
-      double boxY = textY - fm.getAscent() - PADDING;
-      double boxWidth = textWidth + PADDING * 2.5;
-      double boxHeight = fm.getHeight() + PADDING * 2;
-
-      RoundRectangle2D rect = new RoundRectangle2D.Double(boxX, boxY, boxWidth, boxHeight, 2, 2);
-      g.setColor(Style.COLOR_DARKBORDER);
-      Game.graphics().renderShape(g, rect, true);
-
-      g.setColor(Color.WHITE);
-      Game.graphics().renderText(g, objectName, textX, textY, true);
+    if (objectName == null || objectName.isEmpty()) {
+      return;
     }
+    objectName = truncateName(objectName);
+    g.setFont(Style.getDefaultFont().deriveFont(11f));
+    FontMetrics fm = g.getFontMetrics();
+    final double PADDING = fm.getHeight() / 3d;
+
+    double textWidth = fm.stringWidth(objectName);
+
+    Rectangle2D bbox = mapObject.getBoundingBox();
+    Point2D viewportBottom = Game.world().camera().getViewportLocation(bbox.getCenterX(), bbox.getMaxY());
+    double renderScale = Game.world().camera().getRenderScale();
+
+    double screenCenterX = viewportBottom.getX() * renderScale;
+    double screenBottomY = viewportBottom.getY() * renderScale;
+
+    double textScreenX = screenCenterX - textWidth / 2d;
+    double textScreenY = screenBottomY + PADDING + fm.getHeight() / 2d + fm.getAscent();
+
+    RoundRectangle2D rect = new RoundRectangle2D.Double(
+      textScreenX - PADDING,
+      textScreenY - fm.getAscent() - PADDING,
+      textWidth + PADDING * 2.5,
+      fm.getHeight() + PADDING * 2,
+      3, 3);
+
+    g.setColor(Style.COLOR_DARKBORDER);
+    g.fill(rect);
+    g.setColor(Color.WHITE);
+    TextRenderer.render(g, objectName, textScreenX, textScreenY, true);
   }
 
   private static String truncateName(String value) {

@@ -29,4 +29,9 @@ public class BucketFillTool implements Tool {
   @Override
   public void mouseReleased(ComponentMouseEvent event) {
   }
+
+  @Override
+  public boolean showInToolbar() {
+    return false;
+  }
 }
