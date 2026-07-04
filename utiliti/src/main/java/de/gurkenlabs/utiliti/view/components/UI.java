@@ -154,6 +154,10 @@ public final class UI {
     return assetComponent;
   }
 
+  public static JPopupMenu getCanvasPopup() {
+    return canvasPopup;
+  }
+
   public static MapController getMapController() {
     return mapSelectionPanel;
   }
@@ -189,16 +193,18 @@ public final class UI {
 
   private static void setupInterface() {
     JFrame window = initWindow();
+    int winW = window.getSize().width;
+    int winH = window.getSize().height;
 
     Canvas canvas = Game.window().getRenderComponent();
     canvas.setFocusable(true);
-    canvas.setSize((int) (window.getSize().width * 0.75), window.getSize().height);
+    canvas.setSize((int) (winW * 0.75), winH);
 
     window.remove(canvas);
     JPanel renderPanel;
     renderPanel = new JPanel(new BorderLayout());
     renderPanel.add(canvas);
-    renderPanel.setMinimumSize(new Dimension(300, 100));
+    renderPanel.setMinimumSize(new Dimension(250, 100));
     initScrollBars(renderPanel);
 
     initTools();
@@ -206,26 +212,26 @@ public final class UI {
     initDropTarget(renderPanel);
 
     Component leftPanel = initLeftPanel();
-    Component renderSplitPanel = initRenderSplitPanel(renderPanel, window);
+    Component renderSplitPanel = initRenderSplitPanel(renderPanel, winH);
 
     mapObjectPanel = new MapObjectInspector();
-    mapObjectPanel.setMinimumSize(new Dimension(320, 0));
+    mapObjectPanel.setMinimumSize(new Dimension(280, 0));
 
+    int prefInspectorW = Math.max(280, (int) (winW * 0.20));
     JSplitPane centerRightSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, renderSplitPanel, mapObjectPanel);
     centerRightSplit.setContinuousLayout(true);
     centerRightSplit.setResizeWeight(1.0);
-    centerRightSplit.setMinimumSize(new Dimension(620, 0));
     centerRightSplit.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY,
         evt -> Editor.preferences().setSelectionEditSplitter(centerRightSplit.getDividerLocation()));
     if (Editor.preferences().getSelectionEditSplitter() != 0) {
       centerRightSplit.setDividerLocation(Editor.preferences().getSelectionEditSplitter());
     } else {
-      centerRightSplit.setDividerLocation(window.getSize().width - 340);
+      centerRightSplit.setDividerLocation(winW - prefInspectorW);
     }
 
+    int prefHierarchyW = Math.max(250, (int) (winW * 0.18));
     JSplitPane mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, centerRightSplit);
     mainSplit.setContinuousLayout(true);
-    mainSplit.setMinimumSize(new Dimension(870, 0));
     mainSplit.addComponentListener(new ComponentAdapter() {
       @Override public void componentResized(ComponentEvent e) {
         Editor.preferences().setWidth(window.getWidth());
@@ -241,7 +247,7 @@ public final class UI {
     mainSplit.setDividerLocation(
         Editor.preferences().getMainSplitterPosition() != 0
             ? Editor.preferences().getMainSplitterPosition()
-            : 280);
+            : prefHierarchyW);
 
     initPopupMenu(canvas);
     window.setJMenuBar(new MainMenuBar());
@@ -272,15 +278,13 @@ public final class UI {
     return window;
   }
 
-  private static Component initRenderSplitPanel(JPanel renderPanel, JFrame window) {
+  private static Component initRenderSplitPanel(JPanel renderPanel, int winH) {
     JSplitPane renderSplitPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, renderPanel, initBottomPanel());
-    renderSplitPanel.setMinimumSize(new Dimension(400, 0));
     if (Editor.preferences().getBottomSplitter() != 0) {
       renderSplitPanel.setDividerLocation(Editor.preferences().getBottomSplitter());
     } else {
-      renderSplitPanel.setDividerLocation((int) (window.getSize().height * 0.75));
+      renderSplitPanel.setDividerLocation((int) (winH * 0.72));
     }
-
     renderSplitPanel.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY,
         evt -> Editor.preferences().setBottomSplitter(renderSplitPanel.getDividerLocation()));
     renderSplitPanel.setContinuousLayout(true);
@@ -296,8 +300,7 @@ public final class UI {
     tabPane.setFont(Style.getHeaderFont());
     tabPane.add(entityList);
     tabPane.add(mapLayerList);
-    tabPane.setMinimumSize(new Dimension(0, 100));
-    tabPane.setMaximumSize(new Dimension(0, 150));
+    tabPane.setMinimumSize(new Dimension(0, 120));
 
     JSplitPane leftSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
     leftSplit.setContinuousLayout(true);
@@ -307,8 +310,10 @@ public final class UI {
         evt -> Editor.preferences().setMapPanelSplitter(leftSplit.getDividerLocation()));
     if (Editor.preferences().getMapPanelSplitter() != 0) {
       leftSplit.setDividerLocation(Editor.preferences().getMapPanelSplitter());
+    } else {
+      leftSplit.setDividerLocation(120);
     }
-    leftSplit.setMinimumSize(new Dimension(250, 0));
+    leftSplit.setMinimumSize(new Dimension(220, 0));
 
     return leftSplit;
   }
@@ -322,6 +327,7 @@ public final class UI {
   }
 
   private static void initDropTarget(JPanel renderPanel) {
+    Canvas canvas = Game.window().getRenderComponent();
     renderPanel.setTransferHandler(new TransferHandler() {
       @Override public boolean canImport(TransferHandler.TransferSupport support) {
         return support.isDataFlavorSupported(AssetTransferable.ASSET_FLAVOR);
@@ -333,7 +339,8 @@ public final class UI {
         try {
           Object asset = support.getTransferable().getTransferData(AssetTransferable.ASSET_FLAVOR);
           java.awt.Point dropPoint = support.getDropLocation().getDropPoint();
-          Editor.instance().getMapComponent().addMapObjectAt(asset, dropPoint);
+          java.awt.Point canvasPoint = SwingUtilities.convertPoint(renderPanel, dropPoint, canvas);
+          Editor.instance().getMapComponent().addMapObjectAt(asset, canvasPoint);
           return true;
         } catch (Exception ex) {
           return false;
@@ -388,6 +395,7 @@ public final class UI {
       return;
     }
 
+    System.setProperty("darklaf.animatedLafChange", "false");
     loadingTheme = true;
 
     switch (theme) {
@@ -410,18 +418,25 @@ public final class UI {
   }
 
   private static void applyTokyoNightOverrides() {
+    // Rounded corners for modern look
+    UIManager.put("Button.arc", 6);
+    UIManager.put("Component.arc", 6);
+    UIManager.put("TextComponent.arc", 5);
+    UIManager.put("TabbedPane.arc", 5);
+
+    // Panels - borderless design with subtle contrast
     UIManager.put("Panel.background", Style.COLOR_BG);
     UIManager.put("Panel.foreground", Style.COLOR_TEXT);
-    UIManager.put("TextField.background", new Color(31, 33, 50));
+    UIManager.put("TextField.background", Style.COLOR_SURFACE2);
     UIManager.put("TextField.foreground", Style.COLOR_TEXT);
     UIManager.put("TextField.caretForeground", Style.COLOR_ACCENT_BLUE);
-    UIManager.put("TextArea.background", new Color(31, 33, 50));
+    UIManager.put("TextArea.background", Style.COLOR_SURFACE2);
     UIManager.put("TextArea.foreground", Style.COLOR_TEXT);
-    UIManager.put("FormattedTextField.background", new Color(31, 33, 50));
+    UIManager.put("FormattedTextField.background", Style.COLOR_SURFACE2);
     UIManager.put("FormattedTextField.foreground", Style.COLOR_TEXT);
-    UIManager.put("PasswordField.background", new Color(31, 33, 50));
+    UIManager.put("PasswordField.background", Style.COLOR_SURFACE2);
     UIManager.put("PasswordField.foreground", Style.COLOR_TEXT);
-    UIManager.put("ComboBox.background", new Color(31, 33, 50));
+    UIManager.put("ComboBox.background", Style.COLOR_SURFACE2);
     UIManager.put("ComboBox.foreground", Style.COLOR_TEXT);
     UIManager.put("ComboBox.selectionBackground", new Color(59, 66, 97));
     UIManager.put("ComboBox.selectionForeground", Style.COLOR_TEXT);
@@ -429,7 +444,7 @@ public final class UI {
     UIManager.put("List.foreground", Style.COLOR_TEXT);
     UIManager.put("List.selectionBackground", new Color(59, 66, 97));
     UIManager.put("List.selectionForeground", Style.COLOR_TEXT);
-    UIManager.put("Table.background", new Color(31, 33, 50));
+    UIManager.put("Table.background", Style.COLOR_SURFACE2);
     UIManager.put("Table.foreground", Style.COLOR_TEXT);
     UIManager.put("Table.selectionBackground", new Color(59, 66, 97));
     UIManager.put("Table.selectionForeground", Style.COLOR_TEXT);
@@ -440,10 +455,15 @@ public final class UI {
     UIManager.put("Tree.selectionForeground", Style.COLOR_TEXT);
     UIManager.put("Tree.textBackground", Style.COLOR_BG);
     UIManager.put("Tree.textForeground", Style.COLOR_TEXT);
+
+    // TabbedPane - modern minimal headers
     UIManager.put("TabbedPane.background", Style.COLOR_BG);
-    UIManager.put("TabbedPane.foreground", Style.COLOR_TEXT);
-    UIManager.put("TabbedPane.selected", new Color(36, 40, 59));
+    UIManager.put("TabbedPane.foreground", Style.COLOR_SUBTEXT);
+    UIManager.put("TabbedPane.selected", Style.COLOR_SURFACE);
     UIManager.put("TabbedPane.contentAreaColor", Style.COLOR_BORDER);
+    UIManager.put("TabbedPane.tabAreaBackground", Style.COLOR_BG);
+
+    // Labels & Buttons
     UIManager.put("Label.foreground", Style.COLOR_TEXT);
     UIManager.put("Button.background", Style.COLOR_SURFACE);
     UIManager.put("Button.foreground", Style.COLOR_TEXT);
@@ -455,6 +475,8 @@ public final class UI {
     UIManager.put("CheckBox.foreground", Style.COLOR_TEXT);
     UIManager.put("RadioButton.background", Style.COLOR_BG);
     UIManager.put("RadioButton.foreground", Style.COLOR_TEXT);
+
+    // Menus
     UIManager.put("Menu.background", Style.COLOR_BG);
     UIManager.put("Menu.foreground", Style.COLOR_TEXT);
     UIManager.put("Menu.selectionBackground", new Color(59, 66, 97));
@@ -463,16 +485,23 @@ public final class UI {
     UIManager.put("MenuItem.foreground", Style.COLOR_TEXT);
     UIManager.put("MenuItem.selectionBackground", new Color(59, 66, 97));
     UIManager.put("MenuItem.selectionForeground", Style.COLOR_TEXT);
+    UIManager.put("MenuItem.disabledForeground", new Color(98, 104, 128));
+    UIManager.put("Menu.disabledForeground", new Color(98, 104, 128));
     UIManager.put("PopupMenu.background", Style.COLOR_SURFACE);
     UIManager.put("PopupMenu.foreground", Style.COLOR_TEXT);
+
+    // ScrollBars - thinner, cleaner
     UIManager.put("ScrollBar.background", Style.COLOR_BG);
     UIManager.put("ScrollBar.foreground", Style.COLOR_BORDER);
     UIManager.put("ScrollBar.track", Style.COLOR_BG);
-    UIManager.put("ScrollBar.thumb", Style.COLOR_BORDER);
+    UIManager.put("ScrollBar.thumb", new Color(65, 65, 75));
+    UIManager.put("ScrollBar.width", 10);
     UIManager.put("ScrollPane.background", Style.COLOR_BG);
     UIManager.put("Viewport.background", Style.COLOR_BG);
+
+    // Misc
     UIManager.put("Separator.foreground", Style.COLOR_BORDER);
-    UIManager.put("Spinner.background", new Color(31, 33, 50));
+    UIManager.put("Spinner.background", Style.COLOR_SURFACE2);
     UIManager.put("Spinner.foreground", Style.COLOR_TEXT);
     UIManager.put("Slider.background", Style.COLOR_BG);
     UIManager.put("Slider.foreground", Style.COLOR_ACCENT_BLUE);
@@ -484,6 +513,10 @@ public final class UI {
     UIManager.put("OptionPane.foreground", Style.COLOR_TEXT);
     UIManager.put("InternalFrame.background", Style.COLOR_BG);
     UIManager.put("Desktop.background", Style.COLOR_BG);
+
+    // SplitPane - cleaner dividers
+    UIManager.put("SplitPane.background", Style.COLOR_BG);
+    UIManager.put("SplitPane.continuousLayout", true);
   }
 
   private static void applyLightOverrides() {

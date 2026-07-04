@@ -16,22 +16,23 @@ public final class Style {
     DARK
   }
 
-  // Tokyo Night-inspired color palette
-  public static final Color COLOR_BG = new Color(26, 27, 38);
-  public static final Color COLOR_SURFACE = new Color(36, 40, 59);
-  public static final Color COLOR_BORDER = new Color(65, 72, 104);
+  // Tokyo Night-inspired color palette (2026 refinement)
+  public static final Color COLOR_BG = new Color(18, 18, 20);
+  public static final Color COLOR_SURFACE = new Color(30, 30, 35);
+  public static final Color COLOR_SURFACE2 = new Color(40, 40, 46);
+  public static final Color COLOR_BORDER = new Color(55, 55, 64);
   public static final Color COLOR_ACCENT_BLUE = new Color(122, 162, 247);
   public static final Color COLOR_ACCENT_CYAN = new Color(42, 195, 222);
   public static final Color COLOR_GREEN = new Color(158, 206, 106);
   public static final Color COLOR_ORANGE = new Color(224, 175, 104);
   public static final Color COLOR_RED = new Color(247, 118, 142);
   public static final Color COLOR_PURPLE = new Color(187, 154, 247);
-  public static final Color COLOR_TEXT = new Color(192, 202, 245);
-  public static final Color COLOR_SUBTEXT = new Color(169, 177, 214);
+  public static final Color COLOR_TEXT = new Color(200, 208, 245);
+  public static final Color COLOR_SUBTEXT = new Color(150, 158, 185);
   public static final Color COLOR_COMMENT = new Color(86, 95, 137);
 
   public static final Color COLOR_DEFAULT_BOUNDING_BOX_FILL = new Color(0, 0, 0, 40);
-  public static final Color COLOR_DARKBORDER = new Color(36, 40, 59, 200);
+  public static final Color COLOR_DARKBORDER = new Color(30, 30, 35, 220);
   public static final Color COLOR_DEFAULT_GRID = new Color(255, 255, 255, 65);
   public static final Color COLOR_COLLISION_FILL = new Color(247, 118, 142, 20);
   public static final Color COLOR_COLLISION_BORDER = COLOR_RED;
@@ -53,8 +54,8 @@ public final class Style {
   public static final Color COLOR_DEFAULT_TAG = COLOR_COMMENT;
   public static final Color COLOR_STATUS = Color.WHITE;
 
-  public static final float FONT_DEFAULT_SIZE = 13;
-  public static final float FONT_HEADER_SIZE = 14;
+  public static final float FONT_DEFAULT_SIZE = 12;
+  public static final float FONT_HEADER_SIZE = 12;
   public static final String FONTNAME_CONSOLE = "Consolas";
   public static final Font FONT_BOLD =
     Resources.fonts().get("Roboto-Black.ttf", Font.BOLD, FONT_HEADER_SIZE);
