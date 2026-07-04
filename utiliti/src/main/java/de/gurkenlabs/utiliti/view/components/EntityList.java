@@ -28,6 +28,8 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JTree;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
@@ -76,6 +78,17 @@ public final class EntityList extends JPanel implements EntityController {
     this.textField.putClientProperty(DarkTextUI.KEY_DEFAULT_TEXT, entitySearchDefault);
     this.textField.setColumns(10);
     this.textField.addActionListener(e -> search());
+    this.textField.getDocument().addDocumentListener(new DocumentListener() {
+      @Override public void insertUpdate(DocumentEvent e) {
+        search();
+      }
+      @Override public void removeUpdate(DocumentEvent e) {
+        search();
+      }
+      @Override public void changedUpdate(DocumentEvent e) {
+        search();
+      }
+    });
 
     this.btnSearch = new JButton("");
     this.btnSearch.setBorderPainted(false);

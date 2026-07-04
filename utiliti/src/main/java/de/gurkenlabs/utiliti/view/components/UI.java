@@ -22,8 +22,10 @@ import de.gurkenlabs.utiliti.model.Style;
 import de.gurkenlabs.utiliti.model.Style.Theme;
 import de.gurkenlabs.utiliti.view.menus.CanvasPopupMenu;
 import de.gurkenlabs.utiliti.view.menus.MainMenuBar;
+import de.gurkenlabs.utiliti.model.Style;
 import java.awt.BorderLayout;
 import java.awt.Canvas;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -185,32 +187,50 @@ public final class UI {
     canvas.setFocusable(true);
     canvas.setSize((int) (window.getSize().width * 0.75), window.getSize().height);
 
-    // remove canvas because we want to add a wrapping panel
     window.remove(canvas);
     JPanel renderPanel;
-
     renderPanel = new JPanel(new BorderLayout());
     renderPanel.add(canvas);
     renderPanel.setMinimumSize(new Dimension(300, 100));
     initScrollBars(renderPanel);
 
-    JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, initRenderSplitPanel(renderPanel, window), initRightSplitPanel());
-    split.setContinuousLayout(true);
-    split.addComponentListener(new ComponentAdapter() {
+    Component leftPanel = initLeftPanel();
+    Component renderSplitPanel = initRenderSplitPanel(renderPanel, window);
+
+    mapObjectPanel = new MapObjectInspector();
+    mapObjectPanel.setMinimumSize(new Dimension(320, 0));
+
+    JSplitPane centerRightSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, renderSplitPanel, mapObjectPanel);
+    centerRightSplit.setContinuousLayout(true);
+    centerRightSplit.setResizeWeight(1.0);
+    centerRightSplit.setMinimumSize(new Dimension(620, 0));
+    centerRightSplit.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY,
+        evt -> Editor.preferences().setSelectionEditSplitter(centerRightSplit.getDividerLocation()));
+    if (Editor.preferences().getSelectionEditSplitter() != 0) {
+      centerRightSplit.setDividerLocation(Editor.preferences().getSelectionEditSplitter());
+    } else {
+      centerRightSplit.setDividerLocation(window.getSize().width - 340);
+    }
+
+    JSplitPane mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, centerRightSplit);
+    mainSplit.setContinuousLayout(true);
+    mainSplit.setMinimumSize(new Dimension(870, 0));
+    mainSplit.addComponentListener(new ComponentAdapter() {
       @Override public void componentResized(ComponentEvent e) {
         Editor.preferences().setWidth(window.getWidth());
         Editor.preferences().setHeight(window.getHeight());
       }
     });
-
-    split.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> Editor.preferences().setMainSplitter(split.getDividerLocation()));
+    mainSplit.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY,
+        evt -> Editor.preferences().setMainSplitter(mainSplit.getDividerLocation()));
 
     JPanel rootPanel = new JPanel(new BorderLayout());
     window.setContentPane(rootPanel);
-
-    rootPanel.add(split, BorderLayout.CENTER);
-    split.setDividerLocation(
-        Editor.preferences().getMainSplitterPosition() != 0 ? Editor.preferences().getMainSplitterPosition() : (int) (window.getSize().width * 0.75));
+    rootPanel.add(mainSplit, BorderLayout.CENTER);
+    mainSplit.setDividerLocation(
+        Editor.preferences().getMainSplitterPosition() != 0
+            ? Editor.preferences().getMainSplitterPosition()
+            : 280);
 
     initPopupMenu(canvas);
     window.setJMenuBar(new MainMenuBar());
@@ -243,6 +263,7 @@ public final class UI {
 
   private static Component initRenderSplitPanel(JPanel renderPanel, JFrame window) {
     JSplitPane renderSplitPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, renderPanel, initBottomPanel());
+    renderSplitPanel.setMinimumSize(new Dimension(400, 0));
     if (Editor.preferences().getBottomSplitter() != 0) {
       renderSplitPanel.setDividerLocation(Editor.preferences().getBottomSplitter());
     } else {
@@ -255,41 +276,30 @@ public final class UI {
     return renderSplitPanel;
   }
 
-  private static Component initRightSplitPanel() {
+  private static Component initLeftPanel() {
     mapSelectionPanel = new MapList();
-
     mapLayerList = new LayerList();
     entityList = new EntityList();
+
     JTabbedPane tabPane = new JTabbedPane();
     tabPane.setFont(Style.getHeaderFont());
     tabPane.add(entityList);
     tabPane.add(mapLayerList);
+    tabPane.setMinimumSize(new Dimension(0, 100));
     tabPane.setMaximumSize(new Dimension(0, 150));
 
-    JSplitPane topRightSplitPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-    topRightSplitPanel.setContinuousLayout(true);
-    topRightSplitPanel.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY,
-        evt -> Editor.preferences().setMapPanelSplitter(topRightSplitPanel.getDividerLocation()));
+    JSplitPane leftSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+    leftSplit.setContinuousLayout(true);
+    leftSplit.setTopComponent(mapSelectionPanel);
+    leftSplit.setBottomComponent(tabPane);
+    leftSplit.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY,
+        evt -> Editor.preferences().setMapPanelSplitter(leftSplit.getDividerLocation()));
     if (Editor.preferences().getMapPanelSplitter() != 0) {
-      topRightSplitPanel.setDividerLocation(Editor.preferences().getMapPanelSplitter());
+      leftSplit.setDividerLocation(Editor.preferences().getMapPanelSplitter());
     }
+    leftSplit.setMinimumSize(new Dimension(250, 0));
 
-    topRightSplitPanel.setLeftComponent(mapSelectionPanel);
-    topRightSplitPanel.setRightComponent(tabPane);
-
-    mapObjectPanel = new MapObjectInspector();
-
-    JSplitPane rightSplitPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-    rightSplitPanel.setMinimumSize(new Dimension(320, 0));
-    rightSplitPanel.setBottomComponent(mapObjectPanel);
-    rightSplitPanel.setTopComponent(topRightSplitPanel);
-    rightSplitPanel.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY,
-        evt -> Editor.preferences().setSelectionEditSplitter(rightSplitPanel.getDividerLocation()));
-    if (Editor.preferences().getSelectionEditSplitter() != 0) {
-      rightSplitPanel.setDividerLocation(Editor.preferences().getSelectionEditSplitter());
-    }
-
-    return rightSplitPanel;
+    return leftSplit;
   }
 
   private static JPanel initBottomPanel() {
@@ -341,15 +351,110 @@ public final class UI {
     loadingTheme = true;
 
     switch (theme) {
-      case DARK -> LafManager.install(new OneDarkTheme());
-      case LIGHT -> LafManager.install(new IntelliJTheme());
+      case DARK -> {
+        LafManager.install(new OneDarkTheme());
+        applyTokyoNightOverrides();
+      }
+      case LIGHT -> {
+        LafManager.install(new IntelliJTheme());
+        applyLightOverrides();
+      }
     }
 
     if (Game.window() != null && Game.window().getRenderComponent() != null) {
       Game.window().getRenderComponent().setBackground(UIManager.getColor("Panel.background"));
     }
     Editor.preferences().setTheme(theme);
+    updateOrphanComponents();
     loadingTheme = false;
+  }
+
+  private static void applyTokyoNightOverrides() {
+    UIManager.put("Panel.background", Style.COLOR_BG);
+    UIManager.put("Panel.foreground", Style.COLOR_TEXT);
+    UIManager.put("TextField.background", new Color(31, 33, 50));
+    UIManager.put("TextField.foreground", Style.COLOR_TEXT);
+    UIManager.put("TextField.caretForeground", Style.COLOR_ACCENT_BLUE);
+    UIManager.put("TextArea.background", new Color(31, 33, 50));
+    UIManager.put("TextArea.foreground", Style.COLOR_TEXT);
+    UIManager.put("FormattedTextField.background", new Color(31, 33, 50));
+    UIManager.put("FormattedTextField.foreground", Style.COLOR_TEXT);
+    UIManager.put("PasswordField.background", new Color(31, 33, 50));
+    UIManager.put("PasswordField.foreground", Style.COLOR_TEXT);
+    UIManager.put("ComboBox.background", new Color(31, 33, 50));
+    UIManager.put("ComboBox.foreground", Style.COLOR_TEXT);
+    UIManager.put("ComboBox.selectionBackground", new Color(59, 66, 97));
+    UIManager.put("ComboBox.selectionForeground", Style.COLOR_TEXT);
+    UIManager.put("List.background", Style.COLOR_BG);
+    UIManager.put("List.foreground", Style.COLOR_TEXT);
+    UIManager.put("List.selectionBackground", new Color(59, 66, 97));
+    UIManager.put("List.selectionForeground", Style.COLOR_TEXT);
+    UIManager.put("Table.background", new Color(31, 33, 50));
+    UIManager.put("Table.foreground", Style.COLOR_TEXT);
+    UIManager.put("Table.selectionBackground", new Color(59, 66, 97));
+    UIManager.put("Table.selectionForeground", Style.COLOR_TEXT);
+    UIManager.put("Table.gridColor", Style.COLOR_BORDER);
+    UIManager.put("Tree.background", Style.COLOR_BG);
+    UIManager.put("Tree.foreground", Style.COLOR_TEXT);
+    UIManager.put("Tree.selectionBackground", new Color(59, 66, 97));
+    UIManager.put("Tree.selectionForeground", Style.COLOR_TEXT);
+    UIManager.put("Tree.textBackground", Style.COLOR_BG);
+    UIManager.put("Tree.textForeground", Style.COLOR_TEXT);
+    UIManager.put("TabbedPane.background", Style.COLOR_BG);
+    UIManager.put("TabbedPane.foreground", Style.COLOR_TEXT);
+    UIManager.put("TabbedPane.selected", new Color(36, 40, 59));
+    UIManager.put("TabbedPane.contentAreaColor", Style.COLOR_BORDER);
+    UIManager.put("Label.foreground", Style.COLOR_TEXT);
+    UIManager.put("Button.background", Style.COLOR_SURFACE);
+    UIManager.put("Button.foreground", Style.COLOR_TEXT);
+    UIManager.put("Button.select", new Color(59, 66, 97));
+    UIManager.put("ToggleButton.background", Style.COLOR_SURFACE);
+    UIManager.put("ToggleButton.foreground", Style.COLOR_TEXT);
+    UIManager.put("ToggleButton.select", new Color(59, 66, 97));
+    UIManager.put("CheckBox.background", Style.COLOR_BG);
+    UIManager.put("CheckBox.foreground", Style.COLOR_TEXT);
+    UIManager.put("RadioButton.background", Style.COLOR_BG);
+    UIManager.put("RadioButton.foreground", Style.COLOR_TEXT);
+    UIManager.put("Menu.background", Style.COLOR_BG);
+    UIManager.put("Menu.foreground", Style.COLOR_TEXT);
+    UIManager.put("Menu.selectionBackground", new Color(59, 66, 97));
+    UIManager.put("Menu.selectionForeground", Style.COLOR_TEXT);
+    UIManager.put("MenuItem.background", Style.COLOR_BG);
+    UIManager.put("MenuItem.foreground", Style.COLOR_TEXT);
+    UIManager.put("MenuItem.selectionBackground", new Color(59, 66, 97));
+    UIManager.put("MenuItem.selectionForeground", Style.COLOR_TEXT);
+    UIManager.put("PopupMenu.background", Style.COLOR_SURFACE);
+    UIManager.put("PopupMenu.foreground", Style.COLOR_TEXT);
+    UIManager.put("ScrollBar.background", Style.COLOR_BG);
+    UIManager.put("ScrollBar.foreground", Style.COLOR_BORDER);
+    UIManager.put("ScrollBar.track", Style.COLOR_BG);
+    UIManager.put("ScrollBar.thumb", Style.COLOR_BORDER);
+    UIManager.put("ScrollPane.background", Style.COLOR_BG);
+    UIManager.put("Viewport.background", Style.COLOR_BG);
+    UIManager.put("Separator.foreground", Style.COLOR_BORDER);
+    UIManager.put("Spinner.background", new Color(31, 33, 50));
+    UIManager.put("Spinner.foreground", Style.COLOR_TEXT);
+    UIManager.put("Slider.background", Style.COLOR_BG);
+    UIManager.put("Slider.foreground", Style.COLOR_ACCENT_BLUE);
+    UIManager.put("ProgressBar.background", Style.COLOR_SURFACE);
+    UIManager.put("ProgressBar.foreground", Style.COLOR_ACCENT_BLUE);
+    UIManager.put("ToolTip.background", Style.COLOR_SURFACE);
+    UIManager.put("ToolTip.foreground", Style.COLOR_TEXT);
+    UIManager.put("OptionPane.background", Style.COLOR_BG);
+    UIManager.put("OptionPane.foreground", Style.COLOR_TEXT);
+    UIManager.put("InternalFrame.background", Style.COLOR_BG);
+    UIManager.put("Desktop.background", Style.COLOR_BG);
+  }
+
+  private static void applyLightOverrides() {
+    // Light theme keeps the IntelliJ defaults, just ensure consistency
+    UIManager.put("Table.gridColor", new Color(220, 220, 220));
+  }
+
+  private static void updateOrphanComponents() {
+    for (JComponent component : orphanComponents) {
+      SwingUtilities.updateComponentTreeUI(component);
+    }
   }
 
   private static void setDefaultSwingFont(Font font) {

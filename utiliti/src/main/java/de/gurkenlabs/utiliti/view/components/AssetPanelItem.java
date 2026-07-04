@@ -86,6 +86,7 @@ public class AssetPanelItem extends JPanel {
   private final JButton btnAdd;
   private final JButton btnExport;
   private final Object origin;
+  private String assetName;
   private boolean isHovered;
   private boolean isSelected;
 
@@ -320,7 +321,12 @@ public class AssetPanelItem extends JPanel {
     btnExport.addActionListener(e -> exportAsset());
   }
 
+  public String getName() {
+    return assetName;
+  }
+
   private void setAssetData(Icon icon, String text) {
+    this.assetName = text;
     iconLabel.setIcon(icon);
     nameLabel.setText(wrapText(text, 16));
     String tooltip = createTooltip(text);

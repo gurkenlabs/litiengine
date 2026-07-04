@@ -16,6 +16,7 @@ import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.view.menus.AssetPanelPopupMenu;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.swing.Icon;
@@ -30,6 +31,8 @@ public class AssetPanel extends JPanel {
   }
 
   private AssetType currentType;
+  private String filterText = "";
+  private final List<AssetPanelItem> allItems = new ArrayList<>();
 
   public AssetPanel() {
     WrapLayout layout = new WrapLayout();
@@ -56,6 +59,23 @@ public class AssetPanel extends JPanel {
     return currentType;
   }
 
+  public void setFilterText(String text) {
+    this.filterText = text != null ? text.toLowerCase().trim() : "";
+    applyFilter();
+  }
+
+  private void applyFilter() {
+    this.removeAll();
+    for (AssetPanelItem item : allItems) {
+      if (filterText.isEmpty() || item.getName().toLowerCase().contains(filterText)) {
+        this.add(item);
+        item.validate();
+      }
+    }
+    this.revalidate();
+    this.repaint();
+  }
+
   private void maybeShowPopup(MouseEvent e) {
     if (!e.isPopupTrigger()) {
       return;
@@ -65,116 +85,90 @@ public class AssetPanel extends JPanel {
 
   public void loadSprites(List<SpritesheetResource> infos) {
     this.currentType = AssetType.SPRITESHEET;
-    this.load(
-      () -> {
-        for (SpritesheetResource info : infos.stream().sorted().toList()) {
-          Icon icon;
-          Spritesheet opt = Resources.spritesheets().get(info.getName());
+    loadItems(() -> {
+      for (SpritesheetResource info : infos.stream().sorted().toList()) {
+        Icon icon;
+        Spritesheet opt = Resources.spritesheets().get(info.getName());
 
-          if (opt != null && opt.getSprite(0) != null) {
-            icon = new ImageIcon(opt.getPreview(64));
-          } else {
-            icon = null;
-          }
-
-          AssetPanelItem panelItem = new AssetPanelItem(icon, getDisplayName(info), info);
-          this.add(panelItem);
-          panelItem.validate();
+        if (opt != null && opt.getSprite(0) != null) {
+          icon = new ImageIcon(opt.getPreview(64));
+        } else {
+          icon = null;
         }
-      });
+
+        allItems.add(new AssetPanelItem(icon, getDisplayName(info), info));
+      }
+    });
   }
 
   public void loadTilesets(List<Tileset> tilesets) {
     this.currentType = AssetType.TILESET;
-    this.load(
-      () -> {
-        Collections.sort(tilesets);
-        for (Tileset tileset : tilesets) {
-          AssetPanelItem panelItem =
-            new AssetPanelItem(Icons.ASSET_TILESET_32, tileset.getName(), tileset);
-          this.add(panelItem);
-          panelItem.validate();
-        }
-      });
+    loadItems(() -> {
+      Collections.sort(tilesets);
+      for (Tileset tileset : tilesets) {
+        allItems.add(
+          new AssetPanelItem(Icons.ASSET_TILESET_32, tileset.getName(), tileset));
+      }
+    });
   }
 
   public void loadEmitters(List<EmitterAttributes> emitters) {
     this.currentType = AssetType.EMITTER;
-    this.load(
-      () -> {
-        Collections.sort(emitters);
-        for (EmitterAttributes emitter : emitters) {
-          AssetPanelItem panelItem =
-            new AssetPanelItem(Icons.ASSET_EMITTER_32, emitter.getName(), emitter);
-          this.add(panelItem);
-          panelItem.validate();
-        }
-      });
+    loadItems(() -> {
+      Collections.sort(emitters);
+      for (EmitterAttributes emitter : emitters) {
+        allItems.add(
+          new AssetPanelItem(Icons.ASSET_EMITTER_32, emitter.getName(), emitter));
+      }
+    });
   }
 
   public void loadBlueprints(List<Blueprint> blueprints) {
     this.currentType = AssetType.BLUEPRINT;
-    this.load(
-      () -> {
-        Collections.sort(blueprints);
-        for (MapObject blueprint : blueprints) {
-          AssetPanelItem panelItem =
-            new AssetPanelItem(Icons.ASSET_BLUEPRINT_32, blueprint.getName(), blueprint);
-          this.add(panelItem);
-          panelItem.validate();
-        }
-      });
+    loadItems(() -> {
+      Collections.sort(blueprints);
+      for (MapObject blueprint : blueprints) {
+        allItems.add(
+          new AssetPanelItem(Icons.ASSET_BLUEPRINT_32, blueprint.getName(), blueprint));
+      }
+    });
   }
 
   public void loadSounds(List<SoundResource> sounds) {
     this.currentType = AssetType.SOUND;
-    this.load(
-      () -> {
-        Collections.sort(sounds);
-        for (SoundResource sound : sounds) {
-          AssetPanelItem panelItem = new AssetPanelItem(Icons.ASSET_SOUND_32, sound.getName(), sound);
-          this.add(panelItem);
-          panelItem.validate();
-        }
-      });
+    loadItems(() -> {
+      Collections.sort(sounds);
+      for (SoundResource sound : sounds) {
+        allItems.add(
+          new AssetPanelItem(Icons.ASSET_SOUND_32, sound.getName(), sound));
+      }
+    });
   }
 
-  /**
-   * Populates this panel with the given animations.
-   *
-   * <p>
-   * Each animation is rendered using its first sprite as a preview icon (falling back to the
-   * generic animation icon if the sprite sheet is not available).
-   * </p>
-   *
-   * @param animations The animations to display.
-   */
   public void loadAnimations(List<Animation> animations) {
     this.currentType = AssetType.ANIMATION;
-    this.load(
-      () -> {
-        animations.sort((a, b) -> {
-          String nameA = a.getName() == null ? "" : a.getName();
-          String nameB = b.getName() == null ? "" : b.getName();
-          return nameA.compareToIgnoreCase(nameB);
-        });
-        for (Animation animation : animations) {
-          Icon icon = Icons.ASSET_ANIMATION_32;
-          Spritesheet sheet = animation.getSpritesheet();
-          if (sheet != null && sheet.getSprite(0) != null) {
-            icon = new ImageIcon(sheet.getPreview(64));
-          }
-          AssetPanelItem panelItem = new AssetPanelItem(icon, animation.getName(), animation);
-          this.add(panelItem);
-          panelItem.validate();
-        }
+    loadItems(() -> {
+      animations.sort((a, b) -> {
+        String nameA = a.getName() == null ? "" : a.getName();
+        String nameB = b.getName() == null ? "" : b.getName();
+        return nameA.compareToIgnoreCase(nameB);
       });
+      for (Animation animation : animations) {
+        Icon icon = Icons.ASSET_ANIMATION_32;
+        Spritesheet sheet = animation.getSpritesheet();
+        if (sheet != null && sheet.getSprite(0) != null) {
+          icon = new ImageIcon(sheet.getPreview(64));
+        }
+        allItems.add(new AssetPanelItem(icon, animation.getName(), animation));
+      }
+    });
   }
 
-  public void load(Runnable runnable) {
+  private void loadItems(Runnable runnable) {
+    allItems.clear();
     this.removeAll();
     runnable.run();
-    this.getRootPane().repaint();
+    applyFilter();
   }
 
   private static String getDisplayName(SpritesheetResource info) {
