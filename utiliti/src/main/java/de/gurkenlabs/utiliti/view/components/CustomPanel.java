@@ -6,12 +6,17 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.UndoManager;
+import de.gurkenlabs.utiliti.model.Style;
+import java.awt.Color;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -103,7 +108,21 @@ public class CustomPanel extends PropertyPanel {
                             .addComponent(buttonRemove))
                     .addContainerGap(148, Short.MAX_VALUE)));
 
-    this.tableCustomProperties = new JTable();
+    this.tableCustomProperties = new JTable() {
+      private static final String EMPTY_TEXT = "No properties defined";
+      @Override
+      protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        if (getRowCount() == 0) {
+          g.setColor(new Color(74, 74, 74));
+          FontMetrics fm = g.getFontMetrics();
+          int x = (getWidth() - fm.stringWidth(EMPTY_TEXT)) / 2;
+          int y = getHeight() / 2;
+          g.drawString(EMPTY_TEXT, x, y);
+        }
+      }
+    };
+    this.tableCustomProperties.setFillsViewportHeight(true);
     this.tableCustomProperties.getTableHeader().setReorderingAllowed(false);
     this.tableCustomProperties.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     this.scrollPane.setViewportView(tableCustomProperties);

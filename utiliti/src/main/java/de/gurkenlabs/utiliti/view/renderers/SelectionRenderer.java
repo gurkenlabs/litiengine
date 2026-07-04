@@ -11,6 +11,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.geom.Point2D;
+import java.awt.geom.RoundRectangle2D;
 import java.util.Objects;
 
 public class SelectionRenderer implements IEditorRenderer {
@@ -34,10 +35,13 @@ public class SelectionRenderer implements IEditorRenderer {
         continue;
       }
 
-      Stroke stroke = new BasicStroke(1 / Game.world().camera().getRenderScale());
+      float scale = Game.world().camera().getRenderScale();
+      Stroke stroke = new BasicStroke(1.5f / scale);
 
       g.setColor(colorSelectionBorder);
-      Game.graphics().renderOutline(g, mapObject.getBoundingBox(), stroke);
+      java.awt.geom.Rectangle2D bb = mapObject.getBoundingBox();
+      double arc = 4.0 / scale;
+      g.draw(new RoundRectangle2D.Double(bb.getX(), bb.getY(), bb.getWidth(), bb.getHeight(), arc, arc));
     }
   }
 

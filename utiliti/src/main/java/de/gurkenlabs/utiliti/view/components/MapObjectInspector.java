@@ -111,7 +111,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.lblLayer.setFont(
         this.lblLayer.getFont().deriveFont(Style.getDefaultFont().getSize() * 0.75f));
 
-    headerContent.setBorder(BorderFactory.createEmptyBorder(2, 0, 2, 0));
+    headerContent.setBorder(BorderFactory.createEmptyBorder(2, 0, 6, 0));
     headerContent.add(lblEntityId);
     headerContent.add(Box.createHorizontalStrut(4));
     headerContent.add(labelEntityID);
@@ -160,7 +160,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     tfGrid.setMaximumSize(
         new Dimension(Integer.MAX_VALUE, tfGrid.getPreferredSize().height));
     accordion.add(tfGrid);
-    accordion.add(Box.createVerticalStrut(2));
+    accordion.add(Box.createVerticalStrut(6));
 
     this.typeCard = new ExpandableCard("", new JPanel(), true);
     this.collisionCard =
@@ -249,7 +249,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     JLabel title = new JLabel(label);
     title.setFont(title.getFont().deriveFont(10f));
     title.setForeground(new Color(160, 160, 180));
-    title.setBorder(BorderFactory.createEmptyBorder(6, 0, 2, 0));
+    title.setBorder(BorderFactory.createEmptyBorder(6, 0, 4, 0));
     title.setHorizontalAlignment(SwingConstants.TRAILING);
     JPanel wrapper = new JPanel(new BorderLayout());
     wrapper.setOpaque(false);

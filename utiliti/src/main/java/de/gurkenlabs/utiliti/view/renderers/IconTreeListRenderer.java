@@ -63,15 +63,20 @@ public class IconTreeListRenderer implements TreeCellRenderer {
   private static String formatEntityLabel(Object userObj) {
     if (userObj instanceof de.gurkenlabs.litiengine.entities.Entity entity) {
       String name = entity.getName();
+      int id = entity.getMapId();
       if (name != null && !name.isEmpty()) {
-        return name;
+        return "<html>" + escapeHtml(name) + " <span style='color:#787898;font-size:10px'>#" + id + "</span></html>";
       }
-      return entity.getClass().getSimpleName() + " (#" + entity.getMapId() + ")";
+      return entity.getClass().getSimpleName() + " (#" + id + ")";
     }
     if (userObj instanceof IconTreeListItem inner) {
       return inner.toString();
     }
     return userObj.toString();
+  }
+
+  private static String escapeHtml(String s) {
+    return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
   }
 
   private static Icon getIcon(Prop prop) {

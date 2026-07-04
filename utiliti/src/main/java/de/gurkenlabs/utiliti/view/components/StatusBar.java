@@ -2,18 +2,18 @@ package de.gurkenlabs.utiliti.view.components;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.ILayer;
-import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.Zoom;
 import de.gurkenlabs.utiliti.model.Style;
-import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ItemEvent;
 import java.util.Objects;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
@@ -58,9 +58,10 @@ public final class StatusBar {
         });
 
     panel.add(zoomComboBox);
-    panel.add(Box.createRigidArea(new Dimension(8, 0)));
+    panel.add(createSeparator());
     panel.add(statusLabel);
     panel.add(Box.createHorizontalGlue());
+    panel.add(createSeparator());
     panel.add(toolLabel);
     return panel;
   }
@@ -105,6 +106,21 @@ public final class StatusBar {
       return map.getMapObjectLayers().get(0);
     }
     return null;
+  }
+
+  private static JPanel createSeparator() {
+    JPanel sep = new JPanel();
+    sep.setOpaque(false);
+    sep.setLayout(new BoxLayout(sep, BoxLayout.X_AXIS));
+    sep.setBorder(BorderFactory.createEmptyBorder(2, 6, 2, 6));
+    JPanel line = new JPanel();
+    line.setPreferredSize(new Dimension(1, 12));
+    line.setMaximumSize(new Dimension(1, 12));
+    line.setMinimumSize(new Dimension(1, 12));
+    line.setBackground(Style.COLOR_BORDER);
+    line.setOpaque(true);
+    sep.add(line);
+    return sep;
   }
 
   private static String getToolDisplayName() {
