@@ -3,6 +3,7 @@ package de.gurkenlabs.utiliti.view.components;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.model.Style;
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -27,14 +28,16 @@ public class CollapsibleSection extends JPanel {
 
     setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
     setOpaque(false);
+    setAlignmentX(Component.LEFT_ALIGNMENT);
 
     this.headerLabel = new JLabel((expanded ? "\u25BC " : "\u25B6 ") + this.title);
     this.headerLabel.setFont(Style.getHeaderFont());
     this.headerLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-    this.headerLabel.setBorder(BorderFactory.createEmptyBorder(6, 2, 6, 2));
+    this.headerLabel.setBorder(BorderFactory.createEmptyBorder(6, 4, 6, 4));
     this.headerLabel.setOpaque(true);
     this.headerLabel.setBackground(Style.COLOR_SURFACE);
     this.headerLabel.setForeground(Style.COLOR_TEXT);
+    this.headerLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
     this.headerLabel.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(MouseEvent e) {
@@ -44,6 +47,7 @@ public class CollapsibleSection extends JPanel {
 
     this.contentPanel = new JPanel(new BorderLayout());
     this.contentPanel.setOpaque(false);
+    this.contentPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
     this.contentPanel.add(content, BorderLayout.CENTER);
     this.contentPanel.setVisible(this.expanded);
 
