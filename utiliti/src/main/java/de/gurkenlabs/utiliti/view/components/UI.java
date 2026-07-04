@@ -215,7 +215,7 @@ public final class UI {
     Component renderSplitPanel = initRenderSplitPanel(renderPanel, winH);
 
     mapObjectPanel = new MapObjectInspector();
-    mapObjectPanel.setMinimumSize(new Dimension(280, 0));
+    mapObjectPanel.setMinimumSize(new Dimension(360, 0));
 
     int prefInspectorW = Math.max(280, (int) (winW * 0.20));
     JSplitPane centerRightSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, renderSplitPanel, mapObjectPanel);
@@ -244,6 +244,7 @@ public final class UI {
     JPanel rootPanel = new JPanel(new BorderLayout());
     window.setContentPane(rootPanel);
     rootPanel.add(mainSplit, BorderLayout.CENTER);
+    rootPanel.add(StatusBar.create(), BorderLayout.SOUTH);
     mainSplit.setDividerLocation(
         Editor.preferences().getMainSplitterPosition() != 0
             ? Editor.preferences().getMainSplitterPosition()
@@ -358,7 +359,6 @@ public final class UI {
     bottomTab.addTab(Resources.strings().get("assettree_assets"), Icons.ASSET_32, assetComponent);
     bottomTab.addTab(Resources.strings().get("assettree_console"), Icons.CONSOLE_32, new ConsoleComponent());
 
-    bottomPanel.add(StatusBar.create(), BorderLayout.NORTH);
     bottomPanel.add(bottomTab, BorderLayout.CENTER);
 
     return bottomPanel;

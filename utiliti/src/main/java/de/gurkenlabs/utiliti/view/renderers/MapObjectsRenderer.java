@@ -291,7 +291,7 @@ public class MapObjectsRenderer implements IEditorRenderer {
 
     g.setColor(Style.COLOR_DARKBORDER);
     g.fill(rect);
-    g.setColor(Color.WHITE);
+    g.setColor(Style.COLOR_STATUS);
     TextRenderer.render(g, objectName, textScreenX, textScreenY, true);
   }
 

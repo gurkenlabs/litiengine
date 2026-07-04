@@ -72,6 +72,8 @@ public final class EntityList extends JPanel implements EntityController {
     this.searchPanel.setLayout(new BorderLayout(0, 0));
 
     this.btnCollape = new JButton("");
+    this.btnCollape.setBorderPainted(false);
+    this.btnCollape.setContentAreaFilled(false);
     this.btnCollape.setOpaque(false);
     this.btnCollape.setMargin(new Insets(2, 2, 2, 2));
     this.btnCollape.addActionListener(e -> collapseAll());
@@ -83,6 +85,7 @@ public final class EntityList extends JPanel implements EntityController {
     this.textField.putClientProperty(DarkTextUI.KEY_DEFAULT_TEXT, entitySearchDefault);
     this.textField.setToolTipText(Resources.strings().get("panel_entities_search_hint"));
     this.textField.setColumns(10);
+    this.textField.setBorder(null);
     this.searchDebounce = new Timer(300, e -> search());
     this.searchDebounce.setRepeats(false);
 
@@ -129,7 +132,7 @@ public final class EntityList extends JPanel implements EntityController {
     this.tree = new JTree();
     this.tree.setBorder(null);
     this.tree.setRootVisible(false);
-    this.tree.setShowsRootHandles(true);
+    this.tree.setShowsRootHandles(false);
 
     this.tree.setCellRenderer(new IconTreeListRenderer());
     this.tree.setRowHeight((int) (this.tree.getRowHeight() * Editor.preferences().getUiScale()));

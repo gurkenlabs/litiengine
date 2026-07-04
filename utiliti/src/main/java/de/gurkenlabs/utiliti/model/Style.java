@@ -21,7 +21,7 @@ public final class Style {
   public static final Color COLOR_SURFACE = new Color(30, 30, 35);
   public static final Color COLOR_SURFACE2 = new Color(40, 40, 46);
   public static final Color COLOR_BORDER = new Color(55, 55, 64);
-  public static final Color COLOR_ACCENT_BLUE = new Color(122, 162, 247);
+  public static final Color COLOR_ACCENT_BLUE = new Color(53, 116, 242);
   public static final Color COLOR_ACCENT_CYAN = new Color(42, 195, 222);
   public static final Color COLOR_GREEN = new Color(158, 206, 106);
   public static final Color COLOR_ORANGE = new Color(224, 175, 104);
