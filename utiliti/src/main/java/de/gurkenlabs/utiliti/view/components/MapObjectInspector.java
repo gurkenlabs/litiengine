@@ -11,7 +11,6 @@ import de.gurkenlabs.utiliti.controller.Transform;
 import de.gurkenlabs.utiliti.controller.UndoManager;
 import de.gurkenlabs.utiliti.model.Style;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.LayoutManager;
 import java.util.Map;
@@ -165,10 +164,10 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
     LayoutItem[] layoutItems =
         new LayoutItem[] {
+            new LayoutItem(tabbedPanel, GroupLayout.PREFERRED_SIZE),
             new LayoutItem(infoPanel),
             new LayoutItem(transformSection, GroupLayout.PREFERRED_SIZE),
-            new LayoutItem(entitySection, GroupLayout.PREFERRED_SIZE),
-            new LayoutItem(tabbedPanel, GroupLayout.PREFERRED_SIZE)
+            new LayoutItem(entitySection, GroupLayout.PREFERRED_SIZE)
         };
     return this.createLayout(layoutItems);
   }
@@ -184,35 +183,24 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     JLabel lblW = new JLabel(Resources.strings().get("panel_width"));
     JLabel lblH = new JLabel(Resources.strings().get("panel_height"));
 
-    Dimension labelSize = new Dimension(LABEL_WIDTH, CONTROL_HEIGHT);
-    lblX.setPreferredSize(labelSize);
-    lblY.setPreferredSize(labelSize);
-    lblW.setPreferredSize(labelSize);
-    lblH.setPreferredSize(labelSize);
-
-    Dimension spinnerSize = new Dimension(SPINNER_WIDTH, CONTROL_HEIGHT);
-    spnX.setPreferredSize(spinnerSize);
-    spnY.setPreferredSize(spinnerSize);
-    spnW.setPreferredSize(spinnerSize);
-    spnH.setPreferredSize(spinnerSize);
-
-    gl.setAutoCreateGaps(true);
+    gl.setAutoCreateGaps(false);
     gl.setHorizontalGroup(
-      gl.createParallelGroup(Alignment.LEADING)
-        .addGroup(gl.createSequentialGroup()
-          .addContainerGap()
-          .addComponent(lblX, LABEL_WIDTH, LABEL_WIDTH, LABEL_WIDTH)
+      gl.createSequentialGroup()
+        .addGap(12)
+        .addGroup(gl.createParallelGroup(Alignment.TRAILING)
+          .addComponent(lblX)
+          .addComponent(lblW))
+        .addGroup(gl.createParallelGroup()
           .addComponent(spnX, SPINNER_WIDTH, SPINNER_WIDTH, Integer.MAX_VALUE)
-          .addComponent(lblY, LABEL_WIDTH, LABEL_WIDTH, LABEL_WIDTH)
+          .addComponent(spnW, SPINNER_WIDTH, SPINNER_WIDTH, Integer.MAX_VALUE))
+        .addGap(8)
+        .addGroup(gl.createParallelGroup(Alignment.TRAILING)
+          .addComponent(lblY)
+          .addComponent(lblH))
+        .addGroup(gl.createParallelGroup()
           .addComponent(spnY, SPINNER_WIDTH, SPINNER_WIDTH, Integer.MAX_VALUE)
-          .addContainerGap())
-        .addGroup(gl.createSequentialGroup()
-          .addContainerGap()
-          .addComponent(lblW, LABEL_WIDTH, LABEL_WIDTH, LABEL_WIDTH)
-          .addComponent(spnW, SPINNER_WIDTH, SPINNER_WIDTH, Integer.MAX_VALUE)
-          .addComponent(lblH, LABEL_WIDTH, LABEL_WIDTH, LABEL_WIDTH)
-          .addComponent(spnH, SPINNER_WIDTH, SPINNER_WIDTH, Integer.MAX_VALUE)
-          .addContainerGap()));
+          .addComponent(spnH, SPINNER_WIDTH, SPINNER_WIDTH, Integer.MAX_VALUE))
+        .addGap(12));
     gl.setVerticalGroup(
       gl.createSequentialGroup()
         .addContainerGap()
@@ -221,7 +209,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
           .addComponent(spnX)
           .addComponent(lblY)
           .addComponent(spnY))
-        .addPreferredGap(ComponentPlacement.RELATED)
+        .addGap(6)
         .addGroup(gl.createParallelGroup(Alignment.CENTER)
           .addComponent(lblW)
           .addComponent(spnW)
@@ -243,22 +231,18 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
     gl.setAutoCreateGaps(true);
     gl.setHorizontalGroup(
-      gl.createParallelGroup(Alignment.LEADING)
-        .addGroup(gl.createSequentialGroup()
-          .addContainerGap()
-          .addComponent(lblName, LABEL_WIDTH, LABEL_WIDTH, LABEL_WIDTH)
+      gl.createSequentialGroup()
+        .addGap(12)
+        .addGroup(gl.createParallelGroup(Alignment.TRAILING)
+          .addComponent(lblName)
+          .addComponent(lblRenderType)
+          .addComponent(lblTags))
+        .addPreferredGap(ComponentPlacement.UNRELATED)
+        .addGroup(gl.createParallelGroup()
           .addComponent(textFieldName, CONTROL_MIN_WIDTH, CONTROL_WIDTH, Integer.MAX_VALUE)
-          .addContainerGap())
-        .addGroup(gl.createSequentialGroup()
-          .addContainerGap()
-          .addComponent(lblRenderType, LABEL_WIDTH, LABEL_WIDTH, LABEL_WIDTH)
           .addComponent(renderType, CONTROL_MIN_WIDTH, CONTROL_WIDTH, Integer.MAX_VALUE)
-          .addContainerGap())
-        .addGroup(gl.createSequentialGroup()
-          .addContainerGap()
-          .addComponent(lblTags, LABEL_WIDTH, LABEL_WIDTH, LABEL_WIDTH)
-          .addComponent(tagPanel, CONTROL_MIN_WIDTH, CONTROL_WIDTH, Integer.MAX_VALUE)
-          .addContainerGap()));
+          .addComponent(tagPanel, CONTROL_MIN_WIDTH, CONTROL_WIDTH, Integer.MAX_VALUE))
+        .addGap(12));
     gl.setVerticalGroup(
       gl.createSequentialGroup()
         .addContainerGap()
