@@ -32,15 +32,11 @@ public class AssetPanel extends JPanel {
 
   private AssetType currentType;
   private String filterText = "";
+  private boolean compact;
   private final List<AssetPanelItem> allItems = new ArrayList<>();
 
   public AssetPanel() {
-    WrapLayout layout = new WrapLayout();
-    layout.setVgap(5);
-    layout.setHgap(5);
-    layout.setAlignment(LEFT);
-    this.setLayout(layout);
-
+    this.setLayout(createLayout());
     this.setBorder(new EmptyBorder(5, 5, 5, 5));
 
     MouseAdapter popupHandler = new MouseAdapter() {
@@ -62,6 +58,33 @@ public class AssetPanel extends JPanel {
   public void setFilterText(String text) {
     this.filterText = text != null ? text.toLowerCase().trim() : "";
     applyFilter();
+  }
+
+  public void setCompact(boolean compact) {
+    if (this.compact == compact) {
+      return;
+    }
+    this.compact = compact;
+    this.setLayout(createLayout());
+    for (AssetPanelItem item : allItems) {
+      item.setCompact(compact);
+    }
+    applyFilter();
+  }
+
+  public boolean isCompact() {
+    return compact;
+  }
+
+  private java.awt.LayoutManager createLayout() {
+    if (compact) {
+      return new javax.swing.BoxLayout(this, javax.swing.BoxLayout.Y_AXIS);
+    }
+    WrapLayout layout = new WrapLayout();
+    layout.setVgap(5);
+    layout.setHgap(5);
+    layout.setAlignment(LEFT);
+    return layout;
   }
 
   private void applyFilter() {

@@ -6,6 +6,7 @@ import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.FileDrop;
 import de.gurkenlabs.utiliti.model.Icons;
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Insets;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import java.util.Locale;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JToggleButton;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.event.DocumentEvent;
@@ -67,8 +69,20 @@ public class AssetList extends JSplitPane implements Controller {
       }
     });
 
+    JToggleButton densityToggle = new JToggleButton("☰");
+    densityToggle.setPreferredSize(new Dimension(26, 26));
+    densityToggle.setToolTipText("Toggle compact list / card grid");
+    densityToggle.addActionListener(e -> {
+      assetPanel.setCompact(densityToggle.isSelected());
+      densityToggle.setText(densityToggle.isSelected() ? "▦" : "☰");
+    });
+
+    JPanel topBar = new JPanel(new BorderLayout());
+    topBar.add(searchField, BorderLayout.CENTER);
+    topBar.add(densityToggle, BorderLayout.EAST);
+
     JPanel rightPanel = new JPanel(new BorderLayout());
-    rightPanel.add(searchField, BorderLayout.NORTH);
+    rightPanel.add(topBar, BorderLayout.NORTH);
 
     JScrollPane scrollPane =
       new JScrollPane(
