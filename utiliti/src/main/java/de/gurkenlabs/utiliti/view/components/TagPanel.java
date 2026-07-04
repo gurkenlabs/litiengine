@@ -3,6 +3,8 @@ package de.gurkenlabs.utiliti.view.components;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.utiliti.controller.WrapLayout;
+import de.gurkenlabs.utiliti.model.Style;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -15,6 +17,7 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -23,8 +26,11 @@ public class TagPanel extends JPanel {
   private final JTextField textFieldInput;
 
   public TagPanel() {
-    setBorder(null);
-    WrapLayout wrapLayout = new WrapLayout(FlowLayout.LEADING, 0, 0);
+    setBackground(new Color(40, 40, 46));
+    setBorder(BorderFactory.createCompoundBorder(
+        BorderFactory.createLineBorder(new Color(55, 55, 64)),
+        BorderFactory.createEmptyBorder(2, 4, 2, 4)));
+    WrapLayout wrapLayout = new WrapLayout(FlowLayout.LEADING, 2, 2);
     this.addContainerListener(
         new ContainerListener() {
 
@@ -42,7 +48,9 @@ public class TagPanel extends JPanel {
     this.setLayout(wrapLayout);
 
     this.textFieldInput = new JTextField();
-    this.textFieldInput.setPreferredSize(new Dimension(6, PropertyPanel.CONTROL_HEIGHT));
+    this.textFieldInput.setBorder(null);
+    this.textFieldInput.setOpaque(false);
+    this.textFieldInput.setPreferredSize(new Dimension(80, 20));
     add(textFieldInput);
     this.textFieldInput.setColumns(7);
     this.textFieldInput.addActionListener(

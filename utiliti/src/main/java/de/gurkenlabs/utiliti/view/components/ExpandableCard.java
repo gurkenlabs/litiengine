@@ -20,6 +20,7 @@ public class ExpandableCard extends JPanel {
   private static final int ARC = 6;
   private static final Color CARD_BG = new Color(30, 31, 34);
   private static final Color HEADER_BG = new Color(30, 30, 34);
+  private static final Color HEADER_BORDER = new Color(55, 55, 64);
 
   private final JPanel contentPanel;
   private final JLabel arrowLabel;
@@ -46,6 +47,8 @@ public class ExpandableCard extends JPanel {
         if (expanded) {
           g2.fillRoundRect(0, 0, getWidth(), getHeight() + ARC, ARC, ARC);
           g2.fillRect(0, getHeight() - ARC, getWidth(), ARC);
+          g2.setColor(HEADER_BORDER);
+          g2.fillRect(1, getHeight() - 1, getWidth() - 2, 1);
         } else {
           g2.fillRoundRect(0, 0, getWidth(), getHeight(), ARC, ARC);
         }

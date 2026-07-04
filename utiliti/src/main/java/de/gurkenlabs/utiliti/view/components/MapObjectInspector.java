@@ -91,7 +91,9 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.tagPanel = new TagPanel();
 
     this.infoPanel = new JPanel(new BorderLayout());
-    this.infoPanel.setOpaque(false);
+    this.infoPanel.setOpaque(true);
+    this.infoPanel.setBackground(new Color(26, 27, 30));
+    this.infoPanel.setBorder(BorderFactory.createEmptyBorder(6, 0, 6, 0));
 
     JPanel headerContent = new JPanel();
     headerContent.setLayout(new BoxLayout(headerContent, BoxLayout.X_AXIS));
@@ -99,22 +101,25 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
     JLabel lblEntityId = new JLabel(Resources.strings().get("panel_ID"));
     lblEntityId.setFont(lblEntityId.getFont().deriveFont(Font.BOLD));
+    lblEntityId.setForeground(new Color(160, 160, 180));
 
     this.labelEntityID = new JLabel("####");
     this.labelEntityID.setFont(labelEntityID.getFont());
+    this.labelEntityID.setForeground(new Color(200, 200, 215));
 
     this.lblLayer = new JLabel("");
     this.lblLayer.setHorizontalAlignment(SwingConstants.TRAILING);
-    this.lblLayer.setForeground(Color.LIGHT_GRAY);
+    this.lblLayer.setForeground(new Color(120, 120, 152));
     this.lblLayer.setFont(
         this.lblLayer.getFont().deriveFont(Style.getDefaultFont().getSize() * 0.75f));
 
-    headerContent.setBorder(BorderFactory.createEmptyBorder(2, 0, 6, 0));
+    headerContent.add(Box.createHorizontalStrut(6));
     headerContent.add(lblEntityId);
     headerContent.add(Box.createHorizontalStrut(4));
     headerContent.add(labelEntityID);
     headerContent.add(Box.createHorizontalGlue());
     headerContent.add(lblLayer);
+    headerContent.add(Box.createHorizontalStrut(6));
 
     this.infoPanel.add(headerContent, BorderLayout.CENTER);
 
@@ -133,7 +138,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     accordion.setLayout(new BoxLayout(accordion, BoxLayout.Y_AXIS));
     accordion.setOpaque(true);
     accordion.setBackground(BG);
-    accordion.setBorder(BorderFactory.createEmptyBorder(0, 12, 8, 12));
+    accordion.setBorder(BorderFactory.createEmptyBorder(6, 12, 8, 12));
 
     infoPanel.setMaximumSize(
         new Dimension(Integer.MAX_VALUE, infoPanel.getPreferredSize().height));
@@ -268,37 +273,36 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     JLabel lblW = new JLabel("w");
     JLabel lblH = new JLabel("h");
 
+    int lblW2 = 24;
+    int gap = 8;
+
     gl.setAutoCreateGaps(false);
     gl.setHorizontalGroup(
       gl.createSequentialGroup()
         .addGroup(gl.createParallelGroup(Alignment.TRAILING)
-          .addComponent(lblX, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH)
-          .addComponent(lblY, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH)
-          .addComponent(lblW, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH)
-          .addComponent(lblH, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH))
-        .addGap(8)
+          .addComponent(lblX, lblW2, lblW2, lblW2)
+          .addComponent(lblW, lblW2, lblW2, lblW2))
+        .addGap(gap)
         .addGroup(gl.createParallelGroup()
           .addComponent(spnX, SPINNER_WIDTH, SPINNER_WIDTH, Integer.MAX_VALUE)
+          .addComponent(spnW, SPINNER_WIDTH, SPINNER_WIDTH, Integer.MAX_VALUE))
+        .addGap(12)
+        .addGroup(gl.createParallelGroup(Alignment.TRAILING)
+          .addComponent(lblY, lblW2, lblW2, lblW2)
+          .addComponent(lblH, lblW2, lblW2, lblW2))
+        .addGap(gap)
+        .addGroup(gl.createParallelGroup()
           .addComponent(spnY, SPINNER_WIDTH, SPINNER_WIDTH, Integer.MAX_VALUE)
-          .addComponent(spnW, SPINNER_WIDTH, SPINNER_WIDTH, Integer.MAX_VALUE)
           .addComponent(spnH, SPINNER_WIDTH, SPINNER_WIDTH, Integer.MAX_VALUE)));
     gl.setVerticalGroup(
       gl.createSequentialGroup()
         .addGroup(gl.createParallelGroup(Alignment.CENTER)
-          .addComponent(lblX)
-          .addComponent(spnX))
+          .addComponent(lblX).addComponent(spnX)
+          .addComponent(lblY).addComponent(spnY))
         .addGap(6)
         .addGroup(gl.createParallelGroup(Alignment.CENTER)
-          .addComponent(lblY)
-          .addComponent(spnY))
-        .addGap(6)
-        .addGroup(gl.createParallelGroup(Alignment.CENTER)
-          .addComponent(lblW)
-          .addComponent(spnW))
-        .addGap(6)
-        .addGroup(gl.createParallelGroup(Alignment.CENTER)
-          .addComponent(lblH)
-          .addComponent(spnH)));
+          .addComponent(lblW).addComponent(spnW)
+          .addComponent(lblH).addComponent(spnH)));
     return grid;
   }
 

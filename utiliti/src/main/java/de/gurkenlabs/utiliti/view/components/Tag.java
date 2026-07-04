@@ -2,7 +2,6 @@ package de.gurkenlabs.utiliti.view.components;
 
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.Style;
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -25,15 +24,21 @@ public class Tag extends JPanel {
 
   public Tag() {
     setBorder(null);
-    setLayout(new BorderLayout());
+    setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
     setOpaque(false);
 
-    JPanel chip = new JPanel();
+    JPanel chip = new JPanel() {
+      @Override
+      public Dimension getPreferredSize() {
+        Dimension d = super.getPreferredSize();
+        d.height = CHIP_HEIGHT;
+        return d;
+      }
+    };
     chip.setBackground(Style.COLOR_DEFAULT_TAG);
     chip.setLayout(new FlowLayout(FlowLayout.LEFT, 2, 0));
     chip.setOpaque(true);
-    chip.setPreferredSize(new Dimension(chip.getPreferredSize().width, CHIP_HEIGHT));
-    add(chip, BorderLayout.CENTER);
+    add(chip);
 
     this.lblText = new JLabel("New label");
     this.lblText.setForeground(Color.WHITE);

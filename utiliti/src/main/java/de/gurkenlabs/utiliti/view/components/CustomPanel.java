@@ -11,6 +11,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +21,6 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
@@ -34,7 +35,7 @@ public class CustomPanel extends PropertyPanel {
 
     this.scrollPane = new JScrollPane();
 
-    JButton buttonAdd = new JButton("+");
+    JButton buttonAdd = createPillButton("+");
     buttonAdd.addActionListener(
         a -> {
           TableCellEditor editor = tableCustomProperties.getCellEditor();
@@ -45,7 +46,7 @@ public class CustomPanel extends PropertyPanel {
           model.fireTableDataChanged();
         });
 
-    JButton buttonRemove = new JButton("-");
+    JButton buttonRemove = createPillButton("-");
     buttonRemove.addActionListener(
         a -> {
           TableCellEditor editor = tableCustomProperties.getCellEditor();
@@ -65,48 +66,25 @@ public class CustomPanel extends PropertyPanel {
     GroupLayout groupLayout = new GroupLayout(this);
     groupLayout.setHorizontalGroup(
         groupLayout
-            .createParallelGroup(Alignment.TRAILING)
+            .createParallelGroup(Alignment.LEADING)
+            .addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 440, Short.MAX_VALUE)
             .addGroup(
                 groupLayout
                     .createSequentialGroup()
-                    .addGroup(
-                        groupLayout
-                            .createParallelGroup(Alignment.LEADING)
-                            .addGroup(
-                                groupLayout
-                                    .createSequentialGroup()
-                                    .addComponent(buttonAdd)
-                                    .addPreferredGap(ComponentPlacement.RELATED)
-                                    .addComponent(
-                                        buttonRemove,
-                                        GroupLayout.PREFERRED_SIZE,
-                                        41,
-                                        GroupLayout.PREFERRED_SIZE))
-                            .addGroup(
-                                groupLayout
-                                    .createSequentialGroup()
-                                    .addComponent(
-                                        scrollPane,
-                                        GroupLayout.DEFAULT_SIZE,
-                                        440,
-                                        Short.MAX_VALUE)))
-                    .addGap(PropertyPanel.LABEL_GAP)));
+                    .addComponent(buttonAdd)
+                    .addGap(6)
+                    .addComponent(buttonRemove)));
     groupLayout.setVerticalGroup(
         groupLayout
-            .createParallelGroup(Alignment.LEADING)
+            .createSequentialGroup()
+            .addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 112, GroupLayout.PREFERRED_SIZE)
+            .addGap(6)
             .addGroup(
                 groupLayout
-                    .createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(
-                        scrollPane, GroupLayout.PREFERRED_SIZE, 112, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(ComponentPlacement.RELATED)
-                    .addGroup(
-                        groupLayout
-                            .createParallelGroup(Alignment.BASELINE)
-                            .addComponent(buttonAdd)
-                            .addComponent(buttonRemove))
-                    .addContainerGap(148, Short.MAX_VALUE)));
+                    .createParallelGroup(Alignment.CENTER)
+                    .addComponent(buttonAdd)
+                    .addComponent(buttonRemove))
+            .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
 
     this.tableCustomProperties = new JTable() {
       private static final String EMPTY_TEXT = "No properties defined";
@@ -155,6 +133,29 @@ public class CustomPanel extends PropertyPanel {
     setLayout(groupLayout);
 
     this.setupChangedListeners();
+  }
+
+  private static JButton createPillButton(String text) {
+    JButton btn = new JButton(text) {
+      @Override
+      protected void paintComponent(Graphics g) {
+        Graphics2D g2 = (Graphics2D) g.create();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setColor(getModel().isRollover() ? Style.COLOR_SURFACE2.brighter() : Style.COLOR_SURFACE2);
+        g2.fillRoundRect(0, 0, getWidth(), getHeight(), getHeight(), getHeight());
+        g2.setColor(Style.COLOR_BORDER);
+        g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, getHeight(), getHeight());
+        g2.dispose();
+        super.paintComponent(g);
+      }
+    };
+    btn.setOpaque(false);
+    btn.setContentAreaFilled(false);
+    btn.setBorderPainted(false);
+    btn.setFocusPainted(false);
+    btn.setForeground(Style.COLOR_TEXT);
+    btn.setPreferredSize(new Dimension(28, 22));
+    return btn;
   }
 
   @Override
