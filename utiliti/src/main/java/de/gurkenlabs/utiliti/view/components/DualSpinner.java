@@ -4,6 +4,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.JLabel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
@@ -83,25 +84,27 @@ public class DualSpinner extends PropertyPanel {
             new SpinnerNumberModel(this.dim2Default, this.lowerBound, this.upperBound, this.step));
     this.spnDim2.setMinimumSize(SPINNER_SIZE);
 
-    GroupLayout grplayout = new GroupLayout(this);
-    grplayout.setAutoCreateGaps(true);
-    grplayout.setHorizontalGroup(
-        grplayout
-            .createSequentialGroup()
-            .addContainerGap()
-            .addComponent(lblDim1)
-            .addComponent(spnDim1)
-            .addComponent(lblDim2)
-            .addComponent(spnDim2)
-            .addContainerGap());
-    grplayout.setVerticalGroup(
-        grplayout
-            .createParallelGroup()
-            .addComponent(lblDim1, GroupLayout.Alignment.CENTER)
-            .addComponent(spnDim1)
-            .addComponent(lblDim2, GroupLayout.Alignment.CENTER)
-            .addComponent(spnDim2));
-    this.setLayout(grplayout);
+    GroupLayout gl = new GroupLayout(this);
+    gl.setAutoCreateGaps(false);
+    gl.setHorizontalGroup(
+      gl.createSequentialGroup()
+        .addGroup(gl.createParallelGroup(Alignment.TRAILING)
+          .addComponent(lblDim1, LABEL_WIDTH, LABEL_WIDTH, Integer.MAX_VALUE)
+          .addComponent(lblDim2, LABEL_WIDTH, LABEL_WIDTH, Integer.MAX_VALUE))
+        .addGap(8)
+        .addGroup(gl.createParallelGroup()
+          .addComponent(spnDim1, SPINNER_WIDTH, SPINNER_WIDTH, Integer.MAX_VALUE)
+          .addComponent(spnDim2, SPINNER_WIDTH, SPINNER_WIDTH, Integer.MAX_VALUE)));
+    gl.setVerticalGroup(
+      gl.createSequentialGroup()
+        .addGroup(gl.createParallelGroup(Alignment.CENTER)
+          .addComponent(lblDim1)
+          .addComponent(spnDim1))
+        .addGap(6)
+        .addGroup(gl.createParallelGroup(Alignment.CENTER)
+          .addComponent(lblDim2)
+          .addComponent(spnDim2)));
+    this.setLayout(gl);
     setupChangedListeners();
   }
 

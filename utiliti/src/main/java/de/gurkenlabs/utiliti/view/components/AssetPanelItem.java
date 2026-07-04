@@ -285,12 +285,14 @@ public class AssetPanelItem extends JPanel {
     MouseAdapter mouseHandler = new MouseAdapter() {
       @Override public void mouseEntered(MouseEvent e) {
         isHovered = true;
+        updateButtonVisibility(true);
         requestFocus();
         repaint();
       }
 
       @Override public void mouseExited(MouseEvent e) {
         isHovered = false;
+        updateButtonVisibility(false);
         repaint();
       }
 
