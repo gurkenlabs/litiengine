@@ -25,14 +25,16 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
 import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
-import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 
 public class MapObjectInspector extends PropertyPanel implements PropertyInspector {
+  private static final int SECTION_LABEL_WIDTH = 90;
+
   private final Map<MapObjectType, PropertyPanel> panels;
   private MapObjectType type;
   private PropertyPanel currentPanel;
@@ -55,7 +57,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
   public MapObjectInspector() {
     super();
-    this.setBorder(STANDARDBORDER);
+    this.setBorder(BorderFactory.createEmptyBorder(0, 12, 12, 12));
     this.panels = new ConcurrentHashMap<>();
     this.panels.put(MapObjectType.PROP, new PropPanel());
     this.panels.put(MapObjectType.COLLISIONBOX, new CollisionBoxPanel());
@@ -84,8 +86,12 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.tabbedPanel = new JTabbedPane(SwingConstants.TOP);
     this.tabbedPanel.setFont(Style.getHeaderFont());
 
-    this.infoPanel = new JPanel();
-    this.infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.X_AXIS));
+    this.infoPanel = new JPanel(new BorderLayout());
+    this.infoPanel.setOpaque(false);
+
+    JPanel headerContent = new JPanel();
+    headerContent.setLayout(new BoxLayout(headerContent, BoxLayout.X_AXIS));
+    headerContent.setOpaque(false);
 
     JLabel lblEntityId = new JLabel(Resources.strings().get("panel_ID"));
     lblEntityId.setFont(lblEntityId.getFont().deriveFont(Font.BOLD));
@@ -99,12 +105,17 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.lblLayer.setFont(
         this.lblLayer.getFont().deriveFont(Style.getDefaultFont().getSize() * 0.75f));
 
-    this.infoPanel.add(lblEntityId);
-    this.infoPanel.add(Box.createHorizontalStrut(4));
-    this.infoPanel.add(labelEntityID);
-    this.infoPanel.add(Box.createHorizontalGlue());
-    this.infoPanel.add(lblLayer);
-    this.infoPanel.setBorder(BorderFactory.createEmptyBorder(4, 12, 4, 12));
+    headerContent.add(lblEntityId);
+    headerContent.add(Box.createHorizontalStrut(4));
+    headerContent.add(labelEntityID);
+    headerContent.add(Box.createHorizontalGlue());
+    headerContent.add(lblLayer);
+
+    JSeparator separator = new JSeparator();
+    separator.setForeground(new Color(70, 70, 85));
+
+    this.infoPanel.add(headerContent, BorderLayout.CENTER);
+    this.infoPanel.add(separator, BorderLayout.SOUTH);
 
     this.spnX = new JSpinner(new SpinnerNumberModel(0.0, 0.0, (double) Short.MAX_VALUE, 1.0));
     this.spnY = new JSpinner(new SpinnerNumberModel(0.0, 0.0, (double) Short.MAX_VALUE, 1.0));
@@ -166,24 +177,23 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     LayoutItem[] layoutItems =
         new LayoutItem[] {
             new LayoutItem(infoPanel),
-            new LayoutItem(createSectionSeparator("panel_general"), GroupLayout.PREFERRED_SIZE),
+            new LayoutItem(createSectionSeparator("GENERAL")),
             new LayoutItem(entityPanel, GroupLayout.PREFERRED_SIZE),
-            new LayoutItem(createSectionSeparator("panel_transform"), GroupLayout.PREFERRED_SIZE),
+            new LayoutItem(createSectionSeparator("TRANSFORM")),
             new LayoutItem(transformGrid, GroupLayout.PREFERRED_SIZE),
             new LayoutItem(tabbedPanel, GroupLayout.PREFERRED_SIZE)
         };
     return this.createLayout(layoutItems);
   }
 
-  private Component createSectionSeparator(String labelKey) {
+  private Component createSectionSeparator(String label) {
     JPanel panel = new JPanel(new BorderLayout());
     panel.setOpaque(false);
-    JLabel label = new JLabel(Resources.strings().get(labelKey).toUpperCase());
-    label.setFont(label.getFont().deriveFont(10f));
-    label.setForeground(new Color(160, 160, 180));
-    label.setBorder(BorderFactory.createEmptyBorder(8, 12, 4, 12));
-    panel.add(label, BorderLayout.CENTER);
-    panel.setBorder(BorderFactory.createMatteBorder(1, 12, 0, 12, new Color(70, 70, 85)));
+    JLabel title = new JLabel(label);
+    title.setFont(title.getFont().deriveFont(10f));
+    title.setForeground(new Color(160, 160, 180));
+    title.setBorder(BorderFactory.createEmptyBorder(8, 0, 4, 0));
+    panel.add(title, BorderLayout.CENTER);
     return panel;
   }
 
@@ -201,10 +211,10 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     gl.setAutoCreateGaps(false);
     gl.setHorizontalGroup(
       gl.createSequentialGroup()
-        .addGap(12)
         .addGroup(gl.createParallelGroup(Alignment.TRAILING)
-          .addComponent(lblX)
-          .addComponent(lblW))
+          .addComponent(lblX, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH)
+          .addComponent(lblW, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH))
+        .addGap(8)
         .addGroup(gl.createParallelGroup()
           .addComponent(spnX, SPINNER_WIDTH, SPINNER_WIDTH, Integer.MAX_VALUE)
           .addComponent(spnW, SPINNER_WIDTH, SPINNER_WIDTH, Integer.MAX_VALUE))
@@ -214,11 +224,9 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
           .addComponent(lblH))
         .addGroup(gl.createParallelGroup()
           .addComponent(spnY, SPINNER_WIDTH, SPINNER_WIDTH, Integer.MAX_VALUE)
-          .addComponent(spnH, SPINNER_WIDTH, SPINNER_WIDTH, Integer.MAX_VALUE))
-        .addGap(12));
+          .addComponent(spnH, SPINNER_WIDTH, SPINNER_WIDTH, Integer.MAX_VALUE)));
     gl.setVerticalGroup(
       gl.createSequentialGroup()
-        .addContainerGap()
         .addGroup(gl.createParallelGroup(Alignment.CENTER)
           .addComponent(lblX)
           .addComponent(spnX)
@@ -229,8 +237,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
           .addComponent(lblW)
           .addComponent(spnW)
           .addComponent(lblH)
-          .addComponent(spnH))
-        .addContainerGap());
+          .addComponent(spnH)));
     return grid;
   }
 
@@ -244,35 +251,31 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     JLabel lblRenderType = new JLabel(Resources.strings().get("panel_rendertype"));
     JLabel lblTags = new JLabel(Resources.strings().get("panel_tags"));
 
-    gl.setAutoCreateGaps(true);
+    gl.setAutoCreateGaps(false);
     gl.setHorizontalGroup(
       gl.createSequentialGroup()
-        .addGap(12)
         .addGroup(gl.createParallelGroup(Alignment.TRAILING)
-          .addComponent(lblName)
-          .addComponent(lblRenderType)
-          .addComponent(lblTags))
-        .addPreferredGap(ComponentPlacement.UNRELATED)
+          .addComponent(lblName, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH)
+          .addComponent(lblRenderType, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH)
+          .addComponent(lblTags, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH))
+        .addGap(8)
         .addGroup(gl.createParallelGroup()
-          .addComponent(textFieldName, CONTROL_MIN_WIDTH, CONTROL_WIDTH, Integer.MAX_VALUE)
-          .addComponent(renderType, CONTROL_MIN_WIDTH, CONTROL_WIDTH, Integer.MAX_VALUE)
-          .addComponent(tagPanel, CONTROL_MIN_WIDTH, CONTROL_WIDTH, Integer.MAX_VALUE))
-        .addGap(12));
+          .addComponent(textFieldName, 0, CONTROL_WIDTH, Integer.MAX_VALUE)
+          .addComponent(renderType, 0, CONTROL_WIDTH, Integer.MAX_VALUE)
+          .addComponent(tagPanel, 0, CONTROL_WIDTH, Integer.MAX_VALUE)));
     gl.setVerticalGroup(
       gl.createSequentialGroup()
-        .addContainerGap()
         .addGroup(gl.createParallelGroup(Alignment.CENTER)
           .addComponent(lblName)
           .addComponent(textFieldName))
-        .addPreferredGap(ComponentPlacement.RELATED)
+        .addGap(6)
         .addGroup(gl.createParallelGroup(Alignment.CENTER)
           .addComponent(lblRenderType)
           .addComponent(renderType))
-        .addPreferredGap(ComponentPlacement.RELATED)
+        .addGap(6)
         .addGroup(gl.createParallelGroup(Alignment.CENTER)
           .addComponent(lblTags)
-          .addComponent(tagPanel))
-        .addContainerGap());
+          .addComponent(tagPanel)));
     return panel;
   }
 
