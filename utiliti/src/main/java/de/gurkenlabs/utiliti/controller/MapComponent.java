@@ -29,6 +29,9 @@ import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import de.gurkenlabs.utiliti.controller.Transform.TransformMode;
+import de.gurkenlabs.utiliti.controller.tool.PointerTool;
+import de.gurkenlabs.utiliti.controller.tool.Tool;
+import de.gurkenlabs.utiliti.controller.tool.ToolManager;
 import de.gurkenlabs.utiliti.model.Cursors;
 import de.gurkenlabs.utiliti.view.components.UI;
 import de.gurkenlabs.utiliti.view.dialogs.ConfirmDialog;
@@ -1137,10 +1140,20 @@ public class MapComponent extends GuiComponent {
    *          The mouse event of the calling {@link GuiComponent}
    */
   private void handleMouseMoved(ComponentMouseEvent e) {
+    Tool active = ToolManager.instance().getActiveTool();
+    if (!(active instanceof PointerTool)) {
+      active.mouseMoved(e);
+      return;
+    }
     Transform.updateTransform();
   }
 
   private void handleMousePressed(ComponentMouseEvent e) {
+    Tool active = ToolManager.instance().getActiveTool();
+    if (!(active instanceof PointerTool)) {
+      active.mousePressed(e);
+      return;
+    }
     if (!this.hasFocus() || mapIsNull()) {
       return;
     }
@@ -1170,6 +1183,11 @@ public class MapComponent extends GuiComponent {
   }
 
   private void handleMouseDragged(ComponentMouseEvent e) {
+    Tool active = ToolManager.instance().getActiveTool();
+    if (!(active instanceof PointerTool)) {
+      active.mouseDragged(e);
+      return;
+    }
     if (!this.hasFocus() || mapIsNull()) {
       return;
     }
@@ -1205,6 +1223,11 @@ public class MapComponent extends GuiComponent {
   }
 
   private void handleMouseReleased(ComponentMouseEvent e) {
+    Tool active = ToolManager.instance().getActiveTool();
+    if (!(active instanceof PointerTool)) {
+      active.mouseReleased(e);
+      return;
+    }
     if (!this.hasFocus() || mapIsNull() || !SwingUtilities.isLeftMouseButton(e.getEvent())) {
       return;
     }

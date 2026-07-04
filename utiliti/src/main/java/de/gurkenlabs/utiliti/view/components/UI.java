@@ -18,6 +18,11 @@ import de.gurkenlabs.utiliti.controller.Scroll;
 import de.gurkenlabs.utiliti.controller.Transform.TransformMode;
 import de.gurkenlabs.utiliti.model.Cursors;
 import de.gurkenlabs.utiliti.model.Icons;
+import de.gurkenlabs.utiliti.controller.tool.BucketFillTool;
+import de.gurkenlabs.utiliti.controller.tool.EraserTool;
+import de.gurkenlabs.utiliti.controller.tool.PointerTool;
+import de.gurkenlabs.utiliti.controller.tool.StampBrushTool;
+import de.gurkenlabs.utiliti.controller.tool.ToolManager;
 import de.gurkenlabs.utiliti.model.Style;
 import de.gurkenlabs.utiliti.model.Style.Theme;
 import de.gurkenlabs.utiliti.view.menus.CanvasPopupMenu;
@@ -194,6 +199,9 @@ public final class UI {
     renderPanel.setMinimumSize(new Dimension(300, 100));
     initScrollBars(renderPanel);
 
+    initTools();
+    renderPanel.add(new ToolBar(), BorderLayout.NORTH);
+
     Component leftPanel = initLeftPanel();
     Component renderSplitPanel = initRenderSplitPanel(renderPanel, window);
 
@@ -300,6 +308,14 @@ public final class UI {
     leftSplit.setMinimumSize(new Dimension(250, 0));
 
     return leftSplit;
+  }
+
+  private static void initTools() {
+    ToolManager tm = ToolManager.instance();
+    tm.register(new PointerTool());
+    tm.register(new StampBrushTool());
+    tm.register(new EraserTool());
+    tm.register(new BucketFillTool());
   }
 
   private static JPanel initBottomPanel() {
