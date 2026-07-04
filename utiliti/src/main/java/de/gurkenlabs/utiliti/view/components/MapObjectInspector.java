@@ -166,24 +166,24 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     LayoutItem[] layoutItems =
         new LayoutItem[] {
             new LayoutItem(infoPanel),
-            new LayoutItem(createSectionSeparator("properties"), GroupLayout.PREFERRED_SIZE),
-            new LayoutItem(entityPanel),
-            new LayoutItem(createSectionSeparator("transform"), GroupLayout.PREFERRED_SIZE),
-            new LayoutItem(transformGrid),
+            new LayoutItem(createSectionSeparator("panel_general"), GroupLayout.PREFERRED_SIZE),
+            new LayoutItem(entityPanel, GroupLayout.PREFERRED_SIZE),
+            new LayoutItem(createSectionSeparator("panel_transform"), GroupLayout.PREFERRED_SIZE),
+            new LayoutItem(transformGrid, GroupLayout.PREFERRED_SIZE),
             new LayoutItem(tabbedPanel, GroupLayout.PREFERRED_SIZE)
         };
     return this.createLayout(layoutItems);
   }
 
-  private Component createSectionSeparator(String title) {
+  private Component createSectionSeparator(String labelKey) {
     JPanel panel = new JPanel(new BorderLayout());
     panel.setOpaque(false);
-    JLabel label = new JLabel("  " + Resources.strings().get("panel_" + title).toUpperCase());
+    JLabel label = new JLabel(Resources.strings().get(labelKey).toUpperCase());
     label.setFont(label.getFont().deriveFont(10f));
-    label.setForeground(new Color(120, 120, 140));
-    label.setBorder(BorderFactory.createEmptyBorder(8, 0, 4, 0));
+    label.setForeground(new Color(160, 160, 180));
+    label.setBorder(BorderFactory.createEmptyBorder(8, 12, 4, 12));
     panel.add(label, BorderLayout.CENTER);
-    panel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(50, 50, 60)));
+    panel.setBorder(BorderFactory.createMatteBorder(1, 12, 0, 12, new Color(70, 70, 85)));
     return panel;
   }
 
