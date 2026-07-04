@@ -8,8 +8,10 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.ControlBehavior;
 import de.gurkenlabs.utiliti.controller.PropertyInspector;
 import de.gurkenlabs.utiliti.controller.Transform;
+import de.gurkenlabs.utiliti.controller.UndoManager;
 import de.gurkenlabs.utiliti.model.Style;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.LayoutManager;
 import java.util.Map;
@@ -17,11 +19,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 
 public class MapObjectInspector extends PropertyPanel implements PropertyInspector {
@@ -40,8 +46,10 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
   private final TagPanel tagPanel;
   private final JLabel lblLayer;
   private final JPanel infoPanel;
-  private final DualSpinner transform;
-  private final DualSpinner scale;
+  private final JSpinner spnX;
+  private final JSpinner spnY;
+  private final JSpinner spnW;
+  private final JSpinner spnH;
 
   public MapObjectInspector() {
     super();
@@ -95,18 +103,15 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.infoPanel.add(Box.createGlue());
     this.infoPanel.add(lblLayer);
 
-    this.transform =
-        new DualSpinner(
-            Resources.strings().get("panel_x"),
-            Resources.strings().get("panel_y"),
-            0,
-            Short.MAX_VALUE);
-    this.scale =
-        new DualSpinner(
-            Resources.strings().get("panel_width"),
-            Resources.strings().get("panel_height"),
-            0,
-            Short.MAX_VALUE);
+    this.spnX = new JSpinner(new SpinnerNumberModel(0.0, 0.0, (double) Short.MAX_VALUE, 1.0));
+    this.spnY = new JSpinner(new SpinnerNumberModel(0.0, 0.0, (double) Short.MAX_VALUE, 1.0));
+    this.spnW = new JSpinner(new SpinnerNumberModel(0.0, 0.0, (double) Short.MAX_VALUE, 1.0));
+    this.spnH = new JSpinner(new SpinnerNumberModel(0.0, 0.0, (double) Short.MAX_VALUE, 1.0));
+
+    ControlBehavior.apply(this.spnX);
+    ControlBehavior.apply(this.spnY);
+    ControlBehavior.apply(this.spnW);
+    ControlBehavior.apply(this.spnH);
 
     setLayout(createLayout());
     this.setupChangedListeners();
@@ -152,17 +157,124 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
   }
 
   private LayoutManager createLayout() {
+    JPanel transformGrid = createTransformGrid();
+    JPanel entityPanel = createEntityPanel();
+
+    CollapsibleSection transformSection = new CollapsibleSection("panel_transform", transformGrid);
+    CollapsibleSection entitySection = new CollapsibleSection("panel_entity", entityPanel);
+
     LayoutItem[] layoutItems =
         new LayoutItem[] {
             new LayoutItem(infoPanel),
-            new LayoutItem("panel_rendertype", renderType),
-            new LayoutItem("panel_transform", transform),
-            new LayoutItem("panel_scale", scale),
-            new LayoutItem("panel_name", textFieldName),
-            new LayoutItem("panel_tags", tagPanel),
+            new LayoutItem(transformSection),
+            new LayoutItem(entitySection),
             new LayoutItem(tabbedPanel, GroupLayout.PREFERRED_SIZE)
         };
     return this.createLayout(layoutItems);
+  }
+
+  private JPanel createTransformGrid() {
+    JPanel grid = new JPanel();
+    grid.setOpaque(false);
+    GroupLayout gl = new GroupLayout(grid);
+    grid.setLayout(gl);
+
+    JLabel lblX = new JLabel(Resources.strings().get("panel_x"));
+    JLabel lblY = new JLabel(Resources.strings().get("panel_y"));
+    JLabel lblW = new JLabel(Resources.strings().get("panel_width"));
+    JLabel lblH = new JLabel(Resources.strings().get("panel_height"));
+
+    Dimension labelSize = new Dimension(LABEL_WIDTH, CONTROL_HEIGHT);
+    lblX.setPreferredSize(labelSize);
+    lblY.setPreferredSize(labelSize);
+    lblW.setPreferredSize(labelSize);
+    lblH.setPreferredSize(labelSize);
+
+    Dimension spinnerSize = new Dimension(SPINNER_WIDTH, CONTROL_HEIGHT);
+    spnX.setPreferredSize(spinnerSize);
+    spnY.setPreferredSize(spinnerSize);
+    spnW.setPreferredSize(spinnerSize);
+    spnH.setPreferredSize(spinnerSize);
+
+    gl.setAutoCreateGaps(true);
+    gl.setHorizontalGroup(
+      gl.createParallelGroup(Alignment.LEADING)
+        .addGroup(gl.createSequentialGroup()
+          .addContainerGap()
+          .addComponent(lblX, LABEL_WIDTH, LABEL_WIDTH, LABEL_WIDTH)
+          .addComponent(spnX, SPINNER_WIDTH, SPINNER_WIDTH, Integer.MAX_VALUE)
+          .addComponent(lblY, LABEL_WIDTH, LABEL_WIDTH, LABEL_WIDTH)
+          .addComponent(spnY, SPINNER_WIDTH, SPINNER_WIDTH, Integer.MAX_VALUE)
+          .addContainerGap())
+        .addGroup(gl.createSequentialGroup()
+          .addContainerGap()
+          .addComponent(lblW, LABEL_WIDTH, LABEL_WIDTH, LABEL_WIDTH)
+          .addComponent(spnW, SPINNER_WIDTH, SPINNER_WIDTH, Integer.MAX_VALUE)
+          .addComponent(lblH, LABEL_WIDTH, LABEL_WIDTH, LABEL_WIDTH)
+          .addComponent(spnH, SPINNER_WIDTH, SPINNER_WIDTH, Integer.MAX_VALUE)
+          .addContainerGap()));
+    gl.setVerticalGroup(
+      gl.createSequentialGroup()
+        .addContainerGap()
+        .addGroup(gl.createParallelGroup(Alignment.CENTER)
+          .addComponent(lblX)
+          .addComponent(spnX)
+          .addComponent(lblY)
+          .addComponent(spnY))
+        .addPreferredGap(ComponentPlacement.RELATED)
+        .addGroup(gl.createParallelGroup(Alignment.CENTER)
+          .addComponent(lblW)
+          .addComponent(spnW)
+          .addComponent(lblH)
+          .addComponent(spnH))
+        .addContainerGap());
+    return grid;
+  }
+
+  private JPanel createEntityPanel() {
+    JPanel panel = new JPanel();
+    panel.setOpaque(false);
+    GroupLayout gl = new GroupLayout(panel);
+    panel.setLayout(gl);
+
+    JLabel lblName = new JLabel(Resources.strings().get("panel_name"));
+    JLabel lblRenderType = new JLabel(Resources.strings().get("panel_rendertype"));
+    JLabel lblTags = new JLabel(Resources.strings().get("panel_tags"));
+
+    gl.setAutoCreateGaps(true);
+    gl.setHorizontalGroup(
+      gl.createParallelGroup(Alignment.LEADING)
+        .addGroup(gl.createSequentialGroup()
+          .addContainerGap()
+          .addComponent(lblName, LABEL_WIDTH, LABEL_WIDTH, LABEL_WIDTH)
+          .addComponent(textFieldName, CONTROL_MIN_WIDTH, CONTROL_WIDTH, Integer.MAX_VALUE)
+          .addContainerGap())
+        .addGroup(gl.createSequentialGroup()
+          .addContainerGap()
+          .addComponent(lblRenderType, LABEL_WIDTH, LABEL_WIDTH, LABEL_WIDTH)
+          .addComponent(renderType, CONTROL_MIN_WIDTH, CONTROL_WIDTH, Integer.MAX_VALUE)
+          .addContainerGap())
+        .addGroup(gl.createSequentialGroup()
+          .addContainerGap()
+          .addComponent(lblTags, LABEL_WIDTH, LABEL_WIDTH, LABEL_WIDTH)
+          .addComponent(tagPanel, CONTROL_MIN_WIDTH, CONTROL_WIDTH, Integer.MAX_VALUE)
+          .addContainerGap()));
+    gl.setVerticalGroup(
+      gl.createSequentialGroup()
+        .addContainerGap()
+        .addGroup(gl.createParallelGroup(Alignment.CENTER)
+          .addComponent(lblName)
+          .addComponent(textFieldName))
+        .addPreferredGap(ComponentPlacement.RELATED)
+        .addGroup(gl.createParallelGroup(Alignment.CENTER)
+          .addComponent(lblRenderType)
+          .addComponent(renderType))
+        .addPreferredGap(ComponentPlacement.RELATED)
+        .addGroup(gl.createParallelGroup(Alignment.CENTER)
+          .addComponent(lblTags)
+          .addComponent(tagPanel))
+        .addContainerGap());
+    return panel;
   }
 
   private void switchPanel() {
@@ -259,8 +371,10 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.renderType.setSelectedIndex(0);
     this.renderType.setEnabled(false);
     this.tagPanel.clear();
-    this.transform.bind(null);
-    this.scale.bind(null);
+    this.spnX.setValue(0.0);
+    this.spnY.setValue(0.0);
+    this.spnW.setValue(0.0);
+    this.spnH.setValue(0.0);
   }
 
   @Override
@@ -270,10 +384,10 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     }
     this.type = MapObjectType.get(mapObject.getType());
     this.textFieldName.setText(mapObject.getName());
-    this.transform.bind(mapObject);
-    this.scale.bind(mapObject);
-    this.transform.setValues(mapObject.getX(), mapObject.getY());
-    this.scale.setValues(mapObject.getWidth(), mapObject.getHeight());
+    this.spnX.setValue((double) mapObject.getX());
+    this.spnY.setValue((double) mapObject.getY());
+    this.spnW.setValue((double) mapObject.getWidth());
+    this.spnH.setValue((double) mapObject.getHeight());
     this.tagPanel.bind(mapObject.getStringValue(MapObjectProperty.TAGS, null));
 
     this.labelEntityID.setText(Integer.toString(mapObject.getId()));
@@ -294,29 +408,50 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
   private void setupChangedListeners() {
     setup(renderType, MapObjectProperty.RENDERTYPE);
 
-    this.transform.addSpinnerListeners(
-        m -> m.getX() != getSpinnerValue(this.transform.getSpinner1()),
-        m -> m.getY() != getSpinnerValue(this.transform.getSpinner2()),
-        m -> {
-          m.setX(getSpinnerValue(this.transform.getSpinner1()));
-          Transform.updateAnchors();
-        },
-        m -> {
-          m.setY(getSpinnerValue(this.transform.getSpinner2()));
-          Transform.updateAnchors();
-        });
-
-    this.scale.addSpinnerListeners(
-        m -> m.getWidth() != getSpinnerValue(this.scale.getSpinner1()),
-        m -> m.getHeight() != getSpinnerValue(this.scale.getSpinner2()),
-        m -> {
-          m.setWidth(getSpinnerValue(this.scale.getSpinner1()));
-          Transform.updateAnchors();
-        },
-        m -> {
-          m.setHeight(getSpinnerValue(this.scale.getSpinner2()));
-          Transform.updateAnchors();
-        });
+    this.spnX.addChangeListener(e -> {
+      if (getDataSource() == null) { return; }
+      double val = (double) spnX.getValue();
+      if (getDataSource().getX() != val) {
+        UndoManager.instance().mapObjectChanging(getDataSource());
+        getDataSource().setX((float) val);
+        Transform.updateAnchors();
+        UndoManager.instance().mapObjectChanged(getDataSource());
+        updateEnvironment();
+      }
+    });
+    this.spnY.addChangeListener(e -> {
+      if (getDataSource() == null) { return; }
+      double val = (double) spnY.getValue();
+      if (getDataSource().getY() != val) {
+        UndoManager.instance().mapObjectChanging(getDataSource());
+        getDataSource().setY((float) val);
+        Transform.updateAnchors();
+        UndoManager.instance().mapObjectChanged(getDataSource());
+        updateEnvironment();
+      }
+    });
+    this.spnW.addChangeListener(e -> {
+      if (getDataSource() == null) { return; }
+      double val = (double) spnW.getValue();
+      if (getDataSource().getWidth() != val) {
+        UndoManager.instance().mapObjectChanging(getDataSource());
+        getDataSource().setWidth((float) val);
+        Transform.updateAnchors();
+        UndoManager.instance().mapObjectChanged(getDataSource());
+        updateEnvironment();
+      }
+    });
+    this.spnH.addChangeListener(e -> {
+      if (getDataSource() == null) { return; }
+      double val = (double) spnH.getValue();
+      if (getDataSource().getHeight() != val) {
+        UndoManager.instance().mapObjectChanging(getDataSource());
+        getDataSource().setHeight((float) val);
+        Transform.updateAnchors();
+        UndoManager.instance().mapObjectChanged(getDataSource());
+        updateEnvironment();
+      }
+    });
 
     this.textFieldName.addFocusListener(
         new MapObjectPropertyFocusListener(m -> m.setName(textFieldName.getText())));
