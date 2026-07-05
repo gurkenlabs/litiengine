@@ -17,7 +17,7 @@ public class AmbientLightPreviewPanel extends JPanel {
   private boolean previewImageLoadFailed;
 
   public AmbientLightPreviewPanel() {
-    int width = PropertyPanel.LABEL_WIDTH + PropertyPanel.GUTTER_WIDTH + PropertyPanel.CONTROL_WIDTH;
+    int width = PropertyPanel.CONTROL_WIDTH;
     this.setMinimumSize(new Dimension(width, 104));
     this.setPreferredSize(new Dimension(width, 104));
     this.setSize(new Dimension(width, 104));

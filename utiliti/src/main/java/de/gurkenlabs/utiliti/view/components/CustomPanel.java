@@ -67,10 +67,15 @@ public class CustomPanel extends PropertyPanel {
     groupLayout.setHorizontalGroup(
         groupLayout
             .createParallelGroup(Alignment.LEADING)
-            .addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 440, Short.MAX_VALUE)
             .addGroup(
                 groupLayout
                     .createSequentialGroup()
+                    .addGap(PropertyPanel.LABEL_WIDTH + PropertyPanel.GUTTER_WIDTH)
+                    .addComponent(scrollPane, PropertyPanel.CONTROL_WIDTH, PropertyPanel.CONTROL_WIDTH, PropertyPanel.CONTROL_WIDTH))
+            .addGroup(
+                groupLayout
+                    .createSequentialGroup()
+                    .addGap(PropertyPanel.LABEL_WIDTH + PropertyPanel.GUTTER_WIDTH)
                     .addComponent(buttonAdd)
                     .addGap(6)
                     .addComponent(buttonRemove)));
