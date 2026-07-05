@@ -290,16 +290,16 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
           .addComponent(lblW, transformLabelWidth, transformLabelWidth, transformLabelWidth))
         .addGap(gap)
         .addGroup(gl.createParallelGroup()
-          .addComponent(spnX, SPINNER_WIDTH, SPINNER_WIDTH, Integer.MAX_VALUE)
-          .addComponent(spnW, SPINNER_WIDTH, SPINNER_WIDTH, Integer.MAX_VALUE))
+          .addComponent(spnX, SPINNER_WIDTH, SPINNER_WIDTH, SPINNER_WIDTH)
+          .addComponent(spnW, SPINNER_WIDTH, SPINNER_WIDTH, SPINNER_WIDTH))
         .addGap(36)
         .addGroup(gl.createParallelGroup(Alignment.TRAILING)
           .addComponent(lblY, secondaryLabelWidth, secondaryLabelWidth, secondaryLabelWidth)
           .addComponent(lblH, secondaryLabelWidth, secondaryLabelWidth, secondaryLabelWidth))
         .addGap(gap)
         .addGroup(gl.createParallelGroup()
-          .addComponent(spnY, SPINNER_WIDTH, SPINNER_WIDTH, Integer.MAX_VALUE)
-          .addComponent(spnH, SPINNER_WIDTH, SPINNER_WIDTH, Integer.MAX_VALUE)));
+          .addComponent(spnY, SPINNER_WIDTH, SPINNER_WIDTH, SPINNER_WIDTH)
+          .addComponent(spnH, SPINNER_WIDTH, SPINNER_WIDTH, SPINNER_WIDTH)));
     gl.setVerticalGroup(
       gl.createSequentialGroup()
         .addGroup(gl.createParallelGroup(Alignment.CENTER)

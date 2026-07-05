@@ -515,16 +515,16 @@ public abstract class PropertyPanel extends JPanel {
         groupLayout
           .createSequentialGroup()
           .addGap(LABEL_WIDTH + GUTTER_WIDTH)
-          .addComponent(component, CONTROL_MIN_WIDTH, CONTROL_WIDTH, Integer.MAX_VALUE));
+          .addComponent(component, CONTROL_MIN_WIDTH, CONTROL_WIDTH, CONTROL_WIDTH));
     }
 
     for (LayoutItem item : layoutItems) {
       SequentialGroup horGrp = groupLayout.createSequentialGroup();
       if (item.getLabel() != null) {
         horGrp.addComponent(item.getLabel(), LABEL_WIDTH, LABEL_WIDTH, LABEL_WIDTH).addGap(GUTTER_WIDTH)
-          .addComponent(item.getComponent(), CONTROL_MIN_WIDTH, CONTROL_WIDTH, Integer.MAX_VALUE);
+          .addComponent(item.getComponent(), CONTROL_MIN_WIDTH, CONTROL_WIDTH, CONTROL_WIDTH);
       } else {
-        horGrp.addComponent(item.getComponent(), CONTROL_MIN_WIDTH, CONTROL_WIDTH, Integer.MAX_VALUE);
+        horGrp.addComponent(item.getComponent(), CONTROL_MIN_WIDTH, CONTROL_WIDTH, CONTROL_WIDTH);
       }
       parallel.addGroup(Alignment.LEADING, horGrp);
     }

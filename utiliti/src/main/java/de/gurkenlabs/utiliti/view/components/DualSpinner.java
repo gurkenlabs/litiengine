@@ -93,8 +93,8 @@ public class DualSpinner extends PropertyPanel {
           .addComponent(lblDim2, LABEL_WIDTH, LABEL_WIDTH, Integer.MAX_VALUE))
         .addGap(8)
         .addGroup(gl.createParallelGroup()
-          .addComponent(spnDim1, SPINNER_WIDTH, SPINNER_WIDTH, Integer.MAX_VALUE)
-          .addComponent(spnDim2, SPINNER_WIDTH, SPINNER_WIDTH, Integer.MAX_VALUE)));
+          .addComponent(spnDim1, SPINNER_WIDTH, SPINNER_WIDTH, SPINNER_WIDTH)
+          .addComponent(spnDim2, SPINNER_WIDTH, SPINNER_WIDTH, SPINNER_WIDTH)));
     gl.setVerticalGroup(
       gl.createSequentialGroup()
         .addGroup(gl.createParallelGroup(Alignment.CENTER)
