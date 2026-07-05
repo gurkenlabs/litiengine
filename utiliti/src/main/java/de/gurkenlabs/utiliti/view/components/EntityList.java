@@ -173,7 +173,7 @@ public final class EntityList extends JPanel implements EntityController {
           Resources.strings().get("panel_mapselection_entities"), Icons.ENTITY_16));
     this.nodeProps =
       new DefaultMutableTreeNode(
-        new IconTreeListItem(Resources.strings().get("panel_mapselection_props"), Icons.ENTITY_16));
+        new IconTreeListItem(Resources.strings().get("panel_mapselection_props"), Icons.PROP_16));
     this.nodeCreatures =
       new DefaultMutableTreeNode(
         new IconTreeListItem(
@@ -379,7 +379,7 @@ public final class EntityList extends JPanel implements EntityController {
         Game.world().environment().getProps(),
         this.nodeProps,
         Resources.strings().get("panel_mapselection_props"),
-        Icons.ENTITY_16);
+        Icons.PROP_16);
       addEntitiesToTreeNode(
         Game.world().environment().getCreatures(),
         this.nodeCreatures,

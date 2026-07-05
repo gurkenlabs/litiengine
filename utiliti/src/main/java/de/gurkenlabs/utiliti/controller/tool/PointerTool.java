@@ -13,7 +13,7 @@ public class PointerTool implements Tool {
 
   @Override
   public Icon getIcon() {
-    return Icons.ADD_24;
+    return Icons.POINTER_24;
   }
 
   @Override

@@ -19,7 +19,7 @@ public final class AddMenu extends JMenu {
     super(Resources.strings().get("menu_add"));
     this.setIcon(Icons.ADD_16);
 
-    JMenuItem addProp = new JMenuItem(Resources.strings().get("menu_add_prop"), Icons.ENTITY_16);
+    JMenuItem addProp = new JMenuItem(Resources.strings().get("menu_add_prop"), Icons.PROP_16);
     addProp.addActionListener(a -> setCreateMode(MapObjectType.PROP));
     addProp.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, InputEvent.CTRL_DOWN_MASK));
 

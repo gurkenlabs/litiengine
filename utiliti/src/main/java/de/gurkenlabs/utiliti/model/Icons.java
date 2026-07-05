@@ -35,7 +35,9 @@ public final class Icons {
   public static final Icon PASTE_8 = IconLoader.get().getUIAwareIcon("paste.svg", 8, 8);
   public static final Icon PAUSE_8 = IconLoader.get().getUIAwareIcon("pause.svg", 8, 8);
   public static final Icon PENCIL_8 = IconLoader.get().getUIAwareIcon("pencil.svg", 8, 8);
+  public static final Icon POINTER_8 = IconLoader.get().getUIAwareIcon("pointer.svg", 8, 8);
   public static final Icon PLAY_8 = IconLoader.get().getUIAwareIcon("play.svg", 8, 8);
+  public static final Icon PROP_8 = IconLoader.get().getUIAwareIcon("prop.svg", 8, 8);
   public static final Icon RENAME_8 = IconLoader.get().getUIAwareIcon("rename.svg", 8, 8);
   public static final Icon REWIND_8 = IconLoader.get().getUIAwareIcon("rewind.svg", 8, 8);
   public static final Icon SCROLL_DOWN_8 = IconLoader.get().getUIAwareIcon("scroll_down.svg", 8, 8);
@@ -80,7 +82,9 @@ public final class Icons {
   public static final Icon PASTE_16 = IconLoader.get().getUIAwareIcon("paste.svg", 16, 16);
   public static final Icon PAUSE_16 = IconLoader.get().getUIAwareIcon("pause.svg", 16, 16);
   public static final Icon PENCIL_16 = IconLoader.get().getUIAwareIcon("pencil.svg", 16, 16);
+  public static final Icon POINTER_16 = IconLoader.get().getUIAwareIcon("pointer.svg", 16, 16);
   public static final Icon PLAY_16 = IconLoader.get().getUIAwareIcon("play.svg", 16, 16);
+  public static final Icon PROP_16 = IconLoader.get().getUIAwareIcon("prop.svg", 16, 16);
   public static final Icon RENAME_16 = IconLoader.get().getUIAwareIcon("rename.svg", 16, 16);
   public static final Icon REWIND_16 = IconLoader.get().getUIAwareIcon("rewind.svg", 16, 16);
   public static final Icon SCROLL_DOWN_16 = IconLoader.get().getUIAwareIcon("scroll_down.svg", 16, 16);
@@ -125,7 +129,9 @@ public final class Icons {
   public static final Icon PASTE_24 = IconLoader.get().getUIAwareIcon("paste.svg", 24, 24);
   public static final Icon PAUSE_24 = IconLoader.get().getUIAwareIcon("pause.svg", 24, 24);
   public static final Icon PENCIL_24 = IconLoader.get().getUIAwareIcon("pencil.svg", 24, 24);
+  public static final Icon POINTER_24 = IconLoader.get().getUIAwareIcon("pointer.svg", 24, 24);
   public static final Icon PLAY_24 = IconLoader.get().getUIAwareIcon("play.svg", 24, 24);
+  public static final Icon PROP_24 = IconLoader.get().getUIAwareIcon("prop.svg", 24, 24);
   public static final Icon RENAME_24 = IconLoader.get().getUIAwareIcon("rename.svg", 24, 24);
   public static final Icon REWIND_24 = IconLoader.get().getUIAwareIcon("rewind.svg", 24, 24);
   public static final Icon UNDO_24 = IconLoader.get().getUIAwareIcon("undo.svg", 24, 24);
@@ -173,7 +179,9 @@ public final class Icons {
   public static final Icon PASTE_32 = IconLoader.get().getUIAwareIcon("paste.svg", 32, 32);
   public static final Icon PAUSE_32 = IconLoader.get().getUIAwareIcon("pause.svg", 32, 32);
   public static final Icon PENCIL_32 = IconLoader.get().getUIAwareIcon("pencil.svg", 32, 32);
+  public static final Icon POINTER_32 = IconLoader.get().getUIAwareIcon("pointer.svg", 32, 32);
   public static final Icon PLAY_32 = IconLoader.get().getUIAwareIcon("play.svg", 32, 32);
+  public static final Icon PROP_32 = IconLoader.get().getUIAwareIcon("prop.svg", 32, 32);
   public static final Icon RENAME_32 = IconLoader.get().getUIAwareIcon("rename.svg", 32, 32);
   public static final Icon REWIND_32 = IconLoader.get().getUIAwareIcon("rewind.svg", 32, 32);
   public static final Icon SCROLL_DOWN_32 = IconLoader.get().getUIAwareIcon("scroll_down.svg", 32, 32);
