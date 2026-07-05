@@ -9,6 +9,7 @@ import de.gurkenlabs.utiliti.controller.ControlBehavior;
 import de.gurkenlabs.utiliti.controller.PropertyInspector;
 import de.gurkenlabs.utiliti.controller.Transform;
 import de.gurkenlabs.utiliti.controller.UndoManager;
+import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.Style;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -52,6 +53,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
   private final JComboBox<RenderType> renderType;
 
   private final JLabel labelEntityID;
+  private final JLabel labelTypeIcon;
   private final TagPanel tagPanel;
   private final JLabel lblLayer;
   private final JPanel infoPanel;
@@ -108,12 +110,16 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.labelEntityID.setFont(labelEntityID.getFont());
     this.labelEntityID.setForeground(new Color(200, 200, 215));
 
+    this.labelTypeIcon = new JLabel(Icons.ENTITY_16);
+
     this.lblLayer = new JLabel("");
     this.lblLayer.setHorizontalAlignment(SwingConstants.TRAILING);
     this.lblLayer.setForeground(new Color(120, 120, 152));
     this.lblLayer.setFont(
         this.lblLayer.getFont().deriveFont(Style.getDefaultFont().getSize() * 0.75f));
 
+    headerContent.add(Box.createHorizontalStrut(6));
+    headerContent.add(labelTypeIcon);
     headerContent.add(Box.createHorizontalStrut(6));
     headerContent.add(lblEntityId);
     headerContent.add(Box.createHorizontalStrut(4));
@@ -413,6 +419,8 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.type = null;
     this.textFieldName.setText("");
     this.labelEntityID.setText("####");
+    this.labelTypeIcon.setIcon(Icons.ENTITY_16);
+    this.labelTypeIcon.setToolTipText(null);
     this.lblLayer.setText("");
     this.renderType.setSelectedIndex(0);
     this.renderType.setEnabled(false);
@@ -437,6 +445,8 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.tagPanel.bind(mapObject.getStringValue(MapObjectProperty.TAGS, null));
 
     this.labelEntityID.setText(Integer.toString(mapObject.getId()));
+    this.labelTypeIcon.setIcon(Icons.forMapObjectType(this.type));
+    this.labelTypeIcon.setToolTipText(this.type != null ? this.type.name() : null);
     this.lblLayer.setText("Layer: " + mapObject.getLayer());
 
     RenderType rt =

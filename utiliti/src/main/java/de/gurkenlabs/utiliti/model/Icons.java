@@ -1,6 +1,7 @@
 package de.gurkenlabs.utiliti.model;
 
 import com.github.weisj.darklaf.properties.icons.IconLoader;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import javax.swing.Icon;
 
 public final class Icons {
@@ -196,5 +197,24 @@ public final class Icons {
   public static final Icon TRIGGER_32 = IconLoader.get().getUIAwareIcon("trigger.svg", 32, 32);
 
   private Icons() {
+  }
+
+  public static Icon forMapObjectType(MapObjectType type) {
+    if (type == null) {
+      return ENTITY_16;
+    }
+
+    return switch (type) {
+      case COLLISIONBOX -> COLLISIONBOX_16;
+      case CREATURE -> CREATURE_16;
+      case EMITTER -> EMITTER_16;
+      case LIGHTSOURCE -> BULB_16;
+      case PROP -> PROP_16;
+      case SOUNDSOURCE -> SOUND_16;
+      case SPAWNPOINT -> SPAWNPOINT_16;
+      case STATICSHADOW -> SHADOWBOX_16;
+      case TRIGGER -> TRIGGER_16;
+      default -> ENTITY_16;
+    };
   }
 }
