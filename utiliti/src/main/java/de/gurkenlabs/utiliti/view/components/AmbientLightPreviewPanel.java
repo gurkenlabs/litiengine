@@ -3,11 +3,11 @@ package de.gurkenlabs.utiliti.view.components;
 import de.gurkenlabs.litiengine.entities.StaticShadow;
 import de.gurkenlabs.litiengine.graphics.AmbientLight;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.utiliti.model.Style;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
-import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
 public class AmbientLightPreviewPanel extends JPanel {
@@ -21,7 +21,7 @@ public class AmbientLightPreviewPanel extends JPanel {
     this.setMinimumSize(new Dimension(width, 104));
     this.setPreferredSize(new Dimension(width, 104));
     this.setSize(new Dimension(width, 104));
-    this.setBorder(BorderFactory.createLineBorder(Color.black));
+    this.setOpaque(false);
   }
 
   /**
@@ -86,11 +86,11 @@ public class AmbientLightPreviewPanel extends JPanel {
   }
 
   private void paintFallbackPreview(Graphics g) {
-    g.setColor(new Color(42, 44, 48));
+    g.setColor(Style.COLOR_SURFACE2);
     g.fillRect(0, 0, getWidth(), getHeight());
-    g.setColor(new Color(62, 64, 70));
+    g.setColor(Style.COLOR_BG);
     g.fillRect(0, (int) (getHeight() * 0.66), getWidth(), (int) (getHeight() * 0.34));
-    g.setColor(new Color(82, 84, 90));
+    g.setColor(Style.COLOR_BORDER);
     g.fillRect((int) (getWidth() * 0.38), (int) (getHeight() * 0.18), (int) (getWidth() * 0.24), (int) (getHeight() * 0.48));
   }
 }
