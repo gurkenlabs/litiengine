@@ -49,14 +49,10 @@ public class MapPopupMenu extends JPopupMenu {
     JMenuItem del2 = new JMenuItem(Resources.strings().get("menu_map_delete"));
     del2.addActionListener(a -> Editor.instance().getMapComponent().deleteMap());
 
-    JMenuItem mapProps = new JMenuItem(Resources.strings().get("menu_map_properties"));
-    mapProps.addActionListener(a -> MapMenu.handleMapPropertiesChanges());
     this.add(exp);
     this.add(del2);
     this.addSeparator();
     this.add(saveMapSnapshot);
     this.add(reassignIDs);
-    this.addSeparator();
-    this.add(mapProps);
   }
 }

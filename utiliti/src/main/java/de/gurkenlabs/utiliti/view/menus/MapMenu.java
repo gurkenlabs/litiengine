@@ -55,9 +55,6 @@ public final class MapMenu extends JMenu {
     JMenuItem del2 = new JMenuItem(Resources.strings().get("menu_map_delete"));
     del2.addActionListener(a -> Editor.instance().getMapComponent().deleteMap());
 
-    JMenuItem mapProps = new JMenuItem(Resources.strings().get("menu_map_properties"));
-    mapProps.addActionListener(a -> MapMenu.handleMapPropertiesChanges());
-
     JCheckBoxMenuItem sync = new JCheckBoxMenuItem(Resources.strings().get("menu_map_syncMaps"));
     sync.setState(Editor.preferences().syncMaps());
     sync.addItemListener(e -> Editor.preferences().setSyncMaps(sync.getState()));
@@ -69,19 +66,8 @@ public final class MapMenu extends JMenu {
     this.add(saveMapSnapshot);
     this.add(sync);
     this.add(reassignIDs);
-    this.addSeparator();
-    this.add(mapProps);
 
     this.setEnabled(false);
     Editor.instance().onLoaded(() -> this.setEnabled(Editor.instance().getProjectPath() != null));
-  }
-
-  static void handleMapPropertiesChanges() {
-    if (Editor.instance().getMapComponent().getMaps() == null
-        || Editor.instance().getMapComponent().getMaps().isEmpty()) {
-      return;
-    }
-
-    UI.showMapProperties();
   }
 }
