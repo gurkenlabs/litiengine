@@ -186,10 +186,42 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
       @Override
       public void mouseClicked(MouseEvent e) {
         int selRow = tree.getRowForLocation(e.getX(), e.getY());
-        if (selRow != -1 && e.getClickCount() == 2) {
+        if (selRow == -1) {
+          return;
+        }
+
+        TreePath path = tree.getPathForRow(selRow);
+        if (path == null) {
+          return;
+        }
+        Object last = path.getLastPathComponent();
+        if (!(last instanceof DefaultMutableTreeNode dmtn)) {
+          return;
+        }
+        if (!(dmtn.getUserObject() instanceof SceneNode node)) {
+          return;
+        }
+
+        if (e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON1 && node.isLayer()) {
+          // calculate the icon area: tree indentation + visibility icon width
+          Rectangle cellBounds = tree.getRowBounds(selRow);
+          if (cellBounds != null) {
+            int indent = cellBounds.x;
+            int iconEnd = indent + 20;
+            if (e.getX() >= indent && e.getX() < iconEnd) {
+              node.getLayer().setVisible(!node.getLayer().isVisible());
+              UndoManager.instance().recordChanges();
+              refresh();
+              fireLayerChanged();
+              return;
+            }
+          }
+        }
+
+        if (e.getClickCount() == 2) {
           Editor.instance().getMapComponent().centerCameraOnFocus();
         }
-        if (selRow != -1 && e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON3) {
+        if (e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON3) {
           showContextMenu(e);
         }
       }
@@ -394,7 +426,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
 
   private static Icon getLayerIcon(ILayer layer) {
     if (layer instanceof ITileLayer) {
-      return Icons.SPRITESHEET_16;
+      return Icons.TILESET_16;
     } else if (layer instanceof IImageLayer) {
       return Icons.ASSET_16;
     } else if (layer instanceof IGroupLayer) {
@@ -514,7 +546,13 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     addContextMenuItem(popup, "Duplicate Layer", Icons.COPY_24, () -> duplicateLayer(node));
     addContextMenuItem(popup, "Rename Layer", Icons.RENAME_24, () -> renameLayer(node));
     addContextMenuItem(popup, "Set Color", Icons.COLOR_24, () -> setLayerColor(node));
+    popup.addSeparator();
+    String toggleLabel = node.isVisible() ? "Hide Layer" : "Show Layer";
+    Icon toggleIcon = node.isVisible() ? Icons.HIDE_24 : Icons.SHOW_24;
+    addContextMenuItem(popup, toggleLabel, toggleIcon, () -> toggleLayerVisibility(node));
+    addContextMenuItem(popup, "Show All Layers", Icons.SHOW_24, () -> showAllLayers());
     addContextMenuItem(popup, "Hide Other Layers", Icons.HIDEOTHER_24, () -> hideOtherLayers(node));
+    popup.addSeparator();
     addContextMenuItem(popup, "Move Up", Icons.LIFT_24, () -> moveLayerUp(node));
     addContextMenuItem(popup, "Move Down", Icons.LOWER_24, () -> moveLayerDown(node));
 
@@ -635,6 +673,29 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
       }
     }
     Transform.updateAnchors();
+    refresh();
+    UndoManager.instance().recordChanges();
+    fireLayerChanged();
+  }
+
+  private void toggleLayerVisibility(SceneNode node) {
+    if (node.getLayer() == null) {
+      return;
+    }
+    node.getLayer().setVisible(!node.getLayer().isVisible());
+    refresh();
+    UndoManager.instance().recordChanges();
+    fireLayerChanged();
+  }
+
+  private void showAllLayers() {
+    IMap map = getCurrentMap();
+    if (map == null) {
+      return;
+    }
+    for (ILayer renderLayer : map.getRenderLayers()) {
+      renderLayer.setVisible(true);
+    }
     refresh();
     UndoManager.instance().recordChanges();
     fireLayerChanged();

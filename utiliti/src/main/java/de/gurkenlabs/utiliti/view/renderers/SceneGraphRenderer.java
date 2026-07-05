@@ -140,7 +140,7 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
 
   private static Icon getLayerIcon(ILayer layer) {
     if (layer instanceof de.gurkenlabs.litiengine.environment.tilemap.ITileLayer) {
-      return Icons.SPRITESHEET_16;
+      return Icons.TILESET_16;
     } else if (layer instanceof de.gurkenlabs.litiengine.environment.tilemap.IImageLayer) {
       return Icons.ASSET_16;
     } else if (layer instanceof de.gurkenlabs.litiengine.environment.tilemap.IGroupLayer) {
