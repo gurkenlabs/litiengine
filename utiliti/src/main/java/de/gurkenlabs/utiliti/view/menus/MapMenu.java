@@ -1,11 +1,7 @@
 package de.gurkenlabs.utiliti.view.menus;
 
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.Editor;
-import de.gurkenlabs.utiliti.controller.UndoManager;
-import de.gurkenlabs.utiliti.view.components.MapPropertyPanel;
 import de.gurkenlabs.utiliti.view.components.UI;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -86,24 +82,6 @@ public final class MapMenu extends JMenu {
       return;
     }
 
-    MapPropertyPanel panel = new MapPropertyPanel();
-    panel.bind(Game.world().environment().getMap());
-
-    int option =
-        JOptionPane.showConfirmDialog(
-            Game.window().getRenderComponent(),
-            panel,
-            Resources.strings().get("menu_map_properties"),
-            JOptionPane.OK_CANCEL_OPTION,
-            JOptionPane.PLAIN_MESSAGE);
-
-    if (option == JOptionPane.OK_OPTION) {
-      panel.saveChanges();
-      if (Game.world().environment().getMap().hasCustomProperty(MapProperty.AMBIENTCOLOR)) {
-        Game.world().environment().getAmbientLight().setColor(Game.world().environment().getMap().getColorValue(MapProperty.AMBIENTCOLOR));
-      }
-
-      UndoManager.instance().recordChanges();
-    }
+    UI.showMapProperties();
   }
 }

@@ -1,12 +1,16 @@
 package de.gurkenlabs.utiliti.view.components;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.ControlBehavior;
+import de.gurkenlabs.utiliti.controller.UndoManager;
 import de.gurkenlabs.utiliti.model.Style;
 import java.awt.Dimension;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +45,7 @@ public class MapPropertyPanel extends JPanel {
   private JTable tableCustomProperties;
 
   private final JTextField textFieldTitle;
+  private boolean binding;
 
   public MapPropertyPanel() {
     this.setSize(new Dimension(330, 650));
@@ -50,7 +55,11 @@ public class MapPropertyPanel extends JPanel {
     this.scrollPane = new JScrollPane();
 
     final JButton buttonAdd = new JButton("+");
-    buttonAdd.addActionListener(a -> this.model.addRow(new Object[] {"", ""}));
+    buttonAdd.addActionListener(
+        a -> {
+          this.model.addRow(new Object[] {"", ""});
+          this.saveChanges();
+        });
 
     final JButton buttonRemove = new JButton("-");
     buttonRemove.addActionListener(
@@ -59,11 +68,15 @@ public class MapPropertyPanel extends JPanel {
           for (int i = 0; i < rows.length; i++) {
             this.model.removeRow(rows[i] - i);
           }
+          this.saveChanges();
         });
     this.ambientlightPreview = new AmbientLightPreviewPanel();
     this.ambientColorComponent = new ColorComponent();
     this.ambientColorComponent.addActionListener(
-        a -> this.ambientlightPreview.setAmbientColor(this.ambientColorComponent.getColor()));
+        a -> {
+          this.ambientlightPreview.setAmbientColor(this.ambientColorComponent.getColor());
+          this.saveChanges();
+        });
 
     this.tableCustomProperties = new JTable();
     this.tableCustomProperties.getTableHeader().setReorderingAllowed(false);
@@ -111,7 +124,10 @@ public class MapPropertyPanel extends JPanel {
     lblCustomProperties.setFont(Style.getDefaultFont());
     this.shadowColorComponent = new ColorComponent();
     this.shadowColorComponent.addActionListener(
-        a -> this.ambientlightPreview.setStaticShadowColor(this.shadowColorComponent.getColor()));
+        a -> {
+          this.ambientlightPreview.setStaticShadowColor(this.shadowColorComponent.getColor());
+          this.saveChanges();
+        });
 
     JScrollPane scrollPaneDesc = new JScrollPane();
 
@@ -359,6 +375,24 @@ public class MapPropertyPanel extends JPanel {
     this.ambientlightPreview.setLayout(null);
 
     this.setLayout(groupLayout);
+    this.setupChangeListeners();
+  }
+
+  private void setupChangeListeners() {
+    FocusAdapter saveOnFocusLost =
+        new FocusAdapter() {
+          @Override
+          public void focusLost(FocusEvent e) {
+            saveChanges();
+          }
+        };
+    this.textFieldName.addFocusListener(saveOnFocusLost);
+    this.textFieldTitle.addFocusListener(saveOnFocusLost);
+    this.textFieldDesc.addFocusListener(saveOnFocusLost);
+    this.textFieldName.addActionListener(e -> saveChanges());
+    this.textFieldTitle.addActionListener(e -> saveChanges());
+    this.spinnerGravity.addChangeListener(e -> saveChanges());
+    this.model.addTableModelListener(e -> saveChanges());
   }
 
   public void bind(final IMap map) {
@@ -371,7 +405,7 @@ public class MapPropertyPanel extends JPanel {
   }
 
   public void saveChanges() {
-    if (this.dataSource == null) {
+    if (this.binding || this.dataSource == null) {
       return;
     }
 
@@ -395,30 +429,40 @@ public class MapPropertyPanel extends JPanel {
         .getProperties()
         .keySet()
         .removeIf(p -> !setProperties.contains(p) && MapProperty.isCustom(p));
+    if (Game.world().environment() != null && Game.world().environment().getAmbientLight() != null) {
+      Game.world().environment().getAmbientLight().setColor(this.ambientColorComponent.getColor());
+    }
+    UndoManager.instance().recordChanges();
   }
 
   private void setControlValues(final IMap map) {
-    this.textFieldDesc.setText(map.getStringValue(MapProperty.MAP_DESCRIPTION, null));
-    this.textFieldTitle.setText(map.getStringValue(MapProperty.MAP_TITLE, null));
-    this.textFieldName.setText(map.getName());
-    if (map.hasCustomProperty(MapProperty.AMBIENTCOLOR)) {
-      this.ambientColorComponent.setColor(map.getColorValue(MapProperty.AMBIENTCOLOR));
-    }
-    if (map.hasCustomProperty(MapProperty.SHADOWCOLOR)) {
-      this.shadowColorComponent.setColor(map.getColorValue(MapProperty.SHADOWCOLOR));
-    }
-
-    this.spinnerGravity.setValue(map.getIntValue(MapProperty.GRAVITY, 0));
-
-    for (Map.Entry<String, ICustomProperty> prop : map.getProperties().entrySet()) {
-      if (prop.getKey().equals(MapProperty.AMBIENTCOLOR)
-          || prop.getKey().equals(MapProperty.GRAVITY)
-          || prop.getKey().equals(MapProperty.MAP_DESCRIPTION)
-          || prop.getKey().equals(MapProperty.MAP_TITLE)
-          || prop.getKey().equals(MapProperty.SHADOWCOLOR)) {
-        continue;
+    this.binding = true;
+    try {
+      this.model.setRowCount(0);
+      this.textFieldDesc.setText(map.getStringValue(MapProperty.MAP_DESCRIPTION, null));
+      this.textFieldTitle.setText(map.getStringValue(MapProperty.MAP_TITLE, null));
+      this.textFieldName.setText(map.getName());
+      if (map.hasCustomProperty(MapProperty.AMBIENTCOLOR)) {
+        this.ambientColorComponent.setColor(map.getColorValue(MapProperty.AMBIENTCOLOR));
       }
-      this.model.addRow(new Object[] {prop.getKey(), prop.getValue().getAsString()});
+      if (map.hasCustomProperty(MapProperty.SHADOWCOLOR)) {
+        this.shadowColorComponent.setColor(map.getColorValue(MapProperty.SHADOWCOLOR));
+      }
+
+      this.spinnerGravity.setValue(map.getIntValue(MapProperty.GRAVITY, 0));
+
+      for (Map.Entry<String, ICustomProperty> prop : map.getProperties().entrySet()) {
+        if (prop.getKey().equals(MapProperty.AMBIENTCOLOR)
+            || prop.getKey().equals(MapProperty.GRAVITY)
+            || prop.getKey().equals(MapProperty.MAP_DESCRIPTION)
+            || prop.getKey().equals(MapProperty.MAP_TITLE)
+            || prop.getKey().equals(MapProperty.SHADOWCOLOR)) {
+          continue;
+        }
+        this.model.addRow(new Object[] {prop.getKey(), prop.getValue().getAsString()});
+      }
+    } finally {
+      this.binding = false;
     }
   }
 }

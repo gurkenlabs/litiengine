@@ -28,9 +28,9 @@ import de.gurkenlabs.utiliti.model.Style;
 import de.gurkenlabs.utiliti.model.Style.Theme;
 import de.gurkenlabs.utiliti.view.menus.CanvasPopupMenu;
 import de.gurkenlabs.utiliti.view.menus.MainMenuBar;
-import de.gurkenlabs.utiliti.model.Style;
 import java.awt.BorderLayout;
 import java.awt.Canvas;
+import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -64,6 +64,9 @@ public final class UI {
   private static AssetList assetComponent;
 
   private static MapObjectInspector mapObjectPanel;
+  private static MapPropertyPanel mapPropertyPanel;
+  private static JPanel inspectorHost;
+  private static CardLayout inspectorCards;
   private static MapList mapSelectionPanel;
   private static LayerList mapLayerList;
   private static EntityList entityList;
@@ -144,6 +147,25 @@ public final class UI {
     return mapObjectPanel;
   }
 
+  public static void showObjectInspector() {
+    if (inspectorCards != null && inspectorHost != null) {
+      inspectorCards.show(inspectorHost, "objects");
+    }
+  }
+
+  public static void showMapProperties() {
+    if (mapPropertyPanel == null) {
+      return;
+    }
+
+    if (Game.world().environment() != null && Game.world().environment().getMap() != null) {
+      mapPropertyPanel.bind(Game.world().environment().getMap());
+    }
+    if (inspectorCards != null && inspectorHost != null) {
+      inspectorCards.show(inspectorHost, "map");
+    }
+  }
+
   public static LayerController getLayerController() {
     return mapLayerList;
   }
@@ -218,9 +240,16 @@ public final class UI {
 
     mapObjectPanel = new MapObjectInspector();
     mapObjectPanel.setMinimumSize(new Dimension(INSPECTOR_MIN_WIDTH, 0));
+    mapPropertyPanel = new MapPropertyPanel();
+    mapPropertyPanel.setMinimumSize(new Dimension(INSPECTOR_MIN_WIDTH, 0));
+    inspectorCards = new CardLayout();
+    inspectorHost = new JPanel(inspectorCards);
+    inspectorHost.add(mapObjectPanel, "objects");
+    inspectorHost.add(mapPropertyPanel, "map");
+    inspectorHost.setMinimumSize(new Dimension(INSPECTOR_MIN_WIDTH, 0));
 
     int prefInspectorW = Math.max(INSPECTOR_MIN_WIDTH, (int) (winW * 0.20));
-    JSplitPane centerRightSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, renderSplitPanel, mapObjectPanel);
+    JSplitPane centerRightSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, renderSplitPanel, inspectorHost);
     centerRightSplit.setContinuousLayout(true);
     centerRightSplit.setResizeWeight(1.0);
     centerRightSplit.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY,

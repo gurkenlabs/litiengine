@@ -325,7 +325,13 @@ public class MapComponent extends GuiComponent {
       Game.world().loadEnvironment(this.environments.get(map.getName()));
 
       UI.getMapController().setSelection(map);
-      UI.getInspector().bind(getFocusedMapObject());
+      IMapObject focused = getFocusedMapObject();
+      UI.getInspector().bind(focused);
+      if (focused == null) {
+        UI.showMapProperties();
+      } else {
+        UI.showObjectInspector();
+      }
 
       for (Consumer<TmxMap> cons : this.loadedConsumer) {
         cons.accept(map);
@@ -720,6 +726,11 @@ public class MapComponent extends GuiComponent {
       }
 
       UI.getInspector().bind(mapObject);
+      if (mapObject == null) {
+        UI.showMapProperties();
+      } else {
+        UI.showObjectInspector();
+      }
       UI.getEntityController().select(mapObject);
       if (mapObject == null) {
         this.focusedObjects.remove(Game.world().environment().getMap().getName());
