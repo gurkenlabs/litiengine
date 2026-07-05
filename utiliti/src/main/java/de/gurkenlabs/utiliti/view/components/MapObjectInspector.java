@@ -87,6 +87,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
     this.renderType = new JComboBox<>(RenderType.values());
     this.renderType.setMinimumSize(SMALL_CONTROL_SIZE);
+    ControlBehavior.apply(this.renderType);
 
     this.tagPanel = new TagPanel();
 
