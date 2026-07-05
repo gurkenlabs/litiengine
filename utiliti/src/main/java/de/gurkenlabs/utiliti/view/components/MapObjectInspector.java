@@ -186,11 +186,11 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
         new ExpandableCard(
             Resources.strings().get("panel_customProperties"), this.customPanel, true);
 
-    typeCard.setContentInsets(8, 0, 12, 0);
-    collisionCard.setContentInsets(8, 0, 12, 0);
-    combatCard.setContentInsets(8, 0, 12, 0);
-    movementCard.setContentInsets(8, 0, 12, 0);
-    customCard.setContentInsets(8, 0, 12, 0);
+    typeCard.setContentInsets(8, 0, 8, 0);
+    collisionCard.setContentInsets(8, 0, 8, 0);
+    combatCard.setContentInsets(8, 0, 8, 0);
+    movementCard.setContentInsets(8, 0, 8, 0);
+    customCard.setContentInsets(8, 0, 8, 0);
 
     typeCard.setVisible(false);
     collisionCard.setVisible(false);
@@ -201,10 +201,8 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     accordion.add(typeCard);
     accordion.add(collisionCard);
     accordion.add(combatCard);
-    accordion.add(Box.createVerticalStrut(12));
     accordion.add(movementCard);
     accordion.add(customCard);
-    accordion.add(Box.createVerticalGlue());
 
     JScrollPane scrollPane = new JScrollPane(accordion);
     scrollPane.setBorder(null);

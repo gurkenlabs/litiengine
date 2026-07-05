@@ -41,7 +41,7 @@ public class ExpandableCard extends JPanel {
     this.expanded = startExpanded;
     setLayout(new BorderLayout());
     setOpaque(false);
-    setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
+    setBorder(BorderFactory.createEmptyBorder(0, 0, 4, 0));
 
     this.headerPanel = new JPanel(new BorderLayout()) {
       @Override

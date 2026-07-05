@@ -127,14 +127,13 @@ public class MapPropertyPanel extends JPanel {
     ExpandableCard propertiesCard =
         new ExpandableCard(Resources.strings().get("panel_customProperties"), createPropertiesPanel(buttonAdd, buttonRemove), true);
 
-    generalCard.setContentInsets(8, 0, 12, 0);
-    lightingCard.setContentInsets(8, 0, 12, 0);
-    propertiesCard.setContentInsets(8, 0, 12, 0);
+    generalCard.setContentInsets(8, 0, 8, 0);
+    lightingCard.setContentInsets(8, 0, 8, 0);
+    propertiesCard.setContentInsets(8, 0, 8, 0);
 
     accordion.add(generalCard);
     accordion.add(lightingCard);
     accordion.add(propertiesCard);
-    accordion.add(Box.createVerticalGlue());
 
     JScrollPane hostScrollPane = new JScrollPane(accordion);
     hostScrollPane.setBorder(null);
