@@ -54,7 +54,9 @@ public final class Style {
   public static final Color COLOR_SHADOW_BORDER = COLOR_BORDER;
   public static final Color COLOR_MOUSE_SELECTION_AREA_FILL = new Color(42, 195, 222, 50);
   public static final Color COLOR_MOUSE_SELECTION_AREA_BORDER = new Color(42, 195, 222, 120);
-  public static final Color COLOR_DEFAULT_TAG = COLOR_COMMENT;
+  public static final Color COLOR_DEFAULT_TAG = new Color(55, 65, 100);
+  public static final Color COLOR_TAG_BORDER = new Color(80, 90, 130);
+  public static final Color COLOR_TAG_HOVER = new Color(65, 75, 115);
   public static final Color COLOR_STATUS = Color.WHITE;
 
   public static final float FONT_DEFAULT_SIZE = 12;

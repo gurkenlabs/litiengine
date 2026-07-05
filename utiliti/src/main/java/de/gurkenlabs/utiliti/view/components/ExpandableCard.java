@@ -20,10 +20,10 @@ import javax.swing.JPanel;
 
 public class ExpandableCard extends JPanel {
   private static final int ARC = 6;
-  private static final Color CARD_BG = new Color(30, 31, 34);
-  private static final Color HEADER_BG = new Color(30, 30, 34);
-  private static final Color HEADER_BORDER = new Color(55, 55, 64);
-  private static final Color CHEVRON_COLOR = new Color(160, 160, 180);
+  private static final Color CARD_BG = Style.COLOR_SURFACE;
+  private static final Color HEADER_BG = Style.COLOR_SURFACE;
+  private static final Color HEADER_BORDER = Style.COLOR_BORDER;
+  private static final Color CHEVRON_COLOR = Style.COLOR_SUBTEXT;
   private static final Icon CHEVRON_EXPANDED = new ChevronIcon(true);
   private static final Icon CHEVRON_COLLAPSED = new ChevronIcon(false);
 
@@ -67,7 +67,7 @@ public class ExpandableCard extends JPanel {
     this.arrowLabel = new JLabel(expanded ? CHEVRON_EXPANDED : CHEVRON_COLLAPSED);
 
     this.titleLabel = new JLabel(title);
-    titleLabel.setForeground(new Color(200, 200, 215));
+    titleLabel.setForeground(Style.COLOR_TEXT);
     titleLabel.setFont(titleLabel.getFont().deriveFont(11f));
     titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 0));
 

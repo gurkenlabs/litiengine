@@ -69,8 +69,11 @@ public class MapPropertyPanel extends JPanel {
     this.textFieldName = ControlBehavior.apply(new JTextField());
     this.textFieldTitle = ControlBehavior.apply(new JTextField());
     this.textFieldDesc = new JEditorPane();
+    this.textFieldDesc.setBackground(Style.COLOR_SURFACE2);
+    this.textFieldDesc.setForeground(Style.COLOR_TEXT);
     JScrollPane scrollPaneDesc = new JScrollPane(this.textFieldDesc);
-    scrollPaneDesc.setBorder(BorderFactory.createLineBorder(Style.COLOR_BORDER));
+    scrollPaneDesc.setBorder(new RoundedBorder(Style.COLOR_BORDER, 8, 1));
+    scrollPaneDesc.getViewport().setBackground(Style.COLOR_SURFACE2);
 
     this.spinnerGravity = new JSpinner(new SpinnerNumberModel(0, Integer.MIN_VALUE, Integer.MAX_VALUE, 1));
     ControlBehavior.apply(this.spinnerGravity);
