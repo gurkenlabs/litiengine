@@ -23,16 +23,22 @@ import javax.swing.SpinnerNumberModel;
 
 public class ColorComponent extends JPanel {
   private final JButton btnSelectColor;
+  private final JButton btnClearColor;
   private final JTextField textFieldColor;
   private final JSpinner spinnerAlpha;
+  private final Color clearColor;
 
   private final transient List<ActionListener> listeners;
-  private static final String DEFAULT_COLOR = "#FFFFFFFF";
 
   public ColorComponent() {
+    this(Color.WHITE);
+  }
+
+  public ColorComponent(Color clearColor) {
+    this.clearColor = clearColor;
     int height = (PropertyPanel.CONTROL_HEIGHT + PropertyPanel.CONTROL_MARGIN) * 2;
-    this.setSize(200, height);
-    this.setPreferredSize(new Dimension(200, height));
+    this.setSize(PropertyPanel.CONTROL_WIDTH, height);
+    this.setPreferredSize(new Dimension(PropertyPanel.CONTROL_WIDTH, height));
     this.listeners = new ArrayList<>();
     this.textFieldColor = ControlBehavior.apply(new JTextField());
     this.textFieldColor.setEditable(true);
@@ -47,6 +53,10 @@ public class ColorComponent extends JPanel {
               JColorChooser.showDialog(null, Resources.strings().get("panel_selectAmbientColor"), this.getColor());
           this.setColor(result);
         });
+
+    this.btnClearColor = new JButton(Icons.DELETE_16);
+    this.btnClearColor.setToolTipText("Clear color");
+    this.btnClearColor.addActionListener(a -> this.clear());
 
     final JLabel lblAlpha = new JLabel(Resources.strings().get("panel_alpha"));
 
@@ -84,7 +94,13 @@ public class ColorComponent extends JPanel {
                         GroupLayout.PREFERRED_SIZE,
                         GroupLayout.PREFERRED_SIZE)
                     .addPreferredGap(ComponentPlacement.RELATED)
-                    .addComponent(textFieldColor, GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE))
+                    .addComponent(
+                        btnClearColor,
+                        PropertyPanel.CONTROL_HEIGHT,
+                        GroupLayout.PREFERRED_SIZE,
+                        GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(ComponentPlacement.RELATED)
+                    .addComponent(textFieldColor, GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE))
             .addGroup(
                 groupLayout
                     .createSequentialGroup()
@@ -102,6 +118,11 @@ public class ColorComponent extends JPanel {
                             .createParallelGroup(Alignment.BASELINE)
                             .addComponent(
                                 btnSelectColor,
+                                PropertyPanel.CONTROL_HEIGHT,
+                                GroupLayout.PREFERRED_SIZE,
+                                GroupLayout.PREFERRED_SIZE)
+                            .addComponent(
+                                btnClearColor,
                                 PropertyPanel.CONTROL_HEIGHT,
                                 GroupLayout.PREFERRED_SIZE,
                                 GroupLayout.PREFERRED_SIZE)
@@ -155,6 +176,6 @@ public class ColorComponent extends JPanel {
   }
 
   public void clear() {
-    this.textFieldColor.setText(DEFAULT_COLOR);
+    this.setColor(this.clearColor);
   }
 }

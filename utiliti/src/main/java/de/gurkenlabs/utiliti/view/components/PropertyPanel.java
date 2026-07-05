@@ -71,7 +71,7 @@ public abstract class PropertyPanel extends JPanel {
   /**
    * The width of the control in pixels, scaled by the UI scale factor.
    */
-  public static final int CONTROL_WIDTH = (int) (160 * Editor.preferences().getUiScale());
+  public static final int CONTROL_WIDTH = (int) (220 * Editor.preferences().getUiScale());
 
   /**
    * The width of the spinner in pixels, scaled by the UI scale factor.

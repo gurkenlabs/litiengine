@@ -7,6 +7,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.model.Icons;
 import java.awt.LayoutManager;
+import java.awt.Color;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -22,7 +23,7 @@ public class LightSourcePanel extends PropertyPanel {
   public LightSourcePanel() {
     super("panel_lightSource", Icons.BULB_24);
 
-    this.colorControl = new ColorComponent();
+    this.colorControl = new ColorComponent(Color.WHITE);
 
     this.comboBoxLightShape = new JComboBox<>();
     this.comboBoxLightShape.setModel(
