@@ -18,7 +18,7 @@ public class CombatPanel extends PropertyPanel {
   public CombatPanel() {
     super("panel_combatEntity");
 
-    this.spinnerHitpoints = new JSpinner(new SpinnerNumberModel(100, 0, 100, 1));
+    this.spinnerHitpoints = new JSpinner(new SpinnerNumberModel(100, 0, null, 1));
     this.spinnerTeam = new JSpinner(new SpinnerNumberModel(1, 0, Integer.MAX_VALUE, 1));
     this.chckbxIndestructible = new JCheckBox(Resources.strings().get("panel_indestructible"));
 
@@ -46,6 +46,10 @@ public class CombatPanel extends PropertyPanel {
     this.setup(this.chckbxIndestructible, MapObjectProperty.COMBAT_INDESTRUCTIBLE);
     this.setup(this.spinnerHitpoints, MapObjectProperty.COMBAT_HITPOINTS);
     this.setup(this.spinnerTeam, MapObjectProperty.COMBAT_TEAM);
+  }
+
+  SpinnerNumberModel getHitpointsModel() {
+    return (SpinnerNumberModel) this.spinnerHitpoints.getModel();
   }
 
   private LayoutManager createLayout() {
