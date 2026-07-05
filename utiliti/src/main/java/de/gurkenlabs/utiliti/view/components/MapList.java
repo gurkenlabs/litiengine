@@ -98,11 +98,11 @@ public class MapList extends JScrollPane implements MapController {
 
   @Override
   public synchronized void bind(List<TmxMap> maps, boolean clear) {
+    IMap selectedMap = list.getSelectedValue();
     if (clear) {
       this.model.clear();
-      list.setSelectedIndex(0);
+      selectedMap = null;
     }
-    int selectedIndex = list.getSelectedIndex();
     for (TmxMap map : maps) {
       if (!this.model.contains(map)) {
         this.model.addElement(map);
@@ -118,7 +118,13 @@ public class MapList extends JScrollPane implements MapController {
     }
 
     list.setModel(this.model);
-    list.setSelectedIndex(selectedIndex);
+    if (this.model.isEmpty()) {
+      list.clearSelection();
+    } else if (selectedMap != null && this.model.contains(selectedMap)) {
+      list.setSelectedValue(selectedMap, true);
+    } else {
+      list.setSelectedIndex(0);
+    }
 
     this.refresh();
   }
