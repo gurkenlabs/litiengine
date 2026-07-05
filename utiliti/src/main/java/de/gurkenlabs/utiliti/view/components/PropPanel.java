@@ -9,6 +9,7 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.SpriteVariantSelector;
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.view.renderers.LabelListCellRenderer;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.LayoutManager;
 import java.util.Map;
@@ -130,6 +131,13 @@ public class PropPanel extends PropertyPanel {
     this.propsLoaded = true;
   }
 
+  private static JPanel wrapCheckbox(JCheckBox cb) {
+    JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+    p.setOpaque(false);
+    p.add(cb);
+    return p;
+  }
+
   private LayoutManager createLayout() {
     LayoutItem[] layoutItems =
       new LayoutItem[] {
@@ -138,12 +146,12 @@ public class PropPanel extends PropertyPanel {
         new LayoutItem("panel_rotation", this.comboBoxRotation),
       };
 
-    JPanel checkboxGrid = new JPanel(new GridLayout(2, 2, 4, 4));
+    JPanel checkboxGrid = new JPanel(new GridLayout(2, 2, 2, 0));
     checkboxGrid.setOpaque(false);
-    checkboxGrid.add(checkBoxScale);
-    checkboxGrid.add(chckbxShadow);
-    checkboxGrid.add(checkBoxHorizontalFlip);
-    checkboxGrid.add(checkBoxVerticalFlip);
+    checkboxGrid.add(wrapCheckbox(checkBoxScale));
+    checkboxGrid.add(wrapCheckbox(chckbxShadow));
+    checkboxGrid.add(wrapCheckbox(checkBoxHorizontalFlip));
+    checkboxGrid.add(wrapCheckbox(checkBoxVerticalFlip));
 
     return this.createLayout(layoutItems, checkboxGrid);
   }

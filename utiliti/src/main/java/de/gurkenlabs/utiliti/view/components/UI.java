@@ -57,6 +57,8 @@ import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
 
 public final class UI {
+  private static final int INSPECTOR_MIN_WIDTH = 420;
+
   private static final List<JComponent> orphanComponents = new CopyOnWriteArrayList<>();
   private static JPopupMenu canvasPopup;
   private static AssetList assetComponent;
@@ -215,16 +217,17 @@ public final class UI {
     Component renderSplitPanel = initRenderSplitPanel(renderPanel, winH);
 
     mapObjectPanel = new MapObjectInspector();
-    mapObjectPanel.setMinimumSize(new Dimension(260, 0));
+    mapObjectPanel.setMinimumSize(new Dimension(INSPECTOR_MIN_WIDTH, 0));
 
-    int prefInspectorW = Math.max(280, (int) (winW * 0.20));
+    int prefInspectorW = Math.max(INSPECTOR_MIN_WIDTH, (int) (winW * 0.20));
     JSplitPane centerRightSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, renderSplitPanel, mapObjectPanel);
     centerRightSplit.setContinuousLayout(true);
     centerRightSplit.setResizeWeight(1.0);
     centerRightSplit.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY,
         evt -> Editor.preferences().setSelectionEditSplitter(centerRightSplit.getDividerLocation()));
     if (Editor.preferences().getSelectionEditSplitter() != 0) {
-      centerRightSplit.setDividerLocation(Editor.preferences().getSelectionEditSplitter());
+      centerRightSplit.setDividerLocation(
+          Math.max(0, Math.min(Editor.preferences().getSelectionEditSplitter(), winW - INSPECTOR_MIN_WIDTH)));
     } else {
       centerRightSplit.setDividerLocation(winW - prefInspectorW);
     }
@@ -427,16 +430,17 @@ public final class UI {
     // Panels - borderless design with subtle contrast
     UIManager.put("Panel.background", Style.COLOR_BG);
     UIManager.put("Panel.foreground", Style.COLOR_TEXT);
-    UIManager.put("TextField.background", Style.COLOR_SURFACE2);
+    Color INPUT_BG = new Color(48, 49, 55);
+    UIManager.put("TextField.background", INPUT_BG);
     UIManager.put("TextField.foreground", Style.COLOR_TEXT);
     UIManager.put("TextField.caretForeground", Style.COLOR_ACCENT_BLUE);
-    UIManager.put("TextArea.background", Style.COLOR_SURFACE2);
+    UIManager.put("TextArea.background", INPUT_BG);
     UIManager.put("TextArea.foreground", Style.COLOR_TEXT);
-    UIManager.put("FormattedTextField.background", Style.COLOR_SURFACE2);
+    UIManager.put("FormattedTextField.background", INPUT_BG);
     UIManager.put("FormattedTextField.foreground", Style.COLOR_TEXT);
-    UIManager.put("PasswordField.background", Style.COLOR_SURFACE2);
+    UIManager.put("PasswordField.background", INPUT_BG);
     UIManager.put("PasswordField.foreground", Style.COLOR_TEXT);
-    UIManager.put("ComboBox.background", Style.COLOR_SURFACE2);
+    UIManager.put("ComboBox.background", INPUT_BG);
     UIManager.put("ComboBox.foreground", Style.COLOR_TEXT);
     UIManager.put("ComboBox.selectionBackground", Style.COLOR_SELECTION_INACTIVE);
     UIManager.put("ComboBox.selectionForeground", Style.COLOR_TEXT);
@@ -501,7 +505,7 @@ public final class UI {
 
     // Misc
     UIManager.put("Separator.foreground", Style.COLOR_BORDER);
-    UIManager.put("Spinner.background", Style.COLOR_SURFACE2);
+    UIManager.put("Spinner.background", INPUT_BG);
     UIManager.put("Spinner.foreground", Style.COLOR_TEXT);
     UIManager.put("Slider.background", Style.COLOR_BG);
     UIManager.put("Slider.foreground", Style.COLOR_ACCENT_BLUE);

@@ -2,17 +2,18 @@ package de.gurkenlabs.utiliti.view.components;
 
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.Style;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Insets;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class Tag extends JPanel {
-  private static final int CHIP_HEIGHT = 24;
+  static final int CHIP_HEIGHT = 24;
 
   private final JLabel lblText;
   private final JButton btnDelete;
@@ -23,28 +24,16 @@ public class Tag extends JPanel {
   }
 
   public Tag() {
-    setBorder(null);
-    setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
-    setOpaque(false);
-
-    JPanel chip = new JPanel() {
-      @Override
-      public Dimension getPreferredSize() {
-        Dimension d = super.getPreferredSize();
-        d.height = CHIP_HEIGHT;
-        return d;
-      }
-    };
-    chip.setBackground(Style.COLOR_DEFAULT_TAG);
-    chip.setLayout(new FlowLayout(FlowLayout.LEFT, 2, 0));
-    chip.setOpaque(true);
-    add(chip);
+    setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 4));
+    setLayout(new BorderLayout(3, 0));
+    setBackground(Style.COLOR_DEFAULT_TAG);
+    setOpaque(true);
 
     this.lblText = new JLabel("New label");
     this.lblText.setForeground(Color.WHITE);
     this.lblText.setFont(
       this.lblText.getFont().deriveFont(Style.getDefaultFont().getSize() * 0.75f));
-    chip.add(this.lblText);
+    add(this.lblText, BorderLayout.CENTER);
 
     this.btnDelete = new JButton();
     this.btnDelete.addActionListener(
@@ -60,7 +49,14 @@ public class Tag extends JPanel {
     this.btnDelete.setBorder(null);
     this.btnDelete.setPreferredSize(new Dimension(12, 12));
     this.btnDelete.setIcon(Icons.DELETE_8);
-    chip.add(this.btnDelete);
+    add(this.btnDelete, BorderLayout.EAST);
+  }
+
+  @Override
+  public Dimension getPreferredSize() {
+    Dimension d = super.getPreferredSize();
+    d.height = CHIP_HEIGHT;
+    return d;
   }
 
   @Override

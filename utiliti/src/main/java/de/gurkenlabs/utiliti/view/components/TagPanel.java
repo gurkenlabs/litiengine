@@ -23,24 +23,28 @@ import javax.swing.JTextField;
 
 public class TagPanel extends JPanel {
   private static final int MAX_TAG_LENGTH = 15;
+  private static final int INLINE_INPUT_WIDTH = 120;
+  private static final int INLINE_INPUT_COLLAPSED_WIDTH = 18;
   private final JTextField textFieldInput;
 
   public TagPanel() {
-    setBackground(new Color(40, 40, 46));
+    setBackground(new Color(48, 49, 55));
     setBorder(BorderFactory.createCompoundBorder(
         BorderFactory.createLineBorder(new Color(55, 55, 64)),
-        BorderFactory.createEmptyBorder(2, 4, 2, 4)));
-    WrapLayout wrapLayout = new WrapLayout(FlowLayout.LEADING, 2, 2);
+        BorderFactory.createEmptyBorder(3, 6, 3, 6)));
+    WrapLayout wrapLayout = new WrapLayout(FlowLayout.LEADING, 4, 0);
     this.addContainerListener(
         new ContainerListener() {
 
           @Override
           public void componentRemoved(ContainerEvent e) {
+            updateTextFieldWidth();
             fireActionPerformed();
           }
 
           @Override
           public void componentAdded(ContainerEvent e) {
+            updateTextFieldWidth();
             fireActionPerformed();
           }
         });
@@ -48,9 +52,13 @@ public class TagPanel extends JPanel {
     this.setLayout(wrapLayout);
 
     this.textFieldInput = new JTextField();
-    this.textFieldInput.setBorder(null);
+    this.textFieldInput.setBorder(BorderFactory.createEmptyBorder(0, 3, 0, 3));
     this.textFieldInput.setOpaque(false);
-    this.textFieldInput.setPreferredSize(new Dimension(80, 20));
+    this.textFieldInput.setForeground(Style.COLOR_TEXT);
+    this.textFieldInput.setCaretColor(Style.COLOR_ACCENT_BLUE);
+    this.textFieldInput.putClientProperty("JComponent.outline", "none");
+    this.textFieldInput.setPreferredSize(new Dimension(INLINE_INPUT_WIDTH, Tag.CHIP_HEIGHT));
+    this.textFieldInput.setMinimumSize(new Dimension(48, Tag.CHIP_HEIGHT));
     add(textFieldInput);
     this.textFieldInput.setColumns(7);
     this.textFieldInput.addActionListener(
@@ -70,8 +78,9 @@ public class TagPanel extends JPanel {
             return;
           }
 
-          add(new Tag(tag));
+          add(new Tag(tag), Math.max(0, getComponentCount() - 1));
           this.textFieldInput.setText(null);
+          updateTextFieldWidth();
           this.revalidate();
         });
 
@@ -155,6 +164,7 @@ public class TagPanel extends JPanel {
     }
 
     this.textFieldInput.setText(null);
+    updateTextFieldWidth();
     this.revalidate();
   }
 
@@ -174,7 +184,7 @@ public class TagPanel extends JPanel {
         continue;
       }
 
-      this.add(new Tag(tag));
+      this.add(new Tag(tag), Math.max(0, getComponentCount() - 1));
     }
 
     // remove all tags that are no longer present
@@ -184,7 +194,19 @@ public class TagPanel extends JPanel {
       }
     }
 
+    updateTextFieldWidth();
     this.revalidate();
+  }
+
+  private void updateTextFieldWidth() {
+    if (this.textFieldInput == null) {
+      return;
+    }
+
+    int width = this.getTags().isEmpty() ? INLINE_INPUT_WIDTH : INLINE_INPUT_COLLAPSED_WIDTH;
+    Dimension size = new Dimension(width, Tag.CHIP_HEIGHT);
+    this.textFieldInput.setPreferredSize(size);
+    this.textFieldInput.setMinimumSize(size);
   }
 
   private boolean containsTag(String tag) {

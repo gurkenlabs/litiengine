@@ -194,6 +194,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     accordion.add(typeCard);
     accordion.add(collisionCard);
     accordion.add(combatCard);
+    accordion.add(Box.createVerticalStrut(12));
     accordion.add(movementCard);
     accordion.add(customCard);
     accordion.add(Box.createVerticalGlue());
@@ -269,27 +270,32 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     grid.setLayout(gl);
 
     JLabel lblX = new JLabel("x");
+    lblX.setHorizontalAlignment(SwingConstants.TRAILING);
     JLabel lblY = new JLabel("y");
+    lblY.setHorizontalAlignment(SwingConstants.TRAILING);
     JLabel lblW = new JLabel("w");
+    lblW.setHorizontalAlignment(SwingConstants.TRAILING);
     JLabel lblH = new JLabel("h");
+    lblH.setHorizontalAlignment(SwingConstants.TRAILING);
 
-    int lblW2 = 24;
+    int transformLabelWidth = SECTION_LABEL_WIDTH;
+    int secondaryLabelWidth = 24;
     int gap = 8;
 
     gl.setAutoCreateGaps(false);
     gl.setHorizontalGroup(
       gl.createSequentialGroup()
         .addGroup(gl.createParallelGroup(Alignment.TRAILING)
-          .addComponent(lblX, lblW2, lblW2, lblW2)
-          .addComponent(lblW, lblW2, lblW2, lblW2))
+          .addComponent(lblX, transformLabelWidth, transformLabelWidth, transformLabelWidth)
+          .addComponent(lblW, transformLabelWidth, transformLabelWidth, transformLabelWidth))
         .addGap(gap)
         .addGroup(gl.createParallelGroup()
           .addComponent(spnX, SPINNER_WIDTH, SPINNER_WIDTH, Integer.MAX_VALUE)
           .addComponent(spnW, SPINNER_WIDTH, SPINNER_WIDTH, Integer.MAX_VALUE))
-        .addGap(12)
+        .addGap(36)
         .addGroup(gl.createParallelGroup(Alignment.TRAILING)
-          .addComponent(lblY, lblW2, lblW2, lblW2)
-          .addComponent(lblH, lblW2, lblW2, lblW2))
+          .addComponent(lblY, secondaryLabelWidth, secondaryLabelWidth, secondaryLabelWidth)
+          .addComponent(lblH, secondaryLabelWidth, secondaryLabelWidth, secondaryLabelWidth))
         .addGap(gap)
         .addGroup(gl.createParallelGroup()
           .addComponent(spnY, SPINNER_WIDTH, SPINNER_WIDTH, Integer.MAX_VALUE)
@@ -313,8 +319,11 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     panel.setLayout(gl);
 
     JLabel lblName = new JLabel(Resources.strings().get("panel_name"));
+    lblName.setHorizontalAlignment(SwingConstants.TRAILING);
     JLabel lblRenderType = new JLabel(Resources.strings().get("panel_rendertype"));
+    lblRenderType.setHorizontalAlignment(SwingConstants.TRAILING);
     JLabel lblTags = new JLabel(Resources.strings().get("panel_tags"));
+    lblTags.setHorizontalAlignment(SwingConstants.TRAILING);
 
     gl.setAutoCreateGaps(false);
     gl.setHorizontalGroup(
