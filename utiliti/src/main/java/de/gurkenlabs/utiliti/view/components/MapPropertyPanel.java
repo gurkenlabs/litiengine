@@ -118,7 +118,7 @@ public class MapPropertyPanel extends JPanel {
     accordion.setLayout(new BoxLayout(accordion, BoxLayout.Y_AXIS));
     accordion.setOpaque(true);
     accordion.setBackground(Style.COLOR_BG);
-    accordion.setBorder(BorderFactory.createEmptyBorder(6, 12, 8, 0));
+    accordion.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
 
     ExpandableCard generalCard =
         new ExpandableCard(Resources.strings().get("panel_general"), createGeneralPanel(scrollPaneDesc), true);
@@ -241,7 +241,7 @@ public class MapPropertyPanel extends JPanel {
     gl.setHorizontalGroup(
         gl.createSequentialGroup()
             .addGap(PropertyPanel.LABEL_WIDTH + PropertyPanel.GUTTER_WIDTH)
-            .addComponent(component, PropertyPanel.CONTROL_WIDTH, PropertyPanel.CONTROL_WIDTH, PropertyPanel.CONTROL_WIDTH));
+            .addComponent(component, PropertyPanel.CONTROL_MIN_WIDTH, PropertyPanel.CONTROL_WIDTH, Integer.MAX_VALUE));
     gl.setVerticalGroup(
         gl.createSequentialGroup().addComponent(component, height, height, height));
     setRowSize(panel, height);
@@ -273,8 +273,7 @@ public class MapPropertyPanel extends JPanel {
   }
 
   private static void setRowSize(JComponent component, int height) {
-    Dimension size = new Dimension(CONTENT_WIDTH, height);
-    component.setPreferredSize(size);
+    component.setPreferredSize(new Dimension(0, height));
     component.setMaximumSize(new Dimension(Integer.MAX_VALUE, height));
     component.setAlignmentX(LEFT_ALIGNMENT);
   }

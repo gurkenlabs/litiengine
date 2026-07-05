@@ -145,7 +145,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     accordion.setLayout(new BoxLayout(accordion, BoxLayout.Y_AXIS));
     accordion.setOpaque(true);
     accordion.setBackground(BG);
-    accordion.setBorder(BorderFactory.createEmptyBorder(6, 12, 8, 0));
+    accordion.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
 
     infoPanel.setMaximumSize(
         new Dimension(Integer.MAX_VALUE, infoPanel.getPreferredSize().height));
