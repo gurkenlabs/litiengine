@@ -1,6 +1,5 @@
 package de.gurkenlabs.utiliti.view.renderers;
 
-import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.Transform.TransformMode;
 import de.gurkenlabs.utiliti.model.Style;
@@ -11,7 +10,7 @@ import java.awt.geom.Rectangle2D;
 
 public class MouseSelectAreaRenderer implements IEditorRenderer {
   private final BasicStroke shapeStroke =
-      new BasicStroke(1 / Game.world().camera().getRenderScale());
+      new BasicStroke(1);
   private final Color fillColor;
   private final Color borderColor;
 
@@ -41,10 +40,12 @@ public class MouseSelectAreaRenderer implements IEditorRenderer {
   }
 
   protected void renderSelectArea(Graphics2D g, Rectangle2D rect) {
+    Rectangle2D screenRect = EditorRenderHelper.toScreen(rect);
     // draw mouse selection area
     g.setColor(this.fillColor);
-    Game.graphics().renderShape(g, rect);
+    g.fill(screenRect);
     g.setColor(this.borderColor);
-    Game.graphics().renderOutline(g, rect, this.shapeStroke);
+    g.setStroke(this.shapeStroke);
+    g.draw(screenRect);
   }
 }

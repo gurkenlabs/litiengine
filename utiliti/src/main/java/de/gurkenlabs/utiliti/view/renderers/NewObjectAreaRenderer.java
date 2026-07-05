@@ -7,6 +7,7 @@ import de.gurkenlabs.utiliti.model.Style;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 public class NewObjectAreaRenderer extends MouseSelectAreaRenderer {
@@ -36,19 +37,14 @@ public class NewObjectAreaRenderer extends MouseSelectAreaRenderer {
 
     String width = rect.getWidth() + "";
     String height = rect.getHeight() + "";
-    Game.graphics()
-        .renderText(
-            g,
-            width,
-            rect.getX() + rect.getWidth() / 2.0 - fm.stringWidth(width) / 2.0,
-            rect.getY() - 5,
-            true);
-    Game.graphics()
-        .renderText(
-            g,
-            height,
-            rect.getX() - (fm.stringWidth(height) + 3),
-            rect.getY() + rect.getHeight() / 2,
-            true);
+    Point2D start = Game.world().camera().getViewportLocation(rect.getX(), rect.getY());
+    double scale = Game.world().camera().getRenderScale();
+    double x = start.getX() * scale;
+    double y = start.getY() * scale;
+    double w = rect.getWidth() * scale;
+    double h = rect.getHeight() * scale;
+
+    g.drawString(width, (float) (x + w / 2.0 - fm.stringWidth(width) / 2.0), (float) (y - 5));
+    g.drawString(height, (float) (x - fm.stringWidth(height) - 3), (float) (y + h / 2.0));
   }
 }

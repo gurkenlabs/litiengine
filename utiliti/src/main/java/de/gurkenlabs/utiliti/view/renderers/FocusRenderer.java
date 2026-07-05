@@ -45,7 +45,9 @@ public class FocusRenderer implements IEditorRenderer {
 
       g.setColor(Color.BLACK);
 
-      Game.graphics().renderOutline(g, focus, stroke);
+      Rectangle2D screenFocus = EditorRenderHelper.toScreen(focus);
+      g.setStroke(stroke);
+      g.draw(screenFocus);
 
       Stroke whiteStroke =
           new BasicStroke(
@@ -56,16 +58,19 @@ public class FocusRenderer implements IEditorRenderer {
               new float[] {strokeSize, strokeSize},
               dashPhaseWhite);
       g.setColor(Color.WHITE);
-      Game.graphics().renderOutline(g, focus, whiteStroke);
+      g.setStroke(whiteStroke);
+      g.draw(screenFocus);
 
       // render transform rects (not when in MOVE mode)
       if (Editor.instance().getMapComponent().getTransformMode() != TransformMode.MOVE) {
         Stroke transStroke = new BasicStroke(1);
         for (Rectangle2D trans : Transform.getAnchors()) {
+          Rectangle2D screenTrans = EditorRenderHelper.toScreen(trans);
           g.setColor(Style.COLOR_TRANSFORM_RECT_FILL);
-          Game.graphics().renderShape(g, trans);
+          g.fill(screenTrans);
           g.setColor(Color.BLACK);
-          Game.graphics().renderOutline(g, trans, transStroke);
+          g.setStroke(transStroke);
+          g.draw(screenTrans);
         }
       }
     }

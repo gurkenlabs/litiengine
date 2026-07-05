@@ -40,14 +40,14 @@ public class SelectionRenderer implements IEditorRenderer {
         continue;
       }
 
-      float scale = Game.world().camera().getRenderScale();
-      Stroke stroke = new BasicStroke(1.5f / scale);
+      Stroke stroke = new BasicStroke(1.5f);
 
       g.setColor(colorSelectionBorder);
       g.setStroke(stroke);
       java.awt.geom.Rectangle2D bb = mapObject.getBoundingBox();
-      double arc = 4.0 / scale;
-      g.draw(new RoundRectangle2D.Double(bb.getX(), bb.getY(), bb.getWidth(), bb.getHeight(), arc, arc));
+      java.awt.geom.Rectangle2D screenBounds = EditorRenderHelper.toScreen(bb);
+      double arc = 4.0;
+      g.draw(new RoundRectangle2D.Double(screenBounds.getX(), screenBounds.getY(), screenBounds.getWidth(), screenBounds.getHeight(), arc, arc));
     }
   }
 
