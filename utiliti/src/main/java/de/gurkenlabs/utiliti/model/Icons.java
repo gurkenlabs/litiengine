@@ -205,6 +205,7 @@ public final class Icons {
     }
 
     return switch (type) {
+      case AREA -> MAPAREA_16;
       case COLLISIONBOX -> COLLISIONBOX_16;
       case CREATURE -> CREATURE_16;
       case EMITTER -> EMITTER_16;
