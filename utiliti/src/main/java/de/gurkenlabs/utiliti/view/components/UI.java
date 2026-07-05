@@ -45,6 +45,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArrayList;
+import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -338,13 +339,47 @@ public final class UI {
     mapSelectionPanel = new MapList();
     sceneGraph = new SceneGraph();
 
-    JTabbedPane tabPane = new JTabbedPane();
-    tabPane.setFont(Style.getHeaderFont());
-    tabPane.add(sceneGraph);
-    tabPane.setMinimumSize(new Dimension(220, 120));
-    tabPane.setPreferredSize(new Dimension(250, 0));
+    JComboBox<TmxMap> leftMapCombo = new JComboBox<>();
+    leftMapCombo.setRenderer(new de.gurkenlabs.utiliti.view.renderers.MapListCellRenderer());
+    leftMapCombo.setPreferredSize(new Dimension(160, 28));
+    leftMapCombo.setMinimumSize(new Dimension(100, 28));
+    leftMapCombo.setMaximumSize(new Dimension(200, 28));
+    leftMapCombo.addActionListener(e -> {
+      if (Editor.instance().isLoading() || Editor.instance().getMapComponent().isLoading()) {
+        return;
+      }
+      Object selected = leftMapCombo.getSelectedItem();
+      if (selected instanceof TmxMap map) {
+        if (Game.world().environment() != null && Game.world().environment().getMap() == map) {
+          return;
+        }
+        Editor.instance().getMapComponent().loadEnvironment(map);
+      }
+    });
+    Editor.instance().getMapComponent().onMapLoaded(map -> {
+      for (int i = 0; i < leftMapCombo.getItemCount(); i++) {
+        if (leftMapCombo.getItemAt(i) == map) {
+          leftMapCombo.setSelectedIndex(i);
+          return;
+        }
+      }
+    });
+    UI.setMapCombo(leftMapCombo);
 
-    return tabPane;
+    JPanel headerPanel = new JPanel(new BorderLayout(4, 0));
+    headerPanel.setOpaque(false);
+    headerPanel.setBorder(BorderFactory.createEmptyBorder(4, 6, 4, 6));
+    headerPanel.add(leftMapCombo, BorderLayout.CENTER);
+
+    JPanel leftPanel = new JPanel(new BorderLayout());
+    leftPanel.setOpaque(true);
+    leftPanel.setBackground(Style.COLOR_BG);
+    leftPanel.add(headerPanel, BorderLayout.NORTH);
+    leftPanel.add(sceneGraph, BorderLayout.CENTER);
+    leftPanel.setMinimumSize(new Dimension(220, 120));
+    leftPanel.setPreferredSize(new Dimension(250, 0));
+
+    return leftPanel;
   }
 
   private static void initTools() {

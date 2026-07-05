@@ -1,8 +1,6 @@
 package de.gurkenlabs.utiliti.view.components;
 
-import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
-import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.UndoManager;
@@ -11,17 +9,13 @@ import de.gurkenlabs.utiliti.controller.tool.ToolManager;
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.Style;
 import de.gurkenlabs.utiliti.view.menus.AddMenu;
-import de.gurkenlabs.utiliti.view.renderers.MapListCellRenderer;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.RenderingHints;
-import java.util.Optional;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JToggleButton;
@@ -88,49 +82,6 @@ public class ToolBar extends JToolBar {
     Editor.instance()
         .onLoaded(() -> addBtn.setEnabled(Editor.instance().getCurrentResourceFile() != null));
     add(addBtn);
-
-    addSeparator();
-
-    JComboBox<TmxMap> mapCombo = new JComboBox<>();
-    mapCombo.setRenderer(new MapListCellRenderer());
-    mapCombo.setPreferredSize(new Dimension(160, 28));
-    mapCombo.setMinimumSize(new Dimension(100, 28));
-    mapCombo.setMaximumSize(new Dimension(200, 28));
-    mapCombo.setToolTipText(Resources.strings().get("panel_maps"));
-    mapCombo.addActionListener(e -> {
-      if (Editor.instance().isLoading() || Editor.instance().getMapComponent().isLoading()) {
-        return;
-      }
-      Object selected = mapCombo.getSelectedItem();
-      if (selected instanceof TmxMap map) {
-        Optional<TmxMap> current = Editor.instance().getMapComponent().getMaps().stream()
-            .filter(m -> m == map).findFirst();
-        if (current.isPresent() && Editor.instance().getMapComponent().isLoading()) {
-          return;
-        }
-        if (Game.world().environment() != null && Game.world().environment().getMap() == map) {
-          return;
-        }
-        Editor.instance().getMapComponent().loadEnvironment(map);
-      }
-    });
-
-    Editor.instance().getMapComponent().onMapLoaded(map -> {
-      for (int i = 0; i < mapCombo.getItemCount(); i++) {
-        if (mapCombo.getItemAt(i) == map) {
-          mapCombo.setSelectedIndex(i);
-          return;
-        }
-      }
-    });
-
-    Editor.instance().onLoaded(() -> {
-      mapCombo.setEnabled(Editor.instance().getCurrentResourceFile() != null);
-    });
-
-    add(mapCombo);
-
-    UI.setMapCombo(mapCombo);
   }
 
   private static JPopupMenu createAddPopup() {
