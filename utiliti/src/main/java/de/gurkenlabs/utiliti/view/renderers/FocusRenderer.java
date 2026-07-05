@@ -24,6 +24,9 @@ public class FocusRenderer implements IEditorRenderer {
     // render the focus and the transform rects
     final Rectangle2D focus = Editor.instance().getMapComponent().getFocusBounds();
     final IMapObject focusedMapObject = Editor.instance().getMapComponent().getFocusedMapObject();
+    if (!SelectionRenderer.isInCurrentMap(focusedMapObject)) {
+      return;
+    }
     if (focus != null && focusedMapObject != null) {
       final float strokeSize =
           (float) Math.max(1, Math.log(Game.world().camera().getRenderScale()) * 4);

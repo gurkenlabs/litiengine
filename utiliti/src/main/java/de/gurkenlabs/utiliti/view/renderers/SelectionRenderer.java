@@ -1,6 +1,7 @@
 package de.gurkenlabs.utiliti.view.renderers;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.graphics.TextRenderer;
 import de.gurkenlabs.utiliti.controller.Editor;
@@ -29,6 +30,10 @@ public class SelectionRenderer implements IEditorRenderer {
     this.updateSelectionColor();
 
     for (IMapObject mapObject : Editor.instance().getMapComponent().getSelectedMapObjects()) {
+      if (!isInCurrentMap(mapObject)) {
+        continue;
+      }
+
       renderObjectId(g, mapObject);
 
       if (mapObject.equals(Editor.instance().getMapComponent().getFocusedMapObject())) {
@@ -39,10 +44,24 @@ public class SelectionRenderer implements IEditorRenderer {
       Stroke stroke = new BasicStroke(1.5f / scale);
 
       g.setColor(colorSelectionBorder);
+      g.setStroke(stroke);
       java.awt.geom.Rectangle2D bb = mapObject.getBoundingBox();
       double arc = 4.0 / scale;
       g.draw(new RoundRectangle2D.Double(bb.getX(), bb.getY(), bb.getWidth(), bb.getHeight(), arc, arc));
     }
+  }
+
+  static boolean isInCurrentMap(IMapObject mapObject) {
+    if (mapObject == null || Game.world().environment() == null || Game.world().environment().getMap() == null) {
+      return false;
+    }
+
+    for (IMapObjectLayer layer : Game.world().environment().getMap().getMapObjectLayers()) {
+      if (layer != null && layer.getMapObjects().contains(mapObject)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private void updateSelectionColor() {
