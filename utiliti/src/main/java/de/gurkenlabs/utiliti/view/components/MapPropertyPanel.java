@@ -10,6 +10,7 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.ControlBehavior;
 import de.gurkenlabs.utiliti.controller.UndoManager;
 import de.gurkenlabs.utiliti.model.Style;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
@@ -60,8 +61,8 @@ public class MapPropertyPanel extends JPanel {
   private boolean binding;
 
   public MapPropertyPanel() {
-    setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
-    setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+    setBorder(null);
+    setLayout(new BorderLayout());
     setOpaque(true);
     setBackground(Style.COLOR_BG);
 
@@ -113,51 +114,93 @@ public class MapPropertyPanel extends JPanel {
           this.saveChanges();
         });
 
-    addSectionLabel(Resources.strings().get("panel_general"));
-    addForm(
+    JPanel accordion = new JPanel();
+    accordion.setLayout(new BoxLayout(accordion, BoxLayout.Y_AXIS));
+    accordion.setOpaque(true);
+    accordion.setBackground(Style.COLOR_BG);
+    accordion.setBorder(BorderFactory.createEmptyBorder(6, 12, 8, 12));
+
+    ExpandableCard generalCard =
+        new ExpandableCard(Resources.strings().get("panel_general"), createGeneralPanel(scrollPaneDesc), true);
+    ExpandableCard lightingCard =
+        new ExpandableCard("Lighting", createLightingPanel(), true);
+    ExpandableCard propertiesCard =
+        new ExpandableCard(Resources.strings().get("panel_customProperties"), createPropertiesPanel(buttonAdd, buttonRemove), true);
+
+    generalCard.setContentInsets(8, 0, 12, 6);
+    lightingCard.setContentInsets(8, 0, 12, 6);
+    propertiesCard.setContentInsets(8, 0, 12, 6);
+
+    accordion.add(generalCard);
+    accordion.add(lightingCard);
+    accordion.add(propertiesCard);
+    accordion.add(Box.createVerticalGlue());
+
+    JScrollPane hostScrollPane = new JScrollPane(accordion);
+    hostScrollPane.setBorder(null);
+    hostScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    hostScrollPane.getViewport().setBackground(Style.COLOR_BG);
+    add(hostScrollPane, BorderLayout.CENTER);
+
+    this.setupChangeListeners();
+  }
+
+  private JPanel createGeneralPanel(JComponent scrollPaneDesc) {
+    return createForm(
         new JLabel[] {
             createLabel(Resources.strings().get("panel_name")),
             createLabel(Resources.strings().get("panel_title")),
             createLabel(Resources.strings().get("panel_description")),
             createLabel(Resources.strings().get("panel_gravity")),
-            createLabel(Resources.strings().get("panel_ambientlight")),
-            createLabel(Resources.strings().get("panel_staticshadows")),
         },
         new JComponent[] {
             this.textFieldName,
             this.textFieldTitle,
             scrollPaneDesc,
             this.spinnerGravity,
-            this.ambientColorComponent,
-            this.shadowColorComponent,
         },
         new int[] {
             PropertyPanel.CONTROL_HEIGHT,
             PropertyPanel.CONTROL_HEIGHT,
             PropertyPanel.CONTROL_HEIGHT * 2,
             PropertyPanel.CONTROL_HEIGHT,
-            this.ambientColorComponent.getPreferredSize().height,
-            this.shadowColorComponent.getPreferredSize().height,
         });
-
-    addAlignedComponent(this.ambientlightPreview, this.ambientlightPreview.getPreferredSize().height);
-    add(Box.createVerticalStrut(14));
-
-    addPropertiesHeader(buttonAdd, buttonRemove);
-    addSizedComponent(this.scrollPane, CONTENT_WIDTH, 150);
-
-    this.setupChangeListeners();
   }
 
-  private void addSectionLabel(String text) {
-    JLabel label = new JLabel(text);
-    label.setForeground(Style.COLOR_TEXT);
-    label.setFont(Style.getDefaultFont());
-    label.setBorder(BorderFactory.createEmptyBorder(4, 0, 8, 0));
-    addSizedComponent(label, CONTENT_WIDTH, label.getPreferredSize().height + 12);
+  private JPanel createLightingPanel() {
+    JPanel panel = new JPanel();
+    panel.setOpaque(false);
+    panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+    panel.add(
+        createForm(
+            new JLabel[] {
+                createLabel(Resources.strings().get("panel_ambientlight")),
+                createLabel(Resources.strings().get("panel_staticshadows")),
+            },
+            new JComponent[] {
+                this.ambientColorComponent,
+                this.shadowColorComponent,
+            },
+            new int[] {
+                this.ambientColorComponent.getPreferredSize().height,
+                this.shadowColorComponent.getPreferredSize().height,
+            }));
+    panel.add(Box.createVerticalStrut(6));
+    panel.add(createAlignedControl(this.ambientlightPreview, this.ambientlightPreview.getPreferredSize().height));
+    return panel;
   }
 
-  private void addForm(JLabel[] labels, JComponent[] controls, int[] heights) {
+  private JPanel createPropertiesPanel(JButton buttonAdd, JButton buttonRemove) {
+    JPanel panel = new JPanel();
+    panel.setOpaque(false);
+    panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+    panel.add(createPropertiesHeader(buttonAdd, buttonRemove));
+    panel.add(Box.createVerticalStrut(6));
+    panel.add(createAlignedControl(this.scrollPane, 150));
+    return panel;
+  }
+
+  private JPanel createForm(JLabel[] labels, JComponent[] controls, int[] heights) {
     JPanel form = new JPanel();
     form.setOpaque(false);
     GroupLayout gl = new GroupLayout(form);
@@ -186,25 +229,29 @@ public class MapPropertyPanel extends JPanel {
             .addGroup(controlGroup));
     gl.setVerticalGroup(vertical);
 
-    addSizedComponent(form, CONTENT_WIDTH, form.getPreferredSize().height);
+    setSizedComponent(form, CONTENT_WIDTH, form.getPreferredSize().height);
+    return form;
   }
 
-  private void addAlignedComponent(JComponent component, int height) {
+  private JPanel createAlignedControl(JComponent component, int height) {
     JPanel panel = new JPanel();
     panel.setOpaque(false);
     GroupLayout gl = new GroupLayout(panel);
     panel.setLayout(gl);
     gl.setHorizontalGroup(
         gl.createSequentialGroup()
-            .addComponent(component, CONTENT_WIDTH, CONTENT_WIDTH, CONTENT_WIDTH));
+            .addGap(PropertyPanel.LABEL_WIDTH + PropertyPanel.GUTTER_WIDTH)
+            .addComponent(component, PropertyPanel.CONTROL_WIDTH, PropertyPanel.CONTROL_WIDTH, PropertyPanel.CONTROL_WIDTH));
     gl.setVerticalGroup(
         gl.createSequentialGroup().addComponent(component, height, height, height));
-    addSizedComponent(panel, CONTENT_WIDTH, height);
+    setSizedComponent(panel, CONTENT_WIDTH, height);
+    return panel;
   }
 
-  private void addPropertiesHeader(JButton buttonAdd, JButton buttonRemove) {
+  private JPanel createPropertiesHeader(JButton buttonAdd, JButton buttonRemove) {
     JLabel label = new JLabel(Resources.strings().get("panel_customProperties"));
     label.setForeground(Style.COLOR_TEXT);
+    label.setHorizontalAlignment(SwingConstants.TRAILING);
     JPanel panel = new JPanel();
     panel.setOpaque(false);
     GroupLayout gl = new GroupLayout(panel);
@@ -221,16 +268,15 @@ public class MapPropertyPanel extends JPanel {
             .addComponent(label)
             .addComponent(buttonAdd)
             .addComponent(buttonRemove));
-    addSizedComponent(panel, CONTENT_WIDTH, Math.max(32, panel.getPreferredSize().height));
-    add(Box.createVerticalStrut(6));
+    setSizedComponent(panel, CONTENT_WIDTH, Math.max(32, panel.getPreferredSize().height));
+    return panel;
   }
 
-  private void addSizedComponent(JComponent component, int width, int height) {
+  private static void setSizedComponent(JComponent component, int width, int height) {
     Dimension size = new Dimension(width, height);
     component.setPreferredSize(size);
     component.setMaximumSize(size);
     component.setAlignmentX(LEFT_ALIGNMENT);
-    add(component);
   }
 
   private static JLabel createLabel(String text) {
