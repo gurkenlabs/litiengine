@@ -211,9 +211,14 @@ public class MapComponent extends GuiComponent {
     UI.getInspector().bind(null);
     this.setFocus(null, true);
     getMaps().clear();
-    Collections.sort(maps);
-    getMaps().addAll(maps);
+    getMaps().addAll(sortedMaps(maps));
     UI.getMapController().bind(getMaps(), clearSelection);
+  }
+
+  static List<TmxMap> sortedMaps(List<TmxMap> maps) {
+    List<TmxMap> sortedMaps = new ArrayList<>(maps);
+    Collections.sort(sortedMaps);
+    return sortedMaps;
   }
 
   public List<TmxMap> getMaps() {
