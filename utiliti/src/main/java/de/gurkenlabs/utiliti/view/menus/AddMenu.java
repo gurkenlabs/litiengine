@@ -83,7 +83,7 @@ public final class AddMenu extends JMenu {
         .onLoaded(() -> this.setEnabled(Editor.instance().getCurrentResourceFile() != null));
   }
 
-  private static void setCreateMode(MapObjectType type) {
+  public static void setCreateMode(MapObjectType type) {
     Editor.instance().getMapComponent().setTransformMode(TransformMode.CREATE);
     UI.getInspector().setMapObjectType(type);
   }

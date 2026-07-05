@@ -1,11 +1,14 @@
 package de.gurkenlabs.utiliti.view.components;
 
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.UndoManager;
 import de.gurkenlabs.utiliti.controller.tool.Tool;
 import de.gurkenlabs.utiliti.controller.tool.ToolManager;
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.Style;
+import de.gurkenlabs.utiliti.view.menus.AddMenu;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -13,6 +16,7 @@ import java.awt.Insets;
 import java.awt.RenderingHints;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
@@ -71,10 +75,34 @@ public class ToolBar extends JToolBar {
     addBtn.setToolTipText(Resources.strings().get("menu_add"));
     addBtn.setMargin(new Insets(2, 4, 2, 4));
     addBtn.addActionListener(e -> {
-      JPopupMenu popup = UI.getCanvasPopup();
+      JPopupMenu popup = createAddPopup();
       popup.show(addBtn, 0, addBtn.getHeight());
     });
+    addBtn.setEnabled(false);
+    Editor.instance()
+        .onLoaded(() -> addBtn.setEnabled(Editor.instance().getCurrentResourceFile() != null));
     add(addBtn);
+  }
+
+  private static JPopupMenu createAddPopup() {
+    JPopupMenu popup = new JPopupMenu();
+    addCreateItem(popup, Resources.strings().get("menu_add_prop"), Icons.PROP_16, MapObjectType.PROP);
+    addCreateItem(popup, Resources.strings().get("menu_add_creature"), Icons.CREATURE_16, MapObjectType.CREATURE);
+    addCreateItem(popup, Resources.strings().get("menu_add_collisionbox"), Icons.COLLISIONBOX_16, MapObjectType.COLLISIONBOX);
+    addCreateItem(popup, Resources.strings().get("menu_add_trigger"), Icons.TRIGGER_16, MapObjectType.TRIGGER);
+    addCreateItem(popup, Resources.strings().get("menu_add_spawnpoint"), Icons.SPAWNPOINT_16, MapObjectType.SPAWNPOINT);
+    addCreateItem(popup, Resources.strings().get("menu_add_area"), Icons.MAPAREA_16, MapObjectType.AREA);
+    addCreateItem(popup, Resources.strings().get("menu_add_light"), Icons.BULB_16, MapObjectType.LIGHTSOURCE);
+    addCreateItem(popup, Resources.strings().get("menu_add_shadow"), Icons.SHADOWBOX_16, MapObjectType.STATICSHADOW);
+    addCreateItem(popup, Resources.strings().get("menu_add_emitter"), Icons.EMITTER_16, MapObjectType.EMITTER);
+    addCreateItem(popup, Resources.strings().get("menu_add_soundsource"), Icons.SOUND_16, MapObjectType.SOUNDSOURCE);
+    return popup;
+  }
+
+  private static void addCreateItem(JPopupMenu popup, String text, javax.swing.Icon icon, MapObjectType type) {
+    JMenuItem item = new JMenuItem(text, icon);
+    item.addActionListener(e -> AddMenu.setCreateMode(type));
+    popup.add(item);
   }
 
   @Override
