@@ -308,6 +308,10 @@ public class AssetPanelItem extends JPanel {
       }
 
       @Override public void mouseExited(MouseEvent e) {
+        Point p = SwingUtilities.convertPoint(e.getComponent(), e.getPoint(), AssetPanelItem.this);
+        if (contains(p)) {
+          return;
+        }
         isHovered = false;
         updateButtonVisibility(false);
         repaint();
@@ -333,6 +337,11 @@ public class AssetPanelItem extends JPanel {
     addMouseListener(mouseHandler);
     iconLabel.addMouseListener(mouseHandler);
     nameLabel.addMouseListener(mouseHandler);
+    buttonPanel.addMouseListener(mouseHandler);
+    btnAdd.addMouseListener(mouseHandler);
+    btnEdit.addMouseListener(mouseHandler);
+    btnExport.addMouseListener(mouseHandler);
+    btnDelete.addMouseListener(mouseHandler);
   }
 
   private void maybeShowPopup(MouseEvent e) {
