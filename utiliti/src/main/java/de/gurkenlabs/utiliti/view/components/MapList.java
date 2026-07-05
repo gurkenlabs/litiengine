@@ -14,6 +14,7 @@ import java.awt.event.MouseEvent;
 import java.util.List;
 import java.util.Optional;
 import javax.swing.DefaultListModel;
+import javax.swing.JComboBox;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
@@ -64,7 +65,13 @@ public class MapList extends JScrollPane implements MapController {
     UndoManager.onMapObjectRemoved(manager -> this.refresh());
 
     UndoManager.onUndoStackChanged(
-        manager -> this.bind(Editor.instance().getMapComponent().getMaps(), false));
+        manager -> {
+          this.bind(Editor.instance().getMapComponent().getMaps(), false);
+          JComboBox<TmxMap> combo = UI.getMapCombo();
+          if (combo != null) {
+            combo.repaint();
+          }
+        });
   }
 
   private static void initPopupMenu() {
@@ -126,6 +133,18 @@ public class MapList extends JScrollPane implements MapController {
       list.setSelectedIndex(0);
     }
 
+    // sync combo
+    JComboBox<TmxMap> combo = UI.getMapCombo();
+    if (combo != null) {
+      combo.removeAllItems();
+      for (int i = 0; i < this.model.getSize(); i++) {
+        combo.addItem((TmxMap) this.model.get(i));
+      }
+      if (list.getSelectedValue() instanceof TmxMap selectedTmx) {
+        combo.setSelectedItem(selectedTmx);
+      }
+    }
+
     this.refresh();
   }
 
@@ -138,6 +157,12 @@ public class MapList extends JScrollPane implements MapController {
         list.setSelectedValue(map, true);
       }
     }
+
+    JComboBox<TmxMap> combo = UI.getMapCombo();
+    if (combo != null) {
+      combo.setSelectedItem(map);
+    }
+
     this.refresh();
     UI.getEntityController().refresh();
     UI.getLayerController().refresh();

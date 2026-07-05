@@ -7,6 +7,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameListener;
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.EnvironmentListener;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.Controller;
 import de.gurkenlabs.utiliti.controller.Editor;
@@ -45,6 +46,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javax.swing.JComponent;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -68,8 +70,8 @@ public final class UI {
   private static JPanel inspectorHost;
   private static CardLayout inspectorCards;
   private static MapList mapSelectionPanel;
-  private static LayerList mapLayerList;
-  private static EntityList entityList;
+  private static SceneGraph sceneGraph;
+  private static JComboBox<TmxMap> mapCombo;
 
   private static boolean initialized;
 
@@ -167,11 +169,11 @@ public final class UI {
   }
 
   public static LayerController getLayerController() {
-    return mapLayerList;
+    return sceneGraph;
   }
 
   public static EntityController getEntityController() {
-    return entityList;
+    return sceneGraph;
   }
 
   public static Controller getAssetController() {
@@ -184,6 +186,14 @@ public final class UI {
 
   public static MapController getMapController() {
     return mapSelectionPanel;
+  }
+
+  public static void setMapCombo(JComboBox<TmxMap> combo) {
+    mapCombo = combo;
+  }
+
+  public static JComboBox<TmxMap> getMapCombo() {
+    return mapCombo;
   }
 
   private static void initScrollBars(JPanel renderPane) {
@@ -326,29 +336,15 @@ public final class UI {
 
   private static Component initLeftPanel() {
     mapSelectionPanel = new MapList();
-    mapLayerList = new LayerList();
-    entityList = new EntityList();
+    sceneGraph = new SceneGraph();
 
     JTabbedPane tabPane = new JTabbedPane();
     tabPane.setFont(Style.getHeaderFont());
-    tabPane.add(entityList);
-    tabPane.add(mapLayerList);
-    tabPane.setMinimumSize(new Dimension(0, 120));
+    tabPane.add(sceneGraph);
+    tabPane.setMinimumSize(new Dimension(220, 120));
+    tabPane.setPreferredSize(new Dimension(250, 0));
 
-    JSplitPane leftSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-    leftSplit.setContinuousLayout(true);
-    leftSplit.setTopComponent(mapSelectionPanel);
-    leftSplit.setBottomComponent(tabPane);
-    leftSplit.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY,
-        evt -> Editor.preferences().setMapPanelSplitter(leftSplit.getDividerLocation()));
-    if (Editor.preferences().getMapPanelSplitter() != 0) {
-      leftSplit.setDividerLocation(Editor.preferences().getMapPanelSplitter());
-    } else {
-      leftSplit.setDividerLocation(120);
-    }
-    leftSplit.setMinimumSize(new Dimension(220, 0));
-
-    return leftSplit;
+    return tabPane;
   }
 
   private static void initTools() {
