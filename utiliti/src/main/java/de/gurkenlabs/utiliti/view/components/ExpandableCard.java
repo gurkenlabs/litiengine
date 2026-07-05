@@ -84,7 +84,7 @@ public class ExpandableCard extends JPanel {
     this.contentPanel = new JPanel(new BorderLayout());
     contentPanel.setOpaque(true);
     contentPanel.setBackground(CARD_BG);
-    contentPanel.setBorder(BorderFactory.createEmptyBorder(4, 0, 8, 0));
+    contentPanel.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
     contentPanel.setVisible(expanded);
     if (content != null) {
       content.setOpaque(false);

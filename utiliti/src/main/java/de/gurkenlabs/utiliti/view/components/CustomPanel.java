@@ -71,7 +71,7 @@ public class CustomPanel extends PropertyPanel {
                 groupLayout
                     .createSequentialGroup()
                     .addGap(PropertyPanel.LABEL_WIDTH + PropertyPanel.GUTTER_WIDTH)
-                    .addComponent(scrollPane, PropertyPanel.CONTROL_WIDTH, PropertyPanel.CONTROL_WIDTH, PropertyPanel.CONTROL_WIDTH))
+                    .addComponent(scrollPane, PropertyPanel.CONTROL_MIN_WIDTH, PropertyPanel.CONTROL_WIDTH, Integer.MAX_VALUE))
             .addGroup(
                 groupLayout
                     .createSequentialGroup()
