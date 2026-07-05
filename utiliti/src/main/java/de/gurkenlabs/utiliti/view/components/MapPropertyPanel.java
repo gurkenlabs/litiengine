@@ -118,7 +118,7 @@ public class MapPropertyPanel extends JPanel {
     accordion.setLayout(new BoxLayout(accordion, BoxLayout.Y_AXIS));
     accordion.setOpaque(true);
     accordion.setBackground(Style.COLOR_BG);
-    accordion.setBorder(BorderFactory.createEmptyBorder(6, 12, 8, 12));
+    accordion.setBorder(BorderFactory.createEmptyBorder(6, 12, 8, 0));
 
     ExpandableCard generalCard =
         new ExpandableCard(Resources.strings().get("panel_general"), createGeneralPanel(scrollPaneDesc), true);
@@ -127,9 +127,9 @@ public class MapPropertyPanel extends JPanel {
     ExpandableCard propertiesCard =
         new ExpandableCard(Resources.strings().get("panel_customProperties"), createPropertiesPanel(buttonAdd, buttonRemove), true);
 
-    generalCard.setContentInsets(8, 0, 12, 6);
-    lightingCard.setContentInsets(8, 0, 12, 6);
-    propertiesCard.setContentInsets(8, 0, 12, 6);
+    generalCard.setContentInsets(8, 0, 12, 0);
+    lightingCard.setContentInsets(8, 0, 12, 0);
+    propertiesCard.setContentInsets(8, 0, 12, 0);
 
     accordion.add(generalCard);
     accordion.add(lightingCard);
@@ -213,7 +213,7 @@ public class MapPropertyPanel extends JPanel {
 
     for (int i = 0; i < labels.length; i++) {
       labelGroup.addComponent(labels[i], PropertyPanel.LABEL_WIDTH, PropertyPanel.LABEL_WIDTH, PropertyPanel.LABEL_WIDTH);
-      controlGroup.addComponent(controls[i], PropertyPanel.CONTROL_WIDTH, PropertyPanel.CONTROL_WIDTH, PropertyPanel.CONTROL_WIDTH);
+      controlGroup.addComponent(controls[i], PropertyPanel.CONTROL_MIN_WIDTH, PropertyPanel.CONTROL_WIDTH, Short.MAX_VALUE);
       vertical
           .addGroup(
               gl.createParallelGroup(Alignment.LEADING)
@@ -229,7 +229,7 @@ public class MapPropertyPanel extends JPanel {
             .addGroup(controlGroup));
     gl.setVerticalGroup(vertical);
 
-    setSizedComponent(form, CONTENT_WIDTH, form.getPreferredSize().height);
+    setRowSize(form, form.getPreferredSize().height);
     return form;
   }
 
@@ -244,7 +244,7 @@ public class MapPropertyPanel extends JPanel {
             .addComponent(component, PropertyPanel.CONTROL_WIDTH, PropertyPanel.CONTROL_WIDTH, PropertyPanel.CONTROL_WIDTH));
     gl.setVerticalGroup(
         gl.createSequentialGroup().addComponent(component, height, height, height));
-    setSizedComponent(panel, CONTENT_WIDTH, height);
+    setRowSize(panel, height);
     return panel;
   }
 
@@ -268,14 +268,14 @@ public class MapPropertyPanel extends JPanel {
             .addComponent(label)
             .addComponent(buttonAdd)
             .addComponent(buttonRemove));
-    setSizedComponent(panel, CONTENT_WIDTH, Math.max(32, panel.getPreferredSize().height));
+    setRowSize(panel, Math.max(32, panel.getPreferredSize().height));
     return panel;
   }
 
-  private static void setSizedComponent(JComponent component, int width, int height) {
-    Dimension size = new Dimension(width, height);
+  private static void setRowSize(JComponent component, int height) {
+    Dimension size = new Dimension(CONTENT_WIDTH, height);
     component.setPreferredSize(size);
-    component.setMaximumSize(size);
+    component.setMaximumSize(new Dimension(Integer.MAX_VALUE, height));
     component.setAlignmentX(LEFT_ALIGNMENT);
   }
 

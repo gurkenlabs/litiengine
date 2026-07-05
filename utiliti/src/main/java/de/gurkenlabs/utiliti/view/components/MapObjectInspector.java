@@ -145,7 +145,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     accordion.setLayout(new BoxLayout(accordion, BoxLayout.Y_AXIS));
     accordion.setOpaque(true);
     accordion.setBackground(BG);
-    accordion.setBorder(BorderFactory.createEmptyBorder(6, 12, 8, 12));
+    accordion.setBorder(BorderFactory.createEmptyBorder(6, 12, 8, 0));
 
     infoPanel.setMaximumSize(
         new Dimension(Integer.MAX_VALUE, infoPanel.getPreferredSize().height));
@@ -186,11 +186,11 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
         new ExpandableCard(
             Resources.strings().get("panel_customProperties"), this.customPanel, true);
 
-    typeCard.setContentInsets(8, 0, 12, 6);
-    collisionCard.setContentInsets(8, 0, 12, 6);
-    combatCard.setContentInsets(8, 0, 12, 6);
-    movementCard.setContentInsets(8, 0, 12, 6);
-    customCard.setContentInsets(8, 0, 12, 6);
+    typeCard.setContentInsets(8, 0, 12, 0);
+    collisionCard.setContentInsets(8, 0, 12, 0);
+    combatCard.setContentInsets(8, 0, 12, 0);
+    movementCard.setContentInsets(8, 0, 12, 0);
+    customCard.setContentInsets(8, 0, 12, 0);
 
     typeCard.setVisible(false);
     collisionCard.setVisible(false);
