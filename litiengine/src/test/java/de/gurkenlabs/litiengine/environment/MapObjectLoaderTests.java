@@ -24,6 +24,7 @@ import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.LightSource;
 import de.gurkenlabs.litiengine.entities.Material;
 import de.gurkenlabs.litiengine.entities.Prop;
+import de.gurkenlabs.litiengine.entities.SoundSource;
 import de.gurkenlabs.litiengine.entities.Trigger;
 import de.gurkenlabs.litiengine.entities.Trigger.TriggerActivation;
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
@@ -178,6 +179,25 @@ class MapObjectLoaderTests {
     assertEquals(100, prop.getHitPoints().getModifiedMax().intValue());
     assertEquals(100, prop.getHitPoints().getModifiedValue().intValue());
     assertEquals(1, prop.getTeam());
+  }
+
+  @Test
+  void testSoundSourceMapObjectLoaderWithoutSoundName() {
+    SoundSourceMapObjectLoader loader = new SoundSourceMapObjectLoader();
+    MapObject mapObject = new MapObject();
+    mapObject.setType(MapObjectType.SOUNDSOURCE.name());
+    mapObject.setId(112);
+    mapObject.setName("testSoundSource");
+    mapObject.setLocation(10, 20);
+
+    Collection<IEntity> entities = loader.load(this.testEnvironment, mapObject);
+    Optional<IEntity> opt = entities.stream().findFirst();
+    assertTrue(opt.isPresent());
+
+    SoundSource soundSource = assertInstanceOf(SoundSource.class, opt.get());
+    assertEquals(112, soundSource.getMapId());
+    assertEquals("testSoundSource", soundSource.getName());
+    assertNull(soundSource.getSound());
   }
 
   @Test
