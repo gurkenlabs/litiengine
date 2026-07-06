@@ -34,6 +34,8 @@ import javax.swing.KeyStroke;
 public class ViewportToolbar extends JPanel {
   private static final Dimension BUTTON_SIZE = new Dimension(36, 32);
   private final JLabel zoomLabel;
+  private final JButton btnUndo;
+  private final JButton btnRedo;
   private final JButton btnCopy;
   private final JButton btnCut;
   private final JButton btnDelete;
@@ -54,8 +56,10 @@ public class ViewportToolbar extends JPanel {
     right.setOpaque(false);
 
     left.add(button("Select", Icons.POINTER_24, () -> selectTool(0)));
-    left.add(button("Undo", Icons.UNDO_24, () -> UndoManager.instance().undo()));
-    left.add(button("Redo", Icons.REDO_24, () -> UndoManager.instance().redo()));
+    this.btnUndo = button("Undo", Icons.UNDO_24, () -> UndoManager.instance().undo());
+    this.btnRedo = button("Redo", Icons.REDO_24, () -> UndoManager.instance().redo());
+    left.add(this.btnUndo);
+    left.add(this.btnRedo);
     left.add(separator());
     left.add(addButton());
     this.btnCopy = button("Copy", Icons.COPY_24, () -> Editor.instance().getMapComponent().copy());
@@ -67,13 +71,11 @@ public class ViewportToolbar extends JPanel {
     this.btnPaste = button("Paste", Icons.PASTE_24, () -> Editor.instance().getMapComponent().paste());
     left.add(this.btnPaste);
 
-    JButton undo = (JButton) left.getComponent(1);
-    JButton redo = (JButton) left.getComponent(2);
-    undo.setEnabled(false);
-    redo.setEnabled(false);
+    this.btnUndo.setEnabled(false);
+    this.btnRedo.setEnabled(false);
     UndoManager.onUndoStackChanged(mgr -> {
-      undo.setEnabled(UndoManager.instance().canUndo());
-      redo.setEnabled(UndoManager.instance().canRedo());
+      this.btnUndo.setEnabled(UndoManager.instance().canUndo());
+      this.btnRedo.setEnabled(UndoManager.instance().canRedo());
     });
 
     this.btnCopy.setEnabled(false);
@@ -138,10 +140,7 @@ public class ViewportToolbar extends JPanel {
     button.setMargin(new Insets(0, 0, 0, 0));
     button.setFocusPainted(false);
     styleButton(button);
-    button.addActionListener(e -> {
-      action.run();
-      updateZoomLabel();
-    });
+    button.addActionListener(e -> action.run());
     return button;
   }
 
@@ -180,8 +179,8 @@ public class ViewportToolbar extends JPanel {
     JPanel group = new JPanel(new BorderLayout(0, 0));
     group.setOpaque(false);
 
-    JButton out = button("−", null, Zoom::out);
-    JButton in = button("+", null, Zoom::in);
+    JButton out = button("−", null, () -> { Zoom.out(); updateZoomLabel(); });
+    JButton in = button("+", null, () -> { Zoom.in(); updateZoomLabel(); });
     out.setText("−");
     in.setText("+");
     out.setFont(out.getFont().deriveFont(18f));
@@ -249,25 +248,7 @@ public class ViewportToolbar extends JPanel {
   }
 
   private static void paintToolbarButton(java.awt.Component c, javax.swing.ButtonModel model, Graphics g) {
-    Graphics2D g2 = (Graphics2D) g.create();
-    try {
-      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-      boolean enabled = c.isEnabled();
-      boolean selected = model.isSelected();
-      boolean active = selected || model.isPressed();
-      Color fill = !enabled ? Style.COLOR_SURFACE : active ? Style.COLOR_ACCENT_BLUE : model.isRollover() ? Style.COLOR_HOVER : Style.COLOR_SURFACE;
-      Color border = !enabled ? Style.COLOR_BORDER.darker() : selected ? Style.COLOR_ACCENT_BLUE : Style.COLOR_BORDER;
-      g2.setColor(fill);
-      g2.fillRoundRect(0, 0, c.getWidth() - 1, c.getHeight() - 1, 10, 10);
-      g2.setColor(border);
-      g2.drawRoundRect(0, 0, c.getWidth() - 1, c.getHeight() - 1, 10, 10);
-      if (!enabled) {
-        g2.setColor(new Color(0, 0, 0, 80));
-        g2.fillRoundRect(0, 0, c.getWidth() - 1, c.getHeight() - 1, 10, 10);
-      }
-    } finally {
-      g2.dispose();
-    }
+    Style.paintButtonBackground(c, model, g);
   }
 
   private static final class ToolbarButton extends JButton {

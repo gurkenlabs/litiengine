@@ -206,6 +206,9 @@ public class AssetPanelItem extends JPanel {
       iconLabel.setPreferredSize(null);
       iconLabel.setBorder(null);
       nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
+      if (iconLabel.getParent() != null) {
+        iconLabel.getParent().remove(iconLabel);
+      }
       iconPanel.add(iconLabel, BorderLayout.CENTER);
       JPanel contentPanel = createContentPanel();
       add(contentPanel, BorderLayout.CENTER);

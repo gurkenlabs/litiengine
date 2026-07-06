@@ -86,15 +86,20 @@ public final class Style {
     Graphics2D g2 = (Graphics2D) g.create();
     try {
       g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+      boolean enabled = c.isEnabled();
       boolean selected = model.isSelected();
       boolean active = selected || model.isPressed();
-      Color fill = active ? COLOR_ACCENT_BLUE : model.isRollover() ? COLOR_HOVER : COLOR_SURFACE;
-      Color border = selected ? COLOR_ACCENT_BLUE : COLOR_BORDER;
+      Color fill = !enabled ? COLOR_SURFACE : active ? COLOR_ACCENT_BLUE : model.isRollover() ? COLOR_HOVER : COLOR_SURFACE;
+      Color border = !enabled ? COLOR_BORDER.darker() : selected ? COLOR_ACCENT_BLUE : COLOR_BORDER;
       g2.setColor(fill);
       g2.fillRoundRect(0, 0, c.getWidth() - 1, c.getHeight() - 1, 8, 8);
       g2.setColor(border);
       g2.setStroke(new java.awt.BasicStroke(1.2f));
       g2.drawRoundRect(0, 0, c.getWidth() - 1, c.getHeight() - 1, 8, 8);
+      if (!enabled) {
+        g2.setColor(new Color(0, 0, 0, 80));
+        g2.fillRoundRect(0, 0, c.getWidth() - 1, c.getHeight() - 1, 8, 8);
+      }
     } finally {
       g2.dispose();
     }

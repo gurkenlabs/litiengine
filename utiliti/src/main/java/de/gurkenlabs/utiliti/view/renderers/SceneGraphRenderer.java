@@ -38,8 +38,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeCellRenderer;
 
 public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
-  private static final Color HOVER_BG = Style.COLOR_ROW_HOVER;
-  private static final Color SELECTED_BG = Style.COLOR_SELECTION_INACTIVE;
+  private static final Color HOVER_BG = new Color(Style.COLOR_BG.getRed(), Style.COLOR_BG.getGreen(), Style.COLOR_BG.getBlue(), 200);
+  private static final Color SELECTED_BG = new Color(53, 116, 242, 30);
   private enum BadgeKind { COUNT, ID }
 
   private final JPanel rowPanel;
@@ -53,7 +53,7 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
 
   public SceneGraphRenderer() {
     super(new BorderLayout(0, 0));
-    setOpaque(true);
+    setOpaque(false);
 
     this.rowPanel = new JPanel(new BorderLayout(6, 0));
     this.rowPanel.setOpaque(false);
@@ -103,7 +103,6 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
     this.selectedRow = selected && node != null && !node.isSection();
     this.hoverRow = hover && node != null && !node.isSection();
     this.sectionRow = node != null && node.isSection();
-    setBackground(Style.COLOR_BG);
     Color foreground = selected ? Color.WHITE : Style.COLOR_TEXT;
     this.nameLabel.setForeground(node != null && node.isSection() ? Style.COLOR_SUBTEXT : foreground);
     int rowHeight = tree.getRowHeight() > 0 ? tree.getRowHeight() : 26;
@@ -114,7 +113,6 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
 
   @Override
   protected void paintComponent(Graphics g) {
-    super.paintComponent(g);
     if (this.sectionRow || (!this.selectedRow && !this.hoverRow)) {
       return;
     }
@@ -123,7 +121,7 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
     try {
       g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
       g2.setColor(this.selectedRow ? SELECTED_BG : HOVER_BG);
-      g2.fillRoundRect(4, 2, getWidth() - 42, getHeight() - 4, 7, 7);
+      g2.fillRoundRect(0, 2, getWidth() - 34, getHeight() - 4, 7, 7);
     } finally {
       g2.dispose();
     }
@@ -298,11 +296,14 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
     @Override
     protected void paintComponent(Graphics g) {
       Graphics2D g2 = (Graphics2D) g.create();
-      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-      Object kind = getClientProperty("badgeKind");
-      g2.setColor(kind == BadgeKind.ID ? Style.COLOR_BADGE_ID : Style.COLOR_SELECTION_INACTIVE);
-      g2.fillRoundRect(0, 2, getWidth(), getHeight() - 4, 10, 10);
-      g2.dispose();
+      try {
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        Object kind = getClientProperty("badgeKind");
+        g2.setColor(kind == BadgeKind.ID ? Style.COLOR_BADGE_ID : Style.COLOR_SELECTION_INACTIVE);
+        g2.fillRoundRect(0, 2, getWidth(), getHeight() - 4, 10, 10);
+      } finally {
+        g2.dispose();
+      }
       super.paintComponent(g);
     }
   }
