@@ -36,6 +36,7 @@ public class AssetList extends JSplitPane implements Controller {
   private final AssetPanel assetPanel;
   private final AssetTree assetTree;
   private final JTextField searchField;
+  private final JSlider zoomSlider;
   private final JLabel titleLabel;
   private final JLabel summaryLabel;
 
@@ -111,27 +112,7 @@ public class AssetList extends JSplitPane implements Controller {
       }
     });
 
-    JToggleButton densityToggle = new JToggleButton(new GridIcon());
-    densityToggle.setPreferredSize(new Dimension(34, 30));
-    densityToggle.setBorder(new RoundedBorder(Style.COLOR_BORDER, 10, 4));
-    densityToggle.setBackground(Style.COLOR_SURFACE);
-    densityToggle.setContentAreaFilled(true);
-    densityToggle.setOpaque(true);
-    densityToggle.setFocusPainted(false);
-    densityToggle.setToolTipText("Toggle compact list / card grid");
-    densityToggle.addActionListener(e -> {
-      assetPanel.setCompact(densityToggle.isSelected());
-      densityToggle.setIcon(densityToggle.isSelected() ? new ListIcon() : new GridIcon());
-      densityToggle.setBackground(densityToggle.isSelected() ? Style.COLOR_ACCENT_BLUE : Style.COLOR_SURFACE);
-      densityToggle.setForeground(densityToggle.isSelected() ? Color.WHITE : Style.COLOR_TEXT);
-      updateSummary();
-    });
-
-    JButton clearSearch = new JButton(Icons.CROSS_8);
-    clearSearch.setBorderPainted(false);
-    clearSearch.setContentAreaFilled(false);
-    clearSearch.setOpaque(false);
-    clearSearch.setMargin(new Insets(2, 2, 2, 2));
+    JButton clearSearch = Style.clearButton(Icons.CROSS_8);
     clearSearch.setPreferredSize(new Dimension(24, 28));
     clearSearch.setToolTipText("Clear search");
     clearSearch.addActionListener(e -> {
@@ -172,6 +153,22 @@ public class AssetList extends JSplitPane implements Controller {
     this.titleLabel.setFont(this.titleLabel.getFont().deriveFont(java.awt.Font.BOLD));
     titleBar.add(this.titleLabel, BorderLayout.WEST);
 
+    this.zoomSlider = new JSlider(96, 150, 118);
+    this.zoomSlider.setPreferredSize(new Dimension(110, 28));
+    this.zoomSlider.setOpaque(false);
+    this.zoomSlider.setToolTipText("Asset card size");
+    this.zoomSlider.addChangeListener(e -> assetPanel.setCardSize(this.zoomSlider.getValue()));
+
+    JToggleButton densityToggle = Style.iconToggleButton(new GridIcon(), false);
+    densityToggle.setPreferredSize(new Dimension(30, 30));
+    densityToggle.setToolTipText("Toggle compact list / card grid");
+    densityToggle.addActionListener(e -> {
+      assetPanel.setCompact(densityToggle.isSelected());
+      densityToggle.setIcon(densityToggle.isSelected() ? new ListIcon() : new GridIcon());
+      this.zoomSlider.setEnabled(!densityToggle.isSelected());
+      updateSummary();
+    });
+
     JPanel tools = new JPanel(new FlowLayout(FlowLayout.TRAILING, 6, 0));
     tools.setOpaque(false);
     this.summaryLabel = new JLabel();
@@ -179,12 +176,7 @@ public class AssetList extends JSplitPane implements Controller {
     tools.add(this.summaryLabel);
     tools.add(searchBox);
     tools.add(densityToggle);
-    JSlider zoomSlider = new JSlider(96, 150, 118);
-    zoomSlider.setPreferredSize(new Dimension(110, 28));
-    zoomSlider.setOpaque(false);
-    zoomSlider.setToolTipText("Asset card size");
-    zoomSlider.addChangeListener(e -> assetPanel.setCardSize(zoomSlider.getValue()));
-    tools.add(zoomSlider);
+    tools.add(this.zoomSlider);
 
     JPanel topBar = new JPanel(new BorderLayout(8, 0));
     topBar.setOpaque(true);
