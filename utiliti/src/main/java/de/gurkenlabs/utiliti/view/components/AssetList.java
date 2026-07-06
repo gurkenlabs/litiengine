@@ -112,11 +112,18 @@ public class AssetList extends JSplitPane implements Controller {
     });
 
     JToggleButton densityToggle = new JToggleButton(new GridIcon());
-    densityToggle.setPreferredSize(new Dimension(32, 28));
+    densityToggle.setPreferredSize(new Dimension(34, 30));
+    densityToggle.setBorder(new RoundedBorder(Style.COLOR_BORDER, 10, 4));
+    densityToggle.setBackground(Style.COLOR_SURFACE);
+    densityToggle.setContentAreaFilled(true);
+    densityToggle.setOpaque(true);
+    densityToggle.setFocusPainted(false);
     densityToggle.setToolTipText("Toggle compact list / card grid");
     densityToggle.addActionListener(e -> {
       assetPanel.setCompact(densityToggle.isSelected());
       densityToggle.setIcon(densityToggle.isSelected() ? new ListIcon() : new GridIcon());
+      densityToggle.setBackground(densityToggle.isSelected() ? Style.COLOR_ACCENT_BLUE : Style.COLOR_SURFACE);
+      densityToggle.setForeground(densityToggle.isSelected() ? Color.WHITE : Style.COLOR_TEXT);
       updateSummary();
     });
 

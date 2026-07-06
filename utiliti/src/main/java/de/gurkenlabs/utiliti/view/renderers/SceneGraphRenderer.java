@@ -17,6 +17,7 @@ import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.Style;
 import de.gurkenlabs.utiliti.view.components.SceneGraph;
 import java.awt.BorderLayout;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -38,7 +39,8 @@ import javax.swing.tree.TreeCellRenderer;
 
 public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
   private static final Color HOVER_BG = new Color(28, 31, 40);
-  private static final Color SELECTED_BG = new Color(31, 76, 140);
+  private static final Color SELECTED_BG = new Color(39, 45, 58);
+  private static final Color SELECTED_BORDER = new Color(70, 82, 105);
   private enum BadgeKind { COUNT, ID }
 
   private final JPanel rowPanel;
@@ -46,8 +48,9 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
   private final JLabel typeLabel;
   private final JLabel nameLabel;
   private final JLabel badgeLabel;
-  private final JLabel swatchLabel;
-  private final JLabel moreLabel;
+  private boolean selectedRow;
+  private boolean hoverRow;
+  private boolean sectionRow;
 
   public SceneGraphRenderer() {
     super(new BorderLayout(0, 0));
@@ -71,16 +74,7 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
     left.add(this.nameLabel);
     left.add(this.badgeLabel);
 
-    JPanel right = new JPanel(new FlowLayout(FlowLayout.TRAILING, 8, 0));
-    right.setOpaque(false);
-    this.swatchLabel = fixedLabel(14);
-    this.moreLabel = fixedLabel(12);
-    this.moreLabel.setIcon(MoreIcon.INSTANCE);
-    right.add(this.swatchLabel);
-    right.add(this.moreLabel);
-
     this.rowPanel.add(left, BorderLayout.CENTER);
-    this.rowPanel.add(right, BorderLayout.EAST);
     add(this.rowPanel, BorderLayout.CENTER);
   }
 
@@ -107,33 +101,57 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
 
     Object hoverRow = tree.getClientProperty("SceneGraph.hoverRow");
     boolean hover = hoverRow instanceof Integer hovered && hovered == row;
-    setBackground(selected ? SELECTED_BG : hover ? HOVER_BG : Style.COLOR_BG);
+    this.selectedRow = selected && node != null && !node.isSection();
+    this.hoverRow = hover && node != null && !node.isSection();
+    this.sectionRow = node != null && node.isSection();
+    setBackground(Style.COLOR_BG);
     Color foreground = selected ? Color.WHITE : Style.COLOR_TEXT;
     this.nameLabel.setForeground(node != null && node.isSection() ? Style.COLOR_SUBTEXT : foreground);
-    this.moreLabel.setForeground(selected ? Color.WHITE : Style.COLOR_SUBTEXT);
+    int rowHeight = tree.getRowHeight() > 0 ? tree.getRowHeight() : 26;
+    setPreferredSize(new Dimension(Math.max(tree.getWidth() - 4, getPreferredSize().width), rowHeight));
 
     return this;
+  }
+
+  @Override
+  protected void paintComponent(Graphics g) {
+    super.paintComponent(g);
+    if (this.sectionRow || (!this.selectedRow && !this.hoverRow)) {
+      return;
+    }
+
+    Graphics2D g2 = (Graphics2D) g.create();
+    try {
+      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+      g2.setColor(this.selectedRow ? SELECTED_BG : HOVER_BG);
+      g2.fillRoundRect(3, 1, getWidth() - 38, getHeight() - 2, 7, 7);
+      if (this.selectedRow) {
+        g2.setColor(SELECTED_BORDER);
+        g2.drawRoundRect(3, 1, getWidth() - 38, getHeight() - 2, 7, 7);
+      }
+    } finally {
+      g2.dispose();
+    }
   }
 
   private void renderSection(SceneGraph.SceneNode node) {
     this.visibilityLabel.setVisible(false);
     this.typeLabel.setVisible(false);
     this.badgeLabel.setVisible(false);
-    this.swatchLabel.setVisible(false);
-    this.moreLabel.setVisible(false);
     this.nameLabel.setText(node.getName());
     this.nameLabel.setFont(this.nameLabel.getFont().deriveFont(10f));
   }
 
   private void renderLayer(SceneGraph.SceneNode node) {
     this.visibilityLabel.setIcon(node.isVisible() ? Icons.SHOW_16 : Icons.HIDE_16);
-    this.typeLabel.setIcon(node.getIcon() != null ? node.getIcon() : getLayerIcon(node.getLayer()));
+    Color color = node.getLayerColor();
+    this.typeLabel.setIcon(color != null
+        ? new ColoredLayerIcon(color)
+        : node.getIcon() != null ? node.getIcon() : getLayerIcon(node.getLayer()));
     this.nameLabel.setText(node.getName());
     this.badgeLabel.setVisible(node.getObjectCount() > 0);
     this.badgeLabel.putClientProperty("badgeKind", BadgeKind.COUNT);
     this.badgeLabel.setText(node.getObjectCount() + " items");
-    Color color = node.getLayerColor();
-    this.swatchLabel.setIcon(color != null ? new ColorSwatchIcon(color) : null);
   }
 
   private void renderEntity(SceneGraph.SceneNode node) {
@@ -142,7 +160,6 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
     this.typeLabel.setIcon(entityIcon != null ? entityIcon : getDefaultEntityIcon(node));
     this.nameLabel.setText(formatEntityName(node.getName()));
     this.badgeLabel.setVisible(false);
-    this.swatchLabel.setVisible(false);
   }
 
   private void reset() {
@@ -155,9 +172,9 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
     this.badgeLabel.setVisible(false);
     this.badgeLabel.setText("");
     this.badgeLabel.putClientProperty("badgeKind", BadgeKind.COUNT);
-    this.swatchLabel.setVisible(true);
-    this.swatchLabel.setIcon(null);
-    this.moreLabel.setVisible(true);
+    this.selectedRow = false;
+    this.hoverRow = false;
+    this.sectionRow = false;
   }
 
   private static JLabel fixedLabel(int width) {
@@ -295,39 +312,16 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
     }
   }
 
-  private static final class ColorSwatchIcon implements Icon {
+  private static final class ColoredLayerIcon implements Icon {
     private final Color color;
 
-    ColorSwatchIcon(Color color) {
+    ColoredLayerIcon(Color color) {
       this.color = color;
     }
 
     @Override
     public int getIconWidth() {
-      return 10;
-    }
-
-    @Override
-    public int getIconHeight() {
-      return 10;
-    }
-
-    @Override
-    public void paintIcon(Component c, Graphics g, int x, int y) {
-      Graphics2D g2 = (Graphics2D) g.create();
-      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-      g2.setColor(color);
-      g2.fillRoundRect(x, y, 10, 10, 3, 3);
-      g2.dispose();
-    }
-  }
-
-  private static final class MoreIcon implements Icon {
-    private static final MoreIcon INSTANCE = new MoreIcon();
-
-    @Override
-    public int getIconWidth() {
-      return 12;
+      return 16;
     }
 
     @Override
@@ -339,12 +333,19 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
     public void paintIcon(Component c, Graphics g, int x, int y) {
       Graphics2D g2 = (Graphics2D) g.create();
       g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-      g2.setColor(Style.COLOR_SUBTEXT);
-      int cx = x + 6;
-      g2.fillOval(cx - 1, y + 3, 2, 2);
-      g2.fillOval(cx - 1, y + 7, 2, 2);
-      g2.fillOval(cx - 1, y + 11, 2, 2);
+      g2.setStroke(new BasicStroke(1.7f));
+      g2.setColor(color);
+      paintLayer(g2, x + 8, y + 4, 6);
+      paintLayer(g2, x + 8, y + 8, 6);
+      paintLayer(g2, x + 8, y + 12, 6);
       g2.dispose();
     }
+
+    private static void paintLayer(Graphics2D g2, int cx, int cy, int radius) {
+      int[] xs = {cx, cx + radius, cx, cx - radius};
+      int[] ys = {cy - 3, cy, cy + 3, cy};
+      g2.drawPolygon(xs, ys, 4);
+    }
   }
+
 }

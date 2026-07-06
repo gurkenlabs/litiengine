@@ -37,6 +37,7 @@ public class ColorComponent extends JPanel {
   public ColorComponent(Color clearColor) {
     this.clearColor = clearColor;
     int height = (PropertyPanel.CONTROL_HEIGHT + PropertyPanel.CONTROL_MARGIN) * 2;
+    this.setOpaque(false);
     this.setSize(PropertyPanel.CONTROL_WIDTH, height);
     this.setPreferredSize(new Dimension(PropertyPanel.CONTROL_WIDTH, height));
     this.listeners = new ArrayList<>();
@@ -50,7 +51,9 @@ public class ColorComponent extends JPanel {
 
     this.btnSelectColor = new JButton();
     this.btnSelectColor.setIcon(Icons.COLOR_16);
+    styleColorActionButton(this.btnSelectColor);
     this.btnSelectColor.setOpaque(true);
+    this.btnSelectColor.setContentAreaFilled(true);
     this.btnSelectColor.addActionListener(
         a -> {
           final Color result =
@@ -60,6 +63,7 @@ public class ColorComponent extends JPanel {
 
     this.btnClearColor = new JButton(Icons.DELETE_16);
     this.btnClearColor.setToolTipText("Clear color");
+    styleColorActionButton(this.btnClearColor);
     this.btnClearColor.addActionListener(a -> this.clear());
 
     final JLabel lblAlpha = new JLabel(Resources.strings().get("panel_alpha"));
@@ -146,6 +150,12 @@ public class ColorComponent extends JPanel {
                                 GroupLayout.DEFAULT_SIZE,
                                 GroupLayout.PREFERRED_SIZE))));
     setLayout(groupLayout);
+  }
+
+  private static void styleColorActionButton(JButton button) {
+    button.setOpaque(false);
+    button.setContentAreaFilled(false);
+    button.setFocusPainted(false);
   }
 
   public void addActionListener(ActionListener listener) {

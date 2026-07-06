@@ -2,6 +2,7 @@ package de.gurkenlabs.utiliti.view.components;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.UndoManager;
 import de.gurkenlabs.utiliti.controller.Zoom;
@@ -18,6 +19,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.RenderingHints;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JButton;
@@ -26,6 +29,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JToggleButton;
+import javax.swing.KeyStroke;
 
 public class ViewportToolbar extends JPanel {
   private static final Color BAR_BG = new Color(18, 19, 23);
@@ -83,27 +87,33 @@ public class ViewportToolbar extends JPanel {
 
   private static JPopupMenu createAddPopup() {
     JPopupMenu popup = new JPopupMenu();
-    addCreateItem(popup, "Prop", Icons.PROP_16, de.gurkenlabs.litiengine.environment.tilemap.MapObjectType.PROP);
-    addCreateItem(popup, "Creature", Icons.CREATURE_16, de.gurkenlabs.litiengine.environment.tilemap.MapObjectType.CREATURE);
-    addCreateItem(popup, "Collision", Icons.COLLISIONBOX_16, de.gurkenlabs.litiengine.environment.tilemap.MapObjectType.COLLISIONBOX);
-    addCreateItem(popup, "Spawn", Icons.SPAWNPOINT_16, de.gurkenlabs.litiengine.environment.tilemap.MapObjectType.SPAWNPOINT);
-    addCreateItem(popup, "Area", Icons.MAPAREA_16, de.gurkenlabs.litiengine.environment.tilemap.MapObjectType.AREA);
-    addCreateItem(popup, "Light", Icons.BULB_16, de.gurkenlabs.litiengine.environment.tilemap.MapObjectType.LIGHTSOURCE);
+    addCreateItem(popup, "Prop", Icons.PROP_16, MapObjectType.PROP, KeyEvent.VK_1);
+    addCreateItem(popup, "Creature", Icons.CREATURE_16, MapObjectType.CREATURE, KeyEvent.VK_2);
+    addCreateItem(popup, "Collisionbox", Icons.COLLISIONBOX_16, MapObjectType.COLLISIONBOX, KeyEvent.VK_3);
+    addCreateItem(popup, "Trigger", Icons.TRIGGER_16, MapObjectType.TRIGGER, KeyEvent.VK_4);
+    addCreateItem(popup, "Spawnpoint", Icons.SPAWNPOINT_16, MapObjectType.SPAWNPOINT, KeyEvent.VK_5);
+    addCreateItem(popup, "Area", Icons.MAPAREA_16, MapObjectType.AREA, KeyEvent.VK_6);
+    addCreateItem(popup, "Light", Icons.BULB_16, MapObjectType.LIGHTSOURCE, KeyEvent.VK_7);
+    addCreateItem(popup, "Static Shadow", Icons.SHADOWBOX_16, MapObjectType.STATICSHADOW, KeyEvent.VK_8);
+    addCreateItem(popup, "Emitter", Icons.EMITTER_16, MapObjectType.EMITTER, KeyEvent.VK_9);
+    addCreateItem(popup, "Sound", Icons.SOUND_16, MapObjectType.SOUNDSOURCE, KeyEvent.VK_0);
     return popup;
   }
 
-  private static void addCreateItem(JPopupMenu popup, String text, javax.swing.Icon icon, de.gurkenlabs.litiengine.environment.tilemap.MapObjectType type) {
+  private static void addCreateItem(JPopupMenu popup, String text, javax.swing.Icon icon, MapObjectType type, int keyCode) {
     JMenuItem item = new JMenuItem(text, icon);
+    item.setAccelerator(KeyStroke.getKeyStroke(keyCode, InputEvent.CTRL_DOWN_MASK));
     item.addActionListener(e -> AddMenu.setCreateMode(type));
     popup.add(item);
   }
 
   private JButton button(String text, javax.swing.Icon icon, Runnable action) {
-    JButton button = new JButton(icon);
+    JButton button = new ToolbarButton(icon);
     button.setToolTipText(text);
     button.setFocusable(false);
     button.setPreferredSize(BUTTON_SIZE);
     button.setMargin(new Insets(0, 0, 0, 0));
+    button.setFocusPainted(false);
     styleButton(button);
     button.addActionListener(e -> {
       action.run();
@@ -113,11 +123,12 @@ public class ViewportToolbar extends JPanel {
   }
 
   private JToggleButton toggle(String text, javax.swing.Icon icon, boolean selected, java.util.function.Consumer<Boolean> consumer) {
-    JToggleButton button = new JToggleButton(icon, selected);
+    JToggleButton button = new ToolbarToggleButton(icon, selected);
     button.setToolTipText(text);
     button.setFocusable(false);
     button.setPreferredSize(BUTTON_SIZE);
     button.setMargin(new Insets(0, 0, 0, 0));
+    button.setFocusPainted(false);
     styleToggle(button);
     button.addActionListener(e -> {
       consumer.accept(button.isSelected());
@@ -129,23 +140,22 @@ public class ViewportToolbar extends JPanel {
   private static void styleToggle(JToggleButton button) {
     button.setBackground(button.isSelected() ? TOGGLE_SELECTED : BUTTON_BG);
     button.setForeground(button.isSelected() ? Color.WHITE : Style.COLOR_TEXT);
-    button.setBorder(BorderFactory.createLineBorder(button.isSelected() ? Style.COLOR_ACCENT_BLUE : Style.COLOR_BORDER));
-    button.setContentAreaFilled(true);
-    button.setOpaque(true);
+    button.setBorder(BorderFactory.createEmptyBorder());
+    button.setContentAreaFilled(false);
+    button.setOpaque(false);
   }
 
   private static void styleButton(JButton button) {
     button.setBackground(BUTTON_BG);
     button.setForeground(Style.COLOR_TEXT);
-    button.setBorder(BorderFactory.createLineBorder(Style.COLOR_BORDER));
-    button.setContentAreaFilled(true);
-    button.setOpaque(true);
+    button.setBorder(BorderFactory.createEmptyBorder());
+    button.setContentAreaFilled(false);
+    button.setOpaque(false);
   }
 
   private JPanel createZoomGroup() {
     JPanel group = new JPanel(new BorderLayout(0, 0));
     group.setOpaque(false);
-    group.setBorder(BorderFactory.createLineBorder(Style.COLOR_BORDER));
 
     JButton out = button("−", null, Zoom::out);
     JButton in = button("+", null, Zoom::in);
@@ -158,7 +168,7 @@ public class ViewportToolbar extends JPanel {
     this.zoomLabel.setBackground(BUTTON_BG);
     this.zoomLabel.setOpaque(true);
     this.zoomLabel.setPreferredSize(new Dimension(74, 32));
-    this.zoomLabel.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 1, Style.COLOR_BORDER));
+    this.zoomLabel.setBorder(new RoundedBorder(Style.COLOR_BORDER, 10, 4));
 
     group.add(out, BorderLayout.WEST);
     group.add(this.zoomLabel, BorderLayout.CENTER);
@@ -215,6 +225,47 @@ public class ViewportToolbar extends JPanel {
     return Zoom.getZoom().toString().trim();
   }
 
+  private static void paintToolbarButton(java.awt.Component c, javax.swing.ButtonModel model, Graphics g) {
+    Graphics2D g2 = (Graphics2D) g.create();
+    try {
+      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+      boolean selected = model.isSelected();
+      boolean active = selected || model.isPressed();
+      Color fill = active ? TOGGLE_SELECTED : model.isRollover() ? BUTTON_HOVER : BUTTON_BG;
+      Color border = selected ? Style.COLOR_ACCENT_BLUE : Style.COLOR_BORDER;
+      g2.setColor(fill);
+      g2.fillRoundRect(0, 0, c.getWidth() - 1, c.getHeight() - 1, 10, 10);
+      g2.setColor(border);
+      g2.drawRoundRect(0, 0, c.getWidth() - 1, c.getHeight() - 1, 10, 10);
+    } finally {
+      g2.dispose();
+    }
+  }
+
+  private static final class ToolbarButton extends JButton {
+    private ToolbarButton(Icon icon) {
+      super(icon);
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+      paintToolbarButton(this, getModel(), g);
+      super.paintComponent(g);
+    }
+  }
+
+  private static final class ToolbarToggleButton extends JToggleButton {
+    private ToolbarToggleButton(Icon icon, boolean selected) {
+      super(icon, selected);
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+      paintToolbarButton(this, getModel(), g);
+      super.paintComponent(g);
+    }
+  }
+
   private abstract static class ToolbarIcon implements Icon {
     @Override public int getIconWidth() { return 20; }
     @Override public int getIconHeight() { return 20; }
@@ -243,15 +294,19 @@ public class ViewportToolbar extends JPanel {
 
   private static final class SnapIcon extends ToolbarIcon {
     @Override protected void paint(Graphics2D g2, int x, int y) {
-      for (int i = 0; i < 3; i++) {
-        int p = x + 4 + i * 6;
-        g2.fillOval(p - 1, y + 4 - 1, 2, 2);
-        g2.fillOval(p - 1, y + 10 - 1, 2, 2);
-        g2.fillOval(p - 1, y + 16 - 1, 2, 2);
-      }
-      g2.drawRoundRect(x + 5, y + 5, 10, 10, 3, 3);
-      g2.drawLine(x + 10, y + 2, x + 10, y + 18);
-      g2.drawLine(x + 2, y + 10, x + 18, y + 10);
+      g2.drawLine(x + 4, y + 4, x + 4, y + 16);
+      g2.drawLine(x + 10, y + 4, x + 10, y + 16);
+      g2.drawLine(x + 16, y + 4, x + 16, y + 16);
+      g2.drawLine(x + 4, y + 4, x + 16, y + 4);
+      g2.drawLine(x + 4, y + 10, x + 16, y + 10);
+      g2.drawLine(x + 4, y + 16, x + 16, y + 16);
+      g2.fillOval(x + 9, y + 9, 3, 3);
+      g2.drawLine(x + 2, y + 2, x + 7, y + 7);
+      g2.drawLine(x + 7, y + 7, x + 4, y + 7);
+      g2.drawLine(x + 7, y + 7, x + 7, y + 4);
+      g2.drawLine(x + 18, y + 18, x + 13, y + 13);
+      g2.drawLine(x + 13, y + 13, x + 16, y + 13);
+      g2.drawLine(x + 13, y + 13, x + 13, y + 16);
     }
   }
 
@@ -265,6 +320,11 @@ public class ViewportToolbar extends JPanel {
       g2.drawLine(x + 3, y + 17, x + 8, y + 17);
       g2.drawLine(x + 17, y + 12, x + 17, y + 17);
       g2.drawLine(x + 17, y + 17, x + 12, y + 17);
+      g2.drawLine(x + 7, y + 13, x + 13, y + 7);
+      g2.drawLine(x + 7, y + 13, x + 7, y + 10);
+      g2.drawLine(x + 7, y + 13, x + 10, y + 13);
+      g2.drawLine(x + 13, y + 7, x + 10, y + 7);
+      g2.drawLine(x + 13, y + 7, x + 13, y + 10);
     }
   }
 }

@@ -61,6 +61,8 @@ import javax.swing.plaf.FontUIResource;
 
 public final class UI {
   private static final int INSPECTOR_MIN_WIDTH = 420;
+  private static final int SCENE_GRAPH_MIN_WIDTH = 250;
+  private static final int SCENE_GRAPH_MAX_WIDTH = 330;
 
   private static final List<JComponent> orphanComponents = new CopyOnWriteArrayList<>();
   private static JPopupMenu canvasPopup;
@@ -274,7 +276,7 @@ public final class UI {
       centerRightSplit.setDividerLocation(winW - prefInspectorW);
     }
 
-    int prefHierarchyW = Math.max(250, (int) (winW * 0.18));
+    int prefHierarchyW = Math.max(SCENE_GRAPH_MIN_WIDTH, Math.min(SCENE_GRAPH_MAX_WIDTH, (int) (winW * 0.18)));
     JSplitPane mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, centerRightSplit);
     mainSplit.setContinuousLayout(true);
     mainSplit.setResizeWeight(0.0);
@@ -286,8 +288,14 @@ public final class UI {
         Editor.preferences().setHeight(window.getHeight());
       }
     });
-    mainSplit.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY,
-        evt -> Editor.preferences().setMainSplitter(mainSplit.getDividerLocation()));
+    mainSplit.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> {
+      int location = mainSplit.getDividerLocation();
+      if (location > SCENE_GRAPH_MAX_WIDTH) {
+        mainSplit.setDividerLocation(SCENE_GRAPH_MAX_WIDTH);
+        location = SCENE_GRAPH_MAX_WIDTH;
+      }
+      Editor.preferences().setMainSplitter(location);
+    });
 
     JPanel rootPanel = new JPanel(new BorderLayout());
     window.setContentPane(rootPanel);
@@ -295,7 +303,7 @@ public final class UI {
     rootPanel.add(StatusBar.create(), BorderLayout.SOUTH);
     mainSplit.setDividerLocation(
         Editor.preferences().getMainSplitterPosition() != 0
-            ? Editor.preferences().getMainSplitterPosition()
+            ? Math.min(Editor.preferences().getMainSplitterPosition(), SCENE_GRAPH_MAX_WIDTH)
             : prefHierarchyW);
 
     initPopupMenu(canvas);
@@ -381,7 +389,7 @@ public final class UI {
 
     JPanel headerPanel = new JPanel(new BorderLayout(4, 6));
     headerPanel.setOpaque(false);
-    headerPanel.setBorder(BorderFactory.createEmptyBorder(6, 8, 4, 8));
+    headerPanel.setBorder(BorderFactory.createEmptyBorder(6, 6, 5, 6));
     headerPanel.add(leftMapCombo, BorderLayout.CENTER);
 
     JPanel leftPanel = new JPanel(new BorderLayout());
@@ -389,8 +397,9 @@ public final class UI {
     leftPanel.setBackground(Style.COLOR_BG);
     leftPanel.add(headerPanel, BorderLayout.NORTH);
     leftPanel.add(sceneGraph, BorderLayout.CENTER);
-    leftPanel.setMinimumSize(new Dimension(220, 120));
-    leftPanel.setPreferredSize(new Dimension(250, 0));
+    leftPanel.setMinimumSize(new Dimension(SCENE_GRAPH_MIN_WIDTH, 120));
+    leftPanel.setPreferredSize(new Dimension(SCENE_GRAPH_MIN_WIDTH, 0));
+    leftPanel.setMaximumSize(new Dimension(SCENE_GRAPH_MAX_WIDTH, Integer.MAX_VALUE));
 
     return leftPanel;
   }
@@ -428,6 +437,8 @@ public final class UI {
 
   private static JPanel initBottomPanel() {
     JPanel bottomPanel = new JPanel(new BorderLayout());
+    bottomPanel.setOpaque(true);
+    bottomPanel.setBackground(Style.COLOR_BG);
     JTabbedPane bottomTab = new JTabbedPane();
     bottomTab.setFont(Style.getHeaderFont());
     bottomTab.setBorder(null);
