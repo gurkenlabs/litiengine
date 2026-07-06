@@ -12,6 +12,7 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.EntityController;
 import de.gurkenlabs.utiliti.model.Icons;
+import de.gurkenlabs.utiliti.model.Style;
 import de.gurkenlabs.utiliti.view.renderers.IconTreeListRenderer;
 import java.awt.BorderLayout;
 import java.awt.Insets;
@@ -71,13 +72,8 @@ public final class EntityList extends JPanel implements EntityController {
     this.searchPanel = new JPanel();
     this.searchPanel.setLayout(new BorderLayout(0, 0));
 
-    this.btnCollape = new JButton("");
-    this.btnCollape.setBorderPainted(false);
-    this.btnCollape.setContentAreaFilled(false);
-    this.btnCollape.setOpaque(false);
-    this.btnCollape.setMargin(new Insets(2, 2, 2, 2));
+    this.btnCollape = Style.iconButton(Icons.COLLAPSE_24);
     this.btnCollape.addActionListener(e -> collapseAll());
-    this.btnCollape.setIcon(Icons.COLLAPSE_24);
 
     final String entitySearchDefault = Resources.strings().get("panel_entities_search_default");
 
@@ -105,16 +101,11 @@ public final class EntityList extends JPanel implements EntityController {
       }
     });
 
-    this.btnSearch = new JButton("");
-    this.btnSearch.setBorderPainted(false);
-    this.btnSearch.setContentAreaFilled(false);
-    this.btnSearch.setOpaque(false);
-    this.btnSearch.setMargin(new Insets(2, 2, 2, 2));
+    this.btnSearch = Style.iconButton(Icons.SEARCH_24);
     this.btnSearch.addActionListener(e -> {
       searchDebounce.stop();
       search();
     });
-    this.btnSearch.setIcon(Icons.SEARCH_24);
 
     this.searchPanel.add(this.textField, BorderLayout.CENTER);
     this.searchPanel.add(this.btnSearch, BorderLayout.EAST);

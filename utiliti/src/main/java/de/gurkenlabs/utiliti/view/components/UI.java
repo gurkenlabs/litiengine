@@ -389,7 +389,7 @@ public final class UI {
 
     JPanel headerPanel = new JPanel(new BorderLayout(4, 6));
     headerPanel.setOpaque(false);
-    headerPanel.setBorder(BorderFactory.createEmptyBorder(6, 6, 5, 6));
+    headerPanel.setBorder(BorderFactory.createEmptyBorder(6, 8, 5, 8));
     headerPanel.add(leftMapCombo, BorderLayout.CENTER);
 
     JPanel leftPanel = new JPanel(new BorderLayout());
@@ -517,7 +517,7 @@ public final class UI {
     // Panels - borderless design with subtle contrast
     UIManager.put("Panel.background", Style.COLOR_BG);
     UIManager.put("Panel.foreground", Style.COLOR_TEXT);
-    Color INPUT_BG = new Color(48, 49, 55);
+    Color INPUT_BG = Style.COLOR_INPUT_BG;
     UIManager.put("TextField.background", INPUT_BG);
     UIManager.put("TextField.foreground", Style.COLOR_TEXT);
     UIManager.put("TextField.caretForeground", Style.COLOR_ACCENT_BLUE);
@@ -558,10 +558,10 @@ public final class UI {
     UIManager.put("Label.foreground", Style.COLOR_TEXT);
     UIManager.put("Button.background", Style.COLOR_SURFACE);
     UIManager.put("Button.foreground", Style.COLOR_TEXT);
-    UIManager.put("Button.select", new Color(59, 66, 97));
+    UIManager.put("Button.select", Style.COLOR_SELECT);
     UIManager.put("ToggleButton.background", Style.COLOR_SURFACE);
     UIManager.put("ToggleButton.foreground", Style.COLOR_TEXT);
-    UIManager.put("ToggleButton.select", new Color(59, 66, 97));
+    UIManager.put("ToggleButton.select", Style.COLOR_SELECT);
     UIManager.put("CheckBox.background", Style.COLOR_BG);
     UIManager.put("CheckBox.foreground", Style.COLOR_TEXT);
     UIManager.put("RadioButton.background", Style.COLOR_BG);
@@ -570,14 +570,14 @@ public final class UI {
     // Menus
     UIManager.put("Menu.background", Style.COLOR_BG);
     UIManager.put("Menu.foreground", Style.COLOR_TEXT);
-    UIManager.put("Menu.selectionBackground", new Color(59, 66, 97));
+    UIManager.put("Menu.selectionBackground", Style.COLOR_SELECT);
     UIManager.put("Menu.selectionForeground", Style.COLOR_TEXT);
     UIManager.put("MenuItem.background", Style.COLOR_BG);
     UIManager.put("MenuItem.foreground", Style.COLOR_TEXT);
-    UIManager.put("MenuItem.selectionBackground", new Color(59, 66, 97));
+    UIManager.put("MenuItem.selectionBackground", Style.COLOR_SELECT);
     UIManager.put("MenuItem.selectionForeground", Style.COLOR_TEXT);
-    UIManager.put("MenuItem.disabledForeground", new Color(98, 104, 128));
-    UIManager.put("Menu.disabledForeground", new Color(98, 104, 128));
+    UIManager.put("MenuItem.disabledForeground", Style.COLOR_DISABLED_TEXT);
+    UIManager.put("Menu.disabledForeground", Style.COLOR_DISABLED_TEXT);
     UIManager.put("PopupMenu.background", Style.COLOR_SURFACE);
     UIManager.put("PopupMenu.foreground", Style.COLOR_TEXT);
 
@@ -585,7 +585,7 @@ public final class UI {
     UIManager.put("ScrollBar.background", Style.COLOR_BG);
     UIManager.put("ScrollBar.foreground", Style.COLOR_BORDER);
     UIManager.put("ScrollBar.track", Style.COLOR_BG);
-    UIManager.put("ScrollBar.thumb", new Color(65, 65, 75));
+    UIManager.put("ScrollBar.thumb", Style.COLOR_SCROLLBAR_THUMB);
     UIManager.put("ScrollBar.width", 10);
     UIManager.put("ScrollPane.background", Style.COLOR_BG);
     UIManager.put("Viewport.background", Style.COLOR_BG);

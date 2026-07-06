@@ -12,7 +12,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 public final class ControlBehavior {
-  static final Color INPUT_BG = new Color(36, 37, 42);
+  static final Color INPUT_BG = Style.COLOR_INPUT_BG;
 
   private ControlBehavior() {}
 

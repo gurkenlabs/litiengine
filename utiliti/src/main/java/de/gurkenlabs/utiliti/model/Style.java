@@ -3,8 +3,17 @@ package de.gurkenlabs.utiliti.model;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.Editor;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.util.Objects;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.JToggleButton;
 
 /**
  * The Style class provides various constants and methods related to the visual style of the application. It includes color definitions, font
@@ -58,6 +67,104 @@ public final class Style {
   public static final Color COLOR_TAG_BORDER = new Color(80, 90, 130);
   public static final Color COLOR_TAG_HOVER = new Color(65, 75, 115);
   public static final Color COLOR_STATUS = Color.WHITE;
+
+  // Semantic UI state colors
+  public static final Color COLOR_INPUT_BG = new Color(36, 37, 42);
+  public static final Color COLOR_HOVER = new Color(38, 42, 52);
+  public static final Color COLOR_PLACEHOLDER = new Color(74, 74, 74);
+  public static final Color COLOR_SELECT = new Color(59, 66, 97);
+  public static final Color COLOR_DISABLED_TEXT = new Color(98, 104, 128);
+  public static final Color COLOR_SCROLLBAR_THUMB = new Color(65, 65, 75);
+  public static final Color COLOR_ROW_HOVER = new Color(28, 31, 40);
+  public static final Color COLOR_BADGE_ID = new Color(42, 65, 112);
+  public static final Color COLOR_CARD_HOVER = new Color(255, 255, 255, 12);
+  public static final Color COLOR_CARD_SELECTED = new Color(53, 116, 242, 45);
+
+  // --- Shared icon button hover painting ---
+
+  public static void paintButtonBackground(Component c, javax.swing.ButtonModel model, Graphics g) {
+    Graphics2D g2 = (Graphics2D) g.create();
+    try {
+      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+      boolean selected = model.isSelected();
+      boolean active = selected || model.isPressed();
+      Color fill = active ? COLOR_ACCENT_BLUE : model.isRollover() ? COLOR_HOVER : COLOR_SURFACE;
+      Color border = selected ? COLOR_ACCENT_BLUE : COLOR_BORDER;
+      g2.setColor(fill);
+      g2.fillRoundRect(0, 0, c.getWidth() - 1, c.getHeight() - 1, 8, 8);
+      g2.setColor(border);
+      g2.setStroke(new java.awt.BasicStroke(1.2f));
+      g2.drawRoundRect(0, 0, c.getWidth() - 1, c.getHeight() - 1, 8, 8);
+    } finally {
+      g2.dispose();
+    }
+  }
+
+  public static JButton iconButton(Icon icon) {
+    JButton button = new JButton(icon) {
+      @Override protected void paintComponent(Graphics g) {
+        paintButtonBackground(this, getModel(), g);
+        super.paintComponent(g);
+      }
+    };
+    styleIconButton(button);
+    return button;
+  }
+
+  public static JButton iconButton(Action action) {
+    JButton button = new JButton(action) {
+      @Override protected void paintComponent(Graphics g) {
+        paintButtonBackground(this, getModel(), g);
+        super.paintComponent(g);
+      }
+    };
+    styleIconButton(button);
+    return button;
+  }
+
+  public static JToggleButton iconToggleButton(Icon icon, boolean selected) {
+    JToggleButton button = new JToggleButton(icon, selected) {
+      @Override protected void paintComponent(Graphics g) {
+        paintButtonBackground(this, getModel(), g);
+        super.paintComponent(g);
+      }
+    };
+    styleIconButton(button);
+    return button;
+  }
+
+  private static void styleIconButton(javax.swing.AbstractButton button) {
+    button.setFocusable(false);
+    button.setOpaque(false);
+    button.setContentAreaFilled(false);
+    button.setBorderPainted(false);
+    button.setFocusPainted(false);
+    button.setMargin(new java.awt.Insets(2, 2, 2, 2));
+  }
+
+  /**
+   * Creates a ghost/clear button with no visible border by default, only a subtle hover fill.
+   * Used for inline clear (X) buttons inside search boxes.
+   */
+  public static JButton clearButton(Icon icon) {
+    JButton button = new JButton(icon) {
+      @Override protected void paintComponent(Graphics g) {
+        Graphics2D g2 = (Graphics2D) g.create();
+        try {
+          g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+          if (getModel().isRollover() || getModel().isPressed()) {
+            g2.setColor(COLOR_HOVER);
+            g2.fillRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 6, 6);
+          }
+        } finally {
+          g2.dispose();
+        }
+        super.paintComponent(g);
+      }
+    };
+    styleIconButton(button);
+    return button;
+  }
 
   public static final float FONT_DEFAULT_SIZE = 12;
   public static final float FONT_HEADER_SIZE = 12;

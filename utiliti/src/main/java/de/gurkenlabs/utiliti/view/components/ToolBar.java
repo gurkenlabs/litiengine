@@ -23,7 +23,7 @@ import javax.swing.JToolBar;
 
 public class ToolBar extends JToolBar {
   private static final int ARC = 8;
-  private static final Color DOCK_BG = new Color(30, 31, 34, 230);
+  private static final Color DOCK_BG = new Color(Style.COLOR_SURFACE.getRed(), Style.COLOR_SURFACE.getGreen(), Style.COLOR_SURFACE.getBlue(), 230);
 
   public ToolBar() {
     super("Tools");
@@ -38,9 +38,8 @@ public class ToolBar extends JToolBar {
       if (!tool.showInToolbar()) {
         continue;
       }
-      JToggleButton btn = new JToggleButton(tool.getIcon());
+      JToggleButton btn = Style.iconToggleButton(tool.getIcon(), tool.equals(ToolManager.instance().getActiveTool()));
       btn.setToolTipText(tool.getName());
-      btn.setSelected(tool.equals(ToolManager.instance().getActiveTool()));
       btn.addActionListener(e -> ToolManager.instance().setActiveTool(tool));
       group.add(btn);
       add(btn);
@@ -50,16 +49,14 @@ public class ToolBar extends JToolBar {
 
     addSeparator();
 
-    JButton undoBtn = new JButton(Icons.UNDO_24);
+    JButton undoBtn = Style.iconButton(Icons.UNDO_24);
     undoBtn.setToolTipText(Resources.strings().get("menu_edit_undo"));
-    undoBtn.setMargin(new Insets(2, 4, 2, 4));
     undoBtn.addActionListener(e -> UndoManager.instance().undo());
     undoBtn.setEnabled(false);
     add(undoBtn);
 
-    JButton redoBtn = new JButton(Icons.REDO_24);
+    JButton redoBtn = Style.iconButton(Icons.REDO_24);
     redoBtn.setToolTipText(Resources.strings().get("menu_edit_redo"));
-    redoBtn.setMargin(new Insets(2, 4, 2, 4));
     redoBtn.addActionListener(e -> UndoManager.instance().redo());
     redoBtn.setEnabled(false);
     add(redoBtn);
@@ -71,9 +68,8 @@ public class ToolBar extends JToolBar {
 
     addSeparator();
 
-    JButton addBtn = new JButton(Icons.ADD_24);
+    JButton addBtn = Style.iconButton(Icons.ADD_24);
     addBtn.setToolTipText(Resources.strings().get("menu_add"));
-    addBtn.setMargin(new Insets(2, 4, 2, 4));
     addBtn.addActionListener(e -> {
       JPopupMenu popup = createAddPopup();
       popup.show(addBtn, 0, addBtn.getHeight());

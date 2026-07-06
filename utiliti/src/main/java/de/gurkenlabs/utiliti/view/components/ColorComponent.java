@@ -7,6 +7,9 @@ import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.Style;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,11 +52,9 @@ public class ColorComponent extends JPanel {
     this.textFieldColor.setColumns(9);
     this.textFieldColor.addActionListener(a -> this.setColor(ColorHelper.decode(this.textFieldColor.getText())));
 
-    this.btnSelectColor = new JButton();
+    this.btnSelectColor = new ColorSwatchButton();
     this.btnSelectColor.setIcon(Icons.COLOR_16);
     styleColorActionButton(this.btnSelectColor);
-    this.btnSelectColor.setOpaque(true);
-    this.btnSelectColor.setContentAreaFilled(true);
     this.btnSelectColor.addActionListener(
         a -> {
           final Color result =
@@ -61,9 +62,8 @@ public class ColorComponent extends JPanel {
           this.setColor(result);
         });
 
-    this.btnClearColor = new JButton(Icons.DELETE_16);
+    this.btnClearColor = Style.iconButton(Icons.DELETE_16);
     this.btnClearColor.setToolTipText("Clear color");
-    styleColorActionButton(this.btnClearColor);
     this.btnClearColor.addActionListener(a -> this.clear());
 
     final JLabel lblAlpha = new JLabel(Resources.strings().get("panel_alpha"));
@@ -156,6 +156,24 @@ public class ColorComponent extends JPanel {
     button.setOpaque(false);
     button.setContentAreaFilled(false);
     button.setFocusPainted(false);
+    button.setBorder(new RoundedBorder(Style.COLOR_BORDER, 8, 4));
+  }
+
+  private static final class ColorSwatchButton extends JButton {
+    @Override
+    protected void paintComponent(Graphics g) {
+      Graphics2D g2 = (Graphics2D) g.create();
+      try {
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setColor(getBackground() != null ? getBackground() : Style.COLOR_SURFACE);
+        g2.fillRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 8, 8);
+        g2.setColor(Style.COLOR_BORDER);
+        g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 8, 8);
+      } finally {
+        g2.dispose();
+      }
+      super.paintComponent(g);
+    }
   }
 
   public void addActionListener(ActionListener listener) {

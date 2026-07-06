@@ -9,6 +9,7 @@ import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.utiliti.controller.ControlBehavior;
 import de.gurkenlabs.utiliti.controller.SwingHelpers;
 import de.gurkenlabs.utiliti.model.Icons;
+import de.gurkenlabs.utiliti.model.Style;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -54,9 +55,9 @@ public class EmitterColorPanel extends PropertyPanel {
 
     ctrlButtonToolbar = new JToolBar(JToolBar.VERTICAL);
     ctrlButtonToolbar.setFloatable(false);
-    btnAdd = new JButton(Icons.ADD_16);
-    btnRemove = new JButton(Icons.DELETE_16);
-    btnEdit = new JButton(Icons.COLOR_16);
+    btnAdd = Style.iconButton(Icons.ADD_16);
+    btnRemove = Style.iconButton(Icons.DELETE_16);
+    btnEdit = Style.iconButton(Icons.COLOR_16);
 
     ctrlButtonToolbar.setMaximumSize(new Dimension(BUTTON_SIZE.width, BUTTON_SIZE.height * 3));
 
