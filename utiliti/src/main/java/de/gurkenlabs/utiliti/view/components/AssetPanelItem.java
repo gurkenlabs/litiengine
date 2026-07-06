@@ -22,6 +22,7 @@ import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.UndoManager;
 import de.gurkenlabs.utiliti.controller.tool.AssetTransferable;
 import de.gurkenlabs.utiliti.model.Icons;
+import de.gurkenlabs.utiliti.model.Style;
 import java.awt.datatransfer.Transferable;
 import de.gurkenlabs.utiliti.view.dialogs.XmlExportDialog;
 import de.gurkenlabs.utiliti.view.menus.AssetPanelItemPopupMenu;
@@ -50,6 +51,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -76,13 +78,14 @@ public class AssetPanelItem extends JPanel {
   private static final int PADDING = 8;
   private static final int ICON_SIZE = 64;
   private static final int BUTTON_SIZE = 24;
-  private static final Color HOVER_COLOR = new Color(255, 255, 255, 20);
-  private static final Color SELECTED_COLOR = new Color(100, 150, 255, 40);
+  private static final Color HOVER_COLOR = new Color(255, 255, 255, 12);
+  private static final Color SELECTED_COLOR = new Color(53, 116, 242, 45);
   private static final BasicStroke FOCUS_STROKE = new BasicStroke(2.0f);
-  private static final Dimension PREFERRED_SIZE = new Dimension(140, 140);
+  private static final Dimension PREFERRED_SIZE = new Dimension(118, 118);
 
   private final JLabel iconLabel;
   private final JLabel nameLabel;
+  private final JLabel detailsLabel;
   private final JPanel buttonPanel;
   private final JButton btnEdit;
   private final JButton btnDelete;
@@ -94,11 +97,14 @@ public class AssetPanelItem extends JPanel {
   private boolean isSelected;
   private boolean compact;
   private Icon scaledIcon;
+  private int cardSize = PREFERRED_SIZE.width;
+  private Consumer<AssetPanelItem> focusCallback;
 
   public AssetPanelItem(Object origin) {
     this.origin = origin;
     this.iconLabel = createIconLabel();
     this.nameLabel = createNameLabel();
+    this.detailsLabel = createDetailsLabel();
     this.buttonPanel = createButtonPanel();
 
     this.btnAdd = createStyledButton(Icons.ADD_16, "assetpanel_add");
@@ -129,6 +135,15 @@ public class AssetPanelItem extends JPanel {
     label.setHorizontalAlignment(SwingConstants.CENTER);
     label.setVerticalAlignment(SwingConstants.TOP);
     label.setFont(label.getFont().deriveFont(Font.PLAIN, 11f));
+    label.setForeground(Style.COLOR_TEXT);
+    return label;
+  }
+
+  private JLabel createDetailsLabel() {
+    JLabel label = new JLabel();
+    label.setHorizontalAlignment(SwingConstants.LEFT);
+    label.setFont(label.getFont().deriveFont(Font.PLAIN, 10f));
+    label.setForeground(Style.COLOR_SUBTEXT);
     return label;
   }
 
@@ -140,8 +155,8 @@ public class AssetPanelItem extends JPanel {
   }
 
   private void initializeComponent() {
-    setPreferredSize(compact ? new Dimension(PREFERRED_SIZE.width, 42) : PREFERRED_SIZE);
-    setMinimumSize(compact ? new Dimension(PREFERRED_SIZE.width, 42) : PREFERRED_SIZE);
+    setPreferredSize(compact ? new Dimension(PREFERRED_SIZE.width, 42) : new Dimension(cardSize, cardSize));
+    setMinimumSize(compact ? new Dimension(PREFERRED_SIZE.width, 42) : new Dimension(cardSize, cardSize));
     setOpaque(false);
     setFocusable(true);
     setRequestFocusEnabled(true);
@@ -195,6 +210,7 @@ public class AssetPanelItem extends JPanel {
       centerPanel.setOpaque(false);
       centerPanel.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
       centerPanel.add(nameLabel, BorderLayout.CENTER);
+      centerPanel.add(detailsLabel, BorderLayout.SOUTH);
       add(iconLabel, BorderLayout.WEST);
       add(centerPanel, BorderLayout.CENTER);
       add(buttonPanel, BorderLayout.EAST);
@@ -222,7 +238,7 @@ public class AssetPanelItem extends JPanel {
   private JPanel createIconPanel() {
     JPanel panel = new JPanel(new BorderLayout());
     panel.setOpaque(false);
-    panel.setPreferredSize(new Dimension(ICON_SIZE + 16, ICON_SIZE + 8));
+    panel.setPreferredSize(new Dimension(ICON_SIZE + 8, ICON_SIZE + 2));
     panel.add(iconLabel, BorderLayout.CENTER);
     return panel;
   }
@@ -230,7 +246,7 @@ public class AssetPanelItem extends JPanel {
   private JPanel createTextPanel() {
     JPanel panel = new JPanel(new BorderLayout());
     panel.setOpaque(false);
-    panel.setBorder(BorderFactory.createEmptyBorder(4, 0, 8, 0));
+    panel.setBorder(BorderFactory.createEmptyBorder(2, 0, 4, 0));
     panel.add(nameLabel, BorderLayout.CENTER);
     return panel;
   }
@@ -287,6 +303,9 @@ public class AssetPanelItem extends JPanel {
       @Override public void focusGained(FocusEvent e) {
         isSelected = true;
         updateButtonVisibility(true);
+        if (focusCallback != null) {
+          focusCallback.accept(AssetPanelItem.this);
+        }
         repaint();
       }
 
@@ -303,7 +322,6 @@ public class AssetPanelItem extends JPanel {
       @Override public void mouseEntered(MouseEvent e) {
         isHovered = true;
         updateButtonVisibility(true);
-        requestFocus();
         repaint();
       }
 
@@ -369,6 +387,7 @@ public class AssetPanelItem extends JPanel {
     this.scaledIcon = icon;
     iconLabel.setIcon(icon);
     nameLabel.setText(wrapText(text, 16));
+    detailsLabel.setText(getDetailsSummary());
     String tooltip = createTooltip(text);
     setToolTipText(tooltip);
     iconLabel.setToolTipText(tooltip);
@@ -419,6 +438,8 @@ public class AssetPanelItem extends JPanel {
 
     RoundRectangle2D roundRect = new RoundRectangle2D.Float(0, 0, getWidth() - 1f, getHeight() - 1f, CORNER_RADIUS, CORNER_RADIUS);
 
+    g2d.setColor(Style.COLOR_SURFACE);
+    g2d.fill(roundRect);
     if (isSelected) {
       g2d.setColor(SELECTED_COLOR);
       g2d.fill(roundRect);
@@ -427,7 +448,7 @@ public class AssetPanelItem extends JPanel {
       g2d.fill(roundRect);
     }
 
-    g2d.setColor(isSelected ? UIManager.getColor("Tree.selectionBorderColor") : UIManager.getColor("Component.borderColor"));
+    g2d.setColor(isSelected ? Style.COLOR_ACCENT_BLUE : Style.COLOR_BORDER);
     g2d.setStroke(isSelected ? FOCUS_STROKE : new BasicStroke(1.0f));
     g2d.draw(roundRect);
 
@@ -435,7 +456,7 @@ public class AssetPanelItem extends JPanel {
     super.paintComponent(g);
   }
 
-  private static Map<String, String> getDetails(Object origin) {
+  public static Map<String, String> getDetails(Object origin) {
     Map<String, String> details = new ConcurrentHashMap<>();
     if (origin instanceof SpritesheetResource spritesheetResource) {
       details.put("Size", spritesheetResource.getWidth() + "x" + spritesheetResource.getHeight() + "px");
@@ -453,6 +474,20 @@ public class AssetPanelItem extends JPanel {
     return origin;
   }
 
+  public String getDetailsSummary() {
+    Map<String, String> details = getDetails(origin);
+    if (details.isEmpty()) {
+      return "";
+    }
+    return String.join("  •  ", details.entrySet().stream()
+        .map(entry -> entry.getKey() + ": " + entry.getValue())
+        .toList());
+  }
+
+  public void setFocusCallback(Consumer<AssetPanelItem> focusCallback) {
+    this.focusCallback = focusCallback;
+  }
+
   public void setCompact(boolean compact) {
     if (this.compact == compact) {
       return;
@@ -460,11 +495,21 @@ public class AssetPanelItem extends JPanel {
     this.compact = compact;
     removeAll();
     setupLayout();
-    setPreferredSize(compact ? new Dimension(PREFERRED_SIZE.width, 42) : PREFERRED_SIZE);
-    setMinimumSize(compact ? new Dimension(PREFERRED_SIZE.width, 42) : PREFERRED_SIZE);
+    setPreferredSize(compact ? new Dimension(PREFERRED_SIZE.width, 42) : new Dimension(cardSize, cardSize));
+    setMinimumSize(compact ? new Dimension(PREFERRED_SIZE.width, 42) : new Dimension(cardSize, cardSize));
     iconLabel.setPreferredSize(compact ? new Dimension(32, 32) : null);
     revalidate();
     repaint();
+  }
+
+  public void setCardSize(int cardSize) {
+    this.cardSize = cardSize;
+    if (!compact) {
+      setPreferredSize(new Dimension(cardSize, cardSize));
+      setMinimumSize(new Dimension(cardSize, cardSize));
+      revalidate();
+      repaint();
+    }
   }
 
   public boolean isCompact() {

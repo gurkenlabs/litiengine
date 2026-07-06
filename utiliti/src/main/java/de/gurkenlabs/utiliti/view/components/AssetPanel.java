@@ -13,6 +13,7 @@ import de.gurkenlabs.litiengine.resources.SoundResource;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.utiliti.controller.WrapLayout;
 import de.gurkenlabs.utiliti.model.Icons;
+import de.gurkenlabs.utiliti.model.Style;
 import de.gurkenlabs.utiliti.view.menus.AssetPanelPopupMenu;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -34,10 +35,16 @@ public class AssetPanel extends JPanel {
   private String filterText = "";
   private boolean compact;
   private final List<AssetPanelItem> allItems = new ArrayList<>();
+  private int visibleItemCount;
+  private Runnable changedCallback;
+  private int cardSize = 118;
+  private AssetPanelItem focusedItem;
 
   public AssetPanel() {
     this.setLayout(createLayout());
-    this.setBorder(new EmptyBorder(5, 5, 5, 5));
+    this.setBorder(new EmptyBorder(8, 8, 8, 8));
+    this.setBackground(Style.COLOR_BG);
+    this.setOpaque(true);
 
     MouseAdapter popupHandler = new MouseAdapter() {
       @Override public void mousePressed(MouseEvent e) {
@@ -68,8 +75,18 @@ public class AssetPanel extends JPanel {
     this.setLayout(createLayout());
     for (AssetPanelItem item : allItems) {
       item.setCompact(compact);
+      item.setCardSize(this.cardSize);
     }
     applyFilter();
+  }
+
+  public void setCardSize(int cardSize) {
+    this.cardSize = cardSize;
+    for (AssetPanelItem item : this.allItems) {
+      item.setCardSize(cardSize);
+    }
+    revalidate();
+    repaint();
   }
 
   public boolean isCompact() {
@@ -81,22 +98,57 @@ public class AssetPanel extends JPanel {
       return new javax.swing.BoxLayout(this, javax.swing.BoxLayout.Y_AXIS);
     }
     WrapLayout layout = new WrapLayout();
-    layout.setVgap(5);
-    layout.setHgap(5);
+    layout.setVgap(8);
+    layout.setHgap(8);
     layout.setAlignment(LEFT);
     return layout;
   }
 
   private void applyFilter() {
     this.removeAll();
+    this.visibleItemCount = 0;
     for (AssetPanelItem item : allItems) {
       if (filterText.isEmpty() || item.getName().toLowerCase().contains(filterText)) {
         this.add(item);
+        this.visibleItemCount++;
         item.validate();
       }
     }
     this.revalidate();
     this.repaint();
+    if (this.changedCallback != null) {
+      this.changedCallback.run();
+    }
+  }
+
+  public void setChangedCallback(Runnable changedCallback) {
+    this.changedCallback = changedCallback;
+  }
+
+  public int getVisibleItemCount() {
+    return this.visibleItemCount;
+  }
+
+  public int getTotalItemCount() {
+    return this.allItems.size();
+  }
+
+  public AssetPanelItem getFocusedItem() {
+    return this.focusedItem;
+  }
+
+  public String getCurrentTitle() {
+    if (this.currentType == null) {
+      return "Resources";
+    }
+    return switch (this.currentType) {
+      case SPRITESHEET -> "Spritesheets";
+      case TILESET -> "Tilesets";
+      case EMITTER -> "Emitters";
+      case BLUEPRINT -> "Blueprints";
+      case SOUND -> "Sounds";
+      case ANIMATION -> "Animations";
+    };
   }
 
   private void maybeShowPopup(MouseEvent e) {
@@ -119,7 +171,7 @@ public class AssetPanel extends JPanel {
           icon = null;
         }
 
-        allItems.add(new AssetPanelItem(icon, getDisplayName(info), info));
+        allItems.add(createItem(icon, getDisplayName(info), info));
       }
     });
   }
@@ -130,7 +182,7 @@ public class AssetPanel extends JPanel {
       Collections.sort(tilesets);
       for (Tileset tileset : tilesets) {
         allItems.add(
-          new AssetPanelItem(Icons.ASSET_TILESET_32, tileset.getName(), tileset));
+          createItem(Icons.ASSET_TILESET_32, tileset.getName(), tileset));
       }
     });
   }
@@ -141,7 +193,7 @@ public class AssetPanel extends JPanel {
       Collections.sort(emitters);
       for (EmitterAttributes emitter : emitters) {
         allItems.add(
-          new AssetPanelItem(Icons.ASSET_EMITTER_32, emitter.getName(), emitter));
+          createItem(Icons.ASSET_EMITTER_32, emitter.getName(), emitter));
       }
     });
   }
@@ -152,7 +204,7 @@ public class AssetPanel extends JPanel {
       Collections.sort(blueprints);
       for (MapObject blueprint : blueprints) {
         allItems.add(
-          new AssetPanelItem(Icons.ASSET_BLUEPRINT_32, blueprint.getName(), blueprint));
+          createItem(Icons.ASSET_BLUEPRINT_32, blueprint.getName(), blueprint));
       }
     });
   }
@@ -163,7 +215,7 @@ public class AssetPanel extends JPanel {
       Collections.sort(sounds);
       for (SoundResource sound : sounds) {
         allItems.add(
-          new AssetPanelItem(Icons.ASSET_SOUND_32, sound.getName(), sound));
+          createItem(Icons.ASSET_SOUND_32, sound.getName(), sound));
       }
     });
   }
@@ -182,16 +234,30 @@ public class AssetPanel extends JPanel {
         if (sheet != null && sheet.getSprite(0) != null) {
           icon = new ImageIcon(sheet.getPreview(64));
         }
-        allItems.add(new AssetPanelItem(icon, animation.getName(), animation));
+        allItems.add(createItem(icon, animation.getName(), animation));
       }
     });
   }
 
   private void loadItems(Runnable runnable) {
     allItems.clear();
+    focusedItem = null;
     this.removeAll();
     runnable.run();
     applyFilter();
+  }
+
+  private AssetPanelItem createItem(Icon icon, String name, Object origin) {
+    AssetPanelItem item = new AssetPanelItem(icon, name, origin);
+    item.setCompact(this.compact);
+    item.setCardSize(this.cardSize);
+    item.setFocusCallback(focused -> {
+      this.focusedItem = focused;
+      if (this.changedCallback != null) {
+        this.changedCallback.run();
+      }
+    });
+    return item;
   }
 
   private static String getDisplayName(SpritesheetResource info) {

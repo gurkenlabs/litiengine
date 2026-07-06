@@ -10,6 +10,7 @@ import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.SpriteVariantSelector;
 import de.gurkenlabs.utiliti.model.Icons;
+import de.gurkenlabs.utiliti.model.Style;
 import de.gurkenlabs.utiliti.view.renderers.IconTreeListRenderer;
 import java.awt.Dimension;
 import java.util.ArrayList;
@@ -33,9 +34,12 @@ public class AssetTree extends JTree {
   private final DefaultMutableTreeNode nodeBlueprints;
   private final DefaultMutableTreeNode nodeCreatures;
   private final DefaultMutableTreeNode nodeAnimations;
+  private String currentBreadcrumb = "Resources";
 
   public AssetTree(AssetPanel assetPanel) {
     this.setRootVisible(false);
+    this.setShowsRootHandles(true);
+    this.setBackground(Style.COLOR_SURFACE);
 
     this.assetPanel = assetPanel;
 
@@ -66,7 +70,7 @@ public class AssetTree extends JTree {
     this.setModel(this.entitiesTreeModel);
     this.setCellRenderer(new IconTreeListRenderer());
     this.setMaximumSize(new Dimension(0, 250));
-    this.setRowHeight((int) (24 * Editor.preferences().getUiScale()));
+    this.setRowHeight((int) (28 * Editor.preferences().getUiScale()));
     for (int i = 0; i < getRowCount(); i++) {
       this.expandRow(i);
     }
@@ -75,13 +79,29 @@ public class AssetTree extends JTree {
   }
 
   public void forceUpdate() {
+    if (getSelectionPath() == null) {
+      selectDefault();
+      return;
+    }
     loadAssetsOfCurrentSelection(getSelectionPath());
+  }
+
+  public void selectDefault() {
+    TreePath propPath = new TreePath(this.nodeSpriteProps.getPath());
+    setSelectionPath(propPath);
+    scrollPathToVisible(propPath);
+    loadAssetsOfCurrentSelection(propPath);
+  }
+
+  public String getCurrentBreadcrumb() {
+    return this.currentBreadcrumb;
   }
 
   private void loadAssetsOfCurrentSelection(TreePath selectedPath) {
     if (selectedPath == null) {
       return;
     }
+    this.currentBreadcrumb = breadcrumb(selectedPath);
 
     // Precompute TreePaths once
     final TreePath spritePath = new TreePath(this.nodeSpritesheets.getPath());
@@ -137,6 +157,18 @@ public class AssetTree extends JTree {
     if (selectedPath.equals(soundPath)) {
       this.assetPanel.loadSounds(gameFile.getSounds());
     }
+  }
+
+  private static String breadcrumb(TreePath path) {
+    Object[] parts = path.getPath();
+    StringBuilder sb = new StringBuilder("Resources");
+    for (int i = 1; i < parts.length; i++) {
+      Object part = parts[i];
+      if (part instanceof DefaultMutableTreeNode node) {
+        sb.append("  ›  ").append(node.getUserObject());
+      }
+    }
+    return sb.toString();
   }
 
   // --- Sprite classification helpers -----------------------------------------------------------

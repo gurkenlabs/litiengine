@@ -11,9 +11,11 @@ import de.gurkenlabs.litiengine.graphics.animation.CreatureAnimationController;
 import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.Imaging;
+import de.gurkenlabs.utiliti.model.Style;
 import de.gurkenlabs.utiliti.view.components.IconTreeListItem;
 import java.awt.Color;
 import java.awt.Component;
+import javax.swing.BorderFactory;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
@@ -31,6 +33,8 @@ public class IconTreeListRenderer implements TreeCellRenderer {
 
   public IconTreeListRenderer() {
     this.label = new JLabel();
+    this.label.setOpaque(true);
+    this.label.setBorder(BorderFactory.createEmptyBorder(2, 6, 2, 6));
   }
 
   @Override
@@ -57,6 +61,8 @@ public class IconTreeListRenderer implements TreeCellRenderer {
         label.setIcon(getIcon(lightSource));
       }
     }
+    this.label.setBackground(selected ? Style.COLOR_SELECTION_INACTIVE : Style.COLOR_SURFACE);
+    this.label.setForeground(selected ? Style.COLOR_TEXT : Style.COLOR_TEXT);
     return label;
   }
 

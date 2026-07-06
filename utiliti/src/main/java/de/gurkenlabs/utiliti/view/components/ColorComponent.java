@@ -3,8 +3,8 @@ package de.gurkenlabs.utiliti.view.components;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.utiliti.controller.ControlBehavior;
-import de.gurkenlabs.utiliti.controller.SwingHelpers;
 import de.gurkenlabs.utiliti.model.Icons;
+import de.gurkenlabs.utiliti.model.Style;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
@@ -41,12 +41,16 @@ public class ColorComponent extends JPanel {
     this.setPreferredSize(new Dimension(PropertyPanel.CONTROL_WIDTH, height));
     this.listeners = new ArrayList<>();
     this.textFieldColor = ControlBehavior.apply(new JTextField());
+    this.textFieldColor.setBackground(Style.COLOR_SURFACE2);
+    this.textFieldColor.setForeground(Style.COLOR_TEXT);
+    this.textFieldColor.setCaretColor(Style.COLOR_ACCENT_BLUE);
     this.textFieldColor.setEditable(true);
     this.textFieldColor.setColumns(9);
     this.textFieldColor.addActionListener(a -> this.setColor(ColorHelper.decode(this.textFieldColor.getText())));
 
     this.btnSelectColor = new JButton();
     this.btnSelectColor.setIcon(Icons.COLOR_16);
+    this.btnSelectColor.setOpaque(true);
     this.btnSelectColor.addActionListener(
         a -> {
           final Color result =
@@ -168,7 +172,10 @@ public class ColorComponent extends JPanel {
     if (color == null) {
       return;
     }
-    SwingHelpers.updateColorTextField(this.textFieldColor, color);
+    this.textFieldColor.setText(ColorHelper.encode(color));
+    this.textFieldColor.setBackground(Style.COLOR_SURFACE2);
+    this.textFieldColor.setForeground(Style.COLOR_TEXT);
+    this.btnSelectColor.setBackground(new Color(color.getRed(), color.getGreen(), color.getBlue()));
     this.spinnerAlpha.setValue(color.getAlpha());
     for (ActionListener listener : this.listeners) {
       listener.actionPerformed(null);
