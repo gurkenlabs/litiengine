@@ -38,9 +38,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeCellRenderer;
 
 public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
-  private static final Color HOVER_BG = new Color(28, 31, 40);
-  private static final Color SELECTED_BG = new Color(39, 45, 58);
-  private static final Color SELECTED_BORDER = new Color(70, 82, 105);
+  private static final Color HOVER_BG = Style.COLOR_ROW_HOVER;
+  private static final Color SELECTED_BG = Style.COLOR_SELECTION_INACTIVE;
   private enum BadgeKind { COUNT, ID }
 
   private final JPanel rowPanel;
@@ -124,11 +123,7 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
     try {
       g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
       g2.setColor(this.selectedRow ? SELECTED_BG : HOVER_BG);
-      g2.fillRoundRect(3, 1, getWidth() - 38, getHeight() - 2, 7, 7);
-      if (this.selectedRow) {
-        g2.setColor(SELECTED_BORDER);
-        g2.drawRoundRect(3, 1, getWidth() - 38, getHeight() - 2, 7, 7);
-      }
+      g2.fillRoundRect(4, 2, getWidth() - 42, getHeight() - 4, 7, 7);
     } finally {
       g2.dispose();
     }
@@ -305,7 +300,7 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
       Graphics2D g2 = (Graphics2D) g.create();
       g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
       Object kind = getClientProperty("badgeKind");
-      g2.setColor(kind == BadgeKind.ID ? new Color(42, 65, 112) : Style.COLOR_SELECTION_INACTIVE);
+      g2.setColor(kind == BadgeKind.ID ? Style.COLOR_BADGE_ID : Style.COLOR_SELECTION_INACTIVE);
       g2.fillRoundRect(0, 2, getWidth(), getHeight() - 4, 10, 10);
       g2.dispose();
       super.paintComponent(g);
