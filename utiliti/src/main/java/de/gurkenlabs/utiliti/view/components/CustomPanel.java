@@ -6,13 +6,12 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.UndoManager;
+import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.Style;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +34,7 @@ public class CustomPanel extends PropertyPanel {
 
     this.scrollPane = new JScrollPane();
 
-    JButton buttonAdd = createPillButton("+");
+    JButton buttonAdd = Style.iconButton(Icons.ADD_16);
     buttonAdd.addActionListener(
         a -> {
           TableCellEditor editor = tableCustomProperties.getCellEditor();
@@ -46,7 +45,7 @@ public class CustomPanel extends PropertyPanel {
           model.fireTableDataChanged();
         });
 
-    JButton buttonRemove = createPillButton("-");
+    JButton buttonRemove = Style.iconButton(Icons.MINUS_16);
     buttonRemove.addActionListener(
         a -> {
           TableCellEditor editor = tableCustomProperties.getCellEditor();
@@ -66,19 +65,18 @@ public class CustomPanel extends PropertyPanel {
     GroupLayout groupLayout = new GroupLayout(this);
     groupLayout.setHorizontalGroup(
         groupLayout
-            .createParallelGroup(Alignment.LEADING)
+            .createSequentialGroup()
+            .addGap(PropertyPanel.LABEL_WIDTH + PropertyPanel.GUTTER_WIDTH)
             .addGroup(
                 groupLayout
-                    .createSequentialGroup()
-                    .addGap(PropertyPanel.LABEL_WIDTH + PropertyPanel.GUTTER_WIDTH)
-                    .addComponent(scrollPane, PropertyPanel.CONTROL_MIN_WIDTH, PropertyPanel.CONTROL_WIDTH, Integer.MAX_VALUE))
-            .addGroup(
-                groupLayout
-                    .createSequentialGroup()
-                    .addGap(PropertyPanel.LABEL_WIDTH + PropertyPanel.GUTTER_WIDTH)
-                    .addComponent(buttonAdd)
-                    .addGap(6)
-                    .addComponent(buttonRemove)));
+                    .createParallelGroup(Alignment.LEADING)
+                    .addComponent(scrollPane, PropertyPanel.CONTROL_MIN_WIDTH, PropertyPanel.CONTROL_WIDTH, Integer.MAX_VALUE)
+                    .addGroup(
+                        groupLayout
+                            .createSequentialGroup()
+                            .addComponent(buttonAdd)
+                            .addGap(6)
+                            .addComponent(buttonRemove))));
     groupLayout.setVerticalGroup(
         groupLayout
             .createSequentialGroup()
@@ -97,7 +95,7 @@ public class CustomPanel extends PropertyPanel {
       protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         if (getRowCount() == 0) {
-          g.setColor(new Color(74, 74, 74));
+          g.setColor(Style.COLOR_PLACEHOLDER);
           FontMetrics fm = g.getFontMetrics();
           int x = (getWidth() - fm.stringWidth(EMPTY_TEXT)) / 2;
           int y = getHeight() / 2;
@@ -138,29 +136,6 @@ public class CustomPanel extends PropertyPanel {
     setLayout(groupLayout);
 
     this.setupChangedListeners();
-  }
-
-  private static JButton createPillButton(String text) {
-    JButton btn = new JButton(text) {
-      @Override
-      protected void paintComponent(Graphics g) {
-        Graphics2D g2 = (Graphics2D) g.create();
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.setColor(getModel().isRollover() ? Style.COLOR_SURFACE2.brighter() : Style.COLOR_SURFACE2);
-        g2.fillRoundRect(0, 0, getWidth(), getHeight(), getHeight(), getHeight());
-        g2.setColor(Style.COLOR_BORDER);
-        g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, getHeight(), getHeight());
-        g2.dispose();
-        super.paintComponent(g);
-      }
-    };
-    btn.setOpaque(false);
-    btn.setContentAreaFilled(false);
-    btn.setBorderPainted(false);
-    btn.setFocusPainted(false);
-    btn.setForeground(Style.COLOR_TEXT);
-    btn.setPreferredSize(new Dimension(28, 22));
-    return btn;
   }
 
   @Override

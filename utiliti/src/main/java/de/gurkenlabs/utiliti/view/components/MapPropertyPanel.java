@@ -9,14 +9,14 @@ import de.gurkenlabs.litiengine.graphics.AmbientLight;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.ControlBehavior;
 import de.gurkenlabs.utiliti.controller.UndoManager;
+import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.Style;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.util.ArrayList;
@@ -29,12 +29,12 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
@@ -50,7 +50,7 @@ public class MapPropertyPanel extends JPanel {
   private final JScrollPane scrollPane;
   private final JSpinner spinnerGravity;
   private final ColorComponent ambientColorComponent;
-  private final JEditorPane textFieldDesc;
+  private final JTextArea textFieldDesc;
   private final JTextField textFieldName;
   private final ColorComponent shadowColorComponent;
   private final JTextField textFieldTitle;
@@ -68,9 +68,17 @@ public class MapPropertyPanel extends JPanel {
 
     this.textFieldName = ControlBehavior.apply(new JTextField());
     this.textFieldTitle = ControlBehavior.apply(new JTextField());
-    this.textFieldDesc = new JEditorPane();
-    this.textFieldDesc.setBackground(Style.COLOR_SURFACE2);
-    this.textFieldDesc.setForeground(Style.COLOR_TEXT);
+    this.textFieldDesc = new JTextArea() {
+      @Override public void updateUI() {
+        super.updateUI();
+        setBackground(Style.COLOR_SURFACE2);
+        setForeground(Style.COLOR_TEXT);
+        setCaretColor(Style.COLOR_TEXT);
+      }
+    };
+    this.textFieldDesc.setLineWrap(true);
+    this.textFieldDesc.setWrapStyleWord(true);
+    this.textFieldDesc.setMargin(new java.awt.Insets(4, 4, 4, 4));
     JScrollPane scrollPaneDesc = new JScrollPane(this.textFieldDesc);
     scrollPaneDesc.setBorder(new RoundedBorder(Style.COLOR_BORDER, 8, 1));
     scrollPaneDesc.getViewport().setBackground(Style.COLOR_SURFACE2);
@@ -93,8 +101,8 @@ public class MapPropertyPanel extends JPanel {
           this.saveChanges();
         });
 
-    JButton buttonAdd = createPillButton("+");
-    JButton buttonRemove = createPillButton("-");
+    JButton buttonAdd = Style.iconButton(Icons.ADD_16);
+    JButton buttonRemove = Style.iconButton(Icons.MINUS_16);
 
     this.scrollPane = new JScrollPane();
     this.tableCustomProperties = createPropertiesTable();
@@ -193,12 +201,20 @@ public class MapPropertyPanel extends JPanel {
   }
 
   private JPanel createPropertiesPanel(JButton buttonAdd, JButton buttonRemove) {
+    int inset = PropertyPanel.LABEL_WIDTH + PropertyPanel.GUTTER_WIDTH - 6;
     JPanel panel = new JPanel();
     panel.setOpaque(false);
     panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-    panel.add(createPropertiesHeader(buttonAdd, buttonRemove));
+    panel.add(createAlignedControl(this.scrollPane, 150, inset));
     panel.add(Box.createVerticalStrut(6));
-    panel.add(createAlignedControl(this.scrollPane, 150));
+    JPanel buttonRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
+    buttonRow.setOpaque(false);
+    buttonRow.add(buttonAdd);
+    buttonRow.add(buttonRemove);
+    JPanel buttonWrapper = new JPanel(new BorderLayout());
+    buttonWrapper.setOpaque(false);
+    buttonWrapper.add(buttonRow, BorderLayout.WEST);
+    panel.add(createAlignedControl(buttonWrapper, buttonRow.getPreferredSize().height, inset));
     return panel;
   }
 
@@ -236,41 +252,21 @@ public class MapPropertyPanel extends JPanel {
   }
 
   private JPanel createAlignedControl(JComponent component, int height) {
+    return createAlignedControl(component, height, PropertyPanel.LABEL_WIDTH + PropertyPanel.GUTTER_WIDTH);
+  }
+
+  private JPanel createAlignedControl(JComponent component, int height, int inset) {
     JPanel panel = new JPanel();
     panel.setOpaque(false);
     GroupLayout gl = new GroupLayout(panel);
     panel.setLayout(gl);
     gl.setHorizontalGroup(
         gl.createSequentialGroup()
-            .addGap(PropertyPanel.LABEL_WIDTH + PropertyPanel.GUTTER_WIDTH)
+            .addGap(inset)
             .addComponent(component, PropertyPanel.CONTROL_MIN_WIDTH, PropertyPanel.CONTROL_WIDTH, Integer.MAX_VALUE));
     gl.setVerticalGroup(
         gl.createSequentialGroup().addComponent(component, height, height, height));
     setRowSize(panel, height);
-    return panel;
-  }
-
-  private JPanel createPropertiesHeader(JButton buttonAdd, JButton buttonRemove) {
-    JLabel label = new JLabel(Resources.strings().get("panel_customProperties"));
-    label.setForeground(Style.COLOR_TEXT);
-    label.setHorizontalAlignment(SwingConstants.TRAILING);
-    JPanel panel = new JPanel();
-    panel.setOpaque(false);
-    GroupLayout gl = new GroupLayout(panel);
-    panel.setLayout(gl);
-    gl.setHorizontalGroup(
-        gl.createSequentialGroup()
-            .addComponent(label, PropertyPanel.LABEL_WIDTH, PropertyPanel.LABEL_WIDTH, PropertyPanel.LABEL_WIDTH)
-            .addGap(PropertyPanel.GUTTER_WIDTH)
-            .addComponent(buttonAdd)
-            .addGap(6)
-            .addComponent(buttonRemove));
-    gl.setVerticalGroup(
-        gl.createParallelGroup(Alignment.CENTER)
-            .addComponent(label)
-            .addComponent(buttonAdd)
-            .addComponent(buttonRemove));
-    setRowSize(panel, Math.max(32, panel.getPreferredSize().height));
     return panel;
   }
 
@@ -287,29 +283,6 @@ public class MapPropertyPanel extends JPanel {
     return label;
   }
 
-  private static JButton createPillButton(String text) {
-    JButton btn = new JButton(text) {
-      @Override
-      protected void paintComponent(Graphics g) {
-        Graphics2D g2 = (Graphics2D) g.create();
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.setColor(getModel().isRollover() ? Style.COLOR_SURFACE2.brighter() : Style.COLOR_SURFACE2);
-        g2.fillRoundRect(0, 0, getWidth(), getHeight(), getHeight(), getHeight());
-        g2.setColor(Style.COLOR_BORDER);
-        g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, getHeight(), getHeight());
-        g2.dispose();
-        super.paintComponent(g);
-      }
-    };
-    btn.setOpaque(false);
-    btn.setContentAreaFilled(false);
-    btn.setBorderPainted(false);
-    btn.setFocusPainted(false);
-    btn.setForeground(Style.COLOR_TEXT);
-    btn.setPreferredSize(new Dimension(28, 22));
-    return btn;
-  }
-
   private JTable createPropertiesTable() {
     JTable table =
         new JTable() {
@@ -319,7 +292,7 @@ public class MapPropertyPanel extends JPanel {
           protected void paintComponent(Graphics g) {
             super.paintComponent(g);
             if (getRowCount() == 0) {
-              g.setColor(new Color(74, 74, 74));
+              g.setColor(Style.COLOR_PLACEHOLDER);
               FontMetrics fm = g.getFontMetrics();
               int x = (getWidth() - fm.stringWidth(EMPTY_TEXT)) / 2;
               int y = getHeight() / 2;
