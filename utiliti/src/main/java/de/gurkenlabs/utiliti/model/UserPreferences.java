@@ -39,6 +39,9 @@ public class UserPreferences extends ConfigurationGroup {
   private int width;
   private int height;
 
+  private boolean compactMode;
+  private int assetCardSize;
+
   private float gridLineWidth;
   private String gridColor;
   private int snapDivision;
@@ -67,6 +70,8 @@ public class UserPreferences extends ConfigurationGroup {
     this.snapDivision = 1;
     this.setUiScale(1.0f);
     this.setTheme(Theme.DARK);
+    this.compactMode = false;
+    this.assetCardSize = 118;
   }
 
   /**
@@ -538,6 +543,22 @@ public class UserPreferences extends ConfigurationGroup {
    */
   public void setTheme(Theme theme) {
     this.theme = theme;
+  }
+
+  public boolean isCompactMode() {
+    return compactMode;
+  }
+
+  public void setCompactMode(boolean compactMode) {
+    this.compactMode = compactMode;
+  }
+
+  public int getAssetCardSize() {
+    return assetCardSize;
+  }
+
+  public void setAssetCardSize(int assetCardSize) {
+    this.assetCardSize = assetCardSize;
   }
 
   @Override protected void storeProperties(Properties properties) {

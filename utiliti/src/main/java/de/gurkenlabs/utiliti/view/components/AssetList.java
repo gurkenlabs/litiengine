@@ -112,39 +112,12 @@ public class AssetList extends JSplitPane implements Controller {
       }
     });
 
-    JButton clearSearch = Style.clearButton(Icons.CROSS_8);
-    clearSearch.setPreferredSize(new Dimension(24, 28));
-    clearSearch.setToolTipText("Clear search");
-    clearSearch.addActionListener(e -> {
+    RoundedSearchBox searchBox = new RoundedSearchBox(this.searchField, 250);
+    searchBox.getClearButton().addActionListener(e -> {
       searchField.setText("");
       assetPanel.setFilterText("");
       updateSummary();
     });
-
-    JPanel searchBox = new JPanel(new BorderLayout(8, 0)) {
-      @Override
-      protected void paintComponent(Graphics g) {
-        Graphics2D g2 = (Graphics2D) g.create();
-        try {
-          g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-          g2.setColor(Style.COLOR_SURFACE);
-          g2.fillRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 10, 10);
-          g2.setColor(Style.COLOR_BORDER);
-          g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 10, 10);
-        } finally {
-          g2.dispose();
-        }
-        super.paintComponent(g);
-      }
-    };
-    searchBox.setOpaque(false);
-    searchBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 10, 0, 4));
-    searchBox.setPreferredSize(new Dimension(250, 30));
-    JLabel searchIcon = new JLabel(Icons.SEARCH_16);
-    searchIcon.setPreferredSize(new Dimension(16, 30));
-    searchBox.add(searchIcon, BorderLayout.WEST);
-    searchBox.add(this.searchField, BorderLayout.CENTER);
-    searchBox.add(clearSearch, BorderLayout.EAST);
 
     JPanel titleBar = new JPanel(new BorderLayout());
     titleBar.setOpaque(false);
@@ -153,21 +126,29 @@ public class AssetList extends JSplitPane implements Controller {
     this.titleLabel.setFont(this.titleLabel.getFont().deriveFont(java.awt.Font.BOLD));
     titleBar.add(this.titleLabel, BorderLayout.WEST);
 
-    this.zoomSlider = new JSlider(96, 150, 118);
+    this.zoomSlider = new JSlider(96, 150, Editor.preferences().getAssetCardSize());
     this.zoomSlider.setPreferredSize(new Dimension(110, 28));
     this.zoomSlider.setOpaque(false);
     this.zoomSlider.setToolTipText("Asset card size");
-    this.zoomSlider.addChangeListener(e -> assetPanel.setCardSize(this.zoomSlider.getValue()));
+    this.zoomSlider.addChangeListener(e -> {
+      assetPanel.setCardSize(this.zoomSlider.getValue());
+      Editor.preferences().setAssetCardSize(this.zoomSlider.getValue());
+    });
 
-    JToggleButton densityToggle = Style.iconToggleButton(new GridIcon(), false);
+    boolean initialCompact = Editor.preferences().isCompactMode();
+    JToggleButton densityToggle = Style.iconToggleButton(initialCompact ? new ListIcon() : new GridIcon(), initialCompact);
     densityToggle.setPreferredSize(new Dimension(30, 30));
     densityToggle.setToolTipText("Toggle compact list / card grid");
     densityToggle.addActionListener(e -> {
       assetPanel.setCompact(densityToggle.isSelected());
       densityToggle.setIcon(densityToggle.isSelected() ? new ListIcon() : new GridIcon());
       this.zoomSlider.setEnabled(!densityToggle.isSelected());
+      Editor.preferences().setCompactMode(densityToggle.isSelected());
       updateSummary();
     });
+    assetPanel.setCardSize(Editor.preferences().getAssetCardSize());
+    assetPanel.setCompact(initialCompact);
+    this.zoomSlider.setEnabled(!initialCompact);
 
     JPanel tools = new JPanel(new FlowLayout(FlowLayout.TRAILING, 6, 0));
     tools.setOpaque(false);
