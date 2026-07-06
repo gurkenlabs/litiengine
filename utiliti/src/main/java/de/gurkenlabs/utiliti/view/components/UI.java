@@ -542,7 +542,7 @@ public final class UI {
     UIManager.put("Table.gridColor", Style.COLOR_BORDER);
     UIManager.put("Tree.background", Style.COLOR_BG);
     UIManager.put("Tree.foreground", Style.COLOR_TEXT);
-    UIManager.put("Tree.selectionBackground", Style.COLOR_SELECTION_INACTIVE);
+    UIManager.put("Tree.selectionBackground", new Color(0, 0, 0, 0));
     UIManager.put("Tree.selectionForeground", Style.COLOR_TEXT);
     UIManager.put("Tree.textBackground", Style.COLOR_BG);
     UIManager.put("Tree.textForeground", Style.COLOR_TEXT);
