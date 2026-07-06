@@ -32,17 +32,17 @@ import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
 
 public class ViewportToolbar extends JPanel {
-  private static final Color BAR_BG = new Color(18, 19, 23);
-  private static final Color BUTTON_BG = new Color(30, 32, 38);
-  private static final Color BUTTON_HOVER = new Color(38, 42, 52);
-  private static final Color TOGGLE_SELECTED = new Color(53, 116, 242);
   private static final Dimension BUTTON_SIZE = new Dimension(36, 32);
   private final JLabel zoomLabel;
+  private final JButton btnCopy;
+  private final JButton btnCut;
+  private final JButton btnDelete;
+  private final JButton btnPaste;
 
   public ViewportToolbar() {
     super(new BorderLayout());
     setOpaque(true);
-    setBackground(BAR_BG);
+    setBackground(Style.COLOR_BG);
     setBorder(BorderFactory.createCompoundBorder(
         BorderFactory.createMatteBorder(0, 0, 1, 0, Style.COLOR_BORDER),
         BorderFactory.createEmptyBorder(6, 8, 6, 8)));
@@ -56,7 +56,16 @@ public class ViewportToolbar extends JPanel {
     left.add(button("Select", Icons.POINTER_24, () -> selectTool(0)));
     left.add(button("Undo", Icons.UNDO_24, () -> UndoManager.instance().undo()));
     left.add(button("Redo", Icons.REDO_24, () -> UndoManager.instance().redo()));
+    left.add(separator());
     left.add(addButton());
+    this.btnCopy = button("Copy", Icons.COPY_24, () -> Editor.instance().getMapComponent().copy());
+    this.btnCut = button("Cut", Icons.CUT_24, () -> Editor.instance().getMapComponent().cut());
+    this.btnDelete = button("Delete", Icons.DELETE_24, () -> Editor.instance().getMapComponent().delete());
+    left.add(this.btnCopy);
+    left.add(this.btnCut);
+    left.add(this.btnDelete);
+    this.btnPaste = button("Paste", Icons.PASTE_24, () -> Editor.instance().getMapComponent().paste());
+    left.add(this.btnPaste);
 
     JButton undo = (JButton) left.getComponent(1);
     JButton redo = (JButton) left.getComponent(2);
@@ -65,6 +74,20 @@ public class ViewportToolbar extends JPanel {
     UndoManager.onUndoStackChanged(mgr -> {
       undo.setEnabled(UndoManager.instance().canUndo());
       redo.setEnabled(UndoManager.instance().canRedo());
+    });
+
+    this.btnCopy.setEnabled(false);
+    this.btnCut.setEnabled(false);
+    this.btnDelete.setEnabled(false);
+    this.btnPaste.setEnabled(false);
+    Editor.instance().getMapComponent().onSelectionChanged(selection -> {
+      boolean hasSelection = selection != null && !selection.isEmpty();
+      this.btnCopy.setEnabled(hasSelection);
+      this.btnCut.setEnabled(hasSelection);
+      this.btnDelete.setEnabled(hasSelection);
+    });
+    Editor.instance().getMapComponent().onCopyTargetChanged(bp -> {
+      this.btnPaste.setEnabled(bp != null);
     });
 
     left.add(separator());
@@ -138,7 +161,7 @@ public class ViewportToolbar extends JPanel {
   }
 
   private static void styleToggle(JToggleButton button) {
-    button.setBackground(button.isSelected() ? TOGGLE_SELECTED : BUTTON_BG);
+    button.setBackground(button.isSelected() ? Style.COLOR_ACCENT_BLUE : Style.COLOR_SURFACE);
     button.setForeground(button.isSelected() ? Color.WHITE : Style.COLOR_TEXT);
     button.setBorder(BorderFactory.createEmptyBorder());
     button.setContentAreaFilled(false);
@@ -146,7 +169,7 @@ public class ViewportToolbar extends JPanel {
   }
 
   private static void styleButton(JButton button) {
-    button.setBackground(BUTTON_BG);
+    button.setBackground(Style.COLOR_SURFACE);
     button.setForeground(Style.COLOR_TEXT);
     button.setBorder(BorderFactory.createEmptyBorder());
     button.setContentAreaFilled(false);
@@ -165,7 +188,7 @@ public class ViewportToolbar extends JPanel {
     in.setFont(in.getFont().deriveFont(18f));
     this.zoomLabel.setHorizontalAlignment(JLabel.CENTER);
     this.zoomLabel.setForeground(Style.COLOR_TEXT);
-    this.zoomLabel.setBackground(BUTTON_BG);
+    this.zoomLabel.setBackground(Style.COLOR_SURFACE);
     this.zoomLabel.setOpaque(true);
     this.zoomLabel.setPreferredSize(new Dimension(74, 32));
     this.zoomLabel.setBorder(new RoundedBorder(Style.COLOR_BORDER, 10, 4));
@@ -229,14 +252,19 @@ public class ViewportToolbar extends JPanel {
     Graphics2D g2 = (Graphics2D) g.create();
     try {
       g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+      boolean enabled = c.isEnabled();
       boolean selected = model.isSelected();
       boolean active = selected || model.isPressed();
-      Color fill = active ? TOGGLE_SELECTED : model.isRollover() ? BUTTON_HOVER : BUTTON_BG;
-      Color border = selected ? Style.COLOR_ACCENT_BLUE : Style.COLOR_BORDER;
+      Color fill = !enabled ? Style.COLOR_SURFACE : active ? Style.COLOR_ACCENT_BLUE : model.isRollover() ? Style.COLOR_HOVER : Style.COLOR_SURFACE;
+      Color border = !enabled ? Style.COLOR_BORDER.darker() : selected ? Style.COLOR_ACCENT_BLUE : Style.COLOR_BORDER;
       g2.setColor(fill);
       g2.fillRoundRect(0, 0, c.getWidth() - 1, c.getHeight() - 1, 10, 10);
       g2.setColor(border);
       g2.drawRoundRect(0, 0, c.getWidth() - 1, c.getHeight() - 1, 10, 10);
+      if (!enabled) {
+        g2.setColor(new Color(0, 0, 0, 80));
+        g2.fillRoundRect(0, 0, c.getWidth() - 1, c.getHeight() - 1, 10, 10);
+      }
     } finally {
       g2.dispose();
     }
@@ -274,7 +302,11 @@ public class ViewportToolbar extends JPanel {
     public final void paintIcon(java.awt.Component c, Graphics g, int x, int y) {
       Graphics2D g2 = (Graphics2D) g.create();
       g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-      g2.setColor(c instanceof JToggleButton toggle && toggle.isSelected() ? Color.WHITE : Style.COLOR_TEXT);
+      if (!c.isEnabled()) {
+        g2.setColor(Style.COLOR_DISABLED_TEXT);
+      } else {
+        g2.setColor(c instanceof JToggleButton toggle && toggle.isSelected() ? Color.WHITE : Style.COLOR_TEXT);
+      }
       paint(g2, x, y);
       g2.dispose();
     }
