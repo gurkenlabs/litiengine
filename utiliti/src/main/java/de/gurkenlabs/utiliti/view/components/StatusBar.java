@@ -5,18 +5,14 @@ import de.gurkenlabs.litiengine.environment.tilemap.ILayer;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.Editor;
-import de.gurkenlabs.utiliti.controller.Zoom;
 import de.gurkenlabs.utiliti.model.Style;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.event.ItemEvent;
-import java.util.Objects;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -24,22 +20,19 @@ import javax.swing.border.EmptyBorder;
 public final class StatusBar {
   private static JLabel statusLabel;
   private static JLabel toolLabel;
-  private static JComboBox<Zoom> zoomComboBox;
-
-  private static boolean settingZoom;
 
   private StatusBar() {}
 
   public static Container create() {
     JPanel panel = new JPanel();
     panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-    panel.setBorder(new EmptyBorder(2, 6, 2, 6));
+    panel.setOpaque(true);
+    panel.setBackground(Style.COLOR_BG);
+    panel.setBorder(BorderFactory.createCompoundBorder(
+        BorderFactory.createMatteBorder(1, 0, 0, 0, Style.COLOR_BORDER),
+        new EmptyBorder(2, 6, 2, 6)));
 
     int fs = (int) (11 * Editor.preferences().getUiScale());
-
-    zoomComboBox = new JComboBox<>(Zoom.getAll());
-    zoomComboBox.setFont(new Font(Style.FONTNAME_CONSOLE, Font.PLAIN, fs));
-    zoomComboBox.setMaximumSize(new Dimension(80, 24));
 
     statusLabel = new JLabel("");
     statusLabel.setFont(new Font(Style.FONTNAME_CONSOLE, Font.PLAIN, fs));
@@ -49,16 +42,6 @@ public final class StatusBar {
     toolLabel.setFont(new Font(Style.FONTNAME_CONSOLE, Font.PLAIN, fs));
     toolLabel.setForeground(Style.COLOR_ACCENT_BLUE);
 
-    zoomComboBox.addItemListener(
-        e -> {
-          if (settingZoom || e.getStateChange() != ItemEvent.SELECTED) {
-            return;
-          }
-          Zoom.set(((Zoom) Objects.requireNonNull(zoomComboBox.getSelectedItem())).getValue());
-        });
-
-    panel.add(zoomComboBox);
-    panel.add(createSeparator());
     panel.add(statusLabel);
     panel.add(Box.createHorizontalGlue());
     panel.add(createSeparator());
@@ -92,9 +75,6 @@ public final class StatusBar {
     String toolName = getToolDisplayName();
     toolLabel.setText(toolName);
 
-    settingZoom = true;
-    zoomComboBox.setSelectedItem(Zoom.getZoom());
-    settingZoom = false;
   }
 
   private static ILayer getActiveLayer() {

@@ -243,7 +243,7 @@ public final class UI {
     initScrollBars(renderPanel);
 
     initTools();
-    renderPanel.add(new ToolBar(), BorderLayout.NORTH);
+    renderPanel.add(new ViewportToolbar(), BorderLayout.NORTH);
     initDropTarget(renderPanel);
 
     Component leftPanel = initLeftPanel();
@@ -263,6 +263,8 @@ public final class UI {
     JSplitPane centerRightSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, renderSplitPanel, inspectorHost);
     centerRightSplit.setContinuousLayout(true);
     centerRightSplit.setResizeWeight(1.0);
+    centerRightSplit.setBorder(null);
+    centerRightSplit.setDividerSize(6);
     centerRightSplit.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY,
         evt -> Editor.preferences().setSelectionEditSplitter(centerRightSplit.getDividerLocation()));
     if (Editor.preferences().getSelectionEditSplitter() != 0) {
@@ -275,6 +277,9 @@ public final class UI {
     int prefHierarchyW = Math.max(250, (int) (winW * 0.18));
     JSplitPane mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, centerRightSplit);
     mainSplit.setContinuousLayout(true);
+    mainSplit.setResizeWeight(0.0);
+    mainSplit.setBorder(null);
+    mainSplit.setDividerSize(6);
     mainSplit.addComponentListener(new ComponentAdapter() {
       @Override public void componentResized(ComponentEvent e) {
         Editor.preferences().setWidth(window.getWidth());
@@ -324,6 +329,9 @@ public final class UI {
 
   private static Component initRenderSplitPanel(JPanel renderPanel, int winH) {
     JSplitPane renderSplitPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, renderPanel, initBottomPanel());
+    renderSplitPanel.setResizeWeight(1.0);
+    renderSplitPanel.setBorder(null);
+    renderSplitPanel.setDividerSize(6);
     if (Editor.preferences().getBottomSplitter() != 0) {
       renderSplitPanel.setDividerLocation(Editor.preferences().getBottomSplitter());
     } else {
@@ -341,11 +349,13 @@ public final class UI {
 
     JComboBox<TmxMap> leftMapCombo = new JComboBox<>();
     leftMapCombo.setRenderer(new de.gurkenlabs.utiliti.view.renderers.MapListCellRenderer());
-    leftMapCombo.setPreferredSize(new Dimension(160, 28));
-    leftMapCombo.setMinimumSize(new Dimension(100, 28));
-    leftMapCombo.setMaximumSize(new Dimension(200, 28));
+    leftMapCombo.setFont(leftMapCombo.getFont().deriveFont(15f));
+    leftMapCombo.setPreferredSize(new Dimension(0, 36));
+    leftMapCombo.setMinimumSize(new Dimension(100, 36));
+    leftMapCombo.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
     leftMapCombo.addActionListener(e -> {
-      if (Editor.instance().isLoading() || Editor.instance().getMapComponent().isLoading()) {
+      if (Boolean.TRUE.equals(leftMapCombo.getClientProperty("updating"))
+          || Editor.instance().isLoading() || Editor.instance().getMapComponent().isLoading()) {
         return;
       }
       Object selected = leftMapCombo.getSelectedItem();
@@ -357,18 +367,21 @@ public final class UI {
       }
     });
     Editor.instance().getMapComponent().onMapLoaded(map -> {
+      leftMapCombo.putClientProperty("updating", true);
       for (int i = 0; i < leftMapCombo.getItemCount(); i++) {
         if (leftMapCombo.getItemAt(i) == map) {
           leftMapCombo.setSelectedIndex(i);
+          leftMapCombo.putClientProperty("updating", false);
           return;
         }
       }
+      leftMapCombo.putClientProperty("updating", false);
     });
     UI.setMapCombo(leftMapCombo);
 
-    JPanel headerPanel = new JPanel(new BorderLayout(4, 0));
+    JPanel headerPanel = new JPanel(new BorderLayout(4, 6));
     headerPanel.setOpaque(false);
-    headerPanel.setBorder(BorderFactory.createEmptyBorder(4, 6, 4, 6));
+    headerPanel.setBorder(BorderFactory.createEmptyBorder(6, 8, 4, 8));
     headerPanel.add(leftMapCombo, BorderLayout.CENTER);
 
     JPanel leftPanel = new JPanel(new BorderLayout());
@@ -417,10 +430,13 @@ public final class UI {
     JPanel bottomPanel = new JPanel(new BorderLayout());
     JTabbedPane bottomTab = new JTabbedPane();
     bottomTab.setFont(Style.getHeaderFont());
+    bottomTab.setBorder(null);
+    bottomTab.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+    bottomTab.setBackground(Style.COLOR_BG);
 
     assetComponent = new AssetList();
-    bottomTab.addTab(Resources.strings().get("assettree_assets"), Icons.ASSET_32, assetComponent);
-    bottomTab.addTab(Resources.strings().get("assettree_console"), Icons.CONSOLE_32, new ConsoleComponent());
+    bottomTab.addTab(Resources.strings().get("assettree_assets"), assetComponent);
+    bottomTab.addTab(Resources.strings().get("assettree_console"), new ConsoleComponent());
 
     bottomPanel.add(bottomTab, BorderLayout.CENTER);
 

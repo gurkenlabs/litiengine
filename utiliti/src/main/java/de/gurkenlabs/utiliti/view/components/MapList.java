@@ -136,12 +136,17 @@ public class MapList extends JScrollPane implements MapController {
     // sync combo
     JComboBox<TmxMap> combo = UI.getMapCombo();
     if (combo != null) {
-      combo.removeAllItems();
-      for (int i = 0; i < this.model.getSize(); i++) {
-        combo.addItem((TmxMap) this.model.get(i));
-      }
-      if (list.getSelectedValue() instanceof TmxMap selectedTmx) {
-        combo.setSelectedItem(selectedTmx);
+      combo.putClientProperty("updating", true);
+      try {
+        combo.removeAllItems();
+        for (int i = 0; i < this.model.getSize(); i++) {
+          combo.addItem((TmxMap) this.model.get(i));
+        }
+        if (list.getSelectedValue() instanceof TmxMap selectedTmx) {
+          combo.setSelectedItem(selectedTmx);
+        }
+      } finally {
+        combo.putClientProperty("updating", false);
       }
     }
 
@@ -160,7 +165,12 @@ public class MapList extends JScrollPane implements MapController {
 
     JComboBox<TmxMap> combo = UI.getMapCombo();
     if (combo != null) {
-      combo.setSelectedItem(map);
+      combo.putClientProperty("updating", true);
+      try {
+        combo.setSelectedItem(map);
+      } finally {
+        combo.putClientProperty("updating", false);
+      }
     }
 
     this.refresh();
