@@ -33,6 +33,7 @@ public final class Icons {
   public static final Icon LIFT_8 = IconLoader.get().getUIAwareIcon("lift.svg", 8, 8);
   public static final Icon LOWER_8 = IconLoader.get().getUIAwareIcon("lower.svg", 8, 8);
   public static final Icon MAPAREA_8 = IconLoader.get().getUIAwareIcon("maparea.svg", 8, 8);
+  public static final Icon MINUS_8 = IconLoader.get().getUIAwareIcon("minus.svg", 8, 8);
   public static final Icon MISC_8 = IconLoader.get().getUIAwareIcon("misc.svg", 8, 8);
   public static final Icon PASTE_8 = IconLoader.get().getUIAwareIcon("paste.svg", 8, 8);
   public static final Icon PAUSE_8 = IconLoader.get().getUIAwareIcon("pause.svg", 8, 8);
@@ -80,6 +81,7 @@ public final class Icons {
   public static final Icon LIFT_16 = IconLoader.get().getUIAwareIcon("lift.svg", 16, 16);
   public static final Icon LOWER_16 = IconLoader.get().getUIAwareIcon("lower.svg", 16, 16);
   public static final Icon MAPAREA_16 = IconLoader.get().getUIAwareIcon("maparea.svg", 16, 16);
+  public static final Icon MINUS_16 = IconLoader.get().getUIAwareIcon("minus.svg", 16, 16);
   public static final Icon MISC_16 = IconLoader.get().getUIAwareIcon("misc.svg", 16, 16);
   public static final Icon PASTE_16 = IconLoader.get().getUIAwareIcon("paste.svg", 16, 16);
   public static final Icon PAUSE_16 = IconLoader.get().getUIAwareIcon("pause.svg", 16, 16);
