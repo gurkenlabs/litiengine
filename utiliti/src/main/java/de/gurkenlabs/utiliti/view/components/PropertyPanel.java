@@ -571,11 +571,21 @@ public abstract class PropertyPanel extends JPanel {
    *
    * @param updateAction the action to apply to the map object
    */
+  private boolean applying;
+
   private void applyChanges(Consumer<IMapObject> updateAction) {
-    UndoManager.instance().mapObjectChanging(getDataSource());
-    updateAction.accept(getDataSource());
-    UndoManager.instance().mapObjectChanged(getDataSource());
-    updateEnvironment();
+    if (applying) {
+      return;
+    }
+    applying = true;
+    try {
+      UndoManager.instance().mapObjectChanging(getDataSource());
+      updateAction.accept(getDataSource());
+      UndoManager.instance().mapObjectChanged(getDataSource());
+      updateEnvironment();
+    } finally {
+      applying = false;
+    }
   }
 
   /**
