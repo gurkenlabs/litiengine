@@ -386,6 +386,17 @@ public class UndoManager {
   }
 
   private static void restoreState(IMapObject target, IMapObject restore) {
+    IMapObjectLayer targetLayer = target.getLayer();
+    IMapObjectLayer restoreLayer = restore.getLayer();
+    if (targetLayer != restoreLayer) {
+      if (targetLayer != null) {
+        targetLayer.removeMapObject(target);
+      }
+      if (restoreLayer != null) {
+        restoreLayer.addMapObject(target);
+      }
+    }
+
     target.setId(restore.getId());
     target.setName(restore.getName());
     target.setType(restore.getType());

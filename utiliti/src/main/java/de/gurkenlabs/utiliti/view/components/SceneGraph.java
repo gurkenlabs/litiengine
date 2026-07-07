@@ -440,7 +440,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
       boolean selected = entry.getKey() == this.activeFilter;
       JToggleButton button = entry.getValue();
       button.setBackground(selected ? Style.COLOR_SELECTION_INACTIVE : Style.COLOR_SURFACE2);
-      button.setForeground(selected ? Color.WHITE : Style.COLOR_TEXT);
+      button.setForeground(selected ? Style.COLOR_STATUS : Style.COLOR_TEXT);
       button.repaint();
     }
   }
@@ -496,7 +496,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
         if (hovered || selected) {
           g2.setColor(selected ? Style.COLOR_SELECTION_INACTIVE : Style.COLOR_SURFACE2);
           g2.fillRoundRect(buttonX, bounds.y + 3, 22, bounds.height - 6, 7, 7);
-          g2.setColor(selected ? Style.COLOR_BORDER : Style.COLOR_BORDER);
+          g2.setColor(Style.COLOR_BORDER);
           g2.drawRoundRect(buttonX, bounds.y + 3, 22, bounds.height - 6, 7, 7);
         }
         g2.setColor(selected ? Style.COLOR_TEXT : Style.COLOR_SUBTEXT);
@@ -560,6 +560,10 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
 
   @Override
   public void refresh() {
+    if (!javax.swing.SwingUtilities.isEventDispatchThread()) {
+      javax.swing.SwingUtilities.invokeLater(this::refresh);
+      return;
+    }
     this.refreshing = true;
     try {
       // save expansion state before reload
@@ -1374,6 +1378,9 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     }
 
     public boolean isVisible() {
+      if (this.layer != null) {
+        return this.layer.isVisible();
+      }
       return this.visible;
     }
 
@@ -1576,6 +1583,9 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
       UndoManager.instance().beginOperation();
       try {
         UndoManager.instance().mapObjectChanging(mapObject);
+        if (mapObject.getLayer() != null) {
+          mapObject.getLayer().removeMapObject(mapObject);
+        }
         targetLayer.addMapObject(mapObject);
         Game.world().environment().reloadFromMap(mapObject.getId());
         UndoManager.instance().mapObjectChanged(mapObject);
