@@ -1,12 +1,9 @@
 package de.gurkenlabs.utiliti.view.components;
 
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.environment.tilemap.ILayer;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.model.Style;
-import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -63,29 +60,11 @@ public final class StatusBar {
       sb.append("  \u00B7  ").append(Resources.strings().get("status_selected_objects", selectionSize));
     }
 
-    if (Game.world().environment() != null && Game.world().environment().getMap() != null) {
-      ILayer currentLayer = getActiveLayer();
-      if (currentLayer != null) {
-        sb.append("  \u00B7  ").append(currentLayer.getName());
-      }
-    }
-
     statusLabel.setText(sb.toString());
 
     String toolName = getToolDisplayName();
     toolLabel.setText(toolName);
 
-  }
-
-  private static ILayer getActiveLayer() {
-    var map = Game.world().environment().getMap();
-    if (map.getTileLayers().size() > 0) {
-      return map.getTileLayers().get(0);
-    }
-    if (map.getMapObjectLayers().size() > 0) {
-      return map.getMapObjectLayers().get(0);
-    }
-    return null;
   }
 
   private static JPanel createSeparator() {

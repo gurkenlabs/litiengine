@@ -12,7 +12,6 @@ import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.Style;
 import de.gurkenlabs.utiliti.view.menus.AddMenu;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
@@ -62,35 +61,57 @@ public class ViewportToolbar extends JPanel {
     left.add(this.btnRedo);
     left.add(separator());
     left.add(addButton());
-    this.btnCopy = button("Copy", Icons.COPY_24, () -> Editor.instance().getMapComponent().copy());
-    this.btnCut = button("Cut", Icons.CUT_24, () -> Editor.instance().getMapComponent().cut());
-    this.btnDelete = button("Delete", Icons.DELETE_24, () -> Editor.instance().getMapComponent().delete());
+    this.btnCopy = button("Copy", Icons.COPY_24, () -> {
+      if (Editor.instance().getMapComponent() != null) {
+        Editor.instance().getMapComponent().copy();
+      }
+    });
+    this.btnCut = button("Cut", Icons.CUT_24, () -> {
+      if (Editor.instance().getMapComponent() != null) {
+        Editor.instance().getMapComponent().cut();
+      }
+    });
+    this.btnDelete = button("Delete", Icons.DELETE_24, () -> {
+      if (Editor.instance().getMapComponent() != null) {
+        Editor.instance().getMapComponent().delete();
+      }
+    });
     left.add(this.btnCopy);
     left.add(this.btnCut);
     left.add(this.btnDelete);
-    this.btnPaste = button("Paste", Icons.PASTE_24, () -> Editor.instance().getMapComponent().paste());
+    this.btnPaste = button("Paste", Icons.PASTE_24, () -> {
+      if (Editor.instance().getMapComponent() != null) {
+        Editor.instance().getMapComponent().paste();
+      }
+    });
     left.add(this.btnPaste);
 
     this.btnUndo.setEnabled(false);
     this.btnRedo.setEnabled(false);
     UndoManager.onUndoStackChanged(mgr -> {
-      this.btnUndo.setEnabled(UndoManager.instance().canUndo());
-      this.btnRedo.setEnabled(UndoManager.instance().canRedo());
+      javax.swing.SwingUtilities.invokeLater(() -> {
+        this.btnUndo.setEnabled(UndoManager.instance().canUndo());
+        this.btnRedo.setEnabled(UndoManager.instance().canRedo());
+      });
     });
 
     this.btnCopy.setEnabled(false);
     this.btnCut.setEnabled(false);
     this.btnDelete.setEnabled(false);
     this.btnPaste.setEnabled(false);
-    Editor.instance().getMapComponent().onSelectionChanged(selection -> {
-      boolean hasSelection = selection != null && !selection.isEmpty();
-      this.btnCopy.setEnabled(hasSelection);
-      this.btnCut.setEnabled(hasSelection);
-      this.btnDelete.setEnabled(hasSelection);
-    });
-    Editor.instance().getMapComponent().onCopyTargetChanged(bp -> {
-      this.btnPaste.setEnabled(bp != null);
-    });
+    if (Editor.instance().getMapComponent() != null) {
+      Editor.instance().getMapComponent().onSelectionChanged(selection -> {
+        boolean hasSelection = selection != null && !selection.isEmpty();
+        javax.swing.SwingUtilities.invokeLater(() -> {
+          this.btnCopy.setEnabled(hasSelection);
+          this.btnCut.setEnabled(hasSelection);
+          this.btnDelete.setEnabled(hasSelection);
+        });
+      });
+      Editor.instance().getMapComponent().onCopyTargetChanged(bp -> {
+        javax.swing.SwingUtilities.invokeLater(() -> this.btnPaste.setEnabled(bp != null));
+      });
+    }
 
     left.add(separator());
     left.add(toggle("Grid", new GridIcon(), Editor.preferences().showGrid(), selected -> Editor.preferences().setShowGrid(selected)));
@@ -161,7 +182,7 @@ public class ViewportToolbar extends JPanel {
 
   private static void styleToggle(JToggleButton button) {
     button.setBackground(button.isSelected() ? Style.COLOR_ACCENT_BLUE : Style.COLOR_SURFACE);
-    button.setForeground(button.isSelected() ? Color.WHITE : Style.COLOR_TEXT);
+    button.setForeground(button.isSelected() ? Style.COLOR_STATUS : Style.COLOR_TEXT);
     button.setBorder(BorderFactory.createEmptyBorder());
     button.setContentAreaFilled(false);
     button.setOpaque(false);
@@ -212,13 +233,14 @@ public class ViewportToolbar extends JPanel {
       return;
     }
     java.awt.Component renderComponent = Game.window().getRenderComponent();
-    double availableW = Math.max(1, renderComponent.getWidth() - 48);
-    double availableH = Math.max(1, renderComponent.getHeight() - 48);
+    double availableW = Math.max(1, renderComponent.getWidth());
+    double availableH = Math.max(1, renderComponent.getHeight());
     float zoom = (float) Math.min(availableW / map.getSizeInPixels().width, availableH / map.getSizeInPixels().height);
-    zoom = Math.max(Zoom.getMin(), Math.min(Zoom.getMax(), zoom * 0.95f));
+    zoom = Math.max(Zoom.getMin(), Math.min(Zoom.getMax(), zoom));
     Game.world().camera().setZoom(zoom, 0);
     Editor.preferences().setZoom(zoom);
     Editor.instance().getMapComponent().centerCameraOnMap();
+    updateZoomLabel();
   }
 
   private static JPanel separator() {
@@ -286,7 +308,7 @@ public class ViewportToolbar extends JPanel {
       if (!c.isEnabled()) {
         g2.setColor(Style.COLOR_DISABLED_TEXT);
       } else {
-        g2.setColor(c instanceof JToggleButton toggle && toggle.isSelected() ? Color.WHITE : Style.COLOR_TEXT);
+        g2.setColor(c instanceof JToggleButton toggle && toggle.isSelected() ? Style.COLOR_STATUS : Style.COLOR_TEXT);
       }
       paint(g2, x, y);
       g2.dispose();

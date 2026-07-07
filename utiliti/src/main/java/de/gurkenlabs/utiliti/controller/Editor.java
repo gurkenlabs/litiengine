@@ -147,7 +147,7 @@ public class Editor extends Screen {
     // render fps
     g.setFont(Style.getDefaultFont());
     g.setColor(Color.WHITE);
-    TextRenderer.render(g, Game.metrics().getFramesPerSecond() + " FPS", 10, Game.window().getResolution().getHeight() - 20, true);
+    TextRenderer.render(g, Game.metrics().getFramesPerSecond() + " FPS", 4, Game.window().getResolution().getHeight() - 6, true);
 
     if (Game.time().now() % 4 == 0) {
       SwingUtilities.invokeLater(StatusBar::update);
