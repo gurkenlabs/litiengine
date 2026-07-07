@@ -1,6 +1,8 @@
 package de.gurkenlabs.utiliti.view.components;
 
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
+import de.gurkenlabs.utiliti.model.Style;
+import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,9 +22,14 @@ public class TextList extends JPanel {
   private final JTable table;
 
   public TextList(String columnName) {
+    this.setOpaque(false);
     this.listeners = new ArrayList<>();
     this.table = new JTable();
     this.table.getTableHeader().setReorderingAllowed(false);
+    this.table.setShowHorizontalLines(true);
+    this.table.setShowVerticalLines(false);
+    this.table.setGridColor(Style.COLOR_BORDER);
+    this.table.setIntercellSpacing(new Dimension(0, 1));
     this.table.setModel(
         new DefaultTableModel(new Object[][] {}, new String[] {columnName}) {
           final Class<?>[] columnTypes = new Class<?>[] {Integer.class};
@@ -44,7 +51,7 @@ public class TextList extends JPanel {
     JScrollPane scrollPane = new JScrollPane();
     scrollPane.setViewportView(table);
 
-    JButton buttonMinus = new JButton("-");
+    JButton buttonMinus = Style.textButton("−");
     buttonMinus.addActionListener(
         a -> {
           int[] rows = table.getSelectedRows();
@@ -53,7 +60,7 @@ public class TextList extends JPanel {
           }
         });
 
-    JButton buttonPlus = new JButton("+");
+    JButton buttonPlus = Style.textButton("+");
     buttonPlus.addActionListener(a -> model.addRow(new Object[] {0}));
 
     GroupLayout groupLayout = new GroupLayout(this);
@@ -71,12 +78,12 @@ public class TextList extends JPanel {
                             .addComponent(
                                 buttonPlus,
                                 GroupLayout.PREFERRED_SIZE,
-                                41,
+                                36,
                                 GroupLayout.PREFERRED_SIZE)
                             .addComponent(
                                 buttonMinus,
                                 GroupLayout.PREFERRED_SIZE,
-                                41,
+                                36,
                                 GroupLayout.PREFERRED_SIZE))
                     .addGap(0)));
     groupLayout.setVerticalGroup(
@@ -98,13 +105,13 @@ public class TextList extends JPanel {
                             .addComponent(
                                 buttonPlus,
                                 GroupLayout.PREFERRED_SIZE,
-                                34,
+                                32,
                                 GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(ComponentPlacement.RELATED)
                             .addComponent(
                                 buttonMinus,
                                 GroupLayout.PREFERRED_SIZE,
-                                37,
+                                32,
                                 GroupLayout.PREFERRED_SIZE)
                             .addContainerGap())));
     setLayout(groupLayout);

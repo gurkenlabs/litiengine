@@ -6,9 +6,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.UndoManager;
-import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.Style;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -34,7 +32,7 @@ public class CustomPanel extends PropertyPanel {
 
     this.scrollPane = new JScrollPane();
 
-    JButton buttonAdd = Style.iconButton(Icons.ADD_16);
+    JButton buttonAdd = Style.textButton("+");
     buttonAdd.addActionListener(
         a -> {
           TableCellEditor editor = tableCustomProperties.getCellEditor();
@@ -42,10 +40,9 @@ public class CustomPanel extends PropertyPanel {
             editor.stopCellEditing();
           }
           model.addRow(new Object[] {"", ""});
-          model.fireTableDataChanged();
         });
 
-    JButton buttonRemove = Style.iconButton(Icons.MINUS_16);
+    JButton buttonRemove = Style.textButton("−");
     buttonRemove.addActionListener(
         a -> {
           TableCellEditor editor = tableCustomProperties.getCellEditor();
@@ -58,7 +55,6 @@ public class CustomPanel extends PropertyPanel {
             model.removeRow(rows[i] - i);
           }
 
-          model.fireTableDataChanged();
           tableCustomProperties.revalidate();
         });
 
@@ -98,7 +94,7 @@ public class CustomPanel extends PropertyPanel {
           g.setColor(Style.COLOR_PLACEHOLDER);
           FontMetrics fm = g.getFontMetrics();
           int x = (getWidth() - fm.stringWidth(EMPTY_TEXT)) / 2;
-          int y = getHeight() / 2;
+          int y = (getHeight() - fm.getHeight()) / 2 + fm.getAscent();
           g.drawString(EMPTY_TEXT, x, y);
         }
       }
@@ -106,8 +102,10 @@ public class CustomPanel extends PropertyPanel {
     this.tableCustomProperties.setFillsViewportHeight(true);
     this.tableCustomProperties.getTableHeader().setReorderingAllowed(false);
     this.tableCustomProperties.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    this.tableCustomProperties.setShowGrid(false);
-    this.tableCustomProperties.setIntercellSpacing(new Dimension(0, 0));
+    this.tableCustomProperties.setShowHorizontalLines(true);
+    this.tableCustomProperties.setShowVerticalLines(false);
+    this.tableCustomProperties.setGridColor(Style.COLOR_BORDER);
+    this.tableCustomProperties.setIntercellSpacing(new Dimension(0, 1));
     this.scrollPane.setViewportView(tableCustomProperties);
     this.tableCustomProperties.setModel(
         new DefaultTableModel(

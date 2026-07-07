@@ -9,7 +9,6 @@ import de.gurkenlabs.litiengine.graphics.AmbientLight;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.ControlBehavior;
 import de.gurkenlabs.utiliti.controller.UndoManager;
-import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.Style;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -101,8 +100,8 @@ public class MapPropertyPanel extends JPanel {
           this.saveChanges();
         });
 
-    JButton buttonAdd = Style.iconButton(Icons.ADD_16);
-    JButton buttonRemove = Style.iconButton(Icons.MINUS_16);
+    JButton buttonAdd = Style.textButton("+");
+    JButton buttonRemove = Style.textButton("−");
 
     this.scrollPane = new JScrollPane();
     this.tableCustomProperties = createPropertiesTable();
@@ -295,15 +294,17 @@ public class MapPropertyPanel extends JPanel {
               g.setColor(Style.COLOR_PLACEHOLDER);
               FontMetrics fm = g.getFontMetrics();
               int x = (getWidth() - fm.stringWidth(EMPTY_TEXT)) / 2;
-              int y = getHeight() / 2;
+              int y = (getHeight() - fm.getHeight()) / 2 + fm.getAscent();
               g.drawString(EMPTY_TEXT, x, y);
             }
           }
         };
     table.getTableHeader().setReorderingAllowed(false);
     table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    table.setShowGrid(false);
-    table.setIntercellSpacing(new Dimension(0, 0));
+    table.setShowHorizontalLines(true);
+    table.setShowVerticalLines(false);
+    table.setGridColor(Style.COLOR_BORDER);
+    table.setIntercellSpacing(new Dimension(0, 1));
     table.setFillsViewportHeight(true);
     table.setModel(
         new DefaultTableModel(

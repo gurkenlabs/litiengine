@@ -4,7 +4,6 @@ import com.github.weisj.darklaf.components.border.DarkBorders;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterAttributes;
-import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.Style;
 import java.awt.Dimension;
 import java.awt.LayoutManager;
@@ -39,8 +38,8 @@ public class EmitterTextPanel extends PropertyPanel {
     scrollPanel.setPreferredSize(new Dimension(CONTROL_WIDTH * 2, CONTROL_HEIGHT * 3));
 
     ctrlButtonBox = Box.createVerticalBox();
-    btnAdd = Style.iconButton(Icons.ADD_16);
-    btnRemove = Style.iconButton(Icons.DELETE_16);
+    btnAdd = Style.textButton("+");
+    btnRemove = Style.textButton("−");
     btnAdd.setMaximumSize(BUTTON_SIZE);
     btnRemove.setMaximumSize(BUTTON_SIZE);
 

@@ -55,8 +55,8 @@ public class EmitterColorPanel extends PropertyPanel {
 
     ctrlButtonToolbar = new JToolBar(JToolBar.VERTICAL);
     ctrlButtonToolbar.setFloatable(false);
-    btnAdd = Style.iconButton(Icons.ADD_16);
-    btnRemove = Style.iconButton(Icons.DELETE_16);
+    btnAdd = Style.textButton("+");
+    btnRemove = Style.textButton("−");
     btnEdit = Style.iconButton(Icons.COLOR_16);
 
     ctrlButtonToolbar.setMaximumSize(new Dimension(BUTTON_SIZE.width, BUTTON_SIZE.height * 3));
