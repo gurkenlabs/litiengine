@@ -8,7 +8,6 @@ import de.gurkenlabs.utiliti.controller.FileDrop;
 import de.gurkenlabs.utiliti.model.Style;
 import de.gurkenlabs.utiliti.model.Icons;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
@@ -188,7 +187,7 @@ public class AssetList extends JSplitPane implements Controller {
       JSplitPane.DIVIDER_LOCATION_PROPERTY,
       evt -> Editor.preferences().setAssetsSplitter(this.getDividerLocation()));
     this.setDividerLocation(
-      Editor.preferences().getMainSplitterPosition() != 0
+      Editor.preferences().getAssetsSplitter() != 0
         ? Editor.preferences().getAssetsSplitter()
         : 200);
 

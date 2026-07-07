@@ -9,7 +9,6 @@ import de.gurkenlabs.utiliti.controller.tool.ToolManager;
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.Style;
 import de.gurkenlabs.utiliti.view.menus.AddMenu;
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
@@ -23,7 +22,7 @@ import javax.swing.JToolBar;
 
 public class ToolBar extends JToolBar {
   private static final int ARC = 8;
-  private static final Color DOCK_BG = new Color(Style.COLOR_SURFACE.getRed(), Style.COLOR_SURFACE.getGreen(), Style.COLOR_SURFACE.getBlue(), 230);
+  private static final int DOCK_BG_ALPHA = 230;
 
   public ToolBar() {
     super("Tools");
@@ -62,8 +61,10 @@ public class ToolBar extends JToolBar {
     add(redoBtn);
 
     UndoManager.onUndoStackChanged(mgr -> {
-      undoBtn.setEnabled(UndoManager.instance().canUndo());
-      redoBtn.setEnabled(UndoManager.instance().canRedo());
+      javax.swing.SwingUtilities.invokeLater(() -> {
+        undoBtn.setEnabled(UndoManager.instance().canUndo());
+        redoBtn.setEnabled(UndoManager.instance().canRedo());
+      });
     });
 
     addSeparator();
@@ -105,7 +106,11 @@ public class ToolBar extends JToolBar {
   protected void paintComponent(Graphics g) {
     if (g instanceof Graphics2D g2) {
       g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-      g2.setColor(DOCK_BG);
+      g2.setColor(new java.awt.Color(
+          Style.COLOR_SURFACE.getRed(),
+          Style.COLOR_SURFACE.getGreen(),
+          Style.COLOR_SURFACE.getBlue(),
+          DOCK_BG_ALPHA));
       g2.fillRoundRect(0, 0, getWidth(), getHeight(), ARC, ARC);
     }
     super.paintComponent(g);

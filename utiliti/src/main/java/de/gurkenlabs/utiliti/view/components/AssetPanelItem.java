@@ -50,7 +50,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -82,6 +81,7 @@ public class AssetPanelItem extends JPanel {
   private static final Color HOVER_COLOR = Style.COLOR_CARD_HOVER;
   private static final Color SELECTED_COLOR = Style.COLOR_CARD_SELECTED;
   private static final BasicStroke FOCUS_STROKE = new BasicStroke(2.0f);
+  private static final BasicStroke BORDER_STROKE = new BasicStroke(1.0f);
   private static final Dimension PREFERRED_SIZE = new Dimension(118, 118);
 
   private final JLabel iconLabel;
@@ -158,8 +158,8 @@ public class AssetPanelItem extends JPanel {
   }
 
   private void initializeComponent() {
-    setPreferredSize(compact ? new Dimension(PREFERRED_SIZE.width, 42) : new Dimension(cardSize, cardSize));
-    setMinimumSize(compact ? new Dimension(PREFERRED_SIZE.width, 42) : new Dimension(cardSize, cardSize));
+    setPreferredSize(new Dimension(cardSize, cardSize));
+    setMinimumSize(new Dimension(cardSize, cardSize));
     setOpaque(false);
     setFocusable(true);
     setRequestFocusEnabled(true);
@@ -414,7 +414,7 @@ public class AssetPanelItem extends JPanel {
   }
 
   private String wrapText(String text, int maxLength) {
-    if (text.length() <= maxLength) {
+    if (text == null || text.length() <= maxLength) {
       return text;
     }
 
@@ -458,7 +458,7 @@ public class AssetPanelItem extends JPanel {
     }
 
     g2d.setColor(isSelected ? Style.COLOR_ACCENT_BLUE : Style.COLOR_BORDER);
-    g2d.setStroke(isSelected ? FOCUS_STROKE : new BasicStroke(1.0f));
+    g2d.setStroke(isSelected ? FOCUS_STROKE : BORDER_STROKE);
     g2d.draw(roundRect);
 
     g2d.dispose();
@@ -466,7 +466,7 @@ public class AssetPanelItem extends JPanel {
   }
 
   public static Map<String, String> getDetails(Object origin) {
-    Map<String, String> details = new ConcurrentHashMap<>();
+    Map<String, String> details = new java.util.LinkedHashMap<>();
     if (origin instanceof SpritesheetResource spritesheetResource) {
       details.put("Size", spritesheetResource.getWidth() + "x" + spritesheetResource.getHeight() + "px");
     } else if (origin instanceof Animation animation) {
@@ -537,53 +537,59 @@ public class AssetPanelItem extends JPanel {
     }
 
     String assetType = "";
-    String assetName = "";
+    String deletedAssetName = "";
+    boolean deleted = false;
 
     switch (origin) {
       case SpritesheetResource spritesheetResource -> {
         assetType = "spritesheet";
-        assetName = spritesheetResource.getName();
-        if (confirmDelete(assetType, assetName)) {
+        deletedAssetName = spritesheetResource.getName();
+        if (confirmDelete(assetType, deletedAssetName)) {
           Editor.instance().getGameFile().getSpriteSheets().remove(spritesheetResource);
           Resources.images().clear();
-          Resources.spritesheets().remove(assetName);
+          Resources.spritesheets().remove(deletedAssetName);
+          deleted = true;
         }
       }
       case EmitterAttributes emitterData -> {
         assetType = "emitter";
-        assetName = emitterData.getName();
-        if (confirmDelete(assetType, assetName)) {
+        deletedAssetName = emitterData.getName();
+        if (confirmDelete(assetType, deletedAssetName)) {
           Editor.instance().getGameFile().getEmitters().remove(emitterData);
+          deleted = true;
         }
       }
       case Blueprint blueprint -> {
         assetType = "blueprint";
-        assetName = blueprint.getName();
-        if (confirmDelete(assetType, assetName)) {
+        deletedAssetName = blueprint.getName();
+        if (confirmDelete(assetType, deletedAssetName)) {
           Editor.instance().getGameFile().getBluePrints().remove(blueprint);
-          Resources.blueprints().remove(assetName);
+          Resources.blueprints().remove(deletedAssetName);
+          deleted = true;
         }
       }
       case SoundResource soundResource -> {
         assetType = "sound";
-        assetName = soundResource.getName();
-        if (confirmDelete(assetType, assetName)) {
+        deletedAssetName = soundResource.getName();
+        if (confirmDelete(assetType, deletedAssetName)) {
           Editor.instance().getGameFile().getSounds().remove(soundResource);
-          Resources.sounds().remove(assetName);
+          Resources.sounds().remove(deletedAssetName);
+          deleted = true;
         }
       }
       case Animation animation -> {
         assetType = "animation";
-        assetName = animation.getName();
-        if (confirmDelete(assetType, assetName)) {
-          Resources.animations().remove(assetName);
+        deletedAssetName = animation.getName();
+        if (confirmDelete(assetType, deletedAssetName)) {
+          Resources.animations().remove(deletedAssetName);
+          deleted = true;
         }
       }
       default -> {
       }
     }
 
-    if (!assetName.isEmpty()) {
+    if (deleted && !deletedAssetName.isEmpty()) {
       Editor.instance().getMapComponent().reloadEnvironment();
       UI.getAssetController().refresh();
     }

@@ -23,8 +23,8 @@ import javax.swing.ListSelectionModel;
 public class MapList extends JScrollPane implements MapController {
   private final DefaultListModel<IMap> model;
 
-  private static MapPopupMenu mapPopupMenu;
-  private static JList<IMap> list = new JList<>();
+  private MapPopupMenu mapPopupMenu;
+  private final JList<IMap> list = new JList<>();
 
   public MapList() {
     super();
@@ -36,7 +36,6 @@ public class MapList extends JScrollPane implements MapController {
     list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     list.setCellRenderer(new MapListCellRenderer());
     list.setMaximumSize(new Dimension(0, 250));
-    list.setSelectedIndex(0);
     list.getSelectionModel()
         .addListSelectionListener(
             e -> {
@@ -66,15 +65,17 @@ public class MapList extends JScrollPane implements MapController {
 
     UndoManager.onUndoStackChanged(
         manager -> {
-          this.bind(Editor.instance().getMapComponent().getMaps(), false);
-          JComboBox<TmxMap> combo = UI.getMapCombo();
-          if (combo != null) {
-            combo.repaint();
-          }
+          javax.swing.SwingUtilities.invokeLater(() -> {
+            this.bind(Editor.instance().getMapComponent().getMaps(), false);
+            JComboBox<TmxMap> combo = UI.getMapCombo();
+            if (combo != null) {
+              combo.repaint();
+            }
+          });
         });
   }
 
-  private static void initPopupMenu() {
+  private void initPopupMenu() {
     mapPopupMenu = new MapPopupMenu();
     UI.addOrphanComponent(mapPopupMenu);
 
@@ -116,10 +117,10 @@ public class MapList extends JScrollPane implements MapController {
       }
     }
 
-    // remove maps that are no longer present
-    for (int i = 0; i < this.model.getSize(); i++) {
+    // remove maps that are no longer present (iterate backward to avoid index skip)
+    for (int i = this.model.getSize() - 1; i >= 0; i--) {
       final IMap current = this.model.get(i);
-      if (this.model.get(i) == null || maps.stream().noneMatch(x -> x == current)) {
+      if (current == null || maps.stream().noneMatch(x -> x == current)) {
         this.model.remove(i);
       }
     }
@@ -185,7 +186,7 @@ public class MapList extends JScrollPane implements MapController {
     }
     Optional<TmxMap> map =
         Editor.instance().getMapComponent().getMaps().stream()
-            .filter(m -> m.equals(list.getSelectedValue()))
+            .filter(m -> m == list.getSelectedValue())
             .findFirst();
     return map.isPresent() ? map.get() : null;
   }

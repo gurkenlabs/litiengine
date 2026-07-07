@@ -3,7 +3,6 @@ package de.gurkenlabs.utiliti.view.components;
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.Style;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -46,8 +45,10 @@ public class Tag extends JPanel {
     this.btnDelete.addActionListener(
       e -> {
         final Container parent = this.getParent();
-        parent.remove(this);
-        parent.revalidate();
+        if (parent != null) {
+          parent.remove(this);
+          parent.revalidate();
+        }
       });
     this.btnDelete.setFont(this.btnDelete.getFont().deriveFont(11f));
     this.btnDelete.setForeground(Style.COLOR_SUBTEXT);

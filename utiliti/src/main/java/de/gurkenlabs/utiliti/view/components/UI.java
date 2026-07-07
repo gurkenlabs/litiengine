@@ -542,7 +542,7 @@ public final class UI {
     UIManager.put("Table.gridColor", Style.COLOR_BORDER);
     UIManager.put("Tree.background", Style.COLOR_BG);
     UIManager.put("Tree.foreground", Style.COLOR_TEXT);
-    UIManager.put("Tree.selectionBackground", new Color(0, 0, 0, 0));
+    UIManager.put("Tree.selectionBackground", Style.COLOR_TRANSPARENT);
     UIManager.put("Tree.selectionForeground", Style.COLOR_TEXT);
     UIManager.put("Tree.textBackground", Style.COLOR_BG);
     UIManager.put("Tree.textForeground", Style.COLOR_TEXT);
@@ -568,6 +568,9 @@ public final class UI {
     UIManager.put("RadioButton.foreground", Style.COLOR_TEXT);
 
     // Menus
+    UIManager.put("MenuBar.background", Style.COLOR_BG);
+    UIManager.put("MenuBar.foreground", Style.COLOR_TEXT);
+    UIManager.put("MenuBar.borderColor", Style.COLOR_BORDER);
     UIManager.put("Menu.background", Style.COLOR_BG);
     UIManager.put("Menu.foreground", Style.COLOR_TEXT);
     UIManager.put("Menu.selectionBackground", Style.COLOR_SELECT);
@@ -612,7 +615,7 @@ public final class UI {
 
   private static void applyLightOverrides() {
     // Light theme keeps the IntelliJ defaults, just ensure consistency
-    UIManager.put("Table.gridColor", new Color(220, 220, 220));
+    UIManager.put("Table.gridColor", Style.COLOR_LIGHT_GRID);
   }
 
   private static void updateOrphanComponents() {

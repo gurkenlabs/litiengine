@@ -69,7 +69,7 @@ public class AssetTree extends JTree {
 
     this.setModel(this.entitiesTreeModel);
     this.setCellRenderer(new IconTreeListRenderer());
-    this.setMaximumSize(new Dimension(0, 250));
+    this.setMaximumSize(new Dimension(Integer.MAX_VALUE, 250));
     this.setRowHeight((int) (28 * Editor.preferences().getUiScale()));
     for (int i = 0; i < getRowCount(); i++) {
       this.expandRow(i);

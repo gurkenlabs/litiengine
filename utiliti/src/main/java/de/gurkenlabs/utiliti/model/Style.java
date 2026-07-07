@@ -4,9 +4,11 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.Editor;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.util.Objects;
 import javax.swing.Action;
@@ -79,6 +81,11 @@ public final class Style {
   public static final Color COLOR_BADGE_ID = new Color(42, 65, 112);
   public static final Color COLOR_CARD_HOVER = new Color(255, 255, 255, 12);
   public static final Color COLOR_CARD_SELECTED = new Color(53, 116, 242, 45);
+  public static final Color COLOR_TRANSPARENT = new Color(0, 0, 0, 0);
+  public static final Color COLOR_DISABLED_OVERLAY = new Color(0, 0, 0, 80);
+  public static final Color COLOR_LIGHT_GRID = new Color(220, 220, 220);
+  public static final Color COLOR_SCENE_ROW_HOVER = new Color(COLOR_BG.getRed(), COLOR_BG.getGreen(), COLOR_BG.getBlue(), 200);
+  public static final Color COLOR_SCENE_ROW_SELECTED = new Color(COLOR_ACCENT_BLUE.getRed(), COLOR_ACCENT_BLUE.getGreen(), COLOR_ACCENT_BLUE.getBlue(), 30);
 
   // --- Shared icon button hover painting ---
 
@@ -97,7 +104,7 @@ public final class Style {
       g2.setStroke(new java.awt.BasicStroke(1.2f));
       g2.drawRoundRect(0, 0, c.getWidth() - 1, c.getHeight() - 1, 8, 8);
       if (!enabled) {
-        g2.setColor(new Color(0, 0, 0, 80));
+        g2.setColor(COLOR_DISABLED_OVERLAY);
         g2.fillRoundRect(0, 0, c.getWidth() - 1, c.getHeight() - 1, 8, 8);
       }
     } finally {
@@ -124,6 +131,24 @@ public final class Style {
       }
     };
     styleIconButton(button);
+    return button;
+  }
+
+  public static JButton textButton(String text) {
+    JButton button = new JButton(text) {
+      @Override protected void paintComponent(Graphics g) {
+        paintButtonBackground(this, getModel(), g);
+        super.paintComponent(g);
+      }
+    };
+    styleIconButton(button);
+    Dimension size = new Dimension(36, 32);
+    button.setPreferredSize(size);
+    button.setMinimumSize(size);
+    button.setMaximumSize(size);
+    button.setForeground(COLOR_TEXT);
+    button.setFont(button.getFont().deriveFont(18f));
+    button.setMargin(new Insets(0, 0, 0, 0));
     return button;
   }
 

@@ -38,8 +38,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeCellRenderer;
 
 public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
-  private static final Color HOVER_BG = new Color(Style.COLOR_BG.getRed(), Style.COLOR_BG.getGreen(), Style.COLOR_BG.getBlue(), 200);
-  private static final Color SELECTED_BG = new Color(53, 116, 242, 30);
   private enum BadgeKind { COUNT, ID }
 
   private final JPanel rowPanel;
@@ -120,7 +118,7 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
     Graphics2D g2 = (Graphics2D) g.create();
     try {
       g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-      g2.setColor(this.selectedRow ? SELECTED_BG : HOVER_BG);
+      g2.setColor(this.selectedRow ? Style.COLOR_SCENE_ROW_SELECTED : Style.COLOR_SCENE_ROW_HOVER);
       g2.fillRoundRect(0, 2, getWidth() - 34, getHeight() - 4, 7, 7);
     } finally {
       g2.dispose();
@@ -229,7 +227,9 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
   }
 
   private static Icon getIcon(Prop prop) {
-    if (prop == null || prop.getSpritesheetName() == null) {
+    if (prop == null || prop.getSpritesheetName() == null
+        || Game.world() == null || Game.world().environment() == null
+        || Game.world().environment().getMap() == null) {
       return null;
     }
     String cacheKey = Game.world().environment().getMap().getName()
@@ -250,6 +250,10 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
   }
 
   private static Icon getIcon(Creature creature) {
+    if (Game.world() == null || Game.world().environment() == null
+        || Game.world().environment().getMap() == null) {
+      return null;
+    }
     String cacheKey = Game.world().environment().getMap().getName()
         + "-" + creature.getSpritesheetName() + "-" + creature.getMapId() + "-scene";
     BufferedImage img = Resources.images().get(cacheKey, () -> {
@@ -268,7 +272,8 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
 
   private static Icon getIcon(LightSource lightSource) {
     Color lightColor = lightSource.getColor();
-    if (lightColor == null) {
+    if (lightColor == null || Game.world() == null || Game.world().environment() == null
+        || Game.world().environment().getMap() == null) {
       return null;
     }
     String cacheKey = Game.world().environment().getMap().getName()

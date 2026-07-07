@@ -4,7 +4,6 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.utiliti.controller.WrapLayout;
 import de.gurkenlabs.utiliti.model.Style;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -117,7 +116,10 @@ public class TagPanel extends JPanel {
 
           @Override
           public void keyReleased(KeyEvent e) {
-            textFieldInput.setText(textFieldInput.getText().toLowerCase());
+            String text = textFieldInput.getText();
+            if (text != null) {
+              textFieldInput.setText(text.toLowerCase());
+            }
 
             final char c = e.getKeyChar();
             if (c == KeyEvent.VK_BACK_SPACE || c == KeyEvent.VK_DELETE) {
@@ -264,6 +266,9 @@ public class TagPanel extends JPanel {
       return null;
     }
 
+    if (Game.world() == null || Game.world().environment() == null) {
+      return null;
+    }
     Optional<String> found =
         Game.world().environment().getUsedTags().stream()
             .filter(

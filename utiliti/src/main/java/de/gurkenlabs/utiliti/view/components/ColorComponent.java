@@ -11,7 +11,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.List;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -43,7 +42,7 @@ public class ColorComponent extends JPanel {
     this.setOpaque(false);
     this.setSize(PropertyPanel.CONTROL_WIDTH, height);
     this.setPreferredSize(new Dimension(PropertyPanel.CONTROL_WIDTH, height));
-    this.listeners = new ArrayList<>();
+    this.listeners = new java.util.concurrent.CopyOnWriteArrayList<>();
     this.textFieldColor = ControlBehavior.apply(new JTextField());
     this.textFieldColor.setBackground(Style.COLOR_SURFACE2);
     this.textFieldColor.setForeground(Style.COLOR_TEXT);
