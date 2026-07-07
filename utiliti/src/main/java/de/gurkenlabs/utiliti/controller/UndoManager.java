@@ -2,9 +2,11 @@ package de.gurkenlabs.utiliti.controller;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.ILayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
+import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.utiliti.view.components.UI;
 import java.util.ArrayList;
@@ -33,6 +35,10 @@ public class UndoManager {
   private int operation = 0;
   private boolean saved = true;
   private boolean executing;
+  private ILayer changingLayer;
+  private Map<String, Object> changingLayerSnapshot;
+  private IMap changingMap;
+  private Map<String, Object> changingMapSnapshot;
 
   private static final HashMap<String, UndoManager> instance;
   private static final List<Consumer<UndoManager>> undoStackChangedConsumers;
@@ -104,17 +110,27 @@ public class UndoManager {
     this.executing = true;
     try {
       List<IMapObject> affectedTargets = new ArrayList<>();
+      boolean affectedLayer = false;
+      boolean affectedMap = false;
       do {
         stepsUndone++;
         final UndoState state = this.undoStack[this.currentIndex];
-        if (affectedTargets.stream().noneMatch(m -> m.getId() == state.target.getId())) {
+        if (state.target != null && affectedTargets.stream().noneMatch(m -> m.getId() == state.target.getId())) {
           affectedTargets.add(state.target);
+        }
+        if (state.targetLayer != null) {
+          affectedLayer = true;
+        }
+        if (state.targetMap != null) {
+          affectedMap = true;
         }
 
         switch (state.operationType) {
           case ADD -> Editor.instance().getMapComponent().delete(state.target);
           case CHANGE -> restoreState(state.target, Objects.requireNonNull(state.oldMapObject));
           case DELETE -> Editor.instance().getMapComponent().add(state.target, state.layer);
+          case LAYER_CHANGE -> restoreLayerProperties(state.targetLayer, state.oldLayerProperties);
+          case MAP_CHANGE -> restoreMapProperties(state.targetMap, state.oldMapProperties);
         }
 
         this.currentIndex--;
@@ -124,6 +140,9 @@ public class UndoManager {
 
       log.log(Level.FINE, "{0} steps undone.", stepsUndone);
       refreshAffectedTargets(affectedTargets);
+      if (affectedLayer || affectedMap) {
+        refreshLayerAndMapViews();
+      }
       fireUndoStackChangedEvent(this);
     } finally {
       this.executing = false;
@@ -152,19 +171,29 @@ public class UndoManager {
     this.executing = true;
     try {
       List<IMapObject> affectedTargets = new ArrayList<>();
+      boolean affectedLayer = false;
+      boolean affectedMap = false;
       do {
         ++stepsRedone;
         ++this.currentIndex;
 
         final UndoState state = this.undoStack[this.currentIndex];
-        if (affectedTargets.stream().noneMatch(m -> m.getId() == state.target.getId())) {
+        if (state.target != null && affectedTargets.stream().noneMatch(m -> m.getId() == state.target.getId())) {
           affectedTargets.add(state.target);
+        }
+        if (state.targetLayer != null) {
+          affectedLayer = true;
+        }
+        if (state.targetMap != null) {
+          affectedMap = true;
         }
 
         switch (state.operationType) {
           case ADD -> Editor.instance().getMapComponent().add(state.target, state.layer);
           case CHANGE -> restoreState(state.target, Objects.requireNonNull(state.newMapObject));
           case DELETE -> Editor.instance().getMapComponent().delete(state.target);
+          case LAYER_CHANGE -> restoreLayerProperties(state.targetLayer, state.newLayerProperties);
+          case MAP_CHANGE -> restoreMapProperties(state.targetMap, state.newMapProperties);
         }
       } while (currentOperation != 0
         && this.currentIndex < MAX_STACK_SIZE
@@ -174,6 +203,9 @@ public class UndoManager {
       log.log(Level.FINE, "{0} steps redone.", stepsRedone);
 
       refreshAffectedTargets(affectedTargets);
+      if (affectedLayer || affectedMap) {
+        refreshLayerAndMapViews();
+      }
       fireUndoStackChangedEvent(this);
     } finally {
       this.executing = false;
@@ -320,6 +352,108 @@ public class UndoManager {
     fireUndoStackChangedEvent(this);
   }
 
+  private Map<String, Object> snapshotLayerProperties(ILayer layer) {
+    Map<String, Object> props = new HashMap<>();
+    props.put("name", layer.getName());
+    props.put("opacity", layer.getOpacity());
+    props.put("visible", layer.isVisible());
+    props.put("tintColor", layer.getTintColor());
+    props.put("renderType", layer.getRenderType());
+    if (layer instanceof IMapObjectLayer mol) {
+      props.put("color", mol.getColor());
+    }
+    for (Map.Entry<String, ICustomProperty> entry : layer.getProperties().entrySet()) {
+      props.put("prop:" + entry.getKey(), entry.getValue().getAsString());
+    }
+    return props;
+  }
+
+  private void restoreLayerProperties(ILayer layer, Map<String, Object> props) {
+    layer.setName((String) props.get("name"));
+    layer.setOpacity((float) props.get("opacity"));
+    layer.setVisible((boolean) props.get("visible"));
+    layer.setTintColor((java.awt.Color) props.get("tintColor"));
+    layer.setRenderType((de.gurkenlabs.litiengine.graphics.RenderType) props.get("renderType"));
+    if (layer instanceof IMapObjectLayer mol && props.containsKey("color")) {
+      mol.setColor((java.awt.Color) props.get("color"));
+    }
+    layer.getProperties().keySet().removeIf(k -> true);
+    for (Map.Entry<String, Object> entry : props.entrySet()) {
+      if (entry.getKey().startsWith("prop:")) {
+        layer.setValue(entry.getKey().substring(5), (String) entry.getValue());
+      }
+    }
+  }
+
+  private Map<String, Object> snapshotMapProperties(IMap map) {
+    Map<String, Object> props = new HashMap<>();
+    props.put("name", map.getName());
+    for (Map.Entry<String, ICustomProperty> entry : map.getProperties().entrySet()) {
+      props.put("prop:" + entry.getKey(), entry.getValue().getAsString());
+    }
+    return props;
+  }
+
+  private void restoreMapProperties(IMap map, Map<String, Object> props) {
+    map.setName((String) props.get("name"));
+    map.getProperties().keySet().removeIf(k -> !k.equals("name"));
+    for (Map.Entry<String, Object> entry : props.entrySet()) {
+      if (entry.getKey().startsWith("prop:")) {
+        map.setValue(entry.getKey().substring(5), (String) entry.getValue());
+      }
+    }
+  }
+
+  public void layerChanging(ILayer layer) {
+    if (executing || layer == null) {
+      return;
+    }
+    this.changingLayerSnapshot = snapshotLayerProperties(layer);
+    this.changingLayer = layer;
+  }
+
+  public void layerChanged(ILayer layer) {
+    if (executing || layer == null || this.changingLayer != layer) {
+      return;
+    }
+
+    this.ensureStackSize();
+    this.currentIndex++;
+    this.clearRedoSteps();
+
+    Map<String, Object> newProps = snapshotLayerProperties(layer);
+    this.undoStack[this.currentIndex] =
+      new UndoState(layer, this.changingLayerSnapshot, newProps, OperationType.LAYER_CHANGE, this.operation);
+    this.changingLayer = null;
+    this.changingLayerSnapshot = null;
+    fireUndoStackChangedEvent(this);
+  }
+
+  public void mapChanging(IMap map) {
+    if (executing || map == null) {
+      return;
+    }
+    this.changingMapSnapshot = snapshotMapProperties(map);
+    this.changingMap = map;
+  }
+
+  public void mapChanged(IMap map) {
+    if (executing || map == null || this.changingMap != map) {
+      return;
+    }
+
+    this.ensureStackSize();
+    this.currentIndex++;
+    this.clearRedoSteps();
+
+    Map<String, Object> newProps = snapshotMapProperties(map);
+    this.undoStack[this.currentIndex] =
+      new UndoState(map, this.changingMapSnapshot, newProps, OperationType.MAP_CHANGE, this.operation);
+    this.changingMap = null;
+    this.changingMapSnapshot = null;
+    fireUndoStackChangedEvent(this);
+  }
+
   /**
    * Registers a consumer to be called whenever the undo stack changes.
    *
@@ -427,6 +561,13 @@ public class UndoManager {
     }
   }
 
+  private static void refreshLayerAndMapViews() {
+    if (UI.getLayerController() instanceof de.gurkenlabs.utiliti.view.components.SceneGraph sg) {
+      sg.refresh();
+    }
+    UI.showMapProperties();
+  }
+
   /**
    * Ensures that the undo stack does not exceed the maximum stack size. If the stack is full, it shifts all elements to the left by one index,
    * effectively removing the oldest undo state to make room for a new one.
@@ -465,7 +606,9 @@ public class UndoManager {
   private enum OperationType {
     CHANGE,
     ADD,
-    DELETE
+    DELETE,
+    LAYER_CHANGE,
+    MAP_CHANGE
   }
 
   /**
@@ -478,6 +621,12 @@ public class UndoManager {
     private final IMapObjectLayer layer;
     private final OperationType operationType;
     private final int operation;
+    private final ILayer targetLayer;
+    private final IMap targetMap;
+    private final Map<String, Object> oldLayerProperties;
+    private final Map<String, Object> newLayerProperties;
+    private final Map<String, Object> oldMapProperties;
+    private final Map<String, Object> newMapProperties;
 
     /**
      * Constructs an UndoState with the specified parameters.
@@ -493,17 +642,14 @@ public class UndoManager {
       this.oldMapObject = null;
       this.newMapObject = null;
       this.operationType = operationType;
+      this.targetLayer = null;
+      this.targetMap = null;
+      this.oldLayerProperties = null;
+      this.newLayerProperties = null;
+      this.oldMapProperties = null;
+      this.newMapProperties = null;
     }
 
-    /**
-     * Constructs an UndoState with the specified parameters.
-     *
-     * @param target        The target map object associated with this undo state.
-     * @param oldMapObject  The old state of the map object before the change.
-     * @param newMapObject  The new state of the map object after the change.
-     * @param operationType The type of operation (ADD, CHANGE, DELETE).
-     * @param operation     The operation identifier.
-     */
     public UndoState(
       IMapObject target,
       IMapObject oldMapObject,
@@ -515,8 +661,53 @@ public class UndoManager {
       this.oldMapObject = operationType != OperationType.ADD ? oldMapObject : null;
       this.newMapObject = operationType != OperationType.DELETE ? newMapObject : null;
       this.operationType = operationType;
-
       this.layer = Game.world().environment().getMap().getMapObjectLayer(target);
+      this.targetLayer = null;
+      this.targetMap = null;
+      this.oldLayerProperties = null;
+      this.newLayerProperties = null;
+      this.oldMapProperties = null;
+      this.newMapProperties = null;
+    }
+
+    public UndoState(
+      ILayer targetLayer,
+      Map<String, Object> oldProps,
+      Map<String, Object> newProps,
+      OperationType operationType,
+      int operation) {
+      this.operation = operation;
+      this.target = null;
+      this.oldMapObject = null;
+      this.newMapObject = null;
+      this.layer = null;
+      this.operationType = operationType;
+      this.targetLayer = targetLayer;
+      this.targetMap = null;
+      this.oldLayerProperties = oldProps;
+      this.newLayerProperties = newProps;
+      this.oldMapProperties = null;
+      this.newMapProperties = null;
+    }
+
+    public UndoState(
+      IMap targetMap,
+      Map<String, Object> oldProps,
+      Map<String, Object> newProps,
+      OperationType operationType,
+      int operation) {
+      this.operation = operation;
+      this.target = null;
+      this.oldMapObject = null;
+      this.newMapObject = null;
+      this.layer = null;
+      this.operationType = operationType;
+      this.targetLayer = null;
+      this.targetMap = targetMap;
+      this.oldLayerProperties = null;
+      this.newLayerProperties = null;
+      this.oldMapProperties = oldProps;
+      this.newMapProperties = newProps;
     }
 
     /**
@@ -526,16 +717,28 @@ public class UndoManager {
      */
     @Override
     public String toString() {
-      return target.getName() + "(" + target.getId() + ") " + this.operationType.toString();
+      if (target != null) {
+        return target.getName() + "(" + target.getId() + ") " + this.operationType.toString();
+      }
+      if (targetLayer != null) {
+        return "Layer:" + targetLayer.getName() + " " + this.operationType.toString();
+      }
+      if (targetMap != null) {
+        return "Map:" + targetMap.getName() + " " + this.operationType.toString();
+      }
+      return this.operationType.toString();
     }
 
-    /**
-     * Gets the operation identifier for this UndoState.
-     *
-     * @return The operation identifier.
-     */
     public int getOperation() {
       return this.operation;
+    }
+
+    public ILayer getTargetLayer() {
+      return this.targetLayer;
+    }
+
+    public IMap getTargetMap() {
+      return this.targetMap;
     }
   }
 }

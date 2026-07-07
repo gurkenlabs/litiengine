@@ -344,6 +344,8 @@ public class MapPropertyPanel extends JPanel {
       return;
     }
 
+    UndoManager.instance().mapChanging(this.dataSource);
+
     this.dataSource.setValue(MapProperty.MAP_DESCRIPTION, this.textFieldDesc.getText());
     this.dataSource.setValue(MapProperty.MAP_TITLE, this.textFieldTitle.getText());
     this.dataSource.setValue(MapProperty.GRAVITY, (int) this.spinnerGravity.getValue());
@@ -367,7 +369,7 @@ public class MapPropertyPanel extends JPanel {
     if (Game.world().environment() != null && Game.world().environment().getAmbientLight() != null) {
       Game.world().environment().getAmbientLight().setColor(this.ambientColorComponent.getColor());
     }
-    UndoManager.instance().recordChanges();
+    UndoManager.instance().mapChanged(this.dataSource);
   }
 
   private void stopTableEditing() {
