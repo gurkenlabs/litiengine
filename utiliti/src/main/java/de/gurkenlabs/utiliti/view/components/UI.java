@@ -307,6 +307,7 @@ public final class UI {
             : prefHierarchyW);
 
     initPopupMenu(canvas);
+    window.getRootPane().setBackground(Style.COLOR_BG);
     window.setJMenuBar(new MainMenuBar());
   }
 
@@ -570,7 +571,13 @@ public final class UI {
     // Menus
     UIManager.put("MenuBar.background", Style.COLOR_BG);
     UIManager.put("MenuBar.foreground", Style.COLOR_TEXT);
-    UIManager.put("MenuBar.borderColor", Style.COLOR_BORDER);
+    UIManager.put("MenuBar.borderColor", Style.COLOR_BG);
+    UIManager.put("MenuBar.border", BorderFactory.createEmptyBorder());
+    UIManager.put("Windows.TitlePane.background", Style.COLOR_BG);
+    UIManager.put("Windows.TitlePane.inactiveBackground", Style.COLOR_BG);
+    UIManager.put("Windows.TitlePane.foreground", Style.COLOR_TEXT);
+    UIManager.put("Windows.TitlePane.inactiveForeground", Style.COLOR_SUBTEXT);
+    UIManager.put("Windows.TitlePane.borderColor", Style.COLOR_BG);
     UIManager.put("Menu.background", Style.COLOR_BG);
     UIManager.put("Menu.foreground", Style.COLOR_TEXT);
     UIManager.put("Menu.selectionBackground", Style.COLOR_SELECT);
