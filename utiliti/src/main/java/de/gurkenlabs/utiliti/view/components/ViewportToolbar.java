@@ -39,6 +39,9 @@ public class ViewportToolbar extends JPanel {
   private final JButton btnCut;
   private final JButton btnDelete;
   private final JButton btnPaste;
+  private final JToggleButton btnGrid;
+  private final JToggleButton btnSnap;
+  private final JToggleButton btnCollision;
 
   public ViewportToolbar() {
     super(new BorderLayout());
@@ -114,15 +117,32 @@ public class ViewportToolbar extends JPanel {
     }
 
     left.add(separator());
-    left.add(toggle("Grid", new GridIcon(), Editor.preferences().showGrid(), selected -> Editor.preferences().setShowGrid(selected)));
-    left.add(toggle("Snap", new SnapIcon(), Editor.preferences().snapToGrid(), selected -> Editor.preferences().setSnapToGrid(selected)));
-    left.add(toggle("Collision", Icons.COLLISIONBOX_24, Editor.preferences().renderBoundingBoxes(), selected -> Editor.preferences().setRenderBoundingBoxes(selected)));
+    this.btnGrid = toggle("Grid", new GridIcon(), Editor.preferences().showGrid(), selected -> Editor.preferences().setShowGrid(selected));
+    this.btnSnap = toggle("Snap", new SnapIcon(), Editor.preferences().snapToGrid(), selected -> Editor.preferences().setSnapToGrid(selected));
+    this.btnCollision = toggle("Collision", Icons.COLLISIONBOX_24, Editor.preferences().renderBoundingBoxes(), selected -> Editor.preferences().setRenderBoundingBoxes(selected));
+    left.add(this.btnGrid);
+    left.add(this.btnSnap);
+    left.add(this.btnCollision);
 
     this.zoomLabel = new JLabel(formatZoom());
     right.add(createZoomGroup());
 
     add(left, BorderLayout.WEST);
     add(right, BorderLayout.EAST);
+  }
+
+  public void syncPreferenceButtons() {
+    syncToggle(this.btnGrid, Editor.preferences().showGrid());
+    syncToggle(this.btnSnap, Editor.preferences().snapToGrid());
+    syncToggle(this.btnCollision, Editor.preferences().renderBoundingBoxes());
+  }
+
+  private static void syncToggle(JToggleButton button, boolean selected) {
+    if (button.isSelected() != selected) {
+      button.setSelected(selected);
+    }
+    styleToggle(button);
+    button.repaint();
   }
 
   private JButton addButton() {

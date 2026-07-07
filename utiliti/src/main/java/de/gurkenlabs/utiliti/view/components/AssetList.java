@@ -41,8 +41,7 @@ public class AssetList extends JSplitPane implements Controller {
 
   public AssetList() {
     super(JSplitPane.HORIZONTAL_SPLIT);
-    this.setBorder(null);
-    this.setDividerSize(6);
+    UI.configureSplitPane(this);
     this.setResizeWeight(0.0);
     this.assetPanel = new AssetPanel();
     this.assetTree = new AssetTree(this.assetPanel);
@@ -54,7 +53,7 @@ public class AssetList extends JSplitPane implements Controller {
     JPanel leftPanel = new JPanel(new BorderLayout());
     leftPanel.setOpaque(true);
     leftPanel.setBackground(Style.COLOR_SURFACE);
-    leftPanel.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 0, 1, Style.COLOR_BORDER));
+    leftPanel.setBorder(null);
     leftPanel.add(assetTree, BorderLayout.CENTER);
     this.setLeftComponent(leftPanel);
 
@@ -161,9 +160,7 @@ public class AssetList extends JSplitPane implements Controller {
     JPanel topBar = new JPanel(new BorderLayout(8, 0));
     topBar.setOpaque(true);
     topBar.setBackground(Style.COLOR_BG);
-    topBar.setBorder(javax.swing.BorderFactory.createCompoundBorder(
-        javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0, Style.COLOR_BORDER),
-        javax.swing.BorderFactory.createEmptyBorder(6, 10, 6, 10)));
+    topBar.setBorder(javax.swing.BorderFactory.createEmptyBorder(6, 10, 6, 10));
     topBar.add(titleBar, BorderLayout.WEST);
     topBar.add(tools, BorderLayout.EAST);
 

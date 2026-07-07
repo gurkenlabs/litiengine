@@ -50,17 +50,26 @@ import javax.swing.KeyStroke;
 
     JCheckBoxMenuItem snapToGrid = new JCheckBoxMenuItem(Resources.strings().get("menu_view_snapGrid"));
     snapToGrid.setState(Editor.preferences().snapToGrid());
-    snapToGrid.addItemListener(e -> Editor.preferences().setSnapToGrid(snapToGrid.getState()));
+    snapToGrid.addItemListener(e -> {
+      Editor.preferences().setSnapToGrid(snapToGrid.getState());
+      syncViewportToolbar();
+    });
 
     JCheckBoxMenuItem renderGrid = new JCheckBoxMenuItem(Resources.strings().get("menu_view_showGrid"));
     configureCustomCheckBoxMenuItem(renderGrid, Editor.preferences().showGrid());
     renderGrid.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, InputEvent.CTRL_DOWN_MASK));
-    renderGrid.addItemListener(e -> Editor.preferences().setShowGrid(renderGrid.getState()));
+    renderGrid.addItemListener(e -> {
+      Editor.preferences().setShowGrid(renderGrid.getState());
+      syncViewportToolbar();
+    });
 
     JCheckBoxMenuItem renderCollision = new JCheckBoxMenuItem(Resources.strings().get("menu_view_showCollisionBoxes"));
     configureCustomCheckBoxMenuItem(renderCollision, Editor.preferences().renderBoundingBoxes());
     renderCollision.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.CTRL_DOWN_MASK));
-    renderCollision.addItemListener(e -> Editor.preferences().setRenderBoundingBoxes(renderCollision.getState()));
+    renderCollision.addItemListener(e -> {
+      Editor.preferences().setRenderBoundingBoxes(renderCollision.getState());
+      syncViewportToolbar();
+    });
 
     JCheckBoxMenuItem renderCustomMapObjects = new JCheckBoxMenuItem(Resources.strings().get("menu_view_showCustomMapObjects"));
     configureCustomCheckBoxMenuItem(renderCustomMapObjects, Editor.preferences().renderCustomMapObjects());
@@ -133,5 +142,11 @@ import javax.swing.KeyStroke;
     menuItem.setState(initialState);
     menuItem.setIcon(initialState ? Icons.SHOW_24 : Icons.HIDE_24);
     menuItem.addItemListener(e -> menuItem.setIcon(menuItem.getState() ? Icons.SHOW_24 : Icons.HIDE_24));
+  }
+
+  private static void syncViewportToolbar() {
+    if (UI.getViewportToolbar() != null) {
+      UI.getViewportToolbar().syncPreferenceButtons();
+    }
   }
 }
