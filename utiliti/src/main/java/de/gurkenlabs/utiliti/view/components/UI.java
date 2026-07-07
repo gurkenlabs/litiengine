@@ -7,6 +7,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameListener;
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.EnvironmentListener;
+import de.gurkenlabs.litiengine.environment.tilemap.ILayer;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.Controller;
@@ -36,6 +37,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
@@ -58,11 +60,14 @@ import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
+import javax.swing.plaf.basic.BasicSplitPaneDivider;
+import javax.swing.plaf.basic.BasicSplitPaneUI;
 
 public final class UI {
   private static final int INSPECTOR_MIN_WIDTH = 420;
   private static final int SCENE_GRAPH_MIN_WIDTH = 250;
   private static final int SCENE_GRAPH_MAX_WIDTH = 330;
+  private static final int SPLITTER_SIZE = 6;
 
   private static final List<JComponent> orphanComponents = new CopyOnWriteArrayList<>();
   private static JPopupMenu canvasPopup;
@@ -70,11 +75,13 @@ public final class UI {
 
   private static MapObjectInspector mapObjectPanel;
   private static MapPropertyPanel mapPropertyPanel;
+  private static LayerPropertyPanel layerPropertyPanel;
   private static JPanel inspectorHost;
   private static CardLayout inspectorCards;
   private static MapList mapSelectionPanel;
   private static SceneGraph sceneGraph;
   private static JComboBox<TmxMap> mapCombo;
+  private static ViewportToolbar viewportToolbar;
 
   private static boolean initialized;
 
@@ -171,6 +178,17 @@ public final class UI {
     }
   }
 
+  public static void showLayerProperties(ILayer layer) {
+    if (layerPropertyPanel == null) {
+      return;
+    }
+
+    layerPropertyPanel.bind(layer);
+    if (inspectorCards != null && inspectorHost != null) {
+      inspectorCards.show(inspectorHost, "layers");
+    }
+  }
+
   public static LayerController getLayerController() {
     return sceneGraph;
   }
@@ -181,6 +199,10 @@ public final class UI {
 
   public static Controller getAssetController() {
     return assetComponent;
+  }
+
+  public static ViewportToolbar getViewportToolbar() {
+    return viewportToolbar;
   }
 
   public static JPopupMenu getCanvasPopup() {
@@ -245,7 +267,8 @@ public final class UI {
     initScrollBars(renderPanel);
 
     initTools();
-    renderPanel.add(new ViewportToolbar(), BorderLayout.NORTH);
+    viewportToolbar = new ViewportToolbar();
+    renderPanel.add(viewportToolbar, BorderLayout.NORTH);
     initDropTarget(renderPanel);
 
     Component leftPanel = initLeftPanel();
@@ -255,18 +278,20 @@ public final class UI {
     mapObjectPanel.setMinimumSize(new Dimension(INSPECTOR_MIN_WIDTH, 0));
     mapPropertyPanel = new MapPropertyPanel();
     mapPropertyPanel.setMinimumSize(new Dimension(INSPECTOR_MIN_WIDTH, 0));
+    layerPropertyPanel = new LayerPropertyPanel();
+    layerPropertyPanel.setMinimumSize(new Dimension(INSPECTOR_MIN_WIDTH, 0));
     inspectorCards = new CardLayout();
     inspectorHost = new JPanel(inspectorCards);
     inspectorHost.add(mapObjectPanel, "objects");
     inspectorHost.add(mapPropertyPanel, "map");
+    inspectorHost.add(layerPropertyPanel, "layers");
     inspectorHost.setMinimumSize(new Dimension(INSPECTOR_MIN_WIDTH, 0));
 
     int prefInspectorW = Math.max(INSPECTOR_MIN_WIDTH, (int) (winW * 0.20));
     JSplitPane centerRightSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, renderSplitPanel, inspectorHost);
+    configureSplitPane(centerRightSplit);
     centerRightSplit.setContinuousLayout(true);
     centerRightSplit.setResizeWeight(1.0);
-    centerRightSplit.setBorder(null);
-    centerRightSplit.setDividerSize(6);
     centerRightSplit.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY,
         evt -> Editor.preferences().setSelectionEditSplitter(centerRightSplit.getDividerLocation()));
     if (Editor.preferences().getSelectionEditSplitter() != 0) {
@@ -278,10 +303,9 @@ public final class UI {
 
     int prefHierarchyW = Math.max(SCENE_GRAPH_MIN_WIDTH, Math.min(SCENE_GRAPH_MAX_WIDTH, (int) (winW * 0.18)));
     JSplitPane mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, centerRightSplit);
+    configureSplitPane(mainSplit);
     mainSplit.setContinuousLayout(true);
     mainSplit.setResizeWeight(0.0);
-    mainSplit.setBorder(null);
-    mainSplit.setDividerSize(6);
     mainSplit.addComponentListener(new ComponentAdapter() {
       @Override public void componentResized(ComponentEvent e) {
         Editor.preferences().setWidth(window.getWidth());
@@ -338,9 +362,8 @@ public final class UI {
 
   private static Component initRenderSplitPanel(JPanel renderPanel, int winH) {
     JSplitPane renderSplitPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, renderPanel, initBottomPanel());
+    configureSplitPane(renderSplitPanel);
     renderSplitPanel.setResizeWeight(1.0);
-    renderSplitPanel.setBorder(null);
-    renderSplitPanel.setDividerSize(6);
     if (Editor.preferences().getBottomSplitter() != 0) {
       renderSplitPanel.setDividerLocation(Editor.preferences().getBottomSplitter());
     } else {
@@ -350,6 +373,27 @@ public final class UI {
         evt -> Editor.preferences().setBottomSplitter(renderSplitPanel.getDividerLocation()));
     renderSplitPanel.setContinuousLayout(true);
     return renderSplitPanel;
+  }
+
+  static void configureSplitPane(JSplitPane splitPane) {
+    splitPane.setBorder(null);
+    splitPane.setDividerSize(SPLITTER_SIZE);
+    splitPane.setUI(new BasicSplitPaneUI() {
+      @Override public BasicSplitPaneDivider createDefaultDivider() {
+        return new BasicSplitPaneDivider(this) {
+          {
+            setBorder(null);
+            setBackground(Style.COLOR_BG);
+          }
+
+          @Override public void paint(Graphics g) {
+            g.setColor(Style.COLOR_BG);
+            g.fillRect(0, 0, getWidth(), getHeight());
+          }
+        };
+      }
+    });
+    splitPane.setDividerSize(SPLITTER_SIZE);
   }
 
   private static Component initLeftPanel() {
@@ -552,7 +596,8 @@ public final class UI {
     UIManager.put("TabbedPane.background", Style.COLOR_BG);
     UIManager.put("TabbedPane.foreground", Style.COLOR_SUBTEXT);
     UIManager.put("TabbedPane.selected", Style.COLOR_SURFACE);
-    UIManager.put("TabbedPane.contentAreaColor", Style.COLOR_BORDER);
+    UIManager.put("TabbedPane.contentAreaColor", Style.COLOR_BG);
+    UIManager.put("TabbedPane.borderColor", Style.COLOR_BG);
     UIManager.put("TabbedPane.tabAreaBackground", Style.COLOR_BG);
 
     // Labels & Buttons
@@ -617,6 +662,12 @@ public final class UI {
 
     // SplitPane - cleaner dividers
     UIManager.put("SplitPane.background", Style.COLOR_BG);
+    UIManager.put("SplitPane.border", BorderFactory.createEmptyBorder());
+    UIManager.put("SplitPane.dividerSize", SPLITTER_SIZE);
+    UIManager.put("SplitPaneDivider.border", BorderFactory.createEmptyBorder());
+    UIManager.put("SplitPaneDivider.background", Style.COLOR_BG);
+    UIManager.put("SplitPaneDivider.foreground", Style.COLOR_BG);
+    UIManager.put("SplitPaneDivider.draggingColor", Style.COLOR_BG);
     UIManager.put("SplitPane.continuousLayout", true);
   }
 

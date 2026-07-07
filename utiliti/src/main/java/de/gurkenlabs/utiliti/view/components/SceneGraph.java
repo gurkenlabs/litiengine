@@ -51,7 +51,6 @@ import java.util.function.Consumer;
 import javax.swing.Icon;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JColorChooser;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -256,6 +255,8 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
           if (userObj instanceof SceneNode node) {
             if (node.isLayer()) {
               syncLayerSelection(node);
+              Editor.instance().getMapComponent().setFocus(null, true);
+              UI.showLayerProperties(node.getLayer());
             } else if (node.getMapObject() != null) {
               Editor.instance().getMapComponent().setFocus(node.getMapObject(), true);
             }
@@ -615,19 +616,20 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
       this.treeModel.reload();
       restoreExpansionState(map.getName());
 
-      // restore per-map selection
-      if (map != null && this.selectedLayers.containsKey(map.getName())) {
-        int idx = this.selectedLayers.get(map.getName());
-        DefaultMutableTreeNode target = getLayerNodeByRenderIndex(idx);
-        if (target != null) {
-          tree.setSelectionPath(new TreePath(target.getPath()));
-        }
-      }
-
-      // select focused object
+      // select focused object first so we don't flash the layers card
       IMapObject focused = Editor.instance().getMapComponent().getFocusedMapObject();
       if (focused != null) {
         this.select(focused);
+        UI.showObjectInspector();
+      } else {
+        // restore per-map layer selection only when no entity is focused
+        if (map != null && this.selectedLayers.containsKey(map.getName())) {
+          int idx = this.selectedLayers.get(map.getName());
+          DefaultMutableTreeNode target = getLayerNodeByRenderIndex(idx);
+          if (target != null) {
+            tree.setSelectionPath(new TreePath(target.getPath()));
+          }
+        }
       }
     } finally {
       this.refreshing = false;
@@ -1029,8 +1031,6 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     addContextMenuItem(popup, "Add Layer", Icons.ADD_24, () -> addLayer(node));
     addContextMenuItem(popup, "Remove Layer", Icons.DELETE_24, () -> removeLayer(node));
     addContextMenuItem(popup, "Duplicate Layer", Icons.COPY_24, () -> duplicateLayer(node));
-    addContextMenuItem(popup, "Rename Layer", Icons.RENAME_24, () -> renameLayer(node));
-    addContextMenuItem(popup, "Set Color", Icons.COLOR_24, () -> setLayerColor(node));
     popup.addSeparator();
     String toggleLabel = node.isVisible() ? "Hide Layer" : "Show Layer";
     Icon toggleIcon = node.isVisible() ? Icons.HIDE_24 : Icons.SHOW_24;
@@ -1142,37 +1142,6 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     Editor.instance().getMapComponent().add(copied);
     UndoManager.instance().recordChanges();
     fireLayerStructureChanged();
-  }
-
-  private void renameLayer(SceneNode node) {
-    if (node.getLayer() == null) {
-      return;
-    }
-    String newName = javax.swing.JOptionPane.showInputDialog(
-        Resources.strings().get("panel_renameLayer"), node.getName());
-    if (newName == null) {
-      return;
-    }
-    node.getLayer().setName(newName);
-    refresh();
-    UndoManager.instance().recordChanges();
-    fireLayerChanged();
-  }
-
-  private void setLayerColor(SceneNode node) {
-    if (!(node.getLayer() instanceof IMapObjectLayer objLayer)) {
-      return;
-    }
-    Color newColor = JColorChooser.showDialog(
-        null,
-        Resources.strings().get("panel_selectLayerColor"),
-        objLayer.getColor());
-    if (newColor == null) {
-      return;
-    }
-    objLayer.setColor(newColor);
-    UndoManager.instance().recordChanges();
-    fireLayerChanged();
   }
 
   private void hideOtherLayers(SceneNode node) {
