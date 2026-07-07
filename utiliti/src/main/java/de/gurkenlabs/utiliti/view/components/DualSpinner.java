@@ -85,25 +85,22 @@ public class DualSpinner extends PropertyPanel {
     this.spnDim2.setMinimumSize(SPINNER_SIZE);
 
     GroupLayout gl = new GroupLayout(this);
-    gl.setAutoCreateGaps(false);
+    gl.setAutoCreateGaps(true);
     gl.setHorizontalGroup(
       gl.createSequentialGroup()
-        .addGroup(gl.createParallelGroup(Alignment.TRAILING)
-          .addComponent(lblDim1, LABEL_WIDTH, LABEL_WIDTH, Integer.MAX_VALUE)
-          .addComponent(lblDim2, LABEL_WIDTH, LABEL_WIDTH, Integer.MAX_VALUE))
+        .addComponent(lblDim1, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+        .addGap(4)
+        .addComponent(spnDim1, SPINNER_WIDTH, SPINNER_WIDTH, SPINNER_WIDTH)
         .addGap(8)
-        .addGroup(gl.createParallelGroup()
-          .addComponent(spnDim1, SPINNER_WIDTH, SPINNER_WIDTH, SPINNER_WIDTH)
-          .addComponent(spnDim2, SPINNER_WIDTH, SPINNER_WIDTH, SPINNER_WIDTH)));
+        .addComponent(lblDim2, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+        .addGap(4)
+        .addComponent(spnDim2, SPINNER_WIDTH, SPINNER_WIDTH, SPINNER_WIDTH));
     gl.setVerticalGroup(
-      gl.createSequentialGroup()
-        .addGroup(gl.createParallelGroup(Alignment.CENTER)
-          .addComponent(lblDim1)
-          .addComponent(spnDim1))
-        .addGap(6)
-        .addGroup(gl.createParallelGroup(Alignment.CENTER)
-          .addComponent(lblDim2)
-          .addComponent(spnDim2)));
+      gl.createParallelGroup(Alignment.CENTER)
+        .addComponent(lblDim1)
+        .addComponent(spnDim1)
+        .addComponent(lblDim2)
+        .addComponent(spnDim2));
     this.setLayout(gl);
     setupChangedListeners();
   }

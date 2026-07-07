@@ -27,18 +27,11 @@ public class EmitterPanel extends PropertyPanel {
     setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
     this.propertyGrouptabs = new JTabbedPane();
     this.propertyGrouptabs.setAlignmentX(Component.LEFT_ALIGNMENT);
-    this.propertyGrouptabs.setTabPlacement(SwingConstants.LEFT);
+    this.propertyGrouptabs.setTabPlacement(SwingConstants.TOP);
     for (EmitterPropertyGroup e : EmitterPropertyGroup.values()) {
       String localized =
           Resources.strings().get(String.format("emitter_%s", e.name().toLowerCase()));
-      this.propertyGrouptabs.insertTab(
-          String.format(
-              "<html><p style=\"text-align: left; width: %spx\">%s</p></html>",
-              LABEL_WIDTH * 1.5, localized),
-          null,
-          EmitterPropertyPanel.getEmitterPropertyPanel(e),
-          Resources.strings().get(String.format("emitter_%s_tip", e.name().toLowerCase())),
-          e.ordinal());
+      this.propertyGrouptabs.addTab(localized, EmitterPropertyPanel.getEmitterPropertyPanel(e));
     }
 
     this.add(this.propertyGrouptabs);
