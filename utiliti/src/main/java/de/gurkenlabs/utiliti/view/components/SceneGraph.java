@@ -514,10 +514,11 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
 
   @Override
   public void select(IMapObject mapObject) {
-    if (this.isFocussing || mapObject == null) {
-      if (mapObject == null) {
-        tree.clearSelection();
-      }
+    if (this.isFocussing) {
+      return;
+    }
+    if (mapObject == null) {
+      tree.clearSelection();
       return;
     }
 
@@ -547,6 +548,21 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
         }
       }
     }
+  }
+
+  void setFocussingForTest(boolean focussing) {
+    this.isFocussing = focussing;
+  }
+
+  void selectLayerNodeForTest(ILayer layer) {
+    DefaultMutableTreeNode node = new DefaultMutableTreeNode(new SceneNode(layer.getName(), null, layer, layer.isVisible(), 0));
+    this.nodeRoot.add(node);
+    this.treeModel.reload();
+    this.tree.setSelectionPath(new TreePath(node.getPath()));
+  }
+
+  boolean hasTreeSelectionForTest() {
+    return !this.tree.isSelectionEmpty();
   }
 
   @Override
@@ -1091,9 +1107,10 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
         new de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer();
     layer.setName("new layer");
     int absIdx = afterNode != null ? getAbsoluteIndex(map, afterNode) : map.getRenderLayers().size() - 1;
+    UndoManager.instance().layerStructureChanging(map);
     map.addLayer(absIdx + 1, layer);
     refresh();
-    UndoManager.instance().recordChanges();
+    UndoManager.instance().layerStructureChanged(map);
     fireLayerStructureChanged();
   }
 
@@ -1109,10 +1126,11 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     IMapObjectLayer copy = new de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer(
         (de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer) node.getLayer());
 
+    UndoManager.instance().layerStructureChanging(map);
     Editor.instance().getMapComponent().delete((IMapObjectLayer) node.getLayer());
     map.removeLayer(node.getLayer());
     refresh();
-    UndoManager.instance().recordChanges();
+    UndoManager.instance().layerStructureChanged(map);
     fireLayerStructureChanged();
 
     Toast.show(
@@ -1137,10 +1155,11 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
         new de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer(
             (de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer) node.getLayer());
     int absIdx = getAbsoluteIndex(map, node);
+    UndoManager.instance().layerStructureChanging(map);
     map.addLayer(absIdx + 1, copied);
     refresh();
     Editor.instance().getMapComponent().add(copied);
-    UndoManager.instance().recordChanges();
+    UndoManager.instance().layerStructureChanged(map);
     fireLayerStructureChanged();
   }
 
@@ -1196,10 +1215,11 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     if (absIdx <= 0) {
       return;
     }
+    UndoManager.instance().layerStructureChanging(map);
     map.removeLayer(node.getLayer());
     map.addLayer(absIdx - 1, node.getLayer());
     refresh();
-    UndoManager.instance().recordChanges();
+    UndoManager.instance().layerStructureChanged(map);
     fireLayerStructureChanged();
   }
 
@@ -1212,10 +1232,11 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     if (absIdx >= map.getRenderLayers().size() - 1) {
       return;
     }
+    UndoManager.instance().layerStructureChanging(map);
     map.removeLayer(node.getLayer());
     map.addLayer(absIdx + 1, node.getLayer());
     refresh();
-    UndoManager.instance().recordChanges();
+    UndoManager.instance().layerStructureChanged(map);
     fireLayerStructureChanged();
   }
 

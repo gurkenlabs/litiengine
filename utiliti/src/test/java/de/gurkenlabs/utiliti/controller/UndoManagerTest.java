@@ -123,6 +123,38 @@ class UndoManagerTest {
     assertEquals("old", layer.getStringValue("custom"));
   }
 
+  @Test
+  void layerStructureUndoRedoRestoresLayerOrder() {
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
+    TmxMap map = new TmxMap(MapOrientations.ORTHOGONAL);
+    map.setName("undo-layer-structure-test");
+    map.setWidth(1);
+    map.setHeight(1);
+    map.setTileWidth(16);
+    map.setTileHeight(16);
+    MapObjectLayer first = new MapObjectLayer();
+    first.setName("first");
+    MapObjectLayer second = new MapObjectLayer();
+    second.setName("second");
+    map.addLayer(first);
+    map.addLayer(second);
+    Game.world().loadEnvironment(map);
+
+    UndoManager manager = UndoManager.instance();
+    manager.layerStructureChanging(map);
+    map.removeLayer(second);
+    map.addLayer(0, second);
+    manager.layerStructureChanged(map);
+
+    assertSame(second, map.getRenderLayers().get(0));
+    manager.undo();
+    assertSame(first, map.getRenderLayers().get(0));
+    assertSame(second, map.getRenderLayers().get(1));
+    manager.redo();
+    assertSame(second, map.getRenderLayers().get(0));
+    assertSame(first, map.getRenderLayers().get(1));
+  }
+
   private static void restoreState(IMapObject target, IMapObject snapshot) throws Exception {
     Method restoreState = UndoManager.class.getDeclaredMethod("restoreState", IMapObject.class, IMapObject.class);
     restoreState.setAccessible(true);

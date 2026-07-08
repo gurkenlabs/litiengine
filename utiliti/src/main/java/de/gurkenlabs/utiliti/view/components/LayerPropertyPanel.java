@@ -136,14 +136,17 @@ public class LayerPropertyPanel extends JPanel {
         new JLabel[] {
             createLabel("Name"),
             createLabel("Opacity"),
+            createLabel("Visible"),
             this.labelLayerColor,
         },
         new JComponent[] {
             this.textFieldName,
             this.spinnerOpacity,
+            this.checkBoxVisible,
             this.layerColorComponent,
         },
         new int[] {
+            PropertyPanel.CONTROL_HEIGHT,
             PropertyPanel.CONTROL_HEIGHT,
             PropertyPanel.CONTROL_HEIGHT,
             PropertyPanel.CONTROL_HEIGHT,
@@ -294,34 +297,34 @@ public class LayerPropertyPanel extends JPanel {
   }
 
   public void bind(final ILayer layer) {
-    this.dataSource = layer;
-    if (layer == null) {
-      clearControls();
-      return;
-    }
-
-    boolean isMapObjectLayer = layer instanceof IMapObjectLayer;
-    this.labelLayerColor.setVisible(isMapObjectLayer);
-    this.layerColorComponent.setVisible(isMapObjectLayer);
-    if (isMapObjectLayer) {
-      this.layerColorComponent.setColor(((IMapObjectLayer) layer).getColor());
-    }
-
-    this.setControlValues(layer);
-  }
-
-  public void clearControls() {
     this.binding = true;
     try {
-      this.textFieldName.setText("");
-      this.spinnerOpacity.setValue(1.0);
-      this.checkBoxVisible.setSelected(true);
-      this.tintColorComponent.setColor(java.awt.Color.WHITE);
-      this.comboRenderType.setSelectedItem(RenderType.NORMAL);
-      this.model.setRowCount(0);
+      this.dataSource = layer;
+      if (layer == null) {
+        clearControls();
+        return;
+      }
+
+      boolean isMapObjectLayer = layer instanceof IMapObjectLayer;
+      this.labelLayerColor.setVisible(isMapObjectLayer);
+      this.layerColorComponent.setVisible(isMapObjectLayer);
+      if (isMapObjectLayer) {
+        this.layerColorComponent.setColor(((IMapObjectLayer) layer).getColor());
+      }
+
+      this.setControlValues(layer);
     } finally {
       this.binding = false;
     }
+  }
+
+  public void clearControls() {
+    this.textFieldName.setText("");
+    this.spinnerOpacity.setValue(1.0);
+    this.checkBoxVisible.setSelected(true);
+    this.tintColorComponent.setColor(java.awt.Color.WHITE);
+    this.comboRenderType.setSelectedItem(RenderType.NORMAL);
+    this.model.setRowCount(0);
   }
 
   public void saveChanges() {
@@ -362,23 +365,18 @@ public class LayerPropertyPanel extends JPanel {
   }
 
   private void setControlValues(final ILayer layer) {
-    this.binding = true;
-    try {
-      this.textFieldName.setText(layer.getName());
-      this.spinnerOpacity.setValue((double) layer.getOpacity());
-      this.checkBoxVisible.setSelected(layer.isVisible());
+    this.textFieldName.setText(layer.getName());
+    this.spinnerOpacity.setValue((double) layer.getOpacity());
+    this.checkBoxVisible.setSelected(layer.isVisible());
 
-      java.awt.Color tint = layer.getTintColor();
-      this.tintColorComponent.setColor(tint != null ? tint : java.awt.Color.WHITE);
+    java.awt.Color tint = layer.getTintColor();
+    this.tintColorComponent.setColor(tint != null ? tint : java.awt.Color.WHITE);
 
-      this.comboRenderType.setSelectedItem(layer.getRenderType());
+    this.comboRenderType.setSelectedItem(layer.getRenderType());
 
-      this.model.setRowCount(0);
-      for (Map.Entry<String, ICustomProperty> prop : layer.getProperties().entrySet()) {
-        this.model.addRow(new Object[] {prop.getKey(), prop.getValue().getAsString()});
-      }
-    } finally {
-      this.binding = false;
+    this.model.setRowCount(0);
+    for (Map.Entry<String, ICustomProperty> prop : layer.getProperties().entrySet()) {
+      this.model.addRow(new Object[] {prop.getKey(), prop.getValue().getAsString()});
     }
   }
 

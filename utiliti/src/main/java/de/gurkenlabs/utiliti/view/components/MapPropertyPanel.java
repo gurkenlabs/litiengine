@@ -369,6 +369,9 @@ public class MapPropertyPanel extends JPanel {
     if (Game.world().environment() != null && Game.world().environment().getAmbientLight() != null) {
       Game.world().environment().getAmbientLight().setColor(this.ambientColorComponent.getColor());
     }
+    if (Game.world().environment() != null && Game.world().environment().getStaticShadowLayer() != null) {
+      Game.world().environment().getStaticShadowLayer().setColor(this.shadowColorComponent.getColor());
+    }
     UndoManager.instance().mapChanged(this.dataSource);
   }
 

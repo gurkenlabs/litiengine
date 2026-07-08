@@ -129,10 +129,10 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
     this.infoPanel.add(headerContent, BorderLayout.CENTER);
 
-    this.spnX = new JSpinner(new SpinnerNumberModel(0.0, 0.0, (double) Short.MAX_VALUE, 1.0));
-    this.spnY = new JSpinner(new SpinnerNumberModel(0.0, 0.0, (double) Short.MAX_VALUE, 1.0));
-    this.spnW = new JSpinner(new SpinnerNumberModel(0.0, 0.0, (double) Short.MAX_VALUE, 1.0));
-    this.spnH = new JSpinner(new SpinnerNumberModel(0.0, 0.0, (double) Short.MAX_VALUE, 1.0));
+    this.spnX = new JSpinner(createCoordinateSpinnerModel());
+    this.spnY = new JSpinner(createCoordinateSpinnerModel());
+    this.spnW = new JSpinner(createSizeSpinnerModel());
+    this.spnH = new JSpinner(createSizeSpinnerModel());
 
     ControlBehavior.apply(this.spnX);
     ControlBehavior.apply(this.spnY);
@@ -211,6 +211,14 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
     this.setupChangedListeners();
     UI.getLayerController().onLayersChanged(map -> this.bind(this.getDataSource()));
+  }
+
+  static SpinnerNumberModel createCoordinateSpinnerModel() {
+    return new SpinnerNumberModel(0.0, null, (double) Short.MAX_VALUE, 1.0);
+  }
+
+  static SpinnerNumberModel createSizeSpinnerModel() {
+    return new SpinnerNumberModel(0.0, 0.0, (double) Short.MAX_VALUE, 1.0);
   }
 
   @Override
