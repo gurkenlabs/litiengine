@@ -352,6 +352,7 @@ public class LayerPropertyPanel extends JPanel {
         this.dataSource.setValue(name, value);
       }
     }
+    removeUnsetProperties(this.dataSource, setProperties);
 
     UndoManager.instance().layerChanged(this.dataSource);
 
@@ -386,5 +387,9 @@ public class LayerPropertyPanel extends JPanel {
     if (editor != null) {
       editor.stopCellEditing();
     }
+  }
+
+  static void removeUnsetProperties(ILayer layer, List<String> setProperties) {
+    layer.getProperties().keySet().removeIf(p -> !setProperties.contains(p));
   }
 }

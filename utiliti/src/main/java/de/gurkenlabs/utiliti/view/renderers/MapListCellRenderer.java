@@ -17,7 +17,9 @@ public class MapListCellRenderer extends JLabel implements ListCellRenderer<IMap
   @Override
   public Component getListCellRendererComponent(
       JList<? extends IMap> list, IMap map, int index, boolean isSelected, boolean cellHasFocus) {
-    if (UndoManager.hasChanges(map)) {
+    if (map == null) {
+      setText("");
+    } else if (UndoManager.hasChanges(map)) {
       setText(map.getName() + " *");
     } else {
       setText(map.getName());

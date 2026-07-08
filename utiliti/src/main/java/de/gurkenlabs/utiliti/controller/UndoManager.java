@@ -8,6 +8,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
+import de.gurkenlabs.litiengine.entities.StaticShadow;
+import de.gurkenlabs.litiengine.graphics.AmbientLight;
 import de.gurkenlabs.utiliti.view.components.UI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -110,7 +112,7 @@ public class UndoManager {
     this.executing = true;
     try {
       List<IMapObject> affectedTargets = new ArrayList<>();
-      boolean affectedLayer = false;
+      ILayer affectedLayer = null;
       boolean affectedMap = false;
       do {
         stepsUndone++;
@@ -119,7 +121,7 @@ public class UndoManager {
           affectedTargets.add(state.target);
         }
         if (state.targetLayer != null) {
-          affectedLayer = true;
+          affectedLayer = state.targetLayer;
         }
         if (state.targetMap != null) {
           affectedMap = true;
@@ -140,8 +142,8 @@ public class UndoManager {
 
       log.log(Level.FINE, "{0} steps undone.", stepsUndone);
       refreshAffectedTargets(affectedTargets);
-      if (affectedLayer || affectedMap) {
-        refreshLayerAndMapViews();
+      if (affectedLayer != null || affectedMap) {
+        refreshLayerAndMapViews(affectedLayer, affectedMap);
       }
       fireUndoStackChangedEvent(this);
     } finally {
@@ -171,7 +173,7 @@ public class UndoManager {
     this.executing = true;
     try {
       List<IMapObject> affectedTargets = new ArrayList<>();
-      boolean affectedLayer = false;
+      ILayer affectedLayer = null;
       boolean affectedMap = false;
       do {
         ++stepsRedone;
@@ -182,7 +184,7 @@ public class UndoManager {
           affectedTargets.add(state.target);
         }
         if (state.targetLayer != null) {
-          affectedLayer = true;
+          affectedLayer = state.targetLayer;
         }
         if (state.targetMap != null) {
           affectedMap = true;
@@ -203,8 +205,8 @@ public class UndoManager {
       log.log(Level.FINE, "{0} steps redone.", stepsRedone);
 
       refreshAffectedTargets(affectedTargets);
-      if (affectedLayer || affectedMap) {
-        refreshLayerAndMapViews();
+      if (affectedLayer != null || affectedMap) {
+        refreshLayerAndMapViews(affectedLayer, affectedMap);
       }
       fireUndoStackChangedEvent(this);
     } finally {
@@ -402,6 +404,14 @@ public class UndoManager {
         map.setValue(entry.getKey().substring(5), (String) entry.getValue());
       }
     }
+    if (Game.world().environment() != null) {
+      if (Game.world().environment().getAmbientLight() != null) {
+        Game.world().environment().getAmbientLight().setColor(map.getColorValue(MapProperty.AMBIENTCOLOR, AmbientLight.DEFAULT_COLOR));
+      }
+      if (Game.world().environment().getStaticShadowLayer() != null) {
+        Game.world().environment().getStaticShadowLayer().setColor(map.getColorValue(MapProperty.SHADOWCOLOR, StaticShadow.DEFAULT_COLOR));
+      }
+    }
   }
 
   public void layerChanging(ILayer layer) {
@@ -488,6 +498,10 @@ public class UndoManager {
    * @return True if the map has unsaved changes, false otherwise.
    */
   public static boolean hasChanges(IMap map) {
+    if (map == null) {
+      return false;
+    }
+
     if (instance.containsKey(map.getName())) {
       return !instance.get(map.getName()).saved;
     }
@@ -561,11 +575,15 @@ public class UndoManager {
     }
   }
 
-  private static void refreshLayerAndMapViews() {
+  private static void refreshLayerAndMapViews(ILayer affectedLayer, boolean affectedMap) {
     if (UI.getLayerController() instanceof de.gurkenlabs.utiliti.view.components.SceneGraph sg) {
       sg.refresh();
     }
-    UI.showMapProperties();
+    if (affectedLayer != null) {
+      UI.showLayerProperties(affectedLayer);
+    } else if (affectedMap) {
+      UI.showMapProperties();
+    }
   }
 
   /**
