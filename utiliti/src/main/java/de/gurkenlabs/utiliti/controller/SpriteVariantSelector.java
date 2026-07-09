@@ -179,6 +179,18 @@ public final class SpriteVariantSelector {
         return v;
       }
     }
+    String moveToken = "-" + CreatureAnimationState.MOVE.spriteString() + "-";
+    for (SpritesheetResource v : variants) {
+      if (v.getName().contains(moveToken)) {
+        return v;
+      }
+    }
+    String walkToken = "-" + CreaturePanel.WALK_SPRITE_TOKEN + "-";
+    for (SpritesheetResource v : variants) {
+      if (v.getName().contains(walkToken)) {
+        return v;
+      }
+    }
     // Final fallback: first available variant (order preserved by grouping)
     return variants.getFirst();
   }
@@ -195,6 +207,16 @@ public final class SpriteVariantSelector {
     }
     for (String v : variants) {
       if (v.contains("-" + CreatureAnimationState.IDLE.spriteString() + "-")) {
+        return v;
+      }
+    }
+    for (String v : variants) {
+      if (v.contains("-" + CreatureAnimationState.MOVE.spriteString() + "-")) {
+        return v;
+      }
+    }
+    for (String v : variants) {
+      if (v.contains("-" + CreaturePanel.WALK_SPRITE_TOKEN + "-")) {
         return v;
       }
     }

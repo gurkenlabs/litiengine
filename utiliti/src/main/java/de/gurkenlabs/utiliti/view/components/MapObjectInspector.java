@@ -22,6 +22,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -51,6 +52,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
   private final CustomPanel customPanel;
   private final JTextField textFieldName;
   private final JComboBox<RenderType> renderType;
+  private final JCheckBox checkBoxRenderWithLayer;
 
   private final JLabel labelEntityID;
   private final JLabel labelTypeIcon;
@@ -89,6 +91,9 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.renderType = new JComboBox<>(RenderType.values());
     this.renderType.setMinimumSize(SMALL_CONTROL_SIZE);
     ControlBehavior.apply(this.renderType);
+    this.checkBoxRenderWithLayer = new JCheckBox(Resources.strings().get("panel_renderwithlayer"));
+    this.checkBoxRenderWithLayer.setOpaque(false);
+    this.checkBoxRenderWithLayer.addActionListener(e -> updateRenderTypeEnabled());
 
     this.tagPanel = new TagPanel();
 
@@ -210,7 +215,9 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     add(scrollPane, BorderLayout.CENTER);
 
     this.setupChangedListeners();
-    UI.getLayerController().onLayersChanged(map -> this.bind(this.getDataSource()));
+    if (UI.getLayerController() != null) {
+      UI.getLayerController().onLayersChanged(map -> this.bind(this.getDataSource()));
+    }
   }
 
   static SpinnerNumberModel createCoordinateSpinnerModel() {
@@ -347,11 +354,13 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
         .addGroup(gl.createParallelGroup(Alignment.TRAILING)
           .addComponent(lblName, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH)
           .addComponent(lblRenderType, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH)
+          .addGap(PropertyPanel.CONTROL_HEIGHT)
           .addComponent(lblTags, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH))
         .addGap(gap)
         .addGroup(gl.createParallelGroup()
           .addComponent(textFieldName, 0, CONTROL_WIDTH, Integer.MAX_VALUE)
           .addComponent(renderType, 0, CONTROL_WIDTH, Integer.MAX_VALUE)
+          .addComponent(checkBoxRenderWithLayer, 0, CONTROL_WIDTH, Integer.MAX_VALUE)
           .addComponent(tagPanel, 0, CONTROL_WIDTH, Integer.MAX_VALUE)));
     gl.setVerticalGroup(
       gl.createSequentialGroup()
@@ -363,6 +372,8 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
         .addGroup(gl.createParallelGroup(Alignment.CENTER)
           .addComponent(lblRenderType)
           .addComponent(renderType))
+        .addGap(gap)
+        .addComponent(checkBoxRenderWithLayer)
         .addGap(gap)
         .addGroup(gl.createParallelGroup(Alignment.CENTER)
           .addComponent(lblTags)
@@ -435,6 +446,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.lblLayer.setText("");
     this.renderType.setSelectedIndex(0);
     this.renderType.setEnabled(false);
+    this.checkBoxRenderWithLayer.setSelected(false);
     this.tagPanel.clear();
     this.spnX.setValue(0.0);
     this.spnY.setValue(0.0);
@@ -463,19 +475,28 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     RenderType rt =
         mapObject.getEnumValue(
             MapObjectProperty.RENDERTYPE, RenderType.class, RenderType.NORMAL);
-    boolean showRenderTypeControls =
-        MapObjectType.get(mapObject.getType()) == MapObjectType.CREATURE
-            || MapObjectType.get(mapObject.getType()) == MapObjectType.EMITTER
-            || MapObjectType.get(mapObject.getType()) == MapObjectType.PROP;
-    this.renderType.setEnabled(showRenderTypeControls);
-
     if (rt != null) {
       this.renderType.setSelectedItem(rt);
     }
+    this.checkBoxRenderWithLayer.setSelected(mapObject.getBoolValue(MapObjectProperty.RENDERWITHLAYER, false));
+    updateRenderTypeEnabled();
+  }
+
+  private void updateRenderTypeEnabled() {
+    boolean supportsRenderType =
+        this.type == MapObjectType.CREATURE
+            || this.type == MapObjectType.EMITTER
+            || this.type == MapObjectType.PROP;
+    this.renderType.setEnabled(supportsRenderType && !this.checkBoxRenderWithLayer.isSelected());
+  }
+
+  boolean isRenderTypeEnabledForTest() {
+    return this.renderType.isEnabled();
   }
 
   private void setupChangedListeners() {
     setup(renderType, MapObjectProperty.RENDERTYPE);
+    setup(this.checkBoxRenderWithLayer, MapObjectProperty.RENDERWITHLAYER);
 
     this.spnX.addChangeListener(
         e -> {

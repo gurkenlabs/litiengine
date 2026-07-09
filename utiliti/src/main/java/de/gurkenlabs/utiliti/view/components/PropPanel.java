@@ -52,9 +52,15 @@ public class PropPanel extends PropertyPanel {
     this.checkBoxHorizontalFlip = new JCheckBox(Resources.strings().get("panel_flip_horizontal"));
     this.checkBoxVerticalFlip = new JCheckBox(Resources.strings().get("panel_flip_vertical"));
     this.checkBoxScale = new JCheckBox(Resources.strings().get("panel_stretch_sprite"));
+    Resources.spritesheets().addClearedListener(this::clearSpriteCache);
 
     setLayout(this.createLayout());
     setupChangedListeners();
+  }
+
+  private void clearSpriteCache() {
+    this.propsLoaded = false;
+    this.comboBoxSpriteSheets.removeAllItems();
   }
 
   public static String getIdentifierBySpriteName(String spriteName) {
@@ -129,6 +135,10 @@ public class PropPanel extends PropertyPanel {
     Map<String, String> m = SpriteVariantSelector.selectBasePropSpriteNames(Resources.spritesheets().getAll());
     populateComboBoxWithSprites(this.comboBoxSpriteSheets, new TreeMap<>(m)); // TreeMap for sorted order
     this.propsLoaded = true;
+  }
+
+  int getSpriteItemCountForTest() {
+    return this.comboBoxSpriteSheets.getItemCount();
   }
 
   private static JPanel wrapCheckbox(JCheckBox cb) {

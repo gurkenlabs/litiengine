@@ -33,6 +33,7 @@ import java.util.Optional;
  * @see de.gurkenlabs.litiengine.entities.IEntity#getName()
  */
 public class CreatureAnimationController<T extends Creature> extends EntityAnimationController<T> {
+  private static final String WALK_STATE = "walk";
   private String[] customDeathAnimations;
   private String randomDeathSprite;
 
@@ -169,6 +170,12 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
     if (sprite != null) {
       add(new Animation(sprite, true));
     }
+    if (state == CreatureAnimationState.MOVE) {
+      Spritesheet walkSprite = Resources.spritesheets().get(getWalkSpriteName(dir));
+      if (walkSprite != null) {
+        add(new Animation(walkSprite, true));
+      }
+    }
   }
 
   /**
@@ -212,6 +219,12 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
     if (hasAnimation(name)) {
       return name;
     }
+    if (state == CreatureAnimationState.MOVE) {
+      name = getWalkSpriteName(dir);
+      if (hasAnimation(name)) {
+        return name;
+      }
+    }
 
     return getFallbackSpriteName(state, dir);
   }
@@ -221,6 +234,12 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
     String animName = getSpriteName(state);
     if (hasAnimation(animName)) {
       return animName;
+    }
+    if (state == CreatureAnimationState.MOVE) {
+      animName = getWalkSpriteName(null);
+      if (hasAnimation(animName)) {
+        return animName;
+      }
     }
     //   Try the opposite CreatureAnimationState as fallback if there isn't an animation for the specified state and direction
     animName = getSpriteName(state.getOpposite(), dir);
@@ -233,6 +252,12 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
       animName = getSpriteName(state, d);
       if (hasAnimation(animName)) {
         return animName;
+      }
+      if (state == CreatureAnimationState.MOVE) {
+        animName = getWalkSpriteName(d);
+        if (hasAnimation(animName)) {
+          return animName;
+        }
       }
     }
 
@@ -252,6 +277,10 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
 
   private String getSpriteName(CreatureAnimationState state, Direction direction) {
     return getSpriteName(this.getEntity(), state, direction);
+  }
+
+  private String getWalkSpriteName(Direction direction) {
+    return this.getEntity().getSpritesheetName() + '-' + WALK_STATE + (direction != null ? '-' + direction.name().toLowerCase() : "");
   }
 
   private void init(boolean useFlippedSpritesAsFallback) {

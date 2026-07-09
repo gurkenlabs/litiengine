@@ -11,6 +11,7 @@ import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.GroupLayout;
@@ -26,6 +27,7 @@ public class CustomPanel extends PropertyPanel {
   private JTable tableCustomProperties;
   private final JScrollPane scrollPane;
   private DefaultTableModel model;
+  private boolean binding;
 
   public CustomPanel() {
     super("panel_customProperties");
@@ -148,14 +150,19 @@ public class CustomPanel extends PropertyPanel {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    this.clearControls();
-    if (mapObject == null || mapObject.getProperties() == null) {
-      return;
-    }
-    for (Map.Entry<String, ICustomProperty> prop : mapObject.getProperties().entrySet()) {
-      if (MapObjectProperty.isCustom(prop.getKey())) {
-        this.model.addRow(new Object[] {prop.getKey(), prop.getValue().getAsString()});
+    this.binding = true;
+    try {
+      this.clearControls();
+      if (mapObject == null || mapObject.getProperties() == null) {
+        return;
       }
+      for (Map.Entry<String, ICustomProperty> prop : new HashMap<>(mapObject.getProperties()).entrySet()) {
+        if (MapObjectProperty.isCustom(prop.getKey())) {
+          this.model.addRow(new Object[] {prop.getKey(), prop.getValue().getAsString()});
+        }
+      }
+    } finally {
+      this.binding = false;
     }
   }
 
@@ -164,7 +171,7 @@ public class CustomPanel extends PropertyPanel {
   }
 
   private void updateCustomProperties() {
-    if (getDataSource() == null || Editor.instance().getMapComponent().isFocussing()) {
+    if (this.binding || getDataSource() == null || Editor.instance().getMapComponent().isFocussing()) {
       return;
     }
 

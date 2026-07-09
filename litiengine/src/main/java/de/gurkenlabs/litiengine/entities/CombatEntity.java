@@ -6,6 +6,7 @@ import de.gurkenlabs.litiengine.abilities.effects.Effect;
 import de.gurkenlabs.litiengine.attributes.AttributeModifier;
 import de.gurkenlabs.litiengine.attributes.Modification;
 import de.gurkenlabs.litiengine.attributes.RangeAttribute;
+import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.tweening.TweenType;
@@ -284,6 +285,12 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   @Override
   public void setTarget(final ICombatEntity target) {
     this.target = target;
+  }
+
+  @SuppressWarnings("unused") private void afterTmxUnmarshal(IMapObject mapObject) {
+    this.refreshCollisionBox();
+    this.hitPoints.setMax(this.initialHitpoints);
+    this.hitPoints.setValue(mapObject.getIntValue(MapObjectProperty.COMBAT_CURRENT_HITPOINTS, this.initialHitpoints));
   }
 
   /**

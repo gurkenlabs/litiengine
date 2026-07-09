@@ -136,6 +136,28 @@ class MapObjectLoaderTests {
   }
 
   @Test
+  void testCreatureMapObjectLoaderWithZeroCurrentHitpointsStartsDead() {
+    CreatureMapObjectLoader loader = new CreatureMapObjectLoader();
+    MapObject mapObject = new MapObject();
+    mapObject.setType(MapObjectType.CREATURE.name());
+    mapObject.setId(111);
+    mapObject.setName("deadCreature");
+    mapObject.setValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE, false);
+    mapObject.setValue(MapObjectProperty.COMBAT_HITPOINTS, 100);
+    mapObject.setValue(MapObjectProperty.COMBAT_CURRENT_HITPOINTS, 0);
+
+    Collection<IEntity> entities = loader.load(this.testEnvironment, mapObject);
+    Optional<IEntity> opt = entities.stream().findFirst();
+
+    assertTrue(opt.isPresent());
+    Creature creature = (Creature) opt.get();
+    loader.afterLoad(entities, mapObject);
+    assertEquals(100, creature.getHitPoints().getModifiedMax().intValue());
+    assertEquals(0, creature.getHitPoints().getModifiedValue().intValue());
+    assertTrue(creature.isDead());
+  }
+
+  @Test
   void testPropMapObjectLoader() {
     PropMapObjectLoader loader = new PropMapObjectLoader();
     MapObject mapObject = new MapObject();

@@ -67,6 +67,8 @@ public final class MapObjectProperty {
   // combat entity
   /** Hit points of a combat entity. */
   public static final String COMBAT_HITPOINTS = "hitpoints";
+  /** Initial current hit points of a combat entity. */
+  public static final String COMBAT_CURRENT_HITPOINTS = "currentHitpoints";
   /** Whether the combat entity is indestructible. */
   public static final String COMBAT_INDESTRUCTIBLE = "indestructible";
   /** Identifier of the team the combat entity belongs to. */
