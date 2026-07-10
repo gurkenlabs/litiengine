@@ -20,6 +20,7 @@ import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JButton;
@@ -35,6 +36,8 @@ public class ViewportToolbar extends JPanel {
   private final JLabel zoomLabel;
   private final JButton btnUndo;
   private final JButton btnRedo;
+  private final JButton btnUndoHistory;
+  private final JButton btnRedoHistory;
   private final JButton btnCopy;
   private final JButton btnCut;
   private final JButton btnDelete;
@@ -59,9 +62,13 @@ public class ViewportToolbar extends JPanel {
 
     left.add(button("Select", Icons.POINTER_24, () -> selectTool(0)));
     this.btnUndo = button("Undo", Icons.UNDO_24, () -> UndoManager.instance().undo());
+    this.btnUndoHistory = button("Undo history", new DropdownArrowIcon(), () -> {});
+    this.btnUndoHistory.addActionListener(e -> showHistory(this.btnUndoHistory, true));
     this.btnRedo = button("Redo", Icons.REDO_24, () -> UndoManager.instance().redo());
-    left.add(this.btnUndo);
-    left.add(this.btnRedo);
+    this.btnRedoHistory = button("Redo history", new DropdownArrowIcon(), () -> {});
+    this.btnRedoHistory.addActionListener(e -> showHistory(this.btnRedoHistory, false));
+    left.add(splitButton(this.btnUndo, this.btnUndoHistory));
+    left.add(splitButton(this.btnRedo, this.btnRedoHistory));
     left.add(separator());
     left.add(addButton());
     this.btnCopy = button("Copy", Icons.COPY_24, () -> {
@@ -91,10 +98,14 @@ public class ViewportToolbar extends JPanel {
 
     this.btnUndo.setEnabled(false);
     this.btnRedo.setEnabled(false);
+    this.btnUndoHistory.setEnabled(false);
+    this.btnRedoHistory.setEnabled(false);
     UndoManager.onUndoStackChanged(mgr -> {
       javax.swing.SwingUtilities.invokeLater(() -> {
-        this.btnUndo.setEnabled(UndoManager.instance().canUndo());
-        this.btnRedo.setEnabled(UndoManager.instance().canRedo());
+          this.btnUndo.setEnabled(UndoManager.instance().canUndo());
+          this.btnRedo.setEnabled(UndoManager.instance().canRedo());
+          this.btnUndoHistory.setEnabled(this.btnUndo.isEnabled());
+          this.btnRedoHistory.setEnabled(this.btnRedo.isEnabled());
       });
     });
 
@@ -146,9 +157,52 @@ public class ViewportToolbar extends JPanel {
   }
 
   private JButton addButton() {
-    JButton button = button("Add", Icons.ADD_24, () -> {});
+    JButton button = button("Add", new DropdownIcon(Icons.ADD_24), () -> {});
+    button.setPreferredSize(new Dimension(44, BUTTON_SIZE.height));
     button.addActionListener(e -> createAddPopup().show(button, 0, button.getHeight()));
     return button;
+  }
+
+  private static JPanel splitButton(JButton main, JButton arrow) {
+    main.setPreferredSize(new Dimension(28, BUTTON_SIZE.height));
+    arrow.setPreferredSize(new Dimension(14, BUTTON_SIZE.height));
+    JPanel split = new JPanel(new BorderLayout(1, 0));
+    split.setOpaque(false);
+    split.add(main, BorderLayout.WEST);
+    split.add(arrow, BorderLayout.CENTER);
+    return split;
+  }
+
+  private static void showHistory(JButton button, boolean undo) {
+    UndoManager manager = UndoManager.instance();
+    List<UndoManager.HistoryEntry> history = undo ? manager.getUndoHistory() : manager.getRedoHistory();
+    JPopupMenu popup = new JPopupMenu();
+    if (history.isEmpty()) {
+      JMenuItem empty = new JMenuItem(undo ? "Nothing to undo" : "Nothing to redo");
+      empty.setEnabled(false);
+      popup.add(empty);
+    } else {
+      for (int index = 0; index < history.size(); index++) {
+        UndoManager.HistoryEntry entry = history.get(index);
+        int operations = index + 1;
+        String label = (undo ? "Undo " : "Redo ") + entry.description();
+        if (operations > 1) {
+          label += " (" + operations + " operations)";
+        }
+        JMenuItem item = new JMenuItem(label);
+        item.addActionListener(e -> {
+          for (int operation = 0; operation < operations; operation++) {
+            if (undo) {
+              manager.undo();
+            } else {
+              manager.redo();
+            }
+          }
+        });
+        popup.add(item);
+      }
+    }
+    popup.show(button, 0, button.getHeight());
   }
 
   private static JPopupMenu createAddPopup() {
@@ -314,6 +368,45 @@ public class ViewportToolbar extends JPanel {
     protected void paintComponent(Graphics g) {
       paintToolbarButton(this, getModel(), g);
       super.paintComponent(g);
+    }
+  }
+
+  private static final class DropdownIcon implements Icon {
+    private final Icon primary;
+
+    private DropdownIcon(Icon primary) {
+      this.primary = primary;
+    }
+
+    @Override public int getIconWidth() {
+      return this.primary.getIconWidth() + 10;
+    }
+
+    @Override public int getIconHeight() {
+      return Math.max(this.primary.getIconHeight(), 16);
+    }
+
+    @Override public void paintIcon(java.awt.Component component, Graphics g, int x, int y) {
+      this.primary.paintIcon(component, g, x, y + (getIconHeight() - this.primary.getIconHeight()) / 2);
+      Graphics2D g2 = (Graphics2D) g.create();
+      g2.setColor(component.isEnabled() ? Style.COLOR_TEXT : Style.COLOR_DISABLED_TEXT);
+      int arrowX = x + this.primary.getIconWidth() + 3;
+      int arrowY = y + getIconHeight() / 2 - 2;
+      g2.fillPolygon(new int[] {arrowX, arrowX + 6, arrowX + 3}, new int[] {arrowY, arrowY, arrowY + 5}, 3);
+      g2.dispose();
+    }
+  }
+
+  private static final class DropdownArrowIcon implements Icon {
+    @Override public int getIconWidth() { return 8; }
+
+    @Override public int getIconHeight() { return 16; }
+
+    @Override public void paintIcon(java.awt.Component component, Graphics g, int x, int y) {
+      Graphics2D g2 = (Graphics2D) g.create();
+      g2.setColor(component.isEnabled() ? Style.COLOR_TEXT : Style.COLOR_DISABLED_TEXT);
+      g2.fillPolygon(new int[] {x, x + 8, x + 4}, new int[] {y + 6, y + 6, y + 10}, 3);
+      g2.dispose();
     }
   }
 
