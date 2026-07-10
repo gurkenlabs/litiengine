@@ -28,11 +28,6 @@ public final class AssetPanelItemPopupMenu extends JPopupMenu {
     add.addActionListener(e -> item.addEntity());
     add.setEnabled(item.canAdd());
 
-    JMenuItem edit = new JMenuItem(Resources.strings().get("contextmenu_resource_edit_" + typeKey), Icons.PENCIL_16);
-    edit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0));
-    edit.addActionListener(e -> item.editAsset());
-    edit.setEnabled(origin instanceof SpritesheetResource || origin instanceof Animation);
-
     JMenuItem export = new JMenuItem(Resources.strings().get("contextmenu_resource_export_" + typeKey), Icons.EXPORT_16);
     export.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK));
     export.addActionListener(e -> item.exportAsset());
@@ -43,7 +38,12 @@ public final class AssetPanelItemPopupMenu extends JPopupMenu {
     delete.setEnabled(!(origin instanceof Tileset));
 
     add(add);
-    add(edit);
+    if (item.canEdit()) {
+      JMenuItem edit = new JMenuItem(Resources.strings().get("contextmenu_resource_edit_" + typeKey), Icons.PENCIL_16);
+      edit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0));
+      edit.addActionListener(e -> item.editAsset());
+      add(edit);
+    }
     add(export);
     addSeparator();
     add(delete);

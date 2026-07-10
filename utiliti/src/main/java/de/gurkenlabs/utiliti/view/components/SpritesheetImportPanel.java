@@ -50,6 +50,7 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
   private JTextField textField;
   private final JTable tableKeyFrames;
   private final JLabel labelAnimationPreview;
+  private final JScrollPane fileScrollPane;
   private final JList<SpriteFileWrapper> fileList;
   private final DefaultListModel<SpriteFileWrapper> fileListModel;
   private final DefaultTableModel treeModel;
@@ -136,17 +137,17 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
           }
         });
 
-    JScrollPane scrollPane = new JScrollPane();
-    scrollPane.setPreferredSize(new Dimension(150, 2));
-    scrollPane.setViewportView(fileList);
-    add(scrollPane, BorderLayout.WEST);
+    this.fileScrollPane = new JScrollPane();
+    this.fileScrollPane.setPreferredSize(new Dimension(150, 2));
+    this.fileScrollPane.setViewportView(fileList);
+    add(this.fileScrollPane, BorderLayout.WEST);
 
     labelAnimationPreview = new JLabel("");
     labelAnimationPreview.setPreferredSize(new Dimension(0, PREVIEW_SIZE));
     labelAnimationPreview.setMinimumSize(new Dimension(0, PREVIEW_SIZE));
     labelAnimationPreview.setMaximumSize(new Dimension(0, PREVIEW_SIZE));
     labelAnimationPreview.setHorizontalAlignment(SwingConstants.CENTER);
-    scrollPane.setColumnHeaderView(labelAnimationPreview);
+    this.fileScrollPane.setColumnHeaderView(labelAnimationPreview);
 
     JPanel panel = new JPanel();
     panel.setBorder(null);
@@ -446,6 +447,23 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
     }
 
     return infos;
+  }
+
+  public void dispose() {
+    Game.loop().detach(this);
+  }
+
+  public void setInspectorMode(boolean inspectorMode) {
+    if (!inspectorMode) {
+      return;
+    }
+    remove(this.fileScrollPane);
+    this.fileScrollPane.setColumnHeaderView(null);
+    add(this.labelAnimationPreview, BorderLayout.NORTH);
+    setPreferredSize(new Dimension(360, 520));
+    setMinimumSize(new Dimension(0, 0));
+    revalidate();
+    repaint();
   }
 
   private void updateKeyframeTable(SpriteFileWrapper file) {

@@ -279,7 +279,9 @@ public class AssetPanelItem extends JPanel {
     getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0), "editAsset");
     getActionMap().put("editAsset", new AbstractAction() {
       @Override public void actionPerformed(ActionEvent ae) {
-        editAsset();
+        if (canEdit()) {
+          editAsset();
+        }
       }
     });
 
@@ -475,6 +477,12 @@ public class AssetPanelItem extends JPanel {
       if (animation.getSpritesheet() != null) {
         details.put("Spritesheet", animation.getSpritesheet().getName());
       }
+    } else if (origin instanceof Tileset tileset) {
+      details.put("Tiles", String.valueOf(tileset.getTileCount()));
+      details.put("Tile size", tileset.getTileWidth() + "x" + tileset.getTileHeight());
+      if (tileset.getImage() != null) {
+        details.put("Image", tileset.getImage().getSource());
+      }
     }
     return details;
   }
@@ -669,20 +677,7 @@ public class AssetPanelItem extends JPanel {
   }
 
   private void editSpritesheet(SpritesheetResource spritesheetResource) {
-    SpritesheetImportPanel spritePanel = new SpritesheetImportPanel(spritesheetResource);
-    int option = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), spritePanel, Resources.strings().get("menu_assets_editSprite"),
-      JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-
-    if (option != JOptionPane.OK_OPTION) {
-      return;
-    }
-
-    spritePanel.getSpriteSheets().forEach(spriteFile -> {
-      Editor.instance().getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(spriteFile.getName()));
-      Editor.instance().getGameFile().getSpriteSheets().add(spriteFile);
-    });
-
-    Editor.instance().loadSpriteSheets(Editor.instance().getGameFile().getSpriteSheets(), true);
+    UI.showSpriteInspector(spritesheetResource);
   }
 
   private void editAnimation(Animation animation) {
@@ -820,6 +815,10 @@ public class AssetPanelItem extends JPanel {
     return origin instanceof MapObject || origin instanceof EmitterAttributes;
   }
 
+  public boolean canEdit() {
+    return origin instanceof Animation;
+  }
+
   private static int getDeleteDialog(String assetType, String assetName) {
     return JOptionPane.showConfirmDialog(Game.window().getRenderComponent(),
       Resources.strings().get(String.format("assetpanel_confirmdelete_%s", assetType), assetName),
@@ -838,7 +837,7 @@ public class AssetPanelItem extends JPanel {
       btnAdd.setVisible(false);
       btnDelete.setVisible(visible);
     }
-    btnEdit.setVisible(visible);
+    btnEdit.setVisible(visible && canEdit());
     btnExport.setVisible(visible);
   }
 }

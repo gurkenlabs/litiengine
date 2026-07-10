@@ -16,6 +16,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import java.awt.Color;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
@@ -153,6 +154,54 @@ class UndoManagerTest {
     manager.redo();
     assertSame(second, map.getRenderLayers().get(0));
     assertSame(first, map.getRenderLayers().get(1));
+  }
+
+  @Test
+  void resourceUndoRedoExecutesResourceSnapshots() {
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
+    TmxMap map = new TmxMap(MapOrientations.ORTHOGONAL);
+    map.setName("undo-resource-test");
+    map.setWidth(1);
+    map.setHeight(1);
+    map.setTileWidth(16);
+    map.setTileHeight(16);
+    Game.world().loadEnvironment(map);
+    AtomicInteger value = new AtomicInteger(1);
+
+    UndoManager manager = UndoManager.instance();
+    value.set(2);
+    manager.resourceChanged(() -> value.set(1), () -> value.set(2));
+
+    manager.undo();
+    assertEquals(1, value.get());
+    manager.redo();
+    assertEquals(2, value.get());
+  }
+
+  @Test
+  void historyGroupsMultiStepOperationsForToolbarMenus() {
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
+    TmxMap map = new TmxMap(MapOrientations.ORTHOGONAL);
+    map.setName("undo-history-test");
+    map.setWidth(1);
+    map.setHeight(1);
+    map.setTileWidth(16);
+    map.setTileHeight(16);
+    Game.world().loadEnvironment(map);
+    UndoManager manager = UndoManager.instance();
+    AtomicInteger value = new AtomicInteger();
+
+    manager.beginOperation();
+    manager.resourceChanged(() -> value.set(0), () -> value.set(1));
+    manager.resourceChanged(() -> value.set(1), () -> value.set(2));
+    manager.endOperation();
+
+    assertEquals(1, manager.getUndoHistory().size());
+    assertEquals(2, manager.getUndoHistory().getFirst().steps());
+    assertEquals("Edit resource", manager.getUndoHistory().getFirst().description());
+    manager.undo();
+    assertEquals(1, manager.getRedoHistory().size());
+    assertEquals(2, manager.getRedoHistory().getFirst().steps());
   }
 
   private static void restoreState(IMapObject target, IMapObject snapshot) throws Exception {

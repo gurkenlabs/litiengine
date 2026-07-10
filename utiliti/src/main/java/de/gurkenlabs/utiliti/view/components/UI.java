@@ -8,7 +8,9 @@ import de.gurkenlabs.litiengine.GameListener;
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.EnvironmentListener;
 import de.gurkenlabs.litiengine.environment.tilemap.ILayer;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
+import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.Controller;
 import de.gurkenlabs.utiliti.controller.Editor;
@@ -64,7 +66,7 @@ import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 
 public final class UI {
-  private static final int INSPECTOR_MIN_WIDTH = 420;
+  private static final int INSPECTOR_MIN_WIDTH = 560;
   private static final int SCENE_GRAPH_MIN_WIDTH = 250;
   private static final int SCENE_GRAPH_MAX_WIDTH = 330;
   private static final int SPLITTER_SIZE = 6;
@@ -76,8 +78,11 @@ public final class UI {
   private static MapObjectInspector mapObjectPanel;
   private static MapPropertyPanel mapPropertyPanel;
   private static LayerPropertyPanel layerPropertyPanel;
+  private static TilesetEditorPanel tilesetEditorPanel;
+  private static SpriteEditorPanel spriteEditorPanel;
   private static JPanel inspectorHost;
   private static CardLayout inspectorCards;
+  private static String activeInspectorCard = "objects";
   private static MapList mapSelectionPanel;
   private static SceneGraph sceneGraph;
   private static JComboBox<TmxMap> mapCombo;
@@ -162,6 +167,7 @@ public final class UI {
   public static void showObjectInspector() {
     if (inspectorCards != null && inspectorHost != null) {
       inspectorCards.show(inspectorHost, "objects");
+      activeInspectorCard = "objects";
     }
   }
 
@@ -175,6 +181,7 @@ public final class UI {
     }
     if (inspectorCards != null && inspectorHost != null) {
       inspectorCards.show(inspectorHost, "map");
+      activeInspectorCard = "map";
     }
   }
 
@@ -186,6 +193,47 @@ public final class UI {
     layerPropertyPanel.bind(layer);
     if (inspectorCards != null && inspectorHost != null) {
       inspectorCards.show(inspectorHost, "layers");
+      activeInspectorCard = "layers";
+    }
+  }
+
+  public static void showTilesetInspector(Tileset tileset) {
+    if (tilesetEditorPanel == null) {
+      return;
+    }
+
+    tilesetEditorPanel.bind(tileset);
+    if (inspectorCards != null && inspectorHost != null) {
+      inspectorCards.show(inspectorHost, "tilesets");
+      activeInspectorCard = "tilesets";
+    }
+  }
+
+  public static void hideTilesetInspector() {
+    hideAssetInspector();
+  }
+
+  public static void hideAssetInspector() {
+    if (!"tilesets".equals(activeInspectorCard) && !"sprites".equals(activeInspectorCard)) {
+      return;
+    }
+
+    if (Editor.instance().getMapComponent().getFocusedMapObject() != null) {
+      showObjectInspector();
+    } else {
+      showMapProperties();
+    }
+  }
+
+  public static void showSpriteInspector(SpritesheetResource spritesheetResource) {
+    if (spriteEditorPanel == null) {
+      return;
+    }
+
+    spriteEditorPanel.bind(spritesheetResource);
+    if (inspectorCards != null && inspectorHost != null) {
+      inspectorCards.show(inspectorHost, "sprites");
+      activeInspectorCard = "sprites";
     }
   }
 
@@ -280,11 +328,17 @@ public final class UI {
     mapPropertyPanel.setMinimumSize(new Dimension(INSPECTOR_MIN_WIDTH, 0));
     layerPropertyPanel = new LayerPropertyPanel();
     layerPropertyPanel.setMinimumSize(new Dimension(INSPECTOR_MIN_WIDTH, 0));
+    tilesetEditorPanel = new TilesetEditorPanel();
+    tilesetEditorPanel.setMinimumSize(new Dimension(INSPECTOR_MIN_WIDTH, 0));
+    spriteEditorPanel = new SpriteEditorPanel();
+    spriteEditorPanel.setMinimumSize(new Dimension(INSPECTOR_MIN_WIDTH, 0));
     inspectorCards = new CardLayout();
     inspectorHost = new JPanel(inspectorCards);
     inspectorHost.add(mapObjectPanel, "objects");
     inspectorHost.add(mapPropertyPanel, "map");
     inspectorHost.add(layerPropertyPanel, "layers");
+    inspectorHost.add(tilesetEditorPanel, "tilesets");
+    inspectorHost.add(spriteEditorPanel, "sprites");
     inspectorHost.setMinimumSize(new Dimension(INSPECTOR_MIN_WIDTH, 0));
 
     int prefInspectorW = Math.max(INSPECTOR_MIN_WIDTH, (int) (winW * 0.20));

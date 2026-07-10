@@ -1,7 +1,9 @@
 package de.gurkenlabs.utiliti.view.components;
 
 import com.github.weisj.darklaf.ui.text.DarkTextUI;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.resources.ImageFormat;
+import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.utiliti.controller.Controller;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.FileDrop;
@@ -222,6 +224,20 @@ public class AssetList extends JSplitPane implements Controller {
       int total = this.assetPanel.getTotalItemCount();
       String count = visible == total ? total + " assets" : visible + " of " + total + " assets";
       this.summaryLabel.setText(count);
+    }
+    updateAssetInspector();
+  }
+
+  private void updateAssetInspector() {
+    AssetPanelItem focused = this.assetPanel.getFocusedItem();
+    Object origin = focused != null ? focused.getOrigin() : null;
+    if (origin instanceof Tileset tileset) {
+      UI.showTilesetInspector(tileset);
+    } else if (origin instanceof SpritesheetResource spritesheetResource) {
+      UI.showSpriteInspector(spritesheetResource);
+    } else if (this.assetPanel.getCurrentType() != AssetPanel.AssetType.TILESET
+      && this.assetPanel.getCurrentType() != AssetPanel.AssetType.SPRITESHEET) {
+      UI.hideAssetInspector();
     }
   }
 

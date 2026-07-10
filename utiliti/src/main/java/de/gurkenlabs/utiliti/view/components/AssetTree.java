@@ -14,8 +14,11 @@ import de.gurkenlabs.utiliti.model.Style;
 import de.gurkenlabs.utiliti.view.renderers.IconTreeListRenderer;
 import java.awt.Dimension;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -195,11 +198,67 @@ public class AssetTree extends JTree {
       if (name == null) {
         continue;
       }
-      if (!isPropSprite(name) && !isCreatureSprite(name)) {
+      if (!isPropSprite(name) && !isCreatureSprite(name) && !isTilesetSprite(gameFile, name)) {
         misc.add(res);
       }
     }
     return misc;
+  }
+
+  private static boolean isTilesetSprite(ResourceBundle gameFile, String spriteName) {
+    if (gameFile == null || spriteName == null) {
+      return false;
+    }
+    return isTilesetSpriteName(spriteName, collectTilesetSpriteKeys(gameFile));
+  }
+
+  static boolean isTilesetSpriteName(String spriteName, Set<String> tilesetSpriteKeys) {
+    if (spriteName == null || tilesetSpriteKeys == null || tilesetSpriteKeys.isEmpty()) {
+      return false;
+    }
+    Set<String> spriteKeys = normalizedSpriteKeys(spriteName);
+    return spriteKeys.stream().anyMatch(tilesetSpriteKeys::contains);
+  }
+
+  static Set<String> collectTilesetSpriteKeys(ResourceBundle gameFile) {
+    Set<String> keys = new HashSet<>();
+    if (gameFile == null) {
+      return keys;
+    }
+    for (Tileset tileset : gameFile.getTilesets()) {
+      addTilesetSpriteKeys(keys, tileset);
+    }
+    for (TmxMap map : gameFile.getMaps()) {
+      for (ITileset tileset : map.getTilesets()) {
+        addTilesetSpriteKeys(keys, tileset);
+      }
+    }
+    return keys;
+  }
+
+  private static void addTilesetSpriteKeys(Set<String> keys, ITileset tileset) {
+    if (tileset == null || tileset.getImage() == null) {
+      return;
+    }
+    keys.addAll(normalizedSpriteKeys(tileset.getImage().getSource()));
+  }
+
+  private static Set<String> normalizedSpriteKeys(String source) {
+    Set<String> keys = new HashSet<>();
+    if (source == null || source.isBlank()) {
+      return keys;
+    }
+    String normalized = source.replace('\\', '/').toLowerCase(Locale.ROOT);
+    keys.add(normalized);
+    int slash = normalized.lastIndexOf('/');
+    String fileName = slash >= 0 ? normalized.substring(slash + 1) : normalized;
+    keys.add(fileName);
+    int dot = fileName.lastIndexOf('.');
+    if (dot > 0) {
+      keys.add(fileName.substring(0, dot));
+      keys.add(normalized.substring(0, normalized.length() - (fileName.length() - dot)));
+    }
+    return keys;
   }
 
   private List<SpritesheetResource> getAllBaseAndMisc(ResourceBundle gameFile) {

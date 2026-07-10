@@ -140,6 +140,7 @@ public class UndoManager {
           case LAYER_CHANGE -> restoreLayerProperties(state.targetLayer, state.oldLayerProperties);
           case MAP_CHANGE -> restoreMapProperties(state.targetMap, state.oldMapProperties);
           case LAYER_STRUCTURE_CHANGE -> restoreLayerStructure(state.targetLayerStructureMap, state.oldLayerStructure);
+          case RESOURCE_CHANGE -> state.undoResourceAction.run();
         }
 
         this.currentIndex--;
@@ -208,6 +209,7 @@ public class UndoManager {
           case LAYER_CHANGE -> restoreLayerProperties(state.targetLayer, state.newLayerProperties);
           case MAP_CHANGE -> restoreMapProperties(state.targetMap, state.newMapProperties);
           case LAYER_STRUCTURE_CHANGE -> restoreLayerStructure(state.targetLayerStructureMap, state.newLayerStructure);
+          case RESOURCE_CHANGE -> state.redoResourceAction.run();
         }
       } while (currentOperation != 0
         && this.currentIndex < MAX_STACK_SIZE
@@ -251,6 +253,43 @@ public class UndoManager {
    */
   public UndoState[] getUndoStack() {
     return this.undoStack;
+  }
+
+  public List<HistoryEntry> getUndoHistory() {
+    List<HistoryEntry> history = new ArrayList<>();
+    for (int index = this.currentIndex; index >= 0; index--) {
+      UndoState state = this.undoStack[index];
+      int steps = 1;
+      if (state.operation != 0) {
+        while (index - 1 >= 0 && this.undoStack[index - 1].operation == state.operation) {
+          index--;
+          steps++;
+        }
+      }
+      history.add(new HistoryEntry(state.description(), steps));
+    }
+    return history;
+  }
+
+  public List<HistoryEntry> getRedoHistory() {
+    List<HistoryEntry> history = new ArrayList<>();
+    for (int index = this.currentIndex + 1; index < MAX_STACK_SIZE && this.undoStack[index] != null; index++) {
+      UndoState state = this.undoStack[index];
+      int steps = 1;
+      if (state.operation != 0) {
+        while (index + 1 < MAX_STACK_SIZE
+          && this.undoStack[index + 1] != null
+          && this.undoStack[index + 1].operation == state.operation) {
+          index++;
+          steps++;
+        }
+      }
+      history.add(new HistoryEntry(state.description(), steps));
+    }
+    return history;
+  }
+
+  public record HistoryEntry(String description, int steps) {
   }
 
   /**
@@ -363,6 +402,17 @@ public class UndoManager {
    * a layer).
    */
   public void recordChanges() {
+    fireUndoStackChangedEvent(this);
+  }
+
+  public void resourceChanged(Runnable undoAction, Runnable redoAction) {
+    if (this.executing || undoAction == null || redoAction == null) {
+      return;
+    }
+    this.ensureStackSize();
+    this.currentIndex++;
+    this.clearRedoSteps();
+    this.undoStack[this.currentIndex] = new UndoState(undoAction, redoAction, this.operation);
     fireUndoStackChangedEvent(this);
   }
 
@@ -683,7 +733,8 @@ public class UndoManager {
     DELETE,
     LAYER_CHANGE,
     MAP_CHANGE,
-    LAYER_STRUCTURE_CHANGE
+    LAYER_STRUCTURE_CHANGE,
+    RESOURCE_CHANGE
   }
 
   /**
@@ -705,6 +756,8 @@ public class UndoManager {
     private final IMap targetLayerStructureMap;
     private final List<ILayer> oldLayerStructure;
     private final List<ILayer> newLayerStructure;
+    private final Runnable undoResourceAction;
+    private final Runnable redoResourceAction;
 
     /**
      * Constructs an UndoState with the specified parameters.
@@ -729,6 +782,8 @@ public class UndoManager {
       this.targetLayerStructureMap = null;
       this.oldLayerStructure = null;
       this.newLayerStructure = null;
+      this.undoResourceAction = null;
+      this.redoResourceAction = null;
     }
 
     public UndoState(
@@ -752,6 +807,8 @@ public class UndoManager {
       this.targetLayerStructureMap = null;
       this.oldLayerStructure = null;
       this.newLayerStructure = null;
+      this.undoResourceAction = null;
+      this.redoResourceAction = null;
     }
 
     public UndoState(
@@ -775,6 +832,8 @@ public class UndoManager {
       this.targetLayerStructureMap = null;
       this.oldLayerStructure = null;
       this.newLayerStructure = null;
+      this.undoResourceAction = null;
+      this.redoResourceAction = null;
     }
 
     public UndoState(
@@ -798,6 +857,8 @@ public class UndoManager {
       this.targetLayerStructureMap = null;
       this.oldLayerStructure = null;
       this.newLayerStructure = null;
+      this.undoResourceAction = null;
+      this.redoResourceAction = null;
     }
 
     public UndoState(
@@ -820,6 +881,28 @@ public class UndoManager {
       this.targetLayerStructureMap = targetMap;
       this.oldLayerStructure = oldLayerStructure;
       this.newLayerStructure = newLayerStructure;
+      this.undoResourceAction = null;
+      this.redoResourceAction = null;
+    }
+
+    public UndoState(Runnable undoResourceAction, Runnable redoResourceAction, int operation) {
+      this.operation = operation;
+      this.target = null;
+      this.oldMapObject = null;
+      this.newMapObject = null;
+      this.layer = null;
+      this.operationType = OperationType.RESOURCE_CHANGE;
+      this.targetLayer = null;
+      this.targetMap = null;
+      this.oldLayerProperties = null;
+      this.newLayerProperties = null;
+      this.oldMapProperties = null;
+      this.newMapProperties = null;
+      this.targetLayerStructureMap = null;
+      this.oldLayerStructure = null;
+      this.newLayerStructure = null;
+      this.undoResourceAction = undoResourceAction;
+      this.redoResourceAction = redoResourceAction;
     }
 
     /**
@@ -829,19 +912,31 @@ public class UndoManager {
      */
     @Override
     public String toString() {
+      return this.description();
+    }
+
+    private String description() {
       if (target != null) {
-        return target.getName() + "(" + target.getId() + ") " + this.operationType.toString();
+        String name = target.getName();
+        String object = name != null && !name.isBlank()
+          ? name
+          : (target.getType() != null && !target.getType().isBlank() ? target.getType() : "Object") + " #" + target.getId();
+        return switch (this.operationType) {
+          case ADD -> "Add " + object;
+          case DELETE -> "Delete " + object;
+          default -> "Change " + object;
+        };
       }
       if (targetLayer != null) {
-        return "Layer:" + targetLayer.getName() + " " + this.operationType.toString();
+        return "Change layer " + targetLayer.getName();
       }
       if (targetMap != null) {
-        return "Map:" + targetMap.getName() + " " + this.operationType.toString();
+        return "Change map " + targetMap.getName();
       }
       if (targetLayerStructureMap != null) {
-        return "LayerStructure:" + targetLayerStructureMap.getName() + " " + this.operationType.toString();
+        return "Change layer order in " + targetLayerStructureMap.getName();
       }
-      return this.operationType.toString();
+      return "Edit resource";
     }
 
     public int getOperation() {

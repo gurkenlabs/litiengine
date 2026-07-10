@@ -484,23 +484,27 @@ public class Editor extends Screen {
   }
 
   private void processSpritesheets(SpritesheetImportPanel spritePanel) {
-    int option = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), spritePanel, Resources.strings().get("menu_assets_editSprite"),
-      JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-    if (option != JOptionPane.OK_OPTION) {
-      return;
-    }
+    try {
+      int option = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), spritePanel, Resources.strings().get("menu_assets_editSprite"),
+        JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+      if (option != JOptionPane.OK_OPTION) {
+        return;
+      }
 
-    // TODO: somehow improve this to allow keeping the animation frames and only
-    // update the image
-    Collection<SpritesheetResource> sprites = spritePanel.getSpriteSheets();
-    for (SpritesheetResource info : sprites) {
-      Resources.spritesheets().getAll().removeIf(x -> x.getName().equals(info.getName() + "-preview"));
-      this.getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(info.getName()));
-      this.getGameFile().getSpriteSheets().add(info);
-      log.log(Level.INFO, "imported spritesheet {0}", new Object[] {info.getName()});
-    }
+      // TODO: somehow improve this to allow keeping the animation frames and only
+      // update the image
+      Collection<SpritesheetResource> sprites = spritePanel.getSpriteSheets();
+      for (SpritesheetResource info : sprites) {
+        Resources.spritesheets().getAll().removeIf(x -> x.getName().equals(info.getName() + "-preview"));
+        this.getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(info.getName()));
+        this.getGameFile().getSpriteSheets().add(info);
+        log.log(Level.INFO, "imported spritesheet {0}", new Object[] {info.getName()});
+      }
 
-    this.loadSpriteSheets(sprites, true);
+      this.loadSpriteSheets(sprites, true);
+    } finally {
+      spritePanel.dispose();
+    }
   }
 
   public void importEmitters() {
@@ -599,9 +603,11 @@ public class Editor extends Screen {
     }
 
     Resources.images().clear();
-    this.getMapComponent().reloadEnvironment();
+    if (UI.getMapController() != null) {
+      this.getMapComponent().reloadEnvironment();
+    }
 
-    if (forceAssetTreeUpdate) {
+    if (forceAssetTreeUpdate && UI.getAssetController() != null) {
       UI.getAssetController().refresh();
     }
   }
