@@ -17,11 +17,19 @@ import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.graphics.ImageRenderer;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.resources.ResourceLoadException;
 import de.gurkenlabs.litiengine.resources.Resources;
+import java.util.logging.Logger;
 
 public class MapRenderer {
   private static final Collection<LayerRenderedListener> layerRenderedListeners = ConcurrentHashMap.newKeySet();
   private static final Collection<LayerRenderCondition> layerRenderConditions = ConcurrentHashMap.newKeySet();
+  private static final Collection<String> unavailableImageSources = ConcurrentHashMap.newKeySet();
+  private static final Logger log = Logger.getLogger(MapRenderer.class.getName());
+
+  static {
+    Resources.images().addClearedListener(unavailableImageSources::clear);
+  }
 
   private MapRenderer() {
     throw new UnsupportedOperationException();
@@ -179,10 +187,28 @@ public class MapRenderer {
   }
 
   protected static void renderImageLayer(Graphics2D g, IImageLayer layer, final IMap map, Rectangle2D viewport, float opacity) {
+    if (layer.getImage() == null || layer.getImage().getSource() == null) {
+      return;
+    }
     Spritesheet sprite = Resources.spritesheets().get(layer.getImage().getSource());
     BufferedImage img;
     if (sprite == null) {
-      img = Resources.images().get(layer.getImage().getAbsoluteSourcePath());
+      String source = layer.getImage().getAbsoluteSourcePath() != null
+        ? layer.getImage().getAbsoluteSourcePath().toString()
+        : layer.getImage().getSource();
+      if (unavailableImageSources.contains(source)) {
+        return;
+      }
+      try {
+        img = layer.getImage().getAbsoluteSourcePath() != null
+          ? Resources.images().get(layer.getImage().getAbsoluteSourcePath())
+          : Resources.images().get(layer.getImage().getSource());
+      } catch (ResourceLoadException e) {
+        if (unavailableImageSources.add(source)) {
+          log.warning("Skipping unavailable image layer source: " + source);
+        }
+        return;
+      }
     } else {
       img = sprite.getImage();
     }
