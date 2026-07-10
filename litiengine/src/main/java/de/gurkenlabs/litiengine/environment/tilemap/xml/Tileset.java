@@ -25,6 +25,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -122,26 +123,75 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     super(original);
 
     this.firstgid = original.getFirstGridId();
-    this.image = new MapImage((MapImage) original.getImage());
+    this.image = original.getImage() instanceof MapImage mapImage ? new MapImage(mapImage) : null;
     this.margin = original.getMargin();
     this.name = original.getName();
     this.tilesetClass = original.getTilesetClass();
     this.tilewidth = original.getTileWidth();
     this.tileheight = original.getTileHeight();
-    this.tileoffset = (TileOffset) original.getTileOffset();
+    this.tileoffset = original.getTileOffset() != null ? new TileOffset(original.getTileOffset().getX(), original.getTileOffset().getY()) : null;
     this.tilecount = original.getTileCount();
     this.columns = original.getColumns();
     this.spacing = original.getSpacing();
-    this.source = original.getName() + "." + FILE_EXTENSION;
+    this.source = original.source;
     this.objectalignment = original.getObjectalignment();
     this.tilerendersize = original.getTilerendersize();
     this.fillmode = original.getFillmode();
-    this.tiles = original.tiles != null ? new ArrayList<>(original.tiles) : null;
+    this.tiles = null;
     this.wangsets = original.wangsets != null ? new ArrayList<>(original.wangsets) : null;
-    this.transformations = new TileTransformations(original.getTransformations());
-    this.allTiles = original.allTiles != null ? new ArrayList<>(original.allTiles) : null;
-    this.sourceTileset = original.sourceTileset;
+    this.transformations = original.getTransformations() != null ? new TileTransformations(original.getTransformations()) : null;
+    this.allTiles = new ArrayList<>();
+    if (original.allTiles != null) {
+      for (TilesetEntry entry : original.allTiles) {
+        this.allTiles.add(new TilesetEntry(this, entry));
+      }
+    }
+    this.sourceTileset = null;
     this.spriteSheet = original.getSpritesheet();
+  }
+
+  public void copyFrom(Tileset original) {
+    if (this.sourceTileset != null) {
+      int firstGridId = this.sourceTileset.firstgid;
+      String source = this.sourceTileset.source;
+      this.sourceTileset.copyFrom(original);
+      this.sourceTileset.firstgid = firstGridId;
+      this.sourceTileset.source = source;
+      return;
+    }
+    this.firstgid = original.firstgid;
+    this.image = original.image != null ? new MapImage(original.image) : null;
+    this.margin = original.margin;
+    this.name = original.name;
+    this.tilesetClass = original.tilesetClass;
+    this.tilewidth = original.tilewidth;
+    this.tileheight = original.tileheight;
+    this.tileoffset = original.tileoffset != null ? new TileOffset(original.tileoffset.getX(), original.tileoffset.getY()) : null;
+    this.tilecount = original.tilecount;
+    this.columns = original.columns;
+    this.spacing = original.spacing;
+    this.source = original.source;
+    this.objectalignment = original.objectalignment;
+    this.tilerendersize = original.tilerendersize;
+    this.fillmode = original.fillmode;
+    this.transformations = original.transformations != null ? new TileTransformations(original.transformations) : null;
+    this.setProperties(copyProperties(original.getProperties()));
+    this.allTiles = new ArrayList<>();
+    if (original.allTiles != null) {
+      for (TilesetEntry entry : original.allTiles) {
+        this.allTiles.add(new TilesetEntry(this, entry));
+      }
+    }
+    this.tiles = null;
+    this.spriteSheet = original.spriteSheet;
+  }
+
+  private static Map<String, ICustomProperty> copyProperties(Map<String, ICustomProperty> properties) {
+    Map<String, ICustomProperty> copy = new HashMap<>();
+    if (properties != null) {
+      properties.forEach((name, property) -> copy.put(name, new CustomProperty(property)));
+    }
+    return copy;
   }
 
   @Override
@@ -256,6 +306,23 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     return this.sourceTileset != null ? this.sourceTileset.getTileOffset() : this.tileoffset;
   }
 
+  public void setTileOffset(int x, int y) {
+    if (this.sourceTileset != null) {
+      this.sourceTileset.setTileOffset(x, y);
+      return;
+    }
+    if (x == 0 && y == 0) {
+      this.tileoffset = null;
+      return;
+    }
+    if (this.tileoffset == null) {
+      this.tileoffset = new TileOffset(x, y);
+    } else {
+      this.tileoffset.setX(x);
+      this.tileoffset.setY(y);
+    }
+  }
+
   @Override
   public int getTileCount() {
     if (this.sourceTileset != null) {
@@ -305,6 +372,14 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     return this.objectalignment;
   }
 
+  public void setObjectalignment(String objectalignment) {
+    if (this.sourceTileset != null) {
+      this.sourceTileset.setObjectalignment(objectalignment);
+      return;
+    }
+    this.objectalignment = objectalignment == null || objectalignment.isBlank() ? null : objectalignment;
+  }
+
   /**
    * Gets the tile render size.
    *
@@ -314,6 +389,14 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     return this.tilerendersize;
   }
 
+  public void setTilerendersize(String tilerendersize) {
+    if (this.sourceTileset != null) {
+      this.sourceTileset.setTilerendersize(tilerendersize);
+      return;
+    }
+    this.tilerendersize = tilerendersize == null || tilerendersize.isBlank() ? null : tilerendersize;
+  }
+
   /**
    * Gets the fill mode.
    *
@@ -321,6 +404,14 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
    */
   public String getFillmode() {
     return this.fillmode;
+  }
+
+  public void setFillmode(String fillmode) {
+    if (this.sourceTileset != null) {
+      this.sourceTileset.setFillmode(fillmode);
+      return;
+    }
+    this.fillmode = fillmode == null || fillmode.isBlank() ? null : fillmode;
   }
 
   @Override

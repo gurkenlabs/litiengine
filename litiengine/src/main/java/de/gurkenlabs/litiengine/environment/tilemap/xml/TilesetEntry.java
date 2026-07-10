@@ -36,6 +36,9 @@ public class TilesetEntry extends CustomPropertyProvider implements ITilesetEntr
   @XmlAttribute
   private String type;
 
+  @XmlAttribute
+  private Double probability;
+
   @XmlElement(name = "objectgroup")
   private MapObjectLayer collisionData;
 
@@ -99,6 +102,37 @@ public class TilesetEntry extends CustomPropertyProvider implements ITilesetEntr
     return this.type;
   }
 
+  public TilesetEntry(Tileset tileset, TilesetEntry original) {
+    super(original);
+    this.tileset = tileset;
+    this.id = original.id;
+    this.terrain = original.terrain;
+    this.animation = original.animation != null ? new TileAnimation(original.animation.getFrames()) : null;
+    this.image = original.image != null ? new MapImage(original.image) : null;
+    this.type = original.type;
+    this.probability = original.probability;
+    this.collisionData = original.collisionData;
+  }
+
+  public void setType(String type) {
+    this.type = type == null || type.isBlank() ? null : type;
+  }
+
+  public double getProbability() {
+    return this.probability != null ? this.probability : 1.0;
+  }
+
+  public void setProbability(double probability) {
+    if (!Double.isFinite(probability) || probability < 0) {
+      throw new IllegalArgumentException("Tile probability must be finite and non-negative.");
+    }
+    this.probability = probability == 1.0 ? null : probability;
+  }
+
+  public void setAnimation(TileAnimation animation) {
+    this.animation = animation;
+  }
+
   @Override
   public IMapObjectLayer getCollisionInfo() {
     return this.collisionData;
@@ -113,7 +147,8 @@ public class TilesetEntry extends CustomPropertyProvider implements ITilesetEntr
   }
 
   boolean shouldBeSaved() {
-    return this.terrain != null || this.image != null || this.animation != null || this.type != null;
+    return this.terrain != null || this.image != null || this.animation != null || this.type != null || this.probability != null
+      || !this.getProperties().isEmpty();
   }
 
   @SuppressWarnings("unused")

@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.util.List;
+import java.util.ArrayList;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
@@ -17,9 +18,29 @@ public class TileAnimation implements ITileAnimation {
 
   private transient int totalDuration;
 
+  public TileAnimation() {
+    this.frames = new ArrayList<>();
+  }
+
+  public TileAnimation(List<ITileAnimationFrame> frames) {
+    this.setFrames(frames);
+  }
+
   @Override
   public List<ITileAnimationFrame> getFrames() {
     return this.frames;
+  }
+
+  public void setFrames(List<ITileAnimationFrame> frames) {
+    this.frames = new ArrayList<>();
+    if (frames != null) {
+      for (ITileAnimationFrame frame : frames) {
+        if (frame != null) {
+          this.frames.add(new Frame(frame));
+        }
+      }
+    }
+    this.totalDuration = 0;
   }
 
   @Override

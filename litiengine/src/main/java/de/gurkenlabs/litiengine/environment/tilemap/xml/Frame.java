@@ -15,6 +15,18 @@ public class Frame implements ITileAnimationFrame {
   @XmlAttribute
   private int duration;
 
+  public Frame() {
+  }
+
+  public Frame(int tileid, int duration) {
+    this.tileid = tileid;
+    this.duration = duration;
+  }
+
+  public Frame(ITileAnimationFrame original) {
+    this(original.getTileId(), original.getDuration());
+  }
+
   @Override
   @XmlTransient
   public int getTileId() {
@@ -25,5 +37,13 @@ public class Frame implements ITileAnimationFrame {
   @XmlTransient
   public int getDuration() {
     return this.duration;
+  }
+
+  public void setTileId(int tileid) {
+    this.tileid = tileid;
+  }
+
+  public void setDuration(int duration) {
+    this.duration = duration;
   }
 }

@@ -15,6 +15,14 @@ public class TileOffset implements ITileOffset {
   @XmlAttribute
   private int y;
 
+  public TileOffset() {
+  }
+
+  public TileOffset(int x, int y) {
+    this.x = x;
+    this.y = y;
+  }
+
   @Override
   public int getX() {
     return this.x;
@@ -23,6 +31,14 @@ public class TileOffset implements ITileOffset {
   @Override
   public int getY() {
     return this.y;
+  }
+
+  public void setX(int x) {
+    this.x = x;
+  }
+
+  public void setY(int y) {
+    this.y = y;
   }
 
   @Override
