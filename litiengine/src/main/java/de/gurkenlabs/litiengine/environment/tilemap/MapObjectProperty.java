@@ -53,6 +53,8 @@ public final class MapObjectProperty {
   public static final String SPRITESHEETNAME = "spritesheetName";
   /** Whether the entity's sprite should be scaled to fit its bounding box. */
   public static final String SCALE_SPRITE = "scaling";
+  /** Project-defined implementation identifier for a built-in map object type. */
+  public static final String IMPLEMENTATION = "implementation";
 
   // mobile entity
   /** Acceleration value of a mobile entity, in milliseconds to reach max velocity. */

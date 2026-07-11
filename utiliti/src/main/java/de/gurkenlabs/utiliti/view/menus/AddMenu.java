@@ -3,6 +3,7 @@ package de.gurkenlabs.utiliti.view.menus;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.Editor;
+import de.gurkenlabs.utiliti.controller.ProjectCodeIntegration;
 import de.gurkenlabs.utiliti.controller.Transform.TransformMode;
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.view.components.UI;
@@ -78,13 +79,47 @@ public final class AddMenu extends JMenu {
     this.add(addEmitter);
     this.add(addSoundSource);
 
+    addMenuListener(new javax.swing.event.MenuListener() {
+      @Override
+      public void menuSelected(javax.swing.event.MenuEvent e) {
+        refreshProjectTypes();
+      }
+
+      @Override
+      public void menuDeselected(javax.swing.event.MenuEvent e) {
+      }
+
+      @Override
+      public void menuCanceled(javax.swing.event.MenuEvent e) {
+      }
+    });
+
     this.setEnabled(false);
     Editor.instance()
         .onLoaded(() -> this.setEnabled(Editor.instance().getCurrentResourceFile() != null));
   }
 
   public static void setCreateMode(MapObjectType type) {
-    Editor.instance().getMapComponent().setTransformMode(TransformMode.CREATE);
-    UI.getInspector().setMapObjectType(type);
+    Editor.instance().getMapComponent().setCreateMapObjectType(type);
+  }
+
+  private void refreshProjectTypes() {
+    for (int i = getItemCount() - 1; i >= 0; i--) {
+      if (getItem(i) instanceof JMenu menu && "Game Implementations".equals(menu.getText())) {
+        remove(i);
+      }
+    }
+    var definitions = Editor.instance().getProjectCodeIntegration().getDefinitions();
+    if (definitions.isEmpty()) {
+      return;
+    }
+    JMenu projectTypes = new JMenu("Game Implementations");
+    for (ProjectCodeIntegration.Definition definition : definitions) {
+      JMenuItem item = new JMenuItem(definition.displayName(), Icons.forMapObjectType(definition.baseType()));
+      item.setToolTipText(definition.id());
+      item.addActionListener(a -> Editor.instance().getMapComponent().setCreateDefinition(definition));
+      projectTypes.add(item);
+    }
+    add(projectTypes);
   }
 }

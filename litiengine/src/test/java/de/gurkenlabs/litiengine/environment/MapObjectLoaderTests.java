@@ -13,6 +13,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import de.gurkenlabs.litiengine.Align;
+import de.gurkenlabs.litiengine.Direction;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameTest;
 import de.gurkenlabs.litiengine.Valign;
@@ -31,6 +32,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectDefinition;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
@@ -313,6 +315,23 @@ class MapObjectLoaderTests {
   }
 
   @Test
+  void emitterLoaderSwapsReversedParticleRanges() {
+    IMapObject mapObject = mock(IMapObject.class);
+    when(mapObject.getId()).thenReturn(111);
+    when(mapObject.getFloatValue(MapObjectProperty.Particle.OFFSET_X_MIN, 0)).thenReturn(8f);
+    when(mapObject.getFloatValue(MapObjectProperty.Particle.OFFSET_X_MAX, 0)).thenReturn(2f);
+    when(mapObject.getLongValue(MapObjectProperty.Particle.TTL_MIN, 0L)).thenReturn(900L);
+    when(mapObject.getLongValue(MapObjectProperty.Particle.TTL_MAX, 0L)).thenReturn(100L);
+
+    var data = EmitterMapObjectLoader.createEmitterData(mapObject);
+
+    assertEquals(2f, data.getParticleOffsetX().getMin());
+    assertEquals(8f, data.getParticleOffsetX().getMax());
+    assertEquals(100L, data.getParticleTTL().getMin());
+    assertEquals(900L, data.getParticleTTL().getMax());
+  }
+
+  @Test
   void testLightSourceMapObjectLoader() {
     LightSourceMapObjectLoader loader = new LightSourceMapObjectLoader();
     IMapObject mapObject = mock(IMapObject.class);
@@ -384,6 +403,26 @@ class MapObjectLoaderTests {
     CustomEntity customEntity = (CustomEntity) ent;
     assertEquals("foovalue", customEntity.getFoo());
     assertEquals(111, customEntity.getBar());
+  }
+
+  @Test
+  void mapObjectDefinitionRegistersItsDeclaredType() {
+    Environment.registerMapObjectDefinition(DefinedEntity.class);
+
+    IMapObject mapObject = mock(IMapObject.class);
+    when(mapObject.getType()).thenReturn(MapObjectType.CREATURE.name());
+    when(mapObject.getStringValue(MapObjectProperty.IMPLEMENTATION, null)).thenReturn("definedEntity");
+    when(mapObject.getId()).thenReturn(112);
+    when(mapObject.getLocation()).thenReturn(new Point(0, 0));
+    when(mapObject.getWidth()).thenReturn(16f);
+    when(mapObject.getHeight()).thenReturn(16f);
+    when(mapObject.getEnumValue(MapObjectProperty.SPAWN_DIRECTION, Direction.class, Direction.RIGHT)).thenReturn(Direction.RIGHT);
+
+    IMap map = mock(IMap.class);
+    when(map.getSizeInPixels()).thenReturn(new Dimension(100, 100));
+    when(map.getSizeInTiles()).thenReturn(new Dimension(10, 10));
+
+    assertInstanceOf(DefinedEntity.class, new Environment(map).load(mapObject).iterator().next());
   }
 
   @Test
@@ -597,6 +636,12 @@ class MapObjectLoaderTests {
 
     public int getBar() {
       return this.bar;
+    }
+  }
+
+  @MapObjectDefinition(id = "definedEntity", baseType = MapObjectType.CREATURE)
+  public static class DefinedEntity extends Creature {
+    public DefinedEntity() {
     }
   }
 }

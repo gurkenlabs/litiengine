@@ -298,7 +298,7 @@ public class ViewportToolbar extends JPanel {
     return wrapper;
   }
 
-  private void fitMap() {
+  public void fitMap() {
     if (Game.world() == null || Game.world().environment() == null || Game.world().camera() == null) {
       return;
     }
@@ -334,6 +334,10 @@ public class ViewportToolbar extends JPanel {
 
   private void updateZoomLabel() {
     this.zoomLabel.setText(formatZoom());
+  }
+
+  public void refreshZoomLabel() {
+    updateZoomLabel();
   }
 
   private static String formatZoom() {

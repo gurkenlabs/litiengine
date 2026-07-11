@@ -1,3 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#C9C9D1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#C9CDD6" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+  <path d="m13.25 2.75-8 10.1h6.15l-.65 8.4 8-10.1H12.6Z"/>
+  <path d="M18.25 4.75 20 3M19.25 8h2.25" opacity=".7"/>
 </svg>

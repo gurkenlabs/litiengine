@@ -18,8 +18,10 @@ import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.ColorHelper;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.logging.Logger;
 
 public class EmitterMapObjectLoader extends MapObjectLoader {
+  private static final Logger log = Logger.getLogger(EmitterMapObjectLoader.class.getName());
 
   protected EmitterMapObjectLoader() {
     super(MapObjectType.EMITTER);
@@ -59,34 +61,20 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     data.setColors(mapObject.getCommaSeparatedStringValues(MapObjectProperty.Emitter.COLORS, ColorHelper.encode(EmitterAttributes.DEFAULT_COLOR)));
 
     // particle
-    data.setParticleOffsetX(new RangeAttribute<>(mapObject.getFloatValue(MapObjectProperty.Particle.OFFSET_X_MIN, 0),
-      mapObject.getFloatValue(MapObjectProperty.Particle.OFFSET_X_MAX, 0)));
-    data.setParticleOffsetY(new RangeAttribute<>(mapObject.getFloatValue(MapObjectProperty.Particle.OFFSET_Y_MIN, 0),
-      mapObject.getFloatValue(MapObjectProperty.Particle.OFFSET_Y_MAX, 0)));
-    data.setParticleWidth(new RangeAttribute<>(mapObject.getFloatValue(MapObjectProperty.Particle.STARTWIDTH_MIN, 0),
-      mapObject.getFloatValue(MapObjectProperty.Particle.STARTWIDTH_MAX, 0)));
-    data.setParticleHeight(new RangeAttribute<>(mapObject.getFloatValue(MapObjectProperty.Particle.STARTHEIGHT_MIN, 0),
-      mapObject.getFloatValue(MapObjectProperty.Particle.STARTHEIGHT_MAX, 0)));
-    data.setVelocityX(new RangeAttribute<>(mapObject.getFloatValue(MapObjectProperty.Particle.VELOCITY_X_MIN, 0),
-      mapObject.getFloatValue(MapObjectProperty.Particle.VELOCITY_X_MAX, 0)));
-    data.setVelocityY(new RangeAttribute<>(mapObject.getFloatValue(MapObjectProperty.Particle.VELOCITY_Y_MIN, 0),
-      mapObject.getFloatValue(MapObjectProperty.Particle.VELOCITY_Y_MAX, 0)));
-    data.setAccelerationX(new RangeAttribute<>(mapObject.getFloatValue(MapObjectProperty.Particle.ACCELERATION_X_MIN, 0),
-      mapObject.getFloatValue(MapObjectProperty.Particle.ACCELERATION_X_MAX, 0)));
-    data.setAccelerationY(new RangeAttribute<>(mapObject.getFloatValue(MapObjectProperty.Particle.ACCELERATION_Y_MIN, 0),
-      mapObject.getFloatValue(MapObjectProperty.Particle.ACCELERATION_Y_MAX, 0)));
-    data.setDeltaWidth(new RangeAttribute<>(mapObject.getFloatValue(MapObjectProperty.Particle.DELTAWIDTH_MIN, 0),
-      mapObject.getFloatValue(MapObjectProperty.Particle.DELTAWIDTH_MAX, 0)));
-    data.setDeltaHeight(new RangeAttribute<>(mapObject.getFloatValue(MapObjectProperty.Particle.DELTAHEIGHT_MIN, 0),
-      mapObject.getFloatValue(MapObjectProperty.Particle.DELTAHEIGHT_MAX, 0)));
-    data.setAngle(new RangeAttribute<>(mapObject.getFloatValue(MapObjectProperty.Particle.ANGLE_MIN, 0),
-      mapObject.getFloatValue(MapObjectProperty.Particle.ANGLE_MAX, 0)));
-    data.setDeltaRotation(new RangeAttribute<>(mapObject.getFloatValue(MapObjectProperty.Particle.DELTA_ANGLE_MIN, 0),
-      mapObject.getFloatValue(MapObjectProperty.Particle.DELTA_ANGLE_MAX, 0)));
-    data.setParticleTTL(new RangeAttribute<>(mapObject.getLongValue(MapObjectProperty.Particle.TTL_MIN, 0L),
-      mapObject.getLongValue(MapObjectProperty.Particle.TTL_MAX, 0L)));
-    data.setOutlineThickness(new RangeAttribute<>(mapObject.getFloatValue(Particle.OUTLINETHICKNESS_MIN, 1f),
-      mapObject.getFloatValue(MapObjectProperty.Particle.OUTLINETHICKNESS_MAX, 1f)));
+    data.setParticleOffsetX(range(mapObject, MapObjectProperty.Particle.OFFSET_X_MIN, MapObjectProperty.Particle.OFFSET_X_MAX, 0));
+    data.setParticleOffsetY(range(mapObject, MapObjectProperty.Particle.OFFSET_Y_MIN, MapObjectProperty.Particle.OFFSET_Y_MAX, 0));
+    data.setParticleWidth(range(mapObject, MapObjectProperty.Particle.STARTWIDTH_MIN, MapObjectProperty.Particle.STARTWIDTH_MAX, 0));
+    data.setParticleHeight(range(mapObject, MapObjectProperty.Particle.STARTHEIGHT_MIN, MapObjectProperty.Particle.STARTHEIGHT_MAX, 0));
+    data.setVelocityX(range(mapObject, MapObjectProperty.Particle.VELOCITY_X_MIN, MapObjectProperty.Particle.VELOCITY_X_MAX, 0));
+    data.setVelocityY(range(mapObject, MapObjectProperty.Particle.VELOCITY_Y_MIN, MapObjectProperty.Particle.VELOCITY_Y_MAX, 0));
+    data.setAccelerationX(range(mapObject, MapObjectProperty.Particle.ACCELERATION_X_MIN, MapObjectProperty.Particle.ACCELERATION_X_MAX, 0));
+    data.setAccelerationY(range(mapObject, MapObjectProperty.Particle.ACCELERATION_Y_MIN, MapObjectProperty.Particle.ACCELERATION_Y_MAX, 0));
+    data.setDeltaWidth(range(mapObject, MapObjectProperty.Particle.DELTAWIDTH_MIN, MapObjectProperty.Particle.DELTAWIDTH_MAX, 0));
+    data.setDeltaHeight(range(mapObject, MapObjectProperty.Particle.DELTAHEIGHT_MIN, MapObjectProperty.Particle.DELTAHEIGHT_MAX, 0));
+    data.setAngle(range(mapObject, MapObjectProperty.Particle.ANGLE_MIN, MapObjectProperty.Particle.ANGLE_MAX, 0));
+    data.setDeltaRotation(range(mapObject, MapObjectProperty.Particle.DELTA_ANGLE_MIN, MapObjectProperty.Particle.DELTA_ANGLE_MAX, 0));
+    data.setParticleTTL(longRange(mapObject, MapObjectProperty.Particle.TTL_MIN, MapObjectProperty.Particle.TTL_MAX, 0L));
+    data.setOutlineThickness(range(mapObject, Particle.OUTLINETHICKNESS_MIN, MapObjectProperty.Particle.OUTLINETHICKNESS_MAX, 1f));
 
     data.setCollision(mapObject.getEnumValue(MapObjectProperty.COLLISION_TYPE, Collision.class, EmitterAttributes.DEFAULT_COLLISION));
     data.setRequiredQuality(mapObject.getEnumValue(MapObjectProperty.REQUIRED_QUALITY, Quality.class, EmitterAttributes.DEFAULT_REQUIRED_QUALITY));
@@ -100,6 +88,30 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     data.setOutlineOnly(mapObject.getBoolValue(MapObjectProperty.Particle.OUTLINEONLY, false));
     data.setAntiAliasing(mapObject.getBoolValue(MapObjectProperty.Particle.ANTIALIASING, false));
     return data;
+  }
+
+  private static RangeAttribute<Float> range(IMapObject mapObject, String minProperty, String maxProperty, float defaultValue) {
+    float min = mapObject.getFloatValue(minProperty, defaultValue);
+    float max = mapObject.getFloatValue(maxProperty, defaultValue);
+    if (!Float.isFinite(min) || !Float.isFinite(max)) {
+      log.warning("Emitter " + mapObject.getId() + " has non-finite " + minProperty + "/" + maxProperty + "; using defaults.");
+      return new RangeAttribute<>(defaultValue, defaultValue);
+    }
+    if (min > max) {
+      log.warning("Emitter " + mapObject.getId() + " has reversed " + minProperty + "/" + maxProperty + "; swapping values.");
+      return new RangeAttribute<>(max, min);
+    }
+    return new RangeAttribute<>(min, max);
+  }
+
+  private static RangeAttribute<Long> longRange(IMapObject mapObject, String minProperty, String maxProperty, long defaultValue) {
+    long min = mapObject.getLongValue(minProperty, defaultValue);
+    long max = mapObject.getLongValue(maxProperty, defaultValue);
+    if (min > max) {
+      log.warning("Emitter " + mapObject.getId() + " has reversed " + minProperty + "/" + maxProperty + "; swapping values.");
+      return new RangeAttribute<>(max, min);
+    }
+    return new RangeAttribute<>(min, max);
   }
 
   public static void updateMapObject(EmitterAttributes emitterData, IMapObject mo) {

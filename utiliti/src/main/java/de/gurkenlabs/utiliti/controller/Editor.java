@@ -80,6 +80,7 @@ public class Editor extends Screen {
   private final MapComponent mapComponent;
   private ResourceBundle gameFile = new ResourceBundle();
   private Path projectPath;
+  private final ProjectCodeIntegration projectCodeIntegration = new ProjectCodeIntegration();
   private Path currentResourceFile;
 
   private long statusTick;
@@ -183,6 +184,10 @@ public class Editor extends Screen {
     return projectPath;
   }
 
+  public ProjectCodeIntegration getProjectCodeIntegration() {
+    return projectCodeIntegration;
+  }
+
   public void setProjectPath(Path projectPath) {
     this.projectPath = projectPath;
   }
@@ -256,6 +261,7 @@ public class Editor extends Screen {
     getMapComponent().clearAll();
     this.currentResourceFile = null;
     this.gameFile = null;
+    this.projectCodeIntegration.close();
     this.setProjectPath(null);
     this.mapComponent.loadMaps(List.of(), true);
     Resources.clearAll();
@@ -298,6 +304,7 @@ public class Editor extends Screen {
       }
 
       this.setProjectPath(gameFile);
+      this.projectCodeIntegration.reload(gameFile);
 
       // load maps from game file
       this.mapComponent.loadMaps(this.getGameFile().getMaps(), true);

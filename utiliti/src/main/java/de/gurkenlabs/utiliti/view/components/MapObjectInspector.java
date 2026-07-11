@@ -6,6 +6,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.ControlBehavior;
+import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.PropertyInspector;
 import de.gurkenlabs.utiliti.controller.Transform;
 import de.gurkenlabs.utiliti.controller.UndoManager;
@@ -13,18 +14,22 @@ import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.Style;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
@@ -53,6 +58,8 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
   private final JTextField textFieldName;
   private final JComboBox<RenderType> renderType;
   private final JCheckBox checkBoxRenderWithLayer;
+  private final JComboBox<ImplementationOption> implementation;
+  private final JLabel labelImplementation;
 
   private final JLabel labelEntityID;
   private final JLabel labelTypeIcon;
@@ -63,6 +70,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
   private final JSpinner spnY;
   private final JSpinner spnW;
   private final JSpinner spnH;
+  private boolean updatingImplementation;
 
   public MapObjectInspector() {
     super();
@@ -94,6 +102,12 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.checkBoxRenderWithLayer = new JCheckBox(Resources.strings().get("panel_renderwithlayer"));
     this.checkBoxRenderWithLayer.setOpaque(false);
     this.checkBoxRenderWithLayer.addActionListener(e -> updateRenderTypeEnabled());
+    this.labelImplementation = new JLabel("Implementation");
+    this.labelImplementation.setHorizontalAlignment(SwingConstants.TRAILING);
+    this.implementation = new JComboBox<>();
+    ControlBehavior.apply(this.implementation);
+    this.implementation.setMaximumRowCount(9);
+    this.implementation.setRenderer(new ImplementationRenderer());
 
     this.tagPanel = new TagPanel();
 
@@ -243,7 +257,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     super.bind(mapObject);
 
     if (mapObject != null) {
-      MapObjectType t = MapObjectType.get(mapObject.getType());
+      MapObjectType t = resolveType(mapObject.getType());
       this.setMapObjectType(t);
     } else {
       this.setMapObjectType(null);
@@ -352,22 +366,28 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     gl.setHorizontalGroup(
       gl.createSequentialGroup()
         .addGroup(gl.createParallelGroup(Alignment.TRAILING)
-          .addComponent(lblName, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH)
-          .addComponent(lblRenderType, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH)
+           .addComponent(lblName, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH)
+           .addComponent(labelImplementation, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH)
+           .addComponent(lblRenderType, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH)
           .addGap(PropertyPanel.CONTROL_HEIGHT)
           .addComponent(lblTags, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH))
         .addGap(gap)
         .addGroup(gl.createParallelGroup()
-          .addComponent(textFieldName, 0, CONTROL_WIDTH, Integer.MAX_VALUE)
-          .addComponent(renderType, 0, CONTROL_WIDTH, Integer.MAX_VALUE)
+           .addComponent(textFieldName, 0, CONTROL_WIDTH, Integer.MAX_VALUE)
+           .addComponent(implementation, 0, CONTROL_WIDTH, Integer.MAX_VALUE)
+           .addComponent(renderType, 0, CONTROL_WIDTH, Integer.MAX_VALUE)
           .addComponent(checkBoxRenderWithLayer, 0, CONTROL_WIDTH, Integer.MAX_VALUE)
           .addComponent(tagPanel, 0, CONTROL_WIDTH, Integer.MAX_VALUE)));
     gl.setVerticalGroup(
       gl.createSequentialGroup()
         .addGap(2)
         .addGroup(gl.createParallelGroup(Alignment.CENTER)
-          .addComponent(lblName)
-          .addComponent(textFieldName))
+           .addComponent(lblName)
+           .addComponent(textFieldName))
+        .addGap(gap)
+        .addGroup(gl.createParallelGroup(Alignment.CENTER)
+          .addComponent(labelImplementation)
+          .addComponent(implementation))
         .addGap(gap)
         .addGroup(gl.createParallelGroup(Alignment.CENTER)
           .addComponent(lblRenderType)
@@ -459,7 +479,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     if (mapObject == null) {
       return;
     }
-    this.type = MapObjectType.get(mapObject.getType());
+    this.type = resolveType(mapObject.getType());
     this.textFieldName.setText(mapObject.getName());
     this.spnX.setValue((double) mapObject.getX());
     this.spnY.setValue((double) mapObject.getY());
@@ -479,6 +499,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
       this.renderType.setSelectedItem(rt);
     }
     this.checkBoxRenderWithLayer.setSelected(mapObject.getBoolValue(MapObjectProperty.RENDERWITHLAYER, false));
+    updateImplementationOptions(mapObject);
     updateRenderTypeEnabled();
   }
 
@@ -488,6 +509,52 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
             || this.type == MapObjectType.EMITTER
             || this.type == MapObjectType.PROP;
     this.renderType.setEnabled(supportsRenderType && !this.checkBoxRenderWithLayer.isSelected());
+  }
+
+  private void updateImplementationOptions(IMapObject mapObject) {
+    boolean supported = this.type == MapObjectType.CREATURE || this.type == MapObjectType.PROP;
+    this.labelImplementation.setVisible(supported);
+    this.implementation.setVisible(supported);
+    if (!supported) {
+      return;
+    }
+
+    this.updatingImplementation = true;
+    try {
+      this.implementation.removeAllItems();
+      this.implementation.addItem(new ImplementationOption(null, "Built-in default", null, null));
+      Editor.instance().getProjectCodeIntegration().getDefinitions().stream()
+        .filter(definition -> definition.baseType() == this.type)
+        .forEach(definition -> this.implementation.addItem(new ImplementationOption(definition.id(), definition.displayName(), compactPackage(definition.className()), definition.className())));
+      String selectedId = mapObject.getStringValue(MapObjectProperty.IMPLEMENTATION, null);
+      for (int i = 0; i < this.implementation.getItemCount(); i++) {
+        if (Objects.equals(this.implementation.getItemAt(i).id(), selectedId)) {
+          this.implementation.setSelectedIndex(i);
+          return;
+        }
+      }
+      this.implementation.setSelectedIndex(0);
+    } finally {
+      this.updatingImplementation = false;
+    }
+  }
+
+  private static MapObjectType resolveType(String mapObjectType) {
+    return Editor.instance().getProjectCodeIntegration().getDefinitions().stream()
+      .filter(definition -> definition.id().equals(mapObjectType))
+      .map(de.gurkenlabs.utiliti.controller.ProjectCodeIntegration.Definition::baseType)
+      .findFirst()
+      .orElseGet(() -> MapObjectType.get(mapObjectType));
+  }
+
+  private static String compactPackage(String className) {
+    int classSeparator = className.lastIndexOf('.');
+    if (classSeparator < 0) {
+      return "";
+    }
+    String packageName = className.substring(0, classSeparator);
+    int parentSeparator = packageName.lastIndexOf('.');
+    return parentSeparator < 0 ? packageName : packageName.substring(parentSeparator + 1);
   }
 
   boolean isRenderTypeEnabledForTest() {
@@ -569,6 +636,47 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
                 !m.hasCustomProperty(MapObjectProperty.TAGS)
                     || !m.getStringValue(MapObjectProperty.TAGS, null)
                         .equals(this.tagPanel.getTagsString()),
-            m -> m.setValue(MapObjectProperty.TAGS, this.tagPanel.getTagsString())));
+             m -> m.setValue(MapObjectProperty.TAGS, this.tagPanel.getTagsString())));
+
+    this.implementation.addActionListener(new MapObjectPropertyActionListener(m -> {
+      if (this.updatingImplementation) {
+        return false;
+      }
+      ImplementationOption selected = (ImplementationOption) this.implementation.getSelectedItem();
+      return !Objects.equals(m.getStringValue(MapObjectProperty.IMPLEMENTATION, null), selected == null ? null : selected.id());
+    }, m -> {
+      ImplementationOption selected = (ImplementationOption) this.implementation.getSelectedItem();
+      if (selected == null || selected.id() == null) {
+        m.removeProperty(MapObjectProperty.IMPLEMENTATION);
+      } else {
+        m.setValue(MapObjectProperty.IMPLEMENTATION, selected.id());
+      }
+    }));
+  }
+
+  private record ImplementationOption(String id, String displayName, String packageName, String className) {
+    @Override
+    public String toString() {
+      return displayName;
+    }
+  }
+
+  private static final class ImplementationRenderer extends DefaultListCellRenderer {
+    @Override
+    public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+      JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+      if (!(value instanceof ImplementationOption option)) {
+        return label;
+      }
+      label.setToolTipText(option.className());
+      if (index < 0 || option.packageName() == null) {
+        label.setText(option.displayName());
+        return label;
+      }
+      String packageColor = String.format("#%02x%02x%02x", Style.COLOR_SUBTEXT.getRed(), Style.COLOR_SUBTEXT.getGreen(), Style.COLOR_SUBTEXT.getBlue());
+      label.setText("<html>" + option.displayName() + "<br><span style='color:" + packageColor + "; font-size:9px'>" + option.packageName() + "</span></html>");
+      label.setBorder(BorderFactory.createEmptyBorder(3, 4, 3, 4));
+      return label;
+    }
   }
 }

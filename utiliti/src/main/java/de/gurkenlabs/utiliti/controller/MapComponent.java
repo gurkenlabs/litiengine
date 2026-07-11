@@ -86,6 +86,7 @@ public class MapComponent extends GuiComponent {
   private final List<Consumer<Blueprint>> copyTargetChangedConsumer;
 
   private final Map<String, Point2D> cameraFocus;
+  private final Map<String, Float> cameraZoom;
   private final Map<String, IMapObject> focusedObjects;
   private final Map<String, List<IMapObject>> selectedObjects;
   private final Map<String, Environment> environments;
@@ -93,6 +94,7 @@ public class MapComponent extends GuiComponent {
   private TransformMode transformMode = TransformMode.NONE;
   private Point2D startPoint;
   private Blueprint copiedBlueprint;
+  private ProjectCodeIntegration.Definition createDefinition;
 
   /**
    * This flag is used to control the undo behavior of a <b>move transformation</b>. It ensures that the UndoManager tracks the "changing" event in
@@ -140,6 +142,7 @@ public class MapComponent extends GuiComponent {
     this.environments = new ConcurrentHashMap<>();
     this.maps = new CopyOnWriteArrayList<>();
     this.cameraFocus = new ConcurrentHashMap<>();
+    this.cameraZoom = new ConcurrentHashMap<>();
     this.onMouseEnter(e -> Game.window().cursor().setVisible(true));
     this.onMouseLeave(e -> Game.window().cursor().setVisible(false));
 
@@ -299,6 +302,7 @@ public class MapComponent extends GuiComponent {
         double y = Game.world().camera().getFocus().getY();
         Point2D newPoint = new Point2D.Double(x, y);
         this.cameraFocus.put(mapName, newPoint);
+        this.cameraZoom.put(mapName, Game.world().camera().getZoom());
       }
 
       for (Consumer<TmxMap> cons : this.loadingConsumer) {
@@ -310,7 +314,8 @@ public class MapComponent extends GuiComponent {
 
       Point2D newFocus;
 
-      if (this.cameraFocus.containsKey(map.getName())) {
+      boolean fitOnLoad = !this.cameraFocus.containsKey(map.getName());
+      if (!fitOnLoad) {
         newFocus = this.cameraFocus.get(map.getName());
       } else {
         newFocus =
@@ -328,6 +333,21 @@ public class MapComponent extends GuiComponent {
       }
 
       Game.world().loadEnvironment(this.environments.get(map.getName()));
+
+      if (!fitOnLoad && this.cameraZoom.containsKey(map.getName())) {
+        Game.world().camera().setZoom(this.cameraZoom.get(map.getName()), 0);
+        if (UI.getViewportToolbar() != null) {
+          UI.getViewportToolbar().refreshZoomLabel();
+        }
+      }
+
+      if (fitOnLoad && UI.getViewportToolbar() != null) {
+        SwingUtilities.invokeLater(() -> {
+          if (Game.world().environment() != null && Game.world().environment().getMap() == map) {
+            UI.getViewportToolbar().fitMap();
+          }
+        });
+      }
 
       UI.getMapController().setSelection(map);
       IMapObject focused = getFocusedMapObject();
@@ -548,6 +568,7 @@ public class MapComponent extends GuiComponent {
     UI.getLayerController().clear();
     this.selectedObjects.clear();
     this.cameraFocus.clear();
+    this.cameraZoom.clear();
     this.environments.clear();
     UI.getEntityController().refresh();
     UI.getLayerController().refresh();
@@ -1019,6 +1040,17 @@ public class MapComponent extends GuiComponent {
     return new Rectangle2D.Double(minX, minY, width, height);
   }
 
+  public void setCreateDefinition(ProjectCodeIntegration.Definition definition) {
+    this.createDefinition = definition;
+    this.setTransformMode(TransformMode.CREATE);
+  }
+
+  public void setCreateMapObjectType(MapObjectType type) {
+    this.createDefinition = null;
+    this.setTransformMode(TransformMode.CREATE);
+    UI.getInspector().setMapObjectType(type);
+  }
+
   private IMapObject createNewMapObject(MapObjectType type) {
     final Rectangle2D newObjectArea = getMouseSelectArea(true);
     IMapObject mo = new MapObject();
@@ -1068,8 +1100,24 @@ public class MapComponent extends GuiComponent {
         break;
     }
 
+    if (this.createDefinition != null) {
+      mo.setValue(MapObjectProperty.IMPLEMENTATION, this.createDefinition.id());
+      for (var property : this.createDefinition.properties()) {
+        setDefaultValue(mo, property);
+      }
+    }
+
     this.add(mo);
     return mo;
+  }
+
+  private static void setDefaultValue(IMapObject mapObject, de.gurkenlabs.litiengine.environment.tilemap.MapObjectPropertyDefinition property) {
+    switch (property.type()) {
+      case BOOLEAN -> mapObject.setValue(property.name(), Boolean.parseBoolean(property.defaultValue()));
+      case INTEGER -> mapObject.setValue(property.name(), Integer.parseInt(property.defaultValue()));
+      case FLOAT -> mapObject.setValue(property.name(), Float.parseFloat(property.defaultValue()));
+      case STRING -> mapObject.setValue(property.name(), property.defaultValue());
+    }
   }
 
   private void setCopyBlueprint(Blueprint copyTarget) {
@@ -1322,7 +1370,8 @@ public class MapComponent extends GuiComponent {
 
     switch (this.transformMode) {
       case CREATE -> {
-        IMapObject mo = this.createNewMapObject(UI.getInspector().getObjectType());
+        MapObjectType type = this.createDefinition == null ? UI.getInspector().getObjectType() : this.createDefinition.baseType();
+        IMapObject mo = this.createNewMapObject(type);
 
         this.setFocus(mo, !Input.keyboard().isPressed(KeyEvent.VK_SHIFT));
         UI.getInspector().bind(mo);

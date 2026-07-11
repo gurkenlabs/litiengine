@@ -1,4 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#C9C9D1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-  <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
-  <polyline points="13 2 13 9 20 9"></polyline>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#C9CDD6" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M4 7.25A2.25 2.25 0 0 1 6.25 5h3l1.6 1.75H18A2 2 0 0 1 20 8.75v8A2.25 2.25 0 0 1 17.75 19h-11.5A2.25 2.25 0 0 1 4 16.75Z"/>
+  <path d="m7.5 15 2.2-2.2 1.8 1.8 2.8-3.1 2.2 2.5"/>
+  <circle cx="15.75" cy="10" r=".75" fill="#C9CDD6" stroke="none"/>
 </svg>
