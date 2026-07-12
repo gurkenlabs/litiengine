@@ -535,7 +535,7 @@ public abstract class PropertyPanel extends JPanel {
 
     // now prepare the vertical groups
     SequentialGroup seq = groupLayout.createSequentialGroup();
-    SequentialGroup current = seq.addGap(CONTROL_MARGIN);
+    SequentialGroup current = seq;
 
     for (LayoutItem item : layoutItems) {
       ParallelGroup verGrp = groupLayout.createParallelGroup(Alignment.LEADING);

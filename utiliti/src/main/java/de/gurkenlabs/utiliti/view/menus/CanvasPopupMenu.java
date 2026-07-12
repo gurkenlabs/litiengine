@@ -69,7 +69,7 @@ public final class CanvasPopupMenu extends JPopupMenu {
               cut.setEnabled(mo != null);
               delete.setEnabled(mo != null);
               blueprint.setEnabled(mo != null);
-              emitter.setEnabled(mo != null && mo.getType().equals(MapObjectType.EMITTER.name()));
+               emitter.setEnabled(mo != null && MapObjectType.EMITTER.name().equals(mo.getType()));
               paste.setEnabled(Editor.instance().getMapComponent().getCopiedBlueprint() != null);
             });
 

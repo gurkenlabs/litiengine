@@ -3,6 +3,8 @@ package de.gurkenlabs.utiliti.view.components;
 import com.github.weisj.darklaf.ui.text.DarkTextUI;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.Entity;
+import de.gurkenlabs.litiengine.entities.Creature;
+import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.tilemap.IGroupLayer;
@@ -15,6 +17,11 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.graphics.CreatureAnimationState;
+import de.gurkenlabs.litiengine.graphics.animation.CreatureAnimationController;
+import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
+import de.gurkenlabs.litiengine.entities.PropState;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.EntityController;
 import de.gurkenlabs.utiliti.controller.LayerController;
@@ -122,6 +129,8 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
   private final JScrollPane treeScroll;
   private final DefaultTreeModel treeModel;
   private final DefaultMutableTreeNode nodeRoot;
+  private javax.swing.JWindow hoverPreviewWindow;
+  private SpriteAnimationPreview hoverPreview;
   private final JTextField renameField;
   private SceneNode renamedNode;
 
@@ -326,6 +335,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
               UI.showLayerProperties(node.getLayer());
             } else if (node.isMap()) {
               Editor.instance().getMapComponent().setFocus(null, true);
+              ToolManager.instance().setActiveTileLayer(null);
               UI.showMapProperties();
             } else if (node.getMapObject() != null) {
               Editor.instance().getMapComponent().setFocus(node.getMapObject(), true);
@@ -418,6 +428,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
           tree.putClientProperty("SceneGraph.hoverRow", row);
           tree.repaint();
         }
+        showHoverPreview(e, row);
       }
     });
     this.tree.addMouseListener(new MouseAdapter() {
@@ -425,6 +436,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
       public void mouseExited(MouseEvent e) {
         tree.putClientProperty("SceneGraph.hoverRow", -1);
         tree.repaint();
+        hideHoverPreview();
       }
     });
     this.tree.setTransferHandler(new SceneTransferHandler());
@@ -612,6 +624,61 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     }
   }
 
+  private void showHoverPreview(MouseEvent event, int row) {
+    TreePath path = this.tree.getPathForRow(row);
+    if (path == null || !(path.getLastPathComponent() instanceof DefaultMutableTreeNode node)
+        || !(node.getUserObject() instanceof SceneNode sceneNode)) {
+      hideHoverPreview();
+      return;
+    }
+    Spritesheet spritesheet = getPreviewSpritesheet(sceneNode.getEntity());
+    if (spritesheet == null) {
+      hideHoverPreview();
+      return;
+    }
+    if (this.hoverPreviewWindow == null) {
+      java.awt.Window owner = javax.swing.SwingUtilities.getWindowAncestor(this);
+      this.hoverPreviewWindow = new javax.swing.JWindow(owner);
+      this.hoverPreview = new SpriteAnimationPreview();
+      this.hoverPreview.setPreferredSize(new Dimension(144, 112));
+      this.hoverPreviewWindow.add(this.hoverPreview);
+      this.hoverPreviewWindow.setAlwaysOnTop(true);
+      this.hoverPreviewWindow.setFocusableWindowState(false);
+      this.hoverPreviewWindow.pack();
+    }
+    this.hoverPreview.setSpritesheet(spritesheet);
+    java.awt.Point location = event.getLocationOnScreen();
+    this.hoverPreviewWindow.setLocation(location.x + 18, location.y + 18);
+    this.hoverPreviewWindow.setVisible(true);
+  }
+
+  private void hideHoverPreview() {
+    if (this.hoverPreviewWindow != null) {
+      this.hoverPreviewWindow.setVisible(false);
+    }
+  }
+
+  private static Spritesheet getPreviewSpritesheet(IEntity entity) {
+    if (entity instanceof Prop prop) {
+      Spritesheet spritesheet = Resources.spritesheets().get(PropAnimationController.getSpriteName(prop, PropState.INTACT, true));
+      if (spritesheet == null) {
+        spritesheet = Resources.spritesheets().get(PropAnimationController.getSpriteName(prop, false));
+      }
+      if (spritesheet != null) {
+        return spritesheet;
+      }
+      return Resources.spritesheets().get(s -> s.getName().startsWith(prop.getSpritesheetName() + "-")).stream().findFirst().orElse(null);
+    }
+    if (entity instanceof Creature creature) {
+      Spritesheet spritesheet = Resources.spritesheets().get(CreatureAnimationController.getSpriteName(creature, CreatureAnimationState.IDLE));
+      if (spritesheet != null) {
+        return spritesheet;
+      }
+      return Resources.spritesheets().get(s -> s.getName().startsWith(creature.getSpritesheetName() + "-")).stream().findFirst().orElse(null);
+    }
+    return null;
+  }
+
   @Override
   public void select(IMapObject mapObject) {
     if (this.isFocussing) {
@@ -641,6 +708,20 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
       tree.scrollPathToVisible(path);
       treeScroll.getHorizontalScrollBar().setValue(0);
       return;
+    }
+  }
+
+  public void selectMap() {
+    for (int i = 0; i < this.nodeRoot.getChildCount(); i++) {
+      DefaultMutableTreeNode node = (DefaultMutableTreeNode) this.nodeRoot.getChildAt(i);
+      if (node.getUserObject() instanceof SceneNode sceneNode && sceneNode.isMap()) {
+        TreePath path = new TreePath(node.getPath());
+        if (!path.equals(this.tree.getSelectionPath())) {
+          this.tree.setSelectionPath(path);
+        }
+        this.tree.scrollPathToVisible(path);
+        return;
+      }
     }
   }
 

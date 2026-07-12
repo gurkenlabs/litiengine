@@ -509,6 +509,9 @@ public class TilesetEditorPanel extends JPanel {
       return;
     }
     ToolManager.instance().setSelectedTileGid(this.tileset.getFirstGridId() + this.tileGrid.selectedTile);
+    if (ToolManager.instance().getActiveTileLayer() == null) {
+      return;
+    }
     ToolManager.instance().getTools().stream()
       .filter(tool -> tool instanceof de.gurkenlabs.utiliti.controller.tool.StampBrushTool)
       .findFirst()

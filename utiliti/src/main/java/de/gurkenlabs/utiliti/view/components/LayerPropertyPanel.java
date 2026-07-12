@@ -2,12 +2,18 @@ package de.gurkenlabs.utiliti.view.components;
 
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
+import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.ImageLayer;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.MapImage;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.environment.tilemap.ILayer;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.utiliti.controller.ControlBehavior;
+import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.UndoManager;
 import de.gurkenlabs.utiliti.model.Style;
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.FontMetrics;
@@ -25,6 +31,8 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -42,6 +50,10 @@ import javax.swing.table.TableCellEditor;
 public class LayerPropertyPanel extends JPanel {
 
   private final JTextField textFieldName;
+  private final JComboBox<String> imageSourceCombo;
+  private final JLabel imagePreview;
+  private final JPanel imageSourceControl;
+  private final JLabel labelImageSource;
   private final JSpinner spinnerOpacity;
   private final JCheckBox checkBoxVisible;
   private final ColorComponent tintColorComponent;
@@ -64,6 +76,27 @@ public class LayerPropertyPanel extends JPanel {
     setBackground(Style.COLOR_BG);
 
     this.textFieldName = ControlBehavior.apply(new JTextField());
+    this.imageSourceCombo = new SearchableResourceComboBox();
+    ControlBehavior.apply(this.imageSourceCombo);
+    this.imageSourceCombo.setRenderer(new DefaultListCellRenderer() {
+      @Override public Component getListCellRendererComponent(javax.swing.JList<?> list, Object value, int index, boolean selected, boolean focus) {
+        JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, selected, focus);
+        if (value != null) {
+          var spritesheet = Resources.spritesheets().get(value.toString());
+          var preview = spritesheet != null && spritesheet.getTotalNumberOfSprites() > 0 ? spritesheet.getPreview(24) : null;
+          label.setIcon(preview != null ? new ImageIcon(preview) : null);
+        }
+        return label;
+      }
+    });
+    this.imagePreview = new JLabel();
+    this.imagePreview.setPreferredSize(new Dimension(32, 32));
+    this.imagePreview.setHorizontalAlignment(SwingConstants.CENTER);
+    this.imageSourceControl = new JPanel(new BorderLayout(4, 0));
+    this.imageSourceControl.setOpaque(false);
+    this.imageSourceControl.add(this.imageSourceCombo, BorderLayout.CENTER);
+    this.imageSourceControl.add(this.imagePreview, BorderLayout.EAST);
+    this.labelImageSource = createLabel("Image Source");
     this.spinnerOpacity = new JSpinner(new SpinnerNumberModel(1.0, 0.0, 1.0, 0.05));
     ControlBehavior.apply(this.spinnerOpacity);
     this.checkBoxVisible = new JCheckBox("Visible");
@@ -110,6 +143,8 @@ public class LayerPropertyPanel extends JPanel {
     this.accordion.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
 
     this.generalCard = new ExpandableCard("General", createGeneralPanel(), false);
+    this.imageSourceControl.setVisible(false);
+    this.labelImageSource.setVisible(false);
     ExpandableCard renderingCard =
         new ExpandableCard("Rendering", createRenderingPanel(), false);
     ExpandableCard propertiesCard =
@@ -147,14 +182,17 @@ public class LayerPropertyPanel extends JPanel {
             createLabel("Opacity"),
             createLabel("Visible"),
             this.labelLayerColor,
+            this.labelImageSource,
         },
         new JComponent[] {
             this.textFieldName,
             this.spinnerOpacity,
             this.checkBoxVisible,
             this.layerColorComponent,
+            this.imageSourceControl,
         },
         new int[] {
+            PropertyPanel.CONTROL_HEIGHT,
             PropertyPanel.CONTROL_HEIGHT,
             PropertyPanel.CONTROL_HEIGHT,
             PropertyPanel.CONTROL_HEIGHT,
@@ -299,6 +337,10 @@ public class LayerPropertyPanel extends JPanel {
 
     this.textFieldName.addFocusListener(saveOnFocusLost);
     this.textFieldName.addActionListener(e -> saveChanges());
+    this.imageSourceCombo.addActionListener(e -> {
+      updateImagePreview();
+      saveChanges();
+    });
     this.spinnerOpacity.addChangeListener(saveOnChange);
     this.checkBoxVisible.addActionListener(e -> saveChanges());
     this.comboRenderType.addActionListener(e -> saveChanges());
@@ -315,11 +357,17 @@ public class LayerPropertyPanel extends JPanel {
       }
 
       boolean isMapObjectLayer = layer instanceof IMapObjectLayer;
+      boolean isImageLayer = layer instanceof IImageLayer;
       this.labelLayerColor.setVisible(isMapObjectLayer);
       this.layerColorComponent.setVisible(isMapObjectLayer);
       if (isMapObjectLayer) {
         this.layerColorComponent.setColor(((IMapObjectLayer) layer).getColor());
       }
+      this.labelImageSource.setVisible(isImageLayer);
+      this.imageSourceControl.setVisible(isImageLayer);
+      bindImageSources(isImageLayer && ((IImageLayer) layer).getImage() != null
+          ? ((IImageLayer) layer).getImage().getSource() : null);
+      this.generalCard.revalidate();
 
       this.setControlValues(layer);
       String layerName = layer.getName() != null && !layer.getName().isBlank() ? layer.getName() : "Unnamed layer";
@@ -332,6 +380,8 @@ public class LayerPropertyPanel extends JPanel {
   public void clearControls() {
     this.generalCard.setTitle("General");
     this.textFieldName.setText("");
+    this.imageSourceCombo.removeAllItems();
+    this.imagePreview.setIcon(null);
     this.spinnerOpacity.setValue(1.0);
     this.checkBoxVisible.setSelected(true);
     this.tintColorComponent.setColor(java.awt.Color.WHITE);
@@ -356,6 +406,12 @@ public class LayerPropertyPanel extends JPanel {
 
     if (this.dataSource instanceof IMapObjectLayer mol) {
       mol.setColor(this.layerColorComponent.getColor());
+    }
+    if (this.dataSource instanceof ImageLayer imageLayer) {
+      MapImage image = imageLayer.getImage() instanceof MapImage mapImage ? mapImage : new MapImage();
+      Object selected = this.imageSourceCombo.getSelectedItem();
+      image.setSource(selected != null ? selected.toString() : "");
+      imageLayer.setImage(image);
     }
 
     final List<String> setProperties = new ArrayList<>();
@@ -390,6 +446,38 @@ public class LayerPropertyPanel extends JPanel {
     for (Map.Entry<String, ICustomProperty> prop : layer.getProperties().entrySet()) {
       this.model.addRow(new Object[] {prop.getKey(), prop.getValue().getAsString()});
     }
+  }
+
+  private void bindImageSources(String selectedSource) {
+    this.imageSourceCombo.removeAllItems();
+    if (Editor.instance().getGameFile() != null) {
+      for (var sprite : Editor.instance().getGameFile().getSpriteSheets()) {
+        if (sprite.getName() != null && !sprite.getName().isBlank()) {
+          this.imageSourceCombo.addItem(sprite.getName());
+        }
+      }
+    }
+    if (selectedSource != null && !selectedSource.isBlank()) {
+      boolean present = false;
+      for (int i = 0; i < this.imageSourceCombo.getItemCount(); i++) {
+        if (selectedSource.equals(this.imageSourceCombo.getItemAt(i))) {
+          present = true;
+          break;
+        }
+      }
+      if (!present) {
+        this.imageSourceCombo.addItem(selectedSource);
+      }
+      this.imageSourceCombo.setSelectedItem(selectedSource);
+    }
+    updateImagePreview();
+  }
+
+  private void updateImagePreview() {
+    Object selected = this.imageSourceCombo.getSelectedItem();
+    var spritesheet = selected != null ? Resources.spritesheets().get(selected.toString()) : null;
+    var preview = spritesheet != null && spritesheet.getTotalNumberOfSprites() > 0 ? spritesheet.getPreview(32) : null;
+    this.imagePreview.setIcon(preview != null ? new ImageIcon(preview) : null);
   }
 
   private void stopTableEditing() {

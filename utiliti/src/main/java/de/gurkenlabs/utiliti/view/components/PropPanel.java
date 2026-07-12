@@ -10,6 +10,8 @@ import de.gurkenlabs.utiliti.controller.SpriteVariantSelector;
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.view.renderers.LabelListCellRenderer;
 import java.awt.FlowLayout;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.LayoutManager;
 import java.util.Map;
@@ -18,6 +20,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
 public class PropPanel extends PropertyPanel {
@@ -28,6 +31,8 @@ public class PropPanel extends PropertyPanel {
   private final JCheckBox checkBoxHorizontalFlip;
   private final JCheckBox checkBoxVerticalFlip;
   private final JCheckBox checkBoxScale;
+  private final JLabel spritePreview;
+  private final SpriteAnimationPreview animationPreview;
 
   private boolean propsLoaded;
 
@@ -38,8 +43,11 @@ public class PropPanel extends PropertyPanel {
     super("panel_prop", Icons.PROP_24);
     Resources.images().addClearedListener(() -> this.propsLoaded = false);
 
-    this.comboBoxSpriteSheets = new JComboBox<>();
+    this.comboBoxSpriteSheets = new SearchableSpriteComboBox();
     this.comboBoxSpriteSheets.setRenderer(new LabelListCellRenderer());
+    this.spritePreview = new JLabel("", JLabel.CENTER);
+    this.spritePreview.setPreferredSize(new Dimension(96, 96));
+    this.animationPreview = new SpriteAnimationPreview();
 
     this.comboBoxMaterial = new JComboBox<>();
     this.comboBoxMaterial.setModel(
@@ -56,6 +64,7 @@ public class PropPanel extends PropertyPanel {
 
     setLayout(this.createLayout());
     setupChangedListeners();
+    this.comboBoxSpriteSheets.addActionListener(e -> updateSpritePreview());
   }
 
   private void clearSpriteCache() {
@@ -97,6 +106,7 @@ public class PropPanel extends PropertyPanel {
   @Override
   protected void setControlValues(IMapObject mapObject) {
     selectSpriteSheet(this.comboBoxSpriteSheets, mapObject);
+    updateSpritePreview();
 
     var material = Material.UNDEFINED;
     if(mapObject.hasCustomProperty(MapObjectProperty.PROP_MATERIAL)){
@@ -148,9 +158,20 @@ public class PropPanel extends PropertyPanel {
     return p;
   }
 
+  private void updateSpritePreview() {
+    Object selected = this.comboBoxSpriteSheets.getSelectedItem();
+    String name = selected instanceof JLabel label ? label.getText() : null;
+    String source = name != null ? SpriteVariantSelector.selectBasePropSpriteNames(Resources.spritesheets().getAll()).get(name) : null;
+    var spritesheet = source != null ? Resources.spritesheets().get(source) : null;
+    var preview = spritesheet != null ? spritesheet.getPreview(96) : null;
+    this.spritePreview.setIcon(preview != null ? new ImageIcon(preview) : null);
+    this.animationPreview.setSpritesheet(spritesheet);
+  }
+
   private LayoutManager createLayout() {
     LayoutItem[] layoutItems =
       new LayoutItem[] {
+        new LayoutItem(this.animationPreview, 140),
         new LayoutItem("panel_sprite", this.comboBoxSpriteSheets),
         new LayoutItem("panel_material", this.comboBoxMaterial),
         new LayoutItem("panel_rotation", this.comboBoxRotation),

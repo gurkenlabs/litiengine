@@ -181,6 +181,9 @@ public final class UI {
 
     if (Game.world().environment() != null && Game.world().environment().getMap() != null) {
       mapPropertyPanel.bind(Game.world().environment().getMap());
+      if (sceneGraph != null) {
+        sceneGraph.selectMap();
+      }
     }
     if (inspectorCards != null && inspectorHost != null) {
       inspectorCards.show(inspectorHost, "map");

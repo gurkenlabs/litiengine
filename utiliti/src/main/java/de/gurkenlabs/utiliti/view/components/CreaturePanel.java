@@ -16,6 +16,8 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.ImageIcon;
+import java.awt.Dimension;
 
 public class CreaturePanel extends PropertyPanel {
   public static final String WALK_SPRITE_TOKEN = "walk";
@@ -23,12 +25,17 @@ public class CreaturePanel extends PropertyPanel {
   private final JComboBox<Direction> comboBoxDirection;
   private final JCheckBox checkBoxScale;
   private final JCheckBox checkBoxStartDead;
+  private final JLabel spritePreview;
+  private final SpriteAnimationPreview animationPreview;
   private boolean creaturesLoaded; // mirrors PropPanel.propsLoaded behavior
 
   public CreaturePanel() {
     super("panel_creature", Icons.CREATURE_16);
-    this.comboBoxSpriteSheets = new JComboBox<>();
+    this.comboBoxSpriteSheets = new SearchableSpriteComboBox();
     this.comboBoxSpriteSheets.setRenderer(new LabelListCellRenderer());
+    this.spritePreview = new JLabel("", JLabel.CENTER);
+    this.spritePreview.setPreferredSize(new Dimension(96, 96));
+    this.animationPreview = new SpriteAnimationPreview();
 
     this.comboBoxDirection = new JComboBox<>();
     this.comboBoxDirection.setModel(new DefaultComboBoxModel<>(Direction.values()));
@@ -38,6 +45,8 @@ public class CreaturePanel extends PropertyPanel {
 
     setLayout(this.createLayout());
     setupChangedListeners();
+    this.comboBoxSpriteSheets.addActionListener(e -> updateSpritePreview());
+    this.checkBoxStartDead.addActionListener(e -> updateSpritePreview());
 
     // if images are cleared (e.g. resource reload), repopulate on next bind
     Resources.images().addClearedListener(() -> this.creaturesLoaded = false);
@@ -96,6 +105,7 @@ public class CreaturePanel extends PropertyPanel {
   protected void setControlValues(IMapObject mapObject) {
     // first try regular selection by stored property (base name expected)
     selectSpriteSheet(this.comboBoxSpriteSheets, mapObject);
+    updateSpritePreview();
 
     // fallback: if nothing selected and a full spritesheet name was stored earlier, try its base
     if (this.comboBoxSpriteSheets.getSelectedItem() == null) {
@@ -164,9 +174,24 @@ public class CreaturePanel extends PropertyPanel {
 
   private LayoutManager createLayout() {
     LayoutItem[] layoutItems = new LayoutItem[] {
+      new LayoutItem(this.animationPreview, 140),
       new LayoutItem("panel_sprite", this.comboBoxSpriteSheets),
       new LayoutItem("panel_direction", this.comboBoxDirection),
     };
     return this.createLayout(layoutItems, this.checkBoxScale, this.checkBoxStartDead);
+  }
+
+  private void updateSpritePreview() {
+    Object selected = this.comboBoxSpriteSheets.getSelectedItem();
+    String name = selected instanceof JLabel label ? label.getText() : null;
+    String source = name != null ? SpriteVariantSelector.selectBaseCreatureSpriteNames(Resources.spritesheets().getAll()).get(name) : null;
+    var spritesheet = this.checkBoxStartDead.isSelected() && name != null
+        ? Resources.spritesheets().get(name + "-" + CreatureAnimationState.DEAD.spriteString()) : null;
+    if (spritesheet == null) {
+      spritesheet = source != null ? Resources.spritesheets().get(source) : null;
+    }
+    var preview = spritesheet != null ? spritesheet.getPreview(96) : null;
+    this.spritePreview.setIcon(preview != null ? new ImageIcon(preview) : null);
+    this.animationPreview.setSpritesheet(spritesheet);
   }
 }
