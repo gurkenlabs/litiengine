@@ -19,6 +19,7 @@ import de.gurkenlabs.utiliti.controller.EntityController;
 import de.gurkenlabs.utiliti.controller.LayerController;
 import de.gurkenlabs.utiliti.controller.Transform;
 import de.gurkenlabs.utiliti.controller.UndoManager;
+import de.gurkenlabs.utiliti.controller.tool.ToolManager;
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.Style;
 import de.gurkenlabs.utiliti.view.renderers.IconTreeListRenderer;
@@ -102,6 +103,9 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
   private final JPanel searchPanel;
   private final JPanel chipPanel;
   private final JButton btnAddLayer;
+  private final JButton btnAddTileLayer;
+  private final JButton btnRemoveLayer;
+  private final JButton btnTilesets;
   private final JButton btnCollapse;
   private final JButton btnDuplicateLayer;
   private final JButton btnMore;
@@ -137,8 +141,25 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     this.searchPanel.setBorder(BorderFactory.createEmptyBorder(7, 8, 3, 8));
 
     this.btnAddLayer = createToolButton(Icons.ADD_24);
-    this.btnAddLayer.setToolTipText("Add Layer");
+    this.btnAddLayer.setToolTipText("Add Object Layer");
     this.btnAddLayer.addActionListener(e -> addLayer(getSelectedOrLastLayerNode()));
+
+    this.btnAddTileLayer = createToolButton(Icons.TILESET_24);
+    this.btnAddTileLayer.setToolTipText("Add Tile Layer");
+    this.btnAddTileLayer.addActionListener(e -> addTileLayer(getSelectedOrLastLayerNode()));
+
+    this.btnRemoveLayer = createToolButton(Icons.DELETE_24);
+    this.btnRemoveLayer.setToolTipText("Remove Selected Layer");
+    this.btnRemoveLayer.addActionListener(e -> {
+      SceneNode node = getSelectedLayerNode();
+      if (node != null) {
+        removeLayer(node);
+      }
+    });
+
+    this.btnTilesets = createToolButton(Icons.SPRITESHEET_24);
+    this.btnTilesets.setToolTipText("Select Map Tileset");
+    this.btnTilesets.addActionListener(e -> showTilesetMenu(this.btnTilesets));
 
     this.btnCollapse = Style.iconButton(Icons.COLLAPSE_24);
     this.btnCollapse.setToolTipText("Collapse All");
@@ -199,6 +220,12 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     });
 
     this.searchPanel.add(searchBox, BorderLayout.CENTER);
+    JPanel actions = new JPanel(new FlowLayout(FlowLayout.TRAILING, 2, 0));
+    actions.setOpaque(false);
+    actions.add(this.btnTilesets);
+    actions.add(this.btnAddTileLayer);
+    actions.add(this.btnRemoveLayer);
+    this.searchPanel.add(actions, BorderLayout.EAST);
 
     this.chipPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 3, 2));
     this.chipPanel.setOpaque(false);
@@ -703,6 +730,13 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     if (map == null) {
       return;
     }
+    ToolManager.instance().setActiveTileLayer(node.getLayer() instanceof ITileLayer tileLayer ? tileLayer : null);
+    if (node.getLayer() instanceof ITileLayer && ToolManager.instance().getSelectedTileGid() != 0) {
+      ToolManager.instance().getTools().stream()
+        .filter(tool -> tool instanceof de.gurkenlabs.utiliti.controller.tool.StampBrushTool)
+        .findFirst()
+        .ifPresent(ToolManager.instance()::setActiveTool);
+    }
     int idx = 0;
     for (ILayer renderLayer : map.getRenderLayers()) {
       if (renderLayer == node.getLayer()) {
@@ -1114,21 +1148,44 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     fireLayerStructureChanged();
   }
 
+  private void addTileLayer(SceneNode afterNode) {
+    IMap map = getCurrentMap();
+    if (map == null) {
+      return;
+    }
+    de.gurkenlabs.litiengine.environment.tilemap.xml.TileLayer layer =
+      new de.gurkenlabs.litiengine.environment.tilemap.xml.TileLayer(map.getWidth(), map.getHeight());
+    layer.setName("Tile Layer");
+    int absIdx = afterNode != null ? getAbsoluteIndex(map, afterNode) : map.getRenderLayers().size() - 1;
+    UndoManager.instance().layerStructureChanging(map);
+    map.addLayer(absIdx + 1, layer);
+    ToolManager.instance().setActiveTileLayer(layer);
+    refresh();
+    UndoManager.instance().layerStructureChanged(map);
+    fireLayerStructureChanged();
+  }
+
   private void removeLayer(SceneNode node) {
     IMap map = getCurrentMap();
     if (map == null || node.getLayer() == null) {
       return;
     }
-    if (map.getMapObjectLayers().size() <= 1) {
+    int index = map.getRenderLayers().indexOf(node.getLayer());
+    ILayer copy;
+    if (node.getLayer() instanceof de.gurkenlabs.litiengine.environment.tilemap.xml.TileLayer tileLayer) {
+      copy = new de.gurkenlabs.litiengine.environment.tilemap.xml.TileLayer(tileLayer);
+    } else if (node.getLayer() instanceof de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer mapObjectLayer) {
+      copy = new de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer(mapObjectLayer);
+    } else {
       return;
     }
-    int index = map.getRenderLayers().indexOf(node.getLayer());
-    IMapObjectLayer copy = new de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer(
-        (de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer) node.getLayer());
 
     UndoManager.instance().layerStructureChanging(map);
-    Editor.instance().getMapComponent().delete((IMapObjectLayer) node.getLayer());
+    if (node.getLayer() instanceof IMapObjectLayer mapObjectLayer) {
+      Editor.instance().getMapComponent().delete(mapObjectLayer);
+    }
     map.removeLayer(node.getLayer());
+    ToolManager.instance().setActiveTileLayer(null);
     refresh();
     UndoManager.instance().layerStructureChanged(map);
     fireLayerStructureChanged();
@@ -1139,8 +1196,32 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
         () -> {
           map.addLayer(index, copy);
           this.refresh();
-          Editor.instance().getMapComponent().add(copy);
+          if (copy instanceof IMapObjectLayer mapObjectLayer) {
+            Editor.instance().getMapComponent().add(mapObjectLayer);
+          }
         });
+  }
+
+  private void showTilesetMenu(Component anchor) {
+    IMap map = getCurrentMap();
+    if (map == null) {
+      return;
+    }
+    JPopupMenu popup = new JPopupMenu();
+    for (var tileset : map.getTilesets()) {
+      if (tileset instanceof de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset editableTileset) {
+        String name = editableTileset.getName();
+        javax.swing.JMenuItem item = new javax.swing.JMenuItem(name == null || name.isBlank() ? "Unnamed Tileset" : name, Icons.TILESET_16);
+        item.addActionListener(e -> UI.showTileLayerTilesetInspector(editableTileset));
+        popup.add(item);
+      }
+    }
+    if (popup.getComponentCount() == 0) {
+      javax.swing.JMenuItem empty = new javax.swing.JMenuItem("This map has no editable tilesets");
+      empty.setEnabled(false);
+      popup.add(empty);
+    }
+    popup.show(anchor, 0, anchor.getHeight());
   }
 
   private void duplicateLayer(SceneNode node) {

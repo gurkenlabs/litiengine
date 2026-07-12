@@ -6,7 +6,7 @@ import de.gurkenlabs.utiliti.model.Icons;
 import java.awt.Cursor;
 import javax.swing.Icon;
 
-public class EraserTool implements Tool {
+public class EraserTool extends TileBrushTool {
   @Override
   public String getName() {
     return Resources.strings().get("tool_eraser");
@@ -24,18 +24,25 @@ public class EraserTool implements Tool {
 
   @Override
   public void mousePressed(ComponentMouseEvent event) {
+    if (!javax.swing.SwingUtilities.isLeftMouseButton(event.getEvent())) {
+      return;
+    }
+    beginPainting();
+    paintTile(activeLayer(), currentTile(event), 0);
   }
 
   @Override
   public void mouseDragged(ComponentMouseEvent event) {
+    paintTile(activeLayer(), currentTile(event), 0);
   }
 
   @Override
   public void mouseReleased(ComponentMouseEvent event) {
+    endPainting();
   }
 
   @Override
   public boolean showInToolbar() {
-    return false;
+    return true;
   }
 }

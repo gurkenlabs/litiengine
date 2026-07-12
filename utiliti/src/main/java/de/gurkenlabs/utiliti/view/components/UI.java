@@ -8,6 +8,7 @@ import de.gurkenlabs.litiengine.GameListener;
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.EnvironmentListener;
 import de.gurkenlabs.litiengine.environment.tilemap.ILayer;
+import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
@@ -78,7 +79,9 @@ public final class UI {
   private static MapObjectInspector mapObjectPanel;
   private static MapPropertyPanel mapPropertyPanel;
   private static LayerPropertyPanel layerPropertyPanel;
+  private static LayerPropertyPanel tileLayerPropertyPanel;
   private static TilesetEditorPanel tilesetEditorPanel;
+  private static TilesetEditorPanel tileLayerTilesetEditorPanel;
   private static SpriteEditorPanel spriteEditorPanel;
   private static JPanel inspectorHost;
   private static CardLayout inspectorCards;
@@ -190,6 +193,17 @@ public final class UI {
       return;
     }
 
+    if (layer instanceof ITileLayer) {
+      tileLayerPropertyPanel.bind(layer);
+      Tileset tileset = activeMapTileset();
+      tileLayerTilesetEditorPanel.bind(tileset);
+      if (inspectorCards != null && inspectorHost != null) {
+        inspectorCards.show(inspectorHost, "tileLayers");
+        activeInspectorCard = "tileLayers";
+      }
+      return;
+    }
+
     layerPropertyPanel.bind(layer);
     if (inspectorCards != null && inspectorHost != null) {
       inspectorCards.show(inspectorHost, "layers");
@@ -207,6 +221,28 @@ public final class UI {
       inspectorCards.show(inspectorHost, "tilesets");
       activeInspectorCard = "tilesets";
     }
+  }
+
+  public static void showTileLayerTilesetInspector(Tileset tileset) {
+    if (tileLayerTilesetEditorPanel == null) {
+      return;
+    }
+    tileLayerTilesetEditorPanel.bind(tileset);
+    if (inspectorCards != null && inspectorHost != null) {
+      inspectorCards.show(inspectorHost, "tileLayers");
+      activeInspectorCard = "tileLayers";
+    }
+  }
+
+  private static Tileset activeMapTileset() {
+    if (Game.world().environment() == null || Game.world().environment().getMap() == null) {
+      return null;
+    }
+    return Game.world().environment().getMap().getTilesets().stream()
+      .filter(Tileset.class::isInstance)
+      .map(Tileset.class::cast)
+      .findFirst()
+      .orElse(null);
   }
 
   public static void hideTilesetInspector() {
@@ -328,8 +364,16 @@ public final class UI {
     mapPropertyPanel.setMinimumSize(new Dimension(INSPECTOR_MIN_WIDTH, 0));
     layerPropertyPanel = new LayerPropertyPanel();
     layerPropertyPanel.setMinimumSize(new Dimension(INSPECTOR_MIN_WIDTH, 0));
+    tileLayerPropertyPanel = new LayerPropertyPanel();
+    tileLayerPropertyPanel.setMinimumSize(new Dimension(INSPECTOR_MIN_WIDTH, 0));
     tilesetEditorPanel = new TilesetEditorPanel();
     tilesetEditorPanel.setMinimumSize(new Dimension(INSPECTOR_MIN_WIDTH, 0));
+    tileLayerTilesetEditorPanel = new TilesetEditorPanel();
+    tileLayerTilesetEditorPanel.setMinimumSize(new Dimension(INSPECTOR_MIN_WIDTH, 0));
+    JSplitPane tileLayerInspector = new JSplitPane(JSplitPane.VERTICAL_SPLIT, tileLayerPropertyPanel, tileLayerTilesetEditorPanel);
+    configureSplitPane(tileLayerInspector);
+    tileLayerInspector.setResizeWeight(0.35);
+    tileLayerInspector.setDividerLocation(260);
     spriteEditorPanel = new SpriteEditorPanel();
     spriteEditorPanel.setMinimumSize(new Dimension(INSPECTOR_MIN_WIDTH, 0));
     inspectorCards = new CardLayout();
@@ -338,6 +382,7 @@ public final class UI {
     inspectorHost.add(mapPropertyPanel, "map");
     inspectorHost.add(layerPropertyPanel, "layers");
     inspectorHost.add(tilesetEditorPanel, "tilesets");
+    inspectorHost.add(tileLayerInspector, "tileLayers");
     inspectorHost.add(spriteEditorPanel, "sprites");
     inspectorHost.setMinimumSize(new Dimension(INSPECTOR_MIN_WIDTH, 0));
 

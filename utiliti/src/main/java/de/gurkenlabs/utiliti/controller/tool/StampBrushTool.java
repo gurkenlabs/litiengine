@@ -6,7 +6,7 @@ import de.gurkenlabs.utiliti.model.Icons;
 import java.awt.Cursor;
 import javax.swing.Icon;
 
-public class StampBrushTool implements Tool {
+public class StampBrushTool extends TileBrushTool {
   @Override
   public String getName() {
     return Resources.strings().get("tool_stampBrush");
@@ -24,18 +24,25 @@ public class StampBrushTool implements Tool {
 
   @Override
   public void mousePressed(ComponentMouseEvent event) {
+    if (!javax.swing.SwingUtilities.isLeftMouseButton(event.getEvent()) || ToolManager.instance().getSelectedTileGid() == 0) {
+      return;
+    }
+    beginPainting();
+    paintTile(activeLayer(), currentTile(event), ToolManager.instance().getSelectedTileGid());
   }
 
   @Override
   public void mouseDragged(ComponentMouseEvent event) {
+    paintTile(activeLayer(), currentTile(event), ToolManager.instance().getSelectedTileGid());
   }
 
   @Override
   public void mouseReleased(ComponentMouseEvent event) {
+    endPainting();
   }
 
   @Override
   public boolean showInToolbar() {
-    return false;
+    return true;
   }
 }

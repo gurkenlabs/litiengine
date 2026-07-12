@@ -1,5 +1,6 @@
 package de.gurkenlabs.utiliti.controller.tool;
 
+import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -10,6 +11,8 @@ public final class ToolManager {
   private final List<Tool> tools;
   private final List<Runnable> listeners;
   private Tool activeTool;
+  private ITileLayer activeTileLayer;
+  private int selectedTileGid;
 
   private ToolManager() {
     this.tools = new ArrayList<>();
@@ -52,6 +55,22 @@ public final class ToolManager {
     for (Runnable listener : listeners) {
       listener.run();
     }
+  }
+
+  public ITileLayer getActiveTileLayer() {
+    return activeTileLayer;
+  }
+
+  public void setActiveTileLayer(ITileLayer activeTileLayer) {
+    this.activeTileLayer = activeTileLayer;
+  }
+
+  public int getSelectedTileGid() {
+    return selectedTileGid;
+  }
+
+  public void setSelectedTileGid(int selectedTileGid) {
+    this.selectedTileGid = selectedTileGid;
   }
 
   public void addListener(Runnable listener) {

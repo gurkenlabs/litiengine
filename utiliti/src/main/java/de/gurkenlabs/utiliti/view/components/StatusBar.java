@@ -3,6 +3,7 @@ package de.gurkenlabs.utiliti.view.components;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.Editor;
+import de.gurkenlabs.utiliti.controller.tool.ToolManager;
 import de.gurkenlabs.utiliti.model.Style;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -83,6 +84,11 @@ public final class StatusBar {
   }
 
   private static String getToolDisplayName() {
+    if (!(ToolManager.instance().getActiveTool() instanceof de.gurkenlabs.utiliti.controller.tool.PointerTool)) {
+      var layer = ToolManager.instance().getActiveTileLayer();
+      String layerName = layer != null && layer.getName() != null && !layer.getName().isBlank() ? layer.getName() : "No tile layer";
+      return ToolManager.instance().getActiveTool().getName() + "  ·  " + layerName;
+    }
     var mode = Editor.instance().getMapComponent().getTransformMode();
     return switch (mode) {
       case NONE -> "Select";

@@ -1,0 +1,83 @@
+package de.gurkenlabs.utiliti.controller.tool;
+
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.environment.tilemap.IMap;
+import de.gurkenlabs.litiengine.environment.tilemap.ITile;
+import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
+import de.gurkenlabs.litiengine.input.Input;
+import de.gurkenlabs.utiliti.controller.Editor;
+import de.gurkenlabs.litiengine.gui.ComponentMouseEvent;
+import de.gurkenlabs.utiliti.controller.UndoManager;
+import java.awt.Point;
+import java.util.HashSet;
+import java.util.Set;
+
+abstract class TileBrushTool implements Tool {
+  private final Set<Point> paintedTiles = new HashSet<>();
+  private boolean painting;
+
+  protected final void beginPainting() {
+    if (painting || Game.world().environment() == null) {
+      return;
+    }
+    painting = true;
+    paintedTiles.clear();
+    UndoManager.instance().beginOperation();
+  }
+
+  protected final void endPainting() {
+    if (!painting) {
+      return;
+    }
+    painting = false;
+    UndoManager.instance().endOperation();
+  }
+
+  protected final Point currentTile(ComponentMouseEvent event) {
+    if (Game.world().environment() == null) {
+      return null;
+    }
+    IMap map = Game.world().environment().getMap();
+    if (map == null || Game.world().camera() == null) {
+      return null;
+    }
+    return Input.mouse().getTile();
+  }
+
+  protected final boolean paintTile(ITileLayer layer, Point location, int gid) {
+    if (!painting || layer == null || location == null) {
+      return false;
+    }
+    // Input reuses its tile Point. Capture coordinates before recording undo actions.
+    int x = location.x;
+    int y = location.y;
+    if (!paintedTiles.add(new Point(x, y))) {
+      return false;
+    }
+    ITile tile = layer.getTile(x, y);
+    if (tile == null || tile.getGridId() == gid) {
+      return false;
+    }
+    if (gid != 0 && Game.world().environment().getMap().getTilesetEntry(gid) == null) {
+      Editor.instance().setCurrentStatus("Selected tile is not part of the active map");
+      return false;
+    }
+    int previousGid = tile.getGridId();
+    layer.setTile(x, y, gid);
+    UndoManager.instance().resourceChanged(
+      () -> layer.setTile(x, y, previousGid),
+      () -> layer.setTile(x, y, gid));
+    Editor.instance().setCurrentStatus("Painted tile " + x + ", " + y);
+    return true;
+  }
+
+  protected final ITileLayer activeLayer() {
+    ITileLayer selectedLayer = ToolManager.instance().getActiveTileLayer();
+    if (selectedLayer != null && Game.world().environment() != null && Game.world().environment().getMap() != null
+      && Game.world().environment().getMap().getTileLayers().contains(selectedLayer)) {
+      return selectedLayer;
+    }
+    Editor.instance().setCurrentStatus("Select a tile layer before painting");
+    return null;
+  }
+}

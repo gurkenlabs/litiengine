@@ -22,6 +22,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.List;
 import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -60,7 +61,14 @@ public class ViewportToolbar extends JPanel {
     JPanel right = new JPanel(new FlowLayout(FlowLayout.TRAILING, 6, 0));
     right.setOpaque(false);
 
-    left.add(button("Select", Icons.POINTER_24, () -> selectTool(0)));
+    ButtonGroup toolButtons = new ButtonGroup();
+    for (Tool tool : ToolManager.instance().getTools()) {
+      if (tool.showInToolbar()) {
+        JToggleButton button = toolButton(tool);
+        toolButtons.add(button);
+        left.add(button);
+      }
+    }
     this.btnUndo = button("Undo", Icons.UNDO_24, () -> UndoManager.instance().undo());
     this.btnUndoHistory = button("Undo history", new DropdownArrowIcon(), () -> {});
     this.btnUndoHistory.addActionListener(e -> showHistory(this.btnUndoHistory, true));
@@ -160,6 +168,23 @@ public class ViewportToolbar extends JPanel {
     JButton button = button("Add", new DropdownIcon(Icons.ADD_24), () -> {});
     button.setPreferredSize(new Dimension(44, BUTTON_SIZE.height));
     button.addActionListener(e -> createAddPopup().show(button, 0, button.getHeight()));
+    return button;
+  }
+
+  private JToggleButton toolButton(Tool tool) {
+    JToggleButton button = new ToolbarToggleButton(tool.getIcon(), tool.equals(ToolManager.instance().getActiveTool()));
+    button.setToolTipText(tool.getName());
+    button.setFocusable(false);
+    button.setPreferredSize(BUTTON_SIZE);
+    button.setMargin(new Insets(0, 0, 0, 0));
+    button.setFocusPainted(false);
+    styleToggle(button);
+    button.addActionListener(e -> ToolManager.instance().setActiveTool(tool));
+    ToolManager.instance().addListener(() -> javax.swing.SwingUtilities.invokeLater(() -> {
+      button.setSelected(tool.equals(ToolManager.instance().getActiveTool()));
+      styleToggle(button);
+      button.repaint();
+    }));
     return button;
   }
 
@@ -323,13 +348,6 @@ public class ViewportToolbar extends JPanel {
     panel.setBackground(Style.COLOR_BORDER);
     panel.setPreferredSize(new java.awt.Dimension(1, 22));
     return panel;
-  }
-
-  private static void selectTool(int index) {
-    java.util.List<Tool> tools = ToolManager.instance().getTools();
-    if (!tools.isEmpty() && index < tools.size()) {
-      ToolManager.instance().setActiveTool(tools.get(index));
-    }
   }
 
   private void updateZoomLabel() {
