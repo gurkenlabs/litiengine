@@ -28,6 +28,7 @@ public class CustomPanel extends PropertyPanel {
   private final JScrollPane scrollPane;
   private DefaultTableModel model;
   private boolean binding;
+  private java.util.Set<String> excludedProperties = java.util.Set.of();
 
   public CustomPanel() {
     super("panel_customProperties");
@@ -157,7 +158,7 @@ public class CustomPanel extends PropertyPanel {
         return;
       }
       for (Map.Entry<String, ICustomProperty> prop : new HashMap<>(mapObject.getProperties()).entrySet()) {
-        if (MapObjectProperty.isCustom(prop.getKey())) {
+        if (MapObjectProperty.isCustom(prop.getKey()) && !this.excludedProperties.contains(prop.getKey())) {
           this.model.addRow(new Object[] {prop.getKey(), prop.getValue().getAsString()});
         }
       }
@@ -189,7 +190,11 @@ public class CustomPanel extends PropertyPanel {
     getDataSource()
         .getProperties()
         .keySet()
-        .removeIf(p -> MapObjectProperty.isCustom(p) && !setProperties.contains(p));
+        .removeIf(p -> MapObjectProperty.isCustom(p) && !this.excludedProperties.contains(p) && !setProperties.contains(p));
     UndoManager.instance().mapObjectChanged(getDataSource());
+  }
+
+  void setExcludedProperties(java.util.Set<String> excludedProperties) {
+    this.excludedProperties = excludedProperties != null ? java.util.Set.copyOf(excludedProperties) : java.util.Set.of();
   }
 }

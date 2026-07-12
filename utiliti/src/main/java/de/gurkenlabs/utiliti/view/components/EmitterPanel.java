@@ -44,6 +44,8 @@ public class EmitterPanel extends PropertyPanel {
     }
   }
 
+
+
   @Override
   protected void clearControls() {
     // do nothing

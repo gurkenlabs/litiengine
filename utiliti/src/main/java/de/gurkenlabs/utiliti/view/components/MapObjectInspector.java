@@ -267,6 +267,8 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
       this.currentPanel.bind(this.getDataSource());
     }
 
+    this.customPanel.setExcludedProperties(this.type == MapObjectType.EMITTER ? emitterProperties() : java.util.Set.of());
+
     if (this.collisionPanel != null) {
       this.collisionPanel.bind(this.getDataSource());
     }
@@ -278,6 +280,20 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     }
 
     this.customPanel.bind(this.getDataSource());
+  }
+
+  private static java.util.Set<String> emitterProperties() {
+    java.util.Set<String> properties = new java.util.HashSet<>();
+    for (java.lang.reflect.Field field : MapObjectProperty.Particle.class.getFields()) {
+      if (field.getType() == String.class) {
+        try {
+          properties.add((String) field.get(null));
+        } catch (IllegalAccessException ignored) {
+          // Public constants are expected; inaccessible fields are skipped.
+        }
+      }
+    }
+    return properties;
   }
 
   private JPanel createSectionSeparator(String label) {
