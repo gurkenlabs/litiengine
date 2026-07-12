@@ -209,6 +209,31 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     return this.sourceTileset != null ? this.sourceTileset.getImage() : this.image;
   }
 
+  public void setImage(MapImage image) {
+    if (this.sourceTileset != null) {
+      this.sourceTileset.setImage(image);
+      return;
+    }
+    this.image = image;
+    this.spriteSheet = null;
+  }
+
+  public void setMargin(int margin) {
+    if (this.sourceTileset != null) {
+      this.sourceTileset.setMargin(margin);
+      return;
+    }
+    this.margin = margin;
+  }
+
+  public void setSpacing(int spacing) {
+    if (this.sourceTileset != null) {
+      this.sourceTileset.setSpacing(spacing);
+      return;
+    }
+    this.spacing = spacing;
+  }
+
   /**
    * Gets the margin.
    *
@@ -283,7 +308,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
    */
   @Override
   public int getTileHeight() {
-    return this.sourceTileset != null ? this.sourceTileset.getTileHeight() : this.tileheight;
+    return this.sourceTileset != null ? this.sourceTileset.getTileHeight() : this.tileheight != null ? this.tileheight : 0;
   }
 
   /**
@@ -293,12 +318,44 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
    */
   @Override
   public int getTileWidth() {
-    return this.sourceTileset != null ? this.sourceTileset.getTileWidth() : this.tilewidth;
+    return this.sourceTileset != null ? this.sourceTileset.getTileWidth() : this.tilewidth != null ? this.tilewidth : 0;
+  }
+
+  public void setTileWidth(int tileWidth) {
+    if (this.sourceTileset != null) {
+      this.sourceTileset.setTileWidth(tileWidth);
+      return;
+    }
+    this.tilewidth = tileWidth;
   }
 
   @Override
   public int getColumns() {
-    return this.sourceTileset != null ? this.sourceTileset.getColumns() : this.columns;
+    return this.sourceTileset != null ? this.sourceTileset.getColumns() : this.columns != null ? this.columns : 0;
+  }
+
+  public void setTileHeight(int tileHeight) {
+    if (this.sourceTileset != null) {
+      this.sourceTileset.setTileHeight(tileHeight);
+      return;
+    }
+    this.tileheight = tileHeight;
+  }
+
+  public void setColumns(int columns) {
+    if (this.sourceTileset != null) {
+      this.sourceTileset.setColumns(columns);
+      return;
+    }
+    this.columns = columns;
+  }
+
+  public void setTileCount(int tileCount) {
+    if (this.sourceTileset != null) {
+      this.sourceTileset.setTileCount(tileCount);
+      return;
+    }
+    this.tilecount = tileCount;
   }
 
   @Override
