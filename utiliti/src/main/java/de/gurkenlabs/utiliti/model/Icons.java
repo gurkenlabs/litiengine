@@ -75,12 +75,15 @@ public final class Icons {
   public static final Icon EMITTER_16 = IconLoader.get().getUIAwareIcon("emitter.svg", 16, 16);
   public static final Icon ENTITY_16 = IconLoader.get().getUIAwareIcon("entity.svg", 16, 16);
   public static final Icon EXPORT_16 = IconLoader.get().getUIAwareIcon("export.svg", 16, 16);
+  public static final Icon FIT_16 = IconLoader.get().getUIAwareIcon("fit.svg", 16, 16);
   public static final Icon HIDE_16 = IconLoader.get().getUIAwareIcon("hide.svg", 16, 16);
   public static final Icon HIDEOTHER_16 = IconLoader.get().getUIAwareIcon("hideother.svg", 16, 16);
+  public static final Icon GROUP_16 = IconLoader.get().getUIAwareIcon("group.svg", 16, 16);
   public static final Icon LAYER_16 = IconLoader.get().getUIAwareIcon("layer.svg", 16, 16);
   public static final Icon LIFT_16 = IconLoader.get().getUIAwareIcon("lift.svg", 16, 16);
   public static final Icon LOWER_16 = IconLoader.get().getUIAwareIcon("lower.svg", 16, 16);
   public static final Icon MAPAREA_16 = IconLoader.get().getUIAwareIcon("maparea.svg", 16, 16);
+  public static final Icon MAP_16 = IconLoader.get().getUIAwareIcon("map.svg", 16, 16);
   public static final Icon MINUS_16 = IconLoader.get().getUIAwareIcon("minus.svg", 16, 16);
   public static final Icon MISC_16 = IconLoader.get().getUIAwareIcon("misc.svg", 16, 16);
   public static final Icon PASTE_16 = IconLoader.get().getUIAwareIcon("paste.svg", 16, 16);

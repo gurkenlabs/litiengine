@@ -81,7 +81,7 @@ public final class UI {
   private static LayerPropertyPanel layerPropertyPanel;
   private static LayerPropertyPanel tileLayerPropertyPanel;
   private static TilesetEditorPanel tilesetEditorPanel;
-  private static TilesetEditorPanel tileLayerTilesetEditorPanel;
+  private static TilesetTabsPanel tileLayerTilesetEditorPanel;
   private static SpriteEditorPanel spriteEditorPanel;
   private static JPanel inspectorHost;
   private static CardLayout inspectorCards;
@@ -188,6 +188,38 @@ public final class UI {
     }
   }
 
+  static void showMapTilesetMenu(javax.swing.JButton owner) {
+    if (bindCurrentMapTilesetPanel()) {
+      mapPropertyPanel.showAddTilesetMenu(owner);
+    }
+  }
+
+  static void addAllMapTilesets() {
+    if (bindCurrentMapTilesetPanel()) {
+      mapPropertyPanel.addAllTilesets();
+    }
+  }
+
+  static void createMapTileset() {
+    if (bindCurrentMapTilesetPanel()) {
+      mapPropertyPanel.createTileset();
+    }
+  }
+
+  static void removeSelectedMapTileset(TilesetTabsPanel panel) {
+    if (bindCurrentMapTilesetPanel()) {
+      mapPropertyPanel.removeSelectedTileset(panel.getSelectedTileset());
+    }
+  }
+
+  private static boolean bindCurrentMapTilesetPanel() {
+    if (mapPropertyPanel == null || Game.world().environment() == null || Game.world().environment().getMap() == null) {
+      return false;
+    }
+    mapPropertyPanel.bind(Game.world().environment().getMap());
+    return true;
+  }
+
   public static void showLayerProperties(ILayer layer) {
     if (layerPropertyPanel == null) {
       return;
@@ -195,8 +227,7 @@ public final class UI {
 
     if (layer instanceof ITileLayer) {
       tileLayerPropertyPanel.bind(layer);
-      Tileset tileset = activeMapTileset();
-      tileLayerTilesetEditorPanel.bind(tileset);
+      tileLayerTilesetEditorPanel.bind(Game.world().environment().getMap());
       if (inspectorCards != null && inspectorHost != null) {
         inspectorCards.show(inspectorHost, "tileLayers");
         activeInspectorCard = "tileLayers";
@@ -227,7 +258,8 @@ public final class UI {
     if (tileLayerTilesetEditorPanel == null) {
       return;
     }
-    tileLayerTilesetEditorPanel.bind(tileset);
+    tileLayerTilesetEditorPanel.bind(Game.world().environment().getMap());
+    tileLayerTilesetEditorPanel.select(tileset);
     if (inspectorCards != null && inspectorHost != null) {
       inspectorCards.show(inspectorHost, "tileLayers");
       activeInspectorCard = "tileLayers";
@@ -368,12 +400,11 @@ public final class UI {
     tileLayerPropertyPanel.setMinimumSize(new Dimension(INSPECTOR_MIN_WIDTH, 0));
     tilesetEditorPanel = new TilesetEditorPanel();
     tilesetEditorPanel.setMinimumSize(new Dimension(INSPECTOR_MIN_WIDTH, 0));
-    tileLayerTilesetEditorPanel = new TilesetEditorPanel();
+    tileLayerTilesetEditorPanel = new TilesetTabsPanel();
     tileLayerTilesetEditorPanel.setMinimumSize(new Dimension(INSPECTOR_MIN_WIDTH, 0));
-    JSplitPane tileLayerInspector = new JSplitPane(JSplitPane.VERTICAL_SPLIT, tileLayerPropertyPanel, tileLayerTilesetEditorPanel);
-    configureSplitPane(tileLayerInspector);
-    tileLayerInspector.setResizeWeight(0.35);
-    tileLayerInspector.setDividerLocation(260);
+    ExpandableCard tileLayerTilesets = tileLayerPropertyPanel.addSection("Tilesets", tileLayerTilesetEditorPanel, true);
+    tileLayerTilesets.setFillsAvailableHeight(true);
+    tileLayerTilesets.setHeaderTrailing(tileLayerTilesetEditorPanel.getCommands());
     spriteEditorPanel = new SpriteEditorPanel();
     spriteEditorPanel.setMinimumSize(new Dimension(INSPECTOR_MIN_WIDTH, 0));
     inspectorCards = new CardLayout();
@@ -382,7 +413,7 @@ public final class UI {
     inspectorHost.add(mapPropertyPanel, "map");
     inspectorHost.add(layerPropertyPanel, "layers");
     inspectorHost.add(tilesetEditorPanel, "tilesets");
-    inspectorHost.add(tileLayerInspector, "tileLayers");
+    inspectorHost.add(tileLayerPropertyPanel, "tileLayers");
     inspectorHost.add(spriteEditorPanel, "sprites");
     inspectorHost.setMinimumSize(new Dimension(INSPECTOR_MIN_WIDTH, 0));
 

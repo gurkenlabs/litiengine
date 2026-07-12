@@ -4,14 +4,24 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.StaticShadow;
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
+import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.MapImage;
 import de.gurkenlabs.litiengine.graphics.AmbientLight;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.ControlBehavior;
 import de.gurkenlabs.utiliti.controller.UndoManager;
+import de.gurkenlabs.utiliti.controller.Editor;
+import de.gurkenlabs.utiliti.controller.tool.AssetTransferable;
 import de.gurkenlabs.utiliti.model.Style;
+import de.gurkenlabs.utiliti.model.Icons;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.GridLayout;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
+import java.io.File;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.FontMetrics;
@@ -21,6 +31,7 @@ import java.awt.event.FocusEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.LinkedHashMap;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -35,6 +46,14 @@ import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JTabbedPane;
+import javax.swing.JPopupMenu;
+import javax.swing.JMenuItem;
+import javax.swing.TransferHandler;
+import javax.swing.JCheckBox;
+import javax.swing.JFileChooser;
+import javax.swing.JColorChooser;
+import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
@@ -56,6 +75,8 @@ public class MapPropertyPanel extends JPanel {
   private final JTextField textFieldTitle;
   private final JTable tableCustomProperties;
   private final DefaultTableModel model;
+  private JTabbedPane tilesetTabs;
+  private final TilesetTabsPanel tilesetPanel;
 
   private transient IMap dataSource;
   private boolean binding;
@@ -65,6 +86,7 @@ public class MapPropertyPanel extends JPanel {
     setLayout(new BorderLayout());
     setOpaque(true);
     setBackground(Style.COLOR_BG);
+    this.tilesetPanel = new TilesetTabsPanel();
 
     this.textFieldName = ControlBehavior.apply(new JTextField());
     this.textFieldTitle = ControlBehavior.apply(new JTextField());
@@ -131,19 +153,24 @@ public class MapPropertyPanel extends JPanel {
     accordion.setBackground(Style.COLOR_BG);
     accordion.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
 
-    this.generalCard = new ExpandableCard(Resources.strings().get("panel_general"), createGeneralPanel(scrollPaneDesc), true);
+    this.generalCard = new ExpandableCard(Resources.strings().get("panel_general"), createGeneralPanel(scrollPaneDesc), false);
     ExpandableCard lightingCard =
-        new ExpandableCard("Lighting", createLightingPanel(), true);
+        new ExpandableCard("Lighting", createLightingPanel(), false);
     ExpandableCard propertiesCard =
-        new ExpandableCard(Resources.strings().get("panel_customProperties"), createPropertiesPanel(buttonAdd, buttonRemove), true);
+        new ExpandableCard(Resources.strings().get("panel_customProperties"), createPropertiesPanel(buttonAdd, buttonRemove), false);
 
     this.generalCard.setContentInsets(8, 0, 8, 0);
     lightingCard.setContentInsets(8, 0, 8, 0);
     propertiesCard.setContentInsets(8, 0, 8, 0);
+    ExpandableCard tilesetsCard = new ExpandableCard("Tilesets", createTilesetsPanel(), true);
+    tilesetsCard.setContentInsets(8, 0, 8, 0);
+    tilesetsCard.setFillsAvailableHeight(true);
+    tilesetsCard.setHeaderTrailing(this.tilesetPanel.getCommands());
 
     accordion.add(this.generalCard);
     accordion.add(lightingCard);
     accordion.add(propertiesCard);
+    accordion.add(tilesetsCard);
 
     JScrollPane hostScrollPane = new JScrollPane(accordion);
     hostScrollPane.setBorder(null);
@@ -152,6 +179,54 @@ public class MapPropertyPanel extends JPanel {
     add(hostScrollPane, BorderLayout.CENTER);
 
     this.setupChangeListeners();
+  }
+
+  private JPanel createTilesetsPanel() {
+    return this.tilesetPanel;
+  }
+
+  private JPanel createTilesetCommands() {
+    JPanel commands = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
+    commands.setOpaque(false);
+    this.tilesetTabs = new JTabbedPane();
+    this.tilesetTabs.setTransferHandler(new TransferHandler() {
+      @Override public boolean canImport(TransferSupport support) {
+        return support.isDataFlavorSupported(AssetTransferable.ASSET_FLAVOR);
+      }
+
+      @Override public boolean importData(TransferSupport support) {
+        try {
+          Object asset = support.getTransferable().getTransferData(AssetTransferable.ASSET_FLAVOR);
+          if (asset instanceof Tileset tileset) {
+            addTileset(tileset);
+            return true;
+          }
+        } catch (Exception ignored) {
+          // Invalid drops leave the map unchanged.
+        }
+        return false;
+      }
+    });
+    JButton add = Style.iconButton(Icons.ADD_16);
+    add.setToolTipText("Add a project tileset to this map");
+    add.addActionListener(e -> showAddTilesetMenu(add));
+    JButton addAll = Style.iconButton(Icons.COPY_16);
+    addAll.setToolTipText("Add all project tilesets to this map");
+    addAll.addActionListener(e -> addAllTilesets());
+    JButton create = Style.iconButton(Icons.ASSET_16);
+    create.setToolTipText("Create a new tileset and add it to this map");
+    create.addActionListener(e -> createTileset());
+    JButton remove = Style.iconButton(Icons.DELETE_16);
+    remove.setToolTipText("Remove the selected tileset from this map only");
+    remove.addActionListener(e -> removeSelectedTileset(this.tilesetPanel.getSelectedTileset()));
+    JLabel hint = new JLabel("Map tilesets");
+    hint.setForeground(Style.COLOR_SUBTEXT);
+    commands.add(hint);
+    commands.add(add);
+    commands.add(addAll);
+    commands.add(create);
+    commands.add(remove);
+    return commands;
   }
 
   private JPanel createGeneralPanel(JComponent scrollPaneDesc) {
@@ -339,6 +414,176 @@ public class MapPropertyPanel extends JPanel {
     this.setControlValues(map);
     String mapName = map.getName() != null && !map.getName().isBlank() ? map.getName() : "Unnamed map";
     this.generalCard.setTitle(Resources.strings().get("panel_general") + "  ·  " + mapName);
+    refreshTilesets();
+  }
+
+  private void refreshTilesets() {
+    this.tilesetPanel.bind(this.dataSource);
+  }
+
+  void showAddTilesetMenu(JButton owner) {
+    if (Editor.instance().getGameFile() == null) {
+      return;
+    }
+    JPopupMenu menu = new JPopupMenu();
+    for (Tileset tileset : availableTilesets()) {
+      if (this.dataSource != null && this.dataSource.getTilesets().stream()
+          .anyMatch(existing -> java.util.Objects.equals(existing.getName(), tileset.getName()))) {
+        continue;
+      }
+      JMenuItem item = new JMenuItem(tileset.getName());
+      item.addActionListener(e -> addTileset(tileset));
+      menu.add(item);
+    }
+    if (menu.getComponentCount() == 0) {
+      JMenuItem empty = new JMenuItem("All project tilesets are already assigned");
+      empty.setEnabled(false);
+      menu.add(empty);
+    }
+    menu.show(owner, 0, owner.getHeight());
+  }
+
+  private void addTileset(Tileset tileset) {
+    if (this.dataSource == null || this.dataSource.getTilesets().stream()
+        .anyMatch(existing -> java.util.Objects.equals(existing.getName(), tileset.getName()))) {
+      return;
+    }
+    UndoManager.instance().mapChanging(this.dataSource);
+    this.dataSource.getTilesets().add(tileset);
+    UndoManager.instance().mapChanged(this.dataSource);
+    refreshTilesets();
+  }
+
+  void addAllTilesets() {
+    for (Tileset tileset : availableTilesets()) {
+      addTileset(tileset);
+    }
+  }
+
+  private List<Tileset> availableTilesets() {
+    if (Editor.instance().getGameFile() == null) {
+      return List.of();
+    }
+    java.util.Map<String, Tileset> tilesets = new LinkedHashMap<>();
+    for (Tileset tileset : Editor.instance().getGameFile().getTilesets()) {
+      tilesets.putIfAbsent(tileset.getName(), tileset);
+    }
+    for (var map : Editor.instance().getGameFile().getMaps()) {
+      for (ITileset tileset : map.getTilesets()) {
+        if (tileset instanceof Tileset editableTileset) {
+          tilesets.putIfAbsent(editableTileset.getName(), editableTileset);
+        }
+      }
+    }
+    return new ArrayList<>(tilesets.values());
+  }
+
+  void createTileset() {
+    if (Editor.instance().getGameFile() == null) {
+      return;
+    }
+    JTextField nameField = new JTextField("New Tileset");
+    JTextField sourceField = new JTextField();
+    JSpinner width = new JSpinner(new SpinnerNumberModel(16, 1, 4096, 1));
+    JSpinner height = new JSpinner(new SpinnerNumberModel(16, 1, 4096, 1));
+    JSpinner margin = new JSpinner(new SpinnerNumberModel(0, 0, 4096, 1));
+    JSpinner spacing = new JSpinner(new SpinnerNumberModel(0, 0, 4096, 1));
+    JCheckBox transparent = new JCheckBox("Transparent color");
+    JButton color = new JButton("Choose color");
+    final Color[] transparentColor = {null};
+    color.setEnabled(false);
+    transparent.addActionListener(e -> color.setEnabled(transparent.isSelected()));
+    color.addActionListener(e -> transparentColor[0] = JColorChooser.showDialog(this, "Transparent color", transparentColor[0]));
+    JButton browse = new JButton("Browse...");
+    browse.addActionListener(e -> {
+      JFileChooser chooser = new JFileChooser();
+      if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+        File image = chooser.getSelectedFile();
+        sourceField.setText(image.getAbsolutePath());
+        try {
+          BufferedImage bufferedImage = ImageIO.read(image);
+          if (bufferedImage != null) {
+            // Keep the setup values valid for the selected image by default.
+            width.setValue(Math.min(16, bufferedImage.getWidth()));
+            height.setValue(Math.min(16, bufferedImage.getHeight()));
+          }
+        } catch (Exception ignored) {
+          // The source remains editable if the image cannot be inspected here.
+        }
+      }
+    });
+    JPanel imageRow = new JPanel(new BorderLayout(4, 0));
+    imageRow.add(sourceField, BorderLayout.CENTER);
+    imageRow.add(browse, BorderLayout.EAST);
+    JPanel form = new JPanel(new GridLayout(0, 2, 6, 6));
+    form.add(new JLabel("Name")); form.add(nameField);
+    form.add(new JLabel("Image source")); form.add(imageRow);
+    form.add(new JLabel("Tile width")); form.add(width);
+    form.add(new JLabel("Tile height")); form.add(height);
+    form.add(new JLabel("Margin")); form.add(margin);
+    form.add(new JLabel("Spacing")); form.add(spacing);
+    form.add(transparent); form.add(color);
+    if (JOptionPane.showConfirmDialog(this, form, "New Tileset", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE) != JOptionPane.OK_OPTION) {
+      return;
+    }
+    Tileset tileset = new Tileset();
+    String baseName = "New Tileset";
+    int suffix = 1;
+    String name = baseName;
+    boolean exists = true;
+    while (exists) {
+      exists = false;
+      for (Tileset existing : Editor.instance().getGameFile().getTilesets()) {
+        if (name.equals(existing.getName())) {
+          exists = true;
+          break;
+        }
+      }
+      if (!exists) {
+        break;
+      }
+      suffix++;
+      name = baseName + " " + suffix;
+    }
+    tileset.setName(name);
+    int tileWidth = (int) width.getValue();
+    int tileHeight = (int) height.getValue();
+    int tileMargin = (int) margin.getValue();
+    int tileSpacing = (int) spacing.getValue();
+    tileset.setTileWidth(tileWidth);
+    tileset.setTileHeight(tileHeight);
+    tileset.setMargin(tileMargin);
+    tileset.setSpacing(tileSpacing);
+    MapImage mapImage = new MapImage();
+    mapImage.setSource(sourceField.getText().trim());
+    mapImage.setTransparentColor(transparent.isSelected() ? transparentColor[0] : null);
+    tileset.setImage(mapImage);
+    try {
+      BufferedImage image = ImageIO.read(new File(mapImage.getSource()));
+      if (image != null) {
+        mapImage.setWidth(image.getWidth());
+        mapImage.setHeight(image.getHeight());
+        int columns = Math.max(1, (image.getWidth() - tileMargin * 2 + tileSpacing) / (tileWidth + tileSpacing));
+        int rows = Math.max(0, (image.getHeight() - tileMargin * 2 + tileSpacing) / (tileHeight + tileSpacing));
+        tileset.setColumns(columns);
+        tileset.setTileCount(columns * rows);
+      }
+    } catch (Exception ignored) {
+      tileset.setColumns(1);
+      tileset.setTileCount(0);
+    }
+    Editor.instance().getGameFile().getTilesets().add(tileset);
+    addTileset(tileset);
+  }
+
+  void removeSelectedTileset(Tileset selectedTileset) {
+    if (this.dataSource == null || selectedTileset == null) {
+      return;
+    }
+    UndoManager.instance().mapChanging(this.dataSource);
+    this.dataSource.getTilesets().remove(selectedTileset);
+    UndoManager.instance().mapChanged(this.dataSource);
+    refreshTilesets();
   }
 
   public void saveChanges() {

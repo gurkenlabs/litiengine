@@ -14,6 +14,7 @@ import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.utiliti.controller.UndoManager;
 import de.gurkenlabs.utiliti.controller.tool.ToolManager;
 import de.gurkenlabs.utiliti.model.Style;
+import de.gurkenlabs.utiliti.model.Icons;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -67,6 +68,8 @@ public class TilesetEditorPanel extends JPanel {
   private final DefaultTableModel animationModel;
   private final JTable animationTable;
   private final TileGrid tileGrid;
+  private final JScrollPane gridScroll;
+  private final JLabel zoomLabel;
   private final Timer animationTimer;
   private Tileset tileset;
   private boolean binding;
@@ -112,7 +115,6 @@ public class TilesetEditorPanel extends JPanel {
 
     JPanel tilesetControls = new JPanel(new BorderLayout(0, 6));
     tilesetControls.setOpaque(false);
-    tilesetControls.add(info, BorderLayout.NORTH);
     tilesetControls.add(namePanel, BorderLayout.CENTER);
     JPanel lowerTilesetControls = new JPanel(new BorderLayout(0, 6));
     lowerTilesetControls.setOpaque(false);
@@ -123,10 +125,30 @@ public class TilesetEditorPanel extends JPanel {
 
     this.tileGrid = new TileGrid();
     this.tileGrid.setSelectionChanged(this::updateSelectedTileControls);
-    JScrollPane gridScroll = new JScrollPane(this.tileGrid);
-    gridScroll.setBorder(BorderFactory.createLineBorder(Style.COLOR_BORDER));
-    gridScroll.getViewport().setBackground(Style.COLOR_SURFACE);
-    add(gridScroll, BorderLayout.CENTER);
+    this.gridScroll = new JScrollPane(this.tileGrid);
+    this.gridScroll.setBorder(BorderFactory.createLineBorder(Style.COLOR_BORDER));
+    this.gridScroll.getViewport().setBackground(Style.COLOR_SURFACE);
+    JButton zoomOut = Style.iconButton(Icons.MINUS_16);
+    JButton zoomIn = Style.iconButton(Icons.ADD_16);
+    JButton fit = Style.iconButton(Icons.FIT_16);
+    this.zoomLabel = new JLabel();
+    zoomOut.addActionListener(e -> setGridZoom(this.tileGrid.zoom * 0.8f));
+    zoomIn.addActionListener(e -> setGridZoom(this.tileGrid.zoom * 1.25f));
+    fit.addActionListener(e -> fitGrid());
+    zoomOut.setToolTipText("Zoom out");
+    zoomIn.setToolTipText("Zoom in");
+    fit.setToolTipText("Fit tileset");
+    JPanel zoomControls = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 4, 0));
+    zoomControls.setOpaque(false);
+    zoomControls.add(zoomOut);
+    zoomControls.add(this.zoomLabel);
+    zoomControls.add(zoomIn);
+    zoomControls.add(fit);
+    JPanel gridPanel = new JPanel(new BorderLayout(0, 4));
+    gridPanel.setOpaque(false);
+    gridPanel.add(zoomControls, BorderLayout.NORTH);
+    gridPanel.add(this.gridScroll, BorderLayout.CENTER);
+    add(gridPanel, BorderLayout.CENTER);
 
     this.previewLabel = new JLabel("", SwingConstants.CENTER);
     this.previewLabel.setOpaque(true);
@@ -190,11 +212,13 @@ public class TilesetEditorPanel extends JPanel {
 
     this.animationTimer = new Timer(80, _ -> updateSelectedTilePreview());
     this.animationTimer.start();
+    updateZoomLabel();
   }
 
   public void bind(Tileset tileset) {
     this.tileset = tileset;
     this.tileGrid.bind(tileset);
+    javax.swing.SwingUtilities.invokeLater(this::fitGrid);
     publishSelectedTile();
     if (tileset == null) {
       this.titleLabel.setText("No tileset selected");
@@ -208,12 +232,36 @@ public class TilesetEditorPanel extends JPanel {
     String source = tileset.getImage() != null ? tileset.getImage().getSource() : "No image";
     this.metaLabel.setText(
       source + "  •  " + tileset.getTileWidth() + "x" + tileset.getTileHeight()
-        + "  •  " + tileset.getTileCount() + " tiles  •  " + tileset.getColumns() + " columns"
-        + "  •  spacing " + tileset.getSpacing() + "  •  margin " + tileset.getMargin()
-        + "  •  " + (tileset.isExternal() ? "external" : "embedded")
-        + "  •  terrain sets " + (tileset.getTerrainSets() != null ? tileset.getTerrainSets().size() : 0));
+        + "  •  " + tileset.getTileCount() + " tiles");
     bindTilesetControls();
     updateSelectedTileControls();
+  }
+
+  Tileset getTileset() {
+    return this.tileset;
+  }
+
+  private void setGridZoom(float zoom) {
+    this.tileGrid.zoom = Math.max(0.25f, Math.min(4f, zoom));
+    this.tileGrid.revalidate();
+    this.tileGrid.repaint();
+    updateZoomLabel();
+  }
+
+  private void fitGrid() {
+    if (this.tileset == null || this.tileset.getTileCount() <= 0 || this.gridScroll.getViewport().getWidth() <= 0) {
+      return;
+    }
+    int columns = this.tileset.getColumns();
+    if (columns <= 0) {
+      return;
+    }
+    int baseCell = Math.max(this.tileset.getTileWidth(), this.tileset.getTileHeight()) + TileGrid.CELL_PADDING * 2;
+    setGridZoom((float) this.gridScroll.getViewport().getWidth() / (columns * baseCell));
+  }
+
+  private void updateZoomLabel() {
+    this.zoomLabel.setText(Math.round(this.tileGrid.zoom * 100) + "%");
   }
 
   int getSelectedTileIdForTest() {
@@ -682,6 +730,7 @@ public class TilesetEditorPanel extends JPanel {
     private Tileset tileset;
     private int selectedTile = -1;
     private Runnable selectionChanged;
+    private float zoom = 1f;
 
     private TileGrid() {
       setOpaque(true);
@@ -817,7 +866,7 @@ public class TilesetEditorPanel extends JPanel {
       if (this.tileset == null) {
         return 32;
       }
-      return Math.max(MIN_CELL_SIZE, Math.max(this.tileset.getTileWidth(), this.tileset.getTileHeight()) + CELL_PADDING * 2);
+      return Math.max(8, Math.round((Math.max(this.tileset.getTileWidth(), this.tileset.getTileHeight()) + CELL_PADDING * 2) * this.zoom));
     }
 
     private int columns() {

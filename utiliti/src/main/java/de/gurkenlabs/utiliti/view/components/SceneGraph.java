@@ -8,6 +8,7 @@ import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.tilemap.IGroupLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ILayer;
+import de.gurkenlabs.litiengine.environment.tilemap.ILayerList;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
@@ -105,7 +106,10 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
   private final JButton btnAddLayer;
   private final JButton btnAddTileLayer;
   private final JButton btnRemoveLayer;
+  private final JButton btnRaiseLayer;
+  private final JButton btnLowerLayer;
   private final JButton btnTilesets;
+  private final JToggleButton btnShowAllLayers;
   private final JButton btnCollapse;
   private final JButton btnDuplicateLayer;
   private final JButton btnMore;
@@ -118,6 +122,8 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
   private final JScrollPane treeScroll;
   private final DefaultTreeModel treeModel;
   private final DefaultMutableTreeNode nodeRoot;
+  private final JTextField renameField;
+  private SceneNode renamedNode;
 
   private boolean isFocussing;
   private boolean refreshing;
@@ -140,9 +146,10 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     this.searchPanel.setOpaque(false);
     this.searchPanel.setBorder(BorderFactory.createEmptyBorder(7, 8, 3, 8));
 
-    this.btnAddLayer = createToolButton(Icons.ADD_24);
-    this.btnAddLayer.setToolTipText("Add Object Layer");
-    this.btnAddLayer.addActionListener(e -> addLayer(getSelectedOrLastLayerNode()));
+    this.btnAddLayer = createToolButton(new AddDropdownIcon(Icons.ADD_24));
+    this.btnAddLayer.setPreferredSize(new Dimension(44, 28));
+    this.btnAddLayer.setToolTipText("Add Layer");
+    this.btnAddLayer.addActionListener(e -> showAddLayerMenu(this.btnAddLayer));
 
     this.btnAddTileLayer = createToolButton(Icons.TILESET_24);
     this.btnAddTileLayer.setToolTipText("Add Tile Layer");
@@ -157,9 +164,38 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
       }
     });
 
+    this.btnRaiseLayer = createToolButton(Icons.LIFT_24);
+    this.btnRaiseLayer.setToolTipText("Raise Layer");
+    this.btnRaiseLayer.addActionListener(e -> {
+      SceneNode node = getSelectedLayerNode();
+      if (node != null) {
+        moveLayerUp(node);
+      }
+    });
+
+    this.btnLowerLayer = createToolButton(Icons.LOWER_24);
+    this.btnLowerLayer.setToolTipText("Lower Layer");
+    this.btnLowerLayer.addActionListener(e -> {
+      SceneNode node = getSelectedLayerNode();
+      if (node != null) {
+        moveLayerDown(node);
+      }
+    });
+
     this.btnTilesets = createToolButton(Icons.SPRITESHEET_24);
     this.btnTilesets.setToolTipText("Select Map Tileset");
     this.btnTilesets.addActionListener(e -> showTilesetMenu(this.btnTilesets));
+
+    this.btnShowAllLayers = Style.iconToggleButton(Icons.HIDEOTHER_24, false);
+    this.btnShowAllLayers.setToolTipText("Hide Other Layers");
+    this.btnShowAllLayers.addActionListener(e -> {
+      SceneNode node = getSelectedLayerNode();
+      if (this.btnShowAllLayers.isSelected() && node != null) {
+        hideOtherLayers(node);
+      } else {
+        setAllLayersVisible(true);
+      }
+    });
 
     this.btnCollapse = Style.iconButton(Icons.COLLAPSE_24);
     this.btnCollapse.setToolTipText("Collapse All");
@@ -220,12 +256,6 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     });
 
     this.searchPanel.add(searchBox, BorderLayout.CENTER);
-    JPanel actions = new JPanel(new FlowLayout(FlowLayout.TRAILING, 2, 0));
-    actions.setOpaque(false);
-    actions.add(this.btnTilesets);
-    actions.add(this.btnAddTileLayer);
-    actions.add(this.btnRemoveLayer);
-    this.searchPanel.add(actions, BorderLayout.EAST);
 
     this.chipPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 3, 2));
     this.chipPanel.setOpaque(false);
@@ -257,6 +287,16 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     this.tree.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 0));
     this.tree.setRootVisible(false);
     this.tree.setShowsRootHandles(true);
+    this.tree.setToggleClickCount(0);
+    this.tree.setDropMode(javax.swing.DropMode.ON);
+    this.renameField = new JTextField();
+    this.renameField.addActionListener(e -> commitRename());
+    this.renameField.addFocusListener(new java.awt.event.FocusAdapter() {
+      @Override
+      public void focusLost(java.awt.event.FocusEvent e) {
+        commitRename();
+      }
+    });
     this.tree.setCellRenderer(new SceneGraphRenderer());
     this.tree.setRowHeight((int) (26 * Editor.preferences().getUiScale()));
     this.tree.setBackground(Style.COLOR_BG);
@@ -284,14 +324,18 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
               syncLayerSelection(node);
               Editor.instance().getMapComponent().setFocus(null, true);
               UI.showLayerProperties(node.getLayer());
+            } else if (node.isMap()) {
+              Editor.instance().getMapComponent().setFocus(null, true);
+              UI.showMapProperties();
             } else if (node.getMapObject() != null) {
               Editor.instance().getMapComponent().setFocus(node.getMapObject(), true);
             }
           }
         }
-      } finally {
-        this.isFocussing = false;
-      }
+        } finally {
+          this.isFocussing = false;
+        }
+        updateLayerCommandState();
     });
 
     this.tree.addTreeExpansionListener(new javax.swing.event.TreeExpansionListener() {
@@ -350,11 +394,21 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
         }
 
         if (e.getClickCount() == 2) {
-          Editor.instance().getMapComponent().centerCameraOnFocus();
+          beginRename(path);
         }
       }
     };
     this.tree.addMouseListener(ml);
+    this.tree.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0), "renameSceneNode");
+    this.tree.getActionMap().put("renameSceneNode", new javax.swing.AbstractAction() {
+      @Override
+      public void actionPerformed(java.awt.event.ActionEvent e) {
+        TreePath selection = tree.getSelectionPath();
+        if (selection != null) {
+          beginRename(selection);
+        }
+      }
+    });
     this.tree.addMouseMotionListener(new MouseMotionAdapter() {
       @Override
       public void mouseMoved(MouseEvent e) {
@@ -402,6 +456,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     treeScroll.getVerticalScrollBar().setUnitIncrement(tree.getRowHeight());
     this.add(treeScroll, BorderLayout.CENTER);
     this.add(topPanel, BorderLayout.NORTH);
+    this.add(createLayerCommandStrip(), BorderLayout.SOUTH);
 
     Editor.instance().getMapComponent().onMapLoaded(map -> {
       this.refresh();
@@ -426,21 +481,39 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
 
   private void showHeaderMenu(Component owner) {
     JPopupMenu popup = new JPopupMenu();
-    addContextMenuItem(popup, "Add Layer", Icons.ADD_24, () -> addLayer(getSelectedOrLastLayerNode()));
-    addContextMenuItem(popup, "Duplicate Layer", Icons.COPY_24, () -> {
-      SceneNode node = getSelectedLayerNode();
-      if (node != null) {
-        duplicateLayer(node);
-      }
-    });
-    popup.addSeparator();
-    addContextMenuItem(popup, "Show All Layers", Icons.SHOW_24, this::showAllLayers);
+    addContextMenuItem(popup, "Show All Layers", Icons.SHOW_24, () -> setAllLayersVisible(true));
     addContextMenuItem(popup, "Collapse All", Icons.COLLAPSE_24, this::collapseAll);
     popup.show(owner, 0, owner.getHeight());
   }
 
   private JButton createToolButton(Icon icon) {
     return Style.iconButton(icon);
+  }
+
+  private JPanel createLayerCommandStrip() {
+    JPanel commands = new JPanel(new FlowLayout(FlowLayout.LEADING, 4, 4));
+    commands.setOpaque(true);
+    commands.setBackground(Style.COLOR_SURFACE);
+    commands.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Style.COLOR_BORDER));
+    commands.add(this.btnAddLayer);
+    commands.add(this.btnRaiseLayer);
+    commands.add(this.btnLowerLayer);
+    commands.add(this.btnDuplicateLayer);
+    commands.add(this.btnRemoveLayer);
+    commands.add(javax.swing.Box.createHorizontalStrut(8));
+    commands.add(this.btnShowAllLayers);
+    commands.add(this.btnTilesets);
+    return commands;
+  }
+
+  private void showAddLayerMenu(Component anchor) {
+    JPopupMenu popup = new JPopupMenu();
+    SceneNode afterNode = getSelectedOrLastLayerNode();
+    addContextMenuItem(popup, "Tile Layer", Icons.TILESET_16, () -> addTileLayer(afterNode));
+    addContextMenuItem(popup, "Object Layer", Icons.LAYER_16, () -> addLayer(afterNode));
+    addContextMenuItem(popup, "Image Layer", Icons.ASSET_16, () -> addImageLayer(afterNode));
+    addContextMenuItem(popup, "Group", Icons.GROUP_16, () -> addGroup(afterNode));
+    popup.show(anchor, 0, anchor.getHeight());
   }
 
   private JToggleButton createFilterButton(FilterChip chip) {
@@ -512,7 +585,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
         Object pathComponent = path.getLastPathComponent();
         if (!(pathComponent instanceof DefaultMutableTreeNode dmtn)
             || !(dmtn.getUserObject() instanceof SceneNode node)
-            || node.isSection()) {
+            || node.isSection() || node.isMap()) {
           continue;
         }
         Rectangle bounds = this.tree.getRowBounds(row);
@@ -554,26 +627,20 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
       return;
     }
 
-    for (int i = 0; i < nodeRoot.getChildCount(); i++) {
-      DefaultMutableTreeNode layerNode = (DefaultMutableTreeNode) nodeRoot.getChildAt(i);
-      if (!(layerNode.getUserObject() instanceof SceneNode sn) || !sn.isLayer()) {
+    Enumeration<?> nodes = this.nodeRoot.depthFirstEnumeration();
+    while (nodes.hasMoreElements()) {
+      Object candidate = nodes.nextElement();
+      if (!(candidate instanceof DefaultMutableTreeNode treeNode)
+          || !(treeNode.getUserObject() instanceof SceneNode node)
+          || node.getMapObject() == null
+          || node.getMapObject().getId() != mapObject.getId()) {
         continue;
       }
-      if (sn.getLayer() != mapObject.getLayer()) {
-        continue;
-      }
-      for (int j = 0; j < layerNode.getChildCount(); j++) {
-        DefaultMutableTreeNode child = (DefaultMutableTreeNode) layerNode.getChildAt(j);
-        if (child.getUserObject() instanceof SceneNode childNode
-            && childNode.getMapObject() != null
-            && childNode.getMapObject().getId() == mapObject.getId()) {
-          TreePath path = new TreePath(child.getPath());
-          tree.setSelectionPath(path);
-          tree.scrollPathToVisible(path);
-          treeScroll.getHorizontalScrollBar().setValue(0);
-          return;
-        }
-      }
+      TreePath path = new TreePath(treeNode.getPath());
+      tree.setSelectionPath(path);
+      tree.scrollPathToVisible(path);
+      treeScroll.getHorizontalScrollBar().setValue(0);
+      return;
     }
   }
 
@@ -625,38 +692,17 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
       }
 
       IMap map = env.getMap();
+      DefaultMutableTreeNode mapNode = new DefaultMutableTreeNode(new SceneNode(map));
+      this.nodeRoot.add(mapNode);
       for (ILayer layer : map.getRenderLayers()) {
-        if (layer == null) {
-          continue;
+        DefaultMutableTreeNode layerNode = createLayerTreeNode(layer, env);
+        if (layerNode != null) {
+          mapNode.add(layerNode);
         }
-
-        DefaultMutableTreeNode layerNode = createLayerNode(layer);
-        boolean includeLayer = shouldIncludeLayer(layer, null);
-
-        if (layer instanceof IMapObjectLayer objLayer) {
-          List<IMapObject> objects = new ArrayList<>(objLayer.getMapObjects());
-          objects.sort((a, b) -> Integer.compare(a.getId(), b.getId()));
-          for (IMapObject obj : objects) {
-            if (obj == null) {
-              continue;
-            }
-            IEntity entity = env.get(obj.getId());
-            if (entity instanceof Entity ent && shouldIncludeObject(obj, entity)) {
-              DefaultMutableTreeNode objNode = new DefaultMutableTreeNode(
-                  new SceneNode(obj, entity));
-              layerNode.add(objNode);
-            }
-          }
-        }
-
-        if (!includeLayer && layerNode.getChildCount() == 0) {
-          continue;
-        }
-
-        this.nodeRoot.add(layerNode);
       }
 
       this.treeModel.reload();
+      this.tree.expandPath(new TreePath(mapNode.getPath()));
       restoreExpansionState(map.getName());
 
       // select focused object first so we don't flash the layers card
@@ -674,9 +720,38 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
           }
         }
       }
+      updateLayerCommandState();
     } finally {
       this.refreshing = false;
     }
+  }
+
+  private void focusLayer(ILayer layer) {
+    refresh();
+    if (layer == null) {
+      return;
+    }
+    DefaultMutableTreeNode target = findLayerNode(layer);
+    if (target != null) {
+      tree.setSelectionPath(new TreePath(target.getPath()));
+    }
+  }
+
+  private void updateLayerCommandState() {
+    IMap map = getCurrentMap();
+    SceneNode node = getSelectedLayerNode();
+    boolean hasLayer = map != null && node != null && node.getLayer() != null;
+    ILayerList parent = hasLayer ? getParentLayerList(map, node.getLayer()) : null;
+    int index = parent != null ? parent.getRenderLayers().indexOf(node.getLayer()) : -1;
+    this.btnRaiseLayer.setEnabled(hasLayer && index > 0);
+    this.btnLowerLayer.setEnabled(hasLayer && index >= 0 && index < parent.getRenderLayers().size() - 1);
+    this.btnDuplicateLayer.setEnabled(hasLayer);
+    this.btnRemoveLayer.setEnabled(hasLayer);
+    this.btnTilesets.setEnabled(map != null && !map.getTilesets().isEmpty());
+    boolean isolated = hasLayer && isLayerIsolated(map, node.getLayer());
+    this.btnShowAllLayers.setEnabled(hasLayer);
+    this.btnShowAllLayers.setSelected(isolated);
+    this.btnShowAllLayers.setToolTipText(isolated ? "Show All Layers" : "Hide Other Layers");
   }
 
   @Override
@@ -754,14 +829,36 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     if (renderIndex < 0) {
       return null;
     }
-    int current = 0;
-    for (int i = 0; i < this.nodeRoot.getChildCount(); i++) {
-      DefaultMutableTreeNode child = (DefaultMutableTreeNode) this.nodeRoot.getChildAt(i);
-      if (child.getUserObject() instanceof SceneNode node && node.isLayer()) {
-        if (current == renderIndex) {
-          return child;
+    IMap map = getCurrentMap();
+    if (map == null || renderIndex >= map.getRenderLayers().size()) {
+      return null;
+    }
+    return findLayerNode(map.getRenderLayers().get(renderIndex));
+  }
+
+  private DefaultMutableTreeNode findLayerNode(ILayer layer) {
+    Enumeration<?> nodes = this.nodeRoot.depthFirstEnumeration();
+    while (nodes.hasMoreElements()) {
+      Object candidate = nodes.nextElement();
+      if (candidate instanceof DefaultMutableTreeNode treeNode
+          && treeNode.getUserObject() instanceof SceneNode node
+          && node.getLayer() == layer) {
+        return treeNode;
+      }
+    }
+    return null;
+  }
+
+  private ILayerList getParentLayerList(ILayerList parent, ILayer layer) {
+    if (parent.getRenderLayers().contains(layer)) {
+      return parent;
+    }
+    for (ILayer candidate : parent.getRenderLayers()) {
+      if (candidate instanceof IGroupLayer group) {
+        ILayerList result = getParentLayerList(group, layer);
+        if (result != null) {
+          return result;
         }
-        current++;
       }
     }
     return null;
@@ -819,6 +916,36 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     SceneNode node = new SceneNode(name, icon, layer, visible, objCount);
     DefaultMutableTreeNode treeNode = new DefaultMutableTreeNode(node);
     return treeNode;
+  }
+
+  private DefaultMutableTreeNode createLayerTreeNode(ILayer layer, Environment env) {
+    if (layer == null) {
+      return null;
+    }
+
+    DefaultMutableTreeNode layerNode = createLayerNode(layer);
+    if (layer instanceof IGroupLayer group) {
+      for (ILayer child : group.getRenderLayers()) {
+        DefaultMutableTreeNode childNode = createLayerTreeNode(child, env);
+        if (childNode != null) {
+          layerNode.add(childNode);
+        }
+      }
+    } else if (layer instanceof IMapObjectLayer objLayer) {
+      List<IMapObject> objects = new ArrayList<>(objLayer.getMapObjects());
+      objects.sort((a, b) -> Integer.compare(a.getId(), b.getId()));
+      for (IMapObject obj : objects) {
+        if (obj == null) {
+          continue;
+        }
+        IEntity entity = env.get(obj.getId());
+        if (entity instanceof Entity ent && shouldIncludeObject(obj, entity)) {
+          layerNode.add(new DefaultMutableTreeNode(new SceneNode(obj, entity)));
+        }
+      }
+    }
+
+    return shouldIncludeLayer(layer, null) || layerNode.getChildCount() > 0 ? layerNode : null;
   }
 
   private boolean shouldIncludeLayer(ILayer layer, String queryOverride) {
@@ -964,7 +1091,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     } else if (layer instanceof IImageLayer) {
       return Icons.ASSET_16;
     } else if (layer instanceof IGroupLayer) {
-      return Icons.LAYER_16;
+      return Icons.GROUP_16;
     } else if (layer instanceof IMapObjectLayer) {
       return Icons.LAYER_16;
     }
@@ -1078,19 +1205,11 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     }
 
     JPopupMenu popup = new JPopupMenu();
-    addContextMenuItem(popup, "Add Layer", Icons.ADD_24, () -> addLayer(node));
-    addContextMenuItem(popup, "Remove Layer", Icons.DELETE_24, () -> removeLayer(node));
-    addContextMenuItem(popup, "Duplicate Layer", Icons.COPY_24, () -> duplicateLayer(node));
-    popup.addSeparator();
     String toggleLabel = node.isVisible() ? "Hide Layer" : "Show Layer";
     Icon toggleIcon = node.isVisible() ? Icons.HIDE_24 : Icons.SHOW_24;
     addContextMenuItem(popup, toggleLabel, toggleIcon, () -> toggleLayerVisibility(node));
-    addContextMenuItem(popup, "Show All Layers", Icons.SHOW_24, () -> showAllLayers());
+    addContextMenuItem(popup, "Show All Layers", Icons.SHOW_24, () -> setAllLayersVisible(true));
     addContextMenuItem(popup, "Hide Other Layers", Icons.HIDEOTHER_24, () -> hideOtherLayers(node));
-    popup.addSeparator();
-    addContextMenuItem(popup, "Move Up", Icons.LIFT_24, () -> moveLayerUp(node));
-    addContextMenuItem(popup, "Move Down", Icons.LOWER_24, () -> moveLayerDown(node));
-
     popup.show(tree, e.getX(), e.getY());
   }
 
@@ -1132,6 +1251,66 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     popup.add(item);
   }
 
+  private void beginRename(TreePath path) {
+    if (!(path.getLastPathComponent() instanceof DefaultMutableTreeNode treeNode)
+        || !(treeNode.getUserObject() instanceof SceneNode node)
+        || node.isSection()) {
+      return;
+    }
+    commitRename();
+    Rectangle bounds = this.tree.getPathBounds(path);
+    if (bounds == null) {
+      return;
+    }
+    this.renamedNode = node;
+    this.renameField.setText(node.isMap() ? node.getMap().getName() : node.isLayer() ? node.getLayer().getName() : node.getMapObject().getName());
+    Rectangle visible = this.tree.getVisibleRect();
+    int nameX = bounds.x + (node.isLayer() ? 48 : 26);
+    int nameWidth = Math.max(1, visible.x + visible.width - nameX - 36);
+    this.renameField.setBounds(nameX, bounds.y + 2, nameWidth, Math.max(1, bounds.height - 4));
+    this.tree.add(this.renameField);
+    this.tree.setComponentZOrder(this.renameField, 0);
+    this.renameField.setVisible(true);
+    this.tree.revalidate();
+    this.tree.repaint();
+    javax.swing.SwingUtilities.invokeLater(() -> {
+      this.renameField.requestFocusInWindow();
+      this.renameField.selectAll();
+    });
+  }
+
+  private void commitRename() {
+    if (this.renamedNode == null) {
+      return;
+    }
+    SceneNode node = this.renamedNode;
+    this.renamedNode = null;
+    this.renameField.setVisible(false);
+    this.tree.remove(this.renameField);
+    String name = this.renameField.getText();
+    String currentName = node.isMap() ? node.getMap().getName() : node.isLayer() ? node.getLayer().getName() : node.getMapObject().getName();
+    if (java.util.Objects.equals(name, currentName)) {
+      return;
+    }
+    if (node.isMap()) {
+      UndoManager.instance().mapChanging(node.getMap());
+      node.getMap().setName(name);
+      UndoManager.instance().mapChanged(node.getMap());
+      fireLayerChanged();
+    } else if (node.isLayer()) {
+      node.getLayer().setName(name);
+      fireLayerChanged();
+    } else {
+      node.getMapObject().setName(name);
+      if (node.getEntity() != null) {
+        node.getEntity().setName(name);
+      }
+      UI.getInspector().bind(node.getMapObject());
+    }
+    UndoManager.instance().recordChanges();
+    refresh();
+  }
+
   private void addLayer(SceneNode afterNode) {
     IMap map = getCurrentMap();
     if (map == null) {
@@ -1140,10 +1319,40 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer layer =
         new de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer();
     layer.setName("new layer");
-    int absIdx = afterNode != null ? getAbsoluteIndex(map, afterNode) : map.getRenderLayers().size() - 1;
+    addLayer(map, layer, afterNode);
+  }
+
+  private void addGroup(SceneNode afterNode) {
+    IMap map = getCurrentMap();
+    if (map == null) {
+      return;
+    }
+    de.gurkenlabs.litiengine.environment.tilemap.xml.GroupLayer group = new de.gurkenlabs.litiengine.environment.tilemap.xml.GroupLayer();
+    group.setName("Group");
+    addLayer(map, group, afterNode);
+  }
+
+  private void addImageLayer(SceneNode afterNode) {
+    IMap map = getCurrentMap();
+    if (map == null) {
+      return;
+    }
+    de.gurkenlabs.litiengine.environment.tilemap.xml.ImageLayer layer = new de.gurkenlabs.litiengine.environment.tilemap.xml.ImageLayer();
+    layer.setName("Image Layer");
+    addLayer(map, layer, afterNode);
+  }
+
+  private void addLayer(IMap map, ILayer layer, SceneNode afterNode) {
+    ILayerList parent = afterNode != null && afterNode.getLayer() instanceof IGroupLayer group
+        ? group : afterNode != null ? getParentLayerList(map, afterNode.getLayer()) : map;
+    if (parent == null) {
+      parent = map;
+    }
+    int absIdx = afterNode != null && parent.getRenderLayers().contains(afterNode.getLayer())
+        ? parent.getRenderLayers().indexOf(afterNode.getLayer()) : parent.getRenderLayers().size() - 1;
     UndoManager.instance().layerStructureChanging(map);
-    map.addLayer(absIdx + 1, layer);
-    refresh();
+    parent.addLayer(absIdx + 1, layer);
+    focusLayer(layer);
     UndoManager.instance().layerStructureChanged(map);
     fireLayerStructureChanged();
   }
@@ -1156,13 +1365,8 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     de.gurkenlabs.litiengine.environment.tilemap.xml.TileLayer layer =
       new de.gurkenlabs.litiengine.environment.tilemap.xml.TileLayer(map.getWidth(), map.getHeight());
     layer.setName("Tile Layer");
-    int absIdx = afterNode != null ? getAbsoluteIndex(map, afterNode) : map.getRenderLayers().size() - 1;
-    UndoManager.instance().layerStructureChanging(map);
-    map.addLayer(absIdx + 1, layer);
+    addLayer(map, layer, afterNode);
     ToolManager.instance().setActiveTileLayer(layer);
-    refresh();
-    UndoManager.instance().layerStructureChanged(map);
-    fireLayerStructureChanged();
   }
 
   private void removeLayer(SceneNode node) {
@@ -1170,12 +1374,20 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     if (map == null || node.getLayer() == null) {
       return;
     }
-    int index = map.getRenderLayers().indexOf(node.getLayer());
+    ILayerList parent = getParentLayerList(map, node.getLayer());
+    if (parent == null) {
+      return;
+    }
+    int index = parent.getRenderLayers().indexOf(node.getLayer());
     ILayer copy;
     if (node.getLayer() instanceof de.gurkenlabs.litiengine.environment.tilemap.xml.TileLayer tileLayer) {
       copy = new de.gurkenlabs.litiengine.environment.tilemap.xml.TileLayer(tileLayer);
     } else if (node.getLayer() instanceof de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer mapObjectLayer) {
       copy = new de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer(mapObjectLayer);
+    } else if (node.getLayer() instanceof de.gurkenlabs.litiengine.environment.tilemap.xml.ImageLayer imageLayer) {
+      copy = new de.gurkenlabs.litiengine.environment.tilemap.xml.ImageLayer(imageLayer);
+    } else if (node.getLayer() instanceof de.gurkenlabs.litiengine.environment.tilemap.xml.GroupLayer groupLayer) {
+      copy = new de.gurkenlabs.litiengine.environment.tilemap.xml.GroupLayer(groupLayer);
     } else {
       return;
     }
@@ -1184,9 +1396,9 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     if (node.getLayer() instanceof IMapObjectLayer mapObjectLayer) {
       Editor.instance().getMapComponent().delete(mapObjectLayer);
     }
-    map.removeLayer(node.getLayer());
+    parent.removeLayer(node.getLayer());
     ToolManager.instance().setActiveTileLayer(null);
-    refresh();
+    focusLayer(index > 0 ? parent.getRenderLayers().get(index - 1) : parent.getRenderLayers().isEmpty() ? null : parent.getRenderLayers().getFirst());
     UndoManager.instance().layerStructureChanged(map);
     fireLayerStructureChanged();
 
@@ -1194,7 +1406,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
         this.getRootPane(),
         Resources.strings().get("panel_layerDeleted"),
         () -> {
-          map.addLayer(index, copy);
+          parent.addLayer(index, copy);
           this.refresh();
           if (copy instanceof IMapObjectLayer mapObjectLayer) {
             Editor.instance().getMapComponent().add(mapObjectLayer);
@@ -1229,17 +1441,29 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     if (map == null || node.getLayer() == null) {
       return;
     }
-    if (!(node.getLayer() instanceof IMapObjectLayer)) {
+    ILayer copied;
+    if (node.getLayer() instanceof de.gurkenlabs.litiengine.environment.tilemap.xml.TileLayer tileLayer) {
+      copied = new de.gurkenlabs.litiengine.environment.tilemap.xml.TileLayer(tileLayer);
+    } else if (node.getLayer() instanceof de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer mapObjectLayer) {
+      copied = new de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer(mapObjectLayer);
+    } else if (node.getLayer() instanceof de.gurkenlabs.litiengine.environment.tilemap.xml.ImageLayer imageLayer) {
+      copied = new de.gurkenlabs.litiengine.environment.tilemap.xml.ImageLayer(imageLayer);
+    } else if (node.getLayer() instanceof de.gurkenlabs.litiengine.environment.tilemap.xml.GroupLayer groupLayer) {
+      copied = new de.gurkenlabs.litiengine.environment.tilemap.xml.GroupLayer(groupLayer);
+    } else {
       return;
     }
-    de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer copied =
-        new de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer(
-            (de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer) node.getLayer());
-    int absIdx = getAbsoluteIndex(map, node);
+    ILayerList parent = getParentLayerList(map, node.getLayer());
+    if (parent == null) {
+      return;
+    }
+    int absIdx = parent.getRenderLayers().indexOf(node.getLayer());
     UndoManager.instance().layerStructureChanging(map);
-    map.addLayer(absIdx + 1, copied);
-    refresh();
-    Editor.instance().getMapComponent().add(copied);
+    parent.addLayer(absIdx + 1, copied);
+    focusLayer(copied);
+    if (copied instanceof IMapObjectLayer mapObjectLayer) {
+      Editor.instance().getMapComponent().add(mapObjectLayer);
+    }
     UndoManager.instance().layerStructureChanged(map);
     fireLayerStructureChanged();
   }
@@ -1249,19 +1473,66 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     if (map == null || node.getLayer() == null) {
       return;
     }
-    for (ILayer renderLayer : map.getRenderLayers()) {
-      if (renderLayer instanceof IMapObjectLayer objLayer) {
-        if (objLayer != node.getLayer()) {
-          objLayer.setVisible(false);
-        } else if (!objLayer.isVisible()) {
-          objLayer.setVisible(true);
-        }
-      }
-    }
+    setLayerVisibility(map, node.getLayer());
     Transform.updateAnchors();
     refresh();
     UndoManager.instance().recordChanges();
     fireLayerChanged();
+  }
+
+  private void setLayerVisibility(ILayerList parent, ILayer visibleLayer) {
+    for (ILayer layer : parent.getRenderLayers()) {
+      if (layer == visibleLayer) {
+        layer.setVisible(true);
+        if (layer instanceof IGroupLayer group) {
+          setAllLayersVisible(group, true);
+        }
+      } else if (layer instanceof IGroupLayer group && containsLayer(group, visibleLayer)) {
+        layer.setVisible(true);
+        setLayerVisibility(group, visibleLayer);
+      } else {
+        layer.setVisible(false);
+        if (layer instanceof IGroupLayer group) {
+          setAllLayersVisible(group, false);
+        }
+      }
+    }
+  }
+
+  private boolean containsLayer(ILayerList parent, ILayer layer) {
+    for (ILayer candidate : parent.getRenderLayers()) {
+      if (candidate == layer || candidate instanceof IGroupLayer group && containsLayer(group, layer)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private boolean isLayerIsolated(ILayerList parent, ILayer visibleLayer) {
+    for (ILayer layer : parent.getRenderLayers()) {
+      if (layer == visibleLayer) {
+        return layer.isVisible() && (!(layer instanceof IGroupLayer group) || allLayersVisible(group));
+      }
+      if (layer instanceof IGroupLayer group && containsLayer(group, visibleLayer)) {
+        if (!layer.isVisible()) {
+          return false;
+        }
+        return isLayerIsolated(group, visibleLayer);
+      }
+      if (layer.isVisible()) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private boolean allLayersVisible(ILayerList parent) {
+    for (ILayer layer : parent.getRenderLayers()) {
+      if (!layer.isVisible() || layer instanceof IGroupLayer group && !allLayersVisible(group)) {
+        return false;
+      }
+    }
+    return true;
   }
 
   private void toggleLayerVisibility(SceneNode node) {
@@ -1274,17 +1545,25 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     fireLayerChanged();
   }
 
-  private void showAllLayers() {
+  private void setAllLayersVisible(boolean visible) {
     IMap map = getCurrentMap();
     if (map == null) {
       return;
     }
-    for (ILayer renderLayer : map.getRenderLayers()) {
-      renderLayer.setVisible(true);
-    }
+    setAllLayersVisible(map, visible);
     refresh();
     UndoManager.instance().recordChanges();
     fireLayerChanged();
+    updateLayerCommandState();
+  }
+
+  private void setAllLayersVisible(ILayerList parent, boolean visible) {
+    for (ILayer layer : parent.getRenderLayers()) {
+      layer.setVisible(visible);
+      if (layer instanceof IGroupLayer group) {
+        setAllLayersVisible(group, visible);
+      }
+    }
   }
 
   private void moveLayerUp(SceneNode node) {
@@ -1292,14 +1571,18 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     if (map == null || node.getLayer() == null) {
       return;
     }
-    int absIdx = getAbsoluteIndex(map, node);
+    ILayerList parent = getParentLayerList(map, node.getLayer());
+    if (parent == null) {
+      return;
+    }
+    int absIdx = parent.getRenderLayers().indexOf(node.getLayer());
     if (absIdx <= 0) {
       return;
     }
     UndoManager.instance().layerStructureChanging(map);
-    map.removeLayer(node.getLayer());
-    map.addLayer(absIdx - 1, node.getLayer());
-    refresh();
+    parent.removeLayer(node.getLayer());
+    parent.addLayer(absIdx - 1, node.getLayer());
+    focusLayer(node.getLayer());
     UndoManager.instance().layerStructureChanged(map);
     fireLayerStructureChanged();
   }
@@ -1309,14 +1592,18 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     if (map == null || node.getLayer() == null) {
       return;
     }
-    int absIdx = getAbsoluteIndex(map, node);
-    if (absIdx >= map.getRenderLayers().size() - 1) {
+    ILayerList parent = getParentLayerList(map, node.getLayer());
+    if (parent == null) {
+      return;
+    }
+    int absIdx = parent.getRenderLayers().indexOf(node.getLayer());
+    if (absIdx >= parent.getRenderLayers().size() - 1) {
       return;
     }
     UndoManager.instance().layerStructureChanging(map);
-    map.removeLayer(node.getLayer());
-    map.addLayer(absIdx + 1, node.getLayer());
-    refresh();
+    parent.removeLayer(node.getLayer());
+    parent.addLayer(absIdx + 1, node.getLayer());
+    focusLayer(node.getLayer());
     UndoManager.instance().layerStructureChanged(map);
     fireLayerStructureChanged();
   }
@@ -1377,6 +1664,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     private final String name;
     private final Icon icon;
     private final ILayer layer;
+    private final IMap map;
     private final IMapObject mapObject;
     private final IEntity entity;
     private final boolean visible;
@@ -1387,6 +1675,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
       this.name = name;
       this.icon = icon;
       this.layer = layer;
+      this.map = null;
       this.mapObject = null;
       this.entity = null;
       this.visible = visible;
@@ -1398,6 +1687,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
       this.name = getEntityLabel(entity);
       this.icon = null;
       this.layer = null;
+      this.map = null;
       this.mapObject = mapObject;
       this.entity = entity;
       this.visible = true;
@@ -1409,11 +1699,24 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
       this.name = sectionName;
       this.icon = null;
       this.layer = null;
+      this.map = null;
       this.mapObject = null;
       this.entity = null;
       this.visible = true;
       this.objectCount = 0;
       this.section = true;
+    }
+
+    SceneNode(IMap map) {
+      this.name = map.getName() == null || map.getName().isBlank() ? "Map" : map.getName();
+      this.icon = Icons.MAP_16;
+      this.layer = null;
+      this.map = map;
+      this.mapObject = null;
+      this.entity = null;
+      this.visible = true;
+      this.objectCount = 0;
+      this.section = false;
     }
 
     static SceneNode section(String sectionName) {
@@ -1426,6 +1729,14 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
 
     public boolean isLayer() {
       return this.layer != null;
+    }
+
+    public boolean isMap() {
+      return this.map != null;
+    }
+
+    public IMap getMap() {
+      return this.map;
     }
 
     public String getName() {
@@ -1582,11 +1893,10 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
         }
 
         if (draggedNode.isLayer() && draggedNode.getLayer() != null) {
-          // layer reorder
           if (draggedNode.getLayer() == targetNode.getLayer()) {
             return false;
           }
-          return reorderLayer(draggedNode.getLayer(), targetNode.getLayer(), support.getComponent());
+          return moveLayer(draggedNode.getLayer(), targetNode.getLayer(), support.getComponent());
         } else if (!draggedNode.isLayer() && draggedNode.getMapObject() != null) {
           // map object move to layer
           IMapObject draggedObj = draggedNode.getMapObject();
@@ -1611,31 +1921,34 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
       }
     }
 
-    private static boolean reorderLayer(ILayer dragged, ILayer target, Component treeComponent) {
+    private static boolean moveLayer(ILayer dragged, ILayer target, Component treeComponent) {
       IMap map = Game.world().environment().getMap();
       if (map == null) {
         return false;
       }
-      List<ILayer> layers = new ArrayList<>(map.getRenderLayers());
-      int dragIdx = layers.indexOf(dragged);
-      int targetIdx = layers.indexOf(target);
-      if (dragIdx < 0 || targetIdx < 0 || dragIdx == targetIdx) {
+      if (dragged instanceof IGroupLayer group && containsLayer(group, target)) {
         return false;
       }
 
+      ILayerList source = getParentLayerList(map, dragged);
+      ILayerList destination = target instanceof IGroupLayer group ? group : getParentLayerList(map, target);
+      if (source == null || destination == null) {
+        return false;
+      }
+
+      int sourceIndex = source.getRenderLayers().indexOf(dragged);
+      int targetIndex = destination.getRenderLayers().indexOf(target);
+
       UndoManager.instance().beginOperation();
       try {
-        map.removeLayer(dragged);
-        // recompute target index after removal
-        List<ILayer> afterRemove = new ArrayList<>(map.getRenderLayers());
-        int newTargetIdx = afterRemove.indexOf(target);
-        if (newTargetIdx < 0) {
-          newTargetIdx = afterRemove.size();
-        }
-        if (dragIdx < targetIdx) {
-          map.addLayer(newTargetIdx + 1, dragged);
+        source.removeLayer(dragged);
+        if (target instanceof IGroupLayer) {
+          destination.addLayer(dragged);
         } else {
-          map.addLayer(newTargetIdx, dragged);
+          if (source == destination && sourceIndex < targetIndex) {
+            targetIndex--;
+          }
+          destination.addLayer(targetIndex, dragged);
         }
       } finally {
         UndoManager.instance().endOperation();
@@ -1648,6 +1961,30 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
         graph.fireLayerStructureChanged();
       }
       return true;
+    }
+
+    private static ILayerList getParentLayerList(ILayerList parent, ILayer layer) {
+      if (parent.getRenderLayers().contains(layer)) {
+        return parent;
+      }
+      for (ILayer candidate : parent.getRenderLayers()) {
+        if (candidate instanceof IGroupLayer group) {
+          ILayerList result = getParentLayerList(group, layer);
+          if (result != null) {
+            return result;
+          }
+        }
+      }
+      return null;
+    }
+
+    private static boolean containsLayer(ILayerList parent, ILayer layer) {
+      for (ILayer candidate : parent.getRenderLayers()) {
+        if (candidate == layer || candidate instanceof IGroupLayer group && containsLayer(group, layer)) {
+          return true;
+        }
+      }
+      return false;
     }
 
     private static void moveMapObjectToLayer(IMapObject mapObject, IMapObjectLayer targetLayer) {
@@ -1697,6 +2034,35 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     @Override
     public Object getTransferData(DataFlavor flavor) {
       return node;
+    }
+  }
+
+  private static final class AddDropdownIcon implements Icon {
+    private final Icon primary;
+
+    private AddDropdownIcon(Icon primary) {
+      this.primary = primary;
+    }
+
+    @Override
+    public int getIconWidth() {
+      return this.primary.getIconWidth() + 10;
+    }
+
+    @Override
+    public int getIconHeight() {
+      return Math.max(this.primary.getIconHeight(), 16);
+    }
+
+    @Override
+    public void paintIcon(Component component, Graphics graphics, int x, int y) {
+      this.primary.paintIcon(component, graphics, x, y + (getIconHeight() - this.primary.getIconHeight()) / 2);
+      Graphics2D g2 = (Graphics2D) graphics.create();
+      g2.setColor(component.isEnabled() ? Style.COLOR_TEXT : Style.COLOR_DISABLED_TEXT);
+      int arrowX = x + this.primary.getIconWidth() + 3;
+      int arrowY = y + getIconHeight() / 2 - 2;
+      g2.fillPolygon(new int[] {arrowX, arrowX + 6, arrowX + 3}, new int[] {arrowY, arrowY, arrowY + 5}, 3);
+      g2.dispose();
     }
   }
 }

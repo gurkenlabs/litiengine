@@ -32,6 +32,7 @@ public class ExpandableCard extends JPanel {
   private final JLabel titleLabel;
   private final JPanel headerPanel;
   private boolean expanded;
+  private boolean fillsAvailableHeight;
 
   public ExpandableCard(String title, JComponent content) {
     this(title, content, true);
@@ -98,7 +99,18 @@ public class ExpandableCard extends JPanel {
   @Override
   public Dimension getMaximumSize() {
     Dimension pref = getPreferredSize();
-    return new Dimension(Integer.MAX_VALUE, pref.height);
+    return new Dimension(Integer.MAX_VALUE, this.fillsAvailableHeight ? Integer.MAX_VALUE : pref.height);
+  }
+
+  public void setFillsAvailableHeight(boolean fillsAvailableHeight) {
+    this.fillsAvailableHeight = fillsAvailableHeight;
+    revalidate();
+  }
+
+  public void setHeaderTrailing(Component component) {
+    this.headerPanel.add(component, BorderLayout.EAST);
+    this.headerPanel.revalidate();
+    this.headerPanel.repaint();
   }
 
   @Override

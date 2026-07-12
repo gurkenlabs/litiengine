@@ -50,6 +50,7 @@ public class LayerPropertyPanel extends JPanel {
   private final JLabel labelLayerColor;
   private final JTable tableCustomProperties;
   private final DefaultTableModel model;
+  private final JPanel accordion;
   private final JScrollPane scrollPane;
   private final ExpandableCard generalCard;
 
@@ -102,33 +103,41 @@ public class LayerPropertyPanel extends JPanel {
       this.saveChanges();
     });
 
-    JPanel accordion = new JPanel();
-    accordion.setLayout(new BoxLayout(accordion, BoxLayout.Y_AXIS));
-    accordion.setOpaque(true);
-    accordion.setBackground(Style.COLOR_BG);
-    accordion.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
+    this.accordion = new JPanel();
+    this.accordion.setLayout(new BoxLayout(this.accordion, BoxLayout.Y_AXIS));
+    this.accordion.setOpaque(true);
+    this.accordion.setBackground(Style.COLOR_BG);
+    this.accordion.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
 
-    this.generalCard = new ExpandableCard("General", createGeneralPanel(), true);
+    this.generalCard = new ExpandableCard("General", createGeneralPanel(), false);
     ExpandableCard renderingCard =
-        new ExpandableCard("Rendering", createRenderingPanel(), true);
+        new ExpandableCard("Rendering", createRenderingPanel(), false);
     ExpandableCard propertiesCard =
-        new ExpandableCard("Custom Properties", createPropertiesPanel(buttonAdd, buttonRemove), true);
+        new ExpandableCard("Custom Properties", createPropertiesPanel(buttonAdd, buttonRemove), false);
 
     this.generalCard.setContentInsets(8, 0, 8, 0);
     renderingCard.setContentInsets(8, 0, 8, 0);
     propertiesCard.setContentInsets(8, 0, 8, 0);
 
-    accordion.add(this.generalCard);
-    accordion.add(renderingCard);
-    accordion.add(propertiesCard);
+    this.accordion.add(this.generalCard);
+    this.accordion.add(renderingCard);
+    this.accordion.add(propertiesCard);
 
-    JScrollPane hostScrollPane = new JScrollPane(accordion);
+    JScrollPane hostScrollPane = new JScrollPane(this.accordion);
     hostScrollPane.setBorder(null);
     hostScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
     hostScrollPane.getViewport().setBackground(Style.COLOR_BG);
     add(hostScrollPane, BorderLayout.CENTER);
 
     this.setupChangeListeners();
+  }
+
+  ExpandableCard addSection(String title, JComponent content, boolean expanded) {
+    ExpandableCard card = new ExpandableCard(title, content, expanded);
+    card.setContentInsets(8, 0, 8, 0);
+    this.accordion.add(card);
+    this.accordion.revalidate();
+    return card;
   }
 
   private JPanel createGeneralPanel() {

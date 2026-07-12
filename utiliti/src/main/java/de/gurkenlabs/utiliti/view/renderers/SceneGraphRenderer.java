@@ -92,6 +92,8 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
       renderSection(node);
     } else if (node != null && node.isLayer()) {
       renderLayer(node);
+    } else if (node != null && node.isMap()) {
+      renderMap(node);
     } else if (node != null) {
       renderEntity(node);
     }
@@ -143,6 +145,14 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
     this.badgeLabel.setVisible(node.getObjectCount() > 0);
     this.badgeLabel.putClientProperty("badgeKind", BadgeKind.COUNT);
     this.badgeLabel.setText(node.getObjectCount() + " items");
+  }
+
+  private void renderMap(SceneGraph.SceneNode node) {
+    this.visibilityLabel.setVisible(false);
+    this.typeLabel.setIcon(node.getIcon());
+    this.nameLabel.setText(node.getName());
+    this.nameLabel.setFont(this.nameLabel.getFont().deriveFont(java.awt.Font.BOLD));
+    this.badgeLabel.setVisible(false);
   }
 
   private void renderEntity(SceneGraph.SceneNode node) {
