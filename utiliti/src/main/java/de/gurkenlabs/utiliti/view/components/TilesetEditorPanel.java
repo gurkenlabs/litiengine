@@ -12,6 +12,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.TileAnimation;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.utiliti.controller.UndoManager;
+import de.gurkenlabs.utiliti.controller.tool.ToolManager;
 import de.gurkenlabs.utiliti.model.Style;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
@@ -40,22 +41,21 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.table.DefaultTableModel;
 
 public class TilesetEditorPanel extends JPanel {
   private final JLabel titleLabel;
   private final JLabel metaLabel;
   private final JTextField tilesetNameField;
-  private final JTextField objectAlignmentField;
-  private final JTextField tileRenderSizeField;
-  private final JTextField fillModeField;
-  private final JTextField tileOffsetXField;
-  private final JTextField tileOffsetYField;
+  private final JSpinner tileOffsetXSpinner;
+  private final JSpinner tileOffsetYSpinner;
   private final DefaultTableModel tilesetPropertyModel;
   private final JTable tilesetPropertyTable;
   private final JLabel previewLabel;
@@ -97,23 +97,18 @@ public class TilesetEditorPanel extends JPanel {
     });
     JPanel namePanel = labeledField("Name", this.tilesetNameField);
 
-    this.objectAlignmentField = metadataField(this::applyTilesetRenderSettings);
-    this.tileRenderSizeField = metadataField(this::applyTilesetRenderSettings);
-    this.fillModeField = metadataField(this::applyTilesetRenderSettings);
-    this.tileOffsetXField = metadataField(this::applyTilesetRenderSettings);
-    this.tileOffsetYField = metadataField(this::applyTilesetRenderSettings);
-    JPanel renderSettings = new JPanel(new GridLayout(5, 1, 0, 4));
-    renderSettings.setOpaque(false);
-    renderSettings.add(labeledField("Alignment", this.objectAlignmentField));
-    renderSettings.add(labeledField("Render Size", this.tileRenderSizeField));
-    renderSettings.add(labeledField("Fill Mode", this.fillModeField));
-    renderSettings.add(labeledField("Offset X", this.tileOffsetXField));
-    renderSettings.add(labeledField("Offset Y", this.tileOffsetYField));
+    this.tileOffsetXSpinner = new JSpinner(new SpinnerNumberModel(0, -100000, 100000, 1));
+    this.tileOffsetYSpinner = new JSpinner(new SpinnerNumberModel(0, -100000, 100000, 1));
+    this.tileOffsetXSpinner.addChangeListener(_ -> applyTilesetRenderSettings());
+    this.tileOffsetYSpinner.addChangeListener(_ -> applyTilesetRenderSettings());
+    JPanel renderSettings = labeledOffsets();
 
     this.tilesetPropertyModel = createPropertyModel();
     this.tilesetPropertyModel.addTableModelListener(_ -> applyTilesetProperties());
     this.tilesetPropertyTable = createPropertyTable(this.tilesetPropertyModel);
-    JPanel tilesetProperties = createPropertyPanel("Tileset Properties", this.tilesetPropertyTable, this.tilesetPropertyModel);
+    ExpandableCard tilesetProperties = new ExpandableCard("Tileset Properties", createTablePanel(this.tilesetPropertyTable, this.tilesetPropertyModel,
+      () -> this.tilesetPropertyModel.addRow(new Object[] {"", ""})), false);
+    tilesetProperties.setContentInsets(8, 0, 8, 0);
 
     JPanel tilesetControls = new JPanel(new BorderLayout(0, 6));
     tilesetControls.setOpaque(false);
@@ -177,13 +172,17 @@ public class TilesetEditorPanel extends JPanel {
     tileMetadata.add(typePanel);
     tileMetadata.add(probabilityPanel);
     controls.add(tileMetadata, BorderLayout.CENTER);
-    JPanel propertyPanel = createPropertyPanel("Tile Properties", this.tilePropertyTable, this.tilePropertyModel);
-    JPanel animationPanel = createTablePanel(
-      "Tile Animation", this.animationTable, this.animationModel,
-      () -> this.animationModel.addRow(new Object[] {String.valueOf(Math.max(0, this.tileGrid.selectedTile)), "100"}));
-    JPanel lowerTileControls = new JPanel(new GridLayout(2, 1, 0, 6));
+    ExpandableCard propertyPanel = new ExpandableCard("Tile Properties", createTablePanel(this.tilePropertyTable, this.tilePropertyModel,
+      () -> this.tilePropertyModel.addRow(new Object[] {"", ""})), false);
+    propertyPanel.setContentInsets(8, 0, 8, 0);
+    ExpandableCard animationPanel = new ExpandableCard("Tile Animation", createTablePanel(this.animationTable, this.animationModel,
+      () -> this.animationModel.addRow(new Object[] {String.valueOf(Math.max(0, this.tileGrid.selectedTile)), "100"})), false);
+    animationPanel.setContentInsets(8, 0, 8, 0);
+    JPanel lowerTileControls = new JPanel();
+    lowerTileControls.setLayout(new BoxLayout(lowerTileControls, BoxLayout.Y_AXIS));
     lowerTileControls.setOpaque(false);
     lowerTileControls.add(propertyPanel);
+    lowerTileControls.add(javax.swing.Box.createVerticalStrut(6));
     lowerTileControls.add(animationPanel);
     controls.add(lowerTileControls, BorderLayout.SOUTH);
     selectedTilePanel.add(controls, BorderLayout.CENTER);
@@ -196,6 +195,7 @@ public class TilesetEditorPanel extends JPanel {
   public void bind(Tileset tileset) {
     this.tileset = tileset;
     this.tileGrid.bind(tileset);
+    publishSelectedTile();
     if (tileset == null) {
       this.titleLabel.setText("No tileset selected");
       this.metaLabel.setText("Select a tileset asset to inspect its tiles.");
@@ -251,12 +251,9 @@ public class TilesetEditorPanel extends JPanel {
     applyProbability();
   }
 
-  void setTilesetRenderSettingsForTest(String alignment, String renderSize, String fillMode, String offsetX, String offsetY) {
-    this.objectAlignmentField.setText(alignment);
-    this.tileRenderSizeField.setText(renderSize);
-    this.fillModeField.setText(fillMode);
-    this.tileOffsetXField.setText(offsetX);
-    this.tileOffsetYField.setText(offsetY);
+  void setTilesetOffsetsForTest(String offsetX, String offsetY) {
+    this.tileOffsetXSpinner.setValue(Integer.parseInt(offsetX));
+    this.tileOffsetYSpinner.setValue(Integer.parseInt(offsetY));
     applyTilesetRenderSettings();
   }
 
@@ -319,11 +316,36 @@ public class TilesetEditorPanel extends JPanel {
     return panel;
   }
 
-  private JPanel createPropertyPanel(String title, JTable table, DefaultTableModel model) {
-    return createTablePanel(title, table, model, () -> model.addRow(new Object[] {"", ""}));
+  private JPanel labeledOffsets() {
+    JPanel panel = new JPanel(new BorderLayout(6, 0));
+    panel.setOpaque(false);
+    JLabel label = new JLabel("Offset");
+    label.setForeground(Style.COLOR_TEXT);
+    label.setPreferredSize(new Dimension(72, 24));
+    panel.add(label, BorderLayout.WEST);
+
+    JPanel values = new JPanel();
+    values.setOpaque(false);
+    values.setLayout(new BoxLayout(values, BoxLayout.X_AXIS));
+    JLabel xLabel = new JLabel("x");
+    JLabel yLabel = new JLabel("y");
+    xLabel.setForeground(Style.COLOR_SUBTEXT);
+    yLabel.setForeground(Style.COLOR_SUBTEXT);
+    this.tileOffsetXSpinner.setMaximumSize(new Dimension(112, this.tileOffsetXSpinner.getPreferredSize().height));
+    this.tileOffsetYSpinner.setMaximumSize(new Dimension(112, this.tileOffsetYSpinner.getPreferredSize().height));
+    values.add(xLabel);
+    values.add(javax.swing.Box.createHorizontalStrut(4));
+    values.add(this.tileOffsetXSpinner);
+    values.add(javax.swing.Box.createHorizontalStrut(12));
+    values.add(yLabel);
+    values.add(javax.swing.Box.createHorizontalStrut(4));
+    values.add(this.tileOffsetYSpinner);
+    values.add(javax.swing.Box.createHorizontalGlue());
+    panel.add(values, BorderLayout.CENTER);
+    return panel;
   }
 
-  private JPanel createTablePanel(String title, JTable table, DefaultTableModel model, Runnable addAction) {
+  private JPanel createTablePanel(JTable table, DefaultTableModel model, Runnable addAction) {
     JButton addProperty = Style.textButton("+");
     addProperty.addActionListener(_ -> addAction.run());
     JButton removeProperty = Style.textButton("−");
@@ -331,13 +353,10 @@ public class TilesetEditorPanel extends JPanel {
 
     JPanel propertyActions = new JPanel(new BorderLayout(6, 0));
     propertyActions.setOpaque(false);
-    JLabel propertiesLabel = new JLabel(title);
-    propertiesLabel.setForeground(Style.COLOR_TEXT);
     JPanel buttons = new JPanel(new GridLayout(1, 2, 6, 0));
     buttons.setOpaque(false);
     buttons.add(addProperty);
     buttons.add(removeProperty);
-    propertyActions.add(propertiesLabel, BorderLayout.WEST);
     propertyActions.add(buttons, BorderLayout.EAST);
 
     JPanel propertyPanel = new JPanel(new BorderLayout(0, 4));
@@ -354,11 +373,8 @@ public class TilesetEditorPanel extends JPanel {
     this.binding = true;
     try {
       this.tilesetNameField.setText("");
-      this.objectAlignmentField.setText("");
-      this.tileRenderSizeField.setText("");
-      this.fillModeField.setText("");
-      this.tileOffsetXField.setText("");
-      this.tileOffsetYField.setText("");
+      this.tileOffsetXSpinner.setValue(0);
+      this.tileOffsetYSpinner.setValue(0);
       this.tilesetPropertyModel.setRowCount(0);
     } finally {
       this.binding = false;
@@ -369,12 +385,9 @@ public class TilesetEditorPanel extends JPanel {
     this.binding = true;
     try {
       this.tilesetNameField.setText(this.tileset.getName() != null ? this.tileset.getName() : "");
-      this.objectAlignmentField.setText(valueOrEmpty(this.tileset.getObjectalignment()));
-      this.tileRenderSizeField.setText(valueOrEmpty(this.tileset.getTilerendersize()));
-      this.fillModeField.setText(valueOrEmpty(this.tileset.getFillmode()));
       ITileOffset offset = this.tileset.getTileOffset();
-      this.tileOffsetXField.setText(offset != null ? String.valueOf(offset.getX()) : "0");
-      this.tileOffsetYField.setText(offset != null ? String.valueOf(offset.getY()) : "0");
+      this.tileOffsetXSpinner.setValue(offset != null ? offset.getX() : 0);
+      this.tileOffsetYSpinner.setValue(offset != null ? offset.getY() : 0);
       this.tilesetPropertyModel.setRowCount(0);
       for (Map.Entry<String, ICustomProperty> prop : new HashMap<>(this.tileset.getProperties()).entrySet()) {
         this.tilesetPropertyModel.addRow(new Object[] {prop.getKey(), prop.getValue().getAsString()});
@@ -439,6 +452,19 @@ public class TilesetEditorPanel extends JPanel {
     }
 
     updateSelectedTilePreview();
+    publishSelectedTile();
+  }
+
+  private void publishSelectedTile() {
+    if (this.tileset == null || this.tileGrid.selectedTile < 0) {
+      ToolManager.instance().setSelectedTileGid(0);
+      return;
+    }
+    ToolManager.instance().setSelectedTileGid(this.tileset.getFirstGridId() + this.tileGrid.selectedTile);
+    ToolManager.instance().getTools().stream()
+      .filter(tool -> tool instanceof de.gurkenlabs.utiliti.controller.tool.StampBrushTool)
+      .findFirst()
+      .ifPresent(ToolManager.instance()::setActiveTool);
   }
 
   private void updateSelectedTilePreview() {
@@ -536,10 +562,7 @@ public class TilesetEditorPanel extends JPanel {
       return;
     }
     changeTileset(() -> {
-      this.tileset.setObjectalignment(this.objectAlignmentField.getText().trim());
-      this.tileset.setTilerendersize(this.tileRenderSizeField.getText().trim());
-      this.tileset.setFillmode(this.fillModeField.getText().trim());
-      this.tileset.setTileOffset(parseInt(this.tileOffsetXField.getText(), 0), parseInt(this.tileOffsetYField.getText(), 0));
+      this.tileset.setTileOffset((int) this.tileOffsetXSpinner.getValue(), (int) this.tileOffsetYSpinner.getValue());
     });
     bindTilesetControls();
   }

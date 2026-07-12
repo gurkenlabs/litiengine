@@ -51,6 +51,7 @@ public class LayerPropertyPanel extends JPanel {
   private final JTable tableCustomProperties;
   private final DefaultTableModel model;
   private final JScrollPane scrollPane;
+  private final ExpandableCard generalCard;
 
   private transient ILayer dataSource;
   private boolean binding;
@@ -107,18 +108,17 @@ public class LayerPropertyPanel extends JPanel {
     accordion.setBackground(Style.COLOR_BG);
     accordion.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
 
-    ExpandableCard generalCard =
-        new ExpandableCard("General", createGeneralPanel(), true);
+    this.generalCard = new ExpandableCard("General", createGeneralPanel(), true);
     ExpandableCard renderingCard =
         new ExpandableCard("Rendering", createRenderingPanel(), true);
     ExpandableCard propertiesCard =
         new ExpandableCard("Custom Properties", createPropertiesPanel(buttonAdd, buttonRemove), true);
 
-    generalCard.setContentInsets(8, 0, 8, 0);
+    this.generalCard.setContentInsets(8, 0, 8, 0);
     renderingCard.setContentInsets(8, 0, 8, 0);
     propertiesCard.setContentInsets(8, 0, 8, 0);
 
-    accordion.add(generalCard);
+    accordion.add(this.generalCard);
     accordion.add(renderingCard);
     accordion.add(propertiesCard);
 
@@ -313,12 +313,15 @@ public class LayerPropertyPanel extends JPanel {
       }
 
       this.setControlValues(layer);
+      String layerName = layer.getName() != null && !layer.getName().isBlank() ? layer.getName() : "Unnamed layer";
+      this.generalCard.setTitle("General  ·  " + layerName);
     } finally {
       this.binding = false;
     }
   }
 
   public void clearControls() {
+    this.generalCard.setTitle("General");
     this.textFieldName.setText("");
     this.spinnerOpacity.setValue(1.0);
     this.checkBoxVisible.setSelected(true);

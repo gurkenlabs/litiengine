@@ -133,16 +133,13 @@ class TilesetEditorPanelTest {
   }
 
   @Test
-  void tilesetRenderSettingsUpdateTilesetMetadata() throws Exception {
+  void tilesetOffsetControlsUpdateTilesetMetadata() throws Exception {
     Tileset tileset = tileset("world", "tiles/world.png", 4, 2);
     TilesetEditorPanel panel = new TilesetEditorPanel();
     panel.bind(tileset);
 
-    panel.setTilesetRenderSettingsForTest("center", "grid", "preserve-aspect-fit", "3", "-2");
+    panel.setTilesetOffsetsForTest("3", "-2");
 
-    assertEquals("center", tileset.getObjectalignment());
-    assertEquals("grid", tileset.getTilerendersize());
-    assertEquals("preserve-aspect-fit", tileset.getFillmode());
     assertEquals(3, tileset.getTileOffset().getX());
     assertEquals(-2, tileset.getTileOffset().getY());
   }

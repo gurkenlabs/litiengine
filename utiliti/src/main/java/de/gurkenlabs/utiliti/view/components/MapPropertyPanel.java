@@ -47,6 +47,7 @@ public class MapPropertyPanel extends JPanel {
 
   private final AmbientLightPreviewPanel ambientlightPreview;
   private final JScrollPane scrollPane;
+  private final ExpandableCard generalCard;
   private final JSpinner spinnerGravity;
   private final ColorComponent ambientColorComponent;
   private final JTextArea textFieldDesc;
@@ -130,18 +131,17 @@ public class MapPropertyPanel extends JPanel {
     accordion.setBackground(Style.COLOR_BG);
     accordion.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
 
-    ExpandableCard generalCard =
-        new ExpandableCard(Resources.strings().get("panel_general"), createGeneralPanel(scrollPaneDesc), true);
+    this.generalCard = new ExpandableCard(Resources.strings().get("panel_general"), createGeneralPanel(scrollPaneDesc), true);
     ExpandableCard lightingCard =
         new ExpandableCard("Lighting", createLightingPanel(), true);
     ExpandableCard propertiesCard =
         new ExpandableCard(Resources.strings().get("panel_customProperties"), createPropertiesPanel(buttonAdd, buttonRemove), true);
 
-    generalCard.setContentInsets(8, 0, 8, 0);
+    this.generalCard.setContentInsets(8, 0, 8, 0);
     lightingCard.setContentInsets(8, 0, 8, 0);
     propertiesCard.setContentInsets(8, 0, 8, 0);
 
-    accordion.add(generalCard);
+    accordion.add(this.generalCard);
     accordion.add(lightingCard);
     accordion.add(propertiesCard);
 
@@ -337,6 +337,8 @@ public class MapPropertyPanel extends JPanel {
     }
 
     this.setControlValues(map);
+    String mapName = map.getName() != null && !map.getName().isBlank() ? map.getName() : "Unnamed map";
+    this.generalCard.setTitle(Resources.strings().get("panel_general") + "  ·  " + mapName);
   }
 
   public void saveChanges() {
