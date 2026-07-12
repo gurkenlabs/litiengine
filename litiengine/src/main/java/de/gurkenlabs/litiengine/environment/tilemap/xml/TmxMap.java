@@ -279,7 +279,19 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
 
   @Override
   public List<IMapObjectLayer> getMapObjectLayers() {
-    return this.mapObjectLayers;
+    List<IMapObjectLayer> objectLayers = new ArrayList<>();
+    collectMapObjectLayers(this.getRenderLayers(), objectLayers);
+    return objectLayers;
+  }
+
+  private static void collectMapObjectLayers(List<ILayer> layers, List<IMapObjectLayer> objectLayers) {
+    for (ILayer layer : layers) {
+      if (layer instanceof IMapObjectLayer objectLayer) {
+        objectLayers.add(objectLayer);
+      } else if (layer instanceof IGroupLayer group) {
+        collectMapObjectLayers(group.getRenderLayers(), objectLayers);
+      }
+    }
   }
 
   @Override
