@@ -8,6 +8,7 @@ import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.net.URL;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -37,6 +38,37 @@ public class TileLayer extends Layer implements ITileLayer {
    */
   public TileLayer(TileData data) {
     this.data = data;
+  }
+
+  /**
+   * Creates an empty, editable tile layer with the specified dimensions.
+   *
+   * @param width the layer width in tiles
+   * @param height the layer height in tiles
+   */
+  public TileLayer(int width, int height) {
+    if (width < 1 || height < 1) {
+      throw new IllegalArgumentException("Tile layer dimensions must be positive.");
+    }
+    List<Tile> initialTiles = new ArrayList<>(width * height);
+    this.setWidth(width);
+    this.setHeight(height);
+    this.tiles = new Tile[height][width];
+    this.tileList = new CopyOnWriteArrayList<>();
+    for (int y = 0; y < height; y++) {
+      for (int x = 0; x < width; x++) {
+        Tile tile = new Tile(Tile.NONE);
+        tile.setTileCoordinate(new Point(x, y));
+        initialTiles.add(tile);
+        this.tileList.add(tile);
+        this.tiles[y][x] = tile;
+      }
+    }
+    try {
+      this.data = new TileData(initialTiles, width, height, TileData.Encoding.CSV, TileData.Compression.NONE);
+    } catch (TmxException e) {
+      throw new IllegalStateException("Could not create empty tile data.", e);
+    }
   }
 
   /**
@@ -92,18 +124,27 @@ public class TileLayer extends Layer implements ITileLayer {
       return;
     }
 
-    Tile tile = getRawTileData().getTiles().get(x + y * getWidth());
+    int index = x + y * getWidth();
+    Tile tile = getRawTileData().getTiles().get(index);
     if (tile == null) {
       return;
     }
 
-    tile.setGridId(gid);
+    // CSV parsing historically reused Tile.EMPTY for every empty cell. Never mutate that shared sentinel.
+    if (tile == Tile.EMPTY) {
+      tile = new Tile(gid);
+      tile.setTileCoordinate(new Point(x, y));
+      getRawTileData().getTiles().set(index, tile);
+      if (this.tiles != null && y >= 0 && y < this.tiles.length && x >= 0 && x < this.tiles[y].length) {
+        this.tiles[y][x] = tile;
+      }
+    } else {
+      tile.setGridId(gid);
+    }
 
     if (getMap() != null) {
-      ITilesetEntry entry = getMap().getTilesetEntry(gid);
-      if (entry != null) {
-        tile.setTilesetEntry(entry);
-      }
+      // Clearing a tile must also clear its image source. Otherwise undoing an overlay paint leaves the old image visible.
+      tile.setTilesetEntry(gid == Tile.NONE ? null : getMap().getTilesetEntry(gid));
     }
   }
 

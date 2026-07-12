@@ -510,11 +510,7 @@ public class TileData {
       if (tileId > Integer.MAX_VALUE) {
         parsed.add(new Tile(tileId));
       } else {
-        if (tileId == Tile.NONE) {
-          parsed.add(Tile.EMPTY);
-        } else {
-          parsed.add(new Tile(tileId));
-        }
+        parsed.add(new Tile(tileId));
       }
     }
 
