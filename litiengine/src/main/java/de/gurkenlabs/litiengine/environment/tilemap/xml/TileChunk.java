@@ -46,6 +46,10 @@ public class TileChunk implements Comparable<TileChunk> {
     return this.height;
   }
 
+  void setValue(String value) {
+    this.value = value;
+  }
+
   @Override
   public int compareTo(TileChunk o) {
     if (this.getY() != o.getY()) {
