@@ -751,25 +751,25 @@ public class MapComponent extends GuiComponent {
         return;
       }
 
-      UI.getInspector().bind(mapObject);
-      if (mapObject == null) {
-        UI.showMapProperties();
-      } else {
-        UI.showObjectInspector();
-      }
-      UI.getEntityController().select(mapObject);
       if (mapObject == null) {
         this.focusedObjects.remove(Game.world().environment().getMap().getName());
       } else {
         this.focusedObjects.put(Game.world().environment().getMap().getName(), mapObject);
       }
 
+      this.setSelection(mapObject, clearSelection);
+      Transform.updateAnchors();
+      UI.getEntityController().select(mapObject);
+      UI.getInspector().bind(mapObject);
+      if (mapObject == null) {
+        UI.showMapProperties();
+      } else {
+        UI.showObjectInspector();
+      }
+
       for (Consumer<IMapObject> cons : this.focusChangedConsumer) {
         cons.accept(mapObject);
       }
-
-      Transform.updateAnchors();
-      this.setSelection(mapObject, clearSelection);
     } finally {
       isFocussing = false;
     }

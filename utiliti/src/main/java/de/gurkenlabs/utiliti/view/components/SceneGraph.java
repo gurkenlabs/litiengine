@@ -316,7 +316,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
 
     this.tree.addTreeSelectionListener(e -> {
       final Environment env = Game.world().environment();
-      if (env == null) {
+      if (env == null || this.refreshing || this.isFocussing) {
         return;
       }
       this.isFocussing = true;
@@ -712,6 +712,9 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
   }
 
   public void selectMap() {
+    if (this.isFocussing || this.refreshing) {
+      return;
+    }
     for (int i = 0; i < this.nodeRoot.getChildCount(); i++) {
       DefaultMutableTreeNode node = (DefaultMutableTreeNode) this.nodeRoot.getChildAt(i);
       if (node.getUserObject() instanceof SceneNode sceneNode && sceneNode.isMap()) {
@@ -719,7 +722,6 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
         if (!path.equals(this.tree.getSelectionPath())) {
           this.tree.setSelectionPath(path);
         }
-        this.tree.scrollPathToVisible(path);
         return;
       }
     }
@@ -736,9 +738,24 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     this.tree.setSelectionPath(new TreePath(node.getPath()));
   }
 
+  void addMapNodeForTest(IMap map) {
+    this.nodeRoot.add(new DefaultMutableTreeNode(new SceneNode(map)));
+    this.treeModel.reload();
+  }
+
+  ILayer getSelectedLayerForTest() {
+    TreePath path = this.tree.getSelectionPath();
+    if (path != null && path.getLastPathComponent() instanceof DefaultMutableTreeNode node
+        && node.getUserObject() instanceof SceneNode sceneNode) {
+      return sceneNode.getLayer();
+    }
+    return null;
+  }
+
   boolean hasTreeSelectionForTest() {
     return !this.tree.isSelectionEmpty();
   }
+
 
   @Override
   public void refresh(int mapId) {
@@ -835,6 +852,10 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     this.btnShowAllLayers.setToolTipText(isolated ? "Show All Layers" : "Hide Other Layers");
   }
 
+  void refreshLayerCommandState() {
+    updateLayerCommandState();
+  }
+
   @Override
   public IMapObjectLayer getCurrentLayer() {
     if (Game.world().environment() == null || Game.world().environment().getMap() == null) {
@@ -887,12 +908,6 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
       return;
     }
     ToolManager.instance().setActiveTileLayer(node.getLayer() instanceof ITileLayer tileLayer ? tileLayer : null);
-    if (node.getLayer() instanceof ITileLayer && ToolManager.instance().getSelectedTileGid() != 0) {
-      ToolManager.instance().getTools().stream()
-        .filter(tool -> tool instanceof de.gurkenlabs.utiliti.controller.tool.StampBrushTool)
-        .findFirst()
-        .ifPresent(ToolManager.instance()::setActiveTool);
-    }
     int idx = 0;
     for (ILayer renderLayer : map.getRenderLayers()) {
       if (renderLayer == node.getLayer()) {
@@ -929,6 +944,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     }
     return null;
   }
+
 
   private ILayerList getParentLayerList(ILayerList parent, ILayer layer) {
     if (parent.getRenderLayers().contains(layer)) {
