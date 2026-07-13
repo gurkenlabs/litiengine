@@ -34,6 +34,22 @@ class ColorHelperTests {
     assertEquals(expectedColor, colorDecoded);
   }
 
+  @ParameterizedTest
+  @MethodSource("getLegacyColors")
+  void decodesLegacyDecimalAlphaFormat(String value, Color expected) {
+    assertEquals(expected, ColorHelper.decode(value));
+  }
+
+  private static Stream<Arguments> getLegacyColors() {
+    return Stream.of(
+      Arguments.of("#dd190c|49", new Color(0xdd, 0x19, 0x0c, 49)),
+      Arguments.of("#c82010|71", new Color(0xc8, 0x20, 0x10, 71)),
+      Arguments.of("#8b3c01|97", new Color(0x8b, 0x3c, 0x01, 97)),
+      Arguments.of("#000000|40", new Color(0, 0, 0, 40)),
+      Arguments.of("#00d549|255", new Color(0x00, 0xd5, 0x49, 255)),
+      Arguments.of("abbe71|205", new Color(0xab, 0xbe, 0x71, 205)));
+  }
+
   private static Stream<Arguments> getColorFromHexString() {
     return Stream.of(
         Arguments.of("#ff0000", Color.RED),
